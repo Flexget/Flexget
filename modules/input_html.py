@@ -36,9 +36,7 @@ class InputHtml:
         return href[href.rfind("/")+1:]
 
     def run(self, feed):
-        if not soup_present:
-            logging.error(soup_err)
-            return
+        if not soup_present: raise Exception(soup_err)
 
         pageurl = feed.get_input_url('html')
 

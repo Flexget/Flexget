@@ -186,6 +186,8 @@ class RlsLog:
         return releases
 
     def run(self, feed):
+        if not soup_present: raise Exception(soup_err)
+
         url_cache = feed.global_session.setdefault('rlslog_url_cache', {})
 
         releases = self.parse_rlslog(feed.get_input_url('rlslog'))
