@@ -183,7 +183,7 @@ class Manager:
             yaml.safe_dump(self.session, f) # safe_dump removes !!python/unicode which fails to load
             f.close()
         except Exception, e:
-            logging.error("Failed to save session data (%s)!" % e)
+            logging.exception("Failed to save session data (%s)!" % e)
         
     def load_modules(self, parser):
         """Load all modules"""
@@ -205,7 +205,7 @@ class Manager:
                 try:
                     method(self)
                 except RegisterException, e:
-                    logging.error("Error while registering %s. %s" % (module, e.value))
+                    logging.exception("Error while registering %s. %s" % (module, e.value))
                     continue
             else:
                 logging.error("Module %s does not have required required method register" % module)
@@ -332,12 +332,7 @@ class Manager:
                 try:
                     feed.execute()
                 except Exception, e:
-                    logging.error("Feed %s: %s" % (feed.name, e))
-                    if self.options.debug:
-                        import traceback
-                        print '-'*60
-                        traceback.print_exc(file=sys.stdout)
-                        print '-'*60                            
+                    logging.exception("Feed %s: %s" % (feed.name, e))
                     continue
         finally:
             if not self.options.test:
@@ -379,6 +374,7 @@ class Feed:
         purged = 0
         for filtered in self.__filtered:
             try:
+                logging.debug("Purging entry '%s'" % (filtered['title']))
                 self.entries.remove(filtered)
                 purged += 1
             except ValueError, e:
@@ -387,16 +383,17 @@ class Feed:
         if purged>0:
             logging.debug('Purged %i filtered entries' % purged)
         self.__filtered = []
+        return purged
 
     def filter(self, entry):
         """Mark entry to be filtered"""
-        logging.debug("Entry '%s' filtered" % (entry['title']))
+#        logging.debug("Entry '%s' filtered" % (entry['title']))
         self.__filtered.append(entry)
 
     def unfilter(self, entry):
         """Undoes filter command for entry"""
         if entry in self.__filtered:
-            logging.debug("Entry '%s' unfiltered" % (entry['title']))
+#            logging.debug("Entry '%s' unfiltered" % (entry['title']))
             self.__filtered.remove(entry)
 
     def failed(self, entry):
@@ -457,12 +454,7 @@ class Feed:
                 try:
                     module['callback'](self)
                 except Exception, e:
-                    logging.error("Module %s: %s" % (module['keyword'], e))
-                    if self.manager.options.debug:
-                        import traceback
-                        print '-'*60
-                        traceback.print_exc(file=sys.stdout)
-                        print '-'*60
+                    logging.exception("Module %s: %s" % (module['keyword'], e))
 
     def execute(self):
         """Execute this feed, runs all associated modules in order by type"""
@@ -471,12 +463,17 @@ class Feed:
             if self.manager.options.learn:
                 if module_type in ['download', 'output']: continue
             self.__run_modules(module_type)
-            self.__purge_filtered()
+            filtered = self.__purge_filtered()
+            # verbose some progress, unless in quiet mode (logging only)
+            if not manager.options.quiet:
+                if module_type == 'input':
+                    logging.info('Feed %s produced %s entries.' % (self.name, len(self.entries)))
+                if module_type == 'filter':
+                    logging.info('Feed %s filtered %s entries. Remaining entries %s.' % (self.name, filtered, len(self.entries)))
+
 
 if __name__ == "__main__":
-
     manager = Manager()
-    
     if manager.options.doc:
         manager.print_module_doc()
     elif manager.options.list:

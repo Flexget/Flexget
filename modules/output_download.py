@@ -59,25 +59,18 @@ class ModuleDownload:
             except Exception, e:
                 # notify framework that outputing this entry failed
                 feed.failed(entry)
-                if feed.manager.options.debug:
-                    import traceback
-                    print '-'*60
-                    traceback.print_exc(file=sys.stdout)
-                    print '-'*60
+                logging.exception('Execute downloads: %s' % e)
 
     def download(self, feed, entry):
         # get content
         # urllib2 is too smart here, it borks on basic auth urls
-        try:
-            f = urllib.urlopen(entry['url'])
-            mimetype = f.headers.getsubtype()
-            content = f.read()
-            f.close()
-            # store data and mimetype for entry
-            entry['data'] = content
-            entry['mimetype'] = mimetype
-        except IOError, e:
-            raise Exception("IOError when loading content for %s. Error: %s", (entry['title'], e))
+        f = urllib.urlopen(entry['url'])
+        mimetype = f.headers.getsubtype()
+        content = f.read()
+        f.close()
+        # store data and mimetype for entry
+        entry['data'] = content
+        entry['mimetype'] = mimetype
 
     def execute_outputs(self, feed):
         self.validate_config(feed)
@@ -89,12 +82,10 @@ class ModuleDownload:
                     self.output(feed, entry)
             except Warning, e:
                 # different handling because IOError is "ok"
-                feed.failed(entry)
-                logging.error('Error while writing, %s' % e)
+                logging.warning('Error while writing: %s' % e)
             except Exception, e:
                 feed.failed(entry)
-                logging.exception('Error while writing, %s' % e)
-                
+                logging.exception('Error while writing: %s' % e)
 
     def output(self, feed, entry):
         """Writes entry.data into file"""
