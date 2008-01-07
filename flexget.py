@@ -91,6 +91,8 @@ class Manager:
                           help="Matches are not downloaded but will be skipped in the future.")
 #        parser.add_option("--no-skip", action="store_true", dest="noskip", default=0,
 #                          help="Disable previously downloaded skipping (session).")
+        parser.add_option("--only-feed", action="store", dest="onlyfeed", default=None,
+                          help="Run only specified feed from config.")
         parser.add_option("--no-cache", action="store_true", dest="nocache", default=0,
                           help="Disable caches. Works only in modules that have explicit support.")
         parser.add_option("--reset-session", action="store_true", dest="reset", default=0,
@@ -323,11 +325,22 @@ class Manager:
     def execute(self):
         """Iterate trough all feeds and run them."""
         try:
-            if len(self.config.get('feeds', []))==0:
-                logging.warning('There are no feeds in configuration file!')
-            for name in self.config.get('feeds', []):
+            feeds = self.config.get('feeds', [])
+            if len(feeds)==0:
+                logging.critical('There are no feeds in configuration file!')
+
+            # --only-feed
+            if self.options.onlyfeed:
+                ofeeds, feeds = feeds, []
+                for name in ofeeds:
+                    if name.lower() == self.options.onlyfeed.lower(): feeds.append(name)
+                if len(feeds)==0:
+                    logging.critical('Could not find feed %s' % self.options.onlyfeed)
+                
+            for name in feeds:
                 # if feed name is prefixed with _ it's disabled
                 if name.startswith('_'): continue
+                
                 feed = Feed(self, name, self.config['feeds'][name])
                 try:
                     feed.execute()
