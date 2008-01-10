@@ -34,4 +34,4 @@ class UnconditionallyFilter(FilterPatterns):
         self.filter(feed, feed.unfilter, None, 'unconditionally')     
 
 if __name__ == "__main__":
-    print "works!"
+    pass

@@ -3,23 +3,24 @@ __instance__ = 'FilterSeries'
 import logging
 import re
 
+# might be better of just being function which returns dict ...
 class SerieParser:
 
     qualities = ['1080p', '1080', '720p', '720', 'hr', 'hdtv', 'dsr']
     season_ep_regexps = ['s(\d+)e(\d+)', 's(\d+)ep(\d+)', '(\d+)x(\d+)']
     
-    def __init__(self, serie, item):
-        self.serie = serie
+    def __init__(self, name, item):
+        self.name = name
         self.item = item
         # parse produces these
         self.season = None
         self.episode = None
         self.quality = None
         # false if item does not match serie
-        self.valid = True
+        self.valid = False
 
     def parse(self):
-        serie = self.serie.replace('.', ' ').lower()
+        serie = self.name.replace('.', ' ').lower()
         item = self.item.replace('.', ' ').replace('_', ' ').lower()
         serie_data = serie.split(' ')
         item_data = item.split(' ')
@@ -28,9 +29,8 @@ class SerieParser:
                 item_data.remove(part)
             else:
                 print 'part %s not found from %s' % (part, item_data)
-                self.valid = False
-        # it's not serie we are looking for
-        if not self.valid: return
+                # leave this invalid
+                return
 
         for part in item_data:
             # search for quality
@@ -44,15 +44,21 @@ class SerieParser:
                         season, episode = m.groups()
                         self.season = int(season)
                         self.episode = int(episode)
+                        self.valid = True
                         break
-        
+
         print item_data
+
+    def uid(self):
+        """Return UID, used for detecting duplicates"""
+        if not self.valid: raise Exception('Serie flagged invalid')
+        return "%s:S%sE%s" % (self.name, self.season, self.episode)
 
     def __str__(self):
         if self.valid:
-            return '%s, season: %s episode: %s quality: %s' % (self.serie, self.season, self.episode, self.quality)
+            return '%s, season: %s episode: %s quality: %s' % (self.name, self.season, self.episode, self.quality)
         else:
-            return '%s is not valid for serie %s' % (self.item, self.serie)
+            return '%s is not valid for serie %s' % (self.item, self.name)
         
 
 
@@ -84,11 +90,19 @@ class FilterSeries:
 
     def register(self, manager):
         # disabled untill implemented
-        #manager.register(self, "filter", "series", self.filter_series)
-        None
+        manager.register(instance=self, type="filter", keyword="series", callback=self.filter_series)
 
     def filter_series(self, feed):
-        None
+        for entry in feed.entries:
+            for serie_name in feed.config.get('series', []):
+                serie = SerieParser(serie_name, entry['title'])
+                if not serie.valid: continue
+
+                if feed.shared_cache.get(serie.uid()):
+                    feed.filter(entry)
+                else:
+                    # add to cache
+                    feed.shared_cache.store(serie.uid(), True, 90)
 
 if __name__ == '__main__':
     fs = SerieParser('stargate atlantis', 'Stargate.Atlantis.S04E01.HDTV.XviD-TEST.avi')

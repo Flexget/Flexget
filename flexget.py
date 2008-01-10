@@ -26,6 +26,7 @@ import sys
 import logging
 import string
 import types
+from datetime import tzinfo, timedelta, datetime
 
 import socket
 socket.setdefaulttimeout(10) # time out in 10 seconds
@@ -228,13 +229,9 @@ class Manager:
                     modules.append(m)
         return modules
 
-    def get_feed_session(self, name):
-        """Return session that is unique by feed name"""
-        return self.session.setdefault('session_feed', {}).setdefault(name, {})
-
-    def get_global_session(self):
-        """Returns global session for modules"""
-        return self.session.setdefault('global_session', {})
+    def get_cache(self):
+        """Returns cache for modules"""
+        return self.session.setdefault('cache', {})
 
     def register(self, **kwargs):
         """
@@ -351,6 +348,39 @@ class Manager:
             if not self.options.test:
                 self.save_session()
 
+class ModuleCache:
+
+    def __init__(self, name, storage):
+        self.__cache = storage.setdefault(name, {})
+        self.purge()
+    
+    def store(self, key, value, days=60):
+        """Stores key value pair for number of days. Value must be yaml compatible."""
+        item = {}
+        item['stored'] = datetime.today().strftime('%Y-%m-%d')
+        item['days'] = days
+        item['value'] = value
+        self.__cache[key] = item
+
+    def get(self, key, default=None):
+        """Return value by key from cache. Return None or default if not found"""
+        item = self.__cache.get(key, None)
+        if not item: return default
+        return item['value']
+
+    def purge(self):
+        """Remove all values from cache that have passed their expiry date"""
+        now = datetime.today()
+        for key in self.__cache.keys():
+            item = self.__cache[key]
+            y,m,d = item['stored'].split('-')
+            stored = datetime(int(y), int(m), int(d))
+            delta = now - stored
+            if delta.days > item['days']:
+                logging.debug('Purging from cache %s' % (str(item)))
+                self.__cache.pop(key)
+    
+
 class Feed:
 
     def __init__(self, manager, name, config):
@@ -360,17 +390,18 @@ class Feed:
         """
         self.name = name
         self.config = config
+        self.manager = manager
+
         # merge global configuration into this feed config
         self.__merge_config(manager.config.get('global', {}), config)
 
-        self.global_session = manager.get_global_session()
-        self.session = manager.get_feed_session(name)
+        self.cache = ModuleCache(name, manager.get_cache())
+        self.shared_cache = ModuleCache('_shared_', manager.get_cache())
 
-        self.manager = manager
         self.entries = []
         self.__filtered = []
         self.__failed = []
-
+        
     def __merge_config(self, d1, d2):
         """Merges dictionary d1 into dictionary d2"""
         for k, v in d1.items():
@@ -378,8 +409,8 @@ class Feed:
                 if type(v) == type(d2[k]):
                     if type(v)==types.DictType: self.__merge_config(self, d1[k], d2[k])
                     elif type(v)==types.ListType: d2[k].extend(v)
-                    else: raise Exception('Unknown type %s in config' % type(v))
-                else: raise Exception('Key %s has incompatible types' % (k))
+                    else: raise Exception('BUG: Unknown type %s in config' % type(v))
+                else: raise Exception('Global keyword %s is incompatible with feed %s. They should be same datatype.' % (k, self.name))
             else: d2[k] = v
 
     def __purge_filtered(self):
@@ -400,13 +431,12 @@ class Feed:
 
     def filter(self, entry):
         """Mark entry to be filtered"""
-#        logging.debug("Entry '%s' filtered" % (entry['title']))
         self.__filtered.append(entry)
 
     def unfilter(self, entry):
         """Undoes filter command for entry"""
         if entry in self.__filtered:
-#            logging.debug("Entry '%s' unfiltered" % (entry['title']))
+            logging.debug("Entry '%s' unfiltered" % (entry['title']))
             self.__filtered.remove(entry)
 
     def failed(self, entry):
@@ -466,6 +496,8 @@ class Feed:
                 logging.debug('executing %s %s' % (module_type, module['keyword']))
                 try:
                     module['callback'](self)
+                except Warning, w:
+                    logging.warning(w)
                 except Exception, e:
                     logging.exception("Module %s: %s" % (module['keyword'], e))
 

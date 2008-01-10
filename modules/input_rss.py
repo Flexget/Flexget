@@ -31,13 +31,11 @@ class InputRSS:
           password: <password>
     """
 
-
     def register(self, manager):
         manager.register(instance=self, type="input", keyword="rss", callback=self.run)
 
     def passwordize(self, url, user, password):
         """Add username and password to url"""
-
         parts = list(urlparse.urlsplit(url))
         parts[1] = user+":"+password+"@"+parts[1]
         url = urlparse.urlunsplit(parts)
@@ -46,8 +44,6 @@ class InputRSS:
     def run(self, feed):
 
         config = feed.config
-        session = feed.session
-
         url = feed.get_input_url('rss')
 
         # use basic auth when needed
@@ -57,10 +53,10 @@ class InputRSS:
         logging.debug("Checking feed %s (%s)", feed.name, url)
 
         # check etags and last modified -headers
-        etag = session.get('etag', None)
+        etag = feed.cache.get('etag', None)
         if etag:
             logging.debug("Sending etag %s for feed %s" % (etag, feed.name))
-        modified = session.get('modified', None)
+        modified = feed.cache.get('modified', None)
         if modified:
             logging.debug("Sending last-modified %s for feed %s" % (etag, feed.name))
 
@@ -105,10 +101,11 @@ class InputRSS:
 
         # update etag, use last modified if no etag exists
         if rss.has_key('etag') and type(rss['etag']) != feedparser.types.NoneType:
-            session['etag'] = rss.etag.replace("'", "").replace('"', "")
-            logging.debug("etag "+session['etag']+" saved for feed %s", feed.name)
+            etag = rss.etag.replace("'", "").replace('"', "")
+            feed.cache.store('etag', etag, 90)
+            logging.debug("etag %s saved for feed %s" % (etag, feed.name))
         elif rss.headers.has_key('last-modified'):
-            config['modified'] = rss.modified
+            feed.cache.store('modified', rss.modified, 90)
             logging.debug("last modified saved for feed %s", feed.name)
 
         for entry in rss.entries:

@@ -188,21 +188,21 @@ class RlsLog:
     def run(self, feed):
         if not soup_present: raise Exception(soup_err)
 
-        url_cache = feed.global_session.setdefault('rlslog_url_cache', {})
+        try:
+	    releases = self.parse_rlslog(feed.get_input_url('rlslog'))
+        except urllib2.URLError, e:
+            raise Warning('Input RlsLog was unable to complete task. URLError %s' % (e.reason))
 
-        releases = self.parse_rlslog(feed.get_input_url('rlslog'))
         for release in releases:
-            # limit cache size, clearing has no dangerous effects, besides
-            # that all urls are fetched from sites upon clear :)
-            if len(url_cache) > 1500:
-                url_cache.clear()
-            torrent_url = url_cache.get(release['site'].raw_url, None)
+            # try to lookup torrent url (by site url) from cache
+            torrent_url = feed.cache.get(release['site'].raw_url, None)
+            if feed.manager.options.nocache: torrent_url = None
             if torrent_url == None:
                 # find out actual torrent link from site (requests page and parses it)
                 torrent_url = release['site'].request_torrent_url()
             if torrent_url != None:
-                # add to cache if present
-                url_cache[release['site'].raw_url] = torrent_url
+                # add torrent url to cache for future usage
+                feed.cache.store(release['site'].raw_url, torrent_url, 30)
 
                 entry = {}
                 entry['url'] = torrent_url

@@ -10,14 +10,22 @@ class MockManager:
     def __init__(self):
         self.options = MockOptions()
 
+class MockCache:
+    def store(self, key, value, days=30):
+        pass
+
+    def get(self, key):
+        return None
+    
+
 class MockFeed:
     def __init__(self):
-        self.session = {}
         self.config = {}
-        self.global_session = {}
         self.entries = []
         self.name = "Mock"
         self.manager = MockManager()
+        self.cache = MockCache()
+        self.shared_cache = MockCache()
 
     def get_input_url(self, name):
         import sys

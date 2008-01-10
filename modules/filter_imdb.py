@@ -157,12 +157,6 @@ class FilterImdb:
 
         config = feed.config['imdb']
 
-        # initialize cache
-        checked = feed.session.setdefault('checked', [])
-        # disable cache on --no-cache
-        if feed.manager.options.nocache:
-            checked = []
-            
         for entry in feed.entries:
 
             if entry.get('imdb_url', None) == None and self.imdb_required(entry, config):
@@ -175,7 +169,8 @@ class FilterImdb:
 
             # do not check again from imdb if this has already been checked
             if entry.has_key('imdb_url'):
-                if entry['imdb_url'] in checked:
+                # disable cache on --no-cache
+                if feed.cache.get(entry['imdb_url'], False) and not feed.manager.options.nocache:
                     logging.debug('FilterImdb filtering %s, it has already been tried before' % entry['title'])
                     feed.filter(entry)
                     continue
@@ -183,11 +178,8 @@ class FilterImdb:
             imdb = ImdbParser()
             if self.imdb_required(entry, config):
                 imdb.parse(entry['imdb_url'])
-                checked.append(entry['imdb_url'])
+                feed.cache.store(entry['imdb_url'], True, 90)
 
-                # keep cheked list short
-                while len(checked) > 500:
-                    checked.pop(0)
             else:
                 # Set few required fields manually from entry, and thus avoiding request & parse
                 # Note: It doesn't matter even if some fields are missing, previous imdb_required
