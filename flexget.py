@@ -322,9 +322,10 @@ class Manager:
     def execute(self):
         """Iterate trough all feeds and run them."""
         try:
-            feeds = self.config.get('feeds', [])
-            if len(feeds)==0:
+            feeds = self.config.get('feeds', None)
+            if feeds==0:
                 logging.critical('There are no feeds in configuration file!')
+            feeds = feeds.keys()
 
             # --only-feed
             if self.options.onlyfeed:
@@ -337,8 +338,9 @@ class Manager:
             for name in feeds:
                 # if feed name is prefixed with _ it's disabled
                 if name.startswith('_'): continue
-                
-                feed = Feed(self, name, self.config['feeds'][name])
+
+                last = len(feeds) - 1 == feeds.index(name)
+                feed = Feed(self, name, self.config['feeds'][name], last)
                 try:
                     feed.execute()
                 except Exception, e:
@@ -383,7 +385,7 @@ class ModuleCache:
 
 class Feed:
 
-    def __init__(self, manager, name, config):
+    def __init__(self, manager, name, config, last):
         """
             name - name of the feed
             config - yaml configuration (dict)
@@ -391,6 +393,7 @@ class Feed:
         self.name = name
         self.config = config
         self.manager = manager
+        self.last = last
 
         # merge global configuration into this feed config
         self.__merge_config(manager.config.get('global', {}), config)
@@ -514,7 +517,7 @@ class Feed:
                 if module_type == 'input':
                     logging.info('Feed %s produced %s entries.' % (self.name, len(self.entries)))
                 if module_type == 'filter':
-                    logging.info('Feed %s filtered %s entries. Remaining entries %s.' % (self.name, filtered, len(self.entries)))
+                    logging.info('Feed %s filtered %s entries (%s remains).' % (self.name, filtered, len(self.entries)))
 
 
 if __name__ == "__main__":
