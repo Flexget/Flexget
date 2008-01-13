@@ -55,6 +55,8 @@ class Manager:
 
     moduledir = os.path.join(sys.path[0], "modules/")
     module_types = ["start", "input", "filter", "download", "modify", "output", "exit"]
+
+    SESSION_VERSION = 1
     
     def __init__(self):
         self.configname = None
@@ -134,12 +136,23 @@ class Manager:
             self.__init_logging_console(level)
 
 
-        # load yml-files
+        # load config & session
         self.load_config()
         if self.options.reset:
             self.options.learn = True
         else:
             self.load_session()
+            # if new session, init version
+            if len(self.session) == 0:
+                self.session['version'] = self.SESSION_VERSION
+            # check if session version number is different
+            if self.session.get('version', 0) != self.SESSION_VERSION:
+                if not self.options.learn:
+                    logging.critical('Your session is from older incompatible version of flexget. Run application with --learn to fix this. '\
+                                     'New content between previous execution and now are skipped. You must download them manually. '\
+                                     'You can spot them from --learn report.')
+                    sys.exit(1)
+                self.session['version'] = self.SESSION_VERSION
 
     def __init_logging_console(self, log_level):
         """Initialize logging for stdout"""
