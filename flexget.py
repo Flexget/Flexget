@@ -171,12 +171,14 @@ class Manager:
         if os.path.exists(sessionfile):
             try:
                 self.session = yaml.safe_load(file(sessionfile))
-            except yaml.scanner.ScannerError:
-                logging.error("Session file corrupted! Creating a new one.")
-                self.session = {}
-            except yaml.parser.ParserError:
-                logging.error("Session file corrupted! Creating a new one.")
-                self.session = {}
+                if type(self.session) != types.DictType:
+                    raise Exception('Sessionfile does not contain dictionary')
+            except Exception, e:
+                logging.critical("Sessionfile has been broken. Delete %s and execute flexget with --learn to avoid re-downloading everything. "\
+                "Downloads between time of break and now are lost. You must download these manually. "\
+                "This error is most likelly because of bug, check your log-file and report tracebacks." % sessionfile)
+                logging.exception('Load failure: %s' % e)
+                sys.exit(1)
 
     def save_session(self):
         try:
@@ -187,6 +189,7 @@ class Manager:
             f.close()
         except Exception, e:
             logging.exception("Failed to save session data (%s)!" % e)
+            logging.critical(yaml.dump(self.session))
         
     def load_modules(self, parser):
         """Load all modules"""
