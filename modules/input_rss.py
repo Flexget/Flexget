@@ -31,7 +31,7 @@ class InputRSS:
           password: <password>
     """
 
-    def register(self, manager):
+    def register(self, manager, parser):
         manager.register(instance=self, type="input", keyword="rss", callback=self.run)
 
     def passwordize(self, url, user, password):

@@ -2,7 +2,7 @@ __instance__ = 'TestFilter'
 
 class TestFilter:
 
-    def register(self, manager):
+    def register(self, manager, parser):
         manager.register(instance=self, type="filter", keyword="testfilter", callback=self.run, order=999, debug_module=True)
 
     def run(self, feed):

@@ -8,7 +8,7 @@ class YamlDump:
         Dummy module for testing, outputs all entries in yaml
     """
 
-    def register(self, manager):
+    def register(self, manager, parser):
         manager.register(instance=self, type="output", keyword="dump", callback=self.dump, builtin=False, debug_module=True)
 
     def dump(self, feed):

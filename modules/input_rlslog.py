@@ -106,7 +106,7 @@ class RlsLog:
         In case of movies the module supplies pre-parse IMDB-details (helps when chaining with filter_imdb).
     """
 
-    def register(self, manager):
+    def register(self, manager, parser):
         manager.register(instance=self, type="input", keyword="rlslog", callback=self.run)
 
     def parse_imdb(self, s):

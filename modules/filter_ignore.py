@@ -34,7 +34,7 @@ class IgnoreFilter(FilterPatterns):
         Supports same syntax as patterns.
     """
 
-    def register(self, manager):
+    def register(self, manager, parser):
         manager.register(instance=self, type='filter', keyword='ignore', callback=self.ignore, order=65535)
 
     def ignore(self, feed):

@@ -29,7 +29,7 @@ class InputHtml:
         to match only to desired content.
     """
 
-    def register(self, manager):
+    def register(self, manager, parser):
         manager.register(instance=self, type="input", keyword="html", callback=self.run)
 
     def get_filename(self, href):

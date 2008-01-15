@@ -18,7 +18,7 @@ class RemoveTrackers:
         TIP: You can use global section in configuration to make this enabled on all feeds.
     """
 
-    def register(self, manager):
+    def register(self, manager, parser):
         manager.register(instance=self, type="modify", keyword="remove_trackers", callback=self.remove)
 
     def remove(self, feed):

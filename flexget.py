@@ -92,8 +92,6 @@ class Manager:
 #                          help="Test match and show what it would find from feeds.")
         parser.add_option("--learn", action="store_true", dest="learn", default=0,
                           help="Matches are not downloaded but will be skipped in the future.")
-#        parser.add_option("--no-skip", action="store_true", dest="noskip", default=0,
-#                          help="Disable previously downloaded skipping (session).")
         parser.add_option("--only-feed", action="store", dest="onlyfeed", default=None,
                           help="Run only specified feed from config.")
         parser.add_option("--no-cache", action="store_true", dest="nocache", default=0,
@@ -216,24 +214,19 @@ class Manager:
             try:
                 instance = ns[ ns["__instance__"] ]()
             except:
-                logging.error("Exception occured while creating instance %s" % ns["__instance__"])
+                logging.exception("Exception occured while creating instance %s" % ns["__instance__"])
                 continue
             method = getattr(instance, 'register', None)
             if callable(method):
                 logging.debug("Module %s loaded" % module)
                 try:
-                    method(self)
+                    method(self, parser)
                 except RegisterException, e:
                     logging.exception("Error while registering %s. %s" % (module, e.value))
                     continue
             else:
                 logging.error("Module %s does not have required required method register" % module)
                 continue
-
-            # check if module wishes to register commandline parameters
-            method = getattr(instance, 'register_options', None)
-            if callable(method):
-                method(parser)
 
     def find_modules(self, directory):
         """Return array containing all modules in passed path"""
@@ -338,10 +331,9 @@ class Manager:
     def execute(self):
         """Iterate trough all feeds and run them."""
         try:
-            feeds = self.config.get('feeds', None)
-            if feeds==0:
-                logging.critical('There are no feeds in configuration file!')
-            feeds = feeds.keys()
+            feeds = self.config.get('feeds', {})
+            feeds = feeds.keys() # array of feed names
+            if len(feeds)==0: logging.critical('There are no feeds in configuration file!')
 
             # --only-feed
             if self.options.onlyfeed:
@@ -354,14 +346,13 @@ class Manager:
             for name in feeds:
                 # if feed name is prefixed with _ it's disabled
                 if name.startswith('_'): continue
-
                 last = len(feeds) - 1 == feeds.index(name)
+                # create feed and execute it
                 feed = Feed(self, name, self.config['feeds'][name], last)
                 try:
                     feed.execute()
                 except Exception, e:
                     logging.exception("Feed %s: %s" % (feed.name, e))
-                    continue
         finally:
             if not self.options.test:
                 self.save_session()
@@ -405,6 +396,7 @@ class Feed:
         """
             name - name of the feed
             config - yaml configuration (dict)
+            last - boolean flag, true if this is last feed we are going to run
         """
         self.name = name
         self.config = config
@@ -429,7 +421,7 @@ class Feed:
                     if type(v)==types.DictType: self.__merge_config(self, d1[k], d2[k])
                     elif type(v)==types.ListType: d2[k].extend(v)
                     else: raise Exception('BUG: Unknown type %s in config' % type(v))
-                else: raise Exception('Global keyword %s is incompatible with feed %s. They should be same datatype.' % (k, self.name))
+                else: raise Exception('Global keyword %s is incompatible with feed %s. Keywords are not same datatype.' % (k, self.name))
             else: d2[k] = v
 
     def __purge_filtered(self):

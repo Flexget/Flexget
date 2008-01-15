@@ -163,7 +163,7 @@ class TorrentFilename:
         extension. This is enabled always by default (builtins).
     """
 
-    def register(self, manager):
+    def register(self, manager, parser):
         manager.register(instance=self, type='modify', keyword='torrent', callback=self.run, order=-200, builtin=True)
 
     def run(self, feed):

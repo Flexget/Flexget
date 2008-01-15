@@ -4,7 +4,7 @@ class FeedTest:
 
     """ dummy module for testing, finds one dummy hit """
 
-    def register(self, manager):
+    def register(self, manager, parser):
         manager.register(instance=self, type="input", keyword="test", callback=self.run, order=1, debug_module=True)
 
     def run(self, feed):

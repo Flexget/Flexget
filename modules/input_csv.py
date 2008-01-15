@@ -32,7 +32,7 @@ class InputCSV:
         List of other common (optional) fields can be found from documentation.
     """
 
-    def register(self, manager):
+    def register(self, manager, parser):
         manager.register(instance=self, type='input', keyword='csv', callback=self.run)
 
     def run(self, feed):

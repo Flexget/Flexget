@@ -39,7 +39,7 @@ class ModuleDownload:
         attribute title is used.
     """
 
-    def register(self, manager):
+    def register(self, manager, parser):
         manager.register(instance=self, type="download", keyword="download", callback=self.execute_downloads)
         manager.register(instance=self, type="output", keyword="download", callback=self.execute_outputs)
 

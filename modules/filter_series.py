@@ -88,7 +88,7 @@ class FilterSeries:
         In future there may be way to affect which entry will be selected.
     """
 
-    def register(self, manager):
+    def register(self, manager, parser):
         # disabled untill implemented
         manager.register(instance=self, type="filter", keyword="series", callback=self.filter_series)
 

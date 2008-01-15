@@ -139,7 +139,7 @@ class FilterImdb:
             So supply them in your input-module if it's practical!
     """
 
-    def register(self, manager):
+    def register(self, manager, parser):
         manager.register(instance=self, type='filter', keyword='imdb', callback=self.run)
 
     def imdb_required(self, entry, config):
