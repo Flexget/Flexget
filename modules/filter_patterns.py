@@ -1,4 +1,4 @@
-__instance__ = 'FilterPatterns'
+
 
 import urllib
 import logging

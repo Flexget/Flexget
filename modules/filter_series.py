@@ -1,4 +1,4 @@
-__instance__ = 'FilterSeries'
+
 
 import logging
 import re

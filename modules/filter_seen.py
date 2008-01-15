@@ -1,4 +1,4 @@
-__instance__ = 'SeenFilter'
+
 
 import urllib
 import logging

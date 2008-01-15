@@ -1,4 +1,4 @@
-__instance__ = 'UnconditionallyFilter'
+
 
 import urllib
 import logging

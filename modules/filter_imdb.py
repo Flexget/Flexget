@@ -1,4 +1,4 @@
-__instance__ = 'FilterImdb'
+
 
 import urllib
 import urllib2

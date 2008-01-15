@@ -1,4 +1,4 @@
-__instance__ = 'IgnoreFilter'
+
 
 import urllib
 import logging

@@ -203,30 +203,29 @@ class Manager:
             logging.critical(yaml.dump(self.session))
         
     def load_modules(self, parser):
-        """Load all modules"""
+        """Load and call register on all modules"""
         for module in self.find_modules(self.moduledir):
             ns = {}
             execfile(os.path.join(self.moduledir, module), ns, ns)
-            # check that module has required configuration
-            if not ns.has_key("__instance__"):
-                logging.error("Module %s is missing __instance__ definition" % module)
-                continue
-            try:
-                instance = ns[ ns["__instance__"] ]()
-            except:
-                logging.exception("Exception occured while creating instance %s" % ns["__instance__"])
-                continue
-            method = getattr(instance, 'register', None)
-            if callable(method):
-                logging.debug("Module %s loaded" % module)
-                try:
-                    method(self, parser)
-                except RegisterException, e:
-                    logging.exception("Error while registering %s. %s" % (module, e.value))
-                    continue
-            else:
-                logging.error("Module %s does not have required required method register" % module)
-                continue
+            for name in ns.keys():
+                if type(ns[name]) == types.ClassType:
+                    if hasattr(ns[name], 'register'):
+                        try:
+                            instance = ns[name]()
+                        except:
+                            logging.exception('Exception occured while creating instance %s' % name)
+                            break
+                        method = getattr(instance, 'register', None)
+                        if callable(method):
+                            logging.debug('Module %s loaded' % name)
+                            try:
+                                method(self, parser)
+                            except RegisterException, e:
+                                logging.exception('Error while registering %s. %s' % (name, e.value))
+                                break
+                        else:
+                            logging.error('Module %s register method is not callable' % name)
+
 
     def find_modules(self, directory):
         """Return array containing all modules in passed path"""
