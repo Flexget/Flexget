@@ -1,4 +1,4 @@
-__instance__ = "InputCSV"
+
 
 import urllib
 import urllib2

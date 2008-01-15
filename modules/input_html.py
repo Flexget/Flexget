@@ -1,4 +1,4 @@
-__instance__ = "InputHtml"
+
 
 import urllib
 import urllib2

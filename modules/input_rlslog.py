@@ -1,4 +1,4 @@
-__instance__ = "RlsLog"
+
 
 import urllib
 import urllib2

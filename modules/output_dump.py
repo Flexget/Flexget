@@ -1,4 +1,4 @@
-__instance__ = "YamlDump"
+
 
 import yaml
 

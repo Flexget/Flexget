@@ -1,4 +1,4 @@
-__instance__ = "RemoveTrackers"
+
 
 import yaml
 import re

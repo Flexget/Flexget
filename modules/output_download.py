@@ -1,4 +1,4 @@
-__instance__ = "ModuleDownload"
+
 
 import yaml
 import re

@@ -1,4 +1,4 @@
-__instance__ = "FeedTest"
+
 
 class FeedTest:
 

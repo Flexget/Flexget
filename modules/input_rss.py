@@ -1,4 +1,4 @@
-__instance__ = "InputRSS"
+
 
 import logging
 import urlparse

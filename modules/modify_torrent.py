@@ -1,4 +1,4 @@
-__instance__ = "TorrentFilename"
+
 
 import yaml
 import re
