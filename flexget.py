@@ -370,11 +370,24 @@ class ModuleCache:
         item['value'] = value
         self.__cache[key] = item
 
+    def storedetault(self, key, value, days=60):
+        """Identical to dictionary setdefault"""
+        item = self.get(key)
+        if item == None:
+            logging.debug('storing default for %s, value %s' % (key, value))
+            self.store(key, value, days)
+            return value
+        else:
+            return item
+
+#    undefined = object()
     def get(self, key, default=None):
         """Return value by key from cache. Return None or default if not found"""
-        item = self.__cache.get(key, None)
-        if not item: return default
-        return item['value']
+        item = self.__cache.get(key)
+        if item == None:
+            return default
+        else:
+            return item['value']
 
     def purge(self):
         """Remove all values from cache that have passed their expiry date"""
