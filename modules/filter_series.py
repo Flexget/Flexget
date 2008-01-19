@@ -6,7 +6,7 @@ from datetime import tzinfo, timedelta, datetime
 # might be better of just being function which returns dict ...
 class SerieParser:
 
-    qualities = ['1080p', '1080', '720p', '720', 'hr', 'dvd', 'hdtv', 'dsr', 'unknown']
+    qualities = ['1080p', '1080', '720p', '720', 'hr', 'dvd', 'hdtv', 'dsr', 'dsrip', 'unknown']
     season_ep_regexps = ['s(\d+)e(\d+)', 's(\d+)ep(\d+)', '(\d+)x(\d+)']
     
     def __init__(self, name, title):
@@ -26,6 +26,7 @@ class SerieParser:
     def parse(self):
         serie = self.name.replace('.', ' ').lower()
         item = self.item.replace('.', ' ').replace('_', ' ').lower()
+        item = item.replace('[','').replace(']','')
         serie_data = serie.split(' ')
         item_data = item.split(' ')
         for part in serie_data:
