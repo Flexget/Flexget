@@ -134,6 +134,9 @@ class RlsLog:
         for entry in soup.findAll('div', attrs={"class" : "entry"}):
             release = {}
             h3 = entry.find('h3', attrs={"class" : "entrytitle"})
+            if not h3:
+                logging.debug('No h3 entrytitle')
+                continue
             release['title'] = h3.a.string.strip()
             entrybody = entry.find('div', attrs={"class" : "entrybody"})
             if not entrybody:
