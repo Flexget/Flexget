@@ -1,5 +1,3 @@
-
-
 import urllib
 import urllib2
 import urlparse
@@ -169,14 +167,6 @@ class RlsLog:
                 if link_href.startswith('http://thepiratebay.org'):
                     release['site'] = PirateBay(link_href, release['title'])
 
-            # add empty imdb keys if not found
-            if not release.has_key('imdb_url'):
-                release['imdb_url'] = None
-            if not release.has_key('imdb_score'):
-                release['imdb_score'] = None
-            if not release.has_key('imdb_votes'):
-                release['imdb_votes'] = None
-
             # reject if no torrent link
             if release.has_key('site'):
                 releases.append(release)
@@ -204,12 +194,15 @@ class RlsLog:
                 # add torrent url to cache for future usage
                 feed.cache.store(release['site'].raw_url, torrent_url, 30)
 
+                # construct entry from our release
                 entry = {}
                 entry['url'] = torrent_url
-                entry['title'] = release['title']
-                entry['imdb_url'] = release['imdb_url']
-                entry['imdb_score'] = release['imdb_score']
-                entry['imdb_votes'] = release['imdb_votes']
+                def apply_field(d_from, d_to, f):
+                    if d_from.has_key(f):
+                        if d_from[f] == None: return # None values are not wanted!
+                        d_to[f] = d_from[f]
+                for field in ['title', 'imdb_url', 'imdb_score', 'imdb_votes']:
+                    apply_field(release, entry, field)
                 feed.entries.append(entry)
             else:
                 logging.debug("RlsLog: Unable to get torrent url for '%s' from newtorrents" % (release['title']))

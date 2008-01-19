@@ -14,7 +14,7 @@ class MockCache:
     def store(self, key, value, days=30):
         pass
 
-    def get(self, key):
+    def get(self, key, default=None):
         return None
     
 

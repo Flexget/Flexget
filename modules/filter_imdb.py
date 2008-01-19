@@ -144,6 +144,8 @@ class FilterImdb:
 
     def imdb_required(self, entry, config):
         """Return True if config contains conditions that are not available in preparsed fields"""
+        # TODO: make dict (mapping min_votes <->imdb_votes) and loop it
+        # check that entry values are VALID (None is considered as having value, this is a small bug!)
         if config.has_key('min_votes') and not entry.has_key('imdb_votes'): return True
         if config.has_key('min_score') and not entry.has_key('imdb_score'): return True
         if config.has_key('min_year') and not entry.has_key('imdb_year'): return True
@@ -179,7 +181,6 @@ class FilterImdb:
             if self.imdb_required(entry, config):
                 imdb.parse(entry['imdb_url'])
                 feed.cache.store(entry['imdb_url'], True, 90)
-
             else:
                 # Set few required fields manually from entry, and thus avoiding request & parse
                 # Note: It doesn't matter even if some fields are missing, previous imdb_required
@@ -277,5 +278,5 @@ if __name__ == '__main__':
     print "-"*60
     print yaml.safe_dump(feed.entries)
     print "-"*60
-    print yaml.safe_dump(feed.session)
+#    print yaml.safe_dump(feed.session)
 
