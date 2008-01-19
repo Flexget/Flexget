@@ -423,6 +423,7 @@ class Feed:
 
         self.entries = []
         self.__filtered = []
+        self.__disallow_unfilter = []
         self.__failed = []
         
     def __merge_config(self, d1, d2):
@@ -452,12 +453,16 @@ class Feed:
         self.__filtered = []
         return purged
 
-    def filter(self, entry):
+    def filter(self, entry, allow_unfilter=True):
         """Mark entry to be filtered"""
         self.__filtered.append(entry)
+        if not allow_unfilter:
+            self.__disallow_unfilter.append(entry)
 
     def unfilter(self, entry):
         """Undoes filter command for entry"""
+        if entry in self.__disallow_unfilter:
+            logging.debug("Entry '%s' is not allowed to be unfiltered" % (entry['title']))
         if entry in self.__filtered:
             logging.debug("Entry '%s' unfiltered" % (entry['title']))
             self.__filtered.remove(entry)

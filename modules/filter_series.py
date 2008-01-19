@@ -172,6 +172,7 @@ class FilterSeries:
 
     def downloaded(self, feed, serie):
         cache = feed.cache.get(serie.name)
+        # TODO: add --learn verbose!
         return cache[serie.identifier()]['info']['downloaded']
 
     def store(self, feed, serie, entry):

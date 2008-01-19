@@ -23,7 +23,7 @@ class SeenFilter:
             entry_url = urllib.unquote(entry['url'])
             if feed.cache.get(entry_url, False) or feed.cache.get(entry['title'], False):
                 logging.debug("Seen: filtering '%s' '%s'" % (entry_url, entry['title']))
-                feed.filter(entry)
+                feed.filter(entry, False) # False disallows unfiltering (ie. unconditionally)
 
     def learn_succeeded(self, feed):
         for entry in feed.get_succeeded_entries():
