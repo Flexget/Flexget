@@ -34,7 +34,7 @@ socket.setdefaulttimeout(10) # time out in 10 seconds
 try:
     from optparse import OptionParser, SUPPRESS_HELP
 except ImportError:
-    print "Please install Optik 1.4.1 (or higher) or update your Python"
+    print "Please install Optik 1.4.1 (or higher) or preferably update your Python"
     sys.exit(1)
 
 try:
@@ -43,13 +43,11 @@ except ImportError:
     print "Please install PyYAML from http://pyyaml.org/wiki/PyYAML or from your distro repository"
     sys.exit(1)
 
-
 class RegisterException(Exception):
     def __init__(self, value):
         self.value = value
     def __str__(self):
         return repr(self.value)
-
 
 class Manager:
 
@@ -88,8 +86,6 @@ class Manager:
         parser = OptionParser()
         parser.add_option("--test", action="store_true", dest="test", default=0,
                           help="Verbose what would happend on normal execution.")
-#        parser.add_option("--try", action="store", dest="try_pattern", 
-#                          help="Test match and show what it would find from feeds.")
         parser.add_option("--learn", action="store_true", dest="learn", default=0,
                           help="Matches are not downloaded but will be skipped in the future.")
         parser.add_option("--feed", action="store", dest="onlyfeed", default=None,
@@ -122,7 +118,6 @@ class Manager:
             sys.exit(1)
 
         # now once options are parsed set logging level properly
-        
         level = logging.INFO
         if self.options.debug:
             level = logging.DEBUG
@@ -240,6 +235,7 @@ class Manager:
 
     def get_cache(self):
         """Returns cache for modules"""
+        # TODO: after plenty of refactoring only this remains, remove completely?
         return self.session.setdefault('cache', {})
 
     def register(self, **kwargs):
@@ -359,9 +355,14 @@ class Manager:
 
 class ModuleCache:
 
+    """
+        Provides dictionary-like persistent storage for modules, allows saving key value pair for n number of days. Purges old
+        entries to keep storage size in reasonable sizes.
+    """
+
     def __init__(self, name, storage):
         self.__cache = storage.setdefault(name, {})
-        self.purge()
+        self.__purge()
     
     def store(self, key, value, days=60):
         """Stores key value pair for number of days. Value must be yaml compatible."""
@@ -381,7 +382,6 @@ class ModuleCache:
         else:
             return item
 
-#    undefined = object()
     def get(self, key, default=None):
         """Return value by key from cache. Return None or default if not found"""
         item = self.__cache.get(key)
@@ -390,7 +390,7 @@ class ModuleCache:
         else:
             return item['value']
 
-    def purge(self):
+    def __purge(self):
         """Remove all values from cache that have passed their expiry date"""
         now = datetime.today()
         for key in self.__cache.keys():
@@ -401,7 +401,6 @@ class ModuleCache:
             if delta.days > item['days']:
                 logging.debug('Purging from cache %s' % (str(item)))
                 self.__cache.pop(key)
-    
 
 class Feed:
 
@@ -440,34 +439,6 @@ class Feed:
                 else: raise Exception('Global keyword %s is incompatible with feed %s. Keywords are not same datatype.' % (k, self.name))
             else: d2[k] = v
 
-    """
-    def __purge_filtered(self):
-        purged = 0
-        for filtered in self.__filtered:
-            try:
-                logging.debug("Purging entry '%s'" % (filtered['title']))
-                self.entries.remove(filtered)
-                purged += 1
-            except ValueError, e:
-                # ValueError is ok, filtered may contain duplicate entries
-                pass
-        if purged>0:
-            logging.debug('Purged %i filtered entries' % purged)
-        self.__filtered = []
-        return purged
-
-    def filter(self, entry, allow_unfilter=True):
-        self.__filtered.append(entry)
-        if not allow_unfilter:
-            self.__disallow_unfilter.append(entry)
-
-    def unfilter(self, entry):
-        if entry in self.__disallow_unfilter:
-            logging.debug("Entry '%s' is not allowed to be unfiltered" % (entry['title']))
-        if entry in self.__filtered:
-            logging.debug("Entry '%s' unfiltered" % (entry['title']))
-            self.__filtered.remove(entry)
-    """
 
     def __purge(self):
         purged = 0
@@ -517,6 +488,10 @@ class Feed:
                 succeeded.append(entry)
         return succeeded
 
+    def abort(self):
+        """Abort this feed execution, no more modules will be executed."""
+        self.__abort = True
+
     def get_input_url(self, keyword):
         """
             Helper method for modules. Return url for a specified keyword.
@@ -559,6 +534,7 @@ class Feed:
                     module['callback'](self)
                     # check for priority operations
                     self.__filter_immediately()
+                    if self.__abort: return
                 except Warning, w:
                     logging.warning(w)
                 except Exception, e:
@@ -571,14 +547,17 @@ class Feed:
             if self.manager.options.learn:
                 if module_type in ['download', 'output']: continue
             self.__run_modules(module_type)
-            filtered = self.__purge()
+            count = self.__purge()
             # verbose some progress, unless in quiet mode (logging only)
             if not manager.options.quiet:
                 if module_type == 'input':
                     logging.info('Feed %s produced %s entries.' % (self.name, len(self.entries)))
                 if module_type == 'filter':
-                    logging.info('Feed %s filtered %s entries (%s remains).' % (self.name, filtered, len(self.entries)))
-
+                    logging.info('Feed %s filtered %s entries (%s remains).' % (self.name, count, len(self.entries)))
+            # if abort flag has been set feed should be aborted now
+            if self.__abort:
+                logging.info('Aborting feed %s' % self.name)
+                return
 
 if __name__ == "__main__":
     manager = Manager()
