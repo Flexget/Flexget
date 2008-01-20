@@ -192,7 +192,11 @@ class RlsLog:
             if feed.manager.options.nocache: torrent_url = None
             if torrent_url == None:
                 # find out actual torrent link from site (requests page and parses it)
-                torrent_url = release['site'].request_torrent_url()
+                try
+                    torrent_url = release['site'].request_torrent_url()
+                except urllib2.URLError, e:
+                    logging.error('Unable to get torrent url for release %s. URLError %s' % (release['title'], e.reason))
+                    continue
             if torrent_url != None:
                 # add torrent url to cache for future usage
                 feed.cache.store(release['site'].raw_url, torrent_url, 30)
