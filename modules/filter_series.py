@@ -200,7 +200,7 @@ class FilterSeries:
 
         episode.setdefault(serie.quality, entry)
 
-    def mark_downloaded(self, serie):
+    def mark_downloaded(self, feed, serie):
         cache = feed.cache.get(serie.name)
         cache[serie.identifier()]['info']['downloaded'] = True
 
@@ -208,7 +208,8 @@ class FilterSeries:
         for entry in feed.get_succeeded_entries():
             serie = entry.get('serie_parser')
             if serie:
-                self.mark_downloaded(serie)
+                self.mark_downloaded(feed, serie)
+                entry.pop('serie_parser') # remove instance since it cannot be written in yml! TODO: make framework disgard such fields?
 
 if __name__ == '__main__':
     fs = SerieParser('mock serie', 'Mock.Serie.S04E01.HDTV.XviD-TEST.avi')
