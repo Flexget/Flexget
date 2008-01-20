@@ -135,18 +135,18 @@ class Manager:
             self.options.learn = True
         else:
             self.load_session()
-            # if new session, init version
-            if len(self.session) == 0:
-                self.session['version'] = self.SESSION_VERSION
-            # check if session version number is different
-            if self.session.get('version', 0) != self.SESSION_VERSION:
-                if not self.options.learn:
-                    logging.critical('Your session is broken or from older incompatible version of flexget. '\
-                                     'Run application with --reset-session to resolve this. '\
-                                     'Unfornattely new content between previous successfull execution and now are lost. '\
-                                     'You can (try to) spot new content from report and download them manually.')
-                    sys.exit(1)
-                self.session['version'] = self.SESSION_VERSION
+        # if new session, init version
+        if len(self.session) == 0:
+            self.session['version'] = self.SESSION_VERSION
+        # check if session version number is different
+        if self.session.get('version', 0) != self.SESSION_VERSION:
+            if not self.options.learn:
+                logging.critical('Your session is broken or from older incompatible version of flexget. '\
+                                 'Run application with --reset-session to resolve this. '\
+                                 'Unfornattely new content between previous successfull execution and now are lost. '\
+                                 'You can (try to) spot new content from report and download them manually.')
+                sys.exit(1)
+            self.session['version'] = self.SESSION_VERSION
 
     def __init_logging_console(self, log_level):
         """Initialize logging for stdout"""
