@@ -54,7 +54,7 @@ class Manager:
     moduledir = os.path.join(sys.path[0], "modules/")
     module_types = ["start", "input", "filter", "download", "modify", "output", "exit"]
 
-    SESSION_VERSION = 1
+    SESSION_VERSION = 2
     
     def __init__(self):
         self.configname = None
@@ -361,8 +361,19 @@ class ModuleCache:
     """
 
     def __init__(self, name, storage):
-        self.__cache = storage.setdefault(name, {})
+        self.__storage = storage.setdefault(name, {})
+
+    def set_namespace(self, name):
+        self.__cache = self.__storage.setdefault(name, {})
+        self.__namespace = name
         self.__purge()
+
+    def get_namespace(self):
+        return self.__namespace
+
+    def get_namespaces(self):
+        """Return array of known namespaces in this cache"""
+        return self.__storage.keys()
     
     def store(self, key, value, days=60):
         """Stores key value pair for number of days. Value must be yaml compatible."""
@@ -529,8 +540,12 @@ class Feed:
         modules.sort(self.__sort_modules)
         for module in modules:
             if self.config.has_key(module['keyword']) or (module['builtin'] and not self.config.get('disable_builtins', False)):
-                logging.debug('executing %s %s' % (module_type, module['keyword']))
                 try:
+                    # set cache namespaces
+                    self.cache.set_namespace(module['keyword'])
+                    self.shared_cache.set_namespace(module['keyword'])
+                    # call module
+                    logging.debug('executing %s %s' % (module_type, module['keyword']))
                     module['callback'](self)
                     # check for priority operations
                     self.__filter_immediately()
@@ -548,7 +563,7 @@ class Feed:
                 if module_type in ['download', 'output']: continue
             self.__run_modules(module_type)
             count = self.__purge()
-            # verbose some progress, unless in quiet mode (logging only)
+            # verbose some progress, unless in quiet mode (logging only) TODO: implement more widely trough custom level?
             if not manager.options.quiet:
                 if module_type == 'input':
                     logging.info('Feed %s produced %s entries.' % (self.name, len(self.entries)))

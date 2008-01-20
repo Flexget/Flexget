@@ -21,7 +21,7 @@ class SeenFilter:
     def filter_seen(self, feed):
         for entry in feed.entries:
             entry_url = urllib.unquote(entry['url'])
-            if feed.cache.get(entry_url, False) or feed.cache.get(entry['title'], False):
+            if feed.shared_cache.get(entry_url, False) or feed.shared_cache.get(entry['title'], False):
                 logging.debug("Seen: filtering '%s' '%s'" % (entry_url, entry['title']))
                 feed.filter(entry, True) # True removes this entry unconditionally ASAP
 
@@ -30,8 +30,8 @@ class SeenFilter:
             # add title and entry url to seen list
             entry_url = urllib.unquote(entry['url'])
             
-            feed.cache.store(entry['title'], True, 120)
-            feed.cache.store(entry_url, True, 120)
+            feed.shared_cache.store(entry['title'], True, 120)
+            feed.shared_cache.store(entry_url, True, 120)
             
             # verbose if in learning mode
             if feed.manager.options.learn:
