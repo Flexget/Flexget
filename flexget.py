@@ -146,9 +146,10 @@ class Manager:
             # check if session version number is different
             if self.session.get('version', 0) != self.SESSION_VERSION:
                 if not self.options.learn:
-                    logging.critical('Your session is from older incompatible version of flexget. Run application with --learn to fix this. '\
-                                     'New content between previous execution and now are skipped. You must download them manually. '\
-                                     'You can spot them from --learn report.')
+                    logging.critical('Your session is broken or from older incompatible version of flexget. '\
+                                     'Run application with --reset-session to resolve this. '\
+                                     'Unfornattely new content between previous successfull execution and now are lost. '\
+                                     'You can (try to) spot new content from report and download them manually.')
                     sys.exit(1)
                 self.session['version'] = self.SESSION_VERSION
 
@@ -185,9 +186,9 @@ class Manager:
                 if type(self.session) != types.DictType:
                     raise Exception('Sessionfile does not contain dictionary')
             except Exception, e:
-                logging.critical("Sessionfile has been broken. Delete %s and execute flexget with --learn to avoid re-downloading everything. "\
+                logging.critical("Sessionfile has been broken. Execute flexget with --reset-session create new session and to avoid re-downloading everything. "\
                 "Downloads between time of break and now are lost. You must download these manually. "\
-                "This error is most likelly because of bug, check your log-file and report tracebacks." % sessionfile)
+                "This error is most likelly because of bug in software, check your log-file and report any tracebacks." % sessionfile)
                 logging.exception('Load failure: %s' % e)
                 sys.exit(1)
 
