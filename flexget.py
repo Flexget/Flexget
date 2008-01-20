@@ -92,7 +92,7 @@ class Manager:
 #                          help="Test match and show what it would find from feeds.")
         parser.add_option("--learn", action="store_true", dest="learn", default=0,
                           help="Matches are not downloaded but will be skipped in the future.")
-        parser.add_option("--only-feed", action="store", dest="onlyfeed", default=None,
+        parser.add_option("--feed", action="store", dest="onlyfeed", default=None,
                           help="Run only specified feed from config.")
         parser.add_option("--no-cache", action="store_true", dest="nocache", default=0,
                           help="Disable caches. Works only in modules that have explicit support.")
