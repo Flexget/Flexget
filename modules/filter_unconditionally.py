@@ -31,7 +31,7 @@ class UnconditionallyFilter(FilterPatterns):
         manager.register(instance=self, type="filter", keyword="unconditionally", callback=self.unconditionally, order=65536)
 
     def unconditionally(self, feed):
-        self.filter(feed, feed.unfilter, None, 'unconditionally')     
+        self.filter(feed, feed.accept, None, 'unconditionally')     
 
 if __name__ == "__main__":
     pass

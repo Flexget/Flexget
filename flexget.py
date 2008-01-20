@@ -422,9 +422,11 @@ class Feed:
         self.shared_cache = ModuleCache('_shared_', manager.get_cache())
 
         self.entries = []
+        self.__accepted = [] # these entries are always accepted, filtering does not affect them
         self.__filtered = []
-        self.__disallow_unfilter = []
+        self.__immediattely = []
         self.__failed = []
+        self.__abort = False
         
     def __merge_config(self, d1, d2):
         """Merges dictionary d1 into dictionary d2"""
@@ -437,8 +439,8 @@ class Feed:
                 else: raise Exception('Global keyword %s is incompatible with feed %s. Keywords are not same datatype.' % (k, self.name))
             else: d2[k] = v
 
+    """
     def __purge_filtered(self):
-        """Purge filtered entries (contains something normally only in filter type)"""
         purged = 0
         for filtered in self.__filtered:
             try:
@@ -454,18 +456,48 @@ class Feed:
         return purged
 
     def filter(self, entry, allow_unfilter=True):
-        """Mark entry to be filtered"""
         self.__filtered.append(entry)
         if not allow_unfilter:
             self.__disallow_unfilter.append(entry)
 
     def unfilter(self, entry):
-        """Undoes filter command for entry"""
         if entry in self.__disallow_unfilter:
             logging.debug("Entry '%s' is not allowed to be unfiltered" % (entry['title']))
         if entry in self.__filtered:
             logging.debug("Entry '%s' unfiltered" % (entry['title']))
             self.__filtered.remove(entry)
+    """
+
+    def __purge(self):
+        purged = 0
+        for entry in self.entries[:]:
+            if entry in self.__filtered and not entry in self.__accepted:
+                logging.debug('Purging entry %s' % entry)
+                self.entries.remove(entry)
+                purged += 1
+        self.__filtered = []
+        return purged
+
+    def __filter_immediately(self):
+        if len(self.__immediattely) == 0: return
+        for entry in self.entries[:]:
+            if entry in self.__immediattely:
+                logging.debug('Purging immediately entry %s' % entry)
+                self.entries.remove(entry)
+        self.__immediattely = []
+
+    def accept(self, entry):
+        """Accepts this entry"""
+        if not entry in self.__accepted:
+            self.__accepted.append(entry)
+
+    def filter(self, entry, immediately=False):
+        if immediately:
+            # schedule immediately filtering after this module has done execution
+            if not entry in self.__immediattely:
+                self.__immediattely.append(entry)
+        elif not entry in self.__filtered:
+            self.__filtered.append(entry)
 
     def failed(self, entry):
         """Mark entry failed"""
@@ -524,6 +556,8 @@ class Feed:
                 logging.debug('executing %s %s' % (module_type, module['keyword']))
                 try:
                     module['callback'](self)
+                    # check for priority operations
+                    self.__filter_immediately()
                 except Warning, w:
                     logging.warning(w)
                 except Exception, e:
@@ -536,7 +570,7 @@ class Feed:
             if self.manager.options.learn:
                 if module_type in ['download', 'output']: continue
             self.__run_modules(module_type)
-            filtered = self.__purge_filtered()
+            filtered = self.__purge()
             # verbose some progress, unless in quiet mode (logging only)
             if not manager.options.quiet:
                 if module_type == 'input':

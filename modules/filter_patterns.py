@@ -62,7 +62,7 @@ class FilterPatterns:
             return True
 
     def patterns(self, feed):
-        self.filter(feed, None, feed.filter, 'patterns')
+        self.filter(feed, feed.accept, feed.filter, 'patterns')
 
     def filter(self, feed, match_method, non_match_method, keyword):
         for entry in feed.entries:

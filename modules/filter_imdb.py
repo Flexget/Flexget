@@ -235,6 +235,9 @@ class FilterImdb:
             if fail:
                 logging.debug("FilterImdb filtering %s" % (entry))
                 feed.filter(entry)
+            else:
+                logging.debug("FilterImdb accepting %s" % (entry))
+                feed.accept(entry)
 
 if __name__ == '__main__':
     import sys

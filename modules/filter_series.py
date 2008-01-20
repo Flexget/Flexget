@@ -161,10 +161,13 @@ class FilterSeries:
                     logging.debug('FilterSeries filtering %s, downloaded %s' % (best.entry, self.downloaded(feed, best)))
                     feed.filter(best.entry)
                 else:
-                    # accept
                     logging.debug('FilterSeries passing %s' % best.entry)
-                    best.entry = None # not needed, saves memory ?
-                    entry['serie_parser'] = best
+                    feed.accept(best.entry)
+                    # set the serie instance to entry
+                    best.entry['serie_parser'] = best
+                    # remove entry instance from serie instance, not needed any more (save memory, circular reference?)
+                    best.entry = None
+
 
     def get_first_seen(self, feed, serie):
         """Return datetime when this episode of serie was first seen"""
