@@ -1,5 +1,3 @@
-
-
 import urllib
 import urllib2
 import urlparse
@@ -32,12 +30,11 @@ class InputHtml:
     def register(self, manager, parser):
         manager.register(instance=self, type="input", keyword="html", callback=self.run)
 
-    def get_filename(self, href):
-        return href[href.rfind("/")+1:]
+#    def get_filename(self, href):
+#        return href[href.rfind("/")+1:]
 
     def run(self, feed):
         if not soup_present: raise Exception(soup_err)
-
         pageurl = feed.get_input_url('html')
 
         logging.debug("InputModule html requesting url %s" % pageurl)
@@ -46,25 +43,39 @@ class InputHtml:
         soup = BeautifulSoup(page)
         for link in soup.findAll('a'):
             if not link.has_key("href"): continue
-            title = link.contents[0]
+            title = link.string
+            if title == None: continue
             url = link['href']
+            title = str(title).strip()
+            if len(title) == 0: continue
 
             # fix broken urls
             if url.startswith('//'):
                 url = "http:" + url
-            elif url.startswith('/'):
+            elif not url.startswith('http://') or not url.startswith('https://'):
                 url = urlparse.urljoin(pageurl, url)
                 
-            url_readable = urllib.unquote(url)
+            #url_readable = urllib.unquote(url)
 
-            #full_title = "%s - %s" % (self.get_filename(url_readable), title)
-            full_title = str(title)
             # incase title contains xxxxxxx.torrent - foooo.torrent clean it a bit (get upto first .torrent)
-            if (full_title.lower().find('.torrent')):
-                full_title = full_title[:full_title.lower().find(".torrent")]
+            if title.lower().find('.torrent') > 0:
+                title = title[:title.lower().find(".torrent")]
 
             entry = {}
             entry['url'] = url.encode() # removes troublesome unicode
-            entry['title'] = full_title
+            entry['title'] = title
 
             feed.entries.append(entry)
+
+if __name__ == '__main__':
+    import sys
+    logging.basicConfig(level=logging.DEBUG)
+
+    from test_tools import MockFeed
+    feed = MockFeed()
+    feed.config['html'] = sys.argv[1]
+
+    module = InputHtml()
+    module.run(feed)
+
+    feed.dump_entries()

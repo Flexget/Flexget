@@ -3,7 +3,6 @@
 """
 
 class MockOptions:
-
     nocache = False
     
 class MockManager:
@@ -12,6 +11,9 @@ class MockManager:
 
 class MockCache:
     def store(self, key, value, days=30):
+        pass
+
+    def storedefault(self, key, value, default, days=30):
         pass
 
     def get(self, key, default=None):
@@ -38,7 +40,7 @@ class MockFeed:
         print "MockFeed got filtering command on %s" % entry['title']
 
     def dump_entries(self):
-        # available only in mock!
+        """Available only in mock! Dumps entries in yaml"""
         import yaml
         for entry in self.entries:
             c = entry.copy()
