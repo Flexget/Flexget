@@ -1,5 +1,3 @@
-
-
 import yaml
 
 class YamlDump:

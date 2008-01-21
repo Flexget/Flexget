@@ -1,10 +1,10 @@
-
-
 import yaml
 import re
 import os, sys
 import urllib
 import logging
+
+log = logging.getLogger('download')
 
 class ModuleDownload:
 
@@ -53,13 +53,13 @@ class ModuleDownload:
         for entry in feed.entries:
             try:
                 if feed.manager.options.test:
-                    logging.info("Would download %s" % entry['title'])
+                    log.info("Would download %s" % entry['title'])
                 else:
                     self.download(feed, entry)
             except Exception, e:
                 # notify framework that outputing this entry failed
                 feed.failed(entry)
-                logging.exception('Execute downloads: %s' % e)
+                log.exception('Execute downloads: %s' % e)
 
     def download(self, feed, entry):
         # get content
@@ -77,15 +77,15 @@ class ModuleDownload:
         for entry in feed.entries:
             try:
                 if feed.manager.options.test:
-                    logging.info("Would write entry %s" % entry['title'])
+                    log.info("Would write entry %s" % entry['title'])
                 else:
                     self.output(feed, entry)
             except Warning, e:
                 # different handling because IOError is "ok"
-                logging.warning('Error while writing: %s' % e)
+                log.warning('Error while writing: %s' % e)
             except Exception, e:
                 feed.failed(entry)
-                logging.exception('Error while writing: %s' % e)
+                log.exception('Error while writing: %s' % e)
 
     def output(self, feed, entry):
         """Writes entry.data into file"""

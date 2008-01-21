@@ -3,6 +3,8 @@ import re
 import types
 from datetime import tzinfo, timedelta, datetime
 
+log = logging.getLogger('series')
+
 # might be better of just being function which returns dict ...
 class SerieParser:
 
@@ -33,7 +35,7 @@ class SerieParser:
             if part in item_data:
                 item_data.remove(part)
             else:
-                #logging.debug('part %s not found from %s' % (part, item_data))
+                #log.debug('part %s not found from %s' % (part, item_data))
                 # leave this invalid
                 return
 
@@ -116,7 +118,7 @@ class FilterSeries:
                         if feed_entry['title'] == entry['title'] and feed_entry['url'] == entry['url']:
                             exists = True
                     if not exists:
-                        logging.debug('FilterSeries restoring entry %s from cache' % entry['title'])
+                        log.debug('restoring entry %s from cache' % entry['title'])
                         feed.entries.append(entry)
 
 
@@ -146,22 +148,22 @@ class FilterSeries:
                 best = eps[0]
 
                 for ep in eps:
-                    logging.debug('FilterSeries ep %s' % ep)
+                    log.debug('ep %s' % ep)
 
                 # if age exceeds timeframe
                 diff = datetime.today() - self.get_first_seen(feed, best)
                 age_hours = divmod(diff.seconds, 60*60)[0]
 
-                logging.debug('FilterSeries %s age_hours %i' % (best, age_hours))
+                log.debug('%s age_hours %i' % (best, age_hours))
                 
                 timeframe = conf.get('best_in', 0)
-                logging.debug('FilterSeries best ep in %i hours is %s' % (timeframe, best))
+                log.debug('best ep in %i hours is %s' % (timeframe, best))
 
                 if age_hours < timeframe or self.downloaded(feed, best):
-                    logging.debug('FilterSeries filtering %s, downloaded %s' % (best.entry, self.downloaded(feed, best)))
+                    log.debug('filtering %s, downloaded %s' % (best.entry, self.downloaded(feed, best)))
                     feed.filter(best.entry)
                 else:
-                    logging.debug('FilterSeries passing %s' % best.entry)
+                    log.debug('passing %s' % best.entry)
                     feed.accept(best.entry)
                     # set the serie instance to entry
                     best.entry['serie_parser'] = best

@@ -1,7 +1,7 @@
-
-
 import urllib
 import logging
+
+log = logging.getLogger('seen')
 
 class SeenFilter:
 
@@ -22,7 +22,7 @@ class SeenFilter:
         for entry in feed.entries:
             entry_url = urllib.unquote(entry['url'])
             if feed.shared_cache.get(entry_url, False) or feed.shared_cache.get(entry['title'], False):
-                logging.debug("Seen: filtering '%s' '%s'" % (entry_url, entry['title']))
+                log.debug("Seen: filtering '%s' '%s'" % (entry_url, entry['title']))
                 feed.filter(entry, True) # True removes this entry unconditionally ASAP
 
     def learn_succeeded(self, feed):
@@ -35,6 +35,6 @@ class SeenFilter:
             
             # verbose if in learning mode
             if feed.manager.options.learn:
-                logging.info("Learned '%s' (skipped in future)" % (entry['title']))
+                log.info("Learned '%s' (skipped in future)" % (entry['title']))
             else:
-                logging.debug("SeenFilter: learned '%s' '%s' (skipped in future)" % (entry_url, entry['title']))
+                log.debug("Learned '%s' '%s' (skipped in future)" % (entry_url, entry['title']))

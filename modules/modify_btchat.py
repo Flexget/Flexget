@@ -1,5 +1,7 @@
 import logging
 
+log = logging.getLogger('btchat')
+
 class ModifyBtChat:
 
     '''Fixes bt-chat.com urls so that downloading works .. stupid javascript download delay'''
@@ -11,7 +13,7 @@ class ModifyBtChat:
     def run(self, feed):
         for entry in feed.entries:
             if entry['url'].startswith('http://www.bt-chat.com/download.php'):
-                logging.debug('ModifyBtChat fixing download url %s' % entry['url'])
+                log.debug('ModifyBtChat fixing download url %s' % entry['url'])
                 entry['url'] = entry['url'].replace('download.php', 'download1.php')
-                logging.debug('ModifyBtChat fixed download url %s' % entry['url'])
+                log.debug('ModifyBtChat fixed download url %s' % entry['url'])
         

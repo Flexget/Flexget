@@ -1,8 +1,8 @@
-
-
 import yaml
 import re
 import logging
+
+log = logging.getLogger('remove_trackers')
 
 class RemoveTrackers:
 
@@ -28,7 +28,7 @@ class RemoveTrackers:
                 for tracker in trackers:
                     for regexp in feed.config.get('remove_trackers', []):
                         if re.search(regexp, tracker, re.IGNORECASE|re.UNICODE):
-                            logging.debug('remove_trackers removing %s because of %s' % (tracker, regexp))
+                            log.debug('remove_trackers removing %s because of %s' % (tracker, regexp))
                             # remove tracker
                             entry['torrent'].remove_multitracker(tracker)
                             # re-encode torrent data (file modified)

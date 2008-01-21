@@ -1,5 +1,3 @@
-
-
 class TestFilter:
 
     def register(self, manager, parser):

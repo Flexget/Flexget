@@ -1,5 +1,3 @@
-
-
 import urllib
 import urllib2
 import urlparse
@@ -13,8 +11,10 @@ soup_err = "Module filter_imdb requires BeautifulSoup. Please install it from ht
 try:
     from BeautifulSoup import BeautifulSoup
 except:
-    logging.warning(soup_err)
+    log.warning(soup_err)
     soup_present = False
+
+log = logging.getLogger('imdb')
 
 class ImdbParser:
     """Quick-hack to parse relevant imdb details"""
@@ -29,7 +29,7 @@ class ImdbParser:
         self.name = None
 
     def parse(self, url):
-        logging.debug("ImdbParser parsing %s" % url)
+        log.debug("Parser parsing %s" % url)
         page = urllib2.urlopen(url)
         soup = BeautifulSoup(page)
 
@@ -38,14 +38,14 @@ class ImdbParser:
         if tag_name != None:
             if tag_name.next != None:
                 self.name = tag_name.next.string.strip()
-                logging.debug("Detected name: %s" % self.name)
+                log.debug("Detected name: %s" % self.name)
             
         # get votes
         tag_votes = soup.find(attrs={'href':'ratings', 'class': None})
         if tag_votes != None:
             str_votes = ''.join(c for c in tag_votes.string if c.encode().isdigit())
             self.votes = int(str_votes)
-            logging.debug("Detected votes: %s" % self.votes)
+            log.debug("Detected votes: %s" % self.votes)
 
         # get score
         tag_score = soup.find('b', text=re.compile('\d.\d/10'))
@@ -56,7 +56,7 @@ class ImdbParser:
             if match != None:
                 str_score = match.groups()[0]
                 self.score = float(str_score)
-                logging.debug("Detected score: %s" % self.score)
+                log.debug("Detected score: %s" % self.score)
 
         # get genres
         for link in soup.findAll('a', attrs={'href': re.compile('^/Sections/Genres/')}):
@@ -74,7 +74,7 @@ class ImdbParser:
         tag_year = soup.find('a', attrs={'href': re.compile('^/Sections/Years/\d*')})
         if tag_year != None:
             self.year = int(tag_year.string)
-            logging.debug("Detected year: %s" % self.year)
+            log.debug("Detected year: %s" % self.year)
 
         # get plot outline
         tag_outline = soup.find('h5', text='Plot Outline:')
@@ -83,10 +83,10 @@ class ImdbParser:
         if tag_outline:
             if tag_outline.next != None:
                 self.plot_outline = tag_outline.next.string.strip()
-                logging.debug("Detected plot outline: %s" % self.plot_outline)
+                log.debug("Detected plot outline: %s" % self.plot_outline)
 
-        logging.debug("Detected genres: %s" % self.genres)
-        logging.debug("Detected languages: %s" % self.languages)
+        log.debug("Detected genres: %s" % self.genres)
+        log.debug("Detected languages: %s" % self.languages)
 
 class FilterImdb:
 
@@ -163,17 +163,17 @@ class FilterImdb:
 
             if entry.get('imdb_url', None) == None and self.imdb_required(entry, config):
                 if config.get('reject_invalid', True):
-                    logging.debug("FilterImdb rejecting %s due required missing imdb url and configuration conditions" % entry['title'])
+                    log.debug("Rejecting %s due required missing imdb url and configuration conditions" % entry['title'])
                     feed.filter(entry)
                 else:
-                    logging.debug("FilterImdb unable to check %s due missing imdb url, configured to accept (reject_invalid is False)" % entry['title'])
+                    log.debug("Unable to check %s due missing imdb url, configured to accept (reject_invalid is False)" % entry['title'])
                 continue
 
             # do not check again from imdb if this has already been checked
             if entry.has_key('imdb_url'):
                 # disable cache on --no-cache
                 if feed.cache.get(entry['imdb_url'], False) and not feed.manager.options.nocache:
-                    logging.debug('FilterImdb filtering %s, it has already been tried before' % entry['title'])
+                    log.debug('Filtering %s, it has already been tried before' % entry['title'])
                     feed.filter(entry)
                     continue
 
@@ -196,35 +196,35 @@ class FilterImdb:
             fail = False
             if config.has_key('min_score'):
                 if imdb.score < config['min_score']:
-                    logging.debug("FilterImdb rejecting %s due min_score" % entry['title'])
+                    log.debug("Rejecting %s due min_score" % entry['title'])
                     fail = True
             if config.has_key('min_votes'):
                 if imdb.votes < config['min_votes']:
-                    logging.debug("FilterImdb rejecting %s due min_votes" % entry['title'])
+                    log.debug("Rejecting %s due min_votes" % entry['title'])
                     fail = True
             if config.has_key('min_year'):
                 if imdb.year < config['min_year']:
-                    logging.debug("FilterImdb rejecting %s due min_year" % entry['title'])
+                    log.debug("Rejecting %s due min_year" % entry['title'])
                     fail = True
             if config.has_key('reject_genres'):
                 rejected = config['reject_genres']
                 for genre in imdb.genres:
                     if genre in rejected:
-                        logging.debug("FilterImdb rejecting %s due reject_genres" % entry['title'])
+                        log.debug("Rejecting %s due reject_genres" % entry['title'])
                         fail = True
                         break
             if config.has_key('reject_languages'):
                 rejected = config['reject_languages']
                 for language in imdb.languages:
                     if language in rejected:
-                        logging.debug("FilterImdb rejecting %s due reject_languages" % entry['title'])
+                        log.debug("Rejecting %s due reject_languages" % entry['title'])
                         fail = True
                         break
             if config.has_key('accept_languages'):
                 accepted = config['accept_languages']
                 for language in imdb.languages:
                     if language not in accepted:
-                        logging.debug("FilterImdb rejecting %s due accept_languages" % entry['title'])
+                        log.debug("Rejecting %s due accept_languages" % entry['title'])
                         fail = True
                         break
 
@@ -233,10 +233,10 @@ class FilterImdb:
             entry['imdb_name'] = imdb.name
 
             if fail:
-                logging.debug("FilterImdb filtering %s" % (entry))
+                log.debug("Filtering %s" % (entry))
                 feed.filter(entry)
             else:
-                logging.debug("FilterImdb accepting %s" % (entry))
+                log.debug("Accepting %s" % (entry))
                 feed.accept(entry)
 
 if __name__ == '__main__':

@@ -12,9 +12,10 @@ soup_err = "Module rlslog requires BeautifulSoup. Please install it from http://
 try:
     from BeautifulSoup import BeautifulSoup
 except:
-    logging.warning(soup_err)
+    log.warning(soup_err)
     soup_present = False
 
+log = logging.getLogger('rlslog')
 
 class NewTorrents:
     """NewTorrents parsing utilities"""
@@ -26,10 +27,10 @@ class NewTorrents:
     def request_torrent_url(self):
         """Returns torrent from either search url or download page"""
         if (self.raw_url.startswith("http://www.newtorrents.info/?q=") or self.raw_url.startswith("http://www.newtorrents.info/search")) and (self.title != None):
-            #logging.debug("NewTorrents get_torrent_url using search")
+            #log.debug("NewTorrents get_torrent_url using search")
             return self.__get_torrent_url_from_search(self.raw_url, self.title)
         else:
-            #logging.debug("NewTorrents get_torrent_url using page")
+            #log.debug("NewTorrents get_torrent_url using page")
             return self.__get_torrent_url_from_page(self.raw_url)
 
     # TODO: refactor parameters to use self
@@ -41,7 +42,7 @@ class NewTorrents:
         p = re.compile("copy\(\'(.*)\'\)", re.IGNORECASE)
         f = p.search(data)
         if f==None:
-            logging.debug("NewTorrents get_torrent_url_from_page failed")
+            log.debug("NewTorrents get_torrent_url_from_page failed")
             return None
         else:
             return f.groups()[0]
@@ -58,17 +59,17 @@ class NewTorrents:
             if release_name == name:
                 torrents.append(torrent_url)
             else:
-                logging.debug("NewTorrents rejecting search result: '%s' != '%s'" % (release_name, name))
+                log.debug("NewTorrents rejecting search result: '%s' != '%s'" % (release_name, name))
 
         # choose the torrent
         if len(torrents) == 0:
-            logging.debug("NewTorrents did not found any matches in search result")
+            log.debug("NewTorrents did not found any matches in search result")
             return None
         else:
             if len(torrents) == 1:
-                logging.debug("NewTorrents found only one matching search result.")
+                log.debug("NewTorrents found only one matching search result.")
             else:
-                logging.debug('NewTorrents search results contains multiple matches, using first occurence from: %s' % torrents)
+                log.debug('NewTorrents search results contains multiple matches, using first occurence from: %s' % torrents)
                 # TODO: use the one that has most downloaders / seeders
             return torrents[0]
 
@@ -120,13 +121,13 @@ class RlsLog:
         f = re_votes.search(s.replace(",",""))
         if f != None:
             votes = f.groups()[0]
-        logging.debug("RlsLog: parse_imdb returning score: '%s' votes: '%s' from: '%s'" % (str(score), str(votes), s))
+        log.debug("RlsLog: parse_imdb returning score: '%s' votes: '%s' from: '%s'" % (str(score), str(votes), s))
         return (score, votes)
 
     def parse_rlslog(self, rlslog_url):
         """Parse configured url and return releases array"""
         if not soup_present:
-            logging.error(soup_err)
+            log.error(soup_err)
             return
         page = urllib2.urlopen(rlslog_url)
         soup = BeautifulSoup(page)
@@ -135,15 +136,15 @@ class RlsLog:
             release = {}
             h3 = entry.find('h3', attrs={"class" : "entrytitle"})
             if not h3:
-                logging.debug('No h3 entrytitle')
+                log.debug('No h3 entrytitle')
                 continue
             release['title'] = h3.a.string.strip()
             entrybody = entry.find('div', attrs={"class" : "entrybody"})
             if not entrybody:
-                logging.debug("No entrybody")
+                log.debug("No entrybody")
                 continue
 
-            logging.debug("Processing title %s" % (release['title']))
+            log.debug("Processing title %s" % (release['title']))
 
             rating = entrybody.find('strong', text=re.compile('imdb rating\:', re.IGNORECASE))
             if rating != None:
@@ -174,7 +175,7 @@ class RlsLog:
             if release.has_key('site'):
                 releases.append(release)
             else:
-                logging.info('RlsLog: %s rejected due missing torrents-link' % (release['title']))
+                log.info('RlsLog: %s rejected due missing torrents-link' % (release['title']))
 
         return releases
 
@@ -195,7 +196,7 @@ class RlsLog:
                 try:
                     torrent_url = release['site'].request_torrent_url()
                 except urllib2.URLError, e:
-                    logging.error('Unable to get torrent url for release %s. URLError %s' % (release['title'], e.reason))
+                    log.error('Unable to get torrent url for release %s. URLError %s' % (release['title'], e.reason))
                     continue
             if torrent_url != None:
                 # add torrent url to cache for future usage
@@ -212,7 +213,7 @@ class RlsLog:
                     apply_field(release, entry, field)
                 feed.entries.append(entry)
             else:
-                logging.debug("RlsLog: Unable to get torrent url for '%s' from newtorrents" % (release['title']))
+                log.debug("RlsLog: Unable to get torrent url for '%s' from newtorrents" % (release['title']))
 
 
 

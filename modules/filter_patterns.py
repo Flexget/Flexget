@@ -1,9 +1,9 @@
-
-
 import urllib
 import logging
 import re
 import types
+
+log = logging.getLogger('patterns')
 
 class FilterPatterns:
 
@@ -88,12 +88,12 @@ class FilterPatterns:
                     # if we have secondary (filter) regexps test them
                     for secondary_re in secondary:
                         if self.matches(entry, secondary_re):
-                            logging.debug("%s: Secondary filter regexp '%s' matched '%s'" % (keyword, entry['title'], secondary_re))
+                            log.debug("%s: Secondary filter regexp '%s' matched '%s'" % (keyword, entry['title'], secondary_re))
                             match = False
                             
                 if match:
                     if path != None: entry['path'] = path
-                    logging.debug("%s: '%s' matched '%s'" % (keyword, entry['title'], regexp_raw))
+                    log.debug("%s: '%s' matched '%s'" % (keyword, entry['title'], regexp_raw))
                     break
                     
             if match:

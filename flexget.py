@@ -55,6 +55,10 @@ class Manager:
     module_types = ["start", "input", "filter", "download", "modify", "output", "exit"]
 
     SESSION_VERSION = 2
+
+    # logging formatting
+    LOGGING_DETAILED = '%(levelname)-8s %(name)-11s %(message)s'
+    LOGGING_NORMAL = '%(levelname)-8s %(message)s'
     
     def __init__(self):
         self.configname = None
@@ -69,7 +73,7 @@ class Manager:
         initial_level = logging.INFO
         try:
             logging.basicConfig(level=initial_level,
-                                format='%(asctime)s %(levelname)-8s %(message)s',
+                                format=self.LOGGING_DETAILED,
                                 filename=os.path.join(sys.path[0], 'flexget.log'),
                                 filemode="a",
                                 datefmt='%Y-%m-%d %H:%M:%S')
@@ -123,11 +127,10 @@ class Manager:
             level = logging.DEBUG
             # set 'mainlogger' to debug aswell or no debug output, this is done because of
             # shitty python logging that fails to output debug on console if basicConf level
-            # is less
+            # is less (propably because I don't know how to use that pice of ... )
             logging.getLogger().setLevel(logging.DEBUG)
         if not self.options.quiet:
-            self.__init_logging_console(level)
-
+            self.__init_console_logging(level)
 
         # load config & session
         self.load_config()
@@ -148,13 +151,16 @@ class Manager:
                 sys.exit(1)
             self.session['version'] = self.SESSION_VERSION
 
-    def __init_logging_console(self, log_level):
+    def __init_console_logging(self, log_level):
         """Initialize logging for stdout"""
         # define a Handler which writes to the sys.stderr
         console = logging.StreamHandler()
         console.setLevel(logging.DEBUG)
         # set a format which is simpler for console use
-        formatter = logging.Formatter('%(levelname)-8s %(message)s')
+        if self.options.debug:
+            formatter = logging.Formatter(self.LOGGING_DETAILED)
+        else:
+            formatter = logging.Formatter(self.LOGGING_NORMAL)
         # tell the handler to use this format
         console.setFormatter(formatter)
         # add the handler to the root logger
@@ -360,6 +366,8 @@ class ModuleCache:
         entries to keep storage size in reasonable sizes.
     """
 
+    log = logging.getLogger('modulecache')
+
     def __init__(self, name, storage):
         self.__storage = storage.setdefault(name, {})
 
@@ -387,7 +395,7 @@ class ModuleCache:
         """Identical to dictionary setdefault"""
         item = self.get(key)
         if item == None:
-            logging.debug('storing default for %s, value %s' % (key, value))
+            self.log.debug('storing default for %s, value %s' % (key, value))
             self.store(key, value, days)
             return value
         else:
@@ -410,7 +418,7 @@ class ModuleCache:
             stored = datetime(int(y), int(m), int(d))
             delta = now - stored
             if delta.days > item['days']:
-                logging.debug('Purging from cache %s' % (str(item)))
+                self.log.debug('Purging from cache %s' % (str(item)))
                 self.__cache.pop(key)
 
 class Feed:
@@ -438,6 +446,7 @@ class Feed:
         self.__immediattely = []
         self.__failed = []
         self.__abort = False
+        self.__purged = 0
         
     def __merge_config(self, d1, d2):
         """Merges dictionary d1 into dictionary d2"""
@@ -450,16 +459,14 @@ class Feed:
                 else: raise Exception('Global keyword %s is incompatible with feed %s. Keywords are not same datatype.' % (k, self.name))
             else: d2[k] = v
 
-
     def __purge(self):
-        purged = 0
+        """Purge filtered entries from feed"""
         for entry in self.entries[:]:
             if entry in self.__filtered and not entry in self.__accepted:
                 logging.debug('Purging entry %s' % entry)
                 self.entries.remove(entry)
-                purged += 1
+                self.__purged += 1
         self.__filtered = []
-        return purged
 
     def __filter_immediately(self):
         if len(self.__immediattely) == 0: return
@@ -467,6 +474,7 @@ class Feed:
             if entry in self.__immediattely:
                 logging.debug('Purging immediately entry %s' % entry)
                 self.entries.remove(entry)
+                self.__purged += 1
         self.__immediattely = []
 
     def accept(self, entry):
@@ -561,14 +569,16 @@ class Feed:
             # when learning, skip few types
             if self.manager.options.learn:
                 if module_type in ['download', 'output']: continue
+            # run all modules with specified type
             self.__run_modules(module_type)
-            count = self.__purge()
+            # purge filtered entries
+            self.__purge()
             # verbose some progress, unless in quiet mode (logging only) TODO: implement more widely trough custom level?
             if not manager.options.quiet:
                 if module_type == 'input':
                     logging.info('Feed %s produced %s entries.' % (self.name, len(self.entries)))
                 if module_type == 'filter':
-                    logging.info('Feed %s filtered %s entries (%s remains).' % (self.name, count, len(self.entries)))
+                    logging.info('Feed %s filtered %s entries (%s remains).' % (self.name, self.__purged, len(self.entries)))
             # if abort flag has been set feed should be aborted now
             if self.__abort:
                 logging.info('Aborting feed %s' % self.name)

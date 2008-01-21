@@ -1,9 +1,10 @@
-
-
 import yaml
 import re
 import logging
 import types
+
+log = logging.getLogger('modify_torrent')
+
 
 # Torrent decoding is a short fragment from effbot.org. Site copyright says:
 # Test scripts and other short code fragments can be considered as being in the public domain.

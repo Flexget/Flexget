@@ -1,10 +1,10 @@
-
-
 import urllib
 import urllib2
 import urlparse
 import logging
 import re
+
+log = logging.getLogger('csv')
 
 class InputCSV:
 

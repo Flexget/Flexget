@@ -11,8 +11,10 @@ soup_err = "Module feed_html requires BeautifulSoup. Please install it from http
 try:
     from BeautifulSoup import BeautifulSoup
 except:
-    logging.warning(soup_err)
+    log.warning(soup_err)
     soup_present = False
+
+log = logging.getLogger('html')
 
 class InputHtml:
     """
@@ -37,7 +39,7 @@ class InputHtml:
         if not soup_present: raise Exception(soup_err)
         pageurl = feed.get_input_url('html')
 
-        logging.debug("InputModule html requesting url %s" % pageurl)
+        log.debug("InputModule html requesting url %s" % pageurl)
 
         page = urllib2.urlopen(pageurl)
         soup = BeautifulSoup(page)

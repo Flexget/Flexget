@@ -1,11 +1,10 @@
-
-
 import urllib
 import logging
 import re
 import types
-
 from filter_patterns import FilterPatterns
+
+log = logging.getLogger('ignore')
 
 class IgnoreFilter(FilterPatterns):
     """
