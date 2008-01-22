@@ -102,6 +102,8 @@ class Manager:
                           help="Display module documentation (example: --doc patterns). See --list.")
         parser.add_option("--list", action="store_true", dest="list", default=0,
                           help="List all available modules.")
+        parser.add_option("--failed", action="store_true", dest="failed", default=0,
+                                  help="List recently failed entries.")
         parser.add_option("-c", action="store", dest="config", default="config.yml",
                           help="Specify configuration file. Default is config.yml")
         parser.add_option("-q", action="store_true", dest="quiet", default=0,
@@ -329,6 +331,21 @@ class Manager:
                 return
         if not found:
             print "Could not find module %s" % keyword
+            
+    def print_failed(self):
+        failed = self.session.setdefault('failed', [])
+        if len(failed) == 0: print "No failed entries recorded"
+        for entry in failed:
+            tof = datetime(*entry['tof'])
+            print "%-12s TITLE: %-30s URL: %s" % (tof.strftime('%Y-%m-%d %H:%M'), entry['title'], entry['url'])
+        
+    def add_failed(self, entry):
+        """Adds entry to internal failed list, displayed with --failed"""
+        failed = self.session.setdefault('failed', [])
+        entry['tof'] = list(datetime.today().timetuple())[:-4]
+        failed.append(entry)
+        while len(failed) > 255:
+            failed.pop(0)
 
     def execute(self):
         """Iterate trough all feeds and run them."""
@@ -494,6 +511,7 @@ class Feed:
         """Mark entry failed"""
         logging.debug("Marking entry '%s' as failed" % entry['title'])
         self.__failed.append(entry)
+        self.manager.add_failed(entry)
 
     def get_failed_entries(self):
         """Return set containing failed entries"""
@@ -594,5 +612,7 @@ if __name__ == "__main__":
         manager.print_module_doc()
     elif manager.options.list:
         manager.print_module_list()
+    elif manager.options.failed:
+        manager.print_failed()
     else:
         manager.execute()
