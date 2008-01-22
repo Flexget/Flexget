@@ -565,25 +565,22 @@ class Feed:
         # Order can be also configured in which case given value overwrites module default.
         modules.sort(self.__sort_modules)
         for module in modules:
-            # keyword, keyword[0..16]
-            keywords = [module['keyword']] + ['%s[%i]' % (module['keyword'], i) for i in range(16)]
-            for keyword in keywords:
-                # run if keyword present, or builtin (but not if [0..16] or disabled)
-                if self.config.has_key(keyword) or (module['builtin'] and not self.config.get('disable_builtins', False) and keywords.index(keyword) == 0):
-                    try:
-                        # set cache namespaces
-                        self.cache.set_namespace(keyword)
-                        self.shared_cache.set_namespace(keyword)
-                        # call module
-                        logging.debug('executing %s %s' % (module_type, keyword))
-                        module['callback'](self)
-                        # check for priority operations
-                        self.__filter_immediately()
-                        if self.__abort: return
-                    except Warning, w:
-                        logging.warning(w)
-                    except Exception, e:
-                        logging.exception('Module %s: %s' % (keyword, e))
+            keyword = module['keyword']
+            if self.config.has_key(keyword) or (module['builtin'] and not self.config.get('disable_builtins', False)):
+                try:
+                    # set cache namespaces
+                    self.cache.set_namespace(keyword)
+                    self.shared_cache.set_namespace(keyword)
+                    # call module
+                    logging.debug('executing %s %s' % (module_type, keyword))
+                    module['callback'](self)
+                    # check for priority operations
+                    self.__filter_immediately()
+                    if self.__abort: return
+                except Warning, w:
+                    logging.warning(w)
+                except Exception, e:
+                    logging.exception('Module %s: %s' % (keyword, e))
 
     def execute(self):
         """Execute this feed, runs all associated modules in order by type"""
