@@ -103,7 +103,9 @@ class Manager:
         parser.add_option("--list", action="store_true", dest="list", default=0,
                           help="List all available modules.")
         parser.add_option("--failed", action="store_true", dest="failed", default=0,
-                                  help="List recently failed entries.")
+                          help="List recently failed entries.")
+        parser.add_option("--clear-failed", action="store_true", dest="clear_failed", default=0,
+                          help="Clear recently failed list.")
         parser.add_option("-c", action="store", dest="config", default="config.yml",
                           help="Specify configuration file. Default is config.yml")
         parser.add_option("-q", action="store_true", dest="quiet", default=0,
@@ -342,7 +344,8 @@ class Manager:
         if len(failed) == 0: print "No failed entries recorded"
         for entry in failed:
             tof = datetime(*entry['tof'])
-            print "%-12s TITLE: %-30s URL: %s" % (tof.strftime('%Y-%m-%d %H:%M'), entry['title'], entry['url'])
+            print "%16s - %s" % (tof.strftime('%Y-%m-%d %H:%M'), entry['title'])
+            print "%16s - %s" % ('', entry['url'])
         
     def add_failed(self, entry):
         """Adds entry to internal failed list, displayed with --failed"""
@@ -354,6 +357,11 @@ class Manager:
         failed.append(f)
         while len(failed) > 255:
             failed.pop(0)
+            
+    def clear_failed(self):
+        """Clears list of failed entries"""
+        print "Cleared %i items." % len(self.session.setdefault('failed', []))
+        self.session['failed'] = []
 
     def execute(self):
         """Iterate trough all feeds and run them."""
@@ -619,5 +627,7 @@ if __name__ == "__main__":
         manager.print_module_list()
     elif manager.options.failed:
         manager.print_failed()
+    elif manager.options.clear_failed:
+        manager.clear_failed()
     else:
         manager.execute()
