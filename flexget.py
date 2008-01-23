@@ -73,7 +73,7 @@ class Manager:
         initial_level = logging.INFO
         try:
             logging.basicConfig(level=initial_level,
-                                format=self.LOGGING_DETAILED,
+                                format='%(asctime)s '+self.LOGGING_DETAILED,
                                 filename=os.path.join(sys.path[0], 'flexget.log'),
                                 filemode="a",
                                 datefmt='%Y-%m-%d %H:%M:%S')
@@ -191,7 +191,7 @@ class Manager:
             except Exception, e:
                 logging.critical("Sessionfile has been broken. Execute flexget with --reset-session create new session and to avoid re-downloading everything. "\
                 "Downloads between time of break and now are lost. You must download these manually. "\
-                "This error is most likelly because of bug in software, check your log-file and report any tracebacks." % sessionfile)
+                "This error is most likelly because of bug in software, check your log-file and report any tracebacks.")
                 logging.exception('Load failure: %s' % e)
                 sys.exit(1)
 
@@ -208,10 +208,12 @@ class Manager:
         
     def load_modules(self, parser):
         """Load and call register on all modules"""
+        loaded = {} # prevent modules being loaded multiple times when they're imported by other modules
         for module in self.find_modules(self.moduledir):
             ns = {}
             execfile(os.path.join(self.moduledir, module), ns, ns)
             for name in ns.keys():
+                if loaded.get(name, False): continue
                 if type(ns[name]) == types.ClassType:
                     if hasattr(ns[name], 'register'):
                         try:
@@ -221,11 +223,12 @@ class Manager:
                             break
                         method = getattr(instance, 'register', None)
                         if callable(method):
-                            logging.debug('Module %s loaded' % name)
                             try:
+                                #logging.info('Loading module %s from %s' % (name, module))
                                 method(self, parser)
+                                loaded[name] = True
                             except RegisterException, e:
-                                logging.exception('Error while registering %s. %s' % (name, e.value))
+                                logging.error('Error while registering module %s. %s' % (name, e.value))
                                 break
                         else:
                             logging.error('Module %s register method is not callable' % name)
@@ -263,19 +266,21 @@ class Manager:
         for arg in ['instance', 'keyword', 'callback', 'type']:
             if not kwargs.has_key(arg):
                 raise RegisterException('Parameter %s is missing from register arguments' % arg)
-        module_type = kwargs['type']
         if not callable(kwargs['callback']):
             raise RegisterException("Passed method not callable.")
+        module_type = kwargs['type']
         if not module_type in self.module_types:
-            raise RegisterException("Module has invalid type '%s'. Recognized types are: %s." % (kwargs['type'], string.join(self.module_types, ', ')))
+            raise RegisterException("Module has invalid type '%s'. Recognized types are: %s." % (module_type, string.join(self.module_types, ', ')))
         self.modules.setdefault(module_type, {})
         if self.modules[module_type].has_key(kwargs['keyword']):
-            raise RegisterException("Duplicate keyword with same type: '%s'." % (kwargs['keyword']))
+            by = self.modules[module_type][kwargs['keyword']]['instance']
+            raise RegisterException("Duplicate keyword with same type '%s'. Keyword: '%s' Reserved by: '%s'" % (module_type, kwargs['keyword'], by.__class__.__name__))
         # set optional parameter default values
         kwargs.setdefault('order', 16384)
         kwargs.setdefault('builtin', False)
         self.modules[module_type][kwargs['keyword']] = kwargs
-        logging.debug("Module registered type: %s keyword: %s order: %d" % (kwargs['type'], kwargs['keyword'], kwargs['order']))
+        # never visible because of "initial" logging level
+        #logging.debug("Module registered type: %s keyword: %s order: %d" % (kwargs['type'], kwargs['keyword'], kwargs['order']))
 
     def get_modules_by_type(self, module_type):
         """Return all modules by type."""
@@ -342,8 +347,11 @@ class Manager:
     def add_failed(self, entry):
         """Adds entry to internal failed list, displayed with --failed"""
         failed = self.session.setdefault('failed', [])
-        entry['tof'] = list(datetime.today().timetuple())[:-4]
-        failed.append(entry)
+        f = {}
+        f['title'] = entry['title']
+        f['url'] = entry['url']
+        f['tof'] = list(datetime.today().timetuple())[:-4]
+        failed.append(f)
         while len(failed) > 255:
             failed.pop(0)
 
