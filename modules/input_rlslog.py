@@ -121,7 +121,7 @@ class RlsLog:
         f = re_votes.search(s.replace(",",""))
         if f != None:
             votes = f.groups()[0]
-        log.debug("RlsLog: parse_imdb returning score: '%s' votes: '%s' from: '%s'" % (str(score), str(votes), s))
+        log.debug("parse_imdb returning score: '%s' votes: '%s' from: '%s'" % (str(score), str(votes), s))
         return (score, votes)
 
     def parse_rlslog(self, rlslog_url):
@@ -175,7 +175,7 @@ class RlsLog:
             if release.has_key('site'):
                 releases.append(release)
             else:
-                log.info('RlsLog: %s rejected due missing torrents-link' % (release['title']))
+                log.info('%s rejected due missing torrents-link' % (release['title']))
 
         return releases
 
@@ -185,7 +185,7 @@ class RlsLog:
         try:
 	    releases = self.parse_rlslog(feed.get_input_url('rlslog'))
         except urllib2.URLError, e:
-            raise Warning('Input RlsLog was unable to complete task. URLError %s' % (e.reason))
+            raise Warning('RlsLog was unable to complete task. URLError %s' % (e.reason))
 
         for release in releases:
             # try to lookup torrent url (by site url) from cache
@@ -213,7 +213,7 @@ class RlsLog:
                     apply_field(release, entry, field)
                 feed.entries.append(entry)
             else:
-                log.debug("RlsLog: Unable to get torrent url for '%s' from newtorrents" % (release['title']))
+                log.debug("Unable to get torrent url for '%s' from newtorrents" % (release['title']))
 
 
 

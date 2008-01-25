@@ -22,7 +22,7 @@ class SeenFilter:
         for entry in feed.entries:
             entry_url = urllib.unquote(entry['url'])
             if feed.shared_cache.get(entry_url, False) or feed.shared_cache.get(entry['title'], False):
-                log.debug("Seen: filtering '%s' '%s'" % (entry_url, entry['title']))
+                log.debug("Filtering '%s' '%s'" % (entry_url, entry['title']))
                 feed.filter(entry, True) # True removes this entry unconditionally ASAP
 
     def learn_succeeded(self, feed):

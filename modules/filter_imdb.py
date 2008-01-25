@@ -3,6 +3,7 @@ import urllib2
 import urlparse
 import logging
 import re
+import string
 
 # this way we don't force users to install bs incase they do not want to use module http
 soup_present = True
@@ -18,6 +19,8 @@ log = logging.getLogger('imdb')
 
 class ImdbParser:
     """Quick-hack to parse relevant imdb details"""
+
+    yaml_serialized = ['genres', 'languages', 'score', 'votes', 'year', 'plot_outline', 'name']
     
     def __init__(self):
         self.genres = []
@@ -28,8 +31,24 @@ class ImdbParser:
         self.plot_outline = None
         self.name = None
 
+    def to_yaml(self):
+        """Serializes imdb details into yaml compatible structure"""
+        d = {}
+        for n in self.yaml_serialized:
+            d[n] = getattr(self, n)
+        return d
+
+    def from_yaml(self, yaml):
+        """Builds object from yaml serialized data"""
+        undefined = object()
+        for n in self.yaml_serialized:
+            # undefined check allows adding new fields without breaking things ..
+            value = yaml.get(n, undefined)
+            if value is undefined: continue
+            setattr(self, n, value)
+
     def parse(self, url):
-        log.debug("Parser parsing %s" % url)
+        log.info('Parsing from imdb %s' % url)
         page = urllib2.urlopen(url)
         soup = BeautifulSoup(page)
 
@@ -92,11 +111,6 @@ class FilterImdb:
 
     """
         This module allows filtering based on IMDB score, votes and genres etc.
-
-        Results are cached so modifying configuration does not have an effect
-        on already filtered entries. This is done to reduce traffic to
-        IMDB now only once per movie. You can disable this TEMPORARILY by using
-        --no-cache argument. This will potentially affect other modules aswell.
 
         Configuration:
         
@@ -163,24 +177,22 @@ class FilterImdb:
 
             if entry.get('imdb_url', None) == None and self.imdb_required(entry, config):
                 if config.get('reject_invalid', True):
-                    log.debug("Rejecting %s due required missing imdb url and configuration conditions" % entry['title'])
+                    log.debug("Rejecting %s due required missing imdb url" % entry['title'])
                     feed.filter(entry)
                 else:
-                    log.debug("Unable to check %s due missing imdb url, configured to accept (reject_invalid is False)" % entry['title'])
+                    log.debug("Unable to check %s due missing imdb url, configured to pass (reject_invalid is False)" % entry['title'])
                 continue
-
-            # do not check again from imdb if this has already been checked
-            if entry.has_key('imdb_url'):
-                # disable cache on --no-cache
-                if feed.cache.get(entry['imdb_url'], False) and not feed.manager.options.nocache:
-                    log.debug('Filtering %s, it has already been tried before' % entry['title'])
-                    feed.filter(entry)
-                    continue
 
             imdb = ImdbParser()
             if self.imdb_required(entry, config):
-                imdb.parse(entry['imdb_url'])
-                feed.cache.store(entry['imdb_url'], True, 90)
+                # check if this imdb page has been parsed & cached
+                cached = feed.shared_cache.get(entry['imdb_url'])
+                if not cached:
+                    imdb.parse(entry['imdb_url'])
+                else:
+                    imdb.from_yaml(cached)
+                # store to cache
+                feed.shared_cache.store(entry['imdb_url'], imdb.to_yaml())
             else:
                 # Set few required fields manually from entry, and thus avoiding request & parse
                 # Note: It doesn't matter even if some fields are missing, previous imdb_required
@@ -191,49 +203,47 @@ class FilterImdb:
                 imdb.languages = entry.get('imdb_languages', [])
                 imdb.genres = entry.get('imdb_genres', [])
 
-            # Check defined conditions
+            # Check defined conditions, TODO: rewrite into functions?
             
-            fail = False
+            reasons = []
             if config.has_key('min_score'):
                 if imdb.score < config['min_score']:
-                    log.debug("Rejecting %s due min_score" % entry['title'])
-                    fail = True
+                    reasons.append('min_score')
             if config.has_key('min_votes'):
                 if imdb.votes < config['min_votes']:
-                    log.debug("Rejecting %s due min_votes" % entry['title'])
-                    fail = True
+                    reasons.append('min_votes')
             if config.has_key('min_year'):
                 if imdb.year < config['min_year']:
-                    log.debug("Rejecting %s due min_year" % entry['title'])
-                    fail = True
+                    reasons.append('min_year')
             if config.has_key('reject_genres'):
                 rejected = config['reject_genres']
                 for genre in imdb.genres:
                     if genre in rejected:
-                        log.debug("Rejecting %s due reject_genres" % entry['title'])
-                        fail = True
+                        reasons.append('reject_genres')
                         break
             if config.has_key('reject_languages'):
                 rejected = config['reject_languages']
                 for language in imdb.languages:
                     if language in rejected:
-                        log.debug("Rejecting %s due reject_languages" % entry['title'])
-                        fail = True
+                        reasons.append('relect_languages')
                         break
             if config.has_key('accept_languages'):
                 accepted = config['accept_languages']
                 for language in imdb.languages:
                     if language not in accepted:
-                        log.debug("Rejecting %s due accept_languages" % entry['title'])
-                        fail = True
+                        reasons.append('accept_languages')
                         break
 
             # populate some fields from imdb results, incase someone wants to use them later
             entry['imdb_plot_outline'] = imdb.plot_outline
             entry['imdb_name'] = imdb.name
 
-            if fail:
-                log.debug("Filtering %s" % (entry))
+            if len(reasons) != 0:
+                lm = log.debug
+                if not feed.cache.get('log %s' % entry['title']):
+                    lm = log.info
+                    feed.cache.store('log %s' % entry['title'], True)
+                lm('Filtering %s because of rule(s) %s' % (entry['title'], string.join(reasons, ', ')))
                 feed.filter(entry)
             else:
                 log.debug("Accepting %s" % (entry))

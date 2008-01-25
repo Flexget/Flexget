@@ -2,6 +2,8 @@
     Provides some classes that are usefull when developing new modules.
 """
 
+import yaml
+
 class MockOptions:
     nocache = False
     
@@ -11,7 +13,7 @@ class MockManager:
 
 class MockCache:
     def store(self, key, value, days=30):
-        pass
+        print "store key: %s value: %s" % (key, yaml.safe_dump(value))
 
     def storedefault(self, key, value, default, days=30):
         pass
@@ -41,7 +43,6 @@ class MockFeed:
 
     def dump_entries(self):
         """Available only in mock! Dumps entries in yaml"""
-        import yaml
         for entry in self.entries:
             c = entry.copy()
             if c.has_key('data'):
