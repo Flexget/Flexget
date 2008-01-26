@@ -405,7 +405,7 @@ class ModuleCache:
         self.__storage = storage.setdefault(name, {})
 
     def set_namespace(self, name):
-        self.__cache = self.__storage.setdefault(name, {})
+        self._cache = self.__storage.setdefault(name, {})
         self.__namespace = name
         self.__purge()
 
@@ -415,16 +415,39 @@ class ModuleCache:
     def get_namespaces(self):
         """Return array of known namespaces in this cache"""
         return self.__storage.keys()
+
+    def sanitize(self, d):
+        """Makes dictionary d contain only yaml.safe_dump compatible elements"""
+        valid = [types.DictType, types.IntType, types.NoneType,
+                 types.StringType, types.UnicodeType, types.BooleanType,
+                 types.ListType, types.LongType]
+        for k in d.keys():
+            if type(d[k])==types.ListType:
+                for i in d[k][:]:
+                    if not type(i) in valid:
+                        self.log.debug('Removed non yaml compatible list item from key %s' % k)
+                        d[k].remove(i)
+            if type(d[k])==types.DictType:
+                self.sanitize(d[k])
+            if not type(d[k]) in valid:
+                self.log.debug('Removed non yaml compatible key %s' % k)
+                d.pop(k)
     
-    def store(self, key, value, days=60):
-        """Stores key value pair for number of days. Value must be yaml compatible."""
+    def store(self, key, value, days=45):
+        """Stores key value pair for number of days. Non yaml compatible values are not saved."""
+        # make copy to preserve passed value untouched
+        import copy
+        vc = value
+        if type(value) == types.DictType or type(value) == types.ListType:
+            vc = copy.deepcopy(value)
         item = {}
         item['stored'] = datetime.today().strftime('%Y-%m-%d')
         item['days'] = days
-        item['value'] = value
-        self.__cache[key] = item
+        item['value'] = vc
+        self.sanitize(item)
+        self._cache[key] = item
 
-    def storedetault(self, key, value, days=60):
+    def storedetault(self, key, value, days=45):
         """Identical to dictionary setdefault"""
         item = self.get(key)
         if item == None:
@@ -436,7 +459,7 @@ class ModuleCache:
 
     def get(self, key, default=None):
         """Return value by key from cache. Return None or default if not found"""
-        item = self.__cache.get(key)
+        item = self._cache.get(key)
         if item == None:
             return default
         else:
@@ -445,14 +468,14 @@ class ModuleCache:
     def __purge(self):
         """Remove all values from cache that have passed their expiry date"""
         now = datetime.today()
-        for key in self.__cache.keys():
-            item = self.__cache[key]
+        for key in self._cache.keys():
+            item = self._cache[key]
             y,m,d = item['stored'].split('-')
             stored = datetime(int(y), int(m), int(d))
             delta = now - stored
             if delta.days > item['days']:
                 self.log.debug('Purging from cache %s' % (str(item)))
-                self.__cache.pop(key)
+                self._cache.pop(key)
 
 class Feed:
 

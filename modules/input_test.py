@@ -14,6 +14,7 @@ class FeedTest:
             dummy['url'] = 'http://127.0.0.1/dummy%i' %i
             dummy['imdb_score'] = 5.2
             dummy['imdb_votes'] = 1253
+            dummy['instance'] = object()
             feed.entries.append(dummy)
 
         # add serie entries
