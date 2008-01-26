@@ -5,6 +5,8 @@ import logging
 import re
 import yaml
 
+log = logging.getLogger('rlslog')
+
 # this way we don't force users to install bs incase they do not want to use module http
 soup_present = True
 soup_err = "Module rlslog requires BeautifulSoup. Please install it from http://www.crummy.com/software/BeautifulSoup/ or from your distribution repository."
@@ -14,8 +16,6 @@ try:
 except:
     log.warning(soup_err)
     soup_present = False
-
-log = logging.getLogger('rlslog')
 
 class NewTorrents:
     """NewTorrents parsing utilities"""

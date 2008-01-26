@@ -114,6 +114,7 @@ class InputRSS:
                 entry['id'] = entry.link
 
             # Fixes for "interesting" feed structures
+            # TODO: these should be fixed in separate module !
             if entry.link.startswith("http://www.mininova.org/tor/"):
                 entry.link = entry.link.replace('tor', 'get')
             elif entry.link.startswith("http://www.torrentspy.com/torrent/"):
@@ -126,7 +127,7 @@ class InputRSS:
                 log.debug("Using basic auth for retrieval")
                 entry.link = self.passwordize(entry.link, config['username'], config['password'])
 
-            # add torrent link and title to matching pattern
+            # add entry
             e = {}
             e['url'] = entry.link.encode()
             e['title'] = entry.title.replace(u"\u200B", u"") # remove annoying zero width spaces
