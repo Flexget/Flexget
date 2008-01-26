@@ -28,7 +28,7 @@ class UnconditionallyFilter(FilterPatterns):
     """
 
     def register(self, manager, parser):
-        manager.register(instance=self, type="filter", keyword="unconditionally", callback=self.unconditionally, order=65536)
+        manager.register(instance=self, event="filter", keyword="unconditionally", callback=self.unconditionally, order=65536)
 
     def unconditionally(self, feed):
         self.filter(feed, feed.accept, None, 'unconditionally')     

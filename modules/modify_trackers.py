@@ -19,7 +19,7 @@ class RemoveTrackers:
     """
 
     def register(self, manager, parser):
-        manager.register(instance=self, type="modify", keyword="remove_trackers", callback=self.remove)
+        manager.register(instance=self, event="modify", keyword="remove_trackers", callback=self.remove)
 
     def remove(self, feed):
         for entry in feed.entries:

@@ -30,7 +30,7 @@ class InputHtml:
     """
 
     def register(self, manager, parser):
-        manager.register(instance=self, type="input", keyword="html", callback=self.run)
+        manager.register(instance=self, event="input", keyword="html", callback=self.run)
 
 #    def get_filename(self, href):
 #        return href[href.rfind("/")+1:]

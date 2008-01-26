@@ -7,7 +7,7 @@ class ModifyBtChat:
     '''Fixes bt-chat.com urls so that downloading works .. stupid javascript download delay'''
 
     def register(self, manager, parser):
-        manager.register(instance=self, type='input', keyword='btchat',
+        manager.register(instance=self, event='input', keyword='btchat',
                          callback=self.run, order=65535, debug_module=False, builtins=True)
 
     def run(self, feed):

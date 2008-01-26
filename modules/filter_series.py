@@ -94,9 +94,9 @@ class FilterSeries:
     """
 
     def register(self, manager, parser):
-        manager.register(instance=self, type="filter", keyword="series", callback=self.filter_series)
-        manager.register(instance=self, type="input", keyword="series", callback=self.input_series, order=65535)
-        manager.register(instance=self, type="exit", keyword="series", callback=self.learn_succeeded)
+        manager.register(instance=self, event="filter", keyword="series", callback=self.filter_series)
+        manager.register(instance=self, event="input", keyword="series", callback=self.input_series, order=65535)
+        manager.register(instance=self, event="exit", keyword="series", callback=self.learn_succeeded)
 
     def input_series(self, feed):
         """Retrieve stored series from cache, incase they've been expired from feed while waiting"""
@@ -173,12 +173,16 @@ class FilterSeries:
 
     def get_first_seen(self, feed, serie):
         """Return datetime when this episode of serie was first seen"""
-        fs = feed.cache.get(serie.name)[serie.identifier()]['info']['first_seen']
-        return datetime(*fs)
+        try:
+            fs = feed.cache.get(serie.name)[serie.identifier()]['info']['first_seen']
+            return datetime(*fs)
+        except KeyError:
+            # not sure if good practice ...
+            return datetime.today()
 
     def downloaded(self, feed, serie):
+        """Return true if this episode of seri is downloaded"""
         cache = feed.cache.get(serie.name)
-        # TODO: add --learn verbose!
         return cache[serie.identifier()]['info']['downloaded']
 
     def store(self, feed, serie, entry):
@@ -203,6 +207,7 @@ class FilterSeries:
         episode.setdefault(serie.quality, entry)
 
     def mark_downloaded(self, feed, serie):
+        # TODO: add --learn verbose!
         cache = feed.cache.get(serie.name)
         cache[serie.identifier()]['info']['downloaded'] = True
 
@@ -211,7 +216,6 @@ class FilterSeries:
             serie = entry.get('serie_parser')
             if serie:
                 self.mark_downloaded(feed, serie)
-                entry.pop('serie_parser') # remove instance since it cannot be written in yml! TODO: make framework disgard such fields?
 
 if __name__ == '__main__':
     fs = SerieParser('mock serie', 'Mock.Serie.S04E01.HDTV.XviD-TEST.avi')

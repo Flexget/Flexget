@@ -52,7 +52,8 @@ class RegisterException(Exception):
 class Manager:
 
     moduledir = os.path.join(sys.path[0], "modules/")
-    module_types = ["start", "input", "filter", "download", "modify", "output", "exit"]
+
+    EVENTS = ["start", "input", "filter", "download", "modify", "output", "exit"]
 
     SESSION_VERSION = 2
 
@@ -239,7 +240,7 @@ class Manager:
     def find_modules(self, directory):
         """Return array containing all modules in passed path"""
         modules = []
-        prefixes = self.module_types + ['module', 'source']
+        prefixes = self.EVENTS + ['module', 'source']
         for m in os.listdir(directory):
             for p in prefixes:
                 if m.startswith(p+'_') and m.endswith(".py"):
@@ -258,37 +259,37 @@ class Manager:
                 instance    - instance of module (self)
                 keyword     - maps directly into config
                 callback    - method that is called when module is executed
-                type        - specifies when module is executed and implies what it does
+                event       - specifies when module is executed and implies what it does
             Optional arguments:
                 order       - when multiple modules are enabled this is used to
                               determine execution order. Default 16384.
                 builtin     - set to True if module should be executed always
         """
         # validate passed arguments
-        for arg in ['instance', 'keyword', 'callback', 'type']:
+        for arg in ['instance', 'keyword', 'callback', 'event']:
             if not kwargs.has_key(arg):
                 raise RegisterException('Parameter %s is missing from register arguments' % arg)
         if not callable(kwargs['callback']):
             raise RegisterException("Passed method not callable.")
-        module_type = kwargs['type']
-        if not module_type in self.module_types:
-            raise RegisterException("Module has invalid type '%s'. Recognized types are: %s." % (module_type, string.join(self.module_types, ', ')))
-        self.modules.setdefault(module_type, {})
-        if self.modules[module_type].has_key(kwargs['keyword']):
-            by = self.modules[module_type][kwargs['keyword']]['instance']
-            raise RegisterException("Duplicate keyword with same type '%s'. Keyword: '%s' Reserved by: '%s'" % (module_type, kwargs['keyword'], by.__class__.__name__))
+        event = kwargs.get('event')
+        if not event in self.EVENTS:
+            raise RegisterException("Module has invalid event '%s'. Recognized events are: %s." % (event, string.join(self.EVENTS, ', ')))
+        self.modules.setdefault(event, {})
+        if self.modules[event].has_key(kwargs['keyword']):
+            by = self.modules[event][kwargs['keyword']]['instance']
+            raise RegisterException("Duplicate keyword with same event '%s'. Keyword: '%s' Reserved by: '%s'" % (event, kwargs['keyword'], by.__class__.__name__))
         # set optional parameter default values
         kwargs.setdefault('order', 16384)
         kwargs.setdefault('builtin', False)
-        self.modules[module_type][kwargs['keyword']] = kwargs
+        self.modules[event][kwargs['keyword']] = kwargs
         # never visible because of "initial" logging level
-        #logging.debug("Module registered type: %s keyword: %s order: %d" % (kwargs['type'], kwargs['keyword'], kwargs['order']))
+        #logging.debug("Module registered event: %s keyword: %s order: %d" % (kwargs['event'], kwargs['keyword'], kwargs['order']))
 
-    def get_modules_by_type(self, module_type):
-        """Return all modules by type."""
+    def get_modules_by_event(self, event):
+        """Return all modules by event."""
         result = []
-        for keyword, module in self.modules.get(module_type, {}).items():
-            if module['type'] == module_type:
+        for keyword, module in self.modules.get(event, {}).items():
+            if module['event'] == event:
                 result.append(module)
         return result
 
@@ -298,8 +299,8 @@ class Manager:
         print "-"*60
         modules = []
         roles = {}
-        for module_type in self.module_types:
-            ml = self.get_modules_by_type(module_type)
+        for event in self.EVENTS:
+            ml = self.get_modules_by_event(event)
             for m in ml:
                 dupe = False
                 for module in modules:
@@ -309,15 +310,15 @@ class Manager:
             # build roles list
             for m in ml:
                 if roles.has_key(m['keyword']):
-                    roles[m['keyword']].append(module_type)
+                    roles[m['keyword']].append(event)
                 else:
-                    roles[m['keyword']] = [module_type]
+                    roles[m['keyword']] = [event]
         for module in modules:
             # do not include test classes, unless in debug mode
             if module.get('debug_module', False) and not self.options.debug:
                 continue
-            module_type = module['type']
-            if modules.index(module) > 0: module_type=""
+            event = module['event']
+            if modules.index(module) > 0: event = ""
             doc = "Yes"
             if module['instance'].__doc__ == None: doc = "No"
             print "%-20s%-30s%s" % (module['keyword'], string.join(roles[module['keyword']], ', '), doc)
@@ -326,8 +327,8 @@ class Manager:
     def print_module_doc(self):
         keyword = self.options.doc
         found = False
-        for module_type in self.module_types:
-            modules = self.modules.get(module_type, {})
+        for event in self.EVENTS:
+            modules = self.modules.get(event, {})
             module = modules.get(keyword, None)
             if module:
                 found = True
@@ -598,8 +599,8 @@ class Feed:
         b = self.__get_order(b)
         return cmp(a, b)
 
-    def __run_modules(self, module_type):
-        modules = manager.get_modules_by_type(module_type)
+    def __run_modules(self, event):
+        modules = manager.get_modules_by_event(event)
         # Sort modules based on module order.
         # Order can be also configured in which case given value overwrites module default.
         modules.sort(self.__sort_modules)
@@ -611,7 +612,7 @@ class Feed:
                     self.cache.set_namespace(keyword)
                     self.shared_cache.set_namespace(keyword)
                     # call module
-                    logging.debug('executing %s %s' % (module_type, keyword))
+                    logging.debug('executing %s %s' % (event, keyword))
                     module['callback'](self)
                     # check for priority operations
                     self.__filter_immediately()
@@ -623,19 +624,19 @@ class Feed:
 
     def execute(self):
         """Execute this feed, runs all associated modules in order by type"""
-        for module_type in self.manager.module_types:
+        for event in self.manager.EVENTS:
             # when learning, skip few types
             if self.manager.options.learn:
-                if module_type in ['download', 'output']: continue
+                if event in ['download', 'output']: continue
             # run all modules with specified type
-            self.__run_modules(module_type)
+            self.__run_modules(event)
             # purge filtered entries
             self.__purge()
             # verbose some progress, unless in quiet mode (logging only) TODO: implement more widely trough custom level?
             if not manager.options.quiet:
-                if module_type == 'input':
+                if event == 'input':
                     logging.info('Feed %s produced %s entries.' % (self.name, len(self.entries)))
-                if module_type == 'filter':
+                if event == 'filter':
                     logging.info('Feed %s filtered %s entries (%s remains).' % (self.name, self.__purged, len(self.entries)))
             # if abort flag has been set feed should be aborted now
             if self.__abort:

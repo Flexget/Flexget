@@ -40,8 +40,8 @@ class ModuleDownload:
     """
 
     def register(self, manager, parser):
-        manager.register(instance=self, type="download", keyword="download", callback=self.execute_downloads)
-        manager.register(instance=self, type="output", keyword="download", callback=self.execute_outputs)
+        manager.register(instance=self, event="download", keyword="download", callback=self.execute_downloads)
+        manager.register(instance=self, event="output", keyword="download", callback=self.execute_outputs)
 
     def validate_config(self, feed):
         # check for invalid configuration, abort whole download if not goig to work

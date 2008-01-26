@@ -33,7 +33,7 @@ class InputCSV:
     """
 
     def register(self, manager, parser):
-        manager.register(instance=self, type='input', keyword='csv', callback=self.run)
+        manager.register(instance=self, event='input', keyword='csv', callback=self.run)
 
     def run(self, feed):
         url = feed.config['csv'].get('url', None)

@@ -165,7 +165,7 @@ class TorrentFilename:
     """
 
     def register(self, manager, parser):
-        manager.register(instance=self, type='modify', keyword='torrent', callback=self.run, order=-200, builtin=True)
+        manager.register(instance=self, event='modify', keyword='torrent', callback=self.run, order=-200, builtin=True)
 
     def run(self, feed):
         for entry in feed.entries:

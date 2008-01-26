@@ -154,7 +154,7 @@ class FilterImdb:
     """
 
     def register(self, manager, parser):
-        manager.register(instance=self, type='filter', keyword='imdb', callback=self.run)
+        manager.register(instance=self, event='filter', keyword='imdb', callback=self.run)
 
     def imdb_required(self, entry, config):
         """Return True if config contains conditions that are not available in preparsed fields"""

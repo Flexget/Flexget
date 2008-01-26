@@ -5,7 +5,7 @@ class FeedTest:
     ''' dummy module for testing '''
 
     def register(self, manager, parser):
-        manager.register(instance=self, type='input', keyword='input_test', callback=self.run, order=1, debug_module=True)
+        manager.register(instance=self, event='input', keyword='input_test', callback=self.run, order=1, debug_module=True)
 
     def run(self, feed):
         for i in range(10):
