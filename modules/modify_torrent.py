@@ -185,8 +185,6 @@ class TorrentFilename:
         files = torrent.get_filelist()
         if len(files) == 1 :
             # single file, if filename is longer than title use it
-            import yaml
-            print yaml.dump(files)
             fn = files[0]["name"]
             if len(fn) > len(title):
                 title = fn[:fn.rfind('.')]
