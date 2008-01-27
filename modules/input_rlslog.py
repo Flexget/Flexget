@@ -62,7 +62,7 @@ class NewTorrents:
                 log.debug("NewTorrents rejecting search result: '%s' != '%s'" % (release_name, name))
 
         # choose the torrent
-        if len(torrents) == 0:
+        if not torrents:
             log.debug("NewTorrents did not found any matches in search result")
             return None
         else:

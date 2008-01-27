@@ -5,7 +5,6 @@ import types
 
 log = logging.getLogger('modify_torrent')
 
-
 # Torrent decoding is a short fragment from effbot.org. Site copyright says:
 # Test scripts and other short code fragments can be considered as being in the public domain.
 
@@ -69,7 +68,7 @@ class Torrent:
             try:
                 tl.remove(tracker)
                 # if no trackers left in list, remove whole list
-                if len(tl)==0:
+                if not tl:
                     self.content['announce-list'].remove(tl)
             except:
                 pass

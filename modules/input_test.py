@@ -8,6 +8,7 @@ class FeedTest:
         manager.register(instance=self, event='input', keyword='input_test', callback=self.run, order=1, debug_module=True)
 
     def run(self, feed):
+        """
         for i in range(10):
             dummy = {}
             dummy['title'] = 'dummy title %i' % i
@@ -16,6 +17,7 @@ class FeedTest:
             dummy['imdb_votes'] = 1253
             dummy['instance'] = object()
             feed.entries.append(dummy)
+        """
 
         # add serie entries
         for ep in ['S1E01', 'S1E02', 'S1E03']:

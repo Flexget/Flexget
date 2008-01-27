@@ -32,9 +32,6 @@ class InputHtml:
     def register(self, manager, parser):
         manager.register(instance=self, event="input", keyword="html", callback=self.run)
 
-#    def get_filename(self, href):
-#        return href[href.rfind("/")+1:]
-
     def run(self, feed):
         if not soup_present: raise Exception(soup_err)
         pageurl = feed.get_input_url('html')
@@ -49,7 +46,7 @@ class InputHtml:
             if title == None: continue
             url = link['href']
             title = str(title).strip()
-            if len(title) == 0: continue
+            if not title: continue
 
             # fix broken urls
             if url.startswith('//'):

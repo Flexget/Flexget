@@ -137,35 +137,31 @@ class FilterSeries:
                 # save for choosing
                 eps = series.setdefault(serie.identifier(), [])
                 eps.append(serie)
-            
+
             # choose best episode
             for identifier, eps in series.iteritems():
+                if not eps: continue
                 def sort_by_quality(s1, s2):
                     return cmp(SerieParser.qualities.index(s1.quality), SerieParser.qualities.index(s2.quality))
                 eps.sort(sort_by_quality)
-                if len(eps)==0:
-                    continue
                 best = eps[0]
-
-                for ep in eps:
-                    log.debug('ep %s' % ep)
 
                 # if age exceeds timeframe
                 diff = datetime.today() - self.get_first_seen(feed, best)
                 age_hours = divmod(diff.seconds, 60*60)[0]
 
-                log.debug('%s age_hours %i' % (best, age_hours))
+                log.debug('age_hours %i - %s ' % (age_hours, best))
                 
                 timeframe = conf.get('best_in', 0)
                 log.debug('best ep in %i hours is %s' % (timeframe, best))
 
                 if age_hours < timeframe or self.downloaded(feed, best):
-                    log.debug('filtering %s, downloaded %s' % (best.entry, self.downloaded(feed, best)))
+                    log.debug('Filtering %s, downloaded %s' % (best.entry, self.downloaded(feed, best)))
                     feed.filter(best.entry)
                 else:
-                    log.debug('passing %s' % best.entry)
+                    log.debug('Accepting %s' % best.entry)
                     feed.accept(best.entry)
-                    # set the serie instance to entry
+                    # store serie instance to entry for later use
                     best.entry['serie_parser'] = best
                     # remove entry instance from serie instance, not needed any more (save memory, circular reference?)
                     best.entry = None
@@ -173,12 +169,8 @@ class FilterSeries:
 
     def get_first_seen(self, feed, serie):
         """Return datetime when this episode of serie was first seen"""
-        try:
-            fs = feed.cache.get(serie.name)[serie.identifier()]['info']['first_seen']
-            return datetime(*fs)
-        except KeyError:
-            # not sure if good practice ...
-            return datetime.today()
+        fs = feed.cache.get(serie.name)[serie.identifier()]['info']['first_seen']
+        return datetime(*fs)
 
     def downloaded(self, feed, serie):
         """Return true if this episode of seri is downloaded"""
@@ -194,20 +186,16 @@ class FilterSeries:
         #       downloaded: <boolean>
         #     720p: <entry>
         #     dsr: <entry>
-
         cache = feed.cache.storedetault(serie.name, {}, 30)
         episode = cache.setdefault(serie.identifier(), {})
         info = episode.setdefault('info', {})
-
         # store and make first seen time
         fs = info.setdefault('first_seen', list(datetime.today().timetuple())[:-4] )
         first_seen = datetime(*fs)
         info.setdefault('downloaded', False)
-
         episode.setdefault(serie.quality, entry)
 
     def mark_downloaded(self, feed, serie):
-        # TODO: add --learn verbose!
         cache = feed.cache.get(serie.name)
         cache[serie.identifier()]['info']['downloaded'] = True
 
@@ -221,4 +209,3 @@ if __name__ == '__main__':
     fs = SerieParser('mock serie', 'Mock.Serie.S04E01.HDTV.XviD-TEST.avi')
     fs.parse()
     print fs
-    

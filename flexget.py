@@ -143,11 +143,8 @@ class Manager:
             self.options.learn = True
         else:
             self.load_session()
-        # if new session, init version
-        if len(self.session) == 0:
-            self.session['version'] = self.SESSION_VERSION
         # check if session version number is different
-        if self.session.get('version', 0) != self.SESSION_VERSION:
+        if self.session.setdefault('version', self.SESSION_VERSION) != self.SESSION_VERSION:
             if not self.options.learn:
                 logging.critical('Your session is broken or from older incompatible version of flexget. '\
                                  'Run application with --reset-session to resolve this. '\
@@ -342,7 +339,8 @@ class Manager:
             
     def print_failed(self):
         failed = self.session.setdefault('failed', [])
-        if len(failed) == 0: print "No failed entries recorded"
+        if not failed:
+            print "No failed entries recorded"
         for entry in failed:
             tof = datetime(*entry['tof'])
             print "%16s - %s" % (tof.strftime('%Y-%m-%d %H:%M'), entry['title'])
@@ -367,16 +365,15 @@ class Manager:
     def execute(self):
         """Iterate trough all feeds and run them."""
         try:
-            feeds = self.config.get('feeds', {})
-            feeds = feeds.keys() # array of feed names
-            if len(feeds)==0: logging.critical('There are no feeds in configuration file!')
+            feeds = self.config.get('feeds', {}).keys()
+            if not feeds: logging.critical('There are no feeds in configuration file!')
 
             # --only-feed
             if self.options.onlyfeed:
                 ofeeds, feeds = feeds, []
                 for name in ofeeds:
                     if name.lower() == self.options.onlyfeed.lower(): feeds.append(name)
-                if len(feeds)==0:
+                if not feeds:
                     logging.critical('Could not find feed %s' % self.options.onlyfeed)
                 
             for name in feeds:
@@ -450,11 +447,12 @@ class ModuleCache:
 
     def storedetault(self, key, value, days=45):
         """Identical to dictionary setdefault"""
-        item = self.get(key)
-        if item == None:
+        undefined = object()
+        item = self.get(key, undefined)
+        if item is undefined:
             self.log.debug('storing default for %s, value %s' % (key, value))
             self.store(key, value, days)
-            return value
+            return self.get(key)
         else:
             return item
 
@@ -526,7 +524,8 @@ class Feed:
         self.__filtered = []
 
     def __filter_immediately(self):
-        if len(self.__immediattely) == 0: return
+        if not self.__immediattely:
+            return
         for entry in self.entries[:]:
             if entry in self.__immediattely:
                 logging.debug('Purging immediately entry %s' % entry)
