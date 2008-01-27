@@ -498,9 +498,9 @@ class Feed:
         self.shared_cache = ModuleCache('_shared_', manager.get_cache())
 
         self.entries = []
-        self.__accepted = [] # these entries are always accepted, filtering does not affect them
+        self.__accepted = [] # these entries are always accepted, basic filtering does not affect them
         self.__filtered = []
-        self.__immediattely = []
+        self.__immediattely = [] #TODO: refactor to forcibly?
         self.__failed = []
         self.__abort = False
         self.__purged = 0
@@ -516,8 +516,8 @@ class Feed:
                 else: raise Exception('Global keyword %s is incompatible with feed %s. Keywords are not same datatype.' % (k, self.name))
             else: d2[k] = v
 
-    def __purge(self):
-        """Purge filtered entries from feed"""
+    def _purge(self):
+        """Purge filtered entries from feed. Call this from module only if you know what you're doing."""
         for entry in self.entries[:]:
             if entry in self.__filtered and not entry in self.__accepted:
                 logging.debug('Purging entry %s' % entry)
@@ -631,7 +631,7 @@ class Feed:
             # run all modules with specified type
             self.__run_modules(event)
             # purge filtered entries
-            self.__purge()
+            self._purge()
             # verbose some progress, unless in quiet mode (logging only) TODO: implement more widely trough custom level?
             if not manager.options.quiet:
                 if event == 'input':
