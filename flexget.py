@@ -195,12 +195,29 @@ class Manager:
                 logging.exception('Load failure: %s' % e)
                 sys.exit(1)
 
+    def sanitize(self, d):
+        """Makes dictionary d contain only yaml.safe_dump compatible elements"""
+        valid = [types.DictType, types.IntType, types.NoneType,
+                 types.StringType, types.UnicodeType, types.BooleanType,
+                 types.ListType, types.LongType]
+        for k in d.keys():
+            if type(d[k])==types.ListType:
+                for i in d[k][:]:
+                    if not type(i) in valid:
+                        logging.debug('Removed non yaml compatible list item from key %s' % k)
+                        d[k].remove(i)
+            if type(d[k])==types.DictType:
+                self.sanitize(d[k])
+            if not type(d[k]) in valid:
+                logging.debug('Removed non yaml compatible key %s' % k)
+                d.pop(k)
+
     def save_session(self):
         try:
             if self.configname==None: raise Exception('self.configname missing')
             sessionfile = os.path.join(sys.path[0], 'session-%s.yml' % self.configname)
             f = file(sessionfile, 'w')
-            yaml.safe_dump(self.session, f) # safe_dump removes !!python/unicode which fails to load
+            yaml.safe_dump(self.sanitize(self.session), f) # safe_dump removes !!python/unicode which fails to load
             f.close()
         except Exception, e:
             logging.exception("Failed to save session data (%s)!" % e)
@@ -414,35 +431,13 @@ class ModuleCache:
         """Return array of known namespaces in this cache"""
         return self.__storage.keys()
 
-    def sanitize(self, d):
-        """Makes dictionary d contain only yaml.safe_dump compatible elements"""
-        valid = [types.DictType, types.IntType, types.NoneType,
-                 types.StringType, types.UnicodeType, types.BooleanType,
-                 types.ListType, types.LongType]
-        for k in d.keys():
-            if type(d[k])==types.ListType:
-                for i in d[k][:]:
-                    if not type(i) in valid:
-                        self.log.debug('Removed non yaml compatible list item from key %s' % k)
-                        d[k].remove(i)
-            if type(d[k])==types.DictType:
-                self.sanitize(d[k])
-            if not type(d[k]) in valid:
-                self.log.debug('Removed non yaml compatible key %s' % k)
-                d.pop(k)
     
     def store(self, key, value, days=45):
         """Stores key value pair for number of days. Non yaml compatible values are not saved."""
-        # make copy to preserve passed value untouched
-        import copy
-        vc = value
-        if type(value) == types.DictType or type(value) == types.ListType:
-            vc = copy.deepcopy(value)
         item = {}
         item['stored'] = datetime.today().strftime('%Y-%m-%d')
         item['days'] = days
-        item['value'] = vc
-        self.sanitize(item)
+        item['value'] = value
         self._cache[key] = item
 
     def storedetault(self, key, value, days=45):
