@@ -621,6 +621,12 @@ class Feed:
                 except Exception, e:
                     logging.exception('Module %s: %s' % (keyword, e))
 
+    def verbose_progress(self, s):
+        """Verboses progress, outputs only in non quiet mode."""
+        # TODO: implement trough own logger?
+        if not manager.options.quiet:
+          logging.info(s)
+
     def execute(self):
         """Execute this feed, runs all associated modules in order by type"""
         for event in self.manager.EVENTS:
@@ -631,12 +637,11 @@ class Feed:
             self.__run_modules(event)
             # purge filtered entries
             self._purge()
-            # verbose some progress, unless in quiet mode (logging only) TODO: implement more widely trough custom level?
-            if not manager.options.quiet:
-                if event == 'input':
-                    logging.info('Feed %s produced %s entries.' % (self.name, len(self.entries)))
-                if event == 'filter':
-                    logging.info('Feed %s filtered %s entries (%s remains).' % (self.name, self.__purged, len(self.entries)))
+            # verbose some progress
+            if event == 'input':
+                self.verbose_progress('Feed %s produced %s entries.' % (self.name, len(self.entries)))
+            if event == 'filter':
+                self.verbose_progress('Feed %s filtered %s entries (%s remains).' % (self.name, self.__purged, len(self.entries)))
             # if abort flag has been set feed should be aborted now
             if self.__abort:
                 logging.info('Aborting feed %s' % self.name)

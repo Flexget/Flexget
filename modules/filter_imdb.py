@@ -48,7 +48,6 @@ class ImdbParser:
             setattr(self, n, value)
 
     def parse(self, url):
-        log.info('Parsing from imdb %s' % url)
         page = urllib2.urlopen(url)
         soup = BeautifulSoup(page)
 
@@ -188,6 +187,7 @@ class FilterImdb:
                 # check if this imdb page has been parsed & cached
                 cached = feed.shared_cache.get(entry['imdb_url'])
                 if not cached:
+                    feed.verbose_progress('Parsing from imdb %s' % entry['title'])
                     imdb.parse(entry['imdb_url'])
                 else:
                     imdb.from_yaml(cached)
