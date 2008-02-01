@@ -192,7 +192,7 @@ class Manager:
                 logging.critical("Sessionfile has been broken. Execute flexget with --reset-session create new session and to avoid re-downloading everything. "\
                 "Downloads between time of break and now are lost. You must download these manually. "\
                 "This error is most likelly because of bug in software, check your log-file and report any tracebacks.")
-                logging.exception('Load failure: %s' % e)
+                logging.exception('Reason: %s' % e)
                 sys.exit(1)
 
     def sanitize(self, d):
@@ -217,7 +217,8 @@ class Manager:
             if self.configname==None: raise Exception('self.configname missing')
             sessionfile = os.path.join(sys.path[0], 'session-%s.yml' % self.configname)
             f = file(sessionfile, 'w')
-            yaml.safe_dump(self.sanitize(self.session), f) # safe_dump removes !!python/unicode which fails to load
+            self.sanitize(self.session)
+            yaml.safe_dump(self.session, f) # safe_dump removes !!python/unicode which fails to load
             f.close()
         except Exception, e:
             logging.exception("Failed to save session data (%s)!" % e)
