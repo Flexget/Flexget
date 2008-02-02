@@ -193,7 +193,8 @@ class FilterSeries:
         fs = info.setdefault('first_seen', list(datetime.today().timetuple())[:-4] )
         first_seen = datetime(*fs)
         info.setdefault('downloaded', False)
-        episode.setdefault(serie.quality, entry)
+        import copy
+        episode.setdefault(serie.quality, copy.copy(entry))
 
     def mark_downloaded(self, feed, serie):
         cache = feed.cache.get(serie.name)
