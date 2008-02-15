@@ -56,6 +56,9 @@ class ModuleDownload:
                     log.info("Would download %s" % entry['title'])
                 else:
                     self.download(feed, entry)
+            except IOError, e:
+                feed.failed(entry)
+                log.warning("Download of %s timed out" % entry['title']);
             except Exception, e:
                 # notify framework that outputing this entry failed
                 feed.failed(entry)
