@@ -27,6 +27,6 @@ class FilterLimitNew:
         i = 1
         for entry in feed.entries:
             if i > amount:
-                log.debug('Filtering %s' % entry)
-                feed.filter(entry, True)
+                log.debug('Rejecting %s' % entry)
+                feed.reject(entry)
             i += 1

@@ -518,6 +518,13 @@ class Feed:
                 self.entries.remove(entry)
                 self.__purged += 1
         self.__filtered = []
+        
+    def __purge_failed(self):
+        """Purge failed entries from feed."""
+        for entry in self.entries[:]:
+            if entry in self.__failed:
+                logging.debug('Purging failed entry %s' % entry)
+                self.entries.remove(entry)
 
     def __filter_immediately(self):
         if not self.__immediattely:
@@ -530,17 +537,20 @@ class Feed:
         self.__immediattely = []
 
     def accept(self, entry):
-        """Accepts this entry"""
+        """Accepts this entry."""
         if not entry in self.__accepted:
             self.__accepted.append(entry)
 
-    def filter(self, entry, immediately=False):
-        if immediately:
-            # schedule immediately filtering after this module has done execution
-            if not entry in self.__immediattely:
-                self.__immediattely.append(entry)
-        elif not entry in self.__filtered:
+    def filter(self, entry):
+        """Mark entry to be filtered uless told otherwise. Entry may still be accepted."""
+        if not entry in self.__filtered:
             self.__filtered.append(entry)
+
+    def reject(self, entry):
+        """Reject this entry immediattely and permanently."""
+        # schedule immediately filtering after this module has done execution
+        if not entry in self.__immediattely:
+            self.__immediattely.append(entry)
 
     def failed(self, entry):
         """Mark entry failed"""
@@ -626,13 +636,14 @@ class Feed:
     def execute(self):
         """Execute this feed, runs all associated modules in order by type"""
         for event in self.manager.EVENTS:
-            # when learning, skip few types
+            # when learning, skip few events
             if self.manager.options.learn:
                 if event in ['download', 'output']: continue
             # run all modules with specified type
             self.__run_modules(event)
-            # purge filtered entries
+            # purge filtered and failed entries
             self._purge()
+            self.__purge_failed()
             # verbose some progress
             if event == 'input':
                 self.verbose_progress('Feed %s produced %s entries.' % (self.name, len(self.entries)))

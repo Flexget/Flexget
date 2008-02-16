@@ -213,7 +213,7 @@ class RlsLog:
                     apply_field(release, entry, field)
                 feed.entries.append(entry)
             else:
-                log.debug("Unable to get torrent url for '%s' from newtorrents" % (release['title']))
+                log.debug("Unable to get torrent url for '%s'" % (release['title']))
 
 
 

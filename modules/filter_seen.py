@@ -15,15 +15,15 @@ class SeenFilter:
     """
 
     def register(self, manager, parser):
-        manager.register(instance=self, event="filter", keyword="seen", callback=self.filter_seen, order=-100, builtin=True)
-        manager.register(instance=self, event="exit", keyword="seen", callback=self.learn_succeeded, builtin=True)
+        manager.register(instance=self, event='filter', keyword='seen', callback=self.filter_seen, order=-100, builtin=True)
+        manager.register(instance=self, event='exit', keyword='seen', callback=self.learn_succeeded, builtin=True)
 
     def filter_seen(self, feed):
         for entry in feed.entries:
             entry_url = urllib.unquote(entry['url'])
             if feed.shared_cache.get(entry_url, False) or feed.shared_cache.get(entry['title'], False):
-                log.debug("Filtering '%s' '%s'" % (entry_url, entry['title']))
-                feed.filter(entry, True) # True removes this entry unconditionally ASAP
+                log.debug("Rejecting '%s' '%s'" % (entry_url, entry['title']))
+                feed.reject(entry)
 
     def learn_succeeded(self, feed):
         for entry in feed.get_succeeded_entries():
