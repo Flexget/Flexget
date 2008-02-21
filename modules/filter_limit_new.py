@@ -22,7 +22,9 @@ class FilterLimitNew:
         manager.register(instance=self, event='filter', keyword='limit_new', callback=self.limit, order=65535)
 
     def limit(self, feed):
-        feed._purge() # purge filtered items since we don't want to leave them
+        # purge filtered items since we don't want to pass any of them
+        # since they are most likelly useless
+        feed._purge() 
         amount = feed.config.get('limit_new', len(feed.entries))
         i = 1
         for entry in feed.entries:

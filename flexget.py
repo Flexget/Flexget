@@ -92,7 +92,9 @@ class Manager:
                           help="Specify configuration file. Default is config.yml")
         parser.add_option("-q", action="store_true", dest="quiet", default=0,
                           help="Disables stdout and stderr output. Logging is done only to file.")
-        parser.add_option("-d", action="store_true", dest="debug", default=0,
+        parser.add_option("-d", action="store_true", dest="details", default=0,
+                          help="Display detailed process information.")
+        parser.add_option("--debug", action="store_true", dest="debug", default=0,
                           help=SUPPRESS_HELP)
 
         # add module path to sys.path so they can import properly ..
@@ -480,6 +482,10 @@ class Feed:
         self.__abort = False
         self.__purged = 0
         
+        # loggers
+        #self.details = logging.getLogger('details')
+        #self.details.disabled = 1
+        
     def __merge_config(self, d1, d2):
         """Merges dictionary d1 into dictionary d2"""
         for k, v in d1.items():
@@ -521,23 +527,28 @@ class Feed:
         """Accepts this entry."""
         if not entry in self.__accepted:
             self.__accepted.append(entry)
+            self.verbose_details('Accepted %s' % entry['title'])
 
     def filter(self, entry):
         """Mark entry to be filtered uless told otherwise. Entry may still be accepted."""
         if not entry in self.__filtered:
             self.__filtered.append(entry)
+            self.verbose_details('Filtered %s' % entry['title'])
 
     def reject(self, entry):
         """Reject this entry immediattely and permanently."""
         # schedule immediately filtering after this module has done execution
         if not entry in self.__immediattely:
             self.__immediattely.append(entry)
+            self.verbose_details('Rejected %s' % entry['title'])
 
     def failed(self, entry):
         """Mark entry failed"""
         logging.debug("Marking entry '%s' as failed" % entry['title'])
-        self.__failed.append(entry)
-        self.manager.add_failed(entry)
+        if not entry in self.__failed:
+            self.__failed.append(entry)
+            self.manager.add_failed(entry)
+            self.verbose_details('Failed %s' % entry['title'])
 
     def get_failed_entries(self):
         """Return set containing failed entries"""
@@ -554,6 +565,7 @@ class Feed:
     def abort(self):
         """Abort this feed execution, no more modules will be executed."""
         self.__abort = True
+        self.verbose_details('Aborting feed')
 
     def get_input_url(self, keyword):
         """
@@ -586,6 +598,7 @@ class Feed:
         return cmp(a, b)
 
     def __run_modules(self, event):
+        """Execute module callbacks by event type if module is configured for this feed."""
         modules = manager.get_modules_by_event(event)
         # Sort modules based on module order.
         # Order can be also configured in which case given value overwrites module default.
@@ -594,11 +607,13 @@ class Feed:
             keyword = module['keyword']
             if self.config.has_key(keyword) or (module['builtin'] and not self.config.get('disable_builtins', False)):
                 try:
-                    # set cache namespaces
+                    # set cache namespaces to this module realm
                     self.cache.set_namespace(keyword)
                     self.shared_cache.set_namespace(keyword)
+                    # store execute info
+                    self.__current_event = event
+                    self.__current_module = keyword
                     # call module
-                    logging.debug('executing %s %s' % (event, keyword))
                     module['callback'](self)
                     # check for priority operations
                     self.__filter_immediately()
@@ -613,20 +628,31 @@ class Feed:
         # TODO: implement trough own logger?
         if not manager.options.quiet:
           logging.info(s)
+          
+    def verbose_details(self, s):
+        # TODO: implement trough own logger?
+        if manager.options.details:
+            print "+ %-8s %-12s %s" % (self.__current_event, self.__current_module, s)
+
+    def verbose_details_entries(self):
+        if manager.options.details:
+            for entry in self.entries:
+                self.verbose_details('%s' % entry['title'])
 
     def execute(self):
-        """Execute this feed, runs all associated modules in order by type"""
+        """Execute this feed, runs all events in order of events array."""
         for event in self.manager.EVENTS:
             # when learning, skip few events
             if self.manager.options.learn:
                 if event in ['download', 'output']: continue
-            # run all modules with specified type
+            # run all modules with specified event
             self.__run_modules(event)
             # purge filtered and failed entries
             self._purge()
             self.__purge_failed()
             # verbose some progress
             if event == 'input':
+                self.verbose_details_entries()
                 self.verbose_progress('Feed %s produced %s entries.' % (self.name, len(self.entries)))
             if event == 'filter':
                 self.verbose_progress('Feed %s filtered %s entries (%s remains).' % (self.name, self.__purged, len(self.entries)))
