@@ -129,8 +129,8 @@ class Manager:
             if not self.options.learn:
                 logging.critical('Your session is broken or from older incompatible version of flexget. '\
                                  'Run application with --reset-session to resolve this. '\
-                                 'Unfornattely new content between previous successfull execution and now are lost. '\
-                                 'You can (try to) spot new content from report and download them manually.')
+                                 'Any new content downloaded between the previous successful execution and now will be lost. '\
+                                 'You can (try to) spot new content from the report and download them manually.')
                 sys.exit(1)
             self.session['version'] = self.SESSION_VERSION
 
@@ -168,11 +168,11 @@ class Manager:
             try:
                 self.session = yaml.safe_load(file(sessionfile))
                 if type(self.session) != types.DictType:
-                    raise Exception('Sessionfile does not contain dictionary')
+                    raise Exception('Session file does not contain dictionary')
             except Exception, e:
-                logging.critical("Sessionfile has been broken. Execute flexget with --reset-session create new session and to avoid re-downloading everything. "\
+                logging.critical("The session file has been broken. Execute flexget with --reset-session create new session and to avoid re-downloading everything. "\
                 "Downloads between time of break and now are lost. You must download these manually. "\
-                "This error is most likelly because of bug in software, check your log-file and report any tracebacks.")
+                "This error is most likely caused by a bug in the software, check your log-file and report any tracebacks.")
                 logging.exception('Reason: %s' % e)
                 sys.exit(1)
 
@@ -365,7 +365,7 @@ class Manager:
         """Iterate trough all feeds and run them."""
         try:
             feeds = self.config.get('feeds', {}).keys()
-            if not feeds: logging.critical('There are no feeds in configuration file!')
+            if not feeds: logging.critical('There are no feeds in the configuration file!')
 
             # --only-feed
             if self.options.onlyfeed:
