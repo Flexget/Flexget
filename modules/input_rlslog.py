@@ -88,6 +88,20 @@ class PirateBay:
         torrent_url = tag_a.get('href')
         return torrent_url
 
+class IsoHunt:
+    """A very basic IsoHunt parser"""
+    
+    def __init__(self, raw_url, title):
+        self.raw_url = raw_url
+        self.title = title
+
+    def request_torrent_url(self):
+        print self.raw_url
+        torrent_url = self.raw_url.replace("torrent_details", "download")
+        print torrent_url
+        return torrent_url
+    
+
 class RlsLog:
 
     """
@@ -164,12 +178,15 @@ class RlsLog:
                     score_raw = link.next.next.string
                     if not release.has_key('imdb_score') and not release.has_key('imdb_votes') and score_raw != None:
                         release['imdb_score'], release['imdb_votes'] = self.parse_imdb(score_raw)
-                # handle newtorrents link
+                # handle newtorrents
                 if link_href.startswith('http://www.newtorrents.info'):
                     release['site'] = NewTorrents(link_href, release['title'])
-                # handle piratebay link
+                # handle piratebay
                 if link_href.startswith('http://thepiratebay.org'):
                     release['site'] = PirateBay(link_href, release['title'])
+                # handle isohunt
+                if link_href.startswith('http://isohunt.com'):
+                    release['site'] = IsoHunt(link_href, release['title'])
 
             # reject if no torrent link
             if release.has_key('site'):
