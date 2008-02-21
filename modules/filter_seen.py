@@ -35,6 +35,6 @@ class SeenFilter:
             
             # verbose if in learning mode
             if feed.manager.options.learn:
-                log.info("Learned '%s' (skipped in future)" % (entry['title']))
+                log.info("Learned '%s' (will skip this in the future)" % (entry['title']))
             else:
-                log.debug("Learned '%s' '%s' (skipped in future)" % (entry_url, entry['title']))
+                log.debug("Learned '%s' '%s' (will skip this in the future)" % (entry_url, entry['title']))

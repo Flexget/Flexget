@@ -12,7 +12,7 @@ class RemoveTrackers:
         Configuration example:
 
         remove_trackers:
-          - .*moviex.*
+          - moviex
 
         This will remove all trackers that contain text moviex in their url.
         TIP: You can use global section in configuration to make this enabled on all feeds.

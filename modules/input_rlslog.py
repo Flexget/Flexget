@@ -63,13 +63,13 @@ class NewTorrents:
 
         # choose the torrent
         if not torrents:
-            log.debug("NewTorrents did not found any matches in search result")
+            log.debug("NewTorrents did not find any matches in search result")
             return None
         else:
             if len(torrents) == 1:
                 log.debug("NewTorrents found only one matching search result.")
             else:
-                log.debug('NewTorrents search results contains multiple matches, using first occurence from: %s' % torrents)
+                log.debug('NewTorrents search result contains multiple matches, using first occurence from: %s' % torrents)
                 # TODO: use the one that has most downloaders / seeders
             return torrents[0]
 
@@ -96,9 +96,7 @@ class IsoHunt:
         self.title = title
 
     def request_torrent_url(self):
-        print self.raw_url
         torrent_url = self.raw_url.replace("torrent_details", "download")
-        print torrent_url
         return torrent_url
     
 
@@ -106,7 +104,7 @@ class RlsLog:
 
     """
         Adds support for rlslog.net as a feed.
-        
+
         If rlslog entry has NewTorrents download link then torrent url is parsed from there.
         If rlslog entry has NewTorrents search link, we try to look from there if any of the results match entry title.
         On multiple NewTorrents-links per entry have unknown effects ...
@@ -115,8 +113,9 @@ class RlsLog:
         rlslog-entry to NewTorrents thus eliminating any potential DDOS effect and or bandwith wasting.
 
         NEW: Supports also piratebay links
+        NEW: Suports IsoHunt
 
-        In case of movies the module supplies pre-parse IMDB-details (helps when chaining with filter_imdb).
+        In case of movies the module supplies pre-parses IMDB-details (helps when chaining with filter_imdb).
     """
 
     def register(self, manager, parser):
@@ -192,7 +191,7 @@ class RlsLog:
             if release.has_key('site'):
                 releases.append(release)
             else:
-                log.info('%s rejected due missing torrents-link' % (release['title']))
+                log.info('%s rejected due to missing or unrecognized torrent link' % (release['title']))
 
         return releases
 

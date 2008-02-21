@@ -16,7 +16,7 @@ class ModuleDownload:
 
         Advanced users:
 
-        Some modules may set alternative download path for entry.
+        Some modules may set an alternative download path for entry.
         Prime example is module patterns that can be used to override path.
 
         Configuration example:

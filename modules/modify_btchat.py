@@ -4,7 +4,7 @@ log = logging.getLogger('btchat')
 
 class ModifyBtChat:
 
-    '''Fixes bt-chat.com urls so that downloading works .. stupid javascript download delay'''
+    """Fixes bt-chat.com urls so that downloading works .. stupid javascript download delay"""
 
     def register(self, manager, parser):
         manager.register(instance=self, event='input', keyword='btchat',
@@ -16,4 +16,4 @@ class ModifyBtChat:
                 log.debug('ModifyBtChat fixing download url %s' % entry['url'])
                 entry['url'] = entry['url'].replace('download.php', 'download1.php')
                 log.debug('ModifyBtChat fixed download url %s' % entry['url'])
-        
+

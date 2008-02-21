@@ -56,7 +56,7 @@ class InputHtml:
                 
             #url_readable = urllib.unquote(url)
 
-            # incase title contains xxxxxxx.torrent - foooo.torrent clean it a bit (get upto first .torrent)
+            # in case the title contains xxxxxxx.torrent - foooo.torrent clean it a bit (get upto first .torrent)
             if title.lower().find('.torrent') > 0:
                 title = title[:title.lower().find(".torrent")]
 
