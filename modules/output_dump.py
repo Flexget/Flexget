@@ -14,4 +14,5 @@ class YamlDump:
             c = entry.copy()
             if c.has_key('data'):
                 c['data'] = '<%i bytes of data>' % len(c['data'])
-            print yaml.safe_dump(feed.cache.sanitize(c))
+            feed.manager.sanitize(c)
+            print yaml.safe_dump(c)

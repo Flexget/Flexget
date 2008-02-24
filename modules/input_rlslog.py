@@ -17,76 +17,6 @@ except:
     log.warning(soup_err)
     soup_present = False
 
-class NewTorrents:
-    """NewTorrents parsing utilities"""
-
-    def __init__(self, raw_url, title):
-        self.raw_url = raw_url
-        self.title = title
-
-    def request_torrent_url(self):
-        """Returns torrent from either search url or download page"""
-        if (self.raw_url.startswith("http://www.newtorrents.info/?q=") or self.raw_url.startswith("http://www.newtorrents.info/search")) and (self.title != None):
-            #log.debug("NewTorrents get_torrent_url using search")
-            return self.__get_torrent_url_from_search(self.raw_url, self.title)
-        else:
-            #log.debug("NewTorrents get_torrent_url using page")
-            return self.__get_torrent_url_from_page(self.raw_url)
-
-    # TODO: refactor parameters to use self
-    
-    def __get_torrent_url_from_page(self, url):
-        """Parses torrent url from newtorrents download page"""
-        page = urllib2.urlopen(url)
-        data = page.read()
-        p = re.compile("copy\(\'(.*)\'\)", re.IGNORECASE)
-        f = p.search(data)
-        if f==None:
-            log.debug("NewTorrents get_torrent_url_from_page failed")
-            return None
-        else:
-            return f.groups()[0]
-
-    def __get_torrent_url_from_search(self, url, name):
-        """Parses torrent download url (requires release name) from search results"""
-        name = name.replace('.',' ').lower()
-        page = urllib2.urlopen(url)
-        soup = BeautifulSoup(page)
-        torrents = []
-        for link in soup.findAll('a', attrs={'href': re.compile('down.php')}):
-            torrent_url = "http://www.newtorrents.info%s" % link.get('href')
-            release_name = link.parent.next.get('title').replace('.',' ').lower()
-            if release_name == name:
-                torrents.append(torrent_url)
-            else:
-                log.debug("NewTorrents rejecting search result: '%s' != '%s'" % (release_name, name))
-
-        # choose the torrent
-        if not torrents:
-            log.debug("NewTorrents did not find any matches in search result")
-            return None
-        else:
-            if len(torrents) == 1:
-                log.debug("NewTorrents found only one matching search result.")
-            else:
-                log.debug('NewTorrents search result contains multiple matches, using first occurence from: %s' % torrents)
-                # TODO: use the one that has most downloaders / seeders
-            return torrents[0]
-
-class PirateBay:
-    """Piratebay parsing utilities"""
-
-    def __init__(self, raw_url, title):
-        self.raw_url = raw_url
-        self.title = title
-
-    def request_torrent_url(self):
-        page = urllib2.urlopen(self.raw_url)
-        soup = BeautifulSoup(page)
-        tag_div = soup.find("div", attrs={"class":"download"})
-        tag_a = tag_div.find("a")
-        torrent_url = tag_a.get('href')
-        return torrent_url
 
 class IsoHunt:
     """A very basic IsoHunt parser"""
@@ -111,9 +41,6 @@ class RlsLog:
 
         Module caches all successfull NewTorrents 'download torrent'-parses, hence module makes only one request per
         rlslog-entry to NewTorrents thus eliminating any potential DDOS effect and or bandwith wasting.
-
-        NEW: Supports also piratebay links
-        NEW: Suports IsoHunt
 
         In case of movies the module supplies pre-parses IMDB-details (helps when chaining with filter_imdb).
     """
@@ -177,18 +104,16 @@ class RlsLog:
                     score_raw = link.next.next.string
                     if not release.has_key('imdb_score') and not release.has_key('imdb_votes') and score_raw != None:
                         release['imdb_score'], release['imdb_votes'] = self.parse_imdb(score_raw)
-                # handle newtorrents
-                if link_href.startswith('http://www.newtorrents.info'):
-                    release['site'] = NewTorrents(link_href, release['title'])
-                # handle piratebay
-                if link_href.startswith('http://thepiratebay.org'):
-                    release['site'] = PirateBay(link_href, release['title'])
-                # handle isohunt
-                if link_href.startswith('http://isohunt.com'):
-                    release['site'] = IsoHunt(link_href, release['title'])
+
+                # TODO: use link NAME (Torrent, NewTorrents etc) since there may be resolver present we don't know about
+                
+                known_sites = ['http://www.newtorrents.info', 'http://thepiratebay.org', 'http://isohunt.com']
+                for site in known_sites:
+                    if link_href.startswith(site):
+                        release['url'] = link_href
 
             # reject if no torrent link
-            if release.has_key('site'):
+            if release.has_key('url'):
                 releases.append(release)
             else:
                 log.info('%s rejected due to missing or unrecognized torrent link' % (release['title']))
@@ -204,32 +129,18 @@ class RlsLog:
             raise Warning('RlsLog was unable to complete task. URLError %s' % (e.reason))
 
         for release in releases:
-            # try to lookup torrent url (by site url) from cache
-            torrent_url = feed.cache.get(release['site'].raw_url, None)
-            if feed.manager.options.nocache: torrent_url = None
-            if torrent_url == None:
-                # find out actual torrent link from site (requests page and parses it)
-                try:
-                    torrent_url = release['site'].request_torrent_url()
-                except urllib2.URLError, e:
-                    log.error('Unable to get torrent url for release %s. URLError %s' % (release['title'], e.reason))
-                    continue
-            if torrent_url != None:
-                # add torrent url to cache for future usage
-                feed.cache.store(release['site'].raw_url, torrent_url, 30)
+            # construct entry from release
+            entry = {}
 
-                # construct entry from our release
-                entry = {}
-                entry['url'] = torrent_url
-                def apply_field(d_from, d_to, f):
-                    if d_from.has_key(f):
-                        if d_from[f] == None: return # None values are not wanted!
-                        d_to[f] = d_from[f]
-                for field in ['title', 'imdb_url', 'imdb_score', 'imdb_votes']:
-                    apply_field(release, entry, field)
-                feed.entries.append(entry)
-            else:
-                log.debug("Unable to get torrent url for '%s'" % (release['title']))
+            def apply_field(d_from, d_to, f):
+                if d_from.has_key(f):
+                    if d_from[f] == None: return # None values are not wanted!
+                    d_to[f] = d_from[f]
+
+            for field in ['title', 'url', 'imdb_url', 'imdb_score', 'imdb_votes']:
+                apply_field(release, entry, field)
+
+            feed.entries.append(entry)
 
 
 

@@ -30,11 +30,17 @@ class RegisterException(Exception):
     def __str__(self):
         return repr(self.value)
 
+class ResolverException(Exception):
+    def __init__(self, value):
+        self.value = value
+    def __str__(self):
+        return repr(self.value)
+
 class Manager:
 
     moduledir = os.path.join(sys.path[0], "modules/")
 
-    EVENTS = ["start", "input", "filter", "download", "modify", "output", "exit"]
+    EVENTS = ["start", "input", "filter", "resolve", "download", "modify", "output", "exit"]
 
     SESSION_VERSION = 2
 
@@ -46,6 +52,7 @@ class Manager:
         self.configname = None
         self.options = None
         self.modules = {}
+        self.resolvers = []
         self.session = {}
         self.config = {}
 
@@ -280,8 +287,16 @@ class Manager:
         kwargs.setdefault('order', 16384)
         kwargs.setdefault('builtin', False)
         self.modules[event][kwargs['keyword']] = kwargs
-        # never visible because of "initial" logging level
-        #logging.debug("Module registered event: %s keyword: %s order: %d" % (kwargs['event'], kwargs['keyword'], kwargs['order']))
+
+    def register_resolver(self, **kwargs):
+        """
+            Resolver modules call this method to register themselves.
+        """
+        # validate passed arguments
+        for arg in ['instance', 'resolvable', 'resolve']:
+            if not kwargs.has_key(arg):
+                raise RegisterException('Parameter %s is missing from register arguments' % arg)
+        self.resolvers.append(kwargs['instance'])
 
     def get_modules_by_event(self, event):
         """Return all modules by event."""
@@ -475,9 +490,11 @@ class Feed:
         self.shared_cache = ModuleCache('_shared_', manager.get_cache())
 
         self.entries = []
-        self.__accepted = [] # these entries are always accepted, basic filtering does not affect them
+        # accepted entries are always accepted, filtering does not affect them
+        self.__accepted = [] 
         self.__filtered = []
-        self.__immediattely = [] #TODO: refactor to forcibly?
+        # rejected enteries are removed unconditionally, even if accepted
+        self.__rejected = []
         self.__failed = []
         self.__abort = False
         self.__purged = 0
@@ -513,15 +530,15 @@ class Feed:
                 logging.debug('Purging failed entry %s' % entry)
                 self.entries.remove(entry)
 
-    def __filter_immediately(self):
-        if not self.__immediattely:
+    def __filter_rejected(self):
+        if not self.__rejected:
             return
         for entry in self.entries[:]:
-            if entry in self.__immediattely:
+            if entry in self.__rejected:
                 logging.debug('Purging immediately entry %s' % entry)
                 self.entries.remove(entry)
                 self.__purged += 1
-        self.__immediattely = []
+        self.__rejected = []
 
     def accept(self, entry):
         """Accepts this entry."""
@@ -538,8 +555,8 @@ class Feed:
     def reject(self, entry):
         """Reject this entry immediattely and permanently."""
         # schedule immediately filtering after this module has done execution
-        if not entry in self.__immediattely:
-            self.__immediattely.append(entry)
+        if not entry in self.__rejected:
+            self.__rejected.append(entry)
             self.verbose_details('Rejected %s' % entry['title'])
 
     def failed(self, entry):
@@ -616,7 +633,7 @@ class Feed:
                     # call module
                     module['callback'](self)
                     # check for priority operations
-                    self.__filter_immediately()
+                    self.__filter_rejected()
                     if self.__abort: return
                 except Warning, w:
                     logging.warning(w)
@@ -639,12 +656,44 @@ class Feed:
             for entry in self.entries:
                 self.verbose_details('%s' % entry['title'])
 
+    def resolvable(self, entry):
+        """Return true if entry is resolvable by registered resolver"""
+        for resolver in manager.resolvers:
+            if resolver.resolvable(self, entry):
+                return True
+        return False
+
+    def _resolve_entries(self):
+        """Resolves all entries in feed"""
+        for entry in self.entries:
+            try:
+                tries = 0
+                while self.resolvable(entry):
+                    tries += 1
+                    if (tries>1000):
+                        raise ResolverException('resolve_entries was left in infinite loop, aborting! url=%s' % entry['url'])
+                    for resolver in manager.resolvers:
+                        if resolver.resolvable(self, entry):
+                            logging.debug('Resolving %s' % entry['url'])
+                            if not resolver.resolve(self, entry):
+                                raise ResolverException('Failed to resolve %s' % entry['title'])
+            except ResolverException, r:
+                logging.warning(r)
+                self.failed(entry)
+            except Exception, e:
+                logging.exception(e)
+    
     def execute(self):
         """Execute this feed, runs all events in order of events array."""
         for event in self.manager.EVENTS:
             # when learning, skip few events
             if self.manager.options.learn:
                 if event in ['download', 'output']: continue
+            # handle resolve event a bit special
+            if event == 'resolve':
+                self._resolve_entries()
+                self.__purge_failed()
+                continue
             # run all modules with specified event
             self.__run_modules(event)
             # purge filtered and failed entries

@@ -113,15 +113,6 @@ class InputRSS:
             if not entry.has_key('id'):
                 entry['id'] = entry.link
 
-            # Fixes for "interesting" feed structures
-            # TODO: these should be fixed in separate module !
-            if entry.link.startswith("http://www.mininova.org/tor/"):
-                entry.link = entry.link.replace('tor', 'get')
-            elif entry.link.startswith("http://www.torrentspy.com/torrent/"):
-                m = re.match("http://www.torrentspy.com/torrent/([\d]+)/", entry.link)
-                torrent_id = m.group(1)
-                entry.link = "http://www.torrentspy.com/download.asp?id=%s" % torrent_id
-
             # Use basic auth when needed
             if config.has_key('username') and config.has_key('password'):
                 log.debug("Using basic auth for retrieval")
