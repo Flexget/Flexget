@@ -17,19 +17,6 @@ except:
     log.warning(soup_err)
     soup_present = False
 
-
-class IsoHunt:
-    """A very basic IsoHunt parser"""
-    
-    def __init__(self, raw_url, title):
-        self.raw_url = raw_url
-        self.title = title
-
-    def request_torrent_url(self):
-        torrent_url = self.raw_url.replace("torrent_details", "download")
-        return torrent_url
-    
-
 class RlsLog:
 
     """
@@ -142,22 +129,9 @@ class RlsLog:
 
             feed.entries.append(entry)
 
-
-
 if __name__ == '__main__':
     import sys
     logging.basicConfig(level=logging.DEBUG)
-
-    """
-    n = NewTorrents()
-    p2 = None
-    if len(sys.argv) > 2:
-        p2 = sys.argv[2]
-    else:
-        p2 = None
-    url = n.get_torrent_url(sys.argv[1], p2)
-    print yaml.dump(url)
-    """
 
     r = RlsLog()
     from test_tools import MockFeed
