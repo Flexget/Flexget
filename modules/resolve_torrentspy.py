@@ -3,7 +3,7 @@ import logging
 log = logging.getLogger("torrentspy")
 
 class ResolveTorrentSpy:
-    """Mininova resolver."""
+    """TorrentSpy resolver."""
 
     def register(self, manager, parser):
         manager.register_resolver(instance=self, resolvable=self.resolvable, resolve=self.resolve)
