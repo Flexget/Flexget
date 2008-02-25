@@ -1,17 +1,16 @@
 import logging
 
-log = logging.getLogger("btjunkie")
+log = logging.getLogger("btchat")
 
 class ResolveBtJunkie:
-    """BtJunkie resolver."""
+    """BtChat resolver."""
 
     def register(self, manager, parser):
         manager.register_resolver(instance=self, resolvable=self.resolvable, resolve=self.resolve)
 
     def resolvable(self, feed, entry):
-        return entry['url'].startswith('http://btjunkie.org')
+        return entry['url'].startswith('http://www.bt-chat.com/download.php')
         
     def resolve(self, feed, entry):
-        entry['url'] = entry['url'].replace('btjunkie.org', 'dl.btjunkie.org')
-        entry['url'] = entry['url'] + "/download.torrent"
+        entry['url'] = entry['url'].replace('download.php', 'download1.php')
         return True
