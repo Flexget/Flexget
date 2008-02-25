@@ -44,7 +44,7 @@ class RlsLog:
         log.debug("parse_imdb returning score: '%s' votes: '%s' from: '%s'" % (str(score), str(votes), s))
         return (score, votes)
 
-    def parse_rlslog(self, rlslog_url):
+    def parse_rlslog(self, rlslog_url, feed):
         """Parse configured url and return releases array"""
         if not soup_present:
             log.error(soup_err)
@@ -85,12 +85,12 @@ class RlsLog:
                     if not release.has_key('imdb_score') and not release.has_key('imdb_votes') and score_raw != None:
                         release['imdb_score'], release['imdb_votes'] = self.parse_imdb(score_raw)
 
-                # TODO: use link NAME (Torrent, NewTorrents etc) since there may be resolver present we don't know about
-                
-                known_sites = ['http://www.newtorrents.info', 'http://thepiratebay.org', 'http://isohunt.com']
-                for site in known_sites:
-                    if link_href.startswith(site):
-                        release['url'] = link_href
+                # test if entry with this url would be resolvable (downloadable)
+                temp = {}
+                temp['title'] = release['title']
+                temp['url'] = link_href
+                if feed.resolvable(temp):
+                    release['url'] = link_href
 
             # reject if no torrent link
             if release.has_key('url'):
@@ -104,7 +104,7 @@ class RlsLog:
         if not soup_present: raise Exception(soup_err)
 
         try:
-	    releases = self.parse_rlslog(feed.get_input_url('rlslog'))
+	    releases = self.parse_rlslog(feed.get_input_url('rlslog'), feed)
         except urllib2.HTTPError, e:
             raise Warning('RlsLog was unable to complete task. HTTPError %s' % (e.code))
         except urllib2.URLError, e:
