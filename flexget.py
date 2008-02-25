@@ -52,7 +52,7 @@ class Manager:
         self.configname = None
         self.options = None
         self.modules = {}
-        self.resolvers = []
+        self.resolvers = {}
         self.session = {}
         self.config = {}
 
@@ -302,7 +302,9 @@ class Manager:
             raise RegisterException('Resolver %s is missing resolvable method' % name)
         if not callable(getattr(instance, 'resolvable', None)):
             raise RegisterException('Resolver %s is missing resolve method' % name)
-        self.resolvers.append(kwargs['instance'])
+        if self.resolvers.has_key(name):
+            raise RegisterException('Resolver %s is already registered' % name)
+        self.resolvers[name] = kwargs['instance']
 
     def get_modules_by_event(self, event):
         """Return all modules by event."""
@@ -664,7 +666,7 @@ class Feed:
 
     def resolvable(self, entry):
         """Return true if entry is resolvable by registered resolver"""
-        for resolver in manager.resolvers:
+        for name, resolver in manager.resolvers.iteritems():
             if resolver.resolvable(self, entry):
                 return True
         return False
@@ -678,11 +680,11 @@ class Feed:
                     tries += 1
                     if (tries>1000):
                         raise ResolverException('resolve_entries was left in infinite loop, aborting! url=%s' % entry['url'])
-                    for resolver in manager.resolvers:
+                    for name, resolver in manager.resolvers.iteritems():
                         if resolver.resolvable(self, entry):
-                            logging.debug('Resolving %s' % entry['url'])
+                            logging.debug('%s resolving %s' % (name, entry['url']))
                             if not resolver.resolve(self, entry):
-                                raise ResolverException('Failed to resolve %s' % entry['title'])
+                                raise ResolverException('Resolver %s failed to resolve %s' % (name, entry['title']))
             except ResolverException, r:
                 logging.warning(r)
                 self.failed(entry)
