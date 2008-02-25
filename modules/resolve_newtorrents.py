@@ -90,3 +90,10 @@ class ResolveNewTorrents:
                 log.debug('search result contains multiple matches, using first occurence from: %s' % torrents)
                 # TODO: use the one that has most downloaders / seeders
             return torrents[0]
+
+
+if __name__ == '__main__':
+    import sys
+    logging.basicConfig(level=logging.DEBUG)
+    import test_tools
+    test_tools.test_resolver(ResolveNewTorrents())

@@ -51,3 +51,21 @@ class MockFeed:
                 c['torrent'] = '<torrent object>'
             print yaml.safe_dump(c)
         
+
+def test_resolver(resolver):
+    """Simple method to test a instance of resolver. Used when debugging them from command line"""
+    import sys
+    feed = MockFeed()
+
+    mock = {}
+    mock['title'] = 'mock'
+    mock['url'] = sys.argv[1]
+
+    solvable = resolver.resolvable(feed, mock)
+    print "Resolvable : %s" % solvable
+    if solvable:
+        old = mock['url']
+        success = resolver.resolve(feed, mock)
+        print "Resolved   : %s -> %s" % (old, mock['url'])
+        print "Succeeded  : %s" % success
+    
