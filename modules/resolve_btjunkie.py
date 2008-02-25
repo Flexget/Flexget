@@ -1,6 +1,6 @@
 import logging
 
-log = logging.getLogger("isohunt")
+log = logging.getLogger("btjunkie")
 
 class ResolveBtJunkie:
     """BtJunkie resolver."""
