@@ -6,7 +6,7 @@ class ResolveIsoHunt:
     """IsoHunt resolver."""
 
     def register(self, manager, parser):
-        manager.register_resolver(instance=self, resolvable=self.resolvable, resolve=self.resolve)
+        manager.register_resolver(instance=self, name='isohunt')
 
     def resolvable(self, feed, entry):
         url = entry['url']

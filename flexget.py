@@ -293,9 +293,15 @@ class Manager:
             Resolver modules call this method to register themselves.
         """
         # validate passed arguments
-        for arg in ['instance', 'resolvable', 'resolve']:
+        for arg in ['instance', 'name']:
             if not kwargs.has_key(arg):
                 raise RegisterException('Parameter %s is missing from register arguments' % arg)
+        instance = kwargs['instance']
+        name = kwargs['name']
+        if not callable(getattr(instance, 'resolvable', None)):
+            raise RegisterException('Resolver %s is missing resolvable method' % name)
+        if not callable(getattr(instance, 'resolvable', None)):
+            raise RegisterException('Resolver %s is missing resolve method' % name)
         self.resolvers.append(kwargs['instance'])
 
     def get_modules_by_event(self, event):

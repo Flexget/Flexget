@@ -3,7 +3,7 @@ import urllib2
 import urlparse
 import logging
 
-log = logging.getLogger("newtorrents")
+log = logging.getLogger("piratebay")
 
 # this way we don't force users to install bs incase they do not want to use module http
 soup_present = True
@@ -19,7 +19,7 @@ class ResolvePirateBay:
     """PirateBay resolver."""
 
     def register(self, manager, parser):
-        manager.register_resolver(instance=self, resolvable=self.resolvable, resolve=self.resolve)
+        manager.register_resolver(instance=self, name='piratebay')
 
     def resolvable(self, feed, entry):
         url = entry['url']

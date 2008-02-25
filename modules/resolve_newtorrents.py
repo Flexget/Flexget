@@ -23,7 +23,7 @@ class ResolveNewTorrents:
         self.resolved = []
 
     def register(self, manager, parser):
-        manager.register_resolver(instance=self, resolvable=self.resolvable, resolve=self.resolve)
+        manager.register_resolver(instance=self, name='newtorrents')
 
     def resolvable(self, feed, entry):
         """Return true only for urls that can and should be resolved"""
