@@ -105,6 +105,8 @@ class RlsLog:
 
         try:
 	    releases = self.parse_rlslog(feed.get_input_url('rlslog'))
+        except urllib2.HTTPError, e:
+            raise Warning('RlsLog was unable to complete task. HTTPError %s' % (e.code))
         except urllib2.URLError, e:
             raise Warning('RlsLog was unable to complete task. URLError %s' % (e.reason))
 
