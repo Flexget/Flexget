@@ -50,9 +50,9 @@ class FilterPatterns:
 
     
     def register(self, manager, parser):
-        manager.register(instance=self, event="filter", keyword="patterns", callback=self.patterns, order=-200)
-        parser.add_option("--try-pattern", action="store", dest="try_pattern", default=None,
-                          help="Run with given pattern. Useful to try out matching with --test.")
+        manager.register(instance=self, event="filter", keyword="patterns", callback=self.patterns, order=0)
+#        parser.add_option("--try-pattern", action="store", dest="try_pattern", default=None,
+#                          help="Run with given pattern. Useful to try out matching with --test.")
 
     def matches(self, entry, regexp):
         #TODO: match from all fields from entry?

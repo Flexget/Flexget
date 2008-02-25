@@ -670,21 +670,26 @@ class Feed:
             if resolver.resolvable(self, entry):
                 return True
         return False
+        
+    def resolve(self, entry):
+        """Resolves given entry url. Raises ResolverException if resolve failed."""
+        tries = 0
+        while self.resolvable(entry):
+            tries += 1
+            if (tries>1000):
+                raise ResolverException('resolve was left in infinite loop, aborting! url=%s' % entry['url'])
+            for name, resolver in manager.resolvers.iteritems():
+                if resolver.resolvable(self, entry):
+                    logging.debug('%s resolving %s' % (name, entry['url']))
+                    if not resolver.resolve(self, entry):
+                        raise ResolverException('Resolver %s failed to resolve %s' % (name, entry['title']))
+    
 
     def _resolve_entries(self):
         """Resolves all entries in feed"""
         for entry in self.entries:
             try:
-                tries = 0
-                while self.resolvable(entry):
-                    tries += 1
-                    if (tries>1000):
-                        raise ResolverException('resolve_entries was left in infinite loop, aborting! url=%s' % entry['url'])
-                    for name, resolver in manager.resolvers.iteritems():
-                        if resolver.resolvable(self, entry):
-                            logging.debug('%s resolving %s' % (name, entry['url']))
-                            if not resolver.resolve(self, entry):
-                                raise ResolverException('Resolver %s failed to resolve %s' % (name, entry['title']))
+                self.resolve(entry)
             except ResolverException, r:
                 logging.warning(r)
                 self.failed(entry)
