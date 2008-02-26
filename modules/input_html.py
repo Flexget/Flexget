@@ -38,7 +38,11 @@ class InputHtml:
 
         log.debug("InputModule html requesting url %s" % pageurl)
 
-        page = urllib2.urlopen(pageurl)
+        try:
+            page = urllib2.urlopen(pageurl)
+        except URLError, e:
+            log.warning("URLError when opening page: "+e)
+            return
         soup = BeautifulSoup(page)
         for link in soup.findAll('a'):
             if not link.has_key("href"): continue
