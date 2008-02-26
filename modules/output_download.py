@@ -82,6 +82,7 @@ class ModuleDownload:
                     log.info('Would write entry %s' % entry['title'])
                 else:
                     self.output(feed, entry)
+                    feed.verbose_details('Downloaded %s' % entry['title'])
             except Warning, e:
                 # different handling because IOError is "ok"
                 log.warning('Error while writing: %s' % e)
