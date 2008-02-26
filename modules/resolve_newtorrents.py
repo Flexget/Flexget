@@ -6,7 +6,7 @@ import re
 
 log = logging.getLogger("newtorrents")
 
-# this way we don't force users to install bs incase they do not want to use module http
+# this way we don't force users to install bs incase they do not want to use module
 soup_present = True
 soup_err = "Module newtorrents requires BeautifulSoup. Please install it from http://www.crummy.com/software/BeautifulSoup/ or from your distribution repository."
 
@@ -19,6 +19,8 @@ except:
 class ResolveNewTorrents:
     """NewTorrents resolver."""
 
+    # a bit messy since this was not originally a resolver
+
     def __init__(self):
         self.resolved = []
 
@@ -26,15 +28,10 @@ class ResolveNewTorrents:
         manager.register_resolver(instance=self, name='newtorrents')
 
     def resolvable(self, feed, entry):
-        """Return true only for urls that can and should be resolved"""
-        if entry['url'].startswith('http://www.newtorrents.info') and not entry['url'] in self.resolved:
-            return True
-        else:
-            return False
+        # Return true only for urls that can and should be resolved
+        return entry['url'].startswith('http://www.newtorrents.info') and not entry['url'] in self.resolved
         
     def resolve(self, feed, entry):
-        # a bit hack since this was not originally resolver ...
-
         if not soup_present:
             log.error(soup_err)
             return
@@ -60,7 +57,7 @@ class ResolveNewTorrents:
         p = re.compile("copy\(\'(.*)\'\)", re.IGNORECASE)
         f = p.search(data)
         if f==None:
-            log.debug("get_torrent_url_from_page failed")
+            log.error('Failed to get url from download page. Module may need a update.')
             return None
         else:
             return f.groups()[0]
