@@ -29,23 +29,22 @@ class ModuleDownload:
 
         This results that entries matching patterns 1 and 2 are saved into
         ~/torrents/ and pattern3 is saved to ~/another_location/.
-
-        How it works behind the scenes:
-
-        Module downloads url content into entry at the request phase,
-        actual file is written at output. This is done in two phases
-        because this way other modules may modify or reject content.
-        If entry has filename attribute it is used, if not mandatory
-        attribute title is used.
+        
+        You may use commandline parameter --dl-path to temporarily override 
+        all paths to another location.
     """
 
     def register(self, manager, parser):
         manager.register(instance=self, event="download", keyword="download", callback=self.execute_downloads)
         manager.register(instance=self, event="output", keyword="download", callback=self.execute_outputs)
+        # add new commandline parameter
+        parser.add_option("--dl-path", action="store", dest="dl_path", default=False,
+                          help="Override path for download module. Applies to all executed feeds.")
+
 
     def validate_config(self, feed):
         # check for invalid configuration, abort whole download if not goig to work
-        if not feed.config["download"]:
+        if not feed.config['download']:
             raise Exception('Feed %s is missing download path, check your configuration.' % feed.name)
 
     def execute_downloads(self, feed):
@@ -53,12 +52,12 @@ class ModuleDownload:
         for entry in feed.entries:
             try:
                 if feed.manager.options.test:
-                    log.info("Would download %s" % entry['title'])
+                    log.info('Would download %s' % entry['title'])
                 else:
                     self.download(feed, entry)
             except IOError, e:
                 feed.failed(entry)
-                log.warning("Download of %s timed out" % entry['title']);
+                log.warning('Download of %s timed out' % entry['title']);
             except Exception, e:
                 # notify framework that outputing this entry failed
                 feed.failed(entry)
@@ -80,7 +79,7 @@ class ModuleDownload:
         for entry in feed.entries:
             try:
                 if feed.manager.options.test:
-                    log.info("Would write entry %s" % entry['title'])
+                    log.info('Would write entry %s' % entry['title'])
                 else:
                     self.output(feed, entry)
             except Warning, e:
@@ -95,7 +94,10 @@ class ModuleDownload:
         if not entry.has_key('data'):
             raise Exception('Entry %s has no data' % entry['title'])
         # use path from entry if has one, otherwise use from download definition parameter
-        path = entry.get('path', feed.config["download"])
+        path = entry.get('path', feed.config['download'])
+        # override path from commandline parameter
+        if feed.manager.options.dl_path:
+            path = feed.manager.options.dl_path
         # make filename, if entry has perefered filename attribute use it, if not use title
         destfile = os.path.join(os.path.expanduser(path), entry.get('filename', entry['title']))
         if not os.path.exists(destfile):
