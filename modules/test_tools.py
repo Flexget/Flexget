@@ -60,6 +60,8 @@ def test_resolver(resolver):
     mock = {}
     mock['title'] = 'mock'
     mock['url'] = sys.argv[1]
+    if len(sys.argv)>2:
+        mock['title'] = sys.argv[2]
 
     solvable = resolver.resolvable(feed, mock)
     print "Resolvable : %s" % solvable

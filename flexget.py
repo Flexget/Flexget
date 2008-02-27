@@ -189,17 +189,17 @@ class Manager:
         """Makes dictionary d contain only yaml.safe_dump compatible elements"""
         valid = [types.DictType, types.IntType, types.NoneType,
                  types.StringType, types.UnicodeType, types.BooleanType,
-                 types.ListType, types.LongType]
+                 types.ListType, types.LongType, types.FloatType]
         for k in d.keys():
             if type(d[k])==types.ListType:
                 for i in d[k][:]:
                     if not type(i) in valid:
-                        logging.debug('Removed non yaml compatible list item from key %s' % k)
+                        logging.debug('Removed non yaml compatible list item from key %s %s' % (k, type([k])))
                         d[k].remove(i)
             if type(d[k])==types.DictType:
                 self.sanitize(d[k])
             if not type(d[k]) in valid:
-                logging.debug('Removed non yaml compatible key %s' % k)
+                logging.debug('Removed non yaml compatible key %s %s' % (k, type(d[k])))
                 d.pop(k)
 
     def save_session(self):
