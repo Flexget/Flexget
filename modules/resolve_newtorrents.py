@@ -65,7 +65,12 @@ class ResolveNewTorrents:
     def __get_torrent_url_from_search(self, url, name):
         """Parses torrent download url (requires release name) from search results"""
         name = name.replace('.',' ').lower()
-        page = urllib2.urlopen(url)
+        try:
+            page = urllib2.urlopen(url)
+        except URLError, e:
+            log.warning("Timed out when opening page")
+            return
+        
         soup = BeautifulSoup(page)
         torrents = []
         for link in soup.findAll('a', attrs={'href': re.compile('down.php')}):
