@@ -40,7 +40,7 @@ class InputHtml:
 
         try:
             page = urllib2.urlopen(pageurl)
-        except URLError, e:
+        except urllib2.URLError, e:
             log.warning("URLError when opening page: "+e)
             return
         soup = BeautifulSoup(page)
