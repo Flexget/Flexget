@@ -52,8 +52,12 @@ class ResolveNewTorrents:
     
     def __get_torrent_url_from_page(self, url):
         """Parses torrent url from newtorrents download page"""
-        page = urllib2.urlopen(url)
-        data = page.read()
+        try:
+            page = urllib2.urlopen(url)
+            data = page.read()
+        except urllib2.URLError, e:
+            log.error("URLerror when retrieving page")
+            return None
         p = re.compile("copy\(\'(.*)\'\)", re.IGNORECASE)
         f = p.search(data)
         if f==None:
