@@ -648,6 +648,19 @@ class Feed:
                 except Exception, e:
                     logging.exception('Module %s: %s' % (keyword, e))
 
+    def log_once(self, s, log=logging):
+        """Log string s once"""
+        import md5
+        m = md5.new()
+        m.update(s)
+        sum = m.hexdigest()
+        seen = self.shared_cache.get('log-%s' % sum, False)
+        if (seen):
+            return
+        self.shared_cache.store('log-%s' % sum, True, 30)
+        log.info(s)
+
+
     def verbose_progress(self, s):
         """Verboses progress, outputs only in non quiet mode."""
         # TODO: implement trough own logger?

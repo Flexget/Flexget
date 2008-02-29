@@ -176,7 +176,7 @@ class FilterImdb:
 
             if entry.get('imdb_url', None) == None and self.imdb_required(entry, config):
                 if config.get('reject_invalid', True):
-                    log.debug("Rejecting %s due required missing imdb url" % entry['title'])
+                    feed.log_once('Filtering %s because of missing imdb url' % entry['title'], log)
                     feed.filter(entry)
                 else:
                     log.debug("Unable to check %s due missing imdb url, configured to pass (reject_invalid is False)" % entry['title'])
@@ -239,11 +239,7 @@ class FilterImdb:
             entry['imdb_name'] = imdb.name
 
             if len(reasons) != 0:
-                lm = log.debug
-                if not feed.cache.get('log %s' % entry['title']):
-                    lm = log.info
-                    feed.cache.store('log %s' % entry['title'], True)
-                lm('Filtering %s because of rule(s) %s' % (entry['title'], string.join(reasons, ', ')))
+                feed.log_once('Filtering %s because of rule(s) %s' % (entry['title'], string.join(reasons, ', ')), log)
                 feed.filter(entry)
             else:
                 log.debug("Accepting %s" % (entry))
