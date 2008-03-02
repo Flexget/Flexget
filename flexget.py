@@ -437,7 +437,6 @@ class ModuleCache:
     def get_namespaces(self):
         """Return array of known namespaces in this cache"""
         return self.__storage.keys()
-
     
     def store(self, key, value, days=45):
         """Stores key value pair for number of days. Non yaml compatible values are not saved."""

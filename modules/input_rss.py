@@ -39,7 +39,6 @@ class InputRSS:
             file: /path/to/cookie
 
         Possible cookie types are: mozilla, msie, lpw
-        Note: cookie support requires mechanize library
     """
 
     def register(self, manager, parser):
