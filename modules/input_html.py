@@ -40,10 +40,14 @@ class InputHtml:
 
         try:
             page = urllib2.urlopen(pageurl)
-        except urllib2.URLError, e:
-            log.warning("URLError when opening page: "+e)
+            soup = BeautifulSoup(page)
+        except timeout:
+            log.warning("Timed out opening page")
             return
-        soup = BeautifulSoup(page)
+        except urllib2.URLError, e:
+            log.warning("URLError when opening page")
+            return
+        
         for link in soup.findAll('a'):
             if not link.has_key("href"): continue
             title = link.string
