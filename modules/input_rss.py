@@ -19,16 +19,27 @@ class InputRSS:
     """
         Parses RSS feed.
 
-        Short configuration:
+        Hazzlefree configuration for public rss feeds:
 
         rss: <url>
 
-        Configuration with authentication parameters:
+        Configuration with basic http authentication:
 
         rss:
           url: <url>
           username: <name>
           password: <password>
+
+        Configuration with saved cookies:
+
+        rss:
+          url: <url>
+          cookie:
+            type: mozilla
+            file: /path/to/cookie
+
+        Possible cookie types are: mozilla, msie, lpw
+        Note: cookie support requires mechanize library
     """
 
     def register(self, manager, parser):
@@ -43,7 +54,7 @@ class InputRSS:
 
     def run(self, feed):
 
-        config = feed.config
+        config = feed.config['rss']
         url = feed.get_input_url('rss')
 
         # use basic auth when needed
@@ -62,7 +73,39 @@ class InputRSS:
 
         # get the feed & parse
         try:
-            rss = feedparser.parse(url, etag=etag, modified=modified)
+            if config.has_key('cookie'):
+                # check that require configuration is present
+                if not config['cookie'].has_key('type'):
+                    raise Warning('Cookie configuration is missing required field: type')
+                if not config['cookie'].has_key('file'):
+                    raise Warning('Cookie configuration is missing required field: file')
+                # create cookiejar
+                import cookielib
+                t = config['cookie']['type']
+                if t == 'mozilla':
+                    cj = cookielib.MozillaCookieJar()
+                elif t == 'lpw':
+                    cj = cookielib.LWPCookieJar()
+                elif t == 'msie':
+                    cj = cookielib.MSIECookieJar()
+                else:
+                    raise Warning('Unknown cookie type %s' % ctype)
+                try:
+                    cj.load(filename=config['cookie']['file'], ignore_expires=True)
+                    log.debug('Cookies loaded')
+                except (cookielib.LoadError, IOError), e:
+                    log.exception(e)
+                    raise Warning('Aborted rss feed because cookies could not be loaded.')
+                # create new opener for urllib2
+                opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cj))
+                try:
+                    urllib2.install_opener(opener)
+                    rss = feedparser.parse(url, etag=etag, modified=modified)
+                finally:
+                    # remove our opener, needed?
+                    urllib2.install_opener(None)
+            else:
+                rss = feedparser.parse(url, etag=etag, modified=modified)
         except IOError:
             raise Exception("IOError when loading feed %s", feed.name)
 
@@ -72,11 +115,11 @@ class InputRSS:
                 log.debug("Feed %s hasn't changed, skipping" % feed.name)
                 return
             elif rss.status == 401:
-                raise Exception("Authentication needed for feed %s: %s", feed.name, rss.headers['www-authenticate'])
+                raise Warning("Authentication needed for feed %s: %s", feed.name, rss.headers['www-authenticate'])
             elif rss.status == 404:
-                raise Exception("Feed %s not found", feed.name)
+                raise Warning("Feed %s not found", feed.name)
             elif rss.status == 500:
-                raise Exception("Internal server exception on feed %s", feed.name)
+                raise Warning("Internal server exception on feed %s", feed.name)
         except urllib2.URLError:
             raise Exception("URLError on feed %s", feed.name)
         except AttributeError, e:
