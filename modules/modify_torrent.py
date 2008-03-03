@@ -15,7 +15,7 @@ class Torrent:
         """Accepts torrent file as string"""
         
         # valid torrent files start with an announce block
-        if not content.startswith("d8:announce"):
+        if not content.startswith('d8:announce'):
             raise Exception('Invalid content for a torrent')
 
         self.encode_func = {}
@@ -27,25 +27,28 @@ class Torrent:
 
         # decoded torrent structure
         self.content = self.decode(content)
+        self.size = 0
 
     def get_filelist(self):
         """Return array containing fileinfo dictionaries (name, length, path)"""
         files = []
         # single file torrent
-        if self.content["info"].has_key("length"):
+        if self.content['info'].has_key('length'):
             t = {}
-            t["name"] = self.content["info"]["name"]
-            t["size"] = self.content["info"]["length"]
-            t["path"] = ""
+            t['name'] = self.content['info']['name']
+            t['size'] = self.content['info']['length']
+            t['path'] = ''
+            self.size = int(t['size'])
             files.append(t)
         else:
             # multifile torrent
-            for item in self.content["info"]["files"]:
+            for item in self.content['info']['files']:
                 t = {}
                 import string
                 t['path'] = string.join(item['path'][:-1], '/')
                 t['name'] = item['path'][-1:]
                 t['size'] = item['length']
+                self.size += int(t['size'])
                 files.append(t)
         return files
 

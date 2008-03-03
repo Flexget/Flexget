@@ -23,7 +23,6 @@ class ModuleCookies:
         manager.register(instance=self, event='exit', keyword='cookies', callback=self.exit)
 
     def start(self, feed):
-        log.debug('cookies start')
         if not feed.config.has_key('cookies'):
             return
         # cookies enabled
