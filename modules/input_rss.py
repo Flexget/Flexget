@@ -117,14 +117,20 @@ class InputRSS:
                 entry['id'] = entry.link
 
             # Use basic auth when needed
-            if config.has_key('username') and config.has_key('password'):
-                log.debug("Using basic auth for retrieval")
-                entry.link = self.passwordize(entry.link, config['username'], config['password'])
+#            if config.has_key('username') and config.has_key('password'):
+#                log.debug("Using basic auth for retrieval")
+#                entry.link = self.passwordize(entry.link, config['username'], config['password'])
 
             # add entry
             e = {}
             e['url'] = entry.link.encode()
             e['title'] = entry.title.replace(u"\u200B", u"") # remove annoying zero width spaces
+
+            # store basic auth info
+            if config.has_key('username') and config.has_key('password'):
+                e['basic_auth_username'] = config['username']
+                e['basic_auth_password'] = config['password']
+            
             feed.entries.append(e)
 
 if __name__ == '__main__':

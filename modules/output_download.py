@@ -1,7 +1,7 @@
 import yaml
 import re
 import os, sys
-import urllib
+import urllib2
 import logging
 
 log = logging.getLogger('download')
@@ -65,8 +65,16 @@ class ModuleDownload:
 
     def download(self, feed, entry):
         # get content
-        # urllib2 is too smart here, it borks on basic auth urls
-        f = urllib.urlopen(entry['url'])
+        if entry.has_key('basic_auth_password') and entry.has_key('basic_auth_username'):
+            log.debug('Basic auth enabled')
+            auth_handler = urllib2.HTTPPasswordMgrWithDefaultRealm()
+            auth_handler.add_password(None, entry['url'], entry['basic_auth_username'], entry['basic_auth_password'])
+            opener = urllib2.build_opener(auth_handler)
+            f = opener.open(entry['url'])
+        else:
+            log.debug('Basic auth disabled')
+            f = urllib2.urlopen(entry['url'])
+            
         mimetype = f.headers.getsubtype()
         content = f.read()
         f.close()
