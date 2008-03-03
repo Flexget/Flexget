@@ -30,12 +30,13 @@ class CliConfig:
                           help='Configuration parameters trough commandline. See --doc cli_config.')
         self.replaces = {}        
     
-    def replace_dict(self, dict, replaces):
-        for k,v in dict.items():
+    def replace_dict(self, d, replaces):
+        for k,v in d.items():
             if type(v) == types.StringType:
                 nv = replaces.get(v[1:], False)
                 if nv and v.startswith('$'):
                     log.debug('Replacing key %s (%s -> %s)' % (k, v, nv))
+                    d[k] = nv
             if type(v) == types.ListType:
                 for lv in v[:]:
                     nv = replaces.get(lv[1:], False)
@@ -54,7 +55,8 @@ class CliConfig:
             return True # already parsed
         items = s.split(',')
         for item in items:
-            key, value = item.split('=')
+            key = item[:item.index('=')]
+            value = item[item.index('=')+1:]
             self.replaces[key.strip()] = value.strip()
         return True
 
