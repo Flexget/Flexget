@@ -4,6 +4,7 @@ import urlparse
 import logging
 import re
 import yaml
+from httplib import BadStatusLine
 
 log = logging.getLogger('rlslog')
 
@@ -49,8 +50,14 @@ class RlsLog:
         if not soup_present:
             log.error(soup_err)
             return
-        page = urllib2.urlopen(rlslog_url)
-        soup = BeautifulSoup(page)
+        
+        try:
+            page = urllib2.urlopen(rlslog_url)
+            soup = BeautifulSoup(page)
+        except BadStatusLine:
+            log.warn("BadStatusLine when opening page")
+            return
+            
         releases = []
         for entry in soup.findAll('div', attrs={"class" : "entry"}):
             release = {}

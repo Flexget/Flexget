@@ -2,6 +2,7 @@ import urllib
 import urllib2
 import urlparse
 import logging
+from socket import timeout
 import re
 
 log = logging.getLogger('html')
