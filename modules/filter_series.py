@@ -118,6 +118,8 @@ class FilterSeries:
         If we take hdtv off from list, 720p would be downloaded.
 
         Enough has default value of 720p.
+
+        Possible values for enough (in order): 1080p, 1080, 720p, 720, hr, dvd, hdtv, dsr, dsrip
     """
 
     def register(self, manager, parser):
