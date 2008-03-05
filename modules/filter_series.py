@@ -109,10 +109,10 @@ class FilterSeries:
             if not serie: continue
             for identifier in serie.keys():
                 for quality in SerieParser.qualities:
-                    if quality=='info': continue
+                    if quality=='info': continue # a hack, info dict is not quality
                     entry = serie[identifier].get(quality)
                     if not entry: continue
-                    # check if some input already added this feed
+                    # check if episode is still in feed, if not add it
                     exists = False
                     for feed_entry in feed.entries:
                         if feed_entry['title'] == entry['title'] and feed_entry['url'] == entry['url']:
@@ -134,11 +134,11 @@ class FilterSeries:
                 if not serie.valid: continue
                 serie.entry = entry
                 self.store(feed, serie, entry)
-                # save for choosing
+                # add this episode into list of available episodes
                 eps = series.setdefault(serie.identifier(), [])
                 eps.append(serie)
 
-            # choose best episode
+            # choose episode
             for identifier, eps in series.iteritems():
                 if not eps: continue
                 def sort_by_quality(s1, s2):
