@@ -555,7 +555,8 @@ class Feed:
 
     def filter(self, entry):
         """Mark entry to be filtered uless told otherwise. Entry may still be accepted."""
-        if not entry in self.__filtered:
+        # accepted checked only because it makes more sense when verbosing details
+        if not entry in self.__filtered and not entry in self.__accepted:
             self.__filtered.append(entry)
             self.verbose_details('Filtered %s' % entry['title'])
 

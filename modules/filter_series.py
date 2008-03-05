@@ -81,7 +81,7 @@ class FilterSeries:
           - another serie
           
         If "some serie" and "another serie" have understandable episode
-        numbering entry is downloaded only once.
+        numbering any given episode is downloaded only once.
 
         So if we get same episode twice:
         
@@ -90,7 +90,34 @@ class FilterSeries:
 
         Only first file is downloaded.
 
-        In future there may be way to affect which entry will be selected.
+        If two different qualities come available at the same moment,
+        flexget will always download the better one. (more options coming ..)
+        
+        Timeframe:
+
+        Serie filter allows you to specify a timeframe for each serie in which
+        flexget waits better quality.
+
+        Example configuration:
+
+        series:
+          - some serie:
+              timeframe:
+                hours: 4
+                enough: 720p
+          - another serie
+          - third serie
+
+        In this example when a epsisode of 'some serie' appears, flexget will wait
+        for 4 hours incase and then proceeds to download best quality available.
+
+        The enough parameter will tell the quality that you find good enough to start
+        downloading without waiting whole timeframe. If qualities meeting enough parameter
+        and above are available, flexget will prefer the enough. Ie. if enough value is set
+        to 'hdtv' and qualities dsk, hdtv and 720p are available, hdtv will be chosen.
+        If we take hdtv off from list, 720p would be downloaded.
+
+        Enough has default value of 720p.
     """
 
     def register(self, manager, parser):
@@ -122,13 +149,19 @@ class FilterSeries:
                         feed.entries.append(entry)
 
 
+    def cmp_serie_quality(self, s1, s2):
+        return self.cmp_quality(s1.quality, s2.quality)
+
+    def cmp_quality(self, q1, q2):
+        return cmp(SerieParser.qualities.index(q1), SerieParser.qualities.index(q2))
+
     def filter_series(self, feed):
         for name in feed.config.get('series', []):
             conf = {}
             if type(name) == types.DictType:
                 name, conf = name.items()[0]
-          
-            series = {}
+
+            series = {} # ie. S1E2: [Serie, Serie, ..]
             for entry in feed.entries:
                 serie = SerieParser(name, entry['title'])
                 if not serie.valid: continue
@@ -138,34 +171,61 @@ class FilterSeries:
                 eps = series.setdefault(serie.identifier(), [])
                 eps.append(serie)
 
-            # choose episode
+            # choose episode from available qualities
             for identifier, eps in series.iteritems():
                 if not eps: continue
-                def sort_by_quality(s1, s2):
-                    return cmp(SerieParser.qualities.index(s1.quality), SerieParser.qualities.index(s2.quality))
-                eps.sort(sort_by_quality)
+                eps.sort(self.cmp_serie_quality)
                 best = eps[0]
-
-                # if age exceeds timeframe
-                diff = datetime.today() - self.get_first_seen(feed, best)
-                age_hours = divmod(diff.seconds, 60*60)[0]
-
-                log.debug('age_hours %i - %s ' % (age_hours, best))
                 
-                timeframe = conf.get('best_in', 0)
-                log.debug('best ep in %i hours is %s' % (timeframe, best))
+                if self.downloaded(feed, best):
+                    log.debug('Rejecting all episodes of %s. Episode has been already downloaded.' % identifier)
+                    for ep in eps:
+                        feed.reject(ep.entry)
+                    continue
 
-                if age_hours < timeframe or self.downloaded(feed, best):
-                    log.debug('Filtering %s, downloaded %s' % (best.entry, self.downloaded(feed, best)))
-                    feed.filter(best.entry)
+                # timeframe present
+                if conf.has_key('timeframe'):
+                    tconf = conf.get('timeframe')
+                    hours = tconf.get('hours', 0)
+                    enough = tconf.get('enough', '720p')
+
+                    if not enough in SerieParser.qualities:
+                        log.error('Parameter enough has unknown value: %s' % enoigh)
+
+                    # scan for enough, starting from worst quality (reverse)
+                    eps.reverse()
+                    for ep in eps:
+                        if self.cmp_quality(enough, ep.quality) >= 0: # 1=greater, 0=equal, -1=does not meet
+                            log.debug('Episode %s meets quality %s' % (ep.entry['title'], enough))
+                            feed.accept(ep.entry)
+                            continue
+                            
+                    # timeframe
+                    diff = datetime.today() - self.get_first_seen(feed, best)
+                    age_hours = divmod(diff.seconds, 60*60)[0]
+                    log.debug('age_hours %i - %s ' % (age_hours, best))
+                    log.debug('best ep in %i hours is %s' % (hours, best))
+                    if age_hours >= hours:
+                        log.debug('Accepting %s' % best.entry)
+                        feed.accept(best.entry)
+                        # store serie instance to entry for later use
+                        best.entry['serie_parser'] = best
+                        # remove entry instance from serie instance, not needed any more (save memory, circular reference?)
+                        best.entry = None
+                    else:
+                        log.debug('Timeframe ignoring %s' % (best.entry['title']))
                 else:
-                    log.debug('Accepting %s' % best.entry)
+                    # no timeframe, just choose best
                     feed.accept(best.entry)
-                    # store serie instance to entry for later use
-                    best.entry['serie_parser'] = best
-                    # remove entry instance from serie instance, not needed any more (save memory, circular reference?)
-                    best.entry = None
 
+        # filter ALL entries, only previously accepted will remain
+        # other modules may still accept entries
+        for entry in feed.entries:
+            feed.filter(entry)
+
+    def reject_eps(self, feed, eps):
+        for ep in eps:
+            feed.reject(ep.entry)
 
     def get_first_seen(self, feed, serie):
         """Return datetime when this episode of serie was first seen"""
@@ -173,7 +233,7 @@ class FilterSeries:
         return datetime(*fs)
 
     def downloaded(self, feed, serie):
-        """Return true if this episode of seri is downloaded"""
+        """Return true if this episode of serie is downloaded"""
         cache = feed.cache.get(serie.name)
         return cache[serie.identifier()]['info']['downloaded']
 
