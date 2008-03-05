@@ -42,10 +42,9 @@ class InputHtml:
         try:
             page = urllib2.urlopen(pageurl)
             soup = BeautifulSoup(page)
-# timeout is UNDEFINED .. fix fix!
-#        except timeout:
-#            log.warning("Timed out opening page")
-#            return
+        except timeout:
+            log.warning("Timed out opening page")
+            return
         except urllib2.URLError, e:
             log.warning("URLError when opening page")
             return
