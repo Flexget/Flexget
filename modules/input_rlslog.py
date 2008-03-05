@@ -51,12 +51,8 @@ class RlsLog:
             log.error(soup_err)
             return
         
-        try:
-            page = urllib2.urlopen(rlslog_url)
-            soup = BeautifulSoup(page)
-        except BadStatusLine:
-            log.warn("BadStatusLine when opening page")
-            return
+        page = urllib2.urlopen(rlslog_url)
+        soup = BeautifulSoup(page)
             
         releases = []
         for entry in soup.findAll('div', attrs={"class" : "entry"}):
@@ -116,6 +112,8 @@ class RlsLog:
             raise Warning('RlsLog was unable to complete task. HTTPError %s' % (e.code))
         except urllib2.URLError, e:
             raise Warning('RlsLog was unable to complete task. URLError %s' % (e.reason))
+        except BadStatusLine:
+            raise Warning('RlsLog was unable to complete task. Got BadStatusLine.')
 
         for release in releases:
             # construct entry from release
