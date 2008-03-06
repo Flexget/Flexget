@@ -8,9 +8,10 @@ log = logging.getLogger('ignore')
 
 class IgnoreFilter(FilterPatterns):
     """
-        Functionally this is identical to filter unconditionally, but instead
-        of passing entries unconditionally entries are removed unconditionally.
-        This is usefull for filtering entries containing certain patterns
+        Entries matching regexp will be rejected.
+        Non matching entries are not intervened.
+        
+        This is usefull for rejecting entries containing certain patterns
         globally by using global section.
         
         Example:
@@ -37,7 +38,4 @@ class IgnoreFilter(FilterPatterns):
         manager.register(instance=self, event='filter', keyword='ignore', callback=self.ignore, order=65535)
 
     def ignore(self, feed):
-        self.filter(feed, feed.filter, None, 'ignore')
-
-if __name__ == "__main__":
-    print "works!"
+        self.filter(feed, feed.reject, None, 'ignore')

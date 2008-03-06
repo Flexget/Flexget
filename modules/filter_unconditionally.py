@@ -8,12 +8,11 @@ from filter_patterns import FilterPatterns
 log = logging.getLogger('unconditionally')
 
 class UnconditionallyFilter(FilterPatterns):
-    """
-        Functionally this is identical to filter patterns, but
-        instead of filtering content out. This will pass matching
-        content unconditionally even if some other filter removes
-        entry.
 
+    """
+        Entries matching regexp will be accepted.
+        Non matching entries are not intervened.
+        
         Example:
 
         imdb:
