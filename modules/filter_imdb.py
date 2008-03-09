@@ -28,7 +28,7 @@ class ImdbSearch:
         self.debug = True
         self.cutoffs = ['dvdrip', 'dvdscr', 'cam', 'r5', 'limited',
                         'xvid', 'h264', 'x264', 'dvd', 'screener',
-                        'unrated', 'repack', 'rerip']
+                        'unrated', 'repack', 'rerip', 'proper']
         self.ignore_types = ['VG']
 
     def parse_name(self, s):
