@@ -6,13 +6,12 @@ import re
 import string
 import difflib
 
-# this way we don't force users to install bs incase they do not want to use module http
+# this way we don't force users to install bs incase they do not want to use this module
 soup_present = True
 soup_err = "Module filter_imdb requires BeautifulSoup. Please install it from http://www.crummy.com/software/BeautifulSoup/ or from your distribution repository."
 
 try:
     from BeautifulSoup import BeautifulSoup
-    from BeautifulSoup import BeautifulStoneSoup
 except:
     log.warning(soup_err)
     soup_present = False
@@ -21,7 +20,10 @@ log = logging.getLogger('imdb')
 
 class ImdbSearch:
 
-    cutoffs = ['dvdrip', 'dvdscr', 'cam', 'r5', 'limited', 'xvid', 'h264', 'x264']
+    def __init__(self):
+        # depriorize aka matches a bit
+        self.aka_weight = 0.9
+        self.cutoffs = ['dvdrip', 'dvdscr', 'cam', 'r5', 'limited', 'xvid', 'h264', 'x264']
 
     def sanitize(self, s):
         """Sanitizes movie name from all kind of crap"""
@@ -95,7 +97,7 @@ class ImdbSearch:
                 for aka in link.parent.findAll('em', text=re.compile('".*"')):
                     aka = aka.replace('"', '')
                     seq = difflib.SequenceMatcher(lambda x: x==' ', aka, name)
-                    aka_ratio = seq.ratio()
+                    aka_ratio = seq.ratio() * self.aka_weight
                     if aka_ratio > ratio:
                         log.debug('Aka %s has better ratio %s' % (aka, aka_ratio))
                         ratio = aka_ratio
