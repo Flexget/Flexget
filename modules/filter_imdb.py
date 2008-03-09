@@ -4,6 +4,7 @@ import urlparse
 import logging
 import re
 import string
+import difflib
 
 # this way we don't force users to install bs incase they do not want to use module http
 soup_present = True
@@ -11,11 +12,104 @@ soup_err = "Module filter_imdb requires BeautifulSoup. Please install it from ht
 
 try:
     from BeautifulSoup import BeautifulSoup
+    from BeautifulSoup import BeautifulStoneSoup
 except:
     log.warning(soup_err)
     soup_present = False
 
 log = logging.getLogger('imdb')
+
+class ImdbSearch:
+
+    cutoffs = ['dvdrip', 'dvdscr', 'cam', 'r5', 'limited', 'xvid', 'h264', 'x264']
+
+    def sanitize(self, s):
+        """Sanitizes movie name from all kind of crap"""
+        s = s.replace('h.264', 'h264')
+        s = s.replace('x.264', 'x264')
+        s = s.replace('.', ' ')
+        s = s.replace('_', ' ')
+        s = s.replace('-', ' ')
+        parts = s.split(' ')
+        for part in parts:
+            if part.lower() in self.cutoffs:
+                cutted = parts[:parts.index(part)]
+                s = string.join(cutted, ' ')
+                break
+        return s
+
+    def search(self, name):
+        """Return array of movie details (dict)"""
+        name = self.sanitize(name)
+        log.debug('Searching: %s' % name)
+        url = "http://www.imdb.com/find?" + urllib.urlencode({'q':name, 's':'all'})
+        log.debug('Serch query: %s' % url)
+        page = urllib2.urlopen(url)
+        actual_url = page.geturl()
+
+        movies = []
+        # incase we got redirected to movie page (perfect match)
+        actual_url_match = re.match('.*\.imdb\.com\/title\/tt\d+\/', actual_url).group(0)
+        if actual_url_match:
+            log.debug('Perfect hit. Search got redirected to %s' % actual_url_match)
+            movie = {}
+            movie['match'] = 1.0
+            movie['name'] = name
+            movie['url'] = actual_url_match
+            movies.append(movie)
+            return movies
+
+        soup = BeautifulSoup(page)
+
+        sections = ['Popular Titles', 'Titles (Exact Matches)',
+                    'Titles (Partial Matches)', 'Titles (Approx Matches)']
+
+        for section in sections:
+            section_tag = soup.find('b', text=section)
+            if not section_tag:
+                continue
+
+            try:
+                section_p = section_tag.parent.parent
+            except AttributeError, ae:
+                log.debug('Section does not have parent?')
+                continue
+            
+            links = section_p.findAll('a', attrs={'href': re.compile('\/title\/tt')})
+
+            for link in links:
+                # skip links with javascript (not movies)
+                if link.has_key('onclick'): continue
+                movie = {}
+                additional = re.findall('\((.*?)\)', link.next.next)
+                if len(additional) > 0:
+                    movie['year'] = additional[0].encode()
+                if len(additional) > 1:
+                    movie['type'] = additional[1].encode()
+                
+                movie['name'] = link.string.encode()
+                movie['url'] = "http://www.imdb.com" + link.get('href').encode()
+                # calc & set best matching ratio
+                seq = difflib.SequenceMatcher(lambda x: x==' ', movie['name'], name)
+                ratio = seq.ratio()
+                # check if some of the akas match better
+                for aka in link.parent.findAll('em', text=re.compile('".*"')):
+                    aka = aka.replace('"', '')
+                    seq = difflib.SequenceMatcher(lambda x: x==' ', aka, name)
+                    aka_ratio = seq.ratio()
+                    if aka_ratio > ratio:
+                        log.debug('Aka %s has better ratio %s' % (aka, aka_ratio))
+                        ratio = aka_ratio
+                # store ratio
+                movie['match'] = ratio
+                movies.append(movie)
+
+        def cmp_movie(m1, m2):
+            return cmp (m2['match'], m1['match'])
+        movies.sort(cmp_movie)
+        return movies
+        
+
 
 class ImdbParser:
     """Quick-hack to parse relevant imdb details"""
@@ -245,15 +339,9 @@ class FilterImdb:
                 log.debug("Accepting %s" % (entry))
                 feed.accept(entry)
 
-if __name__ == '__main__':
-    import sys
-    logging.basicConfig(level=logging.DEBUG)
 
-#    i = ImdbParser('http://www.imdb.com/title/tt0245429/')
-#    i.parse()
 
-    from test_tools import MockFeed
-    feed = MockFeed()
+def test_parse():
 
     """
     dummy = {}
@@ -283,9 +371,24 @@ if __name__ == '__main__':
     f = FilterImdb()
     f.run(feed)
 
-    import yaml
     print "-"*60
     print yaml.safe_dump(feed.entries)
     print "-"*60
 #    print yaml.safe_dump(feed.session)
 
+def test_search():
+    imdb = ImdbSearch()
+    movies = imdb.search(sys.argv[1])
+    print yaml.dump(movies)
+
+if __name__ == '__main__':
+    import sys
+    import yaml
+    logging.basicConfig(level=logging.DEBUG)
+
+    from test_tools import MockFeed
+    feed = MockFeed()
+
+
+    #test_parse()
+    test_search()

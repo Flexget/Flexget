@@ -41,6 +41,16 @@ class MockFeed:
     def filter(self, entry):
         print "MockFeed got filtering command on %s" % entry['title']
 
+    def accept(self, entry):
+        print "MockFeed got accept command on %s" % entry['title']
+
+    def reject(self, entry):
+        print "MockFeed got reject command on %s" % entry['title']
+
+    def resolvable(self, entry):
+        print "MockFeed is %s resolvable. Returning False." % entry['url']
+        return False
+
     def dump_entries(self):
         """Available only in mock! Dumps entries in yaml"""
         for entry in self.entries:

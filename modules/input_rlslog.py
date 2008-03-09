@@ -136,6 +136,7 @@ if __name__ == '__main__':
     r = RlsLog()
     from test_tools import MockFeed
     feed = MockFeed()
+    feed.config['rlslog'] = sys.argv[1]
 
     r.run(feed)
     print yaml.dump(feed.entries)
