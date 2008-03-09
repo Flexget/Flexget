@@ -25,7 +25,7 @@ class ImdbSearch:
         self.aka_weight = 0.9
         self.min_match = 0.5
         self.min_diff = 0.01
-        self.debug = True
+        self.debug = False
         self.cutoffs = ['dvdrip', 'dvdscr', 'cam', 'r5', 'limited',
                         'xvid', 'h264', 'x264', 'dvd', 'screener',
                         'unrated', 'repack', 'rerip', 'proper']
@@ -33,7 +33,7 @@ class ImdbSearch:
 
     def parse_name(self, s):
         """Sanitizes movie name from all kind of crap"""
-        # todo: improve, remove hacks  ..
+        # todo: improve, remove those two hacks  ..
         s = s.replace('h.264', 'h264')
         s = s.replace('x.264', 'x264')
         s = s.replace('[', ' ')
@@ -41,6 +41,11 @@ class ImdbSearch:
         s = s.replace('.', ' ')
         s = s.replace('_', ' ')
         s = s.replace('-', ' ')
+        # remove extra spaces!
+        s = s.strip()
+        while s.find('  ') != -1:
+            s = s.replace('  ', ' ')
+        # split to parts        
         parts = s.split(' ')
         year = None
         cut_pos = 256
@@ -52,6 +57,10 @@ class ImdbSearch:
                     year = part
                     if parts.index(part) < cut_pos:
                         cut_pos = parts.index(part)
+            # if length > 3 and whole word in uppers, consider as cutword (most likelly a group name)
+            if len(part) > 3 and part.isupper():
+                if parts.index(part) < cut_pos:
+                    cut_pos = parts.index(part)
             # check for cutoff words
             if part.lower() in self.cutoffs:
                 if parts.index(part) < cut_pos:
@@ -70,6 +79,7 @@ class ImdbSearch:
         """Return single movie that best matches criteria or None"""
         movies = self.search(name)
 
+        # todo: remove at some point
         if self.debug:
             import yaml
             print yaml.safe_dump(movies)
@@ -294,9 +304,9 @@ class FilterImdb:
             accept_languages:
                 - language1
 
-            # reject all entries which are not imdb-compatible
+            # filter all entries which are not imdb-compatible
             # this has default value (True) even when key not present
-            reject_invalid: True / False
+            filter_invalid: True / False
 
         Entry fields (module developers):
         
@@ -331,18 +341,40 @@ class FilterImdb:
 
     def run(self, feed):
         if not soup_present: raise Exception(soup_err)
-
         config = feed.config['imdb']
-
         for entry in feed.entries:
 
-            if entry.get('imdb_url', None) == None and self.imdb_required(entry, config):
-                if config.get('reject_invalid', True):
-                    feed.log_once('Filtering %s because of missing imdb url' % entry['title'], log)
+            # if no url, check if it's present in cache
+            if not entry.get('imdb_url'):
+                cached = feed.shared_cache.get(entry['title'])
+                if cached == 'WILL_FAIL':
+                    # this movie cannot be found, not worth trying again ...
                     feed.filter(entry)
+                    continue
+                if cached:
+                    log.debug('Setting imdb url for %s from cache' % entry['title'])
+                    entry['imdb_url'] = cached
+
+            if not entry.get('imdb_url') and self.imdb_required(entry, config):
+                # try searching from imdb
+                search = ImdbSearch()
+                movie = search.smart_match(entry['title'])
+                if movie:
+                    log.debug('Imdb search was success')
+                    entry['imdb_url'] = movie['url']
+                    # store url for this movie, so we don't have to search on every run
+                    feed.shared_cache.store(entry['title'], entry['imdb_url'])
                 else:
-                    log.debug("Unable to check %s due missing imdb url, configured to pass (reject_invalid is False)" % entry['title'])
-                continue
+                    feed.log_once('Imdb search failed with %s' % entry['title'], log)
+                    # store FAIL for this title
+                    feed.shared_cache.store(entry['title'], 'WILL_FAIL')
+                    # act depending configuration
+                    if config.get('filter_invalid', True):
+                        feed.log_once('Filtering %s because of missing imdb url' % entry['title'], log)
+                        feed.filter(entry)
+                    else:
+                        log.debug("Unable to check %s due missing imdb url, configured to pass (filter_invalid is False)" % entry['title'])
+                    continue
 
             imdb = ImdbParser()
             if self.imdb_required(entry, config):
