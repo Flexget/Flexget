@@ -25,7 +25,9 @@ class ImdbSearch:
         self.aka_weight = 0.9
         self.min_match = 0.5
         self.min_diff = 0.01
+        self.debug = True
         self.cutoffs = ['dvdrip', 'dvdscr', 'cam', 'r5', 'limited', 'xvid', 'h264', 'x264']
+        self.ignore_types = ['VG']
 
     def parse_name(self, s):
         """Sanitizes movie name from all kind of crap"""
@@ -63,6 +65,11 @@ class ImdbSearch:
     def best_match(self, name, year=None):
         """Return single movie that best matches criteria or None"""
         movies = self.search(name)
+
+        if self.debug:
+            import yaml
+            print yaml.safe_dump(movies)
+        
         # remove all movies below min_match, and different year
         for movie in movies[:]:
             if year:
@@ -73,6 +80,11 @@ class ImdbSearch:
             if movie['match'] < self.min_match:
                 log.debug('best_match removing %s because min_match' % movie['name'])
                 movies.remove(movie)
+                continue
+            if movie.get('type', None) in self.ignore_types:
+                log.debug('best_match removing %s because ignored type' % movie['name'])
+                movies.remove(movie)
+                continue
 
         if len(movies) == 0:
             log.debug('no movies remain')
