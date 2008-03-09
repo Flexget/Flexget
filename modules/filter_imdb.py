@@ -36,6 +36,8 @@ class ImdbSearch:
         # todo: improve, remove hacks  ..
         s = s.replace('h.264', 'h264')
         s = s.replace('x.264', 'x264')
+        s = s.replace('[', ' ')
+        s = s.replace(']', ' ')
         s = s.replace('.', ' ')
         s = s.replace('_', ' ')
         s = s.replace('-', ' ')
