@@ -74,7 +74,7 @@ class ImdbSearch:
         
         # remove all movies below min_match, and different year
         for movie in movies[:]:
-            if year:
+            if year and movie.get('year'):
                 if movie['year'] != str(year):
                     log.debug('best_match removing %s because difference in year' % movie['name'])
                     movies.remove(movie)
@@ -123,6 +123,7 @@ class ImdbSearch:
             movie['match'] = 1.0
             movie['name'] = name
             movie['url'] = actual_url
+            movie['year'] = None
             movies.append(movie)
             return movies
 
