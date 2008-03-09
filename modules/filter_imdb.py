@@ -23,26 +23,76 @@ class ImdbSearch:
     def __init__(self):
         # depriorize aka matches a bit
         self.aka_weight = 0.9
+        self.min_match = 0.5
+        self.min_diff = 0.01
         self.cutoffs = ['dvdrip', 'dvdscr', 'cam', 'r5', 'limited', 'xvid', 'h264', 'x264']
 
-    def sanitize(self, s):
+    def parse_name(self, s):
         """Sanitizes movie name from all kind of crap"""
+        # todo: improve, remove hacks  ..
         s = s.replace('h.264', 'h264')
         s = s.replace('x.264', 'x264')
         s = s.replace('.', ' ')
         s = s.replace('_', ' ')
         s = s.replace('-', ' ')
         parts = s.split(' ')
+        year = None
+        cut_pos = 256
         for part in parts:
+            # check for year
+            if part.isdigit():
+                n = int(part)
+                if n>1900 and n<2050:
+                    year = part
+                    if parts.index(part) < cut_pos:
+                        cut_pos = parts.index(part)
+            # check for cutoff words
             if part.lower() in self.cutoffs:
-                cutted = parts[:parts.index(part)]
-                s = string.join(cutted, ' ')
-                break
-        return s
+                if parts.index(part) < cut_pos:
+                    cut_pos = parts.index(part)
+        # make cut
+        s = string.join(parts[:cut_pos], ' ')
+        return s, year
+
+    def smart_match(self, name):
+        """Accepts messy name, cleans it and uses information available to make smartest and best match"""
+        name, year = self.parse_name(name)
+        log.debug('smart_match name=%s year=%s' % (name, str(year)))
+        return self.best_match(name, year)
+
+    def best_match(self, name, year=None):
+        """Return single movie that best matches criteria or None"""
+        movies = self.search(name)
+        # remove all movies below min_match, and different year
+        for movie in movies[:]:
+            if year:
+                if movie['year'] != str(year):
+                    log.debug('best_match removing %s because difference in year' % movie['name'])
+                    movies.remove(movie)
+                    continue
+            if movie['match'] < self.min_match:
+                log.debug('best_match removing %s because min_match' % movie['name'])
+                movies.remove(movie)
+
+        if len(movies) == 0:
+            log.debug('no movies remain')
+            return None
+        
+        # if only one remains ..        
+        if len(movies) == 1:
+            log.debug('only one movie remains')
+            return movies[0]
+
+        # check min difference (array is >1 because of previous)
+        diff = movies[0]['match'] - movies[1]['match']
+        if diff < self.min_diff:
+            log.debug('min_diff too small')
+            return None
+        else:
+            return movies[0]
 
     def search(self, name):
         """Return array of movie details (dict)"""
-        name = self.sanitize(name)
         log.debug('Searching: %s' % name)
         url = "http://www.imdb.com/find?" + urllib.urlencode({'q':name, 's':'all'})
         log.debug('Serch query: %s' % url)
@@ -379,8 +429,10 @@ def test_parse():
 
 def test_search():
     imdb = ImdbSearch()
-    movies = imdb.search(sys.argv[1])
-    print yaml.dump(movies)
+#    movies = imdb.search(sys.argv[1])
+#    print yaml.dump(movies)
+    movie = imdb.smart_match(sys.argv[1])
+    print yaml.dump(movie)
 
 if __name__ == '__main__':
     import sys
