@@ -49,13 +49,14 @@ class ImdbSearch:
 
         movies = []
         # incase we got redirected to movie page (perfect match)
-        actual_url_match = re.match('.*\.imdb\.com\/title\/tt\d+\/', actual_url).group(0)
-        if actual_url_match:
-            log.debug('Perfect hit. Search got redirected to %s' % actual_url_match)
+        re_m = re.match('.*\.imdb\.com\/title\/tt\d+\/', actual_url)
+        if re_m:
+            actual_url = re_m.group(0)
+            log.debug('Perfect hit. Search got redirected to %s' % actual_url)
             movie = {}
             movie['match'] = 1.0
             movie['name'] = name
-            movie['url'] = actual_url_match
+            movie['url'] = actual_url
             movies.append(movie)
             return movies
 
@@ -68,7 +69,6 @@ class ImdbSearch:
             section_tag = soup.find('b', text=section)
             if not section_tag:
                 continue
-
             try:
                 section_p = section_tag.parent.parent
             except AttributeError, ae:
@@ -76,7 +76,6 @@ class ImdbSearch:
                 continue
             
             links = section_p.findAll('a', attrs={'href': re.compile('\/title\/tt')})
-
             for link in links:
                 # skip links with javascript (not movies)
                 if link.has_key('onclick'): continue
@@ -92,7 +91,7 @@ class ImdbSearch:
                 # calc & set best matching ratio
                 seq = difflib.SequenceMatcher(lambda x: x==' ', movie['name'], name)
                 ratio = seq.ratio()
-                # check if some of the akas match better
+                # check if some of the akas have better ratio
                 for aka in link.parent.findAll('em', text=re.compile('".*"')):
                     aka = aka.replace('"', '')
                     seq = difflib.SequenceMatcher(lambda x: x==' ', aka, name)
