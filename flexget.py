@@ -403,9 +403,8 @@ class Manager:
             for name in feeds:
                 # if feed name is prefixed with _ it's disabled
                 if name.startswith('_'): continue
-                last = len(feeds) - 1 == feeds.index(name)
                 # create feed and execute it
-                feed = Feed(self, name, self.config['feeds'][name], last)
+                feed = Feed(self, name, self.config['feeds'][name])
                 try:
                     feed.execute()
                 except Exception, e:
@@ -479,16 +478,14 @@ class ModuleCache:
 
 class Feed:
 
-    def __init__(self, manager, name, config, last):
+    def __init__(self, manager, name, config):
         """
             name - name of the feed
             config - yaml configuration (dict)
-            last - boolean flag, true if this is last feed we are going to run
         """
         self.name = name
         self.config = config
         self.manager = manager
-        self.last = last
 
         # merge global configuration into this feed config
         self.__merge_config(manager.config.get('global', {}), config)
