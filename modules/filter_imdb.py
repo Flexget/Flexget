@@ -38,11 +38,14 @@ class ImdbSearch:
         s = s.replace('x.264', 'x264')
         s = s.replace('[', ' ')
         s = s.replace(']', ' ')
-        s = s.replace('.', ' ')
         s = s.replace('_', ' ')
         s = s.replace('-', ' ')
         # remove extra spaces!
         s = s.strip()
+        # if there are no spaces, remove dots
+        if s.find(' ')  != -1:
+            s = s.replace('.', ' ')
+        # remove duplicate spaces
         while s.find('  ') != -1:
             s = s.replace('  ', ' ')
         # split to parts        
@@ -151,7 +154,7 @@ class ImdbSearch:
             try:
                 section_p = section_tag.parent.parent
             except AttributeError, ae:
-                log.debug('Section does not have parent?')
+                log.debug('Section % does not have parent?' % section)
                 continue
             
             links = section_p.findAll('a', attrs={'href': re.compile('\/title\/tt')})
@@ -357,6 +360,7 @@ class FilterImdb:
 
             if not entry.get('imdb_url') and self.imdb_required(entry, config):
                 # try searching from imdb
+                feed.verbose_progress('Searching from imdb %s' % entry['title'])
                 search = ImdbSearch()
                 movie = search.smart_match(entry['title'])
                 if movie:
