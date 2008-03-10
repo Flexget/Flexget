@@ -43,7 +43,7 @@ class ImdbSearch:
         # remove extra spaces!
         s = s.strip()
         # if there are no spaces, remove dots
-        if s.find(' ')  != -1:
+        if s.find(' ')  == -1:
             s = s.replace('.', ' ')
         # remove duplicate spaces
         while s.find('  ') != -1:
@@ -61,7 +61,7 @@ class ImdbSearch:
                     if parts.index(part) < cut_pos:
                         cut_pos = parts.index(part)
             # if length > 3 and whole word in uppers, consider as cutword (most likelly a group name)
-            if len(part) > 3 and part.isupper():
+            if len(part) > 3 and part.isupper() and part.isalpha():
                 if parts.index(part) < cut_pos:
                     cut_pos = parts.index(part)
             # check for cutoff words
