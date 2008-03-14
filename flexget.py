@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: cp1252 -*-
 
 import urllib
 import os, os.path
@@ -31,10 +32,13 @@ class RegisterException(Exception):
         return repr(self.value)
 
 class ResolverException(Exception):
+    pass
+    """
     def __init__(self, value):
         self.value = value
     def __str__(self):
         return repr(self.value)
+    """
 
 class Manager:
 
@@ -166,7 +170,8 @@ class Manager:
                 self.config = yaml.safe_load(file(config))
                 self.configname = os.path.basename(config)[:-4]
                 return
-        logging.error("ERROR: No configuration file found!")
+        logging.debug('Tried to read from: %s' % string.join(possible, ', '))
+        logging.error('Could not find configuration file %s' % self.options.config)
         sys.exit(0)
 
     def load_session(self):
@@ -389,6 +394,9 @@ class Manager:
     def execute(self):
         """Iterate trough all feeds and run them."""
         try:
+            if not self.config:
+              logging.critical('Configuration file is empty.')
+              return
             feeds = self.config.get('feeds', {}).keys()
             if not feeds: logging.critical('There are no feeds in the configuration file!')
 
@@ -686,25 +694,34 @@ class Feed:
         tries = 0
         while self.resolvable(entry):
             tries += 1
-            if (tries>1000):
-                raise ResolverException('resolve was left in infinite loop, aborting! url=%s' % entry['url'])
+            if (tries > 300):
+                raise ResolverException('Resolve was left in infinite loop while resolving %s, some resolver is returning True on resolvable method when it should not.' % entry['url'])
             for name, resolver in manager.resolvers.iteritems():
                 if resolver.resolvable(self, entry):
                     logging.debug('%s resolving %s' % (name, entry['url']))
-                    if not resolver.resolve(self, entry):
-                        raise ResolverException('Resolver %s failed to resolve %s' % (name, entry['title']))
-    
+                    try:
+                        resolver.resolve(self, entry)
+                    except ResolverException, r:
+                        print "got resolver exception"
+                        """
+                        raise ResolverException('%s: %s' % (name, r.value))
+                        """
+#                    except Exception, e:
+                        print "got exception"
+                        print e
+                        """
+                        logging.exception(e)
+                        raise ResolverException('%s: Internal error' % (name))
+                        """
 
     def _resolve_entries(self):
         """Resolves all entries in feed"""
         for entry in self.entries:
             try:
                 self.resolve(entry)
-            except ResolverException, r:
-                logging.warning(r)
+            except ResolverException, e:
+                logging.warn(e.value)
                 self.failed(entry)
-            except Exception, e:
-                logging.exception(e)
     
     def execute(self):
         """Execute this feed, runs all events in order of events array."""

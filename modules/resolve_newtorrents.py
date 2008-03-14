@@ -1,8 +1,10 @@
+# -*- coding: cp1252 -*-
 import urllib
 import urllib2
 import urlparse
 import logging
 import re
+from flexget import ResolverException
 
 log = logging.getLogger("newtorrents")
 
@@ -32,9 +34,8 @@ class ResolveNewTorrents:
         return entry['url'].startswith('http://www.newtorrents.info') and not entry['url'] in self.resolved
         
     def resolve(self, feed, entry):
-        if not soup_present:
-            log.error(soup_err)
-            return
+        raise ResolverException('vittu')
+        if not soup_present: raise Exception(soup_err)
 
         # resolve entry url
         url = entry['url']
@@ -46,9 +47,8 @@ class ResolveNewTorrents:
         if url:
             entry['url'] = url
             self.resolved.append(url)
-            return True
         else:
-            return False
+            raise ResolverException('Bug in newtorrents resolver')
     
     def __get_torrent_url_from_page(self, url):
         """Parses torrent url from newtorrents download page"""
@@ -60,9 +60,9 @@ class ResolveNewTorrents:
             return None
         p = re.compile("copy\(\'(.*)\'\)", re.IGNORECASE)
         f = p.search(data)
-        if f==None:
-            log.error('Failed to get url from download page. Module may need a update.')
-            return None
+        if not f:
+            # the link in which module relies is missing!
+            raise ResolverException('Failed to get url from download page. Module may need a update.')
         else:
             return f.groups()[0]
 
@@ -71,9 +71,8 @@ class ResolveNewTorrents:
         name = name.replace('.',' ').lower()
         try:
             page = urllib2.urlopen(url)
-        except URLError, e:
-            log.warning("Timed out when opening page")
-            return
+        except urllib2.URLError, e:
+            raise ResolverException('Timed out when opening page')
         
         soup = BeautifulSoup(page)
         torrents = []
@@ -87,8 +86,7 @@ class ResolveNewTorrents:
 
         # choose the torrent
         if not torrents:
-            log.debug("did not find any matches in search result")
-            return None
+            raise ResolverException('No matches in search result')
         else:
             if len(torrents) == 1:
                 log.debug("found only one matching search result.")

@@ -14,7 +14,6 @@ class ResolveIsoHunt:
         
     def resolve(self, feed, entry):
         entry['url'] = entry['url'].replace('torrent_details', 'download')
-        return True
 
 if __name__ == '__main__':
     import sys

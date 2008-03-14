@@ -16,4 +16,3 @@ class ResolveTorrentSpy:
         m = re.match('http://www.torrentspy.com/torrent/([\d]+)/', entry['url'])
         torrent_id = m.group(1)
         entry['url'] = 'http://www.torrentspy.com/download.asp?id=%s' % torrent_id
-        return True

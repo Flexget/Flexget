@@ -14,4 +14,3 @@ class ResolveBtJunkie:
     def resolve(self, feed, entry):
         entry['url'] = entry['url'].replace('btjunkie.org', 'dl.btjunkie.org')
         entry['url'] = entry['url'] + "/download.torrent"
-        return True

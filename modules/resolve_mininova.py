@@ -13,4 +13,3 @@ class ResolveMininova:
         
     def resolve(self, feed, entry):
         entry['url'] = entry['url'].replace('tor', 'get')
-        return True

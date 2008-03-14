@@ -13,4 +13,3 @@ class ResolveBtJunkie:
         
     def resolve(self, feed, entry):
         entry['url'] = entry['url'].replace('download.php', 'download1.php')
-        return True
