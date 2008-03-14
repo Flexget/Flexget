@@ -4,7 +4,7 @@ import urllib2
 import urlparse
 import logging
 import re
-from flexget import ResolverException
+from feed import ResolverException
 
 log = logging.getLogger("newtorrents")
 
@@ -34,7 +34,6 @@ class ResolveNewTorrents:
         return entry['url'].startswith('http://www.newtorrents.info') and not entry['url'] in self.resolved
         
     def resolve(self, feed, entry):
-        raise ResolverException('vittu')
         if not soup_present: raise Exception(soup_err)
 
         # resolve entry url

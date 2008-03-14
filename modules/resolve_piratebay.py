@@ -2,7 +2,7 @@ import urllib
 import urllib2
 import urlparse
 import logging
-from flexget import ResolverException
+from feed import ResolverException
 
 log = logging.getLogger("piratebay")
 
