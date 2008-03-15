@@ -1,5 +1,3 @@
-# -*- coding: cp1252 -*-
-import urllib
 import urllib2
 import urlparse
 import logging
@@ -70,7 +68,7 @@ class ResolveNewTorrents:
         name = name.replace('.',' ').lower()
         try:
             page = urllib2.urlopen(url)
-        except urllib2.URLError, e:
+        except urllib2.URLError:
             raise ResolverException('Timed out when opening page')
         
         soup = BeautifulSoup(page)
