@@ -1,9 +1,7 @@
-import urllib
 import logging
+from filter_seen import FilterSeen
 
 log = logging.getLogger('seenmovies')
-
-from filter_seen import FilterSeen
 
 class FilterSeenMovies(FilterSeen):
 
