@@ -101,6 +101,9 @@ class Feed:
         self.__failed = []
         self.__abort = False
         self.__purged = 0
+
+        # keep track which keywords have been executed
+        self.__executed = {}
         
         # loggers
         #self.details = logging.getLogger('details')
@@ -227,22 +230,23 @@ class Feed:
         for module in modules:
             keyword = module['keyword']
             if self.config.has_key(keyword) or (module['builtin'] and not self.config.get('disable_builtins', False)):
+                self.__executed[keyword] = True
+                # set cache namespaces to this module realm
+                self.cache.set_namespace(keyword)
+                self.shared_cache.set_namespace(keyword)
+                # store execute info
+                self.__current_event = event
+                self.__current_module = keyword
+                # call module
                 try:
-                    # set cache namespaces to this module realm
-                    self.cache.set_namespace(keyword)
-                    self.shared_cache.set_namespace(keyword)
-                    # store execute info
-                    self.__current_event = event
-                    self.__current_module = keyword
-                    # call module
                     module['callback'](self)
-                    # check for priority operations
-                    self.__filter_rejected()
-                    if self.__abort: return
                 except Warning, w:
                     logging.warning(w)
                 except Exception, e:
                     logging.exception('Module %s: %s' % (keyword, e))
+                # check for priority operations
+                self.__filter_rejected()
+                if self.__abort: return
 
     def log_once(self, s, log=logging):
         """Log string s once"""
@@ -333,3 +337,8 @@ class Feed:
             if self.__abort:
                 logging.info('Aborting feed %s' % self.name)
                 return
+        # warn on modules that were configured but not executed (mistypes most likelly)
+        for kw in self.config.keys():
+            if not self.__executed.has_key(kw) and kw not in ['disable_builtins']:
+                logging.warning('Feed %s has unknown module %s' % (self.name, kw))
+
