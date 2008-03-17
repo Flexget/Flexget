@@ -369,7 +369,7 @@ class FilterImdb:
                     # store url for this movie, so we don't have to search on every run
                     feed.shared_cache.store(entry['title'], entry['imdb_url'])
                 else:
-                    feed.log_once('Imdb search failed with %s' % entry['title'], log)
+                    feed.log_once('Imdb search failed for %s' % entry['title'], log)
                     # store FAIL for this title
                     feed.shared_cache.store(entry['title'], 'WILL_FAIL')
                     # act depending configuration
@@ -406,10 +406,10 @@ class FilterImdb:
             reasons = []
             if config.has_key('min_score'):
                 if imdb.score < config['min_score']:
-                    reasons.append('min_score')
+                    reasons.append('min_score (%s < %s)' % (imdb.score, config['min_score']))
             if config.has_key('min_votes'):
                 if imdb.votes < config['min_votes']:
-                    reasons.append('min_votes')
+                    reasons.append('min_votes (%s < %s)' % (imdb.votes, config['min_votes']))
             if config.has_key('min_year'):
                 if imdb.year < config['min_year']:
                     reasons.append('min_year')

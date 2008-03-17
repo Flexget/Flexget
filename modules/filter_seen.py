@@ -24,8 +24,10 @@ class FilterSeen:
     def filter_seen(self, feed):
         for entry in feed.entries:
             for field in self.fields:
+                if not entry.has_key(field):
+                    continue
                 # note: urllib.unquote is only for making module backwards compatible
-                if feed.shared_cache.get(field, False) or feed.shared_cache.get(urllib.unquote(field), False):
+                if feed.shared_cache.get(entry[field], False) or feed.shared_cache.get(urllib.unquote(entry[field]), False):
                     log.debug("Rejecting '%s' '%s' because of seen '%s'" % (entry['url'], entry['title'], field))
                     feed.reject(entry)
 
