@@ -23,9 +23,6 @@ class ModuleCookies:
         manager.register(instance=self, event='exit', keyword='cookies', callback=self.exit)
 
     def start(self, feed):
-        if not feed.config.has_key('cookies'):
-            return
-        # cookies enabled
         config = feed.config['cookies']
         # check that require configuration is present
         if not config.has_key('type'):
@@ -47,8 +44,8 @@ class ModuleCookies:
             cj.load(filename=config['file'], ignore_expires=True)
             log.debug('Cookies loaded')
         except (cookielib.LoadError, IOError), e:
-            log.exception(e)
-            raise Warning('Aborted feed because cookies could not be loaded.')
+            import sys
+            raise Warning('Cookies could not be loaded: %s' % sys.exc_info()[1])
         # create new opener for urllib2
         log.debug('Installing urllib2 opener')
         opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cj))
