@@ -69,7 +69,7 @@ class ResolveNewTorrents:
         try:
             page = urllib2.urlopen(url)
         except urllib2.URLError:
-            raise ResolverException('Timed out when opening page')
+            raise ResolverException('Timed out when opening search page')
         
         soup = BeautifulSoup(page)
         torrents = []
@@ -83,7 +83,7 @@ class ResolveNewTorrents:
 
         # choose the torrent
         if not torrents:
-            raise ResolverException('No matches in search result')
+            raise ResolverException("%s doesn't match for any search results" % name)
         else:
             if len(torrents) == 1:
                 log.debug("found only one matching search result.")
