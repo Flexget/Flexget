@@ -42,7 +42,11 @@ class SerieParser:
         for part in item_data:
             # search for quality
             if part in self.qualities:
-                self.quality = part
+                if self.qualities.index(part) < self.qualities.index(self.quality):
+                    log.debug('%s storing quality %s' % (self.name, part))
+                    self.quality = part
+                else:
+                    log.debug('%s ignoring quality %s because found better %s' % (self.name, part, self.quality))
             # search for season and episode number
             for sre in self.season_ep_regexps:
                 m = re.search(sre, part)
