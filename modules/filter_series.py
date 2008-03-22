@@ -124,6 +124,29 @@ class FilterSeries:
         Enough has default value of 720p.
 
         Possible values for enough (in order): 1080p, 1080, 720p, 720, hr, dvd, hdtv, dsr, dsrip
+
+        Custom path:
+
+        Specify download path for this serie.
+
+        Example:
+
+        series:
+          - some series:
+              path: ~/download/some_series/
+          - another series
+          - third serie
+
+        Example with timeframe:
+
+        series:
+          - some series:
+              timeframe:
+                hours: 4
+              path: ~/download/some_series/
+          - another series
+          - third serie
+        
     """
 
     def register(self, manager, parser):
@@ -171,6 +194,10 @@ class FilterSeries:
             for entry in feed.entries:
                 serie = SerieParser(name, entry['title'])
                 if not serie.valid: continue
+                # set custom download path
+                if conf.has_key('path'):
+                    log.debug('setting %s custom path to %s' % (entry['title'], conf.get('path')))
+                    entry['path'] = conf.get('path')
                 serie.entry = entry
                 self.store(feed, serie, entry)
                 # add this episode into list of available episodes
