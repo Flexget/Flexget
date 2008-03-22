@@ -184,7 +184,7 @@ class FilterSeries:
                 best = eps[0]
                 
                 if self.downloaded(feed, best):
-                    log.debug('Rejecting all episodes of %s. Episode has been already downloaded.' % identifier)
+                    log.debug('Rejecting all instances of %s' % identifier)
                     for ep in eps:
                         feed.reject(ep.entry)
                     continue
@@ -203,7 +203,7 @@ class FilterSeries:
                     for ep in eps:
                         if self.cmp_quality(enough, ep.quality) >= 0: # 1=greater, 0=equal, -1=does not meet
                             log.debug('Episode %s meets quality %s' % (ep.entry['title'], enough))
-                            feed.accept(ep.entry)
+                            self.accept_serie(feed, ep)
                             continue
                             
                     # timeframe
@@ -212,22 +212,26 @@ class FilterSeries:
                     log.debug('age_hours %i - %s ' % (age_hours, best))
                     log.debug('best ep in %i hours is %s' % (hours, best))
                     if age_hours >= hours:
-                        log.debug('Accepting %s' % best.entry)
-                        feed.accept(best.entry)
-                        # store serie instance to entry for later use
-                        best.entry['serie_parser'] = best
-                        # remove entry instance from serie instance, not needed any more (save memory, circular reference?)
-                        best.entry = None
+                        self.accept_serie(feed, best)
                     else:
                         log.debug('Timeframe ignoring %s' % (best.entry['title']))
                 else:
                     # no timeframe, just choose best
-                    feed.accept(best.entry)
+                    self.accept_serie(feed, best)
 
         # filter ALL entries, only previously accepted will remain
         # other modules may still accept entries
         for entry in feed.entries:
             feed.filter(entry)
+
+    def accept_serie(self, feed, serie):
+        """Helper method for accepting serie"""
+        log.debug('Accepting %s' % serie.entry)
+        feed.accept(serie.entry)
+        # store serie instance to entry for later use
+        serie.entry['serie_parser'] = serie
+        # remove entry instance from serie instance, not needed any more (save memory, circular reference?)
+        serie.entry = None
 
     def reject_eps(self, feed, eps):
         for ep in eps:
@@ -265,6 +269,7 @@ class FilterSeries:
         episode.setdefault(serie.quality, ec)
 
     def mark_downloaded(self, feed, serie):
+        log.debug('marking %s as downloaded' % serie.identifier())
         cache = feed.cache.get(serie.name)
         cache[serie.identifier()]['info']['downloaded'] = True
 
@@ -273,6 +278,8 @@ class FilterSeries:
             serie = entry.get('serie_parser')
             if serie:
                 self.mark_downloaded(feed, serie)
+            else:
+                log.debug('Entry %s is not valid serie' % entry['title'])
 
 if __name__ == '__main__':
     fs = SerieParser('mock serie', 'Mock.Serie.S04E01.HDTV.XviD-TEST.avi')
