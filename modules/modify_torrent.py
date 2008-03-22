@@ -175,30 +175,34 @@ class TorrentFilename:
             try:
                 torrent = Torrent(entry.get('data', ''))
                 entry['torrent'] = torrent
-                entry['filename'] = self.make_filename(torrent, entry)
+                # if we do not have good filename (by download module)
+                # for this entry, try to generate one from torrent content
+                if not entry.has_key('filename'):
+                    entry['filename'] = self.make_filename(torrent, entry)
             except:
                 # not a torrent file, no need to mess with it
                 pass
 
     def make_filename(self, torrent, entry):
         """Build a filename for this torrent"""
-        
         title = entry['title']
         files = torrent.get_filelist()
         if len(files) == 1 :
             # single file, if filename is longer than title use it
-            fn = files[0]["name"]
+            fn = files[0]['name']
             if len(fn) > len(title):
                 title = fn[:fn.rfind('.')]
         else:
             # create a proper filename from crap we got from the feed
-            title = title.replace("/", "_")
+            title = title.replace('/', '_')
 
         # neatify further
-        title = title.replace(" ", "_")
+        title = title.replace(' ', '_')
         title = title.encode('iso8859-1', 'ignore') # Damn \u200b -character, how I loathe thee
 
-        return title+".torrent"
+        fn = '%s.torrent' % title
+        log.debug('make_filename made %s' % fn)
+        return fn
 
 if __name__ == '__main__':
     import sys

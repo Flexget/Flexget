@@ -120,11 +120,15 @@ class Feed:
                 else: raise Exception('Global keyword %s is incompatible with feed %s. Keywords are not same datatype.' % (k, self.name))
             else: d2[k] = v
 
+    def _entry_str(self, entry):
+        """Returns entry as safe to log string"""
+        return "%s | %s" % (entry['title'], entry['url'])
+
     def _purge(self):
         """Purge filtered entries from feed. Call this from module only if you know what you're doing."""
         for entry in self.entries[:]:
             if entry in self.__filtered and not entry in self.__accepted:
-                logging.debug('Purging entry %s' % entry)
+                logging.debug('Purging entry %s' % self._entry_str(entry))
                 self.entries.remove(entry)
                 self.__purged += 1
         self.__filtered = []
@@ -133,7 +137,7 @@ class Feed:
         """Purge failed entries from feed."""
         for entry in self.entries[:]:
             if entry in self.__failed:
-                logging.debug('Purging failed entry %s' % entry)
+                logging.debug('Purging failed entry %s' % self._entry_str(entry))
                 self.entries.remove(entry)
 
     def __filter_rejected(self):
@@ -141,7 +145,7 @@ class Feed:
             return
         for entry in self.entries[:]:
             if entry in self.__rejected:
-                logging.debug('Purging immediately entry %s' % entry)
+                logging.debug('Purging immediately entry %s' % self._entry_str(entry))
                 self.entries.remove(entry)
                 self.__purged += 1
         self.__rejected = []

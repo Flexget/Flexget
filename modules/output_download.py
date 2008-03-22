@@ -72,15 +72,36 @@ class ModuleDownload:
             opener = urllib2.build_opener(auth_handler)
             f = opener.open(entry['url'])
         else:
-            log.debug('Basic auth disabled')
             f = urllib2.urlopen(entry['url'])
-            
+
         mimetype = f.headers.getsubtype()
         content = f.read()
         f.close()
         # store data and mimetype for entry
         entry['data'] = content
         entry['mimetype'] = mimetype
+        # if there is no specified filename, generate one from headers
+        if not entry.has_key('filename'):
+            self.set_filename(entry, f)
+
+    def set_filename(self, entry, response):
+        # check from content-disposition
+        import email
+        filename = email.message_from_string(unicode(response.info()).encode('utf-8')).get_filename(failobj=False)
+        if filename:
+            # TODO: must be hmtl decoded!
+            log.debug('Found filename from headers: %s' % filename)
+            entry['filename'] = filename
+            return
+        # guess extension from content-type
+        import mimetypes
+        ext = mimetypes.guess_extension(response.headers.getsubtype())
+        if ext:
+            entry['filename'] = entry['title'] + ext
+            log.debug('mimetypes guess for %s is %s ' % (response.headers.getsubtype(), guess))
+            log.debug('Using with guessed extension: %s' % entry['filename'])
+            return
+        
 
     def execute_outputs(self, feed):
         self.validate_config(feed)
@@ -99,7 +120,7 @@ class ModuleDownload:
                 log.exception('Error while writing: %s' % e)
 
     def output(self, feed, entry):
-        """Writes entry.data into file"""
+        """Writes entry.data into a file"""
         if not entry.has_key('data'):
             raise Exception('Entry %s has no data' % entry['title'])
         # use path from entry if has one, otherwise use from download definition parameter
@@ -108,10 +129,13 @@ class ModuleDownload:
         if feed.manager.options.dl_path:
             path = feed.manager.options.dl_path
         # make filename, if entry has perefered filename attribute use it, if not use title
+        if not entry.has_key('filename'):
+            log.warn('Unable to figure proper filename extension for %s' % entry['title'])
         destfile = os.path.join(os.path.expanduser(path), entry.get('filename', entry['title']))
-        if not os.path.exists(destfile):
-            f = file(destfile, 'w')
-            f.write(entry['data'])
-            f.close()
-        else:
+        if os.path.exists(destfile):
             raise Warning("File '%s' already exists" % destfile)
+        # write file
+        f = file(destfile, 'w')
+        f.write(entry['data'])
+        f.close()
+            
