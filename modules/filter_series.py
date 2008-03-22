@@ -81,16 +81,16 @@ class FilterSeries:
         Example configuration:
 
         series:
-          - some serie
-          - another serie
+          - some series
+          - another series
           
         If "some serie" and "another serie" have understandable episode
         numbering any given episode is downloaded only once.
 
         So if we get same episode twice:
         
-        Some.Serie.S2E10.More.Text
-        Some.Serie.S2E10.Something.Else
+        Some.Series.S2E10.More.Text
+        Some.Series.S2E10.Something.Else
 
         Only first file is downloaded.
 
@@ -99,21 +99,21 @@ class FilterSeries:
         
         Timeframe:
 
-        Serie filter allows you to specify a timeframe for each serie in which
+        Series filter allows you to specify a timeframe for each series in which
         flexget waits better quality.
 
         Example configuration:
 
         series:
-          - some serie:
+          - some series:
               timeframe:
                 hours: 4
                 enough: 720p
-          - another serie
-          - third serie
+          - another series
+          - third series
 
         In this example when a epsisode of 'some serie' appears, flexget will wait
-        for 4 hours incase and then proceeds to download best quality available.
+        for 4 hours in case and then proceeds to download best quality available.
 
         The enough parameter will tell the quality that you find good enough to start
         downloading without waiting whole timeframe. If qualities meeting enough parameter
@@ -127,7 +127,7 @@ class FilterSeries:
 
         Custom path:
 
-        Specify download path for this serie.
+        Specify download path for series.
 
         Example:
 
@@ -135,7 +135,7 @@ class FilterSeries:
           - some series:
               path: ~/download/some_series/
           - another series
-          - third serie
+          - third series
 
         Example with timeframe:
 
@@ -145,7 +145,7 @@ class FilterSeries:
                 hours: 4
               path: ~/download/some_series/
           - another series
-          - third serie
+          - third series
         
     """
 
