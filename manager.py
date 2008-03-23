@@ -1,9 +1,9 @@
 import os, os.path
-import re
 import sys
 import logging
 import string
 import types
+import time
 from datetime import tzinfo, timedelta, datetime
 from feed import Feed
 
@@ -38,6 +38,8 @@ class Manager:
     LOGGING_NORMAL = '%(levelname)-8s %(message)s'
     
     def __init__(self):
+        start_time = time.clock()
+      
         self.configname = None
         self.options = None
         self.modules = {}
@@ -131,6 +133,9 @@ class Manager:
                                  'You can (try to) spot new content from the report and download them manually.')
                 sys.exit(1)
             self.session['version'] = self.SESSION_VERSION
+
+        took = time.clock() - start_time
+        logging.debug('Startup took %.2f seconds' % took)
 
     def __init_console_logging(self, log_level):
         """Initialize logging for stdout"""

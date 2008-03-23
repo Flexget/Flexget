@@ -102,9 +102,8 @@ class Feed:
         self.__abort = False
         self.__purged = 0
 
-        # keep track which keywords have been executed
-        self.__executed = {}
-        
+        self.check_config()
+
         # loggers
         #self.details = logging.getLogger('details')
         #self.details.disabled = 1
@@ -234,7 +233,6 @@ class Feed:
         for module in modules:
             keyword = module['keyword']
             if self.config.has_key(keyword) or (module['builtin'] and not self.config.get('disable_builtins', False)):
-                self.__executed[keyword] = True
                 # set cache namespaces to this module realm
                 self.cache.set_namespace(keyword)
                 self.shared_cache.set_namespace(keyword)
@@ -341,8 +339,16 @@ class Feed:
             if self.__abort:
                 logging.info('Aborting feed %s' % self.name)
                 return
-        # warn on modules that were configured but not executed (mistypes most likelly)
+
+    def check_config(self):
+        """Checks that feed configuration does not have mistyped modules"""
+        def available(kw):
+            for event in self.manager.EVENTS:
+                if self.manager.modules.get(event, {}).has_key(kw):
+                    return True
         for kw in self.config.keys():
-            if not self.__executed.has_key(kw) and kw not in ['disable_builtins']:
+            if kw in ['disable_builtins']:
+                continue
+            if not available(kw):
                 logging.warning('Feed %s has unknown module %s' % (self.name, kw))
 

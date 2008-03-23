@@ -227,11 +227,15 @@ class FilterSeries:
 
                     # scan for enough, starting from worst quality (reverse)
                     eps.reverse()
+                    found_enough = False
                     for ep in eps:
                         if self.cmp_quality(enough, ep.quality) >= 0: # 1=greater, 0=equal, -1=does not meet
                             log.debug('Episode %s meets quality %s' % (ep.entry['title'], enough))
                             self.accept_serie(feed, ep)
-                            continue
+                            found_enough = True
+                            break
+                    if found_enough:
+                        continue
                             
                     # timeframe
                     diff = datetime.today() - self.get_first_seen(feed, best)
