@@ -29,7 +29,7 @@ class Manager:
 
     moduledir = os.path.join(sys.path[0], "modules/")
 
-    EVENTS = ["start", "input", "filter", "resolve", "download", "modify", "output", "exit"]
+    EVENTS = ["start", "input", "filter", "resolve", "download", "modify", "output", "exit", "terminate"]
 
     SESSION_VERSION = 2
 
@@ -211,6 +211,7 @@ class Manager:
         
     def load_modules(self, parser):
         """Load and call register on all modules"""
+        # TODO: logging goes only to file due startup levels!
         loaded = {} # prevent modules being loaded multiple times when they're imported by other modules
         for module in self.find_modules(self.moduledir):
             ns = {}
@@ -231,7 +232,7 @@ class Manager:
                                 method(self, parser)
                                 loaded[name] = True
                             except RegisterException, e:
-                                logging.error('Error while registering module %s. %s' % (name, e.value))
+                                logging.critical('Error while registering module %s. %s' % (name, e.value))
                                 break
                         else:
                             logging.error('Module %s register method is not callable' % name)
@@ -397,16 +398,26 @@ class Manager:
                     if name.lower() == self.options.onlyfeed.lower(): feeds.append(name)
                 if not feeds:
                     logging.critical('Could not find feed %s' % self.options.onlyfeed)
-                
+
+            feed_instances = {}
             for name in feeds:
                 # if feed name is prefixed with _ it's disabled
                 if name.startswith('_'): continue
                 # create feed and execute it
                 feed = Feed(self, name, self.config['feeds'][name])
+                feed_instances[name] = feed
                 try:
                     feed.execute()
                 except Exception, e:
                     logging.exception("Feed %s: %s" % (feed.name, e))
+
+            # execute terminates
+            for name, feed in feed_instances.iteritems():
+                try:
+                    feed.terminate()
+                except Exception, e:
+                    logging.exception('Feed %s terminate: %s' % (name, e))
+                
         finally:
             if not self.options.test:
                 self.save_session()

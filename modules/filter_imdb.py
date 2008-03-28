@@ -247,7 +247,7 @@ class ImdbParser:
             re_score = re.compile("(\d.\d)\/10")
             match = re_score.search(str_score)
             if match != None:
-                str_score = match.groups()[0]
+                str_score = match.group(1)
                 self.score = float(str_score)
                 log.debug("Detected score: %s" % self.score)
 

@@ -37,11 +37,11 @@ class RlsLog:
         for r in re_score:
             f = r.search(s)
             if f != None:
-                score = float(f.groups()[0])
+                score = float(f.group(1))
                 break
         f = re_votes.search(s.replace(",",""))
         if f != None:
-            votes = f.groups()[0]
+            votes = f.group(1)
         log.debug("parse_imdb returning score: '%s' votes: '%s' from: '%s'" % (str(score), str(votes), s))
         return (score, votes)
 

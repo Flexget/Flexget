@@ -314,8 +314,8 @@ class Feed:
                 self.failed(entry)
     
     def execute(self):
-        """Execute this feed, runs all events in order of events array."""
-        for event in self.manager.EVENTS:
+        """Execute this feed, runs events in order of events array."""
+        for event in self.manager.EVENTS[:-1]:
             # when learning, skip few events
             if self.manager.options.learn:
                 if event in ['download', 'output']: continue
@@ -339,6 +339,11 @@ class Feed:
             if self.__abort:
                 logging.info('Aborting feed %s' % self.name)
                 return
+
+    def terminate(self):
+        """Execute terminate event for this feed"""
+        if self.__abort: return
+        self.__run_modules(self.manager.EVENTS[-1])
 
     def check_config(self):
         """Checks that feed configuration does not have mistyped modules"""

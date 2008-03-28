@@ -9,7 +9,7 @@ class ModifyExtension:
     
         Example:
 
-        extension: nbz
+        extension: nzb
     """
 
     def register(self, manager, parser):

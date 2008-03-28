@@ -61,7 +61,7 @@ class ResolveNewTorrents:
             # the link in which module relies is missing!
             raise ResolverException('Failed to get url from download page. Module may need a update.')
         else:
-            return f.groups()[0]
+            return f.group(1)
 
     def __get_torrent_url_from_search(self, url, name):
         """Parses torrent download url (requires release name) from search results"""
