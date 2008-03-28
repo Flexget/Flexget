@@ -116,14 +116,13 @@ class InputRSS:
             if not entry.has_key('id'):
                 entry['id'] = entry.link
 
-            # Use basic auth when needed
-#            if config.has_key('username') and config.has_key('password'):
-#                log.debug("Using basic auth for retrieval")
-#                entry.link = self.passwordize(entry.link, config['username'], config['password'])
-
             # add entry
             e = {}
-            e['url'] = entry.link.encode()
+            try:
+                e['url'] = entry.link.encode()
+            except UnicodeEncodeError, e:
+                log.error('URL %s is not ascii compatible! Ignored %s' % (entry.link, entry.title))
+                continue
             e['title'] = entry.title.replace(u"\u200B", u"") # remove annoying zero width spaces
 
             # store basic auth info
