@@ -165,7 +165,7 @@ class Feed:
         """Temporary method for converting dict entries into Entries"""
         count = 0
         for entry in self.entries[:]:
-            if not entry is Entry:
+            if not isinstance(entry, Entry):
                 e = Entry(entry['title'], entry['url'])
                 self.entries.remove(entry)
                 count += 1
