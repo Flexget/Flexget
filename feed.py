@@ -166,7 +166,9 @@ class Feed:
         count = 0
         for entry in self.entries[:]:
             if not isinstance(entry, Entry):
-                e = Entry(entry['title'], entry['url'])
+                e = Entry()
+                for k,v in entry.iteritems():
+                    e[k] = v
                 self.entries.remove(entry)
                 count += 1
                 self.entries.append(e)
