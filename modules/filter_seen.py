@@ -19,7 +19,7 @@ class FilterSeen:
         manager.register(instance=self, event='exit', keyword='seen', callback=self.learn_succeeded, builtin=True)
 
         # remember and filter by these fields
-        self.fields = ['url', 'title']
+        self.fields = ['original_url', 'title']
 
     def filter_seen(self, feed):
         for entry in feed.entries:

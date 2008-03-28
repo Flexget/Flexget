@@ -4,6 +4,7 @@ import urlparse
 import logging
 from socket import timeout
 import re
+from feed import Entry
 
 log = logging.getLogger('html')
 
@@ -69,7 +70,7 @@ class InputHtml:
             if title.lower().find('.torrent') > 0:
                 title = title[:title.lower().find(".torrent")]
 
-            entry = {}
+            entry = Entry()
             entry['url'] = url.encode() # removes troublesome unicode
             entry['title'] = title
 

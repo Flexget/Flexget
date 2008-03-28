@@ -12,6 +12,26 @@ class ResolverException(Exception):
     def __str__(self):
         return repr(self.value)
 
+class Entry(dict):
+
+    def __init__(self, *args):
+        if len(args) == 2:
+            self['title'] = args[0]
+            self['url'] = args[1]
+
+    def __setitem__(self, key, value):
+        if key == 'url':
+            if not self.has_key('original_url'):
+                self['original_url'] = value
+        dict.__setitem__(self, key, value)
+    
+    def get_original_url(self):
+        """Get original url which entry was created with"""
+        return self.get('original_url', None)
+        
+    def safe_str(self):
+        return "%s | %s" % (self['title'], self['url'])
+
 class ModuleCache:
 
     """
@@ -103,10 +123,6 @@ class Feed:
         self.__purged = 0
 
         self.check_config()
-
-        # loggers
-        #self.details = logging.getLogger('details')
-        #self.details.disabled = 1
         
     def __merge_config(self, d1, d2):
         """Merges dictionary d1 into dictionary d2"""
@@ -119,15 +135,11 @@ class Feed:
                 else: raise Exception('Global keyword %s is incompatible with feed %s. Keywords are not same datatype.' % (k, self.name))
             else: d2[k] = v
 
-    def _entry_str(self, entry):
-        """Returns entry as safe to log string"""
-        return "%s | %s" % (entry['title'], entry['url'])
-
     def _purge(self):
         """Purge filtered entries from feed. Call this from module only if you know what you're doing."""
         for entry in self.entries[:]:
             if entry in self.__filtered and not entry in self.__accepted:
-                logging.debug('Purging entry %s' % self._entry_str(entry))
+                logging.debug('Purging entry %s' % entry.safe_str())
                 self.entries.remove(entry)
                 self.__purged += 1
         self.__filtered = []
@@ -136,7 +148,7 @@ class Feed:
         """Purge failed entries from feed."""
         for entry in self.entries[:]:
             if entry in self.__failed:
-                logging.debug('Purging failed entry %s' % self._entry_str(entry))
+                logging.debug('Purging failed entry %s' % entry.safe_str())
                 self.entries.remove(entry)
 
     def __filter_rejected(self):
@@ -144,10 +156,22 @@ class Feed:
             return
         for entry in self.entries[:]:
             if entry in self.__rejected:
-                logging.debug('Purging immediately entry %s' % self._entry_str(entry))
+                logging.debug('Purging immediately entry %s' % entry.safe_str())
                 self.entries.remove(entry)
                 self.__purged += 1
         self.__rejected = []
+        
+    def __convert_entries(self):
+        """Temporary method for converting dict entries into Entries"""
+        count = 0
+        for entry in self.entries[:]:
+            if not entry is Entry:
+                e = Entry(entry['title'], entry['url'])
+                self.entries.remove(entry)
+                count += 1
+                self.entries.append(e)
+        if count>0:
+            logging.warning('Feed %s converted %i old entries into new format. Some modules need upgrading.' % (self.name, count))
 
     def accept(self, entry):
         """Accepts this entry."""
@@ -246,6 +270,7 @@ class Feed:
                     logging.warning(w)
                 except Exception, e:
                     logging.exception('Module %s: %s' % (keyword, e))
+                self.__convert_entries()
                 # check for priority operations
                 self.__filter_rejected()
                 if self.__abort: return

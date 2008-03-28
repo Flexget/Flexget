@@ -3,6 +3,7 @@ import urllib2
 import urlparse
 import logging
 import re
+from feed import Entry
 
 log = logging.getLogger('csv')
 
@@ -42,7 +43,7 @@ class InputCSV:
         for line in page.readlines():
             data = line.split(",")
             print data
-            entry = {}
+            entry = Entry()
             for name, index in feed.config['csv'].get('values', {}).items():
                 try:
                     entry[name] = data[index+1]

@@ -5,6 +5,7 @@ import logging
 import re
 import yaml
 from httplib import BadStatusLine
+from feed import Entry
 
 log = logging.getLogger('rlslog')
 
@@ -117,8 +118,7 @@ class RlsLog:
 
         for release in releases:
             # construct entry from release
-            entry = {}
-
+            entry = Entry()
             def apply_field(d_from, d_to, f):
                 if d_from.has_key(f):
                     if d_from[f] == None: return # None values are not wanted!

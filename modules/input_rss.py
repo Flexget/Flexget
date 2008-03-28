@@ -5,13 +5,13 @@ import urllib2
 import xml.sax
 import re
 import types
+from feed import Entry
 
+feedparser_present = True
 try:
     import feedparser
 except ImportError:
-    print "Please install Feedparser from http://www.feedparser.org/ or from your distro repository"
-    import sys
-    sys.exit(1)
+    feedparser_present = False
 
 log = logging.getLogger('rss')
 
@@ -43,6 +43,8 @@ class InputRSS:
         return url        
 
     def run(self, feed):
+        if not feedparser_present:
+            raise Warning("Module RSS requires Feedparser. Please install it from http://www.feedparser.org/ or from your distro repository")
 
         config = feed.config['rss']
         if type(config) != types.DictType:
@@ -117,7 +119,7 @@ class InputRSS:
                 entry['id'] = entry.link
 
             # add entry
-            e = {}
+            e = Entry()
             try:
                 e['url'] = entry.link.encode()
             except UnicodeEncodeError, e:
