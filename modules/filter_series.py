@@ -2,6 +2,7 @@ import logging
 import re
 import types
 from datetime import tzinfo, timedelta, datetime
+from feed import Entry
 
 log = logging.getLogger('series')
 
@@ -150,9 +151,9 @@ class FilterSeries:
     """
 
     def register(self, manager, parser):
-        manager.register(instance=self, event="filter", keyword="series", callback=self.filter_series)
-        manager.register(instance=self, event="input", keyword="series", callback=self.input_series, order=65535)
-        manager.register(instance=self, event="exit", keyword="series", callback=self.learn_succeeded)
+        manager.register(instance=self, event='filter', keyword='series', callback=self.filter_series)
+        manager.register(instance=self, event='input', keyword='series', callback=self.input_series, order=65535)
+        manager.register(instance=self, event='exit', keyword='series', callback=self.learn_succeeded)
 
     def input_series(self, feed):
         """Retrieve stored series from cache, incase they've been expired from feed while waiting"""
@@ -168,14 +169,18 @@ class FilterSeries:
                     if quality=='info': continue # a hack, info dict is not quality
                     entry = serie[identifier].get(quality)
                     if not entry: continue
-                    # check if episode is still in feed, if not add it
+                    # check if episode is still in feed, if not then add it
                     exists = False
                     for feed_entry in feed.entries:
                         if feed_entry['title'] == entry['title'] and feed_entry['url'] == entry['url']:
                             exists = True
                     if not exists:
                         log.debug('restoring entry %s from cache' % entry['title'])
-                        feed.entries.append(entry)
+                        # TODO: temp fix, do better
+                        e = Entry()
+                        e['title'] = entry['title']
+                        e['url'] = entry['url']
+                        feed.entries.append(e)
 
 
     def cmp_serie_quality(self, s1, s2):
