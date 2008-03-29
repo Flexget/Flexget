@@ -173,7 +173,7 @@ class Feed:
                 count += 1
                 self.entries.append(e)
         if count>0:
-            logging.warning('Feed %s converted %i old entries into new format. Some modules need upgrading.' % (self.name, count))
+            logging.warning('Feed %s converted %i old entries into new format. Some modules need upgrading (Event: %s Module: %s).' % (self.name, count, self.__current_event, self.__current_module))
 
     def accept(self, entry):
         """Accepts this entry."""
