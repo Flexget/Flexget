@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python2.5
 
 from manager import Manager
 

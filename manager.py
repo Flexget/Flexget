@@ -203,7 +203,8 @@ class Manager:
             sessionfile = os.path.join(sys.path[0], 'session-%s.yml' % self.configname)
             f = file(sessionfile, 'w')
             self.sanitize(self.session)
-            yaml.safe_dump(self.session, f) # safe_dump removes !!python/unicode which fails to load
+            #yaml.safe_dump(self.session, f) # safe_dump removes !!python/unicode which fails to load
+            yaml.safe_dump(self.session, f, allow_unicode=True)
             f.close()
         except Exception, e:
             logging.exception("Failed to save session data (%s)!" % e)

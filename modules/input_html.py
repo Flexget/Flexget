@@ -71,7 +71,7 @@ class InputHtml:
                 title = title[:title.lower().find(".torrent")]
 
             entry = Entry()
-            entry['url'] = url.encode() # removes troublesome unicode
+            entry['url'] = url
             entry['title'] = title
 
             feed.entries.append(entry)

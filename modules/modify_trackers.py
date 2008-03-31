@@ -32,4 +32,4 @@ class RemoveTrackers:
                             # remove tracker
                             entry['torrent'].remove_multitracker(tracker)
                             # re-encode torrent data (file modified)
-                            entry['data'] = entry['torrent'].encode()
+                            entry['data'] = entry['torrent']

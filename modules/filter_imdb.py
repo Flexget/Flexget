@@ -164,12 +164,12 @@ class ImdbSearch:
                 movie = {}
                 additional = re.findall('\((.*?)\)', link.next.next)
                 if len(additional) > 0:
-                    movie['year'] = additional[0].encode()
+                    movie['year'] = additional[0]
                 if len(additional) > 1:
-                    movie['type'] = additional[1].encode()
+                    movie['type'] = additional[1]
                 
-                movie['name'] = link.string.encode()
-                movie['url'] = "http://www.imdb.com" + link.get('href').encode()
+                movie['name'] = link.string
+                movie['url'] = "http://www.imdb.com" + link.get('href')
                 # calc & set best matching ratio
                 seq = difflib.SequenceMatcher(lambda x: x==' ', movie['name'], name)
                 ratio = seq.ratio()
@@ -236,7 +236,7 @@ class ImdbParser:
         # get votes
         tag_votes = soup.find(attrs={'href':'ratings', 'class': None})
         if tag_votes != None:
-            str_votes = ''.join(c for c in tag_votes.string if c.encode().isdigit())
+            str_votes = ''.join(c for c in tag_votes.string if c.isdigit())
             self.votes = int(str_votes)
             log.debug("Detected votes: %s" % self.votes)
 
@@ -255,11 +255,11 @@ class ImdbParser:
         for link in soup.findAll('a', attrs={'href': re.compile('^/Sections/Genres/')}):
             # skip links that have javascipr onclick (not in genrelist)
             if link.has_key('onclick'): continue
-            self.genres.append(link.string.encode().lower())
+            self.genres.append(link.string.lower())
 
         # get languages
         for link in soup.findAll('a', attrs={'href': re.compile('^/Sections/Languages/')}):
-            lang = link.string.encode().lower()
+            lang = link.string.lower()
             if not lang in self.languages:
                 self.languages.append(lang)
 

@@ -120,11 +120,7 @@ class InputRSS:
 
             # add entry
             e = Entry()
-            try:
-                e['url'] = entry.link.encode()
-            except UnicodeEncodeError, e:
-                log.error('URL %s is not ascii compatible! Ignored %s' % (entry.link, entry.title))
-                continue
+            e['url'] = entry.link
             e['title'] = entry.title.replace(u"\u200B", u"") # remove annoying zero width spaces
 
             # store basic auth info
