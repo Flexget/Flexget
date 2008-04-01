@@ -292,7 +292,7 @@ class FilterSeries:
         #       downloaded: <boolean>
         #     720p: <entry>
         #     dsr: <entry>
-        cache = feed.cache.storedetault(serie.name, {}, 30)
+        cache = feed.cache.storedefault(serie.name, {}, 30)
         episode = cache.setdefault(serie.identifier(), {})
         info = episode.setdefault('info', {})
         # store and make first seen time

@@ -64,7 +64,7 @@ class ModuleCache:
         item['value'] = value
         self._cache[key] = item
 
-    def storedetault(self, key, value, days=45):
+    def storedefault(self, key, value, days=45):
         """Identical to dictionary setdefault"""
         undefined = object()
         item = self.get(key, undefined)
