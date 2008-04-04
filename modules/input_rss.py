@@ -103,6 +103,8 @@ class InputRSS:
             log.error(rss)
             log.error("Bozo feed exception on %s. Is the URL correct?" % feed.name)
             return
+            
+        log.debug('encoding %s' % rss.encoding)
 
         # update etag, use last modified if no etag exists
         if rss.has_key('etag') and type(rss['etag']) != feedparser.types.NoneType:

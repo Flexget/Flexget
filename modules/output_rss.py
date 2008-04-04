@@ -40,7 +40,6 @@ class OutputRSS:
         manager.register(instance=self, event='terminate', keyword='make_rss', callback=self.write_rss)
 
     def store_entries(self, feed):
-        """Executed on event feed exit"""
         if not rss2gen:
             raise Exception('module make_rss requires PyRSS2Gen library.')
         filename = feed.config['make_rss']
@@ -57,7 +56,6 @@ class OutputRSS:
     def write_rss(self, feed):
         if not rss2gen:
             return
-        """Executed on event feed terminate"""
         filename = feed.config['make_rss']
         data_items = feed.shared_cache.get(filename)
 

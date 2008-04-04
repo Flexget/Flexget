@@ -41,11 +41,11 @@ class ModuleDownload:
         parser.add_option("--dl-path", action="store", dest="dl_path", default=False,
                           help="Override path for download module. Applies to all executed feeds.")
 
-
     def validate_config(self, feed):
         # check for invalid configuration, abort whole download if not goig to work
+        # TODO: rewrite and check exists
         if not feed.config['download']:
-            raise Exception('Feed %s is missing download path, check your configuration.' % feed.name)
+            raise Warning('Feed %s is missing download path, check your configuration.' % feed.name)
 
     def execute_downloads(self, feed):
         self.validate_config(feed)
@@ -135,7 +135,12 @@ class ModuleDownload:
         if os.path.exists(destfile):
             raise Warning("File '%s' already exists" % destfile)
         # write file
-        f = file(destfile, 'w')
-        f.write(entry['data'])
-        f.close()
-            
+        try:
+            f = file(destfile, 'w')
+            f.write(entry['data'])
+            f.close()
+        except:
+            # remove failed write
+            os.remove(destfile)
+            log.error('Debug info: type: %s repr: %s' % (type(entry['data']), repr(entry['data']) )
+            raise
