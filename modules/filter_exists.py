@@ -27,9 +27,17 @@ class FilterExists:
             log.debug('Checking %s' % root)
             for entry in feed.entries:
                 name = entry['title']
-                if name in dirs or name in files:
-                    log.debug('Found %s in %s' % (name, root))
-                    feed.filter(entry)
+                try:  
+                    if name in dirs or name in files:
+                        log.debug('Found %s in %s' % (name, root))
+                        feed.filter(entry)
+                except:
+                    log.info('TEH BUG!')
+                    log.info('name=%s' % name)
+                    log.info('root=%s' % root)
+                    log.info('dirs=%s' % dirs)
+                    log.info('files=%s' % files)
+                
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
