@@ -19,7 +19,7 @@ class RemoveTrackers:
     """
 
     def register(self, manager, parser):
-        manager.register(instance=self, event="modify", keyword="remove_trackers", callback=self.remove)
+        manager.register(instance=self, event='modify', keyword='remove_trackers', callback=self.remove)
 
     def remove(self, feed):
         for entry in feed.entries:
@@ -32,4 +32,4 @@ class RemoveTrackers:
                             # remove tracker
                             entry['torrent'].remove_multitracker(tracker)
                             # re-encode torrent data (file modified)
-                            entry['data'] = entry['torrent']
+                            entry['data'] = entry['torrent'].encode()

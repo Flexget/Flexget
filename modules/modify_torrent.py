@@ -199,6 +199,7 @@ class TorrentFilename:
         # neatify further
         title = title.replace(' ', '_')
         title = title.encode('iso8859-1', 'ignore') # Damn \u200b -character, how I loathe thee
+        # TODO: replace only zero width spaces, leave unicode alone!
 
         fn = '%s.torrent' % title
         log.debug('make_filename made %s' % fn)

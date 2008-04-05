@@ -142,5 +142,5 @@ class ModuleDownload:
         except:
             # remove failed write
             os.remove(destfile)
-            log.error('Debug info: type: %s repr: %s' % (type(entry['data']), repr(entry['data'])) )
+            log.error('Invalid data object: type: %s repr: %s' % (type(entry['data']), repr(entry['data'])) )
             raise
