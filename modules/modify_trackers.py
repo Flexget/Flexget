@@ -31,5 +31,6 @@ class RemoveTrackers:
                             log.debug('remove_trackers removing %s because of %s' % (tracker, regexp))
                             # remove tracker
                             entry['torrent'].remove_multitracker(tracker)
+                            log.info('Removed %s' % tracker)
                             # re-encode torrent data (file modified)
                             entry['data'] = entry['torrent'].encode()
