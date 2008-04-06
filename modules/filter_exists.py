@@ -26,8 +26,8 @@ class FilterExists:
         for root, dirs, files in os.walk(path):
             log.debug('Checking %s' % root)
             # convert filelists into utf-8 to avoid unicode problems
-            dirs = [x.decode('utf-8') for x in dirs]
-            files = [x.decode('utf-8') for x in files]
+            dirs = [x.decode('utf-8', 'ignore') for x in dirs]
+            files = [x.decode('utf-8', 'ignore') for x in files]
             for entry in feed.entries:
                 if entry['title'] in dirs or entry['title'] in files:
                     log.debug('Found %s in %s' % (name, root))
