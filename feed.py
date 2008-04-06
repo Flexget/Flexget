@@ -271,11 +271,12 @@ class Feed:
                 except Warning, w:
                     logging.warning(w)
                 except Exception, e:
-                    logging.exception('Module %s: %s' % (keyword, e))
-                self.__convert_entries()
+                    logging.exception('Unhandled error in module %s: %s' % (keyword, e))
+                    self.abort()
                 # check for priority operations
-                self.__filter_rejected()
                 if self.__abort: return
+                self.__convert_entries()
+                self.__filter_rejected()
 
     def log_once(self, s, log=logging):
         """Log string s once"""
