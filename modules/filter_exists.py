@@ -22,21 +22,16 @@ class FilterExists:
         path = os.path.expanduser(path)
         if not os.path.exists(path):
             raise Warning('Path %s does not exists' % path)
-        # Scan trough
+        # scan trough
         for root, dirs, files in os.walk(path):
             log.debug('Checking %s' % root)
+            # convert filelists into utf-8 to avoid unicode problems
+            dirs = [x.decode('utf-8') for x in dirs]
+            files = [x.decode('utf-8') for x in files]
             for entry in feed.entries:
-                name = entry['title']
-                try:  
-                    if name in dirs or name in files:
-                        log.debug('Found %s in %s' % (name, root))
-                        feed.filter(entry)
-                except:
-                    log.info('TEH BUG!')
-                    log.info('name=%s' % name)
-                    log.info('root=%s' % root)
-                    log.info('dirs=%s' % dirs)
-                    log.info('files=%s' % files)
+                if entry['title'] in dirs or entry['title'] in files:
+                    log.debug('Found %s in %s' % (name, root))
+                    feed.filter(entry)
                 
 
 if __name__ == '__main__':
