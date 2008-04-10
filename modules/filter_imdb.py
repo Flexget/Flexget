@@ -8,12 +8,10 @@ import difflib
 
 # this way we don't force users to install bs incase they do not want to use this module
 soup_present = True
-soup_err = "Module filter_imdb requires BeautifulSoup. Please install it from http://www.crummy.com/software/BeautifulSoup/ or from your distribution repository."
 
 try:
     from BeautifulSoup import BeautifulSoup
 except:
-    log.warning(soup_err)
     soup_present = False
 
 log = logging.getLogger('imdb')
@@ -343,7 +341,7 @@ class FilterImdb:
         return False
 
     def run(self, feed):
-        if not soup_present: raise Exception(soup_err)
+        if not soup_present: raise Warning("Module filter_imdb requires BeautifulSoup. Please install it from http://www.crummy.com/software/BeautifulSoup/ or from your distribution repository.")
         config = feed.config['imdb']
         for entry in feed.entries:
 
@@ -386,7 +384,14 @@ class FilterImdb:
                 cached = feed.shared_cache.get(entry['imdb_url'])
                 if not cached:
                     feed.verbose_progress('Parsing from imdb %s' % entry['title'])
-                    imdb.parse(entry['imdb_url'])
+                    try:
+                        imdb.parse(entry['imdb_url'])
+                    except UnicodeDecodeError, e:
+                        log.error('Unable to determine encoding for %s. Installing chardet library may help.' % entry['imdb_url'])
+                        feed.filter(entry)
+                        # store cache so this will be skipped
+                        feed.shared_cache.store(entry['imdb_url'], imdb.to_yaml())
+                        continue
                 else:
                     imdb.from_yaml(cached)
                 # store to cache
