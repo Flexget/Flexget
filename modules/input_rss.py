@@ -30,6 +30,17 @@ class InputRSS:
           url: <url>
           username: <name>
           password: <password>
+          
+        Advanced usages:
+        
+        Incase RSS-feed uses some nonstandard field for urls (ie. guid) you can 
+        configure module to use url from any feedparser entry attribute.
+        
+        Example:
+        
+        rss:
+          url: <ul>
+          link: guid
     """
 
     def register(self, manager, parser):
@@ -122,7 +133,13 @@ class InputRSS:
 
             # add entry
             e = Entry()
-            e['url'] = entry.link
+            # field name for url can be configured by setting option link. 
+            # default value is link but guid is used in some feeds
+            try:
+                e['url'] = getattr(entry, config.get('link', 'link'))
+            except AttributeError, e:
+                log.error('RSS-entry does not contain configured link attribute %s' % config.get('link', 'link'))
+                continue
             e['title'] = entry.title.replace(u"\u200B", u"") # remove annoying zero width spaces
 
             # store basic auth info

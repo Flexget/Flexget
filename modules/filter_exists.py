@@ -29,7 +29,8 @@ class FilterExists:
             dirs = [x.decode('utf-8', 'ignore') for x in dirs]
             files = [x.decode('utf-8', 'ignore') for x in files]
             for entry in feed.entries:
-                if entry['title'] in dirs or entry['title'] in files:
+                name = entry['title']
+                if name in dirs or name in files:
                     log.debug('Found %s in %s' % (name, root))
                     feed.filter(entry)
                 
