@@ -98,7 +98,6 @@ class OutputRSS:
         if self.written.has_key(config['file']):
             log.debug('skipping already written file %s' % config['file'])
             return
-        print config
         data_items = feed.shared_cache.get(config['file'])
 
         # make items
