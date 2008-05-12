@@ -1,5 +1,10 @@
-from pysqlite2 import dbapi2 as sqlite
 import sys, os.path
+
+has_sqlite = True
+try:
+    from pysqlite2 import dbapi2 as sqlite
+except:
+    has_sqlite = False
 
 class Statistics:
     def __init__(self):
@@ -25,6 +30,8 @@ class Statistics:
         con.commit()
         
     def input(self, feed):
+        if not has_sqlite:
+            raise Exception('module statistics requires python-sqlite2 (Sqlite v3) library.')
         self.total = len(feed.entries)
 
     def exit(self, feed):
