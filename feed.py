@@ -151,7 +151,8 @@ class Feed:
                 logging.debug('Purging failed entry %s' % entry.safe_str())
                 self.entries.remove(entry)
 
-    def __filter_rejected(self):
+    def __purge_rejected(self):
+        """Purge rejected entries from feed."""
         if not self.__rejected:
             return
         for entry in self.entries[:]:
@@ -182,7 +183,7 @@ class Feed:
             self.verbose_details('Accepted %s' % entry['title'])
 
     def filter(self, entry):
-        """Mark entry to be filtered uless told otherwise. Entry may still be accepted."""
+        """Mark entry to be filtered unless told otherwise. Entry may still be accepted."""
         # accepted checked only because it makes more sense when verbosing details
         if not entry in self.__filtered and not entry in self.__accepted:
             self.__filtered.append(entry)
@@ -196,7 +197,7 @@ class Feed:
             self.verbose_details('Rejected %s' % entry['title'])
 
     def failed(self, entry):
-        """Mark entry failed"""
+        """Mark entry as failed."""
         logging.debug("Marking entry '%s' as failed" % entry['title'])
         if not entry in self.__failed:
             self.__failed.append(entry)
@@ -221,6 +222,7 @@ class Feed:
         self.verbose_details('Aborting feed')
 
     def get_input_url(self, keyword):
+        # TODO: move to better place?
         """
             Helper method for modules. Return url for a specified keyword.
             Supports configuration in following forms:
@@ -276,7 +278,7 @@ class Feed:
                 # check for priority operations
                 if self.__abort: return
                 self.__convert_entries()
-                self.__filter_rejected()
+                self.__purge_rejected()
 
     def log_once(self, s, log=logging):
         """Log string s once"""

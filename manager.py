@@ -375,7 +375,7 @@ class Manager:
         f['url'] = entry['url']
         f['tof'] = list(datetime.today().timetuple())[:-4]
         failed.append(f)
-        while len(failed) > 255:
+        while len(failed) > 25:
             failed.pop(0)
             
     def clear_failed(self):
@@ -406,13 +406,13 @@ class Manager:
                 if name.startswith('_'): continue
                 # create feed and execute it
                 feed = Feed(self, name, self.config['feeds'][name])
-                feed_instances[name] = feed
                 try:
                     feed.execute()
+                    feed_instances[name] = feed
                 except Exception, e:
                     logging.exception("Feed %s: %s" % (feed.name, e))
 
-            # execute terminates
+            # execute terminate event for all feeds
             for name, feed in feed_instances.iteritems():
                 try:
                     feed.terminate()
