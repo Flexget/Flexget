@@ -10,28 +10,36 @@ log = logging.getLogger('series')
 class SerieParser:
 
     qualities = ['1080p', '1080', '720p', '720', 'hr', 'dvd', 'hdtv', 'dsr', 'dsrip', 'unknown']
-    season_ep_regexps = ['s(\d+)e(\d+)', 's(\d+)ep(\d+)', '(\d+)x(\d+)']
     
-    def __init__(self, name, title):
-        self.name = name
-        self.item = title
+    def __init__(self):
+        self.name = None
+        self.item = None
+        self.ep_regexps = ['s(\d+)e(\d+)', 's(\d+)ep(\d+)', '(\d+)x(\d+)', '\d\d\d\d-(\d+)-(\d+)']
         # parse produces these
         self.season = None
         self.episode = None
         self.quality = 'unknown'
         # false if item does not match serie
         self.valid = False
-        # parse
-        self.parse()
         # optional for storing entry from which this instance is made from
         self.entry = None
-
+        
+    def set_name(self, name):
+        self.name = name
+        
+    def set_data(self, data):
+        self.item = data
+        
     def parse(self):
+        if not self.name or not self.item:
+            raise Exception('SerieParser missing either name or item')
         serie = self.name.replace('.', ' ').lower()
         item = self.item.replace('.', ' ').replace('_', ' ').lower()
         item = item.replace('[','').replace(']','')
         serie_data = serie.split(' ')
         item_data = item.split(' ')
+        
+        # remove serie name parts from data
         for part in serie_data:
             if part in item_data:
                 item_data.remove(part)
@@ -49,7 +57,7 @@ class SerieParser:
                 else:
                     log.debug('%s ignoring quality %s because found better %s' % (self.name, part, self.quality))
             # search for season and episode number
-            for sre in self.season_ep_regexps:
+            for sre in self.ep_regexps:
                 m = re.search(sre, part)
                 if m:
                     if len(m.groups())==2:
@@ -197,7 +205,11 @@ class FilterSeries:
 
             series = {} # ie. S1E2: [Serie, Serie, ..]
             for entry in feed.entries:
-                serie = SerieParser(name, entry['title'])
+                serie = SerieParser()
+                serie.set_name(name)
+                serie.set_data(entry['title'])
+                serie.ep_regexps.extend(conf.get('ep_regexp', []))
+                serie.parse()
                 if not serie.valid: continue
                 # set custom download path
                 if conf.has_key('path'):
@@ -318,6 +330,16 @@ class FilterSeries:
                 log.debug('Entry %s is not valid serie' % entry['title'])
 
 if __name__ == '__main__':
-    fs = SerieParser('mock serie', 'Mock.Serie.S04E01.HDTV.XviD-TEST.avi')
+    import sys
+    fs = SerieParser()
+    fs.set_name('mock serie')
+    fs.set_data('Mock.Serie.S04E01.HDTV.XviD-TEST.avi')
     fs.parse()
     print fs
+    
+    if len(sys.argv)>1:
+        fs = SerieParser()
+        fs.set_name(sys.argv[1])
+        fs.set_data(sys.argv[2])
+        fs.parse()
+        print fs
