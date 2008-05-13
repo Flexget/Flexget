@@ -15,6 +15,7 @@ class Statistics:
     def register(self, manager, parser):
         manager.register(instance=self, event='input', keyword='stats', callback=self.input, order=65535)
         manager.register(instance=self, event='exit', keyword='stats', callback=self.exit)
+        manager.register(instance=self, event='terminate', keyword='stats', callback=self.generate_statistics)
 
     def init(self, con):
         create = """
@@ -47,3 +48,20 @@ class Statistics:
 
         con.commit()
         con.close()
+
+
+    def generate_statistics(self, feed):
+        sql = """
+        select feed, strftime("%w", timestamp) as dow, sum(success) from statistics group by feed, dow;
+        """
+        dbname = os.path.join(sys.path[0], feed.manager.configname+".db")
+        con = sqlite.connect(dbname)
+        cur = con.cursor()
+        cur.execute(sql)
+
+        outname = os.path.join(sys.path[0], feed.manager.configname+"_statistics.txt")
+        f = file(outname, 'w')
+        for feed, dow, success in cur:
+            f.write("%-10s %-10s %-10s\n" % (feed, dow, success))
+
+        f.close()
