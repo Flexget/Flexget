@@ -6,6 +6,12 @@ try:
 except:
     has_sqlite = False
 
+has_pygooglechart = True
+try:
+    from pygooglechart import StackedVerticalBarChart, Axis
+except:
+    has_pygooglechart = False
+
 class Statistics:
     def __init__(self):
         self.total = 0
@@ -44,24 +50,82 @@ class Statistics:
         self.init(con)
         cur = con.cursor()
 
-        cur.execute("insert into statistics (timestamp, feed, success, failure) values (date('now'), '%s', %d, %d);" % (feed.name, self.passed, self.failed))
+        cur.execute("insert into statistics (timestamp, feed, success, failure) values (datetime('now'), '%s', %d, %d);" % (feed.name, self.passed, self.failed))
 
         con.commit()
         con.close()
 
-
     def generate_statistics(self, feed):
-        sql = """
-        select feed, strftime("%w", timestamp) as dow, sum(success) from statistics group by feed, dow;
-        """
+        if not has_pygooglechart:
+            raise Exception('module statistics requires pygooglechart library.')
+        
         dbname = os.path.join(sys.path[0], feed.manager.configname+".db")
         con = sqlite.connect(dbname)
+
+        self.weekly_stats(feed, con)
+        self.hourly_stats(feed, con)
+
+    def hourly_stats(self, feed, con):
+        sql = """
+        select strftime("%H", timestamp) as hour, sum(success) from statistics group by hour
+        """
         cur = con.cursor()
         cur.execute(sql)
 
-        outname = os.path.join(sys.path[0], feed.manager.configname+"_statistics.txt")
-        f = file(outname, 'w')
-        for feed, dow, success in cur:
-            f.write("%-10s %-10s %-10s\n" % (feed, dow, success))
+        chart = StackedVerticalBarChart(660, 100, title="Releases by hour")
+        axislabels = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23]
+        for i in range(0,len(axislabels)):
+            axislabels[i] = str(axislabels[i])
+            
+        axis = chart.set_axis_labels(Axis.BOTTOM, axislabels)
+        chart.set_axis_style(axis, '000000', alignment=-1)
 
+        data = 24*[0]
+
+        for hour, success in cur:
+            hour = int(hour)
+
+            data[hour] = success
+
+        chart.add_data(data)
+
+        chartname = os.path.join(sys.path[0], feed.manager.configname + "_hourly.png")
+        charthtml = os.path.join(sys.path[0], feed.manager.configname + "_hourly.html")
+
+        chart.download(chartname)
+        url = chart.get_url()
+        f = file(charthtml, 'w')
+        f.write(url)
+        f.close()
+
+    def weekly_stats(self, feed, con):
+        sql = """
+        select strftime("%w", timestamp) as dow, sum(success) from statistics group by dow
+        """
+
+        cur = con.cursor()
+        cur.execute(sql)
+
+        chart = StackedVerticalBarChart(200, 100, title="Releases by day of week")
+        axis = chart.set_axis_labels(Axis.BOTTOM, ['mon','tue','wed','thu','fri','sat','sun'])
+        chart.set_axis_style(axis, '000000', alignment=-1)
+
+        data = [0,0,0,0,0,0,0]
+
+        for dow, success in cur:
+            dow = int(dow) - 1
+            if dow == -1:
+                dow = 6
+
+            data[dow] = success
+
+        chart.add_data(data)
+
+        chartname = os.path.join(sys.path[0], feed.manager.configname + "_weekly.png")
+        charthtml = os.path.join(sys.path[0], feed.manager.configname + "_weekly.html")
+
+        chart.download(chartname)
+        url = chart.get_url()
+        f = file(charthtml, 'w')
+        f.write(url)
         f.close()
