@@ -27,15 +27,7 @@ class RegisterException(Exception):
 
 class Manager:
 
-    moduledir = os.path.join(sys.path[0], "modules/")
-
     EVENTS = ["start", "input", "filter", "resolve", "download", "modify", "output", "exit", "terminate"]
-
-    SESSION_VERSION = 2
-
-    # logging formatting
-    LOGGING_DETAILED = '%(levelname)-8s %(name)-11s %(message)s'
-    LOGGING_NORMAL = '%(levelname)-8s %(message)s'
     
     def __init__(self):
         start_time = time.clock()
@@ -47,13 +39,22 @@ class Manager:
         self.session = {}
         self.config = {}
 
+        # settings
+        self.moduledir = os.path.join(sys.path[0], "modules/")
+        self.session_version = 2
+        
+        # logging formatting
+        self.logging_detailed = '%(levelname)-8s %(name)-11s %(message)s'
+        self.logging_normal = '%(levelname)-8s %(message)s'
+        
+
         # Initialize logging for file, we must init it with some level now because
         # logging utility borks completely if any calls to logging is made before initialization
         # and load modules may call it before we know what level is used
         initial_level = logging.INFO
         try:
             logging.basicConfig(level=initial_level,
-                                format='%(asctime)s '+self.LOGGING_DETAILED,
+                                format='%(asctime)s '+self.logging_detailed,
                                 filename=os.path.join(sys.path[0], 'flexget.log'),
                                 filemode="a",
                                 datefmt='%Y-%m-%d %H:%M:%S')
@@ -116,7 +117,14 @@ class Manager:
             # is less (propably because I don't know how to use that pice of ... )
             logging.getLogger().setLevel(logging.DEBUG)
         if not self.options.quiet:
-            self.__init_console_logging(level)
+          console = logging.StreamHandler()
+          console.setLevel(logging.DEBUG)
+          if self.options.debug:
+              formatter = logging.Formatter(self.logging_detailed)
+          else:
+              formatter = logging.Formatter(self.logging_normal)
+          console.setFormatter(formatter)
+          logging.getLogger().addHandler(console)
 
         # load config & session
         self.load_config()
@@ -125,32 +133,17 @@ class Manager:
         else:
             self.load_session()
         # check if session version number is different
-        if self.session.setdefault('version', self.SESSION_VERSION) != self.SESSION_VERSION:
+        if self.session.setdefault('version', self.session_version) != self.session_version:
             if not self.options.learn:
                 logging.critical('Your session is broken or from older incompatible version of flexget. '\
                                  'Run application with --reset-session to resolve this. '\
                                  'Any new content downloaded between the previous successful execution and now will be lost. '\
                                  'You can (try to) spot new content from the report and download them manually.')
                 sys.exit(1)
-            self.session['version'] = self.SESSION_VERSION
+            self.session['version'] = self.session_version
 
         took = time.clock() - start_time
         logging.debug('Startup took %.2f seconds' % took)
-
-    def __init_console_logging(self, log_level):
-        """Initialize logging for stdout"""
-        # define a Handler which writes to the sys.stderr
-        console = logging.StreamHandler()
-        console.setLevel(logging.DEBUG)
-        # set a format which is simpler for console use
-        if self.options.debug:
-            formatter = logging.Formatter(self.LOGGING_DETAILED)
-        else:
-            formatter = logging.Formatter(self.LOGGING_NORMAL)
-        # tell the handler to use this format
-        console.setFormatter(formatter)
-        # add the handler to the root logger
-        logging.getLogger().addHandler(console)
 
     def load_config(self):
         """Load the configuration file"""
