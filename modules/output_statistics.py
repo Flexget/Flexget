@@ -67,7 +67,7 @@ class Statistics:
 
     def hourly_stats(self, feed, con):
         sql = """
-        select strftime("%H", timestamp) as hour, sum(success) from statistics group by hour
+        select strftime("%H", datetime(timestamp, 'localtime')) as hour, sum(success) from statistics group by hour
         """
         cur = con.cursor()
         cur.execute(sql)
@@ -100,7 +100,7 @@ class Statistics:
 
     def weekly_stats(self, feed, con):
         sql = """
-        select strftime("%w", timestamp) as dow, sum(success) from statistics group by dow
+        select strftime("%w", datetime(timestamp, 'localtime')) as dow, sum(success) from statistics group by dow
         """
 
         cur = con.cursor()
