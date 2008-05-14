@@ -1,4 +1,5 @@
 import sys, os.path
+import types
 
 has_sqlite = True
 try:
@@ -19,9 +20,9 @@ class Statistics:
         self.failed = 0
 
     def register(self, manager, parser):
-        manager.register(instance=self, event='input', keyword='stats', callback=self.input, order=65535)
-        manager.register(instance=self, event='exit', keyword='stats', callback=self.exit)
-        manager.register(instance=self, event='terminate', keyword='stats', callback=self.generate_statistics)
+        manager.register(instance=self, event='input', keyword='statistics', callback=self.input, order=65535)
+        manager.register(instance=self, event='exit', keyword='statistics', callback=self.exit)
+        manager.register(instance=self, event='terminate', keyword='statistics', callback=self.generate_statistics)
 
     def init(self, con):
         create = """
@@ -55,13 +56,19 @@ class Statistics:
         con.commit()
         con.close()
 
+
+    def get_config(self, feed):
+        config = feed.config['statistics']
+        if type(config) != types.DictType:
+            config = {'file': os.path.join(sys.path[0], feed.manager.configname+'_statistics.html')}
+
+        return config
+
     def generate_statistics(self, feed):
         if not has_pygooglechart:
             raise Exception('module statistics requires pygooglechart library.')
 
-        prefix = feed.manager.configname
-        
-        dbname = os.path.join(sys.path[0], prefix+".db")
+        dbname = os.path.join(os.path.join(sys.path[0], feed.manager.configname+".db"))
         con = sqlite.connect(dbname)
 
         charts = []
@@ -70,16 +77,18 @@ class Statistics:
         charts.append(self.weekly_stats_by_feed(con))
         charts.append(self.hourly_stats_by_feed(con))
 
-        self.save_index(prefix, charts)
+        self.save_index(charts, feed)
 
-    def save_index(self, prefix, charts):
+    def save_index(self, charts, feed):
         imagelinks = ""
         for chart in charts:
             imagelinks += """<img src="%s" alt="" />""" % chart
 
         index = index_html % imagelinks
 
-        f = file(prefix+"_statistics.html", 'w')
+        config = self.get_config(feed)
+
+        f = file(config['file'], 'w')
         f.write(index)
         f.close()
 
