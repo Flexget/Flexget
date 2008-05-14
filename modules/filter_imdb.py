@@ -1,6 +1,5 @@
 import urllib
 import urllib2
-import urlparse
 import logging
 import re
 import string

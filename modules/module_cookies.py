@@ -39,7 +39,7 @@ class ModuleCookies:
         elif t == 'msie':
             cj = cookielib.MSIECookieJar()
         else:
-            raise Warning('Unknown cookie type %s' % ctype)
+            raise Warning('Unknown cookie type %s' % t)
         try:
             cj.load(filename=config['file'], ignore_expires=True)
             log.debug('Cookies loaded')

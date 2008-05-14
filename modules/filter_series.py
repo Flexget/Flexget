@@ -240,7 +240,7 @@ class FilterSeries:
                     enough = tconf.get('enough', '720p')
 
                     if not enough in SerieParser.qualities:
-                        log.error('Parameter enough has unknown value: %s' % enoigh)
+                        log.error('Parameter enough has unknown value: %s' % enough)
 
                     # scan for enough, starting from worst quality (reverse)
                     eps.reverse()

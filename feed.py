@@ -1,8 +1,5 @@
-import os, os.path
-import re
-import sys
+import os.path
 import logging
-import string
 import types
 from datetime import tzinfo, timedelta, datetime
 
