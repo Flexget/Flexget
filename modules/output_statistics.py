@@ -73,14 +73,11 @@ class Statistics:
         cur.execute(sql)
 
         chart = StackedVerticalBarChart(660, 100, title="Releases by hour")
-        axislabels = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23]
-        for i in range(0,len(axislabels)):
-            axislabels[i] = str(axislabels[i])
+        axislabels = [str(i) for i in range(24)]
+        data = 24*[0]
             
         axis = chart.set_axis_labels(Axis.BOTTOM, axislabels)
         chart.set_axis_style(axis, '000000', alignment=-1)
-
-        data = 24*[0]
 
         for hour, success in cur:
             hour = int(hour)
@@ -110,7 +107,7 @@ class Statistics:
         axis = chart.set_axis_labels(Axis.BOTTOM, ['mon','tue','wed','thu','fri','sat','sun'])
         chart.set_axis_style(axis, '000000', alignment=-1)
 
-        data = [0,0,0,0,0,0,0]
+        data = 7*[0]
 
         for dow, success in cur:
             dow = int(dow) - 1
