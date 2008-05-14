@@ -125,7 +125,7 @@ class Statistics:
         chart.set_axis_range(Axis.LEFT, 0, max(data))
 
         for i in range(0, len(data)):
-            if data[i]i > 0:
+            if data[i] > 0:
                 chart.add_marker(0, i, 't%s'%data[i], '000000', 13)
 
         chartname = os.path.join(sys.path[0], feed.manager.configname + "_weekly.png")
