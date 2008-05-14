@@ -11,6 +11,15 @@ class ResolverException(Exception):
 
 class Entry(dict):
 
+    """
+        Represents one item in feed. Must have url and title fields.
+        See. http://flexget.com/wiki/DevelopersEntry
+
+        Internally stored original_url is neccessary because
+        resolvers change this into something else and otherwise
+        that information would be lost.
+    """
+
     def __init__(self, *args):
         if len(args) == 2:
             self['title'] = args[0]
@@ -22,18 +31,14 @@ class Entry(dict):
                 self['original_url'] = value
         dict.__setitem__(self, key, value)
     
-    def get_original_url(self):
-        """Get original url which entry was created with"""
-        return self.get('original_url', None)
-        
     def safe_str(self):
         return "%s | %s" % (self['title'], self['url'])
 
 class ModuleCache:
 
     """
-        Provides dictionary-like persistent storage for modules, allows saving key value pair for n number of days. Purges old
-        entries to keep storage size in reasonable sizes.
+        Provides dictionary-like persistent storage for modules, allows saving key value pair
+        for n number of days. Purges old entries to keep storage size in reasonable sizes.
     """
 
     log = logging.getLogger('modulecache')
@@ -96,6 +101,8 @@ class Feed:
 
     def __init__(self, manager, name, config):
         """
+            Represents one feed in configuration.
+
             name - name of the feed
             config - yaml configuration (dict)
         """
@@ -103,13 +110,11 @@ class Feed:
         self.config = config
         self.manager = manager
 
-        # merge global configuration into this feed config
-        self.__merge_config(manager.config.get('global', {}), config)
-
-        self.cache = ModuleCache(name, manager.get_cache())
-        self.shared_cache = ModuleCache('_shared_', manager.get_cache())
+        self.cache = ModuleCache(name, manager.session.setdefault('cache', {}))
+        self.shared_cache = ModuleCache('_shared_', manager.session.setdefault('cache', {}))
 
         self.entries = []
+        
         # accepted entries are always accepted, filtering does not affect them
         self.__accepted = [] 
         self.__filtered = []
@@ -121,17 +126,6 @@ class Feed:
 
         self.check_config()
         
-    def __merge_config(self, d1, d2):
-        """Merges dictionary d1 into dictionary d2"""
-        for k, v in d1.items():
-            if d2.has_key(k):
-                if type(v) == type(d2[k]):
-                    if type(v)==types.DictType: self.__merge_config(self, d1[k], d2[k])
-                    elif type(v)==types.ListType: d2[k].extend(v)
-                    else: raise Exception('BUG: Unknown type %s in config' % type(v))
-                else: raise Exception('Global keyword %s is incompatible with feed %s. Keywords are not same datatype.' % (k, self.name))
-            else: d2[k] = v
-
     def _purge(self):
         """Purge filtered entries from feed. Call this from module only if you know what you're doing."""
         for entry in self.entries[:]:
@@ -289,7 +283,7 @@ class Feed:
         self.shared_cache.store('log-%s' % sum, True, 30)
         log.info(s)
 
-
+    # TODO: all these verbose methods are confusing
     def verbose_progress(self, s):
         """Verboses progress, outputs only in non quiet mode."""
         # TODO: implement trough own logger?
@@ -297,17 +291,19 @@ class Feed:
           logging.info(s)
           
     def verbose_details(self, s):
+        """Verbose if details option is enabled"""
         # TODO: implement trough own logger?
         if self.manager.options.details:
             print "+ %-8s %-12s %s" % (self.__current_event, self.__current_module, s)
 
     def verbose_details_entries(self):
+        """If details option is enabled, print all produced entries"""
         if self.manager.options.details:
             for entry in self.entries:
                 self.verbose_details('%s' % entry['title'])
 
     def resolvable(self, entry):
-        """Return true if entry is resolvable by registered resolver"""
+        """Return True if entry is resolvable by registered resolver."""
         for name, resolver in self.manager.resolvers.iteritems():
             if resolver.resolvable(self, entry):
                 return True

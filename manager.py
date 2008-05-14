@@ -100,7 +100,8 @@ class Manager:
         sys.path.append(self.moduledir)
 
         # load modules, modules may add more commandline parameters!
-        self.load_modules(parser)
+        self.load_modules(parser, self.moduledir)
+        
         self.options = parser.parse_args()[0]
 
         # perform commandline sanity check(s)
@@ -204,13 +205,13 @@ class Manager:
             logging.exception("Failed to save session data (%s)!" % e)
             logging.critical(yaml.dump(self.session))
         
-    def load_modules(self, parser):
+    def load_modules(self, parser, moduledir):
         """Load and call register on all modules"""
         # TODO: logging goes only to file due startup levels!
         loaded = {} # prevent modules being loaded multiple times when they're imported by other modules
-        for module in self.find_modules(self.moduledir):
+        for module in self.find_modules(moduledir):
             ns = {}
-            execfile(os.path.join(self.moduledir, module), ns, ns)
+            execfile(os.path.join(moduledir, module), ns, ns)
             for name in ns.keys():
                 if loaded.get(name, False): continue
                 if type(ns[name]) == types.ClassType:
@@ -243,23 +244,39 @@ class Manager:
                     modules.append(m)
         return modules
 
-    def get_cache(self):
-        """Returns cache for modules"""
-        # TODO: after plenty of refactoring only this remains, remove completely?
-        return self.session.setdefault('cache', {})
+    def get_settings(self, keyword, defaults={}):
+        """
+            Return defaults & settings for a keyword. You may optional defaults that will be used
+            as default values where user has not specified anything.
+
+            Ie. Passed defaults:
+            {'size': 20, 'length': 30}
+            User has configured:
+            {'length': 40}
+            Returned:
+            {'size': 20, 'length': 30}
+
+            See. http://flexget.com/wiki/GlobalSection - uses same merge
+        """
+        settings = self.config.get('settings', {})
+        config = settings.get(keyword, {})
+        #print "keyword: %s defaults: %s config: %s" % (keyword, defaults, config)
+        self.merge_dict(defaults, config)
+        return config
 
     def register(self, **kwargs):
         """
             Modules call this method to register themselves.
             Mandatory arguments:
-                instance    - instance of module (self)
-                keyword     - maps directly into config
-                callback    - method that is called when module is executed
-                event       - specifies when module is executed and implies what it does
+                instance     - Instance of module (self)
+                keyword      - Maps directly into config
+                callback     - Method that is called when module is executed
+                event        - Specifies when module is executed and implies what it does
             Optional arguments:
-                order       - when multiple modules are enabled this is used to
-                              determine execution order. Default 16384.
-                builtin     - set to True if module should be executed always
+                order        - When multiple modules are enabled this is used to
+                               determine execution order. Default 16384.
+                builtin      - Set to True if module should be executed always
+                debug_module - Set to True to hide this module from --list etc
         """
         # validate passed arguments
         for arg in ['instance', 'keyword', 'callback', 'event']:
@@ -271,6 +288,7 @@ class Manager:
         if not event in self.EVENTS:
             raise RegisterException("Module has invalid event '%s'. Recognized events are: %s." % (event, string.join(self.EVENTS, ', ')))
         self.modules.setdefault(event, {})
+        # check if there is already registered keyword with same event
         if self.modules[event].has_key(kwargs['keyword']):
             by = self.modules[event][kwargs['keyword']]['instance']
             raise RegisterException("Duplicate keyword with same event '%s'. Keyword: '%s' Reserved by: '%s'" % (event, kwargs['keyword'], by.__class__.__name__))
@@ -377,6 +395,22 @@ class Manager:
         print "Cleared %i items." % len(self.session.setdefault('failed', []))
         self.session['failed'] = []
 
+    def merge_dict(self, d1, d2):
+        """Merges yaml dictionary d1 into dictionary d2. d1 will remain in original form"""
+        for k, v in d1.items():
+            if d2.has_key(k):
+                if type(v) == type(d2[k]):
+                    if type(v) == types.DictType:
+                        self.__merge_config(self, d1[k], d2[k])
+                    elif type(v) == types.ListType:
+                        d2[k].extend(v)
+                    else:
+                      raise Exception('Unknown type %s in dictionary' % type(v))
+                else:
+                    raise Warning('Merging key %s failed, incompatible datatypes.' % (k))
+            else:
+                d2[k] = v
+
     def execute(self):
         """Iterate trough all feeds and run them."""
         try:
@@ -399,7 +433,17 @@ class Manager:
                 # if feed name is prefixed with _ it's disabled
                 if name.startswith('_'): continue
                 # create feed and execute it
-                feed = Feed(self, name, self.config['feeds'][name])
+                # merge global configuration into this feed config
+                config = self.config['feeds'][name]
+                try:
+                    self.merge_dict(self.config.get('global', {}), config)
+                except Exception, e:
+                    logging.exception(e)
+                    continue
+                except Warning, w:
+                    logging.critical('Global section has conflicting datatypes with feed %s configuration. Feed aborted.' % name)
+                    continue
+                feed = Feed(self, name, config)
                 try:
                     feed.execute()
                     feed_instances[name] = feed

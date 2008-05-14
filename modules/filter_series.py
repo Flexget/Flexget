@@ -105,6 +105,8 @@ class FilterSeries:
 
         If two different qualities come available at the same moment,
         flexget will always download the better one. (more options coming ..)
+
+        Supports default settings trough settings block in configuration file.
         
         Timeframe:
 
@@ -199,9 +201,12 @@ class FilterSeries:
 
     def filter_series(self, feed):
         for name in feed.config.get('series', []):
-            conf = {}
+            # start with default settings
+            conf = feed.manager.get_settings('series', {})
             if type(name) == types.DictType:
                 name, conf = name.items()[0]
+                # merge with default settings
+                conf = feed.manager.get_settings('series', conf)
 
             series = {} # ie. S1E2: [Serie, Serie, ..]
             for entry in feed.entries:

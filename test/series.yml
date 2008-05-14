@@ -1,0 +1,13 @@
+feeds:
+  feed:
+    input_mock:
+      - {title: 'Some.Series.S1E01.XViD', url: 'http://localhost/mock'}
+      - {title: 'Some.Series.S1E02.DSR.XViD', url: 'http://localhost/mock'}
+      - {title: 'Some.Series.S1E03.720p.XViD', url: 'http://localhost/mock'}
+      - {title: 'Some.Series.S1E04.XViD', url: 'http://localhost/mock'}
+      - {title: 'Some.Series.S1E05.XViD', url: 'http://localhost/mock'}
+      - {title: 'Some.Series.S1E06.XViD', url: 'http://localhost/mock'}
+      - {title: 'Some.Series.2008-10-12.XViD', url: 'http://localhost/mock'}
+    series:
+      - some series
+    dump: true
