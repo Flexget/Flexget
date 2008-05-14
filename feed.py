@@ -329,7 +329,7 @@ class Feed:
                         raise ResolverException('%s: %s' % (name, r.value))
                     except Exception, e:
                         logging.exception(e)
-                        raise ResolverException('%s: Internal error' % (name))
+                        raise ResolverException('%s: Internal error with url %s' % (name, entry['url']))
 
     def _resolve_entries(self):
         """Resolves all entries in feed"""

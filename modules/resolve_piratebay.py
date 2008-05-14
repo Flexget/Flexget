@@ -36,6 +36,8 @@ class ResolvePirateBay:
             page = urllib2.urlopen(entry['url'])
             soup = BeautifulSoup(page)
             tag_div = soup.find('div', attrs={'class':'download'})
+            if not tag_div:
+                raise ResolverException('Unable to locate download link from url %s' % entry['url'])
             tag_a = tag_div.find('a')
             torrent_url = tag_a.get('href')
             entry['url'] = torrent_url

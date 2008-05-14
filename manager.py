@@ -117,6 +117,7 @@ class Manager:
             # is less (propably because I don't know how to use that pice of ... )
             logging.getLogger().setLevel(logging.DEBUG)
         if not self.options.quiet:
+          # log to console
           console = logging.StreamHandler()
           console.setLevel(logging.DEBUG)
           if self.options.debug:
