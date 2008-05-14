@@ -328,7 +328,7 @@ class Feed:
                         raise ResolverException('%s: Internal error with url %s' % (name, entry['url']))
 
     def _resolve_entries(self):
-        """Resolves all entries in feed"""
+        """Resolves all entries in feed. Since this causes many requests to sites, use with caution."""
         for entry in self.entries:
             try:
                 self.resolve(entry)

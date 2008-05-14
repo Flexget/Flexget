@@ -48,6 +48,7 @@ class CliConfig:
                 self.replace_dict(v, replaces)
 
     def parse_replaces(self, feed):
+        """Parses commandline string into internal dict"""
         s = feed.manager.options.cli_config
         if not s:
             return False # nothing to process

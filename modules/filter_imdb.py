@@ -29,7 +29,7 @@ class ImdbSearch:
         self.ignore_types = ['VG']
 
     def parse_name(self, s):
-        """Sanitizes movie name from all kind of crap"""
+        """Sanitizes movie name from all kinds of crap"""
         # todo: improve, remove those two hacks  ..
         s = s.replace('h.264', 'h264')
         s = s.replace('x.264', 'x264')
@@ -258,7 +258,7 @@ class ImdbParser:
         for link in soup.findAll('a', attrs={'href': re.compile('^/Sections/Languages/')}):
             lang = link.string.lower()
             if not lang in self.languages:
-                self.languages.append(lang)
+                self.languages.append(lang.strip())
 
         # get year
         tag_year = soup.find('a', attrs={'href': re.compile('^/Sections/Years/\d*')})
