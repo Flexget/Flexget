@@ -72,7 +72,7 @@ class Statistics:
         cur = con.cursor()
         cur.execute(sql)
 
-        chart = StackedVerticalBarChart(660, 100, title="Releases by hour")
+        chart = StackedVerticalBarChart(680, 100, title="Releases by hour")
         axislabels = [str(i) for i in range(24)]
         data = 24*[0]
             
@@ -85,6 +85,11 @@ class Statistics:
             data[hour] = success
 
         chart.add_data(data)
+        chart.set_axis_range(Axis.LEFT, 0, max(data))
+        
+        for i in range(0, len(data)):
+            if data[i] > 0:
+                chart.add_marker(0, i, 't%s'%data[i], '000000', 13)
 
         chartname = os.path.join(sys.path[0], feed.manager.configname + "_hourly.png")
         charthtml = os.path.join(sys.path[0], feed.manager.configname + "_hourly.html")
@@ -92,7 +97,7 @@ class Statistics:
         chart.download(chartname)
         url = chart.get_url()
         f = file(charthtml, 'w')
-        f.write(url)
+        f.write(url+'\n')
         f.close()
 
     def weekly_stats(self, feed, con):
@@ -103,7 +108,7 @@ class Statistics:
         cur = con.cursor()
         cur.execute(sql)
 
-        chart = StackedVerticalBarChart(200, 100, title="Releases by day of week")
+        chart = StackedVerticalBarChart(220, 100, title="Releases by day of week")
         axis = chart.set_axis_labels(Axis.BOTTOM, ['mon','tue','wed','thu','fri','sat','sun'])
         chart.set_axis_style(axis, '000000', alignment=-1)
 
@@ -117,6 +122,11 @@ class Statistics:
             data[dow] = success
 
         chart.add_data(data)
+        chart.set_axis_range(Axis.LEFT, 0, max(data))
+
+        for i in range(0, len(data)):
+            if data[i]i > 0:
+                chart.add_marker(0, i, 't%s'%data[i], '000000', 13)
 
         chartname = os.path.join(sys.path[0], feed.manager.configname + "_weekly.png")
         charthtml = os.path.join(sys.path[0], feed.manager.configname + "_weekly.html")
@@ -124,5 +134,5 @@ class Statistics:
         chart.download(chartname)
         url = chart.get_url()
         f = file(charthtml, 'w')
-        f.write(url)
+        f.write(url+'\n')
         f.close()
