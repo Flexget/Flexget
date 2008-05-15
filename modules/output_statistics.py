@@ -99,7 +99,7 @@ class Statistics:
         cur = con.cursor()
         cur.execute(sql)
 
-        chart = StackedVerticalBarChart(680, 100, title="Releases by hour")
+        chart = StackedVerticalBarChart(680, 200, title="Releases by hour")
         axislabels = [str(i) for i in range(24)]
         data = 24*[0]
             
@@ -171,7 +171,7 @@ class Statistics:
         cur = con.cursor()
         cur.execute(sql)
 
-        chart = StackedVerticalBarChart(220, 100, title="Releases by day of week")
+        chart = StackedVerticalBarChart(220, 200, title="Releases by day of week")
         axis = chart.set_axis_labels(Axis.BOTTOM, ['mon','tue','wed','thu','fri','sat','sun'])
         chart.set_axis_style(axis, '000000', alignment=-1)
 
@@ -202,9 +202,8 @@ class Statistics:
         cur.execute(sql)
 
         chart = StackedVerticalBarChart(350, 200, title="Releases by source")
-        axislabels = [str(i) for i in range(24)]
             
-        axis = chart.set_axis_labels(Axis.BOTTOM, axislabels)
+        axis = chart.set_axis_labels(Axis.BOTTOM, ['mon','tue','wed','thu','fri','sat','sun'])
         chart.set_axis_style(axis, '000000', alignment=-1)
 
         feedname = ""
