@@ -72,8 +72,8 @@ class Statistics:
         con = sqlite.connect(dbname)
 
         charts = []
-        charts.append(self.weekly_stats(con))
-        charts.append(self.hourly_stats(con))
+        #charts.append(self.weekly_stats(con))
+        #charts.append(self.hourly_stats(con))
         charts.append(self.weekly_stats_by_feed(con))
         charts.append(self.hourly_stats_by_feed(con))
 
@@ -201,15 +201,17 @@ class Statistics:
         cur = con.cursor()
         cur.execute(sql)
 
-        chart = StackedVerticalBarChart(350, 200, title="Releases by source")
-            
+        chart = StackedVerticalBarChart(350, 200, title="Releases by source")            
         axis = chart.set_axis_labels(Axis.BOTTOM, ['mon','tue','wed','thu','fri','sat','sun'])
         chart.set_axis_style(axis, '000000', alignment=-1)
 
         feedname = ""
         maxdata = 0
         legend = []
-        for feed, hour, success in cur:
+        for feed, dow, success in cur:
+            dow = int(dow) - 1
+            if dow == -1:
+                dow = 6
             # clear data array for this feed
             if feed != feedname:
                 feedname = feed
@@ -221,7 +223,7 @@ class Statistics:
             success = int(success)
             if success > maxdata:
                 maxdata = success
-            data[int(hour)] = success
+            data[dow] = success
 
         # random colors
         #import random as rn
