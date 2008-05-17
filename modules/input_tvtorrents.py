@@ -21,7 +21,7 @@ except:
 class InputTVTorrents:
     """
         A customized HTML input module. Parses out full torrent URLs from 
-        TVTorrents' page for Recently Aired TV shows.
+        [[TVTorrents]]' page for Recently Aired TV shows.
 
         A bit fragile right now, because it depends heavily on the exact 
         structure of the HTML, as it looked today - 2008-05-17.
@@ -34,7 +34,7 @@ class InputTVTorrents:
         this module yet - just use a pattern like (lost|csi).*?720p until we
         figure out why.
 
-        Module-specific code by Fredrik Br&auml;enstr&ouml;m.
+        Module-specific code by [[Fredrik Br&auml;nstr&ouml;m]].
     """
 
     def register(self, manager, parser):
@@ -42,9 +42,7 @@ class InputTVTorrents:
 
     def run(self, feed):
         if not soup_present: raise Exception(soup_err)
-#        if feed.name.lower().find("tvtorrents") == -1: skipthismodule
-        # Um... not possible to discern feed type based on name... yet... (If implemented it should be in manager.py anyways.) *I'm sleepy*
-        pageurl = "http://tvtorrents.com/loggedin/recently_aired.do" # feed.get_input_url('html')
+        pageurl = "http://tvtorrents.com/loggedin/recently_aired.do"
 
         log.debug("InputModule tvtorrents requesting url %s" % pageurl)
 
@@ -58,9 +56,6 @@ class InputTVTorrents:
             log.warning("URLError when opening page")
             return
         
-#        if pageurl.find("tvtorrents") != -1:
-#            tvtorrents = 1
-#            hline = soup.find(text=re.compile(".*?torrent\.tvtorrents\.com.*?"))
         hscript = soup.find('script', src=None).string
         hlines = hscript.splitlines()
         hash = hlines[15].strip().split("'")[1]
@@ -73,17 +68,13 @@ class InputTVTorrents:
             url = link['href']
             title = link.string
 
-#            if tvtorrents:
             if url == "#" and link.has_key('onclick') and link['onclick'].find("loadTorrent") != -1:
-#                if url == "#" and link.has_key('onclick') and (title == None or title == "download"):
                 infohash = link['onclick'].split("'")[1]
                 sname = link.parent.parent.previous.previous.parent.contents[1].a.string
                 epnr = link.parent.previous.previous
                 eptitle = link.previous.previous
                 title = "%s - %s - %s" % (sname, epnr, eptitle)
                 url = hashurl % (infohash,)
-#                    print "%s: %s" % (infohash, ntitle)
-#                    print "%s: %s" % (title, url)
             else:
                 continue
                 
