@@ -34,7 +34,7 @@ class InputTVTorrents:
         this module yet - just use a pattern like (lost|csi).*?720p until we
         figure out why.
 
-        Module-specific code by Fredrik Bränström.
+        Module-specific code by Fredrik Br&auml;enstr&ouml;m.
     """
 
     def register(self, manager, parser):
