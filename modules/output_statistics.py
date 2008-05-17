@@ -14,6 +14,9 @@ except:
     has_pygooglechart = False
 
 class Statistics:
+    """
+    Saves statistics about downloaded releases and generates graphs from the data.
+    """
     def __init__(self):
         self.total = 0
         self.passed = 0
@@ -25,6 +28,8 @@ class Statistics:
         manager.register(instance=self, event='terminate', keyword='statistics', callback=self.generate_statistics)
 
     def init(self, con):
+        """Create the sqlite table if necessary"""
+        
         create = """
         CREATE TABLE IF NOT EXISTS statistics
         (
@@ -72,8 +77,6 @@ class Statistics:
         con = sqlite.connect(dbname)
 
         charts = []
-        #charts.append(self.weekly_stats(con))
-        #charts.append(self.hourly_stats(con))
         charts.append(self.weekly_stats_by_feed(con))
         charts.append(self.hourly_stats_by_feed(con))
 
