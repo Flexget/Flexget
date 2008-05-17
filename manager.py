@@ -118,15 +118,15 @@ class Manager:
             # is less (propably because I don't know how to use that pice of ... )
             logging.getLogger().setLevel(logging.DEBUG)
         if not self.options.quiet:
-          # log to console
-          console = logging.StreamHandler()
-          console.setLevel(logging.DEBUG)
-          if self.options.debug:
-              formatter = logging.Formatter(self.logging_detailed)
-          else:
-              formatter = logging.Formatter(self.logging_normal)
-          console.setFormatter(formatter)
-          logging.getLogger().addHandler(console)
+            # log to console
+            console = logging.StreamHandler()
+            console.setLevel(logging.DEBUG)
+            if self.options.debug:
+                formatter = logging.Formatter(self.logging_detailed)
+            else:
+                formatter = logging.Formatter(self.logging_normal)
+            console.setFormatter(formatter)
+            logging.getLogger().addHandler(console)
 
         # load config & session
         self.load_config()

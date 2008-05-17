@@ -1,54 +1,81 @@
 import logging
 import re
+import string
 import types
 from datetime import tzinfo, timedelta, datetime
 from feed import Entry
 
 log = logging.getLogger('series')
 
-# might be better of just being function which returns dict ...
 class SerieParser:
-
     qualities = ['1080p', '1080', '720p', '720', 'hr', 'dvd', 'hdtv', 'dsr', 'dsrip', 'unknown']
     
     def __init__(self):
-        self.name = None
-        self.item = None
-        self.ep_regexps = ['s(\d+)e(\d+)', 's(\d+)ep(\d+)', '(\d+)x(\d+)', '\d\d\d\d-(\d+)-(\d+)']
+        # name of the serie
+        self.name = None 
+        # data to parse
+        self.data = None 
+        
+        self.ep_regexps = ['s(\d+)e(\d+)', 's(\d+)ep(\d+)', '(\d+)x(\d+)']
+        self.id_regexps = ['(\d\d\d\d).(\d+).(\d+)', '(\d+).(\d+).(\d\d\d\d)']
+        self.name_regexps = []
         # parse produces these
         self.season = None
         self.episode = None
+        self.id = None
+
         self.quality = 'unknown'
         # false if item does not match serie
         self.valid = False
         # optional for storing entry from which this instance is made from
         self.entry = None
         
-    def set_name(self, name):
-        self.name = name
-        
-    def set_data(self, data):
-        self.item = data
-        
     def parse(self):
-        if not self.name or not self.item:
-            raise Exception('SerieParser missing either name or item')
-        serie = self.name.replace('.', ' ').lower()
-        item = self.item.replace('.', ' ').replace('_', ' ').lower()
-        item = item.replace('[','').replace(']','')
-        serie_data = serie.split(' ')
-        item_data = item.split(' ')
-        
-        # remove serie name parts from data
-        for part in serie_data:
-            if part in item_data:
-                item_data.remove(part)
-            else:
-                #log.debug('part %s not found from %s' % (part, item_data))
-                # leave this invalid
-                return
+        if not self.name or not self.data:
+            raise Exception('SerieParser missing either name or data')
+        def clean(s):
+            res = s
+            r = [('.', ' '), ('_', ' '),
+                 ('[', ' '), (']', ' ')]
+            for p in r:
+                res = res.replace(*p)
+            while (res.find('  ')!=-1):
+                res = res.replace('  ', ' ')
+            return res.lower()
 
-        for part in item_data:
+        name = clean(self.name)
+        data = clean(self.data)
+
+        log.debug('name: %s data: %s' % (name, data))
+        
+        name_parts = name.split(' ')
+        data_parts = data.split(' ')
+
+        # regexp name matching
+        if self.name_regexps:
+            name_matches = False
+            # use all specified regexps to this data
+            for name_re in self.name_regexps:
+                m = re.search(name_re, self.data)
+                if m:
+                    name_matches = True
+                    break
+            if not name_matches:
+                # leave this invalid
+                log.debug('FAIL: name regexps do not match')
+                return
+        else:
+            # try to use given name old fashion way
+            for part in name_parts:
+                if part in data_parts:
+                    data_parts.remove(part)
+                else:
+                    log.debug('FAIL: part %s not found from %s' % (part, data_parts))
+                    # leave this invalid
+                    return
+
+        # seach quality
+        for part in data_parts:
             # search for quality
             if part in self.qualities:
                 if self.qualities.index(part) < self.qualities.index(self.quality):
@@ -56,28 +83,40 @@ class SerieParser:
                     self.quality = part
                 else:
                     log.debug('%s ignoring quality %s because found better %s' % (self.name, part, self.quality))
-            # search for season and episode number
-            for sre in self.ep_regexps:
-                m = re.search(sre, part)
-                if m:
-                    if len(m.groups())==2:
-                        season, episode = m.groups()
-                        self.season = int(season)
-                        self.episode = int(episode)
-                        self.valid = True
-                        break
+
+        # search for season and episode number
+        for ep_re in self.ep_regexps:
+            m = re.search(ep_re, self.data.lower())
+            if m:
+                log.debug('found episode number with regexp %s' % ep_re)
+                season, episode = m.groups()
+                self.season = int(season)
+                self.episode = int(episode)
+                self.valid = True
+                self.id = "S%sE%s" % (self.season, self.episode)
+                return
+
+        # search for id
+        for id_re in self.id_regexps:
+            m = re.search(id_re, self.data.lower())
+            if m:
+                log.debug('found id with regexp %s' % id_re)
+                self.id = string.join(m.groups(), '-')
+                self.valid = True
+                return
+
+        log.debug('FAIL: unable to find any id')
 
     def identifier(self):
-        """Return episode in form of S<Season>E<Episode>"""
+        """Return identifier for parsed episode"""
         if not self.valid: raise Exception('Serie flagged invalid')
-        return "S%sE%s" % (self.season, self.episode)
+        return self.id
 
     def __str__(self):
         valid = 'INVALID'
         if self.valid:
             valid = 'OK'
-        return 'serie: %s, season: %s episode: %s quality: %s status: %s' % (str(self.name), str(self.season), str(self.episode), str(self.quality), valid)
-        
+        return 'serie: %s, id: %s season: %s episode: %s quality: %s status: %s' % (str(self.name), str(self.id), str(self.season), str(self.episode), str(self.quality), valid)
 
 
 class FilterSeries:
@@ -107,8 +146,25 @@ class FilterSeries:
         flexget will always download the better one. (more options coming ..)
 
         Supports default settings trough settings block in configuration file.
+
+        Advanced usage with regexps:
+        ----------------------------
+
+        The standard name matching is not perfect, if you're used to working with regexps you can
+        specify regexp that is used to test if entry is serie.
+
+        You can also give regexps to episode number matching and unique id matching.
+
+        Example:
+
+        series:
+          - some serie:
+              name_patterns: ^some.serie
+              ep_patterns: (\d\d)-(\d\d\d)  # must return TWO groups
+              id_patterns: (\d\d\d)         # can return any number of groups
         
         Timeframe:
+        ----------
 
         Series filter allows you to specify a timeframe for each series in which
         flexget waits better quality.
@@ -137,6 +193,7 @@ class FilterSeries:
         Possible values for enough (in order): 1080p, 1080, 720p, 720, hr, dvd, hdtv, dsr, dsrip
 
         Custom path:
+        ------------
 
         Specify download path for series.
 
@@ -208,14 +265,28 @@ class FilterSeries:
                 # merge with default settings
                 conf = feed.manager.get_settings('series', conf)
 
+            def get_as_array(conf, key):
+                v = conf.get(key, [])
+                if type(v) in types.StringTypes:
+                    return [v]
+                return v
+
+            ep_patterns = get_as_array(conf, 'ep_patterns')
+            id_patterns = get_as_array(conf, 'id_patterns')
+            name_patterns = get_as_array(conf, 'name_patterns')
+
             series = {} # ie. S1E2: [Serie, Serie, ..]
             for entry in feed.entries:
                 serie = SerieParser()
-                serie.set_name(name)
-                serie.set_data(entry['title'])
-                serie.ep_regexps.extend(conf.get('ep_regexp', []))
+                serie.name = name
+                serie.data = entry['title']
+                serie.ep_regexps.extend(ep_patterns)
+                serie.id_regexps.extend(id_patterns)
+                serie.name_regexps.extend(name_patterns)
                 serie.parse()
-                if not serie.valid: continue
+                if not serie.valid:
+                    log.debug('%s is not serie %s' % (entry['title'], name))
+                    continue
                 # set custom download path
                 if conf.has_key('path'):
                     log.debug('setting %s custom path to %s' % (entry['title'], conf.get('path')))
@@ -333,18 +404,3 @@ class FilterSeries:
                 self.mark_downloaded(feed, serie)
             else:
                 log.debug('Entry %s is not valid serie' % entry['title'])
-
-if __name__ == '__main__':
-    import sys
-    fs = SerieParser()
-    fs.set_name('mock serie')
-    fs.set_data('Mock.Serie.S04E01.HDTV.XviD-TEST.avi')
-    fs.parse()
-    print fs
-    
-    if len(sys.argv)>1:
-        fs = SerieParser()
-        fs.set_name(sys.argv[1])
-        fs.set_data(sys.argv[2])
-        fs.parse()
-        print fs
