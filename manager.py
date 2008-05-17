@@ -254,7 +254,7 @@ class Manager:
             User has configured:
             {'length': 40}
             Returned:
-            {'size': 20, 'length': 30}
+            {'size': 20, 'length': 40}
 
             See. http://flexget.com/wiki/GlobalSection - uses same merge
         """
