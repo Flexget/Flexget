@@ -166,25 +166,31 @@ class Manager:
         sys.exit(0)
 
     def load_session(self):
-        # sessions are config-specific
-        if self.configname==None:
+        if not self.configname:
             raise Exception('self.configname missing')
+
         if self.options.experimental:
-            sessiondb = os.path.join(sys.path[0], 'session-%s.db' % self.configname)
-            self.session = shelve.open(sessiondb, protocol=2, writeback=True)
+            self.load_session_shelf()
         else:
-            sessionfile = os.path.join(sys.path[0], 'session-%s.yml' % self.configname)
-            if os.path.exists(sessionfile):
-                try:
-                    self.session = yaml.safe_load(file(sessionfile))
-                    if type(self.session) != types.DictType:
-                        raise Exception('Session file does not contain dictionary')
-                except Exception, e:
-                    logging.critical("The session file has been broken. Execute flexget with --reset-session create new session and to avoid re-downloading everything. "\
-                                     "Downloads between time of break and now are lost. You must download these manually. "\
-                                     "This error is most likely caused by a bug in the software, check your log-file and report any tracebacks.")
-                    logging.exception('Reason: %s' % e)
-                    sys.exit(1)
+            self.load_session_yaml()
+
+    def load_session_yaml(self):
+        sessionfile = os.path.join(sys.path[0], 'session-%s.yml' % self.configname)
+        if os.path.exists(sessionfile):
+            try:
+                self.session = yaml.safe_load(file(sessionfile))
+                if type(self.session) != types.DictType:
+                    raise Exception('Session file does not contain dictionary')
+            except Exception, e:
+                logging.critical("The session file has been broken. Execute flexget with --reset-session create new session and to avoid re-downloading everything. "\
+                                 "Downloads between time of break and now are lost. You must download these manually. "\
+                                 "This error is most likely caused by a bug in the software, check your log-file and report any tracebacks.")
+                logging.exception('Reason: %s' % e)
+                sys.exit(1)
+                
+    def load_session_shelf(self):
+        sessiondb = os.path.join(sys.path[0], 'session-%s.db' % self.configname)
+        self.session = shelve.open(sessiondb, protocol=2, writeback=True)
 
     def sanitize(self, d):
         """Makes dictionary d contain only yaml.safe_dump compatible elements"""
@@ -204,24 +210,28 @@ class Manager:
                 d.pop(k)
 
     def save_session(self):
-        if self.configname==None:
+        if not self.configname:
             raise Exception('self.configname missing')
             
         if self.options.experimental:
-            print "using shelve"
-            sessiondb = os.path.join(sys.path[0], 'session-%s.db' % self.configname)
-            self.session.close()
+            self.save_session_shelf()
         else:
-            try:
-                sessionfile = os.path.join(sys.path[0], 'session-%s.yml' % self.configname)
-                
-                f = file(sessionfile, 'w')
-                self.sanitize(self.session)
-                yaml.safe_dump(self.session, f, allow_unicode=True)
-                f.close()
-            except Exception, e:
-                logging.exception("Failed to save session data (%s)!" % e)
-                logging.critical(yaml.dump(self.session))
+            self.save_session_yaml()
+
+    def save_session_yaml(self):
+        try:
+            sessionfile = os.path.join(sys.path[0], 'session-%s.yml' % self.configname)
+            
+            f = file(sessionfile, 'w')
+            self.sanitize(self.session)
+            yaml.safe_dump(self.session, f, allow_unicode=True)
+            f.close()
+        except Exception, e:
+            logging.exception("Failed to save session data (%s)!" % e)
+            logging.critical(yaml.dump(self.session))
+
+    def save_session_shelf(self):
+        self.session.close()
         
     def load_modules(self, parser, moduledir):
         """Load and call register on all modules"""
