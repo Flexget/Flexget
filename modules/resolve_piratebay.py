@@ -1,8 +1,8 @@
-import urllib
 import urllib2
-import urlparse
 import logging
 from feed import ResolverException
+
+__pychecker__ = 'unusednames=parser,feed'
 
 log = logging.getLogger('piratebay')
 

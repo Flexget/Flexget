@@ -1,6 +1,8 @@
 import sys, os.path
 import types
 
+__pychecker__ = 'unusednames=parser'
+
 has_sqlite = True
 try:
     from pysqlite2 import dbapi2 as sqlite

@@ -13,6 +13,8 @@ try:
 except:
     soup_present = False
 
+__pychecker__ = 'unusednames=parser'
+
 log = logging.getLogger('imdb')
 
 class ImdbSearch:

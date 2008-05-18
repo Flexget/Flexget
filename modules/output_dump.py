@@ -1,5 +1,7 @@
 import yaml
 
+__pychecker__ = 'unusednames=parser'
+
 class YamlDump:
 
     """

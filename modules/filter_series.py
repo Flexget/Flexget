@@ -5,6 +5,8 @@ import types
 from datetime import tzinfo, timedelta, datetime
 from feed import Entry
 
+__pychecker__ = 'unusednames=parser'
+
 log = logging.getLogger('series')
 
 class SerieParser:

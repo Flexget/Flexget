@@ -1,8 +1,8 @@
-import yaml
-import re
-import os, sys
+import os
 import urllib2
 import logging
+
+__pychecker__ = 'unusednames=parser,feed'
 
 log = logging.getLogger('download')
 

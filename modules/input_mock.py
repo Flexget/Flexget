@@ -1,6 +1,8 @@
 import logging
 from feed import Entry
 
+__pychecker__ = 'unusednames=parser'
+
 log = logging.getLogger('input_mock')
 
 class InputMock:

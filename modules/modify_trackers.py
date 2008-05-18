@@ -1,6 +1,7 @@
-import yaml
 import re
 import logging
+
+__pychecker__ = 'unusednames=parser'
 
 log = logging.getLogger('remove_trackers')
 

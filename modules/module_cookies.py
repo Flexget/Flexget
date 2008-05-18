@@ -1,6 +1,8 @@
 import logging
 import urllib2
 
+__pychecker__ = 'unusednames=parser,feed'
+
 log = logging.getLogger('cookies')
 
 class ModuleCookies:

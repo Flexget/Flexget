@@ -1,6 +1,8 @@
 import logging
 from filter_seen import FilterSeen
 
+__pychecker__ = 'unusednames=parser'
+
 log = logging.getLogger('seenmovies')
 
 class FilterSeenMovies(FilterSeen):

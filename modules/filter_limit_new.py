@@ -1,5 +1,7 @@
 import logging
 
+__pychecker__ = 'unusednames=parser'
+
 log = logging.getLogger('limit_new')
 
 class FilterLimitNew:

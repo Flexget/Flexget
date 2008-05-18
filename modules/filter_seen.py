@@ -1,6 +1,8 @@
 import urllib
 import logging
 
+__pychecker__ = 'unusednames=parser'
+
 log = logging.getLogger('seen')
 
 class FilterSeen:
@@ -36,7 +38,7 @@ class FilterSeen:
             for field in self.fields:
                 if not entry.has_key(field):
                     continue
-                feed.shared_cache.store(entry[field], True, 365)    
+                feed.shared_cache.store(entry[field], True, 365)
             
             # verbose if in learning mode
             if feed.manager.options.learn:

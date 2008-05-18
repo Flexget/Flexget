@@ -1,7 +1,8 @@
 import yaml
 import re
 import logging
-import types
+
+__pychecker__ = 'unusednames=parser'
 
 log = logging.getLogger('modify_torrent')
 

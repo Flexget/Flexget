@@ -1,6 +1,7 @@
-import yaml
 import sys
 import logging
+
+__pychecker__ = 'unusednames=parser'
 
 log = logging.getLogger('torrent_size')
 

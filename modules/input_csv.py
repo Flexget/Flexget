@@ -1,8 +1,5 @@
-import urllib
 import urllib2
-import urlparse
 import logging
-import re
 from feed import Entry
 
 log = logging.getLogger('csv')

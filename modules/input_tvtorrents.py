@@ -1,10 +1,11 @@
-import urllib
 import urllib2
 import urlparse
 import logging
 from socket import timeout
 import re
 from feed import Entry
+
+__pychecker__ = 'unusednames=parser'
 
 log = logging.getLogger('tvtorrents')
 

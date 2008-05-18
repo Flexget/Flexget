@@ -2,6 +2,8 @@ import logging
 import datetime
 import types
 
+__pychecker__ = 'unusednames=parser'
+
 log = logging.getLogger('make_rss')
 
 rss2gen = True

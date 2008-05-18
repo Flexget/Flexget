@@ -1,4 +1,3 @@
-import os.path
 import logging
 import types
 from datetime import tzinfo, timedelta, datetime

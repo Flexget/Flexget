@@ -1,9 +1,7 @@
 import logging
 import urlparse
-import urllib
 import urllib2
 import xml.sax
-import re
 import types
 from feed import Entry
 
@@ -13,6 +11,8 @@ try:
 except ImportError:
     feedparser_present = False
 
+__pychecker__ = 'unusednames=parser'
+ 
 log = logging.getLogger('rss')
 
 class InputRSS:

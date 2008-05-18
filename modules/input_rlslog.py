@@ -1,11 +1,11 @@
-import urllib
 import urllib2
-import urlparse
 import logging
 import re
 import yaml
 from httplib import BadStatusLine
 from feed import Entry
+
+__pychecker__ = 'unusednames=parser'
 
 log = logging.getLogger('rlslog')
 

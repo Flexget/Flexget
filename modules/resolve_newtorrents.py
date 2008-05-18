@@ -1,8 +1,9 @@
 import urllib2
-import urlparse
 import logging
 import re
 from feed import ResolverException
+
+__pychecker__ = 'unusednames=parser,feed'
 
 log = logging.getLogger("newtorrents")
 

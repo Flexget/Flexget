@@ -4,6 +4,8 @@ import re
 import types
 from filter_patterns import FilterPatterns
 
+__pychecker__ = 'unusednames=parser'
+
 log = logging.getLogger('ignore')
 
 class IgnoreFilter(FilterPatterns):

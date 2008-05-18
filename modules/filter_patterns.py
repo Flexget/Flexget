@@ -3,6 +3,8 @@ import logging
 import re
 import types
 
+__pychecker__ = 'unusednames=parser,feed'
+
 log = logging.getLogger('patterns')
 
 class FilterPatterns:

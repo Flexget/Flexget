@@ -2,6 +2,8 @@ import sys
 import os
 import logging
 
+__pychecker__ = 'unusednames=parser'
+
 log = logging.getLogger('exists')
 
 class FilterExists:
