@@ -140,11 +140,7 @@ class ModuleDownload:
         if os.path.exists(destfile):
             raise Warning("File '%s' already exists" % destfile)
         
-        # write file
-        if not os.path.exists(destfile):
-            log.error("Cannot write output file %s, does the path exist?" % destfile)
-            return
-        
+        # write file        
         try:
             f = file(destfile, 'w')
             f.write(entry['data'])
