@@ -6,6 +6,7 @@ import types
 import time
 from datetime import tzinfo, timedelta, datetime
 from feed import Feed
+import shelve
 
 try:
   from optparse import OptionParser, SUPPRESS_HELP
@@ -93,6 +94,8 @@ class Manager:
                           help="Disables stdout and stderr output. Logging is done only to file.")
         parser.add_option("-d", action="store_true", dest="details", default=0,
                           help="Display detailed process information.")
+        parser.add_option("--experimental", action="store_true", dest="experimental", default=0,
+                          help="Use experimental features.")
         parser.add_option("--debug", action="store_true", dest="debug", default=0,
                           help=SUPPRESS_HELP)
 
@@ -144,6 +147,9 @@ class Manager:
                 sys.exit(1)
             self.session['version'] = self.session_version
 
+        if self.options.experimental:
+            print "EXPERIMENTAL FEATURES ENABLED"
+
         took = time.clock() - start_time
         logging.debug('Startup took %.2f seconds' % took)
 
@@ -161,19 +167,24 @@ class Manager:
 
     def load_session(self):
         # sessions are config-specific
-        if self.configname==None: raise Exception('self.configname missing')
-        sessionfile = os.path.join(sys.path[0], 'session-%s.yml' % self.configname)
-        if os.path.exists(sessionfile):
-            try:
-                self.session = yaml.safe_load(file(sessionfile))
-                if type(self.session) != types.DictType:
-                    raise Exception('Session file does not contain dictionary')
-            except Exception, e:
-                logging.critical("The session file has been broken. Execute flexget with --reset-session create new session and to avoid re-downloading everything. "\
-                "Downloads between time of break and now are lost. You must download these manually. "\
-                "This error is most likely caused by a bug in the software, check your log-file and report any tracebacks.")
-                logging.exception('Reason: %s' % e)
-                sys.exit(1)
+        if self.configname==None:
+            raise Exception('self.configname missing')
+        if self.options.experimental:
+            sessiondb = os.path.join(sys.path[0], 'session-%s.db' % self.configname)
+            self.session = shelve.open(sessiondb, protocol=2, writeback=True)
+        else:
+            sessionfile = os.path.join(sys.path[0], 'session-%s.yml' % self.configname)
+            if os.path.exists(sessionfile):
+                try:
+                    self.session = yaml.safe_load(file(sessionfile))
+                    if type(self.session) != types.DictType:
+                        raise Exception('Session file does not contain dictionary')
+                except Exception, e:
+                    logging.critical("The session file has been broken. Execute flexget with --reset-session create new session and to avoid re-downloading everything. "\
+                                     "Downloads between time of break and now are lost. You must download these manually. "\
+                                     "This error is most likely caused by a bug in the software, check your log-file and report any tracebacks.")
+                    logging.exception('Reason: %s' % e)
+                    sys.exit(1)
 
     def sanitize(self, d):
         """Makes dictionary d contain only yaml.safe_dump compatible elements"""
@@ -193,17 +204,24 @@ class Manager:
                 d.pop(k)
 
     def save_session(self):
-        try:
-            if self.configname==None: raise Exception('self.configname missing')
-            sessionfile = os.path.join(sys.path[0], 'session-%s.yml' % self.configname)
-            f = file(sessionfile, 'w')
-            self.sanitize(self.session)
-            #yaml.safe_dump(self.session, f) # safe_dump removes !!python/unicode which fails to load
-            yaml.safe_dump(self.session, f, allow_unicode=True)
-            f.close()
-        except Exception, e:
-            logging.exception("Failed to save session data (%s)!" % e)
-            logging.critical(yaml.dump(self.session))
+        if self.configname==None:
+            raise Exception('self.configname missing')
+            
+        if self.options.experimental:
+            print "using shelve"
+            sessiondb = os.path.join(sys.path[0], 'session-%s.db' % self.configname)
+            self.session.close()
+        else:
+            try:
+                sessionfile = os.path.join(sys.path[0], 'session-%s.yml' % self.configname)
+                
+                f = file(sessionfile, 'w')
+                self.sanitize(self.session)
+                yaml.safe_dump(self.session, f, allow_unicode=True)
+                f.close()
+            except Exception, e:
+                logging.exception("Failed to save session data (%s)!" % e)
+                logging.critical(yaml.dump(self.session))
         
     def load_modules(self, parser, moduledir):
         """Load and call register on all modules"""
