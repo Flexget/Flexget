@@ -1,0 +1,10 @@
+# unittest
+
+feeds:
+  test:
+    # make test data
+    input_mock:
+      - {title: 'something', url: 'http://localhost/asdf'}
+      - {title: 'bar', url: 'http://localhost/foo'}
+    patterns:
+      - something

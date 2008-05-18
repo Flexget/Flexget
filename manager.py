@@ -31,14 +31,13 @@ class Manager:
     EVENTS = ["start", "input", "filter", "resolve", "download", "modify", "output", "exit", "terminate"]
     
     def __init__(self):
-        start_time = time.clock()
-      
         self.configname = None
         self.options = None
         self.modules = {}
         self.resolvers = {}
         self.session = {}
         self.config = {}
+        self.initialized = False
 
         # settings
         self.moduledir = os.path.join(sys.path[0], "modules/")
@@ -111,6 +110,8 @@ class Manager:
         if self.options.test and self.options.learn:
             print "--test and --learn are mutually exclusive"
             sys.exit(1)
+        if self.options.reset:
+            self.options.learn = True
 
         # now once options are parsed set logging level properly
         level = logging.INFO
@@ -131,11 +132,18 @@ class Manager:
             console.setFormatter(formatter)
             logging.getLogger().addHandler(console)
 
+    def initialize(self):
+        """Loads configuration and session file, separated to own method because of unittests"""
+        start_time = time.clock()
+      
         # load config & session
-        self.load_config()
-        if self.options.reset:
-            self.options.learn = True
-        else:
+        try:
+            self.load_config()
+        except Exception, e:
+            logging.critical(e)
+            sys.exit(1)
+            
+        if not self.options.reset:
             self.load_session()
         # check if session version number is different
         if self.session.setdefault('version', self.session_version) != self.session_version:
@@ -147,11 +155,9 @@ class Manager:
                 sys.exit(1)
             self.session['version'] = self.session_version
 
-        if self.options.experimental:
-            print "EXPERIMENTAL FEATURES ENABLED"
-
         took = time.clock() - start_time
-        logging.debug('Startup took %.2f seconds' % took)
+        logging.debug('Fileloads took %.2f seconds' % took)
+        self.initialized = True
 
     def load_config(self):
         """Load the configuration file"""
@@ -162,8 +168,8 @@ class Manager:
                 self.configname = os.path.basename(config)[:-4]
                 return
         logging.debug('Tried to read from: %s' % string.join(possible, ', '))
-        logging.error('Could not find configuration file %s' % self.options.config)
-        sys.exit(0)
+        raise Exception('Failed to load configuration file %s' % self.options.config)
+        
 
     def load_session(self):
         if not self.configname:
@@ -441,10 +447,12 @@ class Manager:
 
     def execute(self):
         """Iterate trough all feeds and run them."""
+        if not self.initialized:
+            self.initialize()
         try:
             if not self.config:
-              logging.critical('Configuration file is empty.')
-              return
+                logging.critical('Configuration file is empty.')
+                return
             feeds = self.config.get('feeds', {}).keys()
             if not feeds: logging.critical('There are no feeds in the configuration file!')
 
