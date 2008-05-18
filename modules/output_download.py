@@ -131,13 +131,20 @@ class ModuleDownload:
         # make filename, if entry has perefered filename attribute use it, if not use title
         if not entry.has_key('filename'):
             log.warn('Unable to figure proper filename extension for %s' % entry['title'])
+
+        if not os.path.exists(os.path.expanduser(path)):
+            log.error("Cannot write output file %s, does the path exist?" % destfile)
+            return
+
         destfile = os.path.join(os.path.expanduser(path), entry.get('filename', entry['title']))
         if os.path.exists(destfile):
             raise Warning("File '%s' already exists" % destfile)
+        
         # write file
         if not os.path.exists(destfile):
             log.error("Cannot write output file %s, does the path exist?" % destfile)
             return
+        
         try:
             f = file(destfile, 'w')
             f.write(entry['data'])
