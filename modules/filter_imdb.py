@@ -222,7 +222,11 @@ class ImdbParser:
             setattr(self, n, value)
 
     def parse(self, url):
-        page = urllib2.urlopen(url)
+        try:
+            page = urllib2.urlopen(url)
+        except ValueError:
+            raise ValueError("Invalid url %s" % url)
+            
         soup = BeautifulSoup(page)
 
         # get name
@@ -392,6 +396,9 @@ class FilterImdb:
                         feed.filter(entry)
                         # store cache so this will be skipped
                         feed.shared_cache.store(entry['imdb_url'], imdb.to_yaml())
+                        continue
+                    except ValueError:
+                        log.error("Invalid parameter: %s " % entry['imdb_url'])
                         continue
                 else:
                     imdb.from_yaml(cached)
