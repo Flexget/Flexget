@@ -1,9 +1,25 @@
 #!/usr/bin/python
 
 from manager import Manager
+import os
+import os.path
+import sys
 
 if __name__ == "__main__":
     manager = Manager()
+
+    lockfile = os.path.join(sys.path[0], ".%s-lock" % manager.configname)
+    if os.path.exists(lockfile):
+        f = file(lockfile)
+        pid = f.read()
+        f.close()
+        print "Another process (%s) is running, will exit" % pid
+        sys.exit(1)
+
+    f = file(lockfile, 'w')
+    f.write("PID: %s" % os.getpid())
+    f.close()
+    
     if manager.options.doc:
         manager.print_module_doc()
     elif manager.options.list:
@@ -14,3 +30,5 @@ if __name__ == "__main__":
         manager.clear_failed()
     else:
         manager.execute()
+
+    os.remove(lockfile)
