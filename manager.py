@@ -429,7 +429,7 @@ class Manager:
             if d2.has_key(k):
                 if type(v) == type(d2[k]):
                     if type(v) == types.DictType:
-                        self.__merge_config(self, d1[k], d2[k])
+                        self.merge_dict(self, d1[k], d2[k])
                     elif type(v) == types.ListType:
                         d2[k].extend(v)
                     else:
