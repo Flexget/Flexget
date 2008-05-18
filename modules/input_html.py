@@ -16,7 +16,6 @@ soup_err = "Module feed_html requires BeautifulSoup. Please install it from http
 try:
     from BeautifulSoup import BeautifulSoup
 except:
-    log.warning(soup_err)
     soup_present = False
 
 class InputHtml:
@@ -76,16 +75,3 @@ class InputHtml:
             entry['title'] = title
 
             feed.entries.append(entry)
-
-if __name__ == '__main__':
-    import sys
-    logging.basicConfig(level=logging.DEBUG)
-
-    from test_tools import MockFeed
-    feed = MockFeed()
-    feed.config['html'] = sys.argv[1]
-
-    module = InputHtml()
-    module.run(feed)
-
-    feed.dump_entries()
