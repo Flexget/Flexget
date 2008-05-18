@@ -18,7 +18,7 @@ class TestPatterns(unittest.TestCase):
             self.fail('patterns module not loaded')
         self.feed.execute()
         if not self.feed.entries:
-            self.faile('no entries')
+            self.fail('no entries')
         entry = self.feed.entries[0]
         self.assertEqual(entry['title'], 'something')
         self.assertEqual(entry['url'], 'http://localhost/asdf')
