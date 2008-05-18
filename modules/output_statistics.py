@@ -5,9 +5,16 @@ __pychecker__ = 'unusednames=parser'
 
 has_sqlite = True
 try:
-    from pysqlite2 import dbapi2 as sqlite
+    import sqlite3 as sqlite # python >2.5 only
 except:
     has_sqlite = False
+    
+# fall back to pysqlite on older versions
+if not has_sqlite:
+    try:
+        from pysqlite2 import dbapi2 as sqlite
+    except:
+        has_sqlite = False
 
 has_pygooglechart = True
 try:
@@ -46,7 +53,7 @@ class Statistics:
         
     def input(self, feed):
         if not has_sqlite:
-            raise Exception('module statistics requires python-sqlite2 (Sqlite v3) library.')
+            raise Exception('module statistics requires python-sqlite2 or python 2.5.')
         self.total = len(feed.entries)
 
     def exit(self, feed):
