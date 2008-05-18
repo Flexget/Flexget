@@ -399,6 +399,7 @@ class FilterImdb:
                         continue
                     except ValueError:
                         log.error("Invalid parameter: %s " % entry['imdb_url'])
+                        feed.filter(entry)
                         continue
                 else:
                     imdb.from_yaml(cached)
