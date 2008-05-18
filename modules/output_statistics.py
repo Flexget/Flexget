@@ -65,7 +65,7 @@ class Statistics:
         self.init(con)
         cur = con.cursor()
 
-        cur.execute("insert into statistics (timestamp, feed, success, failure) values (datetime('now'), '%s', %d, %d);" % (feed.name, self.passed, self.failed))
+        cur.execute("insert into statistics (timestamp, feed, success, failure) values (datetime('now'), ?, ?, ?);", (feed.name, self.passed, self.failed))
 
         con.commit()
         con.close()
