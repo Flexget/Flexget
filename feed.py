@@ -119,12 +119,14 @@ class Feed:
         # true when executing from unittest
         self.unittest = False
         
-        # accepted entries are always accepted, filtering does not affect them
-        self.__accepted = [] 
-        self.__filtered = []
-        # rejected enteries are removed unconditionally, even if accepted
-        self.__rejected = []
-        self.__failed = []
+        # You should NOT change these arrays at any point, and in most cases not even read them!
+        # Mainly public since unittest needs these
+        
+        self.accepted = [] # accepted entries are always accepted, filtering does not affect them
+        self.filtered = [] # filtered entries
+        self.rejected = [] # rejected entries are removed unconditionally, even if accepted
+        self.failed = []
+        
         self.__abort = False
         self.__purged = 0
         
@@ -136,30 +138,24 @@ class Feed:
         
     def _purge(self):
         """Purge filtered entries from feed. Call this from module only if you know what you're doing."""
-        for entry in self.entries[:]:
-            if entry in self.__filtered and not entry in self.__accepted:
-                logging.debug('Purging entry %s' % entry.safe_str())
-                self.entries.remove(entry)
-                self.__purged += 1
-        self.__filtered = []
-        
+        self.__purge(self.filtered, self.accepted)
+
     def __purge_failed(self):
         """Purge failed entries from feed."""
-        for entry in self.entries[:]:
-            if entry in self.__failed:
-                logging.debug('Purging failed entry %s' % entry.safe_str())
-                self.entries.remove(entry)
+        self.__purge(self.failed, [], False)
 
     def __purge_rejected(self):
         """Purge rejected entries from feed."""
-        if not self.__rejected:
-            return
+        self.__purge(self.rejected)
+
+    def __purge(self, list, not_in_list=[], count=True):
+        """Purge entries in list from feed.entries"""
         for entry in self.entries[:]:
-            if entry in self.__rejected:
-                logging.debug('Purging immediately entry %s' % entry.safe_str())
+            if entry in list and entry not in not_in_list:
+                logging.debug('Purging entry %s' % entry.safe_str())
                 self.entries.remove(entry)
-                self.__purged += 1
-        self.__rejected = []
+                if count:
+                    self.__purged += 1
         
     def __convert_entries(self):
         """Temporary method for converting dict entries into Entries"""
@@ -177,41 +173,43 @@ class Feed:
 
     def accept(self, entry):
         """Accepts this entry."""
-        if not entry in self.__accepted:
-            self.__accepted.append(entry)
-            self.verbose_details('Accepted %s' % entry['title'])
+        if not entry in self.accepted:
+            self.accepted.append(entry)
+            if entry in self.filtered:
+                self.filtered.remove(entry)
+                self.verbose_details('Accepted previously filtered %s' % entry['title'])
+            else:
+                self.verbose_details('Accepted %s' % entry['title'])
+                
 
     def filter(self, entry):
         """Mark entry to be filtered unless told otherwise. Entry may still be accepted."""
         # accepted checked only because it makes more sense when verbosing details
-        if not entry in self.__filtered and not entry in self.__accepted:
-            self.__filtered.append(entry)
+        if not entry in self.filtered and not entry in self.accepted:
+            self.filtered.append(entry)
             self.verbose_details('Filtered %s' % entry['title'])
 
     def reject(self, entry):
         """Reject this entry immediattely and permanently."""
         # schedule immediately filtering after this module has done execution
-        if not entry in self.__rejected:
-            self.__rejected.append(entry)
+        if not entry in self.rejected:
+            self.rejected.append(entry)
             self.verbose_details('Rejected %s' % entry['title'])
 
     def failed(self, entry):
         """Mark entry as failed."""
         logging.debug("Marking entry '%s' as failed" % entry['title'])
-        if not entry in self.__failed:
-            self.__failed.append(entry)
+        if not entry in self.failed:
+            self.failed.append(entry)
             self.manager.add_failed(entry)
             self.verbose_details('Failed %s' % entry['title'])
 
-    def get_failed_entries(self):
-        """Return set containing failed entries"""
-        return set(self.__failed)
-
     def get_succeeded_entries(self):
         """Return set containing successfull entries"""
+        # TODO: isn't feed.entries always only succeeded since failed are purged between modules?!
         succeeded = []
         for entry in self.entries:
-            if not entry in self.__failed:
+            if not entry in self.failed:
                 succeeded.append(entry)
         return succeeded
 
