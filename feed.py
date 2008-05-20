@@ -1,6 +1,6 @@
 import logging
 import types
-from datetime import tzinfo, timedelta, datetime
+from datetime import datetime
 
 class ResolverException(Exception):
     def __init__(self, value):
@@ -44,6 +44,8 @@ class ModuleCache:
 
     def __init__(self, name, storage):
         self.__storage = storage.setdefault(name, {})
+        self._cache = None
+        self.__namespace = None
 
     def set_namespace(self, name):
         self._cache = self.__storage.setdefault(name, {})
@@ -79,7 +81,7 @@ class ModuleCache:
     def get(self, key, default=None):
         """Return value by key from cache. Return None or default if not found"""
         item = self._cache.get(key)
-        if item == None:
+        if item is None:
             return default
         else:
             return item['value']
@@ -125,6 +127,10 @@ class Feed:
         self.__failed = []
         self.__abort = False
         self.__purged = 0
+        
+        # state
+        self.__current_event = None
+        self.__current_module = None
 
         self.check_config()
         
@@ -372,9 +378,9 @@ class Feed:
 
     def check_config(self):
         """Checks that feed configuration does not have mistyped modules"""
-        def available(kw):
+        def available(keyword):
             for event in self.manager.EVENTS:
-                if self.manager.modules.get(event, {}).has_key(kw):
+                if self.manager.modules.get(event, {}).has_key(keyword):
                     return True
         for kw in self.config.keys():
             if kw in ['disable_builtins']:
