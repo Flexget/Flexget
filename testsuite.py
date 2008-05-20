@@ -10,6 +10,11 @@ class FlexGetTestCase(unittest.TestCase):
             self.fail('Config file missing')
         self.manager = Manager()
         self.manager.options.config = self.config
+        # do not write session, note this will skip events DOWNLOAD and OUTPUT
+        # will need to be re-thinked when those events are to be tested
+        self.manager.options.test = True
+        # do not load session
+        self.manager.options.reset = True
         self.manager.load_config()
         config = self.manager.config['feeds']['test']
         self.feed = Feed(self.manager, 'test', config)
@@ -18,12 +23,6 @@ class FlexGetTestCase(unittest.TestCase):
 
 class TestPatterns(FlexGetTestCase):
 
-    """    
-    def __init__(self):
-        self.config = 'test/test_patterns.yml'
-        TestCase.__init__(self)
-    """
-                
     def setUp(self):
         self.config = 'test/test_patterns.yml'
         FlexGetTestCase.setUp(self)
