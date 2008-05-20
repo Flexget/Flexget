@@ -21,7 +21,7 @@ class FilterLimitNew:
     """
 
     def register(self, manager, parser):
-        manager.register(instance=self, event='filter', keyword='limit_new', callback=self.limit, order=65535)
+        manager.register(event='filter', keyword='limit_new', callback=self.limit, order=65535)
 
     def limit(self, feed):
         # purge filtered items since we don't want to pass any of them

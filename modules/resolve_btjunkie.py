@@ -8,7 +8,7 @@ class ResolveBtJunkie:
     """BtJunkie resolver."""
 
     def register(self, manager, parser):
-        manager.register_resolver(instance=self, name='btjunkie')
+        manager.register_resolver(name='btjunkie')
 
     def resolvable(self, feed, entry):
         return entry['url'].startswith('http://btjunkie.org')

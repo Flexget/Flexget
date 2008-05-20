@@ -35,8 +35,8 @@ class ModuleDownload:
     """
 
     def register(self, manager, parser):
-        manager.register(instance=self, event="download", keyword="download", callback=self.execute_downloads)
-        manager.register(instance=self, event="output", keyword="download", callback=self.execute_outputs)
+        manager.register(event="download", keyword="download", callback=self.execute_downloads)
+        manager.register(event="output", keyword="download", callback=self.execute_outputs)
         # add new commandline parameter
         parser.add_option("--dl-path", action="store", dest="dl_path", default=False,
                           help="Override path for download module. Applies to all executed feeds.")

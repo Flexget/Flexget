@@ -18,7 +18,7 @@ class FilterTorrentSize:
     """
 
     def register(self, manager, parser):
-        manager.register(instance=self, event='modify', keyword='torrent_size', callback=self.run)
+        manager.register(event='modify', keyword='torrent_size', callback=self.run)
 
     def run(self, feed):
         config = feed.config['torrent_size']

@@ -25,7 +25,7 @@ class CliConfig:
     """
 
     def register(self, manager, parser):
-        manager.register(instance=self, event='start', keyword='cli_config', callback=self.run, builtin=True)
+        manager.register(event='start', keyword='cli_config', callback=self.run, builtin=True)
         parser.add_option('--cli-config', action='store', dest='cli_config', default=False,
                           help='Configuration parameters trough commandline. See --doc cli_config.')
         self.replaces = {}        

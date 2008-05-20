@@ -17,8 +17,8 @@ class FilterSeen:
     """
 
     def register(self, manager, parser):
-        manager.register(instance=self, event='filter', keyword='seen', callback=self.filter_seen, order=-100, builtin=True)
-        manager.register(instance=self, event='exit', keyword='seen', callback=self.learn_succeeded, builtin=True)
+        manager.register(event='filter', keyword='seen', callback=self.filter_seen, order=-100, builtin=True)
+        manager.register(event='exit', keyword='seen', callback=self.learn_succeeded, builtin=True)
 
         # remember and filter by these fields
         self.fields = ['original_url', 'title']

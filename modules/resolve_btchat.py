@@ -8,7 +8,7 @@ class ResolveBtJunkie:
     """BtChat resolver."""
 
     def register(self, manager, parser):
-        manager.register_resolver(instance=self, name='btchat')
+        manager.register_resolver(name='btchat')
 
     def resolvable(self, feed, entry):
         return entry['url'].startswith('http://www.bt-chat.com/download.php')

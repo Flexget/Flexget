@@ -66,8 +66,8 @@ class OutputRSS:
         self.written = {}
 
     def register(self, manager, parser):
-        manager.register(instance=self, event='exit', keyword='make_rss', callback=self.store_entries)
-        manager.register(instance=self, event='terminate', keyword='make_rss', callback=self.write_rss)
+        manager.register(event='exit', keyword='make_rss', callback=self.store_entries)
+        manager.register(event='terminate', keyword='make_rss', callback=self.write_rss)
         
     def get_config(self, feed):
         config = feed.config['make_rss']

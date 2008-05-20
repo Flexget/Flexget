@@ -52,7 +52,7 @@ class FilterPatterns:
 
     
     def register(self, manager, parser):
-        manager.register(instance=self, event="filter", keyword="patterns", callback=self.patterns, order=0)
+        manager.register(event='filter', keyword='patterns', callback=self.patterns, order=0)
 #        parser.add_option("--try-pattern", action="store", dest="try_pattern", default=None,
 #                          help="Run with given pattern. Useful to try out matching with --test.")
 

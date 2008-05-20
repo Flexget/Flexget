@@ -44,7 +44,7 @@ class InputRSS:
     """
 
     def register(self, manager, parser):
-        manager.register(instance=self, event="input", keyword="rss", callback=self.run)
+        manager.register(event="input", keyword="rss", callback=self.run)
 
     def passwordize(self, url, user, password):
         """Add username and password to url"""

@@ -9,7 +9,7 @@ class YamlDump:
     """
 
     def register(self, manager, parser):
-        manager.register(instance=self, event="output", keyword="dump", callback=self.dump, builtin=False, debug_module=True)
+        manager.register(event="output", keyword="dump", callback=self.dump, builtin=False, debug_module=True)
 
     def dump(self, feed):
         for entry in feed.entries:

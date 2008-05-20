@@ -15,7 +15,7 @@ class ModifyExtension:
     """
 
     def register(self, manager, parser):
-        manager.register(instance=self, event='modify', keyword='extension', callback=self.run)
+        manager.register(event='modify', keyword='extension', callback=self.run)
 
     def run(self, feed):
         ext = feed.config.get('extension')

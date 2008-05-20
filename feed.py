@@ -114,6 +114,9 @@ class Feed:
 
         self.entries = []
         
+        # true when executing from unittest
+        self.unittest = False
+        
         # accepted entries are always accepted, filtering does not affect them
         self.__accepted = [] 
         self.__filtered = []
@@ -342,7 +345,7 @@ class Feed:
             if self.manager.options.learn:
                 if event in ['download', 'output']: continue
             # handle resolve event a bit special
-            if event == 'resolve':
+            if event == 'resolve' and not self.unittest:
                 self._resolve_entries()
                 self.__purge_failed()
                 continue

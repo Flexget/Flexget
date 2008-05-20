@@ -32,9 +32,9 @@ class Statistics:
         self.failed = 0
 
     def register(self, manager, parser):
-        manager.register(instance=self, event='input', keyword='statistics', callback=self.input, order=65535)
-        manager.register(instance=self, event='exit', keyword='statistics', callback=self.exit)
-        manager.register(instance=self, event='terminate', keyword='statistics', callback=self.generate_statistics)
+        manager.register(event='input', keyword='statistics', callback=self.input, order=65535)
+        manager.register(event='exit', keyword='statistics', callback=self.exit)
+        manager.register(event='terminate', keyword='statistics', callback=self.generate_statistics)
 
     def init(self, con):
         """Create the sqlite table if necessary"""

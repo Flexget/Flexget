@@ -16,7 +16,7 @@ class InputMock:
     """
 
     def register(self, manager, parser):
-        manager.register(instance=self, event='input', keyword='input_mock', callback=self.run, debug_module=True)
+        manager.register(event='input', keyword='input_mock', callback=self.run, debug_module=True)
 
     def run(self, feed):
         config = feed.config.get('input_mock', [])

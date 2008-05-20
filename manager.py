@@ -38,6 +38,8 @@ class Manager:
         self.session = {}
         self.config = {}
         self.initialized = False
+        
+        self.__instance = False
 
         # settings
         self.moduledir = os.path.join(sys.path[0], "modules/")
@@ -114,9 +116,7 @@ class Manager:
             self.options.learn = True
 
         # now once options are parsed set logging level properly
-        level = logging.INFO
         if self.options.debug:
-            level = logging.DEBUG
             # set 'mainlogger' to debug aswell or no debug output, this is done because of
             # shitty python logging that fails to output debug on console if basicConf level
             # is less (propably because I don't know how to use that pice of ... )
@@ -252,6 +252,9 @@ class Manager:
                     if hasattr(ns[name], 'register'):
                         try:
                             instance = ns[name]()
+                            # store current module instance so register method may access it
+                            # without modules having to explicitly give it as parameter
+                            self.__instance = instance
                         except:
                             logging.exception('Exception occured while creating instance %s' % name)
                             break
@@ -302,18 +305,18 @@ class Manager:
         """
             Modules call this method to register themselves.
             Mandatory arguments:
-                instance     - Instance of module (self)
-                keyword      - Maps directly into config
-                callback     - Method that is called when module is executed
-                event        - Specifies when module is executed and implies what it does
+                keyword      - Configuration
+                event        - Specifies event when module is executed in feed (and implies what it does)
+                callback     - Method that is called when module is being executed
             Optional arguments:
+                instance     - Instance of module (self)
                 order        - When multiple modules are enabled this is used to
                                determine execution order. Default 16384.
                 builtin      - Set to True if module should be executed always
                 debug_module - Set to True to hide this module from --list etc
         """
         # validate passed arguments
-        for arg in ['instance', 'keyword', 'callback', 'event']:
+        for arg in ['keyword', 'callback', 'event']:
             if not kwargs.has_key(arg):
                 raise RegisterException('Parameter %s is missing from register arguments' % arg)
         if not callable(kwargs['callback']):
@@ -326,6 +329,8 @@ class Manager:
         if self.modules[event].has_key(kwargs['keyword']):
             by = self.modules[event][kwargs['keyword']]['instance']
             raise RegisterException("Duplicate keyword with same event '%s'. Keyword: '%s' Reserved by: '%s'" % (event, kwargs['keyword'], by.__class__.__name__))
+        # get module instance from load_modules if it's not given
+        kwargs.setdefault('instance', self.__instance)
         # set optional parameter default values
         kwargs.setdefault('order', 16384)
         kwargs.setdefault('builtin', False)
@@ -336,10 +341,10 @@ class Manager:
             Resolver modules call this method to register themselves.
         """
         # validate passed arguments
-        for arg in ['instance', 'name']:
+        for arg in ['name']:
             if not kwargs.has_key(arg):
                 raise RegisterException('Parameter %s is missing from register arguments' % arg)
-        instance = kwargs['instance']
+        instance = kwargs.get('instance', self.__instance)
         name = kwargs['name']
         if not callable(getattr(instance, 'resolvable', None)):
             raise RegisterException('Resolver %s is missing resolvable method' % name)
@@ -347,7 +352,7 @@ class Manager:
             raise RegisterException('Resolver %s is missing resolve method' % name)
         if self.resolvers.has_key(name):
             raise RegisterException('Resolver %s is already registered' % name)
-        self.resolvers[name] = kwargs['instance']
+        self.resolvers[name] = instance
 
     def get_modules_by_event(self, event):
         """Return all modules by event."""
@@ -384,7 +389,7 @@ class Manager:
             event = module['event']
             if modules.index(module) > 0: event = ""
             doc = "Yes"
-            if module['instance'].__doc__ == None: doc = "No"
+            if not module['instance'].__doc__: doc = "No"
             print "%-20s%-30s%s" % (module['keyword'], string.join(roles[module['keyword']], ', '), doc)
         print "-"*60
 
@@ -396,7 +401,7 @@ class Manager:
             module = modules.get(keyword, None)
             if module:
                 found = True
-                if module['instance'].__doc__ == None:
+                if not module['instance'].__doc__:
                     print "Module %s does not have documentation" % keyword
                 else:
                     print module['instance'].__doc__
@@ -476,7 +481,7 @@ class Manager:
                 except Exception, e:
                     logging.exception(e)
                     continue
-                except Warning, w:
+                except Warning:
                     logging.critical('Global section has conflicting datatypes with feed %s configuration. Feed aborted.' % name)
                     continue
                 feed = Feed(self, name, config)

@@ -21,8 +21,8 @@ class ModuleCookies:
     """
 
     def register(self, manager, parser):
-        manager.register(instance=self, event='start', keyword='cookies', callback=self.start)
-        manager.register(instance=self, event='exit', keyword='cookies', callback=self.exit)
+        manager.register(event='start', keyword='cookies', callback=self.start)
+        manager.register(event='exit', keyword='cookies', callback=self.exit)
 
     def start(self, feed):
         config = feed.config['cookies']

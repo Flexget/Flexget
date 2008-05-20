@@ -17,7 +17,7 @@ class FilterExists:
     """
 
     def register(self, manager, parser):
-        manager.register(instance=self, event='filter', keyword='exists', callback=self.run)
+        manager.register(event='filter', keyword='exists', callback=self.run)
 
     def run(self, feed):
         path = feed.config.get('exists', None)

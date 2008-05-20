@@ -17,8 +17,8 @@ class FilterSeenMovies(FilterSeen):
     """
 
     def register(self, manager, parser):
-        manager.register(instance=self, event='filter', keyword='seen_movies', callback=self.filter_seen)
-        manager.register(instance=self, event='exit', keyword='seen_movies', callback=self.learn_succeeded)
+        manager.register(event='filter', keyword='seen_movies', callback=self.filter_seen)
+        manager.register(event='exit', keyword='seen_movies', callback=self.learn_succeeded)
 
         # remember and filter by these fields
         self.fields = ['imdb_url']

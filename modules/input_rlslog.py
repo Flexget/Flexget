@@ -28,7 +28,7 @@ class RlsLog:
     """
 
     def register(self, manager, parser):
-        manager.register(instance=self, event="input", keyword="rlslog", callback=self.run)
+        manager.register(event="input", keyword="rlslog", callback=self.run)
 
     def parse_imdb(self, s):
         score = None

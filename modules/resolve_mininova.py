@@ -8,7 +8,7 @@ class ResolveMininova:
     """Mininova resolver."""
 
     def register(self, manager, parser):
-        manager.register_resolver(instance=self, name='mininova')
+        manager.register_resolver(name='mininova')
 
     def resolvable(self, feed, entry):
         return entry['url'].startswith('http://www.mininova.org/tor/')

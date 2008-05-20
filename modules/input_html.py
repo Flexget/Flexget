@@ -32,7 +32,7 @@ class InputHtml:
     """
 
     def register(self, manager, parser):
-        manager.register(instance=self, event="input", keyword="html", callback=self.run)
+        manager.register(event="input", keyword="html", callback=self.run)
 
     def run(self, feed):
         if not soup_present: raise Exception(soup_err)

@@ -220,9 +220,9 @@ class FilterSeries:
     """
 
     def register(self, manager, parser):
-        manager.register(instance=self, event='filter', keyword='series', callback=self.filter_series)
-        manager.register(instance=self, event='input', keyword='series', callback=self.input_series, order=65535)
-        manager.register(instance=self, event='exit', keyword='series', callback=self.learn_succeeded)
+        manager.register(event='filter', keyword='series', callback=self.filter_series)
+        manager.register(event='input', keyword='series', callback=self.input_series, order=65535)
+        manager.register(event='exit', keyword='series', callback=self.learn_succeeded)
 
     def input_series(self, feed):
         """Retrieve stored series from cache, incase they've been expired from feed while waiting"""
