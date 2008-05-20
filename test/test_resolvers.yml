@@ -1,0 +1,8 @@
+# unittest
+
+feeds:
+  test:
+    # make test data
+    input_mock:
+      - {title: 'something', url: 'http://thepiratebay.org/tor/8492471/Test.avi'}
+      - {title: 'bar', url: 'http://thepiratebay.org/search/something'}
