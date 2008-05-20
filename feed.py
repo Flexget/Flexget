@@ -196,7 +196,7 @@ class Feed:
             self.rejected.append(entry)
             self.verbose_details('Rejected %s' % entry['title'])
 
-    def failed(self, entry):
+    def fail(self, entry):
         """Mark entry as failed."""
         logging.debug("Marking entry '%s' as failed" % entry['title'])
         if not entry in self.failed:
@@ -340,7 +340,7 @@ class Feed:
                 self.resolve(entry)
             except ResolverException, e:
                 logging.warn(e.value)
-                self.failed(entry)
+                self.fail(entry)
     
     def execute(self):
         """Execute this feed, runs events in order of events array."""

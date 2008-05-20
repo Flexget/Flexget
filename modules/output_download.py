@@ -56,11 +56,11 @@ class ModuleDownload:
                 else:
                     self.download(feed, entry)
             except IOError, e:
-                feed.failed(entry)
+                feed.fail(entry)
                 log.warning('Download of %s timed out' % entry['title']);
             except Exception, e:
                 # notify framework that outputing this entry failed
-                feed.failed(entry)
+                feed.fail(entry)
                 log.exception('Execute downloads: %s' % e)
 
     def download(self, feed, entry):
@@ -116,7 +116,7 @@ class ModuleDownload:
                 # different handling because IOError is "ok"
                 log.warning('Error while writing: %s' % e)
             except Exception, e:
-                feed.failed(entry)
+                feed.fail(entry)
                 log.exception('Error while writing: %s' % e)
 
     def output(self, feed, entry):
