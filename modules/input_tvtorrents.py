@@ -21,20 +21,20 @@ except:
 class InputTVTorrents:
     """
         A customized HTML input module. Parses out full torrent URLs from 
-        [[TVTorrents]]' page for Recently Aired TV shows.
+        TVTorrents' page for Recently Aired TV shows.
 
         A bit fragile right now, because it depends heavily on the exact 
-        structure of the HTML, as it looked today - 2008-05-17.
+        structure of the HTML.
 
         Just set tvt: true in your config, and provide the path to your login 
-        cookie by using the [[cookies]] module.
+        cookie by using the cookies module.
         
-        Note: Of yourse, you need to configure [[patterns]] filter to match only 
-        desired content. The [[series]] filter does NOT appear to work well with
+        Note: Of yourse, you need to configure patterns filter to match only 
+        desired content. The series filter does NOT appear to work well with
         this module yet - just use a pattern like (lost|csi).*?720p until we
         figure out why.
 
-        Module-specific code by [[Fredrik Br&auml;nstr&ouml;m]].
+        Module-specific code by Fredrik Braenstroem.
     """
 
     def register(self, manager, parser):
