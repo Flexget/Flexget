@@ -31,6 +31,8 @@ class Subtitles:
         config.setdefault('languages', ['eng'])
         config.setdefault('min_sub_rating', 0.0)
         config.setdefault('match_limit', 0.8)
+
+        config['output'] = os.path.expanduser(config['output'])
             
         return config
 
