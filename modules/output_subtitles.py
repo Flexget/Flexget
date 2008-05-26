@@ -1,5 +1,7 @@
 from xmlrpclib import ServerProxy
 import urllib2
+import re
+import difflib
 
 # movie hash, won't work here though
 # http://trac.opensubtitles.org/projects/opensubtitles/wiki/HashSourceCodes#Python
@@ -21,7 +23,8 @@ class Subtitles:
 
         # filter all entries that have IMDB ID set
 
-        
+        entries = filter(lambda x: x['imdb_url'] != None, feed.entries)
+
         s = ServerProxy("http://www.opensubtitles.org/xml-rpc")
         
         res = s.LogIn("", "", "en", "flexget")
@@ -31,41 +34,64 @@ class Subtitles:
 
         token = res['token']
 
-        # loop through the entries
-        
-
         # these go into config file
         languages = ['fin', 'swe', 'eng']
         min_sub_rating = 0.0
-    
 
-        query = []
-        for language in languages:
-            query.append({'sublanguageid': language, 'imdbid': imdbid})
+        # loop through the entries
+        for entry in entries:
             
-        subtitles = s.SearchSubtitles(token, query)
-        subtitles = subtitles['data']
-        # filter bad subs
-        subtitles = filter(lambda x: x['SubBad'] =='0', subtitles)
-        # some quality required (0.0 == not reviewed)
-        subtitles = filter(lambda x: float(x['SubRating']) >= min_sub_rating or float(x['SubRating']) == 0.0, subtitles)
+            # dig out the raw imdb id 
+            m = re.search("tt(\d+)/$", entry['imdb_url'])
+            if not m:
+                print "no match for "+entry['imdb_url']
+                continue
 
-        filtered_subs = []
-
-        # find the best rated subs for each language
-        for language in languages:
-            langsubs = filter(lambda x: x['SubLanguageID'] == language, subtitles)
-            # find the best one
-            # magic!
-            langsubs.sort(key=lambda x: float(x['SubRating']), reverse=True)
+            imdbid = m.group(1)
             
-            filtered_subs.append(langsubs[0])
+            query = []
+            for language in languages:
+                query.append({'sublanguageid': language, 'imdbid': imdbid})
+            
+            subtitles = s.SearchSubtitles(token, query)
+            subtitles = subtitles['data']
 
+            # nothing found -> continue
+            if not subtitles: continue
+            
+            # filter bad subs
+            subtitles = filter(lambda x: x['SubBad'] == '0', subtitles)
+            # some quality required (0.0 == not reviewed)
+            subtitles = filter(lambda x: float(x['SubRating']) >= min_sub_rating or float(x['SubRating']) == 0.0, subtitles)
 
-        # download
-        for sub in filtered_subs:
-            subfile = urllib2.urlopen(sub['SubDownloadLink']).read()
-            # save somewhere?
+            filtered_subs = []
+
+            # find the best rated subs for each language
+            for language in languages:
+                langsubs = filter(lambda x: x['SubLanguageID'] == language, subtitles)
+
+                # did we find any subs for this language?
+                if langsubs:
+
+                    def seqmatch(subfile):
+                        s = difflib.SequenceMatcher(lambda x: x in " ._", entry['title'], subfile)
+                        #print "matching: ", entry['title'], subfile, s.ratio()
+                        return s.ratio() > 0.8
+
+                    # filter only those that have matching release names
+                    langsubs = filter(lambda x: seqmatch(x['MovieReleaseName']), subtitles)
+
+                    if langsubs:
+                        # find the best one by SubRating
+                        langsubs.sort(key=lambda x: float(x['SubRating']), reverse=True)
+                        filtered_subs.append(langsubs[0])
+
+            # download
+            for sub in filtered_subs:
+                #print sub
+                print "SUBS FOUND: ", sub['MovieReleaseName'], sub['SubRating'], sub['SubLanguageID']
+                #subfile = urllib2.urlopen(sub['SubDownloadLink']).read()
+                # save somewhere?
 
         s.LogOut(token)
         
