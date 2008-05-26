@@ -37,6 +37,7 @@ class Subtitles:
         # these go into config file
         languages = ['fin', 'swe', 'eng']
         min_sub_rating = 0.0
+        match_limit = 0.8 # no need to change this, but it should be configurable
 
         # loop through the entries
         for entry in entries:
@@ -76,7 +77,7 @@ class Subtitles:
                     def seqmatch(subfile):
                         s = difflib.SequenceMatcher(lambda x: x in " ._", entry['title'], subfile)
                         #print "matching: ", entry['title'], subfile, s.ratio()
-                        return s.ratio() > 0.8
+                        return s.ratio() > match_limit
 
                     # filter only those that have matching release names
                     langsubs = filter(lambda x: seqmatch(x['MovieReleaseName']), subtitles)
