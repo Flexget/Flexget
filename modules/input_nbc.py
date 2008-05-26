@@ -2,7 +2,15 @@ import urllib2
 from feed import Entry
 import re
 
-"""Get Heroes novels from nbc.com"""
+"""Get Heroes novels from nbc.com
+
+Config:
+
+  nbc:
+    nbc: true
+    download: ~/comics/heroes/
+
+"""
 
 class InputNBC:
     def register(self, manager, parser):
