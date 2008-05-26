@@ -39,8 +39,11 @@ class Subtitles:
     def get_subtitles(self, feed):
 
         # filter all entries that have IMDB ID set
-
-        entries = filter(lambda x: x['imdb_url'] != None, feed.entries)
+        try:
+            entries = filter(lambda x: x['imdb_url'] != None, feed.entries)
+        except KeyError:
+            # No imdb urls on this feed, skip it
+            return
 
         s = ServerProxy("http://www.opensubtitles.org/xml-rpc")
         
