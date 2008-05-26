@@ -2,6 +2,9 @@ from xmlrpclib import ServerProxy
 import urllib2
 import re
 import difflib
+import os.path
+import sys
+import types
 
 # movie hash, won't work here though
 # http://trac.opensubtitles.org/projects/opensubtitles/wiki/HashSourceCodes#Python
@@ -19,6 +22,18 @@ class Subtitles:
     def register(self, manager, parser):
         manager.register(event='terminate', keyword='subtitles', callback=self.get_subtitles)
 
+    def get_config(self, feed):
+        config = feed.config['subtitles']
+        if type(config) != types.DictType:
+            config = {}
+
+        config.setdefault('output', os.path.join(sys.path[0]))
+        config.setdefault('languages', ['eng'])
+        config.setdefault('min_sub_rating', 0.0)
+        config.setdefault('match_limit', 0.8)
+            
+        return config
+
     def get_subtitles(self, feed):
 
         # filter all entries that have IMDB ID set
@@ -27,21 +42,22 @@ class Subtitles:
 
         s = ServerProxy("http://www.opensubtitles.org/xml-rpc")
         
-        res = s.LogIn("", "", "en", "flexget")
+        res = s.LogIn("", "", "en", "Flexget")
 
         if res['status'] != '200 OK':
             raise Exception("Login to opensubtitles.org XML-RPC interface failed")
 
+        config = self.get_config(feed)
+
         token = res['token']
 
         # these go into config file
-        languages = ['fin', 'swe', 'eng']
-        min_sub_rating = 0.0
-        match_limit = 0.8 # no need to change this, but it should be configurable
-
+        languages = config['languages']
+        min_sub_rating = config['min_sub_rating']
+        match_limit = config['match_limit'] # no need to change this, but it should be configurable
+        
         # loop through the entries
-        for entry in entries:
-            
+        for entry in entries:            
             # dig out the raw imdb id 
             m = re.search("tt(\d+)/$", entry['imdb_url'])
             if not m:
@@ -90,9 +106,15 @@ class Subtitles:
             # download
             for sub in filtered_subs:
                 #print sub
-                print "SUBS FOUND: ", sub['MovieReleaseName'], sub['SubRating'], sub['SubLanguageID']
-                #subfile = urllib2.urlopen(sub['SubDownloadLink']).read()
-                # save somewhere?
+                #print "SUBS FOUND: ", sub['MovieReleaseName'], sub['SubRating'], sub['SubLanguageID']
+
+                f = urllib2.urlopen(sub['ZipDownloadLink'])
+                subfilename = re.match('^attachment; filename="(.*)"$', f.info()['content-disposition']).group(1)
+                outfile = os.path.join(config['output'], subfilename)
+                fp = file(outfile, 'w')
+                fp.write(f.read())
+                fp.close()
+                f.close()
 
         s.LogOut(token)
         
