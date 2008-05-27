@@ -33,6 +33,14 @@ class Entry(dict):
     def safe_str(self):
         return "%s | %s" % (self['title'], self['url'])
 
+    def isvalid(self):
+        """Return True if entry is valid. Return False if this should cannot be used."""
+        if not self.has_key('title'):
+            return False
+        if not self.has_key('url'):
+            return True
+        return True
+
 class ModuleCache:
 
     """
