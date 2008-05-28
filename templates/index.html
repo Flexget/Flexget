@@ -1,0 +1,77 @@
+$def with (enabled, disabled)
+<?xml version="1.0"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+  <title>Flexget</title>
+  <link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/2.5.1/build/reset-fonts-grids/reset-fonts-grids.css" />
+  <link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/2.5.1/build/base/base-min.css" />
+
+<!-- Core + Skin CSS -->
+<link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/2.5.1/build/button/assets/skins/sam/button.css">
+
+<!-- Dependencies -->
+<script type="text/javascript" src="http://yui.yahooapis.com/2.5.1/build/yahoo-dom-event/yahoo-dom-event.js"></script>
+<script type="text/javascript" src="http://yui.yahooapis.com/2.5.1/build/element/element-beta-min.js"></script>
+
+<!-- Source file -->
+<script type="text/javascript" src="http://yui.yahooapis.com/2.5.1/build/button/button-min.js"></script>
+
+  <style type="text/css">
+    body {
+      font-size: 1em;
+    }
+    h1 {
+      font-size: 200%;
+    }
+    ul li {
+      list-style-type: none;
+    }
+    #menu li a {
+      width: 5em;
+    }
+  </style>
+</head>
+<body class="yui-skin-sam">
+
+<div id="doc2" class="yui-t1">
+<h1>Flexget WebUI</h1>
+
+<div id="bd">
+<div id="yui-main">
+  
+<div class="yui-b" style="border: 1px solid black;padding: 0em 1em 1em 1em;">
+$if enabled:
+  <h2>Enabled sources</h2>
+  <ul>
+    $for source in enabled:
+        <li>$source</li>
+  </ul>
+
+$if disabled:
+  <h2>Disabled sources</h2>
+  <ul>
+    $for source in disabled:
+        <li>$source</li>
+  </ul>
+</div>
+</div>
+
+<div class="yui-b" style="border: 1px solid black;">
+  <ul id="menu">
+    <li><a id="modulebutton" href="modules">Modules</a></li>
+    <li><a id="runbutton" href="run">Run</a></li>
+  </ul>
+</div>
+
+</div>
+
+</div>
+
+<script type="text/javascript">
+var oLinkButton1 = new YAHOO.widget.Button("modulebutton"); 
+var oLinkButton2 = new YAHOO.widget.Button("runbutton"); 
+</script>
+</body>
+</html>
