@@ -1,6 +1,7 @@
 import logging
 import datetime
 import types
+import operator
 
 __pychecker__ = 'unusednames=parser'
 
@@ -129,6 +130,10 @@ class OutputRSS:
             return
         data_items = feed.shared_cache.get(config['file'])
 
+        # sort items by pubDate
+        data_items.sort(key=operator.itemgetter('pubDate'))
+        data_items.reverse()
+          
         # make items
         rss_items = []
         for data_item in data_items[:]:
@@ -145,8 +150,6 @@ class OutputRSS:
             else:
                 # purge from storage
                 data_items.remove(data_item)
-            
-        rss_items.reverse()
 
         # make rss
         rss = PyRSS2Gen.RSS2(title = 'FlexGet',
