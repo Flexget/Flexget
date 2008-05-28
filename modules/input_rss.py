@@ -82,37 +82,37 @@ class InputRSS:
         except IOError:
             raise Exception("IOError when loading feed %s", feed.name)
 
-        try:
-            # status checks
-            if rss.status == 304:
+        # status checks
+        status = rss.get('status', False)
+        if status:
+            if status == 304:
                 log.debug("Feed %s hasn't changed, skipping" % feed.name)
                 return
-            elif rss.status == 401:
+            elif status == 401:
                 raise Warning("Authentication needed for feed %s: %s", feed.name, rss.headers['www-authenticate'])
-            elif rss.status == 404:
-                raise Warning("Feed %s not found", feed.name)
-            elif rss.status == 500:
+            elif status == 404:
+                raise Warning("RSS Feed %s not found", feed.name)
+            elif status == 500:
                 raise Warning("Internal server exception on feed %s", feed.name)
-        except urllib2.URLError:
-            raise Exception("URLError on feed %s", feed.name)
-        except AttributeError, e:
-            ex = rss['bozo_exception']
+        else:
+            log.error('rss does not have status: %s' % rss)
+            
+        # check for bozo
+        ex = rss.get('bozo_exception', False)
+        if ex:
             if ex == feedparser.NonXMLContentType:
-                log.error("feedparser.NonXMLContentType")
-                return
+                raise Warning('RSS Feed %s does not contain valid XML' % feed.name)
             elif ex == xml.sax._exceptions.SAXParseException:
-                log.error("xml.sax._exceptions.SAXParseException")
-                return
+                raise Warning('RSS Feed %s is not valid XML' % feed.name)
             elif ex == urllib2.URLError:
-                log.error("urllib2.URLError")
-                return
+                raise Warning("urllib2.URLError")
             else:
                 log.error("Unhandled bozo_exception. Type: %s.%s (feed: %s)" % (ex.__class__.__module__, ex.__class__.__name__ , feed.name))
                 return
 
         if rss['bozo']:
             log.error(rss)
-            log.error("Bozo feed exception on %s. Is the URL correct?" % feed.name)
+            log.error("Bozo feed exception on %s" % feed.name)
             return
             
         log.debug('encoding %s' % rss.encoding)

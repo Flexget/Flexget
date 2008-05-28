@@ -37,7 +37,8 @@ class OutputRSS:
         With this example file series.rss would contain succeeded
         entries from both feeds.
         
-        Number of days or items:
+        Number of days / items:
+        -----------------------
         
         By default output contains items from last 7 days. You can specify
         different perioid, number of items or both. Value -1 means unlimited.
@@ -59,6 +60,23 @@ class OutputRSS:
           items: 50
           
         Generate RSS that will contain last 50 items, regardless of dates.
+        
+        RSS link:
+        ---------
+        
+        You can specify what field from entry is used as a link in generated rss feed.
+        
+        Example:
+        
+        make_rss:
+          file: ~/public_html/series.rss
+          link:
+            - imdb_url
+            
+        List should contain a list of fields in order of preference. Note that url field is always
+        used as last possible fallback even without explicitly adding it into the list.
+        
+        Default list: imdb_url, input_url, url
         
     """
 
@@ -83,12 +101,21 @@ class OutputRSS:
         if not rss2gen:
             raise Exception('module make_rss requires PyRSS2Gen library.')
         config = self.get_config(feed)
+        link_fields = feed.config['make_rss'].get('link', [])
+        # if no fields given, use defaults
+        if len(link_fields) == 0:
+            link_fields = ['imdb_url', 'input_url']
+        # always add url as last resort
+        link_fields.append('url')
         store = feed.shared_cache.storedefault(config['file'], [])
         for entry in feed.entries:
             # make rss data item and store it
             rss = {}
             rss['title'] = entry['title']
-            rss['link'] = entry['url']
+            for field in link_fields:
+                if entry.has_key(field):
+                    rss['link'] = entry[field]
+                    break
             rss['description'] = entry.get('imdb_plot_outline')
             rss['pubDate'] = datetime.datetime.utcnow()
             store.append(rss)
