@@ -355,7 +355,13 @@ class Feed:
         for event in self.manager.EVENTS[:-1]:
             # when learning, skip few events
             if self.manager.options.learn:
-                if event in ['download', 'output']: continue
+                if event in ['download', 'output']: 
+                    # log keywords not executed
+                    modules = self.manager.get_modules_by_event(event)
+                    for module in modules:
+                        if self.config.has_key(module['keyword']):
+                            logging.info('Note: Feed %s keyword %s not executed due learn / reset.' % (self.name, module['keyword']))
+                    continue
             # handle resolve event a bit special
             if event == 'resolve' and not self.unittest:
                 self._resolve_entries()

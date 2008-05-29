@@ -25,7 +25,6 @@ class OutputExec:
         for entry in feed.entries:
             cmd = feed.config['exec'] % entry
             log.debug('executing cmd: %s' % cmd)
-            (stdin, stdout, stderr) = os.popen4(cmd)
-            stdin.close()
-            stdout.close()
-            stderr.close()
+            (r, w) = os.popen4(cmd)
+            r.close()
+            w.close()
