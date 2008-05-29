@@ -134,6 +134,7 @@ class Manager:
 
     def initialize(self):
         """Loads configuration and session file, separated to own method because of unittests"""
+        if self.initialized: return
         start_time = time.clock()
       
         # load config & session
@@ -410,6 +411,7 @@ class Manager:
             print "Could not find module %s" % keyword
             
     def print_failed(self):
+        self.initialize()
         failed = self.session.setdefault('failed', [])
         if not failed:
             print "No failed entries recorded"
@@ -431,6 +433,7 @@ class Manager:
             
     def clear_failed(self):
         """Clears list of failed entries"""
+        self.initialize()
         print "Cleared %i items." % len(self.session.setdefault('failed', []))
         self.session['failed'] = []
 
@@ -452,8 +455,7 @@ class Manager:
 
     def execute(self):
         """Iterate trough all feeds and run them."""
-        if not self.initialized:
-            self.initialize()
+        self.initialize()
         try:
             if not self.config:
                 logging.critical('Configuration file is empty.')
