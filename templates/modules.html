@@ -31,6 +31,11 @@ $def with (roles, modules)
     #menu li a {
       width: 5em;
     }
+    span.event {
+      font-family: monospace;
+      margin-right:1ex;
+      background: #DDD;
+    }
   </style>
 </head>
 <body class="yui-skin-sam">
@@ -44,7 +49,11 @@ $def with (roles, modules)
      <table>
      $for module in modules:
          <tr>
-         <td>$module['keyword']</td><td>$roles[module['keyword']]</td>
+         <td>$module['keyword']<br/>
+	 $for event in roles[module['keyword']]:
+	     <span class="event">$event</span>
+	 </td>
+	 <td><pre>$module['doc']</pre></td>
 	 </tr>
      </table>
    </div>

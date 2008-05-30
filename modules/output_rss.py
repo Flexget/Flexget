@@ -74,8 +74,9 @@ class OutputRSS:
           link:
             - imdb_url
             
-        List should contain a list of fields in order of preference. Note that url field is always
-        used as last possible fallback even without explicitly adding it into the list.
+        List should contain a list of fields in order of preference.
+        Note that the url field is always used as last possible fallback
+        even without explicitly adding it into the list.
         
         Default list: imdb_url, input_url, url
         

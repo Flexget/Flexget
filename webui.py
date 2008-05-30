@@ -3,6 +3,7 @@
 
 import time
 import string
+import textwrap
 
 import web
 from manager import Manager
@@ -15,8 +16,7 @@ urls = (
 
 render = web.template.render('templates/', cache=False)
 
-m = Manager()
-manager = m
+manager = Manager()
 manager.initialize()
 
 class modules:
@@ -37,23 +37,24 @@ class modules:
                     roles[m['keyword']].append(event)
                 else:
                     roles[m['keyword']] = [event]
+                    
         for module in modules:
-            # do not include test classes, unless in debug mode
-            if module.get('debug_module', False):
-                continue
-            event = module['event']
-            if modules.index(module) > 0: event = ""
-            doc = "Yes"
-            if not module['instance'].__doc__:
-                doc = "No"
-            #print "%-20s%-30s%s" % (module['keyword'], string.join(roles[module['keyword']], ', '), doc)
+            if modules.index(module) > 0:
+                event = ""
+            else:
+                event = module['event']
 
+            if not module['instance'].__doc__:
+                module['doc'] = ""
+            else:
+                module['doc'] = textwrap.dedent(module['instance'].__doc__)
+                
         print render.modules(roles, modules);
 
 class run:
     def GET(self):
         start = time.time()
-        m.execute()
+        manager.execute()
         end = time.time()
         duration = end-start
         print duration
@@ -61,11 +62,11 @@ class run:
 class index:
     def GET(self):
         enabled = []
-        for source in filter(lambda x: not x.startswith("_"), m.config.get('feeds', {}).keys()):
+        for source in filter(lambda x: not x.startswith("_"), manager.config.get('feeds', {}).keys()):
             enabled.append(source)
 
         disabled = []
-        for source in filter(lambda x: x.startswith("_"), m.config.get('feeds', {}).keys()):
+        for source in filter(lambda x: x.startswith("_"), manager.config.get('feeds', {}).keys()):
             disabled.append(source[1:])
 
         print render.index(enabled, disabled)

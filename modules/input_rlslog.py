@@ -24,7 +24,8 @@ class RlsLog:
     """
         Adds support for rlslog.net as a feed.
 
-        In case of movies the module supplies pre-parses IMDB-details (helps when chaining with filter_imdb).
+        In case of movies the module supplies pre-parses IMDB-details
+        (helps when chaining with filter_imdb).
     """
 
     def register(self, manager, parser):
