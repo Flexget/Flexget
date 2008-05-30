@@ -98,7 +98,7 @@ class ModuleDownload:
         ext = mimetypes.guess_extension(response.headers.getsubtype())
         if ext:
             entry['filename'] = entry['title'] + ext
-            log.debug('mimetypes guess for %s is %s ' % (response.headers.getsubtype(), guess))
+            log.debug('mimetypes guess for %s is %s ' % (response.headers.getsubtype(), ext))
             log.debug('Using with guessed extension: %s' % entry['filename'])
             return
         
@@ -132,11 +132,12 @@ class ModuleDownload:
         if not entry.has_key('filename'):
             log.warn('Unable to figure proper filename extension for %s' % entry['title'])
 
+        destfile = os.path.join(os.path.expanduser(path), entry.get('filename', entry['title']))
+
         if not os.path.exists(os.path.expanduser(path)):
             log.error("Cannot write output file %s, does the path exist?" % destfile)
             return
 
-        destfile = os.path.join(os.path.expanduser(path), entry.get('filename', entry['title']))
         if os.path.exists(destfile):
             raise Warning("File '%s' already exists" % destfile)
         
