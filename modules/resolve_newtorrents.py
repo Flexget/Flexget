@@ -84,7 +84,7 @@ class ResolveNewTorrents:
 
         # choose the torrent
         if not torrents:
-            raise ResolverException("%s doesn't match for any search results" % name)
+            raise ResolverException("%s doesn't match for any search results: %s" % (name, url))
         else:
             if len(torrents) == 1:
                 log.debug("found only one matching search result.")
