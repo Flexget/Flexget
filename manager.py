@@ -201,7 +201,7 @@ class Manager:
                 
     def load_session_shelf(self):
         sessiondb = os.path.join(sys.path[0], 'session-%s.db' % self.configname)
-        self.session = shelve.open(sessiondb, protocol=2, writeback=True)
+        self.session = shelve.open(sessiondb, protocol=2, writeback=False)
 
     def sanitize(self, d):
         """Makes dictionary d contain only yaml.safe_dump compatible elements"""
@@ -244,7 +244,7 @@ class Manager:
             print "Migrating from old-style session"
             # create the new style session
             sessiondb = os.path.join(sys.path[0], 'session-%s.db' % self.configname)
-            newsession = shelve.open(sessiondb, protocol=2, writeback=True)
+            newsession = shelve.open(sessiondb, protocol=2)
 
             # mirgrate data
             for k,v in self.session.iteritems():
