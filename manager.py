@@ -157,7 +157,7 @@ class Manager:
             self.session['version'] = self.session_version
 
         took = time.clock() - start_time
-        logging.debug('Fileloads took %.2f seconds' % took)
+        logging.debug('Initialize took %.2f seconds' % took)
         self.initialized = True
 
     def load_config(self):
@@ -176,14 +176,15 @@ class Manager:
         if not self.configname:
             raise Exception('self.configname missing')
 
-        if self.options.experimental:
-            self.load_session_shelf()
-        else:
+        # load the old style file, if not found, migrate to new style
+        if not self.load_session_shelf():
             self.load_session_yaml()
 
     def load_session_yaml(self):
         sessionfile = os.path.join(sys.path[0], 'session-%s.yml' % self.configname)
         if os.path.exists(sessionfile):
+            print "Old style sessionfile loaded"
+            print "NOTICE: This file will be migrated to the new format at the end of this run"
             try:
                 self.session = yaml.safe_load(file(sessionfile))
                 if type(self.session) != types.DictType:
@@ -194,6 +195,9 @@ class Manager:
                                  "This error is most likely caused by a bug in the software, check your log-file and report any tracebacks.")
                 logging.exception('Reason: %s' % e)
                 sys.exit(1)
+            return True
+        
+        return False
                 
     def load_session_shelf(self):
         sessiondb = os.path.join(sys.path[0], 'session-%s.db' % self.configname)
@@ -220,10 +224,7 @@ class Manager:
         if not self.configname:
             raise Exception('self.configname missing')
             
-        if self.options.experimental:
-            self.save_session_shelf()
-        else:
-            self.save_session_yaml()
+        self.save_session_shelf()
 
     def save_session_yaml(self):
         try:
@@ -238,6 +239,26 @@ class Manager:
             logging.critical(yaml.dump(self.session))
 
     def save_session_shelf(self):
+        # not a shelve, we're most likely converting from an old style session
+        if type(self.session) == types.DictType:
+            print "Migrating from old-style session"
+            # create the new style session
+            sessiondb = os.path.join(sys.path[0], 'session-%s.db' % self.configname)
+            newsession = shelve.open(sessiondb, protocol=2, writeback=True)
+
+            # mirgrate data
+            for k,v in self.session.iteritems():
+                newsession[k] = v
+
+            # rename the old session file
+            sessionfile = os.path.join(sys.path[0], 'session-%s.yml' % self.configname)
+            os.rename(sessionfile, sessionfile+"-MIGRATED")
+
+            newsession.close()
+            
+            print "Migrate done"
+            return
+            
         self.session.close()
         
     def load_modules(self, parser, moduledir):
