@@ -7,17 +7,18 @@ import sys
 
 if __name__ == "__main__":
     manager = Manager()
-
+    manager.initialize()
     lockfile = os.path.join(sys.path[0], ".%s-lock" % manager.configname)
+
     if os.path.exists(lockfile):
         f = file(lockfile)
         pid = f.read()
         f.close()
-        print "Another process (%s) is running, will exit" % pid
+        print "Another process (%s) is running, will exit" % pid.strip()
         sys.exit(1)
 
     f = file(lockfile, 'w')
-    f.write("PID: %s" % os.getpid())
+    f.write("PID: %s\n" % os.getpid())
     f.close()
     
     if manager.options.doc:
