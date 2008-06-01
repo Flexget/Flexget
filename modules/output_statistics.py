@@ -61,7 +61,7 @@ class Statistics:
         self.failed = self.total - self.passed
 
         # don't bother to save the failed ones, the number is worth shit anyway
-        if not passed: return
+        if not self.passed: return
         
         dbname = os.path.join(sys.path[0], feed.manager.configname+".db")
         con = sqlite.connect(dbname)
@@ -166,7 +166,7 @@ class Statistics:
         # 200 pixels hold exactly 11 feeds
         chartheight = 200
         if len(legend) > 11:
-            height = height + ((len(legend)-11)*20)
+            chartheight = chartheight + ((len(legend)-11)*20)
         
         chart = StackedVerticalBarChart(800, chartheight, title="Releases by source")
         axislabels = [str(i) for i in range(24)]
@@ -252,7 +252,7 @@ class Statistics:
         # 200 pixels hold exactly 11 feeds
         chartheight = 200
         if len(legend) > 11:
-            height = height + ((len(legend)-11)*20)
+            chartheight = chartheight + ((len(legend)-11)*20)
 
         chart = StackedVerticalBarChart(350, chartheight, title="Releases by source")
         axis = chart.set_axis_labels(Axis.BOTTOM, ['mon','tue','wed','thu','fri','sat','sun'])
