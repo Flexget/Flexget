@@ -141,14 +141,9 @@ class Statistics:
         cur = con.cursor()
         cur.execute(sql)
 
-        chart = StackedVerticalBarChart(800, 200, title="Releases by source")
-        axislabels = [str(i) for i in range(24)]
-            
-        axis = chart.set_axis_labels(Axis.BOTTOM, axislabels)
-        chart.set_axis_style(axis, '000000', alignment=-1)
-
         feedname = ""
         maxdata = 0
+        values = []
         legend = []
         for feed, hour, success in cur:
             # clear data array for this feed
@@ -157,12 +152,28 @@ class Statistics:
                 legend.append(feedname)
                 data = 24*[0]
                 # add data set
-                chart.add_data(data)
+                #chart.add_data(data)
+                values.append(data)
 
             success = int(success)
             if success > maxdata:
                 maxdata = success
             data[int(hour)] = success
+
+        # 200 pixels hold exactly 11 feeds
+        chartheight = 200
+        if len(legend) > 11:
+            height = height + ((len(legend)-11)*20)
+        
+        chart = StackedVerticalBarChart(800, chartheight, title="Releases by source")
+        axislabels = [str(i) for i in range(24)]
+            
+        axis = chart.set_axis_labels(Axis.BOTTOM, axislabels)
+        chart.set_axis_style(axis, '000000', alignment=-1)
+
+
+        for value in values:
+            chart.add_data(value)
 
         # random colors
         #import random as rn
@@ -213,12 +224,9 @@ class Statistics:
         cur = con.cursor()
         cur.execute(sql)
 
-        chart = StackedVerticalBarChart(350, 200, title="Releases by source")            
-        axis = chart.set_axis_labels(Axis.BOTTOM, ['mon','tue','wed','thu','fri','sat','sun'])
-        chart.set_axis_style(axis, '000000', alignment=-1)
-
         feedname = ""
         maxdata = 0
+        values = []
         legend = []
         for feed, dow, success in cur:
             dow = int(dow) - 1
@@ -230,12 +238,22 @@ class Statistics:
                 legend.append(feedname)
                 data = 7*[0]
                 # add data set
-                chart.add_data(data)
+                #chart.add_data(data)
+                values.append(data)
 
             success = int(success)
             if success > maxdata:
                 maxdata = success
             data[dow] = success
+
+        # 200 pixels hold exactly 11 feeds
+        chartheight = 200
+        if len(legend) > 11:
+            height = height + ((len(legend)-11)*20)
+
+        chart = StackedVerticalBarChart(350, chartheight, title="Releases by source")
+        axis = chart.set_axis_labels(Axis.BOTTOM, ['mon','tue','wed','thu','fri','sat','sun'])
+        chart.set_axis_style(axis, '000000', alignment=-1)
 
         # random colors
         #import random as rn
