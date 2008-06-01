@@ -60,6 +60,9 @@ class Statistics:
         self.passed = len(feed.entries)
         self.failed = self.total - self.passed
 
+        # don't bother to save the failed ones, the number is worth shit anyway
+        if not passed: return
+        
         dbname = os.path.join(sys.path[0], feed.manager.configname+".db")
         con = sqlite.connect(dbname)
         self.init(con)
