@@ -107,35 +107,6 @@ class Statistics:
         f.write(index)
         f.close()
 
-    def hourly_stats(self, con):
-        sql = """
-        select strftime("%H", timestamp, 'localtime') as hour, sum(success) from statistics group by hour
-        """
-        cur = con.cursor()
-        cur.execute(sql)
-
-        chart = StackedVerticalBarChart(680, 200, title="Releases by hour")
-        axislabels = [str(i) for i in range(24)]
-        data = 24*[0]
-            
-        axis = chart.set_axis_labels(Axis.BOTTOM, axislabels)
-        chart.set_axis_style(axis, '000000', alignment=-1)
-
-        for hour, success in cur:
-            hour = int(hour)
-
-            data[hour] = success
-
-        chart.add_data(data)
-        chart.set_axis_range(Axis.LEFT, 0, max(data))
-        
-        for i in range(0, len(data)):
-            if data[i] > 0:
-                chart.add_marker(0, i, 't%s'%data[i], '000000', 13)
-
-        return chart.get_url()
-
-
     def hourly_stats_by_feed(self, con):
         sql = """
         select feed, strftime("%H", timestamp, 'localtime') as hour, sum(success) from statistics group by feed, hour;
@@ -189,36 +160,6 @@ class Statistics:
 
         return chart.get_url()
 
-    def weekly_stats(self, con):
-        sql = """
-        select strftime("%w", timestamp, 'localtime') as dow, sum(success) from statistics group by dow
-        """
-
-        cur = con.cursor()
-        cur.execute(sql)
-
-        chart = StackedVerticalBarChart(220, 200, title="Releases by day of week")
-        axis = chart.set_axis_labels(Axis.BOTTOM, ['mon','tue','wed','thu','fri','sat','sun'])
-        chart.set_axis_style(axis, '000000', alignment=-1)
-
-        data = 7*[0]
-
-        for dow, success in cur:
-            dow = int(dow) - 1
-            if dow == -1:
-                dow = 6
-
-            data[dow] = success
-
-        chart.add_data(data)
-        chart.set_axis_range(Axis.LEFT, 0, max(data))
-
-        for i in range(0, len(data)):
-            if data[i] > 0:
-                chart.add_marker(0, i, 't%s'%data[i], '000000', 13)
-
-        return chart.get_url()
-
     def weekly_stats_by_feed(self, con):
         sql = """
         select feed, strftime("%w", timestamp, 'localtime') as hour, sum(success) from statistics group by feed, hour;
@@ -254,9 +195,13 @@ class Statistics:
         if len(legend) > 11:
             chartheight = chartheight + ((len(legend)-11)*20)
 
+            
         chart = StackedVerticalBarChart(350, chartheight, title="Releases by source")
         axis = chart.set_axis_labels(Axis.BOTTOM, ['mon','tue','wed','thu','fri','sat','sun'])
         chart.set_axis_style(axis, '000000', alignment=-1)
+
+        for value in values:
+            chart.add_data(value)
 
         # random colors
         #import random as rn
