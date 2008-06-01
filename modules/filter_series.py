@@ -48,7 +48,7 @@ class SerieParser:
         name = clean(self.name)
         data = clean(self.data)
 
-        log.debug('name: %s data: %s' % (name, data))
+        #log.debug('name: %s data: %s' % (name, data))
         
         name_parts = name.split(' ')
         data_parts = data.split(' ')
@@ -64,7 +64,7 @@ class SerieParser:
                     break
             if not name_matches:
                 # leave this invalid
-                log.debug('FAIL: name regexps do not match')
+                #log.debug('FAIL: name regexps do not match')
                 return
         else:
             # try to use given name old fashion way
@@ -72,7 +72,7 @@ class SerieParser:
                 if part in data_parts:
                     data_parts.remove(part)
                 else:
-                    log.debug('FAIL: part %s not found from %s' % (part, data_parts))
+                    #log.debug('FAIL: part %s not found from %s' % (part, data_parts))
                     # leave this invalid
                     return
 
@@ -305,6 +305,7 @@ class FilterSeries:
                 eps.sort(self.cmp_serie_quality)
                 best = eps[0]
                 
+                # episode (with this id) has been downloaded
                 if self.downloaded(feed, best):
                     log.debug('Rejecting all instances of %s' % identifier)
                     for ep in eps:
