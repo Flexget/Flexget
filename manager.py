@@ -11,24 +11,25 @@ import shelve
 try:
   from optparse import OptionParser, SUPPRESS_HELP
 except ImportError:
-  print "Please install Optik 1.4.1 (or higher) or preferably update your Python"
+  print 'Please install Optik 1.4.1 (or higher) or preferably update your Python'
   sys.exit(1)
 
 try:
     import yaml
 except ImportError:
-    print "Please install PyYAML from http://pyyaml.org/wiki/PyYAML or from your distro repository"
+    print 'Please install PyYAML from http://pyyaml.org/wiki/PyYAML or from your distro repository'
     sys.exit(1)
 
 class RegisterException(Exception):
     def __init__(self, value):
         self.value = value
+        Exception.__init__(value)
     def __str__(self):
         return repr(self.value)
 
 class Manager:
 
-    EVENTS = ["start", "input", "filter", "resolve", "download", "modify", "output", "exit", "terminate"]
+    EVENTS = ['start', 'input', 'filter', 'resolve', 'download', 'modify', 'output', 'exit', 'terminate']
     
     def __init__(self):
         self.configname = None
@@ -42,7 +43,7 @@ class Manager:
         self.__instance = False
 
         # settings
-        self.moduledir = os.path.join(sys.path[0], "modules/")
+        self.moduledir = os.path.join(sys.path[0], 'modules/')
         self.session_version = 2
         
         # logging formatting
@@ -58,7 +59,7 @@ class Manager:
             logging.basicConfig(level=initial_level,
                                 format='%(asctime)s '+self.logging_detailed,
                                 filename=os.path.join(sys.path[0], 'flexget.log'),
-                                filemode="a",
+                                filemode='a',
                                 datefmt='%Y-%m-%d %H:%M:%S')
         except TypeError:
             # For pre-2.4 python
@@ -71,33 +72,33 @@ class Manager:
 
         # initialize commandline options
         parser = OptionParser()
-        parser.add_option("--test", action="store_true", dest="test", default=0,
-                          help="Verbose what would happend on normal execution.")
-        parser.add_option("--learn", action="store_true", dest="learn", default=0,
-                          help="Matches are not downloaded but will be skipped in the future.")
-        parser.add_option("--feed", action="store", dest="onlyfeed", default=None,
-                          help="Run only specified feed from config.")
-        parser.add_option("--no-cache", action="store_true", dest="nocache", default=0,
-                          help="Disable caches. Works only in modules that have explicit support.")
-        parser.add_option("--reset-session", action="store_true", dest="reset", default=0,
-                          help="Forgets everything that has been downloaded and learns current matches.")
-        parser.add_option("--doc", action="store", dest="doc",
-                          help="Display module documentation (example: --doc patterns). See --list.")
-        parser.add_option("--list", action="store_true", dest="list", default=0,
-                          help="List all available modules.")
-        parser.add_option("--failed", action="store_true", dest="failed", default=0,
-                          help="List recently failed entries.")
-        parser.add_option("--clear-failed", action="store_true", dest="clear_failed", default=0,
-                          help="Clear recently failed list.")
-        parser.add_option("-c", action="store", dest="config", default="config.yml",
-                          help="Specify configuration file. Default is config.yml")
-        parser.add_option("-q", action="store_true", dest="quiet", default=0,
-                          help="Disables stdout and stderr output. Logging is done only to file.")
-        parser.add_option("-d", action="store_true", dest="details", default=0,
-                          help="Display detailed process information.")
-        parser.add_option("--experimental", action="store_true", dest="experimental", default=0,
-                          help="Use experimental features.")
-        parser.add_option("--debug", action="store_true", dest="debug", default=0,
+        parser.add_option('--test', action='store_true', dest='test', default=0,
+                          help='Verbose what would happend on normal execution.')
+        parser.add_option('--learn', action='store_true', dest='learn', default=0,
+                          help='Matches are not downloaded but will be skipped in the future.')
+        parser.add_option('--feed', action='store', dest='onlyfeed', default=None,
+                          help='Run only specified feed from config.')
+        parser.add_option('--no-cache', action='store_true', dest='nocache', default=0,
+                          help='Disable caches. Works only in modules that have explicit support.')
+        parser.add_option('--reset-session', action='store_true', dest='reset', default=0,
+                          help='Forgets everything that has been downloaded and learns current matches.')
+        parser.add_option('--doc', action='store', dest='doc',
+                          help='Display module documentation (example: --doc patterns). See --list.')
+        parser.add_option('--list', action='store_true', dest='list', default=0,
+                          help='List all available modules.')
+        parser.add_option('--failed', action='store_true', dest='failed', default=0,
+                          help='List recently failed entries.')
+        parser.add_option('--clear-failed', action='store_true', dest='clear_failed', default=0,
+                          help='Clear recently failed list.')
+        parser.add_option('-c', action='store', dest='config', default='config.yml',
+                          help='Specify configuration file. Default is config.yml')
+        parser.add_option('-q', action='store_true', dest='quiet', default=0,
+                          help='Disables stdout and stderr output. Logging is done only to file.')
+        parser.add_option('-d', action='store_true', dest='details', default=0,
+                          help='Display detailed process information.')
+        parser.add_option('--experimental', action='store_true', dest='experimental', default=0,
+                          help='Use experimental features.')
+        parser.add_option('--debug', action='store_true', dest='debug', default=0,
                           help=SUPPRESS_HELP)
 
         # add module path to sys.path so they can import properly ..
@@ -110,7 +111,7 @@ class Manager:
 
         # perform commandline sanity check(s)
         if self.options.test and self.options.learn:
-            print "--test and --learn are mutually exclusive"
+            print '--test and --learn are mutually exclusive'
             sys.exit(1)
         if self.options.reset:
             self.options.learn = True
@@ -146,6 +147,7 @@ class Manager:
             
         if not self.options.reset:
             self.load_session()
+            
         # check if session version number is different
         if self.session.setdefault('version', self.session_version) != self.session_version:
             if not self.options.learn:
@@ -170,7 +172,6 @@ class Manager:
                 return
         logging.debug('Tried to read from: %s' % string.join(possible, ', '))
         raise Exception('Failed to load configuration file %s' % self.options.config)
-        
 
     def load_session(self):
         if not self.configname:
@@ -181,18 +182,19 @@ class Manager:
             self.load_session_yaml()
 
     def load_session_yaml(self):
+        """Deprecated, is used only in migrating currently."""
+        # TODO: remove at some point
         sessionfile = os.path.join(sys.path[0], 'session-%s.yml' % self.configname)
         if os.path.exists(sessionfile):
-            print "Old style sessionfile loaded"
-            print "NOTICE: This file will be migrated to the new format at the end of this run"
+            logging.info('Old sessionfile loaded. Session file will be migrated to the new format at the end of this run')
             try:
                 self.session = yaml.safe_load(file(sessionfile))
                 if type(self.session) != types.DictType:
                     raise Exception('Session file does not contain dictionary')
             except Exception, e:
-                logging.critical("The session file has been broken. Execute flexget with --reset-session create new session and to avoid re-downloading everything. "\
-                                 "Downloads between time of break and now are lost. You must download these manually. "\
-                                 "This error is most likely caused by a bug in the software, check your log-file and report any tracebacks.")
+                logging.critical('The session file has been broken. Execute flexget with --reset-session create new session and to avoid re-downloading everything. '\
+                                 'Downloads between time of break and now are lost. You must download these manually. '\
+                                 'This error is most likely caused by a bug in the software, check your log-file and report any tracebacks.')
                 logging.exception('Reason: %s' % e)
                 sys.exit(1)
             return True
@@ -226,6 +228,7 @@ class Manager:
             
         self.save_session_shelf()
 
+    """
     def save_session_yaml(self):
         try:
             sessionfile = os.path.join(sys.path[0], 'session-%s.yml' % self.configname)
@@ -237,11 +240,12 @@ class Manager:
         except Exception, e:
             logging.exception("Failed to save session data (%s)!" % e)
             logging.critical(yaml.dump(self.session))
+    """
 
     def save_session_shelf(self):
         # not a shelve, we're most likely converting from an old style session
         if type(self.session) == types.DictType:
-            print "Migrating from old-style session"
+            logging.info('Migrating from old-style session.')
             # create the new style session
             sessiondb = os.path.join(sys.path[0], 'session-%s.db' % self.configname)
             newsession = shelve.open(sessiondb, protocol=2)
@@ -252,11 +256,11 @@ class Manager:
 
             # rename the old session file
             sessionfile = os.path.join(sys.path[0], 'session-%s.yml' % self.configname)
-            os.rename(sessionfile, sessionfile+"-MIGRATED")
+            os.rename(sessionfile, sessionfile+'-MIGRATED')
 
             newsession.close()
-            
-            print "Migrate done"
+
+            logging.info('Migrating completed.')
             return
             
         self.session.close()
@@ -299,7 +303,7 @@ class Manager:
         prefixes = self.EVENTS + ['module', 'source']
         for m in os.listdir(directory):
             for p in prefixes:
-                if m.startswith(p+'_') and m.endswith(".py"):
+                if m.startswith(p+'_') and m.endswith('.py'):
                     modules.append(m)
         return modules
 
@@ -342,15 +346,15 @@ class Manager:
             if not kwargs.has_key(arg):
                 raise RegisterException('Parameter %s is missing from register arguments' % arg)
         if not callable(kwargs['callback']):
-            raise RegisterException("Passed method not callable.")
+            raise RegisterException('Passed method not callable.')
         event = kwargs.get('event')
         if not event in self.EVENTS:
-            raise RegisterException("Module has invalid event '%s'. Recognized events are: %s." % (event, string.join(self.EVENTS, ', ')))
+            raise RegisterException('Module has invalid event %s' % event)
         self.modules.setdefault(event, {})
         # check if there is already registered keyword with same event
         if self.modules[event].has_key(kwargs['keyword']):
             by = self.modules[event][kwargs['keyword']]['instance']
-            raise RegisterException("Duplicate keyword with same event '%s'. Keyword: '%s' Reserved by: '%s'" % (event, kwargs['keyword'], by.__class__.__name__))
+            raise RegisterException('Duplicate keyword with same event %s. Keyword: %s Reserved by: %s' % (event, kwargs['keyword'], by.__class__.__name__))
         # get module instance from load_modules if it's not given
         kwargs.setdefault('instance', self.__instance)
         # set optional parameter default values
@@ -385,9 +389,9 @@ class Manager:
         return result
 
     def print_module_list(self):
-        print "-"*60
-        print "%-20s%-30s%s" % ('Keyword', 'Roles', '--doc')
-        print "-"*60
+        print '-'*60
+        print '%-20s%-30s%s' % ('Keyword', 'Roles', '--doc')
+        print '-'*60
         modules = []
         roles = {}
         for event in self.EVENTS:
@@ -409,11 +413,11 @@ class Manager:
             if module.get('debug_module', False) and not self.options.debug:
                 continue
             event = module['event']
-            if modules.index(module) > 0: event = ""
-            doc = "Yes"
-            if not module['instance'].__doc__: doc = "No"
-            print "%-20s%-30s%s" % (module['keyword'], string.join(roles[module['keyword']], ', '), doc)
-        print "-"*60
+            if modules.index(module) > 0: event = ''
+            doc = 'Yes'
+            if not module['instance'].__doc__: doc = 'No'
+            print '%-20s%-30s%s' % (module['keyword'], string.join(roles[module['keyword']], ', '), doc)
+        print '-'*60
 
     def print_module_doc(self):
         keyword = self.options.doc
@@ -424,22 +428,22 @@ class Manager:
             if module:
                 found = True
                 if not module['instance'].__doc__:
-                    print "Module %s does not have documentation" % keyword
+                    print 'Module %s does not have documentation' % keyword
                 else:
                     print module['instance'].__doc__
                 return
         if not found:
-            print "Could not find module %s" % keyword
+            print 'Could not find module %s' % keyword
             
     def print_failed(self):
         self.initialize()
         failed = self.session.setdefault('failed', [])
         if not failed:
-            print "No failed entries recorded"
+            print 'No failed entries recorded'
         for entry in failed:
             tof = datetime(*entry['tof'])
-            print "%16s - %s" % (tof.strftime('%Y-%m-%d %H:%M'), entry['title'])
-            print "%16s - %s" % ('', entry['url'])
+            print '%16s - %s' % (tof.strftime('%Y-%m-%d %H:%M'), entry['title'])
+            print '%16s - %s' % ('', entry['url'])
         
     def add_failed(self, entry):
         """Adds entry to internal failed list, displayed with --failed"""
@@ -455,7 +459,7 @@ class Manager:
     def clear_failed(self):
         """Clears list of failed entries"""
         self.initialize()
-        print "Cleared %i items." % len(self.session.setdefault('failed', []))
+        print 'Cleared %i items.' % len(self.session.setdefault('failed', []))
         self.session['failed'] = []
 
     def merge_dict(self, d1, d2):
@@ -464,7 +468,7 @@ class Manager:
             if d2.has_key(k):
                 if type(v) == type(d2[k]):
                     if type(v) == types.DictType:
-                        self.merge_dict(self, d1[k], d2[k])
+                        self.merge_dict(d1[k], d2[k])
                     elif type(v) == types.ListType:
                         d2[k].extend(v)
                     else:
@@ -512,7 +516,7 @@ class Manager:
                     feed.execute()
                     feed_instances[name] = feed
                 except Exception, e:
-                    logging.exception("Feed %s: %s" % (feed.name, e))
+                    logging.exception('Feed %s: %s' % (feed.name, e))
 
             # execute terminate event for all feeds
             for name, feed in feed_instances.iteritems():

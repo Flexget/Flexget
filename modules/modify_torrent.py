@@ -205,35 +205,3 @@ class TorrentFilename:
         fn = '%s.torrent' % title
         log.debug('make_filename made %s' % fn)
         return fn
-
-if __name__ == '__main__':
-    import sys
-    logging.basicConfig(level=logging.DEBUG)
-
-    from test_tools import MockFeed
-    feed = MockFeed()
-
-    f=open(sys.argv[1], 'r')
-    content = f.read()
-    f.close()
-
-    entry = {}
-    entry['url'] = 'http://127.0.0.1/mock'
-    entry['title'] = sys.argv[2]
-    entry['data'] = content
-
-    feed.entries.append(entry)
-
-    r = TorrentFilename()
-    r.run(feed)
-
-    trackers = entry['torrent'].get_multitrackers()
-
-    print trackers
-    entry['torrent'].remove_multitracker(trackers[0])
-    print entry['torrent'].get_multitrackers()
-
-    print yaml.safe_dump(entry['torrent'].content['announce-list'])
-    
-    feed.dump_entries()
-

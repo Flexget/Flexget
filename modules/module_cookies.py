@@ -45,7 +45,7 @@ class ModuleCookies:
         try:
             cj.load(filename=config['file'], ignore_expires=True)
             log.debug('Cookies loaded')
-        except (cookielib.LoadError, IOError), e:
+        except (cookielib.LoadError, IOError):
             import sys
             raise Warning('Cookies could not be loaded: %s' % sys.exc_info()[1])
         # create new opener for urllib2

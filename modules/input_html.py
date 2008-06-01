@@ -11,7 +11,7 @@ log = logging.getLogger('html')
 
 # this way we don't force users to install bs incase they do not want to use module http
 soup_present = True
-soup_err = "Module feed_html requires BeautifulSoup. Please install it from http://www.crummy.com/software/BeautifulSoup/ or from your distribution repository."
+soup_err = 'Module feed_html requires BeautifulSoup. Please install it from http://www.crummy.com/software/BeautifulSoup/ or from your distribution repository.'
 
 try:
     from BeautifulSoup import BeautifulSoup
@@ -32,26 +32,26 @@ class InputHtml:
     """
 
     def register(self, manager, parser):
-        manager.register(event="input", keyword="html", callback=self.run)
+        manager.register(event='input', keyword='html', callback=self.run)
 
     def run(self, feed):
         if not soup_present: raise Exception(soup_err)
         pageurl = feed.get_input_url('html')
 
-        log.debug("InputModule html requesting url %s" % pageurl)
+        log.debug('InputModule html requesting url %s' % pageurl)
 
         try:
             page = urllib2.urlopen(pageurl)
             soup = BeautifulSoup(page)
         except timeout:
-            log.warning("Timed out opening page")
+            log.warning('Timed out opening page')
             return
-        except urllib2.URLError, e:
-            log.warning("URLError when opening page")
+        except urllib2.URLError:
+            log.warning('URLError when opening page')
             return
         
         for link in soup.findAll('a'):
-            if not link.has_key("href"): continue
+            if not link.has_key('href'): continue
             title = link.string
             if title == None: continue
             url = link['href']
@@ -60,7 +60,7 @@ class InputHtml:
 
             # fix broken urls
             if url.startswith('//'):
-                url = "http:" + url
+                url = 'http:' + url
             elif not url.startswith('http://') or not url.startswith('https://'):
                 url = urlparse.urljoin(pageurl, url)
                 
@@ -68,7 +68,7 @@ class InputHtml:
 
             # in case the title contains xxxxxxx.torrent - foooo.torrent clean it a bit (get upto first .torrent)
             if title.lower().find('.torrent') > 0:
-                title = title[:title.lower().find(".torrent")]
+                title = title[:title.lower().find('.torrent')]
 
             entry = Entry()
             entry['url'] = url

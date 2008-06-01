@@ -81,11 +81,6 @@ class ImdbSearch:
         """Return single movie that best matches criteria or None"""
         movies = self.search(name)
 
-        # todo: remove at some point
-        if self.debug:
-            import yaml
-            print yaml.safe_dump(movies)
-        
         # remove all movies below min_match, and different year
         for movie in movies[:]:
             if year and movie.get('year'):
@@ -152,7 +147,7 @@ class ImdbSearch:
                 continue
             try:
                 section_p = section_tag.parent.parent
-            except AttributeError, ae:
+            except AttributeError:
                 log.debug('Section % does not have parent?' % section)
                 continue
             
@@ -391,7 +386,7 @@ class FilterImdb:
                     feed.verbose_progress('Parsing from imdb %s' % entry['title'])
                     try:
                         imdb.parse(entry['imdb_url'])
-                    except UnicodeDecodeError, e:
+                    except UnicodeDecodeError:
                         log.error('Unable to determine encoding for %s. Installing chardet library may help.' % entry['imdb_url'])
                         feed.filter(entry)
                         # store cache so this will be skipped

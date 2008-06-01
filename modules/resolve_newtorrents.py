@@ -53,7 +53,7 @@ class ResolveNewTorrents:
         try:
             page = urllib2.urlopen(url)
             data = page.read()
-        except urllib2.URLError, e:
+        except urllib2.URLError:
             log.error("URLerror when retrieving page")
             return None
         p = re.compile("copy\(\'(.*)\'\)", re.IGNORECASE)

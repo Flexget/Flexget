@@ -44,30 +44,6 @@ class InputCSV:
             for name, index in feed.config['csv'].get('values', {}).items():
                 try:
                     entry[name] = data[index+1]
-                except IndexError, e:
-                    raise Exception("Field '%s' index is out of range" % name)
+                except IndexError:
+                    raise Exception('Field %s index is out of range' % name)
             feed.entries.append(entry)
-
-
-if __name__ == '__main__':
-    import sys
-    from test_tools import MockFeed
-    import yaml
-    logging.basicConfig(level=logging.DEBUG)
-    feed = MockFeed()
-
-    # make mock config
-    config = {}
-    config['url'] = 'http://localhost/test.csv'
-    values = {}
-    values['url'] = 1
-    values['title'] = 3
-    config['values'] = values
-    feed.config['csv'] = config
-
-    print yaml.dump(feed.config)
-
-    csv = InputCSV()
-    csv.run(feed)
-
-    print yaml.dump(feed.entries)
