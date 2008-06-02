@@ -203,7 +203,9 @@ class Manager:
                 
     def load_session_shelf(self):
         sessiondb = os.path.join(sys.path[0], 'session-%s.db' % self.configname)
-        self.session = shelve.open(sessiondb, protocol=2, writeback=False)
+        # note: writeback must be True because how modules use our persistence.
+        # See. http://docs.python.org/lib/node328.html
+        self.session = shelve.open(sessiondb, protocol=2, writeback=True)
 
     def sanitize(self, d):
         """Makes dictionary d contain only yaml.safe_dump compatible elements"""

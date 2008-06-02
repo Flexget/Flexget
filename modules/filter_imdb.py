@@ -345,11 +345,12 @@ class FilterImdb:
         config = feed.config['imdb']
         for entry in feed.entries:
 
-            # if no url, check if it's present in cache
+            # if no url for this entry, look from cache and try to use imdb search
             if not entry.get('imdb_url'):
                 cached = feed.shared_cache.get(entry['title'])
                 if cached == 'WILL_FAIL':
                     # this movie cannot be found, not worth trying again ...
+                    log.debug('%s will fail search, filtering' % entry['title'])
                     feed.filter(entry)
                     continue
                 if cached:
