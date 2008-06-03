@@ -145,8 +145,7 @@ class Manager:
             logging.critical(e)
             sys.exit(1)
             
-        if not self.options.reset:
-            self.load_session()
+        self.load_session(reset=self.options.reset)
             
         # check if session version number is different
         if self.session.setdefault('version', self.session_version) != self.session_version:
@@ -173,13 +172,16 @@ class Manager:
         logging.debug('Tried to read from: %s' % string.join(possible, ', '))
         raise Exception('Failed to load configuration file %s' % self.options.config)
 
-    def load_session(self):
+    def load_session(self, reset=False):
         if not self.configname:
             raise Exception('self.configname missing')
 
-        # load the old style file, if not found, migrate to new style
-        if not self.load_session_shelf():
-            self.load_session_yaml()
+        if not reset:
+            # load the old style file, if not found, migrate to new style
+            if not self.load_session_yaml():
+                self.load_session_shelf()
+        else:
+            self.load_session_shelf(reset=True)
 
     def load_session_yaml(self):
         """Deprecated, is used only in migrating currently."""
@@ -201,11 +203,15 @@ class Manager:
         
         return False
                 
-    def load_session_shelf(self):
+    def load_session_shelf(self, reset=False):
         sessiondb = os.path.join(sys.path[0], 'session-%s.db' % self.configname)
         # note: writeback must be True because how modules use our persistence.
         # See. http://docs.python.org/lib/node328.html
-        self.session = shelve.open(sessiondb, protocol=2, writeback=True)
+        if not reset:
+            self.session = shelve.open(sessiondb, protocol=2, writeback=True)
+        else:
+            # create a new empty database
+            self.session = shelve.open(sessiondb, flag='n', protocol=2, writeback=True)
 
     def sanitize(self, d):
         """Makes dictionary d contain only yaml.safe_dump compatible elements"""
@@ -246,7 +252,7 @@ class Manager:
 
     def save_session_shelf(self):
         # not a shelve, we're most likely converting from an old style session
-        if type(self.session) == types.DictType:
+        if isinstance(self.session, dict):
             logging.info('Migrating from old-style session.')
             # create the new style session
             sessiondb = os.path.join(sys.path[0], 'session-%s.db' % self.configname)
