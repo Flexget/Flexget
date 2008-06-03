@@ -20,16 +20,17 @@ if __name__ == "__main__":
     f = file(lockfile, 'w')
     f.write("PID: %s\n" % os.getpid())
     f.close()
-    
-    if manager.options.doc:
-        manager.print_module_doc()
-    elif manager.options.list:
-        manager.print_module_list()
-    elif manager.options.failed:
-        manager.print_failed()
-    elif manager.options.clear_failed:
-        manager.clear_failed()
-    else:
-        manager.execute()
 
-    os.remove(lockfile)
+    try:
+        if manager.options.doc:
+            manager.print_module_doc()
+        elif manager.options.list:
+            manager.print_module_list()
+        elif manager.options.failed:
+            manager.print_failed()
+        elif manager.options.clear_failed:
+            manager.clear_failed()
+        else:
+            manager.execute()
+    finally:
+        os.remove(lockfile)
