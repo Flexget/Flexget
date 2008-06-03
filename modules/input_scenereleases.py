@@ -21,6 +21,10 @@ class InputScenereleases:
 
     """
         Uses scenereleases.info category as input.
+
+        Example:
+
+        scenereleases: http://www.scenereleases.info/search/label/Movies%20-%20DVD%20Rip
     """
 
     def register(self, manager, parser):
