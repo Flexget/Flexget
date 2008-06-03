@@ -1,0 +1,4 @@
+feeds:
+  test:
+    scenereleases: http://www.scenereleases.info/search/label/Movies%20-%20DVD%20Rip
+    dump: true

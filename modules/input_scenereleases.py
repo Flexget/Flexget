@@ -7,7 +7,7 @@ from feed import Entry
 
 __pychecker__ = 'unusednames=parser'
 
-log = logging.getLogger('rlslog')
+log = logging.getLogger('scenereleases')
 
 # this way we don't force users to install bs incase they do not want to use module http
 soup_present = True
@@ -18,17 +18,14 @@ try:
 except:
     soup_present = False
 
-class RlsLog:
+class InputScenereleases:
 
     """
-        Adds support for rlslog.net as a feed.
-
-        In case of movies the module supplies pre-parses IMDB-details
-        (helps when chaining with filter_imdb).
+        Uses scenereleases.info category as input.
     """
 
     def register(self, manager, parser):
-        manager.register(event='input', keyword='rlslog', callback=self.run)
+        manager.register(event='input', keyword='scenereleases', callback=self.run)
 
     def parse_imdb(self, s):
         score = None
@@ -46,51 +43,57 @@ class RlsLog:
         log.debug("parse_imdb returning score: '%s' votes: '%s' from: '%s'" % (str(score), str(votes), s))
         return (score, votes)
 
-    def parse_rlslog(self, rlslog_url, feed):
+    def parse_site(self, url, feed):
         """Parse configured url and return releases array"""
         
-        page = urllib2.urlopen(rlslog_url)
+        page = urllib2.urlopen(url)
         soup = BeautifulSoup(page)
             
         releases = []
-        for entry in soup.findAll('div', attrs={'class' : 'entry'}):
+        for entry in soup.findAll('div', attrs={'class':re.compile('post uncustomized-post-template', re.IGNORECASE)}):
             release = {}
-            h3 = entry.find('h3', attrs={'class' : 'entrytitle'})
-            if not h3:
-                log.debug('No h3 entrytitle')
+            title = entry.find('h2')
+            if not title:
+                log.debug('No h2 entrytitle')
                 continue
-            release['title'] = h3.a.string.strip()
-            entrybody = entry.find('div', attrs={'class' : 'entrybody'})
-            if not entrybody:
-                log.debug('No entrybody')
-                continue
+            release['title'] = title.a.string.strip()
 
             log.debug('Processing title %s' % (release['title']))
 
-            rating = entrybody.find('strong', text=re.compile('imdb rating\:', re.IGNORECASE))
+            """
+            # TODO: parse imdb values
+            rating = entry.find('strong', text=re.compile('imdb rating\:', re.IGNORECASE))
             if rating != None:
                 score_raw = rating.next.string
                 if score_raw != None:
                     release['imdb_score'], release['imdb_votes'] = self.parse_imdb(score_raw)
+            """
             
-            for link in entrybody.findAll('a'):
+            for link in entry.findAll('a'):
                 link_name = link.string
                 if link_name == None:
                     continue
                 link_name = link_name.strip().lower()
                 link_href = link['href']
+                log.debug('found link %s -> %s' % (link_name, link_href))
                 # handle imdb link
-                if link_name == 'imdb':
+                if link_name.lower() == 'imdb':
                     release['imdb_url'] = link_href
+                    """
                     score_raw = link.next.next.string
                     if not release.has_key('imdb_score') and not release.has_key('imdb_votes') and score_raw != None:
                         release['imdb_score'], release['imdb_votes'] = self.parse_imdb(score_raw)
+                    """
 
                 # test if entry with this url would be resolvable (downloadable)
                 temp = {}
                 temp['title'] = release['title']
                 temp['url'] = link_href
                 if feed.resolvable(temp):
+                    release['url'] = link_href
+
+                # if name is torrent
+                if link_name.lower() == 'torrent':
                     release['url'] = link_href
 
             # reject if no torrent link
@@ -105,13 +108,13 @@ class RlsLog:
         if not soup_present: raise Exception(soup_err)
 
         try:
-	    releases = self.parse_rlslog(feed.get_input_url('rlslog'), feed)
+	    releases = self.parse_site(feed.get_input_url('scenereleases'), feed)
         except urllib2.HTTPError, e:
-            raise Warning('RlsLog was unable to complete task. HTTPError %s' % (e.code))
+            raise Warning('scenereleases was unable to complete task. HTTPError %s' % (e.code))
         except urllib2.URLError, e:
-            raise Warning('RlsLog was unable to complete task. URLError %s' % (e.reason))
+            raise Warning('scenereleases was unable to complete task. URLError %s' % (e.reason))
         except BadStatusLine:
-            raise Warning('RlsLog was unable to complete task. Got BadStatusLine.')
+            raise Warning('scenereleases was unable to complete task. Got BadStatusLine.')
 
         for release in releases:
             # construct entry from release

@@ -16,9 +16,3 @@ class ResolveIsoHunt:
         
     def resolve(self, feed, entry):
         entry['url'] = entry['url'].replace('torrent_details', 'download')
-
-if __name__ == '__main__':
-    import sys
-    logging.basicConfig(level=logging.DEBUG)
-    import test_tools
-    test_tools.test_resolver(ResolveIsoHunt())
