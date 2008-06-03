@@ -145,7 +145,7 @@ class Manager:
             logging.critical(e)
             sys.exit(1)
             
-        self.load_session(reset=self.options.reset)
+        self.load_session()
             
         # check if session version number is different
         if self.session.setdefault('version', self.session_version) != self.session_version:
@@ -172,25 +172,25 @@ class Manager:
         logging.debug('Tried to read from: %s' % string.join(possible, ', '))
         raise Exception('Failed to load configuration file %s' % self.options.config)
 
-    def load_session(self, reset=False):
+    def load_session(self):
         if not self.configname:
             raise Exception('self.configname missing')
 
-        if not reset:
+        if not self.options.reset:
             # load the old style file, if not found, migrate to new style
             if not self.load_session_yaml():
                 self.load_session_shelf()
         else:
-            self.load_session_yaml(reset=True)
-            self.load_session_shelf(reset=True)
+            self.load_session_yaml()
+            self.load_session_shelf()
 
-    def load_session_yaml(self, reset=False):
+    def load_session_yaml(self):
         """Deprecated, is used only in migrating currently."""
         # TODO: remove at some point
         sessionfile = os.path.join(sys.path[0], 'session-%s.yml' % self.configname)
         if os.path.exists(sessionfile):
             # special case: reseting at the same time we would migrate -> just remove the old session file
-            if reset:
+            if self.options.reset:
                 os.remove(sessionfile)
                 return
             logging.info('Old sessionfile loaded. Session file will be migrated to the new format at the end of this run')
@@ -208,11 +208,11 @@ class Manager:
         
         return False
                 
-    def load_session_shelf(self, reset=False):
+    def load_session_shelf(self):
         sessiondb = os.path.join(sys.path[0], 'session-%s.db' % self.configname)
         # note: writeback must be True because how modules use our persistence.
         # See. http://docs.python.org/lib/node328.html
-        if not reset:
+        if not self.options.reset:
             self.session = shelve.open(sessiondb, protocol=2, writeback=True)
         else:
             # create a new empty database

@@ -1,7 +1,6 @@
 import urllib2
 import logging
 import re
-import yaml
 from httplib import BadStatusLine
 from feed import Entry
 

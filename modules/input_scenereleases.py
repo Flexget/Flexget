@@ -1,7 +1,6 @@
 import urllib2
 import logging
 import re
-import yaml
 from httplib import BadStatusLine
 from feed import Entry
 
@@ -75,9 +74,10 @@ class InputScenereleases:
                     continue
                 link_name = link_name.strip().lower()
                 link_href = link['href']
-                log.debug('found link %s -> %s' % (link_name, link_href))
+                #log.debug('found link %s -> %s' % (link_name, link_href))
                 # handle imdb link
                 if link_name.lower() == 'imdb':
+                    log.debug('found imdb link %s' % link_href)
                     release['imdb_url'] = link_href
                     """
                     score_raw = link.next.next.string
@@ -94,6 +94,7 @@ class InputScenereleases:
 
                 # if name is torrent
                 if link_name.lower() == 'torrent':
+                    log.debug('found torrent url %s' % link_href)
                     release['url'] = link_href
 
             # reject if no torrent link
