@@ -181,13 +181,18 @@ class Manager:
             if not self.load_session_yaml():
                 self.load_session_shelf()
         else:
+            self.load_session_yaml(reset=True)
             self.load_session_shelf(reset=True)
 
-    def load_session_yaml(self):
+    def load_session_yaml(self, reset=False):
         """Deprecated, is used only in migrating currently."""
         # TODO: remove at some point
         sessionfile = os.path.join(sys.path[0], 'session-%s.yml' % self.configname)
         if os.path.exists(sessionfile):
+            # special case: reseting at the same time we would migrate -> just remove the old session file
+            if reset:
+                os.remove(sessionfile)
+                return
             logging.info('Old sessionfile loaded. Session file will be migrated to the new format at the end of this run')
             try:
                 self.session = yaml.safe_load(file(sessionfile))
