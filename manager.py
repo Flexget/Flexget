@@ -100,6 +100,8 @@ class Manager:
                           help='Use experimental features.')
         parser.add_option('--debug', action='store_true', dest='debug', default=0,
                           help=SUPPRESS_HELP)
+        parser.add_option('--dump', action='store_true', dest='dump', default=0,
+                          help=SUPPRESS_HELP)
 
         # add module path to sys.path so they can import properly ..
         sys.path.append(self.moduledir)
@@ -239,21 +241,28 @@ class Manager:
         if not self.configname:
             raise Exception('self.configname missing')
             
+        if self.options.dump:
+            self.dump_session_yaml()
+
         self.save_session_shelf()
 
-    """
-    def save_session_yaml(self):
+    def dump_session_yaml(self):
+        """Dumps session into yaml file for easier debugging """
         try:
-            sessionfile = os.path.join(sys.path[0], 'session-%s.yml' % self.configname)
-            
-            f = file(sessionfile, 'w')
-            self.sanitize(self.session)
-            yaml.safe_dump(self.session, f, allow_unicode=True)
+            fn = os.path.join(sys.path[0], 'dump-%s.yml' % self.configname)
+
+            # mirgrate data
+            dump = {}
+            for k,v in self.session.iteritems():
+                dump[k] = v
+
+            f = file(fn, 'w')
+            self.sanitize(dump)
+            yaml.safe_dump(dump, f, allow_unicode=True)
             f.close()
+            logging.info('Dumped session as YML to %s' % fn)
         except Exception, e:
-            logging.exception("Failed to save session data (%s)!" % e)
-            logging.critical(yaml.dump(self.session))
-    """
+            logging.exception("Failed to dump session data (%s)!" % e)
 
     def save_session_shelf(self):
         # not a shelve, we're most likely converting from an old style session
