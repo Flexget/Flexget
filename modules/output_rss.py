@@ -103,7 +103,7 @@ class OutputRSS:
         if not rss2gen:
             raise Exception('module make_rss requires PyRSS2Gen library.')
         config = self.get_config(feed)
-        link_fields = feed.config['make_rss'].get('link', [])
+        link_fields = config.get('link', [])
         # if no fields given, use defaults
         if len(link_fields) == 0:
             link_fields = ['imdb_url', 'input_url']
