@@ -485,7 +485,7 @@ class Manager:
         self.session['failed'] = []
 
     def merge_dict(self, d1, d2):
-        """Merges yaml dictionary d1 into dictionary d2. d1 will remain in original form"""
+        """Merges dictionary d1 into dictionary d2. d1 will remain in original form."""
         for k, v in d1.items():
             if d2.has_key(k):
                 if type(v) == type(d2[k]):
@@ -493,8 +493,10 @@ class Manager:
                         self.merge_dict(d1[k], d2[k])
                     elif type(v) == types.ListType:
                         d2[k].extend(v)
+                    elif isinstance(v, basestring):
+                        pass
                     else:
-                      raise Exception('Unknown type %s in dictionary' % type(v))
+                        raise Exception('Unknown type %s in dictionary' % type(v))
                 else:
                     raise Warning('Merging key %s failed, incompatible datatypes.' % (k))
             else:

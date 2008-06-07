@@ -95,6 +95,9 @@ class OutputRSS:
             config = {'file': config}
         config.setdefault('days', 7)
         config.setdefault('items', -1)
+        config.setdefault('link', ['imdb_url', 'input_url'])
+        # add url as last resort
+        config['link'].append('url')
         if not config.has_key('file'):
             raise Warning('make_rss is missing a file parameter')
         return config
@@ -103,18 +106,12 @@ class OutputRSS:
         if not rss2gen:
             raise Exception('module make_rss requires PyRSS2Gen library.')
         config = self.get_config(feed)
-        link_fields = config.get('link', [])
-        # if no fields given, use defaults
-        if len(link_fields) == 0:
-            link_fields = ['imdb_url', 'input_url']
-        # always add url as last resort
-        link_fields.append('url')
         store = feed.shared_cache.storedefault(config['file'], [])
         for entry in feed.entries:
             # make rss data item and store it
             rss = {}
             rss['title'] = entry['title']
-            for field in link_fields:
+            for field in config['link']:
                 if entry.has_key(field):
                     rss['link'] = entry[field]
                     break
