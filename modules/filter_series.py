@@ -227,10 +227,6 @@ class FilterSeries:
     def input_series(self, feed):
         """Retrieve stored series from cache, incase they've been expired from feed while waiting"""
         for name in feed.config.get('series', []):
-            conf = {}
-            if type(name) == types.DictType:
-                name, conf = name.items()[0]
-
             serie = feed.cache.get(name)
             if not serie: continue
             for identifier in serie.keys():
@@ -387,8 +383,7 @@ class FilterSeries:
         episode = cache.setdefault(serie.identifier(), {})
         info = episode.setdefault('info', {})
         # store and make first seen time
-        fs = info.setdefault('first_seen', list(datetime.today().timetuple())[:-4] )
-        first_seen = datetime(*fs)
+        info.setdefault('first_seen', list(datetime.today().timetuple())[:-4])
         info.setdefault('downloaded', False)
         ec = {}
         ec['title'] = entry['title']
