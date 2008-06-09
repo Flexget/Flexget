@@ -44,18 +44,18 @@ class InputRSS:
     """
 
     def register(self, manager, parser):
-        manager.register(event="input", keyword="rss", callback=self.run)
+        manager.register(event='input', keyword='rss', callback=self.run)
 
     def passwordize(self, url, user, password):
         """Add username and password to url"""
         parts = list(urlparse.urlsplit(url))
-        parts[1] = user+":"+password+"@"+parts[1]
+        parts[1] = user+':'+password+'@'+parts[1]
         url = urlparse.urlunsplit(parts)
         return url        
 
     def run(self, feed):
         if not feedparser_present:
-            raise Warning("Module RSS requires Feedparser. Please install it from http://www.feedparser.org/ or from your distro repository")
+            raise Warning('Module RSS requires Feedparser. Please install it from http://www.feedparser.org/ or from your distro repository')
 
         config = feed.config['rss']
         if type(config) != types.DictType:
@@ -66,34 +66,34 @@ class InputRSS:
         if config.has_key('username') and config.has_key('password'):
             url = self.passwordize(url, config['username'], config['password'])
 
-        log.debug("Checking feed %s (%s)", feed.name, url)
+        log.debug('Checking feed %s (%s)', feed.name, url)
 
         # check etags and last modified -headers
         etag = feed.cache.get('etag', None)
         if etag:
-            log.debug("Sending etag %s for feed %s" % (etag, feed.name))
+            log.debug('Sending etag %s for feed %s' % (etag, feed.name))
         modified = feed.cache.get('modified', None)
         if modified:
-            log.debug("Sending last-modified %s for feed %s" % (etag, feed.name))
+            log.debug('Sending last-modified %s for feed %s' % (etag, feed.name))
 
         # get the feed & parse
         try:
             rss = feedparser.parse(url, etag=etag, modified=modified)
         except IOError:
-            raise Exception("IOError when loading feed %s", feed.name)
+            raise Exception('IOError when loading feed %s', feed.name)
 
         # status checks
         status = rss.get('status', False)
         if status:
             if status == 304:
-                log.debug("Feed %s hasn't changed, skipping" % feed.name)
+                log.debug('Feed %s hasn\'t changed, skipping' % feed.name)
                 return
             elif status == 401:
-                raise Warning("Authentication needed for feed %s: %s", feed.name, rss.headers['www-authenticate'])
+                raise Warning('Authentication needed for feed %s: %s', feed.name, rss.headers['www-authenticate'])
             elif status == 404:
-                raise Warning("RSS Feed %s not found", feed.name)
+                raise Warning('RSS Feed %s not found', feed.name)
             elif status == 500:
-                raise Warning("Internal server exception on feed %s", feed.name)
+                raise Warning('Internal server exception on feed %s', feed.name)
         else:
             log.error('rss does not have status: %s' % rss)
             
@@ -105,28 +105,33 @@ class InputRSS:
             elif ex == xml.sax._exceptions.SAXParseException:
                 raise Warning('RSS Feed %s is not valid XML' % feed.name)
             elif ex == urllib2.URLError:
-                raise Warning("urllib2.URLError")
+                raise Warning('urllib2.URLError')
             else:
-                log.error("Unhandled bozo_exception. Type: %s.%s (feed: %s)" % (ex.__class__.__module__, ex.__class__.__name__ , feed.name))
+                log.error('Unhandled bozo_exception. Type: %s.%s (feed: %s)' % (ex.__class__.__module__, ex.__class__.__name__ , feed.name))
                 return
 
         if rss['bozo']:
             log.error(rss)
-            log.error("Bozo feed exception on %s" % feed.name)
+            log.error('Bozo feed exception on %s' % feed.name)
             return
             
         log.debug('encoding %s' % rss.encoding)
 
         # update etag, use last modified if no etag exists
         if rss.has_key('etag') and type(rss['etag']) != feedparser.types.NoneType:
-            etag = rss.etag.replace("'", "").replace('"', "")
+            etag = rss.etag.replace("'", '').replace('"', '')
             feed.cache.store('etag', etag, 90)
-            log.debug("etag %s saved for feed %s" % (etag, feed.name))
+            log.debug('etag %s saved for feed %s' % (etag, feed.name))
         elif rss.headers.has_key('last-modified'):
             feed.cache.store('modified', rss.modified, 90)
-            log.debug("last modified saved for feed %s", feed.name)
+            log.debug('last modified saved for feed %s', feed.name)
 
         for entry in rss.entries:
+            # skip rss items without links
+            if not entry.has_key(config.get('link', 'link')):
+                log.info('Skipped RSS-entry that does not contain configured link attribute %s' % config.get('link', 'link'))
+                continue
+
             # fix for crap feeds with no ID
             if not entry.has_key('id'):
                 entry['id'] = entry.link
@@ -140,7 +145,7 @@ class InputRSS:
             except AttributeError, e:
                 log.error('RSS-entry does not contain configured link attribute %s' % config.get('link', 'link'))
                 continue
-            e['title'] = entry.title.replace(u"\u200B", u"") # remove annoying zero width spaces
+            e['title'] = entry.title.replace(u'\u200B', u'') # remove annoying zero width spaces
 
             # store basic auth info
             if config.has_key('username') and config.has_key('password'):
@@ -148,16 +153,3 @@ class InputRSS:
                 e['basic_auth_password'] = config['password']
             
             feed.entries.append(e)
-
-if __name__ == '__main__':
-    import sys
-    logging.basicConfig(level=logging.DEBUG)
-
-    from test_tools import MockFeed
-    feed = MockFeed()
-
-    rss = InputRSS()
-    rss.run(feed)
-
-    import yaml
-    print yaml.dump(feed.entries)
