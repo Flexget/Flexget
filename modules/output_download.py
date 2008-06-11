@@ -135,8 +135,7 @@ class ModuleDownload:
         destfile = os.path.join(os.path.expanduser(path), entry.get('filename', entry['title']))
 
         if not os.path.exists(os.path.expanduser(path)):
-            log.error("Cannot write output file %s, does the path exist?" % destfile)
-            return
+            raise Warning("Cannot write output file %s, does the path exist?" % destfile)
 
         if os.path.exists(destfile):
             raise Warning("File '%s' already exists" % destfile)
@@ -146,6 +145,7 @@ class ModuleDownload:
             f = file(destfile, 'w')
             f.write(entry['data'])
             f.close()
+            log.info('File %s downloaded' % destfile)
         except:
             # remove failed write
             os.remove(destfile)
