@@ -56,12 +56,12 @@ class RlsLog:
             release = {}
             h3 = entry.find('h3', attrs={'class' : 'entrytitle'})
             if not h3:
-                log.debug('No h3 entrytitle')
+                log.debug('FAIL: No h3 entrytitle')
                 continue
             release['title'] = h3.a.string.strip()
             entrybody = entry.find('div', attrs={'class' : 'entrybody'})
             if not entrybody:
-                log.debug('No entrybody')
+                log.debug('FAIL: No entrybody')
                 continue
 
             log.debug('Processing title %s' % (release['title']))
@@ -78,7 +78,7 @@ class RlsLog:
                     continue
                 link_name = link_name.strip().lower()
                 link_href = link['href']
-                # handle imdb link
+                # parse imdb link
                 if link_name == 'imdb':
                     release['imdb_url'] = link_href
                     score_raw = link.next.next.string
@@ -91,12 +91,15 @@ class RlsLog:
                 temp['url'] = link_href
                 if feed.resolvable(temp):
                     release['url'] = link_href
+                    log.debug('--> accepting %s (resolvable)' % link_href)
+                else:
+                    log.debug('<-- ignoring %s (non-resolvable)' % link_href)
 
             # reject if no torrent link
             if release.has_key('url'):
                 releases.append(release)
             else:
-                log.info('%s rejected due to missing or unrecognized torrent link' % (release['title']))
+                feed.log_once('%s rejected due to missing or unrecognized download link' % (release['title']), log)
 
         return releases
 
