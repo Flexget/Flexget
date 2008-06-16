@@ -61,15 +61,22 @@ class TestResolvers(FlexGetTestCase):
     def setUp(self):
         self.config = 'test/test_resolvers.yml'
         FlexGetTestCase.setUp(self)
+        self.feed.execute()
         
     def testPirateBay(self):
-        self.feed.execute()
         # test with piratebay entry
         entry = self.feed.entries[0]
         self.assertEqual(self.feed.resolvable(entry), True)
         # not a piratebay entry
         entry = self.feed.entries[1]
         self.assertEqual(self.feed.resolvable(entry), False)
+
+    def testNyaaTorrents(self):
+        entry = self.feed.entries[2]
+        self.assertEqual(entry['url'], 'http://www.nyaatorrents.org/?page=torrentinfo&tid=12345')
+        self.assertEqual(self.feed.resolvable(entry), True)
+        self.feed.resolve(entry)
+        self.assertEqual(entry['url'], 'http://www.nyaatorrents.org/?page=download&tid=12345')
     
     
 if __name__ == '__main__':

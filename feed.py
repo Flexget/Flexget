@@ -5,6 +5,7 @@ from datetime import datetime
 class ResolverException(Exception):
     def __init__(self, value):
         self.value = value
+        Exception.__init__(value)
     def __str__(self):
         return repr(self.value)
 
@@ -34,7 +35,7 @@ class Entry(dict):
         return "%s | %s" % (self['title'], self['url'])
 
     def isvalid(self):
-        """Return True if entry is valid. Return False if this should cannot be used."""
+        """Return True if entry is valid. Return False if this cannot be used."""
         if not self.has_key('title'):
             return False
         if not self.has_key('url'):
@@ -257,6 +258,11 @@ class Feed:
         b = self.__get_order(b)
         return cmp(a, b)
 
+    def __set_namespace(self, name):
+        """Switch namespace in session"""
+        self.cache.set_namespace(name)
+        self.shared_cache.set_namespace(name)
+
     def __run_modules(self, event):
         """Execute module callbacks by event type if module is configured for this feed."""
         modules = self.manager.get_modules_by_event(event)
@@ -267,8 +273,7 @@ class Feed:
             keyword = module['keyword']
             if self.config.has_key(keyword) or (module['builtin'] and not self.config.get('disable_builtins', False)):
                 # set cache namespaces to this module realm
-                self.cache.set_namespace(keyword)
-                self.shared_cache.set_namespace(keyword)
+                self.__set_namespace(keyword)
                 # store execute info
                 self.__current_event = event
                 self.__current_module = keyword
@@ -336,6 +341,9 @@ class Feed:
                     try:
                         resolver.resolve(self, entry)
                     except ResolverException, r:
+                        # increase failcount
+                        count = self.shared_cache.setdefault(entry['url'], 1)
+                        count += 1
                         raise ResolverException('%s: %s' % (name, r.value))
                     except Exception, e:
                         logging.exception(e)
@@ -364,6 +372,7 @@ class Feed:
                     continue
             # handle resolve event a bit special
             if event == 'resolve' and not self.unittest:
+                self.__set_namespace('resolve')
                 self._resolve_entries()
                 self.__purge_failed()
                 continue

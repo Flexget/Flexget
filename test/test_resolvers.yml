@@ -6,3 +6,4 @@ feeds:
     input_mock:
       - {title: 'something', url: 'http://thepiratebay.org/tor/8492471/Test.avi'}
       - {title: 'bar', url: 'http://thepiratebay.org/search/something'}
+      - {title: 'nyaa', url: 'http://www.nyaatorrents.org/?page=torrentinfo&tid=12345'}
