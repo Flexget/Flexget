@@ -227,6 +227,8 @@ class FilterSeries:
     def input_series(self, feed):
         """Retrieve stored series from cache, incase they've been expired from feed while waiting"""
         for name in feed.config.get('series', []):
+            if type(name) == types.DictType:
+                name = name.items()[0][0]
             serie = feed.cache.get(name)
             if not serie: continue
             for identifier in serie.keys():
