@@ -16,11 +16,9 @@ class Subtitles:
     """
     Fetch subtitles from opensubtitles.org
     """
-    def __init__(self):
-        pass
 
     def register(self, manager, parser):
-        manager.register(event='terminate', keyword='subtitles', callback=self.get_subtitles)
+        manager.register(event='output', keyword='subtitles', callback=self.get_subtitles)
 
     def get_config(self, feed):
         config = feed.config['subtitles']
