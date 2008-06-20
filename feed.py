@@ -5,7 +5,6 @@ from datetime import datetime
 class ResolverException(Exception):
     def __init__(self, value):
         self.value = value
-        Exception.__init__(value)
     def __str__(self):
         return repr(self.value)
 
@@ -342,7 +341,7 @@ class Feed:
                         resolver.resolve(self, entry)
                     except ResolverException, r:
                         # increase failcount
-                        count = self.shared_cache.setdefault(entry['url'], 1)
+                        count = self.shared_cache.storedefault(entry['url'], 1)
                         count += 1
                         raise ResolverException('%s: %s' % (name, r.value))
                     except Exception, e:
