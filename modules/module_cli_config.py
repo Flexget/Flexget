@@ -65,28 +65,3 @@ class CliConfig:
         if self.parse_replaces(feed):
             self.replace_dict(feed.config, self.replaces)
             log.debug(feed.config)
-
-
-if __name__ == '__main__':
-    import sys
-    from test_tools import MockFeed
-    import yaml
-    logging.basicConfig(level=logging.DEBUG)
-    feed = MockFeed()
-
-    # make mock config
-    config = {}
-    config['url'] = '$url'
-    values = {}
-    values['url'] = 1
-    values['title'] = 3
-    config['values'] = '@values'
-    config['array'] = ['a','b','$arr','d']
-    feed.config['csv'] = config
-    
-    replaces = {'url':'new replaced url', 'values':'new replaced value', 'arr':'new in array'}
-    
-    ci = CliConfig()
-    ci.replace_dict(config, replaces)
-
-    print yaml.dump(config)

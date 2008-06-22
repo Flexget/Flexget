@@ -5,11 +5,11 @@ from feed import ResolverException
 
 __pychecker__ = 'unusednames=parser,feed'
 
-log = logging.getLogger("newtorrents")
+log = logging.getLogger('newtorrents')
 
 # this way we don't force users to install bs incase they do not want to use module
 soup_present = True
-soup_err = "Module newtorrents requires BeautifulSoup. Please install it from http://www.crummy.com/software/BeautifulSoup/ or from your distribution repository."
+soup_err = 'Module newtorrents requires BeautifulSoup. Please install it from http://www.crummy.com/software/BeautifulSoup/ or from your distribution repository.'
 
 try:
     from BeautifulSoup import BeautifulSoup
@@ -37,7 +37,7 @@ class ResolveNewTorrents:
 
         # resolve entry url
         url = entry['url']
-        if url.startswith("http://www.newtorrents.info/?q=") or url.startswith("http://www.newtorrents.info/search"):
+        if url.startswith('http://www.newtorrents.info/?q=') or url.startswith('http://www.newtorrents.info/search'):
             url = self.__get_torrent_url_from_search(url, entry['title'])
         else:
             url = self.__get_torrent_url_from_page(url)
@@ -54,7 +54,7 @@ class ResolveNewTorrents:
             page = urllib2.urlopen(url)
             data = page.read()
         except urllib2.URLError:
-            log.error("URLerror when retrieving page")
+            log.error('URLerror when retrieving page')
             return None
         p = re.compile("copy\(\'(.*)\'\)", re.IGNORECASE)
         f = p.search(data)
@@ -75,27 +75,20 @@ class ResolveNewTorrents:
         soup = BeautifulSoup(page)
         torrents = []
         for link in soup.findAll('a', attrs={'href': re.compile('down.php')}):
-            torrent_url = "http://www.newtorrents.info%s" % link.get('href')
+            torrent_url = 'http://www.newtorrents.info%s' % link.get('href')
             release_name = link.parent.next.get('title').replace('.',' ').lower()
             if release_name == name:
                 torrents.append(torrent_url)
             else:
-                log.debug("rejecting search result: '%s' != '%s'" % (release_name, name))
+                log.debug('rejecting search result: %s != %s' % (release_name, name))
 
         # choose the torrent
         if not torrents:
-            raise ResolverException("%s doesn't match for any search results: %s" % (name, url))
+            raise ResolverException('%s doesn\'t match for any search results: %s' % (name, url))
         else:
             if len(torrents) == 1:
-                log.debug("found only one matching search result.")
+                log.debug('found only one matching search result.')
             else:
                 log.debug('search result contains multiple matches, using first occurence from: %s' % torrents)
                 # TODO: use the one that has most downloaders / seeders
             return torrents[0]
-
-
-if __name__ == '__main__':
-    import sys
-    logging.basicConfig(level=logging.DEBUG)
-    import test_tools
-    test_tools.test_resolver(ResolveNewTorrents())
