@@ -312,7 +312,10 @@ class Feed:
         """Verbose if details option is enabled"""
         # TODO: implement trough own logger?
         if self.manager.options.details:
-            print "+ %-8s %-12s %s" % (self.__current_event, self.__current_module, s)
+            try:
+                print "+ %-8s %-12s %s" % (self.__current_event, self.__current_module, s)
+            except:
+                print "+ %-8s %-12s ERROR: Unable to print %s" % (self.__current_event, self.__current_module, repr(s))
 
     def verbose_details_entries(self):
         """If details option is enabled, print all produced entries"""
