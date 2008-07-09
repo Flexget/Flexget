@@ -26,7 +26,23 @@ class FlexGetTestCase(unittest.TestCase):
         if not module:
             raise Exception('module %s isn\'t loaded (event %s)' % (keyword, event))
         return module
-        
+
+class TestFilterSeries(FlexGetTestCase):
+
+    def setUp(self):
+        self.config = 'test/test_series.yml'
+        FlexGetTestCase.setUp(self)
+        self.feed.execute()
+
+    def testSerieParser(self):
+        from filter_series import SerieParser
+        s1 = SerieParser()
+        s1.name = 'Something Interesting'
+        s1.data = 'Something.Interesting.S01E02-FlexGet'
+        s1.parse()
+        self.assertEqual(s1.season, 1)
+        self.assertEqual(s1.episode, 2)
+        self.assertEqual(s1.quality, 'unknown')
 
 
 class TestPatterns(FlexGetTestCase):
@@ -83,5 +99,6 @@ if __name__ == '__main__':
     suite = unittest.TestSuite()
     suite.addTest(unittest.makeSuite(TestPatterns))
     suite.addTest(unittest.makeSuite(TestResolvers))
+    suite.addTest(unittest.makeSuite(TestFilterSeries))
     # run suite
     unittest.TextTestRunner(verbosity=2).run(suite)

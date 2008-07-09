@@ -10,7 +10,7 @@ __pychecker__ = 'unusednames=parser'
 log = logging.getLogger('series')
 
 class SerieParser:
-    qualities = ['1080p', '1080', '720p', '720', 'hr', 'dvd', 'hdtv', 'dsr', 'dsrip', 'unknown']
+    qualities = ['1080p', '1080', '720p', '720', 'hr', 'dvd', 'dvdrip', 'hdtv', 'pdtv', 'dsr', 'dsrip', 'unknown']
     
     def __init__(self):
         # name of the serie
