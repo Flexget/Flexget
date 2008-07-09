@@ -58,7 +58,7 @@ class SerieParser:
             name_matches = False
             # use all specified regexps to this data
             for name_re in self.name_regexps:
-                m = re.search(name_re, self.data)
+                m = re.search(name_re, self.data, re.IGNORECASE|re.UNICODE)
                 if m:
                     name_matches = True
                     break
@@ -88,7 +88,7 @@ class SerieParser:
 
         # search for season and episode number
         for ep_re in self.ep_regexps:
-            m = re.search(ep_re, self.data.lower())
+            m = re.search(ep_re, self.data, re.IGNORECASE|re.UNICODE)
             if m:
                 log.debug('found episode number with regexp %s' % ep_re)
                 season, episode = m.groups()
@@ -100,7 +100,7 @@ class SerieParser:
 
         # search for id
         for id_re in self.id_regexps:
-            m = re.search(id_re, self.data.lower())
+            m = re.search(id_re, self.data, re.IGNORECASE|re.UNICODE)
             if m:
                 log.debug('found id with regexp %s' % id_re)
                 self.id = string.join(m.groups(), '-')
@@ -144,8 +144,8 @@ class FilterSeries:
 
         Only first file is downloaded.
 
-        If two different qualities come available at the same moment,
-        flexget will always download the better one. (more options coming ..)
+        If different qualities come available at the same moment,
+        flexget will always download the best one (up to 720p by default).
 
         Supports default settings trough settings block in configuration file.
 
@@ -153,9 +153,10 @@ class FilterSeries:
         ----------------------------
 
         The standard name matching is not perfect, if you're used to working with regexps you can
-        specify regexp that is used to test if entry is serie.
+        specify regexp that is used to test if entry is a defined series.
 
-        You can also give regexps to episode number matching and unique id matching.
+        You can also give regexps to episode number matching or unique id matching if it doesn't have
+        normal episode numbering scheme (season, episode).
 
         Example:
 
