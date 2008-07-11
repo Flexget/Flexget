@@ -1,6 +1,8 @@
-import os
+import sys, os
 import urllib2
 import logging
+import shutil
+import md5
 
 __pychecker__ = 'unusednames=parser,feed'
 
@@ -75,10 +77,36 @@ class ModuleDownload:
             f = urllib2.urlopen(entry['url'])
 
         mimetype = f.headers.getsubtype()
-        content = f.read()
-        f.close()
-        # store data and mimetype for entry
-        entry['data'] = content
+
+        # generate temp file
+        m = md5.new()
+        m.update(entry['url'])
+        tmp_path = os.path.join(sys.path[0], 'temp')
+        if not os.path.isdir(tmp_path):
+            logging.debug('creating tmp_path %s' % tmp_path)
+            os.mkdir(tmp_path)
+        datafile = os.path.join(tmp_path, m.hexdigest()) 
+
+        # download and write data into a temp file
+        buffer_size = 1024
+        outfile = open(datafile, 'wb')
+        try:
+            while 1:
+                data = f.read(buffer_size)
+                if not data:
+                    logging.debug('wrote file %s' % datafile)
+                    break
+                outfile.write(data)
+            outfile.close()
+            f.close()
+            # store temp filename into entry so other modules may read and modify content
+            # later this temp file is moved into final destination (at self.output)
+            entry['file'] = datafile
+        except Exception, e:
+            # don't leave futile files behind
+            os.remove(datafile)
+            raise
+
         entry['mimetype'] = mimetype
         # if there is no specified filename, generate one from headers
         if not entry.has_key('filename'):
@@ -101,7 +129,6 @@ class ModuleDownload:
             log.debug('mimetypes guess for %s is %s ' % (response.headers.getsubtype(), ext))
             log.debug('Using with guessed extension: %s' % entry['filename'])
             return
-        
 
     def execute_outputs(self, feed):
         self.validate_config(feed)
@@ -113,16 +140,20 @@ class ModuleDownload:
                     self.output(feed, entry)
                     feed.verbose_details('Downloaded %s' % entry['title'])
             except Warning, e:
-                # different handling because IOError is "ok"
-                log.warning('Error while writing: %s' % e)
+                feed.fail(entry)
+                log.error('Error while writing: %s' % e)
             except Exception, e:
                 feed.fail(entry)
                 log.exception('Error while writing: %s' % e)
+            # remove temp file if it remains due exceptions
+            if os.path.exists(entry['file']):
+                log.debug('removing temp file %s (left behind)' % entry['file'])
+                os.remove(entry['file'])
 
     def output(self, feed, entry):
-        """Writes entry.data into a file"""
-        if not entry.has_key('data'):
-            raise Exception('Entry %s has no data' % entry['title'])
+        """Moves temp-file into final destination"""
+        if not entry.has_key('file'):
+            raise Exception('Entry %s has no temp file associated with' % entry['title'])
         # use path from entry if has one, otherwise use from download definition parameter
         path = entry.get('path', feed.config['download'])
         # override path from commandline parameter
@@ -139,15 +170,11 @@ class ModuleDownload:
 
         if os.path.exists(destfile):
             raise Warning("File '%s' already exists" % destfile)
-        
-        # write file        
-        try:
-            f = file(destfile, 'w')
-            f.write(entry['data'])
-            f.close()
-            log.info('File %s downloaded' % destfile)
-        except:
-            # remove failed write
-            os.remove(destfile)
-            log.error('Invalid data object: type: %s repr: %s' % (type(entry['data']), repr(entry['data'])) )
-            raise
+
+        # move file
+        shutil.move(entry['file'], destfile)
+        logging.debug('moved %s to %s' % (entry['file'], destfile))
+        # remove temp file from entry
+        del(entry['file'])
+
+        # TODO: should we add final filename? different key?     

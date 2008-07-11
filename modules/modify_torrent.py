@@ -170,17 +170,31 @@ class TorrentFilename:
         manager.register(event='modify', keyword='torrent', callback=self.run, order=-200, builtin=True)
 
     def run(self, feed):
+        idstr = 'd8:announce'
         for entry in feed.entries:
-            # create torrent object from torrent & match data
+            f = open(entry['file'], 'r')
+            data = f.read(len(idstr))
+            f.close()
+            if not data == idstr:
+                # not a torrent file at all, skip
+                continue
+            
+            # create torrent object from torrent
             try:
-                torrent = Torrent(entry.get('data', ''))
+                f = open(entry['file'], 'r')
+                # NOTE: this reads entire file into memory, but we're pretty sure it's
+                # a small torrent file since it starts with idstr
+                data = f.read()
+                f.close()
+                # construct torrent object
+                torrent = Torrent(data)
                 entry['torrent'] = torrent
                 # if we do not have good filename (by download module)
                 # for this entry, try to generate one from torrent content
                 if not entry.has_key('filename'):
                     entry['filename'] = self.make_filename(torrent, entry)
             except:
-                # not a torrent file, no need to mess with it
+                # not a VALID torrent file, no need to mess with it
                 pass
 
     def make_filename(self, torrent, entry):
