@@ -446,7 +446,7 @@ class FilterImdb:
             entry['imdb_plot_outline'] = imdb.plot_outline
             entry['imdb_name'] = imdb.name
 
-            if len(reasons) != 0:
+            if reasons:
                 feed.log_once('Filtering %s because of rule(s) %s' % (entry['title'], string.join(reasons, ', ')), log)
                 feed.filter(entry)
             else:

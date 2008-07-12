@@ -146,9 +146,10 @@ class ModuleDownload:
                 feed.fail(entry)
                 log.exception('Error while writing: %s' % e)
             # remove temp file if it remains due exceptions
-            if os.path.exists(entry['file']):
-                log.debug('removing temp file %s (left behind)' % entry['file'])
-                os.remove(entry['file'])
+            if entry.has_key('file'):
+                if os.path.exists(entry['file']):
+                    log.debug('removing temp file %s (left behind)' % entry['file'])
+                    os.remove(entry['file'])
 
     def output(self, feed, entry):
         """Moves temp-file into final destination"""
