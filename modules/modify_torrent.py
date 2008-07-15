@@ -172,6 +172,9 @@ class TorrentFilename:
     def run(self, feed):
         idstr = 'd8:announce'
         for entry in feed.entries:
+            # skip if entry does not have file assigned
+            if not entry.has_key('file'):
+                continue
             f = open(entry['file'], 'r')
             data = f.read(len(idstr))
             f.close()
