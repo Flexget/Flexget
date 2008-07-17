@@ -1,0 +1,6 @@
+group:
+  name: foo
+  email: foo@mail.com
+user:
+  name: bar
+  email: bar@mail.com

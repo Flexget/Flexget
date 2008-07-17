@@ -1,0 +1,9 @@
+answers:
+  - name:      Foo
+    answer:    good
+    reason:    I like this style.
+  - name:      Bar
+    answer:    not bad
+  - name:      Baz
+    answer:    bad
+    reason:    I don't like this style.

@@ -1,0 +1,11 @@
+type: seq
+sequence:
+  - type:     map
+    required: yes
+    mapping:
+     "name":   { type: str, required: yes, unique: yes }
+     "email":  { type: str }
+     "groups":
+        type:     seq
+        sequence:
+          - { type: str, unique: yes }

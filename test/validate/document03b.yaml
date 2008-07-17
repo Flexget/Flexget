@@ -1,0 +1,6 @@
+- name:   foo
+  email:  foo@mail.com
+- naem:   bar
+  email:  bar@mail.net
+- name:   baz
+  mail:   baz@mail.org

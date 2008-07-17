@@ -1,0 +1,9 @@
+type:      seq
+sequence:
+  - type:      map
+    mapping:
+     "name":
+        type:      str
+        required:  true
+     "email":
+        type:      str

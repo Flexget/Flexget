@@ -1,0 +1,12 @@
+type:       map
+mapping:
+ "name":
+    type:      str
+    required:  yes
+ "email":
+    type:      str
+    pattern:   /@/
+ "age":
+    type:      int
+ "birth":
+    type:      date

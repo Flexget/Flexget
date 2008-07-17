@@ -1,0 +1,13 @@
+type:   seq
+sequence:
+  - &employee
+    type:      map
+    mapping:
+     "given-name": &name
+        type:     str
+        required: yes
+     "family-name": *name
+     "post":
+        type: str
+        enum: [exective, manager, clerk]
+     "supervisor":  *employee

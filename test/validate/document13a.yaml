@@ -1,0 +1,17 @@
+- &foo
+  given-name:    foo
+  family-name:   Foo
+  post:          exective
+- &bar
+  given-name:    bar
+  family-name:   Bar
+  post:          manager
+  supervisor:    *foo
+- given-name:    baz
+  family-name:   Baz
+  post:          clerk
+  supervisor:    *bar
+- given-name:    zak
+  family-name:   Zak
+  post:          clerk
+  supervisor:    *bar

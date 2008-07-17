@@ -1,0 +1,5 @@
+type: map
+mapping:
+  =:              # default rule
+    type: number
+    range: { max: 1, min: -1 }

@@ -1,0 +1,12 @@
+- name:     foo
+  email:    foo(at)mail.com
+  password: xxx123
+  age:      twenty
+  blood:    a
+  birth:    1985-01-01
+- given-name:  bar
+  family-name: Bar
+  email:    bar@mail.net
+  age:      15
+  blood:    AB
+  birth:    1980/01/01

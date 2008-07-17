@@ -1,0 +1,15 @@
+- name:   foo
+  email:  admin@mail.com
+  groups:
+    - users
+    - foo
+    - admin
+- name:   bar
+  email:  admin@mail.com
+  groups:
+    - users
+    - admin
+- name:   baz
+  email:  baz@mail.com
+  groups:
+    - users

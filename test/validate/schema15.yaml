@@ -1,0 +1,21 @@
+type: map
+mapping:
+ "group":
+    type: map
+    mapping:
+     "name": &name
+        type: str
+        required: yes
+     "email": &email
+        type: str
+        pattern: /@/
+        required: no
+ "user":
+    type: map
+    mapping:
+     "name":
+        <<: *name             # merge
+        length: { max: 16 }   # add
+     "email":
+        <<: *email            # merge
+        required: yes         # override

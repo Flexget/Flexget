@@ -1,0 +1,7 @@
+answers:
+  - name:    Foo
+    answer:  good
+  - name:    Bar
+    answer:  bad
+  - name:    Baz
+    answer:  not bad

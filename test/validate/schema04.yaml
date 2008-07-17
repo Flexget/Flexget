@@ -1,0 +1,20 @@
+type:      map
+mapping:
+ "company":
+    type:      str
+    required:  yes
+ "email":
+    type:      str
+ "employees":
+    type:      seq
+    sequence:
+      - type:    map
+        mapping:
+         "code":
+            type:      int
+            required:  yes
+         "name":
+            type:      str
+            required:  yes
+         "email":
+            type:      str

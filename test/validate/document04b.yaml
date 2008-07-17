@@ -1,0 +1,9 @@
+company:    Kuwata Lab.
+email:      webmaster@kuwata-lab.com
+employees:
+  - code:   A101
+    name:   foo
+    email:  foo@kuwata-lab.com
+  - code:   102
+    name:   bar
+    mail:   bar@kuwata-lab.com
