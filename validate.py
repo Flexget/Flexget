@@ -61,12 +61,14 @@ class Validate:
             for item in items:
                 self.validate_map(item, item_schema)
                 self.path[level] =+ 1
+            # TODO: unique constraint
         else:
             # normal sequence
             for item in items:
                 if not self.istype(item, schema_type):
                     self.error('seq item %s is not %s' % (item, schema_type))
                 self.path[level] =+ 1
+            # TODO: unique constraint
         self.path_remove_level(level)
 
     def validate_map(self, data, schema):
@@ -84,6 +86,9 @@ class Validate:
             # recurse if sequence
             if mapping[k]['type']=='seq':
                 self.validate_list(v, mapping[k])
+                continue
+            if mapping[k]['type']=='map':
+                self.error('implement map of map!')
                 continue
             # check constraints
             self.check_constraints(v, mapping[k])
@@ -123,11 +128,9 @@ class Validate:
         # pattern
         pattern = schema.get('pattern')
         if pattern:
-            # DEBUG !!!!
-            if pattern=='/@/':
-                pattern='.*'
-            # DEBUG !!!!
-            if not re.match(pattern, v):
+            if pattern.startswith('/') and pattern.endswith('/'):
+                pattern=pattern[1:-1]
+            if not re.search(pattern, v):
                 self.error('%s not matched to pattern %s.' % (v, pattern))
         # unique
         if schema.get('unique'):
