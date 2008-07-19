@@ -565,11 +565,12 @@ class Manager:
                     logging.exception('Feed %s: %s' % (feed.name, e))
 
             # execute terminate event for all feeds
-            for name, feed in feed_instances.iteritems():
-                try:
-                    feed.terminate()
-                except Exception, e:
-                    logging.exception('Feed %s terminate: %s' % (name, e))
+            if not self.options.validate:
+                for name, feed in feed_instances.iteritems():
+                    try:
+                        feed.terminate()
+                    except Exception, e:
+                        logging.exception('Feed %s terminate: %s' % (name, e))
                 
         finally:
             if not self.options.test:

@@ -29,6 +29,11 @@ class RlsLog:
     def register(self, manager, parser):
         manager.register(event='input', keyword='rlslog', callback=self.run)
 
+    def validate(self, config):
+        if not isinstance(config, str):
+            return ['wrong datatype']
+        return []
+
     def parse_imdb(self, s):
         score = None
         votes = None

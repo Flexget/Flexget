@@ -229,11 +229,22 @@ class FilterSeries:
         """Validate configuration format for this module"""
         from validator import ListValidator
         serie = ListValidator()
+        # just plain names
         serie.accept(str)
+        # or "bundles" with serie name as key ..
         bundle = serie.accept(dict)
-        serie_options = bundle.accept_any_key(dict)
-        serie_options.accept('path', str)
-        timeframe = serie_options.accept('timeframe', dict)
+        options = bundle.accept_any_key(dict)
+        options.accept('path', str)
+        # these patterns can be given in as a single string ..
+        options.accept('name_patterns', str)
+        options.accept('ep_patterns', str)
+        options.accept('id_patterns', str)
+        # .. or as list containing strings
+        options.accept('name_patterns', list).accept(str)
+        options.accept('ep_patterns', list).accept(str)
+        options.accept('id_patterns', list).accept(str)
+        # timeframe dict
+        timeframe = options.accept('timeframe', dict)
         timeframe.accept('hours', int)
         timeframe.accept('enough', str) # TODO: accept only list of qualities!
         serie.validate(config)

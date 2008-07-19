@@ -3,6 +3,11 @@ import sys
 import string
 import re
 
+# TODO:
+# - patterns validator
+# - path validator (with existing check)
+# - url validator
+
 class Validator:
 
     errors = []

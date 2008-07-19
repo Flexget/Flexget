@@ -43,7 +43,16 @@ class ModuleDownload:
         parser.add_option("--dl-path", action="store", dest="dl_path", default=False,
                           help="Override path for download module. Applies to all executed feeds.")
 
+    def validate(self, config):
+        """Validate given configuration"""
+        if not isinstance(config, str):
+            return ['wrong datatype']
+        path = os.path.expanduser(config)
+        if not os.path.exists(path):
+            return ['path %s does not exists' % path]
+
     def validate_config(self, feed):
+        # TODO: migrate into real validate!!!
         # check for invalid configuration, abort whole download if not goig to work
         # TODO: rewrite and check exists
         if not feed.config['download']:

@@ -56,6 +56,19 @@ class FilterPatterns:
 #        parser.add_option("--try-pattern", action="store", dest="try_pattern", default=None,
 #                          help="Run with given pattern. Useful to try out matching with --test.")
 
+    def validate(self, config):
+        """Validate given configuration"""
+        from validator import ListValidator
+        patterns = ListValidator()
+        patterns.accept(str)
+        bundle = patterns.accept(dict)
+        options = bundle.accept_any_key(dict)
+        options.accept('path', str)
+        options.accept('not', str)
+        options.accept('not', list).accept(str)
+        patterns.validate(config)
+        return patterns.errors
+
     def matches(self, entry, regexp):
         #TODO: match from all fields from entry?
         regexp = str(regexp)

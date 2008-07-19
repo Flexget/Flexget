@@ -48,6 +48,7 @@ class InputRSS:
 
 
     def validate(self, config):
+        """Validate given configuration"""
         from validator import DictValidator
         if isinstance(config, dict):
             rss = DictValidator()

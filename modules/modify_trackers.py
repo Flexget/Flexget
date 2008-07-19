@@ -22,6 +22,13 @@ class RemoveTrackers:
     def register(self, manager, parser):
         manager.register(event='modify', keyword='remove_trackers', callback=self.remove)
 
+    def validate(self, config):
+        from validator import ListValidator
+        remove = ListValidator()
+        remove.accept(str)
+        remove.validate(config)
+        return remove.errors
+
     def remove(self, feed):
         for entry in feed.entries:
             if entry.has_key('torrent'):

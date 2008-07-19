@@ -401,6 +401,7 @@ class Feed:
 
     def check_config(self):
         """Checks that feed configuration does not have mistyped modules"""
+        # TODO: migrate into validate (use validator) ?
         def available(keyword):
             for event in self.manager.EVENTS:
                 if self.manager.modules.get(event, {}).has_key(keyword):
@@ -413,18 +414,16 @@ class Feed:
 
     def validate(self):
         """Module configuration validation."""
-        print 'Validating feed %s:' % self.name
+        logging.info('Validating feed %s' % self.name)
         for kw, value in self.config.iteritems():
             modules = self.manager.get_modules_by_keyword(kw)
             for module in modules:
                 if hasattr(module['instance'], 'validate'):
                     errors = module['instance'].validate(self.config[kw])
-                    if not errors:
-                        print '%s passed' % kw
-                    else:
-                        print '%s failed:' % kw
+                    if errors:
+                        logging.error('%s failed:' % kw)
                         for error in errors:
-                            print error
+                            logging.error(error)
                 else:
                     logging.warning('Used module %s does not support validating' % kw)
 

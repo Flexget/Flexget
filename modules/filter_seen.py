@@ -23,6 +23,11 @@ class FilterSeen:
         # remember and filter by these fields
         self.fields = ['original_url', 'title']
 
+    def validate(self, config):
+        if not isinstance(config, bool):
+            return ['wrong datatype, expecting bool']
+        return []
+
     def filter_seen(self, feed):
         for entry in feed.entries:
             for field in self.fields:
