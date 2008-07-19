@@ -1,7 +1,4 @@
-import os
-import sys
 import string
-import re
 
 # TODO:
 # - patterns validator
@@ -48,6 +45,9 @@ class Validator:
         if not isinstance(data, self.meta_type()):
             return
         return self.validate(data)
+
+    def validate(self, data):
+        raise Exception('method should be overridden')
 
 class MetaValidator(Validator):
     def __init__(self):
@@ -163,9 +163,3 @@ if __name__=='__main__':
     print "errors:"
     for err in lv.errors:
         print err
-    
-            
-
-
-
-        

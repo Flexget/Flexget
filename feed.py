@@ -124,9 +124,6 @@ class Feed:
 
         self.entries = []
         
-        # true when executing from unittest
-        self.unittest = False
-        
         # You should NOT change these arrays at any point, and in most cases not even read them!
         # Mainly public since unittest needs these
         
@@ -134,7 +131,9 @@ class Feed:
         self.filtered = [] # filtered entries
         self.rejected = [] # rejected entries are removed unconditionally, even if accepted
         self.failed = []
-        
+
+        # flags and counters
+        self.unittest = False
         self.__abort = False
         self.__purged = 0
         
@@ -164,20 +163,6 @@ class Feed:
                 self.entries.remove(entry)
                 if count:
                     self.__purged += 1
-        
-    def __convert_entries(self):
-        """Temporary method for converting dict entries into Entries"""
-        count = 0
-        for entry in self.entries[:]:
-            if not isinstance(entry, Entry):
-                e = Entry()
-                for k,v in entry.iteritems():
-                    e[k] = v
-                self.entries.remove(entry)
-                count += 1
-                self.entries.append(e)
-        if count>0:
-            logging.warning('Feed %s converted %i old entries into new format. Some modules need upgrading (Event: %s Module: %s).' % (self.name, count, self.__current_event, self.__current_module))
 
     def accept(self, entry):
         """Accepts this entry."""
@@ -286,7 +271,6 @@ class Feed:
                     self.abort()
                 # check for priority operations
                 if self.__abort: return
-                self.__convert_entries()
                 self.__purge_rejected()
 
     def log_once(self, s, log=logging):
@@ -421,9 +405,7 @@ class Feed:
                 if hasattr(module['instance'], 'validate'):
                     errors = module['instance'].validate(self.config[kw])
                     if errors:
-                        errors = True
-                        logging.error('%s failed:' % kw)
                         for error in errors:
-                            logging.error(error)
+                            logging.error('%s %s' % (kw, error))
                 else:
                     logging.warning('Used module %s does not support validating' % kw)
