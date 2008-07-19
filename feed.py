@@ -421,9 +421,9 @@ class Feed:
                 if hasattr(module['instance'], 'validate'):
                     errors = module['instance'].validate(self.config[kw])
                     if errors:
+                        errors = True
                         logging.error('%s failed:' % kw)
                         for error in errors:
                             logging.error(error)
                 else:
                     logging.warning('Used module %s does not support validating' % kw)
-

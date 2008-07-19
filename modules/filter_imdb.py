@@ -328,6 +328,20 @@ class FilterImdb:
     def register(self, manager, parser):
         manager.register(event='filter', keyword='imdb', callback=self.run)
 
+    def validate(self, config):
+        """Validate given configuration"""
+        from validator import DictValidator
+        imdb = DictValidator()
+        imdb.accept('min_year', int)
+        imdb.accept('min_votes', int)
+        imdb.accept('min_score', float)
+        imdb.accept('min_score', int)
+        imdb.accept('reject_genres', list).accept(str)
+        imdb.accept('reject_languages', list).accept(str)
+        imdb.accept('filter_invalid', bool)
+        imdb.validate(config)
+        return imdb.errors
+
     def imdb_required(self, entry, config):
         """Return True if config contains conditions that are not available in preparsed fields"""
         # TODO: make dict (mapping min_votes <->imdb_votes) and loop it
