@@ -10,4 +10,9 @@ feeds:
       - {title: 'Some.Series.2008-10-12.XViD', url: 'http://localhost/mock'}
     series:
       - some series
+      - another series:
+          path: ~/foo/
+      - third series:
+          timeframe:
+            hours: 4
     dump: true

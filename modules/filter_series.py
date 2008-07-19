@@ -31,7 +31,7 @@ class SerieParser:
         self.valid = False
         # optional for storing entry from which this instance is made from
         self.entry = None
-        
+
     def parse(self):
         if not self.name or not self.data:
             raise Exception('SerieParser missing either name or data')
@@ -224,6 +224,10 @@ class FilterSeries:
         manager.register(event='filter', keyword='series', callback=self.filter_series)
         manager.register(event='input', keyword='series', callback=self.input_series, order=65535)
         manager.register(event='exit', keyword='series', callback=self.learn_succeeded)
+
+
+    def validate(self, config):
+        return []
 
     def input_series(self, feed):
         """Retrieve stored series from cache, incase they've been expired from feed while waiting"""

@@ -73,13 +73,15 @@ class Manager:
         parser = OptionParser()
         parser.add_option('--test', action='store_true', dest='test', default=0,
                           help='Verbose what would happend on normal execution.')
+        parser.add_option('--check', action='store_true', dest='validate', default=0,
+                          help='Validate configuration file and print errors.')
         parser.add_option('--learn', action='store_true', dest='learn', default=0,
                           help='Matches are not downloaded but will be skipped in the future.')
         parser.add_option('--feed', action='store', dest='onlyfeed', default=None,
                           help='Run only specified feed from config.')
         parser.add_option('--no-cache', action='store_true', dest='nocache', default=0,
                           help='Disable caches. Works only in modules that have explicit support.')
-        parser.add_option('--reset-session', action='store_true', dest='reset', default=0,
+        parser.add_option('--reset', action='store_true', dest='reset', default=0,
                           help='Forgets everything that has been downloaded and learns current matches.')
         parser.add_option('--doc', action='store', dest='doc',
                           help='Display module documentation (example: --doc patterns). See --list.')
@@ -87,7 +89,7 @@ class Manager:
                           help='List all available modules.')
         parser.add_option('--failed', action='store_true', dest='failed', default=0,
                           help='List recently failed entries.')
-        parser.add_option('--clear-failed', action='store_true', dest='clear_failed', default=0,
+        parser.add_option('--clear', action='store_true', dest='clear_failed', default=0,
                           help='Clear recently failed list.')
         parser.add_option('-c', action='store', dest='config', default='config.yml',
                           help='Specify configuration file. Default is config.yml')
@@ -100,6 +102,8 @@ class Manager:
         parser.add_option('--debug', action='store_true', dest='debug', default=0,
                           help=SUPPRESS_HELP)
         parser.add_option('--dump', action='store_true', dest='dump', default=0,
+                          help=SUPPRESS_HELP)
+        parser.add_option('--validate', action='store_true', dest='validate', default=0,
                           help=SUPPRESS_HELP)
 
         # add module path to sys.path so they can import properly ..
@@ -409,6 +413,22 @@ class Manager:
                 result.append(module)
         return result
 
+    def get_modules_by_keyword(self, keyword):
+        """
+          Return all modules by keyword. Yes, (currently) multiple modules
+          may use same keyword (for hooking) but not in same event!
+          Returned list is unique.
+        """
+        result = []
+        dupe = []
+        for event in self.EVENTS:
+            modules = self.get_modules_by_event(event)
+            for module in modules:
+                if (module['keyword'] == keyword) and (not module['instance'] in dupe):
+                    result.append(module)
+                    dupe.append(module['instance'])
+        return result
+
     def print_module_list(self):
         print '-'*60
         print '%-20s%-30s%s' % ('Keyword', 'Roles', '--doc')
@@ -536,7 +556,10 @@ class Manager:
                     continue
                 feed = Feed(self, name, config)
                 try:
-                    feed.execute()
+                    if self.options.validate:
+                        feed.validate()
+                    else:
+                        feed.execute()
                     feed_instances[name] = feed
                 except Exception, e:
                     logging.exception('Feed %s: %s' % (feed.name, e))

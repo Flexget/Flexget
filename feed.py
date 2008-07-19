@@ -411,3 +411,19 @@ class Feed:
             if not available(kw):
                 logging.warning('Feed %s has unknown module %s' % (self.name, kw))
 
+    def validate(self):
+        """Module configuration validation."""
+        for kw, value in self.config.iteritems():
+            modules = self.manager.get_modules_by_keyword(kw)
+            for module in modules:
+                if hasattr(module['instance'], 'validate'):
+                    errors = module['instance'].validate(self.config[kw])
+                    if not errors:
+                        print '%s passed' % kw
+                    else:
+                        print '%s failed:' % kw
+                        for error in errors:
+                            print error
+                else:
+                    logging.warning('Used module %s does not support validating' % kw)
+
