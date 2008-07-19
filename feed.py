@@ -413,6 +413,7 @@ class Feed:
 
     def validate(self):
         """Module configuration validation."""
+        print 'Validating feed %s:' % self.name
         for kw, value in self.config.iteritems():
             modules = self.manager.get_modules_by_keyword(kw)
             for module in modules:

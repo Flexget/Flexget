@@ -26,7 +26,6 @@ class Validator:
         if not hasattr(self, 'path_level'):
             raise Exception('no path level')
         self.path[self.path_level] = value
-        print self.path
 
     def get_validator(self, meta):
         """Return validator instance for meta-class"""
@@ -85,10 +84,9 @@ class ListValidator(Validator):
                 if rule.try_validate(item):
                     item_passed = True
             if not item_passed:
-                print "list item %s did not pass" % item
+                l = [r.meta_type().__name__ for r in self.valid]
+                self.error("is not %s" % (string.join(l, ', ')))
                 passed = False
-            else:
-                print "list item %s passed" % item
         self.path_remove_level()
         return passed
 
@@ -100,10 +98,16 @@ class DictValidator(Validator):
 
     def __init__(self):
         self.valid = {}
+        self.any_key = []
 
     def accept(self, key, meta):
         v = self.get_validator(meta)
         self.valid.setdefault(key, []).append(v)
+        return v
+
+    def accept_any_key(self, meta):
+        v = self.get_validator(meta)
+        self.any_key.append(v)
         return v
 
     def validate(self, data):
@@ -114,20 +118,22 @@ class DictValidator(Validator):
         self.path_add_level()
         for key, value in data.iteritems():
             self.path_update_value(key)
-            if not self.valid.has_key(key):
+            if not self.valid.has_key(key) and not self.any_key:
                 self.error("key '%s' is undefined" % key)
                 continue
             # test if matches to any given rules
             item_passed = False
-            for rule in self.valid[key]:
+            # rules contain rules specified for this key AND
+            # rules specified for any key
+            rules = self.valid.get(key, [])
+            rules.extend(self.any_key)
+            for rule in rules:
                 if rule.try_validate(value):
                     item_passed = True
             if not item_passed:
-                l = [r.meta_type().__name__ for r in self.valid[key]]
+                l = [r.meta_type().__name__ for r in rules]
                 self.error("'%s' is not %s" % (value, string.join(l, ', ')))
                 passed = False
-            else:
-                print "map key %s value %s passed" % (key, value)
         self.path_remove_level()
         return passed
 

@@ -225,9 +225,19 @@ class FilterSeries:
         manager.register(event='input', keyword='series', callback=self.input_series, order=65535)
         manager.register(event='exit', keyword='series', callback=self.learn_succeeded)
 
-
     def validate(self, config):
-        return []
+        """Validate configuration format for this module"""
+        from validator import ListValidator
+        serie = ListValidator()
+        serie.accept(str)
+        bundle = serie.accept(dict)
+        serie_options = bundle.accept_any_key(dict)
+        serie_options.accept('path', str)
+        timeframe = serie_options.accept('timeframe', dict)
+        timeframe.accept('hours', int)
+        timeframe.accept('enough', str) # TODO: accept only list of qualities!
+        serie.validate(config)
+        return serie.errors
 
     def input_series(self, feed):
         """Retrieve stored series from cache, incase they've been expired from feed while waiting"""
