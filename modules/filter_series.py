@@ -248,7 +248,7 @@ class FilterSeries:
         timeframe.accept('hours', int)
         timeframe.accept('enough', str) # TODO: accept only list of qualities!
         serie.validate(config)
-        return serie.errors
+        return serie.errors.messages
 
     def input_series(self, feed):
         """Retrieve stored series from cache, incase they've been expired from feed while waiting"""

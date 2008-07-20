@@ -67,7 +67,7 @@ class FilterPatterns:
         options.accept('not', str)
         options.accept('not', list).accept(str)
         patterns.validate(config)
-        return patterns.errors
+        return patterns.errors.messages
 
     def matches(self, entry, regexp):
         #TODO: match from all fields from entry?

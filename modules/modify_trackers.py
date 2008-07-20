@@ -27,7 +27,7 @@ class RemoveTrackers:
         remove = ListValidator()
         remove.accept(str)
         remove.validate(config)
-        return remove.errors
+        return remove.errors.messages
 
     def remove(self, feed):
         for entry in feed.entries:

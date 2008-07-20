@@ -57,7 +57,7 @@ class InputRSS:
             rss.accept('password', str)
             rss.accept('link', str)
             rss.validate(config)
-            return rss.errors
+            return rss.errors.messages
         elif isinstance(config, str):
             return []
         else:

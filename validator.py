@@ -1,42 +1,50 @@
-import string
 
 # TODO:
 # - patterns validator
 # - path validator (with existing check)
 # - url validator
 
-class Validator:
 
-    errors = []
-    path = []
+class Errors:
 
-    def error(self, msg):
+    def __init__(self):
+        self.messages = []
+        self.path = []
+        self.path_level = None
+
+    def add(self, msg):
         path = [str(p) for p in self.path]
-        self.errors.append('[/%s] %s' % (string.join(path, '/'), msg))
+        self.messages.append('[/%s] %s' % ('/'.join(path), msg))
 
     def path_add_level(self, value='?'):
-        """Adds one level into error message path list"""
+        """Adds level into error message path"""
         self.path_level = len(self.path)
         self.path.append(value)
 
     def path_remove_level(self):
         """Removes level from path by depth number"""
+        if self.path_level is None:
+            raise Exception('no path level')
         del(self.path[self.path_level])
-        self.path_level = None
+        self.path_level -= 1
 
     def path_update_value(self, value):
-        if not hasattr(self, 'path_level'):
+        """Updates path level value"""
+        if self.path_level is None:
             raise Exception('no path level')
         self.path[self.path_level] = value
+
+
+class Validator:
 
     def get_validator(self, meta):
         """Return validator instance for meta-class"""
         if meta == list:
-            return ListValidator()
+            return ListValidator(self.errors)
         elif meta == dict:
-            return DictValidator()
+            return DictValidator(self.errors)
         else:
-            mv = MetaValidator()
+            mv = MetaValidator(self.errors)
             mv.accept(meta)
             return mv
 
@@ -50,8 +58,12 @@ class Validator:
         raise Exception('method should be overridden')
 
 class MetaValidator(Validator):
-    def __init__(self):
+    
+    def __init__(self, errors=None):
         self.valid = None
+        if errors==None:
+            errors = Errors()
+        self.errors = errors
 
     def accept(self, meta):
         self.valid = meta
@@ -67,8 +79,11 @@ class MetaValidator(Validator):
 
 class ListValidator(Validator):
 
-    def __init__(self):
+    def __init__(self, errors=None):
         self.valid = []
+        if errors==None:
+            errors = Errors()
+        self.errors = errors
 
     def accept(self, meta):
         v = self.get_validator(meta)
@@ -77,12 +92,12 @@ class ListValidator(Validator):
 
     def validate(self, data):
         if not isinstance(data, list):
-            self.error('data is not a list')
+            self.errors.add('data is not a list')
             return
         passed = True
-        self.path_add_level()
+        self.errors.path_add_level()
         for item in data:
-            self.path_update_value(data.index(item))
+            self.errors.path_update_value(data.index(item))
             # test if matches to any given rules
             item_passed = False
             for rule in self.valid:
@@ -90,9 +105,9 @@ class ListValidator(Validator):
                     item_passed = True
             if not item_passed:
                 l = [r.meta_type().__name__ for r in self.valid]
-                self.error("is not %s" % (string.join(l, ', ')))
+                self.errors.add("is not %s" % (string.join(l, ', ')))
                 passed = False
-        self.path_remove_level()
+        self.errors.path_remove_level()
         return passed
 
     def meta_type(self):
@@ -101,9 +116,12 @@ class ListValidator(Validator):
 
 class DictValidator(Validator):
 
-    def __init__(self):
+    def __init__(self, errors=None):
         self.valid = {}
         self.any_key = []
+        if errors==None:
+            errors = Errors()
+        self.errors = errors
 
     def accept(self, key, meta):
         v = self.get_validator(meta)
@@ -117,14 +135,14 @@ class DictValidator(Validator):
 
     def validate(self, data):
         if not isinstance(data, dict):
-            self.error('data is not a dict')
+            self.errors.add('data is not a dict')
             return
         passed = True
-        self.path_add_level()
+        self.errors.path_add_level()
         for key, value in data.iteritems():
-            self.path_update_value(key)
+            self.errors.path_update_value(key)
             if not self.valid.has_key(key) and not self.any_key:
-                self.error("key '%s' is undefined" % key)
+                self.errors.add("key '%s' is undefined" % key)
                 continue
             # test if matches to any given rules
             item_passed = False
@@ -137,9 +155,9 @@ class DictValidator(Validator):
                     item_passed = True
             if not item_passed:
                 l = [r.meta_type().__name__ for r in rules]
-                self.error("'%s' is not %s" % (value, string.join(l, ', ')))
+                self.errors.add("'%s' is not %s" % (value, string.join(l, ', ')))
                 passed = False
-        self.path_remove_level()
+        self.errors.path_remove_level()
         return passed
 
     def meta_type(self):
@@ -161,5 +179,5 @@ if __name__=='__main__':
     lv.validate(l)
 
     print "errors:"
-    for err in lv.errors:
+    for err in lv.errors.messages:
         print err

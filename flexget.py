@@ -14,7 +14,8 @@ if __name__ == "__main__":
         f = file(lockfile)
         pid = f.read()
         f.close()
-        print "Another process (%s) is running, will exit" % pid.strip()
+        print "Another process (%s) is running, will exit." % pid.strip()
+        print "If you're sure there is no other instance runnig, delete %s" % lockfile
         sys.exit(1)
 
     f = file(lockfile, 'w')

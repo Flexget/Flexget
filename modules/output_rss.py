@@ -100,7 +100,7 @@ class OutputRSS:
         rss.accept('items', int)
         rss.accept('link', list).accept(str)
         rss.validate(config)
-        return rss.errors
+        return rss.errors.messages
         
     def get_config(self, feed):
         config = feed.config['make_rss']

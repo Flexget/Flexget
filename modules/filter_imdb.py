@@ -340,7 +340,7 @@ class FilterImdb:
         imdb.accept('reject_languages', list).accept(str)
         imdb.accept('filter_invalid', bool)
         imdb.validate(config)
-        return imdb.errors
+        return imdb.errors.messages
 
     def imdb_required(self, entry, config):
         """Return True if config contains conditions that are not available in preparsed fields"""
