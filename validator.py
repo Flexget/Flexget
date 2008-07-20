@@ -4,7 +4,6 @@
 # - path validator (with existing check)
 # - url validator
 
-
 class Errors:
 
     def __init__(self):
@@ -34,11 +33,12 @@ class Errors:
             raise Exception('no path level')
         self.path[self.path_level] = value
 
-
 class Validator:
 
     def get_validator(self, meta):
         """Return validator instance for meta-class"""
+        if not hasattr(self, 'errors'):
+            self.errors = None
         if meta == list:
             return ListValidator(self.errors)
         elif meta == dict:
@@ -49,14 +49,11 @@ class Validator:
             return mv
 
     def try_validate(self, data):
-        """Try to validate data without failure on wrong datatype (internal)."""
-        if not isinstance(data, self.meta_type()):
-            return
-        return self.validate(data)
-
-    def validate(self, data):
-        raise Exception('method should be overridden')
-
+        """Try to validate, should not fail on wrong datatype."""
+        try:
+            return self.validate(data)
+        except Exception, e:
+            pass
 
 class MetaValidator(Validator):
     
@@ -93,8 +90,7 @@ class ListValidator(Validator):
 
     def validate(self, data):
         if not isinstance(data, list):
-            self.errors.add('data is not a list')
-            return
+            raise Exception('data is not a list')
         passed = True
         self.errors.path_add_level()
         for item in data:
@@ -106,7 +102,7 @@ class ListValidator(Validator):
                     item_passed = True
             if not item_passed:
                 l = [r.meta_type().__name__ for r in self.valid]
-                self.errors.add("is not %s" % (', '.join(l)))
+                self.errors.add("is not valid %s" % (', '.join(l)))
                 passed = False
         self.errors.path_remove_level()
         return passed
@@ -136,8 +132,7 @@ class DictValidator(Validator):
 
     def validate(self, data):
         if not isinstance(data, dict):
-            self.errors.add('data is not a dict')
-            return
+            raise Exception('data is not a dict')
         passed = True
         self.errors.path_add_level()
         for key, value in data.iteritems():
