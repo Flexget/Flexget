@@ -35,18 +35,25 @@ class Errors:
 
 class Validator:
 
-    def get_validator(self, meta):
-        """Return validator instance for meta-class"""
+    def get_validator(self, t):
+        """Return validator instance"""
         if not hasattr(self, 'errors'):
             self.errors = None
-        if meta == list:
+        # choose
+        if t == list:
             return ListValidator(self.errors)
-        elif meta == dict:
+        elif t == dict:
             return DictValidator(self.errors)
-        else:
+        elif t == int or t == float or t == bool or t == str:
             mv = MetaValidator(self.errors)
-            mv.accept(meta)
+            mv.accept(t)
             return mv
+        elif isinstance(t, str):
+            sv = ValueValidator(self.errors)
+            sv.accept(t)
+            return sv
+        else:
+            raise Exception('unknown type')
 
     def try_validate(self, data):
         """Try to validate, should not fail on wrong datatype."""
@@ -55,11 +62,28 @@ class Validator:
         except Exception, e:
             pass
 
+class ValueValidator(Validator):
+
+    def __init__(self, errors=None):
+        self.valid = None
+        if errors is None:
+            errors = Errors()
+        self.errors = errors
+
+    def accept(self, value):
+        self.valid = value
+
+    def validate(self, data):
+        return data == self.valid
+
+    def meta_type(self):
+        return '%s' % self.valid
+
 class MetaValidator(Validator):
     
     def __init__(self, errors=None):
         self.valid = None
-        if errors==None:
+        if errors is None:
             errors = Errors()
         self.errors = errors
 
@@ -70,16 +94,15 @@ class MetaValidator(Validator):
         return isinstance(data, self.valid)
 
     def meta_type(self):
-        """Return metaclass this validator expects"""
         if self.valid is None:
             raise Exception('empty metavalidator')
-        return self.valid
+        return self.valid.__name__
 
 class ListValidator(Validator):
 
     def __init__(self, errors=None):
         self.valid = []
-        if errors==None:
+        if errors is None:
             errors = Errors()
         self.errors = errors
 
@@ -101,22 +124,21 @@ class ListValidator(Validator):
                 if rule.try_validate(item):
                     item_passed = True
             if not item_passed:
-                l = [r.meta_type().__name__ for r in self.valid]
+                l = [r.meta_type() for r in self.valid]
                 self.errors.add("is not valid %s" % (', '.join(l)))
                 passed = False
         self.errors.path_remove_level()
         return passed
 
     def meta_type(self):
-        """Return metaclass this validator expects"""
-        return list
+        return 'list'
 
 class DictValidator(Validator):
 
     def __init__(self, errors=None):
         self.valid = {}
         self.any_key = []
-        if errors==None:
+        if errors is None:
             errors = Errors()
         self.errors = errors
 
@@ -150,18 +172,17 @@ class DictValidator(Validator):
                 if rule.try_validate(value):
                     item_passed = True
             if not item_passed:
-                l = [r.meta_type().__name__ for r in rules]
-                self.errors.add("'%s' is not %s" % (value, ', '.join(l)))
+                l = [r.meta_type() for r in rules]
+                self.errors.add("key '%s' is not valid %s" % (value, ', '.join(l)))
                 passed = False
         self.errors.path_remove_level()
         return passed
 
     def meta_type(self):
-        """Return metaclass this validator expects"""
-        return dict
+        return 'dict'
 
 if __name__=='__main__':
-    l = ['aaa','bbb','ccc', 123, {'xxax':'yyyy', 'yyy': 12}]
+    l = ['aaa','bbb','ccc', 123, {'xxax':'yyyy', 'yyy': ['a','b','c']}]
 
     lv = ListValidator()
     lv.accept(str)
@@ -170,7 +191,9 @@ if __name__=='__main__':
     dv.accept('xxx', str)
     dv.accept('yyy', str)
     dv.accept('yyy', float)
-    dv.accept('yyy', list)
+    ll = dv.accept('yyy', list)
+    ll.accept('a')
+    ll.accept('b')
     
     lv.validate(l)
 
