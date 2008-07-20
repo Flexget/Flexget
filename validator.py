@@ -57,6 +57,7 @@ class Validator:
     def validate(self, data):
         raise Exception('method should be overridden')
 
+
 class MetaValidator(Validator):
     
     def __init__(self, errors=None):
@@ -105,7 +106,7 @@ class ListValidator(Validator):
                     item_passed = True
             if not item_passed:
                 l = [r.meta_type().__name__ for r in self.valid]
-                self.errors.add("is not %s" % (string.join(l, ', ')))
+                self.errors.add("is not %s" % (', '.join(l))
                 passed = False
         self.errors.path_remove_level()
         return passed
@@ -155,7 +156,7 @@ class DictValidator(Validator):
                     item_passed = True
             if not item_passed:
                 l = [r.meta_type().__name__ for r in rules]
-                self.errors.add("'%s' is not %s" % (value, string.join(l, ', ')))
+                self.errors.add("'%s' is not %s" % (value, ', '.join(l)))
                 passed = False
         self.errors.path_remove_level()
         return passed
