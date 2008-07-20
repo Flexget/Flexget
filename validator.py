@@ -106,7 +106,7 @@ class ListValidator(Validator):
                     item_passed = True
             if not item_passed:
                 l = [r.meta_type().__name__ for r in self.valid]
-                self.errors.add("is not %s" % (', '.join(l))
+                self.errors.add("is not %s" % (', '.join(l)))
                 passed = False
         self.errors.path_remove_level()
         return passed
