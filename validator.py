@@ -4,6 +4,9 @@
 # - path validator (with existing check)
 # - url validator
 
+class TypeException(Exception):
+    pass
+
 class Errors:
 
     def __init__(self):
@@ -138,6 +141,7 @@ class DictValidator(Validator):
     def __init__(self, errors=None):
         self.valid = {}
         self.any_key = []
+        self.required_keys = []
         if errors is None:
             errors = Errors()
         self.errors = errors
@@ -146,6 +150,10 @@ class DictValidator(Validator):
         v = self.get_validator(meta)
         self.valid.setdefault(key, []).append(v)
         return v
+
+    def require(self, key):
+        if not key in self.required_keys:
+            self.required_keys.append(key)
 
     def accept_any_key(self, meta):
         v = self.get_validator(meta)
@@ -175,6 +183,10 @@ class DictValidator(Validator):
                 l = [r.meta_type() for r in rules]
                 self.errors.add("key '%s' is not valid %s" % (value, ', '.join(l)))
                 passed = False
+        for required in self.required_keys:
+            if not data.has_key(required):
+                self.errors.add("key '%s' must be defined" % required)
+                passed = False
         self.errors.path_remove_level()
         return passed
 
@@ -191,6 +203,7 @@ if __name__=='__main__':
     dv.accept('xxx', str)
     dv.accept('yyy', str)
     dv.accept('yyy', float)
+    dv.require('foo')
     ll = dv.accept('yyy', list)
     ll.accept('a')
     ll.accept('b')
