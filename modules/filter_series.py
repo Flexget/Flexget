@@ -246,7 +246,7 @@ class FilterSeries:
         # timeframe dict
         timeframe = options.accept('timeframe', dict)
         timeframe.accept('hours', int)
-        timeframe.accept('enough', str) # TODO: accept only list of qualities!
+        timeframe.accept('enough', SerieParser.qualities)
         serie.validate(config)
         return serie.errors.messages
 

@@ -55,15 +55,28 @@ class Validator:
             sv = ValueValidator(self.errors)
             sv.accept(t)
             return sv
+        elif isinstance(t, list):
+            vlv = ValueListValidator(self.errors)
+            for v in t:
+                vlv.accept(v)
+            return vlv
         else:
             raise Exception('unknown type')
 
-    def try_validate(self, data):
-        """Try to validate, should not fail on wrong datatype."""
-        try:
-            return self.validate(data)
-        except Exception, e:
-            pass
+    def validate_item(self, item, rules):
+        """Helper method. Validate list of items against list of rules (validators).
+        Return True if item matches to any of the rules.
+        Raises TypeException if it could not be even tried."""
+        failed = True
+        for rule in rules:
+            try:
+                if rule.validate(item):
+                    return True
+                failed = False
+            except TypeException, e:
+                pass
+        if failed:
+            raise TypeException()
 
 class ValueValidator(Validator):
 
@@ -81,6 +94,30 @@ class ValueValidator(Validator):
 
     def meta_type(self):
         return '%s' % self.valid
+
+
+class ValueListValidator(Validator):
+
+    def __init__(self, errors=None):
+        self.valid = []
+        if errors is None:
+            errors = Errors()
+        self.errors = errors
+
+    def accept(self, value):
+        v = self.get_validator(value)
+        self.valid.append(v)
+        return v
+
+    def validate(self, data):
+        try:
+            if not self.validate_item(data, self.valid):
+                l = [r.meta_type() for r in self.valid]
+                self.errors.add("must be one of values %s" % (', '.join(l)))
+        except TypeException, e:
+            pass
+        return True
+        
 
 class MetaValidator(Validator):
     
@@ -116,22 +153,20 @@ class ListValidator(Validator):
 
     def validate(self, data):
         if not isinstance(data, list):
-            raise Exception('data is not a list')
-        passed = True
+            raise TypeException('validate data is not a list')
         self.errors.path_add_level()
         for item in data:
             self.errors.path_update_value(data.index(item))
-            # test if matches to any given rules
-            item_passed = False
-            for rule in self.valid:
-                if rule.try_validate(item):
-                    item_passed = True
-            if not item_passed:
-                l = [r.meta_type() for r in self.valid]
-                self.errors.add("is not valid %s" % (', '.join(l)))
-                passed = False
+            try:
+                if not self.validate_item(item, self.valid):
+                    l = [r.meta_type() for r in self.valid]
+                    self.errors.add("is not valid %s" % (', '.join(l)))
+            except TypeException, e:
+                pass
         self.errors.path_remove_level()
-        return passed
+        
+        # validation succeeded, errors are logged so it's considered clean!
+        return True
 
     def meta_type(self):
         return 'list'
@@ -162,39 +197,36 @@ class DictValidator(Validator):
 
     def validate(self, data):
         if not isinstance(data, dict):
-            raise Exception('data is not a dict')
-        passed = True
+            raise TypeException('validate data is not a dict')
         self.errors.path_add_level()
         for key, value in data.iteritems():
             self.errors.path_update_value(key)
             if not self.valid.has_key(key) and not self.any_key:
-                self.errors.add("key '%s' is undefined" % key)
+                self.errors.add("key is unknown")
                 continue
-            # test if matches to any given rules
-            item_passed = False
             # rules contain rules specified for this key AND
             # rules specified for any key
             rules = self.valid.get(key, [])
             rules.extend(self.any_key)
-            for rule in rules:
-                if rule.try_validate(value):
-                    item_passed = True
-            if not item_passed:
-                l = [r.meta_type() for r in rules]
-                self.errors.add("key '%s' is not valid %s" % (value, ', '.join(l)))
-                passed = False
+            try:
+                if not self.validate_item(value, rules):
+                    l = [r.meta_type() for r in rules]
+                    self.errors.add("key '%s' is not valid %s" % (value, ', '.join(l)))
+            except TypeException, e:
+                pass
         for required in self.required_keys:
             if not data.has_key(required):
-                self.errors.add("key '%s' must be defined" % required)
-                passed = False
+                self.errors.add("key '%s' must be present" % required)
         self.errors.path_remove_level()
-        return passed
+        
+        # validation succeeded, errors are logged so it's considered clean!
+        return True
 
     def meta_type(self):
         return 'dict'
 
 if __name__=='__main__':
-    l = ['aaa','bbb','ccc', 123, {'xxax':'yyyy', 'yyy': ['a','b','c']}]
+    l = ['aaa','bbb','ccc', 123, {'xxax':'yyyy', 'zzz': 'c'}]
 
     lv = ListValidator()
     lv.accept(str)
@@ -204,10 +236,8 @@ if __name__=='__main__':
     dv.accept('yyy', str)
     dv.accept('yyy', float)
     dv.require('foo')
-    ll = dv.accept('yyy', list)
-    ll.accept('a')
-    ll.accept('b')
-    
+    dv.accept('zzz', ['a','b'])
+
     lv.validate(l)
 
     print "errors:"
