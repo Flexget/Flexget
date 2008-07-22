@@ -181,16 +181,21 @@ class DictValidator(Validator):
             errors = Errors()
         self.errors = errors
 
-    def accept(self, key, meta):
+    def accept(self, key, meta, **kwargs):
+        """Accepts key with meta type"""
         v = self.get_validator(meta)
         self.valid.setdefault(key, []).append(v)
+        if kwargs.get('require', False):
+            self.require(key)
         return v
 
     def require(self, key):
+        """Flag key as mandatory"""
         if not key in self.required_keys:
             self.required_keys.append(key)
 
     def accept_any_key(self, meta):
+        """Accepts all keys with given meta type, regardless of name"""
         v = self.get_validator(meta)
         self.any_key.append(v)
         return v
@@ -233,7 +238,7 @@ if __name__=='__main__':
     lv.accept(int)
     dv = lv.accept(dict)
     dv.accept('xxx', str)
-    dv.accept('yyy', str)
+    dv.accept('yyz', str, require=True)
     dv.accept('yyy', float)
     dv.require('foo')
     dv.accept('zzz', ['a','b'])

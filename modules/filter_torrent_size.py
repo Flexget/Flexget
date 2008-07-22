@@ -20,6 +20,14 @@ class FilterTorrentSize:
     def register(self, manager, parser):
         manager.register(event='modify', keyword='torrent_size', callback=self.run)
 
+    def validate(self, config):
+        from validator import DictValidator
+        t = DictValidator()
+        t.accept('min', int)
+        t.accept('max', int)
+        t.validate(config)
+        return t.errors.messages
+
     def run(self, feed):
         config = feed.config['torrent_size']
         for entry in feed.entries:

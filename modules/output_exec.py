@@ -20,6 +20,12 @@ class OutputExec:
     def register(self, manager, parser):
         manager.register(event='output', keyword='exec', callback=self.run)
 
+    def validate(self, config):
+        if not isinstance(config, str):
+            return ['wrong datatype']
+        else:
+            return []
+
     def run(self, feed):
         for entry in feed.entries:
             cmd = feed.config['exec'] % entry

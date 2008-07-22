@@ -17,6 +17,12 @@ class ModifyExtension:
     def register(self, manager, parser):
         manager.register(event='modify', keyword='extension', callback=self.run)
 
+    def validate(self, config):
+        if not isinstance(config, str) or not isinstance(config, int):
+            return ['extension is not string or number']
+        else:
+            return []
+
     def run(self, feed):
         ext = feed.config.get('extension')
         if not ext.startswith('.'):

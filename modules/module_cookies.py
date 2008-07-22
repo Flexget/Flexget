@@ -24,6 +24,14 @@ class ModuleCookies:
         manager.register(event='start', keyword='cookies', callback=self.start)
         manager.register(event='exit', keyword='cookies', callback=self.exit)
 
+    def validate(self, config):
+        from validator import DictValidator
+        cookies = DictValidator()
+        cookies.accept('type', ['mozilla', 'msie', 'lpw'], required=True)
+        cookies.accept('file', str, required=True)
+        cookies.validate(config) 
+        return cookies.errors.messages
+
     def start(self, feed):
         config = feed.config['cookies']
         # check that require configuration is present

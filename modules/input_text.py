@@ -33,6 +33,20 @@ class InputText:
     def register(self, manager, parser):
         manager.register(event='input', keyword='text', callback=self.run)
 
+    def validate(self, config):
+        from validator import DictValidator
+        text = DictValidator()
+        text.accept('url', str, require=True)
+        entry = text.accept('entry', dict)
+        entry.accept('url', str, require=True)
+        entry.accept('title', str, require=True)
+        entry.accept_any_key(str) # user can add any fields
+        format = text.accept('format', dict)
+        format.accept('url', str)
+        format.accept_any_key(str) # user can add any fields
+        text.validate(config)
+        return text.errors.messages
+
     def format_entry(self, entry, d):
         for k,v in d.iteritems():
             entry[k] = v % entry

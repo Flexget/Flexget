@@ -28,7 +28,11 @@ class CliConfig:
         manager.register(event='start', keyword='cli_config', callback=self.run, builtin=True)
         parser.add_option('--cli-config', action='store', dest='cli_config', default=False,
                           help='Configuration parameters trough commandline. See --doc cli_config.')
-        self.replaces = {}        
+        self.replaces = {}
+
+    def validate(self, config):
+        # there is no way to misconfigure this .. ?
+        return []
     
     def replace_dict(self, d, replaces):
         for k,v in d.items():

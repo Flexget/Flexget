@@ -95,7 +95,7 @@ class OutputRSS:
             return []
         from validator import DictValidator
         rss = DictValidator()
-        rss.accept('file', str)
+        rss.accept('file', str, require=True)
         rss.accept('days', int)
         rss.accept('items', int)
         rss.accept('link', list).accept(str)

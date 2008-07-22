@@ -52,9 +52,11 @@ class InputRSS:
         from validator import DictValidator
         if isinstance(config, dict):
             rss = DictValidator()
-            rss.accept('url', str) # TODO: required!
+            rss.accept('url', str, required=True)
             rss.accept('username', str)
             rss.accept('password', str)
+            if config.has_key('username'):
+                rss.require('password')
             rss.accept('link', str)
             rss.validate(config)
             return rss.errors.messages
