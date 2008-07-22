@@ -92,6 +92,8 @@ class ModuleCache:
         if item is None:
             return default
         else:
+            # reading value should update "stored" date .. TODO: refactor stored -> access & days -> keep?
+            item['stored'] = datetime.today().strftime('%Y-%m-%d')
             return item['value']
 
     def __purge(self):
