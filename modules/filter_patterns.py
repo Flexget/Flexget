@@ -61,11 +61,15 @@ class FilterPatterns:
         from validator import ListValidator
         patterns = ListValidator()
         patterns.accept(str)
+        patterns.accept(int)
         bundle = patterns.accept(dict)
         options = bundle.accept_any_key(dict)
         options.accept('path', str)
         options.accept('not', str)
-        options.accept('not', list).accept(str)
+        options.accept('not', int)
+        nl = options.accept('not', list)
+        nl.accept(str)
+        nl.accept(int)
         patterns.validate(config)
         return patterns.errors.messages
 

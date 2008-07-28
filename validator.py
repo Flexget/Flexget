@@ -231,7 +231,7 @@ class DictValidator(Validator):
         return 'dict'
 
 if __name__=='__main__':
-    l = ['aaa','bbb','ccc', 123, {'xxax':'yyyy', 'zzz': 'c'}]
+    l = ['aaa','bbb','ccc', 123, {'xxax':'yyyy', 'zzz': 'c', 'mixed': ['a', 12]}]
 
     lv = ListValidator()
     lv.accept(str)
@@ -242,6 +242,7 @@ if __name__=='__main__':
     dv.accept('yyy', float)
     dv.require('foo')
     dv.accept('zzz', ['a','b'])
+    dv.accept('mixed', list).accept([str, int])
 
     lv.validate(l)
 
