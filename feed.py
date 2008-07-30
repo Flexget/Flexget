@@ -142,8 +142,6 @@ class Feed:
         # state
         self.__current_event = None
         self.__current_module = None
-
-        self.check_config()
         
     def _purge(self):
         """Purge filtered entries from feed. Call this from module only if you know what you're doing."""
@@ -210,8 +208,9 @@ class Feed:
 
     def abort(self):
         """Abort this feed execution, no more modules will be executed."""
+        if not self.__abort:
+            logging.info('Aborting feed %s' % self.name)
         self.__abort = True
-        self.verbose_details('Aborting feed')
 
     def get_input_url(self, keyword):
         # TODO: move to better place?
@@ -348,6 +347,19 @@ class Feed:
     
     def execute(self):
         """Execute this feed, runs events in order of events array."""
+        # validate configuration
+        errors = self.validate()
+        if errors:
+            logging.critical('Feed \'%s\' has configuration errors:' % self.name)
+            for error in errors:
+                logging.error(error)
+            if not self.manager.options.validate:
+                self.abort()
+            return
+        # do not execute in validate mode
+        if self.manager.options.validate:
+            return
+        # run events
         for event in self.manager.EVENTS[:-1]:
             # when learning, skip few events
             if self.manager.options.learn:
@@ -377,7 +389,6 @@ class Feed:
                 self.verbose_progress('Feed %s filtered %s entries (%s remains).' % (self.name, self.__purged, len(self.entries)))
             # if abort flag has been set feed should be aborted now
             if self.__abort:
-                logging.info('Aborting feed %s' % self.name)
                 return
 
     def terminate(self):
@@ -385,29 +396,22 @@ class Feed:
         if self.__abort: return
         self.__run_modules(self.manager.EVENTS[-1])
 
-    def check_config(self):
-        """Checks that feed configuration does not have mistyped modules"""
-        # TODO: migrate into validate (use validator) ?
-        def available(keyword):
-            for event in self.manager.EVENTS:
-                if self.manager.modules.get(event, {}).has_key(keyword):
-                    return True
-        for kw in self.config.keys():
-            if kw in ['disable_builtins']:
-                continue
-            if not available(kw):
-                logging.warning('Feed %s has unknown module %s' % (self.name, kw))
 
     def validate(self):
-        """Module configuration validation."""
-        logging.info('Validating feed %s' % self.name)
+        """Module configuration validation. Return array of error messages that were detected."""
+        #logging.info('Validating feed %s' % self.name)
+        validate_errors = []
+        # validate all modules
         for kw, value in self.config.iteritems():
             modules = self.manager.get_modules_by_keyword(kw)
+            if not modules:
+                validate_errors.append('unknown keyword \'%s\'' % kw)
             for module in modules:
                 if hasattr(module['instance'], 'validate'):
                     errors = module['instance'].validate(self.config[kw])
                     if errors:
                         for error in errors:
-                            logging.error('%s %s' % (kw, error))
+                            validate_errors.append('%s %s' % (kw, error))
                 else:
-                    logging.warning('Used module %s does not support validating' % kw)
+                    logging.warning('Used module %s does not support validating. Please notify author!' % kw)
+        return validate_errors

@@ -48,7 +48,6 @@ class Manager:
         # logging formatting
         self.logging_detailed = '%(levelname)-8s %(name)-11s %(message)s'
         self.logging_normal = '%(levelname)-8s %(message)s'
-        
 
         # Initialize logging for file, we must init it with some level now because
         # logging utility borks completely if any calls to logging is made before initialization
@@ -121,7 +120,7 @@ class Manager:
         if self.options.reset:
             self.options.learn = True
 
-        # now once options are parsed set logging level properly
+        # now once options are known set logging level accordingly
         if self.options.debug:
             # set 'mainlogger' to debug aswell or no debug output, this is done because of
             # shitty python logging that fails to output debug on console if basicConf level
@@ -178,11 +177,9 @@ class Manager:
         raise Exception('Failed to load configuration file %s' % self.options.config)
 
     def load_session(self):
-        if not self.configname:
-            raise Exception('self.configname missing')
-
+        """Load session file"""
         if not self.options.reset:
-            # load the old style file, if not found, migrate to new style
+            # try to load old session file and migrate it
             if not self.load_session_yaml():
                 self.load_session_shelf()
         else:
@@ -241,12 +238,9 @@ class Manager:
                 d.pop(k)
 
     def save_session(self):
-        if not self.configname:
-            raise Exception('self.configname missing')
-            
+        """Save session file"""
         if self.options.dump:
             self.dump_session_yaml()
-
         self.save_session_shelf()
 
     def dump_session_yaml(self):
@@ -430,6 +424,7 @@ class Manager:
         return result
 
     def print_module_list(self):
+        """Parameter --list"""
         print '-'*60
         print '%-20s%-30s%s' % ('Keyword', 'Roles', '--doc')
         print '-'*60
@@ -461,6 +456,7 @@ class Manager:
         print '-'*60
 
     def print_module_doc(self):
+        """Parameter --doc <keyword>"""
         keyword = self.options.doc
         found = False
         for event in self.EVENTS:
@@ -477,6 +473,7 @@ class Manager:
             print 'Could not find module %s' % keyword
             
     def print_failed(self):
+        """Parameter --failed"""
         self.initialize()
         failed = self.session.setdefault('failed', [])
         if not failed:
@@ -528,9 +525,10 @@ class Manager:
             if not self.config:
                 logging.critical('Configuration file is empty.')
                 return
+
+            # construct feed list
             feeds = self.config.get('feeds', {}).keys()
             if not feeds: logging.critical('There are no feeds in the configuration file!')
-
             # --only-feed
             if self.options.onlyfeed:
                 ofeeds, feeds = feeds, []
@@ -539,7 +537,7 @@ class Manager:
                 if not feeds:
                     logging.critical('Could not find feed %s' % self.options.onlyfeed)
 
-            feed_instances = {}
+            terminate = {}
             for name in feeds:
                 # if feed name is prefixed with _ it's disabled
                 if name.startswith('_'): continue
@@ -554,19 +552,17 @@ class Manager:
                 except Warning:
                     logging.critical('Global section has conflicting datatypes with feed %s configuration. Feed aborted.' % name)
                     continue
+                # create feed instance and execute it
                 feed = Feed(self, name, config)
                 try:
-                    if self.options.validate:
-                        feed.validate()
-                    else:
-                        feed.execute()
-                    feed_instances[name] = feed
+                    feed.execute()
+                    terminate[name] = feed
                 except Exception, e:
                     logging.exception('Feed %s: %s' % (feed.name, e))
 
             # execute terminate event for all feeds
             if not self.options.validate:
-                for name, feed in feed_instances.iteritems():
+                for name, feed in terminate.iteritems():
                     try:
                         feed.terminate()
                     except Exception, e:
