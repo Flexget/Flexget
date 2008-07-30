@@ -64,9 +64,9 @@ class Validator:
             raise Exception('unknown type')
 
     def validate_item(self, item, rules):
-        """Helper method. Validate list of items against list of rules (validators).
-        Return True if item matches to any of the rules.
-        Raises TypeException if it could not be even tried."""
+        """Helper method. Validate item against list of rules (validators).
+        Return True if item passed some rule. False if none of the rules pass item.
+        Raises TypeException if it could not be even tried (wrong type)."""
         failed = True
         for rule in rules:
             try:
@@ -175,6 +175,7 @@ class DictValidator(Validator):
 
     def __init__(self, errors=None):
         self.valid = {}
+        self.reject = []
         self.any_key = []
         self.required_keys = []
         if errors is None:
@@ -188,6 +189,14 @@ class DictValidator(Validator):
         if kwargs.get('require', False):
             self.require(key)
         return v
+
+    def reject_key(self, key):
+        """Rejects key"""
+        self.reject.append(key)
+
+    def reject_keys(self, keys):
+        """Reject list of keys"""
+        self.reject.extend(keys)
 
     def require(self, key):
         """Flag key as mandatory"""
@@ -207,8 +216,10 @@ class DictValidator(Validator):
         for key, value in data.iteritems():
             self.errors.path_update_value(key)
             if not self.valid.has_key(key) and not self.any_key:
-                self.errors.add("key is unknown")
+                self.errors.add('key is unknown')
                 continue
+            if key in self.reject:
+                self.errors.add('key %s is forbidden here' % key)
             # rules contain rules specified for this key AND
             # rules specified for any key
             rules = self.valid.get(key, [])

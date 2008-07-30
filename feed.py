@@ -358,6 +358,8 @@ class Feed:
             return
         # do not execute in validate mode
         if self.manager.options.validate:
+            if not errors:
+                logging.info('Feed \'%s\' passed' % self.name)
             return
         # run events
         for event in self.manager.EVENTS[:-1]:

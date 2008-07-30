@@ -233,6 +233,9 @@ class FilterSeries:
         serie.accept(str)
         # or "bundles" with serie name as key ..
         bundle = serie.accept(dict)
+        # prevent invalid indentation level
+        bundle.reject_keys(['path', 'timeframe', 'name_patterns', 'ep_patterns', 'id_patterns'])
+        # accept serie name, which can be anything ...
         options = bundle.accept_any_key(dict)
         options.accept('path', str)
         # these patterns can be given in as a single string ..
