@@ -17,6 +17,16 @@ class InputMock:
 
     def register(self, manager, parser):
         manager.register(event='input', keyword='input_mock', callback=self.run, debug_module=True)
+        
+    def validate(self, config):
+        from validator import ListValidator
+        mock = ListValidator()
+        entry = mock.accept(dict)
+        entry.accept('title', str, require=True)
+        entry.accept('url', str, require=True)
+        entry.accept_any_key(str)
+        mock.validate(config)
+        return mock.errors.messages
 
     def run(self, feed):
         config = feed.config.get('input_mock', [])

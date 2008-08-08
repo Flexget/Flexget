@@ -539,6 +539,14 @@ class Manager:
 
             terminate = {}
             for name in feeds:
+                # validate (TODO: make use of validator?)
+                if not isinstance(name, dict):
+                    if isinstance(name, str):
+                        if self.get_modules_by_keyword(name):
+                            logging.error('\'%s\' is known keyword, but in wrong indentation level. Please indent it correctly under feed, it should have 2 more spaces than feed name.' % name)
+                            continue
+                    logging.error('\'%s\' is not a properly configured feed, please check indentation levels.' % name)
+                    continue
                 # if feed name is prefixed with _ it's disabled
                 if name.startswith('_'): continue
                 # create feed and execute it
