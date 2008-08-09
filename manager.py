@@ -540,8 +540,8 @@ class Manager:
             terminate = {}
             for name in feeds:
                 # validate (TODO: make use of validator?)
-                if not isinstance(name, dict):
-                    if isinstance(name, str):
+                if not isinstance(self.config['feeds'][name], dict):
+                    if isinstance(self.config['feeds'][name], str):
                         if self.get_modules_by_keyword(name):
                             logging.error('\'%s\' is known keyword, but in wrong indentation level. Please indent it correctly under feed, it should have 2 more spaces than feed name.' % name)
                             continue
