@@ -3,6 +3,10 @@ import logging
 import re
 from feed import ResolverException
 
+timeout = 10
+import socket
+socket.setdefaulttimeout(timeout)
+
 __pychecker__ = 'unusednames=parser,feed'
 
 log = logging.getLogger('newtorrents')

@@ -291,7 +291,6 @@ class Feed:
             
     def __get_priority(self, module, event):
         """Return order for module in this feed. Uses default value if no value is configured."""
-        print repr(module)
         priority = module.get('priorities', {}).get('event', 0)
         keyword = module['name']
         if self.config.has_key(keyword):
