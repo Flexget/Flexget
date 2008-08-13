@@ -31,7 +31,7 @@ class InputText:
     """
 
     def register(self, manager, parser):
-        manager.register(event='input', keyword='text', callback=self.run)
+        manager.register('text')
 
     def validate(self, config):
         from validator import DictValidator
@@ -51,7 +51,7 @@ class InputText:
         for k,v in d.iteritems():
             entry[k] = v % entry
 
-    def run(self, feed):
+    def feed_input(self, feed):
         url = feed.config['text'].get('url', None)
         if not url:
             raise Warning('text input is missing url')

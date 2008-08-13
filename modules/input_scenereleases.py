@@ -28,7 +28,7 @@ class InputScenereleases:
     """
 
     def register(self, manager, parser):
-        manager.register(event='input', keyword='scenereleases', callback=self.run)
+        manager.register('scenereleases')
 
     def parse_imdb(self, s):
         score = None
@@ -109,7 +109,7 @@ class InputScenereleases:
 
         return releases
 
-    def run(self, feed):
+    def feed_input(self, feed):
         if not soup_present: raise Exception(soup_err)
 
         try:

@@ -15,7 +15,7 @@ class ModifyExtension:
     """
 
     def register(self, manager, parser):
-        manager.register(event='modify', keyword='extension', callback=self.run)
+        manager.register('extension')
 
     def validate(self, config):
         if not isinstance(config, str) or not isinstance(config, int):
@@ -23,7 +23,7 @@ class ModifyExtension:
         else:
             return []
 
-    def run(self, feed):
+    def feed_modify(self, feed):
         ext = feed.config.get('extension')
         if not ext.startswith('.'):
             ext = '.%s' % ext

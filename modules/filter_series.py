@@ -221,9 +221,7 @@ class FilterSeries:
     """
 
     def register(self, manager, parser):
-        manager.register(event='filter', keyword='series', callback=self.filter_series)
-        manager.register(event='input', keyword='series', callback=self.input_series, order=65535)
-        manager.register(event='exit', keyword='series', callback=self.learn_succeeded)
+        manager.register('series')
 
     def validate(self, config):
         """Validate configuration format for this module"""
@@ -253,7 +251,7 @@ class FilterSeries:
         serie.validate(config)
         return serie.errors.messages
 
-    def input_series(self, feed):
+    def feed_input(self, feed):
         """Retrieve stored series from cache, incase they've been expired from feed while waiting"""
         for name in feed.config.get('series', []):
             if type(name) == types.DictType:
@@ -285,7 +283,8 @@ class FilterSeries:
     def cmp_quality(self, q1, q2):
         return cmp(SerieParser.qualities.index(q1), SerieParser.qualities.index(q2))
 
-    def filter_series(self, feed):
+    def feed_filter(self, feed):
+        """Filter series"""
         for name in feed.config.get('series', []):
             # start with default settings
             conf = feed.manager.get_settings('series', {})
@@ -426,8 +425,9 @@ class FilterSeries:
         cache = feed.cache.get(serie.name)
         cache[serie.identifier()]['info']['downloaded'] = True
 
-    def learn_succeeded(self, feed):
-        for entry in feed.get_succeeded_entries():
+    def feed_exit(self, feed):
+        """Learn succeeded episodes"""
+        for entry in feed.entries:
             serie = entry.get('serie_parser')
             if serie:
                 self.mark_downloaded(feed, serie)

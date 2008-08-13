@@ -38,9 +38,9 @@ class InputTVTorrents:
     """
 
     def register(self, manager, parser):
-        manager.register(event="input", keyword="tvt", callback=self.run)
+        manager.register('tvt')
 
-    def run(self, feed):
+    def feed_input(self, feed):
         if not soup_present: raise Exception(soup_err)
         pageurl = "http://tvtorrents.com/loggedin/recently_aired.do"
 

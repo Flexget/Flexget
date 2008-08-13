@@ -37,11 +37,10 @@ class ModuleDownload:
     """
 
     def register(self, manager, parser):
-        manager.register(event="download", keyword="download", callback=self.execute_downloads)
-        manager.register(event="output", keyword="download", callback=self.execute_outputs)
+        manager.register('download')
         # add new commandline parameter
-        parser.add_option("--dl-path", action="store", dest="dl_path", default=False,
-                          help="Override path for download module. Applies to all executed feeds.")
+        parser.add_option('--dl-path', action='store', dest='dl_path', default=False,
+                          help='Override path for download module. Applies to all executed feeds.')
 
     def validate(self, config):
         """Validate given configuration"""
@@ -58,7 +57,8 @@ class ModuleDownload:
         if not feed.config['download']:
             raise Warning('Feed %s is missing download path, check your configuration.' % feed.name)
 
-    def execute_downloads(self, feed):
+    def feed_download(self, feed):
+        """Download all feed content and store in temporary folder"""
         self.validate_config(feed)
         for entry in feed.entries:
             try:
@@ -139,7 +139,8 @@ class ModuleDownload:
             log.debug('Using with guessed extension: %s' % entry['filename'])
             return
 
-    def execute_outputs(self, feed):
+    def feed_output(self, feed):
+        """Move downloaded content from temp folder to final destination"""
         self.validate_config(feed)
         for entry in feed.entries:
             try:

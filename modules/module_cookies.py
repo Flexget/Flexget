@@ -21,8 +21,7 @@ class ModuleCookies:
     """
 
     def register(self, manager, parser):
-        manager.register(event='start', keyword='cookies', callback=self.start)
-        manager.register(event='exit', keyword='cookies', callback=self.exit)
+        manager.register('cookies')
 
     def validate(self, config):
         from validator import DictValidator
@@ -32,7 +31,8 @@ class ModuleCookies:
         cookies.validate(config) 
         return cookies.errors.messages
 
-    def start(self, feed):
+    def feed_start(self, feed):
+        """Feed starting, install cookiejar"""
         config = feed.config['cookies']
         # check that require configuration is present
         if not config.has_key('type'):
@@ -61,6 +61,7 @@ class ModuleCookies:
         opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cj))
         urllib2.install_opener(opener)
 
-    def exit(self, feed):
+    def feed_exit(self, feed):
+        """Feed exiting, remove cookiejar"""
         log.debug('Removing urllib2 opener')
         urllib2.install_opener(None)

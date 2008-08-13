@@ -29,12 +29,7 @@ class AcceptFilter(FilterPatterns):
     """
 
     def register(self, manager, parser):
-        manager.register(event="filter", keyword="unconditionally", callback=self.refactored, order=65536)
-        manager.register(event="filter", keyword="accept", callback=self.accept, order=65536)
+        manager.register('accept') 
         
-    def refactored(self, feed):
-        log.warning('Keyword unconditionally has been renamed to accept. Update your configuration file!')
-        self.accept(feed)
-
-    def accept(self, feed):
+    def feed_filter(self, feed):
         self.filter(feed, feed.accept, None, 'accept')

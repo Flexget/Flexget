@@ -86,8 +86,7 @@ class OutputRSS:
         self.written = {}
 
     def register(self, manager, parser):
-        manager.register(event='exit', keyword='make_rss', callback=self.store_entries)
-        manager.register(event='terminate', keyword='make_rss', callback=self.write_rss)
+        manager.register('make_rss')
 
     def validate(self, config):
         """Validate given configuration"""
@@ -115,7 +114,8 @@ class OutputRSS:
             raise Warning('make_rss is missing a file parameter')
         return config
 
-    def store_entries(self, feed):
+    def feed_exit(self, feed):
+        """Store finished / downloaded entries at exit"""
         if not rss2gen:
             raise Exception('module make_rss requires PyRSS2Gen library.')
         config = self.get_config(feed)
@@ -132,7 +132,8 @@ class OutputRSS:
             rss['pubDate'] = datetime.datetime.utcnow()
             store.append(rss)
 
-    def write_rss(self, feed):
+    def application_terminate(self, feed):
+        """Write RSS file at application terminate."""
         if not rss2gen:
             return
         config = self.get_config(feed)

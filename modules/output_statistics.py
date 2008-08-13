@@ -32,9 +32,7 @@ class Statistics:
         self.failed = 0
 
     def register(self, manager, parser):
-        manager.register(event='input', keyword='statistics', callback=self.input, order=65535)
-        manager.register(event='exit', keyword='statistics', callback=self.exit)
-        manager.register(event='terminate', keyword='statistics', callback=self.generate_statistics)
+        manager.register('statistics')
 
     def init(self, con):
         """Create the sqlite table if necessary"""
@@ -51,12 +49,12 @@ class Statistics:
         cur.execute(create)
         con.commit()
         
-    def input(self, feed):
+    def feed_input(self, feed):
         if not has_sqlite:
             raise Exception('module statistics requires python-sqlite2 or python 2.5.')
         self.total = len(feed.entries)
 
-    def exit(self, feed):
+    def feed_exit(self, feed):
         self.passed = len(feed.entries)
         self.failed = self.total - self.passed
 
@@ -81,7 +79,7 @@ class Statistics:
 
         return config
 
-    def generate_statistics(self, feed):
+    def application_terminate(self, feed):
         if not has_pygooglechart:
             raise Exception('module statistics requires pygooglechart library.')
 

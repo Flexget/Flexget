@@ -16,14 +16,14 @@ class FilterExists:
     """
 
     def register(self, manager, parser):
-        manager.register(event='filter', keyword='exists', callback=self.run)
+        manager.register('exists')
 
     def validate(self, config):
         if not isinstance(config, str):
             return ['wrong datatype']
         return []
 
-    def run(self, feed):
+    def feed_filter(self, feed):
         path = feed.config.get('exists', None)
         path = os.path.expanduser(path)
         if not os.path.exists(path):

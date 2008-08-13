@@ -26,7 +26,7 @@ class ResolveNewTorrents:
         self.resolved = []
 
     def register(self, manager, parser):
-        manager.register_resolver(name='newtorrents')
+        manager.register('resolve_newtorrents')
 
     def resolvable(self, feed, entry):
         # Return true only for urls that can and should be resolved

@@ -21,14 +21,14 @@ class FilterLimitNew:
     """
 
     def register(self, manager, parser):
-        manager.register(event='filter', keyword='limit_new', callback=self.limit, order=65535)
+        manager.register('limit_new')
 
     def validate(self, config):
         if not isinstance(config, int):
             return ['wrong datatype, expecting number']
         return []
 
-    def limit(self, feed):
+    def feed_filter(self, feed):
         # purge filtered items since we don't want to pass any of them
         # since they are most likelly useless
         feed._purge() 

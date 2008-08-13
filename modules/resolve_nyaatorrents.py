@@ -8,7 +8,7 @@ class ResolveNyaaTorrents:
     """NyaaTorrents resolver."""
 
     def register(self, manager, parser):
-        manager.register_resolver(name='nyaatorrents')
+        manager.register('resolve_nyaatorrents')
 
     def resolvable(self, feed, entry):
         return entry['url'].startswith('http://www.nyaatorrents.org/?page=torrentinfo&tid=')

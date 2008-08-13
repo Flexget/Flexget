@@ -37,7 +37,7 @@ class IgnoreFilter(FilterPatterns):
     """
 
     def register(self, manager, parser):
-        manager.register(event='filter', keyword='ignore', callback=self.ignore, order=65535)
+        manager.register('ignore')
 
-    def ignore(self, feed):
+    def feed_filter(self, feed):
         self.filter(feed, feed.reject, None, 'ignore')

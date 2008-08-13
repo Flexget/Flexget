@@ -18,7 +18,7 @@ class OutputExec:
     """
 
     def register(self, manager, parser):
-        manager.register(event='output', keyword='exec', callback=self.run)
+        manager.register('exec')
 
     def validate(self, config):
         if not isinstance(config, str):
@@ -26,7 +26,7 @@ class OutputExec:
         else:
             return []
 
-    def run(self, feed):
+    def feed_output(self, feed):
         for entry in feed.entries:
             cmd = feed.config['exec'] % entry
             log.debug('executing cmd: %s' % cmd)

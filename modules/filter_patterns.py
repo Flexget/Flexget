@@ -52,7 +52,7 @@ class FilterPatterns:
 
     
     def register(self, manager, parser):
-        manager.register(event='filter', keyword='patterns', callback=self.patterns, order=0)
+        manager.register('patterns')
 #        parser.add_option("--try-pattern", action="store", dest="try_pattern", default=None,
 #                          help="Run with given pattern. Useful to try out matching with --test.")
 
@@ -74,16 +74,22 @@ class FilterPatterns:
         return patterns.errors.messages
 
     def matches(self, entry, regexp):
-        #TODO: match from all fields from entry?
+        # TODO: match from all fields from entry?
         regexp = str(regexp)
         entry_url = urllib.unquote(entry['url'])
         if re.search(regexp, entry_url, re.IGNORECASE|re.UNICODE) or re.search(regexp, entry['title'], re.IGNORECASE|re.UNICODE):
             return True
 
-    def patterns(self, feed):
+    def feed_filter(self, feed):
+        """This method is overriden by ignore and accept modules"""
         self.filter(feed, feed.accept, feed.filter, 'patterns')
 
     def filter(self, feed, match_method, non_match_method, keyword):
+        """
+            match_method - passed method is called with a entry as a parameter when entry matches rule
+            non_match_method - passed method is called with a entry as a parameter when entry does NOT match rule
+            keyword - used to get rules from feed configuration
+        """
         for entry in feed.entries:
             match = False
             for regexp_raw in feed.config.get(keyword, []):
@@ -120,5 +126,4 @@ class FilterPatterns:
                     match_method(entry)
             else:
                 if non_match_method != None:
-                    non_match_method(entry)
-            
+                    non_match_method(entry)           

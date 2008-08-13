@@ -25,7 +25,7 @@ class CliConfig:
     """
 
     def register(self, manager, parser):
-        manager.register(event='start', keyword='cli_config', callback=self.run, builtin=True)
+        manager.register('cli_config', builtin=True)
         parser.add_option('--cli-config', action='store', dest='cli_config', default=False,
                           help='Configuration parameters trough commandline. See --doc cli_config.')
         self.replaces = {}
@@ -65,7 +65,7 @@ class CliConfig:
             self.replaces[key.strip()] = value.strip()
         return True
 
-    def run(self, feed):
+    def feed_start(self, feed):
         if self.parse_replaces(feed):
             self.replace_dict(feed.config, self.replaces)
             log.debug(feed.config)

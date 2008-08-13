@@ -167,9 +167,9 @@ class TorrentFilename:
     """
 
     def register(self, manager, parser):
-        manager.register(event='modify', keyword='torrent', callback=self.run, order=-200, builtin=True)
+        manager.register('torrent', builtin=True, modify_priority=255)
 
-    def run(self, feed):
+    def feed_modify(self, feed):
         idstr = 'd8:announce'
         for entry in feed.entries:
             # skip if entry does not have file assigned

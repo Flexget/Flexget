@@ -17,8 +17,7 @@ class FilterSeen:
     """
 
     def register(self, manager, parser):
-        manager.register(event='filter', keyword='seen', callback=self.filter_seen, order=-100, builtin=True)
-        manager.register(event='exit', keyword='seen', callback=self.learn_succeeded, builtin=True)
+        manager.register('seen', builtin=True, filter_priority=255)
 
         # remember and filter by these fields
         self.fields = ['original_url', 'title']
@@ -28,7 +27,8 @@ class FilterSeen:
             return ['wrong datatype, expecting bool']
         return []
 
-    def filter_seen(self, feed):
+    def feed_filter(self, feed):
+        """Filter seen entries"""
         for entry in feed.entries:
             for field in self.fields:
                 if not entry.has_key(field):
@@ -38,8 +38,9 @@ class FilterSeen:
                     log.debug("Rejecting '%s' '%s' because of seen '%s'" % (entry['url'], entry['title'], field))
                     feed.reject(entry)
 
-    def learn_succeeded(self, feed):
-        for entry in feed.get_succeeded_entries():
+    def feed_exit(self, feed):
+        """Remember succeeded entries"""
+        for entry in feed.entries:
             for field in self.fields:
                 if not entry.has_key(field):
                     continue

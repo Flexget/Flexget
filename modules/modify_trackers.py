@@ -20,7 +20,7 @@ class RemoveTrackers:
     """
 
     def register(self, manager, parser):
-        manager.register(event='modify', keyword='remove_trackers', callback=self.remove)
+        manager.register('remove_trackers')
 
     def validate(self, config):
         from validator import ListValidator
@@ -29,7 +29,7 @@ class RemoveTrackers:
         remove.validate(config)
         return remove.errors.messages
 
-    def remove(self, feed):
+    def feed_modify(self, feed):
         for entry in feed.entries:
             if entry.has_key('torrent'):
                 trackers = entry['torrent'].get_multitrackers()

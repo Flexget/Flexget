@@ -18,23 +18,20 @@ class Subtitles:
     """
 
     def register(self, manager, parser):
-        manager.register(event='output', keyword='subtitles', callback=self.get_subtitles)
+        manager.register('subtitles')
 
     def get_config(self, feed):
         config = feed.config['subtitles']
         if type(config) != types.DictType:
             config = {}
-
         config.setdefault('output', os.path.join(sys.path[0]))
         config.setdefault('languages', ['eng'])
         config.setdefault('min_sub_rating', 0.0)
         config.setdefault('match_limit', 0.8)
-
         config['output'] = os.path.expanduser(config['output'])
-            
         return config
 
-    def get_subtitles(self, feed):
+    def feed_download(self, feed):
 
         # filter all entries that have IMDB ID set
         try:
@@ -44,7 +41,6 @@ class Subtitles:
             return
 
         s = ServerProxy("http://www.opensubtitles.org/xml-rpc")
-        
         res = s.LogIn("", "", "en", "Flexget")
 
         if res['status'] != '200 OK':

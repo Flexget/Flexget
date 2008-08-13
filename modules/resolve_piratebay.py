@@ -22,7 +22,7 @@ class ResolvePirateBay:
         if not soup_present:
             log.info('Resolver disabled. BeautifulSoup is not installed.')
             return
-        manager.register_resolver(name='piratebay')
+        manager.register('resolve_piratebay')
 
     def resolvable(self, feed, entry):
         url = entry['url']

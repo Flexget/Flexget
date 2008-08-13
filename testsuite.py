@@ -22,7 +22,7 @@ class FlexGetTestCase(unittest.TestCase):
         self.feed.unittest = True
         
     def getModule(self, event, keyword):
-        module = self.manager.modules[event].get(keyword)
+        module = self.manager.modules.get(keyword)
         if not module:
             raise Exception('module %s isn\'t loaded (event %s)' % (keyword, event))
         return module

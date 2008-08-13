@@ -2,7 +2,6 @@ import urllib2
 import urlparse
 import logging
 from socket import timeout
-import re
 from feed import Entry
 
 __pychecker__ = 'unusednames=parser'
@@ -32,9 +31,9 @@ class InputHtml:
     """
 
     def register(self, manager, parser):
-        manager.register(event='input', keyword='html', callback=self.run)
+        manager.register('html')
 
-    def run(self, feed):
+    def feed_input(self, feed):
         if not soup_present: raise Exception(soup_err)
         pageurl = feed.get_input_url('html')
 

@@ -27,7 +27,7 @@ class RlsLog:
     """
 
     def register(self, manager, parser):
-        manager.register(event='input', keyword='rlslog', callback=self.run)
+        manager.register('rlslog')
 
     def validate(self, config):
         if not isinstance(config, str):
@@ -108,7 +108,7 @@ class RlsLog:
 
         return releases
 
-    def run(self, feed):
+    def feed_input(self, feed):
         if not soup_present: raise Exception(soup_err)
 
         try:

@@ -326,7 +326,7 @@ class FilterImdb:
     """
 
     def register(self, manager, parser):
-        manager.register(event='filter', keyword='imdb', callback=self.run)
+        manager.register('imdb')
 
     def validate(self, config):
         """Validate given configuration"""
@@ -354,7 +354,7 @@ class FilterImdb:
         if config.has_key('accept_languages') and not entry.has_key('imdb_languages'): return True
         return False
 
-    def run(self, feed):
+    def feed_filter(self, feed):
         if not soup_present: raise Warning("Module filter_imdb requires BeautifulSoup. Please install it from http://www.crummy.com/software/BeautifulSoup/ or from your distribution repository.")
         config = feed.config['imdb']
         for entry in feed.entries:

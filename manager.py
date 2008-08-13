@@ -9,10 +9,10 @@ from feed import Feed
 import shelve
 
 try:
-  from optparse import OptionParser, SUPPRESS_HELP
+    from optparse import OptionParser, SUPPRESS_HELP
 except ImportError:
-  print 'Please install Optik 1.4.1 (or higher) or preferably update your Python'
-  sys.exit(1)
+    print 'Please install Optik 1.4.1 (or higher) or preferably update your Python'
+    sys.exit(1)
 
 try:
     import yaml
@@ -29,12 +29,15 @@ class RegisterException(Exception):
 class Manager:
 
     EVENTS = ['start', 'input', 'filter', 'resolve', 'download', 'modify', 'output', 'exit', 'terminate']
+
+    EVENT_METHODS = {'start':'feed_start', 'input':'feed_input', 'filter':
+                     'feed_filter', 'download':'feed_download', 'modify':'feed_modify', 
+                     'output':'feed_output', 'exit':'feed_exit', 'terminate':'application_terminate'}
     
     def __init__(self):
         self.configname = None
         self.options = None
         self.modules = {}
-        self.resolvers = {}
         self.session = {}
         self.config = {}
         self.initialized = False
@@ -346,84 +349,67 @@ class Manager:
         self.merge_dict(defaults, config)
         return config
 
-    def register(self, **kwargs):
-        """
-            Modules call this method to register themselves.
-            Mandatory arguments:
-                keyword      - Configuration
-                event        - Specifies event when module is executed in feed (and implies what it does)
-                callback     - Method that is called when module is being executed
-            Optional arguments:
-                instance     - Instance of module (self)
-                order        - When multiple modules are enabled this is used to
-                               determine execution order. Default 16384.
-                builtin      - Set to True if module should be executed always
-                debug_module - Set to True to hide this module from --list etc
-        """
-        # validate passed arguments
-        for arg in ['keyword', 'callback', 'event']:
-            if not kwargs.has_key(arg):
-                raise RegisterException('Parameter %s is missing from register arguments' % arg)
-        if not callable(kwargs['callback']):
-            raise RegisterException('Passed method not callable.')
-        event = kwargs.get('event')
-        if not event in self.EVENTS:
-            raise RegisterException('Module has invalid event %s' % event)
-        self.modules.setdefault(event, {})
-        # check if there is already registered keyword with same event
-        if self.modules[event].has_key(kwargs['keyword']):
-            by = self.modules[event][kwargs['keyword']]['instance']
-            raise RegisterException('Duplicate keyword with same event %s. Keyword: %s Reserved by: %s' % (event, kwargs['keyword'], by.__class__.__name__))
-        # get module instance from load_modules if it's not given
-        kwargs.setdefault('instance', self.__instance)
-        # set optional parameter default values
-        kwargs.setdefault('order', 16384)
-        kwargs.setdefault('builtin', False)
-        self.modules[event][kwargs['keyword']] = kwargs
+    def register(self, name, **kwargs):
+        # TODO: debug what properties were detected from this module
+        if self.modules.has_key(name):
+            raise RegisterException('Module %s is already registered' % name)
+        meta = kwargs
+        meta['instance'] = self.__instance
+        meta['name'] = name
+        meta.setdefault('events', False)   # module has events
+        meta.setdefault('resolver', False) # module has resolver capabilities
+        meta.setdefault('builtin', False)
+        # probulate module
+        for event, method in self.EVENT_METHODS.iteritems():
+            if hasattr(meta['instance'], method):
+                if callable(getattr(meta['instance'], method)):
+                    meta['events'] = True
+        if hasattr(meta['instance'], 'resolvable') and hasattr(meta['instance'], 'resolve'):
+            meta['resolver'] = True
+        # parse priorities
+        for event in self.EVENTS:
+            key = '%s_priority' % event
+            if meta.has_key(key):
+                meta.setdefault('priorities', {})
+                meta['priorities'][event] = meta[key]
+                del(meta[key])
+                
+        self.modules[name] = meta
 
-    def register_resolver(self, **kwargs):
-        """
-            Resolver modules call this method to register themselves.
-        """
-        # validate passed arguments
-        for arg in ['name']:
-            if not kwargs.has_key(arg):
-                raise RegisterException('Parameter %s is missing from register arguments' % arg)
-        instance = kwargs.get('instance', self.__instance)
-        name = kwargs['name']
-        if not callable(getattr(instance, 'resolvable', None)):
-            raise RegisterException('Resolver %s is missing resolvable method' % name)
-        if not callable(getattr(instance, 'resolvable', None)):
-            raise RegisterException('Resolver %s is missing resolve method' % name)
-        if self.resolvers.has_key(name):
-            raise RegisterException('Resolver %s is already registered' % name)
-        self.resolvers[name] = instance
+        
+    def get_method_for_event(self, event):
+        """Return method name for event"""
+        # TODO: futile? refactor?
+        return self.EVENT_METHODS[event]
 
     def get_modules_by_event(self, event):
-        """Return all modules by event."""
-        result = []
-        for keyword, module in self.modules.get(event, {}).items():
-            if module['event'] == event:
-                result.append(module)
-        return result
+        """Return all modules that hook given event."""
+        res = []
+        if not self.EVENT_METHODS.has_key(event):
+            raise Exception('Unknown event %s' % event)
+        method = self.EVENT_METHODS[event]
+        for name, meta in self.modules.iteritems():
+            instance = meta['instance']
+            if not hasattr(instance, method):
+                continue
+            if callable(getattr(instance, method)):
+                res.append(meta)
+        return res
 
-    def get_modules_by_keyword(self, keyword):
+    def get_resolvers(self):
         """
-          Return all modules by keyword. Yes, (currently) multiple modules
-          may use same keyword (for hooking) but not in same event!
-          Returned list is unique.
+        Return all modules that meet resolver-type API in dict.
+        Dictionary format:
+        <name> = <instance>
         """
-        result = []
-        dupe = []
-        for event in self.EVENTS:
-            modules = self.get_modules_by_event(event)
-            for module in modules:
-                if (module['keyword'] == keyword) and (not module['instance'] in dupe):
-                    result.append(module)
-                    dupe.append(module['instance'])
-        return result
+        res = {}
+        for name, meta in self.modules.iteritems():
+            if meta['resolver']:
+                res[name] = meta['instance']
+        return res
 
     def print_module_list(self):
+        # TODO: this can be rewritten in simpler form now when multiple modules cannot share keyword!
         """Parameter --list"""
         print '-'*60
         print '%-20s%-30s%s' % ('Keyword', 'Roles', '--doc')
@@ -431,28 +417,29 @@ class Manager:
         modules = []
         roles = {}
         for event in self.EVENTS:
-            ml = self.get_modules_by_event(event)
+            try:
+                ml = self.get_modules_by_event(event)
+            except:
+                continue
             for m in ml:
                 dupe = False
                 for module in modules:
-                    if module['keyword'] == m['keyword']: dupe = True
+                    if module['name'] == m['name']: dupe = True
                 if not dupe:
                     modules.append(m)
             # build roles list
             for m in ml:
-                if roles.has_key(m['keyword']):
-                    roles[m['keyword']].append(event)
+                if roles.has_key(m['name']):
+                    roles[m['name']].append(event)
                 else:
-                    roles[m['keyword']] = [event]
+                    roles[m['name']] = [event]
         for module in modules:
             # do not include test classes, unless in debug mode
             if module.get('debug_module', False) and not self.options.debug:
                 continue
-            event = module['event']
-            if modules.index(module) > 0: event = ''
             doc = 'Yes'
             if not module['instance'].__doc__: doc = 'No'
-            print '%-20s%-30s%s' % (module['keyword'], string.join(roles[module['keyword']], ', '), doc)
+            print '%-20s%-30s%s' % (module['name'], string.join(roles[module['name']], ', '), doc)
         print '-'*60
 
     def print_module_doc(self):
@@ -460,8 +447,7 @@ class Manager:
         keyword = self.options.doc
         found = False
         for event in self.EVENTS:
-            modules = self.modules.get(event, {})
-            module = modules.get(keyword, None)
+            module = self.modules.get(keyword, None)
             if module:
                 found = True
                 if not module['instance'].__doc__:
@@ -542,7 +528,7 @@ class Manager:
                 # validate (TODO: make use of validator?)
                 if not isinstance(self.config['feeds'][name], dict):
                     if isinstance(self.config['feeds'][name], str):
-                        if self.get_modules_by_keyword(name):
+                        if self.modules.has_key(name):
                             logging.error('\'%s\' is known keyword, but in wrong indentation level. Please indent it correctly under feed, it should have 2 more spaces than feed name.' % name)
                             continue
                     logging.error('\'%s\' is not a properly configured feed, please check indentation levels.' % name)

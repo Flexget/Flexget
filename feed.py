@@ -173,7 +173,6 @@ class Feed:
                 self.verbose_details('Accepted previously filtered %s' % entry['title'])
             else:
                 self.verbose_details('Accepted %s' % entry['title'])
-                
 
     def filter(self, entry):
         """Mark entry to be filtered unless told otherwise. Entry may still be accepted."""
@@ -197,15 +196,6 @@ class Feed:
             self.manager.add_failed(entry)
             self.verbose_details('Failed %s' % entry['title'])
 
-    def get_succeeded_entries(self):
-        """Return set containing successfull entries"""
-        # TODO: isn't feed.entries always only succeeded since failed are purged between modules?!
-        succeeded = []
-        for entry in self.entries:
-            if not entry in self.failed:
-                succeeded.append(entry)
-        return succeeded
-
     def abort(self):
         """Abort this feed execution, no more modules will be executed."""
         if not self.__abort:
@@ -222,57 +212,12 @@ class Feed:
                 <keyword>:
                     url: <address>
         """
-        if type(self.config[keyword])==types.DictType:
+        if isinstance(self.config[keyword], dict):
             if not self.config[keyword].has_key('url'):
                 raise Exception('Input %s has invalid configuration, url is missing.' % keyword)
             return self.config[keyword]['url']
         else:
             return self.config[keyword]
-
-    def __get_order(self, module):
-        """Return order for module in this feed. Uses default value if no value is configured."""
-        order = module['order']
-        keyword = module['keyword']
-        if self.config.has_key(keyword):
-            if type(self.config[keyword])==types.DictType:
-                order = self.config[keyword].get('order', order)
-        return order
-
-    def __sort_modules(self, a, b):
-        a = self.__get_order(a)
-        b = self.__get_order(b)
-        return cmp(a, b)
-
-    def __set_namespace(self, name):
-        """Switch namespace in session"""
-        self.cache.set_namespace(name)
-        self.shared_cache.set_namespace(name)
-
-    def __run_modules(self, event):
-        """Execute module callbacks by event type if module is configured for this feed."""
-        modules = self.manager.get_modules_by_event(event)
-        # Sort modules based on module order.
-        # Order can be also configured in which case given value overwrites module default.
-        modules.sort(self.__sort_modules)
-        for module in modules:
-            keyword = module['keyword']
-            if self.config.has_key(keyword) or (module['builtin'] and not self.config.get('disable_builtins', False)):
-                # set cache namespaces to this module realm
-                self.__set_namespace(keyword)
-                # store execute info
-                self.__current_event = event
-                self.__current_module = keyword
-                # call module
-                try:
-                    module['callback'](self)
-                except Warning, w:
-                    logging.warning(w)
-                except Exception, e:
-                    logging.exception('Unhandled error in module %s: %s' % (keyword, e))
-                    self.abort()
-                # check for priority operations
-                if self.__abort: return
-                self.__purge_rejected()
 
     def log_once(self, s, log=logging):
         """Log string s once"""
@@ -281,8 +226,7 @@ class Feed:
         m.update(s)
         sum = m.hexdigest()
         seen = self.shared_cache.get('log-%s' % sum, False)
-        if (seen):
-            return
+        if (seen): return
         self.shared_cache.store('log-%s' % sum, True, 30)
         log.info(s)
 
@@ -310,7 +254,7 @@ class Feed:
 
     def resolvable(self, entry):
         """Return True if entry is resolvable by registered resolver."""
-        for name, resolver in self.manager.resolvers.iteritems():
+        for name, resolver in self.manager.get_resolvers().iteritems():
             if resolver.resolvable(self, entry):
                 return True
         return False
@@ -322,7 +266,7 @@ class Feed:
             tries += 1
             if (tries > 300):
                 raise ResolverException('Resolve was left in infinite loop while resolving %s, some resolver is returning True on resolvable method when it should not.' % entry['url'])
-            for name, resolver in self.manager.resolvers.iteritems():
+            for name, resolver in self.manager.get_resolvers().iteritems():
                 if resolver.resolvable(self, entry):
                     logging.debug('%s resolving %s' % (name, entry['url']))
                     try:
@@ -344,6 +288,56 @@ class Feed:
             except ResolverException, e:
                 logging.warn(e.value)
                 self.fail(entry)
+            
+    def __get_priority(self, module, event):
+        """Return order for module in this feed. Uses default value if no value is configured."""
+        print repr(module)
+        priority = module.get('priorities', {}).get('event', 0)
+        keyword = module['name']
+        if self.config.has_key(keyword):
+            if isinstance(self.config[keyword], dict):
+                order = self.config[keyword].get('priority', priority)
+        return priority
+
+    def __sort_modules(self, a, b, event):
+        a = self.__get_priority(a, event)
+        b = self.__get_priority(b, event)
+        return cmp(a, b)
+
+    def __set_namespace(self, name):
+        """Switch namespace in session"""
+        self.cache.set_namespace(name)
+        self.shared_cache.set_namespace(name)
+
+    def __run_modules(self, event):
+        """Execute module events if module is configured for this feed."""
+        modules = self.manager.get_modules_by_event(event)
+        # Sort modules based on module event priority
+        # Priority can be also configured in which case given value overwrites module default.
+        modules.sort(lambda x,y: self.__sort_modules(x,y, event), reverse=True)
+
+        for module in modules:
+            keyword = module['name']
+            if self.config.has_key(keyword) or (module['builtin'] and not self.config.get('disable_builtins', False)):
+                # set cache namespaces to this module realm
+                self.__set_namespace(keyword)
+                # store execute info
+                self.__current_event = event
+                self.__current_module = keyword
+                # call module
+                try:
+                    method = self.manager.get_method_for_event(event)
+                    getattr(module['instance'], method)(self)
+                except Warning, w: # TODO: refactor into ModuleWarning
+                    logging.warning(w)
+                except Exception, e:
+                    logging.exception('Unhandled error in module %s: %s' % (keyword, e))
+                    self.abort()
+                # check for priority operations
+                self.__purge_rejected()
+                self.__purge_failed()
+                if self.__abort: return
+
     
     def execute(self):
         """Execute this feed, runs events in order of events array."""
@@ -363,6 +357,12 @@ class Feed:
             return
         # run events
         for event in self.manager.EVENTS[:-1]:
+            # skip resolve if in unittest
+            if event == 'resolve' and not self.unittest:
+                self.__set_namespace('resolve')
+                self._resolve_entries()
+                self.__purge_failed()
+            if event == 'resolve': continue
             # when learning, skip few events
             if self.manager.options.learn:
                 if event in ['download', 'output']: 
@@ -370,19 +370,13 @@ class Feed:
                     modules = self.manager.get_modules_by_event(event)
                     for module in modules:
                         if self.config.has_key(module['keyword']):
-                            logging.info('Note: Feed %s keyword %s not executed due learn / reset.' % (self.name, module['keyword']))
+                            logging.info('Feed %s keyword %s is not executed because of learn/reset.' % (self.name, module['keyword']))
                     continue
-            # handle resolve event a bit special
-            if event == 'resolve' and not self.unittest:
-                self.__set_namespace('resolve')
-                self._resolve_entries()
-                self.__purge_failed()
-                continue
-            # run all modules with specified event
+            # run all modules with this event
             self.__run_modules(event)
-            # purge filtered and failed entries
+            # purge filtered entries between events
+            # rejected and failed entries are purged between modules
             self._purge()
-            self.__purge_failed()
             # verbose some progress
             if event == 'input':
                 self.verbose_details_entries()
@@ -398,22 +392,20 @@ class Feed:
         if self.__abort: return
         self.__run_modules(self.manager.EVENTS[-1])
 
-
     def validate(self):
         """Module configuration validation. Return array of error messages that were detected."""
-        #logging.info('Validating feed %s' % self.name)
         validate_errors = []
         # validate all modules
         for kw, value in self.config.iteritems():
-            modules = self.manager.get_modules_by_keyword(kw)
-            if not modules:
+            module = self.manager.modules.get(kw)
+            if not module:
                 validate_errors.append('unknown keyword \'%s\'' % kw)
-            for module in modules:
-                if hasattr(module['instance'], 'validate'):
-                    errors = module['instance'].validate(self.config[kw])
-                    if errors:
-                        for error in errors:
-                            validate_errors.append('%s %s' % (kw, error))
-                else:
-                    logging.warning('Used module %s does not support validating. Please notify author!' % kw)
+                continue
+            if hasattr(module['instance'], 'validate'):
+                errors = module['instance'].validate(self.config[kw])
+                if errors:
+                    for error in errors:
+                        validate_errors.append('%s %s' % (kw, error))
+            else:
+                logging.warning('Used module %s does not support validating. Please notify author!' % kw)
         return validate_errors

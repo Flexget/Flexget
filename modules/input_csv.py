@@ -31,9 +31,9 @@ class InputCSV:
     """
 
     def register(self, manager, parser):
-        manager.register(event='input', keyword='csv', callback=self.run)
+        manager.register('csv')
 
-    def run(self, feed):
+    def feed_input(self, feed):
         url = feed.config['csv'].get('url', None)
         if not url: raise Exception('CSV in %s is missing url' % feed.name)
         page = urllib2.urlopen(url)
