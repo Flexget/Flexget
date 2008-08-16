@@ -1,5 +1,4 @@
 import logging
-import types
 from datetime import datetime
 
 class Entry(dict):
@@ -252,7 +251,7 @@ class Feed:
         keyword = module['name']
         if self.config.has_key(keyword):
             if isinstance(self.config[keyword], dict):
-                order = self.config[keyword].get('priority', priority)
+                priority = self.config[keyword].get('priority', priority)
         return priority
 
     def __sort_modules(self, a, b, event):
@@ -264,7 +263,6 @@ class Feed:
         """Switch namespace in session"""
         self.cache.set_namespace(name)
         self.shared_cache.set_namespace(name)
-
         
     def __run_modules(self, event):
         """Execute module events if module is configured for this feed."""
@@ -283,7 +281,7 @@ class Feed:
                 self.__current_module = keyword
                 # call the module
                 try:
-                    method = self.manager.EVENT_METHODS[event]
+                    method = self.manager.event_methods[event]
                     getattr(module['instance'], method)(self)
                 except Warning, w: # TODO: refactor into ModuleWarning
                     logging.warning(w)
@@ -313,7 +311,7 @@ class Feed:
                 logging.info('Feed \'%s\' passed' % self.name)
             return
         # run events
-        for event in self.manager.EVENTS[:-1]:
+        for event in self.manager.events[:-1]: # TODO: !!!! should not be done this way since modules may modify events now!
             # when learning, skip few events
             if self.manager.options.learn:
                 if event in ['download', 'output']: 
@@ -341,7 +339,7 @@ class Feed:
     def terminate(self):
         """Execute terminate event for this feed"""
         if self.__abort: return
-        self.__run_modules(self.manager.EVENTS[-1])
+        self.__run_modules('terminate')
 
     def validate(self):
         """Module configuration validation. Return array of error messages that were detected."""

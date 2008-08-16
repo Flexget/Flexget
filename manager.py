@@ -27,12 +27,6 @@ class RegisterException(Exception):
         return repr(self.value)
 
 class Manager:
-
-    EVENTS = ['start', 'input', 'filter', 'resolve', 'download', 'modify', 'output', 'exit', 'terminate']
-
-    EVENT_METHODS = {'start':'feed_start', 'input':'feed_input', 'filter':
-                     'feed_filter', 'resolve':'feed_resolve', 'download':'feed_download', 'modify':'feed_modify', 
-                     'output':'feed_output', 'exit':'feed_exit', 'terminate':'application_terminate'}
     
     def __init__(self):
         self.configname = None
@@ -42,7 +36,15 @@ class Manager:
         self.config = {}
         self.initialized = False
         
+        # events
+        self.events = ['start', 'input', 'filter', 'download', 'modify', 'output', 'exit', 'terminate']
+        self.event_methods = {'start':'feed_start', 'input':'feed_input', 'filter':
+                              'feed_filter', 'download':'feed_download', 'modify':'feed_modify', 
+                              'output':'feed_output', 'exit':'feed_exit', 'terminate':'application_terminate'}
+        
+        # pass current module instance around while loading
         self.__instance = False
+        self.__load_queue = self.events + ['module', 'source']
 
         # settings
         self.moduledir = os.path.join(sys.path[0], 'modules/')
@@ -291,42 +293,41 @@ class Manager:
         """Load and call register on all modules"""
         # TODO: logging goes only to file due startup levels!
         loaded = {} # prevent modules being loaded multiple times when they're imported by other modules
-        for module in self.find_modules(moduledir):
-            ns = {}
-            execfile(os.path.join(moduledir, module), ns, ns)
-            for name in ns.keys():
-                if loaded.get(name, False): continue
-                if type(ns[name]) == types.ClassType:
-                    if hasattr(ns[name], 'register'):
-                        try:
-                            instance = ns[name]()
-                            # store current module instance so register method may access it
-                            # without modules having to explicitly give it as parameter
-                            self.__instance = instance
-                        except:
-                            logging.exception('Exception occured while creating instance %s' % name)
-                            break
-                        method = getattr(instance, 'register', None)
-                        if callable(method):
+        for prefix in self.__load_queue:
+            for module in self.find_modules(moduledir, prefix):
+                ns = {}
+                execfile(os.path.join(moduledir, module), ns, ns)
+                for name in ns.keys():
+                    if loaded.get(name, False): continue
+                    if type(ns[name]) == types.ClassType:
+                        if hasattr(ns[name], 'register'):
                             try:
-                                #logging.info('Loading module %s from %s' % (name, module))
-                                method(self, parser)
-                                loaded[name] = True
-                            except RegisterException, e:
-                                logging.critical('Error while registering module %s. %s' % (name, e.value))
+                                instance = ns[name]()
+                                # store current module instance so register method may access it
+                                # without modules having to explicitly give it as parameter
+                                self.__instance = instance
+                            except:
+                                logging.exception('Exception occured while creating instance %s' % name)
                                 break
-                        else:
-                            logging.error('Module %s register method is not callable' % name)
+                            method = getattr(instance, 'register', None)
+                            if callable(method):
+                                try:
+                                    #logging.info('Loading module %s from %s' % (name, module))
+                                    method(self, parser)
+                                    loaded[name] = True
+                                except RegisterException, e:
+                                    logging.critical('Error while registering module %s. %s' % (name, e.value))
+                                    break
+                            else:
+                                logging.error('Module %s register method is not callable' % name)
 
 
-    def find_modules(self, directory):
-        """Return array containing all modules in passed path"""
+    def find_modules(self, directory, prefix):
+        """Return array containing all modules in passed path that begin with prefix."""
         modules = []
-        prefixes = self.EVENTS + ['module', 'source']
         for m in os.listdir(directory):
-            for p in prefixes:
-                if m.startswith(p+'_') and m.endswith('.py'):
-                    modules.append(m)
+            if m.startswith(prefix+'_') and m.endswith('.py'):
+                modules.append(m)
         return modules
 
     def get_settings(self, keyword, defaults={}):
@@ -370,12 +371,12 @@ class Manager:
         info.setdefault('events', False)   # module has events
         info.setdefault('builtin', False)
         # probulate module
-        for event, method in self.EVENT_METHODS.iteritems():
+        for event, method in self.event_methods.iteritems():
             if hasattr(info['instance'], method):
                 if callable(getattr(info['instance'], method)):
                     info['events'] = True
         # parse event priorities, given in form <event>_priority=<n>, ie. input_priority=10
-        for event in self.EVENTS:
+        for event in self.events:
             key = '%s_priority' % event
             if info.has_key(key):
                 info.setdefault('priorities', {})
@@ -383,13 +384,37 @@ class Manager:
                 del(info[key])
                 
         self.modules[name] = info
+        
+    def add_feed_event(self, event_name, **kwargs):
+        """Register new event in FlexGet and queue module loading for them. Note: queue works only while loading is in process."""
+        if event_name in self.events:
+            raise RegisterException('Event %s already exists.' % event_name)
+        if kwargs.has_key('before') and kwargs.has_key('after'):
+            raise RegisterException('You can only give either before or after for event.')
+        if not kwargs.has_key('before') and not kwargs.has_key('after'):
+            raise RegisterException('You must specify either before or after event.')
+        if kwargs.has_key('before'):
+            if not kwargs.get('before', None) in self.events:
+                raise RegisterException('Event %s specified by \'before\' cannot be found.' % kwargs.get('before', None))
+        if kwargs.has_key('after'):
+            if not kwargs.get('after', None) in self.events:
+                raise RegisterException('Event %s specified by \'after\' cannot be found.' % kwargs.get('after', None))
+        # add method name to event -> method lookup table
+        self.event_methods[event_name] = 'feed_'+event_name
+        # queue module loading for this type
+        self.__load_queue.append(event_name)
+        # place event in event list
+        if kwargs.get('after'):
+            self.events.insert(self.events.index(kwargs['after'])+1, event_name)
+        if kwargs.get('before'):
+            self.events.insert(self.events.index(kwargs['before'])-1, event_name)
 
     def get_modules_by_event(self, event):
         """Return all modules that hook given event."""
         res = []
-        if not self.EVENT_METHODS.has_key(event):
+        if not self.event_methods.has_key(event):
             raise Exception('Unknown event %s' % event)
-        method = self.EVENT_METHODS[event]
+        method = self.event_methods[event]
         for name, info in self.modules.iteritems():
             instance = info['instance']
             if not hasattr(instance, method):
@@ -420,7 +445,7 @@ class Manager:
         print '-'*60
         modules = []
         roles = {}
-        for event in self.EVENTS:
+        for event in self.events:
             try:
                 ml = self.get_modules_by_event(event)
             except:
@@ -450,7 +475,7 @@ class Manager:
         """Parameter --doc <keyword>"""
         keyword = self.options.doc
         found = False
-        for event in self.EVENTS:
+        for event in self.events:
             module = self.modules.get(keyword, None)
             if module:
                 found = True
