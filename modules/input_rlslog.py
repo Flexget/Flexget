@@ -94,7 +94,8 @@ class RlsLog:
                 temp = {}
                 temp['title'] = release['title']
                 temp['url'] = link_href
-                if feed.resolvable(temp):
+                resolver = feed.manager.get_module_by_name('resolver')
+                if resolver['instance'].resolvable(feed, temp):
                     release['url'] = link_href
                     log.debug('--> accepting %s (resolvable)' % link_href)
                 else:
@@ -104,7 +105,7 @@ class RlsLog:
             if release.has_key('url'):
                 releases.append(release)
             else:
-                feed.log_once('%s rejected due to missing or unrecognized download link' % (release['title']), log)
+                feed.log_once('%s skipped due to missing or unrecognized download link' % (release['title']), log)
 
         return releases
 
@@ -112,7 +113,7 @@ class RlsLog:
         if not soup_present: raise Exception(soup_err)
 
         try:
-	    releases = self.parse_rlslog(feed.get_input_url('rlslog'), feed)
+            releases = self.parse_rlslog(feed.get_input_url('rlslog'), feed)
         except urllib2.HTTPError, e:
             raise Warning('RlsLog was unable to complete task. HTTPError %s' % (e.code))
         except urllib2.URLError, e:

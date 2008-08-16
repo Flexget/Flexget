@@ -1,7 +1,7 @@
 import urllib2
 import logging
 import re
-from feed import ResolverException
+from module_resolver import ResolverException
 
 timeout = 10
 import socket
@@ -30,7 +30,7 @@ class ResolveNewTorrents:
         self.resolved = []
 
     def register(self, manager, parser):
-        manager.register('resolve_newtorrents')
+        manager.register('resolve_newtorrents', group='resolver')
 
     def resolvable(self, feed, entry):
         # Return true only for urls that can and should be resolved

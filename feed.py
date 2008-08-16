@@ -2,12 +2,6 @@ import logging
 import types
 from datetime import datetime
 
-class ResolverException(Exception):
-    def __init__(self, value):
-        self.value = value
-    def __str__(self):
-        return repr(self.value)
-
 class Entry(dict):
 
     """
@@ -15,8 +9,8 @@ class Entry(dict):
         See. http://flexget.com/wiki/DevelopersEntry
 
         Internally stored original_url is neccessary because
-        resolvers change this into something else and otherwise
-        that information would be lost.
+        resolvers / modules may change this into something else 
+        and otherwise that information would be lost.
     """
 
     def __init__(self, *args):
@@ -251,43 +245,6 @@ class Feed:
         if self.manager.options.details:
             for entry in self.entries:
                 self.verbose_details('%s' % entry['title'])
-
-    def resolvable(self, entry):
-        """Return True if entry is resolvable by registered resolver."""
-        for name, resolver in self.manager.get_resolvers().iteritems():
-            if resolver.resolvable(self, entry):
-                return True
-        return False
-        
-    def resolve(self, entry):
-        """Resolves given entry url. Raises ResolverException if resolve failed."""
-        tries = 0
-        while self.resolvable(entry):
-            tries += 1
-            if (tries > 300):
-                raise ResolverException('Resolve was left in infinite loop while resolving %s, some resolver is returning True on resolvable method when it should not.' % entry['url'])
-            for name, resolver in self.manager.get_resolvers().iteritems():
-                if resolver.resolvable(self, entry):
-                    logging.debug('%s resolving %s' % (name, entry['url']))
-                    try:
-                        resolver.resolve(self, entry)
-                    except ResolverException, r:
-                        # increase failcount
-                        count = self.shared_cache.storedefault(entry['url'], 1)
-                        count += 1
-                        raise ResolverException('%s: %s' % (name, r.value))
-                    except Exception, e:
-                        logging.exception(e)
-                        raise ResolverException('%s: Internal error with url %s' % (name, entry['url']))
-
-    def _resolve_entries(self):
-        """Resolves all entries in feed. Since this causes many requests to sites, use with caution."""
-        for entry in self.entries:
-            try:
-                self.resolve(entry)
-            except ResolverException, e:
-                logging.warn(e.value)
-                self.fail(entry)
             
     def __get_priority(self, module, event):
         """Return order for module in this feed. Uses default value if no value is configured."""
@@ -308,6 +265,7 @@ class Feed:
         self.cache.set_namespace(name)
         self.shared_cache.set_namespace(name)
 
+        
     def __run_modules(self, event):
         """Execute module events if module is configured for this feed."""
         modules = self.manager.get_modules_by_event(event)
@@ -323,20 +281,20 @@ class Feed:
                 # store execute info
                 self.__current_event = event
                 self.__current_module = keyword
-                # call module
+                # call the module
                 try:
-                    method = self.manager.get_method_for_event(event)
+                    method = self.manager.EVENT_METHODS[event]
                     getattr(module['instance'], method)(self)
                 except Warning, w: # TODO: refactor into ModuleWarning
                     logging.warning(w)
                 except Exception, e:
                     logging.exception('Unhandled error in module %s: %s' % (keyword, e))
                     self.abort()
-                # check for priority operations
+                # remove entries
                 self.__purge_rejected()
                 self.__purge_failed()
+                # check for priority operations
                 if self.__abort: return
-
     
     def execute(self):
         """Execute this feed, runs events in order of events array."""
@@ -356,12 +314,6 @@ class Feed:
             return
         # run events
         for event in self.manager.EVENTS[:-1]:
-            # skip resolve if in unittest
-            if event == 'resolve' and not self.unittest:
-                self.__set_namespace('resolve')
-                self._resolve_entries()
-                self.__purge_failed()
-            if event == 'resolve': continue
             # when learning, skip few events
             if self.manager.options.learn:
                 if event in ['download', 'output']: 

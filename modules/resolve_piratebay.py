@@ -1,6 +1,6 @@
 import urllib2
 import logging
-from feed import ResolverException
+from module_resolver import ResolverException
 
 __pychecker__ = 'unusednames=parser,feed'
 
@@ -8,7 +8,6 @@ log = logging.getLogger('piratebay')
 
 # this way we don't force users to install bs incase they do not want to use module
 soup_present = True
-
 try:
     from BeautifulSoup import BeautifulSoup
 except:
@@ -22,13 +21,14 @@ class ResolvePirateBay:
         if not soup_present:
             log.info('Resolver disabled. BeautifulSoup is not installed.')
             return
-        manager.register('resolve_piratebay')
+        manager.register('resolve_piratebay', group='resolver')
 
     def resolvable(self, feed, entry):
         url = entry['url']
         if url.endswith('.torrent'): return False
         if url.startswith('http://thepiratebay.org/tor/'): return True
         if url.startswith('http://torrents.thepiratebay.org/'): return True
+        return False
         
     def resolve(self, feed, entry):
         try:

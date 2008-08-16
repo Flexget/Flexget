@@ -20,7 +20,7 @@ except:
 class InputScenereleases:
 
     """
-        Uses scenereleases.info category as input.
+        Uses scenereleases.info category url as input.
 
         Example:
 
@@ -93,7 +93,8 @@ class InputScenereleases:
                 temp = {}
                 temp['title'] = release['title']
                 temp['url'] = link_href
-                if feed.resolvable(temp):
+                resolver = feed.manager.get_module_by_name('resolver')
+                if resolver['instance'].resolvable(feed, temp):
                     release['url'] = link_href
 
                 # if name is torrent
@@ -113,7 +114,7 @@ class InputScenereleases:
         if not soup_present: raise Exception(soup_err)
 
         try:
-	    releases = self.parse_site(feed.get_input_url('scenereleases'), feed)
+            releases = self.parse_site(feed.get_input_url('scenereleases'), feed)
         except urllib2.HTTPError, e:
             raise Warning('scenereleases was unable to complete task. HTTPError %s' % (e.code))
         except urllib2.URLError, e:

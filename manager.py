@@ -31,7 +31,7 @@ class Manager:
     EVENTS = ['start', 'input', 'filter', 'resolve', 'download', 'modify', 'output', 'exit', 'terminate']
 
     EVENT_METHODS = {'start':'feed_start', 'input':'feed_input', 'filter':
-                     'feed_filter', 'download':'feed_download', 'modify':'feed_modify', 
+                     'feed_filter', 'resolve':'feed_resolve', 'download':'feed_download', 'modify':'feed_modify', 
                      'output':'feed_output', 'exit':'feed_exit', 'terminate':'application_terminate'}
     
     def __init__(self):
@@ -350,37 +350,39 @@ class Manager:
         return config
 
     def register(self, name, **kwargs):
-        # TODO: debug what properties were detected from this module
+        """
+            Register module with name.
+
+            **kwargs options:
+            
+            builtin : boolean
+            <event>_priority : int
+            group - str
+            
+            Modules may also pass any number of additional values to be stored in module info (dict).
+            
+        """
         if self.modules.has_key(name):
             raise RegisterException('Module %s is already registered' % name)
-        meta = kwargs
-        meta['instance'] = self.__instance
-        meta['name'] = name
-        meta.setdefault('events', False)   # module has events
-        meta.setdefault('resolver', False) # module has resolver capabilities
-        meta.setdefault('builtin', False)
+        info = kwargs
+        info['instance'] = self.__instance
+        info['name'] = name
+        info.setdefault('events', False)   # module has events
+        info.setdefault('builtin', False)
         # probulate module
         for event, method in self.EVENT_METHODS.iteritems():
-            if hasattr(meta['instance'], method):
-                if callable(getattr(meta['instance'], method)):
-                    meta['events'] = True
-        if hasattr(meta['instance'], 'resolvable') and hasattr(meta['instance'], 'resolve'):
-            meta['resolver'] = True
-        # parse priorities
+            if hasattr(info['instance'], method):
+                if callable(getattr(info['instance'], method)):
+                    info['events'] = True
+        # parse event priorities, given in form <event>_priority=<n>, ie. input_priority=10
         for event in self.EVENTS:
             key = '%s_priority' % event
-            if meta.has_key(key):
-                meta.setdefault('priorities', {})
-                meta['priorities'][event] = meta[key]
-                del(meta[key])
+            if info.has_key(key):
+                info.setdefault('priorities', {})
+                info['priorities'][event] = info[key]
+                del(info[key])
                 
-        self.modules[name] = meta
-
-        
-    def get_method_for_event(self, event):
-        """Return method name for event"""
-        # TODO: futile? refactor?
-        return self.EVENT_METHODS[event]
+        self.modules[name] = info
 
     def get_modules_by_event(self, event):
         """Return all modules that hook given event."""
@@ -388,25 +390,27 @@ class Manager:
         if not self.EVENT_METHODS.has_key(event):
             raise Exception('Unknown event %s' % event)
         method = self.EVENT_METHODS[event]
-        for name, meta in self.modules.iteritems():
-            instance = meta['instance']
+        for name, info in self.modules.iteritems():
+            instance = info['instance']
             if not hasattr(instance, method):
                 continue
             if callable(getattr(instance, method)):
-                res.append(meta)
+                res.append(info)
         return res
 
-    def get_resolvers(self):
-        """
-        Return all modules that meet resolver-type API in dict.
-        Dictionary format:
-        <name> = <instance>
-        """
-        res = {}
-        for name, meta in self.modules.iteritems():
-            if meta['resolver']:
-                res[name] = meta['instance']
+    def get_modules_by_group(self, group):
+        """Return all modules with in specified group."""
+        res = []
+        for name, info in self.modules.iteritems():
+            if info.get('group', '')==group:
+                res.append(info)
         return res
+        
+    def get_module_by_name(self, name):
+        """Get module by name, prefered way since manager.modules structure may be changed at some point."""
+        if not self.modules.has_key(name):
+            raise Exception('Unknown module %s' % name)
+        return self.modules[name]
 
     def print_module_list(self):
         # TODO: this can be rewritten in simpler form now when multiple modules cannot share keyword!
