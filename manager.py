@@ -289,45 +289,45 @@ class Manager:
             
         self.session.close()
         
+        
     def load_modules(self, parser, moduledir):
-        """Load and call register on all modules"""
-        # TODO: logging goes only to file due startup levels!
+        """Load all modules from moduledir"""
         loaded = {} # prevent modules being loaded multiple times when they're imported by other modules
         for prefix in self.__load_queue:
             for module in self.find_modules(moduledir, prefix):
-                ns = {}
-                execfile(os.path.join(moduledir, module), ns, ns)
-                for name in ns.keys():
+                try:
+                    module = __import__(module)
+                except Exception, e:
+                    logging.critical('Module %s is broken! Skipping it!' % module)
+                    logging.exception(e)
+                    continue
+                for name, item in vars(module).iteritems():
                     if loaded.get(name, False): continue
-                    if type(ns[name]) == types.ClassType:
-                        if hasattr(ns[name], 'register'):
+                    if hasattr(item, 'register'):
+                        try:
+                            instance = item()
+                            # store current module instance so register method may access it
+                            # without modules having to explicitly give it as parameter
+                            self.__instance = instance
+                        except:
+                            logging.exception('Exception occured while creating instance %s' % name)
+                            return
+                        method = getattr(instance, 'register', None)
+                        if callable(method):
                             try:
-                                instance = ns[name]()
-                                # store current module instance so register method may access it
-                                # without modules having to explicitly give it as parameter
-                                self.__instance = instance
-                            except:
-                                logging.exception('Exception occured while creating instance %s' % name)
-                                break
-                            method = getattr(instance, 'register', None)
-                            if callable(method):
-                                try:
-                                    #logging.info('Loading module %s from %s' % (name, module))
-                                    method(self, parser)
-                                    loaded[name] = True
-                                except RegisterException, e:
-                                    logging.critical('Error while registering module %s. %s' % (name, e.value))
-                                    break
-                            else:
-                                logging.error('Module %s register method is not callable' % name)
-
+                                method(self, parser)
+                                loaded[name] = True
+                            except RegisterException, e:
+                                logging.critical('Error while registering module %s. %s' % (name, e.value))
+                        else:
+                            logging.error('Module %s register method is not callable' % name)
 
     def find_modules(self, directory, prefix):
         """Return array containing all modules in passed path that begin with prefix."""
         modules = []
         for m in os.listdir(directory):
             if m.startswith(prefix+'_') and m.endswith('.py'):
-                modules.append(m)
+                modules.append(m[:-3])
         return modules
 
     def get_settings(self, keyword, defaults={}):

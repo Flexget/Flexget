@@ -16,7 +16,6 @@ class Resolver:
     def register(self, manager, parser):
         manager.register('resolver', builtin=True)
         manager.add_feed_event('resolve', before='download')
-        # TODO: manager.register_feed_event(name='resolve', before='download')
 
     def feed_resolve(self, feed):
         # no resolves in unittest mode
