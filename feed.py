@@ -8,7 +8,7 @@ class Entry(dict):
         See. http://flexget.com/wiki/DevelopersEntry
 
         Internally stored original_url is neccessary because
-        resolvers / modules may change this into something else 
+        modules (ie. resolvers) may change this into something else 
         and otherwise that information would be lost.
     """
 

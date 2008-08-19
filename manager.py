@@ -44,7 +44,9 @@ class Manager:
         
         # pass current module instance around while loading
         self.__instance = False
+        self.__class_name = None
         self.__load_queue = self.events + ['module', 'source']
+        self.__event_queue = {}
 
         # settings
         self.moduledir = os.path.join(sys.path[0], 'modules/')
@@ -110,22 +112,9 @@ class Manager:
         parser.add_option('--validate', action='store_true', dest='validate', default=0,
                           help=SUPPRESS_HELP)
 
-        # add module path to sys.path so they can import properly ..
-        sys.path.append(self.moduledir)
-
-        # load modules, modules may add more commandline parameters!
-        self.load_modules(parser, self.moduledir)
-        
+        # parse first without module customized options, needed to determine verbosity level at first ..
         self.options = parser.parse_args()[0]
 
-        # perform commandline sanity check(s)
-        if self.options.test and self.options.learn:
-            print '--test and --learn are mutually exclusive'
-            sys.exit(1)
-        if self.options.reset:
-            self.options.learn = True
-
-        # now once options are known set logging level accordingly
         if self.options.debug:
             # set 'mainlogger' to debug aswell or no debug output, this is done because of
             # shitty python logging that fails to output debug on console if basicConf level
@@ -141,6 +130,22 @@ class Manager:
                 formatter = logging.Formatter(self.logging_normal)
             console.setFormatter(formatter)
             logging.getLogger().addHandler(console)
+
+        # add module path to sys.path so they can import properly ..
+        sys.path.append(self.moduledir)
+
+        # load modules, modules may add more commandline parameters!
+        self.load_modules(parser, self.moduledir)
+
+        # parse options including module customized options
+        self.options = parser.parse_args()[0]
+
+        # perform commandline sanity check(s)
+        if self.options.test and self.options.learn:
+            print '--test and --learn are mutually exclusive'
+            sys.exit(1)
+        if self.options.reset:
+            self.options.learn = True
 
     def initialize(self):
         """Loads configuration and session file, separated to own method because of unittests"""
@@ -252,12 +257,10 @@ class Manager:
         """Dumps session into yaml file for easier debugging """
         try:
             fn = os.path.join(sys.path[0], 'dump-%s.yml' % self.configname)
-
             # mirgrate data
             dump = {}
             for k,v in self.session.iteritems():
                 dump[k] = v
-
             f = file(fn, 'w')
             self.sanitize(dump)
             yaml.safe_dump(dump, f, allow_unicode=True)
@@ -309,6 +312,7 @@ class Manager:
                             # store current module instance so register method may access it
                             # without modules having to explicitly give it as parameter
                             self.__instance = instance
+                            self.__class_name = name
                         except:
                             logging.exception('Exception occured while creating instance %s' % name)
                             return
@@ -321,6 +325,11 @@ class Manager:
                                 logging.critical('Error while registering module %s. %s' % (name, e.value))
                         else:
                             logging.error('Module %s register method is not callable' % name)
+        
+        # check that event queue is empty (all module created events succeeded)
+        if self.__event_queue:
+            for event, info in self.__event_queue.iteritems():
+                logging.error('Module %s requested new event %s, but it could not be created at requested point (before, after). Module is not working properly.' % (info['class_name'], event))
 
     def find_modules(self, directory, prefix):
         """Return array containing all modules in passed path that begin with prefix."""
@@ -387,27 +396,45 @@ class Manager:
         
     def add_feed_event(self, event_name, **kwargs):
         """Register new event in FlexGet and queue module loading for them. Note: queue works only while loading is in process."""
-        if event_name in self.events:
-            raise RegisterException('Event %s already exists.' % event_name)
         if kwargs.has_key('before') and kwargs.has_key('after'):
-            raise RegisterException('You can only give either before or after for event.')
+            raise RegisterException('You can only give either before or after for a event.')
         if not kwargs.has_key('before') and not kwargs.has_key('after'):
-            raise RegisterException('You must specify either before or after event.')
-        if kwargs.has_key('before'):
-            if not kwargs.get('before', None) in self.events:
-                raise RegisterException('Event %s specified by \'before\' cannot be found.' % kwargs.get('before', None))
-        if kwargs.has_key('after'):
-            if not kwargs.get('after', None) in self.events:
-                raise RegisterException('Event %s specified by \'after\' cannot be found.' % kwargs.get('after', None))
-        # add method name to event -> method lookup table
-        self.event_methods[event_name] = 'feed_'+event_name
-        # queue module loading for this type
-        self.__load_queue.append(event_name)
-        # place event in event list
-        if kwargs.get('after'):
-            self.events.insert(self.events.index(kwargs['after'])+1, event_name)
-        if kwargs.get('before'):
-            self.events.insert(self.events.index(kwargs['before'])-1, event_name)
+            raise RegisterException('You must specify either a before or after event.')
+        if event_name in self.events or self.__event_queue.has_key(event_name):
+            raise RegisterException('Event %s already exists.' % event_name)
+
+        def add_event(name, args):
+            print 'name: %s args: %s' % (repr(name), repr(args))
+            if args.has_key('before'):
+                if not args.get('before', None) in self.events:
+                    return False
+            if args.has_key('after'):
+                if not args.get('after', None) in self.events:
+                    return False
+            # add method name to event -> method lookup table
+            self.event_methods[name] = 'feed_'+name
+            # queue module loading for this type
+            self.__load_queue.append(event_name)
+            # place event in event list
+            if args.get('after'):
+                self.events.insert(self.events.index(kwargs['after'])+1, name)
+            if args.get('before'):
+                self.events.insert(self.events.index(kwargs['before'])-1, name)
+            logging.debug('added event %s' % name)
+            return True
+
+        kwargs.setdefault('class_name', self.__class_name)
+        if not add_event(event_name, kwargs):
+            # specified event insert point does not exists yet, add into queue and exit
+            logging.debug('event %s queued' % event_name)
+            self.__event_queue[event_name] = kwargs
+            return
+
+        # new event added, now loop and see if any queued can be added after this
+        for event_name, kwargs in self.__event_queue.items():
+            if add_event(event_name, kwargs):
+                logging.debug('event %s added from queue' % event_name)
+                del self.__event_queue[event_name]
 
     def get_modules_by_event(self, event):
         """Return all modules that hook given event."""
