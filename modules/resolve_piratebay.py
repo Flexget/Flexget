@@ -26,6 +26,7 @@ class ResolvePirateBay:
     def resolvable(self, feed, entry):
         url = entry['url']
         if url.endswith('.torrent'): return False
+        if url.startswith('http://thepiratebay.org/torrent/'): return True
         if url.startswith('http://thepiratebay.org/tor/'): return True
         if url.startswith('http://torrents.thepiratebay.org/'): return True
         return False
