@@ -21,14 +21,8 @@ class ModuleInterval:
         manager.register('interval')
 
     def validate(self, config):
-        """
-        from validator import DictValidator
-        cookies = DictValidator()
-        cookies.accept('type', ['mozilla', 'msie', 'lpw'], required=True)
-        cookies.accept('file', str, required=True)
-        cookies.validate(config) 
-        return cookies.errors.messages
-        """
+        if not isinstance(config, str):
+            return ['parameter must be a string']
         return []
 
     def feed_start(self, feed):
