@@ -18,10 +18,10 @@ class ModifyExtension:
         manager.register('extension')
 
     def validate(self, config):
-        if not isinstance(config, str) or not isinstance(config, int):
-            return ['extension is not string or number']
-        else:
+        if isinstance(config, str) or isinstance(config, int):
             return []
+        else:
+            return ['extension is not string or number']
 
     def feed_modify(self, feed):
         ext = feed.config.get('extension')
