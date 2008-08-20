@@ -189,11 +189,12 @@ class Feed:
             self.manager.add_failed(entry)
             self.verbose_details('Failed %s' % entry['title'])
 
-    def abort(self):
+    def abort(self, **kwargs):
         """Abort this feed execution, no more modules will be executed."""
-        if not self.__abort:
+        if not self.__abort and not kwargs.get('silent', False):
             logging.info('Aborting feed %s' % self.name)
         self.__abort = True
+        self.__run_event('abort')
 
     def get_input_url(self, keyword):
         # TODO: move to better place?
@@ -264,7 +265,7 @@ class Feed:
         self.cache.set_namespace(name)
         self.shared_cache.set_namespace(name)
         
-    def __run_modules(self, event):
+    def __run_event(self, event):
         """Execute module events if module is configured for this feed."""
         modules = self.manager.get_modules_by_event(event)
         # Sort modules based on module event priority
@@ -311,7 +312,7 @@ class Feed:
                 logging.info('Feed \'%s\' passed' % self.name)
             return
         # run events
-        for event in self.manager.events[:-1]: # TODO: !!!! should not be done this way since modules may modify events now!
+        for event in self.manager.events:
             # when learning, skip few events
             if self.manager.options.learn:
                 if event in ['download', 'output']: 
@@ -322,7 +323,7 @@ class Feed:
                             logging.info('Feed %s keyword %s is not executed because of learn/reset.' % (self.name, module['keyword']))
                     continue
             # run all modules with this event
-            self.__run_modules(event)
+            self.__run_event(event)
             # purge filtered entries between events
             # rejected and failed entries are purged between modules
             self._purge()
@@ -339,7 +340,7 @@ class Feed:
     def terminate(self):
         """Execute terminate event for this feed"""
         if self.__abort: return
-        self.__run_modules('terminate')
+        self.__run_event('terminate')
 
     def validate(self):
         """Module configuration validation. Return array of error messages that were detected."""

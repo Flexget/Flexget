@@ -60,6 +60,10 @@ class ModuleCookies:
         log.debug('Installing urllib2 opener')
         opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cj))
         urllib2.install_opener(opener)
+        
+    def feed_abort(self, feed):
+        """Feed aborted, unhook the cookiejar"""
+        self.feed_exit(feed)
 
     def feed_exit(self, feed):
         """Feed exiting, remove cookiejar"""

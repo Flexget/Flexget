@@ -20,46 +20,57 @@ try:
 except:
     log.warning(soup_err)
     soup_present = False
-
-class ResolveNewTorrents:
-    """NewTorrents resolver."""
-
-    # a bit messy since this was not originally a resolver
+    
+    
+class NewTorrents:
+    """NewTorrents resolver and search module."""
 
     def __init__(self):
         self.resolved = []
 
     def register(self, manager, parser):
-        manager.register('resolve_newtorrents', group='resolver')
+        manager.register('newtorrents', groups=['resolver', 'search'])
 
+    # Resolver module API
     def resolvable(self, feed, entry):
         # Return true only for urls that can and should be resolved
         return entry['url'].startswith('http://www.newtorrents.info') and not entry['url'] in self.resolved
         
+    # Resolver module API
     def resolve(self, feed, entry):
         if not soup_present: raise Exception(soup_err)
 
         # resolve entry url
         url = entry['url']
         if url.startswith('http://www.newtorrents.info/?q=') or url.startswith('http://www.newtorrents.info/search'):
-            url = self.__get_torrent_url_from_search(url, entry['title'])
+            url = self.url_from_search(url, entry['title'])
         else:
-            url = self.__get_torrent_url_from_page(url)
+            url = self.url_from_page(url)
 
         if url:
             entry['url'] = url
             self.resolved.append(url)
         else:
             raise ResolverException('Bug in newtorrents resolver')
+            
+    # Search module API
+    def search(self, feed, entry):
+        try:
+            import urllib
+            search_url = 'http://www.newtorrents.info/search/%s' % urllib.quote(entry['title'])
+            url = self.url_from_search(search_url, entry['title'])
+            entry['url'] = url
+        except:
+            # TODO: raise what?
+            pass
     
-    def __get_torrent_url_from_page(self, url):
+    def url_from_page(self, url):
         """Parses torrent url from newtorrents download page"""
         try:
             page = urllib2.urlopen(url)
             data = page.read()
         except urllib2.URLError:
-            log.error('URLerror when retrieving page')
-            return None
+            raise ResolverException('URLerror when retrieving page')
         p = re.compile("copy\(\'(.*)\'\)", re.IGNORECASE)
         f = p.search(data)
         if not f:
@@ -68,8 +79,8 @@ class ResolveNewTorrents:
         else:
             return f.group(1)
 
-    def __get_torrent_url_from_search(self, url, name):
-        """Parses torrent download url (requires release name) from search results"""
+    def url_from_search(self, url, name):
+        """Parses torrent download url from search results"""
         name = name.replace('.',' ').lower()
         try:
             page = urllib2.urlopen(url)

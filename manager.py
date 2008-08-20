@@ -37,10 +37,11 @@ class Manager:
         self.initialized = False
         
         # events
-        self.events = ['start', 'input', 'filter', 'download', 'modify', 'output', 'exit', 'terminate']
+        self.events = ['start', 'input', 'filter', 'download', 'modify', 'output', 'exit']
         self.event_methods = {'start':'feed_start', 'input':'feed_input', 'filter':
                               'feed_filter', 'download':'feed_download', 'modify':'feed_modify', 
-                              'output':'feed_output', 'exit':'feed_exit', 'terminate':'application_terminate'}
+                              'output':'feed_output', 'exit':'feed_exit', 'abort':'feed_abort',
+                              'terminate':'application_terminate'}
         
         # pass current module instance around while loading
         self.__instance = False
@@ -368,6 +369,7 @@ class Manager:
             builtin : boolean
             <event>_priority : int
             group - str
+            groups - list of groups (str)
             
             Modules may also pass any number of additional values to be stored in module info (dict).
             
@@ -404,7 +406,6 @@ class Manager:
             raise RegisterException('Event %s already exists.' % event_name)
 
         def add_event(name, args):
-            print 'name: %s args: %s' % (repr(name), repr(args))
             if args.has_key('before'):
                 if not args.get('before', None) in self.events:
                     return False
@@ -420,20 +421,17 @@ class Manager:
                 self.events.insert(self.events.index(kwargs['after'])+1, name)
             if args.get('before'):
                 self.events.insert(self.events.index(kwargs['before'])-1, name)
-            logging.debug('added event %s' % name)
             return True
 
         kwargs.setdefault('class_name', self.__class_name)
         if not add_event(event_name, kwargs):
             # specified event insert point does not exists yet, add into queue and exit
-            logging.debug('event %s queued' % event_name)
             self.__event_queue[event_name] = kwargs
             return
 
         # new event added, now loop and see if any queued can be added after this
         for event_name, kwargs in self.__event_queue.items():
             if add_event(event_name, kwargs):
-                logging.debug('event %s added from queue' % event_name)
                 del self.__event_queue[event_name]
 
     def get_modules_by_event(self, event):
@@ -454,7 +452,7 @@ class Manager:
         """Return all modules with in specified group."""
         res = []
         for name, info in self.modules.iteritems():
-            if info.get('group', '')==group:
+            if info.get('group', '')==group or group in info.get('groups', []):
                 res.append(info)
         return res
         
