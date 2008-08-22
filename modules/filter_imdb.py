@@ -4,6 +4,7 @@ import logging
 import re
 import string
 import difflib
+from manager import ModuleWarning
 
 # this way we don't force users to install bs incase they do not want to use this module
 soup_present = True
@@ -355,7 +356,7 @@ class FilterImdb:
         return False
 
     def feed_filter(self, feed):
-        if not soup_present: raise Warning("Module filter_imdb requires BeautifulSoup. Please install it from http://www.crummy.com/software/BeautifulSoup/ or from your distribution repository.")
+        if not soup_present: raise ModuleWarning("Module filter_imdb requires BeautifulSoup. Please install it from http://www.crummy.com/software/BeautifulSoup/ or from your distribution repository.", log)
         config = feed.config['imdb']
         for entry in feed.entries:
 

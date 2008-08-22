@@ -5,7 +5,6 @@ import string
 import types
 import time
 from datetime import tzinfo, timedelta, datetime
-from feed import Feed
 import shelve
 
 try:
@@ -26,6 +25,21 @@ class RegisterException(Exception):
     def __str__(self):
         return repr(self.value)
 
+class ModuleWarning(Warning):
+    def __init__(self, value, logger=logging):
+        self.value = value
+        self.log = logger
+    def __str__(self):
+        return repr(self.value)
+        
+class MergeException(Exception):
+    def __init__(self, value):
+        self.value = value
+    def __str__(self):
+        return repr(self.value)
+
+from feed import Feed        
+        
 class Manager:
     
     def __init__(self):
@@ -500,15 +514,14 @@ class Manager:
         """Parameter --doc <keyword>"""
         keyword = self.options.doc
         found = False
-        for event in self.events:
-            module = self.modules.get(keyword, None)
-            if module:
-                found = True
-                if not module['instance'].__doc__:
-                    print 'Module %s does not have documentation' % keyword
-                else:
-                    print module['instance'].__doc__
-                return
+        module = self.modules.get(keyword, None)
+        if module:
+            found = True
+            if not module['instance'].__doc__:
+                print 'Module %s does not have documentation' % keyword
+            else:
+                print module['instance'].__doc__
+            return
         if not found:
             print 'Could not find module %s' % keyword
             
@@ -554,7 +567,7 @@ class Manager:
                     else:
                         raise Exception('Unknown type %s in dictionary' % type(v))
                 else:
-                    raise Warning('Merging key %s failed, incompatible datatypes.' % (k))
+                    raise MergeException('Merging key %s failed, conflicting datatypes.' % (k))
             else:
                 d2[k] = v
 
@@ -594,10 +607,7 @@ class Manager:
                 config = self.config['feeds'][name]
                 try:
                     self.merge_dict(self.config.get('global', {}), config)
-                except Exception, e:
-                    logging.exception(e)
-                    continue
-                except Warning:
+                except MergeException:
                     logging.critical('Global section has conflicting datatypes with feed %s configuration. Feed aborted.' % name)
                     continue
                 # create feed instance and execute it

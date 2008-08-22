@@ -3,6 +3,7 @@ import logging
 import re
 from httplib import BadStatusLine
 from feed import Entry
+from manager import ModuleWarning
 
 __pychecker__ = 'unusednames=parser'
 
@@ -116,11 +117,11 @@ class InputScenereleases:
         try:
             releases = self.parse_site(feed.get_input_url('scenereleases'), feed)
         except urllib2.HTTPError, e:
-            raise Warning('scenereleases was unable to complete task. HTTPError %s' % (e.code))
+            raise ModuleWarning('scenereleases was unable to complete task. HTTPError %s' % (e.code), log)
         except urllib2.URLError, e:
-            raise Warning('scenereleases was unable to complete task. URLError %s' % (e.reason))
+            raise ModuleWarning('scenereleases was unable to complete task. URLError %s' % (e.reason), log)
         except BadStatusLine:
-            raise Warning('scenereleases was unable to complete task. Got BadStatusLine.')
+            raise ModuleWarning('scenereleases was unable to complete task. Got BadStatusLine.', log)
 
         for release in releases:
             # construct entry from release

@@ -2,6 +2,7 @@ import urllib2
 from feed import Entry
 import re
 import logging
+from manager import ModuleWarning
 
 log = logging.getLogger('text')
 
@@ -52,9 +53,7 @@ class InputText:
             entry[k] = v % entry
 
     def feed_input(self, feed):
-        url = feed.config['text'].get('url', None)
-        if not url:
-            raise Warning('text input is missing url')
+        url = feed.config['text']['url']
         f = urllib2.urlopen(url)
         s = f.read()
         l = s.split("\r\n")
@@ -62,7 +61,7 @@ class InputText:
         # configs
         entry_config = feed.config['text'].get('entry', None)
         if not entry_config:
-            raise Warning('text input is missing entry definition')
+            raise ModuleWarning('missing entry definition', log)
         format_config = feed.config['text'].get('format', {})
 
         # keep track what fields have been found

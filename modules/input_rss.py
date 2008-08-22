@@ -4,6 +4,7 @@ import urllib2
 import xml.sax
 import types
 from feed import Entry
+from manager import ModuleWarning
 
 feedparser_present = True
 try:
@@ -46,7 +47,6 @@ class InputRSS:
     def register(self, manager, parser):
         manager.register('rss')
 
-
     def validate(self, config):
         """Validate given configuration"""
         from validator import DictValidator
@@ -74,7 +74,7 @@ class InputRSS:
 
     def feed_input(self, feed):
         if not feedparser_present:
-            raise Warning('Module RSS requires Feedparser. Please install it from http://www.feedparser.org/ or from your distro repository')
+            raise ModuleWarning('Module RSS requires Feedparser. Please install it from http://www.feedparser.org/ or from your distro repository', log)
 
         config = feed.config['rss']
         if type(config) != types.DictType:
@@ -108,11 +108,11 @@ class InputRSS:
                 log.debug('Feed %s hasn\'t changed, skipping' % feed.name)
                 return
             elif status == 401:
-                raise Warning('Authentication needed for feed %s: %s', feed.name, rss.headers['www-authenticate'])
+                raise ModuleWarning('Authentication needed for feed %s: %s' % (feed.name, rss.headers['www-authenticate']), log)
             elif status == 404:
-                raise Warning('RSS Feed %s not found', feed.name)
+                raise ModuleWarning('RSS Feed %s not found' % feed.name, log)
             elif status == 500:
-                raise Warning('Internal server exception on feed %s', feed.name)
+                raise ModuleWarning('Internal server exception on feed %s' % feed.name, log)
         else:
             log.error('rss does not have status: %s' % rss)
             
@@ -120,11 +120,11 @@ class InputRSS:
         ex = rss.get('bozo_exception', False)
         if ex:
             if ex == feedparser.NonXMLContentType:
-                raise Warning('RSS Feed %s does not contain valid XML' % feed.name)
+                raise ModuleWarning('RSS Feed %s does not contain valid XML' % feed.name, log)
             elif ex == xml.sax._exceptions.SAXParseException:
-                raise Warning('RSS Feed %s is not valid XML' % feed.name)
+                raise ModuleWarning('RSS Feed %s is not valid XML' % feed.name, log)
             elif ex == urllib2.URLError:
-                raise Warning('urllib2.URLError')
+                raise ModuleWarning('urllib2.URLError', log)
             else:
                 log.error('Unhandled bozo_exception. Type: %s.%s (feed: %s)' % (ex.__class__.__module__, ex.__class__.__name__ , feed.name))
                 return

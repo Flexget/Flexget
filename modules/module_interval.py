@@ -1,5 +1,6 @@
 import logging
 import datetime
+from manager import ModuleWarning
 
 __pychecker__ = 'unusednames=parser,feed'
 
@@ -34,7 +35,7 @@ class ModuleInterval:
         try:
             next_time = last_time + datetime.timedelta(**params)
         except TypeError:
-            raise Warning('Invalid configuration')          
+            raise ModuleWarning('Invalid configuration', log)
         log.debug('next_time: %s' % repr(next_time))
         if datetime.datetime.today() < next_time:
             log.debug('interval not met')

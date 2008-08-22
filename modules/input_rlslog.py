@@ -3,6 +3,7 @@ import logging
 import re
 from httplib import BadStatusLine
 from feed import Entry
+from manager import ModuleWarning
 
 __pychecker__ = 'unusednames=parser'
 
@@ -115,11 +116,11 @@ class RlsLog:
         try:
             releases = self.parse_rlslog(feed.get_input_url('rlslog'), feed)
         except urllib2.HTTPError, e:
-            raise Warning('RlsLog was unable to complete task. HTTPError %s' % (e.code))
+            raise ModuleWarning('RlsLog was unable to complete task. HTTPError %s' % (e.code), log)
         except urllib2.URLError, e:
-            raise Warning('RlsLog was unable to complete task. URLError %s' % (e.reason))
+            raise ModuleWarning('RlsLog was unable to complete task. URLError %s' % (e.reason), log)
         except BadStatusLine:
-            raise Warning('RlsLog was unable to complete task. Got BadStatusLine.')
+            raise ModuleWarning('RlsLog was unable to complete task. Got BadStatusLine.', log)
 
         for release in releases:
             # construct entry from release

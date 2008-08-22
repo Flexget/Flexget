@@ -3,6 +3,7 @@ import urllib2
 import logging
 import shutil
 import md5
+from manager import ModuleWarning
 
 __pychecker__ = 'unusednames=parser,feed'
 
@@ -55,7 +56,7 @@ class ModuleDownload:
         # check for invalid configuration, abort whole download if not goig to work
         # TODO: rewrite and check exists
         if not feed.config['download']:
-            raise Warning('Feed %s is missing download path, check your configuration.' % feed.name)
+            raise ModuleWarning('Feed %s is missing download path, check your configuration.' % feed.name)
 
     def feed_download(self, feed):
         """Download all feed content and store in temporary folder"""
@@ -68,7 +69,7 @@ class ModuleDownload:
                     self.download(feed, entry)
             except IOError, e:
                 feed.fail(entry)
-                log.warning('Download of %s timed out' % entry['title']);
+                log.ModuleWarning('timed out %s' % entry['title'], log)
             except Exception, e:
                 # notify framework that outputing this entry failed
                 feed.fail(entry)
@@ -111,7 +112,7 @@ class ModuleDownload:
             # store temp filename into entry so other modules may read and modify content
             # later this temp file is moved into final destination (at self.output)
             entry['file'] = datafile
-        except Exception, e:
+        except:
             # don't leave futile files behind
             os.remove(datafile)
             raise
@@ -149,7 +150,7 @@ class ModuleDownload:
                 else:
                     self.output(feed, entry)
                     feed.verbose_details('Downloaded %s' % entry['title'])
-            except Warning, e:
+            except ModuleWarning, e:
                 feed.fail(entry)
                 log.error('Error while writing: %s' % e)
             except Exception, e:
@@ -177,10 +178,10 @@ class ModuleDownload:
         destfile = os.path.join(os.path.expanduser(path), entry.get('filename', entry['title']))
 
         if not os.path.exists(os.path.expanduser(path)):
-            raise Warning("Cannot write output file %s, does the path exist?" % destfile)
+            raise ModuleWarning("Cannot write output file %s, does the path exist?" % destfile, log)
 
         if os.path.exists(destfile):
-            raise Warning("File '%s' already exists" % destfile)
+            raise ModuleWarning("File '%s' already exists" % destfile, log)
 
         # move file
         shutil.move(entry['file'], destfile)

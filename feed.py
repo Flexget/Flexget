@@ -1,5 +1,6 @@
 import logging
 from datetime import datetime
+from manager import ModuleWarning
 
 class Entry(dict):
 
@@ -284,8 +285,8 @@ class Feed:
                 try:
                     method = self.manager.event_methods[event]
                     getattr(module['instance'], method)(self)
-                except Warning, w: # TODO: refactor into ModuleWarning
-                    logging.warning(w)
+                except ModuleWarning, m:
+                    m.log.warning(m)
                 except Exception, e:
                     logging.exception('Unhandled error in module %s: %s' % (keyword, e))
                     self.abort()

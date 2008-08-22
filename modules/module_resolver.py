@@ -35,11 +35,11 @@ class Resolver:
         while self.resolvable(feed, entry):
             tries += 1
             if (tries > 300):
-                raise ResolverException('Resolve was left in infinite loop while resolving %s, some resolver is returning always True')
+                raise ResolverException('Resolve was left in infinite loop while resolving %s, some resolver is returning always True' % entry)
             for resolver in feed.manager.get_modules_by_group('resolver'):
                 name = resolver['name']
                 if resolver['instance'].resolvable(feed, entry):
-                    log.debug('%s resolving %s' % (name, entry['url']))
+                    #log.debug('%s resolving %s' % (name, entry['url']))
                     try:
                         resolver['instance'].resolve(feed, entry)
                     except ResolverException, r:

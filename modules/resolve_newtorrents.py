@@ -13,14 +13,10 @@ log = logging.getLogger('newtorrents')
 
 # this way we don't force users to install bs incase they do not want to use module
 soup_present = True
-soup_err = 'Module newtorrents requires BeautifulSoup. Please install it from http://www.crummy.com/software/BeautifulSoup/ or from your distribution repository.'
-
 try:
     from BeautifulSoup import BeautifulSoup
 except:
-    log.warning(soup_err)
     soup_present = False
-    
     
 class NewTorrents:
     """NewTorrents resolver and search module."""
@@ -38,7 +34,8 @@ class NewTorrents:
         
     # Resolver module API
     def resolve(self, feed, entry):
-        if not soup_present: raise Exception(soup_err)
+        if not soup_present:
+            raise ResolverException('BeautifulSoup not present')
 
         # resolve entry url
         url = entry['url']

@@ -1,5 +1,6 @@
 import os
 import logging
+from manager import ModuleWarning
 
 __pychecker__ = 'unusednames=parser'
 
@@ -27,7 +28,7 @@ class FilterExists:
         path = feed.config.get('exists', None)
         path = os.path.expanduser(path)
         if not os.path.exists(path):
-            raise Warning('Path %s does not exists' % path)
+            raise ModuleWarning('Path %s does not exists' % path, log)
         # scan trough
         for root, dirs, files in os.walk(path):
             # convert filelists into utf-8 to avoid unicode problems

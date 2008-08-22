@@ -110,8 +110,6 @@ class OutputRSS:
         config.setdefault('link', ['imdb_url', 'input_url'])
         # add url as last resort
         config['link'].append('url')
-        if not config.has_key('file'):
-            raise Warning('make_rss is missing a file parameter')
         return config
 
     def feed_exit(self, feed):

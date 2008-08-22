@@ -2,8 +2,8 @@ import urllib2
 import urlparse
 import logging
 from socket import timeout
-import re
 from feed import Entry
+from manager import ModuleWarning
 
 __pychecker__ = 'unusednames=parser'
 
@@ -50,11 +50,9 @@ class InputTVTorrents:
             page = urllib2.urlopen(pageurl)
             soup = BeautifulSoup(page)
         except timeout:
-            log.warning("Timed out opening page")
-            return
-        except urllib2.URLError, e:
-            log.warning("URLError when opening page")
-            return
+            raise ModuleWarning("Timed out opening page", log)
+        except urllib2.URLError:
+            raise ModuleWarning("URLError when opening page", log)
         
         hscript = soup.find('script', src=None).string
         hlines = hscript.splitlines()
@@ -90,8 +88,6 @@ class InputTVTorrents:
             elif not url.startswith('http://') or not url.startswith('https://'):
                 url = urlparse.urljoin(pageurl, url)
                 
-            #url_readable = urllib.unquote(url)
-
             # in case the title contains xxxxxxx.torrent - foooo.torrent clean it a bit (get upto first .torrent)
             if title.lower().find('.torrent') > 0:
                 title = title[:title.lower().find(".torrent")]

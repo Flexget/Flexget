@@ -1,5 +1,6 @@
 import logging
 import urllib2
+from manager import ModuleWarning
 
 __pychecker__ = 'unusednames=parser,feed'
 
@@ -34,11 +35,6 @@ class ModuleCookies:
     def feed_start(self, feed):
         """Feed starting, install cookiejar"""
         config = feed.config['cookies']
-        # check that require configuration is present
-        if not config.has_key('type'):
-            raise Warning('Cookies configuration is missing required field: type')
-        if not config.has_key('file'):
-            raise Warning('Cookies configuration is missing required field: file')
         # create cookiejar
         import cookielib
         t = config['type']
@@ -49,13 +45,13 @@ class ModuleCookies:
         elif t == 'msie':
             cj = cookielib.MSIECookieJar()
         else:
-            raise Warning('Unknown cookie type %s' % t)
+            raise ModuleWarning('Unknown cookie type %s' % t, log)
         try:
             cj.load(filename=config['file'], ignore_expires=True)
             log.debug('Cookies loaded')
         except (cookielib.LoadError, IOError):
             import sys
-            raise Warning('Cookies could not be loaded: %s' % sys.exc_info()[1])
+            raise ModuleWarning('Cookies could not be loaded: %s' % sys.exc_info()[1], log)
         # create new opener for urllib2
         log.debug('Installing urllib2 opener')
         opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cj))
