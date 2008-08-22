@@ -85,13 +85,17 @@ class TestResolvers(FlexGetTestCase):
         
     def testPirateBay(self):
         # test with piratebay entry
-        resolver = self.get_resolver('resolve_piratebay')
+        resolver = self.get_resolver('piratebay')
         entry = self.feed.entries[0]
         self.assertEqual(resolver.resolvable(self.feed, entry), True)
-        # not a piratebay entry
-        entry = self.feed.entries[1]
-        self.assertEqual(resolver.resolvable(self.feed, entry), False)
 
+    def testPirateBaySearch(self):
+        # test with piratebay entry
+        resolver = self.get_resolver('piratebay')
+        entry = self.feed.entries[1]
+        self.assertEqual(resolver.resolvable(self.feed, entry), True)
+        
+        
     def testNyaaTorrents(self):
         entry = self.feed.entries[2]
         resolver = self.get_resolver('resolve_nyaatorrents')

@@ -18,7 +18,7 @@ class ResolvePirateBay:
     """PirateBay resolver."""
 
     def register(self, manager, parser):
-        manager.register('resolve_piratebay', group='resolver')
+        manager.register('piratebay', group='resolver')
 
     # resolver API
     def resolvable(self, feed, entry):
