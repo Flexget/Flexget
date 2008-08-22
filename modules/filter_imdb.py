@@ -405,13 +405,19 @@ class FilterImdb:
                         feed.filter(entry)
                         # store cache so this will be skipped
                         feed.shared_cache.store(entry['imdb_url'], imdb.to_yaml())
-                        continue
+                        continue # next entry
                     except ValueError:
                         log.error('Invalid parameter: %s' % entry['imdb_url'])
                         feed.filter(entry)
-                        continue
+                        continue # next entry
+                    except urllib2.HTTPError, he:
+                        feed.log_once('Invalid imdb url %s ? %s' % (entry['imdb_url'], he), log)
+                        feed.filter(entry)
+                        continue # next entry
                     except Exception, e:
-                        raise ModuleWarning('Failed to open %s. %s' % (entry['imdb_url'], e), log)
+                        feed.filter(entry)
+                        log.exception(e)
+                        continue # next entry
                 else:
                     imdb.from_yaml(cached)
                 # store to cache

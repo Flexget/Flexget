@@ -18,7 +18,7 @@ class ResolvePirateBay:
     """PirateBay resolver."""
 
     def register(self, manager, parser):
-        manager.register('piratebay', group='resolver')
+        manager.register('piratebay', groups=['resolver', 'search'])
 
     # resolver API
     def resolvable(self, feed, entry):
@@ -68,7 +68,7 @@ class ResolvePirateBay:
         try:
             page = urllib2.urlopen(url)
         except urllib2.URLError:
-            raise ResolverException('Timed out when opening search page')
+            raise ModuleWarning('Timed out when opening search page', log)
         
         soup = BeautifulSoup(page)
         torrents = []

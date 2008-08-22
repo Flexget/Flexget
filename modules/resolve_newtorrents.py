@@ -41,7 +41,10 @@ class NewTorrents:
         # resolve entry url
         url = entry['url']
         if url.startswith('http://www.newtorrents.info/?q=') or url.startswith('http://www.newtorrents.info/search'):
-            url = self.url_from_search(url, entry['title'])
+            try:
+                url = self.url_from_search(url, entry['title'])
+            except ModuleWarning, e:
+                raise ResolverException(e)
         else:
             url = self.url_from_page(url)
 
@@ -79,7 +82,7 @@ class NewTorrents:
         try:
             page = urllib2.urlopen(url)
         except urllib2.URLError:
-            raise ResolverException('Timed out when opening search page')
+            raise ModuleWarning('Timed out when opening search page', log)
         
         soup = BeautifulSoup(page)
         torrents = []
