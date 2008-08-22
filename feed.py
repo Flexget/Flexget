@@ -286,7 +286,11 @@ class Feed:
                     method = self.manager.event_methods[event]
                     getattr(module['instance'], method)(self)
                 except ModuleWarning, m:
-                    m.log.warning(m)
+                    # this warning should be logged only once (may keep repeating)
+                    if m.kwargs.get('log_once', False):
+                        self.log_once(m, m.log)
+                    else:
+                        m.log.warning(m)
                 except Exception, e:
                     logging.exception('Unhandled error in module %s: %s' % (keyword, e))
                     self.abort()

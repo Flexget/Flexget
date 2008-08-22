@@ -26,9 +26,10 @@ class RegisterException(Exception):
         return repr(self.value)
 
 class ModuleWarning(Warning):
-    def __init__(self, value, logger=logging):
+    def __init__(self, value, logger=logging, **kwargs):
         self.value = value
         self.log = logger
+        self.kwargs = kwargs
     def __str__(self):
         return repr(self.value)
         

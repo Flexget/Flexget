@@ -84,7 +84,7 @@ class ResolvePirateBay:
             torrents.append(torrent)
             
         if not torrents:
-            raise ModuleWarning('No matches for %s' % name)
+            raise ModuleWarning('No matches for %s' % name, log, log_once=True)
             
         # TODO: choose best torrent based on leech / seed
         return torrents[0]['link']

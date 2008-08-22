@@ -184,8 +184,6 @@ class ImdbSearch:
             return cmp (m2['match'], m1['match'])
         movies.sort(cmp_movie)
         return movies
-        
-
 
 class ImdbParser:
     """Quick-hack to parse relevant imdb details"""
@@ -391,7 +389,7 @@ class FilterImdb:
                         feed.log_once('Filtering %s because of missing imdb url' % entry['title'], log)
                         feed.filter(entry)
                     else:
-                        log.debug("Unable to check %s due missing imdb url, configured to pass (filter_invalid is False)" % entry['title'])
+                        log.debug('Unable to check %s due missing imdb url, configured to pass (filter_invalid is False)' % entry['title'])
                     continue
 
             imdb = ImdbParser()
@@ -409,9 +407,11 @@ class FilterImdb:
                         feed.shared_cache.store(entry['imdb_url'], imdb.to_yaml())
                         continue
                     except ValueError:
-                        log.error("Invalid parameter: %s " % entry['imdb_url'])
+                        log.error('Invalid parameter: %s' % entry['imdb_url'])
                         feed.filter(entry)
                         continue
+                    except Exception, e:
+                        raise ModuleWarning('Failed to open %s. %s' % (entry['imdb_url'], e), log)
                 else:
                     imdb.from_yaml(cached)
                 # store to cache
@@ -465,5 +465,5 @@ class FilterImdb:
                 feed.log_once('Filtering %s because of rule(s) %s' % (entry['title'], string.join(reasons, ', ')), log)
                 feed.filter(entry)
             else:
-                log.debug("Accepting %s" % (entry))
+                log.debug('Accepting %s' % (entry))
                 feed.accept(entry)

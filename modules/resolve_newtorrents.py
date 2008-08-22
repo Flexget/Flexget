@@ -52,14 +52,10 @@ class NewTorrents:
             
     # Search module API
     def search(self, feed, entry):
-        try:
-            import urllib
-            search_url = 'http://www.newtorrents.info/search/%s' % urllib.quote(entry['title'])
-            url = self.url_from_search(search_url, entry['title'])
-            entry['url'] = url
-        except:
-            # TODO: raise what?
-            pass
+        import urllib
+        search_url = 'http://www.newtorrents.info/search/%s' % urllib.quote(entry['title'])
+        url = self.url_from_search(search_url, entry['title'])
+        entry['url'] = url
     
     def url_from_page(self, url):
         """Parses torrent url from newtorrents download page"""
@@ -96,7 +92,7 @@ class NewTorrents:
 
         # choose the torrent
         if not torrents:
-            raise ResolverException('%s doesn\'t match for any search results: %s' % (name, url))
+            raise ModuleWarning('No matches for %s' % name, log, log_once=True)
         else:
             if len(torrents) == 1:
                 log.debug('found only one matching search result.')
