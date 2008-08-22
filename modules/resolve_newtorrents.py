@@ -2,6 +2,7 @@ import urllib2
 import logging
 import re
 from module_resolver import ResolverException
+from manager import ModuleWarning
 
 timeout = 10
 import socket
