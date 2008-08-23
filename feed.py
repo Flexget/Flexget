@@ -324,8 +324,8 @@ class Feed:
                     # log keywords not executed
                     modules = self.manager.get_modules_by_event(event)
                     for module in modules:
-                        if self.config.has_key(module['keyword']):
-                            logging.info('Feed %s keyword %s is not executed because of learn/reset.' % (self.name, module['keyword']))
+                        if self.config.has_key(module['name']):
+                            logging.info('Feed %s keyword %s is not executed because of learn/reset.' % (self.name, module['name']))
                     continue
             # run all modules with this event
             self.__run_event(event)
