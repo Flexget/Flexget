@@ -435,7 +435,7 @@ class Manager:
             if args.get('after'):
                 self.events.insert(self.events.index(kwargs['after'])+1, name)
             if args.get('before'):
-                self.events.insert(self.events.index(kwargs['before'])-1, name)
+                self.events.insert(self.events.index(kwargs['before']), name)
             return True
 
         kwargs.setdefault('class_name', self.__class_name)
