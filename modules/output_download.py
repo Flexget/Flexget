@@ -76,9 +76,10 @@ class ModuleDownload:
                 log.exception('Execute downloads: %s' % e)
 
     def download(self, feed, entry):
+        log.debug('Downloading url %s' % entry['url'])
         # get content
         if entry.has_key('basic_auth_password') and entry.has_key('basic_auth_username'):
-            log.debug('Basic auth enabled')
+            log.debug('Basic auth enabled. User: %s Password: %s' % (entry['basic_auth_username'], entry['basic_auth_password']))
             auth_handler = urllib2.HTTPPasswordMgrWithDefaultRealm()
             auth_handler.add_password(None, entry['url'], entry['basic_auth_username'], entry['basic_auth_password'])
             opener = urllib2.build_opener(auth_handler)

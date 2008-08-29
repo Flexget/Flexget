@@ -416,6 +416,7 @@ class FilterImdb:
                         continue # next entry
                     except Exception, e:
                         feed.filter(entry)
+                        log.error('Unable to process url %s' % entry['imdb_url'])
                         log.exception(e)
                         continue # next entry
                 else:
