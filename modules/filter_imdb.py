@@ -352,11 +352,26 @@ class FilterImdb:
         if config.has_key('reject_languages') and not entry.has_key('imdb_languages'): return True
         if config.has_key('accept_languages') and not entry.has_key('imdb_languages'): return True
         return False
+        
+    def clean_url(self, url):
+        """Cleans imdb url, returns valid clean url or False"""
+        m = re.search('(http://.*imdb\.com\/title\/tt\d*\/)', url)
+        if m:
+            return m.group()
+        return False
 
     def feed_filter(self, feed):
         if not soup_present: raise ModuleWarning("Module filter_imdb requires BeautifulSoup. Please install it from http://www.crummy.com/software/BeautifulSoup/ or from your distribution repository.", log)
         config = feed.config['imdb']
         for entry in feed.entries:
+        
+            # make sure imdb url is valid
+            if entry.has_key('imdb_url'):
+                clean = self.clean_url(entry['imdb_url'])
+                if not clean:
+                    del(entry['imdb_url'])
+                else:
+                    entry['imdb_url'] = clean
 
             # if no url for this entry, look from cache and try to use imdb search
             if not entry.get('imdb_url'):
