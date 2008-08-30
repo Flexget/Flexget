@@ -31,7 +31,7 @@ class ModuleWarning(Warning):
         self.log = logger
         self.kwargs = kwargs
     def __str__(self):
-        return repr(self.value)
+        return self.value
         
 class MergeException(Exception):
     def __init__(self, value):

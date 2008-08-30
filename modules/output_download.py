@@ -60,18 +60,21 @@ class ModuleDownload:
 
     def feed_download(self, feed):
         """Download all feed content and store in temporary folder"""
-        self.validate_config(feed)
+        self.validate_config(feed) # TODO: remove
         for entry in feed.entries:
             try:
                 if feed.manager.options.test:
                     log.info('Would download %s' % entry['title'])
                 else:
                     self.download(feed, entry)
+            except urllib2.HTTPError, e:
+                feed.fail(entry)
+                log.error('HTTP Error: %s' % e)
             except IOError, e:
                 feed.fail(entry)
-                log.ModuleWarning('timed out %s' % entry['title'], log)
+                log.warning('Timed out %s' % entry['title'])
+                log.exception('Execute downloads: %s' % e)
             except Exception, e:
-                # notify framework that outputing this entry failed
                 feed.fail(entry)
                 log.exception('Execute downloads: %s' % e)
 
@@ -80,9 +83,10 @@ class ModuleDownload:
         # get content
         if entry.has_key('basic_auth_password') and entry.has_key('basic_auth_username'):
             log.debug('Basic auth enabled. User: %s Password: %s' % (entry['basic_auth_username'], entry['basic_auth_password']))
-            auth_handler = urllib2.HTTPPasswordMgrWithDefaultRealm()
-            auth_handler.add_password(None, entry['url'], entry['basic_auth_username'], entry['basic_auth_password'])
-            opener = urllib2.build_opener(auth_handler)
+            passman = urllib2.HTTPPasswordMgrWithDefaultRealm()
+            passman.add_password(None, entry['url'], entry['basic_auth_username'], entry['basic_auth_password'])
+            handler = urllib2.HTTPBasicAuthHandler(passman)
+            opener = urllib2.build_opener(handler)
             f = opener.open(entry['url'])
         else:
             f = urllib2.urlopen(entry['url'])
@@ -182,7 +186,7 @@ class ModuleDownload:
             raise ModuleWarning("Cannot write output file %s, does the path exist?" % destfile, log)
 
         if os.path.exists(destfile):
-            raise ModuleWarning("File '%s' already exists" % destfile, log)
+            raise ModuleWarning('File \'%s\' already exists' % destfile, log)
 
         # move file
         shutil.move(entry['file'], destfile)
