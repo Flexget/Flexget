@@ -544,6 +544,9 @@ class Manager:
         f['title'] = entry['title']
         f['url'] = entry['url']
         f['tof'] = list(datetime.today().timetuple())[:-4]
+        for lf in failed[:]:
+            if lf['title'] == f['title'] and lf['url'] == f['url']:
+                failed.remove(lf)
         failed.append(f)
         while len(failed) > 25:
             failed.pop(0)

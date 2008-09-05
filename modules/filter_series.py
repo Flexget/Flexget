@@ -35,6 +35,10 @@ class SerieParser:
     def parse(self):
         if not self.name or not self.data:
             raise Exception('SerieParser missing either name or data')
+        if not isinstance(self.name, str):
+            raise Exception('SerieParser name is not a string, got %s' % repr(self.name))
+        if not isinstance(self.data, str):
+            raise Exception('SerieParser data is not a string, got %s' % repr(self.data))
         def clean(s):
             res = s
             r = [('.', ' '), ('_', ' '),
@@ -311,7 +315,12 @@ class FilterSeries:
                 serie.ep_regexps.extend(ep_patterns)
                 serie.id_regexps.extend(id_patterns)
                 serie.name_regexps.extend(name_patterns)
-                serie.parse()
+                try:
+                    serie.parse()
+                except Exception, e:
+                    feed.fail(entry)
+                    log.error(e)
+                # serie is not valid if it does not match given name / regexp or fails with exception
                 if not serie.valid:
                     log.debug('%s is not serie %s' % (entry['title'], name))
                     continue

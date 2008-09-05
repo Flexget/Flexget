@@ -36,13 +36,35 @@ class TestFilterSeries(FlexGetTestCase):
 
     def testSerieParser(self):
         from filter_series import SerieParser
-        s1 = SerieParser()
-        s1.name = 'Something Interesting'
-        s1.data = 'Something.Interesting.S01E02-FlexGet'
-        s1.parse()
-        self.assertEqual(s1.season, 1)
-        self.assertEqual(s1.episode, 2)
-        self.assertEqual(s1.quality, 'unknown')
+        s = SerieParser()
+        s.name = 'Something Interesting'
+        s.data = 'Something.Interesting.S01E02-FlexGet'
+        s.parse()
+        self.assertEqual(s.season, 1)
+        self.assertEqual(s.episode, 2)
+        self.assertEqual(s.quality, 'unknown')
+        
+        # test invalid name
+        s = SerieParser()
+        s.name = 1
+        s.data = 'Something'
+        try:
+            s.parse()
+        except:
+            pass
+        else:
+            fail('Data was not a str, should have failed')
+        
+        # test invalid data
+        s = SerieParser()
+        s.name = 'Something Interesting'
+        s.data = 1
+        try:
+            s.parse()
+        except:
+            pass
+        else:
+            fail('Data was not a str, should have failed')
 
 
 class TestPatterns(FlexGetTestCase):
@@ -95,7 +117,6 @@ class TestResolvers(FlexGetTestCase):
         entry = self.feed.entries[1]
         self.assertEqual(resolver.resolvable(self.feed, entry), True)
         
-        
     def testNyaaTorrents(self):
         entry = self.feed.entries[2]
         resolver = self.get_resolver('resolve_nyaatorrents')
@@ -103,6 +124,28 @@ class TestResolvers(FlexGetTestCase):
         self.assertEqual(resolver.resolvable(self.feed, entry), True)
         resolver.resolve(self.feed, entry)
         self.assertEqual(entry['url'], 'http://www.nyaatorrents.org/?page=download&tid=12345')
+        
+        
+class TestManager(FlexGetTestCase):
+
+    def setUp(self):
+        # just load with some conf
+        self.config = 'test/test_patterns.yml'
+        FlexGetTestCase.setUp(self)
+        
+    def testFailed(self):
+        e = Entry()
+        e['title'] = 'test'
+        e['url'] = 'http://localhost/mock'
+        self.manager.add_failed(e)
+        assert len(self.manager.session['failed']) == 1, 'failed to add'
+        e = Entry()
+        e['title'] = 'test 2'
+        e['url'] = 'http://localhost/mock'
+        self.manager.add_failed(e)
+        assert len(self.manager.session['failed']) == 2, 'failed to add again'
+        self.manager.add_failed(e)
+        assert len(self.manager.session['failed']) == 2, 'failed to filter already added'
     
     
 if __name__ == '__main__':
@@ -110,5 +153,6 @@ if __name__ == '__main__':
     suite.addTest(unittest.makeSuite(TestPatterns))
     suite.addTest(unittest.makeSuite(TestResolvers))
     suite.addTest(unittest.makeSuite(TestFilterSeries))
+    suite.addTest(unittest.makeSuite(TestManager))
     # run suite
     unittest.TextTestRunner(verbosity=2).run(suite)
