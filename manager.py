@@ -563,7 +563,7 @@ class Manager:
                         self.merge_dict(d1[k], d2[k])
                     elif type(v) == types.ListType:
                         d2[k].extend(v)
-                    elif isinstance(v, basestring):
+                    elif isinstance(v, basestring) or isinstance(v, bool):
                         pass
                     else:
                         raise Exception('Unknown type %s in dictionary' % type(v))
