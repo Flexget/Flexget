@@ -290,6 +290,9 @@ class FilterSeries:
     def feed_filter(self, feed):
         """Filter series"""
         for name in feed.config.get('series', []):
+            # force name to a string
+            name = str(name)
+        
             # start with default settings
             conf = feed.manager.get_settings('series', {})
             if type(name) == types.DictType:
