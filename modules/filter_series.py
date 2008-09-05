@@ -35,9 +35,9 @@ class SerieParser:
     def parse(self):
         if not self.name or not self.data:
             raise Exception('SerieParser missing either name or data')
-        if not isinstance(self.name, str):
+        if not isinstance(self.name, basestring):
             raise Exception('SerieParser name is not a string, got %s' % repr(self.name))
-        if not isinstance(self.data, str):
+        if not isinstance(self.data, basestring):
             raise Exception('SerieParser data is not a string, got %s' % repr(self.data))
         def clean(s):
             res = s
