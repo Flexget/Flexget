@@ -3,6 +3,7 @@ import urlparse
 import logging
 from socket import timeout
 from feed import Entry
+from manager import ModuleWarning
 
 __pychecker__ = 'unusednames=parser'
 
@@ -32,6 +33,10 @@ class InputHtml:
 
     def register(self, manager, parser):
         manager.register('html')
+        
+    def validate(self, config):
+        # TODO: validate that parameter is url ...
+        return []
 
     def feed_input(self, feed):
         if not soup_present: raise Exception(soup_err)
@@ -43,11 +48,9 @@ class InputHtml:
             page = urllib2.urlopen(pageurl)
             soup = BeautifulSoup(page)
         except timeout:
-            log.warning('Timed out opening page')
-            return
+            raise ModuleWarning('Timed out opening page')
         except urllib2.URLError:
-            log.warning('URLError when opening page')
-            return
+            raise ModuleWarning('URLError when opening page')
         
         for link in soup.findAll('a'):
             if not link.has_key('href'): continue
@@ -63,8 +66,6 @@ class InputHtml:
             elif not url.startswith('http://') or not url.startswith('https://'):
                 url = urlparse.urljoin(pageurl, url)
                 
-            #url_readable = urllib.unquote(url)
-
             # in case the title contains xxxxxxx.torrent - foooo.torrent clean it a bit (get upto first .torrent)
             if title.lower().find('.torrent') > 0:
                 title = title[:title.lower().find('.torrent')]

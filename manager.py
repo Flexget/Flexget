@@ -128,19 +128,17 @@ class Manager:
         parser.add_option('--validate', action='store_true', dest='validate', default=0,
                           help=SUPPRESS_HELP)
 
-        # parse first without module customized options, needed to determine verbosity level at first ..
-        self.options = parser.parse_args()[0]
-
-        if self.options.debug:
+        # unfortunately we cannot use optik at this point
+        if '--debug' in sys.argv:
             # set 'mainlogger' to debug aswell or no debug output, this is done because of
             # shitty python logging that fails to output debug on console if basicConf level
             # is less (propably because I don't know how to use that pice of ... )
             logging.getLogger().setLevel(logging.DEBUG)
-        if not self.options.quiet:
+        if not '-q' in sys.argv:
             # log to console
             console = logging.StreamHandler()
             console.setLevel(logging.DEBUG)
-            if self.options.debug:
+            if '--debug' in sys.argv:
                 formatter = logging.Formatter(self.logging_detailed)
             else:
                 formatter = logging.Formatter(self.logging_normal)

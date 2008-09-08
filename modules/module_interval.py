@@ -20,13 +20,18 @@ class ModuleInterval:
 
     def register(self, manager, parser):
         manager.register('interval')
-
+        parser.add_option('--now', action='store_true', dest='interval_ignore', default=0,
+                          help='Ignore interval')
+        
     def validate(self, config):
         if not isinstance(config, str):
             return ['parameter must be a string']
         return []
 
     def feed_start(self, feed):
+        if feed.manager.options.interval_ignore:
+            log.info('Ignoring feed %s interval' % feed.name)
+            return
         last_time = feed.cache.storedefault('last_time', datetime.datetime.today())
         amount, unit = feed.config.get('interval').split(' ')
         log.debug('amount: %s unit: %s' % (repr(amount), repr(unit)))
