@@ -4,4 +4,11 @@ feeds:
   test:
     # test data
     input_mock:
-      - {title: 'Some.Series.720p.XViD-FlexGet', url: 'http://localhost/irrelevant'}
+      - {title: 'Some.Series.S01E20.720p.XViD-FlexGet', url: 'http://localhost/irrelevant'}
+      - {title: 'Another.Series.S01E20.720p.XViD-FlexGet', url: 'http://localhost/irrelevant'}
+    series:
+      - some series:
+          timeframe:
+            hours: 4
+            enough: 1080p
+      - another series
