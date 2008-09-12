@@ -43,7 +43,20 @@ class TestFilterSeries(FlexGetTestCase):
         self.assertEqual(s.season, 1)
         self.assertEqual(s.episode, 2)
         self.assertEqual(s.quality, 'unknown')
-        
+
+        s = SerieParser()
+        s.name = 'Something Interesting'
+        s.data = 'The.Something.Interesting.S01E02-FlexGet'
+        s.parse()
+        assert not s.valid, 'Should not be valid'
+
+        s = SerieParser()
+        s.name = '25'
+        s.data = '25.And.More.S01E02-FlexGet'
+        s.parse()
+        # TODO: This behavior should be changed.
+        assert s.valid, 'Fix the implementation, should not be valid'
+
         # test invalid name
         s = SerieParser()
         s.name = 1

@@ -39,18 +39,23 @@ class SerieParser:
             raise Exception('SerieParser name is not a string, got %s' % repr(self.name))
         if not isinstance(self.data, basestring):
             raise Exception('SerieParser data is not a string, got %s' % repr(self.data))
+
         def clean(s):
-            res = s
-            r = [('.', ' '), ('_', ' '),
-                 ('[', ' '), (']', ' ')]
-            for p in r:
-                res = res.replace(*p)
-            while (res.find('  ')!=-1):
-                res = res.replace('  ', ' ')
-            return res.lower()
+            return re.sub(r'[ _.\[\]]+', ' ', s).strip().lower()
 
         name = clean(self.name)
         data = clean(self.data)
+
+        def name_to_re(name):
+            """Convert 'foo bar' to '^[^...]*foo[^...]*bar[^...]+"""
+            # TODO: Still doesn't handle the case where the user wants
+            # "Schmost" and the feed contains "Schmost at Sea".
+            blank = r'[^0-9a-zA-Z]'
+            res = re.sub(blank+'+', ' ', name)
+            res = res.strip()
+            res = re.sub(' +', blank+'*', res)
+            res = '^' + (blank+'*') + res + (blank+'+')
+            return res
 
         #log.debug('name: %s data: %s' % (name, data))
         
@@ -71,14 +76,12 @@ class SerieParser:
                 #log.debug('FAIL: name regexps do not match')
                 return
         else:
-            # try to use given name old fashion way
-            for part in name_parts:
-                if part in data_parts:
-                    data_parts.remove(part)
-                else:
-                    #log.debug('FAIL: part %s not found from %s' % (part, data_parts))
-                    # leave this invalid
-                    return
+            # Use a regexp generated from the name as a fallback.
+            name_re = name_to_re(name)
+            if not re.search(name_re, self.data, re.IGNORECASE|re.UNICODE):
+                #log.debug('FAIL: regexp %s does not match %s' % (name_re, self.data))
+                # leave this invalid
+                return
 
         # seach quality
         for part in data_parts:
