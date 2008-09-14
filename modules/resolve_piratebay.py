@@ -61,6 +61,7 @@ class ResolvePirateBay:
         entry['url'] = self.search_title(entry['title'])
             
     def search_title(self, name, url=None):
+        """Search for name from piratebay, if url is passed it it used instead of internal search."""
         import urllib
         name = name.replace('.',' ').lower()
         if not url:
@@ -79,12 +80,17 @@ class ResolvePirateBay:
             torrent['name'] = link.string
             torrent['link'] = 'http://thepiratebay.org'+link.get('href')
             tds = link.parent.parent.findAll('td')
-            torrent['seed'] = tds[-2]
-            torrent['leech'] = tds[-1]
+            torrent['seed'] = int(tds[-2].string)
+            torrent['leech'] = int(tds[-1].string)
             torrents.append(torrent)
             
         if not torrents:
             raise ModuleWarning('No matches for %s' % name, log, log_once=True)
             
-        # TODO: choose best torrent based on leech / seed
+        def best(a, b):
+            score_a = a['seed']*2 + a['leech']
+            score_b = b['seed']*2 + b['leech']
+            return cmp(a, b)
+
+        torrents.sort(best, reverse=True)
         return torrents[0]['link']
