@@ -219,34 +219,40 @@ class ImdbParser:
         try:
             page = urllib2.urlopen(url)
         except ValueError:
-            raise ValueError("Invalid url %s" % url)
+            raise ValueError('Invalid url %s' % url)
             
         soup = BeautifulSoup(page)
 
         # get name
         tag_name = soup.find('h1')
-        if tag_name != None:
-            if tag_name.next != None:
+        if tag_name:
+            if tag_name.next:
                 self.name = tag_name.next.string.strip()
-                log.debug("Detected name: %s" % self.name)
+                log.debug('Detected name: %s' % self.name)
+        else:
+            log.warning('Unable to get name for %s, module needs update?' % url)
             
         # get votes
-        tag_votes = soup.find(attrs={'href':'ratings', 'class': None})
-        if tag_votes != None:
+        tag_votes = soup.find('b', text=re.compile('\d votes'))
+        if tag_votes:
             str_votes = ''.join(c for c in tag_votes.string if c.isdigit())
             self.votes = int(str_votes)
-            log.debug("Detected votes: %s" % self.votes)
+            log.debug('Detected votes: %s' % self.votes)
+        else:
+            log.warning('Unable to get votes for %s, module needs update?' % url)
 
         # get score
         tag_score = soup.find('b', text=re.compile('\d.\d/10'))
-        if tag_score != None:
+        if tag_score:
             str_score = tag_score.string
             re_score = re.compile("(\d.\d)\/10")
             match = re_score.search(str_score)
-            if match != None:
+            if match:
                 str_score = match.group(1)
                 self.score = float(str_score)
-                log.debug("Detected score: %s" % self.score)
+                log.debug('Detected score: %s' % self.score)
+        else:
+            log.warning('Unable to get score for %s, module needs update?' % url)
 
         # get genres
         for link in soup.findAll('a', attrs={'href': re.compile('^/Sections/Genres/')}):
@@ -262,21 +268,21 @@ class ImdbParser:
 
         # get year
         tag_year = soup.find('a', attrs={'href': re.compile('^/Sections/Years/\d*')})
-        if tag_year != None:
+        if tag_year:
             self.year = int(tag_year.string)
-            log.debug("Detected year: %s" % self.year)
+            log.debug('Detected year: %s' % self.year)
+        else:
+            log.warning('Unable to get year for %s, module needs update?' % url)
 
         # get plot outline
-        tag_outline = soup.find('h5', text='Plot Outline:')
-        if not tag_outline:
-            tag_outline = soup.find('h5', text='Plot Summary:')
+        tag_outline = soup.find('h5', text=re.compile('Plot.*:'))
         if tag_outline:
-            if tag_outline.next != None:
+            if tag_outline.next:
                 self.plot_outline = tag_outline.next.string.strip()
-                log.debug("Detected plot outline: %s" % self.plot_outline)
+                log.debug('Detected plot outline: %s' % self.plot_outline)
 
-        log.debug("Detected genres: %s" % self.genres)
-        log.debug("Detected languages: %s" % self.languages)
+        log.debug('Detected genres: %s' % self.genres)
+        log.debug('Detected languages: %s' % self.languages)
 
 class FilterImdb:
 
