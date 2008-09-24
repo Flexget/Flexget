@@ -10,7 +10,12 @@ feeds:
       - {title: 'accept', url: 'http://localhost/accept'}
       # unmatched
       - {title: 'unmatched', url: 'http://localhost/unmatched'}
+      # not
+      - {title: 'foobar', url: 'http://localhost/'}
+      - {title: 'xxx.yyyy', url: 'http://localhost/'}
     patterns:
       - pattern
+      - foo: {not: bar}
+      - xxx: {not: asdf}
     accept:
       - accept

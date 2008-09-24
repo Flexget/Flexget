@@ -110,12 +110,17 @@ class TestPatterns(FlexGetTestCase):
         entry = self.feed.entries[1]
         self.assertEqual(entry['title'], 'accept')
         self.assertEqual(entry['url'], 'http://localhost/accept')
+        entry = self.feed.entries[2]
+        self.assertEqual(entry['title'], 'xxx.yyyy')
         
     def testFiltered(self):
         entry = self.feed.filtered[0]
         self.assertEqual(entry['title'], 'unmatched')
         self.assertEqual(entry['url'], 'http://localhost/unmatched')
         
+    def testNot(self):
+        entry = self.feed.filtered[1]
+        self.assertEqual(entry['title'], 'foobar')
         
 class TestResolvers(FlexGetTestCase):
 
