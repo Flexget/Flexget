@@ -44,6 +44,7 @@ class ModuleInterval:
         log.debug('next_time: %s' % repr(next_time))
         if datetime.datetime.today() < next_time:
             log.debug('interval not met')
+            feed.verbose_progress('Interval %s not met on feed %s. Use --now to override.' % (feed.config.get('interval'), feed.name), log)
             feed.abort(silent=True)
         else:
             log.debug('interval passed')

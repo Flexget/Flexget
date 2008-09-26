@@ -118,18 +118,20 @@ class InputRSS:
             
         # check for bozo
         ex = rss.get('bozo_exception', False)
+        ignore = False
         if ex:
-            if ex == feedparser.NonXMLContentType:
-                raise ModuleWarning('RSS Feed %s does not contain valid XML' % feed.name, log)
-            elif ex == xml.sax._exceptions.SAXParseException:
+            if isinstance(ex, feedparser.NonXMLContentType):
+                # see: http://www.feedparser.org/docs/character-encoding.html#advanced.encoding.nonxml
+                ignore = True
+                pass
+            elif isinstance(ex, xml.sax._exceptions.SAXParseException):
                 raise ModuleWarning('RSS Feed %s is not valid XML' % feed.name, log)
-            elif ex == urllib2.URLError:
+            elif isinstance(ex, urllib2.URLError):
                 raise ModuleWarning('urllib2.URLError', log)
             else:
-                log.error('Unhandled bozo_exception. Type: %s.%s (feed: %s)' % (ex.__class__.__module__, ex.__class__.__name__ , feed.name))
-                return
+                raise ModuleWarning('Unhandled bozo_exception. Type: %s.%s (feed: %s)' % (ex.__class__.__module__, ex.__class__.__name__ , feed.name), log)
 
-        if rss['bozo']:
+        if rss['bozo'] and not ignore:
             log.error(rss)
             log.error('Bozo feed exception on %s' % feed.name)
             return

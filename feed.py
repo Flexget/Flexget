@@ -226,11 +226,11 @@ class Feed:
         log.info(s)
 
     # TODO: all these verbose methods are confusing
-    def verbose_progress(self, s):
+    def verbose_progress(self, s, log=logging):
         """Verboses progress, outputs only in non quiet mode."""
         # TODO: implement trough own logger?
         if not self.manager.options.quiet and not self.unittest:
-          logging.info(s)
+            log.info(s)
           
     def verbose_details(self, s):
         """Verbose if details option is enabled"""
