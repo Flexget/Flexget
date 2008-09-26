@@ -1,6 +1,5 @@
 import logging
 import datetime
-import types
 import operator
 
 __pychecker__ = 'unusednames=parser'
@@ -103,7 +102,7 @@ class OutputRSS:
         
     def get_config(self, feed):
         config = feed.config['make_rss']
-        if type(config) != types.DictType:
+        if not isinstance(config, dict):
             config = {'file': config}
         config.setdefault('days', 7)
         config.setdefault('items', -1)

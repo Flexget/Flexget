@@ -1,5 +1,4 @@
 import logging
-import types
 
 log = logging.getLogger('cli_config')
 
@@ -36,19 +35,19 @@ class CliConfig:
     
     def replace_dict(self, d, replaces):
         for k,v in d.items():
-            if type(v) == types.StringType:
+            if isinstance(v, basestring):
                 nv = replaces.get(v[1:], False)
                 if nv and v.startswith('$'):
                     log.debug('Replacing key %s (%s -> %s)' % (k, v, nv))
                     d[k] = nv
-            if type(v) == types.ListType:
+            if isinstance(v, list):
                 for lv in v[:]:
                     nv = replaces.get(lv[1:], False)
                     if nv and lv.startswith('$'):
                         log.debug('Replacing list item %s (%s -> %s)' % (k, lv, nv))
                         i = v.index(lv)
                         v[i] = nv
-            if type(v) == types.DictType:
+            if isinstance(v, dict):
                 self.replace_dict(v, replaces)
 
     def parse_replaces(self, feed):

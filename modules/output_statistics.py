@@ -1,5 +1,4 @@
 import sys, os.path
-import types
 
 __pychecker__ = 'unusednames=parser'
 
@@ -74,9 +73,8 @@ class Statistics:
 
     def get_config(self, feed):
         config = feed.config['statistics']
-        if type(config) != types.DictType:
+        if not isinstance(config, dict):
             config = {'file': os.path.join(sys.path[0], feed.manager.configname+'_statistics.html')}
-
         return config
 
     def application_terminate(self, feed):

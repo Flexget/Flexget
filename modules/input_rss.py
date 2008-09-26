@@ -2,7 +2,6 @@ import logging
 import urlparse
 import urllib2
 import xml.sax
-import types
 from feed import Entry
 from manager import ModuleWarning
 
@@ -77,7 +76,7 @@ class InputRSS:
             raise ModuleWarning('Module RSS requires Feedparser. Please install it from http://www.feedparser.org/ or from your distro repository', log)
 
         config = feed.config['rss']
-        if type(config) != types.DictType:
+        if not isinstance(config, dict):
             config = {}
         url = feed.get_input_url('rss')
 

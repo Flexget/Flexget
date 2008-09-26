@@ -4,7 +4,6 @@ import re
 import difflib
 import os.path
 import sys
-import types
 
 # movie hash, won't work here though
 # http://trac.opensubtitles.org/projects/opensubtitles/wiki/HashSourceCodes#Python
@@ -22,7 +21,7 @@ class Subtitles:
 
     def get_config(self, feed):
         config = feed.config['subtitles']
-        if type(config) != types.DictType:
+        if not isinstance(config, dict):
             config = {}
         config.setdefault('output', os.path.join(sys.path[0]))
         config.setdefault('languages', ['eng'])
@@ -117,6 +116,3 @@ class Subtitles:
 
         s.LogOut(token)
         
-
-if __name__ == "__main__":
-    pass

@@ -1,5 +1,4 @@
 import logging
-import datetime
 import smtplib
 import email.Message
 from validator import DictValidator

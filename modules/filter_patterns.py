@@ -1,7 +1,6 @@
 import urllib
 import logging
 import re
-import types
 
 __pychecker__ = 'unusednames=parser,feed'
 
@@ -96,14 +95,16 @@ class FilterPatterns:
                 # set custom path for entry if pattern specifies one
                 path = None
                 secondary = []
-                if type(regexp_raw) == types.DictType:
+                if isinstance(regexp_raw, dict):
                     regexp_raw, value = regexp_raw.items()[0]
                     # if regexp has dict as parameter
-                    if type(value) == types.DictType:
+                    if isinstance(value, dict):
                         path = value.get('path', None)
                         if value.has_key('not'):
-                            if type(value['not'])==types.ListType: secondary.extend(value['not'])
-                            else: secondary.append(value['not'])
+                            if isinstance(value['not'], list): 
+                                secondary.extend(value['not'])
+                            else: 
+                                secondary.append(value['not'])
                     else:
                         path = value
 
@@ -117,13 +118,13 @@ class FilterPatterns:
                             match = False
                             
                 if match:
-                    if path != None: entry['path'] = path
+                    if path: entry['path'] = path
                     log.debug("%s: '%s' matched '%s'" % (keyword, entry['title'], regexp_raw))
                     break
                     
             if match:
-                if match_method != None:
+                if match_method:
                     match_method(entry)
             else:
-                if non_match_method != None:
+                if non_match_method:
                     non_match_method(entry)           

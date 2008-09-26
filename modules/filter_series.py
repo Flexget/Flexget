@@ -1,7 +1,6 @@
 import logging
 import re
 import string
-import types
 from datetime import tzinfo, timedelta, datetime
 from feed import Entry
 
@@ -59,7 +58,6 @@ class SerieParser:
 
         #log.debug('name: %s data: %s' % (name, data))
         
-        name_parts = name.split(' ')
         data_parts = data.split(' ')
 
         # regexp name matching
@@ -261,7 +259,7 @@ class FilterSeries:
     def feed_input(self, feed):
         """Retrieve stored series from cache, incase they've been expired from feed while waiting"""
         for name in feed.config.get('series', []):
-            if type(name) == types.DictType:
+            if isinstance(name, dict):
                 name = name.items()[0][0]
             serie = feed.cache.get(name)
             if not serie: continue
@@ -295,14 +293,14 @@ class FilterSeries:
         for name in feed.config.get('series', []):
             # start with default settings
             conf = feed.manager.get_settings('series', {})
-            if type(name) == types.DictType:
+            if isinstance(name, dict):
                 name, conf = name.items()[0]
                 # merge with default settings
                 conf = feed.manager.get_settings('series', conf)
 
             def get_as_array(conf, key):
                 v = conf.get(key, [])
-                if type(v) in types.StringTypes:
+                if isinstance(v, basestring):
                     return [v]
                 return v
 
