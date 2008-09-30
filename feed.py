@@ -89,6 +89,13 @@ class ModuleCache:
             # reading value should update "stored" date .. TODO: refactor stored -> access & days -> keep?
             item['stored'] = datetime.today().strftime('%Y-%m-%d')
             return item['value']
+            
+    def remove(self, key):
+        """Removes a key from cache"""
+        return self._cache.pop(key)
+        
+    def has_key(self, key):
+        return self._cache.has_key(key)
 
     def __purge(self):
         """Remove all values from cache that have passed their expiry date"""

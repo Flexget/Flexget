@@ -84,8 +84,8 @@ class TestFilterSeries(FlexGetTestCase):
         e = self.feed.entries[0]
         self.assertEqual(e['title'], 'Another.Series.S01E20.720p.XViD-FlexGet')
         # some series should be in timeframe-queue
-        self.feed.cache.set_namespace('series')
-        s = self.feed.cache.get('some series')
+        self.feed.shared_cache.set_namespace('series')
+        s = self.feed.shared_cache.get('some series')
         self.assertEqual(isinstance(s, dict), True)
         self.assertEqual(s.get('S1E20', {}).get('info').get('downloaded'), False)
 

@@ -255,13 +255,26 @@ class FilterSeries:
         timeframe.accept('enough', SerieParser.qualities)
         serie.validate(config)
         return serie.errors.messages
-
-    def feed_input(self, feed):
-        """Retrieve stored series from cache, incase they've been expired from feed while waiting"""
+        
+    # TODO: remove at some point
+    def upgrade(self, feed):
+        """Upgrades cache from old version to new."""
         for name in feed.config.get('series', []):
             if isinstance(name, dict):
                 name = name.items()[0][0]
-            serie = feed.cache.get(name)
+            if not feed.shared_cache.has_key(name) and feed.shared_cache.has_key(name):
+                log.info('Converting serie %s to new format' % name)
+                data = feed.shared_cache.get(name)
+                feed.shared_cache.store(data)
+                feed.cache.remove(name)
+
+    def feed_input(self, feed):
+        """Retrieve stored series from cache, incase they've been expired from feed while waiting"""
+        self.upgrade(feed)
+        for name in feed.config.get('series', []):
+            if isinstance(name, dict):
+                name = name.items()[0][0]
+            serie = feed.shared_cache.get(name)
             if not serie: continue
             for identifier in serie.keys():
                 for quality in SerieParser.qualities:
@@ -290,6 +303,7 @@ class FilterSeries:
 
     def feed_filter(self, feed):
         """Filter series"""
+        self.upgrade(feed)
         for name in feed.config.get('series', []):
             # start with default settings
             conf = feed.manager.get_settings('series', {})
@@ -402,12 +416,12 @@ class FilterSeries:
 
     def get_first_seen(self, feed, serie):
         """Return datetime when this episode of serie was first seen"""
-        fs = feed.cache.get(serie.name)[serie.identifier()]['info']['first_seen']
+        fs = feed.shared_cache.get(serie.name)[serie.identifier()]['info']['first_seen']
         return datetime(*fs)
 
     def downloaded(self, feed, serie):
         """Return true if this episode of serie is downloaded"""
-        cache = feed.cache.get(serie.name)
+        cache = feed.shared_cache.get(serie.name)
         return cache[serie.identifier()]['info']['downloaded']
 
     def store(self, feed, serie, entry):
@@ -419,7 +433,7 @@ class FilterSeries:
         #       downloaded: <boolean>
         #     720p: <entry>
         #     dsr: <entry>
-        cache = feed.cache.storedefault(serie.name, {}, 30)
+        cache = feed.shared_cache.storedefault(serie.name, {}, 30)
         episode = cache.setdefault(serie.identifier(), {})
         info = episode.setdefault('info', {})
         # store and make first seen time
@@ -432,7 +446,7 @@ class FilterSeries:
 
     def mark_downloaded(self, feed, serie):
         log.debug('marking %s as downloaded' % serie.identifier())
-        cache = feed.cache.get(serie.name)
+        cache = feed.shared_cache.get(serie.name)
         cache[serie.identifier()]['info']['downloaded'] = True
 
     def feed_exit(self, feed):
