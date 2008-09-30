@@ -3,6 +3,7 @@ import re
 import string
 from datetime import tzinfo, timedelta, datetime
 from feed import Entry
+from sys import maxint
 
 __pychecker__ = 'unusednames=parser'
 
@@ -222,7 +223,27 @@ class FilterSeries:
               path: ~/download/some_series/
           - another series
           - third series
-        
+
+        Watched:
+        --------
+
+        If you already watched some episodes when adding a new series, you can specify a
+        season/episode number of the last episode you know.
+
+        Example:
+
+        series:
+            - some series:
+                watched:
+                    season: 2
+                    episode: 3
+            - another series
+            - third series
+
+        This example would reject everything prior to episode 4 of season 2.
+
+        The paramter episode is optional, if it is missing, the entire first and second
+        season would be skipped.
     """
 
     def register(self, manager, parser):
@@ -237,7 +258,7 @@ class FilterSeries:
         # or "bundles" with serie name as key ..
         bundle = serie.accept(dict)
         # prevent invalid indentation level
-        bundle.reject_keys(['path', 'timeframe', 'name_patterns', 'ep_patterns', 'id_patterns'])
+        bundle.reject_keys(['path', 'timeframe', 'name_patterns', 'ep_patterns', 'id_patterns', 'watched'])
         # accept serie name, which can be anything ...
         options = bundle.accept_any_key(dict)
         options.accept('path', str)
@@ -253,6 +274,9 @@ class FilterSeries:
         timeframe = options.accept('timeframe', dict)
         timeframe.accept('hours', int)
         timeframe.accept('enough', SerieParser.qualities)
+        watched = options.accept('watched', dict)
+        watched.accept('season', int)
+        watched.accept('episode', int)
         serie.validate(config)
         return serie.errors.messages
         
@@ -361,6 +385,17 @@ class FilterSeries:
                     for ep in eps:
                         feed.reject(ep.entry)
                     continue
+
+                # reject episodes that have been marked as watched in config file
+                if conf.has_key('watched'):
+                    wconf = conf.get('watched')
+                    season = wconf.get('season', -1)
+                    episode = wconf.get('episode', maxint)
+                    if best.season < season or (best.season == season and best.episode <= episode):
+                        log.debug('Rejecting all instances of %s' % identifier)
+                        for ep in eps:
+                            feed.reject(ep.entry)
+                        continue
 
                 # timeframe present
                 if conf.has_key('timeframe'):
