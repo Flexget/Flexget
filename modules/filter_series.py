@@ -262,10 +262,10 @@ class FilterSeries:
         for name in feed.config.get('series', []):
             if isinstance(name, dict):
                 name = name.items()[0][0]
-            if not feed.shared_cache.has_key(name) and feed.shared_cache.has_key(name):
+            if not feed.shared_cache.has_key(name) and feed.cache.has_key(name):
                 log.info('Converting serie %s to new format' % name)
                 data = feed.shared_cache.get(name)
-                feed.shared_cache.store(data)
+                feed.shared_cache.store(name, data, days=120)
                 feed.cache.remove(name)
 
     def feed_input(self, feed):
