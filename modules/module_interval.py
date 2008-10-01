@@ -29,7 +29,7 @@ class ModuleInterval:
         return []
 
     def feed_start(self, feed):
-        if feed.manager.options.interval_ignore:
+        if feed.manager.options.interval_ignore or feed.manager.options.learn:
             log.info('Ignoring feed %s interval' % feed.name)
             return
         last_time = feed.cache.storedefault('last_time', datetime.datetime.today())
