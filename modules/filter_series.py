@@ -289,7 +289,10 @@ class FilterSeries:
             if not feed.shared_cache.has_key(name) and feed.cache.has_key(name):
                 log.info('Converting serie %s to new format' % name)
                 data = feed.shared_cache.get(name)
-                feed.shared_cache.store(name, data, days=120)
+                if isisntance(data, dict):
+                    feed.shared_cache.store(name, data, days=120)
+                else:
+                    log.error('Failed to convert %s to new format! Duplicate downloads are possible.' % name)
                 feed.cache.remove(name)
 
     def feed_input(self, feed):
@@ -361,7 +364,7 @@ class FilterSeries:
                     log.error(e)
                 # serie is not valid if it does not match given name / regexp or fails with exception
                 if not serie.valid:
-                    log.debug('%s is not serie %s' % (entry['title'], name))
+                    #log.debug('%s is not serie %s' % (entry['title'], name))
                     continue
                 # set custom download path
                 if conf.has_key('path'):
@@ -421,8 +424,11 @@ class FilterSeries:
                     # timeframe
                     diff = datetime.today() - self.get_first_seen(feed, best)
                     age_hours = divmod(diff.seconds, 60*60)[0]
-                    log.debug('age_hours %i - %s ' % (age_hours, best))
+                    log.debug('age hours: %i, seconds: %i - %s ' % (age_hours, diff.seconds, best))
                     log.debug('best ep in %i hours is %s' % (hours, best))
+                    # log when it is added to timeframe wait list (a bit hacky way to detect first time, by age)
+                    if (diff.seconds < 60):
+                        log.info('Timeframe waiting %s for %s hours, currently best is %s' % (name, hours, best.entry['title']))
                     if age_hours >= hours:
                         self.accept_serie(feed, best)
                     else:
@@ -468,6 +474,12 @@ class FilterSeries:
         #       downloaded: <boolean>
         #     720p: <entry>
         #     dsr: <entry>
+        
+        # TODO: remove at some point, hack to fix broken session
+        if feed.shared_cache.get(serie.name, 'empty') is None:
+            log.info('Fixing broken session for %s' % serie.name)
+            feed.shared_cache.remove(serie.name) 
+        
         cache = feed.shared_cache.storedefault(serie.name, {}, 30)
         episode = cache.setdefault(serie.identifier(), {})
         info = episode.setdefault('info', {})

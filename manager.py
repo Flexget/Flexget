@@ -153,6 +153,13 @@ class Manager:
 
         # parse options including module customized options
         self.options = parser.parse_args()[0]
+        
+        if self.options.test:
+            print '--test is currently broken'
+            # only way to fix it may be to make a copy of session file and restore it after execution
+            # this is because shelve seems to update the file more or less immediattely when changes
+            # are made to dictionary
+            sys.exit(1)
 
         # perform commandline sanity check(s)
         if self.options.test and self.options.learn:
