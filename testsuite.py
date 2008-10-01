@@ -174,6 +174,40 @@ class TestManager(FlexGetTestCase):
         assert len(self.manager.session['failed']) == 2, 'failed to add again'
         self.manager.add_failed(e)
         assert len(self.manager.session['failed']) == 2, 'failed to filter already added'
+
+class TestCache(unittest.TestCase):
+
+    def setUp(self):
+        from feed import ModuleCache
+        self.master = {}
+        self.cache = ModuleCache('test', self.master)
+        
+    def testNamespace(self):
+        self.cache.set_namespace('namespace')
+        assert self.cache.get_namespace() == 'namespace', 'cache namespace is not correct'
+        
+    def testStoreDefault(self):
+        self.cache.set_namespace('storedefault')
+        dummy = object()
+        ret = self.cache.storedefault('name', dummy, days=69)
+        if not ret is dummy:
+            self.fail('store_default return is not correct')
+        assert self.cache._cache.get('name', {}).get('days', None) == 69, 'stored days not correct'
+        assert self.cache.get('name') == dummy, 'get failed'
+        ret = self.cache.storedefault('name', 'value')
+        assert ret == dummy, 'store existing failed'
+        
+    def testStore(self):
+        self.cache.set_namespace('store')
+        self.cache.store('foo', 'bar')
+        assert self.cache.get('foo') == 'bar', 'get failed'
+        self.cache.store('foo', 'xxx')
+        assert self.cache.get('foo') == 'xxx', 'overwrite failed'
+        self.cache.remove('foo')
+        dummy = object()
+        ret = self.cache.get('foo', dummy)
+        assert ret == dummy, 'remove failed'       
+
     
     
 if __name__ == '__main__':
@@ -182,5 +216,6 @@ if __name__ == '__main__':
     suite.addTest(unittest.makeSuite(TestResolvers))
     suite.addTest(unittest.makeSuite(TestFilterSeries))
     suite.addTest(unittest.makeSuite(TestManager))
+    suite.addTest(unittest.makeSuite(TestCache))
     # run suite
     unittest.TextTestRunner(verbosity=2).run(suite)
