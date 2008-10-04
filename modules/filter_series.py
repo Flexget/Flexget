@@ -289,7 +289,7 @@ class FilterSeries:
             if not feed.shared_cache.has_key(name) and feed.cache.has_key(name):
                 log.info('Converting serie %s to new format' % name)
                 data = feed.shared_cache.get(name)
-                if isisntance(data, dict):
+                if isinstance(data, dict):
                     feed.shared_cache.store(name, data, days=120)
                 else:
                     log.error('Failed to convert %s to new format! Duplicate downloads are possible.' % name)
