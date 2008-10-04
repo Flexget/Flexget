@@ -33,6 +33,16 @@ class Statistics:
     def register(self, manager, parser):
         manager.register('statistics')
 
+    def validate(self, config):
+        """Validate given configuration"""
+        if isinstance(config, str):
+            return []
+        from validator import DictValidator
+        rss = DictValidator()
+        rss.accept('file', str, require=True)
+        rss.validate(config)
+        return rss.errors.messages
+
     def init(self, con):
         """Create the sqlite table if necessary"""
         
@@ -58,7 +68,7 @@ class Statistics:
         self.failed = self.total - self.passed
 
         # don't bother to save the failed ones, the number is worth shit anyway
-        if not self.passed: return
+        #if not self.passed: return
         
         dbname = os.path.join(sys.path[0], feed.manager.configname+".db")
         con = sqlite.connect(dbname)
