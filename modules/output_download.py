@@ -1,4 +1,4 @@
-import sys, os
+import sys, os, string, time
 import urllib2
 import logging
 import shutil
@@ -66,6 +66,7 @@ class ModuleDownload:
                 if feed.manager.options.test:
                     log.info('Would download %s' % entry['title'])
                 else:
+                    feed.verbose_progress('Downloading %s' % entry['title'])
                     self.download(feed, entry)
             except urllib2.HTTPError, e:
                 feed.fail(entry)
@@ -93,9 +94,11 @@ class ModuleDownload:
 
         mimetype = f.headers.getsubtype()
 
-        # generate temp file
+        # generate temp file, with random md5 sum .. 
+        # url alone is not random enough, it has happened that there are two entries with same url
         m = md5.new()
         m.update(entry['url'])
+        m.update('%s' % time.time())
         tmp_path = os.path.join(sys.path[0], 'temp')
         if not os.path.isdir(tmp_path):
             logging.debug('creating tmp_path %s' % tmp_path)
@@ -109,13 +112,13 @@ class ModuleDownload:
             while 1:
                 data = f.read(buffer_size)
                 if not data:
-                    logging.debug('wrote file %s' % datafile)
+                    log.debug('wrote file %s' % datafile)
                     break
                 outfile.write(data)
             outfile.close()
             f.close()
             # store temp filename into entry so other modules may read and modify content
-            # later this temp file is moved into final destination (at self.output)
+            # temp file is moved into final destination at self.output
             entry['file'] = datafile
         except:
             # don't leave futile files behind
@@ -128,6 +131,7 @@ class ModuleDownload:
             self.set_filename(entry, f)
 
     def set_filename(self, entry, response):
+        """Set entry['filename'] with intelligence"""
         # check from content-disposition
         import email
         filename = email.message_from_string(unicode(response.info()).encode('utf-8')).get_filename(failobj=False)
@@ -154,7 +158,6 @@ class ModuleDownload:
                     log.info('Would write entry %s' % entry['title'])
                 else:
                     self.output(feed, entry)
-                    feed.verbose_details('Downloaded %s' % entry['title'])
             except ModuleWarning, e:
                 feed.fail(entry)
                 log.error('Error while writing: %s' % e)
@@ -164,7 +167,7 @@ class ModuleDownload:
             # remove temp file if it remains due exceptions
             if entry.has_key('file'):
                 if os.path.exists(entry['file']):
-                    log.debug('removing temp file %s (left behind)' % entry['file'])
+                    log.debug('removing temp file %s (left behind) from %s' % (entry['file'], entry['title']))
                     os.remove(entry['file'])
 
     def output(self, feed, entry):
@@ -183,10 +186,16 @@ class ModuleDownload:
         destfile = os.path.join(os.path.expanduser(path), entry.get('filename', entry['title']))
 
         if not os.path.exists(os.path.expanduser(path)):
-            raise ModuleWarning("Cannot write output file %s, does the path exist?" % destfile, log)
+            raise ModuleWarning('Cannot write output file %s, does the path exist?' % destfile, log)
 
         if os.path.exists(destfile):
             raise ModuleWarning('File \'%s\' already exists' % destfile, log)
+            
+        if not os.path.exists(entry['file']):
+            tmp_path = os.path.join(sys.path[0], 'temp')
+            log.debug('entry: %s' % entry)
+            log.debug('temp: %s' % string.join(os.listdir(tmp_path), ', '))
+            raise ModuleWarning('Downloaded temp file \'%s\' doesn\'t exists!' % entry['file'])
 
         # move file
         shutil.move(entry['file'], destfile)

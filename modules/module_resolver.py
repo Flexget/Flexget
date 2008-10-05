@@ -39,8 +39,8 @@ class Resolver:
             for resolver in feed.manager.get_modules_by_group('resolver'):
                 name = resolver['name']
                 if resolver['instance'].resolvable(feed, entry):
-                    #log.debug('%s resolving %s' % (name, entry['url']))
                     try:
+                        feed.verbose_progress('Resolving \'%s\' with resolver %s' % (entry['title'], name))
                         resolver['instance'].resolve(feed, entry)
                     except ResolverException, r:
                         # increase failcount
