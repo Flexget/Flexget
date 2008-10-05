@@ -39,8 +39,17 @@ class InputRSS:
         Example:
         
         rss:
-          url: <ul>
+          url: <url>
           link: guid
+          
+       You can disable link not found warnings by setting silent value to True on feeds where there are 
+       frequently non downloadable items.
+       
+       Example:
+       
+       rss:
+         url: <url>
+         silent: True
     """
 
     def register(self, manager, parser):
@@ -54,6 +63,7 @@ class InputRSS:
             rss.accept('url', str, required=True)
             rss.accept('username', str)
             rss.accept('password', str)
+            rss.accept('silent', bool)
             if config.has_key('username'):
                 rss.require('password')
             rss.accept('link', str)
@@ -149,7 +159,8 @@ class InputRSS:
         for entry in rss.entries:
             # skip rss items without links
             if not entry.has_key(config.get('link', 'link')):
-                log.info('Skipped RSS-entry that does not contain configured link attribute %s' % config.get('link', 'link'))
+                if not config.get('silent', False):
+                    feed.log_once('Ignoring %s: Doesn\'t contain any of configured link attributes: %s' % (entry.title, config.get('link', 'link')), log)
                 continue
 
             # fix for crap feeds with no ID
@@ -163,7 +174,7 @@ class InputRSS:
             try:
                 e['url'] = getattr(entry, config.get('link', 'link'))
             except AttributeError, e:
-                log.error('RSS-entry does not contain configured link attribute %s' % config.get('link', 'link'))
+                log.error('RSS-entry does not contain configured link attributes: %s' % config.get('link', 'link'))
                 continue
             e['title'] = entry.title.replace(u'\u200B', u'') # remove annoying zero width spaces
 

@@ -60,7 +60,7 @@ class Statistics:
         
     def feed_input(self, feed):
         if not has_sqlite:
-            raise Exception('module statistics requires python-sqlite2 or python 2.5.')
+            raise ModuleWarning('module statistics requires python-sqlite2 or python 2.5.')
         self.total = len(feed.entries)
 
     def feed_exit(self, feed):
@@ -89,7 +89,7 @@ class Statistics:
 
     def application_terminate(self, feed):
         if not has_pygooglechart:
-            raise Exception('module statistics requires pygooglechart library.')
+            raise ModuleWarning('module statistics requires pygooglechart library.')
 
         dbname = os.path.join(os.path.join(sys.path[0], feed.manager.configname+".db"))
         con = sqlite.connect(dbname)
