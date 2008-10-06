@@ -226,10 +226,10 @@ class Feed:
         import md5
         m = md5.new()
         m.update(s)
-        sum = m.hexdigest()
-        seen = self.shared_cache.get('log-%s' % sum, False)
+        md5sum = m.hexdigest()
+        seen = self.shared_cache.get('log-%s' % md5sum, False)
         if (seen): return
-        self.shared_cache.store('log-%s' % sum, True, 30)
+        self.shared_cache.store('log-%s' % md5sum, True, 30)
         log.info(s)
 
     # TODO: all these verbose methods are confusing

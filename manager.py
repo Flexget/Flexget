@@ -39,8 +39,6 @@ class MergeException(Exception):
     def __str__(self):
         return repr(self.value)
 
-from feed import Feed        
-        
 class Manager:
     
     def __init__(self):
@@ -104,7 +102,7 @@ class Manager:
         parser.add_option('--no-cache', action='store_true', dest='nocache', default=0,
                           help='Disable caches. Works only in modules that have explicit support.')
         parser.add_option('--reset', action='store_true', dest='reset', default=0,
-                          help='Forgets everything that has been downloaded and learns current matches.')
+                          help='Forgets everything that has been done and learns current matches.')
         parser.add_option('--doc', action='store', dest='doc',
                           help='Display module documentation (example: --doc patterns). See --list.')
         parser.add_option('--list', action='store_true', dest='list', default=0,
@@ -120,7 +118,7 @@ class Manager:
         parser.add_option('-d', action='store_true', dest='details', default=0,
                           help='Display detailed process information.')
         parser.add_option('--experimental', action='store_true', dest='experimental', default=0,
-                          help='Use experimental features.')
+                          help=SUPPRESS_HELP)
         parser.add_option('--debug', action='store_true', dest='debug', default=0,
                           help=SUPPRESS_HELP)
         parser.add_option('--dump', action='store_true', dest='dump', default=0,
@@ -165,11 +163,14 @@ class Manager:
         if self.options.test and self.options.learn:
             print '--test and --learn are mutually exclusive'
             sys.exit(1)
+            
+        # reset is executed with learn
         if self.options.reset:
             self.options.learn = True
 
     def initialize(self):
-        """Loads configuration and session file, separated to own method because of unittests"""
+        # TODO: not needed as separate method anymore!
+
         if self.initialized: return
         start_time = time.clock()
       
@@ -203,6 +204,7 @@ class Manager:
             if os.path.exists(config):
                 self.config = yaml.safe_load(file(config))
                 self.configname = os.path.basename(config)[:-4]
+                self.session_name = os.path.join(sys.path[0], 'session-%s.db' % self.configname)
                 return
         logging.debug('Tried to read from: %s' % string.join(possible, ', '))
         raise Exception('Failed to load configuration file %s' % self.options.config)
@@ -242,14 +244,13 @@ class Manager:
         return False
                 
     def load_session_shelf(self):
-        sessiondb = os.path.join(sys.path[0], 'session-%s.db' % self.configname)
         # note: writeback must be True because how modules use our persistence.
         # See. http://docs.python.org/lib/node328.html
         if not self.options.reset:
-            self.session = shelve.open(sessiondb, protocol=2, writeback=True)
+            self.session = shelve.open(self.session_name, protocol=2, writeback=True)
         else:
             # create a new empty database
-            self.session = shelve.open(sessiondb, flag='n', protocol=2, writeback=True)
+            self.session = shelve.open(self.session_name, flag='n', protocol=2, writeback=True)
 
     def sanitize(self, d):
         """Makes dictionary d contain only yaml.safe_dump compatible elements"""
@@ -295,8 +296,7 @@ class Manager:
         if isinstance(self.session, dict):
             logging.info('Migrating from old-style session.')
             # create the new style session
-            sessiondb = os.path.join(sys.path[0], 'session-%s.db' % self.configname)
-            newsession = shelve.open(sessiondb, protocol=2)
+            newsession = shelve.open(self.session_name, protocol=2)
 
             # mirgrate data
             for k,v in self.session.iteritems():
@@ -322,7 +322,7 @@ class Manager:
                 try:
                     module = __import__(module)
                 except Exception, e:
-                    logging.critical('Module %s is broken! Skipping it!' % module)
+                    logging.critical('Module %s is faulty! Ignored!' % module)
                     logging.exception(e)
                     continue
                 for name, item in vars(module).iteritems():
@@ -583,6 +583,7 @@ class Manager:
     def execute(self):
         """Iterate trough all feeds and run them."""
         self.initialize()
+        from feed import Feed
         try:
             if not self.config:
                 logging.critical('Configuration file is empty.')

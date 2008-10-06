@@ -1,4 +1,4 @@
-import unittest
+import os, unittest
 from manager import Manager
 from feed import Feed, Entry
 
@@ -10,16 +10,17 @@ class FlexGetTestCase(unittest.TestCase):
             self.fail('Config file missing')
         self.manager = Manager()
         self.manager.options.config = self.config
-        # do not write session, note this will skip events DOWNLOAD and OUTPUT
-        # will need to be re-thinked when those events are to be tested
-        self.manager.options.test = True
         # do not load session
         self.manager.options.reset = True
-        #self.manager.options.details = True
-        self.manager.load_config()
+        self.manager.initialize()
+        # test feed for easy access
         config = self.manager.config['feeds']['test']
         self.feed = Feed(self.manager, 'test', config)
         self.feed.unittest = True
+        
+    def tearDown(self):
+        self.manager.save_session()
+        os.remove(self.manager.session_name)
         
     def getModule(self, event, keyword):
         module = self.manager.modules.get(keyword)
@@ -66,7 +67,7 @@ class TestFilterSeries(FlexGetTestCase):
         except:
             pass
         else:
-            fail('Data was not a str, should have failed')
+            self.fail('Data was not a str, should have failed')
         
         # test invalid data
         s = SerieParser()
@@ -77,7 +78,7 @@ class TestFilterSeries(FlexGetTestCase):
         except:
             pass
         else:
-            fail('Data was not a str, should have failed')
+            self.fail('Data was not a str, should have failed')
             
     def testSeries(self):
         # another series should be accepted
@@ -100,13 +101,13 @@ class TestPatterns(FlexGetTestCase):
             self.fail('no entries')
                 
     def testPattern(self):
-        module = self.getModule('filter', 'patterns')
+        #module = self.getModule('filter', 'patterns')
         entry = self.feed.entries[0]
         self.assertEqual(entry['title'], 'pattern')
         self.assertEqual(entry['url'], 'http://localhost/pattern')
         
     def testAccept(self):
-        module = self.getModule('filter', 'accept')
+        #module = self.getModule('filter', 'accept')
         entry = self.feed.entries[1]
         self.assertEqual(entry['title'], 'accept')
         self.assertEqual(entry['url'], 'http://localhost/accept')
@@ -208,6 +209,22 @@ class TestCache(unittest.TestCase):
         ret = self.cache.get('foo', dummy)
         assert ret == dummy, 'remove failed'       
 
+class TestDownload(FlexGetTestCase):
+
+    def setUp(self):
+        self.config = 'test/test_download.yml'
+        FlexGetTestCase.setUp(self)
+
+    def testDownload(self):
+        self.testfile = os.path.expanduser('~/flexget_test')
+        if os.path.exists(self.testfile):
+            os.remove(self.testfile)
+        # executes feed and downloads the file
+        self.feed.execute()
+        if not os.path.exists(self.testfile):
+            self.fail('download file does not exists')
+        else:
+            os.remove(self.testfile)
     
     
 if __name__ == '__main__':
@@ -217,5 +234,6 @@ if __name__ == '__main__':
     suite.addTest(unittest.makeSuite(TestFilterSeries))
     suite.addTest(unittest.makeSuite(TestManager))
     suite.addTest(unittest.makeSuite(TestCache))
+    suite.addTest(unittest.makeSuite(TestDownload))
     # run suite
     unittest.TextTestRunner(verbosity=2).run(suite)

@@ -1,4 +1,5 @@
 import sys, os.path
+from manager import ModuleWarning
 
 __pychecker__ = 'unusednames=parser'
 
