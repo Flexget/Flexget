@@ -1,7 +1,8 @@
-import sys, os, string
+import sys, os, string, time
 import urllib2
 import logging
 import shutil
+import md5
 import tempfile
 from manager import ModuleWarning
 
@@ -36,6 +37,8 @@ class ModuleDownload:
         You may use commandline parameter --dl-path to temporarily override 
         all paths to another location.
     """
+
+    tmp_path = tempfile.mkdtemp(prefix="flexget_")
 
     def register(self, manager, parser):
         manager.register('download')
@@ -80,6 +83,7 @@ class ModuleDownload:
                 log.exception('Execute downloads: %s' % e)
 
     def download(self, feed, entry):
+        global tmp_path
         log.debug('Downloading url %s' % entry['url'])
         # get content
         if entry.has_key('basic_auth_password') and entry.has_key('basic_auth_username'):
@@ -94,24 +98,31 @@ class ModuleDownload:
 
         mimetype = f.headers.getsubtype()
 
+        # generate temp file, with random md5 sum .. 
+        # url alone is not random enough, it has happened that there are two entries with same url
+        m = md5.new()
+        m.update(entry['url'])
+        m.update('%s' % time.time())
+        datafile = os.path.join(tmp_path, m.hexdigest()) 
+
         # download and write data into a temp file
         buffer_size = 1024
-        outfile = tempfile.NamedTemporaryFile(prefix="flexget_") # add delete=False on 2.6
+        outfile = open(datafile, 'wb')
         try:
             while 1:
                 data = f.read(buffer_size)
                 if not data:
-                    log.debug('wrote file %s' % outfile.name)
+                    log.debug('wrote file %s' % datafile)
                     break
                 outfile.write(data)
             outfile.close()
             f.close()
             # store temp filename into entry so other modules may read and modify content
             # temp file is moved into final destination at self.output
-            entry['file'] = outfile.name
+            entry['file'] = datafile
         except:
             # don't leave futile files behind
-            os.remove(outfile.name)
+            os.remove(datafile)
             raise
 
         entry['mimetype'] = mimetype
@@ -163,6 +174,8 @@ class ModuleDownload:
         """Moves temp-file into final destination"""
         if not entry.has_key('file'):
             raise Exception('Entry %s has no temp file associated with' % entry['title'])
+        global tmp_path
+        
         # use path from entry if has one, otherwise use from download definition parameter
         path = entry.get('path', feed.config['download'])
         # override path from commandline parameter
@@ -181,7 +194,6 @@ class ModuleDownload:
             raise ModuleWarning('File \'%s\' already exists' % destfile, log)
             
         if not os.path.exists(entry['file']):
-            tmp_path = os.path.join(sys.path[0], 'temp')
             log.debug('entry: %s' % entry)
             log.debug('temp: %s' % string.join(os.listdir(tmp_path), ', '))
             raise ModuleWarning('Downloaded temp file \'%s\' doesn\'t exists!' % entry['file'])
