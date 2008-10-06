@@ -1,8 +1,7 @@
-import sys, os, string, time
+import sys, os, string
 import urllib2
 import logging
 import shutil
-import md5
 import tempfile
 from manager import ModuleWarning
 
@@ -94,12 +93,6 @@ class ModuleDownload:
             f = urllib2.urlopen(entry['url'])
 
         mimetype = f.headers.getsubtype()
-
-        # generate temp file, with random md5 sum .. 
-        # url alone is not random enough, it has happened that there are two entries with same url
-        m = md5.new()
-        m.update(entry['url'])
-        m.update('%s' % time.time())
 
         # download and write data into a temp file
         buffer_size = 1024
