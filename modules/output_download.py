@@ -3,7 +3,6 @@ import urllib2
 import logging
 import shutil
 import md5
-import tempfile
 from manager import ModuleWarning
 
 __pychecker__ = 'unusednames=parser,feed'
@@ -100,25 +99,30 @@ class ModuleDownload:
         m = md5.new()
         m.update(entry['url'])
         m.update('%s' % time.time())
+        tmp_path = os.path.join(sys.path[0], 'temp')
+        if not os.path.isdir(tmp_path):
+            logging.debug('creating tmp_path %s' % tmp_path)
+            os.mkdir(tmp_path)
+        datafile = os.path.join(tmp_path, m.hexdigest()) 
 
         # download and write data into a temp file
         buffer_size = 1024
-        outfile = tempfile.NamedTemporaryFile(prefix="flexget_") # add delete=False on 2.6
+        outfile = open(datafile, 'wb')
         try:
             while 1:
                 data = f.read(buffer_size)
                 if not data:
-                    log.debug('wrote file %s' % outfile.name)
+                    log.debug('wrote file %s' % datafile)
                     break
                 outfile.write(data)
             outfile.close()
             f.close()
             # store temp filename into entry so other modules may read and modify content
             # temp file is moved into final destination at self.output
-            entry['file'] = outfile.name
+            entry['file'] = datafile
         except:
             # don't leave futile files behind
-            os.remove(outfile.name)
+            os.remove(datafile)
             raise
 
         entry['mimetype'] = mimetype
