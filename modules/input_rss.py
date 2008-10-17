@@ -131,8 +131,12 @@ class InputRSS:
         if ex:
             if isinstance(ex, feedparser.NonXMLContentType):
                 # see: http://www.feedparser.org/docs/character-encoding.html#advanced.encoding.nonxml
+                log.debug('ignoring feedparser.NonXMLContentType')
                 ignore = True
-                pass
+            elif isinstance(ex, feedparser.CharacterEncodingOverride):
+                # see: ticket 88
+                log.debug('ignoring feedparser.CharacterEncodingOverride')
+                ignore = True
             elif isinstance(ex, xml.sax._exceptions.SAXParseException):
                 raise ModuleWarning('RSS Feed %s is not valid XML' % feed.name, log)
             elif isinstance(ex, urllib2.URLError):

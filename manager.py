@@ -362,8 +362,8 @@ class Manager:
 
     def get_settings(self, keyword, defaults={}):
         """
-            Return defaults & settings for a keyword. You may optional defaults that will be used
-            as default values where user has not specified anything.
+            Return defaults / settings for a keyword. Optionally you may pass defaults values in dictionary 
+            which will be used as default values.
 
             Ie. Passed defaults:
             {'size': 20, 'length': 30}
