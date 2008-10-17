@@ -1,7 +1,10 @@
 import sys, os.path
+import logging
 from manager import ModuleWarning
 
 __pychecker__ = 'unusednames=parser'
+
+log = logging.getLogger('statistics')
 
 has_sqlite = True
 try:
@@ -30,6 +33,8 @@ class Statistics:
         self.total = 0
         self.passed = 0
         self.failed = 0
+
+        self.written = False
 
     def register(self, manager, parser):
         manager.register('statistics')
@@ -91,6 +96,13 @@ class Statistics:
     def application_terminate(self, feed):
         if not has_pygooglechart:
             raise ModuleWarning('module statistics requires pygooglechart library.')
+
+        if self.written:
+            log.debug("stats already done for this run")
+            return
+
+        log.debug("generating charts")
+        self.written = True
 
         dbname = os.path.join(os.path.join(sys.path[0], feed.manager.configname+".db"))
         con = sqlite.connect(dbname)
