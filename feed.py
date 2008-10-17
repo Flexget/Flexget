@@ -228,7 +228,6 @@ class Feed:
         m.update(s)
         md5sum = m.hexdigest()
         seen = self.shared_cache.get('log-%s' % md5sum, False)
-        print "seen = %s" % seen
         if (seen): return
         self.shared_cache.store('log-%s' % md5sum, True, 30)
         log.info(s)
