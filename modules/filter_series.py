@@ -242,7 +242,7 @@ class FilterSeries:
 
         This example would reject everything prior to episode 4 of season 2.
 
-        The paramter episode is optional, if it is missing, the entire first and second
+        The parameter episode is optional, if it is missing, the entire first and second
         season would be skipped.
     """
 
@@ -349,7 +349,7 @@ class FilterSeries:
             id_patterns = get_as_array(conf, 'id_patterns')
             name_patterns = get_as_array(conf, 'name_patterns')
 
-            series = {} # ie. S1E2: [Serie, Serie, ..]
+            series = {} # ie. S1E2: [Serie Instance, Serie Instance, ..]
             for entry in feed.entries:
                 serie = SerieParser()
                 serie.name = str(name)
@@ -364,7 +364,6 @@ class FilterSeries:
                     log.error(e)
                 # serie is not valid if it does not match given name / regexp or fails with exception
                 if not serie.valid:
-                    #log.debug('%s is not serie %s' % (entry['title'], name))
                     continue
                 # set custom download path
                 if conf.has_key('path'):
@@ -399,6 +398,16 @@ class FilterSeries:
                         for ep in eps:
                             feed.reject(ep.entry)
                         continue
+                        
+                # episode advancement
+                latest = self.get_latest_info(feed, best)
+                # allow few episodes "backwards" incase missing
+                grace = len(series) + 1
+                if best.season < latest['season'] or (best.season == latest['season'] and best.episode < latest['episode'] - grace):
+                    log.debug('Episode advancement rejecting all instances of %s' % identifier)
+                    for ep in eps:
+                        feed.reject(ep.entry)
+                    continue
 
                 # timeframe present
                 if conf.has_key('timeframe'):
@@ -459,6 +468,11 @@ class FilterSeries:
         """Return datetime when this episode of serie was first seen"""
         fs = feed.shared_cache.get(serie.name)[serie.identifier()]['info']['first_seen']
         return datetime(*fs)
+        
+    def get_latest_info(self, feed, serie):
+        """Return latest known identifier in dict (season, episode) for serie name"""
+        latest = feed.shared_cache.get(serie.name).get('latest', {})
+        return {'season': latest.get('season', 0), 'episode': latest.get('episode', 0)}
 
     def downloaded(self, feed, serie):
         """Return true if this episode of serie is downloaded"""
@@ -481,11 +495,18 @@ class FilterSeries:
             feed.shared_cache.remove(serie.name) 
         
         cache = feed.shared_cache.storedefault(serie.name, {}, 30)
+        latest = cache.setdefault('latest', {})
         episode = cache.setdefault(serie.identifier(), {})
         info = episode.setdefault('info', {})
         # store and make first seen time
         info.setdefault('first_seen', list(datetime.today().timetuple())[:-4])
         info.setdefault('downloaded', False)
+        # save last known (episode advancement)
+        if serie.season and serie.episode:
+            if latest.get('episode', 0) < serie.episode and latest.get('season', 0) < serie.season:
+                latest['season'] = serie.season
+                latest['episode'] = serie.episode
+        # copy of entry, we don't want to ues original reference ...
         ec = {}
         ec['title'] = entry['title']
         ec['url'] = entry['url']
@@ -502,5 +523,3 @@ class FilterSeries:
             serie = entry.get('serie_parser')
             if serie:
                 self.mark_downloaded(feed, serie)
-            else:
-                log.debug('Entry %s is not valid serie' % entry['title'])

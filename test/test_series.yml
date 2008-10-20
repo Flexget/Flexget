@@ -6,6 +6,8 @@ feeds:
     input_mock:
       - {title: 'Some.Series.S01E20.720p.XViD-FlexGet', url: 'http://localhost/irrelevant'}
       - {title: 'Another.Series.S01E20.720p.XViD-FlexGet', url: 'http://localhost/irrelevant'}
+      - {title: 'Another.Series.S01E10.720p.XViD-FlexGet', url: 'http://localhost/irrelevant'}
+      - {title: 'Another.Series.S01E16.720p.XViD-FlexGet', url: 'http://localhost/irrelevant'}
     series:
       - some series:
           timeframe:

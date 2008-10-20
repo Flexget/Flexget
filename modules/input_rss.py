@@ -33,8 +33,17 @@ class InputRSS:
           
         Advanced usages:
         
-        Incase RSS-feed uses some nonstandard field for urls (ie. guid) you can 
-        configure module to use url from any feedparser entry attribute.
+        You may wish to clean up the entry by stripping out all non-ascii characters. This can be done by
+        setting ascii value to True.
+        
+        Example:
+        
+        rss:
+          url: <url>
+          ascii: True
+        
+        Incase RSS-feed uses some nonstandard field for urls and automatic detection fails 
+        you can configure module to use url from any feedparser entry attribute.
         
         Example:
         
@@ -42,14 +51,14 @@ class InputRSS:
           url: <url>
           link: guid
           
-       You can disable link not found warnings by setting silent value to True on feeds where there are 
-       frequently non downloadable items.
+        You can disable link not found warnings by setting silent value to True on feeds where there are 
+        frequently non downloadable items.
        
-       Example:
+        Example:
        
-       rss:
-         url: <url>
-         silent: True
+        rss:
+          url: <url>
+          silent: True
     """
 
     def register(self, manager, parser):
@@ -67,6 +76,7 @@ class InputRSS:
             if config.has_key('username'):
                 rss.require('password')
             rss.accept('link', str)
+            rss.accept('ascii', boolean)
             rss.validate(config)
             return rss.errors.messages
         elif isinstance(config, str):
@@ -131,8 +141,12 @@ class InputRSS:
         if ex:
             if isinstance(ex, feedparser.NonXMLContentType):
                 # see: http://www.feedparser.org/docs/character-encoding.html#advanced.encoding.nonxml
+                log.debug('ignoring feedparser.NonXMLContentType')
                 ignore = True
-                pass
+            elif isinstance(ex, feedparser.CharacterEncodingOverride):
+                # see: ticket 88
+                log.debug('ignoring feedparser.CharacterEncodingOverride')
+                ignore = True
             elif isinstance(ex, xml.sax._exceptions.SAXParseException):
                 raise ModuleWarning('RSS Feed %s is not valid XML' % feed.name, log)
             elif isinstance(ex, urllib2.URLError):
@@ -156,26 +170,56 @@ class InputRSS:
             feed.cache.store('modified', rss.modified, 90)
             log.debug('last modified saved for feed %s', feed.name)
 
+        # field name for url can be configured by setting link. 
+        # default value is auto but for example guid is used in some feeds
+        curl = config.get('link', 'auto')
         for entry in rss.entries:
-            # skip rss items without links
-            if not entry.has_key(config.get('link', 'link')):
-                if not config.get('silent', False):
-                    feed.log_once('Ignoring %s: Doesn\'t contain any of configured link attributes: %s' % (entry.title, config.get('link', 'link')), log)
-                continue
-
+            # convert title to ascii (cleanup)
+            if config.get('ascii', False):
+                entry.title = entry.title.encode('ascii', 'ignore')
+        
             # fix for crap feeds with no ID
             if not entry.has_key('id'):
                 entry['id'] = entry.link
 
-            # add entry
+            # create flexget entry
             e = Entry()
-            # field name for url can be configured by setting option link. 
-            # default value is link but guid is used in some feeds
-            try:
-                e['url'] = getattr(entry, config.get('link', 'link'))
-            except AttributeError, e:
-                log.error('RSS-entry does not contain configured link attributes: %s' % config.get('link', 'link'))
-                continue
+
+            # automaticly determine url from available fields
+            if curl == 'auto':
+                enclosures = entry.get('enclosures', [])
+                # TODO: how should these be handled?
+                if len(enclosures)>1:
+                    feed.log_once('RSS-entry %s has too many enclosures, unable to choose. Item ignored.' % (entry.title), log)
+                    continue
+                # get from enclosure
+                if len(enclosures)==1:
+                    log.debug('getting url from enclosure')
+                    ec = enclosures[0]
+                    if not ec.has_key('href'):
+                        feed.log_once('RSS-entry %s closure does not have url' % entry.title, log)
+                        continue
+                    e['url'] = ec['href']
+                    # get optional meta-data
+                    if ec.has_key('length'): e['size'] = int(ec['length'])
+                    if ec.has_key('type'): e['type'] = ec['type']
+                else:
+                    # try from link, guid
+                    log.debug('fallback to link, guid')
+                    if entry.has_key('link'):
+                        e['url'] = entry['link']
+                    elif entry.has_key('guid'):
+                        e['url'] = entry['guid']
+                    else:
+                        feed.log_once('Failed to auto-detect RSS-entry %s link' % (entry.title), log)
+                        continue
+            else:
+                # manual mode (configuration)
+                if not entry.has_key(curl):
+                    feed.log_once('RSS-entry %s does not contain configured link attributes: %s' % (entry.title, curl), log)
+                    continue
+                e['url'] = getattr(entry, curl)
+
             e['title'] = entry.title.replace(u'\u200B', u'') # remove annoying zero width spaces
 
             # store basic auth info
