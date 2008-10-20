@@ -27,6 +27,14 @@ class FlexGetTestCase(unittest.TestCase):
         if not module:
             raise Exception('module %s isn\'t loaded (event %s)' % (keyword, event))
         return module
+        
+    def has_entry(self, title):
+        """Return true if feed containt entry with given title"""
+        for entry in self.feed.entries:
+            if entry['title'] == title: 
+                return True
+        return False
+    
 
 class TestFilterSeries(FlexGetTestCase):
 
@@ -81,14 +89,20 @@ class TestFilterSeries(FlexGetTestCase):
             self.fail('Data was not a str, should have failed')
             
     def testSeries(self):
-        # another series should be accepted
-        e = self.feed.entries[0]
-        self.assertEqual(e['title'], 'Another.Series.S01E20.720p.XViD-FlexGet')
-        # some series should be in timeframe-queue
+        # 'some series' should be in timeframe-queue
         self.feed.shared_cache.set_namespace('series')
         s = self.feed.shared_cache.get('some series')
         self.assertEqual(isinstance(s, dict), True)
         self.assertEqual(s.get('S1E20', {}).get('info').get('downloaded'), False)
+        
+        # normal passing
+        if not self.has_entry('Another.Series.S01E20.720p.XViD-FlexGet'):
+            self.fail('Another.Series.S01E20.720p.XViD-FlexGet should have passed')
+        # episode advancement
+        if self.has_entry('Another.Series.S01E10.720p.XViD-FlexGet'):
+            self.fail('Another.Series.S01E10.720p.XViD-FlexGet should not have passed because of episode advancement')
+        if not self.has_entry('Another.Series.S01E16.720p.XViD-FlexGet'):
+            self.fail('Another.Series.S01E16.720p.XViD-FlexGet should have passed because of episode advancement grace magin')
 
 
 class TestPatterns(FlexGetTestCase):
