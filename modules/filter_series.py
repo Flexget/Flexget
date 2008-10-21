@@ -354,8 +354,8 @@ class FilterSeries:
                 serie = SerieParser()
                 serie.name = str(name)
                 serie.data = entry['title']
-                serie.ep_regexps.extend(ep_patterns)
-                serie.id_regexps.extend(id_patterns)
+                serie.ep_regexps = ep_patterns + serie.ep_regexps
+                serie.id_regexps = id_patterns + serie.id_regexps
                 # do not use builtin list for id when ep configured and vice versa
                 if conf.has_key('ep_patterns') and not conf.has_key('id_patterns'):
                     serie.id_regexps = []
