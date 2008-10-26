@@ -117,10 +117,11 @@ FlexGet has just downloaded %d new entries for feed %s :
         """ % (entries_count, feed.name)
         for entry in feed.entries:
             content += "\n - %s (%s)" % (entry['title'], entry['url'])
-            entry_path = entry.get('path', feed.config['download'])
+            entry_path = entry.get('path', feed.config.get('download'))
             entry_filename = entry.get('filename', entry['title'])
-            if entry_path != None:
+            if entry_path:
                 content += " => %s (%s)" % (entry_path, entry_filename)
+                
         content += "\n\n"
 
         # prepare email message
