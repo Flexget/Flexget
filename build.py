@@ -8,7 +8,7 @@ def safe_rmtree(path):
     # count damage, I dont trust this script at all :)
     damage = 0
     for root, dirs, files in os.walk(path):
-        damage =+ len(files) + len(dirs)
+        damage += len(files) + len(dirs)
     if damage > 100:
         raise Exception('potential damage, aborted')
     #print '!! Deleting everything from temp path %s/ in 5 seconds ...' % path
@@ -32,7 +32,7 @@ if __name__ == "__main__":
     parser = OptionParser()
     parser.add_option('-r', '--rev',
                       action='store', type='int', dest='rev', default=0,
-                      help='Build revision', metavar='FILE')
+                      help='Build specific revision', metavar='FILE')
                       
     parser.add_option('-p', '--path',
                       action='store', dest='path', default='http://svn.flexget.com/trunk',
@@ -44,7 +44,7 @@ if __name__ == "__main__":
                       
     parser.add_option('-t', '--tag',
                       action='store', dest='tag', default=None,
-                      help='Tag package name')
+                      help='Tag package name, used instead revision')
 
     (options, args) = parser.parse_args()
     
