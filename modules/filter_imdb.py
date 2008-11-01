@@ -156,6 +156,9 @@ class ImdbSearch:
             for link in links:
                 # skip links with javascript (not movies)
                 if link.has_key('onclick'): continue
+                # skip links with div as a parent (not movies, somewhat rare links in additional details)
+                if link.parent.name==u'div': continue
+                
                 movie = {}
                 additional = re.findall('\((.*?)\)', link.next.next)
                 if len(additional) > 0:
