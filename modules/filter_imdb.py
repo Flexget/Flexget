@@ -39,12 +39,13 @@ class ImdbSearch:
         s = s.replace('[', ' ')
         s = s.replace(']', ' ')
         s = s.replace('_', ' ')
-        s = s.replace('-', ' ')
         # remove extra spaces!
         s = s.strip()
-        # if there are no spaces, remove dots
-        if s.find(' ')  == -1:
+        # if there are no spaces, remove dots and -
+        if s.find(' ') == -1:
             s = s.replace('.', ' ')
+            s = s.replace('-', ' ')
+            
         # remove duplicate spaces
         while s.find('  ') != -1:
             s = s.replace('  ', ' ')
@@ -168,16 +169,17 @@ class ImdbSearch:
                 
                 movie['name'] = link.string
                 movie['url'] = "http://www.imdb.com" + link.get('href')
+                log.debug('processing %s' % movie['name'])
                 # calc & set best matching ratio
                 seq = difflib.SequenceMatcher(lambda x: x==' ', movie['name'], name)
                 ratio = seq.ratio()
                 # check if some of the akas have better ratio
                 for aka in link.parent.findAll('em', text=re.compile('".*"')):
                     aka = aka.replace('"', '')
-                    seq = difflib.SequenceMatcher(lambda x: x==' ', aka, name)
+                    seq = difflib.SequenceMatcher(lambda x: x==' ', aka.lower(), name.lower())
                     aka_ratio = seq.ratio() * self.aka_weight
                     if aka_ratio > ratio:
-                        log.debug('Aka %s has better ratio %s' % (aka, aka_ratio))
+                        log.debug('- aka %s has better ratio %s' % (aka, aka_ratio))
                         ratio = aka_ratio
                 # store ratio
                 movie['match'] = ratio
