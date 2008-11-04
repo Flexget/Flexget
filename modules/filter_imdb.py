@@ -23,33 +23,44 @@ class ImdbSearch:
     def __init__(self):
         # depriorize aka matches a bit
         self.aka_weight = 0.9
+        # priorize popular matches a bit
+        self.unpopular_weight = 0.95
         self.min_match = 0.5
         self.min_diff = 0.01
         self.debug = False
         self.cutoffs = ['dvdrip', 'dvdscr', 'cam', 'r5', 'limited',
-                        'xvid', 'h264', 'x264', 'dvd', 'screener',
-                        'unrated', 'repack', 'rerip', 'proper', 
-                        '720p', '1080p', '1080i']
+                        'xvid', 'h264', 'x264', 'h.264', 'x.264', 
+                        'dvd', 'screener', 'unrated', 'repack', 
+                        'rerip', 'proper', '720p', '1080p', '1080i',
+                        'bluray']
+        self.remove = ['imax']
+        
         self.ignore_types = ['VG']
+        
+    def ireplace(self, str, old, new, count=0):
+        """Case insensitive string replace"""
+        pattern = re.compile(re.escape(old), re.I)
+        return re.sub(pattern, new, str, count)
 
     def parse_name(self, s):
         """Sanitizes movie name from all kinds of crap"""
-        # todo: improve, remove those two hacks  ..
-        s = s.replace('h.264', 'h264')
-        s = s.replace('x.264', 'x264')
-        s = s.replace('[', ' ')
-        s = s.replace(']', ' ')
-        s = s.replace('_', ' ')
-        # remove extra spaces!
-        s = s.strip()
-        # if there are no spaces, remove dots and -
+        for char in ['[', ']', '_']:
+            s = s.replace(char, ' ')
+        # if there are no spaces, start making begining from dots
         if s.find(' ') == -1:
             s = s.replace('.', ' ')
+        if s.find(' ') == -1:
             s = s.replace('-', ' ')
+
+        # remove unwanted words
+        for word in self.remove:
+            s = self.ireplace(s, word, '')
             
-        # remove duplicate spaces
+        # remove extra and duplicate spaces!
+        s = s.strip()
         while s.find('  ') != -1:
             s = s.replace('  ', ' ')
+
         # split to parts        
         parts = s.split(' ')
         year = None
@@ -74,9 +85,12 @@ class ImdbSearch:
         s = string.join(parts[:cut_pos], ' ')
         return s, year
 
-    def smart_match(self, name):
+    def smart_match(self, raw_name):
         """Accepts messy name, cleans it and uses information available to make smartest and best match"""
-        name, year = self.parse_name(name)
+        name, year = self.parse_name(raw_name)
+        if name=='':
+            log.critical('Failed to parse name from %s' % raw_name)
+            return None
         log.debug('smart_match name=%s year=%s' % (name, str(year)))
         return self.best_match(name, year)
 
@@ -109,7 +123,7 @@ class ImdbSearch:
             log.debug('only one movie remains')
             return movies[0]
 
-        # check min difference (array is >1 because of previous)
+        # check min difference between best two hits
         diff = movies[0]['match'] - movies[1]['match']
         if diff < self.min_diff:
             log.debug('unable to determine correct movie, min_diff too small')
@@ -184,6 +198,10 @@ class ImdbSearch:
                     if aka_ratio > ratio:
                         log.debug('- aka %s has better ratio %s' % (aka, aka_ratio))
                         ratio = aka_ratio
+                # priorize popular titles
+                if section!=sections[0]:
+                    log.debug('- depriorizing unpopular title')
+                    ratio = ratio * self.unpopular_weight
                 # store ratio
                 movie['match'] = ratio
                 movies.append(movie)
@@ -415,7 +433,7 @@ class FilterImdb:
                     feed.shared_cache.store(entry['title'], 'WILL_FAIL')
                     # act depending configuration
                     if config.get('filter_invalid', True):
-                        feed.log_once('Filtering %s because of missing imdb url' % entry['title'], log)
+                        feed.log_once('Filtering %s because of undeterminable imdb url' % entry['title'], log)
                         feed.filter(entry)
                     else:
                         log.debug('Unable to check %s due missing imdb url, configured to pass (filter_invalid is False)' % entry['title'])
