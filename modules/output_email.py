@@ -104,6 +104,10 @@ class OutputEmail:
 
         if not config['active']:
             return
+            
+        # don't send mail when learning
+        if feed.manager.options.learn:
+            return
 
         entries_count = len(feed.entries)
         if entries_count == 0:
