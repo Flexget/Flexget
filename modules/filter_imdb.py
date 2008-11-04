@@ -28,7 +28,8 @@ class ImdbSearch:
         self.debug = False
         self.cutoffs = ['dvdrip', 'dvdscr', 'cam', 'r5', 'limited',
                         'xvid', 'h264', 'x264', 'dvd', 'screener',
-                        'unrated', 'repack', 'rerip', 'proper']
+                        'unrated', 'repack', 'rerip', 'proper', 
+                        '720p', '1080p', '1080i']
         self.ignore_types = ['VG']
 
     def parse_name(self, s):
@@ -57,7 +58,7 @@ class ImdbSearch:
             # check for year
             if part.isdigit():
                 n = int(part)
-                if n>1900 and n<2050:
+                if n>1930 and n<2050:
                     year = part
                     if parts.index(part) < cut_pos:
                         cut_pos = parts.index(part)
@@ -80,7 +81,7 @@ class ImdbSearch:
         return self.best_match(name, year)
 
     def best_match(self, name, year=None):
-        """Return single movie that best matches criteria or None"""
+        """Return single movie that best matches name criteria or None"""
         movies = self.search(name)
 
         # remove all movies below min_match, and different year
@@ -111,7 +112,9 @@ class ImdbSearch:
         # check min difference (array is >1 because of previous)
         diff = movies[0]['match'] - movies[1]['match']
         if diff < self.min_diff:
-            log.debug('min_diff too small')
+            log.debug('unable to determine correct movie, min_diff too small')
+            for m in movies:
+                log.debug('remain: %s (match: %s) %s' % (m['name'], m['match'], m['url']))
             return None
         else:
             return movies[0]
