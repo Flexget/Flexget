@@ -76,7 +76,7 @@ class InputRSS:
             if config.has_key('username'):
                 rss.require('password')
             rss.accept('link', str)
-            rss.accept('ascii', boolean)
+            rss.accept('ascii', bool)
             rss.validate(config)
             return rss.errors.messages
         elif isinstance(config, str):

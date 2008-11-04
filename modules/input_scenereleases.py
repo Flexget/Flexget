@@ -31,6 +31,11 @@ class InputScenereleases:
     def register(self, manager, parser):
         manager.register('scenereleases')
 
+    def validate(self, config):
+        if not isinstance(config, str):
+            return ['wrong datatype']
+        return []
+        
     def parse_imdb(self, s):
         score = None
         votes = None

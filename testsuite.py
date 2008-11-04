@@ -103,6 +103,11 @@ class TestFilterSeries(FlexGetTestCase):
             self.fail('Another.Series.S01E10.720p.XViD-FlexGet should not have passed because of episode advancement')
         if not self.has_entry('Another.Series.S01E16.720p.XViD-FlexGet'):
             self.fail('Another.Series.S01E16.720p.XViD-FlexGet should have passed because of episode advancement grace magin')
+        # date formats
+        df = ['Date.Series.10-11-2008.XViD','Date.Series.10.12.2008.XViD','Date.Series.2008-10-13.XViD','Date.Series.2008x10.14.XViD']
+        for d in df:
+            if not self.has_entry(d):
+                self.fail('Date format did not match %s' % d)
 
 
 class TestPatterns(FlexGetTestCase):

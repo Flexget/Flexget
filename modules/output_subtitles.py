@@ -4,6 +4,9 @@ import re
 import difflib
 import os.path
 import sys
+import logging
+
+log = logging.getLogger('subtitles')
 
 # movie hash, won't work here though
 # http://trac.opensubtitles.org/projects/opensubtitles/wiki/HashSourceCodes#Python
@@ -19,6 +22,18 @@ class Subtitles:
     def register(self, manager, parser):
         manager.register('subtitles')
 
+    def validate(self, config):
+        """Validate given configuration"""
+        from validator import DictValidator
+        subs = DictValidator()
+        subs.accept('output', str, required=True)
+        langs = subs.accept('languages', list)
+        langs.accept(str)
+        subs.accept('min_sub_rating', float)
+        subs.accept('match_limit', float)
+        subs.validate(config)
+        return subs.errors.messages
+        
     def get_config(self, feed):
         config = feed.config['subtitles']
         if not isinstance(config, dict):
@@ -59,7 +74,7 @@ class Subtitles:
             # dig out the raw imdb id 
             m = re.search("tt(\d+)/$", entry['imdb_url'])
             if not m:
-                print "no match for "+entry['imdb_url']
+                log.debug("no match for "+entry['imdb_url'])
                 continue
 
             imdbid = m.group(1)

@@ -1,4 +1,5 @@
 import logging
+from manager import ModuleWarning
 
 log = logging.getLogger('cli_config')
 
@@ -42,11 +43,14 @@ class CliConfig:
                     d[k] = nv
             if isinstance(v, list):
                 for lv in v[:]:
-                    nv = replaces.get(lv[1:], False)
-                    if nv and lv.startswith('$'):
-                        log.debug('Replacing list item %s (%s -> %s)' % (k, lv, nv))
-                        i = v.index(lv)
-                        v[i] = nv
+                    if isinstance(lv, dict):
+                        self.replace_dict(lv, replaces)
+                    else:
+                        nv = replaces.get(lv[1:], False)
+                        if nv and lv.startswith('$'):
+                            log.debug('Replacing list item %s (%s -> %s)' % (k, lv, nv))
+                            i = v.index(lv)
+                            v[i] = nv
             if isinstance(v, dict):
                 self.replace_dict(v, replaces)
 
@@ -59,7 +63,11 @@ class CliConfig:
             return True # already parsed
         items = s.split(',')
         for item in items:
-            key = item[:item.index('=')]
+            try:
+                key = item[:item.index('=')]
+            except ValueError:
+                log.critical('Invalid --cli-config, no name for %s' % item)
+                continue
             value = item[item.index('=')+1:]
             self.replaces[key.strip()] = value.strip()
         return True

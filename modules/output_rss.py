@@ -1,6 +1,8 @@
 import logging
 import datetime
 import operator
+import os
+from manager import ModuleWarning
 
 __pychecker__ = 'unusednames=parser'
 
@@ -133,6 +135,10 @@ class OutputRSS:
         """Write RSS file at application terminate."""
         if not rss2gen:
             return
+        # don't generate rss when learning
+        if feed.manager.options.learn:
+            return
+
         config = self.get_config(feed)
         if self.written.has_key(config['file']):
             log.debug('skipping already written file %s' % config['file'])
@@ -163,9 +169,15 @@ class OutputRSS:
         # make rss
         rss = PyRSS2Gen.RSS2(title = 'FlexGet',
                              link = None,
-                             description = "FlexGet generated RSS feed",
+                             description = 'FlexGet generated RSS feed',
                              lastBuildDate = datetime.datetime.utcnow(),
                              items = rss_items)
         # write rss
-        rss.write_xml(open(config['file'], "w"))
+        fn = os.path.expanduser(config['file'])
+        try:
+            rss.write_xml(open(fn, 'w'))
+        except IOError:
+            # TODO: modules cannot raise ModuleWarnings in terminate event ..
+            log.error('Unable to write %s' % fn)
+            return
         self.written[config['file']] = True

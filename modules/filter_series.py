@@ -19,7 +19,7 @@ class SerieParser:
         self.data = None 
         
         self.ep_regexps = ['s(\d+)e(\d+)', 's(\d+)ep(\d+)', '(\d+)x(\d+)']
-        self.id_regexps = ['(\d\d\d\d).(\d+).(\d+)', '(\d+).(\d+).(\d\d\d\d)']
+        self.id_regexps = ['(\d\d\d\d).(\d+).(\d+)', '(\d+).(\d+).(\d\d\d\d)', '(\d\d\d\d)x(\d+)\.(\d+)']
         self.name_regexps = []
         # parse produces these
         self.season = None
@@ -92,6 +92,15 @@ class SerieParser:
                 else:
                     log.debug('%s ignoring quality %s because found better %s' % (self.name, part, self.quality))
 
+        # search for id first, since they match to less
+        for id_re in self.id_regexps:
+            m = re.search(id_re, self.data, re.IGNORECASE|re.UNICODE)
+            if m:
+                log.debug('found id with regexp %s' % id_re)
+                self.id = string.join(m.groups(), '-')
+                self.valid = True
+                return
+
         # search for season and episode number
         for ep_re in self.ep_regexps:
             m = re.search(ep_re, self.data, re.IGNORECASE|re.UNICODE)
@@ -102,15 +111,6 @@ class SerieParser:
                 self.episode = int(episode)
                 self.valid = True
                 self.id = "S%sE%s" % (self.season, self.episode)
-                return
-
-        # search for id
-        for id_re in self.id_regexps:
-            m = re.search(id_re, self.data, re.IGNORECASE|re.UNICODE)
-            if m:
-                log.debug('found id with regexp %s' % id_re)
-                self.id = string.join(m.groups(), '-')
-                self.valid = True
                 return
 
         log.debug('FAIL: unable to find any id')
@@ -354,8 +354,14 @@ class FilterSeries:
                 serie = SerieParser()
                 serie.name = str(name)
                 serie.data = entry['title']
-                serie.ep_regexps.extend(ep_patterns)
-                serie.id_regexps.extend(id_patterns)
+                serie.ep_regexps = ep_patterns + serie.ep_regexps
+                serie.id_regexps = id_patterns + serie.id_regexps
+                # do not use builtin list for id when ep configured and vice versa
+                if conf.has_key('ep_patterns') and not conf.has_key('id_patterns'):
+                    serie.id_regexps = []
+                if conf.has_key('id_patterns') and not conf.has_key('ep_patterns'):
+                    serie.ep_regexps = []
+                
                 serie.name_regexps.extend(name_patterns)
                 try:
                     serie.parse()
@@ -399,15 +405,16 @@ class FilterSeries:
                             feed.reject(ep.entry)
                         continue
                         
-                # episode advancement
-                latest = self.get_latest_info(feed, best)
-                # allow few episodes "backwards" incase missing
-                grace = len(series) + 1
-                if best.season < latest['season'] or (best.season == latest['season'] and best.episode < latest['episode'] - grace):
-                    log.debug('Episode advancement rejecting all instances of %s' % identifier)
-                    for ep in eps:
-                        feed.reject(ep.entry)
-                    continue
+                # episode advancement, only when using season, ep identifier
+                if best.season and best.episode:
+                    latest = self.get_latest_info(feed, best)
+                    # allow few episodes "backwards" incase missing
+                    grace = len(series) + 1
+                    if best.season < latest['season'] or (best.season == latest['season'] and best.episode < latest['episode'] - grace):
+                        log.debug('Episode advancement rejecting all instances of %s' % identifier)
+                        for ep in eps:
+                            feed.reject(ep.entry)
+                        continue
 
                 # timeframe present
                 if conf.has_key('timeframe'):

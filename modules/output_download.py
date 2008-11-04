@@ -66,7 +66,7 @@ class ModuleDownload:
                 if feed.manager.options.test:
                     log.info('Would download %s' % entry['title'])
                 else:
-                    feed.verbose_progress('Downloading %s' % entry['title'])
+                    log.info('Downloading %s' % entry['title'])
                     self.download(feed, entry)
             except urllib2.HTTPError, e:
                 feed.fail(entry)

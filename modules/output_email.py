@@ -104,6 +104,10 @@ class OutputEmail:
 
         if not config['active']:
             return
+            
+        # don't send mail when learning
+        if feed.manager.options.learn:
+            return
 
         entries_count = len(feed.entries)
         if entries_count == 0:
@@ -117,10 +121,11 @@ FlexGet has just downloaded %d new entries for feed %s :
         """ % (entries_count, feed.name)
         for entry in feed.entries:
             content += "\n - %s (%s)" % (entry['title'], entry['url'])
-            entry_path = entry.get('path', feed.config['download'])
+            entry_path = entry.get('path', feed.config.get('download'))
             entry_filename = entry.get('filename', entry['title'])
-            if entry_path != None:
+            if entry_path:
                 content += " => %s (%s)" % (entry_path, entry_filename)
+                
         content += "\n\n"
 
         # prepare email message
