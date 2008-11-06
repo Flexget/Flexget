@@ -102,15 +102,15 @@ class ImdbSearch:
         for movie in movies[:]:
             if year and movie.get('year'):
                 if movie['year'] != str(year):
-                    log.debug('best_match removing %s because difference in year' % movie['name'])
+                    log.debug('best_match removing %s - %s (wrong year: %s)' % (movie['name'], movie['url'], str(movie['year'])))
                     movies.remove(movie)
                     continue
             if movie['match'] < self.min_match:
-                log.debug('best_match removing %s because min_match' % movie['name'])
+                log.debug('best_match removing %s (min_match)' % movie['name'])
                 movies.remove(movie)
                 continue
             if movie.get('type', None) in self.ignore_types:
-                log.debug('best_match removing %s because ignored type' % movie['name'])
+                log.debug('best_match removing %s (ignored type)' % movie['name'])
                 movies.remove(movie)
                 continue
 
@@ -151,7 +151,7 @@ class ImdbSearch:
             movie['match'] = 1.0
             movie['name'] = name
             movie['url'] = actual_url
-            movie['year'] = None
+            movie['year'] = None # skips year check
             movies.append(movie)
             return movies
 
@@ -180,13 +180,13 @@ class ImdbSearch:
                 movie = {}
                 additional = re.findall('\((.*?)\)', link.next.next)
                 if len(additional) > 0:
-                    movie['year'] = additional[0]
+                    movie['year'] = filter(unicode.isdigit, additional[0]) # strip non numbers ie. 2008/I
                 if len(additional) > 1:
                     movie['type'] = additional[1]
                 
                 movie['name'] = link.string
                 movie['url'] = "http://www.imdb.com" + link.get('href')
-                log.debug('processing %s' % movie['name'])
+                log.debug('processing %s - %s' % (movie['name'], movie['url']))
                 # calc & set best matching ratio
                 seq = difflib.SequenceMatcher(lambda x: x==' ', movie['name'], name)
                 ratio = seq.ratio()
@@ -200,8 +200,9 @@ class ImdbSearch:
                         ratio = aka_ratio
                 # priorize popular titles
                 if section!=sections[0]:
-                    log.debug('- depriorizing unpopular title')
                     ratio = ratio * self.unpopular_weight
+                else:
+                    log.debug('- priorizing popular title')
                 # store ratio
                 movie['match'] = ratio
                 movies.append(movie)
