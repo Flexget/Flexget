@@ -91,6 +91,9 @@ class Statistics:
         config = feed.config['statistics']
         if not isinstance(config, dict):
             config = {'file': os.path.join(sys.path[0], feed.manager.configname+'_statistics.html')}
+
+        config['file'] = os.path.expanduser(config['file'])
+        
         return config
 
     def application_terminate(self, feed):

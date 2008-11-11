@@ -1,3 +1,4 @@
+
 import os, os.path
 import sys
 import logging
@@ -63,7 +64,7 @@ class Manager:
         self.__event_queue = {}
 
         # settings
-        self.moduledir = os.path.join(sys.path[0], 'modules/')
+        self.moduledir = os.path.join(sys.path[0], 'modules')
         self.session_version = 2
         
         # logging formatting
