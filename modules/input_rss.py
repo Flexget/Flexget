@@ -51,8 +51,8 @@ class InputRSS:
           url: <url>
           link: guid
           
-        You can disable link not found warnings by setting silent value to True on feeds where there are 
-        frequently non downloadable items.
+        You can disable few possibly annoying warnings by setting silent value to True on feeds where there are 
+        frequently invalid items.
        
         Example:
        
@@ -211,7 +211,8 @@ class InputRSS:
                     elif entry.has_key('guid'):
                         e['url'] = entry['guid']
                     else:
-                        feed.log_once('Failed to auto-detect RSS-entry %s link' % (entry.title), log)
+                        if not config.get('silent'):
+                            feed.log_once('Failed to auto-detect RSS-entry %s link' % (entry.title), log)
                         continue
             else:
                 # manual mode (configuration)
@@ -221,6 +222,12 @@ class InputRSS:
                 e['url'] = getattr(entry, curl)
 
             e['title'] = entry.title.replace(u'\u200B', u'') # remove annoying zero width spaces
+
+            # ignore entries without title            
+            if e['title']=='':
+                if not config.get('silent'):
+                    feed.log_once('RSS-entry %s is missing title' % e['url'])
+                continue
 
             # store basic auth info
             if config.has_key('username') and config.has_key('password'):
