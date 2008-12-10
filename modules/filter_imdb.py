@@ -4,7 +4,9 @@ import logging
 import re
 import string
 import difflib
+import time
 from manager import ModuleWarning
+from socket import timeout
 
 # this way we don't force users to install bs incase they do not want to use this module
 soup_present = True
@@ -418,11 +420,22 @@ class FilterImdb:
                     log.debug('Setting imdb url for %s from cache' % entry['title'])
                     entry['imdb_url'] = cached
 
+            # no imdb url, but information required
             if not entry.get('imdb_url') and self.imdb_required(entry, config):
                 # try searching from imdb
                 feed.verbose_progress('Searching from imdb %s' % entry['title'])
-                search = ImdbSearch()
-                movie = search.smart_match(entry['title'])
+                movie = {}
+                try:
+                    search = ImdbSearch()
+                    movie = search.smart_match(entry['title'])
+                except timeout:
+                    log.error('Timeout when searching for %s' % entry['title'])
+                    feed.filter(entry)
+                    continue
+                except urllib2.URLError:
+                    log.error('URLError when searching for %s' % entry['title'])
+                    feed.filter(entry)
+                    continue
                 if movie:
                     log.debug('Imdb search was success')
                     entry['imdb_url'] = movie['url']
@@ -522,3 +535,8 @@ class FilterImdb:
             else:
                 log.debug('Accepting %s' % (entry))
                 feed.accept(entry)
+
+            # give imdb a little break between requests (see: http://flexget.com/ticket/129#comment:1)
+            # TODO: improve ?
+            if not feed.manager.options.debug:
+                time.sleep(3)
