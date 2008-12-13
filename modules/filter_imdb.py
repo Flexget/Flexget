@@ -99,6 +99,10 @@ class ImdbSearch:
     def best_match(self, name, year=None):
         """Return single movie that best matches name criteria or None"""
         movies = self.search(name)
+        
+        if not movies:
+            log.debug('search did not return any movies')
+            return None
 
         # remove all movies below min_match, and different year
         for movie in movies[:]:
@@ -116,7 +120,7 @@ class ImdbSearch:
                 movies.remove(movie)
                 continue
 
-        if len(movies) == 0:
+        if not movies:
             log.debug('no movies remain')
             return None
         
@@ -165,7 +169,9 @@ class ImdbSearch:
         for section in sections:
             section_tag = soup.find('b', text=section)
             if not section_tag:
+                log.debug('section %s not found' % section)
                 continue
+            log.debug('processing section %s' % section)
             try:
                 section_p = section_tag.parent.parent
             except AttributeError:
@@ -173,12 +179,19 @@ class ImdbSearch:
                 continue
             
             links = section_p.findAll('a', attrs={'href': re.compile('\/title\/tt')})
+            if not links:
+                log.debug('section %s does not have links' % section)
             for link in links:
-                # skip links with javascript (not movies)
-                if link.has_key('onclick'): continue
                 # skip links with div as a parent (not movies, somewhat rare links in additional details)
-                if link.parent.name==u'div': continue
-                
+                if link.parent.name==u'div': 
+                    continue
+                    
+                # skip links without text value, these are small pictures before title
+                if not link.string:
+                    continue
+
+                #log.debug('processing link %s' % link)
+                    
                 movie = {}
                 additional = re.findall('\((.*?)\)', link.next.next)
                 if len(additional) > 0:
@@ -188,7 +201,7 @@ class ImdbSearch:
                 
                 movie['name'] = link.string
                 movie['url'] = "http://www.imdb.com" + link.get('href')
-                log.debug('processing %s - %s' % (movie['name'], movie['url']))
+                log.debug('processing name: %s url: %s' % (movie['name'], movie['url']))
                 # calc & set best matching ratio
                 seq = difflib.SequenceMatcher(lambda x: x==' ', movie['name'], name)
                 ratio = seq.ratio()
