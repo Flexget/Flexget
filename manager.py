@@ -568,14 +568,14 @@ class Manager:
         for k, v in d1.items():
             if d2.has_key(k):
                 if type(v) == type(d2[k]):
-                    if type(v) == types.DictType:
+                    if isinstance(v, dict):
                         self.merge_dict(d1[k], d2[k])
-                    elif type(v) == types.ListType:
+                    elif isinstance(v, list):
                         d2[k].extend(v)
-                    elif isinstance(v, basestring) or isinstance(v, bool):
+                    elif isinstance(v, basestring) or isinstance(v, bool) or isinstance(v, int):
                         pass
                     else:
-                        raise Exception('Unknown type %s in dictionary' % type(v))
+                        raise Exception('Unknown type: %s value: %s in dictionary' % (type(v), repr(v)))
                 else:
                     raise MergeException('Merging key %s failed, conflicting datatypes.' % (k))
             else:
