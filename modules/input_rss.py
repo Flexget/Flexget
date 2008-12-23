@@ -200,7 +200,6 @@ class InputRSS:
                 if config.has_key('username') and config.has_key('password'):
                     ea['basic_auth_username'] = config['username']
                     ea['basic_auth_password'] = config['password']
-                print 'adding %s' % ea
                 
             # create from enclosures if present
             enclosures = entry.get('enclosures', [])
