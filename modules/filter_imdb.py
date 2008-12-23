@@ -4,7 +4,9 @@ import logging
 import re
 import string
 import difflib
+import time
 from manager import ModuleWarning
+from socket import timeout
 
 # this way we don't force users to install bs incase they do not want to use this module
 soup_present = True
@@ -97,24 +99,28 @@ class ImdbSearch:
     def best_match(self, name, year=None):
         """Return single movie that best matches name criteria or None"""
         movies = self.search(name)
+        
+        if not movies:
+            log.debug('search did not return any movies')
+            return None
 
         # remove all movies below min_match, and different year
         for movie in movies[:]:
             if year and movie.get('year'):
                 if movie['year'] != str(year):
-                    log.debug('best_match removing %s because difference in year' % movie['name'])
+                    log.debug('best_match removing %s - %s (wrong year: %s)' % (movie['name'], movie['url'], str(movie['year'])))
                     movies.remove(movie)
                     continue
             if movie['match'] < self.min_match:
-                log.debug('best_match removing %s because min_match' % movie['name'])
+                log.debug('best_match removing %s (min_match)' % movie['name'])
                 movies.remove(movie)
                 continue
             if movie.get('type', None) in self.ignore_types:
-                log.debug('best_match removing %s because ignored type' % movie['name'])
+                log.debug('best_match removing %s (ignored type)' % movie['name'])
                 movies.remove(movie)
                 continue
 
-        if len(movies) == 0:
+        if not movies:
             log.debug('no movies remain')
             return None
         
@@ -151,7 +157,7 @@ class ImdbSearch:
             movie['match'] = 1.0
             movie['name'] = name
             movie['url'] = actual_url
-            movie['year'] = None
+            movie['year'] = None # skips year check
             movies.append(movie)
             return movies
 
@@ -163,7 +169,9 @@ class ImdbSearch:
         for section in sections:
             section_tag = soup.find('b', text=section)
             if not section_tag:
+                log.debug('section %s not found' % section)
                 continue
+            log.debug('processing section %s' % section)
             try:
                 section_p = section_tag.parent.parent
             except AttributeError:
@@ -171,22 +179,29 @@ class ImdbSearch:
                 continue
             
             links = section_p.findAll('a', attrs={'href': re.compile('\/title\/tt')})
+            if not links:
+                log.debug('section %s does not have links' % section)
             for link in links:
-                # skip links with javascript (not movies)
-                if link.has_key('onclick'): continue
                 # skip links with div as a parent (not movies, somewhat rare links in additional details)
-                if link.parent.name==u'div': continue
-                
+                if link.parent.name==u'div': 
+                    continue
+                    
+                # skip links without text value, these are small pictures before title
+                if not link.string:
+                    continue
+
+                #log.debug('processing link %s' % link)
+                    
                 movie = {}
                 additional = re.findall('\((.*?)\)', link.next.next)
                 if len(additional) > 0:
-                    movie['year'] = additional[0]
+                    movie['year'] = filter(unicode.isdigit, additional[0]) # strip non numbers ie. 2008/I
                 if len(additional) > 1:
                     movie['type'] = additional[1]
                 
                 movie['name'] = link.string
                 movie['url'] = "http://www.imdb.com" + link.get('href')
-                log.debug('processing %s' % movie['name'])
+                log.debug('processing name: %s url: %s' % (movie['name'], movie['url']))
                 # calc & set best matching ratio
                 seq = difflib.SequenceMatcher(lambda x: x==' ', movie['name'], name)
                 ratio = seq.ratio()
@@ -200,8 +215,9 @@ class ImdbSearch:
                         ratio = aka_ratio
                 # priorize popular titles
                 if section!=sections[0]:
-                    log.debug('- depriorizing unpopular title')
                     ratio = ratio * self.unpopular_weight
+                else:
+                    log.debug('- priorizing popular title')
                 # store ratio
                 movie['match'] = ratio
                 movies.append(movie)
@@ -417,11 +433,22 @@ class FilterImdb:
                     log.debug('Setting imdb url for %s from cache' % entry['title'])
                     entry['imdb_url'] = cached
 
+            # no imdb url, but information required
             if not entry.get('imdb_url') and self.imdb_required(entry, config):
                 # try searching from imdb
                 feed.verbose_progress('Searching from imdb %s' % entry['title'])
-                search = ImdbSearch()
-                movie = search.smart_match(entry['title'])
+                movie = {}
+                try:
+                    search = ImdbSearch()
+                    movie = search.smart_match(entry['title'])
+                except timeout:
+                    log.error('Timeout when searching for %s' % entry['title'])
+                    feed.filter(entry)
+                    continue
+                except urllib2.URLError:
+                    log.error('URLError when searching for %s' % entry['title'])
+                    feed.filter(entry)
+                    continue
                 if movie:
                     log.debug('Imdb search was success')
                     entry['imdb_url'] = movie['url']
@@ -521,3 +548,8 @@ class FilterImdb:
             else:
                 log.debug('Accepting %s' % (entry))
                 feed.accept(entry)
+
+            # give imdb a little break between requests (see: http://flexget.com/ticket/129#comment:1)
+            # TODO: improve ?
+            if not feed.manager.options.debug:
+                time.sleep(3)

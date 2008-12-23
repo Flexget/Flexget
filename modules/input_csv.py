@@ -39,11 +39,10 @@ class InputCSV:
         page = urllib2.urlopen(url)
         for line in page.readlines():
             data = line.split(",")
-            print data
             entry = Entry()
             for name, index in feed.config['csv'].get('values', {}).items():
                 try:
-                    entry[name] = data[index+1]
+                    entry[name] = data[index-1]
                 except IndexError:
                     raise Exception('Field %s index is out of range' % name)
             feed.entries.append(entry)

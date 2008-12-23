@@ -51,8 +51,8 @@ class InputRSS:
           url: <url>
           link: guid
           
-        You can disable link not found warnings by setting silent value to True on feeds where there are 
-        frequently non downloadable items.
+        You can disable few possibly annoying warnings by setting silent value to True on feeds where there are 
+        frequently invalid items.
        
         Example:
        
@@ -182,49 +182,65 @@ class InputRSS:
             if not entry.has_key('id'):
                 entry['id'] = entry.link
 
+            # remove annoying zero width spaces
+            entry.title = entry.title.replace(u'\u200B', u'') 
+
+            # ignore entries without title            
+            if not entry.title:
+                log.debug('skipping entry without title')
+                continue
+
+            # helper
+            def add_entry(ea):
+                ea['title'] = entry.title
+                if entry.has_key('description'):
+                    # TODO: html decode!
+                    ea['description'] = entry.description
+                # store basic auth info
+                if config.has_key('username') and config.has_key('password'):
+                    ea['basic_auth_username'] = config['username']
+                    ea['basic_auth_password'] = config['password']
+                
+            # create from enclosures if present
+            enclosures = entry.get('enclosures', [])
+            if enclosures:
+                for enclosure in enclosures:
+                    ee = Entry()
+                    if not enclosure.has_key('href'):
+                        feed.log_once('RSS-entry %s enclosure does not have url' % entry.title, log)
+                        continue
+                    ee['url'] = enclosure['href']
+                    # get optional meta-data
+                    if enclosure.has_key('length'): ee['size'] = int(enclosure['length'])
+                    if enclosure.has_key('type'): ee['type'] = enclosure['type']
+                    # set clean filename from url (titles are messy)
+                    # TODO: should this be done always when no specific name is found, and in download module?
+                    if ee['url'].rfind != -1:
+                        ee['filename'] = ee['url'][ee['url'].rfind('/')+1:]
+                    log.debug('adding entry from enclosure')
+                    add_entry(ee)
+                continue
+
             # create flexget entry
             e = Entry()
-
+                
             # automaticly determine url from available fields
             if curl == 'auto':
-                enclosures = entry.get('enclosures', [])
-                # TODO: how should these be handled?
-                if len(enclosures)>1:
-                    feed.log_once('RSS-entry %s has too many enclosures, unable to choose. Item ignored.' % (entry.title), log)
-                    continue
-                # get from enclosure
-                if len(enclosures)==1:
-                    log.debug('getting url from enclosure')
-                    ec = enclosures[0]
-                    if not ec.has_key('href'):
-                        feed.log_once('RSS-entry %s closure does not have url' % entry.title, log)
-                        continue
-                    e['url'] = ec['href']
-                    # get optional meta-data
-                    if ec.has_key('length'): e['size'] = int(ec['length'])
-                    if ec.has_key('type'): e['type'] = ec['type']
+                # try from link, guid
+                log.debug('fallback to link, guid')
+                if entry.has_key('link'):
+                    e['url'] = entry['link']
+                elif entry.has_key('guid'):
+                    e['url'] = entry['guid']
                 else:
-                    # try from link, guid
-                    log.debug('fallback to link, guid')
-                    if entry.has_key('link'):
-                        e['url'] = entry['link']
-                    elif entry.has_key('guid'):
-                        e['url'] = entry['guid']
-                    else:
+                    if not config.get('silent'):
                         feed.log_once('Failed to auto-detect RSS-entry %s link' % (entry.title), log)
-                        continue
+                    continue
             else:
-                # manual mode (configuration)
+                # manual configuration
                 if not entry.has_key(curl):
                     feed.log_once('RSS-entry %s does not contain configured link attributes: %s' % (entry.title, curl), log)
                     continue
                 e['url'] = getattr(entry, curl)
-
-            e['title'] = entry.title.replace(u'\u200B', u'') # remove annoying zero width spaces
-
-            # store basic auth info
-            if config.has_key('username') and config.has_key('password'):
-                e['basic_auth_username'] = config['username']
-                e['basic_auth_password'] = config['password']
-            
-            feed.entries.append(e)
+          
+            add_entry(e)

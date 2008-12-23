@@ -17,20 +17,21 @@ class OutputEmail:
           to            : the email address of the recipient (required)
           smtp_host     : the host of the smtp server
           smtp_port     : the port of the smtp server
-          smtp_login    : should we use anonymous mode or login to the smtp server ? 
+          smtp_login    : should we use anonymous mode or login to the smtp server ?
           smtp_username : the username to use to connect to the smtp server
           smtp_password : the password to use to connect to the smtp server
+          smtp_tls      : should we use TLS to connect to the smtp server ?
           active        : is this module active or not ?
 
         Config basic example:
-        
+
         email:
           from: xxx@xxx.xxx
           to: xxx@xxx.xxx
           smtp_host: smtp.host.com
 
         Config example with smtp login:
-        
+
         email:
           from: xxx@xxx.xxx
           to: xxx@xxx.xxx
@@ -39,9 +40,10 @@ class OutputEmail:
           smtp_login: true
           smtp_username: my_smtp_login
           smtp_password: my_smtp_password
+          smtp_tls: true
 
         Config multi-feed example:
-        
+
         global:
           email:
             from: xxx@xxx.xxx
@@ -60,6 +62,16 @@ class OutputEmail:
             email:
               to: zzz@zzz.zzz
 
+        GMAIL example:
+            from: from@gmail.com
+            to: to@gmail.com
+            smtp_host: smtp.gmail.com
+            smtp_port: 587
+            smtp_login: true
+            smtp_username: gmailUser
+            smtp_password: gmailPassword
+            smtp_tls: true
+
         Default values for the config elements:
 
         email:
@@ -67,8 +79,9 @@ class OutputEmail:
           smtp_host: localhost
           smtp_port: 25
           smtp_login: False
-          smtp_username: 
-          smtp_password: 
+          smtp_username:
+          smtp_password:
+          smtp_tls: False
     """
 
     def register(self, manager, parser):
@@ -85,9 +98,10 @@ class OutputEmail:
         email.accept('smtp_login', bool)
         email.accept('smtp_username', str)
         email.accept('smtp_password', str)
+        email.accept('smtp_tls', bool)
         email.validate(config)
         return email.errors.messages
-        
+
     def get_config(self, feed):
         config = feed.config['email']
         config.setdefault('active', True)
@@ -96,6 +110,7 @@ class OutputEmail:
         config.setdefault('smtp_login', False)
         config.setdefault('smtp_username', '')
         config.setdefault('smtp_password', '')
+        config.setdefault('smtp_tls', False)
         return config
 
     def feed_exit(self, feed):
@@ -104,7 +119,7 @@ class OutputEmail:
 
         if not config['active']:
             return
-            
+
         # don't send mail when learning
         if feed.manager.options.learn:
             return
@@ -125,7 +140,7 @@ FlexGet has just downloaded %d new entries for feed %s :
             entry_filename = entry.get('filename', entry['title'])
             if entry_path:
                 content += " => %s (%s)" % (entry_path, entry_filename)
-                
+
         content += "\n\n"
 
         # prepare email message
@@ -140,7 +155,13 @@ FlexGet has just downloaded %d new entries for feed %s :
             log.info('Would send email : %s' % message.as_string())
         else:
             mailServer = smtplib.SMTP(config['smtp_host'], config['smtp_port'])
+
+            if config['smtp_tls']:
+                mailServer.ehlo()
+                mailServer.starttls()
+
             if config['smtp_login']:
                 mailServer.login(config['smtp_username'], config['smtp_password'])
+
             mailServer.sendmail(message["From"], message["To"], message.as_string())
             mailServer.quit()

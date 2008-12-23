@@ -5,14 +5,14 @@ feeds:
     # make test data
     input_mock:
       # matched by patterns
-      - {title: 'pattern', url: 'http://localhost/pattern'}
+      - {title: 'pattern', url: 'http://localhost/pattern', 'imdb_score': 5}
       # filtered by patterns, accepted by accept
       - {title: 'accept', url: 'http://localhost/accept'}
       # unmatched
       - {title: 'unmatched', url: 'http://localhost/unmatched'}
       # not
       - {title: 'foobar', url: 'http://localhost/'}
-      - {title: 'xxx.yyyy', url: 'http://localhost/'}
+      - {title: 'xxx.yyyy', url: 'http://localhost/', 'imdb_score': 5}
     patterns:
       - pattern
       - foo: {not: bar}

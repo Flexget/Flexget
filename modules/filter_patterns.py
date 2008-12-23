@@ -73,11 +73,17 @@ class FilterPatterns:
         return patterns.errors.messages
 
     def matches(self, entry, regexp):
-        # TODO: match from all fields from entry?
+        """Return True if any of the entry string fields match given regexp"""
         regexp = str(regexp)
-        entry_url = urllib.unquote(entry['url'])
-        if re.search(regexp, entry_url, re.IGNORECASE|re.UNICODE) or re.search(regexp, entry['title'], re.IGNORECASE|re.UNICODE):
-            return True
+        unquote = ['url']
+        for field, value in entry.iteritems():
+            if not isinstance(value, basestring):
+                continue
+            if field in unquote:
+                value = urllib.unquote(value)
+            if re.search(regexp, value, re.IGNORECASE|re.UNICODE):
+                log.debug('match from %s' % field)
+                return True
 
     def feed_filter(self, feed):
         """This method is overriden by ignore and accept modules"""

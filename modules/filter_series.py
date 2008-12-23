@@ -248,6 +248,8 @@ class FilterSeries:
 
     def register(self, manager, parser):
         manager.register('series')
+        parser.add_option('--stop-waiting', action='store', dest='stop_waiting', default=False,
+                          help='Stop timeframe for a given series.')
 
     def validate(self, config):
         """Validate configuration format for this module"""
@@ -421,6 +423,7 @@ class FilterSeries:
                     tconf = conf.get('timeframe')
                     hours = tconf.get('hours', 0)
                     enough = tconf.get('enough', '720p')
+                    stop = feed.manager.options.stop_waiting == name
 
                     if not enough in SerieParser.qualities:
                         log.error('Parameter enough has unknown value: %s' % enough)
@@ -445,7 +448,9 @@ class FilterSeries:
                     # log when it is added to timeframe wait list (a bit hacky way to detect first time, by age)
                     if (diff.seconds < 60) and not feed.unittest:
                         log.info('Timeframe waiting %s for %s hours, currently best is %s' % (name, hours, best.entry['title']))
-                    if age_hours >= hours:
+                    if age_hours >= hours or stop:
+                        if stop:
+                            log.info('Stopped timeframe, accepting %s' % (best.entry['title']))
                         self.accept_serie(feed, best)
                     else:
                         log.debug('Timeframe ignoring %s' % (best.entry['title']))
