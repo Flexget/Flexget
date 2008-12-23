@@ -25,6 +25,7 @@ class InputMock:
         entry.accept('title', str, require=True)
         entry.accept('url', str, require=True)
         entry.accept_any_key(str)
+        entry.accept_any_key(int)
         mock.validate(config)
         return mock.errors.messages
 

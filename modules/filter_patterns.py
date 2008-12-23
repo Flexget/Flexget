@@ -73,10 +73,12 @@ class FilterPatterns:
         return patterns.errors.messages
 
     def matches(self, entry, regexp):
-        """Return True if any of the entry fields match given regexp"""
+        """Return True if any of the entry string fields match given regexp"""
         regexp = str(regexp)
         unquote = ['url']
         for field, value in entry.iteritems():
+            if not isinstance(value, basestring):
+                continue
             if field in unquote:
                 value = urllib.unquote(value)
             if re.search(regexp, value, re.IGNORECASE|re.UNICODE):
