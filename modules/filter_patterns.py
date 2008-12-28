@@ -82,7 +82,6 @@ class FilterPatterns:
             if field in unquote:
                 value = urllib.unquote(value)
             if re.search(regexp, value, re.IGNORECASE|re.UNICODE):
-                log.debug('match from %s' % field)
                 return True
 
     def feed_filter(self, feed):
