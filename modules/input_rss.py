@@ -200,6 +200,7 @@ class InputRSS:
                 if config.has_key('username') and config.has_key('password'):
                     ea['basic_auth_username'] = config['username']
                     ea['basic_auth_password'] = config['password']
+                feed.entries.append(ea)
                 
             # create from enclosures if present
             enclosures = entry.get('enclosures', [])
@@ -227,7 +228,6 @@ class InputRSS:
             # automaticly determine url from available fields
             if curl == 'auto':
                 # try from link, guid
-                log.debug('fallback to link, guid')
                 if entry.has_key('link'):
                     e['url'] = entry['link']
                 elif entry.has_key('guid'):

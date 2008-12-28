@@ -88,6 +88,10 @@ class ModuleCache:
         else:
             # reading value should update "stored" date .. TODO: refactor stored -> access & days -> keep?
             item['stored'] = datetime.today().strftime('%Y-%m-%d')
+            # HACK, for some reason there seems to be items without value, most likely elusive rare bug ..
+            if not item.has_key('value'):
+                self.log.warning('BUGFIX: Key %s is missing value, using default.' % key)
+                return default
             return item['value']
             
     def remove(self, key):
