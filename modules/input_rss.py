@@ -205,6 +205,7 @@ class InputRSS:
             # create from enclosures if present
             enclosures = entry.get('enclosures', [])
             if enclosures:
+                log.debug('adding %i entries from enclosures' % len(enclosures))
                 for enclosure in enclosures:
                     ee = Entry()
                     if not enclosure.has_key('href'):
@@ -214,11 +215,11 @@ class InputRSS:
                     # get optional meta-data
                     if enclosure.has_key('length'): ee['size'] = int(enclosure['length'])
                     if enclosure.has_key('type'): ee['type'] = enclosure['type']
-                    # set clean filename from url (titles are messy)
-                    # TODO: should this be done always when no specific name is found, and in download module?
-                    if ee['url'].rfind != -1:
-                        ee['filename'] = ee['url'][ee['url'].rfind('/')+1:]
-                    log.debug('adding entry from enclosure')
+                    # if enclosure has size OR there are multiple enclosures use filename from url
+                    if ee.get('size', 0) != 0 or len(enclosures)>1:
+                        if ee['url'].rfind != -1:
+                            ee['filename'] = ee['url'][ee['url'].rfind('/')+1:]
+                            log.debug('filename %s from enclosure' % ee['filename'])
                     add_entry(ee)
                 continue
 

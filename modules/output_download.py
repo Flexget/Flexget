@@ -1,4 +1,4 @@
-import sys, os, string, time
+import sys, os, time
 import urllib2
 import logging
 import shutil
@@ -139,15 +139,19 @@ class ModuleDownload:
             # TODO: must be hmtl decoded!
             log.debug('Found filename from headers: %s' % filename)
             entry['filename'] = filename
-            return
+        # TODO: set filename from URL?
+        
         # guess extension from content-type
         import mimetypes
-        ext = mimetypes.guess_extension(response.headers.getsubtype())
-        if ext:
-            entry['filename'] = entry['title'] + ext
-            log.debug('mimetypes guess for %s is %s ' % (response.headers.getsubtype(), ext))
-            log.debug('Using with guessed extension: %s' % entry['filename'])
-            return
+        extension = mimetypes.guess_extension(response.headers.getsubtype())
+        if extension:
+            log.debug('Mimetypes guess for %s is %s ' % (response.headers.getsubtype(), extension))
+            if entry.has_key('filename'):
+                if entry['filename'].endswith('.%s' % extension):
+                    log.debug('Filename %s extension matches to mimetype' % entry['filename'])
+                else:
+                    log.debug('Adding mimetype extension %s to %s' % (extension, entry['filename']))
+                    entry['filename'] = '%s.%s' % (entry['filename'], extension)
 
     def feed_output(self, feed):
         """Move downloaded content from temp folder to final destination"""
@@ -183,21 +187,32 @@ class ModuleDownload:
         if not entry.has_key('filename'):
             log.warn('Unable to figure proper filename extension for %s' % entry['title'])
 
-        destfile = os.path.join(os.path.expanduser(path), entry.get('filename', entry['title']))
+        # make path
+        path = os.path.expanduser(path)
 
-        if not os.path.exists(os.path.expanduser(path)):
-            raise ModuleWarning('Cannot write output file %s, does the path exist?' % destfile, log)
+        if not os.path.exists(path):
+            log.info('Creating directory %s' % path)
+            try:
+                os.mkdir(path)
+            except:
+                raise ModuleWarning('Cannot create path %s' % path, log)
+        
+        # make full filename (destfile)
+        if not entry.has_key('filename'):
+            log.warning('%s does not have filename, using title' % entry['title'])
+        destfile = os.path.join(path, entry.get('filename', entry['title']))
 
         if os.path.exists(destfile):
             raise ModuleWarning('File \'%s\' already exists' % destfile, log)
-            
+        
+        # see that temp file is present
         if not os.path.exists(entry['file']):
             tmp_path = os.path.join(sys.path[0], 'temp')
             log.debug('entry: %s' % entry)
-            log.debug('temp: %s' % string.join(os.listdir(tmp_path), ', '))
+            log.debug('temp: %s' % ', '.join(os.listdir(tmp_path)))
             raise ModuleWarning('Downloaded temp file \'%s\' doesn\'t exists!' % entry['file'])
 
-        # move file
+        # move temp file
         shutil.move(entry['file'], destfile)
         logging.debug('moved %s to %s' % (entry['file'], destfile))
         # remove temp file from entry
