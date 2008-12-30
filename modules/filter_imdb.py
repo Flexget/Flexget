@@ -450,10 +450,10 @@ class FilterImdb:
                     feed.filter(entry)
                     continue
                 if movie:
-                    log.debug('Imdb search was success')
                     entry['imdb_url'] = movie['url']
                     # store url for this movie, so we don't have to search on every run
                     feed.shared_cache.store(entry['title'], entry['imdb_url'])
+                    log.info('Found %s' % (entry['imdb_url']))
                 else:
                     feed.log_once('Imdb search failed for %s' % entry['title'], log)
                     # store FAIL for this title
