@@ -40,13 +40,13 @@ class Resolver:
                 name = resolver['name']
                 if resolver['instance'].resolvable(feed, entry):
                     try:
-                        feed.verbose_progress('Resolving \'%s\' with resolver %s' % (entry['title'], name))
                         resolver['instance'].resolve(feed, entry)
+                        log.info('Resolved \'%s\' to %s (with %s)' % (entry['title'], entry['url'], name))
                     except ResolverException, r:
                         # increase failcount
                         #count = self.shared_cache.storedefault(entry['url'], 1)
                         #count += 1
-                        raise ResolverException('%s: %s' % (name, r.value))
+                        raise ResolverException('Resolver %s failed: %s' % (name, r.value))
                     except Exception, e:
                         log.exception(e)
                         raise ResolverException('%s: Internal error with url %s' % (name, entry['url']))

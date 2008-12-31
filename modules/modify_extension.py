@@ -25,9 +25,8 @@ class ModifyExtension:
 
     def feed_modify(self, feed):
         ext = feed.config.get('extension')
-        if not ext.startswith('.'):
-            ext = '.%s' % ext
+        if ext.startswith('.'):
+            ext = ext[1:]
         for entry in feed.entries:
-            if not entry.has_key('filename'):
-                entry['filename'] = '%s%s' % (entry['title'], ext)
-                log.debug('generated filename %s' % entry['filename'])
+            entry['filename'] = '%s.%s' % (entry.get('filename', entry['title']), ext)
+            log.debug('setting filename %s' % entry['filename'])

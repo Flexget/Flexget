@@ -194,7 +194,12 @@ class TorrentFilename:
                 entry['torrent'] = torrent
                 # if we do not have good filename (by download module)
                 # for this entry, try to generate one from torrent content
-                if not entry.has_key('filename'):
+                if entry.has_key('filename'):
+                    if not entry['filename'].lower().endswith('.torrent'):
+                        # filename present but without .torrent extension, add it
+                        entry['filename'] = '%s.torrent' % entry['filename']
+                else:
+                    # generate filename from torrent or fall back to title plus extension
                     entry['filename'] = self.make_filename(torrent, entry)
             except:
                 # not a VALID torrent file, no need to mess with it
@@ -209,14 +214,12 @@ class TorrentFilename:
             fn = files[0]['name']
             if len(fn) > len(title):
                 title = fn[:fn.rfind('.')]
-        else:
-            # create a proper filename from crap we got from the feed
-            title = title.replace('/', '_')
 
-        # neatify further
+        # neatify title
+        title = title.replace('/', '_')
         title = title.replace(' ', '_')
         title = title.encode('iso8859-1', 'ignore') # Damn \u200b -character, how I loathe thee
-        # TODO: replace only zero width spaces, leave unicode alone!
+        # TODO: replace only zero width spaces, leave unicode alone?
 
         fn = '%s.torrent' % title
         log.debug('make_filename made %s' % fn)

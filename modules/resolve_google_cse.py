@@ -23,8 +23,8 @@ class ResolveGoogleCse:
 
     # resolver API
     def resolvable(self, feed, entry):
-        url = entry['url']
-        if url.startswith('http://www.google.com/cse?cx='): return True
+        if entry['url'].startswith('http://www.google.com/cse?'): return True
+        if entry['url'].startswith('http://www.google.com/custom?'): return True
         return False
         
     # resolver API

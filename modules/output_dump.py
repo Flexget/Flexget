@@ -10,6 +10,9 @@ class YamlDump:
 
     def register(self, manager, parser):
         manager.register('dump', debug_module=True)
+        
+    def validate(self, config):
+        return []
 
     def feed_output(self, feed):
         for entry in feed.entries:
