@@ -442,11 +442,11 @@ class FilterImdb:
                     search = ImdbSearch()
                     movie = search.smart_match(entry['title'])
                 except timeout:
-                    log.error('Timeout when searching for %s' % entry['title'])
+                    log.error('Timeout while searching for %s' % entry['title'])
                     feed.filter(entry)
                     continue
                 except urllib2.URLError:
-                    log.error('URLError when searching for %s' % entry['title'])
+                    log.error('URLError while searching for %s' % entry['title'])
                     feed.filter(entry)
                     continue
                 if movie:

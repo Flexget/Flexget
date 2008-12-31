@@ -87,16 +87,17 @@ class SerieParser:
             # search for quality
             if part in self.qualities:
                 if self.qualities.index(part) < self.qualities.index(self.quality):
-                    log.debug('%s storing quality %s' % (self.name, part))
+                    #log.debug('%s storing quality %s' % (self.name, part))
                     self.quality = part
                 else:
-                    log.debug('%s ignoring quality %s because found better %s' % (self.name, part, self.quality))
+                    pass
+                    #log.debug('%s ignoring quality tag %s because found better %s' % (self.name, part, self.quality))
 
         # search for id first, since they match to less
         for id_re in self.id_regexps:
             m = re.search(id_re, self.data, re.IGNORECASE|re.UNICODE)
             if m:
-                log.debug('found id with regexp %s' % id_re)
+                #log.debug('found id with regexp %s' % id_re)
                 self.id = string.join(m.groups(), '-')
                 self.valid = True
                 return
@@ -105,7 +106,7 @@ class SerieParser:
         for ep_re in self.ep_regexps:
             m = re.search(ep_re, self.data, re.IGNORECASE|re.UNICODE)
             if m:
-                log.debug('found episode number with regexp %s' % ep_re)
+                #log.debug('found episode number with regexp %s' % ep_re)
                 season, episode = m.groups()
                 self.season = int(season)
                 self.episode = int(episode)
@@ -113,7 +114,7 @@ class SerieParser:
                 self.id = "S%sE%s" % (self.season, self.episode)
                 return
 
-        log.debug('FAIL: unable to find any id')
+        log.debug('FAIL: unable to find any id from %s' % data)
 
     def identifier(self):
         """Return identifier for parsed episode"""
@@ -306,11 +307,15 @@ class FilterSeries:
             serie = feed.shared_cache.get(name)
             if not serie: continue
             for identifier in serie.keys():
+                # don't add downloaded episodes
+                if serie[identifier].get('info', {}).get('downloaded', False):
+                    continue
+                # add all qualities
                 for quality in SerieParser.qualities:
                     if quality=='info': continue # a hack, info dict is not quality
                     entry = serie[identifier].get(quality)
                     if not entry: continue
-                    # check if episode is still in feed, if not then add it
+                    # check if this episode is still in feed, if not then add it
                     exists = False
                     for feed_entry in feed.entries:
                         if feed_entry['title'] == entry['title'] and feed_entry['url'] == entry['url']:
@@ -391,7 +396,7 @@ class FilterSeries:
                 
                 # episode (with this id) has been downloaded
                 if self.downloaded(feed, best):
-                    log.debug('Rejecting all instances of %s' % identifier)
+                    #log.debug('Rejecting all instances of %s' % identifier)
                     for ep in eps:
                         feed.reject(ep.entry)
                     continue
@@ -402,7 +407,7 @@ class FilterSeries:
                     season = wconf.get('season', -1)
                     episode = wconf.get('episode', maxint)
                     if best.season < season or (best.season == season and best.episode <= episode):
-                        log.debug('Rejecting all instances of %s' % identifier)
+                        #log.debug('Rejecting all instances of %s' % identifier)
                         for ep in eps:
                             feed.reject(ep.entry)
                         continue
@@ -433,7 +438,7 @@ class FilterSeries:
                     found_enough = False
                     for ep in eps:
                         if self.cmp_quality(enough, ep.quality) >= 0: # 1=greater, 0=equal, -1=does not meet
-                            log.debug('Episode %s meets quality %s' % (ep.entry['title'], enough))
+                            log.debug('Accepting. Episode %s meets quality %s' % (ep.entry['title'], enough))
                             self.accept_serie(feed, ep)
                             found_enough = True
                             break
@@ -443,14 +448,16 @@ class FilterSeries:
                     # timeframe
                     diff = datetime.today() - self.get_first_seen(feed, best)
                     age_hours = divmod(diff.seconds, 60*60)[0]
-                    log.debug('age hours: %i, seconds: %i - %s ' % (age_hours, diff.seconds, best))
-                    log.debug('best ep in %i hours is %s' % (hours, best))
+                    log.debug('Age hours: %i, seconds: %i - %s ' % (age_hours, diff.seconds, best))
+                    log.debug('Best ep in %i hours is %s' % (hours, best))
                     # log when it is added to timeframe wait list (a bit hacky way to detect first time, by age)
                     if (diff.seconds < 60) and not feed.unittest:
                         log.info('Timeframe waiting %s for %s hours, currently best is %s' % (name, hours, best.entry['title']))
                     if age_hours >= hours or stop:
                         if stop:
                             log.info('Stopped timeframe, accepting %s' % (best.entry['title']))
+                        else:
+                            log.info('Timeframe expired, accepting %s' % (best.entry['title']))
                         self.accept_serie(feed, best)
                     else:
                         log.debug('Timeframe ignoring %s' % (best.entry['title']))
