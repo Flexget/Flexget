@@ -1,6 +1,5 @@
 import logging
 import urlparse
-import urllib2
 import xml.sax
 from feed import Entry
 from manager import ModuleWarning
@@ -117,8 +116,11 @@ class InputRSS:
         # get the feed & parse
         try:
             rss = feedparser.parse(url, etag=etag, modified=modified)
-        except IOError:
-            raise Exception('IOError when loading feed %s', feed.name)
+        except IOError, e:
+            if hasattr(e, 'reason'):
+                raise ModuleWarning('Failed to reach server. Reason: %s' % e.reason)
+            elif hasattr(e, 'code'):
+                raise ModuleWarning('The server couldn\'t fulfill the request. Error code: %s' % e.code)
 
         # status checks
         status = rss.get('status', False)
@@ -133,7 +135,7 @@ class InputRSS:
             elif status == 500:
                 raise ModuleWarning('Internal server exception on feed %s' % feed.name, log)
         else:
-            log.error('rss does not have status: %s' % rss)
+            log.debug('RSS does not have status: %s' % rss)
             
         # check for bozo
         ex = rss.get('bozo_exception', False)
@@ -149,8 +151,11 @@ class InputRSS:
                 ignore = True
             elif isinstance(ex, xml.sax._exceptions.SAXParseException):
                 raise ModuleWarning('RSS Feed %s is not valid XML' % feed.name, log)
-            elif isinstance(ex, urllib2.URLError):
-                raise ModuleWarning('urllib2.URLError', log)
+            elif isinstance(ex, IOError):
+                if hasattr(ex, 'reason'):
+                    raise ModuleWarning('Failed to reach server. Reason: %s' % ex.reason)
+                elif hasattr(ex, 'code'):
+                    raise ModuleWarning('The server couldn\'t fulfill the request. Error code: %s' % ex.code)
             else:
                 raise ModuleWarning('Unhandled bozo_exception. Type: %s.%s (feed: %s)' % (ex.__class__.__module__, ex.__class__.__name__ , feed.name), log)
 
