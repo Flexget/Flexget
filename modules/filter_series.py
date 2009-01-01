@@ -447,12 +447,13 @@ class FilterSeries:
                             
                     # timeframe
                     diff = datetime.today() - self.get_first_seen(feed, best)
-                    age_hours = divmod(diff.seconds, 60*60)[0]
+                    age_hours = divmod(diff.days*24*60*60 + diff.seconds, 60*60)[0]
                     log.debug('Age hours: %i, seconds: %i - %s ' % (age_hours, diff.seconds, best))
                     log.debug('Best ep in %i hours is %s' % (hours, best))
                     # log when it is added to timeframe wait list (a bit hacky way to detect first time, by age)
                     if (diff.seconds < 60) and not feed.unittest:
                         log.info('Timeframe waiting %s for %s hours, currently best is %s' % (name, hours, best.entry['title']))
+                    # stop timeframe
                     if age_hours >= hours or stop:
                         if stop:
                             log.info('Stopped timeframe, accepting %s' % (best.entry['title']))
