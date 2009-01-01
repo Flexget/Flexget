@@ -1,7 +1,9 @@
 import logging
 import smtplib
 import email.Message
+import socket
 from validator import DictValidator
+from manager import ModuleWarning
 
 __pychecker__ = 'unusednames=parser'
 
@@ -154,7 +156,10 @@ FlexGet has just downloaded %d new entries for feed %s :
         if feed.manager.options.test:
             log.info('Would send email : %s' % message.as_string())
         else:
-            mailServer = smtplib.SMTP(config['smtp_host'], config['smtp_port'])
+            try:
+                mailServer = smtplib.SMTP(config['smtp_host'], config['smtp_port'])
+            except socket.error, (value, message):
+                raise ModuleWarning('Socket error: ' + message)
 
             if config['smtp_tls']:
                 mailServer.ehlo()
