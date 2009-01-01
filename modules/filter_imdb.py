@@ -441,12 +441,11 @@ class FilterImdb:
                 try:
                     search = ImdbSearch()
                     movie = search.smart_match(entry['title'])
-                except timeout:
-                    log.error('Timeout when searching for %s' % entry['title'])
-                    feed.filter(entry)
-                    continue
-                except urllib2.URLError:
-                    log.error('URLError when searching for %s' % entry['title'])
+                except IOError, e:
+                    if hasattr(e, 'reason'):
+                        log.error('Failed to reach server. Reason: %s' % e.reason)
+                    elif hasattr(e, 'code'):
+                        log.error('The server couldn\'t fulfill the request. Error code: %s' % e.code)
                     feed.filter(entry)
                     continue
                 if movie:
@@ -479,20 +478,23 @@ class FilterImdb:
                         feed.filter(entry)
                         # store cache so this will be skipped
                         feed.shared_cache.store(entry['imdb_url'], imdb.to_yaml())
-                        continue # next entry
+                        continue
                     except ValueError:
                         log.error('Invalid parameter: %s' % entry['imdb_url'])
                         feed.filter(entry)
-                        continue # next entry
-                    except urllib2.HTTPError, he:
-                        feed.log_once('Invalid imdb url %s ? %s' % (entry['imdb_url'], he), log)
+                        continue
+                    except IOError, e:
+                        if hasattr(e, 'reason'):
+                            log.error('Failed to reach server. Reason: %s' % e.reason)
+                        elif hasattr(e, 'code'):
+                            log.error('The server couldn\'t fulfill the request. Error code: %s' % e.code)
                         feed.filter(entry)
-                        continue # next entry
+                        continue
                     except Exception, e:
                         feed.filter(entry)
                         log.error('Unable to process url %s' % entry['imdb_url'])
                         log.exception(e)
-                        continue # next entry
+                        continue
                 else:
                     imdb.from_yaml(cached)
                 # store to cache

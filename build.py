@@ -1,6 +1,4 @@
 import os, sys, re
-import shutil
-import time
 from optparse import OptionParser
 import subprocess
     
