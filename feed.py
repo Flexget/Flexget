@@ -346,7 +346,10 @@ class Feed:
             # verbose some progress
             if event == 'input':
                 self.verbose_details_entries()
-                self.verbose_progress('Feed %s produced %s entries.' % (self.name, len(self.entries)))
+                if not self.entries:
+                    self.verbose_progress('Feed %s didn\'t produce any entries. This is likelly to be misconfigured or non-functional input.' % self.name)
+                else:
+                    self.verbose_progress('Feed %s produced %s entries.' % (self.name, len(self.entries)))
             if event == 'filter':
                 self.verbose_progress('Feed %s filtered %s entries (%s remains).' % (self.name, self.__purged, len(self.entries)))
             # if abort flag has been set feed should be aborted now
