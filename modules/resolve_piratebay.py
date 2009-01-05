@@ -92,5 +92,6 @@ class ResolvePirateBay:
             score_b = b['seed']*2 + b['leech']
             return cmp(score_a, score_b)
 
-        torrents.sort(best, reverse=True)
+        torrents.sort(best)
+        torrents.reverse()
         return torrents[0]['link']

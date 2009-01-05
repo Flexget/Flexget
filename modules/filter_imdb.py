@@ -277,7 +277,7 @@ class ImdbParser:
         # get votes
         tag_votes = soup.find('b', text=re.compile('\d votes'))
         if tag_votes:
-            str_votes = ''.join(c for c in tag_votes.string if c.isdigit())
+            str_votes = ''.join([c for c in tag_votes.string if c.isdigit()])
             self.votes = int(str_votes)
             log.debug('Detected votes: %s' % self.votes)
         else:
