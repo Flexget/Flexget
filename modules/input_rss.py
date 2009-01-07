@@ -172,10 +172,11 @@ class InputRSS:
             etag = rss.etag.replace("'", '').replace('"', '')
             feed.cache.store('etag', etag, 90)
             log.debug('etag %s saved for feed %s' % (etag, feed.name))
-        elif rss.headers.has_key('last-modified'):
-            feed.cache.store('modified', rss.modified, 90)
-            log.debug('last modified saved for feed %s', feed.name)
-
+        elif hasattr(rss, 'headers'):
+            if rss.headers.has_key('last-modified'):
+                feed.cache.store('modified', rss.modified, 90)
+                log.debug('last modified saved for feed %s', feed.name)
+        
         # field name for url can be configured by setting link. 
         # default value is auto but for example guid is used in some feeds
         curl = config.get('link', 'auto')

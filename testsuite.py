@@ -28,12 +28,17 @@ class FlexGetTestCase(unittest.TestCase):
             raise Exception('module %s isn\'t loaded (event %s)' % (keyword, event))
         return module
         
-    def has_entry(self, title):
-        """Return true if feed containt entry with given title"""
+    def get_entry(self, **values):
+        """Get entry from feed with given parameters"""
         for entry in self.feed.entries:
-            if entry['title'] == title: 
-                return True
-        return False
+            match = 0
+            for k, v in values.iteritems():
+                if entry.has_key(k):
+                    if entry.get(k) == v: 
+                        match += 1
+            if match==len(values):
+                return entry
+        return None
     
 
 class TestFilterSeries(FlexGetTestCase):
@@ -96,17 +101,17 @@ class TestFilterSeries(FlexGetTestCase):
         self.assertEqual(s.get('S1E20', {}).get('info').get('downloaded'), False)
         
         # normal passing
-        if not self.has_entry('Another.Series.S01E20.720p.XViD-FlexGet'):
+        if not self.get_entry(title='Another.Series.S01E20.720p.XViD-FlexGet'):
             self.fail('Another.Series.S01E20.720p.XViD-FlexGet should have passed')
         # episode advancement
-        if self.has_entry('Another.Series.S01E10.720p.XViD-FlexGet'):
-            self.fail('Another.Series.S01E10.720p.XViD-FlexGet should not have passed because of episode advancement')
-        if not self.has_entry('Another.Series.S01E16.720p.XViD-FlexGet'):
+        if self.get_entry(title='Another.Series.S01E10.720p.XViD-FlexGet'):
+            self.fail('Another.Series.S01E10.720p.XViD-FlexGet should NOT have passed because of episode advancement')
+        if not self.get_entry(title='Another.Series.S01E16.720p.XViD-FlexGet'):
             self.fail('Another.Series.S01E16.720p.XViD-FlexGet should have passed because of episode advancement grace magin')
         # date formats
         df = ['Date.Series.10-11-2008.XViD','Date.Series.10.12.2008.XViD','Date.Series.2008-10-13.XViD','Date.Series.2008x10.14.XViD']
         for d in df:
-            if not self.has_entry(d):
+            if not self.get_entry(title=d):
                 self.fail('Date format did not match %s' % d)
 
 
@@ -244,7 +249,52 @@ class TestDownload(FlexGetTestCase):
             self.fail('download file does not exists')
         else:
             os.remove(self.testfile)
-    
+
+class TestInputRSS(FlexGetTestCase):
+
+    def setUp(self):
+        self.config = 'test/test_rss.yml'
+        FlexGetTestCase.setUp(self)
+
+    def testInputRSS(self):
+        self.feed.execute()
+        
+        # normal entry
+        if not self.get_entry(title='Normal', url='http://localhost/normal', description='Description, normal'):
+            self.fail('RSS entry missing: normal')
+        
+        # multiple enclosures
+        if not self.get_entry(title='Multiple enclosures', url='http://localhost/enclosure1', filename='enclosure1', description='Description, multiple'):
+            self.fail('RSS entry missing: enclosure1')
+        if not self.get_entry(title='Multiple enclosures', url='http://localhost/enclosure2', filename='enclosure2', description='Description, multiple'):
+            self.fail('RSS entry missing: enclosure2')
+        if not self.get_entry(title='Multiple enclosures', url='http://localhost/enclosure3', filename='enclosure3', description='Description, multiple'):
+            self.fail('RSS entry missing: enclosure3')
+        
+        # zero sized enclosure should not pick up filename (some idiotic sites)
+        e = self.get_entry(title='Zero sized enclosure')
+        if not e:
+            self.fail('RSS entry missing: zero sized')
+        if e.has_key('filename'):
+            self.fail('RSS entry with 0-sized enclosure should not have explicit filename')
+        
+        # messy enclosure
+        e = self.get_entry(title='Messy enclosure')
+        if not e:
+            self.fail('RSS entry missing: messy')
+        if not e.has_key('filename'):
+            self.fail('Messy RSS enclosure: missing filename')
+        if e['filename'] != 'enclosure.mp3':
+            self.fail('Messy RSS enclosure: wrong filename')
+        
+        # pick link from guid
+        if not self.get_entry(title='Guid link', url='http://localhost/guid', description='Description, guid'):
+            self.fail('RSS entry missing: guid')
+            
+        # empty title, should be skipped
+        if self.get_entry(description='Description, empty title'):
+            self.fail('RSS entry without title should be skipped')
+        
     
 if __name__ == '__main__':
     suite = unittest.TestSuite()
@@ -254,5 +304,6 @@ if __name__ == '__main__':
     suite.addTest(unittest.makeSuite(TestManager))
     suite.addTest(unittest.makeSuite(TestCache))
     suite.addTest(unittest.makeSuite(TestDownload))
+    suite.addTest(unittest.makeSuite(TestInputRSS))
     # run suite
     unittest.TextTestRunner(verbosity=2).run(suite)

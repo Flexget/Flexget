@@ -1,0 +1,4 @@
+feeds:
+  test:
+    rss: test/test_rss.xml
+    dump: true
