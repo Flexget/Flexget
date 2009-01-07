@@ -1,6 +1,7 @@
 import logging
 import urlparse
 import xml.sax
+import re
 from feed import Entry
 from manager import ModuleWarning
 
@@ -153,9 +154,9 @@ class InputRSS:
                 raise ModuleWarning('RSS Feed %s is not valid XML' % feed.name, log)
             elif isinstance(ex, IOError):
                 if hasattr(ex, 'reason'):
-                    raise ModuleWarning('Failed to reach server. Reason: %s' % ex.reason)
+                    raise ModuleWarning('Failed to reach server. Reason: %s' % ex.reason, log)
                 elif hasattr(ex, 'code'):
-                    raise ModuleWarning('The server couldn\'t fulfill the request. Error code: %s' % ex.code)
+                    raise ModuleWarning('The server couldn\'t fulfill the request. Error code: %s' % ex.code, log)
             else:
                 raise ModuleWarning('Unhandled bozo_exception. Type: %s.%s (feed: %s)' % (ex.__class__.__module__, ex.__class__.__name__ , feed.name), log)
 
@@ -223,8 +224,14 @@ class InputRSS:
                     # if enclosure has size OR there are multiple enclosures use filename from url
                     if ee.get('size', 0) != 0 or len(enclosures)>1:
                         if ee['url'].rfind != -1:
-                            ee['filename'] = ee['url'][ee['url'].rfind('/')+1:]
-                            log.debug('filename %s from enclosure' % ee['filename'])
+                            # parse filename from enclosure url
+                            # TODO: better and perhaps join/in download module? also see urlparse module
+                            m = re.search('.*\/([^?#]*)', ee['url'])
+                            if m:
+                                ee['filename'] = m.group(1)
+                                log.debug('filename %s from enclosure' % ee['filename'])
+                            else:
+                                log.debug('failed to parse filename from %s' % ee['url'])
                     add_entry(ee)
                 continue
 

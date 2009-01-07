@@ -282,7 +282,8 @@ class Feed:
         modules = self.manager.get_modules_by_event(event)
         # Sort modules based on module event priority
         # Priority can be also configured in which case given value overwrites module default.
-        modules.sort(lambda x,y: self.__sort_modules(x,y, event), reverse=True)
+        modules.sort(lambda x,y: self.__sort_modules(x,y, event))
+        modules.reverse()
 
         for module in modules:
             keyword = module['name']
