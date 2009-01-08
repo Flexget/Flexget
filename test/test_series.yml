@@ -12,6 +12,7 @@ feeds:
       - {title: 'Date.Series.10.12.2008.XViD', url: 'http://localhost/irrelevant'}
       - {title: 'Date.Series.2008-10-13.XViD', url: 'http://localhost/irrelevant'}
       - {title: 'Date.Series.2008x10.14.XViD', url: 'http://localhost/irrelevant'}
+      - {title: 'Useless title', url: 'http://localhost/irrelevant', filename: 'Filename.Series.S01E26.XViD'}
     series:
       - some series:
           timeframe:
@@ -19,3 +20,4 @@ feeds:
             enough: 1080p
       - another series
       - date series
+      - filename series
