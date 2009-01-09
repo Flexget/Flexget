@@ -14,8 +14,7 @@ class FlexGetTestCase(unittest.TestCase):
         self.manager.options.reset = True
         self.manager.initialize()
         # test feed for easy access
-        config = self.manager.config['feeds']['test']
-        self.feed = Feed(self.manager, 'test', config)
+        self.feed = Feed(self.manager, 'test', self.manager.config['feeds']['test'])
         self.feed.unittest = True
         
     def tearDown(self):
@@ -116,6 +115,10 @@ class TestFilterSeries(FlexGetTestCase):
         # parse from filename
         if not self.get_entry(filename='Filename.Series.S01E26.XViD'):
             self.fail('Filename parsing failed')
+        # empty description
+        if not self.get_entry(title='Empty.Description.S01E22.XViD'):
+            self.fail('Empty Description failed')
+        
 
 
 class TestPatterns(FlexGetTestCase):
@@ -203,6 +206,71 @@ class TestManager(FlexGetTestCase):
         self.manager.add_failed(e)
         assert len(self.manager.session['failed']) == 2, 'failed to filter already added'
 
+class TestFilterSeen(FlexGetTestCase):
+        
+    def setUp(self):
+        self.config = 'test/test_seen.yml'
+        FlexGetTestCase.setUp(self)
+        
+    def testSeen(self):
+        self.feed.execute()
+        if not self.get_entry(title='Seen title 1'):
+            self.fail('Test entry missing')
+        # run again, should filter
+        self.feed.execute()
+        if self.get_entry(title='Seen title 1'):
+            self.fail('Seen test entry remains')
+            
+        # execute another feed
+        
+        self.feed = Feed(self.manager, 'test2', self.manager.config['feeds']['test2'])
+        self.feed.unittest = True
+        self.feed.execute()
+        # should not contain since fields seen in previous feed
+        if self.get_entry(title='Seen title 1'):
+            self.fail('Seen test entry 1 remains in second feed')
+        if self.get_entry(title='Seen title 2'):
+            self.fail('Seen test entry 2 remains in second feed')
+        # new item in feed should exists
+        if not self.get_entry(title='Seen title 3'):
+            self.fail('Unseen test entry 3 not in second feed')
+            
+
+class TestFilterSeenMovies(FlexGetTestCase):
+
+    def setUp(self):
+        self.config = 'test/test_seen_movies.yml'
+        FlexGetTestCase.setUp(self)
+            
+    def testSeenMovies(self):
+        self.feed.execute()
+        if not self.get_entry(title='Seen movie title 1'):
+            self.fail('Test movie entry 1 is missing')
+        # should be filtered, duplicate imdb url
+        if self.get_entry(title='Seen movie title 2'):
+            self.fail('Test movie entry 2 should be filtered')
+        # execute again
+        self.feed.execute()
+        if self.get_entry(title='Seen movie title 1'):
+            self.fail('Test movie entry 1 should be filtered in second execution')
+        if self.get_entry(title='Seen movie title 2'):
+            self.fail('Test movie entry 2 should be filtered in second execution')
+
+        # execute another feed
+
+        self.feed = Feed(self.manager, 'test2', self.manager.config['feeds']['test2'])
+        self.feed.unittest = True
+        self.feed.execute()
+
+        # should not contain since fields seen in previous feed
+        if self.get_entry(title='Seen movie title 3'):
+            self.fail('seen movie 3 exists')
+        if self.get_entry(title='Seen movie title 4'):
+            self.fail('seen movie 4 exists')
+        if not self.get_entry(title='Seen movie title 5'):
+            self.fail('unseen movie 5 exists')
+        
+        
 class TestCache(unittest.TestCase):
 
     def setUp(self):
@@ -304,6 +372,8 @@ if __name__ == '__main__':
     suite.addTest(unittest.makeSuite(TestPatterns))
     suite.addTest(unittest.makeSuite(TestResolvers))
     suite.addTest(unittest.makeSuite(TestFilterSeries))
+    suite.addTest(unittest.makeSuite(TestFilterSeen))
+    suite.addTest(unittest.makeSuite(TestFilterSeenMovies))
     suite.addTest(unittest.makeSuite(TestManager))
     suite.addTest(unittest.makeSuite(TestCache))
     suite.addTest(unittest.makeSuite(TestDownload))

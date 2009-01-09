@@ -34,7 +34,7 @@ class SerieParser:
 
     def parse(self):
         if not self.name or not self.data:
-            raise Exception('SerieParser missing either name or data')
+            raise Exception('SerieParser initialization error, name: %s data: %s' % (repr(self.name), repr(self.data)))
         if not isinstance(self.name, basestring):
             raise Exception('SerieParser name is not a string, got %s' % repr(self.name))
         if not isinstance(self.data, basestring):
@@ -360,7 +360,9 @@ class FilterSeries:
             for entry in feed.entries:
                 valid = False
                 for field, data in entry.iteritems():
+                    # skip non string values and empty strings
                     if not isinstance(data, basestring): continue
+                    if not data: continue
                     # TODO: improve, use only single instance to test?
                     serie = SerieParser()
                     serie.name = str(name)

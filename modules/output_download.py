@@ -66,7 +66,8 @@ class ModuleDownload:
                 if feed.manager.options.test:
                     log.info('Would download %s' % entry['title'])
                 else:
-                    log.info('Downloading %s' % entry['title'])
+                    if not feed.unittest:
+                        log.info('Downloading %s' % entry['title'])
                     self.download(feed, entry)
             except urllib2.HTTPError, e:
                 feed.fail(entry)

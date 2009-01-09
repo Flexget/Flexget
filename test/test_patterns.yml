@@ -11,8 +11,8 @@ feeds:
       # unmatched
       - {title: 'unmatched', url: 'http://localhost/unmatched'}
       # not
-      - {title: 'foobar', url: 'http://localhost/'}
-      - {title: 'xxx.yyyy', url: 'http://localhost/', 'imdb_score': 5}
+      - {title: 'foobar', url: 'http://localhost/foobar'}
+      - {title: 'xxx.yyyy', url: 'http://localhost/xxx.yyyy', 'imdb_score': 5}
     patterns:
       - pattern
       - foo: {not: bar}
