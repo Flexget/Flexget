@@ -394,7 +394,7 @@ if __name__ == '__main__':
     suite.addTest(unittest.makeSuite(TestInputRSS))
     
     # online test disabled until commandline can be added
-    # adding options proved problematic flexget managers commandline parsing ...
+    # adding options proved problematic since flexget manager parses commandline as well ...
     
     #suite.addTest(unittest.makeSuite(TestImdbOnline))
     
