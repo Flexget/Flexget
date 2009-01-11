@@ -113,7 +113,8 @@ class Subtitles:
 
                     if langsubs:
                         # find the best one by SubRating
-                        langsubs.sort(key=lambda x: float(x['SubRating']), reverse=True)
+                        langsubs.sort(key=lambda x: float(x['SubRating']))
+                        langsubs.reverse()
                         filtered_subs.append(langsubs[0])
 
             # download

@@ -48,9 +48,12 @@ class InputHtml:
             page = urllib2.urlopen(pageurl)
             soup = BeautifulSoup(page)
         except timeout:
-            raise ModuleWarning('Timed out opening page')
-        except urllib2.URLError:
-            raise ModuleWarning('URLError when opening page')
+            raise ModuleWarning('Timed out while opening url')
+        except IOError, e:
+            if hasattr(e, 'reason'):
+                raise ModuleWarning('Failed to reach server. Reason: %s' % e.reason, log)
+            elif hasattr(e, 'code'):
+                raise ModuleWarning('The server couldn\'t fulfill the request. Error code: %s' % e.code, log)
         
         for link in soup.findAll('a'):
             if not link.has_key('href'): continue
@@ -67,6 +70,7 @@ class InputHtml:
                 url = urlparse.urljoin(pageurl, url)
                 
             # in case the title contains xxxxxxx.torrent - foooo.torrent clean it a bit (get upto first .torrent)
+            # TODO: hack
             if title.lower().find('.torrent') > 0:
                 title = title[:title.lower().find('.torrent')]
 

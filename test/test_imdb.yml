@@ -1,0 +1,10 @@
+feeds:
+  test:
+    input_mock:
+      # tests search
+      - {title: 'Spirited Away', url: 'http://localhost/imdb/spirited_away'}
+      # tests direct url
+      - {title: 'Princess Mononoke', url: 'http://localhost/imdb/princess_mononoke', imdb_url: 'http://www.imdb.com/title/tt0119698/'}
+    imdb:
+      min_votes: 20
+    dump: true

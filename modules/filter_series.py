@@ -34,7 +34,7 @@ class SerieParser:
 
     def parse(self):
         if not self.name or not self.data:
-            raise Exception('SerieParser missing either name or data')
+            raise Exception('SerieParser initialization error, name: %s data: %s' % (repr(self.name), repr(self.data)))
         if not isinstance(self.name, basestring):
             raise Exception('SerieParser name is not a string, got %s' % repr(self.name))
         if not isinstance(self.data, basestring):
@@ -358,26 +358,32 @@ class FilterSeries:
 
             series = {} # ie. S1E2: [Serie Instance, Serie Instance, ..]
             for entry in feed.entries:
-                serie = SerieParser()
-                serie.name = str(name)
-                serie.data = entry['title']
-                serie.ep_regexps = ep_patterns + serie.ep_regexps
-                serie.id_regexps = id_patterns + serie.id_regexps
-                # do not use builtin list for id when ep configured and vice versa
-                if conf.has_key('ep_patterns') and not conf.has_key('id_patterns'):
-                    serie.id_regexps = []
-                if conf.has_key('id_patterns') and not conf.has_key('ep_patterns'):
-                    serie.ep_regexps = []
-                
-                serie.name_regexps.extend(name_patterns)
-                try:
+                valid = False
+                for field, data in entry.iteritems():
+                    # skip non string values and empty strings
+                    if not isinstance(data, basestring): continue
+                    if not data: continue
+                    # TODO: improve, use only single instance to test?
+                    serie = SerieParser()
+                    serie.name = str(name)
+                    serie.data = data
+                    serie.ep_regexps = ep_patterns + serie.ep_regexps
+                    serie.id_regexps = id_patterns + serie.id_regexps
+                    # do not use builtin list for id when ep configured and vice versa
+                    if conf.has_key('ep_patterns') and not conf.has_key('id_patterns'):
+                        serie.id_regexps = []
+                    if conf.has_key('id_patterns') and not conf.has_key('ep_patterns'):
+                        serie.ep_regexps = []
+                    serie.name_regexps.extend(name_patterns)
                     serie.parse()
-                except Exception, e:
-                    feed.fail(entry)
-                    log.error(e)
-                # serie is not valid if it does not match given name / regexp or fails with exception
-                if not serie.valid:
+                    # serie is not valid if it does not match given name / regexp or fails with exception
+                    if serie.valid:
+                        valid = True
+                        break
+                
+                if not valid:
                     continue
+
                 # set custom download path
                 if conf.has_key('path'):
                     log.debug('setting %s custom path to %s' % (entry['title'], conf.get('path')))

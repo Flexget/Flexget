@@ -20,7 +20,7 @@ class FilterSeen:
         manager.register('seen', builtin=True, filter_priority=255)
 
         # remember and filter by these fields
-        self.fields = ['original_url', 'title']
+        self.fields = ['original_url', 'title', 'url']
 
     def validate(self, config):
         if not isinstance(config, bool):
@@ -29,6 +29,7 @@ class FilterSeen:
 
     def feed_filter(self, feed):
         """Filter seen entries"""
+        duplicates = []
         for entry in feed.entries:
             for field in self.fields:
                 if not entry.has_key(field):
@@ -37,6 +38,23 @@ class FilterSeen:
                 if feed.shared_cache.get(entry[field], False) or feed.shared_cache.get(urllib.unquote(entry[field]), False):
                     log.debug("Rejecting '%s' '%s' because of seen '%s'" % (entry['url'], entry['title'], field))
                     feed.reject(entry)
+
+            # scan for duplicates
+            for duplicate in feed.entries:
+                if entry == duplicate or entry in duplicates: 
+                    continue
+                for field in self.fields:
+                    if field in ['title']:
+                        # allow duplicates with these fields
+                        continue
+                    if entry.get(field, object()) == duplicate.get(field, object()):
+                        log.debug('Rejecting %s because of duplicate field %s' % (duplicate['title'], field))
+                        feed.reject(duplicate)
+                        # TODO: if / when entry has multiple entries it should combine these two entries
+                        # now the duplicate is just rejected and considered seen
+                        feed.shared_cache.store(duplicate[field], True, 365)
+                        duplicates.append(duplicate)
+                    
 
     def feed_exit(self, feed):
         """Remember succeeded entries"""

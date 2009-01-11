@@ -42,6 +42,7 @@ class ResolveGoogleCse:
                 raise ResolverException('No results')
             for res in results:
                 url = res.get('href')
+                url = url.replace('/interstitial?url=', '')
                 # generate match regexp from google search result title
                 regexp = '.*'.join([x.string for x in res.findAll('em')])
                 if re.match(regexp, entry['title']):
