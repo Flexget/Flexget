@@ -142,8 +142,8 @@ class ImdbSearch:
     def search(self, name):
         """Return array of movie details (dict)"""
         log.debug('Searching: %s' % name)
-        url = "http://www.imdb.com/find?" + urllib.urlencode({'q':name, 's':'all'})
-        log.debug('Serch query: %s' % url)
+        url = u'http://www.imdb.com/find?' + urllib.urlencode({'q':name.encode('latin1'), 's':'all'})
+        log.debug('Serch query: %s' % repr(url))
         page = urllib2.urlopen(url)
         actual_url = page.geturl()
 

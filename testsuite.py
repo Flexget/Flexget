@@ -1,4 +1,4 @@
-import os, unittest
+import os, sys, unittest
 from manager import Manager
 from feed import Feed, Entry
 
@@ -365,7 +365,21 @@ class TestInputRSS(FlexGetTestCase):
         # empty title, should be skipped
         if self.get_entry(description='Description, empty title'):
             self.fail('RSS entry without title should be skipped')
+
+
+class TestImdbOnline(FlexGetTestCase):
+
+    def setUp(self):
+        self.config = 'test/test_imdb.yml'
+        FlexGetTestCase.setUp(self)
         
+    def testParse(self):
+        self.feed.execute()
+        if not self.get_entry(imdb_name='Sen to Chihiro no kamikakushi'):
+            self.fail('Failed imdb lookup (search)')
+        if not self.get_entry(imdb_name='Mononoke-hime'):
+            self.fail('Failed imdb lookup (direct)')
+            
     
 if __name__ == '__main__':
     suite = unittest.TestSuite()
@@ -378,5 +392,11 @@ if __name__ == '__main__':
     suite.addTest(unittest.makeSuite(TestCache))
     suite.addTest(unittest.makeSuite(TestDownload))
     suite.addTest(unittest.makeSuite(TestInputRSS))
+    
+    # online test disabled until commandline can be added
+    # adding options proved problematic flexget managers commandline parsing ...
+    
+    #suite.addTest(unittest.makeSuite(TestImdbOnline))
+    
     # run suite
     unittest.TextTestRunner(verbosity=2).run(suite)
