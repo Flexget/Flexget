@@ -69,16 +69,12 @@ class ModuleDownload:
                     if not feed.unittest:
                         log.info('Downloading %s' % entry['title'])
                     self.download(feed, entry)
-            except urllib2.HTTPError, e:
-                feed.fail(entry)
-                log.error('HTTP Error: %s' % e)
             except IOError, e:
-                feed.fail(entry)
-                log.warning('Timed out %s' % entry['title'])
-                log.exception('Execute downloads: %s' % e)
-            except Exception, e:
-                feed.fail(entry)
-                log.exception('Execute downloads: %s' % e)
+                self.fail(entry)
+                if hasattr(e, 'reason'):
+                    log.error('Failed to reach server. Reason: %s' % e.reason)
+                elif hasattr(e, 'code'):
+                    log.error('The server couldn\'t fulfill the request. Error code: %s' % e.code)
 
     def download(self, feed, entry):
         log.debug('Downloading url %s' % entry['url'])
