@@ -402,7 +402,7 @@ class FilterSeries:
                 
                 # episode (with this id) has been downloaded
                 if self.downloaded(feed, best):
-                    #log.debug('Rejecting all instances of %s' % identifier)
+                    log.debug('Series %s episode %s is already downloaded, rejecting all occurences' % (name, identifier))
                     for ep in eps:
                         feed.reject(ep.entry)
                     continue
@@ -413,7 +413,7 @@ class FilterSeries:
                     season = wconf.get('season', -1)
                     episode = wconf.get('episode', maxint)
                     if best.season < season or (best.season == season and best.episode <= episode):
-                        #log.debug('Rejecting all instances of %s' % identifier)
+                        log.debug('Series %s episode %s is already watched, rejecting all occurences' % (name, identifier))
                         for ep in eps:
                             feed.reject(ep.entry)
                         continue
@@ -424,7 +424,7 @@ class FilterSeries:
                     # allow few episodes "backwards" incase missing
                     grace = len(series) + 1
                     if best.season < latest['season'] or (best.season == latest['season'] and best.episode < latest['episode'] - grace):
-                        log.debug('Episode advancement rejecting all instances of %s' % identifier)
+                        log.debug('Series %s episode %s does not meet episode advancement, rejecting all occurences' % (name, identifier))
                         for ep in eps:
                             feed.reject(ep.entry)
                         continue
@@ -444,7 +444,7 @@ class FilterSeries:
                     found_enough = False
                     for ep in eps:
                         if self.cmp_quality(enough, ep.quality) >= 0: # 1=greater, 0=equal, -1=does not meet
-                            log.debug('Accepting. Episode %s meets quality %s' % (ep.entry['title'], enough))
+                            log.debug('Timeframe accepting. %s meets quality %s' % (ep.entry['title'], enough))
                             self.accept_serie(feed, ep)
                             found_enough = True
                             break
