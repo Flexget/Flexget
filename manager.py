@@ -377,9 +377,8 @@ class Manager:
         """
         settings = self.config.get('settings', {})
         config = settings.get(keyword, {})
-        #print "keyword: %s defaults: %s config: %s" % (keyword, defaults, config)
-        self.merge_dict(defaults, config)
-        return config
+        self.merge_dict_from_to(config, defaults)
+        return defaults
 
     def register(self, name, **kwargs):
         """
@@ -563,13 +562,13 @@ class Manager:
         print 'Cleared %i items.' % len(self.session.setdefault('failed', []))
         self.session['failed'] = []
 
-    def merge_dict(self, d1, d2):
+    def merge_dict_from_to(self, d1, d2):
         """Merges dictionary d1 into dictionary d2. d1 will remain in original form."""
         for k, v in d1.items():
             if d2.has_key(k):
                 if type(v) == type(d2[k]):
                     if isinstance(v, dict):
-                        self.merge_dict(d1[k], d2[k])
+                        self.merge_dict_from_to(d1[k], d2[k])
                     elif isinstance(v, list):
                         d2[k].extend(v)
                     elif isinstance(v, basestring) or isinstance(v, bool) or isinstance(v, int):
@@ -617,7 +616,7 @@ class Manager:
                 # merge global configuration into this feed config
                 config = self.config['feeds'][name]
                 try:
-                    self.merge_dict(self.config.get('global', {}), config)
+                    self.merge_dict_from_to(self.config.get('global', {}), config)
                 except MergeException:
                     logging.critical('Global section has conflicting datatypes with feed %s configuration. Feed aborted.' % name)
                     continue

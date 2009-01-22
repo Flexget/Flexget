@@ -422,7 +422,7 @@ class FilterSeries:
                 if best.season and best.episode:
                     latest = self.get_latest_info(feed, best)
                     # allow few episodes "backwards" incase missing
-                    grace = len(series) + 1
+                    grace = len(series) + 2
                     if best.season < latest['season'] or (best.season == latest['season'] and best.episode < latest['episode'] - grace):
                         log.debug('Series %s episode %s does not meet episode advancement, rejecting all occurences' % (name, identifier))
                         for ep in eps:
