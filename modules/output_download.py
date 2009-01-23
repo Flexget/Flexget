@@ -70,7 +70,7 @@ class ModuleDownload:
                         log.info('Downloading %s' % entry['title'])
                     self.download(feed, entry)
             except IOError, e:
-                self.fail(entry)
+                feed.fail(entry)
                 if hasattr(e, 'reason'):
                     log.error('Failed to reach server. Reason: %s' % e.reason)
                 elif hasattr(e, 'code'):
