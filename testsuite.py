@@ -373,12 +373,27 @@ class TestImdbOnline(FlexGetTestCase):
         self.config = 'test/test_imdb.yml'
         FlexGetTestCase.setUp(self)
         
-    def testParse(self):
+    def testMovies(self):
         self.feed.execute()
         if not self.get_entry(imdb_name='Sen to Chihiro no kamikakushi'):
             self.fail('Failed imdb lookup (search)')
         if not self.get_entry(imdb_name='Mononoke-hime'):
             self.fail('Failed imdb lookup (direct)')
+        if not self.get_entry(imdb_name='Taken', imdb_url='http://www.imdb.com/title/tt0936501/'):
+            self.fail('Failed to pick correct Taken from search results')
+
+
+class TestRssOnline(FlexGetTestCase):
+
+    def setUp(self):
+        self.config = 'test/test_rss_online.yml'
+        FlexGetTestCase.setUp(self)
+        
+    def testFeeds(self):
+        # TODO:
+        pass
+    
+
             
     
 if __name__ == '__main__':
@@ -393,10 +408,11 @@ if __name__ == '__main__':
     suite.addTest(unittest.makeSuite(TestDownload))
     suite.addTest(unittest.makeSuite(TestInputRSS))
     
-    # online test disabled until commandline can be added
-    # adding options proved problematic since flexget manager parses commandline as well ...
-    
-    #suite.addTest(unittest.makeSuite(TestImdbOnline))
+    if '--online' in sys.argv:
+        print 'NOTE: Online tests are enabled'
+        suite.addTest(unittest.makeSuite(TestImdbOnline))
+    else:
+        print 'NOTE: Use --online argument to enable online tests. Some of these may fail since they depend on 3rd party services.'
     
     # run suite
     unittest.TextTestRunner(verbosity=2).run(suite)

@@ -31,7 +31,7 @@ class Search:
         
         modules = {}
         for m in feed.manager.get_modules_by_group('search'):
-            modules[m['name']] = m['instange']
+            modules[m['name']] = m['instance']
         
         for entry in feed.entries:
             # loop trough configured searches
