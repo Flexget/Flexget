@@ -47,6 +47,7 @@ class InputHtml:
         try:
             page = urllib2.urlopen(pageurl)
             soup = BeautifulSoup(page)
+            log.debug('Detected encoding %s' % soup.originalEncoding)
         except timeout:
             raise ModuleWarning('Timed out while opening url')
         except IOError, e:
