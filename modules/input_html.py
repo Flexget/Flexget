@@ -36,10 +36,14 @@ class InputHtml:
         
     def validate(self, config):
         # TODO: validate that parameter is url ...
+        # TODO: dump
         return []
 
     def feed_input(self, feed):
         if not soup_present: raise Exception(soup_err)
+        config = feed.config['html']
+        if not isinstance(config, dict):
+            config = {}
         pageurl = feed.get_input_url('html')
 
         log.debug('InputModule html requesting url %s' % pageurl)
@@ -47,13 +51,20 @@ class InputHtml:
         try:
             page = urllib2.urlopen(pageurl)
             soup = BeautifulSoup(page)
-        except timeout:
-            raise ModuleWarning('Timed out while opening url')
         except IOError, e:
             if hasattr(e, 'reason'):
                 raise ModuleWarning('Failed to reach server. Reason: %s' % e.reason, log)
             elif hasattr(e, 'code'):
                 raise ModuleWarning('The server couldn\'t fulfill the request. Error code: %s' % e.code, log)
+        
+        # dump received content into a file
+        if config.has_key('dump'):
+            name = config['dump']
+            log.info('Dumping %s into %s' % (pageurl, name))
+            data = soup.prettify()
+            f = open(name, 'w')
+            f.write(data)
+            f.close
         
         for link in soup.findAll('a'):
             if not link.has_key('href'): continue
