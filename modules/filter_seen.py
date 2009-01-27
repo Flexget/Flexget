@@ -29,6 +29,10 @@ class FilterSeen:
 
     def feed_filter(self, feed):
         """Filter seen entries"""
+        if not feed.config.get('seen', True):
+            log.debug('Seen is disabled')
+            return
+        
         duplicates = []
         for entry in feed.entries:
             for field in self.fields:
@@ -58,6 +62,10 @@ class FilterSeen:
 
     def feed_exit(self, feed):
         """Remember succeeded entries"""
+        if not feed.config.get('seen', True):
+            log.debug('Seen is disabled')
+            return
+
         for entry in feed.entries:
             for field in self.fields:
                 if not entry.has_key(field):

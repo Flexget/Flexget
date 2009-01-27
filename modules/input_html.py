@@ -35,9 +35,18 @@ class InputHtml:
         manager.register('html')
         
     def validate(self, config):
-        # TODO: validate that parameter is url ...
-        # TODO: dump
-        return []
+        """Validate given configuration"""
+        from validator import DictValidator
+        if isinstance(config, dict):
+            root = DictValidator()
+            root.accept('url', str, required=True)
+            root.accept('dump', str)
+            root.validate(config)
+            return rss.errors.messages
+        elif isinstance(config, str):
+            return []
+        else:
+            return ['wrong datatype']
 
     def feed_input(self, feed):
         if not soup_present: raise Exception(soup_err)

@@ -14,22 +14,40 @@ class FlexGetTestCase(unittest.TestCase):
         self.manager.options.reset = True
         self.manager.initialize()
         # test feed for easy access
-        self.feed = Feed(self.manager, 'test', self.manager.config['feeds']['test'])
-        self.feed.unittest = True
+        if self.manager.config.get('feeds', {}).has_key('test'):
+            self.feed = self.get_feed('test')
         
     def tearDown(self):
         self.manager.save_session()
         os.remove(self.manager.session_name)
+
+    def get_feed(self, name):
+        config = self.manager.config['feeds'][name]
+        try:
+            self.manager.merge_dict_from_to(self.manager.config.get('global', {}), config)
+        except MergeException:
+            logging.critical('Global section has conflicting datatypes with feed %s configuration. Feed aborted.' % name)
+    
+        feed = Feed(self.manager, name, config)
+        feed.unittest = True
+        return feed
         
-    def getModule(self, event, keyword):
+    def get_module(self, event, keyword):
         module = self.manager.modules.get(keyword)
         if not module:
             raise Exception('module %s isn\'t loaded (event %s)' % (keyword, event))
         return module
         
-    def get_entry(self, **values):
+    def get_entry(self, entries=None, **values):
         """Get entry from feed with given parameters"""
-        for entry in self.feed.entries:
+        
+        if hasattr(self, 'feed') and entries is None:
+            entries = self.feed.entries
+        
+        if entries is None:
+            raise Exception('get_entry needs a list')
+        
+        for entry in entries:
             match = 0
             for k, v in values.iteritems():
                 if entry.has_key(k):
@@ -38,7 +56,14 @@ class FlexGetTestCase(unittest.TestCase):
             if match==len(values):
                 return entry
         return None
-    
+
+    def dump(self, feed):
+        """Helper method for debugging"""
+        print 'entries=%s' % feed.entries
+        print 'accepted=%s' % feed.accepted
+        print 'filtered=%s' % feed.filtered
+        print 'rejected=%s' % feed.rejected
+        
 
 class TestFilterSeries(FlexGetTestCase):
 
@@ -118,8 +143,60 @@ class TestFilterSeries(FlexGetTestCase):
         # empty description
         if not self.get_entry(title='Empty.Description.S01E22.XViD'):
             self.fail('Empty Description failed')
-        
 
+class TestRegexp(FlexGetTestCase):
+
+    def setUp(self):
+        self.config = 'test/test_regexp.yml'
+        FlexGetTestCase.setUp(self)
+
+    def testAccept(self):
+        feed = self.get_feed('test_accept')
+        feed.execute()
+        if not self.get_entry(feed.accepted, title='regexp1'):
+            self.fail('regexp1 should have been accepter')
+        if not self.get_entry(feed.accepted, title='regexp2'):
+            self.fail('regexp2 should have been accepted')
+        if not self.get_entry(feed.accepted, title='regexp3'):
+            self.fail('regexp3 should have been accepted')
+        if not self.get_entry(feed.entries, title='regexp4'):
+            self.fail('regexp4 should have been left')
+        if not self.get_entry(feed.accepted, title='regexp2', path='~/custom_path/2/'):
+            self.fail('regexp2 should have been accepter with custom path')
+        if not self.get_entry(feed.accepted, title='regexp3', path='~/custom_path/3/'):
+            self.fail('regexp3 should have been accepter with custom path')
+            
+    def testFilter(self):
+        feed = self.get_feed('test_filter')
+        feed.execute()
+        if not self.get_entry(feed.filtered, title='regexp1'):
+            self.fail('regexp1 should have been filtered')
+        
+    def testReject(self):
+        feed = self.get_feed('test_reject')
+        feed.execute()
+        if not self.get_entry(feed.rejected, title='regexp1'):
+            self.fail('regexp1 should have been rejected')
+
+    def testRest(self):
+        feed = self.get_feed('test_rest')
+        feed.execute()
+        if not self.get_entry(feed.accepted, title='regexp1'):
+            self.fail('regexp1 should have been accepted')
+        if not self.get_entry(feed.filtered, title='regexp2'):
+            self.fail('regexp2 should have been filtered')
+        if not self.get_entry(feed.rejected, title='regexp3'):
+            self.fail('regexp3 should have been rejected')
+            
+    def testExcluding(self):
+        feed = self.get_feed('test_excluding')
+        feed.execute()
+        if self.get_entry(feed.accepted, title='regexp1'):
+            self.fail('regexp1 should not have been accepted')
+        if not self.get_entry(feed.accepted, title='regexp2'):
+            self.fail('regexp2 should have been accepted')
+        if not self.get_entry(feed.accepted, title='regexp3'):
+            self.fail('regexp3 should have been accepted')
 
 class TestPatterns(FlexGetTestCase):
 
@@ -131,13 +208,11 @@ class TestPatterns(FlexGetTestCase):
             self.fail('no entries')
                 
     def testPattern(self):
-        #module = self.getModule('filter', 'patterns')
         entry = self.feed.entries[0]
         self.assertEqual(entry['title'], 'pattern')
         self.assertEqual(entry['url'], 'http://localhost/pattern')
         
     def testAccept(self):
-        #module = self.getModule('filter', 'accept')
         entry = self.feed.entries[1]
         self.assertEqual(entry['title'], 'accept')
         self.assertEqual(entry['url'], 'http://localhost/accept')
@@ -383,6 +458,7 @@ class TestImdbOnline(FlexGetTestCase):
     
 if __name__ == '__main__':
     suite = unittest.TestSuite()
+    suite.addTest(unittest.makeSuite(TestRegexp))
     suite.addTest(unittest.makeSuite(TestPatterns))
     suite.addTest(unittest.makeSuite(TestResolvers))
     suite.addTest(unittest.makeSuite(TestFilterSeries))

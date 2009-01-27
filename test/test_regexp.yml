@@ -1,0 +1,57 @@
+# unittest
+
+
+global:
+  input_mock:
+    - {title: 'regexp1', url: 'http://localhost/regexp/1', 'imdb_score': 5}
+    - {title: 'regexp2', url: 'http://localhost/regexp/2', 'bool_attr': true}
+    - {title: 'regexp3', url: 'http://localhost/regexp/3', 'imdb_score': 5}
+    - {title: 'regexp4', url: 'http://localhost/regexp/4', 'imdb_score': 5}
+    - {title: 'regexp5', url: 'http://localhost/regexp/5', 'imdb_score': 5}
+    - {title: 'regexp6', url: 'http://localhost/regexp/6', 'imdb_score': 5}
+    - {title: 'regexp7', url: 'http://localhost/regexp/7', 'imdb_score': 5}
+    - {title: 'regexp8', url: 'http://localhost/regexp/8', 'imdb_score': 5}
+    - {title: 'regexp9', url: 'http://localhost/regexp/9', 'imdb_score': 5}
+  seen: false
+
+
+feeds:
+  # test accepting, setting custom path (both ways), test not (secondary regexp)
+  test_accept:
+    regexp:
+      accept:
+        - regexp1
+        - regexp2: ~/custom_path/2/
+        - regexp3:
+            path: ~/custom_path/3/
+        - regexp4:
+            not:
+              - exp4
+              
+  # test filtering
+  test_filter:
+    regexp:
+      filter:
+        - regexp1
+
+  # test rejecting        
+  test_reject:
+    regexp:
+      reject:
+        - regexp1
+        
+  # test rest
+  test_rest:
+    regexp:
+      accept:
+        - regexp1
+      filter:
+        - regexp2
+      rest: reject
+      
+      
+  # test excluding
+  test_excluding:
+    regexp:
+      accept_excluding:
+        - regexp1
