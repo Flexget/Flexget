@@ -42,7 +42,7 @@ class InputHtml:
             root.accept('url', str, required=True)
             root.accept('dump', str)
             root.validate(config)
-            return rss.errors.messages
+            return root.errors.messages
         elif isinstance(config, str):
             return []
         else:
