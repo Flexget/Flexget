@@ -75,11 +75,10 @@ class InputTVTorrents:
                 url = hashurl % (infohash,)
             else:
                 continue
-                
 
             if title == None: continue
 
-            title = str(title).strip()
+            title = title.strip()
             if not title: continue
 
             # fix broken urls

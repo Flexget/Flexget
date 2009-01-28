@@ -199,6 +199,7 @@ class Manager:
         took = time.clock() - start_time
         logging.debug('Initialize took %.2f seconds' % took)
         self.initialized = True
+        logging.debug('Default encoding: %s' % sys.getdefaultencoding())
 
     def load_config(self):
         """Load the configuration file"""

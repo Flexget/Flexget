@@ -4,6 +4,7 @@ import string
 from datetime import tzinfo, timedelta, datetime
 from feed import Entry
 from sys import maxint
+from manager import ModuleWarning
 
 __pychecker__ = 'unusednames=parser'
 
@@ -255,11 +256,12 @@ class FilterSeries:
     def validate(self, config):
         """Validate configuration format for this module"""
         from validator import ListValidator
-        serie = ListValidator()
+        series = ListValidator()
         # just plain names
-        serie.accept(str)
+        series.accept(str)
+        series.accept(int)
         # or "bundles" with serie name as key ..
-        bundle = serie.accept(dict)
+        bundle = series.accept(dict)
         # prevent invalid indentation level
         bundle.reject_keys(['path', 'timeframe', 'name_patterns', 'ep_patterns', 'id_patterns', 'watched'])
         # accept serie name, which can be anything ...
@@ -280,8 +282,8 @@ class FilterSeries:
         watched = options.accept('watched', dict)
         watched.accept('season', int)
         watched.accept('episode', int)
-        serie.validate(config)
-        return serie.errors.messages
+        series.validate(config)
+        return series.errors.messages
         
     # TODO: remove at some point
     def upgrade(self, feed):
@@ -343,6 +345,9 @@ class FilterSeries:
             conf = feed.manager.get_settings('series', {})
             if isinstance(name, dict):
                 name, conf = name.items()[0]
+                if conf is None:
+                    log.critical('Series %s has unexpected \':\'' % name)
+                    continue
                 # merge with default settings
                 conf = feed.manager.get_settings('series', conf)
 
@@ -402,7 +407,7 @@ class FilterSeries:
                 
                 # episode (with this id) has been downloaded
                 if self.downloaded(feed, best):
-                    #log.debug('Rejecting all instances of %s' % identifier)
+                    log.debug('Series %s episode %s is already downloaded, rejecting all occurences' % (name, identifier))
                     for ep in eps:
                         feed.reject(ep.entry)
                     continue
@@ -413,7 +418,7 @@ class FilterSeries:
                     season = wconf.get('season', -1)
                     episode = wconf.get('episode', maxint)
                     if best.season < season or (best.season == season and best.episode <= episode):
-                        #log.debug('Rejecting all instances of %s' % identifier)
+                        log.debug('Series %s episode %s is already watched, rejecting all occurences' % (name, identifier))
                         for ep in eps:
                             feed.reject(ep.entry)
                         continue
@@ -422,9 +427,9 @@ class FilterSeries:
                 if best.season and best.episode:
                     latest = self.get_latest_info(feed, best)
                     # allow few episodes "backwards" incase missing
-                    grace = len(series) + 1
+                    grace = len(series) + 2
                     if best.season < latest['season'] or (best.season == latest['season'] and best.episode < latest['episode'] - grace):
-                        log.debug('Episode advancement rejecting all instances of %s' % identifier)
+                        log.debug('Series %s episode %s does not meet episode advancement, rejecting all occurences' % (name, identifier))
                         for ep in eps:
                             feed.reject(ep.entry)
                         continue
@@ -444,7 +449,7 @@ class FilterSeries:
                     found_enough = False
                     for ep in eps:
                         if self.cmp_quality(enough, ep.quality) >= 0: # 1=greater, 0=equal, -1=does not meet
-                            log.debug('Accepting. Episode %s meets quality %s' % (ep.entry['title'], enough))
+                            log.debug('Timeframe accepting. %s meets quality %s' % (ep.entry['title'], enough))
                             self.accept_serie(feed, ep)
                             found_enough = True
                             break

@@ -9,4 +9,8 @@ feeds:
       - {title: 'Seen title 1', url: 'http://localhost/seen2'} # duplicate by title
       - {title: 'Seen title 3', url: 'http://localhost/seen3'} # new
 
- 
+  test_number:
+    input_mock:
+      - {title: 'New title 1', url: 'http://localhost/new1', imdb_score: 5}
+      - {title: 'New title 2', url: 'http://localhost/new2', imdb_score: 5}
+  

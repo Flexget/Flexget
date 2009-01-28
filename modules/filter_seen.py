@@ -29,6 +29,10 @@ class FilterSeen:
 
     def feed_filter(self, feed):
         """Filter seen entries"""
+        if not feed.config.get('seen', True):
+            log.debug('Seen is disabled')
+            return
+        
         duplicates = []
         for entry in feed.entries:
             for field in self.fields:
@@ -47,6 +51,9 @@ class FilterSeen:
                     if field in ['title']:
                         # allow duplicates with these fields
                         continue
+                    if not isinstance(entry.get(field, None), basestring):
+                        # don't filter based on seen non-string fields like imdb_score!
+                        continue
                     if entry.get(field, object()) == duplicate.get(field, object()):
                         log.debug('Rejecting %s because of duplicate field %s' % (duplicate['title'], field))
                         feed.reject(duplicate)
@@ -58,6 +65,10 @@ class FilterSeen:
 
     def feed_exit(self, feed):
         """Remember succeeded entries"""
+        if not feed.config.get('seen', True):
+            log.debug('Seen is disabled')
+            return
+
         for entry in feed.entries:
             for field in self.fields:
                 if not entry.has_key(field):

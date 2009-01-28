@@ -1,7 +1,7 @@
 import re
 import logging
 
-__pychecker__ = 'unusednames=parser'
+__pychecker__ = 'unusednames=parser,token'
 
 log = logging.getLogger('modify_torrent')
 
