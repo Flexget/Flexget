@@ -4,6 +4,7 @@ import string
 from datetime import tzinfo, timedelta, datetime
 from feed import Entry
 from sys import maxint
+from manager import ModuleWarning
 
 __pychecker__ = 'unusednames=parser'
 
@@ -343,6 +344,9 @@ class FilterSeries:
             conf = feed.manager.get_settings('series', {})
             if isinstance(name, dict):
                 name, conf = name.items()[0]
+                if conf is None:
+                    log.critical('Series %s has unexpected \':\'' % name)
+                    continue
                 # merge with default settings
                 conf = feed.manager.get_settings('series', conf)
 
