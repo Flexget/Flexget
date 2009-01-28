@@ -23,10 +23,7 @@ class FlexGetTestCase(unittest.TestCase):
 
     def get_feed(self, name):
         config = self.manager.config['feeds'][name]
-        try:
-            self.manager.merge_dict_from_to(self.manager.config.get('global', {}), config)
-        except MergeException:
-            logging.critical('Global section has conflicting datatypes with feed %s configuration. Feed aborted.' % name)
+        self.manager.merge_dict_from_to(self.manager.config.get('global', {}), config)
     
         feed = Feed(self.manager, name, config)
         feed.unittest = True

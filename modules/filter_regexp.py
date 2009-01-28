@@ -18,7 +18,6 @@ class FilterRegexp:
     def validate(self, config):
         """Validate given configuration"""
         from validator import DictValidator
-        from validator import ListValidator
         def conf(patterns):
             patterns.accept(str)
             patterns.accept(int)

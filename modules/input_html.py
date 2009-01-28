@@ -74,7 +74,7 @@ class InputHtml:
             data = soup.prettify()
             f = open(name, 'w')
             f.write(data)
-            f.close
+            f.close()
         
         for link in soup.findAll('a'):
             if not link.has_key('href'): continue
