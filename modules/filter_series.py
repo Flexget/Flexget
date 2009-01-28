@@ -256,11 +256,12 @@ class FilterSeries:
     def validate(self, config):
         """Validate configuration format for this module"""
         from validator import ListValidator
-        serie = ListValidator()
+        series = ListValidator()
         # just plain names
-        serie.accept(str)
+        series.accept(str)
+        series.accept(int)
         # or "bundles" with serie name as key ..
-        bundle = serie.accept(dict)
+        bundle = series.accept(dict)
         # prevent invalid indentation level
         bundle.reject_keys(['path', 'timeframe', 'name_patterns', 'ep_patterns', 'id_patterns', 'watched'])
         # accept serie name, which can be anything ...
@@ -281,8 +282,8 @@ class FilterSeries:
         watched = options.accept('watched', dict)
         watched.accept('season', int)
         watched.accept('episode', int)
-        serie.validate(config)
-        return serie.errors.messages
+        series.validate(config)
+        return series.errors.messages
         
     # TODO: remove at some point
     def upgrade(self, feed):
