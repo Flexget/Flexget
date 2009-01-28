@@ -60,6 +60,7 @@ class InputHtml:
         try:
             page = urllib2.urlopen(pageurl)
             soup = BeautifulSoup(page)
+            log.debug('Detected encoding %s' % soup.originalEncoding)
         except IOError, e:
             if hasattr(e, 'reason'):
                 raise ModuleWarning('Failed to reach server. Reason: %s' % e.reason, log)
@@ -79,9 +80,9 @@ class InputHtml:
             if not link.has_key('href'): continue
             title = link.string
             if title == None: continue
-            url = link['href']
-            title = str(title).strip()
+            title = title.replace(u'\u200B', u'').strip()
             if not title: continue
+            url = link['href']
 
             # fix broken urls
             if url.startswith('//'):
