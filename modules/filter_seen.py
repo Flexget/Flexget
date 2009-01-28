@@ -51,6 +51,9 @@ class FilterSeen:
                     if field in ['title']:
                         # allow duplicates with these fields
                         continue
+                    if not isinstance(entry.get(field, None), basestring):
+                        # don't filter based on seen non-string fields like imdb_score!
+                        continue
                     if entry.get(field, object()) == duplicate.get(field, object()):
                         log.debug('Rejecting %s because of duplicate field %s' % (duplicate['title'], field))
                         feed.reject(duplicate)

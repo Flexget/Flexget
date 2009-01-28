@@ -287,7 +287,7 @@ class Feed:
 
         for module in modules:
             keyword = module['name']
-            if self.config.has_key(keyword) or (module['builtin'] and not self.config.get('disable_builtins', False)):
+            if self.config.has_key(keyword) or module['builtin']:
                 # set cache namespaces to this module realm
                 self.__set_namespace(keyword)
                 # store execute info

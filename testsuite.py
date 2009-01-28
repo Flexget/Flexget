@@ -200,6 +200,10 @@ class TestRegexp(FlexGetTestCase):
 
 class TestPatterns(FlexGetTestCase):
 
+    """
+        Bad example, does things manually, you should use self.get_entry to check existance
+    """
+
     def setUp(self):
         self.config = 'test/test_patterns.yml'
         FlexGetTestCase.setUp(self)
@@ -230,6 +234,10 @@ class TestPatterns(FlexGetTestCase):
         
 class TestResolvers(FlexGetTestCase):
 
+    """
+        Bad example, does things manually, you should use self.get_entry to check existance
+    """
+
     def setUp(self):
         self.config = 'test/test_resolvers.yml'
         FlexGetTestCase.setUp(self)
@@ -258,6 +266,22 @@ class TestResolvers(FlexGetTestCase):
         self.assertEqual(resolver.resolvable(self.feed, entry), True)
         resolver.resolve(self.feed, entry)
         self.assertEqual(entry['url'], 'http://www.nyaatorrents.org/?page=download&tid=12345')
+
+
+class TestDisableBuiltins(FlexGetTestCase):
+
+    """
+        Quick hack, test disable functionality by checking if seen filtering (builtin) is working
+    """
+        
+    def setUp(self):
+        self.config = 'test/test_disable_builtins.yml'
+        FlexGetTestCase.setUp(self)
+
+    def testDisableBuiltins(self):
+        self.feed.execute()
+        if not (self.get_entry(title='dupe1') and self.get_entry(title='dupe2')):
+            self.fail('disable_builtins is not working?')
         
         
 class TestManager(FlexGetTestCase):
@@ -298,8 +322,7 @@ class TestFilterSeen(FlexGetTestCase):
             
         # execute another feed
         
-        self.feed = Feed(self.manager, 'test2', self.manager.config['feeds']['test2'])
-        self.feed.unittest = True
+        self.feed = self.get_feed('test2')
         self.feed.execute()
         # should not contain since fields seen in previous feed
         if self.get_entry(title='Seen title 1'):
@@ -309,6 +332,13 @@ class TestFilterSeen(FlexGetTestCase):
         # new item in feed should exists
         if not self.get_entry(title='Seen title 3'):
             self.fail('Unseen test entry 3 not in second feed')
+            
+        # test that we don't filter based on non-string fields (ie, seen same imdb_score)
+
+        self.feed = self.get_feed('test_number')
+        self.feed.execute()
+        if not self.get_entry(title='New title 1') or not self.get_entry(title='New title 2'):
+            self.fail('Item should not have been filtered because of number field')
             
 
 class TestFilterSeenMovies(FlexGetTestCase):
@@ -332,8 +362,8 @@ class TestFilterSeenMovies(FlexGetTestCase):
             self.fail('Test movie entry 2 should be filtered in second execution')
 
         # execute another feed
-
-        self.feed = Feed(self.manager, 'test2', self.manager.config['feeds']['test2'])
+        
+        self.feed = self.get_feed('test2')
         self.feed.unittest = True
         self.feed.execute()
 
@@ -468,6 +498,7 @@ if __name__ == '__main__':
     suite.addTest(unittest.makeSuite(TestCache))
     suite.addTest(unittest.makeSuite(TestDownload))
     suite.addTest(unittest.makeSuite(TestInputRSS))
+    suite.addTest(unittest.makeSuite(TestDisableBuiltins))
     
     # online test disabled until commandline can be added
     # adding options proved problematic since flexget manager parses commandline as well ...
