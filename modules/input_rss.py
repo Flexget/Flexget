@@ -180,7 +180,21 @@ class InputRSS:
         # field name for url can be configured by setting link. 
         # default value is auto but for example guid is used in some feeds
         curl = config.get('link', 'auto')
+        ignored = 0
         for entry in rss.entries:
+
+            # ignore entries without title            
+            if not entry.title:
+                log.debug('skipping entry without title')
+                ignored += 1
+                continue
+
+            # ignore entries without link
+            if not entry.has_key('link') and not entry.has_key('enclosures'):
+                log.debug('%s does not have link or enclosure' % entry.title)
+                ignored += 1
+                continue
+        
             # convert title to ascii (cleanup)
             if config.get('ascii', False):
                 entry.title = entry.title.encode('ascii', 'ignore')
@@ -191,11 +205,6 @@ class InputRSS:
 
             # remove annoying zero width spaces
             entry.title = entry.title.replace(u'\u200B', u'') 
-
-            # ignore entries without title            
-            if not entry.title:
-                log.debug('skipping entry without title')
-                continue
 
             # helper
             def add_entry(ea):
@@ -249,12 +258,18 @@ class InputRSS:
                 else:
                     if not config.get('silent'):
                         feed.log_once('Failed to auto-detect RSS-entry %s link' % (entry.title), log)
+                    ignored += 1    
                     continue
             else:
                 # manual configuration
                 if not entry.has_key(curl):
                     feed.log_once('RSS-entry %s does not contain configured link attributes: %s' % (entry.title, curl), log)
+                    ignored += 1
                     continue
                 e['url'] = getattr(entry, curl)
           
             add_entry(e)
+            
+        if ignored:
+            if not config.get('silent'):
+                log.warning('Skipped %s RSS-entries without required information (title, link or enclosures)' % ignored)

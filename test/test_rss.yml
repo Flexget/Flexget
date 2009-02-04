@@ -1,3 +1,5 @@
 feeds:
   test:
-    rss: test/test_rss.xml
+    rss: 
+      url: test/test_rss.xml
+      silent: true

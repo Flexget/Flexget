@@ -64,10 +64,10 @@ class ModuleDownload:
         for entry in feed.entries:
             try:
                 if feed.manager.options.test:
-                    log.info('Would download %s' % entry['title'])
+                    log.info('Would download: %s' % entry['title'])
                 else:
                     if not feed.unittest:
-                        log.info('Downloading %s' % entry['title'])
+                        log.info('Downloading: %s' % entry['title'])
                     self.download(feed, entry)
             except IOError, e:
                 feed.fail(entry)
@@ -156,7 +156,7 @@ class ModuleDownload:
         for entry in feed.entries:
             try:
                 if feed.manager.options.test:
-                    log.info('Would write entry %s' % entry['title'])
+                    log.info('Would write: %s' % entry['title'])
                 else:
                     self.output(feed, entry)
             except ModuleWarning, e:

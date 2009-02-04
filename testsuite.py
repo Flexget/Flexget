@@ -22,7 +22,10 @@ class FlexGetTestCase(unittest.TestCase):
         os.remove(self.manager.session_name)
 
     def get_feed(self, name):
+        # TODO: rename to use_feed and set self.feed ?
+        
         config = self.manager.config['feeds'][name]
+        # merge global configuration, # TODO: should not be have to be done in here!
         self.manager.merge_dict_from_to(self.manager.config.get('global', {}), config)
     
         feed = Feed(self.manager, name, config)
@@ -361,7 +364,6 @@ class TestFilterSeenMovies(FlexGetTestCase):
         # execute another feed
         
         self.feed = self.get_feed('test2')
-        self.feed.unittest = True
         self.feed.execute()
 
         # should not contain since fields seen in previous feed
@@ -371,6 +373,12 @@ class TestFilterSeenMovies(FlexGetTestCase):
             self.fail('seen movie 4 exists')
         if not self.get_entry(title='Seen movie title 5'):
             self.fail('unseen movie 5 exists')
+    
+    def testSeenMoviesStrict(self):
+        self.feed = self.get_feed('strict')
+        self.feed.execute()
+        if self.get_entry(title='Seen movie title 8'):
+            self.fail('strict should not have passed movie 8')
         
         
 class TestCache(unittest.TestCase):

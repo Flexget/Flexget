@@ -22,4 +22,12 @@ class FilterSeenMovies(FilterSeen):
         # remember and filter by these fields
         self.fields = ['imdb_url']
         
-        # Note: our hookup methods are in FilterSeen
+    def feed_filter(self, feed):
+        # strict method
+        if feed.config['seen_movies']=='strict':
+            for entry in feed.entries:
+                if not entry.has_key('imdb_url'):
+                    log.info('Rejecting %s because of missing imdb url' % entry['title'])
+                    feed.reject(entry)
+        # call super
+        super(FilterSeenMovies, self).feed_filter(feed)
