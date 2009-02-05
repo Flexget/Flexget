@@ -5,7 +5,7 @@ __pychecker__ = 'unusednames=parser'
 
 log = logging.getLogger('seen')
 
-class FilterSeen:
+class FilterSeen(object):
 
     """
         Remembers previously downloaded content and rejects them in
@@ -23,7 +23,7 @@ class FilterSeen:
         self.fields = ['original_url', 'title', 'url']
 
     def validate(self, config):
-        if not isinstance(config, bool):
+        if not isinstance(config, bool) and not isinstance(config, basestring):
             return ['wrong datatype, expecting bool']
         return []
 

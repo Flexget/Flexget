@@ -156,13 +156,6 @@ class Manager:
         # parse options including module customized options
         self.options = parser.parse_args()[0]
         
-        if self.options.test:
-            print '--test is currently broken'
-            # only way to fix it may be to make a copy of session file and restore it after execution
-            # this is because shelve seems to update the file more or less immediattely when changes
-            # are made to dictionary
-            sys.exit(1)
-
         # perform commandline sanity check(s)
         if self.options.test and self.options.learn:
             parser.error('--test and --learn are mutually exclusive')
@@ -255,6 +248,12 @@ class Manager:
         else:
             # create a new empty database
             self.session = shelve.open(self.session_name, flag='n', protocol=2, writeback=True)
+        # if test mode
+        if self.options.test:
+            import copy
+            temp = copy.deepcopy(self.session.cache)
+            self.session.close()
+            self.session = temp
 
     def sanitize(self, d):
         """Makes dictionary d contain only yaml.safe_dump compatible elements"""
@@ -296,6 +295,7 @@ class Manager:
             logging.exception("Failed to dump session data (%s)!" % e)
 
     def save_session_shelf(self):
+        if self.options.test: return
         # not a shelve, we're most likely converting from an old style session
         if isinstance(self.session, dict):
             logging.info('Migrating from old-style session.')
