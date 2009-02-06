@@ -34,8 +34,13 @@ class FilterLimitNew:
         feed._purge() 
         amount = feed.config.get('limit_new', len(feed.entries))
         i = 1
+        rejected = 0
+        passed = 0
         for entry in feed.entries:
             if i > amount:
-                log.debug('Rejecting %s' % entry)
+                rejected += 1
                 feed.reject(entry)
+            else:
+                passed += 1
             i += 1
+        log.info('Rejected: %s Passed: %s' % (rejected, passed))

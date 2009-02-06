@@ -221,7 +221,7 @@ class InputRSS:
             # create from enclosures if present
             enclosures = entry.get('enclosures', [])
             if enclosures:
-                log.debug('adding %i entries from enclosures' % len(enclosures))
+                #log.debug('adding %i entries from enclosures' % len(enclosures))
                 for enclosure in enclosures:
                     ee = Entry()
                     if not enclosure.has_key('href'):
@@ -239,9 +239,10 @@ class InputRSS:
                             m = re.search('.*\/([^?#]*)', ee['url'])
                             if m:
                                 ee['filename'] = m.group(1)
-                                log.debug('filename %s from enclosure' % ee['filename'])
+                                #log.debug('filename %s from enclosure' % ee['filename'])
                             else:
-                                log.debug('failed to parse filename from %s' % ee['url'])
+                                pass
+                                #log.debug('failed to parse filename from %s' % ee['url'])
                     add_entry(ee)
                 continue
 
