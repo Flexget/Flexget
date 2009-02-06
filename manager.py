@@ -615,14 +615,6 @@ class Manager:
                     continue
                 # if feed name is prefixed with _ it's disabled
                 if name.startswith('_'): continue
-                # create feed and execute it
-                # merge global configuration into this feed config
-                config = self.config['feeds'][name]
-                try:
-                    self.merge_dict_from_to(self.config.get('global', {}), config)
-                except MergeException:
-                    logging.critical('Global section has conflicting datatypes with feed %s configuration. Feed aborted.' % name)
-                    continue
                 # create feed instance and execute it
                 feed = Feed(self, name, config)
                 try:

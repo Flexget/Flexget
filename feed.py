@@ -139,6 +139,8 @@ class Feed:
         self.rejected = [] # rejected entries are removed unconditionally, even if accepted
         self.failed = []
 
+        # TODO: feed.abort() should be done by using exception, not a flag that has to be checked everywhere
+
         # flags and counters
         self.unittest = False
         self.__abort = False
@@ -316,18 +318,12 @@ class Feed:
         """Execute this feed, runs events in order of events array."""
         # validate configuration
         errors = self.validate()
-        if errors:
-            logging.critical('Feed \'%s\' has configuration errors:' % self.name)
-            for error in errors:
-                logging.error(error)
-            if not self.manager.options.validate:
-                self.abort()
-            return
-        # do not execute in validate mode
+        if self.__abort: return
         if self.manager.options.validate:
             if not errors:
-                logging.info('Feed \'%s\' passed' % self.name)
-            return
+                print 'Feed \'%s\' passed' % self.name
+                return
+            
         # run events
         for event in self.manager.events:
             # when learning, skip few events
@@ -369,7 +365,7 @@ class Feed:
         for kw, value in self.config.iteritems():
             module = self.manager.modules.get(kw)
             if not module:
-                validate_errors.append('unknown keyword \'%s\'' % kw)
+                validate_errors.append('Unknown keyword \'%s\'' % kw)
                 continue
             if hasattr(module['instance'], 'validate'):
                 errors = module['instance'].validate(self.config[kw])
@@ -378,4 +374,13 @@ class Feed:
                         validate_errors.append('%s %s' % (kw, error))
             else:
                 logging.warning('Used module %s does not support validating. Please notify author!' % kw)
+                
+        # log errors and abort
+        if validate_errors:
+            logging.critical('Feed \'%s\' has configuration errors:' % self.name)
+            for error in validate_errors:
+                logging.error(error)
+            # feed has errors, abort it
+            self.abort()
+                
         return validate_errors
