@@ -20,7 +20,7 @@ class ModulePreset:
             return ['wrong datatype']
         
     def feed_start(self, feed):
-        config = feed.config.get('preset', 'globals')
+        config = feed.config.get('preset', 'global')
         if isinstance(config, basestring):
             config = [config]
         log.debug('presets: %s' % config)
@@ -28,7 +28,7 @@ class ModulePreset:
         for preset in config:
             log.debug('Merging preset %s into feed %s' % (preset, feed.name))
             if not feed.manager.config.has_key(preset):
-                if preset=='globals': continue
+                if preset=='global': continue
                 raise ModuleWarning('Unable to set preset %s for %s' % (preset, feed.name))
             try:
                 feed.manager.merge_dict_from_to(feed.manager.config[preset], feed.config)
