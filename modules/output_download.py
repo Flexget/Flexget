@@ -123,21 +123,27 @@ class ModuleDownload:
             raise
 
         entry['mimetype'] = mimetype
-        # if there is no specified filename, generate one from headers
+        # prefer content-disposition naming
+        self.filename_from_headers(entry, f)
+        # if there is still no specified filename, use mime-type
         if not entry.has_key('filename'):
-            self.set_filename(entry, f)
+            self.filename_from_mime(entry, f)
+        # TODO: LAST option, try to scrap url?
 
-    def set_filename(self, entry, response):
-        """Set entry['filename'] with intelligence"""
-        # check from content-disposition
+    def filename_from_headers(self, entry, response):
+        """Checks entry filename if it's found from content-disposition"""
         import email
         filename = email.message_from_string(unicode(response.info()).encode('utf-8')).get_filename(failobj=False)
         if filename:
-            # TODO: must be hmtl decoded!
+            import utils
+            filename = utils.html_decode(filename)
             log.debug('Found filename from headers: %s' % filename)
+            if entry.has_key('filename'):
+                log.debug('Overriding filename %s with %s from content-disposition' % (entry['filename'], filename))
             entry['filename'] = filename
-        # TODO: set filename from URL?
-        
+
+    def filename_from_mime(self, entry, response):
+        """Tries to set filename (extensions) from mime-type"""
         # guess extension from content-type
         import mimetypes
         extension = mimetypes.guess_extension(response.headers.getsubtype())

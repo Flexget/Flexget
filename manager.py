@@ -69,7 +69,7 @@ class Manager:
         
         # logging formatting
         self.logging_detailed = '%(levelname)-8s %(name)-11s %(message)s'
-        self.logging_normal = '%(levelname)-8s %(message)s'
+        self.logging_normal = '%(levelname)-8s %(name)-11s %(message)s'
 
         # Initialize logging for file, we must init it with some level now because
         # logging utility borks completely if any calls to logging is made before initialization
