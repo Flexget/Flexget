@@ -616,7 +616,7 @@ class Manager:
                 # if feed name is prefixed with _ it's disabled
                 if name.startswith('_'): continue
                 # create feed instance and execute it
-                feed = Feed(self, name, config)
+                feed = Feed(self, name, self.config['feeds'][name])
                 try:
                     feed.execute()
                     terminate[name] = feed
