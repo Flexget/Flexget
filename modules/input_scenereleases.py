@@ -59,11 +59,11 @@ class InputScenereleases:
         soup = BeautifulSoup(page)
             
         releases = []
-        for entry in soup.findAll('div', attrs={'class':re.compile('post uncustomized-post-template', re.IGNORECASE)}):
+        for entry in soup.findAll('div', attrs={'id':re.compile('post', re.IGNORECASE)}):
             release = {}
-            title = entry.find('h2')
+            title = entry.find('h3')
             if not title:
-                log.debug('No h2 entrytitle')
+                log.debug('No h3 entrytitle')
                 continue
             release['title'] = title.a.string.strip()
 
@@ -83,7 +83,10 @@ class InputScenereleases:
                 if link_name == None:
                     continue
                 link_name = link_name.strip().lower()
-                link_href = link['href']
+                if link.has_key('href'):
+                    link_href = link['href']
+                else:
+                    continue
                 #log.debug('found link %s -> %s' % (link_name, link_href))
                 # handle imdb link
                 if link_name.lower() == 'imdb':
