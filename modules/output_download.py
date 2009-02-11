@@ -200,10 +200,10 @@ class ModuleDownload:
             except:
                 raise ModuleWarning('Cannot create path %s' % path, log)
         
-        # make full filename (destfile)
         if not entry.has_key('filename'):
             log.warning('%s does not have filename, using title' % entry['title'])
-        destfile = os.path.join(path, entry.get('filename', entry['title']))
+        # combine to full path + filename, replace / from filename (#208)
+        destfile = os.path.join(path, entry.get('filename', entry['title']).replace('/', ' '))
 
         if os.path.exists(destfile):
             raise ModuleWarning('File \'%s\' already exists' % destfile, log)
