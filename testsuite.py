@@ -1,6 +1,7 @@
 import os, sys, unittest
 from manager import Manager
 from feed import Feed, Entry
+from validator4 import *
 
 class FlexGetTestCase(unittest.TestCase):
 
@@ -503,8 +504,11 @@ class TestRssOnline(FlexGetTestCase):
         # TODO:
         pass
     
+class TestValidator(unittest.TestCase):
 
-            
+    def testDefault(self):
+        root = Validator.factory()
+        assert root.name=='root', 'wrong name'
     
 if __name__ == '__main__':
     suite = unittest.TestSuite()
@@ -519,6 +523,7 @@ if __name__ == '__main__':
     suite.addTest(unittest.makeSuite(TestDownload))
     suite.addTest(unittest.makeSuite(TestInputRSS))
     suite.addTest(unittest.makeSuite(TestDisableBuiltins))
+    suite.addTest(unittest.makeSuite(TestValidator))
     
     if '--online' in sys.argv:
         print 'NOTE: Online tests are enabled'

@@ -1,5 +1,4 @@
 import logging
-import datetime
 from manager import ModuleWarning, MergeException
 
 __pychecker__ = 'unusednames=parser'
@@ -32,7 +31,7 @@ class ModulePreset:
                 raise ModuleWarning('Unable to set preset %s for %s' % (preset, feed.name))
             try:
                 feed.manager.merge_dict_from_to(feed.manager.config[preset], feed.config)
-            except MergeException, e:
+            except MergeException:
                 raise ModuleWarning('Failed to merge preset %s to feed %s, incompatible datatypes' % (preset, feed.name))
 
             # re-validate feed after changes in configuration

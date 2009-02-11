@@ -147,7 +147,7 @@ class Manager:
             console.setFormatter(formatter)
             logging.getLogger().addHandler(console)
 
-        # add module path to sys.path so they can import properly ..
+        # add module path to sys.path so that imports work properly ..
         sys.path.append(self.moduledir)
 
         # load modules, modules may add more commandline parameters!
@@ -208,39 +208,6 @@ class Manager:
 
     def load_session(self):
         """Load session file"""
-        if not self.options.reset:
-            # try to load old session file and migrate it
-            if not self.load_session_yaml():
-                self.load_session_shelf()
-        else:
-            self.load_session_yaml()
-            self.load_session_shelf()
-
-    def load_session_yaml(self):
-        """Deprecated, is used only in migrating currently."""
-        # TODO: remove at some point
-        sessionfile = os.path.join(sys.path[0], 'session-%s.yml' % self.configname)
-        if os.path.exists(sessionfile):
-            # special case: reseting at the same time we would migrate -> just remove the old session file
-            if self.options.reset:
-                os.remove(sessionfile)
-                return
-            logging.info('Old sessionfile loaded. Session file will be migrated to the new format at the end of this run')
-            try:
-                self.session = yaml.safe_load(file(sessionfile))
-                if type(self.session) != types.DictType:
-                    raise Exception('Session file does not contain dictionary')
-            except Exception, e:
-                logging.critical('The session file has been broken. Execute flexget with --reset-session create new session and to avoid re-downloading everything. '\
-                                 'Downloads between time of break and now are lost. You must download these manually. '\
-                                 'This error is most likely caused by a bug in the software, check your log-file and report any tracebacks.')
-                logging.exception('Reason: %s' % e)
-                sys.exit(1)
-            return True
-        
-        return False
-                
-    def load_session_shelf(self):
         # note: writeback must be True because how modules use our persistence.
         # See. http://docs.python.org/lib/node328.html
         if not self.options.reset:
@@ -279,10 +246,9 @@ class Manager:
         self.save_session_shelf()
 
     def dump_session_yaml(self):
-        """Dumps session into yaml file for easier debugging """
+        """Dumps session into yaml file for easier debugging"""
         try:
             fn = os.path.join(sys.path[0], 'dump-%s.yml' % self.configname)
-            # mirgrate data
             dump = {}
             for k,v in self.session.iteritems():
                 dump[k] = v
@@ -292,31 +258,11 @@ class Manager:
             f.close()
             logging.info('Dumped session as YML to %s' % fn)
         except Exception, e:
-            logging.exception("Failed to dump session data (%s)!" % e)
+            logging.exception('Failed to dump session data (%s)!' % e)
 
     def save_session_shelf(self):
         if self.options.test: return
-        # not a shelve, we're most likely converting from an old style session
-        if isinstance(self.session, dict):
-            logging.info('Migrating from old-style session.')
-            # create the new style session
-            newsession = shelve.open(self.session_name, protocol=2)
-
-            # mirgrate data
-            for k,v in self.session.iteritems():
-                newsession[k] = v
-
-            # rename the old session file
-            sessionfile = os.path.join(sys.path[0], 'session-%s.yml' % self.configname)
-            os.rename(sessionfile, sessionfile+'-MIGRATED')
-
-            newsession.close()
-
-            logging.info('Migrating completed.')
-            return
-            
         self.session.close()
-        
         
     def load_modules(self, parser, moduledir):
         """Load all modules from moduledir"""
@@ -349,7 +295,7 @@ class Manager:
                             except RegisterException, e:
                                 logging.critical('Error while registering module %s. %s' % (name, e.value))
                         else:
-                            logging.error('Module %s register method is not callable' % name)
+                            logging.critical('Module %s register method is not callable' % name)
         
         # check that event queue is empty (all module created events succeeded)
         if self.__event_queue:
@@ -365,6 +311,7 @@ class Manager:
         return modules
 
     def get_settings(self, keyword, defaults={}):
+        # TO BE REMOVED
         """
             Return defaults / settings for a keyword. Optionally you may pass defaults values in dictionary 
             which will be used as default values.
