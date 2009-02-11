@@ -43,4 +43,4 @@ class FilterLimitNew:
             else:
                 passed += 1
             i += 1
-        log.info('Rejected: %s Passed: %s' % (rejected, passed))
+        log.debug('Rejected: %s Passed: %s' % (rejected, passed))
