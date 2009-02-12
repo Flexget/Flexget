@@ -385,6 +385,7 @@ class FilterImdb:
         imdb.accept('min_score', int)
         imdb.accept('reject_genres', list).accept(str)
         imdb.accept('reject_languages', list).accept(str)
+        imdb.accept('accept_languages', list).accept(str)
         imdb.accept('filter_invalid', bool)
         imdb.validate(config)
         return imdb.errors.messages
