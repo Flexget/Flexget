@@ -1,5 +1,4 @@
 import logging
-import datetime
 from manager import ModuleWarning
 
 __pychecker__ = 'unusednames=parser,feed'

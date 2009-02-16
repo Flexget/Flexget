@@ -2,6 +2,8 @@ import logging
 from datetime import datetime
 from manager import ModuleWarning
 
+log = logging.getLogger('feed')
+
 class Entry(dict):
 
     """
@@ -166,7 +168,7 @@ class Feed:
         """Purge entries in list from feed.entries"""
         for entry in self.entries[:]:
             if entry in list and entry not in not_in_list:
-                logging.debug('Purging entry %s' % entry.safe_str())
+                log.debug('Purging entry %s' % entry.safe_str())
                 self.entries.remove(entry)
                 if count:
                     self.__purged += 1
@@ -197,7 +199,7 @@ class Feed:
 
     def fail(self, entry):
         """Mark entry as failed."""
-        logging.debug("Marking entry '%s' as failed" % entry['title'])
+        log.debug("Marking entry '%s' as failed" % entry['title'])
         if not entry in self.failed:
             self.failed.append(entry)
             self.manager.add_failed(entry)
@@ -206,7 +208,7 @@ class Feed:
     def abort(self, **kwargs):
         """Abort this feed execution, no more modules will be executed."""
         if not self.__abort and not kwargs.get('silent', False):
-            logging.info('Aborting feed %s' % self.name)
+            log.info('Aborting feed %s' % self.name)
         self.__abort = True
         self.__run_event('abort')
 
@@ -227,7 +229,7 @@ class Feed:
         else:
             return self.config[keyword]
 
-    def log_once(self, s, log=logging):
+    def log_once(self, s, logger=log):
         """Log string s once"""
         import md5
         m = md5.new()
@@ -236,14 +238,14 @@ class Feed:
         seen = self.shared_cache.get('log-%s' % md5sum, False)
         if (seen): return
         self.shared_cache.store('log-%s' % md5sum, True, 30)
-        log.info(s)
+        logger.info(s)
 
     # TODO: all these verbose methods are confusing
-    def verbose_progress(self, s, log=logging):
+    def verbose_progress(self, s, logger=log):
         """Verboses progress, outputs only in non quiet mode."""
         # TODO: implement trough own logger?
         if not self.manager.options.quiet and not self.unittest:
-            log.info(s)
+            logger.info(s)
           
     def verbose_details(self, s):
         """Verbose if details option is enabled"""
@@ -306,7 +308,7 @@ class Feed:
                     else:
                         m.log.warning(m)
                 except Exception, e:
-                    logging.exception('Unhandled error in module %s: %s' % (keyword, e))
+                    log.exception('Unhandled error in module %s: %s' % (keyword, e))
                     self.abort()
                 # remove entries
                 self.__purge_rejected()
@@ -333,7 +335,7 @@ class Feed:
                     modules = self.manager.get_modules_by_event(event)
                     for module in modules:
                         if self.config.has_key(module['name']):
-                            logging.info('Feed %s keyword %s is not executed because of learn/reset.' % (self.name, module['name']))
+                            log.info('Feed %s keyword %s is not executed because of learn/reset.' % (self.name, module['name']))
                     continue
             # run all modules with this event
             self.__run_event(event)
@@ -373,13 +375,13 @@ class Feed:
                     for error in errors:
                         validate_errors.append('%s %s' % (kw, error))
             else:
-                logging.warning('Used module %s does not support validating. Please notify author!' % kw)
+                log.warning('Used module %s does not support validating. Please notify author!' % kw)
                 
         # log errors and abort
         if validate_errors:
-            logging.critical('Feed \'%s\' has configuration errors:' % self.name)
+            log.critical('Feed \'%s\' has configuration errors:' % self.name)
             for error in validate_errors:
-                logging.error(error)
+                log.error(error)
             # feed has errors, abort it
             self.abort()
                 

@@ -9,7 +9,7 @@ class FlexGetTestCase(unittest.TestCase):
         """Set up test env"""
         if not hasattr(self, 'config'):
             self.fail('Config file missing')
-        self.manager = Manager()
+        self.manager = Manager(unit_test=True)
         self.manager.options.config = self.config
         # do not load session
         self.manager.options.reset = True
@@ -508,7 +508,11 @@ class TestValidator(unittest.TestCase):
 
     def testDefault(self):
         root = Validator.factory()
-        assert root.name=='root', 'wrong name'
+        assert root.name=='root', 'expected root'
+        dv = root.accept('dict')
+        assert dv.name=='dict', 'expected dict'
+        dv.accept('text', key='text')
+        
     
 if __name__ == '__main__':
     suite = unittest.TestSuite()
@@ -520,16 +524,17 @@ if __name__ == '__main__':
     suite.addTest(unittest.makeSuite(TestFilterSeenMovies))
     suite.addTest(unittest.makeSuite(TestManager))
     suite.addTest(unittest.makeSuite(TestCache))
-    suite.addTest(unittest.makeSuite(TestDownload))
     suite.addTest(unittest.makeSuite(TestInputRSS))
     suite.addTest(unittest.makeSuite(TestDisableBuiltins))
     suite.addTest(unittest.makeSuite(TestValidator))
     
     if '--online' in sys.argv:
-        print 'NOTE: Online tests are enabled'
+        print 'NOTE: Online tests are enabled. Some of these may fail since they depend on 3rd party services.'
         suite.addTest(unittest.makeSuite(TestImdbOnline))
+        suite.addTest(unittest.makeSuite(TestDownload))
+        suite.addTest(unittest.makeSuite(TestRssOnline))
     else:
-        print 'NOTE: Use --online argument to enable online tests. Some of these may fail since they depend on 3rd party services.'
+        print 'NOTE: Use --online argument to enable online tests.'
     
     # run suite
     unittest.TextTestRunner(verbosity=2).run(suite)

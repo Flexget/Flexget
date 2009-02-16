@@ -2,11 +2,14 @@
 import os, os.path
 import sys
 import logging
+import logging.handlers
 import string
 import types
 import time
 from datetime import tzinfo, timedelta, datetime
 import shelve
+
+log = logging.getLogger('manager')
 
 try:
     from optparse import OptionParser, SUPPRESS_HELP
@@ -41,14 +44,18 @@ class MergeException(Exception):
         return repr(self.value)
 
 class Manager:
+
+    log_initialized = False
     
-    def __init__(self):
+    def __init__(self, unit_test=False):
+        self.init_logging()
+    
+        self.unit_test = unit_test
         self.configname = None
         self.options = None
         self.modules = {}
         self.session = {}
         self.config = {}
-        self.initialized = False
         
         # events
         self.events = ['start', 'input', 'filter', 'download', 'modify', 'output', 'exit']
@@ -66,29 +73,6 @@ class Manager:
         # settings
         self.moduledir = os.path.join(sys.path[0], 'modules')
         self.session_version = 2
-        
-        # logging formatting
-        self.logging_detailed = '%(levelname)-8s %(name)-11s %(message)s'
-        self.logging_normal = '%(levelname)-8s %(name)-11s %(message)s'
-
-        # Initialize logging for file, we must init it with some level now because
-        # logging utility borks completely if any calls to logging is made before initialization
-        # and load modules may call it before we know what level is used
-        initial_level = logging.INFO
-        try:
-            logging.basicConfig(level=initial_level,
-                                format='%(asctime)s '+self.logging_detailed,
-                                filename=os.path.join(sys.path[0], 'flexget.log'),
-                                filemode='a',
-                                datefmt='%Y-%m-%d %H:%M:%S')
-        except TypeError:
-            # For pre-2.4 python
-            logger = logging.getLogger() # root logger
-            handler = logging.FileHandler(os.path.join(sys.path[0], 'flexget.log'))
-            formatter = logging.Formatter('%(asctime)s %(levelname)-8s %(message)s')
-            handler.setFormatter(formatter)
-            logger.addHandler(handler)
-            logger.setLevel(initial_level)
 
         # initialize commandline options
         parser = OptionParser()
@@ -130,23 +114,6 @@ class Manager:
         parser.add_option('--online', action='store_true', dest='unittest_online', default=0,
                           help=SUPPRESS_HELP)
 
-        # unfortunately we cannot use optik at this point
-        if '--debug' in sys.argv:
-            # set 'mainlogger' to debug aswell or no debug output, this is done because of
-            # shitty python logging that fails to output debug on console if basicConf level
-            # is less (propably because I don't know how to use that pice of ... )
-            logging.getLogger().setLevel(logging.DEBUG)
-        if not '-q' in sys.argv:
-            # log to console
-            console = logging.StreamHandler()
-            console.setLevel(logging.DEBUG)
-            if '--debug' in sys.argv:
-                formatter = logging.Formatter(self.logging_detailed)
-            else:
-                formatter = logging.Formatter(self.logging_normal)
-            console.setFormatter(formatter)
-            logging.getLogger().addHandler(console)
-
         # add module path to sys.path so that imports work properly ..
         sys.path.append(self.moduledir)
 
@@ -163,18 +130,20 @@ class Manager:
         # reset is executed with learn
         if self.options.reset:
             self.options.learn = True
+            
+        if not self.unit_test:
+            self.initialize()
 
     def initialize(self):
-        # TODO: not needed as separate method anymore!
+        """Separated from __init__ so that unit test can modify options before loading config."""
 
-        if self.initialized: return
         start_time = time.clock()
       
         # load config & session
         try:
             self.load_config()
         except Exception, e:
-            logging.critical(e)
+            log.critical(e)
             sys.exit(1)
             
         self.load_session()
@@ -182,18 +151,48 @@ class Manager:
         # check if session version number is different
         if self.session.setdefault('version', self.session_version) != self.session_version:
             if not self.options.learn:
-                logging.critical('Your session is broken or from older incompatible version of flexget. '\
-                                 'Run application with --reset-session to resolve this. '\
-                                 'Any new content downloaded between the previous successful execution and now will be lost. '\
-                                 'You can (try to) spot new content from the report and download them manually.')
+                log.critical('Your session is broken or from older incompatible version of flexget. '\
+                             'Run application with --reset-session to resolve this. '\
+                             'Any new content downloaded between the previous successful execution and now will be lost. '\
+                             'You can (try to) spot new content from the report and download them manually.')
                 sys.exit(1)
             self.session['version'] = self.session_version
 
         took = time.clock() - start_time
-        logging.debug('Initialize took %.2f seconds' % took)
-        self.initialized = True
-        logging.debug('Default encoding: %s' % sys.getdefaultencoding())
+        log.debug('Initialize took %.2f seconds' % took)
+        log.debug('Default encoding: %s' % sys.getdefaultencoding())
+            
+    def init_logging(self):
+        """
+            Creates and initializes logger.
+        """
+        if Manager.log_initialized: return
+        
+        LOG_FILENAME = os.path.join(sys.path[0], 'flexget.log')
 
+        # get root logger
+        logger = logging.getLogger()
+        handler = logging.handlers.RotatingFileHandler(LOG_FILENAME, maxBytes=200*1024, backupCount=9)
+        #handler = logging.FileHandler(os.path.join(sys.path[0], 'flexget.log'))
+        formatter = logging.Formatter('%(asctime)-15s %(levelname)-8s %(name)-11s %(message)s')
+        handler.setFormatter(formatter)
+        logger.addHandler(handler)
+         
+        # unfortunately we cannot use optik in here
+        if '--debug' in sys.argv:
+            logger.setLevel(logging.DEBUG)
+        else:
+            logger.setLevel(logging.INFO)
+
+        if not '-q' in sys.argv:
+            # log to console
+            console = logging.StreamHandler()
+            #console.setLevel(logging.DEBUG)
+            console.setFormatter(formatter)
+            logger.addHandler(console)
+        
+        Manager.log_initialized = True
+           
     def load_config(self):
         """Load the configuration file"""
         possible = [os.path.join(sys.path[0], self.options.config), self.options.config]
@@ -203,7 +202,7 @@ class Manager:
                 self.configname = os.path.basename(config)[:-4]
                 self.session_name = os.path.join(sys.path[0], 'session-%s.db' % self.configname)
                 return
-        logging.debug('Tried to read from: %s' % string.join(possible, ', '))
+        log.debug('Tried to read from: %s' % string.join(possible, ', '))
         raise Exception('Failed to load configuration file %s' % self.options.config)
 
     def load_session(self):
@@ -231,12 +230,12 @@ class Manager:
             if type(d[k])==types.ListType:
                 for i in d[k][:]:
                     if not type(i) in valid:
-                        logging.debug('Removed non yaml compatible list item from key %s %s' % (k, type([k])))
+                        log.debug('Removed non yaml compatible list item from key %s %s' % (k, type([k])))
                         d[k].remove(i)
             if type(d[k])==types.DictType:
                 self.sanitize(d[k])
             if not type(d[k]) in valid:
-                logging.debug('Removed non yaml compatible key %s %s' % (k, type(d[k])))
+                log.debug('Removed non yaml compatible key %s %s' % (k, type(d[k])))
                 d.pop(k)
 
     def save_session(self):
@@ -256,9 +255,9 @@ class Manager:
             self.sanitize(dump)
             yaml.safe_dump(dump, f, allow_unicode=True)
             f.close()
-            logging.info('Dumped session as YML to %s' % fn)
+            log.info('Dumped session as YML to %s' % fn)
         except Exception, e:
-            logging.exception('Failed to dump session data (%s)!' % e)
+            log.exception('Failed to dump session data (%s)!' % e)
 
     def save_session_shelf(self):
         if self.options.test: return
@@ -272,8 +271,8 @@ class Manager:
                 try:
                     module = __import__(module)
                 except Exception, e:
-                    logging.critical('Module %s is faulty! Ignored!' % module)
-                    logging.exception(e)
+                    log.critical('Module %s is faulty! Ignored!' % module)
+                    log.exception(e)
                     continue
                 for name, item in vars(module).iteritems():
                     if loaded.get(name, False): continue
@@ -285,7 +284,7 @@ class Manager:
                             self.__instance = instance
                             self.__class_name = name
                         except:
-                            logging.exception('Exception occured while creating instance %s' % name)
+                            log.exception('Exception occured while creating instance %s' % name)
                             return
                         method = getattr(instance, 'register', None)
                         if callable(method):
@@ -293,14 +292,14 @@ class Manager:
                                 method(self, parser)
                                 loaded[name] = True
                             except RegisterException, e:
-                                logging.critical('Error while registering module %s. %s' % (name, e.value))
+                                log.critical('Error while registering module %s. %s' % (name, e.value))
                         else:
-                            logging.critical('Module %s register method is not callable' % name)
+                            log.critical('Module %s register method is not callable' % name)
         
         # check that event queue is empty (all module created events succeeded)
         if self.__event_queue:
             for event, info in self.__event_queue.iteritems():
-                logging.error('Module %s requested new event %s, but it could not be created at requested point (before, after). Module is not working properly.' % (info['class_name'], event))
+                log.error('Module %s requested new event %s, but it could not be created at requested point (before, after). Module is not working properly.' % (info['class_name'], event))
 
     def find_modules(self, directory, prefix):
         """Return array containing all modules in passed path that begin with prefix."""
@@ -483,7 +482,6 @@ class Manager:
             
     def print_failed(self):
         """Parameter --failed"""
-        self.initialize()
         failed = self.session.setdefault('failed', [])
         if not failed:
             print 'No failed entries recorded'
@@ -508,7 +506,6 @@ class Manager:
             
     def clear_failed(self):
         """Clears list of failed entries"""
-        self.initialize()
         print 'Cleared %i items.' % len(self.session.setdefault('failed', []))
         self.session['failed'] = []
 
@@ -532,23 +529,22 @@ class Manager:
 
     def execute(self):
         """Iterate trough all feeds and run them."""
-        self.initialize()
         from feed import Feed
         try:
             if not self.config:
-                logging.critical('Configuration file is empty.')
+                log.critical('Configuration file is empty.')
                 return
 
             # construct feed list
             feeds = self.config.get('feeds', {}).keys()
-            if not feeds: logging.critical('There are no feeds in the configuration file!')
+            if not feeds: log.critical('There are no feeds in the configuration file!')
             # --only-feed
             if self.options.onlyfeed:
                 ofeeds, feeds = feeds, []
                 for name in ofeeds:
                     if name.lower() == self.options.onlyfeed.lower(): feeds.append(name)
                 if not feeds:
-                    logging.critical('Could not find feed %s' % self.options.onlyfeed)
+                    log.critical('Could not find feed %s' % self.options.onlyfeed)
 
             terminate = {}
             for name in feeds:
@@ -556,9 +552,9 @@ class Manager:
                 if not isinstance(self.config['feeds'][name], dict):
                     if isinstance(self.config['feeds'][name], str):
                         if self.modules.has_key(name):
-                            logging.error('\'%s\' is known keyword, but in wrong indentation level. Please indent it correctly under feed, it should have 2 more spaces than feed name.' % name)
+                            log.error('\'%s\' is known keyword, but in wrong indentation level. Please indent it correctly under feed, it should have 2 more spaces than feed name.' % name)
                             continue
-                    logging.error('\'%s\' is not a properly configured feed, please check indentation levels.' % name)
+                    log.error('\'%s\' is not a properly configured feed, please check indentation levels.' % name)
                     continue
                 # if feed name is prefixed with _ it's disabled
                 if name.startswith('_'): continue
@@ -568,7 +564,7 @@ class Manager:
                     feed.execute()
                     terminate[name] = feed
                 except Exception, e:
-                    logging.exception('Feed %s: %s' % (feed.name, e))
+                    log.exception('Feed %s: %s' % (feed.name, e))
 
             # execute terminate event for all feeds
             if not self.options.validate:
@@ -576,7 +572,7 @@ class Manager:
                     try:
                         feed.terminate()
                     except Exception, e:
-                        logging.exception('Feed %s terminate: %s' % (name, e))
+                        log.exception('Feed %s terminate: %s' % (name, e))
                 
         finally:
             if not self.options.test:

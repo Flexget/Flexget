@@ -7,7 +7,6 @@ import sys
 
 if __name__ == "__main__":
     manager = Manager()
-    manager.initialize()
     lockfile = os.path.join(sys.path[0], ".%s-lock" % manager.configname)
 
     if os.path.exists(lockfile):
