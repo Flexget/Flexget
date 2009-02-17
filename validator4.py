@@ -71,8 +71,10 @@ class Validator(object):
         return self.validators[meta](self)
 
     def accept(self, meta, **kwargs):
-        # TODO: should it?
-        raise Exception('Validator %s should override accept method?' % self.__class__.__name__)
+        raise Exception('Validator %s should override accept method' % self.__class__.__name__)
+        
+    def validate(self, data):
+        raise Exception('Validator %s should override validate method' % self.__class__.__name__)
         
     def validate_item(self, item, rules):
         """
@@ -182,7 +184,7 @@ class ListValidator(Validator):
     def validate(self, data):
         if not isinstance(data, list):
             self.errors.add('validate data is not a list object')
-            return
+            return False
         self.errors.path_add_level()
         for item in data:
             self.errors.path_update_value(data.index(item))
@@ -190,8 +192,6 @@ class ListValidator(Validator):
                 l = [r.name for r in self.valid]
                 self.errors.add('is not valid %s' % (', '.join(l)))
         self.errors.path_remove_level()
-        
-        # validation succeeded, errors are logged so it's considered clean!
         return True
 
 class DictValidator(Validator):
@@ -240,7 +240,7 @@ class DictValidator(Validator):
     def validate(self, data):
         if not isinstance(data, dict):
             self.errors.add('validate data is not a dict')
-            return
+            return False
         self.errors.path_add_level()
         for key, value in data.iteritems():
             self.errors.path_update_value(key)
@@ -260,8 +260,6 @@ class DictValidator(Validator):
             if not data.has_key(required):
                 self.errors.add('key \'%s\' required' % required)
         self.errors.path_remove_level()
-        
-        # validation succeeded, errors are logged so it's considered clean!
         return True
 
 if __name__=='__main__':
