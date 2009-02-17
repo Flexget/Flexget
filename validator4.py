@@ -1,11 +1,7 @@
 import re
 
-# TODO: get rid of TypeException, bad exception! Or atleast improve it's usage!
 # TODO: "validation succeeded, errors are logged so it's considered clean!"
-# TODO: rename all validator.valid -> validator.accepts / accepted / accept
-
-class TypeException(Exception):
-    pass
+# TODO: rename all validator.valid -> validator.accepts / accepted / accept ?
 
 class Errors:
 
@@ -55,14 +51,10 @@ class Validator(object):
             self.errors = Errors()
             self.validators = {}
             
-            # register default handlers
-            self.register(RootValidator)
-            self.register(ListValidator)
-            self.register(DictValidator) 
-            self.register(TextValidator)
-            self.register(NumberValidator)
-            self.register(UrlValidator)
-            self.register(ChoiceValidator)
+            # register default validators
+            register = [RootValidator, ListValidator, DictValidator, TextValidator, NumberValidator, UrlValidator, ChoiceValidator]
+            for v in register:
+                self.register(v)
         else:
             self.errors = parent.errors
             self.validators = parent.validators
@@ -86,19 +78,12 @@ class Validator(object):
         """
             Helper method. Validate item against list of rules (validators).
             Return True if item passed some rule. False if none of the rules pass item.
-            Raises TypeException if it could not be even tried (wrong type).
         """
-        failed = True
         for rule in rules:
-            try:
-                print 'validating %s' % rule.name
-                if rule.validate(item):
-                    return True
-                failed = False
-            except TypeException:
-                pass
-        if failed:
-            raise TypeException()
+            print 'validating %s' % rule.name
+            if rule.validate(item):
+                return True
+        return False
 
     def __str__(self):
         return '<%s>' % self.name
@@ -125,11 +110,8 @@ class RootValidator(Validator):
     
     def validate(self, data):
         for v in self.valid:
-            try:
-                v.validate(data)
-                return True
-            except TypeException:
-                pass
+            v.validate(data)
+            return True
         self.errors.add('incorrect format')
         return False
 
@@ -144,12 +126,9 @@ class ChoiceValidator(Validator):
         return v
 
     def validate(self, data):
-        try:
-            if not self.validate_item(data, self.valid):
-                l = [r.name for r in self.valid]
-                self.errors.add('must be one of values %s' % (', '.join(l)))
-        except TypeException:
-            pass
+        if not self.validate_item(data, self.valid):
+            l = [r.name for r in self.valid]
+            self.errors.add('must be one of values %s' % (', '.join(l)))
         return True
 
 class EqualsValidator(Validator):
@@ -202,16 +181,14 @@ class ListValidator(Validator):
 
     def validate(self, data):
         if not isinstance(data, list):
-            raise TypeException('validate data is not a list')
+            self.errors.add('validate data is not a list object')
+            return
         self.errors.path_add_level()
         for item in data:
             self.errors.path_update_value(data.index(item))
-            try:
-                if not self.validate_item(item, self.valid):
-                    l = [r.name for r in self.valid]
-                    self.errors.add('is not valid %s' % (', '.join(l)))
-            except TypeException:
-                pass
+            if not self.validate_item(item, self.valid):
+                l = [r.name for r in self.valid]
+                self.errors.add('is not valid %s' % (', '.join(l)))
         self.errors.path_remove_level()
         
         # validation succeeded, errors are logged so it's considered clean!
@@ -262,7 +239,8 @@ class DictValidator(Validator):
 
     def validate(self, data):
         if not isinstance(data, dict):
-            raise TypeException('validate data is not a dict')
+            self.errors.add('validate data is not a dict')
+            return
         self.errors.path_add_level()
         for key, value in data.iteritems():
             self.errors.path_update_value(key)
@@ -275,12 +253,9 @@ class DictValidator(Validator):
             # rules specified for any key
             rules = self.valid.get(key, [])
             rules.extend(self.any_key)
-            try:
-                if not self.validate_item(value, rules):
-                    l = [r.name for r in rules]
-                    self.errors.add('key \'%s\' is not valid %s' % (value, ', '.join(l)))
-            except TypeException:
-                pass
+            if not self.validate_item(value, rules):
+                l = [r.name for r in rules]
+                self.errors.add('key \'%s\' is not valid %s' % (value, ', '.join(l)))
         for required in self.required_keys:
             if not data.has_key(required):
                 self.errors.add('key \'%s\' required' % required)
