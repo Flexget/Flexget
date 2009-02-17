@@ -42,6 +42,8 @@ class Callable:
 
 class Validator(object):
 
+    name = 'validator'
+
     def factory(meta='root'):
         v = Validator()
         return v.get_validator(meta)
@@ -73,10 +75,10 @@ class Validator(object):
     def get_validator(self, meta):
         if not self.validators.get(meta):
             raise Exception('Asked unknown validator \'%s\'' % meta)
-        print 'returning %s' % meta
+        #print 'returning %s' % meta
         return self.validators[meta](self)
 
-    def accept(self, **kwargs):
+    def accept(self, meta, **kwargs):
         # TODO: should it?
         raise Exception('Validator %s should override accept method?' % self.__class__.__name__)
         
@@ -93,7 +95,7 @@ class Validator(object):
                 if rule.validate(item):
                     return True
                 failed = False
-            except TypeException, e:
+            except TypeException:
                 pass
         if failed:
             raise TypeException()
@@ -126,7 +128,7 @@ class RootValidator(Validator):
             try:
                 v.validate(data)
                 return True
-            except TypeException, e:
+            except TypeException:
                 pass
         self.errors.add('incorrect format')
         return False
@@ -136,8 +138,8 @@ class RootValidator(Validator):
 class ChoiceValidator(Validator):
     name = 'choice'
 
-    def accept(self, value):
-        v = self.get_validator(value)
+    def accept(self, meta, **kwargs):
+        v = self.get_validator(kwargs['value'])
         self.valid.append(v)
         return v
 
@@ -146,7 +148,7 @@ class ChoiceValidator(Validator):
             if not self.validate_item(data, self.valid):
                 l = [r.name for r in self.valid]
                 self.errors.add('must be one of values %s' % (', '.join(l)))
-        except TypeException, e:
+        except TypeException:
             pass
         return True
 
@@ -208,7 +210,7 @@ class ListValidator(Validator):
                 if not self.validate_item(item, self.valid):
                     l = [r.name for r in self.valid]
                     self.errors.add('is not valid %s' % (', '.join(l)))
-            except TypeException, e:
+            except TypeException:
                 pass
         self.errors.path_remove_level()
         
@@ -229,15 +231,14 @@ class DictValidator(Validator):
     def accept(self, meta, **kwargs):
         """Accepts key with meta type"""
         if not kwargs.has_key('key'):
-            # not sure if this is good idea, quite implicit
-            return self.accept_any_key(meta)
-        else:
-            key = kwargs['key']
-            v = self.get_validator(meta)
-            self.valid.setdefault(key, []).append(v)
-            if kwargs.get('require', False):
-                self.require(key)
-            return v
+            raise Exception('%s.accept() must specify key' % self.name)
+
+        key = kwargs['key']
+        v = self.get_validator(meta)
+        self.valid.setdefault(key, []).append(v)
+        if kwargs.get('require', False):
+            self.require_key(key)
+        return v
 
     def reject_key(self, key):
         """Rejects key"""
@@ -278,7 +279,7 @@ class DictValidator(Validator):
                 if not self.validate_item(value, rules):
                     l = [r.name for r in rules]
                     self.errors.add('key \'%s\' is not valid %s' % (value, ', '.join(l)))
-            except TypeException, e:
+            except TypeException:
                 pass
         for required in self.required_keys:
             if not data.has_key(required):
@@ -320,4 +321,5 @@ if __name__=='__main__':
     except Exception, e:
         print e
     finally:
-        s = raw_input('--> ')
+        pass
+        #s = raw_input('--> ')
