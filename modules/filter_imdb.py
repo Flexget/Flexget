@@ -385,6 +385,7 @@ class FilterImdb:
         imdb.accept('min_score', int)
         imdb.accept('reject_genres', list).accept(str)
         imdb.accept('reject_languages', list).accept(str)
+        imdb.accept('accept_languages', list).accept(str)
         imdb.accept('filter_invalid', bool)
         imdb.validate(config)
         return imdb.errors.messages
@@ -412,6 +413,14 @@ class FilterImdb:
         if not soup_present: raise ModuleWarning("Module filter_imdb requires BeautifulSoup. Please install it from http://www.crummy.com/software/BeautifulSoup/ or from your distribution repository.", log)
         config = feed.config['imdb']
         for entry in feed.entries:
+        
+            # sanity checks
+            if entry.has_key('imdb_votes'):
+                if not isinstance(entry['imdb_votes'], int):
+                    raise ModuleWarning('imdb_votes should be int!')
+            if entry.has_key('imdb_score'):
+                if not isinstance(entry['imdb_score'], float):
+                    raise ModuleWarning('imdb_score should be float!')
         
             # make sure imdb url is valid
             if entry.has_key('imdb_url'):

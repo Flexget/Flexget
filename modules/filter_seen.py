@@ -42,6 +42,7 @@ class FilterSeen(object):
                 if feed.shared_cache.get(entry[field], False) or feed.shared_cache.get(urllib.unquote(entry[field]), False):
                     log.debug("Rejecting '%s' '%s' because of seen '%s'" % (entry['url'], entry['title'], field))
                     feed.reject(entry)
+                    break
 
             # scan for duplicates
             for duplicate in feed.entries:
