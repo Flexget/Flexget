@@ -52,7 +52,8 @@ class Validator(object):
             self.validators = {}
             
             # register default validators
-            register = [RootValidator, ListValidator, DictValidator, TextValidator, NumberValidator, UrlValidator, ChoiceValidator]
+            register = [RootValidator, ListValidator, DictValidator, TextValidator, 
+                        NumberValidator, DecimalValidator, UrlValidator, ChoiceValidator]
             for v in register:
                 self.register(v)
         else:
@@ -149,8 +150,16 @@ class NumberValidator(Validator):
         pass
 
     def validate(self, data):
-        return isinstance(data, int) or isinstance(data, float)
+        return isinstance(data, int)
 
+class DecimalValidator(Validator):
+    name = 'decimal'
+
+    def accept(self, meta, **kwargs):
+        pass
+
+    def validate(self, data):
+        return isinstance(data, float)
 
 class TextValidator(Validator):
     name = 'text'
