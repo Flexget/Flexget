@@ -414,6 +414,14 @@ class FilterImdb:
         config = feed.config['imdb']
         for entry in feed.entries:
         
+            # sanity checks
+            if entry.has_key('imdb_votes'):
+                if not isinstance(entry['imdb_votes'], int):
+                    raise ModuleWarning('imdb_votes should be int!')
+            if entry.has_key('imdb_score'):
+                if not isinstance(entry['imdb_score'], float):
+                    raise ModuleWarning('imdb_score should be float!')
+        
             # make sure imdb url is valid
             if entry.has_key('imdb_url'):
                 clean = self.clean_url(entry['imdb_url'])

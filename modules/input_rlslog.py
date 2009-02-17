@@ -47,7 +47,7 @@ class RlsLog:
                 break
         f = re_votes.search(s.replace(',',''))
         if f != None:
-            votes = f.group(1)
+            votes = int(f.group(1))
         log.debug("parse_imdb returning score: '%s' votes: '%s' from: '%s'" % (str(score), str(votes), s))
         return (score, votes)
 
