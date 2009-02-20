@@ -83,7 +83,6 @@ class NewTorrents:
             html = urllib2.urlopen(url).read()
             # fix </SCR'+'IPT> so that BS does not crash
             html = re.sub(r'(</SCR.*?)...(.*?IPT>)', r'\1\2', html)
-            print html
         except urllib2.URLError:
             raise ModuleWarning('Timed out when opening search page', log)
         
