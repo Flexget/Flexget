@@ -83,7 +83,7 @@ class SerieParser:
                 # leave this invalid
                 return
 
-        # seach quality
+        # search quality
         for part in data_parts:
             # search for quality
             if part in self.qualities:
@@ -284,25 +284,9 @@ class FilterSeries:
         watched.accept('episode', int)
         series.validate(config)
         return series.errors.messages
-        
-    # TODO: remove at some point
-    def upgrade(self, feed):
-        """Upgrades cache from old version to new."""
-        for name in feed.config.get('series', []):
-            if isinstance(name, dict):
-                name = name.items()[0][0]
-            if not feed.shared_cache.has_key(name) and feed.cache.has_key(name):
-                log.info('Converting serie %s to new format' % name)
-                data = feed.shared_cache.get(name)
-                if isinstance(data, dict):
-                    feed.shared_cache.store(name, data, days=120)
-                else:
-                    log.error('Failed to convert %s to new format! Duplicate downloads are possible.' % name)
-                feed.cache.remove(name)
 
     def feed_input(self, feed):
-        """Retrieve stored series from cache, incase they've been expired from feed while waiting"""
-        self.upgrade(feed)
+        """Retrieve stored series from cache, in case they've been expired from feed while waiting"""
         for name in feed.config.get('series', []):
             if isinstance(name, dict):
                 name = name.items()[0][0]
@@ -314,7 +298,7 @@ class FilterSeries:
                     continue
                 # add all qualities
                 for quality in SerieParser.qualities:
-                    if quality=='info': continue # a hack, info dict is not quality
+                    if quality == 'info': continue # a hack, info dict is not quality
                     entry = serie[identifier].get(quality)
                     if not entry: continue
                     # check if this episode is still in feed, if not then add it
@@ -330,7 +314,6 @@ class FilterSeries:
                         e['url'] = entry['url']
                         feed.entries.append(e)
 
-
     def cmp_serie_quality(self, s1, s2):
         return self.cmp_quality(s1.quality, s2.quality)
 
@@ -339,7 +322,6 @@ class FilterSeries:
 
     def feed_filter(self, feed):
         """Filter series"""
-        self.upgrade(feed)
         for name in feed.config.get('series', []):
             # start with default settings
             conf = feed.manager.get_settings('series', {})
@@ -363,7 +345,6 @@ class FilterSeries:
 
             series = {} # ie. S1E2: [Serie Instance, Serie Instance, ..]
             for entry in feed.entries:
-                valid = False
                 for field, data in entry.iteritems():
                     # skip non string values and empty strings
                     if not isinstance(data, basestring): continue
@@ -383,10 +364,8 @@ class FilterSeries:
                     serie.parse()
                     # serie is not valid if it does not match given name / regexp or fails with exception
                     if serie.valid:
-                        valid = True
                         break
-                
-                if not valid:
+                else:
                     continue
 
                 # set custom download path
@@ -418,7 +397,7 @@ class FilterSeries:
                     season = wconf.get('season', -1)
                     episode = wconf.get('episode', maxint)
                     if best.season < season or (best.season == season and best.episode <= episode):
-                        log.debug('Series %s episode %s is already watched, rejecting all occurences' % (name, identifier))
+                        log.debug('Series %s episode %s is already watched, rejecting all occurrences' % (name, identifier))
                         for ep in eps:
                             feed.reject(ep.entry)
                         continue
@@ -426,10 +405,10 @@ class FilterSeries:
                 # episode advancement, only when using season, ep identifier
                 if best.season and best.episode:
                     latest = self.get_latest_info(feed, best)
-                    # allow few episodes "backwards" incase missing
+                    # allow few episodes "backwards" in case missing
                     grace = len(series) + 2
                     if best.season < latest['season'] or (best.season == latest['season'] and best.episode < latest['episode'] - grace):
-                        log.debug('Series %s episode %s does not meet episode advancement, rejecting all occurences' % (name, identifier))
+                        log.debug('Series %s episode %s does not meet episode advancement, rejecting all occurrences' % (name, identifier))
                         for ep in eps:
                             feed.reject(ep.entry)
                         continue
@@ -519,12 +498,6 @@ class FilterSeries:
         #       downloaded: <boolean>
         #     720p: <entry>
         #     dsr: <entry>
-        
-        # TODO: remove at some point, hack to fix broken session
-        if feed.shared_cache.get(serie.name, 'empty') is None:
-            log.info('Fixing broken session for %s' % serie.name)
-            feed.shared_cache.remove(serie.name) 
-        
         cache = feed.shared_cache.storedefault(serie.name, {}, 30)
         latest = cache.setdefault('latest', {})
         episode = cache.setdefault(serie.identifier(), {})
@@ -544,6 +517,7 @@ class FilterSeries:
         episode.setdefault(serie.quality, ec)
 
     def mark_downloaded(self, feed, serie):
+        """Mark episode in persistence as being downloaded"""
         log.debug('marking %s as downloaded' % serie.identifier())
         cache = feed.shared_cache.get(serie.name)
         cache[serie.identifier()]['info']['downloaded'] = True

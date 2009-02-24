@@ -1,5 +1,4 @@
 import urllib, urllib2
-from BeautifulSoup import BeautifulSoup
 import logging
 
 __pychecker__ = 'unusednames=parser,feed'
@@ -17,6 +16,11 @@ class ResolveNewzleech:
 
     # Search API
     def search(self, feed, entry):
+        try:
+            from BeautifulSoup import BeautifulSoup
+        except:
+            raise ModuleWarning('Newzleech requires BeautifulSoup')
+
         url = u'http://newzleech.com/?' + urllib.urlencode({'q':entry['title'].encode('latin1'), 'group':'', 'min':'', 'max':'', 'age':''})
         log.debug('search url: %s' % url)
         
