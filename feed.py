@@ -2,7 +2,7 @@ import logging
 from datetime import datetime
 from manager import ModuleWarning
 
-log = logging.getLogger('feed') 
+log = logging.getLogger('feed')
 
 class Entry(dict):
 
@@ -10,7 +10,7 @@ class Entry(dict):
         Represents one item in feed. Must have url and title fields.
         See. http://flexget.com/wiki/DevelopersEntry
 
-        Internally stored original_url is neccessary because
+        Internally stored original_url is necessary because
         modules (ie. resolvers) may change this into something else 
         and otherwise that information would be lost.
     """
@@ -108,7 +108,7 @@ class ModuleCache:
         now = datetime.today()
         for key in self._cache.keys():
             item = self._cache[key]
-            y,m,d = item['stored'].split('-')
+            y, m, d = item['stored'].split('-')
             stored = datetime(int(y), int(m), int(d))
             delta = now - stored
             if delta.days > item['days']:
@@ -134,12 +134,14 @@ class Feed:
         self.entries = []
         
         # You should NOT change these arrays at any point, and in most cases not even read them!
-        # Mainly public since unittest needs these
+        # Mainly public since unit test needs these
         
         self.accepted = [] # accepted entries are always accepted, filtering does not affect them
         self.filtered = [] # filtered entries
         self.rejected = [] # rejected entries are removed unconditionally, even if accepted
         self.failed = []
+
+        # TODO: feed.abort() should be done by using exception, not a flag that has to be checked everywhere
 
         # flags and counters
         self.unittest = False
@@ -166,7 +168,7 @@ class Feed:
         """Purge entries in list from feed.entries"""
         for entry in self.entries[:]:
             if entry in list and entry not in not_in_list:
-                logging.debug('Purging entry %s' % entry.safe_str())
+                log.debug('Purging entry %s' % entry.safe_str())
                 self.entries.remove(entry)
                 if count:
                     self.__purged += 1
@@ -183,13 +185,13 @@ class Feed:
 
     def filter(self, entry):
         """Mark entry to be filtered unless told otherwise. Entry may still be accepted."""
-        # accepted checked only because it makes more sense when verbosing details
+        # accepted checked only because it makes more sense when verbose details
         if not entry in self.filtered and not entry in self.accepted:
             self.filtered.append(entry)
             self.verbose_details('Filtered %s' % entry['title'])
 
     def reject(self, entry):
-        """Reject this entry immediattely and permanently."""
+        """Reject this entry immediately and permanently."""
         # schedule immediately filtering after this module has done execution
         if not entry in self.rejected:
             self.rejected.append(entry)
@@ -240,7 +242,7 @@ class Feed:
 
     # TODO: all these verbose methods are confusing
     def verbose_progress(self, s, logger=log):
-        """Verboses progress, outputs only in non quiet mode."""
+        """Verbose progress, outputs only in non quiet mode."""
         # TODO: implement trough own logger?
         if not self.manager.options.quiet and not self.unittest:
             logger.info(s)
@@ -318,18 +320,12 @@ class Feed:
         """Execute this feed, runs events in order of events array."""
         # validate configuration
         errors = self.validate()
-        if errors:
-            log.critical('Feed \'%s\' has configuration errors:' % self.name)
-            for error in errors:
-                log.error(error)
-            if not self.manager.options.validate:
-                self.abort()
-            return
-        # do not execute in validate mode
+        if self.__abort: return
         if self.manager.options.validate:
             if not errors:
-                log.info('Feed \'%s\' passed' % self.name)
-            return
+                print 'Feed \'%s\' passed' % self.name
+                return
+            
         # run events
         for event in self.manager.events:
             # when learning, skip few events
@@ -350,7 +346,7 @@ class Feed:
             if event == 'input':
                 self.verbose_details_entries()
                 if not self.entries:
-                    self.verbose_progress('Feed %s didn\'t produce any entries. This is likely to be misconfigured or non-functional input.' % self.name)
+                    self.verbose_progress('Feed %s didn\'t produce any entries. This is likely to be miss configured or non-functional input.' % self.name)
                 else:
                     self.verbose_progress('Feed %s produced %s entries.' % (self.name, len(self.entries)))
             if event == 'filter':
@@ -368,16 +364,25 @@ class Feed:
         """Module configuration validation. Return array of error messages that were detected."""
         validate_errors = []
         # validate all modules
-        for kw, value in self.config.iteritems():
-            module = self.manager.modules.get(kw)
+        for keyword in self.config:
+            module = self.manager.modules.get(keyword)
             if not module:
-                validate_errors.append('unknown keyword \'%s\'' % kw)
+                validate_errors.append('Unknown keyword \'%s\'' % keyword)
                 continue
             if hasattr(module['instance'], 'validate'):
-                errors = module['instance'].validate(self.config[kw])
+                errors = module['instance'].validate(self.config[keyword])
                 if errors:
                     for error in errors:
-                        validate_errors.append('%s %s' % (kw, error))
+                        validate_errors.append('%s %s' % (keyword, error))
             else:
-                log.warning('Used module %s does not support validating. Please notify author!' % kw)
+                log.warning('Used module %s does not support validating. Please notify author!' % keyword)
+                
+        # log errors and abort
+        if validate_errors:
+            log.critical('Feed \'%s\' has configuration errors:' % self.name)
+            for error in validate_errors:
+                log.error(error)
+            # feed has errors, abort it
+            self.abort()
+                
         return validate_errors
