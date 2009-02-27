@@ -107,12 +107,18 @@ class InputRSS:
         log.debug('Checking feed %s (%s)', feed.name, url)
 
         # check etags and last modified -headers
+        
+        # let's not, flexget works better when feed contains all entries all the time ?
+        etag = None
+        modified = None
+        """
         etag = feed.cache.get('etag', None)
         if etag:
             log.debug('Sending etag %s for feed %s' % (etag, feed.name))
         modified = feed.cache.get('modified', None)
         if modified:
             log.debug('Sending last-modified %s for feed %s' % (etag, feed.name))
+        """
 
         # get the feed & parse
         try:

@@ -348,7 +348,7 @@ class Feed:
             if event == 'input':
                 self.verbose_details_entries()
                 if not self.entries:
-                    self.verbose_progress('Feed %s didn\'t produce any entries. This is likelly to be misconfigured or non-functional input.' % self.name)
+                    self.verbose_progress('Feed %s didn\'t produce any entries. This is likely to be misconfigured or non-functional input.' % self.name)
                 else:
                     self.verbose_progress('Feed %s produced %s entries.' % (self.name, len(self.entries)))
             if event == 'filter':

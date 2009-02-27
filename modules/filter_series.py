@@ -20,7 +20,7 @@ class SerieParser:
         self.data = None 
         
         self.ep_regexps = ['s(\d+)e(\d+)', 's(\d+)ep(\d+)', '(\d+)x(\d+)']
-        self.id_regexps = ['(\d\d\d\d).(\d+).(\d+)', '(\d+).(\d+).(\d\d\d\d)', '(\d\d\d\d)x(\d+)\.(\d+)']
+        self.id_regexps = ['(\d\d\d\d).(\d+).(\d+)', '(\d+).(\d+).(\d\d\d\d)', '(\d\d\d\d)x(\d+)\.(\d+)', '(\d\d\d)', '(\d\d)', '(\d)']
         self.name_regexps = []
         # parse produces these
         self.season = None
@@ -82,6 +82,8 @@ class SerieParser:
                 #log.debug('FAIL: regexp %s does not match %s' % (name_re, self.data))
                 # leave this invalid
                 return
+                
+        # TODO: matched name should be EXCLUDED from ep and id searching!
 
         # seach quality
         for part in data_parts:
@@ -94,15 +96,6 @@ class SerieParser:
                     pass
                     #log.debug('%s ignoring quality tag %s because found better %s' % (self.name, part, self.quality))
 
-        # search for id first, since they match to less
-        for id_re in self.id_regexps:
-            m = re.search(id_re, self.data, re.IGNORECASE|re.UNICODE)
-            if m:
-                #log.debug('found id with regexp %s' % id_re)
-                self.id = string.join(m.groups(), '-')
-                self.valid = True
-                return
-
         # search for season and episode number
         for ep_re in self.ep_regexps:
             m = re.search(ep_re, self.data, re.IGNORECASE|re.UNICODE)
@@ -113,6 +106,15 @@ class SerieParser:
                 self.episode = int(episode)
                 self.valid = True
                 self.id = "S%sE%s" % (self.season, self.episode)
+                return
+
+        # search for id as last since they contain somewhat broad matches
+        for id_re in self.id_regexps:
+            m = re.search(id_re, self.data, re.IGNORECASE|re.UNICODE)
+            if m:
+                #log.debug('found id with regexp %s' % id_re)
+                self.id = string.join(m.groups(), '-')
+                self.valid = True
                 return
 
         log.debug('FAIL: unable to find any id from %s' % data)
