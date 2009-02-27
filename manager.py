@@ -116,6 +116,7 @@ class Manager:
 
         # add module path to sys.path so that imports work properly ..
         sys.path.append(self.moduledir)
+        sys.path.insert(1, os.path.join(sys.path[0], 'BeautifulSoup-3.0.7a'))
 
         # load modules, modules may add more commandline parameters!
         self.load_modules(parser, self.moduledir)

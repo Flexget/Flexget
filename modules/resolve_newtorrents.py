@@ -80,11 +80,13 @@ class NewTorrents:
         """Parses torrent download url from search results"""
         name = name.replace('.',' ').lower()
         try:
-            page = urllib2.urlopen(url)
+            html = urllib2.urlopen(url).read()
+            # fix </SCR'+'IPT> so that BS does not crash
+            html = re.sub(r'(</SCR.*?)...(.*?IPT>)', r'\1\2', html)
         except urllib2.URLError:
             raise ModuleWarning('Timed out when opening search page', log)
         
-        soup = BeautifulSoup(page)
+        soup = BeautifulSoup(html)
         torrents = []
         for link in soup.findAll('a', attrs={'href': re.compile('down.php')}):
             torrent_url = 'http://www.newtorrents.info%s' % link.get('href')
