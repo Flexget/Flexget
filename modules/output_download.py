@@ -1,4 +1,5 @@
 import sys, os, time
+import urllib
 import urllib2
 import logging
 import shutil
@@ -77,24 +78,25 @@ class ModuleDownload:
                     log.error('The server couldn\'t fulfill the request. Error code: %s' % e.code)
 
     def download(self, feed, entry):
-        log.debug('Downloading url %s' % entry['url'])
+        url = urllib.quote(entry['url'], safe=':/~')
+        log.debug('Downloading url %s' % url)
         # get content
         if entry.has_key('basic_auth_password') and entry.has_key('basic_auth_username'):
             log.debug('Basic auth enabled. User: %s Password: %s' % (entry['basic_auth_username'], entry['basic_auth_password']))
             passman = urllib2.HTTPPasswordMgrWithDefaultRealm()
-            passman.add_password(None, entry['url'], entry['basic_auth_username'], entry['basic_auth_password'])
+            passman.add_password(None, url, entry['basic_auth_username'], entry['basic_auth_password'])
             handler = urllib2.HTTPBasicAuthHandler(passman)
             opener = urllib2.build_opener(handler)
-            f = opener.open(entry['url'])
+            f = opener.open(url)
         else:
-            f = urllib2.urlopen(entry['url'])
+            f = urllib2.urlopen(url)
 
         mimetype = f.headers.getsubtype()
 
         # generate temp file, with random md5 sum .. 
         # url alone is not random enough, it has happened that there are two entries with same url
         m = md5.new()
-        m.update(entry['url'])
+        m.update(url)
         m.update('%s' % time.time())
         tmp_path = os.path.join(sys.path[0], 'temp')
         if not os.path.isdir(tmp_path):
