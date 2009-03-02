@@ -78,7 +78,7 @@ class ModuleDownload:
                     log.error('The server couldn\'t fulfill the request. Error code: %s' % e.code)
 
     def download(self, feed, entry):
-        url = urllib.quote(entry['url'], safe=':/~')
+        url = urllib.quote(entry['url'], safe=':/~?=&')
         log.debug('Downloading url %s' % url)
         # get content
         if entry.has_key('basic_auth_password') and entry.has_key('basic_auth_username'):
