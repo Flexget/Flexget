@@ -1,5 +1,7 @@
 import sgmllib
 
+"""Contains html related helpers"""
+
 class HtmlParser(sgmllib.SGMLParser):
     from htmlentitydefs import entitydefs
 

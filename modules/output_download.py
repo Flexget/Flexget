@@ -78,7 +78,7 @@ class ModuleDownload:
                     log.error('The server couldn\'t fulfill the request. Error code: %s' % e.code)
 
     def download(self, feed, entry):
-        url = urllib.quote(entry['url'], safe=':/~')
+        url = urllib.quote(entry['url'], safe=':/~?=&')
         log.debug('Downloading url %s' % url)
         # get content
         if entry.has_key('basic_auth_password') and entry.has_key('basic_auth_username'):
@@ -137,8 +137,8 @@ class ModuleDownload:
         import email
         filename = email.message_from_string(unicode(response.info()).encode('utf-8')).get_filename(failobj=False)
         if filename:
-            import utils
-            filename = utils.html_decode(filename)
+            from utils.html import html_decode
+            filename = html_decode(filename)
             log.debug('Found filename from headers: %s' % filename)
             if entry.has_key('filename'):
                 log.debug('Overriding filename %s with %s from content-disposition' % (entry['filename'], filename))

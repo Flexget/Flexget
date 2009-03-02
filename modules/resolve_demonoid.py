@@ -8,7 +8,7 @@ class ResolveDemonoid:
     """Demonoid resolver."""
 
     def register(self, manager, parser):
-        manager.register('resolve_demonoid', group='resolver')
+        manager.register('demonoid', group='resolver')
 
     def resolvable(self, feed, entry):
         return entry['url'].startswith('http://www.demonoid.com/files/details/')

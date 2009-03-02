@@ -8,7 +8,7 @@ class ResolveRedskunk:
     """Redskunk resolver."""
 
     def register(self, manager, parser):
-        manager.register('resolve_redskunk', group='resolver')
+        manager.register('redskunk', group='resolver')
 
     def resolvable(self, feed, entry):
         url = entry['url']

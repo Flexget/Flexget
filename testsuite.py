@@ -262,7 +262,7 @@ class TestResolvers(FlexGetTestCase):
         
     def testNyaaTorrents(self):
         entry = self.feed.entries[2]
-        resolver = self.get_resolver('resolve_nyaatorrents')
+        resolver = self.get_resolver('nyaatorrents')
         self.assertEqual(entry['url'], 'http://www.nyaatorrents.org/?page=torrentinfo&tid=12345')
         self.assertEqual(resolver.resolvable(self.feed, entry), True)
         resolver.resolve(self.feed, entry)

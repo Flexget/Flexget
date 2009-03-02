@@ -20,7 +20,7 @@ class Resolver:
     def feed_resolve(self, feed):
         # no resolves in unittest mode
         if feed.unittest: return
-        self.resolve_entries(feed)
+        self.entries(feed)
 
     def resolvable(self, feed, entry):
         """Return True if entry is resolvable by registered resolver."""
@@ -51,7 +51,7 @@ class Resolver:
                         log.exception(e)
                         raise ResolverException('%s: Internal error with url %s' % (name, entry['url']))
 
-    def resolve_entries(self, feed):
+    def entries(self, feed):
         """Resolves all entries in feed. Since this causes many requests to sites, use with caution."""
         for entry in feed.entries:
             try:
