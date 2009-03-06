@@ -304,6 +304,11 @@ class TestManager(FlexGetTestCase):
         assert len(self.manager.session['failed']) == 2, 'failed to add again'
         self.manager.add_failed(e)
         assert len(self.manager.session['failed']) == 2, 'failed to filter already added'
+        
+    def testBsImport(self):
+        import BeautifulSoup
+        if BeautifulSoup.__version__ != '3.0.7a':
+            self.fail('BeautifulSoup version wrong')
 
 class TestFilterSeen(FlexGetTestCase):
         
