@@ -421,7 +421,7 @@ class TestDownload(FlexGetTestCase):
         FlexGetTestCase.setUp(self)
 
     def testDownload(self):
-        self.testfile = os.path.expanduser('~/flexget_test')
+        self.testfile = os.path.expanduser('~/flexget_test_data')
         if os.path.exists(self.testfile):
             os.remove(self.testfile)
         # executes feed and downloads the file
@@ -430,6 +430,7 @@ class TestDownload(FlexGetTestCase):
             self.fail('download file does not exists')
         else:
             os.remove(self.testfile)
+    
 
 class TestInputRSS(FlexGetTestCase):
 

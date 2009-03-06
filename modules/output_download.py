@@ -81,7 +81,7 @@ class ModuleDownload:
         url = urllib.quote(entry['url'], safe=':/~?=&%')
         log.debug('Downloading url %s' % url)
         # get content
-        if entry.has_key('basic_auth_password') and entry.has_key('basic_auth_username'):
+        if 'basic_auth_password' in entry and 'basic_auth_username' in entry:
             log.debug('Basic auth enabled. User: %s Password: %s' % (entry['basic_auth_username'], entry['basic_auth_password']))
             passman = urllib2.HTTPPasswordMgrWithDefaultRealm()
             passman.add_password(None, url, entry['basic_auth_username'], entry['basic_auth_password'])
@@ -128,7 +128,7 @@ class ModuleDownload:
         # prefer content-disposition naming
         self.filename_from_headers(entry, f)
         # if there is still no specified filename, use mime-type
-        if not entry.has_key('filename'):
+        if not 'filename' in entry:
             self.filename_from_mime(entry, f)
         # TODO: LAST option, try to scrap url?
 
@@ -140,7 +140,7 @@ class ModuleDownload:
             import utils
             filename = utils.html_decode(filename)
             log.debug('Found filename from headers: %s' % filename)
-            if entry.has_key('filename'):
+            if 'filename' in entry:
                 log.debug('Overriding filename %s with %s from content-disposition' % (entry['filename'], filename))
             entry['filename'] = filename
 
@@ -151,7 +151,7 @@ class ModuleDownload:
         extension = mimetypes.guess_extension(response.headers.getsubtype())
         if extension:
             log.debug('Mimetypes guess for %s is %s ' % (response.headers.getsubtype(), extension))
-            if entry.has_key('filename'):
+            if 'filename' in entry:
                 if entry['filename'].endswith('.%s' % extension):
                     log.debug('Filename %s extension matches to mimetype' % entry['filename'])
                 else:
@@ -174,14 +174,14 @@ class ModuleDownload:
                 feed.fail(entry)
                 log.exception('Error while writing: %s' % e)
             # remove temp file if it remains due exceptions
-            if entry.has_key('file'):
+            if 'file' in entry:
                 if os.path.exists(entry['file']):
                     log.debug('removing temp file %s (left behind) from %s' % (entry['file'], entry['title']))
                     os.remove(entry['file'])
 
     def output(self, feed, entry):
         """Moves temp-file into final destination"""
-        if not entry.has_key('file'):
+        if not 'file' in entry:
             raise Exception('Entry %s has no temp file associated with' % entry['title'])
         # use path from entry if has one, otherwise use from download definition parameter
         path = entry.get('path', feed.config['download'])
@@ -189,8 +189,8 @@ class ModuleDownload:
         if feed.manager.options.dl_path:
             path = feed.manager.options.dl_path
         # make filename, if entry has perefered filename attribute use it, if not use title
-        if not entry.has_key('filename'):
-            log.warn('Unable to figure proper filename extension for %s' % entry['title'])
+        if not 'filename' in entry:
+            log.warning('Unable to figure proper filename / extension for %s, using title.' % entry['title'])
 
         # make path
         path = os.path.expanduser(path)
@@ -202,10 +202,8 @@ class ModuleDownload:
             except:
                 raise ModuleWarning('Cannot create path %s' % path, log)
         
-        if not entry.has_key('filename'):
-            log.warning('%s does not have filename, using title' % entry['title'])
         # combine to full path + filename, replace / from filename (#208)
-        destfile = os.path.join(path, entry.get('filename', entry['title']).replace('/', ' '))
+        destfile = os.path.join(path, entry.get('filename', entry['title']).replace('/', '_'))
 
         if os.path.exists(destfile):
             raise ModuleWarning('File \'%s\' already exists' % destfile, log)
@@ -215,11 +213,11 @@ class ModuleDownload:
             tmp_path = os.path.join(sys.path[0], 'temp')
             log.debug('entry: %s' % entry)
             log.debug('temp: %s' % ', '.join(os.listdir(tmp_path)))
-            raise ModuleWarning('Downloaded temp file \'%s\' doesn\'t exists!' % entry['file'])
+            raise ModuleWarning('Downloaded temp file \'%s\' doesn\'t exists!?' % entry['file'])
 
         # move temp file
+        logging.debug('moving %s to %s' % (entry['file'], destfile))
         shutil.move(entry['file'], destfile)
-        logging.debug('moved %s to %s' % (entry['file'], destfile))
         # remove temp file from entry
         del(entry['file'])
 
