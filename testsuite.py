@@ -305,6 +305,11 @@ class TestManager(FlexGetTestCase):
         assert len(self.manager.session['failed']) == 2, 'failed to add again'
         self.manager.add_failed(e)
         assert len(self.manager.session['failed']) == 2, 'failed to filter already added'
+        
+    def testBsImport(self):
+        import BeautifulSoup
+        if BeautifulSoup.__version__ != '3.0.7a':
+            self.fail('BeautifulSoup version wrong')
 
 class TestFilterSeen(FlexGetTestCase):
         
@@ -422,7 +427,7 @@ class TestDownload(FlexGetTestCase):
         FlexGetTestCase.setUp(self)
 
     def testDownload(self):
-        self.testfile = os.path.expanduser('~/flexget_test')
+        self.testfile = os.path.expanduser('~/flexget_test_data')
         if os.path.exists(self.testfile):
             os.remove(self.testfile)
         # executes feed and downloads the file
@@ -431,6 +436,7 @@ class TestDownload(FlexGetTestCase):
             self.fail('download file does not exists')
         else:
             os.remove(self.testfile)
+    
 
 class TestInputRSS(FlexGetTestCase):
 
