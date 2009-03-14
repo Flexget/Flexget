@@ -142,7 +142,7 @@ class InputRSS:
             elif status == 500:
                 raise ModuleWarning('Internal server exception on feed %s' % feed.name, log)
         else:
-            log.debug('RSS does not have status: %s' % rss)
+            log.debug('RSS does not have status (normal if processing a file)')
             
         # check for bozo
         ex = rss.get('bozo_exception', False)
