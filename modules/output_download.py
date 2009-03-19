@@ -3,7 +3,6 @@ import urllib
 import urllib2
 import logging
 import shutil
-import md5
 from manager import ModuleWarning
 
 __pychecker__ = 'unusednames=parser,feed'
@@ -97,7 +96,8 @@ class ModuleDownload:
 
         # generate temp file, with random md5 sum .. 
         # url alone is not random enough, it has happened that there are two entries with same url
-        m = md5.new()
+        import hashlib
+        m = hashlib.md5()
         m.update(url)
         m.update('%s' % time.time())
         tmp_path = os.path.join(sys.path[0], 'temp')
