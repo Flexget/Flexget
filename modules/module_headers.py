@@ -6,16 +6,6 @@ __pychecker__ = 'unusednames=parser,feed'
 
 log = logging.getLogger('headers')
 
-"""
-class HTTHeadersPHandler(BaseHandler):
-
-    def __init__(self):
-        self.headers = {}
-
-    def http_open(self, req):
-        return self.do_open(httplib.HTTPConnection, req)
-"""
-
 class HTTPHeadersProcessor(urllib2.BaseHandler):
 
     # run first
@@ -41,7 +31,7 @@ class HTTPHeadersProcessor(urllib2.BaseHandler):
 class ModuleHeaders:
 
     """
-        Allow setting up any headers in all requests (using urllib2)
+        Allow setting up any headers in all requests (which use urllib2)
         
         Example:
         
@@ -53,8 +43,11 @@ class ModuleHeaders:
         manager.register('headers')
 
     def validate(self, config):
-        # TODO
-        return []
+        from validator import DictValidator
+        root = DictValidator()
+        root.accept_any_key(str)
+        root.validate(config)
+        return root.errors.messages
 
     def feed_start(self, feed):
         """Feed starting, install cookiejar"""
