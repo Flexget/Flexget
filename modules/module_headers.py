@@ -50,18 +50,22 @@ class ModuleHeaders:
         return root.errors.messages
 
     def feed_start(self, feed):
-        """Feed starting, install cookiejar"""
+        """Feed starting"""
         config = feed.config['headers']
-        # create new opener for urllib2
-        log.debug('Installing new urllib2 default opener')
-        opener = urllib2.build_opener(HTTPHeadersProcessor(config))
-        urllib2.install_opener(opener)
+        if urllib2._opener:
+            log.debug('Adding HTTPCaptureHeaderHandler to default opener')
+            urllib2._opener.add_handler(HTTPHeadersProcessor(config))
+        else:
+            log.debug('Creating new opener and installing it')
+            opener = urllib2.build_opener(HTTPHeadersProcessor(config))
+            urllib2.install_opener(opener)
         
     def feed_abort(self, feed):
-        """Feed aborted, unhook the cookiejar"""
         self.feed_exit(feed)
 
     def feed_exit(self, feed):
-        """Feed exiting, remove cookiejar"""
-        log.debug('Removing urllib2 default opener')
-        urllib2.install_opener(None)
+        """Feed exiting, remove additions"""
+        if urllib2._opener:
+            log.debug('Removing urllib2 default opener')
+            # TODO: this uninstalls all other handlers as well, but does it matter?
+            urllib2.install_opener(None)

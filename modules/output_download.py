@@ -89,7 +89,8 @@ class ModuleDownload:
             f = opener.open(url)
         else:
             if urllib2._opener:
-                log.debug('default opener present, handlers: %s' % repr(urllib2._opener.handlers))
+                handlers = [h.__class__.__name__ for h in urllib2._opener.handlers]
+                log.debug('default opener present, handlers: %s' % ', '.join(handlers))
             f = urllib2.urlopen(url)
 
         mimetype = f.headers.getsubtype()
