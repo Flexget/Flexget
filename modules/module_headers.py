@@ -17,7 +17,8 @@ class HTTPHeadersProcessor(urllib2.BaseHandler):
     def http_request(self, request):
         for name, value in self.headers.iteritems():
             if not request.has_header(name):
-                request.add_unredirected_header(name, value)
+                log.debug('Adding %s: %s' % (name, value))
+                request.add_unredirected_header(name.capitalize(), value.strip())
         return request
 
     def http_response(self, request, response):
@@ -34,7 +35,7 @@ class ModuleHeaders:
         Example:
         
         headers:
-          Cookie: uid=<YOUR UID>, pass=<YOUR PASS>
+          cookie: uid=<YOUR UID>; pass=<YOUR PASS>
     """
 
     def register(self, manager, parser):
