@@ -16,9 +16,7 @@ class HTTPHeadersProcessor(urllib2.BaseHandler):
 
     def http_request(self, request):
         for name, value in self.headers.iteritems():
-            print repr(request)
             if not request.has_header(name):
-                #print '***** adding header: %s = %s' % (name, value)
                 request.add_unredirected_header(name, value)
         return request
 
