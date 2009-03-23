@@ -22,12 +22,11 @@ class RemoveTrackers:
     def register(self, manager, parser):
         manager.register('remove_trackers')
 
-    def validate(self, config):
-        from validator import ListValidator
-        remove = ListValidator()
-        remove.accept(str)
-        remove.validate(config)
-        return remove.errors.messages
+    def validator(self):
+        import validator
+        trackers = validator.factory('list')
+        trackers.accept('text')
+        return trackers
 
     def feed_modify(self, feed):
         for entry in feed.entries:

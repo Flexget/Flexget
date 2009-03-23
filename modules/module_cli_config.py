@@ -30,9 +30,10 @@ class CliConfig:
                           help='Configuration parameters trough commandline. See --doc cli_config.')
         self.replaces = {}
 
-    def validate(self, config):
-        # there is no way to misconfigure this .. ?
-        return []
+    def validator(self):
+        # there is no way to misconfigure this .. 
+        import validator
+        return validator.factory('any')
     
     def replace_dict(self, d, replaces):
         for k,v in d.items():

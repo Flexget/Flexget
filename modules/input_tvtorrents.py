@@ -40,9 +40,9 @@ class InputTVTorrents:
     def register(self, manager, parser):
         manager.register('tvt')
 
-    def validate(self, config):
-        # TODO: validate that parameter is url ...
-        return []
+    def validator(self):
+        import validator
+        return validator.factory('url')
 
     def feed_input(self, feed):
         if not soup_present: raise Exception(soup_err)

@@ -375,7 +375,7 @@ class FilterImdb:
     def register(self, manager, parser):
         manager.register('imdb')
 
-    def validate(self, config):
+    def validator(self):
         """Validate given configuration"""
         import validator
         imdb = validator.factory('dict')

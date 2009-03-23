@@ -23,10 +23,9 @@ class FilterLimitNew:
     def register(self, manager, parser):
         manager.register('limit_new')
 
-    def validate(self, config):
-        if not isinstance(config, int):
-            return ['wrong datatype, expecting number']
-        return []
+    def validator(self):
+        import validator
+        return validator.factory('number')
 
     def feed_filter(self, feed):
         # purge filtered items since we don't want to pass any of them

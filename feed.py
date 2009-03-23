@@ -104,7 +104,7 @@ class ModuleCache:
         return self._cache.has_key(key)
 
     def __purge(self):
-        """Remove all values from cache that have passed their expire date"""
+        """Remove all values from cache that have passed their expiration date"""
         now = datetime.today()
         for key in self._cache.keys():
             item = self._cache[key]

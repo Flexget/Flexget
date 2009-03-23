@@ -22,7 +22,7 @@ class Subtitles:
     def register(self, manager, parser):
         manager.register('subtitles')
 
-    def validate(self, config):
+    def validator(self):
         """Validate given configuration"""
         import validator
         subs = validator.factory('dict')

@@ -17,11 +17,12 @@ class ModifyExtension:
     def register(self, manager, parser):
         manager.register('extension')
 
-    def validate(self, config):
-        if isinstance(config, str) or isinstance(config, int):
-            return []
-        else:
-            return ['extension is not string or number']
+    def validator(self):
+        import validator
+        root = validator.factory()
+        root.accept('text')
+        root.accept('number')
+        return root
 
     def feed_modify(self, feed):
         ext = feed.config.get('extension')

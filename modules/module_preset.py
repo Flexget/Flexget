@@ -48,7 +48,7 @@ class ModulePreset:
             except MergeException:
                 raise ModuleWarning('Failed to merge preset %s to feed %s, incompatible datatypes' % (preset, feed.name))
 
-            # re-validate feed after changes in configuration
+            # TODO: re-validate feed after changes in configuration
             """
             errors = feed.validate()
             if errors:
