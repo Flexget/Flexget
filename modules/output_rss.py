@@ -89,18 +89,18 @@ class OutputRSS:
     def register(self, manager, parser):
         manager.register('make_rss')
 
-    def validate(self, config):
+    def validator(self):
         """Validate given configuration"""
-        if isinstance(config, str):
-            return []
-        from validator import DictValidator
-        rss = DictValidator()
-        rss.accept('file', str, require=True)
-        rss.accept('days', int)
-        rss.accept('items', int)
-        rss.accept('link', list).accept(str)
-        rss.validate(config)
-        return rss.errors.messages
+        import validator
+        root = validator.factory()
+        root.accept('text') # TODO: path / file
+        rss = root.accept('dict')
+        rss.accept('text', key='file', required=True)
+        rss.accept('number', key='days')
+        rss.accept('number', key='items')
+        links = rss.accept('list', key='link')
+        links.accept('text')
+        return root
         
     def get_config(self, feed):
         config = feed.config['make_rss']

@@ -34,19 +34,17 @@ class InputText:
     def register(self, manager, parser):
         manager.register('text')
 
-    def validate(self, config):
-        from validator import DictValidator
-        text = DictValidator()
-        text.accept('url', str, require=True)
-        entry = text.accept('entry', dict)
-        entry.accept('url', str, require=True)
-        entry.accept('title', str, require=True)
-        entry.accept_any_key(str) # user can add any fields
-        format = text.accept('format', dict)
-        format.accept('url', str)
-        format.accept_any_key(str) # user can add any fields
-        text.validate(config)
-        return text.errors.messages
+    def validator(self):
+        import validator
+        text = validator.factory('dict')
+        text.accept('url', key='url', required=True)
+        entry = text.accept('dict', key='entry', required=True)
+        entry.accept('url', key='url', required=True)
+        entry.accept('text', key='title', required=True)
+        entry.accept_any_key('text')
+        format = text.accept('dict', key='format')
+        format.accept_any_key('text')
+        return format
 
     def format_entry(self, entry, d):
         for k,v in d.iteritems():

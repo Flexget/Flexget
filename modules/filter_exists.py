@@ -19,10 +19,9 @@ class FilterExists:
     def register(self, manager, parser):
         manager.register('exists')
 
-    def validate(self, config):
-        if not isinstance(config, str):
-            return ['wrong datatype']
-        return []
+    def validator(self):
+        import validator
+        return validator.factory('text')
 
     def feed_filter(self, feed):
         path = feed.config.get('exists', None)

@@ -17,8 +17,10 @@ class ModuleTryRegexp:
                           help='Try regular expressions interactively.')
         self.abort = False
 
-    def validate(self, config):
-        return []
+    def validator(self):
+        # this is not ment to be configured .. :)
+        import validator
+        return validator.factory('any')
         
     def matches(self, entry, regexp):
         """Return True if any of the entry string fields match given regexp"""

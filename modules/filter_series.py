@@ -135,8 +135,13 @@ class FilterSeries:
         parser.add_option('--stop-waiting', action='store', dest='stop_waiting', default=False,
                           help='Stop timeframe for a given series.')
 
-    def validate(self, config):
+    def validator(self):
         """Validate configuration format for this module"""
+        import validator
+        log.warning('TODO: fix series module validator')
+        return validator.factory('any')
+        
+        """
         from validator import ListValidator
         series = ListValidator()
         # just plain names
@@ -166,6 +171,7 @@ class FilterSeries:
         watched.accept('episode', int)
         series.validate(config)
         return series.errors.messages
+        """
 
     def feed_input(self, feed):
         """Retrieve stored series from cache, in case they've been expired from feed while waiting"""
@@ -323,7 +329,7 @@ class FilterSeries:
                     log.debug('Age hours: %i, seconds: %i - %s ' % (age_hours, diff.seconds, best))
                     log.debug('Best ep in %i hours is %s' % (hours, best))
                     # log when it is added to timeframe wait list (a bit hacky way to detect first time, by age)
-                    if (diff.seconds < 60) and not feed.unittest:
+                    if (age_hours == 0 and diff.seconds < 60) and not feed.unittest:
                         log.info('Timeframe waiting %s for %s hours, currently best is %s' % (name, hours, best.entry['title']))
                     # stop timeframe
                     if age_hours >= hours or stop:

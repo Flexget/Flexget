@@ -15,8 +15,15 @@ class FilterRegexp:
     def register(self, manager, parser):
         manager.register('regexp')
 
-    def validate(self, config):
+    def validator(self):
         """Validate given configuration"""
+        import validator
+        log.warning('TODO: fix filter regexp validator')
+        return validator.factory('any')
+    
+        # will take a bit work to get this converted
+        
+        """
         from validator import DictValidator
         def conf(patterns):
             patterns.accept(str)
@@ -36,6 +43,7 @@ class FilterRegexp:
         root.accept('rest', ['accept','filter','reject'])
         root.validate(config)
         return root.errors.messages
+        """
         
     def feed_filter(self, feed):
         match_methods = {'accept': feed.accept, 'filter': feed.filter, 'reject': feed.reject }

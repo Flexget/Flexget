@@ -13,8 +13,9 @@ class ModuleDisableBuiltins:
         manager.register('disable_builtins')
         self.disabled = []
         
-    def validate(self, config):
-        return []
+    def validator(self):
+        import validator
+        return validator.factory('any')
         
     def feed_start(self, feed):
         for name, module in feed.manager.modules.iteritems():

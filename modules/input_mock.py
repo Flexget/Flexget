@@ -18,16 +18,15 @@ class InputMock:
     def register(self, manager, parser):
         manager.register('input_mock', debug_module=True)
         
-    def validate(self, config):
-        from validator import ListValidator
-        mock = ListValidator()
-        entry = mock.accept(dict)
-        entry.accept('title', str, require=True)
-        entry.accept('url', str, require=True)
-        entry.accept_any_key(str)
-        entry.accept_any_key(int)
-        mock.validate(config)
-        return mock.errors.messages
+    def validator(self):
+        import validator
+        container = validator.factory('list')
+        entry = container.accept('dict')
+        entry.accept('url', key='url', required=True)
+        entry.accept('text', key='title', required=True)
+        entry.accept_any_key('text')
+        entry.accept_any_key('number')
+        return container
 
     def feed_input(self, feed):
         config = feed.config.get('input_mock', [])

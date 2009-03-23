@@ -8,15 +8,29 @@ log = logging.getLogger('preset')
 class ModulePreset:
 
     """
-        Use presets
+        Use presets.
+        
+        Example:
+        
+        preset: movies
+        
+        Example 2:
+        
+        preset:
+          - movies
+          - imdb
     """
 
     def register(self, manager, parser):
         manager.register('preset', start_priority=255, builtin=True)
         
-    def validate(self, config):
-        if not isinstance(config, basestring) and not isinstance(config, list):
-            return ['wrong datatype']
+    def validator(self):
+        import validator
+        root = validator.factory()
+        root.accept('text')
+        presets = root.accept('list')
+        presets.accept('text')
+        return root
         
     def feed_start(self, feed):
         config = feed.config.get('preset', 'global')
@@ -35,7 +49,8 @@ class ModulePreset:
                 raise ModuleWarning('Failed to merge preset %s to feed %s, incompatible datatypes' % (preset, feed.name))
 
             # re-validate feed after changes in configuration
+            """
             errors = feed.validate()
             if errors:
                 raise ModuleWarning('Preset caused configuration errors')
-            
+            """

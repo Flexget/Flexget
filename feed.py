@@ -104,7 +104,7 @@ class ModuleCache:
         return self._cache.has_key(key)
 
     def __purge(self):
-        """Remove all values from cache that have passed their expiry date"""
+        """Remove all values from cache that have passed their expire date"""
         now = datetime.today()
         for key in self._cache.keys():
             item = self._cache[key]
@@ -369,11 +369,16 @@ class Feed:
             if not module:
                 validate_errors.append('Unknown keyword \'%s\'' % keyword)
                 continue
-            if hasattr(module['instance'], 'validate'):
-                errors = module['instance'].validate(self.config[keyword])
+            if hasattr(module['instance'], 'validator'):
+                try:
+                    validator = module['instance'].validator()
+                except TypeError:
+                    log.critical('invalid validator interface in module %s' % keyword)
+                    continue
+                errors = validator.validate(self.config[keyword])
                 if errors:
-                    for error in errors:
-                        validate_errors.append('%s %s' % (keyword, error))
+                    for msg in validator.errors.messages:
+                        validate_errors.append('%s %s' % (keyword, msg))
             else:
                 log.warning('Used module %s does not support validating. Please notify author!' % keyword)
                 

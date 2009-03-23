@@ -3,7 +3,6 @@ import urllib
 import urllib2
 import logging
 import shutil
-import md5
 from manager import ModuleWarning
 
 __pychecker__ = 'unusednames=parser,feed'
@@ -44,13 +43,11 @@ class ModuleDownload:
         parser.add_option('--dl-path', action='store', dest='dl_path', default=False,
                           help='Override path for download module. Applies to all executed feeds.')
 
-    def validate(self, config):
+    def validator(self):
         """Validate given configuration"""
-        if not isinstance(config, str):
-            return ['wrong datatype']
-        path = os.path.expanduser(config)
-        if not os.path.exists(path):
-            return ['path %s does not exists' % path]
+        # TODO: complain non existent paths
+        import validator
+        return validator.factory('text') 
 
     def validate_config(self, feed):
         # TODO: migrate into real validate!!!
@@ -89,13 +86,17 @@ class ModuleDownload:
             opener = urllib2.build_opener(handler)
             f = opener.open(url)
         else:
+            if urllib2._opener:
+                handlers = [h.__class__.__name__ for h in urllib2._opener.handlers]
+                log.debug('default opener present, handlers: %s' % ', '.join(handlers))
             f = urllib2.urlopen(url)
 
         mimetype = f.headers.getsubtype()
 
         # generate temp file, with random md5 sum .. 
         # url alone is not random enough, it has happened that there are two entries with same url
-        m = md5.new()
+        import hashlib
+        m = hashlib.md5()
         m.update(url)
         m.update('%s' % time.time())
         tmp_path = os.path.join(sys.path[0], 'temp')

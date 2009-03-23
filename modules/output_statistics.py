@@ -26,9 +26,15 @@ except:
     has_pygooglechart = False
 
 class Statistics:
+
     """
-    Saves statistics about downloaded releases and generates graphs from the data.
+        Saves statistics about downloaded releases and generates graphs from the data.
+    
+        Example:
+        
+        TODO: !!
     """
+    
     def __init__(self):
         self.total = 0
         self.passed = 0
@@ -39,15 +45,14 @@ class Statistics:
     def register(self, manager, parser):
         manager.register('statistics')
 
-    def validate(self, config):
+    def validator(self):
         """Validate given configuration"""
-        if isinstance(config, str):
-            return []
-        from validator import DictValidator
-        rss = DictValidator()
-        rss.accept('file', str, require=True)
-        rss.validate(config)
-        return rss.errors.messages
+        import validator
+        root = validator.factory()
+        root.accept('text')
+        stats = root.accept('dict')
+        stats.accept('text', key='file', required=True)
+        return root
 
     def init(self, con):
         """Create the sqlite table if necessary"""

@@ -377,18 +377,16 @@ class FilterImdb:
 
     def validate(self, config):
         """Validate given configuration"""
-        from validator import DictValidator
-        imdb = DictValidator()
-        imdb.accept('min_year', int)
-        imdb.accept('min_votes', int)
-        imdb.accept('min_score', float)
-        imdb.accept('min_score', int)
-        imdb.accept('reject_genres', list).accept(str)
-        imdb.accept('reject_languages', list).accept(str)
-        imdb.accept('accept_languages', list).accept(str)
-        imdb.accept('filter_invalid', bool)
-        imdb.validate(config)
-        return imdb.errors.messages
+        import validator
+        imdb = validator.factory('dict')
+        imdb.accept('number', key='min_year')
+        imdb.accept('number', key='min_votes')
+        imdb.accept('number', key='min_score')
+        imdb.accept('list', key='reject_genres').accept('text')
+        imdb.accept('list', key='reject_languages').accept('text')
+        imdb.accept('list', key='accept_languages').accept('text')
+        imdb.accept('boolean', key='filter_invalid')
+        return imdb
 
     def imdb_required(self, entry, config):
         """Return True if config contains conditions that are not available in preparsed fields"""

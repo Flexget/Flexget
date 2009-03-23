@@ -24,15 +24,13 @@ class Subtitles:
 
     def validate(self, config):
         """Validate given configuration"""
-        from validator import DictValidator
-        subs = DictValidator()
-        subs.accept('output', str, required=True)
-        langs = subs.accept('languages', list)
-        langs.accept(str)
-        subs.accept('min_sub_rating', float)
-        subs.accept('match_limit', float)
-        subs.validate(config)
-        return subs.errors.messages
+        import validator
+        subs = validator.factory('dict')
+        langs = subs.accept('list', key='languages')
+        langs.accept('text')
+        subs.accept('decimal', key='min_sub_rating')
+        subs.accept('decimal', key='match_limit')
+        return subs
         
     def get_config(self, feed):
         config = feed.config['subtitles']

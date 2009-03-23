@@ -9,17 +9,19 @@ log = logging.getLogger('path_by_ext')
 class ModulePathByExt:
 
     """
+    path_by_ext:
+      torrent: ~/watch/torrents/
+      nzb: ~/watch/nzbs/
     """
 
     def register(self, manager, parser):
         manager.register('path_by_ext')
         
-    """
-    def validate(self, config):
-        if not isinstance(config, str):
-            return ['parameter must be a string']
-        return []
-    """
+    def validator(self):
+        import validator
+        config = validator.factory('dict')
+        config.accept_any_key('any')
+        return config
 
     def feed_modify(self, feed):
         self.ext(feed, self.set_path)

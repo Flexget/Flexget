@@ -23,10 +23,10 @@ class ModuleInterval:
         parser.add_option('--now', action='store_true', dest='interval_ignore', default=0,
                           help='Ignore interval')
         
-    def validate(self, config):
-        if not isinstance(config, str):
-            return ['parameter must be a string']
-        return []
+    def validator(self):
+        # TODO: make a regexp validation
+        import validator
+        return validator.factory('text')
 
     def feed_start(self, feed):
         if feed.manager.options.interval_ignore or feed.manager.options.learn:

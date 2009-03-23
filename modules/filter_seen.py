@@ -22,10 +22,12 @@ class FilterSeen(object):
         # remember and filter by these fields
         self.fields = ['original_url', 'title', 'url']
 
-    def validate(self, config):
-        if not isinstance(config, bool) and not isinstance(config, basestring):
-            return ['wrong datatype, expecting bool']
-        return []
+    def validator(self):
+        import validator
+        root = validator.factory()
+        root.accept('boolean')
+        root.accept('text')
+        return root
 
     def feed_filter(self, feed):
         """Filter seen entries"""

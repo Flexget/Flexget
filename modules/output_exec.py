@@ -20,11 +20,9 @@ class OutputExec:
     def register(self, manager, parser):
         manager.register('exec')
 
-    def validate(self, config):
-        if not isinstance(config, str):
-            return ['wrong datatype']
-        else:
-            return []
+    def validator(self):
+        import validator
+        return validator.factory('text')
 
     def feed_output(self, feed):
         for entry in feed.entries:

@@ -24,13 +24,20 @@ class ModuleCookies:
     def register(self, manager, parser):
         manager.register('cookies')
 
-    def validate(self, config):
+    def validator(self,):
+        import validator
+        # perhaps this module goes way of the dodo in 1.0 ....
+        log.warning('fix module cookies validator')
+        return validator.factory('any')
+    
+        """
         from validator import DictValidator
         cookies = DictValidator()
         cookies.accept('type', ['mozilla', 'msie', 'lpw'], required=True)
         cookies.accept('file', str, required=True)
         cookies.validate(config) 
         return cookies.errors.messages
+        """
 
     def feed_start(self, feed):
         """Feed starting, install cookiejar"""

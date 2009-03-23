@@ -64,25 +64,17 @@ class InputRSS:
     def register(self, manager, parser):
         manager.register('rss')
 
-    def validate(self, config):
-        """Validate given configuration"""
-        from validator import DictValidator
-        if isinstance(config, dict):
-            rss = DictValidator()
-            rss.accept('url', str, required=True)
-            rss.accept('username', str)
-            rss.accept('password', str)
-            rss.accept('silent', bool)
-            if config.has_key('username'):
-                rss.require('password')
-            rss.accept('link', str)
-            rss.accept('ascii', bool)
-            rss.validate(config)
-            return rss.errors.messages
-        elif isinstance(config, str):
-            return []
-        else:
-            return ['wrong datatype']
+    def validator(self):
+        import validator
+        root = validator.factory()
+        root.accept('url')
+        advanced = root.accept('dict')
+        advanced.accept('url', key='url', required=True)
+        advanced.accept('text', key='username')
+        advanced.accept('text', key='password')
+        advanced.accept('boolean', key='silent')
+        advanced.accept('boolean', key='ascii')
+        return root
 
     def passwordize(self, url, user, password):
         """Add username and password to url"""

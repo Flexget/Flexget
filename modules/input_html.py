@@ -27,26 +27,22 @@ class InputHtml:
         
         Configuration expects url parameter.
 
-        Note: This returns ALL links on url so you need to configure patterns filter
+        Note: This returns ALL links on url so you need to configure filters
         to match only to desired content.
     """
 
     def register(self, manager, parser):
         manager.register('html')
         
-    def validate(self, config):
-        """Validate given configuration"""
-        from validator import DictValidator
-        if isinstance(config, dict):
-            root = DictValidator()
-            root.accept('url', str, required=True)
-            root.accept('dump', str)
-            root.validate(config)
-            return root.errors.messages
-        elif isinstance(config, str):
-            return []
-        else:
-            return ['wrong datatype']
+    def validator(self):
+        import validator
+        root = validator.factory()
+        root.accept('text')
+        advanced = root.accept('dict')
+        advanced.accept('url', key='url', required=True)
+        advanced.accept('text', key='dump')
+        advanced.accept('boolean', key='title_from_url')
+        return root
 
     def feed_input(self, feed):
         if not soup_present: raise Exception(soup_err)
@@ -89,7 +85,30 @@ class InputHtml:
                 url = 'http:' + url
             elif not url.startswith('http://') or not url.startswith('https://'):
                 url = urlparse.urljoin(pageurl, url)
-                
+            
+            if config.get('title_from_url', False):
+                import urllib
+                parts = urllib.splitquery(url[url.rfind('/')+1:])
+                title = urllib.unquote_plus(parts[0])
+                log.debug('title_from_url: %s' % title)
+            else:
+                # TODO: there should be this kind of function in feed, trunk unit test has it already
+                # move it to feed?
+                def exists(title):
+                    for entry in feed.entries:
+                        if entry['title'] == title:
+                            return True
+                    return False
+            
+                # title link should be unique, add count to end if it's not
+                i = 0
+                orig_title = title
+                while True:
+                    if not exists(title):
+                        break
+                    i += 1
+                    title = '%s (%s)' % (orig_title, i)
+
             # in case the title contains xxxxxxx.torrent - foooo.torrent clean it a bit (get upto first .torrent)
             # TODO: hack
             if title.lower().find('.torrent') > 0:

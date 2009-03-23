@@ -25,6 +25,14 @@ class Search:
     def register(self, manager, parser):
         manager.register('search')
         manager.add_feed_event('search', after='resolve')
+        
+        
+    def validator(self):
+        # TODO: should only accept registered validators
+        import validator
+        search = validator.factory('list')
+        search.accept('text')
+        return search
 
     def feed_search(self, feed):
         if feed.unittest: return # no searches in unittest mode

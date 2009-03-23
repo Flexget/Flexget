@@ -20,13 +20,11 @@ class ModulePriority:
     def register(self, manager, parser):
         manager.register('priority')
         
-    def _validate(self, config):
-        from validator import DictValidator
-        root = DictValidator() 
-        root.accept_any_key(int)
-        root.validate(config)
-        return root.error.messages
-        
+    def validator(self):
+        import validator
+        config = validator.factory('dict')
+        config.accept_any_key('number')
+        return config
 
     def feed_start(self, feed):
         self.priorities = {}

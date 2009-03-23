@@ -2,7 +2,6 @@ import logging
 import smtplib
 import email.Message
 import socket
-from validator import DictValidator
 from manager import ModuleWarning
 
 __pychecker__ = 'unusednames=parser'
@@ -89,20 +88,19 @@ class OutputEmail:
     def register(self, manager, parser):
         manager.register('email')
 
-    def validate(self, config):
-        """Validate given configuration"""
-        email = DictValidator()
-        email.accept('active', bool)
-        email.accept('to', str, require=True)
-        email.accept('from', str, require=True)
-        email.accept('smtp_host', str)
-        email.accept('smtp_port', int)
-        email.accept('smtp_login', bool)
-        email.accept('smtp_username', str)
-        email.accept('smtp_password', str)
-        email.accept('smtp_tls', bool)
-        email.validate(config)
-        return email.errors.messages
+    def validator(self):
+        import validator
+        email = validator.factory('dict')
+        email.accept('boolean', key='active')
+        email.accept('text', key='to', required=True)
+        email.accept('text', key='from', required=True)
+        email.accept('text', key='smtp_host')
+        email.accept('number', key='smtp_port')
+        email.accept('boolean', key='smtp_login')
+        email.accept('text', key='smtp_username')
+        email.accept('text', key='smtp_password')
+        email.accept('boolean', key='smtp_tls')
+        return email
 
     def get_config(self, feed):
         config = feed.config['email']

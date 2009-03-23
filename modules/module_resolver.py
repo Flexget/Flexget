@@ -11,7 +11,7 @@ class ResolverException(Exception):
     def __str__(self):
         return repr(self.value)
 
-class Resolver:
+class ModuleResolver:
 
     def register(self, manager, parser):
         manager.register('resolver', builtin=True)

@@ -27,11 +27,19 @@ class InputCSV:
             url: 1    # download url is in 1st field
 
         Fields title and url are mandatory. First field is 1.
-        List of other common (optional) fields can be found from documentation.
+        List of other common (optional) fields can be found from wiki.
     """
 
     def register(self, manager, parser):
         manager.register('csv')
+        
+    def validator(self):
+        import validator
+        config = validator.factory('dict')
+        config.accept('url', key='url', require=True)
+        values = config.accept('dict', key='values', require=True)
+        values.accept_any_key('number')
+        return config
 
     def feed_input(self, feed):
         url = feed.config['csv'].get('url', None)

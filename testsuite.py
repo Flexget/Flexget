@@ -1,7 +1,7 @@
 import os, sys, unittest
 from manager import Manager
 from feed import Feed, Entry
-from validator4 import *
+import validator
 
 class FlexGetTestCase(unittest.TestCase):
 
@@ -198,40 +198,6 @@ class TestRegexp(FlexGetTestCase):
             self.fail('regexp2 should have been accepted')
         if not self.get_entry(feed.accepted, title='regexp3'):
             self.fail('regexp3 should have been accepted')
-
-class TestPatterns(FlexGetTestCase):
-
-    """
-        Bad example, does things manually, you should use self.get_entry to check existance
-    """
-
-    def setUp(self):
-        self.config = 'test/test_patterns.yml'
-        FlexGetTestCase.setUp(self)
-        self.feed.execute()
-        if not self.feed.entries:
-            self.fail('no entries')
-                
-    def testPattern(self):
-        entry = self.feed.entries[0]
-        self.assertEqual(entry['title'], 'pattern')
-        self.assertEqual(entry['url'], 'http://localhost/pattern')
-        
-    def testAccept(self):
-        entry = self.feed.entries[1]
-        self.assertEqual(entry['title'], 'accept')
-        self.assertEqual(entry['url'], 'http://localhost/accept')
-        entry = self.feed.entries[2]
-        self.assertEqual(entry['title'], 'xxx.yyyy')
-        
-    def testFiltered(self):
-        entry = self.feed.filtered[0]
-        self.assertEqual(entry['title'], 'unmatched')
-        self.assertEqual(entry['url'], 'http://localhost/unmatched')
-        
-    def testNot(self):
-        entry = self.feed.filtered[1]
-        self.assertEqual(entry['title'], 'foobar')
         
 class TestResolvers(FlexGetTestCase):
 
@@ -513,7 +479,7 @@ class TestRssOnline(FlexGetTestCase):
 class TestValidator(unittest.TestCase):
 
     def testDefault(self):
-        root = Validator.factory()
+        root = validator.factory()
         assert root.name=='root', 'expected root'
         dv = root.accept('dict')
         assert dv.name=='dict', 'expected dict'
@@ -523,7 +489,6 @@ class TestValidator(unittest.TestCase):
 if __name__ == '__main__':
     suite = unittest.TestSuite()
     suite.addTest(unittest.makeSuite(TestRegexp))
-    suite.addTest(unittest.makeSuite(TestPatterns))
     suite.addTest(unittest.makeSuite(TestResolvers))
     suite.addTest(unittest.makeSuite(TestFilterSeries))
     suite.addTest(unittest.makeSuite(TestFilterSeen))

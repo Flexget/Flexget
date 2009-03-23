@@ -110,6 +110,8 @@ class Manager:
                           help=SUPPRESS_HELP)
         parser.add_option('--validate', action='store_true', dest='validate', default=0,
                           help=SUPPRESS_HELP)
+        parser.add_option('--verbosity', action='store_true', dest='crap', default=0,
+                          help=SUPPRESS_HELP)
         # hacky way to allow unit tests to use --online parameter, without this Optik would exit application ...
         parser.add_option('--online', action='store_true', dest='unittest_online', default=0,
                           help=SUPPRESS_HELP)
@@ -269,6 +271,7 @@ class Manager:
         loaded = {} # prevent modules being loaded multiple times when they're imported by other modules
         for prefix in self.__load_queue:
             for module in self.find_modules(moduledir, prefix):
+                log.debug('loading module %s' % module)
                 try:
                     module = __import__(module)
                 except Exception, e:
@@ -285,7 +288,7 @@ class Manager:
                             self.__instance = instance
                             self.__class_name = name
                         except:
-                            log.exception('Exception occured while creating instance %s' % name)
+                            log.exception('Exception occurred while creating instance %s' % name)
                             return
                         method = getattr(instance, 'register', None)
                         if callable(method):
@@ -294,6 +297,9 @@ class Manager:
                                 loaded[name] = True
                             except RegisterException, e:
                                 log.critical('Error while registering module %s. %s' % (name, e.value))
+                            except TypeError, e:
+                                log.critical('Module %s register method has invalid signature!' % name)
+                                log.exception(e)
                         else:
                             log.critical('Module %s register method is not callable' % name)
         
