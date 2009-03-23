@@ -123,35 +123,20 @@ class Validator(object):
 
     def __str__(self):
         return '<%s>' % self.name
-
-    # TODO: remove
-    def __repr__(self):
-        return '<%s>' % self.name
-        
         
 class RootValidator(Validator):
     name = 'root'
 
-    """
-    def __init__(self, parent=None):
-        Validator.__init__(self, parent)
-        self.valid.append(self.get_validator('dict'))
-        self.valid.append(self.get_validator('list'))
-    """
-    
     def accept(self, meta, **kwargs):
         v = self.get_validator(meta)
         self.valid.append(v)
         return v
     
     def validate(self, data):
-        #self.errors.freeze()
         for v in self.valid:
             if v.validateable(data):
                 if v.validate(data):
-                    #self.errors.unfreeze()
                     return True
-        #self.errors.unfreeze()
         acceptable = [v.name for v in self.valid]
         self.errors.add('incorrect format, should be %s' % ', '.join(acceptable))
         return False
@@ -271,7 +256,7 @@ class UrlValidator(Validator):
     def validate(self, data):
         regexp = '(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?'
         if not isinstance(data, basestring):
-            self.errors.add('expecting url')
+            self.errors.add('expecting text')
             return False
         valid = re.match(regexp, data) != None
         if not valid:
@@ -292,16 +277,17 @@ class ListValidator(Validator):
 
     def validate(self, data):
         if not isinstance(data, list):
-            self.errors.add('data should be a list')
+            self.errors.add('value should be a list')
             return False
         self.errors.path_add_level()
+        ec = self.errors.count()
         for item in data:
             self.errors.path_update_value(data.index(item))
             if not self.validate_item(item, self.valid):
                 l = [r.name for r in self.valid]
                 self.errors.add('is not valid %s' % (', '.join(l)))
         self.errors.path_remove_level()
-        return True
+        return ec == self.errors.count()
 
 class DictValidator(Validator):
     name = 'dict'
@@ -354,15 +340,15 @@ class DictValidator(Validator):
     
     def validate(self, data):
         if not isinstance(data, dict):
-            self.errors.add('data should be a dictionary / map')
+            self.errors.add('value should be a dictionary / map')
             return False
         
-        ec = self.errors.count() # get error count
+        ec = self.errors.count()
         self.errors.path_add_level()
         for key, value in data.iteritems():
             self.errors.path_update_value(key)
             if not key in self.valid and not self.any_key:
-                self.errors.add('unknown key')
+                self.errors.add('key \'%s\' is not recognized' % key)
                 continue
             if key in self.reject:
                 self.errors.add('key \'%s\' is forbidden here' % key)
