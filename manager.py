@@ -1,12 +1,10 @@
-
 import os, os.path
 import sys
 import logging
 import logging.handlers
-import string
 import types
 import time
-from datetime import tzinfo, timedelta, datetime
+from datetime import datetime
 import shelve
 
 log = logging.getLogger('manager')
@@ -15,6 +13,18 @@ try:
     from optparse import OptionParser, SUPPRESS_HELP
 except ImportError:
     print 'Please install Optik 1.4.1 (or higher) or preferably update your Python'
+    sys.exit(1)
+
+try:
+    from sqlite3 import dbapi2 as sqlite
+except ImportError:
+    print 'Please install sqlite3'
+    sys.exit(1)
+
+try:
+    from sqlalchemy import create_engine
+except ImportError:
+    print 'Please install SQLAlchemy from http://www.sqlalchemy.org/ or from your distro repository'
     sys.exit(1)
 
 try:
@@ -190,7 +200,7 @@ class Manager:
         else:
             logger.setLevel(logging.INFO)
 
-        if not '-q' in sys.argv:
+        if not '-q' in sys.argv or not '--cron' in sys.argv:
             # log to console
             console = logging.StreamHandler()
             #console.setLevel(logging.DEBUG)
@@ -208,7 +218,7 @@ class Manager:
                 self.configname = os.path.basename(config)[:-4]
                 self.session_name = os.path.join(sys.path[0], 'session-%s.db' % self.configname)
                 return
-        log.debug('Tried to read from: %s' % string.join(possible, ', '))
+        log.debug('Tried to read from: %s' % ', '.join(possible, ', '))
         raise Exception('Failed to load configuration file %s' % self.options.config)
 
     def load_session(self):
@@ -255,7 +265,7 @@ class Manager:
         try:
             fn = os.path.join(sys.path[0], 'dump-%s.yml' % self.configname)
             dump = {}
-            for k,v in self.session.iteritems():
+            for k, v in self.session.iteritems():
                 dump[k] = v
             f = file(fn, 'w')
             self.sanitize(dump)
@@ -266,7 +276,8 @@ class Manager:
             log.exception('Failed to dump session data (%s)!' % e)
 
     def save_session_shelf(self):
-        if self.options.test: return
+        if self.options.test: 
+            return
         self.session.close()
         
     def load_modules(self, parser, moduledir):
@@ -282,7 +293,8 @@ class Manager:
                     log.exception(e)
                     continue
                 for name, item in vars(module).iteritems():
-                    if loaded.get(name, False): continue
+                    if loaded.get(name, False): 
+                        continue
                     if hasattr(item, 'register'):
                         try:
                             instance = item()
@@ -376,7 +388,9 @@ class Manager:
         self.modules[name] = info
         
     def add_feed_event(self, event_name, **kwargs):
-        """Register new event in FlexGet and queue module loading for them. Note: queue works only while loading is in process."""
+        """Register new event in FlexGet and queue module loading for them. 
+        Note: queue works only while loading is in process."""
+        
         if 'before' in kwargs and 'after' in kwargs:
             raise RegisterException('You can only give either before or after for a event.')
         if not 'before' in kwargs and not 'after' in kwargs:
@@ -457,7 +471,8 @@ class Manager:
             for m in ml:
                 dupe = False
                 for module in modules:
-                    if module['name'] == m['name']: dupe = True
+                    if module['name'] == m['name']: 
+                        dupe = True
                 if not dupe:
                     modules.append(m)
             # build roles list
@@ -471,8 +486,9 @@ class Manager:
             if module.get('debug_module', False) and not self.options.debug:
                 continue
             doc = 'Yes'
-            if not module['instance'].__doc__: doc = 'No'
-            print '%-20s%-30s%s' % (module['name'], string.join(roles[module['name']], ', '), doc)
+            if not module['instance'].__doc__: 
+                doc = 'No'
+            print '%-20s%-30s%s' % (module['name'], ', '.join(roles[module['name']]), doc)
         print '-'*60
 
     def print_module_doc(self):
@@ -547,12 +563,14 @@ class Manager:
 
             # construct feed list
             feeds = self.config.get('feeds', {}).keys()
-            if not feeds: log.critical('There are no feeds in the configuration file!')
+            if not feeds: 
+                log.critical('There are no feeds in the configuration file!')
             # --only-feed
             if self.options.onlyfeed:
                 ofeeds, feeds = feeds, []
                 for name in ofeeds:
-                    if name.lower() == self.options.onlyfeed.lower(): feeds.append(name)
+                    if name.lower() == self.options.onlyfeed.lower(): 
+                        feeds.append(name)
                 if not feeds:
                     log.critical('Could not find feed %s' % self.options.onlyfeed)
 
