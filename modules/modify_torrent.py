@@ -33,7 +33,7 @@ class Torrent:
         """Return array containing fileinfo dictionaries (name, length, path)"""
         files = []
         # single file torrent
-        if self.content['info'].has_key('length'):
+        if 'length' in self.content['info']:
             t = {}
             t['name'] = self.content['info']['name']
             t['size'] = self.content['info']['length']
@@ -173,7 +173,7 @@ class TorrentFilename:
         idstr = 'd8:announce'
         for entry in feed.entries:
             # skip if entry does not have file assigned
-            if not entry.has_key('file'):
+            if not 'file' in entry:
                 continue
             f = open(entry['file'], 'r')
             data = f.read(len(idstr))
@@ -194,7 +194,7 @@ class TorrentFilename:
                 entry['torrent'] = torrent
                 # if we do not have good filename (by download module)
                 # for this entry, try to generate one from torrent content
-                if entry.has_key('filename'):
+                if 'filename' in entry:
                     if not entry['filename'].lower().endswith('.torrent'):
                         # filename present but without .torrent extension, add it
                         entry['filename'] = '%s.torrent' % entry['filename']

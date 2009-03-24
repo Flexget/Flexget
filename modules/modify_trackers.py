@@ -30,7 +30,7 @@ class RemoveTrackers:
 
     def feed_modify(self, feed):
         for entry in feed.entries:
-            if entry.has_key('torrent'):
+            if 'torrent' in entry:
                 trackers = entry['torrent'].get_multitrackers()
                 for tracker in trackers:
                     for regexp in feed.config.get('remove_trackers', []):

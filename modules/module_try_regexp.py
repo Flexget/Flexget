@@ -32,7 +32,7 @@ class ModuleTryRegexp:
         return (False, None)
         
     def feed_filter(self, feed):
-        if not feed.manager.options.try_regexp and not feed.config.has_key('try_regexp'):
+        if not feed.manager.options.try_regexp and not 'try_regexp' in feed.config:
             return
         if self.abort: 
             return
@@ -63,5 +63,4 @@ class ModuleTryRegexp:
                     print 'Invalid regular expression'
                     break
             print '%s entries matched' % count
-        print 'Bye!'
-        
+        print 'Bye!'       

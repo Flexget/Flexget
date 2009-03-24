@@ -234,9 +234,9 @@ class FilterSeries:
                     serie.ep_regexps = ep_patterns + serie.ep_regexps
                     serie.id_regexps = id_patterns + serie.id_regexps
                     # do not use builtin list for id when ep configured and vice versa
-                    if conf.has_key('ep_patterns') and not conf.has_key('id_patterns'):
+                    if 'ep_patterns' in conf and not 'id_patterns' in conf:
                         serie.id_regexps = []
-                    if conf.has_key('id_patterns') and not conf.has_key('ep_patterns'):
+                    if 'id_patterns' in conf and not 'ep_patterns' in conf:
                         serie.ep_regexps = []
                     serie.name_regexps.extend(name_patterns)
                     serie.parse()
@@ -247,7 +247,7 @@ class FilterSeries:
                     continue
 
                 # set custom download path
-                if conf.has_key('path'):
+                if 'path' in conf:
                     log.debug('setting %s custom path to %s' % (entry['title'], conf.get('path')))
                     entry['path'] = conf.get('path')
                 serie.entry = entry
@@ -270,7 +270,7 @@ class FilterSeries:
                     continue
 
                 # reject episodes that have been marked as watched in config file
-                if conf.has_key('watched'):
+                if 'watched' in conf:
                     wconf = conf.get('watched')
                     season = wconf.get('season', -1)
                     episode = wconf.get('episode', maxint)
@@ -292,7 +292,7 @@ class FilterSeries:
                         continue
 
                 # timeframe present
-                if conf.has_key('timeframe'):
+                if 'timeframe' in conf:
                     tconf = conf.get('timeframe')
                     hours = tconf.get('hours', 0)
                     enough = tconf.get('enough', '720p')

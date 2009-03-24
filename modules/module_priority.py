@@ -30,7 +30,7 @@ class ModulePriority:
         self.priorities = {}
         for module, priority in feed.config.get('priority', {}).iteritems():
             # abort if no priorities
-            if not feed.manager.modules[module].has_key('priorities'):
+            if not 'priorities' in feed.manager.modules[module]:
                 log.error('Unable to set module %s priority, no default value in module' % module)
                 continue
             

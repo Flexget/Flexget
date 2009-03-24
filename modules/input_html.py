@@ -64,7 +64,7 @@ class InputHtml:
                 raise ModuleWarning('The server couldn\'t fulfill the request. Error code: %s' % e.code, log)
         
         # dump received content into a file
-        if config.has_key('dump'):
+        if 'dump' in config:
             name = config['dump']
             log.info('Dumping %s into %s' % (pageurl, name))
             data = soup.prettify()
@@ -73,11 +73,14 @@ class InputHtml:
             f.close()
         
         for link in soup.findAll('a'):
-            if not link.has_key('href'): continue
+            if not 'href' in link: 
+                continue
             title = link.string
-            if title == None: continue
+            if title == None: 
+                continue
             title = title.replace(u'\u200B', u'').strip()
-            if not title: continue
+            if not title: 
+                continue
             url = link['href']
 
             # fix broken urls

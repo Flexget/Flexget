@@ -299,7 +299,8 @@ class ImdbParser:
         # get genres
         for link in soup.findAll('a', attrs={'href': re.compile('^/Sections/Genres/')}):
             # skip links that have javascipr onclick (not in genrelist)
-            if link.has_key('onclick'): continue
+            if 'onclick' in link: 
+                continue
             self.genres.append(link.string.lower())
 
         # get languages
@@ -392,12 +393,12 @@ class FilterImdb:
         """Return True if config contains conditions that are not available in preparsed fields"""
         # TODO: make dict (mapping min_votes <->imdb_votes) and loop it
         # check that entry values are VALID (None is considered as having value, this is a small bug!)
-        if config.has_key('min_votes') and not entry.has_key('imdb_votes'): return True
-        if config.has_key('min_score') and not entry.has_key('imdb_score'): return True
-        if config.has_key('min_year') and not entry.has_key('imdb_year'): return True
-        if config.has_key('reject_genres') and not entry.has_key('imdb_genres'): return True
-        if config.has_key('reject_languages') and not entry.has_key('imdb_languages'): return True
-        if config.has_key('accept_languages') and not entry.has_key('imdb_languages'): return True
+        if 'min_votes' in config and not 'imdb_votes' in entry: return True
+        if 'min_score' in config and not 'imdb_score' in entry: return True
+        if 'min_year' in config and not 'imdb_year' in entry: return True
+        if 'reject_genres' in config and not 'imdb_genres' in entry: return True
+        if 'reject_languages' in config and not 'imdb_languages' in entry: return True
+        if 'accept_languages' in config and not 'imdb_languages' in entry: return True
         return False
         
     def clean_url(self, url):
@@ -413,15 +414,15 @@ class FilterImdb:
         for entry in feed.entries:
         
             # sanity checks
-            if entry.has_key('imdb_votes'):
+            if 'imdb_votes' in entry:
                 if not isinstance(entry['imdb_votes'], int):
                     raise ModuleWarning('imdb_votes should be int!')
-            if entry.has_key('imdb_score'):
+            if 'imdb_score' in entry:
                 if not isinstance(entry['imdb_score'], float):
                     raise ModuleWarning('imdb_score should be float!')
         
             # make sure imdb url is valid
-            if entry.has_key('imdb_url'):
+            if 'imdb_url' in entry:
                 clean = self.clean_url(entry['imdb_url'])
                 if not clean:
                     del(entry['imdb_url'])
@@ -519,28 +520,28 @@ class FilterImdb:
             # Check defined conditions, TODO: rewrite into functions?
             
             reasons = []
-            if config.has_key('min_score'):
+            if 'min_score' in config:
                 if imdb.score < config['min_score']:
                     reasons.append('min_score (%s < %s)' % (imdb.score, config['min_score']))
-            if config.has_key('min_votes'):
+            if 'min_votes' in config:
                 if imdb.votes < config['min_votes']:
                     reasons.append('min_votes (%s < %s)' % (imdb.votes, config['min_votes']))
-            if config.has_key('min_year'):
+            if 'min_year' in config:
                 if imdb.year < config['min_year']:
                     reasons.append('min_year')
-            if config.has_key('reject_genres'):
+            if 'reject_genres' in config:
                 rejected = config['reject_genres']
                 for genre in imdb.genres:
                     if genre in rejected:
                         reasons.append('reject_genres')
                         break
-            if config.has_key('reject_languages'):
+            if 'reject_languages' in config:
                 rejected = config['reject_languages']
                 for language in imdb.languages:
                     if language in rejected:
                         reasons.append('relect_languages')
                         break
-            if config.has_key('accept_languages'):
+            if 'accept_languages' in config:
                 accepted = config['accept_languages']
                 for language in imdb.languages:
                     if language not in accepted:

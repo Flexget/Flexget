@@ -49,7 +49,6 @@ class InputTVTorrents:
         pageurl = "http://tvtorrents.com/loggedin/recently_aired.do"
 
         log.debug("InputModule tvtorrents requesting url %s" % pageurl)
-#        log.info("InputModule tvtorrents requesting url %s" % pageurl)
 
         try:
             page = urllib2.urlopen(pageurl)
@@ -62,40 +61,22 @@ class InputTVTorrents:
         hscript = soup.find('script', src=None).string
         hlines = hscript.splitlines()
         hash = hlines[15].strip().split("'")[1]
-#        log.info("InputModule tvtorrents found hash: %s" % hash)
         digest = hlines[16].strip().split("'")[1]
-#        log.info("InputModule tvtorrents found digest: %s" % digest)
         hurl = hlines[17].strip().split("'")
         hashurl = hurl[1] + "%s" + hurl[3] + digest + hurl[5] + hash
-#        log.info("InputModule tvtorrents constructed base URL: %s" % hashurl)
 
         for link in soup.findAll('a'):
-            if not link.has_key("href"): continue
+            if not 'href' in link: continue
             url = link['href']
             title = link.string
 
-#            if url == "#" and link.has_key('onclick') and link['onclick'].find("loadTorrent") != -1:
             if link.has_key('onclick') and link['onclick'].find("loadTorrent") != -1:
                 infohash = link['onclick'].split("'")[1]
-#                log.info("*** TvT: info_hash: %s" % infohash)
-#                sname = link.parent.parent.previous.previous.parent.contents[1].a.string # For old-style page
-
                 td = link.parent.parent.contents[4]
-#                log.info("TvT: element: %s" % td.string)
-
                 sname = td.contents[0].strip()
-#                log.info("TvT: show name: %s" % sname.string)
-
                 epi = td.contents[2].contents[0].strip()
-#                log.info("TvT: episode: %s" % epi.string)
-
-#                epnr = link.parent.previous.previous
-#                eptitle = link.previous.previous
-#                title = "%s - %s - %s" % (sname, epnr, eptitle)
                 title = "%s - %s" % (sname, epi)
                 url = hashurl % (infohash,)
-#                log.info("TvT: found episode: %s (%s)" % (title, url))
-#                continue
             else:
                 continue
             if title == None: continue

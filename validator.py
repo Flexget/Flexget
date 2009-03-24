@@ -302,7 +302,7 @@ class DictValidator(Validator):
 
     def accept(self, meta, **kwargs):
         """Accepts key with meta type"""
-        if not kwargs.has_key('key'):
+        if not 'key' in kwargs:
             raise Exception('%s.accept() must specify key' % self.name)
 
         key = kwargs['key']

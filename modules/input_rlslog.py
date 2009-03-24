@@ -87,7 +87,7 @@ class RlsLog:
                 if link_name == 'imdb':
                     release['imdb_url'] = link_href
                     score_raw = link.next.next.string
-                    if not release.has_key('imdb_score') and not release.has_key('imdb_votes') and score_raw != None:
+                    if not 'imdb_score' in release and not 'imdb_votes' in release and score_raw != None:
                         release['imdb_score'], release['imdb_votes'] = self.parse_imdb(score_raw)
 
                 # test if entry with this url would be resolvable (downloadable)
@@ -102,10 +102,10 @@ class RlsLog:
                     log.debug('<-- ignoring %s (non-resolvable)' % link_href)
 
             # reject if no torrent link
-            if release.has_key('url'):
-                releases.append(release)
-            else:
+            if not 'url' in release:
                 feed.log_once('%s skipped due to missing or unrecognized download link' % (release['title']), log)
+            else:
+                releases.append(release)
 
         return releases
 
@@ -125,7 +125,7 @@ class RlsLog:
             # construct entry from release
             entry = Entry()
             def apply_field(d_from, d_to, f):
-                if d_from.has_key(f):
+                if f in d_from:
                     if d_from[f] == None: return # None values are not wanted!
                     d_to[f] = d_from[f]
 

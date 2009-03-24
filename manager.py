@@ -350,7 +350,7 @@ class Manager:
             Modules may also pass any number of additional values to be stored in module info (dict).
             
         """
-        if self.modules.has_key(name):
+        if name in self.modules:
             raise RegisterException('Module %s is already registered' % name)
         info = kwargs
         info['instance'] = self.__instance
@@ -365,7 +365,7 @@ class Manager:
         # parse event priorities, given in form <event>_priority=<n>, ie. input_priority=10
         for event in self.events:
             key = '%s_priority' % event
-            if info.has_key(key):
+            if key in info:
                 info.setdefault('priorities', {})
                 info['priorities'][event] = info[key]
                 del(info[key])
@@ -374,18 +374,18 @@ class Manager:
         
     def add_feed_event(self, event_name, **kwargs):
         """Register new event in FlexGet and queue module loading for them. Note: queue works only while loading is in process."""
-        if kwargs.has_key('before') and kwargs.has_key('after'):
+        if 'before' in kwargs and 'after' in kwargs:
             raise RegisterException('You can only give either before or after for a event.')
-        if not kwargs.has_key('before') and not kwargs.has_key('after'):
+        if not 'before' in kwargs and not 'after' in kwargs:
             raise RegisterException('You must specify either a before or after event.')
-        if event_name in self.events or self.__event_queue.has_key(event_name):
+        if event_name in self.events or event_name in self.__event_queue:
             raise RegisterException('Event %s already exists.' % event_name)
 
         def add_event(name, args):
-            if args.has_key('before'):
+            if 'before' in args:
                 if not args.get('before', None) in self.events:
                     return False
-            if args.has_key('after'):
+            if 'after' in args:
                 if not args.get('after', None) in self.events:
                     return False
             # add method name to event -> method lookup table
@@ -413,7 +413,7 @@ class Manager:
     def get_modules_by_event(self, event):
         """Return all modules that hook given event."""
         res = []
-        if not self.event_methods.has_key(event):
+        if not event in self.event_methods:
             raise Exception('Unknown event %s' % event)
         method = self.event_methods[event]
         for name, info in self.modules.iteritems():
@@ -434,7 +434,7 @@ class Manager:
         
     def get_module_by_name(self, name):
         """Get module by name, prefered way since manager.modules structure may be changed at some point."""
-        if not self.modules.has_key(name):
+        if not name in self.modules:
             raise Exception('Unknown module %s' % name)
         return self.modules[name]
 
@@ -459,7 +459,7 @@ class Manager:
                     modules.append(m)
             # build roles list
             for m in ml:
-                if roles.has_key(m['name']):
+                if m['name'] in roles:
                     roles[m['name']].append(event)
                 else:
                     roles[m['name']] = [event]
@@ -519,7 +519,7 @@ class Manager:
     def merge_dict_from_to(self, d1, d2):
         """Merges dictionary d1 into dictionary d2. d1 will remain in original form."""
         for k, v in d1.items():
-            if d2.has_key(k):
+            if k in d2:
                 if type(v) == type(d2[k]):
                     if isinstance(v, dict):
                         self.merge_dict_from_to(d1[k], d2[k])
@@ -558,7 +558,7 @@ class Manager:
                 # validate (TODO: make use of validator?)
                 if not isinstance(self.config['feeds'][name], dict):
                     if isinstance(self.config['feeds'][name], str):
-                        if self.modules.has_key(name):
+                        if name in self.modules:
                             log.error('\'%s\' is known keyword, but in wrong indentation level. Please indent it correctly under feed, it should have 2 more spaces than feed name.' % name)
                             continue
                     log.error('\'%s\' is not a properly configured feed, please check indentation levels.' % name)

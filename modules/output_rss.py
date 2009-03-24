@@ -124,7 +124,7 @@ class OutputRSS:
             rss = {}
             rss['title'] = entry['title']
             for field in config['link']:
-                if entry.has_key(field):
+                if field in entry:
                     rss['link'] = entry[field]
                     break
             rss['description'] = entry.get('imdb_plot_outline')
@@ -140,7 +140,7 @@ class OutputRSS:
             return
 
         config = self.get_config(feed)
-        if self.written.has_key(config['file']):
+        if config['file'] in self.written:
             log.debug('skipping already written file %s' % config['file'])
             return
         data_items = feed.shared_cache.get(config['file'])

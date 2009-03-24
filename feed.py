@@ -22,7 +22,7 @@ class Entry(dict):
 
     def __setitem__(self, key, value):
         if key == 'url':
-            if not self.has_key('original_url'):
+            if not 'original_url' in self:
                 self['original_url'] = value
         dict.__setitem__(self, key, value)
     
@@ -31,9 +31,9 @@ class Entry(dict):
 
     def isvalid(self):
         """Return True if entry is valid. Return False if this cannot be used."""
-        if not self.has_key('title'):
+        if not 'title' in self:
             return False
-        if not self.has_key('url'):
+        if not 'url' in self:
             return True
         return True
 
@@ -91,7 +91,7 @@ class ModuleCache:
             # reading value should update "stored" date .. TODO: refactor stored -> access & days -> keep?
             item['stored'] = datetime.today().strftime('%Y-%m-%d')
             # HACK, for some reason there seems to be items without value, most likely elusive rare bug ..
-            if not item.has_key('value'):
+            if not 'value' in item:
                 self.log.warning('BUGFIX: Key %s is missing value, using default.' % key)
                 return default
             return item['value']
@@ -99,8 +99,9 @@ class ModuleCache:
     def remove(self, key):
         """Removes a key from cache"""
         return self._cache.pop(key)
-        
+
     def has_key(self, key):
+        log.warning('use of deprecated has_key')
         return self._cache.has_key(key)
 
     def __purge(self):
@@ -223,7 +224,7 @@ class Feed:
                     url: <address>
         """
         if isinstance(self.config[keyword], dict):
-            if not self.config[keyword].has_key('url'):
+            if not 'url' in self.config[keyword]:
                 raise Exception('Input %s has invalid configuration, url is missing.' % keyword)
             return self.config[keyword]['url']
         else:
@@ -269,7 +270,7 @@ class Feed:
         """Return order for module in this feed. Uses default value if no value is configured."""
         priority = module.get('priorities', {}).get(event, 0)
         keyword = module['name']
-        if self.config.has_key(keyword):
+        if keyword in self.config:
             if isinstance(self.config[keyword], dict):
                 priority = self.config[keyword].get('priority', priority)
         return priority
@@ -294,7 +295,7 @@ class Feed:
 
         for module in modules:
             keyword = module['name']
-            if self.config.has_key(keyword) or module['builtin']:
+            if keyword in self.config or module['builtin']:
                 # set cache namespaces to this module realm
                 self.__set_namespace(keyword)
                 # store execute info
@@ -337,7 +338,7 @@ class Feed:
                     # log keywords not executed
                     modules = self.manager.get_modules_by_event(event)
                     for module in modules:
-                        if self.config.has_key(module['name']):
+                        if module['name'] in self.config:
                             log.info('Feed %s keyword %s is not executed because of learn/reset.' % (self.name, module['name']))
                     continue
             # run all modules with this event

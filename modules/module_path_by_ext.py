@@ -33,9 +33,9 @@ class ModulePathByExt:
     def ext(self, feed, callback):
         config = feed.config
         for entry in feed.entries:
-            if entry.has_key('mime'):
+            if 'mime' in entry:
                 # check if configuration has mimetype that entry has
-                if config.has_key(entry['mime']):
+                if entry['mime'] in config:
                     callback(entry, config[entry['mime']])
                 # check if entry mimetype extension matches in config
                 ext = mimetypes.types_map.get(entry['mime'])

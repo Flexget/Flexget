@@ -40,7 +40,7 @@ class ModulePreset:
         
         for preset in config:
             log.debug('Merging preset %s into feed %s' % (preset, feed.name))
-            if not feed.manager.config.has_key(preset):
+            if not preset in feed.manager.config:
                 if preset=='global': continue
                 raise ModuleWarning('Unable to set preset %s for %s' % (preset, feed.name))
             try:

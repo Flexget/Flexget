@@ -52,7 +52,7 @@ class FilterRegexp:
             if isinstance(r, list):
                 rest.extend(r)
             
-        if config.has_key('rest'):
+        if 'rest' in config:
             rest_method = match_methods.get(config['rest'])
             for entry in rest:
                 log.debug('Rest method %s for %s' % (rest_method.__name__, entry['title']))
@@ -91,7 +91,7 @@ class FilterRegexp:
                     # if regexp has dict as parameter
                     if isinstance(value, dict):
                         path = value.get('path', None)
-                        if value.has_key('not'):
+                        if 'not' in value:
                             if isinstance(value['not'], list): 
                                 secondary.extend(value['not'])
                             else: 
