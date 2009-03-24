@@ -16,34 +16,25 @@ class FilterRegexp:
         manager.register('regexp')
 
     def validator(self):
-        """Validate given configuration"""
         import validator
-        log.warning('TODO: fix filter regexp validator')
-        return validator.factory('any')
-    
-        # will take a bit work to get this converted
-        
-        """
-        from validator import DictValidator
-        def conf(patterns):
-            patterns.accept(str)
-            patterns.accept(int)
-            bundle = patterns.accept(dict)
-            options = bundle.accept_any_key(dict)
-            options.accept('path', str)
-            options.accept('not', str)
-            options.accept('not', int)
-            nl = options.accept('not', list)
-            nl.accept(str)
-            nl.accept(int)
-        root = DictValidator()
-        for name in ['accept','filter','reject','accept_excluding','filter_excluding','reject_excluding']:
-            sub = root.accept(name, list)
-            conf(sub)
-        root.accept('rest', ['accept','filter','reject'])
-        root.validate(config)
-        return root.errors.messages
-        """
+
+        def build(sub):
+            sub.accept('text')
+            sub.accept('number')
+            adv = sub.accept('dict')
+            adv.accept('text', key='path') # TODO: text -> path
+            adv.accept('text', key='not')
+            adv.accept('number', key='not')
+            notl = adv.accept('list', key='not')
+            notl.accept('text')
+            notl.accept('number')
+            
+        conf = validator.factory('dict')
+        for name in ['accept', 'filter', 'reject', 'accept_excluding', 'filter_excluding', 'reject_excluding']:
+            sub = conf.accept('list', key=name)
+            build(sub)
+        conf.accept('text', key='rest') # TODO: accept only ['accept','filter','reject']
+        return conf
         
     def feed_filter(self, feed):
         match_methods = {'accept': feed.accept, 'filter': feed.filter, 'reject': feed.reject }

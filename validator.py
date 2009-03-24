@@ -331,7 +331,7 @@ class DictValidator(Validator):
     def accept_any_key(self, meta, **kwargs):
         """Accepts any key with this given type."""
         v = self.get_validator(meta)
-        v.accept(meta, **kwargs)
+        #v.accept(meta, **kwargs)
         self.any_key.append(v)
         return v
 
@@ -359,7 +359,6 @@ class DictValidator(Validator):
             rules.extend(self.any_key)
             if not self.validate_item(value, rules):
                 l = [r.name for r in rules]
-                print l
                 self.errors.add('key \'%s\' is not valid %s' % (value, ', '.join(l)))
         for required in self.required_keys:
             if not required in data:

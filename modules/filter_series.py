@@ -136,42 +136,32 @@ class FilterSeries:
                           help='Stop timeframe for a given series.')
 
     def validator(self):
-        """Validate configuration format for this module"""
         import validator
-        log.warning('TODO: fix series module validator')
-        return validator.factory('any')
-        
-        """
-        from validator import ListValidator
-        series = ListValidator()
-        # just plain names
-        series.accept(str)
-        series.accept(int)
-        # or "bundles" with serie name as key ..
-        bundle = series.accept(dict)
+        series = validator.factory('list')
+        series.accept('text')
+        series.accept('number')
+        bundle = series.accept('dict')
         # prevent invalid indentation level
         bundle.reject_keys(['path', 'timeframe', 'name_patterns', 'ep_patterns', 'id_patterns', 'watched'])
-        # accept serie name, which can be anything ...
-        options = bundle.accept_any_key(dict)
-        options.accept('path', str)
-        # these patterns can be given in as a single string ..
-        options.accept('name_patterns', str)
-        options.accept('ep_patterns', str)
-        options.accept('id_patterns', str)
+        advanced = bundle.accept_any_key('dict')
+        advanced.accept('text', key='path')
+        # regexes can be given in as a single string ..
+        advanced.accept('text', key='name_patterns')
+        advanced.accept('text', key='ep_patterns')
+        advanced.accept('text', key='id_patterns')
         # .. or as list containing strings
-        options.accept('name_patterns', list).accept(str)
-        options.accept('ep_patterns', list).accept(str)
-        options.accept('id_patterns', list).accept(str)
+        advanced.accept('list', key='name_patterns').accept('text')
+        advanced.accept('list', key='ep_patterns').accept('text')
+        advanced.accept('list', key='id_patterns').accept('text')
         # timeframe dict
-        timeframe = options.accept('timeframe', dict)
-        timeframe.accept('hours', int)
-        timeframe.accept('enough', SerieParser.qualities)
-        watched = options.accept('watched', dict)
-        watched.accept('season', int)
-        watched.accept('episode', int)
-        series.validate(config)
-        return series.errors.messages
-        """
+        timeframe = advanced.accept('dict', key='timeframe')
+        timeframe.accept('number', key='hours')
+        timeframe.accept('text', key='enough') # TODO: allow only SerieParser.qualities
+        # watched
+        watched = advanced.accept('dict', key='watched')
+        watched.accept('number', key='season')
+        watched.accept('number', key='episode')
+        return series
 
     def feed_input(self, feed):
         """Retrieve stored series from cache, in case they've been expired from feed while waiting"""

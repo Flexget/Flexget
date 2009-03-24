@@ -164,16 +164,16 @@ class Feed:
         """Purge rejected entries from feed."""
         self.__purge(self.rejected)
 
-    def __purge(self, list, not_in_list=[], count=True):
+    def __purge(self, entries, not_in_list=[], count=True):
         """Purge entries in list from feed.entries"""
         for entry in self.entries[:]:
-            if entry in list and entry not in not_in_list:
+            if entry in entries and entry not in not_in_list:
                 log.debug('Purging entry %s' % entry.safe_str())
                 self.entries.remove(entry)
                 if count:
                     self.__purged += 1
 
-    def accept(self, entry):
+    def accept(self, entry, reason=None):
         """Accepts this entry."""
         if not entry in self.accepted:
             self.accepted.append(entry)
@@ -181,29 +181,29 @@ class Feed:
                 self.filtered.remove(entry)
                 self.verbose_details('Accepted previously filtered %s' % entry['title'])
             else:
-                self.verbose_details('Accepted %s' % entry['title'])
+                self.verbose_details('Accepted %s' % entry['title'], reason)
 
-    def filter(self, entry):
+    def filter(self, entry, reason=None):
         """Mark entry to be filtered unless told otherwise. Entry may still be accepted."""
         # accepted checked only because it makes more sense when verbose details
         if not entry in self.filtered and not entry in self.accepted:
             self.filtered.append(entry)
-            self.verbose_details('Filtered %s' % entry['title'])
+            self.verbose_details('Filtered %s' % entry['title'], reason)
 
-    def reject(self, entry):
+    def reject(self, entry, reason=None):
         """Reject this entry immediately and permanently."""
         # schedule immediately filtering after this module has done execution
         if not entry in self.rejected:
             self.rejected.append(entry)
-            self.verbose_details('Rejected %s' % entry['title'])
+            self.verbose_details('Rejected %s' % entry['title'], reason)
 
-    def fail(self, entry):
+    def fail(self, entry, reason=None):
         """Mark entry as failed."""
         log.debug("Marking entry '%s' as failed" % entry['title'])
         if not entry in self.failed:
             self.failed.append(entry)
             self.manager.add_failed(entry)
-            self.verbose_details('Failed %s' % entry['title'])
+            self.verbose_details('Failed %s' % entry['title'], reason)
 
     def abort(self, **kwargs):
         """Abort this feed execution, no more modules will be executed."""
@@ -247,14 +247,17 @@ class Feed:
         if not self.manager.options.quiet and not self.unittest:
             logger.info(s)
           
-    def verbose_details(self, s):
+    def verbose_details(self, msg, reason):
         """Verbose if details option is enabled"""
         # TODO: implement trough own logger?
         if self.manager.options.details:
             try:
-                print "+ %-8s %-12s %s" % (self.__current_event, self.__current_module, s)
+                reson_str = ''
+                if reason:
+                    reason_str = ' (%s)' % reason
+                print "+ %-8s %-12s %s%s" % (self.__current_event, self.__current_module, msg, reason_str)
             except:
-                print "+ %-8s %-12s ERROR: Unable to print %s" % (self.__current_event, self.__current_module, repr(s))
+                print "+ %-8s %-12s ERROR: Unable to print %s" % (self.__current_event, self.__current_module, repr(msg))
 
     def verbose_details_entries(self):
         """If details option is enabled, print all produced entries"""
@@ -373,7 +376,7 @@ class Feed:
                 try:
                     validator = module['instance'].validator()
                 except TypeError:
-                    log.critical('invalid validator interface in module %s' % keyword)
+                    log.critical('invalid validator method in module %s' % keyword)
                     continue
                 errors = validator.validate(self.config[keyword])
                 if errors:

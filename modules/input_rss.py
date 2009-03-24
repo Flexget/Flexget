@@ -93,7 +93,7 @@ class InputRSS:
         url = feed.get_input_url('rss')
 
         # use basic auth when needed
-        if config.has_key('username') and config.has_key('password'):
+        if 'username' in config and 'password' in config:
             url = self.passwordize(url, config['username'], config['password'])
 
         log.debug('Checking feed %s (%s)', feed.name, url)
@@ -166,12 +166,12 @@ class InputRSS:
         log.debug('encoding %s' % rss.encoding)
 
         # update etag, use last modified if no etag exists
-        if rss.has_key('etag') and type(rss['etag']) != feedparser.types.NoneType:
+        if 'etag' in rss and type(rss['etag']) != feedparser.types.NoneType:
             etag = rss.etag.replace("'", '').replace('"', '')
             feed.cache.store('etag', etag, 90)
             log.debug('etag %s saved for feed %s' % (etag, feed.name))
         elif hasattr(rss, 'headers'):
-            if rss.headers.has_key('last-modified'):
+            if 'last-modified' in rss.headers:
                 feed.cache.store('modified', rss.modified, 90)
                 log.debug('last modified saved for feed %s', feed.name)
         
@@ -188,7 +188,7 @@ class InputRSS:
                 continue
 
             # ignore entries without link
-            if not entry.has_key('link') and not entry.has_key('enclosures'):
+            if not 'link' in entry and not 'enclosures' in entry:
                 log.debug('%s does not have link or enclosure' % entry.title)
                 ignored += 1
                 continue
@@ -198,7 +198,7 @@ class InputRSS:
                 entry.title = entry.title.encode('ascii', 'ignore')
         
             # fix for crap feeds with no ID
-            if not entry.has_key('id'):
+            if not 'id' in entry:
                 entry['id'] = entry.link
 
             # remove annoying zero width spaces
@@ -207,11 +207,11 @@ class InputRSS:
             # helper
             def add_entry(ea):
                 ea['title'] = entry.title
-                if entry.has_key('description'):
+                if 'description' in entry:
                     # TODO: html decode!
                     ea['description'] = entry.description
                 # store basic auth info
-                if config.has_key('username') and config.has_key('password'):
+                if 'username' in config and 'password' in config:
                     ea['basic_auth_username'] = config['username']
                     ea['basic_auth_password'] = config['password']
                 feed.entries.append(ea)
@@ -222,13 +222,15 @@ class InputRSS:
                 #log.debug('adding %i entries from enclosures' % len(enclosures))
                 for enclosure in enclosures:
                     ee = Entry()
-                    if not enclosure.has_key('href'):
+                    if not 'href' in enclosure:
                         feed.log_once('RSS-entry %s enclosure does not have url' % entry.title, log)
                         continue
                     ee['url'] = enclosure['href']
                     # get optional meta-data
-                    if enclosure.has_key('length'): ee['size'] = int(enclosure['length'])
-                    if enclosure.has_key('type'): ee['type'] = enclosure['type']
+                    if 'length' in enclosure: 
+                        ee['size'] = int(enclosure['length'])
+                    if 'type' in enclosure: 
+                        ee['type'] = enclosure['type']
                     # if enclosure has size OR there are multiple enclosures use filename from url
                     if ee.get('size', 0) != 0 or len(enclosures)>1:
                         if ee['url'].rfind != -1:
@@ -250,9 +252,9 @@ class InputRSS:
             # automaticly determine url from available fields
             if curl == 'auto':
                 # try from link, guid
-                if entry.has_key('link'):
+                if 'link' in entry:
                     e['url'] = entry['link']
-                elif entry.has_key('guid'):
+                elif 'guid' in entry:
                     e['url'] = entry['guid']
                 else:
                     if not config.get('silent'):
@@ -261,7 +263,7 @@ class InputRSS:
                     continue
             else:
                 # manual configuration
-                if not entry.has_key(curl):
+                if not 'curl' in entry:
                     feed.log_once('RSS-entry %s does not contain configured link attributes: %s' % (entry.title, curl), log)
                     ignored += 1
                     continue
