@@ -2,11 +2,8 @@
 # TODO: purge old entries
 
 import logging
-from manager import Session
-from sqlalchemy.ext.declarative import declarative_base
+from manager import Session, Base
 from sqlalchemy import Table, Column, Integer, String, MetaData, ForeignKey
-
-Base = declarative_base()
 
 class LogMessage(Base):
     __tablename__ = 'log_once'
@@ -23,7 +20,7 @@ class LogMessage(Base):
 
 def log_once(message, log=logging.getLogger('log_once')):
     """Log message only once using given logger."""
-
+    
     import hashlib
     hash = hashlib.md5()
     hash.update(message)

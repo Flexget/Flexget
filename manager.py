@@ -54,7 +54,9 @@ class MergeException(Exception):
         return repr(self.value)
 
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.ext.declarative import declarative_base
 
+Base = declarative_base()
 Session = sessionmaker()
 
 class Manager:
@@ -242,13 +244,17 @@ class Manager:
             temp = copy.deepcopy(self.shelve_session.cache)
             self.shelve_session.close()
             self.shelve_session = temp
+            
         # SQLAlchemy
+        #from utils.log import log_once
+
         engine = create_engine('sqlite:///%s.sqlite' % self.configname, echo=True)
         Session.configure(bind=engine)
+        # create all tables
+        Base.metadata.create_all(bind=engine)
         
         ## TEST TEST TEST
         """
-        from utils.log import log_once
         log_once('test1')
         log_once('test2')
         log_once('test3')
