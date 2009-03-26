@@ -28,14 +28,16 @@ class Search:
         
         
     def validator(self):
-        # TODO: should only accept registered validators
+        # TODO: should only accept registered search modules
         import validator
         search = validator.factory('list')
         search.accept('text')
         return search
 
     def feed_search(self, feed):
-        if feed.unittest: return # no searches in unittest mode
+        # no searches in unit test mode
+        if feed.unit_test: 
+            return 
         
         modules = {}
         for module in feed.manager.get_modules_by_group('search'):

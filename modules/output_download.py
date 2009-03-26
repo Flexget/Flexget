@@ -64,7 +64,7 @@ class ModuleDownload:
                 if feed.manager.options.test:
                     log.info('Would download: %s' % entry['title'])
                 else:
-                    if not feed.unittest:
+                    if not feed.manager.unit_test:
                         log.info('Downloading: %s' % entry['title'])
                     self.download(feed, entry)
             except IOError, e:

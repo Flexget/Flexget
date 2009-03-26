@@ -53,6 +53,10 @@ class MergeException(Exception):
     def __str__(self):
         return repr(self.value)
 
+from sqlalchemy.orm import sessionmaker
+
+Session = sessionmaker()
+
 class Manager:
 
     log_initialized = False
@@ -64,12 +68,7 @@ class Manager:
         self.configname = None
         self.options = None
         self.modules = {}
-        self.shelve_session = {}
         self.config = {}
-        
-        # SQLAlchemy
-        from sqlalchemy.orm import sessionmaker
-        self.Session = sessionmaker()
         
         # events
         self.events = ['start', 'input', 'filter', 'download', 'modify', 'output', 'exit']
@@ -86,7 +85,11 @@ class Manager:
 
         # settings
         self.moduledir = os.path.join(sys.path[0], 'modules')
+        
+        # shelve
+        self.shelve_session = {}
         self.shelve_session_version = 2
+        self.shelve_session_name = None
 
         # initialize commandline options
         parser = OptionParser()
@@ -183,16 +186,15 @@ class Manager:
         log.debug('Default encoding: %s' % sys.getdefaultencoding())
             
     def init_logging(self):
-        """
-            Creates and initializes logger.
-        """
+        """Creates and initializes logger."""
+        
         if Manager.log_initialized: return
         
-        LOG_FILENAME = os.path.join(sys.path[0], 'flexget.log')
+        filename = os.path.join(sys.path[0], 'flexget.log')
 
         # get root logger
         logger = logging.getLogger()
-        handler = logging.handlers.RotatingFileHandler(LOG_FILENAME, maxBytes=200*1024, backupCount=9)
+        handler = logging.handlers.RotatingFileHandler(filename, maxBytes=200*1024, backupCount=9)
         #handler = logging.FileHandler(os.path.join(sys.path[0], 'flexget.log'))
         formatter = logging.Formatter('%(asctime)-15s %(levelname)-8s %(name)-11s %(message)s')
         handler.setFormatter(formatter)
@@ -242,7 +244,7 @@ class Manager:
             self.shelve_session = temp
         # SQLAlchemy
         engine = create_engine('sqlite:///%s.sqlite' % self.configname, echo=True)
-        self.Session.configure(bind=engine)
+        Session.configure(bind=engine)
 
     def sanitize(self, d):
         """Makes dictionary d contain only yaml.safe_dump compatible elements"""
@@ -328,14 +330,15 @@ class Manager:
         # check that event queue is empty (all module created events succeeded)
         if self.__event_queue:
             for event, info in self.__event_queue.iteritems():
-                log.error('Module %s requested new event %s, but it could not be created at requested point (before, after). Module is not working properly.' % (info['class_name'], event))
+                log.error('Module %s requested new event %s, but it could not be created at requested \
+                point (before, after). Module is not working properly.' % (info['class_name'], event))
 
     def find_modules(self, directory, prefix):
         """Return array containing all modules in passed path that begin with prefix."""
         modules = []
-        for m in os.listdir(directory):
-            if m.startswith(prefix+'_') and m.endswith('.py'):
-                modules.append(m[:-3])
+        for file in os.listdir(directory):
+            if file.startswith(prefix+'_') and file.endswith('.py'):
+                modules.append(file[:-3])
         return modules
 
     def get_settings(self, keyword, defaults={}):

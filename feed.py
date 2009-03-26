@@ -145,7 +145,6 @@ class Feed:
         # TODO: feed.abort() should be done by using exception, not a flag that has to be checked everywhere
 
         # flags and counters
-        self.unittest = False
         self.__abort = False
         self.__purged = 0
         
@@ -245,7 +244,7 @@ class Feed:
     def verbose_progress(self, s, logger=log):
         """Verbose progress, outputs only in non quiet mode."""
         # TODO: implement trough own logger?
-        if not self.manager.options.quiet and not self.unittest:
+        if not self.manager.options.quiet and not self.manager.unit_test:
             logger.info(s)
           
     def verbose_details(self, msg, reason):

@@ -319,7 +319,7 @@ class FilterSeries:
                     log.debug('Age hours: %i, seconds: %i - %s ' % (age_hours, diff.seconds, best))
                     log.debug('Best ep in %i hours is %s' % (hours, best))
                     # log when it is added to timeframe wait list (a bit hacky way to detect first time, by age)
-                    if (age_hours == 0 and diff.seconds < 60) and not feed.unittest:
+                    if (age_hours == 0 and diff.seconds < 60) and not feed.manager.unit_test:
                         log.info('Timeframe waiting %s for %s hours, currently best is %s' % (name, hours, best.entry['title']))
                     # stop timeframe
                     if age_hours >= hours or stop:

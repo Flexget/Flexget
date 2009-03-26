@@ -4,7 +4,6 @@ __pychecker__ = 'unusednames=parser'
 
 log = logging.getLogger('resolver')
 
-
 class ResolverException(Exception):
     def __init__(self, value):
         self.value = value
@@ -18,8 +17,9 @@ class ModuleResolver:
         manager.add_feed_event('resolve', before='download')
 
     def feed_resolve(self, feed):
-        # no resolves in unittest mode
-        if feed.unittest: return
+        # no resolves in unit test mode
+        if feed.manager.unit_test: 
+            return
         self.entries(feed)
 
     def resolvable(self, feed, entry):
@@ -59,4 +59,3 @@ class ModuleResolver:
             except ResolverException, e:
                 log.warn(e.value)
                 feed.fail(entry)
-
