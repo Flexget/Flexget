@@ -69,7 +69,7 @@ class Manager:
         
         # SQLAlchemy
         from sqlalchemy.orm import sessionmaker
-        self.Session = sessionmaker(bind=engine)
+        self.Session = sessionmaker()
         
         # events
         self.events = ['start', 'input', 'filter', 'download', 'modify', 'output', 'exit']
@@ -242,7 +242,7 @@ class Manager:
             self.shelve_session = temp
         # SQLAlchemy
         engine = create_engine('sqlite:///%s.sqlite' % self.configname, echo=True)
-        Session.configure(bind=engine)
+        self.Session.configure(bind=engine)
 
     def sanitize(self, d):
         """Makes dictionary d contain only yaml.safe_dump compatible elements"""
