@@ -245,6 +245,16 @@ class Manager:
         # SQLAlchemy
         engine = create_engine('sqlite:///%s.sqlite' % self.configname, echo=True)
         Session.configure(bind=engine)
+        
+        ## TEST TEST TEST
+        """
+        from utils.log import log_once
+        log_once('test1')
+        log_once('test2')
+        log_once('test3')
+        log_once('test1')
+        log_once('test1')
+        """
 
     def sanitize(self, d):
         """Makes dictionary d contain only yaml.safe_dump compatible elements"""
