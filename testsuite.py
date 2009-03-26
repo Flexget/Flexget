@@ -20,7 +20,7 @@ class FlexGetTestCase(unittest.TestCase):
         
     def tearDown(self):
         self.manager.save_session()
-        os.remove(self.manager.session_name)
+        os.remove(self.manager.shelve_session_name)
 
     def get_feed(self, name):
         # TODO: rename to use_feed and set self.feed ?
@@ -263,14 +263,14 @@ class TestManager(FlexGetTestCase):
         e['title'] = 'test'
         e['url'] = 'http://localhost/mock'
         self.manager.add_failed(e)
-        assert len(self.manager.session['failed']) == 1, 'failed to add'
+        assert len(self.manager.shelve_session['failed']) == 1, 'failed to add'
         e = Entry()
         e['title'] = 'test 2'
         e['url'] = 'http://localhost/mock'
         self.manager.add_failed(e)
-        assert len(self.manager.session['failed']) == 2, 'failed to add again'
+        assert len(self.manager.shelve_session['failed']) == 2, 'failed to add again'
         self.manager.add_failed(e)
-        assert len(self.manager.session['failed']) == 2, 'failed to filter already added'
+        assert len(self.manager.shelve_session['failed']) == 2, 'failed to filter already added'
         
     def testBsImport(self):
         import BeautifulSoup

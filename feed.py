@@ -129,8 +129,8 @@ class Feed:
         self.config = config
         self.manager = manager
 
-        self.cache = ModuleCache(name, manager.session.setdefault('cache', {}))
-        self.shared_cache = ModuleCache('_shared_', manager.session.setdefault('cache', {}))
+        self.cache = ModuleCache(name, manager.shelve_session.setdefault('cache', {}))
+        self.shared_cache = ModuleCache('_shared_', manager.shelve_session.setdefault('cache', {}))
 
         self.entries = []
         

@@ -64,8 +64,12 @@ class Manager:
         self.configname = None
         self.options = None
         self.modules = {}
-        self.session = {}
+        self.shelve_session = {}
         self.config = {}
+        
+        # SQLAlchemy
+        from sqlalchemy.orm import sessionmaker
+        self.Session = sessionmaker(bind=engine)
         
         # events
         self.events = ['start', 'input', 'filter', 'download', 'modify', 'output', 'exit']
@@ -82,7 +86,7 @@ class Manager:
 
         # settings
         self.moduledir = os.path.join(sys.path[0], 'modules')
-        self.session_version = 2
+        self.shelve_session_version = 2
 
         # initialize commandline options
         parser = OptionParser()
@@ -165,14 +169,14 @@ class Manager:
         self.load_session()
             
         # check if session version number is different
-        if self.session.setdefault('version', self.session_version) != self.session_version:
+        if self.shelve_session.setdefault('version', self.shelve_session_version) != self.shelve_session_version:
             if not self.options.learn:
                 log.critical('Your session is broken or from older incompatible version of flexget. '\
                              'Run application with --reset-session to resolve this. '\
                              'Any new content downloaded between the previous successful execution and now will be lost. '\
                              'You can (try to) spot new content from the report and download them manually.')
                 sys.exit(1)
-            self.session['version'] = self.session_version
+            self.shelve_session['version'] = self.shelve_session_version
 
         took = time.clock() - start_time
         log.debug('Initialize took %.2f seconds' % took)
@@ -216,7 +220,7 @@ class Manager:
             if os.path.exists(config):
                 self.config = yaml.safe_load(file(config))
                 self.configname = os.path.basename(config)[:-4]
-                self.session_name = os.path.join(sys.path[0], 'session-%s.db' % self.configname)
+                self.shelve_session_name = os.path.join(sys.path[0], 'session-%s.db' % self.configname)
                 return
         log.debug('Tried to read from: %s' % ', '.join(possible, ', '))
         raise Exception('Failed to load configuration file %s' % self.options.config)
@@ -226,16 +230,19 @@ class Manager:
         # note: writeback must be True because how modules use our persistence.
         # See. http://docs.python.org/lib/node328.html
         if not self.options.reset:
-            self.session = shelve.open(self.session_name, protocol=2, writeback=True)
+            self.shelve_session = shelve.open(self.shelve_session_name, protocol=2, writeback=True)
         else:
             # create a new empty database
-            self.session = shelve.open(self.session_name, flag='n', protocol=2, writeback=True)
+            self.shelve_session = shelve.open(self.shelve_session_name, flag='n', protocol=2, writeback=True)
         # if test mode
         if self.options.test:
             import copy
-            temp = copy.deepcopy(self.session.cache)
-            self.session.close()
-            self.session = temp
+            temp = copy.deepcopy(self.shelve_session.cache)
+            self.shelve_session.close()
+            self.shelve_session = temp
+        # SQLAlchemy
+        engine = create_engine('sqlite:///%s.sqlite' % self.configname, echo=True)
+        Session.configure(bind=engine)
 
     def sanitize(self, d):
         """Makes dictionary d contain only yaml.safe_dump compatible elements"""
@@ -265,7 +272,7 @@ class Manager:
         try:
             fn = os.path.join(sys.path[0], 'dump-%s.yml' % self.configname)
             dump = {}
-            for k, v in self.session.iteritems():
+            for k, v in self.shelve_session.iteritems():
                 dump[k] = v
             f = file(fn, 'w')
             self.sanitize(dump)
@@ -278,7 +285,7 @@ class Manager:
     def save_session_shelf(self):
         if self.options.test: 
             return
-        self.session.close()
+        self.shelve_session.close()
         
     def load_modules(self, parser, moduledir):
         """Load all modules from moduledir"""
@@ -456,7 +463,7 @@ class Manager:
         return self.modules[name]
 
     def print_module_list(self):
-        # TODO: this can be rewritten in simpler form now when multiple modules cannot share keyword!
+        # TODO: rewrite!
         """Parameter --list"""
         print '-'*60
         print '%-20s%-30s%s' % ('Keyword', 'Roles', '--doc')
@@ -508,7 +515,7 @@ class Manager:
             
     def print_failed(self):
         """Parameter --failed"""
-        failed = self.session.setdefault('failed', [])
+        failed = self.shelve_session.setdefault('failed', [])
         if not failed:
             print 'No failed entries recorded'
         for entry in failed:
@@ -518,7 +525,7 @@ class Manager:
         
     def add_failed(self, entry):
         """Adds entry to internal failed list, displayed with --failed"""
-        failed = self.session.setdefault('failed', [])
+        failed = self.shelve_session.setdefault('failed', [])
         f = {}
         f['title'] = entry['title']
         f['url'] = entry['url']
@@ -532,8 +539,8 @@ class Manager:
             
     def clear_failed(self):
         """Clears list of failed entries"""
-        print 'Cleared %i items.' % len(self.session.setdefault('failed', []))
-        self.session['failed'] = []
+        print 'Cleared %i items.' % len(self.shelve_session.setdefault('failed', []))
+        self.shelve_session['failed'] = []
 
     def merge_dict_from_to(self, d1, d2):
         """Merges dictionary d1 into dictionary d2. d1 will remain in original form."""
