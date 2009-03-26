@@ -10,7 +10,7 @@ class FlexGetTestCase(unittest.TestCase):
         if not hasattr(self, 'config'):
             self.fail('Config file missing')
         self.manager = Manager(unit_test=True)
-        self.manager.options.config = self.config
+        self.manager.options.config = self.config # pylint: disable-msg=E1101
         # do not load session
         self.manager.options.reset = True
         self.manager.initialize()
@@ -30,7 +30,6 @@ class FlexGetTestCase(unittest.TestCase):
         self.manager.merge_dict_from_to(self.manager.config.get('global', {}), config)
     
         feed = Feed(self.manager, name, config)
-        feed.unittest = True
         return feed
         
     def get_module(self, event, keyword):
