@@ -95,6 +95,8 @@ class Manager:
 
         # initialize commandline options
         parser = OptionParser()
+        parser.add_option('--log-start', action='store_true', dest='log_start', default=0,
+                          help='Add FlexGet executions into a log.')
         parser.add_option('--test', action='store_true', dest='test', default=0,
                           help='Verbose what would happend on normal execution.')
         parser.add_option('--check', action='store_true', dest='validate', default=0,
@@ -151,6 +153,9 @@ class Manager:
         # perform commandline sanity check(s)
         if self.options.test and self.options.learn:
             parser.error('--test and --learn are mutually exclusive')
+            
+        if self.options.log_start:
+            logging.info('FlexGet started')
             
         # reset is executed with learn
         if self.options.reset:
