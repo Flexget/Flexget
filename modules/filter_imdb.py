@@ -2,12 +2,12 @@ import urllib
 import urllib2
 import logging
 import re
-import string
 import difflib
 import time
 from manager import ModuleWarning
 from socket import timeout
 from BeautifulSoup import BeautifulSoup
+from utils.log import log_once
 
 __pychecker__ = 'unusednames=parser'
 
@@ -77,7 +77,7 @@ class ImdbSearch:
                 if parts.index(part) < cut_pos:
                     cut_pos = parts.index(part)
         # make cut
-        s = string.join(parts[:cut_pos], ' ')
+        s = ' '.join(parts[:cut_pos])
         return s, year
 
     def smart_match(self, raw_name):
@@ -454,12 +454,12 @@ class FilterImdb:
                     feed.shared_cache.store(entry['title'], entry['imdb_url'])
                     log.info('Found %s' % (entry['imdb_url']))
                 else:
-                    feed.log_once('Imdb search failed for %s' % entry['title'], log)
+                    log_once('Imdb search failed for %s' % entry['title'], log)
                     # store FAIL for this title
                     feed.shared_cache.store(entry['title'], 'WILL_FAIL')
                     # act depending configuration
                     if config.get('filter_invalid', True):
-                        feed.log_once('Filtering %s because of undeterminable imdb url' % entry['title'], log)
+                        log_once('Filtering %s because of undeterminable imdb url' % entry['title'], log)
                         feed.filter(entry)
                     else:
                         log.debug('Unable to check %s due missing imdb url, configured to pass (filter_invalid is False)' % entry['title'])
@@ -545,7 +545,7 @@ class FilterImdb:
             entry['imdb_name'] = imdb.name
 
             if reasons:
-                feed.log_once('Filtering %s because of rule(s) %s' % (entry['title'], string.join(reasons, ', ')), log)
+                log_once('Filtering %s because of rule(s) %s' % (entry['title'], ', '.join(reasons), log))
                 feed.filter(entry)
             else:
                 log.debug('Accepting %s' % (entry))

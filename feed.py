@@ -229,17 +229,6 @@ class Feed:
         else:
             return self.config[keyword]
 
-    def log_once(self, s, logger=log):
-        """Log string s once"""
-        import md5
-        m = md5.new()
-        m.update(s)
-        md5sum = m.hexdigest()
-        seen = self.shared_cache.get('log-%s' % md5sum, False)
-        if (seen): return
-        self.shared_cache.store('log-%s' % md5sum, True, 30)
-        logger.info(s)
-
     # TODO: all these verbose methods are confusing
     def verbose_progress(self, s, logger=log):
         """Verbose progress, outputs only in non quiet mode."""
@@ -252,7 +241,7 @@ class Feed:
         # TODO: implement trough own logger?
         if self.manager.options.details:
             try:
-                reson_str = ''
+                reason_str = ''
                 if reason:
                     reason_str = ' (%s)' % reason
                 print "+ %-8s %-12s %s%s" % (self.__current_event, self.__current_module, msg, reason_str)
@@ -304,12 +293,13 @@ class Feed:
                 try:
                     method = self.manager.event_methods[event]
                     getattr(module['instance'], method)(self)
-                except ModuleWarning, m:
+                except ModuleWarning, warn:
                     # this warning should be logged only once (may keep repeating)
-                    if m.kwargs.get('log_once', False):
-                        self.log_once(m, m.log)
+                    if warn.kwargs.get('log_once', False):
+                        from utils.log import log_once
+                        log_once(warn, warn.log)
                     else:
-                        m.log.warning(m)
+                        warn.log.warning(warn)
                 except Exception, e:
                     log.exception('Unhandled error in module %s: %s' % (keyword, e))
                     self.abort()

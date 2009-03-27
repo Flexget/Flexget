@@ -4,6 +4,7 @@ import re
 from httplib import BadStatusLine
 from feed import Entry
 from manager import ModuleWarning
+from utils.log import log_once
 from BeautifulSoup import BeautifulSoup
 
 __pychecker__ = 'unusednames=parser'
@@ -95,7 +96,7 @@ class RlsLog:
 
             # reject if no torrent link
             if not 'url' in release:
-                feed.log_once('%s skipped due to missing or unrecognized download link' % (release['title']), log)
+                log_once('%s skipped due to missing or unrecognized download link' % (release['title']), log)
             else:
                 releases.append(release)
 

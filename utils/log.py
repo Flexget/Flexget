@@ -1,30 +1,43 @@
-
-# TODO: purge old entries
+"""Logging utilities"""
 
 import logging
 from manager import Session, Base
-from sqlalchemy import Table, Column, Integer, String, MetaData, ForeignKey
+from datetime import datetime, timedelta
+from sqlalchemy import Column, Integer, String, DateTime
+
+log = logging.getLogger('util.log')
 
 class LogMessage(Base):
     __tablename__ = 'log_once'
     
     id = Column(Integer, primary_key=True)
     md5sum = Column(String)
-    # TODO: add date
+    added = Column(DateTime)
 
     def __init__(self, md5sum):
         self.md5sum = md5sum
+        self.added = datetime.now()
     
     def __repr__(self):
         return "<LogMessage('%s')>" % (self.md5sum)
+    
+def purge():
+    """Purge old messages from database"""
+    old = datetime.now() - timedelta(days=365)
+    session = Session()
+    for message in session.query(LogMessage).filter(LogMessage.added < old):
+        log.debug('purging: %s' % message)
+        session.delete(message)
+    session.commit()
 
 def log_once(message, log=logging.getLogger('log_once')):
     """Log message only once using given logger."""
+    purge()
     
     import hashlib
-    hash = hashlib.md5()
-    hash.update(message)
-    md5sum = hash.hexdigest()
+    digest = hashlib.md5()
+    digest.update(message)
+    md5sum = digest.hexdigest()
     
     session = Session()
     # abort if this has already been logged

@@ -145,7 +145,10 @@ class Manager:
         sys.path.insert(1, os.path.join(sys.path[0], 'BeautifulSoup-3.0.7a'))
 
         # load modules, modules may add more commandline parameters!
+        start_time = time.clock()
         self.load_modules(parser, self.moduledir)
+        took = time.clock() - start_time
+        log.debug('load_modules took %.2f seconds' % took)
 
         # parse options including module customized options
         self.options = parser.parse_args()[0]
@@ -167,8 +170,6 @@ class Manager:
     def initialize(self):
         """Separated from __init__ so that unit test can modify options before loading config."""
 
-        start_time = time.clock()
-      
         # load config & session
         try:
             self.load_config()
@@ -188,14 +189,13 @@ class Manager:
                 sys.exit(1)
             self.shelve_session['version'] = self.shelve_session_version
 
-        took = time.clock() - start_time
-        log.debug('Initialize took %.2f seconds' % took)
         log.debug('Default encoding: %s' % sys.getdefaultencoding())
             
     def init_logging(self):
         """Creates and initializes logger."""
         
-        if Manager.log_initialized: return
+        if Manager.log_initialized: 
+            return
         
         filename = os.path.join(sys.path[0], 'flexget.log')
 
@@ -251,21 +251,21 @@ class Manager:
             self.shelve_session = temp
             
         # SQLAlchemy
-        #from utils.log import log_once
+        from utils.log import log_once
 
         engine = create_engine('sqlite:///%s.sqlite' % self.configname, echo=True)
         Session.configure(bind=engine)
         # create all tables
+        if self.options.reset:
+            Base.metadata.drop_all(bind=engine)
         Base.metadata.create_all(bind=engine)
         
         ## TEST TEST TEST
-        """
         log_once('test1')
         log_once('test2')
         log_once('test3')
         log_once('test1')
         log_once('test1')
-        """
 
     def sanitize(self, d):
         """Makes dictionary d contain only yaml.safe_dump compatible elements"""
@@ -357,9 +357,9 @@ class Manager:
     def find_modules(self, directory, prefix):
         """Return array containing all modules in passed path that begin with prefix."""
         modules = []
-        for file in os.listdir(directory):
-            if file.startswith(prefix+'_') and file.endswith('.py'):
-                modules.append(file[:-3])
+        for fn in os.listdir(directory):
+            if fn.startswith(prefix+'_') and fn.endswith('.py'):
+                modules.append(fn[:-3])
         return modules
 
     def get_settings(self, keyword, defaults={}):
@@ -611,12 +611,15 @@ class Manager:
                 if not isinstance(self.config['feeds'][name], dict):
                     if isinstance(self.config['feeds'][name], str):
                         if name in self.modules:
-                            log.error('\'%s\' is known keyword, but in wrong indentation level. Please indent it correctly under feed, it should have 2 more spaces than feed name.' % name)
+                            log.error('\'%s\' is known keyword, but in wrong indentation level. \
+                            Please indent it correctly under feed, it should have 2 more spaces \
+                            than feed name.' % name)
                             continue
                     log.error('\'%s\' is not a properly configured feed, please check indentation levels.' % name)
                     continue
                 # if feed name is prefixed with _ it's disabled
-                if name.startswith('_'): continue
+                if name.startswith('_'): 
+                    continue
                 # create feed instance and execute it
                 feed = Feed(self, name, self.config['feeds'][name])
                 try:

@@ -4,6 +4,7 @@ import xml.sax
 import re
 from feed import Entry
 from manager import ModuleWarning
+from utils.log import log_once
 
 feedparser_present = True
 try:
@@ -223,7 +224,7 @@ class InputRSS:
                 for enclosure in enclosures:
                     ee = Entry()
                     if not 'href' in enclosure:
-                        feed.log_once('RSS-entry %s enclosure does not have url' % entry.title, log)
+                        log_once('RSS-entry %s enclosure does not have url' % entry.title, log)
                         continue
                     ee['url'] = enclosure['href']
                     # get optional meta-data
@@ -258,13 +259,13 @@ class InputRSS:
                     e['url'] = entry['guid']
                 else:
                     if not config.get('silent'):
-                        feed.log_once('Failed to auto-detect RSS-entry %s link' % (entry.title), log)
+                        log_once('Failed to auto-detect RSS-entry %s link' % (entry.title), log)
                     ignored += 1    
                     continue
             else:
                 # manual configuration
                 if not 'curl' in entry:
-                    feed.log_once('RSS-entry %s does not contain configured link attributes: %s' % (entry.title, curl), log)
+                    log_once('RSS-entry %s does not contain configured link attributes: %s' % (entry.title, curl), log)
                     ignored += 1
                     continue
                 e['url'] = getattr(entry, curl)
