@@ -1,7 +1,5 @@
 import logging
 import re
-import string
-from datetime import tzinfo, timedelta, datetime
 
 log = logging.getLogger('serieparser')
 
@@ -36,8 +34,8 @@ class SerieParser:
         if not isinstance(self.data, basestring):
             raise Exception('SerieParser data is not a string, got %s' % repr(self.data))
 
-        def clean(s):
-            return re.sub(r'[ _.\[\]]+', ' ', s).strip().lower()
+        def clean(str):
+            return re.sub(r'[ _.\[\]]+', ' ', str).strip().lower()
 
         name = clean(self.name)
         data = clean(self.data)
@@ -62,8 +60,8 @@ class SerieParser:
             name_matches = False
             # use all specified regexps to this data
             for name_re in self.name_regexps:
-                m = re.search(name_re, self.data, re.IGNORECASE|re.UNICODE)
-                if m:
+                match = re.search(name_re, self.data, re.IGNORECASE|re.UNICODE)
+                if match:
                     name_matches = True
                     break
             if not name_matches:
@@ -93,10 +91,10 @@ class SerieParser:
 
         # search for season and episode number
         for ep_re in self.ep_regexps:
-            m = re.search(ep_re, self.data, re.IGNORECASE|re.UNICODE)
-            if m:
+            match = re.search(ep_re, self.data, re.IGNORECASE|re.UNICODE)
+            if match:
                 #log.debug('found episode number with regexp %s' % ep_re)
-                season, episode = m.groups()
+                season, episode = match.groups()
                 self.season = int(season)
                 self.episode = int(episode)
                 self.valid = True
@@ -105,10 +103,10 @@ class SerieParser:
 
         # search for id as last since they contain somewhat broad matches
         for id_re in self.id_regexps:
-            m = re.search(id_re, self.data, re.IGNORECASE|re.UNICODE)
-            if m:
+            match = re.search(id_re, self.data, re.IGNORECASE|re.UNICODE)
+            if match:
                 #log.debug('found id with regexp %s' % id_re)
-                self.id = string.join(m.groups(), '-')
+                self.id = '-'.join(match.groups())
                 self.valid = True
                 return
 

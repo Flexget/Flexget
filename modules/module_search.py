@@ -36,7 +36,7 @@ class Search:
 
     def feed_search(self, feed):
         # no searches in unit test mode
-        if feed.unit_test: 
+        if feed.manager.unit_test: 
             return 
         
         modules = {}
