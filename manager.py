@@ -250,22 +250,12 @@ class Manager:
             self.shelve_session.close()
             self.shelve_session = temp
             
-        # SQLAlchemy
-        from utils.log import log_once
-
         engine = create_engine('sqlite:///%s.sqlite' % self.configname, echo=True)
         Session.configure(bind=engine)
         # create all tables
         if self.options.reset:
             Base.metadata.drop_all(bind=engine)
         Base.metadata.create_all(bind=engine)
-        
-        ## TEST TEST TEST
-        log_once('test1')
-        log_once('test2')
-        log_once('test3')
-        log_once('test1')
-        log_once('test1')
 
     def sanitize(self, d):
         """Makes dictionary d contain only yaml.safe_dump compatible elements"""
