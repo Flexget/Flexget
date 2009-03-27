@@ -4,19 +4,11 @@ import logging
 from socket import timeout
 from feed import Entry
 from manager import ModuleWarning
+from BeautifulSoup import BeautifulSoup
 
 __pychecker__ = 'unusednames=parser'
 
 log = logging.getLogger('tvtorrents')
-
-# this way we don't force users to install bs incase they do not want to use module http
-soup_present = True
-soup_err = "Module tvtorrents requires BeautifulSoup. Please install it from http://www.crummy.com/software/BeautifulSoup/ or from your distribution repository."
-
-try:
-    from BeautifulSoup import BeautifulSoup
-except:
-    soup_present = False
 
 class InputTVTorrents:
     """
@@ -45,11 +37,8 @@ class InputTVTorrents:
         return []
 
     def feed_input(self, feed):
-        if not soup_present: raise Exception(soup_err)
         pageurl = "http://tvtorrents.com/loggedin/recently_aired.do"
-
         log.debug("InputModule tvtorrents requesting url %s" % pageurl)
-#        log.info("InputModule tvtorrents requesting url %s" % pageurl)
 
         try:
             page = urllib2.urlopen(pageurl)

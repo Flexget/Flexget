@@ -2,17 +2,11 @@ import urllib2
 import logging
 from module_resolver import ResolverException
 from manager import ModuleWarning
+from BeautifulSoup import BeautifulSoup
 
 __pychecker__ = 'unusednames=parser,feed'
 
 log = logging.getLogger('piratebay')
-
-# this way we don't force users to install bs incase they do not want to use module
-soup_present = True
-try:
-    from BeautifulSoup import BeautifulSoup
-except:
-    soup_present = False
 
 class ResolvePirateBay:
     """PirateBay resolver."""
@@ -30,8 +24,6 @@ class ResolvePirateBay:
         
     # resolver API
     def resolve(self, feed, entry):
-        if not soup_present:
-            raise ResolverException('BeautifulSoup not present')
         if entry['url'].startswith('http://thepiratebay.org/search/'):
             # use search
             try:

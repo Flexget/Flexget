@@ -7,14 +7,7 @@ import difflib
 import time
 from manager import ModuleWarning
 from socket import timeout
-
-# this way we don't force users to install bs incase they do not want to use this module
-soup_present = True
-
-try:
-    from BeautifulSoup import BeautifulSoup
-except:
-    soup_present = False
+from BeautifulSoup import BeautifulSoup
 
 __pychecker__ = 'unusednames=parser'
 
@@ -410,7 +403,6 @@ class FilterImdb:
         return False
 
     def feed_filter(self, feed):
-        if not soup_present: raise ModuleWarning("Module filter_imdb requires BeautifulSoup. Please install it from http://www.crummy.com/software/BeautifulSoup/ or from your distribution repository.", log)
         config = feed.config['imdb']
         for entry in feed.entries:
         

@@ -3,17 +3,11 @@ import urllib2
 import logging
 from module_resolver import ResolverException
 from manager import ModuleWarning
+from BeautifulSoup import BeautifulSoup
 
 __pychecker__ = 'unusednames=parser,feed'
 
 log = logging.getLogger('google_cse')
-
-# this way we don't force users to install bs incase they do not want to use module
-soup_present = True
-try:
-    from BeautifulSoup import BeautifulSoup
-except:
-    soup_present = False
 
 class ResolveGoogleCse:
     """Google custom query resolver."""
@@ -29,8 +23,6 @@ class ResolveGoogleCse:
         
     # resolver API
     def resolve(self, feed, entry):
-        if not soup_present:
-            raise ResolverException('BeautifulSoup not present')
         try:
             # need to fake user agent
             txheaders =  {'User-agent' : 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'}

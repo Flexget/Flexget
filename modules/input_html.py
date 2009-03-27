@@ -4,19 +4,11 @@ import logging
 from socket import timeout
 from feed import Entry
 from manager import ModuleWarning
+from BeautifulSoup import BeautifulSoup
 
 __pychecker__ = 'unusednames=parser'
 
 log = logging.getLogger('html')
-
-# this way we don't force users to install bs incase they do not want to use module http
-soup_present = True
-soup_err = 'Module feed_html requires BeautifulSoup. Please install it from http://www.crummy.com/software/BeautifulSoup/ or from your distribution repository.'
-
-try:
-    from BeautifulSoup import BeautifulSoup
-except:
-    soup_present = False
 
 class InputHtml:
     """
@@ -50,7 +42,6 @@ class InputHtml:
             return ['wrong datatype']
 
     def feed_input(self, feed):
-        if not soup_present: raise Exception(soup_err)
         config = feed.config['html']
         if not isinstance(config, dict):
             config = {}

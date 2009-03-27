@@ -4,19 +4,11 @@ import re
 from httplib import BadStatusLine
 from feed import Entry
 from manager import ModuleWarning
+from BeautifulSoup import BeautifulSoup
 
 __pychecker__ = 'unusednames=parser'
 
 log = logging.getLogger('rlslog')
-
-# this way we don't force users to install bs incase they do not want to use module http
-soup_present = True
-soup_err = 'Module rlslog requires BeautifulSoup. Please install it from http://www.crummy.com/software/BeautifulSoup/ or from your distribution repository.'
-
-try:
-    from BeautifulSoup import BeautifulSoup
-except:
-    soup_present = False
 
 class RlsLog:
 
@@ -111,8 +103,6 @@ class RlsLog:
         return releases
 
     def feed_input(self, feed):
-        if not soup_present: raise Exception(soup_err)
-
         try:
             releases = self.parse_rlslog(feed.get_input_url('rlslog'), feed)
         except urllib2.HTTPError, e:

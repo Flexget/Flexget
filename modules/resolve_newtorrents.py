@@ -3,6 +3,7 @@ import logging
 import re
 from module_resolver import ResolverException
 from manager import ModuleWarning
+from BeautifulSoup import BeautifulSoup
 
 timeout = 10
 import socket
@@ -12,13 +13,6 @@ __pychecker__ = 'unusednames=parser,feed'
 
 log = logging.getLogger('newtorrents')
 
-# this way we don't force users to install bs incase they do not want to use module
-soup_present = True
-try:
-    from BeautifulSoup import BeautifulSoup
-except:
-    soup_present = False
-    
 class NewTorrents:
     """NewTorrents resolver and search module."""
 
@@ -35,10 +29,6 @@ class NewTorrents:
         
     # Resolver module API
     def resolve(self, feed, entry):
-        if not soup_present:
-            raise ResolverException('BeautifulSoup not present')
-
-        # resolve entry url
         url = entry['url']
         if url.startswith('http://www.newtorrents.info/?q=') or url.startswith('http://www.newtorrents.info/search'):
             try:
@@ -56,8 +46,7 @@ class NewTorrents:
             
     # Search module API
     def search(self, feed, entry):
-        import urllib
-        search_url = 'http://www.newtorrents.info/search/%s' % urllib.quote(entry['title'])
+        search_url = 'http://www.newtorrents.info/search/%s' % entry['title']
         url = self.url_from_search(search_url, entry['title'])
         entry['url'] = url
     
@@ -79,12 +68,18 @@ class NewTorrents:
     def url_from_search(self, url, name):
         """Parses torrent download url from search results"""
         name = name.replace('.',' ').lower()
+        import urllib
+        url = urllib.quote(url, safe=':/~?=&%')
+        log.debug('search url: %s' % url)
         try:
             html = urllib2.urlopen(url).read()
             # fix </SCR'+'IPT> so that BS does not crash
             html = re.sub(r'(</SCR.*?)...(.*?IPT>)', r'\1\2', html)
-        except urllib2.URLError:
-            raise ModuleWarning('Timed out when opening search page', log)
+        except IOError, e:
+            if hasattr(e, 'reason'):
+                raise ModuleWarning('Failed to reach server. Reason: %s' % e.reason, log)
+            elif hasattr(e, 'code'):
+                raise ModuleWarning('The server couldn\'t fulfill the request. Error code: %s' % e.code, log)
         
         soup = BeautifulSoup(html)
         torrents = []
