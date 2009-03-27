@@ -16,15 +16,11 @@ except ImportError:
     sys.exit(1)
 
 try:
-    from sqlite3 import dbapi2 as sqlite
-except ImportError:
-    print 'Please install sqlite3'
-    sys.exit(1)
-
-try:
     from sqlalchemy import create_engine
+    from sqlalchemy.orm import sessionmaker
+    from sqlalchemy.ext.declarative import declarative_base
 except ImportError:
-    print 'Please install SQLAlchemy from http://www.sqlalchemy.org/ or from your distro repository'
+    print 'Please install SQLAlchemy (>0.5) from http://www.sqlalchemy.org/ or from your distro repository'
     sys.exit(1)
 
 try:
@@ -52,9 +48,6 @@ class MergeException(Exception):
         self.value = value
     def __str__(self):
         return repr(self.value)
-
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
 Session = sessionmaker()
@@ -125,7 +118,7 @@ class Manager:
                           help='Disables stdout and stderr output, log file used. Reduces logging level slightly.')
         parser.add_option('--experimental', action='store_true', dest='experimental', default=0,
                           help=SUPPRESS_HELP)
-        parser.add_option('--debug', action='store_true', dest='debug', default=0,
+        parser.add_option('--debug', action='store_true', dest='debug', default=False,
                           help=SUPPRESS_HELP)
         parser.add_option('--dump', action='store_true', dest='dump', default=0,
                           help=SUPPRESS_HELP)
@@ -249,8 +242,9 @@ class Manager:
             temp = copy.deepcopy(self.shelve_session.cache)
             self.shelve_session.close()
             self.shelve_session = temp
-            
-        engine = create_engine('sqlite:///%s.sqlite' % self.configname, echo=True)
+        
+        # SQLAlchemy
+        engine = create_engine('sqlite:///%s.sqlite' % self.configname, echo=self.options.debug)
         Session.configure(bind=engine)
         # create all tables
         if self.options.reset:
@@ -454,7 +448,7 @@ class Manager:
         if not event in self.event_methods:
             raise Exception('Unknown event %s' % event)
         method = self.event_methods[event]
-        for name, info in self.modules.iteritems():
+        for _, info in self.modules.iteritems():
             instance = info['instance']
             if not hasattr(instance, method):
                 continue
@@ -465,7 +459,7 @@ class Manager:
     def get_modules_by_group(self, group):
         """Return all modules with in specified group."""
         res = []
-        for name, info in self.modules.iteritems():
+        for _, info in self.modules.iteritems():
             if info.get('group', '')==group or group in info.get('groups', []):
                 res.append(info)
         return res
