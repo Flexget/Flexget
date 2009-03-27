@@ -8,6 +8,8 @@ from sqlalchemy import Column, Integer, String, DateTime
 log = logging.getLogger('util.log')
 
 class LogMessage(Base):
+    """Declarative"""
+    
     __tablename__ = 'log_once'
     
     id = Column(Integer, primary_key=True)
@@ -30,7 +32,7 @@ def purge():
         session.delete(message)
     session.commit()
 
-def log_once(message, log=logging.getLogger('log_once')):
+def log_once(message, logger=logging.getLogger('log_once')):
     """Log message only once using given logger."""
     purge()
     
@@ -49,4 +51,4 @@ def log_once(message, log=logging.getLogger('log_once')):
     session.add(row)
     session.commit()
     
-    log.info(message)
+    logger.info(message)
