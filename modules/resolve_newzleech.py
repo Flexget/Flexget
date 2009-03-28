@@ -46,11 +46,14 @@ class ResolveNewzleech:
 
         soup = BeautifulSoup(page)
         
+        nzbs = []
+        
         for item in soup.findAll('table', attrs={'class':'contentt'}):
             subject_tag = item.find('td', attrs={'class':'subject'}).next
             subject = ''.join(subject_tag.findAll(text=True))
             complete = item.find('td', attrs={'class':'complete'}).string
-            nzb_url = 'http://newzleech.com' + item.find('td', attrs={'class':'get'}).next.get('href')
+            size = item.find('td', attrs={'class':'size'}).string
+            nzb_url = 'http://newzleech.com/' + item.find('td', attrs={'class':'get'}).next.get('href')
             
             # generate regexp from entry title and see if it matches subject
             regexp = entry['title']
@@ -66,7 +69,37 @@ class ResolveNewzleech:
                     log.debug('Match is incomplete %s from newzleech, skipping ..' % entry['title'])
                     continue
                 log.info('Found \'%s\'' % entry['title'])
-                entry['url'] = nzb_url
-                break
-        else:
+                
+                def parse_size(value):
+                    try:
+                        num = float(value[:-3])
+                    except:
+                        log.error('Failed to parse_size %s' % value)
+                        return 0
+                    # convert into megabytes
+                    if 'GB' in value:
+                        num *= 1024
+                    if 'KB' in value:
+                        num /= 1024
+                    return num
+                
+                nzb = {}
+                nzb['url'] = nzb_url
+                nzb['size'] = parse_size(size)
+                
+                nzbs.append(nzb) 
+            
+        if not nzbs:
             log.debug('Unable to find %s' % entry['title'])
+            return
+
+        # choose largest hit
+
+        def cmp_size(a, b):
+            return cmp(a['size'], b['size'])
+            
+        nzbs.sort(cmp_size)
+        nzbs.reverse()
+        
+        entry['url'] = nzbs[0]['url']    
+    

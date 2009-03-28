@@ -79,6 +79,8 @@ class ModuleDownload:
         log.debug('Downloading url \'%s\'' % url)
         # get content
         if 'basic_auth_password' in entry and 'basic_auth_username' in entry:
+            # TODO: should just add handler if default opener is present, now this will lose all other
+            # handlers that other modules have potentialy added
             log.debug('Basic auth enabled. User: %s Password: %s' % (entry['basic_auth_username'], entry['basic_auth_password']))
             passman = urllib2.HTTPPasswordMgrWithDefaultRealm()
             passman.add_password(None, url, entry['basic_auth_username'], entry['basic_auth_password'])
@@ -89,6 +91,13 @@ class ModuleDownload:
             if urllib2._opener:
                 handlers = [h.__class__.__name__ for h in urllib2._opener.handlers]
                 log.debug('default opener present, handlers: %s' % ', '.join(handlers))
+
+            """
+            txheaders =  {'User-agent' : 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'}
+            req = urllib2.Request(url, None, txheaders)
+            f = urllib2.urlopen(req)
+            """
+                
             f = urllib2.urlopen(url)
 
         mimetype = f.headers.getsubtype()
