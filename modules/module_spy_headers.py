@@ -8,7 +8,6 @@ __pychecker__ = 'unusednames=parser,feed'
 
 log = logging.getLogger('spy_headers')
 
-"""
 class CustomHTTPConnection(httplib.HTTPConnection):
 
     def __init__(self, *args, **kwargs):
@@ -34,6 +33,7 @@ class HTTPCaptureHeaderHandler(urllib2.AbstractHTTPHandler):
         # All code here lifted directly from the python library
         host = req.get_host()
         if not host:
+            from urllib2 import URLError
             raise URLError('no host given')
 
         h = http_class(host) # will parse host:port
@@ -68,7 +68,6 @@ class HTTPCaptureHeaderHandler(urllib2.AbstractHTTPHandler):
         log.info('--------------------------------------')
 
         return resp
-"""
 
 class ModuleSpyHeaders:
 

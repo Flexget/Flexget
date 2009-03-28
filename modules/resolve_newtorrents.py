@@ -30,7 +30,8 @@ class NewTorrents:
     # Resolver module API
     def resolve(self, feed, entry):
         url = entry['url']
-        if url.startswith('http://www.newtorrents.info/?q=') or url.startswith('http://www.newtorrents.info/search'):
+        if url.startswith('http://www.newtorrents.info/?q=') or \
+           url.startswith('http://www.newtorrents.info/search'):
             try:
                 url = self.url_from_search(url, entry['title'])
             except ModuleWarning, e:

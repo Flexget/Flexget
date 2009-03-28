@@ -38,6 +38,12 @@ class ResolvePirateBay:
     def parse_download_page(self, url):
         try:
             page = urllib2.urlopen(url)
+        except IOError, e:
+            if hasattr(e, 'reason'):
+                raise ResolverException('Failed to reach server. Reason: %s' % e.reason)
+            elif hasattr(e, 'code'):
+                raise ResolverException('The server couldn\'t fulfill the request. Error code: %s' % e.code)
+        try:
             soup = BeautifulSoup(page)
             tag_div = soup.find('div', attrs={'class':'download'})
             if not tag_div:
@@ -53,15 +59,20 @@ class ResolvePirateBay:
         entry['url'] = self.search_title(entry['title'])
             
     def search_title(self, name, url=None):
-        """Search for name from piratebay, if url is passed it it used instead of internal search."""
+        """Search for name from piratebay, if a search url is passed it will be 
+        used instead of internal search."""
+        
         import urllib
         name = name.replace('.',' ').lower()
         if not url:
             url = 'http://thepiratebay.org/search/'+urllib.quote(name)
         try:
             page = urllib2.urlopen(url)
-        except urllib2.URLError:
-            raise ModuleWarning('Timed out when opening search page', log)
+        except IOError, e:
+            if hasattr(e, 'reason'):
+                raise ModuleWarning('Failed to reach server. Reason: %s' % e.reason)
+            elif hasattr(e, 'code'):
+                raise ModuleWarning('The server couldn\'t fulfill the request. Error code: %s' % e.code)
         
         soup = BeautifulSoup(page)
         torrents = []

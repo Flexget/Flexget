@@ -27,7 +27,7 @@ class ModuleCookies:
     def validator(self,):
         import validator
         # perhaps this module goes way of the dodo in 1.0 ....
-        log.warning('fix module cookies validator')
+        log.warning('TODO: cookies validator')
         return validator.factory('any')
     
         """

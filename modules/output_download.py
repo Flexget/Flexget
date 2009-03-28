@@ -76,7 +76,7 @@ class ModuleDownload:
 
     def download(self, feed, entry):
         url = urllib.quote(entry['url'], safe=':/~?=&%')
-        log.debug('Downloading url %s' % url)
+        log.debug('Downloading url \'%s\'' % url)
         # get content
         if 'basic_auth_password' in entry and 'basic_auth_username' in entry:
             log.debug('Basic auth enabled. User: %s Password: %s' % (entry['basic_auth_username'], entry['basic_auth_password']))
