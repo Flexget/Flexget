@@ -172,7 +172,7 @@ class Manager:
             log.critical(e)
             sys.exit(1)
             
-        self.load_session()
+        self.init_sqlalchemy()
         log.debug('Default encoding: %s' % sys.getdefaultencoding())
         
     def init_logging(self):
@@ -217,8 +217,8 @@ class Manager:
         log.debug('Tried to read from: %s' % ', '.join(possible, ', '))
         raise Exception('Failed to load configuration file %s' % self.options.config)
 
-    def load_session(self):
-        """Load session file"""
+    def init_sqlalchemy(self):
+        """Initialize SQLAlchemy"""
         
         # load old shelve session
         if os.path.exists(self.shelve_session_name):

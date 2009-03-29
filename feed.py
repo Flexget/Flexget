@@ -197,8 +197,6 @@ class Feed:
         for module in modules:
             keyword = module['name']
             if keyword in self.config or module['builtin']:
-                # set cache namespaces to this module realm
-                self.__set_cache_plugin(keyword)
                 # store execute info
                 self.__current_event = event
                 self.__current_module = keyword

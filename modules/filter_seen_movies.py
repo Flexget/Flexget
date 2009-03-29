@@ -1,8 +1,6 @@
 import logging
 from filter_seen import FilterSeen
 
-__pychecker__ = 'unusednames=parser'
-
 log = logging.getLogger('seenmovies')
 
 class FilterSeenMovies(FilterSeen):
@@ -27,7 +25,7 @@ class FilterSeenMovies(FilterSeen):
         # strict method
         if feed.config['seen_movies']=='strict':
             for entry in feed.entries:
-                if not entry.has_key('imdb_url'):
+                if not 'imdb_url' in entry:
                     log.info('Rejecting %s because of missing imdb url' % entry['title'])
                     feed.reject(entry)
         # call super
