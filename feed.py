@@ -1,7 +1,6 @@
 import logging
 from datetime import datetime
 from manager import ModuleWarning
-from utils.cache import Cache, purge_cache
 
 log = logging.getLogger('feed')
 
@@ -50,11 +49,6 @@ class Feed:
         self.name = name
         self.config = config
         self.manager = manager
-
-        # backwards compatibility
-        self.cache = Cache(self.name, 'undefined-plugin')
-        self.shared_cache = Cache('_shared_', 'undefined-plugin')
-        purge_cache()
 
         self.entries = []
         
@@ -191,11 +185,6 @@ class Feed:
         a = self.__get_priority(a, event)
         b = self.__get_priority(b, event)
         return cmp(a, b)
-
-    def __set_cache_plugin(self, name):
-        """Switch namespace in session"""
-        self.cache.plugin = name
-        self.shared_cache.plugin = name
         
     def __run_event(self, event):
         """Execute module events if module is configured for this feed."""
