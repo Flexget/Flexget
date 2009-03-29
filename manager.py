@@ -196,10 +196,9 @@ class Manager:
         else:
             logger.setLevel(logging.INFO)
 
-        if not '-q' in sys.argv or not '--cron' in sys.argv:
-            # log to console
+        # log to console, unless --cron present (or -q)
+        if not '-q' in sys.argv and not '--cron' in sys.argv:
             console = logging.StreamHandler()
-            #console.setLevel(logging.DEBUG)
             console.setFormatter(formatter)
             logger.addHandler(console)
         
@@ -231,7 +230,7 @@ class Manager:
             #shutil.move(self.shelve_session_name, '%s_backup' % self.shelve_session_name)
         
         # SQLAlchemy
-        engine = create_engine('sqlite:///persistence-%s.sqlite' % self.configname, echo=self.options.debug_sql)
+        engine = create_engine('sqlite:///db-%s.sqlite' % self.configname, echo=self.options.debug_sql)
         Session.configure(bind=engine)
         # create all tables
         if self.options.reset:

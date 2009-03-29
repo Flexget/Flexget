@@ -1,133 +1,48 @@
 import logging
 import re
-import string
 from datetime import tzinfo, timedelta, datetime
 from feed import Entry
 from sys import maxint
 from manager import ModuleWarning
 from utils.serieparser import SerieParser
 
-__pychecker__ = 'unusednames=parser'
+from manager import Session, Base
+from sqlalchemy import Column, Integer, String, DateTime, Boolean, PickleType
 
 log = logging.getLogger('series')
+
+class Series(Base):
+    
+    __tablename__ = 'series'
+    
+    id = Column(Integer, primary_key=True)
+    name = Column(String)
+    identifier = Column(String)
+    downloaded = Column(Boolean)
+    first_seen = Column(DateTime)
+    
+    def __init__(self):
+        pass
+        
+    def __str__(self):
+        return '<Series(%s, %s)>' % (self.name, self.identifier)
+
+
+class Episode(Base):
+    
+    __tablename__ = 'episodes'
+
+    id = Column(Integer, primary_key=True)
+
+    def __init__(self):
+        pass
 
 class FilterSeries:
 
     """
-        Intelligent filter for tv-series. This solves duplicate downloads
-        problem that occurs when using patterns (regexp) matching since same
-        episode is often released by multiple groups.
-
-        Example configuration:
-
-        series:
-          - some series
-          - another series
-          
-        If "some serie" and "another serie" have understandable episode
-        numbering any given episode is downloaded only once.
-
-        So if we get same episode twice:
+        Intelligent filter for tv-series.
         
-        Some.Series.S2E10.More.Text
-        Some.Series.S2E10.Something.Else
-
-        Only first file is downloaded.
-
-        If different qualities come available at the same moment,
-        flexget will always download the best one (up to 720p by default).
-
-        Supports default settings trough settings block in configuration file.
-
-        Advanced usage with regexps:
-        ----------------------------
-
-        The standard name matching is not perfect, if you're used to working with regexps you can
-        specify regexp that is used to test if entry is a defined series.
-
-        You can also give regexps to episode number matching or unique id matching if it doesn't have
-        normal episode numbering scheme (season, episode).
-
-        Example:
-
-        series:
-          - some serie:
-              name_patterns: ^some.serie
-              ep_patterns: (\d\d)-(\d\d\d)  # must return TWO groups
-              id_patterns: (\d\d\d)         # can return any number of groups
-        
-        Timeframe:
-        ----------
-
-        Series filter allows you to specify a timeframe for each series in which
-        flexget waits better quality.
-
-        Example configuration:
-
-        series:
-          - some series:
-              timeframe:
-                hours: 4
-                enough: 720p
-          - another series
-          - third series
-
-        In this example when a epsisode of 'some serie' appears, flexget will wait
-        for 4 hours in case and then proceeds to download best quality available.
-
-        The enough parameter will tell the quality that you find good enough to start
-        downloading without waiting whole timeframe. If qualities meeting enough parameter
-        and above are available, flexget will prefer the enough. Ie. if enough value is set
-        to 'hdtv' and qualities dsk, hdtv and 720p are available, hdtv will be chosen.
-        If we take hdtv off from list, 720p would be downloaded.
-
-        Enough has default value of 720p.
-
-        Possible values for enough (in order): 1080p, 1080, 720p, 720, hr, dvd, hdtv, dsr, dsrip
-
-        Custom path:
-        ------------
-
-        Specify download path for series.
-
-        Example:
-
-        series:
-          - some series:
-              path: ~/download/some_series/
-          - another series
-          - third series
-
-        Example with timeframe:
-
-        series:
-          - some series:
-              timeframe:
-                hours: 4
-              path: ~/download/some_series/
-          - another series
-          - third series
-
-        Watched:
-        --------
-
-        If you already watched some episodes when adding a new series, you can specify a
-        season/episode number of the last episode you know.
-
-        Example:
-
-        series:
-            - some series:
-                watched:
-                    season: 2
-                    episode: 3
-            - another series
-            - third series
-
-        This example would reject everything prior to episode 4 of season 2.
-
-        The parameter episode is optional, if it is missing, the entire first and second
-        season would be skipped.
+        http://flexget.com/wiki/FilterSeries
     """
 
     def register(self, manager, parser):
