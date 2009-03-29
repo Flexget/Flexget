@@ -11,6 +11,8 @@ from sqlalchemy import Column, Integer, String, DateTime, Boolean, PickleType
 
 log = logging.getLogger('series')
 
+# drafting database ...
+
 class Series(Base):
     
     __tablename__ = 'series'
@@ -33,6 +35,8 @@ class Episode(Base):
     __tablename__ = 'episodes'
 
     id = Column(Integer, primary_key=True)
+    quality = Column(String)
+    entry = Column(PickleType)
 
     def __init__(self):
         pass
