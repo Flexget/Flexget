@@ -1,6 +1,7 @@
 import logging
 from datetime import datetime
 from manager import ModuleWarning
+from utils.cache import Cache, purge_cache
 
 log = logging.getLogger('feed')
 
@@ -37,85 +38,6 @@ class Entry(dict):
             return True
         return True
 
-class ModuleCache:
-
-    """
-        Provides dictionary-like persistent storage for modules, allows saving key value pair
-        for n number of days. Purges old entries to keep storage size in reasonable sizes.
-    """
-
-    log = logging.getLogger('modulecache')
-
-    def __init__(self, name, storage):
-        self.__storage = storage.setdefault(name, {})
-        self._cache = None
-        self.__namespace = None
-
-    def set_namespace(self, name):
-        self._cache = self.__storage.setdefault(name, {})
-        self.__namespace = name
-        self.__purge()
-
-    def get_namespace(self):
-        return self.__namespace
-
-    def get_namespaces(self):
-        """Return array of known namespaces in this cache"""
-        return self.__storage.keys()
-    
-    def store(self, key, value, days=45):
-        """Stores key value pair for number of days. Non yaml compatible values are not saved."""
-        item = {}
-        item['stored'] = datetime.today().strftime('%Y-%m-%d')
-        item['days'] = days
-        item['value'] = value
-        self._cache[key] = item
-
-    def storedefault(self, key, value, days=45):
-        """Identical to dictionary setdefault"""
-        undefined = object()
-        item = self.get(key, undefined)
-        if item is undefined:
-            self.log.debug('storing default for %s, value %s' % (key, value))
-            self.store(key, value, days)
-            return self.get(key)
-        else:
-            return item
-
-    def get(self, key, default=None):
-        """Return value by key from cache. Return None or default if not found"""
-        item = self._cache.get(key)
-        if item is None:
-            return default
-        else:
-            # reading value should update "stored" date .. TODO: refactor stored -> access & days -> keep?
-            item['stored'] = datetime.today().strftime('%Y-%m-%d')
-            # HACK, for some reason there seems to be items without value, most likely elusive rare bug ..
-            if not 'value' in item:
-                self.log.warning('BUGFIX: Key %s is missing value, using default.' % key)
-                return default
-            return item['value']
-            
-    def remove(self, key):
-        """Removes a key from cache"""
-        return self._cache.pop(key)
-
-    def has_key(self, key):
-        log.warning('use of deprecated has_key')
-        return self._cache.has_key(key)
-
-    def __purge(self):
-        """Remove all values from cache that have passed their expiration date"""
-        now = datetime.today()
-        for key in self._cache.keys():
-            item = self._cache[key]
-            y, m, d = item['stored'].split('-')
-            stored = datetime(int(y), int(m), int(d))
-            delta = now - stored
-            if delta.days > item['days']:
-                self.log.debug('Purging from cache %s' % (str(item)))
-                self._cache.pop(key)
-
 class Feed:
 
     def __init__(self, manager, name, config):
@@ -129,8 +51,10 @@ class Feed:
         self.config = config
         self.manager = manager
 
-        self.cache = ModuleCache(name, manager.shelve_session.setdefault('cache', {}))
-        self.shared_cache = ModuleCache('_shared_', manager.shelve_session.setdefault('cache', {}))
+        # backwards compatibility
+        self.cache = Cache(self.name, 'undefined-plugin')
+        self.shared_cache = Cache('_shared_', 'undefined-plugin')
+        purge_cache()
 
         self.entries = []
         
@@ -268,10 +192,10 @@ class Feed:
         b = self.__get_priority(b, event)
         return cmp(a, b)
 
-    def __set_namespace(self, name):
+    def __set_cache_plugin(self, name):
         """Switch namespace in session"""
-        self.cache.set_namespace(name)
-        self.shared_cache.set_namespace(name)
+        self.cache.plugin = name
+        self.shared_cache.plugin = name
         
     def __run_event(self, event):
         """Execute module events if module is configured for this feed."""
@@ -285,7 +209,7 @@ class Feed:
             keyword = module['name']
             if keyword in self.config or module['builtin']:
                 # set cache namespaces to this module realm
-                self.__set_namespace(keyword)
+                self.__set_cache_plugin(keyword)
                 # store execute info
                 self.__current_event = event
                 self.__current_module = keyword

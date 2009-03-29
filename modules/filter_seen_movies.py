@@ -21,6 +21,7 @@ class FilterSeenMovies(FilterSeen):
 
         # remember and filter by these fields
         self.fields = ['imdb_url']
+        self.keyword = 'seen_movies'
         
     def feed_filter(self, feed):
         # strict method

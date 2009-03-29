@@ -57,7 +57,7 @@ class ResolveNewzleech:
             
             # generate regexp from entry title and see if it matches subject
             regexp = entry['title']
-            wildcardize = [' ', '-'] # dot needs to be last or replace screws it up
+            wildcardize = [' ', '-']
             for wild in wildcardize:
                 regexp = regexp.replace(wild, '.')
             regexp = '.*' + regexp + '.*'

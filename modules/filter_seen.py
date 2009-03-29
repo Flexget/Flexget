@@ -1,9 +1,29 @@
 import urllib
 import logging
-
-__pychecker__ = 'unusednames=parser'
+from manager import Session, Base
+from sqlalchemy import Column, Integer, String, DateTime, PickleType
+from datetime import datetime, timedelta
 
 log = logging.getLogger('seen')
+
+class Seen(Base):
+    
+    __tablename__ = 'seen'
+
+    id = Column(Integer, primary_key=True)
+    field = Column(String)
+    value = Column(String)
+    feed = Column(String)
+    added = Column(DateTime)
+    
+    def __init__(self, field, value, feed):
+        self.field = field
+        self.value = value
+        self.feed = feed
+        self.added = datetime.now()
+    
+    def __str__(self):
+        return '<Seen(%s=%s)>' % (self.field, self.value)
 
 class FilterSeen(object):
 
@@ -21,6 +41,7 @@ class FilterSeen(object):
 
         # remember and filter by these fields
         self.fields = ['original_url', 'title', 'url']
+        self.keyword = 'seen'
 
     def validator(self):
         import validator
@@ -35,13 +56,18 @@ class FilterSeen(object):
             log.debug('Seen is disabled')
             return
         
+        # migrate shelve -> sqlalchemy
+        if feed.manager.shelve_session:
+            self.migrate(feed.manager.shelve_session)
+        
+        session = Session()
+        
         duplicates = []
         for entry in feed.entries:
             for field in self.fields:
-                if not entry.has_key(field):
+                if not field in entry:
                     continue
-                # note: urllib.unquote is only for making module backwards compatible
-                if feed.shared_cache.get(entry[field], False) or feed.shared_cache.get(urllib.unquote(entry[field]), False):
+                if session.query(Seen).filter(Seen.value == entry[field]).first():
                     log.debug("Rejecting '%s' '%s' because of seen '%s'" % (entry['url'], entry['title'], field))
                     feed.reject(entry)
                     break
@@ -60,10 +86,12 @@ class FilterSeen(object):
                     if entry.get(field, object()) == duplicate.get(field, object()):
                         log.debug('Rejecting %s because of duplicate field %s' % (duplicate['title'], field))
                         feed.reject(duplicate)
-                        # TODO: if / when entry has multiple entries it should combine these two entries
+                        # TODO: if / when entry has multiple urls it should combine these two entries
                         # now the duplicate is just rejected and considered seen
-                        feed.shared_cache.store(duplicate[field], True, 365)
+                        seen = Seen(field, duplicate[field], feed.name)
+                        session.add(seen)
                         duplicates.append(duplicate)
+        session.commit()
                     
 
     def feed_exit(self, feed):
@@ -72,14 +100,33 @@ class FilterSeen(object):
             log.debug('Seen is disabled')
             return
 
+        session = Session()
         for entry in feed.entries:
             for field in self.fields:
-                if not entry.has_key(field):
+                if not field in entry:
                     continue
-                feed.shared_cache.store(entry[field], True, 365)
+                
+                seen = Seen(field, entry[field], feed.name)
+                session.add(seen)
             
             # verbose if in learning mode
             if feed.manager.options.learn:
                 log.info("Learned '%s' (will skip this in the future)" % (entry['title']))
             else:
                 log.debug("Learned '%s' '%s' (will skip this in the future)" % (entry['url'], entry['title']))
+                
+        session.commit()
+        
+    def migrate(self, shelve, name):
+        count = 0
+        session = Session()
+        for feed, data in shelve.iteritems():
+            if not name in data:
+                continue
+            seen = data[self.keyword]
+            for k, v in seen.iteritems():
+                seen = Seen('unknown', k, 'unknown')
+                session.add(seen)
+                count += 1
+        log.info('Migrated %s seen items' % count)
+        session.commit()

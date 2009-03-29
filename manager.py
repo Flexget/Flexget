@@ -82,8 +82,7 @@ class Manager:
         self.moduledir = os.path.join(sys.path[0], 'modules')
         
         # shelve
-        self.shelve_session = {}
-        self.shelve_session_version = 2
+        self.shelve_session = None
         self.shelve_session_name = None
 
         # initialize commandline options
@@ -120,7 +119,7 @@ class Manager:
                           help=SUPPRESS_HELP)
         parser.add_option('--debug', action='store_true', dest='debug', default=False,
                           help=SUPPRESS_HELP)
-        parser.add_option('--dump', action='store_true', dest='dump', default=0,
+        parser.add_option('--debug-sql', action='store_true', dest='debug_sql', default=False,
                           help=SUPPRESS_HELP)
         parser.add_option('--validate', action='store_true', dest='validate', default=0,
                           help=SUPPRESS_HELP)
@@ -159,11 +158,14 @@ class Manager:
             
         if not self.unit_test:
             self.initialize()
+            
+        # TODO: xxx
+        if self.options.test:
+            print '--test is borked again'
+            sys.exit(1)
 
     def initialize(self):
         """Separated from __init__ so that unit test can modify options before loading config."""
-
-        # load config & session
         try:
             self.load_config()
         except Exception, e:
@@ -171,19 +173,8 @@ class Manager:
             sys.exit(1)
             
         self.load_session()
-            
-        # check if session version number is different
-        if self.shelve_session.setdefault('version', self.shelve_session_version) != self.shelve_session_version:
-            if not self.options.learn:
-                log.critical('Your session is broken or from older incompatible version of flexget. '\
-                             'Run application with --reset-session to resolve this. '\
-                             'Any new content downloaded between the previous successful execution and now will be lost. '\
-                             'You can (try to) spot new content from the report and download them manually.')
-                sys.exit(1)
-            self.shelve_session['version'] = self.shelve_session_version
-
         log.debug('Default encoding: %s' % sys.getdefaultencoding())
-            
+        
     def init_logging(self):
         """Creates and initializes logger."""
         
@@ -195,7 +186,6 @@ class Manager:
         # get root logger
         logger = logging.getLogger()
         handler = logging.handlers.RotatingFileHandler(filename, maxBytes=200*1024, backupCount=9)
-        #handler = logging.FileHandler(os.path.join(sys.path[0], 'flexget.log'))
         formatter = logging.Formatter('%(asctime)-15s %(levelname)-8s %(name)-11s %(message)s')
         handler.setFormatter(formatter)
         logger.addHandler(handler)
@@ -229,22 +219,19 @@ class Manager:
 
     def load_session(self):
         """Load session file"""
-        # note: writeback must be True because how modules use our persistence.
-        # See. http://docs.python.org/lib/node328.html
-        if not self.options.reset:
-            self.shelve_session = shelve.open(self.shelve_session_name, protocol=2, writeback=True)
-        else:
-            # create a new empty database
-            self.shelve_session = shelve.open(self.shelve_session_name, flag='n', protocol=2, writeback=True)
-        # if test mode
-        if self.options.test:
+        
+        # load old shelve session
+        if os.path.exists(self.shelve_session_name):
+            log.critical('Old shelve session found, relevant data will be migrated.')
+            old = shelve.open(self.shelve_session_name, flag='r', protocol=2)
             import copy
-            temp = copy.deepcopy(self.shelve_session.cache)
-            self.shelve_session.close()
-            self.shelve_session = temp
+            self.shelve_session = copy.deepcopy(old['cache'])
+            old.close()
+            import shutil
+            #shutil.move(self.shelve_session_name, '%s_backup' % self.shelve_session_name)
         
         # SQLAlchemy
-        engine = create_engine('sqlite:///%s.sqlite' % self.configname, echo=self.options.debug)
+        engine = create_engine('sqlite:///persistence-%s.sqlite' % self.configname, echo=self.options.debug_sql)
         Session.configure(bind=engine)
         # create all tables
         if self.options.reset:
@@ -268,32 +255,6 @@ class Manager:
                 log.debug('Removed non yaml compatible key %s %s' % (k, type(d[k])))
                 d.pop(k)
 
-    def save_session(self):
-        """Save session file"""
-        if self.options.dump:
-            self.dump_session_yaml()
-        self.save_session_shelf()
-
-    def dump_session_yaml(self):
-        """Dumps session into yaml file for easier debugging"""
-        try:
-            fn = os.path.join(sys.path[0], 'dump-%s.yml' % self.configname)
-            dump = {}
-            for k, v in self.shelve_session.iteritems():
-                dump[k] = v
-            f = file(fn, 'w')
-            self.sanitize(dump)
-            yaml.safe_dump(dump, f, allow_unicode=True)
-            f.close()
-            log.info('Dumped session as YML to %s' % fn)
-        except Exception, e:
-            log.exception('Failed to dump session data (%s)!' % e)
-
-    def save_session_shelf(self):
-        if self.options.test: 
-            return
-        self.shelve_session.close()
-        
     def load_modules(self, parser, moduledir):
         """Load all modules from moduledir"""
         loaded = {} # prevent modules being loaded multiple times when they're imported by other modules
@@ -571,55 +532,52 @@ class Manager:
     def execute(self):
         """Iterate trough all feeds and run them."""
         from feed import Feed
-        try:
-            if not self.config:
-                log.critical('Configuration file is empty.')
-                return
 
-            # construct feed list
-            feeds = self.config.get('feeds', {}).keys()
-            if not feeds: 
-                log.critical('There are no feeds in the configuration file!')
-            # --only-feed
-            if self.options.onlyfeed:
-                ofeeds, feeds = feeds, []
-                for name in ofeeds:
-                    if name.lower() == self.options.onlyfeed.lower(): 
-                        feeds.append(name)
-                if not feeds:
-                    log.critical('Could not find feed %s' % self.options.onlyfeed)
+        if not self.config:
+            log.critical('Configuration file is empty.')
+            return
 
-            terminate = {}
-            for name in feeds:
-                # validate (TODO: make use of validator?)
-                if not isinstance(self.config['feeds'][name], dict):
-                    if isinstance(self.config['feeds'][name], str):
-                        if name in self.modules:
-                            log.error('\'%s\' is known keyword, but in wrong indentation level. \
-                            Please indent it correctly under feed, it should have 2 more spaces \
-                            than feed name.' % name)
-                            continue
-                    log.error('\'%s\' is not a properly configured feed, please check indentation levels.' % name)
-                    continue
-                # if feed name is prefixed with _ it's disabled
-                if name.startswith('_'): 
-                    continue
-                # create feed instance and execute it
-                feed = Feed(self, name, self.config['feeds'][name])
+        # construct feed list
+        feeds = self.config.get('feeds', {}).keys()
+        if not feeds: 
+            log.critical('There are no feeds in the configuration file!')
+        # --only-feed
+        if self.options.onlyfeed:
+            ofeeds, feeds = feeds, []
+            for name in ofeeds:
+                if name.lower() == self.options.onlyfeed.lower(): 
+                    feeds.append(name)
+            if not feeds:
+                log.critical('Could not find feed %s' % self.options.onlyfeed)
+
+        terminate = {}
+        for name in feeds:
+            # validate (TODO: make use of validator?)
+            if not isinstance(self.config['feeds'][name], dict):
+                if isinstance(self.config['feeds'][name], str):
+                    if name in self.modules:
+                        log.error('\'%s\' is known keyword, but in wrong indentation level. \
+                        Please indent it correctly under feed, it should have 2 more spaces \
+                        than feed name.' % name)
+                        continue
+                log.error('\'%s\' is not a properly configured feed, please check indentation levels.' % name)
+                continue
+            # if feed name is prefixed with _ it's disabled
+            if name.startswith('_'): 
+                continue
+            # create feed instance and execute it
+            feed = Feed(self, name, self.config['feeds'][name])
+            try:
+                feed.execute()
+                terminate[name] = feed
+            except Exception, e:
+                log.exception('Feed %s: %s' % (feed.name, e))
+
+        # execute terminate event for all feeds
+        if not self.options.validate:
+            for name, feed in terminate.iteritems():
                 try:
-                    feed.execute()
-                    terminate[name] = feed
+                    feed.terminate()
                 except Exception, e:
-                    log.exception('Feed %s: %s' % (feed.name, e))
-
-            # execute terminate event for all feeds
-            if not self.options.validate:
-                for name, feed in terminate.iteritems():
-                    try:
-                        feed.terminate()
-                    except Exception, e:
-                        log.exception('Feed %s terminate: %s' % (name, e))
+                    log.exception('Feed %s terminate: %s' % (name, e))
                 
-        finally:
-            if not self.options.test:
-                self.save_session()
