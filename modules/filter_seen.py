@@ -117,11 +117,11 @@ class FilterSeen(object):
                 
         session.commit()
         
-    def migrate(self, shelve, name):
+    def migrate(self, shelve):
         count = 0
         session = Session()
         for feed, data in shelve.iteritems():
-            if not name in data:
+            if not self.keyword in data:
                 continue
             seen = data[self.keyword]
             for k, v in seen.iteritems():

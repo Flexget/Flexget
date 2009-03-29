@@ -227,7 +227,7 @@ class Manager:
             self.shelve_session = copy.deepcopy(old['cache'])
             old.close()
             import shutil
-            #shutil.move(self.shelve_session_name, '%s_backup' % self.shelve_session_name)
+            shutil.move(self.shelve_session_name, '%s_migrated' % self.shelve_session_name)
         
         # SQLAlchemy
         engine = create_engine('sqlite:///db-%s.sqlite' % self.configname, echo=self.options.debug_sql)
