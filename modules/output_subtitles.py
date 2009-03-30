@@ -6,6 +6,41 @@ import os.path
 import sys
 import logging
 
+from manager import Session, Base
+from sqlalchemy import Column, Integer, String, DateTime, PickleType
+from datetime import datetime, timedelta
+
+""" 
+
+DRAFT
+
+class SubtitleQueue(Base):
+    
+    __tablename__ = 'subtitle_queue'
+
+    id = Column(Integer, primary_key=True)
+    feed = Column(String)
+    imdb_id = Column(String)
+    added = Column(DateTime)
+    
+    def __init__(self, feed, imdb_id):
+        self.feed = feed
+        self.imdb_id = imdb_id
+        self.added = datetime.now()
+    
+    def __str__(self):
+        return '<SubtitleQueue(%s=%s)>' % (self.feed, self.imdb_id)
+        
+TODO:
+ 
+ * add new option, retry: [n] days
+ * add everything into queue using above class
+ * consume queue (look up by feed name), configuration is available from feed
+ * remove successful downloads
+ * remove queue items that are part retry: n days 
+        
+"""        
+
 log = logging.getLogger('subtitles')
 
 # movie hash, won't work here though
@@ -15,6 +50,7 @@ log = logging.getLogger('subtitles')
 # http://trac.opensubtitles.org/projects/opensubtitles/wiki/XMLRPC
 
 class Subtitles:
+    
     """
     Fetch subtitles from opensubtitles.org
     """
@@ -23,7 +59,6 @@ class Subtitles:
         manager.register('subtitles')
 
     def validator(self):
-        """Validate given configuration"""
         import validator
         subs = validator.factory('dict')
         langs = subs.accept('list', key='languages')
@@ -53,7 +88,7 @@ class Subtitles:
             return
 
         s = ServerProxy("http://www.opensubtitles.org/xml-rpc")
-        res = s.LogIn("", "", "en", "Flexget")
+        res = s.LogIn("", "", "en", "FlexGet")
 
         if res['status'] != '200 OK':
             raise Exception("Login to opensubtitles.org XML-RPC interface failed")
@@ -62,7 +97,7 @@ class Subtitles:
 
         token = res['token']
 
-        # these go into config file
+        # configuration
         languages = config['languages']
         min_sub_rating = config['min_sub_rating']
         match_limit = config['match_limit'] # no need to change this, but it should be configurable
@@ -117,8 +152,7 @@ class Subtitles:
 
             # download
             for sub in filtered_subs:
-                #print sub
-                #print "SUBS FOUND: ", sub['MovieReleaseName'], sub['SubRating'], sub['SubLanguageID']
+                log.debug('SUBS FOUND: ', sub['MovieReleaseName'], sub['SubRating'], sub['SubLanguageID'])
 
                 f = urllib2.urlopen(sub['ZipDownloadLink'])
                 subfilename = re.match('^attachment; filename="(.*)"$', f.info()['content-disposition']).group(1)
@@ -128,5 +162,4 @@ class Subtitles:
                 fp.close()
                 f.close()
 
-        s.LogOut(token)
-        
+        s.LogOut(token)     

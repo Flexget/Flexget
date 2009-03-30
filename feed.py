@@ -172,6 +172,7 @@ class Feed:
             for entry in self.entries:
                 self.verbose_details('%s' % entry['title'])
             
+    # TODO: BROKEN! needs to be moved into manager
     def __get_priority(self, module, event):
         """Return order for module in this feed. Uses default value if no value is configured."""
         priority = module.get('priorities', {}).get(event, 0)
@@ -181,6 +182,7 @@ class Feed:
                 priority = self.config[keyword].get('priority', priority)
         return priority
 
+    # TODO: seems unnecessary
     def __sort_modules(self, a, b, event):
         a = self.__get_priority(a, event)
         b = self.__get_priority(b, event)
