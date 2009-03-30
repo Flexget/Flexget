@@ -8,6 +8,8 @@ from utils.serieparser import SerieParser
 
 from manager import Session, Base
 from sqlalchemy import Column, Integer, String, DateTime, Boolean, PickleType
+from sqlalchemy.schema import ForeignKey
+from sqlalchemy.orm import relation
 
 log = logging.getLogger('series')
 
@@ -19,27 +21,48 @@ class Series(Base):
     
     id = Column(Integer, primary_key=True)
     name = Column(String)
-    identifier = Column(String)
-    downloaded = Column(Boolean)
-    first_seen = Column(DateTime)
-    
+    episodes = relation('Episode', backref='series')
+
     def __init__(self):
         pass
         
     def __str__(self):
-        return '<Series(%s, %s)>' % (self.name, self.identifier)
-
+        return '<Series(name=%s)>' % (self.name)
 
 class Episode(Base):
     
-    __tablename__ = 'episodes'
+    __tablename__ = 'series_episodes'
+
+    id = Column(Integer, primary_key=True)
+    identifier = Column(String)
+    downloaded = Column(Boolean)
+    first_seen = Column(DateTime)
+
+    series_id = Column(Integer, ForeignKey('series.id'))
+    qualities = relation('Quality', backref='episode')
+
+    def __init__(self):
+        self.first_seen = datetime.now()
+        self.downloaded = False
+
+    def __str__(self):
+        return '<Episode(identifier=%s)>' % (self.identifier)
+
+
+class Quality(Base):
+
+    __tablename__ = 'episode_qualities'
 
     id = Column(Integer, primary_key=True)
     quality = Column(String)
     entry = Column(PickleType)
+    episode_id = Column(Integer, ForeignKey('series_episodes.id'))
 
     def __init__(self):
         pass
+
+    def __str__(self):
+        return '<Quality(quality=%s)>' % (self.quality)
 
 class FilterSeries:
 
@@ -82,8 +105,10 @@ class FilterSeries:
         watched.accept('number', key='episode')
         return series
 
+    # TODO: re-implement!
+    """
     def feed_input(self, feed):
-        """Retrieve stored series from cache, in case they've been expired from feed while waiting"""
+        # Retrieve stored series from cache, in case they've been expired from feed while waiting
         for name in feed.config.get('series', []):
             if isinstance(name, dict):
                 name = name.items()[0][0]
@@ -110,8 +135,9 @@ class FilterSeries:
                         e['title'] = entry['title']
                         e['url'] = entry['url']
                         feed.entries.append(e)
+    """
 
-    def cmp_serie_quality(self, s1, s2):
+    def cmp_series_quality(self, s1, s2):
         return self.cmp_quality(s1.quality, s2.quality)
 
     def cmp_quality(self, q1, q2):
@@ -147,20 +173,20 @@ class FilterSeries:
                     if not isinstance(data, basestring): continue
                     if not data: continue
                     # TODO: improve, use only single instance to test?
-                    serie = SerieParser()
-                    serie.name = str(name)
-                    serie.data = data
-                    serie.ep_regexps = ep_patterns + serie.ep_regexps
-                    serie.id_regexps = id_patterns + serie.id_regexps
+                    parser = SerieParser()
+                    parser.name = str(name)
+                    parser.data = data
+                    parser.ep_regexps = ep_patterns + parser.ep_regexps
+                    parser.id_regexps = id_patterns + parser.id_regexps
                     # do not use builtin list for id when ep configured and vice versa
                     if 'ep_patterns' in conf and not 'id_patterns' in conf:
-                        serie.id_regexps = []
+                        parser.id_regexps = []
                     if 'id_patterns' in conf and not 'ep_patterns' in conf:
-                        serie.ep_regexps = []
-                    serie.name_regexps.extend(name_patterns)
-                    serie.parse()
+                        parser.ep_regexps = []
+                    parser.name_regexps.extend(name_patterns)
+                    parser.parse()
                     # serie is not valid if it does not match given name / regexp or fails with exception
-                    if serie.valid:
+                    if parser.valid:
                         break
                 else:
                     continue
@@ -169,16 +195,16 @@ class FilterSeries:
                 if 'path' in conf:
                     log.debug('setting %s custom path to %s' % (entry['title'], conf.get('path')))
                     entry['path'] = conf.get('path')
-                serie.entry = entry
-                self.store(feed, serie, entry)
+                parser.entry = entry
+                self.store(feed, parser)
                 # add this episode into list of available episodes
-                eps = series.setdefault(serie.identifier(), [])
-                eps.append(serie)
+                eps = series.setdefault(parser.identifier(), [])
+                eps.append(parser)
 
             # choose episode from available qualities
             for identifier, eps in series.iteritems():
                 if not eps: continue
-                eps.sort(self.cmp_serie_quality)
+                eps.sort(self.cmp_series_quality)
                 best = eps[0]
                 
                 # episode (with this id) has been downloaded
@@ -202,13 +228,16 @@ class FilterSeries:
                 # episode advancement, only when using season, ep identifier
                 if best.season and best.episode:
                     latest = self.get_latest_info(feed, best)
-                    # allow few episodes "backwards" in case missing
-                    grace = len(series) + 2
-                    if best.season < latest['season'] or (best.season == latest['season'] and best.episode < latest['episode'] - grace):
-                        log.debug('Series %s episode %s does not meet episode advancement, rejecting all occurrences' % (name, identifier))
-                        for ep in eps:
-                            feed.reject(ep.entry)
-                        continue
+                    if latest:
+                        # allow few episodes "backwards" in case missing
+                        grace = len(series) + 2
+                        if best.season < latest['season'] or (best.season == latest['season'] and best.episode < latest['episode'] - grace):
+                            log.debug('Series %s episode %s does not meet episode advancement, rejecting all occurrences' % (name, identifier))
+                            for ep in eps:
+                                feed.reject(ep.entry)
+                            continue
+                    else:
+                        log.debug('No latest info available')
 
                 # timeframe present
                 if 'timeframe' in conf:
@@ -226,7 +255,7 @@ class FilterSeries:
                     for ep in eps:
                         if self.cmp_quality(enough, ep.quality) >= 0: # 1=greater, 0=equal, -1=does not meet
                             log.debug('Timeframe accepting. %s meets quality %s' % (ep.entry['title'], enough))
-                            self.accept_serie(feed, ep)
+                            self.accept_series(feed, ep)
                             found_enough = True
                             break
                     if found_enough:
@@ -246,82 +275,99 @@ class FilterSeries:
                             log.info('Stopped timeframe, accepting %s' % (best.entry['title']))
                         else:
                             log.info('Timeframe expired, accepting %s' % (best.entry['title']))
-                        self.accept_serie(feed, best)
+                        self.accept_series(feed, best)
                     else:
                         log.debug('Timeframe ignoring %s' % (best.entry['title']))
                 else:
                     # no timeframe, just choose best
-                    self.accept_serie(feed, best)
+                    self.accept_series(feed, best)
 
         # filter ALL entries, only previously accepted will remain
         # other modules may still accept entries
         for entry in feed.entries:
             feed.filter(entry)
 
-    def accept_serie(self, feed, serie):
+    def accept_series(self, feed, parser):
         """Helper method for accepting serie"""
-        log.debug('Accepting %s' % serie.entry)
-        feed.accept(serie.entry)
+        log.debug('Accepting %s' % parser.entry)
+        feed.accept(parser.entry)
         # store serie instance to entry for later use
-        serie.entry['serie_parser'] = serie
+        parser.entry['series_parser'] = parser
         # remove entry instance from serie instance, not needed any more (save memory, circular reference?)
-        serie.entry = None
+        parser.entry = None
 
-    def reject_eps(self, feed, eps):
-        for ep in eps:
-            feed.reject(ep.entry)
-
-    def get_first_seen(self, feed, serie):
+    def get_first_seen(self, feed, parser):
         """Return datetime when this episode of serie was first seen"""
-        fs = feed.shared_cache.get(serie.name)[serie.identifier()]['info']['first_seen']
-        return datetime(*fs)
+        session = Session()
+        episode = session.query(Episode).filter(Series.name==parser.name).filter(Episode.series_id==Series.id).first()
+        session.close()
+        return episode.first_seen
         
-    def get_latest_info(self, feed, serie):
+    def get_latest_info(self, feed, parser):
         """Return latest known identifier in dict (season, episode) for serie name"""
+        """
         latest = feed.shared_cache.get(serie.name).get('latest', {})
         return {'season': latest.get('season', 0), 'episode': latest.get('episode', 0)}
+        """
+        return None
 
-    def downloaded(self, feed, serie):
-        """Return true if this episode of serie is downloaded"""
+    def downloaded(self, feed, series):
+        """Return true if this episode of series is downloaded"""
+        """
         cache = feed.shared_cache.get(serie.name)
         return cache[serie.identifier()]['info']['downloaded']
+        """
+        return False
 
-    def store(self, feed, serie, entry):
-        """Stores serie into cache"""
-        # serie_name:
-        #   S1E2:
-        #     info:
-        #       first_seen: <time>
-        #       downloaded: <boolean>
-        #     720p: <entry>
-        #     dsr: <entry>
-        cache = feed.shared_cache.storedefault(serie.name, {}, 30)
-        latest = cache.setdefault('latest', {})
-        episode = cache.setdefault(serie.identifier(), {})
-        info = episode.setdefault('info', {})
-        # store and make first seen time
-        info.setdefault('first_seen', list(datetime.today().timetuple())[:-4])
-        info.setdefault('downloaded', False)
-        # save last known (episode advancement)
-        if serie.season and serie.episode:
-            if latest.get('episode', 0) < serie.episode and latest.get('season', 0) < serie.season:
-                latest['season'] = serie.season
-                latest['episode'] = serie.episode
-        # copy of entry, we don't want to ues original reference ...
-        ec = {}
-        ec['title'] = entry['title']
-        ec['url'] = entry['url']
-        episode.setdefault(serie.quality, ec)
+    def store(self, feed, parser):
+        """Push series parser information into database"""
+        session = Session()
+        
+        # if does not exist in database, add new
+        series = session.query(Series).filter(Series.name==parser.name).first()
+        if not series:
+            log.debug('Adding series %s into database' % parser.name)
+            series = Series()
+            series.name = parser.name
+            session.add(series)
+        
+        # if episode does not exist in series, add new
+        episode = session.query(Episode).filter(Episode.series_id==series.id).\
+            filter(Episode.identifier==parser.identifier).first()
+        if not episode:
+            log.debug('Adding episode %s into series %s' % (parser.identifier(), parser.name))
+            episode = Episode()
+            episode.identifier = parser.identifier()
+            series.episodes.append(episode) # pylint: disable-msg=E1103
 
-    def mark_downloaded(self, feed, serie):
-        """Mark episode in persistence as being downloaded"""
-        log.debug('marking %s as downloaded' % serie.identifier())
-        cache = feed.shared_cache.get(serie.name)
-        cache[serie.identifier()]['info']['downloaded'] = True
+        # if quality does not exists in episodes, add new
+        quality = session.query(Quality).filter(Quality.episode_id==episode.id).\
+            filter(Quality.quality==parser.quality).first()
+        if not quality:
+            log.debug('Adding quality %s into series %s episode %s' % (parser.quality, parser.name, parser.identifier()))
+            quality = Quality()
+            quality.entry = parser.entry
+            quality.quality = parser.quality
+            episode.qualities.append(quality) # pylint: disable-msg=E1103
+        
+        session.commit()
+
+    def mark_downloaded(self, feed, parser):
+        """Mark episode as being downloaded"""
+        
+        log.debug('marking series %s identifier %s as downloaded' % (parser.name, parser.identifier()))
+
+        session = Session()
+        # TODO: this could be done using join or something similar
+        series = session.query(Series).filter(Series.name==parser.name).one()
+        episode = session.query(Episode).filter(Episode.series_id==series.id).\
+            filter(Episode.identifier==parser.identifier).one()
+        episode.downloaded = True
+        session.commit()
 
     def feed_exit(self, feed):
         """Learn succeeded episodes"""
         for entry in feed.entries:
-            serie = entry.get('serie_parser')
-            if serie:
-                self.mark_downloaded(feed, serie)
+            parser = entry.get('series_parser')
+            if parser:
+                self.mark_downloaded(feed, parser)
