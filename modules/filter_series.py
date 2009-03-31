@@ -7,13 +7,11 @@ from manager import ModuleWarning
 from utils.serieparser import SerieParser
 
 from manager import Session, Base
-from sqlalchemy import Column, Integer, String, DateTime, Boolean, PickleType
+from sqlalchemy import Column, Integer, String, Unicode, DateTime, Boolean, PickleType
 from sqlalchemy.schema import ForeignKey
 from sqlalchemy.orm import relation
 
 log = logging.getLogger('series')
-
-# drafting database ...
 
 class Series(Base):
     
@@ -22,10 +20,8 @@ class Series(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String)
     episodes = relation('Episode', backref='series')
+    #latest_ep = relation('Episode', backref='series', single_parent=True)
 
-    def __init__(self):
-        pass
-        
     def __str__(self):
         return '<Series(name=%s)>' % (self.name)
 
@@ -57,9 +53,6 @@ class Quality(Base):
     quality = Column(String)
     entry = Column(PickleType)
     episode_id = Column(Integer, ForeignKey('series_episodes.id'))
-
-    def __init__(self):
-        pass
 
     def __str__(self):
         return '<Quality(quality=%s)>' % (self.quality)
@@ -166,13 +159,12 @@ class FilterSeries:
             id_patterns = get_as_array(conf, 'id_patterns')
             name_patterns = get_as_array(conf, 'name_patterns')
 
-            series = {} # ie. S1E2: [Serie Instance, Serie Instance, ..]
+            series = {} # ie. S1E2: [Parser, Parser*n]
             for entry in feed.entries:
-                for field, data in entry.iteritems():
+                for _, data in entry.iteritems():
                     # skip non string values and empty strings
                     if not isinstance(data, basestring): continue
                     if not data: continue
-                    # TODO: improve, use only single instance to test?
                     parser = SerieParser()
                     parser.name = str(name)
                     parser.data = data
@@ -185,7 +177,7 @@ class FilterSeries:
                         parser.ep_regexps = []
                     parser.name_regexps.extend(name_patterns)
                     parser.parse()
-                    # serie is not valid if it does not match given name / regexp or fails with exception
+                    # series is not valid if it does not match given name / regexp or fails with exception
                     if parser.valid:
                         break
                 else:
@@ -309,6 +301,8 @@ class FilterSeries:
         latest = feed.shared_cache.get(serie.name).get('latest', {})
         return {'season': latest.get('season', 0), 'episode': latest.get('episode', 0)}
         """
+        session = Session()
+        session.close()
         return None
 
     def downloaded(self, feed, series):
