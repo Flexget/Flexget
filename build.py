@@ -66,7 +66,7 @@ if __name__ == "__main__":
     rev = m.groups()[0]
     
     # rename and remove some files
-    os.rename('%s/example.yml' % export_path, '%s/config.yml' % export_path)
+    os.rename('%s/example.yml' % export_path, '%s/config.yml.example' % export_path)
     os.remove('%s/quality_check.sh' % export_path)
     os.remove('%s/build.py' % export_path)
     
