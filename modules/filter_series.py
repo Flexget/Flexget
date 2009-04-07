@@ -7,7 +7,7 @@ from manager import ModuleWarning
 from utils.serieparser import SerieParser
 
 from manager import Session, Base
-from sqlalchemy import Column, Integer, String, Unicode, DateTime, Boolean, PickleType
+from sqlalchemy import Column, Integer, String, Unicode, DateTime, Boolean, PickleType, func
 from sqlalchemy.schema import ForeignKey
 from sqlalchemy.orm import relation
 
@@ -20,7 +20,6 @@ class Series(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String)
     episodes = relation('Episode', backref='series')
-    #latest_ep = relation('Episode', backref='series', single_parent=True)
 
     def __str__(self):
         return '<Series(name=%s)>' % (self.name)
@@ -31,15 +30,19 @@ class Episode(Base):
 
     id = Column(Integer, primary_key=True)
     identifier = Column(String)
-    downloaded = Column(Boolean)
-    first_seen = Column(DateTime)
+    downloaded = Column(Boolean, default=False)
+    first_seen = Column(DateTime, default=datetime.now())
+    
+    season = Column(Integer)
+    number = Column(Integer)
 
     series_id = Column(Integer, ForeignKey('series.id'))
     qualities = relation('Quality', backref='episode')
 
     def __init__(self):
-        self.first_seen = datetime.now()
-        self.downloaded = False
+        #self.first_seen = datetime.now()
+        #self.downloaded = False
+        pass
 
     def __str__(self):
         return '<Episode(identifier=%s)>' % (self.identifier)
@@ -280,7 +283,7 @@ class FilterSeries:
             feed.filter(entry)
 
     def accept_series(self, feed, parser):
-        """Helper method for accepting serie"""
+        """Helper method for accepting series"""
         log.debug('Accepting %s' % parser.entry)
         feed.accept(parser.entry)
         # store serie instance to entry for later use
@@ -296,14 +299,18 @@ class FilterSeries:
         return episode.first_seen
         
     def get_latest_info(self, feed, parser):
-        """Return latest known identifier in dict (season, episode) for serie name"""
-        """
-        latest = feed.shared_cache.get(serie.name).get('latest', {})
-        return {'season': latest.get('season', 0), 'episode': latest.get('episode', 0)}
-        """
+        """Return latest known identifier in dict (season, episode) for series name"""
         session = Session()
+        # TODO: this could be done using single query, but how?
+        series = session.query(Series).filter(Series.name==parser.name).first()
+        log.debug('get_latest_info found series')
+        if not series:
+            session.close()
+            return False
+        episode = session.query(Episode).filter(func.max(Episode.season)).\
+            filter(func.max(Episode.number)).filter(Episode.series_id==series.id).first()
         session.close()
-        return None
+        return (episode.season, episode.number)
 
     def downloaded(self, feed, series):
         """Return true if this episode of series is downloaded"""
@@ -332,6 +339,10 @@ class FilterSeries:
             log.debug('Adding episode %s into series %s' % (parser.identifier(), parser.name))
             episode = Episode()
             episode.identifier = parser.identifier()
+            # if episodic format
+            if parser.season and parser.episode:
+                episode.season = parser.season
+                episode.number = parser.episode
             series.episodes.append(episode) # pylint: disable-msg=E1103
 
         # if quality does not exists in episodes, add new
@@ -352,7 +363,7 @@ class FilterSeries:
         log.debug('marking series %s identifier %s as downloaded' % (parser.name, parser.identifier()))
 
         session = Session()
-        # TODO: this could be done using join or something similar
+        # TODO: this could be done using single query, but how?
         series = session.query(Series).filter(Series.name==parser.name).one()
         episode = session.query(Episode).filter(Episode.series_id==series.id).\
             filter(Episode.identifier==parser.identifier).one()
