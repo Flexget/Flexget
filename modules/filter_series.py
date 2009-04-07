@@ -307,12 +307,12 @@ class FilterSeries:
         if not series:
             session.close()
             return False
-        episode = session.query(Episode).filter(func.max(Episode.season)).\
-            filter(func.max(Episode.number)).filter(Episode.series_id==series.id).first()
+        episode = session.query(Episode).order_by(Episode.season).\
+            order_by(Episode.number).filter(Episode.series_id==series.id).first()
         session.close()
-        return (episode.season, episode.number)
+        return {'season':episode.season, 'episode':episode.number}
 
-    def downloaded(self, feed, series):
+    def downloaded(self, feed, parser):
         """Return true if this episode of series is downloaded"""
         """
         cache = feed.shared_cache.get(serie.name)
