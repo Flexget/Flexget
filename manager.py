@@ -257,6 +257,12 @@ class Manager:
     def load_modules(self, parser, moduledir):
         """Load all modules from moduledir"""
         loaded = {} # prevent modules being loaded multiple times when they're imported by other modules
+        
+        # ----------------------------------------------------------------------------------------------
+        # TODO: HACK! Loading method tries to instantiate SQLAlchemy func since it has register method!
+        # ----------------------------------------------------------------------------------------------
+        loaded['func'] = True
+        
         for prefix in self.__load_queue:
             for module in self.find_modules(moduledir, prefix):
                 log.debug('loading module %s' % module)

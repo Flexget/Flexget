@@ -313,11 +313,14 @@ class FilterSeries:
         return {'season':episode.season, 'episode':episode.number}
 
     def downloaded(self, feed, parser):
-        """Return true if this episode of series is downloaded"""
-        """
-        cache = feed.shared_cache.get(serie.name)
-        return cache[serie.identifier()]['info']['downloaded']
-        """
+        """Return true if episode is downloaded"""
+        session = Session()
+        series = session.query(Series).filter(Series.name==parser.name).first()
+        episode = session.query(Episode).filter(Episode.series_id==series.id).\
+            filter(Episode.identifier==parser.identifier())
+        session.close()
+        if episode:
+            return True
         return False
 
     def store(self, feed, parser):
