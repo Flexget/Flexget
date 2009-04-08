@@ -1,13 +1,10 @@
 import logging
-import re
-from datetime import tzinfo, timedelta, datetime
-from feed import Entry
+from datetime import datetime
 from sys import maxint
-from manager import ModuleWarning
 from utils.serieparser import SerieParser
 
-from manager import Session, Base
-from sqlalchemy import Column, Integer, String, Unicode, DateTime, Boolean, PickleType, func
+from manager import Base
+from sqlalchemy import Column, Integer, String, DateTime, Boolean, PickleType
 from sqlalchemy.schema import ForeignKey
 from sqlalchemy.orm import relation
 
@@ -21,7 +18,7 @@ class Series(Base):
     name = Column(String)
     episodes = relation('Episode', backref='series')
 
-    def __str__(self):
+    def __repr__(self):
         return '<Series(name=%s)>' % (self.name)
 
 class Episode(Base):
@@ -39,14 +36,8 @@ class Episode(Base):
     series_id = Column(Integer, ForeignKey('series.id'))
     qualities = relation('Quality', backref='episode')
 
-    def __init__(self):
-        #self.first_seen = datetime.now()
-        #self.downloaded = False
-        pass
-
-    def __str__(self):
+    def __repr__(self):
         return '<Episode(identifier=%s)>' % (self.identifier)
-
 
 class Quality(Base):
 
@@ -57,7 +48,7 @@ class Quality(Base):
     entry = Column(PickleType)
     episode_id = Column(Integer, ForeignKey('series_episodes.id'))
 
-    def __str__(self):
+    def __repr__(self):
         return '<Quality(quality=%s)>' % (self.quality)
 
 class FilterSeries:
