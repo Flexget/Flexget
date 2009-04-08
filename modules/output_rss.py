@@ -2,9 +2,10 @@ import logging
 import datetime
 import operator
 import os
-from manager import ModuleWarning
-
-__pychecker__ = 'unusednames=parser'
+from manager import ModuleWarning, Base
+from sqlalchemy import Column, Integer, String, Unicode, DateTime, Boolean, PickleType, func
+from sqlalchemy.schema import ForeignKey
+from sqlalchemy.orm import relation
 
 log = logging.getLogger('make_rss')
 
@@ -13,6 +14,17 @@ try:
     import PyRSS2Gen
 except:
     rss2gen = False
+    
+class RSSEntry(Base):
+    
+    __tablename__ = 'make_rss'
+
+    id = Column(Integer, primary_key=True)
+    title = Column(String)
+    description = Column(String)
+    link = Column(String)
+    file = Column(String)
+    published = Column(DateTime, default=datetime.datetime.utcnow())
 
 class OutputRSS:
 
@@ -116,20 +128,19 @@ class OutputRSS:
     def feed_exit(self, feed):
         """Store finished / downloaded entries at exit"""
         if not rss2gen:
-            raise Exception('module make_rss requires PyRSS2Gen library.')
+            raise ModuleWarning('module make_rss requires PyRSS2Gen library.')
         config = self.get_config(feed)
-        store = feed.shared_cache.storedefault(config['file'], [])
+        # save entries into db for RSS generation
         for entry in feed.entries:
-            # make rss data item and store it
-            rss = {}
-            rss['title'] = entry['title']
+            rss = RSSEntry()
+            rss.title = entry['title']
             for field in config['link']:
                 if field in entry:
-                    rss['link'] = entry[field]
+                    rss.link = entry[field]
                     break
-            rss['description'] = entry.get('imdb_plot_outline')
-            rss['pubDate'] = datetime.datetime.utcnow()
-            store.append(rss)
+            rss.description = entry.get('description', entry.get('imdb_plot_outline')) # TODO: hack! fix at imdb, use field description!
+            rss.file = config['file']
+            feed.session.add(rss)
 
     def application_terminate(self, feed):
         """Write RSS file at application terminate."""
@@ -143,28 +154,38 @@ class OutputRSS:
         if config['file'] in self.written:
             log.debug('skipping already written file %s' % config['file'])
             return
-        data_items = feed.shared_cache.get(config['file'])
-
-        # sort items by pubDate
-        data_items.sort(key=operator.itemgetter('pubDate'))
-        data_items.reverse()
-          
+        
+        # in terminate event there is no open session in feed, so open new one
+        from manager import Session
+        session = Session()
+        
+        db_items = session.query(RSSEntry).find(RSSEntry.file==config['file']).\
+            order_by(RSSEntry.published).desc().all()
+        
         # make items
         rss_items = []
-        for data_item in data_items[:]:
+        for db_item in db_items:
             add = True
             if config['items'] != -1:
                 if len(rss_items) > config['items']:
                     add = False
             if config['days'] != -1:
-                if datetime.datetime.today()-datetime.timedelta(days=config['days']) > data_item['pubDate']:
+                if datetime.datetime.today()-datetime.timedelta(days=config['days']) > db_item.published:
                     add = False
             if add:
                 # add into generated feed
-                rss_items.append(PyRSS2Gen.RSSItem(**data_item))
+                gen = {}
+                gen['title'] = db_item.title
+                gen['description'] = db_item.description
+                gen['link'] = db_item.link
+                gen['pubDate'] = db_item.published
+                rss_items.append(PyRSS2Gen.RSSItem(**gen))
             else:
-                # purge from storage
-                data_items.remove(data_item)
+                # no longer needed
+                session.delete(db_item)
+
+        session.commit()
+        session.close()
 
         # make rss
         rss = PyRSS2Gen.RSS2(title = 'FlexGet',

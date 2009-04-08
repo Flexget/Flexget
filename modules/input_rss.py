@@ -5,6 +5,7 @@ import re
 from feed import Entry
 from manager import ModuleWarning
 from utils.log import log_once
+from utils.html import html_decode
 
 feedparser_present = True
 try:
@@ -12,8 +13,6 @@ try:
 except ImportError:
     feedparser_present = False
 
-__pychecker__ = 'unusednames=parser'
- 
 log = logging.getLogger('rss')
 
 class InputRSS:
@@ -157,7 +156,8 @@ class InputRSS:
                 elif hasattr(ex, 'code'):
                     raise ModuleWarning('The server couldn\'t fulfill the request. Error code: %s' % ex.code, log)
             else:
-                raise ModuleWarning('Unhandled bozo_exception. Type: %s.%s (feed: %s)' % (ex.__class__.__module__, ex.__class__.__name__ , feed.name), log)
+                raise ModuleWarning('Unhandled bozo_exception. Type: %s.%s (feed: %s)' % \
+                                    (ex.__class__.__module__, ex.__class__.__name__ , feed.name), log)
 
         if rss['bozo'] and not ignore:
             log.error(rss)
@@ -167,6 +167,7 @@ class InputRSS:
         log.debug('encoding %s' % rss.encoding)
 
         # update etag, use last modified if no etag exists
+        """
         if 'etag' in rss and type(rss['etag']) != feedparser.types.NoneType:
             etag = rss.etag.replace("'", '').replace('"', '')
             feed.cache.store('etag', etag, 90)
@@ -175,6 +176,7 @@ class InputRSS:
             if 'last-modified' in rss.headers:
                 feed.cache.store('modified', rss.modified, 90)
                 log.debug('last modified saved for feed %s', feed.name)
+        """
         
         # field name for url can be configured by setting link. 
         # default value is auto but for example guid is used in some feeds
@@ -209,8 +211,7 @@ class InputRSS:
             def add_entry(ea):
                 ea['title'] = entry.title
                 if 'description' in entry:
-                    # TODO: html decode!
-                    ea['description'] = entry.description
+                    ea['description'] = html_decode(entry.description)
                 # store basic auth info
                 if 'username' in config and 'password' in config:
                     ea['basic_auth_username'] = config['username']
@@ -237,13 +238,10 @@ class InputRSS:
                         if ee['url'].rfind != -1:
                             # parse filename from enclosure url
                             # TODO: better and perhaps join/in download module? also see urlparse module
-                            m = re.search('.*\/([^?#]*)', ee['url'])
-                            if m:
-                                ee['filename'] = m.group(1)
+                            match = re.search('.*\/([^?#]*)', ee['url'])
+                            if match:
+                                ee['filename'] = match.group(1)
                                 #log.debug('filename %s from enclosure' % ee['filename'])
-                            else:
-                                pass
-                                #log.debug('failed to parse filename from %s' % ee['url'])
                     add_entry(ee)
                 continue
 

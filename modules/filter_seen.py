@@ -1,6 +1,6 @@
 import urllib
 import logging
-from manager import Session, Base
+from manager import Base
 from sqlalchemy import Column, Integer, String, DateTime, PickleType
 from datetime import datetime, timedelta
 
@@ -60,14 +60,12 @@ class FilterSeen(object):
         if feed.manager.shelve_session:
             self.migrate(feed.manager.shelve_session)
         
-        session = Session()
-        
         duplicates = []
         for entry in feed.entries:
             for field in self.fields:
                 if not field in entry:
                     continue
-                if session.query(Seen).filter(Seen.value == entry[field]).first():
+                if feed.session.query(Seen).filter(Seen.value == entry[field]).first():
                     log.debug("Rejecting '%s' '%s' because of seen '%s'" % (entry['url'], entry['title'], field))
                     feed.reject(entry)
                     break
@@ -89,10 +87,8 @@ class FilterSeen(object):
                         # TODO: if / when entry has multiple urls it should combine these two entries
                         # now the duplicate is just rejected and considered seen
                         seen = Seen(field, duplicate[field], feed.name)
-                        session.add(seen)
+                        feed.session.add(seen)
                         duplicates.append(duplicate)
-        session.commit()
-                    
 
     def feed_exit(self, feed):
         """Remember succeeded entries"""
@@ -100,14 +96,13 @@ class FilterSeen(object):
             log.debug('Seen is disabled')
             return
 
-        session = Session()
         for entry in feed.entries:
             for field in self.fields:
                 if not field in entry:
                     continue
                 
                 seen = Seen(field, entry[field], feed.name)
-                session.add(seen)
+                feed.session.add(seen)
             
             # verbose if in learning mode
             if feed.manager.options.learn:
@@ -115,18 +110,14 @@ class FilterSeen(object):
             else:
                 log.debug("Learned '%s' '%s' (will skip this in the future)" % (entry['url'], entry['title']))
                 
-        session.commit()
-        
     def migrate(self, shelve):
         count = 0
-        session = Session()
         for feed, data in shelve.iteritems():
             if not self.keyword in data:
                 continue
             seen = data[self.keyword]
             for k, v in seen.iteritems():
                 seen = Seen('unknown', k, 'unknown')
-                session.add(seen)
+                feed.session.add(seen)
                 count += 1
         log.info('Migrated %s seen items' % count)
-        session.commit()

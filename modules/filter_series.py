@@ -101,7 +101,7 @@ class FilterSeries:
         watched.accept('number', key='episode')
         return series
 
-    # TODO: re-implement!
+    # TODO: re-implement (as new (sub)-module InputBacklog ?)
     """
     def feed_input(self, feed):
         # Retrieve stored series from cache, in case they've been expired from feed while waiting
@@ -293,50 +293,42 @@ class FilterSeries:
 
     def get_first_seen(self, feed, parser):
         """Return datetime when this episode of serie was first seen"""
-        session = Session()
-        episode = session.query(Episode).filter(Series.name==parser.name).filter(Episode.series_id==Series.id).first()
-        session.close()
+        episode = feed.session.query(Episode).filter(Series.name==parser.name).\
+            filter(Episode.series_id==Series.id).first()
         return episode.first_seen
         
     def get_latest_info(self, feed, parser):
         """Return latest known identifier in dict (season, episode) for series name"""
-        session = Session()
         # TODO: this could be done using single query, but how?
-        series = session.query(Series).filter(Series.name==parser.name).first()
+        series = feed.session.query(Series).filter(Series.name==parser.name).first()
         log.debug('get_latest_info found series')
         if not series:
-            session.close()
             return False
-        episode = session.query(Episode).order_by(Episode.season).\
+        episode = feed.session.query(Episode).order_by(Episode.season).\
             order_by(Episode.number).filter(Episode.series_id==series.id).first()
-        session.close()
         return {'season':episode.season, 'episode':episode.number}
 
     def downloaded(self, feed, parser):
         """Return true if episode is downloaded"""
-        session = Session()
-        series = session.query(Series).filter(Series.name==parser.name).first()
-        episode = session.query(Episode).filter(Episode.series_id==series.id).\
+        series = feed.session.query(Series).filter(Series.name==parser.name).first()
+        episode = feed.session.query(Episode).filter(Episode.series_id==series.id).\
             filter(Episode.identifier==parser.identifier())
-        session.close()
         if episode:
             return True
         return False
 
     def store(self, feed, parser):
         """Push series parser information into database"""
-        session = Session()
-        
         # if does not exist in database, add new
-        series = session.query(Series).filter(Series.name==parser.name).first()
+        series = feed.session.query(Series).filter(Series.name==parser.name).first()
         if not series:
             log.debug('Adding series %s into database' % parser.name)
             series = Series()
             series.name = parser.name
-            session.add(series)
+            feed.session.add(series)
         
         # if episode does not exist in series, add new
-        episode = session.query(Episode).filter(Episode.series_id==series.id).\
+        episode = feed.session.query(Episode).filter(Episode.series_id==series.id).\
             filter(Episode.identifier==parser.identifier).first()
         if not episode:
             log.debug('Adding episode %s into series %s' % (parser.identifier(), parser.name))
@@ -349,29 +341,26 @@ class FilterSeries:
             series.episodes.append(episode) # pylint: disable-msg=E1103
 
         # if quality does not exists in episodes, add new
-        quality = session.query(Quality).filter(Quality.episode_id==episode.id).\
+        quality = feed.session.query(Quality).filter(Quality.episode_id==episode.id).\
             filter(Quality.quality==parser.quality).first()
         if not quality:
-            log.debug('Adding quality %s into series %s episode %s' % (parser.quality, parser.name, parser.identifier()))
+            log.debug('Adding quality %s into series %s episode %s' % (parser.quality, \
+                                                                       parser.name, parser.identifier()))
             quality = Quality()
             quality.entry = parser.entry
             quality.quality = parser.quality
             episode.qualities.append(quality) # pylint: disable-msg=E1103
-        
-        session.commit()
 
     def mark_downloaded(self, feed, parser):
         """Mark episode as being downloaded"""
         
         log.debug('marking series %s identifier %s as downloaded' % (parser.name, parser.identifier()))
 
-        session = Session()
         # TODO: this could be done using single query, but how?
-        series = session.query(Series).filter(Series.name==parser.name).one()
-        episode = session.query(Episode).filter(Episode.series_id==series.id).\
+        series = feed.session.query(Series).filter(Series.name==parser.name).one()
+        episode = feed.session.query(Episode).filter(Episode.series_id==series.id).\
             filter(Episode.identifier==parser.identifier).one()
         episode.downloaded = True
-        session.commit()
 
     def feed_exit(self, feed):
         """Learn succeeded episodes"""

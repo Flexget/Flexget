@@ -32,7 +32,7 @@ class ModuleInterval:
         if feed.manager.options.interval_ignore or feed.manager.options.learn:
             log.info('Ignoring feed %s interval' % feed.name)
             return
-        last_time = feed.cache.storedefault('last_time', datetime.datetime.today())
+        last_time = feed.simple_persistence.setdefault('last_time', datetime.datetime.now())
         amount, unit = feed.config.get('interval').split(' ')
         log.debug('amount: %s unit: %s' % (repr(amount), repr(unit)))
         params = {unit:int(amount)}
@@ -48,4 +48,4 @@ class ModuleInterval:
             feed.abort(silent=True)
         else:
             log.debug('interval passed')
-            feed.cache.store('last_time', datetime.datetime.today())
+            feed.simple_persistence.set('last_time', datetime.datetime.now())
