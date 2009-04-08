@@ -1,5 +1,5 @@
 import os, sys, unittest
-from manager import Manager
+from manager import Manager, Session
 from feed import Feed, Entry
 import validator
 
@@ -28,9 +28,11 @@ class FlexGetTestCase(unittest.TestCase):
         
         config = self.manager.config['feeds'][name]
         # merge global configuration, # TODO: should not be have to be done in here!
-        self.manager.merge_dict_from_to(self.manager.config.get('global', {}), config)
+        #self.manager.merge_dict_from_to(self.manager.config.get('global', {}), config)
     
         feed = Feed(self.manager, name, config)
+        feed.session = Session()
+        # TODO: session needs to be closed / rollbacked at teardown!
         return feed
         
     def get_module(self, event, keyword):

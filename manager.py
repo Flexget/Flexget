@@ -2,9 +2,7 @@ import os, os.path
 import sys
 import logging
 import logging.handlers
-import types
 import time
-from datetime import datetime
 import shelve
 
 log = logging.getLogger('manager')
@@ -237,8 +235,10 @@ class Manager:
             Base.metadata.drop_all(bind=engine)
         Base.metadata.create_all(bind=engine)
 
+    # TODO: move into utils?! used only by couple times in modules anymore ...
     def sanitize(self, d):
         """Makes dictionary d contain only yaml.safe_dump compatible elements"""
+        import types
         valid = [types.DictType, types.IntType, types.NoneType,
                  types.StringType, types.UnicodeType, types.BooleanType,
                  types.ListType, types.LongType, types.FloatType]
@@ -489,6 +489,11 @@ class Manager:
             
     def print_failed(self):
         """Parameter --failed"""
+        print 'TODO: broken'
+        
+        # TODO: RE-IMPLEMENT
+        
+        """
         failed = self.shelve_session.setdefault('failed', [])
         if not failed:
             print 'No failed entries recorded'
@@ -496,9 +501,15 @@ class Manager:
             tof = datetime(*entry['tof'])
             print '%16s - %s' % (tof.strftime('%Y-%m-%d %H:%M'), entry['title'])
             print '%16s - %s' % ('', entry['url'])
+        """
         
     def add_failed(self, entry):
         """Adds entry to internal failed list, displayed with --failed"""
+        return
+        
+        # TODO: RE-IMPLEMENT
+        
+        """
         failed = self.shelve_session.setdefault('failed', [])
         f = {}
         f['title'] = entry['title']
@@ -510,11 +521,17 @@ class Manager:
         failed.append(f)
         while len(failed) > 25:
             failed.pop(0)
+        """
             
     def clear_failed(self):
         """Clears list of failed entries"""
+        
+        # TODO: RE-IMPLEMENT
+        
+        """
         print 'Cleared %i items.' % len(self.shelve_session.setdefault('failed', []))
         self.shelve_session['failed'] = []
+        """
 
     def merge_dict_from_to(self, d1, d2):
         """Merges dictionary d1 into dictionary d2. d1 will remain in original form."""
@@ -573,10 +590,15 @@ class Manager:
             # create feed instance and execute it
             feed = Feed(self, name, self.config['feeds'][name])
             try:
+                feed.session = Session()
                 feed.execute()
                 terminate[name] = feed
+                feed.session.commit()
             except Exception, e:
+                feed.session.rollback()
                 log.exception('Feed %s: %s' % (feed.name, e))
+            finally:
+                feed.session.close()
 
         # execute terminate event for all feeds
         if not self.options.validate:
@@ -584,5 +606,4 @@ class Manager:
                 try:
                     feed.terminate()
                 except Exception, e:
-                    log.exception('Feed %s terminate: %s' % (name, e))
-                
+                    log.exception('Feed %s terminate: %s' % (name, e))            

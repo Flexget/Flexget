@@ -14,11 +14,10 @@ class LogMessage(Base):
     
     id = Column(Integer, primary_key=True)
     md5sum = Column(String)
-    added = Column(DateTime)
+    added = Column(DateTime, default=datetime.now())
 
     def __init__(self, md5sum):
         self.md5sum = md5sum
-        self.added = datetime.now()
     
     def __repr__(self):
         return "<LogMessage('%s')>" % (self.md5sum)

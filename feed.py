@@ -1,6 +1,7 @@
 import logging
 from datetime import datetime
 from manager import ModuleWarning
+from utils.simple_persistence import SimplePersistence
 
 log = logging.getLogger('feed')
 
@@ -49,8 +50,12 @@ class Feed:
         self.name = name
         self.config = config
         self.manager = manager
+        self.session = None
 
         self.entries = []
+        
+        # simple persistence
+        self.simple_persistence = SimplePersistence(self)
         
         # You should NOT change these arrays at any point, and in most cases not even read them!
         # Mainly public since unit test needs these
@@ -67,8 +72,8 @@ class Feed:
         self.__purged = 0
         
         # state
-        self.__current_event = None
-        self.__current_module = None
+        self.current_event = None
+        self.current_module = None
         
     def _purge(self):
         """Purge filtered entries from feed. Call this from module only if you know what you're doing."""
@@ -162,9 +167,9 @@ class Feed:
                 reason_str = ''
                 if reason:
                     reason_str = ' (%s)' % reason
-                print "+ %-8s %-12s %s%s" % (self.__current_event, self.__current_module, msg, reason_str)
+                print "+ %-8s %-12s %s%s" % (self.current_event, self.current_module, msg, reason_str)
             except:
-                print "+ %-8s %-12s ERROR: Unable to print %s" % (self.__current_event, self.__current_module, repr(msg))
+                print "+ %-8s %-12s ERROR: Unable to print %s" % (self.current_event, self.current_module, repr(msg))
 
     def verbose_details_entries(self):
         """If details option is enabled, print all produced entries"""
@@ -200,8 +205,8 @@ class Feed:
             keyword = module['name']
             if keyword in self.config or module['builtin']:
                 # store execute info
-                self.__current_event = event
-                self.__current_module = keyword
+                self.current_event = event
+                self.current_module = keyword
                 # call the module
                 try:
                     method = self.manager.event_methods[event]
