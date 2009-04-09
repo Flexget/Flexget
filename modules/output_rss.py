@@ -159,7 +159,7 @@ class OutputRSS:
         from manager import Session
         session = Session()
         
-        db_items = session.query(RSSEntry).find(RSSEntry.file==config['file']).\
+        db_items = session.query(RSSEntry).filter(RSSEntry.file==config['file']).\
             order_by(RSSEntry.published).desc().all()
         
         # make items
