@@ -244,7 +244,10 @@ class FilterImdb:
                         log.error('Unable to determine encoding for %s. Installing chardet library may help.' % entry['imdb_url'])
                         feed.filter(entry)
                         # store cache so this will be skipped
-                        feed.shared_cache.store(entry['imdb_url'], imdb.to_yaml())
+                        movie = Movie()
+                        movie.url = entry['imdb_url']
+                        feed.session.add(movie)
+                        #feed.shared_cache.store(entry['imdb_url'], imdb.to_yaml())
                         continue
                     except ValueError:
                         log.error('Invalid parameter: %s' % entry['imdb_url'])
@@ -266,7 +269,7 @@ class FilterImdb:
                     imdb.name = cached.title
                     imdb.year = cached.year
                     imdb.votes = cached.votes
-                    imdb.score = cached.scores
+                    imdb.score = cached.score
                     imdb.plot_outline = cached.plot_outline
                     imdb.genres = cached.genres
                     imdb.languages = cached.languages
@@ -316,7 +319,7 @@ class FilterImdb:
             entry['imdb_name'] = imdb.name
 
             if reasons:
-                log_once('Filtering %s because of rule(s) %s' % (entry['title'], ', '.join(reasons), log))
+                log_once('Filtering %s because of rule(s) %s' % (entry['title'], ', '.join(reasons)), log)
                 feed.filter(entry)
             else:
                 log.debug('Accepting %s' % (entry))
