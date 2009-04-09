@@ -14,7 +14,9 @@ except ImportError:
     sys.exit(1)
 
 try:
-    from sqlalchemy import create_engine
+    import sqlalchemy
+    if float(sqlalchemy.__version__[0:3]) < 0.5:
+        raise ImportError('Old SQLAlchemy')
     from sqlalchemy.orm import sessionmaker
     from sqlalchemy.ext.declarative import declarative_base
 except ImportError:
@@ -228,7 +230,7 @@ class Manager:
             shutil.move(self.shelve_session_name, '%s_migrated' % self.shelve_session_name)
         
         # SQLAlchemy
-        engine = create_engine('sqlite:///db-%s.sqlite' % self.configname, echo=self.options.debug_sql)
+        engine = sqlalchemy.create_engine('sqlite:///db-%s.sqlite' % self.configname, echo=self.options.debug_sql)
         Session.configure(bind=engine)
         # create all tables
         if self.options.reset:
