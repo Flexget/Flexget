@@ -3,7 +3,6 @@ import sys
 import logging
 import logging.handlers
 import time
-import shelve
 
 log = logging.getLogger('manager')
 
@@ -83,7 +82,6 @@ class Manager:
         
         # shelve
         self.shelve_session = None
-        self.shelve_session_name = None
 
         # initialize commandline options
         parser = OptionParser()
@@ -211,7 +209,6 @@ class Manager:
             if os.path.exists(config):
                 self.config = yaml.safe_load(file(config))
                 self.configname = os.path.basename(config)[:-4]
-                self.shelve_session_name = os.path.join(sys.path[0], 'session-%s.db' % self.configname)
                 return
         log.debug('Tried to read from: %s' % ', '.join(possible, ', '))
         raise Exception('Failed to load configuration file %s' % self.options.config)
@@ -220,14 +217,16 @@ class Manager:
         """Initialize SQLAlchemy"""
         
         # load old shelve session
-        if os.path.exists(self.shelve_session_name):
-            log.critical('Old shelve session found, relevant data will be migrated.')
-            old = shelve.open(self.shelve_session_name, flag='r', protocol=2)
+        shelve_session_name = os.path.join(sys.path[0], 'session-%s.db' % self.configname)
+        if os.path.exists(shelve_session_name):
+            import shelve
             import copy
+            import shutil
+            log.critical('Old shelve session found, relevant data will be migrated.')
+            old = shelve.open(shelve_session_name, flag='r', protocol=2)
             self.shelve_session = copy.deepcopy(old['cache'])
             old.close()
-            import shutil
-            shutil.move(self.shelve_session_name, '%s_migrated' % self.shelve_session_name)
+            shutil.move(shelve_session_name, '%s_migrated' % shelve_session_name)
         
         # SQLAlchemy
         engine = sqlalchemy.create_engine('sqlite:///db-%s.sqlite' % self.configname, echo=self.options.debug_sql)
