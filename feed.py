@@ -135,6 +135,22 @@ class Feed:
         self.__abort = True
         self.__run_event('abort')
 
+
+    def find_entry(self, category='entries', **values):
+        """Find and return entry with given attributes from feed or None"""
+        cat = getattr(self, category)
+        if not isinstance(cat, list):
+            raise TypeError('category must be a list')
+        for entry in cat:
+            match = 0
+            for k, v in values.iteritems():
+                if entry.has_key(k):
+                    if entry.get(k) == v: 
+                        match += 1
+            if match==len(values):
+                return entry
+        return None
+
     def get_input_url(self, keyword):
         # TODO: move to better place?
         """
