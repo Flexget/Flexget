@@ -35,8 +35,8 @@ class SimplePersistence(object):
         self.feed.session.add(skv)
     
     def get(self, key, default=None):
-        skv = self.feed.session.query(SimpleKeyValue).find(SimpleKeyValue.feed==self.feed.name).\
-            find(SimpleKeyValue.module==self.feed.current_module).find(SimpleKeyValue.key==key).first()
+        skv = self.feed.session.query(SimpleKeyValue).filter(SimpleKeyValue.feed==self.feed.name).\
+            filter(SimpleKeyValue.module==self.feed.current_module).filter(SimpleKeyValue.key==key).first()
         if not skv:
             return default
         else:
