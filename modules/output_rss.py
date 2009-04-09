@@ -179,7 +179,7 @@ class OutputRSS:
                 gen['description'] = db_item.description
                 gen['link'] = db_item.link
                 gen['pubDate'] = db_item.published
-                log.debug('Adding %s into rss %s' % (gen['title'], config['file'])
+                log.debug('Adding %s into rss %s' % (gen['title'], config['file']))
                 rss_items.append(PyRSS2Gen.RSSItem(**gen))
             else:
                 # no longer needed
