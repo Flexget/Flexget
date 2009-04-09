@@ -595,9 +595,9 @@ class Manager:
                 terminate[name] = feed
                 feed.session.commit()
             except Exception, e:
-                feed.session.rollback()
                 log.exception('Feed %s: %s' % (feed.name, e))
             finally:
+                # note: will perform rollback if error occured (session has not been committed)
                 feed.session.close()
 
         # execute terminate event for all feeds

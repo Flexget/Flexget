@@ -160,7 +160,7 @@ class OutputRSS:
         session = Session()
         
         db_items = session.query(RSSEntry).filter(RSSEntry.file==config['file']).\
-            order_by(RSSEntry.published).desc().all()
+            order_by(RSSEntry.published.desc()).all()
         
         # make items
         rss_items = []
@@ -179,6 +179,7 @@ class OutputRSS:
                 gen['description'] = db_item.description
                 gen['link'] = db_item.link
                 gen['pubDate'] = db_item.published
+                log.debug('Adding %s into rss %s' % (gen['title'], config['file'])
                 rss_items.append(PyRSS2Gen.RSSItem(**gen))
             else:
                 # no longer needed
