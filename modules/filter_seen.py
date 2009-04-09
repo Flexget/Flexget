@@ -58,7 +58,7 @@ class FilterSeen(object):
         
         # migrate shelve -> sqlalchemy
         if feed.manager.shelve_session:
-            self.migrate(feed.manager.shelve_session)
+            self.migrate(feed)
         
         duplicates = []
         for entry in feed.entries:
@@ -110,9 +110,10 @@ class FilterSeen(object):
             else:
                 log.debug("Learned '%s' '%s' (will skip this in the future)" % (entry['url'], entry['title']))
                 
-    def migrate(self, shelve):
+    def migrate(self, feed):
+        shelve = feed.manager.shelve_session
         count = 0
-        for feed, data in shelve.iteritems():
+        for name, data in shelve.iteritems():
             if not self.keyword in data:
                 continue
             seen = data[self.keyword]
