@@ -175,7 +175,7 @@ class Feed:
         if not self.manager.options.quiet and not self.manager.unit_test:
             logger.info(s)
           
-    def verbose_details(self, msg, reason):
+    def verbose_details(self, msg, reason=''):
         """Verbose if details option is enabled"""
         # TODO: implement trough own logger?
         if self.manager.options.details:
