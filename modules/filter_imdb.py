@@ -116,7 +116,7 @@ class FilterImdb:
         imdb = validator.factory('dict')
         imdb.accept('number', key='min_year')
         imdb.accept('number', key='min_votes')
-        imdb.accept('number', key='min_score')
+        imdb.accept('decimal', key='min_score')
         imdb.accept('list', key='reject_genres').accept('text')
         imdb.accept('list', key='reject_languages').accept('text')
         imdb.accept('list', key='accept_languages').accept('text')
