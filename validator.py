@@ -369,13 +369,15 @@ class DictValidator(Validator):
 if __name__=='__main__':
     
     try:
-
-        container = factory('list')
-        entry = container.accept('dict')
-        entry.accept('url', key='url', required=True)
-        entry.accept('text', key='title', required=True)
-        entry.accept_any_key('text')
-        entry.accept_any_key('number')
+        entry = factory('dict')
+        #entry.accept('url', key='url')
+        #entry.accept('text', key='title')
+        d = entry.accept('dict', key='foo')
+        d.accept('text', key='name')
+        
+        entry.validate( {'bar': {} } )
+        
+        print entry.errors.messages
 
     except Exception, e:
         print e

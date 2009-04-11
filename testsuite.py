@@ -445,6 +445,20 @@ class TestValidator(unittest.TestCase):
         dv = root.accept('dict')
         assert dv.name=='dict', 'expected dict'
         dv.accept('text', key='text')
+        
+    def testDict(self):
+        dv = validator.factory('dict')
+        dv.accept('dict', key='foo')
+        result = dv.validate( {'foo': {}} )
+        if dv.errors.messages:
+            self.fail('should have passed foo')
+        if not result:
+            self.fail('invalid result for foo')
+        result = dv.validate( {'bar': {}} )
+        if not dv.errors.messages:
+            self.fail('should not have passed bar')                    
+        if result:
+            self.fail('invalid result for bar')
     
 if __name__ == '__main__':
     suite = unittest.TestSuite()

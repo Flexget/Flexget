@@ -294,7 +294,7 @@ class Feed:
         for keyword in self.config:
             module = self.manager.modules.get(keyword)
             if not module:
-                validate_errors.append('Unknown keyword \'%s\'' % keyword)
+                validate_errors.append('Unknown module \'%s\'' % keyword)
                 continue
             if hasattr(module['instance'], 'validator'):
                 try:
@@ -302,8 +302,7 @@ class Feed:
                 except TypeError:
                     log.critical('invalid validator method in module %s' % keyword)
                     continue
-                errors = validator.validate(self.config[keyword])
-                if errors:
+                if not validator.validate(self.config[keyword]):
                     for msg in validator.errors.messages:
                         validate_errors.append('%s %s' % (keyword, msg))
             else:
