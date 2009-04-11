@@ -109,7 +109,7 @@ class Feed:
     def filter(self, entry, reason=None):
         """Mark entry to be filtered unless told otherwise. Entry may still be accepted."""
         # accepted checked only because it makes more sense when verbose details
-        if not entry in self.filtered and not entry in self.accepted:
+        if not entry in self.filtered and not entry in self.accepted and not entry in self.rejected:
             self.filtered.append(entry)
             self.verbose_details('Filtered %s' % entry['title'], reason)
 

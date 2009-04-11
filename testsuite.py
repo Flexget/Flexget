@@ -55,31 +55,34 @@ class TestFilterSeries(FlexGetTestCase):
         FlexGetTestCase.setUp(self)
         self.feed.execute()
 
-    def testSerieParser(self):
-        from filter_series import SerieParser
-        s = SerieParser()
+    def testSeriesParser(self):
+        from utils.series import SeriesParser
+        
+        s = SeriesParser()
         s.name = 'Something Interesting'
-        s.data = 'Something.Interesting.S01E02-FlexGet'
+        s.data = 'Something.Interesting.S01E02.Proper-FlexGet'
         s.parse()
         self.assertEqual(s.season, 1)
         self.assertEqual(s.episode, 2)
         self.assertEqual(s.quality, 'unknown')
+        assert not s.proper_or_repack, 'did not detect proper'
+        
 
-        s = SerieParser()
+        s = SeriesParser()
         s.name = 'Something Interesting'
         s.data = 'The.Something.Interesting.S01E02-FlexGet'
         s.parse()
         assert not s.valid, 'Should not be valid'
 
-        s = SerieParser()
+        s = SeriesParser()
         s.name = '25'
         s.data = '25.And.More.S01E02-FlexGet'
         s.parse()
-        # TODO: This behavior should be changed.
+        # TODO: This behavior should be changed. uhh, why?
         assert s.valid, 'Fix the implementation, should not be valid'
 
         # test invalid name
-        s = SerieParser()
+        s = SeriesParser()
         s.name = 1
         s.data = 'Something'
         try:
@@ -90,7 +93,7 @@ class TestFilterSeries(FlexGetTestCase):
             self.fail('Data was not a str, should have failed')
         
         # test invalid data
-        s = SerieParser()
+        s = SeriesParser()
         s.name = 'Something Interesting'
         s.data = 1
         try:
@@ -101,37 +104,34 @@ class TestFilterSeries(FlexGetTestCase):
             self.fail('Data was not a str, should have failed')
             
     def testSeries(self):
-        pass
-        
         # TODO: needs to be fixed after series is converted into SQLAlchemy
-        
         """
         # 'some series' should be in timeframe-queue
         self.feed.shared_cache.set_namespace('series')
         s = self.feed.shared_cache.get('some series')
         self.assertEqual(isinstance(s, dict), True)
         self.assertEqual(s.get('S1E20', {}).get('info').get('downloaded'), False)
+        """
         
         # normal passing
-        if not self.get_entry(title='Another.Series.S01E20.720p.XViD-FlexGet'):
+        if not self.feed.find_entry(title='Another.Series.S01E20.720p.XViD-FlexGet'):
             self.fail('Another.Series.S01E20.720p.XViD-FlexGet should have passed')
         # episode advancement
-        if self.get_entry(title='Another.Series.S01E10.720p.XViD-FlexGet'):
+        if self.feed.find_entry(title='Another.Series.S01E10.720p.XViD-FlexGet'):
             self.fail('Another.Series.S01E10.720p.XViD-FlexGet should NOT have passed because of episode advancement')
-        if not self.get_entry(title='Another.Series.S01E16.720p.XViD-FlexGet'):
+        if not self.feed.find_entry(title='Another.Series.S01E16.720p.XViD-FlexGet'):
             self.fail('Another.Series.S01E16.720p.XViD-FlexGet should have passed because of episode advancement grace magin')
         # date formats
         df = ['Date.Series.10-11-2008.XViD','Date.Series.10.12.2008.XViD', 'Date.Series.2008-10-13.XViD', 'Date.Series.2008x10.14.XViD']
         for d in df:
-            if not self.get_entry(title=d):
+            if not self.feed.find_entry(title=d):
                 self.fail('Date format did not match %s' % d)
         # parse from filename
-        if not self.get_entry(filename='Filename.Series.S01E26.XViD'):
+        if not self.feed.find_entry(filename='Filename.Series.S01E26.XViD'):
             self.fail('Filename parsing failed')
         # empty description
-        if not self.get_entry(title='Empty.Description.S01E22.XViD'):
+        if not self.feed.find_entry(title='Empty.Description.S01E22.XViD'):
             self.fail('Empty Description failed')
-        """
 
 class TestRegexp(FlexGetTestCase):
 

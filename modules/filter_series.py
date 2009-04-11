@@ -1,7 +1,7 @@
 import logging
 from datetime import datetime
 from sys import maxint
-from utils.serieparser import SerieParser
+from utils.series import SeriesParser
 
 from manager import Base
 from sqlalchemy import Column, Integer, String, DateTime, Boolean, PickleType
@@ -85,7 +85,7 @@ class FilterSeries:
         # timeframe dict
         timeframe = advanced.accept('dict', key='timeframe')
         timeframe.accept('number', key='hours')
-        timeframe.accept('text', key='enough') # TODO: allow only SerieParser.qualities
+        timeframe.accept('text', key='enough') # TODO: allow only SeriesParser.qualities
         # watched
         watched = advanced.accept('dict', key='watched')
         watched.accept('number', key='season')
@@ -106,7 +106,7 @@ class FilterSeries:
                 if serie[identifier].get('info', {}).get('downloaded', False):
                     continue
                 # add all qualities
-                for quality in SerieParser.qualities:
+                for quality in SeriesParser.qualities:
                     if quality == 'info': continue # a hack, info dict is not quality
                     entry = serie[identifier].get(quality)
                     if not entry: continue
@@ -128,7 +128,7 @@ class FilterSeries:
         return self.cmp_quality(s1.quality, s2.quality)
 
     def cmp_quality(self, q1, q2):
-        return cmp(SerieParser.qualities.index(q1), SerieParser.qualities.index(q2))
+        return cmp(SeriesParser.qualities.index(q1), SeriesParser.qualities.index(q2))
 
     def feed_filter(self, feed):
         """Filter series"""
@@ -159,7 +159,7 @@ class FilterSeries:
                     # skip non string values and empty strings
                     if not isinstance(data, basestring): continue
                     if not data: continue
-                    parser = SerieParser()
+                    parser = SeriesParser()
                     parser.name = str(name)
                     parser.data = data
                     parser.ep_regexps = ep_patterns + parser.ep_regexps
@@ -197,7 +197,7 @@ class FilterSeries:
                 if self.downloaded(feed, best):
                     log.debug('Series %s episode %s is already downloaded, rejecting all occurences' % (name, identifier))
                     for ep in eps:
-                        feed.reject(ep.entry)
+                        feed.reject(ep.entry, 'already downloaded')
                     continue
 
                 # reject episodes that have been marked as watched in config file
@@ -208,7 +208,7 @@ class FilterSeries:
                     if best.season < season or (best.season == season and best.episode <= episode):
                         log.debug('Series %s episode %s is already watched, rejecting all occurrences' % (name, identifier))
                         for ep in eps:
-                            feed.reject(ep.entry)
+                            feed.reject(ep.entry, 'watched')
                         continue
                         
                 # episode advancement, only when using season, ep identifier
@@ -220,7 +220,7 @@ class FilterSeries:
                         if best.season < latest['season'] or (best.season == latest['season'] and best.episode < latest['episode'] - grace):
                             log.debug('Series %s episode %s does not meet episode advancement, rejecting all occurrences' % (name, identifier))
                             for ep in eps:
-                                feed.reject(ep.entry)
+                                feed.reject(ep.entry, 'episode advancement')
                             continue
                     else:
                         log.debug('No latest info available')
@@ -232,7 +232,7 @@ class FilterSeries:
                     enough = tconf.get('enough', '720p')
                     stop = feed.manager.options.stop_waiting == name
 
-                    if not enough in SerieParser.qualities:
+                    if not enough in SeriesParser.qualities:
                         log.error('Parameter enough has unknown value: %s' % enough)
 
                     # scan for enough, starting from worst quality (reverse)
@@ -271,7 +271,7 @@ class FilterSeries:
         # filter ALL entries, only previously accepted will remain
         # other modules may still accept entries
         for entry in feed.entries:
-            feed.filter(entry)
+            feed.filter(entry, 'default')
 
     def accept_series(self, feed, parser):
         """Helper method for accepting series"""
@@ -303,9 +303,9 @@ class FilterSeries:
         """Return true if episode is downloaded"""
         series = feed.session.query(Series).filter(Series.name==parser.name).first()
         episode = feed.session.query(Episode).filter(Episode.series_id==series.id).\
-            filter(Episode.identifier==parser.identifier())
+            filter(Episode.identifier==parser.identifier()).first()
         if episode:
-            return True
+            return episode.downloaded
         return False
 
     def store(self, feed, parser):
@@ -313,7 +313,7 @@ class FilterSeries:
         # if does not exist in database, add new
         series = feed.session.query(Series).filter(Series.name==parser.name).first()
         if not series:
-            log.debug('Adding series %s into database' % parser.name)
+            #log.debug('Adding series %s into database' % parser.name)
             series = Series()
             series.name = parser.name
             feed.session.add(series)
@@ -322,7 +322,7 @@ class FilterSeries:
         episode = feed.session.query(Episode).filter(Episode.series_id==series.id).\
             filter(Episode.identifier==parser.identifier).first()
         if not episode:
-            log.debug('Adding episode %s into series %s' % (parser.identifier(), parser.name))
+            #log.debug('Adding episode %s into series %s' % (parser.identifier(), parser.name))
             episode = Episode()
             episode.identifier = parser.identifier()
             # if episodic format
@@ -335,8 +335,8 @@ class FilterSeries:
         quality = feed.session.query(Quality).filter(Quality.episode_id==episode.id).\
             filter(Quality.quality==parser.quality).first()
         if not quality:
-            log.debug('Adding quality %s into series %s episode %s' % (parser.quality, \
-                                                                       parser.name, parser.identifier()))
+            #log.debug('Adding quality %s into series %s episode %s' % (parser.quality, \
+            #                                                           parser.name, parser.identifier()))
             quality = Quality()
             quality.entry = parser.entry
             quality.quality = parser.quality

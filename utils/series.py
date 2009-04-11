@@ -1,10 +1,12 @@
 import logging
 import re
 
-log = logging.getLogger('serieparser')
+log = logging.getLogger('seriesparser')
 
-class SerieParser:
+class SeriesParser:
     qualities = ['1080p', '1080', '720p', '720', 'hr', 'dvd', 'dvdrip', 'hdtv', 'pdtv', 'dsr', 'dsrip', 'unknown']
+    
+    propers = ['proper', 'repack']
     
     def __init__(self):
         # name of the serie
@@ -13,7 +15,8 @@ class SerieParser:
         self.data = None 
         
         self.ep_regexps = ['s(\d+)e(\d+)', 's(\d+)ep(\d+)', '(\d+)x(\d+)']
-        self.id_regexps = ['(\d\d\d\d).(\d+).(\d+)', '(\d+).(\d+).(\d\d\d\d)', '(\d\d\d\d)x(\d+)\.(\d+)', '(\d\d\d)', '(\d\d)', '(\d)']
+        self.id_regexps = ['(\d\d\d\d).(\d+).(\d+)', '(\d+).(\d+).(\d\d\d\d)', \
+                           '(\d\d\d\d)x(\d+)\.(\d+)', '(\d\d\d)', '(\d\d)', '(\d)']
         self.name_regexps = []
         # parse produces these
         self.season = None
@@ -25,14 +28,17 @@ class SerieParser:
         self.valid = False
         # optional for storing entry from which this instance is made from
         self.entry = None
+        # repack / proper
+        self.proper_or_repack = False
 
     def parse(self):
         if not self.name or not self.data:
-            raise Exception('SerieParser initialization error, name: %s data: %s' % (repr(self.name), repr(self.data)))
+            raise Exception('SeriesParser initialization error, name: %s data: %s' % \
+                            (repr(self.name), repr(self.data)))
         if not isinstance(self.name, basestring):
-            raise Exception('SerieParser name is not a string, got %s' % repr(self.name))
+            raise Exception('SeriesParser name is not a string, got %s' % repr(self.name))
         if not isinstance(self.data, basestring):
-            raise Exception('SerieParser data is not a string, got %s' % repr(self.data))
+            raise Exception('SeriesParser data is not a string, got %s' % repr(self.data))
 
         def clean(str):
             return re.sub(r'[ _.\[\]]+', ' ', str).strip().lower()
@@ -78,7 +84,7 @@ class SerieParser:
                 
         # TODO: matched name should be EXCLUDED from ep and id searching!
 
-        # search quality
+        # search quality, proper/repack
         for part in data_parts:
             # search for quality
             if part in self.qualities:
@@ -88,6 +94,8 @@ class SerieParser:
                 else:
                     pass
                     #log.debug('%s ignoring quality tag %s because found better %s' % (self.name, part, self.quality))
+            if part in self.propers:
+                self.proper_or_repack = True
 
         # search for season and episode number
         for ep_re in self.ep_regexps:
@@ -121,4 +129,5 @@ class SerieParser:
         valid = 'INVALID'
         if self.valid:
             valid = 'OK'
-        return 'serie: %s, id: %s season: %s episode: %s quality: %s status: %s' % (str(self.name), str(self.id), str(self.season), str(self.episode), str(self.quality), valid)
+        return 'serie: %s, id: %s season: %s episode: %s quality: %s status: %s' % \
+        (str(self.name), str(self.id), str(self.season), str(self.episode), str(self.quality), valid)
