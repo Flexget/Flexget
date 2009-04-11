@@ -229,7 +229,7 @@ class Manager:
             shutil.move(shelve_session_name, '%s_migrated' % shelve_session_name)
         
         # SQLAlchemy
-        engine = sqlalchemy.create_engine('sqlite:///db-%s.sqlite' % self.configname, echo=self.options.debug_sql)
+        engine = sqlalchemy.create_engine('sqlite:////%s/db-%s.sqlite' %( sys.path[0], self.configname), echo=self.options.debug_sql)
         Session.configure(bind=engine)
         # create all tables
         if self.options.reset:
