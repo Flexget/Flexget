@@ -2,8 +2,6 @@ import os
 import logging
 from manager import ModuleWarning
 
-__pychecker__ = 'unusednames=parser'
-
 log = logging.getLogger('exists')
 
 class FilterExists:
@@ -21,7 +19,7 @@ class FilterExists:
 
     def validator(self):
         import validator
-        return validator.factory('text')
+        return validator.factory('text') # TODO: path
 
     def feed_filter(self, feed):
         path = feed.config.get('exists', None)
@@ -37,4 +35,4 @@ class FilterExists:
                 name = entry['title']
                 if name in dirs or name in files:
                     log.debug('Found %s in %s' % (name, root))
-                    feed.filter(entry)
+                    feed.reject(entry, '%s' % (name, root))

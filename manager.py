@@ -410,8 +410,8 @@ class Manager:
                 del self.__event_queue[event_name]
 
     def get_modules_by_event(self, event):
-        """Return all modules that hook given event."""
-        res = []
+        """Return all modules that hook event in order of priority."""
+        modules = []
         if not event in self.event_methods:
             raise Exception('Unknown event %s' % event)
         method = self.event_methods[event]
@@ -420,8 +420,17 @@ class Manager:
             if not hasattr(instance, method):
                 continue
             if callable(getattr(instance, method)):
-                res.append(info)
-        return res
+                modules.append(info)
+        modules.sort(lambda x, y: cmp(x.get('priorities', {}).get(event, 0), \
+                                      y.get('priorities', {}).get(event, 0)))
+        xx = []
+        for m in modules:
+            if 'priorities' in m:
+                if event in m['priorities']:
+                    xx.append(str(m['priorities'][event]))
+        print ', '.join(xx)
+        
+        return modules
 
     def get_modules_by_group(self, group):
         """Return all modules with in specified group."""

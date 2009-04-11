@@ -193,29 +193,9 @@ class Feed:
             for entry in self.entries:
                 self.verbose_details('%s' % entry['title'])
             
-    # TODO: BROKEN! needs to be moved into manager
-    def __get_priority(self, module, event):
-        """Return order for module in this feed. Uses default value if no value is configured."""
-        priority = module.get('priorities', {}).get(event, 0)
-        keyword = module['name']
-        if keyword in self.config:
-            if isinstance(self.config[keyword], dict):
-                priority = self.config[keyword].get('priority', priority)
-        return priority
-
-    # TODO: seems unnecessary
-    def __sort_modules(self, a, b, event):
-        a = self.__get_priority(a, event)
-        b = self.__get_priority(b, event)
-        return cmp(a, b)
-        
     def __run_event(self, event):
         """Execute module events if module is configured for this feed."""
         modules = self.manager.get_modules_by_event(event)
-        # Sort modules based on module event priority
-        # Priority can be also configured in which case given value overwrites module default.
-        modules.sort(lambda x,y: self.__sort_modules(x,y, event))
-        modules.reverse()
 
         for module in modules:
             keyword = module['name']
