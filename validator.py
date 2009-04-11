@@ -12,13 +12,23 @@ class Errors:
         self.messages = []
         self.path = []
         self.path_level = None
-        self.frozen = False
+        self.transaction = False
+        self.transaction_queue = []
         
-    def freeze(self):
-        self.frozen = True
+    def begin(self):
+        """Start message transaction"""
+        self.transaction = True
+        self.transaction_queue = []
         
-    def unfreeze(self):
-        self.frozen = False
+    def rollback(self):
+        """Rollback added error messages"""
+        self.transaction = False
+        self.transaction_queue = []
+        
+    def commit(self):
+        if not self.transaction:
+            raise Exception('no error transaction in process')
+        self.messages.extend(self.transaction_queue)
         
     def count(self):
         """Return number of errors"""
@@ -26,10 +36,12 @@ class Errors:
     
     def add(self, msg):
         """Add new error message to current path."""
-        if self.frozen:
-            return
         path = [str(p) for p in self.path]
-        self.messages.append('[/%s] %s' % ('/'.join(path), msg))
+        msg = '[/%s] %s' % ('/'.join(path), msg)
+        if self.transaction:
+            self.transaction_queue.append(msg)
+        else:  
+            self.messages.append(msg)
 
     def path_add_level(self, value='?'):
         """Adds level into error message path"""
@@ -49,27 +61,14 @@ class Errors:
             raise Exception('no path level')
         self.path[self.path_level] = value
 
-"""
-class Callable:
-    def __init__(self, call):
-        self.__call__ = call
-"""
-
-def factory(meta='root'):
+def factory(name='root'):
     """Factory method, return validator instance."""
     v = Validator()
-    return v.get_validator(meta)
+    return v.get_validator(name)
 
 class Validator(object):
 
     name = 'validator'
-
-    """
-    def factory(meta='root'): # pylint: disable-msg=E0213
-        v = Validator()
-        return v.get_validator(meta)
-    factory = Callable(factory)
-    """
 
     def __init__(self, parent=None):
         self.valid = []
@@ -78,8 +77,8 @@ class Validator(object):
             self.validators = {}
             
             # register default validators
-            register = [RootValidator, ListValidator, DictValidator, TextValidator, AnyValidator, 
-                        NumberValidator, BooleanValidator, DecimalValidator, UrlValidator, 
+            register = [RootValidator, ListValidator, DictValidator, TextValidator, FileValidator,
+                        AnyValidator, NumberValidator, BooleanValidator, DecimalValidator, UrlValidator, 
                         ChoiceValidator]
             for v in register:
                 self.register(v)
@@ -92,13 +91,13 @@ class Validator(object):
             raise Exception('Validator %s is missing class-attribute name' % validator.__class__.__name__)
         self.validators[validator.name] = validator
 
-    def get_validator(self, meta):
-        if not self.validators.get(meta):
-            raise Exception('Asked unknown validator \'%s\'' % meta)
-        #print 'returning %s' % meta
-        return self.validators[meta](self)
+    def get_validator(self, name):
+        if not self.validators.get(name):
+            raise Exception('Asked unknown validator \'%s\'' % name)
+        #print 'returning %s' % name
+        return self.validators[name](self)
 
-    def accept(self, meta, **kwargs):
+    def accept(self, name, **kwargs):
         raise Exception('Validator %s should override accept method' % self.__class__.__name__)
     
     def validateable(self, data):
@@ -116,9 +115,14 @@ class Validator(object):
         """
         for rule in rules:
             #print 'validating %s' % rule.name
+            self.errors.begin()
             if rule.validateable(item):
                 if rule.validate(item):
+                    # passed, roll back any previous errors
+                    self.errors.rollback()
                     return True
+            # add errors
+            self.errors.commit()
         return False
 
     def __str__(self):
@@ -127,10 +131,13 @@ class Validator(object):
 class RootValidator(Validator):
     name = 'root'
 
-    def accept(self, meta, **kwargs):
-        v = self.get_validator(meta)
+    def accept(self, name, **kwargs):
+        v = self.get_validator(name)
         self.valid.append(v)
         return v
+    
+    def validateable(self, data):
+        return True
     
     def validate(self, data):
         for v in self.valid:
@@ -141,12 +148,11 @@ class RootValidator(Validator):
         self.errors.add('incorrect format, should be %s' % ', '.join(acceptable))
         return False
 
-
 # borked                
 class ChoiceValidator(Validator):
     name = 'choice'
 
-    def accept(self, meta, **kwargs):
+    def accept(self, name, **kwargs):
         v = self.get_validator(kwargs['value'])
         self.valid.append(v)
         return v
@@ -187,7 +193,7 @@ class EqualsValidator(Validator):
 class NumberValidator(Validator):
     name = 'number'
 
-    def accept(self, meta, **kwargs):
+    def accept(self, name, **kwargs):
         pass
 
     def validateable(self, data):
@@ -202,7 +208,7 @@ class NumberValidator(Validator):
 class BooleanValidator(Validator):
     name = 'boolean'
 
-    def accept(self, meta, **kwargs):
+    def accept(self, name, **kwargs):
         pass
 
     def validateable(self, data):
@@ -217,7 +223,7 @@ class BooleanValidator(Validator):
 class DecimalValidator(Validator):
     name = 'decimal'
 
-    def accept(self, meta, **kwargs):
+    def accept(self, name, **kwargs):
         pass
 
     def validateable(self, data):
@@ -232,7 +238,7 @@ class DecimalValidator(Validator):
 class TextValidator(Validator):
     name = 'text'
     
-    def accept(self, meta, **kwargs):
+    def accept(self, name, **kwargs):
         pass
 
     def validateable(self, data):
@@ -244,10 +250,15 @@ class TextValidator(Validator):
             self.errors.add('value %s is not valid text' % data)
         return valid
 
+class FileValidator(TextValidator):
+    name = 'file'
+    
+    # TODO: implement!!
+
 class UrlValidator(Validator):
     name = 'url'
     
-    def accept(self, meta, **kwargs):
+    def accept(self, name, **kwargs):
         pass
         
     def validateable(self, data):
@@ -266,9 +277,9 @@ class UrlValidator(Validator):
 class ListValidator(Validator):
     name = 'list'
 
-    def accept(self, meta, **kwargs):
-        v = self.get_validator(meta)
-#        v.accept(meta, **kwargs)
+    def accept(self, name, **kwargs):
+        v = self.get_validator(name)
+#        v.accept(name, **kwargs)
         self.valid.append(v)
         return v
 
@@ -300,13 +311,13 @@ class DictValidator(Validator):
         # TODO: not dictionary?
         self.valid = {}
 
-    def accept(self, meta, **kwargs):
-        """Accepts key with meta type"""
+    def accept(self, name, **kwargs):
+        """Accepts key with name type"""
         if not 'key' in kwargs:
             raise Exception('%s.accept() must specify key' % self.name)
 
         key = kwargs['key']
-        v = self.get_validator(meta)
+        v = self.get_validator(name)
         self.valid.setdefault(key, []).append(v)
         # complain from old format
         if 'require' in kwargs:
@@ -328,10 +339,10 @@ class DictValidator(Validator):
         if not key in self.required_keys:
             self.required_keys.append(key)
 
-    def accept_any_key(self, meta, **kwargs):
+    def accept_any_key(self, name, **kwargs):
         """Accepts any key with this given type."""
-        v = self.get_validator(meta)
-        #v.accept(meta, **kwargs)
+        v = self.get_validator(name)
+        #v.accept(name, **kwargs)
         self.any_key.append(v)
         return v
 
@@ -369,15 +380,21 @@ class DictValidator(Validator):
 if __name__=='__main__':
     
     try:
-        entry = factory('dict')
-        #entry.accept('url', key='url')
-        #entry.accept('text', key='title')
-        d = entry.accept('dict', key='foo')
-        d.accept('text', key='name')
         
-        entry.validate( {'bar': {} } )
+        ll = factory('list')
+
+        dict1 = ll.accept('dict')
+        dict1.accept('text', key='name', required=True)
+        dict1.accept('number', key='age', required=True)
         
-        print entry.errors.messages
+        dict2 = ll.accept('dict')
+        dict2.accept_any_key('text')
+        
+        #ll.validate( [{'name':'foobar', 'age': 5} ] )
+        
+        ll.validate( [{'kukkuu':'foobar'} ] )
+        
+        print ll.errors.messages
 
     except Exception, e:
         print e

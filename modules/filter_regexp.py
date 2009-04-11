@@ -2,8 +2,6 @@ import urllib
 import logging
 import re
 
-__pychecker__ = 'unusednames=parser,feed'
-
 log = logging.getLogger('regexp')
 
 class FilterRegexp:
@@ -21,18 +19,24 @@ class FilterRegexp:
         def build(sub):
             sub.accept('text')
             sub.accept('number')
-            adv = sub.accept('dict')
-            adv.accept('text', key='path') # TODO: text -> path
-            adv.accept('text', key='not')
-            adv.accept('number', key='not')
-            notl = adv.accept('list', key='not')
+            
+            compact = sub.accept('dict')
+            compact.accept_any_key('text')
+            
+            advanced = sub.accept('dict')
+            advanced.accept('text', key='path') # TODO: text -> path
+            advanced.accept('text', key='not')
+            advanced.accept('number', key='not')
+            
+            notl = advanced.accept('list', key='not')
             notl.accept('text')
             notl.accept('number')
             
         conf = validator.factory('dict')
-        for name in ['accept', 'filter', 'reject', 'accept_excluding', 'filter_excluding', 'reject_excluding']:
-            sub = conf.accept('list', key=name)
+        for operation in ['accept', 'filter', 'reject', 'accept_excluding', 'filter_excluding', 'reject_excluding']:
+            sub = conf.accept('list', key=operation)
             build(sub)
+            
         conf.accept('text', key='rest') # TODO: accept only ['accept','filter','reject']
         return conf
         

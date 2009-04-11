@@ -69,7 +69,7 @@ class InputRSS:
         root = validator.factory()
         root.accept('url')
         advanced = root.accept('dict')
-        advanced.accept('url', key='url', required=True)
+        url = advanced.accept('text', key='url', required=True) # TODO: accept only url, file
         advanced.accept('text', key='username')
         advanced.accept('text', key='password')
         advanced.accept('boolean', key='silent')
