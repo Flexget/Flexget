@@ -436,7 +436,20 @@ class TestRssOnline(FlexGetTestCase):
     def testFeeds(self):
         # TODO:
         pass
+
+class TestScanImdb(FlexGetTestCase):
     
+    def setUp(self):
+        self.config = 'test/test_scan_imdb.yml'
+        FlexGetTestCase.setUp(self)
+
+    def testScanImdb(self):
+        self.feed.execute()
+        if not self.feed.find_entry(imdb_url='http://www.imdb.com/title/tt0330793'):
+            self.fail('Failed pick url from description')
+        if not self.feed.find_entry(imdb_url='http://imdb.com/title/tt0472198'):
+            self.fail('Failed pick imdb.com from description')
+
 class TestValidator(unittest.TestCase):
 
     def testDefault(self):
@@ -459,7 +472,7 @@ class TestValidator(unittest.TestCase):
             self.fail('should not have passed bar')                    
         if result:
             self.fail('invalid result for bar')
-    
+
 if __name__ == '__main__':
     suite = unittest.TestSuite()
     suite.addTest(unittest.makeSuite(TestRegexp))
@@ -471,6 +484,7 @@ if __name__ == '__main__':
     suite.addTest(unittest.makeSuite(TestInputRSS))
     suite.addTest(unittest.makeSuite(TestDisableBuiltins))
     suite.addTest(unittest.makeSuite(TestValidator))
+    suite.addTest(unittest.makeSuite(TestScanImdb))
     
     if '--online' in sys.argv:
         print 'NOTE: Online tests are enabled. Some of these may fail since they depend on 3rd party services.'
