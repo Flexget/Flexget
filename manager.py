@@ -184,10 +184,11 @@ class Manager:
         # get root logger
         logger = logging.getLogger()
         handler = logging.handlers.RotatingFileHandler(filename, maxBytes=200*1024, backupCount=9)
-        formatter = logging.Formatter('%(asctime)-15s %(levelname)-8s %(name)-11s %(message)s')
+        # time format is same format of strftime
+        formatter = logging.Formatter('%(asctime)-15s %(levelname)-8s %(name)-11s %(message)s', '%y%m%d-%H:%M:%S')
         handler.setFormatter(formatter)
         logger.addHandler(handler)
-         
+        
         # unfortunately we cannot use optik in here
         if '--debug' in sys.argv:
             logger.setLevel(logging.DEBUG)
@@ -428,7 +429,7 @@ class Manager:
             if 'priorities' in m:
                 if event in m['priorities']:
                     xx.append(str(m['priorities'][event]))
-        print ', '.join(xx)
+        #print ', '.join(xx)
         
         return modules
 
