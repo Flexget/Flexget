@@ -1,0 +1,9 @@
+feeds:
+  test:
+    input_mock:
+      # for description url
+      - {title: 'Punisher-War Zone[2008]DvDrip-aXXo', url: 'http://www.mininova.org/tor/2365255', description: 'title: Punisher-War Zone\n imdb-url: http://www.imdb.com/title/tt0330793/'}
+    scan_imdb: true
+    imdb:
+        min_votes: 20
+

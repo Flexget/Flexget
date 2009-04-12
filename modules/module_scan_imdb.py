@@ -1,4 +1,5 @@
 import os
+import re
 import logging
 from manager import ModuleWarning
 
@@ -18,6 +19,10 @@ class ModuleScanImdb:
         return validator.factory('boolean')
 
     def feed_filter(self, feed):
-        pass
+        for entry in feed.entries:
+            results = re.findall('(?:http://)?(?:www\.)?imdb.com/title/tt\d+',entry['description'])
+            for result in results:
+                entry['imdb_url'] = result
+            log.info('Found imdb url in description  %s' % entry['imdb_url'])
         
         # TODO: implement!
