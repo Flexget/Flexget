@@ -3,6 +3,7 @@ import urllib
 import urllib2
 import logging
 import shutil
+import filecmp
 from manager import ModuleWarning
 
 __pychecker__ = 'unusednames=parser,feed'
@@ -179,11 +180,11 @@ class ModuleDownload:
                     self.output(feed, entry)
             except ModuleWarning, e:
                 feed.fail(entry)
-                log.error('Error while writing: %s' % e)
+                log.error('Module error while writing: %s' % e)
             except Exception, e:
                 feed.fail(entry)
-                log.exception('Error while writing: %s' % e)
-            # remove temp file if it remains due exceptions
+                log.exception('Exception while writing: %s' % e)
+            # remove temp file if it remains due to exceptions
             if 'file' in entry:
                 if os.path.exists(entry['file']):
                     log.debug('removing temp file %s (left behind) from %s' % (entry['file'], entry['title']))
@@ -212,19 +213,25 @@ class ModuleDownload:
             except:
                 raise ModuleWarning('Cannot create path %s' % path, log)
         
-        # combine to full path + filename, replace / from filename (#208)
-        destfile = os.path.join(path, entry.get('filename', entry['title']).replace('/', '_'))
-
-        if os.path.exists(destfile):
-            raise ModuleWarning('File \'%s\' already exists' % destfile, log)
-        
         # see that temp file is present
         if not os.path.exists(entry['file']):
             tmp_path = os.path.join(sys.path[0], 'temp')
             log.debug('entry: %s' % entry)
             log.debug('temp: %s' % ', '.join(os.listdir(tmp_path)))
-            raise ModuleWarning('Downloaded temp file \'%s\' doesn\'t exists!?' % entry['file'])
+            raise ModuleWarning("Downloaded temp file '%s' doesn't exist!?" % entry['file'])
 
+        # combine to full path + filename, replace / from filename (#208)
+        destfile = os.path.join(path, entry.get('filename', entry['title']).replace('/', '_'))
+
+        if os.path.exists(destfile):
+            if filecmp.cmp(entry['file'], destfile):
+                logging.debug("Identical destination file '%s' already exists", destfile)
+                os.remove(entry['file'])
+                del(entry['file'])
+                return
+            else:
+                raise ModuleWarning('File \'%s\' already exists' % destfile, log)
+        
         # move temp file
         logging.debug('moving %s to %s' % (entry['file'], destfile))
         shutil.move(entry['file'], destfile)
