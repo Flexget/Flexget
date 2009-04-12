@@ -423,13 +423,14 @@ class Manager:
             if callable(getattr(instance, method)):
                 modules.append(info)
         modules.sort(lambda x, y: cmp(x.get('priorities', {}).get(event, 0), \
-                                      y.get('priorities', {}).get(event, 0)))
-        xx = []
+                                      y.get('priorities', {}).get(event, 0)), reverse=True)
+        debug = []
         for m in modules:
             if 'priorities' in m:
                 if event in m['priorities']:
-                    xx.append(str(m['priorities'][event]))
-        #print ', '.join(xx)
+                    debug.append(str(m['priorities'][event]))
+        if debug:
+            log.debug('priorities: %s' % ', '.join(debug))
         
         return modules
 
