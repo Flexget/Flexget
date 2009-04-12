@@ -185,7 +185,7 @@ class Manager:
         logger = logging.getLogger()
         handler = logging.handlers.RotatingFileHandler(filename, maxBytes=200*1024, backupCount=9)
         # time format is same format of strftime
-        formatter = logging.Formatter('%(asctime)-15s %(levelname)-8s %(name)-11s %(message)s', '%y%m%d-%H:%M:%S')
+        formatter = logging.Formatter('%(asctime)-15s %(levelname)-8s %(name)-11s %(message)s', '%Y-%m-%d %H:%M')
         handler.setFormatter(formatter)
         logger.addHandler(handler)
         
