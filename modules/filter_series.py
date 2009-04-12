@@ -6,7 +6,7 @@ from utils.series import SeriesParser
 from manager import Base
 from sqlalchemy import Column, Integer, String, DateTime, Boolean, PickleType
 from sqlalchemy.schema import ForeignKey
-from sqlalchemy.orm import relation
+from sqlalchemy.orm import relation,join
 
 log = logging.getLogger('series')
 
@@ -291,12 +291,13 @@ class FilterSeries:
     def get_latest_info(self, feed, parser):
         """Return latest known identifier in dict (season, episode) for series name"""
         # TODO: this could be done using single query, but how?
-        series = feed.session.query(Series).filter(Series.name==parser.name).first()
+        # i think this should work -limon
+        # is really need order?
+        episode = feed.session.query(Episode).select_from(join(Episode,Series)).\
+            filter(Series.name==parser.name).order_by(Episode.number).order_by(Episode.season).first()
         log.debug('get_latest_info found series')
-        if not series:
+        if not episode:
             return False
-        episode = feed.session.query(Episode).order_by(Episode.season).\
-            order_by(Episode.number).filter(Episode.series_id==series.id).first()
         return {'season':episode.season, 'episode':episode.number}
 
     def downloaded(self, feed, parser):

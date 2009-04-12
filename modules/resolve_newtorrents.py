@@ -83,15 +83,22 @@ class NewTorrents:
                 raise ModuleWarning('The server couldn\'t fulfill the request. Error code: %s' % e.code, log)
         
         soup = BeautifulSoup(html)
+        # saving torrents in dict
         torrents = []
+        seeds = []
         for link in soup.findAll('a', attrs={'href': re.compile('down.php')}):
             torrent_url = 'http://www.newtorrents.info%s' % link.get('href')
             release_name = link.parent.next.get('title').replace('.',' ').lower()
+            # quick dirty hack
+            seed = link.findNext('td', attrs={'class': re.compile('s')}).renderContents()
             if release_name == name:
                 torrents.append(torrent_url)
+                seeds.append(seed)
             else:
                 log.debug('rejecting search result: %s != %s' % (release_name, name))
-
+        # sort with seed number Reverse order
+        torrents = [(seeds[i],torrents[i]) for i in range(len(torrents)) ]
+        torrents.sort(lambda x, y: y-x)
         # choose the torrent
         if not torrents:
             raise ModuleWarning('No matches for %s' % name, log, log_once=True)
@@ -100,5 +107,4 @@ class NewTorrents:
                 log.debug('found only one matching search result.')
             else:
                 log.debug('search result contains multiple matches, using first occurence from: %s' % torrents)
-                # TODO: use the one that has most downloaders / seeders
             return torrents[0]
