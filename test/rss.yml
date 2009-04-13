@@ -1,5 +1,5 @@
 feeds:
   test:
     rss: 
-      url: test/test_rss.xml
+      url: test/rss.xml
       silent: true

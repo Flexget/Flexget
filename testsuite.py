@@ -51,7 +51,7 @@ class FlexGetTestCase(unittest.TestCase):
 class TestFilterSeries(FlexGetTestCase):
 
     def setUp(self):
-        self.config = 'test/test_series.yml'
+        self.config = 'test/series.yml'
         FlexGetTestCase.setUp(self)
         self.feed.execute()
 
@@ -136,7 +136,7 @@ class TestFilterSeries(FlexGetTestCase):
 class TestRegexp(FlexGetTestCase):
 
     def setUp(self):
-        self.config = 'test/test_regexp.yml'
+        self.config = 'test/regexp.yml'
         FlexGetTestCase.setUp(self)
 
     def testAccept(self):
@@ -194,7 +194,7 @@ class TestResolvers(FlexGetTestCase):
     """
 
     def setUp(self):
-        self.config = 'test/test_resolvers.yml'
+        self.config = 'test/resolvers.yml'
         FlexGetTestCase.setUp(self)
         self.feed.execute()
         
@@ -230,7 +230,7 @@ class TestDisableBuiltins(FlexGetTestCase):
     """
         
     def setUp(self):
-        self.config = 'test/test_disable_builtins.yml'
+        self.config = 'test/disable_builtins.yml'
         FlexGetTestCase.setUp(self)
 
     def testDisableBuiltins(self):
@@ -243,7 +243,7 @@ class TestManager(FlexGetTestCase):
 
     def setUp(self):
         # just load with some conf
-        self.config = 'test/test_patterns.yml'
+        self.config = 'test/regexp.yml'
         FlexGetTestCase.setUp(self)
         
     def testFailed(self):
@@ -271,7 +271,7 @@ class TestManager(FlexGetTestCase):
 class TestFilterSeen(FlexGetTestCase):
         
     def setUp(self):
-        self.config = 'test/test_seen.yml'
+        self.config = 'test/seen.yml'
         FlexGetTestCase.setUp(self)
         
     def testSeen(self):
@@ -307,7 +307,7 @@ class TestFilterSeen(FlexGetTestCase):
 class TestFilterSeenMovies(FlexGetTestCase):
 
     def setUp(self):
-        self.config = 'test/test_seen_movies.yml'
+        self.config = 'test/seen_movies.yml'
         FlexGetTestCase.setUp(self)
             
     def testSeenMovies(self):
@@ -346,7 +346,7 @@ class TestFilterSeenMovies(FlexGetTestCase):
 class TestDownload(FlexGetTestCase):
 
     def setUp(self):
-        self.config = 'test/test_download.yml'
+        self.config = 'test/download.yml'
         FlexGetTestCase.setUp(self)
 
     def testDownload(self):
@@ -363,7 +363,7 @@ class TestDownload(FlexGetTestCase):
 class TestInputRSS(FlexGetTestCase):
 
     def setUp(self):
-        self.config = 'test/test_rss.yml'
+        self.config = 'test/rss.yml'
         FlexGetTestCase.setUp(self)
 
     def testInputRSS(self):
@@ -414,7 +414,7 @@ class TestInputRSS(FlexGetTestCase):
 class TestImdbOnline(FlexGetTestCase):
 
     def setUp(self):
-        self.config = 'test/test_imdb.yml'
+        self.config = 'test/imdb.yml'
         FlexGetTestCase.setUp(self)
         
     def testMovies(self):
@@ -430,7 +430,7 @@ class TestImdbOnline(FlexGetTestCase):
 class TestRssOnline(FlexGetTestCase):
 
     def setUp(self):
-        self.config = 'test/test_rss_online.yml'
+        self.config = 'test/rss_online.yml'
         FlexGetTestCase.setUp(self)
         
     def testFeeds(self):
@@ -440,7 +440,7 @@ class TestRssOnline(FlexGetTestCase):
 class TestScanImdb(FlexGetTestCase):
     
     def setUp(self):
-        self.config = 'test/test_scan_imdb.yml'
+        self.config = 'test/scan_imdb.yml'
         FlexGetTestCase.setUp(self)
 
     def testScanImdb(self):
