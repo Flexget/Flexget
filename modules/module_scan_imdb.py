@@ -19,9 +19,9 @@ class ModuleScanImdb:
         return validator.factory('boolean')
 
     def feed_filter(self, feed):
-        if not entry.has_key('description'):
-            return
         for entry in feed.entries:
+            if not entry.has_key('description'):
+                continue
             results = re.findall('(?:http://)?(?:www\.)?imdb.com/title/tt\d+',entry['description'])
             for result in results:
                 entry['imdb_url'] = result
