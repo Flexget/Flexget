@@ -1,6 +1,5 @@
 import logging
 from datetime import datetime
-from sys import maxint
 from utils.series import SeriesParser
 
 from manager import Base
@@ -202,6 +201,7 @@ class FilterSeries:
 
                 # reject episodes that have been marked as watched in config file
                 if 'watched' in conf:
+                    from sys import maxint
                     wconf = conf.get('watched')
                     season = wconf.get('season', -1)
                     episode = wconf.get('episode', maxint)
@@ -277,52 +277,50 @@ class FilterSeries:
         """Helper method for accepting series"""
         log.debug('Accepting %s' % parser.entry)
         feed.accept(parser.entry)
-        # store serie instance to entry for later use
+        # store series parser instance to entry for later use
         parser.entry['series_parser'] = parser
-        # remove entry instance from serie instance, not needed any more (save memory, circular reference?)
+        # remove entry instance from parser, not needed any more (prevents circular reference?)
         parser.entry = None
 
     def get_first_seen(self, feed, parser):
-        """Return datetime when this episode of serie was first seen"""
+        """Return datetime when this episode of series was first seen"""
         episode = feed.session.query(Episode).filter(Series.name==parser.name).\
             filter(Episode.series_id==Series.id).first()
         return episode.first_seen
         
     def get_latest_info(self, feed, parser):
         """Return latest known identifier in dict (season, episode) for series name"""
-        # TODO: this could be done using single query, but how?
-        # i think this should work -limon
-        episode = feed.session.query(Episode).select_from(join(Episode,Series)).\
+        episode = feed.session.query(Episode).select_from(join(Episode, Series)).\
             filter(Series.name==parser.name).order_by(Episode.number).order_by(Episode.season).first()
-        log.debug('get_latest_info found series')
         if not episode:
             return False
+        log.debug('get_latest_info, series: %s season: %s episode: %s' % \
+                  (parser.name, episode.season, episode.number))
         return {'season':episode.season, 'episode':episode.number}
 
     def downloaded(self, feed, parser):
         """Return true if episode is downloaded"""
-        series = feed.session.query(Series).filter(Series.name==parser.name).first()
-        episode = feed.session.query(Episode).filter(Episode.series_id==series.id).\
-            filter(Episode.identifier==parser.identifier()).first()
+        episode = feed.session.query(Episode).select_from(join(Episode, Series)).\
+            filter(Series.name==parser.name).first()
         if episode:
             return episode.downloaded
         return False
 
     def store(self, feed, parser):
-        """Push series parser information into database"""
+        """Push series information into database"""
         # if does not exist in database, add new
         series = feed.session.query(Series).filter(Series.name==parser.name).first()
         if not series:
-            #log.debug('Adding series %s into database' % parser.name)
+            log.debug('add series %s into database' % parser.name)
             series = Series()
             series.name = parser.name
             feed.session.add(series)
         
         # if episode does not exist in series, add new
         episode = feed.session.query(Episode).filter(Episode.series_id==series.id).\
-            filter(Episode.identifier==parser.identifier).first()
+            filter(Episode.identifier==parser.identifier()).first()
         if not episode:
-            #log.debug('Adding episode %s into series %s' % (parser.identifier(), parser.name))
+            log.debug('add episode %s into series %s' % (parser.identifier(), parser.name))
             episode = Episode()
             episode.identifier = parser.identifier()
             # if episodic format
@@ -335,23 +333,26 @@ class FilterSeries:
         quality = feed.session.query(Quality).filter(Quality.episode_id==episode.id).\
             filter(Quality.quality==parser.quality).first()
         if not quality:
-            #log.debug('Adding quality %s into series %s episode %s' % (parser.quality, \
-            #                                                           parser.name, parser.identifier()))
+            log.debug('add quality %s into series %s episode %s' % (parser.quality, \
+                                                                    parser.name, parser.identifier()))
             quality = Quality()
-            quality.entry = parser.entry
+            
+            # TODO:
+            # This CRASHES sqlalchemy in SOME cases, not all
+            #quality.entry = parser.entry
+            
+            # HACK: create copy of entry, this however does NOT contain all information from the original!
+            from feed import Entry
+            quality.entry = Entry(parser.entry['title'], parser.entry['url'])
+
             quality.quality = parser.quality
             episode.qualities.append(quality) # pylint: disable-msg=E1103
 
     def mark_downloaded(self, feed, parser):
         """Mark episode as being downloaded"""
-        
-        log.debug('marking series %s identifier %s as downloaded' % (parser.name, parser.identifier()))
-
-        # TODO: this could be done using single query, but how?
-        # not tried
-        episode = feed.session.query(Episode).select_from(join(Episode,Series)).\
-            filter(Episode.series_id==Series.id).filter(Series.name==parser.name).\
-            filter(Episode.identifier==parser.identifier).one()
+        log.debug('marking as downloaded %s' % parser)
+        episode = feed.session.query(Episode).select_from(join(Episode, Series)).\
+            filter(Series.name==parser.name).filter(Episode.identifier==parser.identifier()).first()
         episode.downloaded = True
 
     def feed_exit(self, feed):

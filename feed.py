@@ -91,7 +91,7 @@ class Feed:
         """Purge entries in list from feed.entries"""
         for entry in self.entries[:]:
             if entry in entries and entry not in not_in_list:
-                log.debug('Purging entry %s' % entry.safe_str())
+                #log.debug('Purging entry %s' % entry.safe_str())
                 self.entries.remove(entry)
                 if count:
                     self.__purged += 1

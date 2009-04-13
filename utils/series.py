@@ -8,6 +8,8 @@ class SeriesParser:
     
     propers = ['proper', 'repack']
     
+    specials = ['special']
+    
     def __init__(self):
         # name of the serie
         self.name = None 
@@ -30,6 +32,7 @@ class SeriesParser:
         self.entry = None
         # repack / proper
         self.proper_or_repack = False
+        self.special = False
 
     def parse(self):
         if not self.name or not self.data:
@@ -84,9 +87,8 @@ class SeriesParser:
                 
         # TODO: matched name should be EXCLUDED from ep and id searching!
 
-        # search quality, proper/repack
+        # search tags
         for part in data_parts:
-            # search for quality
             if part in self.qualities:
                 if self.qualities.index(part) < self.qualities.index(self.quality):
                     #log.debug('%s storing quality %s' % (self.name, part))
@@ -96,6 +98,8 @@ class SeriesParser:
                     #log.debug('%s ignoring quality tag %s because found better %s' % (self.name, part, self.quality))
             if part in self.propers:
                 self.proper_or_repack = True
+            if part in self.specials:
+                self.special = True
 
         # search for season and episode number
         for ep_re in self.ep_regexps:
@@ -115,6 +119,8 @@ class SeriesParser:
             if match:
                 #log.debug('found id with regexp %s' % id_re)
                 self.id = '-'.join(match.groups())
+                if self.special:
+                    self.id += '-SPECIAL'
                 self.valid = True
                 return
 
@@ -122,12 +128,12 @@ class SeriesParser:
 
     def identifier(self):
         """Return identifier for parsed episode"""
-        if not self.valid: raise Exception('Serie flagged invalid')
+        if not self.valid: raise Exception('Series flagged invalid')
         return self.id
 
     def __str__(self):
         valid = 'INVALID'
         if self.valid:
             valid = 'OK'
-        return 'serie: %s, id: %s season: %s episode: %s quality: %s status: %s' % \
+        return 'series: %s, id: %s season: %s episode: %s quality: %s status: %s' % \
         (str(self.name), str(self.id), str(self.season), str(self.episode), str(self.quality), valid)
