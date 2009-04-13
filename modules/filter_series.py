@@ -292,7 +292,6 @@ class FilterSeries:
         """Return latest known identifier in dict (season, episode) for series name"""
         # TODO: this could be done using single query, but how?
         # i think this should work -limon
-        # is really need order?
         episode = feed.session.query(Episode).select_from(join(Episode,Series)).\
             filter(Series.name==parser.name).order_by(Episode.number).order_by(Episode.season).first()
         log.debug('get_latest_info found series')
@@ -349,8 +348,9 @@ class FilterSeries:
         log.debug('marking series %s identifier %s as downloaded' % (parser.name, parser.identifier()))
 
         # TODO: this could be done using single query, but how?
-        series = feed.session.query(Series).filter(Series.name==parser.name).one()
-        episode = feed.session.query(Episode).filter(Episode.series_id==series.id).\
+        # not tried
+        episode = feed.session.query(Episode).select_from(join(Episode,Series)).\
+            filter(Episode.series_id==Series.id).filter(Series.name==parser.name).\
             filter(Episode.identifier==parser.identifier).one()
         episode.downloaded = True
 

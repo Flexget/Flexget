@@ -3,6 +3,7 @@ import sys
 import logging
 import logging.handlers
 import time
+from datetime import datetime
 
 log = logging.getLogger('manager')
 
@@ -50,6 +51,23 @@ class MergeException(Exception):
 
 Base = declarative_base()
 Session = sessionmaker()
+
+from sqlalchemy import Column, Integer, String, DateTime
+class FailedEntry(Base):
+    __tablename__ =  'failed'
+
+    id = Column(Integer, primary_key=True)
+    title = Column(String)
+    url = Column(String)
+    tof = Column(DateTime, default=datetime.now())
+
+    def __init__(self, title, url):
+        self.title = title
+        self.url = url
+
+    def __repr__(self):
+        return '<Failed(title=%s)>' % (self.title)
+
 
 class Manager:
 
@@ -501,10 +519,15 @@ class Manager:
             
     def print_failed(self):
         """Parameter --failed"""
-        print 'TODO: broken'
         
-        # TODO: RE-IMPLEMENT
-        
+        failed = Session()
+        results = failed.query(FailedEntry).all()
+        if (len(results) == 0):
+            print 'No failed entries recorded'
+        for entry in results:
+            print '%16s - %s' % (entry.tof.strftime('%Y-%m-%d %H:%M'), entry.title)
+        failed.close()
+
         """
         failed = self.shelve_session.setdefault('failed', [])
         if not failed:
@@ -517,10 +540,20 @@ class Manager:
         
     def add_failed(self, entry):
         """Adds entry to internal failed list, displayed with --failed"""
-        return
         
-        # TODO: RE-IMPLEMENT
-        
+        failed = Session()
+        failedentry = FailedEntry(entry['title'],entry['url'])
+        #TODO: query item's existence
+        if not failed.query(FailedEntry).filter(FailedEntry.title==entry['title']).one():
+            failed.add(failedentry)
+        #TODO: limit item number to 25
+        i = 0
+        for row in failed.query(FailedEntry).order_by(FailedEntry.tof.desc()).all():
+            i=i+1
+            if (i>25):
+                failed.delete(row)
+        failed.commit()
+        failed.close()
         """
         failed = self.shelve_session.setdefault('failed', [])
         f = {}
@@ -538,7 +571,11 @@ class Manager:
     def clear_failed(self):
         """Clears list of failed entries"""
         
-        # TODO: RE-IMPLEMENT
+        session = Session()
+        for row in session.query(FailedEntry).all():
+            session.delete(row)
+        session.commit()
+        session.close()
         
         """
         print 'Cleared %i items.' % len(self.shelve_session.setdefault('failed', []))
