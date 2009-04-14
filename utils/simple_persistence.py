@@ -12,12 +12,12 @@ class SimpleKeyValue(Base):
     
     id = Column(Integer, primary_key=True)
     feed = Column(String)
-    module = Column(String)
+    plugin = Column(String)
     key = Column(String)
     value = Column(PickleType)
     added = Column(DateTime, default=datetime.now())
 
-    def __init__(self, feed, module, key, value):
+    def __init__(self, feed, plugin, key, value):
         self.feed = feed
         self.key = key
         self.value = value
@@ -31,12 +31,12 @@ class SimplePersistence(object):
         self.feed = feed
         
     def set(self, key, value):
-        skv = SimpleKeyValue(self.feed.name, self.feed.current_module, key, value)
+        skv = SimpleKeyValue(self.feed.name, self.feed.current_plugin, key, value)
         self.feed.session.add(skv)
     
     def get(self, key, default=None):
         skv = self.feed.session.query(SimpleKeyValue).filter(SimpleKeyValue.feed==self.feed.name).\
-            filter(SimpleKeyValue.module==self.feed.current_module).filter(SimpleKeyValue.key==key).first()
+            filter(SimpleKeyValue.plugin==self.feed.current_plugin).filter(SimpleKeyValue.key==key).first()
         if not skv:
             return default
         else:

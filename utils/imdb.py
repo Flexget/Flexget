@@ -242,7 +242,7 @@ class ImdbParser:
                 self.name = tag_name.next.string.strip()
                 log.debug('Detected name: %s' % self.name)
         else:
-            log.warning('Unable to get name for %s - module needs update?' % url)
+            log.warning('Unable to get name for %s - plugin needs update?' % url)
             
         # get votes
         tag_votes = soup.find('b', text=re.compile('\d votes'))
@@ -251,7 +251,7 @@ class ImdbParser:
             self.votes = int(str_votes)
             log.debug('Detected votes: %s' % self.votes)
         else:
-            log.warning('Unable to get votes for %s - module needs update?' % url)
+            log.warning('Unable to get votes for %s - plugin needs update?' % url)
 
         # get score
         tag_score = soup.find('b', text=re.compile('\d.\d/10'))
@@ -264,7 +264,7 @@ class ImdbParser:
                 self.score = float(str_score)
                 log.debug('Detected score: %s' % self.score)
         else:
-            log.warning('Unable to get score for %s - module needs update?' % url)
+            log.warning('Unable to get score for %s - plugin needs update?' % url)
 
         # get genres
         for link in soup.findAll('a', attrs={'href': re.compile('^/Sections/Genres/')}):
@@ -285,7 +285,7 @@ class ImdbParser:
             self.year = int(tag_year.string)
             log.debug('Detected year: %s' % self.year)
         else:
-            log.warning('Unable to get year for %s - module needs update?' % url)
+            log.warning('Unable to get year for %s - plugin needs update?' % url)
 
         # get plot outline
         tag_outline = soup.find('h5', text=re.compile('Plot.*:'))
