@@ -61,17 +61,17 @@ class Feed:
         
         # You should NOT change these arrays, use reject / accept methods!
         
-        self.accepted = [] # accepted entries are accepted, can still be rejected
+        self.accepted = [] # accepted entries, can still be rejected
         self.rejected = [] # rejected entries
         self.failed = []
 
-        # TODO: feed.abort() should be done by using exception, not a flag that has to be checked everywhere
+        # TODO: feed.abort() should be done by using exception? not a flag that has to be checked everywhere
 
         # flags and counters
         self.__abort = False
         self.__purged = 0
         
-        # state
+        # current state
         self.current_event = None
         self.current_module = None
         
@@ -101,6 +101,7 @@ class Feed:
             self.accepted.append(entry)
             self.verbose_details('Accepted %s' % entry['title'], reason)
 
+    # TODO: remove at some point
     def filter(self, entry, reason=None):
         log.critical('module %s called deprecated method feed.filter' % self.current_module)
 
