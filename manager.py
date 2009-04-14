@@ -35,7 +35,7 @@ class RegisterException(Exception):
     def __str__(self):
         return repr(self.value)
 
-class ModuleWarning(Warning):
+class PluginWarning(Warning):
     def __init__(self, value, logger=logging, **kwargs):
         self.value = value
         self.log = logger
@@ -78,7 +78,7 @@ class Manager:
         self.unit_test = unit_test
         self.configname = None
         self.options = None
-        self.modules = {}
+        self.plugins = {}
         self.config = {}
         
         # events
@@ -88,14 +88,14 @@ class Manager:
                               'output':'feed_output', 'exit':'feed_exit', 'abort':'feed_abort',
                               'terminate':'application_terminate'}
         
-        # pass current module instance around while loading
+        # pass current plugin instance around while loading
         self.__instance = False
         self.__class_name = None
-        self.__load_queue = self.events + ['module', 'source']
+        self.__load_queue = self.events + ['module', 'plugin', 'source']
         self.__event_queue = {}
 
         # settings
-        self.moduledir = os.path.join(sys.path[0], 'modules')
+        self.plugindir = os.path.join(sys.path[0], 'plugins')
         
         # shelve
         self.shelve_session = None
@@ -113,13 +113,13 @@ class Manager:
         parser.add_option('--feed', action='store', dest='onlyfeed', default=None,
                           help='Run only specified feed.')
         parser.add_option('--no-cache', action='store_true', dest='nocache', default=0,
-                          help='Disable caches. Works only in modules that have explicit support.')
+                          help='Disable caches. Works only in plugins that have explicit support.')
         parser.add_option('--reset', action='store_true', dest='reset', default=0,
                           help='Forgets everything that has been done and learns current matches.')
         parser.add_option('--doc', action='store', dest='doc',
-                          help='Display module documentation (example: --doc patterns). See --list.')
+                          help='Display plugin documentation (example: --doc patterns). See --list.')
         parser.add_option('--list', action='store_true', dest='list', default=0,
-                          help='List all available modules.')
+                          help='List all available plugins.')
         parser.add_option('--failed', action='store_true', dest='failed', default=0,
                           help='List recently failed entries.')
         parser.add_option('--clear', action='store_true', dest='clear_failed', default=0,
@@ -149,17 +149,17 @@ class Manager:
         parser.add_option('--online', action='store_true', dest='unittest_online', default=0,
                           help=SUPPRESS_HELP)
 
-        # add module path to sys.path so that imports work properly ..
-        sys.path.append(self.moduledir)
+        # add plugin path to sys.path so that imports work properly ..
+        sys.path.append(self.plugindir)
         sys.path.insert(1, os.path.join(sys.path[0], 'BeautifulSoup-3.0.7a'))
 
-        # load modules, modules may add more commandline parameters!
+        # load plugins, plugins may add more commandline parameters!
         start_time = time.clock()
-        self.load_modules(parser, self.moduledir)
+        self.load_plugins(parser, self.plugindir)
         took = time.clock() - start_time
-        log.debug('load_modules took %.2f seconds' % took)
+        log.debug('load_plugins took %.2f seconds' % took)
 
-        # parse options including module customized options
+        # parse options including plugin customized options
         self.options = parser.parse_args()[0]
         
         # perform commandline sanity check(s)
@@ -256,7 +256,7 @@ class Manager:
             Base.metadata.drop_all(bind=engine)
         Base.metadata.create_all(bind=engine)
 
-    # TODO: move into utils?! used only by couple times in modules anymore ...
+    # TODO: move into utils?! used only by couple times in plugins anymore ...
     def sanitize(self, d):
         """Makes dictionary d contain only yaml.safe_dump compatible elements"""
         import types
@@ -275,9 +275,9 @@ class Manager:
                 log.debug('Removed non yaml compatible key %s %s' % (k, type(d[k])))
                 d.pop(k)
 
-    def load_modules(self, parser, moduledir):
-        """Load all modules from moduledir"""
-        loaded = {} # prevent modules being loaded multiple times when they're imported by other modules
+    def load_plugins(self, parser, plugindir):
+        """Load all plugins from plugindir"""
+        loaded = {} # prevent plugins being loaded multiple times when they're imported by other plugins
         
         # ----------------------------------------------------------------------------------------------
         # TODO: HACK! Loading method tries to instantiate SQLAlchemy func since it has register method!
@@ -285,22 +285,22 @@ class Manager:
         loaded['func'] = True
         
         for prefix in self.__load_queue:
-            for module in self.find_modules(moduledir, prefix):
-                log.debug('loading module %s' % module)
+            for plugin in self.find_plugins(plugindir, prefix):
+                log.debug('loading plugin %s' % plugin)
                 try:
-                    module = __import__(module)
+                    plugin = __import__(plugin)
                 except Exception, e:
-                    log.critical('Module %s is faulty! Ignored!' % module)
+                    log.critical('Plugin %s is faulty! Ignored!' % plugin)
                     log.exception(e)
                     continue
-                for name, item in vars(module).iteritems():
+                for name, item in vars(plugin).iteritems():
                     if loaded.get(name, False): 
                         continue
                     if hasattr(item, 'register'):
                         try:
                             instance = item()
-                            # store current module instance so register method may access it
-                            # without modules having to explicitly give it as parameter
+                            # store current plugin instance so register method may access it
+                            # without plugins having to explicitly give it as parameter
                             self.__instance = instance
                             self.__class_name = name
                         except:
@@ -312,26 +312,26 @@ class Manager:
                                 method(self, parser)
                                 loaded[name] = True
                             except RegisterException, e:
-                                log.critical('Error while registering module %s. %s' % (name, e.value))
+                                log.critical('Error while registering plugin %s. %s' % (name, e.value))
                             except TypeError, e:
-                                log.critical('Module %s register method has invalid signature!' % name)
+                                log.critical('Plugin %s register method has invalid signature!' % name)
                                 log.exception(e)
                         else:
-                            log.critical('Module %s register method is not callable' % name)
+                            log.critical('Plugin %s register method is not callable' % name)
         
-        # check that event queue is empty (all module created events succeeded)
+        # check that event queue is empty (all plugin created events succeeded)
         if self.__event_queue:
             for event, info in self.__event_queue.iteritems():
-                log.error('Module %s requested new event %s, but it could not be created at requested \
-                point (before, after). Module is not working properly.' % (info['class_name'], event))
+                log.error('plugin %s requested new event %s, but it could not be created at requested \
+                point (before, after). plugin is not working properly.' % (info['class_name'], event))
 
-    def find_modules(self, directory, prefix):
-        """Return array containing all modules in passed path that begin with prefix."""
-        modules = []
+    def find_plugins(self, directory, prefix):
+        """Return array containing all plugins in passed path that begin with prefix."""
+        plugins = []
         for fn in os.listdir(directory):
             if fn.startswith(prefix+'_') and fn.endswith('.py'):
-                modules.append(fn[:-3])
-        return modules
+                plugins.append(fn[:-3])
+        return plugins
 
     def get_settings(self, keyword, defaults={}):
         # TO BE REMOVED
@@ -355,7 +355,7 @@ class Manager:
 
     def register(self, name, **kwargs):
         """
-            Register module with name.
+            Register plugin with name.
 
             **kwargs options:
             
@@ -364,17 +364,17 @@ class Manager:
             group - str
             groups - list of groups (str)
             
-            Modules may also pass any number of additional values to be stored in module info (dict).
+            plugins may also pass any number of additional values to be stored in plugin info (dict).
             
         """
-        if name in self.modules:
-            raise RegisterException('Module %s is already registered' % name)
+        if name in self.plugins:
+            raise RegisterException('plugin %s is already registered' % name)
         info = kwargs
         info['instance'] = self.__instance
         info['name'] = name
-        info.setdefault('events', False)   # module has events
+        info.setdefault('events', False)   # plugin has events
         info.setdefault('builtin', False)
-        # probulate module
+        # probulate plugin
         for event, method in self.event_methods.iteritems():
             if hasattr(info['instance'], method):
                 if callable(getattr(info['instance'], method)):
@@ -387,10 +387,10 @@ class Manager:
                 info['priorities'][event] = info[key]
                 del(info[key])
                 
-        self.modules[name] = info
+        self.plugins[name] = info
         
     def add_feed_event(self, event_name, **kwargs):
-        """Register new event in FlexGet and queue module loading for them. 
+        """Register new event in FlexGet and queue plugin loading for them. 
         Note: queue works only while loading is in process."""
         
         if 'before' in kwargs and 'after' in kwargs:
@@ -409,7 +409,7 @@ class Manager:
                     return False
             # add method name to event -> method lookup table
             self.event_methods[name] = 'feed_'+name
-            # queue module loading for this type
+            # queue plugin loading for this type
             self.__load_queue.append(event_name)
             # place event in event list
             if args.get('after'):
@@ -429,94 +429,94 @@ class Manager:
             if add_event(event_name, kwargs):
                 del self.__event_queue[event_name]
 
-    def get_modules_by_event(self, event):
-        """Return all modules that hook event in order of priority."""
-        modules = []
+    def get_plugins_by_event(self, event):
+        """Return all plugins that hook event in order of priority."""
+        plugins = []
         if not event in self.event_methods:
             raise Exception('Unknown event %s' % event)
         method = self.event_methods[event]
-        for _, info in self.modules.iteritems():
+        for _, info in self.plugins.iteritems():
             instance = info['instance']
             if not hasattr(instance, method):
                 continue
             if callable(getattr(instance, method)):
-                modules.append(info)
-        modules.sort(lambda x, y: cmp(x.get('priorities', {}).get(event, 0), \
+                plugins.append(info)
+        plugins.sort(lambda x, y: cmp(x.get('priorities', {}).get(event, 0), \
                                       y.get('priorities', {}).get(event, 0)), reverse=True)
         debug = []
-        for m in modules:
+        for m in plugins:
             if 'priorities' in m:
                 if event in m['priorities']:
                     debug.append(str(m['priorities'][event]))
         if debug:
             log.debug('priorities: %s' % ', '.join(debug))
         
-        return modules
+        return plugins
 
-    def get_modules_by_group(self, group):
-        """Return all modules with in specified group."""
+    def get_plugins_by_group(self, group):
+        """Return all plugins with in specified group."""
         res = []
-        for _, info in self.modules.iteritems():
+        for _, info in self.plugins.iteritems():
             if info.get('group', '')==group or group in info.get('groups', []):
                 res.append(info)
         return res
         
-    def get_module_by_name(self, name):
-        """Get module by name, prefered way since manager.modules structure may be changed at some point."""
-        if not name in self.modules:
-            raise Exception('Unknown module %s' % name)
-        return self.modules[name]
+    def get_plugin_by_name(self, name):
+        """Get plugin by name, prefered way since manager.plugins structure may be changed at some point."""
+        if not name in self.plugins:
+            raise Exception('Unknown plugin %s' % name)
+        return self.plugins[name]
 
-    def print_module_list(self):
+    def print_plugin_list(self):
         # TODO: rewrite!
         """Parameter --list"""
         print '-'*60
         print '%-20s%-30s%s' % ('Keyword', 'Roles', '--doc')
         print '-'*60
-        modules = []
+        plugins = []
         roles = {}
         for event in self.events:
             try:
-                ml = self.get_modules_by_event(event)
+                ml = self.get_plugins_by_event(event)
             except:
                 continue
             for m in ml:
                 dupe = False
-                for module in modules:
-                    if module['name'] == m['name']: 
+                for plugin in plugins:
+                    if plugin['name'] == m['name']: 
                         dupe = True
                 if not dupe:
-                    modules.append(m)
+                    plugins.append(m)
             # build roles list
             for m in ml:
                 if m['name'] in roles:
                     roles[m['name']].append(event)
                 else:
                     roles[m['name']] = [event]
-        for module in modules:
+        for plugin in plugins:
             # do not include test classes, unless in debug mode
-            if module.get('debug_module', False) and not self.options.debug:
+            if plugin.get('debug_plugin', False) and not self.options.debug:
                 continue
             doc = 'Yes'
-            if not module['instance'].__doc__: 
+            if not plugin['instance'].__doc__: 
                 doc = 'No'
-            print '%-20s%-30s%s' % (module['name'], ', '.join(roles[module['name']]), doc)
+            print '%-20s%-30s%s' % (plugin['name'], ', '.join(roles[plugin['name']]), doc)
         print '-'*60
 
-    def print_module_doc(self):
+    def print_plugin_doc(self):
         """Parameter --doc <keyword>"""
         keyword = self.options.doc
         found = False
-        module = self.modules.get(keyword, None)
-        if module:
+        plugin = self.plugins.get(keyword, None)
+        if plugin:
             found = True
-            if not module['instance'].__doc__:
-                print 'Module %s does not have documentation' % keyword
+            if not plugin['instance'].__doc__:
+                print 'plugin %s does not have documentation' % keyword
             else:
-                print module['instance'].__doc__
+                print plugin['instance'].__doc__
             return
         if not found:
-            print 'Could not find module %s' % keyword
+            print 'Could not find plugin %s' % keyword
             
     def print_failed(self):
         """Parameter --failed"""
@@ -601,7 +601,7 @@ class Manager:
             # validate (TODO: make use of validator?)
             if not isinstance(self.config['feeds'][name], dict):
                 if isinstance(self.config['feeds'][name], str):
-                    if name in self.modules:
+                    if name in self.plugins:
                         log.error('\'%s\' is known keyword, but in wrong indentation level. \
                         Please indent it correctly under feed, it should have 2 more spaces \
                         than feed name.' % name)

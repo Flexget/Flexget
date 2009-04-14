@@ -1,6 +1,6 @@
 import logging
 from datetime import datetime
-from manager import ModuleWarning
+from manager import PluginWarning
 from utils.simple_persistence import SimplePersistence
 
 log = logging.getLogger('feed')
@@ -12,7 +12,7 @@ class Entry(dict):
         See. http://flexget.com/wiki/DevelopersEntry
 
         Internally stored original_url is necessary because
-        modules (ie. resolvers) may change this into something else 
+        plugins (ie. resolvers) may change this into something else 
         and otherwise that information would be lost.
     """
 
@@ -73,10 +73,10 @@ class Feed:
         
         # current state
         self.current_event = None
-        self.current_module = None
+        self.current_plugin = None
         
     def _purge(self):
-        log.critical('module %s called deprecated method feed._purge' % self.current_module)
+        log.critical('plugin %s called deprecated method feed._purge' % self.current_plugin)
 
     def __purge_failed(self):
         """Purge failed entries from feed."""
@@ -103,11 +103,11 @@ class Feed:
 
     # TODO: remove at some point
     def filter(self, entry, reason=None):
-        log.critical('module %s called deprecated method feed.filter' % self.current_module)
+        log.critical('plugin %s called deprecated method feed.filter' % self.current_plugin)
 
     def reject(self, entry, reason=None):
         """Reject this entry immediately and permanently."""
-        # schedule immediately filtering after this module has done execution
+        # schedule immediately filtering after this plugin has done execution
         if not entry in self.rejected:
             self.rejected.append(entry)
             self.verbose_details('Rejected %s' % entry['title'], reason)
@@ -121,7 +121,7 @@ class Feed:
             self.verbose_details('Failed %s' % entry['title'], reason)
 
     def abort(self, **kwargs):
-        """Abort this feed execution, no more modules will be executed."""
+        """Abort this feed execution, no more plugins will be executed."""
         if not self.__abort and not kwargs.get('silent', False):
             log.info('Aborting feed %s' % self.name)
         self.__abort = True
@@ -145,7 +145,7 @@ class Feed:
     def get_input_url(self, keyword):
         # TODO: move to better place?
         """
-            Helper method for modules. Return url for a specified keyword.
+            Helper method for plugins. Return url for a specified keyword.
             Supports configuration in following forms:
                 <keyword>: <address>
             and
@@ -174,9 +174,9 @@ class Feed:
                 reason_str = ''
                 if reason:
                     reason_str = ' (%s)' % reason
-                print "+ %-8s %-12s %s%s" % (self.current_event, self.current_module, msg, reason_str)
+                print "+ %-8s %-12s %s%s" % (self.current_event, self.current_plugin, msg, reason_str)
             except:
-                print "+ %-8s %-12s ERROR: Unable to print %s" % (self.current_event, self.current_module, repr(msg))
+                print "+ %-8s %-12s ERROR: Unable to print %s" % (self.current_event, self.current_plugin, repr(msg))
 
     def verbose_details_entries(self):
         """If details option is enabled, print all produced entries"""
@@ -185,20 +185,20 @@ class Feed:
                 self.verbose_details('%s' % entry['title'])
             
     def __run_event(self, event):
-        """Execute module events if module is configured for this feed."""
-        modules = self.manager.get_modules_by_event(event)
+        """Execute plugin events if plugin is configured for this feed."""
+        plugins = self.manager.get_plugins_by_event(event)
 
-        for module in modules:
-            keyword = module['name']
-            if keyword in self.config or module['builtin']:
+        for plugin in plugins:
+            keyword = plugin['name']
+            if keyword in self.config or plugin['builtin']:
                 # store execute info
                 self.current_event = event
-                self.current_module = keyword
-                # call the module
+                self.current_plugin = keyword
+                # call the plugin
                 try:
                     method = self.manager.event_methods[event]
-                    getattr(module['instance'], method)(self)
-                except ModuleWarning, warn:
+                    getattr(plugin['instance'], method)(self)
+                except PluginWarning, warn:
                     # this warning should be logged only once (may keep repeating)
                     if warn.kwargs.get('log_once', False):
                         from utils.log import log_once
@@ -206,7 +206,7 @@ class Feed:
                     else:
                         warn.log.warning(warn)
                 except Exception, e:
-                    log.exception('Unhandled error in module %s: %s' % (keyword, e))
+                    log.exception('Unhandled error in plugin %s: %s' % (keyword, e))
                     self.abort()
                 # remove entries
                 self.__purge_rejected()
@@ -230,12 +230,12 @@ class Feed:
             if self.manager.options.learn:
                 if event in ['download', 'output']: 
                     # log keywords not executed
-                    modules = self.manager.get_modules_by_event(event)
-                    for module in modules:
-                        if module['name'] in self.config:
-                            log.info('Feed %s keyword %s is not executed because of learn/reset.' % (self.name, module['name']))
+                    plugins = self.manager.get_plugins_by_event(event)
+                    for plugin in plugins:
+                        if plugin['name'] in self.config:
+                            log.info('Feed %s keyword %s is not executed because of learn/reset.' % (self.name, plugin['name']))
                     continue
-            # run all modules with this event
+            # run all plugins with this event
             self.__run_event(event)
             # TODO: should we purge rejected and failed between events?
             
@@ -258,25 +258,25 @@ class Feed:
         self.__run_event('terminate')
 
     def validate(self):
-        """Module configuration validation. Return array of error messages that were detected."""
+        """Plugin configuration validation. Return array of error messages that were detected."""
         validate_errors = []
-        # validate all modules
+        # validate all plugins
         for keyword in self.config:
-            module = self.manager.modules.get(keyword)
-            if not module:
-                validate_errors.append('Unknown module \'%s\'' % keyword)
+            plugin = self.manager.plugins.get(keyword)
+            if not plugin:
+                validate_errors.append('Unknown plugin \'%s\'' % keyword)
                 continue
-            if hasattr(module['instance'], 'validator'):
+            if hasattr(plugin['instance'], 'validator'):
                 try:
-                    validator = module['instance'].validator()
+                    validator = plugin['instance'].validator()
                 except TypeError:
-                    log.critical('invalid validator method in module %s' % keyword)
+                    log.critical('invalid validator method in plugin %s' % keyword)
                     continue
                 if not validator.validate(self.config[keyword]):
                     for msg in validator.errors.messages:
                         validate_errors.append('%s %s' % (keyword, msg))
             else:
-                log.warning('Used module %s does not support validating. Please notify author!' % keyword)
+                log.warning('Used plugin %s does not support validating. Please notify author!' % keyword)
                 
         # log errors and abort
         if validate_errors:

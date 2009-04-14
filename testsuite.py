@@ -35,11 +35,11 @@ class FlexGetTestCase(unittest.TestCase):
         self.feed = Feed(self.manager, name, config)
         self.feed.session = Session()
         
-    def get_module(self, event, keyword):
-        module = self.manager.modules.get(keyword)
-        if not module:
-            raise Exception('module %s isn\'t loaded (event %s)' % (keyword, event))
-        return module
+    def get_plugin(self, event, keyword):
+        plugin = self.manager.plugins.get(keyword)
+        if not plugin:
+            raise Exception('plugin %s isn\'t loaded (event %s)' % (keyword, event))
+        return plugin
 
     def dump(self):
         """Helper method for debugging"""
@@ -208,7 +208,7 @@ class TestResolvers(FlexGetTestCase):
         self.feed.execute()
         
     def get_resolver(self, name):
-        info = self.manager.get_module_by_name(name)
+        info = self.manager.get_plugin_by_name(name)
         return info['instance']
         
     def testPirateBay(self):

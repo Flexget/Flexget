@@ -1,0 +1,31 @@
+import logging
+
+__pychecker__ = 'unusednames=parser,feed'
+  
+log = logging.getLogger('disable_builtins')
+
+class PluginDisableBuiltins:
+    """
+        Disables all builtin plugins from a feed.
+    """
+    
+    def register(self, manager, parser):
+        manager.register('disable_builtins')
+        self.disabled = []
+        
+    def validator(self):
+        import validator
+        return validator.factory('any')
+        
+    def feed_start(self, feed):
+        for name, plugin in feed.manager.plugins.iteritems():
+            if plugin['builtin']:
+                log.debug('Disabling builtin plugin %s' % name)
+                plugin['builtin'] = False
+                self.disabled.append(name)
+        
+    def feed_exit(self, feed):
+        for name in self.disabled:
+            log.debug('Enabling builtin plugin %s' % name)
+            feed.manager.plugins[name]['builtin'] = True
+        self.disabled = []
