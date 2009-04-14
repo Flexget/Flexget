@@ -529,16 +529,6 @@ class Manager:
             print '%16s - %s' % (entry.tof.strftime('%Y-%m-%d %H:%M'), entry.title)
         failed.close()
 
-        """
-        failed = self.shelve_session.setdefault('failed', [])
-        if not failed:
-            print 'No failed entries recorded'
-        for entry in failed:
-            tof = datetime(*entry['tof'])
-            print '%16s - %s' % (tof.strftime('%Y-%m-%d %H:%M'), entry['title'])
-            print '%16s - %s' % ('', entry['url'])
-        """
-        
     def add_failed(self, entry):
         """Adds entry to internal failed list, displayed with --failed"""
         
@@ -555,33 +545,17 @@ class Manager:
                 failed.delete(row)
         failed.commit()
         failed.close()
-        """
-        failed = self.shelve_session.setdefault('failed', [])
-        f = {}
-        f['title'] = entry['title']
-        f['url'] = entry['url']
-        f['tof'] = list(datetime.today().timetuple())[:-4]
-        for lf in failed[:]:
-            if lf['title'] == f['title'] and lf['url'] == f['url']:
-                failed.remove(lf)
-        failed.append(f)
-        while len(failed) > 25:
-            failed.pop(0)
-        """
             
     def clear_failed(self):
         """Clears list of failed entries"""
         
         session = Session()
-        for row in session.query(FailedEntry).all():
+        results = session.query(FailedEntry).all()
+        for row in results:
             session.delete(row)
+        print 'Cleared %i items.' % len(results)
         session.commit()
         session.close()
-        
-        """
-        print 'Cleared %i items.' % len(self.shelve_session.setdefault('failed', []))
-        self.shelve_session['failed'] = []
-        """
 
     def merge_dict_from_to(self, d1, d2):
         """Merges dictionary d1 into dictionary d2. d1 will remain in original form."""
