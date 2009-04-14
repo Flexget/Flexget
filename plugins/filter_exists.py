@@ -35,4 +35,4 @@ class FilterExists:
                 name = entry['title']
                 if name in dirs or name in files:
                     log.debug('Found %s in %s' % (name, root))
-                    feed.reject(entry, '%s' % (name, root))
+                    feed.reject(entry, '%s/%s' % (name, root))
