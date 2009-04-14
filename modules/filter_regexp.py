@@ -1,6 +1,7 @@
 import urllib
 import logging
 import re
+from manager import ModuleWarning
 
 log = logging.getLogger('regexp')
 
@@ -58,6 +59,8 @@ class FilterRegexp:
             
         if 'rest' in config:
             rest_method = match_methods.get(config['rest'])
+            if not rest_method:
+                raise ModuleWarning('Unknown operation %s' % config['rest'], log)
             for entry in rest:
                 log.debug('Rest method %s for %s' % (rest_method.__name__, entry['title']))
                 rest_method(entry)
