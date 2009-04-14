@@ -16,7 +16,7 @@ class SeriesParser:
         # data to parse
         self.data = None 
         
-        self.ep_regexps = ['s(\d+)e(\d+)', 's(\d+)ep(\d+)', '(\d+)x(\d+)']
+        self.ep_regexps = ['s(\d+)e(\d+)', 's(\d+)ep(\d+)', '[^\d]([\d]{1,2})x(\d+)']
         self.id_regexps = ['(\d\d\d\d).(\d+).(\d+)', '(\d+).(\d+).(\d\d\d\d)', \
                            '(\d\d\d\d)x(\d+)\.(\d+)', '(\d\d\d)', '(\d\d)', '(\d)']
         self.name_regexps = []

@@ -90,6 +90,24 @@ class TestFilterSeries(FlexGetTestCase):
             pass
         else:
             self.fail('Data was not a str, should have failed')
+
+        # test confusing format
+        s = SeriesParser()
+        s.name = 'Something'
+        s.data = 'Something.2008x12.13-FlexGet'
+        s.parse()
+        assert not s.episode, 'Should not have episode'
+        assert not s.season, 'Should not have season'
+        assert s.id == '2008-12-13', 'invalid id'
+        assert s.valid, 'should not valid'
+        
+        # test 01x02 format
+        s = SeriesParser()
+        s.name = 'Something'
+        s.data = 'Something.01x02-FlexGet'
+        s.parse()
+        if not s.season==1 and s.episode==2:
+            self.fail('failed to parse 01x02')
         
         # test invalid data
         s = SeriesParser()
