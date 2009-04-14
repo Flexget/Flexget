@@ -124,15 +124,11 @@ class FilterImdb:
         return imdb
 
     def imdb_required(self, entry, config):
-        """Return True if config contains conditions that are not available in preparsed fields"""
-        # TODO: make dict (mapping min_votes <->imdb_votes) and loop it
-        # check that entry values are VALID (None is considered as having value, this is a small bug!)
-        if 'min_votes' in config and not 'imdb_votes' in entry: return True
-        if 'min_score' in config and not 'imdb_score' in entry: return True
-        if 'min_year' in config and not 'imdb_year' in entry: return True
-        if 'reject_genres' in config and not 'imdb_genres' in entry: return True
-        if 'reject_languages' in config and not 'imdb_languages' in entry: return True
-        if 'accept_languages' in config and not 'imdb_languages' in entry: return True
+        """Return True if config contains conditions that are NOT available in preparsed fields"""
+        check = {'min_votes':'imdb_votes', 'min_score': 'imdb_score', 'reject_genres': 'imdb_genres',
+                 'reject_languages': 'imdb_languages', 'accept_languages': 'imdb_languages'}
+        for key, value in check.iteritems():
+            if key in config and not value in entry: return True
         return False
         
     def clean_url(self, url):
@@ -318,13 +314,12 @@ class FilterImdb:
 
             if reasons:
                 log_once('Rejecting %s because of rule(s) %s' % (entry['title'], ', '.join(reasons)), log)
-                feed.reject(entry)
+                feed.reject(entry, ', '.join(reasons))
             else:
                 log.debug('Accepting %s' % (entry))
                 feed.accept(entry)
 
             # give imdb a little break between requests (see: http://flexget.com/ticket/129#comment:1)
-            # TODO: improve ?
             if not feed.manager.options.debug:
                 import time
                 time.sleep(3)

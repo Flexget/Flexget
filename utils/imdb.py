@@ -218,8 +218,6 @@ class ImdbSearch:
 class ImdbParser:
     """Quick-hack to parse relevant imdb details"""
 
-    yaml_serialized = ['genres', 'languages', 'score', 'votes', 'year', 'plot_outline', 'name']
-    
     def __init__(self):
         self.genres = []
         self.languages = []
@@ -228,22 +226,6 @@ class ImdbParser:
         self.year = 0
         self.plot_outline = None
         self.name = None
-
-    def to_yaml(self):
-        """Serializes imdb details into yaml compatible structure"""
-        d = {}
-        for n in self.yaml_serialized:
-            d[n] = getattr(self, n)
-        return d
-
-    def from_yaml(self, yaml):
-        """Builds object from yaml serialized data"""
-        undefined = object()
-        for n in self.yaml_serialized:
-            # undefined check allows adding new fields without breaking things ..
-            value = yaml.get(n, undefined)
-            if value is undefined: continue
-            setattr(self, n, value)
 
     def parse(self, url):
         try:
