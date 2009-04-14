@@ -2,7 +2,6 @@ import urllib2
 from feed import Entry
 import re
 import logging
-from manager import ModuleWarning
 
 log = logging.getLogger('text')
 
@@ -47,17 +46,14 @@ class InputText:
         return format
 
     def format_entry(self, entry, d):
-        for k,v in d.iteritems():
+        for k, v in d.iteritems():
             entry[k] = v % entry
 
     def feed_input(self, feed):
         url = feed.config['text']['url']
-        f = urllib2.urlopen(url)
+        content = urllib2.urlopen(url)
 
-        # configs
-        entry_config = feed.config['text'].get('entry', None)
-        if not entry_config:
-            raise ModuleWarning('missing entry definition', log)
+        entry_config = feed.config['text'].get('entry')
         format_config = feed.config['text'].get('format', {})
 
         # keep track what fields have been found
@@ -65,11 +61,11 @@ class InputText:
         entry = Entry()
 
         # now parse text
-        for line in f:
+        for line in content:
             for field, regexp in entry_config.iteritems():
                 #log.debug('search field: %s regexp: %s' % (field, regexp))
-                m = re.search(regexp, line)
-                if m:
+                match = re.search(regexp, line)
+                if match:
                     # check if used field detected, in such case start with new entry
                     if used.has_key(field):
                         if entry.isvalid():
@@ -83,7 +79,7 @@ class InputText:
                         used = {}
                         
                     # add field to entry
-                    entry[field] = m.group(1)
+                    entry[field] = match.group(1)
                     used[field] = True
                     log.debug('found field: %s value: %s' % (field, entry[field]))
 

@@ -7,7 +7,7 @@ from sqlalchemy import Table, Column, Integer, Float, String, Unicode, DateTime,
 from sqlalchemy.schema import ForeignKey
 from sqlalchemy.orm import relation
 
-log = logging.getLogger('series')
+log = logging.getLogger('imdb')
 
 # association tables
 genres = Table('imdb_movie_genres', Base.metadata,
@@ -128,7 +128,8 @@ class FilterImdb:
         check = {'min_votes':'imdb_votes', 'min_score': 'imdb_score', 'reject_genres': 'imdb_genres',
                  'reject_languages': 'imdb_languages', 'accept_languages': 'imdb_languages'}
         for key, value in check.iteritems():
-            if key in config and not value in entry: return True
+            if key in config and not value in entry: 
+                return True
         return False
         
     def clean_url(self, url):
@@ -157,7 +158,7 @@ class FilterImdb:
                 else:
                     entry['imdb_url'] = clean
 
-            # if no url for this entry, look from db and try to use imdb search
+            # no imdb_url, check if there is cached result for it or if the search is known to fail
             if not 'imdb_url' in entry:
                 result = feed.session.query(SearchResult).filter(SearchResult.title==entry['title']).first()
                 if result:
@@ -170,16 +171,14 @@ class FilterImdb:
                         log.debug('Setting imdb url for %s from db' % entry['title'])
                         entry['imdb_url'] = result.url
 
-            # no imdb url, but information required
+            # no imdb url, but information required, try searching
             if not 'imdb_url' in entry and self.imdb_required(entry, config):
-                # try searching from imdb
                 feed.verbose_progress('Searching from imdb %s' % entry['title'])
                 try:
                     search = ImdbSearch()
-                    movie = {}
-                    movie = search.smart_match(entry['title'])
-                    if movie:
-                        entry['imdb_url'] = movie['url']
+                    search_result = search.smart_match(entry['title'])
+                    if search_result:
+                        entry['imdb_url'] = search_result['url']
                         # store url for this movie, so we don't have to search on every run
                         result = SearchResult(entry['title'], entry['imdb_url'])
                         feed.session.add(result)
@@ -241,7 +240,6 @@ class FilterImdb:
                         movie = Movie()
                         movie.url = entry['imdb_url']
                         feed.session.add(movie)
-                        #feed.shared_cache.store(entry['imdb_url'], imdb.to_yaml())
                         continue
                     except ValueError:
                         log.error('Invalid parameter: %s' % entry['imdb_url'])
