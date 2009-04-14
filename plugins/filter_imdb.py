@@ -147,8 +147,9 @@ class FilterImdb:
             # sanity checks
             for field in ['imdb_votes', 'imdb_score']:
                 if field in entry:
-                    if not isinstance(entry[field], int):
-                        raise PluginWarning('%s should be int!' % field)
+                    value = entry[field]
+                    if not isinstance(value, int) and not isinstance(value, float):
+                        raise PluginWarning('%s should be a number!' % field)
         
             # make sure imdb url is valid
             if 'imdb_url' in entry:
