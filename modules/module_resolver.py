@@ -52,8 +52,8 @@ class ModuleResolver:
                         raise ResolverException('%s: Internal error with url %s' % (name, entry['url']))
 
     def entries(self, feed):
-        """Resolves all entries in feed. Since this causes many requests to sites, use with caution."""
-        for entry in feed.entries:
+        """Resolves all accepted entries in feed. Since this causes many requests to sites, use with caution."""
+        for entry in feed.accepted:
             try:
                 self.resolve(feed, entry)
             except ResolverException, e:

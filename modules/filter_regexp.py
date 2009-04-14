@@ -33,7 +33,7 @@ class FilterRegexp:
             notl.accept('number')
             
         conf = validator.factory('dict')
-        for operation in ['accept', 'filter', 'reject', 'accept_excluding', 'filter_excluding', 'reject_excluding']:
+        for operation in ['accept', 'reject', 'accept_excluding', 'reject_excluding']:
             sub = conf.accept('list', key=operation)
             build(sub)
             
@@ -41,8 +41,8 @@ class FilterRegexp:
         return conf
         
     def feed_filter(self, feed):
-        match_methods = {'accept': feed.accept, 'filter': feed.filter, 'reject': feed.reject }
-        non_match_methods = {'accept_excluding': feed.accept, 'filter_excluding': feed.filter, 'reject_excluding': feed.reject }
+        match_methods = {'accept': feed.accept, 'reject': feed.reject }
+        non_match_methods = {'accept_excluding': feed.accept, 'reject_excluding': feed.reject }
         
         # TODO: what if accept and accept_excluding configured? Should raise error ...
 

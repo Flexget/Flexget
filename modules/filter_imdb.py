@@ -39,7 +39,7 @@ class Movie(Base):
     plot_outline = Column(String)
 
     def __repr__(self):
-        return '<Movie(name=%s)>' % (self.name)
+        return '<Movie(name=%s)>' % (self.title)
 
 class Language(Base):
     
@@ -148,12 +148,10 @@ class FilterImdb:
         for entry in feed.entries:
         
             # sanity checks
-            if 'imdb_votes' in entry:
-                if not isinstance(entry['imdb_votes'], int):
-                    raise ModuleWarning('imdb_votes should be int!')
-            if 'imdb_score' in entry:
-                if not isinstance(entry['imdb_score'], float):
-                    raise ModuleWarning('imdb_score should be float!')
+            for field in ['imdb_votes', 'imdb_score']:
+                if field in entry:
+                    if not isinstance(entry[field], int):
+                        raise ModuleWarning('%s should be int!' % field)
         
             # make sure imdb url is valid
             if 'imdb_url' in entry:
@@ -169,8 +167,8 @@ class FilterImdb:
                 if result:
                     if result.fails:
                         # this movie cannot be found, not worth trying again ...
-                        log.debug('%s will fail search, filtering' % entry['title'])
-                        feed.filter(entry)
+                        log.debug('%s will fail search, rejecting' % entry['title'])
+                        feed.reject(entry, 'search failed')
                         continue
                     else:
                         log.debug('Setting imdb url for %s from db' % entry['title'])
@@ -197,9 +195,9 @@ class FilterImdb:
                         result.fails = True
                         feed.session.add(result)
                         # act depending configuration
-                        if config.get('filter_invalid', True):
-                            log_once('Filtering %s because of undeterminable imdb url' % entry['title'], log)
-                            feed.filter(entry)
+                        if config.get('reject_invalid', True):
+                            log_once('Rejecting %s because of undeterminable imdb url' % entry['title'], log)
+                            feed.reject(entry, 'undeterminable url')
                         else:
                             log.debug('Unable to check %s due missing imdb url, configured to pass (filter_invalid is False)' % entry['title'])
                         continue
@@ -208,7 +206,7 @@ class FilterImdb:
                         log.error('Failed to reach server. Reason: %s' % e.reason)
                     elif hasattr(e, 'code'):
                         log.error('The server couldn\'t fulfill the request. Error code: %s' % e.code)
-                    feed.filter(entry)
+                    feed.reject(entry, 'error occured')
                     continue
 
             imdb = ImdbParser()
@@ -242,7 +240,7 @@ class FilterImdb:
                         
                     except UnicodeDecodeError:
                         log.error('Unable to determine encoding for %s. Installing chardet library may help.' % entry['imdb_url'])
-                        feed.filter(entry)
+                        feed.reject(entry, 'UnicodeDecodeError')
                         # store cache so this will be skipped
                         movie = Movie()
                         movie.url = entry['imdb_url']
@@ -251,17 +249,17 @@ class FilterImdb:
                         continue
                     except ValueError:
                         log.error('Invalid parameter: %s' % entry['imdb_url'])
-                        feed.filter(entry)
+                        feed.reject(entry, 'parameters')
                         continue
                     except IOError, e:
                         if hasattr(e, 'reason'):
                             log.error('Failed to reach server. Reason: %s' % e.reason)
                         elif hasattr(e, 'code'):
                             log.error('The server couldn\'t fulfill the request. Error code: %s' % e.code)
-                        feed.filter(entry)
+                        feed.reject(entry, 'error occured')
                         continue
                     except Exception, e:
-                        feed.filter(entry)
+                        feed.reject(entry, 'error occured')
                         log.error('Unable to process url %s' % entry['imdb_url'])
                         log.exception(e)
                         continue
@@ -319,8 +317,8 @@ class FilterImdb:
             entry['imdb_name'] = imdb.name
 
             if reasons:
-                log_once('Filtering %s because of rule(s) %s' % (entry['title'], ', '.join(reasons)), log)
-                feed.filter(entry)
+                log_once('Rejecting %s because of rule(s) %s' % (entry['title'], ', '.join(reasons)), log)
+                feed.reject(entry)
             else:
                 log.debug('Accepting %s' % (entry))
                 feed.accept(entry)

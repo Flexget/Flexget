@@ -25,7 +25,7 @@ class OutputExec:
         return validator.factory('text')
 
     def feed_output(self, feed):
-        for entry in feed.entries:
+        for entry in feed.accepted:
             cmd = feed.config['exec'] % entry
             log.debug('executing cmd: %s' % cmd)
             (r, w) = os.popen4(cmd)

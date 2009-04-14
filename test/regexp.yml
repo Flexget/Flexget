@@ -28,12 +28,6 @@ feeds:
             not:
               - exp4
               
-  # test filtering
-  test_filter:
-    regexp:
-      filter:
-        - regexp1
-
   # test rejecting        
   test_reject:
     regexp:
@@ -45,8 +39,6 @@ feeds:
     regexp:
       accept:
         - regexp1
-      filter:
-        - regexp2
       rest: reject
       
       

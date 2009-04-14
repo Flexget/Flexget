@@ -65,9 +65,8 @@ class FailedEntry(Base):
         self.title = title
         self.url = url
 
-    def __repr__(self):
+    def __str__(self):
         return '<Failed(title=%s)>' % (self.title)
-
 
 class Manager:
 
@@ -112,7 +111,7 @@ class Manager:
         parser.add_option('--learn', action='store_true', dest='learn', default=0,
                           help='Matches are not downloaded but will be skipped in the future.')
         parser.add_option('--feed', action='store', dest='onlyfeed', default=None,
-                          help='Run only specified feed from config.')
+                          help='Run only specified feed.')
         parser.add_option('--no-cache', action='store_true', dest='nocache', default=0,
                           help='Disable caches. Works only in modules that have explicit support.')
         parser.add_option('--reset', action='store_true', dest='reset', default=0,
@@ -127,8 +126,8 @@ class Manager:
                           help='Clear recently failed list.')
         parser.add_option('-c', action='store', dest='config', default='config.yml',
                           help='Specify configuration file. Default is config.yml')
-        parser.add_option('-d', action='store_true', dest='details', default=0,
-                          help='Display detailed process information.')
+        parser.add_option('-v', action='store_true', dest='details', default=0,
+                          help='Verbose more process information.')
         parser.add_option('--cron', action='store_true', dest='quiet', default=0,
                           help='Disables stdout and stderr output, log file used. Reduces logging level slightly.')
         parser.add_option('--experimental', action='store_true', dest='experimental', default=0,
@@ -141,8 +140,10 @@ class Manager:
                           help=SUPPRESS_HELP)
         parser.add_option('--verbosity', action='store_true', dest='crap', default=0,
                           help=SUPPRESS_HELP)
-        # provides backward compatibility to --cron
+        # provides backward compatibility to --cron and -d
         parser.add_option('-q', action='store_true', dest='quiet', default=0,
+                          help=SUPPRESS_HELP)
+        parser.add_option('-d', action='store_true', dest='details', default=0,
                           help=SUPPRESS_HELP)
         # hacky way to allow unit tests to use --online parameter, without this Optik would exit application ...
         parser.add_option('--online', action='store_true', dest='unittest_online', default=0,

@@ -268,11 +268,6 @@ class FilterSeries:
                     # no timeframe, just choose best
                     self.accept_series(feed, best)
 
-        # filter ALL entries, only previously accepted will remain
-        # other modules may still accept entries
-        for entry in feed.entries:
-            feed.filter(entry, 'default')
-
     def accept_series(self, feed, parser):
         """Helper method for accepting series"""
         log.debug('Accepting %s' % parser.entry)
@@ -357,7 +352,7 @@ class FilterSeries:
 
     def feed_exit(self, feed):
         """Learn succeeded episodes"""
-        for entry in feed.entries:
+        for entry in feed.accepted:
             parser = entry.get('series_parser')
             if parser:
                 self.mark_downloaded(feed, parser)

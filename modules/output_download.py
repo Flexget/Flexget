@@ -60,7 +60,7 @@ class ModuleDownload:
     def feed_download(self, feed):
         """Download all feed content and store in temporary folder"""
         self.validate_config(feed) # TODO: remove
-        for entry in feed.entries:
+        for entry in feed.accepted:
             try:
                 if feed.manager.options.test:
                     log.info('Would download: %s' % entry['title'])
@@ -172,7 +172,7 @@ class ModuleDownload:
     def feed_output(self, feed):
         """Move downloaded content from temp folder to final destination"""
         self.validate_config(feed)
-        for entry in feed.entries:
+        for entry in feed.accepted:
             try:
                 if feed.manager.options.test:
                     log.info('Would write: %s' % entry['title'])

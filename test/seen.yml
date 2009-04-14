@@ -1,3 +1,6 @@
+global:
+  accept_all: true
+
 feeds:
   test:
     input_mock:

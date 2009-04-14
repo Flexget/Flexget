@@ -45,7 +45,6 @@ class FlexGetTestCase(unittest.TestCase):
         """Helper method for debugging"""
         print 'entries=%s' % self.feed.entries
         print 'accepted=%s' % self.feed.accepted
-        print 'filtered=%s' % self.feed.filtered
         print 'rejected=%s' % self.feed.rejected
 
 class TestFilterSeries(FlexGetTestCase):
@@ -155,12 +154,6 @@ class TestRegexp(FlexGetTestCase):
         if not self.feed.find_entry('accepted', title='regexp3', path='~/custom_path/3/'):
             self.fail('regexp3 should have been accepter with custom path')
             
-    def testFilter(self):
-        self.use_feed('test_filter')
-        self.feed.execute()
-        if not self.feed.find_entry('filtered', title='regexp1'):
-            self.fail('regexp1 should have been filtered')
-        
     def testReject(self):
         self.use_feed('test_reject')
         self.feed.execute()
@@ -172,8 +165,6 @@ class TestRegexp(FlexGetTestCase):
         self.feed.execute()
         if not self.feed.find_entry('accepted', title='regexp1'):
             self.fail('regexp1 should have been accepted')
-        if not self.feed.find_entry('filtered', title='regexp2'):
-            self.fail('regexp2 should have been filtered')
         if not self.feed.find_entry('rejected', title='regexp3'):
             self.fail('regexp3 should have been rejected')
             
@@ -296,12 +287,12 @@ class TestFilterSeen(FlexGetTestCase):
         if not self.feed.find_entry(title='Seen title 3'):
             self.fail('Unseen test entry 3 not in second feed')
             
-        # test that we don't filter based on non-string fields (ie, seen same imdb_score)
+        # test that we don't filter reject on non-string fields (ie, seen same imdb_score)
 
         self.use_feed('test_number')
         self.feed.execute()
         if not self.feed.find_entry(title='New title 1') or not self.feed.find_entry(title='New title 2'):
-            self.fail('Item should not have been filtered because of number field')
+            self.fail('Item should not have been rejected because of number field')
             
 
 class TestFilterSeenMovies(FlexGetTestCase):
@@ -314,15 +305,15 @@ class TestFilterSeenMovies(FlexGetTestCase):
         self.feed.execute()
         if not self.feed.find_entry(title='Seen movie title 1'):
             self.fail('Test movie entry 1 is missing')
-        # should be filtered, duplicate imdb url
+        # should be rejected, duplicate imdb url
         if self.feed.find_entry(title='Seen movie title 2'):
-            self.fail('Test movie entry 2 should be filtered')
+            self.fail('Test movie entry 2 should be rejected')
         # execute again
         self.feed.execute()
         if self.feed.find_entry(title='Seen movie title 1'):
-            self.fail('Test movie entry 1 should be filtered in second execution')
+            self.fail('Test movie entry 1 should be rejected in second execution')
         if self.feed.find_entry(title='Seen movie title 2'):
-            self.fail('Test movie entry 2 should be filtered in second execution')
+            self.fail('Test movie entry 2 should be rejected in second execution')
 
         # execute another feed
         

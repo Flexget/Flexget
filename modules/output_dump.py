@@ -16,7 +16,7 @@ class YamlDump:
         return validator.factory('any')
 
     def feed_output(self, feed):
-        for entry in feed.entries:
+        for entry in feed.accepted:
             c = entry.copy()
             feed.manager.sanitize(c)
             print yaml.safe_dump(c)

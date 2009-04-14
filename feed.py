@@ -52,17 +52,17 @@ class Feed:
         self.manager = manager
         self.session = None
 
-        self.entries = []
         
         # simple persistence
         self.simple_persistence = SimplePersistence(self)
         
-        # You should NOT change these arrays at any point, and in most cases not even read them!
-        # Mainly public since unit test needs these
+        # undecided entries in the feed (created by input)
+        self.entries = []
         
-        self.accepted = [] # accepted entries are always accepted, filtering does not affect them
-        self.filtered = [] # filtered entries
-        self.rejected = [] # rejected entries are removed unconditionally, even if accepted
+        # You should NOT change these arrays, use reject / accept methods!
+        
+        self.accepted = [] # accepted entries are accepted, can still be rejected
+        self.rejected = [] # rejected entries
         self.failed = []
 
         # TODO: feed.abort() should be done by using exception, not a flag that has to be checked everywhere
@@ -76,8 +76,7 @@ class Feed:
         self.current_module = None
         
     def _purge(self):
-        """Purge filtered entries from feed. Call this from module only if you know what you're doing."""
-        self.__purge(self.filtered, self.accepted)
+        log.critical('module %s called deprecated method feed._purge' % self.current_module)
 
     def __purge_failed(self):
         """Purge failed entries from feed."""
@@ -100,18 +99,10 @@ class Feed:
         """Accepts this entry."""
         if not entry in self.accepted:
             self.accepted.append(entry)
-            if entry in self.filtered:
-                self.filtered.remove(entry)
-                self.verbose_details('Accepted previously filtered %s' % entry['title'])
-            else:
-                self.verbose_details('Accepted %s' % entry['title'], reason)
+            self.verbose_details('Accepted %s' % entry['title'], reason)
 
     def filter(self, entry, reason=None):
-        """Mark entry to be filtered unless told otherwise. Entry may still be accepted."""
-        # accepted checked only because it makes more sense when verbose details
-        if not entry in self.filtered and not entry in self.accepted and not entry in self.rejected:
-            self.filtered.append(entry)
-            self.verbose_details('Filtered %s' % entry['title'], reason)
+        log.critical('module %s called deprecated method feed.filter' % self.current_module)
 
     def reject(self, entry, reason=None):
         """Reject this entry immediately and permanently."""
@@ -134,7 +125,6 @@ class Feed:
             log.info('Aborting feed %s' % self.name)
         self.__abort = True
         self.__run_event('abort')
-
 
     def find_entry(self, category='entries', **values):
         """Find and return entry with given attributes from feed or None"""
@@ -246,9 +236,8 @@ class Feed:
                     continue
             # run all modules with this event
             self.__run_event(event)
-            # purge filtered entries between events
-            # rejected and failed entries are purged between modules
-            self._purge()
+            # TODO: should we purge rejected and failed between events?
+            
             # verbose some progress
             if event == 'input':
                 self.verbose_details_entries()

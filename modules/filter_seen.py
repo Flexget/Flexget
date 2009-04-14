@@ -96,7 +96,7 @@ class FilterSeen(object):
             log.debug('Seen is disabled')
             return
 
-        for entry in feed.entries:
+        for entry in feed.accepted:
             for field in self.fields:
                 if not field in entry:
                     continue

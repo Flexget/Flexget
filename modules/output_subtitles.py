@@ -82,7 +82,7 @@ class Subtitles:
 
         # filter all entries that have IMDB ID set
         try:
-            entries = filter(lambda x: x['imdb_url'] != None, feed.entries)
+            entries = filter(lambda x: x['imdb_url'] != None, feed.accepted)
         except KeyError:
             # No imdb urls on this feed, skip it
             return

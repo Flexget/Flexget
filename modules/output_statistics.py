@@ -75,7 +75,7 @@ class Statistics:
         self.total = len(feed.entries)
 
     def feed_exit(self, feed):
-        self.passed = len(feed.entries)
+        self.passed = len(feed.accepted)
         self.failed = self.total - self.passed
 
         # don't bother to save the failed ones, the number is worth shit anyway

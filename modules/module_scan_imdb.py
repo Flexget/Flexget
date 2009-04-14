@@ -20,11 +20,9 @@ class ModuleScanImdb:
 
     def feed_filter(self, feed):
         for entry in feed.entries:
-            if not entry.has_key('description'):
+            if not 'description' in entry:
                 continue
             results = re.findall('(?:http://)?(?:www\.)?imdb.com/title/tt\d+',entry['description'])
             for result in results:
                 entry['imdb_url'] = result
             log.info('Found imdb url in description  %s' % entry['imdb_url'])
-        
-        # TODO: implement!

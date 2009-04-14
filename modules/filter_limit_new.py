@@ -1,7 +1,5 @@
 import logging
 
-__pychecker__ = 'unusednames=parser'
-
 log = logging.getLogger('limit_new')
 
 class FilterLimitNew:
@@ -28,14 +26,11 @@ class FilterLimitNew:
         return validator.factory('number')
 
     def feed_filter(self, feed):
-        # purge filtered items since we don't want to pass any of them
-        # since they are most likelly useless
-        feed._purge() 
         amount = feed.config.get('limit_new', len(feed.entries))
         i = 1
         rejected = 0
         passed = 0
-        for entry in feed.entries:
+        for entry in feed.accepted:
             if i > amount:
                 rejected += 1
                 feed.reject(entry)

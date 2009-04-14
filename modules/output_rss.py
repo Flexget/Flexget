@@ -131,7 +131,7 @@ class OutputRSS:
             raise ModuleWarning('module make_rss requires PyRSS2Gen library.')
         config = self.get_config(feed)
         # save entries into db for RSS generation
-        for entry in feed.entries:
+        for entry in feed.accepted:
             rss = RSSEntry()
             rss.title = entry['title']
             for field in config['link']:

@@ -124,7 +124,7 @@ class OutputEmail:
         if feed.manager.options.learn:
             return
 
-        entries_count = len(feed.entries)
+        entries_count = len(feed.accepted)
         if entries_count == 0:
             return # don't send empty emails
 
@@ -134,7 +134,7 @@ class OutputEmail:
 
 FlexGet has just downloaded %d new entries for feed %s : 
         """ % (entries_count, feed.name)
-        for entry in feed.entries:
+        for entry in feed.accepted:
             content += "\n - %s (%s)" % (entry['title'], entry['url'])
             entry_path = entry.get('path', feed.config.get('download'))
             entry_filename = entry.get('filename', entry['title'])
