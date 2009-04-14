@@ -9,7 +9,7 @@ timeout = 10
 import socket
 socket.setdefaulttimeout(timeout)
 
-__pychecker__ = 'unusednames=parser,feed'
+
 
 log = logging.getLogger('newtorrents')
 

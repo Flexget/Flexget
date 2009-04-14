@@ -237,7 +237,7 @@ class InputRSS:
                     if ee.get('size', 0) != 0 or len(enclosures)>1:
                         if ee['url'].rfind != -1:
                             # parse filename from enclosure url
-                            # TODO: better and perhaps join/in download plugin? also see urlparse plugin
+                            # TODO: better and perhaps join/in download plugin? also see urlparse module
                             match = re.search('.*\/([^?#]*)', ee['url'])
                             if match:
                                 ee['filename'] = match.group(1)

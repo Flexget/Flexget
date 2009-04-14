@@ -1,7 +1,7 @@
 import logging
 from manager import PluginWarning
 
-__pychecker__ = 'unusednames=parser,feed'
+
 
 log = logging.getLogger('priority')
 

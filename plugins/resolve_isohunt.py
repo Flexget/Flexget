@@ -1,6 +1,6 @@
 import logging
 
-__pychecker__ = 'unusednames=parser,feed'
+
 
 log = logging.getLogger("isohunt")
 

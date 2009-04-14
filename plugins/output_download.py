@@ -6,7 +6,7 @@ import shutil
 import filecmp
 from manager import PluginWarning
 
-__pychecker__ = 'unusednames=parser,feed'
+
 
 log = logging.getLogger('download')
 

@@ -3,7 +3,7 @@ import logging
 import re
 from manager import PluginWarning
 
-__pychecker__ = 'unusednames=parser,feed'
+
 
 log = logging.getLogger("newzleech")
 

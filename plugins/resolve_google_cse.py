@@ -5,7 +5,7 @@ from module_resolver import ResolverException
 from manager import PluginWarning
 from BeautifulSoup import BeautifulSoup
 
-__pychecker__ = 'unusednames=parser,feed'
+
 
 log = logging.getLogger('google_cse')
 

@@ -4,7 +4,7 @@ import httplib
 import socket
 from manager import PluginWarning
 
-__pychecker__ = 'unusednames=parser,feed'
+
 
 log = logging.getLogger('spy_headers')
 
