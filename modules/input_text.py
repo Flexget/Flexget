@@ -53,8 +53,6 @@ class InputText:
     def feed_input(self, feed):
         url = feed.config['text']['url']
         f = urllib2.urlopen(url)
-        s = f.read()
-        l = s.split("\r\n")
 
         # configs
         entry_config = feed.config['text'].get('entry', None)
@@ -67,7 +65,7 @@ class InputText:
         entry = Entry()
 
         # now parse text
-        for line in l:
+        for line in f:
             for field, regexp in entry_config.iteritems():
                 #log.debug('search field: %s regexp: %s' % (field, regexp))
                 m = re.search(regexp, line)
