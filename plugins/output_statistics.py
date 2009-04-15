@@ -101,7 +101,7 @@ class Statistics:
         
         return config
 
-    def application_terminate(self, feed):
+    def process_end(self, feed):
         if not has_pygooglechart:
             raise PluginWarning('plugin statistics requires pygooglechart library.')
 

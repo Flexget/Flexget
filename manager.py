@@ -80,13 +80,14 @@ class Manager:
         self.options = None
         self.plugins = {}
         self.config = {}
+        self.feeds = {}
         
         # events
         self.events = ['start', 'input', 'filter', 'download', 'modify', 'output', 'exit']
         self.event_methods = {'start':'feed_start', 'input':'feed_input', 'filter':
                               'feed_filter', 'download':'feed_download', 'modify':'feed_modify', 
                               'output':'feed_output', 'exit':'feed_exit', 'abort':'feed_abort',
-                              'terminate':'application_terminate'}
+                              'process_start':'process_start', 'process_end':'process_end'}
         
         # pass current plugin instance around while loading
         self.__instance = False
@@ -523,7 +524,7 @@ class Manager:
         
         failed = Session()
         results = failed.query(FailedEntry).all()
-        if (len(results) == 0):
+        if not results:
             print 'No failed entries recorded'
         for entry in results:
             print '%16s - %s' % (entry.tof.strftime('%Y-%m-%d %H:%M'), entry.title)
@@ -557,6 +558,7 @@ class Manager:
         session.commit()
         session.close()
 
+    # TODO: move into utils (only module_preset uses this)
     def merge_dict_from_to(self, d1, d2):
         """Merges dictionary d1 into dictionary d2. d1 will remain in original form."""
         for k, v in d1.items():
@@ -574,19 +576,17 @@ class Manager:
                     raise MergeException('Merging key %s failed, conflicting datatypes.' % (k))
             else:
                 d2[k] = v
-
-    def execute(self):
-        """Iterate trough all feeds and run them."""
+                
+                
+    def create_feeds(self):
+        """Creates instances of all configured feeds"""
         from feed import Feed
-
-        if not self.config:
-            log.critical('Configuration file is empty.')
-            return
 
         # construct feed list
         feeds = self.config.get('feeds', {}).keys()
         if not feeds: 
             log.critical('There are no feeds in the configuration file!')
+
         # --only-feed
         if self.options.onlyfeed:
             ofeeds, feeds = feeds, []
@@ -595,8 +595,8 @@ class Manager:
                     feeds.append(name)
             if not feeds:
                 log.critical('Could not find feed %s' % self.options.onlyfeed)
-
-        terminate = {}
+        
+        # let's create them        
         for name in feeds:
             # validate (TODO: make use of validator?)
             if not isinstance(self.config['feeds'][name], dict):
@@ -611,23 +611,48 @@ class Manager:
             # if feed name is prefixed with _ it's disabled
             if name.startswith('_'): 
                 continue
-            # create feed instance and execute it
             feed = Feed(self, name, self.config['feeds'][name])
+            self.feeds[name] = feed
+                
+
+    def execute(self):
+        """Iterate trough all feeds and run them."""
+
+        if not self.config:
+            log.critical('Configuration file is empty.')
+            return
+        
+        self.create_feeds()
+
+        failed = []
+
+        # execute process_start to all feeds
+        for name, feed in self.feeds.iteritems():
+            try:
+                feed.process_start()
+            except Exception, e:
+                failed.append(name)
+                log.exception('Feed %s process_start: %s' % (feed.name, e))
+
+        for name, feed in self.feeds.iteritems():
+            if name in failed:
+                continue
             try:
                 feed.session = Session()
                 feed.execute()
-                terminate[name] = feed
                 feed.session.commit()
             except Exception, e:
+                failed.append(name)
                 log.exception('Feed %s: %s' % (feed.name, e))
             finally:
                 # note: will perform rollback if error occured (session has not been committed)
                 feed.session.close()
 
-        # execute terminate event for all feeds
-        if not self.options.validate:
-            for name, feed in terminate.iteritems():
-                try:
-                    feed.terminate()
-                except Exception, e:
-                    log.exception('Feed %s terminate: %s' % (name, e))            
+        # execute process_end to all feeds
+        for name, feed in self.feeds.iteritems():
+            if name in failed:
+                continue
+            try:
+                feed.process_end()
+            except Exception, e:
+                log.exception('Feed %s process_end: %s' % (name, e))       

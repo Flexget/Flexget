@@ -252,10 +252,15 @@ class Feed:
             if self.__abort:
                 return
 
-    def terminate(self):
+
+    def process_start(self):
+        """Execute process_start event"""
+        self.__run_event('process_start')
+
+    def process_end(self):
         """Execute terminate event for this feed"""
         if self.__abort: return
-        self.__run_event('terminate')
+        self.__run_event('process_end')
 
     def validate(self):
         """Plugin configuration validation. Return array of error messages that were detected."""

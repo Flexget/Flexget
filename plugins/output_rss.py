@@ -142,7 +142,7 @@ class OutputRSS:
             rss.file = config['file']
             feed.session.add(rss)
 
-    def application_terminate(self, feed):
+    def process_end(self, feed):
         """Write RSS file at application terminate."""
         if not rss2gen:
             return
