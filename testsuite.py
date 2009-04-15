@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 import os, sys, unittest
 from manager import Manager, Session
 from feed import Feed
