@@ -111,6 +111,9 @@ class Feed:
         if not entry in self.rejected:
             self.rejected.append(entry)
             self.verbose_details('Rejected %s' % entry['title'], reason)
+        # TODO: HACK
+        if entry in self.accepted:
+            self.accepted.remove(entry)
 
     def fail(self, entry, reason=None):
         """Mark entry as failed."""
