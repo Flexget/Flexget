@@ -97,7 +97,7 @@ class Feed:
 
     def accept(self, entry, reason=None):
         """Accepts this entry."""
-        if not entry in self.accepted:
+        if not entry in self.accepted and not entry in self.rejected:
             self.accepted.append(entry)
             self.verbose_details('Accepted %s' % entry['title'], reason)
 
@@ -111,7 +111,7 @@ class Feed:
         if not entry in self.rejected:
             self.rejected.append(entry)
             self.verbose_details('Rejected %s' % entry['title'], reason)
-        # TODO: HACK
+        # TODO: HACK?
         if entry in self.accepted:
             self.accepted.remove(entry)
 
