@@ -287,7 +287,7 @@ class Manager:
         
         for prefix in self.__load_queue:
             for plugin in self.find_plugins(plugindir, prefix):
-                log.debug('loading plugin %s' % plugin)
+                #log.debug('loading plugin %s' % plugin)
                 try:
                     plugin = __import__(plugin)
                 except Exception, e:
@@ -444,14 +444,6 @@ class Manager:
                 plugins.append(info)
         plugins.sort(lambda x, y: cmp(x.get('priorities', {}).get(event, 0), \
                                       y.get('priorities', {}).get(event, 0)), reverse=True)
-        debug = []
-        for m in plugins:
-            if 'priorities' in m:
-                if event in m['priorities']:
-                    debug.append(str(m['priorities'][event]))
-        if debug:
-            log.debug('priorities: %s' % ', '.join(debug))
-        
         return plugins
 
     def get_plugins_by_group(self, group):
@@ -536,7 +528,7 @@ class Manager:
         failed = Session()
         failedentry = FailedEntry(entry['title'],entry['url'])
         #TODO: query item's existence
-        if not failed.query(FailedEntry).filter(FailedEntry.title==entry['title']).one():
+        if not failed.query(FailedEntry).filter(FailedEntry.title==entry['title']).first():
             failed.add(failedentry)
         #TODO: limit item number to 25
         i = 0

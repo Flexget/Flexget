@@ -40,7 +40,7 @@ class FilterSeen(object):
         manager.register('seen', builtin=True, filter_priority=255)
 
         # remember and filter by these fields
-        self.fields = ['original_url', 'title', 'url']
+        self.fields = ['url', 'title', 'original_url']
         self.keyword = 'seen'
 
     def validator(self):

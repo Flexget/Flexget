@@ -30,7 +30,7 @@ class FilterLimitNew:
         i = 1
         rejected = 0
         passed = 0
-        for entry in feed.accepted:
+        for entry in feed.entries:
             if i > amount:
                 rejected += 1
                 feed.reject(entry)

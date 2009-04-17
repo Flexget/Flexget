@@ -10,8 +10,8 @@ class PluginPathByExt:
 
     """
     path_by_ext:
-      torrent: ~/watch/torrents/
-      nzb: ~/watch/nzbs/
+      torrent: ~/watch/torrent/
+      nzb: ~/watch/nzb/
     """
 
     def register(self, manager, parser):

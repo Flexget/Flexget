@@ -56,7 +56,7 @@ class ResolvePirateBay:
             
     # search API
     def search(self, feed, entry):
-        entry['url'] = self.search_title(entry['title'])
+        return self.search_title(entry['title'])
             
     def search_title(self, name, url=None):
         """Search for name from piratebay, if a search url is passed it will be 

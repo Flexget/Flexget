@@ -24,8 +24,6 @@ class Search:
 
     def register(self, manager, parser):
         manager.register('search')
-        manager.add_feed_event('search', after='resolve')
-        
         
     def validator(self):
         # TODO: should only accept registered search plugins
@@ -34,7 +32,7 @@ class Search:
         search.accept('text')
         return search
 
-    def feed_search(self, feed):
+    def feed_resolve(self, feed):
         # no searches in unit test mode
         if feed.manager.unit_test: 
             return 
@@ -52,4 +50,8 @@ class Search:
                     continue
                 else:
                     log.debug('Issuing search from %s' % name)
-                    plugins[name].search(feed, entry)
+                    url = plugins[name].search(feed, entry)
+                    if url:
+                        log.debug('Found url: %s' % url)
+                        entry['url'] = url
+                        return

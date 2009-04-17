@@ -13,7 +13,7 @@ class ResolverException(Exception):
 class PluginResolver:
 
     def register(self, manager, parser):
-        manager.register('resolver', builtin=True)
+        manager.register('resolver', builtin=True, resolve_priority=255)
         manager.add_feed_event('resolve', before='download')
 
     def feed_resolve(self, feed):

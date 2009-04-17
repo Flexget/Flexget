@@ -40,7 +40,7 @@ class RlsLog:
         f = re_votes.search(s.replace(',',''))
         if f != None:
             votes = int(f.group(1))
-        log.debug("parse_imdb returning score: '%s' votes: '%s' from: '%s'" % (str(score), str(votes), s))
+        #log.debug("parse_imdb returning score: '%s' votes: '%s' from: '%s'" % (str(score), str(votes), s))
         return (score, votes)
 
     def parse_rlslog(self, rlslog_url, feed):
@@ -90,9 +90,10 @@ class RlsLog:
                 resolver = feed.manager.get_plugin_by_name('resolver')
                 if resolver['instance'].resolvable(feed, temp):
                     release['url'] = link_href
-                    log.debug('--> accepting %s (resolvable)' % link_href)
+                    #log.debug('--> accepting %s (resolvable)' % link_href)
                 else:
-                    log.debug('<-- ignoring %s (non-resolvable)' % link_href)
+                    pass
+                    #log.debug('<-- ignoring %s (non-resolvable)' % link_href)
 
             # reject if no torrent link
             if not 'url' in release:

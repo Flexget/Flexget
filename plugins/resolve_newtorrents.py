@@ -48,8 +48,7 @@ class NewTorrents:
     # Search plugin API
     def search(self, feed, entry):
         search_url = 'http://www.newtorrents.info/search/%s' % entry['title']
-        url = self.url_from_search(search_url, entry['title'])
-        entry['url'] = url
+        return self.url_from_search(search_url, entry['title'])
     
     def url_from_page(self, url):
         """Parses torrent url from newtorrents download page"""

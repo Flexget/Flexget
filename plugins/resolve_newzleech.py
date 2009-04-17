@@ -24,7 +24,7 @@ class ResolveNewzleech:
             raise PluginWarning('Newzleech requires BeautifulSoup')
 
         url = u'http://newzleech.com/?' + urllib.urlencode({'q':entry['title'].encode('latin1'), 'm':'search', 'group':'', 'min':'min', 'max':'max', 'age':'', 'minage':'', 'adv':''})
-        log.debug('Search url: %s' % url)
+        #log.debug('Search url: %s' % url)
         
         txheaders = {
             'User-Agent': 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)',
@@ -61,7 +61,7 @@ class ResolveNewzleech:
             for wild in wildcardize:
                 regexp = regexp.replace(wild, '.')
             regexp = '.*' + regexp + '.*'
-            log.debug('Title regexp: %s' % regexp)
+            #log.debug('Title regexp: %s' % regexp)
             
             if re.match(regexp, subject):
                 log.debug('%s matches to regexp' % subject)
@@ -93,13 +93,8 @@ class ResolveNewzleech:
             log.debug('Unable to find %s' % entry['title'])
             return
 
-        # choose largest hit
-
-        def cmp_size(a, b):
-            return cmp(a['size'], b['size'])
-            
-        nzbs.sort(cmp_size)
-        nzbs.reverse()
+        # choose largest file
+        nzbs.sort(lambda a,b: cmp(a['size'], b['size']), reverse=True)
         
         entry['url'] = nzbs[0]['url']    
     
