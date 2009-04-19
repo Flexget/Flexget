@@ -86,6 +86,7 @@ class Feed:
         """Purge rejected entries from feed."""
         self.__purge(self.rejected)
 
+    # TODO: refactor, does not make any sense anymore (?)
     def __purge(self, entries, not_in_list=[], count=True):
         """Purge entries in list from feed.entries"""
         for entry in self.entries[:]:
@@ -250,7 +251,7 @@ class Feed:
                 else:
                     self.verbose_progress('Feed %s produced %s entries.' % (self.name, len(self.entries)))
             if event == 'filter':
-                self.verbose_progress('Feed %s filtered %s entries (%s remains).' % (self.name, self.__purged, len(self.entries)))
+                self.verbose_progress('Feed %s filtered %s entries (%s accepted).' % (self.name, self.__purged, len(self.accepted)))
             # if abort flag has been set feed should be aborted now
             if self.__abort:
                 return
