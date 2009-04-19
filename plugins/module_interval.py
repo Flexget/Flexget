@@ -2,8 +2,6 @@ import logging
 import datetime
 from manager import PluginWarning
 
-
-
 log = logging.getLogger('interval')
 
 class PluginInterval:
@@ -21,7 +19,7 @@ class PluginInterval:
     def register(self, manager, parser):
         manager.register('interval')
         parser.add_option('--now', action='store_true', dest='interval_ignore', default=0,
-                          help='Ignore interval')
+                          help='Ignore interval(s)')
         
     def validator(self):
         # TODO: make a regexp validation
@@ -36,11 +34,10 @@ class PluginInterval:
         amount, unit = feed.config.get('interval').split(' ')
         log.debug('amount: %s unit: %s' % (repr(amount), repr(unit)))
         params = {unit:int(amount)}
-        log.debug('params: %s' % repr(params))
         try:
             next_time = last_time + datetime.timedelta(**params)
         except TypeError:
-            raise PluginWarning('Invalid configuration', log)
+            raise PluginWarning('Invalid time format', log)
         log.debug('next_time: %s' % repr(next_time))
         if datetime.datetime.today() < next_time:
             log.debug('interval not met')
