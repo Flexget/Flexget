@@ -26,6 +26,9 @@ class PluginScanImdb:
             if not 'description' in entry:
                 continue
             results = re.findall('(?:http://)?(?:www\.)?imdb.com/title/tt\d+', entry['description'])
+            # not found any url
+            if len(results) < 1:
+                return
             for result in results:
                 entry['imdb_url'] = result
             log.info('Found imdb url in description %s' % entry['imdb_url'])

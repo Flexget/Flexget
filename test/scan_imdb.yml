@@ -4,5 +4,6 @@ feeds:
       # for description url
       - {title: 'Punisher-War Zone[2008]DvDrip-aXXo', url: 'http://www.mininova.org/tor/2365255', description: 'title: Punisher-War Zone\n imdb-url: http://www.imdb.com/title/tt0330793/'}
       - {title: 'Notorious 2009 PROPER DVDRip XVID-KART3LDVD', url: 'http://www.rlslog.net/notorious-2009-proper-dvdrip-xvid-kart3ldvd/', description: '<a href="http://imdb.com/title/tt0472198/">IMDb</a>'}
+      - {title: 'Notorious 2009 PROPER DVDRip XVID-KART3LDVD', url: 'http://www.rlslog.net/notorious-2009-proper-dvdrip-xvid-kart3ldvd/', description: 'hebele hubele'}
     scan_imdb: true
 
