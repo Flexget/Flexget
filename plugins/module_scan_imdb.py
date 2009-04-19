@@ -27,7 +27,7 @@ class PluginScanImdb:
                 continue
             results = re.findall('(?:http://)?(?:www\.)?imdb.com/title/tt\d+', entry['description'])
             # not found any url
-            if len(results) < 1:
+            if not results:
                 return
             for result in results:
                 entry['imdb_url'] = result
