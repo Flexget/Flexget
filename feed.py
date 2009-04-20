@@ -51,7 +51,6 @@ class Feed:
         self.config = config
         self.manager = manager
         self.session = None
-
         
         # simple persistence
         self.simple_persistence = SimplePersistence(self)
@@ -75,24 +74,22 @@ class Feed:
         self.current_event = None
         self.current_plugin = None
         
-    def _purge(self):
-        log.critical('plugin %s called deprecated method feed._purge' % self.current_plugin)
-
     def __purge_failed(self):
         """Purge failed entries from feed."""
-        self.__purge(self.failed, [], False)
+        self.__purge(self.failed, self.entries, False)
+        self.__purge(self.failed, self.rejected, False)
+        self.__purge(self.failed, self.accepted, False)
 
     def __purge_rejected(self):
         """Purge rejected entries from feed."""
-        self.__purge(self.rejected)
+        self.__purge(self.rejected, self.entries)
+        self.__purge(self.rejected, self.accepted)
 
-    # TODO: refactor, does not make any sense anymore (?)
-    def __purge(self, entries, not_in_list=[], count=True):
+    def __purge(self, purge_what, purge_from, count=True):
         """Purge entries in list from feed.entries"""
-        for entry in self.entries[:]:
-            if entry in entries and entry not in not_in_list:
-                #log.debug('Purging entry %s' % entry.safe_str())
-                self.entries.remove(entry)
+        for entry in purge_what[:]:
+            if entry in purge_from:
+                purge_from.remove(entry)
                 if count:
                     self.__purged += 1
 
@@ -101,10 +98,6 @@ class Feed:
         if not entry in self.accepted and not entry in self.rejected:
             self.accepted.append(entry)
             self.verbose_details('Accepted %s' % entry['title'], reason)
-
-    # TODO: remove at some point
-    def filter(self, entry, reason=None):
-        log.critical('plugin %s called deprecated method feed.filter' % self.current_plugin)
 
     def reject(self, entry, reason=None):
         """Reject this entry immediately and permanently."""
@@ -251,7 +244,9 @@ class Feed:
                 else:
                     self.verbose_progress('Feed %s produced %s entries.' % (self.name, len(self.entries)))
             if event == 'filter':
-                self.verbose_progress('Feed %s filtered %s entries (%s accepted).' % (self.name, self.__purged, len(self.accepted)))
+                self.verbose_progress('Feed %s rejected: %s undecided: %s accepted: %s failed: %s' % \
+                                      (self.name, len(self.rejected), len(self.entries), \
+                                       len(self.accepted), len(self.failed)))
             # if abort flag has been set feed should be aborted now
             if self.__abort:
                 return

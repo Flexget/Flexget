@@ -65,6 +65,8 @@ class FilterSeries:
 
     def validator(self):
         import validator
+        return validator.factory('any')
+        """
         series = validator.factory('list')
         series.accept('text')
         series.accept('number')
@@ -90,6 +92,7 @@ class FilterSeries:
         watched.accept('number', key='season')
         watched.accept('number', key='episode')
         return series
+        """
 
     # TODO: re-implement (as new (sub)-plugin InputBacklog ?)
     """
@@ -123,150 +126,209 @@ class FilterSeries:
                         feed.entries.append(e)
     """
 
-    def cmp_series_quality(self, s1, s2):
-        return self.cmp_quality(s1.quality, s2.quality)
+    def generate_config(self, feed):
+        import yaml
 
-    def cmp_quality(self, q1, q2):
-        return cmp(SeriesParser.qualities.index(q1), SeriesParser.qualities.index(q2))
+        feed_config = feed.config.get('series', [])
+        
+        # generate unified configuration in complex form, requires complex code as well :)
+        config = {}
+        config['settings'] = {}
+        if isinstance(feed_config, list):
+            # convert simpliest configuration internally grouped format
+            config['simple'] = []
+            for series in feed_config:
+                # convert into dict-form if necessary
+                series_settings = {}
+                if isinstance(series, dict):
+                    series, series_settings = series.items()[0]
+                    if series_settings is None:
+                        raise Exception('Series %s has unexpected \':\'' % series)
+                config['simple'].append({series: series_settings})
+                config['settings']['simple'] = {} # hack to make simple work for now! see todo below
+        else:
+            # already in grouped format, just get settings from there
+            import copy
+            config = copy.deepcopy(feed_config)
+            
+        # TODO: create empty settings block for all groups, otherwise they are not included in generated config
+        #print yaml.safe_dump(config)
+        
+        # TODO: what if same series is configured in multiple groups?!
+
+        # generate groups from settings groups
+        for group_name, group_settings in config['settings'].iteritems():
+            # convert group series into complex types
+            complex_series = []
+            for series in config.get(group_name, []):
+                # convert into dict-form if necessary
+                series_settings = {}
+                if isinstance(series, dict):
+                    series, series_settings = series.items()[0]
+                    if series_settings is None:
+                        raise Exception('Series %s has unexpected \':\'' % series)
+                # if series have given path instead of dict, convert it into a dict    
+                if isinstance(series_settings, basestring):
+                    series_settings = {'path': series_settings}
+                # merge group settings into this series settings
+                feed.manager.merge_dict_from_to(group_settings, series_settings)
+                complex_series.append({series: series_settings})
+            
+            # add generated complex series into config
+            config[group_name] = complex_series
+            
+        #print yaml.safe_dump(config)
+        return config
 
     def feed_filter(self, feed):
         """Filter series"""
-        for name in feed.config.get('series', []):
-            # start with default settings
-            conf = feed.manager.get_settings('series', {})
-            if isinstance(name, dict):
-                name, conf = name.items()[0]
-                if conf is None:
-                    log.critical('Series %s has unexpected \':\'' % name)
+        
+        config = self.generate_config(feed)
+        for group_name, group_series in config.iteritems():
+            # TODO: do we even need settings block in the config at this point?
+            if group_name == 'settings':
+                continue
+            for series_item in group_series:
+                series_name, series_config = series_item.items()[0]
+                log.debug('series_name: %s series_config: %s' % (series_name, series_config))
+                series = self.parse_series(feed, series_name, series_config)
+                self.process_series(feed, series, series_name, series_config)
+
+    def parse_series(self, feed, series_name, config):
+        """Search for series_name and return dict containing all episodes from it."""
+
+        def get_as_array(config, key):
+            """Return configuration key as array, even if given as a single string"""
+            v = config.get(key, [])
+            if isinstance(v, basestring):
+                return [v]
+            return v
+
+        # key: series (episode) identifier ie. S1E2
+        # value: seriesparser
+        series = {}
+        for entry in feed.entries:
+            for _, data in entry.iteritems():
+                # skip non string values and empty strings
+                if not isinstance(data, basestring) or not data: 
                     continue
-                # merge with default settings
-                conf = feed.manager.get_settings('series', conf)
+                parser = SeriesParser()
+                parser.name = str(series_name)
+                parser.data = data
+                parser.ep_regexps = get_as_array(config, 'ep_regexps') + parser.ep_regexps
+                parser.id_regexps = get_as_array(config, 'id_regexps') + parser.id_regexps
+                # do not use builtin list for id when ep configigured and vice versa
+                if 'ep_regexps' in config and not 'id_regexps' in config:
+                    parser.id_regexps = []
+                if 'id_regexps' in config and not 'ep_regexps' in config:
+                    parser.ep_regexps = []
+                parser.name_regexps.extend(get_as_array(config, 'name_regexps'))
+                parser.parse()
+                # series is not valid if it does not match given name / regexp or fails with exception
+                if parser.valid:
+                    break
+            else:
+                continue
 
-            def get_as_array(conf, key):
-                v = conf.get(key, [])
-                if isinstance(v, basestring):
-                    return [v]
-                return v
+            # set custom download path
+            if 'path' in config:
+                log.debug('setting %s custom path to %s' % (entry['title'], config.get('path')))
+                entry['path'] = config.get('path')
 
-            ep_patterns = get_as_array(conf, 'ep_patterns')
-            id_patterns = get_as_array(conf, 'id_patterns')
-            name_patterns = get_as_array(conf, 'name_patterns')
+            parser.entry = entry
+            # add this episode into list of available episodes
+            eps = series.setdefault(parser.identifier(), [])
+            eps.append(parser)
+            # store this episode into database
+            self.store(feed, parser)
+        return series
 
-            series = {} # ie. S1E2: [Parser, Parser*n]
-            for entry in feed.entries:
-                for _, data in entry.iteritems():
-                    # skip non string values and empty strings
-                    if not isinstance(data, basestring): continue
-                    if not data: continue
-                    parser = SeriesParser()
-                    parser.name = str(name)
-                    parser.data = data
-                    parser.ep_regexps = ep_patterns + parser.ep_regexps
-                    parser.id_regexps = id_patterns + parser.id_regexps
-                    # do not use builtin list for id when ep configured and vice versa
-                    if 'ep_patterns' in conf and not 'id_patterns' in conf:
-                        parser.id_regexps = []
-                    if 'id_patterns' in conf and not 'ep_patterns' in conf:
-                        parser.ep_regexps = []
-                    parser.name_regexps.extend(name_patterns)
-                    parser.parse()
-                    # series is not valid if it does not match given name / regexp or fails with exception
-                    if parser.valid:
-                        break
-                else:
-                    continue
+    def process_series(self, feed, series, series_name, config):
+        """Accept or Reject episode from available qualities, or postpone choosing."""
+        for identifier, eps in series.iteritems():
+            if not eps: continue
+            eps.sort(lambda x,y: cmp(x.quality, y.quality))
+            best = eps[0]
+            
+            # episode (with this id) has been downloaded
+            if self.downloaded(feed, best):
+                log.debug('Series %s episode %s is already downloaded, rejecting all occurences' % (series_name, identifier))
+                for ep in eps:
+                    feed.reject(ep.entry, 'already downloaded')
+                continue
 
-                # set custom download path
-                if 'path' in conf:
-                    log.debug('setting %s custom path to %s' % (entry['title'], conf.get('path')))
-                    entry['path'] = conf.get('path')
-                parser.entry = entry
-                self.store(feed, parser)
-                # add this episode into list of available episodes
-                eps = series.setdefault(parser.identifier(), [])
-                eps.append(parser)
-
-            # choose episode from available qualities
-            for identifier, eps in series.iteritems():
-                if not eps: continue
-                eps.sort(self.cmp_series_quality)
-                best = eps[0]
-                
-                # episode (with this id) has been downloaded
-                if self.downloaded(feed, best):
-                    log.debug('Series %s episode %s is already downloaded, rejecting all occurences' % (name, identifier))
+            # reject episodes that have been marked as watched in configig file
+            if 'watched' in config:
+                from sys import maxint
+                wconfig = config.get('watched')
+                season = wconfig.get('season', -1)
+                episode = wconfig.get('episode', maxint)
+                if best.season < season or (best.season == season and best.episode <= episode):
+                    log.debug('Series %s episode %s is already watched, rejecting all occurrences' % (series_name, identifier))
                     for ep in eps:
-                        feed.reject(ep.entry, 'already downloaded')
+                        feed.reject(ep.entry, 'watched')
                     continue
-
-                # reject episodes that have been marked as watched in config file
-                if 'watched' in conf:
-                    from sys import maxint
-                    wconf = conf.get('watched')
-                    season = wconf.get('season', -1)
-                    episode = wconf.get('episode', maxint)
-                    if best.season < season or (best.season == season and best.episode <= episode):
-                        log.debug('Series %s episode %s is already watched, rejecting all occurrences' % (name, identifier))
+                    
+            # episode advancement, only when using season, ep identifier
+            if best.season and best.episode:
+                latest = self.get_latest_info(feed, best)
+                if latest:
+                    # allow few episodes "backwards" in case missing
+                    grace = len(series) + 2
+                    if best.season < latest['season'] or (best.season == latest['season'] and best.episode < latest['episode'] - grace):
+                        log.debug('Series %s episode %s does not meet episode advancement, rejecting all occurrences' % (series_name, identifier))
                         for ep in eps:
-                            feed.reject(ep.entry, 'watched')
+                            feed.reject(ep.entry, 'episode advancement')
                         continue
-                        
-                # episode advancement, only when using season, ep identifier
-                if best.season and best.episode:
-                    latest = self.get_latest_info(feed, best)
-                    if latest:
-                        # allow few episodes "backwards" in case missing
-                        grace = len(series) + 2
-                        if best.season < latest['season'] or (best.season == latest['season'] and best.episode < latest['episode'] - grace):
-                            log.debug('Series %s episode %s does not meet episode advancement, rejecting all occurrences' % (name, identifier))
-                            for ep in eps:
-                                feed.reject(ep.entry, 'episode advancement')
-                            continue
-                    else:
-                        log.debug('No latest info available')
-
-                # timeframe present
-                if 'timeframe' in conf:
-                    tconf = conf.get('timeframe')
-                    hours = tconf.get('hours', 0)
-                    enough = tconf.get('enough', '720p')
-                    stop = feed.manager.options.stop_waiting == name
-
-                    if not enough in SeriesParser.qualities:
-                        log.error('Parameter enough has unknown value: %s' % enough)
-
-                    # scan for enough, starting from worst quality (reverse)
-                    eps.reverse()
-                    found_enough = False
-                    for ep in eps:
-                        if self.cmp_quality(enough, ep.quality) >= 0: # 1=greater, 0=equal, -1=does not meet
-                            log.debug('Timeframe accepting. %s meets quality %s' % (ep.entry['title'], enough))
-                            self.accept_series(feed, ep)
-                            found_enough = True
-                            break
-                    if found_enough:
-                        continue
-                            
-                    # timeframe
-                    diff = datetime.today() - self.get_first_seen(feed, best)
-                    age_hours = divmod(diff.days*24*60*60 + diff.seconds, 60*60)[0]
-                    log.debug('Age hours: %i, seconds: %i - %s ' % (age_hours, diff.seconds, best))
-                    log.debug('Best ep in %i hours is %s' % (hours, best))
-                    # log when it is added to timeframe wait list (a bit hacky way to detect first time, by age)
-                    if (age_hours == 0 and diff.seconds < 60) and not feed.manager.unit_test:
-                        log.info('Timeframe waiting %s for %s hours, currently best is %s' % (name, hours, best.entry['title']))
-                    # stop timeframe
-                    if age_hours >= hours or stop:
-                        if stop:
-                            log.info('Stopped timeframe, accepting %s' % (best.entry['title']))
-                        else:
-                            log.info('Timeframe expired, accepting %s' % (best.entry['title']))
-                        self.accept_series(feed, best)
-                    else:
-                        log.debug('Timeframe ignoring %s' % (best.entry['title']))
                 else:
-                    # no timeframe, just choose best
+                    log.debug('No latest info available')
+
+            # timeframe present
+            if 'timeframe' in config:
+                timeframe = config.get('timeframe')
+                hours = timeframe.get('hours', 0)
+                enough = timeframe.get('enough', '720p')
+                stop = feed.manager.options.stop_waiting == series_name
+
+                if not enough in SeriesParser.qualities:
+                    log.error('Parameter enough has unknown value: %s' % enough)
+
+                # scan for enough, starting from worst quality (reverse)
+                eps.reverse()
+                found_enough = False
+
+                def cmp_quality(q1, q2):
+                    return cmp(SeriesParser.qualities.index(q1), SeriesParser.qualities.index(q2))
+
+                for ep in eps:
+                    if cmp_quality(enough, ep.quality) >= 0: # 1=greater, 0=equal, -1=does not meet
+                        log.debug('Timeframe accepting. %s meets quality %s' % (ep.entry['title'], enough))
+                        self.accept_series(feed, ep)
+                        found_enough = True
+                        break
+                if found_enough:
+                    continue
+                        
+                # timeframe
+                diff = datetime.today() - self.get_first_seen(feed, best)
+                age_hours = divmod(diff.days*24*60*60 + diff.seconds, 60*60)[0]
+                log.debug('Age hours: %i, seconds: %i - %s ' % (age_hours, diff.seconds, best))
+                log.debug('Best ep in %i hours is %s' % (hours, best))
+                # log when it is added to timeframe wait list (a bit hacky way to detect first time, by age)
+                if (age_hours == 0 and diff.seconds < 60) and not feed.manager.unit_test:
+                    log.info('Timeframe waiting %s for %s hours, currently best is %s' % (series_name, hours, best.entry['title']))
+                # stop timeframe
+                if age_hours >= hours or stop:
+                    if stop:
+                        log.info('Stopped timeframe, accepting %s' % (best.entry['title']))
+                    else:
+                        log.info('Timeframe expired, accepting %s' % (best.entry['title']))
                     self.accept_series(feed, best)
+                else:
+                    log.debug('Timeframe ignoring %s' % (best.entry['title']))
+            else:
+                # no timeframe, just choose best
+                self.accept_series(feed, best)
 
     def accept_series(self, feed, parser):
         """Helper method for accepting series"""

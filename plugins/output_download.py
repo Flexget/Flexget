@@ -6,8 +6,6 @@ import shutil
 import filecmp
 from manager import PluginWarning
 
-
-
 log = logging.getLogger('download')
 
 class PluginDownload:

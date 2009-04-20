@@ -32,20 +32,32 @@ except ImportError:
 class RegisterException(Exception):
     def __init__(self, value):
         self.value = value
+    
     def __str__(self):
         return repr(self.value)
 
 class PluginWarning(Warning):
-    def __init__(self, value, logger=logging, **kwargs):
+    def __init__(self, value, logger=log, **kwargs):
         self.value = value
         self.log = logger
         self.kwargs = kwargs
+    
+    def __str__(self):
+        return self.value
+
+class PluginError(Exception):
+    def __init__(self, value, logger=log, **kwargs):
+        self.value = value
+        self.log = logger
+        self.kwargs = kwargs
+        
     def __str__(self):
         return self.value
         
 class MergeException(Exception):
     def __init__(self, value):
         self.value = value
+
     def __str__(self):
         return repr(self.value)
 
@@ -333,26 +345,6 @@ class Manager:
             if fn.startswith(prefix+'_') and fn.endswith('.py'):
                 plugins.append(fn[:-3])
         return plugins
-
-    def get_settings(self, keyword, defaults={}):
-        # TO BE REMOVED
-        """
-            Return defaults / settings for a keyword. Optionally you may pass defaults values in dictionary 
-            which will be used as default values.
-
-            Ie. Passed defaults:
-            {'size': 20, 'length': 30}
-            User has configured:
-            {'length': 40}
-            Returned:
-            {'size': 20, 'length': 40}
-
-            See. http://flexget.com/wiki/GlobalSection - uses same merge
-        """
-        settings = self.config.get('settings', {})
-        config = settings.get(keyword, {})
-        self.merge_dict_from_to(config, defaults)
-        return defaults
 
     def register(self, name, **kwargs):
         """
