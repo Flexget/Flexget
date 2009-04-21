@@ -264,7 +264,7 @@ class FilterSeries:
                 season = wconfig.get('season', -1)
                 episode = wconfig.get('episode', maxint)
                 if best.season < season or (best.season == season and best.episode <= episode):
-                    log.debug('Series %s episode %s is already watched, rejecting all occurrences' % (series_name, identifier))
+                    log.debug('%s episode %s is already watched, rejecting all occurrences' % (series_name, identifier))
                     for ep in eps:
                         feed.reject(ep.entry, 'watched')
                     continue
@@ -273,10 +273,10 @@ class FilterSeries:
             if best.season and best.episode:
                 latest = self.get_latest_info(feed, best)
                 if latest:
-                    # allow few episodes "backwards" in case missing
+                    # allow few episodes "backwards" in case of missed eps
                     grace = len(series) + 2
                     if best.season < latest['season'] or (best.season == latest['season'] and best.episode < latest['episode'] - grace):
-                        log.debug('Series %s episode %s does not meet episode advancement, rejecting all occurrences' % (series_name, identifier))
+                        log.debug('%s episode %s does not meet episode advancement, rejecting all occurrences' % (series_name, identifier))
                         for ep in eps:
                             feed.reject(ep.entry, 'episode advancement')
                         continue
@@ -324,8 +324,14 @@ class FilterSeries:
                     else:
                         log.info('Timeframe expired, accepting %s' % (best.entry['title']))
                     self.accept_series(feed, best)
+                    for ep in eps:
+                        if ep==best:
+                            continue
+                        feed.reject(ep.entry, 'low quality')
                 else:
-                    log.debug('Timeframe ignoring %s' % (best.entry['title']))
+                    log.debug('timeframe waiting %s episode %s, rejecting all occurrences' % (series_name, identifier))
+                    for ep in eps:
+                        feed.reject(ep.entry, 'timeframe waiting')
             else:
                 # no timeframe, just choose best
                 self.accept_series(feed, best)
