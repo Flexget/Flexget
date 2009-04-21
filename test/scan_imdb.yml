@@ -1,9 +1,7 @@
 feeds:
   test:
     input_mock:
-      # for description url
-      - {title: 'with just url', url: 'http://localhost/scanimdb', description: 'title: Punisher-War Zone\n imdb-url: http://www.imdb.com/title/tt0330793/'}
-      - {title: 'with html tag url', url: 'http://localhost/scanimdb', description: '<a href="http://imdb.com/title/tt0472198/">IMDb</a>'}
-      - {title: 'test not have imdb url', url: 'http://localhost/scanimdb', description: 'hebele hubele'}
-    scan_imdb: true
+      - {title: 'Scan Test 1', url: 'http://localhost/scanimdb/1', description: 'title: Foo Bar Asdf\n imdb-url: http://www.imdb.com/title/tt0330793/ more text'}
+      - {title: 'Scan Test 2', url: 'http://localhost/scanimdb/2', description: '<a href="http://imdb.com/title/tt0472198/">IMDb</a>'}
+      - {title: 'Scan Test 3', url: 'http://localhost/scanimdb/3', description: 'nothing here'}
 

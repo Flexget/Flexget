@@ -136,9 +136,9 @@ class TestFilterSeries(FlexGetTestCase):
         if not self.feed.find_entry(title='Another.Series.S01E20.720p.XViD-FlexGet'):
             self.fail('Another.Series.S01E20.720p.XViD-FlexGet should have passed')
         # episode advancement
-        if self.feed.find_entry(title='Another.Series.S01E10.720p.XViD-FlexGet'):
+        if self.feed.find_entry('rejected', title='Another.Series.S01E10.720p.XViD-FlexGet'):
             self.fail('Another.Series.S01E10.720p.XViD-FlexGet should NOT have passed because of episode advancement')
-        if not self.feed.find_entry(title='Another.Series.S01E16.720p.XViD-FlexGet'):
+        if not self.feed.find_entry('accepted', title='Another.Series.S01E16.720p.XViD-FlexGet'):
             self.fail('Another.Series.S01E16.720p.XViD-FlexGet should have passed because of episode advancement grace magin')
         # date formats
         df = ['Date.Series.10-11-2008.XViD','Date.Series.10.12.2008.XViD', 'Date.Series.2008-10-13.XViD', 'Date.Series.2008x10.14.XViD']
@@ -457,9 +457,9 @@ class TestScanImdb(FlexGetTestCase):
     def testScanImdb(self):
         self.feed.execute()
         if not self.feed.find_entry(imdb_url='http://www.imdb.com/title/tt0330793'):
-            self.fail('Failed pick url from description')
+            self.fail('Failed pick url from test 1')
         if not self.feed.find_entry(imdb_url='http://imdb.com/title/tt0472198'):
-            self.fail('Failed pick imdb.com from description')
+            self.fail('Failed pick url from test 2')
 
 class TestValidator(unittest.TestCase):
 
