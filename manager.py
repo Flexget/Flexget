@@ -262,7 +262,12 @@ class Manager:
             shutil.move(shelve_session_name, '%s_migrated' % shelve_session_name)
         
         # SQLAlchemy
-        engine = sqlalchemy.create_engine('sqlite:////%s/db-%s.sqlite' %( sys.path[0], self.configname), echo=self.options.debug_sql)
+        filename = os.path.join(sys.path[0], 'db-%s.sqlite' % self.configname)
+        # in case running on windows, needs double \\
+        filename = filename.replace('\\', '\\\\')
+        connection = 'sqlite:///%s' % filename
+        log.debug('connection: %s' % connection)
+        engine = sqlalchemy.create_engine(connection, echo=self.options.debug_sql)
         Session.configure(bind=engine)
         # create all tables
         if self.options.reset:

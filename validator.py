@@ -1,4 +1,5 @@
 import re
+import copy
 
 # TODO: "validation succeeded, errors are logged so it's considered clean!"
 # TODO: rename all validator.valid -> validator.accepts / accepted / accept ?
@@ -12,36 +13,16 @@ class Errors:
         self.messages = []
         self.path = []
         self.path_level = None
-        self.transaction = False
-        self.transaction_queue = []
-        
-    def begin(self):
-        """Start message transaction"""
-        self.transaction = True
-        self.transaction_queue = []
-        
-    def rollback(self):
-        """Rollback added error messages"""
-        self.transaction = False
-        self.transaction_queue = []
-        
-    def commit(self):
-        if not self.transaction:
-            raise Exception('no error transaction in process')
-        self.messages.extend(self.transaction_queue)
         
     def count(self):
-        """Return number of errors"""
+        """Return number of errors."""
         return len(self.messages)
     
     def add(self, msg):
         """Add new error message to current path."""
         path = [str(p) for p in self.path]
         msg = '[/%s] %s' % ('/'.join(path), msg)
-        if self.transaction:
-            self.transaction_queue.append(msg)
-        else:  
-            self.messages.append(msg)
+        self.messages.append(msg)
 
     def path_add_level(self, value='?'):
         """Adds level into error message path"""
@@ -115,14 +96,16 @@ class Validator(object):
         """
         for rule in rules:
             #print 'validating %s' % rule.name
-            self.errors.begin()
+            original = copy.deepcopy(self.errors)
+            #self.errors.begin()
             if rule.validateable(item):
                 if rule.validate(item):
-                    # passed, roll back any previous errors
-                    self.errors.rollback()
+                    # passed, rollback any previously added errors
+                    self.errors = original
+                    #self.errors.rollback()
                     return True
             # add errors
-            self.errors.commit()
+            #self.errors.commit()
         return False
 
     def __str__(self):
@@ -140,12 +123,15 @@ class RootValidator(Validator):
         return True
     
     def validate(self, data):
+        count = self.errors.count()
         for v in self.valid:
             if v.validateable(data):
                 if v.validate(data):
                     return True
-        acceptable = [v.name for v in self.valid]
-        self.errors.add('incorrect format, should be %s' % ', '.join(acceptable))
+        # containers should only add errors if inner validators did not
+        if count == self.errors.count():
+            acceptable = [v.name for v in self.valid]
+            self.errors.add('failed to pass as %s' % ', '.join(acceptable))
         return False
 
 # borked                
@@ -291,14 +277,16 @@ class ListValidator(Validator):
             self.errors.add('value should be a list')
             return False
         self.errors.path_add_level()
-        ec = self.errors.count()
+        count = self.errors.count()
         for item in data:
-            self.errors.path_update_value(data.index(item))
+            self.errors.path_update_value('list:%i' % data.index(item))
             if not self.validate_item(item, self.valid):
-                l = [r.name for r in self.valid]
-                self.errors.add('is not valid %s' % (', '.join(l)))
+                # containers should only add errors if inner validators did not
+                if count == self.errors.count():
+                    l = [r.name for r in self.valid]
+                    self.errors.add('is not valid %s' % (', '.join(l)))
         self.errors.path_remove_level()
-        return ec == self.errors.count()
+        return count == self.errors.count()
 
 class DictValidator(Validator):
     name = 'dict'
@@ -354,10 +342,10 @@ class DictValidator(Validator):
             self.errors.add('value should be a dictionary / map')
             return False
         
-        ec = self.errors.count()
+        count = self.errors.count()
         self.errors.path_add_level()
         for key, value in data.iteritems():
-            self.errors.path_update_value(key)
+            self.errors.path_update_value('dict:%s' % key)
             if not key in self.valid and not self.any_key:
                 self.errors.add('key \'%s\' is not recognized' % key)
                 continue
@@ -369,35 +357,28 @@ class DictValidator(Validator):
             rules = self.valid.get(key, [])
             rules.extend(self.any_key)
             if not self.validate_item(value, rules):
-                l = [r.name for r in rules]
-                self.errors.add('key \'%s\' is not valid %s' % (value, ', '.join(l)))
+                if count==self.errors.count():
+                    # containers should only add errors if inner validators did not
+                    l = [r.name for r in rules]
+                    self.errors.add('key \'%s\' is not valid %s' % (value, ', '.join(l)))
         for required in self.required_keys:
             if not required in data:
                 self.errors.add('key \'%s\' required' % required)
         self.errors.path_remove_level()
-        return ec == self.errors.count()
+        return count == self.errors.count()
 
 if __name__=='__main__':
     
-    try:
-        
-        ll = factory('list')
+    root = factory()
+    container = root.accept('list')
+    #container.accept('text')
+    #container.accept('number')
+    bundle = container.accept('dict')
+    advanced = bundle.accept_any_key('dict')
+    advanced.accept('text', key='path')
+    
+    root.validate([{'some series':{'path':'~/asfd/', 'fail':True}}])
+    #root.validate(['asdfasdf', 'asdfasdfasdf', {'key':'value'}])
+    
+    print root.errors.messages
 
-        dict1 = ll.accept('dict')
-        dict1.accept('text', key='name', required=True)
-        dict1.accept('number', key='age', required=True)
-        
-        dict2 = ll.accept('dict')
-        dict2.accept_any_key('text')
-        
-        #ll.validate( [{'name':'foobar', 'age': 5} ] )
-        
-        ll.validate( [{'kukkuu':'foobar'} ] )
-        
-        print ll.errors.messages
-
-    except Exception, e:
-        print e
-    finally:
-        pass
-        #s = raw_input('--> ')

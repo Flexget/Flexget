@@ -1,7 +1,5 @@
 import logging
 
-
-
 log = logging.getLogger("mininova")
 
 class ResolveMininova:

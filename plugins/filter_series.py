@@ -65,34 +65,60 @@ class FilterSeries:
 
     def validator(self):
         import validator
-        return validator.factory('any')
-        """
-        series = validator.factory('list')
-        series.accept('text')
-        series.accept('number')
-        bundle = series.accept('dict')
-        # prevent invalid indentation level
-        bundle.reject_keys(['path', 'timeframe', 'name_patterns', 'ep_patterns', 'id_patterns', 'watched'])
-        advanced = bundle.accept_any_key('dict')
-        advanced.accept('text', key='path')
-        # regexes can be given in as a single string ..
-        advanced.accept('text', key='name_patterns')
-        advanced.accept('text', key='ep_patterns')
-        advanced.accept('text', key='id_patterns')
-        # .. or as list containing strings
-        advanced.accept('list', key='name_patterns').accept('text')
-        advanced.accept('list', key='ep_patterns').accept('text')
-        advanced.accept('list', key='id_patterns').accept('text')
-        # timeframe dict
-        timeframe = advanced.accept('dict', key='timeframe')
-        timeframe.accept('number', key='hours')
-        timeframe.accept('text', key='enough') # TODO: allow only SeriesParser.qualities
-        # watched
-        watched = advanced.accept('dict', key='watched')
-        watched.accept('number', key='season')
-        watched.accept('number', key='episode')
-        return series
-        """
+
+        def build_options(advanced):
+            advanced.accept('text', key='path')
+            # regexes can be given in as a single string ..
+            advanced.accept('text', key='name_regexps')
+            advanced.accept('text', key='ep_regexps')
+            advanced.accept('text', key='id_regexps')
+            # .. or as list containing strings
+            advanced.accept('list', key='name_regexps').accept('text')
+            advanced.accept('list', key='ep_regexps').accept('text')
+            advanced.accept('list', key='id_regexps').accept('text')
+            # timeframe dict
+            timeframe = advanced.accept('dict', key='timeframe')
+            timeframe.accept('number', key='hours')
+            timeframe.accept('text', key='enough') # TODO: allow only SeriesParser.qualities
+            # watched
+            watched = advanced.accept('dict', key='watched')
+            watched.accept('number', key='season')
+            watched.accept('number', key='episode')
+
+        def build_list(series):
+            """Build series list to series."""
+            series.accept('text')
+            series.accept('number')
+            bundle = series.accept('dict')
+            # prevent invalid indentation level
+            bundle.reject_keys(['path', 'timeframe', 'name_regexps', 'ep_regexps', 'id_regexps', 'watched'])
+            advanced = bundle.accept_any_key('dict')
+            build_options(advanced)
+        
+        root = validator.factory()
+        
+        # simple format:
+        #   - series
+        #   - another series
+        
+        simple = root.accept('list')
+        build_list(simple)
+        
+        # advanced format:
+        #   settings:
+        #     group: {...}
+        #   group:
+        #     {...}
+
+        advanced = root.accept('dict')
+        settings = advanced.accept('dict', key='settings', required=True)
+        settings_group = settings.accept_any_key('dict')
+        build_options(settings_group)
+
+        group = advanced.accept_any_key('list')        
+        build_list(group)
+
+        return root
 
     # TODO: re-implement (as new (sub)-plugin InputBacklog ?)
     """

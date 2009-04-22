@@ -244,9 +244,9 @@ class Feed:
                 else:
                     self.verbose_progress('Feed %s produced %s entries.' % (self.name, len(self.entries)))
             if event == 'filter':
-                self.verbose_progress('Feed %s rejected: %s undecided: %s accepted: %s failed: %s' % \
-                                      (self.name, len(self.rejected), len(self.entries), \
-                                       len(self.accepted), len(self.failed)))
+                self.verbose_progress('Feed %s accepted: %s (failed: %s rejected: %s undecided: %s)' % \
+                                      (self.name, len(self.accepted), len(self.failed), \
+                                       len(self.rejected), len(self.entries)))
             # if abort flag has been set feed should be aborted now
             if self.__abort:
                 return
@@ -266,6 +266,8 @@ class Feed:
         validate_errors = []
         # validate all plugins
         for keyword in self.config:
+            if keyword.startswith('_'):
+                continue
             plugin = self.manager.plugins.get(keyword)
             if not plugin:
                 validate_errors.append('Unknown plugin \'%s\'' % keyword)
@@ -273,8 +275,9 @@ class Feed:
             if hasattr(plugin['instance'], 'validator'):
                 try:
                     validator = plugin['instance'].validator()
-                except TypeError:
-                    log.critical('invalid validator method in plugin %s' % keyword)
+                except TypeError, e:
+                    log.critical('Invalid validator method in plugin %s' % keyword)
+                    log.exception(e)
                     continue
                 if not validator.validate(self.config[keyword]):
                     for msg in validator.errors.messages:
