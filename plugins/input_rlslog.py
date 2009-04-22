@@ -62,7 +62,7 @@ class RlsLog:
                 log.debug('FAIL: No entrybody')
                 continue
 
-            log.debug('Processing title %s' % (release['title']))
+            log.log(5, 'Processing title %s' % (release['title']))
 
             rating = entrybody.find('strong', text=re.compile('imdb rating\:', re.IGNORECASE))
             if rating != None:
@@ -90,10 +90,9 @@ class RlsLog:
                 resolver = feed.manager.get_plugin_by_name('resolver')
                 if resolver['instance'].resolvable(feed, temp):
                     release['url'] = link_href
-                    #log.debug('--> accepting %s (resolvable)' % link_href)
+                    log.log(5, '--> accepting %s (resolvable)' % link_href)
                 else:
-                    pass
-                    #log.debug('<-- ignoring %s (non-resolvable)' % link_href)
+                    log.log(5, '<-- ignoring %s (non-resolvable)' % link_href)
 
             # reject if no torrent link
             if not 'url' in release:

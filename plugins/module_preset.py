@@ -36,7 +36,7 @@ class PluginPreset:
         config = feed.config.get('preset', 'global')
         if isinstance(config, basestring):
             config = [config]
-        log.debug('presets: %s' % config)
+        log.log(5, 'presets: %s' % config)
         
         for preset in config:
             log.debug('Merging preset %s into feed %s' % (preset, feed.name))

@@ -147,6 +147,8 @@ class Manager:
                           help=SUPPRESS_HELP)
         parser.add_option('--debug', action='store_true', dest='debug', default=False,
                           help=SUPPRESS_HELP)
+        parser.add_option('--debug-all', action='store_true', dest='debug_all', default=False,
+                          help=SUPPRESS_HELP)
         parser.add_option('--debug-sql', action='store_true', dest='debug_sql', default=False,
                           help=SUPPRESS_HELP)
         parser.add_option('--validate', action='store_true', dest='validate', default=0,
@@ -213,6 +215,7 @@ class Manager:
         
         filename = os.path.join(sys.path[0], 'flexget.log')
 
+        logging.addLevelName(5, 'DEBUGALL')
         # get root logger
         logger = logging.getLogger()
         handler = logging.handlers.RotatingFileHandler(filename, maxBytes=200*1024, backupCount=9)
@@ -224,6 +227,8 @@ class Manager:
         # unfortunately we cannot use optik in here
         if '--debug' in sys.argv:
             logger.setLevel(logging.DEBUG)
+        elif '--debug-all' in sys.argv:
+            logger.setLevel(0)
         else:
             logger.setLevel(logging.INFO)
 
@@ -233,6 +238,7 @@ class Manager:
             console.setFormatter(formatter)
             logger.addHandler(console)
         
+        log.log(5, 'test')
         Manager.log_initialized = True
            
     def load_config(self):
