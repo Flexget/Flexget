@@ -364,7 +364,7 @@ class FilterSeries:
     def downloaded(self, feed, parser):
         """Return true if episode is downloaded"""
         episode = feed.session.query(Episode).select_from(join(Episode, Series)).\
-            filter(Series.name==parser.name).first()
+            filter(Series.name==parser.name).filter(Episode.identifier==parser.identifier()).first()
         if episode:
             return episode.downloaded
         return False
