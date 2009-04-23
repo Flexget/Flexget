@@ -1,5 +1,4 @@
 import re
-import copy
 
 # TODO: "validation succeeded, errors are logged so it's considered clean!"
 # TODO: rename all validator.valid -> validator.accepts / accepted / accept ?
@@ -96,16 +95,9 @@ class Validator(object):
         """
         for rule in rules:
             #print 'validating %s' % rule.name
-            original = copy.deepcopy(self.errors)
-            #self.errors.begin()
             if rule.validateable(item):
                 if rule.validate(item):
-                    # passed, rollback any previously added errors
-                    self.errors = original
-                    #self.errors.rollback()
                     return True
-            # add errors
-            #self.errors.commit()
         return False
 
     def __str__(self):

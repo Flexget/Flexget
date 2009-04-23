@@ -8,7 +8,26 @@ log = logging.getLogger('regexp')
 class FilterRegexp:
 
     """
-        TODO: (see wiki for now)
+        All possible forms.
+        
+        regexp:
+          [operation]:          # operation to perform on matches
+            - [regexp]          # simple regexp
+            - [regexp]: <path>  # override path
+            - [regexp]:
+                [path]: <path>  # override path
+                [not]: <regexp> # not match
+            - [regexp]:
+                [path]: <path>  # override path
+                [not]:          # not matches 
+                  - [regexp]    # not match
+                  - [regexp]    # not match
+          [operation]:
+            - ....
+            - ....
+          [rest]: <operation>   # non matching entries are
+        
+        Possible operations: accept, reject, accept_excluding, reject_excluding        
     """
     
     def register(self, manager, parser):
@@ -17,26 +36,31 @@ class FilterRegexp:
     def validator(self):
         import validator
 
-        def build(sub):
-            sub.accept('text')
-            sub.accept('number')
+        def build_list(regexps):
+            regexps.accept('text')
+            regexps.accept('number')
             
-            compact = sub.accept('dict')
-            compact.accept_any_key('text')
+            # bundle is a dictionary form
+            bundle = regexps.accept('dict')
+            # path as a single parameter
+            bundle.accept_any_key('text') 
             
-            advanced = sub.accept('dict')
+            # advanced configuration as a parameter
+            advanced = bundle.accept_any_key('dict')
             advanced.accept('text', key='path') # TODO: text -> path
             advanced.accept('text', key='not')
+            # not as a single parameter
             advanced.accept('number', key='not')
             
+            # not in a list form
             notl = advanced.accept('list', key='not')
             notl.accept('text')
             notl.accept('number')
             
         conf = validator.factory('dict')
         for operation in ['accept', 'reject', 'accept_excluding', 'reject_excluding']:
-            sub = conf.accept('list', key=operation)
-            build(sub)
+            regexps = conf.accept('list', key=operation)
+            build_list(regexps)
             
         conf.accept('text', key='rest') # TODO: accept only ['accept','filter','reject']
         return conf
