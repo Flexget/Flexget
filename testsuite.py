@@ -197,6 +197,12 @@ class TestRegexp(FlexGetTestCase):
             self.fail('regexp2 should have been accepted')
         if not self.feed.find_entry('accepted', title='regexp3'):
             self.fail('regexp3 should have been accepted')
+
+    def testFrom(self):
+        self.use_feed('test_from')
+        self.feed.execute()
+        if self.feed.accepted:
+            self.fail('should not have accepted anything')
         
 class TestResolvers(FlexGetTestCase):
 

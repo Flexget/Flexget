@@ -47,3 +47,11 @@ feeds:
     regexp:
       accept_excluding:
         - regexp1
+        
+  # test from
+  test_from:
+    regexp:
+      accept:
+        - localhost:
+            from:
+              - title

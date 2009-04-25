@@ -69,13 +69,13 @@ class FilterSeries:
         def build_options(advanced):
             advanced.accept('text', key='path')
             # regexes can be given in as a single string ..
-            advanced.accept('text', key='name_regexps')
-            advanced.accept('text', key='ep_regexps')
-            advanced.accept('text', key='id_regexps')
+            advanced.accept('regexp', key='name_regexps')
+            advanced.accept('regexp', key='ep_regexps')
+            advanced.accept('regexp', key='id_regexps')
             # .. or as list containing strings
-            advanced.accept('list', key='name_regexps').accept('text')
-            advanced.accept('list', key='ep_regexps').accept('text')
-            advanced.accept('list', key='id_regexps').accept('text')
+            advanced.accept('list', key='name_regexps').accept('regexp')
+            advanced.accept('list', key='ep_regexps').accept('regexp')
+            advanced.accept('list', key='id_regexps').accept('regexp')
             # timeframe dict
             timeframe = advanced.accept('dict', key='timeframe')
             timeframe.accept('number', key='hours')

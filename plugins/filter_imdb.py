@@ -83,28 +83,27 @@ class FilterImdb:
 
         Configuration:
         
-            Note: All parameters are optional. Some are mutually exclusive.
-        
-            min_score: <num>
-            min_votes: <num>
-            min_year: <num>
+        Note: All parameters are optional. Some are mutually exclusive.
+    
+        min_score: <num>
+        min_votes: <num>
+        min_year: <num>
 
-            # reject if genre contains any of these
-            reject_genres:
-                - genre1
-                - genre2
+        # reject if genre contains any of these
+        reject_genres:
+            - genre1
+            - genre2
 
-            # reject if language contain any of these
-            reject_languages:
-                - language1
+        # reject if language contain any of these
+        reject_languages:
+            - language1
 
-            # accept only this language
-            accept_languages:
-                - language1
+        # accept only this language
+        accept_languages:
+            - language1
 
-            # filter all entries which are not imdb-compatible
-            # this has default value (True) even when key not present
-            filter_invalid: True / False
+        # Reject all entries which are not imdb-compatible (default)
+        reject_invalid: True / False
     """
 
     def register(self, manager, parser):
@@ -120,7 +119,7 @@ class FilterImdb:
         imdb.accept('list', key='reject_genres').accept('text')
         imdb.accept('list', key='reject_languages').accept('text')
         imdb.accept('list', key='accept_languages').accept('text')
-        imdb.accept('boolean', key='filter_invalid')
+        imdb.accept('boolean', key='reject_invalid')
         return imdb
 
     def imdb_required(self, entry, config):
@@ -195,7 +194,7 @@ class FilterImdb:
                             log_once('Rejecting %s because of undeterminable imdb url' % entry['title'], log)
                             feed.reject(entry, 'undeterminable url')
                         else:
-                            log.debug('Unable to check %s due missing imdb url, configured to pass (filter_invalid is False)' % entry['title'])
+                            log.debug('Unable to check %s due missing imdb url, configured to pass (reject_invalid is False)' % entry['title'])
                         continue
                 except IOError, e:
                     if hasattr(e, 'reason'):
@@ -259,6 +258,7 @@ class FilterImdb:
                         log.exception(e)
                         continue
                 else:
+                    # TODO: I don't like this shoveling ...
                     imdb.name = cached.title
                     imdb.year = cached.year
                     imdb.votes = cached.votes

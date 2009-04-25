@@ -59,7 +59,7 @@ class Validator(object):
             # register default validators
             register = [RootValidator, ListValidator, DictValidator, TextValidator, FileValidator,
                         AnyValidator, NumberValidator, BooleanValidator, DecimalValidator, UrlValidator, 
-                        ChoiceValidator]
+                        RegexpValidator, ChoiceValidator]
             for v in register:
                 self.register(v)
         else:
@@ -227,6 +227,26 @@ class TextValidator(Validator):
         if not valid:
             self.errors.add('value %s is not valid text' % data)
         return valid
+
+class RegexpValidator(Validator):
+    name = 'regexp'
+    
+    def accept(self, name, **kwargs):
+        pass
+
+    def validateable(self, data):
+        return isinstance(data, basestring)
+
+    def validate(self, data):
+        if not isinstance(data, basestring):
+            self.errors.add('Value should be text')
+            return False
+        try:
+            re.compile(data)
+        except:
+            self.errors.add('%s is not a valid regular expression' % data)
+            return False
+        return True
 
 class FileValidator(TextValidator):
     name = 'file'

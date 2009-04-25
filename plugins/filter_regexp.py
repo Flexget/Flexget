@@ -11,20 +11,21 @@ class FilterRegexp:
         All possible forms.
         
         regexp:
-          [operation]:          # operation to perform on matches
-            - [regexp]          # simple regexp
-            - [regexp]: <path>  # override path
+          [operation]:           # operation to perform on matches
+            - [regexp]           # simple regexp
+            - [regexp]: <path>   # override path
             - [regexp]:
-                [path]: <path>  # override path
-                [not]: <regexp> # not match
+                [path]: <path>   # override path
+                [not]: <regexp>  # not match
+                [from]: <field>  # search from given entry field
             - [regexp]:
-                [path]: <path>  # override path
-                [not]:          # not matches 
-                  - [regexp]    # not match
-                  - [regexp]    # not match
+                [path]: <path>   # override path
+                [not]:           # list of not match regexps
+                  - <regexp>    
+                [from]:          # search only from these fields
+                  - <field>
           [operation]:
-            - ....
-            - ....
+            - <regexp>
           [rest]: <operation>   # non matching entries are
         
         Possible operations: accept, reject, accept_excluding, reject_excluding        
@@ -37,8 +38,7 @@ class FilterRegexp:
         import validator
 
         def build_list(regexps):
-            regexps.accept('text')
-            regexps.accept('number')
+            regexps.accept('regexp')
             
             # bundle is a dictionary form
             bundle = regexps.accept('dict')
@@ -48,14 +48,16 @@ class FilterRegexp:
             # advanced configuration as a parameter
             advanced = bundle.accept_any_key('dict')
             advanced.accept('text', key='path') # TODO: text -> path
-            advanced.accept('text', key='not')
             # not as a single parameter
-            advanced.accept('number', key='not')
+            advanced.accept('regexp', key='not')
+            # from as a single parameter
+            advanced.accept('text', key='from')
             
             # not in a list form
-            notl = advanced.accept('list', key='not')
-            notl.accept('text')
-            notl.accept('number')
+            advanced.accept('list', key='not').accept('regexp')
+
+            # from in a list form
+            advanced.accept('list', key='from').accept('text')
             
         conf = validator.factory('dict')
         for operation in ['accept', 'reject', 'accept_excluding', 'reject_excluding']:
@@ -89,13 +91,16 @@ class FilterRegexp:
                 log.debug('Rest method %s for %s' % (rest_method.__name__, entry['title']))
                 rest_method(entry)
         
-    def matches(self, entry, regexp):
+    def matches(self, entry, regexp, find_from=[]):
         """Return True if any of the entry string fields match given regexp"""
         regexp = str(regexp)
         unquote = ['url']
         for field, value in entry.iteritems():
             if not isinstance(value, basestring):
                 continue
+            if find_from:
+                if not field in find_from:
+                    continue
             if field in unquote:
                 value = urllib.unquote(value)
             if re.search(regexp, value, re.IGNORECASE|re.UNICODE):
@@ -116,12 +121,14 @@ class FilterRegexp:
                 # set custom path for entry if pattern specifies one
                 path = None
                 secondary = []
+                from_fields = []
                 if isinstance(regexp_raw, dict):
                     #log.debug('complex regexp: %s' % regexp_raw)
                     regexp_raw, value = regexp_raw.items()[0]
-                    # if regexp has dict as parameter
+                    # advanced configuration
                     if isinstance(value, dict):
                         path = value.get('path', None)
+                        from_fields = value.get('from', [])
                         if 'not' in value:
                             if isinstance(value['not'], list): 
                                 secondary.extend(value['not'])
@@ -131,7 +138,7 @@ class FilterRegexp:
                         path = value
 
                 # check if entry matches given regexp
-                if self.matches(entry, regexp_raw):
+                if self.matches(entry, regexp_raw, from_fields):
                     match = True
                     # if we have secondary (not) regexps, test them
                     for secondary_re in secondary:
