@@ -1,8 +1,8 @@
 import logging
-from datetime import datetime
+from datetime import datetime, timedelta
 from utils.series import SeriesParser
 
-from manager import Base
+from manager import Base, PluginWarning
 from sqlalchemy import Column, Integer, String, DateTime, Boolean, PickleType
 from sqlalchemy.schema import ForeignKey
 from sqlalchemy.orm import relation,join
@@ -76,10 +76,9 @@ class FilterSeries:
             advanced.accept('list', key='name_regexps').accept('regexp')
             advanced.accept('list', key='ep_regexps').accept('regexp')
             advanced.accept('list', key='id_regexps').accept('regexp')
-            # timeframe dict
-            timeframe = advanced.accept('dict', key='timeframe')
-            timeframe.accept('number', key='hours')
-            timeframe.accept('text', key='enough') # TODO: allow only SeriesParser.qualities
+            # quality
+            advanced.accept('text', key='quality') # TODO: allow only SeriesParser.qualities
+            advanced.accept('text', key='timeframe')
             # watched
             watched = advanced.accept('dict', key='watched')
             watched.accept('number', key='season')
@@ -88,7 +87,6 @@ class FilterSeries:
         def build_list(series):
             """Build series list to series."""
             series.accept('text')
-            series.accept('number')
             bundle = series.accept('dict')
             # prevent invalid indentation level
             bundle.reject_keys(['path', 'timeframe', 'name_regexps', 'ep_regexps', 'id_regexps', 'watched'])
@@ -153,7 +151,8 @@ class FilterSeries:
     """
 
     def generate_config(self, feed):
-        import yaml
+        """Generate advanced form configuration dictionary from feed configuration. This way we do not
+        need to handle different configuration forms in the logic."""
 
         feed_config = feed.config.get('series', [])
         
@@ -178,8 +177,6 @@ class FilterSeries:
             config = copy.deepcopy(feed_config)
             
         # TODO: create empty settings block for all groups, otherwise they are not included in generated config
-        #print yaml.safe_dump(config)
-        
         # TODO: what if same series is configured in multiple groups?!
 
         # generate groups from settings groups
@@ -199,11 +196,9 @@ class FilterSeries:
                 # merge group settings into this series settings
                 feed.manager.merge_dict_from_to(group_settings, series_settings)
                 complex_series.append({series: series_settings})
-            
             # add generated complex series into config
             config[group_name] = complex_series
             
-        #print yaml.safe_dump(config)
         return config
 
     def feed_filter(self, feed):
@@ -308,64 +303,85 @@ class FilterSeries:
                         continue
                 else:
                     log.debug('No latest info available')
+                    
+            # plain quality
+            if 'quality' in config and not 'timeframe' in config:
+                for ep in eps:
+                    if ep.quality == config['quality']:
+                        self.accept_series(feed, ep, 'meets quality')
+                    else:
+                        feed.reject(ep.entry, 'quality') # is this needed or a good idea?
+                continue
 
             # timeframe present
             if 'timeframe' in config:
-                timeframe = config.get('timeframe')
-                hours = timeframe.get('hours', 0)
-                enough = timeframe.get('enough', '720p')
+                
+                # parse options
+                amount, unit = config['timeframe'].split(' ')
+                log.debug('amount: %s unit: %s' % (repr(amount), repr(unit)))
+                params = {unit:int(amount)}
+                try:
+                    timeframe = timedelta(**params)
+                except TypeError:
+                    raise PluginWarning('Invalid time format', log)
+                quality = config.get('quality', '720p')
+                if not quality in SeriesParser.qualities:
+                    log.error('Parameter quality has unknown value: %s' % quality)
                 stop = feed.manager.options.stop_waiting == series_name
 
-                if not enough in SeriesParser.qualities:
-                    log.error('Parameter enough has unknown value: %s' % enough)
-
-                # scan for enough, starting from worst quality (reverse)
+                # scan for quality, starting from worst quality (reverse) (old logic, see note below)
                 eps.reverse()
-                found_enough = False
 
                 def cmp_quality(q1, q2):
                     return cmp(SeriesParser.qualities.index(q1), SeriesParser.qualities.index(q2))
 
+                # scan for episode that meets defined quality
+                found_quality = False
                 for ep in eps:
-                    if cmp_quality(enough, ep.quality) >= 0: # 1=greater, 0=equal, -1=does not meet
-                        log.debug('Timeframe accepting. %s meets quality %s' % (ep.entry['title'], enough))
-                        self.accept_series(feed, ep)
-                        found_enough = True
+                    # Note: switch == operator to >= if wish to enable old behaviour
+                    if cmp_quality(quality, ep.quality) == 0: # 1=greater, 0=equal, -1=does not meet
+                        log.debug('Timeframe accepting. %s meets quality %s' % (ep.entry['title'], quality))
+                        self.accept_series(feed, ep, 'quality met, timeframe unnecessary')
+                        found_quality = True
                         break
-                if found_enough:
+                if found_quality:
                     continue
                         
-                # timeframe
-                diff = datetime.today() - self.get_first_seen(feed, best)
-                age_hours = divmod(diff.days*24*60*60 + diff.seconds, 60*60)[0]
-                log.debug('Age hours: %i, seconds: %i - %s ' % (age_hours, diff.seconds, best))
-                log.debug('Best ep in %i hours is %s' % (hours, best))
-                # log when it is added to timeframe wait list (a bit hacky way to detect first time, by age)
-                if (age_hours == 0 and diff.seconds < 60) and not feed.manager.unit_test:
-                    log.info('Timeframe waiting %s for %s hours, currently best is %s' % (series_name, hours, best.entry['title']))
-                # stop timeframe
-                if age_hours >= hours or stop:
+                # expire timeframe, accept anything
+                diff = datetime.now() - self.get_first_seen(feed, best)
+                if (diff.seconds < 60) and not feed.manager.unit_test:
+                    log.info('Timeframe waiting %s for %s hours, currently best is %s' % (series_name, timeframe.seconds/60, best.entry['title']))
+                
+                
+                log.debug('timeframe: %s' % timeframe)
+                log.debug('first_seen: %s' % self.get_first_seen(feed, best))
+                what = self.get_first_seen(feed, best) + timeframe
+                log.debug('first_seen + timeframe: %s' % what)
+                
+                if (self.get_first_seen(feed, best) + timeframe <= datetime.now()) or (stop):
                     if stop:
                         log.info('Stopped timeframe, accepting %s' % (best.entry['title']))
                     else:
                         log.info('Timeframe expired, accepting %s' % (best.entry['title']))
-                    self.accept_series(feed, best)
+                    self.accept_series(feed, best, 'expired/stopped')
                     for ep in eps:
                         if ep==best:
                             continue
-                        feed.reject(ep.entry, 'low quality')
+                        feed.reject(ep.entry, 'wrong quality')
+                    continue
                 else:
                     log.debug('timeframe waiting %s episode %s, rejecting all occurrences' % (series_name, identifier))
                     for ep in eps:
                         feed.reject(ep.entry, 'timeframe waiting')
-            else:
-                # no timeframe, just choose best
-                self.accept_series(feed, best)
+                    continue
 
-    def accept_series(self, feed, parser):
+            # no special configuration, just choose the best
+            self.accept_series(feed, best, 'choose best')
+
+    def accept_series(self, feed, parser, reason):
         """Helper method for accepting series"""
-        log.debug('Accepting %s' % parser.entry)
-        feed.accept(parser.entry)
+        log.debug('Accepting %s because %s' % (parser.entry, reason))
+        feed.accept(parser.entry, reason)
         # store series parser instance to entry for later use
         parser.entry['series_parser'] = parser
         # remove entry instance from parser, not needed any more (prevents circular reference?)

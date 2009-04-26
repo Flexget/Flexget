@@ -17,9 +17,8 @@ feeds:
       
     series:
       - some series:
-          timeframe:
-            hours: 4
-            enough: 1080p
+          quality: 1080p
+          timeframe: 4 hours
       - another series
       - date series
       - filename series
