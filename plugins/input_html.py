@@ -5,6 +5,7 @@ from socket import timeout
 from feed import Entry
 from manager import PluginWarning
 from BeautifulSoup import BeautifulSoup
+import re
 
 __pychecker__ = 'unusednames=parser'
 
@@ -34,6 +35,7 @@ class InputHtml:
         advanced.accept('url', key='url', required=True)
         advanced.accept('text', key='dump')
         advanced.accept('boolean', key='title_from_url')
+        advanced.accept('boolean', key='title_from_title')
         return root
 
     def feed_input(self, feed):
@@ -64,11 +66,15 @@ class InputHtml:
             f.close()
         
         for link in soup.findAll('a'):
-            if not 'href' in link: 
+            if not link.has_key('href'):
                 continue
             title = link.string
+
             if title == None: 
-                continue
+                title = link.next.string
+                if title == None:
+                    continue
+
             title = title.replace(u'\u200B', u'').strip()
             if not title: 
                 continue
@@ -85,6 +91,9 @@ class InputHtml:
                 parts = urllib.splitquery(url[url.rfind('/')+1:])
                 title = urllib.unquote_plus(parts[0])
                 log.debug('title_from_url: %s' % title)
+            elif config.get('title_from_title', False) and link.has_key('title'):
+                title = link['title']
+                log.debug('title_from_title: %s' % title)
             else:
                 # TODO: there should be this kind of function in feed, trunk unit test has it already
                 # move it to feed?
