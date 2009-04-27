@@ -1,6 +1,7 @@
 import logging
 from feed import Entry
 from manager import PluginWarning
+import urllib2
 
 mechanize_present = True
 try:
