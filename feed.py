@@ -35,7 +35,11 @@ class Entry(dict):
         if not 'title' in self:
             return False
         if not 'url' in self:
-            return True
+            return False
+        if not isinstance(self['url'], basestring):
+            return False
+        if not isinstance(self['title'], basestring):
+            return False
         return True
 
 class Feed:
