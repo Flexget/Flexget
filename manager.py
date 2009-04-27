@@ -218,7 +218,7 @@ class Manager:
         logging.addLevelName(5, 'DEBUGALL')
         # get root logger
         logger = logging.getLogger()
-        handler = logging.handlers.RotatingFileHandler(filename, maxBytes=200*1024, backupCount=9)
+        handler = logging.handlers.RotatingFileHandler(filename, maxBytes=1000*1024, backupCount=9)
         # time format is same format of strftime
         formatter = logging.Formatter('%(asctime)-15s %(levelname)-8s %(name)-11s %(message)s', '%Y-%m-%d %H:%M')
         handler.setFormatter(formatter)

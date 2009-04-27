@@ -45,6 +45,5 @@ class InputFormLogin:
 
         cookiejar = br._ua_handlers["_cookies"].cookiejar
 
-        # TODO: Store cookie jar so that other modules can use the session cookie(s) we just got
-        #opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cookiejar))
-        #urllib2.install_opener(opener)                                
+        opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cookiejar))
+        urllib2.install_opener(opener)                                
