@@ -285,6 +285,19 @@ class TestManager(FlexGetTestCase):
         if BeautifulSoup.__version__ != '3.0.7a':
             self.fail('BeautifulSoup version wrong')
 
+
+class TestInputHtml(FlexGetTestCase):
+        
+    def setUp(self):
+        self.config = 'test/html.yml'
+        FlexGetTestCase.setUp(self)
+        
+    def testParsing(self):
+        self.feed.execute()
+        if not self.feed.entries:
+            self.fail('did not produce entries')
+
+
 class TestFilterSeen(FlexGetTestCase):
         
     def setUp(self):
@@ -507,6 +520,7 @@ if __name__ == '__main__':
         print 'NOTE: Online tests are enabled. Some of these may fail since they depend on 3rd party services.'
         suite.addTest(unittest.makeSuite(TestImdbOnline))
         suite.addTest(unittest.makeSuite(TestDownload))
+        suite.addTest(unittest.makeSuite(TestInputHtml))
         suite.addTest(unittest.makeSuite(TestRssOnline))
     else:
         print 'NOTE: Use --online argument to enable online tests.'
