@@ -269,7 +269,7 @@ class ImdbParser:
         # get genres
         for link in soup.findAll('a', attrs={'href': re.compile('^/Sections/Genres/')}):
             # skip links that have javascipr onclick (not in genrelist)
-            if 'onclick' in link: 
+            if link.has_key('onclick'): 
                 continue
             self.genres.append(link.string.lower())
 
