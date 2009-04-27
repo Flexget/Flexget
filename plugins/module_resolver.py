@@ -38,18 +38,19 @@ class PluginResolver:
                 raise ResolverException('Resolve was left in infinite loop while resolving %s, some resolver is returning always True' % entry)
             for resolver in feed.manager.get_plugins_by_group('resolver'):
                 name = resolver['name']
-                if resolver['instance'].resolvable(feed, entry):
-                    try:
+                try:
+                    if resolver['instance'].resolvable(feed, entry):
+                        log.debug('Rerolving %s' % entry['url'])
                         resolver['instance'].resolve(feed, entry)
                         log.info('Resolved \'%s\' to %s (with %s)' % (entry['title'], entry['url'], name))
-                    except ResolverException, r:
-                        # increase failcount
-                        #count = self.shared_cache.storedefault(entry['url'], 1)
-                        #count += 1
-                        raise ResolverException('Resolver %s failed: %s' % (name, r.value))
-                    except Exception, e:
-                        log.exception(e)
-                        raise ResolverException('%s: Internal error with url %s' % (name, entry['url']))
+                except ResolverException, r:
+                    # increase failcount
+                    #count = self.shared_cache.storedefault(entry['url'], 1)
+                    #count += 1
+                    raise ResolverException('Resolver %s failed: %s' % (name, r.value))
+                except Exception, e:
+                    log.exception(e)
+                    raise ResolverException('%s: Internal error with url %s' % (name, entry['url']))
 
     def entries(self, feed):
         """Resolves all accepted entries in feed. Since this causes many requests to sites, use with caution."""
