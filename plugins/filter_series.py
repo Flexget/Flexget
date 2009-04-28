@@ -109,7 +109,7 @@ class FilterSeries:
         #     {...}
 
         advanced = root.accept('dict')
-        settings = advanced.accept('dict', key='settings', required=True)
+        settings = advanced.accept('dict', key='settings')
         settings_group = settings.accept_any_key('dict')
         build_options(settings_group)
 
@@ -158,9 +158,9 @@ class FilterSeries:
         
         # generate unified configuration in complex form, requires complex code as well :)
         config = {}
-        config['settings'] = {}
         if isinstance(feed_config, list):
             # convert simpliest configuration internally grouped format
+            config['settings'] = {}
             config['simple'] = []
             for series in feed_config:
                 # convert into dict-form if necessary
@@ -170,15 +170,26 @@ class FilterSeries:
                     if series_settings is None:
                         raise Exception('Series %s has unexpected \':\'' % series)
                 config['simple'].append({series: series_settings})
-                config['settings']['simple'] = {} # hack to make simple work for now! see todo below
         else:
             # already in grouped format, just get settings from there
             import copy
             config = copy.deepcopy(feed_config)
+            if not 'settings' in config:
+                config['settings'] = {}
             
-        # TODO: create empty settings block for all groups, otherwise they are not included in generated config
         # TODO: what if same series is configured in multiple groups?!
-
+        
+        # generate quality settings from group name and empty settings if not present (required) 
+        for group_name, _ in config.iteritems():
+            if group_name == 'settings':
+                continue
+            if not group_name in config['settings']:
+                # at least empty settings 
+                config['settings'][group_name] = {}
+                # if known quality, convenience create settings with that quality
+                if group_name in SeriesParser.qualities:
+                    config['settings'][group_name]['quality'] = group_name
+                    
         # generate groups from settings groups
         for group_name, group_settings in config['settings'].iteritems():
             # convert group series into complex types
