@@ -16,7 +16,7 @@ class DelayedEntry(Base):
     id = Column(Integer, primary_key=True)
     feed = Column(String)
     title = Column(String)
-    release = Column(DateTime)
+    expire = Column(DateTime)
     entry = Column(PickleType)
 
     def __repr__(self):
@@ -52,7 +52,7 @@ class FilterDelay:
             raise PluginWarning('Invalid time format', log)
 
     def feed_input(self, feed):
-        entries = feed.session.query(DelayedEntry).filter(datetime.now() > DelayedEntry.release).\
+        entries = feed.session.query(DelayedEntry).filter(datetime.now() > DelayedEntry.expire).\
                                      filter(DelayedEntry.feed == feed.name).all()
         for delayed_entry in entries:
             entry = delayed_entry.entry
@@ -63,13 +63,13 @@ class FilterDelay:
             for fe in feed.entries[:]:
                 if fe['title'] == entry['title']:
                     feed.entries.remove(fe)
-            # add released entry
+            # add expired entry
             feed.entries.append(entry)
             # remove from queue
             feed.session.delete(delayed_entry)
         
     def feed_filter(self, feed):
-        release_time = datetime.now() + self.get_delay(feed)
+        expire_time = datetime.now() + self.get_delay(feed)
         for entry in feed.entries:
             if 'passed_delay' in entry:
                 continue
@@ -82,6 +82,6 @@ class FilterDelay:
                 delay_entry.title = entry['title']
                 delay_entry.entry = entry
                 delay_entry.feed = feed.name
-                delay_entry.release = release_time
+                delay_entry.expire = expire_time
                 feed.reject(entry, 'delaying')
                 feed.session.add(delay_entry)

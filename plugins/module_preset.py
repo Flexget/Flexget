@@ -32,7 +32,7 @@ class PluginPreset:
         presets.accept('text')
         return root
         
-    def feed_start(self, feed):
+    def process_start(self, feed):
         config = feed.config.get('preset', 'global')
         if isinstance(config, basestring):
             config = [config]
@@ -47,10 +47,3 @@ class PluginPreset:
                 feed.manager.merge_dict_from_to(feed.manager.config[preset], feed.config)
             except MergeException:
                 raise PluginWarning('Failed to merge preset %s to feed %s, incompatible datatypes' % (preset, feed.name))
-
-            # TODO: re-validate feed after changes in configuration
-            """
-            errors = feed.validate()
-            if errors:
-                raise PluginWarning('Preset caused configuration errors')
-            """
