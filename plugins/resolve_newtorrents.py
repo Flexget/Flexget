@@ -105,5 +105,5 @@ class NewTorrents:
             if len(torrents) == 1:
                 log.debug('found only one matching search result.')
             else:
-                log.debug('search result contains multiple matches, using first occurence from: %s' % torrents)
-            return torrents[0]
+                log.debug('search result contains multiple matches, using most seeders from: %s' % torrents)
+            return torrents[0][1]
