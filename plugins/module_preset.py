@@ -1,8 +1,6 @@
 import logging
 from manager import PluginWarning, MergeException
 
-__pychecker__ = 'unusednames=parser'
-
 log = logging.getLogger('preset')
 
 class PluginPreset:
@@ -43,7 +41,9 @@ class PluginPreset:
             if not preset in feed.manager.config:
                 if preset=='global': continue
                 raise PluginWarning('Unable to set preset %s for %s' % (preset, feed.name))
+            # merge
+            from utils.tools import MergeException, merge_dict_from_to
             try:
-                feed.manager.merge_dict_from_to(feed.manager.config[preset], feed.config)
+                merge_dict_from_to(feed.manager.config[preset], feed.config)
             except MergeException:
                 raise PluginWarning('Failed to merge preset %s to feed %s, incompatible datatypes' % (preset, feed.name))

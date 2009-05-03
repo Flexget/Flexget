@@ -53,13 +53,7 @@ class PluginError(Exception):
         
     def __str__(self):
         return self.value
-        
-class MergeException(Exception):
-    def __init__(self, value):
-        self.value = value
-
-    def __str__(self):
-        return repr(self.value)
+       
 
 Base = declarative_base()
 Session = sessionmaker()
@@ -279,25 +273,6 @@ class Manager:
         if self.options.reset:
             Base.metadata.drop_all(bind=engine)
         Base.metadata.create_all(bind=engine)
-
-    # TODO: move into utils?! used only by couple times in plugins anymore ...
-    def sanitize(self, d):
-        """Makes dictionary d contain only yaml.safe_dump compatible elements"""
-        import types
-        valid = [types.DictType, types.IntType, types.NoneType,
-                 types.StringType, types.UnicodeType, types.BooleanType,
-                 types.ListType, types.LongType, types.FloatType]
-        for k in d.keys():
-            if type(d[k])==types.ListType:
-                for i in d[k][:]:
-                    if not type(i) in valid:
-                        log.debug('Removed non yaml compatible list item from key %s %s' % (k, type([k])))
-                        d[k].remove(i)
-            if type(d[k])==types.DictType:
-                self.sanitize(d[k])
-            if not type(d[k]) in valid:
-                log.debug('Removed non yaml compatible key %s %s' % (k, type(d[k])))
-                d.pop(k)
 
     def load_plugins(self, parser, plugindir):
         """Load all plugins from plugindir"""
@@ -551,26 +526,6 @@ class Manager:
         print 'Cleared %i items.' % len(results)
         session.commit()
         session.close()
-
-    # TODO: move into utils (only module_preset uses this)
-    def merge_dict_from_to(self, d1, d2):
-        """Merges dictionary d1 into dictionary d2. d1 will remain in original form."""
-        for k, v in d1.items():
-            if k in d2:
-                if type(v) == type(d2[k]):
-                    if isinstance(v, dict):
-                        self.merge_dict_from_to(d1[k], d2[k])
-                    elif isinstance(v, list):
-                        d2[k].extend(v)
-                    elif isinstance(v, basestring) or isinstance(v, bool) or isinstance(v, int):
-                        pass
-                    else:
-                        raise Exception('Unknown type: %s value: %s in dictionary' % (type(v), repr(v)))
-                else:
-                    raise MergeException('Merging key %s failed, conflicting datatypes.' % (k))
-            else:
-                d2[k] = v
-                
                 
     def create_feeds(self):
         """Creates instances of all configured feeds"""

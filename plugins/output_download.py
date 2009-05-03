@@ -146,8 +146,8 @@ class PluginDownload:
         import email
         filename = email.message_from_string(unicode(response.info()).encode('utf-8')).get_filename(failobj=False)
         if filename:
-            from utils.html import html_decode
-            filename = html_decode(filename)
+            from utils.tools import decode_html
+            filename = decode_html(filename)
             log.debug('Found filename from headers: %s' % filename)
             if 'filename' in entry:
                 log.debug('Overriding filename %s with %s from content-disposition' % (entry['filename'], filename))

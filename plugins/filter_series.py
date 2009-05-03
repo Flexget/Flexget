@@ -205,7 +205,8 @@ class FilterSeries:
                 if isinstance(series_settings, basestring):
                     series_settings = {'path': series_settings}
                 # merge group settings into this series settings
-                feed.manager.merge_dict_from_to(group_settings, series_settings)
+                from utils.tools import merge_dict_from_to 
+                merge_dict_from_to(group_settings, series_settings)
                 complex_series.append({series: series_settings})
             # add generated complex series into config
             config[group_name] = complex_series

@@ -5,7 +5,6 @@ import re
 from feed import Entry
 from manager import PluginWarning
 from utils.log import log_once
-from utils.html import html_decode
 
 feedparser_present = True
 try:
@@ -209,9 +208,10 @@ class InputRSS:
 
             # helper
             def add_entry(ea):
+                from utils.tools import decode_html
                 ea['title'] = entry.title
                 if 'description' in entry:
-                    ea['description'] = html_decode(entry.description)
+                    ea['description'] = decode_html(entry.description)
                 # store basic auth info
                 if 'username' in config and 'password' in config:
                     ea['basic_auth_username'] = config['username']

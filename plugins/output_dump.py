@@ -1,7 +1,5 @@
 import yaml
 
-__pychecker__ = 'unusednames=parser'
-
 class YamlDump:
 
     """
@@ -16,7 +14,8 @@ class YamlDump:
         return validator.factory('any')
 
     def feed_output(self, feed):
+        from utils.tools import sanitize
         for entry in feed.accepted:
             c = entry.copy()
-            feed.manager.sanitize(c)
+            sanitize(c)
             print yaml.safe_dump(c)
