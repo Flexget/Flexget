@@ -1,4 +1,4 @@
-import os
+import subprocess
 import logging
 
 __pychecker__ = 'unusednames=parser'
@@ -28,6 +28,7 @@ class OutputExec:
         for entry in feed.accepted:
             cmd = feed.config['exec'] % entry
             log.debug('executing cmd: %s' % cmd)
-            (r, w) = os.popen4(cmd)
+            p = subprocess.Popen(cmd, shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, close_fds=True)
+            (r, w) = (p.stdout, p.stdin)
             r.close()
             w.close()
