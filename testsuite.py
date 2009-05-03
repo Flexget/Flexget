@@ -16,9 +16,6 @@ class FlexGetTestCase(unittest.TestCase):
         # do not load session
         self.manager.options.reset = True
         self.manager.initialize()
-        # test feed as a default
-        if self.manager.config.get('feeds', {}).has_key('test'):
-            self.use_feed('test')
         
     def tearDown(self):
         try:
@@ -29,13 +26,17 @@ class FlexGetTestCase(unittest.TestCase):
         if os.path.exists(fn):
             os.remove(fn)
 
-    def use_feed(self, name):
+    def execute_feed(self, name):
+        """Use to execute one test feed from config"""
         config = self.manager.config['feeds'][name]
         if hasattr(self, 'feed'):
             if hasattr(self, 'session'):
                 self.feed.session.close() # pylint: disable-msg=E0203
         self.feed = Feed(self.manager, name, config)
         self.feed.session = Session()
+        self.feed.process_start()
+        self.feed.execute()
+        self.feed.process_end()
         
     def get_plugin(self, event, keyword):
         plugin = self.manager.plugins.get(keyword)
@@ -54,7 +55,7 @@ class TestFilterSeries(FlexGetTestCase):
     def setUp(self):
         self.config = 'test/series.yml'
         FlexGetTestCase.setUp(self)
-        self.feed.execute()
+        self.execute_feed('test')
 
     def testSeriesParser(self):
         from utils.series import SeriesParser
@@ -159,10 +160,9 @@ class TestRegexp(FlexGetTestCase):
         FlexGetTestCase.setUp(self)
 
     def testAccept(self):
-        self.use_feed('test_accept')
-        self.feed.execute()
+        self.execute_feed('test_accept')
         if not self.feed.find_entry('accepted', title='regexp1'):
-            self.fail('regexp1 should have been accepter')
+            self.fail('regexp1 should have been accepted')
         if not self.feed.find_entry('accepted', title='regexp2'):
             self.fail('regexp2 should have been accepted')
         if not self.feed.find_entry('accepted', title='regexp3'):
@@ -175,22 +175,19 @@ class TestRegexp(FlexGetTestCase):
             self.fail('regexp3 should have been accepter with custom path')
             
     def testReject(self):
-        self.use_feed('test_reject')
-        self.feed.execute()
+        self.execute_feed('test_reject')
         if not self.feed.find_entry('rejected', title='regexp1'):
             self.fail('regexp1 should have been rejected')
 
     def testRest(self):
-        self.use_feed('test_rest')
-        self.feed.execute()
+        self.execute_feed('test_rest')
         if not self.feed.find_entry('accepted', title='regexp1'):
             self.fail('regexp1 should have been accepted')
         if not self.feed.find_entry('rejected', title='regexp3'):
             self.fail('regexp3 should have been rejected')
             
     def testExcluding(self):
-        self.use_feed('test_excluding')
-        self.feed.execute()
+        self.execute_feed('test_excluding')
         if self.feed.find_entry('accepted', title='regexp1'):
             self.fail('regexp1 should not have been accepted')
         if not self.feed.find_entry('accepted', title='regexp2'):
@@ -199,8 +196,7 @@ class TestRegexp(FlexGetTestCase):
             self.fail('regexp3 should have been accepted')
 
     def testFrom(self):
-        self.use_feed('test_from')
-        self.feed.execute()
+        self.execute_feed('test_from')
         if self.feed.accepted:
             self.fail('should not have accepted anything')
         
@@ -213,7 +209,7 @@ class TestResolvers(FlexGetTestCase):
     def setUp(self):
         self.config = 'test/resolvers.yml'
         FlexGetTestCase.setUp(self)
-        self.feed.execute()
+        self.execute_feed('test')
         
     def get_resolver(self, name):
         info = self.manager.get_plugin_by_name(name)
@@ -251,7 +247,7 @@ class TestDisableBuiltins(FlexGetTestCase):
         FlexGetTestCase.setUp(self)
 
     def testDisableBuiltins(self):
-        self.feed.execute()
+        self.execute_feed('test')
         if not (self.feed.find_entry(title='dupe1') and self.feed.find_entry(title='dupe2')):
             self.fail('disable_builtins is not working?')
         
@@ -293,7 +289,7 @@ class TestInputHtml(FlexGetTestCase):
         FlexGetTestCase.setUp(self)
         
     def testParsing(self):
-        self.feed.execute()
+        self.execute_feed('test')
         if not self.feed.entries:
             self.fail('did not produce entries')
 
@@ -305,7 +301,7 @@ class TestFilterSeen(FlexGetTestCase):
         FlexGetTestCase.setUp(self)
         
     def testSeen(self):
-        self.feed.execute()
+        self.execute_feed('test')
         if not self.feed.find_entry(title='Seen title 1'):
             self.fail('Test entry missing')
         # run again, should filter
@@ -315,8 +311,7 @@ class TestFilterSeen(FlexGetTestCase):
             
         # execute another feed
         
-        self.use_feed('test2')
-        self.feed.execute()
+        self.execute_feed('test2')
         # should not contain since fields seen in previous feed
         if self.feed.find_entry(title='Seen title 1'):
             self.fail('Seen test entry 1 remains in second feed')
@@ -328,8 +323,7 @@ class TestFilterSeen(FlexGetTestCase):
             
         # test that we don't filter reject on non-string fields (ie, seen same imdb_score)
 
-        self.use_feed('test_number')
-        self.feed.execute()
+        self.execute_feed('test_number')
         if not self.feed.find_entry(title='New title 1') or not self.feed.find_entry(title='New title 2'):
             self.fail('Item should not have been rejected because of number field')
             
@@ -341,7 +335,7 @@ class TestFilterSeenMovies(FlexGetTestCase):
         FlexGetTestCase.setUp(self)
             
     def testSeenMovies(self):
-        self.feed.execute()
+        self.execute_feed('test')
         if not self.feed.find_entry(title='Seen movie title 1'):
             self.fail('Test movie entry 1 is missing')
         # should be rejected, duplicate imdb url
@@ -356,8 +350,7 @@ class TestFilterSeenMovies(FlexGetTestCase):
 
         # execute another feed
         
-        self.use_feed('test2')
-        self.feed.execute()
+        self.execute_feed('test2')
 
         # should not contain since fields seen in previous feed
         if self.feed.find_entry(title='Seen movie title 3'):
@@ -368,8 +361,7 @@ class TestFilterSeenMovies(FlexGetTestCase):
             self.fail('unseen movie 5 exists')
     
     def testSeenMoviesStrict(self):
-        self.use_feed('strict')
-        self.feed.execute()
+        self.execute_feed('strict')
         if self.feed.find_entry(title='Seen movie title 8'):
             self.fail('strict should not have passed movie 8')
 
@@ -384,7 +376,7 @@ class TestDownload(FlexGetTestCase):
         if os.path.exists(self.testfile):
             os.remove(self.testfile)
         # executes feed and downloads the file
-        self.feed.execute()
+        self.execute_feed('test')
         if not os.path.exists(self.testfile):
             self.fail('download file does not exists')
         else:
@@ -397,7 +389,7 @@ class TestInputRSS(FlexGetTestCase):
         FlexGetTestCase.setUp(self)
 
     def testInputRSS(self):
-        self.feed.execute()
+        self.execute_feed('test')
         
         # normal entry
         if not self.feed.find_entry(title='Normal', url='http://localhost/normal', \
@@ -448,7 +440,7 @@ class TestImdbOnline(FlexGetTestCase):
         FlexGetTestCase.setUp(self)
         
     def testMovies(self):
-        self.feed.execute()
+        self.execute_feed('test')
         if not self.feed.find_entry(imdb_name='Sen to Chihiro no kamikakushi'):
             self.fail('Failed imdb lookup (search)')
         if not self.feed.find_entry(imdb_name='Mononoke-hime'):
@@ -474,7 +466,7 @@ class TestScanImdb(FlexGetTestCase):
         FlexGetTestCase.setUp(self)
 
     def testScanImdb(self):
-        self.feed.execute()
+        self.execute_feed('test')
         if not self.feed.find_entry(imdb_url='http://www.imdb.com/title/tt0330793'):
             self.fail('Failed pick url from test 1')
         if not self.feed.find_entry(imdb_url='http://imdb.com/title/tt0472198'):
