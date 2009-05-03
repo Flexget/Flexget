@@ -53,7 +53,6 @@ class PluginError(Exception):
         
     def __str__(self):
         return self.value
-       
 
 Base = declarative_base()
 Session = sessionmaker()
@@ -289,9 +288,9 @@ class Manager:
                 try:
                     plugin = __import__(plugin)
                 except Exception, e:
-                    log.critical('Plugin %s is faulty! Ignored!' % plugin)
+                    log.critical('Exception while loading plugin %s' % plugin)
                     log.exception(e)
-                    continue
+                    raise
                 for name, item in vars(plugin).iteritems():
                     if loaded.get(name, False): 
                         continue
@@ -302,9 +301,10 @@ class Manager:
                             # without plugins having to explicitly give it as parameter
                             self.__instance = instance
                             self.__class_name = name
-                        except:
-                            log.exception('Exception occurred while creating instance %s' % name)
-                            return
+                        except Exception, e:
+                            log.critical('Exception occurred while creating instance %s' % name)
+                            log.exception(e)
+                            raise
                         method = getattr(instance, 'register', None)
                         if callable(method):
                             try:

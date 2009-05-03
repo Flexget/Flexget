@@ -1,5 +1,5 @@
 import logging
-from manager import PluginWarning, MergeException
+from manager import PluginWarning
 
 log = logging.getLogger('preset')
 
