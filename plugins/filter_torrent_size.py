@@ -20,7 +20,7 @@ class FilterTorrentSize:
 
     def validator(self):
         import validator
-        config = validator.factory()
+        config = validator.factory('dict')
         config.accept('number', key='min')
         config.accept('number', key='max')
         return config
