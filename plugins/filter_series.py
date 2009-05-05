@@ -362,7 +362,7 @@ class FilterSeries:
                 # expire timeframe, accept anything
                 diff = datetime.now() - self.get_first_seen(feed, best)
                 if (diff.seconds < 60) and not feed.manager.unit_test:
-                    log.info('Timeframe waiting %s for %s hours, currently best is %s' % (series_name, timeframe.seconds/60, best.entry['title']))
+                    log.info('Timeframe waiting %s for %s hours, currently best is %s' % (series_name, timeframe.seconds/60**2, best.entry['title']))
                 
                 
                 log.debug('timeframe: %s' % timeframe)
