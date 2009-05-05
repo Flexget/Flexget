@@ -148,6 +148,8 @@ class Manager:
                           help=SUPPRESS_HELP)
         parser.add_option('--verbosity', action='store_true', dest='crap', default=0,
                           help=SUPPRESS_HELP)
+        parser.add_option('--migrate', action='store', dest='migrate', default=None,
+                          help=SUPPRESS_HELP)
         # provides backward compatibility to --cron and -d
         parser.add_option('-q', action='store_true', dest='quiet', default=0,
                           help=SUPPRESS_HELP)
@@ -177,8 +179,8 @@ class Manager:
         if self.options.log_start:
             logging.info('FlexGet started')
             
-        # reset is executed with learn
-        if self.options.reset:
+        # reset and migrate should be executed with learn
+        if self.options.reset or self.options.migrate:
             self.options.learn = True
             
         if not self.unit_test:
@@ -264,7 +266,10 @@ class Manager:
         """Initialize SQLAlchemy"""
         
         # load old shelve session
-        shelve_session_name = os.path.join(sys.path[0], 'session-%s.db' % self.configname)
+        if self.options.migrate:
+            shelve_session_name = self.options.migrate
+        else:
+            shelve_session_name = os.path.join(sys.path[0], 'session-%s.db' % self.configname)
         if os.path.exists(shelve_session_name):
             import shelve
             import copy
@@ -273,7 +278,7 @@ class Manager:
             old = shelve.open(shelve_session_name, flag='r', protocol=2)
             self.shelve_session = copy.deepcopy(old['cache'])
             old.close()
-            shutil.move(shelve_session_name, '%s_migrated' % shelve_session_name)
+            #shutil.move(shelve_session_name, '%s_migrated' % shelve_session_name)
         
         # SQLAlchemy
         filename = os.path.join(sys.path[0], 'db-%s.sqlite' % self.configname)
