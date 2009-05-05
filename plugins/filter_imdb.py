@@ -134,7 +134,7 @@ class FilterImdb:
     def clean_url(self, url):
         """Cleans imdb url, returns valid clean url or False"""
         import re
-        match = re.search('(http://.*imdb\.com\/title\/tt\d*\/)', url)
+        match = re.search('(?:http://)?(?:www\.)?imdb.com/title/tt\d+', url)
         if match:
             return match.group()
         return False
@@ -156,6 +156,7 @@ class FilterImdb:
             if 'imdb_url' in entry:
                 clean = self.clean_url(entry['imdb_url'])
                 if not clean:
+                    log.debug('imdb url %s is unclean, removing it' % entry['imdb_url'])
                     del(entry['imdb_url'])
                 else:
                     entry['imdb_url'] = clean
