@@ -266,7 +266,11 @@ class Manager:
         filename = filename.replace('\\', '\\\\')
         connection = 'sqlite:///%s' % filename
         log.debug('connection: %s' % connection)
-        engine = sqlalchemy.create_engine(connection, echo=self.options.debug_sql)
+        try:
+            engine = sqlalchemy.create_engine(connection, echo=self.options.debug_sql)
+        except ImportError:
+            log.critical('Unable to use SQLite. Try installing python sqlite packages.')
+            sys.exit(1)
         Session.configure(bind=engine)
         # create all tables
         if self.options.reset:

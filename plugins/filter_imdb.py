@@ -142,6 +142,8 @@ class FilterImdb:
     def feed_filter(self, feed):
         config = feed.config['imdb']
         for entry in feed.entries:
+            
+            take_a_break = False
         
             # sanity checks
             for field in ['imdb_votes', 'imdb_score']:
@@ -175,6 +177,7 @@ class FilterImdb:
             if not 'imdb_url' in entry and self.imdb_required(entry, config):
                 feed.verbose_progress('Searching from imdb %s' % entry['title'])
                 try:
+                    take_a_break = True
                     search = ImdbSearch()
                     search_result = search.smart_match(entry['title'])
                     if search_result:
@@ -211,6 +214,7 @@ class FilterImdb:
                 if not cached:
                     feed.verbose_progress('Parsing from imdb %s' % entry['title'])
                     try:
+                        take_a_break = True
                         imdb.parse(entry['imdb_url'])
                         
                         # store to database
@@ -287,7 +291,7 @@ class FilterImdb:
                     reasons.append('min_votes (%s < %s)' % (imdb.votes, config['min_votes']))
             if 'min_year' in config:
                 if imdb.year < config['min_year']:
-                    reasons.append('min_year')
+                    reasons.append('min_year (%s < %s)' % (imdb.year, config['min_year']))
             if 'reject_genres' in config:
                 rejected = config['reject_genres']
                 for genre in imdb.genres:
@@ -319,6 +323,6 @@ class FilterImdb:
                 feed.accept(entry)
 
             # give imdb a little break between requests (see: http://flexget.com/ticket/129#comment:1)
-            if not feed.manager.options.debug:
+            if take_a_break and not feed.manager.options.debug and not feed.manager.unit_test:
                 import time
                 time.sleep(3)
