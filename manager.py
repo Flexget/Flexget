@@ -242,8 +242,6 @@ class Manager:
                 try:
                     self.config = yaml.safe_load(file(config))
                 except Exception, e:
-                    #print dir(e)
-                    
                     log.critical(e)
                     print ''
                     print '-'*79
@@ -253,11 +251,9 @@ class Manager:
                     print ' o Indentation error'
                     print ' o Missing : from end of the line'
                     print ' o If text contains : it must be quoted\n'
-                    
                     area = str(e.context_mark)[str(e.context_mark).find('line'):]
                     print ' Check your configuration near %s' % area
                     print ' Fault is almost always in this line or previous\n'
-                    
                     sys.exit(1)
                 self.configname = os.path.basename(config)[:-4]
                 return
