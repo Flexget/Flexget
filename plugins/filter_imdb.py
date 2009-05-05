@@ -35,11 +35,10 @@ class Movie(Base):
     score = Column(Float)
     votes = Column(Integer)
     year = Column(Integer)
-    year = Column(Integer)
     plot_outline = Column(String)
 
     def __repr__(self):
-        return '<Movie(name=%s)>' % (self.title)
+        return '<Movie(name=%s,votes=%s,year=%s)>' % (self.title, self.votes, self.year)
 
 class Language(Base):
     
@@ -124,8 +123,9 @@ class FilterImdb:
 
     def imdb_required(self, entry, config):
         """Return True if config contains conditions that are NOT available in preparsed fields"""
-        check = {'min_votes':'imdb_votes', 'min_score': 'imdb_score', 'reject_genres': 'imdb_genres',
-                 'reject_languages': 'imdb_languages', 'accept_languages': 'imdb_languages'}
+        check = {'min_votes':'imdb_votes', 'min_year':'imdb_year', 'min_score': 'imdb_score', 
+                 'reject_genres': 'imdb_genres', 'reject_languages': 'imdb_languages', 
+                 'accept_languages': 'imdb_languages'}
         for key, value in check.iteritems():
             if key in config and not value in entry: 
                 return True
@@ -274,6 +274,7 @@ class FilterImdb:
                 # Set few required fields manually from entry, and thus avoiding request & parse
                 # Note: It doesn't matter even if some fields are missing, previous imdb_required
                 # checks that those aren't required in condition check. So just set them all! :)
+                log.debug('no imdb request needed')
                 imdb.votes = entry.get('imdb_votes', 0)
                 imdb.score = entry.get('imdb_score', 0.0)
                 imdb.year = entry.get('imdb_year', 0)
@@ -314,6 +315,9 @@ class FilterImdb:
             # populate some fields from imdb results, incase someone wants to use them later
             entry['imdb_plot_outline'] = imdb.plot_outline
             entry['imdb_name'] = imdb.name
+            entry['imdb_year'] = imdb.year
+            entry['imdb_score'] = imdb.score
+            entry['imdb_votes'] = imdb.votes
 
             if reasons:
                 log_once('Rejecting %s because of rule(s) %s' % (entry['title'], ', '.join(reasons)), log)

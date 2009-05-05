@@ -448,6 +448,12 @@ class TestImdbOnline(FlexGetTestCase):
         if not self.feed.find_entry(imdb_name='Taken', imdb_url='http://www.imdb.com/title/tt0936501/'):
             self.fail('Failed to pick correct Taken from search results')
 
+    def testYear(self):
+        self.execute_feed('year')
+        if not self.feed.find_entry('accepted', imdb_name='Taken'):
+            self.fail('Taken should\'ve been accepted')
+        if not self.feed.find_entry('rejected', imdb_name='Mononoke-hime'):
+            self.fail('Mononoke-hime should\'ve been rejected')
 
 class TestRssOnline(FlexGetTestCase):
 

@@ -1,3 +1,7 @@
+# seen screws these tests :)
+#global:
+  #disable_builtins: yes
+
 feeds:
   test:
     input_mock:
@@ -10,3 +14,10 @@ feeds:
     imdb:
       min_votes: 20
 
+  year:
+    input_mock:
+      - {title: 'Princess Mononoke', url: 'http://localhost/imdb/princess_mononoke', imdb_url: 'http://www.imdb.com/title/tt0119698/'}
+      - {title: 'Taken[2008]DvDrip[Eng]-FOO', url: 'http://localhost/Taken', imdb_url: 'http://www.imdb.com/title/tt0936501/' }
+    imdb:
+      min_year: 2003
+      
