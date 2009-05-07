@@ -37,7 +37,7 @@ def log_once(message, logger=logging.getLogger('log_once')):
     
     import hashlib
     digest = hashlib.md5()
-    digest.update(message)
+    digest.update(message.encode('latin1', 'replace')) # ticket:250
     md5sum = digest.hexdigest()
     
     session = Session()
