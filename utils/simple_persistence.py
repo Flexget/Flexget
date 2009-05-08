@@ -19,6 +19,7 @@ class SimpleKeyValue(Base):
 
     def __init__(self, feed, plugin, key, value):
         self.feed = feed
+        self.plugin = plugin
         self.key = key
         self.value = value
     
@@ -31,8 +32,15 @@ class SimplePersistence(object):
         self.feed = feed
         
     def set(self, key, value):
-        skv = SimpleKeyValue(self.feed.name, self.feed.current_plugin, key, value)
-        self.feed.session.add(skv)
+        skv = self.feed.session.query(SimpleKeyValue).filter(SimpleKeyValue.feed==self.feed.name).\
+            filter(SimpleKeyValue.plugin==self.feed.current_plugin).filter(SimpleKeyValue.key==key).first()
+        if skv:
+            # update existing
+            skv.value = value
+        else:
+            # add new key
+            skv = SimpleKeyValue(self.feed.name, self.feed.current_plugin, key, value)
+            self.feed.session.add(skv)
     
     def get(self, key, default=None):
         skv = self.feed.session.query(SimpleKeyValue).filter(SimpleKeyValue.feed==self.feed.name).\
@@ -43,8 +51,10 @@ class SimplePersistence(object):
             return skv.value
         
     def setdefault(self, key, default):
-        got = self.get(key)
-        if not got:
+        empty = object()
+        got = self.get(key, empty)
+        if got is empty:
+            log.debug('storing default for %s' % key)
             self.set(key, default)
             return default
         else:
