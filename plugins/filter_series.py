@@ -365,12 +365,12 @@ class FilterSeries:
                     log.info('Timeframe waiting %s for %s hours, currently best is %s' % (series_name, timeframe.seconds/60**2, best.entry['title']))
                 
                 
+                first_seen = self.get_first_seen(feed, best)
                 log.debug('timeframe: %s' % timeframe)
-                log.debug('first_seen: %s' % self.get_first_seen(feed, best))
-                what = self.get_first_seen(feed, best) + timeframe
-                log.debug('first_seen + timeframe: %s' % what)
+                log.debug('first_seen: %s' % first_seen)
+                log.debug('first_seen + timeframe: %s' % str(first_seen + timeframe))
                 
-                if (self.get_first_seen(feed, best) + timeframe <= datetime.now()) or (stop):
+                if first_seen + timeframe <= datetime.now() or stop:
                     if stop:
                         log.info('Stopped timeframe, accepting %s' % (best.entry['title']))
                     else:
@@ -401,8 +401,8 @@ class FilterSeries:
 
     def get_first_seen(self, feed, parser):
         """Return datetime when this episode of series was first seen"""
-        episode = feed.session.query(Episode).filter(Series.name==parser.name).\
-            filter(Episode.series_id==Series.id).first()
+        episode = feed.session.query(Episode).select_from(join(Episode, Series)).\
+            filter(Series.name==parser.name).filter(Episode.identifier==parser.identifier()).first()
         return episode.first_seen
         
     def get_latest_info(self, feed, parser):
