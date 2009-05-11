@@ -38,9 +38,9 @@ class InputText:
         text = validator.factory('dict')
         text.accept('url', key='url', required=True)
         entry = text.accept('dict', key='entry', required=True)
-        entry.accept('url', key='url', required=True)
-        entry.accept('text', key='title', required=True)
-        entry.accept_any_key('text')
+        entry.accept('regexp', key='url', required=True)
+        entry.accept('regexp', key='title', required=True)
+        entry.accept_any_key('regexp')
         format = text.accept('dict', key='format')
         format.accept_any_key('text')
         return format

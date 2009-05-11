@@ -71,6 +71,7 @@ class InputRSS:
         url = advanced.accept('text', key='url', required=True) # TODO: accept only url, file
         advanced.accept('text', key='username')
         advanced.accept('text', key='password')
+        advanced.accept('text', key='link')
         advanced.accept('boolean', key='silent')
         advanced.accept('boolean', key='ascii')
         return root
