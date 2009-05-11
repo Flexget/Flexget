@@ -35,15 +35,15 @@ class InputText:
 
     def validator(self):
         import validator
-        text = validator.factory('dict')
-        text.accept('url', key='url', required=True)
-        entry = text.accept('dict', key='entry', required=True)
+        root = validator.factory('dict')
+        root.accept('url', key='url', required=True)
+        entry = root.accept('dict', key='entry', required=True)
         entry.accept('regexp', key='url', required=True)
         entry.accept('regexp', key='title', required=True)
         entry.accept_any_key('regexp')
-        format = text.accept('dict', key='format')
+        format = root.accept('dict', key='format')
         format.accept_any_key('text')
-        return format
+        return root
 
     def format_entry(self, entry, d):
         for k, v in d.iteritems():

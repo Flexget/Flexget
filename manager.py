@@ -176,8 +176,8 @@ class Manager:
         if self.options.test and self.options.learn:
             parser.error('--test and --learn are mutually exclusive')
             
-        if self.options.log_start:
-            logging.info('FlexGet started')
+        if self.options.test and self.options.reset:
+            parser.error('--test and --reset are mutually exclusive')
             
         # reset and migrate should be executed with learn
         if self.options.reset or self.options.migrate:
@@ -188,8 +188,14 @@ class Manager:
             
         # TODO: xxx
         if self.options.test:
-            print '--test is borked again'
+            print '--test is broken again .. please wait while the code elves are working'
             sys.exit(1)
+            
+        if self.options.log_start:
+            logging.info('FlexGet started')
+
+        log.debug('Default encoding: %s' % sys.getdefaultencoding())
+            
 
     def initialize(self):
         """Separated from __init__ so that unit test can modify options before loading config."""
@@ -200,7 +206,6 @@ class Manager:
             sys.exit(1)
             
         self.init_sqlalchemy()
-        log.debug('Default encoding: %s' % sys.getdefaultencoding())
         
     def init_logging(self):
         """Creates and initializes logger."""
@@ -542,7 +547,6 @@ class Manager:
             
     def clear_failed(self):
         """Clears list of failed entries"""
-        
         session = Session()
         results = session.query(FailedEntry).all()
         for row in results:
