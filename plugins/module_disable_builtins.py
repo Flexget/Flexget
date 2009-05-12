@@ -20,9 +20,14 @@ class PluginDisableBuiltins:
     def feed_start(self, feed):
         for name, plugin in feed.manager.plugins.iteritems():
             if plugin['builtin']:
-                log.debug('Disabling builtin plugin %s' % name)
-                plugin['builtin'] = False
-                self.disabled.append(name)
+                if type(feed.config['disable_builtins']) is list:
+                    if plugin['name'] in feed.config['disable_builtins']:
+                        plugin['builtin'] = False
+                        self.disabled.append(name)
+                else: #disabling all builtins
+                    log.debug('Disabling builtin plugin %s' % name)
+                    plugin['builtin'] = False
+                    self.disabled.append(name)
         
     def feed_exit(self, feed):
         for name in self.disabled:
