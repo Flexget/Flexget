@@ -103,8 +103,11 @@ class RlsLog:
         return releases
 
     def feed_input(self, feed):
+        url = feed.get_input_url('rlslog')
+        if url.endswith('feed/'):
+            raise PluginWarning('Invalid URL. Remove trailing feed/ from the url.')
         try:
-            releases = self.parse_rlslog(feed.get_input_url('rlslog'), feed)
+            releases = self.parse_rlslog(url, feed)
         except urllib2.HTTPError, e:
             raise PluginWarning('RlsLog was unable to complete task. HTTPError %s' % (e.code), log)
         except urllib2.URLError, e:

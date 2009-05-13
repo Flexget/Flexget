@@ -1,6 +1,4 @@
 import logging
-
-
   
 log = logging.getLogger('disable_builtins')
 
@@ -20,7 +18,7 @@ class PluginDisableBuiltins:
     def feed_start(self, feed):
         for name, plugin in feed.manager.plugins.iteritems():
             if plugin['builtin']:
-                if type(feed.config['disable_builtins']) is list:
+                if isinstance(feed.config['disable_builtins'], list):
                     if plugin['name'] in feed.config['disable_builtins']:
                         plugin['builtin'] = False
                         self.disabled.append(name)

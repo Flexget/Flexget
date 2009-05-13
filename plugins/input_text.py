@@ -69,7 +69,8 @@ class InputText:
                     # check if used field detected, in such case start with new entry
                     if used.has_key(field):
                         if entry.isvalid():
-                            log.info('Found field %s again before entry was completed. Adding current incomplete, but valid entry and moving to next.' % field)
+                            log.info('Found field %s again before entry was completed. \
+                                      Adding current incomplete, but valid entry and moving to next.' % field)
                             self.format_entry(entry, format_config)
                             feed.entries.append(entry)
                         else:
