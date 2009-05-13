@@ -88,7 +88,7 @@ class Subtitles:
             return
 
 
-       try:
+        try:
             s = ServerProxy("http://www.opensubtitles.org/xml-rpc")
             res = s.LogIn("", "", "en", "FlexGet")
         except:
