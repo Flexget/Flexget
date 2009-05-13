@@ -87,8 +87,13 @@ class Subtitles:
             # No imdb urls on this feed, skip it
             return
 
-        s = ServerProxy("http://www.opensubtitles.org/xml-rpc")
-        res = s.LogIn("", "", "en", "FlexGet")
+
+       try:
+            s = ServerProxy("http://www.opensubtitles.org/xml-rpc")
+            res = s.LogIn("", "", "en", "FlexGet")
+        except:
+            log.warning('Error connecting to opensubtitles.org')
+            return
 
         if res['status'] != '200 OK':
             raise Exception("Login to opensubtitles.org XML-RPC interface failed")
