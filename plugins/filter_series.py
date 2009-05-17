@@ -237,11 +237,21 @@ class FilterSeries:
                 return [v]
             return v
 
+        # helper function, iterate entry fields in certain order
+        def field_order(a, b):
+            order = ['title', 'description']
+            def index(c):
+                try:
+                    return order.index(c[0])
+                except ValueError:
+                    return 1
+            return cmp(index(a), index(b))
+            
         # key: series (episode) identifier ie. S1E2
         # value: seriesparser
         series = {}
         for entry in feed.entries:
-            for _, data in entry.iteritems():
+            for field, data in sorted(entry.items(), cmp=field_order):
                 # skip non string values and empty strings
                 if not isinstance(data, basestring) or not data: 
                     continue
@@ -259,6 +269,7 @@ class FilterSeries:
                 parser.parse()
                 # series is not valid if it does not match given name / regexp or fails with exception
                 if parser.valid:
+                    log.debug('Detected quality: %s from: %s' % (parser.quality, field))
                     break
             else:
                 continue
