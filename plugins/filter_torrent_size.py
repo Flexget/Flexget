@@ -30,12 +30,13 @@ class FilterTorrentSize:
         for entry in feed.accepted:
             if 'torrent' in entry:
                 size = entry['torrent'].size / 1024 / 1024
+                log.debug('Size: %s MB' % size)
                 if size < config.get('min', 0):
                     log.debug('Torrent too small, rejecting')
-                    feed.reject(entry)
+                    feed.reject(entry, 'minimum size')
                 if size > config.get('max', maxint):
                     log.debug('Torrent too big, rejecting')
-                    feed.reject(entry)
+                    feed.reject(entry, 'maximum size')
             else:
                 # not a torrent?
                 log.debug('Entry %s is not a torrent' % entry['title'])
