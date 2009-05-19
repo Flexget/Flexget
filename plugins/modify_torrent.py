@@ -27,7 +27,7 @@ class Torrent:
 
         # decoded torrent structure
         self.content = self.decode(content)
-        self.size = 0
+        self._size = 0
 
     def get_filelist(self):
         """Return array containing fileinfo dictionaries (name, length, path)"""
@@ -38,7 +38,7 @@ class Torrent:
             t['name'] = self.content['info']['name']
             t['size'] = self.content['info']['length']
             t['path'] = ''
-            self.size = int(t['size'])
+            self._size = int(t['size'])
             files.append(t)
         else:
             # multifile torrent
@@ -48,9 +48,15 @@ class Torrent:
                 t['path'] = string.join(item['path'][:-1], '/')
                 t['name'] = item['path'][-1:]
                 t['size'] = item['length']
-                self.size += int(t['size'])
+                self._size += int(t['size'])
                 files.append(t)
         return files
+        
+    def get_size(self):
+        """Return total size of the torrent"""
+        # calculates _size
+        _ = self.get_filelist()
+        return self._size
 
     def get_multitrackers(self):
         """
@@ -201,7 +207,7 @@ class TorrentFilename:
                 else:
                     # generate filename from torrent or fall back to title plus extension
                     entry['filename'] = self.make_filename(torrent, entry)
-            except:
+            except Exception, e:
                 # not a VALID torrent file, no need to mess with it
                 pass
 

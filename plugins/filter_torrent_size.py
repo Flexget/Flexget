@@ -29,7 +29,7 @@ class FilterTorrentSize:
         config = feed.config['torrent_size']
         for entry in feed.accepted:
             if 'torrent' in entry:
-                size = entry['torrent'].size / 1024 / 1024
+                size = entry['torrent'].get_size() / 1024 / 1024
                 log.debug('%s size: %s MB' % (entry['title'], size))
                 if size < config.get('min', 0):
                     log.debug('Torrent too small, rejecting')
