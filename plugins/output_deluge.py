@@ -55,7 +55,7 @@ class OutputDeluge:
             if 'path' in entry:
                 opts['download_location'] = entry['path']
             elif config['path']:
-                opts['download_location'] = str(config['path']) % entry
+                opts['download_location'] = str(config['path'])
             sclient.add_torrent_url(entry['url'],opts)
             log.info("%s torrent added to deluge with options %s" % (entry['url'], opts))
             if config['movedone'] or config['label']:
