@@ -68,6 +68,8 @@ class FilterSeries:
 
         def build_options(advanced):
             advanced.accept('text', key='path')
+            bundle = advanced.accept('dict', key='set')
+            bundle.accept_any_key('text')
             # regexes can be given in as a single string ..
             advanced.accept('regexp', key='name_regexps')
             advanced.accept('regexp', key='ep_regexps')
@@ -89,7 +91,7 @@ class FilterSeries:
             series.accept('text')
             bundle = series.accept('dict')
             # prevent invalid indentation level
-            bundle.reject_keys(['path', 'timeframe', 'name_regexps', 'ep_regexps', 'id_regexps', 'watched'])
+            bundle.reject_keys(['set','path', 'timeframe', 'name_regexps', 'ep_regexps', 'id_regexps', 'watched'])
             advanced = bundle.accept_any_key('dict')
             build_options(advanced)
         
@@ -273,11 +275,18 @@ class FilterSeries:
                     break
             else:
                 continue
-
+            
             # set custom download path
             if 'path' in config:
                 log.debug('setting %s custom path to %s' % (entry['title'], config.get('path')))
                 entry['path'] = config.get('path')
+            
+            # accept info from set: and place into the entry
+            if 'set' in config:
+                log.debug('adding set: info to entry:"%s" %s' % (entry['title'], config.get('set')))
+                setitems = config.get('set')
+                for key, value in setitems.iteritems():
+                    entry[key] = value
 
             parser.entry = entry
             # add this episode into list of available episodes
