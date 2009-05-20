@@ -147,8 +147,11 @@ class PluginDownload:
         try:
             filename = email.message_from_string(unicode(response.info()).encode('utf-8')).get_filename(failobj=False)
         except:
+            """
             d = response.info()
             log.error('Failed to decode filename from response: %s' % ",".join(['%02x' % ord(x) for x in d]))
+            """
+            log.error('Failed to decode filename from response')
             return
         if filename:
             from utils.tools import decode_html
