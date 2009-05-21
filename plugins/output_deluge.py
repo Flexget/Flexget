@@ -1,7 +1,6 @@
 import logging
-import time, os
-
-__pychecker__ = 'unusednames=parser'
+import time, os, sys
+from manager import PluginError, PluginWarning
 
 log = logging.getLogger('deluge')
 
@@ -11,12 +10,6 @@ class OutputDeluge:
         Add the torrents directly to deluge, supporting custom save paths.
     """
     
-    """def __init__(self):
-        self.torrent_ids = []
-        self.torrent_status = []
-        self.newtorrentids = []
-        aclient.set_core_uri()"""
-        
     def register(self, manager, parser):
         manager.register('deluge')
 
@@ -38,10 +31,12 @@ class OutputDeluge:
         return config
         
     def feed_download(self, feed):
-        #call the feed_download method of download plugin
-        #this will generate the temp files we will load into deluge
-        #we don't need to call this if download plugin is loaded on this feed
-        if not feed.config.has_key('download'):
+        """
+        call the feed_download method of download plugin
+        this will generate the temp files we will load into deluge
+        we don't need to call this if download plugin is loaded on this feed
+        """
+        if not 'download' in feed.config:
             download = feed.manager.get_plugin_by_name('download')
             download['instance'].feed_download(feed)
         
@@ -50,7 +45,7 @@ class OutputDeluge:
         try:
             from deluge.ui.client import sclient
         except:
-            raise PluginException('error importing deluge module')
+            raise PluginError('Deluge module required')
         config = self.get_config(feed)
         
 		# don't add when learning
@@ -74,7 +69,7 @@ class OutputDeluge:
                 log.debug('temp: %s' % ', '.join(os.listdir(tmp_path)))
                 raise PluginWarning("Downloaded temp file '%s' doesn't exist!?" % entry['file'])
             
-            sclient.add_torrent_file([entry['file']],[opts])
+            sclient.add_torrent_file([entry['file']], [opts])
             
             #clean up temp file if download plugin is not configured for this feed
             if not feed.config.has_key('download'):
