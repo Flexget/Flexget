@@ -57,9 +57,7 @@ class PluginDownload:
 
     def feed_download(self, feed):
         """Download all feed content and store in temporary folder"""
-        #if deluge plugin is calling this method, we will not have a download config
-        if not feed.config.has_key('deluge'):
-            self.validate_config(feed) # TODO: remove
+        self.validate_config(feed) # TODO: remove
         for entry in feed.accepted:
             try:
                 if feed.manager.options.test:
