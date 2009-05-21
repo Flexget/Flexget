@@ -143,18 +143,32 @@ class PluginDownload:
 
     def filename_from_headers(self, entry, response):
         """Checks entry filename if it's found from content-disposition"""
+        from utils.tools import encode_html, decode_html
         import email
+
+        data = str(response.info())
+        
+        # try to decode/encode, afaik this is against specs but some servers do it anyway
         try:
-            filename = email.message_from_string(unicode(response.info()).encode('utf-8')).get_filename(failobj=False)
+            data = data.decode('utf-8')
+            log.debug('response info UTF-8 decoded')
         except:
-            """
-            d = response.info()
-            log.error('Failed to decode filename from response: %s' % ",".join(['%02x' % ord(x) for x in d]))
-            """
-            log.error('Failed to decode filename from response')
+            try:
+                data = unicode(data)
+                log.debug('response info unicoded')
+            except:
+                pass
+        
+        # now we should have unicode string, let's convert into proper format where non-ascii 
+        # chars are entities
+        data = encode_html(data)
+        
+        try:
+            filename = email.message_from_string(data).get_filename(failobj=False)
+        except:
+            log.error('Failed to decode filename from response: %s' % ''.join(['%02x' % ord(x) for x in data]))
             return
         if filename:
-            from utils.tools import decode_html
             filename = decode_html(filename)
             log.debug('Found filename from headers: %s' % filename)
             if 'filename' in entry:
