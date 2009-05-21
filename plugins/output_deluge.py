@@ -1,6 +1,5 @@
 import logging
-import time
-from deluge.ui.client import sclient
+import time, os
 
 __pychecker__ = 'unusednames=parser'
 
@@ -38,8 +37,20 @@ class OutputDeluge:
             config['label'] = str(config['label']).lower()
         return config
         
+    def feed_download(self, feed):
+        #call the feed_download method of download plugin
+        #this will generate the temp files we will load into deluge
+        #we don't need to call this if download plugin is loaded on this feed
+        if not feed.config.has_key('download'):
+            download = feed.manager.get_plugin_by_name('download')
+            download['instance'].feed_download(feed)
+        
     def feed_output(self, feed):
         """Add torrents to deluge at exit."""
+        try:
+            from deluge.ui.client import sclient
+        except:
+            raise PluginException('error importing deluge module')
         config = self.get_config(feed)
         
 		# don't add when learning
@@ -56,10 +67,23 @@ class OutputDeluge:
                 opts['download_location'] = entry['path']
             elif config['path']:
                 opts['download_location'] = str(config['path'])
-            sclient.add_torrent_url(entry['url'],opts)
-            log.info("%s torrent added to deluge with options %s" % (entry['url'], opts))
+            # see that temp file is present
+            if not os.path.exists(entry['file']):
+                tmp_path = os.path.join(sys.path[0], 'temp')
+                log.debug('entry: %s' % entry)
+                log.debug('temp: %s' % ', '.join(os.listdir(tmp_path)))
+                raise PluginWarning("Downloaded temp file '%s' doesn't exist!?" % entry['file'])
+            
+            sclient.add_torrent_file([entry['file']],[opts])
+            
+            #clean up temp file if download plugin is not configured for this feed
+            if not feed.config.has_key('download'):
+                os.remove(entry['file'])
+                del(entry['file'])
+            
+            log.info("%s torrent added to deluge with options %s" % (entry['title'], opts))
             if config['movedone'] or config['label']:
-                time.sleep(5)
+                time.sleep(4)
                 after = sclient.get_session_state()
                 for item in after:
                     if not item in before:
