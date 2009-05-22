@@ -56,6 +56,8 @@ class ModifySet:
         import validator
         v = validator.factory('dict')
         for key in self.keys:
+            if self.keys[key] == 'text' and key in config:
+                config[key] = config[key] % entry
             v.accept(self.keys[key], key=key)
             
         if not v.validate(config):
