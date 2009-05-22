@@ -10,6 +10,9 @@ class OutputDeluge:
         Add the torrents directly to deluge, supporting custom save paths.
     """
     
+    def __init__(self):
+        pass
+    
     def register(self, manager, parser):
         manager.register('deluge')
 
@@ -19,6 +22,7 @@ class OutputDeluge:
         deluge.accept('text', key='path')
         deluge.accept('text', key='movedone')
         deluge.accept('text', key='label')
+        deluge.accept('boolean', key='queuetotop')
         return deluge
         
     def get_config(self, feed):
@@ -26,9 +30,15 @@ class OutputDeluge:
         config.setdefault('path', '')
         config.setdefault('movedone', '')
         config.setdefault('label', '')
-        if config['label']:
-            config['label'] = str(config['label']).lower()
+        config.setdefault('queuetotop', False)
         return config
+        
+    def feed_start(self, feed):
+        """
+        register the usable set: keywords
+        """
+        set = feed.manager.get_plugin_by_name('set')
+        set['instance'].register_keys({'path':'text', 'movedone':'text', 'queuetotop':'boolean', 'label':'text'})
         
     def feed_download(self, feed):
         """
@@ -71,8 +81,7 @@ class OutputDeluge:
         sclient.set_core_uri()
         opts = {}
         for entry in feed.accepted:
-            if config['movedone'] or config['label']:
-                before = sclient.get_session_state()
+            before = sclient.get_session_state()
             if 'path' in entry:
                 opts['download_location'] = entry['path']
             elif config['path']:
@@ -91,21 +100,24 @@ class OutputDeluge:
             if not feed.config.has_key('download'):
                 os.remove(entry['file'])
                 del(entry['file'])
-            
-            if config['movedone'] or config['label']:
-                time.sleep(1)
-                after = sclient.get_session_state()
-                #TODO: add overridden movedone and queuetotop
-                for item in after:
-                    if not item in before:
-                        if config['movedone']:
-                            sclient.set_torrent_move_on_completed(item, True)
-                            sclient.set_torrent_move_on_completed_path(item, str(config['movedone']) % entry)
-                        if config['label']:
-                            if not "label" in sclient.get_enabled_plugins():
-                                sclient.enable_plugin("label")
-                            if not config['label'] in sclient.label_get_labels():
-                                sclient.label_add(config['label'])
-                            sclient.label_set_torrent(item, config['label'])
-                        break
+
+            time.sleep(1)
+            after = sclient.get_session_state()
+            movedone = entry.get('movedone', config['movedone'])
+            label = entry.get('label', config['label']).lower()
+            queuetotop = entry.get('queuetotop', config['queuetotop'])
+            for item in after:
+                if not item in before:
+                    if movedone:
+                        sclient.set_torrent_move_on_completed(item, True)
+                        sclient.set_torrent_move_on_completed_path(item, movedone % entry)
+                    if label:
+                        if not "label" in sclient.get_enabled_plugins():
+                            sclient.enable_plugin("label")
+                        if not label in sclient.label_get_labels():
+                            sclient.label_add(label)
+                        sclient.label_set_torrent(item, label)
+                    if queuetotop:
+                        sclient.queue_top([item])
+                    break
                 

@@ -54,6 +54,13 @@ class PluginDownload:
         # TODO: rewrite and check exists
         if not feed.config['download']:
             raise PluginWarning('Feed %s is missing download path, check your configuration.' % feed.name)
+            
+    def feed_start(self, feed):
+        """
+        register the usable set: keywords
+        """
+        set = feed.manager.get_plugin_by_name('set')
+        set['instance'].register_key('path')
 
     def feed_download(self, feed):
         """Download all feed content and store in temporary folder"""

@@ -48,6 +48,9 @@ class FilterRegexp:
             # advanced configuration as a parameter
             advanced = bundle.accept_any_key('dict')
             advanced.accept('text', key='path') # TODO: text -> path
+            # accept set parameters
+            set = advanced.accept('dict', key='set')
+            set.accept_any_key('any')
             # not as a single parameter
             advanced.accept('regexp', key='not')
             # from as a single parameter
@@ -120,6 +123,7 @@ class FilterRegexp:
             for regexp_raw in regexps:
                 # set custom path for entry if pattern specifies one
                 path = None
+                setconfig = {}
                 secondary = []
                 from_fields = []
                 if isinstance(regexp_raw, dict):
@@ -128,6 +132,7 @@ class FilterRegexp:
                     # advanced configuration
                     if isinstance(value, dict):
                         path = value.get('path', None)
+                        setconfig = value.get('set', {})
                         from_fields = value.get('from', [])
                         if 'not' in value:
                             if isinstance(value['not'], list): 
@@ -148,6 +153,10 @@ class FilterRegexp:
                             
                 if match:
                     if path: entry['path'] = path
+                    if setconfig:
+                        log.debug('adding set: info to entry:"%s" %s' % (entry['title'], setconfig))
+                        set = feed.manager.get_plugin_by_name('set')
+                        set['instance'].modify(entry, setconfig)
                     log.debug("'%s' matched '%s'" % (entry['title'], regexp_raw))
                     break
                     
