@@ -82,10 +82,9 @@ class OutputDeluge:
         opts = {}
         for entry in feed.accepted:
             before = sclient.get_session_state()
-            if 'path' in entry:
-                opts['download_location'] = entry['path']
-            elif config['path']:
-                opts['download_location'] = config['path']
+            path = entry.get('path', config['path'])
+            if 'path':
+                opts['download_location'] = path % entry
             # see that temp file is present
             if not os.path.exists(entry['file']):
                 tmp_path = os.path.join(sys.path[0], 'temp')
@@ -109,7 +108,7 @@ class OutputDeluge:
             for item in after:
                 if not item in before:
                     if movedone:
-                        log.info("%s move on complete set to %s" % (entry['title'], movedone))
+                        log.info("%s move on complete set to %s" % (entry['title'], movedone % entry))
                         sclient.set_torrent_move_on_completed(item, True)
                         sclient.set_torrent_move_on_completed_path(item, movedone % entry)
                     if label:

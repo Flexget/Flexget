@@ -276,6 +276,11 @@ class FilterSeries:
             else:
                 continue
             
+            # add series, season and episode to entry
+            entry['series_name'] = str(series_name)
+            entry['series_season'] = parser.season
+            entry['series_episode'] = parser.episode
+            
             # set custom download path TODO: Remove, replaced by set
             if 'path' in config:
                 log.debug('setting %s custom path to %s' % (entry['title'], config.get('path')))
