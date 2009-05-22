@@ -104,7 +104,7 @@ class OutputDeluge:
             log.info("%s torrent added to deluge with options %s" % (entry['title'], opts))
             
             #clean up temp file if download plugin is not configured for this feed
-            if not feed.config.has_key('download'):
+            if not 'download' in feed.config:
                 os.remove(entry['file'])
                 del(entry['file'])
 
