@@ -18,15 +18,20 @@ class OutputDeluge:
 
     def validator(self):
         import validator
-        deluge = validator.factory('dict')
+        root = validator.factory()
+        root.accept('boolean')
+        deluge = root.accept('dict')
         deluge.accept('text', key='path')
         deluge.accept('text', key='movedone')
         deluge.accept('text', key='label')
         deluge.accept('boolean', key='queuetotop')
-        return deluge
+        return root
         
     def get_config(self, feed):
-        config = feed.config['deluge']
+        config = feed.config.get('deluge', {})
+        if isinstance(config, bool):
+            config = {'enabled':config}
+        config.setdefault('enabled', True)
         config.setdefault('path', '')
         config.setdefault('movedone', '')
         config.setdefault('label', '')
@@ -46,6 +51,9 @@ class OutputDeluge:
         this will generate the temp files we will load into deluge
         we don't need to call this if download plugin is loaded on this feed
         """
+        config = self.get_config(feed)
+        if not config['enabled']:
+            return
         if not 'download' in feed.config:
             download = feed.manager.get_plugin_by_name('download')
             """Download all feed content and store in temporary folder"""
@@ -76,7 +84,7 @@ class OutputDeluge:
 		# don't add when learning
         if feed.manager.options.learn:
             return
-        if not feed.accepted:
+        if not feed.accepted or not config['enabled']:
             return
         sclient.set_core_uri()
         opts = {}
