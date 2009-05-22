@@ -109,6 +109,7 @@ class OutputDeluge:
             for item in after:
                 if not item in before:
                     if movedone:
+                        log.info("%s move on complete set to %s" % (entry['title'], movedone))
                         sclient.set_torrent_move_on_completed(item, True)
                         sclient.set_torrent_move_on_completed_path(item, movedone % entry)
                     if label:
@@ -116,8 +117,10 @@ class OutputDeluge:
                             sclient.enable_plugin("label")
                         if not label in sclient.label_get_labels():
                             sclient.label_add(label)
+                        log.info("%s label set to '%s'" % (entry['title'], label))
                         sclient.label_set_torrent(item, label)
                     if queuetotop:
+                        log.info("%s moved to top of queue" % entry['title'])
                         sclient.queue_top([item])
                     break
                 
