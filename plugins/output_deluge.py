@@ -25,6 +25,7 @@ class OutputDeluge:
         deluge.accept('text', key='movedone')
         deluge.accept('text', key='label')
         deluge.accept('boolean', key='queuetotop')
+        deluge.accept('boolean', key='enabled')
         return root
         
     def get_config(self, feed):
