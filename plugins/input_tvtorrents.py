@@ -3,8 +3,7 @@ import urlparse
 import logging
 from socket import timeout
 from feed import Entry
-from manager import PluginWarning
-from BeautifulSoup import BeautifulSoup
+from manager import PluginError
 
 __pychecker__ = 'unusednames=parser'
 
@@ -37,6 +36,10 @@ class InputTVTorrents:
         return validator.factory('url')
 
     def feed_input(self, feed):
+        try:
+            from BeautifulSoup import BeautifulSoup
+        except:
+            raise PluginError('BeautifulSoup module required.', log)
         pageurl = "http://tvtorrents.com/loggedin/recently_aired.do"
         log.debug("InputPlugin tvtorrents requesting url %s" % pageurl)
 
@@ -44,9 +47,9 @@ class InputTVTorrents:
             page = urllib2.urlopen(pageurl)
             soup = BeautifulSoup(page)
         except timeout:
-            raise PluginWarning("Timed out opening page", log)
+            raise PluginError("Timed out opening page", log)
         except urllib2.URLError:
-            raise PluginWarning("URLError when opening page", log)
+            raise PluginError("URLError when opening page", log)
         
         hscript = soup.find('script', src=None).string
         hlines = hscript.splitlines()

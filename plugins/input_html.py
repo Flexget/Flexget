@@ -3,8 +3,7 @@ import urlparse
 import logging
 from socket import timeout
 from feed import Entry
-from manager import PluginWarning
-from BeautifulSoup import BeautifulSoup
+from manager import PluginError
 import re
 
 __pychecker__ = 'unusednames=parser'
@@ -39,6 +38,10 @@ class InputHtml:
         return root
 
     def feed_input(self, feed):
+        try:
+            from BeautifulSoup import BeautifulSoup
+        except:
+            raise PluginError('BeautifulSoup module required', log)
         config = feed.config['html']
         if not isinstance(config, dict):
             config = {}
@@ -52,9 +55,9 @@ class InputHtml:
             log.debug('Detected encoding %s' % soup.originalEncoding)
         except IOError, e:
             if hasattr(e, 'reason'):
-                raise PluginWarning('Failed to reach server. Reason: %s' % e.reason, log)
+                raise PluginError('Failed to reach server. Reason: %s' % e.reason, log)
             elif hasattr(e, 'code'):
-                raise PluginWarning('The server couldn\'t fulfill the request. Error code: %s' % e.code, log)
+                raise PluginError('The server couldn\'t fulfill the request. Error code: %s' % e.code, log)
         
         # dump received content into a file
         if 'dump' in config:

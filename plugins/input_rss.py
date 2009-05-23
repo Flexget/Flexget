@@ -3,7 +3,7 @@ import urlparse
 import xml.sax
 import re
 from feed import Entry
-from manager import PluginWarning
+from manager import PluginWarning, PluginError
 from utils.log import log_once
 
 feedparser_present = True
@@ -85,7 +85,7 @@ class InputRSS:
 
     def feed_input(self, feed):
         if not feedparser_present:
-            raise PluginWarning('Plugin RSS requires Feedparser. Please install it from http://www.feedparser.org/ or from your distro repository', log)
+            raise PluginError('Plugin RSS requires Feedparser. Please install it from http://www.feedparser.org/ or from your distro repository', log)
 
         config = feed.config['rss']
         if not isinstance(config, dict):
@@ -117,9 +117,9 @@ class InputRSS:
             rss = feedparser.parse(url, etag=etag, modified=modified)
         except IOError, e:
             if hasattr(e, 'reason'):
-                raise PluginWarning('Failed to reach server. Reason: %s' % e.reason)
+                raise PluginError('Failed to reach server. Reason: %s' % e.reason)
             elif hasattr(e, 'code'):
-                raise PluginWarning('The server couldn\'t fulfill the request. Error code: %s' % e.code)
+                raise PluginError('The server couldn\'t fulfill the request. Error code: %s' % e.code)
 
         # status checks
         status = rss.get('status', False)
@@ -128,11 +128,11 @@ class InputRSS:
                 log.debug('Feed %s hasn\'t changed, skipping' % feed.name)
                 return
             elif status == 401:
-                raise PluginWarning('Authentication needed for feed %s: %s' % (feed.name, rss.headers['www-authenticate']), log)
+                raise PluginError('Authentication needed for feed %s: %s' % (feed.name, rss.headers['www-authenticate']), log)
             elif status == 404:
-                raise PluginWarning('RSS Feed %s not found' % feed.name, log)
+                raise PluginError('RSS Feed %s not found' % feed.name, log)
             elif status == 500:
-                raise PluginWarning('Internal server exception on feed %s' % feed.name, log)
+                raise PluginError('Internal server exception on feed %s' % feed.name, log)
         else:
             log.debug('RSS does not have status (normal if processing a file)')
             
@@ -152,9 +152,9 @@ class InputRSS:
                 raise PluginWarning('RSS Feed %s is not valid XML' % feed.name, log)
             elif isinstance(ex, IOError):
                 if hasattr(ex, 'reason'):
-                    raise PluginWarning('Failed to reach server. Reason: %s' % ex.reason, log)
+                    raise PluginError('Failed to reach server. Reason: %s' % ex.reason, log)
                 elif hasattr(ex, 'code'):
-                    raise PluginWarning('The server couldn\'t fulfill the request. Error code: %s' % ex.code, log)
+                    raise PluginError('The server couldn\'t fulfill the request. Error code: %s' % ex.code, log)
             else:
                 raise PluginWarning('Unhandled bozo_exception. Type: %s.%s (feed: %s)' % \
                                     (ex.__class__.__plugin__, ex.__class__.__name__ , feed.name), log)

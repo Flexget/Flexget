@@ -1,5 +1,5 @@
 import logging
-from manager import PluginWarning
+from manager import PluginWarning, PluginError
 
 log = logging.getLogger('preset')
 
@@ -48,10 +48,10 @@ class PluginPreset:
             log.debug('Merging preset %s into feed %s' % (preset, feed.name))
             if not preset in feed.manager.config:
                 if preset=='global': continue
-                raise PluginWarning('Unable to set preset %s for %s' % (preset, feed.name))
+                raise PluginError('Unable to set preset %s for %s' % (preset, feed.name), log)
             # merge
             from utils.tools import MergeException, merge_dict_from_to
             try:
                 merge_dict_from_to(feed.manager.config[preset], feed.config)
             except MergeException:
-                raise PluginWarning('Failed to merge preset %s to feed %s, incompatible datatypes' % (preset, feed.name))
+                raise PluginError('Failed to merge preset %s to feed %s, incompatible datatypes' % (preset, feed.name))

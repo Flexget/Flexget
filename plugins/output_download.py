@@ -4,7 +4,7 @@ import urllib2
 import logging
 import shutil
 import filecmp
-from manager import PluginWarning
+from manager import PluginWarning, PluginError
 
 log = logging.getLogger('download')
 
@@ -53,7 +53,7 @@ class PluginDownload:
         # check for invalid configuration, abort whole download if not goig to work
         # TODO: rewrite and check exists
         if not feed.config['download']:
-            raise PluginWarning('Feed %s is missing download path, check your configuration.' % feed.name)
+            raise PluginError('Feed %s is missing download path, check your configuration.' % feed.name, log)
             
     def feed_start(self, feed):
         """
@@ -64,7 +64,6 @@ class PluginDownload:
 
     def feed_download(self, feed):
         """Download all feed content and store in temporary folder"""
-        self.validate_config(feed) # TODO: remove
         for entry in feed.accepted:
             try:
                 if feed.manager.options.test:
@@ -198,7 +197,7 @@ class PluginDownload:
 
     def feed_output(self, feed):
         """Move downloaded content from temp folder to final destination"""
-        self.validate_config(feed)
+        self.validate_config(feed) #TODO: remove
         for entry in feed.accepted:
             try:
                 if feed.manager.options.test:
@@ -238,7 +237,7 @@ class PluginDownload:
             try:
                 os.mkdir(path)
             except:
-                raise PluginWarning('Cannot create path %s' % path, log)
+                raise PluginError('Cannot create path %s' % path, log)
         
         # see that temp file is present
         if not os.path.exists(entry['file']):

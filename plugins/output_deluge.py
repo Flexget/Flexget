@@ -1,6 +1,6 @@
 import logging
 import time, os, sys
-from manager import PluginError, PluginWarning
+from manager import PluginError
 
 log = logging.getLogger('deluge')
 
@@ -79,7 +79,7 @@ class OutputDeluge:
         try:
             from deluge.ui.client import sclient
         except:
-            raise PluginError('Deluge module required')
+            raise PluginError('Deluge module required', log)
         config = self.get_config(feed)
         
 		# don't add when learning
@@ -87,10 +87,15 @@ class OutputDeluge:
             return
         if not feed.accepted or not config['enabled']:
             return
+        
         sclient.set_core_uri()
         opts = {}
         for entry in feed.accepted:
-            before = sclient.get_session_state()
+            try:
+                before = sclient.get_session_state()
+            except Exception, (errno, msg):
+                raise PluginError('Could not communicate with deluge core. %s' % msg, log)
+                
             path = entry.get('path', config['path'])
             if 'path':
                 opts['download_location'] = path % entry
@@ -99,8 +104,7 @@ class OutputDeluge:
                 tmp_path = os.path.join(sys.path[0], 'temp')
                 log.debug('entry: %s' % entry)
                 log.debug('temp: %s' % ', '.join(os.listdir(tmp_path)))
-                raise PluginWarning("Downloaded temp file '%s' doesn't exist!?" % entry['file'])
-            
+                raise PluginError("Downloaded temp file '%s' doesn't exist!?" % entry['file'], log)
             sclient.add_torrent_file([entry['file']], [opts])
             log.info("%s torrent added to deluge with options %s" % (entry['title'], opts))
             
@@ -108,13 +112,15 @@ class OutputDeluge:
             if not 'download' in feed.config:
                 os.remove(entry['file'])
                 del(entry['file'])
-
-            time.sleep(1)
-            after = sclient.get_session_state()
             movedone = entry.get('movedone', config['movedone'])
             label = entry.get('label', config['label']).lower()
             queuetotop = entry.get('queuetotop', config['queuetotop'])
+            if not any([movedone, label, queuetotop]):
+                continue
+            time.sleep(1)
+            after = sclient.get_session_state()
             for item in after:
+                #find torrentid of just added torrent
                 if not item in before:
                     if movedone:
                         log.info("%s move on complete set to %s" % (entry['title'], movedone % entry))
@@ -132,5 +138,5 @@ class OutputDeluge:
                         sclient.queue_top([item])
                     break
             else:
-                log.info("It appears %s was not added to deluge. (maybe it was already loaded?)" % entry['title'])
-                
+                log.info("%s is already loaded in deluge. Cannot change label, movedone, or queuetotop" % entry['title'])
+

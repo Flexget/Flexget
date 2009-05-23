@@ -1,6 +1,6 @@
 import logging
 from datetime import datetime
-from manager import PluginWarning
+from manager import PluginWarning, PluginError
 from utils.simple_persistence import SimplePersistence
 
 log = logging.getLogger('feed')
@@ -206,6 +206,9 @@ class Feed:
                         log_once(warn, warn.log)
                     else:
                         warn.log.warning(warn)
+                except PluginError, err:
+                    err.log.error(err)
+                    self.abort()
                 except Exception, e:
                     log.exception('Unhandled error in plugin %s: %s' % (keyword, e))
                     self.abort()

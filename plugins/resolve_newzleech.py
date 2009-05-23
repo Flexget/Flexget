@@ -1,6 +1,7 @@
 import urllib, urllib2
 import logging
 import re
+from module_resolver import ResolverException
 from manager import PluginWarning
 
 
@@ -21,7 +22,7 @@ class ResolveNewzleech:
         try:
             from BeautifulSoup import BeautifulSoup
         except:
-            raise PluginWarning('Newzleech requires BeautifulSoup')
+            raise ResolverException('Newzleech requires BeautifulSoup')
 
         url = u'http://newzleech.com/?' + urllib.urlencode({'q':entry['title'].encode('latin1'), 'm':'search', 'group':'', 'min':'min', 'max':'max', 'age':'', 'minage':'', 'adv':''})
         #log.debug('Search url: %s' % url)
@@ -40,9 +41,9 @@ class ResolveNewzleech:
             page = urllib2.urlopen(req)
         except IOError, e:
             if hasattr(e, 'reason'):
-                raise PluginWarning('Failed to reach server. Reason: %s' % e.reason)
+                raise PluginWarning('Failed to reach server. Reason: %s' % e.reason, log)
             elif hasattr(e, 'code'):
-                raise PluginWarning('The server couldn\'t fulfill the request. Error code: %s' % e.code)
+                raise PluginWarning('The server couldn\'t fulfill the request. Error code: %s' % e.code, log)
 
         soup = BeautifulSoup(page)
         

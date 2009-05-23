@@ -1,6 +1,6 @@
 import logging
 from feed import Entry
-from manager import PluginWarning
+from manager import PluginError
 import urllib2
 
 mechanize_present = True
@@ -21,7 +21,7 @@ class InputFormLogin:
 
     def feed_input(self, feed):
         if not mechanize_present:
-            raise PluginWarning('module form requires mechanize')
+            raise PluginError('mechanize module required.', log)
         url = feed.config['form']['url']
         username = feed.config['form']['username']
         password = feed.config['form']['password']
