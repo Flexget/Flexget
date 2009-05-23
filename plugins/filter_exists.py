@@ -27,7 +27,7 @@ class FilterExists:
         
     def get_config(self, feed):
         config = feed.config.get('exists', None)
-        #if only a single path is passed turn it into a 1 elemnt list
+        #if only a single path is passed turn it into a 1 element list
         if isinstance(config, str):
             config = [config]
         return config
@@ -39,8 +39,8 @@ class FilterExists:
         for path in config:
             path = os.path.expanduser(path)
             if not os.path.exists(path):
-                raise PluginWarning('Path %s does not exists' % path, log)
-            # scan trough
+                raise PluginWarning('Path %s does not exist' % path, log)
+            # scan through
             for root, dirs, files in os.walk(path):
                 # convert filelists into utf-8 to avoid unicode problems
                 dirs = [x.decode('utf-8', 'ignore') for x in dirs]

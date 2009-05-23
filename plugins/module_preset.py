@@ -26,6 +26,7 @@ class PluginPreset:
         import validator
         root = validator.factory()
         root.accept('text')
+        root.accept('boolean')
         presets = root.accept('list')
         presets.accept('text')
         return root
@@ -34,6 +35,13 @@ class PluginPreset:
         config = feed.config.get('preset', 'global')
         if isinstance(config, basestring):
             config = [config]
+        # handles 'preset: no' form to turn off global preset on this feed
+        elif isinstance(config, bool):
+            if not config:
+                config = []
+            else:
+                config = ['global']
+                
         log.log(5, 'presets: %s' % config)
         
         for preset in config:

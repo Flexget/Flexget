@@ -131,4 +131,6 @@ class OutputDeluge:
                         log.info("%s moved to top of queue" % entry['title'])
                         sclient.queue_top([item])
                     break
+            else:
+                log.info("It appears %s was not added to deluge. (maybe it was already loaded?)" % entry['title'])
                 
