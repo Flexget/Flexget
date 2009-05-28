@@ -14,7 +14,7 @@ class OutputDeluge:
         pass
     
     def register(self, manager, parser):
-        manager.register('deluge')
+        manager.register('deluge', output_priority=1)
 
     def validator(self):
         import validator
