@@ -1,8 +1,6 @@
 import re
 import logging
 
-__pychecker__ = 'unusednames=parser,token'
-
 log = logging.getLogger('modify_torrent')
 
 # Torrent decoding is a short fragment from effbot.org. Site copyright says:
@@ -27,7 +25,6 @@ class Torrent:
 
         # decoded torrent structure
         self.content = self.decode(content)
-        self._size = 0
 
     def get_filelist(self):
         """Return array containing fileinfo dictionaries (name, length, path)"""
@@ -38,7 +35,6 @@ class Torrent:
             t['name'] = self.content['info']['name']
             t['size'] = self.content['info']['length']
             t['path'] = ''
-            self._size = int(t['size'])
             files.append(t)
         else:
             # multifile torrent
@@ -48,15 +44,20 @@ class Torrent:
                 t['path'] = string.join(item['path'][:-1], '/')
                 t['name'] = item['path'][-1:]
                 t['size'] = item['length']
-                self._size += int(t['size'])
                 files.append(t)
         return files
         
     def get_size(self):
         """Return total size of the torrent"""
-        # calculates _size
-        _ = self.get_filelist()
-        return self._size
+        size = 0
+        # single file torrent
+        if 'length' in self.content['info']:
+            size = int(t['size'])
+        else:
+            # multifile torrent
+            for item in self.content['info']['files']:
+                size += int(t['size'])
+        return size
 
     def get_multitrackers(self):
         """
