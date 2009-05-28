@@ -40,8 +40,7 @@ class Torrent:
             # multifile torrent
             for item in self.content['info']['files']:
                 t = {}
-                import string
-                t['path'] = string.join(item['path'][:-1], '/')
+                t['path'] = '/'.join(item['path'][:-1])
                 t['name'] = item['path'][-1:]
                 t['size'] = item['length']
                 files.append(t)
@@ -52,11 +51,11 @@ class Torrent:
         size = 0
         # single file torrent
         if 'length' in self.content['info']:
-            size = int(t['size'])
+            size = int(self.content['info']['length'])
         else:
             # multifile torrent
             for item in self.content['info']['files']:
-                size += int(t['size'])
+                size += int(item['length'])
         return size
 
     def get_multitrackers(self):
