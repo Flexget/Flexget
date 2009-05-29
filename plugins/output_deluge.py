@@ -155,9 +155,10 @@ class OutputDeluge:
                     break
             else:
                 log.info("%s is already loaded in deluge. Cannot change label, movedone, or queuetotop" % entry['title'])
-
+    #TODO: Activate once propers are detected or another use is thought of.
+    """
     def feed_exit(self, feed):
-        """Remember torrentid of series torrents for future control"""
+        #Remember torrentid of series torrents for future control
         for entry in feed.accepted:
             if not 'deluge_torrentid' in entry:
                 continue
@@ -175,5 +176,4 @@ class OutputDeluge:
                         delugeepisode.episode_id = episode.id
                         delugeepisode.torrentid = entry['deluge_torrentid']
                         feed.session.add(delugeepisode)
-
-        
+    """
