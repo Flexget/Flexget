@@ -256,7 +256,9 @@ class PluginDownload:
                 del(entry['file'])
                 return
             else:
-                raise PluginWarning('File \'%s\' already exists' % destfile, log)
+                #TODO: Rethink the best course of action in this case.
+                log.info('File \'%s\' already exists and is not identical, skipping.' % destfile)
+                #raise PluginWarning('File \'%s\' already exists' % destfile, log)
         
         # move temp file
         logging.debug('moving %s to %s' % (entry['file'], destfile))
