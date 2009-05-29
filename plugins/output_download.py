@@ -257,7 +257,11 @@ class PluginDownload:
                 return
             else:
                 #TODO: Rethink the best course of action in this case.
-                log.info('File \'%s\' already exists and is not identical, skipping.' % destfile)
+                log.info('File \'%s\' already exists and is not identical, download failed.' % destfile)
+                feed.fail(entry, 'File \'%s\' already exists and is not identical.' % destfile)
+                os.remove(entry['file'])
+                del(entry['file'])
+                return
                 #raise PluginWarning('File \'%s\' already exists' % destfile, log)
         
         # move temp file
