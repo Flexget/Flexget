@@ -64,6 +64,6 @@ class FilterExists:
                             parser.parse()
                             if parser.valid:
                                 if parser.identifier()==oldparser.identifier() and parser.quality==oldparser.quality:
-                                    log.info('Found episode %s %s in %s' % (parser.name, parser.identifier(), root))
+                                    log.debug('Found episode %s %s in %s' % (parser.name, parser.identifier(), root))
                                     feed.reject(entry, 'episode already exists')
                             
