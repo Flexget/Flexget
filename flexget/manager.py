@@ -8,27 +8,12 @@ from datetime import datetime
 
 log = logging.getLogger('manager')
 
-try:
-    from optparse import OptionParser, SUPPRESS_HELP
-except ImportError:
-    print 'Please install Optik 1.4.1 (or higher) or preferably update your Python'
-    sys.exit(1)
+from optparse import OptionParser, SUPPRESS_HELP
 
-try:
-    import sqlalchemy
-    if float(sqlalchemy.__version__[0:3]) < 0.5:
-        raise ImportError('Old SQLAlchemy')
-    from sqlalchemy.orm import sessionmaker
-    from sqlalchemy.ext.declarative import declarative_base
-except ImportError:
-    print 'Please install SQLAlchemy (>0.5) from http://www.sqlalchemy.org/ or from your distro repository'
-    sys.exit(1)
-
-try:
-    import yaml
-except ImportError:
-    print 'Please install PyYAML from http://pyyaml.org/wiki/PyYAML or from your distro repository'
-    sys.exit(1)
+import yaml
+import sqlalchemy
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy.ext.declarative import declarative_base
 
 class RegisterException(Exception):
     def __init__(self, value):
