@@ -63,6 +63,8 @@ class Manager:
     log_initialized = False
     
     def __init__(self, unit_test=False):
+        pkg_resources.require('BeautifulSoup==3.0.7a')
+    
         if unit_test or os.path.exists(os.path.join(sys.path[0], '..', 'config.yml')):
             self.config_base = os.path.join(sys.path[0], '..')
         else:
@@ -199,6 +201,7 @@ class Manager:
     def init_logging(self):
         """Creates and initializes logger."""
         
+        # prevent multiple loggers being initialized (ie. unit tests)
         if Manager.log_initialized: 
             return
         
