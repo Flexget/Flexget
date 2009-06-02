@@ -51,7 +51,7 @@ def test(options):
 def clean():
     """Cleans up the virtualenv"""
     for p in ('bin', 'build', 'dist', 'docs', 'include', 'lib', 'man',
-            'share', 'flexget.egg-info', 'paver-minilib.zip', 'setup.py'):
+            'share', 'FlexGet.egg-info', 'paver-minilib.zip', 'setup.py'):
         pth = path(p)
         if pth.isdir():
             pth.rmtree()
