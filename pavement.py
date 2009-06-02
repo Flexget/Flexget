@@ -20,7 +20,6 @@ setup(
     package_data=find_package_data("flexget", package="flexget",
                                    only_in_packages=False),
     zip_safe=False,
-    test_suite = 'test.test_all',
     entry_points="""
         [console_scripts]
         flexget = flexget:main
@@ -41,6 +40,12 @@ options(
 def sdist():
     """Generates the tar.gz"""
     pass
+
+@task
+@cmdopts([('online', None, 'Run online tests')])
+def test(options):
+    import test
+    test.test_all(options)
 
 @task
 def clean():
