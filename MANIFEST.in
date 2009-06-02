@@ -1,0 +1,8 @@
+include LICENSE
+include README
+include pavement.py
+include paver-minilib.zip
+include setup.py
+include bootstrap.py
+include config-example.yml
+recursive-include test *
