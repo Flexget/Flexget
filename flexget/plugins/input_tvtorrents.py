@@ -4,8 +4,7 @@ import logging
 from socket import timeout
 from flexget.feed import Entry
 from flexget.manager import PluginError
-
-__pychecker__ = 'unusednames=parser'
+from BeautifulSoup import BeautifulSoup
 
 log = logging.getLogger('tvtorrents')
 
@@ -36,10 +35,6 @@ class InputTVTorrents:
         return validator.factory('url')
 
     def feed_input(self, feed):
-        try:
-            from BeautifulSoup import BeautifulSoup
-        except:
-            raise PluginError('BeautifulSoup module required.', log)
         pageurl = "http://tvtorrents.com/loggedin/recently_aired.do"
         log.debug("InputPlugin tvtorrents requesting url %s" % pageurl)
 

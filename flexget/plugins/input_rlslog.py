@@ -7,8 +7,6 @@ from flexget.manager import PluginWarning
 from flexget.utils.log import log_once
 from BeautifulSoup import BeautifulSoup
 
-__pychecker__ = 'unusednames=parser'
-
 log = logging.getLogger('rlslog')
 
 class RlsLog:

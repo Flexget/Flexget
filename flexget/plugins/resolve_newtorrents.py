@@ -3,12 +3,11 @@ import logging
 import re
 from module_resolver import ResolverException
 from flexget.manager import PluginWarning
+from BeautifulSoup import BeautifulSoup
 
 timeout = 10
 import socket
 socket.setdefaulttimeout(timeout)
-
-
 
 log = logging.getLogger('newtorrents')
 
@@ -66,10 +65,6 @@ class NewTorrents:
 
     def url_from_search(self, url, name):
         """Parses torrent download url from search results"""
-        try:
-            from BeautifulSoup import BeautifulSoup
-        except:
-            raise ResolverException('Newtorrents requires BeautifulSoup')
         name = name.replace('.',' ').lower()
         import urllib
         url = urllib.quote(url, safe=':/~?=&%')

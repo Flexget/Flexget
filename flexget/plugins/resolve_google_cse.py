@@ -5,8 +5,6 @@ from module_resolver import ResolverException
 from flexget.manager import PluginWarning
 from BeautifulSoup import BeautifulSoup
 
-
-
 log = logging.getLogger('google_cse')
 
 class ResolveGoogleCse:

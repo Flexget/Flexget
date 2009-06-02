@@ -5,8 +5,7 @@ from socket import timeout
 from flexget.feed import Entry
 from flexget.manager import PluginError
 import re
-
-__pychecker__ = 'unusednames=parser'
+from BeautifulSoup import BeautifulSoup
 
 log = logging.getLogger('html')
 

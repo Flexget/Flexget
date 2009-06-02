@@ -6,8 +6,6 @@ from flexget.feed import Entry
 from flexget.manager import PluginWarning
 from BeautifulSoup import BeautifulSoup
 
-__pychecker__ = 'unusednames=parser'
-
 log = logging.getLogger('scenereleases')
 
 class InputScenereleases:
