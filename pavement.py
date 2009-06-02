@@ -45,7 +45,7 @@ def sdist():
 @cmdopts([('online', None, 'Run online tests')])
 def test(options):
     import test
-    test.test_all(options)
+    test.test_all(getattr(options, 'online', False))
 
 @task
 def clean():

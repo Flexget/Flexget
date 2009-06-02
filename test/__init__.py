@@ -501,7 +501,7 @@ class TestValidator(unittest.TestCase):
         if result:
             self.fail('invalid result for bar')
 
-def test_all(options=None):
+def test_all(online=False):
     suite = unittest.TestSuite()
     suite.addTest(unittest.makeSuite(TestRegexp))
     suite.addTest(unittest.makeSuite(TestResolvers))
@@ -514,7 +514,7 @@ def test_all(options=None):
     suite.addTest(unittest.makeSuite(TestValidator))
     suite.addTest(unittest.makeSuite(TestScanImdb))
     
-    if options is not None and hasattr(options, 'online'):
+    if online:
         print 'NOTE: Online tests are enabled. Some of these may fail since they depend on 3rd party services.'
         suite.addTest(unittest.makeSuite(TestImdbOnline))
         suite.addTest(unittest.makeSuite(TestDownload))
