@@ -3,7 +3,7 @@
 import os, sys, unittest
 from flexget.manager import Manager, Session
 from flexget.feed import Feed
-import validator
+from flexget import validator
 
 class FlexGetTestCase(unittest.TestCase):
 

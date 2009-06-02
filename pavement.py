@@ -20,7 +20,7 @@ setup(
     package_data=find_package_data("flexget", package="flexget",
                                    only_in_packages=False),
     zip_safe=False,
-    test_suite = 'testsuite.test_all',
+    test_suite = 'test.test_all',
     entry_points="""
         [console_scripts]
         flexget = flexget:main
@@ -61,9 +61,11 @@ def clean():
     ('tag=', 't', 'Tag package name, used instead of revision')
 ])
 def build_release(options):
-    export_path = path('build/flexget')
+    export_path = path('build')
     if not export_path.exists():
         export_path.makedirs()
+
+    export_path = export_path / 'flexget'
 
     if hasattr(options, 'zip'):
         if options.zip[-1:] == '/':
@@ -71,16 +73,15 @@ def build_release(options):
     else:
         options['zip'] = '/var/www/flexget_dist'
 
-    export_path = path('flexget_build')
     if not hasattr(options, 'rev'):
-        options['rev'] = 0
+        options['rev'] = ""
 
     if not hasattr(options, 'path'):
         options['path'] = 'http://svn.flexget.com/trunk'
 
-    output = sh("svn co %s%s %s" % (svn._format_revision(options.rev), url, dest), capture=True)
+    output = sh("svn export %s%s %s" % (svn._format_revision(options.rev), options.path, export_path), capture=True)
     m = re.search('Exported revision (\d+)', output)
-    if m:
+    if not m:
         raise Exception('no rev found from svn export?')
     rev = m.groups()[0]
 
@@ -88,13 +89,15 @@ def build_release(options):
     path(export_path / 'quality_check.sh').remove()
 
     if not hasattr(options, 'tag'):
-        package_name = path(options.zip) / ("FlexGet_(%s).zip" % rev)
+        package_name = path(options.zip) / (r"FlexGet_(%s).zip" % rev)
     else:
         package_name = path(options.zip) / ("FlexGet_%s.zip" % options.tag)
 
-    sh("7z a -tzip %s %s" % (package_name, export_path))
+    sh("7z a -tzip \"%s\" %s" % (package_name, export_path))
 
     export_path.rmtree()
+
+    print package_name
 
     if not package_name.exists():
         print '!! FAILED to create %s' % package_name
