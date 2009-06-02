@@ -1,0 +1,3 @@
+To start using flexget from this directory, run the following commands:
+python bootstrap.py
+bin/flexget

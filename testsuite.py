@@ -1,8 +1,8 @@
 #!/usr/bin/python
 
 import os, sys, unittest
-from manager import Manager, Session
-from feed import Feed
+from flexget.manager import Manager, Session
+from flexget.feed import Feed
 import validator
 
 class FlexGetTestCase(unittest.TestCase):
@@ -58,7 +58,7 @@ class TestFilterSeries(FlexGetTestCase):
         self.execute_feed('test')
 
     def testSeriesParser(self):
-        from utils.series import SeriesParser
+        from flexget.utils.series import SeriesParser
         
         s = SeriesParser()
         s.name = 'Something Interesting'
@@ -501,7 +501,7 @@ class TestValidator(unittest.TestCase):
         if result:
             self.fail('invalid result for bar')
 
-if __name__ == '__main__':
+def test_all():
     suite = unittest.TestSuite()
     suite.addTest(unittest.makeSuite(TestRegexp))
     suite.addTest(unittest.makeSuite(TestResolvers))
@@ -525,3 +525,6 @@ if __name__ == '__main__':
     
     # run suite
     unittest.TextTestRunner(verbosity=2).run(suite)
+
+if __name__ == '__main__':
+    test_all()
