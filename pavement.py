@@ -16,7 +16,7 @@ setup(
     author_email='',
     url='http://flexget.com',
     install_requires=['SQLAlchemy>0.5', 'PyYAML', 'BeautifulSoup==3.0.7a'],
-    packages=find_packages(exclude=['ez_setup']),
+    packages=['flexget', 'flexget.plugins', 'flexget.utils'],
     package_data=find_package_data("flexget", package="flexget",
                                    only_in_packages=False),
     zip_safe=False,
@@ -90,7 +90,6 @@ def build_release(options):
         raise Exception('no rev found from svn export?')
     rev = m.groups()[0]
 
-    path(export_path / 'example.yml').rename(export_path / 'config.yml.example')
     path(export_path / 'quality_check.sh').remove()
 
     if not hasattr(options, 'tag'):

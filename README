@@ -1,3 +1,5 @@
-To start using flexget from this directory, run the following commands:
+To start using flexget from this directory, copy your configuration and db-config.sqlite here and run the following commands:
 python bootstrap.py
 bin/flexget
+
+You may also place the configuration files in ~/.flexget (Unix, Mac OS X) or C:\Documents and Setting\<username>\.flexget (Windows).
