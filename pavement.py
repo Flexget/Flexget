@@ -9,10 +9,10 @@ from paver.setuputils import setup, find_package_data, find_packages
 
 options = environment.options
 setup(
-    name='flexget',
-    version='0.9.4',
+    name='FlexGet',
+    version='1.0',
     description='FlexGet is a program aimed to automate downloading or processing content (torrents, podcasts, etc.) from different sources like RSS-feeds, html-pages, various sites and more.',
-    author='',
+    author='Marko Koivusalo',
     author_email='',
     url='http://flexget.com',
     install_requires=['SQLAlchemy>0.5', 'PyYAML', 'BeautifulSoup==3.0.7a'],
@@ -89,8 +89,6 @@ def build_release(options):
     if not m:
         raise Exception('no rev found from svn export?')
     rev = m.groups()[0]
-
-    path(export_path / 'quality_check.sh').remove()
 
     if not hasattr(options, 'tag'):
         package_name = path(options.zip) / (r"FlexGet_(%s).zip" % rev)
