@@ -65,8 +65,13 @@ class Manager:
     def __init__(self, unit_test=False):
         pkg_resources.require('BeautifulSoup==3.0.7a')
 
-        if unit_test or os.path.exists(os.path.join(sys.path[0], 'config.yml')):
-            self.config_base = os.path.join(sys.path[0])
+        if os.path.exists(os.path.join(sys.path[0], '..', 'pavement.py')):
+            basedir = os.path.normpath(os.path.join(sys.path[0], '..'))
+        else:
+            basedir = os.path.join(sys.path[0])
+
+        if unit_test or os.path.exists(os.path.join(basedir, 'config.yml')):
+            self.config_base = basedir
         else:
             self.config_base = os.path.join(os.path.expanduser('~'), '.flexget')
 
