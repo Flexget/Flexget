@@ -130,16 +130,15 @@ class OutputDeluge:
             movedone = entry.get('movedone', config['movedone'])
             label = entry.get('label', config['label']).lower()
             queuetotop = entry.get('queuetotop', config['queuetotop'])
-            #if not any([movedone, label, queuetotop]):
-            #    continue
+            #Sometimes deluge takes a moment to add the torrent, wait a second.
             time.sleep(1)
             after = sclient.get_session_state()
             for item in after:
                 #find torrentid of just added torrent
                 if not item in before:
-                    entry['deluge_torrentid'] = item
+                    #entry['deluge_torrentid'] = item
                     if movedone:
-                        log.info("%s move on complete set to %s" % (entry['title'], movedone % entry))
+                        log.debug("%s move on complete set to %s" % (entry['title'], movedone % entry))
                         sclient.set_torrent_move_on_completed(item, True)
                         sclient.set_torrent_move_on_completed_path(item, movedone % entry)
                     if label:
@@ -147,10 +146,10 @@ class OutputDeluge:
                             sclient.enable_plugin("label")
                         if not label in sclient.label_get_labels():
                             sclient.label_add(label)
-                        log.info("%s label set to '%s'" % (entry['title'], label))
+                        log.debug("%s label set to '%s'" % (entry['title'], label))
                         sclient.label_set_torrent(item, label)
                     if queuetotop:
-                        log.info("%s moved to top of queue" % entry['title'])
+                        log.debug("%s moved to top of queue" % entry['title'])
                         sclient.queue_top([item])
                     break
             else:
