@@ -12,26 +12,25 @@ class PluginDownload:
 
     """
         Downloads content from entry url and writes it into a file.
-        Simple example:
+        
+        Example:
 
         download: ~/torrents/
-
-        Advanced users:
-
-        Some plugins may set an alternative download path for entry.
-        Prime example is plugin patterns that can be used to override path.
-
-        Configuration example:
         
-        pattenrs:
-          - pattern1
-          - pattern2
-          - pattern3: ~/another_location/
-        download: ~/torrents/
-
-        This results that entries matching patterns 1 and 2 are saved into
-        ~/torrents/ and pattern3 is saved to ~/another_location/.
+        Allow HTML content:
         
+        By default download module reports failure if received content
+        is a html. Usually this is some sort of custom error page without
+        proper http code and thus entry is assumed to be downloaded 
+        correctly.
+        
+        In the rare case you actually need to retrieve html-pages you must
+        disable this feature.
+        
+        download:
+          path: ~/something/
+          fail_html: no
+
         You may use commandline parameter --dl-path to temporarily override 
         all paths to another location.
     """
@@ -43,10 +42,14 @@ class PluginDownload:
                           help='Override path for download plugin. Applies to all executed feeds.')
 
     def validator(self):
-        """Validate given configuration"""
-        # TODO: complain non existent paths
+        """Return config validator"""
         from flexget import validator
-        return validator.factory('text') 
+        root = validator.factory()
+        root.accept('text') # TODO: path validator
+        advanced = root.accept('dict')
+        advanced.accept('text', key='path') # TODO: path validator
+        advanced.accept('boolean', key='fail_html')
+        return root
 
     def validate_config(self, feed):
         # TODO: migrate into real validate!!!
@@ -55,6 +58,7 @@ class PluginDownload:
         if not feed.config['download']:
             raise PluginError('Feed %s is missing download path, check your configuration.' % feed.name, log)
             
+    # TODO: not in use? should be at process_start event ?
     def feed_start(self, feed):
         """
         register the usable set: keywords
@@ -96,13 +100,6 @@ class PluginDownload:
             if urllib2._opener:
                 handlers = [h.__class__.__name__ for h in urllib2._opener.handlers]
                 log.debug('default opener present, handlers: %s' % ', '.join(handlers))
-
-            """
-            txheaders =  {'User-agent' : 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'}
-            req = urllib2.Request(url, None, txheaders)
-            f = urllib2.urlopen(req)
-            """
-                
             f = urllib2.urlopen(url)
 
         mimetype = f.headers.getsubtype()
@@ -139,7 +136,7 @@ class PluginDownload:
             os.remove(datafile)
             raise
 
-        entry['mimetype'] = mimetype
+        entry['mime-type'] = mimetype
         # prefer content-disposition naming
         self.filename_from_headers(entry, f)
         # if there is still no specified filename, use mime-type
@@ -190,10 +187,12 @@ class PluginDownload:
             log.debug('Mimetypes guess for %s is %s ' % (response.headers.getsubtype(), extension))
             if 'filename' in entry:
                 if entry['filename'].endswith('.%s' % extension):
-                    log.debug('Filename %s extension matches to mimetype' % entry['filename'])
+                    log.debug('Filename %s extension matches to mime-type' % entry['filename'])
                 else:
-                    log.debug('Adding mimetype extension %s to %s' % (extension, entry['filename']))
+                    log.debug('Adding mime-type extension %s to %s' % (extension, entry['filename']))
                     entry['filename'] = '%s.%s' % (entry['filename'], extension)
+        else:
+            log.debug('Python doesn\'t know extension for mime-type: %s' % response.headers.getsubtype())
 
     def feed_output(self, feed):
         """Move downloaded content from temp folder to final destination"""
@@ -210,64 +209,74 @@ class PluginDownload:
             except Exception, e:
                 feed.fail(entry)
                 log.exception('Exception while writing: %s' % e)
-            # remove temp file if it remains due to exceptions
-            if 'file' in entry:
-                if os.path.exists(entry['file']):
-                    log.debug('removing temp file %s (left behind) from %s' % (entry['file'], entry['title']))
-                    os.remove(entry['file'])
 
     def output(self, feed, entry):
         """Moves temp-file into final destination"""
+
         if not 'file' in entry:
             raise Exception('Entry %s has no temp file associated with' % entry['title'])
-        # use path from entry if has one, otherwise use from download definition parameter
-        path = entry.get('path', feed.config['download'])
-        # override path from commandline parameter
-        if feed.manager.options.dl_path:
-            path = feed.manager.options.dl_path
-        # make filename, if entry has perefered filename attribute use it, if not use title
-        if not 'filename' in entry:
-            log.warning('Unable to figure proper filename / extension for %s, using title.' % entry['title'])
 
-        # make path
-        path = os.path.expanduser(path)
+        try:
+            # convert config into advanced form
+            config = feed.config['download']
+            if not isinstance(config, dict):
+                config = {}
+                config['path'] = feed.config['download']
+                config['fail_html'] = True
+                
+            # use path from entry if has one, otherwise use from download definition parameter
+            path = entry.get('path', config['path'])
+            # override path from commandline parameter
+            if feed.manager.options.dl_path:
+                path = feed.manager.options.dl_path
 
-        if not os.path.exists(path):
-            log.info('Creating directory %s' % path)
-            try:
-                os.mkdir(path)
-            except:
-                raise PluginError('Cannot create path %s' % path, log)
-        
-        # see that temp file is present
-        if not os.path.exists(entry['file']):
-            tmp_path = os.path.join(feed.manager.config_base, 'temp')
-            log.debug('entry: %s' % entry)
-            log.debug('temp: %s' % ', '.join(os.listdir(tmp_path)))
-            raise PluginWarning("Downloaded temp file '%s' doesn't exist!?" % entry['file'])
+            # make filename, if entry has perefered filename attribute use it, if not use title
+            if not 'filename' in entry:
+                if entry.get('mime-type') == 'html' and config['fail_html']:
+                    feed.fail(entry, 'unexpected html content')
+                    return
+                else:
+                    log.warning('Unable to figure proper filename / extension for %s, using title. Mime-type: %s' % (entry['title'], entry.get('mime-type', 'N/A')))
 
-        # combine to full path + filename, replace / from filename (#208)
-        destfile = os.path.join(path, entry.get('filename', entry['title']).replace('/', '_'))
+            # make path
+            path = os.path.expanduser(path)
 
-        if os.path.exists(destfile):
-            if filecmp.cmp(entry['file'], destfile):
-                logging.debug("Identical destination file '%s' already exists", destfile)
+            if not os.path.exists(path):
+                log.info('Creating directory %s' % path)
+                try:
+                    os.mkdir(path)
+                except:
+                    raise PluginError('Cannot create path %s' % path, log)
+            
+            # check that temp file is present
+            if not os.path.exists(entry['file']):
+                tmp_path = os.path.join(feed.manager.config_base, 'temp')
+                log.debug('entry: %s' % entry)
+                log.debug('temp: %s' % ', '.join(os.listdir(tmp_path)))
+                raise PluginWarning("Downloaded temp file '%s' doesn't exist!?" % entry['file'])
+
+            # combine to full path + filename, replace / from filename (#208)
+            destfile = os.path.join(path, entry.get('filename', entry['title']).replace('/', '_'))
+
+            if os.path.exists(destfile):
+                if filecmp.cmp(entry['file'], destfile):
+                    logging.debug("Identical destination file '%s' already exists", destfile)
+                    return
+                else:
+                    # TODO: Rethink the best course of action in this case.
+                    log.info('File \'%s\' already exists and is not identical, download failed.' % destfile)
+                    feed.fail(entry, 'File \'%s\' already exists and is not identical.' % destfile)
+                    return
+            
+            # move temp file
+            logging.debug('moving %s to %s' % (entry['file'], destfile))
+            shutil.move(entry['file'], destfile)
+
+            # store final destination as output key
+            entry['output'] = destfile
+
+        finally:
+            if os.path.exists(entry['file']):
+                log.debug('removing temp file %s from %s' % (entry['file'], entry['title']))
                 os.remove(entry['file'])
-                del(entry['file'])
-                return
-            else:
-                #TODO: Rethink the best course of action in this case.
-                log.info('File \'%s\' already exists and is not identical, download failed.' % destfile)
-                feed.fail(entry, 'File \'%s\' already exists and is not identical.' % destfile)
-                os.remove(entry['file'])
-                del(entry['file'])
-                return
-                #raise PluginWarning('File \'%s\' already exists' % destfile, log)
-        
-        # move temp file
-        logging.debug('moving %s to %s' % (entry['file'], destfile))
-        shutil.move(entry['file'], destfile)
-        # remove temp file from entry
-        del(entry['file'])
-
-        # TODO: should we add final filename? different key?     
+            del(entry['file'])

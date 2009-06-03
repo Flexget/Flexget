@@ -2,8 +2,6 @@ import logging
 import mimetypes
 from flexget.manager import PluginWarning
 
-__pychecker__ = 'unusednames=parser'
-
 log = logging.getLogger('path_by_ext')
 
 class PluginPathByExt:
@@ -33,17 +31,17 @@ class PluginPathByExt:
     def ext(self, feed, callback):
         config = feed.config
         for entry in feed.entries:
-            if 'mime' in entry:
+            if 'mime-type' in entry:
                 # check if configuration has mimetype that entry has
-                if entry['mime'] in config:
-                    callback(entry, config[entry['mime']])
+                if entry['mime-type'] in config:
+                    callback(entry, config[entry['mime-type']])
                 # check if entry mimetype extension matches in config
-                ext = mimetypes.types_map.get(entry['mime'])
+                ext = mimetypes.types_map.get(entry['mime-type'])
                 path = config.get(ext) or config.get(ext[1:])
                 if path:
                     callback(entry, path)
                 else:
-                    log.debug('Unknown mimetype %s' % entry['mime'])
+                    log.debug('Unknown mimetype %s' % entry['mime-type'])
             else:
                 # try to find from url
                 for ext, path in config.iteritems():
