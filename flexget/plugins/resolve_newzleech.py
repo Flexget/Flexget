@@ -18,11 +18,6 @@ class ResolveNewzleech:
 
     # Search API
     def search(self, feed, entry):
-        try:
-            from BeautifulSoup import BeautifulSoup
-        except:
-            raise ResolverException('Newzleech requires BeautifulSoup')
-
         url = u'http://newzleech.com/?' + urllib.urlencode({'q':entry['title'].encode('latin1'), 'm':'search', 'group':'', 'min':'min', 'max':'max', 'age':'', 'minage':'', 'adv':''})
         #log.debug('Search url: %s' % url)
         
@@ -94,7 +89,7 @@ class ResolveNewzleech:
             return
 
         # choose largest file
-        nzbs.sort(lambda a,b: cmp(a['size'], b['size']), reverse=True)
+        nzbs.sort(lambda a, b: cmp(a['size'], b['size']), reverse=True)
         
         entry['url'] = nzbs[0]['url']    
     
