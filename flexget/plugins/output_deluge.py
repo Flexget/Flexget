@@ -54,7 +54,7 @@ class OutputDeluge:
         config.setdefault('queuetotop', False)
         return config
 
-    def feed_start(self, feed):
+    def process_start(self, feed):
         """
         register the usable set: keywords
         """
