@@ -291,6 +291,7 @@ class TestDownload(FlexGetBase):
         if os.path.exists(temp_dir) and os.path.isdir(temp_dir):
             os.rmdir(temp_dir)
 
+    @attr(online=True)
     def testDownload(self):
         self.testfile = os.path.expanduser('~/flexget_test_data')
         if os.path.exists(self.testfile):
