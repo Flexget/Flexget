@@ -1,5 +1,0 @@
-feeds:
-  test:
-    rss: 
-      url: test/rss.xml
-      silent: true

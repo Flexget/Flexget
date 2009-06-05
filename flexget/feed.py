@@ -6,7 +6,6 @@ from flexget.utils.simple_persistence import SimplePersistence
 log = logging.getLogger('feed')
 
 class Entry(dict):
-
     """
         Represents one item in feed. Must have url and title fields.
         See. http://flexget.com/wiki/DevelopersEntry
@@ -43,7 +42,6 @@ class Entry(dict):
         return True
 
 class Feed:
-
     def __init__(self, manager, name, config):
         """
             Represents one feed in configuration.

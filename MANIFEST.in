@@ -5,4 +5,4 @@ include paver-minilib.zip
 include setup.py
 include bootstrap.py
 include config-example.yml
-recursive-include test *
+recursive-include tests *

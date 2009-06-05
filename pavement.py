@@ -15,11 +15,13 @@ setup(
     author='Marko Koivusalo',
     author_email='',
     url='http://flexget.com',
-    install_requires=['SQLAlchemy>0.5', 'PyYAML', 'BeautifulSoup==3.0.7a'],
+    install_requires=['SQLAlchemy>0.5', 'PyYAML', 'BeautifulSoup', 'html5lib>=0.11'],
     packages=['flexget', 'flexget.plugins', 'flexget.utils'],
     package_data=find_package_data("flexget", package="flexget",
                                    only_in_packages=False),
     zip_safe=False,
+    test_suite="nose.collector",
+    setup_requires=["nose>=0.11"],
     entry_points="""
         [console_scripts]
         flexget = flexget:main
@@ -30,6 +32,7 @@ options(
         extra_files=["virtual", "svn"]
     ),
     virtualenv=Bunch(
+        packages_to_install=["nose>=0.11"],
         paver_command_line="develop",
         unzip_setuptools=True
     )
@@ -42,10 +45,19 @@ def sdist():
     pass
 
 @task
-@cmdopts([('online', None, 'Run online tests')])
+@cmdopts([
+    ('online', None, 'Run online tests')
+])
 def test(options):
-    import test
-    test.test_all(getattr(options, 'online', False))
+    from nose import run, config
+    from nose.plugins.manager import DefaultPluginManager
+    cfg = config.Config(plugins=DefaultPluginManager(), verbosity=2)
+
+    argv = ['bin/paver']
+
+    if not hasattr(options, 'online'):
+        argv.extend(['--attr=!online'])
+    run(argv=argv, config=cfg)
 
 @task
 def clean():

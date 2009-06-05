@@ -8,7 +8,7 @@ from datetime import datetime
 
 log = logging.getLogger('manager')
 
-from optparse import OptionParser, SUPPRESS_HELP
+from flexget.options import Options
 
 import yaml
 import sqlalchemy
@@ -59,25 +59,56 @@ class FailedEntry(Base):
     def __str__(self):
         return '<Failed(title=%s)>' % (self.title)
 
+_logging_configured = False
+
+def initialize_logging(filename=None, level=logging.INFO, debug=False, quiet=False, unit_test=False):
+    global _logging_configured
+
+    if not _logging_configured:
+        logging.addLevelName(5, 'DEBUGALL')
+
+        if unit_test:
+            _logging_configured = True
+            return
+
+        # root logger
+        logger = logging.getLogger()
+
+        # time format is same format of strftime
+        log_format = ['%(asctime)-15s %(levelname)-8s %(name)-11s %(message)s', '%Y-%m-%d %H:%M']
+        formatter = logging.Formatter(*log_format)
+
+        if debug:
+            logging.basicConfig(level=level, format=log_format[0], datefmt=log_format[1])
+        else:
+            handler = logging.handlers.RotatingFileHandler(filename, maxBytes=1000*1024, backupCount=9)
+            handler.setFormatter(formatter)
+            logger.addHandler(handler)
+
+            logger.setLevel(level)
+
+        if not quiet:
+            console = logging.StreamHandler()
+            console.setFormatter(formatter)
+            logger.addHandler(console)
+
+        _logging_configured = True
+
 class Manager:
     log_initialized = False
+    unit_test = False
     
-    def __init__(self, unit_test=False):
-        pkg_resources.require('BeautifulSoup==3.0.7a')
-
+    def __init__(self):
         if os.path.exists(os.path.join(sys.path[0], '..', 'pavement.py')):
             basedir = os.path.normpath(os.path.join(sys.path[0], '..'))
         else:
-            basedir = os.path.join(sys.path[0])
+            basedir = sys.path[0]
 
-        if unit_test or os.path.exists(os.path.join(basedir, 'config.yml')):
+        if self.unit_test or os.path.exists(os.path.join(basedir, 'config.yml')):
             self.config_base = basedir
         else:
             self.config_base = os.path.join(os.path.expanduser('~'), '.flexget')
 
-        self.init_logging()
-    
-        self.unit_test = unit_test
         self.configname = None
         self.options = None
         self.plugins = {}
@@ -104,57 +135,7 @@ class Manager:
         self.shelve_session = None
 
         # initialize commandline options
-        parser = OptionParser()
-        parser.add_option('--log-start', action='store_true', dest='log_start', default=0,
-                          help='Add FlexGet executions into a log.')
-        parser.add_option('--test', action='store_true', dest='test', default=0,
-                          help='Verbose what would happend on normal execution.')
-        parser.add_option('--check', action='store_true', dest='validate', default=0,
-                          help='Validate configuration file and print errors.')
-        parser.add_option('--learn', action='store_true', dest='learn', default=0,
-                          help='Matches are not downloaded but will be skipped in the future.')
-        parser.add_option('--feed', action='store', dest='onlyfeed', default=None,
-                          help='Run only specified feed.')
-        parser.add_option('--no-cache', action='store_true', dest='nocache', default=0,
-                          help='Disable caches. Works only in plugins that have explicit support.')
-        parser.add_option('--reset', action='store_true', dest='reset', default=0,
-                          help='Forgets everything that has been done and learns current matches.')
-        parser.add_option('--doc', action='store', dest='doc',
-                          help='Display plugin documentation (example: --doc patterns). See --list.')
-        parser.add_option('--list', action='store_true', dest='list', default=0,
-                          help='List all available plugins.')
-        parser.add_option('--failed', action='store_true', dest='failed', default=0,
-                          help='List recently failed entries.')
-        parser.add_option('--clear', action='store_true', dest='clear_failed', default=0,
-                          help='Clear recently failed list.')
-        parser.add_option('-c', action='store', dest='config', default='config.yml',
-                          help='Specify configuration file. Default is config.yml')
-        parser.add_option('-v', action='store_true', dest='details', default=0,
-                          help='Verbose more process information.')
-        parser.add_option('--cron', action='store_true', dest='quiet', default=0,
-                          help='Disables stdout and stderr output, log file used. Reduces logging level slightly.')
-        parser.add_option('--experimental', action='store_true', dest='experimental', default=0,
-                          help=SUPPRESS_HELP)
-        parser.add_option('--debug', action='store_true', dest='debug', default=False,
-                          help=SUPPRESS_HELP)
-        parser.add_option('--debug-all', action='store_true', dest='debug_all', default=False,
-                          help=SUPPRESS_HELP)
-        parser.add_option('--debug-sql', action='store_true', dest='debug_sql', default=False,
-                          help=SUPPRESS_HELP)
-        parser.add_option('--validate', action='store_true', dest='validate', default=0,
-                          help=SUPPRESS_HELP)
-        parser.add_option('--verbosity', action='store_true', dest='crap', default=0,
-                          help=SUPPRESS_HELP)
-        parser.add_option('--migrate', action='store', dest='migrate', default=None,
-                          help=SUPPRESS_HELP)
-        # provides backward compatibility to --cron and -d
-        parser.add_option('-q', action='store_true', dest='quiet', default=0,
-                          help=SUPPRESS_HELP)
-        parser.add_option('-d', action='store_true', dest='details', default=0,
-                          help=SUPPRESS_HELP)
-        # hacky way to allow unit tests to use --online parameter, without this Optik would exit application ...
-        parser.add_option('--online', action='store_true', dest='unittest_online', default=0,
-                          help=SUPPRESS_HELP)
+        parser = Options(self.unit_test)
 
         # add plugin path to sys.path so that imports work properly ..
         sys.path.append(self.plugindir)
@@ -163,17 +144,32 @@ class Manager:
         start_time = time.clock()
         self.load_plugins(parser, self.plugindir)
         took = time.clock() - start_time
-        log.debug('load_plugins took %.2f seconds' % took)
 
         # parse options including plugin customized options
         self.options = parser.parse_args()[0]
-        
+
         # perform commandline sanity check(s)
+        if self.options.loglevel != 'debugall':
+            log_level = getattr(logging, self.options.loglevel.upper())
+        else:
+            log_level = 5
+
         if self.options.test and self.options.learn:
             parser.error('--test and --learn are mutually exclusive')
             
         if self.options.test and self.options.reset:
             parser.error('--test and --reset are mutually exclusive')
+
+        # initialize logging
+        if self.unit_test:
+            initialize_logging(unit_test=True)
+        else:
+            self.log_filename = os.path.join(self.config_base, 'flexget.log')
+            initialize_logging(self.log_filename, log_level, quiet=self.options.quiet)
+
+        # report how long it took to load the plugins
+        log.debug('load_plugins took %.2f seconds' % took)
+
             
         # reset and migrate should be executed with learn
         if self.options.reset or self.options.migrate:
@@ -203,41 +199,6 @@ class Manager:
             
         self.init_sqlalchemy()
         
-    def init_logging(self):
-        """Creates and initializes logger."""
-        
-        # prevent multiple loggers being initialized (ie. unit tests)
-        if Manager.log_initialized: 
-            return
-        
-        filename = os.path.join(self.config_base, 'flexget.log')
-
-        logging.addLevelName(5, 'DEBUGALL')
-        # get root logger
-        logger = logging.getLogger()
-        handler = logging.handlers.RotatingFileHandler(filename, maxBytes=1000*1024, backupCount=9)
-        # time format is same format of strftime
-        formatter = logging.Formatter('%(asctime)-15s %(levelname)-8s %(name)-11s %(message)s', '%Y-%m-%d %H:%M')
-        handler.setFormatter(formatter)
-        logger.addHandler(handler)
-        
-        # unfortunately we cannot use optik in here
-        if '--debug' in sys.argv:
-            logger.setLevel(logging.DEBUG)
-        elif '--debug-all' in sys.argv:
-            logger.setLevel(0)
-        else:
-            logger.setLevel(logging.INFO)
-
-        # log to console, unless --cron present (or -q)
-        if not '-q' in sys.argv and not '--cron' in sys.argv:
-            console = logging.StreamHandler()
-            console.setFormatter(formatter)
-            logger.addHandler(console)
-        
-        log.log(5, 'test')
-        Manager.log_initialized = True
-           
     def load_config(self):
         """Load the configuration file"""
         possible = [os.path.join(self.config_base, self.options.config), self.options.config]
@@ -261,7 +222,7 @@ class Manager:
                     sys.exit(1)
                 self.configname = os.path.basename(config)[:-4]
                 return
-        log.debug('Tried to read from: %s' % ', '.join(possible, ', '))
+        log.debug('Tried to read from: %s' % ', '.join(possible))
         raise Exception('Failed to find configuration file %s' % self.options.config)
 
     def init_sqlalchemy(self):
@@ -283,9 +244,9 @@ class Manager:
             #shutil.move(shelve_session_name, '%s_migrated' % shelve_session_name)
         
         # SQLAlchemy
-        filename = os.path.join(self.config_base, 'db-%s.sqlite' % self.configname)
+        self.db_filename = os.path.join(self.config_base, 'db-%s.sqlite' % self.configname)
         # in case running on windows, needs double \\
-        filename = filename.replace('\\', '\\\\')
+        filename = self.db_filename.replace('\\', '\\\\')
         connection = 'sqlite:///%s' % filename
         log.debug('connection: %s' % connection)
         try:

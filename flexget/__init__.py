@@ -34,6 +34,3 @@ def main():
             manager.execute()
     finally:
         os.remove(lockfile)
-
-if __name__ == "__main__":
-    main()
