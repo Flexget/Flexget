@@ -279,7 +279,7 @@ class TestDownload(FlexGetBase):
           test:
             # make test data
             input_mock:
-              - {title: 'README', url: 'http://svn.flexget.com/trunk/test/README', 'filename': 'flexget_test/data'}
+              - {title: 'README', url: 'http://svn.flexget.com/trunk/bootstrap.py', 'filename': 'flexget_test/data'}
             accept_all: true
             download: ~/
     """
