@@ -251,8 +251,9 @@ class Manager:
         log.debug('connection: %s' % connection)
         try:
             engine = sqlalchemy.create_engine(connection, echo=self.options.debug_sql)
-        except ImportError:
-            log.critical('Unable to use SQLite. Try installing python sqlite packages.')
+        except ImportError, e:
+            log.critical('Unable to use SQLite. Try installing python SQLite packages.')
+            log.exception(e)
             sys.exit(1)
         Session.configure(bind=engine)
         # create all tables
