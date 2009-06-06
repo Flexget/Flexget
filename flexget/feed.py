@@ -52,6 +52,7 @@ class Feed:
         self.name = name
         self.config = config
         self.manager = manager
+        self.enabled = True
         self.session = None
         
         # simple persistence

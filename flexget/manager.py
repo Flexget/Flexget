@@ -523,16 +523,6 @@ class Manager:
         if not feeds: 
             log.critical('There are no feeds in the configuration file!')
 
-        # --only-feed
-        if self.options.onlyfeed:
-            ofeeds, feeds = feeds, []
-            for name in ofeeds:
-                if name.lower() == self.options.onlyfeed.lower(): 
-                    feeds.append(name)
-            if not feeds:
-                log.critical('Could not find feed %s' % self.options.onlyfeed)
-        
-        # let's create them        
         for name in feeds:
             # validate (TODO: make use of validator?)
             if not isinstance(self.config['feeds'][name], dict):
@@ -544,12 +534,21 @@ class Manager:
                         continue
                 log.error('\'%s\' is not a properly configured feed, please check indentation levels.' % name)
                 continue
-            # if feed name is prefixed with _ it's disabled
-            if name.startswith('_'): 
-                continue
+            
+            # create feed
             feed = Feed(self, name, self.config['feeds'][name])
+            # if feed name is prefixed with _ it's disabled
+            if name.startswith('_'):
+                feed.enabled = False
+            # if executing only one feed, disable others
+            if self.options.onlyfeed:
+                if name.lower() != self.options.onlyfeed.lower():
+                    feed.enabled = False
             self.feeds[name] = feed
-                
+        
+        if self.options.onlyfeed:
+            if not [feed for feed in self.feeds.itervalues() if feed.enabled]:
+                log.critical('Could not find feed %s' % self.options.onlyfeed)
 
     def execute(self):
         """Iterate trough all feeds and run them."""
@@ -564,6 +563,8 @@ class Manager:
 
         # execute process_start to all feeds
         for name, feed in self.feeds.iteritems():
+            if not feed.enabled: 
+                continue
             try:
                 feed.process_start()
             except Exception, e:
@@ -571,6 +572,8 @@ class Manager:
                 log.exception('Feed %s process_start: %s' % (feed.name, e))
 
         for name, feed in self.feeds.iteritems():
+            if not feed.enabled: 
+                continue
             if name in failed:
                 continue
             try:
@@ -586,6 +589,8 @@ class Manager:
 
         # execute process_end to all feeds
         for name, feed in self.feeds.iteritems():
+            if not feed.enabled: 
+                continue
             if name in failed:
                 continue
             try:
