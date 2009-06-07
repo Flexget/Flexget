@@ -41,7 +41,7 @@ class FilterTorrentSize:
                     feed.reject(entry, 'maximum size')
                     rejected = True
                 if rejected:
-                    feed.manager.get_plugin_by_name('seen').learn(entry)
+                    feed.manager.get_plugin_by_name('seen').learn(feed, entry)
             else:
                 # not a torrent?
                 log.debug('Entry %s is not a torrent' % entry['title'])
