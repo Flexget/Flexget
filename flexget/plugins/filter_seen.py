@@ -97,18 +97,22 @@ class FilterSeen(object):
             return
 
         for entry in feed.accepted:
-            for field in self.fields:
-                if not field in entry:
-                    continue
-                
-                seen = Seen(field, entry[field], feed.name)
-                feed.session.add(seen)
+            self.learn(feed, entry, self.fields)
             
             # verbose if in learning mode
             if feed.manager.options.learn:
                 log.info("Learned '%s' (will skip this in the future)" % (entry['title']))
             else:
                 log.debug("Learned '%s' '%s' (will skip this in the future)" % (entry['url'], entry['title']))
+    
+    def learn(self, feed, entry, fields):
+        """Marks entry as seen"""
+        for field in fields:
+            if not field in entry:
+                continue
+            
+            seen = Seen(field, entry[field], feed.name)
+            feed.session.add(seen)
                 
     def migrate(self, feed):
         shelve = feed.manager.shelve_session
