@@ -97,7 +97,7 @@ class FilterSeen(object):
             return
 
         for entry in feed.accepted:
-            self.learn(feed, entry, self.fields)
+            self.learn(feed, entry)
             
             # verbose if in learning mode
             if feed.manager.options.learn:
@@ -105,8 +105,10 @@ class FilterSeen(object):
             else:
                 log.debug("Learned '%s' '%s' (will skip this in the future)" % (entry['url'], entry['title']))
     
-    def learn(self, feed, entry, fields):
+    def learn(self, feed, entry, fields=[]):
         """Marks entry as seen"""
+        if not fields:
+            fields = self.fields
         for field in fields:
             if not field in entry:
                 continue
