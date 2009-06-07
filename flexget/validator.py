@@ -1,8 +1,6 @@
 import re
 
-# TODO: "validation succeeded, errors are logged so it's considered clean!"
 # TODO: rename all validator.valid -> validator.accepts / accepted / accept ?
-# TODO: path validator
 
 class Errors:
 
@@ -58,8 +56,8 @@ class Validator(object):
             
             # register default validators
             register = [RootValidator, ListValidator, DictValidator, TextValidator, FileValidator,
-                        AnyValidator, NumberValidator, BooleanValidator, DecimalValidator, UrlValidator, 
-                        RegexpValidator, ChoiceValidator]
+                        PathValidator, AnyValidator, NumberValidator, BooleanValidator, 
+                        DecimalValidator, UrlValidator, RegexpValidator, ChoiceValidator]
             for v in register:
                 self.register(v)
         else:
@@ -251,17 +249,26 @@ class RegexpValidator(Validator):
 class FileValidator(TextValidator):
     name = 'file'
     
-    # TODO: implement!!
+    def validate(self, data):
+        import os
+        if not os.path.isfile(os.path.expanduser(data)):
+            self.errors.add('File %s does not exist' % data)
+            return False
+        return True
 
-class UrlValidator(Validator):
+class PathValidator(TextValidator):
+    name = 'path'
+    
+    def validate(self, data):
+        import os
+        if not os.path.isdir(os.path.expanduser(data)):
+            self.errors.add('Path %s does not exist' % data)
+            return False
+        return True
+
+class UrlValidator(TextValidator):
     name = 'url'
     
-    def accept(self, name, **kwargs):
-        pass
-        
-    def validateable(self, data):
-        return isinstance(data, basestring)
-
     def validate(self, data):
         regexp = '(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?'
         if not isinstance(data, basestring):
@@ -277,7 +284,6 @@ class ListValidator(Validator):
 
     def accept(self, name, **kwargs):
         v = self.get_validator(name)
-#        v.accept(name, **kwargs)
         self.valid.append(v)
         return v
 

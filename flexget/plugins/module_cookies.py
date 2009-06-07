@@ -23,7 +23,7 @@ class PluginCookies:
 
     def validator(self,):
         from flexget import validator
-        return validator.factory('text') # TODO: file (existing)
+        return validator.factory('file')
 
     def sqlite2cookie(self, filename):
         from cStringIO import StringIO

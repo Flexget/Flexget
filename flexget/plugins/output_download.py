@@ -45,19 +45,12 @@ class PluginDownload:
         """Return config validator"""
         from flexget import validator
         root = validator.factory()
-        root.accept('text') # TODO: path validator
+        root.accept('path')
         advanced = root.accept('dict')
-        advanced.accept('text', key='path') # TODO: path validator
+        advanced.accept('path', key='path')
         advanced.accept('boolean', key='fail_html')
         return root
 
-    def validate_config(self, feed):
-        # TODO: migrate into real validate!!!
-        # check for invalid configuration, abort whole download if not goig to work
-        # TODO: rewrite and check exists
-        if not feed.config['download']:
-            raise PluginError('Feed %s is missing download path, check your configuration.' % feed.name, log)
-            
     def feed_download(self, feed):
         """Download all feed content and store in temporary folder"""
         for entry in feed.accepted:
@@ -188,7 +181,6 @@ class PluginDownload:
 
     def feed_output(self, feed):
         """Move downloaded content from temp folder to final destination"""
-        self.validate_config(feed) #TODO: remove
         for entry in feed.accepted:
             try:
                 if feed.manager.options.test:

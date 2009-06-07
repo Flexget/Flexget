@@ -21,10 +21,10 @@ class FilterExists:
     def validator(self):
         from flexget import validator
         root = validator.factory()
-        root.accept('text')
+        root.accept('path')
         bundle = root.accept('list')
-        bundle.accept('text')
-        return root # TODO: path
+        bundle.accept('path')
+        return root
         
     def get_config(self, feed):
         config = feed.config.get('exists', None)
