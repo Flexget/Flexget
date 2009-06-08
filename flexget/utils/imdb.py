@@ -3,7 +3,8 @@ import urllib
 import urllib2
 import logging
 import re
-from BeautifulSoup import BeautifulSoup
+from flexget.utils.soup import get_soup
+from BeautifulSoup import NavigableString
 from socket import timeout
 
 log = logging.getLogger('utils.imdb')
@@ -149,7 +150,7 @@ class ImdbSearch:
             movies.append(movie)
             return movies
 
-        soup = BeautifulSoup(page)
+        soup = get_soup(page)
 
         sections = ['Popular Titles', 'Titles (Exact Matches)',
                     'Titles (Partial Matches)', 'Titles (Approx Matches)']
@@ -161,12 +162,12 @@ class ImdbSearch:
                 continue
             log.debug('processing section %s' % section)
             try:
-                section_p = section_tag.parent.parent
+                section_table = section_tag.parent.parent.nextSibling
             except AttributeError:
-                log.debug('Section % does not have parent?' % section)
+                log.debug('Section % does not have a table?' % section)
                 continue
             
-            links = section_p.findAll('a', attrs={'href': re.compile('\/title\/tt')})
+            links = section_table.findAll('a', attrs={'href': re.compile('\/title\/tt')})
             if not links:
                 log.debug('section %s does not have links' % section)
             for link in links:
@@ -175,7 +176,7 @@ class ImdbSearch:
                     continue
                     
                 # skip links without text value, these are small pictures before title
-                if not link.string:
+                if len(link.contents) == 1 and not isinstance(link.contents[0], NavigableString):
                     continue
 
                 #log.debug('processing link %s' % link)
@@ -187,14 +188,15 @@ class ImdbSearch:
                 if len(additional) > 1:
                     movie['type'] = additional[1]
                 
-                movie['name'] = link.string
+                movie['name'] = link.contents[0]
                 movie['url'] = "http://www.imdb.com" + link.get('href')
                 log.debug('processing name: %s url: %s' % (movie['name'], movie['url']))
                 # calc & set best matching ratio
                 seq = difflib.SequenceMatcher(lambda x: x==' ', movie['name'], name)
                 ratio = seq.ratio()
                 # check if some of the akas have better ratio
-                for aka in link.parent.findAll('em', text=re.compile('".*"')):
+                aka_re = re.compile('".*"')
+                for aka in [l for l in link.parent.findAll(text=re.compile('".*"')) if l.parent.name == 'em']:
                     aka = aka.replace('"', '')
                     seq = difflib.SequenceMatcher(lambda x: x==' ', aka.lower(), name.lower())
                     aka_ratio = seq.ratio() * self.aka_weight
@@ -233,7 +235,7 @@ class ImdbParser:
         except ValueError:
             raise ValueError('Invalid url %s' % url)
             
-        soup = BeautifulSoup(page)
+        soup = get_soup(page)
 
         # get name
         tag_name = soup.find('h1')
@@ -271,18 +273,18 @@ class ImdbParser:
             # skip links that have javascipr onclick (not in genrelist)
             if link.has_key('onclick'): 
                 continue
-            self.genres.append(link.string.lower())
+            self.genres.append(link.contents[0].lower())
 
         # get languages
         for link in soup.findAll('a', attrs={'href': re.compile('^/Sections/Languages/')}):
-            lang = link.string.lower()
+            lang = link.contents[0].lower()
             if not lang in self.languages:
                 self.languages.append(lang.strip())
 
         # get year
         tag_year = soup.find('a', attrs={'href': re.compile('^/Sections/Years/\d*')})
         if tag_year:
-            self.year = int(tag_year.string)
+            self.year = int(tag_year.contents[0])
             log.debug('Detected year: %s' % self.year)
         else:
             log.warning('Unable to get year for %s - plugin needs update?' % url)

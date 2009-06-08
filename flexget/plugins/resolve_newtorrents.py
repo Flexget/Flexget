@@ -3,7 +3,7 @@ import logging
 import re
 from module_resolver import ResolverException
 from flexget.manager import PluginWarning
-from BeautifulSoup import BeautifulSoup
+from flexget.utils.soup import get_soup
 
 timeout = 10
 import socket
@@ -79,7 +79,7 @@ class NewTorrents:
             elif hasattr(e, 'code'):
                 raise PluginWarning('The server couldn\'t fulfill the request. Error code: %s' % e.code, log)
         
-        soup = BeautifulSoup(html)
+        soup = get_soup(html)
         # saving torrents in dict
         torrents = []
         seeds = []

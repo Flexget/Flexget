@@ -3,7 +3,7 @@ import logging
 import re
 from module_resolver import ResolverException
 from flexget.manager import PluginWarning
-from BeautifulSoup import BeautifulSoup
+from flexget.utils.soup import get_soup
 
 log = logging.getLogger("newzleech")
 
@@ -39,15 +39,15 @@ class ResolveNewzleech:
             elif hasattr(e, 'code'):
                 raise PluginWarning('The server couldn\'t fulfill the request. Error code: %s' % e.code, log)
 
-        soup = BeautifulSoup(page)
+        soup = get_soup(page)
         
         nzbs = []
         
         for item in soup.findAll('table', attrs={'class':'contentt'}):
             subject_tag = item.find('td', attrs={'class':'subject'}).next
             subject = ''.join(subject_tag.findAll(text=True))
-            complete = item.find('td', attrs={'class':'complete'}).string
-            size = item.find('td', attrs={'class':'size'}).string
+            complete = item.find('td', attrs={'class':'complete'}).contents[0]
+            size = item.find('td', attrs={'class':'size'}).contents[0]
             nzb_url = 'http://newzleech.com/' + item.find('td', attrs={'class':'get'}).next.get('href')
             
             # generate regexp from entry title and see if it matches subject

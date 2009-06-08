@@ -4,7 +4,7 @@ import re
 from httplib import BadStatusLine
 from flexget.feed import Entry
 from flexget.manager import PluginWarning
-from BeautifulSoup import BeautifulSoup
+from flexget.utils.soup import get_soup
 
 log = logging.getLogger('scenereleases')
 
@@ -45,7 +45,7 @@ class InputScenereleases:
         """Parse configured url and return releases array"""
         
         page = urllib2.urlopen(url)
-        soup = BeautifulSoup(page)
+        soup = get_soup(page)
             
         releases = []
         for entry in soup.findAll('div', attrs={'id':re.compile('post', re.IGNORECASE)}):
@@ -54,7 +54,7 @@ class InputScenereleases:
             if not title:
                 log.debug('No h3 entrytitle')
                 continue
-            release['title'] = title.a.string.strip()
+            release['title'] = title.a.contents[0].strip()
 
             log.debug('Processing title %s' % (release['title']))
 
@@ -68,7 +68,7 @@ class InputScenereleases:
             """
             
             for link in entry.findAll('a'):
-                link_name = link.string
+                link_name = link.contents[0]
                 if link_name == None:
                     continue
                 link_name = link_name.strip().lower()

@@ -2,7 +2,7 @@ import urllib2
 import logging
 from module_resolver import ResolverException
 from flexget.manager import PluginWarning
-from BeautifulSoup import BeautifulSoup
+from flexget.utils.soup import get_soup
 
 log = logging.getLogger('piratebay')
 
@@ -42,7 +42,7 @@ class ResolvePirateBay:
             elif hasattr(e, 'code'):
                 raise ResolverException('The server couldn\'t fulfill the request. Error code: %s' % e.code)
         try:
-            soup = BeautifulSoup(page)
+            soup = get_soup(page)
             tag_div = soup.find('div', attrs={'class':'download'})
             if not tag_div:
                 raise ResolverException('Unable to locate download link from url %s' % url)
@@ -72,17 +72,17 @@ class ResolvePirateBay:
             elif hasattr(e, 'code'):
                 raise PluginWarning('The server couldn\'t fulfill the request. Error code: %s' % e.code)
         
-        soup = BeautifulSoup(page)
+        soup = get_soup(page)
         torrents = []
         for link in soup.findAll('a', attrs={'class': 'detLink'}):
-            if not link.string.replace('.', ' ').lower() == name:
+            if not link.contents[0].replace('.', ' ').lower() == name:
                 continue
             torrent = {}
-            torrent['name'] = link.string
+            torrent['name'] = link.contents[0]
             torrent['link'] = 'http://thepiratebay.org'+link.get('href')
             tds = link.parent.parent.findAll('td')
-            torrent['seed'] = int(tds[-2].string)
-            torrent['leech'] = int(tds[-1].string)
+            torrent['seed'] = int(tds[-2].contents[0])
+            torrent['leech'] = int(tds[-1].contents[0])
             torrents.append(torrent)
             
         if not torrents:

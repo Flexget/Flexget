@@ -5,7 +5,7 @@ from httplib import BadStatusLine
 from flexget.feed import Entry
 from flexget.manager import PluginWarning
 from flexget.utils.log import log_once
-from BeautifulSoup import BeautifulSoup
+from flexget.utils.soup import get_soup
 
 log = logging.getLogger('rlslog')
 
@@ -45,7 +45,7 @@ class RlsLog:
         """Parse configured url and return releases array"""
         
         page = urllib2.urlopen(rlslog_url)
-        soup = BeautifulSoup(page)
+        soup = get_soup(page)
             
         releases = []
         for entry in soup.findAll('div', attrs={'class' : 'entry'}):
@@ -54,7 +54,7 @@ class RlsLog:
             if not h3:
                 log.debug('FAIL: No h3 entrytitle')
                 continue
-            release['title'] = h3.a.string.strip()
+            release['title'] = h3.a.contents[0].strip()
             entrybody = entry.find('div', attrs={'class' : 'entrybody'})
             if not entrybody:
                 log.debug('FAIL: No entrybody')
@@ -69,7 +69,7 @@ class RlsLog:
                     release['imdb_score'], release['imdb_votes'] = self.parse_imdb(score_raw)
             
             for link in entrybody.findAll('a'):
-                link_name = link.string
+                link_name = link.contents[0]
                 if link_name == None:
                     continue
                 link_name = link_name.strip().lower()

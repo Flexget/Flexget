@@ -4,7 +4,7 @@ import logging
 from socket import timeout
 from flexget.feed import Entry
 from flexget.manager import PluginError
-from BeautifulSoup import BeautifulSoup
+from flexget.utils.soup import get_soup
 
 log = logging.getLogger('tvtorrents')
 
@@ -40,13 +40,13 @@ class InputTVTorrents:
 
         try:
             page = urllib2.urlopen(pageurl)
-            soup = BeautifulSoup(page)
+            soup = get_soup(page)
         except timeout:
             raise PluginError("Timed out opening page", log)
         except urllib2.URLError:
             raise PluginError("URLError when opening page", log)
         
-        hscript = soup.find('script', src=None).string
+        hscript = soup.find('script', src=None).contents[0]
         hlines = hscript.splitlines()
         hash = hlines[15].strip().split("'")[1]
         digest = hlines[16].strip().split("'")[1]
@@ -56,7 +56,7 @@ class InputTVTorrents:
         for link in soup.findAll('a'):
             if not 'href' in link: continue
             url = link['href']
-            title = link.string
+            title = link.contents[0]
 
             if link.has_key('onclick') and link['onclick'].find("loadTorrent") != -1:
                 infohash = link['onclick'].split("'")[1]

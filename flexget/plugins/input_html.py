@@ -5,7 +5,7 @@ from socket import timeout
 from flexget.feed import Entry
 from flexget.manager import PluginError
 import re
-from BeautifulSoup import BeautifulSoup
+from flexget.utils.soup import get_soup
 
 log = logging.getLogger('html')
 
@@ -37,10 +37,6 @@ class InputHtml:
         return root
 
     def feed_input(self, feed):
-        try:
-            from BeautifulSoup import BeautifulSoup
-        except:
-            raise PluginError('BeautifulSoup module required', log)
         config = feed.config['html']
         if not isinstance(config, dict):
             config = {}
@@ -50,7 +46,7 @@ class InputHtml:
 
         try:
             page = urllib2.urlopen(pageurl)
-            soup = BeautifulSoup(page)
+            soup = get_soup(page)
             log.debug('Detected encoding %s' % soup.originalEncoding)
         except IOError, e:
             if hasattr(e, 'reason'):
@@ -70,7 +66,7 @@ class InputHtml:
         for link in soup.findAll('a'):
             if not link.has_key('href'):
                 continue
-            title = link.string
+            title = link.contents[0]
 
             if title == None: 
                 title = link.next.string

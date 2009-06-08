@@ -3,7 +3,7 @@ import urllib2
 import logging
 from module_resolver import ResolverException
 from flexget.manager import PluginWarning
-from BeautifulSoup import BeautifulSoup
+from flexget.utils.soup import get_soup
 
 log = logging.getLogger('google_cse')
 
@@ -26,7 +26,7 @@ class ResolveGoogleCse:
             txheaders =  {'User-agent' : 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'}
             req = urllib2.Request(entry['url'], None, txheaders)
             page = urllib2.urlopen(req)
-            soup = BeautifulSoup(page)
+            soup = get_soup(page)
             results = soup.findAll('a', attrs={'class': 'l'})
             if not results:
                 raise ResolverException('No results')
@@ -34,7 +34,7 @@ class ResolveGoogleCse:
                 url = res.get('href')
                 url = url.replace('/interstitial?url=', '')
                 # generate match regexp from google search result title
-                regexp = '.*'.join([x.string for x in res.findAll('em')])
+                regexp = '.*'.join([x.contents[0] for x in res.findAll('em')])
                 if re.match(regexp, entry['title']):
                     log.debug('resolved, found with %s' % regexp)
                     entry['url'] = url
