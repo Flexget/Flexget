@@ -12,7 +12,7 @@ class FilterTorrentSize:
           min: 12
           max: 1200
 
-        Untested, may not work!
+        Unit is MB
     """
 
     def register(self, manager, parser):
@@ -41,7 +41,6 @@ class FilterTorrentSize:
                     feed.reject(entry, 'maximum size')
                     rejected = True
                 if rejected:
-                    feed.manager.get_plugin_by_name('seen').learn(feed, entry)
+                    feed.manager.get_plugin_by_name('seen')['instance'].learn(feed, entry)
             else:
-                # not a torrent?
                 log.debug('Entry %s is not a torrent' % entry['title'])

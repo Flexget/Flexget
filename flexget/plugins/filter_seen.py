@@ -93,17 +93,14 @@ class FilterSeen(object):
     def feed_exit(self, feed):
         """Remember succeeded entries"""
         if not feed.config.get('seen', True):
-            log.debug('Seen is disabled')
+            log.debug('disabled')
             return
 
         for entry in feed.accepted:
             self.learn(feed, entry)
-            
             # verbose if in learning mode
             if feed.manager.options.learn:
                 log.info("Learned '%s' (will skip this in the future)" % (entry['title']))
-            else:
-                log.debug("Learned '%s' '%s' (will skip this in the future)" % (entry['url'], entry['title']))
     
     def learn(self, feed, entry, fields=[]):
         """Marks entry as seen"""
@@ -115,6 +112,8 @@ class FilterSeen(object):
             
             seen = Seen(field, entry[field], feed.name)
             feed.session.add(seen)
+            
+        log.debug("Learned '%s' '%s'" % (entry['url'], entry['title']))
                 
     def migrate(self, feed):
         shelve = feed.manager.shelve_session
