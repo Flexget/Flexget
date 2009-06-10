@@ -131,7 +131,7 @@ class OutputDeluge:
             label = entry.get('label', config['label']).lower()
             queuetotop = entry.get('queuetotop', config['queuetotop'])
             #Sometimes deluge takes a moment to add the torrent, wait a second.
-            time.sleep(1)
+            time.sleep(2)
             after = sclient.get_session_state()
             for item in after:
                 #find torrentid of just added torrent
