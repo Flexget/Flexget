@@ -11,10 +11,17 @@ class PluginTryRegexp:
         This plugin allows user to test regexps for a feed.
     """
 
-    def register(self, manager, parser):
-        manager.register('try_regexp', builtin=True)
-        parser.add_option('--try', action='store_true', dest='try_regexp', default=False,
-                          help='Try regular expressions interactively.')
+    __plugin__ = 'try_regexp'
+    __plugin_builtin__ = True
+    __parser_options__ = [
+        (
+            ['--try'],
+            dict(action='store_true', dest='try_regexp', default=False,
+                 help='Try regular expressions interactively.')
+        )
+    ]
+
+    def __init__(self):
         self.abort = False
 
     def validator(self):

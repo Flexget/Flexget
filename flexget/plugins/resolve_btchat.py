@@ -7,8 +7,8 @@ log = logging.getLogger("btchat")
 class ResolveBtJunkie:
     """BtChat resolver."""
 
-    def register(self, manager, parser):
-        manager.register(name='btchat', group='resolver')
+    __plugin__ = 'btchat'
+    __plugin_groups__ = ['resolver']
 
     def resolvable(self, feed, entry):
         return entry['url'].startswith('http://www.bt-chat.com/download.php')

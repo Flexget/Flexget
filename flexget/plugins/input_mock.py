@@ -15,9 +15,9 @@ class InputMock:
           - {title: mock, url: http://another.com }
     """
 
-    def register(self, manager, parser):
-        manager.register('input_mock', debug_plugin=True)
-        
+    __plugin__ = 'input_mock'
+    __plugin_debug__ = True
+
     def validator(self):
         from flexget import validator
         container = validator.factory('list')

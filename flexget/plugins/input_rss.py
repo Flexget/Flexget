@@ -3,7 +3,7 @@ import urlparse
 import xml.sax
 import re
 from flexget.feed import Entry
-from flexget.manager import PluginWarning, PluginError
+from flexget.plugin import PluginWarning, PluginError
 from flexget.utils.log import log_once
 
 feedparser_present = True
@@ -60,8 +60,7 @@ class InputRSS:
           silent: True
     """
 
-    def register(self, manager, parser):
-        manager.register('rss')
+    __plugin__ = 'rss'
 
     def validator(self):
         from flexget import validator

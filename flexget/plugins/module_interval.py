@@ -1,6 +1,6 @@
 import logging
 import datetime
-from flexget.manager import PluginWarning
+from flexget.plugin import PluginWarning
 
 log = logging.getLogger('interval')
 
@@ -16,11 +16,15 @@ class PluginInterval:
         interval: 7 days
     """
 
-    def register(self, manager, parser):
-        manager.register('interval')
-        parser.add_option('--now', action='store_true', dest='interval_ignore', default=0,
-                          help='Ignore interval(s)')
-        
+    __plugin__ = 'interval'
+    __parser_options__ = [
+        (
+            ['--now'],
+            dict(action='store_true', dest='interval_ignore', default=0,
+                 help='Ignore interval(s)')
+        )
+    ]
+
     def validator(self):
         # TODO: make a regexp validation
         from flexget import validator

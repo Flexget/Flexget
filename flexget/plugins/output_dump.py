@@ -1,4 +1,5 @@
 import yaml
+from optparse import SUPPRESS_HELP
 
 class YamlDump:
 
@@ -6,12 +7,14 @@ class YamlDump:
         Dummy plugin for testing, outputs all entries in yaml
     """
 
-    def register(self, manager, parser):
-        from optparse import SUPPRESS_HELP
-        manager.register('dump', debug_plugin=True, builtin=True)
-        parser.add_option('--dump', action='store_true', dest='dump', default=0,
-                          help=SUPPRESS_HELP)
-        
+    __plugin__ = 'dump'
+    __parser_options__ = [
+        (
+            ['--dump'],
+            dict(action='store_true', dest='dump', default=0, help=SUPPRESS_HELP)
+        )
+    ]
+
     def validator(self):
         from flexget import validator
         return validator.factory('any')

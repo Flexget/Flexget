@@ -4,7 +4,7 @@ import urllib2
 import logging
 import shutil
 import filecmp
-from flexget.manager import PluginWarning, PluginError
+from flexget.plugin import PluginWarning, PluginError
 
 log = logging.getLogger('download')
 
@@ -35,11 +35,14 @@ class PluginDownload:
         all paths to another location.
     """
 
-    def register(self, manager, parser):
-        manager.register('download')
-        # add new commandline parameter
-        parser.add_option('--dl-path', action='store', dest='dl_path', default=False,
-                          help='Override path for download plugin. Applies to all executed feeds.')
+    __plugin__ = 'download'
+    __parser_options__ = [
+        (
+            ['--dl-path'],
+            dict(action='store', dest='dl_path', default=False,
+                 help='Override path for download plugin. Applies to all executed feeds.')
+        )
+    ]
 
     def validator(self):
         """Return config validator"""

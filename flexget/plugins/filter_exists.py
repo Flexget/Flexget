@@ -1,6 +1,6 @@
 import os
 import logging
-from flexget.manager import PluginWarning
+from flexget.plugin import PluginWarning
 from flexget.utils.series import SeriesParser
 
 log = logging.getLogger('exists')
@@ -15,8 +15,10 @@ class FilterExists:
         exists: /storage/movies/
     """
 
-    def register(self, manager, parser):
-        manager.register('exists', filter_priority=-1)
+    __plugin__ = 'exists'
+    __priorities__ = {
+        'filter': -1
+    }
 
     def validator(self):
         from flexget import validator

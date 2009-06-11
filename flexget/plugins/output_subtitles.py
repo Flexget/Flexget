@@ -55,8 +55,7 @@ class Subtitles:
     Fetch subtitles from opensubtitles.org
     """
 
-    def register(self, manager, parser):
-        manager.register('subtitles')
+    __plugin__ = 'subtitles'
 
     def validator(self):
         from flexget import validator

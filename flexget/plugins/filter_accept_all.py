@@ -12,9 +12,8 @@ class FilterAcceptAll:
         accept_all: true
     """
 
-    def register(self, manager, parser):
-        manager.register('accept_all')
-        
+    __plugin__ = 'accept_all'
+
     def validator(self):
         from flexget import validator
         return validator.factory('boolean')

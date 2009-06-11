@@ -1,6 +1,7 @@
 import logging
 import time, os, sys
-from flexget.manager import PluginError, Base
+from flexget.manager import Base
+from flexget.plugin import PluginError, get_plugin_by_name
 from sqlalchemy import Column, Integer, String
 from sqlalchemy.schema import ForeignKey
 from sqlalchemy.orm import relation,join
@@ -20,16 +21,14 @@ class DelugeEpisode(Base):
         return '<DelugeEpisode(identifier=%s)>' % (self.identifier)
 
 class OutputDeluge:
-
     """
         Add the torrents directly to deluge, supporting custom save paths.
     """
 
-    def __init__(self):
-        pass
-
-    def register(self, manager, parser):
-        manager.register('deluge', output_priority=1)
+    __plugin__ = 'deluge'
+    __priorities__ = {
+        'output': 1
+    }
 
     def validator(self):
         from flexget import validator
@@ -58,8 +57,8 @@ class OutputDeluge:
         """
         register the usable set: keywords
         """
-        set = feed.manager.get_plugin_by_name('set')
-        set['instance'].register_keys({'path':'text', 'movedone':'text', 'queuetotop':'boolean', 'label':'text'})
+        set = get_plugin_by_name('set')
+        set.instance.register_keys({'path':'text', 'movedone':'text', 'queuetotop':'boolean', 'label':'text'})
 
     def feed_download(self, feed):
         """
@@ -71,7 +70,7 @@ class OutputDeluge:
         if not config['enabled']:
             return
         if not 'download' in feed.config:
-            download = feed.manager.get_plugin_by_name('download')
+            download = get_plugin_by_name('download')
             """Download all feed content and store in temporary folder"""
             for entry in feed.accepted:
                 try:
@@ -80,7 +79,7 @@ class OutputDeluge:
                     else:
                         if not feed.manager.unit_test:
                             log.info('Downloading: %s' % entry['title'])
-                        download['instance'].download(feed, entry)
+                        download.instance.download(feed, entry)
                 except IOError, e:
                     feed.fail(entry)
                     if hasattr(e, 'reason'):

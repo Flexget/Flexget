@@ -7,8 +7,8 @@ log = logging.getLogger("isohunt")
 class ResolveIsoHunt:
     """IsoHunt resolver."""
 
-    def register(self, manager, parser):
-        manager.register('isohunt', group='resolver')
+    __plugin__ = 'isohunt'
+    __plugin_groups__ = ['resolver']
 
     def resolvable(self, feed, entry):
         url = entry['url']

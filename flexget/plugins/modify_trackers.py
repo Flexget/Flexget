@@ -19,8 +19,7 @@ class RemoveTrackers:
         TIP: You can use global section in configuration to make this enabled on all feeds.
     """
 
-    def register(self, manager, parser):
-        manager.register('remove_trackers')
+    __plugin__ = 'remove_trackers'
 
     def validator(self):
         from flexget import validator

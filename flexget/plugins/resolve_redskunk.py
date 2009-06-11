@@ -7,8 +7,8 @@ log = logging.getLogger("redskunk")
 class ResolveRedskunk:
     """Redskunk resolver."""
 
-    def register(self, manager, parser):
-        manager.register('redskunk', group='resolver')
+    __plugin__ = 'redskunk'
+    __plugin_groups__ = ['resolver']
 
     def resolvable(self, feed, entry):
         url = entry['url']

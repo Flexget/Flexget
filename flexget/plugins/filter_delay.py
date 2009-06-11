@@ -1,7 +1,8 @@
 import urllib2
 import logging
 from flexget.feed import Entry
-from flexget.manager import Base, PluginWarning
+from flexget.manager import Base
+from flexget.plugin import PluginWarning
 from datetime import datetime, timedelta
 from sqlalchemy import Column, Integer, String, DateTime, Boolean, PickleType
 from sqlalchemy.schema import ForeignKey
@@ -23,7 +24,6 @@ class DelayedEntry(Base):
         return '<DelayedEntry(title=%s)>' % (self.title)
 
 class FilterDelay:
-
     """
         Add delay to a feed. This is usefull for de-priorizing expensive / bad-quality feeds.
         
@@ -34,9 +34,11 @@ class FilterDelay:
         delay: 2 hours
     """
 
-    def register(self, manager, parser):
-        manager.register('delay', filter_priority=250)
-        
+    __plugin__ = 'delay'
+    __priorities__ = {
+        'filter': 250
+    }
+
     def validator(self):
         # TODO: make a regexp validation
         from flexget import validator

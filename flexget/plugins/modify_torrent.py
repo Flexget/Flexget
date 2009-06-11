@@ -172,8 +172,11 @@ class TorrentFilename:
         extension. This is enabled always by default (builtins).
     """
 
-    def register(self, manager, parser):
-        manager.register('torrent', builtin=True, modify_priority=255)
+    __plugin__ = 'torrent'
+    __plugin_builtin__ = True
+    __priorities__ = {
+        'modify': 255
+    }
 
     def feed_modify(self, feed):
         idstr = 'd8:announce'

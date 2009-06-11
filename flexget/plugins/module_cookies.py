@@ -1,12 +1,11 @@
 import logging
 import urllib2
 import cookielib
-from flexget.manager import PluginWarning
+from flexget.plugin import PluginWarning
 
 log = logging.getLogger('cookies')
 
 class PluginCookies:
-
     """
         Adds cookie to all requests (rss, resolvers, download). Anything
         that uses urllib2 to be exact.
@@ -18,8 +17,7 @@ class PluginCookies:
         cookies: /path/firefox/profile/something/cookies.sqlite
     """
 
-    def register(self, manager, parser):
-        manager.register('cookies')
+    __plugin__ = 'cookies'
 
     def validator(self,):
         from flexget import validator

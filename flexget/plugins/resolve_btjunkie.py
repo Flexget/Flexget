@@ -7,8 +7,8 @@ log = logging.getLogger("btjunkie")
 class ResolveBtJunkie:
     """BtJunkie resolver."""
 
-    def register(self, manager, parser):
-        manager.register('btjunkie', group='resolver')
+    __plugin__ = 'btjunkie'
+    __plugin_groups__ = ['resolver']
 
     def resolvable(self, feed, entry):
         return entry['url'].startswith('http://btjunkie.org')

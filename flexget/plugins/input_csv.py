@@ -5,7 +5,6 @@ from flexget.feed import Entry
 log = logging.getLogger('csv')
 
 class InputCSV:
-
     """
         Adds support for CSV format. Configuration may seem a bit complex,
         but this has advantage of being universal solution regardless of CSV
@@ -30,9 +29,8 @@ class InputCSV:
         List of other common (optional) fields can be found from wiki.
     """
 
-    def register(self, manager, parser):
-        manager.register('csv')
-        
+    __plugin__ = 'csv'
+
     def validator(self):
         from flexget import validator
         config = validator.factory('dict')

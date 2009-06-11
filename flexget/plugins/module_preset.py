@@ -1,5 +1,5 @@
 import logging
-from flexget.manager import PluginWarning, PluginError
+from flexget.plugin import PluginWarning, PluginError
 
 log = logging.getLogger('preset')
 
@@ -19,9 +19,12 @@ class PluginPreset:
           - imdb
     """
 
-    def register(self, manager, parser):
-        manager.register('preset', start_priority=255, builtin=True)
-        
+    __plugin__ = 'preset'
+    __plugin_builtin__ = True
+    __priorities__ = {
+        'start': 255
+    }
+
     def validator(self):
         from flexget import validator
         root = validator.factory()

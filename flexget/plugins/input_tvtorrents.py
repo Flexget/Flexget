@@ -3,7 +3,7 @@ import urlparse
 import logging
 from socket import timeout
 from flexget.feed import Entry
-from flexget.manager import PluginError
+from flexget.plugin import PluginError
 from flexget.utils.soup import get_soup
 
 log = logging.getLogger('tvtorrents')
@@ -27,8 +27,7 @@ class InputTVTorrents:
         Plugin-specific code by Fredrik Braenstroem.
     """
 
-    def register(self, manager, parser):
-        manager.register('tvt')
+    __plugin__ = 'tvt'
 
     def validator(self):
         from flexget import validator

@@ -4,15 +4,28 @@ import os, sys
 from nose.tools import *
 from nose.plugins.attrib import attr
 from flexget.manager import Manager, Session
+from flexget.plugin import get_plugin_by_name, load_plugins
+from flexget.options import OptionParser
 from flexget.feed import Feed
 import yaml
 
+test_options = None
+
+plugins_loaded = False
+def setup_once():
+    global plugins_loaded, test_options
+    if not plugins_loaded:
+        parser = OptionParser(True)
+        load_plugins(parser)
+        test_options = parser.parse_args()[0]
+        plugins_loaded = True
+
 class MockManager(Manager):
+    unit_test = True
     def __init__(self, config_text, config_name):
         self.config_text = config_text
-        self.unit_test = True
-        Manager.__init__(self)
         self.configname = config_name
+        Manager.__init__(self, test_options, os.path.dirname(os.path.abspath(sys.path[0])))
 
     def load_config(self):
         try:
@@ -37,11 +50,9 @@ class FlexGetBase(object):
 
     def setUp(self):
         """Set up test env"""
+        setup_once()
         self.manager = MockManager(self.__yaml__, self.__class__.__name__)
-        # do not load session
-        self.manager.options.reset = True
-        self.manager.initialize()
-        
+
     def tearDown(self):
         try:
             self.feed.session.close()
@@ -63,7 +74,7 @@ class FlexGetBase(object):
         self.feed.process_end()
         
     def get_plugin(self, event, keyword):
-        plugin = self.manager.plugins.get(keyword)
+        plugin = get_plugin_by_name(keyword)
         if not plugin:
             raise Exception('plugin %s isn\'t loaded (event %s)' % (keyword, event))
         return plugin
@@ -134,44 +145,31 @@ class TestRegexp(FlexGetBase):
     """
     def testAccept(self):
         self.execute_feed('test_accept')
-        if not self.feed.find_entry('accepted', title='regexp1'):
-            self.fail('regexp1 should have been accepted')
-        if not self.feed.find_entry('accepted', title='regexp2'):
-            self.fail('regexp2 should have been accepted')
-        if not self.feed.find_entry('accepted', title='regexp3'):
-            self.fail('regexp3 should have been accepted')
-        if not self.feed.find_entry('entries', title='regexp4'):
-            self.fail('regexp4 should have been left')
-        if not self.feed.find_entry('accepted', title='regexp2', path='~/custom_path/2/'):
-            self.fail('regexp2 should have been accepter with custom path')
-        if not self.feed.find_entry('accepted', title='regexp3', path='~/custom_path/3/'):
-            self.fail('regexp3 should have been accepter with custom path')
+        assert self.feed.find_entry('accepted', title='regexp1'), 'regexp1 should have been accepted'
+        assert self.feed.find_entry('accepted', title='regexp2'), 'regexp2 should have been accepted'
+        assert self.feed.find_entry('accepted', title='regexp3'), 'regexp3 should have been accepted'
+        assert self.feed.find_entry('entries', title='regexp4'), 'regexp4 should have been left'
+        assert self.feed.find_entry('accepted', title='regexp2', path='~/custom_path/2/'), 'regexp2 should have been accepter with custom path'
+        assert self.feed.find_entry('accepted', title='regexp3', path='~/custom_path/3/'), 'regexp3 should have been accepter with custom path'
             
     def testReject(self):
         self.execute_feed('test_reject')
-        if not self.feed.find_entry('rejected', title='regexp1'):
-            self.fail('regexp1 should have been rejected')
+        assert self.feed.find_entry('rejected', title='regexp1'), 'regexp1 should have been rejected'
 
     def testRest(self):
         self.execute_feed('test_rest')
-        if not self.feed.find_entry('accepted', title='regexp1'):
-            self.fail('regexp1 should have been accepted')
-        if not self.feed.find_entry('rejected', title='regexp3'):
-            self.fail('regexp3 should have been rejected')
+        assert self.feed.find_entry('accepted', title='regexp1'), 'regexp1 should have been accepted'
+        assert self.feed.find_entry('rejected', title='regexp3'), 'regexp3 should have been rejected'
             
     def testExcluding(self):
         self.execute_feed('test_excluding')
-        if self.feed.find_entry('accepted', title='regexp1'):
-            self.fail('regexp1 should not have been accepted')
-        if not self.feed.find_entry('accepted', title='regexp2'):
-            self.fail('regexp2 should have been accepted')
-        if not self.feed.find_entry('accepted', title='regexp3'):
-            self.fail('regexp3 should have been accepted')
+        assert not self.feed.find_entry('accepted', title='regexp1'), 'regexp1 should not have been accepted'
+        assert self.feed.find_entry('accepted', title='regexp2'), 'regexp2 should have been accepted'
+        assert self.feed.find_entry('accepted', title='regexp3'), 'regexp3 should have been accepted'
 
     def testFrom(self):
         self.execute_feed('test_from')
-        if self.feed.accepted:
-            self.fail('should not have accepted anything')
+        assert not self.feed.accepted, 'should not have accepted anything'
         
 class TestResolvers(FlexGetBase):
     """
@@ -191,8 +189,8 @@ class TestResolvers(FlexGetBase):
         self.execute_feed('test')
         
     def get_resolver(self, name):
-        info = self.manager.get_plugin_by_name(name)
-        return info['instance']
+        info = get_plugin_by_name(name)
+        return info.instance
         
     def testPirateBay(self):
         # test with piratebay entry
@@ -237,9 +235,8 @@ class TestDisableBuiltins(FlexGetBase):
     """
     def testDisableBuiltins(self):
         self.execute_feed('test')
-        if not (self.feed.find_entry(title='dupe1') and self.feed.find_entry(title='dupe2')):
-            self.fail('disable_builtins is not working?')
-        
+        assert self.feed.find_entry(title='dupe1') and self.feed.find_entry(title='dupe2'), 'disable_builtins is not working?'
+
 #class TestManager(FlexGetBase):
 #    def setUp(self):
 #        # just load with some conf

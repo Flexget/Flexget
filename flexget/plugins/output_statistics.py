@@ -1,6 +1,6 @@
 import sys, os.path
 import logging
-from flexget.manager import PluginWarning
+from flexget.plugin import PluginWarning
 
 __pychecker__ = 'unusednames=parser'
 
@@ -34,6 +34,8 @@ class Statistics:
         
         TODO: !!
     """
+
+    __plugin__ = 'statistics'
     
     def __init__(self):
         self.total = 0
@@ -41,9 +43,6 @@ class Statistics:
         self.failed = 0
 
         self.written = False
-
-    def register(self, manager, parser):
-        manager.register('statistics')
 
     def validator(self):
         """Validate given configuration"""

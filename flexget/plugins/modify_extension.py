@@ -14,8 +14,7 @@ class ModifyExtension:
         extension: nzb
     """
 
-    def register(self, manager, parser):
-        manager.register('extension')
+    __plugin__ = 'extension'
 
     def validator(self):
         from flexget import validator

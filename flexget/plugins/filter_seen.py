@@ -26,7 +26,6 @@ class Seen(Base):
         return '<Seen(%s=%s)>' % (self.field, self.value)
 
 class FilterSeen(object):
-
     """
         Remembers previously downloaded content and rejects them in
         subsequent executions. Without this plugin FlexGet would
@@ -36,9 +35,13 @@ class FilterSeen(object):
         See wiki for more information.
     """
 
-    def register(self, manager, parser):
-        manager.register('seen', builtin=True, filter_priority=255)
+    __plugin__ = 'seen'
+    __plugin_builtin__ = True
+    __priorities__ = {
+        'filter': 255
+    }
 
+    def __init__(self):
         # remember and filter by these fields
         self.fields = ['url', 'title', 'original_url']
         self.keyword = 'seen'

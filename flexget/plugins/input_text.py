@@ -30,8 +30,7 @@ class InputText:
 
     """
 
-    def register(self, manager, parser):
-        manager.register('text')
+    __plugin__ = 'text'
 
     def validator(self):
         from flexget import validator

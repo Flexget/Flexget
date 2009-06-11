@@ -1,7 +1,5 @@
-import urllib
-import logging
-import re
-from flexget.manager import PluginWarning
+import urllib, logging, re
+from flexget.plugin import PluginWarning, get_plugin_by_name
 
 log = logging.getLogger('regexp')
 
@@ -30,10 +28,9 @@ class FilterRegexp:
         
         Possible operations: accept, reject, accept_excluding, reject_excluding        
     """
-    
-    def register(self, manager, parser):
-        manager.register('regexp')
 
+    __plugin__ = 'regexp'
+    
     def validator(self):
         from flexget import validator
 
@@ -155,8 +152,8 @@ class FilterRegexp:
                     if path: entry['path'] = path
                     if setconfig:
                         log.debug('adding set: info to entry:"%s" %s' % (entry['title'], setconfig))
-                        set = feed.manager.get_plugin_by_name('set')
-                        set['instance'].modify(entry, setconfig)
+                        set = get_plugin_by_name('set')
+                        set.instance.modify(entry, setconfig)
                     log.debug("'%s' matched '%s'" % (entry['title'], regexp_raw))
                     break
                     

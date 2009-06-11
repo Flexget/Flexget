@@ -1,20 +1,18 @@
 import logging
 import mimetypes
-from flexget.manager import PluginWarning
+from flexget.plugin import PluginWarning
 
 log = logging.getLogger('path_by_ext')
 
 class PluginPathByExt:
-
     """
     path_by_ext:
       torrent: ~/watch/torrent/
       nzb: ~/watch/nzb/
     """
 
-    def register(self, manager, parser):
-        manager.register('path_by_ext')
-        
+    __plugin__ = 'path_by_ext'
+
     def validator(self):
         from flexget import validator
         config = validator.factory('dict')

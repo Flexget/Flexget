@@ -2,7 +2,7 @@ import logging
 import smtplib
 import email.Message
 import socket
-from flexget.manager import PluginWarning
+from flexget.plugin import PluginWarning
 
 __pychecker__ = 'unusednames=parser'
 
@@ -85,8 +85,7 @@ class OutputEmail:
           smtp_tls: False
     """
 
-    def register(self, manager, parser):
-        manager.register('email')
+    __plugin__ = 'email'
 
     def validator(self):
         from flexget import validator

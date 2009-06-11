@@ -1,4 +1,5 @@
 import logging
+from flexget.plugin import get_plugins_by_group
 
 __pychecker__ = 'unusednames=parser'
 
@@ -22,9 +23,8 @@ class Search:
         - Some resolvers will use search plugins automaticly if enry url points into a search page.
     """
 
-    def register(self, manager, parser):
-        manager.register('search')
-        
+    __plugin__ = 'search'
+
     def validator(self):
         # TODO: should only accept registered search plugins
         from flexget import validator
@@ -38,8 +38,8 @@ class Search:
             return 
         
         plugins = {}
-        for plugin in feed.manager.get_plugins_by_group('search'):
-            plugins[plugin['name']] = plugin['instance']
+        for plugin in get_plugins_by_group('search'):
+            plugins[plugin.name] = plugin.instance
             
         for entry in feed.entries:
             # loop trough configured searches

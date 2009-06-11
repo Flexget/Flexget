@@ -1,5 +1,5 @@
 import logging
-from flexget.manager import PluginWarning
+from flexget.plugin import PluginWarning
 
 #from validator_pluginset import PluginSetValidator
 
@@ -15,14 +15,12 @@ class ModifySet:
         set:
           path: ~/download/path/
     """
-    
+
+    __plugin__ = 'set'
+
     def __init__(self):
         self.keys = {}
             
-
-    def register(self, manager, parser):
-        manager.register('set')
-        
     def validator(self):
         from flexget import validator
         v = validator.factory('dict')

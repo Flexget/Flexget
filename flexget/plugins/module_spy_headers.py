@@ -2,7 +2,7 @@ import logging
 import urllib2
 import httplib
 import socket
-from flexget.manager import PluginWarning
+from flexget.plugin import PluginWarning
 
 
 
@@ -77,8 +77,7 @@ class PluginSpyHeaders:
         WARNING: At the moment this modifies requests somehow!
     """
 
-    def register(self, manager, parser):
-        manager.register('spy_headers')
+    __plugin__ = 'spy_headers'
 
     def validator(self):
         from flexget import validator

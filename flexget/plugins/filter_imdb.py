@@ -1,5 +1,6 @@
 import logging
-from flexget.manager import PluginWarning, Base
+from flexget.plugin import PluginWarning
+from flexget.manager import Base
 from flexget.utils.log import log_once
 from flexget.utils.imdb import ImdbSearch, ImdbParser
 
@@ -105,8 +106,7 @@ class FilterImdb:
         reject_invalid: True / False
     """
 
-    def register(self, manager, parser):
-        manager.register('imdb')
+    __plugin__ = 'imdb'
 
     def validator(self):
         """Validate given configuration"""

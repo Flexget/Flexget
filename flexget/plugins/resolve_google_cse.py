@@ -1,8 +1,6 @@
-import re
-import urllib2
-import logging
-from module_resolver import ResolverException
-from flexget.manager import PluginWarning
+import re, urllib2, logging
+from flexget.plugins.module_resolver import ResolverException
+from flexget.plugin import PluginWarning
 from flexget.utils.soup import get_soup
 
 log = logging.getLogger('google_cse')
@@ -10,8 +8,8 @@ log = logging.getLogger('google_cse')
 class ResolveGoogleCse:
     """Google custom query resolver."""
 
-    def register(self, manager, parser):
-        manager.register('google_cse', groups=['resolver'])
+    __plugin__ = 'google_cse'
+    __plugin_groups__ = ['resolver']
 
     # resolver API
     def resolvable(self, feed, entry):

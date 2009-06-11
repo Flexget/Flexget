@@ -17,8 +17,7 @@ class OutputExec:
     You can use all (available) entry fields in the command.
     """
 
-    def register(self, manager, parser):
-        manager.register('exec')
+    __plugin__ = 'exec'
 
     def validator(self):
         from flexget import validator

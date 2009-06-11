@@ -1,8 +1,6 @@
 import logging
 import urllib2
-from flexget.manager import PluginWarning
-
-
+from flexget.plugin import PluginWarning
 
 log = logging.getLogger('headers')
 
@@ -28,7 +26,6 @@ class HTTPHeadersProcessor(urllib2.BaseHandler):
     https_response = http_response
 
 class PluginHeaders:
-
     """
         Allow setting up any headers in all requests (which use urllib2)
         
@@ -38,8 +35,7 @@ class PluginHeaders:
           cookie: uid=<YOUR UID>; pass=<YOUR PASS>
     """
 
-    def register(self, manager, parser):
-        manager.register('headers')
+    __plugin__ = 'headers'
 
     def validator(self):
         from flexget import validator

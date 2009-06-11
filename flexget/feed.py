@@ -1,6 +1,6 @@
 import logging
 from datetime import datetime
-from flexget.manager import PluginWarning, PluginError
+from flexget.plugin import PluginWarning, PluginError, get_plugins_by_event, get_methods_by_event, get_plugin_by_name, EVENTS
 from flexget.utils.simple_persistence import SimplePersistence
 
 log = logging.getLogger('feed')
@@ -186,18 +186,17 @@ class Feed:
             
     def __run_event(self, event):
         """Execute plugin events if plugin is configured for this feed."""
-        plugins = self.manager.get_plugins_by_event(event)
+        methods = get_methods_by_event(event)
 
-        for plugin in plugins:
-            keyword = plugin['name']
-            if keyword in self.config or plugin['builtin']:
+        for method in methods:
+            keyword = method.plugin.name
+            if keyword in self.config or method.plugin.builtin:
                 # store execute info
                 self.current_event = event
                 self.current_plugin = keyword
                 # call the plugin
                 try:
-                    method = self.manager.event_methods[event]
-                    getattr(plugin['instance'], method)(self)
+                    method(self)
                 except PluginWarning, warn:
                     # this warning should be logged only once (may keep repeating)
                     if warn.kwargs.get('log_once', False):
@@ -228,15 +227,15 @@ class Feed:
                 return
             
         # run events
-        for event in self.manager.events:
+        for event in EVENTS:
             # when learning, skip few events
             if self.manager.options.learn:
                 if event in ['download', 'output']: 
                     # log keywords not executed
-                    plugins = self.manager.get_plugins_by_event(event)
+                    plugins = get_plugins_by_event(event)
                     for plugin in plugins:
-                        if plugin['name'] in self.config:
-                            log.info('Feed %s keyword %s is not executed because of learn/reset.' % (self.name, plugin['name']))
+                        if plugin.name in self.config:
+                            log.info('Feed %s keyword %s is not executed because of learn/reset.' % (self.name, plugin.name))
                     continue
             # run all plugins with this event
             self.__run_event(event)
@@ -274,13 +273,14 @@ class Feed:
         for keyword in self.config:
             if keyword.startswith('_'):
                 continue
-            plugin = self.manager.plugins.get(keyword)
-            if not plugin:
+            try:
+                plugin = get_plugin_by_name(keyword)
+            except:
                 validate_errors.append('Unknown plugin \'%s\'' % keyword)
                 continue
-            if hasattr(plugin['instance'], 'validator'):
+            if hasattr(plugin.instance, 'validator'):
                 try:
-                    validator = plugin['instance'].validator()
+                    validator = plugin.instance.validator()
                 except TypeError, e:
                     log.critical('Invalid validator method in plugin %s' % keyword)
                     log.exception(e)

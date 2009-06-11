@@ -1,6 +1,6 @@
 import logging
 from flexget.feed import Entry
-from flexget.manager import PluginError
+from flexget.plugin import PluginError
 import urllib2
 
 mechanize_present = True
@@ -16,8 +16,10 @@ class InputFormLogin:
     Login on form
     """
 
-    def register(self, manager, parser):
-        manager.register('form', input_priority=255)
+    __plugin__ = 'form'
+    __priorities__ = {
+        'input': 255
+    }
 
     def feed_input(self, feed):
         if not mechanize_present:

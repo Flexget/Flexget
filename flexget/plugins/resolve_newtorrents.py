@@ -2,7 +2,7 @@ import urllib2
 import logging
 import re
 from module_resolver import ResolverException
-from flexget.manager import PluginWarning
+from flexget.plugin import PluginWarning
 from flexget.utils.soup import get_soup
 
 timeout = 10
@@ -14,11 +14,11 @@ log = logging.getLogger('newtorrents')
 class NewTorrents:
     """NewTorrents resolver and search plugin."""
 
+    __plugin__ = 'newtorrents'
+    __plugin_groups__ = ['resolver', 'search']
+
     def __init__(self):
         self.resolved = []
-
-    def register(self, manager, parser):
-        manager.register('newtorrents', groups=['resolver', 'search'])
 
     # Resolver plugin API
     def resolvable(self, feed, entry):

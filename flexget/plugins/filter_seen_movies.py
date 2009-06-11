@@ -4,7 +4,6 @@ from filter_seen import FilterSeen
 log = logging.getLogger('seenmovies')
 
 class FilterSeenMovies(FilterSeen):
-
     """
         Prevents movies being downloaded twice.
         Works only on entries which have imdb url available.
@@ -14,9 +13,10 @@ class FilterSeenMovies(FilterSeen):
         2) If stored imdb url appears again, entry is rejected.
     """
 
-    def register(self, manager, parser):
-        manager.register('seen_movies')
+    __plugin__ = 'seen_movies'
+    __plugin_builtin__ = False
 
+    def __init__(self):
         # remember and filter by these fields
         self.fields = ['imdb_url']
         self.keyword = 'seen_movies'

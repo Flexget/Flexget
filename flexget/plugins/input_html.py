@@ -3,7 +3,7 @@ import urlparse
 import logging
 from socket import timeout
 from flexget.feed import Entry
-from flexget.manager import PluginError
+from flexget.plugin import PluginError
 import re
 from flexget.utils.soup import get_soup
 
@@ -22,9 +22,8 @@ class InputHtml:
         to match only to desired content.
     """
 
-    def register(self, manager, parser):
-        manager.register('html')
-        
+    __plugin__ = 'html'
+
     def validator(self):
         from flexget import validator
         root = validator.factory()

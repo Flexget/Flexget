@@ -1,4 +1,5 @@
 import logging
+from flexget import plugin
   
 log = logging.getLogger('disable_builtins')
 
@@ -6,29 +7,30 @@ class PluginDisableBuiltins:
     """
         Disables all builtin plugins from a feed.
     """
+
+    __plugin__ = 'disable_builtins'
     
-    def register(self, manager, parser):
-        manager.register('disable_builtins')
+    def __init__(self):
         self.disabled = []
-        
+
     def validator(self):
         from flexget import validator
         return validator.factory('any')
         
     def feed_start(self, feed):
-        for name, plugin in feed.manager.plugins.iteritems():
-            if plugin['builtin']:
+        for name, info in plugin.plugins.iteritems():
+            if info.builtin:
                 if isinstance(feed.config['disable_builtins'], list):
-                    if plugin['name'] in feed.config['disable_builtins']:
-                        plugin['builtin'] = False
+                    if info.name in feed.config['disable_builtins']:
+                        info.builtin = False
                         self.disabled.append(name)
                 else: #disabling all builtins
                     log.debug('Disabling builtin plugin %s' % name)
-                    plugin['builtin'] = False
+                    info.builtin = False
                     self.disabled.append(name)
         
     def feed_exit(self, feed):
         for name in self.disabled:
             log.debug('Enabling builtin plugin %s' % name)
-            feed.manager.plugins[name]['builtin'] = True
+            plugin.plugins[name].builtin = True
         self.disabled = []

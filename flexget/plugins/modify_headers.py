@@ -1,6 +1,6 @@
 import logging
 import urllib2
-from flexget.manager import PluginWarning
+from flexget.plugin import PluginWarning
 
 log = logging.getLogger('headers')
 
@@ -36,8 +36,7 @@ class PluginHeaders:
           cookie: uid=<YOUR UID>; pass=<YOUR PASS>
     """
 
-    def register(self, manager, parser):
-        manager.register('headers')
+    __plugin__ = 'headers'
 
     def validator(self):
         from flexget import validator

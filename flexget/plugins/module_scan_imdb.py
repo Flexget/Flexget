@@ -9,8 +9,11 @@ class PluginScanImdb:
         Scan entry information for imdb url.
     """
 
-    def register(self, manager, parser):
-        manager.register('scan_imdb', filter_priority=200, builtin=True)
+    __plugin__ = 'scan_imdb'
+    __plugin_builtin__ = True
+    __priorities__ = {
+        'filter': 200
+    }
 
     def validator(self):
         from flexget import validator

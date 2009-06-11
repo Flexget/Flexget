@@ -1,4 +1,5 @@
 import logging
+from flexget.plugin import get_plugins_by_group
 
 __pychecker__ = 'unusednames=parser'
 
@@ -11,10 +12,14 @@ class ResolverException(Exception):
         return repr(self.value)
 
 class PluginResolver:
-
-    def register(self, manager, parser):
-        manager.register('resolver', builtin=True, resolve_priority=255)
-        manager.add_feed_event('resolve', before='download')
+    __plugin__ = 'resolver'
+    __plugin_builtin__ = True
+    __priorities__ = {
+        'resolve': 255
+    }
+    __feed_events__ = [
+        ('resolve', { 'before': 'download' })
+    ]
 
     def feed_resolve(self, feed):
         # no resolves in unit test mode
@@ -24,8 +29,8 @@ class PluginResolver:
 
     def resolvable(self, feed, entry):
         """Return True if entry is resolvable by registered resolver."""
-        for resolver in feed.manager.get_plugins_by_group('resolver'):
-            if resolver['instance'].resolvable(self, entry):
+        for resolver in get_plugins_by_group('resolver'):
+            if resolver.instance.resolvable(self, entry):
                 return True
         return False
 
@@ -36,12 +41,12 @@ class PluginResolver:
             tries += 1
             if (tries > 300):
                 raise ResolverException('Resolve was left in infinite loop while resolving %s, some resolver is returning always True' % entry)
-            for resolver in feed.manager.get_plugins_by_group('resolver'):
-                name = resolver['name']
+            for resolver in get_plugins_by_group('resolver'):
+                name = resolver.name
                 try:
-                    if resolver['instance'].resolvable(feed, entry):
+                    if resolver.instance.resolvable(feed, entry):
                         log.debug('Rerolving %s' % entry['url'])
-                        resolver['instance'].resolve(feed, entry)
+                        resolver.instance.resolve(feed, entry)
                         log.info('Resolved \'%s\' to %s (with %s)' % (entry['title'], entry['url'], name))
                 except ResolverException, r:
                     # increase failcount

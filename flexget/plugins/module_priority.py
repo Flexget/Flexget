@@ -1,7 +1,6 @@
 import logging
-from flexget.manager import PluginWarning
-
-
+from flexget import plugin
+from flexget.plugin import PluginWarning
 
 log = logging.getLogger('priority')
 
@@ -17,9 +16,8 @@ class PluginPriority:
           series: 100
     """
 
-    def register(self, manager, parser):
-        manager.register('priority')
-        
+    __plugin__ = 'priority'
+
     def validator(self):
         from flexget import validator
         config = validator.factory('dict')
@@ -28,24 +26,24 @@ class PluginPriority:
 
     def feed_start(self, feed):
         self.priorities = {}
-        for plugin, priority in feed.config.get('priority', {}).iteritems():
+        for name, priority in feed.config.get('priority', {}).iteritems():
             # abort if no priorities
-            if not 'priorities' in feed.manager.plugins[plugin]:
-                log.error('Unable to set plugin %s priority, no default value in plugin' % plugin)
+            if not 'priorities' in plugin.plugins[name]:
+                log.error('Unable to set plugin %s priority, no default value in plugin' % name)
                 continue
             
             # if multiple events with different priorities, abort .. not implemented, would make configuration really messy?
-            if len(feed.manager.plugins[plugin]['priorities'])>1:
-                log.error('Cannot modify plugin %s priority because of multiple events with default priorities' % plugin)
+            if len(plugin.plugins[name].priorities)>1:
+                log.error('Cannot modify plugin %s priority because of multiple events with default priorities' % name)
                 continue
             
             # store original values
-            self.priorities[plugin] = feed.manager.plugins[plugin]['priorities'].copy()
+            self.priorities[name] = plugin.plugins[name].priorities.copy()
             
             # modify original values
-            for event, value in feed.manager.plugins[plugin]['priorities'].iteritems():
-                feed.manager.plugins[plugin]['priorities'][event] = priority
+            for event, value in plugin.plugins[name].priorities.iteritems():
+                plugin.plugins[name].priorities[event] = priority
     
     def feed_exit(self, feed):
-        for plugin, original in self.priorities.iteritems():
-            feed.manager.plugins[plugin]['priorities'] = original
+        for name, original in self.priorities.iteritems():
+            plugin.plugins[name].priorities = original

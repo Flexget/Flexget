@@ -18,8 +18,7 @@ class FilterLimitNew:
         FlexGet is executed.
     """
 
-    def register(self, manager, parser):
-        manager.register('limit_new')
+    __plugin__ = 'limit_new'
 
     def validator(self):
         from flexget import validator

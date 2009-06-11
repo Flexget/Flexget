@@ -1,5 +1,6 @@
 import logging
-from flexget.manager import Base, PluginWarning
+from flexget.manager import Base
+from flexget.plugin import PluginWarning
 from datetime import datetime, timedelta
 from sqlalchemy import Column, Integer, String, DateTime, PickleType
 
@@ -19,13 +20,15 @@ class BacklogEntry(Base):
         return '<BacklogEntry(title=%s)>' % (self.title)
 
 class InputBacklog:
-
     """
     """
 
-    def register(self, manager, parser):
-        manager.register('backlog', input_priority=-250, filter_priority=255)
-        
+    __plugin__ = 'backlog'
+    __priorities__ = {
+        'input': -250,
+        'filter': 255
+    }
+
     def validator(self):
         # TODO: make a regexp validation
         from flexget import validator

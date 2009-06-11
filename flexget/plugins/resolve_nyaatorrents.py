@@ -7,8 +7,8 @@ log = logging.getLogger("nyaatorrents")
 class ResolveNyaaTorrents:
     """NyaaTorrents resolver."""
 
-    def register(self, manager, parser):
-        manager.register('nyaatorrents', group='resolver')
+    __plugin__ = 'nyaatorrents'
+    __plugin_groups__ = ['resolver']
 
     def resolvable(self, feed, entry):
         return entry['url'].startswith('http://www.nyaatorrents.org/?page=torrentinfo&tid=')
