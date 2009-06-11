@@ -8,7 +8,7 @@ from datetime import datetime
 
 log = logging.getLogger('manager')
 
-from flexget.plugin import RegisterException, load_plugins, plugins
+from flexget.plugin import plugins
 
 import yaml
 import sqlalchemy
