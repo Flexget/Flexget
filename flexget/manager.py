@@ -34,43 +34,7 @@ class FailedEntry(Base):
     def __str__(self):
         return '<Failed(title=%s)>' % (self.title)
 
-_logging_configured = False
-
-def initialize_logging(filename=None, level=logging.INFO, debug=False, quiet=False, unit_test=False):
-    global _logging_configured
-
-    if not _logging_configured:
-        logging.addLevelName(5, 'DEBUGALL')
-
-        if unit_test:
-            _logging_configured = True
-            return
-
-        # root logger
-        logger = logging.getLogger()
-
-        # time format is same format of strftime
-        log_format = ['%(asctime)-15s %(levelname)-8s %(name)-11s %(message)s', '%Y-%m-%d %H:%M']
-        formatter = logging.Formatter(*log_format)
-
-        if debug:
-            logging.basicConfig(level=level, format=log_format[0], datefmt=log_format[1])
-        else:
-            handler = logging.handlers.RotatingFileHandler(filename, maxBytes=1000*1024, backupCount=9)
-            handler.setFormatter(formatter)
-            logger.addHandler(handler)
-
-            logger.setLevel(level)
-
-        if not quiet:
-            console = logging.StreamHandler()
-            console.setFormatter(formatter)
-            logger.addHandler(console)
-
-        _logging_configured = True
-
 class Manager:
-    log_initialized = False
     unit_test = False
     configname = None
     options = None
@@ -84,19 +48,6 @@ class Manager:
         
         # shelve
         self.shelve_session = None
-
-        # perform commandline sanity check(s)
-        if self.options.loglevel != 'debugall':
-            log_level = getattr(logging, self.options.loglevel.upper())
-        else:
-            log_level = 5
-
-        # initialize logging
-        if self.unit_test:
-            initialize_logging(unit_test=True)
-        else:
-            self.log_filename = os.path.join(self.config_base, 'flexget.log')
-            initialize_logging(self.log_filename, log_level, quiet=self.options.quiet)
 
         self.initialize()
             

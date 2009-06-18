@@ -7,6 +7,7 @@ from flexget.manager import Manager, Session
 from flexget.plugin import get_plugin_by_name, load_plugins
 from flexget.options import OptionParser
 from flexget.feed import Feed
+from flexget import initialize_logging
 import yaml
 
 test_options = None
@@ -15,6 +16,7 @@ plugins_loaded = False
 def setup_once():
     global plugins_loaded, test_options
     if not plugins_loaded:
+        initialize_logging(True)
         parser = OptionParser(True)
         load_plugins(parser)
         test_options = parser.parse_args()[0]

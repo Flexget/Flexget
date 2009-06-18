@@ -1,5 +1,5 @@
 from flexget import plugins as _plugins_mod
-import imp, os, sys, logging
+import imp, os, sys, logging, time
 
 log = logging.getLogger('plugin')
 
@@ -245,9 +245,12 @@ def load_plugins(parser):
         if parser is not None:
             for name, info in plugins.iteritems():
                 info.add_options(parser)
-        return
+        return 0
+    start_time = time.clock()
     load_plugins_from_dirs(get_standard_plugins_path(), parser)
+    took = time.clock() - start_time
     plugins_loaded = True
+    return took
 
 def get_plugins_by_event(event):
     """Return all plugins that hook event in order of priority."""
