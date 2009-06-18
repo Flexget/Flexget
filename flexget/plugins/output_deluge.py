@@ -112,7 +112,7 @@ class OutputDeluge:
                 raise PluginError('Could not communicate with deluge core. %s' % msg, log)
 
             path = entry.get('path', config['path'])
-            if 'path':
+            if path:
                 opts['download_location'] = path % entry
             # see that temp file is present
             if not os.path.exists(entry['file']):
