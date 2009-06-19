@@ -1,5 +1,6 @@
 import urllib2
 from flexget.feed import Entry
+from flexget.plugin import *
 import re
 import logging
 
@@ -29,10 +30,6 @@ class InputText:
         url: http://www.nbc.com%(url)s
 
     """
-
-    def register(self, manager, parser):
-        manager.register('text')
-
     def validator(self):
         from flexget import validator
         root = validator.factory('dict')
@@ -96,3 +93,5 @@ class InputText:
                         # start new entry
                         entry = Entry()
                         used = {}
+
+register_plugin(InputText, 'text')

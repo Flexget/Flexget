@@ -1,16 +1,13 @@
 import urllib2
 import logging
 from module_resolver import ResolverException
-from flexget.manager import PluginWarning
+from flexget.plugin import *
 from flexget.utils.soup import get_soup
 
 log = logging.getLogger('piratebay')
 
 class ResolvePirateBay:
     """PirateBay resolver."""
-
-    def register(self, manager, parser):
-        manager.register('piratebay', groups=['resolver', 'search'])
 
     # resolver API
     def resolvable(self, feed, entry):
@@ -96,3 +93,5 @@ class ResolvePirateBay:
         torrents.sort(best)
         torrents.reverse()
         return torrents[0]['link']
+
+register_plugin(ResolvePirateBay, 'piratebay', groups=['resolver', 'search'])

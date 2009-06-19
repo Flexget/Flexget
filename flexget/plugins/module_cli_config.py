@@ -1,5 +1,5 @@
 import logging
-from flexget.manager import PluginWarning
+from flexget.plugin import *
 
 log = logging.getLogger('cli_config')
 
@@ -24,10 +24,7 @@ class CliConfig:
         
     """
 
-    def register(self, manager, parser):
-        manager.register('cli_config', builtin=True)
-        parser.add_option('--cli-config', action='store', dest='cli_config', default=False,
-                          help='Configuration parameters trough commandline. See --doc cli_config.')
+    def __init__(self):
         self.replaces = {}
 
     def validator(self):
@@ -77,3 +74,7 @@ class CliConfig:
         if self.parse_replaces(feed):
             self.replace_dict(feed.config, self.replaces)
             log.debug(feed.config)
+
+register_plugin(CliConfig, 'cli_config', builtin=True)
+register_parser_option('--cli-config', action='store', dest='cli_config', default=False,
+                       help='Configuration parameters trough commandline. See --doc cli_config.')

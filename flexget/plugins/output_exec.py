@@ -1,12 +1,12 @@
 import subprocess
 import logging
+from flexget.plugin import *
 
 __pychecker__ = 'unusednames=parser'
 
 log = logging.getLogger('exec')
 
 class OutputExec:
-
     """
     Execute command for entries that reach output.
     
@@ -16,10 +16,6 @@ class OutputExec:
     
     You can use all (available) entry fields in the command.
     """
-
-    def register(self, manager, parser):
-        manager.register('exec')
-
     def validator(self):
         from flexget import validator
         return validator.factory('text')
@@ -32,3 +28,5 @@ class OutputExec:
             (r, w) = (p.stdout, p.stdin)
             r.close()
             w.close()
+
+register_plugin(OutputExec, 'exec')

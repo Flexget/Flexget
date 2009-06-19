@@ -1,6 +1,6 @@
 import logging
 import urllib2
-from flexget.manager import PluginWarning
+from flexget.plugin import *
 
 log = logging.getLogger('headers')
 
@@ -26,7 +26,6 @@ class HTTPHeadersProcessor(urllib2.BaseHandler):
     https_response = http_response
 
 class PluginHeaders:
-
     """
         Allow setting up any headers in all requests (which use urllib2)
         
@@ -35,10 +34,6 @@ class PluginHeaders:
         headers:
           cookie: uid=<YOUR UID>; pass=<YOUR PASS>
     """
-
-    def register(self, manager, parser):
-        manager.register('headers')
-
     def validator(self):
         from flexget import validator
         config = validator.factory('dict')
@@ -66,3 +61,5 @@ class PluginHeaders:
             log.debug('Removing urllib2 default opener')
             # TODO: this uninstalls all other handlers as well, but does it matter?
             urllib2.install_opener(None)
+
+register_plugin(PluginHeaders, 'headers')

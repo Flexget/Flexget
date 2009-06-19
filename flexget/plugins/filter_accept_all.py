@@ -1,9 +1,9 @@
 import logging
+from flexget.plugin import *
 
 log = logging.getLogger('accept_all')
 
 class FilterAcceptAll:
-
     """
         Just accepts all entries.
         
@@ -11,10 +11,6 @@ class FilterAcceptAll:
         
         accept_all: true
     """
-
-    def register(self, manager, parser):
-        manager.register('accept_all')
-        
     def validator(self):
         from flexget import validator
         return validator.factory('boolean')
@@ -22,3 +18,5 @@ class FilterAcceptAll:
     def feed_filter(self, feed):
         for entry in feed.entries:
             feed.accept(entry)
+
+register_plugin(FilterAcceptAll, 'accept_all')

@@ -1,5 +1,6 @@
 import re
 import logging
+from flexget.plugin import *
 
 log = logging.getLogger('modify_torrent')
 
@@ -164,17 +165,12 @@ class Torrent:
         data = self.content
         return self.encode_func[type(data)](data)
             
-
 class TorrentFilename:
 
     """
         Makes sure that entries containing torrent-file have .torrent
         extension. This is enabled always by default (builtins).
     """
-
-    def register(self, manager, parser):
-        manager.register('torrent', builtin=True, modify_priority=255)
-
     def feed_modify(self, feed):
         idstr = 'd8:announce'
         for entry in feed.entries:
@@ -230,3 +226,5 @@ class TorrentFilename:
         fn = '%s.torrent' % title
         log.debug('make_filename made %s' % fn)
         return fn
+
+register_plugin(TorrentFilename, 'torrent', builtin=True, priorities=dict(modify=255))

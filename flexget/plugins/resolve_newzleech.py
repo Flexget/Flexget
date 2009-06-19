@@ -1,8 +1,6 @@
-import urllib, urllib2
-import logging
-import re
-from module_resolver import ResolverException
-from flexget.manager import PluginWarning
+import urllib, urllib2, logging, re
+from flexget.plugin import *
+from flexget.plugins.module_resolver import ResolverException
 from flexget.utils.soup import get_soup
 
 log = logging.getLogger("newzleech")
@@ -12,9 +10,6 @@ class ResolveNewzleech:
         Resolver or search by using newzleech.com
         TODO: implement resolving
     """
-
-    def register(self, manager, parser):
-        manager.register('newzleech', group='search')
 
     # Search API
     def search(self, feed, entry):
@@ -92,4 +87,5 @@ class ResolveNewzleech:
         nzbs.sort(lambda a, b: cmp(a['size'], b['size']), reverse=True)
         
         entry['url'] = nzbs[0]['url']    
-    
+
+register_plugin(ResolveNewzleech, 'newzleach', groups=['search'])

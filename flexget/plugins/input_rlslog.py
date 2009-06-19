@@ -1,9 +1,7 @@
-import urllib2
-import logging
-import re
+import urllib2, logging, re
 from httplib import BadStatusLine
 from flexget.feed import Entry
-from flexget.manager import PluginWarning
+from flexget.plugin import *
 from flexget.utils.log import log_once
 from flexget.utils.soup import get_soup
 from BeautifulSoup import NavigableString
@@ -11,17 +9,12 @@ from BeautifulSoup import NavigableString
 log = logging.getLogger('rlslog')
 
 class RlsLog:
-
     """
         Adds support for rlslog.net as a feed.
 
         In case of movies the plugin supplies pre-parses IMDB-details
         (helps when chaining with filter_imdb).
     """
-
-    def register(self, manager, parser):
-        manager.register('rlslog')
-
     def validator(self):
         from flexget import validator
         return validator.factory('url')
@@ -88,7 +81,7 @@ class RlsLog:
                 temp = {}
                 temp['title'] = release['title']
                 temp['url'] = link_href
-                resolver = feed.manager.get_plugin_by_name('resolver')
+                resolver = get_plugin_by_name('resolver')
                 if resolver['instance'].resolvable(feed, temp):
                     release['url'] = link_href
                     log.log(5, '--> accepting %s (resolvable)' % link_href)
@@ -128,3 +121,5 @@ class RlsLog:
                 apply_field(release, entry, field)
 
             feed.entries.append(entry)
+
+register_plugin(RlsLog, 'rlslog')

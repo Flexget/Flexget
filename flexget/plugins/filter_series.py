@@ -2,7 +2,8 @@ import logging
 from datetime import datetime, timedelta
 from flexget.utils.series import SeriesParser
 
-from flexget.manager import Base, PluginWarning
+from flexget.manager import Base
+from flexget.plugin import *
 from sqlalchemy import Column, Integer, String, DateTime, Boolean, PickleType
 from sqlalchemy.schema import ForeignKey
 from sqlalchemy.orm import relation,join
@@ -57,12 +58,6 @@ class FilterSeries:
         
         http://flexget.com/wiki/FilterSeries
     """
-
-    def register(self, manager, parser):
-        manager.register('series')
-        parser.add_option('--stop-waiting', action='store', dest='stop_waiting', default=False,
-                          help='Stop timeframe for a given series.')
-
     def validator(self):
         from flexget import validator
 
@@ -288,8 +283,8 @@ class FilterSeries:
             
             # accept info from set: and place into the entry
             if 'set' in config:
-                set = feed.manager.get_plugin_by_name('set')
-                set['instance'].modify(entry, config.get('set'))
+                set = get_plugin_by_name('set')
+                set.instance.modify(entry, config.get('set'))
                 
             parser.entry = entry
             # add this episode into list of available episodes
@@ -501,3 +496,7 @@ class FilterSeries:
             parser = entry.get('series_parser')
             if parser:
                 self.mark_downloaded(feed, parser)
+
+register_plugin(FilterSeries, 'series')
+register_parser_option('--stop-waiting', action='store', dest='stop_waiting',
+                       default=False, help='Stop timeframe for a given series.')

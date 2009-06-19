@@ -1,10 +1,10 @@
 import logging
 from filter_seen import FilterSeen
+from flexget.plugin import *
 
 log = logging.getLogger('seenmovies')
 
 class FilterSeenMovies(FilterSeen):
-
     """
         Prevents movies being downloaded twice.
         Works only on entries which have imdb url available.
@@ -13,10 +13,7 @@ class FilterSeenMovies(FilterSeen):
         1) Remember all imdb urls from downloaded entries.
         2) If stored imdb url appears again, entry is rejected.
     """
-
-    def register(self, manager, parser):
-        manager.register('seen_movies')
-
+    def __init__(self):
         # remember and filter by these fields
         self.fields = ['imdb_url']
         self.keyword = 'seen_movies'
@@ -30,3 +27,5 @@ class FilterSeenMovies(FilterSeen):
                     feed.reject(entry)
         # call super
         super(FilterSeenMovies, self).feed_filter(feed)
+
+register_plugin(FilterSeenMovies, 'seen_movies', priorities=dict(filter=255))

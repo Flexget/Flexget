@@ -1,11 +1,11 @@
 import urllib2
 import logging
 from flexget.feed import Entry
+from flexget.plugin import *
 
 log = logging.getLogger('csv')
 
 class InputCSV:
-
     """
         Adds support for CSV format. Configuration may seem a bit complex,
         but this has advantage of being universal solution regardless of CSV
@@ -29,10 +29,6 @@ class InputCSV:
         Fields title and url are mandatory. First field is 1.
         List of other common (optional) fields can be found from wiki.
     """
-
-    def register(self, manager, parser):
-        manager.register('csv')
-        
     def validator(self):
         from flexget import validator
         config = validator.factory('dict')
@@ -54,3 +50,5 @@ class InputCSV:
                 except IndexError:
                     raise Exception('Field %s index is out of range' % name)
             feed.entries.append(entry)
+
+register_plugin(InputCSV, 'csv')

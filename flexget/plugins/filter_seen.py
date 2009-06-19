@@ -1,6 +1,7 @@
 import urllib
 import logging
 from flexget.manager import Base
+from flexget.plugin import *
 from sqlalchemy import Column, Integer, String, DateTime, PickleType
 from datetime import datetime, timedelta
 
@@ -26,7 +27,6 @@ class Seen(Base):
         return '<Seen(%s=%s)>' % (self.field, self.value)
 
 class FilterSeen(object):
-
     """
         Remembers previously downloaded content and rejects them in
         subsequent executions. Without this plugin FlexGet would
@@ -35,10 +35,7 @@ class FilterSeen(object):
         This plugin is enabled on all feeds by default.
         See wiki for more information.
     """
-
-    def register(self, manager, parser):
-        manager.register('seen', builtin=True, filter_priority=255)
-
+    def __init__(self):
         # remember and filter by these fields
         self.fields = ['url', 'title', 'original_url']
         self.keyword = 'seen'
@@ -127,3 +124,5 @@ class FilterSeen(object):
                 feed.session.add(seen)
                 count += 1
         log.info('Migrated %s seen items' % count)
+
+register_plugin(FilterSeen, 'seen', builtin=True, priorities=dict(filter=255))

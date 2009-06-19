@@ -2,7 +2,7 @@ import logging
 import smtplib
 import email.Message
 import socket
-from flexget.manager import PluginWarning
+from flexget.plugin import *
 
 __pychecker__ = 'unusednames=parser'
 
@@ -84,10 +84,6 @@ class OutputEmail:
           smtp_password:
           smtp_tls: False
     """
-
-    def register(self, manager, parser):
-        manager.register('email')
-
     def validator(self):
         from flexget import validator
         email = validator.factory('dict')
@@ -168,3 +164,5 @@ FlexGet has just downloaded %d new entries for feed %s :
 
             mailServer.sendmail(message["From"], message["To"], message.as_string())
             mailServer.quit()
+
+register_plugin(OutputEmail, 'email')

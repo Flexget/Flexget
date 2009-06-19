@@ -1,4 +1,5 @@
 import logging
+from flexget.plugin import *
 
 __pychecker__ = 'unusednames=parser'
 
@@ -13,10 +14,6 @@ class ModifyExtension:
 
         extension: nzb
     """
-
-    def register(self, manager, parser):
-        manager.register('extension')
-
     def validator(self):
         from flexget import validator
         root = validator.factory()
@@ -31,3 +28,5 @@ class ModifyExtension:
         for entry in feed.entries:
             entry['filename'] = '%s.%s' % (entry.get('filename', entry['title']), ext)
             log.debug('setting filename %s' % entry['filename'])
+
+register_plugin(ModifyExtension, 'extension')

@@ -3,7 +3,7 @@ import urlparse
 import xml.sax
 import re
 from flexget.feed import Entry
-from flexget.manager import PluginWarning, PluginError
+from flexget.plugin import *
 from flexget.utils.log import log_once
 
 feedparser_present = True
@@ -15,7 +15,6 @@ except ImportError:
 log = logging.getLogger('rss')
 
 class InputRSS:
-
     """
         Parses RSS feed.
 
@@ -59,10 +58,6 @@ class InputRSS:
           url: <url>
           silent: True
     """
-
-    def register(self, manager, parser):
-        manager.register('rss')
-
     def validator(self):
         from flexget import validator
         root = validator.factory()
@@ -274,3 +269,5 @@ class InputRSS:
         if ignored:
             if not config.get('silent'):
                 log.warning('Skipped %s RSS-entries without required information (title, link or enclosures)' % ignored)
+
+register_plugin(InputRSS, 'rss')

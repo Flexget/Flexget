@@ -1,8 +1,6 @@
-import logging
-import datetime
-import operator
-import os
-from flexget.manager import PluginWarning, Base
+import logging, datetime, operator, os
+from flexget.plugin import *
+from flexget.manager import Base
 from sqlalchemy import Column, Integer, String, Unicode, DateTime, Boolean, PickleType, func
 from sqlalchemy.schema import ForeignKey
 from sqlalchemy.orm import relation
@@ -27,7 +25,6 @@ class RSSEntry(Base):
     published = Column(DateTime, default=datetime.datetime.utcnow())
 
 class OutputRSS:
-
     """
         Write RSS containing succeeded (downloaded) entries.
         
@@ -94,12 +91,8 @@ class OutputRSS:
         Default list: imdb_url, input_url, url
         
     """
-
     def __init__(self):
         self.written = {}
-
-    def register(self, manager, parser):
-        manager.register('make_rss')
 
     def validator(self):
         """Validate given configuration"""
@@ -203,3 +196,5 @@ class OutputRSS:
             log.error('Unable to write %s' % fn)
             return
         self.written[config['file']] = True
+
+register_plugin(OutputRSS, 'make_rss')

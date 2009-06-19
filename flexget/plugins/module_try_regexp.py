@@ -1,20 +1,15 @@
-import logging
-import re
+import logging, re
+from flexget.plugin import *
 
 __pychecker__ = 'unusednames=parser'
 
 log = logging.getLogger('try_regexp')
 
 class PluginTryRegexp:
-
     """
         This plugin allows user to test regexps for a feed.
     """
-
-    def register(self, manager, parser):
-        manager.register('try_regexp', builtin=True)
-        parser.add_option('--try', action='store_true', dest='try_regexp', default=False,
-                          help='Try regular expressions interactively.')
+    def __init__(self):
         self.abort = False
 
     def validator(self):
@@ -63,4 +58,8 @@ class PluginTryRegexp:
                     print 'Invalid regular expression'
                     break
             print '%s entries matched' % count
-        print 'Bye!'       
+        print 'Bye!'
+
+register_plugin(PluginTryRegexp, 'try_regexp', builtin=True)
+register_parser_option('--try', action='store_true', dest='try_regexp', default=False,
+                       help='Try regular expressions interactively.')

@@ -1,6 +1,6 @@
 import sys, os.path
 import logging
-from flexget.manager import PluginWarning
+from flexget.plugin import *
 
 __pychecker__ = 'unusednames=parser'
 
@@ -26,7 +26,6 @@ except:
     has_pygooglechart = False
 
 class Statistics:
-
     """
         Saves statistics about downloaded releases and generates graphs from the data.
     
@@ -34,16 +33,12 @@ class Statistics:
         
         TODO: !!
     """
-    
     def __init__(self):
         self.total = 0
         self.passed = 0
         self.failed = 0
 
         self.written = False
-
-    def register(self, manager, parser):
-        manager.register('statistics')
 
     def validator(self):
         """Validate given configuration"""
@@ -241,6 +236,7 @@ class Statistics:
 
         return chart.get_url()
 
+register_plugin(Statistics, 'statistics')
 
 index_html = """
 <?xml version="1.0"?>

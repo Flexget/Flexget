@@ -1,12 +1,12 @@
 import logging
 from flexget.feed import Entry
+from flexget.plugin import *
 
 __pychecker__ = 'unusednames=parser'
 
 log = logging.getLogger('input_mock')
 
 class InputMock:
-
     """
         Allows adding mock input entries. Example:
         
@@ -14,10 +14,6 @@ class InputMock:
           - {title: foobar, url: http://some.com }
           - {title: mock, url: http://another.com }
     """
-
-    def register(self, manager, parser):
-        manager.register('input_mock', debug_plugin=True)
-        
     def validator(self):
         from flexget import validator
         container = validator.factory('list')
@@ -35,3 +31,5 @@ class InputMock:
             for k,v in line.iteritems():
                 entry[k] = v
             feed.entries.append(entry)
+
+register_plugin(InputMock, 'input_mock', debug=True)

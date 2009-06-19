@@ -1,14 +1,10 @@
 import logging
-
-
+from flexget.plugin import *
 
 log = logging.getLogger("redskunk")
 
 class ResolveRedskunk:
     """Redskunk resolver."""
-
-    def register(self, manager, parser):
-        manager.register('redskunk', group='resolver')
 
     def resolvable(self, feed, entry):
         url = entry['url']
@@ -17,3 +13,5 @@ class ResolveRedskunk:
     def resolve(self, feed, entry):
         entry['url'] = entry['url'].replace('torrents-details', 'download')
         entry['url'] = entry['url'].replace('&hit=1', '')
+
+register_plugin(ResolveRedskunk, 'redskunk', groups=['resolver'])

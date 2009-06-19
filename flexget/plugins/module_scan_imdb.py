@@ -1,17 +1,13 @@
 import re
 import logging
+from flexget.plugin import *
 
 log = logging.getLogger('scan_imdb')
 
 class PluginScanImdb:
-
     """
         Scan entry information for imdb url.
     """
-
-    def register(self, manager, parser):
-        manager.register('scan_imdb', filter_priority=200, builtin=True)
-
     def validator(self):
         from flexget import validator
         return validator.factory('boolean')
@@ -32,3 +28,5 @@ class PluginScanImdb:
             for result in results:
                 entry['imdb_url'] = result
             log.info('Found imdb url in description %s' % entry['imdb_url'])
+
+register_plugin(PluginScanImdb, 'scan_imdb', builtin=True, priorities=dict(filter=200))

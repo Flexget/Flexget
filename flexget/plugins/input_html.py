@@ -3,7 +3,7 @@ import urlparse
 import logging
 from socket import timeout
 from flexget.feed import Entry
-from flexget.manager import PluginError
+from flexget.plugin import *
 import re
 from flexget.utils.soup import get_soup
 
@@ -21,10 +21,6 @@ class InputHtml:
         Note: This returns ALL links on url so you need to configure filters
         to match only to desired content.
     """
-
-    def register(self, manager, parser):
-        manager.register('html')
-        
     def validator(self):
         from flexget import validator
         root = validator.factory()
@@ -120,3 +116,5 @@ class InputHtml:
             entry['title'] = title
 
             feed.entries.append(entry)
+
+register_plugin(InputHtml, 'html')

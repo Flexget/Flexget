@@ -1,12 +1,11 @@
 import os
 import logging
-from flexget.manager import PluginWarning
+from flexget.plugin import *
 from flexget.utils.series import SeriesParser
 
 log = logging.getLogger('exists')
 
 class FilterExists:
-
     """
         Reject entries that already exist in given path.
 
@@ -14,10 +13,6 @@ class FilterExists:
 
         exists: /storage/movies/
     """
-
-    def register(self, manager, parser):
-        manager.register('exists', filter_priority=-1)
-
     def validator(self):
         from flexget import validator
         root = validator.factory()
@@ -66,4 +61,5 @@ class FilterExists:
                                 if parser.identifier()==oldparser.identifier() and parser.quality==oldparser.quality:
                                     log.debug('Found episode %s %s in %s' % (parser.name, parser.identifier(), root))
                                     feed.reject(entry, 'episode already exists')
-                            
+
+register_plugin(FilterExists, 'exists', priorities={'filter': -1})

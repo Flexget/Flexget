@@ -1,10 +1,9 @@
 import logging
-from flexget.manager import PluginWarning, PluginError
+from flexget.plugin import *
 
 log = logging.getLogger('preset')
 
 class PluginPreset:
-
     """
         Use presets.
         
@@ -19,9 +18,6 @@ class PluginPreset:
           - imdb
     """
 
-    def register(self, manager, parser):
-        manager.register('preset', start_priority=255, builtin=True)
-        
     def validator(self):
         from flexget import validator
         root = validator.factory()
@@ -55,3 +51,5 @@ class PluginPreset:
                 merge_dict_from_to(feed.manager.config[preset], feed.config)
             except MergeException:
                 raise PluginError('Failed to merge preset %s to feed %s, incompatible datatypes' % (preset, feed.name))
+
+register_plugin(PluginPreset, 'preset', builtin=True, priorities=dict(start=255))

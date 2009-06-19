@@ -1,9 +1,9 @@
-from optparse import OptionParser, SUPPRESS_HELP
+from optparse import OptionParser as OptParser, SUPPRESS_HELP
 import logging
 
-class Options(OptionParser):
+class OptionParser(OptParser):
     def __init__(self, unit_test=False):
-        OptionParser.__init__(self)
+        OptParser.__init__(self)
 
         self._unit_test = unit_test
 
@@ -62,7 +62,19 @@ class Options(OptionParser):
                           help=SUPPRESS_HELP)
 
     def parse_args(self):
-        return OptionParser.parse_args(self, self._unit_test and ['flexget'] or None)
+        result = OptParser.parse_args(self, self._unit_test and ['flexget', '--reset'] or None)
+        options = result[0]
+        if options.test and options.learn:
+            self.error('--test and --learn are mutually exclusive')
+            
+        if options.test and options.reset:
+            self.error('--test and --reset are mutually exclusive')
+
+        # reset and migrate should be executed with learn
+        if (options.reset and not self._unit_test) or options.migrate:
+            options.learn = True
+
+        return result
 
     def _debug_callback(self, option, opt, value, parser):
         setattr(parser.values, option.dest, 1)

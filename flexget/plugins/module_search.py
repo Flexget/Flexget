@@ -1,11 +1,11 @@
 import logging
+from flexget.plugin import *
 
 __pychecker__ = 'unusednames=parser'
 
 log = logging.getLogger('search')
 
 class Search:
-
     """
         Search entry from sites. Accepts list of known search plugins, list is in priority order.
         Once hit has been found no more searches are performed. Should be used only when
@@ -21,10 +21,6 @@ class Search:
         Notes: 
         - Some resolvers will use search plugins automaticly if enry url points into a search page.
     """
-
-    def register(self, manager, parser):
-        manager.register('search')
-        
     def validator(self):
         # TODO: should only accept registered search plugins
         from flexget import validator
@@ -38,8 +34,8 @@ class Search:
             return 
         
         plugins = {}
-        for plugin in feed.manager.get_plugins_by_group('search'):
-            plugins[plugin['name']] = plugin['instance']
+        for plugin in get_plugins_by_group('search'):
+            plugins[plugin.name] = plugin.instance
             
         for entry in feed.entries:
             # loop trough configured searches
@@ -55,3 +51,5 @@ class Search:
                         log.debug('Found url: %s' % url)
                         entry['url'] = url
                         return
+
+register_plugin(Search, 'search')
