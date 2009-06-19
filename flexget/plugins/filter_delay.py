@@ -2,7 +2,7 @@ import urllib2
 import logging
 from flexget.feed import Entry
 from flexget.manager import Base
-from flexget.plugin import PluginWarning
+from flexget.plugin import *
 from datetime import datetime, timedelta
 from sqlalchemy import Column, Integer, String, DateTime, Boolean, PickleType
 from sqlalchemy.schema import ForeignKey
@@ -33,12 +33,6 @@ class FilterDelay:
         
         delay: 2 hours
     """
-
-    __plugin__ = 'delay'
-    __priorities__ = {
-        'filter': 250
-    }
-
     def validator(self):
         # TODO: make a regexp validation
         from flexget import validator
@@ -87,3 +81,5 @@ class FilterDelay:
                 delay_entry.expire = expire_time
                 feed.reject(entry, 'delaying')
                 feed.session.add(delay_entry)
+
+register_plugin(FilterDelay, 'delay', priorities={'filter': 250})

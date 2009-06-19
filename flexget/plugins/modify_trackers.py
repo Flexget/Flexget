@@ -1,5 +1,6 @@
 import re
 import logging
+from flexget.plugin import *
 
 __pychecker__ = 'unusednames=parser'
 
@@ -18,8 +19,6 @@ class RemoveTrackers:
         This will remove all trackers that contain text moviex in their url.
         TIP: You can use global section in configuration to make this enabled on all feeds.
     """
-
-    __plugin__ = 'remove_trackers'
 
     def validator(self):
         from flexget import validator
@@ -42,3 +41,5 @@ class RemoveTrackers:
                             f = open(entry['file'], 'r+')
                             f.write(entry['torrent'].encode())
                             f.close()
+
+register_plugin(RemoveTrackers, 'remove_trackers')

@@ -1,6 +1,6 @@
 import logging
 import mimetypes
-from flexget.plugin import PluginWarning
+from flexget.plugin import *
 
 log = logging.getLogger('path_by_ext')
 
@@ -10,8 +10,6 @@ class PluginPathByExt:
       torrent: ~/watch/torrent/
       nzb: ~/watch/nzb/
     """
-
-    __plugin__ = 'path_by_ext'
 
     def validator(self):
         from flexget import validator
@@ -45,3 +43,5 @@ class PluginPathByExt:
                 for ext, path in config.iteritems():
                     if entry['url'].endswith('.'+ext):
                         callback(entry, path)
+
+register_plugin(PluginPathByExt, 'path_by_ext')

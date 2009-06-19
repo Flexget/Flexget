@@ -2,7 +2,7 @@ import urllib2
 import logging
 import re
 from module_resolver import ResolverException
-from flexget.plugin import PluginWarning
+from flexget.plugin import *
 from flexget.utils.soup import get_soup
 
 timeout = 10
@@ -13,9 +13,6 @@ log = logging.getLogger('newtorrents')
 
 class NewTorrents:
     """NewTorrents resolver and search plugin."""
-
-    __plugin__ = 'newtorrents'
-    __plugin_groups__ = ['resolver', 'search']
 
     def __init__(self):
         self.resolved = []
@@ -105,3 +102,5 @@ class NewTorrents:
             else:
                 log.debug('search result contains multiple matches, using most seeders from: %s' % torrents)
             return torrents[0][1]
+
+register_plugin(NewTorrents, 'newtorrents', groups=['resolver', 'search'])

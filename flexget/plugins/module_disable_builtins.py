@@ -7,9 +7,6 @@ class PluginDisableBuiltins:
     """
         Disables all builtin plugins from a feed.
     """
-
-    __plugin__ = 'disable_builtins'
-    
     def __init__(self):
         self.disabled = []
 
@@ -34,3 +31,5 @@ class PluginDisableBuiltins:
             log.debug('Enabling builtin plugin %s' % name)
             plugin.plugins[name].builtin = True
         self.disabled = []
+
+plugin.register_plugin(PluginDisableBuiltins, 'disable_builtins')

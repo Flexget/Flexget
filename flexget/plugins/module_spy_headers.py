@@ -1,10 +1,5 @@
-import logging
-import urllib2
-import httplib
-import socket
-from flexget.plugin import PluginWarning
-
-
+import logging, urllib2, httplib, socket
+from flexget.plugin import *
 
 log = logging.getLogger('spy_headers')
 
@@ -70,15 +65,11 @@ class HTTPCaptureHeaderHandler(urllib2.AbstractHTTPHandler):
         return resp
 
 class PluginSpyHeaders:
-
     """
         Logs all headers sent in http requests. Useful for resolving issues.
         
         WARNING: At the moment this modifies requests somehow!
     """
-
-    __plugin__ = 'spy_headers'
-
     def validator(self):
         from flexget import validator
         return validator.factory('any')
@@ -102,3 +93,5 @@ class PluginSpyHeaders:
             log.debug('Removing urllib2 default opener')
             # TODO: this uninstalls all other handlers as well, but does it matter?
             urllib2.install_opener(None)
+
+register_plugin(PluginSpyHeaders, 'spy_headers')

@@ -3,6 +3,11 @@ import imp, os, sys, logging, time
 
 log = logging.getLogger('plugin')
 
+__all__ = ['PluginWarning', 'PluginError', 'register_plugin',
+           'register_parser_option', 'register_feed_event',
+           'get_plugin_by_name', 'get_plugins_by_group',
+           'get_plugins_by_event', 'get_methods_by_event']
+
 class RegisterException(Exception):
     def __init__(self, value):
         self.value = value
@@ -31,8 +36,80 @@ class PluginError(Exception):
 def _strip_trailing_sep(path):
     return path.rstrip("\\/")
 
+EVENTS = ['start', 'input', 'filter', 'download', 'modify', 'output', 'exit']
+EVENT_METHODS = {
+    'start': 'feed_start',
+    'input': 'feed_input',
+    'filter': 'feed_filter',
+    'download': 'feed_download',
+    'modify': 'feed_modify', 
+    'output': 'feed_output',
+    'exit': 'feed_exit',
+    'abort': 'feed_abort',
+    'process_start': 'process_start',
+    'process_end': 'process_end'
+}
+PREFIXES = EVENTS + ['module', 'plugin', 'source']
+
+plugins = {}
+
+def register_plugin(plugin_class, name, groups=[], builtin=False, debug=False, priorities={}):
+    global plugins
+    if name in plugins:
+        log.critical('Error while registering plugin %s. %s' % (name, ('A plugin with the name %s is already registered' % name)))
+        return
+    plugins[name] = PluginInfo(name, plugin_class, groups, builtin, debug, priorities)
+
+_parser = None
+_plugin_options = []
+def register_parser_option(*args, **kwargs):
+    global _parser, _plugin_options
+    _parser.add_option(*args, **kwargs)
+    _plugin_options.append((args, kwargs))
+
+_new_event_queue = {}
+def register_feed_event(plugin_class, name, before=None, after=None):
+    global _new_event_queue, plugins
+    if not before is None and not after is None:
+        raise RegisterException('You can only give either before or after for a event.')
+    if before is None and after is None:
+        raise RegisterException('You must specify either a before or after event.')
+    if name in EVENTS or name in _new_event_queue:
+        raise RegisterException('Event %s already exists.' % name)
+
+    def add_event(event_name, plugin_class, before, after):
+        if not before is None and not before in EVENTS:
+            return False
+        if not after is None and not after in EVENTS:
+            return False
+        # add method name to event -> method lookup table
+        EVENT_METHODS[event_name] = 'feed_'+event_name
+        # queue plugin loading for this type
+        PREFIXES.append(name)
+        # place event in event list
+        if before is None:
+            EVENTS.insert(EVENTS.index(after)+1, event_name)
+        if after is None:
+            EVENTS.insert(EVENTS.index(before), event_name)
+
+        for loaded_plugin in plugins:
+            if plugins[loaded_plugin].events:
+                continue
+            if hasattr(plugins[loaded_plugin].instance, 'feed_' + name):
+                if callable(getattr(plugins[loaded_plugin].instance, 'feed_' + name)):
+                    plugins[loaded_plugin].events = True
+                    continue
+        return True
+
+    if not add_event(name, plugin_class.__name__, before, after):
+        _new_event_queue[name] = [plugin_class.__name__, before, after]
+
+    for event_name, args in _new_event_queue.items():
+        if add_event(event_name, *args):
+            del _new_event_queue[event_name]
+
 class PluginInfo(dict):
-    def __init__(self, name, item_class, parser):
+    def __init__(self, name, item_class, groups=[], builtin=False, debug=False, priorities={}):
         dict.__init__(self)
 
         self.name = name
@@ -44,18 +121,9 @@ class PluginInfo(dict):
             raise
 
         self.instance = instance
-
-        if hasattr(item_class, '__parser_options__'):
-            self.options = item_class.__parser_options__
-            if parser is not None:
-                self.add_options(parser)
-
-        def get_item_attr(attr_name, default):
-            return hasattr(item_class, attr_name) and getattr(item_class, attr_name) or default
-
-        self.groups = get_item_attr('__plugin_groups__', [])
-        self.builtin = get_item_attr('__plugin_builtin__', False)
-        self.debug = get_item_attr('__plugin_debug__', False)
+        self.groups = groups
+        self.builtin = builtin
+        self.debug = debug
 
         self.events = False
         for event, method in EVENT_METHODS.iteritems():
@@ -64,14 +132,7 @@ class PluginInfo(dict):
                     self.events = True
                     break
 
-        # parse event priorities
-        self.priorities = get_item_attr('__priorities__', {})
-
-    def add_options(self, parser):
-        if not 'options' in self:
-            return
-        for args, kwargs in self.options:
-            parser.add_option(*args, **kwargs)
+        self.priorities = priorities
 
     def __getattr__(self, attr):
         if attr in self:
@@ -102,23 +163,6 @@ class PluginMethod(object):
 
     __repr__ = __str__
 
-EVENTS = ['start', 'input', 'filter', 'download', 'modify', 'output', 'exit']
-EVENT_METHODS = {
-    'start': 'feed_start',
-    'input': 'feed_input',
-    'filter': 'feed_filter',
-    'download': 'feed_download',
-    'modify': 'feed_modify', 
-    'output': 'feed_output',
-    'exit': 'feed_exit',
-    'abort': 'feed_abort',
-    'process_start': 'process_start',
-    'process_end': 'process_end'
-}
-PREFIXES = EVENTS + ['module', 'plugin', 'source']
-
-plugins = {}
-
 def get_standard_plugins_path():
     """Determine a plugin path suitable for general use."""
     path = os.environ.get('FLEXGET_PLUGIN_PATH',
@@ -142,17 +186,16 @@ def get_standard_plugins_path():
                 path.append(archless_path)
     return path
 
-def load_plugins_from_dirs(dirs, parser):
+def load_plugins_from_dirs(dirs):
     _plugins_mod.__path__ = map(_strip_trailing_sep, dirs)
     for d in dirs:
         if not d:
             continue
         log.debug('looking for plugins in %s', d)
         if os.path.isdir(d):
-            load_plugins_from_dir(d, parser)
+            load_plugins_from_dir(d)
 
-_new_event_queue = {}
-def load_plugins_from_dir(d, parser):
+def load_plugins_from_dir(d):
     # Get the list of valid python suffixes for modules
     # this includes .py, .pyc, and .pyo (depending on if we are running -O)
     # but it doesn't include compiled modules (.so, .dll, etc)
@@ -176,78 +219,27 @@ def load_plugins_from_dir(d, parser):
         try:
             exec "import flexget.plugins.%s" % name in {}
         except Exception, e:
-            log.critical('Exception while loading plugin %s' % plugin)
+            log.critical('Exception while loading plugin %s' % name)
             log.exception(e)
             raise
 
-        plugin = getattr(_plugins_mod, name)
-        for item_name, item in plugin.__dict__.iteritems():
-            if hasattr(item, '__plugin__'):
-                plugin_name = item.__plugin__
-                if plugin_name in plugins:
-                    continue
-                    #log.critical('Error while registering plugin %s. %s' % (plugin_name, ('A plugin with the name %s is already registered' % plugin_name)))
-                plugins[plugin_name] = PluginInfo(plugin_name, item, parser)
-
-                if hasattr(item, '__feed_events__'):
-                    for event_name, kwargs in item.__feed_events__:
-                        if 'before' in kwargs and 'after' in kwargs:
-                            raise RegisterException('You can only give either before or after for a event.')
-                        if not 'before' in kwargs and not 'after' in kwargs:
-                            raise RegisterException('You must specify either a before or after event.')
-                        if event_name in EVENTS: # or event_name in self.__event_queue:
-                            raise RegisterException('Event %s already exists.' % event_name)
-
-                        def add_event(name, args):
-                            if 'before' in args:
-                                if not args.get('before', None) in EVENTS:
-                                    return False
-                            if 'after' in args:
-                                if not args.get('after', None) in EVENTS:
-                                    return False
-                            # add method name to event -> method lookup table
-                            EVENT_METHODS[name] = 'feed_'+name
-                            # queue plugin loading for this type
-                            PREFIXES.append(event_name)
-                            # place event in event list
-                            if args.get('after'):
-                                EVENTS.insert(EVENTS.index(kwargs['after'])+1, name)
-                            if args.get('before'):
-                                EVENTS.insert(EVENTS.index(kwargs['before']), name)
-
-                            for loaded_plugin in plugins:
-                                if plugins[loaded_plugin].events:
-                                    continue
-                                if hasattr(plugins[loaded_plugin].instance, 'feed_' + event_name):
-                                    if callable(getattr(plugins[loaded_plugin].instance, 'feed_' + event_name)):
-                                        plugins[loaded_plugin].events = True
-                                        continue
-
-                            return True
-
-                        kwargs.setdefault('class_name', item_name)
-                        if not add_event(event_name, kwargs):
-                            _new_event_queue[event_name] = kwargs
-                            continue
-
-                        for event_name, kwargs in _new_event_queue.items():
-                            if add_event(event_name, kwargs):
-                                del _new_event_queue[event_name]
     if _new_event_queue:
-        for event, info in _new_event_queue.iteritems():
+        for event, args in _new_event_queue.iteritems():
             log.error('plugin %s requested new event %s, but it could not be created at requested \
-            point (before, after). plugin is not working properly.' % (info['class_name'], event))
+            point (before, after). plugin is not working properly.' % (args[0], event))
 
 plugins_loaded = False
 def load_plugins(parser):
-    global plugins_loaded
+    global plugins_loaded, _parser, _plugin_options
     if plugins_loaded:
         if parser is not None:
-            for name, info in plugins.iteritems():
-                info.add_options(parser)
+            for args, kwargs in _plugin_options:
+                parser.add_option(*args, **kwargs)
         return 0
     start_time = time.clock()
-    load_plugins_from_dirs(get_standard_plugins_path(), parser)
+    _parser = parser
+    load_plugins_from_dirs(get_standard_plugins_path())
+    _parser = None
     took = time.clock() - start_time
     plugins_loaded = True
     return took

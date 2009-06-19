@@ -4,10 +4,9 @@ import urllib2
 import logging
 import shutil
 import filecmp
-from flexget.plugin import PluginWarning, PluginError
+from flexget.plugin import *
 
 log = logging.getLogger('download')
-
 class PluginDownload:
 
     """
@@ -34,16 +33,6 @@ class PluginDownload:
         You may use commandline parameter --dl-path to temporarily override 
         all paths to another location.
     """
-
-    __plugin__ = 'download'
-    __parser_options__ = [
-        (
-            ['--dl-path'],
-            dict(action='store', dest='dl_path', default=False,
-                 help='Override path for download plugin. Applies to all executed feeds.')
-        )
-    ]
-
     def validator(self):
         """Return config validator"""
         from flexget import validator
@@ -267,3 +256,7 @@ class PluginDownload:
                 log.debug('removing temp file %s from %s' % (entry['file'], entry['title']))
                 os.remove(entry['file'])
             del(entry['file'])
+
+register_plugin(PluginDownload, 'download')
+register_parser_option('--dl-path', action='store', dest='dl_path', default=False,
+                       help='Override path for download plugin. Applies to all executed feeds.')

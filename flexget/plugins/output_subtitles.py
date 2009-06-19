@@ -7,6 +7,7 @@ import sys
 import logging
 
 from flexget.manager import Session, Base
+from flexget.plugin import *
 from sqlalchemy import Column, Integer, String, DateTime, PickleType
 from datetime import datetime, timedelta
 
@@ -50,13 +51,9 @@ log = logging.getLogger('subtitles')
 # http://trac.opensubtitles.org/projects/opensubtitles/wiki/XMLRPC
 
 class Subtitles:
-    
     """
     Fetch subtitles from opensubtitles.org
     """
-
-    __plugin__ = 'subtitles'
-
     def validator(self):
         from flexget import validator
         subs = validator.factory('dict')
@@ -167,3 +164,4 @@ class Subtitles:
                 f.close()
 
         s.LogOut(token)     
+register_plugin(Subtitles, 'subtitles')

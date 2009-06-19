@@ -1,9 +1,9 @@
 import logging
+from flexget.plugin import *
 
 log = logging.getLogger('limit_new')
 
 class FilterLimitNew:
-
     """
         Limit number of new items.
 
@@ -17,9 +17,6 @@ class FilterLimitNew:
         Note that since this is per execution, actual rate depends how often
         FlexGet is executed.
     """
-
-    __plugin__ = 'limit_new'
-
     def validator(self):
         from flexget import validator
         return validator.factory('number')
@@ -37,3 +34,5 @@ class FilterLimitNew:
                 passed += 1
             i += 1
         log.debug('Rejected: %s Passed: %s' % (rejected, passed))
+
+register_plugin(FilterLimitNew, 'limit_new')

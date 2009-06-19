@@ -1,5 +1,5 @@
 import logging
-from flexget.plugin import PluginWarning
+from flexget.plugin import *
 
 log = logging.getLogger('cli_config')
 
@@ -23,16 +23,6 @@ class CliConfig:
         --cli-config "url=http://some.url/, path=~/downloads"
         
     """
-
-    __plugin__ = 'cli_config'
-    __plugin_builtin__ = True
-    __parser_options__ = [
-        (
-            ['--cli-config'],
-            dict(action='store', dest='cli_config', default=False,
-                 help='Configuration parameters trough commandline. See --doc cli_config.')
-        )
-    ]
 
     def __init__(self):
         self.replaces = {}
@@ -84,3 +74,7 @@ class CliConfig:
         if self.parse_replaces(feed):
             self.replace_dict(feed.config, self.replaces)
             log.debug(feed.config)
+
+register_plugin(CliConfig, 'cli_config', builtin=True)
+register_parser_option('--cli-config', action='store', dest='cli_config', default=False,
+                       help='Configuration parameters trough commandline. See --doc cli_config.')

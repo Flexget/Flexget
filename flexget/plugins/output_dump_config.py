@@ -1,4 +1,5 @@
 import logging
+from flexget.plugin import *
 
 log = logging.getLogger('dump_config')
 
@@ -6,9 +7,6 @@ class OutputDumpConfig:
     """
         Dumps feed config in STDOUT in yaml at exit or abort event.
     """
-
-    __plugin__ = 'dump_config'
-    __plugin_debug__ = True
 
     def validator(self, config):
         from flexget import validator
@@ -21,3 +19,5 @@ class OutputDumpConfig:
         print '---'
         
     feed_abort = feed_exit
+
+register_plugin(OutputDumpConfig, 'dump_config', debug=True)

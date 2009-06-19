@@ -1,5 +1,5 @@
 import urllib, logging, re
-from flexget.plugin import PluginWarning, get_plugin_by_name
+from flexget.plugin import *
 
 log = logging.getLogger('regexp')
 
@@ -28,9 +28,6 @@ class FilterRegexp:
         
         Possible operations: accept, reject, accept_excluding, reject_excluding        
     """
-
-    __plugin__ = 'regexp'
-    
     def validator(self):
         from flexget import validator
 
@@ -172,3 +169,5 @@ class FilterRegexp:
             return rest
         else:
             return None
+
+register_plugin(FilterRegexp, 'regexp')

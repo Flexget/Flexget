@@ -1,5 +1,5 @@
 import logging
-from flexget.plugin import get_plugin_by_name
+from flexget.plugin import *
 from sys import maxint
 
 log = logging.getLogger('torrent_size')
@@ -14,9 +14,6 @@ class FilterTorrentSize:
 
         Unit is MB
     """
-
-    __plugin__ = 'torrent_size'
-
     def validator(self):
         from flexget import validator
         config = validator.factory('dict')
@@ -43,3 +40,5 @@ class FilterTorrentSize:
                     get_plugin_by_name('seen').instance.learn(feed, entry)
             else:
                 log.debug('Entry %s is not a torrent' % entry['title'])
+
+register_plugin(FilterTorrentSize, 'torrent_size')

@@ -1,5 +1,5 @@
 import logging
-from flexget.plugin import get_plugins_by_group
+from flexget.plugin import *
 
 __pychecker__ = 'unusednames=parser'
 
@@ -12,15 +12,6 @@ class ResolverException(Exception):
         return repr(self.value)
 
 class PluginResolver:
-    __plugin__ = 'resolver'
-    __plugin_builtin__ = True
-    __priorities__ = {
-        'resolve': 255
-    }
-    __feed_events__ = [
-        ('resolve', { 'before': 'download' })
-    ]
-
     def feed_resolve(self, feed):
         # no resolves in unit test mode
         if feed.manager.unit_test: 
@@ -65,3 +56,6 @@ class PluginResolver:
             except ResolverException, e:
                 log.warn(e.value)
                 feed.fail(entry)
+
+register_plugin(PluginResolver, 'resolver', builtin=True, priorities={'resolve': 255})
+register_feed_event(PluginResolver, 'resolve', before='download')

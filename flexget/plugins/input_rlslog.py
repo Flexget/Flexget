@@ -1,7 +1,7 @@
 import urllib2, logging, re
 from httplib import BadStatusLine
 from flexget.feed import Entry
-from flexget.plugin import PluginWarning, get_plugin_by_name
+from flexget.plugin import *
 from flexget.utils.log import log_once
 from flexget.utils.soup import get_soup
 
@@ -14,9 +14,6 @@ class RlsLog:
         In case of movies the plugin supplies pre-parses IMDB-details
         (helps when chaining with filter_imdb).
     """
-
-    __plugin__ = 'rlslog'
-
     def validator(self):
         from flexget import validator
         return validator.factory('url')
@@ -121,3 +118,5 @@ class RlsLog:
                 apply_field(release, entry, field)
 
             feed.entries.append(entry)
+
+register_plugin(RlsLog, 'rlslog')

@@ -1,5 +1,5 @@
 import logging, datetime, operator, os
-from flexget.plugin import PluginWarning
+from flexget.plugin import *
 from flexget.manager import Base
 from sqlalchemy import Column, Integer, String, Unicode, DateTime, Boolean, PickleType, func
 from sqlalchemy.schema import ForeignKey
@@ -91,9 +91,6 @@ class OutputRSS:
         Default list: imdb_url, input_url, url
         
     """
-
-    __plugin__ = 'make_rss'
-
     def __init__(self):
         self.written = {}
 
@@ -199,3 +196,5 @@ class OutputRSS:
             log.error('Unable to write %s' % fn)
             return
         self.written[config['file']] = True
+
+register_plugin(OutputRSS, 'make_rss')

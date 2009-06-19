@@ -1,5 +1,5 @@
 import logging
-from flexget.plugin import PluginWarning
+from flexget.plugin import *
 
 #from validator_pluginset import PluginSetValidator
 
@@ -15,9 +15,6 @@ class ModifySet:
         set:
           path: ~/download/path/
     """
-
-    __plugin__ = 'set'
-
     def __init__(self):
         self.keys = {}
             
@@ -63,3 +60,5 @@ class ModifySet:
         log.debug('adding set: info to entry:"%s" %s' % (entry['title'], config))
         for key, value in config.iteritems():
             entry[key] = value
+
+register_plugin(ModifySet, 'set')

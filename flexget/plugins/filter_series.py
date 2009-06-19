@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 from flexget.utils.series import SeriesParser
 
 from flexget.manager import Base
-from flexget.plugin import PluginWarning, get_plugin_by_name
+from flexget.plugin import *
 from sqlalchemy import Column, Integer, String, DateTime, Boolean, PickleType
 from sqlalchemy.schema import ForeignKey
 from sqlalchemy.orm import relation,join
@@ -58,15 +58,6 @@ class FilterSeries:
         
         http://flexget.com/wiki/FilterSeries
     """
-    __plugin__ = 'series'
-    __parser_options__ = [
-        (
-            ['--stop-waiting'],
-            { 'action': 'store', 'dest': 'stop_waiting',
-                'default': False, 'help': 'Stop timeframe for a given series.' }
-        )
-    ]
-
     def validator(self):
         from flexget import validator
 
@@ -505,3 +496,7 @@ class FilterSeries:
             parser = entry.get('series_parser')
             if parser:
                 self.mark_downloaded(feed, parser)
+
+register_plugin(FilterSeries, 'series')
+register_parser_option('--stop-waiting', action='store', dest='stop_waiting',
+                       default=False, help='Stop timeframe for a given series.')

@@ -1,7 +1,7 @@
 import logging
 import time, os, sys
 from flexget.manager import Base
-from flexget.plugin import PluginError, get_plugin_by_name
+from flexget.plugin import *
 from sqlalchemy import Column, Integer, String
 from sqlalchemy.schema import ForeignKey
 from sqlalchemy.orm import relation,join
@@ -24,12 +24,6 @@ class OutputDeluge:
     """
         Add the torrents directly to deluge, supporting custom save paths.
     """
-
-    __plugin__ = 'deluge'
-    __priorities__ = {
-        'output': 1
-    }
-
     def validator(self):
         from flexget import validator
         root = validator.factory()
@@ -175,3 +169,4 @@ class OutputDeluge:
                         delugeepisode.torrentid = entry['deluge_torrentid']
                         feed.session.add(delugeepisode)
     """
+register_plugin(OutputDeluge, 'deluge', priorities=dict(output=1))

@@ -1,10 +1,9 @@
 import logging
-from flexget.plugin import PluginWarning, PluginError
+from flexget.plugin import *
 
 log = logging.getLogger('preset')
 
 class PluginPreset:
-
     """
         Use presets.
         
@@ -18,12 +17,6 @@ class PluginPreset:
           - movies
           - imdb
     """
-
-    __plugin__ = 'preset'
-    __plugin_builtin__ = True
-    __priorities__ = {
-        'start': 255
-    }
 
     def validator(self):
         from flexget import validator
@@ -58,3 +51,5 @@ class PluginPreset:
                 merge_dict_from_to(feed.manager.config[preset], feed.config)
             except MergeException:
                 raise PluginError('Failed to merge preset %s to feed %s, incompatible datatypes' % (preset, feed.name))
+
+register_plugin(PluginPreset, 'preset', builtin=True, priorities=dict(start=255))

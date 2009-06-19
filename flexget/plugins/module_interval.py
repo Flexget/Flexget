@@ -1,6 +1,6 @@
 import logging
 import datetime
-from flexget.plugin import PluginWarning
+from flexget.plugin import *
 
 log = logging.getLogger('interval')
 
@@ -15,15 +15,6 @@ class PluginInterval:
         
         interval: 7 days
     """
-
-    __plugin__ = 'interval'
-    __parser_options__ = [
-        (
-            ['--now'],
-            dict(action='store_true', dest='interval_ignore', default=0,
-                 help='Ignore interval(s)')
-        )
-    ]
 
     def validator(self):
         # TODO: make a regexp validation
@@ -51,3 +42,7 @@ class PluginInterval:
         else:
             log.debug('interval passed')
             feed.simple_persistence.set('last_time', datetime.datetime.now())
+
+register_plugin(PluginInterval, 'interval')
+register_parser_option('--now', action='store_true', dest='interval_ignore', default=False,
+                       help='Ignore interval(s)')

@@ -1,6 +1,7 @@
 import urllib
 import logging
 from flexget.manager import Base
+from flexget.plugin import *
 from sqlalchemy import Column, Integer, String, DateTime, PickleType
 from datetime import datetime, timedelta
 
@@ -34,13 +35,6 @@ class FilterSeen(object):
         This plugin is enabled on all feeds by default.
         See wiki for more information.
     """
-
-    __plugin__ = 'seen'
-    __plugin_builtin__ = True
-    __priorities__ = {
-        'filter': 255
-    }
-
     def __init__(self):
         # remember and filter by these fields
         self.fields = ['url', 'title', 'original_url']
@@ -130,3 +124,5 @@ class FilterSeen(object):
                 feed.session.add(seen)
                 count += 1
         log.info('Migrated %s seen items' % count)
+
+register_plugin(FilterSeen, 'seen', builtin=True, priorities=dict(filter=255))

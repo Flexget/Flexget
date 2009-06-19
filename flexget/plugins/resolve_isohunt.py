@@ -1,14 +1,10 @@
 import logging
-
-
+from flexget.plugin import *
 
 log = logging.getLogger("isohunt")
 
 class ResolveIsoHunt:
     """IsoHunt resolver."""
-
-    __plugin__ = 'isohunt'
-    __plugin_groups__ = ['resolver']
 
     def resolvable(self, feed, entry):
         url = entry['url']
@@ -16,3 +12,5 @@ class ResolveIsoHunt:
         
     def resolve(self, feed, entry):
         entry['url'] = entry['url'].replace('torrent_details', 'download')
+
+register_plugin(ResolveIsoHunt, 'isohunt', groups=['resolver'])

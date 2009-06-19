@@ -1,6 +1,6 @@
 import logging
 from flexget.feed import Entry
-from flexget.plugin import PluginError
+from flexget.plugin import *
 import urllib2
 
 mechanize_present = True
@@ -15,11 +15,6 @@ class InputFormLogin:
     """
     Login on form
     """
-
-    __plugin__ = 'form'
-    __priorities__ = {
-        'input': 255
-    }
 
     def feed_input(self, feed):
         if not mechanize_present:
@@ -50,3 +45,5 @@ class InputFormLogin:
 
         opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cookiejar))
         urllib2.install_opener(opener)                                
+
+register_plugin(InputFormLogin, 'form', priorities=dict(input=255))

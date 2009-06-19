@@ -1,5 +1,5 @@
 import logging
-from flexget.plugin import PluginWarning
+from flexget.plugin import *
 from flexget.manager import Base
 from flexget.utils.log import log_once
 from flexget.utils.imdb import ImdbSearch, ImdbParser
@@ -77,7 +77,6 @@ class SearchResult(Base):
 log = logging.getLogger('imdb')
 
 class FilterImdb:
-
     """
         This plugin allows filtering based on IMDB score, votes and genres etc.
 
@@ -105,9 +104,6 @@ class FilterImdb:
         # Reject all entries which are not imdb-compatible (default)
         reject_invalid: True / False
     """
-
-    __plugin__ = 'imdb'
-
     def validator(self):
         """Validate given configuration"""
         from flexget import validator
@@ -331,3 +327,5 @@ class FilterImdb:
             if take_a_break and not feed.manager.options.debug and not feed.manager.unit_test:
                 import time
                 time.sleep(3)
+
+register_plugin(FilterImdb, 'imdb')

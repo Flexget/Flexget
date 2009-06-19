@@ -1,6 +1,6 @@
 import logging
 from flexget import plugin
-from flexget.plugin import PluginWarning
+from flexget.plugin import *
 
 log = logging.getLogger('priority')
 
@@ -15,8 +15,6 @@ class PluginPriority:
           ignore: 50
           series: 100
     """
-
-    __plugin__ = 'priority'
 
     def validator(self):
         from flexget import validator
@@ -47,3 +45,5 @@ class PluginPriority:
     def feed_exit(self, feed):
         for name, original in self.priorities.iteritems():
             plugin.plugins[name].priorities = original
+
+register_plugin(PluginPriority, 'priority')

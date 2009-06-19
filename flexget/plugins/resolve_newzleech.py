@@ -1,5 +1,5 @@
 import urllib, urllib2, logging, re
-from flexget.plugin import PluginWarning
+from flexget.plugin import *
 from flexget.plugins.module_resolver import ResolverException
 from flexget.utils.soup import get_soup
 
@@ -10,9 +10,6 @@ class ResolveNewzleech:
         Resolver or search by using newzleech.com
         TODO: implement resolving
     """
-
-    __plugin__ = 'newzleech'
-    __plugin_groups__ = ['search']
 
     # Search API
     def search(self, feed, entry):
@@ -90,4 +87,5 @@ class ResolveNewzleech:
         nzbs.sort(lambda a, b: cmp(a['size'], b['size']), reverse=True)
         
         entry['url'] = nzbs[0]['url']    
-    
+
+register_plugin(ResolveNewzleech, 'newzleach', groups=['search'])

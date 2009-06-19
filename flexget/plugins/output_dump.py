@@ -1,20 +1,11 @@
 import yaml
 from optparse import SUPPRESS_HELP
+from flexget.plugin import *
 
 class YamlDump:
-
     """
         Dummy plugin for testing, outputs all entries in yaml
     """
-
-    __plugin__ = 'dump'
-    __parser_options__ = [
-        (
-            ['--dump'],
-            dict(action='store_true', dest='dump', default=0, help=SUPPRESS_HELP)
-        )
-    ]
-
     def validator(self):
         from flexget import validator
         return validator.factory('any')
@@ -34,3 +25,5 @@ class YamlDump:
         if feed.rejected:
             print '-- Rejected: ---------------------------'
             dump(feed.rejected)
+register_plugin(YamlDump, 'dump')
+register_parser_option('--dump', action='store', dest='dump', default=0, help=SUPPRESS_HELP)

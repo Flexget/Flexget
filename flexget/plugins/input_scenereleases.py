@@ -1,7 +1,7 @@
 import urllib2, logging, re
 from httplib import BadStatusLine
 from flexget.feed import Entry
-from flexget.plugin import PluginWarning
+from flexget.plugin import *
 from flexget.utils.soup import get_soup
 
 log = logging.getLogger('scenereleases')
@@ -14,9 +14,6 @@ class InputScenereleases:
 
         scenereleases: http://www.scenereleases.info/search/label/Movies%20-%20DVD%20Rip
     """
-
-    __plugin__ = 'scenereleases'
-
     def validator(self):
         from flexget import validator
         return validator.factory('url')
@@ -126,3 +123,5 @@ class InputScenereleases:
                 apply_field(release, entry, field)
 
             feed.entries.append(entry)
+
+register_plugin(InputScenereleases, 'scenereleases')

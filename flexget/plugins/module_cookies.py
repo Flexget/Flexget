@@ -1,7 +1,7 @@
 import logging
 import urllib2
 import cookielib
-from flexget.plugin import PluginWarning
+from flexget.plugin import *
 
 log = logging.getLogger('cookies')
 
@@ -16,8 +16,6 @@ class PluginCookies:
 
         cookies: /path/firefox/profile/something/cookies.sqlite
     """
-
-    __plugin__ = 'cookies'
 
     def validator(self,):
         from flexget import validator
@@ -76,3 +74,5 @@ class PluginCookies:
         """Feed exiting, remove cookiejar"""
         log.debug('Removing urllib2 opener')
         urllib2.install_opener(None)
+
+register_plugin(PluginCookies, 'cookies')
