@@ -54,6 +54,7 @@ PREFIXES = EVENTS + ['module', 'plugin', 'source']
 plugins = {}
 
 def register_plugin(plugin_class, name, groups=[], builtin=False, debug=False, priorities={}):
+    """Registers a plugin."""
     global plugins
     if name in plugins:
         log.critical('Error while registering plugin %s. %s' % (name, ('A plugin with the name %s is already registered' % name)))
@@ -63,12 +64,14 @@ def register_plugin(plugin_class, name, groups=[], builtin=False, debug=False, p
 _parser = None
 _plugin_options = []
 def register_parser_option(*args, **kwargs):
+    """Adds a parser option to the global parser."""
     global _parser, _plugin_options
     _parser.add_option(*args, **kwargs)
     _plugin_options.append((args, kwargs))
 
 _new_event_queue = {}
 def register_feed_event(plugin_class, name, before=None, after=None):
+    """Adds a feed event to the available events."""
     global _new_event_queue, plugins
     if not before is None and not after is None:
         raise RegisterException('You can only give either before or after for a event.')
@@ -109,6 +112,10 @@ def register_feed_event(plugin_class, name, before=None, after=None):
             del _new_event_queue[event_name]
 
 class PluginInfo(dict):
+    """
+        Allows accessing key/value pairs of this dictionary subclass via
+        attributes.  Also instantiates a plugin and initializes properties.
+    """
     def __init__(self, name, item_class, groups=[], builtin=False, debug=False, priorities={}):
         dict.__init__(self)
 
@@ -142,7 +149,16 @@ class PluginInfo(dict):
     def __setattr__(self, attr, value):
         self[attr] = value
 
+    def __str__(self):
+        return "PluginInfo: %s" % self.name
+
+    __repr__ = __str__
+
 class PluginMethod(object):
+    """
+        Proxies an event for a plugin to be used as a callable object
+        while also allowing accessing the plugin's attributes directly.
+    """
     def __init__(self, plugin, method_name):
         self.plugin = plugin
         self.method_name = method_name
