@@ -246,12 +246,18 @@ def load_plugins_from_dir(d):
 
 plugins_loaded = False
 def load_plugins(parser):
+    """Load plugins from the standard plugin paths."""
     global plugins_loaded, _parser, _plugin_options
     if plugins_loaded:
         if parser is not None:
             for args, kwargs in _plugin_options:
                 parser.add_option(*args, **kwargs)
         return 0
+
+    # suppress DeprecationWarning's
+    import warnings
+    warnings.simplefilter('ignore', DeprecationWarning)
+
     start_time = time.clock()
     _parser = parser
     load_plugins_from_dirs(get_standard_plugins_path())
