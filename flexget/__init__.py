@@ -64,6 +64,12 @@ def start_logging(filename=None, level=logging.INFO, debug=False, quiet=False):
             console.setFormatter(hdlr.formatter)
             logger.addHandler(console)
 
+            # flush memory handler to the console without
+            # destroying the buffer
+            if len(_mem_handler.buffer) > 0:
+                for record in _mem_handler.buffer:
+                    console.handle(record)
+
         # flush what we have stored from the plugin initialization
         _mem_handler.flush()
 
