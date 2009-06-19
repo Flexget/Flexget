@@ -273,6 +273,19 @@ class TestInputHtml(FlexGetBase):
         self.execute_feed('test')
         assert self.feed.entries, 'did not produce entries'
 
+class TestRlsLog(FlexGetBase):
+
+    __yaml__ = """
+        feeds:
+          test:
+            rlslog: http://www.rlslog.net/category/movies/dvdrip/
+    """
+
+    def testParsing(self):
+        self.execute_feed('test')
+        assert self.feed.entries, 'no entries created'
+        
+        
 class TestDownload(FlexGetBase):
     __yaml__ = """
         feeds:
