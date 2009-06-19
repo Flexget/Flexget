@@ -302,7 +302,7 @@ def get_methods_by_event(event):
 def get_plugins_by_group(group):
     """Return all plugins with in specified group."""
     res = []
-    for _, info in plugins.itervalues():
+    for info in plugins.itervalues():
         if group in info.get('groups'):
             res.append(info)
     return res
