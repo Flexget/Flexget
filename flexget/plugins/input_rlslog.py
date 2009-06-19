@@ -6,6 +6,7 @@ from flexget.feed import Entry
 from flexget.manager import PluginWarning
 from flexget.utils.log import log_once
 from flexget.utils.soup import get_soup
+from BeautifulSoup import NavigableString
 
 log = logging.getLogger('rlslog')
 
@@ -71,6 +72,8 @@ class RlsLog:
             for link in entrybody.findAll('a'):
                 link_name = link.contents[0]
                 if link_name == None:
+                    continue
+                if not isinstance(link_name, NavigableString):
                     continue
                 link_name = link_name.strip().lower()
                 link_href = link['href']
