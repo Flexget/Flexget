@@ -81,7 +81,7 @@ def main():
     parser = OptionParser()
     time_took = plugin.load_plugins(parser)
 
-    log.info('plugins took %.2f seconds to load' % time_took)
+    log.debug('Plugins took %.2f seconds to load' % time_took)
 
     options = parser.parse_args()[0]
 
@@ -130,4 +130,5 @@ def main():
         else:
             manager.execute()
     finally:
+        manager.shutdown()
         os.remove(lockfile)

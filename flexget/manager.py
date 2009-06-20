@@ -2,8 +2,6 @@ import os, os.path
 import sys
 import logging
 import logging.handlers
-import time
-import pkg_resources
 from datetime import datetime
 
 log = logging.getLogger('manager')
@@ -51,16 +49,10 @@ class Manager:
 
         self.initialize()
             
-        # TODO: xxx
-        if self.options.test:
-            print '--test is broken again .. please wait while the code elves are working'
-            sys.exit(1)
-            
         if self.options.log_start:
             logging.info('FlexGet started')
 
         log.debug('Default encoding: %s' % sys.getdefaultencoding())
-            
 
     def initialize(self):
         """Separated from __init__ so that unit test can modify options before loading config."""
@@ -100,6 +92,7 @@ class Manager:
 
     def init_sqlalchemy(self):
         """Initialize SQLAlchemy"""
+        import shutil
         
         # load old shelve session
         if self.options.migrate:
@@ -109,17 +102,25 @@ class Manager:
         if os.path.exists(shelve_session_name):
             import shelve
             import copy
-            import shutil
             log.critical('Old shelve session found, relevant data will be migrated.')
             old = shelve.open(shelve_session_name, flag='r', protocol=2)
             self.shelve_session = copy.deepcopy(old['cache'])
             old.close()
-            #shutil.move(shelve_session_name, '%s_migrated' % shelve_session_name)
+            shutil.move(shelve_session_name, '%s_migrated' % shelve_session_name)
         
         # SQLAlchemy
         self.db_filename = os.path.join(self.config_base, 'db-%s.sqlite' % self.configname)
+        
+        if self.options.test:
+            db_test_filename = os.path.join(self.config_base, 'test-%s.sqlite' % self.configname)
+            log.info('Test mode, creating a copy from database.')
+            if os.path.exists(self.db_filename):
+                shutil.copy(self.db_filename, db_test_filename)
+            self.db_filename = db_test_filename 
+        
         # in case running on windows, needs double \\
         filename = self.db_filename.replace('\\', '\\\\')
+
         connection = 'sqlite:///%s' % filename
         log.debug('connection: %s' % connection)
         try:
@@ -214,6 +215,7 @@ class Manager:
             log.critical('Configuration file is empty.')
             return
         
+        # separated for future when flexget runs continously in the background
         self.create_feeds()
 
         failed = []
@@ -253,4 +255,14 @@ class Manager:
             try:
                 feed.process_end()
             except Exception, e:
-                log.exception('Feed %s process_end: %s' % (name, e))       
+                log.exception('Feed %s process_end: %s' % (name, e))
+                
+    def shutdown(self):
+        """Application is being exited"""
+        
+        # remove temporary database used in test mode
+        if self.options.test:
+            if not 'test' in self.db_filename:
+                raise Exception('trying to delete non test database?')
+            os.remove(self.db_filename)
+            log.info('Removed test database') 
