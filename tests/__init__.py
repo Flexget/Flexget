@@ -33,7 +33,6 @@ class MockManager(Manager):
         try:
             self.config = yaml.safe_load(self.config_text)
         except Exception, e:
-            log.critical(e)
             print ''
             print '-'*79
             print ' This is caused by malformed configuration file, common reasons:'
@@ -75,12 +74,6 @@ class FlexGetBase(object):
         self.feed.execute()
         self.feed.process_end()
         
-    def get_plugin(self, event, keyword):
-        plugin = get_plugin_by_name(keyword)
-        if not plugin:
-            raise Exception('plugin %s isn\'t loaded (event %s)' % (keyword, event))
-        return plugin
-
     def dump(self):
         """Helper method for debugging"""
         print 'entries=%s' % self.feed.entries
@@ -280,10 +273,26 @@ class TestRlsLog(FlexGetBase):
             rlslog: http://www.rlslog.net/category/movies/dvdrip/
     """
 
+    @attr(online=True)
     def testParsing(self):
         self.execute_feed('test')
         assert self.feed.entries, 'no entries created'
-        
+
+class TestPriority(FlexGetBase):
+
+    __yaml__ = """
+        feeds:
+          test:
+            input_mock:
+              - {title: 'Smoke', url: 'http://localhost/smoke'}
+            accept_all: true
+            priority:
+              accept_all: 100
+    """
+
+    def testSmoke(self):
+        self.execute_feed('test')
+        assert self.feed.entries, 'no entries created'
         
 class TestDownload(FlexGetBase):
     __yaml__ = """

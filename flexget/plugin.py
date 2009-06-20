@@ -124,7 +124,7 @@ class PluginInfo(dict):
 
         try:
             instance = item_class()
-        except Exception, e:
+        except Exception:
             raise
 
         self.instance = instance
@@ -133,7 +133,7 @@ class PluginInfo(dict):
         self.debug = debug
 
         self.events = False
-        for event, method in EVENT_METHODS.iteritems():
+        for method in EVENT_METHODS.itervalues():
             if hasattr(instance, method):
                 if callable(getattr(instance, method)):
                     self.events = True
@@ -144,7 +144,7 @@ class PluginInfo(dict):
     def __getattr__(self, attr):
         if attr in self:
             return self[attr]
-        return dict.__getattr__(self, attr)
+        return dict.__getattribute__(self, attr)
 
     def __setattr__(self, attr, value):
         self[attr] = value
@@ -166,7 +166,7 @@ class PluginMethod(object):
     def __getattr__(self, attr):
         if attr in self.plugin:
             return self.plugin[attr]
-        return object.__getattr__(self, attr)
+        return object.__getattribute__(self, attr)
 
     def __getitem__(self, key):
         return self.plugin[key]
@@ -196,8 +196,7 @@ def get_standard_plugins_path():
             # If distutuils is not available, we just won't add that path
             pass
         else:
-            archless_path = os.path.join(get_python_lib(), 'flexget',
-                    'plugins')
+            archless_path = os.path.join(get_python_lib(), 'flexget', 'plugins')
             if archless_path not in path:
                 path.append(archless_path)
     return path
