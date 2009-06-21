@@ -6,9 +6,13 @@ log = logging.getLogger('path_by_ext')
 
 class PluginPathByExt:
     """
-    path_by_ext:
-      torrent: ~/watch/torrent/
-      nzb: ~/watch/nzb/
+        Allows specifying path based on content-type
+        
+        Example:
+    
+        path_by_ext:
+          torrent: ~/watch/torrent/
+          nzb: ~/watch/nzb/
     """
 
     def validator(self):
