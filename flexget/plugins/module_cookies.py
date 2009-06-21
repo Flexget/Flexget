@@ -17,7 +17,7 @@ class PluginCookies:
         cookies: /path/firefox/profile/something/cookies.sqlite
     """
 
-    def validator(self,):
+    def validator(self):
         from flexget import validator
         return validator.factory('file')
 
