@@ -1,4 +1,9 @@
-To start using flexget from this directory, copy your configuration and db-config.sqlite here and run the following commands:
+Check that you have Python2.5 available with command 'python -V'. In some
+environments that might be available via 'python25' command in which case you need
+to use that one instead of plain 'python'.
+
+To start using flexget from this directory, run the following commands:
+
 python bootstrap.py
 bin/flexget
 
