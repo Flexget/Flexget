@@ -1,3 +1,4 @@
+from flexget.utils.log import log_once
 import logging
 import re
 
@@ -124,7 +125,7 @@ class SeriesParser:
                 self.valid = True
                 return
 
-        log.debug('FAIL: unable to find any id from %s' % data)
+        log_once('%s looks like series %s but I cannot find any episode or id numbering!' % (self.data, self.name))
 
     def identifier(self):
         """Return identifier for parsed episode"""
