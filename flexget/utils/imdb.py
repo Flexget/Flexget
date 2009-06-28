@@ -131,7 +131,11 @@ class ImdbSearch:
     def search(self, name):
         """Return array of movie details (dict)"""
         log.debug('Searching: %s' % name)
-        url = u'http://www.imdb.com/find?' + urllib.urlencode({'q':name.encode('latin1'), 's':'all'})
+        try:
+            url = u'http://www.imdb.com/find?' + urllib.urlencode({'q':name.encode('latin1'), 's':'all'})
+        except:
+            log.warning('Problems with encoding %s, string possibly corrupted? Ignoring troublesome characters.' % name)
+            url = u'http://www.imdb.com/find?' + urllib.urlencode({'q':name.encode('latin1', 'ignore'), 's':'all'})
         log.debug('Serch query: %s' % repr(url))
         page = urllib2.urlopen(url)
         actual_url = page.geturl()
@@ -172,7 +176,7 @@ class ImdbSearch:
                 log.debug('section %s does not have links' % section)
             for link in links:
                 # skip links with div as a parent (not movies, somewhat rare links in additional details)
-                if link.parent.name==u'div': 
+                if link.parent.name == u'div': 
                     continue
                     
                 # skip links without text value, these are small pictures before title
@@ -195,7 +199,6 @@ class ImdbSearch:
                 seq = difflib.SequenceMatcher(lambda x: x==' ', movie['name'], name)
                 ratio = seq.ratio()
                 # check if some of the akas have better ratio
-                aka_re = re.compile('".*"')
                 for aka in [l for l in link.parent.findAll(text=re.compile('".*"')) if l.parent.name == 'em']:
                     aka = aka.replace('"', '')
                     seq = difflib.SequenceMatcher(lambda x: x==' ', aka.lower(), name.lower())
@@ -204,7 +207,7 @@ class ImdbSearch:
                         log.debug('- aka %s has better ratio %s' % (aka, aka_ratio))
                         ratio = aka_ratio
                 # priorize popular titles
-                if section!=sections[0]:
+                if section != sections[0]:
                     ratio = ratio * self.unpopular_weight
                 else:
                     log.debug('- priorizing popular title')

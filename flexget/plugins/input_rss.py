@@ -207,7 +207,10 @@ class InputRSS:
                 from flexget.utils.tools import decode_html
                 ea['title'] = entry.title
                 if 'description' in entry:
-                    ea['description'] = decode_html(entry.description)
+                    try:
+                        ea['description'] = decode_html(entry.description)
+                    except UnicodeDecodeError:
+                        log.warning('Failed to decode entry %s description' % ea['title'])
                 # store basic auth info
                 if 'username' in config and 'password' in config:
                     ea['basic_auth_username'] = config['username']
