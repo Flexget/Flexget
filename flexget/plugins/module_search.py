@@ -38,6 +38,7 @@ class Search:
             plugins[plugin.name] = plugin.instance
             
         for entry in feed.entries:
+            found = False
             # loop trough configured searches
             for name in feed.config.get('search', []):
                 if not name in plugins:
@@ -50,8 +51,10 @@ class Search:
                     if url:
                         log.debug('Found url: %s' % url)
                         entry['url'] = url
-                        return
-                    else:
-                        feed.reject(entry, 'search failed')
+                        found = True
+                        break
+            # failed
+            if not found:
+                feed.reject(entry, 'search failed')
 
 register_plugin(Search, 'search')
