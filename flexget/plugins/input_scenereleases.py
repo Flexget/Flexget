@@ -3,6 +3,7 @@ from httplib import BadStatusLine
 from flexget.feed import Entry
 from flexget.plugin import *
 from flexget.utils.soup import get_soup
+from BeautifulSoup import NavigableString
 
 log = logging.getLogger('scenereleases')
 
@@ -41,11 +42,11 @@ class InputScenereleases:
         soup = get_soup(page)
             
         releases = []
-        for entry in soup.findAll('div', attrs={'id':re.compile('post', re.IGNORECASE)}):
+        for entry in soup.findAll('div', attrs={'class':'entry'}):
             release = {}
-            title = entry.find('h3')
+            title = entry.find('h2')
             if not title:
-                log.debug('No h3 entrytitle')
+                log.debug('No h2 entrytitle')
                 continue
             release['title'] = title.a.contents[0].strip()
 
@@ -62,14 +63,16 @@ class InputScenereleases:
             
             for link in entry.findAll('a'):
                 link_name = link.contents[0]
-                if link_name == None:
+                if link_name is None:
+                    continue
+                if not isinstance(link_name, NavigableString):
                     continue
                 link_name = link_name.strip().lower()
                 if link.has_key('href'):
                     link_href = link['href']
                 else:
                     continue
-                #log.debug('found link %s -> %s' % (link_name, link_href))
+                log.debug('found link %s -> %s' % (link_name, link_href))
                 # handle imdb link
                 if link_name.lower() == 'imdb':
                     log.debug('found imdb link %s' % link_href)
@@ -84,20 +87,18 @@ class InputScenereleases:
                 temp = {}
                 temp['title'] = release['title']
                 temp['url'] = link_href
-                resolver = feed.manager.plugin.get_plugin_by_name('resolver')
+                resolver = get_plugin_by_name('resolver')
                 if resolver['instance'].resolvable(feed, temp):
                     release['url'] = link_href
-
-                # if name is torrent
-                if link_name.lower() == 'torrent':
-                    log.debug('found torrent url %s' % link_href)
-                    release['url'] = link_href
+                    log.log(5, '--> accepting %s (resolvable)' % link_href)
+                else:
+                    log.log(5, '<-- ignoring %s (non-resolvable)' % link_href)
 
             # reject if no torrent link
-            if release.has_key('url'):
-                releases.append(release)
+            if not 'url' in release:
+                log_once('%s skipped due to missing or unrecognized download link' % (release['title']), log)
             else:
-                log.info('%s rejected due to missing or unrecognized torrent link' % (release['title']))
+                releases.append(release)
 
         return releases
 
