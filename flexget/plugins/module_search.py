@@ -51,5 +51,7 @@ class Search:
                         log.debug('Found url: %s' % url)
                         entry['url'] = url
                         return
+                    else:
+                        feed.reject(entry, 'search failed')
 
 register_plugin(Search, 'search')
