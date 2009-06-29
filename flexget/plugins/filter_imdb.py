@@ -265,8 +265,8 @@ class FilterImdb:
                     imdb.votes = cached.votes
                     imdb.score = cached.score
                     imdb.plot_outline = cached.plot_outline
-                    imdb.genres = cached.genres
-                    imdb.languages = cached.languages
+                    imdb.genres = [genre.name for genre in cached.genres]
+                    imdb.languages = [lang.name for lang in cached.languages]
             else:
                 # Set few required fields manually from entry, and thus avoiding request & parse
                 # Note: It doesn't matter even if some fields are missing, previous imdb_required
@@ -278,8 +278,13 @@ class FilterImdb:
                 imdb.languages = entry.get('imdb_languages', [])
                 imdb.genres = entry.get('imdb_genres', [])
 
-            # Check defined conditions, TODO: rewrite into functions?
+            log.log(5, 'imdb.score: %s' % imdb.score)
+            log.log(5, 'imdb.votes: %s' % imdb.votes)
+            log.log(5, 'imdb.year: %s' % imdb.year)
+            log.log(5, 'imdb.genres: %s' % imdb.genres)
+            log.log(5, 'imdb.languages: %s' % imdb.languages)
             
+            # Check defined conditions, TODO: rewrite into functions?
             reasons = []
             if 'min_score' in config:
                 if imdb.score < config['min_score']:
@@ -317,8 +322,11 @@ class FilterImdb:
             entry['imdb_votes'] = imdb.votes
 
             if reasons:
-                log_once('Rejecting %s because of rule(s) %s' % (entry['title'], ', '.join(reasons)), log)
-                feed.reject(entry, ', '.join(reasons))
+                msg = 'Skipping %s because of rule(s) %s' % (entry['title'], ', '.join(reasons))
+                if feed.manager.options.debug:
+                    log.debug(msg)
+                else:
+                    log_once(msg, log)
             else:
                 log.debug('Accepting %s' % (entry))
                 feed.accept(entry)
