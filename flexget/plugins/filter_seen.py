@@ -47,6 +47,30 @@ class FilterSeen(object):
         root.accept('text')
         return root
 
+    def process_start(self, feed):
+        """Implements --forget"""
+        name = feed.manager.options.forget
+        if not name:
+            return
+        
+        # don't run any feeds
+        for afeed in feed.manager.feeds.itervalues():
+            afeed.enabled = False
+        
+        if not name in feed.manager.feeds:
+            log.critical('Unknown feed %s' % name)
+            return
+        
+        from flexget.manager import Session
+        session = Session()
+        count = 0
+        for seen in session.query(Seen).filter(Seen.feed == name):
+            session.delete(seen)
+            count += 1
+        session.commit()
+        
+        log.info('Forgot %s memories' % count)
+
     def feed_filter(self, feed):
         """Filter seen entries"""
         if not feed.config.get('seen', True):
@@ -126,3 +150,5 @@ class FilterSeen(object):
         log.info('Migrated %s seen items' % count)
 
 register_plugin(FilterSeen, 'seen', builtin=True, priorities=dict(filter=255))
+register_parser_option('--forget', action='store', dest='forget', default=False,
+                       help='Forget what has been seen in a feed')
