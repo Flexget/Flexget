@@ -375,10 +375,10 @@ class DictValidator(Validator):
             rules = self.valid.get(key, [])
             rules.extend(self.any_key)
             if not self.validate_item(value, rules):
-                if count==self.errors.count():
+                if count == self.errors.count():
                     # containers should only add errors if inner validators did not
                     l = [r.name for r in rules]
-                    self.errors.add('key \'%s\' is not valid %s' % (value, ', '.join(l)))
+                    self.errors.add('value \'%s\' is not valid %s' % (value, ', '.join(l)))
         for required in self.required_keys:
             if not required in data:
                 self.errors.add('key \'%s\' required' % required)

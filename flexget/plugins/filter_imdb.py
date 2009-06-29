@@ -328,4 +328,4 @@ class FilterImdb:
                 import time
                 time.sleep(3)
 
-register_plugin(FilterImdb, 'imdb')
+register_plugin(FilterImdb, 'imdb', priorities={'filter': 10})

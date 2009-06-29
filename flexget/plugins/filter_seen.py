@@ -61,6 +61,7 @@ class FilterSeen(object):
             log.critical('Unknown feed %s' % name)
             return
         
+        # in process_start the feed.session is not available
         from flexget.manager import Session
         session = Session()
         count = 0
