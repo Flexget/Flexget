@@ -1,5 +1,5 @@
 import logging
-import time, os, sys
+import time, os, sys, base64
 from flexget.manager import Base
 from flexget.plugin import *
 from sqlalchemy import Column, Integer, String
@@ -7,18 +7,6 @@ from sqlalchemy.schema import ForeignKey
 from sqlalchemy.orm import relation,join
 
 log = logging.getLogger('deluge')
-
-class DelugeEpisode(Base):
-    
-    __tablename__ = 'deluge_episodes'
-
-    id = Column(Integer, primary_key=True)
-    
-    torrentid = Column(Integer)
-    episode_id = Column(Integer, ForeignKey('series_episodes.id'))
-
-    def __repr__(self):
-        return '<DelugeEpisode(identifier=%s)>' % (self.identifier)
 
 class OutputDeluge:
     """
@@ -81,20 +69,30 @@ class OutputDeluge:
                     elif hasattr(e, 'code'):
                         log.error('The server couldn\'t fulfill the request. Error code: %s' % e.code)
 
-
     def feed_output(self, feed):
         """Add torrents to deluge at exit."""
-        try:
-            from deluge.ui.client import sclient
-        except:
-            raise PluginError('Deluge module required', log)
         config = self.get_config(feed)
-
         # don't add when learning
         if feed.manager.options.learn:
             return
         if not feed.accepted or not config['enabled']:
             return
+        #TODO: Figure out better way to detect version
+        try:
+            from deluge.ui.client import sclient
+        except:
+            log.info("Using deluge 1.2 api")
+            self.add_to_deluge12(feed, config)
+        else:
+            log.info("Using deluge 1.1 api")
+            self.add_to_deluge11(feed, config)
+
+    def add_to_deluge11(self, feed, config):
+        """Add torrents to deluge at exit."""
+        try:
+            from deluge.ui.client import sclient
+        except:
+            raise PluginError('Deluge module required', log)
 
         sclient.set_core_uri()
         opts = {}
@@ -147,26 +145,84 @@ class OutputDeluge:
                     break
             else:
                 log.info("%s is already loaded in deluge. Cannot change label, movedone, or queuetotop" % entry['title'])
-    #TODO: Activate once propers are detected or another use is thought of.
-    """
-    def feed_exit(self, feed):
-        #Remember torrentid of series torrents for future control
-        for entry in feed.accepted:
-            if not 'deluge_torrentid' in entry:
-                continue
-            parser = entry.get('series_parser')
-            if parser:
-                from filter_series import Episode, Series
-                log.debug('storing deluge torrentid for %s' % parser)
-                episode = feed.session.query(Episode).select_from(join(Episode, Series)).\
-                    filter(Series.name==parser.name).filter(Episode.identifier==parser.identifier()).first()
-                if episode:
-                    # if does not exist in database, add new
-                    delugeepisode = feed.session.query(DelugeEpisode).filter(DelugeEpisode.episode_id==episode.id).first()
-                    if not delugeepisode:
-                        delugeepisode = DelugeEpisode()
-                        delugeepisode.episode_id = episode.id
-                        delugeepisode.torrentid = entry['deluge_torrentid']
-                        feed.session.add(delugeepisode)
-    """
+                
+    def add_to_deluge12(self, feed, config):
+        try:
+            from twisted.internet import reactor, defer
+            from deluge.ui.client import client
+        except:
+            raise PluginError('Deluge and twisted module required', log)
+
+        d = client.connect()
+        def on_connect_success(result):
+            if not result:
+                #TODO: connect failed, do something
+                pass
+            def on_success(torrent_id, entry, config):
+                if not torrent_id:
+                    log.info("%s is already loaded in deluge, cannot set movedone, label, or queuetotop." % entry['title'])
+                    return
+                log.info("%s successfully added to deluge." % entry['title'])
+                movedone = entry.get('movedone', config['movedone'])
+                label = entry.get('label', config['label']).lower()
+                queuetotop = entry.get('queuetotop', config['queuetotop'])
+                if movedone:
+                    if not os.path.isdir(movedone):
+                        log.debug("movedone path %s doesn't exist, creating" % movedone)
+                        os.mkdir(movedone)
+                    log.debug("%s move on complete set to %s" % (entry['title'], movedone % entry))
+                    client.core.set_torrent_move_completed(torrent_id, True)
+                    client.core.set_torrent_move_completed_path(torrent_id, movedone % entry)
+                if label:
+                    #TODO: check if label plugin is enabled
+                    client.label.add(label)
+                    client.label.set_torrent(torrent_id, label)
+                    log.debug("%s label set to '%s'" % (entry['title'], label))
+                if queuetotop:
+                    log.debug("%s moved to top of queue" % entry['title'])
+                    client.core.queue_top([torrent_id])
+            def on_fail(result, entry, feed):
+                log.info("%s was not added to deluge! %s" % (entry['title'], result))
+                feed.fail(entry, "Could not be added to deluge")
+            #add the torrents
+            dlist = []
+            for entry in feed.accepted:
+                opts = {}
+                path = entry.get('path', config['path'])
+                if path:
+                    opts['download_location'] = path % entry
+                # see that temp file is present
+                if not os.path.exists(entry['file']):
+                    tmp_path = os.path.join(feed.manager.config_base, 'temp')
+                    log.debug('entry: %s' % entry)
+                    log.debug('temp: %s' % ', '.join(os.listdir(tmp_path)))
+                    raise PluginError("Downloaded temp file '%s' doesn't exist!?" % entry['file'], log)
+                filedump = base64.encodestring(open(entry['file']).read())
+                addresult = client.core.add_torrent_file(entry['title'], filedump, opts)
+                addresult.addCallback(on_success, entry, config).addErrback(on_fail, entry, feed)
+                dlist.append(addresult)
+                #clean up temp file if download plugin is not configured for this feed
+                if not 'download' in feed.config:
+                    os.remove(entry['file'])
+                    del(entry['file'])
+
+            def on_complete(result):
+                def on_disconnect(result):
+                    reactor.stop()
+                client.disconnect().addCallback(on_disconnect).addErrback(on_disconnect)
+            defer.DeferredList(dlist).addCallback(on_complete)
+            
+        def on_connect_fail(result):
+            #clean up temp files
+            for entry in feed.accepted:
+                os.remove(entry['file'])
+                del(entry['file'])
+            #TODO: is aborting the feed the best course of action?
+            log.info('Connect failed: %s' % result)
+            feed.abort()
+            reactor.stop()
+
+        d.addCallback(on_connect_success).addErrback(on_connect_fail)
+        reactor.run()
+
 register_plugin(OutputDeluge, 'deluge', priorities=dict(output=1))
