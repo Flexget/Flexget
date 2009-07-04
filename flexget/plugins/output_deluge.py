@@ -163,7 +163,7 @@ class OutputDeluge:
                     log.info("%s is already loaded in deluge, cannot set movedone, label, or queuetotop." % entry['title'])
                     return
                 log.info("%s successfully added to deluge." % entry['title'])
-                movedone = entry.get('movedone', config['movedone'])
+                movedone = entry.get('movedone', config['movedone']) % entry
                 label = entry.get('label', config['label']).lower()
                 queuetotop = entry.get('queuetotop', config['queuetotop'])
                 if movedone:
