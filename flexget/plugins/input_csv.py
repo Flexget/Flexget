@@ -32,8 +32,8 @@ class InputCSV:
     def validator(self):
         from flexget import validator
         config = validator.factory('dict')
-        config.accept('url', key='url', require=True)
-        values = config.accept('dict', key='values', require=True)
+        config.accept('url', key='url', required=True)
+        values = config.accept('dict', key='values', required=True)
         values.accept_any_key('number')
         return config
 

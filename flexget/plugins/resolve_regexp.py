@@ -1,5 +1,6 @@
 import re
 import logging
+import yaml
 from flexget.plugin import *
 
 log = logging.getLogger('regexp')
@@ -16,7 +17,14 @@ class ResolveRegexp:
             replace: http://www.demonoid.com/files/download/HTTP/
     """
 
-    resolves = {}
+    # built-in resolves
+    
+    resolves = yaml.safe_load("""
+    tvsubtitles:
+      match: http://www.tvsubtitles.net/subtitle-
+      replace: http://www.tvsubtitles.net/download-
+    """
+    )
 
     def validator(self):
         from flexget import validator

@@ -327,7 +327,7 @@ class DictValidator(Validator):
         self.valid.setdefault(key, []).append(v)
         # complain from old format
         if 'require' in kwargs:
-            print 'TODO: REQUIRE USED'
+            print 'Deprecated validator api, should use required=bool instead of require=bool'
         if kwargs.get('required', False):
             self.require_key(key)
         return v
