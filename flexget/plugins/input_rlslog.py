@@ -63,6 +63,9 @@ class RlsLog:
                     release['imdb_score'], release['imdb_votes'] = self.parse_imdb(score_raw)
             
             for link in entrybody.findAll('a'):
+                if not link.contents:
+                    log.log(5, 'link content empty, skipping')
+                    continue
                 link_name = link.contents[0]
                 if link_name == None:
                     continue
