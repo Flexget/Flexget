@@ -8,13 +8,13 @@ class OutputDumpConfig:
         Dumps feed config in STDOUT in yaml at exit or abort event.
     """
 
-    def validator(self, config):
+    def validator(self):
         from flexget import validator
         return validator.factory('boolean')
 
     def feed_exit(self, feed):
         import yaml
-        print '--- %s' % feed.name
+        print '--- config from feed: %s' % feed.name
         print yaml.safe_dump(feed.config)
         print '---'
         
