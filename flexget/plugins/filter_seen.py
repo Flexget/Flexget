@@ -48,30 +48,50 @@ class FilterSeen(object):
         return root
 
     def process_start(self, feed):
-        """Implements --forget"""
-        name = feed.manager.options.forget
-        if not name:
-            return
+        """Implements --forget and --seen"""
         
-        # don't run any feeds
-        for afeed in feed.manager.feeds.itervalues():
-            afeed.enabled = False
+        if feed.manager.options.forget or feed.manager.options.seen:
+            # don't run any feeds
+            for afeed in feed.manager.feeds.itervalues():
+                afeed.enabled = False
+            
+            # in process_start the feed.session is not available
+            from flexget.manager import Session
         
-        if not name in feed.manager.feeds:
-            log.critical('Unknown feed %s' % name)
-            return
-        
-        # in process_start the feed.session is not available
-        from flexget.manager import Session
-        session = Session()
-        count = 0
-        for seen in session.query(Seen).filter(Seen.feed == name):
-            session.delete(seen)
-            count += 1
-        session.commit()
-        
-        log.info('Forgot %s memories' % count)
+        if feed.manager.options.forget:
 
+            name = feed.manager.options.forget
+
+            if not name in feed.manager.feeds:
+                log.critical('Unknown feed %s' % name)
+                return
+            
+            session = Session()
+            count = 0
+            for seen in session.query(Seen).filter(Seen.feed == name):
+                session.delete(seen)
+                count += 1
+            session.commit()
+            
+            log.info('Forgot %s memories' % count)
+            
+        if feed.manager.options.seen:
+
+            if not feed.manager.options.onlyfeed:
+                log.critical('You must specify --feed')
+                return
+            
+            if not feed.manager.options.onlyfeed in feed.manager.feeds:
+                log.critical('Unknown feed %s' % feed.manager.options.onlyfeed)
+                return
+
+            session = Session()
+            seen = Seen('', feed.manager.options.seen, feed.manager.options.onlyfeed)
+            session.add(seen)
+            session.commit()
+            
+            log.info('Added %s as seen in a feed %s. This will affect other feeds as well.' % (feed.manager.options.seen, feed.manager.options.onlyfeed))
+        
     def feed_filter(self, feed):
         """Filter seen entries"""
         if not feed.config.get('seen', True):
@@ -153,3 +173,5 @@ class FilterSeen(object):
 register_plugin(FilterSeen, 'seen', builtin=True, priorities=dict(filter=255))
 register_parser_option('--forget', action='store', dest='forget', default=False,
                        help='Forget what has been seen in a feed')
+register_parser_option('--seen', action='store', dest='seen', default=False,
+                       help='Add url or title to what has been seen in a feed. Use --feed to choose specify a feed.')

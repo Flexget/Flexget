@@ -33,18 +33,8 @@ class MockManager(Manager):
         try:
             self.config = yaml.safe_load(self.config_text)
         except Exception, e:
-            print ''
-            print '-'*79
-            print ' This is caused by malformed configuration file, common reasons:'
-            print '-'*79
-            print ''
-            print ' o Indentation error'
-            print ' o Missing : from end of the line'
-            print ' o If text contains : it must be quoted\n'
-            area = str(e.context_mark)[str(e.context_mark).find('line'):]
-            print ' Check your configuration near %s' % area
-            print ' Fault is almost always in this line or previous\n'
-            sys.exit(1)
+            print 'Invalid configuration'
+            raise
 
 class FlexGetBase(object):
     __yaml__ = """Yaml goes here"""
@@ -207,6 +197,22 @@ class TestResolvers(FlexGetBase):
         resolver.resolve(self.feed, entry)
         assert entry['url'] == 'http://www.nyaatorrents.org/?page=download&tid=12345'
 
+
+class TestRegexpResolver(FlexGetBase):
+    __yaml__ = """
+        feeds:
+          test:
+            input_mock:
+              - {title: 'irrelevant', url: 'http://newzleech.com/?p=123'}
+            regexp_resolve:
+              newzleech:
+                match: http://newzleech.com/?p=
+                replace: http://newzleech.com/?m=gen&dl=1&post=
+    """
+    
+    def testNewzleech(self):
+        self.execute_feed('test')
+        assert not self.feed.find_entry(url='http://newzleech.com/?m=gen&dl=1&post=123'), 'did not resolve properly'
 
 class TestDisableBuiltins(FlexGetBase):
     """

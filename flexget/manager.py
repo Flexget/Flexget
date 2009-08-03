@@ -225,6 +225,7 @@ class Manager:
             if not feed.enabled: 
                 continue
             try:
+                log.log(5, 'calling process_start on a feed %s' % name)
                 feed.process_start()
             except Exception, e:
                 failed.append(name)

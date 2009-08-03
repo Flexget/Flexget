@@ -187,6 +187,7 @@ class Feed:
     def __run_event(self, event):
         """Execute plugin events if plugin is configured for this feed."""
         methods = get_methods_by_event(event)
+        log.log(5, 'Event %s methods %s' % (event, methods))
 
         for method in methods:
             keyword = method.plugin.name

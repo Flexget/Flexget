@@ -209,7 +209,8 @@ class PluginDownload:
 
             # make filename, if entry has perefered filename attribute use it, if not use title
             if not 'filename' in entry:
-                if entry.get('mime-type') == 'html' and config['fail_html']:
+                html_mimes = ['html', 'text/html']
+                if entry.get('mime-type') in html_mimes and config['fail_html']:
                     feed.fail(entry, 'unexpected html content')
                     log.error('Unexpected html content received from %s' % entry['url'])
                     return

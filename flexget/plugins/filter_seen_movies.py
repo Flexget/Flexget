@@ -13,6 +13,11 @@ class FilterSeenMovies(FilterSeen):
         1) Remember all imdb urls from downloaded entries.
         2) If stored imdb url appears again, entry is rejected.
     """
+
+    def process_start(self, feed):
+        """Disable this so it doesn't get ran twice"""
+        pass
+
     def __init__(self):
         # remember and filter by these fields
         self.fields = ['imdb_url']
@@ -20,7 +25,7 @@ class FilterSeenMovies(FilterSeen):
         
     def feed_filter(self, feed):
         # strict method
-        if feed.config['seen_movies']=='strict':
+        if feed.config['seen_movies'] == 'strict':
             for entry in feed.entries:
                 if not 'imdb_url' in entry:
                     log.info('Rejecting %s because of missing imdb url' % entry['title'])
