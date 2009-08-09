@@ -62,10 +62,6 @@ class FilterSeen(object):
 
             name = feed.manager.options.forget
 
-            if not name in feed.manager.feeds:
-                log.critical('Unknown feed %s' % name)
-                return
-            
             session = Session()
             count = 0
             for seen in session.query(Seen).filter(Seen.feed == name):
@@ -75,22 +71,17 @@ class FilterSeen(object):
             
             log.info('Forgot %s memories' % count)
             
+            if count == 0:
+                log.info('Perhaps feed does not exists?')
+            
         if feed.manager.options.seen:
 
-            if not feed.manager.options.onlyfeed:
-                log.critical('You must specify --feed')
-                return
-            
-            if not feed.manager.options.onlyfeed in feed.manager.feeds:
-                log.critical('Unknown feed %s' % feed.manager.options.onlyfeed)
-                return
-
             session = Session()
-            seen = Seen('', feed.manager.options.seen, feed.manager.options.onlyfeed)
+            seen = Seen('', feed.manager.options.seen, '--seen')
             session.add(seen)
             session.commit()
             
-            log.info('Added %s as seen in a feed %s. This will affect other feeds as well.' % (feed.manager.options.seen, feed.manager.options.onlyfeed))
+            log.info('Added %s as seen. This will affect all feeds.' % feed.manager.options.seen)
         
     def feed_filter(self, feed):
         """Filter seen entries"""
