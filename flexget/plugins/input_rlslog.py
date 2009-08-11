@@ -93,7 +93,7 @@ class RlsLog:
 
             # reject if no torrent link
             if not 'url' in release:
-                log_once('%s skipped due to missing or unrecognized download link' % (release['title']), log)
+                log_once('%s skipped due to missing or unsupported (unresolvable) download link' % (release['title']), log)
             else:
                 releases.append(release)
 
