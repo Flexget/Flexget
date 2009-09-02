@@ -69,6 +69,7 @@ class Manager:
         possible = [os.path.join(self.config_base, self.options.config), self.options.config]
         for config in possible:
             if os.path.exists(config):
+                self.pre_check_config(config)
                 try:
                     self.config = yaml.safe_load(file(config))
                 except Exception, e:
@@ -80,15 +81,75 @@ class Manager:
                     print ''
                     print ' o Indentation error'
                     print ' o Missing : from end of the line'
-                    print ' o If text contains : it must be quoted\n'
-                    area = str(e.context_mark)[str(e.context_mark).find('line'):]
-                    print ' Check your configuration near %s' % area
-                    print ' Fault is almost always in this line or previous\n'
+                    print ' o Non ASCII characters (use UTF8)'
+                    print ' o If text contains : or [] characters it must be quoted\n'
+                    try:
+                        if not e.context_mark is None:
+                            area = str(e.context_mark)[str(e.context_mark).find('line'):]
+                            print ' Check your configuration near %s' % area
+                            print ' Fault is almost always in this line or previous\n'
+                    except:
+                        pass
                     sys.exit(1)
                 self.configname = os.path.basename(config)[:-4]
                 return
         log.debug('Tried to read from: %s' % ', '.join(possible))
         raise Exception('Failed to find configuration file %s' % self.options.config)
+    
+    def pre_check_config(self, fn):
+        """
+            Checks configuration file for common mistakes that are easily detectable 
+        """
+        
+        def get_indentation(line):
+            i, n = 0, len(line)
+            while i < n and line[i] == " ":
+                i += 1
+            return i
+                
+        def isodd(n):
+            return bool(n%2)
+        
+        file = open(fn)
+        line_num = 0
+        # flags
+        prev_indentation = 0
+        prev_mapping = False
+        prev_list = True
+        for line in file:
+            line_num += 1
+            # remove linefeed
+            line = line[:-1]
+            # empty line
+            if line.strip()=='':
+                continue
+            indentation = get_indentation(line)
+            
+            #print '%i - %i: %s' % (line_num, indentation, line)
+            #print 'prev_mapping: %s, prev_list: %s, prev_ind: %s' % (prev_mapping, prev_list, prev_indentation)
+            
+            if isodd(indentation):
+                log.warning('Config line %s has odd (uneven) indentation' % line_num)
+            if indentation > prev_indentation + 2 and not prev_mapping:
+                # line increases indentation but previously didn't start mapping
+                log.warning('Confi line %s is likely missing ":" at the end' % (line_num - 1))
+            if indentation > prev_indentation + 2 and prev_mapping:
+                # mapping value indented more than 2
+                log.warning('Config line %s is indented too much' % line_num)
+            if prev_mapping and indentation <= prev_indentation:
+                # after opening a map, indentation decreases
+                log.warning('Config line %s is indented incorrectly (previous line ends with ":")' % line_num)
+            if prev_list and not prev_mapping and indentation > prev_indentation:
+                # after a list item that does NOT start mapping indentation increases
+                log.warning('Config line %s is likely missing ":" at the end' % (line_num - 1))
+                
+            prev_indentation = indentation
+            # this line is a mapping (ends with :)
+            prev_mapping = line[-1] == ':'
+            # this line is a list
+            prev_list = line.strip()[0] == '-'
+            
+        file.close()
 
     def init_sqlalchemy(self):
         """Initialize SQLAlchemy"""

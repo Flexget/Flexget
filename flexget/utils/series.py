@@ -12,7 +12,7 @@ class SeriesParser:
     specials = ['special']
     
     def __init__(self):
-        # name of the serie
+        # name of the series
         self.name = None 
         # data to parse
         self.data = None 
@@ -27,7 +27,7 @@ class SeriesParser:
         self.id = None
 
         self.quality = 'unknown'
-        # false if item does not match serie
+        # false if item does not match series
         self.valid = False
         # optional for storing entry from which this instance is made from
         self.entry = None
@@ -129,7 +129,8 @@ class SeriesParser:
 
     def identifier(self):
         """Return identifier for parsed episode"""
-        if not self.valid: raise Exception('Series flagged invalid')
+        if not self.valid: 
+            raise Exception('Series flagged invalid')
         return self.id
 
     def __str__(self):
