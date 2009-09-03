@@ -123,6 +123,9 @@ class Manager:
             # empty line
             if line.strip()=='':
                 continue
+            # comment line
+            if line[0]=='#':
+                continue
             indentation = get_indentation(line)
             
             #print '%i - %i: %s' % (line_num, indentation, line)
@@ -133,9 +136,11 @@ class Manager:
             if indentation > prev_indentation + 2 and not prev_mapping:
                 # line increases indentation but previously didn't start mapping
                 log.warning('Confi line %s is likely missing ":" at the end' % (line_num - 1))
-            if indentation > prev_indentation + 2 and prev_mapping:
-                # mapping value indented more than 2
+            if indentation > prev_indentation + 2 and prev_mapping and not prev_list:
+                # mapping value after non list indented more than 2
                 log.warning('Config line %s is indented too much' % line_num)
+            if indentation < prev_indentation + 2 and prev_mapping and prev_list:
+                log.warning('Config line %s is not indented enough' % line_num)
             if prev_mapping and indentation <= prev_indentation:
                 # after opening a map, indentation decreases
                 log.warning('Config line %s is indented incorrectly (previous line ends with ":")' % line_num)

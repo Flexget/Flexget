@@ -220,7 +220,7 @@ class FilterSeries:
                 continue
             for series_item in group_series:
                 series_name, series_config = series_item.items()[0]
-                log.debug('series_name: %s series_config: %s' % (series_name, series_config))
+                log.log(5, 'series_name: %s series_config: %s' % (series_name, series_config))
                 series = self.parse_series(feed, series_name, series_config)
                 self.process_series(feed, series, series_name, series_config)
 
