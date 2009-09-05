@@ -1,4 +1,3 @@
-import urllib
 import logging
 from flexget.manager import Base
 from flexget.plugin import *
@@ -48,7 +47,11 @@ class FilterSeen(object):
         return root
 
     def process_start(self, feed):
-        """Implements --forget and --seen"""
+        """Implements --forget <feed> and --seen <value>"""
+
+        # migrate shelve -> sqlalchemy
+        if feed.manager.shelve_session:
+            self.migrate(feed)
         
         if feed.manager.options.forget or feed.manager.options.seen:
             # don't run any feeds
@@ -85,13 +88,9 @@ class FilterSeen(object):
         
     def feed_filter(self, feed):
         """Filter seen entries"""
-        if not feed.config.get('seen', True):
-            log.debug('Seen is disabled')
+        if not feed.config.get(self.keyword, True):
+            log.debug('%s is disabled' % self.keyword)
             return
-        
-        # migrate shelve -> sqlalchemy
-        if feed.manager.shelve_session:
-            self.migrate(feed)
         
         duplicates = []
         for entry in feed.entries:
@@ -116,7 +115,7 @@ class FilterSeen(object):
                         continue
                     if entry.get(field, object()) == duplicate.get(field, object()):
                         log.debug('Rejecting %s because of duplicate field %s' % (duplicate['title'], field))
-                        feed.reject(duplicate)
+                        feed.reject(duplicate, 'duplicate entry with field %s' % field)
                         # TODO: if / when entry has multiple urls it should combine these two entries
                         # now the duplicate is just rejected and considered seen
                         seen = Seen(field, duplicate[field], feed.name)
@@ -143,12 +142,19 @@ class FilterSeen(object):
             if not field in entry:
                 continue
             
-            seen = Seen(field, entry[field], feed.name)
-            feed.session.add(seen)
+            # TODO: see ticket #303
+            if feed.session.query(Seen).filter(Seen.value == entry[field]).\
+                                        filter(Seen.feed == feed.name).first():
+                log.warning('BUG? Tried to add seen but already exists as seen. \
+                    Title: %s Field: %s Value: %s' % (entry['title'], field, entry[field]))
+            else:
+                seen = Seen(field, entry[field], feed.name)
+                feed.session.add(seen)
             
-        log.debug("Learned '%s' '%s'" % (entry['url'], entry['title']))
+                log.debug("Learned '%s' '%s'" % (entry['url'], entry['title']))
                 
     def migrate(self, feed):
+        """Migrates 0.9 session data into new database"""
         shelve = feed.manager.shelve_session
         count = 0
         for name, data in shelve.iteritems():

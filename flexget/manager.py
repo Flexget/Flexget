@@ -1,7 +1,6 @@
-import os, os.path
+import os.path
 import sys
 import logging
-import logging.handlers
 from datetime import datetime
 
 log = logging.getLogger('manager')

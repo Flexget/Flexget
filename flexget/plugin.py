@@ -71,7 +71,7 @@ def register_parser_option(*args, **kwargs):
 
 _new_event_queue = {}
 def register_feed_event(plugin_class, name, before=None, after=None):
-    """Adds a feed event to the available events."""
+    """Adds a new feed event to the available events."""
     global _new_event_queue, plugins
     if not before is None and not after is None:
         raise RegisterException('You can only give either before or after for a event.')
@@ -211,7 +211,7 @@ def load_plugins_from_dirs(dirs):
             load_plugins_from_dir(d)
 
 def load_plugins_from_dir(d):
-    # Get the list of valid python suffixes for modules
+    # Get the list of valid python suffixes for plugins
     # this includes .py, .pyc, and .pyo (depending on if we are running -O)
     # but it doesn't include compiled modules (.so, .dll, etc)
     global _new_event_queue
@@ -240,7 +240,7 @@ def load_plugins_from_dir(d):
 
     if _new_event_queue:
         for event, args in _new_event_queue.iteritems():
-            log.error('plugin %s requested new event %s, but it could not be created at requested \
+            log.error('Plugin %s requested new event %s, but it could not be created at requested \
             point (before, after). plugin is not working properly.' % (args[0], event))
 
 plugins_loaded = False
@@ -355,7 +355,7 @@ def print_doc(plugin_name):
     if plugin:
         found = True
         if not plugin.instance.__doc__:
-            print 'plugin %s does not have documentation' % plugin_name
+            print 'Plugin %s does not have documentation' % plugin_name
         else:
             print plugin.instance.__doc__
         return

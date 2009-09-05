@@ -1,5 +1,4 @@
 import logging
-from datetime import datetime
 from flexget.plugin import PluginWarning, PluginError, get_plugins_by_event, get_methods_by_event, get_plugin_by_name, EVENTS
 from flexget.utils.simple_persistence import SimplePersistence
 
@@ -90,7 +89,7 @@ class Feed:
 
     def __purge(self, purge_what, purge_from, count=True):
         """Purge entries in list from feed.entries"""
-        for entry in purge_what[:]:
+        for entry in purge_what:
             if entry in purge_from:
                 purge_from.remove(entry)
                 if count:
@@ -211,7 +210,7 @@ class Feed:
                 except Exception, e:
                     log.exception('Unhandled error in plugin %s: %s' % (keyword, e))
                     self.abort()
-                # remove entries
+                # purge entries between plugins
                 self.__purge_rejected()
                 self.__purge_failed()
                 # check for priority operations

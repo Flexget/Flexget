@@ -29,8 +29,8 @@ class FilterSeenMovies(FilterSeen):
             for entry in feed.entries:
                 if not 'imdb_url' in entry:
                     log.info('Rejecting %s because of missing imdb url' % entry['title'])
-                    feed.reject(entry)
+                    feed.reject(entry, 'missing imdb url, strict')
         # call super
         super(FilterSeenMovies, self).feed_filter(feed)
 
-register_plugin(FilterSeenMovies, 'seen_movies', priorities=dict(filter=255))
+register_plugin(FilterSeenMovies, 'seen_movies', priorities=dict(filter=64))

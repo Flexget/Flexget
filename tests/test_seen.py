@@ -1,5 +1,4 @@
 from tests import FlexGetBase
-import os
 
 class TestFilterSeen(FlexGetBase):
     __yaml__ = """

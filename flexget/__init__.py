@@ -7,6 +7,7 @@ import os
 import os.path
 import sys
 import logging
+import logging.handlers
 
 log = logging.getLogger('main')
 

@@ -1,7 +1,11 @@
-This directory contains test configuration files for modules. Usefull when developing with flexget.
+This directory contains FlexGet unit tests and related resources. These can only be ran in development environment.
 
-Example:
+To run all tests:
+-----------------
 
-python flexget.py -d -c test/series.yml
+bin/paver test
 
-Ideally in the future there should be one configuration file per each module that is also used for unit testing.
+To run a single test:
+---------------------
+
+bin/nosetests tests/__init__.py:TestDisableBuiltins
