@@ -37,7 +37,7 @@ class MockManager(Manager):
             raise
 
 class FlexGetBase(object):
-    __yaml__ = """Yaml goes here"""
+    __yaml__ = """# Yaml goes here"""
 
     def setUp(self):
         """Set up test env"""
@@ -66,10 +66,12 @@ class FlexGetBase(object):
         
     def dump(self):
         """Helper method for debugging"""
-        print 'entries=%s' % self.feed.entries
-        print 'accepted=%s' % self.feed.accepted
-        print 'rejected=%s' % self.feed.rejected
-
+        print '-- ENTRIES: -----------------------------------------------------'
+        print yaml.dump(self.feed.entries)
+        print '-- ACCEPTED: ----------------------------------------------------'
+        print yaml.dump(self.feed.accepted)
+        print '-- REJECTED: ----------------------------------------------------'
+        print yaml.dump(self.feed.rejected)
 
 class TestRegexp(FlexGetBase):
     __yaml__ = """

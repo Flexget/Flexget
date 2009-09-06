@@ -2,8 +2,6 @@ import logging
 from flexget.feed import Entry
 from flexget.plugin import *
 
-__pychecker__ = 'unusednames=parser'
-
 log = logging.getLogger('input_mock')
 
 class InputMock:

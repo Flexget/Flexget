@@ -131,7 +131,22 @@ class OutputRSS:
                 if field in entry:
                     rss.link = entry[field]
                     break
-            rss.description = entry.get('description', entry.get('imdb_plot_outline')) # TODO: hack! fix at imdb, use field description!
+            
+            # TODO: just a quick hack, implement better :)
+            description = ''
+            if 'imdb_score' in entry:
+                description += 'Score: %s / 10 | ' % entry['imdb_score']
+            if 'imdb_genres' in entry:
+                description += 'Genres: %s | ' % ', '.join(entry['imdb_genres'])
+            if 'imdb_plot_outline' in entry:
+                description += 'Description: %s' % entry['imdb_plot_outline']
+            else:
+                description += entry.get('description', '')
+            
+            rss.description = description 
+            
+            
+            
             rss.file = config['file']
             feed.session.add(rss)
 

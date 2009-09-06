@@ -34,7 +34,9 @@ class TestImdbOnline(FlexGetBase):
     def testYear(self):
         self.execute_feed('year')
         assert self.feed.find_entry('accepted', imdb_name='Taken'), 'Taken should\'ve been accepted'
-        assert self.feed.find_entry('rejected', imdb_name='Mononoke-hime'), 'Mononoke-hime should\'ve been rejected'
+        # mononoke should not be accepted (or rejected)
+        assert self.feed.find_entry('accepted', imdb_name='Mononoke-hime'), 'Mononoke-hime should not have been accepted'
+        assert self.feed.find_entry('rejected', imdb_name='Mononoke-hime'), 'Mononoke-hime should not have been rejected'
 
 class TestScanImdb(FlexGetBase):
     __yaml__ = """
