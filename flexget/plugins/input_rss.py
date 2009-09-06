@@ -112,7 +112,7 @@ class InputRSS:
             rss = feedparser.parse(url, etag=etag, modified=modified)
         except IOError, e:
             if hasattr(e, 'reason'):
-                raise PluginError('Failed to reach server. Reason: %s' % e.reason)
+                raise PluginError('Failed to reach server for feed %s. Reason: %s' % (feed.name, e.reason))
             elif hasattr(e, 'code'):
                 raise PluginError('The server couldn\'t fulfill the request. Error code: %s' % e.code)
 
@@ -147,7 +147,7 @@ class InputRSS:
                 raise PluginWarning('RSS Feed %s is not valid XML' % feed.name, log)
             elif isinstance(ex, IOError):
                 if hasattr(ex, 'reason'):
-                    raise PluginError('Failed to reach server. Reason: %s' % ex.reason, log)
+                    raise PluginError('Failed to reach server for feed %s. Reason: %s' % (feed.name, e.reason), log)
                 elif hasattr(ex, 'code'):
                     raise PluginError('The server couldn\'t fulfill the request. Error code: %s' % ex.code, log)
             else:
