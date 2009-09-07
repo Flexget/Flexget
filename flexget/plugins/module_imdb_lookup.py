@@ -1,4 +1,5 @@
 import logging
+from optparse import SUPPRESS_HELP
 from flexget.plugin import *
 from flexget.manager import Base
 from flexget.utils.log import log_once
@@ -130,13 +131,14 @@ class ModuleImdbLookup:
         if not 'imdb_url' in entry:
             result = feed.session.query(SearchResult).filter(SearchResult.title==entry['title']).first()
             if result:
-                if result.fails:
+                if result.fails and not feed.manager.options.retry_lookup:
                     # this movie cannot be found, not worth trying again ...
                     log.debug('%s will fail search, rejecting' % entry['title'])
                     raise PluginError('search failed')
                 else:
                     log.debug('Setting imdb url for %s from db' % entry['title'])
-                    entry['imdb_url'] = result.url
+                    if result.url:
+                        entry['imdb_url'] = result.url
 
         # no imdb url, but information required, try searching
         if not 'imdb_url' in entry and search_allowed:
@@ -249,3 +251,4 @@ class ModuleImdbLookup:
             time.sleep(3)
         
 register_plugin(ModuleImdbLookup, 'imdb_lookup', priorities={'filter': 128})
+register_parser_option('--retry-lookup', action='store_true', dest='retry_lookup', default=0, help=SUPPRESS_HELP)

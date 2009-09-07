@@ -35,7 +35,7 @@ class ImdbSearch:
 
     def parse_name(self, s):
         """Sanitizes movie name from all kinds of crap"""
-        for char in ['[', ']', '_']:
+        for char in ['[', ']', '_', '(', ')', ',']:
             s = s.replace(char, ' ')
         # if there are no spaces, start making begining from dots
         if s.find(' ') == -1:

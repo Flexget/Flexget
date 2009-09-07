@@ -103,6 +103,7 @@ class OutputRSS:
         rss.accept('text', key='file', required=True)
         rss.accept('number', key='days')
         rss.accept('number', key='items')
+        rss.accept('boolean', key='history')
         links = rss.accept('list', key='link')
         links.accept('text')
         return root
@@ -113,6 +114,7 @@ class OutputRSS:
             config = {'file': config}
         config.setdefault('days', 7)
         config.setdefault('items', -1)
+        config.setdefault('history', True)
         config.setdefault('link', ['imdb_url', 'input_url'])
         # add url as last resort
         config['link'].append('url')
@@ -123,6 +125,13 @@ class OutputRSS:
         if not rss2gen:
             raise PluginWarning('plugin make_rss requires PyRSS2Gen library.')
         config = self.get_config(feed)
+        
+        # when history is disabled, remove everything from backlog on every run (a bit hackish, rarely usefull)
+        if not config['history']:
+            log.debug('disabling history')
+            for item in feed.session.query(RSSEntry).filter(RSSEntry.file==config['file']).all():
+                feed.session.delete(item)
+        
         # save entries into db for RSS generation
         for entry in feed.accepted:
             rss = RSSEntry()
@@ -136,6 +145,8 @@ class OutputRSS:
             description = ''
             if 'imdb_score' in entry:
                 description += 'Score: %s / 10 | ' % entry['imdb_score']
+            if 'imdb_votes' in entry:
+                description += 'Votes: %s | ' % entry['imdb_votes']
             if 'imdb_genres' in entry:
                 description += 'Genres: %s | ' % ', '.join(entry['imdb_genres'])
             if 'imdb_plot_outline' in entry:
@@ -143,11 +154,10 @@ class OutputRSS:
             else:
                 description += entry.get('description', '')
             
-            rss.description = description 
-            
-            
-            
+            rss.description = description
             rss.file = config['file']
+            
+            # TODO: check if this exists and suggest disabling history if it does since it shouldn't happen normally ...
             feed.session.add(rss)
 
     def process_end(self, feed):
