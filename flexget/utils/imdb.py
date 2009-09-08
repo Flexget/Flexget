@@ -231,8 +231,10 @@ class ImdbParser:
         self.year = 0
         self.plot_outline = None
         self.name = None
+        self.url = None
 
     def parse(self, url):
+        self.url = url
         try:
             page = urllib2.urlopen(url)
         except ValueError:

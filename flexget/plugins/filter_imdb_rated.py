@@ -57,19 +57,24 @@ class FilterImdbRated:
 
         massage = [(re.compile('"}'), lambda match: '"')]
         
-        data = urllib2.urlopen('http://www.imdb.com/mymovies/list?l=15524979')
+        data = urllib2.urlopen(feed.config['imdb_rated'])
         soup = BeautifulSoup(data, markupMassage=massage)
 
+        count = 0
         for a_imdb_link in soup.findAll('a', attrs={'href': re.compile('\/title\/tt\d+')}):
-            imdb_url = 'http://imdb.com%s' % a_imdb_link.get('href')
+            imdb_url = 'http://www.imdb.com%s' % a_imdb_link.get('href')
             
             if not feed.session.query(ImdbRated).filter(ImdbRated.url == feed.config['imdb_rated']).\
                                                  filter(ImdbRated.imdb_url == imdb_url).first():
                 rated = ImdbRated(feed.config['imdb_rated'], imdb_url)
                 feed.session.add(rated)
                 log.debug('adding %s' % rated)
+                count += 1
             else:
                 log.debug('%s is already stored' % imdb_url)
+                
+        if count>0:
+            log.info('Added %s new movies' % count)
 
     def feed_filter(self, feed):
         self.update_rated(feed)

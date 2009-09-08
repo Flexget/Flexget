@@ -221,6 +221,7 @@ class ModuleImdbLookup:
         else:
             # Set values from cache
             # TODO: I don't like this shoveling ...
+            imdb.url = cached.url
             imdb.name = cached.title
             imdb.year = cached.year
             imdb.votes = cached.votes
@@ -237,6 +238,7 @@ class ModuleImdbLookup:
         
         # store to entries
         # TODO: I really don't like this shoveling!
+        entry['imdb_url'] = imdb.url
         entry['imdb_name'] = imdb.name
         entry['imdb_plot_outline'] = imdb.plot_outline
         entry['imdb_score'] = imdb.score
