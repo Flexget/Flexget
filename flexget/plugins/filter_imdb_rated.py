@@ -44,11 +44,12 @@ class FilterImdbRated:
 
     def update_rated(self, feed):
         """Update my movies list"""
-        last_time = feed.simple_persistence.setdefault('last_time', datetime.datetime.now() - datetime.timedelta(hours=5))
-        next_time = last_time + datetime.timedelta(hours=4)
-        if datetime.datetime.now() < next_time:
-            log.debug('skipping my movies update, interval not met. next run at %s' % next_time)
+        # set first last_time into past so we trigger update on first run
+        next_time = feed.simple_persistence.setdefault('next_time', datetime.datetime.min)
+        log.debug('next_time: %s' % next_time)
+        if not datetime.datetime.now() > next_time:
             return
+        feed.simple_persistence.set('next_time', datetime.datetime.now() + datetime.timedelta(hours=4))
         log.debug('updating my movies from %s' % feed.config['imdb_rated'])
         
         # fix imdb html damnit
@@ -70,10 +71,8 @@ class FilterImdbRated:
                 feed.session.add(rated)
                 log.debug('adding %s' % rated)
                 count += 1
-            else:
-                log.debug('%s is already stored' % imdb_url)
                 
-        if count>0:
+        if count > 0:
             log.info('Added %s new movies' % count)
 
     def feed_filter(self, feed):
