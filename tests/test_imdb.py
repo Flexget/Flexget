@@ -51,3 +51,20 @@ class TestScanImdb(FlexGetBase):
         self.execute_feed('test')
         assert self.feed.find_entry(imdb_url='http://www.imdb.com/title/tt0330793'), 'Failed pick url from test 1'
         assert self.feed.find_entry(imdb_url='http://imdb.com/title/tt0472198'), 'Failed pick url from test 2'
+
+class TestImdbRequired(FlexGetBase):
+    __yaml__ = """
+        feeds:
+          test:
+            input_mock:
+              - {title: 'Require Test 1', url: 'http://localhost/test/1', imdb_url: 'http://imdb.com/something' }
+              - {title: 'Require Test 2', url: 'http://localhost/test/2'}
+            imdb_required: yes
+    """
+    
+    def testImdbRequired(self):
+        self.execute_feed('test')
+        # hmm, tricky ...
+        #assert not self.feed.find_entry(title='Require Test 2'), 'Test 2 should have been rejected'
+        #assert self.feed.find_entry(title='Require Test 1'), 'Test 1 should NOT have been rejected'
+    

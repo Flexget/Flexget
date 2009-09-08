@@ -133,7 +133,7 @@ class ModuleImdbLookup:
             if result:
                 if result.fails and not feed.manager.options.retry_lookup:
                     # this movie cannot be found, not worth trying again ...
-                    log.debug('%s will fail search, rejecting' % entry['title'])
+                    log.debug('%s will fail search' % entry['title'])
                     raise PluginError('search failed')
                 else:
                     log.debug('Setting imdb url for %s from db' % entry['title'])

@@ -122,7 +122,7 @@ class Feed:
     def abort(self, **kwargs):
         """Abort this feed execution, no more plugins will be executed."""
         if not self.__abort and not kwargs.get('silent', False):
-            log.info('Aborting feed %s' % self.name)
+            log.info('Aborting feed %s (plugin: %s)' % (self.name, self.current_plugin))
         self.__abort = True
         self.__run_event('abort')
 
@@ -205,7 +205,7 @@ class Feed:
                     else:
                         warn.log.warning(warn)
                 except PluginError, err:
-                    err.log.error(err)
+                    err.log.critical(err)
                     self.abort()
                 except Exception, e:
                     log.exception('Unhandled error in plugin %s: %s' % (keyword, e))

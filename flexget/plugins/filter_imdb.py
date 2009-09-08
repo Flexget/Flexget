@@ -28,9 +28,6 @@ class FilterImdb:
         # accept only this language
         accept_languages:
             - language1
-
-        # Reject all entries which are not imdb-compatible (default)
-        reject_invalid: True / False
     """
     
     def validator(self):
@@ -43,7 +40,6 @@ class FilterImdb:
         imdb.accept('list', key='reject_genres').accept('text')
         imdb.accept('list', key='reject_languages').accept('text')
         imdb.accept('list', key='accept_languages').accept('text')
-        imdb.accept('boolean', key='reject_invalid')
         return imdb
 
     def imdb_required(self, entry, config):
