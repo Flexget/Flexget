@@ -158,6 +158,7 @@ class OutputRSS:
             rss.file = config['file']
             
             # TODO: check if this exists and suggest disabling history if it does since it shouldn't happen normally ...
+            log.debug('Saving %s into rss database' % entry['title'])
             feed.session.add(rss)
 
     def process_end(self, feed):
