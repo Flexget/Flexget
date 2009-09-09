@@ -31,5 +31,7 @@ class PluginDisableBuiltins:
             log.debug('Enabling builtin plugin %s' % name)
             plugin.plugins[name].builtin = True
         self.disabled = []
+        
+    feed_abort = feed_exit
 
 plugin.register_plugin(PluginDisableBuiltins, 'disable_builtins')
