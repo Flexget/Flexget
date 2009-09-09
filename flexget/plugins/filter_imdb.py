@@ -60,7 +60,11 @@ class FilterImdb:
         for entry in feed.entries:
             
             if self.imdb_required(entry, config):
-                lookup(feed, entry)
+                try:
+                    lookup(feed, entry)
+                except PluginError, e:
+                    log.error('Skipping %s because error: %s' % (entry['title'], e.value))
+                    continue
             else:
                 # Set few required fields manually from entry, and thus avoiding request & parse
                 # Note: It doesn't matter even if some fields are missing, previous imdb_required
