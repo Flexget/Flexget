@@ -12,7 +12,14 @@ class PluginDisableBuiltins:
 
     def validator(self):
         from flexget import validator
+        # TODO: accept only list (of texts) or boolean
         return validator.factory('any')
+    
+    def debug(self):
+        for name, info in plugin.plugins.iteritems():
+            if not info.builtin:
+                continue
+            log.debug('Builtin plugin: %s' % (name))
         
     def feed_start(self, feed):
         for name, info in plugin.plugins.iteritems():
@@ -21,7 +28,8 @@ class PluginDisableBuiltins:
                     if info.name in feed.config['disable_builtins']:
                         info.builtin = False
                         self.disabled.append(name)
-                else: #disabling all builtins
+                else: 
+                    # disabling all builtins
                     log.debug('Disabling builtin plugin %s' % name)
                     info.builtin = False
                     self.disabled.append(name)

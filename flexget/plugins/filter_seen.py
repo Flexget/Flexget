@@ -144,9 +144,10 @@ class FilterSeen(object):
             
             # TODO: see ticket #303
             if feed.session.query(Seen).filter(Seen.value == entry[field]).\
-                                        filter(Seen.feed == feed.name).first():
-                log.warning('BUG? Tried to add seen but already exists as seen. \
-                    Title: %s Field: %s Value: %s' % (entry['title'], field, entry[field]))
+                                        filter(Seen.feed == feed.name).\
+                                        filter(Seen.field == field).first():
+                log.warning('BUG? Tried to add seen but already exists as seen.' + \
+                    'Title: %s Field: %s Value: %s' % (entry['title'], field, entry[field]))
             else:
                 seen = Seen(field, entry[field], feed.name)
                 feed.session.add(seen)
