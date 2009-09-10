@@ -142,17 +142,10 @@ class FilterSeen(object):
             if not field in entry:
                 continue
             
-            # TODO: see ticket #303
-            if feed.session.query(Seen).filter(Seen.value == entry[field]).\
-                                        filter(Seen.feed == feed.name).\
-                                        filter(Seen.field == field).first():
-                log.warning('BUG? Tried to add seen but already exists as seen.' + \
-                    'Title: %s Field: %s Value: %s' % (entry['title'], field, entry[field]))
-            else:
-                seen = Seen(field, entry[field], feed.name)
-                feed.session.add(seen)
+            seen = Seen(field, entry[field], feed.name)
+            feed.session.add(seen)
             
-                log.debug("Learned '%s' '%s'" % (entry['url'], entry['title']))
+            log.debug("Learned '%s' '%s'" % (entry['url'], entry['title']))
                 
     def migrate(self, feed):
         """Migrates 0.9 session data into new database"""
