@@ -62,13 +62,14 @@ class NewTorrents:
 
     def url_from_search(self, url, name):
         """Parses torrent download url from search results"""
-        name = name.replace('.',' ').lower()
+        name = name.replace('.',' ').strip().lower()
         import urllib
         url = urllib.quote(url, safe=':/~?=&%')
         log.debug('search url: %s' % url)
         try:
             html = urllib2.urlopen(url).read()
             # fix </SCR'+'IPT> so that BS does not crash
+            # TODO: should use beautifulsoup massage
             html = re.sub(r'(</SCR.*?)...(.*?IPT>)', r'\1\2', html)
         except IOError, e:
             if hasattr(e, 'reason'):
@@ -82,7 +83,7 @@ class NewTorrents:
         seeds = []
         for link in soup.findAll('a', attrs={'href': re.compile('down.php')}):
             torrent_url = 'http://www.newtorrents.info%s' % link.get('href')
-            release_name = link.parent.next.get('title').replace('.',' ').lower()
+            release_name = link.parent.next.get('title').replace('.',' ').strip().lower()
             # quick dirty hack
             seed = link.findNext('td', attrs={'class': re.compile('s')}).renderContents()
             if release_name == name:
