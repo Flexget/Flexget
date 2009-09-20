@@ -59,10 +59,14 @@ class NewTorrents:
             raise ResolverException('Failed to get url from download page. Plugin may need a update.')
         else:
             return f.group(1)
+            
+    def clean(self, s):
+        """Formalize names"""
+        return s.replace('.',' ').replace('_',' ').strip().lower()
 
     def url_from_search(self, url, name):
         """Parses torrent download url from search results"""
-        name = name.replace('.',' ').strip().lower()
+        name = self.clean(name)
         import urllib
         url = urllib.quote(url, safe=':/~?=&%')
         log.debug('search url: %s' % url)
@@ -83,7 +87,7 @@ class NewTorrents:
         seeds = []
         for link in soup.findAll('a', attrs={'href': re.compile('down.php')}):
             torrent_url = 'http://www.newtorrents.info%s' % link.get('href')
-            release_name = link.parent.next.get('title').replace('.',' ').strip().lower()
+            release_name = self.clean(link.parent.next.get('title'))
             # quick dirty hack
             seed = link.findNext('td', attrs={'class': re.compile('s')}).renderContents()
             if release_name == name:
