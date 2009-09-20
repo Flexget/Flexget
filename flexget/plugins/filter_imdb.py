@@ -42,16 +42,6 @@ class FilterImdb:
         imdb.accept('list', key='accept_languages').accept('text')
         return imdb
 
-    def imdb_required(self, entry, config):
-        """Return True if config contains conditions that are NOT available in preparsed fields"""
-        check = {'min_votes':'imdb_votes', 'min_year':'imdb_year', 'min_score': 'imdb_score', 
-                 'reject_genres': 'imdb_genres', 'reject_languages': 'imdb_languages', 
-                 'accept_languages': 'imdb_languages'}
-        for key, value in check.iteritems():
-            if key in config and not value in entry: 
-                return True
-        return False
-
     def feed_filter(self, feed):
         config = feed.config['imdb']
         
@@ -59,22 +49,11 @@ class FilterImdb:
         
         for entry in feed.entries:
             
-            if self.imdb_required(entry, config):
-                try:
-                    lookup(feed, entry)
-                except PluginError, e:
-                    log.error('Skipping %s because error: %s' % (entry['title'], e.value))
-                    continue
-            else:
-                # Set few required fields manually from entry, and thus avoiding request & parse
-                # Note: It doesn't matter even if some fields are missing, previous imdb_required
-                # checks that those aren't required in condition check. So just set them all! :)
-                log.debug('no imdb request needed')
-                imdb.votes = entry.get('imdb_votes', 0)
-                imdb.score = entry.get('imdb_score', 0.0)
-                imdb.year = entry.get('imdb_year', 0)
-                imdb.languages = entry.get('imdb_languages', [])
-                imdb.genres = entry.get('imdb_genres', [])
+            try:
+                lookup(feed, entry)
+            except PluginError, e:
+                log.error('Skipping %s because error: %s' % (entry['title'], e.value))
+                continue
             
             # Check defined conditions, TODO: rewrite into functions?
             reasons = []
