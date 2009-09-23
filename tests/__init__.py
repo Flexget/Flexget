@@ -302,6 +302,24 @@ class TestPriority(FlexGetBase):
         self.execute_feed('test')
         assert self.feed.entries, 'no entries created'
         
+        
+class TestManipulate(FlexGetBase):
+
+    __yaml__ = """
+        feeds:
+          test:
+            input_mock:
+              - {title: '[1234]foobar', url: 'http://localhost/irrelevant'}
+            manipulate:
+              cleaned:
+                from: title
+                regexp: \[\d\d\d\d\](.*)
+    """
+    
+    def testClean(self):
+        self.execute_feed('test')
+        assert self.feed.find_entry(cleaned='foobar'), 'title not cleaned'
+            
 class TestDownload(FlexGetBase):
     __yaml__ = """
         feeds:
