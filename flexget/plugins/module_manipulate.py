@@ -29,6 +29,7 @@ class Manipulate:
                 match = re.match(config['regexp'], entry[config['from']])
                 if match:
                     entry[field] = ' '.join(match.groups())
-                    log.debug('setting field %s to value %s' % (field, entry[field]))
+                    feed.verbose_details('field %s is now %s' % (field, entry[field]))
+                    log.debug('field %s is now %s' % (field, entry[field]))
 
 register_plugin(Manipulate, 'manipulate', priorities={filter: 255})
