@@ -327,8 +327,8 @@ class TestImmortal(FlexGetBase):
         feeds:
           test:
             input_mock:
-              - {title: 'title1', url: 'http://localhost/irrelevant', immortal: yes}
-              - {title: 'title2', url: 'http://localhost/irrelevant'}
+              - {title: 'title1', url: 'http://localhost/irrelevant1', immortal: yes}
+              - {title: 'title2', url: 'http://localhost/irrelevant2'}
             regexp:
               reject:
                 - .*
