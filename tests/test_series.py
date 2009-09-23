@@ -80,6 +80,12 @@ class TestFilterSeries(FlexGetBase):
         s.data = 'Something.01x02-FlexGet'
         s.parse()
         assert (s.season==1 and s.episode==2), 'failed to parse 01x02'
+
+        s = SeriesParser()
+        s.name = 'Something'
+        s.data = 'Something 1 x 2-FlexGet'
+        s.parse()
+        assert (s.season==1 and s.episode==2), 'failed to parse 1 x 2'
         
         # test invalid data
         s = SeriesParser()

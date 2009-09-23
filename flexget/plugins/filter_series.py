@@ -6,7 +6,7 @@ from flexget.manager import Base
 from flexget.plugin import *
 from sqlalchemy import Column, Integer, String, DateTime, Boolean, PickleType
 from sqlalchemy.schema import ForeignKey
-from sqlalchemy.orm import relation,join
+from sqlalchemy.orm import relation, join
 
 log = logging.getLogger('series')
 
@@ -253,7 +253,7 @@ class FilterSeries:
                 if not isinstance(data, basestring) or not data: 
                     continue
                 parser = SeriesParser()
-                parser.name = str(series_name)
+                parser.name = series_name
                 parser.data = data
                 parser.ep_regexps = get_as_array(config, 'ep_regexp') + parser.ep_regexps
                 parser.id_regexps = get_as_array(config, 'id_regexp') + parser.id_regexps
@@ -272,11 +272,12 @@ class FilterSeries:
                 continue
             
             # add series, season and episode to entry
-            entry['series_name'] = str(series_name)
+            entry['series_name'] = series_name
             entry['series_season'] = parser.season
             entry['series_episode'] = parser.episode
+            entry['series_id'] = parser.id
             
-            # set custom download path TODO: Remove, replaced by set
+            # set custom download path TODO: Remove, replaced by set?
             if 'path' in config:
                 log.debug('setting %s custom path to %s' % (entry['title'], config.get('path')))
                 entry['path'] = config.get('path')
@@ -292,6 +293,7 @@ class FilterSeries:
             eps.append(parser)
             # store this episode into database
             self.store(feed, parser)
+            
         return series
 
     def process_series(self, feed, series, series_name, config):
@@ -382,7 +384,6 @@ class FilterSeries:
                 if (diff.seconds < 60) and not feed.manager.unit_test:
                     log.info('Timeframe waiting %s for %s hours, currently best is %s' % (series_name, timeframe.seconds/60**2, best.entry['title']))
                 
-                
                 first_seen = self.get_first_seen(feed, best)
                 log.debug('timeframe: %s' % timeframe)
                 log.debug('first_seen: %s' % first_seen)
@@ -395,7 +396,7 @@ class FilterSeries:
                         log.info('Timeframe expired, accepting %s' % (best.entry['title']))
                     self.accept_series(feed, best, 'expired/stopped')
                     for ep in eps:
-                        if ep==best:
+                        if ep == best:
                             continue
                         feed.reject(ep.entry, 'wrong quality')
                     continue
