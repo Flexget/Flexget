@@ -66,13 +66,13 @@ class FilterSeries:
             bundle = advanced.accept('dict', key='set')
             bundle.accept_any_key('any')
             # regexes can be given in as a single string ..
-            advanced.accept('regexp', key='name_regexps')
-            advanced.accept('regexp', key='ep_regexps')
-            advanced.accept('regexp', key='id_regexps')
+            advanced.accept('regexp', key='name_regexp')
+            advanced.accept('regexp', key='ep_regexp')
+            advanced.accept('regexp', key='id_regexp')
             # .. or as list containing strings
-            advanced.accept('list', key='name_regexps').accept('regexp')
-            advanced.accept('list', key='ep_regexps').accept('regexp')
-            advanced.accept('list', key='id_regexps').accept('regexp')
+            advanced.accept('list', key='name_regexp').accept('regexp')
+            advanced.accept('list', key='ep_regexp').accept('regexp')
+            advanced.accept('list', key='id_regexp').accept('regexp')
             # quality
             advanced.accept('text', key='quality') # TODO: allow only SeriesParser.qualities
             advanced.accept('text', key='timeframe')
@@ -86,7 +86,7 @@ class FilterSeries:
             series.accept('text')
             bundle = series.accept('dict')
             # prevent invalid indentation level
-            bundle.reject_keys(['set', 'path', 'timeframe', 'name_regexps', 'ep_regexps', 'id_regexps', 'watched'])
+            bundle.reject_keys(['set', 'path', 'timeframe', 'name_regexp', 'ep_regexp', 'id_regexp', 'watched'])
             advanced = bundle.accept_any_key('dict')
             build_options(advanced)
         
@@ -255,14 +255,14 @@ class FilterSeries:
                 parser = SeriesParser()
                 parser.name = str(series_name)
                 parser.data = data
-                parser.ep_regexps = get_as_array(config, 'ep_regexps') + parser.ep_regexps
-                parser.id_regexps = get_as_array(config, 'id_regexps') + parser.id_regexps
+                parser.ep_regexps = get_as_array(config, 'ep_regexp') + parser.ep_regexps
+                parser.id_regexps = get_as_array(config, 'id_regexp') + parser.id_regexps
                 # do not use builtin list for id when ep configigured and vice versa
-                if 'ep_regexps' in config and not 'id_regexps' in config:
+                if 'ep_regexp' in config and not 'id_regexp' in config:
                     parser.id_regexps = []
-                if 'id_regexps' in config and not 'ep_regexps' in config:
+                if 'id_regexp' in config and not 'ep_regexp' in config:
                     parser.ep_regexps = []
-                parser.name_regexps.extend(get_as_array(config, 'name_regexps'))
+                parser.name_regexps.extend(get_as_array(config, 'name_regexp'))
                 parser.parse()
                 # series is not valid if it does not match given name / regexp or fails with exception
                 if parser.valid:
