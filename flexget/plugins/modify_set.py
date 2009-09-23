@@ -15,6 +15,7 @@ class ModifySet:
         set:
           path: ~/download/path/
     """
+    
     def __init__(self):
         self.keys = {}
             
@@ -30,7 +31,7 @@ class ModifySet:
         """
         if key:
             if not key in self.keys:
-                self.keys[key]=type
+                self.keys[key] = type
             
     def register_keys(self, keys):
         """

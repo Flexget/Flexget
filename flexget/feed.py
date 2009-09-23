@@ -103,6 +103,14 @@ class Feed:
 
     def reject(self, entry, reason=None):
         """Reject this entry immediately and permanently."""
+        # ignore rejections on immortal entries
+        if 'immortal' in entry:
+            reason_str = ''
+            if reason:
+                reason_str = ' (%s)' % reason
+            log.info('Tried to reject immortal %s %s' % (entry['title'], reason_str))
+            return
+        
         # schedule immediately filtering after this plugin has done execution
         if not entry in self.rejected:
             self.rejected.append(entry)

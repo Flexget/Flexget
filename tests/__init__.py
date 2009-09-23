@@ -319,6 +319,26 @@ class TestManipulate(FlexGetBase):
     def testClean(self):
         self.execute_feed('test')
         assert self.feed.find_entry(cleaned='foobar'), 'title not cleaned'
+
+
+class TestImmortal(FlexGetBase):
+
+    __yaml__ = """
+        feeds:
+          test:
+            input_mock:
+              - {title: 'title1', url: 'http://localhost/irrelevant', immortal: yes}
+              - {title: 'title2', url: 'http://localhost/irrelevant'}
+            regexp:
+              reject:
+                - .*
+    """
+    
+    def testImmortal(self):
+        self.execute_feed('test')
+        assert self.feed.find_entry(title='title1'), 'rejected immortal entry'
+        assert not self.feed.find_entry(title='title2'), 'did not reject mortal'
+
             
 class TestDownload(FlexGetBase):
     __yaml__ = """
