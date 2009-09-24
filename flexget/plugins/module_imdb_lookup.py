@@ -104,7 +104,8 @@ class ModuleImdbLookup:
             try:
                 self.lookup(feed, entry)
             except PluginError, e:
-                log.error('Failed %s' % e.value)
+                from flexget.utils.log import log_once
+                log_once(e.value.capitalize(), logger=log)
 
     def lookup(self, feed, entry, search_allowed=True):
         """Perform imdb lookup for entry. Raises PluginError with failure reason."""
@@ -134,7 +135,7 @@ class ModuleImdbLookup:
                 if result.fails and not feed.manager.options.retry_lookup:
                     # this movie cannot be found, not worth trying again ...
                     log.debug('%s will fail search' % entry['title'])
-                    raise PluginError('search failed')
+                    raise PluginError('search failed for %s' % entry['title'])
                 else:
                     log.debug('Setting imdb url for %s from db' % entry['title'])
                     if result.url:
