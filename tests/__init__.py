@@ -240,28 +240,45 @@ class TestDisableBuiltins(FlexGetBase):
         self.execute_feed('test')
         assert self.feed.find_entry(title='dupe1') and self.feed.find_entry(title='dupe2'), 'disable_builtins is not working?'
 
-#class TestManager(FlexGetBase):
-#    def setUp(self):
-#        # just load with some conf
-#        self.config = 'regexp.yml'
-#        FlexGetBase.setUp(self, os.path.dirname(__file__))
-#        
-#    def testFailed(self):
-#        pass
-#        """
-#        e = Entry()
-#        e['title'] = 'test'
-#        e['url'] = 'http://localhost/mock'
-#        self.manager.add_failed(e)
-#        assert len(self.manager.shelve_session['failed']) == 1, 'failed to add'
-#        e = Entry()
-#        e['title'] = 'test 2'
-#        e['url'] = 'http://localhost/mock'
-#        self.manager.add_failed(e)
-#        assert len(self.manager.shelve_session['failed']) == 2, 'failed to add again'
-#        self.manager.add_failed(e)
-#        assert len(self.manager.shelve_session['failed']) == 2, 'failed to filter already added'
-#        """
+
+class TestPreset(FlexGetBase):
+    __yaml__ = """
+        global:
+          input_mock:
+            - {title: 'global', url: 'http://localhost/global'}
+            
+        movies:
+          input_mock:
+            - {title: 'movies', url: 'http://localhost/movies'}
+    
+        feeds:
+          test1:
+            preset: movies
+
+          test2:
+            preset: no
+            
+          test3:
+            preset:
+              - movies
+              - no_global
+    """
+    
+    def testPreset1(self):
+        self.execute_feed('test1')
+        assert self.feed.find_entry(title='global'), 'test1, preset global not applied'
+        assert self.feed.find_entry(title='movies'), 'test1, preset movies not applied'
+
+    def testPreset2(self):
+        self.execute_feed('test2')
+        self.dump()
+        assert not self.feed.find_entry(title='global'), 'test2, preset global applied'
+        assert not self.feed.find_entry(title='movies'), 'test2, preset movies applied'
+
+    def testPreset3(self):
+        self.execute_feed('test3')
+        assert not self.feed.find_entry(title='global'), 'test3, preset global applied'
+        assert self.feed.find_entry(title='movies'), 'test3, preset movies not applied'
         
 class TestInputHtml(FlexGetBase):
     __yaml__ = """

@@ -2,8 +2,6 @@ import subprocess
 import logging
 from flexget.plugin import *
 
-__pychecker__ = 'unusednames=parser'
-
 log = logging.getLogger('exec')
 
 class OutputExec:

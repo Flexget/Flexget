@@ -31,19 +31,26 @@ class PluginPreset:
         config = feed.config.get('preset', 'global')
         if isinstance(config, basestring):
             config = [config]
-        # handles 'preset: no' form to turn off global preset on this feed
-        elif isinstance(config, bool):
+        elif isinstance(config, bool): # handles 'preset: no' form to turn off preset on this feed
             if not config:
-                config = []
-            else:
-                config = ['global']
+                return
+        
+        # add global in except when disabled with no_global
+        if 'no_global' in config:
+            config.remove('no_global')
+            if 'global' in config:
+                config.remove('global')
+        elif not 'global' in config:
+            log.debug('adding default global')
+            config.append('global')
                 
         log.log(5, 'presets: %s' % config)
         
         for preset in config:
             log.debug('Merging preset %s into feed %s' % (preset, feed.name))
             if not preset in feed.manager.config:
-                if preset=='global': continue
+                if preset == 'global': 
+                    continue
                 raise PluginError('Unable to set preset %s for %s' % (preset, feed.name), log)
             # merge
             from flexget.utils.tools import MergeException, merge_dict_from_to

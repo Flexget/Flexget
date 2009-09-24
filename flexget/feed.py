@@ -115,6 +115,7 @@ class Feed:
         if not entry in self.rejected:
             self.rejected.append(entry)
             self.verbose_details('Rejected %s' % entry['title'], reason)
+            log.debug('Rejected %s %s' % (entry['title'], reason))
         # TODO: HACK?
         if entry in self.accepted:
             self.accepted.remove(entry)
@@ -194,7 +195,7 @@ class Feed:
     def __run_event(self, event):
         """Execute plugin events if plugin is configured for this feed."""
         methods = get_methods_by_event(event)
-        log.log(5, 'Event %s methods %s' % (event, methods))
+        #log.log(5, 'Event %s methods %s' % (event, methods))
 
         for method in methods:
             keyword = method.plugin.name
@@ -257,9 +258,9 @@ class Feed:
                 else:
                     self.verbose_progress('Feed %s produced %s entries.' % (self.name, len(self.entries)))
             if event == 'filter':
-                self.verbose_progress('Feed %s accepted: %s (failed: %s rejected: %s undecided: %s)' % \
-                                      (self.name, len(self.accepted), len(self.failed), \
-                                       len(self.rejected), len(self.entries)-len(self.accepted)))
+                self.verbose_progress('Feed %s accepted: %s (rejected: %s undecided: %s failed: %s )' % \
+                                      (self.name, len(self.accepted), len(self.rejected), \
+                                       len(self.entries)-len(self.accepted), len(self.failed)))
             # if abort flag has been set feed should be aborted now
             if self.__abort:
                 return
