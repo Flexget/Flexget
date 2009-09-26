@@ -1,8 +1,8 @@
 import logging
 from flexget.manager import Base
 from flexget.plugin import *
-from sqlalchemy import Column, Integer, String, DateTime, PickleType
-from datetime import datetime, timedelta
+from sqlalchemy import Column, Integer, String, DateTime
+from datetime import datetime
 
 log = logging.getLogger('seen')
 
@@ -63,19 +63,24 @@ class FilterSeen(object):
         
         if feed.manager.options.forget:
 
-            name = feed.manager.options.forget
+            forget = feed.manager.options.forget
 
             session = Session()
             count = 0
-            for seen in session.query(Seen).filter(Seen.feed == name):
+            for seen in session.query(Seen).filter(Seen.feed == forget):
                 session.delete(seen)
                 count += 1
+                
+            for seen in session.query(Seen).filter(Seen.value == forget):
+                session.delete(seen)
+                count += 1
+                
             session.commit()
             
             log.info('Forgot %s memories' % count)
             
             if count == 0:
-                log.info('Perhaps feed does not exists?')
+                log.info('Perhaps feed / given value does not exists?')
             
         if feed.manager.options.seen:
 
@@ -163,6 +168,6 @@ class FilterSeen(object):
 
 register_plugin(FilterSeen, 'seen', builtin=True, priorities=dict(filter=255))
 register_parser_option('--forget', action='store', dest='forget', default=False,
-                       help='Forget what has been seen in a feed')
+                       help='Forget feed (completely) or given title or url.')
 register_parser_option('--seen', action='store', dest='seen', default=False,
-                       help='Add url or title to what has been seen in a feed. Use --feed to choose specify a feed.')
+                       help='Add title or url to what has been seen in feeds.')

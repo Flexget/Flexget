@@ -24,11 +24,9 @@ class FilterExists:
     def get_config(self, feed):
         config = feed.config.get('exists', None)
         #if only a single path is passed turn it into a 1 element list
-        if isinstance(config, str):
+        if isinstance(config, basestring):
             config = [config]
         return config
-                
-          
 
     def feed_filter(self, feed):
         config = self.get_config(feed)
