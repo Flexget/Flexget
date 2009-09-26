@@ -77,4 +77,4 @@ class CliConfig:
 
 register_plugin(CliConfig, 'cli_config', builtin=True)
 register_parser_option('--cli-config', action='store', dest='cli_config', default=False,
-                       help='Configuration parameters trough commandline. See --doc cli_config.')
+                       metavar='PARAMS', help='Configuration parameters trough commandline. See --doc cli_config.')

@@ -499,5 +499,5 @@ class FilterSeries:
                 self.mark_downloaded(feed, parser)
 
 register_plugin(FilterSeries, 'series')
-register_parser_option('--stop-waiting', action='store', dest='stop_waiting',
-                       default=False, help='Stop timeframe for a given series.')
+register_parser_option('--stop-waiting', action='store', dest='stop_waiting', default=False, 
+                       metavar='NAME', help='Stop timeframe for a given series.')

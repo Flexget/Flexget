@@ -168,6 +168,6 @@ class FilterSeen(object):
 
 register_plugin(FilterSeen, 'seen', builtin=True, priorities=dict(filter=255))
 register_parser_option('--forget', action='store', dest='forget', default=False,
-                       help='Forget feed (completely) or given title or url.')
+                       metavar='FEED|VALUE', help='Forget feed (completely) or given title or url.')
 register_parser_option('--seen', action='store', dest='seen', default=False,
-                       help='Add title or url to what has been seen in feeds.')
+                       metavar='VALUE', help='Add title or url to what has been seen in feeds.')

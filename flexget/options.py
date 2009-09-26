@@ -16,13 +16,13 @@ class OptionParser(OptParser):
         self.add_option('--learn', action='store_true', dest='learn', default=0,
                           help='Matches are not downloaded but will be skipped in the future.')
         self.add_option('--feed', action='store', dest='onlyfeed', default=None,
-                          help='Run only specified feed.')
+                          metavar='FEED', help='Run only specified feed.')
         self.add_option('--no-cache', action='store_true', dest='nocache', default=0,
                           help='Disable caches. Works only in plugins that have explicit support.')
         self.add_option('--reset', action='store_true', dest='reset', default=0,
                           help='Forgets everything that has been done and learns current matches.')
         self.add_option('--doc', action='store', dest='doc',
-                          help='Display plugin documentation (example: --doc patterns). See --list.')
+                          metavar='PLUGIN', help='Display plugin documentation (example: --doc patterns). See also --list.')
         self.add_option('--list', action='store_true', dest='list', default=0,
                           help='List all available plugins.')
         self.add_option('--failed', action='store_true', dest='failed', default=0,

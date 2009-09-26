@@ -266,4 +266,4 @@ class PluginDownload:
 
 register_plugin(PluginDownload, 'download')
 register_parser_option('--dl-path', action='store', dest='dl_path', default=False,
-                       help='Override path for download plugin. Applies to all executed feeds.')
+                       metavar='PATH', help='Override path for download plugin. Applies to all executed feeds.')
