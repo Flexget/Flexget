@@ -35,14 +35,27 @@ class FilterImdbRated:
         
         imdb_rated: http://www.imdb.com/mymovies/list?l=<YOUR USER ID>
         
-        Note: in theory this should work on any other page containing imdb urls as well.
+        Reverse, reject unvoted:
+        
+        Example:
+        
+        imdb_rated:
+          url: http://www.imdb.com/mymovies/list?l=<YOUR USER ID>
+          reverse: yes
+        
+        Note: in theory this should work with any other page containing imdb urls.
     """
 
     def validator(self):
         from flexget import validator
-        return validator.factory('url')
+        root =  validator.factory()
+        root.accept('url')
+        complex = root.accept('dict')
+        complex.accept('url', key='url')
+        complex.accept('boolean', key='reverse')
+        return root
 
-    def update_rated(self, feed):
+    def update_rated(self, feed, config):
         """Update my movies list"""
         # set first last_time into past so we trigger update on first run
         next_time = feed.simple_persistence.setdefault('next_time', datetime.datetime.min)
@@ -50,7 +63,7 @@ class FilterImdbRated:
         if not datetime.datetime.now() > next_time:
             return
         feed.simple_persistence.set('next_time', datetime.datetime.now() + datetime.timedelta(hours=4))
-        log.debug('updating my movies from %s' % feed.config['imdb_rated'])
+        log.debug('updating my movies from %s' % config['url'])
         
         # fix imdb html damnit
         # <td class=list bgcolor="#CCCCCC"} colspan="4">
@@ -58,16 +71,16 @@ class FilterImdbRated:
 
         massage = [(re.compile('"}'), lambda match: '"')]
         
-        data = urllib2.urlopen(feed.config['imdb_rated'])
+        data = urllib2.urlopen(config['url'])
         soup = BeautifulSoup(data, markupMassage=massage)
 
         count = 0
         for a_imdb_link in soup.findAll('a', attrs={'href': re.compile('\/title\/tt\d+')}):
             imdb_url = 'http://www.imdb.com%s' % a_imdb_link.get('href')
             
-            if not feed.session.query(ImdbRated).filter(ImdbRated.url == feed.config['imdb_rated']).\
+            if not feed.session.query(ImdbRated).filter(ImdbRated.url == config['url']).\
                                                  filter(ImdbRated.imdb_url == imdb_url).first():
-                rated = ImdbRated(feed.config['imdb_rated'], imdb_url)
+                rated = ImdbRated(config['url'], imdb_url)
                 feed.session.add(rated)
                 log.debug('adding %s' % rated)
                 count += 1
@@ -76,20 +89,37 @@ class FilterImdbRated:
             log.info('Added %s new movies' % count)
 
     def feed_filter(self, feed):
-        self.update_rated(feed)
+        config = feed.config['imdb_rated']
+        if isinstance(config, basestring):
+            config = {}
+            config['url'] = feed.config['imdb_rated']
+        
+        self.update_rated(feed, config)
         for entry in feed.entries:
+            
+            # if no imdb_url perform lookup
             if not 'imdb_url' in entry:
                 try:
                     get_plugin_by_name('imdb_lookup').instance.lookup(feed, entry)
                 except PluginError:
-                    # ignore imdb failures
-                    pass
-            # still no luck with the imdb url .. skip
+                    pass # ignore imdb lookup failures
+
+            # ignore entries without imdb_url
             if not 'imdb_url' in entry:
                 continue
-            if feed.session.query(ImdbRated).filter(ImdbRated.url == feed.config['imdb_rated']).\
-                                             filter(ImdbRated.imdb_url == entry['imdb_url']).first():
-                feed.reject(entry, 'imdb rated')
+            
+            is_rated = feed.session.query(ImdbRated).\
+                       filter(ImdbRated.url == config['url']).\
+                       filter(ImdbRated.imdb_url == entry['imdb_url']).first() is not None
+                       
+            if config.get('reverse', False):
+                # reversed, reject unrated
+                if not is_rated:
+                    feed.reject(entry, 'imdb rated reverse')
+            else:
+                # normal mode, reject rated
+                if is_rated: 
+                    feed.reject(entry, 'imdb rated')
                 
 
 register_plugin(FilterImdbRated, 'imdb_rated')
