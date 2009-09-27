@@ -196,6 +196,14 @@ class Feed:
         """Execute plugin events if plugin is configured for this feed."""
         methods = get_methods_by_event(event)
         #log.log(5, 'Event %s methods %s' % (event, methods))
+        
+        # warn if no filters or outputs in the feed
+        if event in ['filter', 'output']:
+            for method in methods:
+                if method.plugin.name in self.config:
+                    break
+            else:
+                log.warning('Feed %s doesn\'t have any %s plugins' % (self.name, event) )
 
         for method in methods:
             keyword = method.plugin.name
