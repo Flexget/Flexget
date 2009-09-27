@@ -6,6 +6,7 @@ from flexget.feed import Entry
 from flexget.plugin import *
 import re
 from flexget.utils.soup import get_soup
+import BeautifulSoup
 
 log = logging.getLogger('html')
 
@@ -60,18 +61,32 @@ class InputHtml:
             f.close()
         
         for link in soup.findAll('a'):
+            # not a valid link
             if not link.has_key('href'):
                 continue
+            # no content in link
+            if not link.contents:
+                continue
+            
             title = link.contents[0]
+            
+            # tag inside link
+            if isinstance(title, BeautifulSoup.Tag):
+                log.debug('title is tag: %s' % title)
+                continue
 
-            if title == None: 
+            # just unable to get any decent title
+            if title is None: 
                 title = link.next.string
-                if title == None:
+                if title is None:
                     continue
 
+            # stip unicode whitespaces
             title = title.replace(u'\u200B', u'').strip()
+            
             if not title: 
                 continue
+            
             url = link['href']
 
             # fix broken urls
@@ -89,19 +104,11 @@ class InputHtml:
                 title = link['title']
                 log.debug('title_from_title: %s' % title)
             else:
-                # TODO: there should be this kind of function in feed, trunk unit test has it already
-                # move it to feed?
-                def exists(title):
-                    for entry in feed.entries:
-                        if entry['title'] == title:
-                            return True
-                    return False
-            
                 # title link should be unique, add count to end if it's not
                 i = 0
                 orig_title = title
                 while True:
-                    if not exists(title):
+                    if not feed.find_entry(title=title):
                         break
                     i += 1
                     title = '%s (%s)' % (orig_title, i)
