@@ -77,7 +77,7 @@ class OutputDeluge:
             return
         if not feed.accepted or not config['enabled']:
             return
-        #TODO: Figure out better way to detect version
+        # TODO: Figure out better way to detect version
         try:
             from deluge.ui.client import sclient
         except:
@@ -105,6 +105,12 @@ class OutputDeluge:
             path = entry.get('path', config['path'])
             if path:
                 opts['download_location'] = path % entry
+            
+            # check that file is downloaded
+            if not 'file' in entry:
+                feed.fail(entry, 'file missing?')
+                continue
+                
             # see that temp file is present
             if not os.path.exists(entry['file']):
                 tmp_path = os.path.join(feed.manager.config_base, 'temp')
@@ -114,20 +120,20 @@ class OutputDeluge:
             sclient.add_torrent_file([entry['file']], [opts])
             log.info("%s torrent added to deluge with options %s" % (entry['title'], opts))
 
-            #clean up temp file if download plugin is not configured for this feed
+            # clean up temp file if download plugin is not configured for this feed
             if not 'download' in feed.config:
                 os.remove(entry['file'])
                 del(entry['file'])
             movedone = entry.get('movedone', config['movedone'])
             label = entry.get('label', config['label']).lower()
             queuetotop = entry.get('queuetotop', config['queuetotop'])
-            #Sometimes deluge takes a moment to add the torrent, wait a second.
+            # Sometimes deluge takes a moment to add the torrent, wait a second.
             time.sleep(2)
             after = sclient.get_session_state()
             for item in after:
-                #find torrentid of just added torrent
+                # find torrentid of just added torrent
                 if not item in before:
-                    #entry['deluge_torrentid'] = item
+                    # entry['deluge_torrentid'] = item
                     if movedone:
                         log.debug("%s move on complete set to %s" % (entry['title'], movedone % entry))
                         sclient.set_torrent_move_on_completed(item, True)
@@ -156,7 +162,7 @@ class OutputDeluge:
         d = client.connect()
         def on_connect_success(result):
             if not result:
-                #TODO: connect failed, do something
+                # TODO: connect failed, do something
                 pass
             def on_success(torrent_id, entry, config):
                 if not torrent_id:
@@ -174,7 +180,7 @@ class OutputDeluge:
                     client.core.set_torrent_move_completed(torrent_id, True)
                     client.core.set_torrent_move_completed_path(torrent_id, movedone % entry)
                 if label:
-                    #TODO: check if label plugin is enabled
+                    # TODO: check if label plugin is enabled
                     client.label.add(label)
                     client.label.set_torrent(torrent_id, label)
                     log.debug("%s label set to '%s'" % (entry['title'], label))
@@ -184,7 +190,7 @@ class OutputDeluge:
             def on_fail(result, entry, feed):
                 log.info("%s was not added to deluge! %s" % (entry['title'], result))
                 feed.fail(entry, "Could not be added to deluge")
-            #add the torrents
+            # add the torrents
             dlist = []
             for entry in feed.accepted:
                 opts = {}
@@ -201,7 +207,7 @@ class OutputDeluge:
                 addresult = client.core.add_torrent_file(entry['title'], filedump, opts)
                 addresult.addCallback(on_success, entry, config).addErrback(on_fail, entry, feed)
                 dlist.append(addresult)
-                #clean up temp file if download plugin is not configured for this feed
+                # clean up temp file if download plugin is not configured for this feed
                 if not 'download' in feed.config:
                     os.remove(entry['file'])
                     del(entry['file'])
@@ -213,11 +219,11 @@ class OutputDeluge:
             defer.DeferredList(dlist).addCallback(on_complete)
             
         def on_connect_fail(result):
-            #clean up temp files
+            # clean up temp files
             for entry in feed.accepted:
                 os.remove(entry['file'])
                 del(entry['file'])
-            #TODO: is aborting the feed the best course of action?
+            # TODO: is aborting the feed the best course of action?
             log.info('Connect failed: %s' % result)
             feed.abort()
             reactor.stop()
