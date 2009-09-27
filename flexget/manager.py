@@ -92,7 +92,7 @@ class Manager:
                     sys.exit(1)
                 self.configname = os.path.basename(config)[:-4]
                 return
-        log.debug('Tried to read from: %s' % ', '.join(possible))
+        log.info('Tried to read from: %s' % ', '.join(possible))
         raise Exception('Failed to find configuration file %s' % self.options.config)
     
     def pre_check_config(self, fn):

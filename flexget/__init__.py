@@ -91,6 +91,7 @@ def main():
     else:
         log_level = 5
 
+    """
     if os.path.exists(os.path.join(sys.path[0], '..', 'pavement.py')):
         basedir = os.path.dirname(os.path.abspath(sys.path[0]))
     else:
@@ -100,6 +101,18 @@ def main():
         config_base = basedir
     else:
         config_base = os.path.join(os.path.expanduser('~'), '.flexget')
+
+    print 'basedir: %s' % basedir
+    print 'config_base: %s' % config_base
+
+    if not os.path.exists(config_base):
+        print 'Current path doesn''t have config.yml and %s doesn''t exist either' % config_base
+        print 'Aborting! Need configuration file to execute.'
+        return 
+    
+    """
+
+    config_base = os.path.dirname(os.path.abspath(sys.path[0]))
 
     start_logging(os.path.join(config_base, 'flexget.log'), log_level, quiet=options.quiet)
 
