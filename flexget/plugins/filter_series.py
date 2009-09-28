@@ -107,6 +107,7 @@ class FilterSeries:
 
         advanced = root.accept('dict')
         settings = advanced.accept('dict', key='settings')
+        settings.reject_keys(get_plugin_keywords())
         settings_group = settings.accept_any_key('dict')
         build_options(settings_group)
 

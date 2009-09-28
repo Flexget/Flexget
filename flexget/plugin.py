@@ -6,7 +6,8 @@ log = logging.getLogger('plugin')
 __all__ = ['PluginWarning', 'PluginError', 'register_plugin',
            'register_parser_option', 'register_feed_event',
            'get_plugin_by_name', 'get_plugins_by_group',
-           'get_plugins_by_event', 'get_methods_by_event']
+           'get_plugin_keywords', 'get_plugins_by_event', 
+           'get_methods_by_event']
 
 class RegisterException(Exception):
     def __init__(self, value):
@@ -305,6 +306,13 @@ def get_plugins_by_group(group):
         if group in info.get('groups'):
             res.append(info)
     return res
+
+def get_plugin_keywords():
+    """Return all registered keywords in a list"""
+    keywords = []
+    for name, info in plugins.iteritems():
+        keywords.append(name)
+    return keywords
 
 def get_plugin_by_name(name):
     """Get plugin by name, prefered way since this structure may be changed at some point."""
