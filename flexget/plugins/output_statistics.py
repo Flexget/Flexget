@@ -31,7 +31,8 @@ class Statistics:
     
         Example:
         
-        TODO: !!
+        statistics:
+            file: /home/user/public_html/flexget/index.html
     """
     def __init__(self):
         self.total = 0
