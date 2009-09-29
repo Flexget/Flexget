@@ -31,8 +31,17 @@ class Statistics:
     
         Example:
         
+        This will create the stats html in the specified location
+
         statistics:
             file: /home/user/public_html/flexget/index.html
+
+        OR
+
+        This example creates one stat file per config named 
+        CONFIGNAME_statistics.html in flexget's root directory
+
+        statistics: true
     """
     def __init__(self):
         self.total = 0
