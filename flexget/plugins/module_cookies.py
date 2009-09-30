@@ -45,13 +45,26 @@ class PluginCookies:
 # This is a generated file!  Do not edit.
 """)
         count = 0
+        failed = 0
         for item in cur.fetchall():
-            s.write('%s\t%s\t%s\t%s\t%s\t%s\t%s\n' % (item[0], ftstr[item[0].startswith('.')], item[1],
-                                                      ftstr[item[2]], item[3], item[4], item[5]))
-            log.log(5, 'Adding cookie for %s. key: %s value: %s' % (item[0], item[4], item[5]))
-            count += 1
+            try:
+                s.write('%s\t%s\t%s\t%s\t%s\t%s\t%s\n' % (item[0], ftstr[item[0].startswith('.')], item[1],
+                                                          ftstr[item[2]], item[3], item[4], item[5]))
+                                                         
+                log.log(5, 'Adding cookie for %s. key: %s value: %s' % (item[0], item[4], item[5]))
+                count += 1
+            except:
+                to_hex = lambda x: ''.join([hex(ord(c))[2:].zfill(2) for c in x])
+                i = 0
+                for val in item:
+                    if isinstance(val, basestring):
+                        log.debug('item[%s]: %s' % (i, to_hex(val)))
+                    else:
+                        log.debug('item[%s]: %s' % (i, val))
+                    i += 1
+                failed += 1
             
-        log.debug('Added %s cookies to jar' % count)
+        log.debug('Added %s cookies to jar. %s failed (non-ascii items?)' % (count, failed))
  
         s.seek(0)
         con.close()
