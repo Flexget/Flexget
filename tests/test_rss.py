@@ -4,6 +4,7 @@ from nose.plugins.attrib import attr
 import os
 
 class TestInputRSS(FlexGetBase):
+    
     __yaml__ = """
         feeds:
           test:
@@ -11,6 +12,7 @@ class TestInputRSS(FlexGetBase):
               url: tests/rss.xml
               silent: true
     """
+    
     def testInputRSS(self):
         self.execute_feed('test')
 
@@ -50,6 +52,7 @@ class TestInputRSS(FlexGetBase):
         assert not self.feed.find_entry(description='Description, empty title'), 'RSS entry without title should be skipped'
 
 class TestRssOnline(FlexGetBase):
+    
     __yaml__ = """
         feeds:
           normal:
@@ -70,6 +73,7 @@ class TestRssOnline(FlexGetBase):
               username: testuser
               password: testpass
     """
+    
     @attr(online=True)
     def testFeeds(self):
         # TODO:

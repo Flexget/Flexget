@@ -1,8 +1,10 @@
 from tests import FlexGetBase
 from nose.tools import assert_raises, assert_true
+from flexget.utils.series import SeriesParser, ParseWarning
 import os
 
 class TestFilterSeries(FlexGetBase):
+    
     __yaml__ = """
         feeds:
           test:
@@ -28,6 +30,7 @@ class TestFilterSeries(FlexGetBase):
               - filename series
               - empty description
     """
+    
     def setUp(self):
         FlexGetBase.setUp(self)
         self.execute_feed('test')
@@ -58,12 +61,9 @@ class TestFilterSeries(FlexGetBase):
         # empty description
         assert self.feed.find_entry(title='Empty.Description.S01E22.XViD'), 'Empty Description failed'
 
-
-
 class TestSeriesParser(object):
 
     def testParser(self):
-        from flexget.utils.series import SeriesParser, ParseWarning
         
         s = SeriesParser()
         s.name = 'Something Interesting'
@@ -121,8 +121,9 @@ class TestSeriesParser(object):
         s.name = 'Something Interesting'
         s.data = 1
         assert_raises(Exception, s.parse)
+
+    def testSeasonPacks(self):
         
-        # test season packs
         s = SeriesParser()
         s.name = 'Something'
         s.data = 'Something S02 Pack 720p WEB-DL-FlexGet'

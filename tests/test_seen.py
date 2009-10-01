@@ -1,6 +1,7 @@
 from tests import FlexGetBase
 
 class TestFilterSeen(FlexGetBase):
+    
     __yaml__ = """
         global:
           accept_all: true
@@ -21,6 +22,7 @@ class TestFilterSeen(FlexGetBase):
               - {title: 'New title 1', url: 'http://localhost/new1', imdb_score: 5}
               - {title: 'New title 2', url: 'http://localhost/new2', imdb_score: 5}
     """
+    
     def testSeen(self):
         self.execute_feed('test')
         assert self.feed.find_entry(title='Seen title 1'), 'Test entry missing'
@@ -43,6 +45,7 @@ class TestFilterSeen(FlexGetBase):
             
 
 class TestFilterSeenMovies(FlexGetBase):
+    
     __yaml__ = """
         feeds:
           test:
@@ -65,6 +68,7 @@ class TestFilterSeenMovies(FlexGetBase):
               - {title: 'Seen movie title 8', url: 'http://localhost/seen_movie8'}
             seen_movies: strict
     """
+    
     def testSeenMovies(self):
         self.execute_feed('test')
         assert self.feed.find_entry(title='Seen movie title 1'), 'Test movie entry 1 is missing'

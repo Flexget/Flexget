@@ -50,15 +50,19 @@ def sdist():
 ])
 def test(options):
     """Run FlexGet unit tests"""
-    from nose import run, config
+    import nose
     from nose.plugins.manager import DefaultPluginManager
-    cfg = config.Config(plugins=DefaultPluginManager(), verbosity=2)
+
+    cfg = nose.config.Config(plugins=DefaultPluginManager(), verbosity=2)
 
     argv = ['bin/paver']
 
     if not hasattr(options, 'online'):
         argv.extend(['--attr=!online'])
-    run(argv=argv, config=cfg)
+        
+    argv.append('-v')
+    
+    nose.run(argv=argv, config=cfg)
 
 @task
 def clean():
