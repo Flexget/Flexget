@@ -358,15 +358,18 @@ class TestImmortal(FlexGetBase):
 
             
 class TestDownload(FlexGetBase):
+    
     __yaml__ = """
         feeds:
           test:
-            # make test data
             input_mock:
-              - {title: 'README', url: 'http://svn.flexget.com/trunk/bootstrap.py', 'filename': 'flexget_test/data'}
+              - {title: 'README', url: 'http://svn.flexget.com/trunk/bootstrap.py', 'filename': 'flexget_test_data'}
             accept_all: true
-            download: ~/
+            download: 
+              path: ~/
+              fail_html: no
     """
+    
     def tearDown(self):
         FlexGetBase.tearDown(self)
         if hasattr(self, 'testfile') and os.path.exists(self.testfile):
@@ -377,7 +380,7 @@ class TestDownload(FlexGetBase):
 
     @attr(online=True)
     def testDownload(self):
-        self.testfile = os.path.expanduser('~/flexget_test_data')
+        self.testfile = os.path.expanduser('~/flexget_test_data.ksh') # note: what the hell is .ksh and where it comes from?
         if os.path.exists(self.testfile):
             os.remove(self.testfile)
         # executes feed and downloads the file
