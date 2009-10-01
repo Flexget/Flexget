@@ -51,13 +51,11 @@ class Quality(Base):
     def __repr__(self):
         return '<Quality(quality=%s)>' % (self.quality)
 
-
-class FilterSeriesReport(object):
+class SeriesReport(object):
     
     """Produces --series report"""
 
     def process_start(self, feed):
-        
         if feed.manager.options.series:
             # disable all feeds
             for afeed in feed.manager.feeds.itervalues():
@@ -101,6 +99,28 @@ class FilterSeriesReport(object):
             print '-' * 79
             session.close()
 
+class SeriesPurge(object):
+    
+    """provides --series-purge"""
+
+    def process_start(self, feed):
+        if feed.manager.options.series_purge:
+            # disable all feeds
+            for afeed in feed.manager.feeds.itervalues():
+                afeed.enabled = False
+                
+            from flexget.manager import Session
+            session = Session()
+
+            series = session.query(Series).\
+                     filter(Series.name == feed.manager.options.series_purge).first()
+            if series:
+                print 'Removed %s' % feed.manager.options.series_purge 
+                session.delete(series)
+            else:
+                print 'Didn''t find series %s' % feed.manager.options.series_purge
+            
+            session.commit()
 
 
 class FilterSeries(object):
@@ -553,11 +573,12 @@ class FilterSeries(object):
                 self.mark_downloaded(feed, parser)
 
 register_plugin(FilterSeries, 'series')
+register_plugin(SeriesReport, 'series_report', builtin=True)
+register_plugin(SeriesPurge, 'series_purge', builtin=True)
 
-register_plugin(FilterSeriesReport, 'series_report', builtin=True)
-
-
-register_parser_option('--stop-waiting', action='store', dest='stop_waiting', default=False, 
-                       metavar='NAME', help='Stop timeframe for a given series.')
 register_parser_option('--series', action='store_true', dest='series', default=False, 
                        help='Display series summary.')
+register_parser_option('--series-purge', action='store', dest='series_purge', default=False, 
+                       metavar='NAME', help='Remove given series from database.')
+register_parser_option('--stop-waiting', action='store', dest='stop_waiting', default=False, 
+                       metavar='NAME', help='Stop timeframe for a given series.')
