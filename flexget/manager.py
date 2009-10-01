@@ -308,6 +308,9 @@ class Manager:
             except Exception, e:
                 failed.append(name)
                 log.exception('Feed %s: %s' % (feed.name, e))
+            except KeyboardInterrupt:
+                print '**** Keyboard Interrupt ****'
+                return
             finally:
                 # note: will perform rollback if error occured (session has not been committed)
                 feed.session.close()

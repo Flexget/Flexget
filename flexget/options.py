@@ -47,11 +47,12 @@ class OptionParser(OptParser):
                         help=SUPPRESS_HELP)
         self.add_option('--debug-sql', action='store_true', dest='debug_sql', default=False,
                           help=SUPPRESS_HELP)
-        self.add_option('--validate', action='store_true', dest='validate', default=0,
+        self.add_option('--validate', action='store_true', dest='validate', default=False,
                           help=SUPPRESS_HELP)
-        self.add_option('--verbosity', action='store_true', dest='crap', default=0,
-                          help=SUPPRESS_HELP)
-
+        
+        self.add_option('-V', '--version', action='store_true', dest='version', default=False,
+                          help='Print FlexGet version and exit.')
+        
         self.add_option('--migrate', action='store', dest='migrate', default=None,
                           help=SUPPRESS_HELP)
 

@@ -90,6 +90,10 @@ def main():
         log_level = getattr(logging, options.loglevel.upper())
     else:
         log_level = 5
+        
+    if options.version:
+        print 'FlexGet {subversion}'
+        return
 
     """
     if os.path.exists(os.path.join(sys.path[0], '..', 'pavement.py')):

@@ -49,6 +49,7 @@ def sdist():
     ('online', None, 'Run online tests')
 ])
 def test(options):
+    """Run FlexGet unit tests"""
     from nose import run, config
     from nose.plugins.manager import DefaultPluginManager
     cfg = config.Config(plugins=DefaultPluginManager(), verbosity=2)
@@ -78,6 +79,8 @@ def clean():
     ('tag=', 't', 'Tag package name, used instead of revision')
 ])
 def build_release(options):
+    """Deprecated"""
+    
     export_path = path('build')
     if not export_path.exists():
         export_path.makedirs()
