@@ -1,6 +1,6 @@
 import logging
 from datetime import datetime, timedelta
-from flexget.utils.series import SeriesParser
+from flexget.utils.series import SeriesParser, ParseWarning
 
 from flexget.manager import Base
 from flexget.plugin import *
@@ -336,7 +336,12 @@ class FilterSeries(object):
                 if 'id_regexp' in config and not 'ep_regexp' in config:
                     parser.ep_regexps = []
                 parser.name_regexps.extend(get_as_array(config, 'name_regexp'))
-                parser.parse()
+                try:
+                    parser.parse()
+                except ParseWarning, pw:
+                    from flexget.utils.log import log_once
+                    log_once(pw.value, logger=log)
+                    
                 # series is not valid if it does not match given name / regexp or fails with exception
                 if parser.valid:
                     log.debug('Detected quality: %s from: %s' % (parser.quality, field))

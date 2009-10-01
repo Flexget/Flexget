@@ -32,8 +32,38 @@ class TestFilterSeries(FlexGetBase):
         FlexGetBase.setUp(self)
         self.execute_feed('test')
 
-    def testSeriesParser(self):
-        from flexget.utils.series import SeriesParser
+    def testSeries(self):
+        # TODO: needs to be fixed after series is converted into SQLAlchemy
+        # 'some series' should be in timeframe-queue
+        #self.feed.shared_cache.set_namespace('series')
+        #s = self.feed.shared_cache.get('some series')
+        #assert isinstance(s, dict)
+        #assert not s.get('S1E20', {}).get('info').get('downloaded')
+        
+        # normal passing
+        assert self.feed.find_entry(title='Another.Series.S01E20.720p.XViD-FlexGet'), 'Another.Series.S01E20.720p.XViD-FlexGet should have passed'
+        
+        # episode advancement
+        assert not self.feed.find_entry('rejected', title='Another.Series.S01E10.720p.XViD-FlexGet'), 'Another.Series.S01E10.720p.XViD-FlexGet should NOT have passed because of episode advancement'
+        assert self.feed.find_entry('accepted', title='Another.Series.S01E16.720p.XViD-FlexGet'), 'Another.Series.S01E16.720p.XViD-FlexGet should have passed because of episode advancement grace magin'
+
+        # date formats
+        df = ['Date.Series.10-11-2008.XViD','Date.Series.10.12.2008.XViD', 'Date.Series.2008-10-13.XViD', 'Date.Series.2008x10.14.XViD']
+        for d in df:
+            assert self.feed.find_entry(title=d), 'Date format did not match %s' % d
+        
+        # parse from filename
+        assert self.feed.find_entry(filename='Filename.Series.S01E26.XViD'), 'Filename parsing failed'
+        
+        # empty description
+        assert self.feed.find_entry(title='Empty.Description.S01E22.XViD'), 'Empty Description failed'
+
+
+
+class TestSeriesParser(object):
+
+    def testParser(self):
+        from flexget.utils.series import SeriesParser, ParseWarning
         
         s = SeriesParser()
         s.name = 'Something Interesting'
@@ -43,7 +73,6 @@ class TestFilterSeries(FlexGetBase):
         assert s.episode == 2
         assert s.quality == 'unknown'
         assert not s.proper_or_repack, 'did not detect proper'
-        
 
         s = SeriesParser()
         s.name = 'Something Interesting'
@@ -92,25 +121,9 @@ class TestFilterSeries(FlexGetBase):
         s.name = 'Something Interesting'
         s.data = 1
         assert_raises(Exception, s.parse)
-
-    def testSeries(self):
-        # TODO: needs to be fixed after series is converted into SQLAlchemy
-        # 'some series' should be in timeframe-queue
-        #self.feed.shared_cache.set_namespace('series')
-        #s = self.feed.shared_cache.get('some series')
-        #assert isinstance(s, dict)
-        #assert not s.get('S1E20', {}).get('info').get('downloaded')
         
-        # normal passing
-        assert self.feed.find_entry(title='Another.Series.S01E20.720p.XViD-FlexGet'), 'Another.Series.S01E20.720p.XViD-FlexGet should have passed'
-        # episode advancement
-        assert not self.feed.find_entry('rejected', title='Another.Series.S01E10.720p.XViD-FlexGet'), 'Another.Series.S01E10.720p.XViD-FlexGet should NOT have passed because of episode advancement'
-        assert self.feed.find_entry('accepted', title='Another.Series.S01E16.720p.XViD-FlexGet'), 'Another.Series.S01E16.720p.XViD-FlexGet should have passed because of episode advancement grace magin'
-        # date formats
-        df = ['Date.Series.10-11-2008.XViD','Date.Series.10.12.2008.XViD', 'Date.Series.2008-10-13.XViD', 'Date.Series.2008x10.14.XViD']
-        for d in df:
-            assert self.feed.find_entry(title=d), 'Date format did not match %s' % d
-        # parse from filename
-        assert self.feed.find_entry(filename='Filename.Series.S01E26.XViD'), 'Filename parsing failed'
-        # empty description
-        assert self.feed.find_entry(title='Empty.Description.S01E22.XViD'), 'Empty Description failed'
+        # test season packs
+        s = SeriesParser()
+        s.name = 'Something'
+        s.data = 'Something S02 Pack 720p WEB-DL-FlexGet'
+        assert_raises(ParseWarning, s.parse)

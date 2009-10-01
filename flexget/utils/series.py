@@ -1,8 +1,12 @@
-from flexget.utils.log import log_once
 import logging
 import re
 
 log = logging.getLogger('seriesparser')
+
+class ParseWarning(Warning):
+    def __init__(self, value, **kwargs):
+        self.value = value
+        self.kwargs = kwargs
 
 class SeriesParser:
     qualities = ['1080p', '1080', '720p', '720', 'hr', 'dvd', 'dvdrip', 'hdtv', 'pdtv', 'dsr', 'dsrip', 'unknown']
@@ -19,7 +23,7 @@ class SeriesParser:
         
         self.ep_regexps = ['s(\d+)e(\d+)', 's(\d+)ep(\d+)', 's(\d+).e(\d+)', '[^\d]([\d]{1,2})[\s]?x[\s]?(\d+)']
         self.id_regexps = ['(\d\d\d\d).(\d+).(\d+)', '(\d+).(\d+).(\d\d\d\d)', \
-                           '(\d\d\d\d)x(\d+)\.(\d+)', '(\d\d\d)', '(\d\d)', '(\d)']
+                           '(\d\d\d\d)x(\d+)\.(\d+)', '[^s^\d](\d{1,3})[^p^\d]']
         self.name_regexps = []
         # parse produces these
         self.season = None
@@ -125,7 +129,7 @@ class SeriesParser:
                 self.valid = True
                 return
 
-        log_once('%s looks like series %s but I cannot find any episode or id numbering!' % (self.data, self.name))
+        raise ParseWarning('%s looks like series %s but I cannot find any episode or id numbering!' % (self.data, self.name))
 
     def identifier(self):
         """Return identifier for parsed episode"""
