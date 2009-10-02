@@ -26,12 +26,13 @@ class MockManager(Manager):
     unit_test = True
     def __init__(self, config_text, config_name):
         self.config_text = config_text
-        self.configname = config_name
-        Manager.__init__(self, test_options, os.path.dirname(os.path.abspath(sys.path[0])))
+        self.config_name = config_name
+        Manager.__init__(self, test_options)
 
     def load_config(self):
         try:
             self.config = yaml.safe_load(self.config_text)
+            self.config_base = os.path.dirname(os.path.abspath(sys.path[0]))
         except Exception, e:
             print 'Invalid configuration'
             raise

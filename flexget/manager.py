@@ -1,4 +1,4 @@
-import os.path
+import os
 import sys
 import logging
 from datetime import datetime
@@ -33,12 +33,13 @@ class FailedEntry(Base):
 
 class Manager:
     unit_test = False
-    configname = None
+    config_name = None
+    lockfile = None
     options = None
     
-    def __init__(self, options, config_base):
+    def __init__(self, options):
         self.options = options
-        self.config_base = config_base
+        self.config_base = None
 
         self.config = {}
         self.feeds = {}
@@ -55,18 +56,25 @@ class Manager:
 
     def initialize(self):
         """Separated from __init__ so that unit test can modify options before loading config."""
-        try:
-            self.load_config()
-        except Exception, e:
-            log.critical(e)
-            sys.exit(1)
-            
+        self.load_config()
         self.init_sqlalchemy()
         
     def load_config(self):
         """Load the configuration file"""
-        possible = [os.path.join(self.config_base, self.options.config), self.options.config]
-        for config in possible:
+        startup_path = os.path.dirname(os.path.abspath(sys.path[0]))
+        home_path = os.path.join(os.path.expanduser('~'), '.flexget')
+        current_path = os.getcwd()
+        exec_path = sys.path[0]
+        
+        possible = {}
+        possible[os.path.join(startup_path, self.options.config)] = startup_path
+        possible[os.path.join(home_path, self.options.config)] = home_path
+        # for virtualenv / dev sandbox
+        possible[os.path.join(sys.path[0], '..', self.options.config)] = os.path.join(sys.path[0], '..')
+        possible[os.path.join(current_path, self.options.config)] = current_path
+        possible[os.path.join(exec_path, self.options.config)] = exec_path
+        
+        for config, base in possible.iteritems():
             if os.path.exists(config):
                 self.pre_check_config(config)
                 try:
@@ -90,10 +98,12 @@ class Manager:
                     except:
                         pass
                     sys.exit(1)
-                self.configname = os.path.basename(config)[:-4]
+                # config loaded successfully
+                self.config_name, extension = os.path.splitext(os.path.basename(config))
+                self.config_base = base
                 return
         log.info('Tried to read from: %s' % ', '.join(possible))
-        raise Exception('Failed to find configuration file %s' % self.options.config)
+        raise IOError('Failed to find configuration file %s' % self.options.config)
     
     def pre_check_config(self, fn):
         """
@@ -163,7 +173,7 @@ class Manager:
         if self.options.migrate:
             shelve_session_name = self.options.migrate
         else:
-            shelve_session_name = os.path.join(self.config_base, 'session-%s.db' % self.configname)
+            shelve_session_name = os.path.join(self.config_base, 'session-%s.db' % self.config_name)
         if os.path.exists(shelve_session_name):
             import shelve
             import copy
@@ -174,10 +184,10 @@ class Manager:
             shutil.move(shelve_session_name, '%s_migrated' % shelve_session_name)
         
         # SQLAlchemy
-        self.db_filename = os.path.join(self.config_base, 'db-%s.sqlite' % self.configname)
+        self.db_filename = os.path.join(self.config_base, 'db-%s.sqlite' % self.config_name)
         
         if self.options.test:
-            db_test_filename = os.path.join(self.config_base, 'test-%s.sqlite' % self.configname)
+            db_test_filename = os.path.join(self.config_base, 'test-%s.sqlite' % self.config_name)
             log.info('Test mode, creating a copy from database.')
             if os.path.exists(self.db_filename):
                 shutil.copy(self.db_filename, db_test_filename)
@@ -199,6 +209,24 @@ class Manager:
         if self.options.reset:
             Base.metadata.drop_all(bind=engine)
         Base.metadata.create_all(bind=engine)
+        
+        
+    def acquire_lock(self):
+        self.lockfile = os.path.join(self.config_base, ".%s-lock" % self.config_name)
+        if os.path.exists(self.lockfile):
+            f = file(self.lockfile)
+            pid = f.read()
+            f.close()
+            print "Another process (%s) is running, will exit." % pid.strip()
+            print "If you're sure there is no other instance running, delete %s" % self.lockfile
+            sys.exit(1)
+        
+        f = file(self.lockfile, 'w')
+        f.write("PID: %s\n" % os.getpid())
+        f.close()
+        
+    def release_lock(self):
+        os.remove(self.lockfile)
 
     def print_failed(self):
         """Parameter --failed"""
@@ -215,10 +243,10 @@ class Manager:
         """Adds entry to internal failed list, displayed with --failed"""
         failed = Session()
         failedentry = FailedEntry(str(entry['title']), str(entry['url']))
-        #TODO: query item's existence
+        # TODO: query item's existence
         if not failed.query(FailedEntry).filter(FailedEntry.title==str(entry['title'])).first():
             failed.add(failedentry)
-        #TODO: limit item number to 25
+        # TODO: limit item number to 25
         i = 0
         for row in failed.query(FailedEntry).order_by(FailedEntry.tof.desc()).all():
             i += 1
@@ -335,3 +363,5 @@ class Manager:
                 raise Exception('trying to delete non test database?')
             os.remove(self.db_filename)
             log.info('Removed test database') 
+
+        self.release_lock()

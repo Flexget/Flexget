@@ -75,6 +75,17 @@ def start_logging(filename=None, level=logging.INFO, debug=False, quiet=False):
         _mem_handler.flush()
 
         _logging_started = True
+        
+def flush_logging():
+    """Flushes memory logger to console"""
+    console = logging.StreamHandler()
+    console.setFormatter(_mem_handler.formatter)
+    logger = logging.getLogger()
+    logger.addHandler(console)
+    if len(_mem_handler.buffer) > 0:
+        for record in _mem_handler.buffer:
+            console.handle(record)
+    _mem_handler.flush()
 
 def main():
     initialize_logging()
@@ -95,46 +106,17 @@ def main():
         print 'FlexGet {subversion}'
         return
 
-    """
-    if os.path.exists(os.path.join(sys.path[0], '..', 'pavement.py')):
-        basedir = os.path.dirname(os.path.abspath(sys.path[0]))
-    else:
-        basedir = sys.path[0]
-
-    if os.path.exists(os.path.join(basedir, 'config.yml')):
-        config_base = basedir
-    else:
-        config_base = os.path.join(os.path.expanduser('~'), '.flexget')
-
-    print 'basedir: %s' % basedir
-    print 'config_base: %s' % config_base
-
-    if not os.path.exists(config_base):
-        print 'Current path doesn''t have config.yml and %s doesn''t exist either' % config_base
-        print 'Aborting! Need configuration file to execute.'
-        return 
-    
-    """
-
-    config_base = os.path.dirname(os.path.abspath(sys.path[0]))
-
-    start_logging(os.path.join(config_base, 'flexget.log'), log_level, quiet=options.quiet)
-
-    manager = Manager(options, config_base)
-
-    lockfile = os.path.join(config_base, ".%s-lock" % manager.configname)
-
-    if os.path.exists(lockfile):
-        f = file(lockfile)
-        pid = f.read()
-        f.close()
-        print "Another process (%s) is running, will exit." % pid.strip()
-        print "If you're sure there is no other instance running, delete %s" % lockfile
+    try:
+        manager = Manager(options)
+    except IOError, e:
+        # failed to load config
+        log.critical(e.message)
+        flush_logging()
         sys.exit(1)
-
-    f = file(lockfile, 'w')
-    f.write("PID: %s\n" % os.getpid())
-    f.close()
+        
+    manager.acquire_lock()
+    
+    start_logging(os.path.join(manager.config_base, 'flexget.log'), log_level, quiet=options.quiet)
 
     try:
         if options.doc:
@@ -149,4 +131,3 @@ def main():
             manager.execute()
     finally:
         manager.shutdown()
-        os.remove(lockfile)
