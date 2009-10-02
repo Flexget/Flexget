@@ -66,6 +66,28 @@ class TestFilterSeries(FlexGetBase):
         assert not self.feed.find_entry('rejected', title='Another.Series.S01E10.720p.XViD-FlexGet'), 'Another.Series.S01E10.720p.XViD-FlexGet should NOT have passed because of episode advancement'
         assert self.feed.find_entry('accepted', title='Another.Series.S01E16.720p.XViD-FlexGet'), 'Another.Series.S01E16.720p.XViD-FlexGet should have passed because of episode advancement grace magin'
         
+class TestFilterSeriesPriority(FlexGetBase):
+    __yaml__ = """
+        feeds:
+          test:
+            input_mock:
+              - {title: 'foobar 720p s01e01', url: 'http://localhost/1' }
+              - {title: 'foobar hdtv s01e01', url: 'http://localhost/2' }
+            regexp:
+              reject:
+                - 720p
+            series:
+              - foobar
+    """    
+
+    def setUp(self):
+        FlexGetBase.setUp(self)
+        self.execute_feed('test')
+
+    def testIt(self):
+        assert self.feed.find_entry('rejected', title='foobar 720p s01e01'), 'foobar 720p s01e01 should have been rejected'
+        assert self.feed.find_entry('accepted', title='foobar hdtv s01e01'), 'foobar hdtv s01e01 is not accepted'
+
 
 class TestSeriesParser(object):
 

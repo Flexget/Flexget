@@ -170,4 +170,4 @@ class FilterRegexp:
         else:
             return None
 
-register_plugin(FilterRegexp, 'regexp')
+register_plugin(FilterRegexp, 'regexp', priorities={'filter': 128})

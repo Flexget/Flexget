@@ -52,7 +52,7 @@ class FilterImdb:
             try:
                 lookup(feed, entry)
             except PluginError, e:
-                log.error('Skipping %s because error: %s' % (entry['title'], e.value))
+                log.error('Skipping %s because of an error: %s' % (entry['title'], e.value))
                 continue
             
             # Check defined conditions, TODO: rewrite into functions?
@@ -94,6 +94,5 @@ class FilterImdb:
             else:
                 log.debug('Accepting %s' % (entry))
                 feed.accept(entry)
-
 
 register_plugin(FilterImdb, 'imdb', priorities={'filter': 128})
