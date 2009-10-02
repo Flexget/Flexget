@@ -86,7 +86,7 @@ class Statistics:
         # don't bother to save the failed ones, the number is worth shit anyway
         #if not self.passed: return
         
-        dbname = os.path.join(feed.manager.config_base, feed.manager.configname+".db")
+        dbname = os.path.join(feed.manager.config_base, feed.manager.config_name+".db")
         con = sqlite.connect(dbname)
         self.init(con)
         cur = con.cursor()
@@ -100,7 +100,7 @@ class Statistics:
     def get_config(self, feed):
         config = feed.config['statistics']
         if not isinstance(config, dict):
-            config = {'file': os.path.join(feed.manager.config_base, feed.manager.configname+'_statistics.html')}
+            config = {'file': os.path.join(feed.manager.config_base, feed.manager.config_name+'_statistics.html')}
 
         config['file'] = os.path.expanduser(config['file'])
         
@@ -117,7 +117,7 @@ class Statistics:
         log.debug("generating charts")
         self.written = True
 
-        dbname = os.path.join(os.path.join(feed.manager.config_base, feed.manager.configname+".db"))
+        dbname = os.path.join(os.path.join(feed.manager.config_base, feed.manager.config_name+".db"))
         con = sqlite.connect(dbname)
 
         charts = []
