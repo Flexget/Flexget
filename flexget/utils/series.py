@@ -24,6 +24,7 @@ class SeriesParser:
         self.ep_regexps = ['s(\d+)e(\d+)', 's(\d+)ep(\d+)', 's(\d+).e(\d+)', '[^\d]([\d]{1,2})[\s]?x[\s]?(\d+)']
         self.id_regexps = ['(\d\d\d\d).(\d+).(\d+)', '(\d+).(\d+).(\d\d\d\d)', \
                            '(\d\d\d\d)x(\d+)\.(\d+)', '[^s^\d](\d{1,3})[^p^\d]']
+        self.clean_regexps = ['\[.*?\]', '\(.*?\)']
         self.name_regexps = []
         # parse produces these
         self.season = None
@@ -48,12 +49,40 @@ class SeriesParser:
         if not isinstance(self.data, basestring):
             raise Exception('SeriesParser data is not a string, got %s' % repr(self.data))
 
+        data = self.data
+
+        # perform data cleaner regexps
+        for clean_re in self.clean_regexps:
+            matches = re.findall(clean_re, data, re.IGNORECASE|re.UNICODE)
+            # remove all matches from data, unless they happen to contain relevant information
+            if matches:
+                for match in matches:
+                    # TODO: check if match contain valid episode number .. 
+                    safe = True
+                    for quality in self.qualities:
+                        if quality in match:
+                            safe = False
+                            break
+                    for proper in self.propers:
+                        if proper in match:
+                            safe = False
+                            break
+                    if not safe:
+                        break
+                    else:
+                        data = data.replace(match, '').strip()
+            
+        #log.log(5, 'data after cleaners: %s' % data)
+
         def clean(str):
-            return re.sub(r'[ _.\[\]]+', ' ', str).strip().lower()
+            """Helper, just replace crap with spaces"""
+            return re.sub(r'[ _.\[\]\(\)]+', ' ', str).strip().lower()
 
         name = clean(self.name)
-        data = clean(self.data)
-
+        data = clean(data)
+        
+        #log.log(5, 'data pre-cleaned: %s' % data)
+            
         def name_to_re(name):
             """Convert 'foo bar' to '^[^...]*foo[^...]*bar[^...]+"""
             # TODO: Still doesn't handle the case where the user wants
@@ -74,7 +103,7 @@ class SeriesParser:
             name_matches = False
             # use all specified regexps to this data
             for name_re in self.name_regexps:
-                match = re.search(name_re, self.data, re.IGNORECASE|re.UNICODE)
+                match = re.search(name_re, data, re.IGNORECASE|re.UNICODE)
                 if match:
                     name_matches = True
                     break
@@ -85,8 +114,8 @@ class SeriesParser:
         else:
             # Use a regexp generated from the name as a fallback.
             name_re = name_to_re(name)
-            if not re.search(name_re, self.data, re.IGNORECASE|re.UNICODE):
-                #log.debug('FAIL: regexp %s does not match %s' % (name_re, self.data))
+            if not re.search(name_re, data, re.IGNORECASE|re.UNICODE):
+                #log.debug('FAIL: regexp %s does not match %s' % (name_re, data))
                 # leave this invalid
                 return
                 
@@ -108,7 +137,7 @@ class SeriesParser:
 
         # search for season and episode number
         for ep_re in self.ep_regexps:
-            match = re.search(ep_re, self.data, re.IGNORECASE|re.UNICODE)
+            match = re.search(ep_re, data, re.IGNORECASE|re.UNICODE)
             if match:
                 #log.debug('found episode number with regexp %s' % ep_re)
                 season, episode = match.groups()
@@ -120,7 +149,7 @@ class SeriesParser:
 
         # search for id as last since they contain somewhat broad matches
         for id_re in self.id_regexps:
-            match = re.search(id_re, self.data, re.IGNORECASE|re.UNICODE)
+            match = re.search(id_re, data, re.IGNORECASE|re.UNICODE)
             if match:
                 #log.debug('found id with regexp %s' % id_re)
                 self.id = '-'.join(match.groups())
@@ -129,7 +158,7 @@ class SeriesParser:
                 self.valid = True
                 return
 
-        raise ParseWarning('%s looks like series %s but I cannot find any episode or id numbering!' % (self.data, self.name))
+        raise ParseWarning('%s looks like series %s but I cannot find any episode or id numbering!' % (data, self.name))
 
     def identifier(self):
         """Return identifier for parsed episode"""

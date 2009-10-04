@@ -112,7 +112,6 @@ class TestSeriesParser(object):
         s.name = '25'
         s.data = '25.And.More.S01E02-FlexGet'
         s.parse()
-        # TODO: This behavior should be changed. uhh, why?
         assert s.valid, 'Fix the implementation, should not be valid'
 
         # test invalid name
@@ -130,8 +129,9 @@ class TestSeriesParser(object):
         assert not s.season, 'Should not have season'
         assert s.id == '2008-12-13', 'invalid id'
         assert s.valid, 'should not valid'
-        
-        # test 01x02 format
+
+    def testSxE(self):
+        # Test 01x02 format
         s = SeriesParser()
         s.name = 'Something'
         s.data = 'Something.01x02-FlexGet'
@@ -144,11 +144,72 @@ class TestSeriesParser(object):
         s.parse()
         assert (s.season==1 and s.episode==2), 'failed to parse 1 x 2'
         
-        # test invalid data
+    def testInvalid(self):
         s = SeriesParser()
         s.name = 'Something Interesting'
         s.data = 1
         assert_raises(Exception, s.parse)
+
+    def testSimpleDigits(self):
+        s = SeriesParser()
+        s.name = 'Something'
+        s.data = 'Something 01 FlexGet'
+        s.parse()
+        assert (s.id=='01'), 'failed to parse %s' % s.data
+
+        s = SeriesParser()
+        s.name = 'Something'
+        s.data = 'Something-121.H264.FlexGet'
+        s.parse()
+        assert (s.id=='121'), 'failed to parse %s' % s.data
+
+    def testQuality(self):
+        s = SeriesParser()
+        s.name = 'Foo Bar'
+        s.data = 'Foo.Bar.S01E01.720p.HDTV.x264-FlexGet'
+        s.parse()
+        assert (s.season==1 and s.episode==1), 'failed to parse episodes from %s' % s.data
+        assert (s.quality=='720p'), 'failed to parse quality from %s' % s.data
+
+    def testQualityParenthesis(self):
+        s = SeriesParser()
+        s.name = 'Foo Bar'
+        s.data = 'Foo.Bar.S01E01.[720p].HDTV.x264-FlexGet'
+        s.parse()
+        assert (s.season==1 and s.episode==1), 'failed to parse episodes from %s' % s.data
+        assert (s.quality=='720p'), 'failed to parse quality from %s' % s.data
+
+        s = SeriesParser()
+        s.name = 'Foo Bar'
+        s.data = 'Foo.Bar.S01E01.(720p).HDTV.x264-FlexGet'
+        s.parse()
+        assert (s.season==1 and s.episode==1), 'failed to parse episodes from %s' % s.data
+        assert (s.quality=='720p'), 'failed to parse quality from %s' % s.data
+        
+    def testNumbericNames(self):
+        s = SeriesParser()
+        s.name = '24'
+        s.data = '24.1x2-FlexGet'
+        s.parse()
+        assert (s.season==1 and s.episode==2), 'failed to parse %s' % s.data
+        
+        s = SeriesParser()
+        s.name = '90120'
+        s.data = '90120.1x2-FlexGet'
+        s.parse()
+        assert (s.season==1 and s.episode==2), 'failed to parse %s' % s.data
+
+        s = SeriesParser()
+        s.name = 'Foo Bar'
+        s.data = '[l.u.l.z] Foo Bar - 11 (H.264) [5235532D].mkv'
+        s.parse()
+        assert (s.id=='11'), 'failed to parse %s' % s.data
+        
+        s = SeriesParser()
+        s.name = 'Foo Bar'
+        s.data = '[7.1.7.5] Foo Bar - 11 (H.264) [5235532D].mkv'
+        s.parse()
+        assert (s.id=='11'), 'failed to parse %s' % s.data
 
     def testSeasonPacks(self):
         
