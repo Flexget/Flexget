@@ -50,8 +50,6 @@ class FlexGetBase(object):
             self.feed.session.close()
         except:
             pass
-        if os.path.exists(self.manager.db_filename):
-            os.remove(self.manager.db_filename)
 
     def execute_feed(self, name):
         """Use to execute one test feed from config"""

@@ -184,19 +184,22 @@ class Manager:
             shutil.move(shelve_session_name, '%s_migrated' % shelve_session_name)
         
         # SQLAlchemy
-        self.db_filename = os.path.join(self.config_base, 'db-%s.sqlite' % self.config_name)
+        if self.unit_test:
+            connection = 'sqlite:///:memory:'
+        else:
+            self.db_filename = os.path.join(self.config_base, 'db-%s.sqlite' % self.config_name)
+            if self.options.test:
+                db_test_filename = os.path.join(self.config_base, 'test-%s.sqlite' % self.config_name)
+                log.info('Test mode, creating a copy from database.')
+                if os.path.exists(self.db_filename):
+                    shutil.copy(self.db_filename, db_test_filename)
+                self.db_filename = db_test_filename 
+            
+            # in case running on windows, needs double \\
+            filename = self.db_filename.replace('\\', '\\\\')
+            connection = 'sqlite:///%s' % filename
         
-        if self.options.test:
-            db_test_filename = os.path.join(self.config_base, 'test-%s.sqlite' % self.config_name)
-            log.info('Test mode, creating a copy from database.')
-            if os.path.exists(self.db_filename):
-                shutil.copy(self.db_filename, db_test_filename)
-            self.db_filename = db_test_filename 
-        
-        # in case running on windows, needs double \\
-        filename = self.db_filename.replace('\\', '\\\\')
-
-        connection = 'sqlite:///%s' % filename
+        # fire up the engine
         log.debug('connection: %s' % connection)
         try:
             engine = sqlalchemy.create_engine(connection, echo=self.options.debug_sql)

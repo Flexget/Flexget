@@ -10,7 +10,7 @@ from paver.setuputils import setup, find_package_data, find_packages
 options = environment.options
 setup(
     name='FlexGet',
-    version='1.0b4',
+    version='1.0-svn',
     description='FlexGet is a program aimed to automate downloading or processing content (torrents, podcasts, etc.) from different sources like RSS-feeds, html-pages, various sites and more.',
     author='Marko Koivusalo',
     author_email='',
