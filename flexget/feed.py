@@ -97,12 +97,16 @@ class Feed:
 
     def accept(self, entry, reason=None):
         """Accepts this entry."""
+        if not isinstance(entry, Entry):
+            raise Exception('Trying to accept non entry, %s' % repr(entry))
         if not entry in self.accepted and not entry in self.rejected:
             self.accepted.append(entry)
             self.verbose_details('Accepted %s' % entry['title'], reason)
 
     def reject(self, entry, reason=None):
         """Reject this entry immediately and permanently."""
+        if not isinstance(entry, Entry):
+             raise Exception('Trying to reject non entry, %s' % repr(entry))
         # ignore rejections on immortal entries
         if 'immortal' in entry:
             reason_str = ''

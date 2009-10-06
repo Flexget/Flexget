@@ -36,6 +36,7 @@ class Manager:
     config_name = None
     lockfile = None
     options = None
+    engine = None
     
     def __init__(self, options):
         self.options = options
@@ -202,16 +203,16 @@ class Manager:
         # fire up the engine
         log.debug('connection: %s' % connection)
         try:
-            engine = sqlalchemy.create_engine(connection, echo=self.options.debug_sql)
+            self.engine = sqlalchemy.create_engine(connection, echo=self.options.debug_sql)
         except ImportError, e:
             log.critical('Unable to use SQLite. Try installing python SQLite packages.')
             log.exception(e)
             sys.exit(1)
-        Session.configure(bind=engine)
+        Session.configure(bind=self.engine)
         # create all tables
         if self.options.reset:
-            Base.metadata.drop_all(bind=engine)
-        Base.metadata.create_all(bind=engine)
+            Base.metadata.drop_all(bind=self.engine)
+        Base.metadata.create_all(bind=self.engine)
         
         
     def acquire_lock(self):

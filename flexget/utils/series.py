@@ -57,7 +57,7 @@ class SeriesParser:
             # remove all matches from data, unless they happen to contain relevant information
             if matches:
                 for match in matches:
-                    # TODO: check if match contain valid episode number .. 
+                    # TODO: check if match contain valid episode number ? .. 
                     safe = True
                     for quality in self.qualities:
                         if quality in match:
@@ -76,12 +76,12 @@ class SeriesParser:
 
         def clean(str):
             """Helper, just replace crap with spaces"""
-            return re.sub(r'[ _.\[\]\(\)]+', ' ', str).strip().lower()
+            return re.sub(r'[-_.\[\]\(\)]+', ' ', str).strip().lower()
 
         name = clean(self.name)
         data = clean(data)
         
-        #log.log(5, 'data pre-cleaned: %s' % data)
+        #log.log(5, 'data fully-cleaned: %s' % data)
             
         def name_to_re(name):
             """Convert 'foo bar' to '^[^...]*foo[^...]*bar[^...]+"""
@@ -144,7 +144,7 @@ class SeriesParser:
                 self.season = int(season)
                 self.episode = int(episode)
                 self.valid = True
-                self.id = "S%sE%s" % (self.season, self.episode)
+                self.id = "S%sE%s" % (str(self.season).zfill(2), str(self.episode).zfill(2))
                 return
 
         # search for id as last since they contain somewhat broad matches
@@ -170,5 +170,6 @@ class SeriesParser:
         valid = 'INVALID'
         if self.valid:
             valid = 'OK'
-        return 'series: %s, id: %s season: %s episode: %s quality: %s status: %s' % \
-        (str(self.name), str(self.id), str(self.season), str(self.episode), str(self.quality), valid)
+        return '<SeriesParser(data=%s,name=%s,id=%s,season=%s,episode=%s,quality=%s,proper=%s,status=%s)>' % \
+            (str(self.data), str(self.name), str(self.id), str(self.season), str(self.episode), \
+             str(self.quality), str(self.proper_or_repack), valid)

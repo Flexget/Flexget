@@ -27,31 +27,118 @@ class Episode(Base):
 
     id = Column(Integer, primary_key=True)
     identifier = Column(String)
-    downloaded = Column(Boolean, default=False)
     first_seen = Column(DateTime, default=datetime.now())
     
     season = Column(Integer)
     number = Column(Integer)
 
     series_id = Column(Integer, ForeignKey('series.id'))
-    qualities = relation('Quality', backref='episode')
+    releases = relation('Release', backref='episode')
 
     def __repr__(self):
         return '<Episode(identifier=%s)>' % (self.identifier)
 
-class Quality(Base):
+class Release(Base):
 
-    __tablename__ = 'episode_qualities'
+    __tablename__ = 'episode_releases'
 
     id = Column(Integer, primary_key=True)
-    quality = Column(String)
-    entry = Column(PickleType)
     episode_id = Column(Integer, ForeignKey('series_episodes.id'))
+    quality = Column(String)
+    downloaded = Column(Boolean, default=False)
+    proper = Column(Boolean, default=False)
+    title = Column(String)
 
     def __repr__(self):
-        return '<Quality(quality=%s)>' % (self.quality)
+        return '<Release(quality=%s,downloaded=%s,proper=%s)>' % (self.quality, self.downloaded, self.proper)
 
-class SeriesReport(object):
+class SeriesPlugin(object):
+    
+    """Database helpers"""
+
+    def get_first_seen(self, session, parser):
+        """Return datetime when this episode of series was first seen"""
+        episode = session.query(Episode).select_from(join(Episode, Series)).\
+            filter(Series.name == parser.name).filter(Episode.identifier == parser.identifier()).first()
+        return episode.first_seen
+        
+    def get_latest_info(self, session, name):
+        """Return latest known identifier in dict (season, episode) for series name"""
+        episode = session.query(Episode).select_from(join(Episode, Series)).\
+            filter(Episode.season != None).filter(Series.name == name).\
+            order_by(desc(Episode.season)).order_by(desc(Episode.number)).first()
+        if not episode:
+            return False
+        log.debug('get_latest_info, series: %s season: %s episode: %s' % \
+            (name, episode.season, episode.number))
+        return {'season':episode.season, 'episode':episode.number}
+    
+    def get_releases(self, session, series_name, identifier):
+        """Return all releases for series by identifier."""
+        episode = session.query(Episode).select_from(join(Episode, Series)).\
+            filter(Series.name == series_name).\
+            filter(Episode.identifier == identifier).first()
+        if not episode:
+            return []
+        releases = []
+        for release in session.query(Release).filter(Release.episode_id == episode.id).\
+            order_by(desc(Release.quality)).all():
+            releases.append(release)
+        return releases
+    
+    def get_downloaded(self, session, name, identifier):
+        """Return list of downloaded releases for this episode"""
+        episode = session.query(Episode).select_from(join(Episode, Series)).\
+            filter(Series.name == name).\
+            filter(Episode.identifier == identifier).first()
+        if not episode:
+            log.debug('episode does not exist')
+            return []
+        downloaded = []
+        for release in session.query(Release).filter(Release.episode_id == episode.id).\
+            filter(Release.downloaded == True).all():
+            log.debug('got release')
+            downloaded.append(release)
+        return downloaded
+    
+    def store(self, session, parser):
+        """Push series information into database. Returns added/existing release."""
+        # if series does not exist in database, add new
+        series = session.query(Series).filter(Series.name == parser.name).first()
+        if not series:
+            log.debug('add series %s into database' % parser.name)
+            series = Series()
+            series.name = parser.name
+            session.add(series)
+        
+        # if episode does not exist in series, add new
+        episode = session.query(Episode).filter(Episode.series_id == series.id).\
+            filter(Episode.identifier == parser.identifier()).first()
+        if not episode:
+            log.debug('add episode %s into series %s' % (parser.identifier(), parser.name))
+            episode = Episode()
+            episode.identifier = parser.identifier()
+            # if episodic format
+            if parser.season and parser.episode:
+                episode.season = parser.season
+                episode.number = parser.episode
+            series.episodes.append(episode) # pylint: disable-msg=E1103
+
+        # if release does not exists in episodes, add new
+        release = session.query(Release).filter(Release.episode_id == episode.id).\
+            filter(Release.quality == parser.quality).\
+            filter(Release.proper == parser.proper_or_repack).first()
+        if not release:
+            log.debug('add release %s' % parser)
+            release = Release()
+            release.quality = parser.quality
+            release.proper = parser.proper_or_repack
+            release.title = parser.data
+            episode.releases.append(release) # pylint: disable-msg=E1103
+        return release
+
+
+class SeriesReport(SeriesPlugin):
     
     """Produces --series report"""
 
@@ -80,31 +167,38 @@ class SeriesReport(object):
                               filter(Series.name == series.name).filter(Episode.season == None).\
                               order_by(desc(Episode.first_seen)).first()
                 
-                ep = ''
-                dl = ''
+                latest = ''
+                status = ''
                 
                 if episode:
                     if not episode.season or not episode.number:
-                        ep = '%s (uid)' % episode.identifier
+                        latest = '%s (uid)' % episode.identifier
                     else:
-                        ep = 's%se%s' % (str(episode.season).zfill(2), str(episode.number).zfill(2))
-                    if not episode.downloaded:
-                        dl = 'Waiting for download'
+                        latest = 's%se%s' % (str(episode.season).zfill(2), str(episode.number).zfill(2))
+                        
+                    for release in self.get_releases(session, series.name, episode.identifier):
+                        if release.downloaded:
+                            status += '*'
+                        status += release.quality
+                        if release.proper:
+                            status += '-Proper'
+                        status += ' '
                 else:
-                    ep = 'N/A'
-                    dl = 'N/A'
+                    latest = 'N/A'
+                    status = 'N/A'
                 
-                print ' %-30s%-20s%-21s' % (series.name, ep, dl)
+                print ' %-30s%-20s%-21s' % (series.name, latest, status)
             
             print '-' * 79
+            print ' * = downloaded'
             session.close()
 
-class SeriesPurge(object):
+class SeriesForget(object):
     
-    """provides --series-purge"""
+    """provides --series-forget"""
 
     def process_start(self, feed):
-        if feed.manager.options.series_purge:
+        if feed.manager.options.series_forget:
             # disable all feeds
             for afeed in feed.manager.feeds.itervalues():
                 afeed.enabled = False
@@ -113,23 +207,27 @@ class SeriesPurge(object):
             session = Session()
 
             series = session.query(Series).\
-                     filter(Series.name == feed.manager.options.series_purge).first()
+                     filter(Series.name == feed.manager.options.series_forget).first()
             if series:
-                print 'Removed %s' % feed.manager.options.series_purge 
+                print 'Removed %s' % feed.manager.options.series_forget 
                 session.delete(series)
             else:
-                print 'Didn''t find series %s' % feed.manager.options.series_purge
+                print 'Didn''t find series %s' % feed.manager.options.series_forget
             
             session.commit()
 
 
-class FilterSeries(object):
+class FilterSeries(SeriesPlugin):
 
     """
         Intelligent filter for tv-series.
         
         http://flexget.com/wiki/FilterSeries
     """
+    
+    def __init__(self):
+        self.parser2entry = {}
+    
     def validator(self):
         from flexget import validator
 
@@ -188,41 +286,18 @@ class FilterSeries(object):
 
         return root
 
-    # TODO: re-implement (as new (sub)-plugin InputBacklog ?)
+    # TODO: re-implement (as new (sub)-plugin InputBacklog)
     """
     def feed_input(self, feed):
-        # Retrieve stored series from cache, in case they've been expired from feed while waiting
-        for name in feed.config.get('series', []):
-            if isinstance(name, dict):
-                name = name.items()[0][0]
-            serie = feed.shared_cache.get(name)
-            if not serie: continue
-            for identifier in serie.keys():
-                # don't add downloaded episodes
-                if serie[identifier].get('info', {}).get('downloaded', False):
-                    continue
-                # add all qualities
-                for quality in SeriesParser.qualities:
-                    if quality == 'info': continue # a hack, info dict is not quality
-                    entry = serie[identifier].get(quality)
-                    if not entry: continue
-                    # check if this episode is still in feed, if not then add it
-                    exists = False
-                    for feed_entry in feed.entries:
-                        if feed_entry['title'] == entry['title'] and feed_entry['url'] == entry['url']:
-                            exists = True
-                    if not exists:
-                        log.debug('restoring entry %s from cache' % entry['title'])
-                        # TODO: temp fix, do better
-                        e = Entry()
-                        e['title'] = entry['title']
-                        e['url'] = entry['url']
-                        feed.entries.append(e)
+        .
+        .
+        .
     """
 
     def generate_config(self, feed):
-        """Generate advanced form configuration dictionary from feed configuration. This way we do not
-        need to handle different configuration forms in the logic."""
+        """Generate configuration dictionary from configuration. Converts simple format into advanced.
+        This way we don't need to handle two different configuration formats in the logic.
+        Applies group settings with advanced form."""
 
         feed_config = feed.config.get('series', [])
         
@@ -282,13 +357,26 @@ class FilterSeries(object):
             config[group_name] = complex_series
             
         return config
-
+    
     def feed_filter(self, feed):
         """Filter series"""
         
+        # hack, test if running old database with sqlalchemy table reflection ..
+        running_old = True
+        from sqlalchemy.exceptions import NoSuchTableError
+        from sqlalchemy import Table, MetaData
+        try:
+            meta = MetaData()
+            reflect = Table('episode_qualities', meta, autoload=True, autoload_with=feed.session.connection())
+        except NoSuchTableError:
+            running_old = False
+        if running_old:
+            log.critical('Running old database! Please see bleeding edge news!')
+            feed.abort()
+        
         config = self.generate_config(feed)
         for group_name, group_series in config.iteritems():
-            # TODO: do we even need settings block in the config at this point?
+            # TODO: do we even need settings block in the config at this point, should we remove it?
             if group_name == 'settings':
                 continue
             for series_item in group_series:
@@ -322,7 +410,7 @@ class FilterSeries(object):
         series = {}
         for entry in feed.entries:
             for field, data in sorted(entry.items(), cmp=field_order):
-                # skip non string values and empty strings
+                # skip invalid fields
                 if not isinstance(data, basestring) or not data: 
                     continue
                 parser = SeriesParser()
@@ -342,9 +430,9 @@ class FilterSeries(object):
                     from flexget.utils.log import log_once
                     log_once(pw.value, logger=log)
                     
-                # series is not valid if it does not match given name / regexp or fails with exception
                 if parser.valid:
                     log.debug('Detected quality: %s from: %s' % (parser.quality, field))
+                    self.parser2entry[parser] = entry
                     break
             else:
                 continue
@@ -365,28 +453,50 @@ class FilterSeries(object):
                 set = get_plugin_by_name('set')
                 set.instance.modify(entry, config.get('set'))
                 
-            parser.entry = entry
             # add this episode into list of available episodes
             eps = series.setdefault(parser.identifier(), [])
             eps.append(parser)
             # store this episode into database
-            self.store(feed, parser)
+            release = self.store(feed.session, parser)
+            # save release reference for later use
+            entry['series_release'] = release
             
         return series
 
     def process_series(self, feed, series, series_name, config):
-        """Accept or Reject episode from available qualities, or postpone choosing."""
+        """Accept or Reject episode from available releases, or postpone choosing."""
         for identifier, eps in series.iteritems():
             if not eps: continue
             eps.sort(lambda x,y: cmp(x.quality, y.quality))
             best = eps[0]
             
             # episode (with this id) has been downloaded
-            if self.is_downloaded(feed.session, best):
+            downloaded = self.get_downloaded(feed.session, best.name, best.identifier())
+            #log.debug('downloaded: %s' % downloaded)
+            #log.debug('releases: %s' % self.get_releases(feed.session, best.name, best.identifier()))
+            
+            # remove uninteresting episodes from the list (downloaded)
+            for ep in eps[:]:
+                interested = True
+                for release in downloaded:
+                    if release.quality == ep.quality and ep.proper_or_repack and not release.proper:
+                        log.debug('oh, lookey .. found repack %s' % ep)
+                    else:
+                        entry = self.parser2entry[ep]
+                        feed.reject(entry, 'already downloaded')
+                        eps.remove(ep)
+                        
+            # no episodes left, continue to next series
+            if not eps:
+                continue 
+                
+
+            """
+            if downloaded:
                 log.debug('Series %s episode %s is already downloaded, rejecting all occurences' % (series_name, identifier))
                 for ep in eps:
-                    feed.reject(ep.entry, 'already downloaded')
                 continue
+            """
 
             # reject episodes that have been marked as watched in configig file
             if 'watched' in config:
@@ -397,7 +507,8 @@ class FilterSeries(object):
                 if best.season < season or (best.season == season and best.episode <= episode):
                     log.debug('%s episode %s is already watched, rejecting all occurrences' % (series_name, identifier))
                     for ep in eps:
-                        feed.reject(ep.entry, 'watched')
+                        entry = self.parser2entry[ep]
+                        feed.reject(entry, 'watched')
                     continue
                     
             # episode advancement, only when using season, ep identifier
@@ -409,7 +520,8 @@ class FilterSeries(object):
                     if best.season < latest['season'] or (best.season == latest['season'] and best.episode < latest['episode'] - grace):
                         log.debug('%s episode %s does not meet episode advancement, rejecting all occurrences' % (series_name, identifier))
                         for ep in eps:
-                            feed.reject(ep.entry, 'episode advancement')
+                            entry = self.parser2entry[ep]
+                            feed.reject(entry, 'episode advancement')
                         continue
                 else:
                     log.debug('No latest info available')
@@ -420,7 +532,8 @@ class FilterSeries(object):
                     if ep.quality == config['quality']:
                         self.accept_series(feed, ep, 'meets quality')
                     else:
-                        feed.reject(ep.entry, 'quality') # is this needed or a good idea?
+                        entry = self.parser2entry[ep]
+                        feed.reject(entry, 'quality') # is this needed or a good idea?
                 continue
 
             # timeframe present
@@ -450,7 +563,8 @@ class FilterSeries(object):
                 for ep in eps:
                     # Note: switch == operator to >= if wish to enable old behaviour
                     if cmp_quality(quality, ep.quality) == 0: # 1=greater, 0=equal, -1=does not meet
-                        log.debug('Timeframe accepting. %s meets quality %s' % (ep.entry['title'], quality))
+                        entry = self.parser2entry[ep]
+                        log.debug('Timeframe accepting. %s meets quality %s' % (entry['title'], quality))
                         self.accept_series(feed, ep, 'quality met, timeframe unnecessary')
                         found_quality = True
                         break
@@ -460,7 +574,8 @@ class FilterSeries(object):
                 # expire timeframe, accept anything
                 diff = datetime.now() - self.get_first_seen(feed.session, best)
                 if (diff.seconds < 60) and not feed.manager.unit_test:
-                    log.info('Timeframe waiting %s for %s hours, currently best is %s' % (series_name, timeframe.seconds/60**2, best.entry['title']))
+                    entry = self.parser2entry[best]
+                    log.info('Timeframe waiting %s for %s hours, currently best is %s' % (series_name, timeframe.seconds/60**2, entry['title']))
                 
                 first_seen = self.get_first_seen(feed.session, best)
                 log.debug('timeframe: %s' % timeframe)
@@ -468,20 +583,23 @@ class FilterSeries(object):
                 log.debug('first_seen + timeframe: %s' % str(first_seen + timeframe))
                 
                 if first_seen + timeframe <= datetime.now() or stop:
+                    entry = self.parser2entry[best]
                     if stop:
-                        log.info('Stopped timeframe, accepting %s' % (best.entry['title']))
+                        log.info('Stopped timeframe, accepting %s' % (entry['title']))
                     else:
-                        log.info('Timeframe expired, accepting %s' % (best.entry['title']))
+                        log.info('Timeframe expired, accepting %s' % (entry['title']))
                     self.accept_series(feed, best, 'expired/stopped')
                     for ep in eps:
                         if ep == best:
                             continue
-                        feed.reject(ep.entry, 'wrong quality')
+                        entry = self.parser2entry[ep]
+                        feed.reject(entry, 'wrong quality')
                     continue
                 else:
                     log.debug('timeframe waiting %s episode %s, rejecting all occurrences' % (series_name, identifier))
                     for ep in eps:
-                        feed.reject(ep.entry, 'timeframe waiting')
+                        entry = self.parser2entry[ep]
+                        feed.reject(entry, 'timeframe waiting')
                     continue
 
             # no special configuration, just choose the best
@@ -489,101 +607,28 @@ class FilterSeries(object):
 
     def accept_series(self, feed, parser, reason):
         """Helper method for accepting series"""
-        log.debug('Accepting %s because %s' % (parser.entry, reason))
-        feed.accept(parser.entry, reason)
-        # store series parser instance to entry for later use
-        parser.entry['series_parser'] = parser
-        # remove entry instance from parser, not needed any more (prevents circular reference?)
-        parser.entry = None
-
-    def get_first_seen(self, session, parser):
-        """Return datetime when this episode of series was first seen"""
-        episode = session.query(Episode).select_from(join(Episode, Series)).\
-            filter(Series.name == parser.name).filter(Episode.identifier == parser.identifier()).first()
-        return episode.first_seen
-        
-    def get_latest_info(self, session, name):
-        """Return latest known identifier in dict (season, episode) for series name"""
-        episode = session.query(Episode).select_from(join(Episode, Series)).\
-                  filter(Episode.season != None).filter(Series.name == name).\
-                  order_by(desc(Episode.season)).order_by(desc(Episode.number)).first()
-        if not episode:
-            return False
-        log.debug('get_latest_info, series: %s season: %s episode: %s' % \
-                  (name, episode.season, episode.number))
-        return {'season':episode.season, 'episode':episode.number}
-
-    def is_downloaded(self, session, parser):
-        """Return true if episode is downloaded"""
-        episode = session.query(Episode).select_from(join(Episode, Series)).\
-            filter(Series.name == parser.name).filter(Episode.identifier == parser.identifier()).first()
-        if episode:
-            return episode.downloaded
-        return False
-
-    def store(self, feed, parser):
-        """Push series information into database"""
-        # if does not exist in database, add new
-        series = feed.session.query(Series).filter(Series.name == parser.name).first()
-        if not series:
-            log.debug('add series %s into database' % parser.name)
-            series = Series()
-            series.name = parser.name
-            feed.session.add(series)
-        
-        # if episode does not exist in series, add new
-        episode = feed.session.query(Episode).filter(Episode.series_id == series.id).\
-            filter(Episode.identifier == parser.identifier()).first()
-        if not episode:
-            log.debug('add episode %s into series %s' % (parser.identifier(), parser.name))
-            episode = Episode()
-            episode.identifier = parser.identifier()
-            # if episodic format
-            if parser.season and parser.episode:
-                episode.season = parser.season
-                episode.number = parser.episode
-            series.episodes.append(episode) # pylint: disable-msg=E1103
-
-        # if quality does not exists in episodes, add new
-        quality = feed.session.query(Quality).filter(Quality.episode_id == episode.id).\
-            filter(Quality.quality == parser.quality).first()
-        if not quality:
-            log.debug('add quality %s into series %s episode %s' % (parser.quality, \
-                                                                    parser.name, parser.identifier()))
-            quality = Quality()
-            
-            # TODO:
-            # This CRASHES sqlalchemy in SOME cases, not all
-            #quality.entry = parser.entry
-            
-            # HACK: create copy of entry, this however does NOT contain all information from the original!
-            from flexget.feed import Entry
-            quality.entry = Entry(parser.entry['title'], parser.entry['url'])
-
-            quality.quality = parser.quality
-            episode.qualities.append(quality) # pylint: disable-msg=E1103
-
-    def mark_downloaded(self, feed, parser):
-        """Mark episode as being downloaded"""
-        log.debug('marking as downloaded %s' % parser)
-        episode = feed.session.query(Episode).select_from(join(Episode, Series)).\
-            filter(Series.name == parser.name).filter(Episode.identifier == parser.identifier()).first()
-        episode.downloaded = True
+        entry = self.parser2entry[parser]
+        log.debug('Accepting %s, reason %s' % (entry, reason))
+        feed.accept(entry, reason)
 
     def feed_exit(self, feed):
         """Learn succeeded episodes"""
         for entry in feed.accepted:
-            parser = entry.get('series_parser')
-            if parser:
-                self.mark_downloaded(feed, parser)
+            if 'series_release' in entry:
+                log.debug('Marking %s - %s as downloaded' % (entry['title'], entry['series_release']))
+                entry['series_release'].downloaded = True
+
+#
+# Register plugins
+#
 
 register_plugin(FilterSeries, 'series')
 register_plugin(SeriesReport, 'series_report', builtin=True)
-register_plugin(SeriesPurge, 'series_purge', builtin=True)
+register_plugin(SeriesForget, 'series_forget', builtin=True)
 
 register_parser_option('--series', action='store_true', dest='series', default=False, 
                        help='Display series summary.')
-register_parser_option('--series-purge', action='store', dest='series_purge', default=False, 
+register_parser_option('--series-forget', action='store', dest='series_forget', default=False, 
                        metavar='NAME', help='Remove given series from database.')
 register_parser_option('--stop-waiting', action='store', dest='stop_waiting', default=False, 
                        metavar='NAME', help='Stop timeframe for a given series.')

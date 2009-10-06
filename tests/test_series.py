@@ -8,19 +8,22 @@ class TestFilterSeries(FlexGetBase):
     __yaml__ = """
         feeds:
           test:
-            # test data
             input_mock:
-              - {title: 'Some.Series.S01E20.720p.XViD-FlexGet', url: 'http://localhost/irrelevant1'}
-              - {title: 'Another.Series.S01E20.720p.XViD-FlexGet', url: 'http://localhost/irrelevant2'}
-              - {title: 'Another.Series.S01E10.720p.XViD-FlexGet', url: 'http://localhost/irrelevant3'}
-              - {title: 'Another.Series.S01E16.720p.XViD-FlexGet', url: 'http://localhost/irrelevant4'}
-              - {title: 'Date.Series.10-11-2008.XViD', url: 'http://localhost/irrelevant5'}
-              - {title: 'Date.Series.10.12.2008.XViD', url: 'http://localhost/irrelevant6'}
-              - {title: 'Date.Series.2008-10-13.XViD', url: 'http://localhost/irrelevant7'}
-              - {title: 'Date.Series.2008x10.14.XViD', url: 'http://localhost/irrelevant8'}
-              - {title: 'Useless title', url: 'http://localhost/irrelevant9', filename: 'Filename.Series.S01E26.XViD'}
-              - {title: 'Empty.Description.S01E22.XViD', url: 'http://localhost/irrelevant10', description: ''}
+              - {title: 'Some.Series.S01E20.720p.XViD-FlexGet'}
+              - {title: 'Another.Series.S01E20.720p.XViD-FlexGet'}
+              - {title: 'Another.Series.S01E10.720p.XViD-FlexGet'}
+              - {title: 'Another.Series.S01E16.720p.XViD-FlexGet'}
+              - {title: 'Another.Series.S01E21.1080p.H264-FlexGet'}
+              - {title: 'Date.Series.10-11-2008.XViD'}
+              - {title: 'Date.Series.10.12.2008.XViD'}
+              - {title: 'Date.Series.2008-10-13.XViD'}
+              - {title: 'Date.Series.2008x10.14.XViD'}
+              - {title: 'Useless title', filename: 'Filename.Series.S01E26.XViD'}
+              - {title: 'Empty.Description.S01E22.XViD', description: ''}
               
+            regexp:
+              reject:
+                - 1080p
             series:
               - some series:
                   quality: 1080p
@@ -29,13 +32,51 @@ class TestFilterSeries(FlexGetBase):
               - date series
               - filename series
               - empty description
+              
+          test_propers_1:
+            input_mock:
+              - {title: 'Test.S01E01.720p-FlexGet'}
+            series:
+              - test
+            # prevents seen from rejecting on second execution, 
+            # we want to see that series is able to reject
+            disable_builtins: yes
+    
+          test_propers_2:
+            input_mock:
+              - {title: 'Test.S01E01.720p.Proper-FlexGet'}
+            series:
+              - test
+            # prevents seen from rejecting on second execution, 
+            # we want to see that series is able to reject
+            disable_builtins: yes
+            
+          test_quality:
+            input_mock:
+              - {title: 'QTest.S01E01.HDTV.XViD-FlexGet'}
+              - {title: 'QTest.S01E01.PDTV.XViD-FlexGet'}
+              - {title: 'QTest.S01E01.DSR.XViD-FlexGet'}
+              - {title: 'QTest.S01E01.1080p.XViD-FlexGet'}
+              - {title: 'QTest.S01E01.720p.XViD-FlexGet'}
+            series:
+              - QTest:
+                  quality: 720p
     """
     
     def setUp(self):
         FlexGetBase.setUp(self)
-        self.execute_feed('test')
 
-    def testSeries(self):
+
+    def testQuality(self):
+        self.execute_feed('test_quality')
+        assert self.feed.find_entry('accepted', title='QTest.S01E01.720p.XViD-FlexGet'), '720p should have been accepted'
+        assert not self.feed.find_entry('accepted', title='QTest.S01E01.HDTV.XViD-FlexGet'), 'hdtv shouldn\'t have been accepted'
+        assert not self.feed.find_entry('accepted', title='QTest.S01E01.PDTV.XViD-FlexGet'), 'pdtv shouldn\'t have been accepted'
+        assert not self.feed.find_entry('accepted', title='QTest.S01E01.1080p.XViD-FlexGet'), '1080p shouldn\'t have been accepted'
+        assert not self.feed.find_entry('accepted', title='QTest.S01E01.DSR.XViD-FlexGet'), 'DSR shouldn\'t have been accepted'
+
+    def testSmoke(self):
+        self.execute_feed('test')
         # TODO: needs to be fixed after series is converted into SQLAlchemy
         # 'some series' should be in timeframe-queue
         #self.feed.shared_cache.set_namespace('series')
@@ -57,14 +98,26 @@ class TestFilterSeries(FlexGetBase):
         # empty description
         assert self.feed.find_entry(title='Empty.Description.S01E22.XViD'), 'Empty Description failed'
         
-    def testAdvancement(self):
-        return
+        # chaining with regexp plugin
+        assert self.feed.find_entry('rejected', title='Another.Series.S01E21.1080p.H264-FlexGet'), 'regexp rejection'
         
-        # TODO: FIX FIX AND ENABLE
-        
-        # episode advancement
-        assert not self.feed.find_entry('rejected', title='Another.Series.S01E10.720p.XViD-FlexGet'), 'Another.Series.S01E10.720p.XViD-FlexGet should NOT have passed because of episode advancement'
+        # episode advancement (tracking)
+        assert self.feed.find_entry('rejected', title='Another.Series.S01E10.720p.XViD-FlexGet'), 'Another.Series.S01E10.720p.XViD-FlexGet should be rejected due advancement'
         assert self.feed.find_entry('accepted', title='Another.Series.S01E16.720p.XViD-FlexGet'), 'Another.Series.S01E16.720p.XViD-FlexGet should have passed because of episode advancement grace magin'
+        
+    def testPropers(self):
+        self.execute_feed('test_propers_1')
+        assert self.feed.find_entry('accepted', title='Test.S01E01.720p-FlexGet'), 'Test.S01E01-FlexGet should have been accepted'
+        # rejects downloaded
+        self.execute_feed('test_propers_1')
+        assert self.feed.find_entry('rejected', title='Test.S01E01.720p-FlexGet'), 'Test.S01E01-FlexGet should have been rejected'
+        # accepts proper
+        self.execute_feed('test_propers_2')
+        assert self.feed.find_entry('accepted', title='Test.S01E01.720p.Proper-FlexGet'), 'Test.S01E01.Proper-FlexGet should have been accepted'
+        # reject downloaded proper
+        self.execute_feed('test_propers_2')
+        assert self.feed.find_entry('rejected', title='Test.S01E01.720p.Proper-FlexGet'), 'Test.S01E01.Proper-FlexGet should have been rejected'
+
         
 class TestFilterSeriesPriority(FlexGetBase):
     __yaml__ = """
@@ -103,7 +156,18 @@ class TestSeriesParser(object):
         assert s.season == 1
         assert s.episode == 2
         assert s.quality == 'unknown'
-        assert not s.proper_or_repack, 'did not detect proper'
+        assert s.proper_or_repack, 'did not detect proper from %s' % s.data
+        
+        s = self.parse(name='foobar', data='foobar 720p proper s01e01')
+        assert s.proper_or_repack, 'did not detect proper from %s' % s.data
+        
+
+    def testNonProper(self):
+        s = self.parse(name='Something Interesting', data='Something.Interesting.S01E02-FlexGet')
+        assert s.season == 1
+        assert s.episode == 2
+        assert s.quality == 'unknown'
+        assert not s.proper_or_repack, 'detected proper'
 
     def testParser(self):
         s = self.parse(name='Something Interesting', data='The.Something.Interesting.S01E02-FlexGet')
@@ -172,6 +236,10 @@ class TestSeriesParser(object):
         
         s = self.parse(name='Foo Bar', data='[7.1.7.5] Foo Bar - 11 (H.264) [5235532D].mkv')
         assert (s.id=='11'), 'failed to parse %s' % s.data
+        
+    def testQuality(self):
+        s = self.parse(name='Test', data='Test.S01E01.720p-FlexGet')
+        assert s.quality=='720p', 'failed to parse quality from %s' % s.data
 
     def testSeasonPacks(self):
         s = SeriesParser()

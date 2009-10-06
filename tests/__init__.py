@@ -62,15 +62,23 @@ class FlexGetBase(object):
         self.feed.process_start()
         self.feed.execute()
         self.feed.process_end()
+        self.feed.session.commit()
         
     def dump(self):
         """Helper method for debugging"""
+        from flexget.utils.tools import sanitize
+        #entries = sanitize(self.feed.entries)
+        #accepted = sanitize(self.feed.accepted)
+        #rejected = sanitize(self.feed.rejected)
         print '-- ENTRIES: -----------------------------------------------------'
-        print yaml.dump(self.feed.entries)
+        #print yaml.safe_dump(entries)
+        print self.feed.entries
         print '-- ACCEPTED: ----------------------------------------------------'
-        print yaml.dump(self.feed.accepted)
+        #print yaml.safe_dump(accepted)
+        print self.feed.accepted
         print '-- REJECTED: ----------------------------------------------------'
-        print yaml.dump(self.feed.rejected)
+        #print yaml.safe_dump(rejected)
+        print self.feed.rejected
 
 class TestRegexp(FlexGetBase):
     __yaml__ = """

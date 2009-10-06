@@ -150,7 +150,7 @@ class FilterSeen(object):
             seen = Seen(field, entry[field], feed.name)
             feed.session.add(seen)
             
-            log.debug("Learned '%s' '%s'" % (entry['url'], entry['title']))
+            log.debug("Learned '%s' '%s' (field: %s)" % (entry['url'], entry['title'], field))
                 
     def migrate(self, feed):
         """Migrates 0.9 session data into new database"""

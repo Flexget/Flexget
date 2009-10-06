@@ -61,27 +61,39 @@ def _xmlcharref_encode(unicode_data, encoding):
             chars.append('&#%i;' % ord(char))
     return ''.join(chars)
 
-def sanitize(d, logger=None):
+
+import types
+_valid = [types.DictType, types.IntType, types.NoneType,
+          types.StringType, types.UnicodeType, types.BooleanType,
+          types.ListType, types.LongType, types.FloatType]
+
+def sanitize(value, logger=None):
+    if isinstance(value, dict):
+        sanitize_dict(value, logger)
+    elif isinstance(value, list):
+        sanitize_list(value, logger)
+    else:
+        raise Exception('Unsupported datatype')
+
+def sanitize_dict(d, logger=None):
     """Makes dictionary d contain only yaml.safe_dump compatible elements. On other words, remove all non
     standard types from dictionary."""
-    import types
-    valid = [types.DictType, types.IntType, types.NoneType,
-             types.StringType, types.UnicodeType, types.BooleanType,
-             types.ListType, types.LongType, types.FloatType]
     for k in d.keys():
-        if type(d[k])==types.ListType:
-            for i in d[k][:]:
-                if not type(i) in valid:
-                    if logger:
-                        logger.debug('Removed non yaml compatible list item from key %s %s' % (k, type([k])))
-                    d[k].remove(i)
-        if type(d[k])==types.DictType:
-            sanitize(d[k])
-        if not type(d[k]) in valid:
+        if isinstance(type(d[k]), list):
+            d[k] = sanitize_list(d[k])
+        elif isinstance(type(d[k]), dict):
+            sanitize_dict(d[k], logger)
+        elif not type(d[k]) in _valid:
             if logger:
                 logger.debug('Removed non yaml compatible key %s %s' % (k, type(d[k])))
             d.pop(k)
 
+def sanitize_list(content, logger=None):
+    for value in content[:]:
+        if not type(value) in _valid:
+            if logger:
+                logger.debug('Removed non yaml compatible list item from key %s %s' % (k, type([k])))
+        content.remove(value)
 
 def merge_dict_from_to(d1, d2):
     """Merges dictionary d1 into dictionary d2. d1 will remain in original form."""
