@@ -40,7 +40,7 @@ class ModifySet:
         for key, value in keys.iteritems():
             self.register_key(key, value)
 
-    def feed_modify(self, feed):
+    def on_feed_modify(self, feed):
         for entry in feed.accepted:
             self.modify(entry, feed.config['set'])
             

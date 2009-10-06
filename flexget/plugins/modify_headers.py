@@ -41,7 +41,7 @@ class PluginHeaders:
         config.accept_any_key('number')
         return config
 
-    def feed_start(self, feed):
+    def on_feed_start(self, feed):
         """Feed starting"""
         config = feed.config['headers']
         if urllib2._opener:
@@ -52,10 +52,10 @@ class PluginHeaders:
             opener = urllib2.build_opener(HTTPHeadersProcessor(config))
             urllib2.install_opener(opener)
         
-    def feed_abort(self, feed):
+    def on_feed_abort(self, feed):
         self.feed_exit(feed)
 
-    def feed_exit(self, feed):
+    def on_feed_exit(self, feed):
         """Feed exiting, remove additions"""
         if urllib2._opener:
             log.debug('Removing urllib2 default opener')

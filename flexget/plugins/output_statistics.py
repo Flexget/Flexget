@@ -74,12 +74,12 @@ class Statistics:
         cur.execute(create)
         con.commit()
         
-    def feed_input(self, feed):
+    def on_feed_input(self, feed):
         if not has_sqlite:
             raise PluginWarning('plugin statistics requires python-sqlite2 or python 2.5.')
         self.total = len(feed.entries)
 
-    def feed_exit(self, feed):
+    def on_feed_exit(self, feed):
         self.passed = len(feed.accepted)
         self.failed = self.total - self.passed
 
@@ -106,7 +106,7 @@ class Statistics:
         
         return config
 
-    def process_end(self, feed):
+    def on_process_end(self, feed):
         if not has_pygooglechart:
             raise PluginWarning('plugin statistics requires pygooglechart library.')
 

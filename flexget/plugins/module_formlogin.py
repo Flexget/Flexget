@@ -16,7 +16,7 @@ class InputFormLogin:
     Login on form
     """
 
-    def feed_input(self, feed):
+    def on_feed_input(self, feed):
         if not mechanize_present:
             raise PluginError('mechanize module required.', log)
         url = feed.config['form']['url']

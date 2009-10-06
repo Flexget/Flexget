@@ -28,7 +28,7 @@ class FilterExists:
             config = [config]
         return config
 
-    def feed_filter(self, feed):
+    def on_feed_filter(self, feed):
         config = self.get_config(feed)
         for path in config:
             path = os.path.expanduser(path)

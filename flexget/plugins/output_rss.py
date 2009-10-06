@@ -120,7 +120,7 @@ class OutputRSS:
         config['link'].append('url')
         return config
 
-    def feed_exit(self, feed):
+    def on_feed_exit(self, feed):
         """Store finished / downloaded entries at exit"""
         if not rss2gen:
             raise PluginWarning('plugin make_rss requires PyRSS2Gen library.')
@@ -161,7 +161,7 @@ class OutputRSS:
             log.debug('Saving %s into rss database' % entry['title'])
             feed.session.add(rss)
 
-    def process_end(self, feed):
+    def on_process_end(self, feed):
         """Write RSS file at application terminate."""
         if not rss2gen:
             return

@@ -15,7 +15,7 @@ class FilterAcceptAll:
         from flexget import validator
         return validator.factory('boolean')
 
-    def feed_filter(self, feed):
+    def on_feed_filter(self, feed):
         for entry in feed.entries:
             feed.accept(entry)
 

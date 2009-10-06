@@ -88,7 +88,7 @@ class FilterImdbRated:
         if count > 0:
             log.info('Added %s new movies' % count)
 
-    def feed_filter(self, feed):
+    def on_feed_filter(self, feed):
         config = feed.config['imdb_rated']
         if isinstance(config, basestring):
             config = {}

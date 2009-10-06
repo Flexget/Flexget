@@ -42,7 +42,7 @@ class FilterImdb:
         imdb.accept('list', key='accept_languages').accept('text')
         return imdb
 
-    def feed_filter(self, feed):
+    def on_feed_filter(self, feed):
         config = feed.config['imdb']
         
         lookup = get_plugin_by_name('imdb_lookup').instance.lookup

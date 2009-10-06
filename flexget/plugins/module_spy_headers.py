@@ -74,7 +74,7 @@ class PluginSpyHeaders:
         from flexget import validator
         return validator.factory('any')
 
-    def feed_start(self, feed):
+    def on_feed_start(self, feed):
         if urllib2._opener:
             log.debug('Adding HTTPCaptureHeaderHandler to default opener')
             urllib2._opener.add_handler(HTTPCaptureHeaderHandler())
@@ -83,11 +83,11 @@ class PluginSpyHeaders:
             opener = urllib2.build_opener(HTTPCaptureHeaderHandler())
             urllib2.install_opener(opener)
         
-    def feed_abort(self, feed):
+    def on_feed_abort(self, feed):
         """Feed aborted, remove additions"""
         self.feed_exit(feed)
 
-    def feed_exit(self, feed):
+    def on_feed_exit(self, feed):
         """Feed exiting, remove additions"""
         if urllib2._opener:
             log.debug('Removing urllib2 default opener')

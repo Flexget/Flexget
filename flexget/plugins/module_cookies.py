@@ -73,7 +73,7 @@ class PluginCookies:
         cookie_jar._really_load(s, '', True, True)
         return cookie_jar
 
-    def feed_start(self, feed):
+    def on_feed_start(self, feed):
         """Feed starting, install cookiejar"""
         cj = self.sqlite2cookie(feed.config['cookies'])
         
@@ -82,11 +82,11 @@ class PluginCookies:
         opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cj))
         urllib2.install_opener(opener)
         
-    def feed_abort(self, feed):
+    def on_feed_abort(self, feed):
         """Feed aborted, unhook the cookiejar"""
         self.feed_exit(feed)
 
-    def feed_exit(self, feed):
+    def on_feed_exit(self, feed):
         """Feed exiting, remove cookiejar"""
         log.debug('Removing urllib2 opener')
         urllib2.install_opener(None)

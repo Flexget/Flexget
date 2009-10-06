@@ -66,10 +66,10 @@ class InputBacklog:
                 backlog_entry.expire = expire_time
                 feed.session.add(backlog_entry)        
         
-    def feed_input(self, feed):
+    def on_feed_input(self, feed):
         self.inject_backlog(feed)
             
-    def feed_filter(self, feed):
+    def on_feed_filter(self, feed):
         self.learn_backlog(feed)
 
 register_plugin(InputBacklog, 'backlog', priorities=dict(input=-250, filter=255))

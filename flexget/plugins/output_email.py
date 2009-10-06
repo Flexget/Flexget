@@ -109,7 +109,7 @@ class OutputEmail:
         config.setdefault('smtp_tls', False)
         return config
 
-    def feed_exit(self, feed):
+    def on_feed_exit(self, feed):
         """Send email at exit."""
         config = self.get_config(feed)
 

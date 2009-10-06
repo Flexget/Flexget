@@ -102,7 +102,7 @@ class InputScenereleases:
 
         return releases
 
-    def feed_input(self, feed):
+    def on_feed_input(self, feed):
         try:
             releases = self.parse_site(feed.get_input_url('scenereleases'), feed)
         except urllib2.HTTPError, e:

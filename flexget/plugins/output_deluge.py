@@ -35,14 +35,14 @@ class OutputDeluge:
         config.setdefault('queuetotop', False)
         return config
 
-    def process_start(self, feed):
+    def on_process_start(self, feed):
         """
         register the usable set: keywords
         """
         set = get_plugin_by_name('set')
         set.instance.register_keys({'path':'text', 'movedone':'text', 'queuetotop':'boolean', 'label':'text'})
 
-    def feed_download(self, feed):
+    def on_feed_download(self, feed):
         """
         call the feed_download method of download plugin
         this will generate the temp files we will load into deluge
@@ -69,7 +69,7 @@ class OutputDeluge:
                     elif hasattr(e, 'code'):
                         log.error('The server couldn\'t fulfill the request. Error code: %s' % e.code)
 
-    def feed_output(self, feed):
+    def on_feed_output(self, feed):
         """Add torrents to deluge at exit."""
         config = self.get_config(feed)
         # don't add when learning

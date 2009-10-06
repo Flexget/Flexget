@@ -26,7 +26,7 @@ class RemoveTrackers:
         trackers.accept('text')
         return trackers
 
-    def feed_modify(self, feed):
+    def on_feed_modify(self, feed):
         for entry in feed.entries:
             if 'torrent' in entry:
                 trackers = entry['torrent'].get_multitrackers()

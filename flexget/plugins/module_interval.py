@@ -21,7 +21,7 @@ class PluginInterval:
         from flexget import validator
         return validator.factory('text')
 
-    def feed_start(self, feed):
+    def on_feed_start(self, feed):
         if feed.manager.options.interval_ignore or feed.manager.options.learn:
             log.info('Ignoring feed %s interval' % feed.name)
             return

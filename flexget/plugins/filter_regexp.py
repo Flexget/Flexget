@@ -64,7 +64,7 @@ class FilterRegexp:
         conf.accept('text', key='rest') # TODO: accept only ['accept','filter','reject']
         return conf
         
-    def feed_filter(self, feed):
+    def on_feed_filter(self, feed):
         match_methods = {'accept': feed.accept, 'reject': feed.reject }
         non_match_methods = {'accept_excluding': feed.accept, 'reject_excluding': feed.reject }
         

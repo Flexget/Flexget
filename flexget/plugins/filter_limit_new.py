@@ -21,7 +21,7 @@ class FilterLimitNew:
         from flexget import validator
         return validator.factory('number')
 
-    def feed_filter(self, feed):
+    def on_feed_filter(self, feed):
         amount = feed.config.get('limit_new', len(feed.entries))
         i = 1
         rejected = 0

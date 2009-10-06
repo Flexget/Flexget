@@ -27,7 +27,7 @@ class PluginPreset:
         presets.accept('text')
         return root
         
-    def process_start(self, feed):
+    def on_process_start(self, feed):
         config = feed.config.get('preset', 'global')
         if isinstance(config, basestring):
             config = [config]

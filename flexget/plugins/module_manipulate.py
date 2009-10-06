@@ -21,7 +21,7 @@ class Manipulate:
         edit.accept('regexp', key='regexp')
         return root
 
-    def feed_filter(self, feed):
+    def on_feed_filter(self, feed):
         for entry in feed.entries:
             for field, config in feed.config['manipulate'].iteritems():
                 if not config['from'] in entry:

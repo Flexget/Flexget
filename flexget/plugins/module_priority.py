@@ -22,7 +22,7 @@ class PluginPriority:
         config.accept_any_key('number')
         return config
 
-    def feed_start(self, feed):
+    def on_feed_start(self, feed):
         self.priorities = {}
         for name, priority in feed.config.get('priority', {}).iteritems():
             # abort if no priorities
@@ -42,7 +42,7 @@ class PluginPriority:
             for event, value in plugin.plugins[name].priorities.iteritems():
                 plugin.plugins[name].priorities[event] = priority
     
-    def feed_exit(self, feed):
+    def on_feed_exit(self, feed):
         for name, original in self.priorities.iteritems():
             plugin.plugins[name].priorities = original
 

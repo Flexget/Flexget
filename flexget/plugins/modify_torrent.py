@@ -171,7 +171,7 @@ class TorrentFilename:
         Makes sure that entries containing torrent-file have .torrent
         extension. This is enabled always by default (builtins).
     """
-    def feed_modify(self, feed):
+    def on_feed_modify(self, feed):
         idstr = 'd8:announce'
         for entry in feed.entries:
             # skip if entry does not have file assigned

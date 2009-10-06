@@ -21,7 +21,7 @@ class ModifyExtension:
         root.accept('number')
         return root
 
-    def feed_modify(self, feed):
+    def on_feed_modify(self, feed):
         ext = feed.config.get('extension')
         if ext.startswith('.'):
             ext = ext[1:]

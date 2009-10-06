@@ -99,7 +99,7 @@ class RlsLog:
 
         return releases
 
-    def feed_input(self, feed):
+    def on_feed_input(self, feed):
         url = feed.get_input_url('rlslog')
         if url.endswith('feed/'):
             raise PluginWarning('Invalid URL. Remove trailing feed/ from the url.')

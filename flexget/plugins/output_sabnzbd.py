@@ -35,7 +35,7 @@ class OutputSabnzbd:
         config.accept('text', key='username')
         return config
 
-    def feed_output(self, feed):
+    def on_feed_output(self, feed):
         import urllib
         import urllib2
         

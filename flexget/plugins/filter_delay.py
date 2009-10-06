@@ -47,7 +47,7 @@ class FilterDelay:
         except TypeError:
             raise PluginWarning('Invalid time format', log)
 
-    def feed_input(self, feed):
+    def on_feed_input(self, feed):
         entries = feed.session.query(DelayedEntry).filter(datetime.now() > DelayedEntry.expire).\
                                      filter(DelayedEntry.feed == feed.name).all()
         for delayed_entry in entries:
@@ -64,7 +64,7 @@ class FilterDelay:
             # remove from queue
             feed.session.delete(delayed_entry)
         
-    def feed_filter(self, feed):
+    def on_feed_filter(self, feed):
         expire_time = datetime.now() + self.get_delay(feed)
         for entry in feed.entries:
             if 'passed_delay' in entry:

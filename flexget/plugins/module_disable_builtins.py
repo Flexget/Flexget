@@ -21,7 +21,7 @@ class PluginDisableBuiltins:
                 continue
             log.debug('Builtin plugin: %s' % (name))
         
-    def feed_start(self, feed):
+    def on_feed_start(self, feed):
         for name, info in plugin.plugins.iteritems():
             if info.builtin:
                 if isinstance(feed.config['disable_builtins'], list):
@@ -34,7 +34,7 @@ class PluginDisableBuiltins:
                     self.disabled.append(name)
         log.debug('Disabled builtin plugin %s' % ', '.join(self.disabled))
         
-    def feed_exit(self, feed):
+    def on_feed_exit(self, feed):
         names = []
         for name in self.disabled:
             names.append(name)
@@ -42,6 +42,6 @@ class PluginDisableBuiltins:
         self.disabled = []
         log.debug('Enabled builtin plugins %s' % ', '.join(names))
         
-    feed_abort = feed_exit
+    on_feed_abort = on_feed_exit
 
 plugin.register_plugin(PluginDisableBuiltins, 'disable_builtins')

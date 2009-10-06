@@ -46,7 +46,7 @@ class FilterSeen(object):
         root.accept('text')
         return root
 
-    def process_start(self, feed):
+    def on_process_start(self, feed):
         """Implements --forget <feed> and --seen <value>"""
 
         # migrate shelve -> sqlalchemy
@@ -91,7 +91,7 @@ class FilterSeen(object):
             
             log.info('Added %s as seen. This will affect all feeds.' % feed.manager.options.seen)
         
-    def feed_filter(self, feed):
+    def on_feed_filter(self, feed):
         """Filter seen entries"""
         if not feed.config.get(self.keyword, True):
             log.debug('%s is disabled' % self.keyword)
@@ -127,7 +127,7 @@ class FilterSeen(object):
                         feed.session.add(seen)
                         duplicates.append(duplicate)
 
-    def feed_exit(self, feed):
+    def on_feed_exit(self, feed):
         """Remember succeeded entries"""
         if not feed.config.get('seen', True):
             log.debug('disabled')

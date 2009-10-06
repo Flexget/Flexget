@@ -12,7 +12,7 @@ class PluginScanImdb:
         from flexget import validator
         return validator.factory('boolean')
 
-    def feed_filter(self, feed):
+    def on_feed_filter(self, feed):
         # check if disabled (value set to false)
         if 'scan_imdb' in feed.config:
             if not feed.config['scan_imdb']:

@@ -30,7 +30,7 @@ class InputTVTorrents:
         from flexget import validator
         return validator.factory('url')
 
-    def feed_input(self, feed):
+    def on_feed_input(self, feed):
         pageurl = "http://tvtorrents.com/loggedin/recently_aired.do"
         log.debug("InputPlugin tvtorrents requesting url %s" % pageurl)
 

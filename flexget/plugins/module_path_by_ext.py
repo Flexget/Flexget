@@ -21,7 +21,7 @@ class PluginPathByExt:
         config.accept_any_key('any')
         return config
 
-    def feed_modify(self, feed):
+    def on_feed_modify(self, feed):
         self.ext(feed, self.set_path)
 
     def set_path(self, entry, path):

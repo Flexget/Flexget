@@ -22,7 +22,7 @@ class InputMock:
         entry.accept_any_key('number')
         return container
 
-    def feed_input(self, feed):
+    def on_feed_input(self, feed):
         config = feed.config.get('input_mock', [])
         for line in config:
             entry = Entry()

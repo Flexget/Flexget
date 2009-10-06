@@ -15,7 +15,7 @@ class FilterImdbRequired:
         from flexget import validator
         return validator.factory('boolean')
 
-    def feed_filter(self, feed):
+    def on_feed_filter(self, feed):
         for entry in feed.entries:
             try:
                 get_plugin_by_name('imdb_lookup').instance.lookup(feed, entry)

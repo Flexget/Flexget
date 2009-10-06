@@ -142,7 +142,7 @@ class SeriesReport(SeriesPlugin):
     
     """Produces --series report"""
 
-    def process_start(self, feed):
+    def on_process_start(self, feed):
         if feed.manager.options.series:
             # disable all feeds
             for afeed in feed.manager.feeds.itervalues():
@@ -197,7 +197,7 @@ class SeriesForget(object):
     
     """provides --series-forget"""
 
-    def process_start(self, feed):
+    def on_process_start(self, feed):
         if feed.manager.options.series_forget:
             # disable all feeds
             for afeed in feed.manager.feeds.itervalues():
@@ -288,7 +288,7 @@ class FilterSeries(SeriesPlugin):
 
     # TODO: re-implement (as new (sub)-plugin InputBacklog)
     """
-    def feed_input(self, feed):
+    def on_feed_input(self, feed):
         .
         .
         .
@@ -358,7 +358,7 @@ class FilterSeries(SeriesPlugin):
             
         return config
     
-    def feed_filter(self, feed):
+    def on_feed_filter(self, feed):
         """Filter series"""
         
         # hack, test if running old database with sqlalchemy table reflection ..
@@ -611,7 +611,7 @@ class FilterSeries(SeriesPlugin):
         log.debug('Accepting %s, reason %s' % (entry, reason))
         feed.accept(entry, reason)
 
-    def feed_exit(self, feed):
+    def on_feed_exit(self, feed):
         """Learn succeeded episodes"""
         for entry in feed.accepted:
             if 'series_release' in entry:

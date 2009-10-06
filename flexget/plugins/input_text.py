@@ -46,7 +46,7 @@ class InputText:
         for k, v in d.iteritems():
             entry[k] = v % entry
 
-    def feed_input(self, feed):
+    def on_feed_input(self, feed):
         url = feed.config['text']['url']
         content = urllib2.urlopen(url)
 

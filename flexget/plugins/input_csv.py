@@ -37,7 +37,7 @@ class InputCSV:
         values.accept_any_key('number')
         return config
 
-    def feed_input(self, feed):
+    def on_feed_input(self, feed):
         url = feed.config['csv'].get('url', None)
         if not url: raise Exception('CSV in %s is missing url' % feed.name)
         page = urllib2.urlopen(url)

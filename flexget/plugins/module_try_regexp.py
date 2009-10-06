@@ -26,7 +26,7 @@ class PluginTryRegexp:
                 return (True, field)
         return (False, None)
         
-    def feed_filter(self, feed):
+    def on_feed_filter(self, feed):
         if not feed.manager.options.try_regexp and not 'try_regexp' in feed.config:
             return
         if self.abort: 

@@ -78,7 +78,7 @@ class InputRSS:
         url = urlparse.urlunsplit(parts)
         return url        
 
-    def feed_input(self, feed):
+    def on_feed_input(self, feed):
         if not feedparser_present:
             raise PluginError('Plugin RSS requires Feedparser. Please install it from http://www.feedparser.org/ or from your distro repository', log)
 

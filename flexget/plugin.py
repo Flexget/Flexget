@@ -39,16 +39,16 @@ def _strip_trailing_sep(path):
 
 EVENTS = ['start', 'input', 'filter', 'download', 'modify', 'output', 'exit']
 EVENT_METHODS = {
-    'start': 'feed_start',
-    'input': 'feed_input',
-    'filter': 'feed_filter',
-    'download': 'feed_download',
-    'modify': 'feed_modify', 
-    'output': 'feed_output',
-    'exit': 'feed_exit',
-    'abort': 'feed_abort',
-    'process_start': 'process_start',
-    'process_end': 'process_end'
+    'start': 'on_feed_start',
+    'input': 'on_feed_input',
+    'filter': 'on_feed_filter',
+    'download': 'on_feed_download',
+    'modify': 'on_feed_modify', 
+    'output': 'on_feed_output',
+    'exit': 'on_feed_exit',
+    'abort': 'on_feed_abort',
+    'process_start': 'on_process_start',
+    'process_end': 'on_process_end'
 }
 PREFIXES = EVENTS + ['module', 'plugin', 'source']
 
@@ -87,7 +87,7 @@ def register_feed_event(plugin_class, name, before=None, after=None):
         if not after is None and not after in EVENTS:
             return False
         # add method name to event -> method lookup table
-        EVENT_METHODS[event_name] = 'feed_'+event_name
+        EVENT_METHODS[event_name] = 'on_feed_'+event_name
         # queue plugin loading for this type
         PREFIXES.append(name)
         # place event in event list
@@ -99,8 +99,8 @@ def register_feed_event(plugin_class, name, before=None, after=None):
         for loaded_plugin in plugins:
             if plugins[loaded_plugin].events:
                 continue
-            if hasattr(plugins[loaded_plugin].instance, 'feed_' + name):
-                if callable(getattr(plugins[loaded_plugin].instance, 'feed_' + name)):
+            if hasattr(plugins[loaded_plugin].instance, 'on_feed_' + name):
+                if callable(getattr(plugins[loaded_plugin].instance, 'on_feed_' + name)):
                     plugins[loaded_plugin].events = True
                     continue
         return True

@@ -74,7 +74,7 @@ class Subtitles:
         config['output'] = os.path.expanduser(config['output'])
         return config
 
-    def feed_download(self, feed):
+    def on_feed_download(self, feed):
 
         # filter all entries that have IMDB ID set
         try:

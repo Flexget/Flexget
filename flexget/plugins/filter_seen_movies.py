@@ -14,7 +14,7 @@ class FilterSeenMovies(FilterSeen):
         2) If stored imdb url appears again, entry is rejected.
     """
 
-    def process_start(self, feed):
+    def on_process_start(self, feed):
         """Disable this so it doesn't get ran twice"""
         pass
 
@@ -23,7 +23,7 @@ class FilterSeenMovies(FilterSeen):
         self.fields = ['imdb_url']
         self.keyword = 'seen_movies'
         
-    def feed_filter(self, feed):
+    def on_feed_filter(self, feed):
         # strict method
         if feed.config['seen_movies'] == 'strict':
             for entry in feed.entries:
@@ -31,6 +31,6 @@ class FilterSeenMovies(FilterSeen):
                     log.info('Rejecting %s because of missing imdb url' % entry['title'])
                     feed.reject(entry, 'missing imdb url, strict')
         # call super
-        super(FilterSeenMovies, self).feed_filter(feed)
+        super(FilterSeenMovies, self).on_feed_filter(feed)
 
 register_plugin(FilterSeenMovies, 'seen_movies', priorities=dict(filter=64))

@@ -9,7 +9,7 @@ class YamlDump:
         from flexget import validator
         return validator.factory('boolean')
 
-    def feed_output(self, feed):
+    def on_feed_output(self, feed):
         if not 'dump' in feed.config and not feed.manager.options.dump:
             return
         from flexget.utils.tools import sanitize

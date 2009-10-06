@@ -10,7 +10,7 @@ class ResolverException(Exception):
         return repr(self.value)
 
 class PluginResolver:
-    def feed_resolve(self, feed):
+    def on_feed_resolve(self, feed):
         # no resolves in unit test mode
         if feed.manager.unit_test: 
             return

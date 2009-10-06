@@ -36,7 +36,7 @@ class ResolveRegexp:
         config.accept('regexp', key='replace', required=True)
         return root
     
-    def process_start(self, feed):
+    def on_process_start(self, feed):
         for name, config in feed.config.get('regexp_resolve', {}).iteritems():
             match = re.compile(config['match'])
             replace =  config['replace']

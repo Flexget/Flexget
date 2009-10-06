@@ -43,7 +43,7 @@ class PluginDownload:
         advanced.accept('boolean', key='fail_html')
         return root
 
-    def feed_download(self, feed):
+    def on_feed_download(self, feed):
         """Download all feed content and store in temporary folder"""
         for entry in feed.accepted:
             try:
@@ -172,7 +172,7 @@ class PluginDownload:
         else:
             log.debug('Python doesn\'t know extension for mime-type: %s' % entry['mime-type'])
 
-    def feed_output(self, feed):
+    def on_feed_output(self, feed):
         """Move downloaded content from temp folder to final destination"""
         for entry in feed.accepted:
             try:

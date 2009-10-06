@@ -21,7 +21,7 @@ class FilterTorrentSize:
         config.accept('number', key='max')
         return config
 
-    def feed_modify(self, feed):
+    def on_feed_modify(self, feed):
         config = feed.config['torrent_size']
         for entry in feed.accepted:
             if 'torrent' in entry:

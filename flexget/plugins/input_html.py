@@ -33,7 +33,7 @@ class InputHtml:
         advanced.accept('boolean', key='title_from_title')
         return root
 
-    def feed_input(self, feed):
+    def on_feed_input(self, feed):
         config = feed.config['html']
         if not isinstance(config, dict):
             config = {}

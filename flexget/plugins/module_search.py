@@ -28,7 +28,7 @@ class Search:
         search.accept('text')
         return search
 
-    def feed_resolve(self, feed):
+    def on_feed_resolve(self, feed):
         # no searches in unit test mode
         if feed.manager.unit_test: 
             return 

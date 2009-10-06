@@ -16,7 +16,7 @@ class InputDirectories:
         from flexget import validator
         return validator.factory('path')
 
-    def feed_input(self, feed):
+    def on_feed_input(self, feed):
         import os
         
         for name in os.listdir(feed.config['directories']):

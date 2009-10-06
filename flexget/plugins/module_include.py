@@ -18,7 +18,7 @@ class PluginInclude:
         from flexget import validator
         return validator.factory('text') # TODO: file
         
-    def process_start(self, feed):
+    def on_process_start(self, feed):
         if not 'include' in feed.config:
             return
     

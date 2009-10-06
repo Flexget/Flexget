@@ -99,7 +99,7 @@ class ModuleImdbLookup:
             return match.group()
         return False
 
-    def feed_filter(self, feed):
+    def on_feed_filter(self, feed):
         for entry in feed.entries:
             try:
                 self.lookup(feed, entry)

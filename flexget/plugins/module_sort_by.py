@@ -28,7 +28,7 @@ class ModuleSortBy:
         complex.accept('boolean', key='reverse')
         return root
 
-    def feed_modify(self, feed):
+    def on_feed_modify(self, feed):
         if isinstance(feed.config['sort_by'], basestring):
             field = feed.config['sort_by']
             revert = False

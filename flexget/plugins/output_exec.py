@@ -18,7 +18,7 @@ class OutputExec:
         from flexget import validator
         return validator.factory('text')
 
-    def feed_output(self, feed):
+    def on_feed_output(self, feed):
         for entry in feed.accepted:
             cmd = feed.config['exec'] % entry
             log.debug('executing cmd: %s' % cmd)
