@@ -69,7 +69,7 @@ class Feed:
         # TODO: feed.abort() should be done by using exception? not a flag that has to be checked everywhere
 
         # flags and counters
-        self.__abort = False
+        self._abort = False
         self.__purged = 0
         
         # current state
@@ -134,9 +134,11 @@ class Feed:
 
     def abort(self, **kwargs):
         """Abort this feed execution, no more plugins will be executed."""
-        if not self.__abort and not kwargs.get('silent', False):
+        if self._abort:
+            return
+        if not kwargs.get('silent', False):
             log.info('Aborting feed %s (plugin: %s)' % (self.name, self.current_plugin))
-        self.__abort = True
+        self._abort = True
         self.__run_event('abort')
 
     def find_entry(self, category='entries', **values):
@@ -235,13 +237,13 @@ class Feed:
                 self.__purge_rejected()
                 self.__purge_failed()
                 # check for priority operations
-                if self.__abort: return
+                if self._abort: return
     
     def execute(self):
         """Execute this feed, runs events in order of events array."""
         # validate configuration
         errors = self.validate()
-        if self.__abort: return
+        if self._abort: return
         if self.manager.options.validate:
             if not errors:
                 print 'Feed \'%s\' passed' % self.name
@@ -274,7 +276,7 @@ class Feed:
                                       (self.name, len(self.accepted), len(self.rejected), \
                                        len(self.entries)-len(self.accepted), len(self.failed)))
             # if abort flag has been set feed should be aborted now
-            if self.__abort:
+            if self._abort:
                 return
 
 
@@ -284,7 +286,7 @@ class Feed:
 
     def process_end(self):
         """Execute terminate event for this feed"""
-        if self.__abort: return
+        if self._abort: return
         self.__run_event('process_end')
 
     def validate(self):
