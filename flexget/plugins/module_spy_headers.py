@@ -83,15 +83,14 @@ class PluginSpyHeaders:
             opener = urllib2.build_opener(HTTPCaptureHeaderHandler())
             urllib2.install_opener(opener)
         
-    def on_feed_abort(self, feed):
-        """Feed aborted, remove additions"""
-        self.feed_exit(feed)
-
     def on_feed_exit(self, feed):
         """Feed exiting, remove additions"""
         if urllib2._opener:
             log.debug('Removing urllib2 default opener')
             # TODO: this uninstalls all other handlers as well, but does it matter?
             urllib2.install_opener(None)
+    
+    # remove also on abort
+    on_feed_abort = on_feed_exit
 
 register_plugin(PluginSpyHeaders, 'spy_headers')

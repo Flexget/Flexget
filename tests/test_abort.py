@@ -5,9 +5,15 @@ class TestAbort(FlexGetBase):
     __yaml__ = """
         feeds:
           test:
-            input_mock:
-              - {title: 'Abort'}
-            interval: 10 days # causes abort
+            # causes on_feed_abort to be called
+            disable_builtins: yes 
+
+            # causes abort
+            interval: 10 days
+            
+            # another event hookup with this plugin
+            headers:
+              test: value 
     """
     
     def testAbort(self):

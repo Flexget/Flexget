@@ -82,13 +82,12 @@ class PluginCookies:
         opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cj))
         urllib2.install_opener(opener)
         
-    def on_feed_abort(self, feed):
-        """Feed aborted, unhook the cookiejar"""
-        self.feed_exit(feed)
-
     def on_feed_exit(self, feed):
         """Feed exiting, remove cookiejar"""
         log.debug('Removing urllib2 opener')
         urllib2.install_opener(None)
+        
+    # Feed aborted, unhook the cookiejar
+    on_feed_abort = on_feed_exit
 
 register_plugin(PluginCookies, 'cookies')

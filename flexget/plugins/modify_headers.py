@@ -52,14 +52,13 @@ class PluginHeaders:
             opener = urllib2.build_opener(HTTPHeadersProcessor(config))
             urllib2.install_opener(opener)
         
-    def on_feed_abort(self, feed):
-        self.feed_exit(feed)
-
     def on_feed_exit(self, feed):
         """Feed exiting, remove additions"""
         if urllib2._opener:
             log.debug('Removing urllib2 default opener')
             # TODO: this uninstalls all other handlers as well, but does it matter?
             urllib2.install_opener(None)
+            
+    on_feed_abort = on_feed_exit
 
 register_plugin(PluginHeaders, 'headers')
