@@ -79,11 +79,11 @@ class SeriesParser(TitleParser):
             """Convert 'foo bar' to '^[^...]*foo[^...]*bar[^...]+"""
             # TODO: Still doesn't handle the case where the user wants
             # "Schmost" and the feed contains "Schmost at Sea".
-            blank = r'[^0-9a-zA-Z]'
-            res = re.sub(blank+'+', ' ', name)
+            blank = r'[^0-9a-zA-Z:]'
+            res = re.sub(blank + '+', ' ', name)
             res = res.strip()
-            res = re.sub(' +', blank+'*', res)
-            res = '^' + (blank+'*') + res + (blank+'+')
+            res = re.sub(' +', blank + '*', res)
+            res = '^' + (blank + '*') + res + (blank + '+')
             return res
 
         #log.debug('name: %s data: %s' % (name, data))

@@ -137,10 +137,33 @@ class TestFilterSeriesPriority(FlexGetBase):
         FlexGetBase.setUp(self)
         self.execute_feed('test')
 
-    def testIt(self):
+    def testPrior(self):
         assert self.feed.find_entry('rejected', title='foobar 720p s01e01'), 'foobar 720p s01e01 should have been rejected'
         assert self.feed.find_entry('accepted', title='foobar hdtv s01e01'), 'foobar hdtv s01e01 is not accepted'
 
+
+class TestSimilarNames(FlexGetBase):
+    __yaml__ = """
+        feeds:
+          test:
+            input_mock:
+              - {title: 'FooBar.S03E01.DSR-FlexGet'}
+              - {title: 'FooBar: FirstAlt.S02E01.DSR-FlexGet'}
+              - {title: 'FooBar: SecondAlt.S01E01.DSR-FlexGet'}
+            series:
+              - FooBar
+              - "FooBar: FirstAlt"
+              - "FooBar: SecondAlt"
+    """    
+
+    def setUp(self):
+        FlexGetBase.setUp(self)
+        self.execute_feed('test')
+
+    def testNames(self):
+        assert self.feed.find_entry('accepted', title='FooBar.S03E01.DSR-FlexGet'), 'Standard failed?'
+        assert self.feed.find_entry('accepted', title='FooBar: FirstAlt.S02E01.DSR-FlexGet'), 'FirstAlt failed'
+        assert self.feed.find_entry('accepted', title='FooBar: SecondAlt.S01E01.DSR-FlexGet'), 'SecondAlt failed'
 
 class TestSeriesParser(object):
     
