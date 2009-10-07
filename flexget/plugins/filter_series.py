@@ -1,7 +1,6 @@
 import logging
 from datetime import datetime, timedelta
-from flexget.utils.series import SeriesParser, ParseWarning
-
+from flexget.utils.titles import SeriesParser, ParseWarning
 from flexget.manager import Base
 from flexget.plugin import *
 from sqlalchemy import Column, Integer, String, DateTime, Boolean, PickleType, desc
