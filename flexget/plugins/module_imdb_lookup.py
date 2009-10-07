@@ -134,8 +134,8 @@ class ModuleImdbLookup:
             if result:
                 if result.fails and not feed.manager.options.retry_lookup:
                     # this movie cannot be found, not worth trying again ...
-                    log.debug('%s will fail search' % entry['title'])
-                    raise PluginError('search failed for %s' % entry['title'])
+                    log.debug('%s will fail lookup' % entry['title'])
+                    raise PluginError('Lookup fails')
                 else:
                     log.debug('Setting imdb url for %s from db' % entry['title'])
                     if result.url:
@@ -155,12 +155,12 @@ class ModuleImdbLookup:
                     feed.session.add(result)
                     log.info('Found %s' % (entry['imdb_url']))
                 else:
-                    log_once('Imdb search failed for %s' % entry['title'], log)
+                    log_once('Imdb lookup failed for %s' % entry['title'], log)
                     # store FAIL for this title
                     result = SearchResult(entry['title'])
                     result.fails = True
                     feed.session.add(result)
-                    raise PluginError('Undeterminable URL')
+                    raise PluginError('Lookup failed')
             except IOError, e:
                 if hasattr(e, 'reason'):
                     log.error('Failed to reach server. Reason: %s' % e.reason)
@@ -206,7 +206,9 @@ class ModuleImdbLookup:
                 movie.url = entry['imdb_url']
                 feed.session.add(movie)
                 raise PluginError('UnicodeDecodeError')
-            except ValueError:
+            except ValueError, e:
+                if feed.manager.options.debug:
+                    log.exception(e)
                 log.error('Invalid parameter: %s' % entry['imdb_url'])
                 raise PluginError('Parameters')
             except IOError, e:

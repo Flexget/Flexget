@@ -17,7 +17,8 @@ class PluginScanImdb:
         if 'scan_imdb' in feed.config:
             if not feed.config['scan_imdb']:
                 return
-        # scan
+            
+        count = 0
         for entry in feed.entries:
             if not 'description' in entry:
                 continue
@@ -27,6 +28,10 @@ class PluginScanImdb:
                 return
             for result in results:
                 entry['imdb_url'] = result
-            log.info('Found imdb url in description %s' % entry['imdb_url'])
+            count += 1
+            log.debug('Found imdb url in description %s' % entry['imdb_url'])
 
+        if count:
+            log.debug('Found %s imdb urls from descriptions' % count)
+            
 register_plugin(PluginScanImdb, 'scan_imdb', builtin=True, priorities=dict(filter=200))
