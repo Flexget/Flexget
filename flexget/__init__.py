@@ -9,6 +9,8 @@ import sys
 import logging
 import logging.handlers
 
+__version__ = '{subversion}'
+
 log = logging.getLogger('main')
 
 _logging_configured = False
@@ -103,7 +105,7 @@ def main():
         log_level = 5
         
     if options.version:
-        print 'FlexGet {subversion}'
+        print 'FlexGet %s' % __version__
         return
 
     try:
