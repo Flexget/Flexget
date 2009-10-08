@@ -35,6 +35,13 @@ options(
     )
 )
 
+def freplace(name, what_str, with_str):
+    import fileinput
+    for line in fileinput.FileInput(name, inplace=1):
+        if what_str in line:
+            line=line.replace(what_str, with_str)
+        print line,
+
 @task
 @needs(['minilib', 'generate_setup', 'setuptools.command.sdist'])
 def sdist():
@@ -71,3 +78,61 @@ def clean():
             pth.rmtree()
         elif pth.isfile():
             pth.remove()
+
+
+@task
+@needs(["minilib", "generate_setup", "setuptools.command.bdist_egg"])
+def bdist_egg():
+    pass
+
+@task
+def release_coverage():
+    """Make coverage.flexget.com"""
+    # --with-coverage --cover-package=flexget --cover-html --cover-html-dir /var/www/flexget_coverage/
+    
+    import nose
+    from nose.plugins.manager import DefaultPluginManager
+    
+    cfg = nose.config.Config(plugins=DefaultPluginManager(), verbosity=2)
+    argv = ['bin/paver']
+    argv.extend(['--attr=!online'])
+    argv.append('--with-coverage')
+    argv.append('--cover-html')
+    argv.extend(['--cover-package', 'flexget'])
+    argv.extend(['--cover-html-dir', '/var/www/flexget_coverage/'])
+    nose.run(argv=argv, config=cfg)
+
+@task
+@consume_args
+def release(args):
+    """Make a FlexGet release. Same as bdist_egg but adds version information."""
+    if len(args) != 1:
+        print 'Version number must be specified, ie. paver release 1.0b9'
+        return
+    ver = args[0]
+    
+    # replace version number
+    freplace('flexget/__init__.py', "__version__ = '{subversion}'", "__version__ = '%s'" % ver)
+
+    # run unit tests
+    test(environment.options) # dunno if param is correct ..
+
+    # hack version number into setup( ... options='1.0-svn' ...)
+    from paver import tasks
+    setup_section = tasks.environment.options.setdefault("setup", Bunch())
+    setup_section.update(version=ver)
+    
+    # restore version ...
+    freplace('flexget/__init__.py', "__version__ = '%s'" % ver, "__version__ = '{subversion}'")
+
+    egg_options = ['-d', '/var/www/flexget_dist/unstable'] # hmph, how can I pass params to it? doesn't seem to work ..
+    bdist_egg(egg_options)
+    
+    # hack since -d does not work ..
+    import os
+    import shutil
+    dest = '/var/www/flexget_dist/unstable/'
+    for name in os.listdir('dist'):
+        if os.path.exists(os.path.join(dest, name)):
+            print 'Skipped copying %s, destination already exists' % name
+        shutil.move(os.path.join('dist', name), os.path.join(dest, name))
