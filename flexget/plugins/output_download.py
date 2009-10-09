@@ -5,8 +5,51 @@ import logging
 import shutil
 import filecmp
 from flexget.plugin import *
+from sqlalchemy import Column, String, Integer, DateTime, desc
+from flexget.manager import Base
+from datetime import datetime
 
 log = logging.getLogger('download')
+
+class Download(Base):
+
+    __tablename__ = 'download_history'
+    
+    id = Column(Integer, primary_key=True)
+    feed = Column(String)
+    filename = Column(String)
+    url = Column(String)
+    title = Column(String)
+    time = Column(DateTime)
+    
+    def __init__(self):
+        self.time = datetime.now()
+    
+    def __str__(self):
+        return '<Download(filename=%s,feed=%s)>' % (self.filename, self.feed)
+
+
+class PluginDownloads:
+
+    """
+        Provides --downloads
+    """
+
+    def on_process_start(self, feed):
+        if feed.manager.options.downloads:
+            from flexget.manager import Session
+            feed.manager.disable_feeds()
+            session = Session()
+            print '-- Downloads: ' + '-' * 65
+            for download in session.query(Download).order_by(Download.time)[-50:]:
+                print ' Title  : %s' % download.title
+                print ' Url    : %s' % download.url
+                print ' Stored : %s' % download.filename
+                print ' Time   : %s' % download.time.strftime("%c")
+                print '-' * 79
+            session.close()
+
+
 class PluginDownload:
 
     """
@@ -18,10 +61,10 @@ class PluginDownload:
         
         Allow HTML content:
         
-        By default download module reports failure if received content
+        By default download plugin reports failure if received content
         is a html. Usually this is some sort of custom error page without
         proper http code and thus entry is assumed to be downloaded 
-        correctly.
+        incorrectly.
         
         In the rare case you actually need to retrieve html-pages you must
         disable this feature.
@@ -33,6 +76,7 @@ class PluginDownload:
         You may use commandline parameter --dl-path to temporarily override 
         all paths to another location.
     """
+    
     def validator(self):
         """Return config validator"""
         from flexget import validator
@@ -129,7 +173,7 @@ class PluginDownload:
 
         data = str(response.info())
         
-        # try to decode/encode, afaik this is against specs but some servers do it anyway
+        # try to decode/encode, afaik this is against the specs but some servers do it anyway
         try:
             data = data.decode('utf-8')
             log.debug('response info UTF-8 decoded')
@@ -158,7 +202,6 @@ class PluginDownload:
 
     def filename_from_mime(self, entry):
         """Tries to set filename (extensions) from mime-type"""
-        # guess extension from content-type
         import mimetypes
         extension = mimetypes.guess_extension(entry['mime-type'])
         if extension:
@@ -217,7 +260,7 @@ class PluginDownload:
                 else:
                     log.warning('Unable to figure proper filename / extension for %s, using title. Mime-type: %s' % (entry['title'], entry.get('mime-type', 'N/A')))
                     # try to append an extension to the title
-                    entry['filename']=entry['title']
+                    entry['filename'] = entry['title']
                     self.filename_from_mime(entry)
 
             # make path
@@ -237,8 +280,8 @@ class PluginDownload:
                 log.debug('temp: %s' % ', '.join(os.listdir(tmp_path)))
                 raise PluginWarning("Downloaded temp file '%s' doesn't exist!?" % entry['file'])
 
-            # combine to full path + filename, replace / from filename (#208)
-            destfile = os.path.join(path, entry.get('filename', entry['title']).replace('/', '_'))
+            # combine to full path + filename, replace / from filename (replaces: #208, #325)
+            destfile = os.path.join(path, entry.get('filename', entry['title']).replace('/', '_').replace(':', ' '))
 
             if os.path.exists(destfile):
                 if filecmp.cmp(entry['file'], destfile):
@@ -257,6 +300,18 @@ class PluginDownload:
 
             # store final destination as output key
             entry['output'] = destfile
+            
+            # add to download history
+            download = Download()
+            download.feed = feed.name
+            download.filename = destfile
+            download.title = entry['title']
+            download.url = entry['url']
+            feed.session.add(download)
+            
+            # test
+            import time
+            time.sleep(2)
 
         finally:
             if os.path.exists(entry['file']):
@@ -265,5 +320,8 @@ class PluginDownload:
             del(entry['file'])
 
 register_plugin(PluginDownload, 'download')
+register_plugin(PluginDownloads, 'downloads', builtin=True)
 register_parser_option('--dl-path', action='store', dest='dl_path', default=False,
                        metavar='PATH', help='Override path for download plugin. Applies to all executed feeds.')
+register_parser_option('--downloads', action='store_true', dest='downloads', default=False,
+                       help='List latest downloads (50).')

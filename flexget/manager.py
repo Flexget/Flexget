@@ -304,6 +304,16 @@ class Manager:
         if self.options.onlyfeed:
             if not [feed for feed in self.feeds.itervalues() if feed.enabled]:
                 log.critical('Could not find feed %s' % self.options.onlyfeed)
+                
+    def disable_feeds(self):
+        """Disable all feeds."""
+        for feed in self.feeds.itervalues():
+            feed.enabled = False
+            
+    def enable_feeds(self):
+        """Enable all feeds."""
+        for feed in self.feeds.itervalues():
+            feed.enabled = True
 
     def execute(self):
         """Iterate trough all feeds and run them."""

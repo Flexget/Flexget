@@ -55,8 +55,7 @@ class FilterSeen(object):
         
         if feed.manager.options.forget or feed.manager.options.seen:
             # don't run any feeds
-            for afeed in feed.manager.feeds.itervalues():
-                afeed.enabled = False
+            feed.manager.disable_feeds()
             
             # in process_start the feed.session is not available
             from flexget.manager import Session

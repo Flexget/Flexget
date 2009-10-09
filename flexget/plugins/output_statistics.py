@@ -2,28 +2,21 @@ import sys, os.path
 import logging
 from flexget.plugin import *
 
-__pychecker__ = 'unusednames=parser'
-
 log = logging.getLogger('statistics')
 
-has_sqlite = True
 try:
-    import sqlite3 as sqlite # python >2.5 only
-except:
-    has_sqlite = False
-    
-# fall back to pysqlite on older versions
-if not has_sqlite:
+    from pysqlite2 import dbapi2 as sqlite
+except ImportError:
     try:
-        from pysqlite2 import dbapi2 as sqlite
-    except:
-        has_sqlite = False
+        from sqlite3 import dbapi2 as sqlite # try the 2.5+ stdlib
+    except ImportError:
+        raise Exception('Unable to use sqlite3 or pysqlite2', log)
 
-has_pygooglechart = True
 try:
     from pygooglechart import StackedVerticalBarChart, Axis
 except:
-    has_pygooglechart = False
+    print "Please run 'bin/paver clean' and then 'python bootstrap.py'"
+    sys.exit(1)
 
 class Statistics:
     """
@@ -96,7 +89,6 @@ class Statistics:
         con.commit()
         con.close()
 
-
     def get_config(self, feed):
         config = feed.config['statistics']
         if not isinstance(config, dict):
@@ -107,9 +99,6 @@ class Statistics:
         return config
 
     def on_process_end(self, feed):
-        if not has_pygooglechart:
-            raise PluginWarning('plugin statistics requires pygooglechart library.')
-
         if self.written:
             log.debug("stats already done for this run")
             return
@@ -268,13 +257,3 @@ index_html = """
 </body>
 </html>
 """
-
-if __name__ == "__main__":
-    dbname = os.path.join("../test.db")
-    con = sqlite.connect(dbname)
-
-    s = Statistics()
-
-    s.weekly_stats_by_feed('config', con)
-    #s.weekly_stats('config', con)
-    #s.hourly_stats('config', con)

@@ -18,19 +18,17 @@ class SeriesParser(TitleParser):
                            '(\d\d\d\d)x(\d+)\.(\d+)', '[^s^\d](\d{1,3})[^p^\d]']
         self.clean_regexps = ['\[.*?\]', '\(.*?\)']
         self.name_regexps = []
+
         # parse produces these
         self.season = None
         self.episode = None
         self.id = None
-
         self.quality = 'unknown'
-        # false if item does not match series
-        self.valid = False
-        # optional for storing entry from which this instance is made from
-        self.entry = None
-        # repack / proper
         self.proper_or_repack = False
         self.special = False
+        
+        # false if item does not match series
+        self.valid = False
 
     def parse(self):
         if not self.name or not self.data:

@@ -1,6 +1,6 @@
 from tests import FlexGetBase
 from nose.tools import assert_raises, assert_true
-from flexget.utils.series import SeriesParser, ParseWarning
+from flexget.utils.titles import SeriesParser, ParseWarning
 import os
 
 class TestFilterSeries(FlexGetBase):

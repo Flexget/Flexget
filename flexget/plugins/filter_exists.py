@@ -1,7 +1,7 @@
 import os
 import logging
 from flexget.plugin import *
-from flexget.utils.series import SeriesParser
+from flexget.utils.titles import SeriesParser
 
 log = logging.getLogger('exists')
 
