@@ -107,6 +107,10 @@ class OutputRSS:
         links = rss.accept('list', key='link')
         links.accept('text')
         return root
+
+    def on_feed_output(self, feed):
+        # makes this plugin count as output (stops warnings about missing outputs)
+        pass
         
     def get_config(self, feed):
         config = feed.config['make_rss']
