@@ -12,12 +12,12 @@ from sqlalchemy.orm import relation
 log = logging.getLogger('imdb')
 
 # association tables
-genres = Table('imdb_movie_genres', Base.metadata,
+genres_table = Table('imdb_movie_genres', Base.metadata,
     Column('movie_id', Integer, ForeignKey('imdb_movies.id')),
     Column('genre_id', Integer, ForeignKey('imdb_genres.id'))
 )
 
-languages = Table('imdb_movie_languages', Base.metadata,
+languages_table = Table('imdb_movie_languages', Base.metadata,
     Column('movie_id', Integer, ForeignKey('imdb_movies.id')),
     Column('language_id', Integer, ForeignKey('imdb_languages.id'))
 )
@@ -31,8 +31,8 @@ class Movie(Base):
     url = Column(String)
 
     # many-to-many relations
-    genres = relation('Genre', secondary=genres, backref='movies')
-    languages = relation('Language', secondary=languages, backref='movies')
+    genres = relation('Genre', secondary=genres_table, backref='movies')
+    languages = relation('Language', secondary=languages_table, backref='movies')
     
     score = Column(Float)
     votes = Column(Integer)
