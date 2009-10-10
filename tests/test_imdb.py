@@ -10,7 +10,7 @@ class TestImdbOnline(FlexGetBase):
               # tests search
               - {title: 'Spirited Away'}
               # tests direct url
-              - {title: 'Princess Mononoke' imdb_url: 'http://www.imdb.com/title/tt0119698/'}
+              - {title: 'Princess Mononoke', imdb_url: 'http://www.imdb.com/title/tt0119698/'}
               # generic test material, some tricky ones here :)
               - {title: 'Taken[2008]DvDrip[Eng]-FOO'}
             imdb:
@@ -24,7 +24,7 @@ class TestImdbOnline(FlexGetBase):
               min_year: 2003
     """
     @attr(online=True)
-    def testMovies(self):
+    def testLookup(self):
         self.execute_feed('test')
         assert self.feed.find_entry(imdb_name='Sen to Chihiro no kamikakushi'), 'Failed IMDB lookup (search)'
         assert self.feed.find_entry(imdb_name='Mononoke-hime'), 'Failed imdb lookup (direct)'
@@ -34,9 +34,9 @@ class TestImdbOnline(FlexGetBase):
     def testYear(self):
         self.execute_feed('year')
         assert self.feed.find_entry('accepted', imdb_name='Taken'), 'Taken should\'ve been accepted'
-        # mononoke should not be accepted (or rejected)
-        assert self.feed.find_entry('accepted', imdb_name='Mononoke-hime'), 'Mononoke-hime should not have been accepted'
-        assert self.feed.find_entry('rejected', imdb_name='Mononoke-hime'), 'Mononoke-hime should not have been rejected'
+        # mononoke should not be accepted or rejected
+        assert not self.feed.find_entry('accepted', imdb_name='Mononoke-hime'), 'Mononoke-hime should not have been accepted'
+        assert not self.feed.find_entry('rejected', imdb_name='Mononoke-hime'), 'Mononoke-hime should not have been rejected'
 
 class TestScanImdb(FlexGetBase):
     __yaml__ = """
