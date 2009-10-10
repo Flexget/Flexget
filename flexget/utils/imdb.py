@@ -226,6 +226,8 @@ class ImdbParser:
     def __init__(self):
         self.genres = []
         self.languages = []
+        self.actors = set()
+        self.directors = set()
         self.score = 0.0
         self.votes = 0
         self.year = 0
@@ -301,5 +303,21 @@ class ImdbParser:
                 self.plot_outline = tag_outline.next.string.strip()
                 log.debug('Detected plot outline: %s' % self.plot_outline)
 
+        # get main cast
+        tag_cast = soup.find('table', "cast")
+        if tag_cast:
+            for actor in tag_cast.findAll("a", href=re.compile("/name/nm")):                
+                actor_id = actor['href'].split('/')[2]
+                self.actors.add(actor_id)
+
+        # get director(s)
+        tag_directors = soup.find('div', id='director-info')
+        if tag_directors:
+            for director in tag_directors.findAll('a'):
+                director_id = director['href'].split('/')[2]
+                self.directors.add(director_id)
+                                
         log.debug('Detected genres: %s' % self.genres)
         log.debug('Detected languages: %s' % self.languages)
+        log.debug('Detected director(s): %s' % self.directors)
+        log.debug('Detected actors: %s' % self.actors)
