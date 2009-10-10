@@ -84,15 +84,15 @@ class TestRegexp(FlexGetBase):
     __yaml__ = """
         global:
           input_mock:
-            - {title: 'regexp1', url: 'http://localhost/regexp/1', 'imdb_score': 5}
-            - {title: 'regexp2', url: 'http://localhost/regexp/2', 'bool_attr': true}
-            - {title: 'regexp3', url: 'http://localhost/regexp/3', 'imdb_score': 5}
-            - {title: 'regexp4', url: 'http://localhost/regexp/4', 'imdb_score': 5}
-            - {title: 'regexp5', url: 'http://localhost/regexp/5', 'imdb_score': 5}
-            - {title: 'regexp6', url: 'http://localhost/regexp/6', 'imdb_score': 5}
-            - {title: 'regexp7', url: 'http://localhost/regexp/7', 'imdb_score': 5}
-            - {title: 'regexp8', url: 'http://localhost/regexp/8', 'imdb_score': 5}
-            - {title: 'regexp9', url: 'http://localhost/regexp/9', 'imdb_score': 5}
+            - {title: 'regexp1', 'imdb_score': 5}
+            - {title: 'regexp2', 'bool_attr': true}
+            - {title: 'regexp3', 'imdb_score': 5}
+            - {title: 'regexp4', 'imdb_score': 5}
+            - {title: 'regexp5', 'imdb_score': 5}
+            - {title: 'regexp6', 'imdb_score': 5}
+            - {title: 'regexp7', 'imdb_score': 5}
+            - {title: 'regexp8', 'imdb_score': 5}
+            - {title: 'regexp9', 'imdb_score': 5}
           seen: false
 
 
@@ -225,7 +225,7 @@ class TestRegexpResolver(FlexGetBase):
 
 class TestDisableBuiltins(FlexGetBase):
     """
-        Quick hack, test disable functionality by checking if seen filtering (builtin) is working
+        Quick a hack, test disable functionality by checking if seen filtering (builtin) is working
     """
     __yaml__ = """
         feeds:
@@ -252,11 +252,11 @@ class TestPreset(FlexGetBase):
     __yaml__ = """
         global:
           input_mock:
-            - {title: 'global', url: 'http://localhost/global'}
+            - {title: 'global'}
             
         movies:
           input_mock:
-            - {title: 'movies', url: 'http://localhost/movies'}
+            - {title: 'movies'}
     
         feeds:
           test1:
@@ -316,7 +316,7 @@ class TestPriority(FlexGetBase):
         feeds:
           test:
             input_mock:
-              - {title: 'Smoke', url: 'http://localhost/smoke'}
+              - {title: 'Smoke'}
             accept_all: true
             priority:
               accept_all: 100
@@ -333,7 +333,7 @@ class TestManipulate(FlexGetBase):
         feeds:
           test:
             input_mock:
-              - {title: '[1234]foobar', url: 'http://localhost/irrelevant'}
+              - {title: '[1234]foobar'}
             manipulate:
               cleaned:
                 from: title
@@ -351,8 +351,8 @@ class TestImmortal(FlexGetBase):
         feeds:
           test:
             input_mock:
-              - {title: 'title1', url: 'http://localhost/irrelevant1', immortal: yes}
-              - {title: 'title2', url: 'http://localhost/irrelevant2'}
+              - {title: 'title1', immortal: yes}
+              - {title: 'title2'}
             regexp:
               reject:
                 - .*

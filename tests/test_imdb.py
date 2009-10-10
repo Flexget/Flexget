@@ -8,18 +8,18 @@ class TestImdbOnline(FlexGetBase):
           test:
             input_mock:
               # tests search
-              - {title: 'Spirited Away', url: 'http://localhost/imdb/spirited_away'}
+              - {title: 'Spirited Away'}
               # tests direct url
-              - {title: 'Princess Mononoke', url: 'http://localhost/imdb/princess_mononoke', imdb_url: 'http://www.imdb.com/title/tt0119698/'}
+              - {title: 'Princess Mononoke' imdb_url: 'http://www.imdb.com/title/tt0119698/'}
               # generic test material, some tricky ones here :)
-              - {title: 'Taken[2008]DvDrip[Eng]-FOO', url: 'http://localhost/Taken' }
+              - {title: 'Taken[2008]DvDrip[Eng]-FOO'}
             imdb:
               min_votes: 20
 
           year:
             input_mock:
-              - {title: 'Princess Mononoke', url: 'http://localhost/imdb/princess_mononoke', imdb_url: 'http://www.imdb.com/title/tt0119698/'}
-              - {title: 'Taken[2008]DvDrip[Eng]-FOO', url: 'http://localhost/Taken', imdb_url: 'http://www.imdb.com/title/tt0936501/' }
+              - {title: 'Princess Mononoke', imdb_url: 'http://www.imdb.com/title/tt0119698/'}
+              - {title: 'Taken[2008]DvDrip[Eng]-FOO', imdb_url: 'http://www.imdb.com/title/tt0936501/'}
             imdb:
               min_year: 2003
     """
@@ -43,9 +43,9 @@ class TestScanImdb(FlexGetBase):
         feeds:
           test:
             input_mock:
-              - {title: 'Scan Test 1', url: 'http://localhost/scanimdb/1', description: 'title: Foo Bar Asdf\n imdb-url: http://www.imdb.com/title/tt0330793/ more text'}
-              - {title: 'Scan Test 2', url: 'http://localhost/scanimdb/2', description: '<a href="http://imdb.com/title/tt0472198/">IMDb</a>'}
-              - {title: 'Scan Test 3', url: 'http://localhost/scanimdb/3', description: 'nothing here'}
+              - {title: 'Scan Test 1', description: 'title: Foo Bar Asdf\n imdb-url: http://www.imdb.com/title/tt0330793/ more text'}
+              - {title: 'Scan Test 2', description: '<a href="http://imdb.com/title/tt0472198/">IMDb</a>'}
+              - {title: 'Scan Test 3', description: 'nothing here'}
     """
     def testScanImdb(self):
         self.execute_feed('test')
@@ -57,8 +57,8 @@ class TestImdbRequired(FlexGetBase):
         feeds:
           test:
             input_mock:
-              - {title: 'Require Test 1', url: 'http://localhost/test/1', imdb_url: 'http://imdb.com/something' }
-              - {title: 'Require Test 2', url: 'http://localhost/test/2'}
+              - {title: 'Require Test 1', imdb_url: 'http://imdb.com/something' }
+              - {title: 'Require Test 2'}
             imdb_required: yes
     """
     
