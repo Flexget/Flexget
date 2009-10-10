@@ -40,6 +40,10 @@ class FilterImdb:
         imdb.accept('list', key='reject_genres').accept('text')
         imdb.accept('list', key='reject_languages').accept('text')
         imdb.accept('list', key='accept_languages').accept('text')
+        imdb.accept('list', key='reject_actors').accept('text')
+        imdb.accept('list', key='accept_actors').accept('text')
+        imdb.accept('list', key='reject_directors').accept('text')
+        imdb.accept('list', key='accept_directors').accept('text')
         return imdb
 
     def on_feed_filter(self, feed):
@@ -76,13 +80,37 @@ class FilterImdb:
                 rejected = config['reject_languages']
                 for language in entry['imdb_languages']:
                     if language in rejected:
-                        reasons.append('relect_languages')
+                        reasons.append('reject_languages')
                         break
             if 'accept_languages' in config:
                 accepted = config['accept_languages']
                 for language in entry['imdb_languages']:
                     if language not in accepted:
                         reasons.append('accept_languages')
+                        break
+            if 'reject_actors' in config:
+                rejected = config['reject_actors']
+                for actor in entry['imdb_actors']:
+                    if actor in rejected:
+                        reasons.append('reject_actors')
+                        break
+            if 'accept_actors' in config:
+                accepted = config['accept_actors']
+                for actor in entry['imdb_actors']:
+                    if actor not in accepted:
+                        reasons.append('accept_actors')
+                        break
+            if 'reject_directors' in config:
+                rejected = config['reject_directors']
+                for director in entry['imdb_directors']:
+                    if director in rejected:
+                        reasons.append('reject_directors')
+                        break
+            if 'accept_directors' in config:
+                accepted = config['accept_directors']
+                for director in entry['imdb_directors']:
+                    if director not in accepted:
+                        reasons.append('accept_directors')
                         break
 
             if reasons:
