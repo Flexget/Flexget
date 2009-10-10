@@ -4,11 +4,14 @@ from flexget.plugin import *
 
 log = logging.getLogger('statistics')
 
+has_sqlite = False
 try:
     from pysqlite2 import dbapi2 as sqlite
+    has_sqlite = True
 except ImportError:
     try:
         from sqlite3 import dbapi2 as sqlite # try the 2.5+ stdlib
+        has_sqlite = True
     except ImportError:
         raise Exception('Unable to use sqlite3 or pysqlite2', log)
 
