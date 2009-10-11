@@ -1,5 +1,7 @@
 import logging
-from flexget.plugin import PluginWarning, PluginError, get_plugins_by_event, get_methods_by_event, get_plugin_by_name, EVENTS
+from flexget.plugin import *
+from flexget.plugin import EVENTS
+
 from flexget.utils.simple_persistence import SimplePersistence
 
 log = logging.getLogger('feed')

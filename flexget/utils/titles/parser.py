@@ -17,3 +17,11 @@ class TitleParser(object):
                'bluray', 'multisubs'] + propers + specials + qualities
     
     remove = ['imax']
+
+    def strip_spaces(self, text):
+        """Removes all unnecessary duplicate spaces from a text"""
+        s = text.strip()
+        while s.find('  ') != -1:
+            s = s.replace('  ', ' ')
+
+        return s

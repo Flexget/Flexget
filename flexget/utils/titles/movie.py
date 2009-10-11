@@ -1,21 +1,28 @@
 import logging
 import re
-
-from flexget.utils.titles.parser import TitleParser, ParseWarning
+from flexget.utils.titles.parser import TitleParser
 
 log = logging.getLogger('movieparser')
 
 class MovieParser(TitleParser):
     
-    # TODO: refactor SeriesParser and this into common nice API
+    def __init__(self):
+        self.data = None
 
+        # parsing results
+        self.name = None
+        self.year = None
+        self.quality = 'unknown'
 
     def _ireplace(self, str, old, new, count=0):
         """Case insensitive string replace"""
         pattern = re.compile(re.escape(old), re.I)
         return re.sub(pattern, new, str, count)
 
-    def parse(self, s):
+    def parse(self):
+
+        s = self.data
+
         """Parse movie name, returns name, year"""
         for char in ['[', ']', '_', '(', ')', ',']:
             s = s.replace(char, ' ')
@@ -29,10 +36,7 @@ class MovieParser(TitleParser):
         for word in self.remove:
             s = self._ireplace(s, word, '')
             
-        # remove extra and duplicate spaces!
-        s = s.strip()
-        while s.find('  ') != -1:
-            s = s.replace('  ', ' ')
+        s = self.strip_spaces(s)
 
         # split to parts        
         parts = s.split(' ')
@@ -41,8 +45,8 @@ class MovieParser(TitleParser):
         for part in parts:
             # check for year
             if part.isdigit():
-                n = int(part)
-                if n>1930 and n<2050:
+                num = int(part)
+                if num > 1930 and num < 2050:
                     year = part
                     if parts.index(part) < cut_pos:
                         cut_pos = parts.index(part)
@@ -53,8 +57,18 @@ class MovieParser(TitleParser):
             # check for cutoff words
             if part.lower() in self.cutoffs:
                 if parts.index(part) < cut_pos:
-                    cut_pos = parts.index(part)
+                    if parts.index(part) < cut_pos:
+                        cut_pos = parts.index(part)
+            # check for qualities, these are already cutoff words (self.cutoffs)
+            if part in self.qualities:
+                self.quality = part
+
         # make cut
         s = ' '.join(parts[:cut_pos])
-        return s, year
 
+        # save results
+        self.name = s
+
+        if year:
+            if year.isdigit():
+                self.year = int(year)

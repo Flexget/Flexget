@@ -182,7 +182,8 @@ class Manager:
             old = shelve.open(shelve_session_name, flag='r', protocol=2)
             self.shelve_session = copy.deepcopy(old['cache'])
             old.close()
-            shutil.move(shelve_session_name, '%s_migrated' % shelve_session_name)
+            if not self.options.test:
+                shutil.move(shelve_session_name, '%s_migrated' % shelve_session_name)
         
         # SQLAlchemy
         if self.unit_test:
