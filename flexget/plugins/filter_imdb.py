@@ -50,6 +50,8 @@ class FilterImdb:
         config = feed.config['imdb']
         
         lookup = get_plugin_by_name('imdb_lookup').instance.lookup
+
+        force_accept = False
         
         for entry in feed.entries:
             
@@ -102,6 +104,7 @@ class FilterImdb:
                 for actor in entry['imdb_actors']:
                     if actor in accepted:
                         log.debug("Accepting because of accept_actors %s" % actor)
+                        force_accept = True
                         break
 
             if 'reject_directors' in config:
@@ -116,9 +119,10 @@ class FilterImdb:
                 for director in entry['imdb_directors']:
                     if director in accepted:
                         log.debug("Accepting because of accept_directors %s" % actor)
+                        force_accept = True
                         break
 
-            if reasons:
+            if reasons and not force_accept:
                 msg = 'Skipping %s because of rule(s) %s' % (entry['title'], ', '.join(reasons))
                 if feed.manager.options.debug:
                     log.debug(msg)
