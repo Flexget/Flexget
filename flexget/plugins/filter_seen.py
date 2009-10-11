@@ -153,6 +153,8 @@ class FilterSeen(object):
                 
     def migrate(self, feed):
         """Migrates 0.9 session data into new database"""
+        from flexget.manager import Session
+        session = Session()
         shelve = feed.manager.shelve_session
         count = 0
         for name, data in shelve.iteritems():
@@ -161,8 +163,9 @@ class FilterSeen(object):
             seen = data[self.keyword]
             for k, v in seen.iteritems():
                 seen = Seen('unknown', k, 'unknown')
-                feed.session.add(seen)
+                session.add(seen)
                 count += 1
+        session.commit()
         log.info('Migrated %s seen items' % count)
 
 register_plugin(FilterSeen, 'seen', builtin=True, priorities=dict(filter=255))
