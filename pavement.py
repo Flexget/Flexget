@@ -4,6 +4,12 @@ import paver.setuputils
 from paver import svn
 from paver.setuputils import setup, find_package_data, find_packages
 
+# TODO:
+#  * pylint is not listed as dependency (task: pylint)
+#  * coverage is not listed as dependency (task: release_coverage)
+
+PROJECT_DIR = path(__file__).dirname()
+
 options = environment.options
 setup(
     name='FlexGet',
@@ -32,7 +38,16 @@ options(
         packages_to_install=['nose>=0.11'],
         paver_command_line='develop',
         unzip_setuptools=True
+    ),
+    pylint = Bunch(
+        check_modules = ['flexget'],
+        quiet = False,
+        verbose = False,
+        quiet_args = ['--reports=no', '--disable-checker=similarities'],
+        pylint_args = ['--rcfile=pylint.rc'],
+        ignore = False
     )
+    
 )
 
 def freplace(name, what_str, with_str):
@@ -136,3 +151,48 @@ def release(args):
         if os.path.exists(os.path.join(dest, name)):
             print 'Skipped copying %s, destination already exists' % name
         shutil.move(os.path.join('dist', name), os.path.join(dest, name))
+
+
+@task
+@cmdopts([
+    ('pylint-command=', 'c', 'Specify a custom pylint executable'),
+    ('quiet', 'q', 'Disables a lot of the pylint output'),
+    ('verbose', 'v', 'Enables detailed output'),
+    ('ignore', 'i', 'Ignore PyLint errors')
+])
+def pylint(options):
+    """Check the source code using PyLint."""
+    from pylint import lint
+    
+    # Initial command.
+    arguments = []
+    
+    if options.pylint.quiet:
+        arguments.extend(options.pylint.quiet_args)
+        
+    if 'pylint_args' in options.pylint:
+        arguments.extend(list(options.pylint.pylint_args))
+    
+    if not options.pylint.verbose:
+        arguments.append('--errors-only')
+    
+    # Add the list of paths containing the modules to check using PyLint.
+    arguments.extend(str(PROJECT_DIR / module) for module in options.check_modules)
+    
+    # By placing run_pylint into its own function, it allows us to do dry runs
+    # without actually running PyLint.
+    def run_pylint():
+        # Add app folder to path.
+        sys.path.insert(0, PROJECT_DIR)
+        
+        # Runs the PyLint command.
+        try:
+            lint.Run(arguments)
+        # PyLint will `sys.exit()` when it has finished, so we need to catch
+        # the exception and process it accordingly.
+        except SystemExit, exc:
+            return_code = exc.args[0]
+            if return_code != 0 and (not options.pylint.ignore):
+                raise paver.tasks.BuildFailure('PyLint finished with a non-zero exit code')
+    
+    return dry('pylint ' + ' '.join(arguments), run_pylint)
