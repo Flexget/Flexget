@@ -359,18 +359,12 @@ class FilterSeries(SeriesPlugin):
     
     def on_feed_filter(self, feed):
         """Filter series"""
-        
+
         # hack, test if running old database with sqlalchemy table reflection ..
-        running_old = True
-        from sqlalchemy.exceptions import NoSuchTableError
-        from sqlalchemy import Table, MetaData
-        try:
-            meta = MetaData()
-            reflect = Table('episode_qualities', meta, autoload=True, autoload_with=feed.session.connection())
-        except NoSuchTableError:
-            running_old = False
-        if running_old:
+        from flexget.utils.sqlalchemy_utils import table_exists
+        if table_exists('episode_qualities', feed):
             log.critical('Running old database! Please see bleeding edge news!')
+            feed.manager.disable_feeds()
             feed.abort()
         
         config = self.generate_config(feed)

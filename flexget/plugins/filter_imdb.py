@@ -72,6 +72,7 @@ class FilterImdb:
             if 'min_year' in config:
                 if entry['imdb_year'] < config['min_year']:
                     reasons.append('min_year (%s < %s)' % (entry['imdb_year'], config['min_year']))
+
             if 'reject_genres' in config:
                 rejected = config['reject_genres']
                 for genre in entry['imdb_genres']:
@@ -85,6 +86,7 @@ class FilterImdb:
                     if language in rejected:
                         reasons.append('reject_languages')
                         break
+
             if 'accept_languages' in config:
                 accepted = config['accept_languages']
                 for language in entry['imdb_languages']:
@@ -98,6 +100,7 @@ class FilterImdb:
                     if actor in rejected:
                         reasons.append('reject_actors')
                         break
+                    
             # Accept if actors contains an accepted actor, but don't reject otherwise
             if 'accept_actors' in config:
                 accepted = config['accept_actors']
@@ -113,6 +116,7 @@ class FilterImdb:
                     if director in rejected:
                         reasons.append('reject_directors')
                         break
+                    
             # Accept if the director is in the accept list, but do not reject if the director is unknown
             if 'accept_directors' in config:
                 accepted = config['accept_directors']
