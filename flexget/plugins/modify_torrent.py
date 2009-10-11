@@ -129,7 +129,7 @@ class Torrent:
     def decode(self, text):
         try:
             src = self.tokenize(text)
-            data = self.decode_item(src.next, src.next())
+            data = self.decode_item(src.next, src.next()) # pylint: disable-msg: E1101
             for token in src: # look for more tokens
                 raise SyntaxError("trailing junk")
         except (AttributeError, ValueError, StopIteration):

@@ -6,6 +6,8 @@ from paver.setuputils import setup, find_package_data, find_packages
 
 # TODO:
 #  * pylint is not listed as dependency (task: pylint)
+#    * the correct package to install is bin/easy_install logilab.pylintinstaller
+#      this will however give tons of errors, and still work ..
 #  * coverage is not listed as dependency (task: release_coverage)
 
 PROJECT_DIR = path(__file__).dirname()
@@ -44,7 +46,7 @@ options(
         quiet = False,
         verbose = False,
         quiet_args = ['--reports=no', '--disable-checker=similarities'],
-        pylint_args = ['--rcfile=pylint.rc'],
+        pylint_args = ['--rcfile=pylint.rc', '--include-ids=y'],
         ignore = False
     )
     
@@ -161,6 +163,14 @@ def release(args):
     ('ignore', 'i', 'Ignore PyLint errors')
 ])
 def pylint(options):
+    
+    import os.path
+    if not os.path.exists('bin/pylint'):
+        raise paver.tasks.BuildFailure('PyLint not installed!\n'+\
+                                       'Run bin/easy_install logilab.pylintinstaller\n' + \
+                                       'Do not be alarmed by the errors it may give, it still works ..')
+        
+    
     """Check the source code using PyLint."""
     from pylint import lint
     
@@ -185,6 +195,7 @@ def pylint(options):
         # Add app folder to path.
         sys.path.insert(0, PROJECT_DIR)
         
+        print 'Running pylint (this may take a while)'
         # Runs the PyLint command.
         try:
             lint.Run(arguments)
@@ -195,4 +206,4 @@ def pylint(options):
             if return_code != 0 and (not options.pylint.ignore):
                 raise paver.tasks.BuildFailure('PyLint finished with a non-zero exit code')
     
-    return dry('pylint ' + ' '.join(arguments), run_pylint)
+    return dry('bin/pylint ' + ' '.join(arguments), run_pylint)

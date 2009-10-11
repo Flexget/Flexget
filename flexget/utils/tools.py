@@ -80,7 +80,7 @@ def sanitize_dict(d, logger=None):
     standard types from dictionary."""
     for k in d.keys():
         if isinstance(type(d[k]), list):
-            d[k] = sanitize_list(d[k])
+            sanitize_list(d[k])
         elif isinstance(type(d[k]), dict):
             sanitize_dict(d[k], logger)
         elif not type(d[k]) in _valid:
@@ -92,7 +92,7 @@ def sanitize_list(content, logger=None):
     for value in content[:]:
         if not type(value) in _valid:
             if logger:
-                logger.debug('Removed non yaml compatible list item from key %s %s' % (k, type([k])))
+                logger.debug('Removed non yaml compatible list item %s' % type(value))
         content.remove(value)
 
 def merge_dict_from_to(d1, d2):

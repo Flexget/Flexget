@@ -96,6 +96,7 @@ class InputScenereleases:
 
             # reject if no torrent link
             if not 'url' in release:
+                from flexget.utils.log import log_once 
                 log_once('%s skipped due to missing or unsupported (unresolvable) download link' % (release['title']), log)
             else:
                 releases.append(release)

@@ -152,7 +152,7 @@ class InputRSS:
                     raise PluginError('The server couldn\'t fulfill the request. Error code: %s' % ex.code, log)
             else:
                 raise PluginWarning('Unhandled bozo_exception. Type: %s.%s (feed: %s)' % \
-                                    (ex.__class__.__plugin__, ex.__class__.__name__ , feed.name), log)
+                                    (ex.__class__.__plugin__, ex.__class__.__name__ , feed.name), log) # pylint: disable-msg=E1103
 
         if rss['bozo'] and not ignore:
             log.error(rss)
