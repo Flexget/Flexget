@@ -22,12 +22,12 @@ languages_table = Table('imdb_movie_languages', Base.metadata,
     Column('language_id', Integer, ForeignKey('imdb_languages.id'))
 )
 
-actors = Table('imdb_movie_actors', Base.metadata,
+actors_table = Table('imdb_movie_actors', Base.metadata,
     Column('movie_id', Integer, ForeignKey('imdb_movies.id')),
     Column('actor_id', Integer, ForeignKey('imdb_actors.id'))
 )
 
-directors = Table('imdb_movie_directors', Base.metadata,
+directors_table = Table('imdb_movie_directors', Base.metadata,
     Column('movie_id', Integer, ForeignKey('imdb_movies.id')),
     Column('director_id', Integer, ForeignKey('imdb_directors.id'))
 )
@@ -43,8 +43,8 @@ class Movie(Base):
     # many-to-many relations
     genres = relation('Genre', secondary=genres_table, backref='movies')
     languages = relation('Language', secondary=languages_table, backref='movies')
-    actors = relation('Actor', secondary=actors, backref='movies')
-    directors = relation('Director', secondary=directors, backref='movies')
+    actors = relation('Actor', secondary=actors_table, backref='movies')
+    directors = relation('Director', secondary=directors_table, backref='movies')
     
     score = Column(Float)
     votes = Column(Integer)
@@ -118,7 +118,8 @@ class ModuleImdbLookup:
         Example:
 
         imdb_lookup: yes
-
+        
+        Also provides imdb lookup functionality to all other imdb related plugins.
     """
     def validator(self):
         from flexget import validator
@@ -225,24 +226,24 @@ class ModuleImdbLookup:
                     genre = feed.session.query(Genre).filter(Genre.name==name).first()
                     if not genre:
                         genre = Genre(name)
-                    movie.genres.append(genre)
+                    movie.genres.append(genre) # pylint: disable-msg=E1101
                 for name in imdb.languages:
                     language = feed.session.query(Language).filter(Language.name==name).first()
                     if not language:
                         language = Language(name)
-                    movie.languages.append(language)
+                    movie.languages.append(language) # pylint: disable-msg=E1101
                 for imdb_id in imdb.actors:
                     actor = feed.session.query(Actor).filter(Actor.imdb_id==imdb_id).first()
                     if not actor:
                         # TODO: Handle actor name
                         actor = Actor(imdb_id)
-                    movie.actors.append(actor)
+                    movie.actors.append(actor) # pylint: disable-msg=E1101
                 for imdb_id in imdb.directors:
                     director = feed.session.query(Director).filter(Director.imdb_id==imdb_id).first()
                     if not director:
                         # TODO: Handle director name
                         director = Director(imdb_id)
-                    movie.directors.append(director)
+                    movie.directors.append(director) # pylint: disable-msg=E1101
                 feed.session.add(movie)                        
                 
             except UnicodeDecodeError:
