@@ -7,5 +7,5 @@ def table_exists(table_name, feed):
         meta = MetaData()
         reflect = Table(table_name, meta, autoload=True, autoload_with=feed.session.connection())
     except NoSuchTableError:
-        return True
-    return False
+        return False
+    return True

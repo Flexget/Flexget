@@ -143,13 +143,6 @@ class ModuleImdbLookup:
 
     def lookup(self, feed, entry, search_allowed=True):
         """Perform imdb lookup for entry. Raises PluginError with failure reason."""
-        
-        # hack, test if running old database with sqlalchemy table reflection ..
-        from flexget.utils.sqlalchemy_utils import table_exists
-        if table_exists('imdb_directors', feed):
-            log.critical('Running old database! Please see bleeding edge news!')
-            feed.manager.disable_feeds()
-            feed.abort()
             
         take_a_break = False
         
