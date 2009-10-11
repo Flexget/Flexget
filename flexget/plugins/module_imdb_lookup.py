@@ -22,6 +22,16 @@ languages_table = Table('imdb_movie_languages', Base.metadata,
     Column('language_id', Integer, ForeignKey('imdb_languages.id'))
 )
 
+actors = Table('imdb_movie_actors', Base.metadata,
+    Column('movie_id', Integer, ForeignKey('imdb_movies.id')),
+    Column('actor_id', Integer, ForeignKey('imdb_actors.id'))
+)
+
+directors = Table('imdb_movie_directors', Base.metadata,
+    Column('movie_id', Integer, ForeignKey('imdb_movies.id')),
+    Column('director_id', Integer, ForeignKey('imdb_directors.id'))
+)
+
 class Movie(Base):
     
     __tablename__ = 'imdb_movies'
@@ -33,6 +43,8 @@ class Movie(Base):
     # many-to-many relations
     genres = relation('Genre', secondary=genres_table, backref='movies')
     languages = relation('Language', secondary=languages_table, backref='movies')
+    actors = relation('Actor', secondary=actors, backref='movies')
+    directors = relation('Director', secondary=directors, backref='movies')
     
     score = Column(Float)
     votes = Column(Integer)
@@ -60,6 +72,28 @@ class Genre(Base):
     name = Column(String)
     
     def __init__(self, name):
+        self.name = name
+
+class Actor(Base):
+    __tablename__ = 'imdb_actors'
+
+    id = Column(Integer, primary_key=True)
+    imdb_id = Column(String)
+    name = Column(String)
+
+    def __init__(self, imdb_id, name="N/A"):
+        self.imdb_id = imdb_id
+        self.name = name
+
+class Director(Base):
+    __tablename__ = 'imdb_directors'
+
+    id = Column(Integer, primary_key=True)
+    imdb_id = Column(String)
+    name = Column(String)
+
+    def __init__(self, imdb_id, name="N/A"):
+        self.imdb_id = imdb_id
         self.name = name
 
 class SearchResult(Base):
@@ -184,7 +218,7 @@ class ModuleImdbLookup:
                 movie.title = imdb.name
                 movie.score = imdb.score
                 movie.votes = imdb.votes
-                movie.year = imdb.year
+                movie.year = imdb.year                
                 movie.plot_outline = imdb.plot_outline
                 movie.url = entry['imdb_url']
                 for name in imdb.genres:
@@ -197,6 +231,18 @@ class ModuleImdbLookup:
                     if not language:
                         language = Language(name)
                     movie.languages.append(language)
+                for imdb_id in imdb.actors:
+                    actor = feed.session.query(Actor).filter(Actor.imdb_id==imdb_id).first()
+                    if not actor:
+                        # TODO: Handle actor name
+                        actor = Actor(imdb_id)
+                    movie.actors.append(actor)
+                for imdb_id in imdb.directors:
+                    director = feed.session.query(Director).filter(Director.imdb_id==imdb_id).first()
+                    if not director:
+                        # TODO: Handle director name
+                        director = Director(imdb_id)
+                    movie.directors.append(director)
                 feed.session.add(movie)                        
                 
             except UnicodeDecodeError:
@@ -232,12 +278,16 @@ class ModuleImdbLookup:
             imdb.plot_outline = cached.plot_outline
             imdb.genres = [genre.name for genre in cached.genres]
             imdb.languages = [lang.name for lang in cached.languages]
+            imdb.actors = [actor.name for actor in cached.actors]
+            imdb.directors = [director.name for director in cached.directors]
 
         log.log(5, 'imdb.score: %s' % imdb.score)
         log.log(5, 'imdb.votes: %s' % imdb.votes)
         log.log(5, 'imdb.year: %s' % imdb.year)
         log.log(5, 'imdb.genres: %s' % imdb.genres)
         log.log(5, 'imdb.languages: %s' % imdb.languages)
+        log.log(5, 'imdb.actors: %s' % imdb.actors)
+        log.log(5, 'imdb.directors: %s' % imdb.directors)
         
         # store to entries
         # TODO: I really don't like this shoveling!
@@ -249,6 +299,8 @@ class ModuleImdbLookup:
         entry['imdb_year'] = imdb.year
         entry['imdb_genres'] = imdb.genres
         entry['imdb_languages'] = imdb.languages
+        entry['imdb_actors'] = imdb.actors
+        entry['imdb_directors'] = imdb.directors
         
         # give imdb a little break between requests (see: http://flexget.com/ticket/129#comment:1)
         if take_a_break and not feed.manager.options.debug and not feed.manager.unit_test:

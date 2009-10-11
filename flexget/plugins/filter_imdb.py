@@ -76,6 +76,7 @@ class FilterImdb:
                     if genre in rejected:
                         reasons.append('reject_genres')
                         break
+
             if 'reject_languages' in config:
                 rejected = config['reject_languages']
                 for language in entry['imdb_languages']:
@@ -88,29 +89,33 @@ class FilterImdb:
                     if language not in accepted:
                         reasons.append('accept_languages')
                         break
+
             if 'reject_actors' in config:
                 rejected = config['reject_actors']
                 for actor in entry['imdb_actors']:
                     if actor in rejected:
                         reasons.append('reject_actors')
                         break
+            # Accept if actors contains an accepted actor, but don't reject otherwise
             if 'accept_actors' in config:
                 accepted = config['accept_actors']
                 for actor in entry['imdb_actors']:
-                    if actor not in accepted:
-                        reasons.append('accept_actors')
+                    if actor in accepted:
+                        log.debug("Accepting because of accept_actors %s" % actor)
                         break
+
             if 'reject_directors' in config:
                 rejected = config['reject_directors']
                 for director in entry['imdb_directors']:
                     if director in rejected:
                         reasons.append('reject_directors')
                         break
+            # Accept if the director is in the accept list, but do not reject if the director is unknown
             if 'accept_directors' in config:
                 accepted = config['accept_directors']
                 for director in entry['imdb_directors']:
-                    if director not in accepted:
-                        reasons.append('accept_directors')
+                    if director in accepted:
+                        log.debug("Accepting because of accept_directors %s" % actor)
                         break
 
             if reasons:
