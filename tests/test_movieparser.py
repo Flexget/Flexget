@@ -28,6 +28,5 @@ class TestMovieParser:
         assert movie.quality == '720p', 'failed to parse quality from %s' % movie.data
 
         movie = self.parse('Coraline.3D.1080p.BluRay.x264-FlexGet')
-        print movie.name
         assert movie.name == 'Coraline', 'failed to parse %s' % movie.data
         assert movie.quality == '1080p', 'failed to parse quality from %s' % movie.data
