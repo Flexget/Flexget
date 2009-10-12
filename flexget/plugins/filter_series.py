@@ -3,9 +3,10 @@ from datetime import datetime, timedelta
 from flexget.utils.titles import SeriesParser, ParseWarning
 from flexget.manager import Base
 from flexget.plugin import *
-from sqlalchemy import Column, Integer, String, DateTime, Boolean, PickleType, desc
+from sqlalchemy import Column, Integer, String, DateTime, Boolean, desc
 from sqlalchemy.schema import ForeignKey
 from sqlalchemy.orm import relation, join
+from optparse import SUPPRESS_HELP
 
 log = logging.getLogger('series')
 
@@ -198,20 +199,36 @@ class SeriesForget(object):
 
     def on_process_start(self, feed):
         if feed.manager.options.series_forget:
-            # disable all feeds
-            for afeed in feed.manager.feeds.itervalues():
-                afeed.enabled = False
-                
+            feed.manager.disable_feeds()
+
             from flexget.manager import Session
             session = Session()
 
-            series = session.query(Series).\
-                     filter(Series.name == feed.manager.options.series_forget).first()
-            if series:
-                print 'Removed %s' % feed.manager.options.series_forget 
-                session.delete(series)
+            if feed.manager.options.series_forget_ep:
+                # remove by id
+                identifier = feed.manager.options.series_forget_ep.upper()
+                name = feed.manager.options.series_forget
+                if identifier and name:
+                    series = session.query(Series).filter(Series.name == name).first()
+                    if series:
+                        episode = session.query(Episode).filter(Episode.identifier == identifier).first()
+                        if episode:
+                            print 'Removed %s %s' % (name.capitalize(), identifier)
+                            session.delete(episode)
+                        else:
+                            print 'Didn\'t find %s episode identified by %s' % (name.capitalize(), identifier)
+                    else:
+                        print 'Unknown series %s' % name
             else:
-                print 'Didn''t find series %s' % feed.manager.options.series_forget
+                # remove whole series
+                if not removed:
+                    series = session.query(Series).\
+                             filter(Series.name == feed.manager.options.series_forget).first()
+                    if series:
+                        print 'Removed %s' % feed.manager.options.series_forget
+                        session.delete(series)
+                    else:
+                        print 'Unknown series %s' % feed.manager.options.series_forget
             
             session.commit()
 
@@ -622,6 +639,8 @@ register_plugin(SeriesForget, 'series_forget', builtin=True)
 register_parser_option('--series', action='store_true', dest='series', default=False, 
                        help='Display series summary.')
 register_parser_option('--series-forget', action='store', dest='series_forget', default=False, 
-                       metavar='NAME', help='Remove given series from database.')
+                       metavar='NAME', help='Remove series from database. To remove single episode add --ep-id ID.')
+register_parser_option('--ep-id', action='store', dest='series_forget_ep', default=False,
+                       help=SUPPRESS_HELP)
 register_parser_option('--stop-waiting', action='store', dest='stop_waiting', default=False, 
                        metavar='NAME', help='Stop timeframe for a given series.')
