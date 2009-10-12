@@ -1,14 +1,15 @@
 from flexget import validator
 
 class TestValidator(object):
-    def testDefault(self):
+
+    def test_default(self):
         root = validator.factory()
         assert root.name=='root', 'expected root'
         dv = root.accept('dict')
         assert dv.name=='dict', 'expected dict'
         dv.accept('text', key='text')
         
-    def testDict(self):
+    def test_dict(self):
         dv = validator.factory('dict')
         dv.accept('dict', key='foo')
         result = dv.validate( {'foo': {}} )

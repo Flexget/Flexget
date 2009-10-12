@@ -23,7 +23,7 @@ class TestFilterSeen(FlexGetBase):
               - {title: 'New title 2', url: 'http://localhost/new2', imdb_score: 5}
     """
     
-    def testSeen(self):
+    def test_seen(self):
         self.execute_feed('test')
         assert self.feed.find_entry(title='Seen title 1'), 'Test entry missing'
         # run again, should filter
@@ -69,7 +69,7 @@ class TestFilterSeenMovies(FlexGetBase):
             seen_movies: strict
     """
     
-    def testSeenMovies(self):
+    def test_seen_movies(self):
         self.execute_feed('test')
         assert self.feed.find_entry(title='Seen movie title 1'), 'Test movie entry 1 is missing'
         # should be rejected, duplicate imdb url
@@ -87,6 +87,6 @@ class TestFilterSeenMovies(FlexGetBase):
         assert not self.feed.find_entry(title='Seen movie title 4'), 'seen movie 4 exists'
         assert self.feed.find_entry(title='Seen movie title 5'), 'unseen movie 5 exists'
     
-    def testSeenMoviesStrict(self):
+    def test_seen_movies_strict(self):
         self.execute_feed('strict')
         assert not self.feed.find_entry(title='Seen movie title 8'), 'strict should not have passed movie 8'

@@ -16,6 +16,6 @@ class TestAbort(FlexGetBase):
               test: value 
     """
     
-    def testAbort(self):
+    def test_abort(self):
         self.execute_feed('test')
         assert self.feed._abort, 'Feed not aborted'
