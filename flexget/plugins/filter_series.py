@@ -221,14 +221,13 @@ class SeriesForget(object):
                         print 'Unknown series %s' % name
             else:
                 # remove whole series
-                if not removed:
-                    series = session.query(Series).\
-                             filter(Series.name == feed.manager.options.series_forget).first()
-                    if series:
-                        print 'Removed %s' % feed.manager.options.series_forget
-                        session.delete(series)
-                    else:
-                        print 'Unknown series %s' % feed.manager.options.series_forget
+                series = session.query(Series).\
+                         filter(Series.name == feed.manager.options.series_forget).first()
+                if series:
+                    print 'Removed %s' % feed.manager.options.series_forget
+                    session.delete(series)
+                else:
+                    print 'Unknown series %s' % feed.manager.options.series_forget
             
             session.commit()
 
