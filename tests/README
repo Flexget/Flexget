@@ -12,10 +12,15 @@ Use --online to enable online tests.
 To run a single test suite:
 ---------------------------
 
-bin/nosetests tests/test_rss.py:TestInputRSS
+bin/nosetests tests/test_rss.py:TestInputRSS -v
 
 
 To run a single test in a suite:
 --------------------------------
 
-bin/nosetests tests/test_rss.py:TestInputRSS.test_rss
+bin/nosetests tests/test_rss.py:TestInputRSS.test_rss -v
+
+
+Test parameters can be added with --atrr=<params>
+
+Ie. to disable online tests: --attr=\!online
