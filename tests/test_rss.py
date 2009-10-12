@@ -33,7 +33,8 @@ class TestInputRSS(FlexGetBase):
         # zero sized enclosure should not pick up filename (some idiotic sites)
         e = self.feed.find_entry(title='Zero sized enclosure')
         assert e, 'RSS entry missing: zero sized'
-        assert not e.has_key('filename'), 'RSS entry with 0-sized enclosure should not have explicit filename'
+        assert not e.has_key('filename'), \
+            'RSS entry with 0-sized enclosure should not have explicit filename'
         
         # messy enclosure
         e = self.feed.find_entry(title='Messy enclosure')
@@ -44,10 +45,11 @@ class TestInputRSS(FlexGetBase):
         # pick link from guid
         assert self.feed.find_entry(title='Guid link', url='http://localhost/guid', \
                                     description='Description, guid'), \
-            'RSS entry missing: guid'
+                                    'RSS entry missing: guid'
             
         # empty title, should be skipped
-        assert not self.feed.find_entry(description='Description, empty title'), 'RSS entry without title should be skipped'
+        assert not self.feed.find_entry(description='Description, empty title'), \
+            'RSS entry without title should be skipped'
 
 class TestRssOnline(FlexGetBase):
     
