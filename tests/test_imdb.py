@@ -21,6 +21,27 @@ class TestImdbOnline(FlexGetBase):
               - {title: 'Taken[2008]DvDrip[Eng]-FOO', imdb_url: 'http://www.imdb.com/title/tt0936501/'}
             imdb:
               min_year: 2003
+
+          actor:
+            input_mock:
+              - {title: 'The Matrix', imdb_url: 'http://www.imdb.com/title/tt0133093/'}
+              - {title: 'The Terminator', imdb_url: 'http://www.imdb.com/title/tt0088247/'}
+            imdb:
+              accept_actors:
+                - nm0000206
+              reject_actors:
+                - nm0000216
+
+          director:
+            input_mock:
+              - {title: 'The Matrix', imdb_url: 'http://www.imdb.com/title/tt0133093/'}
+              - {title: 'The Terminator', imdb_url: 'http://www.imdb.com/title/tt0088247/'}
+            imdb:
+              accept_directors:
+                - nm0905152
+                - nm0905154
+              reject_directors:
+                - nm0000116
     """
     @attr(online=True)
     def test_lookup(self):
@@ -36,6 +57,19 @@ class TestImdbOnline(FlexGetBase):
         # mononoke should not be accepted or rejected
         assert not self.feed.find_entry('accepted', imdb_name='Mononoke-hime'), 'Mononoke-hime should not have been accepted'
         assert not self.feed.find_entry('rejected', imdb_name='Mononoke-hime'), 'Mononoke-hime should not have been rejected'
+
+    @attr(online=True)
+    def test_actors(self):
+        self.execute_feed('actor')
+        assert self.feed.find_entry('accepted', imdb_name='The Matrix'), 'The Matrix should\'ve been accepted'
+        assert not self.feed.find_entry('rejected', imdb_name='The Terminator'), 'The The Terminator have been rejected'
+    
+    @attr(online=True)
+    def test_directors(self):
+        self.execute_feed('director')
+        assert self.feed.find_entry('accepted', imdb_name='The Matrix'), 'The Matrix should\'ve been accepted'
+        assert not self.feed.find_entry('rejected', imdb_name='The Terminator'), 'The The Terminator have been rejected'
+    
 
 class TestScanImdb(FlexGetBase):
     __yaml__ = """

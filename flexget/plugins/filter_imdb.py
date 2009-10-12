@@ -28,6 +28,24 @@ class FilterImdb:
         # accept only this language
         accept_languages:
             - language1
+
+        # accept movies with any of these actors
+        accept_actors:
+            - nm0004695
+            - nm0004754
+
+        # reject movie if it has any of these actors
+        reject_actors:
+            - nm0001191
+            - nm0002071
+
+        # accept all movies by these directors
+        accept_directors:
+            - nm0000318
+   
+        # reject movies by these directors
+        reject_directors:
+            - nm0093051       
     """
     
     def validator(self):
@@ -51,9 +69,9 @@ class FilterImdb:
         
         lookup = get_plugin_by_name('imdb_lookup').instance.lookup
 
-        force_accept = False
         
         for entry in feed.entries:
+            force_accept = False
             
             try:
                 lookup(feed, entry)
@@ -122,7 +140,7 @@ class FilterImdb:
                 accepted = config['accept_directors']
                 for director in entry['imdb_directors']:
                     if director in accepted:
-                        log.debug("Accepting because of accept_directors %s" % actor)
+                        log.debug("Accepting because of accept_directors %s" % director)
                         force_accept = True
                         break
 
