@@ -1,11 +1,21 @@
-This directory contains FlexGet unit tests and related resources. These can only be ran in development environment.
+This directory contains FlexGet unit tests and related resources. These can only be ran in development
+sandbox.
 
 To run all tests:
 -----------------
 
 bin/paver test
 
-To run a single test:
----------------------
+Use --online to enable online tests.
 
-bin/nosetests tests/__init__.py:TestDisableBuiltins
+
+To run a single test suite:
+---------------------------
+
+bin/nosetests tests/test_rss.py:TestInputRSS
+
+
+To run a single test in a suite:
+--------------------------------
+
+bin/nosetests tests/test_rss.py:TestInputRSS.test_rss
