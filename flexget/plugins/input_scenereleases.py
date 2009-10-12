@@ -1,4 +1,5 @@
-import urllib2, logging, re
+import urllib2
+import logging
 from httplib import BadStatusLine
 from flexget.feed import Entry
 from flexget.plugin import *
@@ -13,27 +14,12 @@ class InputScenereleases:
 
         Example:
 
-        scenereleases: http://www.scenereleases.info/search/label/Movies%20-%20DVD%20Rip
+        scenereleases: http://scenereleases.info/category/movies/movies-dvd-rip
     """
     def validator(self):
         from flexget import validator
         return validator.factory('url')
         
-    def parse_imdb(self, s):
-        score = None
-        votes = None
-        re_votes = re.compile('\((\d*).votes\)', re.IGNORECASE)
-        re_score = [re.compile('(\d\.\d)'), re.compile('(\d)\/10')]
-        for r in re_score:
-            f = r.search(s)
-            if f != None:
-                score = float(f.group(1))
-                break
-        f = re_votes.search(s.replace(',',''))
-        if f != None:
-            votes = f.group(1)
-        log.debug("parse_imdb returning score: '%s' votes: '%s' from: '%s'" % (str(score), str(votes), s))
-        return (score, votes)
 
     def parse_site(self, url, feed):
         """Parse configured url and return releases array"""
@@ -52,15 +38,6 @@ class InputScenereleases:
 
             log.debug('Processing title %s' % (release['title']))
 
-            """
-            # TODO: parse imdb values
-            rating = entry.find('strong', text=re.compile('imdb rating\:', re.IGNORECASE))
-            if rating != None:
-                score_raw = rating.next.string
-                if score_raw != None:
-                    release['imdb_score'], release['imdb_votes'] = self.parse_imdb(score_raw)
-            """
-            
             for link in entry.findAll('a'):
                 link_name = link.contents[0]
                 if link_name is None:
@@ -77,11 +54,6 @@ class InputScenereleases:
                 if link_name.lower() == 'imdb':
                     log.debug('found imdb link %s' % link_href)
                     release['imdb_url'] = link_href
-                    """
-                    score_raw = link.next.next.string
-                    if not release.has_key('imdb_score') and not release.has_key('imdb_votes') and score_raw != None:
-                        release['imdb_score'], release['imdb_votes'] = self.parse_imdb(score_raw)
-                    """
 
                 # test if entry with this url would be resolvable (downloadable)
                 temp = {}

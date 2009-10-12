@@ -1,7 +1,5 @@
 from tests import FlexGetBase
-from nose.tools import assert_raises, set_trace
 from nose.plugins.attrib import attr
-import os
 
 class TestInputRSS(FlexGetBase):
     
@@ -13,7 +11,7 @@ class TestInputRSS(FlexGetBase):
               silent: true
     """
     
-    def testInputRSS(self):
+    def test_rss(self):
         self.execute_feed('test')
 
         # normal entry
@@ -75,6 +73,6 @@ class TestRssOnline(FlexGetBase):
     """
     
     @attr(online=True)
-    def testFeeds(self):
-        # TODO:
+    def test_rss_online(self):
+        # TODO: XXX
         pass

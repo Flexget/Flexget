@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
-import os, sys
+import os
+import sys
 from nose.tools import *
 from nose.plugins.attrib import attr
 from flexget.manager import Manager, Session
@@ -296,19 +297,6 @@ class TestInputHtml(FlexGetBase):
     def testParsing(self):
         self.execute_feed('test')
         assert self.feed.entries, 'did not produce entries'
-
-class TestRlsLog(FlexGetBase):
-
-    __yaml__ = """
-        feeds:
-          test:
-            rlslog: http://www.rlslog.net/category/movies/dvdrip/
-    """
-
-    @attr(online=True)
-    def testParsing(self):
-        self.execute_feed('test')
-        assert self.feed.entries, 'no entries created'
 
 class TestPriority(FlexGetBase):
 
