@@ -22,7 +22,7 @@ class TestMovieParser:
         assert movie.year == 2002, 'failed to parse year from %s' % movie.data
         assert movie.quality == '1080p', 'failed to parse quality from %s' % movie.data
 
-        movie = self.parse("Howl's_Moving_Castle_(2004)_[720p,HDTV,x264,DTS]_-_THORA")
+        movie = self.parse("Howl's_Moving_Castle_(2004)_[720p,HDTV,x264,DTS]-FlexGet")
         assert movie.name == "Howl's Moving Castle", 'failed to parse %s' % movie.data
         assert movie.year == 2004, 'failed to parse year from %s' % movie.data
         assert movie.quality == '720p', 'failed to parse quality from %s' % movie.data
