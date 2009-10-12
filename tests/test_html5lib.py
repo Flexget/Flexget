@@ -1,9 +1,10 @@
-import os, html5lib, urllib2
+import html5lib
 from html5lib import treebuilders
 from cStringIO import StringIO
 
 class TestHtml5Lib():
-    def testParseBroken(self):
+
+    def test_parse_broken(self):
         parser = html5lib.HTMLParser(tree=treebuilders.getTreeBuilder('beautifulsoup'))
         s = StringIO("""<html>
 <head><title>Foo</title>

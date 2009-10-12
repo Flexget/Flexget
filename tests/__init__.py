@@ -82,6 +82,7 @@ class FlexGetBase(object):
         print self.feed.rejected
 
 class TestRegexp(FlexGetBase):
+
     __yaml__ = """
         global:
           input_mock:
@@ -138,7 +139,7 @@ class TestRegexp(FlexGetBase):
                     from:
                       - title
     """
-    def testAccept(self):
+    def test_accept(self):
         self.execute_feed('test_accept')
         assert self.feed.find_entry('accepted', title='regexp1'), 'regexp1 should have been accepted'
         assert self.feed.find_entry('accepted', title='regexp2'), 'regexp2 should have been accepted'
@@ -147,22 +148,22 @@ class TestRegexp(FlexGetBase):
         assert self.feed.find_entry('accepted', title='regexp2', path='~/custom_path/2/'), 'regexp2 should have been accepter with custom path'
         assert self.feed.find_entry('accepted', title='regexp3', path='~/custom_path/3/'), 'regexp3 should have been accepter with custom path'
             
-    def testReject(self):
+    def test_reject(self):
         self.execute_feed('test_reject')
         assert self.feed.find_entry('rejected', title='regexp1'), 'regexp1 should have been rejected'
 
-    def testRest(self):
+    def test_rest(self):
         self.execute_feed('test_rest')
         assert self.feed.find_entry('accepted', title='regexp1'), 'regexp1 should have been accepted'
         assert self.feed.find_entry('rejected', title='regexp3'), 'regexp3 should have been rejected'
             
-    def testExcluding(self):
+    def test_excluding(self):
         self.execute_feed('test_excluding')
         assert not self.feed.find_entry('accepted', title='regexp1'), 'regexp1 should not have been accepted'
         assert self.feed.find_entry('accepted', title='regexp2'), 'regexp2 should have been accepted'
         assert self.feed.find_entry('accepted', title='regexp3'), 'regexp3 should have been accepted'
 
-    def testFrom(self):
+    def test_from(self):
         self.execute_feed('test_from')
         assert not self.feed.accepted, 'should not have accepted anything'
         
@@ -187,19 +188,19 @@ class TestResolvers(FlexGetBase):
         info = get_plugin_by_name(name)
         return info.instance
         
-    def testPirateBay(self):
+    def test_piratebay(self):
         # test with piratebay entry
         resolver = self.get_resolver('piratebay')
         entry = self.feed.entries[0]
         assert_true(resolver.resolvable(self.feed, entry))
 
-    def testPirateBaySearch(self):
+    def test_piratebay_search(self):
         # test with piratebay entry
         resolver = self.get_resolver('piratebay')
         entry = self.feed.entries[1]
         assert_true(resolver.resolvable(self.feed, entry))
         
-    def testNyaaTorrents(self):
+    def test_nyaa_torrents(self):
         entry = self.feed.entries[2]
         resolver = self.get_resolver('nyaatorrents')
         assert entry['url'] == 'http://www.nyaatorrents.org/?page=torrentinfo&tid=12345'
@@ -209,6 +210,7 @@ class TestResolvers(FlexGetBase):
 
 
 class TestRegexpResolver(FlexGetBase):
+
     __yaml__ = """
         feeds:
           test:
@@ -220,7 +222,7 @@ class TestRegexpResolver(FlexGetBase):
                 replace: http://newzleech.com/?m=gen&dl=1&post=
     """
     
-    def testNewzleech(self):
+    def test_newzleech(self):
         self.execute_feed('test')
         assert not self.feed.find_entry(url='http://newzleech.com/?m=gen&dl=1&post=123'), 'did not resolve properly'
 
@@ -228,6 +230,7 @@ class TestDisableBuiltins(FlexGetBase):
     """
         Quick a hack, test disable functionality by checking if seen filtering (builtin) is working
     """
+
     __yaml__ = """
         feeds:
             test:
@@ -244,7 +247,7 @@ class TestDisableBuiltins(FlexGetBase):
                     - seen
                     - cli_config
     """
-    def testDisableBuiltins(self):
+    def test_disable_builtins(self):
         self.execute_feed('test')
         assert self.feed.find_entry(title='dupe1') and self.feed.find_entry(title='dupe2'), 'disable_builtins is not working?'
 
@@ -272,29 +275,31 @@ class TestPreset(FlexGetBase):
               - no_global
     """
     
-    def testPreset1(self):
+    def test_preset1(self):
         self.execute_feed('test1')
         assert self.feed.find_entry(title='global'), 'test1, preset global not applied'
         assert self.feed.find_entry(title='movies'), 'test1, preset movies not applied'
 
-    def testPreset2(self):
+    def test_preset2(self):
         self.execute_feed('test2')
         self.dump()
         assert not self.feed.find_entry(title='global'), 'test2, preset global applied'
         assert not self.feed.find_entry(title='movies'), 'test2, preset movies applied'
 
-    def testPreset3(self):
+    def test_preset3(self):
         self.execute_feed('test3')
         assert not self.feed.find_entry(title='global'), 'test3, preset global applied'
         assert self.feed.find_entry(title='movies'), 'test3, preset movies not applied'
         
 class TestInputHtml(FlexGetBase):
+
     __yaml__ = """
         feeds:
           test:
             html: http://download.flexget.com/
     """
-    def testParsing(self):
+
+    def test_parsing(self):
         self.execute_feed('test')
         assert self.feed.entries, 'did not produce entries'
 
@@ -310,7 +315,7 @@ class TestPriority(FlexGetBase):
               accept_all: 100
     """
 
-    def testSmoke(self):
+    def test_smoke(self):
         self.execute_feed('test')
         assert self.feed.entries, 'no entries created'
         
@@ -328,7 +333,7 @@ class TestManipulate(FlexGetBase):
                 regexp: \[\d\d\d\d\](.*)
     """
     
-    def testClean(self):
+    def test_clean(self):
         self.execute_feed('test')
         assert self.feed.find_entry(cleaned='foobar'), 'title not cleaned'
 
@@ -346,7 +351,7 @@ class TestImmortal(FlexGetBase):
                 - .*
     """
     
-    def testImmortal(self):
+    def test_immortal(self):
         self.execute_feed('test')
         assert self.feed.find_entry(title='title1'), 'rejected immortal entry'
         assert not self.feed.find_entry(title='title2'), 'did not reject mortal'
@@ -374,7 +379,7 @@ class TestDownload(FlexGetBase):
             os.rmdir(temp_dir)
 
     @attr(online=True)
-    def testDownload(self):
+    def test_download(self):
         self.testfile = os.path.expanduser('~/flexget_test_data.ksh') # note: what the hell is .ksh and where it comes from?
         if os.path.exists(self.testfile):
             os.remove(self.testfile)
