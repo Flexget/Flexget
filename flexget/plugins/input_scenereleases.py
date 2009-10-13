@@ -39,6 +39,9 @@ class InputScenereleases:
             log.debug('Processing title %s' % (release['title']))
 
             for link in entry.findAll('a'):
+                # no content in the link
+                if not link.contents:
+                    continue
                 link_name = link.contents[0]
                 if link_name is None:
                     continue
