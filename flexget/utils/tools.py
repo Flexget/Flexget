@@ -104,7 +104,8 @@ def merge_dict_from_to(d1, d2):
                     merge_dict_from_to(d1[k], d2[k])
                 elif isinstance(v, list):
                     d2[k].extend(v)
-                elif isinstance(v, basestring) or isinstance(v, bool) or isinstance(v, int):
+                elif isinstance(v, basestring) or isinstance(v, bool) or \
+                     isinstance(v, int) or isinstance(v, float):
                     pass
                 else:
                     raise Exception('Unknown type: %s value: %s in dictionary' % (type(v), repr(v)))

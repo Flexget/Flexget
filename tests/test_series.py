@@ -164,6 +164,48 @@ class TestSimilarNames(FlexGetBase):
         assert self.feed.find_entry('accepted', title='FooBar: FirstAlt.S02E01.DSR-FlexGet'), 'FirstAlt failed'
         assert self.feed.find_entry('accepted', title='FooBar: SecondAlt.S01E01.DSR-FlexGet'), 'SecondAlt failed'
 
+class TestRemembering(FlexGetBase):
+
+    # Added to test one possible bug report, no bug found (useless test?)
+
+    __yaml__ = """
+        feeds:
+          test_1:
+            input_mock:
+              - {title: 'Foo.2009.S02E04.HDTV.XviD-2HD[FlexGet]'}
+            series:
+              - Foo 2009
+          test_2:
+            input_mock:
+              - {title: 'Foo.2009.S02E04.HDTV.XviD-2HD[ASDF]'}
+            series:
+              - Foo 2009
+    """
+
+    def test_foo(self):
+        self.execute_feed('test_1')
+        assert self.feed.find_entry('accepted', title='Foo.2009.S02E04.HDTV.XviD-2HD[FlexGet]'), 'Did not accept Foo.2009.S02E04.HDTV.XviD-FlexGet'
+        self.execute_feed('test_2')
+        assert self.feed.find_entry('rejected', title='Foo.2009.S02E04.HDTV.XviD-2HD[ASDF]'), 'Did not reject Foo.2009.S02E04.HDTV.XviD-ASDF'
+
+
+class TestDuplicates(FlexGetBase):
+    __yaml__ = """
+        feeds:
+          test:
+            input_mock:
+              - {title: 'Foo.2009.S02E04.HDTV.XviD-2HD[FlexGet]'}
+              - {title: 'Foo.2009.S02E04.HDTV.XviD-2HD[ASDF]'}
+            series:
+              - Foo 2009
+    """
+
+    def test_dupes(self):
+        self.execute_feed('test')
+        self.dump()
+        assert not (self.feed.find_entry('accepted', title='Foo.2009.S02E04.HDTV.XviD-2HD[FlexGet]') and \
+                    self.feed.find_entry('accepted', title='Foo.2009.S02E04.HDTV.XviD-2HD[ASDF]')), 'accepted both'
+
 class TestSeriesParser(object):
     
     def parse(self, **kwargs):
@@ -249,7 +291,7 @@ class TestSeriesParser(object):
         assert (s.season==1 and s.episode==1), 'failed to parse episodes from %s' % s.data
         assert (s.quality=='720p'), 'failed to parse quality from %s' % s.data
         
-    def test_numberic_names(self):
+    def test_numeric_names(self):
         s = self.parse(name='24', data='24.1x2-FlexGet')
         assert (s.season==1 and s.episode==2), 'failed to parse %s' % s.data
         
@@ -261,6 +303,11 @@ class TestSeriesParser(object):
         
         s = self.parse(name='Foo Bar', data='[7.1.7.5] Foo Bar - 11 (H.264) [5235532D].mkv')
         assert (s.id=='11'), 'failed to parse %s' % s.data
+        
+    def test_partially_numeric(self):
+        s = self.parse(name='Foo 2009', data='Foo.2009.S02E04.HDTV.XviD-2HD[FlexGet]')
+        assert (s.season==2 and s.episode==4), 'failed to parse %s' % s.data
+        assert (s.quality=='hdtv'), 'failed to parse quality from %s' % s.data
 
     def test_seasonpacks(self):
         s = SeriesParser()

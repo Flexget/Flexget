@@ -252,44 +252,6 @@ class TestDisableBuiltins(FlexGetBase):
         assert self.feed.find_entry(title='dupe1') and self.feed.find_entry(title='dupe2'), 'disable_builtins is not working?'
 
 
-class TestPreset(FlexGetBase):
-    __yaml__ = """
-        global:
-          input_mock:
-            - {title: 'global'}
-            
-        movies:
-          input_mock:
-            - {title: 'movies'}
-    
-        feeds:
-          test1:
-            preset: movies
-
-          test2:
-            preset: no
-            
-          test3:
-            preset:
-              - movies
-              - no_global
-    """
-    
-    def test_preset1(self):
-        self.execute_feed('test1')
-        assert self.feed.find_entry(title='global'), 'test1, preset global not applied'
-        assert self.feed.find_entry(title='movies'), 'test1, preset movies not applied'
-
-    def test_preset2(self):
-        self.execute_feed('test2')
-        self.dump()
-        assert not self.feed.find_entry(title='global'), 'test2, preset global applied'
-        assert not self.feed.find_entry(title='movies'), 'test2, preset movies applied'
-
-    def test_preset3(self):
-        self.execute_feed('test3')
-        assert not self.feed.find_entry(title='global'), 'test3, preset global applied'
-        assert self.feed.find_entry(title='movies'), 'test3, preset movies not applied'
         
 class TestInputHtml(FlexGetBase):
 
