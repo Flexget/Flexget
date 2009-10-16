@@ -144,7 +144,7 @@ class InputRSS:
                 log.debug('ignoring feedparser.CharacterEncodingOverride')
                 ignore = True
             elif isinstance(ex, xml.sax._exceptions.SAXParseException):
-                raise PluginWarning('RSS Feed %s is not valid XML' % feed.name, log)
+                raise PluginError('RSS Feed %s is not valid XML' % feed.name, log)
             elif isinstance(ex, IOError):
                 if hasattr(ex, 'reason'):
                     raise PluginError('Failed to reach server for feed %s. Reason: %s' % (feed.name, ex.reason), log)

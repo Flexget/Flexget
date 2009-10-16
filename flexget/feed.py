@@ -274,7 +274,7 @@ class Feed:
                 else:
                     self.verbose_progress('Feed %s produced %s entries.' % (self.name, len(self.entries)))
             if event == 'filter':
-                self.verbose_progress('Feed %s accepted: %s (rejected: %s undecided: %s failed: %s )' % \
+                self.verbose_progress('Feed %s accepted: %s (rejected: %s undecided: %s failed: %s)' % \
                                       (self.name, len(self.accepted), len(self.rejected), \
                                        len(self.entries)-len(self.accepted), len(self.failed)))
             # if abort flag has been set feed should be aborted now

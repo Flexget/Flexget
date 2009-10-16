@@ -145,7 +145,8 @@ class FilterImdb:
                         break
 
             if reasons and not force_accept:
-                msg = 'Skipping %s because of rule(s) %s' % (entry['title'], ', '.join(reasons))
+                msg = 'Skipping %s because of rule(s) %s' % \
+                    (entry.get('imdb_name', None) or entry['title'], ', '.join(reasons))
                 if feed.manager.options.debug:
                     log.debug(msg)
                 else:
