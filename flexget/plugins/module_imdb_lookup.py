@@ -5,7 +5,7 @@ from flexget.manager import Base
 from flexget.utils.log import log_once
 from flexget.utils.imdb import ImdbSearch, ImdbParser
 
-from sqlalchemy import Table, Column, Integer, Float, String, DateTime, Boolean
+from sqlalchemy import Table, Column, Integer, Float, String, Unicode, Boolean
 from sqlalchemy.schema import ForeignKey
 from sqlalchemy.orm import relation
 
@@ -81,7 +81,7 @@ class Actor(Base):
     imdb_id = Column(String)
     name = Column(String)
 
-    def __init__(self, imdb_id, name="N/A"):
+    def __init__(self, imdb_id, name=None):
         self.imdb_id = imdb_id
         self.name = name
 
@@ -92,7 +92,7 @@ class Director(Base):
     imdb_id = Column(String)
     name = Column(String)
 
-    def __init__(self, imdb_id, name="N/A"):
+    def __init__(self, imdb_id, name=None):
         self.imdb_id = imdb_id
         self.name = name
 
@@ -232,17 +232,15 @@ class ModuleImdbLookup:
                     if not language:
                         language = Language(name)
                     movie.languages.append(language) # pylint: disable-msg=E1101
-                for imdb_id in imdb.actors:
+                for imdb_id, name in imdb.actors.iteritems():
                     actor = feed.session.query(Actor).filter(Actor.imdb_id==imdb_id).first()
                     if not actor:
-                        # TODO: Handle actor name
-                        actor = Actor(imdb_id)
+                        actor = Actor(imdb_id, name)
                     movie.actors.append(actor) # pylint: disable-msg=E1101
-                for imdb_id in imdb.directors:
+                for imdb_id, name in imdb.directors.iteritems():
                     director = feed.session.query(Director).filter(Director.imdb_id==imdb_id).first()
                     if not director:
-                        # TODO: Handle director name
-                        director = Director(imdb_id)
+                        director = Director(imdb_id, name)
                     movie.directors.append(director) # pylint: disable-msg=E1101
                 feed.session.add(movie)                        
                 
@@ -279,8 +277,10 @@ class ModuleImdbLookup:
             imdb.plot_outline = cached.plot_outline
             imdb.genres = [genre.name for genre in cached.genres]
             imdb.languages = [lang.name for lang in cached.languages]
-            imdb.actors = [actor.name for actor in cached.actors]
-            imdb.directors = [director.name for director in cached.directors]
+            for actor in cached.actors:
+                imdb.actors[actor.imdb_id] = actor.name
+            for director in cached.directors:
+                imdb.directors[director.imdb_id] = director.name
 
         log.log(5, 'imdb.score: %s' % imdb.score)
         log.log(5, 'imdb.votes: %s' % imdb.votes)

@@ -114,33 +114,33 @@ class FilterImdb:
 
             if 'reject_actors' in config:
                 rejected = config['reject_actors']
-                for actor in entry['imdb_actors']:
-                    if actor in rejected:
-                        reasons.append('reject_actors')
+                for actor_id, actor_name in entry['imdb_actors'].iteritems():
+                    if actor_id in rejected or actor_name in rejected:
+                        reasons.append('reject_actors %s' % actor_name or actor_id)
                         break
                     
             # Accept if actors contains an accepted actor, but don't reject otherwise
             if 'accept_actors' in config:
                 accepted = config['accept_actors']
-                for actor in entry['imdb_actors']:
-                    if actor in accepted:
-                        log.debug("Accepting because of accept_actors %s" % actor)
+                for actor_id, actor_name in entry['imdb_actors'].iteritems():
+                    if actor_id in accepted or actor_name in accepted:
+                        log.debug("Accepting because of accept_actors %s" % actor_name or actor_id)
                         force_accept = True
                         break
 
             if 'reject_directors' in config:
                 rejected = config['reject_directors']
-                for director in entry['imdb_directors']:
-                    if director in rejected:
-                        reasons.append('reject_directors')
+                for director_id, director_name in entry['imdb_directors'].iteritems():
+                    if director_id in rejected or director_name in rejected:
+                        reasons.append('reject_directors %s' % director_name or director_id)
                         break
                     
             # Accept if the director is in the accept list, but do not reject if the director is unknown
             if 'accept_directors' in config:
                 accepted = config['accept_directors']
-                for director in entry['imdb_directors']:
-                    if director in accepted:
-                        log.debug("Accepting because of accept_directors %s" % director)
+                for director_id, director_name in entry['imdb_directors'].iteritems():
+                    if director_id in accepted or director_name in accepted:
+                        log.debug("Accepting because of accept_directors %s" % director_name or director_id)
                         force_accept = True
                         break
 

@@ -4,8 +4,7 @@ import urllib2
 import logging
 import re
 from flexget.utils.soup import get_soup
-from BeautifulSoup import NavigableString
-from socket import timeout
+from BeautifulSoup import NavigableString, Tag
 
 log = logging.getLogger('utils.imdb')
 
@@ -226,8 +225,8 @@ class ImdbParser:
     def __init__(self):
         self.genres = []
         self.languages = []
-        self.actors = []
-        self.directors = []
+        self.actors = {}
+        self.directors = {}
         self.score = 0.0
         self.votes = 0
         self.year = 0
@@ -304,22 +303,26 @@ class ImdbParser:
                 log.debug('Detected plot outline: %s' % self.plot_outline)
 
         # get main cast
-        tag_cast = soup.find('table', "cast")
+        tag_cast = soup.find('table', 'cast')
         if tag_cast:
-            s = set()
-            for actor in tag_cast.findAll("a", href=re.compile("/name/nm")):                
+            for actor in tag_cast.findAll('a', href=re.compile('/name/nm')):
                 actor_id = actor['href'].split('/')[2]
-                s.add(actor_id)
-            self.actors = list(s)
+                actor_name = actor.contents[0]
+                # tag instead of name
+                if isinstance(actor_name, Tag):
+                    actor_name = None
+                self.actors[actor_id] = actor_name
 
         # get director(s)
         tag_directors = soup.find('div', id='director-info')
         if tag_directors:
-            s = set()
             for director in tag_directors.findAll('a'):
                 director_id = director['href'].split('/')[2]
-                s.add(director_id)
-            self.directors = list(s)
+                director_name = director.contents[0]
+                # tag instead of name
+                if isinstance(director_name, Tag):
+                    director_name = None
+                self.directors[director_id] = director_name
                                 
         log.debug('Detected genres: %s' % self.genres)
         log.debug('Detected languages: %s' % self.languages)
