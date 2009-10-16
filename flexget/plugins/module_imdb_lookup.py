@@ -5,7 +5,7 @@ from flexget.manager import Base
 from flexget.utils.log import log_once
 from flexget.utils.imdb import ImdbSearch, ImdbParser
 
-from sqlalchemy import Table, Column, Integer, Float, String, Unicode, DateTime, Boolean, PickleType
+from sqlalchemy import Table, Column, Integer, Float, String, DateTime, Boolean
 from sqlalchemy.schema import ForeignKey
 from sqlalchemy.orm import relation
 

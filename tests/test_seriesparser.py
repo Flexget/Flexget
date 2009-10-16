@@ -104,7 +104,7 @@ class TestSeriesParser(object):
         assert (s.season==2 and s.episode==4), 'failed to parse %s' % s.data
         assert (s.quality=='hdtv'), 'failed to parse quality from %s' % s.data
 
-    def test_seasonpacks(self):
+    def test_ignore_seasonpacks(self):
         s = SeriesParser()
         s.name = 'Something'
         s.data = 'Something S02 Pack 720p WEB-DL-FlexGet'

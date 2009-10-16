@@ -108,7 +108,7 @@ class Feed:
     def reject(self, entry, reason=None):
         """Reject this entry immediately and permanently."""
         if not isinstance(entry, Entry):
-             raise Exception('Trying to reject non entry, %s' % repr(entry))
+            raise Exception('Trying to reject non entry, %s' % repr(entry))
         # ignore rejections on immortal entries
         if 'immortal' in entry:
             reason_str = ''

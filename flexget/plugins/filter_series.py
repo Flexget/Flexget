@@ -442,6 +442,7 @@ class FilterSeries(SeriesPlugin):
                 if parser.valid:
                     log.debug('Detected quality: %s from: %s' % (parser.quality, field))
                     self.parser2entry[parser] = entry
+                    entry['series_parser'] = parser
                     break
             else:
                 continue

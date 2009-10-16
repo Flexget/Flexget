@@ -1,11 +1,11 @@
 import os
 import logging
 from flexget.plugin import *
-from flexget.utils.titles import SeriesParser
 
 log = logging.getLogger('exists')
 
 class FilterExists:
+
     """
         Reject entries that already exist in given path.
 
@@ -13,6 +13,7 @@ class FilterExists:
 
         exists: /storage/movies/
     """
+
     def validator(self):
         from flexget import validator
         root = validator.factory()
@@ -44,20 +45,5 @@ class FilterExists:
                     if name in dirs or name in files:
                         log.debug('Found %s in %s' % (name, root))
                         feed.reject(entry, '%s/%s' % (name, root))
-                    elif 'series_parser' in entry:
-                        for afile in files:
-                            #make new parser from parser in entry
-                            parser = SeriesParser()
-                            oldparser = entry['series_parser']
-                            parser.name = oldparser.name
-                            parser.ep_regexps = oldparser.ep_regexps
-                            parser.id_regexps = oldparser.id_regexps
-                            #run parser on filename data
-                            parser.data = afile
-                            parser.parse()
-                            if parser.valid:
-                                if parser.identifier()==oldparser.identifier() and parser.quality==oldparser.quality:
-                                    log.debug('Found episode %s %s in %s' % (parser.name, parser.identifier(), root))
-                                    feed.reject(entry, 'episode already exists')
 
 register_plugin(FilterExists, 'exists', priorities={'filter': -1})
