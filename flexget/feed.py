@@ -121,7 +121,6 @@ class Feed:
         if not entry in self.rejected:
             self.rejected.append(entry)
             self.verbose_details('Rejected %s' % entry['title'], reason)
-            log.debug('Rejected %s %s' % (entry['title'], reason))
         # TODO: HACK?
         if entry in self.accepted:
             self.accepted.remove(entry)
@@ -185,14 +184,15 @@ class Feed:
     def verbose_details(self, msg, reason=''):
         """Verbose if details option is enabled"""
         # TODO: implement trough own logger?
+        reason_str = ''
+        if reason:
+            reason_str = ' (%s)' % reason
         if self.manager.options.details:
             try:
-                reason_str = ''
-                if reason:
-                    reason_str = ' (%s)' % reason
                 print "+ %-8s %-12s %s%s" % (self.current_event, self.current_plugin, msg, reason_str)
             except:
                 print "+ %-8s %-12s ERROR: Unable to print %s" % (self.current_event, self.current_plugin, repr(msg))
+        log.debug('event: %s plugin: %s msg: %s reason: %s' % (self.current_event, self.current_plugin, msg, reason_str))
 
     def verbose_details_entries(self):
         """If details option is enabled, print all produced entries"""
