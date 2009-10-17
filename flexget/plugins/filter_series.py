@@ -491,7 +491,10 @@ class FilterSeries(SeriesPlugin):
                     else:
                         entry = self.parser2entry[ep]
                         feed.reject(entry, 'already downloaded')
-                        eps.remove(ep)
+                        try:
+                            eps.remove(ep)
+                        except:
+                            log.critical('BUG! Fix coming soon ....')
                         
             # no episodes left, continue to next series
             if not eps:
