@@ -138,9 +138,6 @@ def release(args):
     setup_section = tasks.environment.options.setdefault("setup", Bunch())
     setup_section.update(version=ver)
     
-    # restore version ...
-    freplace('flexget/__init__.py', "__version__ = '%s'" % ver, "__version__ = '{subversion}'")
-
     egg_options = ['-d', '/var/www/flexget_dist/unstable'] # hmph, how can I pass params to it? doesn't seem to work ..
     bdist_egg(egg_options)
     
@@ -153,6 +150,8 @@ def release(args):
             print 'Skipped copying %s, destination already exists' % name
         shutil.move(os.path.join('dist', name), os.path.join(dest, name))
 
+    # restore version ...
+    freplace('flexget/__init__.py', "__version__ = '%s'" % ver, "__version__ = '{subversion}'")
 
 @task
 @cmdopts([
