@@ -2,15 +2,11 @@ import logging
 import urlparse
 import xml.sax
 import re
+import feedparser
+import httplib
 from flexget.feed import Entry
 from flexget.plugin import *
 from flexget.utils.log import log_once
-
-feedparser_present = True
-try:
-    import feedparser
-except ImportError:
-    feedparser_present = False
 
 log = logging.getLogger('rss')
 
@@ -31,14 +27,14 @@ class InputRSS:
           
         Advanced usages:
         
-        You may wish to clean up the entry by stripping out all non-ascii characters. This can be done by
-        setting ascii value to True.
+        You may wish to clean up the entry by stripping out all non-ascii characters.
+        This can be done by setting ascii value to yes.
         
         Example:
         
         rss:
           url: <url>
-          ascii: True
+          ascii: yes
         
         Incase RSS-feed uses some nonstandard field for urls and automatic detection fails 
         you can configure plugin to use url from any feedparser entry attribute.
@@ -49,14 +45,14 @@ class InputRSS:
           url: <url>
           link: guid
           
-        You can disable few possibly annoying warnings by setting silent value to True on feeds where there are 
-        frequently invalid items.
+        You can disable few possibly annoying warnings by setting silent value to
+        yes on feeds where there are frequently invalid items.
        
         Example:
        
         rss:
           url: <url>
-          silent: True
+          silent: yes
     """
     def validator(self):
         from flexget import validator
@@ -79,9 +75,6 @@ class InputRSS:
         return url        
 
     def on_feed_input(self, feed):
-        if not feedparser_present:
-            raise PluginError('Plugin RSS requires Feedparser. Please install it from http://www.feedparser.org/ or from your distro repository', log)
-
         config = feed.config['rss']
         if not isinstance(config, dict):
             config = {}
@@ -123,7 +116,8 @@ class InputRSS:
                 log.debug('Feed %s hasn\'t changed, skipping' % feed.name)
                 return
             elif status == 401:
-                raise PluginError('Authentication needed for feed %s: %s' % (feed.name, rss.headers['www-authenticate']), log)
+                raise PluginError('Authentication needed for feed %s: %s' % \
+                    (feed.name, rss.headers['www-authenticate']), log)
             elif status == 404:
                 raise PluginError('RSS Feed %s not found' % feed.name, log)
             elif status == 500:
@@ -143,6 +137,8 @@ class InputRSS:
                 # see: ticket 88
                 log.debug('ignoring feedparser.CharacterEncodingOverride')
                 ignore = True
+            elif isinstance(ex, httplib.BadStatusLine):
+                raise PluginError('Got BadStatusLine from feed %s' % feed.name, log)
             elif isinstance(ex, xml.sax._exceptions.SAXParseException):
                 raise PluginError('RSS Feed %s is not valid XML' % feed.name, log)
             elif isinstance(ex, IOError):
@@ -151,8 +147,8 @@ class InputRSS:
                 elif hasattr(ex, 'code'):
                     raise PluginError('The server couldn\'t fulfill the request. Error code: %s' % ex.code, log)
             else:
-                raise PluginWarning('Unhandled bozo_exception. Type: %s.%s (feed: %s)' % \
-                                    (ex.__class__.__plugin__, ex.__class__.__name__ , feed.name), log) # pylint: disable-msg=E1103
+                raise PluginWarning('Unhandled bozo_exception. Type: %s (feed: %s)' % \
+                    (ex.__class__.__name__ , feed.name), log)
 
         if rss['bozo'] and not ignore:
             log.error(rss)
