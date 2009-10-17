@@ -487,7 +487,6 @@ class FilterSeries(SeriesPlugin):
             
             # remove uninteresting episodes from the list (downloaded)
             for ep in eps[:]:
-                interested = True
                 for release in downloaded:
                     if release.quality == ep.quality and ep.proper_or_repack and not release.proper:
                         log.debug('oh, lookey .. found repack %s' % ep)
@@ -499,7 +498,6 @@ class FilterSeries(SeriesPlugin):
             # no episodes left, continue to next series
             if not eps:
                 continue 
-                
 
             """
             if downloaded:
@@ -521,7 +519,7 @@ class FilterSeries(SeriesPlugin):
                         feed.reject(entry, 'watched')
                     continue
                     
-            # episode advancement, only when using season, ep identifier
+            # Episode advancement. Used only with season based series
             if best.season and best.episode:
                 latest = self.get_latest_info(feed.session, best.name)
                 if latest:
