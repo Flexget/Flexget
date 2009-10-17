@@ -64,14 +64,21 @@ class TestFilterSeries(FlexGetBase):
         FlexGetBase.setUp(self)
 
     def test_quality(self):
+        """Series plugin: quality choosing is working"""
         self.execute_feed('test_quality')
-        assert self.feed.find_entry('accepted', title='QTest.S01E01.720p.XViD-FlexGet'), '720p should have been accepted'
-        assert not self.feed.find_entry('accepted', title='QTest.S01E01.HDTV.XViD-FlexGet'), 'hdtv shouldn\'t have been accepted'
-        assert not self.feed.find_entry('accepted', title='QTest.S01E01.PDTV.XViD-FlexGet'), 'pdtv shouldn\'t have been accepted'
-        assert not self.feed.find_entry('accepted', title='QTest.S01E01.1080p.XViD-FlexGet'), '1080p shouldn\'t have been accepted'
-        assert not self.feed.find_entry('accepted', title='QTest.S01E01.DSR.XViD-FlexGet'), 'DSR shouldn\'t have been accepted'
+        assert self.feed.find_entry('accepted', title='QTest.S01E01.720p.XViD-FlexGet'), \
+            '720p should have been accepted'
+        assert not self.feed.find_entry('accepted', title='QTest.S01E01.HDTV.XViD-FlexGet'), \
+            'hdtv shouldn\'t have been accepted'
+        assert not self.feed.find_entry('accepted', title='QTest.S01E01.PDTV.XViD-FlexGet'), \
+            'pdtv shouldn\'t have been accepted'
+        assert not self.feed.find_entry('accepted', title='QTest.S01E01.1080p.XViD-FlexGet'), \
+            '1080p shouldn\'t have been accepted'
+        assert not self.feed.find_entry('accepted', title='QTest.S01E01.DSR.XViD-FlexGet'), \
+            'DSR shouldn\'t have been accepted'
 
     def test_smoke(self):
+        """Series plugin: test several standard features"""
         self.execute_feed('test')
         # TODO: needs to be fixed after series is converted into SQLAlchemy
         # 'some series' should be in timeframe-queue
@@ -102,6 +109,7 @@ class TestFilterSeries(FlexGetBase):
         assert self.feed.find_entry('accepted', title='Another.Series.S01E16.720p.XViD-FlexGet'), 'Another.Series.S01E16.720p.XViD-FlexGet should have passed because of episode advancement grace magin'
         
     def test_propers(self):
+        """Series plugin: propers are accepted after episode is downloaded"""
         self.execute_feed('test_propers_1')
         assert self.feed.find_entry('accepted', title='Test.S01E01.720p-FlexGet'), 'Test.S01E01-FlexGet should have been accepted'
         # rejects downloaded
@@ -134,8 +142,10 @@ class TestFilterSeriesPriority(FlexGetBase):
         self.execute_feed('test')
 
     def test_priorities(self):
+        """Series plugin: regexp plugin is able to reject before series plugin"""
         assert self.feed.find_entry('rejected', title='foobar 720p s01e01'), 'foobar 720p s01e01 should have been rejected'
         assert self.feed.find_entry('accepted', title='foobar hdtv s01e01'), 'foobar hdtv s01e01 is not accepted'
+
 class TestSimilarNames(FlexGetBase):
 
     # hmm, not very good way to test this .. seriesparser should be tested alone?
@@ -153,55 +163,82 @@ class TestSimilarNames(FlexGetBase):
               - "FooBar: SecondAlt"
     """    
 
-    def setUp(self):
+    def setup(self):
         FlexGetBase.setUp(self)
         self.execute_feed('test')
 
-    def testNames(self):
+    def test_names(self):
         assert self.feed.find_entry('accepted', title='FooBar.S03E01.DSR-FlexGet'), 'Standard failed?'
         assert self.feed.find_entry('accepted', title='FooBar: FirstAlt.S02E01.DSR-FlexGet'), 'FirstAlt failed'
         assert self.feed.find_entry('accepted', title='FooBar: SecondAlt.S01E01.DSR-FlexGet'), 'SecondAlt failed'
-
-class TestRemembering(FlexGetBase):
-
-    # Added to test one possible bug report, no bug found (useless test?)
-
-    __yaml__ = """
-        feeds:
-          test_1:
-            input_mock:
-              - {title: 'Foo.2009.S02E04.HDTV.XviD-2HD[FlexGet]'}
-            series:
-              - Foo 2009
-          test_2:
-            input_mock:
-              - {title: 'Foo.2009.S02E04.HDTV.XviD-2HD[ASDF]'}
-            series:
-              - Foo 2009
-    """
-
-    def test_foo(self):
-        self.execute_feed('test_1')
-        assert self.feed.find_entry('accepted', title='Foo.2009.S02E04.HDTV.XviD-2HD[FlexGet]'), 'Did not accept Foo.2009.S02E04.HDTV.XviD-FlexGet'
-        self.execute_feed('test_2')
-        assert self.feed.find_entry('rejected', title='Foo.2009.S02E04.HDTV.XviD-2HD[ASDF]'), 'Did not reject Foo.2009.S02E04.HDTV.XviD-ASDF'
-
 
 class TestDuplicates(FlexGetBase):
 
     __yaml__ = """
         feeds:
-          test:
+          test_dupes:
             input_mock:
               - {title: 'Foo.2009.S02E04.HDTV.XviD-2HD[FlexGet]'}
               - {title: 'Foo.2009.S02E04.HDTV.XviD-2HD[ASDF]'}
             series:
               - Foo 2009
+
+          test_1:
+            input_mock:
+              - {title: 'Foo.Bar.S02E04.HDTV.XviD-2HD[FlexGet]'}
+              - {title: 'Foo.Bar.S02E04.HDTV.XviD-2HD[ASDF]'}
+            series:
+              - foo bar
+
+          test_2:
+            input_mock:
+              - {title: 'Foo.Bar.S02E04.XviD-2HD[ASDF]'}
+              - {title: 'Foo.Bar.S02E04.HDTV.720p.XviD-2HD[FlexGet]'}
+              - {title: 'Foo.Bar.S02E04.DSRIP.XviD-2HD[ASDF]'}
+              - {title: 'Foo.Bar.S02E04.HDTV.1080p.XviD-2HD[ASDF]'}
+              - {title: 'Foo.Bar.S02E03.HDTV.XviD-FlexGet'}
+              - {title: 'Foo.Bar.S02E05.HDTV.XviD-ZZZ'}
+              - {title: 'Foo.Bar.S02E05.720p.HDTV.XviD-YYY'}
+            series:
+              - foo bar
+
+          test_true_dupes:
+            input_mock:
+              - {title: 'Dupe.S02E04.HDTV.XviD-FlexGet'}
+              - {title: 'Dupe.S02E04.HDTV.XviD-FlexGet'}
+              - {title: 'Dupe.S02E04.HDTV.XviD-FlexGet'}
+            series:
+              - dupe
     """
 
     def test_dupes(self):
-        self.execute_feed('test')
-        self.dump()
+        """Series plugin: multiple new releases at once from same episode"""
+
+        self.execute_feed('test_dupes')
         assert not (self.feed.find_entry('accepted', title='Foo.2009.S02E04.HDTV.XviD-2HD[FlexGet]') and \
                     self.feed.find_entry('accepted', title='Foo.2009.S02E04.HDTV.XviD-2HD[ASDF]')), 'accepted both'
 
+
+    def test_true_dupes(self):
+        """Series plugin: true duplicate items"""
+        self.execute_feed('test_true_dupes')
+        assert len(self.feed.accepted) == 1, 'should have accepted only one'
+
+    def test_downloaded(self):
+        """Series plugin: multiple downloaded and new episodes are handled correctly"""
+
+        self.execute_feed('test_1')
+        self.execute_feed('test_2')
+
+        # these should be accepted
+        accepted = ['Foo.Bar.S02E03.HDTV.XviD-FlexGet', 'Foo.Bar.S02E05.720p.HDTV.XviD-YYY']
+        for item in accepted:
+            assert self.feed.find_entry('accepted', title=item), \
+                '%s should have been accepted' % item
+
+        # these should be rejected
+        rejected = ['Foo.Bar.S02E04.XviD-2HD[ASDF]', 'Foo.Bar.S02E04.HDTV.720p.XviD-2HD[FlexGet]', \
+                    'Foo.Bar.S02E04.DSRIP.XviD-2HD[ASDF]', 'Foo.Bar.S02E04.HDTV.1080p.XviD-2HD[ASDF]']
+        for item in rejected:
+            assert self.feed.find_entry('rejected', title=item), \
+                '%s should have been rejected' % item

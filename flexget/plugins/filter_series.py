@@ -478,6 +478,7 @@ class FilterSeries(SeriesPlugin):
         for identifier, eps in series.iteritems():
             if not eps: continue
             eps.sort(lambda x,y: cmp(x.quality, y.quality))
+            log.debug('processing episodes: %s' % [e.data for e in eps]) # temp for elusive bug
             best = eps[0]
             
             # list of downloaded releases
@@ -491,10 +492,8 @@ class FilterSeries(SeriesPlugin):
                     else:
                         entry = self.parser2entry[ep]
                         feed.reject(entry, 'already downloaded')
-                        try:
-                            eps.remove(ep)
-                        except:
-                            log.critical('BUG! Fix coming soon ....')
+                        log.debug('removing from eps: %s' % ep.data) # temp for elusive bug
+                        eps.remove(ep)
                         
             # no episodes left, continue to next series
             if not eps:
