@@ -480,10 +480,8 @@ class FilterSeries(SeriesPlugin):
             eps.sort(lambda x,y: cmp(x.quality, y.quality))
             best = eps[0]
             
-            # episode (with this id) has been downloaded
+            # list of downloaded releases
             downloaded = self.get_downloaded(feed.session, best.name, best.identifier())
-            #log.debug('downloaded: %s' % downloaded)
-            #log.debug('releases: %s' % self.get_releases(feed.session, best.name, best.identifier()))
             
             # remove uninteresting episodes from the list (downloaded)
             for ep in eps[:]:
@@ -498,13 +496,6 @@ class FilterSeries(SeriesPlugin):
             # no episodes left, continue to next series
             if not eps:
                 continue 
-
-            """
-            if downloaded:
-                log.debug('Series %s episode %s is already downloaded, rejecting all occurences' % (series_name, identifier))
-                for ep in eps:
-                continue
-            """
 
             # reject episodes that have been marked as watched in configig file
             if 'watched' in config:
@@ -546,7 +537,6 @@ class FilterSeries(SeriesPlugin):
 
             # timeframe present
             if 'timeframe' in config:
-                
                 # parse options
                 amount, unit = config['timeframe'].split(' ')
                 log.debug('amount: %s unit: %s' % (repr(amount), repr(unit)))
@@ -607,7 +597,7 @@ class FilterSeries(SeriesPlugin):
                     log.debug('timeframe waiting %s episode %s, rejecting all occurrences' % (series_name, identifier))
                     for ep in eps:
                         entry = self.parser2entry[ep]
-                        feed.reject(entry, 'timeframe waiting')
+                        feed.reject(entry, 'timeframe is waiting')
                     continue
 
             # no special configuration, just choose the best

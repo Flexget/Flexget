@@ -193,7 +193,7 @@ class Feed:
             except:
                 print "+ %-8s %-12s ERROR: Unable to print %s" % (self.current_event, self.current_plugin, repr(msg))
         log.debug('event: %s plugin: %s msg: %s reason: %s' % (self.current_event, self.current_plugin, \
-            msg, reason_str.trim()))
+            msg, reason_str.strip()))
 
     def verbose_details_entries(self):
         """If details option is enabled, print all produced entries"""
