@@ -22,6 +22,9 @@ class FilterTorrentSize:
         return config
 
     def on_feed_modify(self, feed):
+        if feed.manager.options.test:
+            log.info('plugin is disabled in test mode as size information is not available')
+            return
         config = feed.config['torrent_size']
         for entry in feed.accepted:
             if 'torrent' in entry:
