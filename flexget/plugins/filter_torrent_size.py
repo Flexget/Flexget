@@ -36,6 +36,7 @@ class FilterTorrentSize:
                     log.debug('Torrent too big, rejecting')
                     feed.reject(entry, 'maximum size')
                     rejected = True
+                # learn this as seen that it won't be re-downloaded & rejected on every execution
                 if rejected:
                     get_plugin_by_name('seen').instance.learn(feed, entry)
             else:

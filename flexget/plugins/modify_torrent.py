@@ -204,7 +204,7 @@ class TorrentFilename:
                     # generate filename from torrent or fall back to title plus extension
                     entry['filename'] = self.make_filename(torrent, entry)
             except Exception, e:
-                log.cricical('Unable to parse torrent file?')
+                log.critical('Unable to parse torrent file?')
                 log.exception(e)
 
     def make_filename(self, torrent, entry):

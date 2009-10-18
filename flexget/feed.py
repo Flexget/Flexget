@@ -236,6 +236,9 @@ class Feed:
                 except Exception, e:
                     log.exception('Unhandled error in plugin %s: %s' % (keyword, e))
                     self.abort()
+                    # don't handle plugin errors gracefully with unit test
+                    if self.manager.unit_test:
+                        raise
                 # purge entries between plugins
                 self.__purge_rejected()
                 self.__purge_failed()

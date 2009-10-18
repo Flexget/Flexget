@@ -97,7 +97,6 @@ class SeriesPlugin(object):
         downloaded = []
         for release in session.query(Release).filter(Release.episode_id == episode.id).\
             filter(Release.downloaded == True).all():
-            log.debug('got release')
             downloaded.append(release)
         return downloaded
     
@@ -470,7 +469,9 @@ class FilterSeries(SeriesPlugin):
             release = self.store(feed.session, parser)
             # save release reference for later use
             entry['series_release'] = release
-            
+
+        for key in self.parser2entry.keys():
+            log.debug('key=%s' % repr(key))
         return series
 
     def process_series(self, feed, series, series_name, config):
@@ -478,26 +479,47 @@ class FilterSeries(SeriesPlugin):
         for identifier, eps in series.iteritems():
             if not eps: continue
             eps.sort(lambda x,y: cmp(x.quality, y.quality))
-            log.debug('processing episodes: %s' % [e.data for e in eps]) # temp for elusive bug
-            best = eps[0]
             
             # list of downloaded releases
-            downloaded = self.get_downloaded(feed.session, best.name, best.identifier())
-            
+            downloaded_releases = self.get_downloaded(feed.session, eps[0].name, eps[0].identifier())
+
+            log.debug('processing episodes: %s' % [e.data for e in eps])
+            log.debug('downloaded episodes: %s' % [e.title for e in downloaded_releases])
+
             # remove uninteresting episodes from the list (downloaded)
             for ep in eps[:]:
-                for release in downloaded:
+                for release in downloaded_releases:
                     if release.quality == ep.quality and ep.proper_or_repack and not release.proper:
                         log.debug('oh, lookey .. found repack %s' % ep)
                     else:
                         entry = self.parser2entry[ep]
                         feed.reject(entry, 'already downloaded')
-                        log.debug('removing from eps: %s' % ep.data) # temp for elusive bug
-                        eps.remove(ep)
-                        
+                        # must test if ep in eps because downloaded_releases may contain
+                        # this episode multiple times
+                        if ep in eps:
+                            log.debug('removing from eps: %s' % ep.data)
+                            eps.remove(ep)
+            
+            # if we have proper from some release, reject non-propers (with same quality)
+            for ep in eps[:]:
+                if ep.proper_or_repack:
+                    for nuked in eps[:]:
+                        if ep == nuked:
+                            continue
+                        if nuked.quality == ep.quality:
+                            log.debug('found %s from which we have proper: %s' % (nuked.data, ep.data))
+                            entry = self.parser2entry[nuked]
+                            feed.reject(entry, 'nuked')
+                            if nuked in eps:
+                                eps.remove(nuked)
+
             # no episodes left, continue to next series
             if not eps:
                 continue 
+
+            best = eps[0]
+            log.debug('continuing episodes: %s' % [e.data for e in eps])
+            log.debug('best episode is: %s' % best.data)
 
             # reject episodes that have been marked as watched in configig file
             if 'watched' in config:
@@ -608,7 +630,7 @@ class FilterSeries(SeriesPlugin):
     def accept_series(self, feed, parser, reason):
         """Helper method for accepting series"""
         entry = self.parser2entry[parser]
-        log.debug('Accepting %s, reason %s' % (entry, reason))
+        log.debug('Accepting %s (%s), reason: %s' % (entry['title'], parser.data, reason))
         feed.accept(entry, reason)
 
     def on_feed_exit(self, feed):
