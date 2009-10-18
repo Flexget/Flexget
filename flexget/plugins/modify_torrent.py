@@ -171,6 +171,7 @@ class TorrentFilename:
         Makes sure that entries containing torrent-file have .torrent
         extension. This is enabled always by default (builtins).
     """
+
     def on_feed_modify(self, feed):
         idstr = 'd8:announce'
         for entry in feed.entries:
@@ -182,6 +183,7 @@ class TorrentFilename:
             f.close()
             if not data == idstr:
                 # not a torrent file at all, skip
+                log.debug('%s doesn\'t seem to be a torrent')
                 continue
             
             # create torrent object from torrent
