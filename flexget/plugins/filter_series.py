@@ -470,8 +470,6 @@ class FilterSeries(SeriesPlugin):
             # save release reference for later use
             entry['series_release'] = release
 
-        for key in self.parser2entry.keys():
-            log.debug('key=%s' % repr(key))
         return series
 
     def process_series(self, feed, series, series_name, config):

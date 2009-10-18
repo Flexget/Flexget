@@ -173,8 +173,9 @@ class TorrentFilename:
     """
 
     def on_feed_modify(self, feed):
+        log.debug('scanning for torrents')
         idstr = 'd8:announce'
-        for entry in feed.entries:
+        for entry in feed.accepted:
             # skip if entry does not have file assigned
             if not 'file' in entry:
                 continue
