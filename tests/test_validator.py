@@ -18,3 +18,12 @@ class TestValidator(object):
         result = dv.validate( {'bar': {}} )
         assert dv.errors.messages, 'should not have passed bar'
         assert not result, 'should have an invalid result for bar'
+        
+    def test_regexp_match(self):
+        re_match = validator.factory('regexp_match')
+        re_match.accept('abc.*')
+        assert not re_match.validate('foobar'), 'foobar should not have passed'
+        assert re_match.validate('abcdefg'), 'abcdefg should have passed'
+            
+        
+        

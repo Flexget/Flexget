@@ -1,5 +1,85 @@
 from tests import FlexGetBase
 
+class TestQuality(FlexGetBase):
+
+    __yaml__ = """
+        feeds:
+          best_quality:
+            input_mock:
+              - {title: 'QTest.S01E01.HDTV.XViD-FlexGet'}
+              - {title: 'QTest.S01E01.PDTV.XViD-FlexGet'}
+              - {title: 'QTest.S01E01.DSR.XViD-FlexGet'}
+              - {title: 'QTest.S01E01.1080p.XViD-FlexGet'}
+              - {title: 'QTest.S01E01.720p.XViD-FlexGet'}
+            series:
+              - QTest:
+                  quality: 720p
+
+          min_quality:
+            input_mock:
+              - {title: 'MinQTest.S01E01.HDTV.XViD-FlexGet'}
+              - {title: 'MinQTest.S01E01.PDTV.XViD-FlexGet'}
+              - {title: 'MinQTest.S01E01.DSR.XViD-FlexGet'}
+              - {title: 'MinQTest.S01E01.1080p.XViD-FlexGet'}
+              - {title: 'MinQTest.S01E01.720p.XViD-FlexGet'}
+            series:
+              - MinQTest:
+                  min_quality: hdtv
+
+          max_quality:
+            input_mock:
+              - {title: 'MaxQTest.S01E01.HDTV.XViD-FlexGet'}
+              - {title: 'MaxQTest.S01E01.PDTV.XViD-FlexGet'}
+              - {title: 'MaxQTest.S01E01.DSR.XViD-FlexGet'}
+              - {title: 'MaxQTest.S01E01.1080p.XViD-FlexGet'}
+              - {title: 'MaxQTest.S01E01.720p.XViD-FlexGet'}
+            series:
+              - MaxQTest:
+                  max_quality: hdtv
+
+          min_max_quality:
+            input_mock:
+              - {title: 'MinMaxQTest.S01E01.HDTV.XViD-FlexGet'}
+              - {title: 'MinMaxQTest.S01E01.PDTV.XViD-FlexGet'}
+              - {title: 'MinMaxQTest.S01E01.DSR.XViD-FlexGet'}
+              - {title: 'MinMaxQTest.S01E01.720p.XViD-FlexGet'}
+              - {title: 'MinMaxQTest.S01E01.HR.XViD-FlexGet'}
+              - {title: 'MinMaxQTest.S01E01.1080p.XViD-FlexGet'}
+            series:
+              - MinMaxQTest:
+                  min_quality: pdtv
+                  max_quality: hr
+    """
+
+    def test_best_quality(self):
+        """Series plugin: choose by quality"""
+        self.execute_feed('best_quality')
+        assert self.feed.find_entry('accepted', title='QTest.S01E01.720p.XViD-FlexGet'), \
+            '720p should have been accepted'
+        assert len(self.feed.accepted) == 1, 'should have accepted only one'
+            
+    def test_min_quality(self):
+        """Series plugin: min_quality"""
+        self.execute_feed('min_quality')
+        assert self.feed.find_entry('accepted', title='MinQTest.S01E01.1080p.XViD-FlexGet'), \
+            'MinQTest.S01E01.1080p.XViD-FlexGet should have been accepted'
+        assert len(self.feed.accepted) == 1, 'should have accepted only one'
+            
+    def test_max_quality(self):
+        """Series plugin: max_quality"""
+        self.execute_feed('max_quality')
+        assert self.feed.find_entry('accepted', title='MaxQTest.S01E01.HDTV.XViD-FlexGet'), \
+            'MaxQTest.S01E01.HDTV.XViD-FlexGet should have been accepted'
+        assert len(self.feed.accepted) == 1, 'should have accepted only one'
+    
+    def test_min_max_quality(self):
+        """Series plugin: min_quality with max_quality"""
+        self.execute_feed('min_max_quality')
+        assert self.feed.find_entry('accepted', title='MinMaxQTest.S01E01.HR.XViD-FlexGet'), \
+            'MinMaxQTest.S01E01.HR.XViD-FlexGet should have been accepted'
+        assert len(self.feed.accepted) == 1, 'should have accepted only one'
+
+
 class TestFilterSeries(FlexGetBase):
     
     __yaml__ = """
@@ -30,31 +110,8 @@ class TestFilterSeries(FlexGetBase):
               - filename series
               - empty description
             
-          test_quality:
-            input_mock:
-              - {title: 'QTest.S01E01.HDTV.XViD-FlexGet'}
-              - {title: 'QTest.S01E01.PDTV.XViD-FlexGet'}
-              - {title: 'QTest.S01E01.DSR.XViD-FlexGet'}
-              - {title: 'QTest.S01E01.1080p.XViD-FlexGet'}
-              - {title: 'QTest.S01E01.720p.XViD-FlexGet'}
-            series:
-              - QTest:
-                  quality: 720p
     """
     
-    def test_quality(self):
-        """Series plugin: quality choosing is working"""
-        self.execute_feed('test_quality')
-        assert self.feed.find_entry('accepted', title='QTest.S01E01.720p.XViD-FlexGet'), \
-            '720p should have been accepted'
-        assert not self.feed.find_entry('accepted', title='QTest.S01E01.HDTV.XViD-FlexGet'), \
-            'hdtv shouldn\'t have been accepted'
-        assert not self.feed.find_entry('accepted', title='QTest.S01E01.PDTV.XViD-FlexGet'), \
-            'pdtv shouldn\'t have been accepted'
-        assert not self.feed.find_entry('accepted', title='QTest.S01E01.1080p.XViD-FlexGet'), \
-            '1080p shouldn\'t have been accepted'
-        assert not self.feed.find_entry('accepted', title='QTest.S01E01.DSR.XViD-FlexGet'), \
-            'DSR shouldn\'t have been accepted'
 
     def test_smoke(self):
         """Series plugin: test several standard features"""
@@ -94,6 +151,7 @@ class TestFilterSeries(FlexGetBase):
 
         
 class TestFilterSeriesPriority(FlexGetBase):
+
     __yaml__ = """
         feeds:
           test:
@@ -107,11 +165,8 @@ class TestFilterSeriesPriority(FlexGetBase):
               - foobar
     """    
 
-    def setup(self):
-        FlexGetBase.setUp(self)
-        self.execute_feed('test')
-
     def test_priorities(self):
+        self.execute_feed('test')
         """Series plugin: regexp plugin is able to reject before series plugin"""
         assert self.feed.find_entry('rejected', title='foobar 720p s01e01'), \
             'foobar 720p s01e01 should have been rejected'

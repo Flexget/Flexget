@@ -56,7 +56,7 @@ class Validator(object):
             
             # register default validators
             register = [RootValidator, ListValidator, DictValidator, TextValidator, FileValidator,
-                        PathValidator, AnyValidator, NumberValidator, BooleanValidator, 
+                        PathValidator, AnyValidator, NumberValidator, BooleanValidator, RegexpMatchValidator,
                         DecimalValidator, UrlValidator, RegexpValidator, ChoiceValidator]
             for v in register:
                 self.register(v)
@@ -79,7 +79,7 @@ class Validator(object):
         raise Exception('Validator %s should override accept method' % self.__class__.__name__)
     
     def validateable(self, data):
-        """Return true if validator can be used to validate given data, False otherwise."""
+        """Return True if validator can be used to validate given data, False otherwise."""
         raise Exception('Validator %s should override validateable method' % self.__class__.__name__)
         
     def validate(self, data):
@@ -89,7 +89,7 @@ class Validator(object):
     def validate_item(self, item, rules):
         """
             Helper method. Validate item against list of rules (validators).
-            Return True if item passed some rule. False if none of the rules pass item.
+            Return True if item passed any of the rules, False if none of the rules pass item.
         """
         for rule in rules:
             #print 'validating %s' % rule.name
@@ -245,6 +245,33 @@ class RegexpValidator(Validator):
             self.errors.add('%s is not a valid regular expression' % data)
             return False
         return True
+        
+class RegexpMatchValidator(Validator):
+    name = 'regexp_match'
+
+    def __init__(self, parent=None):
+        self.regexps = []
+        Validator.__init__(self, parent)
+    
+    def accept(self, regexp, **kwargs):
+        try:
+            self.regexps.append(re.compile(regexp))
+        except:
+            raise Exception('Invalid regexp given to match_regexp')
+        
+    def validateable(self, data):
+        return isinstance(data, basestring)
+    
+    def validate(self, data):
+        if not isinstance(data, basestring):
+            self.errors.add('Value should be text')
+            return False
+        for regexp in self.regexps:
+            if regexp.match(data):
+                return True
+        self.errors.add('%s is not valid value')
+        return False
+    
 
 class FileValidator(TextValidator):
     name = 'file'

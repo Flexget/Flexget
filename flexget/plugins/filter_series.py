@@ -258,8 +258,10 @@ class FilterSeries(SeriesPlugin):
             advanced.accept('list', key='ep_regexp').accept('regexp')
             advanced.accept('list', key='id_regexp').accept('regexp')
             # quality
-            advanced.accept('text', key='quality') # TODO: allow only SeriesParser.qualities
-            advanced.accept('text', key='timeframe')
+            advanced.accept('text', key='quality')     # TODO: allow only SeriesParser.qualities
+            advanced.accept('text', key='min_quality') # TODO: ^^
+            advanced.accept('text', key='max_quality') # TODO: ^^
+            advanced.accept('regexp_match', key='timeframe').accept('\d+ (minutes|hours|days|weeks)')
             # watched
             watched = advanced.accept('dict', key='watched')
             watched.accept('number', key='season')
@@ -476,7 +478,9 @@ class FilterSeries(SeriesPlugin):
         """Accept or Reject episode from available releases, or postpone choosing."""
         for identifier, eps in series.iteritems():
             if not eps: continue
-            eps.sort(lambda x,y: cmp(x.quality, y.quality))
+
+            # sort episodes in order of quality
+            eps.sort()
             
             # list of downloaded releases
             downloaded_releases = self.get_downloaded(feed.session, eps[0].name, eps[0].identifier())
@@ -501,11 +505,14 @@ class FilterSeries(SeriesPlugin):
             # if we have proper from some release, reject non-propers (with same quality)
             for ep in eps[:]:
                 if ep.proper_or_repack:
+                    log.debug('found repack: %s' % ep.data)
                     for nuked in eps[:]:
-                        if ep == nuked:
+                        log.debug('should we nuke %s ?' % nuked)
+                        if ep is nuked:
+                            log.debug('NO: suicide')
                             continue
                         if nuked.quality == ep.quality:
-                            log.debug('found %s from which we have proper: %s' % (nuked.data, ep.data))
+                            log.debug('YES, same quality: %s' % nuked)
                             entry = self.parser2entry[nuked]
                             feed.reject(entry, 'nuked')
                             if nuked in eps:
@@ -547,16 +554,30 @@ class FilterSeries(SeriesPlugin):
                 else:
                     log.debug('No latest info available')
                     
-            # plain quality
-            if 'quality' in config and not 'timeframe' in config:
+            # quality without timeframe
+            if not 'timeframe' in config:
+                accepted_qualities = []
+                if 'quality' in config:
+                    accepted_qualities.append(config['quality'])
+                else:
+                    qualities = SeriesParser.qualities
+                    min = config.get('min_quality', qualities[-1])
+                    max = config.get('max_quality', qualities[0])
+                    log.debug('min: %s max: %s' % (min, max))
+                    min_index = qualities.index(min) + 1
+                    max_index = qualities.index(max)
+                    log.debug('min_index: %s max_index: %s' % (min_index, max_index))
+                    for quality in qualities[max_index:min_index]:
+                        accepted_qualities.append(quality)
+                    log.debug('accepted_qualities: %s' % accepted_qualities)
+                # see if any of the eps match accepted qualities
                 for ep in eps:
-                    if ep.quality == config['quality']:
+                    log.debug('testing %s (quality: %s) for qualities' % (ep.data, ep.quality))
+                    if ep.quality in accepted_qualities:
                         self.accept_series(feed, ep, 'meets quality')
-                    else:
-                        entry = self.parser2entry[ep]
-                        feed.reject(entry, 'quality') # is this needed or a good idea?
+                        break
                 continue
-
+                
             # timeframe present
             if 'timeframe' in config:
                 # parse options

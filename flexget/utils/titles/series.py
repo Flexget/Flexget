@@ -163,3 +163,6 @@ class SeriesParser(TitleParser):
         return '<SeriesParser(data=%s,name=%s,id=%s,season=%s,episode=%s,quality=%s,proper=%s,status=%s)>' % \
             (str(self.data), str(self.name), str(self.id), str(self.season), str(self.episode), \
              str(self.quality), str(self.proper_or_repack), valid)
+             
+    def __cmp__(self, other):
+        return cmp(self.qualities.index(self.quality), self.qualities.index(other.quality))
