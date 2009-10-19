@@ -316,7 +316,7 @@ class ImdbParser:
         # get director(s)
         tag_directors = soup.find('div', id='director-info')
         if tag_directors:
-            for director in tag_directors.findAll('a'):
+            for director in tag_directors.findAll('a', href=re.compile('/name/nm')):
                 director_id = director['href'].split('/')[2]
                 director_name = director.contents[0]
                 # tag instead of name
