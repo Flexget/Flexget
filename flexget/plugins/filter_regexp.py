@@ -90,7 +90,6 @@ class FilterRegexp:
         
     def matches(self, entry, regexp, find_from=[]):
         """Return True if any of the entry string fields match given regexp"""
-        regexp = str(regexp)
         unquote = ['url']
         for field, value in entry.iteritems():
             if not isinstance(value, basestring):
