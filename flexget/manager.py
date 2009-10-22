@@ -76,8 +76,8 @@ class Manager:
         for config, base in possible.iteritems():
             if os.path.exists(config):
                 self.pre_check_config(config)
+                import yaml
                 try:
-                    import yaml
                     self.config = yaml.safe_load(file(config))
                 except Exception, e:
                     log.critical(e)
