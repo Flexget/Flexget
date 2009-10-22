@@ -13,8 +13,8 @@ class TitleParser(object):
     specials = ['special']
     
     cutoffs = ['dvdrip', 'dvdscr', 'cam', 'r5', 'limited', 'xvid', 'h264', 
-               'x264', 'h.264', 'x.264', 'screener', 'unrated', '3d', 
-               'bluray', 'multisubs'] + propers + specials + qualities
+               'x264', 'h.264', 'x.264', 'screener', 'unrated', '3d', 'extended',
+               'directors', 'bluray', 'multisubs'] + propers + specials + qualities
     
     remove = ['imax']
 

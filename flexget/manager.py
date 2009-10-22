@@ -16,6 +16,7 @@ Base = declarative_base()
 Session = sessionmaker()
 
 from sqlalchemy import Column, Integer, String, DateTime
+
 class FailedEntry(Base):
     __tablename__ =  'failed'
 
@@ -33,14 +34,15 @@ class FailedEntry(Base):
 
 class Manager:
     unit_test = False
-    config_name = None
-    lockfile = None
     options = None
-    engine = None
     
     def __init__(self, options):
         self.options = options
         self.config_base = None
+        self.config_name = None
+        self.db_filename = None
+        self.engine = None
+        self.lockfile = None
 
         self.config = {}
         self.feeds = {}
@@ -56,7 +58,7 @@ class Manager:
         log.debug('Default encoding: %s' % sys.getdefaultencoding())
 
     def initialize(self):
-        """Separated from __init__ so that unit test can modify options before loading config."""
+        """Separated from __init__ so that unit tests can modify options before loading config."""
         self.load_config()
         self.init_sqlalchemy()
         
@@ -100,7 +102,7 @@ class Manager:
                         pass
                     sys.exit(1)
                 # config loaded successfully
-                self.config_name, extension = os.path.splitext(os.path.basename(config))
+                self.config_name = os.path.splitext(os.path.basename(config))[0]
                 self.config_base = base
                 return
         log.info('Tried to read from: %s' % ', '.join(possible))
@@ -352,6 +354,9 @@ class Manager:
                 failed.append(name)
                 log.exception('Feed %s: %s' % (feed.name, e))
             except KeyboardInterrupt:
+                # show real stack trace in debug mode
+                if self.options.debug:
+                    raise
                 print '**** Keyboard Interrupt ****'
                 return
             finally:
