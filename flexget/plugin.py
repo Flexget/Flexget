@@ -73,7 +73,8 @@ def register_plugin(plugin_class, name, groups=[], builtin=False, debug=False, p
     """Registers a plugin."""
     global plugins
     if name in plugins:
-        log.critical('Error while registering plugin %s. %s' % (name, ('A plugin with the name %s is already registered' % name)))
+        log.critical('Error while registering plugin %s. %s' % \
+            (name, ('A plugin with the name %s is already registered' % name)))
         return
     plugins[name] = PluginInfo(name, plugin_class, groups, builtin, debug, priorities)
 

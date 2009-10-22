@@ -47,13 +47,13 @@ class PluginPreset:
             if 'global' in config:
                 config.remove('global')
         elif not 'global' in config:
-            log.debug('adding default global')
             config.append('global')
                 
         log.log(5, 'presets: %s' % config)
         
         for preset in config:
-            log.debug('Merging preset %s into feed %s' % (preset, feed.name))
+            if preset != 'global':
+                log.debug('Merging preset %s into feed %s' % (preset, feed.name))
             if not preset in feed.manager.config:
                 if preset == 'global': 
                     continue

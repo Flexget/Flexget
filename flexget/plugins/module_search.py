@@ -1,11 +1,25 @@
 import logging
 from flexget.plugin import *
 
-__pychecker__ = 'unusednames=parser'
-
 log = logging.getLogger('search')
 
-class Search:
+class SearchPlugins:
+
+    """
+        Implements --search-plugins
+    """
+
+    def on_process_start(self, feed):
+        if feed.manager.options.search_plugins:
+            feed.manager.disable_feeds()
+            header = '-- Supported search plugins: '
+            header = header + '-' * (79 - len(header))
+            print header
+            for plugin in get_plugins_by_group('search'):
+                print ' %s' % plugin.name
+            print '-' * 79
+
+class PluginSearch:
     """
         Search entry from sites. Accepts list of known search plugins, list is in priority order.
         Once hit has been found no more searches are performed. Should be used only when
@@ -57,4 +71,8 @@ class Search:
             if not found:
                 feed.reject(entry, 'search failed')
 
-register_plugin(Search, 'search')
+register_plugin(PluginSearch, 'search')
+register_plugin(SearchPlugins, 'list_search_plugins', builtin=True)
+register_parser_option('--search-plugins', action='store_true', dest='search_plugins', default=False,
+                       help='List supported search plugins.')
+
