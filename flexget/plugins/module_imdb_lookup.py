@@ -293,6 +293,7 @@ class ModuleImdbLookup:
         # store to entries
         # TODO: I really don't like this shoveling!
         entry['imdb_url'] = imdb.url
+        entry['imdb_id'] = imdb.imdb_id
         entry['imdb_name'] = imdb.name
         entry['imdb_plot_outline'] = imdb.plot_outline
         entry['imdb_score'] = imdb.score

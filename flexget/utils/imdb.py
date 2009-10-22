@@ -8,6 +8,12 @@ from BeautifulSoup import NavigableString, Tag
 
 log = logging.getLogger('utils.imdb')
 
+def extract_id(url):
+    """Return IMDb ID of the given URL"""
+    m = re.search("((?:nm|tt)[\d]{7})", url)
+    if m:
+        return m.group(1)
+
 class ImdbSearch:
 
     def __init__(self):
@@ -233,14 +239,17 @@ class ImdbParser:
         self.plot_outline = None
         self.name = None
         self.url = None
-
+        self.imdb_id = None
+    
     def parse(self, url):
         self.url = url
         try:
             page = urllib2.urlopen(url)
         except ValueError:
             raise ValueError('Invalid url %s' % url)
-            
+        
+        self.imdb_id = extract_id(self.url)
+    
         soup = get_soup(page)
 
         # get name
@@ -306,7 +315,7 @@ class ImdbParser:
         tag_cast = soup.find('table', 'cast')
         if tag_cast:
             for actor in tag_cast.findAll('a', href=re.compile('/name/nm')):
-                actor_id = actor['href'].split('/')[2]
+                actor_id = extract_id(actor['href'])
                 actor_name = actor.contents[0]
                 # tag instead of name
                 if isinstance(actor_name, Tag):
@@ -317,7 +326,7 @@ class ImdbParser:
         tag_directors = soup.find('div', id='director-info')
         if tag_directors:
             for director in tag_directors.findAll('a', href=re.compile('/name/nm')):
-                director_id = director['href'].split('/')[2]
+                director_id = extract_id(director['href'])
                 director_name = director.contents[0]
                 # tag instead of name
                 if isinstance(director_name, Tag):
