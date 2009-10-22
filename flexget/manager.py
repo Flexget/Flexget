@@ -250,10 +250,10 @@ class Manager:
         """Adds entry to internal failed list, displayed with --failed"""
         failed = Session()
         failedentry = FailedEntry(entry['title'], entry['url'])
-        # TODO: query item's existence
-        if not failed.query(FailedEntry).filter(FailedEntry.title==str(entry['title'])).first():
+        # query item's existence
+        if not failed.query(FailedEntry).filter(FailedEntry.title==entry['title']).first():
             failed.add(failedentry)
-        # TODO: limit item number to 25
+        # limit item number to 25
         i = 0
         for row in failed.query(FailedEntry).order_by(FailedEntry.tof.desc()).all():
             i += 1
