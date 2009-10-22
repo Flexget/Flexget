@@ -34,6 +34,12 @@ class PluginPreset:
         elif isinstance(config, bool): # handles 'preset: no' form to turn off preset on this feed
             if not config:
                 return
+
+        # implements --preset NAME
+        if feed.manager.options.preset:
+            if feed.manager.options.preset not in config:
+                feed.enabled = False
+                return
         
         # add global in except when disabled with no_global
         if 'no_global' in config:
@@ -59,4 +65,9 @@ class PluginPreset:
             except MergeException:
                 raise PluginError('Failed to merge preset %s to feed %s, incompatible datatypes' % (preset, feed.name))
 
-register_plugin(PluginPreset, 'preset', builtin=True, priorities=dict(start=255))
+register_plugin(PluginPreset, 'preset', builtin=True, priorities={'start': 255})
+
+
+register_parser_option('--preset', action='store', dest='preset', default=False,
+                       metavar='NAME', help='Execute feeds with given preset.')
+
