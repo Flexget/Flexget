@@ -1,13 +1,28 @@
 from flexget import plugins as _plugins_mod
-import imp, os, sys, logging, time
+import imp
+import os
+import sys
+import logging
+import time
 
 log = logging.getLogger('plugin')
 
-__all__ = ['PluginWarning', 'PluginError', 'register_plugin',
+__all__ = ['PluginWarning', 'PluginError', 
+           'PluginDependencyError', 'register_plugin',
            'register_parser_option', 'register_feed_event',
            'get_plugin_by_name', 'get_plugins_by_group',
            'get_plugin_keywords', 'get_plugins_by_event', 
            'get_methods_by_event']
+
+class PluginDependencyError(Exception):
+    """A plugin has requested another plugin by name, but this plugin does not exists"""
+
+    def __init__(self, value, plugin):
+        self.value = value
+        self.plugin = plugin
+
+    def __str__(self):
+        return '%s plugin: %s' % (repr(self.value), repr(self.plugin))
 
 class RegisterException(Exception):
     def __init__(self, value):
@@ -317,7 +332,7 @@ def get_plugin_keywords():
 def get_plugin_by_name(name):
     """Get plugin by name, prefered way since this structure may be changed at some point."""
     if not name in plugins:
-        raise Exception('Unknown plugin %s' % name)
+        raise PluginDependencyError('Unknown plugin %s' % name, name)
     return plugins[name]
 
 def print_list(options):

@@ -4,7 +4,7 @@ from flexget.plugin import *
 from datetime import datetime, timedelta
 from sqlalchemy import Column, Integer, String, DateTime, PickleType
 
-log = logging.getLogger('delay')
+log = logging.getLogger('backlog')
 
 class BacklogEntry(Base):
     

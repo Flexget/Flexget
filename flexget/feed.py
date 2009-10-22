@@ -233,6 +233,10 @@ class Feed:
                 except PluginError, err:
                     err.log.critical(err)
                     self.abort()
+                except PluginDependencyError, e:
+                    err.log.critical('Plugin %s has requested another plugin %s which is not available.' % \
+                        (self.current_plugin, e.plugin))
+                    self.abort()
                 except Exception, e:
                     log.exception('Unhandled error in plugin %s: %s' % (keyword, e))
                     self.abort()

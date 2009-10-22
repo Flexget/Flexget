@@ -13,6 +13,8 @@ class TestImdbOnline(FlexGetBase):
               - {title: 'Princess Mononoke', imdb_url: 'http://www.imdb.com/title/tt0119698/'}
               # generic test material, some tricky ones here :)
               - {title: 'Taken[2008]DvDrip[Eng]-FOO'}
+              # test short title, with repack and without year
+              - {title: 'Up.REPACK.720p.Bluray.x264-FlexGet'}
             imdb:
               min_votes: 20
 
@@ -54,6 +56,8 @@ class TestImdbOnline(FlexGetBase):
             'Failed imdb lookup (direct)'
         assert self.feed.find_entry(imdb_name='Taken', imdb_url='http://www.imdb.com/title/tt0936501/'), \
             'Failed to pick correct Taken from search results'
+        assert self.feed.find_entry(imdb_url='http://www.imdb.com/title/tt1049413/'), \
+            'Failed to lookup Up.REPACK.720p.Bluray.x264-FlexGet'
 
     @attr(online=True)
     def test_year(self):
