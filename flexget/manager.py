@@ -1,21 +1,16 @@
 import os
 import sys
 import logging
-from datetime import datetime
-
-log = logging.getLogger('manager')
-
-from flexget.plugin import plugins
-
-import yaml
 import sqlalchemy
+from datetime import datetime
+from sqlalchemy import Column, Integer, String, DateTime
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 
+log = logging.getLogger('manager')
+
 Base = declarative_base()
 Session = sessionmaker()
-
-from sqlalchemy import Column, Integer, String, DateTime
 
 class FailedEntry(Base):
     __tablename__ =  'failed'
@@ -23,11 +18,12 @@ class FailedEntry(Base):
     id = Column(Integer, primary_key=True)
     title = Column(String)
     url = Column(String)
-    tof = Column(DateTime, default=datetime.now())
+    tof = Column(DateTime)
 
     def __init__(self, title, url):
         self.title = title
         self.url = url
+        self.tof = datetime.now()
 
     def __str__(self):
         return '<Failed(title=%s)>' % (self.title)
@@ -81,6 +77,7 @@ class Manager:
             if os.path.exists(config):
                 self.pre_check_config(config)
                 try:
+                    import yaml
                     self.config = yaml.safe_load(file(config))
                 except Exception, e:
                     log.critical(e)
@@ -133,10 +130,10 @@ class Manager:
             # remove linefeed
             line = line[:-1]
             # empty line
-            if line.strip()=='':
+            if line.strip() == '':
                 continue
             # comment line
-            if line[0]=='#':
+            if line[0] == '#':
                 continue
             indentation = get_indentation(line)
             
@@ -284,11 +281,12 @@ class Manager:
         for name in feeds:
             # validate (TODO: make use of validator?)
             if not isinstance(self.config['feeds'][name], dict):
-                if isinstance(self.config['feeds'][name], str):
+                if isinstance(self.config['feeds'][name], basestring):
+                    from flexget.plugin import plugins
                     if name in plugins:
                         log.error('\'%s\' is known keyword, but in wrong indentation level. \
-                        Please indent it correctly under feed, it should have 2 more spaces \
-                        than feed name.' % name)
+                        Please indent it correctly under a feed. Reminder: keyword should have 2 \
+                        more spaces than feed name.' % name)
                         continue
                 log.error('\'%s\' is not a properly configured feed, please check indentation levels.' % name)
                 continue
@@ -309,12 +307,12 @@ class Manager:
                 log.critical('Could not find feed %s' % self.options.onlyfeed)
                 
     def disable_feeds(self):
-        """Disable all feeds."""
+        """Disables all feeds."""
         for feed in self.feeds.itervalues():
             feed.enabled = False
             
     def enable_feeds(self):
-        """Enable all feeds."""
+        """Enables all feeds."""
         for feed in self.feeds.itervalues():
             feed.enabled = True
 

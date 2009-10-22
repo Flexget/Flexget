@@ -153,7 +153,7 @@ class Feed:
                 if entry.has_key(k):
                     if entry.get(k) == v: 
                         match += 1
-            if match==len(values):
+            if match == len(values):
                 return entry
         return None
 
