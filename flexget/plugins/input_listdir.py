@@ -21,7 +21,7 @@ class InputListdir:
         for name in os.listdir(feed.config['listdir']):
             e = Entry()
             e['title'] = name
-            e['url'] = 'file://%s/%s' % (feed.config['listdir'], dir)
+            e['url'] = 'file://%s/%s' % (feed.config['listdir'], name)
             
             feed.entries.append(e)
 
