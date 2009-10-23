@@ -86,13 +86,17 @@ class ImdbQueueAdd:
     def on_process_start(self, feed):
         if feed.manager.options.imdb_queue_url:
             feed.manager.disable_feeds()
-            
-            from flexget.manager import Session
-
-            session = Session()            
 
             imdb_id = extract_id(feed.manager.options.imdb_queue_url)
             quality = feed.manager.options.imdb_queue_quality
+
+            from flexget.utils.titles.parser import TitleParser
+            if quality not in TitleParser.qualities:
+                print 'Unknown quality: %s' % quality
+                return
+
+            from flexget.manager import Session
+            session = Session()
 
             # check if the item is already queued
             item = session.query(ImdbQueue).filter(ImdbQueue.imdb_id == imdb_id).first()
