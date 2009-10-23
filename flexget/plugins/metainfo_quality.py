@@ -24,7 +24,7 @@ class MetainfoQuality:
         for entry in feed.entries:
             for quality in TitleParser.qualities:
                 for field_name, field_value in entry.iteritems():
-                    if str(quality).lower() in str(field_value).lower():
+                    if unicode(quality).lower() in unicode(field_value).lower():
                         log.debug('Found quality %s for %s from field %s' % \
                             (quality, entry['title'], field_name))
                         entry['quality'] = quality
