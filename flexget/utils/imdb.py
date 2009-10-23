@@ -1,3 +1,4 @@
+import parser
 import difflib
 import urllib
 import urllib2
@@ -24,11 +25,7 @@ class ImdbSearch:
         self.min_match = 0.5
         self.min_diff = 0.01
         self.debug = False
-        self.cutoffs = ['dvdrip', 'dvdscr', 'cam', 'r5', 'limited',
-                        'xvid', 'h264', 'x264', 'h.264', 'x.264', 
-                        'dvd', 'screener', 'unrated', 'repack', 
-                        'rerip', 'proper', '720p', '1080p', '1080i',
-                        'bluray']
+
         self.remove = ['imax']
         
         self.ignore_types = ['VG']
@@ -38,52 +35,14 @@ class ImdbSearch:
         pattern = re.compile(re.escape(old), re.I)
         return re.sub(pattern, new, str, count)
 
-    def parse_name(self, s):
-        """Sanitizes movie name from all kinds of crap"""
-        for char in ['[', ']', '_', '(', ')', ',']:
-            s = s.replace(char, ' ')
-        # if there are no spaces, start making begining from dots
-        if s.find(' ') == -1:
-            s = s.replace('.', ' ')
-        if s.find(' ') == -1:
-            s = s.replace('-', ' ')
-
-        # remove unwanted words
-        for word in self.remove:
-            s = self.ireplace(s, word, '')
-            
-        # remove extra and duplicate spaces!
-        s = s.strip()
-        while s.find('  ') != -1:
-            s = s.replace('  ', ' ')
-
-        # split to parts        
-        parts = s.split(' ')
-        year = None
-        cut_pos = 256
-        for part in parts:
-            # check for year
-            if part.isdigit():
-                n = int(part)
-                if n>1930 and n<2050:
-                    year = part
-                    if parts.index(part) < cut_pos:
-                        cut_pos = parts.index(part)
-            # if length > 3 and whole word in uppers, consider as cutword (most likelly a group name)
-            if len(part) > 3 and part.isupper() and part.isalpha():
-                if parts.index(part) < cut_pos:
-                    cut_pos = parts.index(part)
-            # check for cutoff words
-            if part.lower() in self.cutoffs:
-                if parts.index(part) < cut_pos:
-                    cut_pos = parts.index(part)
-        # make cut
-        s = ' '.join(parts[:cut_pos])
-        return s, year
-
     def smart_match(self, raw_name):
         """Accepts messy name, cleans it and uses information available to make smartest and best match"""
-        name, year = self.parse_name(raw_name)
+        from flexget.utils.titles.movie import MovieParser
+        parser = MovieParser()
+        parser.data = raw_name
+        parser.parse()
+        name = parser.name
+        year = parser.year
         if name=='':
             log.critical('Failed to parse name from %s' % raw_name)
             return None
