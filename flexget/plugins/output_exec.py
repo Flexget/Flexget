@@ -20,7 +20,11 @@ class OutputExec:
 
     def on_feed_output(self, feed):
         for entry in feed.accepted:
-            cmd = feed.config['exec'] % entry
+            try:
+                cmd = feed.config['exec'] % entry
+            except KeyError, e:
+                log.error('Entry %s does not have required field %s' % (entry['title'], e.message))
+                continue
             log.debug('executing cmd: %s' % cmd)
             p = subprocess.Popen(cmd, shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, close_fds=True)
             (r, w) = (p.stdout, p.stdin)
