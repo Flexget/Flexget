@@ -2,9 +2,9 @@ import re
 import logging
 from flexget.plugin import *
 
-log = logging.getLogger('scan_imdb')
+log = logging.getLogger('metainfo_imdb_url')
 
-class PluginScanImdb:
+class MetainfoImdbUrl:
     """
         Scan entry information for imdb url.
     """
@@ -12,7 +12,7 @@ class PluginScanImdb:
         from flexget import validator
         return validator.factory('boolean')
 
-    def on_feed_filter(self, feed):
+    def on_feed_metainfo(self, feed):
         # check if disabled (value set to false)
         if 'scan_imdb' in feed.config:
             if not feed.config['scan_imdb']:
@@ -34,4 +34,4 @@ class PluginScanImdb:
         if count:
             log.debug('Found %s imdb urls from descriptions' % count)
             
-register_plugin(PluginScanImdb, 'scan_imdb', builtin=True, priorities=dict(filter=200))
+register_plugin(MetainfoImdbUrl, 'scan_imdb', builtin=True)

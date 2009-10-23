@@ -52,10 +52,11 @@ class PluginError(Exception):
 def _strip_trailing_sep(path):
     return path.rstrip("\\/")
 
-EVENTS = ['start', 'input', 'filter', 'download', 'modify', 'output', 'exit']
+EVENTS = ['start', 'input', 'metainfo', 'filter', 'download', 'modify', 'output', 'exit']
 EVENT_METHODS = {
     'start': 'on_feed_start',
     'input': 'on_feed_input',
+    'metainfo': 'on_feed_metainfo',
     'filter': 'on_feed_filter',
     'download': 'on_feed_download',
     'modify': 'on_feed_modify', 

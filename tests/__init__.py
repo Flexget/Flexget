@@ -41,16 +41,19 @@ class MockManager(Manager):
 class FlexGetBase(object):
     __yaml__ = """# Yaml goes here"""
 
-    def setUp(self):
+    def setup(self):
         """Set up test env"""
         setup_once()
         self.manager = MockManager(self.__yaml__, self.__class__.__name__)
 
-    def tearDown(self):
+    def teardown(self):
         try:
             self.feed.session.close()
         except:
             pass
+        
+    setUp = setup
+    tearDown = teardown
 
     def execute_feed(self, name):
         """Use to execute one test feed from config"""
@@ -290,3 +293,24 @@ class TestDownload(FlexGetBase):
         # executes feed and downloads the file
         self.execute_feed('test')
         assert os.path.exists(self.testfile), 'download file does not exists'
+
+
+class TestMetainfoQuality(FlexGetBase):
+
+    __yaml__ = """
+        feeds:
+          test:
+            input_mock:
+              - {title: 'FooBar.S01E02.720p.HDTV'}
+    """
+
+    def test_quality(self):
+        self.execute_feed('test')
+        entry = self.feed.find_entry(title='FooBar.S01E02.720p.HDTV')
+        assert entry, 'entry not found?'
+        assert 'quality' in entry, 'failed to pick up quality'
+        assert entry['quality'] == '720p', 'picked up wrong quality'
+
+
+
+
