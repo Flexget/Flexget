@@ -192,21 +192,37 @@ class SeriesReport(SeriesPlugin):
             print ' * = downloaded'
             session.close()
 
+_series_forget = {}
+def optik_series_forget(option, opt, value, parser):
+    """
+    Callback for Optik
+    --series-forget NAME [ID]
+    """
+    if len(parser.rargs) == 0:
+        return # how to handle invalid?
+    if len(parser.rargs) > 0:
+        _series_forget['name'] = parser.rargs[0]
+    if len(parser.rargs) > 1:
+        _series_forget['episode'] = parser.rargs[1]
+
 class SeriesForget(object):
     
     """provides --series-forget"""
 
+
     def on_process_start(self, feed):
-        if feed.manager.options.series_forget:
+
+        if _series_forget:
             feed.manager.disable_feeds()
+
+            name = _series_forget.get('name')
 
             from flexget.manager import Session
             session = Session()
 
-            if feed.manager.options.series_forget_ep:
+            if _series_forget.get('episode'):
                 # remove by id
-                identifier = feed.manager.options.series_forget_ep.upper()
-                name = feed.manager.options.series_forget
+                identifier = _series_forget.get('episode').upper()
                 if identifier and name:
                     series = session.query(Series).filter(Series.name == name).first()
                     if series:
@@ -221,12 +237,12 @@ class SeriesForget(object):
             else:
                 # remove whole series
                 series = session.query(Series).\
-                         filter(Series.name == feed.manager.options.series_forget).first()
+                         filter(Series.name == name).first()
                 if series:
-                    print 'Removed %s' % feed.manager.options.series_forget
+                    print 'Removed %s' % name
                     session.delete(series)
                 else:
-                    print 'Unknown series %s' % feed.manager.options.series_forget
+                    print 'Unknown series %s' % name
             
             session.commit()
 
@@ -669,9 +685,10 @@ register_plugin(SeriesForget, 'series_forget', builtin=True)
 
 register_parser_option('--series', action='store_true', dest='series', default=False, 
                        help='Display series summary.')
-register_parser_option('--series-forget', action='store', dest='series_forget', default=False, 
-                       metavar='NAME', help='Remove series from database. To remove single episode add --ep-id ID.')
-register_parser_option('--ep-id', action='store', dest='series_forget_ep', default=False,
-                       help=SUPPRESS_HELP)
+
+register_parser_option('--series-forget', action='callback', callback=optik_series_forget,
+                       help='Remove complete series or single episode from database. <Series> [episode]')
+
 register_parser_option('--stop-waiting', action='store', dest='stop_waiting', default=False, 
                        metavar='NAME', help='Stop timeframe for a given series.')
+
