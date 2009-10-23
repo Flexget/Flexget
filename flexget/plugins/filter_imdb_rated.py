@@ -2,7 +2,7 @@ import logging
 from flexget.plugin import *
 from BeautifulSoup import BeautifulSoup
 from flexget.manager import Base
-from sqlalchemy import Table, Column, Integer, Float, String, DateTime
+from sqlalchemy import Column, Integer, Float, String, DateTime
 import urllib2
 import re
 import datetime

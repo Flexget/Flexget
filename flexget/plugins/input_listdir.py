@@ -1,29 +1,28 @@
 import logging
-from flexget.feed import Entry
 from flexget.plugin import *
 
-log = logging.getLogger('input_mock')
+log = logging.getLogger('listdir')
 
-class InputDirectories:
+class InputListdir:
     """
-        Uses local path as input
+        Uses local path content as an input.
         
         Example:
         
-        directories: /storage/movies/
+        listdir: /storage/movies/
     """
     def validator(self):
         from flexget import validator
         return validator.factory('path')
 
     def on_feed_input(self, feed):
+        from flexget.feed import Entry
         import os
-        
-        for name in os.listdir(feed.config['directories']):
+        for name in os.listdir(feed.config['listdir']):
             e = Entry()
             e['title'] = name
-            e['url'] = 'file://%s/%s' % (feed.config['directories'], dir)
+            e['url'] = 'file://%s/%s' % (feed.config['listdir'], dir)
             
             feed.entries.append(e)
 
-register_plugin(InputDirectories, 'directories')
+register_plugin(InputListdir, 'listdir')
