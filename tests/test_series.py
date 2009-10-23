@@ -80,7 +80,30 @@ class TestQuality(FlexGetBase):
         assert len(self.feed.accepted) == 1, 'should have accepted only one'
 
 
+class TestTracking(FlexGetBase):
+    __yaml__ = """
+        global:
+          series:
+            - some series
+
+        feeds:
+          test_1:
+            input_mock:
+              - {title: 'Some.Series.S01E20.720p.XViD-FlexGet'}
+          test_2:
+            input_mock:
+              - {title: 'Some.Series.S01E20.720p.XViD-DoppelGanger'}
+    """
+
+    def test_tracking(self):
+        self.execute_feed('test_1')
+        self.execute_feed('test_2')
+        assert self.feed.find_entry('rejected', title='Some.Series.S01E20.720p.XViD-DoppelGanger'), \
+            'failed basic download tracking'
+
 class TestFilterSeries(FlexGetBase):
+
+    # TODO: TOO LARGE
     
     __yaml__ = """
         feeds:
@@ -190,14 +213,17 @@ class TestPropers(FlexGetBase):
             input_mock:
               - {title: 'Test.S01E01.720p-FlexGet'}
 
+          # introduce proper, should be accepted
           test_propers_2:
             input_mock:
               - {title: 'Test.S01E01.720p.Proper-FlexGet'}
 
+          # introduce non-proper, should not be downloaded
           test_propers_3:
             input_mock:
               - {title: 'Test.S01E01.FlexGet'}
 
+          # introduce proper at the same time, should nuke non-proper and get proper
           test_propers_4:
             input_mock:
               - {title: 'Foobar.S01E01.720p.FlexGet'}
@@ -263,6 +289,11 @@ class TestSimilarNames(FlexGetBase):
 class TestDuplicates(FlexGetBase):
 
     __yaml__ = """
+        
+        global: # just cleans log a bit ..
+          disable_builtins:
+            - seen
+            
         feeds:
           test_dupes:
             input_mock:
@@ -300,11 +331,9 @@ class TestDuplicates(FlexGetBase):
     """
 
     def test_dupes(self):
-        """Series plugin: multiple new releases at once from same episode"""
-
+        """Series plugin: dupes with same quality"""
         self.execute_feed('test_dupes')
-        assert not (self.feed.find_entry('accepted', title='Foo.2009.S02E04.HDTV.XviD-2HD[FlexGet]') and \
-                    self.feed.find_entry('accepted', title='Foo.2009.S02E04.HDTV.XviD-2HD[ASDF]')), 'accepted both'
+        assert len(self.feed.accepted) == 1, 'accepted both'
 
 
     def test_true_dupes(self):
@@ -331,3 +360,48 @@ class TestDuplicates(FlexGetBase):
         for item in rejected:
             assert self.feed.find_entry('rejected', title=item), \
                 '%s should have been rejected' % item
+
+class TestQualities(FlexGetBase):
+
+    __yaml__ = """
+        feeds:
+          test:
+            input_mock:
+              - {title: 'FooBar.S01E01.PDTV-FlexGet'}
+              - {title: 'FooBar.S01E01.720p-FlexGet'}
+              - {title: 'FooBar.S01E01.1080p-FlexGet'}
+              - {title: 'FooBar.S01E01.HR-FlexGet'}
+            series:
+              - FooBar:
+                  qualities:
+                    - PDTV
+                    - 720p
+                    - 1080p
+    """
+
+    def test_qualities(self):
+        self.execute_feed('test')
+
+        assert self.feed.find_entry('accepted', title='FooBar.S01E01.PDTV-FlexGet'), \
+            'Didn''t accept FooBar.S01E01.PDTV-FlexGet'
+        assert self.feed.find_entry('accepted', title='FooBar.S01E01.720p-FlexGet'), \
+            'Didn''t accept FooBar.S01E01.720p-FlexGet'
+        assert self.feed.find_entry('accepted', title='FooBar.S01E01.1080p-FlexGet'), \
+            'Didn''t accept FooBar.S01E01.1080p-FlexGet'
+
+        assert not self.feed.find_entry('accepted', title='FooBar.S01E01.HR-FlexGet'), \
+            'Accepted FooBar.S01E01.HR-FlexGet'
+
+        # test that it rejects them after
+
+        self.execute_feed('test')
+
+        assert self.feed.find_entry('rejected', title='FooBar.S01E01.PDTV-FlexGet'), \
+            'Didn''t rehect FooBar.S01E01.PDTV-FlexGet'
+        assert self.feed.find_entry('rejected', title='FooBar.S01E01.720p-FlexGet'), \
+            'Didn''t reject FooBar.S01E01.720p-FlexGet'
+        assert self.feed.find_entry('rejected', title='FooBar.S01E01.1080p-FlexGet'), \
+            'Didn''t reject FooBar.S01E01.1080p-FlexGet'
+
+        assert not self.feed.find_entry('accepted', title='FooBar.S01E01.HR-FlexGet'), \
+            'Accepted FooBar.S01E01.HR-FlexGet'

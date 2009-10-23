@@ -6,7 +6,6 @@ from flexget.plugin import *
 from sqlalchemy import Column, Integer, String, DateTime, Boolean, desc
 from sqlalchemy.schema import ForeignKey
 from sqlalchemy.orm import relation, join
-from optparse import SUPPRESS_HELP
 
 log = logging.getLogger('series')
 
@@ -274,9 +273,10 @@ class FilterSeries(SeriesPlugin):
             advanced.accept('list', key='ep_regexp').accept('regexp')
             advanced.accept('list', key='id_regexp').accept('regexp')
             # quality
-            advanced.accept('text', key='quality')     # TODO: allow only SeriesParser.qualities
-            advanced.accept('text', key='min_quality') # TODO: ^^
-            advanced.accept('text', key='max_quality') # TODO: ^^
+            advanced.accept('text', key='quality')                    # TODO: allow only SeriesParser.qualities
+            advanced.accept('list', key='qualities').accept('text')   # TODO: ^^
+            advanced.accept('text', key='min_quality')                # TODO: ^^
+            advanced.accept('text', key='max_quality')                # TODO: ^^
             advanced.accept('regexp_match', key='timeframe').accept('\d+ (minutes|hours|days|weeks)')
             # watched
             watched = advanced.accept('dict', key='watched')
@@ -501,23 +501,25 @@ class FilterSeries(SeriesPlugin):
             # list of downloaded releases
             downloaded_releases = self.get_downloaded(feed.session, eps[0].name, eps[0].identifier())
 
-            log.debug('processing episodes: %s' % [e.data for e in eps])
-            log.debug('downloaded episodes: %s' % [e.title for e in downloaded_releases])
+            log.debug('@begin, episodes: %s' % [e.data for e in eps])
+            log.debug('@begin, downloaded: %s' % [e.title for e in downloaded_releases])
 
-            # remove uninteresting episodes from the list (downloaded)
-            for ep in eps[:]:
+            # whitelist undownloaded propers
+            whitelist = []
+
+            def proper_downloaded():
                 for release in downloaded_releases:
-                    if release.quality == ep.quality and ep.proper_or_repack and not release.proper:
-                        log.debug('oh, lookey .. found repack %s' % ep)
-                    else:
-                        entry = self.parser2entry[ep]
-                        feed.reject(entry, 'already downloaded')
-                        # must test if ep in eps because downloaded_releases may contain
-                        # this episode multiple times
-                        if ep in eps:
-                            log.debug('removing from eps: %s' % ep.data)
-                            eps.remove(ep)
-            
+                    if release.proper:
+                        return True
+
+            for ep in eps:
+                if ep.proper_or_repack:
+                    if not proper_downloaded():
+                        log.debug('found undownloaded repack %s' % ep)
+                        whitelist.append(ep)
+
+            log.debug('whitelisted: %s' % [e.data for e in whitelist])
+
             # if we have proper from some release, reject non-propers (with same quality)
             for ep in eps[:]:
                 if ep.proper_or_repack:
@@ -533,6 +535,23 @@ class FilterSeries(SeriesPlugin):
                             feed.reject(entry, 'nuked')
                             if nuked in eps:
                                 eps.remove(nuked)
+
+            # reject downloaded (except if whitelisted)
+
+            log.debug('@reject, eps: %s' % [e.data for e in eps])
+            log.debug('@reject, downloaded: %s' % [e.title for e in downloaded_releases])
+
+            if downloaded_releases and eps:
+                log.debug('%s is downloaded' % eps[0].identifier())
+                for ep in eps[:]:
+                    if ep not in whitelist:
+                        entry = self.parser2entry[ep]
+                        feed.reject(entry, 'already downloaded')
+                        # must test if ep in eps because downloaded_releases may contain
+                        # this episode multiple times
+                        if ep in eps:
+                            log.debug('removing from eps: %s' % ep.data)
+                            eps.remove(ep)
 
             # no episodes left, continue to next series
             if not eps:
@@ -569,33 +588,33 @@ class FilterSeries(SeriesPlugin):
                         continue
                 else:
                     log.debug('No latest info available')
-                    
-            # quality without timeframe
-            if not 'timeframe' in config:
-                accepted_qualities = []
-                if 'quality' in config:
-                    accepted_qualities.append(config['quality'])
-                else:
-                    qualities = SeriesParser.qualities
-                    min = config.get('min_quality', qualities[-1])
-                    max = config.get('max_quality', qualities[0])
-                    log.debug('min: %s max: %s' % (min, max))
-                    min_index = qualities.index(min) + 1
-                    max_index = qualities.index(max)
-                    log.debug('min_index: %s max_index: %s' % (min_index, max_index))
-                    for quality in qualities[max_index:min_index]:
-                        accepted_qualities.append(quality)
-                    log.debug('accepted_qualities: %s' % accepted_qualities)
-                # see if any of the eps match accepted qualities
+
+            # multiple qualities, accept all wanted qualities
+            def is_quality_downloaded(quality):
+                for release in downloaded_releases:
+                    if release.quality == quality:
+                        return True
+
+            if 'qualities' in config:
+                qualities = [quality.lower() for quality in config['qualities']]
                 for ep in eps:
-                    log.debug('testing %s (quality: %s) for qualities' % (ep.data, ep.quality))
-                    if ep.quality in accepted_qualities:
-                        self.accept_series(feed, ep, 'meets quality')
-                        break
+                    #log.debug('qualities, quality: %s' % ep.quality)
+                    if not ep.quality.lower() in qualities:
+                        continue # unwanted quality
+                    if not is_quality_downloaded(ep.quality):
+                        log.debug('found wanted quality %s' % ep.data)
+                        self.accept_series(feed, ep, 'wanted qualities')
                 continue
-                
+
             # timeframe present
             if 'timeframe' in config:
+                if 'max_quality' in config:
+                    log.warning('Timeframe does not support max_quality (yet)')
+                if 'min_quality' in config:
+                    log.warning('Timeframe does not support min_quality (yet)')
+                if 'qualities' in config:
+                    log.warning('Timeframe does not support qualities (yet)')
+
                 # parse options
                 amount, unit = config['timeframe'].split(' ')
                 log.debug('amount: %s unit: %s' % (repr(amount), repr(unit)))
@@ -658,6 +677,30 @@ class FilterSeries(SeriesPlugin):
                         entry = self.parser2entry[ep]
                         feed.reject(entry, 'timeframe is waiting')
                     continue
+
+            # quality, min_quality, max_quality and NO timeframe
+            if not 'timeframe' in config and 'qualities' not in config:
+                accepted_qualities = []
+                if 'quality' in config:
+                    accepted_qualities.append(config['quality'])
+                else:
+                    qualities = SeriesParser.qualities
+                    min = config.get('min_quality', qualities[-1])
+                    max = config.get('max_quality', qualities[0])
+                    log.debug('min: %s max: %s' % (min, max))
+                    min_index = qualities.index(min) + 1
+                    max_index = qualities.index(max)
+                    log.debug('min_index: %s max_index: %s' % (min_index, max_index))
+                    for quality in qualities[max_index:min_index]:
+                        accepted_qualities.append(quality)
+                    log.debug('accepted_qualities: %s' % accepted_qualities)
+                # see if any of the eps match accepted qualities
+                for ep in eps:
+                    log.debug('testing %s (quality: %s) for qualities' % (ep.data, ep.quality))
+                    if ep.quality in accepted_qualities:
+                        self.accept_series(feed, ep, 'meets quality')
+                        break
+                continue
 
             # no special configuration, just choose the best
             self.accept_series(feed, best, 'choose best')
