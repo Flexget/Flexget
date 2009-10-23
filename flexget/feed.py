@@ -139,6 +139,7 @@ class Feed:
             return
         if not kwargs.get('silent', False):
             log.info('Aborting feed %s (plugin: %s)' % (self.name, self.current_plugin))
+        log.debug('Aborting feed %s (plugin: %s)' % (self.name, self.current_plugin))
         self._abort = True
         self.__run_event('abort')
 
@@ -257,7 +258,7 @@ class Feed:
         if self.manager.options.validate:
             if not errors:
                 print 'Feed \'%s\' passed' % self.name
-                return
+            return
             
         # run events
         for event in EVENTS:
@@ -296,7 +297,9 @@ class Feed:
 
     def process_end(self):
         """Execute terminate event for this feed"""
-        if self._abort: return
+        if self.manager.options.validate:
+            log.debug('No process_end event with --check')
+            return
         self.__run_event('process_end')
 
     def validate(self):
