@@ -136,60 +136,105 @@ class SeriesPlugin(object):
         return release
 
 
+_series = {}
+def optik_series(option, opt, value, parser):
+    """--series [NAME]"""
+    _series['got'] = True
+    if len(parser.rargs) != 0:
+        _series['name'] = parser.rargs[0]
+
 class SeriesReport(SeriesPlugin):
     
     """Produces --series report"""
 
     def on_process_start(self, feed):
-        if feed.manager.options.series:
+        if _series:
             # disable all feeds
             for afeed in feed.manager.feeds.itervalues():
                 afeed.enabled = False
-                
-            print ' %-30s%-20s%-21s' % ('Name', 'Latest', 'Status')
-            print '-' * 79
-            
-            from flexget.manager import Session
-            session = Session()
-            
-            for series in session.query(Series).all():
-                
-                # get latest episode in episodic format
-                episode = session.query(Episode).select_from(join(Episode, Series)).\
-                          filter(Series.name == series.name).filter(Episode.season != None).\
-                          order_by(desc(Episode.season)).order_by(desc(Episode.number)).first()
 
-                # no luck, try uid format
-                if not episode:
-                    episode = session.query(Episode).select_from(join(Episode, Series)).\
-                              filter(Series.name == series.name).filter(Episode.season == None).\
-                              order_by(desc(Episode.first_seen)).first()
+            if not 'name' in _series:
+                self.display_summary()
+            else:
+                self.display_details()
                 
-                latest = ''
-                status = ''
-                
-                if episode:
-                    if not episode.season or not episode.number:
-                        latest = '%s (uid)' % episode.identifier
-                    else:
-                        latest = 's%se%s' % (str(episode.season).zfill(2), str(episode.number).zfill(2))
-                        
-                    for release in self.get_releases(session, series.name, episode.identifier):
-                        if release.downloaded:
-                            status += '*'
-                        status += release.quality
-                        if release.proper:
-                            status += '-Proper'
-                        status += ' '
-                else:
-                    latest = 'N/A'
-                    status = 'N/A'
-                
-                print ' %-30s%-20s%-21s' % (series.name, latest, status)
+
+    def display_details(self):
+        """Display detailed series information"""
+        from flexget.manager import Session
+        session = Session()
+
+        name = _series['name'].lower()
+        series = session.query(Series).filter(Series.name == name).first()
+        if not series:
+            print 'Unknown series %s' % name
+            return
+
+        print ' %-30s%-20s' % ('Identifier', 'Status')
+        print '-' * 79
+
+        for episode in series.episodes:
+            status = ''
+            for release in episode.releases:
+                if release.downloaded:
+                    status += '*'
+                status += release.quality
+                if release.proper:
+                    status += '-Proper'
+                status += ' '
+            print ' %-30s%-20s' % (episode.identifier, status)
             
-            print '-' * 79
-            print ' * = downloaded'
-            session.close()
+        print '-' * 79
+        print ' * = downloaded'
+        session.close()
+
+
+    def display_summary(self):
+        """Display series summary"""
+        print ' %-30s%-20s%-21s' % ('Name', 'Latest', 'Status')
+        print '-' * 79
+
+        from flexget.manager import Session
+        session = Session()
+
+        for series in session.query(Series).all():
+
+            # get latest episode in episodic format
+            episode = session.query(Episode).select_from(join(Episode, Series)).\
+                      filter(Series.name == series.name).filter(Episode.season != None).\
+                      order_by(desc(Episode.season)).order_by(desc(Episode.number)).first()
+
+            # no luck, try uid format
+            if not episode:
+                episode = session.query(Episode).select_from(join(Episode, Series)).\
+                          filter(Series.name == series.name).filter(Episode.season == None).\
+                          order_by(desc(Episode.first_seen)).first()
+
+            latest = ''
+            status = ''
+
+            if episode:
+                if not episode.season or not episode.number:
+                    latest = '%s (uid)' % episode.identifier
+                else:
+                    latest = 's%se%s' % (str(episode.season).zfill(2), str(episode.number).zfill(2))
+
+                for release in self.get_releases(session, series.name, episode.identifier):
+                    if release.downloaded:
+                        status += '*'
+                    status += release.quality
+                    if release.proper:
+                        status += '-Proper'
+                    status += ' '
+            else:
+                latest = 'N/A'
+                status = 'N/A'
+
+            print ' %-30s%-20s%-21s' % (series.name, latest, status)
+
+        print '-' * 79
+        print ' * = downloaded'
+        session.close()
 
 _series_forget = {}
 def optik_series_forget(option, opt, value, parser):
@@ -726,7 +771,8 @@ register_plugin(FilterSeries, 'series')
 register_plugin(SeriesReport, 'series_report', builtin=True)
 register_plugin(SeriesForget, 'series_forget', builtin=True)
 
-register_parser_option('--series', action='store_true', dest='series', default=False, 
+
+register_parser_option('--series', action='callback', callback=optik_series,
                        help='Display series summary.')
 
 register_parser_option('--series-forget', action='callback', callback=optik_series_forget,

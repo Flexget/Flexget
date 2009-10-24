@@ -1,9 +1,7 @@
 import logging
 from flexget.plugin import *
 from flexget.manager import Base
-from sqlalchemy import Table, Column, Integer, Float, String, DateTime, Boolean
-import urllib2
-import re
+from sqlalchemy import Column, Integer, String, DateTime, Boolean
 import datetime
 from flexget.utils.imdb import extract_id
 
