@@ -43,7 +43,7 @@ def optik_imdb_queue(option, opt, value, parser):
     if len(parser.rargs) == 1:
         return
     # more than 2 args, we've got quality
-    if len(parser.rargs) == 2:
+    if len(parser.rargs) >= 2:
         _imdb_queue['imdb_url'] = parser.rargs[1]
 
     if len(parser.rargs) >= 3:
