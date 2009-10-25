@@ -157,7 +157,6 @@ class SeriesReport(SeriesPlugin):
                 self.display_summary()
             else:
                 self.display_details()
-                
 
     def display_details(self):
         """Display detailed series information"""
@@ -187,7 +186,6 @@ class SeriesReport(SeriesPlugin):
         print '-' * 79
         print ' * = downloaded'
         session.close()
-
 
     def display_summary(self):
         """Display series summary"""
@@ -251,8 +249,7 @@ def optik_series_forget(option, opt, value, parser):
 
 class SeriesForget(object):
     
-    """provides --series-forget"""
-
+    """Provides --series-forget"""
 
     def on_process_start(self, feed):
 

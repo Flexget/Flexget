@@ -148,7 +148,7 @@ def release(args):
     for name in os.listdir('dist'):
         if os.path.exists(os.path.join(dest, name)):
             print 'Skipped copying %s, destination already exists' % name
-        shutil.move(os.path.join('dist', name), os.path.join(dest, name))
+        shutil.copy(os.path.join('dist', name), os.path.join(dest, name))
 
     # restore version ...
     freplace('flexget/__init__.py', "__version__ = '%s'" % ver, "__version__ = '{subversion}'")

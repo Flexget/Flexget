@@ -30,8 +30,12 @@ class PluginCookies:
                 from sqlite3 import dbapi2 as sqlite # try the 2.5+ stdlib
             except ImportError:
                 raise PluginWarning('Unable to use sqlite3 or pysqlite2', log)
- 
-        con = sqlite.connect(filename)
+
+        log.debug('connecting: %s' % filename)
+        try:
+            con = sqlite.connect(filename)
+        except:
+            raise PluginError('Unable to open cookies sqlite database')
  
         cur = con.cursor()
         cur.execute('select host, path, isSecure, expiry, name, value from moz_cookies')
@@ -46,25 +50,37 @@ class PluginCookies:
 """)
         count = 0
         failed = 0
-        for item in cur.fetchall():
+
+        log.debug('fetching all cookies')
+
+        while True:
             try:
-                s.write('%s\t%s\t%s\t%s\t%s\t%s\t%s\n' % (item[0], ftstr[item[0].startswith('.')], item[1],
-                                                          ftstr[item[2]], item[3], item[4], item[5]))
-                                                         
-                log.log(5, 'Adding cookie for %s. key: %s value: %s' % (item[0], item[4], item[5]))
-                count += 1
-            except:
-                to_hex = lambda x: ''.join([hex(ord(c))[2:].zfill(2) for c in x])
-                i = 0
-                for val in item:
-                    if isinstance(val, basestring):
-                        log.debug('item[%s]: %s' % (i, to_hex(val)))
-                    else:
-                        log.debug('item[%s]: %s' % (i, val))
-                    i += 1
+                item = cur.next()
+                try:
+                    s.write('%s\t%s\t%s\t%s\t%s\t%s\t%s\n' % (item[0], ftstr[item[0].startswith('.')], item[1],
+                                                              ftstr[item[2]], item[3], item[4], item[5]))
+
+                    log.log(5, 'Adding cookie for %s. key: %s value: %s' % (item[0], item[4], item[5]))
+                    count += 1
+                except:
+                    to_hex = lambda x: ''.join([hex(ord(c))[2:].zfill(2) for c in x])
+                    i = 0
+                    for val in item:
+                        if isinstance(val, basestring):
+                            log.debug('item[%s]: %s' % (i, to_hex(val)))
+                        else:
+                            log.debug('item[%s]: %s' % (i, val))
+                        i += 1
+                    failed += 1
+
+            except UnicodeDecodeError, e:
+                # for some god awful reason the sqlite module can throw UnicodeDecodeError ...
                 failed += 1
-            
-        log.debug('Added %s cookies to jar. %s failed (non-ascii items?)' % (count, failed))
+                pass
+            except StopIteration:
+                break
+
+        log.debug('Added %s cookies to jar. %s failed (non-ascii)' % (count, failed))
  
         s.seek(0)
         con.close()
