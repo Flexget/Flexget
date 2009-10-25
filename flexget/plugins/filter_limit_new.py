@@ -29,7 +29,7 @@ class FilterLimitNew:
         for entry in feed.entries:
             if i > amount:
                 rejected += 1
-                feed.reject(entry)
+                feed.reject(entry, 'limit exceeded')
             else:
                 passed += 1
             i += 1

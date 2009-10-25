@@ -73,10 +73,10 @@ class PluginCookies:
                         i += 1
                     failed += 1
 
-            except UnicodeDecodeError, e:
+            except UnicodeDecodeError:
                 # for some god awful reason the sqlite module can throw UnicodeDecodeError ...
+                log.debug('got UnicodeDecodeError from sqlite, ignored')
                 failed += 1
-                pass
             except StopIteration:
                 break
 
