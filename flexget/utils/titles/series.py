@@ -6,12 +6,22 @@ from flexget.utils.titles.parser import TitleParser, ParseWarning
 log = logging.getLogger('seriesparser')
 
 class SeriesParser(TitleParser):
+
+    """
+
+    Parse series.
+
+    :name: series name
+    :data: data to parse
+    :expect_ep: expect series to be in season, ep format
+
+    """
     
     def __init__(self):
-        # name of the series
-        self.name = None 
-        # data to parse
-        self.data = None 
+        # parser settings
+        self.name = None
+        self.data = None
+        self.expect_ep = False
         
         self.ep_regexps = ['s(\d+)e(\d+)', 's(\d+)ep(\d+)', 's(\d+).e(\d+)', '[^\d]([\d]{1,2})[\s]?x[\s]?(\d+)']
         self.id_regexps = ['(\d\d\d\d).(\d+).(\d+)', '(\d+).(\d+).(\d\d\d\d)', \
@@ -138,13 +148,27 @@ class SeriesParser(TitleParser):
                 return
 
         # search for id as last since they contain somewhat broad matches
-        for id_re in self.id_regexps:
-            match = re.search(id_re, data, re.IGNORECASE|re.UNICODE)
+        if not self.expect_ep:
+            for id_re in self.id_regexps:
+                match = re.search(id_re, data, re.IGNORECASE|re.UNICODE)
+                if match:
+                    #log.debug('found id with regexp %s' % id_re)
+                    self.id = '-'.join(match.groups())
+                    if self.special:
+                        self.id += '-SPECIAL'
+                    self.valid = True
+                    return
+        else:
+            # we should be getting season, ep !
+            # try to look up idiotic numberin scheme 101,102,103,201,202
+            # search for 3 digits
+
+            match = re.search('\d\d\d', data, re.IGNORECASE|re.UNICODE)
             if match:
-                #log.debug('found id with regexp %s' % id_re)
-                self.id = '-'.join(match.groups())
-                if self.special:
-                    self.id += '-SPECIAL'
+                got = match.group(0)
+                self.season = int(got[0])
+                self.episode = int(got[1:])
+                log.debug(self)
                 self.valid = True
                 return
 

@@ -64,7 +64,7 @@ class SeriesPlugin(object):
     def get_latest_info(self, session, name):
         """Return latest known identifier in dict (season, episode) for series name"""
         episode = session.query(Episode).select_from(join(Episode, Series)).\
-            filter(Episode.season != None).filter(Series.name == name).\
+            filter(Episode.season != None).filter(Series.name == name.lower()).\
             order_by(desc(Episode.season)).order_by(desc(Episode.number)).first()
         if not episode:
             return False
@@ -106,7 +106,7 @@ class SeriesPlugin(object):
         if not series:
             log.debug('add series %s into database' % parser.name)
             series = Series()
-            series.name = parser.name
+            series.name = parser.name.lower()
             session.add(series)
         
         # if episode does not exist in series, add new
@@ -435,12 +435,16 @@ class FilterSeries(SeriesPlugin):
     def on_feed_filter(self, feed):
         """Filter series"""
 
-        # hack, test if running old database with sqlalchemy table reflection ..
+        # TEMP: hack, test if running old database with sqlalchemy table reflection ..
         from flexget.utils.sqlalchemy_utils import table_exists
         if table_exists('episode_qualities', feed):
             log.critical('Running old database! Please see bleeding edge news!')
             feed.manager.disable_feeds()
             feed.abort()
+        
+        # TEMP: bugfix, convert all series to lowercase
+        for series in feed.session.query(Series).all():
+            series.name = series.name.lower()
         
         config = self.generate_config(feed)
         for group_name, group_series in config.iteritems():
@@ -473,6 +477,15 @@ class FilterSeries(SeriesPlugin):
                     return 1
             return cmp(index(a), index(b))
             
+        # determine if series is known to be in season, episode format
+        expect_ep = False
+        latest = self.get_latest_info(feed.session, series_name)
+        if latest:
+            log.debug('idiotic latest: %s' % latest)
+            if latest.get('season') and latest.get('episode'):
+                log.debug('Series %s seems to have been in "ep format"' % series_name)
+                expect_ep = True
+            
         # key: series (episode) identifier ie. S1E2
         # value: seriesparser
         series = {}
@@ -484,6 +497,7 @@ class FilterSeries(SeriesPlugin):
                 parser = SeriesParser()
                 parser.name = series_name
                 parser.data = data
+                parser.expect_ep = expect_ep
                 parser.ep_regexps = get_as_array(config, 'ep_regexp') + parser.ep_regexps
                 parser.id_regexps = get_as_array(config, 'id_regexp') + parser.id_regexps
                 # do not use builtin list for id when ep configigured and vice versa
@@ -499,7 +513,7 @@ class FilterSeries(SeriesPlugin):
                     log_once(pw.value, logger=log)
                     
                 if parser.valid:
-                    log.debug('Detected quality: %s from: %s' % (parser.quality, field))
+                    log.debug('Got valid %s' % parser)
                     self.parser2entry[parser] = entry
                     entry['series_parser'] = parser
                     break

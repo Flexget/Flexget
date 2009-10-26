@@ -129,3 +129,14 @@ class TestSeriesParser(object):
         s = self.parse(name='Foo Bar', data='Foo.Bar.Doppelganger.S02E04.HDTV.FlexGet')
         assert not s.valid, 'should not have parser Foo.Bar.Doppelganger'
         """
+
+    def test_idiotic_numbering(self):
+        """SeriesParser: idiotic 101, 102, 103, .. numbering"""
+        s = SeriesParser()
+        s.name = 'test'
+        s.data = 'Test.706.720p-FlexGet'
+        s.expect_ep = True
+        s.parse()
+        assert s.season == 7, 'didn''t pick up season'
+        assert s.episode == 6, 'didn''t pick up episode'
+

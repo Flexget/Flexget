@@ -34,14 +34,14 @@ class PluginTryRegexp:
         
         print '-'*79
         print 'Hi there, welcome to try regexps in realtime!'
-        print 'Press ^D or type \'exit\' to continue. Type \'abort\' to continue non-interactive execution.'
+        print 'Press ^D or type \'exit\' to continue. Type \'continue\' to continue non-interactive execution.'
         print 'Feed \'%s\' has %s entries, enter regexp to see what matches it.' % (feed.name, len(feed.entries))
         while (True):
             try:
                 s = raw_input('--> ')
                 if s=='exit': 
                     break
-                if s=='abort':
+                if s=='abort' or s=='continue':
                     self.abort = True
                     break
             except EOFError:
@@ -57,7 +57,7 @@ class PluginTryRegexp:
                 except:
                     print 'Invalid regular expression'
                     break
-            print '%s entries matched' % count
+            print '%s of %s entries matched' % (count, len(feed.entries))
         print 'Bye!'
 
 register_plugin(PluginTryRegexp, 'try_regexp', builtin=True)

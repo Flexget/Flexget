@@ -405,3 +405,29 @@ class TestQualities(FlexGetBase):
 
         assert not self.feed.find_entry('accepted', title='FooBar.S01E01.HR-FlexGet'), \
             'Accepted FooBar.S01E01.HR-FlexGet'
+
+
+class TestIdioticNumbering(FlexGetBase):
+
+    __yaml__ = """
+        global:
+          series:
+            - FooBar
+
+        feeds:
+          test_1:
+            input_mock:
+              - {title: 'FooBar.S01E01.PDTV-FlexGet'}
+          test_2:
+            input_mock:
+              - {title: 'FooBar.102.PDTV-FlexGet'}
+    """
+
+    def test_idiotic(self):
+        self.execute_feed('test_1')
+        self.execute_feed('test_2')
+        entry = self.feed.find_entry(title='FooBar.102.PDTV-FlexGet')
+        assert entry, 'entry not found?'
+        print entry
+        assert entry['series_season'] == 1, 'season not detected'
+        assert entry['series_episode'] == 2, 'episode not detected'
