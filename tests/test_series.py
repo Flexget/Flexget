@@ -431,3 +431,27 @@ class TestIdioticNumbering(FlexGetBase):
         print entry
         assert entry['series_season'] == 1, 'season not detected'
         assert entry['series_episode'] == 2, 'episode not detected'
+
+
+
+class TestCapitalization(FlexGetBase):
+
+    __yaml__ = """
+        feeds:
+          test_1:
+            input_mock:
+              - {title: 'FooBar.S01E01.PDTV-FlexGet'}
+            series:
+              - FOOBAR
+          test_2:
+            input_mock:
+              - {title: 'FooBar.S01E01.PDTV-FlexGet'}
+            series:
+              - foobar
+    """
+
+    def test_capitalization(self):
+        self.execute_feed('test_1')
+        assert self.feed.find_entry('accepted', title='FooBar.S01E01.PDTV-FlexGet')
+        self.execute_feed('test_2')
+        assert self.feed.find_entry('rejected', title='FooBar.S01E01.PDTV-FlexGet')

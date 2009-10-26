@@ -58,7 +58,7 @@ class SeriesPlugin(object):
     def get_first_seen(self, session, parser):
         """Return datetime when this episode of series was first seen"""
         episode = session.query(Episode).select_from(join(Episode, Series)).\
-            filter(Series.name == parser.name).filter(Episode.identifier == parser.identifier()).first()
+            filter(Series.name == parser.name.lower()).filter(Episode.identifier == parser.identifier()).first()
         return episode.first_seen
         
     def get_latest_info(self, session, name):
@@ -75,7 +75,7 @@ class SeriesPlugin(object):
     def get_releases(self, session, series_name, identifier):
         """Return all releases for series by identifier."""
         episode = session.query(Episode).select_from(join(Episode, Series)).\
-            filter(Series.name == series_name).\
+            filter(Series.name == series_name.lower()).\
             filter(Episode.identifier == identifier).first()
         if not episode:
             return []
@@ -88,7 +88,7 @@ class SeriesPlugin(object):
     def get_downloaded(self, session, name, identifier):
         """Return list of downloaded releases for this episode"""
         episode = session.query(Episode).select_from(join(Episode, Series)).\
-            filter(Series.name == name).\
+            filter(Series.name == name.lower()).\
             filter(Episode.identifier == identifier).first()
         if not episode:
             log.debug('episode does not exist')
@@ -102,7 +102,7 @@ class SeriesPlugin(object):
     def store(self, session, parser):
         """Push series information into database. Returns added/existing release."""
         # if series does not exist in database, add new
-        series = session.query(Series).filter(Series.name == parser.name).first()
+        series = session.query(Series).filter(Series.name == parser.name.lower()).first()
         if not series:
             log.debug('add series %s into database' % parser.name)
             series = Series()
@@ -164,7 +164,7 @@ class SeriesReport(SeriesPlugin):
         session = Session()
 
         name = _series['name'].lower()
-        series = session.query(Series).filter(Series.name == name).first()
+        series = session.query(Series).filter(Series.name == name.lower()).first()
         if not series:
             print 'Unknown series %s' % name
             return
@@ -199,13 +199,13 @@ class SeriesReport(SeriesPlugin):
 
             # get latest episode in episodic format
             episode = session.query(Episode).select_from(join(Episode, Series)).\
-                      filter(Series.name == series.name).filter(Episode.season != None).\
+                      filter(Series.name == series.name.lower()).filter(Episode.season != None).\
                       order_by(desc(Episode.season)).order_by(desc(Episode.number)).first()
 
             # no luck, try uid format
             if not episode:
                 episode = session.query(Episode).select_from(join(Episode, Series)).\
-                          filter(Series.name == series.name).filter(Episode.season == None).\
+                          filter(Series.name == series.name.lower()).filter(Episode.season == None).\
                           order_by(desc(Episode.first_seen)).first()
 
             latest = ''
@@ -265,7 +265,7 @@ class SeriesForget(object):
                 # remove by id
                 identifier = _series_forget.get('episode').upper()
                 if identifier and name:
-                    series = session.query(Series).filter(Series.name == name).first()
+                    series = session.query(Series).filter(Series.name == name.lower()).first()
                     if series:
                         episode = session.query(Episode).filter(Episode.identifier == identifier).first()
                         if episode:
@@ -278,7 +278,7 @@ class SeriesForget(object):
             else:
                 # remove whole series
                 series = session.query(Series).\
-                         filter(Series.name == name).first()
+                         filter(Series.name == name.lower()).first()
                 if series:
                     print 'Removed %s' % name
                     session.delete(series)
