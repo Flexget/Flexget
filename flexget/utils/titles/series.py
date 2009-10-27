@@ -121,7 +121,7 @@ class SeriesParser(TitleParser):
                 
         # TODO: matched name should be EXCLUDED from ep and id searching!
 
-        # search tags
+        # search tags and quality
         for part in data_parts:
             if part in self.qualities:
                 if self.qualities.index(part) < self.qualities.index(self.quality):
@@ -134,6 +134,9 @@ class SeriesParser(TitleParser):
                 self.proper_or_repack = True
             if part in self.specials:
                 self.special = True
+
+        # remove unwanted words (qualities and such) from data for ep / id parsing
+        data = self.remove_words(data, self.remove + self.qualities + self.codecs)
 
         # search for season and episode number
         for ep_re in self.ep_regexps:

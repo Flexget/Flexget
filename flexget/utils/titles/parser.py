@@ -1,3 +1,5 @@
+import re
+
 class ParseWarning(Warning):
     def __init__(self, value, **kwargs):
         self.value = value
@@ -18,6 +20,8 @@ class TitleParser(object):
     
     remove = ['imax']
 
+    codecs = ['x264', 'x.264', 'h264', 'h.264', 'XViD']
+
     def strip_spaces(self, text):
         """Removes all unnecessary duplicate spaces from a text"""
         s = text.strip()
@@ -25,3 +29,15 @@ class TitleParser(object):
             s = s.replace('  ', ' ')
 
         return s
+
+    def remove_words(self, text, words):
+        """Clean all given :words: from :text: case insensitivively"""
+        for word in words:
+            text = self.ireplace(text, word, '')
+        return text
+
+    def ireplace(self, str, old, new, count=0):
+        """Case insensitive string replace"""
+        pattern = re.compile(re.escape(old), re.I)
+        return re.sub(pattern, new, str, count)
+

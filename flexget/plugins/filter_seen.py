@@ -140,16 +140,19 @@ class FilterSeen(object):
     
     def learn(self, feed, entry, fields=[]):
         """Marks entry as seen"""
+        # no explicit fields given, use default
         if not fields:
             fields = self.fields
+        remembered = []
         for field in fields:
             if not field in entry:
                 continue
-            
+            if entry[field] in remembered:
+                continue
             seen = Seen(field, entry[field], feed.name)
             feed.session.add(seen)
-            
-            log.debug("Learned '%s' '%s' (field: %s)" % (entry['url'], entry['title'], field))
+            remembered.append(entry[field])
+            log.debug("Learned '%s' (field: %s)" % (entry[field], field))
                 
     def migrate(self, feed):
         """Migrates 0.9 session data into new database"""

@@ -481,9 +481,8 @@ class FilterSeries(SeriesPlugin):
         expect_ep = False
         latest = self.get_latest_info(feed.session, series_name)
         if latest:
-            log.debug('idiotic latest: %s' % latest)
             if latest.get('season') and latest.get('episode'):
-                log.debug('Series %s seems to have been in "ep format"' % series_name)
+                log.debug('enabling expect_ep for %s' % series_name)
                 expect_ep = True
             
         # key: series (episode) identifier ie. S1E2
@@ -513,7 +512,6 @@ class FilterSeries(SeriesPlugin):
                     log_once(pw.value, logger=log)
                     
                 if parser.valid:
-                    log.debug('Got valid %s' % parser)
                     self.parser2entry[parser] = entry
                     entry['series_parser'] = parser
                     break
@@ -526,7 +524,7 @@ class FilterSeries(SeriesPlugin):
             entry['series_episode'] = parser.episode
             entry['series_id'] = parser.id
             
-            # set custom download path TODO: Remove, replaced by set?
+            # set custom download path
             if 'path' in config:
                 log.debug('setting %s custom path to %s' % (entry['title'], config.get('path')))
                 entry['path'] = config.get('path')

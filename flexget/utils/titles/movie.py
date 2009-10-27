@@ -14,11 +14,6 @@ class MovieParser(TitleParser):
         self.year = None
         self.quality = 'unknown'
 
-    def _ireplace(self, str, old, new, count=0):
-        """Case insensitive string replace"""
-        pattern = re.compile(re.escape(old), re.I)
-        return re.sub(pattern, new, str, count)
-
     def parse(self):
 
         s = self.data
@@ -32,9 +27,8 @@ class MovieParser(TitleParser):
         if s.find(' ') == -1:
             s = s.replace('-', ' ')
 
-        # remove unwanted words
-        for word in self.remove:
-            s = self._ireplace(s, word, '')
+        # remove unwanted words (imax, ..)
+        self.remove_words(s, self.remove)
             
         s = self.strip_spaces(s)
 

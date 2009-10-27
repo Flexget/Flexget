@@ -6,8 +6,10 @@ class OptionParser(OptParser):
 
         self._unit_test = unit_test
 
+        self.add_option('-v', action='store_true', dest='details', default=0,
+                        help='Verbose process. Display entry accept and reject info.')
         self.add_option('--log-start', action='store_true', dest='log_start', default=0,
-                        help='Add FlexGet executions into a log.')
+                        help=SUPPRESS_HELP)
         self.add_option('--test', action='store_true', dest='test', default=0,
                         help='Verbose what would happend on normal execution.')
         self.add_option('--check', action='store_true', dest='validate', default=0,
@@ -30,8 +32,6 @@ class OptionParser(OptParser):
                         help='Clear recently failed list.')
         self.add_option('-c', action='store', dest='config', default='config.yml',
                         help='Specify configuration file. Default is config.yml')
-        self.add_option('-v', action='store_true', dest='details', default=0,
-                        help='Verbose more process information.')
         self.add_option('--cron', action='store_true', dest='quiet', default=False,
                         help='Disables stdout and stderr output, log file used. Reduces logging level slightly.')
 
