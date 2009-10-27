@@ -89,14 +89,22 @@ class Manager:
                     print ' o Indentation error'
                     print ' o Missing : from end of the line'
                     print ' o Non ASCII characters (use UTF8)'
-                    print ' o If text contains : or [] characters it must be quoted\n'
-                    try:
-                        if not e.context_mark is None:
-                            area = str(e.context_mark)[str(e.context_mark).find('line'):]
-                            print ' Check your configuration near %s' % area
-                            print ' Fault is almost always in this line or previous\n'
-                    except:
-                        pass
+                    print " o If text contains any of :[]{} characters it must be single-quoted ('')\n"
+                    lines = 0
+                    if not e.context_mark is None:
+                        print ' Check configuration near line %s, column %s' % (e.context_mark.line, e.context_mark.column)
+                        lines += 1
+                    if e.context_mark is not None:
+                        print ' Check configuration near line %s, column %s' % (e.problem_mark.line, e.problem_mark.column)
+                        lines += 1
+                    if lines:
+                        print ''
+                    if lines == 1:
+                        print ' Fault is almost always in this line or previous'
+                    if lines == 2:
+                        print ' Fault is almost always in one of these lines or previous ones\n'
+                    if self.options.debug:
+                        raise
                     sys.exit(1)
                 # config loaded successfully
                 self.config_name = os.path.splitext(os.path.basename(config))[0]
