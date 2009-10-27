@@ -80,7 +80,7 @@ class TestQuality(FlexGetBase):
         assert len(self.feed.accepted) == 1, 'should have accepted only one'
 
 
-class TestTracking(FlexGetBase):
+class TestDatabase(FlexGetBase):
     __yaml__ = """
         global:
           series:
@@ -95,15 +95,15 @@ class TestTracking(FlexGetBase):
               - {title: 'Some.Series.S01E20.720p.XViD-DoppelGanger'}
     """
 
-    def test_tracking(self):
+    def test_database(self):
         self.execute_feed('test_1')
         self.execute_feed('test_2')
         assert self.feed.find_entry('rejected', title='Some.Series.S01E20.720p.XViD-DoppelGanger'), \
-            'failed basic download tracking'
+            'failed basic download remembering'
 
 class TestFilterSeries(FlexGetBase):
 
-    # TODO: TOO LARGE
+    # TODO: still TOO LARGE, chop it down
     
     __yaml__ = """
         feeds:
@@ -111,8 +111,6 @@ class TestFilterSeries(FlexGetBase):
             input_mock:
               - {title: 'Some.Series.S01E20.720p.XViD-FlexGet'}
               - {title: 'Another.Series.S01E20.720p.XViD-FlexGet'}
-              - {title: 'Another.Series.S01E10.720p.XViD-FlexGet'}
-              - {title: 'Another.Series.S01E16.720p.XViD-FlexGet'}
               - {title: 'Another.Series.S01E21.1080p.H264-FlexGet'}
               - {title: 'Date.Series.10-11-2008.XViD'}
               - {title: 'Date.Series.10.12.2008.XViD'}
@@ -134,7 +132,6 @@ class TestFilterSeries(FlexGetBase):
               - empty description
             
     """
-    
 
     def test_smoke(self):
         """Series plugin: test several standard features"""
@@ -165,13 +162,50 @@ class TestFilterSeries(FlexGetBase):
         # chaining with regexp plugin
         assert self.feed.find_entry('rejected', title='Another.Series.S01E21.1080p.H264-FlexGet'), \
             'regexp rejection'
-        
-        # episode advancement (tracking)
-        assert self.feed.find_entry('rejected', title='Another.Series.S01E10.720p.XViD-FlexGet'), \
-            'Another.Series.S01E10.720p.XViD-FlexGet should be rejected due advancement'
-        assert self.feed.find_entry('accepted', title='Another.Series.S01E16.720p.XViD-FlexGet'), \
-            'Another.Series.S01E16.720p.XViD-FlexGet should have passed because of episode advancement grace magin'
 
+
+class TestEpisodeAdvancement(FlexGetBase):
+    __yaml__ = """
+        feeds:
+          test_simple:
+            input_mock:
+              - {title: 'foobar s01e12'}
+              - {title: 'foobar s01e10'}
+              - {title: 'foobar s01e01'}
+            series:
+              - foobar
+              
+          test_unordered:
+            input_mock:
+              - {title: 'zzz s01e05'}
+              - {title: 'zzz s01e06'}
+              - {title: 'zzz s01e07'}
+              - {title: 'zzz s01e08'}
+              - {title: 'zzz s01e09'}
+              - {title: 'zzz s01e10'}
+              - {title: 'zzz s01e15'}
+              - {title: 'zzz s01e14'}
+              - {title: 'zzz s01e13'}
+              - {title: 'zzz s01e12'}
+              - {title: 'zzz s01e11'}
+              - {title: 'zzz s01e01'}
+            series:
+              - zzz
+    """
+    
+    def test_simple(self):
+        self.execute_feed('test_simple')
+        assert self.feed.find_entry('accepted', title='foobar s01e12'), \
+            'foobar s01e12 should have been accepted'
+        assert self.feed.find_entry('accepted', title='foobar s01e10'), \
+            'foobar s01e10 should have been accepted within grace margin'
+        assert self.feed.find_entry('rejected', title='foobar s01e01'), \
+            'foobar s01e01 should have been rejected, too old'
+
+    def test_unordered(self):
+        self.execute_feed('test_unordered')
+        assert len(self.feed.accepted) == 12, \
+            'not everyone was accepted'
         
 class TestFilterSeriesPriority(FlexGetBase):
 
@@ -179,8 +213,8 @@ class TestFilterSeriesPriority(FlexGetBase):
         feeds:
           test:
             input_mock:
-              - {title: 'foobar 720p s01e01', url: 'http://localhost/1' }
-              - {title: 'foobar hdtv s01e01', url: 'http://localhost/2' }
+              - {title: 'foobar 720p s01e01'}
+              - {title: 'foobar hdtv s01e01'}
             regexp:
               reject:
                 - 720p
@@ -189,8 +223,8 @@ class TestFilterSeriesPriority(FlexGetBase):
     """    
 
     def test_priorities(self):
-        self.execute_feed('test')
         """Series plugin: regexp plugin is able to reject before series plugin"""
+        self.execute_feed('test')
         assert self.feed.find_entry('rejected', title='foobar 720p s01e01'), \
             'foobar 720p s01e01 should have been rejected'
         assert self.feed.find_entry('accepted', title='foobar hdtv s01e01'), \
@@ -431,7 +465,6 @@ class TestIdioticNumbering(FlexGetBase):
         print entry
         assert entry['series_season'] == 1, 'season not detected'
         assert entry['series_episode'] == 2, 'episode not detected'
-
 
 
 class TestCapitalization(FlexGetBase):

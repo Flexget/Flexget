@@ -81,6 +81,7 @@ def test(options):
         argv.extend(['--attr=!online'])
         
     argv.append('-v')
+    argv.append('--processes 2')
     
     nose.run(argv=argv, config=cfg)
 

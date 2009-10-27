@@ -20,7 +20,7 @@ def setup_once():
         initialize_logging(True)
         parser = OptionParser(True)
         load_plugins(parser)
-        test_options = parser.parse_args()[0]
+        test_options = parser.parse_args()[0] # uhh, this is required by how?
         plugins_loaded = True
 
 class MockManager(Manager):
@@ -28,18 +28,24 @@ class MockManager(Manager):
     def __init__(self, config_text, config_name):
         self.config_text = config_text
         self.config_name = config_name
+        self.config = None
+        self.config_base = None
         Manager.__init__(self, test_options)
 
     def load_config(self):
         try:
             self.config = yaml.safe_load(self.config_text)
             self.config_base = os.path.dirname(os.path.abspath(sys.path[0]))
-        except Exception, e:
+        except Exception:
             print 'Invalid configuration'
             raise
 
 class FlexGetBase(object):
     __yaml__ = """# Yaml goes here"""
+
+    def __init__(self):
+        self.manager = None
+        self.feed = None
 
     def setup(self):
         """Set up test env"""
@@ -51,7 +57,8 @@ class FlexGetBase(object):
             self.feed.session.close()
         except:
             pass
-        
+
+    # backwards compatibility, remove once all test are converted
     setUp = setup
     tearDown = teardown
 
@@ -84,93 +91,6 @@ class FlexGetBase(object):
         #print yaml.safe_dump(rejected)
         print self.feed.rejected
 
-class TestRegexp(FlexGetBase):
-
-    __yaml__ = """
-        global:
-          input_mock:
-            - {title: 'regexp1', 'imdb_score': 5}
-            - {title: 'regexp2', 'bool_attr': true}
-            - {title: 'regexp3', 'imdb_score': 5}
-            - {title: 'regexp4', 'imdb_score': 5}
-            - {title: 'regexp5', 'imdb_score': 5}
-            - {title: 'regexp6', 'imdb_score': 5}
-            - {title: 'regexp7', 'imdb_score': 5}
-            - {title: 'regexp8', 'imdb_score': 5}
-            - {title: 'regexp9', 'imdb_score': 5}
-          seen: false
-
-
-        feeds:
-          # test accepting, setting custom path (both ways), test not (secondary regexp)
-          test_accept:
-            regexp:
-              accept:
-                - regexp1
-                - regexp2: ~/custom_path/2/
-                - regexp3:
-                    path: ~/custom_path/3/
-                - regexp4:
-                    not:
-                      - exp4
-                      
-          # test rejecting        
-          test_reject:
-            regexp:
-              reject:
-                - regexp1
-                
-          # test rest
-          test_rest:
-            regexp:
-              accept:
-                - regexp1
-              rest: reject
-              
-              
-          # test excluding
-          test_excluding:
-            regexp:
-              accept_excluding:
-                - regexp1
-                
-          # test from
-          test_from:
-            regexp:
-              accept:
-                - localhost:
-                    from:
-                      - title
-    """
-    def test_accept(self):
-        self.execute_feed('test_accept')
-        assert self.feed.find_entry('accepted', title='regexp1'), 'regexp1 should have been accepted'
-        assert self.feed.find_entry('accepted', title='regexp2'), 'regexp2 should have been accepted'
-        assert self.feed.find_entry('accepted', title='regexp3'), 'regexp3 should have been accepted'
-        assert self.feed.find_entry('entries', title='regexp4'), 'regexp4 should have been left'
-        assert self.feed.find_entry('accepted', title='regexp2', path='~/custom_path/2/'), 'regexp2 should have been accepter with custom path'
-        assert self.feed.find_entry('accepted', title='regexp3', path='~/custom_path/3/'), 'regexp3 should have been accepter with custom path'
-            
-    def test_reject(self):
-        self.execute_feed('test_reject')
-        assert self.feed.find_entry('rejected', title='regexp1'), 'regexp1 should have been rejected'
-
-    def test_rest(self):
-        self.execute_feed('test_rest')
-        assert self.feed.find_entry('accepted', title='regexp1'), 'regexp1 should have been accepted'
-        assert self.feed.find_entry('rejected', title='regexp3'), 'regexp3 should have been rejected'
-            
-    def test_excluding(self):
-        self.execute_feed('test_excluding')
-        assert not self.feed.find_entry('accepted', title='regexp1'), 'regexp1 should not have been accepted'
-        assert self.feed.find_entry('accepted', title='regexp2'), 'regexp2 should have been accepted'
-        assert self.feed.find_entry('accepted', title='regexp3'), 'regexp3 should have been accepted'
-
-    def test_from(self):
-        self.execute_feed('test_from')
-        assert not self.feed.accepted, 'should not have accepted anything'
-        
-
 class TestDisableBuiltins(FlexGetBase):
     """
         Quick a hack, test disable functionality by checking if seen filtering (builtin) is working
@@ -195,7 +115,6 @@ class TestDisableBuiltins(FlexGetBase):
     def test_disable_builtins(self):
         self.execute_feed('test')
         assert self.feed.find_entry(title='dupe1') and self.feed.find_entry(title='dupe2'), 'disable_builtins is not working?'
-
 
         
 class TestInputHtml(FlexGetBase):
@@ -270,14 +189,20 @@ class TestDownload(FlexGetBase):
         feeds:
           test:
             input_mock:
-              - {title: 'README', url: 'http://svn.flexget.com/trunk/bootstrap.py', 'filename': 'flexget_test_data'}
+              - title: README
+                url: http://svn.flexget.com/trunk/bootstrap.py
+                filename: flexget_test_data
             accept_all: true
             download: 
               path: ~/
               fail_html: no
     """
+
+    def __init__(self):
+        self.testfile = None
+        FlexGetBase.__init__(self)
     
-    def tearDown(self):
+    def teardown(self):
         FlexGetBase.tearDown(self)
         if hasattr(self, 'testfile') and os.path.exists(self.testfile):
             os.remove(self.testfile)
@@ -287,7 +212,9 @@ class TestDownload(FlexGetBase):
 
     @attr(online=True)
     def test_download(self):
-        self.testfile = os.path.expanduser('~/flexget_test_data.ksh') # note: what the hell is .ksh and where it comes from?
+        # NOTE: what the hell is .ksh and where it comes from?
+        # Re: seems to come from python mimetype detection in download plugin ...
+        self.testfile = os.path.expanduser('~/flexget_test_data.ksh') 
         if os.path.exists(self.testfile):
             os.remove(self.testfile)
         # executes feed and downloads the file

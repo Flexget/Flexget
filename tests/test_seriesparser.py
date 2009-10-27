@@ -120,6 +120,18 @@ class TestSeriesParser(object):
         s.name = 'Something'
         s.data = 'Something S02 Pack 720p WEB-DL-FlexGet'
         assert_raises(ParseWarning, s.parse)
+        
+        s = SeriesParser()
+        s.name = 'The Foo'
+        s.expect_ep = False
+        s.data = 'The Foo S05 720p BluRay DTS x264-FlexGet'
+        assert_raises(ParseWarning, s.parse)
+        
+        s = SeriesParser()
+	s.name = 'The Foo'
+	s.expect_ep = True
+	s.data = 'The Foo S05 720p BluRay DTS x264-FlexGet'
+        assert_raises(ParseWarning, s.parse)
 
     def _test_similar(self):
         pass

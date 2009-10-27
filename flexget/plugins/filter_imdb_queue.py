@@ -1,8 +1,9 @@
 import logging
+import datetime
+from flexget.manager import Session
 from flexget.plugin import *
 from flexget.manager import Base
 from sqlalchemy import Column, Integer, String, DateTime, Boolean
-import datetime
 from flexget.utils.imdb import extract_id
 
 log = logging.getLogger('imdb_queue')
@@ -24,7 +25,7 @@ class ImdbQueue(Base):
         self.added = datetime.datetime.now()
 
     def __str__(self):
-        return '<ImdbQueue(%s qual %s)>' % (self.imdb_id, self.quality)
+        return '<ImdbQueue(imdb_id=%s,quality=%s)>' % (self.imdb_id, self.quality)
 
 _imdb_queue = {}
 def optik_imdb_queue(option, opt, value, parser):
@@ -88,7 +89,8 @@ class FilterImdbQueue:
                     log.warning("No quality found for %s, skipping..." % entry['title'])
                     continue
 
-                item = feed.session.query(ImdbQueue).filter(ImdbQueue.imdb_id == imdb_id).filter(ImdbQueue.quality == entry['quality']).first()
+                item = feed.session.query(ImdbQueue).filter(ImdbQueue.imdb_id == imdb_id).\
+                                                     filter(ImdbQueue.quality == entry['quality']).first()
                 if item:
                     log.info("Accepting %s from queue with quality %s" % (entry['title'], entry['quality']))
                     # entry is in the database, accept over all other filters
@@ -98,8 +100,6 @@ class FilterImdbQueue:
                     feed.session.delete(item)
                 else:
                     log.debug("%s not in queue, skipping" % entry['title'])
-
-            feed.session.commit()
             
 class ImdbQueueManager:
     """
@@ -130,13 +130,10 @@ class ImdbQueueManager:
             
         if action == 'add':            
             self.queue_add(_imdb_queue)
-            return
         elif action == 'del':
             self.queue_del(_imdb_queue)
-            return
         elif action == 'list':
             self.queue_list()
-            return
 
     def error(self, msg):
         print "IMDb Queue error: %s" % msg
@@ -153,7 +150,6 @@ class ImdbQueueManager:
             print 'Unknown quality: %s' % quality
             return
 
-        from flexget.manager import Session
         session = Session()
 
         # check if the item is already queued
@@ -167,13 +163,11 @@ class ImdbQueueManager:
             log.info("%s is already in the queue" % imdb_id)
 
 
-
     def queue_del(self, queue_item):
         """Delete the given item from the queue"""
 
         imdb_id = extract_id(queue_item['imdb_url'])
 
-        from flexget.manager import Session
         session = Session()
 
         # check if the item is already queued
@@ -188,13 +182,10 @@ class ImdbQueueManager:
     def queue_list(self):
         """List IMDb queue"""
 
-        from flexget.manager import Session
         session = Session()            
 
         items = session.query(ImdbQueue)
-
         found = False
-
         for item in items:
             found = True
             # TODO: Pretty printing
