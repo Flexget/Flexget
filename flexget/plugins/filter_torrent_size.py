@@ -11,14 +11,18 @@ class FilterTorrentSize:
         torrent_size:
           min: 12
           max: 1200
+          strict: yes
 
         Unit is MB
+        Optional strict flag will cause all non-torrents to be rejected.
+        
     """
     def validator(self):
         from flexget import validator
         config = validator.factory('dict')
         config.accept('number', key='min')
         config.accept('number', key='max')
+        config.accept('boolean', keys='strict')
         return config
 
     def on_feed_modify(self, feed):
@@ -43,6 +47,8 @@ class FilterTorrentSize:
                 if rejected:
                     get_plugin_by_name('seen').instance.learn(feed, entry)
             else:
+                if config.get('strict', False):
+                    feed.reject(entry, 'not a torrent')
                 log.debug('Entry %s is not a torrent' % entry['title'])
 
 register_plugin(FilterTorrentSize, 'torrent_size')
