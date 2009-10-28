@@ -116,6 +116,14 @@ class TestSeriesParser(object):
 
     def test_ignore_seasonpacks(self):
         """SeriesParser: ignoring season packs"""
+        """
+        s = SeriesParser()
+	s.name = 'The Foo'
+	s.expect_ep = False
+	s.data = 'The.Foo.S04.1080p.FlexGet.5.1'
+        assert_raises(ParseWarning, s.parse)
+        """
+
         s = SeriesParser()
         s.name = 'Something'
         s.data = 'Something S02 Pack 720p WEB-DL-FlexGet'

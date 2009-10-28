@@ -67,6 +67,7 @@ class SeriesPlugin(object):
             filter(Episode.season != None).filter(Series.name == name.lower()).\
             order_by(desc(Episode.season)).order_by(desc(Episode.number)).first()
         if not episode:
+            log.debug('get_latest_info: no info available')
             return False
         log.debug('get_latest_info, series: %s season: %s episode: %s' % \
             (name, episode.season, episode.number))
@@ -477,18 +478,21 @@ class FilterSeries(SeriesPlugin):
                     return 1
             return cmp(index(a), index(b))
             
-        # determine if series is known to be in season, episode format
-        expect_ep = False
-        latest = self.get_latest_info(feed.session, series_name)
-        if latest:
-            if latest.get('season') and latest.get('episode'):
-                log.debug('enabling expect_ep for %s' % series_name)
-                expect_ep = True
-            
         # key: series (episode) identifier ie. S1E2
         # value: seriesparser
         series = {}
         for entry in feed.entries:
+
+            # determine if series is known to be in season, episode format
+            # note: inside the loop for better handling multiple new eps
+            # ie. after first season, episode release we stick with expect_ep
+            expect_ep = False
+            latest = self.get_latest_info(feed.session, series_name)
+            if latest:
+                if latest.get('season') and latest.get('episode'):
+                    log.debug('enabling expect_ep for %s' % series_name)
+                    expect_ep = True
+
             for field, data in sorted(entry.items(), cmp=field_order):
                 # skip invalid fields
                 if not isinstance(data, basestring) or not data: 
