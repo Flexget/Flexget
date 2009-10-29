@@ -22,7 +22,7 @@ class FilterTorrentSize:
         config = validator.factory('dict')
         config.accept('number', key='min')
         config.accept('number', key='max')
-        config.accept('boolean', keys='strict')
+        config.accept('boolean', key='strict')
         return config
 
     def on_feed_modify(self, feed):
