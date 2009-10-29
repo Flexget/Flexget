@@ -30,7 +30,7 @@ class FilterTorrentSize:
             log.info('plugin is disabled in test mode as size information is not available')
             return
         config = feed.config['torrent_size']
-        for entry in feed.accepted:
+        for entry in feed.accepted + feed.entries:
             if 'torrent' in entry:
                 size = entry['torrent'].get_size() / 1024 / 1024
                 log.debug('%s size: %s MB' % (entry['title'], size))
