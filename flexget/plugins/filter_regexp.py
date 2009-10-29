@@ -1,4 +1,6 @@
-import urllib, logging, re
+import urllib
+import logging
+import re
 from flexget.plugin import *
 
 log = logging.getLogger('regexp')
@@ -89,7 +91,7 @@ class FilterRegexp:
                 rest_method(entry)
         
     def matches(self, entry, regexp, find_from=[]):
-        """Return True if any of the entry string fields match given regexp"""
+        """Of any of the entry string fields match given regexp, return the field name. None otherwise."""
         unquote = ['url']
         for field, value in entry.iteritems():
             if not isinstance(value, basestring):
@@ -100,7 +102,8 @@ class FilterRegexp:
             if field in unquote:
                 value = urllib.unquote(value)
             if re.search(regexp, value, re.IGNORECASE|re.UNICODE):
-                return True
+                return field
+        return None
 
     def filter(self, feed, match_method, non_match_method, regexps):
         """
@@ -136,7 +139,8 @@ class FilterRegexp:
                         path = value
 
                 # check if entry matches given regexp
-                if self.matches(entry, regexp_raw, from_fields):
+                field = self.matches(entry, regexp_raw, from_fields)
+                if field:
                     match = True
                     # if we have secondary (not) regexps, test them
                     for secondary_re in secondary:
@@ -155,7 +159,7 @@ class FilterRegexp:
                     
             if match:
                 if match_method:
-                    match_method(entry)
+                    match_method(entry, '%s matched to %s' % (regexp_raw, field))
                 else:
                     rest.append(entry)
             else:
