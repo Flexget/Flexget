@@ -146,10 +146,13 @@ def release(args):
     import os
     import shutil
     dest = '/var/www/flexget_dist/unstable/'
-    for name in os.listdir('dist'):
-        if os.path.exists(os.path.join(dest, name)):
-            print 'Skipped copying %s, destination already exists' % name
-        shutil.copy(os.path.join('dist', name), os.path.join(dest, name))
+    for sname in os.listdir('dist'):
+        dname_base = sname[:-9]
+        for py in ['py2.5.egg', 'py2.6.egg']:
+            dname = dname_base + py
+            if os.path.exists(os.path.join(dest, dname)):
+                print 'Skipped copying %s, destination already exists' % dname
+            shutil.copy(os.path.join('dist', sname), os.path.join(dest, dname))
 
     # restore version ...
     freplace('flexget/__init__.py', "__version__ = '%s'" % ver, "__version__ = '{subversion}'")
