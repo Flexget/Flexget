@@ -101,27 +101,6 @@ class TestDatabase(FlexGetBase):
         assert self.feed.find_entry('rejected', title='Some.Series.S01E20.720p.XViD-DoppelGanger'), \
             'failed basic download remembering'
 
-class TestDatabaseWithSpace(FlexGetBase):
-    __yaml__ = """
-        global:
-          series:
-            - some series
-
-        feeds:
-          test_1:
-            input_mock:
-              - {title: 'SomeSeries.S01E20.720p.XViD-FlexGet'}
-          test_2:
-            input_mock:
-              - {title: 'SomeSeries.S01E20.720p.XViD-DoppelGanger'}
-    """
-
-    def test_database(self):
-        self.execute_feed('test_1')
-        self.execute_feed('test_2')
-        assert self.feed.find_entry('rejected', title='Some.Series.S01E20.720p.XViD-DoppelGanger'), \
-            'failed basic download remembering with whitespace'
-
 class TestFilterSeries(FlexGetBase):
 
     # TODO: still TOO LARGE, chop it down
