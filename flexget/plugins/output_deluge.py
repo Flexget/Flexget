@@ -214,6 +214,7 @@ class OutputDeluge:
 
             def on_complete(result):
                 def on_disconnect(result):
+                    log.debug('Stopping twisted reactor. result: %s' % result)
                     reactor.stop()
                 client.disconnect().addCallback(on_disconnect).addErrback(on_disconnect)
             defer.DeferredList(dlist).addCallback(on_complete)
