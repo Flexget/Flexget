@@ -77,29 +77,6 @@ class FilterImdbQueue:
                 else:
                     log.debug("%s not in queue, skipping" % entry['title'])
 
-_imdb_queue = {}
-def optik_imdb_queue(option, opt, value, parser):
-    """
-    Callback for Optik
-    --imdb-queue (add|del|list) IMDB-URL [quality]
-    """
-    if len(parser.rargs) == 0:
-        print "Usage: --imdb-queue (add|del|list) [IMDB_URL|NAME] [QUALITY]"
-        return
-
-    _imdb_queue['action'] = parser.rargs[0].lower()
-
-    if len(parser.rargs) == 1:
-        return
-    # more than 2 args, we've got quality
-    if len(parser.rargs) >= 2:
-        _imdb_queue['what'] = parser.rargs[1]
-
-    if len(parser.rargs) >= 3:
-        _imdb_queue['quality'] = parser.rargs[2]
-    else:
-        _imdb_queue['quality'] = 'dvd' # TODO: Get defaul from config somehow?
-
 class ImdbQueueManager:
     """
     Handle IMDb queue management; add, delete and list
@@ -107,57 +84,84 @@ class ImdbQueueManager:
 
     valid_actions = ['add', 'del', 'list']
 
+    options = {}
+
+    @staticmethod
+    def optik_imdb_queue(option, opt, value, parser):
+        """
+        Callback for Optik
+        --imdb-queue (add|del|list) IMDB-URL [quality]
+        """
+        if len(parser.rargs) == 0:
+            print 'Usage: --imdb-queue (add|del|list) [IMDB_URL|NAME] [QUALITY]'
+            return
+
+        ImdbQueueManager.options['action'] = parser.rargs[0].lower()
+
+        if len(parser.rargs) == 1:
+            return
+        # more than 2 args, we've got quality
+        if len(parser.rargs) >= 2:
+            ImdbQueueManager.options['what'] = parser.rargs[1]
+
+        if len(parser.rargs) >= 3:
+            ImdbQueueManager.options['quality'] = parser.rargs[2]
+        else:
+            ImdbQueueManager.options['quality'] = 'dvd' # TODO: Get defaul from config somehow?
+
+
     def on_process_start(self, feed):
         """
         Handle IMDb queue management
         """
         
-        if not _imdb_queue:
+        if not self.options:
             return
 
         feed.manager.disable_feeds()
 
-        action = _imdb_queue['action']
+        action = self.options['action']
         if action not in self.valid_actions:
-            self.error("Invalid action, valid actions are: " + ", ".join(self.valid_actions))
+            self.error('Invalid action, valid actions are: ' + ', '.join(self.valid_actions))
             return
 
         # all actions except list require imdb_url to work
-        if action != 'list' and not 'what' in _imdb_queue:
-            self.error("No URL given")
+        if action != 'list' and not 'what' in self.options:
+            self.error('No URL given')
             return
             
         if action == 'add':            
-            self.queue_add(_imdb_queue)
+            self.queue_add()
         elif action == 'del':
-            self.queue_del(_imdb_queue)
+            self.queue_del()
         elif action == 'list':
             self.queue_list()
 
     def error(self, msg):
-        print "IMDb Queue error: %s" % msg
+        print 'IMDb Queue error: %s' % msg
 
-    def queue_add(self, queue_item):
+    def queue_add(self):
         """Add an item to the queue with the specified quality"""
 
-        imdb_id = extract_id(queue_item['what'])
+        imdb_id = extract_id(self.options['what'])
 
         if not imdb_id:
             # try to do imdb search
-            print 'Searching imdb for %s' % queue_item['what']
+            print 'Searching imdb for %s' % self.options['what']
             search = ImdbSearch()
-            result = search.smart_match(queue_item['what'])
+            result = search.smart_match(self.options['what'])
             if not result:
                 print 'Unable to find any such movie from imdb, use imdb url instead.'
                 return
             imdb_id = extract_id(result['url'])
 
-        quality = queue_item['quality']
+        quality = self.options['quality']
 
         # Check that the quality is valid
         from flexget.utils.titles.parser import TitleParser
         if quality not in TitleParser.qualities:
             print 'Unknown quality: %s' % quality
+            print 'Recognized qualities are %s' % ', '.join(TitleParser.qualities)
             return
 
         session = Session()
@@ -173,10 +177,10 @@ class ImdbQueueManager:
             log.info("%s is already in the queue" % imdb_id)
 
 
-    def queue_del(self, queue_item):
+    def queue_del(self):
         """Delete the given item from the queue"""
 
-        imdb_id = extract_id(queue_item['what'])
+        imdb_id = extract_id(self.options['what'])
 
         session = Session()
 
@@ -185,9 +189,9 @@ class ImdbQueueManager:
         if item:
             session.delete(item)
             session.commit()
-            print "Deleted %s from queue" % (imdb_id)
+            print 'Deleted %s from queue' % (imdb_id)
         else:
-            log.info("%s is not in the queue" % imdb_id)
+            log.info('%s is not in the queue' % imdb_id)
 
     def queue_list(self):
         """List IMDb queue"""
@@ -199,13 +203,13 @@ class ImdbQueueManager:
         for item in items:
             found = True
             # TODO: Pretty printing
-            print "http://www.imdb.com/title/"+item.imdb_id, item.quality
+            print 'http://www.imdb.com/title/' + item.imdb_id, item.quality
 
         if not found:
-            print "IMDb queue is empty"
+            print 'IMDb queue is empty'
                 
 register_plugin(FilterImdbQueue, 'imdb_queue', priorities={'filter': 129})
 register_plugin(ImdbQueueManager, 'imdb_queue_manager', builtin=True)
 
-register_parser_option('--imdb-queue', action='callback', callback=optik_imdb_queue,
+register_parser_option('--imdb-queue', action='callback', callback=ImdbQueueManager.optik_imdb_queue,
                        help='(add|del|list) [IMDB_URL] [QUALITY]')
