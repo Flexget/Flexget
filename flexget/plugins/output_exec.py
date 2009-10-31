@@ -28,7 +28,10 @@ class OutputExec:
             log.debug('executing cmd: %s' % cmd)
             p = subprocess.Popen(cmd, shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, close_fds=True)
             (r, w) = (p.stdout, p.stdin)
+            response = r.read()
             r.close()
             w.close()
+            if response:
+                log.info('Stdout: %s' % response)
 
 register_plugin(OutputExec, 'exec')

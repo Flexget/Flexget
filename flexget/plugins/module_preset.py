@@ -11,7 +11,7 @@ class PluginPreset:
         
         preset: movies
         
-        Example 2:
+        Example, list of presets:
         
         preset:
           - movies
@@ -64,8 +64,50 @@ class PluginPreset:
                 merge_dict_from_to(feed.manager.config[preset], feed.config)
             except MergeException:
                 raise PluginError('Failed to merge preset %s to feed %s, incompatible datatypes' % (preset, feed.name))
+                
+class DisablePlugin:
+    """
+	Allows disabling plugins when using presets.
+
+	Example:
+
+        movies:
+          download: ~/torrents/movies/
+          .
+          .
+
+        feeds:
+          nzbs:
+            preset: movies
+            disable_plugin:
+              - download
+            sabnzbd:
+              .
+              .
+
+        Feed nzbs uses all other configuration from preset movies but removes the download plugin
+    """
+    
+    def validator(self):
+        from flexget import validator
+	root = validator.factory()
+	root.accept('text')
+	presets = root.accept('list')
+	presets.accept('text')
+	return root
+    
+    def on_feed_start(self, feed):
+        config = feed.config['disable']
+	if isinstance(config, basestring):
+	    config = [config]
+	# let's disable them
+	for disable in config:
+	    if disable in feed.config:
+		log.debug('disabling %s' % disable)
+		del(feed.config[disable])
 
 register_plugin(PluginPreset, 'preset', builtin=True, priorities={'start': 255})
+register_plugin(DisablePlugin, 'disable_plugin', priorities={'start': 250})
 
 
 register_parser_option('--preset', action='store', dest='preset', default=False,
