@@ -104,7 +104,7 @@ class OutputDeluge:
 
             path = entry.get('path', config['path'])
             if path:
-                opts['download_location'] = path % entry
+                opts['download_location'] = os.path.expanduser(path % entry)
             
             # check that file is downloaded
             if not 'file' in entry:
@@ -137,7 +137,7 @@ class OutputDeluge:
                     if movedone:
                         log.debug("%s move on complete set to %s" % (entry['title'], movedone % entry))
                         sclient.set_torrent_move_on_completed(item, True)
-                        sclient.set_torrent_move_on_completed_path(item, movedone % entry)
+                        sclient.set_torrent_move_on_completed_path(item, os.path.expanduser(movedone % entry))
                     if label:
                         if not "label" in sclient.get_enabled_plugins():
                             sclient.enable_plugin("label")
@@ -169,16 +169,16 @@ class OutputDeluge:
                     log.info("%s is already loaded in deluge, cannot set movedone, label, or queuetotop." % entry['title'])
                     return
                 log.info("%s successfully added to deluge." % entry['title'])
-                movedone = entry.get('movedone', config['movedone']) % entry
+                movedone = os.path.expanduser(entry.get('movedone', config['movedone']) % entry)
                 label = entry.get('label', config['label']).lower()
                 queuetotop = entry.get('queuetotop', config['queuetotop'])
                 if movedone:
                     if not os.path.isdir(movedone):
                         log.debug("movedone path %s doesn't exist, creating" % movedone)
                         os.mkdir(movedone)
-                    log.debug("%s move on complete set to %s" % (entry['title'], movedone % entry))
+                    log.debug("%s move on complete set to %s" % (entry['title'], movedone))
                     client.core.set_torrent_move_completed(torrent_id, True)
-                    client.core.set_torrent_move_completed_path(torrent_id, movedone % entry)
+                    client.core.set_torrent_move_completed_path(torrent_id, movedone)
                 if label:
                     # TODO: check if label plugin is enabled
                     client.label.add(label)
@@ -196,7 +196,7 @@ class OutputDeluge:
                 opts = {}
                 path = entry.get('path', config['path'])
                 if path:
-                    opts['download_location'] = path % entry
+                    opts['download_location'] = os.path.expanduser(path % entry)
                 # see that temp file is present
                 if not os.path.exists(entry['file']):
                     tmp_path = os.path.join(feed.manager.config_base, 'temp')
