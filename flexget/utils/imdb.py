@@ -1,4 +1,3 @@
-import parser
 import difflib
 import urllib
 import urllib2
@@ -199,6 +198,9 @@ class ImdbParser:
         self.name = None
         self.url = None
         self.imdb_id = None
+
+    def __str__(self):
+        return '<ImdbParser(name=%s,imdb_id=%s)>' % (self.name, self.imdb_id)
     
     def parse(self, url):
         self.url = url

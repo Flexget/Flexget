@@ -4,7 +4,7 @@ from flexget.manager import Session
 from flexget.plugin import *
 from flexget.manager import Base
 from sqlalchemy import Column, Integer, String, DateTime, Boolean
-from flexget.utils.imdb import extract_id
+from flexget.utils.imdb import extract_id, ImdbSearch
 
 log = logging.getLogger('imdb_queue')
 
@@ -26,29 +26,6 @@ class ImdbQueue(Base):
 
     def __str__(self):
         return '<ImdbQueue(imdb_id=%s,quality=%s)>' % (self.imdb_id, self.quality)
-
-_imdb_queue = {}
-def optik_imdb_queue(option, opt, value, parser):
-    """
-    Callback for Optik
-    --imdb-queue (add|del|list) IMDB-URL [quality]
-    """
-    if len(parser.rargs) == 0:
-        print "Usage: --imdb-queue (add|del|list) [IMDB_URL] [QUALITY]"
-        return
-
-    _imdb_queue['action'] = parser.rargs[0].lower()
-    
-    if len(parser.rargs) == 1:
-        return
-    # more than 2 args, we've got quality
-    if len(parser.rargs) >= 2:
-        _imdb_queue['imdb_url'] = parser.rargs[1]
-
-    if len(parser.rargs) >= 3:
-        _imdb_queue['quality'] = parser.rargs[2]
-    else:
-        _imdb_queue['quality'] = 'dvd' # TODO: Get defaul from config somehow?
 
 class FilterImdbQueue:
     """
@@ -78,7 +55,6 @@ class FilterImdbQueue:
                 if 'imdb_id' in entry and entry['imdb_id'] != None:
                     imdb_id = entry['imdb_id']
                 else:
-                    log.debug("Entry has no ID, calculating...")
                     imdb_id = extract_id(entry['imdb_url'])
 
                 if not imdb_id: 
@@ -100,7 +76,30 @@ class FilterImdbQueue:
                     feed.session.delete(item)
                 else:
                     log.debug("%s not in queue, skipping" % entry['title'])
-            
+
+_imdb_queue = {}
+def optik_imdb_queue(option, opt, value, parser):
+    """
+    Callback for Optik
+    --imdb-queue (add|del|list) IMDB-URL [quality]
+    """
+    if len(parser.rargs) == 0:
+        print "Usage: --imdb-queue (add|del|list) [IMDB_URL|NAME] [QUALITY]"
+        return
+
+    _imdb_queue['action'] = parser.rargs[0].lower()
+
+    if len(parser.rargs) == 1:
+        return
+    # more than 2 args, we've got quality
+    if len(parser.rargs) >= 2:
+        _imdb_queue['what'] = parser.rargs[1]
+
+    if len(parser.rargs) >= 3:
+        _imdb_queue['quality'] = parser.rargs[2]
+    else:
+        _imdb_queue['quality'] = 'dvd' # TODO: Get defaul from config somehow?
+
 class ImdbQueueManager:
     """
     Handle IMDb queue management; add, delete and list
@@ -113,18 +112,18 @@ class ImdbQueueManager:
         Handle IMDb queue management
         """
         
-        if not _imdb_queue: return
+        if not _imdb_queue:
+            return
 
         feed.manager.disable_feeds()
 
         action = _imdb_queue['action']
-
         if action not in self.valid_actions:
             self.error("Invalid action, valid actions are: " + ", ".join(self.valid_actions))
             return
 
         # all actions except list require imdb_url to work
-        if action != 'list' and not 'imdb_url' in _imdb_queue:
+        if action != 'list' and not 'what' in _imdb_queue:
             self.error("No URL given")
             return
             
@@ -141,7 +140,18 @@ class ImdbQueueManager:
     def queue_add(self, queue_item):
         """Add an item to the queue with the specified quality"""
 
-        imdb_id = extract_id(queue_item['imdb_url'])
+        imdb_id = extract_id(queue_item['what'])
+
+        if not imdb_id:
+            # try to do imdb search
+            print 'Searching imdb for %s' % queue_item['what']
+            search = ImdbSearch()
+            result = search.smart_match(queue_item['what'])
+            if not result:
+                print 'Unable to find any such movie from imdb, use imdb url instead.'
+                return
+            imdb_id = extract_id(result['url'])
+
         quality = queue_item['quality']
 
         # Check that the quality is valid
@@ -166,7 +176,7 @@ class ImdbQueueManager:
     def queue_del(self, queue_item):
         """Delete the given item from the queue"""
 
-        imdb_id = extract_id(queue_item['imdb_url'])
+        imdb_id = extract_id(queue_item['what'])
 
         session = Session()
 
