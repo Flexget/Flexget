@@ -175,7 +175,7 @@ class OutputDeluge:
                 if movedone:
                     if not os.path.isdir(movedone):
                         log.debug("movedone path %s doesn't exist, creating" % movedone)
-                        os.mkdir(movedone)
+                        os.makedirs(movedone)
                     log.debug("%s move on complete set to %s" % (entry['title'], movedone))
                     client.core.set_torrent_move_completed(torrent_id, True)
                     client.core.set_torrent_move_completed_path(torrent_id, movedone)
