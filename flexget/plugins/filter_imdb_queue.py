@@ -127,7 +127,7 @@ class ImdbQueueManager:
 
         # all actions except list require imdb_url to work
         if action != 'list' and not 'what' in self.options:
-            self.error('No URL given')
+            self.error('No URL or NAME given')
             return
             
         if action == 'add':            

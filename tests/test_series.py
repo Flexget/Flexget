@@ -103,13 +103,10 @@ class TestDatabase(FlexGetBase):
 
 class TestFilterSeries(FlexGetBase):
 
-    # TODO: still TOO LARGE, chop it down
-    
     __yaml__ = """
         feeds:
           test:
             input_mock:
-              - {title: 'Some.Series.S01E20.720p.XViD-FlexGet'}
               - {title: 'Another.Series.S01E20.720p.XViD-FlexGet'}
               - {title: 'Another.Series.S01E21.1080p.H264-FlexGet'}
               - {title: 'Date.Series.10-11-2008.XViD'}
@@ -118,30 +115,22 @@ class TestFilterSeries(FlexGetBase):
               - {title: 'Date.Series.2008x10.14.XViD'}
               - {title: 'Useless title', filename: 'Filename.Series.S01E26.XViD'}
               - {title: 'Empty.Description.S01E22.XViD', description: ''}
-              
+
+            # test chaining
             regexp:
               reject:
                 - 1080p
+
             series:
-              - some series:
-                  quality: 1080p
-                  timeframe: 4 hours
               - another series
               - date series
               - filename series
               - empty description
-            
     """
 
     def test_smoke(self):
         """Series plugin: test several standard features"""
         self.execute_feed('test')
-        # TODO: needs to be fixed after series is converted into SQLAlchemy
-        # 'some series' should be in timeframe-queue
-        #self.feed.shared_cache.set_namespace('series')
-        #s = self.feed.shared_cache.get('some series')
-        #assert isinstance(s, dict)
-        #assert not s.get('S1E20', {}).get('info').get('downloaded')
         
         # normal passing
         assert self.feed.find_entry(title='Another.Series.S01E20.720p.XViD-FlexGet'), \
@@ -161,7 +150,27 @@ class TestFilterSeries(FlexGetBase):
         
         # chaining with regexp plugin
         assert self.feed.find_entry('rejected', title='Another.Series.S01E21.1080p.H264-FlexGet'), \
-            'regexp rejection'
+            'regexp chaining'
+
+
+class TestTimeframe(FlexGetBase):
+
+    __yaml__ = """
+        feeds:
+          test_quality:
+            input_mock:
+              - {title: 'foobar s01e01.pdtv-FlexGetA'}
+              - {title: 'foobar s01e01.720p-FlexGetB'}
+            series:
+              - foobar:
+                  timeframe: 3 hours
+                  quality: 720p
+    """
+
+    def test_quality(self):
+        self.execute_feed('test_quality')
+        assert self.feed.find_entry(title='foobar s01e01.720p-FlexGetB'), \
+            'should have accepted foobar s01e01.720p-FlexGetB'
 
 
 class TestEpisodeAdvancement(FlexGetBase):
