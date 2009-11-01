@@ -20,18 +20,22 @@ class internet(object):
     def __init__(self, func):
         self.func = func
 
-    def __call__(self):
+    def __call__(self, *args, **kwargs):
         from httplib import BadStatusLine
         import urllib2
         try:
-            self.func()
+            self.func(self, *args, **kwargs)
         except urllib2.HTTPError, e:
+            print 'decorator catched'
             raise PluginWarning('HTTPError %s' % e.code)
         except urllib2.URLError, e:
-            raise PluginWarning(' URLError %s' % e.reason)
+            print 'decorator catched'
+            raise PluginWarning('URLError %s' % e.reason)
         except BadStatusLine:
+            print 'decorator catched'
             raise PluginError('Got BadStatusLine')
         except IOError, e:
+            print 'decorator catched'
             if hasattr(e, 'reason'):
                 raise PluginError('Failed to reach server. Reason: %s' % e.reason)
             elif hasattr(e, 'code'):
@@ -213,6 +217,9 @@ class PluginMethod(object):
         return self.plugin[key]
 
     def __call__(self, *args, **kwargs):
+        #print self
+        #print "args:%s" % args
+        #print "kwargs:%s" % kwargs
         return getattr(self.plugin.instance, self.method_name)(*args, **kwargs)
 
     def __str__(self):

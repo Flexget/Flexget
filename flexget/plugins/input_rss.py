@@ -59,7 +59,7 @@ class InputRSS:
         root = validator.factory()
         root.accept('url')
         advanced = root.accept('dict')
-        url = advanced.accept('text', key='url', required=True) # TODO: accept only url, file
+        advanced.accept('text', key='url', required=True) # TODO: accept only url, file
         advanced.accept('text', key='username')
         advanced.accept('text', key='password')
         advanced.accept('text', key='link')
@@ -74,6 +74,7 @@ class InputRSS:
         url = urlparse.urlunsplit(parts)
         return url        
 
+    @internet
     def on_feed_input(self, feed):
         config = feed.config['rss']
         if not isinstance(config, dict):
@@ -101,13 +102,7 @@ class InputRSS:
         """
 
         # get the feed & parse
-        try:
-            rss = feedparser.parse(url, etag=etag, modified=modified)
-        except IOError, e:
-            if hasattr(e, 'reason'):
-                raise PluginError('Failed to reach server for feed %s. Reason: %s' % (feed.name, e.reason))
-            elif hasattr(e, 'code'):
-                raise PluginError('The server couldn\'t fulfill the request. Error code: %s' % e.code)
+        rss = feedparser.parse(url, etag=etag, modified=modified)
 
         # status checks
         status = rss.get('status', False)
@@ -137,15 +132,10 @@ class InputRSS:
                 # see: ticket 88
                 log.debug('ignoring feedparser.CharacterEncodingOverride')
                 ignore = True
-            elif isinstance(ex, httplib.BadStatusLine):
-                raise PluginError('Got BadStatusLine from feed %s' % feed.name, log)
-            elif isinstance(ex, xml.sax._exceptions.SAXParseException):
-                raise PluginError('RSS Feed %s is not valid XML' % feed.name, log)
-            elif isinstance(ex, IOError):
-                if hasattr(ex, 'reason'):
-                    raise PluginError('Failed to reach server for feed %s. Reason: %s' % (feed.name, ex.reason), log)
-                elif hasattr(ex, 'code'):
-                    raise PluginError('The server couldn\'t fulfill the request. Error code: %s' % ex.code, log)
+            elif isinstance(ex, httplib.BadStatusLine) or \
+                 isinstance(ex, xml.sax._exceptions.SAXParseException) or \
+                 isinstance(ex, IOError):
+                raise ex # let the @internet decorator handle
             else:
                 raise PluginWarning('Unhandled bozo_exception. Type: %s (feed: %s)' % \
                     (ex.__class__.__name__ , feed.name), log)
