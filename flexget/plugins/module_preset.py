@@ -97,7 +97,7 @@ class DisablePlugin:
 	return root
     
     def on_feed_start(self, feed):
-        config = feed.config['disable']
+        config = feed.config['disable_plugin']
 	if isinstance(config, basestring):
 	    config = [config]
 	# let's disable them
