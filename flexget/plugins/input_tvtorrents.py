@@ -30,17 +30,13 @@ class InputTVTorrents:
         from flexget import validator
         return validator.factory('url')
 
+    @internet(log)
     def on_feed_input(self, feed):
         pageurl = "http://tvtorrents.com/loggedin/recently_aired.do"
         log.debug("InputPlugin tvtorrents requesting url %s" % pageurl)
 
-        try:
-            page = urllib2.urlopen(pageurl)
-            soup = get_soup(page)
-        except timeout:
-            raise PluginError("Timed out opening page", log)
-        except urllib2.URLError:
-            raise PluginError("URLError when opening page", log)
+        page = urllib2.urlopen(pageurl)
+        soup = get_soup(page)
         
         hscript = soup.find('script', src=None).contents[0]
         hlines = hscript.splitlines()

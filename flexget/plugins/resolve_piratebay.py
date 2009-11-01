@@ -29,15 +29,10 @@ class ResolvePirateBay:
         else:
             # parse download page
             entry['url'] = self.parse_download_page(entry['url'])
-            
+
+    @internet(log)
     def parse_download_page(self, url):
-        try:
-            page = urllib2.urlopen(url)
-        except IOError, e:
-            if hasattr(e, 'reason'):
-                raise ResolverException('Failed to reach server. Reason: %s' % e.reason)
-            elif hasattr(e, 'code'):
-                raise ResolverException('The server couldn\'t fulfill the request. Error code: %s' % e.code)
+        page = urllib2.urlopen(url)
         try:
             soup = get_soup(page)
             tag_div = soup.find('div', attrs={'class':'download'})
@@ -52,7 +47,8 @@ class ResolvePirateBay:
     # search API
     def search(self, feed, entry):
         return self.search_title(entry['title'])
-            
+
+    @internet(log)
     def search_title(self, name, url=None):
         """Search for name from piratebay, if a search url is passed it will be 
         used instead of internal search."""
@@ -61,13 +57,7 @@ class ResolvePirateBay:
         name = name.replace('.',' ').lower()
         if not url:
             url = 'http://thepiratebay.org/search/'+urllib.quote(name)
-        try:
-            page = urllib2.urlopen(url)
-        except IOError, e:
-            if hasattr(e, 'reason'):
-                raise PluginWarning('Failed to reach server. Reason: %s' % e.reason)
-            elif hasattr(e, 'code'):
-                raise PluginWarning('The server couldn\'t fulfill the request. Error code: %s' % e.code)
+        page = urllib2.urlopen(url)
         
         soup = get_soup(page)
         torrents = []

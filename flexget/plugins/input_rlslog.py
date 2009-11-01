@@ -1,7 +1,6 @@
 import urllib2
 import logging
 import re
-from httplib import BadStatusLine
 from flexget.feed import Entry
 from flexget.plugin import *
 from flexget.utils.log import log_once
@@ -101,18 +100,13 @@ class RlsLog:
 
         return releases
 
+    @internet(log)
     def on_feed_input(self, feed):
         url = feed.get_input_url('rlslog')
         if url.endswith('feed/'):
             raise PluginWarning('Invalid URL. Remove trailing feed/ from the url.')
-        try:
-            releases = self.parse_rlslog(url, feed)
-        except urllib2.HTTPError, e:
-            raise PluginWarning('RlsLog was unable to complete task. HTTPError %s' % (e.code), log)
-        except urllib2.URLError, e:
-            raise PluginWarning('RlsLog was unable to complete task. URLError %s' % (e.reason), log)
-        except BadStatusLine:
-            raise PluginWarning('RlsLog was unable to complete task. Got BadStatusLine.', log)
+
+        releases = self.parse_rlslog(url, feed)
 
         for release in releases:
             # construct entry from release

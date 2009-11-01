@@ -20,6 +20,7 @@ class InputHtml:
         Note: This returns ALL links on url so you need to configure filters
         to match only to desired content.
     """
+    
     def validator(self):
         from flexget import validator
         root = validator.factory()
@@ -31,6 +32,7 @@ class InputHtml:
         advanced.accept('boolean', key='title_from_title')
         return root
 
+    @internet(log)
     def on_feed_input(self, feed):
         config = feed.config['html']
         if not isinstance(config, dict):
@@ -39,15 +41,9 @@ class InputHtml:
 
         log.debug('InputPlugin html requesting url %s' % pageurl)
 
-        try:
-            page = urllib2.urlopen(pageurl)
-            soup = get_soup(page)
-            log.debug('Detected encoding %s' % soup.originalEncoding)
-        except IOError, e:
-            if hasattr(e, 'reason'):
-                raise PluginError('Failed to reach server. Reason: %s' % e.reason, log)
-            elif hasattr(e, 'code'):
-                raise PluginError('The server couldn\'t fulfill the request. Error code: %s' % e.code, log)
+        page = urllib2.urlopen(pageurl)
+        soup = get_soup(page)
+        log.debug('Detected encoding %s' % soup.originalEncoding)
         
         # dump received content into a file
         if 'dump' in config:

@@ -64,22 +64,19 @@ class NewTorrents:
         """Formalize names"""
         return s.replace('.',' ').replace('_',' ').strip().lower()
 
+    @internet(log)
     def url_from_search(self, url, name):
         """Parses torrent download url from search results"""
         name = self.clean(name)
         import urllib
         url = urllib.quote(url, safe=':/~?=&%')
+
         log.debug('search url: %s' % url)
-        try:
-            html = urllib2.urlopen(url).read()
-            # fix </SCR'+'IPT> so that BS does not crash
-            # TODO: should use beautifulsoup massage
-            html = re.sub(r'(</SCR.*?)...(.*?IPT>)', r'\1\2', html)
-        except IOError, e:
-            if hasattr(e, 'reason'):
-                raise PluginWarning('Failed to reach server. Reason: %s' % e.reason, log)
-            elif hasattr(e, 'code'):
-                raise PluginWarning('The server couldn\'t fulfill the request. Error code: %s' % e.code, log)
+
+        html = urllib2.urlopen(url).read()
+        # fix </SCR'+'IPT> so that BS does not crash
+        # TODO: should use beautifulsoup massage
+        html = re.sub(r'(</SCR.*?)...(.*?IPT>)', r'\1\2', html)
         
         soup = get_soup(html)
         # saving torrents in dict

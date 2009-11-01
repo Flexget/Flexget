@@ -78,15 +78,9 @@ class InputScenereleases:
 
         return releases
 
+    @internet(log)
     def on_feed_input(self, feed):
-        try:
-            releases = self.parse_site(feed.get_input_url('scenereleases'), feed)
-        except urllib2.HTTPError, e:
-            raise PluginWarning('scenereleases was unable to complete task. HTTPError %s' % (e.code), log)
-        except urllib2.URLError, e:
-            raise PluginWarning('scenereleases was unable to complete task. URLError %s' % (e.reason), log)
-        except BadStatusLine:
-            raise PluginWarning('scenereleases was unable to complete task. Got BadStatusLine.', log)
+        releases = self.parse_site(feed.get_input_url('scenereleases'), feed)
 
         for release in releases:
             # construct entry from release

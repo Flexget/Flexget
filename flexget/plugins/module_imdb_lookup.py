@@ -142,6 +142,7 @@ class ModuleImdbLookup:
                 from flexget.utils.log import log_once
                 log_once(e.value.capitalize(), logger=log)
 
+    @internet(log)
     def lookup(self, feed, entry, search_allowed=True):
         """Perform imdb lookup for entry. Raises PluginError with failure reason."""
             
@@ -179,29 +180,23 @@ class ModuleImdbLookup:
         # no imdb url, but information required, try searching
         if not 'imdb_url' in entry and search_allowed:
             feed.verbose_progress('Searching from imdb %s' % entry['title'])
-            try:
-                take_a_break = True
-                search = ImdbSearch()
-                search_result = search.smart_match(entry['title'])
-                if search_result:
-                    entry['imdb_url'] = search_result['url']
-                    # store url for this movie, so we don't have to search on every run
-                    result = SearchResult(entry['title'], entry['imdb_url'])
-                    feed.session.add(result)
-                    log.info('Found %s' % (entry['imdb_url']))
-                else:
-                    log_once('Imdb lookup failed for %s' % entry['title'], log)
-                    # store FAIL for this title
-                    result = SearchResult(entry['title'])
-                    result.fails = True
-                    feed.session.add(result)
-                    raise PluginError('Lookup failed')
-            except IOError, e:
-                if hasattr(e, 'reason'):
-                    log.error('Failed to reach server. Reason: %s' % e.reason)
-                elif hasattr(e, 'code'):
-                    log.error('The server couldn\'t fulfill the request. Error code: %s' % e.code)
-                raise PluginError('error occured')
+
+            take_a_break = True
+            search = ImdbSearch()
+            search_result = search.smart_match(entry['title'])
+            if search_result:
+                entry['imdb_url'] = search_result['url']
+                # store url for this movie, so we don't have to search on every run
+                result = SearchResult(entry['title'], entry['imdb_url'])
+                feed.session.add(result)
+                log.info('Found %s' % (entry['imdb_url']))
+            else:
+                log_once('Imdb lookup failed for %s' % entry['title'], log)
+                # store FAIL for this title
+                result = SearchResult(entry['title'])
+                result.fails = True
+                feed.session.add(result)
+                raise PluginError('Lookup failed')
 
         imdb = ImdbParser()
         
@@ -256,16 +251,6 @@ class ModuleImdbLookup:
                     log.exception(e)
                 log.error('Invalid parameter: %s' % entry['imdb_url'])
                 raise PluginError('Parameters')
-            except IOError, e:
-                if hasattr(e, 'reason'):
-                    log.error('Failed to reach server. Reason: %s' % e.reason)
-                elif hasattr(e, 'code'):
-                    log.error('The server couldn\'t fulfill the request. Error code: %s' % e.code)
-                raise PluginError('Error occured')
-            except Exception, e:
-                log.error('Unable to process url %s' % entry['imdb_url'])
-                log.exception(e)
-                raise PluginError('Error occured')
         else:
             # Set values from cache
             # TODO: I don't like this shoveling ...
