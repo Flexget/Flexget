@@ -14,33 +14,6 @@ __all__ = ['PluginWarning', 'PluginError',
            'get_plugin_keywords', 'get_plugins_by_event', 
            'get_methods_by_event', 'internet']
 
-class internet(object):
-    """@internet decorator for plugin hooks"""
-
-    def __init__(self, func):
-        self.func = func
-
-    def __call__(self, *args, **kwargs):
-        from httplib import BadStatusLine
-        import urllib2
-        try:
-            self.func(self, *args, **kwargs)
-        except urllib2.HTTPError, e:
-            print 'decorator catched'
-            raise PluginWarning('HTTPError %s' % e.code)
-        except urllib2.URLError, e:
-            print 'decorator catched'
-            raise PluginWarning('URLError %s' % e.reason)
-        except BadStatusLine:
-            print 'decorator catched'
-            raise PluginError('Got BadStatusLine')
-        except IOError, e:
-            print 'decorator catched'
-            if hasattr(e, 'reason'):
-                raise PluginError('Failed to reach server. Reason: %s' % e.reason)
-            elif hasattr(e, 'code'):
-                raise PluginError('The server couldn''t fulfill the request. Error code: %s' % e.code)
-
 class PluginDependencyError(Exception):
     """A plugin has requested another plugin by name, but this plugin does not exists"""
 
@@ -75,6 +48,39 @@ class PluginError(Exception):
         
     def __str__(self):
         return self.value
+
+
+class internet(object):
+    """@internet decorator for plugin event methods.
+    Catches all internet related exceptions and aborts the feed."""
+
+    def __init__(self, logger=None):
+        if logger:
+            self.log = logger
+        else:
+            self.log = logging.getLogger('@internet')
+
+    def __call__(self, func):
+        def wrapped_func(*args, **kwargs):
+            from httplib import BadStatusLine
+            import urllib2
+            try:
+                func(*args, **kwargs)
+            except urllib2.HTTPError, e:
+                raise PluginError('HTTPError %s' % e.code, self.log)
+            except urllib2.URLError, e:
+                print 'decorator catched'
+                raise PluginError('URLError %s' % e.reason, self.log)
+            except BadStatusLine:
+                print 'decorator catched'
+                raise PluginError('Got BadStatusLine', self.log)
+            except IOError, e:
+                print 'decorator catched'
+                if hasattr(e, 'reason'):
+                    raise PluginError('Failed to reach server. Reason: %s' % e.reason, self.log)
+                elif hasattr(e, 'code'):
+                    raise PluginError('The server couldn''t fulfill the request. Error code: %s' % e.code, self.log)
+        return wrapped_func
 
 def _strip_trailing_sep(path):
     return path.rstrip("\\/")

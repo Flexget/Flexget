@@ -74,7 +74,7 @@ class InputRSS:
         url = urlparse.urlunsplit(parts)
         return url        
 
-    @internet
+    @internet(log)
     def on_feed_input(self, feed):
         config = feed.config['rss']
         if not isinstance(config, dict):
