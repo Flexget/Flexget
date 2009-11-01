@@ -132,8 +132,9 @@ class InputRSS:
                 # see: ticket 88
                 log.debug('ignoring feedparser.CharacterEncodingOverride')
                 ignore = True
+            elif isinstance(ex, xml.sax._exceptions.SAXParseException):
+                raise PluginError('Invalid XML received from %s' % feed.name)
             elif isinstance(ex, httplib.BadStatusLine) or \
-                 isinstance(ex, xml.sax._exceptions.SAXParseException) or \
                  isinstance(ex, IOError):
                 raise ex # let the @internet decorator handle
             else:
