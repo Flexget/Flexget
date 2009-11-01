@@ -1,12 +1,10 @@
 import urllib2
 import urlparse
 import logging
-from socket import timeout
+import BeautifulSoup
 from flexget.feed import Entry
 from flexget.plugin import *
-import re
 from flexget.utils.soup import get_soup
-import BeautifulSoup
 
 log = logging.getLogger('html')
 

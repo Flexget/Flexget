@@ -33,7 +33,9 @@ class InputText:
     def validator(self):
         from flexget import validator
         root = validator.factory('dict')
-        root.accept('url', key='url', required=True)
+        root.accept('url', key='url')
+        root.accept('file', key='url')
+        root.require_key('url')
         entry = root.accept('dict', key='entry', required=True)
         entry.accept('regexp', key='url', required=True)
         entry.accept('regexp', key='title', required=True)

@@ -1,4 +1,6 @@
-import urllib2, logging, re
+import urllib2
+import logging
+import re
 from httplib import BadStatusLine
 from flexget.feed import Entry
 from flexget.plugin import *

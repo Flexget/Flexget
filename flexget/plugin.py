@@ -12,7 +12,30 @@ __all__ = ['PluginWarning', 'PluginError',
            'register_parser_option', 'register_feed_event',
            'get_plugin_by_name', 'get_plugins_by_group',
            'get_plugin_keywords', 'get_plugins_by_event', 
-           'get_methods_by_event']
+           'get_methods_by_event', 'internet']
+
+class internet(object):
+    """@internet decorator for plugin hooks"""
+
+    def __init__(self, func):
+        self.func = func
+
+    def __call__(self):
+        from httplib import BadStatusLine
+        import urllib2
+        try:
+            self.func()
+        except urllib2.HTTPError, e:
+            raise PluginWarning('HTTPError %s' % e.code)
+        except urllib2.URLError, e:
+            raise PluginWarning(' URLError %s' % e.reason)
+        except BadStatusLine:
+            raise PluginError('Got BadStatusLine')
+        except IOError, e:
+            if hasattr(e, 'reason'):
+                raise PluginError('Failed to reach server. Reason: %s' % e.reason)
+            elif hasattr(e, 'code'):
+                raise PluginError('The server couldn''t fulfill the request. Error code: %s' % e.code)
 
 class PluginDependencyError(Exception):
     """A plugin has requested another plugin by name, but this plugin does not exists"""

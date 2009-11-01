@@ -1,9 +1,9 @@
-import logging, datetime, operator, os
+import logging
+import datetime
+import os
 from flexget.plugin import *
 from flexget.manager import Base
-from sqlalchemy import Column, Integer, String, Unicode, DateTime, Boolean, PickleType, func
-from sqlalchemy.schema import ForeignKey
-from sqlalchemy.orm import relation
+from sqlalchemy import Column, Integer, String, DateTime
 
 log = logging.getLogger('make_rss')
 
