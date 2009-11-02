@@ -17,6 +17,10 @@ class OutputDeluge:
         root = validator.factory()
         root.accept('boolean')
         deluge = root.accept('dict')
+        deluge.accept('text', key='host')
+        deluge.accept('number', key='port')
+        deluge.accept('text', key='user')
+        deluge.accept('text', key='pass')
         deluge.accept('text', key='path')
         deluge.accept('text', key='movedone')
         deluge.accept('text', key='label')
@@ -28,6 +32,10 @@ class OutputDeluge:
         config = feed.config.get('deluge', {})
         if isinstance(config, bool):
             config = {'enabled':config}
+        config.setdefault('host', 'localhost')
+        config.setdefault('port', 58846)
+        config.setdefault('user', '')
+        config.setdefault('pass', '')
         config.setdefault('enabled', True)
         config.setdefault('path', '')
         config.setdefault('movedone', '')
@@ -159,7 +167,12 @@ class OutputDeluge:
         except:
             raise PluginError('Deluge and twisted module required', log)
 
-        d = client.connect()
+        d = client.connect(
+            host=config['host'],
+            port=config['port'],
+            username=config['user'],
+            password=config['pass']
+        )
         def on_connect_success(result):
             if not result:
                 # TODO: connect failed, do something
