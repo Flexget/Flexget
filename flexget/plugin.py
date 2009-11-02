@@ -69,13 +69,13 @@ class internet(object):
             except urllib2.HTTPError, e:
                 raise PluginError('HTTPError %s' % e.code, self.log)
             except urllib2.URLError, e:
-                print 'decorator catched'
+                log.info('decorator catched')
                 raise PluginError('URLError %s' % e.reason, self.log)
             except BadStatusLine:
-                print 'decorator catched'
+                log.info('decorator catched')
                 raise PluginError('Got BadStatusLine', self.log)
             except IOError, e:
-                print 'decorator catched'
+                log.info('decorator catched')
                 if hasattr(e, 'reason'):
                     raise PluginError('Failed to reach server. Reason: %s' % e.reason, self.log)
                 elif hasattr(e, 'code'):
