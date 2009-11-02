@@ -18,7 +18,7 @@ class ImdbQueue(Base):
     immortal = Column(Boolean)
     added = Column(DateTime)
 
-    def __init__(self, imdb_id, quality, immortal=False):
+    def __init__(self, imdb_id, quality, immortal):
         self.imdb_id = imdb_id
         self.quality = quality
         self.immortal = immortal
@@ -93,7 +93,8 @@ class ImdbQueueManager:
         --imdb-queue (add|del|list) IMDB-URL [quality]
         """
         if len(parser.rargs) == 0:
-            print 'Usage: --imdb-queue (add|del|list) [IMDB_URL|NAME] [QUALITY]'
+            print 'Usage: --imdb-queue (add|del|list) [IMDB_URL|NAME] [QUALITY] [FORCE]'
+            print "Force defaults to true, any given value will be interpreted as false"
             return
 
         ImdbQueueManager.options['action'] = parser.rargs[0].lower()
@@ -108,6 +109,11 @@ class ImdbQueueManager:
             ImdbQueueManager.options['quality'] = parser.rargs[2]
         else:
             ImdbQueueManager.options['quality'] = 'dvd' # TODO: Get defaul from config somehow?
+
+        if len(parser.rargs) >= 4:
+            ImdbQueueManager.options['force'] = False
+        else:
+            ImdbQueueManager.options['force'] = True
 
 
     def on_process_start(self, feed):
@@ -169,7 +175,7 @@ class ImdbQueueManager:
         # check if the item is already queued
         item = session.query(ImdbQueue).filter(ImdbQueue.imdb_id == imdb_id).first()
         if not item:
-            item = ImdbQueue(imdb_id, quality, True)
+            item = ImdbQueue(imdb_id, quality, self.options['force'])
             session.add(item)
             session.commit()
             print "Added %s to queue with quality %s" % (imdb_id, quality)
