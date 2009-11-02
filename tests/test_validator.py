@@ -1,4 +1,5 @@
 from flexget import validator
+import yaml
 
 class TestValidator(object):
 
@@ -24,6 +25,17 @@ class TestValidator(object):
         re_match.accept('abc.*')
         assert not re_match.validate('foobar'), 'foobar should not have passed'
         assert re_match.validate('abcdefg'), 'abcdefg should have passed'
+        
+    def test_choice(self):
+        choice = validator.factory('choice')
+        choice.accept('foo')
+        choice.accept('bar')
+        choice.validate('foo')
+        print choice.errors.messages
+        assert not choice.errors.messages, 'foo should be valid'
+        choice.validate('xxx')
+        print choice.errors.messages
+        assert choice.errors.messages, 'xxx should be invalid'
             
         
         

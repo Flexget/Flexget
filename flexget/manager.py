@@ -141,7 +141,7 @@ class Manager:
             if line.strip() == '':
                 continue
             # comment line
-            if line[0] == '#':
+            if line.strip().startswith('#'):
                 continue
             indentation = get_indentation(line)
             
@@ -151,7 +151,7 @@ class Manager:
             if isodd(indentation):
                 log.warning('Config line %s has odd (uneven) indentation' % line_num)
             if indentation > prev_indentation + 2 and not prev_mapping:
-                # line increases indentation but previously didn't start mapping
+                # line increases indentation, but previously didn't start mapping
                 log.warning('Config line %s is likely missing ":" at the end' % (line_num - 1))
             if indentation > prev_indentation + 2 and prev_mapping and not prev_list:
                 # mapping value after non list indented more than 2

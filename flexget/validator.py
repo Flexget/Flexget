@@ -57,7 +57,7 @@ class Validator(object):
             # register default validators
             register = [RootValidator, ListValidator, DictValidator, TextValidator, FileValidator,
                         PathValidator, AnyValidator, NumberValidator, BooleanValidator, RegexpMatchValidator,
-                        DecimalValidator, UrlValidator, RegexpValidator, ChoiceValidator]
+                        DecimalValidator, UrlValidator, RegexpValidator, EqualsValidator, ChoiceValidator]
             for v in register:
                 self.register(v)
         else:
@@ -124,17 +124,21 @@ class RootValidator(Validator):
             self.errors.add('failed to pass as %s' % ', '.join(acceptable))
         return False
 
-# borked                
 class ChoiceValidator(Validator):
     name = 'choice'
 
-    def accept(self, name, **kwargs):
-        v = self.get_validator(kwargs['value'])
+    def accept(self, value, **kwargs):
+        v = self.get_validator('equals')
+        v.accept(value)
         self.valid.append(v)
         return v
+        
+    def accept_choices(self, values):
+        for value in values:
+            self.accept(value)
 
     def validateable(self, data):
-        raise Exception('borked')
+        return True
 
     def validate(self, data):
         if not self.validate_item(data, self.valid):
@@ -402,8 +406,8 @@ class DictValidator(Validator):
             rules = self.valid.get(key, [])
             rules.extend(self.any_key)
             if not self.validate_item(value, rules):
+                # containers should only add errors if inner validators did not
                 if count == self.errors.count():
-                    # containers should only add errors if inner validators did not
                     l = [r.name for r in rules]
                     self.errors.add('value \'%s\' is not valid %s' % (value, ', '.join(l)))
         for required in self.required_keys:
