@@ -5,6 +5,7 @@ from flexget.plugin import *
 from flexget.manager import Base
 from sqlalchemy import Column, Integer, String, DateTime, Boolean
 from flexget.utils.imdb import extract_id, ImdbSearch
+from flexget.utils.tools import str_to_boolean
 
 log = logging.getLogger('imdb_queue')
 
@@ -111,10 +112,7 @@ class ImdbQueueManager:
             ImdbQueueManager.options['quality'] = 'dvd' # TODO: Get defaul from config somehow?
 
         if len(parser.rargs) >= 4:
-            ImdbQueueManager.options['force'] = False
-        else:
-            ImdbQueueManager.options['force'] = True
-
+            ImdbQueueManager.options['force'] = str_to_boolean(parser.rargs[3])
 
     def on_process_start(self, feed):
         """

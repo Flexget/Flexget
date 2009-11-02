@@ -2,6 +2,13 @@
 
 import sgmllib
 
+
+def str_to_boolean(string):
+    if string.lower() in ['true', '1', 't', 'y', 'yes']:
+        return True
+    else:
+        return False
+
 class HtmlParser(sgmllib.SGMLParser):
     from htmlentitydefs import entitydefs
 
