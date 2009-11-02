@@ -1,11 +1,12 @@
-import sys, os, time
+import os
+import time
 import urllib
 import urllib2
 import logging
 import shutil
 import filecmp
 from flexget.plugin import *
-from sqlalchemy import Column, String, Integer, DateTime, desc
+from sqlalchemy import Column, String, Integer, DateTime
 from flexget.manager import Base
 from datetime import datetime
 
@@ -21,6 +22,7 @@ class Download(Base):
     url = Column(String)
     title = Column(String)
     time = Column(DateTime)
+    details = Column(String)
     
     def __init__(self):
         self.time = datetime.now()
@@ -36,6 +38,17 @@ class PluginDownloads:
     """
 
     def on_process_start(self, feed):
+
+        # temp hack for database change
+        from flexget.manager import Session
+        from flexget.utils.sqlalchemy_utils import table_columns, table_schema
+        columns = table_columns('download_history', Session())
+        if not 'details' in columns:
+            log.critical('Please see bleeding edge news for neccessary actions')
+            log.critical('Re-cap run: sqlite3 %s "drop table download_history;"' % feed.manager.db_filename)
+            import sys
+            sys.exit(1)
+
         if feed.manager.options.downloads:
             from flexget.manager import Session
             feed.manager.disable_feeds()
@@ -307,6 +320,10 @@ class PluginDownload:
             download.filename = destfile
             download.title = entry['title']
             download.url = entry['url']
+            reason = ''
+            if 'reason' in entry:
+                reason = ' (reason: %s)' % entry['reason']
+            download.details = 'Accepted by %s%s' % (entry.get('accepted_by', '<unknown>'), reason)
             feed.session.add(download)
             
             # test

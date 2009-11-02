@@ -5,25 +5,19 @@ class TestRlsLog(FlexGetBase):
 
     __yaml__ = """
         feeds:
-          test:
+          test_rlslog:
             rlslog: http://www.rlslog.net/category/movies/dvdrip/
-    """
-
-    @attr(online=True)
-    def test_parsing(self):
-        self.execute_feed('test')
-        assert self.feed.entries, 'no entries created'
-
-class TestScenereleases(FlexGetBase):
-
-    __yaml__ = """
-        feeds:
-          test:
+          test_scenereleases:
             scenereleases: http://scenereleases.info/category/movies/movies-dvd-rip
     """
 
     @attr(online=True)
-    def test_parsing(self):
-        self.execute_feed('test')
-        assert self.feed.entries, 'no entries created'
+    def test_rlslog(self):
+        self.execute_feed('test_rlslog')
+        assert self.feed.entries, 'no entries created / site may be down'
+
+    @attr(online=True)
+    def test_scenereleases(self):
+        self.execute_feed('test_scenereleases')
+        assert self.feed.entries, 'no entries created / site may be down'
 

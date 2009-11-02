@@ -104,6 +104,10 @@ class Feed:
         if not entry in self.accepted and not entry in self.rejected:
             self.accepted.append(entry)
             self.verbose_details('Accepted %s' % entry['title'], reason)
+            # store the reason into entry, TODO: plugin in the future?
+            if reason:
+                entry['reason'] = reason
+            entry['accepted_by'] = self.current_plugin
 
     def reject(self, entry, reason=None):
         """Reject this entry immediately and permanently."""
@@ -121,6 +125,10 @@ class Feed:
         if not entry in self.rejected:
             self.rejected.append(entry)
             self.verbose_details('Rejected %s' % entry['title'], reason)
+        # store the reason into entry, TODO: plugin in the future?
+        if reason:
+            entry['reason'] = reason
+        entry['rejected_by'] = self.current_plugin
         # TODO: HACK?
         if entry in self.accepted:
             self.accepted.remove(entry)
