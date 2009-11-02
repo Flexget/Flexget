@@ -69,7 +69,7 @@ class SeriesPlugin(object):
         if not episode:
             log.log(5, 'get_latest_info: no info available')
             return False
-        log.debug('get_latest_info, series: %s season: %s episode: %s' % \
+        log.log(5, 'get_latest_info, series: %s season: %s episode: %s' % \
             (name, episode.season, episode.number))
         return {'season':episode.season, 'episode':episode.number}
     
@@ -644,8 +644,6 @@ class FilterSeries(SeriesPlugin):
                             entry = self.parser2entry[ep]
                             feed.reject(entry, 'episode advancement')
                         continue
-                else:
-                    log.debug('No latest info available')
 
             # multiple qualities, accept all wanted qualities
             def is_quality_downloaded(quality):
