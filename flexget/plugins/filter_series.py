@@ -67,7 +67,7 @@ class SeriesPlugin(object):
             filter(Episode.season != None).filter(Series.name == name.lower()).\
             order_by(desc(Episode.season)).order_by(desc(Episode.number)).first()
         if not episode:
-            log.debug('get_latest_info: no info available')
+            log.log(5, 'get_latest_info: no info available')
             return False
         log.debug('get_latest_info, series: %s season: %s episode: %s' % \
             (name, episode.season, episode.number))
@@ -490,7 +490,7 @@ class FilterSeries(SeriesPlugin):
             latest = self.get_latest_info(feed.session, series_name)
             if latest:
                 if latest.get('season') and latest.get('episode'):
-                    log.debug('enabling expect_ep for %s' % series_name)
+                    log.log(5, 'enabling expect_ep for %s' % series_name)
                     expect_ep = True
 
             for field, data in sorted(entry.items(), cmp=field_order):

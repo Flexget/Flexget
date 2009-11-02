@@ -25,7 +25,7 @@ class MetainfoQuality:
             for quality in TitleParser.qualities:
                 for field_name, field_value in entry.iteritems():
                     if unicode(quality).lower() in unicode(field_value).lower():
-                        log.debug('Found quality %s for %s from field %s' % \
+                        log.log(5, 'Found quality %s for %s from field %s' % \
                             (quality, entry['title'], field_name))
                         entry['quality'] = quality
                         break
