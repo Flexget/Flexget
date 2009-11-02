@@ -55,10 +55,12 @@ class PluginDownloads:
             session = Session()
             print '-- Downloads: ' + '-' * 65
             for download in session.query(Download).order_by(Download.time)[-50:]:
-                print ' Title  : %s' % download.title
-                print ' Url    : %s' % download.url
-                print ' Stored : %s' % download.filename
-                print ' Time   : %s' % download.time.strftime("%c")
+                print ' Title   : %s' % download.title
+                print ' Url     : %s' % download.url
+                print ' Stored  : %s' % download.filename
+                print ' Time    : %s' % download.time.strftime("%c")
+                if feed.manager.options.details:
+                    print ' Details : %s' % download.details
                 print '-' * 79
             session.close()
 
