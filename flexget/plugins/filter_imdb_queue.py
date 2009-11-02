@@ -204,10 +204,10 @@ class ImdbQueueManager:
 
         items = session.query(ImdbQueue)
         found = False
+        print "%-40s %-8s %-5s" % ("URL", "Quality", "Force")
         for item in items:
             found = True
-            # TODO: Pretty printing
-            print 'http://www.imdb.com/title/' + item.imdb_id, item.quality
+            print "%-40s %-8s %-5s" % ('http://www.imdb.com/title/' + item.imdb_id, item.quality, item.immortal)
 
         if not found:
             print 'IMDb queue is empty'
