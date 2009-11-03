@@ -95,7 +95,6 @@ class ImdbQueueManager:
         """
         if len(parser.rargs) == 0:
             print 'Usage: --imdb-queue (add|del|list) [IMDB_URL|NAME] [QUALITY] [FORCE]'
-            print "Force defaults to true, any given value will be interpreted as false"
             return
 
         ImdbQueueManager.options['action'] = parser.rargs[0].lower()
@@ -113,6 +112,8 @@ class ImdbQueueManager:
 
         if len(parser.rargs) >= 4:
             ImdbQueueManager.options['force'] = str_to_boolean(parser.rargs[3])
+        else:
+            ImdbQueueManager.options['force'] = True
 
     def on_process_start(self, feed):
         """
