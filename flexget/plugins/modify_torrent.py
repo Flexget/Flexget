@@ -178,14 +178,14 @@ class TorrentFilename:
         for entry in feed.accepted + feed.entries:
             # skip if entry does not have file assigned
             if not 'file' in entry:
-                log.debug('%s doesn''t have file' % entry['title'])
+                log.debug('%s doesn\'t have a file associated' % entry['title'])
                 continue
             f = open(entry['file'], 'r')
             data = f.read(len(idstr))
             f.close()
             if not data == idstr:
                 # not a torrent file at all, skip
-                log.debug('%s doesn''t seem to be a torrent' % entry['title'])
+                log.debug('%s doesn\'t seem to be a torrent' % entry['title'])
                 continue
             else:
                 log.debug('%s seems to be a torrent' % entry['title'])

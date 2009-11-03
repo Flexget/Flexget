@@ -404,6 +404,43 @@ class TestDuplicates(FlexGetBase):
             assert self.feed.find_entry('rejected', title=item), \
                 '%s should have been rejected' % item
 
+
+"""
+class TestLaterDupes(FlexGetBase):
+
+    __yaml__ = '''
+        global:
+          series:
+            - Foobar:
+                watched:
+                  season: 2
+                  episode: 1
+        feeds:
+
+          test_1:
+            input_mock:
+              - {title: 'FooBar.S02E02.PDTV-FlexGet'}
+
+          test_2:
+            input_mock:
+              - {title: 'FooBar.S02E03.HDTV-FlexGet'}
+
+          test_3:
+            input_mock:
+              - {title: 'FooBar.S02E03.HDTV-Bug'}
+              - {title: 'FooBar.S02E03.HDTV-FlexGet'}
+    '''
+    
+    def test_later(self):
+        self.execute_feed('test_1')
+        assert len(self.feed.accepted) == 1
+        self.execute_feed('test_2')
+        assert len(self.feed.accepted) == 1
+        self.execute_feed('test_3')
+        assert len(self.feed.accepted) == 0
+        assert False
+"""
+
 class TestQualities(FlexGetBase):
 
     __yaml__ = """
