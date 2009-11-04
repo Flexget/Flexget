@@ -62,8 +62,13 @@ class OutputSabnzbd:
             params['name'] = entry['url']
             request_url = baseurl + urllib.urlencode(params)
             log.debug('request_url: %s' % request_url)
-            
-            response = urllib2.urlopen(request_url).read()
+
+            try:            
+                response = urllib2.urlopen(request_url).read()
+            except:
+                log.critical('Failed to use sabnzbd at %s' % request_url)
+                feed.fail(entry, 'sabnzbd unreachable')
+                continue
             
             if response.lower().find('error') != -1:
                 feed.fail(entry, response.replace('\n', ''))
