@@ -34,7 +34,7 @@ class PluginResolver:
                 name = resolver.name
                 try:
                     if resolver.instance.resolvable(feed, entry):
-                        log.debug('Rerolving %s' % entry['url'])
+                        log.debug('Resolving %s' % entry['url'])
                         resolver.instance.resolve(feed, entry)
                         log.info('Resolved \'%s\' to %s (with %s)' % (entry['title'], entry['url'], name))
                 except ResolverException, r:
