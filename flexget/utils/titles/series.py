@@ -192,4 +192,12 @@ class SeriesParser(TitleParser):
              str(self.quality), str(self.proper_or_repack), valid)
              
     def __cmp__(self, other):
+        """
+        me = (self.qualities.index(self.quality), self.name)
+        other = (self.qualities.index(other.quality), other.name)
+        return cmp(me, other)
+        """
         return cmp(self.qualities.index(self.quality), self.qualities.index(other.quality))
+        
+    def __eq__(self, other):
+        return self is other

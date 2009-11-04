@@ -250,6 +250,7 @@ class TestPropers(FlexGetBase):
           series:
             - test
             - foobar
+            - V
 
         feeds:
           test_propers_1:
@@ -271,7 +272,18 @@ class TestPropers(FlexGetBase):
             input_mock:
               - {title: 'Foobar.S01E01.720p.FlexGet'}
               - {title: 'Foobar.S01E01.720p.proper.FlexGet'}
-    """
+              
+          # test a lot of propers at once
+          test_propers_5:
+            input_mock:
+              - {title: 'V.2009.S01E01.PROPER.HDTV.A'}
+              - {title: 'V.2009.S01E01.PROPER.HDTV.B'}
+              - {title: 'V.2009.S01E01.PROPER.HDTV.C'}
+        """
+
+    def test_lot_propers(self):
+        self.execute_feed('test_propers_5')
+        assert len(self.feed.accepted) == 1, 'should have accepted (only) one of the propers'
 
     def test_propers(self):
         """Series plugin: propers are accepted after episode is downloaded"""

@@ -295,8 +295,13 @@ class PluginDownload:
                 log.debug('temp: %s' % ', '.join(os.listdir(tmp_path)))
                 raise PluginWarning("Downloaded temp file '%s' doesn't exist!?" % entry['file'])
 
-            # combine to full path + filename, replace / from filename (replaces: #208, #325)
-            destfile = os.path.join(path, entry.get('filename', entry['title']).replace('/', '_').replace(':', ' '))
+            # combine to full path + filename, replace / from filename (replaces: #208, #325, #353)
+            name = entry.get('filename', entry['title'])
+            for char in '/:<>^*?~':
+                name = name.replace(char, ' ')
+            # remove duplicate spaces
+            name = ' '.join(name.split())
+            destfile = os.path.join(path, name)
 
             if os.path.exists(destfile):
                 if filecmp.cmp(entry['file'], destfile):

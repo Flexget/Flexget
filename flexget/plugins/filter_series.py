@@ -67,7 +67,7 @@ class SeriesPlugin(object):
             filter(Episode.season != None).filter(Series.name == name.lower()).\
             order_by(desc(Episode.season)).order_by(desc(Episode.number)).first()
         if not episode:
-            log.log(5, 'get_latest_info: no info available')
+            log.log(5, 'get_latest_info: no info available for %s' % name)
             return False
         log.log(5, 'get_latest_info, series: %s season: %s episode: %s' % \
             (name, episode.season, episode.number))
@@ -256,7 +256,6 @@ class SeriesForget(object):
     """Provides --series-forget"""
 
     def on_process_start(self, feed):
-
         if _series_forget:
             feed.manager.disable_feeds()
 
@@ -570,55 +569,62 @@ class FilterSeries(SeriesPlugin):
             ipshell()
             """
 
-            # whitelist undownloaded propers
-            whitelist = []
-
+            #
+            # proper handling
+            #
             def proper_downloaded():
                 for release in downloaded_releases:
                     if release.proper:
                         return True
 
+            the_proper = None
             for ep in eps:
                 if ep.proper_or_repack:
                     if not proper_downloaded():
-                        log.debug('found undownloaded repack %s' % ep)
-                        whitelist.append(ep)
+                        log.debug('found the_proper %s' % ep)
+                        the_proper = ep
+                        break
+            
+            if the_proper:
+                removed = []
 
-            log.debug('whitelisted: %s' % [e.data for e in whitelist])
+                # nuke non-propers and other propers
+                for ep in eps[:]:
+                    if ep is the_proper:
+                        log.debug('killing %s would be suicide' % ep)
+                        continue
+                    log.debug('rejecting extra proper %s' % ep)
+                    entry = self.parser2entry[ep]
+                    feed.reject(entry, 'nuked')
+                    removed.append(ep)
 
-            # if we have proper from some release, reject non-propers (with same quality)
-            for ep in eps[:]:
-                if ep.proper_or_repack:
-                    log.debug('found repack: %s' % ep.data)
-                    for nuked in eps[:]:
-                        log.debug('should we nuke %s ?' % nuked)
-                        if ep is nuked:
-                            log.debug('NO: suicide')
-                            continue
-                        if nuked.quality == ep.quality:
-                            log.debug('YES, same quality: %s' % nuked)
-                            entry = self.parser2entry[nuked]
-                            feed.reject(entry, 'nuked')
-                            if nuked in eps:
-                                eps.remove(nuked)
+                # remove them from eps
+                for ep in removed:
+                    log.debug('removed: %s' % ep)
+                    eps.remove(ep)
+                    
+                log.debug('post-eps: %s' % [e.data for e in eps])
+                log.debug('after nuked, eps: %s' % [e.data for e in eps])
+            
 
-            log.debug('after nuked, eps: %s' % [e.data for e in eps])
-
-            # reject downloaded (except if whitelisted, propers)
+            #
+            # reject downloaded (except if the proper)
+            #
             if downloaded_releases and eps:
                 log.debug('%s is downloaded' % eps[0].identifier())
                 for ep in eps[:]:
-                    if ep not in whitelist:
+                    if ep is not the_proper:
                         entry = self.parser2entry[ep]
                         feed.reject(entry, 'already downloaded')
-                        # must test if ep in eps because downloaded_releases may contain
-                        # this episode multiple times
+                        # must test if ep in eps because downloaded_releases may contain this episode 
+                        # multiple times and trying to remove it twice will cause crash
                         if ep in eps:
                             log.debug('removing from eps: %s' % ep.data)
                             eps.remove(ep)
 
             # no episodes left, continue to next series
             if not eps:
+                log.debug('no eps left')
                 continue 
 
             best = eps[0]
@@ -627,6 +633,7 @@ class FilterSeries(SeriesPlugin):
 
             # reject episodes that have been marked as watched in configig file
             if 'watched' in config:
+                log.debug('::watched')
                 from sys import maxint
                 wconfig = config.get('watched')
                 season = wconfig.get('season', -1)
@@ -640,6 +647,7 @@ class FilterSeries(SeriesPlugin):
                     
             # Episode advancement. Used only with season based series
             if best.season and best.episode:
+                log.debug('::episode advancement')
                 latest = self.get_latest_info(feed.session, best.name)
                 if latest:
                     # allow few episodes "backwards" in case of missed eps
@@ -658,6 +666,7 @@ class FilterSeries(SeriesPlugin):
                         return True
 
             if 'qualities' in config:
+                log.debug('::processing qualities')
                 qualities = [quality.lower() for quality in config['qualities']]
                 for ep in eps:
                     #log.debug('qualities, quality: %s' % ep.quality)
@@ -670,6 +679,7 @@ class FilterSeries(SeriesPlugin):
 
             # timeframe present
             if 'timeframe' in config:
+                log.debug('::processing timeframe')
                 if 'max_quality' in config:
                     log.warning('Timeframe does not support max_quality (yet)')
                 if 'min_quality' in config:
@@ -743,6 +753,7 @@ class FilterSeries(SeriesPlugin):
             # quality, min_quality, max_quality and NO timeframe
             if ('timeframe' not in config and 'qualities' not in config) and \
                ('quality' in config or 'min_quality' in config or 'max_quality' in config):
+                log.debug('::quality/min_quality/max_quality without timeframe')
                 accepted_qualities = []
                 if 'quality' in config:
                     accepted_qualities.append(config['quality'])
@@ -765,6 +776,7 @@ class FilterSeries(SeriesPlugin):
                 continue
 
             # no special configuration, just choose the best
+            log.debug('::plain')
             self.accept_series(feed, best, 'choose best')
 
     def accept_series(self, feed, parser, reason):
