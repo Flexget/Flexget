@@ -35,14 +35,7 @@ class OutputSabnzbd:
         config.accept('text', key='username')
         return config
 
-    def on_feed_output(self, feed):
-        import urllib
-        import urllib2
-        
-        # convert config into url parameters
-        config = feed.config['sabnzbd']
-        baseurl = config.get('url', 'http://localhost:8080/sabnzbd/api?')
-        
+    def get_params(self, config):
         params = {}
         if 'key' in config:
             params['apikey'] = config['key']
@@ -57,8 +50,28 @@ class OutputSabnzbd:
         if 'password' in config:
             params['ma_password'] = config['password']
         params['mode'] = 'addurl'
+        return params
+
+    def on_process_start(self, feed):
+        """
+        register the usable set: keywords
+        """
+        set = get_plugin_by_name('set')
+        set.instance.register_keys({'category':'text'})
+
+    def on_feed_output(self, feed):
+        import urllib
+        import urllib2
+        
+        # convert config into url parameters
+        config = feed.config['sabnzbd']
+        baseurl = config.get('url', 'http://localhost:8080/sabnzbd/api?')
         
         for entry in feed.accepted:
+            params = self.get_params(config)
+            # allow overriding the category
+            if 'category' in entry:
+                params['cat'] = entry['category']
             params['name'] = entry['url']
             request_url = baseurl + urllib.urlencode(params)
             log.debug('request_url: %s' % request_url)
