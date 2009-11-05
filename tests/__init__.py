@@ -10,6 +10,9 @@ from flexget.options import OptionParser
 from flexget.feed import Feed
 from flexget import initialize_logging
 import yaml
+import logging
+
+log = logging.getLogger('tests')
 
 test_options = None
 
@@ -64,6 +67,7 @@ class FlexGetBase(object):
 
     def execute_feed(self, name):
         """Use to execute one test feed from config"""
+        log.info('********** Running feed: %s ********** ' % name)
         config = self.manager.config['feeds'][name]
         if hasattr(self, 'feed'):
             if hasattr(self, 'session'):

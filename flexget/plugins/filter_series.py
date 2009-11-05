@@ -67,10 +67,10 @@ class SeriesPlugin(object):
             filter(Episode.season != None).filter(Series.name == name.lower()).\
             order_by(desc(Episode.season)).order_by(desc(Episode.number)).first()
         if not episode:
-            log.log(5, 'get_latest_info: no info available for %s' % name)
+            #log.log(5, 'get_latest_info: no info available for %s' % name)
             return False
-        log.log(5, 'get_latest_info, series: %s season: %s episode: %s' % \
-            (name, episode.season, episode.number))
+        #log.log(5, 'get_latest_info, series: %s season: %s episode: %s' % \
+        #    (name, episode.season, episode.number))
         return {'season':episode.season, 'episode':episode.number}
     
     def get_releases(self, session, name, identifier):
@@ -561,7 +561,7 @@ class FilterSeries(SeriesPlugin):
             # get list of downloaded releases
             downloaded_releases = self.get_downloaded(feed.session, eps[0].name, eps[0].identifier())
             log.debug('downloaded: %s' % [e.title for e in downloaded_releases])
-            log.debug('processing episodes: %s' % [e.data for e in eps])
+            log.debug('episodes: %s' % [e.data for e in eps])
 
             """            
             from IPython.Shell import IPShellEmbed
@@ -577,45 +577,51 @@ class FilterSeries(SeriesPlugin):
                     if release.proper:
                         return True
 
-            the_proper = None
+            downloaded_qualities = [d.quality for d in downloaded_releases]
+            log.debug('dl\'ed qualities: %s' % downloaded_qualities)
+
+            new_propers = []
+            removed = []
             for ep in eps:
                 if ep.proper_or_repack:
                     if not proper_downloaded():
-                        log.debug('found the_proper %s' % ep)
-                        the_proper = ep
-                        break
-            
-            if the_proper:
-                removed = []
+                        log.debug('found new proper %s' % ep)
+                        new_propers.append(ep)
+                    else:
+                        log.debug('found downloaded proper %s' % ep)
+                        feed.reject(self.parser2entry[ep], 'proper already downloaded')
+                        removed.append(ep)
 
-                # nuke non-propers and other propers
-                for ep in eps[:]:
-                    if ep is the_proper:
-                        log.debug('killing %s would be suicide' % ep)
-                        continue
-                    log.debug('rejecting extra proper %s' % ep)
-                    entry = self.parser2entry[ep]
-                    feed.reject(entry, 'nuked')
-                    removed.append(ep)
+            if downloaded_qualities:
+                for proper in new_propers[:]:
+                    if proper.quality not in downloaded_qualities:
+                        log.debug('proper %s quality missmatch' % proper)
+                        new_propers.remove(proper)
 
-                # remove them from eps
-                for ep in removed:
-                    log.debug('removed: %s' % ep)
-                    eps.remove(ep)
-                    
-                log.debug('post-eps: %s' % [e.data for e in eps])
-                log.debug('after nuked, eps: %s' % [e.data for e in eps])
-            
+            # nuke qualities which there is proper available
+            for proper in new_propers:
+                for ep in set(eps) - set(removed) - set(new_propers):
+                    if ep.quality == proper.quality:
+                        entry = self.parser2entry[ep]
+                        feed.reject(entry, 'nuked')
+                        removed.append(ep)
+
+            # remove rejections & unwanted stuff from eps list
+            for ep in removed:
+                log.debug('removed: %s' % ep)
+                eps.remove(ep)
+
+            log.debug('new_propers: %s' % [e.data for e in new_propers])
+            log.debug('episodes: %s' % [e.data for e in eps])
 
             #
-            # reject downloaded (except if the proper)
+            # reject downloaded
             #
             if downloaded_releases and eps:
-                log.debug('%s is downloaded' % eps[0].identifier())
+                log.debug('identifier %s is downloaded' % eps[0].identifier())
                 for ep in eps[:]:
-                    if ep is not the_proper:
-                        entry = self.parser2entry[ep]
-                        feed.reject(entry, 'already downloaded')
+                    if ep not in new_propers:
+                        feed.reject(self.parser2entry[ep], 'already downloaded')
                         # must test if ep in eps because downloaded_releases may contain this episode 
                         # multiple times and trying to remove it twice will cause crash
                         if ep in eps:

@@ -253,63 +253,88 @@ class TestPropers(FlexGetBase):
             - V
 
         feeds:
-          test_propers_1:
+          propers_1:
             input_mock:
               - {title: 'Test.S01E01.720p-FlexGet'}
 
           # introduce proper, should be accepted
-          test_propers_2:
+          propers_2:
             input_mock:
               - {title: 'Test.S01E01.720p.Proper-FlexGet'}
 
           # introduce non-proper, should not be downloaded
-          test_propers_3:
+          propers_3:
             input_mock:
               - {title: 'Test.S01E01.FlexGet'}
 
           # introduce proper at the same time, should nuke non-proper and get proper
-          test_propers_4:
+          proper_at_first:
             input_mock:
               - {title: 'Foobar.S01E01.720p.FlexGet'}
               - {title: 'Foobar.S01E01.720p.proper.FlexGet'}
               
           # test a lot of propers at once
-          test_propers_5:
+          lot_propers:
             input_mock:
               - {title: 'V.2009.S01E01.PROPER.HDTV.A'}
               - {title: 'V.2009.S01E01.PROPER.HDTV.B'}
               - {title: 'V.2009.S01E01.PROPER.HDTV.C'}
+
+          diff_quality_1:
+            input_mock:
+              - {title: 'Test.S01E02.720p-FlexGet'}
+
+          # low quality proper, should not be accepted
+          diff_quality_2:
+            input_mock:
+              - {title: 'Test.S01E02.HDTV.Proper-FlexGet'}
+
+
         """
 
     def test_lot_propers(self):
-        self.execute_feed('test_propers_5')
+        """Series plugin: proper flood"""
+        self.execute_feed('lot_propers')
         assert len(self.feed.accepted) == 1, 'should have accepted (only) one of the propers'
 
+    def test_diff_quality_propers(self):
+        """Series plugin: proper in different/wrong quality"""
+        self.execute_feed('diff_quality_1')
+        assert len(self.feed.accepted) == 1
+        self.execute_feed('diff_quality_2')
+        assert len(self.feed.accepted) == 0, 'should not have accepted lower quality proper'
+
     def test_propers(self):
-        """Series plugin: propers are accepted after episode is downloaded"""
-        self.execute_feed('test_propers_1')
+        """Series plugin: proper accepted after episode is downloaded"""
+        # start with normal download ...
+        self.execute_feed('propers_1')
         assert self.feed.find_entry('accepted', title='Test.S01E01.720p-FlexGet'), \
             'Test.S01E01-FlexGet should have been accepted'
+
         # rejects downloaded
-        self.execute_feed('test_propers_1')
+        self.execute_feed('propers_1')
         assert self.feed.find_entry('rejected', title='Test.S01E01.720p-FlexGet'), \
             'Test.S01E01-FlexGet should have been rejected'
+
         # accepts proper
-        self.execute_feed('test_propers_2')
+        self.execute_feed('propers_2')
         assert self.feed.find_entry('accepted', title='Test.S01E01.720p.Proper-FlexGet'), \
-            'Test.S01E01.Proper-FlexGet should have been accepted'
+            'new undownloaded proper should have been accepted'
+
         # reject downloaded proper
-        self.execute_feed('test_propers_2')
+        self.execute_feed('propers_2')
+        #assert not self.feed.accepted, 'downloaded proper accepted'
         assert self.feed.find_entry('rejected', title='Test.S01E01.720p.Proper-FlexGet'), \
-            'Test.S01E01.Proper-FlexGet should have been rejected'
+            'downloaded proper should have been rejected'
+
         # reject episode that has been downloaded normally and with proper
-        self.execute_feed('test_propers_3')
+        self.execute_feed('propers_3')
         assert self.feed.find_entry('rejected', title='Test.S01E01.FlexGet'), \
             'Test.S01E01.FlexGet should have been rejected'
 
     def test_proper_available(self):
         """Series plugin: proper available immediately"""
-        self.execute_feed('test_propers_4')
+        self.execute_feed('proper_at_first')
         self.dump()
         assert self.feed.find_entry('accepted', title='Foobar.S01E01.720p.proper.FlexGet'), \
             'Foobar.S01E01.720p.proper.FlexGet should have been accepted'
