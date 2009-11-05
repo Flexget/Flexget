@@ -22,6 +22,8 @@ class SeriesParser(TitleParser):
         self.name = None
         self.data = None
         self.expect_ep = False
+        # if set to true, episode or id must follow immediattely after name
+        self.strict_name = False
         
         self.ep_regexps = ['s(\d+)e(\d+)', 's(\d+)ep(\d+)', 's(\d+).e(\d+)', '[^\d]([\d]{1,2})[\s]?x[\s]?(\d+)']
         self.id_regexps = ['(\d\d\d\d).(\d+).(\d+)', '(\d+).(\d+).(\d\d\d\d)', \
@@ -98,6 +100,8 @@ class SeriesParser(TitleParser):
         
         data_parts = data.split(' ')
 
+        # name end position
+        name_end = 0
         # regexp name matching
         if self.name_regexps:
             name_matches = False
@@ -105,6 +109,7 @@ class SeriesParser(TitleParser):
             for name_re in self.name_regexps:
                 match = re.search(name_re, data, re.IGNORECASE|re.UNICODE)
                 if match:
+                    name_end = match.end()
                     name_matches = True
                     break
             if not name_matches:
@@ -114,10 +119,12 @@ class SeriesParser(TitleParser):
         else:
             # Use a regexp generated from the name as a fallback.
             name_re = name_to_re(name)
-            if not re.search(name_re, data, re.IGNORECASE|re.UNICODE):
+            match = re.search(name_re, data, re.IGNORECASE|re.UNICODE)
+            if not match:
                 #log.debug('FAIL: regexp %s does not match %s' % (name_re, data))
                 # leave this invalid
                 return
+            name_end = match.end()
                 
         # TODO: matched name should be EXCLUDED from ep and id searching!
 
@@ -142,6 +149,11 @@ class SeriesParser(TitleParser):
         for ep_re in self.ep_regexps:
             match = re.search(ep_re, data, re.IGNORECASE|re.UNICODE)
             if match:
+                # strict_name
+                if self.strict_name:
+                    if match.start() - name_end >= 2:
+                        return
+
                 #log.debug('found episode number with regexp %s' % ep_re)
                 season, episode = match.groups()
                 self.season = int(season)
@@ -155,6 +167,11 @@ class SeriesParser(TitleParser):
             for id_re in self.id_regexps:
                 match = re.search(id_re, data, re.IGNORECASE|re.UNICODE)
                 if match:
+                    # strict_name
+                    if self.strict_name:
+                        if match.start() - name_end >= 2:
+                            return
+
                     #log.debug('found id with regexp %s' % id_re)
                     self.id = '-'.join(match.groups())
                     if self.special:
@@ -168,6 +185,11 @@ class SeriesParser(TitleParser):
 
             match = re.search('\d\d\d', data, re.IGNORECASE|re.UNICODE)
             if match:
+                # strict_name
+                if self.strict_name:
+                    if match.start() - name_end >= 2:
+                        return
+
                 got = match.group(0)
                 self.season = int(got[0])
                 self.episode = int(got[1:])

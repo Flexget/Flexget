@@ -323,6 +323,8 @@ class FilterSeries(SeriesPlugin):
             advanced.accept('text', key='min_quality')                # TODO: ^^
             advanced.accept('text', key='max_quality')                # TODO: ^^
             advanced.accept('regexp_match', key='timeframe').accept('\d+ (minutes|hours|days|weeks)')
+            # strict naming
+            advanced.accept('boolean', key='exact')
             # watched
             watched = advanced.accept('dict', key='watched')
             watched.accept('number', key='season')
@@ -432,8 +434,29 @@ class FilterSeries(SeriesPlugin):
                 complex_series.append({series: series_settings})
             # add generated complex series into config
             config[group_name] = complex_series
-            
+
+        # settings is not needed anymore, just confuses
+        del(config['settings'])
         return config
+
+    def auto_exact(self, config):
+        """Automatically enable exact naming option for series that look like a problem"""
+
+        # generate list of all series in one dict
+        all_series = {}
+        for group_name, group_series in config.iteritems():
+            for series_item in group_series:
+                series_name, series_config = series_item.items()[0]
+                all_series[series_name] = series_config
+
+        # scan for problematic names
+        for series_name, series_config in all_series.iteritems():
+            for name in all_series.keys():
+                if (name.lower().startswith(series_name.lower())) and \
+                   (name.lower() != series_name.lower()):
+                    if not 'exact' in series_config:
+                        log.info('Auto enabling exact (naming) for series %s' % series_name)
+                        series_config['exact'] = True
     
     def on_feed_filter(self, feed):
         """Filter series"""
@@ -450,10 +473,9 @@ class FilterSeries(SeriesPlugin):
             series.name = series.name.lower()
         
         config = self.generate_config(feed)
+        self.auto_exact(config)
+        
         for group_name, group_series in config.iteritems():
-            # TODO: do we even need settings block in the config at this point, should generate remove it?
-            if group_name == 'settings':
-                continue
             for series_item in group_series:
                 series_name, series_config = series_item.items()[0]
                 log.log(5, 'series_name: %s series_config: %s' % (series_name, series_config))

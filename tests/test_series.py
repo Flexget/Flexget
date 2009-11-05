@@ -571,3 +571,25 @@ class TestCapitalization(FlexGetBase):
         assert self.feed.find_entry('accepted', title='FooBar.S01E01.PDTV-FlexGet')
         self.execute_feed('test_2')
         assert self.feed.find_entry('rejected', title='FooBar.S01E01.PDTV-FlexGet')
+
+
+class TestAutoExact(FlexGetBase):
+
+    __yaml__ = """
+        feeds:
+          test:
+            input_mock:
+              - {title: 'ABC.S01E01.PDTV-FlexGet'}
+              - {title: 'ABC.LA.S01E01.PDTV-FlexGet'}
+              - {title: 'ABC.MIAMI.S01E01.PDTV-FlexGet'}
+            series:
+              - ABC
+              - ABC LA
+              - ABC Miami
+    """
+
+    def test_auto(self):
+        self.execute_feed('test')
+        assert self.feed.find_entry('accepted', title='ABC.S01E01.PDTV-FlexGet')
+        assert self.feed.find_entry('accepted', title='ABC.LA.S01E01.PDTV-FlexGet')
+        assert self.feed.find_entry('accepted', title='ABC.MIAMI.S01E01.PDTV-FlexGet')

@@ -160,3 +160,26 @@ class TestSeriesParser(object):
         assert s.season == 7, 'didn''t pick up season'
         assert s.episode == 6, 'didn''t pick up episode'
 
+
+    def test_strict_name(self):
+        """SeriesParser: test strict name parsing"""
+
+        s = SeriesParser()
+        s.name = 'test'
+        s.data = 'Test.Foobar.S01E02.720p-FlexGet'
+        s.parse()
+        assert s.valid, 'normal failed'
+
+        s = SeriesParser()
+        s.strict_name = True
+        s.name = 'test'
+        s.data = 'Test.A.S01E02.720p-FlexGet'
+        s.parse()
+        assert not s.valid, 'strict failed'
+
+        s = SeriesParser()
+        s.strict_name = True
+        s.name = 'Test AB'
+        s.data = 'Test.AB.S01E02.720p-FlexGet'
+        s.parse()
+        assert s.valid, 'strict AB failed'
