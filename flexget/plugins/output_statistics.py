@@ -1,4 +1,5 @@
-import sys, os.path
+import sys
+import os.path
 import logging
 from flexget.plugin import *
 
@@ -71,8 +72,6 @@ class Statistics:
         con.commit()
         
     def on_feed_input(self, feed):
-        if not has_sqlite:
-            raise PluginWarning('plugin statistics requires python-sqlite2 or python 2.5.')
         self.total = len(feed.entries)
 
     def on_feed_exit(self, feed):
@@ -102,6 +101,8 @@ class Statistics:
         return config
 
     def on_process_end(self, feed):
+        if feed._abort:
+            return
         if self.written:
             log.debug("stats already done for this run")
             return
