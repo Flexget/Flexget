@@ -89,7 +89,7 @@ class Manager:
                     print ' o Indentation error'
                     print ' o Missing : from end of the line'
                     print ' o Non ASCII characters (use UTF8)'
-                    print " o If text contains any of :[]{} characters it must be single-quoted ('')\n"
+                    print " o If text contains any of :[]{}% characters it must be single-quoted ('')\n"
                     lines = 0
                     if not e.context_mark is None:
                         print ' Check configuration near line %s, column %s' % (e.context_mark.line, e.context_mark.column)
@@ -355,6 +355,7 @@ class Manager:
             try:
                 feed.session = Session()
                 feed.execute()
+                log.debug('session.commit() for %s' % feed.name)
                 feed.session.commit()
             except Exception, e:
                 failed.append(name)

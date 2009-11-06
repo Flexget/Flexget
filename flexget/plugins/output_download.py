@@ -59,8 +59,7 @@ class PluginDownloads:
                 print ' Url     : %s' % download.url
                 print ' Stored  : %s' % download.filename
                 print ' Time    : %s' % download.time.strftime("%c")
-                if feed.manager.options.details:
-                    print ' Details : %s' % download.details
+                print ' Details : %s' % download.details
                 print '-' * 79
             session.close()
 

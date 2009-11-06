@@ -84,6 +84,9 @@ class TestSeriesParser(object):
         s = self.parse(name='Test', data='Test.S01E01.720p-FlexGet')
         assert s.quality=='720p', 'failed to parse quality from %s' % s.data
 
+        s = self.parse(name='30 Suck', data='30 Suck 4x4 [HDTV - FlexGet]')
+        assert s.quality=='hdtv', 'failed to parse quality %s' % s
+
     def test_quality_parenthesis(self):
         """SeriesParser: quality in parenthesis"""
         s = self.parse(name='Foo Bar', data='Foo.Bar.S01E01.[720p].HDTV.x264-FlexGet')
@@ -118,9 +121,9 @@ class TestSeriesParser(object):
         """SeriesParser: ignoring season packs"""
         """
         s = SeriesParser()
-	s.name = 'The Foo'
-	s.expect_ep = False
-	s.data = 'The.Foo.S04.1080p.FlexGet.5.1'
+        s.name = 'The Foo'
+        s.expect_ep = False
+        s.data = 'The.Foo.S04.1080p.FlexGet.5.1'
         assert_raises(ParseWarning, s.parse)
         """
 
@@ -128,17 +131,17 @@ class TestSeriesParser(object):
         s.name = 'Something'
         s.data = 'Something S02 Pack 720p WEB-DL-FlexGet'
         assert_raises(ParseWarning, s.parse)
-        
+
         s = SeriesParser()
         s.name = 'The Foo'
         s.expect_ep = False
         s.data = 'The Foo S05 720p BluRay DTS x264-FlexGet'
         assert_raises(ParseWarning, s.parse)
-        
+
         s = SeriesParser()
-	s.name = 'The Foo'
-	s.expect_ep = True
-	s.data = 'The Foo S05 720p BluRay DTS x264-FlexGet'
+        s.name = 'The Foo'
+        s.expect_ep = True
+        s.data = 'The Foo S05 720p BluRay DTS x264-FlexGet'
         assert_raises(ParseWarning, s.parse)
 
     def _test_similar(self):

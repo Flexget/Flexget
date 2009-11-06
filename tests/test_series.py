@@ -57,21 +57,21 @@ class TestQuality(FlexGetBase):
         assert self.feed.find_entry('accepted', title='QTest.S01E01.720p.XViD-FlexGet'), \
             '720p should have been accepted'
         assert len(self.feed.accepted) == 1, 'should have accepted only one'
-            
+
     def test_min_quality(self):
         """Series plugin: min_quality"""
         self.execute_feed('min_quality')
         assert self.feed.find_entry('accepted', title='MinQTest.S01E01.1080p.XViD-FlexGet'), \
             'MinQTest.S01E01.1080p.XViD-FlexGet should have been accepted'
         assert len(self.feed.accepted) == 1, 'should have accepted only one'
-            
+
     def test_max_quality(self):
         """Series plugin: max_quality"""
         self.execute_feed('max_quality')
         assert self.feed.find_entry('accepted', title='MaxQTest.S01E01.HDTV.XViD-FlexGet'), \
             'MaxQTest.S01E01.HDTV.XViD-FlexGet should have been accepted'
         assert len(self.feed.accepted) == 1, 'should have accepted only one'
-    
+
     def test_min_max_quality(self):
         """Series plugin: min_quality with max_quality"""
         self.execute_feed('min_max_quality')
@@ -81,10 +81,12 @@ class TestQuality(FlexGetBase):
 
 
 class TestDatabase(FlexGetBase):
+
     __yaml__ = """
         global:
           series:
             - some series
+            - progress
 
         feeds:
           test_1:
@@ -93,6 +95,16 @@ class TestDatabase(FlexGetBase):
           test_2:
             input_mock:
               - {title: 'Some.Series.S01E20.720p.XViD-DoppelGanger'}
+              
+          progress_1:
+            input_mock:
+              - {title: 'Progress.S01E20.720p-FlexGet'}
+              - {title: 'Progress.S01E20.HDTV-FlexGet'}
+              
+          progress_2:
+            input_mock:
+              - {title: 'Progress.S01E20.720p.Another-FlexGet'}
+              - {title: 'Progress.S01E20.HDTV-Another-FlexGet'}
     """
 
     def test_database(self):
@@ -100,6 +112,17 @@ class TestDatabase(FlexGetBase):
         self.execute_feed('test_2')
         assert self.feed.find_entry('rejected', title='Some.Series.S01E20.720p.XViD-DoppelGanger'), \
             'failed basic download remembering'
+            
+    def test_progress(self):
+        self.execute_feed('progress_1')
+        assert self.feed.find_entry('accepted', title='Progress.S01E20.720p-FlexGet'), \
+            'best quality not accepted'
+        # should not accept anything
+        self.execute_feed('progress_1')
+        assert not self.feed.accepted, 'repeated execution accepted'
+        # introduce new doppelgangers
+        self.execute_feed('progress_2')
+        assert not self.feed.accepted, 'doppelgangers accepted'
 
 class TestFilterSeries(FlexGetBase):
 
@@ -131,7 +154,7 @@ class TestFilterSeries(FlexGetBase):
     def test_smoke(self):
         """Series plugin: test several standard features"""
         self.execute_feed('test')
-        
+
         # normal passing
         assert self.feed.find_entry(title='Another.Series.S01E20.720p.XViD-FlexGet'), \
             'Another.Series.S01E20.720p.XViD-FlexGet should have passed'
@@ -141,36 +164,16 @@ class TestFilterSeries(FlexGetBase):
               'Date.Series.2008-10-13.XViD', 'Date.Series.2008x10.14.XViD']
         for d in df:
             assert self.feed.find_entry(title=d), 'Date format did not match %s' % d
-        
+
         # parse from filename
         assert self.feed.find_entry(filename='Filename.Series.S01E26.XViD'), 'Filename parsing failed'
-        
+
         # empty description
         assert self.feed.find_entry(title='Empty.Description.S01E22.XViD'), 'Empty Description failed'
-        
+
         # chaining with regexp plugin
         assert self.feed.find_entry('rejected', title='Another.Series.S01E21.1080p.H264-FlexGet'), \
             'regexp chaining'
-
-
-class TestTimeframe(FlexGetBase):
-
-    __yaml__ = """
-        feeds:
-          test_quality:
-            input_mock:
-              - {title: 'foobar s01e01.pdtv-FlexGetA'}
-              - {title: 'foobar s01e01.720p-FlexGetB'}
-            series:
-              - foobar:
-                  timeframe: 3 hours
-                  quality: 720p
-    """
-
-    def test_quality(self):
-        self.execute_feed('test_quality')
-        assert self.feed.find_entry(title='foobar s01e01.720p-FlexGetB'), \
-            'should have accepted foobar s01e01.720p-FlexGetB'
 
 
 class TestEpisodeAdvancement(FlexGetBase):
@@ -183,7 +186,7 @@ class TestEpisodeAdvancement(FlexGetBase):
               - {title: 'foobar s01e01'}
             series:
               - foobar
-              
+
           test_unordered:
             input_mock:
               - {title: 'zzz s01e05'}
@@ -201,7 +204,7 @@ class TestEpisodeAdvancement(FlexGetBase):
             series:
               - zzz
     """
-    
+
     def test_simple(self):
         self.execute_feed('test_simple')
         assert self.feed.find_entry('accepted', title='foobar s01e12'), \
@@ -215,7 +218,7 @@ class TestEpisodeAdvancement(FlexGetBase):
         self.execute_feed('test_unordered')
         assert len(self.feed.accepted) == 12, \
             'not everyone was accepted'
-        
+
 class TestFilterSeriesPriority(FlexGetBase):
 
     __yaml__ = """
@@ -229,7 +232,7 @@ class TestFilterSeriesPriority(FlexGetBase):
                 - 720p
             series:
               - foobar
-    """    
+    """
 
     def test_priorities(self):
         """Series plugin: regexp plugin is able to reject before series plugin"""
@@ -272,7 +275,7 @@ class TestPropers(FlexGetBase):
             input_mock:
               - {title: 'Foobar.S01E01.720p.FlexGet'}
               - {title: 'Foobar.S01E01.720p.proper.FlexGet'}
-              
+
           # test a lot of propers at once
           lot_propers:
             input_mock:
@@ -339,7 +342,6 @@ class TestPropers(FlexGetBase):
         assert self.feed.find_entry('accepted', title='Foobar.S01E01.720p.proper.FlexGet'), \
             'Foobar.S01E01.720p.proper.FlexGet should have been accepted'
 
-
 class TestSimilarNames(FlexGetBase):
 
     # hmm, not very good way to test this .. seriesparser should be tested alone?
@@ -355,7 +357,7 @@ class TestSimilarNames(FlexGetBase):
               - FooBar
               - "FooBar: FirstAlt"
               - "FooBar: SecondAlt"
-    """    
+    """
 
     def setup(self):
         FlexGetBase.setUp(self)
@@ -369,11 +371,11 @@ class TestSimilarNames(FlexGetBase):
 class TestDuplicates(FlexGetBase):
 
     __yaml__ = """
-        
+
         global: # just cleans log a bit ..
           disable_builtins:
             - seen
-            
+
         feeds:
           test_dupes:
             input_mock:
@@ -467,7 +469,7 @@ class TestLaterDupes(FlexGetBase):
               - {title: 'FooBar.S02E03.HDTV-Bug'}
               - {title: 'FooBar.S02E03.HDTV-FlexGet'}
     '''
-    
+
     def test_later(self):
         self.execute_feed('test_1')
         assert len(self.feed.accepted) == 1
@@ -481,37 +483,43 @@ class TestLaterDupes(FlexGetBase):
 class TestQualities(FlexGetBase):
 
     __yaml__ = """
+        global:
+          series:
+            - FooBar:
+                qualities:
+                  - PDTV
+                  - 720p
+                  - 1080p
         feeds:
-          test:
+          test_1:
             input_mock:
               - {title: 'FooBar.S01E01.PDTV-FlexGet'}
-              - {title: 'FooBar.S01E01.720p-FlexGet'}
               - {title: 'FooBar.S01E01.1080p-FlexGet'}
               - {title: 'FooBar.S01E01.HR-FlexGet'}
-            series:
-              - FooBar:
-                  qualities:
-                    - PDTV
-                    - 720p
-                    - 1080p
+          test_2:
+            input_mock:
+              - {title: 'FooBar.S01E01.720p-FlexGet'}
     """
 
     def test_qualities(self):
-        self.execute_feed('test')
+        self.execute_feed('test_1')
 
         assert self.feed.find_entry('accepted', title='FooBar.S01E01.PDTV-FlexGet'), \
             'Didn''t accept FooBar.S01E01.PDTV-FlexGet'
-        assert self.feed.find_entry('accepted', title='FooBar.S01E01.720p-FlexGet'), \
-            'Didn''t accept FooBar.S01E01.720p-FlexGet'
         assert self.feed.find_entry('accepted', title='FooBar.S01E01.1080p-FlexGet'), \
             'Didn''t accept FooBar.S01E01.1080p-FlexGet'
 
         assert not self.feed.find_entry('accepted', title='FooBar.S01E01.HR-FlexGet'), \
             'Accepted FooBar.S01E01.HR-FlexGet'
 
+        self.execute_feed('test_2')
+
+        assert self.feed.find_entry('accepted', title='FooBar.S01E01.720p-FlexGet'), \
+            'Didn''t accept FooBar.S01E01.720p-FlexGet'
+
         # test that it rejects them after
 
-        self.execute_feed('test')
+        self.execute_feed('test_1')
 
         assert self.feed.find_entry('rejected', title='FooBar.S01E01.PDTV-FlexGet'), \
             'Didn''t rehect FooBar.S01E01.PDTV-FlexGet'
@@ -589,7 +597,74 @@ class TestAutoExact(FlexGetBase):
     """
 
     def test_auto(self):
+        """Series plugin: auto enable exact"""
         self.execute_feed('test')
         assert self.feed.find_entry('accepted', title='ABC.S01E01.PDTV-FlexGet')
         assert self.feed.find_entry('accepted', title='ABC.LA.S01E01.PDTV-FlexGet')
         assert self.feed.find_entry('accepted', title='ABC.MIAMI.S01E01.PDTV-FlexGet')
+
+
+class TestTimeframe(FlexGetBase):
+    __yaml__ = """
+        global:
+          series:
+            - test:
+                timeframe: 5 hours
+                quality: 720p
+        feeds:
+          test_no_waiting:
+            input_mock:
+              - {title: 'Test.S01E01.720p-FlexGet'}
+
+          test_stop_waiting_1:
+            input_mock:
+              - {title: 'Test.S01E02.HDTV-FlexGet'}
+
+          test_stop_waiting_2:
+             input_mock:
+               - {title: 'Test.S01E02.720p-FlexGet'}
+
+          test_expires:
+            input_mock:
+              - {title: 'Test.S01E03.pdtv-FlexGet'}
+    """
+
+    def test_no_waiting(self):
+        """Series plugin: no timeframe waiting needed"""
+        self.execute_feed('test_no_waiting')
+        assert self.feed.find_entry('accepted', title='Test.S01E01.720p-FlexGet'), \
+            '720p not accepted immediattely'
+
+    def test_stop_waiting(self):
+        """Series plugin: timeframe quality appears, stop waiting"""
+        self.execute_feed('test_stop_waiting_1')
+        assert self.feed.rejected
+        self.execute_feed('test_stop_waiting_2')
+        assert self.feed.find_entry('accepted', title='Test.S01E02.720p-FlexGet'), \
+            '720p should have caused stop waiting'
+
+    def test_expires(self):
+        """Series plugin: timeframe expires"""
+        # first excecution should not accept anything
+        self.execute_feed('test_expires')
+        assert not self.feed.accepted
+        
+        def age(**kwargs):
+            from flexget.plugins.filter_series import Series
+            from flexget.manager import Session
+            import datetime
+            session = Session()
+            for series in session.query(Series).all():
+                for episode in series.episodes:
+                    episode.first_seen = datetime.datetime.now() - datetime.timedelta(**kwargs)
+            session.commit()
+            
+        # let 3 hours pass            
+        age(hours=3)
+        self.execute_feed('test_expires')
+        assert not self.feed.accepted, 'expired too soon'
+        
+        # let another 3 hours pass, should expire now!
+        age(hours=6)
+        self.execute_feed('test_expires')
+        assert self.feed.accepted, 'timeframe didn\'t expire'

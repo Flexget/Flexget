@@ -60,13 +60,14 @@ class SeriesParser(TitleParser):
             if matches:
                 for match in matches:
                     # TODO: check if match contain valid episode number ? .. 
+                    log.debug('match: %s' % match)
                     safe = True
                     for quality in self.qualities:
-                        if quality in match:
+                        if quality.lower() in match.lower():
                             safe = False
                             break
                     for proper in self.propers:
-                        if proper in match:
+                        if proper.lower() in match.lower():
                             safe = False
                             break
                     if not safe:
@@ -74,7 +75,7 @@ class SeriesParser(TitleParser):
                     else:
                         data = data.replace(match, '').strip()
             
-        #log.log(5, 'data after cleaners: %s' % data)
+        log.log(5, 'data after cleaners: %s' % data)
 
         def clean(str):
             """Helper, just replace crap with spaces"""
@@ -82,8 +83,10 @@ class SeriesParser(TitleParser):
 
         name = clean(self.name)
         data = clean(data)
+        # remove duplicate spaces
+        data = ' '.join(data.split())
         
-        #log.log(5, 'data fully-cleaned: %s' % data)
+        log.log(5, 'data fully-cleaned: %s' % data)
             
         def name_to_re(name):
             """Convert 'foo bar' to '^[^...]*foo[^...]*bar[^...]+"""
@@ -97,7 +100,7 @@ class SeriesParser(TitleParser):
             return res
 
         #log.debug('name: %s data: %s' % (name, data))
-        
+
         data_parts = data.split(' ')
 
         # name end position

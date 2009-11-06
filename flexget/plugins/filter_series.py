@@ -582,8 +582,9 @@ class FilterSeries(SeriesPlugin):
             
             # get list of downloaded releases
             downloaded_releases = self.get_downloaded(feed.session, eps[0].name, eps[0].identifier())
+            log.debug('querying downloaded for name: %s id: %s' % (eps[0].name, eps[0].identifier()))
             log.debug('downloaded: %s' % [e.title for e in downloaded_releases])
-            log.debug('episodes: %s' % [e.data for e in eps])
+            log.debug('current episodes: %s' % [e.data for e in eps])
 
             """            
             from IPython.Shell import IPShellEmbed
@@ -634,7 +635,7 @@ class FilterSeries(SeriesPlugin):
                 eps.remove(ep)
 
             log.debug('new_propers: %s' % [e.data for e in new_propers])
-            log.debug('episodes: %s' % [e.data for e in eps])
+            log.debug('current episodes: %s' % [e.data for e in eps])
 
             #
             # reject downloaded
@@ -686,8 +687,9 @@ class FilterSeries(SeriesPlugin):
                             entry = self.parser2entry[ep]
                             feed.reject(entry, 'episode advancement')
                         continue
-
-            # multiple qualities, accept all wanted qualities
+            #
+            # qualities
+            #
             def is_quality_downloaded(quality):
                 for release in downloaded_releases:
                     if release.quality == quality:
@@ -705,7 +707,9 @@ class FilterSeries(SeriesPlugin):
                         self.accept_series(feed, ep, 'wanted qualities')
                 continue
 
-            # timeframe present
+            #
+            # timeframe
+            #
             if 'timeframe' in config:
                 log.debug('::processing timeframe')
                 if 'max_quality' in config:
@@ -756,7 +760,7 @@ class FilterSeries(SeriesPlugin):
                 first_seen = self.get_first_seen(feed.session, best)
                 log.debug('timeframe: %s' % timeframe)
                 log.debug('first_seen: %s' % first_seen)
-                log.debug('first_seen + timeframe: %s' % str(first_seen + timeframe))
+                log.debug('timeframe expires: %s' % str(first_seen + timeframe))
                 
                 if first_seen + timeframe <= datetime.now() or stop:
                     entry = self.parser2entry[best]
@@ -778,7 +782,9 @@ class FilterSeries(SeriesPlugin):
                         feed.reject(entry, 'timeframe is waiting')
                     continue
 
+            #
             # quality, min_quality, max_quality and NO timeframe
+            #
             if ('timeframe' not in config and 'qualities' not in config) and \
                ('quality' in config or 'min_quality' in config or 'max_quality' in config):
                 log.debug('::quality/min_quality/max_quality without timeframe')
@@ -811,15 +817,18 @@ class FilterSeries(SeriesPlugin):
         """Helper method for accepting series"""
         entry = self.parser2entry[parser]
         if (entry['title'] != parser.data):
-            log.debug('BUG? accepted title is different from parser.data')
+            log.critical('BUG? accepted title is different from parser.data')
         feed.accept(entry, reason)
 
     def on_feed_exit(self, feed):
         """Learn succeeded episodes"""
+        log.debug('on_feed_exit')
         for entry in feed.accepted:
             if 'series_release' in entry:
-                log.debug('marking %s as downloaded' % (entry['series_release']))
+                log.debug('marking %s as downloaded' % entry['series_release'])
                 entry['series_release'].downloaded = True
+            else:
+                log.debug('%s is not a series' % entry['title'])
 
 #
 # Register plugins
