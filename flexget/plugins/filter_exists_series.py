@@ -53,14 +53,14 @@ class FilterExistsSeries:
                             parser.parse()
                             if parser.valid:
                                 log.debug('name %s is same series as %s' % (name, entry['title']))
-                                log.debug('parser.identifier = %s' % parser.identifier())
-                                log.debug('oldparser.identifier = %s' % oldparser.identifier())
+                                log.debug('parser.identifier = %s' % parser.identifier)
+                                log.debug('oldparser.identifier = %s' % oldparser.identifier)
                                 log.debug('parser.quality = %s' % parser.quality)
                                 log.debug('oldparser.quality = %s' % oldparser.quality)
                                 
-                                if parser.identifier() == oldparser.identifier() and \
+                                if parser.identifier == oldparser.identifier and \
                                    parser.quality == oldparser.quality:
-                                    log.debug('Found episode %s %s in %s' % (parser.name, parser.identifier(), root))
+                                    log.debug('Found episode %s %s in %s' % (parser.name, parser.identifier, root))
                                     feed.reject(entry, 'episode already exists')
                                 else:
                                     log.debug('... but doesn\'t match')

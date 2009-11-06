@@ -108,12 +108,16 @@ class TestDatabase(FlexGetBase):
     """
 
     def test_database(self):
+        """Series plugin: simple database"""
+
         self.execute_feed('test_1')
         self.execute_feed('test_2')
         assert self.feed.find_entry('rejected', title='Some.Series.S01E20.720p.XViD-DoppelGanger'), \
             'failed basic download remembering'
             
-    def test_progress(self):
+    def test_doppelgangers(self):
+        """Series plugin: doppelganger releases (dupes)"""
+        
         self.execute_feed('progress_1')
         assert self.feed.find_entry('accepted', title='Progress.S01E20.720p-FlexGet'), \
             'best quality not accepted'
@@ -206,6 +210,7 @@ class TestEpisodeAdvancement(FlexGetBase):
     """
 
     def test_simple(self):
+        """Series plugin: simple episode advancement"""
         self.execute_feed('test_simple')
         assert self.feed.find_entry('accepted', title='foobar s01e12'), \
             'foobar s01e12 should have been accepted'
@@ -215,6 +220,7 @@ class TestEpisodeAdvancement(FlexGetBase):
             'foobar s01e01 should have been rejected, too old'
 
     def test_unordered(self):
+        """Series plugin: unordered episode advancement"""
         self.execute_feed('test_unordered')
         assert len(self.feed.accepted) == 12, \
             'not everyone was accepted'
@@ -364,6 +370,7 @@ class TestSimilarNames(FlexGetBase):
         self.execute_feed('test')
 
     def test_names(self):
+        """Series plugin: similar namings"""
         assert self.feed.find_entry('accepted', title='FooBar.S03E01.DSR-FlexGet'), 'Standard failed?'
         assert self.feed.find_entry('accepted', title='FooBar: FirstAlt.S02E01.DSR-FlexGet'), 'FirstAlt failed'
         assert self.feed.find_entry('accepted', title='FooBar: SecondAlt.S01E01.DSR-FlexGet'), 'SecondAlt failed'
@@ -510,6 +517,7 @@ class TestQualities(FlexGetBase):
     """
 
     def test_qualities(self):
+        """Series plugin: qualities"""
         self.execute_feed('test_1')
 
         assert self.feed.find_entry('accepted', title='FooBar.S01E01.PDTV-FlexGet'), \
@@ -538,6 +546,7 @@ class TestQualities(FlexGetBase):
             'Accepted FooBar.S01E01.HR-FlexGet'
 
     def test_propers(self):
+        """Series plugin: qualities + propers"""
         self.execute_feed('propers_1')
         assert self.feed.accepted
         self.execute_feed('propers_2')
@@ -563,6 +572,7 @@ class TestIdioticNumbering(FlexGetBase):
     """
 
     def test_idiotic(self):
+        """Series plugin: idiotic numbering scheme"""
         self.execute_feed('test_1')
         self.execute_feed('test_2')
         entry = self.feed.find_entry(title='FooBar.102.PDTV-FlexGet')
@@ -589,6 +599,7 @@ class TestCapitalization(FlexGetBase):
     """
 
     def test_capitalization(self):
+        """Series plugin: configuration capitalization"""
         self.execute_feed('test_1')
         assert self.feed.find_entry('accepted', title='FooBar.S01E01.PDTV-FlexGet')
         self.execute_feed('test_2')

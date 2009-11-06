@@ -585,6 +585,7 @@ class FilterSeries(SeriesPlugin):
             log.debug('start with episodes: %s' % [e.data for e in eps])
 
             # proper handling
+            log.debug('process_propers -->')
             removed, new_propers = self.process_propers(feed, eps)
             log.debug('new_propers: %s' % [e.data for e in new_propers])
 
@@ -599,10 +600,12 @@ class FilterSeries(SeriesPlugin):
 
             # qualities
             if 'qualities' in config:
+                log.debug('qualities -->')
                 self.process_qualities(feed, config, eps, new_propers)
                 continue
 
             # reject downloaded
+            log.debug('downloaded -->')
             for ep in self.process_downloaded(feed, eps, new_propers):
                 feed.reject(self.parser2entry[ep], 'already downloaded')
                 log.debug('downloaded removed: %s' % ep)
@@ -618,15 +621,19 @@ class FilterSeries(SeriesPlugin):
 
             # reject episodes that have been marked as watched in configig file
             if 'watched' in config:
+                log.debug('watched -->')
                 if self.process_watched(feed, config, eps):
                     continue
                     
             # Episode advancement. Used only with season based series
             if best.season and best.episode:
-                self.process_episode_advancement(feed, eps, series)
+                log.debug('episode advancement -->')
+                if self.process_episode_advancement(feed, eps, series):
+                    continue
 
             # timeframe
             if 'timeframe' in config:
+                log.debug('timeframe -->')
                 if self.process_timeframe(feed, config, eps, series_name):
                     # TODO: would it be simplier / valid just to continue always?
                     continue
@@ -634,6 +641,7 @@ class FilterSeries(SeriesPlugin):
             # quality, min_quality, max_quality and NO timeframe
             if ('timeframe' not in config and 'qualities' not in config) and \
                ('quality' in config or 'min_quality' in config or 'max_quality' in config):
+                log.debug('process quality -->')
                 self.process_quality(feed, config, eps)
                 continue
 
@@ -645,8 +653,6 @@ class FilterSeries(SeriesPlugin):
             Rejects downloaded propers, nukes episodes from which there exists proper.
             Returns a list of removed episodes and a list of new propers.
         """
-
-        log.debug('process_propers -->')
 
         # get list of downloaded releases
         downloaded_releases = self.get_downloaded(feed.session, eps[0].name, eps[0].identifier)
@@ -667,7 +673,6 @@ class FilterSeries(SeriesPlugin):
                     log.debug('found new proper %s' % ep)
                     new_propers.append(ep)
                 else:
-                    log.debug('found downloaded proper %s' % ep)
                     feed.reject(self.parser2entry[ep], 'proper already downloaded')
                     removed.append(ep)
 
@@ -708,7 +713,6 @@ class FilterSeries(SeriesPlugin):
     def process_quality(self, feed, config, eps):
         """Accepts episodes that meet configured qualities"""
 
-        log.debug('process quality -->')
         accepted_qualities = []
         if 'quality' in config:
             accepted_qualities.append(config['quality'])
@@ -732,7 +736,6 @@ class FilterSeries(SeriesPlugin):
     def process_watched(self, feed, config, eps):
         """Rejects all episodes older than defined in watched, returns True when this happens."""
 
-        log.debug('watched -->')
         from sys import maxint
         best = eps[0]
         wconfig = config.get('watched')
@@ -748,7 +751,6 @@ class FilterSeries(SeriesPlugin):
     def process_episode_advancement(self, feed, eps, series):
         """Rjects all episodes that are too old (advancement), return True when this happens."""
 
-        log.debug('episode advancement -->')
         best = eps[0]
         latest = self.get_latest_info(feed.session, best.name)
         if latest:
@@ -765,7 +767,6 @@ class FilterSeries(SeriesPlugin):
         """The nasty timeframe logic, too complex even to explain (for now). Returns True
         when there's no sense trying any other logic."""
 
-        log.debug('::processing timeframe')
         if 'max_quality' in config:
             log.warning('Timeframe does not support max_quality (yet)')
         if 'min_quality' in config:
@@ -836,8 +837,6 @@ class FilterSeries(SeriesPlugin):
     def process_qualities(self, feed, config, eps, whitelist):
         """Accepts all wanted qualities. Accepts whitelisted episodes even if downloaded."""
 
-        log.debug('qualities -->')
-
         # get list of downloaded releases
         downloaded_releases = self.get_downloaded(feed.session, eps[0].name, eps[0].identifier)
         log.debug('downloaded_releases: %s' % downloaded_releases)
@@ -894,4 +893,3 @@ register_parser_option('--series-forget', action='callback', callback=optik_seri
 
 register_parser_option('--stop-waiting', action='store', dest='stop_waiting', default=False, 
                        metavar='NAME', help='Stop timeframe for a given series.')
-
