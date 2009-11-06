@@ -484,6 +484,7 @@ class TestQualities(FlexGetBase):
 
     __yaml__ = """
         global:
+          disable_builtins: yes
           series:
             - FooBar:
                 qualities:
@@ -517,14 +518,12 @@ class TestQualities(FlexGetBase):
         assert self.feed.find_entry('accepted', title='FooBar.S01E01.720p-FlexGet'), \
             'Didn''t accept FooBar.S01E01.720p-FlexGet'
 
-        # test that it rejects them after
+        # test that it rejects them afterwards
 
         self.execute_feed('test_1')
 
         assert self.feed.find_entry('rejected', title='FooBar.S01E01.PDTV-FlexGet'), \
             'Didn''t rehect FooBar.S01E01.PDTV-FlexGet'
-        assert self.feed.find_entry('rejected', title='FooBar.S01E01.720p-FlexGet'), \
-            'Didn''t reject FooBar.S01E01.720p-FlexGet'
         assert self.feed.find_entry('rejected', title='FooBar.S01E01.1080p-FlexGet'), \
             'Didn''t reject FooBar.S01E01.1080p-FlexGet'
 

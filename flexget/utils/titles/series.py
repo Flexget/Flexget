@@ -202,6 +202,7 @@ class SeriesParser(TitleParser):
 
         raise ParseWarning('%s looks like series %s but I cannot find any episode or id numbering!' % (data, self.name))
 
+    @property
     def identifier(self):
         """Return identifier for parsed episode"""
         if not self.valid: 
