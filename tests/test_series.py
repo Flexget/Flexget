@@ -500,6 +500,13 @@ class TestQualities(FlexGetBase):
           test_2:
             input_mock:
               - {title: 'FooBar.S01E01.720p-FlexGet'}
+
+          propers_1:
+            input_mock:
+              - {title: 'FooBar.S01E02.720p-FlexGet'}
+          propers_2:
+            input_mock:
+              - {title: 'FooBar.S01E02.720p.Proper-FlexGet'}
     """
 
     def test_qualities(self):
@@ -529,6 +536,14 @@ class TestQualities(FlexGetBase):
 
         assert not self.feed.find_entry('accepted', title='FooBar.S01E01.HR-FlexGet'), \
             'Accepted FooBar.S01E01.HR-FlexGet'
+
+    def test_propers(self):
+        self.execute_feed('propers_1')
+        assert self.feed.accepted
+        self.execute_feed('propers_2')
+        assert self.feed.accepted, 'proper not accepted'
+        self.execute_feed('propers_2')
+        assert not self.feed.accepted, 'proper accepted again'
 
 
 class TestIdioticNumbering(FlexGetBase):

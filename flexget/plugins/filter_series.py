@@ -475,7 +475,7 @@ class FilterSeries(SeriesPlugin):
         config = self.generate_config(feed)
         self.auto_exact(config)
         
-        for group_name, group_series in config.iteritems():
+        for group_series in config.itervalues():
             for series_item in group_series:
                 series_name, series_config = series_item.items()[0]
                 log.log(5, 'series_name: %s series_config: %s' % (series_name, series_config))
@@ -576,7 +576,7 @@ class FilterSeries(SeriesPlugin):
 
     def process_series(self, feed, series, series_name, config):
         """Accept or Reject episode from available releases, or postpone choosing."""
-        for identifier, eps in series.iteritems():
+        for eps in series.itervalues():
             if not eps: continue
 
             # sort episodes in order of quality
@@ -586,8 +586,7 @@ class FilterSeries(SeriesPlugin):
 
             # proper handling
             removed, new_propers = self.process_propers(feed, eps)
-            if new_propers:
-                log.debug('new_propers: %s' % [e.data for e in new_propers])
+            log.debug('new_propers: %s' % [e.data for e in new_propers])
 
             for ep in removed:
                 log.debug('propers removed: %s' % ep)
@@ -600,7 +599,7 @@ class FilterSeries(SeriesPlugin):
 
             # qualities
             if 'qualities' in config:
-                self.process_qualities(feed, config, eps)
+                self.process_qualities(feed, config, eps, new_propers)
                 continue
 
             # reject downloaded
@@ -682,8 +681,7 @@ class FilterSeries(SeriesPlugin):
         for proper in new_propers:
             for ep in set(eps) - set(removed) - set(new_propers):
                 if ep.quality == proper.quality:
-                    entry = self.parser2entry[ep]
-                    feed.reject(entry, 'nuked')
+                    feed.reject(self.parser2entry[ep], 'nuked')
                     removed.append(ep)
 
         return removed, new_propers
@@ -835,8 +833,8 @@ class FilterSeries(SeriesPlugin):
                 feed.reject(self.parser2entry[ep], 'timeframe is waiting')
             return True
 
-    def process_qualities(self, feed, config, eps):
-        """Accepts all wanted qualities."""
+    def process_qualities(self, feed, config, eps, whitelist):
+        """Accepts all wanted qualities. Accepts whitelisted episodes even if downloaded."""
 
         log.debug('qualities -->')
 
@@ -856,10 +854,10 @@ class FilterSeries(SeriesPlugin):
             if not ep.quality.lower() in qualities:
                 log.debug('%s is unwanted quality' % ep.quality)
                 continue
-            if not is_quality_downloaded(ep.quality):
-                feed.accept(self.parser2entry[ep], 'quality wanted')
-            else:
+            if is_quality_downloaded(ep.quality) and ep not in whitelist:
                 feed.reject(self.parser2entry[ep], 'quality downloaded')
+            else:
+                feed.accept(self.parser2entry[ep], 'quality wanted')
 
     # TODO: get rid of, see how feed.reject is called, consistency!
     def accept_series(self, feed, parser, reason):
