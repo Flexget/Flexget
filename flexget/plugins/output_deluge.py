@@ -49,7 +49,6 @@ class OutputDeluge:
         set_plugin.instance.register_keys({'path':'text', 'movedone':'text', \
             'queuetotop':'boolean', 'label':'text'})
 
-    @internet(log)
     def on_feed_download(self, feed):
         """
             call the feed_download method of download plugin
@@ -61,14 +60,8 @@ class OutputDeluge:
             return
         if not 'download' in feed.config:
             download = get_plugin_by_name('download')
-            """Download all feed content and store in temporary folder"""
-            for entry in feed.accepted:
-                if feed.manager.options.test:
-                    log.info('Would download: %s' % entry['title'])
-                else:
-                    if not feed.manager.unit_test:
-                        log.info('Downloading: %s' % entry['title'])
-                    download.instance.download(feed, entry)
+            # download all content to temp folder, may fail some entries
+            download.instance.on_feed_download(feed)
 
     def on_feed_output(self, feed):
         """Add torrents to deluge at exit."""
