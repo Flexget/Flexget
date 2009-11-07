@@ -50,7 +50,11 @@ class FilterExistsSeries:
                             parser.id_regexps = oldparser.id_regexps
                             # run parser on filename data
                             parser.data = name
-                            parser.parse()
+                            try:
+                                parser.parse()
+                            except ParseWarning, pw:
+                                from flexget.utils.log import log_once
+                                log_once(pw.value, logger=log)
                             if parser.valid:
                                 log.debug('name %s is same series as %s' % (name, entry['title']))
                                 log.debug('parser.identifier = %s' % parser.identifier)
