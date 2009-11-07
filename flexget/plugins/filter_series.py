@@ -129,6 +129,7 @@ class SeriesPlugin(object):
 
         # if release does not exists in episodes, add new
         release = session.query(Release).filter(Release.episode_id == episode.id).\
+            filter(Release.episode_id != None).\
             filter(Release.quality == parser.quality).\
             filter(Release.proper == parser.proper_or_repack).first()
         if not release:
