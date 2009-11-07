@@ -64,8 +64,10 @@ class SeriesPlugin(object):
     def get_latest_info(self, session, name):
         """Return latest known identifier in dict (season, episode) for series name"""
         episode = session.query(Episode).select_from(join(Episode, Series)).\
-            filter(Episode.season != None).filter(Series.name == name.lower()).\
-            order_by(desc(Episode.season)).order_by(desc(Episode.number)).first()
+            filter(Episode.season != None).\
+            filter(Series.name == name.lower()).\
+            order_by(desc(Episode.season)).\
+            order_by(desc(Episode.number)).first()
         if not episode:
             #log.log(5, 'get_latest_info: no info available for %s' % name)
             return False
@@ -128,6 +130,12 @@ class SeriesPlugin(object):
             log.debug('-> added %s' % episode)
 
         # if release does not exists in episodes, add new
+        #
+        # NOTE:
+        #
+        # filter(Release.episode_id != None) fixes weird bug where release had/has been added
+        # to database but doesn't have episode_id, this causes all kinds of havoc with the plugin.
+        # perhaps a bug in sqlalchemy?
         release = session.query(Release).filter(Release.episode_id == episode.id).\
             filter(Release.episode_id != None).\
             filter(Release.quality == parser.quality).\
@@ -142,23 +150,24 @@ class SeriesPlugin(object):
             log.debug('-> added %s' % release)
         return release
 
-
-_series = {}
-def optik_series(option, opt, value, parser):
-    """--series [NAME]"""
-    _series['got'] = True
-    if len(parser.rargs) != 0:
-        _series['name'] = parser.rargs[0]
-
 class SeriesReport(SeriesPlugin):
     
     """Produces --series report"""
 
+    options = {}
+
+    @staticmethod
+    def optik_series(option, opt, value, parser):
+        """--series [NAME]"""
+        SeriesReport.options['got'] = True
+        if len(parser.rargs) != 0:
+            SeriesReport.options['name'] = parser.rargs[0]
+
     def on_process_start(self, feed):
-        if _series:
+        if self.options:
             feed.manager.disable_feeds()
 
-            if not 'name' in _series:
+            if not 'name' in self.options:
                 self.display_summary()
             else:
                 self.display_details()
@@ -168,7 +177,7 @@ class SeriesReport(SeriesPlugin):
         from flexget.manager import Session
         session = Session()
 
-        name = _series['name'].lower()
+        name = self.options['name'].lower()
         series = session.query(Series).filter(Series.name == name.lower()).first()
         if not series:
             print 'Unknown series %s' % name
@@ -239,35 +248,38 @@ class SeriesReport(SeriesPlugin):
         print ' * = downloaded'
         session.close()
 
-_series_forget = {}
-def optik_series_forget(option, opt, value, parser):
-    """
-    Callback for Optik
-    --series-forget NAME [ID]
-    """
-    if len(parser.rargs) == 0:
-        return # how to handle invalid?
-    if len(parser.rargs) > 0:
-        _series_forget['name'] = parser.rargs[0]
-    if len(parser.rargs) > 1:
-        _series_forget['episode'] = parser.rargs[1]
-
 class SeriesForget(object):
     
     """Provides --series-forget"""
 
+    options = {}
+
+    @staticmethod
+    def optik_series_forget(option, opt, value, parser):
+        """
+        Callback for Optik
+        --series-forget NAME [ID]
+        """
+        if len(parser.rargs) == 0:
+            return # how to handle invalid?
+        if len(parser.rargs) > 0:
+            SeriesForget.options['name'] = parser.rargs[0]
+        if len(parser.rargs) > 1:
+            SeriesForget.options['episode'] = parser.rargs[1]
+
+
     def on_process_start(self, feed):
-        if _series_forget:
+        if self.options:
             feed.manager.disable_feeds()
 
-            name = _series_forget.get('name')
+            name = self.options.get('name')
 
             from flexget.manager import Session
             session = Session()
 
-            if _series_forget.get('episode'):
+            if self.options.get('episode'):
                 # remove by id
-                identifier = _series_forget.get('episode').upper()
+                identifier = self.options.get('episode').upper()
                 if identifier and name:
                     series = session.query(Series).filter(Series.name == name.lower()).first()
                     if series:
@@ -445,12 +457,12 @@ class FilterSeries(SeriesPlugin):
 
         # generate list of all series in one dict
         all_series = {}
-        for group_name, group_series in config.iteritems():
+        for group_series in config.itervalues():
             for series_item in group_series:
                 series_name, series_config = series_item.items()[0]
                 all_series[series_name] = series_config
 
-        # scan for problematic names
+        # scan for problematic names, enable exact mode for them
         for series_name, series_config in all_series.iteritems():
             for name in all_series.keys():
                 if (name.lower().startswith(series_name.lower())) and \
@@ -882,14 +894,13 @@ class FilterSeries(SeriesPlugin):
 #
 
 register_plugin(FilterSeries, 'series')
-register_plugin(SeriesReport, 'series_report', builtin=True)
-register_plugin(SeriesForget, 'series_forget', builtin=True)
+register_plugin(SeriesReport, '--series', builtin=True)
+register_plugin(SeriesForget, '--series-forget', builtin=True)
 
-
-register_parser_option('--series', action='callback', callback=optik_series,
+register_parser_option('--series', action='callback', callback=SeriesReport.optik_series,
                        help='Display series summary.')
 
-register_parser_option('--series-forget', action='callback', callback=optik_series_forget,
+register_parser_option('--series-forget', action='callback', callback=SeriesForget.optik_series_forget,
                        help='Remove complete series or single episode from database. <Series> [episode]')
 
 register_parser_option('--stop-waiting', action='store', dest='stop_waiting', default=False, 
