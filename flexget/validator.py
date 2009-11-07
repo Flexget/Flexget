@@ -417,17 +417,4 @@ class DictValidator(Validator):
         return count == self.errors.count()
 
 if __name__=='__main__':
-    
     root = factory()
-    container = root.accept('list')
-    #container.accept('text')
-    #container.accept('number')
-    bundle = container.accept('dict')
-    advanced = bundle.accept_any_key('dict')
-    advanced.accept('text', key='path')
-    
-    root.validate([{'some series':{'path':'~/asfd/', 'fail':True}}])
-    #root.validate(['asdfasdf', 'asdfasdfasdf', {'key':'value'}])
-    
-    print root.errors.messages
-

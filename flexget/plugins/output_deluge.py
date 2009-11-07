@@ -1,10 +1,8 @@
 import logging
-import time, os, sys, base64
-from flexget.manager import Base
+import time
+import os
+import base64
 from flexget.plugin import *
-from sqlalchemy import Column, Integer, String
-from sqlalchemy.schema import ForeignKey
-from sqlalchemy.orm import relation,join
 
 log = logging.getLogger('deluge')
 
@@ -45,16 +43,18 @@ class OutputDeluge:
 
     def on_process_start(self, feed):
         """
-        register the usable set: keywords
+            register the usable set: keywords
         """
-        set = get_plugin_by_name('set')
-        set.instance.register_keys({'path':'text', 'movedone':'text', 'queuetotop':'boolean', 'label':'text'})
+        set_plugin = get_plugin_by_name('set')
+        set_plugin.instance.register_keys({'path':'text', 'movedone':'text', \
+            'queuetotop':'boolean', 'label':'text'})
 
+    @internet(log)
     def on_feed_download(self, feed):
         """
-        call the feed_download method of download plugin
-        this will generate the temp files we will load into deluge
-        we don't need to call this if download plugin is loaded on this feed
+            call the feed_download method of download plugin
+            this will generate the temp files we will load into deluge
+            we don't need to call this if download plugin is loaded on this feed
         """
         config = self.get_config(feed)
         if not config['enabled']:
@@ -63,19 +63,12 @@ class OutputDeluge:
             download = get_plugin_by_name('download')
             """Download all feed content and store in temporary folder"""
             for entry in feed.accepted:
-                try:
-                    if feed.manager.options.test:
-                        log.info('Would download: %s' % entry['title'])
-                    else:
-                        if not feed.manager.unit_test:
-                            log.info('Downloading: %s' % entry['title'])
-                        download.instance.download(feed, entry)
-                except IOError, e:
-                    feed.fail(entry)
-                    if hasattr(e, 'reason'):
-                        log.error('Failed to reach server. Reason: %s' % e.reason)
-                    elif hasattr(e, 'code'):
-                        log.error('The server couldn\'t fulfill the request. Error code: %s' % e.code)
+                if feed.manager.options.test:
+                    log.info('Would download: %s' % entry['title'])
+                else:
+                    if not feed.manager.unit_test:
+                        log.info('Downloading: %s' % entry['title'])
+                    download.instance.download(feed, entry)
 
     def on_feed_output(self, feed):
         """Add torrents to deluge at exit."""
@@ -85,6 +78,7 @@ class OutputDeluge:
             return
         if not feed.accepted or not config['enabled']:
             return
+
         # TODO: Figure out better way to detect version
         try:
             from deluge.ui.client import sclient
@@ -125,6 +119,7 @@ class OutputDeluge:
                 log.debug('entry: %s' % entry)
                 log.debug('temp: %s' % ', '.join(os.listdir(tmp_path)))
                 raise PluginError("Downloaded temp file '%s' doesn't exist!?" % entry['file'], log)
+
             sclient.add_torrent_file([entry['file']], [opts])
             log.info("%s torrent added to deluge with options %s" % (entry['title'], opts))
 
@@ -132,9 +127,11 @@ class OutputDeluge:
             if not 'download' in feed.config:
                 os.remove(entry['file'])
                 del(entry['file'])
+
             movedone = entry.get('movedone', config['movedone'])
             label = entry.get('label', config['label']).lower()
             queuetotop = entry.get('queuetotop', config['queuetotop'])
+
             # Sometimes deluge takes a moment to add the torrent, wait a second.
             time.sleep(2)
             after = sclient.get_session_state()
@@ -165,7 +162,7 @@ class OutputDeluge:
             from twisted.internet import reactor, defer
             from deluge.ui.client import client
         except:
-            raise PluginError('Deluge and twisted module required', log)
+            raise PluginError('Deluge and twisted modules required', log)
 
         d = client.connect(
             host=config['host'],
@@ -173,10 +170,12 @@ class OutputDeluge:
             username=config['user'],
             password=config['pass']
         )
+
         def on_connect_success(result):
             if not result:
                 # TODO: connect failed, do something
                 pass
+
             def on_success(torrent_id, entry, config):
                 if not torrent_id:
                     log.info("%s is already loaded in deluge, cannot set movedone, label, or queuetotop." % entry['title'])
@@ -200,9 +199,11 @@ class OutputDeluge:
                 if queuetotop:
                     log.debug("%s moved to top of queue" % entry['title'])
                     client.core.queue_top([torrent_id])
+
             def on_fail(result, entry, feed):
                 log.info("%s was not added to deluge! %s" % (entry['title'], result))
                 feed.fail(entry, "Could not be added to deluge")
+
             # add the torrents
             dlist = []
             for entry in feed.accepted:
@@ -230,6 +231,7 @@ class OutputDeluge:
                     log.debug('Stopping twisted reactor. result: %s' % result)
                     reactor.stop()
                 client.disconnect().addCallback(on_disconnect).addErrback(on_disconnect)
+
             defer.DeferredList(dlist).addCallback(on_complete)
             
         def on_connect_fail(result):
