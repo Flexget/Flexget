@@ -164,6 +164,17 @@ class TestSeriesParser(object):
         assert s.episode == 6, 'didn''t pick up episode'
 
 
+    def test_idiotic_numbering_with_zero(self):
+        """SeriesParser: idiotic 0101, 0102, 0103, .. numbering"""
+        s = SeriesParser()
+        s.name = 'test'
+        s.data = 'Test.0706.720p-FlexGet'
+        s.expect_ep = True
+        s.parse()
+        assert s.season == 7, 'didn''t pick up season'
+        assert s.episode == 6, 'didn''t pick up episode'
+
+
     def test_strict_name(self):
         """SeriesParser: test strict name parsing"""
 

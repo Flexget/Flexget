@@ -184,18 +184,18 @@ class SeriesParser(TitleParser):
         else:
             # we should be getting season, ep !
             # try to look up idiotic numberin scheme 101,102,103,201,202
-            # search for 3 digits
+	    # ressu: Added matching for 0101, 0102... It will fail on 
+	    #        season 11 though
 
-            match = re.search('\d\d\d', data, re.IGNORECASE|re.UNICODE)
+            match = re.search('(0?\d)(\d\d)', data, re.IGNORECASE|re.UNICODE)
             if match:
                 # strict_name
                 if self.strict_name:
                     if match.start() - name_end >= 2:
                         return
 
-                got = match.group(0)
-                self.season = int(got[0])
-                self.episode = int(got[1:])
+                self.season = int(match.group(1))
+                self.episode = int(match.group(2))
                 log.debug(self)
                 self.valid = True
                 return
