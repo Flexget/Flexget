@@ -1,5 +1,6 @@
 from tests import FlexGetBase
 
+
 class TestQuality(FlexGetBase):
 
     __yaml__ = """
@@ -95,12 +96,12 @@ class TestDatabase(FlexGetBase):
           test_2:
             input_mock:
               - {title: 'Some.Series.S01E20.720p.XViD-DoppelGanger'}
-              
+
           progress_1:
             input_mock:
               - {title: 'Progress.S01E20.720p-FlexGet'}
               - {title: 'Progress.S01E20.HDTV-FlexGet'}
-              
+
           progress_2:
             input_mock:
               - {title: 'Progress.S01E20.720p.Another-FlexGet'}
@@ -114,10 +115,10 @@ class TestDatabase(FlexGetBase):
         self.execute_feed('test_2')
         assert self.feed.find_entry('rejected', title='Some.Series.S01E20.720p.XViD-DoppelGanger'), \
             'failed basic download remembering'
-            
+
     def test_doppelgangers(self):
         """Series plugin: doppelganger releases (dupes)"""
-        
+
         self.execute_feed('progress_1')
         assert self.feed.find_entry('accepted', title='Progress.S01E20.720p-FlexGet'), \
             'best quality not accepted'
@@ -127,6 +128,7 @@ class TestDatabase(FlexGetBase):
         # introduce new doppelgangers
         self.execute_feed('progress_2')
         assert not self.feed.accepted, 'doppelgangers accepted'
+
 
 class TestFilterSeries(FlexGetBase):
 
@@ -164,7 +166,7 @@ class TestFilterSeries(FlexGetBase):
             'Another.Series.S01E20.720p.XViD-FlexGet should have passed'
 
         # date formats
-        df = ['Date.Series.10-11-2008.XViD','Date.Series.10.12.2008.XViD', \
+        df = ['Date.Series.10-11-2008.XViD', 'Date.Series.10.12.2008.XViD', \
               'Date.Series.2008-10-13.XViD', 'Date.Series.2008x10.14.XViD']
         for d in df:
             assert self.feed.find_entry(title=d), 'Date format did not match %s' % d
@@ -224,6 +226,7 @@ class TestEpisodeAdvancement(FlexGetBase):
         self.execute_feed('test_unordered')
         assert len(self.feed.accepted) == 12, \
             'not everyone was accepted'
+
 
 class TestFilterSeriesPriority(FlexGetBase):
 
@@ -363,6 +366,7 @@ class TestPropers(FlexGetBase):
         assert self.feed.find_entry('accepted', title='Foobar.S01E01.720p.proper.FlexGet'), \
             'Foobar.S01E01.720p.proper.FlexGet should have been accepted'
 
+
 class TestSimilarNames(FlexGetBase):
 
     # hmm, not very good way to test this .. seriesparser should be tested alone?
@@ -389,6 +393,7 @@ class TestSimilarNames(FlexGetBase):
         assert self.feed.find_entry('accepted', title='FooBar.S03E01.DSR-FlexGet'), 'Standard failed?'
         assert self.feed.find_entry('accepted', title='FooBar: FirstAlt.S02E01.DSR-FlexGet'), 'FirstAlt failed'
         assert self.feed.find_entry('accepted', title='FooBar: SecondAlt.S01E01.DSR-FlexGet'), 'SecondAlt failed'
+
 
 class TestDuplicates(FlexGetBase):
 
@@ -438,7 +443,6 @@ class TestDuplicates(FlexGetBase):
         """Series plugin: dupes with same quality"""
         self.execute_feed('test_dupes')
         assert len(self.feed.accepted) == 1, 'accepted both'
-
 
     def test_true_dupes(self):
         """Series plugin: true duplicate items"""
@@ -501,6 +505,7 @@ class TestLaterDupes(FlexGetBase):
         assert len(self.feed.accepted) == 0
         assert False
 """
+
 
 class TestQualities(FlexGetBase):
 
@@ -690,14 +695,12 @@ class TestTimeframe(FlexGetBase):
         assert self.feed.find_entry('accepted', title='Test.S01E02.720p.Proper-FlexGet'), \
             'proper should have been accepted'
 
-
-
     def test_expires(self):
         """Series plugin: timeframe expires"""
         # first excecution should not accept anything
         self.execute_feed('test_expires')
         assert not self.feed.accepted
-        
+
         def age(**kwargs):
             from flexget.plugins.filter_series import Series
             from flexget.manager import Session
@@ -707,12 +710,12 @@ class TestTimeframe(FlexGetBase):
                 for episode in series.episodes:
                     episode.first_seen = datetime.datetime.now() - datetime.timedelta(**kwargs)
             session.commit()
-            
-        # let 3 hours pass            
+
+        # let 3 hours pass
         age(hours=3)
         self.execute_feed('test_expires')
         assert not self.feed.accepted, 'expired too soon'
-        
+
         # let another 3 hours pass, should expire now!
         age(hours=6)
         self.execute_feed('test_expires')
