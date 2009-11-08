@@ -1,10 +1,10 @@
 import logging
 from flexget.plugin import *
 from flexget.plugin import EVENTS
-
 from flexget.utils.simple_persistence import SimplePersistence
 
 log = logging.getLogger('feed')
+
 
 class Entry(dict):
     """
@@ -12,7 +12,7 @@ class Entry(dict):
         See. http://flexget.com/wiki/DevelopersEntry
 
         Internally stored original_url is necessary because
-        plugins (ie. resolvers) may change this into something else 
+        plugins (ie. resolvers) may change this into something else
         and otherwise that information would be lost.
     """
 
@@ -26,7 +26,7 @@ class Entry(dict):
             if not 'original_url' in self:
                 self['original_url'] = value
         dict.__setitem__(self, key, value)
-    
+
     def safe_str(self):
         return "%s | %s" % (self['title'], self['url'])
 
@@ -42,7 +42,9 @@ class Entry(dict):
             return False
         return True
 
+
 class Feed:
+
     def __init__(self, manager, name, config):
         """
             Represents one feed in configuration.
@@ -55,15 +57,15 @@ class Feed:
         self.manager = manager
         self.enabled = True
         self.session = None
-        
+
         # simple persistence
         self.simple_persistence = SimplePersistence(self)
-        
+
         # undecided entries in the feed (created by input)
         self.entries = []
-        
+
         # You should NOT change these arrays, use reject / accept methods!
-        
+
         self.accepted = [] # accepted entries, can still be rejected
         self.rejected = [] # rejected entries
         self.failed = []
@@ -73,11 +75,11 @@ class Feed:
         # flags and counters
         self._abort = False
         self.__purged = 0
-        
+
         # current state
         self.current_event = None
         self.current_plugin = None
-        
+
     def __purge_failed(self):
         """Purge failed entries from feed."""
         self.__purge(self.failed, self.entries, False)
@@ -122,7 +124,7 @@ class Feed:
                 reason_str = ' (%s)' % reason
             log.info('Tried to reject immortal %s %s' % (entry['title'], reason_str))
             return
-        
+
         # schedule immediately filtering after this plugin has done execution
         if not entry in self.rejected:
             self.rejected.append(entry)
@@ -161,8 +163,8 @@ class Feed:
         for entry in cat:
             match = 0
             for k, v in values.iteritems():
-                if entry.has_key(k):
-                    if entry.get(k) == v: 
+                if k in entry:
+                    if entry.get(k) == v:
                         match += 1
             if match == len(values):
                 return entry
@@ -191,7 +193,7 @@ class Feed:
         # TODO: implement trough own logger?
         if not self.manager.options.quiet and not self.manager.unit_test:
             logger.info(s)
-          
+
     def verbose_details(self, msg, reason=''):
         """Verbose if details option is enabled"""
         # TODO: implement trough own logger?
@@ -210,19 +212,19 @@ class Feed:
         if self.manager.options.details:
             for entry in self.entries:
                 self.verbose_details('%s' % entry['title'])
-            
+
     def __run_event(self, event):
         """Execute plugin events if plugin is configured for this feed."""
         methods = get_methods_by_event(event)
         #log.log(5, 'Event %s methods %s' % (event, methods))
-        
+
         # warn if no filters or outputs in the feed
         if event in ['filter', 'output']:
             for method in methods:
                 if method.plugin.name in self.config:
                     break
             else:
-                log.warning('Feed %s doesn\'t have any %s plugins' % (self.name, event) )
+                log.warning('Feed %s doesn\'t have any %s plugins' % (self.name, event))
 
         for method in methods:
             keyword = method.plugin.name
@@ -257,23 +259,25 @@ class Feed:
                 self.__purge_rejected()
                 self.__purge_failed()
                 # check for priority operations
-                if self._abort: return
-    
+                if self._abort:
+                    return
+
     def execute(self):
         """Execute this feed, runs events in order of events array."""
         # validate configuration
         errors = self.validate()
-        if self._abort: return
+        if self._abort:
+            return
         if self.manager.options.validate:
             if not errors:
                 print 'Feed \'%s\' passed' % self.name
             return
-            
+
         # run events
         for event in EVENTS:
             # when learning, skip few events
             if self.manager.options.learn:
-                if event in ['download', 'output']: 
+                if event in ['download', 'output']:
                     # log keywords not executed
                     plugins = get_plugins_by_event(event)
                     for plugin in plugins:
@@ -283,7 +287,7 @@ class Feed:
             # run all plugins with this event
             self.__run_event(event)
             # TODO: should we purge rejected and failed between events?
-            
+
             # verbose some progress
             if event == 'input':
                 self.verbose_details_entries()
@@ -293,12 +297,11 @@ class Feed:
                     self.verbose_progress('Feed %s produced %s entries.' % (self.name, len(self.entries)))
             if event == 'filter':
                 self.verbose_progress('Feed %s accepted: %s (rejected: %s undecided: %s failed: %s)' % \
-                                      (self.name, len(self.accepted), len(self.rejected), \
-                                       len(self.entries)-len(self.accepted), len(self.failed)))
+                    (self.name, len(self.accepted), len(self.rejected), \
+                    len(self.entries) - len(self.accepted), len(self.failed)))
             # if abort flag has been set feed should be aborted now
             if self._abort:
                 return
-
 
     def process_start(self):
         """Execute process_start event"""
@@ -335,7 +338,7 @@ class Feed:
                         validate_errors.append('%s %s' % (keyword, msg))
             else:
                 log.warning('Used plugin %s does not support validating. Please notify author!' % keyword)
-                
+
         # log errors and abort
         if validate_errors:
             log.critical('Feed \'%s\' has configuration errors:' % self.name)
@@ -343,5 +346,5 @@ class Feed:
                 log.error(error)
             # feed has errors, abort it
             self.abort()
-                
+
         return validate_errors

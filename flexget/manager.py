@@ -12,8 +12,9 @@ log = logging.getLogger('manager')
 Base = declarative_base()
 Session = sessionmaker()
 
+
 class FailedEntry(Base):
-    __tablename__ =  'failed'
+    __tablename__ = 'failed'
 
     id = Column(Integer, primary_key=True)
     title = Column(String)
@@ -28,10 +29,11 @@ class FailedEntry(Base):
     def __str__(self):
         return '<Failed(title=%s)>' % (self.title)
 
+
 class Manager:
     unit_test = False
     options = None
-    
+
     def __init__(self, options):
         self.options = options
         self.config_base = None
@@ -42,12 +44,12 @@ class Manager:
 
         self.config = {}
         self.feeds = {}
-        
+
         # shelve
         self.shelve_session = None
 
         self.initialize()
-            
+
         if self.options.log_start:
             logging.info('FlexGet started')
 
@@ -57,14 +59,14 @@ class Manager:
         """Separated from __init__ so that unit tests can modify options before loading config."""
         self.load_config()
         self.init_sqlalchemy()
-        
+
     def load_config(self):
         """Load the configuration file"""
         startup_path = os.path.dirname(os.path.abspath(sys.path[0]))
         home_path = os.path.join(os.path.expanduser('~'), '.flexget')
         current_path = os.getcwd()
         exec_path = sys.path[0]
-        
+
         possible = {}
         possible[os.path.join(startup_path, self.options.config)] = startup_path
         possible[os.path.join(home_path, self.options.config)] = home_path
@@ -72,7 +74,7 @@ class Manager:
         possible[os.path.join(sys.path[0], '..', self.options.config)] = os.path.join(sys.path[0], '..')
         possible[os.path.join(current_path, self.options.config)] = current_path
         possible[os.path.join(exec_path, self.options.config)] = exec_path
-        
+
         for config, base in possible.iteritems():
             if os.path.exists(config):
                 self.pre_check_config(config)
@@ -82,9 +84,9 @@ class Manager:
                 except Exception, e:
                     log.critical(e)
                     print ''
-                    print '-'*79
+                    print '-' * 79
                     print ' This is caused by malformed configuration file, common reasons:'
-                    print '-'*79
+                    print '-' * 79
                     print ''
                     print ' o Indentation error'
                     print ' o Missing : from end of the line'
@@ -112,21 +114,21 @@ class Manager:
                 return
         log.info('Tried to read from: %s' % ', '.join(possible))
         raise IOError('Failed to find configuration file %s' % self.options.config)
-    
+
     def pre_check_config(self, fn):
         """
-            Checks configuration file for common mistakes that are easily detectable 
+            Checks configuration file for common mistakes that are easily detectable
         """
-        
+
         def get_indentation(line):
             i, n = 0, len(line)
             while i < n and line[i] == " ":
                 i += 1
             return i
-                
+
         def isodd(n):
-            return bool(n%2)
-        
+            return bool(n % 2)
+
         file = open(fn)
         line_num = 0
         # flags
@@ -144,10 +146,10 @@ class Manager:
             if line.strip().startswith('#'):
                 continue
             indentation = get_indentation(line)
-            
+
             #print '%i - %i: %s' % (line_num, indentation, line)
             #print 'prev_mapping: %s, prev_list: %s, prev_ind: %s' % (prev_mapping, prev_list, prev_indentation)
-            
+
             if isodd(indentation):
                 log.warning('Config line %s has odd (uneven) indentation' % line_num)
             if indentation > prev_indentation + 2 and not prev_mapping:
@@ -164,19 +166,19 @@ class Manager:
             if prev_list and not prev_mapping and indentation > prev_indentation:
                 # after a list item that does NOT start mapping indentation increases
                 log.warning('Config line %s is likely missing ":" at the end' % (line_num - 1))
-                
+
             prev_indentation = indentation
             # this line is a mapping (ends with :)
             prev_mapping = line[-1] == ':'
             # this line is a list
             prev_list = line.strip()[0] == '-'
-            
+
         file.close()
 
     def init_sqlalchemy(self):
         """Initialize SQLAlchemy"""
         import shutil
-        
+
         # load old shelve session
         if self.options.migrate:
             shelve_session_name = self.options.migrate
@@ -191,7 +193,7 @@ class Manager:
             old.close()
             if not self.options.test:
                 shutil.move(shelve_session_name, '%s_migrated' % shelve_session_name)
-        
+
         # SQLAlchemy
         if self.unit_test:
             connection = 'sqlite:///:memory:'
@@ -202,12 +204,12 @@ class Manager:
                 log.info('Test mode, creating a copy from database.')
                 if os.path.exists(self.db_filename):
                     shutil.copy(self.db_filename, db_test_filename)
-                self.db_filename = db_test_filename 
-            
+                self.db_filename = db_test_filename
+
             # in case running on windows, needs double \\
             filename = self.db_filename.replace('\\', '\\\\')
             connection = 'sqlite:///%s' % filename
-        
+
         # fire up the engine
         log.debug('connection: %s' % connection)
         try:
@@ -221,8 +223,7 @@ class Manager:
         if self.options.reset:
             Base.metadata.drop_all(bind=self.engine)
         Base.metadata.create_all(bind=self.engine)
-        
-        
+
     def acquire_lock(self):
         self.lockfile = os.path.join(self.config_base, ".%s-lock" % self.config_name)
         if os.path.exists(self.lockfile):
@@ -232,17 +233,17 @@ class Manager:
             print "Another process (%s) is running, will exit." % pid.strip()
             print "If you're sure there is no other instance running, delete %s" % self.lockfile
             sys.exit(1)
-        
+
         f = file(self.lockfile, 'w')
         f.write("PID: %s\n" % os.getpid())
         f.close()
-        
+
     def release_lock(self):
         os.remove(self.lockfile)
 
     def print_failed(self):
         """Parameter --failed"""
-        
+
         failed = Session()
         results = failed.query(FailedEntry).all()
         if not results:
@@ -256,7 +257,7 @@ class Manager:
         failed = Session()
         failedentry = FailedEntry(entry['title'], entry['url'])
         # query item's existence
-        if not failed.query(FailedEntry).filter(FailedEntry.title==entry['title']).first():
+        if not failed.query(FailedEntry).filter(FailedEntry.title == entry['title']).first():
             failed.add(failedentry)
         # limit item number to 25
         i = 0
@@ -266,7 +267,7 @@ class Manager:
                 failed.delete(row)
         failed.commit()
         failed.close()
-            
+
     def clear_failed(self):
         """Clears list of failed entries"""
         session = Session()
@@ -276,14 +277,14 @@ class Manager:
         print 'Cleared %i items.' % len(results)
         session.commit()
         session.close()
-                
+
     def create_feeds(self):
         """Creates instances of all configured feeds"""
         from flexget.feed import Feed
 
         # construct feed list
         feeds = self.config.get('feeds', {}).keys()
-        if not feeds: 
+        if not feeds:
             log.critical('There are no feeds in the configuration file!')
 
         for name in feeds:
@@ -298,7 +299,7 @@ class Manager:
                         continue
                 log.error('\'%s\' is not a properly configured feed, please check indentation levels.' % name)
                 continue
-            
+
             # create feed
             feed = Feed(self, name, self.config['feeds'][name])
             # if feed name is prefixed with _ it's disabled
@@ -309,16 +310,16 @@ class Manager:
                 if name.lower() != self.options.onlyfeed.lower():
                     feed.enabled = False
             self.feeds[name] = feed
-        
+
         if self.options.onlyfeed:
             if not [feed for feed in self.feeds.itervalues() if feed.enabled]:
                 log.critical('Could not find feed %s' % self.options.onlyfeed)
-                
+
     def disable_feeds(self):
         """Disables all feeds."""
         for feed in self.feeds.itervalues():
             feed.enabled = False
-            
+
     def enable_feeds(self):
         """Enables all feeds."""
         for feed in self.feeds.itervalues():
@@ -330,7 +331,7 @@ class Manager:
         if not self.config:
             log.critical('Configuration file is empty.')
             return
-        
+
         # separated for future when flexget runs continously in the background
         self.create_feeds()
 
@@ -338,7 +339,7 @@ class Manager:
 
         # execute process_start to all feeds
         for name, feed in self.feeds.iteritems():
-            if not feed.enabled: 
+            if not feed.enabled:
                 continue
             try:
                 log.log(5, 'calling process_start on a feed %s' % name)
@@ -348,7 +349,7 @@ class Manager:
                 log.exception('Feed %s process_start: %s' % (feed.name, e))
 
         for name, feed in self.feeds.iteritems():
-            if not feed.enabled: 
+            if not feed.enabled:
                 continue
             if name in failed:
                 continue
@@ -372,7 +373,7 @@ class Manager:
 
         # execute process_end to all feeds
         for name, feed in self.feeds.iteritems():
-            if not feed.enabled: 
+            if not feed.enabled:
                 continue
             if name in failed:
                 continue
@@ -380,15 +381,15 @@ class Manager:
                 feed.process_end()
             except Exception, e:
                 log.exception('Feed %s process_end: %s' % (name, e))
-                
+
     def shutdown(self):
         """Application is being exited"""
-        
+
         # remove temporary database used in test mode
         if self.options.test:
             if not 'test' in self.db_filename:
                 raise Exception('trying to delete non test database?')
             os.remove(self.db_filename)
-            log.info('Removed test database') 
+            log.info('Removed test database')
 
         self.release_lock()
