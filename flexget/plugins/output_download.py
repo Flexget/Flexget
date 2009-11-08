@@ -9,7 +9,6 @@ from flexget.plugin import *
 from sqlalchemy import Column, String, Integer, DateTime
 from flexget.manager import Base
 from datetime import datetime
-from httplib import BadStatusLine
 
 log = logging.getLogger('download')
 
@@ -112,17 +111,8 @@ class PluginDownload:
                     if not feed.manager.unit_test:
                         log.info('Downloading: %s' % entry['title'])
                     self.download(feed, entry)
-            except urllib2.HTTPError, e:
-                feed.fail(entry, 'HTTP error')
-                log.error('HTTPError %s' % e.code)
-            except urllib2.URLError, e:
-                feed.fail(entry, 'URL Error')
-                log.error('URLError %s' % e.reason, self.log)
-            except BadStatusLine:
-                feed.fail(entry, 'BadStatusLine')
-                log.error('Failed to reach server. Reason: %s' % e.reason)
             except IOError, e:
-                feed.fail(entry, 'IOError')
+                feed.fail(entry)
                 if hasattr(e, 'reason'):
                     log.error('Failed to reach server. Reason: %s' % e.reason)
                 elif hasattr(e, 'code'):

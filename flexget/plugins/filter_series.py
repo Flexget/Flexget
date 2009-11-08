@@ -267,6 +267,7 @@ class SeriesForget(object):
         if len(parser.rargs) > 1:
             SeriesForget.options['episode'] = parser.rargs[1]
 
+
     def on_process_start(self, feed):
         if self.options:
             feed.manager.disable_feeds()
@@ -591,20 +592,15 @@ class FilterSeries(SeriesPlugin):
         for eps in series.itervalues():
             if not eps: continue
 
-            whitelist = []
-
             # sort episodes in order of quality
             eps.sort()
             
             log.debug('start with episodes: %s' % [e.data for e in eps])
 
-            #
             # proper handling
-            #
-
-            log.debug('-' * 20 + ' process_propers -->')
+            log.debug('process_propers -->')
             removed, new_propers = self.process_propers(feed, eps)
-            whitelist.extend(new_propers)
+            log.debug('new_propers: %s' % [e.data for e in new_propers])
 
             for ep in removed:
                 log.debug('propers removed: %s' % ep)
@@ -613,21 +609,17 @@ class FilterSeries(SeriesPlugin):
             if not eps:
                 continue
 
-            log.debug('-' * 20 + ' accept_propers -->')
-            accepted = self.accept_propers(feed, eps, whitelist)
-            whitelist.extend(accepted)
-
             log.debug('current episodes: %s' % [e.data for e in eps])
 
             # qualities
             if 'qualities' in config:
-                log.debug('-' * 20 + ' qualities -->')
-                self.process_qualities(feed, config, eps, whitelist)
+                log.debug('qualities -->')
+                self.process_qualities(feed, config, eps, new_propers)
                 continue
 
             # reject downloaded
-            log.debug('-' * 20 + ' downloaded -->')
-            for ep in self.process_downloaded(feed, eps, whitelist):
+            log.debug('downloaded -->')
+            for ep in self.process_downloaded(feed, eps, new_propers):
                 feed.reject(self.parser2entry[ep], 'already downloaded')
                 log.debug('downloaded removed: %s' % ep)
                 eps.remove(ep)
@@ -642,26 +634,27 @@ class FilterSeries(SeriesPlugin):
 
             # reject episodes that have been marked as watched in configig file
             if 'watched' in config:
-                log.debug('-' * 20 + ' watched -->')
+                log.debug('watched -->')
                 if self.process_watched(feed, config, eps):
                     continue
                     
             # Episode advancement. Used only with season based series
             if best.season and best.episode:
-                log.debug('-' * 20 + ' episode advancement -->')
+                log.debug('episode advancement -->')
                 if self.process_episode_advancement(feed, eps, series):
                     continue
 
             # timeframe
             if 'timeframe' in config:
-                log.debug('-' * 20 + ' timeframe -->')
-                self.process_timeframe(feed, config, eps, series_name)
-                continue
+                log.debug('timeframe -->')
+                if self.process_timeframe(feed, config, eps, series_name):
+                    # TODO: would it be simplier / valid just to continue always?
+                    continue
 
             # quality, min_quality, max_quality and NO timeframe
             if ('timeframe' not in config and 'qualities' not in config) and \
                ('quality' in config or 'min_quality' in config or 'max_quality' in config):
-                log.debug('-' * 20 + ' process quality -->')
+                log.debug('process quality -->')
                 self.process_quality(feed, config, eps)
                 continue
 
@@ -674,16 +667,16 @@ class FilterSeries(SeriesPlugin):
             Returns a list of removed episodes and a list of new propers.
         """
 
+        # get list of downloaded releases
         downloaded_releases = self.get_downloaded(feed.session, eps[0].name, eps[0].identifier)
-        downloaded_qualities = [d.quality for d in downloaded_releases]
-
-        log.debug('downloaded qualities: %s' % downloaded_qualities)
 
         def proper_downloaded():
             for release in downloaded_releases:
                 if release.proper:
                     return True
 
+        downloaded_qualities = [d.quality for d in downloaded_releases]
+        log.debug('downloaded qualities: %s' % downloaded_qualities)
 
         new_propers = []
         removed = []
@@ -709,33 +702,11 @@ class FilterSeries(SeriesPlugin):
                     feed.reject(self.parser2entry[ep], 'nuked')
                     removed.append(ep)
 
-        log.debug('new_propers: %s' % [e.data for e in new_propers])
         return removed, new_propers
-
-
-    def accept_propers(self, feed, eps, new_propers):
-        """
-            Accepts all propers from qualities already downloaded.
-            :return: list of accepted
-        """
-
-        downloaded_releases = self.get_downloaded(feed.session, eps[0].name, eps[0].identifier)
-        downloaded_qualities = [d.quality for d in downloaded_releases]
-
-        accepted = []
-
-        for proper in new_propers:
-            if proper.quality in downloaded_qualities:
-                log.debug('we\'ve downloaded quality %s, accepting proper from it' % proper.quality)
-                feed.accept(self.parser2entry[proper], 'proper')
-                accepted.append(proper)
-
-        return accepted
-
 
     def process_downloaded(self, feed, eps, whitelist):
         """
-            Rejects all downloaded episodes (regardless of quality).
+            Reject all downloaded episodes (regardless of quality).
             Doesn't reject reject anything in :whitelist:.
         """
 
@@ -760,8 +731,8 @@ class FilterSeries(SeriesPlugin):
             accepted_qualities.append(config['quality'])
         else:
             qualities = SeriesParser.qualities
-            min = config.get('min_quality', qualities[-1]).lower()
-            max = config.get('max_quality', qualities[0]).lower()
+            min = config.get('min_quality', qualities[-1])
+            max = config.get('max_quality', qualities[0])
             min_index = qualities.index(min) + 1
             max_index = qualities.index(max)
             log.debug('min: %s (%s) max: %s (%s)' % (min, min_index, max, max_index))
@@ -806,10 +777,8 @@ class FilterSeries(SeriesPlugin):
                 return True
 
     def process_timeframe(self, feed, config, eps, series_name):
-        """
-            The nasty timeframe logic, too complex even to explain (for now).
-            Returns True when there's no sense trying any other logic.
-        """
+        """The nasty timeframe logic, too complex even to explain (for now). Returns True
+        when there's no sense trying any other logic."""
 
         if 'max_quality' in config:
             log.warning('Timeframe does not support max_quality (yet)')
@@ -878,12 +847,8 @@ class FilterSeries(SeriesPlugin):
                 feed.reject(self.parser2entry[ep], 'timeframe is waiting')
             return True
 
-    # TODO: whitelist deprecated ?
-    def process_qualities(self, feed, config, eps, whitelist=[]):
-        """
-            Accepts all wanted qualities.
-            Accepts whitelisted episodes even if downloaded.
-        """
+    def process_qualities(self, feed, config, eps, whitelist):
+        """Accepts all wanted qualities. Accepts whitelisted episodes even if downloaded."""
 
         # get list of downloaded releases
         downloaded_releases = self.get_downloaded(feed.session, eps[0].name, eps[0].identifier)

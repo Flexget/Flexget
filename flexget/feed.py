@@ -237,7 +237,7 @@ class Feed:
                     # this warning should be logged only once (may keep repeating)
                     if warn.kwargs.get('log_once', False):
                         from flexget.utils.log import log_once
-                        log_once(warn.value, warn.log)
+                        log_once(warn, warn.log)
                     else:
                         warn.log.warning(warn)
                 except PluginError, err:

@@ -22,6 +22,8 @@ class OutputEmail:
           smtp_username : the username to use to connect to the smtp server
           smtp_password : the password to use to connect to the smtp server
           smtp_tls      : should we use TLS to connect to the smtp server ?
+          smtp_ssl      : should we use SSL to connect to the smtp server ?
+                          Due to a bug in python, this only works in python 2.6.3 and up
           active        : is this plugin active or not ?
 
         Config basic example:
@@ -83,6 +85,7 @@ class OutputEmail:
           smtp_username:
           smtp_password:
           smtp_tls: False
+          smtp_ssl: False
     """
     def validator(self):
         from flexget import validator
@@ -96,6 +99,7 @@ class OutputEmail:
         email.accept('text', key='smtp_username')
         email.accept('text', key='smtp_password')
         email.accept('boolean', key='smtp_tls')
+        email.accept('boolean', key='smtp_ssl')
         return email
 
     def get_config(self, feed):
@@ -107,6 +111,7 @@ class OutputEmail:
         config.setdefault('smtp_username', '')
         config.setdefault('smtp_password', '')
         config.setdefault('smtp_tls', False)
+        config.setdefault('smtp_ssl', False)
         return config
 
     def on_feed_exit(self, feed):
@@ -151,13 +156,20 @@ FlexGet has just downloaded %d new entries for feed %s :
             log.info('Would send email : %s' % message.as_string())
         else:
             try:
+              if config['smtp_ssl']:
+                import sys
+                if sys.version_info < (2,6,3):
+                  raise PluginError('SSL email support requires python >= 2.6.3 due to python bug #4066, upgrade python or use TLS')
+                # Create a SSL connection to smtp server
+                mailServer = smtplib.SMTP_SSL(config['smtp_host'], config['smtp_port'])
+              else:
                 mailServer = smtplib.SMTP(config['smtp_host'], config['smtp_port'])
+                if config['smtp_tls']:
+                    mailServer.ehlo()
+                    mailServer.starttls()
             except socket.error, (value, message):
                 raise PluginWarning('Socket error: ' + message)
 
-            if config['smtp_tls']:
-                mailServer.ehlo()
-                mailServer.starttls()
 
             if config['smtp_login']:
                 mailServer.login(config['smtp_username'], config['smtp_password'])

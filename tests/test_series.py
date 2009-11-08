@@ -259,9 +259,6 @@ class TestPropers(FlexGetBase):
           series:
             - test
             - foobar
-            - asfd:
-                min_quality: HR
-                max_quality: 1080p
             - V
 
         feeds:
@@ -301,20 +298,8 @@ class TestPropers(FlexGetBase):
             input_mock:
               - {title: 'Test.S01E02.HDTV.Proper-FlexGet'}
 
-          # min + max quality with propers
-          min_max_quality_1:
-            input_mock:
-              - {title: 'asfd.S01E01.720p-FlexGet'}
-          min_max_quality_2:
-            input_mock:
-              - {title: 'asfd.S01E01.720p.Proper-FlexGet'}
-        """
 
-    def test_min_max_propers(self):
-        self.execute_feed('min_max_quality_1')
-        assert len(self.feed.accepted) == 1, 'uhh, broken badly'
-        self.execute_feed('min_max_quality_2')
-        assert len(self.feed.accepted) == 1, 'should have accepted proper'
+        """
 
     def test_lot_propers(self):
         """Series plugin: proper flood"""
@@ -664,10 +649,6 @@ class TestTimeframe(FlexGetBase):
              input_mock:
                - {title: 'Test.S01E02.720p-FlexGet'}
 
-          test_proper_afterwards:
-             input_mock:
-               - {title: 'Test.S01E02.720p.Proper-FlexGet'}
-
           test_expires:
             input_mock:
               - {title: 'Test.S01E03.pdtv-FlexGet'}
@@ -680,17 +661,12 @@ class TestTimeframe(FlexGetBase):
             '720p not accepted immediattely'
 
     def test_stop_waiting(self):
-        """Series plugin: timeframe quality appears, stop waiting, proper appears"""
+        """Series plugin: timeframe quality appears, stop waiting"""
         self.execute_feed('test_stop_waiting_1')
         assert self.feed.rejected
         self.execute_feed('test_stop_waiting_2')
         assert self.feed.find_entry('accepted', title='Test.S01E02.720p-FlexGet'), \
             '720p should have caused stop waiting'
-        self.execute_feed('test_proper_afterwards')
-        assert self.feed.find_entry('accepted', title='Test.S01E02.720p.Proper-FlexGet'), \
-            'proper should have been accepted'
-
-
 
     def test_expires(self):
         """Series plugin: timeframe expires"""
