@@ -1,6 +1,6 @@
 import logging
 from flexget.plugin import *
-from flexget.plugin import EVENTS
+from flexget.plugin import FEED_EVENTS
 from flexget.utils.simple_persistence import SimplePersistence
 
 log = logging.getLogger('feed')
@@ -274,7 +274,7 @@ class Feed:
             return
 
         # run events
-        for event in EVENTS:
+        for event in FEED_EVENTS:
             # when learning, skip few events
             if self.manager.options.learn:
                 if event in ['download', 'output']:

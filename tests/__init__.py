@@ -15,19 +15,22 @@ import logging
 log = logging.getLogger('tests')
 
 test_options = None
-
 plugins_loaded = False
+
+
 def setup_once():
     global plugins_loaded, test_options
     if not plugins_loaded:
         initialize_logging(True)
         parser = OptionParser(True)
         load_plugins(parser)
-        test_options = parser.parse_args()[0] # uhh, this is required by how?
+        test_options = parser.parse_args()[0]
         plugins_loaded = True
+
 
 class MockManager(Manager):
     unit_test = True
+
     def __init__(self, config_text, config_name):
         self.config_text = config_text
         self.config_name = config_name
@@ -42,6 +45,7 @@ class MockManager(Manager):
         except Exception:
             print 'Invalid configuration'
             raise
+
 
 class FlexGetBase(object):
     __yaml__ = """# Yaml goes here"""
@@ -78,7 +82,7 @@ class FlexGetBase(object):
         self.feed.execute()
         self.feed.process_end()
         self.feed.session.commit()
-        
+
     def dump(self):
         """Helper method for debugging"""
         from flexget.utils.tools import sanitize
@@ -95,6 +99,7 @@ class FlexGetBase(object):
         #print yaml.safe_dump(rejected)
         print self.feed.rejected
 
+
 class TestDisableBuiltins(FlexGetBase):
     """
         Quick a hack, test disable functionality by checking if seen filtering (builtin) is working
@@ -106,7 +111,7 @@ class TestDisableBuiltins(FlexGetBase):
                 input_mock:
                     - {title: 'dupe1', url: 'http://localhost/dupe', 'imdb_score': 5}
                     - {title: 'dupe2', url: 'http://localhost/dupe', 'imdb_score': 5}
-                disable_builtins: true 
+                disable_builtins: true
 
             test2:
                 input_mock:
@@ -116,11 +121,12 @@ class TestDisableBuiltins(FlexGetBase):
                     - seen
                     - cli_config
     """
+
     def test_disable_builtins(self):
         self.execute_feed('test')
         assert self.feed.find_entry(title='dupe1') and self.feed.find_entry(title='dupe2'), 'disable_builtins is not working?'
 
-        
+
 class TestInputHtml(FlexGetBase):
 
     __yaml__ = """
@@ -133,6 +139,7 @@ class TestInputHtml(FlexGetBase):
         self.execute_feed('test')
         assert self.feed.entries, 'did not produce entries'
 
+
 class TestPriority(FlexGetBase):
 
     __yaml__ = """
@@ -140,7 +147,7 @@ class TestPriority(FlexGetBase):
           test:
             input_mock:
               - {title: 'Smoke'}
-            accept_all: true
+            accept_all: yes
             priority:
               accept_all: 100
     """
@@ -148,8 +155,8 @@ class TestPriority(FlexGetBase):
     def test_smoke(self):
         self.execute_feed('test')
         assert self.feed.entries, 'no entries created'
-        
-        
+
+
 class TestManipulate(FlexGetBase):
 
     __yaml__ = """
@@ -162,7 +169,7 @@ class TestManipulate(FlexGetBase):
                 from: title
                 regexp: \[\d\d\d\d\](.*)
     """
-    
+
     def test_clean(self):
         self.execute_feed('test')
         assert self.feed.find_entry(cleaned='foobar'), 'title not cleaned'
@@ -180,15 +187,15 @@ class TestImmortal(FlexGetBase):
               reject:
                 - .*
     """
-    
+
     def test_immortal(self):
         self.execute_feed('test')
         assert self.feed.find_entry(title='title1'), 'rejected immortal entry'
         assert not self.feed.find_entry(title='title2'), 'did not reject mortal'
 
-            
+
 class TestDownload(FlexGetBase):
-    
+
     __yaml__ = """
         feeds:
           test:
@@ -197,7 +204,7 @@ class TestDownload(FlexGetBase):
                 url: http://svn.flexget.com/trunk/bootstrap.py
                 filename: flexget_test_data
             accept_all: true
-            download: 
+            download:
               path: ~/
               fail_html: no
     """
@@ -205,7 +212,7 @@ class TestDownload(FlexGetBase):
     def __init__(self):
         self.testfile = None
         FlexGetBase.__init__(self)
-    
+
     def teardown(self):
         FlexGetBase.tearDown(self)
         if hasattr(self, 'testfile') and os.path.exists(self.testfile):
@@ -218,7 +225,7 @@ class TestDownload(FlexGetBase):
     def test_download(self):
         # NOTE: what the hell is .ksh and where it comes from?
         # Re: seems to come from python mimetype detection in download plugin ...
-        self.testfile = os.path.expanduser('~/flexget_test_data.ksh') 
+        self.testfile = os.path.expanduser('~/flexget_test_data.ksh')
         if os.path.exists(self.testfile):
             os.remove(self.testfile)
         # executes feed and downloads the file
@@ -241,7 +248,3 @@ class TestMetainfoQuality(FlexGetBase):
         assert entry, 'entry not found?'
         assert 'quality' in entry, 'failed to pick up quality'
         assert entry['quality'] == '720p', 'picked up wrong quality'
-
-
-
-

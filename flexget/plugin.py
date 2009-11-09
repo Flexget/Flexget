@@ -1,5 +1,4 @@
 from flexget import plugins as _plugins_mod
-import imp
 import os
 import sys
 import logging
@@ -7,12 +6,13 @@ import time
 
 log = logging.getLogger('plugin')
 
-__all__ = ['PluginWarning', 'PluginError', 
+__all__ = ['PluginWarning', 'PluginError',
            'PluginDependencyError', 'register_plugin',
            'register_parser_option', 'register_feed_event',
            'get_plugin_by_name', 'get_plugins_by_group',
-           'get_plugin_keywords', 'get_plugins_by_event', 
+           'get_plugin_keywords', 'get_plugins_by_event',
            'get_methods_by_event', 'internet']
+
 
 class PluginDependencyError(Exception):
     """A plugin has requested another plugin by name, but this plugin does not exists"""
@@ -24,28 +24,34 @@ class PluginDependencyError(Exception):
     def __str__(self):
         return '%s plugin: %s' % (repr(self.value), repr(self.plugin))
 
+
 class RegisterException(Exception):
+
     def __init__(self, value):
         self.value = value
-    
+
     def __str__(self):
         return repr(self.value)
 
+
 class PluginWarning(Warning):
+
     def __init__(self, value, logger=log, **kwargs):
         self.value = value
         self.log = logger
         self.kwargs = kwargs
-    
+
     def __str__(self):
         return self.value
 
+
 class PluginError(Exception):
+
     def __init__(self, value, logger=log, **kwargs):
         self.value = value
         self.log = logger
         self.kwargs = kwargs
-        
+
     def __str__(self):
         return self.value
 
@@ -61,6 +67,7 @@ class internet(object):
             self.log = logging.getLogger('@internet')
 
     def __call__(self, func):
+
         def wrapped_func(*args, **kwargs):
             from httplib import BadStatusLine
             import urllib2
@@ -82,26 +89,34 @@ class internet(object):
                     raise PluginError('The server couldn''t fulfill the request. Error code: %s' % e.code, self.log)
         return wrapped_func
 
+
 def _strip_trailing_sep(path):
     return path.rstrip("\\/")
 
-EVENTS = ['start', 'input', 'metainfo', 'filter', 'download', 'modify', 'output', 'exit']
+FEED_EVENTS = ['start', 'input', 'metainfo', 'filter', 'download', 'modify', 'output', 'exit']
+
 EVENT_METHODS = {
     'start': 'on_feed_start',
     'input': 'on_feed_input',
     'metainfo': 'on_feed_metainfo',
     'filter': 'on_feed_filter',
     'download': 'on_feed_download',
-    'modify': 'on_feed_modify', 
+    'modify': 'on_feed_modify',
     'output': 'on_feed_output',
     'exit': 'on_feed_exit',
     'abort': 'on_feed_abort',
     'process_start': 'on_process_start',
-    'process_end': 'on_process_end'
-}
-PREFIXES = EVENTS + ['module', 'plugin', 'source']
+    'process_end': 'on_process_end'}
+    
+PREFIXES = FEED_EVENTS + ['module', 'plugin', 'source']
 
 plugins = {}
+plugins_loaded = False
+
+_parser = None
+_plugin_options = []
+_new_event_queue = {}
+
 
 def register_plugin(plugin_class, name, groups=[], builtin=False, debug=False, priorities={}):
     """Registers a plugin."""
@@ -112,39 +127,38 @@ def register_plugin(plugin_class, name, groups=[], builtin=False, debug=False, p
         return
     plugins[name] = PluginInfo(name, plugin_class, groups, builtin, debug, priorities)
 
-_parser = None
-_plugin_options = []
+
 def register_parser_option(*args, **kwargs):
     """Adds a parser option to the global parser."""
     global _parser, _plugin_options
     _parser.add_option(*args, **kwargs)
     _plugin_options.append((args, kwargs))
 
-_new_event_queue = {}
+
 def register_feed_event(plugin_class, name, before=None, after=None):
     """Adds a new feed event to the available events."""
     global _new_event_queue, plugins
-    if not before is None and not after is None:
+    if before and after:
         raise RegisterException('You can only give either before or after for a event.')
-    if before is None and after is None:
+    if not before and not after:
         raise RegisterException('You must specify either a before or after event.')
-    if name in EVENTS or name in _new_event_queue:
+    if name in FEED_EVENTS or name in _new_event_queue:
         raise RegisterException('Event %s already exists.' % name)
 
     def add_event(event_name, plugin_class, before, after):
-        if not before is None and not before in EVENTS:
+        if not before is None and not before in FEED_EVENTS:
             return False
-        if not after is None and not after in EVENTS:
+        if not after is None and not after in FEED_EVENTS:
             return False
         # add method name to event -> method lookup table
-        EVENT_METHODS[event_name] = 'on_feed_'+event_name
+        EVENT_METHODS[event_name] = 'on_feed_' + event_name
         # queue plugin loading for this type
         PREFIXES.append(name)
         # place event in event list
         if before is None:
-            EVENTS.insert(EVENTS.index(after)+1, event_name)
+            FEED_EVENTS.insert(FEED_EVENTS.index(after) + 1, event_name)
         if after is None:
-            EVENTS.insert(EVENTS.index(before), event_name)
+            FEED_EVENTS.insert(FEED_EVENTS.index(before), event_name)
 
         for loaded_plugin in plugins:
             if plugins[loaded_plugin].events:
@@ -162,11 +176,13 @@ def register_feed_event(plugin_class, name, before=None, after=None):
         if add_event(event_name, *args):
             del _new_event_queue[event_name]
 
+
 class PluginInfo(dict):
     """
         Allows accessing key/value pairs of this dictionary subclass via
         attributes.  Also instantiates a plugin and initializes properties.
     """
+
     def __init__(self, name, item_class, groups=[], builtin=False, debug=False, priorities={}):
         dict.__init__(self)
 
@@ -205,11 +221,13 @@ class PluginInfo(dict):
 
     __repr__ = __str__
 
+
 class PluginMethod(object):
     """
         Proxies an event for a plugin to be used as a callable object
         while also allowing accessing the plugin's attributes directly.
     """
+
     def __init__(self, plugin, method_name):
         self.plugin = plugin
         self.method_name = method_name
@@ -233,6 +251,7 @@ class PluginMethod(object):
 
     __repr__ = __str__
 
+
 def get_standard_plugins_path():
     """Determine a plugin path suitable for general use."""
     path = os.environ.get('FLEXGET_PLUGIN_PATH',
@@ -255,6 +274,7 @@ def get_standard_plugins_path():
                 path.append(archless_path)
     return path
 
+
 def load_plugins_from_dirs(dirs):
     _plugins_mod.__path__ = map(_strip_trailing_sep, dirs)
     for d in dirs:
@@ -264,11 +284,13 @@ def load_plugins_from_dirs(dirs):
         if os.path.isdir(d):
             load_plugins_from_dir(d)
 
+
 def load_plugins_from_dir(d):
     # Get the list of valid python suffixes for plugins
     # this includes .py, .pyc, and .pyo (depending on if we are running -O)
     # but it doesn't include compiled modules (.so, .dll, etc)
     global _new_event_queue
+    import imp
     valid_suffixes = [suffix for suffix, mod_type, flags in imp.get_suffixes()
                               if flags in (imp.PY_SOURCE, imp.PY_COMPILED)]
     plugin_names = set()
@@ -276,12 +298,12 @@ def load_plugins_from_dir(d):
         path = os.path.join(d, f)
         if os.path.isfile(path):
             f_base, ext = os.path.splitext(f)
-            path_parts = f_base.split('_')
+            #path_parts = f_base.split('_')
             if ext in valid_suffixes:
                 if f_base == '__init__':
                     continue # don't load __init__.py again
                 elif getattr(_plugins_mod, f_base, None):
-                    log.info('Plugin named %s already loaded' % f_base)
+                    log.warning('Plugin named %s already loaded' % f_base)
                 plugin_names.add(f_base)
 
     for name in plugin_names:
@@ -295,9 +317,9 @@ def load_plugins_from_dir(d):
     if _new_event_queue:
         for event, args in _new_event_queue.iteritems():
             log.error('Plugin %s requested new event %s, but it could not be created at requested \
-            point (before, after). plugin is not working properly.' % (args[0], event))
+            point (before, after). Plugin is not working properly.' % (args[0], event))
 
-plugins_loaded = False
+
 def load_plugins(parser):
     """Load plugins from the standard plugin paths."""
     global plugins_loaded, _parser, _plugin_options
@@ -319,6 +341,7 @@ def load_plugins(parser):
     plugins_loaded = True
     return took
 
+
 def get_plugins_by_event(event):
     """Return all plugins that hook event in order of priority."""
     result = []
@@ -334,6 +357,7 @@ def get_plugins_by_event(event):
     result.sort(lambda x, y: cmp(x.get('priorities', {}).get(event, 0), \
                                  y.get('priorities', {}).get(event, 0)), reverse=True)
     return result
+
 
 def get_methods_by_event(event):
     """Return plugin methods that hook event in order of priority."""
@@ -352,6 +376,7 @@ def get_methods_by_event(event):
     result = map(lambda info: PluginMethod(info, method), result)
     return result
 
+
 def get_plugins_by_group(group):
     """Return all plugins with in specified group."""
     res = []
@@ -360,12 +385,14 @@ def get_plugins_by_group(group):
             res.append(info)
     return res
 
+
 def get_plugin_keywords():
     """Return all registered keywords in a list"""
     keywords = []
-    for name, info in plugins.iteritems():
+    for name in plugins.iterkeys():
         keywords.append(name)
     return keywords
+
 
 def get_plugin_by_name(name):
     """Get plugin by name, prefered way since this structure may be changed at some point."""
@@ -373,15 +400,16 @@ def get_plugin_by_name(name):
         raise PluginDependencyError('Unknown plugin %s' % name, name)
     return plugins[name]
 
+
 def print_list(options):
     # TODO: rewrite!
     """Parameter --list"""
-    print '-'*60
+    print '-' * 60
     print '%-20s%-30s%s' % ('Keyword', 'Roles', '--doc')
-    print '-'*60
+    print '-' * 60
     plugins = []
     roles = {}
-    for event in EVENTS:
+    for event in FEED_EVENTS:
         try:
             ml = get_plugins_by_event(event)
         except:
@@ -389,7 +417,7 @@ def print_list(options):
         for m in ml:
             dupe = False
             for plugin in plugins:
-                if plugin['name'] == m['name']: 
+                if plugin['name'] == m['name']:
                     dupe = True
             if not dupe:
                 plugins.append(m)
@@ -404,10 +432,11 @@ def print_list(options):
         if plugin.get('debug_plugin', False) and not options.debug:
             continue
         doc = 'Yes'
-        if not plugin.instance.__doc__: 
+        if not plugin.instance.__doc__:
             doc = 'No'
         print '%-20s%-30s%s' % (plugin['name'], ', '.join(roles[plugin['name']]), doc)
-    print '-'*60
+    print '-' * 60
+
 
 def print_doc(plugin_name):
     """Parameter --doc <plugin_name>"""
