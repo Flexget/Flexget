@@ -1,9 +1,9 @@
 import logging
 import re
-
 from flexget.utils.titles.parser import TitleParser, ParseWarning
 
 log = logging.getLogger('seriesparser')
+
 
 class SeriesParser(TitleParser):
 
@@ -16,7 +16,7 @@ class SeriesParser(TitleParser):
     :expect_ep: expect series to be in season, ep format
 
     """
-    
+
     def __init__(self):
         # parser settings
         self.name = None
@@ -24,7 +24,7 @@ class SeriesParser(TitleParser):
         self.expect_ep = False
         # if set to true, episode or id must follow immediattely after name
         self.strict_name = False
-        
+
         self.ep_regexps = ['s(\d+)e(\d+)', 's(\d+)ep(\d+)', 's(\d+).e(\d+)', '[^\d]([\d]{1,2})[\s]?x[\s]?(\d+)']
         self.id_regexps = ['(\d\d\d\d).(\d+).(\d+)', '(\d+).(\d+).(\d\d\d\d)', \
                            '(\d\d\d\d)x(\d+)\.(\d+)', '[^s\d](\d{1,3})[^p\d]']
@@ -38,14 +38,14 @@ class SeriesParser(TitleParser):
         self.quality = 'unknown'
         self.proper_or_repack = False
         self.special = False
-        
+
         # false if item does not match series
         self.valid = False
 
     def parse(self):
         if not self.name or not self.data:
             raise Exception('SeriesParser initialization error, name: %s data: %s' % \
-                            (repr(self.name), repr(self.data)))
+               (repr(self.name), repr(self.data)))
         if not isinstance(self.name, basestring):
             raise Exception('SeriesParser name is not a string, got %s' % repr(self.name))
         if not isinstance(self.data, basestring):
@@ -55,11 +55,11 @@ class SeriesParser(TitleParser):
 
         # perform data cleaner regexps
         for clean_re in self.clean_regexps:
-            matches = re.findall(clean_re, data, re.IGNORECASE|re.UNICODE)
+            matches = re.findall(clean_re, data, re.IGNORECASE | re.UNICODE)
             # remove all matches from data, unless they happen to contain relevant information
             if matches:
                 for match in matches:
-                    # TODO: check if match contain valid episode number ? .. 
+                    # TODO: check if match contain valid episode number ?
                     log.debug('match: %s' % match)
                     safe = True
                     for quality in self.qualities:
@@ -74,7 +74,7 @@ class SeriesParser(TitleParser):
                         break
                     else:
                         data = data.replace(match, '').strip()
-            
+
         log.log(5, 'data after cleaners: %s' % data)
 
         def clean(str):
@@ -85,9 +85,9 @@ class SeriesParser(TitleParser):
         data = clean(data)
         # remove duplicate spaces
         data = ' '.join(data.split())
-        
+
         log.log(5, 'data fully-cleaned: %s' % data)
-            
+
         def name_to_re(name):
             """Convert 'foo bar' to '^[^...]*foo[^...]*bar[^...]+"""
             # TODO: Still doesn't handle the case where the user wants
@@ -110,7 +110,7 @@ class SeriesParser(TitleParser):
             name_matches = False
             # use all specified regexps to this data
             for name_re in self.name_regexps:
-                match = re.search(name_re, data, re.IGNORECASE|re.UNICODE)
+                match = re.search(name_re, data, re.IGNORECASE | re.UNICODE)
                 if match:
                     name_end = match.end()
                     name_matches = True
@@ -122,13 +122,13 @@ class SeriesParser(TitleParser):
         else:
             # Use a regexp generated from the name as a fallback.
             name_re = name_to_re(name)
-            match = re.search(name_re, data, re.IGNORECASE|re.UNICODE)
+            match = re.search(name_re, data, re.IGNORECASE | re.UNICODE)
             if not match:
                 #log.debug('FAIL: regexp %s does not match %s' % (name_re, data))
                 # leave this invalid
                 return
             name_end = match.end()
-                
+
         # TODO: matched name should be EXCLUDED from ep and id searching!
 
         # search tags and quality
@@ -150,7 +150,7 @@ class SeriesParser(TitleParser):
 
         # search for season and episode number
         for ep_re in self.ep_regexps:
-            match = re.search(ep_re, data, re.IGNORECASE|re.UNICODE)
+            match = re.search(ep_re, data, re.IGNORECASE | re.UNICODE)
             if match:
                 # strict_name
                 if self.strict_name:
@@ -162,13 +162,12 @@ class SeriesParser(TitleParser):
                 self.season = int(season)
                 self.episode = int(episode)
                 self.valid = True
-                self.id = "S%sE%s" % (str(self.season).zfill(2), str(self.episode).zfill(2))
                 return
 
         # search for id as last since they contain somewhat broad matches
         if not self.expect_ep:
             for id_re in self.id_regexps:
-                match = re.search(id_re, data, re.IGNORECASE|re.UNICODE)
+                match = re.search(id_re, data, re.IGNORECASE | re.UNICODE)
                 if match:
                     # strict_name
                     if self.strict_name:
@@ -184,10 +183,10 @@ class SeriesParser(TitleParser):
         else:
             # we should be getting season, ep !
             # try to look up idiotic numberin scheme 101,102,103,201,202
-	    # ressu: Added matching for 0101, 0102... It will fail on 
-	    #        season 11 though
+            # ressu: Added matching for 0101, 0102... It will fail on
+            #        season 11 though
 
-            match = re.search('(0?\d)(\d\d)', data, re.IGNORECASE|re.UNICODE)
+            match = re.search('(0?\d)(\d\d)', data, re.IGNORECASE | re.UNICODE)
             if match:
                 # strict_name
                 if self.strict_name:
@@ -205,9 +204,14 @@ class SeriesParser(TitleParser):
     @property
     def identifier(self):
         """Return identifier for parsed episode"""
-        if not self.valid: 
+        if not self.valid:
             raise Exception('Series flagged invalid')
-        return self.id
+        if self.season and self.episode:
+            return 'S%sE%s' % (str(self.season).zfill(2), str(self.episode).zfill(2))
+        elif self.id is None:
+            raise Exception('Series is missing identifier')
+        else:
+            return self.id
 
     def __str__(self):
         valid = 'INVALID'
@@ -216,7 +220,7 @@ class SeriesParser(TitleParser):
         return '<SeriesParser(data=%s,name=%s,id=%s,season=%s,episode=%s,quality=%s,proper=%s,status=%s)>' % \
             (str(self.data), str(self.name), str(self.id), str(self.season), str(self.episode), \
              str(self.quality), str(self.proper_or_repack), valid)
-             
+
     def __cmp__(self, other):
         """
         me = (self.qualities.index(self.quality), self.name)
@@ -224,6 +228,6 @@ class SeriesParser(TitleParser):
         return cmp(me, other)
         """
         return cmp(self.qualities.index(self.quality), self.qualities.index(other.quality))
-        
+
     def __eq__(self, other):
         return self is other

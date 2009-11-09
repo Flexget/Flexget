@@ -9,10 +9,11 @@ from sqlalchemy.orm import relation, join
 
 log = logging.getLogger('series')
 
+
 class Series(Base):
-    
+
     __tablename__ = 'series'
-    
+
     id = Column(Integer, primary_key=True)
     name = Column(String)
     episodes = relation('Episode', backref='series')
@@ -20,14 +21,15 @@ class Series(Base):
     def __repr__(self):
         return '<Series(name=%s)>' % (self.name)
 
+
 class Episode(Base):
-    
+
     __tablename__ = 'series_episodes'
 
     id = Column(Integer, primary_key=True)
     identifier = Column(String)
     first_seen = Column(DateTime, default=datetime.now())
-    
+
     season = Column(Integer)
     number = Column(Integer)
 
@@ -36,6 +38,7 @@ class Episode(Base):
 
     def __repr__(self):
         return '<Episode(identifier=%s)>' % (self.identifier)
+
 
 class Release(Base):
 
@@ -51,8 +54,9 @@ class Release(Base):
     def __repr__(self):
         return '<Release(quality=%s,downloaded=%s,proper=%s,title=%s)>' % (self.quality, self.downloaded, self.proper, self.title)
 
+
 class SeriesPlugin(object):
-    
+
     """Database helpers"""
 
     def get_first_seen(self, session, parser):
@@ -60,7 +64,7 @@ class SeriesPlugin(object):
         episode = session.query(Episode).select_from(join(Episode, Series)).\
             filter(Series.name == parser.name.lower()).filter(Episode.identifier == parser.identifier).first()
         return episode.first_seen
-        
+
     def get_latest_info(self, session, name):
         """Return latest known identifier in dict (season, episode) for series name"""
         episode = session.query(Episode).select_from(join(Episode, Series)).\
@@ -73,8 +77,8 @@ class SeriesPlugin(object):
             return False
         #log.log(5, 'get_latest_info, series: %s season: %s episode: %s' % \
         #    (name, episode.season, episode.number))
-        return {'season':episode.season, 'episode':episode.number}
-    
+        return {'season': episode.season, 'episode': episode.number}
+
     def get_releases(self, session, name, identifier):
         """Return all releases for series by identifier."""
         episode = session.query(Episode).select_from(join(Episode, Series)).\
@@ -87,7 +91,7 @@ class SeriesPlugin(object):
             order_by(desc(Release.quality)).all():
             releases.append(release)
         return releases
-    
+
     def get_downloaded(self, session, name, identifier):
         """Return list of downloaded releases for this episode"""
         episode = session.query(Episode).select_from(join(Episode, Series)).\
@@ -103,7 +107,7 @@ class SeriesPlugin(object):
         if not downloaded:
             log.debug('get_downloaded: no %s downloads recorded for %s' % (identifier, name))
         return downloaded
-    
+
     def store(self, session, parser):
         """Push series information into database. Returns added/existing release."""
         # if series does not exist in database, add new
@@ -114,7 +118,7 @@ class SeriesPlugin(object):
             series.name = parser.name.lower()
             session.add(series)
             log.debug('-> added %s' % series)
-        
+
         # if episode does not exist in series, add new
         episode = session.query(Episode).filter(Episode.series_id == series.id).\
             filter(Episode.identifier == parser.identifier).first()
@@ -150,8 +154,9 @@ class SeriesPlugin(object):
             log.debug('-> added %s' % release)
         return release
 
+
 class SeriesReport(SeriesPlugin):
-    
+
     """Produces --series report"""
 
     options = {}
@@ -196,7 +201,7 @@ class SeriesReport(SeriesPlugin):
                     status += '-Proper'
                 status += ' '
             print ' %-30s%-20s' % (episode.identifier, status)
-            
+
         print '-' * 79
         print ' * = downloaded'
         session.close()
@@ -248,8 +253,9 @@ class SeriesReport(SeriesPlugin):
         print ' * = downloaded'
         session.close()
 
+
 class SeriesForget(object):
-    
+
     """Provides --series-forget"""
 
     options = {}
@@ -299,7 +305,7 @@ class SeriesForget(object):
                     session.delete(series)
                 else:
                     print 'Unknown series %s' % name
-            
+
             session.commit()
 
 
@@ -307,13 +313,13 @@ class FilterSeries(SeriesPlugin):
 
     """
         Intelligent filter for tv-series.
-        
+
         http://flexget.com/wiki/FilterSeries
     """
-    
+
     def __init__(self):
         self.parser2entry = {}
-    
+
     def validator(self):
         from flexget import validator
 
@@ -350,16 +356,16 @@ class FilterSeries(SeriesPlugin):
             bundle.reject_keys(['set', 'path', 'timeframe', 'name_regexp', 'ep_regexp', 'id_regexp', 'watched'])
             advanced = bundle.accept_any_key('dict')
             build_options(advanced)
-        
+
         root = validator.factory()
-        
+
         # simple format:
         #   - series
         #   - another series
-        
+
         simple = root.accept('list')
         build_list(simple)
-        
+
         # advanced format:
         #   settings:
         #     group: {...}
@@ -372,7 +378,7 @@ class FilterSeries(SeriesPlugin):
         settings_group = settings.accept_any_key('dict')
         build_options(settings_group)
 
-        group = advanced.accept_any_key('list')        
+        group = advanced.accept_any_key('list')
         build_list(group)
 
         return root
@@ -391,7 +397,7 @@ class FilterSeries(SeriesPlugin):
         Applies group settings with advanced form."""
 
         feed_config = feed.config.get('series', [])
-        
+
         # generate unified configuration in complex form, requires complex code as well :)
         config = {}
         if isinstance(feed_config, list):
@@ -412,20 +418,20 @@ class FilterSeries(SeriesPlugin):
             config = copy.deepcopy(feed_config)
             if not 'settings' in config:
                 config['settings'] = {}
-            
+
         # TODO: what if same series is configured in multiple groups?!
-        
-        # generate quality settings from group name and empty settings if not present (required) 
+
+        # generate quality settings from group name and empty settings if not present (required)
         for group_name, _ in config.iteritems():
             if group_name == 'settings':
                 continue
             if not group_name in config['settings']:
-                # at least empty settings 
+                # at least empty settings
                 config['settings'][group_name] = {}
                 # if known quality, convenience create settings with that quality
                 if group_name in SeriesParser.qualities:
                     config['settings'][group_name]['quality'] = group_name
-                    
+
         # generate groups from settings groups
         for group_name, group_settings in config['settings'].iteritems():
             # convert group series into complex types
@@ -437,11 +443,11 @@ class FilterSeries(SeriesPlugin):
                     series, series_settings = series.items()[0]
                     if series_settings is None:
                         raise Exception('Series %s has unexpected \':\'' % series)
-                # if series have given path instead of dict, convert it into a dict    
+                # if series have given path instead of dict, convert it into a dict
                 if isinstance(series_settings, basestring):
                     series_settings = {'path': series_settings}
                 # merge group settings into this series settings
-                from flexget.utils.tools import merge_dict_from_to 
+                from flexget.utils.tools import merge_dict_from_to
                 merge_dict_from_to(group_settings, series_settings)
                 complex_series.append({series: series_settings})
             # add generated complex series into config
@@ -469,7 +475,7 @@ class FilterSeries(SeriesPlugin):
                     if not 'exact' in series_config:
                         log.info('Auto enabling exact (naming) for series %s' % series_name)
                         series_config['exact'] = True
-    
+
     def on_feed_filter(self, feed):
         """Filter series"""
 
@@ -479,14 +485,14 @@ class FilterSeries(SeriesPlugin):
             log.critical('Running old database! Please see bleeding edge news!')
             feed.manager.disable_feeds()
             feed.abort()
-        
+
         # TEMP: bugfix, convert all series to lowercase
         for series in feed.session.query(Series).all():
             series.name = series.name.lower()
-        
+
         config = self.generate_config(feed)
         self.auto_exact(config)
-        
+
         for group_series in config.itervalues():
             for series_item in group_series:
                 series_name, series_config = series_item.items()[0]
@@ -509,13 +515,15 @@ class FilterSeries(SeriesPlugin):
         # helper function, iterate entry fields in certain order
         def field_order(a, b):
             order = ['title', 'description']
+
             def index(c):
                 try:
                     return order.index(c[0])
                 except ValueError:
                     return 1
+
             return cmp(index(a), index(b))
-            
+
         # key: series (episode) identifier ie. S01E02
         # value: seriesparser
         series = {}
@@ -533,7 +541,7 @@ class FilterSeries(SeriesPlugin):
 
             for field, data in sorted(entry.items(), cmp=field_order):
                 # skip invalid fields
-                if not isinstance(data, basestring) or not data: 
+                if not isinstance(data, basestring) or not data:
                     continue
                 parser = SeriesParser()
                 parser.name = series_name
@@ -552,34 +560,34 @@ class FilterSeries(SeriesPlugin):
                 except ParseWarning, pw:
                     from flexget.utils.log import log_once
                     log_once(pw.value, logger=log)
-                    
+
                 if parser.valid:
                     self.parser2entry[parser] = entry
                     entry['series_parser'] = parser
                     break
             else:
                 continue
-            
+
             # add series, season and episode to entry
             entry['series_name'] = series_name
             entry['series_season'] = parser.season
             entry['series_episode'] = parser.episode
             entry['series_id'] = parser.id
-            
+
             # set custom download path
             if 'path' in config:
                 log.debug('setting %s custom path to %s' % (entry['title'], config.get('path')))
                 entry['path'] = config.get('path')
-            
+
             # accept info from set: and place into the entry
             if 'set' in config:
                 set = get_plugin_by_name('set')
                 set.instance.modify(entry, config.get('set'))
-                
+
             # add this episode into list of available episodes
             eps = series.setdefault(parser.identifier, [])
             eps.append(parser)
-            
+
             # store this episode into database and save reference for later use
             release = self.store(feed.session, parser)
             entry['series_release'] = release
@@ -589,13 +597,11 @@ class FilterSeries(SeriesPlugin):
     def process_series(self, feed, series, series_name, config):
         """Accept or Reject episode from available releases, or postpone choosing."""
         for eps in series.itervalues():
-            if not eps: continue
-
             whitelist = []
 
             # sort episodes in order of quality
             eps.sort()
-            
+
             log.debug('start with episodes: %s' % [e.data for e in eps])
 
             #
@@ -634,7 +640,7 @@ class FilterSeries(SeriesPlugin):
 
             # no episodes left, continue to next series
             if not eps:
-                continue 
+                continue
 
             best = eps[0]
             log.debug('continuing w. episodes: %s' % [e.data for e in eps])
@@ -645,7 +651,7 @@ class FilterSeries(SeriesPlugin):
                 log.debug('-' * 20 + ' watched -->')
                 if self.process_watched(feed, config, eps):
                     continue
-                    
+
             # Episode advancement. Used only with season based series
             if best.season and best.episode:
                 log.debug('-' * 20 + ' episode advancement -->')
@@ -712,7 +718,6 @@ class FilterSeries(SeriesPlugin):
         log.debug('new_propers: %s' % [e.data for e in new_propers])
         return removed, new_propers
 
-
     def accept_propers(self, feed, eps, new_propers):
         """
             Accepts all propers from qualities already downloaded.
@@ -732,7 +737,6 @@ class FilterSeries(SeriesPlugin):
 
         return accepted
 
-
     def process_downloaded(self, feed, eps, whitelist):
         """
             Rejects all downloaded episodes (regardless of quality).
@@ -750,7 +754,6 @@ class FilterSeries(SeriesPlugin):
                     if ep not in downloaded:
                         downloaded.append(ep)
         return downloaded
-
 
     def process_quality(self, feed, config, eps):
         """Accepts episodes that meet configured qualities"""
@@ -823,7 +826,7 @@ class FilterSeries(SeriesPlugin):
         # parse options
         amount, unit = config['timeframe'].split(' ')
         log.debug('amount: %s unit: %s' % (repr(amount), repr(unit)))
-        params = {unit:int(amount)}
+        params = {unit: int(amount)}
         try:
             timeframe = timedelta(**params)
         except TypeError:
@@ -851,7 +854,8 @@ class FilterSeries(SeriesPlugin):
         diff = datetime.now() - self.get_first_seen(feed.session, best)
         if (diff.seconds < 60) and not feed.manager.unit_test:
             entry = self.parser2entry[best]
-            log.info('Timeframe waiting %s for %s hours, currently best is %s' % (series_name, timeframe.seconds/60**2, entry['title']))
+            log.info('Timeframe waiting %s for %s hours, currently best is %s' % \
+                (series_name, timeframe.seconds / 60 ** 2, entry['title']))
 
         first_seen = self.get_first_seen(feed.session, best)
         log.debug('timeframe: %s' % timeframe)
@@ -938,5 +942,5 @@ register_parser_option('--series', action='callback', callback=SeriesReport.opti
 register_parser_option('--series-forget', action='callback', callback=SeriesForget.optik_series_forget,
                        help='Remove complete series or single episode from database. <Series> [episode]')
 
-register_parser_option('--stop-waiting', action='store', dest='stop_waiting', default=False, 
+register_parser_option('--stop-waiting', action='store', dest='stop_waiting', default=False,
                        metavar='NAME', help='Stop timeframe for a given series.')
