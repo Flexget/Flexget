@@ -626,6 +626,29 @@ class TestCapitalization(FlexGetBase):
         assert self.feed.find_entry('rejected', title='FooBar.S01E01.PDTV-FlexGet')
 
 
+class TestMixedNumbering(FlexGetBase):
+
+    __yaml__ = """
+        global:
+          series:
+            - FooBar
+        feeds:
+          test_1:
+            input_mock:
+              - {title: 'FooBar.S03E07.PDTV-FlexGet'}
+          test_2:
+            input_mock:
+              - {title: 'FooBar.0307.PDTV-FlexGet'}
+    """
+
+    def test_mixednumbering(self):
+        """Series plugin: Mixed series numbering"""
+        self.execute_feed('test_1')
+        assert self.feed.find_entry('accepted', title='FooBar.S03E07.PDTV-FlexGet')
+        self.execute_feed('test_2')
+        assert self.feed.find_entry('rejected', title='FooBar.0307.PDTV-FlexGet')
+
+
 class TestAutoExact(FlexGetBase):
 
     __yaml__ = """
