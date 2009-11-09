@@ -3,6 +3,7 @@
 from flexget.options import OptionParser
 from flexget.manager import Manager
 from flexget import plugin
+import re
 import os
 import os.path
 import sys
@@ -13,8 +14,34 @@ __version__ = '{subversion}'
 
 log = logging.getLogger('main')
 
+
+class PrivacyFilter(logging.Filter):
+
+    """Edits log messages and <hides> obviously private information."""
+
+    def __init__(self):
+        self.replaces = []
+
+        def hide(name):
+            s = '([?&]%s=)\w+' % name
+            p = re.compile(s)
+            self.replaces.append(p)
+
+        for param in ['passwd', 'password', 'pw', 'pass', 'passkey', \
+            'key', 'user', 'username', 'uname', 'login', 'id']:
+            hide(param)
+
+    def filter(self, record):
+        for p in self.replaces:
+            record.msg = p.sub(r'\g<1><hidden>', record.msg)
+            record.msg = record.msg
+        return False
+
 _logging_configured = False
 _mem_handler = None
+_logging_started = False
+
+
 def initialize_logging(unit_test=False):
     global _logging_configured, _mem_handler
 
@@ -32,15 +59,13 @@ def initialize_logging(unit_test=False):
         log_format = ['%(asctime)-15s %(levelname)-8s %(name)-11s %(message)s', '%Y-%m-%d %H:%M']
         formatter = logging.Formatter(*log_format)
 
-        _mem_handler = logging.handlers.MemoryHandler(1000*1000, 100)
+        _mem_handler = logging.handlers.MemoryHandler(1000 * 1000, 100)
         _mem_handler.setFormatter(formatter)
         logger.addHandler(_mem_handler)
-
         logger.setLevel(logging.INFO)
-
         _logging_configured = True
 
-_logging_started = False
+
 def start_logging(filename=None, level=logging.INFO, debug=False, quiet=False):
     global _logging_configured, _mem_handler, _logging_started
 
@@ -48,18 +73,17 @@ def start_logging(filename=None, level=logging.INFO, debug=False, quiet=False):
         if debug:
             hdlr = logging.StreamHandler()
         else:
-            hdlr = logging.handlers.RotatingFileHandler(filename, maxBytes=1000*1024, backupCount=9)
+            hdlr = logging.handlers.RotatingFileHandler(filename, maxBytes=1000 * 1024, backupCount=9)
 
         hdlr.setFormatter(_mem_handler.formatter)
+        hdlr.addFilter(PrivacyFilter())
 
         _mem_handler.setTarget(hdlr)
 
         # root logger
         logger = logging.getLogger()
-
         logger.removeHandler(_mem_handler)
         logger.addHandler(hdlr)
-
         logger.setLevel(level)
 
         if not debug and not quiet:
@@ -75,9 +99,9 @@ def start_logging(filename=None, level=logging.INFO, debug=False, quiet=False):
 
         # flush what we have stored from the plugin initialization
         _mem_handler.flush()
-
         _logging_started = True
-        
+
+
 def flush_logging():
     """Flushes memory logger to console"""
     console = logging.StreamHandler()
@@ -88,6 +112,7 @@ def flush_logging():
         for record in _mem_handler.buffer:
             console.handle(record)
     _mem_handler.flush()
+
 
 def main():
     initialize_logging()
