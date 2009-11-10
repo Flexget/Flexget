@@ -77,7 +77,7 @@ class SeriesPlugin(object):
             return False
         #log.log(5, 'get_latest_info, series: %s season: %s episode: %s' % \
         #    (name, episode.season, episode.number))
-        return {'season': episode.season, 'episode': episode.number}
+        return {'season': episode.season, 'episode': episode.number, 'name': name}
 
     def get_releases(self, session, name, identifier):
         """Return all releases for series by identifier."""
