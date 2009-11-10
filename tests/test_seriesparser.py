@@ -176,8 +176,8 @@ class TestSeriesParser(object):
         assert s.episode == 6, 'episode missing'
         assert s.identifier == 'S07E06', 'identifier broken'
 
-    def test_strict_name(self):
-        """SeriesParser: test strict name parsing"""
+    def test_exact_name(self):
+        """SeriesParser: test exact/strict name parsing"""
 
         s = SeriesParser()
         s.name = 'test'

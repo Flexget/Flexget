@@ -183,14 +183,10 @@ class TestFilterSeries(FlexGetBase):
 
 
 class TestEpisodeAdvancement(FlexGetBase):
+    
     __yaml__ = """
         feeds:
-          test_really_simple:
-            input_mock:
-              - {title: 'yyy s08e17'}
-            series:
-              - yyy
-              
+
           test_simple:
             input_mock:
               - {title: 'foobar s01e12'}
@@ -217,10 +213,6 @@ class TestEpisodeAdvancement(FlexGetBase):
               - zzz
     """
     
-    def test_really_simple(self):
-        self.execute_feed('test_really_simple')
-        assert self.feed.find_entry('accepted', title='yyy s08e17')
-
     def test_simple(self):
         """Series plugin: simple episode advancement"""
         self.execute_feed('test_simple')
@@ -665,9 +657,9 @@ class TestAutoExact(FlexGetBase):
         feeds:
           test:
             input_mock:
+              - {title: 'ABC.MIAMI.S01E01.PDTV-FlexGet'}
               - {title: 'ABC.S01E01.PDTV-FlexGet'}
               - {title: 'ABC.LA.S01E01.PDTV-FlexGet'}
-              - {title: 'ABC.MIAMI.S01E01.PDTV-FlexGet'}
             series:
               - ABC
               - ABC LA
@@ -683,6 +675,7 @@ class TestAutoExact(FlexGetBase):
 
 
 class TestTimeframe(FlexGetBase):
+
     __yaml__ = """
         global:
           series:

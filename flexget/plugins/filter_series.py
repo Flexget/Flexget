@@ -1,3 +1,4 @@
+import parser
 import logging
 from datetime import datetime, timedelta
 from flexget.utils.titles import SeriesParser, ParseWarning
@@ -473,7 +474,7 @@ class FilterSeries(SeriesPlugin):
                 if (name.lower().startswith(series_name.lower())) and \
                    (name.lower() != series_name.lower()):
                     if not 'exact' in series_config:
-                        log.info('Auto enabling exact (naming) for series %s' % series_name)
+                        log.info('Auto enabling exact matching for series %s' % series_name)
                         series_config['exact'] = True
 
     def on_feed_filter(self, feed):
@@ -501,9 +502,11 @@ class FilterSeries(SeriesPlugin):
                 self.process_series(feed, series, series_name, series_config)
 
     def parse_series(self, feed, series_name, config):
-        """Search for :series_name: and return dict containing all episodes from it
-        in a dict where key is the episode identifier and value is a list of episodes
-        in form of SeriesParser."""
+        """
+            Search for :series_name: and return dict containing all episodes from it
+            in a dict where key is the episode identifier and value is a list of episodes
+            in form of SeriesParser.
+        """
 
         def get_as_array(config, key):
             """Return configuration key as array, even if given as a single string"""
@@ -549,6 +552,7 @@ class FilterSeries(SeriesPlugin):
                 parser.expect_ep = expect_ep
                 parser.ep_regexps = get_as_array(config, 'ep_regexp') + parser.ep_regexps
                 parser.id_regexps = get_as_array(config, 'id_regexp') + parser.id_regexps
+                parser.strict_name = config.get('exact', False)
                 # do not use builtin list for id when ep configigured and vice versa
                 if 'ep_regexp' in config and not 'id_regexp' in config:
                     parser.id_regexps = []
@@ -562,6 +566,7 @@ class FilterSeries(SeriesPlugin):
                     log_once(pw.value, logger=log)
 
                 if parser.valid:
+                    log.debug('%s seems to be valid %s' % (entry['title'], series_name))
                     self.parser2entry[parser] = entry
                     entry['series_parser'] = parser
                     break
@@ -572,7 +577,7 @@ class FilterSeries(SeriesPlugin):
             entry['series_name'] = series_name
             entry['series_season'] = parser.season
             entry['series_episode'] = parser.episode
-            entry['series_id'] = parser.id
+            entry['series_id'] = parser.identifier
 
             # set custom download path
             if 'path' in config:
