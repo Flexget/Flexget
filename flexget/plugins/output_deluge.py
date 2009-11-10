@@ -6,10 +6,13 @@ from flexget.plugin import *
 
 log = logging.getLogger('deluge')
 
+
 class OutputDeluge:
+
     """
         Add the torrents directly to deluge, supporting custom save paths.
     """
+
     def validator(self):
         from flexget import validator
         root = validator.factory()
@@ -29,7 +32,7 @@ class OutputDeluge:
     def get_config(self, feed):
         config = feed.config.get('deluge', {})
         if isinstance(config, bool):
-            config = {'enabled':config}
+            config = {'enabled': config}
         config.setdefault('host', 'localhost')
         config.setdefault('port', 58846)
         config.setdefault('user', '')
@@ -46,8 +49,8 @@ class OutputDeluge:
             register the usable set: keywords
         """
         set_plugin = get_plugin_by_name('set')
-        set_plugin.instance.register_keys({'path':'text', 'movedone':'text', \
-            'queuetotop':'boolean', 'label':'text'})
+        set_plugin.instance.register_keys({'path': 'text', 'movedone': 'text', \
+            'queuetotop': 'boolean', 'label': 'text'})
 
     def on_feed_download(self, feed):
         """
@@ -161,8 +164,7 @@ class OutputDeluge:
             host=config['host'],
             port=config['port'],
             username=config['user'],
-            password=config['pass']
-        )
+            password=config['pass'])
 
         def on_connect_success(result):
             if not result:
@@ -220,9 +222,13 @@ class OutputDeluge:
                     del(entry['file'])
 
             def on_complete(result):
+
                 def on_disconnect(result):
                     log.debug('Stopping twisted reactor. result: %s' % result)
-                    reactor.stop()
+                    try:
+                        reactor.stop()
+                    except twisted.internet.error.ReactorNotRunning:
+                        pass
                 client.disconnect().addCallback(on_disconnect).addErrback(on_disconnect)
 
             defer.DeferredList(dlist).addCallback(on_complete)
