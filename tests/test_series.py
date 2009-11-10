@@ -185,6 +185,12 @@ class TestFilterSeries(FlexGetBase):
 class TestEpisodeAdvancement(FlexGetBase):
     __yaml__ = """
         feeds:
+          test_really_simple:
+            input_mock:
+              - {title: 'yyy s08e17'}
+            series:
+              - yyy
+              
           test_simple:
             input_mock:
               - {title: 'foobar s01e12'}
@@ -210,6 +216,10 @@ class TestEpisodeAdvancement(FlexGetBase):
             series:
               - zzz
     """
+    
+    def test_really_simple(self):
+        self.execute_feed('test_really_simple')
+        assert self.feed.find_entry('accepted', title='yyy s08e17')
 
     def test_simple(self):
         """Series plugin: simple episode advancement"""

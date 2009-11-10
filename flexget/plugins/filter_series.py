@@ -796,16 +796,17 @@ class FilterSeries(SeriesPlugin):
     def process_episode_advancement(self, feed, eps, series):
         """Rjects all episodes that are too old (advancement), return True when this happens."""
 
-        best = eps[0]
-        latest = self.get_latest_info(feed.session, best.name)
+        current = eps[0]
+        latest = self.get_latest_info(feed.session, current.name)
+        log.debug('latest: %s' % latest)
+        log.debug('current: %s' % current)
         if latest:
             # allow few episodes "backwards" in case of missed eps
             grace = len(series) + 2
-            if best.season < latest['season'] or (best.season == latest['season'] and best.episode < latest['episode'] - grace):
-                log.debug('%s episode %s does not meet episode advancement, rejecting all occurrences' % (best.name, best.identifier))
+            if (current.season < latest['season']) or (current.season == latest['season'] and current.episode < (latest['episode'] - grace)):
+                log.debug('%s episode %s does not meet episode advancement, rejecting all occurrences' % (current.name, current.identifier))
                 for ep in eps:
-                    entry = self.parser2entry[ep]
-                    feed.reject(entry, 'episode advancement')
+                    feed.reject(self.parser2entry[ep], 'episode advancement')
                 return True
 
     def process_timeframe(self, feed, config, eps, series_name):
