@@ -188,6 +188,7 @@ class OutputDeluge:
                     client.core.set_torrent_move_completed_path(torrent_id, movedone)
                 if label:
                     # TODO: check if label plugin is enabled
+                    client.core.enable_plugin('Label')
                     client.label.add(label)
                     client.label.set_torrent(torrent_id, label)
                     log.debug("%s label set to '%s'" % (entry['title'], label))
