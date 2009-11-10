@@ -32,6 +32,8 @@ class PrivacyFilter(logging.Filter):
             hide(param)
 
     def filter(self, record):
+        if not isinstance(record.msg, basestring):
+            return False
         for p in self.replaces:
             record.msg = p.sub(r'\g<1><hidden>', record.msg)
             record.msg = record.msg
@@ -76,7 +78,6 @@ def start_logging(filename=None, level=logging.INFO, debug=False, quiet=False):
             hdlr = logging.handlers.RotatingFileHandler(filename, maxBytes=1000 * 1024, backupCount=9)
 
         hdlr.setFormatter(_mem_handler.formatter)
-        hdlr.addFilter(PrivacyFilter())
 
         _mem_handler.setTarget(hdlr)
 
@@ -84,6 +85,7 @@ def start_logging(filename=None, level=logging.INFO, debug=False, quiet=False):
         logger = logging.getLogger()
         logger.removeHandler(_mem_handler)
         logger.addHandler(hdlr)
+        logger.addFilter(PrivacyFilter())
         logger.setLevel(level)
 
         if not debug and not quiet:
@@ -140,7 +142,7 @@ def main():
         log.critical(e.message)
         flush_logging()
         sys.exit(1)
-        
+
     manager.acquire_lock()
     
     start_logging(os.path.join(manager.config_base, 'flexget.log'), log_level, quiet=options.quiet)
