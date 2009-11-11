@@ -7,6 +7,19 @@ from flexget.plugin import *
 log = logging.getLogger('deluge')
 
 
+class DelugeDrop:
+
+    """" Stores all the info needed to add a torrent to deluge. """
+
+    def __init__(self, name, filedump, path, movedone, label, qtt):
+        self.name = name
+        self.filedump = filedump
+        self.path = path
+        self.movedone = movedone
+        self.label = label
+        self.qtt = qtt
+
+
 class OutputDeluge:
 
     """
@@ -48,6 +61,7 @@ class OutputDeluge:
         """
             register the usable set: keywords
         """
+        self.droplets = []
         set_plugin = get_plugin_by_name('set')
         set_plugin.instance.register_keys({'path': 'text', 'movedone': 'text', \
             'queuetotop': 'boolean', 'label': 'text'})
@@ -80,10 +94,12 @@ class OutputDeluge:
             from deluge.ui.client import sclient
         except:
             log.info("Using deluge 1.2 api")
-            self.add_to_deluge12(feed, config)
+            self.makelist_deluge12(feed, config)
+            self.deluge12 = True
         else:
             log.info("Using deluge 1.1 api")
             self.add_to_deluge11(feed, config)
+            self.deluge12 = False
 
     def add_to_deluge11(self, feed, config):
         """Add torrents to deluge at exit."""
@@ -153,7 +169,27 @@ class OutputDeluge:
             else:
                 log.info("%s is already loaded in deluge. Cannot change label, movedone, or queuetotop" % entry['title'])
                 
-    def add_to_deluge12(self, feed, config):
+    def makelist_deluge12(self, feed, config):
+        for entry in feed.accepted:
+            name = entry['title']
+            # see that temp file is present
+            if not os.path.exists(entry['file']):
+                tmp_path = os.path.join(feed.manager.config_base, 'temp')
+                log.debug('entry: %s' % entry)
+                log.debug('temp: %s' % ', '.join(os.listdir(tmp_path)))
+                raise PluginError("Downloaded temp file '%s' doesn't exist!?" % entry['file'], log)
+            filedump = base64.encodestring(open(entry['file']).read())
+            path = os.path.expanduser(entry.get('path', config['path']) % entry)
+            movedone = os.path.expanduser(entry.get('movedone', config['movedone']) % entry)
+            label = entry.get('label', config['label']).lower()
+            qtt = entry.get('queuetotop', config['queuetotop'])
+            self.droplets.append(DelugeDrop(name, filedump, path, movedone, label, qtt))
+            # clean up temp file if download plugin is not configured for this feed
+            if not 'download' in feed.config:
+                os.remove(entry['file'])
+                del(entry['file'])
+            
+    def add_to_deluge12(self, config):
         try:
             from twisted.internet import reactor, defer
             from deluge.ui.client import client
@@ -171,80 +207,64 @@ class OutputDeluge:
                 # TODO: connect failed, do something
                 pass
 
-            def on_success(torrent_id, entry, config):
+            def on_success(torrent_id, drop):
                 if not torrent_id:
-                    log.info("%s is already loaded in deluge, cannot set movedone, label, or queuetotop." % entry['title'])
+                    log.info("%s is already loaded in deluge, cannot set movedone, label, or queuetotop." % drop.name)
                     return
-                log.info("%s successfully added to deluge." % entry['title'])
-                movedone = os.path.expanduser(entry.get('movedone', config['movedone']) % entry)
-                label = entry.get('label', config['label']).lower()
-                queuetotop = entry.get('queuetotop', config['queuetotop'])
+                log.info("%s successfully added to deluge." % drop.name)
+                movedone = drop.movedone
                 if movedone:
                     if not os.path.isdir(movedone):
                         log.debug("movedone path %s doesn't exist, creating" % movedone)
                         os.makedirs(movedone)
-                    log.debug("%s move on complete set to %s" % (entry['title'], movedone))
+                    log.debug("%s move on complete set to %s" % (drop.name, movedone))
                     client.core.set_torrent_move_completed(torrent_id, True)
                     client.core.set_torrent_move_completed_path(torrent_id, movedone)
-                if label:
-                    # TODO: check if label plugin is enabled
+                if drop.label:
                     client.core.enable_plugin('Label')
-                    client.label.add(label)
-                    client.label.set_torrent(torrent_id, label)
-                    log.debug("%s label set to '%s'" % (entry['title'], label))
-                if queuetotop:
-                    log.debug("%s moved to top of queue" % entry['title'])
+                    client.label.add(drop.label)
+                    client.label.set_torrent(torrent_id, drop.label)
+                    log.debug("%s label set to '%s'" % (drop.name, drop.label))
+                if drop.queuetotop:
+                    log.debug("%s moved to top of queue" % drop.name)
                     client.core.queue_top([torrent_id])
 
-            def on_fail(result, entry, feed):
-                log.info("%s was not added to deluge! %s" % (entry['title'], result))
-                feed.fail(entry, "Could not be added to deluge")
+            def on_fail(result, drop):
+                log.info("%s was not added to deluge! %s" % (drop.name, result))
+                # TODO: Need to figure out how to fail entries properly from here.
+                #feed.fail(entry, "Could not be added to deluge")
 
             # add the torrents
             dlist = []
-            for entry in feed.accepted:
+            for drop in self.droplets:
                 opts = {}
-                path = entry.get('path', config['path'])
-                if path:
-                    opts['download_location'] = os.path.expanduser(path % entry)
-                # see that temp file is present
-                if not os.path.exists(entry['file']):
-                    tmp_path = os.path.join(feed.manager.config_base, 'temp')
-                    log.debug('entry: %s' % entry)
-                    log.debug('temp: %s' % ', '.join(os.listdir(tmp_path)))
-                    raise PluginError("Downloaded temp file '%s' doesn't exist!?" % entry['file'], log)
-                filedump = base64.encodestring(open(entry['file']).read())
-                addresult = client.core.add_torrent_file(entry['title'], filedump, opts)
-                addresult.addCallback(on_success, entry, config).addErrback(on_fail, entry, feed)
+                if drop.path:
+                    opts['download_location'] = drop.path
+                addresult = client.core.add_torrent_file(drop.name, drop.filedump, opts)
+                addresult.addCallback(on_success, drop).addErrback(on_fail, drop)
                 dlist.append(addresult)
-                # clean up temp file if download plugin is not configured for this feed
-                if not 'download' in feed.config:
-                    os.remove(entry['file'])
-                    del(entry['file'])
 
             def on_complete(result):
 
                 def on_disconnect(result):
-                    log.debug('Stopping twisted reactor. result: %s' % result)
-                    try:
-                        reactor.stop()
-                    except twisted.internet.error.ReactorNotRunning:
-                        pass
+                    log.debug('Done adding torrents to deluge.' % result)
+                    reactor.stop()
                 client.disconnect().addCallback(on_disconnect).addErrback(on_disconnect)
 
             defer.DeferredList(dlist).addCallback(on_complete)
             
         def on_connect_fail(result):
-            # clean up temp files
-            for entry in feed.accepted:
-                os.remove(entry['file'])
-                del(entry['file'])
-            # TODO: is aborting the feed the best course of action?
-            log.info('Connect failed: %s' % result)
-            feed.abort()
+            # TODO: Can I fail the feed from here?
+            log.info('Connect to deluge daemon failed: %s' % result)
+            #feed.abort()
             reactor.stop()
 
         d.addCallback(on_connect_success).addErrback(on_connect_fail)
         reactor.run()
+        self.deluge12 = False
+
+    def on_process_end(self, feed):
+        if self.deluge12:
+            self.add_to_deluge12(self.get_config(feed))
 
 register_plugin(OutputDeluge, 'deluge', priorities=dict(output=1))
