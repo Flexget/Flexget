@@ -11,13 +11,13 @@ class DelugeDrop:
 
     """" Stores all the info needed to add a torrent to deluge. """
 
-    def __init__(self, name, filedump, path, movedone, label, qtt):
+    def __init__(self, name, filedump, path, movedone, label, queuetotop):
         self.name = name
         self.filedump = filedump
         self.path = path
         self.movedone = movedone
         self.label = label
-        self.qtt = qtt
+        self.queuetotop = queuetotop
 
 
 class OutputDeluge:
@@ -62,6 +62,7 @@ class OutputDeluge:
             register the usable set: keywords
         """
         self.droplets = []
+        self.deluge12 = False
         set_plugin = get_plugin_by_name('set')
         set_plugin.instance.register_keys({'path': 'text', 'movedone': 'text', \
             'queuetotop': 'boolean', 'label': 'text'})
