@@ -1,13 +1,17 @@
 from optparse import OptionParser as OptParser, SUPPRESS_HELP
 
+
 class OptionParser(OptParser):
+
     def __init__(self, unit_test=False):
         OptParser.__init__(self)
 
         self._unit_test = unit_test
 
         self.add_option('-v', action='store_true', dest='details', default=0,
-                        help='Verbose process. Display entry accept and reject info.')
+                        help='Verbose process. Display entry accept and reject info. HIGHLY USEFULL.')
+        self.add_option('--initdb', action='store_true', dest='initdb', default=0,
+                        help='Verify starting new database.')
         self.add_option('--log-start', action='store_true', dest='log_start', default=0,
                         help=SUPPRESS_HELP)
         self.add_option('--test', action='store_true', dest='test', default=0,

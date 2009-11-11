@@ -64,7 +64,12 @@ def initialize_logging(unit_test=False):
         _mem_handler = logging.handlers.MemoryHandler(1000 * 1000, 100)
         _mem_handler.setFormatter(formatter)
         logger.addHandler(_mem_handler)
-        logger.setLevel(logging.INFO)
+        # hackish way to turn on debug level before optik processes options
+        import sys
+        if '--debug' in sys.argv:
+            logger.setLevel(logging.DEBUG)
+        else:
+            logger.setLevel(logging.INFO)
         _logging_configured = True
 
 

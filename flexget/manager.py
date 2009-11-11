@@ -67,13 +67,25 @@ class Manager:
         current_path = os.getcwd()
         exec_path = sys.path[0]
 
+        config_path = os.path.dirname(self.options.config)
+        path_given = config_path != ''
+
         possible = {}
-        possible[os.path.join(startup_path, self.options.config)] = startup_path
-        possible[os.path.join(home_path, self.options.config)] = home_path
-        # for virtualenv / dev sandbox
-        possible[os.path.join(sys.path[0], '..', self.options.config)] = os.path.join(sys.path[0], '..')
-        possible[os.path.join(current_path, self.options.config)] = current_path
-        possible[os.path.join(exec_path, self.options.config)] = exec_path
+        if path_given:
+            # explicit path given, don't try anything too fancy
+            possible[self.options.config] = config_path
+        else:
+            log.debug('trying to figuring out paths')
+            # normal lookup locations
+            possible[os.path.join(startup_path, self.options.config)] = startup_path
+            possible[os.path.join(home_path, self.options.config)] = home_path
+            # for virtualenv / dev sandbox
+            from flexget import __version__ as version
+            if version == '{subversion}':
+                log.debug('adding virtualenv / sandbox paths')
+                possible[os.path.join(sys.path[0], '..', self.options.config)] = os.path.join(sys.path[0], '..')
+                possible[os.path.join(current_path, self.options.config)] = current_path
+                possible[os.path.join(exec_path, self.options.config)] = exec_path
 
         for config, base in possible.iteritems():
             if os.path.exists(config):
@@ -111,6 +123,8 @@ class Manager:
                 # config loaded successfully
                 self.config_name = os.path.splitext(os.path.basename(config))[0]
                 self.config_base = base
+                log.debug('config_name: %s' % self.config_name)
+                log.debug('config_base: %s' % self.config_base)
                 return
         log.info('Tried to read from: %s' % ', '.join(possible))
         raise IOError('Failed to find configuration file %s' % self.options.config)
@@ -199,6 +213,20 @@ class Manager:
             connection = 'sqlite:///:memory:'
         else:
             self.db_filename = os.path.join(self.config_base, 'db-%s.sqlite' % self.config_name)
+            # this is mainly to handle fixing one bug without causing havoc ..
+            if not os.path.exists(self.db_filename) and not self.options.initdb:
+                print ''
+                print 'Configuration file \'%s\' doesn\'t have a initialized database.' % self.config_name
+                print 'Add --initdb parameter once to verify that you mean to start a new database.'
+                print ''
+                print 'If you\'re old user and didn\'t expect this, see bleeding edge news'
+                print ''
+                sys.exit(1)
+            if os.path.exists(self.db_filename) and self.options.initdb:
+                print ''
+                print 'Database has already been initialized.'
+                print ''
+                sys.exit(1)
             if self.options.test:
                 db_test_filename = os.path.join(self.config_base, 'test-%s.sqlite' % self.config_name)
                 log.info('Test mode, creating a copy from database.')
