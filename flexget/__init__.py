@@ -28,7 +28,7 @@ class PrivacyFilter(logging.Filter):
             self.replaces.append(p)
 
         for param in ['passwd', 'password', 'pw', 'pass', 'passkey', \
-            'key', 'user', 'username', 'uname', 'login', 'id']:
+            'key', 'apikey', 'user', 'username', 'uname', 'login', 'id']:
             hide(param)
 
     def filter(self, record):

@@ -1,14 +1,11 @@
-import urllib2
 import logging
-from flexget.feed import Entry
 from flexget.manager import Base
 from flexget.plugin import *
 from datetime import datetime, timedelta
-from sqlalchemy import Column, Integer, String, DateTime, Boolean, PickleType
-from sqlalchemy.schema import ForeignKey
-from sqlalchemy.orm import relation,join
+from sqlalchemy import Column, Integer, String, DateTime, PickleType
 
 log = logging.getLogger('delay')
+
 
 class DelayedEntry(Base):
     
@@ -23,6 +20,7 @@ class DelayedEntry(Base):
     def __repr__(self):
         return '<DelayedEntry(title=%s)>' % (self.title)
 
+
 class FilterDelay:
     """
         Add delay to a feed. This is usefull for de-priorizing expensive / bad-quality feeds.
@@ -33,15 +31,17 @@ class FilterDelay:
         
         delay: 2 hours
     """
+
     def validator(self):
-        # TODO: make a regexp validation
         from flexget import validator
-        return validator.factory('text')
+        root = validator.factory('regexp_match')
+        root.accept('\d+ (minutes|hours|days|weeks)')
+        return root
     
     def get_delay(self, feed):
         amount, unit = feed.config.get('delay').split(' ')
         log.debug('amount: %s unit: %s' % (repr(amount), repr(unit)))
-        params = {unit:int(amount)}
+        params = {unit: int(amount)}
         try:
             return timedelta(**params)
         except TypeError:

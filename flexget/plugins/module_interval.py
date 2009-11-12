@@ -4,6 +4,7 @@ from flexget.plugin import *
 
 log = logging.getLogger('interval')
 
+
 class PluginInterval:
 
     """
@@ -17,9 +18,10 @@ class PluginInterval:
     """
 
     def validator(self):
-        # TODO: make a regexp validation
         from flexget import validator
-        return validator.factory('text')
+        root = validator.factory('regexp_match')
+        root.accept('\d+ (minutes|hours|days|weeks)')
+        return root
 
     def on_feed_start(self, feed):
         if feed.manager.options.interval_ignore or feed.manager.options.learn:
@@ -29,7 +31,7 @@ class PluginInterval:
         log.debug('last_time: %s' % repr(last_time))
         amount, unit = feed.config.get('interval').split(' ')
         log.debug('amount: %s unit: %s' % (repr(amount), repr(unit)))
-        params = {unit:int(amount)}
+        params = {unit: int(amount)}
         try:
             next_time = last_time + datetime.timedelta(**params)
         except TypeError:
