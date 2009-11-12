@@ -1,4 +1,3 @@
-import parser
 import logging
 from datetime import datetime, timedelta
 from flexget.utils.titles import SeriesParser, ParseWarning
