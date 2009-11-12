@@ -97,7 +97,7 @@ class Manager:
                     log.critical(e)
                     print ''
                     print '-' * 79
-                    print ' This is caused by malformed configuration file, common reasons:'
+                    print ' Malformed configuration file, common reasons:'
                     print '-' * 79
                     print ''
                     print ' o Indentation error'
@@ -105,16 +105,18 @@ class Manager:
                     print ' o Non ASCII characters (use UTF8)'
                     print " o If text contains any of :[]{}% characters it must be single-quoted ('')\n"
                     lines = 0
-                    if not e.context_mark is None:
+                    if e.problem is not None:
+                        print ' Reason: %s\n' % e.problem
+                    if e.context_mark is not None:
                         print ' Check configuration near line %s, column %s' % (e.context_mark.line, e.context_mark.column)
                         lines += 1
-                    if e.context_mark is not None:
+                    if e.problem_mark is not None:
                         print ' Check configuration near line %s, column %s' % (e.problem_mark.line, e.problem_mark.column)
                         lines += 1
                     if lines:
                         print ''
                     if lines == 1:
-                        print ' Fault is almost always in this line or previous'
+                        print ' Fault is almost always in this line or previous\n'
                     if lines == 2:
                         print ' Fault is almost always in one of these lines or previous ones\n'
                     if self.options.debug:
