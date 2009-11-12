@@ -609,6 +609,12 @@ class FilterSeries(SeriesPlugin):
 
             log.debug('start with episodes: %s' % [e.data for e in eps])
 
+            # reject episodes that have been marked as watched in configig file
+            if 'watched' in config:
+                log.debug('-' * 20 + ' watched -->')
+                if self.process_watched(feed, config, eps):
+                    continue
+
             #
             # proper handling
             #
@@ -650,12 +656,6 @@ class FilterSeries(SeriesPlugin):
             best = eps[0]
             log.debug('continuing w. episodes: %s' % [e.data for e in eps])
             log.debug('best episode is: %s' % best.data)
-
-            # reject episodes that have been marked as watched in configig file
-            if 'watched' in config:
-                log.debug('-' * 20 + ' watched -->')
-                if self.process_watched(feed, config, eps):
-                    continue
 
             # Episode advancement. Used only with season based series
             if best.season and best.episode:
