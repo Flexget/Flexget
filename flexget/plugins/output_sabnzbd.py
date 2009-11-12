@@ -3,6 +3,7 @@ from flexget.plugin import *
 
 log = logging.getLogger('sabnzbd')
 
+
 class OutputSabnzbd:
     """
         Example:
@@ -23,11 +24,12 @@ class OutputSabnzbd:
           script: ...
           pp: ...
     """
+
     def validator(self):
         from flexget import validator
         config = validator.factory('dict')
         config.accept('text', key='key', required=True)
-        config.accept('url', key='url')
+        config.accept('url', key='url', required=True)
         config.accept('text', key='category')
         config.accept('text', key='script')
         config.accept('text', key='pp')
@@ -57,7 +59,7 @@ class OutputSabnzbd:
         register the usable set: keywords
         """
         set = get_plugin_by_name('set')
-        set.instance.register_keys({'category':'text'})
+        set.instance.register_keys({'category': 'text'})
 
     def on_feed_output(self, feed):
         import urllib
@@ -65,7 +67,7 @@ class OutputSabnzbd:
         
         # convert config into url parameters
         config = feed.config['sabnzbd']
-        baseurl = config.get('url', 'http://localhost:8080/sabnzbd/api?')
+        baseurl = config.get['url']
         
         for entry in feed.accepted:
             params = self.get_params(config)
@@ -73,18 +75,22 @@ class OutputSabnzbd:
             if 'category' in entry:
                 params['cat'] = entry['category']
             params['name'] = entry['url']
+            # add cleaner nzb name (undocumented api feature)
+            params['nzbname'] = entry['title']
+
             request_url = baseurl + urllib.urlencode(params)
             log.debug('request_url: %s' % request_url)
-
             try:            
                 response = urllib2.urlopen(request_url).read()
-            except:
-                log.critical('Failed to use sabnzbd at %s' % request_url)
+            except Exception, e:
+                log.critical('Failed to use sabnzbd. Requested %s' % request_url)
+                log.critical('Result was: %s' % e)
                 feed.fail(entry, 'sabnzbd unreachable')
+                if feed.manager.options.debug:
+                    log.exception(e)
                 continue
             
             if response.lower().find('error') != -1:
                 feed.fail(entry, response.replace('\n', ''))
             
-
 register_plugin(OutputSabnzbd, 'sabnzbd')
