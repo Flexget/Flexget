@@ -170,7 +170,6 @@ FlexGet has just downloaded %d new entries for feed %s :
             except socket.error, (value, message):
                 raise PluginWarning('Socket error: ' + message)
 
-
             if config['smtp_login']:
                 mailServer.login(config['smtp_username'], config['smtp_password'])
 
