@@ -67,7 +67,7 @@ class OutputSabnzbd:
         
         # convert config into url parameters
         config = feed.config['sabnzbd']
-        baseurl = config.get['url']
+        baseurl = config['url']
         
         for entry in feed.accepted:
             params = self.get_params(config)
