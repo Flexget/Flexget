@@ -57,8 +57,11 @@ class PluginError(Exception):
 
 
 class internet(object):
-    """@internet decorator for plugin event methods.
-    Catches all internet related exceptions and aborts the feed."""
+    """
+        @internet decorator for plugin event methods.
+        Catches all internet related exceptions and raises PluginError with relevant message.
+        Feed handles PluginErrors by aborting the feed.
+    """
 
     def __init__(self, logger=None):
         if logger:
@@ -72,7 +75,7 @@ class internet(object):
             from httplib import BadStatusLine
             import urllib2
             try:
-                func(*args, **kwargs)
+                return func(*args, **kwargs)
             except urllib2.HTTPError, e:
                 raise PluginError('HTTPError %s' % e.code, self.log)
             except urllib2.URLError, e:

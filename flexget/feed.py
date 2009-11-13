@@ -25,6 +25,13 @@ class Entry(dict):
         if key == 'url':
             if not 'original_url' in self:
                 self['original_url'] = value
+            if not isinstance(value, basestring):
+                raise PluginError('Tried to set %s url to %s' % \
+                    (repr(self.get('title')), repr(value)))
+        if key == 'title':
+            if not isinstance(value, basestring):
+                raise PluginError('Tried to set title to %s' % \
+                    (repr(value)))
         dict.__setitem__(self, key, value)
 
     def safe_str(self):
