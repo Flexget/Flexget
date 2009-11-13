@@ -189,7 +189,7 @@ class Feed:
 
     # TODO: all these verbose methods are confusing
     def verbose_progress(self, s, logger=log):
-        """Verbose progress, outputs only in non quiet mode."""
+        """Verbose progress, outputs only without --cron or -q"""
         # TODO: implement trough own logger?
         if not self.manager.options.quiet and not self.manager.unit_test:
             logger.info(s)
