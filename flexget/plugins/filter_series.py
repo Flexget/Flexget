@@ -353,7 +353,10 @@ class FilterSeries(SeriesPlugin):
             series.accept('text')
             bundle = series.accept('dict')
             # prevent invalid indentation level
-            bundle.reject_keys(['set', 'path', 'timeframe', 'name_regexp', 'ep_regexp', 'id_regexp', 'watched'])
+            bundle.reject_keys(['set', 'path', 'timeframe', 'name_regexp', \
+                'ep_regexp', 'id_regexp', 'watched', 'quality', 'min_quality', \
+                'max_quality', 'qualities', 'exact'], \
+                'Option \'$key\' has invalid indentation level. It needs 2 more spaces.')
             advanced = bundle.accept_any_key('dict')
             build_options(advanced)
 

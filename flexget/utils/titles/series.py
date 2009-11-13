@@ -213,6 +213,10 @@ class SeriesParser(TitleParser):
         else:
             return self.id
 
+    @property            
+    def proper(self):
+        return self.proper_or_repack 
+
     def __str__(self):
         valid = 'INVALID'
         if self.valid:

@@ -5,6 +5,7 @@ from flexget.utils.titles import SeriesParser, ParseWarning
 
 log = logging.getLogger('exists_series')
 
+
 class FilterExistsSeries:
     """
         Intelligent series aware exists rejecting.
@@ -13,6 +14,7 @@ class FilterExistsSeries:
 
         exists_series: /storage/series/
     """
+
     def validator(self):
         from flexget import validator
         root = validator.factory()
@@ -43,32 +45,41 @@ class FilterExistsSeries:
                     if 'series_parser' in entry:
                         for name in files + dirs:
                             # make new parser from parser in entry
-                            parser = SeriesParser()
-                            oldparser = entry['series_parser']
-                            parser.name = oldparser.name
-                            parser.ep_regexps = oldparser.ep_regexps
-                            parser.id_regexps = oldparser.id_regexps
+                            disk_parser = SeriesParser()
+                            series_parser = entry['series_parser']
+                            disk_parser.name = series_parser.name
+                            disk_parser.strict_name = series_parser.strict_name
+                            disk_parser.ep_regexps = series_parser.ep_regexps
+                            disk_parser.id_regexps = series_parser.id_regexps
                             # run parser on filename data
-                            parser.data = name
+                            disk_parser.data = name
                             try:
-                                parser.parse()
+                                disk_parser.parse()
                             except ParseWarning, pw:
                                 from flexget.utils.log import log_once
                                 log_once(pw.value, logger=log)
-                            if parser.valid:
+                            if disk_parser.valid:
                                 log.debug('name %s is same series as %s' % (name, entry['title']))
-                                log.debug('parser.identifier = %s' % parser.identifier)
-                                log.debug('oldparser.identifier = %s' % oldparser.identifier)
-                                log.debug('parser.quality = %s' % parser.quality)
-                                log.debug('oldparser.quality = %s' % oldparser.quality)
+                                log.debug('disk_parser.identifier = %s' % disk_parser.identifier)
+                                log.debug('series_parser.identifier = %s' % series_parser.identifier)
+                                log.debug('disk_parser.quality = %s' % disk_parser.quality)
+                                log.debug('series_parser.quality = %s' % series_parser.quality)
                                 
-                                if parser.identifier == oldparser.identifier and \
-                                   parser.quality == oldparser.quality:
-                                    log.debug('Found episode %s %s in %s' % (parser.name, parser.identifier, root))
-                                    feed.reject(entry, 'episode already exists')
-                                else:
-                                    log.debug('... but doesn\'t match')
+                                if disk_parser.identifier != series_parser.identifier:
+                                    log.log(5, 'wrong identifier')
+                                    continue
+                                if disk_parser.quality != series_parser.quality:
+                                    log.log(5, 'wrong quality')
+                                    continue
+                                if disk_parser.proper and not series_parser.proper:
+                                    feed.reject(entry, 'proper already already exists')
+                                    continue
+                                if series_parser.proper and not disk_parser.proper:
+                                    log.log(5, 'new one is proper, disk is not')
+                                    continue
+                                
+                                feed.reject(entry, 'episode already exists')    
                     else:
-                        log.debug('%s doesn\'t seem to be a series' % entry['title'])
+                        log.log(5, '%s doesn\'t seem to be known series' % entry['title'])
 
 register_plugin(FilterExistsSeries, 'exists_series', groups=['exists'], priorities={'filter': -1})

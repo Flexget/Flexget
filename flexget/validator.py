@@ -2,6 +2,7 @@ import re
 
 # TODO: rename all validator.valid -> validator.accepts / accepted / accept ?
 
+
 class Errors:
 
     """Create and hold validator error messages."""
@@ -39,10 +40,12 @@ class Errors:
             raise Exception('no path level')
         self.path[self.path_level] = value
 
+
 def factory(name='root'):
-    """Factory method, return validator instance."""
+    """Factory method, returns validator instance."""
     v = Validator()
     return v.get_validator(name)
+
 
 class Validator(object):
 
@@ -101,6 +104,7 @@ class Validator(object):
     def __str__(self):
         return '<%s>' % self.name
         
+
 class RootValidator(Validator):
     name = 'root'
 
@@ -124,6 +128,7 @@ class RootValidator(Validator):
             self.errors.add('failed to pass as %s' % ', '.join(acceptable))
         return False
 
+
 class ChoiceValidator(Validator):
     name = 'choice'
 
@@ -146,6 +151,7 @@ class ChoiceValidator(Validator):
             self.errors.add('must be one of values %s' % (', '.join(l)))
         return True
 
+
 class AnyValidator(Validator):
     name = 'any'
 
@@ -158,6 +164,7 @@ class AnyValidator(Validator):
     def validate(self, data):
         return True
 
+
 class EqualsValidator(Validator):
     name = 'equals'
 
@@ -169,6 +176,7 @@ class EqualsValidator(Validator):
     
     def validate(self, data):
         return self.valid == data
+
 
 class NumberValidator(Validator):
     name = 'number'
@@ -185,6 +193,7 @@ class NumberValidator(Validator):
             self.errors.add('value %s is not valid number' % data)
         return valid
 
+
 class BooleanValidator(Validator):
     name = 'boolean'
 
@@ -199,6 +208,7 @@ class BooleanValidator(Validator):
         if not valid:
             self.errors.add('value %s is not valid boolean' % data)
         return valid
+
 
 class DecimalValidator(Validator):
     name = 'decimal'
@@ -215,6 +225,7 @@ class DecimalValidator(Validator):
             self.errors.add('value %s is not valid decimal number' % data)
         return valid
 
+
 class TextValidator(Validator):
     name = 'text'
     
@@ -229,6 +240,7 @@ class TextValidator(Validator):
         if not valid:
             self.errors.add('value %s is not valid text' % data)
         return valid
+
 
 class RegexpValidator(Validator):
     name = 'regexp'
@@ -250,6 +262,7 @@ class RegexpValidator(Validator):
             return False
         return True
         
+
 class RegexpMatchValidator(Validator):
     name = 'regexp_match'
 
@@ -287,6 +300,7 @@ class FileValidator(TextValidator):
             return False
         return True
 
+
 class PathValidator(TextValidator):
     name = 'path'
     
@@ -296,6 +310,7 @@ class PathValidator(TextValidator):
             self.errors.add('Path %s does not exist' % data)
             return False
         return True
+
 
 class UrlValidator(TextValidator):
     name = 'url'
@@ -307,9 +322,10 @@ class UrlValidator(TextValidator):
             return False
         valid = re.match(regexp, data) != None
         if not valid:
-            self.errors.add('value %s is not valid url' % data)
+            self.errors.add('value %s is not a valid url' % data)
         return valid
         
+
 class ListValidator(Validator):
     name = 'list'
 
@@ -323,7 +339,7 @@ class ListValidator(Validator):
 
     def validate(self, data):
         if not isinstance(data, list):
-            self.errors.add('value should be a list')
+            self.errors.add('value must be a list')
             return False
         self.errors.path_add_level()
         count = self.errors.count()
@@ -337,11 +353,12 @@ class ListValidator(Validator):
         self.errors.path_remove_level()
         return count == self.errors.count()
 
+
 class DictValidator(Validator):
     name = 'dict'
 
     def __init__(self, parent=None):
-        self.reject = []
+        self.reject = {}
         self.any_key = []
         self.required_keys = []
         Validator.__init__(self, parent)
@@ -363,13 +380,14 @@ class DictValidator(Validator):
             self.require_key(key)
         return v
 
-    def reject_key(self, key):
-        """Rejects key"""
-        self.reject.append(key)
+    def reject_key(self, key, message=None):
+        """Rejects a key"""
+        self.reject[key] = message
 
-    def reject_keys(self, keys):
+    def reject_keys(self, keys, message=None):
         """Reject list of keys"""
-        self.reject.extend(keys)
+        for key in keys:
+            self.reject[key] = message
 
     def require_key(self, key):
         """Flag key as mandatory"""
@@ -377,7 +395,7 @@ class DictValidator(Validator):
             self.required_keys.append(key)
 
     def accept_any_key(self, name, **kwargs):
-        """Accepts any key with this given type."""
+        """Accepts any key with given type"""
         v = self.get_validator(name)
         #v.accept(name, **kwargs)
         self.any_key.append(v)
@@ -388,7 +406,7 @@ class DictValidator(Validator):
     
     def validate(self, data):
         if not isinstance(data, dict):
-            self.errors.add('value should be a dictionary / map')
+            self.errors.add('value must be a dictionary')
             return False
         
         count = self.errors.count()
@@ -398,8 +416,15 @@ class DictValidator(Validator):
             if not key in self.valid and not self.any_key:
                 self.errors.add('key \'%s\' is not recognized' % key)
                 continue
+            # reject keys
             if key in self.reject:
-                self.errors.add('key \'%s\' is forbidden here' % key)
+                msg = self.reject[key]
+                if msg:
+                    from string import Template
+                    template = Template(msg)
+                    self.errors.add(template.safe_substitute(key=key))
+                else:
+                    self.errors.add('key \'%s\' is forbidden here' % key)
                 continue
             # rules contain rules specified for this key AND
             # rules specified for any key
@@ -416,5 +441,6 @@ class DictValidator(Validator):
         self.errors.path_remove_level()
         return count == self.errors.count()
 
-if __name__=='__main__':
+
+if __name__ == '__main__':
     root = factory()

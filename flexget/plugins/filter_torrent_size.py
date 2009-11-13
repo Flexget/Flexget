@@ -4,6 +4,7 @@ from sys import maxint
 
 log = logging.getLogger('torrent_size')
 
+
 class FilterTorrentSize:
     """
         Example:
@@ -17,6 +18,7 @@ class FilterTorrentSize:
         Optional strict flag will cause all non-torrents to be rejected.
         
     """
+
     def validator(self):
         from flexget import validator
         config = validator.factory('dict')
