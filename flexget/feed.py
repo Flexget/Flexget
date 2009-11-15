@@ -213,7 +213,7 @@ class Feed:
             except:
                 print "+ %-8s %-12s %s%s (warning: unable to print unicode)" % (self.current_event, self.current_plugin, repr(msg), reason_str)
         else:
-            log.debug('event: %s plugin: %s msg: %s%s' % (self.current_event, self.current_plugin, msg, reason_str.strip()))
+            log.debug('event: %s plugin: %s msg: %s%s' % (self.current_event, self.current_plugin, msg, reason_str))
 
     def verbose_details_entries(self):
         """If details option is enabled, print all produced entries"""

@@ -9,6 +9,28 @@ def str_to_boolean(string):
     else:
         return False
 
+
+def convert_bytes(bytes):
+    """Returns given bytes as prettified string."""
+
+    bytes = float(bytes)
+    if bytes >= 1099511627776:
+        terabytes = bytes / 1099511627776
+        size = '%.2fT' % terabytes
+    elif bytes >= 1073741824:
+        gigabytes = bytes / 1073741824
+        size = '%.2fG' % gigabytes
+    elif bytes >= 1048576:
+        megabytes = bytes / 1048576
+        size = '%.2fM' % megabytes
+    elif bytes >= 1024:
+        kilobytes = bytes / 1024
+        size = '%.2fK' % kilobytes
+    else:
+        size = '%.2fb' % bytes
+    return size
+
+
 class HtmlParser(sgmllib.SGMLParser):
     from htmlentitydefs import entitydefs
 
@@ -19,7 +41,7 @@ class HtmlParser(sgmllib.SGMLParser):
             self.feed(s)
 
     def handle_entityref(self, name):
-        if self.entitydefs.has_key(name):
+        if name in self.entitydefs:
             x = ';'
         else:
             x = ''
@@ -29,12 +51,15 @@ class HtmlParser(sgmllib.SGMLParser):
         if data:
             self.result += data
 
+
 class MergeException(Exception):
+
     def __init__(self, value):
         self.value = value
 
     def __str__(self):
         return repr(self.value)
+
 
 def decode_html(value):
     """Decode HTML entities from string and return it"""
@@ -56,6 +81,7 @@ def encode_html(unicode_data, encoding='ascii'):
         # handler, so we'll emulate it.
         return _xmlcharref_encode(unicode_data, encoding)
 
+
 def _xmlcharref_encode(unicode_data, encoding):
     """Emulate Python 2.3's 'xmlcharrefreplace' encoding error handler."""
     chars = []
@@ -74,6 +100,8 @@ _valid = [types.DictType, types.IntType, types.NoneType,
           types.StringType, types.UnicodeType, types.BooleanType,
           types.ListType, types.LongType, types.FloatType]
 
+
+# TODO: I think this was left as broken ...
 def sanitize(value, logger=None):
     if isinstance(value, dict):
         sanitize_dict(value, logger)
@@ -82,6 +110,8 @@ def sanitize(value, logger=None):
     else:
         raise Exception('Unsupported datatype')
 
+
+# TODO: I think this was left as broken ...
 def sanitize_dict(d, logger=None):
     """Makes dictionary d contain only yaml.safe_dump compatible elements. On other words, remove all non
     standard types from dictionary."""
@@ -95,12 +125,15 @@ def sanitize_dict(d, logger=None):
                 logger.debug('Removed non yaml compatible key %s %s' % (k, type(d[k])))
             d.pop(k)
 
+
+# TODO: I think this was left as broken ...
 def sanitize_list(content, logger=None):
     for value in content[:]:
         if not type(value) in _valid:
             if logger:
                 logger.debug('Removed non yaml compatible list item %s' % type(value))
         content.remove(value)
+
 
 def merge_dict_from_to(d1, d2):
     """Merges dictionary d1 into dictionary d2. d1 will remain in original form."""
@@ -120,5 +153,3 @@ def merge_dict_from_to(d1, d2):
                 raise MergeException('Merging key %s failed, conflicting datatypes.' % (k))
         else:
             d2[k] = v
-
-

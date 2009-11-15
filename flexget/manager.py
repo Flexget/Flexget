@@ -225,10 +225,7 @@ class Manager:
                 print ''
                 sys.exit(1)
             if os.path.exists(self.db_filename) and self.options.initdb:
-                print ''
-                print 'Database has already been initialized.'
-                print ''
-                sys.exit(1)
+                log.warning('Database has already been initialized.')
             if self.options.test:
                 db_test_filename = os.path.join(self.config_base, 'test-%s.sqlite' % self.config_name)
                 log.info('Test mode, creating a copy from database.')
