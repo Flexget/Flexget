@@ -4,6 +4,7 @@ from flexget.plugin import *
 
 log = logging.getLogger('priority')
 
+
 class PluginPriority:
 
     """
@@ -22,6 +23,9 @@ class PluginPriority:
         config.accept_any_key('number')
         return config
 
+    def __init__(self):
+        self.priorities = {}
+
     def on_feed_start(self, feed):
         self.priorities = {}
         for name, priority in feed.config.get('priority', {}).iteritems():
@@ -31,7 +35,7 @@ class PluginPriority:
                 continue
             
             # if multiple events with different priorities, abort .. not implemented, would make configuration really messy?
-            if len(plugin.plugins[name].priorities)>1:
+            if len(plugin.plugins[name].priorities) > 1:
                 log.error('Cannot modify plugin %s priority because of multiple events with default priorities' % name)
                 continue
             

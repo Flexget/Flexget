@@ -57,6 +57,10 @@ class OutputDeluge:
         config.setdefault('queuetotop', False)
         return config
 
+    def __init__(self):
+        self.droplets = []
+        self.deluge12 = False
+
     def on_process_start(self, feed):
         """
             register the usable set: keywords
