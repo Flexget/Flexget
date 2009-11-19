@@ -240,6 +240,7 @@ class Feed:
                 # store execute info
                 self.current_event = event
                 self.current_plugin = keyword
+                log.log(5, 'running %s' % keyword)
                 # call the plugin
                 try:
                     method(self)

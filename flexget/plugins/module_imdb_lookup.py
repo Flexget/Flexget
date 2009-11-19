@@ -3,34 +3,28 @@ from optparse import SUPPRESS_HELP
 from flexget.plugin import *
 from flexget.manager import Base
 from flexget.utils.log import log_once
-from flexget.utils.imdb import ImdbSearch, ImdbParser
-
-from sqlalchemy import Table, Column, Integer, Float, String, Unicode, Boolean
+from flexget.utils.imdb import ImdbSearch, ImdbParser, extract_id
+from sqlalchemy import Table, Column, Integer, Float, String, Boolean
 from sqlalchemy.schema import ForeignKey
 from sqlalchemy.orm import relation
-
-log = logging.getLogger('imdb')
 
 # association tables
 genres_table = Table('imdb_movie_genres', Base.metadata,
     Column('movie_id', Integer, ForeignKey('imdb_movies.id')),
-    Column('genre_id', Integer, ForeignKey('imdb_genres.id'))
-)
+    Column('genre_id', Integer, ForeignKey('imdb_genres.id')))
 
 languages_table = Table('imdb_movie_languages', Base.metadata,
     Column('movie_id', Integer, ForeignKey('imdb_movies.id')),
-    Column('language_id', Integer, ForeignKey('imdb_languages.id'))
-)
+    Column('language_id', Integer, ForeignKey('imdb_languages.id')))
 
 actors_table = Table('imdb_movie_actors', Base.metadata,
     Column('movie_id', Integer, ForeignKey('imdb_movies.id')),
-    Column('actor_id', Integer, ForeignKey('imdb_actors.id'))
-)
+    Column('actor_id', Integer, ForeignKey('imdb_actors.id')))
 
 directors_table = Table('imdb_movie_directors', Base.metadata,
     Column('movie_id', Integer, ForeignKey('imdb_movies.id')),
-    Column('director_id', Integer, ForeignKey('imdb_directors.id'))
-)
+    Column('director_id', Integer, ForeignKey('imdb_directors.id')))
+
 
 class Movie(Base):
     
@@ -54,6 +48,7 @@ class Movie(Base):
     def __repr__(self):
         return '<Movie(name=%s,votes=%s,year=%s)>' % (self.title, self.votes, self.year)
 
+
 class Language(Base):
     
     __tablename__ = 'imdb_languages'
@@ -63,6 +58,7 @@ class Language(Base):
     
     def __init__(self, name):
         self.name = name
+
 
 class Genre(Base):
     
@@ -74,7 +70,9 @@ class Genre(Base):
     def __init__(self, name):
         self.name = name
 
+
 class Actor(Base):
+
     __tablename__ = 'imdb_actors'
 
     id = Column(Integer, primary_key=True)
@@ -85,7 +83,9 @@ class Actor(Base):
         self.imdb_id = imdb_id
         self.name = name
 
+
 class Director(Base):
+
     __tablename__ = 'imdb_directors'
 
     id = Column(Integer, primary_key=True)
@@ -95,6 +95,7 @@ class Director(Base):
     def __init__(self, imdb_id, name=None):
         self.imdb_id = imdb_id
         self.name = name
+
 
 class SearchResult(Base):
 
@@ -111,6 +112,7 @@ class SearchResult(Base):
 
 log = logging.getLogger('imdb_lookup')
 
+
 class ModuleImdbLookup:
     """
         Retrieves imdb information for entries.
@@ -121,25 +123,19 @@ class ModuleImdbLookup:
         
         Also provides imdb lookup functionality to all other imdb related plugins.
     """
+
     def validator(self):
         from flexget import validator
         return validator.factory('boolean')
 
-
-    def clean_url(self, url):
-        """Cleans imdb url, returns valid clean url or False"""
-        import re
-        match = re.search('(?:http://)?(?:www\.)?imdb.com/title/tt\d+', url)
-        if match:
-            return match.group()
-        return False
-
     def on_feed_filter(self, feed):
+        from flexget.utils.log import log_once
         for entry in feed.entries:
             try:
                 self.lookup(feed, entry)
             except PluginError, e:
-                from flexget.utils.log import log_once
+                log_once(e.value.capitalize(), logger=log)
+            except PluginWarning, e:
                 log_once(e.value.capitalize(), logger=log)
 
     @internet(log)
@@ -157,16 +153,16 @@ class ModuleImdbLookup:
     
         # make sure imdb url is valid
         if 'imdb_url' in entry:
-            clean = self.clean_url(entry['imdb_url'])
-            if not clean:
-                log.debug('imdb url %s is unclean, removing it' % entry['imdb_url'])
-                del(entry['imdb_url'])
+            imdb_id = extract_id(entry['imdb_url'])
+            if imdb_id:
+                entry['imdb_url'] = 'http://www.imdb.com/title/%s' % imdb_id
             else:
-                entry['imdb_url'] = clean
+                log.debug('imdb url %s is invalid, removing it' % entry['imdb_url'])
+                del(entry['imdb_url'])
 
         # no imdb_url, check if there is cached result for it or if the search is known to fail
         if not 'imdb_url' in entry:
-            result = feed.session.query(SearchResult).filter(SearchResult.title==entry['title']).first()
+            result = feed.session.query(SearchResult).filter(SearchResult.title == entry['title']).first()
             if result:
                 if result.fails and not feed.manager.options.retry_lookup:
                     # this movie cannot be found, not worth trying again ...
@@ -201,7 +197,7 @@ class ModuleImdbLookup:
         imdb = ImdbParser()
         
         # check if this imdb page has been parsed & cached
-        cached = feed.session.query(Movie).filter(Movie.url==entry['imdb_url']).first()
+        cached = feed.session.query(Movie).filter(Movie.url == entry['imdb_url']).first()
         if not cached:
             # search and store to cache
             feed.verbose_progress('Parsing imdb for %s' % entry['title'])
@@ -218,22 +214,22 @@ class ModuleImdbLookup:
                 movie.plot_outline = imdb.plot_outline
                 movie.url = entry['imdb_url']
                 for name in imdb.genres:
-                    genre = feed.session.query(Genre).filter(Genre.name==name).first()
+                    genre = feed.session.query(Genre).filter(Genre.name == name).first()
                     if not genre:
                         genre = Genre(name)
                     movie.genres.append(genre) # pylint: disable-msg=E1101
                 for name in imdb.languages:
-                    language = feed.session.query(Language).filter(Language.name==name).first()
+                    language = feed.session.query(Language).filter(Language.name == name).first()
                     if not language:
                         language = Language(name)
                     movie.languages.append(language) # pylint: disable-msg=E1101
                 for imdb_id, name in imdb.actors.iteritems():
-                    actor = feed.session.query(Actor).filter(Actor.imdb_id==imdb_id).first()
+                    actor = feed.session.query(Actor).filter(Actor.imdb_id == imdb_id).first()
                     if not actor:
                         actor = Actor(imdb_id, name)
                     movie.actors.append(actor) # pylint: disable-msg=E1101
                 for imdb_id, name in imdb.directors.iteritems():
-                    director = feed.session.query(Director).filter(Director.imdb_id==imdb_id).first()
+                    director = feed.session.query(Director).filter(Director.imdb_id == imdb_id).first()
                     if not director:
                         director = Director(imdb_id, name)
                     movie.directors.append(director) # pylint: disable-msg=E1101
@@ -245,12 +241,11 @@ class ModuleImdbLookup:
                 movie = Movie()
                 movie.url = entry['imdb_url']
                 feed.session.add(movie)
-                raise PluginError('UnicodeDecodeError')
+                raise PluginWarning('UnicodeDecodeError')
             except ValueError, e:
                 if feed.manager.options.debug:
                     log.exception(e)
-                log.error('Invalid parameter: %s' % entry['imdb_url'])
-                raise PluginError('Parameters')
+                raise PluginError('Invalid parameter: %s' % entry['imdb_url'], log)
         else:
             # Set values from cache
             # TODO: I don't like this shoveling ...
@@ -294,5 +289,5 @@ class ModuleImdbLookup:
             import time
             time.sleep(3)
         
-register_plugin(ModuleImdbLookup, 'imdb_lookup', priorities={'filter': 128})
+register_plugin(ModuleImdbLookup, 'imdb_lookup', priorities={'filter': 100})
 register_parser_option('--retry-lookup', action='store_true', dest='retry_lookup', default=0, help=SUPPRESS_HELP)

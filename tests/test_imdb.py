@@ -1,7 +1,8 @@
 from tests import FlexGetBase
 from nose.plugins.attrib import attr
 
-class TestImdbOnline(FlexGetBase):
+
+class TestImdb(FlexGetBase):
 
     __yaml__ = """
         feeds:
@@ -120,6 +121,7 @@ class TestScanImdb(FlexGetBase):
         assert self.feed.find_entry(imdb_url='http://imdb.com/title/tt0472198'), \
             'Failed pick url from test 2'
 
+
 class TestImdbRequired(FlexGetBase):
 
     __yaml__ = """
@@ -138,4 +140,21 @@ class TestImdbRequired(FlexGetBase):
             'Taken should NOT have been rejected'
         assert self.feed.find_entry('rejected', title='ASDFASDFASDF'), \
             'ASDFASDFASDF should have been rejected'
-    
+
+
+class TestImdbLookup(FlexGetBase):
+
+    __yaml__ = """
+        feeds:
+          invalid url:
+            input_mock:
+              - {title: 'Taken', imdb_url: 'imdb.com/title/tt0936501/'}
+            imdb_lookup: yes
+    """
+
+    @attr(online=True)
+    def test_invalid_url(self):
+        self.execute_feed('invalid url')
+        # check that these were created
+        assert self.feed.entries[0]['imdb_score'], 'didn\'t get score'
+        assert self.feed.entries[0]['imdb_year'], 'didn\'t get year'
