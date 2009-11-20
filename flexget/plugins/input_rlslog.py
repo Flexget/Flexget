@@ -69,19 +69,26 @@ class RlsLog:
                 if not link.contents:
                     log.log(5, 'link content empty, skipping')
                     continue
+                    
                 link_name = link.contents[0]
+                link_name_ok = True
                 if link_name == None:
-                    continue
+                    log.log(5, 'link_name is none')
+                    link_name_ok = False
                 if not isinstance(link_name, NavigableString):
-                    continue
-                link_name = link_name.strip().lower()
+                    log.log(5, 'link_name is NavigableString')
+                    link_name_ok = False
+
                 link_href = link['href']
+
                 # parse imdb link
-                if link_name == 'imdb':
-                    release['imdb_url'] = link_href
-                    score_raw = link.next.next.string
-                    if not 'imdb_score' in release and not 'imdb_votes' in release and score_raw != None:
-                        release['imdb_score'], release['imdb_votes'] = self.parse_imdb(score_raw)
+                if link_name_ok:
+                    link_name = link_name.strip().lower()
+                    if link_name == 'imdb':
+                        release['imdb_url'] = link_href
+                        score_raw = link.next.next.string
+                        if not 'imdb_score' in release and not 'imdb_votes' in release and score_raw != None:
+                            release['imdb_score'], release['imdb_votes'] = self.parse_imdb(score_raw)
 
                 # test if entry with this url would be resolvable (downloadable)
                 temp = {}

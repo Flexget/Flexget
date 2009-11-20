@@ -7,6 +7,7 @@ log = logging.getLogger('modify_torrent')
 # Torrent decoding is a short fragment from effbot.org. Site copyright says:
 # Test scripts and other short code fragments can be considered as being in the public domain.
 
+
 class Torrent:
     """Represents a torrent"""
 
@@ -69,7 +70,8 @@ class Torrent:
         # funny iteration because of nesting, ie:
         # [ [ tracker1, tracker2 ], [backup1] ]
         for tl in self.content.get('announce-list', []):
-            for t in tl: trackers.append(t)
+            for t in tl:
+                trackers.append(t)
         return trackers
 
     def remove_multitracker(self, tracker):
@@ -99,7 +101,7 @@ class Torrent:
             i = m.end()
             if m.lastindex == 2:
                 yield "s"
-                yield text[i:i+int(s)]
+                yield text[i:i + int(s)]
                 i = i + int(s)
             else:
                 yield s
@@ -165,6 +167,7 @@ class Torrent:
         data = self.content
         return self.encode_func[type(data)](data)
             
+
 class TorrentFilename:
 
     """
@@ -185,7 +188,7 @@ class TorrentFilename:
             f.close()
             if not data == idstr:
                 # not a torrent file at all, skip
-                log.debug('%s doesn\'t seem to be a torrent' % entry['title'])
+                log.log(5, '%s doesn\'t seem to be a torrent' % entry['title'])
                 continue
             else:
                 log.debug('%s seems to be a torrent' % entry['title'])
@@ -217,7 +220,7 @@ class TorrentFilename:
         """Build a filename for this torrent"""
         title = entry['title']
         files = torrent.get_filelist()
-        if len(files) == 1 :
+        if len(files) == 1:
             # single file, if filename is longer than title use it
             fn = files[0]['name']
             if len(fn) > len(title):
