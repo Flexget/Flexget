@@ -60,7 +60,7 @@ class SeriesParser(TitleParser):
             if matches:
                 for match in matches:
                     # TODO: check if match contain valid episode number ?
-                    log.debug('match: %s' % match)
+                    log.log(5, 'match: %s' % match)
                     safe = True
                     for quality in self.qualities:
                         if quality.lower() in match.lower():
