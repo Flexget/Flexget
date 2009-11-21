@@ -3,6 +3,7 @@ from flexget.plugin import *
 
 log = logging.getLogger('search')
 
+
 class SearchPlugins:
 
     """
@@ -18,6 +19,7 @@ class SearchPlugins:
             for plugin in get_plugins_by_group('search'):
                 print ' %s' % plugin.name
             print '-' * 79
+
 
 class PluginSearch:
     """
@@ -35,6 +37,7 @@ class PluginSearch:
         Notes: 
         - Some resolvers will use search plugins automaticly if enry url points into a search page.
     """
+    
     def validator(self):
         # TODO: should only accept registered search plugins
         from flexget import validator
@@ -51,7 +54,7 @@ class PluginSearch:
         for plugin in get_plugins_by_group('search'):
             plugins[plugin.name] = plugin.instance
             
-        for entry in feed.entries:
+        for entry in feed.accepted:
             found = False
             # loop trough configured searches
             for name in feed.config.get('search', []):
@@ -72,7 +75,6 @@ class PluginSearch:
                 feed.reject(entry, 'search failed')
 
 register_plugin(PluginSearch, 'search')
-register_plugin(SearchPlugins, 'list_search_plugins', builtin=True)
+register_plugin(SearchPlugins, '--search-plugins', builtin=True)
 register_parser_option('--search-plugins', action='store_true', dest='search_plugins', default=False,
                        help='List supported search plugins.')
-

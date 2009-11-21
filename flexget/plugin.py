@@ -220,7 +220,7 @@ class PluginInfo(dict):
         self[attr] = value
 
     def __str__(self):
-        return "PluginInfo: %s" % self.name
+        return '<PluginInfo(name=%s)>' % self.name
 
     __repr__ = __str__
 
@@ -250,7 +250,7 @@ class PluginMethod(object):
         return getattr(self.plugin.instance, self.method_name)(*args, **kwargs)
 
     def __str__(self):
-        return "PluginMethod: %s.%s" % (self.plugin['name'], self.method_name)
+        return '<PluginMethod(name=%s,method=%s)>' % (self.plugin['name'], self.method_name)
 
     __repr__ = __str__
 
