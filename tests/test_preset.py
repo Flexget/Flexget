@@ -1,14 +1,14 @@
 from tests import FlexGetBase
-from nose.plugins.attrib import attr
+
 
 class TestPreset(FlexGetBase):
     __yaml__ = """
         global:
-          input_mock:
+          mock:
             - {title: 'global'}
 
         movies:
-          input_mock:
+          mock:
             - {title: 'movies'}
 
         feeds:

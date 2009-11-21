@@ -1,10 +1,11 @@
 from tests import FlexGetBase
 
+
 class TestRegexp(FlexGetBase):
 
     __yaml__ = """
         global:
-          input_mock:
+          mock:
             - {title: 'regexp1', 'imdb_score': 5}
             - {title: 'regexp2', 'bool_attr': true}
             - {title: 'regexp3', 'imdb_score': 5}

@@ -7,7 +7,7 @@ class TestImdb(FlexGetBase):
     __yaml__ = """
         feeds:
           test:
-            input_mock:
+            mock:
               # tests search
               - {title: 'Spirited Away'}
               # tests direct url
@@ -20,14 +20,14 @@ class TestImdb(FlexGetBase):
               min_votes: 20
 
           year:
-            input_mock:
+            mock:
               - {title: 'Princess Mononoke', imdb_url: 'http://www.imdb.com/title/tt0119698/'}
               - {title: 'Taken[2008]DvDrip[Eng]-FOO', imdb_url: 'http://www.imdb.com/title/tt0936501/'}
             imdb:
               min_year: 2003
 
           actor:
-            input_mock:
+            mock:
               - {title: 'The Matrix', imdb_url: 'http://www.imdb.com/title/tt0133093/'}
               - {title: 'The Terminator', imdb_url: 'http://www.imdb.com/title/tt0088247/'}
             imdb:
@@ -37,7 +37,7 @@ class TestImdb(FlexGetBase):
                 - nm0000216
 
           director:
-            input_mock:
+            mock:
               - {title: 'The Matrix', imdb_url: 'http://www.imdb.com/title/tt0133093/'}
               - {title: 'The Terminator', imdb_url: 'http://www.imdb.com/title/tt0088247/'}
             imdb:
@@ -108,7 +108,7 @@ class TestScanImdb(FlexGetBase):
     __yaml__ = """
         feeds:
           test:
-            input_mock:
+            mock:
               - {title: 'Scan Test 1', description: 'title: Foo Bar Asdf\n imdb-url: http://www.imdb.com/title/tt0330793/ more text'}
               - {title: 'Scan Test 2', description: '<a href="http://imdb.com/title/tt0472198/">IMDb</a>'}
               - {title: 'Scan Test 3', description: 'nothing here'}
@@ -127,7 +127,7 @@ class TestImdbRequired(FlexGetBase):
     __yaml__ = """
         feeds:
           test:
-            input_mock:
+            mock:
               - {title: 'Taken[2008]DvDrip[Eng]-FOO', imdb_url: 'http://www.imdb.com/title/tt0936501/'}
               - {title: 'ASDFASDFASDF'}
             imdb_required: yes
@@ -147,7 +147,7 @@ class TestImdbLookup(FlexGetBase):
     __yaml__ = """
         feeds:
           invalid url:
-            input_mock:
+            mock:
               - {title: 'Taken', imdb_url: 'imdb.com/title/tt0936501/'}
             imdb_lookup: yes
     """

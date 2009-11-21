@@ -6,7 +6,7 @@ class TestQuality(FlexGetBase):
     __yaml__ = """
         feeds:
           best_quality:
-            input_mock:
+            mock:
               - {title: 'QTest.S01E01.HDTV.XViD-FlexGet'}
               - {title: 'QTest.S01E01.PDTV.XViD-FlexGet'}
               - {title: 'QTest.S01E01.DSR.XViD-FlexGet'}
@@ -17,7 +17,7 @@ class TestQuality(FlexGetBase):
                   quality: 720p
 
           min_quality:
-            input_mock:
+            mock:
               - {title: 'MinQTest.S01E01.HDTV.XViD-FlexGet'}
               - {title: 'MinQTest.S01E01.PDTV.XViD-FlexGet'}
               - {title: 'MinQTest.S01E01.DSR.XViD-FlexGet'}
@@ -28,7 +28,7 @@ class TestQuality(FlexGetBase):
                   min_quality: hdtv
 
           max_quality:
-            input_mock:
+            mock:
               - {title: 'MaxQTest.S01E01.HDTV.XViD-FlexGet'}
               - {title: 'MaxQTest.S01E01.PDTV.XViD-FlexGet'}
               - {title: 'MaxQTest.S01E01.DSR.XViD-FlexGet'}
@@ -39,7 +39,7 @@ class TestQuality(FlexGetBase):
                   max_quality: hdtv
 
           min_max_quality:
-            input_mock:
+            mock:
               - {title: 'MinMaxQTest.S01E01.HDTV.XViD-FlexGet'}
               - {title: 'MinMaxQTest.S01E01.PDTV.XViD-FlexGet'}
               - {title: 'MinMaxQTest.S01E01.DSR.XViD-FlexGet'}
@@ -91,19 +91,19 @@ class TestDatabase(FlexGetBase):
 
         feeds:
           test_1:
-            input_mock:
+            mock:
               - {title: 'Some.Series.S01E20.720p.XViD-FlexGet'}
           test_2:
-            input_mock:
+            mock:
               - {title: 'Some.Series.S01E20.720p.XViD-DoppelGanger'}
 
           progress_1:
-            input_mock:
+            mock:
               - {title: 'Progress.S01E20.720p-FlexGet'}
               - {title: 'Progress.S01E20.HDTV-FlexGet'}
 
           progress_2:
-            input_mock:
+            mock:
               - {title: 'Progress.S01E20.720p.Another-FlexGet'}
               - {title: 'Progress.S01E20.HDTV-Another-FlexGet'}
     """
@@ -135,7 +135,7 @@ class TestFilterSeries(FlexGetBase):
     __yaml__ = """
         feeds:
           test:
-            input_mock:
+            mock:
               - {title: 'Another.Series.S01E20.720p.XViD-FlexGet'}
               - {title: 'Another.Series.S01E21.1080p.H264-FlexGet'}
               - {title: 'Date.Series.10-11-2008.XViD'}
@@ -188,7 +188,7 @@ class TestEpisodeAdvancement(FlexGetBase):
         feeds:
 
           test_simple:
-            input_mock:
+            mock:
               - {title: 'foobar s01e12'}
               - {title: 'foobar s01e10'}
               - {title: 'foobar s01e01'}
@@ -196,7 +196,7 @@ class TestEpisodeAdvancement(FlexGetBase):
               - foobar
 
           test_unordered:
-            input_mock:
+            mock:
               - {title: 'zzz s01e05'}
               - {title: 'zzz s01e06'}
               - {title: 'zzz s01e07'}
@@ -235,7 +235,7 @@ class TestFilterSeriesPriority(FlexGetBase):
     __yaml__ = """
         feeds:
           test:
-            input_mock:
+            mock:
               - {title: 'foobar 720p s01e01'}
               - {title: 'foobar hdtv s01e01'}
             regexp:
@@ -271,47 +271,47 @@ class TestPropers(FlexGetBase):
 
         feeds:
           propers_1:
-            input_mock:
+            mock:
               - {title: 'Test.S01E01.720p-FlexGet'}
 
           # introduce proper, should be accepted
           propers_2:
-            input_mock:
+            mock:
               - {title: 'Test.S01E01.720p.Proper-FlexGet'}
 
           # introduce non-proper, should not be downloaded
           propers_3:
-            input_mock:
+            mock:
               - {title: 'Test.S01E01.FlexGet'}
 
           # introduce proper at the same time, should nuke non-proper and get proper
           proper_at_first:
-            input_mock:
+            mock:
               - {title: 'Foobar.S01E01.720p.FlexGet'}
               - {title: 'Foobar.S01E01.720p.proper.FlexGet'}
 
           # test a lot of propers at once
           lot_propers:
-            input_mock:
+            mock:
               - {title: 'V.2009.S01E01.PROPER.HDTV.A'}
               - {title: 'V.2009.S01E01.PROPER.HDTV.B'}
               - {title: 'V.2009.S01E01.PROPER.HDTV.C'}
 
           diff_quality_1:
-            input_mock:
+            mock:
               - {title: 'Test.S01E02.720p-FlexGet'}
 
           # low quality proper, should not be accepted
           diff_quality_2:
-            input_mock:
+            mock:
               - {title: 'Test.S01E02.HDTV.Proper-FlexGet'}
 
           # min + max quality with propers
           min_max_quality_1:
-            input_mock:
+            mock:
               - {title: 'asfd.S01E01.720p-FlexGet'}
           min_max_quality_2:
-            input_mock:
+            mock:
               - {title: 'asfd.S01E01.720p.Proper-FlexGet'}
         """
 
@@ -376,7 +376,7 @@ class TestSimilarNames(FlexGetBase):
     __yaml__ = """
         feeds:
           test:
-            input_mock:
+            mock:
               - {title: 'FooBar.S03E01.DSR-FlexGet'}
               - {title: 'FooBar: FirstAlt.S02E01.DSR-FlexGet'}
               - {title: 'FooBar: SecondAlt.S01E01.DSR-FlexGet'}
@@ -407,21 +407,21 @@ class TestDuplicates(FlexGetBase):
 
         feeds:
           test_dupes:
-            input_mock:
+            mock:
               - {title: 'Foo.2009.S02E04.HDTV.XviD-2HD[FlexGet]'}
               - {title: 'Foo.2009.S02E04.HDTV.XviD-2HD[ASDF]'}
             series:
               - Foo 2009
 
           test_1:
-            input_mock:
+            mock:
               - {title: 'Foo.Bar.S02E04.HDTV.XviD-2HD[FlexGet]'}
               - {title: 'Foo.Bar.S02E04.HDTV.XviD-2HD[ASDF]'}
             series:
               - foo bar
 
           test_2:
-            input_mock:
+            mock:
               - {title: 'Foo.Bar.S02E04.XviD-2HD[ASDF]'}
               - {title: 'Foo.Bar.S02E04.HDTV.720p.XviD-2HD[FlexGet]'}
               - {title: 'Foo.Bar.S02E04.DSRIP.XviD-2HD[ASDF]'}
@@ -433,7 +433,7 @@ class TestDuplicates(FlexGetBase):
               - foo bar
 
           test_true_dupes:
-            input_mock:
+            mock:
               - {title: 'Dupe.S02E04.HDTV.XviD-FlexGet'}
               - {title: 'Dupe.S02E04.HDTV.XviD-FlexGet'}
               - {title: 'Dupe.S02E04.HDTV.XviD-FlexGet'}
@@ -485,15 +485,15 @@ class TestLaterDupes(FlexGetBase):
         feeds:
 
           test_1:
-            input_mock:
+            mock:
               - {title: 'FooBar.S02E02.PDTV-FlexGet'}
 
           test_2:
-            input_mock:
+            mock:
               - {title: 'FooBar.S02E03.HDTV-FlexGet'}
 
           test_3:
-            input_mock:
+            mock:
               - {title: 'FooBar.S02E03.HDTV-Bug'}
               - {title: 'FooBar.S02E03.HDTV-FlexGet'}
     '''
@@ -522,19 +522,19 @@ class TestQualities(FlexGetBase):
                   - 1080p
         feeds:
           test_1:
-            input_mock:
+            mock:
               - {title: 'FooBar.S01E01.PDTV-FlexGet'}
               - {title: 'FooBar.S01E01.1080p-FlexGet'}
               - {title: 'FooBar.S01E01.HR-FlexGet'}
           test_2:
-            input_mock:
+            mock:
               - {title: 'FooBar.S01E01.720p-FlexGet'}
 
           propers_1:
-            input_mock:
+            mock:
               - {title: 'FooBar.S01E02.720p-FlexGet'}
           propers_2:
-            input_mock:
+            mock:
               - {title: 'FooBar.S01E02.720p.Proper-FlexGet'}
     """
 
@@ -586,10 +586,10 @@ class TestIdioticNumbering(FlexGetBase):
 
         feeds:
           test_1:
-            input_mock:
+            mock:
               - {title: 'FooBar.S01E01.PDTV-FlexGet'}
           test_2:
-            input_mock:
+            mock:
               - {title: 'FooBar.102.PDTV-FlexGet'}
     """
 
@@ -609,12 +609,12 @@ class TestCapitalization(FlexGetBase):
     __yaml__ = """
         feeds:
           test_1:
-            input_mock:
+            mock:
               - {title: 'FooBar.S01E01.PDTV-FlexGet'}
             series:
               - FOOBAR
           test_2:
-            input_mock:
+            mock:
               - {title: 'FooBar.S01E01.PDTV-FlexGet'}
             series:
               - foobar
@@ -636,10 +636,10 @@ class TestMixedNumbering(FlexGetBase):
             - FooBar
         feeds:
           test_1:
-            input_mock:
+            mock:
               - {title: 'FooBar.S03E07.PDTV-FlexGet'}
           test_2:
-            input_mock:
+            mock:
               - {title: 'FooBar.0307.PDTV-FlexGet'}
     """
 
@@ -656,7 +656,7 @@ class TestAutoExact(FlexGetBase):
     __yaml__ = """
         feeds:
           test:
-            input_mock:
+            mock:
               - {title: 'ABC.MIAMI.S01E01.PDTV-FlexGet'}
               - {title: 'ABC.S01E01.PDTV-FlexGet'}
               - {title: 'ABC.LA.S01E01.PDTV-FlexGet'}
@@ -684,23 +684,23 @@ class TestTimeframe(FlexGetBase):
                 quality: 720p
         feeds:
           test_no_waiting:
-            input_mock:
+            mock:
               - {title: 'Test.S01E01.720p-FlexGet'}
 
           test_stop_waiting_1:
-            input_mock:
+            mock:
               - {title: 'Test.S01E02.HDTV-FlexGet'}
 
           test_stop_waiting_2:
-             input_mock:
+             mock:
                - {title: 'Test.S01E02.720p-FlexGet'}
 
           test_proper_afterwards:
-             input_mock:
+             mock:
                - {title: 'Test.S01E02.720p.Proper-FlexGet'}
 
           test_expires:
-            input_mock:
+            mock:
               - {title: 'Test.S01E03.pdtv-FlexGet'}
     """
 

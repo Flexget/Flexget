@@ -1,5 +1,6 @@
 from tests import FlexGetBase
 
+
 class TestFilterSeen(FlexGetBase):
     
     __yaml__ = """
@@ -8,17 +9,17 @@ class TestFilterSeen(FlexGetBase):
 
         feeds:
           test:
-            input_mock:
+            mock:
               - {title: 'Seen title 1', url: 'http://localhost/seen1'}
 
           test2:
-            input_mock:
+            mock:
               - {title: 'Seen title 2', url: 'http://localhost/seen1'} # duplicate by url
               - {title: 'Seen title 1', url: 'http://localhost/seen2'} # duplicate by title
               - {title: 'Seen title 3', url: 'http://localhost/seen3'} # new
 
           test_number:
-            input_mock:
+            mock:
               - {title: 'New title 1', url: 'http://localhost/new1', imdb_score: 5}
               - {title: 'New title 2', url: 'http://localhost/new2', imdb_score: 5}
     """
@@ -49,20 +50,20 @@ class TestFilterSeenMovies(FlexGetBase):
     __yaml__ = """
         feeds:
           test:
-            input_mock:
+            mock:
                - {title: 'Seen movie title 1', url: 'http://localhost/seen_movie1', imdb_url: 'http://www.imdb.com/title/tt0103064/'}
                - {title: 'Seen movie title 2', url: 'http://localhost/seen_movie2', imdb_url: 'http://www.imdb.com/title/tt0103064/'}
             seen_movies: true
          
           test2:
-            input_mock:
+            mock:
               - {title: 'Seen movie title 3', url: 'http://localhost/seen_movie3', imdb_url: 'http://www.imdb.com/title/tt0103064/'}
               - {title: 'Seen movie title 4', url: 'http://localhost/seen_movie4', imdb_url: 'http://www.imdb.com/title/tt0103064/'}
               - {title: 'Seen movie title 5', url: 'http://localhost/seen_movie5', imdb_url: 'http://www.imdb.com/title/tt0231264/'}
             seen_movies: true
 
           strict:
-            input_mock:
+            mock:
               - {title: 'Seen movie title 6', url: 'http://localhost/seen_movie6', imdb_url: 'http://www.imdb.com/title/tt0134532/'}
               - {title: 'Seen movie title 7', url: 'http://localhost/seen_movie7', imdb_url: 'http://www.imdb.com/title/tt0103066/'}
               - {title: 'Seen movie title 8', url: 'http://localhost/seen_movie8'}

@@ -108,13 +108,13 @@ class TestDisableBuiltins(FlexGetBase):
     __yaml__ = """
         feeds:
             test:
-                input_mock:
+                mock:
                     - {title: 'dupe1', url: 'http://localhost/dupe', 'imdb_score': 5}
                     - {title: 'dupe2', url: 'http://localhost/dupe', 'imdb_score': 5}
                 disable_builtins: true
 
             test2:
-                input_mock:
+                mock:
                     - {title: 'dupe1', url: 'http://localhost/dupe', 'imdb_score': 5, description: 'http://www.imdb.com/title/tt0409459/'}
                     - {title: 'dupe2', url: 'http://localhost/dupe', 'imdb_score': 5}
                 disable_builtins:
@@ -145,7 +145,7 @@ class TestPriority(FlexGetBase):
     __yaml__ = """
         feeds:
           test:
-            input_mock:
+            mock:
               - {title: 'Smoke'}
             accept_all: yes
             priority:
@@ -162,7 +162,7 @@ class TestManipulate(FlexGetBase):
     __yaml__ = """
         feeds:
           test:
-            input_mock:
+            mock:
               - {title: '[1234]foobar'}
             manipulate:
               cleaned:
@@ -180,7 +180,7 @@ class TestImmortal(FlexGetBase):
     __yaml__ = """
         feeds:
           test:
-            input_mock:
+            mock:
               - {title: 'title1', immortal: yes}
               - {title: 'title2'}
             regexp:
@@ -199,7 +199,7 @@ class TestDownload(FlexGetBase):
     __yaml__ = """
         feeds:
           test:
-            input_mock:
+            mock:
               - title: README
                 url: http://svn.flexget.com/trunk/bootstrap.py
                 filename: flexget_test_data
@@ -238,7 +238,7 @@ class TestMetainfoQuality(FlexGetBase):
     __yaml__ = """
         feeds:
           test:
-            input_mock:
+            mock:
               - {title: 'FooBar.S01E02.720p.HDTV'}
     """
 

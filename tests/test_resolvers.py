@@ -1,22 +1,25 @@
 from tests import FlexGetBase
-from nose.tools import assert_true, assert_false
+from nose.tools import assert_true
 from flexget.plugin import get_plugin_by_name
+
 
 class TestResolvers(FlexGetBase):
     """
         Bad example, does things manually, you should use feed.find_entry to check existance
     """
+
     __yaml__ = """
         feeds:
           test:
             # make test data
-            input_mock:
+            mock:
               - {title: 'something', url: 'http://thepiratebay.org/tor/8492471/Test.avi'}
               - {title: 'bar', url: 'http://thepiratebay.org/search/something'}
               - {title: 'nyaa', url: 'http://www.nyaatorrents.org/?page=torrentinfo&tid=12345'}
               - {title: 'isohunt search', url: 'http://isohunt.com/torrents/?ihq=Query.Here'}
               - {title: 'isohunt direct', url: 'http://isohunt.com/torrent_details/123456789/Name.Here'}
     """
+
     def setup(self):
         FlexGetBase.setUp(self)
         self.execute_feed('test')
@@ -54,12 +57,13 @@ class TestResolvers(FlexGetBase):
         assert resolver.resolvable(self.feed, entry), \
             'direct entry should be resolvable'
 
+
 class TestRegexpResolver(FlexGetBase):
 
     __yaml__ = """
         feeds:
           test:
-            input_mock:
+            mock:
               - {title: 'irrelevant', url: 'http://newzleech.com/?p=123'}
             regexp_resolve:
               newzleech:

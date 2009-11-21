@@ -1,9 +1,10 @@
 from tests import FlexGetBase
 
+
 class TestTorrentSize(FlexGetBase):
     __yaml__ = """
         global:
-          input_mock:
+          mock:
             - {title: 'test', file: 'tests/test.torrent'}
           disable_builtins:
             - seen
@@ -20,7 +21,7 @@ class TestTorrentSize(FlexGetBase):
           test_strict:
             preset:
               - no_global
-            input_mock:
+            mock:
               - {title: 'test'}
             torrent_size:
               min: 1
@@ -41,4 +42,3 @@ class TestTorrentSize(FlexGetBase):
         self.execute_feed('test_strict')
         assert self.feed.find_entry('rejected', title='test'), \
             'should have rejected non torrent'
-            

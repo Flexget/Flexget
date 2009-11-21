@@ -10,6 +10,7 @@ from flexget.utils.log import log_once
 
 log = logging.getLogger('rss')
 
+
 class InputRSS:
     """
         Parses RSS feed.
@@ -54,6 +55,7 @@ class InputRSS:
           url: <url>
           silent: yes
     """
+
     def validator(self):
         from flexget import validator
         root = validator.factory()
@@ -70,7 +72,7 @@ class InputRSS:
     def passwordize(self, url, user, password):
         """Add username and password to url"""
         parts = list(urlparse.urlsplit(url))
-        parts[1] = user+':'+password+'@'+parts[1]
+        parts[1] = user + ':' + password + '@' + parts[1]
         url = urlparse.urlunsplit(parts)
         return url        
 
@@ -139,7 +141,7 @@ class InputRSS:
                 raise ex # let the @internet decorator handle
             else:
                 raise PluginWarning('Unhandled bozo_exception. Type: %s (feed: %s)' % \
-                    (ex.__class__.__name__ , feed.name), log)
+                    (ex.__class__.__name__, feed.name), log)
 
         if rss['bozo'] and not ignore:
             log.error(rss)
@@ -220,7 +222,7 @@ class InputRSS:
                     if 'type' in enclosure: 
                         ee['type'] = enclosure['type']
                     # if enclosure has size OR there are multiple enclosures use filename from url
-                    if ee.get('size', 0) != 0 or len(enclosures)>1:
+                    if ee.get('size', 0) != 0 or len(enclosures) > 1:
                         if ee['url'].rfind != -1:
                             # parse filename from enclosure url
                             # TODO: better and perhaps join/in download plugin? also see urlparse module
