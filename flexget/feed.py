@@ -1,4 +1,5 @@
 import logging
+from flexget.manager import Session
 from flexget.plugin import *
 from flexget.plugin import FEED_EVENTS
 from flexget.utils.simple_persistence import SimplePersistence
@@ -281,6 +282,9 @@ class Feed:
             if not errors:
                 print 'Feed \'%s\' passed' % self.name
             return
+            
+        log.debug('starting session')
+        self.session = Session()
 
         # run events
         for event in FEED_EVENTS:
@@ -311,6 +315,9 @@ class Feed:
             # if abort flag has been set feed should be aborted now
             if self._abort:
                 return
+        
+        log.debug('committing session')
+        self.session.commit()
 
     def process_start(self):
         """Execute process_start event"""

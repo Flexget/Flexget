@@ -25,7 +25,7 @@ setup(
     package_data=find_package_data('flexget', package='flexget', only_in_packages=False),
     zip_safe=False,
     test_suite='nose.collector',
-    setup_requires=['nose>=0.11'],
+    setup_requires=['nose>=0.11', 'ipython'],
     entry_points="""
         [console_scripts]
         flexget = flexget:main
@@ -102,7 +102,7 @@ def bdist_egg():
     pass
 
 @task
-def release_coverage():
+def coverage():
     """Make coverage.flexget.com"""
     # --with-coverage --cover-package=flexget --cover-html --cover-html-dir /var/www/flexget_coverage/
     
@@ -117,6 +117,8 @@ def release_coverage():
     argv.extend(['--cover-package', 'flexget'])
     argv.extend(['--cover-html-dir', '/var/www/flexget_coverage/'])
     nose.run(argv=argv, config=cfg)
+    
+    print 'Coverage generated'
 
 @task
 @consume_args

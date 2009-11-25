@@ -381,10 +381,7 @@ class Manager:
             if name in failed:
                 continue
             try:
-                feed.session = Session()
                 feed.execute()
-                log.debug('session.commit() for %s' % feed.name)
-                feed.session.commit()
             except Exception, e:
                 failed.append(name)
                 log.exception('Feed %s: %s' % (feed.name, e))
@@ -396,7 +393,8 @@ class Manager:
                 return
             finally:
                 # note: will perform rollback if error occured (session has not been committed)
-                feed.session.close()
+                if feed.session:
+                    feed.session.close()
 
         # execute process_end to all feeds
         for name, feed in self.feeds.iteritems():
@@ -405,6 +403,7 @@ class Manager:
             if name in failed:
                 continue
             try:
+                log.log(5, 'calling process_end on a feed %s' % name)
                 feed.process_end()
             except Exception, e:
                 log.exception('Feed %s process_end: %s' % (name, e))

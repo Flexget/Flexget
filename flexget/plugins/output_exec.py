@@ -4,6 +4,7 @@ from flexget.plugin import *
 
 log = logging.getLogger('exec')
 
+
 class OutputExec:
     """
     Execute command for entries that reach output.
@@ -14,6 +15,7 @@ class OutputExec:
     
     You can use all (available) entry fields in the command.
     """
+    
     def validator(self):
         from flexget import validator
         return validator.factory('text')
