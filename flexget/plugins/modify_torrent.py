@@ -183,7 +183,7 @@ class TorrentFilename:
             if not 'file' in entry:
                 log.log(5, '%s doesn\'t have a file associated' % entry['title'])
                 continue
-            f = open(entry['file'], 'r')
+            f = open(entry['file'], 'rb')
             data = f.read(len(idstr))
             f.close()
             if not data == idstr:
@@ -195,7 +195,7 @@ class TorrentFilename:
             
             # create torrent object from torrent
             try:
-                f = open(entry['file'], 'r')
+                f = open(entry['file'], 'rb')
                 # NOTE: this reads entire file into memory, but we're pretty sure it's
                 # a small torrent file since it starts with idstr
                 data = f.read()

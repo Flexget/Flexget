@@ -183,7 +183,7 @@ class OutputDeluge:
                 log.debug('entry: %s' % entry)
                 log.debug('temp: %s' % ', '.join(os.listdir(tmp_path)))
                 raise PluginError("Downloaded temp file '%s' doesn't exist!?" % entry['file'], log)
-            filedump = base64.encodestring(open(entry['file']).read())
+            filedump = base64.encodestring(open(entry['file'], 'rb').read())
             path = os.path.expanduser(entry.get('path', config['path']) % entry)
             movedone = os.path.expanduser(entry.get('movedone', config['movedone']) % entry)
             label = entry.get('label', config['label']).lower()
