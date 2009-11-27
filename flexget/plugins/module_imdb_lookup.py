@@ -1,7 +1,7 @@
 import logging
 from optparse import SUPPRESS_HELP
 from flexget.plugin import *
-from flexget.manager import Base
+from flexget.manager import Base, Session
 from flexget.utils.log import log_once
 from flexget.utils.imdb import ImdbSearch, ImdbParser, extract_id
 from sqlalchemy import Table, Column, Integer, Float, String, Boolean
@@ -143,151 +143,156 @@ class ModuleImdbLookup:
         """Perform imdb lookup for entry. Raises PluginError with failure reason."""
             
         take_a_break = False
+        session = Session()
         
-        # entry sanity checks
-        for field in ['imdb_votes', 'imdb_score']:
-            if field in entry:
-                value = entry[field]
-                if not isinstance(value, int) and not isinstance(value, float):
-                    raise PluginError('Entry field %s should be a number!' % field)
-    
-        # make sure imdb url is valid
-        if 'imdb_url' in entry:
-            imdb_id = extract_id(entry['imdb_url'])
-            if imdb_id:
-                entry['imdb_url'] = 'http://www.imdb.com/title/%s' % imdb_id
-            else:
-                log.debug('imdb url %s is invalid, removing it' % entry['imdb_url'])
-                del(entry['imdb_url'])
-
-        # no imdb_url, check if there is cached result for it or if the search is known to fail
-        if not 'imdb_url' in entry:
-            result = feed.session.query(SearchResult).filter(SearchResult.title == entry['title']).first()
-            if result:
-                if result.fails and not feed.manager.options.retry_lookup:
-                    # this movie cannot be found, not worth trying again ...
-                    log.debug('%s will fail lookup' % entry['title'])
-                    raise PluginError('Lookup fails')
+        try:
+            # entry sanity checks
+            for field in ['imdb_votes', 'imdb_score']:
+                if field in entry:
+                    value = entry[field]
+                    if not isinstance(value, int) and not isinstance(value, float):
+                        raise PluginError('Entry field %s should be a number!' % field)
+        
+            # make sure imdb url is valid
+            if 'imdb_url' in entry:
+                imdb_id = extract_id(entry['imdb_url'])
+                if imdb_id:
+                    entry['imdb_url'] = 'http://www.imdb.com/title/%s' % imdb_id
                 else:
-                    log.debug('Setting imdb url for %s from db' % entry['title'])
-                    if result.url:
-                        entry['imdb_url'] = result.url
+                    log.debug('imdb url %s is invalid, removing it' % entry['imdb_url'])
+                    del(entry['imdb_url'])
 
-        # no imdb url, but information required, try searching
-        if not 'imdb_url' in entry and search_allowed:
-            feed.verbose_progress('Searching from imdb %s' % entry['title'])
+            # no imdb_url, check if there is cached result for it or if the search is known to fail
+            if not 'imdb_url' in entry:
+                result = session.query(SearchResult).filter(SearchResult.title == entry['title']).first()
+                if result:
+                    if result.fails and not feed.manager.options.retry_lookup:
+                        # this movie cannot be found, not worth trying again ...
+                        log.debug('%s will fail lookup' % entry['title'])
+                        raise PluginError('Lookup fails')
+                    else:
+                        log.debug('Setting imdb url for %s from db' % entry['title'])
+                        if result.url:
+                            entry['imdb_url'] = result.url
 
-            take_a_break = True
-            search = ImdbSearch()
-            search_result = search.smart_match(entry['title'])
-            if search_result:
-                entry['imdb_url'] = search_result['url']
-                # store url for this movie, so we don't have to search on every run
-                result = SearchResult(entry['title'], entry['imdb_url'])
-                feed.session.add(result)
-                log.info('Found %s' % (entry['imdb_url']))
-            else:
-                log_once('Imdb lookup failed for %s' % entry['title'], log)
-                # store FAIL for this title
-                result = SearchResult(entry['title'])
-                result.fails = True
-                feed.session.add(result)
-                raise PluginError('Lookup failed')
+            # no imdb url, but information required, try searching
+            if not 'imdb_url' in entry and search_allowed:
+                feed.verbose_progress('Searching from imdb %s' % entry['title'])
 
-        imdb = ImdbParser()
-        
-        # check if this imdb page has been parsed & cached
-        cached = feed.session.query(Movie).filter(Movie.url == entry['imdb_url']).first()
-        if not cached:
-            # search and store to cache
-            feed.verbose_progress('Parsing imdb for %s' % entry['title'])
-            try:
                 take_a_break = True
-                imdb.parse(entry['imdb_url'])
-                
-                # store to database
-                movie = Movie()
-                movie.title = imdb.name
-                movie.score = imdb.score
-                movie.votes = imdb.votes
-                movie.year = imdb.year                
-                movie.plot_outline = imdb.plot_outline
-                movie.url = entry['imdb_url']
-                for name in imdb.genres:
-                    genre = feed.session.query(Genre).filter(Genre.name == name).first()
-                    if not genre:
-                        genre = Genre(name)
-                    movie.genres.append(genre) # pylint: disable-msg=E1101
-                for name in imdb.languages:
-                    language = feed.session.query(Language).filter(Language.name == name).first()
-                    if not language:
-                        language = Language(name)
-                    movie.languages.append(language) # pylint: disable-msg=E1101
-                for imdb_id, name in imdb.actors.iteritems():
-                    actor = feed.session.query(Actor).filter(Actor.imdb_id == imdb_id).first()
-                    if not actor:
-                        actor = Actor(imdb_id, name)
-                    movie.actors.append(actor) # pylint: disable-msg=E1101
-                for imdb_id, name in imdb.directors.iteritems():
-                    director = feed.session.query(Director).filter(Director.imdb_id == imdb_id).first()
-                    if not director:
-                        director = Director(imdb_id, name)
-                    movie.directors.append(director) # pylint: disable-msg=E1101
-                feed.session.add(movie)                        
-                
-            except UnicodeDecodeError:
-                log.error('Unable to determine encoding for %s. Installing chardet library may help.' % entry['imdb_url'])
-                # store cache so this will not be tried again
-                movie = Movie()
-                movie.url = entry['imdb_url']
-                feed.session.add(movie)
-                raise PluginWarning('UnicodeDecodeError')
-            except ValueError, e:
-                if feed.manager.options.debug:
-                    log.exception(e)
-                raise PluginError('Invalid parameter: %s' % entry['imdb_url'], log)
-        else:
-            # Set values from cache
-            # TODO: I don't like this shoveling ...
-            imdb.url = cached.url
-            imdb.name = cached.title
-            imdb.year = cached.year
-            imdb.votes = cached.votes
-            imdb.score = cached.score
-            imdb.plot_outline = cached.plot_outline
-            imdb.genres = [genre.name for genre in cached.genres]
-            imdb.languages = [lang.name for lang in cached.languages]
-            for actor in cached.actors:
-                imdb.actors[actor.imdb_id] = actor.name
-            for director in cached.directors:
-                imdb.directors[director.imdb_id] = director.name
+                search = ImdbSearch()
+                search_result = search.smart_match(entry['title'])
+                if search_result:
+                    entry['imdb_url'] = search_result['url']
+                    # store url for this movie, so we don't have to search on every run
+                    result = SearchResult(entry['title'], entry['imdb_url'])
+                    session.add(result)
+                    log.info('Found %s' % (entry['imdb_url']))
+                else:
+                    log_once('Imdb lookup failed for %s' % entry['title'], log)
+                    # store FAIL for this title
+                    result = SearchResult(entry['title'])
+                    result.fails = True
+                    session.add(result)
+                    raise PluginError('Lookup failed')
 
-        log.log(5, 'imdb.score: %s' % imdb.score)
-        log.log(5, 'imdb.votes: %s' % imdb.votes)
-        log.log(5, 'imdb.year: %s' % imdb.year)
-        log.log(5, 'imdb.genres: %s' % imdb.genres)
-        log.log(5, 'imdb.languages: %s' % imdb.languages)
-        log.log(5, 'imdb.actors: %s' % imdb.actors)
-        log.log(5, 'imdb.directors: %s' % imdb.directors)
-        
-        # store to entries
-        # TODO: I really don't like this shoveling!
-        entry['imdb_url'] = imdb.url
-        entry['imdb_id'] = imdb.imdb_id
-        entry['imdb_name'] = imdb.name
-        entry['imdb_plot_outline'] = imdb.plot_outline
-        entry['imdb_score'] = imdb.score
-        entry['imdb_votes'] = imdb.votes
-        entry['imdb_year'] = imdb.year
-        entry['imdb_genres'] = imdb.genres
-        entry['imdb_languages'] = imdb.languages
-        entry['imdb_actors'] = imdb.actors
-        entry['imdb_directors'] = imdb.directors
-        
-        # give imdb a little break between requests (see: http://flexget.com/ticket/129#comment:1)
-        if take_a_break and not feed.manager.options.debug and not feed.manager.unit_test:
-            import time
-            time.sleep(3)
+            imdb = ImdbParser()
+            
+            # check if this imdb page has been parsed & cached
+            cached = session.query(Movie).filter(Movie.url == entry['imdb_url']).first()
+            if not cached:
+                # search and store to cache
+                feed.verbose_progress('Parsing imdb for %s' % entry['title'])
+                try:
+                    take_a_break = True
+                    imdb.parse(entry['imdb_url'])
+                    
+                    # store to database
+                    movie = Movie()
+                    movie.title = imdb.name
+                    movie.score = imdb.score
+                    movie.votes = imdb.votes
+                    movie.year = imdb.year                
+                    movie.plot_outline = imdb.plot_outline
+                    movie.url = entry['imdb_url']
+                    for name in imdb.genres:
+                        genre = session.query(Genre).filter(Genre.name == name).first()
+                        if not genre:
+                            genre = Genre(name)
+                        movie.genres.append(genre) # pylint: disable-msg=E1101
+                    for name in imdb.languages:
+                        language = session.query(Language).filter(Language.name == name).first()
+                        if not language:
+                            language = Language(name)
+                        movie.languages.append(language) # pylint: disable-msg=E1101
+                    for imdb_id, name in imdb.actors.iteritems():
+                        actor = session.query(Actor).filter(Actor.imdb_id == imdb_id).first()
+                        if not actor:
+                            actor = Actor(imdb_id, name)
+                        movie.actors.append(actor) # pylint: disable-msg=E1101
+                    for imdb_id, name in imdb.directors.iteritems():
+                        director = session.query(Director).filter(Director.imdb_id == imdb_id).first()
+                        if not director:
+                            director = Director(imdb_id, name)
+                        movie.directors.append(director) # pylint: disable-msg=E1101
+                    session.add(movie)                        
+                    
+                except UnicodeDecodeError:
+                    log.error('Unable to determine encoding for %s. Installing chardet library may help.' % entry['imdb_url'])
+                    # store cache so this will not be tried again
+                    movie = Movie()
+                    movie.url = entry['imdb_url']
+                    session.add(movie)
+                    raise PluginWarning('UnicodeDecodeError')
+                except ValueError, e:
+                    if feed.manager.options.debug:
+                        log.exception(e)
+                    raise PluginError('Invalid parameter: %s' % entry['imdb_url'], log)
+            else:
+                # Set values from cache
+                # TODO: I don't like this shoveling ...
+                imdb.url = cached.url
+                imdb.name = cached.title
+                imdb.year = cached.year
+                imdb.votes = cached.votes
+                imdb.score = cached.score
+                imdb.plot_outline = cached.plot_outline
+                imdb.genres = [genre.name for genre in cached.genres]
+                imdb.languages = [lang.name for lang in cached.languages]
+                for actor in cached.actors:
+                    imdb.actors[actor.imdb_id] = actor.name
+                for director in cached.directors:
+                    imdb.directors[director.imdb_id] = director.name
+
+            log.log(5, 'imdb.score: %s' % imdb.score)
+            log.log(5, 'imdb.votes: %s' % imdb.votes)
+            log.log(5, 'imdb.year: %s' % imdb.year)
+            log.log(5, 'imdb.genres: %s' % imdb.genres)
+            log.log(5, 'imdb.languages: %s' % imdb.languages)
+            log.log(5, 'imdb.actors: %s' % imdb.actors)
+            log.log(5, 'imdb.directors: %s' % imdb.directors)
+            
+            # store to entries
+            # TODO: I really don't like this shoveling!
+            entry['imdb_url'] = imdb.url
+            entry['imdb_id'] = imdb.imdb_id
+            entry['imdb_name'] = imdb.name
+            entry['imdb_plot_outline'] = imdb.plot_outline
+            entry['imdb_score'] = imdb.score
+            entry['imdb_votes'] = imdb.votes
+            entry['imdb_year'] = imdb.year
+            entry['imdb_genres'] = imdb.genres
+            entry['imdb_languages'] = imdb.languages
+            entry['imdb_actors'] = imdb.actors
+            entry['imdb_directors'] = imdb.directors
+            
+            # give imdb a little break between requests (see: http://flexget.com/ticket/129#comment:1)
+            if take_a_break and not feed.manager.options.debug and not feed.manager.unit_test:
+                import time
+                time.sleep(3)
+        finally:
+            log.debug('committing...')
+            session.commit()
         
 register_plugin(ModuleImdbLookup, 'imdb_lookup', priorities={'filter': 100})
 register_parser_option('--retry-lookup', action='store_true', dest='retry_lookup', default=0, help=SUPPRESS_HELP)
