@@ -221,28 +221,29 @@ class Manager:
                 print 'Configuration file \'%s\' doesn\'t have a initialized database.' % self.config_name
                 print 'Add --initdb parameter once to verify that you mean to start a new database.'
                 print ''
-                print 'If you\'re old user and didn\'t expect this, see bleeding edge news'
+                print 'Important: If you\'re old user and didn\'t expect this, see bleeding edge news!'
                 print ''
                 sys.exit(1)
             if os.path.exists(self.db_filename) and self.options.initdb:
                 log.warning('Database has already been initialized.')
             if self.options.test:
                 db_test_filename = os.path.join(self.config_base, 'test-%s.sqlite' % self.config_name)
-                log.info('Test mode, creating a copy from database.')
+                log.info('Test mode, creating a copy from database ...')
                 if os.path.exists(self.db_filename):
                     shutil.copy(self.db_filename, db_test_filename)
                 self.db_filename = db_test_filename
+                log.info('Test database created')
 
             # in case running on windows, needs double \\
             filename = self.db_filename.replace('\\', '\\\\')
             connection = 'sqlite:///%s' % filename
 
         # fire up the engine
-        log.debug('connection: %s' % connection)
+        log.debug('connecting to: %s' % connection)
         try:
             self.engine = sqlalchemy.create_engine(connection, echo=self.options.debug_sql)
         except ImportError, e:
-            log.critical('Unable to use SQLite. Try installing python SQLite packages.')
+            log.critical('Unable to use SQLite. Are you running Python 2.5.x or 2.6.x ?')
             log.exception(e)
             sys.exit(1)
         Session.configure(bind=self.engine)
@@ -392,7 +393,7 @@ class Manager:
                 print '**** Keyboard Interrupt ****'
                 return
             finally:
-                # note: will perform rollback if error occured (session has not been committed)
+                # note: this will cause db rollback if error occured (session has not been committed)
                 if feed.session:
                     feed.session.close()
 
