@@ -223,13 +223,16 @@ class TestDownload(FlexGetBase):
 
     @attr(online=True)
     def test_download(self):
-        # NOTE: what the hell is .ksh and where it comes from?
+        # NOTE: what the hell is .obj and where it comes from?
         # Re: seems to come from python mimetype detection in download plugin ...
-        self.testfile = os.path.expanduser('~/flexget_test_data.ksh')
+        # Re Re: Implemented in such way that extension does not matter?
+        self.testfile = os.path.expanduser('~/flexget_test_data.obj')
         if os.path.exists(self.testfile):
             os.remove(self.testfile)
         # executes feed and downloads the file
         self.execute_feed('test')
+        assert self.feed.entries[0]['output'], 'output missing?'
+        self.testfile = self.feed.entries[0]['output']
         assert os.path.exists(self.testfile), 'download file does not exists'
 
 

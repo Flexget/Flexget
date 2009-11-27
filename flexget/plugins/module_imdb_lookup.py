@@ -171,8 +171,8 @@ class ModuleImdbLookup:
                         log.debug('%s will fail lookup' % entry['title'])
                         raise PluginError('Lookup fails')
                     else:
-                        log.debug('Setting imdb url for %s from db' % entry['title'])
                         if result.url:
+                            log.log(5, 'Setting imdb url for %s from db' % entry['title'])
                             entry['imdb_url'] = result.url
 
             # no imdb url, but information required, try searching
@@ -291,7 +291,7 @@ class ModuleImdbLookup:
                 import time
                 time.sleep(3)
         finally:
-            log.debug('committing...')
+            log.log(5, 'committing session')
             session.commit()
         
 register_plugin(ModuleImdbLookup, 'imdb_lookup', priorities={'filter': 100})
