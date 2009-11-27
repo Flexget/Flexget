@@ -52,6 +52,7 @@ class Entry(dict):
 
 
 class useFeedLogging(object):
+    """Changes logging format during method execution."""
 
     def __call__(self, func):
 
@@ -74,7 +75,6 @@ class useFeedLogging(object):
             try:
                 return func(*args, **kwargs)
             finally:
-                # restore original format
                 for handler in log.parent.handlers:
                     handler.setFormatter(formatters[handler])
 
