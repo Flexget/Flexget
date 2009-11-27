@@ -9,6 +9,7 @@ import datetime
 
 log = logging.getLogger('imdb_rated')
 
+
 class ImdbRated(Base):
 
     __tablename__ = 'imdb_rated'
@@ -26,6 +27,7 @@ class ImdbRated(Base):
 
     def __str__(self):
         return '<ImdbRated(%s at %s)>' % (self.imdb_url, self.url)
+
 
 class FilterImdbRated:
     """
@@ -48,7 +50,7 @@ class FilterImdbRated:
 
     def validator(self):
         from flexget import validator
-        root =  validator.factory()
+        root = validator.factory()
         root.accept('url')
         complex = root.accept('dict')
         complex.accept('url', key='url')
@@ -65,11 +67,15 @@ class FilterImdbRated:
         feed.simple_persistence.set('next_time', datetime.datetime.now() + datetime.timedelta(hours=4))
         log.debug('updating my movies from %s' % config['url'])
         
-        # fix imdb html damnit
+        # fix imdb html, just enough to pass parser
+        #
         # <td class=list bgcolor="#CCCCCC"} colspan="4">
         #                                 ^ god damn noobs
+        #
+        # onclick="(new Image()).src='/rg/home/navbar/images/b.gif?link=/'"">IMDb</a>
+        #                                                                 ^ are you even trying?
 
-        massage = [(re.compile('"}'), lambda match: '"')]
+        massage = [(re.compile('"}'), lambda match: '"'), (re.compile('/\'""'), lambda match: '/\'"')]
         
         data = urllib2.urlopen(config['url'])
         soup = BeautifulSoup(data, markupMassage=massage)
