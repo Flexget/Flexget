@@ -345,7 +345,7 @@ class Feed:
                 else:
                     self.verbose_progress('Produced %s entries.' % (len(self.entries)))
             if event == 'filter':
-                self.verbose_progress('Results accepted: %s (rejected: %s undecided: %s failed: %s)' % \
+                self.verbose_progress('Accepted: %s (Rejected: %s Undecided: %s Failed: %s)' % \
                     (len(self.accepted), len(self.rejected), \
                     len(self.entries) - len(self.accepted), len(self.failed)))
 
