@@ -51,35 +51,32 @@ class Entry(dict):
         return True
 
 
-class useFeedLogging(object):
-    """Changes logging format during method execution."""
+def useFeedLogging(func):
 
-    def __call__(self, func):
+    def wrapper(self, *args, **kw):
+        # re-format logging
+        feed_name = self.name
+        while len(feed_name) <= 15:
+            feed_name += ' '
+        if len(feed_name) > 15:
+            feed_name = feed_name[:15]
 
-        def wrapped_func(*args, **kwargs):
-            # re-format logging
-            feed_name = args[0].name
-            while len(feed_name) <= 15:
-                feed_name += ' '
-            if len(feed_name) > 15:
-                feed_name = feed_name[:15]
+        log_format = ['%(asctime)-15s %(levelname)-8s %(name)-11s ' + feed_name + ' %(message)s', '%Y-%m-%d %H:%M']
+        formatter = logging.Formatter(*log_format)
 
-            log_format = ['%(asctime)-15s %(levelname)-8s %(name)-11s ' + feed_name + ' %(message)s', '%Y-%m-%d %H:%M']
-            formatter = logging.Formatter(*log_format)
+        formatters = {}
+        for handler in log.parent.handlers:
+            formatters[handler] = handler.formatter
+            handler.setFormatter(formatter)
 
-            formatters = {}
+        try:
+            return func(self, *args, **kw)
+        finally:
             for handler in log.parent.handlers:
-                formatters[handler] = handler.formatter
-                handler.setFormatter(formatter)
+                handler.setFormatter(formatters[handler])
+       
+    return wrapper
 
-            try:
-                return func(*args, **kwargs)
-            finally:
-                for handler in log.parent.handlers:
-                    handler.setFormatter(formatters[handler])
-
-        return wrapped_func
-                                        
 
 class Feed:
 
@@ -306,7 +303,7 @@ class Feed:
                 if self._abort:
                     return
 
-    @useFeedLogging()
+    @useFeedLogging
     def execute(self):
         """Execute this feed, runs events in order of events array."""
 
@@ -356,12 +353,12 @@ class Feed:
         log.debug('committing session')
         self.session.commit()
 
-    @useFeedLogging()
+    @useFeedLogging
     def process_start(self):
         """Execute process_start event"""
         self.__run_event('process_start')
 
-    @useFeedLogging()
+    @useFeedLogging
     def process_end(self):
         """Execute terminate event for this feed"""
         if self.manager.options.validate:
