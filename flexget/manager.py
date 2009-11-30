@@ -243,11 +243,12 @@ class Manager:
         try:
             self.engine = sqlalchemy.create_engine(connection, echo=self.options.debug_sql)
         except ImportError, e:
-            log.critical('Unable to use SQLite. Are you running Python 2.5.x or 2.6.x ?')
+            log.critical('Unable to use SQLite. Are you running Python 2.5.x or 2.6.x ? ' + \
+                'If yes then your Python is not compiled with SQLite support!')
             log.exception(e)
             sys.exit(1)
         Session.configure(bind=self.engine)
-        # create all tables
+        # create all tables, doesn't do anything to existing tables
         if self.options.reset:
             Base.metadata.drop_all(bind=self.engine)
         Base.metadata.create_all(bind=self.engine)

@@ -1,6 +1,17 @@
 from tests import FlexGetBase
 
 
+def age_series(**kwargs):
+    from flexget.plugins.filter_series import Series
+    from flexget.manager import Session
+    import datetime
+    session = Session()
+    for series in session.query(Series).all():
+        for episode in series.episodes:
+            episode.first_seen = datetime.datetime.now() - datetime.timedelta(**kwargs)
+    session.commit()
+
+
 class TestQuality(FlexGetBase):
 
     __yaml__ = """
@@ -727,22 +738,34 @@ class TestTimeframe(FlexGetBase):
         self.execute_feed('test_expires')
         assert not self.feed.accepted
 
-        def age(**kwargs):
-            from flexget.plugins.filter_series import Series
-            from flexget.manager import Session
-            import datetime
-            session = Session()
-            for series in session.query(Series).all():
-                for episode in series.episodes:
-                    episode.first_seen = datetime.datetime.now() - datetime.timedelta(**kwargs)
-            session.commit()
-
         # let 3 hours pass
-        age(hours=3)
+        age_series(hours=3)
         self.execute_feed('test_expires')
         assert not self.feed.accepted, 'expired too soon'
 
         # let another 3 hours pass, should expire now!
-        age(hours=6)
+        age_series(hours=6)
         self.execute_feed('test_expires')
         assert self.feed.accepted, 'timeframe didn\'t expire'
+
+
+class TestBacklog(FlexGetBase):
+
+    __yaml__ = """
+        feeds:
+          backlog:
+            mock:
+              - {title: 'Test.S01E01.hdtv-FlexGet'}
+            series:
+              - test: {timeframe: 6 hours}
+    """
+
+    def testBacklog(self):
+        """Series plugin: backlog"""
+        self.execute_feed('backlog')
+        assert self.feed.rejected, 'no entries at the start'
+        # simulate test going away from the feed
+        del(self.manager.config['feeds']['backlog']['mock'])
+        age_series(hours=12)
+        self.execute_feed('backlog')
+        assert self.feed.accepted, 'backlog is not injecting episodes'

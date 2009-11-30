@@ -65,6 +65,7 @@ class SeriesPlugin(object):
             filter(Series.name == parser.name.lower()).filter(Episode.identifier == parser.identifier).first()
         return episode.first_seen
 
+    # TODO: profiled to be a bottleneck! ~9seconds & 2000+ calls ?
     def get_latest_info(self, session, name):
         """Return latest known identifier in dict (season, episode) for series name"""
         episode = session.query(Episode).select_from(join(Episode, Series)).\
@@ -319,6 +320,14 @@ class FilterSeries(SeriesPlugin):
 
     def __init__(self):
         self.parser2entry = {}
+        self.backlog = None
+
+    def on_process_start(self, feed):
+
+        try:
+            self.backlog = get_plugin_by_name('backlog').instance
+        except:
+            log.warning('Unable utilize backlog plugin, episodes may slip trough timeframe')
 
     def validator(self):
         from flexget import validator
@@ -386,13 +395,9 @@ class FilterSeries(SeriesPlugin):
 
         return root
 
-    # TODO: re-implement (as new (sub)-plugin InputBacklog)
-    """
     def on_feed_input(self, feed):
-        .
-        .
-        .
-    """
+        if self.backlog:
+            self.backlog.inject_backlog(feed)
 
     def generate_config(self, feed):
         """Generate configuration dictionary from configuration. Converts simple format into advanced.
@@ -493,6 +498,10 @@ class FilterSeries(SeriesPlugin):
         for series in feed.session.query(Series).all():
             series.name = series.name.lower()
 
+        # add current entries into backlog memory
+        if self.backlog:
+            self.backlog.learn_backlog(feed, '14 days') # TODO: backlog length could be largest timeframe present
+
         config = self.generate_config(feed)
         self.auto_exact(config)
 
@@ -579,7 +588,18 @@ class FilterSeries(SeriesPlugin):
             entry['series_name'] = series_name
             entry['series_season'] = parser.season
             entry['series_episode'] = parser.episode
-            entry['series_id'] = parser.identifier
+            # debug for #390
+            try:
+                entry['series_id'] = parser.identifier
+            except:
+                log.critical('-' * 79)
+                log.critical('Found bug #390! Please report this:')
+                log.critical('-' * 79)
+                log.critical('series_name: %s' % series_name)
+                log.critical('Entry: %s' % entry.safe_str())
+                log.critical('Parser: %s' % parser)
+                log.critical('-' * 79)
+                continue
 
             # set custom download path
             if 'path' in config:
