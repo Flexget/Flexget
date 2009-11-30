@@ -13,6 +13,7 @@ from httplib import BadStatusLine
 
 log = logging.getLogger('download')
 
+
 class Download(Base):
 
     __tablename__ = 'download_history'
@@ -97,13 +98,27 @@ class PluginDownload:
         from flexget import validator
         root = validator.factory()
         root.accept('path')
+        root.accept('boolean')
         advanced = root.accept('dict')
         advanced.accept('path', key='path')
         advanced.accept('boolean', key='fail_html')
         return root
 
+    def get_config(self, feed):
+        """Return plugin configuration in advanced form"""
+        config = feed.config['download']
+        if not isinstance(config, dict):
+            config = {}
+            if isinstance(feed.config['download'], bool):
+                config['require_path'] = True
+            else:
+                config['path'] = feed.config['download']
+            config['fail_html'] = True
+        return config
+
     def on_feed_download(self, feed):
         """Download all feed content and store in temporary folder"""
+        config = self.get_config(feed)
         for entry in feed.accepted:
             try:
                 if feed.manager.options.test:
@@ -111,6 +126,11 @@ class PluginDownload:
                 else:
                     if not feed.manager.unit_test:
                         log.info('Downloading: %s' % entry['title'])
+                    # check if entry must have a path (download: yes)
+                    if 'require_path' in config and 'path' not in entry:
+                        log.info('%s can\'t be downloaded, no path specified for it' % entry['title'])
+                        feed.fail(entry, 'no path specified')
+                        continue
                     self.download(feed, entry)
             except urllib2.HTTPError, e:
                 feed.fail(entry, 'HTTP error')
@@ -257,19 +277,23 @@ class PluginDownload:
     def output(self, feed, entry):
         """Moves temp-file into final destination"""
 
+        config = self.get_config(feed)
+
+        # check if entry must have a path (download: yes)
+        if 'require_path' in config and 'path' not in entry:
+            log.debug('%s can\'t be written, no path specified for it' % entry['title'])
+            feed.fail(entry, 'no path specified')
+            return
+
         if not 'file' in entry:
             raise Exception('Entry %s has no temp file associated with' % entry['title'])
 
         try:
-            # convert config into advanced form
-            config = feed.config['download']
-            if not isinstance(config, dict):
-                config = {}
-                config['path'] = feed.config['download']
-                config['fail_html'] = True
-                
             # use path from entry if has one, otherwise use from download definition parameter
-            path = entry.get('path', config['path'])
+            path = entry.get('path', config.get('path'))
+            if path is None:
+                raise PluginError('Unreachable situation?')
+
             # override path from commandline parameter
             if feed.manager.options.dl_path:
                 path = feed.manager.options.dl_path
