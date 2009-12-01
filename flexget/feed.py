@@ -144,7 +144,7 @@ class Feed:
                     self.__purged += 1
 
     def accept(self, entry, reason=None):
-        """Accepts this entry."""
+        """Accepts this entry with optional reason."""
         if not isinstance(entry, Entry):
             raise Exception('Trying to accept non entry, %s' % repr(entry))
         if entry in self.rejected:
@@ -158,7 +158,7 @@ class Feed:
             entry['accepted_by'] = self.current_plugin
 
     def reject(self, entry, reason=None):
-        """Reject this entry immediately and permanently."""
+        """Reject this entry immediately and permanently with optional reason"""
         if not isinstance(entry, Entry):
             raise Exception('Trying to reject non entry, %s' % repr(entry))
         # ignore rejections on immortal entries

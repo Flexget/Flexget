@@ -9,6 +9,7 @@ from flexget.utils.tools import str_to_boolean
 
 log = logging.getLogger('imdb_queue')
 
+
 class ImdbQueue(Base):
 
     __tablename__ = 'imdb_queue'
@@ -26,7 +27,8 @@ class ImdbQueue(Base):
         self.added = datetime.datetime.now()
 
     def __str__(self):
-        return '<ImdbQueue(imdb_id=%s,quality=%s)>' % (self.imdb_id, self.quality)
+        return '<ImdbQueue(imdb_id=%s,quality=%s,force=%s)>' % (self.imdb_id, self.quality, self.immortal)
+
 
 class FilterImdbQueue:
     """
@@ -69,14 +71,14 @@ class FilterImdbQueue:
                 item = feed.session.query(ImdbQueue).filter(ImdbQueue.imdb_id == imdb_id).\
                                                      filter(ImdbQueue.quality == entry['quality']).first()
                 if item:
-                    log.info("Accepting %s from queue with quality %s" % (entry['title'], entry['quality']))
-                    # entry is in the database, accept over all other filters
                     entry['immortal'] = item.immortal
-                    feed.accept(entry)
+                    log.info("Accepting %s from queue with quality %s. Force: %s" % (entry['title'], entry['quality'], entry['immortal']))
+                    feed.accept(entry, 'imdb-queue - force: ' % entry['immortal'])
                     # and remove from database
                     feed.session.delete(item)
                 else:
                     log.debug("%s not in queue, skipping" % entry['title'])
+
 
 class ImdbQueueManager:
     """
@@ -101,15 +103,17 @@ class ImdbQueueManager:
 
         if len(parser.rargs) == 1:
             return
-        # more than 2 args, we've got quality
+        # 2 args is the minimum allowed (operation + item)
         if len(parser.rargs) >= 2:
             ImdbQueueManager.options['what'] = parser.rargs[1]
 
+        # 3, quality
         if len(parser.rargs) >= 3:
             ImdbQueueManager.options['quality'] = parser.rargs[2]
         else:
-            ImdbQueueManager.options['quality'] = 'dvd' # TODO: Get defaul from config somehow?
+            ImdbQueueManager.options['quality'] = 'dvd' # TODO: Get default from config somehow?
 
+        # 4, force download
         if len(parser.rargs) >= 4:
             ImdbQueueManager.options['force'] = str_to_boolean(parser.rargs[3])
         else:
@@ -180,7 +184,6 @@ class ImdbQueueManager:
             print "Added %s to queue with quality %s" % (imdb_id, quality)
         else:
             log.info("%s is already in the queue" % imdb_id)
-
 
     def queue_del(self):
         """Delete the given item from the queue"""
