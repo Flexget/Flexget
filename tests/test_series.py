@@ -375,7 +375,6 @@ class TestPropers(FlexGetBase):
     def test_proper_available(self):
         """Series plugin: proper available immediately"""
         self.execute_feed('proper_at_first')
-        self.dump()
         assert self.feed.find_entry('accepted', title='Foobar.S01E01.720p.proper.FlexGet'), \
             'Foobar.S01E01.720p.proper.FlexGet should have been accepted'
 
@@ -460,7 +459,6 @@ class TestDuplicates(FlexGetBase):
     def test_true_dupes(self):
         """Series plugin: true duplicate items"""
         self.execute_feed('test_true_dupes')
-        self.dump()
         assert len(self.feed.accepted) == 1, 'should have accepted (only) one'
 
     def test_downloaded(self):
@@ -610,7 +608,6 @@ class TestIdioticNumbering(FlexGetBase):
         self.execute_feed('test_2')
         entry = self.feed.find_entry(title='FooBar.102.PDTV-FlexGet')
         assert entry, 'entry not found?'
-        print entry
         assert entry['series_season'] == 1, 'season not detected'
         assert entry['series_episode'] == 2, 'episode not detected'
 
