@@ -1,6 +1,19 @@
 from nose.tools import assert_raises
 from flexget.utils.titles import SeriesParser, ParseWarning
 
+#
+# NOTE:
+#
+# Logging doesn't properly work if you run this test only as it is initialized in FlexGetBase
+# which this does NOT use at all. I spent hour debugging why logging doesn't work ...
+#
+
+# try to get logging running ...
+from flexget import initialize_logging
+from flexget.utils.titles.series import log as parser_log
+initialize_logging(True)
+#parser_log.setLevel(logging.DEBUG)
+
 
 class TestSeriesParser(object):
 
@@ -175,6 +188,32 @@ class TestSeriesParser(object):
         assert s.season == 7, 'season missing'
         assert s.episode == 6, 'episode missing'
         assert s.identifier == 'S07E06', 'identifier broken'
+        
+    def test_idiotic_invalid(self):
+        """SeriesParser: idiotic confused by invalid"""
+        return
+
+        # FIX: #394
+        s = SeriesParser()
+        s.expect_ep = True
+        s.name = 'test'
+        s.data = 'Test.Revealed.WS.PDTV.XviD-aAF.5190458.TPB.torrent'
+        s.parse()
+        print s
+        assert not s.season == 5, 'confused, got season'
+        assert not s.episode == 19, 'confused, got episode'
+        assert False, 'fuk'
+
+    def test_zeroes(self):
+        """SeriesParser: test zeroes as a season, episode"""
+
+        for data in ['Test.S00E00-FlexGet', 'Test.S00E01-FlexGet', 'Test.S01E00-FlexGet']:
+            s = self.parse(name='Test', data=data)
+            id = s.identifier
+            assert s.valid, 'parser not a valid for %s' % data
+            assert isinstance(id, basestring), 'id is not a string for %s' % data
+            assert isinstance(s.season, int), 'season is not a int for %s' % data
+            assert isinstance(s.episode, int), 'season is not a int for %s' % data
 
     def test_exact_name(self):
         """SeriesParser: test exact/strict name parsing"""

@@ -4,6 +4,10 @@ from flexget.utils.titles.parser import TitleParser, ParseWarning
 
 log = logging.getLogger('seriesparser')
 
+# Forced to INFO !
+# switch to logging.DEBUG if you want to debug this class (produces quite a bit info ..)
+log.setLevel(logging.INFO)
+
 
 class SeriesParser(TitleParser):
 
@@ -99,7 +103,7 @@ class SeriesParser(TitleParser):
             res = '^' + (blank + '*') + res + (blank + '+')
             return res
 
-        #log.debug('name: %s data: %s' % (name, data))
+        log.debug('name: %s data: %s' % (name, data))
 
         data_parts = data.split(' ')
 
@@ -117,7 +121,7 @@ class SeriesParser(TitleParser):
                     break
             if not name_matches:
                 # leave this invalid
-                #log.debug('FAIL: name regexps do not match')
+                log.debug('FAIL: name regexps do not match')
                 return
         else:
             # Use a regexp generated from the name as a fallback.
@@ -135,7 +139,7 @@ class SeriesParser(TitleParser):
         for part in data_parts:
             if part in self.qualities:
                 if self.qualities.index(part) < self.qualities.index(self.quality):
-                    #log.debug('%s storing quality %s' % (self.name, part))
+                    log.debug('%s storing quality %s' % (self.name, part))
                     self.quality = part
                 else:
                     pass
@@ -157,7 +161,7 @@ class SeriesParser(TitleParser):
                     if match.start() - name_end >= 2:
                         return
 
-                #log.debug('found episode number with regexp %s' % ep_re)
+                log.debug('found episode number with regexp %s' % ep_re)
                 season, episode = match.groups()
                 self.season = int(season)
                 self.episode = int(episode)
@@ -174,7 +178,7 @@ class SeriesParser(TitleParser):
                         if match.start() - name_end >= 2:
                             return
 
-                    #log.debug('found id with regexp %s' % id_re)
+                    log.debug('found id with regexp %s' % id_re)
                     self.id = '-'.join(match.groups())
                     if self.special:
                         self.id += '-SPECIAL'
@@ -185,7 +189,7 @@ class SeriesParser(TitleParser):
             # try to look up idiotic numberin scheme 101,102,103,201,202
             # ressu: Added matching for 0101, 0102... It will fail on
             #        season 11 though
-
+            log.debug('expect_ep enabled')
             match = re.search('(0?\d)(\d\d)', data, re.IGNORECASE | re.UNICODE)
             if match:
                 # strict_name
@@ -198,6 +202,7 @@ class SeriesParser(TitleParser):
                 log.debug(self)
                 self.valid = True
                 return
+            log.debug('-> no luck with the expect_ep')
 
         raise ParseWarning('%s looks like series %s but I cannot find any episode or id numbering!' % (data, self.name))
 
@@ -206,7 +211,7 @@ class SeriesParser(TitleParser):
         """Return identifier for parsed episode"""
         if not self.valid:
             raise Exception('Series flagged invalid')
-        if self.season and self.episode:
+        if isinstance(self.season, int) and isinstance(self.episode, int):
             return 'S%sE%s' % (str(self.season).zfill(2), str(self.episode).zfill(2))
         elif self.id is None:
             raise Exception('Series is missing identifier')

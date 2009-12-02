@@ -51,17 +51,20 @@ options(
 )
 
 def freplace(name, what_str, with_str):
+    """Replaces a :what_str: with :with_str: in file :name:"""
     import fileinput
     for line in fileinput.FileInput(name, inplace=1):
         if what_str in line:
-            line=line.replace(what_str, with_str)
+            line = line.replace(what_str, with_str)
         print line,
+
 
 @task
 @needs(['minilib', 'generate_setup', 'setuptools.command.sdist'])
 def sdist():
     """Generates the tar.gz"""
     pass
+
 
 @task
 @cmdopts([
@@ -84,6 +87,7 @@ def test(options):
     
     nose.run(argv=argv, config=cfg)
 
+
 @task
 def clean():
     """Cleans up the virtualenv"""
@@ -100,6 +104,7 @@ def clean():
 @needs(["minilib", "generate_setup", "setuptools.command.bdist_egg"])
 def bdist_egg():
     pass
+
 
 @task
 def coverage():
@@ -120,6 +125,7 @@ def coverage():
     
     print 'Coverage generated'
 
+
 @task
 @consume_args
 def release(args):
@@ -134,6 +140,9 @@ def release(args):
 
     # run unit tests
     test(environment.options) # dunno if param is correct ..
+    
+    import shutil
+    shutil.copytree('FlexGet.egg-info', 'FlexGet.egg-info-backup')
 
     # hack version number into setup( ... options='1.0-svn' ...)
     from paver import tasks
@@ -157,6 +166,13 @@ def release(args):
 
     # restore version ...
     freplace('flexget/__init__.py', "__version__ = '%s'" % ver, "__version__ = '{subversion}'")
+
+    # restore egg info from backup
+    print 'Removing FlexGet.egg-info ...'
+    shutil.rmtree('FlexGet.egg-info')
+    print 'Restoring FlexGet.egg-info'
+    shutil.move('FlexGet.egg-info-backup', 'FlexGet.egg-info')
+
 
 @task
 @cmdopts([

@@ -49,9 +49,10 @@ def initialize_logging(unit_test=False):
 
     if not _logging_configured:
         logging.addLevelName(5, 'DEBUGALL')
+        _logging_configured = True
 
         if unit_test:
-            _logging_configured = True
+            logging.basicConfig()
             return
 
         # root logger
@@ -70,7 +71,6 @@ def initialize_logging(unit_test=False):
             logger.setLevel(logging.DEBUG)
         else:
             logger.setLevel(logging.INFO)
-        _logging_configured = True
 
 
 def start_logging(filename=None, level=logging.INFO, debug=False, quiet=False):
@@ -149,7 +149,7 @@ def main():
         sys.exit(1)
 
     manager.acquire_lock()
-    
+
     start_logging(os.path.join(manager.config_base, 'flexget.log'), log_level, quiet=options.quiet)
 
     try:
