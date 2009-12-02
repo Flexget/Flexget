@@ -2,7 +2,9 @@ import logging
 import time
 import os
 import base64
+import urllib2
 from flexget.plugin import *
+from httplib import BadStatusLine
 
 log = logging.getLogger('deluge')
 
@@ -83,7 +85,30 @@ class OutputDeluge:
         if not 'download' in feed.config:
             download = get_plugin_by_name('download')
             # download all content to temp folder, may fail some entries
-            download.instance.on_feed_download(feed)
+            for entry in feed.accepted:
+                try:
+                    if feed.manager.options.test:
+                        log.info('Would download: %s' % entry['title'])
+                    else:
+                        if not feed.manager.unit_test:
+                            log.info('Downloading: %s' % entry['title'])
+                        # check if entry must have a path (download: yes)
+                        download.instance.download(feed, entry)
+                except urllib2.HTTPError, e:
+                    feed.fail(entry, 'HTTP error')
+                    log.error('HTTPError %s' % e.code)
+                except urllib2.URLError, e:
+                    feed.fail(entry, 'URL Error')
+                    log.error('URLError %s' % e.reason, self.log)
+                except BadStatusLine:
+                    feed.fail(entry, 'BadStatusLine')
+                    log.error('Failed to reach server. Reason: %s' % e.reason)
+                except IOError, e:
+                    feed.fail(entry, 'IOError')
+                    if hasattr(e, 'reason'):
+                        log.error('Failed to reach server. Reason: %s' % e.reason)
+                    elif hasattr(e, 'code'):
+                        log.error('The server couldn\'t fulfill the request. Error code: %s' % e.code)
 
     def on_feed_output(self, feed):
         """Add torrents to deluge at exit."""
