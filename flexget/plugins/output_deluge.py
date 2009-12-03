@@ -99,7 +99,7 @@ class OutputDeluge:
                     log.error('HTTPError %s' % e.code)
                 except urllib2.URLError, e:
                     feed.fail(entry, 'URL Error')
-                    log.error('URLError %s' % e.reason, self.log)
+                    log.error('URLError %s' % e.reason)
                 except BadStatusLine:
                     feed.fail(entry, 'BadStatusLine')
                     log.error('Failed to reach server. Reason: %s' % e.reason)
