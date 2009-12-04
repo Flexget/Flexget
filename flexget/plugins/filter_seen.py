@@ -6,6 +6,7 @@ from datetime import datetime
 
 log = logging.getLogger('seen')
 
+
 class Seen(Base):
     
     __tablename__ = 'seen'
@@ -25,6 +26,50 @@ class Seen(Base):
     def __str__(self):
         return '<Seen(%s=%s)>' % (self.field, self.value)
 
+
+class RepairSeen(object):
+
+    """Repair seen database by removing duplicate items."""
+
+    def on_process_start(self, feed):
+        if not feed.manager.options.repair_seen:
+            return
+    
+        feed.manager.disable_feeds()
+        
+        print '-' * 79
+        print ' Removing faulty duplicate items from seen database'
+        print ' This may take a while ...'
+        print '-' * 79
+        
+        from flexget.manager import Session
+        
+        session = Session()
+        
+        index = 0
+        removed = 0
+        total = session.query(Seen).count()
+        for seen in session.query(Seen).all():
+            index += 1
+            if (index % 500 == 0):
+                print ' %s / %s' % (index, total)
+            amount = 0
+            for dupe in session.query(Seen).filter(Seen.value == seen.value):
+                amount += 1
+                if amount > 1:
+                    removed += 1
+                    session.delete(dupe)
+        
+        session.commit()
+        session.close()
+
+        total = session.query(Seen).count()
+        print '-' * 79
+        print ' Removed %s duplicates' % removed
+        print ' %s items remaining' % total
+        print '-' * 79
+
+
 class FilterSeen(object):
     """
         Remembers previously downloaded content and rejects them in
@@ -34,6 +79,7 @@ class FilterSeen(object):
         This plugin is enabled on all feeds by default.
         See wiki for more information.
     """
+
     def __init__(self):
         # remember and filter by these fields
         self.fields = ['url', 'title', 'original_url']
@@ -46,6 +92,7 @@ class FilterSeen(object):
         root.accept('text')
         return root
 
+    # TODO: separate to own class!
     def on_process_start(self, feed):
         """Implements --forget <feed> and --seen <value>"""
 
@@ -96,7 +143,6 @@ class FilterSeen(object):
             log.debug('%s is disabled' % self.keyword)
             return
         
-        duplicates = []
         for entry in feed.entries:
             for field in self.fields:
                 if not field in entry:
@@ -105,26 +151,6 @@ class FilterSeen(object):
                     log.debug("Rejecting '%s' '%s' because of seen '%s'" % (entry['url'], entry['title'], field))
                     feed.reject(entry)
                     break
-
-            # scan for duplicates
-            for duplicate in feed.entries:
-                if entry == duplicate or entry in duplicates: 
-                    continue
-                for field in self.fields:
-                    if field in ['title']:
-                        # allow duplicates with these fields
-                        continue
-                    if not isinstance(entry.get(field, None), basestring):
-                        # don't filter based on seen non-string fields like imdb_score!
-                        continue
-                    if entry.get(field, object()) == duplicate.get(field, object()):
-                        log.debug('Rejecting %s because of duplicate field %s' % (duplicate['title'], field))
-                        feed.reject(duplicate, 'duplicate entry with field %s' % field)
-                        # TODO: if / when entry has multiple urls it should combine these two entries
-                        # now the duplicate is just rejected and considered seen
-                        seen = Seen(field, duplicate[field], feed.name)
-                        feed.session.add(seen)
-                        duplicates.append(duplicate)
 
     def on_feed_exit(self, feed):
         """Remember succeeded entries"""
@@ -172,7 +198,10 @@ class FilterSeen(object):
         log.info('Migrated %s seen items' % count)
 
 register_plugin(FilterSeen, 'seen', builtin=True, priorities=dict(filter=255))
+register_plugin(RepairSeen, '--repair-seen', builtin=True)
 register_parser_option('--forget', action='store', dest='forget', default=False,
                        metavar='FEED|VALUE', help='Forget feed (completely) or given title or url.')
 register_parser_option('--seen', action='store', dest='seen', default=False,
                        metavar='VALUE', help='Add title or url to what has been seen in feeds.')
+register_parser_option('--repair-seen', action='store_true', dest='repair_seen', default=False,
+                       help='Repair seen database by removing duplicate lines.')

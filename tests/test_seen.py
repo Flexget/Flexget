@@ -42,20 +42,22 @@ class TestFilterSeen(FlexGetBase):
         # test that we don't filter reject on non-string fields (ie, seen same imdb_score)
 
         self.execute_feed('test_number')
-        assert self.feed.find_entry(title='New title 1') and self.feed.find_entry(title='New title 2'), 'Item should not have been rejected because of number field'
+        assert self.feed.find_entry(title='New title 1') and self.feed.find_entry(title='New title 2'), \
+            'Item should not have been rejected because of number field'
             
 
 class TestFilterSeenMovies(FlexGetBase):
     
     __yaml__ = """
         feeds:
-          test:
+          test_1:
             mock:
                - {title: 'Seen movie title 1', url: 'http://localhost/seen_movie1', imdb_url: 'http://www.imdb.com/title/tt0103064/'}
                - {title: 'Seen movie title 2', url: 'http://localhost/seen_movie2', imdb_url: 'http://www.imdb.com/title/tt0103064/'}
+            accept_all: yes
             seen_movies: true
          
-          test2:
+          test_2:
             mock:
               - {title: 'Seen movie title 3', url: 'http://localhost/seen_movie3', imdb_url: 'http://www.imdb.com/title/tt0103064/'}
               - {title: 'Seen movie title 4', url: 'http://localhost/seen_movie4', imdb_url: 'http://www.imdb.com/title/tt0103064/'}
@@ -71,18 +73,16 @@ class TestFilterSeenMovies(FlexGetBase):
     """
     
     def test_seen_movies(self):
-        self.execute_feed('test')
-        assert self.feed.find_entry(title='Seen movie title 1'), 'Test movie entry 1 is missing'
-        # should be rejected, duplicate imdb url
-        assert not self.feed.find_entry(title='Seen movie title 2'), 'Test movie entry 2 should be rejected'
+        self.execute_feed('test_1')
+        
         # execute again
         self.feed.execute()
         assert not self.feed.find_entry(title='Seen movie title 1'), 'Test movie entry 1 should be rejected in second execution'
         assert not self.feed.find_entry(title='Seen movie title 2'), 'Test movie entry 2 should be rejected in second execution'
 
         # execute another feed
-        
-        self.execute_feed('test2')
+        self.execute_feed('test_2')
+
         # should not contain since fields seen in previous feed
         assert not self.feed.find_entry(title='Seen movie title 3'), 'seen movie 3 exists'
         assert not self.feed.find_entry(title='Seen movie title 4'), 'seen movie 4 exists'

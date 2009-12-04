@@ -189,19 +189,27 @@ class SeriesReport(SeriesPlugin):
             print 'Unknown series %s' % name
             return
 
-        print ' %-30s%-20s' % ('Identifier', 'Status')
+        print ' %-63s%-15s' % ('Identifier, Title', 'Quality')
         print '-' * 79
 
         for episode in series.episodes:
-            status = ''
+        
+            if episode.identifier is None:
+                print ' None <--- Broken!'
+            else:
+                print ' %s' % episode.identifier
+            
             for release in episode.releases:
-                if release.downloaded:
-                    status += '*'
-                status += release.quality
+                status = release.quality
+                title = release.title
+                if len(title) > 55:
+                    title = title[:55] + '...'
                 if release.proper:
                     status += '-Proper'
-                status += ' '
-            print ' %-30s%-20s' % (episode.identifier, status)
+                if release.downloaded:
+                    print '  * %-60s%-15s' % (title, status)
+                else:
+                    print '    %-60s%-15s' % (title, status)
 
         print '-' * 79
         print ' * = downloaded'
