@@ -3,6 +3,7 @@ import urlparse
 import xml.sax
 import re
 import feedparser
+import urllib2
 import httplib
 from flexget.feed import Entry
 from flexget.plugin import *
@@ -104,7 +105,11 @@ class InputRSS:
         """
 
         # get the feed & parse
-        rss = feedparser.parse(url, etag=etag, modified=modified)
+        if urllib2._opener:
+            rss = feedparser.parse(url, etag=etag, modified=modified,
+                    handlers=urllib2._opener.handlers)
+        else:
+            rss = feedparser.parse(url, etag=etag, modified=modified)
 
         # status checks
         status = rss.get('status', False)
