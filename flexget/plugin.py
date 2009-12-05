@@ -141,6 +141,7 @@ def register_parser_option(*args, **kwargs):
 def register_feed_event(plugin_class, name, before=None, after=None):
     """Adds a new feed event to the available events."""
     global _new_event_queue, plugins
+
     if before and after:
         raise RegisterException('You can only give either before or after for a event.')
     if not before and not after:
@@ -163,6 +164,7 @@ def register_feed_event(plugin_class, name, before=None, after=None):
         if after is None:
             FEED_EVENTS.insert(FEED_EVENTS.index(before), event_name)
 
+        # update PluginInfo events flag
         for loaded_plugin in plugins:
             if plugins[loaded_plugin].events:
                 continue
@@ -172,6 +174,7 @@ def register_feed_event(plugin_class, name, before=None, after=None):
                     continue
         return True
 
+    # if can't add yet (dependencies) queue addition
     if not add_event(name, plugin_class.__name__, before, after):
         _new_event_queue[name] = [plugin_class.__name__, before, after]
 
@@ -404,43 +407,7 @@ def get_plugin_by_name(name):
     return plugins[name]
 
 
-def print_list(options):
-    # TODO: rewrite!
-    """Parameter --list"""
-    print '-' * 60
-    print '%-20s%-30s%s' % ('Keyword', 'Roles', '--doc')
-    print '-' * 60
-    plugins = []
-    roles = {}
-    for event in FEED_EVENTS:
-        try:
-            ml = get_plugins_by_event(event)
-        except:
-            continue
-        for m in ml:
-            dupe = False
-            for plugin in plugins:
-                if plugin['name'] == m['name']:
-                    dupe = True
-            if not dupe:
-                plugins.append(m)
-        # build roles list
-        for m in ml:
-            if m['name'] in roles:
-                roles[m['name']].append(event)
-            else:
-                roles[m['name']] = [event]
-    for plugin in plugins:
-        # do not include test classes, unless in debug mode
-        if plugin.get('debug_plugin', False) and not options.debug:
-            continue
-        doc = 'Yes'
-        if not plugin.instance.__doc__:
-            doc = 'No'
-        print '%-20s%-30s%s' % (plugin['name'], ', '.join(roles[plugin['name']]), doc)
-    print '-' * 60
-
-
+# TODO: separate to plugin
 def print_doc(plugin_name):
     """Parameter --doc <plugin_name>"""
     found = False

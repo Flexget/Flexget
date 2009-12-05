@@ -255,7 +255,7 @@ class Feed:
                 self.verbose_details('%s' % entry['title'])
 
     def __run_event(self, event):
-        """Execute configured plugins in this event."""
+        """Execute all configured plugins in :event:"""
         methods = get_methods_by_event(event)
         #log.log(5, 'Event %s methods %s' % (event, methods))
 
@@ -273,7 +273,7 @@ class Feed:
                 # store execute info
                 self.current_event = event
                 self.current_plugin = keyword
-                log.log(5, 'running %s' % keyword)
+                log.log(5, 'running %s method %s' % (keyword, method))
                 # call the plugin
                 try:
                     method(self)

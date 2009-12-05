@@ -766,3 +766,38 @@ class TestBacklog(FlexGetBase):
         age_series(hours=12)
         self.execute_feed('backlog')
         assert self.feed.accepted, 'backlog is not injecting episodes'
+
+
+class TestManipulate(FlexGetBase):
+
+    """Tests that it's possible to manipulate entries before they're parsed by series plugin"""
+
+    __yaml__ = """
+        feeds:
+          test_1:
+            mock:
+              - {title: 'PREFIX: Test.S01E01.hdtv-FlexGet'}
+            series:
+              - test
+          test_2:
+            mock:
+              - {title: 'PREFIX: Test.S01E01.hdtv-FlexGet'}
+            series:
+              - test
+            manipulate:
+              title:
+                from: title
+                regexp: '^PREFIX: (.*)'
+            priority:
+              series: 255
+              manipulate: 0
+    """
+
+    def testManipulate(self):
+        """Series plugin: test manipulation priority"""
+        # should not work with the prefix
+        self.execute_feed('test_1')
+        assert not self.feed.accepted, 'series accepted even with prefix?'
+        assert not self.feed.accepted, 'series rejecte even with prefix?'
+        self.execute_feed('test_2')
+        assert self.feed.accepted, 'manipulate failed to pre-clean title'

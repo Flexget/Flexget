@@ -10,8 +10,9 @@ from flexget.utils.titles import SeriesParser, ParseWarning
 
 # try to get logging running ...
 from flexget import initialize_logging
-from flexget.utils.titles.series import log as parser_log
 initialize_logging(True)
+
+#from flexget.utils.titles.series import log as parser_log
 #parser_log.setLevel(logging.DEBUG)
 
 
