@@ -29,7 +29,8 @@ class SeriesParser(TitleParser):
         # if set to true, episode or id must follow immediattely after name
         self.strict_name = False
 
-        self.ep_regexps = ['s(\d+)e(\d+)', 's(\d+)ep(\d+)', 's(\d+).e(\d+)', '[^\d]([\d]{1,2})[\s]?x[\s]?(\d+)']
+        self.ep_regexps = ['s(\d+)e(\d+)', 's(\d+)ep(\d+)', 's(\d+).e(\d+)', \
+                           '[^\d]([\d]{1,2})[\s]?x[\s]?(\d+)']
         self.id_regexps = ['(\d\d\d\d).(\d+).(\d+)', '(\d+).(\d+).(\d\d\d\d)', \
                            '(\d\d\d\d)x(\d+)\.(\d+)', '[^s\d](\d{1,3})[^p\d]']
         self.clean_regexps = ['\[.*?\]', '\(.*?\)']

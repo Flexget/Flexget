@@ -950,8 +950,9 @@ class FilterSeries(SeriesPlugin):
     def accept_series(self, feed, parser, reason):
         """Accept this series with a given reason"""
         entry = self.parser2entry[parser]
-        if (entry['title'] != parser.data):
-            log.critical('BUG? accepted title is different from parser.data')
+        if entry['title'] != parser.data:
+            log.critical('BUG? accepted title is different from parser.data ! %s != %s' % \
+                (entry['title'], parser.data))
         feed.accept(entry, reason)
 
     def on_feed_exit(self, feed):

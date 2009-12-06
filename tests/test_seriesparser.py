@@ -10,11 +10,17 @@ from flexget.utils.titles import SeriesParser, ParseWarning
 #
 
 # try to get logging running ...
-from flexget import initialize_logging
-initialize_logging(True)
 
-#from flexget.utils.titles.series import log as parser_log
-#parser_log.setLevel(logging.DEBUG)
+enable_logging = False
+
+if enable_logging:
+    import logging
+    from flexget import initialize_logging
+    initialize_logging(True)
+    log = logging.getLogger()
+    log.setLevel(logging.DEBUG)
+    from flexget.utils.titles.series import log as parser_log
+    parser_log.setLevel(logging.DEBUG)
 
 
 class TestSeriesParser(object):
@@ -83,6 +89,14 @@ class TestSeriesParser(object):
 
         s = self.parse(name='Something', data='Something 1 x 2-FlexGet')
         assert (s.season == 1 and s.episode == 2), 'failed to parse 1 x 2'
+
+    def test_ep_in_square_brackets(self):
+        """SeriesParser: [S01] [E02] NOT IMPLEMENTED"""
+        return
+
+        # FIX: #402 .. a bit hard to do
+        s = self.parse(name='Something', data='Something [S01] [E02]')
+        assert (s.season == 1 and s.episode == 2), 'failed to parse %s' % s
 
     def test_digits(self):
         """SeriesParser: digits (UID)"""
