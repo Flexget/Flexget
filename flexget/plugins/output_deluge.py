@@ -110,8 +110,8 @@ class ReactorThread(Process):
         def on_connect_fail(result):
             log.info('Connect to deluge daemon failed: %s' % result)
             self.tocore.put('connectfail')
-            reactor.callLater(1, reactor.stop)
-
+            reactor.callLater(0.1, reactor.stop())
+        
         connection = self.fromcore.get()
         if isinstance(connection, ConnectionDrop):
             d = client.connect(
@@ -242,7 +242,7 @@ class OutputDeluge:
             return
             
         if self.deluge12:
-            self.makelist_deluge12(feed, config)
+            self.add_to_deluge12(feed, config)
         else:
             log.info("Using deluge 1.1 api")
             self.add_to_deluge11(feed, config)
@@ -316,7 +316,9 @@ class OutputDeluge:
             else:
                 log.info("%s is already loaded in deluge. Cannot change label, movedone, or queuetotop" % entry['title'])
                 
-    def makelist_deluge12(self, feed, config):
+    def add_to_deluge12(self, feed, config):
+        if not self.reactorthread.is_alive():
+            raise PluginError('Delgue daemon is not connected', log)
         connectiondrop = ConnectionDrop(
             config['host'],
             config['port'],
