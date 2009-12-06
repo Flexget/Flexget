@@ -4,8 +4,9 @@ from flexget.utils.titles import SeriesParser, ParseWarning
 #
 # NOTE:
 #
-# Logging doesn't properly work if you run this test only as it is initialized in FlexGetBase
-# which this does NOT use at all. I spent hour debugging why logging doesn't work ...
+# Logging doesn't properly work if you run this test only as it is initialized
+# in FlexGetBase which this does NOT use at all. I spent hour debugging why
+# logging doesn't work ...
 #
 
 # try to get logging running ...
@@ -192,18 +193,15 @@ class TestSeriesParser(object):
         
     def test_idiotic_invalid(self):
         """SeriesParser: idiotic confused by invalid"""
-        return
-
-        # FIX: #394
         s = SeriesParser()
         s.expect_ep = True
         s.name = 'test'
         s.data = 'Test.Revealed.WS.PDTV.XviD-aAF.5190458.TPB.torrent'
-        s.parse()
-        print s
+        assert_raises(ParseWarning, s.parse)
         assert not s.season == 5, 'confused, got season'
+        assert not s.season == 4, 'confused, got season'
         assert not s.episode == 19, 'confused, got episode'
-        assert False, 'fuk'
+        assert not s.episode == 58, 'confused, got episode'
 
     def test_zeroes(self):
         """SeriesParser: test zeroes as a season, episode"""
