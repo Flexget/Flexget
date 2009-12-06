@@ -5,7 +5,11 @@ import base64
 import urllib2
 from flexget.plugin import *
 from httplib import BadStatusLine
-from multiprocessing import Process, Queue
+try:
+    from multiprocessing import Process, Queue
+except ImportError:
+    Process = object
+    Queue = object
 from Queue import Empty
 
 log = logging.getLogger('deluge')
@@ -179,6 +183,10 @@ class OutputDeluge:
             try:
                 from deluge.ui.client import sclient
             except:
+                try:
+                    from multiprocessing import Process, Queue
+                except:
+                    raise PluginError('Python 2.6 required to use deluge 1.2 api', log)
                 try:
                     from deluge.ui.client import client
                 except:
