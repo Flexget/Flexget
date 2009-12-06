@@ -169,7 +169,8 @@ class OutputDeluge:
 
     def on_process_start(self, feed):
         """
-            register the usable set: keywords
+            Register the usable set: keywords. Detect what version of deluge
+            is loaded, start the reactor process if using the deluge 1.2 api.
         """
         set_plugin = get_plugin_by_name('set')
         set_plugin.instance.register_keys({'path': 'text', 'movedone': 'text', \
@@ -244,11 +245,10 @@ class OutputDeluge:
         if self.deluge12:
             self.add_to_deluge12(feed, config)
         else:
-            log.info("Using deluge 1.1 api")
             self.add_to_deluge11(feed, config)
 
     def add_to_deluge11(self, feed, config):
-        """Add torrents to deluge at exit."""
+        """ Add torrents to deluge using deluge 1.1.x api. """
         try:
             from deluge.ui.client import sclient
         except:
@@ -317,6 +317,11 @@ class OutputDeluge:
                 log.info("%s is already loaded in deluge. Cannot change label, movedone, or queuetotop" % entry['title'])
                 
     def add_to_deluge12(self, feed, config):
+        """ 
+        This will pass connection info and torrents to the reactorthread
+        process, which adds the torrents to deluge using the 1.2 api.
+        We then wait for the reactorthread to return the result.
+        """
         if not self.reactorthread.is_alive():
             raise PluginError('Delgue daemon is not connected', log)
         connectiondrop = ConnectionDrop(
@@ -358,6 +363,7 @@ class OutputDeluge:
                 del(entry['file'])
             
     def on_process_end(self, feed):
+        """ Sends signal to shutdown reactorthread """
         if self.deluge12:
             self.toreactor.put('end')
             self.deluge12 = False
