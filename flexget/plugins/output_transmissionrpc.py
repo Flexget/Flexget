@@ -1,6 +1,5 @@
 import netrc
 import logging
-import transmissionrpc
 from flexget.plugin import *
 from flexget import validator
 
@@ -33,6 +32,10 @@ class PluginTransmissionrpc:
 
     def add_to_transmission(self, feed):
         """ adds accepted entries to transmission """
+        try:
+            import transmissionrpc
+        except:
+            PluginError('Transmissionrpc module required.', log)
         user, account, password = None, None, None
  
         conf = feed.config['transmissionrpc']
