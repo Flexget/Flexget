@@ -84,4 +84,4 @@ class InputInject:
 register_plugin(InputInject, '--inject', debug=True, builtin=True, priorities={'input': 255})
 
 register_parser_option('--inject', action='callback', callback=InputInject.optik_series,
-                       help='Injects imaginary entry to feed(s): <TITLE> [URL] [FORCE]')
+                       help='Injects entry to all executed feeds: <TITLE> [URL] [FORCE]')
