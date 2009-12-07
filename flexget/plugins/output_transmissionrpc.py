@@ -1,4 +1,4 @@
-import netrc
+from netrc import netrc, NetrcParseError
 import logging
 from flexget.plugin import *
 from flexget import validator
@@ -8,21 +8,23 @@ log = logging.getLogger('transmissionrpc')
 
 class PluginTransmissionrpc:
     """
-    Add url from entry url to transmission
+        Add url from entry url to transmission
      
-    Example: transmissionrpc:
-               host: localhost
-               port: 9091
-               netrc: /home/flexget/.tmnetrc
+        Example: 
+    
+        transmissionrpc:
+          host: localhost
+          port: 9091
+          netrc: /home/flexget/.tmnetrc
     """
 
     def validator(self):
         """Return config validator"""
         root = validator.factory()
         advanced = root.accept('dict')
-        advanced.accept('text', key='host')
-        advanced.accept('number', key='port')
-        advanced.accept('file', key='netrc')
+        advanced.accept('text', key='host', required=True)
+        advanced.accept('number', key='port', required=True)
+        advanced.accept('file', key='netrc', required=True)
         return root
 
     def on_feed_output(self, feed):
@@ -35,15 +37,15 @@ class PluginTransmissionrpc:
         try:
             import transmissionrpc
         except:
-            PluginError('Transmissionrpc module required.', log)
-        user, account, password = None, None, None
- 
+            raise PluginError('Transmissionrpc module required.', log)
+            
         conf = feed.config['transmissionrpc']
-   
-        if 'netrc' in feed.config['transmissionrpc']:
+
+        # why is netrc required always? .. or at all
+        if 'netrc' in conf:
   
             try:
-                user, account, password = netrc.netrc(conf['netrc']).authenticators(conf['host'])
+                user, account, password = netrc(conf['netrc']).authenticators(conf['host'])
             except IOError, e:
                 log.error('netrc: unable to open: %s' % e.filename)
             except NetrcParseError, e:
