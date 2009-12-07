@@ -11,7 +11,8 @@ __all__ = ['PluginWarning', 'PluginError',
            'register_parser_option', 'register_feed_event',
            'get_plugin_by_name', 'get_plugins_by_group',
            'get_plugin_keywords', 'get_plugins_by_event',
-           'get_methods_by_event', 'internet']
+           'get_methods_by_event', 'get_events_by_plugin',
+           'internet']
 
 
 class PluginDependencyError(Exception):
@@ -381,6 +382,16 @@ def get_methods_by_event(event):
                                  y.get('priorities', {}).get(event, 0)), reverse=True)
     result = map(lambda info: PluginMethod(info, method), result)
     return result
+
+
+def get_events_by_plugin(name):
+    """Return all events plugin :name: hooks"""
+    plugin = get_plugin_by_name(name)
+    events = []
+    for event_name, event in EVENT_METHODS.iteritems():
+        if hasattr(plugin.instance, event):
+            events.append(event_name)
+    return events
 
 
 def get_plugins_by_group(group):

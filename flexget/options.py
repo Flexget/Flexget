@@ -27,7 +27,7 @@ class OptionParser(OptParser):
         self.add_option('--reset', action='store_true', dest='reset', default=0,
                         help='Forgets everything that has been done and learns current matches.')
         self.add_option('--doc', action='store', dest='doc',
-                        metavar='PLUGIN', help='Display plugin documentation (example: --doc patterns). See also --list.')
+                        metavar='PLUGIN', help='Display plugin documentation. See also --plugins.')
         self.add_option('--failed', action='store_true', dest='failed', default=0,
                         help='List recently failed entries.')
         self.add_option('--clear', action='store_true', dest='clear_failed', default=0,

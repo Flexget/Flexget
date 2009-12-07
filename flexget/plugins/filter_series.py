@@ -977,7 +977,7 @@ register_parser_option('--series', action='callback', callback=SeriesReport.opti
                        help='Display series summary.')
 
 register_parser_option('--series-forget', action='callback', callback=SeriesForget.optik_series_forget,
-                       help='Remove complete series or single episode from database. <Series> [episode]')
+                       help='Remove complete series or single episode from database: <NAME> [EPISODE]')
 
 register_parser_option('--stop-waiting', action='store', dest='stop_waiting', default=False,
                        metavar='NAME', help='Stop timeframe for a given series.')

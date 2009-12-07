@@ -1,24 +1,29 @@
-import re, urllib2, logging
+import re
+import urllib2
+import logging
 from flexget.plugins.module_resolver import ResolverException
 from flexget.plugin import *
 from flexget.utils.soup import get_soup
 
 log = logging.getLogger('google_cse')
 
+
 class ResolveGoogleCse:
     """Google custom query resolver."""
 
     # resolver API
     def resolvable(self, feed, entry):
-        if entry['url'].startswith('http://www.google.com/cse?'): return True
-        if entry['url'].startswith('http://www.google.com/custom?'): return True
+        if entry['url'].startswith('http://www.google.com/cse?'):
+            return True
+        if entry['url'].startswith('http://www.google.com/custom?'):
+            return True
         return False
         
     # resolver API
     def resolve(self, feed, entry):
         try:
             # need to fake user agent
-            txheaders =  {'User-agent' : 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'}
+            txheaders = {'User-agent': 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'}
             req = urllib2.Request(entry['url'], None, txheaders)
             page = urllib2.urlopen(req)
             soup = get_soup(page)
