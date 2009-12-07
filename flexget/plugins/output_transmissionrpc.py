@@ -24,7 +24,8 @@ class PluginTransmissionrpc:
         advanced = root.accept('dict')
         advanced.accept('text', key='host', required=True)
         advanced.accept('number', key='port', required=True)
-        advanced.accept('file', key='netrc', required=True)
+        """note that password is optional in transmission"""
+        advanced.accept('file', key='netrc', required=False) 
         return root
 
     def on_feed_output(self, feed):
@@ -41,7 +42,6 @@ class PluginTransmissionrpc:
             
         conf = feed.config['transmissionrpc']
 
-        # why is netrc required always? .. or at all
         if 'netrc' in conf:
   
             try:
@@ -50,13 +50,15 @@ class PluginTransmissionrpc:
                 log.error('netrc: unable to open: %s' % e.filename)
             except NetrcParseError, e:
                 log.error('netrc: %s, file: %s, line: %n' % (e.msg, e.filename, e.line))
+        else:
+            user, password = None, None
 
-            cli = transmissionrpc.Client(conf['host'], conf['port'], user, password)
+        cli = transmissionrpc.Client(conf['host'], conf['port'], user, password)
 
-            for entry in feed.accepted:
-                if entry['url'].lower().find('magnet:', 0, 7):
-                    cli.add(None, filename=entry['url'])
-                else:
-                    cli.add_url(entry['url'])
+        for entry in feed.accepted:
+            if entry['url'].lower().find('magnet:', 0, 7):
+                cli.add(None, filename=entry['url'])
+            else:
+                cli.add_url(entry['url'])
 
 register_plugin(PluginTransmissionrpc, 'transmissionrpc')
