@@ -46,6 +46,11 @@ class InputInject:
             elif index == 2:
                 InputInject.options['url'] = arg
             elif index == 3:
+                if arg.lower() == 'accept':
+                    InputInject.options['accept'] = True
+                else:
+                    InputInject.options['accept'] = str_to_boolean(arg)
+            elif index == 4:
                 if arg.lower() == 'force':
                     InputInject.options['force'] = True
                 else:
@@ -81,7 +86,11 @@ class InputInject:
 
         feed.entries.append(entry)
 
+        if InputInject.options.get('accept', False):
+            feed.accept(entry, '--inject accepted')
+
+
 register_plugin(InputInject, '--inject', debug=True, builtin=True, priorities={'input': 255})
 
 register_parser_option('--inject', action='callback', callback=InputInject.optik_series,
-                       help='Injects entry to all executed feeds: <TITLE> [URL] [FORCE]')
+                       help='Injects entry to all executed feeds: <TITLE> [URL] [ACCEPT] [FORCE]')
