@@ -8,14 +8,16 @@ log = logging.getLogger('transmissionrpc')
 
 class PluginTransmissionrpc:
     """
-        Add url from entry url to transmission
+      Add url from entry url to transmission
      
-        Example: 
+      Example: 
     
-        transmissionrpc:
-          host: localhost
-          port: 9091
-          netrc: /home/flexget/.tmnetrc
+      transmissionrpc:
+        host: localhost
+        port: 9091
+        netrc: /home/flexget/.tmnetrc
+        username: myusername
+        password: mypassword
     """
 
     def validator(self):
@@ -26,6 +28,8 @@ class PluginTransmissionrpc:
         advanced.accept('number', key='port', required=True)
         """note that password is optional in transmission"""
         advanced.accept('file', key='netrc', required=False) 
+        advanced.accept('text', key='username', required=False) 
+        advanced.accept('text', key='password', required=False) 
         return root
 
     def on_feed_output(self, feed):
@@ -42,6 +46,8 @@ class PluginTransmissionrpc:
             
         conf = feed.config['transmissionrpc']
 
+        user, password = None, None
+
         if 'netrc' in conf:
   
             try:
@@ -50,8 +56,13 @@ class PluginTransmissionrpc:
                 log.error('netrc: unable to open: %s' % e.filename)
             except NetrcParseError, e:
                 log.error('netrc: %s, file: %s, line: %n' % (e.msg, e.filename, e.line))
+       
         else:
-            user, password = None, None
+
+            if 'username' in conf: 
+                user = conf['username']
+            if 'password' in conf: 
+                password = conf['password']
 
         cli = transmissionrpc.Client(conf['host'], conf['port'], user, password)
 
