@@ -33,6 +33,7 @@ class FilterExistsSeries:
     def on_feed_filter(self, feed):
         config = self.get_config(feed)
         for path in config:
+            feed.verbose_progress('Scanning %s' % path, log)
             path = os.path.expanduser(path)
             if not os.path.exists(path):
                 raise PluginWarning('Path %s does not exist' % path, log)
@@ -41,7 +42,7 @@ class FilterExistsSeries:
                 # convert filelists into utf-8 to avoid unicode problems
                 dirs = [x.decode('utf-8', 'ignore') for x in dirs]
                 files = [x.decode('utf-8', 'ignore') for x in files]
-                for entry in feed.entries:
+                for entry in feed.entries + feed.accepted:
                     if 'series_parser' in entry:
                         for name in files + dirs:
                             # make new parser from parser in entry
