@@ -125,6 +125,8 @@ class ReactorThread(Process):
                 password=connection.password)
             d.addCallback(on_connect_success).addErrback(on_connect_fail)
             reactor.run()
+        elif connection == 'end':
+            log.debug('Ending deluge child process.')
         else:
             self.tocore.put('connectfail')
         
@@ -374,6 +376,11 @@ class OutputDeluge:
         """ Sends signal to shutdown reactorthread """
         if self.deluge12:
             self.toreactor.put('end')
+            try:
+                item = self.fromreactor.get(False)
+                item = self.toreactor.get(False)
+            except Empty:
+                pass
             self.deluge12 = False
 
 register_plugin(OutputDeluge, 'deluge', priorities=dict(output=1))
