@@ -82,11 +82,13 @@ class InputInject:
         else:
             entry['url'] = 'http://localhost/inject/%s' % ''.join([random.choice(string.letters + string.digits) for x in range(1, 30)])
         if InputInject.options.get('force', False):
+            log.debug('setting injection as immortal')
             entry['immortal'] = True
 
         feed.entries.append(entry)
 
         if InputInject.options.get('accept', False):
+            log.debug('accepting the injection')
             feed.accept(entry, '--inject accepted')
 
 

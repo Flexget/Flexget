@@ -107,6 +107,9 @@ class Manager:
                     lines = 0
                     if e.problem is not None:
                         print ' Reason: %s\n' % e.problem
+                        if e.problem == 'mapping values are not allowed here':
+                            print ' ----> MOST LIKELY REASON: Missing : from end of the line!'
+                            print ''
                     if e.context_mark is not None:
                         print ' Check configuration near line %s, column %s' % (e.context_mark.line, e.context_mark.column)
                         lines += 1
@@ -116,7 +119,7 @@ class Manager:
                     if lines:
                         print ''
                     if lines == 1:
-                        print ' Fault is almost always in this line or previous\n'
+                        print ' Fault is almost always in this or previous line\n'
                     if lines == 2:
                         print ' Fault is almost always in one of these lines or previous ones\n'
                     if self.options.debug:
