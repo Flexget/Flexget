@@ -376,11 +376,13 @@ class OutputDeluge:
         """ Sends signal to shutdown reactorthread """
         if self.deluge12:
             self.toreactor.put('end')
+            # Make sure both queues are empty, so processes terminate properly.
             try:
                 item = self.fromreactor.get(False)
                 item = self.toreactor.get(False)
             except Empty:
                 pass
+            self.reactorthread.terminate()
             self.deluge12 = False
 
 register_plugin(OutputDeluge, 'deluge', priorities=dict(output=1))
