@@ -3,6 +3,7 @@ from flexget.plugin import *
 
 log = logging.getLogger('include')
 
+
 class PluginInclude:
     """
     Include configuration from another yaml file.
@@ -37,4 +38,4 @@ class PluginInclude:
             except MergeException:
                 raise PluginError('Failed to merge include file to feed %s, incompatible datatypes' % (feed.name))
 
-register_plugin(PluginInclude, 'include', builtin=True, priorities=dict(start=255))
+register_plugin(PluginInclude, 'include', builtin=True, priorities=dict(process_start=255))

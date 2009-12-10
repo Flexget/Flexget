@@ -3,6 +3,7 @@ from flexget.plugin import *
 
 log = logging.getLogger('preset')
 
+
 class PluginPreset:
     """
         Use presets.
@@ -65,11 +66,12 @@ class PluginPreset:
             except MergeException:
                 raise PluginError('Failed to merge preset %s to feed %s, incompatible datatypes' % (preset, feed.name))
                 
+                
 class DisablePlugin:
     """
-	Allows disabling plugins when using presets.
+    Allows disabling plugins when using presets.
 
-	Example:
+    Example:
 
         movies:
           download: ~/torrents/movies/
@@ -90,26 +92,25 @@ class DisablePlugin:
     
     def validator(self):
         from flexget import validator
-	root = validator.factory()
-	root.accept('text')
-	presets = root.accept('list')
-	presets.accept('text')
-	return root
+    root = validator.factory()
+    root.accept('text')
+    presets = root.accept('list')
+    presets.accept('text')
+    return root
     
     def on_feed_start(self, feed):
         config = feed.config['disable_plugin']
-	if isinstance(config, basestring):
-	    config = [config]
-	# let's disable them
-	for disable in config:
-	    if disable in feed.config:
-		log.debug('disabling %s' % disable)
-		del(feed.config[disable])
+    if isinstance(config, basestring):
+        config = [config]
+    # let's disable them
+    for disable in config:
+        if disable in feed.config:
+            log.debug('disabling %s' % disable)
+            del(feed.config[disable])
 
-register_plugin(PluginPreset, 'preset', builtin=True, priorities={'start': 255})
-register_plugin(DisablePlugin, 'disable_plugin', priorities={'start': 250})
+register_plugin(PluginPreset, 'preset', builtin=True, priorities={'process_start': 255})
+register_plugin(DisablePlugin, 'disable_plugin', priorities={'process_start': 250})
 
 
 register_parser_option('--preset', action='store', dest='preset', default=False,
                        metavar='NAME', help='Execute feeds with given preset.')
-
