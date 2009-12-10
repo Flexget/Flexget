@@ -59,6 +59,8 @@ class InputHtml:
     def create_entries(self, feed, pageurl, soup, config):
 
         entries = []
+        duplicates = {}
+        duplicate_limit = 4
 
         def title_exists(title):
             """Helper method. Return True if title is already added to entries"""
@@ -113,11 +115,14 @@ class InputHtml:
             else:
                 # automatic mode, check if title is unique
                 if title_exists(title):
-                    log.info('Link names seem to be useless, auto-enabling \'title_from: url\'')
-                    config['title_from'] = 'url'
-                    # start from the beginning  ...
-                    self.create_entries(feed, pageurl, soup, config)
-                    return
+                    duplicates.setdefault(title, 0)
+                    duplicates[title] += 1
+                    if duplicates[title] > duplicate_limit:
+                        log.info('Link names seem to be useless, auto-enabling \'title_from: url\'')
+                        config['title_from'] = 'url'
+                        # start from the beginning  ...
+                        self.create_entries(feed, pageurl, soup, config)
+                        return
 
             if title_exists(title):
                 # title link should be unique, add CRC32 to end if it's not
