@@ -92,21 +92,21 @@ class DisablePlugin:
     
     def validator(self):
         from flexget import validator
-    root = validator.factory()
-    root.accept('text')
-    presets = root.accept('list')
-    presets.accept('text')
-    return root
+        root = validator.factory()
+        root.accept('text')
+        presets = root.accept('list')
+        presets.accept('text')
+        return root
     
     def on_feed_start(self, feed):
         config = feed.config['disable_plugin']
-    if isinstance(config, basestring):
-        config = [config]
-    # let's disable them
-    for disable in config:
-        if disable in feed.config:
-            log.debug('disabling %s' % disable)
-            del(feed.config[disable])
+        if isinstance(config, basestring):
+            config = [config]
+        # let's disable them
+        for disable in config:
+            if disable in feed.config:
+                log.debug('disabling %s' % disable)
+                del(feed.config[disable])
 
 register_plugin(PluginPreset, 'preset', builtin=True, priorities={'process_start': 255})
 register_plugin(DisablePlugin, 'disable_plugin', priorities={'process_start': 250})
