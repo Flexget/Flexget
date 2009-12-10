@@ -225,6 +225,14 @@ class OutputDeluge:
             if not result:
                 # TODO: connect failed? do something
                 pass
+            if feed.manager.options.test:
+            
+                def on_disconnect(result):
+                    log.debug('Done adding torrents to deluge.' % result)
+                    reactor.callLater(0.1, pause_reactor, 0)
+                    
+                client.disconnect().addCallback(on_disconnect)
+                return
                 
             def on_success(torrent_id, entry, opts):
                 if not torrent_id:
@@ -287,7 +295,7 @@ class OutputDeluge:
                     log.debug('Done adding torrents to deluge.' % result)
                     reactor.callLater(0.1, pause_reactor, 0)
                     
-                client.disconnect().addCallback(on_disconnect).addErrback(on_disconnect)
+                client.disconnect().addCallback(on_disconnect)
 
             defer.DeferredList(dlist).addCallback(on_complete)
             
