@@ -115,6 +115,9 @@ class InputHtml:
             else:
                 # automatic mode, check if title is unique
                 if title_exists(title):
+                    # ignore index links as a counter
+                    if 'index' in title and len(title) < 10:
+                        continue
                     duplicates.setdefault(title, 0)
                     duplicates[title] += 1
                     if duplicates[title] > duplicate_limit:
