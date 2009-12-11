@@ -65,7 +65,6 @@ class SeriesPlugin(object):
             filter(Series.name == parser.name.lower()).filter(Episode.identifier == parser.identifier).first()
         return episode.first_seen
 
-    # TODO: profiled to be a bottleneck! ~9seconds & 2000+ calls ?
     def get_latest_info(self, session, name):
         """Return latest known identifier in dict (season, episode) for series name"""
         episode = session.query(Episode).select_from(join(Episode, Series)).\
@@ -517,8 +516,15 @@ class FilterSeries(SeriesPlugin):
             for series_item in group_series:
                 series_name, series_config = series_item.items()[0]
                 log.log(5, 'series_name: %s series_config: %s' % (series_name, series_config))
+
+                import time
+                start_time = time.clock()
+
                 series = self.parse_series(feed, series_name, series_config)
                 self.process_series(feed, series, series_name, series_config)
+
+                took = time.clock() - start_time
+                log.debug('processing %s took %s' % (series_name, took))
 
     def parse_series(self, feed, series_name, config):
         """
@@ -546,21 +552,18 @@ class FilterSeries(SeriesPlugin):
 
             return cmp(index(a), index(b))
 
+        # determine if series is known to be in season, episode format
+        expect_ep = False
+        latest = self.get_latest_info(feed.session, series_name)
+        if latest:
+            if latest.get('season') and latest.get('episode'):
+                log.debug('auto enabling expect_ep for %s' % series_name)
+                expect_ep = True
+
         # key: series (episode) identifier ie. S01E02
         # value: seriesparser
         series = {}
         for entry in feed.entries:
-
-            # determine if series is known to be in season, episode format
-            # note: inside the loop for better handling multiple new eps
-            # ie. after first season, episode release we stick with expect_ep
-            expect_ep = False
-            latest = self.get_latest_info(feed.session, series_name)
-            if latest:
-                if latest.get('season') and latest.get('episode'):
-                    log.log(5, 'enabling expect_ep for %s' % series_name)
-                    expect_ep = True
-
             for field, data in sorted(entry.items(), cmp=field_order):
                 # skip invalid fields
                 if not isinstance(data, basestring) or not data:
@@ -591,6 +594,13 @@ class FilterSeries(SeriesPlugin):
                     break
             else:
                 continue
+
+            # check for auto enable expect_ep
+            if not expect_ep:
+                if parser.season and parser.episode:
+                    expect_ep = True
+                    log.debug('auto enabling expect_ep for %s' % series_name)
+
 
             # add series, season and episode to entry
             entry['series_name'] = series_name
