@@ -98,7 +98,7 @@ class OutputDeluge:
                 log.info("Using deluge 1.2 api")
                 self.deluge12 = True
             else:
-                log.info("Using deluge 1.1 api foofoo")
+                log.info("Using deluge 1.1 api")
                 self.deluge12 = False
                 
     def on_feed_download(self, feed):
