@@ -28,6 +28,15 @@ class OutputDeluge:
         deluge.accept('text', key='movedone')
         deluge.accept('text', key='label')
         deluge.accept('boolean', key='queuetotop')
+        deluge.accept('boolean', key='automanaged')
+        deluge.accept('decimal', key='maxupspeed')
+        deluge.accept('decimal', key='maxdownspeed')
+        deluge.accept('number', key='maxconnections')
+        deluge.accept('number', key='maxupslots')
+        deluge.accept('decimal', key='ratio')
+        deluge.accept('boolean', key='removeatratio')
+        deluge.accept('boolean', key='addpaused')
+        deluge.accept('boolean', key='compact')
         deluge.accept('boolean', key='enabled')
         return root
 
@@ -43,12 +52,18 @@ class OutputDeluge:
         config.setdefault('path', '')
         config.setdefault('movedone', '')
         config.setdefault('label', '')
-        config.setdefault('queuetotop', False)
+        config.setdefault('queuetotop', None)
+        for key in self.options.iterkeys():
+            config.setdefault(key, None)
         return config
 
     def __init__(self):
         self.deluge12 = False
         self.reactorRunning = 0
+        self.options = {'maxupspeed': 'max_upload_speed', 'maxdownspeed': 'max_download_speed', \
+            'maxconnections': 'max_connections', 'maxupslots': 'max_upload_slots', \
+            'automanaged': 'auto_managed', 'ratio': 'stop_ratio', 'removeatratio': 'remove_at_ratio', \
+            'addpaused': 'add_paused', 'compact': 'compact_allocation'}
 
     def on_process_start(self, feed):
         """
@@ -56,8 +71,11 @@ class OutputDeluge:
             is loaded, start the reactor process if using the deluge 1.2 api.
         """
         set_plugin = get_plugin_by_name('set')
-        set_plugin.instance.register_keys({'path': 'text', 'movedone': 'text', \
-            'queuetotop': 'boolean', 'label': 'text'})
+        set_plugin.instance.register_keys({'path': 'text', 'btclient_movedone': 'text', \
+            'btclient_queuetotop': 'boolean', 'btclient_label': 'text', 'btclient_automanaged': 'boolean', \
+            'btclient_maxupspeed': 'decimal', 'btclient_maxdownspeed': 'decimal', 'btclient_maxupslots': 'number', \
+            'btclient_maxconnections': 'number', 'btclient_ratio': 'decimal', 'btclient_removeatratio': 'boolean', \
+            'btclient_addpaused': 'boolean', 'btclient_compact': 'boolean'})
         if not self.deluge12:
             try:
                 from deluge.ui.client import sclient
@@ -139,7 +157,6 @@ class OutputDeluge:
             raise PluginError('Deluge module required', log)
 
         sclient.set_core_uri()
-        opts = {}
         for entry in feed.accepted:
             try:
                 before = sclient.get_session_state()
@@ -147,9 +164,16 @@ class OutputDeluge:
                 raise PluginError('Could not communicate with deluge core. %s' % msg, log)
             if feed.manager.options.test:
                 return
+            opts = {}
             path = entry.get('path', config['path'])
             if path:
                 opts['download_location'] = os.path.expanduser(path % entry)
+            for fopt, dopt in self.options.iteritems():
+                value = entry.get('btclient_' + fopt, config[fopt])
+                if value != None:
+                    opts[dopt] = value
+                    if fopt == 'ratio':
+                        opts['stop_at_ratio'] = True
             
             # check that file is downloaded
             if not 'file' in entry:
@@ -171,9 +195,9 @@ class OutputDeluge:
                 os.remove(entry['file'])
                 del(entry['file'])
                 
-            movedone = entry.get('movedone', config['movedone'])
-            label = entry.get('label', config['label']).lower()
-            queuetotop = entry.get('queuetotop', config['queuetotop'])
+            movedone = entry.get('btclient_movedone', config['movedone'])
+            label = entry.get('btclient_label', config['label']).lower()
+            queuetotop = entry.get('btclient_queuetotop', config['queuetotop'])
 
             # Sometimes deluge takes a moment to add the torrent, wait a second.
             time.sleep(2)
@@ -202,17 +226,20 @@ class OutputDeluge:
                 
     def add_to_deluge12(self, feed, config):
     
-        """ This is the new add to deluge method, using iterate """
+        """ This is the new add to deluge method, using reactor.iterate """
         
         from deluge.ui.client import client
         from twisted.internet import reactor, defer
         
         def start_reactor():
+            #if this is the first this function is being called, we have to call startRunning
             if self.reactorRunning < 2:
                 reactor.startRunning(True)
             self.reactorRunning = 1
             while self.reactorRunning == 1:
                 reactor.iterate()
+            #if there was an error requiring an exception during reactor running, it should be
+            #   thrown here so the reactor loop doesn't exit prematurely
             if self.reactorRunning < 0:
                 self.reactorRunning = 2
                 raise PluginError('Could not connect to deluge daemon', log)
@@ -236,7 +263,7 @@ class OutputDeluge:
                 
             def on_success(torrent_id, entry, opts):
                 if not torrent_id:
-                    log.info("%s is already loaded in deluge, cannot set movedone, label, or queuetotop." % entry['title'])
+                    log.info("%s is already loaded in deluge, cannot set options." % entry['title'])
                     return
                 log.info("%s successfully added to deluge." % entry['title'])
                 if opts['movedone']:
@@ -251,9 +278,13 @@ class OutputDeluge:
                     client.label.add(opts['label'])
                     client.label.set_torrent(torrent_id, opts['label'])
                     log.debug("%s label set to '%s'" % (entry['title'], opts['label']))
-                if opts['queuetotop']:
-                    client.core.queue_top([torrent_id])
-                    log.debug("%s moved to top of queue" % entry['title'])
+                if opts['queuetotop'] != None:
+                    if opts['queuetotop']:
+                        client.core.queue_top([torrent_id])
+                        log.debug("%s moved to top of queue" % entry['title'])
+                    else:
+                        client.core.queue_bottom([torrent_id])
+                        log.debug("%s moved to bottom of queue" % entry['title'])
 
             def on_fail(result, feed, entry):
                 log.info("%s was not added to deluge! %s" % (entry['title'], result))
@@ -275,6 +306,12 @@ class OutputDeluge:
                 opts = {}
                 if path:
                     opts['download_location'] = path
+                for fopt, dopt in self.options.iteritems():
+                    value = entry.get('btclient_' + fopt, config[fopt])
+                    if value != None:
+                        opts[dopt] = value
+                        if fopt == 'ratio':
+                            opts['stop_at_ratio'] = True
                 addresult = client.core.add_torrent_file(entry['title'], filedump, opts)
                 # clean up temp file if download plugin is not configured for this feed
                 if not 'download' in feed.config:
@@ -283,9 +320,9 @@ class OutputDeluge:
 
                 # Make a new set of options, that get set after the torrent has been added
                 opts = {}
-                opts['movedone'] = os.path.expanduser(entry.get('movedone', config['movedone']) % entry)
-                opts['label'] = entry.get('label', config['label']).lower()
-                opts['queuetotop'] = entry.get('queuetotop', config['queuetotop'])
+                opts['movedone'] = os.path.expanduser(entry.get('btclient_movedone', config['movedone']) % entry)
+                opts['label'] = entry.get('btclient_label', config['label']).lower()
+                opts['queuetotop'] = entry.get('btclient_queuetotop', config['queuetotop'])
                 addresult.addCallback(on_success, entry, opts).addErrback(on_fail, feed, entry)
                 dlist.append(addresult)
                 
@@ -300,6 +337,7 @@ class OutputDeluge:
             defer.DeferredList(dlist).addCallback(on_complete)
             
         def on_connect_fail(result, feed):
+            log.info('connect failed result: %s' % result)
             # clean up temp file if download plugin is not configured for this feed
             if not 'download' in feed.config:
                 for entry in feed.accepted:
@@ -315,6 +353,7 @@ class OutputDeluge:
             username=config['user'],
             password=config['pass'])
 
+        #d.addCallbacks(on_connect_success, on_connect_fail, (feed), None, (feed))
         d.addCallback(on_connect_success, feed).addErrback(on_connect_fail, feed)
         start_reactor()
 
