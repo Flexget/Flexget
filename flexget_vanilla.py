@@ -1,3 +1,4 @@
+#!/usr/bin/env python 
 """
     Run FlexGet without bootstrap and virtualenv.
     

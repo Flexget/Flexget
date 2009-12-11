@@ -78,8 +78,11 @@ class OutputDeluge:
             'btclient_addpaused': 'boolean', 'btclient_compact': 'boolean'})
         if not self.deluge12:
             try:
+                log.debug("Testing for deluge 1.1 API")
                 from deluge.ui.client import sclient
+                log.debug("1.1 API found")
             except:
+                log.debug("Testing for deluge 1.2 API")
                 try:
                     from multiprocessing import Process, Queue
                 except:
@@ -95,7 +98,7 @@ class OutputDeluge:
                 log.info("Using deluge 1.2 api")
                 self.deluge12 = True
             else:
-                log.info("Using deluge 1.1 api")
+                log.info("Using deluge 1.1 api foofoo")
                 self.deluge12 = False
                 
     def on_feed_download(self, feed):
