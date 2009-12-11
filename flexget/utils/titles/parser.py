@@ -13,7 +13,7 @@ class TitleParser(object):
     qualities = ['1080p', '1080', '720p', '720', 'hr', 'dvd', 'bdrip', 'dvdrip', 'hdtv', 
                  'pdtv', 'dsr', 'dsrip', 'unknown']
     
-    propers = ['proper', 'repack', 'rerip']
+    propers = ['proper', 'repack', 'rerip', 'real']
     
     specials = ['special']
     
