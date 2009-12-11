@@ -71,11 +71,11 @@ class OutputDeluge:
             is loaded, start the reactor process if using the deluge 1.2 api.
         """
         set_plugin = get_plugin_by_name('set')
-        set_plugin.instance.register_keys({'path': 'text', 'btclient_movedone': 'text', \
-            'btclient_queuetotop': 'boolean', 'btclient_label': 'text', 'btclient_automanaged': 'boolean', \
-            'btclient_maxupspeed': 'decimal', 'btclient_maxdownspeed': 'decimal', 'btclient_maxupslots': 'number', \
-            'btclient_maxconnections': 'number', 'btclient_ratio': 'decimal', 'btclient_removeatratio': 'boolean', \
-            'btclient_addpaused': 'boolean', 'btclient_compact': 'boolean'})
+        set_plugin.instance.register_keys({'path': 'text', 'movedone': 'text', \
+            'queuetotop': 'boolean', 'label': 'text', 'automanaged': 'boolean', \
+            'maxupspeed': 'decimal', 'maxdownspeed': 'decimal', 'maxupslots': 'number', \
+            'maxconnections': 'number', 'ratio': 'decimal', 'removeatratio': 'boolean', \
+            'addpaused': 'boolean', 'compact': 'boolean'})
         if not self.deluge12:
             try:
                 log.debug("Testing for deluge 1.1 API")
@@ -172,7 +172,7 @@ class OutputDeluge:
             if path:
                 opts['download_location'] = os.path.expanduser(path % entry)
             for fopt, dopt in self.options.iteritems():
-                value = entry.get('btclient_' + fopt, config[fopt])
+                value = entry.get(fopt, config[fopt])
                 if value != None:
                     opts[dopt] = value
                     if fopt == 'ratio':
@@ -198,9 +198,9 @@ class OutputDeluge:
                 os.remove(entry['file'])
                 del(entry['file'])
                 
-            movedone = entry.get('btclient_movedone', config['movedone'])
-            label = entry.get('btclient_label', config['label']).lower()
-            queuetotop = entry.get('btclient_queuetotop', config['queuetotop'])
+            movedone = entry.get('movedone', config['movedone'])
+            label = entry.get('label', config['label']).lower()
+            queuetotop = entry.get('queuetotop', config['queuetotop'])
 
             # Sometimes deluge takes a moment to add the torrent, wait a second.
             time.sleep(2)
@@ -310,7 +310,7 @@ class OutputDeluge:
                 if path:
                     opts['download_location'] = path
                 for fopt, dopt in self.options.iteritems():
-                    value = entry.get('btclient_' + fopt, config[fopt])
+                    value = entry.get(fopt, config[fopt])
                     if value != None:
                         opts[dopt] = value
                         if fopt == 'ratio':
@@ -323,9 +323,9 @@ class OutputDeluge:
 
                 # Make a new set of options, that get set after the torrent has been added
                 opts = {}
-                opts['movedone'] = os.path.expanduser(entry.get('btclient_movedone', config['movedone']) % entry)
-                opts['label'] = entry.get('btclient_label', config['label']).lower()
-                opts['queuetotop'] = entry.get('btclient_queuetotop', config['queuetotop'])
+                opts['movedone'] = os.path.expanduser(entry.get('movedone', config['movedone']) % entry)
+                opts['label'] = entry.get('label', config['label']).lower()
+                opts['queuetotop'] = entry.get('queuetotop', config['queuetotop'])
                 addresult.addCallback(on_success, entry, opts).addErrback(on_fail, feed, entry)
                 dlist.append(addresult)
                 
