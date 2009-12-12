@@ -52,9 +52,6 @@ class OutputDeluge:
         config.setdefault('path', '')
         config.setdefault('movedone', '')
         config.setdefault('label', '')
-        config.setdefault('queuetotop', None)
-        for key in self.options.iterkeys():
-            config.setdefault(key, None)
         return config
 
     def __init__(self):
@@ -172,7 +169,7 @@ class OutputDeluge:
             if path:
                 opts['download_location'] = os.path.expanduser(path % entry)
             for fopt, dopt in self.options.iteritems():
-                value = entry.get(fopt, config[fopt])
+                value = entry.get(fopt, config.get(fopt))
                 if value != None:
                     opts[dopt] = value
                     if fopt == 'ratio':
@@ -200,7 +197,7 @@ class OutputDeluge:
                 
             movedone = entry.get('movedone', config['movedone'])
             label = entry.get('label', config['label']).lower()
-            queuetotop = entry.get('queuetotop', config['queuetotop'])
+            queuetotop = entry.get('queuetotop', config.get('queuetotop'))
 
             # Sometimes deluge takes a moment to add the torrent, wait a second.
             time.sleep(2)
@@ -310,7 +307,7 @@ class OutputDeluge:
                 if path:
                     opts['download_location'] = path
                 for fopt, dopt in self.options.iteritems():
-                    value = entry.get(fopt, config[fopt])
+                    value = entry.get(fopt, config.get('fopt'))
                     if value != None:
                         opts[dopt] = value
                         if fopt == 'ratio':
@@ -325,7 +322,7 @@ class OutputDeluge:
                 opts = {}
                 opts['movedone'] = os.path.expanduser(entry.get('movedone', config['movedone']) % entry)
                 opts['label'] = entry.get('label', config['label']).lower()
-                opts['queuetotop'] = entry.get('queuetotop', config['queuetotop'])
+                opts['queuetotop'] = entry.get('queuetotop', config.get('queuetotop'))
                 addresult.addCallback(on_success, entry, opts).addErrback(on_fail, feed, entry)
                 dlist.append(addresult)
                 
