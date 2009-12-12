@@ -99,6 +99,7 @@ def _strip_trailing_sep(path):
 
 FEED_EVENTS = ['start', 'input', 'metainfo', 'filter', 'download', 'modify', 'output', 'exit']
 
+# map event names to method names
 EVENT_METHODS = {
     'start': 'on_feed_start',
     'input': 'on_feed_input',
