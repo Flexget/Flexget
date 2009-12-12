@@ -130,6 +130,7 @@ def coverage():
 @consume_args
 def release(args):
     """Make a FlexGet release. Same as bdist_egg but adds version information."""
+
     if len(args) != 1:
         print 'Version number must be specified, ie. paver release 1.0b9'
         return
@@ -152,17 +153,13 @@ def release(args):
     egg_options = ['-d', '/var/www/flexget_dist/unstable'] # hmph, how can I pass params to it? doesn't seem to work ..
     bdist_egg(egg_options)
     
-    # hack since -d does not work ..
+    # hack since -d does not work .. copy build to release folder
     import os
     import shutil
     dest = '/var/www/flexget_dist/unstable/'
-    for sname in os.listdir('dist'):
-        dname_base = sname[:-9]
-        for py in ['py2.5.egg', 'py2.6.egg']:
-            dname = dname_base + py
-            if os.path.exists(os.path.join(dest, dname)):
-                print 'Skipped copying %s, destination already exists' % dname
-            shutil.copy(os.path.join('dist', sname), os.path.join(dest, dname))
+    
+    for fname in os.listdir('dist'):
+        shutil.copy(os.path.join('dist', fname), os.path.join(dest, fname))
 
     # restore version ...
     freplace('flexget/__init__.py', "__version__ = '%s'" % ver, "__version__ = '{subversion}'")
