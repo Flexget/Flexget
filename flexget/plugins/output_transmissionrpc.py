@@ -18,6 +18,7 @@ class PluginTransmissionrpc:
         netrc: /home/flexget/.tmnetrc
         username: myusername
         password: mypassword
+        path: the download location
     """
 
     def validator(self):
@@ -30,12 +31,38 @@ class PluginTransmissionrpc:
         advanced.accept('file', key='netrc', required=False) 
         advanced.accept('text', key='username', required=False) 
         advanced.accept('text', key='password', required=False) 
+        advanced.accept('path', key='path', required=False) 
+        advanced.accept('boolean', key='addpaused', required=False) 
+        advanced.accept('number', key='maxconnections', required=False) 
+        advanced.accept('number', key='maxupspeed', required=False) 
+        advanced.accept('number', key='maxdownspeed', required=False) 
         return root
 
     def on_feed_output(self, feed):
         """ event handler """ 
         if len(feed.accepted) > 0: 
             self.add_to_transmission(feed)
+    
+    def _options(self, feed):
+        options = {}
+        options['add'] = {}
+        options['change'] = {}
+
+        conf = feed.config['transmissionrpc']
+        
+        if 'path' in conf:
+            options['add']['download_dir'] = conf['path']
+        if 'addpaused' in conf and conf['addpaused'] == 'yes': 
+            options['add']['paused'] = True
+        if 'maxconnections' in conf:
+            options['add']['peer_limit'] = conf['maxconnections']
+
+        if 'maxupspeed' in conf:
+            options['change']['uploadLimit'] = conf['maxupspeed']
+        if 'maxdownspeed' in conf:
+            options['change']['downloadLimit'] = conf['maxdownspeed']
+        
+        return options
 
     def add_to_transmission(self, feed):
         """ adds accepted entries to transmission """
@@ -45,6 +72,8 @@ class PluginTransmissionrpc:
             raise PluginError('Transmissionrpc module required.', log)
             
         conf = feed.config['transmissionrpc']
+
+        options = self._options(feed)
 
         user, password = None, None
 
@@ -67,9 +96,10 @@ class PluginTransmissionrpc:
         cli = transmissionrpc.Client(conf['host'], conf['port'], user, password)
 
         for entry in feed.accepted:
-            if entry['url'].lower().find('magnet:', 0, 7):
-                cli.add(None, filename=entry['url'])
-            else:
-                cli.add_url(entry['url'])
+            r = cli.add(None, 30, filename=entry['url'], **options['add'])
+            
+            if len(options['change'].keys()) > 0:
+                for id in r.keys():
+                    cli.change(id, 30, **options['change'])
 
 register_plugin(PluginTransmissionrpc, 'transmissionrpc')
