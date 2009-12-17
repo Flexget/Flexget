@@ -1,5 +1,5 @@
 import logging
-from flexget.plugin import plugins
+from flexget.plugin import plugins, FEED_EVENTS
 from flexget.plugin import *
 
 log = logging.getLogger('priority')
@@ -45,12 +45,13 @@ class PluginPriority:
             # store original values
             self.priorities[name] = plugins[name].priorities.copy()
             
-            # modify original values
-            for event in plugins[name].priorities.iterkeys():
+            # set all event priorities to given value,
+            # creates also event priority values if they've not been given (=absent from priorities)
+            for event in FEED_EVENTS:
                 plugins[name].priorities[event] = priority
 
         log.debug('Changed priority for: %s' % ', '.join(names))
-    
+
     def on_feed_exit(self, feed):
         names = []
         for name, original in self.priorities.iteritems():

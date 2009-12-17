@@ -97,6 +97,8 @@ class internet(object):
 def _strip_trailing_sep(path):
     return path.rstrip("\\/")
 
+DEFAULT_PRIORITY = 128
+
 FEED_EVENTS = ['start', 'input', 'metainfo', 'filter', 'download', 'modify', 'output', 'exit']
 
 # map event names to method names
@@ -208,9 +210,9 @@ class PluginInfo(dict):
         self.debug = debug
 
         self.events = False
-        for method in EVENT_METHODS.itervalues():
-            if hasattr(instance, method):
-                if callable(getattr(instance, method)):
+        for method_name in EVENT_METHODS.itervalues():
+            if hasattr(instance, method_name):
+                if callable(getattr(instance, method_name)):
                     self.events = True
                     break
 
@@ -236,9 +238,11 @@ class PluginMethod(object):
         while also allowing accessing the plugin's attributes directly.
     """
 
-    def __init__(self, plugin, method_name):
+    def __init__(self, plugin, method_name, event_name):
         self.plugin = plugin
         self.method_name = method_name
+        self.event_name = event_name
+        self.priority = plugin.priorities.get(event_name, DEFAULT_PRIORITY)
 
     def __getattr__(self, attr):
         if attr in self.plugin:
@@ -255,7 +259,7 @@ class PluginMethod(object):
         return getattr(self.plugin.instance, self.method_name)(*args, **kwargs)
 
     def __str__(self):
-        return '<PluginMethod(name=%s,method=%s)>' % (self.plugin['name'], self.method_name)
+        return '<PluginMethod(name=%s,method=%s,priority=%s)>' % (self.plugin['name'], self.method_name, self.priority)
 
     __repr__ = __str__
 
@@ -355,15 +359,16 @@ def get_plugins_by_event(event):
     result = []
     if not event in EVENT_METHODS:
         raise Exception('Unknown event %s' % event)
-    method = EVENT_METHODS[event]
+    method_name = EVENT_METHODS[event]
     for info in plugins.itervalues():
         instance = info.instance
-        if not hasattr(instance, method):
+        if not hasattr(instance, method_name):
             continue
-        if callable(getattr(instance, method)):
+        if callable(getattr(instance, method_name)):
             result.append(info)
-    result.sort(lambda x, y: cmp(x.get('priorities', {}).get(event, 0), \
-                                 y.get('priorities', {}).get(event, 0)), reverse=True)
+    # sort plugins into proper order
+    result.sort(lambda x, y: cmp(x.get('priorities', {}).get(event, DEFAULT_PRIORITY), \
+                                 y.get('priorities', {}).get(event, DEFAULT_PRIORITY)), reverse=True)
     return result
 
 
@@ -379,10 +384,11 @@ def get_methods_by_event(event):
             continue
         if callable(getattr(instance, method)):
             result.append(info)
-    result.sort(lambda x, y: cmp(x.get('priorities', {}).get(event, 0), \
-                                 y.get('priorities', {}).get(event, 0)), reverse=True)
-    result = map(lambda info: PluginMethod(info, method), result)
-    return result
+    # sort plugins into proper order
+    result.sort(lambda x, y: cmp(x.get('priorities', {}).get(event, DEFAULT_PRIORITY), \
+                                 y.get('priorities', {}).get(event, DEFAULT_PRIORITY)), reverse=True)
+    # create plugin methods from the result
+    return map(lambda info: PluginMethod(info, method, event), result)
 
 
 def get_events_by_plugin(name):
