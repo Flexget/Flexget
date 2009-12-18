@@ -68,17 +68,21 @@ class InputBacklog:
 
     def learn_backlog(self, feed, amount=''):
         """Learn current entries into backlog. All feed inputs must have been executed."""
-        expire_time = datetime.now() + self.get_amount(feed.config.get('backlog', amount))
         for entry in feed.entries:
-            if not feed.session.query(BacklogEntry).filter(BacklogEntry.title == entry['title']).\
-                                                    filter(BacklogEntry.feed == feed.name).first():
-                log.debug('Saving %s' % entry['title'])
-                backlog_entry = BacklogEntry()
-                backlog_entry.title = entry['title']
-                backlog_entry.entry = entry
-                backlog_entry.feed = feed.name
-                backlog_entry.expire = expire_time
-                feed.session.add(backlog_entry)        
+            self.add_backlog(feed, entry, amount)
+
+    def add_backlog(self, feed, entry, amount=''):
+        """Add single entry to feed backlog"""
+        expire_time = datetime.now() + self.get_amount(feed.config.get('backlog', amount))
+        if not feed.session.query(BacklogEntry).filter(BacklogEntry.title == entry['title']).\
+                                                filter(BacklogEntry.feed == feed.name).first():
+            log.debug('Saving %s' % entry['title'])
+            backlog_entry = BacklogEntry()
+            backlog_entry.title = entry['title']
+            backlog_entry.entry = entry
+            backlog_entry.feed = feed.name
+            backlog_entry.expire = expire_time
+            feed.session.add(backlog_entry)
         
     on_feed_input = inject_backlog
     on_feed_filter = learn_backlog

@@ -505,10 +505,6 @@ class FilterSeries(SeriesPlugin):
         for series in feed.session.query(Series).all():
             series.name = series.name.lower()
 
-        # add current entries into backlog memory
-        if self.backlog:
-            self.backlog.learn_backlog(feed, '14 days') # TODO: backlog length could be largest timeframe present
-
         config = self.generate_config(feed)
         self.auto_exact(config)
 
@@ -926,6 +922,10 @@ class FilterSeries(SeriesPlugin):
             log.debug('timeframe waiting %s episode %s, rejecting all occurrences' % (series_name, best.identifier))
             for ep in eps:
                 feed.reject(self.parser2entry[ep], 'timeframe is waiting')
+                # add entry to backlog (backlog prevents duplicates)
+                # TODO: backlog length could calculated from timeframe legnth!
+                if self.backlog:
+                    self.backlog.add_backlog(feed, self.parser2entry[ep], '14 days')
             return True
 
     # TODO: whitelist deprecated ?
