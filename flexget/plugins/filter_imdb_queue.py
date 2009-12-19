@@ -73,7 +73,7 @@ class FilterImdbQueue:
                 if item:
                     entry['immortal'] = item.immortal
                     log.info("Accepting %s from queue with quality %s. Force: %s" % (entry['title'], entry['quality'], entry['immortal']))
-                    feed.accept(entry, 'imdb-queue - force: ' % entry['immortal'])
+                    feed.accept(entry, 'imdb-queue - force: %s' % entry['immortal'])
                     # and remove from database
                     feed.session.delete(item)
                 else:
