@@ -5,6 +5,7 @@ import re
 import feedparser
 import urllib2
 import httplib
+import socket
 from flexget.feed import Entry
 from flexget.plugin import *
 from flexget.utils.log import log_once
@@ -104,12 +105,19 @@ class InputRSS:
             log.debug('Sending last-modified %s for feed %s' % (etag, feed.name))
         """
 
+        # set timeout to one minute
+        orig_timout = socket.getdefaulttimeout()
+        socket.setdefaulttimeout(60)
+
         # get the feed & parse
         if urllib2._opener:
             rss = feedparser.parse(url, etag=etag, modified=modified,
-                    handlers=urllib2._opener.handlers)
+                handlers=urllib2._opener.handlers)
         else:
             rss = feedparser.parse(url, etag=etag, modified=modified)
+
+        # restore original timeout
+        socket.setdefaulttimeout(orig_timout)
 
         # status checks
         status = rss.get('status', False)
