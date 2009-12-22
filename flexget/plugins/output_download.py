@@ -135,8 +135,8 @@ class PluginDownload:
                         log.info('Downloading: %s' % entry['title'])
                     # check if entry must have a path (download: yes)
                     if 'require_path' in config and 'path' not in entry:
-                        log.info('%s can\'t be downloaded, no path specified for it' % entry['title'])
-                        feed.fail(entry, 'no path specified')
+                        log.info('%s can\'t be downloaded, no path specified for entry' % entry['title'])
+                        feed.fail(entry, 'no path specified for entry')
                         continue
                     self.download(feed, entry)
             except urllib2.HTTPError, e:
