@@ -21,7 +21,7 @@ class ModifySet:
     def validator(self):
         from flexget import validator
         v = validator.factory('dict')
-        v.accept_any_key('text')
+        v.accept_any_key('any')
         return v
 
     def register_key(self, key, type='text'):
@@ -39,7 +39,11 @@ class ModifySet:
         for key, value in keys.iteritems():
             self.register_key(key, value)
 
-    def on_feed_modify(self, feed):
+    def on_feed_filter(self, feed):
+        """
+        Adds the set dict to all accepted entries. This is not really a filter plugin,
+        but it needs to be run before feed_download, so it is run last in the filter chain.
+        """
         for entry in feed.accepted:
             self.modify(entry, feed.config['set'], False)
             
@@ -47,7 +51,9 @@ class ModifySet:
         """
         this can be called from a plugin to add set values to an entry
         """
-
+        #run string replacement on all string variables before validation
+        config.update(dict([(key, value % entry) for (key, value) in config.iteritems() if isinstance(value, basestring)]))
+        
         if validate:
             from flexget import validator
             v = validator.factory('dict')
@@ -60,7 +66,8 @@ class ModifySet:
                 return
 
         log.debug('adding set: info to entry:"%s" %s' % (entry['title'], config))
-        for key, value in config.iteritems():
-            entry[key] = value
+        
+        entry.update(config)
 
-register_plugin(ModifySet, 'set')
+#filter priority is -255 so we run after all filters are finished
+register_plugin(ModifySet, 'set', priorities={'filter': -255})

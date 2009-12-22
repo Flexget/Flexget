@@ -115,6 +115,13 @@ class PluginDownload:
                 config['path'] = feed.config['download']
             config['fail_html'] = True
         return config
+        
+    def on_process_start(self, feed):
+        """
+            Register the usable set: keywords.
+        """
+        set_plugin = get_plugin_by_name('set')
+        set_plugin.instance.register_keys({'path': 'text'})
 
     def on_feed_download(self, feed):
         """Download all feed content and store in temporary folder"""
