@@ -2,7 +2,6 @@ from netrc import netrc, NetrcParseError
 import logging
 from flexget.plugin import *
 from flexget import validator
-
 log = logging.getLogger('transmissionrpc')
 
 
@@ -55,7 +54,17 @@ class PluginTransmissionrpc:
         if len(feed.accepted) > 0: 
             self.add_to_transmission(feed)
     
-    def _options(self, opt_dic):
+    def _make_torrent_options_dict(self, feed, entry):
+
+        opt_dic = {}
+
+        for opt_key in \
+        ['path', 'addpaused', 'maxconnections', 'maxupspeed', 'maxdownspeed', 'ratio']:
+            if opt_key in entry:
+                opt_dic[opt_key] = entry[opt_key]
+            elif opt_key in feed.config['transmissionrpc']:
+                opt_dic[opt_key] = feed.config['transmissionrpc'][opt_key]
+
         options = {}
         options['add'] = {}
         options['change'] = {}
@@ -121,16 +130,7 @@ class PluginTransmissionrpc:
 
         for entry in feed.accepted:
 
-            opt_dic = {}
-
-            for opt_key in \
-            ['path', 'addpaused', 'maxconnections', 'maxupspeed', 'maxdownspeed', 'ratio']:
-                if opt_key in entry:
-                    opt_dic[opt_key] = entry[opt_key]
-                elif opt_key in conf:
-                    opt_dic[opt_key] = entry[opt_key]
-
-            options = self._options(opt_dic)
+            options = self._make_torrent_options_dict(feed, entry)
            
             r = cli.add(None, 30, filename=entry['url'], **options['add'])
             
