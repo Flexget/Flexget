@@ -36,32 +36,57 @@ class PluginTransmissionrpc:
         advanced.accept('number', key='maxconnections', required=False) 
         advanced.accept('number', key='maxupspeed', required=False) 
         advanced.accept('number', key='maxdownspeed', required=False) 
+        advanced.accept('decimal', key='ratio', required=False) 
         return root
+
+    def on_process_start(self, feed):
+        '''event handler'''
+        set_plugin = get_plugin_by_name('set')
+        
+        set_plugin.instance.register_keys({'path': 'path', \
+                                           'addpaused': 'boolean', \
+                                           'maxconnections': 'number', \
+                                           'maxupspeed': 'number',  \
+                                           'maxdownspeed': 'number', \
+                                           'ratio': 'decimal'})
 
     def on_feed_output(self, feed):
         """ event handler """ 
         if len(feed.accepted) > 0: 
             self.add_to_transmission(feed)
     
-    def _options(self, feed):
+    def _options(self, opt_dic):
         options = {}
         options['add'] = {}
         options['change'] = {}
 
-        conf = feed.config['transmissionrpc']
-        
-        if 'path' in conf:
-            options['add']['download_dir'] = conf['path']
-        if 'addpaused' in conf and conf['addpaused'] == 'yes': 
+        if 'path' in opt_dic:
+            options['add']['download_dir'] = opt_dic['path']
+        if 'addpaused' in opt_dic and opt_dic['addpaused']: 
             options['add']['paused'] = True
-        if 'maxconnections' in conf:
-            options['add']['peer_limit'] = conf['maxconnections']
+        if 'maxconnections' in opt_dic:
+            options['add']['peer_limit'] = opt_dic['maxconnections']
 
-        if 'maxupspeed' in conf:
-            options['change']['uploadLimit'] = conf['maxupspeed']
-        if 'maxdownspeed' in conf:
-            options['change']['downloadLimit'] = conf['maxdownspeed']
-        
+        if 'maxupspeed' in opt_dic:
+            options['change']['uploadLimit'] = opt_dic['maxupspeed']
+            options['change']['uploadLimited'] = True
+        if 'maxdownspeed' in opt_dic:
+            options['change']['downloadLimit'] = opt_dic['maxdownspeed']
+            options['change']['downloadLimited'] = True
+
+        if 'ratio' in opt_dic:
+            options['change']['seedRatioLimit'] = opt_dic['ratio']
+            if opt_dic['ratio'] == 0.0:
+                '''
+                seedRatioMode:
+                0 follow the global settings
+                1 override the global settings, seeding until a certain ratio
+                2 override the global settings, seeding regardless of ratio
+                '''
+                options['change']['seedRatioMode'] = 3
+            else:
+                options['change']['seedRatioMode'] = 2
+
         return options
 
     def add_to_transmission(self, feed):
@@ -70,10 +95,9 @@ class PluginTransmissionrpc:
             import transmissionrpc
         except:
             raise PluginError('Transmissionrpc module required.', log)
-            
-        conf = feed.config['transmissionrpc']
+      
 
-        options = self._options(feed)
+        conf = feed.config['transmissionrpc']
 
         user, password = None, None
 
@@ -96,6 +120,18 @@ class PluginTransmissionrpc:
         cli = transmissionrpc.Client(conf['host'], conf['port'], user, password)
 
         for entry in feed.accepted:
+
+            opt_dic = {}
+
+            for opt_key in \
+            ['path', 'addpaused', 'maxconnections', 'maxupspeed', 'maxdownspeed', 'ratio']:
+                if opt_key in entry:
+                    opt_dic[opt_key] = entry[opt_key]
+                elif opt_key in conf:
+                    opt_dic[opt_key] = entry[opt_key]
+
+            options = self._options(opt_dic)
+           
             r = cli.add(None, 30, filename=entry['url'], **options['add'])
             
             if len(options['change'].keys()) > 0:
