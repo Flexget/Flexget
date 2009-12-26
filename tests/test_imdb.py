@@ -93,9 +93,9 @@ class TestImdb(FlexGetBase):
         # check that directors have been parsed properly
         matrix = self.feed.find_entry(imdb_name='The Matrix')
         assert 'nm0905154' in matrix['imdb_directors'], \
-            'Larry Wachowski is missing'
-        assert matrix['imdb_directors']['nm0905154'] == 'Larry Wachowski', \
-            'Larry Wachowski name is missing (sex change as well? ;)'
+            'Lana Wachowski is missing'
+        assert matrix['imdb_directors']['nm0905154'] == 'Lana Wachowski', \
+            'Lana Wachowski name is missing'
 
         assert self.feed.find_entry('accepted', imdb_name='The Matrix'), \
             'The Matrix should\'ve been accepted'
