@@ -13,7 +13,10 @@ class MovieParser(TitleParser):
         # parsing results
         self.name = None
         self.year = None
-        self.quality = 'unknown'
+        self.quality = None
+
+    def __str__(self):
+        return "MovieParser(%s, %s, %s)" % self.name, self.year, self.quality
 
     def parse(self):
 
@@ -55,7 +58,7 @@ class MovieParser(TitleParser):
                     if parts.index(part) < cut_pos:
                         cut_pos = parts.index(part)
             # check for qualities, these are already cutoff words (self.cutoffs)
-            if part.lower() in self.qualities:
+            if part.lower() in self.qualities and not self.quality:
                 self.quality = part
 
         # make cut
@@ -63,6 +66,9 @@ class MovieParser(TitleParser):
 
         # save results
         self.name = s
+
+        if self.quality == None:
+            self.quality = 'unknown'
 
         if year:
             if year.isdigit():

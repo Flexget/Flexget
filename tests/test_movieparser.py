@@ -1,5 +1,6 @@
 from flexget.utils.titles import MovieParser, ParseWarning
 
+
 class TestMovieParser:
 
     def parse(self, data):
@@ -30,3 +31,7 @@ class TestMovieParser:
         movie = self.parse('Coraline.3D.1080p.BluRay.x264-FlexGet')
         assert movie.name == 'Coraline', 'failed to parse %s' % movie.data
         assert movie.quality == '1080p', 'failed to parse quality from %s' % movie.data
+
+        movie = self.parse('Slumdog.Millionaire.DVDRip.XviD-DASH')
+        assert movie.name == 'Slumdog Millionaire', 'failed to parse %s' % movie.data
+        assert movie.quality == 'DVDRip', 'failed to parse quality from %s' % movie.data
