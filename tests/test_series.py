@@ -95,10 +95,11 @@ class TestQuality(FlexGetBase):
 class TestDatabase(FlexGetBase):
 
     __yaml__ = """
-        global:
-          series:
-            - some series
-            - progress
+        presets:
+          global:
+            series:
+              - some series
+              - progress
 
         feeds:
           test_1:
@@ -268,17 +269,18 @@ class TestFilterSeriesPriority(FlexGetBase):
 class TestPropers(FlexGetBase):
 
     __yaml__ = """
-        global:
-          # prevents seen from rejecting on second execution,
-          # we want to see that series is able to reject
-          disable_builtins: yes
-          series:
-            - test
-            - foobar
-            - asfd:
-                min_quality: HR
-                max_quality: 1080p
-            - V
+        presets:
+          global:
+            # prevents seen from rejecting on second execution,
+            # we want to see that series is able to reject
+            disable_builtins: yes
+            series:
+              - test
+              - foobar
+              - asfd:
+                  min_quality: HR
+                  max_quality: 1080p
+              - V
 
         feeds:
           propers_1:
@@ -411,9 +413,10 @@ class TestDuplicates(FlexGetBase):
 
     __yaml__ = """
 
-        global: # just cleans log a bit ..
-          disable_builtins:
-            - seen
+        presets:
+          global: # just cleans log a bit ..
+            disable_builtins:
+              - seen
 
         feeds:
           test_dupes:
@@ -481,54 +484,18 @@ class TestDuplicates(FlexGetBase):
                 '%s should have been rejected' % item
 
 
-"""
-class TestLaterDupes(FlexGetBase):
-
-    __yaml__ = '''
-        global:
-          series:
-            - Foobar:
-                watched:
-                  season: 2
-                  episode: 1
-        feeds:
-
-          test_1:
-            mock:
-              - {title: 'FooBar.S02E02.PDTV-FlexGet'}
-
-          test_2:
-            mock:
-              - {title: 'FooBar.S02E03.HDTV-FlexGet'}
-
-          test_3:
-            mock:
-              - {title: 'FooBar.S02E03.HDTV-Bug'}
-              - {title: 'FooBar.S02E03.HDTV-FlexGet'}
-    '''
-
-    def test_later(self):
-        self.execute_feed('test_1')
-        assert len(self.feed.accepted) == 1
-        self.execute_feed('test_2')
-        assert len(self.feed.accepted) == 1
-        self.execute_feed('test_3')
-        assert len(self.feed.accepted) == 0
-        assert False
-"""
-
-
 class TestQualities(FlexGetBase):
 
     __yaml__ = """
-        global:
-          disable_builtins: yes
-          series:
-            - FooBar:
-                qualities:
-                  - PDTV
-                  - 720p
-                  - 1080p
+        presets:
+          global:
+            disable_builtins: yes
+            series:
+              - FooBar:
+                  qualities:
+                    - PDTV
+                    - 720p
+                    - 1080p
         feeds:
           test_1:
             mock:
@@ -589,9 +556,10 @@ class TestQualities(FlexGetBase):
 class TestIdioticNumbering(FlexGetBase):
 
     __yaml__ = """
-        global:
-          series:
-            - FooBar
+        presets:
+          global:
+            series:
+              - FooBar
 
         feeds:
           test_1:
@@ -639,9 +607,11 @@ class TestCapitalization(FlexGetBase):
 class TestMixedNumbering(FlexGetBase):
 
     __yaml__ = """
-        global:
-          series:
-            - FooBar
+        presets:
+          global:
+            series:
+              - FooBar
+
         feeds:
           test_1:
             mock:
@@ -685,11 +655,12 @@ class TestAutoExact(FlexGetBase):
 class TestTimeframe(FlexGetBase):
 
     __yaml__ = """
-        global:
-          series:
-            - test:
-                timeframe: 5 hours
-                quality: 720p
+        presets:
+          global:
+            series:
+              - test:
+                  timeframe: 5 hours
+                  quality: 720p
         feeds:
           test_no_waiting:
             mock:

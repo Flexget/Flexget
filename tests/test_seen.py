@@ -4,8 +4,9 @@ from tests import FlexGetBase
 class TestFilterSeen(FlexGetBase):
     
     __yaml__ = """
-        global:
-          accept_all: true
+        presets:
+          global:
+            accept_all: true
 
         feeds:
           test:

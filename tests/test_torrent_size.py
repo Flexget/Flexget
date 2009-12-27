@@ -3,11 +3,12 @@ from tests import FlexGetBase
 
 class TestTorrentSize(FlexGetBase):
     __yaml__ = """
-        global:
-          mock:
-            - {title: 'test', file: 'tests/test.torrent'}
-          disable_builtins:
-            - seen
+        presets:
+          global:
+            mock:
+              - {title: 'test', file: 'tests/test.torrent'}
+            disable_builtins:
+              - seen
 
         feeds:
           test_min:

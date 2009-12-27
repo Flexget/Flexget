@@ -3,13 +3,13 @@ from tests import FlexGetBase
 
 class TestPreset(FlexGetBase):
     __yaml__ = """
-        global:
-          mock:
-            - {title: 'global'}
-
-        movies:
-          mock:
-            - {title: 'movies'}
+        presets:
+          global:
+            mock:
+              - {title: 'global'}
+          movies:
+            mock:
+              - {title: 'movies'}
 
         feeds:
           test1:
@@ -42,18 +42,20 @@ class TestPreset(FlexGetBase):
 
 
 class TestPresetMerge(FlexGetBase):
+
     __yaml__ = """
-        movies:
-          seen_movies: strict
-          imdb:
-            min_score: 6.0
-            min_votes: 500
-            min_year: 2006
-            reject_genres:
-              - musical
-              - music
-              - biography
-              - romance
+        presets:
+          movies:
+            seen_movies: strict
+            imdb:
+              min_score: 6.0
+              min_votes: 500
+              min_year: 2006
+              reject_genres:
+                - musical
+                - music
+                - biography
+                - romance
 
         feeds:
           test:

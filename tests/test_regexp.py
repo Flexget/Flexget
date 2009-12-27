@@ -4,18 +4,19 @@ from tests import FlexGetBase
 class TestRegexp(FlexGetBase):
 
     __yaml__ = """
-        global:
-          mock:
-            - {title: 'regexp1', 'imdb_score': 5}
-            - {title: 'regexp2', 'bool_attr': true}
-            - {title: 'regexp3', 'imdb_score': 5}
-            - {title: 'regexp4', 'imdb_score': 5}
-            - {title: 'regexp5', 'imdb_score': 5}
-            - {title: 'regexp6', 'imdb_score': 5}
-            - {title: 'regexp7', 'imdb_score': 5}
-            - {title: 'regexp8', 'imdb_score': 5}
-            - {title: 'regexp9', 'imdb_score': 5}
-          seen: false
+        presets:
+          global:
+            mock:
+              - {title: 'regexp1', 'imdb_score': 5}
+              - {title: 'regexp2', 'bool_attr': true}
+              - {title: 'regexp3', 'imdb_score': 5}
+              - {title: 'regexp4', 'imdb_score': 5}
+              - {title: 'regexp5', 'imdb_score': 5}
+              - {title: 'regexp6', 'imdb_score': 5}
+              - {title: 'regexp7', 'imdb_score': 5}
+              - {title: 'regexp8', 'imdb_score': 5}
+              - {title: 'regexp9', 'imdb_score': 5}
+            seen: false
 
         feeds:
           # test accepting, setting custom path (both ways), test not (secondary regexp)

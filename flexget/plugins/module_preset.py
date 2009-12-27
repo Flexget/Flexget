@@ -51,18 +51,20 @@ class PluginPreset:
             config.append('global')
                 
         log.log(5, 'presets: %s' % config)
+
+        toplevel_presets = feed.manager.config.get('presets', {})
         
         for preset in config:
             if preset != 'global':
                 log.debug('Merging preset %s into feed %s' % (preset, feed.name))
-            if not preset in feed.manager.config:
+            if not preset in toplevel_presets:
                 if preset == 'global': 
                     continue
                 raise PluginError('Unable to set preset %s for %s' % (preset, feed.name), log)
             # merge
             from flexget.utils.tools import MergeException, merge_dict_from_to
             try:
-                merge_dict_from_to(feed.manager.config[preset], feed.config)
+                merge_dict_from_to(toplevel_presets[preset], feed.config)
             except MergeException:
                 raise PluginError('Failed to merge preset %s to feed %s, incompatible datatypes' % (preset, feed.name))
                 
@@ -73,10 +75,11 @@ class DisablePlugin:
 
     Example:
 
-        movies:
-          download: ~/torrents/movies/
-          .
-          .
+        presets:
+          movies:
+            download: ~/torrents/movies/
+            .
+            .
 
         feeds:
           nzbs:
@@ -110,7 +113,6 @@ class DisablePlugin:
 
 register_plugin(PluginPreset, 'preset', builtin=True, priorities={'process_start': 255})
 register_plugin(DisablePlugin, 'disable_plugin', priorities={'process_start': 250})
-
 
 register_parser_option('--preset', action='store', dest='preset', default=False,
                        metavar='NAME', help='Execute feeds with given preset.')
