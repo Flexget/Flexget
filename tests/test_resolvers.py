@@ -59,6 +59,7 @@ class TestResolvers(FlexGetBase):
 
 
 class TestRegexpResolver(FlexGetBase):
+    # TODO: this test is broken?
 
     __yaml__ = """
         feeds:
@@ -67,10 +68,11 @@ class TestRegexpResolver(FlexGetBase):
               - {title: 'irrelevant', url: 'http://newzleech.com/?p=123'}
             regexp_resolve:
               newzleech:
-                match: http://newzleech.com/?p=
+                match: http\:\/\/newzleech.com\/\?p\=
                 replace: http://newzleech.com/?m=gen&dl=1&post=
     """
 
     def test_newzleech(self):
         self.execute_feed('test')
-        assert not self.feed.find_entry(url='http://newzleech.com/?m=gen&dl=1&post=123'), 'did not resolve properly'
+        assert not self.feed.find_entry(url='http://newzleech.com/?m=gen&dl=1&post=123'), \
+            'did not resolve properly'

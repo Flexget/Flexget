@@ -1,9 +1,9 @@
 import re
 import logging
-import yaml
 from flexget.plugin import *
 
-log = logging.getLogger('regexp')
+log = logging.getLogger('resolv_regexp')
+
 
 class ResolveRegexp:
     """
@@ -13,7 +13,7 @@ class ResolveRegexp:
         
         regexp_resolve:
           demonoid:
-            match: http://www.demonoid.com/files/details/
+            match: http\:\/\/www\.demonoid\.com\/files\/details\/
             replace: http://www.demonoid.com/files/download/HTTP/
     """
 
@@ -39,11 +39,13 @@ class ResolveRegexp:
     def on_process_start(self, feed):
         for name, config in feed.config.get('regexp_resolve', {}).iteritems():
             match = re.compile(config['match'])
-            replace =  config['replace']
-            self.resolves[name] = {'match': match, 'replace': replace }
+            replace = config['replace']
+            self.resolves[name] = {'match': match, 'replace': replace}
             log.debug('Added regexp resolve %s' % name)
 
     def resolvable(self, feed, entry):
+        log.log(5, 'running regexp resolvable')
+        log.log(5, self.resolves)
         for name, config in self.resolves.iteritems():
             if config['match'].match(entry['url']):
                 return True

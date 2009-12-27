@@ -3,13 +3,18 @@ from flexget.plugin import *
 
 log = logging.getLogger('resolver')
 
+
 class ResolverException(Exception):
+
     def __init__(self, value):
         self.value = value
+        
     def __str__(self):
         return repr(self.value)
 
+
 class PluginResolver:
+
     def on_feed_resolve(self, feed):
         # no resolves in unit test mode
         if feed.manager.unit_test: 
@@ -19,6 +24,7 @@ class PluginResolver:
     def resolvable(self, feed, entry):
         """Return True if entry is resolvable by registered resolver."""
         for resolver in get_plugins_by_group('resolver'):
+            log.log(5, 'checking resolver %s' % resolver.name)
             if resolver.instance.resolvable(self, entry):
                 return True
         return False
