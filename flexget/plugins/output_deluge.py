@@ -288,7 +288,6 @@ class OutputDeluge:
 
             def on_fail(result, feed, entry):
                 log.info("%s was not added to deluge! %s" % (entry['title'], result))
-                # TODO: Need to figure out how to fail entries properly from here.
                 feed.fail(entry, "Could not be added to deluge")
 
             # add the torrents

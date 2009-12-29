@@ -5,6 +5,7 @@ import urllib2
 import logging
 import shutil
 import filecmp
+import zlib
 from flexget.plugin import *
 from sqlalchemy import Column, String, Integer, DateTime
 from flexget.manager import Base
@@ -176,6 +177,11 @@ class PluginDownload:
 
         mimetype = f.headers.gettype()
 
+        if f.headers.get('content-encoding') in ('gzip', 'x-gzip', 'deflate'):
+            decompressor = zlib.decompressobj(15 + 32)
+        else:
+            decompressor = None
+
         # generate temp file, with random md5 sum .. 
         # url alone is not random enough, it has happened that there are two entries with same url
         import hashlib
@@ -193,7 +199,10 @@ class PluginDownload:
         outfile = open(datafile, 'wb')
         try:
             while 1:
-                data = f.read(buffer_size)
+                if decompressor:
+                    data = decompressor.decompress(f.read(buffer_size))
+                else:
+                    data = f.read(buffer_size)
                 if not data:
                     log.debug('wrote file %s' % datafile)
                     break
