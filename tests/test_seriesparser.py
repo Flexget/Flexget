@@ -1,4 +1,5 @@
 from nose.tools import assert_raises
+from nose.tools import raises
 from flexget.utils.titles import SeriesParser, ParseWarning
 
 #
@@ -59,19 +60,19 @@ class TestSeriesParser(object):
         assert s.valid, 'Fix the implementation, should not be valid'
         assert s.identifier == 'S01E02', 'identifier broken'
 
+    @raises(Exception)
     def test_invalid_name(self):
         """SeriesParser: invalid name"""
         s = SeriesParser()
         s.name = 1
         s.data = 'Something'
-        assert_raises(Exception, s.parse)
 
+    @raises(Exception)
     def test_invalid_data(self):
         """SeriesParser: invalid data"""
         s = SeriesParser()
         s.name = 'Something Interesting'
         s.data = 1
-        assert_raises(Exception, s.parse)
 
     def test_confusing(self):
         """SeriesParser: confusing (invalid) numbering scheme"""

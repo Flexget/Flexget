@@ -23,9 +23,10 @@ class SeriesParser(TitleParser):
 
     def __init__(self):
         # parser settings
-        self.name = None
-        self.data = None
+        self.name = ''
+        self.data = ''
         self.expect_ep = False
+
         # if set to true, episode or id must follow immediattely after name
         self.strict_name = False
 
@@ -47,14 +48,24 @@ class SeriesParser(TitleParser):
         # false if item does not match series
         self.valid = False
 
+    def __setattr__(self, name, value):
+        """Convert name and data to unicode transparently"""
+        if name == 'name' or name == 'data':
+            if isinstance(value, str):
+                object.__setattr__(self, name, unicode(value))
+                return
+            elif not isinstance(value, unicode):
+                raise Exception('%s cannot be %s' % (name, repr(value)))
+        object.__setattr__(self, name, value)
+
     def parse(self):
         if not self.name or not self.data:
             raise Exception('SeriesParser initialization error, name: %s data: %s' % \
                (repr(self.name), repr(self.data)))
         if not isinstance(self.name, basestring):
-            raise Exception('SeriesParser name is not a string, got %s' % repr(self.name))
+            raise Exception('SeriesParser name is not a unicode string, got %s' % repr(self.name))
         if not isinstance(self.data, basestring):
-            raise Exception('SeriesParser data is not a string, got %s' % repr(self.data))
+            raise Exception('SeriesParser data is not a unicode string, got %s' % repr(self.data))
 
         data = self.data
 
@@ -228,7 +239,7 @@ class SeriesParser(TitleParser):
         if self.valid:
             valid = 'OK'
         return '<SeriesParser(data=%s,name=%s,id=%s,season=%s,episode=%s,quality=%s,proper=%s,status=%s)>' % \
-            (str(self.data), str(self.name), str(self.id), str(self.season), str(self.episode), \
+            (self.data, self.name, str(self.id), str(self.season), str(self.episode), \
              str(self.quality), str(self.proper_or_repack), valid)
 
     def __cmp__(self, other):

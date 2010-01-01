@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 from flexget.utils.titles import SeriesParser, ParseWarning
 from flexget.manager import Base
 from flexget.plugin import *
-from sqlalchemy import Column, Integer, String, DateTime, Boolean, desc
+from sqlalchemy import Column, Integer, String, Unicode, DateTime, Boolean, desc
 from sqlalchemy.schema import ForeignKey
 from sqlalchemy.orm import relation, join
 
@@ -15,7 +15,7 @@ class Series(Base):
     __tablename__ = 'series'
 
     id = Column(Integer, primary_key=True)
-    name = Column(String)
+    name = Column(Unicode)
     episodes = relation('Episode', backref='series')
 
     def __repr__(self):
@@ -49,10 +49,11 @@ class Release(Base):
     quality = Column(String)
     downloaded = Column(Boolean, default=False)
     proper = Column(Boolean, default=False)
-    title = Column(String)
+    title = Column(Unicode)
 
     def __repr__(self):
-        return '<Release(quality=%s,downloaded=%s,proper=%s,title=%s)>' % (self.quality, self.downloaded, self.proper, self.title)
+        return '<Release(quality=%s,downloaded=%s,proper=%s,title=%s)>' % \
+            (self.quality, self.downloaded, self.proper, self.title)
 
 
 class SeriesPlugin(object):
@@ -511,6 +512,8 @@ class FilterSeries(SeriesPlugin):
         for group_series in config.itervalues():
             for series_item in group_series:
                 series_name, series_config = series_item.items()[0]
+                # yaml loads ascii only as str
+                series_name = unicode(series_name)
                 log.log(5, 'series_name: %s series_config: %s' % (series_name, series_config))
 
                 import time
