@@ -62,10 +62,6 @@ class SeriesParser(TitleParser):
         if not self.name or not self.data:
             raise Exception('SeriesParser initialization error, name: %s data: %s' % \
                (repr(self.name), repr(self.data)))
-        if not isinstance(self.name, basestring):
-            raise Exception('SeriesParser name is not a unicode string, got %s' % repr(self.name))
-        if not isinstance(self.data, basestring):
-            raise Exception('SeriesParser data is not a unicode string, got %s' % repr(self.data))
 
         data = self.data
 
