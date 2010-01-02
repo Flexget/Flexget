@@ -1,0 +1,16 @@
+
+# TEMPORARY CONFIGURATION FILE FOR TEMPLATE TESTING & DEVELOPMENT
+
+feeds:
+  test:
+    mock:
+      - title: Chuck.S01E01.720p-FlexGet
+        series_name: Chuck
+        series_season: 1
+        series_episode: 1
+        quality: 720p
+
+    accept_all: yes
+    make_html:
+      template: ~/projects/flexget/templates/default.template
+      file: ~/public_html/flexget.html
