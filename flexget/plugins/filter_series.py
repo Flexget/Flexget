@@ -654,10 +654,7 @@ class FilterSeries(SeriesPlugin):
                 if self.process_watched(feed, config, eps):
                     continue
 
-            #
             # proper handling
-            #
-
             log.debug('-' * 20 + ' process_propers -->')
             removed, new_propers = self.process_propers(feed, eps)
             whitelist.extend(new_propers)
@@ -696,7 +693,7 @@ class FilterSeries(SeriesPlugin):
             log.debug('continuing w. episodes: %s' % [e.data for e in eps])
             log.debug('best episode is: %s' % best.data)
 
-            # Episode advancement. Used only with season based series
+            # episode advancement. used only with season based series
             if best.season and best.episode:
                 log.debug('-' * 20 + ' episode advancement -->')
                 if self.process_episode_advancement(feed, eps, series):
@@ -716,7 +713,10 @@ class FilterSeries(SeriesPlugin):
                 continue
 
             # no special configuration, just choose the best
-            self.accept_series(feed, best, 'choose best')
+            reason = 'only choice'
+            if len(eps) > 1:
+                reason = 'choose best'
+            self.accept_series(feed, best, reason)
 
     def process_propers(self, feed, eps):
         """
