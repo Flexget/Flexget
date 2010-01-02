@@ -229,4 +229,4 @@ class FilterTvdb:
                 log.debug('Accepting %s' % (entry))
                 feed.accept(entry)
 
-register_plugin(FilterImdb, 'thetvdb', priorities={'filter': 126})
+register_plugin(FilterTvdb, 'thetvdb', priorities={'filter': 126})
