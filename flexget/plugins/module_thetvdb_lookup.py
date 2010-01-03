@@ -134,12 +134,17 @@ class ModuleThetvdbLookup:
         session = Session()
         
         # if I can't pull the series info from the DB:
-        seriesdata = session.query(TheTvDB).filter(TheTvDB.series_name == unicode(entry['series_name'])).first()
-        if not seriesdata:
+        cachedata = session.query(TheTvDB).filter(TheTvDB.series_name == unicode(entry['series_name'])).first()
+        if not cachedata:
+            log.debug('No data cached for %s' % entry['series_name'])
             get_new_info = True
         # otherwise, if it's more than an hour old...
-        elif seriesdata.added < datetime.datetime.now() - datetime.timedelta(hours=1):
+        elif cachedata.added < datetime.datetime.now() - datetime.timedelta(hours=1):
             get_new_info = True
+            log.debug('Cache expired for %s' % entry['series_name'])
+            log.debug('Added %s expires %s' % (cachedata.added, datetime.datetime.now() - datetime.timedelta(hours=1)))
+            # remove old expired data
+            session.delete(cachedata)
         else:
             get_new_info = False
         
@@ -147,14 +152,14 @@ class ModuleThetvdbLookup:
             feed.verbose_progress('Requesting %s information from TheTvDB.com' % entry['series_name'])
             # get my series data.
             # TODO: need to impliment error handling around grabbing url.
-            seriesdata = BeautifulStoneSoup(urllib.urlopen("http://thetvdb.com/api/GetSeries.php?seriesname=%s" % entry["series_name"])).data
+            xmldata = BeautifulStoneSoup(urllib.urlopen("http://thetvdb.com/api/GetSeries.php?seriesname=%s" % entry["series_name"])).data
             # Yeah, I'm lazy. Grabbing the one with the latest airing date, 
             # instead of trying to see what's the closest match.
             # If there's an exact match, return that immediately. Could
             # run into issues with queries with multiple exact matches.
             newest_series_first_aired = datetime.date(1800, 1, 1)
             series_id = None
-            for i in seriesdata.findAll("series", recursive=False):
+            for i in xmldata.findAll('series', recursive=False):
                 this_series_air_date = self._convert_date(i.firstaired.string)
                 if this_series_air_date > newest_series_first_aired:
                     newest_series_first_aired = this_series_air_date
@@ -165,16 +170,16 @@ class ModuleThetvdbLookup:
                     newest_series_first_aired = this_series_air_date
                     break
             if series_id == None:
-                log.warning("Didn't get a return from tvdb on the series search for " % entry["series_name"])
+                log.warning("Didn't get a return from tvdb on the series search for %s" % entry["series_name"])
                 raise PluginWarning('No return on series lookup')
             
             # Grab the url, and parse it out into BSS. Store it's root element as data.
             # TODO: need to impliment error handling around grabbing url.
             data = BeautifulStoneSoup(urllib.urlopen("http://thetvdb.com/data/series/%s/all/" % str(series_id))).data
             session.add(TheTvDB(unicode(entry['series_name']), unicode(data)))
-            
         else:
-            data = BeautifulStoneSoup(session.query(TheTvDB).filter(TheTvDB.series_name == unicode(entry['series_name'])).first().series_xml).data
+            log.debug('Loaded seriesdata from cache for %s' % entry['series_name'])
+            data = BeautifulStoneSoup(cachedata.series_xml).data
         
         session.commit()
         
@@ -198,7 +203,7 @@ class ModuleThetvdbLookup:
         if data.series.zap2it_id.string:
             entry['zap2it_id'] = data.series.zap2it_id.string
         
-        log.debug("searching for correct episode %(series_name)s - S%(series_season)sE%(series_episode)s on thetvdb" % entry)
+        log.debug("searching for correct episode %(series_name)s - S%(series_season)sE%(series_episode)s from the data" % entry)
         
         for i in data.findAll("episode", recursive=False):
             #print "%s %s %s %s" % (i.combined_season.string, i.episodenumber.string, entry['series_season'], entry['series_episode'])

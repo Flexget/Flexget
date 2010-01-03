@@ -8,11 +8,13 @@ from BeautifulSoup import NavigableString, Tag
 
 log = logging.getLogger('utils.imdb')
 
+
 def extract_id(url):
     """Return IMDb ID of the given URL"""
     m = re.search("((?:nm|tt)[\d]{7})", url)
     if m:
         return m.group(1)
+
 
 class ImdbSearch:
 
@@ -42,7 +44,7 @@ class ImdbSearch:
         parser.parse()
         name = parser.name
         year = parser.year
-        if name=='':
+        if name == '':
             log.critical('Failed to parse name from %s' % raw_name)
             return None
         log.debug('smart_match name=%s year=%s' % (name, str(year)))
@@ -95,10 +97,10 @@ class ImdbSearch:
         """Return array of movie details (dict)"""
         log.debug('Searching: %s' % name)
         try:
-            url = u'http://www.imdb.com/find?' + urllib.urlencode({'q':name.encode('latin1'), 's':'all'})
+            url = u'http://www.imdb.com/find?' + urllib.urlencode({'q': name.encode('latin1'), 's': 'all'})
         except:
             log.warning('Problems with encoding %s, string possibly corrupted? Ignoring troublesome characters.' % name)
-            url = u'http://www.imdb.com/find?' + urllib.urlencode({'q':name.encode('latin1', 'ignore'), 's':'all'})
+            url = u'http://www.imdb.com/find?' + urllib.urlencode({'q': name.encode('latin1', 'ignore'), 's': 'all'})
         log.debug('Serch query: %s' % repr(url))
         page = urllib2.urlopen(url)
         actual_url = page.geturl()
@@ -159,12 +161,12 @@ class ImdbSearch:
                 movie['url'] = "http://www.imdb.com" + link.get('href')
                 log.debug('processing name: %s url: %s' % (movie['name'], movie['url']))
                 # calc & set best matching ratio
-                seq = difflib.SequenceMatcher(lambda x: x==' ', movie['name'], name)
+                seq = difflib.SequenceMatcher(lambda x: x == ' ', movie['name'], name)
                 ratio = seq.ratio()
                 # check if some of the akas have better ratio
                 for aka in [l for l in link.parent.findAll(text=re.compile('".*"')) if l.parent.name == 'em']:
                     aka = aka.replace('"', '')
-                    seq = difflib.SequenceMatcher(lambda x: x==' ', aka.lower(), name.lower())
+                    seq = difflib.SequenceMatcher(lambda x: x == ' ', aka.lower(), name.lower())
                     aka_ratio = seq.ratio() * self.aka_weight
                     if aka_ratio > ratio:
                         log.debug('- aka %s has better ratio %s' % (aka, aka_ratio))
@@ -179,9 +181,11 @@ class ImdbSearch:
                 movies.append(movie)
 
         def cmp_movie(m1, m2):
-            return cmp (m2['match'], m1['match'])
+            return cmp(m2['match'], m1['match'])
+        
         movies.sort(cmp_movie)
         return movies
+
 
 class ImdbParser:
     """Quick-hack to parse relevant imdb details"""
@@ -268,9 +272,10 @@ class ImdbParser:
         # get plot outline
         tag_outline = soup.find('h5', text=re.compile('Plot.*:'))
         if tag_outline:
-            if tag_outline.next:
-                self.plot_outline = tag_outline.next.string.strip()
-                log.debug('Detected plot outline: %s' % self.plot_outline)
+            self.plot_outline = tag_outline.parent.parent.find('div').next.string.strip()
+            log.debug('Detected plot outline: %s' % self.plot_outline)
+        else:
+            log.debug('No h5 plot found')
 
         # get main cast
         tag_cast = soup.find('table', 'cast')

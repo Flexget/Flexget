@@ -12,8 +12,12 @@ div#main {
     width:780px;
 }
 
+/* MOVIE */
 
-div.series {
+
+/* SERIES */
+
+div.series, div.movie, div.other {
     border: 2px solid #FE7C32;
     margin-bottom: 0.5em;
     padding: 0.5em;
@@ -21,8 +25,8 @@ div.series {
     background: #fff;
 }
 
-div.series h1 {
-
+div.series h1, div.movie h1, div.other h1 {
+    margin: 0;
 }
 
 div.series div.banner {
@@ -142,8 +146,8 @@ div.clear {
     </script>
 
 
-    #for $entry in $accepted
     <div id="main">
+    #for $entry in $accepted
         <!-- HANDLE SERIES -->
         #if 'series_name' in $entry
             <div class="series">
@@ -243,12 +247,55 @@ div.clear {
         <!-- HANDLE MOVIES -->
         #else if 'imdb_url' in $entry
             <div class="movie">
+            <h1>$entry.title</h1>
+
+            #if 'imdb_score' in $entry
+                Score: #echo "%.1f" % $entry.imdb_score
+            #end if
+
+            #if 'imdb_votes' in $entry
+                Votes: $entry.imdb_votes
+            #end if
+
+            #if 'imdb_plot_outline' in $entry
+                <div class="overview">
+                    <h2>Plot</h2>
+                    $entry.imdb_plot_outline
+                </div>
+            #end if
+
+            #if 'imdb_genres' in $entry
+                <div class="genres">
+                    <h2>Genres</h2>
+                    <ul>
+                    #for $genre in $entry.imdb_genres:
+                        <li>$genre</li>
+                    #end for
+                    </ul>
+                </div>
+            #end if
+
+            #if 'imdb_actors' in $entry
+                <div class="actors">
+                    <h2>Actors</h2>
+                    <ul>
+                    #for $imdbid, $actor in $entry.imdb_actors.items():
+                        <li><a href="http://www.imdb.com/name/$imdbid">$actor</a></li>
+                    #end for
+                    </ul>
+                </div>
+            #end if
+
+
+            </div>
+        #else
+            <div class="other">
             $entry.title
             </div>
         #end if
 
-      </div>
       #end for
+      </div>
 
     </body>
 </html>
