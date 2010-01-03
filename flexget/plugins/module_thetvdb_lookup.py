@@ -1,16 +1,15 @@
 import logging
 from flexget.plugin import *
-from flexget.utils.log import log_once
 from flexget.manager import Base, Session
-from sqlalchemy import Column, Integer, Unicode, UnicodeText, String, DateTime
+from sqlalchemy import Column, Integer, Unicode, UnicodeText, DateTime
 from BeautifulSoup import BeautifulStoneSoup
 import urllib
 import datetime
 
-log = logging.getLogger('TheTVDB_lookup')
+log = logging.getLogger('thetvdb')
 
 
-class thetvdb(Base):
+class TheTvDB(Base):
     
     __tablename__ = 'thetvdb'
 
@@ -25,7 +24,7 @@ class thetvdb(Base):
         self.added = datetime.datetime.now()
     
     def __str__(self):
-        return '<thetvdb(%s=%s)>' % (self.series_name, self.series_xml)
+        return '<Thetvdb(%s=%s)>' % (self.series_name, self.series_xml)
 
 
 class ModuleThetvdbLookup:
@@ -65,6 +64,7 @@ class ModuleThetvdbLookup:
             zap2it_id (if available)
           episode info: (if episode is found)
             ep_name
+            ep_overview
             ep_director
             ep_writer
             ep_air_date
@@ -134,7 +134,7 @@ class ModuleThetvdbLookup:
         session = Session()
         
         # if I can't pull the series info from the DB:
-        seriesdata = session.query(thetvdb).filter(thetvdb.series_name == unicode(entry['series_name'])).first()
+        seriesdata = session.query(TheTvDB).filter(TheTvDB.series_name == unicode(entry['series_name'])).first()
         if not seriesdata:
             get_new_info = True
         # otherwise, if it's more than an hour old...
@@ -144,6 +144,7 @@ class ModuleThetvdbLookup:
             get_new_info = False
         
         if get_new_info:
+            feed.verbose_progress('Requesting %s information from TheTvDB.com' % entry['series_name'])
             # get my series data.
             # TODO: need to impliment error handling around grabbing url.
             seriesdata = BeautifulStoneSoup(urllib.urlopen("http://thetvdb.com/api/GetSeries.php?seriesname=%s" % entry["series_name"])).data
@@ -170,10 +171,10 @@ class ModuleThetvdbLookup:
             # Grab the url, and parse it out into BSS. Store it's root element as data.
             # TODO: need to impliment error handling around grabbing url.
             data = BeautifulStoneSoup(urllib.urlopen("http://thetvdb.com/data/series/%s/all/" % str(series_id))).data
-            session.add(thetvdb(unicode(entry['series_name']), unicode(data)))
+            session.add(TheTvDB(unicode(entry['series_name']), unicode(data)))
             
         else:
-            data = BeautifulStoneSoup(session.query(thetvdb).filter(thetvdb.series_name == unicode(entry['series_name'])).first().series_xml).data
+            data = BeautifulStoneSoup(session.query(TheTvDB).filter(TheTvDB.series_name == unicode(entry['series_name'])).first().series_xml).data
         
         session.commit()
         
@@ -210,6 +211,7 @@ class ModuleThetvdbLookup:
                     entry['ep_air_date'] = self._convert_date(i.firstaired.string)
                     entry['ep_rating'] = i.rating.string
                     entry['ep_image_url'] = "http://www.thetvdb.com/banners/%s" % i.filename.string
+                    entry['ep_overview'] = i.overview.string
                     if i.gueststars.string:
                         entry['ep_guest_stars'] = i.gueststars.string.strip("|").split("|")
                     else:
@@ -219,4 +221,4 @@ class ModuleThetvdbLookup:
         if not 'ep_name' in entry:
             log.info("Didn't find an episode on thetvdb for %(series_name)s - S%(series_season)sE%(series_episode)s" % entry)
 
-register_plugin(ModuleThetvdbLookup, 'thetvdb_lookup', priorities={'filter': 127})
+register_plugin(ModuleThetvdbLookup, 'thetvdb_lookup', priorities={'filter': 100})

@@ -1,3 +1,4 @@
+import hashlib
 import logging
 from flexget.manager import Session
 from flexget.plugin import *
@@ -34,6 +35,12 @@ class Entry(dict):
                 raise PluginError('Tried to set title to %s' % \
                     (repr(value)))
         dict.__setitem__(self, key, value)
+        if self.get('title') and self.get('original_url'):
+            m = hashlib.md5()
+            m.update(self['original_url'])
+            m.update(self['title'])
+            uid = m.hexdigest()
+            dict.__setitem__(self, 'uid', uid)
 
     def safe_str(self):
         return "%s | %s" % (self['title'], self['url'])

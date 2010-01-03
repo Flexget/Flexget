@@ -1,10 +1,12 @@
 from optparse import SUPPRESS_HELP
 from flexget.plugin import *
 
+
 class YamlDump:
     """
         Dummy plugin for testing, outputs all entries in yaml
     """
+
     def validator(self):
         from flexget import validator
         return validator.factory('boolean')
@@ -12,13 +14,16 @@ class YamlDump:
     def on_feed_output(self, feed):
         if not 'dump' in feed.config and not feed.manager.options.dump:
             return
-        from flexget.utils.tools import sanitize
+        #from flexget.utils.tools import sanitize
         import yaml
+        
         def dump(values):
             for entry in values:
-                c = entry.copy()
-                sanitize(c)
-                print yaml.safe_dump(c)
+                #c = entry.copy()
+                #sanitize(c)
+                #print yaml.safe_dump(entry)
+                print entry
+                
         if feed.entries:
             print '-- Entries: ----------------------------'
             dump(feed.entries)

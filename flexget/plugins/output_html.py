@@ -35,7 +35,7 @@ class OutputHtml:
         template.entries = feed.entries
 
         f = open(output, 'w')
-        f.write(unicode(template))
+        f.write(template.__str__())
         f.close()
 
 register_plugin(OutputHtml, 'make_html')

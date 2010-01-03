@@ -103,6 +103,7 @@ _valid = [types.DictType, types.IntType, types.NoneType,
 
 # TODO: I think this was left as broken ...
 def sanitize(value, logger=None):
+    raise Exception('broken')
     if isinstance(value, dict):
         sanitize_dict(value, logger)
     elif isinstance(value, list):
