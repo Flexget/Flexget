@@ -134,7 +134,6 @@ class OutputRSS:
         config.setdefault('days', 7)
         config.setdefault('items', -1)
         config.setdefault('history', True)
-        config.setdefault('rsslink', None)
         config.setdefault('link', ['imdb_url', 'input_url'])
         # add url as last resort
         config['link'].append('url')
@@ -229,7 +228,7 @@ class OutputRSS:
 
         # make rss
         rss = PyRSS2Gen.RSS2(title='FlexGet',
-                             link=config['rsslink'],
+                             link=config.get('rsslink', None),
                              description='FlexGet generated RSS feed',
                              lastBuildDate=datetime.datetime.utcnow(),
                              items=rss_items)
