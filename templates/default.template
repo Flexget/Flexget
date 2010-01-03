@@ -189,8 +189,10 @@ div.clear {
                     </div>
                 #end if
 
-                <div id="js-$entry.uid">
-                    <a href="#a-$entry.uid" onclick="toggle_visibility('js-$entry.uid', 'info-$entry.uid');">Details</a>
+                <div class="details-button">
+                    <div id="js-$entry.uid">
+                        <a href="#a-$entry.uid" onclick="toggle_visibility('js-$entry.uid', 'info-$entry.uid');">Details</a>
+                    </div>
                 </div>
 
                 <div id="info-$entry.uid" style="display: none;">
