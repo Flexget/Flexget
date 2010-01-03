@@ -21,7 +21,7 @@ class ChangeWarn:
         config = feed.manager.config
 
         # prevent useless keywords in root level
-        allow = ['feeds', 'presets']
+        allow = ['feeds', 'presets', 'variables']
         for key in config.iterkeys():
             if key not in allow:
                 log.critical('Keyword \'%s\' is not allowed in the root level!' % key)
