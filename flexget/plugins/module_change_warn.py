@@ -13,7 +13,7 @@ class ChangeWarn:
     """
 
     def old_database(self, feed, reason=''):
-        log.critical('Running old database! Please see bleeding edge news! %s' % reason)
+        log.critical('You\'re running old database! Please see bleeding edge news for necessary actions! %s' % reason)
         feed.manager.disable_feeds()
         feed.abort()
 
