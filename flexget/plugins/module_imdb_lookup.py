@@ -44,6 +44,7 @@ class Movie(Base):
     votes = Column(Integer)
     year = Column(Integer)
     plot_outline = Column(String)
+    photo = Column(String)
 
     def __repr__(self):
         return '<Movie(name=%s,votes=%s,year=%s)>' % (self.title, self.votes, self.year)
@@ -209,10 +210,11 @@ class ModuleImdbLookup:
                     
                     # store to database
                     movie = Movie()
+                    movie.photo = imdb.photo
                     movie.title = imdb.name
                     movie.score = imdb.score
                     movie.votes = imdb.votes
-                    movie.year = imdb.year                
+                    movie.year = imdb.year
                     movie.plot_outline = imdb.plot_outline
                     movie.url = entry['imdb_url']
                     for name in imdb.genres:
@@ -252,6 +254,7 @@ class ModuleImdbLookup:
                 # Set values from cache
                 # TODO: I don't like this shoveling ...
                 imdb.url = cached.url
+                imdb.photo = cached.photo
                 imdb.name = cached.title
                 imdb.year = cached.year
                 imdb.votes = cached.votes
@@ -277,6 +280,7 @@ class ModuleImdbLookup:
             entry['imdb_url'] = imdb.url
             entry['imdb_id'] = imdb.imdb_id
             entry['imdb_name'] = imdb.name
+            entry['imdb_photo'] = imdb.photo
             entry['imdb_plot_outline'] = imdb.plot_outline
             entry['imdb_score'] = imdb.score
             entry['imdb_votes'] = imdb.votes

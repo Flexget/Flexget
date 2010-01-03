@@ -495,13 +495,6 @@ class FilterSeries(SeriesPlugin):
     def on_feed_filter(self, feed):
         """Filter series"""
 
-        # TEMP: hack, test if running old database with sqlalchemy table reflection ..
-        from flexget.utils.sqlalchemy_utils import table_exists
-        if table_exists('episode_qualities', feed):
-            log.critical('Running old database! Please see bleeding edge news!')
-            feed.manager.disable_feeds()
-            feed.abort()
-
         # TEMP: bugfix, convert all series to lowercase
         for series in feed.session.query(Series).all():
             series.name = series.name.lower()

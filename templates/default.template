@@ -14,6 +14,15 @@ div#main {
 
 /* MOVIE */
 
+div.photo {
+    border: 1px solid #000;
+    height: 120px;
+    width: 100px;
+    float: right;
+    background: #fff;
+    margin-left: 1em;
+}
+
 
 /* SERIES */
 
@@ -152,7 +161,7 @@ div.clear {
         #if 'series_name' in $entry
             <div class="series">
 
-                #if 'series_banner_url' in $entry:
+                #if 'series_banner_url' in $entry
                     <div class="banner">
                         <img src="$entry.series_banner_url">
                     </div>
@@ -161,11 +170,11 @@ div.clear {
                 #end if
 
                 <div class="basic">
-                    #if 'ep_name' in $entry:
+                    #if 'ep_name' in $entry
                         <div class="ep_name">$entry.ep_name</div>
                     #end if
 
-                    #if 'series_episode' in $entry and 'series_season' in $entry:
+                    #if 'series_episode' in $entry and 'series_season' in $entry
                         <div class="season_ep">
                             Season: $entry.series_season Episode: $entry.series_episode
                         </div>
@@ -173,17 +182,17 @@ div.clear {
 
                     <div class="clear">&nbsp;</div>
 
-                    #if 'ep_rating' in $entry:
+                    #if 'ep_rating' in $entry
                         <div class="ep_rating">Rating: $entry.ep_rating</div>
                     #end if
 
-                    #if 'series_status' in $entry:
+                    #if 'series_status' in $entry
                         <!--
                         <div class="series_status">Status: $entry.series_status</div>
                         -->
                     #end if
 
-                    #if 'ep_director' in $entry:
+                    #if 'ep_director' in $entry
                         <div class="ep_director">Director: $entry.ep_director</div>
                     #end if
 
@@ -211,7 +220,7 @@ div.clear {
                         <div class="genres">
                             <h2>Genres</h2>
                             <ul>
-                            #for $genre in $entry.series_genres:
+                            #for $genre in $entry.series_genres
                                 <li>$genre</li>
                             #end for
                             </ul>
@@ -222,7 +231,7 @@ div.clear {
                         <div class="actors">
                             <h2>Actors</h2>
                             <ul>
-                            #for $actor in $entry.series_actors:
+                            #for $actor in $entry.series_actors
                                 <li>$actor</li>
                             #end for
                             </ul>
@@ -233,7 +242,7 @@ div.clear {
                         <div class="actors">
                             <h2>Guest stars</h2>
                             <ul>
-                            #for $actor in $entry.ep_guest_stars:
+                            #for $actor in $entry.ep_guest_stars
                                 <li>$actor</li>
                             #end for
                             </ul>
@@ -245,9 +254,18 @@ div.clear {
             </div>
 
         <!-- HANDLE MOVIES -->
+
         #else if 'imdb_url' in $entry
             <div class="movie">
             <h1>$entry.title</h1>
+
+            <!-- imdb has referer blocker
+            #if 'imdb_photo' in $entry
+                <div class="photo">
+                    <img src="$entry.imdb_photo">
+                </div>
+            #end if
+            -->
 
             #if 'imdb_score' in $entry
                 Score: #echo "%.1f" % $entry.imdb_score
@@ -268,7 +286,7 @@ div.clear {
                 <div class="genres">
                     <h2>Genres</h2>
                     <ul>
-                    #for $genre in $entry.imdb_genres:
+                    #for $genre in $entry.imdb_genres
                         <li>$genre</li>
                     #end for
                     </ul>
@@ -279,7 +297,7 @@ div.clear {
                 <div class="actors">
                     <h2>Actors</h2>
                     <ul>
-                    #for $imdbid, $actor in $entry.imdb_actors.items():
+                    #for $imdbid, $actor in $entry.imdb_actors.items()
                         <li><a href="http://www.imdb.com/name/$imdbid">$actor</a></li>
                     #end for
                     </ul>

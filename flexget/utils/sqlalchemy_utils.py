@@ -1,14 +1,15 @@
-def table_exists(name, feed):
+def table_exists(name, session):
     """Hack, return True if table_name exists """
 
     from sqlalchemy.exceptions import NoSuchTableError
     from sqlalchemy import Table, MetaData
     try:
         meta = MetaData()
-        Table(name, meta, autoload=True, autoload_with=feed.session.connection())
+        Table(name, meta, autoload=True, autoload_with=session.connection())
     except NoSuchTableError:
         return False
     return True
+
 
 def table_schema(name, session):
     """Hack, return table schema"""
@@ -21,6 +22,7 @@ def table_schema(name, session):
         return reflect
     except NoSuchTableError:
         return None
+
 
 def table_columns(name, session):
     """

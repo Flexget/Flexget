@@ -12,7 +12,8 @@ try:
     import PyRSS2Gen
 except:
     rss2gen = False
-    
+
+
 class RSSEntry(Base):
     
     __tablename__ = 'make_rss'
@@ -21,8 +22,10 @@ class RSSEntry(Base):
     title = Column(String)
     description = Column(String)
     link = Column(String)
+    rsslink = Column(String)
     file = Column(String)
     published = Column(DateTime, default=datetime.datetime.utcnow())
+
 
 class OutputRSS:
     """
@@ -72,6 +75,16 @@ class OutputRSS:
           
         Generate RSS that will contain last 50 items, regardless of dates.
         
+        RSS location link:
+
+        You can specify the url location of the rss file.
+
+        Example:
+
+        make_rss:
+          file: ~/public_html/series.rss
+          rsslink: http://my.server.net/series.rss
+
         RSS link:
         ---------
         
@@ -91,6 +104,7 @@ class OutputRSS:
         Default list: imdb_url, input_url, url
         
     """
+    
     def __init__(self):
         self.written = {}
 
@@ -104,6 +118,7 @@ class OutputRSS:
         rss.accept('number', key='days')
         rss.accept('number', key='items')
         rss.accept('boolean', key='history')
+        rss.accept('text', key='rsslink')
         links = rss.accept('list', key='link')
         links.accept('text')
         return root
@@ -119,6 +134,7 @@ class OutputRSS:
         config.setdefault('days', 7)
         config.setdefault('items', -1)
         config.setdefault('history', True)
+        config.setdefault('rsslink', None)
         config.setdefault('link', ['imdb_url', 'input_url'])
         # add url as last resort
         config['link'].append('url')
@@ -133,7 +149,7 @@ class OutputRSS:
         # when history is disabled, remove everything from backlog on every run (a bit hackish, rarely usefull)
         if not config['history']:
             log.debug('disabling history')
-            for item in feed.session.query(RSSEntry).filter(RSSEntry.file==config['file']).all():
+            for item in feed.session.query(RSSEntry).filter(RSSEntry.file == config['file']).all():
                 feed.session.delete(item)
         
         # save entries into db for RSS generation
@@ -182,7 +198,7 @@ class OutputRSS:
         from flexget.manager import Session
         session = Session()
         
-        db_items = session.query(RSSEntry).filter(RSSEntry.file==config['file']).\
+        db_items = session.query(RSSEntry).filter(RSSEntry.file == config['file']).\
             order_by(RSSEntry.published.desc()).all()
         
         # make items
@@ -193,7 +209,7 @@ class OutputRSS:
                 if len(rss_items) > config['items']:
                     add = False
             if config['days'] != -1:
-                if datetime.datetime.today()-datetime.timedelta(days=config['days']) > db_item.published:
+                if datetime.datetime.today() - datetime.timedelta(days=config['days']) > db_item.published:
                     add = False
             if add:
                 # add into generated feed
@@ -212,11 +228,11 @@ class OutputRSS:
         session.close()
 
         # make rss
-        rss = PyRSS2Gen.RSS2(title = 'FlexGet',
-                             link = None,
-                             description = 'FlexGet generated RSS feed',
-                             lastBuildDate = datetime.datetime.utcnow(),
-                             items = rss_items)
+        rss = PyRSS2Gen.RSS2(title='FlexGet',
+                             link=config['rsslink'],
+                             description='FlexGet generated RSS feed',
+                             lastBuildDate=datetime.datetime.utcnow(),
+                             items=rss_items)
         # write rss
         fn = os.path.expanduser(config['file'])
         try:

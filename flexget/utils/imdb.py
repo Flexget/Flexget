@@ -202,6 +202,7 @@ class ImdbParser:
         self.name = None
         self.url = None
         self.imdb_id = None
+        self.photo = None
 
     def __str__(self):
         return '<ImdbParser(name=%s,imdb_id=%s)>' % (self.name, self.imdb_id)
@@ -216,6 +217,19 @@ class ImdbParser:
         self.imdb_id = extract_id(self.url)
     
         soup = get_soup(page)
+
+        from IPython.Shell import IPShellEmbed
+        args = []
+        ipshell = IPShellEmbed(args)
+        ipshell()
+
+        # get photo
+        tag_photo = soup.find('div', attrs={'class': 'photo'})
+        if tag_photo:
+            tag_img = tag_photo.find('img')
+            if tag_img:
+                self.photo = tag_img.get('src')
+                log.debug('Detected photo: %s' % self.photo)
 
         # get name
         tag_name = soup.find('h1')
