@@ -10,7 +10,6 @@ body {
 div#main {
     margin:0px auto 0px auto;
     width:780px;
-    background: #fff;
 }
 
 
@@ -18,6 +17,8 @@ div.series {
     border: 2px solid #FE7C32;
     margin-bottom: 0.5em;
     padding: 0.5em;
+    -moz-border-radius: 5px;
+    background: #fff;
 }
 
 div.series h1 {
