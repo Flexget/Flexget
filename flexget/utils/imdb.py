@@ -218,11 +218,6 @@ class ImdbParser:
     
         soup = get_soup(page)
 
-        from IPython.Shell import IPShellEmbed
-        args = []
-        ipshell = IPShellEmbed(args)
-        ipshell()
-
         # get photo
         tag_photo = soup.find('div', attrs={'class': 'photo'})
         if tag_photo:
