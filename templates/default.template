@@ -52,6 +52,10 @@ div.ep_director {
     float: right;
 }
 
+div.details-button {
+    text-align: center;
+}
+
 div.actors, div.genres, div.overview {
     background: #F7F7F7;
     padding: 0.4em;
@@ -191,7 +195,7 @@ div.clear {
 
                 <div class="details-button">
                     <div id="js-$entry.uid">
-                        <a href="#a-$entry.uid" onclick="toggle_visibility('js-$entry.uid', 'info-$entry.uid');">Details</a>
+                        <a href="#a-$entry.uid" onclick="toggle_visibility('js-$entry.uid', 'info-$entry.uid');">More</a>
                     </div>
                 </div>
 
