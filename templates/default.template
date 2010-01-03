@@ -40,6 +40,7 @@ div.season_ep {
 
 div.ep_name {
     float: left;
+    font-weight: bold;
 }
 
 div.ep_rating {
