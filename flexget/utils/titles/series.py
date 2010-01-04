@@ -236,9 +236,9 @@ class SeriesParser(TitleParser):
         valid = 'INVALID'
         if self.valid:
             valid = 'OK'
-        return '<SeriesParser(data=%s,name=%s,id=%s,season=%s,episode=%s,quality=%s,proper=%s,status=%s)>' % \
+        return '<SeriesParser(data=%s,name=%s,id=%s,season=%s,episode=%s,quality=%s,proper=%s,field=%s,status=%s)>' % \
             (self.data, self.name, str(self.id), str(self.season), str(self.episode), \
-             str(self.quality), str(self.proper_or_repack), valid)
+             str(self.quality), str(self.proper_or_repack), str(self.field), valid)
 
     def __cmp__(self, other):
         """
