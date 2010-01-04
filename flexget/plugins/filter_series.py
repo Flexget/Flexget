@@ -183,7 +183,7 @@ class SeriesReport(SeriesPlugin):
         from flexget.manager import Session
         session = Session()
 
-        name = self.options['name'].lower()
+        name = unicode(self.options['name'].lower())
         series = session.query(Series).filter(Series.name == name.lower()).first()
         if not series:
             print 'Unknown series %s' % name
@@ -286,7 +286,7 @@ class SeriesForget(object):
         if self.options:
             feed.manager.disable_feeds()
 
-            name = self.options.get('name')
+            name = unicode(self.options.get('name'))
 
             from flexget.manager import Session
             session = Session()
