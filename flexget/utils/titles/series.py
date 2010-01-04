@@ -37,6 +37,8 @@ class SeriesParser(TitleParser):
         self.clean_regexps = ['\[.*?\]', '\(.*?\)']
         self.name_regexps = []
 
+        self.field = None
+
         # parse produces these
         self.season = None
         self.episode = None

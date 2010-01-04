@@ -567,6 +567,7 @@ class FilterSeries(SeriesPlugin):
                 parser.ep_regexps = get_as_array(config, 'ep_regexp') + parser.ep_regexps
                 parser.id_regexps = get_as_array(config, 'id_regexp') + parser.id_regexps
                 parser.strict_name = config.get('exact', False)
+                parser.field = field
                 # do not use builtin list for id when ep configigured and vice versa
                 if 'ep_regexp' in config and not 'id_regexp' in config:
                     parser.id_regexps = []
@@ -580,7 +581,8 @@ class FilterSeries(SeriesPlugin):
                     log_once(pw.value, logger=log)
 
                 if parser.valid:
-                    log.debug('%s seems to be valid %s' % (entry['title'], series_name))
+                    log.debug('%s seems to be valid %s, data: %s field: %s' % \
+                        (entry['title'], series_name, parser.data, field))
                     self.parser2entry[parser] = entry
                     entry['series_parser'] = parser
                     break
@@ -956,9 +958,10 @@ class FilterSeries(SeriesPlugin):
     def accept_series(self, feed, parser, reason):
         """Accept this series with a given reason"""
         entry = self.parser2entry[parser]
-        if entry['title'] != parser.data:
-            log.critical('BUG? accepted title is different from parser.data ! %s != %s' % \
-                (entry['title'], parser.data))
+        if parser.field:
+            if entry[parser.field] != parser.data:
+                log.critical('BUG? accepted title is different from parser.data %s != %s, field=%s, series=%s' % \
+                    (entry[parser.field], parser.data, parser.field, parser.name))
         feed.accept(entry, reason)
 
     def on_feed_exit(self, feed):
