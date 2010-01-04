@@ -56,7 +56,10 @@ class InputBacklog:
         # add missing from backlog
         count = 0
         for backlog_entry in feed.session.query(BacklogEntry).filter(BacklogEntry.feed == feed.name).all():
-            entry = backlog_entry.entry
+            # we don't want changes to reflect back into database
+            # this is because it causes bugs if entry gets say series parser instance..
+            import copy
+            entry = copy.deepcopy(backlog_entry.entry)
             # this is already in the feed
             if feed.find_entry(title=entry['title'], url=entry['url']):
                 continue
