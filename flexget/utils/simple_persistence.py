@@ -5,6 +5,7 @@ from sqlalchemy import Column, Integer, String, DateTime, PickleType
 
 log = logging.getLogger('util.simple_persistence')
 
+
 class SimpleKeyValue(Base):
     """Declarative"""
     
@@ -26,25 +27,28 @@ class SimpleKeyValue(Base):
     def __repr__(self):
         return "<SimpleKeyValue('%s','%s','%s')>" % (self.feed, self.key, self.value)
 
+
 class SimplePersistence(object):
     
     def __init__(self, feed):
         self.feed = feed
         
     def set(self, key, value):
-        skv = self.feed.session.query(SimpleKeyValue).filter(SimpleKeyValue.feed==self.feed.name).\
-            filter(SimpleKeyValue.plugin==self.feed.current_plugin).filter(SimpleKeyValue.key==key).first()
+        skv = self.feed.session.query(SimpleKeyValue).filter(SimpleKeyValue.feed == self.feed.name).\
+            filter(SimpleKeyValue.plugin == self.feed.current_plugin).filter(SimpleKeyValue.key == key).first()
         if skv:
             # update existing
+            log.debug('updating key %s value %s' % (key, repr(value)))
             skv.value = value
         else:
             # add new key
             skv = SimpleKeyValue(self.feed.name, self.feed.current_plugin, key, value)
+            log.debug('adding key %s value %s' % (key, repr(value)))
             self.feed.session.add(skv)
     
     def get(self, key, default=None):
-        skv = self.feed.session.query(SimpleKeyValue).filter(SimpleKeyValue.feed==self.feed.name).\
-            filter(SimpleKeyValue.plugin==self.feed.current_plugin).filter(SimpleKeyValue.key==key).first()
+        skv = self.feed.session.query(SimpleKeyValue).filter(SimpleKeyValue.feed == self.feed.name).\
+            filter(SimpleKeyValue.plugin == self.feed.current_plugin).filter(SimpleKeyValue.key == key).first()
         if not skv:
             return default
         else:
