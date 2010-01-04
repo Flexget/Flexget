@@ -552,6 +552,9 @@ class FilterSeries(SeriesPlugin):
                 log.debug('auto enabling expect_ep for %s' % series_name)
                 expect_ep = True
 
+        # don't try to parse these fields
+        ignore_fields = ['uid']
+
         # key: series (episode) identifier ie. S01E02
         # value: seriesparser
         series = {}
@@ -559,6 +562,9 @@ class FilterSeries(SeriesPlugin):
             for field, data in sorted(entry.items(), cmp=field_order):
                 # skip invalid fields
                 if not isinstance(data, basestring) or not data:
+                    continue
+                # skip ignored
+                if field in ignore_fields:
                     continue
                 parser = SeriesParser()
                 parser.name = series_name
