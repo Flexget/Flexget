@@ -102,6 +102,7 @@ class PluginTransmissionrpc:
         """ adds accepted entries to transmission """
         try:
             import transmissionrpc
+            from transmissionrpc.transmission import TransmissionError
         except:
             raise PluginError('Transmissionrpc module required.', log)
       
@@ -131,9 +132,12 @@ class PluginTransmissionrpc:
         for entry in feed.accepted:
 
             options = self._make_torrent_options_dict(feed, entry)
-           
-            r = cli.add(None, 30, filename=entry['url'], **options['add'])
             
+            try:
+                r = cli.add(None, 30, filename=entry['url'], **options['add'])
+            except TransmissionError, e:
+                log.error(e.message)
+
             if len(options['change'].keys()) > 0:
                 for id in r.keys():
                     cli.change(id, 30, **options['change'])
