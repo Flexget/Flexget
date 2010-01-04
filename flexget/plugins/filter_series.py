@@ -587,7 +587,7 @@ class FilterSeries(SeriesPlugin):
                     log_once(pw.value, logger=log)
 
                 if parser.valid:
-                    log.debug('%s detected as %s' % (entry['title'], str(parser.data)))
+                    log.debug('%s detected as %s, field: %s' % (entry['title'], parser, parser.field))
                     self.parser2entry[parser] = entry
                     entry['series_parser'] = parser
                     break

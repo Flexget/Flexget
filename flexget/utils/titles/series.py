@@ -233,12 +233,14 @@ class SeriesParser(TitleParser):
         return self.proper_or_repack 
 
     def __str__(self):
+        # for some fucking reason it's impossible to print self.field here, if someone figures out why please
+        # tell me!
         valid = 'INVALID'
         if self.valid:
             valid = 'OK'
-        return '<SeriesParser(data=%s,name=%s,id=%s,season=%s,episode=%s,quality=%s,proper=%s,field=%s,status=%s)>' % \
-            (self.data, self.name, str(self.id), str(self.season), str(self.episode), \
-             str(self.quality), str(self.proper_or_repack), str(self.field), valid)
+        return '<SeriesParser(data=%s,name=%s,id=%s,season=%s,episode=%s,quality=%s,proper=%s,status=%s)>' % \
+            (self.data, self.name, str(self.id), self.season, self.episode, \
+             self.quality, self.proper_or_repack, valid)
 
     def __cmp__(self, other):
         """
