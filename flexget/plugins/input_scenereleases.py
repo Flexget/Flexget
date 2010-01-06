@@ -1,12 +1,13 @@
 import urllib2
 import logging
-from httplib import BadStatusLine
 from flexget.feed import Entry
 from flexget.plugin import *
 from flexget.utils.soup import get_soup
+from flexget.plugins.cached_input import cached
 from BeautifulSoup import NavigableString
 
 log = logging.getLogger('scenereleases')
+
 
 class InputScenereleases:
     """
@@ -16,10 +17,10 @@ class InputScenereleases:
 
         scenereleases: http://scenereleases.info/category/movies/movies-dvd-rip
     """
+    
     def validator(self):
         from flexget import validator
         return validator.factory('url')
-        
 
     def parse_site(self, url, feed):
         """Parse configured url and return releases array"""
@@ -28,7 +29,7 @@ class InputScenereleases:
         soup = get_soup(page)
             
         releases = []
-        for entry in soup.findAll('div', attrs={'class':'entry'}):
+        for entry in soup.findAll('div', attrs={'class': 'entry'}):
             release = {}
             title = entry.find('h2')
             if not title:
@@ -78,6 +79,7 @@ class InputScenereleases:
 
         return releases
 
+    @cached('scenereleases', 'url')
     @internet(log)
     def on_feed_input(self, feed):
         releases = self.parse_site(feed.get_input_url('scenereleases'), feed)
@@ -85,9 +87,11 @@ class InputScenereleases:
         for release in releases:
             # construct entry from release
             entry = Entry()
+            
             def apply_field(d_from, d_to, f):
                 if d_from.has_key(f):
-                    if d_from[f] == None: return # None values are not wanted!
+                    if d_from[f] == None:
+                        return # None values are not wanted!
                     d_to[f] = d_from[f]
 
             for field in ['title', 'url', 'imdb_url', 'imdb_score', 'imdb_votes']:

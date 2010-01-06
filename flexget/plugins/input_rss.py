@@ -9,6 +9,7 @@ import socket
 from flexget.feed import Entry
 from flexget.plugin import *
 from flexget.utils.log import log_once
+from flexget.plugins.cached_input import cached
 
 log = logging.getLogger('rss')
 
@@ -78,6 +79,7 @@ class InputRSS:
         url = urlparse.urlunsplit(parts)
         return url        
 
+    @cached('rss', 'url')
     @internet(log)
     def on_feed_input(self, feed):
         config = feed.config['rss']
@@ -87,11 +89,13 @@ class InputRSS:
 
         # get input caching facility
         cache = None
+        """
         try:
             cache = get_plugin_by_name('input_cache').instance
         except PluginDependencyError:
             pass
-
+        """
+        
         # check if cache is available for this url
         if cache:
             if cache.restore(feed, url):

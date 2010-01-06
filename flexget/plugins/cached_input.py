@@ -1,0 +1,74 @@
+import copy
+import logging
+from flexget.plugin import *
+
+log = logging.getLogger('@cached')
+
+cache = {}
+
+
+class cached(object):
+
+    """
+    Implements transparent caching decorater @cached for inputs.
+
+    Decorator has two parameters
+
+    :name: in which the configuration is present in feeds configuration.
+    :key: in which the configuration has the cached resource identifier (ie. url). If the :key: is not
+    given or present in the configuration :name: is expected to be a cache name (ie. url)
+
+    Configuration assumptions may make this unusable in some (future) inputs
+    """
+
+    def __init__(self, name, key=None):
+        self.name = name
+        self.key = key
+
+    def __call__(self, func):
+
+        def wrapped_func(*args, **kwargs):
+            global cache
+            
+            # get feed from method parameters
+            feed = args[1]
+
+            # get name for a cache from feed's configuration
+            if not self.name in feed.config:
+                raise Exception('@cache config name %s is not configured in feed %s' % (self.name, feed.name))
+            config = feed.config[self.name]
+            if self.key in config:
+                name = feed.config[self.name][self.key]
+            else:
+                name = feed.config[self.name]
+
+            log.debug('name is %s' % name)
+
+            if name in cache:
+                count = 0
+                for entry in cache[name]:
+                    fresh = copy.deepcopy(entry)
+                    feed.entries.append(fresh)
+                    count += 1
+                if count > 0:
+                    log.info('Restored %s entries from cache' % count)
+            else:
+                # call input event
+                func(*args, **kwargs)
+                # store results to cache
+                log.debug('storing to cache %s %s entries' % (name, len(feed.entries)))
+                cache[name] = copy.deepcopy(feed.entries)
+
+        return wrapped_func
+
+
+class CacheClearer:
+
+    def on_process_start(self, feed):
+        """Internal. Clears the input cache on every process"""
+        # as flexget runs only once process per run this is not necessary,
+        # will be needed in the future tough
+        global cache
+        cache = {}
+
+register_plugin(CacheClearer, 'cache_clearer')

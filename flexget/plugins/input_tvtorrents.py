@@ -1,12 +1,13 @@
 import urllib2
 import urlparse
 import logging
-from socket import timeout
 from flexget.feed import Entry
 from flexget.plugin import *
 from flexget.utils.soup import get_soup
+from flexget.plugins.cached_input import cached
 
 log = logging.getLogger('tvtorrents')
+
 
 class InputTVTorrents:
     """
@@ -26,10 +27,12 @@ class InputTVTorrents:
 
         Plugin-specific code by Fredrik Braenstroem.
     """
+
     def validator(self):
         from flexget import validator
         return validator.factory('url')
 
+    @cached('tvtorrents')
     @internet(log)
     def on_feed_input(self, feed):
         pageurl = "http://tvtorrents.com/loggedin/recently_aired.do"
@@ -46,7 +49,8 @@ class InputTVTorrents:
         hashurl = hurl[1] + "%s" + hurl[3] + digest + hurl[5] + hash
 
         for link in soup.findAll('a'):
-            if not 'href' in link: continue
+            if not 'href' in link:
+                continue
             url = link['href']
             title = link.contents[0]
 
@@ -59,10 +63,12 @@ class InputTVTorrents:
                 url = hashurl % (infohash,)
             else:
                 continue
-            if title == None: continue
+            if title == None:
+                continue
 
             title = title.strip()
-            if not title: continue
+            if not title:
+                continue
 
             # fix broken urls
             if url.startswith('//'):

@@ -5,6 +5,7 @@ from flexget.feed import Entry
 from flexget.plugin import *
 from flexget.utils.log import log_once
 from flexget.utils.soup import get_soup
+from flexget.plugins.cached_input import cached
 from BeautifulSoup import NavigableString
 
 log = logging.getLogger('rlslog')
@@ -109,6 +110,7 @@ class RlsLog:
 
         return releases
 
+    @cached('rlslog', 'url')
     @internet(log)
     def on_feed_input(self, feed):
         url = feed.get_input_url('rlslog')

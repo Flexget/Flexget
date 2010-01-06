@@ -1,10 +1,12 @@
 import urllib2
 from flexget.feed import Entry
 from flexget.plugin import *
+from flexget.plugins.cached_input import cached
 import re
 import logging
 
 log = logging.getLogger('text')
+
 
 class InputText:
 
@@ -28,8 +30,8 @@ class InputText:
         url: novelPrint = "(.*)"
       format:
         url: http://www.nbc.com%(url)s
-
     """
+
     def validator(self):
         from flexget import validator
         root = validator.factory('dict')
@@ -48,6 +50,8 @@ class InputText:
         for k, v in d.iteritems():
             entry[k] = v % entry
 
+    @cached('text', 'url')
+    @internet(log)
     def on_feed_input(self, feed):
         url = feed.config['text']['url']
         content = urllib2.urlopen(url)

@@ -5,6 +5,7 @@ import BeautifulSoup
 from flexget.feed import Entry
 from flexget.plugin import *
 from flexget.utils.soup import get_soup
+from flexget.plugins.cached_input import cached
 
 log = logging.getLogger('html')
 
@@ -32,6 +33,7 @@ class InputHtml:
         advanced.accept('text', key='title_from')
         return root
 
+    @cached('html', 'url')
     @internet(log)
     def on_feed_input(self, feed):
         config = feed.config['html']

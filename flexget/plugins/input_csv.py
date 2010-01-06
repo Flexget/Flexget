@@ -2,8 +2,10 @@ import urllib2
 import logging
 from flexget.feed import Entry
 from flexget.plugin import *
+from flexget.plugins.cached_input import cached
 
 log = logging.getLogger('csv')
+
 
 class InputCSV:
     """
@@ -29,6 +31,7 @@ class InputCSV:
         Fields title and url are mandatory. First field is 1.
         List of other common (optional) fields can be found from wiki.
     """
+    
     def validator(self):
         from flexget import validator
         config = validator.factory('dict')
@@ -37,9 +40,12 @@ class InputCSV:
         values.accept_any_key('number')
         return config
 
+    @cached('csv', 'url')
+    @internet(log)
     def on_feed_input(self, feed):
         url = feed.config['csv'].get('url', None)
-        if not url: raise Exception('CSV in %s is missing url' % feed.name)
+        if not url:
+            raise Exception('CSV in %s is missing url' % feed.name)
         page = urllib2.urlopen(url)
         for line in page.readlines():
             data = line.split(",")
