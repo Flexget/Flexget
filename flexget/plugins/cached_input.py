@@ -10,7 +10,7 @@ cache = {}
 class cached(object):
 
     """
-    Implements transparent caching decorater @cached for inputs.
+    Implements transparent caching decorator @cached for inputs.
 
     Decorator has two parameters
 
