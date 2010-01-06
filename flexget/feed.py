@@ -255,12 +255,6 @@ class Feed:
         else:
             log.debug('event: %s plugin: %s msg: %s%s' % (self.current_event, self.current_plugin, msg, reason_str))
 
-    def verbose_details_entries(self):
-        """If details option is enabled, print all produced entries"""
-        if self.manager.options.details:
-            for entry in self.entries:
-                self.verbose_details('%s' % entry['title'])
-
     def __run_event(self, event):
         """Execute all configured plugins in :event:"""
         methods = get_methods_by_event(event)
@@ -272,7 +266,7 @@ class Feed:
                 if method.plugin.name in self.config:
                     break
             else:
-                log.warning('Feed doesn\'t have any %s plugins' % (event))
+                log.warning('Feed doesn\'t have any %s plugins, you should add some!' % (event))
 
         for method in methods:
             keyword = method.plugin.name
@@ -312,7 +306,7 @@ class Feed:
 
     @useFeedLogging
     def execute(self):
-        """Execute this feed, runs events in order of events array."""
+        """Execute this feed"""
 
         # validate configuration
         errors = self.validate()
@@ -341,9 +335,12 @@ class Feed:
             # run all plugins with this event
             self.__run_event(event)
 
+            # if abort flag has been set feed should be aborted now
+            if self._abort:
+                return
+
             # verbose some progress
             if event == 'input':
-                self.verbose_details_entries()
                 if not self.entries:
                     self.verbose_progress('Feed didn\'t produce any entries. This is likely due to a mis-configured or non-functional input.')
                 else:
@@ -352,13 +349,14 @@ class Feed:
                 self.verbose_progress('Accepted: %s (Rejected: %s Undecided: %s Failed: %s)' % \
                     (len(self.accepted), len(self.rejected), \
                     len(self.entries) - len(self.accepted), len(self.failed)))
-
-            # if abort flag has been set feed should be aborted now
-            if self._abort:
-                return
         
         log.debug('committing session')
         self.session.commit()
+
+        # verbose undecided entries
+        if self.manager.options.details:
+            for entry in self.entries:
+                print "+ %-8s %-12s %s" % ('undecided', '', entry['title'])
 
     @useFeedLogging
     def process_start(self):
