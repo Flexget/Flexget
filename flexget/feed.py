@@ -37,7 +37,7 @@ class Entry(dict):
         dict.__setitem__(self, key, value)
         if self.get('title') and self.get('original_url'):
             m = hashlib.md5()
-            m.update(self['original_url'])
+            m.update(self['original_url'].encode('ascii', 'ignore'))
             m.update(self['title'].encode('ascii', 'ignore'))
             uid = m.hexdigest()
             dict.__setitem__(self, 'uid', uid)
