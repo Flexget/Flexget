@@ -10,6 +10,9 @@ class OutputHtml:
     # TODO: implement
     def __validator(self):
         from flexget import validator
+        root = validator.factory('dict')
+        root.accept('file', key='template')
+        root.accept('text', key='file')
         return validator.factory('text')
 
     def on_feed_output(self, feed):

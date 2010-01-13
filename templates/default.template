@@ -14,6 +14,18 @@ div#main {
 
 /* MOVIE */
 
+div.header {
+  height: 57px;
+}
+
+div.name {
+    float: left;
+}
+
+div.ratings {
+   float: right;
+}
+
 div.photo {
     border: 1px solid #000;
     height: 120px;
@@ -21,6 +33,12 @@ div.photo {
     float: right;
     background: #fff;
     margin-left: 1em;
+}
+
+h2 {
+    margin: 0;
+    font-size: 0.9em;
+    color: #777;
 }
 
 
@@ -257,53 +275,60 @@ div.clear {
 
         #else if 'imdb_url' in $entry
             <div class="movie">
-            <h1>$entry.title</h1>
+                <div class="header">
+                    <div class="name">
+                        #if 'imdb_name' in $entry and 'imdb_year' in $entry
+                            <h1>$entry.imdb_name ($entry.imdb_year)</h1>
+                            <h2>$entry.title</h2>
+                        #else
+                            <h1>$entry.title</h1>
+                        #end if
+                    </div>
 
-            <!-- imdb has referer blocker
-            #if 'imdb_photo' in $entry
-                <div class="photo">
-                    <img src="$entry.imdb_photo">
+                    <div class="ratings">
+                        #if 'imdb_score' in $entry
+                            <div class="score">
+                                Score: #echo "%.1f" % $entry.imdb_score
+                            </div>
+                        #end if
+
+                        #if 'imdb_votes' in $entry
+                            <div class="votes">
+                                Votes: $entry.imdb_votes
+                            </div>
+                        #end if
+                    </div>
+                    <div class="clear">&nbsp;</div>
                 </div>
-            #end if
-            -->
 
-            #if 'imdb_score' in $entry
-                Score: #echo "%.1f" % $entry.imdb_score
-            #end if
+                #if 'imdb_plot_outline' in $entry
+                    <div class="overview">
+                        <h2>Plot</h2>
+                        $entry.imdb_plot_outline
+                    </div>
+                #end if
 
-            #if 'imdb_votes' in $entry
-                Votes: $entry.imdb_votes
-            #end if
+                #if 'imdb_genres' in $entry
+                    <div class="genres">
+                        <h2>Genres</h2>
+                        <ul>
+                        #for $genre in $entry.imdb_genres
+                            <li>$genre</li>
+                        #end for
+                        </ul>
+                    </div>
+                #end if
 
-            #if 'imdb_plot_outline' in $entry
-                <div class="overview">
-                    <h2>Plot</h2>
-                    $entry.imdb_plot_outline
-                </div>
-            #end if
-
-            #if 'imdb_genres' in $entry
-                <div class="genres">
-                    <h2>Genres</h2>
-                    <ul>
-                    #for $genre in $entry.imdb_genres
-                        <li>$genre</li>
-                    #end for
-                    </ul>
-                </div>
-            #end if
-
-            #if 'imdb_actors' in $entry
-                <div class="actors">
-                    <h2>Actors</h2>
-                    <ul>
-                    #for $imdbid, $actor in $entry.imdb_actors.items()
-                        <li><a href="http://www.imdb.com/name/$imdbid">$actor</a></li>
-                    #end for
-                    </ul>
-                </div>
-            #end if
-
+                #if 'imdb_actors' in $entry
+                    <div class="actors">
+                        <h2>Actors</h2>
+                        <ul>
+                        #for $imdbid, $actor in $entry.imdb_actors.items()
+                            <li><a href="http://www.imdb.com/name/$imdbid">$actor</a></li>
+                        #end for
+                        </ul>
+                    </div>
+                #end if
 
             </div>
         #else
