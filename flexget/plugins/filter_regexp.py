@@ -1,9 +1,9 @@
-import urllib
 import logging
 import re
 from flexget.plugin import *
 
 log = logging.getLogger('regexp')
+
 
 class FilterRegexp:
 
@@ -30,6 +30,7 @@ class FilterRegexp:
         
         Possible operations: accept, reject, accept_excluding, reject_excluding        
     """
+
     def validator(self):
         from flexget import validator
 
@@ -67,15 +68,16 @@ class FilterRegexp:
         return conf
         
     def on_feed_filter(self, feed):
-        match_methods = {'accept': feed.accept, 'reject': feed.reject }
-        non_match_methods = {'accept_excluding': feed.accept, 'reject_excluding': feed.reject }
+        match_methods = {'accept': feed.accept, 'reject': feed.reject}
+        non_match_methods = {'accept_excluding': feed.accept, 'reject_excluding': feed.reject}
         
         # TODO: what if accept and accept_excluding configured? Should raise error ...
 
         rest = []
         config = feed.config.get('regexp', {})
         for operation, regexps in config.iteritems():
-            if operation=='rest': continue
+            if operation == 'rest':
+                continue
             match_method = match_methods.get(operation, None)
             non_match_method = non_match_methods.get(operation, None)
             r = self.filter(feed, match_method, non_match_method, regexps)
@@ -91,7 +93,8 @@ class FilterRegexp:
                 rest_method(entry)
         
     def matches(self, entry, regexp, find_from=[]):
-        """Of any of the entry string fields match given regexp, return the field name. None otherwise."""
+        """Check if :entry: has any string fields that matches :regexp:.
+        Optional :find_from: can be given to limit searching fields"""
         unquote = ['url']
         for field, value in entry.iteritems():
             if not isinstance(value, basestring):
@@ -100,8 +103,9 @@ class FilterRegexp:
                 if not field in find_from:
                     continue
             if field in unquote:
+                import urllib
                 value = urllib.unquote(value)
-            if re.search(regexp, value, re.IGNORECASE|re.UNICODE):
+            if re.search(regexp, value, re.IGNORECASE | re.UNICODE):
                 return field
         return None
 
@@ -149,17 +153,18 @@ class FilterRegexp:
                             match = False
                             
                 if match:
-                    if path: entry['path'] = path
+                    if path:
+                        entry['path'] = path
                     if setconfig:
                         log.debug('adding set: info to entry:"%s" %s' % (entry['title'], setconfig))
                         set = get_plugin_by_name('set')
                         set.instance.modify(entry, setconfig)
-                    log.debug("'%s' matched '%s'" % (entry['title'], regexp_raw))
+                    log.debug('regexp %s matched to field %s' % (regexp_raw, field))
                     break
                     
             if match:
                 if match_method:
-                    match_method(entry, '%s matched to %s' % (regexp_raw, field))
+                    match_method(entry, 'regexp %s matched to field %s' % (regexp_raw, field))
                 else:
                     rest.append(entry)
             else:
@@ -173,4 +178,4 @@ class FilterRegexp:
         else:
             return None
 
-register_plugin(FilterRegexp, 'regexp', priorities={'filter': 128})
+register_plugin(FilterRegexp, 'regexp', priorities={'filter': 172})
