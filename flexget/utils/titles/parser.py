@@ -10,8 +10,8 @@ class ParseWarning(Warning):
 
 class TitleParser(object):
     
-    qualities = ['1080p', '1080', '720p', '720', 'hr', 'dvd', 'bdrip', 'dvdrip', 'bdscr', 'dvdscr', 'hdtv', 
-                 'pdtv', 'dsr', 'dsrip', 'r5', 'cam', 'unknown']
+    qualities = ['1080p', '1080', '720p', '720', 'hr', 'dvd', 'bdrip', 'dvdrip', '480p', '480',
+                 'bdscr', 'dvdscr', 'hdtv', 'pdtv', 'dsr', 'dsrip', 'r5', 'cam', 'unknown']
     
     propers = ['proper', 'repack', 'rerip', 'real']
     
@@ -23,6 +23,8 @@ class TitleParser(object):
     remove = ['imax']
 
     codecs = ['x264', 'x.264', 'h264', 'h.264', 'XViD']
+
+    sounds = ['AC3', 'DD5.1']
 
     def strip_spaces(self, text):
         """Removes all unnecessary duplicate spaces from a text"""
@@ -36,6 +38,8 @@ class TitleParser(object):
         """Clean all given :words: from :text: case insensitivively"""
         for word in words:
             text = self.ireplace(text, word, '')
+        # remove duplicate spaces
+        text = ' '.join(text.split())
         return text
 
     def ireplace(self, str, old, new, count=0):

@@ -60,13 +60,7 @@ class SeriesParser(TitleParser):
                 raise Exception('%s cannot be %s' % (name, repr(value)))
         object.__setattr__(self, name, value)
 
-    def parse(self):
-        if not self.name or not self.data:
-            raise Exception('SeriesParser initialization error, name: %s data: %s' % \
-               (repr(self.name), repr(self.data)))
-
-        data = self.data
-
+    def clean(self, data):
         # perform data cleaner regexps
         for clean_re in self.clean_regexps:
             matches = re.findall(clean_re, data, re.IGNORECASE | re.UNICODE)
@@ -89,14 +83,23 @@ class SeriesParser(TitleParser):
                     else:
                         data = data.replace(match, '').strip()
 
-        log.log(5, 'data after cleaners: %s' % data)
+        log.log(5, 'cleaned data: %s' % data)
 
-        def clean(str):
+        return data
+
+    def parse(self):
+        if not self.name or not self.data:
+            raise Exception('SeriesParser initialization error, name: %s data: %s' % \
+               (repr(self.name), repr(self.data)))
+
+        data = self.clean(self.data)
+
+        def remove_dirt(str):
             """Helper, just replace crap with spaces"""
             return re.sub(r'[-_.\[\]\(\)]+', ' ', str).strip().lower()
 
-        name = clean(self.name)
-        data = clean(data)
+        name = remove_dirt(self.name)
+        data = remove_dirt(data)
         # remove duplicate spaces
         data = ' '.join(data.split())
 
@@ -118,7 +121,9 @@ class SeriesParser(TitleParser):
         data_parts = data.split(' ')
 
         # name end position
+        name_start = 0
         name_end = 0
+
         # regexp name matching
         if self.name_regexps:
             name_matches = False
@@ -126,6 +131,7 @@ class SeriesParser(TitleParser):
             for name_re in self.name_regexps:
                 match = re.search(name_re, data, re.IGNORECASE | re.UNICODE)
                 if match:
+                    name_start = match.start()
                     name_end = match.end()
                     name_matches = True
                     break
@@ -141,9 +147,8 @@ class SeriesParser(TitleParser):
                 #log.debug('FAIL: regexp %s does not match %s' % (name_re, data))
                 # leave this invalid
                 return
+            name_start = match.start()
             name_end = match.end()
-
-        # TODO: matched name should be EXCLUDED from ep and id searching!
 
         # search tags and quality
         for part in data_parts:
@@ -160,15 +165,26 @@ class SeriesParser(TitleParser):
                 self.special = True
 
         # remove unwanted words (qualities and such) from data for ep / id parsing
-        data = self.remove_words(data, self.remove + self.qualities + self.codecs)
+        # need to remove them from the original string, as they might not match to cleaned string
+        new_data = self.remove_words(self.data, self.remove + self.qualities + self.codecs + self.sounds)
+        new_data = self.clean(new_data)
+        data = remove_dirt(new_data)
+
+        # remove series name from the data 
+        name_in_data = data[name_start:name_end-1]
+        log.log(5, "name_in_data '%s'" % name_in_data)
+        data = data.replace(name_in_data, '')
+
+        log.debug("data for id/ep parsing '%s'" % data)
 
         # search for season and episode number
+
         for ep_re in self.ep_regexps:
             match = re.search(ep_re, data, re.IGNORECASE | re.UNICODE)
             if match:
                 # strict_name
                 if self.strict_name:
-                    if match.start() - name_end >= 2:
+                    if match.start() > 1:
                         return
 
                 log.debug('found episode number with regexp %s' % ep_re)
@@ -178,8 +194,28 @@ class SeriesParser(TitleParser):
                 self.valid = True
                 return
 
-        # search for id as last since they contain somewhat broad matches
-        if not self.expect_ep:
+        # search for ids later as last since they contain somewhat broad matches
+
+        if self.expect_ep:
+            # we should be getting season, ep !
+            # try to look up idiotic numberin scheme 101,102,103,201,202
+            # ressu: Added matching for 0101, 0102... It will fail on
+            #        season 11 though
+            log.debug('expect_ep enabled')
+            match = re.search('\D(0?\d)(\d\d)\D', data, re.IGNORECASE | re.UNICODE)
+            if match:
+                # strict_name
+                if self.strict_name:
+                    if match.start() > 1:
+                        return
+
+                self.season = int(match.group(1))
+                self.episode = int(match.group(2))
+                log.debug(self)
+                self.valid = True
+                return
+            log.debug('-> no luck with the expect_ep')
+        else:
             for id_re in self.id_regexps:
                 match = re.search(id_re, data, re.IGNORECASE | re.UNICODE)
                 if match:
@@ -194,25 +230,6 @@ class SeriesParser(TitleParser):
                         self.id += '-SPECIAL'
                     self.valid = True
                     return
-        else:
-            # we should be getting season, ep !
-            # try to look up idiotic numberin scheme 101,102,103,201,202
-            # ressu: Added matching for 0101, 0102... It will fail on
-            #        season 11 though
-            log.debug('expect_ep enabled')
-            match = re.search('\D(0?\d)(\d\d)\D', data, re.IGNORECASE | re.UNICODE)
-            if match:
-                # strict_name
-                if self.strict_name:
-                    if match.start() - name_end >= 2:
-                        return
-
-                self.season = int(match.group(1))
-                self.episode = int(match.group(2))
-                log.debug(self)
-                self.valid = True
-                return
-            log.debug('-> no luck with the expect_ep')
 
         raise ParseWarning('%s looks like series %s but I cannot find any episode or id numbering!' % (data, self.name))
 

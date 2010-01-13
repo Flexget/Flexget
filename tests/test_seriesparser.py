@@ -11,17 +11,21 @@ from flexget.utils.titles import SeriesParser, ParseWarning
 #
 
 # try to get logging running ...
+# enable enable_logging and add --nologcapture to nosetest to see debug
+# (should not be needed, logging is not initialized properly?)
 
 enable_logging = False
 
 if enable_logging:
+    level = 5
     import logging
     from flexget import initialize_logging
     initialize_logging(True)
     log = logging.getLogger()
-    log.setLevel(logging.DEBUG)
+    log.setLevel(level)
+    # switch seriesparser logging to debug
     from flexget.utils.titles.series import log as parser_log
-    parser_log.setLevel(logging.DEBUG)
+    parser_log.setLevel(level)
 
 
 class TestSeriesParser(object):
@@ -243,7 +247,7 @@ class TestSeriesParser(object):
         s.name = 'test'
         s.data = 'Test.A.S01E02.720p-FlexGet'
         s.parse()
-        assert not s.valid, 'strict failed'
+        assert not s.valid, 'strict A failed'
 
         s = SeriesParser()
         s.strict_name = True
@@ -251,3 +255,27 @@ class TestSeriesParser(object):
         s.data = 'Test.AB.S01E02.720p-FlexGet'
         s.parse()
         assert s.valid, 'strict AB failed'
+
+    def test_quality_as_ep(self):
+        """SeriesParser: test that qualities are not picked as ep"""
+        for quality in SeriesParser.qualities:
+            s = SeriesParser()
+            s.expect_ep = True
+            s.name = 'FooBar'
+            s.data = 'FooBar %s XviD-FlexGet' % quality
+            assert_raises(ParseWarning, s.parse)
+
+    def test_sound_as_ep(self):
+        """SeriesParser: test that sound infos are not picked as ep"""
+        for sound in SeriesParser.sounds:
+            s = SeriesParser()
+            s.name = 'FooBar'
+            s.data = 'FooBar %s XViD-FlexGet' % sound
+            assert_raises(ParseWarning, s.parse)
+
+    def test_name_with_number(self):
+        """SeriesParser: test number in a name"""
+        s = SeriesParser()
+        s.name = 'Storage 13'
+        s.data = 'Storage 13 no ep number'
+        assert_raises(ParseWarning, s.parse)
