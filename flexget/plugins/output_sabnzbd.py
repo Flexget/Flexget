@@ -62,6 +62,7 @@ class OutputSabnzbd:
         set.instance.register_keys({'category': 'text'})
 
     def on_feed_output(self, feed):
+
         import urllib
         import urllib2
         
@@ -70,6 +71,10 @@ class OutputSabnzbd:
         baseurl = config['url']
         
         for entry in feed.accepted:
+            if feed.manager.options.test:
+                log.info('Would add into sabnzbd: %s' % entry['title'])
+                continue
+                
             params = self.get_params(config)
             # allow overriding the category
             if 'category' in entry:
@@ -90,7 +95,7 @@ class OutputSabnzbd:
                     log.exception(e)
                 continue
             
-            if response.lower().find('error') != -1:
+            if 'error' in response.lower():
                 feed.fail(entry, response.replace('\n', ''))
             
 register_plugin(OutputSabnzbd, 'sabnzbd')
