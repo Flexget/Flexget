@@ -50,9 +50,6 @@ class Manager:
 
         self.initialize()
 
-        if self.options.log_start:
-            logging.info('FlexGet started')
-
         log.debug('Default encoding: %s' % sys.getdefaultencoding())
 
     def initialize(self):
@@ -257,6 +254,9 @@ class Manager:
         Base.metadata.create_all(bind=self.engine)
 
     def acquire_lock(self):
+        if self.options.log_start:
+            log.info('FlexGet started (PID: %s)' % os.getpid())
+
         self.lockfile = os.path.join(self.config_base, ".%s-lock" % self.config_name)
         if os.path.exists(self.lockfile):
             f = file(self.lockfile)
@@ -271,6 +271,8 @@ class Manager:
         f.close()
 
     def release_lock(self):
+        if self.options.log_start:
+            log.info('FlexGet stopped (PID: %s)' % os.getpid())
         os.remove(self.lockfile)
 
     def print_failed(self):
