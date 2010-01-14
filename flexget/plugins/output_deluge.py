@@ -328,12 +328,16 @@ class OutputDeluge:
             def on_complete(result):
 
                 def on_disconnect(result):
-                    log.debug('Done adding torrents to deluge.' % result)
+                    log.debug('Done adding torrents to deluge. result: %s' % result)
                     reactor.callLater(0.1, pause_reactor, 0)
                     
-                client.disconnect().addCallback(on_disconnect)
+                def on_disconnect_fail(result):
+                    log.debug('Disconnect from deluge daemon failed, result: %s' % result)
+                    reactor.callLater(0.1, pause_reactor, 0)
+                    
+                client.disconnect().addCallbacks(on_disconnect, errback=on_disconnect_fail)
 
-            defer.DeferredList(dlist).addCallback(on_complete)
+            defer.DeferredList(dlist).addCallbacks(on_complete, errback=on_complete)
             
         def on_connect_fail(result, feed):
             log.info('connect failed result: %s' % result)
