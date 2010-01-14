@@ -1,5 +1,6 @@
 import logging
 from flexget.plugin import *
+import copy
 
 log = logging.getLogger('set')
 
@@ -52,7 +53,8 @@ class ModifySet:
         this can be called from a plugin to add set values to an entry
         """
         #run string replacement on all string variables before validation
-        config.update(dict([(key, value % entry) for (key, value) in config.iteritems() if isinstance(value, basestring)]))
+        conf = copy.deepcopy(config)
+        conf.update(dict([(key, value % entry) for (key, value) in config.iteritems() if isinstance(value, basestring)]))
         
         if validate:
             from flexget import validator
@@ -67,7 +69,7 @@ class ModifySet:
 
         log.debug('adding set: info to entry:"%s" %s' % (entry['title'], config))
         
-        entry.update(config)
+        entry.update(conf)
 
 #filter priority is -255 so we run after all filters are finished
 register_plugin(ModifySet, 'set', priorities={'filter': -255})
