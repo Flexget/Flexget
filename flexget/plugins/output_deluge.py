@@ -275,9 +275,14 @@ class OutputDeluge:
                     log.debug("%s move on complete set to %s" % (entry['title'], opts['movedone']))
                 if opts['label']:
                     client.core.enable_plugin('Label')
-                    client.label.add(opts['label'])
-                    client.label.set_torrent(torrent_id, opts['label'])
-                    log.debug("%s label set to '%s'" % (entry['title'], opts['label']))
+                    
+                    def on_get_labels(labels, label, torrent_id):
+                        if not label in labels:
+                            client.label.add(label)
+                        client.label.set_torrent(torrent_id, label)
+                        log.debug("%s label set to '%s'" % (entry['title'], label))
+                        
+                    client.label.get_labels().addCallback(on_get_labels, opts['label'], torrent_id)
                 if opts['queuetotop'] != None:
                     if opts['queuetotop']:
                         client.core.queue_top([torrent_id])
