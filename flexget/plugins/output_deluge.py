@@ -306,7 +306,7 @@ class OutputDeluge:
                 if path:
                     opts['download_location'] = path
                 for fopt, dopt in self.options.iteritems():
-                    value = entry.get(fopt, config.get('fopt'))
+                    value = entry.get(fopt, config.get(fopt))
                     if value != None:
                         opts[dopt] = value
                         if fopt == 'ratio':
