@@ -81,13 +81,9 @@ class OutputDeluge:
             except:
                 log.debug("Testing for deluge 1.2 API")
                 try:
-                    from multiprocessing import Process, Queue
-                except:
-                    raise PluginError('Python 2.6 required to use deluge 1.2 api', log)
-                try:
                     from deluge.ui.client import client
-                except:
-                    raise PluginError('Deluge module required.', log)
+                except ImportError, e:
+                    raise PluginError('Deluge module and it\'s dependencies required. ImportError: %s' % e, log)
                 try:
                     from twisted.internet import reactor
                 except:
