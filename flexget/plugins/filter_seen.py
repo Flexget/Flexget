@@ -13,7 +13,7 @@ class Seen(Base):
 
     id = Column(Integer, primary_key=True)
     field = Column(String)
-    value = Column(String)
+    value = Column(String, index=True)
     feed = Column(String)
     added = Column(DateTime)
     
@@ -151,6 +151,8 @@ class FilterSeen(object):
                     log.debug("Rejecting '%s' '%s' because of seen '%s'" % (entry['url'], entry['title'], field))
                     feed.reject(entry)
                     break
+            else:
+                continue
 
     def on_feed_exit(self, feed):
         """Remember succeeded entries"""

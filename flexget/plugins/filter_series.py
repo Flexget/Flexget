@@ -553,7 +553,7 @@ class FilterSeries(SeriesPlugin):
                 expect_ep = True
 
         # don't try to parse these fields
-        ignore_fields = ['uid']
+        ignore_fields = ['uid', 'feed', 'url', 'original_url']
 
         # key: series (episode) identifier ie. S01E02
         # value: seriesparser
@@ -600,23 +600,11 @@ class FilterSeries(SeriesPlugin):
                     expect_ep = True
                     log.debug('auto enabling expect_ep for %s' % series_name)
 
-
             # add series, season and episode to entry
             entry['series_name'] = series_name
             entry['series_season'] = parser.season
             entry['series_episode'] = parser.episode
-            # debug for #390
-            try:
-                entry['series_id'] = parser.identifier
-            except:
-                log.critical('-' * 79)
-                log.critical('Found bug #390! Please report this:')
-                log.critical('-' * 79)
-                log.critical('series_name: %s' % series_name)
-                log.critical('Entry: %s' % entry.safe_str())
-                log.critical('Parser: %s' % parser)
-                log.critical('-' * 79)
-                continue
+            entry['series_id'] = parser.identifier
 
             # set custom download path
             if 'path' in config:
