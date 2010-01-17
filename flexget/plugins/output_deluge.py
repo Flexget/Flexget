@@ -230,6 +230,7 @@ class OutputDeluge:
         
         from deluge.ui.client import client
         from twisted.internet import reactor, defer
+        from twisted.internet.task import deferLater
         
         def start_reactor():
             #if this is the first this function is being called, we have to call startRunning
@@ -262,6 +263,7 @@ class OutputDeluge:
                 return
                 
             def on_success(torrent_id, entry, opts):
+                dlist = []
                 if not torrent_id:
                     log.info("%s is already loaded in deluge, cannot set options." % entry['title'])
                     return
@@ -270,26 +272,28 @@ class OutputDeluge:
                     if not os.path.isdir(opts['movedone']):
                         log.debug("movedone path %s doesn't exist, creating" % opts['movedone'])
                         os.makedirs(opts['movedone'])
-                    client.core.set_torrent_move_completed(torrent_id, True)
-                    client.core.set_torrent_move_completed_path(torrent_id, opts['movedone'])
+                    dlist.append(client.core.set_torrent_move_completed(torrent_id, True))
+                    dlist.append(client.core.set_torrent_move_completed_path(torrent_id, opts['movedone']))
                     log.debug("%s move on complete set to %s" % (entry['title'], opts['movedone']))
                 if opts['label']:
-                    client.core.enable_plugin('Label')
+                    dlist.append(client.core.enable_plugin('Label'))
                     
                     def on_get_labels(labels, label, torrent_id):
                         if not label in labels:
-                            client.label.add(label)
-                        client.label.set_torrent(torrent_id, label)
+                            yield client.label.add(label)
+                        yield client.label.set_torrent(torrent_id, label)
                         log.debug("%s label set to '%s'" % (entry['title'], label))
                         
-                    client.label.get_labels().addCallback(on_get_labels, opts['label'], torrent_id)
+                    dlist.append(client.label.get_labels().addCallback(defer.inlineCallbacks(on_get_labels), opts['label'], torrent_id))
                 if opts['queuetotop'] != None:
                     if opts['queuetotop']:
-                        client.core.queue_top([torrent_id])
+                        dlist.append(client.core.queue_top([torrent_id]))
                         log.debug("%s moved to top of queue" % entry['title'])
                     else:
-                        client.core.queue_bottom([torrent_id])
+                        dlist.append(client.core.queue_bottom([torrent_id]))
                         log.debug("%s moved to bottom of queue" % entry['title'])
+                d = defer.DeferredList(dlist)
+                yield d
 
             def on_fail(result, feed, entry):
                 log.info("%s was not added to deluge! %s" % (entry['title'], result))
@@ -327,7 +331,7 @@ class OutputDeluge:
                 opts['movedone'] = os.path.expanduser(entry.get('movedone', config['movedone']) % entry)
                 opts['label'] = entry.get('label', config['label']).lower()
                 opts['queuetotop'] = entry.get('queuetotop', config.get('queuetotop'))
-                addresult.addCallback(on_success, entry, opts).addErrback(on_fail, feed, entry)
+                addresult.addCallback(defer.inlineCallbacks(on_success), entry, opts).addErrback(on_fail, feed, entry)
                 dlist.append(addresult)
                 
             def on_complete(result):
@@ -340,9 +344,10 @@ class OutputDeluge:
                     log.debug('Disconnect from deluge daemon failed, result: %s' % result)
                     reactor.callLater(0.1, pause_reactor, 0)
                     
+                #deferLater(reactor, 0.1, client.disconnect).addCallbacks(on_disconnect, errback=on_disconnect_fail)
                 client.disconnect().addCallbacks(on_disconnect, errback=on_disconnect_fail)
 
-            defer.DeferredList(dlist).addCallbacks(on_complete, errback=on_complete)
+            defer.DeferredList(dlist, consumeErrors=True).addBoth(on_complete)
             
         def on_connect_fail(result, feed):
             log.info('connect failed result: %s' % result)
@@ -364,5 +369,11 @@ class OutputDeluge:
         #d.addCallbacks(on_connect_success, on_connect_fail, (feed), None, (feed))
         d.addCallback(on_connect_success, feed).addErrback(on_connect_fail, feed)
         start_reactor()
+        
+    def on_process_end(self, feed):
+        if self.deluge12 and self.reactorRunning == 2:
+            from twisted.internet import reactor
+            reactor.fireSystemEvent('shutdown')
+            self.reactorRunning = 0
 
 register_plugin(OutputDeluge, 'deluge', priorities=dict(output=1, process_start=1))
