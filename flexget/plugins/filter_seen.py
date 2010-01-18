@@ -143,16 +143,20 @@ class FilterSeen(object):
             log.debug('%s is disabled' % self.keyword)
             return
         
+        queries = 0
         for entry in feed.entries:
             for field in self.fields:
                 if not field in entry:
                     continue
+                queries += 1
                 if feed.session.query(Seen).filter(Seen.value == entry[field]).first():
                     log.debug("Rejecting '%s' '%s' because of seen '%s'" % (entry['url'], entry['title'], field))
                     feed.reject(entry)
                     break
             else:
                 continue
+        if feed.manager.options.debug_perf:
+            log.info('Executed %s queries' % queries)
 
     def on_feed_exit(self, feed):
         """Remember succeeded entries"""

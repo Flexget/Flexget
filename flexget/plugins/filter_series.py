@@ -914,9 +914,11 @@ class FilterSeries(SeriesPlugin):
             for ep in eps:
                 feed.reject(self.parser2entry[ep], 'timeframe is waiting')
                 # add entry to backlog (backlog prevents duplicates)
-                # TODO: backlog length could calculated from timeframe legnth!
                 if self.backlog:
-                    self.backlog.add_backlog(feed, self.parser2entry[ep], '14 days')
+                    # set expiring timeframe length + 10%
+                    expires = timedelta(seconds=timeframe.seconds * 1.10)
+                    log.debug('timeframe expires: %s hours' % (int(expires.seconds) / 60))
+                    self.backlog.add_backlog(feed, self.parser2entry[ep], '%s seconds' % expires.seconds)
             return True
 
     # TODO: whitelist deprecated ?

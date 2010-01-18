@@ -15,7 +15,7 @@ class BacklogEntry(Base):
     feed = Column(String)
     title = Column(String)
     expire = Column(DateTime)
-    entry = Column(PickleType)
+    entry = Column(PickleType(mutable=False))
 
     def __repr__(self):
         return '<BacklogEntry(title=%s)>' % (self.title)
@@ -56,10 +56,8 @@ class InputBacklog:
         # add missing from backlog
         count = 0
         for backlog_entry in feed.session.query(BacklogEntry).filter(BacklogEntry.feed == feed.name).all():
-            # we don't want changes to reflect back into database
-            # this is because it causes bugs if entry gets say series parser instance..
-            import copy
-            entry = copy.deepcopy(backlog_entry.entry)
+            entry = backlog_entry.entry
+            
             # this is already in the feed
             if feed.find_entry(title=entry['title'], url=entry['url']):
                 continue
@@ -67,7 +65,7 @@ class InputBacklog:
             count += 1
             feed.entries.append(entry)
         if count:
-            log.info('Injected %s entries from backlog' % count)
+            log.info('Added %s entries from backlog' % count)
 
     def learn_backlog(self, feed, amount=''):
         """Learn current entries into backlog. All feed inputs must have been executed."""

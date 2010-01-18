@@ -15,7 +15,7 @@ class DelayedEntry(Base):
     feed = Column(String)
     title = Column(String)
     expire = Column(DateTime)
-    entry = Column(PickleType)
+    entry = Column(PickleType(mutable=False))
 
     def __repr__(self):
         return '<DelayedEntry(title=%s)>' % (self.title)
