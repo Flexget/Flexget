@@ -60,7 +60,7 @@ class PluginPreset:
             if not preset in toplevel_presets:
                 if preset == 'global': 
                     continue
-                raise PluginError('Unable to set preset %s for %s' % (preset, feed.name), log)
+                raise PluginError('Unable to find preset %s for feed %s' % (preset, feed.name), log)
             # merge
             from flexget.utils.tools import MergeException, merge_dict_from_to
             try:
