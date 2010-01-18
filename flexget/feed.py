@@ -1,3 +1,4 @@
+import time
 import hashlib
 import logging
 from flexget.manager import Session
@@ -121,6 +122,8 @@ class Feed:
         # current state
         self.current_event = None
         self.current_plugin = None
+
+        self.performance = {}
         
     def purge(self):
         """
@@ -271,6 +274,9 @@ class Feed:
         for method in methods:
             keyword = method.plugin.name
             if keyword in self.config or method.plugin.builtin:
+                # performance
+                start_time = time.clock()
+
                 # store execute info
                 self.current_event = event
                 self.current_plugin = keyword
@@ -298,6 +304,10 @@ class Feed:
                     # don't handle plugin errors gracefully with unit test
                     if self.manager.unit_test:
                         raise
+                # store performance information
+                took = time.clock() - start_time
+                self.performance[keyword] = self.performance.get(keyword, 0) + took
+
                 # purge entries between plugins
                 self.purge()
                 # check for priority operations
@@ -349,9 +359,16 @@ class Feed:
                 self.verbose_progress('Accepted: %s (Rejected: %s Undecided: %s Failed: %s)' % \
                     (len(self.accepted), len(self.rejected), \
                     len(self.entries) - len(self.accepted), len(self.failed)))
-        
+
         log.debug('committing session')
         self.session.commit()
+
+        # display performance
+        if self.manager.options.debug_perf:
+            for key, value in self.performance.iteritems():
+                if value < 0.01:
+                    continue
+                log.info('%-20s took %-5s sec' % (key, value))
 
         # verbose undecided entries
         if self.manager.options.details:
