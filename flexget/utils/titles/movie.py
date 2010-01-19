@@ -19,15 +19,13 @@ class MovieParser(TitleParser):
         return "MovieParser(%s, %s, %s)" % self.name, self.year, self.quality
 
     def parse(self):
-
+        """Parse movie name, returns name, year"""
         s = self.data
 
-        """Parse movie name, returns name, year"""
-        for char in ['[', ']', '_', '(', ')', ',']:
+        for char in '[]()_,.':
             s = s.replace(char, ' ')
-        # if there are no spaces, start making begining from dots
-        if s.find(' ') == -1:
-            s = s.replace('.', ' ')
+
+        # if there are no spaces
         if s.find(' ') == -1:
             s = s.replace('-', ' ')
 
