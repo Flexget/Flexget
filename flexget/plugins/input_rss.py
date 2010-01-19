@@ -248,7 +248,10 @@ class InputRSS:
                     ee['url'] = enclosure['href']
                     # get optional meta-data
                     if 'length' in enclosure: 
-                        ee['size'] = int(enclosure['length'])
+                        try:
+                            ee['size'] = int(enclosure['length'])
+                        except:
+                            ee['size'] = 0
                     if 'type' in enclosure: 
                         ee['type'] = enclosure['type']
                     # if enclosure has size OR there are multiple enclosures use filename from url
