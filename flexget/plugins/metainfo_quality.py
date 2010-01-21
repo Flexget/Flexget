@@ -4,6 +4,7 @@ from flexget.utils.titles.parser import TitleParser
 
 log = logging.getLogger('metainfo_quality')
 
+
 class MetainfoQuality:
     """
     Utility:
@@ -24,6 +25,9 @@ class MetainfoQuality:
         for entry in feed.entries:
             for quality in TitleParser.qualities:
                 for field_name, field_value in entry.iteritems():
+                    if not isinstance(field_value, basestring):
+                        continue
+                    log.log(5, 'checking quality from %s' % field_name)
                     if unicode(quality).lower() in unicode(field_value).lower():
                         log.log(5, 'Found quality %s for %s from field %s' % \
                             (quality, entry['title'], field_name))
