@@ -130,7 +130,9 @@ class PluginTransmissionrpc:
         cli = transmissionrpc.Client(conf['host'], conf['port'], user, password)
 
         for entry in feed.accepted:
-
+            if feed.manager.options.test:
+                log.info('Would add %s to transmission' % entry['url'])
+                continue
             options = self._make_torrent_options_dict(feed, entry)
             
             try:
