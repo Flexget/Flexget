@@ -216,7 +216,7 @@ class Manager:
         else:
             self.db_filename = os.path.join(self.config_base, 'db-%s.sqlite' % self.config_name)
             # this is mainly to handle fixing one bug without causing havoc ..
-            if not os.path.exists(self.db_filename) and not self.options.initdb:
+            if not os.path.exists(self.db_filename) and not self.options.initdb and not self.options.test:
                 print ''
                 print 'Configuration file \'%s\' doesn\'t have a initialized database.' % self.config_name
                 print 'Add --initdb parameter once to verify that you mean to start a new database.'

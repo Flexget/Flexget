@@ -27,6 +27,9 @@ class OutputExec:
             except KeyError, e:
                 log.error('Entry %s does not have required field %s' % (entry['title'], e.message))
                 continue
+            if feed.manager.options.test:
+                log.info('would execute cmd: %s' % cmd)
+                continue
             log.debug('executing cmd: %s' % cmd)
             p = subprocess.Popen(cmd, shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, close_fds=False)
             (r, w) = (p.stdout, p.stdin)
