@@ -203,6 +203,9 @@ class OutputDeluge:
                 if not item in before:
                     # entry['deluge_torrentid'] = item
                     if movedone:
+                        if not os.path.isdir(os.path.expanduser(movedone % entry)):
+                            log.debug("movedone path %s doesn't exist, creating" % (movedone % entry))
+                            os.makedirs(os.path.expanduser(movedone % entry))
                         log.debug("%s move on complete set to %s" % (entry['title'], movedone % entry))
                         sclient.set_torrent_move_on_completed(item, True)
                         sclient.set_torrent_move_on_completed_path(item, os.path.expanduser(movedone % entry))
