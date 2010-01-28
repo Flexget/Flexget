@@ -65,7 +65,7 @@ class InputBacklog:
             count += 1
             feed.entries.append(entry)
         if count:
-            log.info('Added %s entries from backlog' % count)
+            feed.verbose_progress('Added %s entries from backlog' % count, log)
 
     def learn_backlog(self, feed, amount=''):
         """Learn current entries into backlog. All feed inputs must have been executed."""

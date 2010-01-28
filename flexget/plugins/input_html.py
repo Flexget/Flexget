@@ -82,7 +82,7 @@ class InputHtml:
             
             # tag inside link
             if isinstance(title, BeautifulSoup.Tag):
-                log.debug('title is tag: %s' % title)
+                log.log(5, 'title is tag: %s' % title)
                 continue
 
             # just unable to get any decent title

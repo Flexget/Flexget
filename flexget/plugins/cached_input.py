@@ -2,7 +2,7 @@ import copy
 import logging
 from flexget.plugin import *
 
-log = logging.getLogger('@cached')
+log = logging.getLogger('cached')
 
 cache = {}
 
@@ -51,7 +51,7 @@ class cached(object):
                     feed.entries.append(fresh)
                     count += 1
                 if count > 0:
-                    log.info('Restored %s entries from cache' % count)
+                    feed.verbose_progress('Restored %s entries from cache' % count, log)
             else:
                 # call input event
                 func(*args, **kwargs)

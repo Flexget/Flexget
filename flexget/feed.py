@@ -63,13 +63,14 @@ def useFeedLogging(func):
 
     def wrapper(self, *args, **kw):
         # re-format logging
+        padding = 15
         feed_name = self.name
-        while len(feed_name) <= 15:
+        while len(feed_name) <= padding:
             feed_name += ' '
-        if len(feed_name) > 15:
-            feed_name = feed_name[:15]
+        if len(feed_name) > padding:
+            feed_name = feed_name[:padding]
 
-        log_format = ['%(asctime)-15s %(levelname)-8s %(name)-11s ' + feed_name + ' %(message)s', '%Y-%m-%d %H:%M']
+        log_format = ['%(asctime)-15s %(levelname)-8s %(name)-13s ' + feed_name + ' %(message)s', '%Y-%m-%d %H:%M']
         formatter = logging.Formatter(*log_format)
 
         formatters = {}

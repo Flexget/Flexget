@@ -59,7 +59,7 @@ def initialize_logging(unit_test=False):
         logger = logging.getLogger()
 
         # time format is same format of strftime
-        log_format = ['%(asctime)-15s %(levelname)-8s %(name)-27s %(message)s', '%Y-%m-%d %H:%M']
+        log_format = ['%(asctime)-15s %(levelname)-8s %(name)-29s %(message)s', '%Y-%m-%d %H:%M']
         formatter = logging.Formatter(*log_format)
 
         _mem_handler = logging.handlers.MemoryHandler(1000 * 1000, 100)
