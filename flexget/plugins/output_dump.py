@@ -1,5 +1,8 @@
 from optparse import SUPPRESS_HELP
 from flexget.plugin import *
+import logging
+
+log = logging.getLogger('dump')
 
 
 class YamlDump:
@@ -12,7 +15,8 @@ class YamlDump:
         return validator.factory('boolean')
 
     def on_feed_output(self, feed):
-        if not 'dump' in feed.config and not feed.manager.options.dump:
+        log.debug('dump_entries: %s' % feed.manager.options.dump_entries)
+        if not 'dump' in feed.config and not feed.manager.options.dump_entries:
             return
         #from flexget.utils.tools import sanitize
         import yaml
@@ -37,4 +41,4 @@ class YamlDump:
 register_plugin(YamlDump, 'dump', builtin=True)
 
 # for some fucking reason this --dump does not work
-register_parser_option('--dump', action='store_true', dest='dump', default=False, help=SUPPRESS_HELP)
+register_parser_option('--dump', action='store_true', dest='dump_entries', default=False, help=SUPPRESS_HELP)

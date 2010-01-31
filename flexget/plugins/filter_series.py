@@ -340,28 +340,29 @@ class FilterSeries(SeriesPlugin):
     def validator(self):
         from flexget import validator
 
-        def build_options(advanced):
-            advanced.accept('text', key='path')
-            bundle = advanced.accept('dict', key='set')
-            bundle.accept_any_key('any')
+        def build_options(options):
+            options.accept('text', key='path')
+            # set
+            set = options.accept('dict', key='set')
+            set.accept_any_key('any')
             # regexes can be given in as a single string ..
-            advanced.accept('regexp', key='name_regexp')
-            advanced.accept('regexp', key='ep_regexp')
-            advanced.accept('regexp', key='id_regexp')
+            options.accept('regexp', key='name_regexp')
+            options.accept('regexp', key='ep_regexp')
+            options.accept('regexp', key='id_regexp')
             # .. or as list containing strings
-            advanced.accept('list', key='name_regexp').accept('regexp')
-            advanced.accept('list', key='ep_regexp').accept('regexp')
-            advanced.accept('list', key='id_regexp').accept('regexp')
+            options.accept('list', key='name_regexp').accept('regexp')
+            options.accept('list', key='ep_regexp').accept('regexp')
+            options.accept('list', key='id_regexp').accept('regexp')
             # quality
-            advanced.accept('text', key='quality')                    # TODO: allow only SeriesParser.qualities
-            advanced.accept('list', key='qualities').accept('text')   # TODO: ^^
-            advanced.accept('text', key='min_quality')                # TODO: ^^
-            advanced.accept('text', key='max_quality')                # TODO: ^^
-            advanced.accept('regexp_match', key='timeframe').accept('\d+ (minutes|hours|days|weeks)')
+            options.accept('text', key='quality')                    # TODO: allow only SeriesParser.qualities
+            options.accept('list', key='qualities').accept('text')   # TODO: ^^
+            options.accept('text', key='min_quality')                # TODO: ^^
+            options.accept('text', key='max_quality')                # TODO: ^^
+            options.accept('regexp_match', key='timeframe').accept('\d+ (minutes|hours|days|weeks)')
             # strict naming
-            advanced.accept('boolean', key='exact')
+            options.accept('boolean', key='exact')
             # watched
-            watched = advanced.accept('dict', key='watched')
+            watched = options.accept('dict', key='watched')
             watched.accept('number', key='season')
             watched.accept('number', key='episode')
 
@@ -374,8 +375,8 @@ class FilterSeries(SeriesPlugin):
                 'ep_regexp', 'id_regexp', 'watched', 'quality', 'min_quality', \
                 'max_quality', 'qualities', 'exact'], \
                 'Option \'$key\' has invalid indentation level. It needs 2 more spaces.')
-            advanced = bundle.accept_any_key('dict')
-            build_options(advanced)
+            options = bundle.accept_any_key('dict')
+            build_options(options)
 
         root = validator.factory()
 

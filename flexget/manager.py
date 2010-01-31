@@ -72,14 +72,14 @@ class Manager:
             # explicit path given, don't try anything too fancy
             possible[self.options.config] = config_path
         else:
-            log.debug('trying to figuring out paths')
+            log.debug('Figuring out lookup paths')
             # normal lookup locations
             possible[os.path.join(startup_path, self.options.config)] = startup_path
             possible[os.path.join(home_path, self.options.config)] = home_path
             # for virtualenv / dev sandbox
             from flexget import __version__ as version
             if version == '{subversion}':
-                log.debug('adding virtualenv / sandbox paths')
+                log.debug('Running subversion, adding virtualenv / sandbox paths')
                 possible[os.path.join(sys.path[0], '..', self.options.config)] = os.path.join(sys.path[0], '..')
                 possible[os.path.join(current_path, self.options.config)] = current_path
                 possible[os.path.join(exec_path, self.options.config)] = exec_path
@@ -219,7 +219,7 @@ class Manager:
             if not os.path.exists(self.db_filename) and not self.options.initdb and not self.options.test:
                 print ''
                 print 'Configuration file \'%s\' doesn\'t have a initialized database.' % self.config_name
-                print 'Add --initdb parameter once to verify that you mean to start a new database.'
+                print 'Run FlexGet once with --initdb parameter to verify that you mean to start a new database.'
                 print ''
                 print 'Important: If you\'re old user and didn\'t expect this, see bleeding edge news!'
                 print ''
