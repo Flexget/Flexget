@@ -154,7 +154,7 @@ class Manager:
         for line in file:
             line_num += 1
             # remove linefeed
-            line = line[:-1]
+            line = line.rstrip()
             # empty line
             if line.strip() == '':
                 continue
@@ -166,6 +166,8 @@ class Manager:
             #print '%i - %i: %s' % (line_num, indentation, line)
             #print 'prev_mapping: %s, prev_list: %s, prev_ind: %s' % (prev_mapping, prev_list, prev_indentation)
 
+            if '\t' in line:
+                log.warning('Line %s has tabs, use only spaces!' % line_num)
             if isodd(indentation):
                 log.warning('Config line %s has odd (uneven) indentation' % line_num)
             if indentation > prev_indentation + 2 and not prev_mapping:
@@ -190,6 +192,7 @@ class Manager:
             prev_list = line.strip()[0] == '-'
 
         file.close()
+        log.debug('Pre-checked %s configuration lines' % line_num)
 
     def init_sqlalchemy(self):
         """Initialize SQLAlchemy"""
