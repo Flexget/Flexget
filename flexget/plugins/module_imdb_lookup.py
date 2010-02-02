@@ -170,7 +170,7 @@ class ModuleImdbLookup:
                     if result.fails and not feed.manager.options.retry_lookup:
                         # this movie cannot be found, not worth trying again ...
                         log.debug('%s will fail lookup' % entry['title'])
-                        raise PluginError('Lookup fails')
+                        raise PluginError('Title lookup fails')
                     else:
                         if result.url:
                             log.log(5, 'Setting imdb url for %s from db' % entry['title'])
@@ -188,14 +188,14 @@ class ModuleImdbLookup:
                     # store url for this movie, so we don't have to search on every run
                     result = SearchResult(entry['title'], entry['imdb_url'])
                     session.add(result)
-                    log.info('Found %s' % (entry['imdb_url']))
+                    feed.verbose_progress('Found %s' % (entry['imdb_url']), log)
                 else:
                     log_once('Imdb lookup failed for %s' % entry['title'], log)
                     # store FAIL for this title
                     result = SearchResult(entry['title'])
                     result.fails = True
                     session.add(result)
-                    raise PluginError('Lookup failed')
+                    raise PluginError('Title lookup failed')
 
             imdb = ImdbParser()
             

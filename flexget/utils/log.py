@@ -7,6 +7,7 @@ from sqlalchemy import Column, Integer, String, DateTime
 
 log = logging.getLogger('util.log')
 
+
 class LogMessage(Base):
     """Declarative"""
     
@@ -21,7 +22,8 @@ class LogMessage(Base):
     
     def __repr__(self):
         return "<LogMessage('%s')>" % (self.md5sum)
-    
+
+
 def purge():
     """Purge old messages from database"""
     old = datetime.now() - timedelta(days=365)
@@ -31,8 +33,9 @@ def purge():
         session.delete(message)
     session.commit()
 
+
 def log_once(message, logger=logging.getLogger('log_once')):
-    """Log message only once using given logger."""
+    """Log message only once using given logger. Returns False if supressed logging."""
     purge()
     
     import hashlib
@@ -44,10 +47,11 @@ def log_once(message, logger=logging.getLogger('log_once')):
     # abort if this has already been logged
     if session.query(LogMessage).filter_by(md5sum=md5sum).first():
         session.close()
-        return
+        return False
 
     row = LogMessage(md5sum)
     session.add(row)
     session.commit()
     
     logger.info(message)
+    return True

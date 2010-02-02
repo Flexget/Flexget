@@ -4,6 +4,7 @@ from flexget.utils.log import log_once
 
 log = logging.getLogger('imdb')
 
+
 class FilterImdb:
     """
         This plugin allows filtering based on IMDB score, votes and genres etc.
@@ -76,7 +77,10 @@ class FilterImdb:
             try:
                 lookup(feed, entry)
             except PluginError, e:
-                log.error('Skipping %s because of an error: %s' % (entry['title'], e.value))
+                # logs skip message once trough log_once (info) and then only when ran from cmd line (w/o --cron)
+                msg = 'Skipping %s because of an error: %s' % (entry['title'], e.value)
+                if not log_once(msg, logger=log):
+                    feed.verbose_progress(msg, log)
                 continue
             
             # Check defined conditions, TODO: rewrite into functions?
