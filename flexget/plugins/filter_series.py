@@ -490,7 +490,7 @@ class FilterSeries(SeriesPlugin):
                 if (name.lower().startswith(series_name.lower())) and \
                    (name.lower() != series_name.lower()):
                     if not 'exact' in series_config:
-                        log.info('Auto enabling exact matching for series %s' % series_name)
+                        log.info('Auto enabling exact matching for series %s (reason %s)' % (series_name, name))
                         series_config['exact'] = True
 
     def on_feed_filter(self, feed):
