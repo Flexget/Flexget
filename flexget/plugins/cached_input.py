@@ -37,12 +37,17 @@ class cached(object):
             if not self.name in feed.config:
                 raise Exception('@cache config name %s is not configured in feed %s' % (self.name, feed.name))
             config = feed.config[self.name]
-            if self.key in config:
+
+            log.log(5, 'config: %s' % config)
+            log.log(5, 'self.name: %s' % self.name)
+            log.log(5, 'self.key: %s' % self.key)
+
+            if isinstance(config, dict) and self.key in config:
                 name = feed.config[self.name][self.key]
             else:
                 name = feed.config[self.name]
 
-            log.debug('name is %s' % name)
+            log.debug('cache name: %s' % name)
 
             if name in cache:
                 count = 0
