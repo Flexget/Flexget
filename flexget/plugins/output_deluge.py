@@ -262,7 +262,6 @@ class OutputDeluge:
                 return
                 
             def on_success(torrent_id, entry, opts):
-                dlist = []
                 if not torrent_id:
                     log.info("%s is already loaded in deluge, cannot set options." % entry['title'])
                     return
@@ -271,11 +270,11 @@ class OutputDeluge:
                     if not os.path.isdir(opts['movedone']):
                         log.debug("movedone path %s doesn't exist, creating" % opts['movedone'])
                         os.makedirs(opts['movedone'])
-                    dlist.append(client.core.set_torrent_move_completed(torrent_id, True))
-                    dlist.append(client.core.set_torrent_move_completed_path(torrent_id, opts['movedone']))
+                    yield client.core.set_torrent_move_completed(torrent_id, True)
+                    yield client.core.set_torrent_move_completed_path(torrent_id, opts['movedone'])
                     log.debug("%s move on complete set to %s" % (entry['title'], opts['movedone']))
                 if opts['label']:
-                    dlist.append(client.core.enable_plugin('Label'))
+                    yield client.core.enable_plugin('Label')
                     
                     def on_get_labels(labels, label, torrent_id):
                         if not label in labels:
@@ -283,16 +282,14 @@ class OutputDeluge:
                         yield client.label.set_torrent(torrent_id, label)
                         log.debug("%s label set to '%s'" % (entry['title'], label))
                         
-                    dlist.append(client.label.get_labels().addCallback(defer.inlineCallbacks(on_get_labels), opts['label'], torrent_id))
+                    yield client.label.get_labels().addCallback(defer.inlineCallbacks(on_get_labels), opts['label'], torrent_id)
                 if opts['queuetotop'] != None:
                     if opts['queuetotop']:
-                        dlist.append(client.core.queue_top([torrent_id]))
+                        yield client.core.queue_top([torrent_id])
                         log.debug("%s moved to top of queue" % entry['title'])
                     else:
-                        dlist.append(client.core.queue_bottom([torrent_id]))
+                        yield client.core.queue_bottom([torrent_id])
                         log.debug("%s moved to bottom of queue" % entry['title'])
-                d = defer.DeferredList(dlist)
-                yield d
 
             def on_fail(result, feed, entry):
                 log.info("%s was not added to deluge! %s" % (entry['title'], result))
