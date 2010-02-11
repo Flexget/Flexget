@@ -24,11 +24,15 @@ class PluginInclude:
             return
     
         import yaml
+        import os
     
         # just support one file now
         files = [feed.config['include']]
     
         for name in files:
+            if not os.path.basename(name):
+                name = os.path.join(feed.manager.config_base, name)
+            name = os.path.expanduser(name)
             include = yaml.load(file(name))
             log.debug('Merging into feed %s' % (feed.name))
             # merge
