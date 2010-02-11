@@ -38,12 +38,15 @@ class Entry(dict):
         dict.__setitem__(self, key, value)
         if self.get('title') and self.get('original_url'):
             m = hashlib.md5()
-            m.update(self['original_url'].encode('ascii', 'ignore'))
-            title = self['title']
-            if isinstance(title, unicode):
-                m.update(title.encode('ascii', 'ignore'))
-            else:
-                m.update(title)
+
+            def just_fucking_do_it(value):
+                if isinstance(value, unicode):
+                    m.update(value.encode('ascii', 'ignore'))
+                else:
+                    m.update(value)
+                    
+            just_fucking_do_it(self['original_url'])
+            just_fucking_do_it(self['title'])
             uid = m.hexdigest()
             dict.__setitem__(self, 'uid', uid)
 
