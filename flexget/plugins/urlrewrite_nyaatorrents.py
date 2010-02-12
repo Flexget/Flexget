@@ -3,13 +3,14 @@ from flexget.plugin import *
 
 log = logging.getLogger("nyaatorrents")
 
-class ResolveNyaaTorrents:
-    """NyaaTorrents resolver."""
 
-    def resolvable(self, feed, entry):
+class UrlRewriteNyaaTorrents:
+    """NyaaTorrents urlrewriter."""
+
+    def url_rewritable(self, feed, entry):
         return entry['url'].startswith('http://www.nyaatorrents.org/?page=torrentinfo&tid=')
         
-    def resolve(self, feed, entry):
+    def url_rewrite(self, feed, entry):
         entry['url'] = entry['url'].replace('torrentinfo', 'download')
 
-register_plugin(ResolveNyaaTorrents, 'nyaatorrents', groups=['resolver'])
+register_plugin(UrlRewriteNyaaTorrents, 'nyaatorrents', groups=['urlrewriter'])

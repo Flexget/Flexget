@@ -1,7 +1,7 @@
 import urllib2
 import logging
 import re
-from module_resolver import ResolverException
+from plugin_urlrewriting import UrlRewritingError
 from flexget.plugin import *
 from flexget.utils.soup import get_soup
 
@@ -11,26 +11,27 @@ socket.setdefaulttimeout(timeout)
 
 log = logging.getLogger('newtorrents')
 
+
 class NewTorrents:
-    """NewTorrents resolver and search plugin."""
+    """NewTorrents urlrewriter and search plugin."""
 
     def __init__(self):
         self.resolved = []
 
-    # Resolver plugin API
-    def resolvable(self, feed, entry):
+    # UrlRewriter plugin API
+    def url_rewritable(self, feed, entry):
         # Return true only for urls that can and should be resolved
         return entry['url'].startswith('http://www.newtorrents.info') and not entry['url'] in self.resolved
         
-    # Resolver plugin API
-    def resolve(self, feed, entry):
+    # UrlRewriter plugin API
+    def url_rewrite(self, feed, entry):
         url = entry['url']
         if url.startswith('http://www.newtorrents.info/?q=') or \
            url.startswith('http://www.newtorrents.info/search'):
             try:
                 url = self.url_from_search(url, entry['title'])
             except PluginWarning, e:
-                raise ResolverException(e)
+                raise UrlRewritingError(e)
         else:
             url = self.url_from_page(url)
 
@@ -38,7 +39,7 @@ class NewTorrents:
             entry['url'] = url
             self.resolved.append(url)
         else:
-            raise ResolverException('Bug in newtorrents resolver')
+            raise UrlRewritingError('Bug in newtorrents urlrewriter')
             
     # Search plugin API
     def search(self, feed, entry):
@@ -51,12 +52,12 @@ class NewTorrents:
             page = urllib2.urlopen(url)
             data = page.read()
         except urllib2.URLError:
-            raise ResolverException('URLerror when retrieving page')
+            raise UrlRewritingError('URLerror when retrieving page')
         p = re.compile("copy\(\'(.*)\'\)", re.IGNORECASE)
         f = p.search(data)
         if not f:
             # the link in which plugin relies is missing!
-            raise ResolverException('Failed to get url from download page. Plugin may need a update.')
+            raise UrlRewritingError('Failed to get url from download page. Plugin may need a update.')
         else:
             return f.group(1)
             
@@ -105,4 +106,4 @@ class NewTorrents:
                 log.debug('search result contains multiple matches, using most seeders from: %s' % torrents)
             return torrents[0][1]
 
-register_plugin(NewTorrents, 'newtorrents', groups=['resolver', 'search'])
+register_plugin(NewTorrents, 'newtorrents', groups=['urlrewriter', 'search'])

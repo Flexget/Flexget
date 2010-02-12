@@ -25,7 +25,7 @@ setup(
     package_data=find_package_data('flexget', package='flexget', only_in_packages=False),
     zip_safe=False,
     test_suite='nose.collector',
-    setup_requires=['nose>=0.11', 'ipython'],
+    setup_requires=['nose>=0.11'],
     entry_points="""
         [console_scripts]
         flexget = flexget:main

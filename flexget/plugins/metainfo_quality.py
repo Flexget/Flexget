@@ -27,7 +27,6 @@ class MetainfoQuality:
                 for field_name, field_value in entry.iteritems():
                     if not isinstance(field_value, basestring):
                         continue
-                    log.log(5, 'checking quality from %s' % field_name)
                     if unicode(quality).lower() in unicode(field_value).lower():
                         log.log(5, 'Found quality %s for %s from field %s' % \
                             (quality, entry['title'], field_name))

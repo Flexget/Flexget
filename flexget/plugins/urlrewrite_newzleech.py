@@ -1,13 +1,16 @@
-import urllib, urllib2, logging, re
+import urllib
+import urllib2
+import logging
+import re
 from flexget.plugin import *
-from flexget.plugins.module_resolver import ResolverException
 from flexget.utils.soup import get_soup
 
 log = logging.getLogger("newzleech")
 
-class ResolveNewzleech:
+
+class UrlRewriteNewzleech:
     """
-        Resolver or search by using newzleech.com
+        UrlRewriter or search by using newzleech.com
         TODO: implement resolving
     """
 
@@ -83,4 +86,4 @@ class ResolveNewzleech:
         
         entry['url'] = nzbs[0]['url']    
 
-register_plugin(ResolveNewzleech, 'newzleach', groups=['search'])
+register_plugin(UrlRewriteNewzleech, 'newzleach', groups=['search'])

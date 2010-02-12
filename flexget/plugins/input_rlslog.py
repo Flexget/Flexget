@@ -91,16 +91,16 @@ class RlsLog:
                         if not 'imdb_score' in release and not 'imdb_votes' in release and score_raw != None:
                             release['imdb_score'], release['imdb_votes'] = self.parse_imdb(score_raw)
 
-                # test if entry with this url would be resolvable (downloadable)
+                # test if entry with this url would be recognized
                 temp = {}
                 temp['title'] = release['title']
                 temp['url'] = link_href
-                resolver = get_plugin_by_name('resolver')
-                if resolver['instance'].resolvable(feed, temp):
+                urlrewriting = get_plugin_by_name('urlrewriting')
+                if urlrewriting['instance'].url_rewritable(feed, temp):
                     release['url'] = link_href
-                    log.log(5, '--> accepting %s (resolvable)' % link_href)
+                    log.log(5, '--> accepting %s (known url pattern)' % link_href)
                 else:
-                    log.log(5, '<-- ignoring %s (non-resolvable)' % link_href)
+                    log.log(5, '<-- ignoring %s (unknown url pattern)' % link_href)
 
             # reject if no torrent link
             if not 'url' in release:

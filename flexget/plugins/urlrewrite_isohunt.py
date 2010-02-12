@@ -3,10 +3,11 @@ from flexget.plugin import *
 
 log = logging.getLogger("isohunt")
 
-class ResolveIsoHunt:
-    """IsoHunt resolver."""
 
-    def resolvable(self, feed, entry):
+class UrlRewriteIsoHunt:
+    """IsoHunt urlrewriter."""
+
+    def url_rewritable(self, feed, entry):
         url = entry['url']
         # search is not supported
         if url.startswith('http://isohunt.com/torrents/?ihq='):
@@ -16,7 +17,7 @@ class ResolveIsoHunt:
             return False
         return url.startswith('http://isohunt.com') and url.find('download') == -1
         
-    def resolve(self, feed, entry):
+    def url_rewrite(self, feed, entry):
         entry['url'] = entry['url'].replace('torrent_details', 'download')
 
-register_plugin(ResolveIsoHunt, 'isohunt', groups=['resolver'])
+register_plugin(UrlRewriteIsoHunt, 'isohunt', groups=['urlrewriter'])

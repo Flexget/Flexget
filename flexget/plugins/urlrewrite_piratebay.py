@@ -1,18 +1,18 @@
 import urllib
 import urllib2
 import logging
-from module_resolver import ResolverException
+from plugin_urlrewriting import UrlRewritingError
 from flexget.plugin import *
 from flexget.utils.soup import get_soup
 
 log = logging.getLogger('piratebay')
 
 
-class ResolvePirateBay:
-    """PirateBay resolver."""
+class UrlRewritePirateBay:
+    """PirateBay urlrewriter."""
 
-    # resolver API
-    def resolvable(self, feed, entry):
+    # urlrewriter API
+    def url_rewritable(self, feed, entry):
         url = entry['url']
         if url.endswith('.torrent'):
             return False
@@ -22,14 +22,14 @@ class ResolvePirateBay:
             return True
         return False
         
-    # resolver API
-    def resolve(self, feed, entry):
+    # urlrewriter API
+    def url_rewrite(self, feed, entry):
         if entry['url'].startswith('http://thepiratebay.org/search/'):
             # use search
             try:
                 entry['url'] = self.search_title(entry['title'])
             except PluginWarning, e:
-                raise ResolverException(e)
+                raise UrlRewritingError(e)
         else:
             # parse download page
             entry['url'] = self.parse_download_page(entry['url'])
@@ -41,12 +41,12 @@ class ResolvePirateBay:
             soup = get_soup(page)
             tag_div = soup.find('div', attrs={'class': 'download'})
             if not tag_div:
-                raise ResolverException('Unable to locate download link from url %s' % url)
+                raise UrlRewritingError('Unable to locate download link from url %s' % url)
             tag_a = tag_div.find('a')
             torrent_url = tag_a.get('href')
             return torrent_url
         except Exception, e:
-            raise ResolverException(e)    
+            raise UrlRewritingError(e)    
             
     # search API
     def search(self, feed, entry):
@@ -95,4 +95,4 @@ class ResolvePirateBay:
 
         return str(torrents[0]['link'])
 
-register_plugin(ResolvePirateBay, 'piratebay', groups=['resolver', 'search'])
+register_plugin(UrlRewritePirateBay, 'piratebay', groups=['urlrewriter', 'search'])
