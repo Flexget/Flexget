@@ -381,7 +381,10 @@ class Feed:
         # verbose undecided entries
         if self.manager.options.details:
             for entry in self.entries:
-                print "+ %-8s %-12s %s" % ('undecided', '', entry['title'])
+                try:
+                    print "+ %-8s %-12s %s" % ('undecided', '', entry['title'])
+                except:
+                    print "+ %-8s %-12s %s (warning: unable to print unicode)" % ('undecided', '', repr(entry['title']))
 
     @useFeedLogging
     def process_start(self):
