@@ -36,7 +36,7 @@ class UrlRewrite:
         config.accept('text', key='format', required=True)
         return root
     
-    def on_process_start(self, feed):
+    def on_feed_start(self, feed):
         for name, config in feed.config.get('urlrewrite', {}).iteritems():
             match = re.compile(config['regexp'])
             format = config['format']

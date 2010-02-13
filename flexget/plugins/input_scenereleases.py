@@ -63,8 +63,8 @@ class InputScenereleases:
                 temp = {}
                 temp['title'] = release['title']
                 temp['url'] = link_href
-                resolver = get_plugin_by_name('resolver')
-                if resolver['instance'].resolvable(feed, temp):
+                urlrewriting = get_plugin_by_name('urlrewriting')
+                if urlrewriting['instance'].url_rewritable(feed, temp):
                     release['url'] = link_href
                     log.log(5, '--> accepting %s (resolvable)' % link_href)
                 else:
