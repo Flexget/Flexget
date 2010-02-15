@@ -885,12 +885,6 @@ class FilterSeries(SeriesPlugin):
                 return True
 
         # expire timeframe, accept anything
-        diff = datetime.now() - self.get_first_seen(feed.session, best)
-        if (diff.seconds < 60) and not feed.manager.unit_test:
-            entry = self.parser2entry[best]
-            log.info('Timeframe waiting %s for %s hours, currently best is %s' % \
-                (series_name, timeframe.seconds / 60 ** 2, entry['title']))
-
         first_seen = self.get_first_seen(feed.session, best)
         log.debug('timeframe: %s' % timeframe)
         log.debug('first_seen: %s' % first_seen)
@@ -911,6 +905,16 @@ class FilterSeries(SeriesPlugin):
                 feed.reject(entry, 'wrong quality')
             return True
         else:
+            # just verboses waiting
+            diff = datetime.now() - self.get_first_seen(feed.session, best)
+            if (diff.seconds < 60) and not feed.manager.unit_test:
+                import math
+                entry = self.parser2entry[best]
+                remain = math.ceil(timeframe.seconds / float(60) ** 2)
+                log.info('Timeframe waiting %1d for %s hours, currently best is %s' % \
+                    (series_name, remain, entry['title']))
+
+            # reject all episodes that are in timeframe
             log.debug('timeframe waiting %s episode %s, rejecting all occurrences' % (series_name, best.identifier))
             for ep in eps:
                 feed.reject(self.parser2entry[ep], 'timeframe is waiting')
