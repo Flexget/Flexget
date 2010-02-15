@@ -131,6 +131,17 @@ def coverage():
 def release(args):
     """Make a FlexGet release. Same as bdist_egg but adds version information."""
 
+    # clean previous build
+    print 'Cleaning build...'
+    for p in ['build']:
+        pth = path(p)
+        if pth.isdir():
+            pth.rmtree()
+        elif pth.isfile():
+            pth.remove()
+        else:
+            print 'Unable to remove %s' % pth
+
     if len(args) != 1:
         print 'Version number must be specified, ie. paver release 1.0b9'
         return
