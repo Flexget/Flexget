@@ -74,7 +74,7 @@ class UrlRewritePirateBay:
             torrent = {}
             torrent['name'] = link.contents[0]
             torrent['link'] = 'http://thepiratebay.org' + link.get('href')
-            tds = link.parent.parent.findAll('td')
+            tds = link.parent.parent.parent.findAll('td') 
             torrent['seed'] = int(tds[-2].contents[0])
             torrent['leech'] = int(tds[-1].contents[0])
             torrents.append(torrent)
