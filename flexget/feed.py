@@ -180,7 +180,7 @@ class Feed:
         if not isinstance(entry, Entry):
             raise Exception('Trying to reject non entry, %s' % repr(entry))
         # ignore rejections on immortal entries
-        if 'immortal' in entry:
+        if entry.get('immortal'):
             reason_str = ''
             if reason:
                 reason_str = ' (%s)' % reason
