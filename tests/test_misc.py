@@ -1,6 +1,8 @@
 import os
 from tests import FlexGetBase
 from nose.plugins.attrib import attr
+from nose.tools import raises
+from flexget.feed import EntryUnicodeError, Entry
 
 
 class TestDisableBuiltins(FlexGetBase):
@@ -154,3 +156,11 @@ class TestMetainfoQuality(FlexGetBase):
         assert entry, 'entry not found?'
         assert 'quality' in entry, 'failed to pick up quality'
         assert entry['quality'] == '720p', 'picked up wrong quality'
+
+
+class TestEntryUnicodeError(FlexGetBase):
+
+    @raises(EntryUnicodeError)
+    def test_encoding(self):
+        e = Entry('title', 'url')
+        e['invalid'] = '\x8e'

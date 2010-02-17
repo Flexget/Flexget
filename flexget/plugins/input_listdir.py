@@ -33,7 +33,7 @@ class InputListdir:
         import os
         config = self.get_config(feed)
         for path in config: 
-            for name in os.listdir(path):
+            for name in os.listdir(unicode(path)):
                 e = Entry()
                 e['title'] = name
                 e['url'] = 'file://%s' % (os.path.join(path, name))

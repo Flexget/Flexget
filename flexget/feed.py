@@ -9,6 +9,18 @@ from flexget.utils.simple_persistence import SimplePersistence
 log = logging.getLogger('feed')
 
 
+class EntryUnicodeError(Exception):
+
+    """This exception is thrown when trying to set non-unicode compatible field value to entry"""
+
+    def __init__(self, key, value):
+        self.key = key
+        self.value = value
+
+    def __str__(self):
+        return 'Field %s is not unicode-compatible (%s)' % (self.key, repr(self.value))
+
+
 class Entry(dict):
     """
         Represents one item in feed. Must have url and title fields.
@@ -25,17 +37,30 @@ class Entry(dict):
             self['url'] = args[1]
 
     def __setitem__(self, key, value):
+        # enforce unicode compatibility
+        if isinstance(value, str):
+            try:
+                value = unicode(value)
+            except UnicodeDecodeError:
+                raise EntryUnicodeError(key, value)
+
+        # url and original_url handling
         if key == 'url':
             if not 'original_url' in self:
                 self['original_url'] = value
             if not isinstance(value, basestring):
                 raise PluginError('Tried to set %s url to %s' % \
                     (repr(self.get('title')), repr(value)))
+
+        # title handling
         if key == 'title':
             if not isinstance(value, basestring):
                 raise PluginError('Tried to set title to %s' % \
                     (repr(value)))
+
         dict.__setitem__(self, key, value)
+
+        # calculate uid
         if self.get('title') and self.get('original_url'):
             m = hashlib.md5()
 
@@ -299,6 +324,10 @@ class Feed:
                         log_once(warn.value, warn.log)
                     else:
                         warn.log.warning(warn)
+                except EntryUnicodeError, eue:
+                    log.critical('Plugin %s tried to create non-unicode compatible entry (key: %s, value: %s)' % \
+                        (keyword, eue.key, repr(eue.value)))
+                    self.abort()
                 except PluginError, err:
                     err.log.critical(err)
                     self.abort()
