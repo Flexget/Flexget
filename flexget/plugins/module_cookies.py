@@ -5,6 +5,7 @@ from flexget.plugin import *
 
 log = logging.getLogger('cookies')
 
+
 class PluginCookies:
     """
         Adds cookie to all requests (rss, resolvers, download). Anything
@@ -90,8 +91,9 @@ class PluginCookies:
         return cookie_jar
 
     def on_feed_start(self, feed):
+        import os
         """Feed starting, install cookiejar"""
-        cj = self.sqlite2cookie(feed.config['cookies'])
+        cj = self.sqlite2cookie(os.path.expanduser(feed.config['cookies']))
         
         # create new opener for urllib2
         log.debug('Installing urllib2 opener')
