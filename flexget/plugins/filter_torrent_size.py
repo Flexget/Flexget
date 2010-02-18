@@ -28,6 +28,7 @@ class FilterTorrentSize:
         return config
 
     def on_feed_modify(self, feed):
+        import os
         if feed.manager.options.test:
             log.info('plugin is disabled in test mode as size information is not available')
             return
@@ -48,6 +49,10 @@ class FilterTorrentSize:
                 # learn this as seen that it won't be re-downloaded & rejected on every execution
                 if rejected:
                     get_plugin_by_name('seen').instance.learn(feed, entry)
+                    # clean up temporary files
+                    if os.path.exists(entry.get('file', '')):
+                        os.remove(entry['file'])
+                        del(entry['file'])
             else:
                 if config.get('strict', False):
                     feed.reject(entry, 'not a torrent')
