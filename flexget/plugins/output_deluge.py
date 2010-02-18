@@ -100,9 +100,11 @@ class OutputDeluge:
             this will generate the temp files we will load into deluge
             we don't need to call this if download plugin is loaded on this feed
         """
+        import deluge.ui.common
         config = self.get_config(feed)
         if not config['enabled']:
             return
+        #If the download plugin is not enabled, we need to call it to get our temp .torrent files
         if not 'download' in feed.config:
             download = get_plugin_by_name('download')
             # download all content to temp folder, may fail some entries
@@ -110,10 +112,10 @@ class OutputDeluge:
                 try:
                     if feed.manager.options.test:
                         log.info('Would download: %s' % entry['title'])
+                        continue
                     else:
                         if not feed.manager.unit_test:
                             log.info('Downloading: %s' % entry['title'])
-                        # check if entry must have a path (download: yes)
                         download.instance.download(feed, entry)
                 except urllib2.HTTPError, e:
                     feed.fail(entry, 'HTTP error')
@@ -130,6 +132,18 @@ class OutputDeluge:
                         log.error('Failed to reach server. Reason: %s' % e.reason)
                     elif hasattr(e, 'code'):
                         log.error('The server couldn\'t fulfill the request. Error code: %s' % e.code)
+        #Even if the download plugin got our temp files, we need to verify they are valid torrent files
+        for entry in feed.accepted:
+            if os.path.exists(entry.get('file', '')):
+                #Check if downloaded file is a valid torrent file
+                try:
+                    info = deluge.ui.common.TorrentInfo(entry['file'])
+                except Exception, e:
+                    feed.fail(entry, 'Invalid torrent file')
+                    log.error("Torrent file appears invalid for: %s", entry['title'])
+                    #clean up invalid torrent file
+                    os.remove(entry['file'])
+                    del(entry['file'])
 
     def on_feed_output(self, feed):
         """Add torrents to deluge at exit."""
@@ -304,6 +318,7 @@ class OutputDeluge:
                     log.debug('entry: %s' % entry)
                     log.debug('temp: %s' % ', '.join(os.listdir(tmp_path)))
                     feed.fail(entry, "Downloaded temp file '%s' doesn't exist!" % entry['file'])
+                    del(entry['file'])
                     continue
                 filedump = base64.encodestring(open(entry['file'], 'rb').read())
                 path = os.path.expanduser(entry.get('path', config['path']) % entry)
@@ -350,7 +365,7 @@ class OutputDeluge:
             # clean up temp file if download plugin is not configured for this feed
             if not 'download' in feed.config:
                 for entry in feed.accepted:
-                    if entry['file'] and os.path.exists(entry['file']):
+                    if os.path.exists(entry.get('file', '')):
                         os.remove(entry['file'])
                         del(entry['file'])
             log.debug('Connect to deluge daemon failed, result: %s' % result)
@@ -372,4 +387,4 @@ class OutputDeluge:
             reactor.fireSystemEvent('shutdown')
             self.reactorRunning = 0
 
-register_plugin(OutputDeluge, 'deluge', priorities=dict(output=1, process_start=1))
+register_plugin(OutputDeluge, 'deluge', priorities=dict(output=129, process_start=127, download=127))
