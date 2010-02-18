@@ -74,6 +74,20 @@ class Torrent:
                 trackers.append(t)
         return trackers
 
+    def get_info_hash(self):
+        """Return Torrent info hash"""
+        import hashlib
+        hash = hashlib.sha1()
+        info_data = self.encode_dictionary(self.content['info'])
+        hash.update(info_data)
+        return hash.hexdigest().upper()
+
+    def get_comment(self):
+        return self.content['comment']
+
+    def set_comment(self, comment):
+        self.content['comment'] = comment
+
     def remove_multitracker(self, tracker):
         """Removes passed multi-tracker from this torrent"""
         for tl in self.content.get('announce-list', [])[:]:
@@ -91,7 +105,7 @@ class Torrent:
         self.content['announce-list'].append(tracker)
 
     def __str__(self):
-        return 'Torrent instance. Files: %s' % self.get_filelist()
+        return '<Torrent instance. Files: %s>' % self.get_filelist()
         
     def tokenize(self, text, match=re.compile("([idel])|(\d+):|(-?\d+)").match):
         i = 0
@@ -203,6 +217,7 @@ class TorrentFilename:
                 # construct torrent object
                 torrent = Torrent(data)
                 entry['torrent'] = torrent
+                entry['torrent_info_hash'] = torrent.get_info_hash()
                 # if we do not have good filename (by download plugin)
                 # for this entry, try to generate one from torrent content
                 if 'filename' in entry:

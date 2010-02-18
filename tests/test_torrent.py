@@ -2,6 +2,7 @@ from tests import FlexGetBase
 
 
 class TestTorrentSize(FlexGetBase):
+
     __yaml__ = """
         presets:
           global:
@@ -27,6 +28,7 @@ class TestTorrentSize(FlexGetBase):
             torrent_size:
               min: 1
               strict: yes
+
     """
 
     def test_min(self):
@@ -43,3 +45,18 @@ class TestTorrentSize(FlexGetBase):
         self.execute_feed('test_strict')
         assert self.feed.find_entry('rejected', title='test'), \
             'should have rejected non torrent'
+
+
+class TestInfoHash(FlexGetBase):
+
+    __yaml__ = """
+        feeds:
+          test:
+            mock:
+              - {title: 'test', file: 'tests/test.torrent'}
+    """
+
+    def test_infohash(self):
+        self.execute_feed('test')
+        assert self.feed.entries[0]['torrent_info_hash'] == '20AE692114DC343C86DF5B07C276E5077E581766', \
+            'InfoHash does not match'
