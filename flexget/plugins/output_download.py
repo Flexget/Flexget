@@ -330,10 +330,10 @@ class PluginDownload:
             # make path
             path = os.path.expanduser(path)
 
-            if not os.path.exists(path):
+            if not os.path.isdir(path):
                 log.info('Creating directory %s' % path)
                 try:
-                    os.mkdir(path)
+                    os.makedirs(path)
                 except:
                     raise PluginError('Cannot create path %s' % path, log)
             
@@ -354,7 +354,7 @@ class PluginDownload:
 
             if os.path.exists(destfile):
                 if filecmp.cmp(entry['file'], destfile):
-                    logging.debug("Identical destination file '%s' already exists", destfile)
+                    log.debug("Identical destination file '%s' already exists", destfile)
                     return
                 else:
                     # TODO: Rethink the best course of action in this case.
