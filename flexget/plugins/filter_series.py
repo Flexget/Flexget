@@ -907,11 +907,11 @@ class FilterSeries(SeriesPlugin):
         else:
             # just verboses waiting
             diff = datetime.now() - self.get_first_seen(feed.session, best)
-            if (diff.seconds < 60) and not feed.manager.unit_test:
+            if diff.seconds < 60:
                 import math
                 entry = self.parser2entry[best]
                 remain = math.ceil(timeframe.seconds / float(60) ** 2)
-                log.info('Timeframe waiting %1d for %s hours, currently best is %s' % \
+                log.info('Timeframe waiting %s for %1d hours, currently best is %s' % \
                     (series_name, remain, entry['title']))
 
             # reject all episodes that are in timeframe
