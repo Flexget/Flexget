@@ -1,3 +1,5 @@
+import os
+import shutil
 from tests import FlexGetBase
 
 
@@ -7,7 +9,7 @@ class TestTorrentSize(FlexGetBase):
         presets:
           global:
             mock:
-              - {title: 'test', file: 'tests/test.torrent'}
+              - {title: 'test', file: 'tests/copy_of_test.torrent'}
             disable_builtins:
               - seen
 
@@ -30,6 +32,19 @@ class TestTorrentSize(FlexGetBase):
               strict: yes
 
     """
+
+    def setup(self):
+        FlexGetBase.setup(self)
+        if not os.path.exists('tests/copy_of_test.torrent'):
+            shutil.copy('tests/test.torrent', 'tests/copy_of_test.torrent')
+
+    def teardown(self):
+        FlexGetBase.setup(self)
+        if os.path.exists('tests/copy_of_test.torrent'):
+            os.remove('tests/copy_of_test.torrent')
+
+    def restore(self):
+        """Some tests delete the torrent, provide mechanism to make copies ..."""
 
     def test_min(self):
         self.execute_feed('test_min')
