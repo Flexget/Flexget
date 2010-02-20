@@ -355,7 +355,6 @@ class PluginDownload:
             if os.path.exists(destfile):
                 if filecmp.cmp(entry['file'], destfile):
                     logging.debug("Identical destination file '%s' already exists", destfile)
-                    feed.fail(entry, 'Identical file \'%s\' already exists' % destfile)
                     return
                 else:
                     # TODO: Rethink the best course of action in this case.
