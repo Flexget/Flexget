@@ -58,12 +58,12 @@ register_plugin(ChangeWarn, 'change_warn', builtin=True)
 try:
     import sys
     import os.path
-    dir = sys.path[0] + '/../flexget/plugins/'
+    dir = os.path.normpath(sys.path[0] + '/../flexget/plugins/')
     for name in os.listdir(dir):
         if 'resolver' in name:
             log.critical('-' * 79)
             log.critical('IMPORTANT: Please remove all pre-compiled .pyc and .pyo files from')
-            log.critical('           path: %s' % os.path.normpath(dir))
+            log.critical('           path: %s' % dir)
             log.critical('           After this FlexGet should run again normally')
             log.critical('-' * 79)
             found_deprecated = True
