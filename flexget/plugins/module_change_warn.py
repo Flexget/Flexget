@@ -57,13 +57,15 @@ register_plugin(ChangeWarn, 'change_warn', builtin=True)
 # check that no old plugins are in pre-compiled form (pyc)
 try:
     import sys
-    root = sys.path[0]
-    for name in os.listdir(root + '/../flexget/plugins/'):
+    import os.path
+    dir = sys.path[0] + '/../flexget/plugins/'
+    for name in os.listdir(dir):
         if 'resolver' in name:
-            log.critical('-'*79)
-            log.critical('IMPORTANT: Please remove all pre-compiled .pyc files from flexget/plugins/')
+            log.critical('-' * 79)
+            log.critical('IMPORTANT: Please remove all pre-compiled .pyc and .pyo files from')
+            log.critical('           path: %s' % os.path.normpath(dir))
             log.critical('           After this FlexGet should run again normally')
-            log.critical('-'*79)
+            log.critical('-' * 79)
             found_deprecated = True
             break
 except:
