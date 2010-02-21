@@ -125,13 +125,14 @@ class OutputEmail:
         if feed.manager.options.learn:
             return
 
-        entries_count = len(feed.accepted)
-        if entries_count == 0:
-            return # don't send empty emails
+        # don't send empty emails
+        if not feed.accepted:
+            return
 
         # generate email content
+        entries_count = len(feed.accepted)
         subject = "[FlexGet] %s : %d new entries downloaded" % (feed.name, entries_count)
-        content = """Hi,
+        content = u"""Hi,
 
 FlexGet has just downloaded %d new entries for feed %s :
         """ % (entries_count, feed.name)
@@ -149,7 +150,8 @@ FlexGet has just downloaded %d new entries for feed %s :
         message["To"] = config['to']
         message["From"] = config['from']
         message["Subject"] = subject
-        message.set_payload(content)
+        message.set_payload(content.encode('utf-8'))
+        message.set_charset('utf-8')
 
         # send email message
         if feed.manager.options.test:
