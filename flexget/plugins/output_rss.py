@@ -144,6 +144,10 @@ class OutputRSS:
         if not rss2gen:
             raise PluginWarning('plugin make_rss requires PyRSS2Gen library.')
         config = self.get_config(feed)
+
+        # don't run with --test
+        if feed.manager.options.test:
+            return
         
         # when history is disabled, remove everything from backlog on every run (a bit hackish, rarely usefull)
         if not config['history']:

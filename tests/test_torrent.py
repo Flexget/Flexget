@@ -34,7 +34,10 @@ class TestTorrentSize(FlexGetBase):
     """
 
     def setup(self):
+        self.create_copy()
         FlexGetBase.setup(self)
+
+    def create_copy(self):
         if not os.path.exists('tests/copy_of_test.torrent'):
             shutil.copy('tests/test.torrent', 'tests/copy_of_test.torrent')
 
@@ -43,20 +46,20 @@ class TestTorrentSize(FlexGetBase):
         if os.path.exists('tests/copy_of_test.torrent'):
             os.remove('tests/copy_of_test.torrent')
 
-    def restore(self):
-        """Some tests delete the torrent, provide mechanism to make copies ..."""
-
     def test_min(self):
+        self.create_copy()
         self.execute_feed('test_min')
         assert self.feed.find_entry('rejected', title='test'), \
             'should have rejected, minimum size'
 
     def test_max(self):
+        self.create_copy()
         self.execute_feed('test_max')
         assert self.feed.find_entry('rejected', title='test'), \
             'should have rejected, maximum size'
             
     def test_strict(self):
+        self.create_copy()
         self.execute_feed('test_strict')
         assert self.feed.find_entry('rejected', title='test'), \
             'should have rejected non torrent'
