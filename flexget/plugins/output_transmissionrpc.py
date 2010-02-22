@@ -92,9 +92,9 @@ class PluginTransmissionrpc:
                 1 override the global settings, seeding until a certain ratio
                 2 override the global settings, seeding regardless of ratio
                 '''
-                options['change']['seedRatioMode'] = 3
-            else:
                 options['change']['seedRatioMode'] = 2
+            else:
+                options['change']['seedRatioMode'] = 1
 
         return options
 
