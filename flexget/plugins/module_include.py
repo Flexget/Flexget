@@ -17,8 +17,19 @@ class PluginInclude:
 
     def validator(self):
         from flexget import validator
-        return validator.factory('text') # TODO: file
+        root = validator.factory()
+        root.accept('text') # TODO: file
+        bundle = root.accept('list')
+        bundle.accept('text')
+        return root
         
+    def get_config(self, feed):
+        config = feed.config.get('include', None)
+        #if only a single path is passed turn it into a 1 element list
+        if isinstance(config, basestring):
+            config = [config]
+        return config
+
     def on_process_start(self, feed):
         if not 'include' in feed.config:
             return
@@ -26,8 +37,7 @@ class PluginInclude:
         import yaml
         import os
     
-        # just support one file now
-        files = [feed.config['include']]
+        files = self.get_config(feed)
     
         for name in files:
             if not os.path.basename(name):
