@@ -275,42 +275,57 @@ class OutputDeluge:
                 client.disconnect().addCallback(on_disconnect)
                 return
                 
-            def on_success(torrent_id, entry, opts):
+            def on_success(torrent_id, entry, opts, d):
+                dlist = []
                 if not torrent_id:
                     log.info("%s is already loaded in deluge, cannot set options." % entry['title'])
+                    d.callback(None)
                     return
                 log.info("%s successfully added to deluge." % entry['title'])
                 if opts['movedone']:
                     if not os.path.isdir(opts['movedone']):
                         log.debug("movedone path %s doesn't exist, creating" % opts['movedone'])
                         os.makedirs(opts['movedone'])
-                    yield client.core.set_torrent_move_completed(torrent_id, True)
-                    yield client.core.set_torrent_move_completed_path(torrent_id, opts['movedone'])
+                    dlist.append(client.core.set_torrent_move_completed(torrent_id, True))
+                    dlist.append(client.core.set_torrent_move_completed_path(torrent_id, opts['movedone']))
                     log.debug("%s move on complete set to %s" % (entry['title'], opts['movedone']))
                 if opts['label']:
-                    yield client.core.enable_plugin('Label')
-                    
-                    def on_get_labels(labels, label, torrent_id):
-                        if not label in labels:
-                            yield client.label.add(label)
-                        yield client.label.set_torrent(torrent_id, label)
-                        log.debug("%s label set to '%s'" % (entry['title'], label))
-                        
-                    yield client.label.get_labels().addCallback(defer.inlineCallbacks(on_get_labels), opts['label'], torrent_id)
+                    dlist.append(client.label.set_torrent(torrent_id, opts['label']))
                 if opts['queuetotop'] != None:
                     if opts['queuetotop']:
-                        yield client.core.queue_top([torrent_id])
+                        dlist.append(client.core.queue_top([torrent_id]))
                         log.debug("%s moved to top of queue" % entry['title'])
                     else:
-                        yield client.core.queue_bottom([torrent_id])
+                        dlist.append(client.core.queue_bottom([torrent_id]))
                         log.debug("%s moved to bottom of queue" % entry['title'])
+                defer.DeferredList(dlist).addBoth(d.callback)
 
             def on_fail(result, feed, entry):
                 log.info("%s was not added to deluge! %s" % (entry['title'], result))
                 feed.fail(entry, "Could not be added to deluge")
-
-            # add the torrents
+            
+            #dlist is a list of deferreds that must complete before we exit
             dlist = []
+            #loop through entries to get a list of labels to add
+            labels = []
+            if config.get('label'):
+                labels.append(config['label'].lower())
+            for entry in feed.accepted:
+                if entry.get('label'):
+                    labels.append(entry['label'].lower())
+            if len(labels) > 0:
+                client.core.enable_plugin('Label')
+
+                def on_get_labels(d_labels, labels, d):
+                    for label in labels:
+                        if not label in d_labels:
+                            client.label.add(label)
+                    d.callback(None)
+
+                d = defer.Deferred()
+                client.label.get_labels().addCallback(on_get_labels, labels, d)
+                dlist.append(d)
+            # add the torrents
             for entry in feed.accepted:
                 # see that temp file is present
                 if not os.path.exists(entry['file']):
@@ -342,8 +357,10 @@ class OutputDeluge:
                 opts['movedone'] = os.path.expanduser(entry.get('movedone', config['movedone']) % entry)
                 opts['label'] = entry.get('label', config['label']).lower()
                 opts['queuetotop'] = entry.get('queuetotop', config.get('queuetotop'))
-                addresult.addCallback(defer.inlineCallbacks(on_success), entry, opts).addErrback(on_fail, feed, entry)
-                dlist.append(addresult)
+                #create a deferred here which we will callback after all work in on_success is done
+                d = defer.Deferred()
+                addresult.addCallbacks(on_success, on_fail, callbackArgs=(entry, opts, d), errbackArgs=(feed, entry))
+                dlist.append(d)
                 
             def on_complete(result):
 
