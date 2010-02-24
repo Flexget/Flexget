@@ -18,14 +18,21 @@ class PluginTransmissionrpc:
         username: myusername
         password: mypassword
         path: the download location
+
+    Default values for the config elements:
+
+    transmissionrpc:
+        host: localhost
+        port: 9091
+        enabled: True
     """
 
     def validator(self):
         """Return config validator"""
         root = validator.factory()
         advanced = root.accept('dict')
-        advanced.accept('text', key='host', required=True)
-        advanced.accept('number', key='port', required=True)
+        advanced.accept('text', key='host')
+        advanced.accept('number', key='port')
         """note that password is optional in transmission"""
         advanced.accept('file', key='netrc', required=False) 
         advanced.accept('text', key='username', required=False) 
@@ -37,6 +44,15 @@ class PluginTransmissionrpc:
         advanced.accept('number', key='maxdownspeed', required=False) 
         advanced.accept('decimal', key='ratio', required=False) 
         return root
+
+    def get_config(self, feed):
+        config = feed.config['transmissionrpc']
+        if isinstance(config, bool):
+            config = {'enabled': config}
+        config.setdefault('enabled', True)
+        config.setdefault('host', 'localhost')
+        config.setdefault('port', 9091)
+        return config
 
     def on_process_start(self, feed):
         '''event handler'''
@@ -85,7 +101,7 @@ class PluginTransmissionrpc:
 
         if 'ratio' in opt_dic:
             options['change']['seedRatioLimit'] = opt_dic['ratio']
-            if opt_dic['ratio'] == 0.0:
+            if opt_dic['ratio'] == -1:
                 '''
                 seedRatioMode:
                 0 follow the global settings
@@ -105,9 +121,8 @@ class PluginTransmissionrpc:
             from transmissionrpc.transmission import TransmissionError
         except:
             raise PluginError('Transmissionrpc module required.', log)
-      
 
-        conf = feed.config['transmissionrpc']
+        conf = self.get_config(feed)
 
         user, password = None, None
 
@@ -136,6 +151,11 @@ class PluginTransmissionrpc:
             options = self._make_torrent_options_dict(feed, entry)
             
             try:
+                # TODO: Private trackers may need certain cookie headers, so
+                # do something similar to what the deluge plugin does to
+                # allow downloading the torrent file and adding using the
+                # path to the downloaded file, or the "metainfo"
+                # (base64-encoded .torrent content.
                 r = cli.add(None, 30, filename=entry['url'], **options['add'])
             except TransmissionError, e:
                 log.error(e.message)
