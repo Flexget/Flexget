@@ -169,11 +169,11 @@ class PluginTransmissionrpc:
                 # path to the downloaded file, or the "metainfo"
                 # (base64-encoded .torrent content.
                 r = cli.add(None, 30, filename=entry['url'], **options['add'])
+
+                if len(options['change'].keys()) > 0:
+                    for id in r.keys():
+                        cli.change(id, 30, **options['change'])
             except TransmissionError, e:
                 log.error(e.message)
-
-            if len(options['change'].keys()) > 0:
-                for id in r.keys():
-                    cli.change(id, 30, **options['change'])
 
 register_plugin(PluginTransmissionrpc, 'transmissionrpc')
