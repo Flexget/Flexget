@@ -125,8 +125,11 @@ class PluginDownload:
         set_plugin.instance.register_keys({'path': 'text'})
 
     def on_feed_download(self, feed):
-        """Download all feed content and store in temporary folder"""
         config = self.get_config(feed)
+        self.get_temp_files(feed, require_path=config.get('require_path', False))
+
+    def get_temp_files(self, feed, require_path=False):
+        """Download all feed content and store in temporary folder"""
         for entry in feed.accepted:
             try:
                 if feed.manager.options.test:
@@ -135,7 +138,7 @@ class PluginDownload:
                     if not feed.manager.unit_test:
                         log.info('Downloading: %s' % entry['title'])
                     # check if entry must have a path (download: yes)
-                    if 'require_path' in config and 'path' not in entry:
+                    if require_path and 'path' not in entry:
                         log.info('%s can\'t be downloaded, no path specified for entry' % entry['title'])
                         feed.fail(entry, 'no path specified for entry')
                         continue

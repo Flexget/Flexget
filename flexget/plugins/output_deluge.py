@@ -96,9 +96,8 @@ class OutputDeluge:
                 
     def on_feed_download(self, feed):
         """
-            call the feed_download method of download plugin
-            this will generate the temp files we will load into deluge
-            we don't need to call this if download plugin is loaded on this feed
+            call download plugin to generate the temp files we will load into deluge
+            then verify they are valid torrents
         """
         import deluge.ui.common
         config = self.get_config(feed)
@@ -107,32 +106,9 @@ class OutputDeluge:
         #If the download plugin is not enabled, we need to call it to get our temp .torrent files
         if not 'download' in feed.config:
             download = get_plugin_by_name('download')
-            # download all content to temp folder, may fail some entries
-            for entry in feed.accepted:
-                try:
-                    if feed.manager.options.test:
-                        log.info('Would download: %s' % entry['title'])
-                        continue
-                    else:
-                        if not feed.manager.unit_test:
-                            log.info('Downloading: %s' % entry['title'])
-                        download.instance.download(feed, entry)
-                except urllib2.HTTPError, e:
-                    feed.fail(entry, 'HTTP error')
-                    log.error('HTTPError %s' % e.code)
-                except urllib2.URLError, e:
-                    feed.fail(entry, 'URL Error')
-                    log.error('URLError %s' % e.reason)
-                except BadStatusLine:
-                    feed.fail(entry, 'BadStatusLine')
-                    log.error('Failed to reach server. Reason: %s' % e.reason)
-                except IOError, e:
-                    feed.fail(entry, 'IOError')
-                    if hasattr(e, 'reason'):
-                        log.error('Failed to reach server. Reason: %s' % e.reason)
-                    elif hasattr(e, 'code'):
-                        log.error('The server couldn\'t fulfill the request. Error code: %s' % e.code)
-        #Even if the download plugin got our temp files, we need to verify they are valid torrent files
+            download.instance.get_temp_files(feed)
+
+        #Check torrent files are valid
         for entry in feed.accepted:
             if os.path.exists(entry.get('file', '')):
                 #Check if downloaded file is a valid torrent file
@@ -311,9 +287,9 @@ class OutputDeluge:
             if config.get('label'):
                 labels.append(config['label'].lower())
             for entry in feed.accepted:
-                if entry.get('label'):
+                if entry.get('label') and not entry['label'].lower() in labels:
                     labels.append(entry['label'].lower())
-            if len(labels) > 0:
+            if labels:
                 client.core.enable_plugin('Label')
 
                 def on_get_labels(d_labels, labels, d):
