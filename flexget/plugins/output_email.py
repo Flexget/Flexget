@@ -92,6 +92,7 @@ class OutputEmail:
         email = validator.factory('dict')
         email.accept('boolean', key='active')
         email.accept('text', key='to', required=True)
+        email.accept('list', key='to', required=True).accept('text')
         email.accept('text', key='from', required=True)
         email.accept('text', key='smtp_host')
         email.accept('number', key='smtp_port')
@@ -112,6 +113,8 @@ class OutputEmail:
         config.setdefault('smtp_password', '')
         config.setdefault('smtp_tls', False)
         config.setdefault('smtp_ssl', False)
+        if not isinstance(config['to'], list):
+            config['to'] = [config['to']]
         return config
 
     def on_feed_exit(self, feed):
@@ -147,7 +150,7 @@ FlexGet has just downloaded %d new entries for feed %s :
 
         # prepare email message
         message = email.Message.Message()
-        message["To"] = config['to']
+        message["To"] = ','.join(config['to'])
         message["From"] = config['from']
         message["Subject"] = subject
         message.set_payload(content.encode('utf-8'))
@@ -175,7 +178,7 @@ FlexGet has just downloaded %d new entries for feed %s :
             if config['smtp_login']:
                 mailServer.login(config['smtp_username'], config['smtp_password'])
 
-            mailServer.sendmail(message["From"], message["To"], message.as_string())
+            mailServer.sendmail(message["From"], config['to'], message.as_string())
             mailServer.quit()
 
 register_plugin(OutputEmail, 'email')
