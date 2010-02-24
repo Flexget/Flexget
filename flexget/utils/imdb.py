@@ -271,7 +271,7 @@ class ImdbParser:
                 self.languages.append(lang.strip())
 
         # get year
-        tag_year = soup.find('a', attrs={'href': re.compile('^/Sections/Years/\d*')})
+        tag_year = soup.find('a', attrs={'href': re.compile('^/year/\d+')})
         if tag_year:
             self.year = int(tag_year.contents[0])
             log.debug('Detected year: %s' % self.year)
