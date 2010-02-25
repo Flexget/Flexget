@@ -265,8 +265,8 @@ class Manager:
             f = file(self.lockfile)
             pid = f.read()
             f.close()
-            print "Another process (%s) is running, will exit." % pid.strip()
-            print "If you're sure there is no other instance running, delete %s" % self.lockfile
+            print >> sys.stderr, "Another process (%s) is running, will exit." % pid.strip()
+            print >> sys.stderr, "If you're sure there is no other instance running, delete %s" % self.lockfile
             sys.exit(1)
 
         f = file(self.lockfile, 'w')
