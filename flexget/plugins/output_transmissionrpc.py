@@ -9,9 +9,9 @@ log = logging.getLogger('transmissionrpc')
 class PluginTransmissionrpc:
     """
       Add url from entry url to transmission
-     
-      Example: 
-    
+
+      Example:
+
       transmissionrpc:
         host: localhost
         port: 9091
@@ -71,6 +71,20 @@ class PluginTransmissionrpc:
                                            'maxdownspeed': 'number', \
                                            'ratio': 'decimal'})
 
+    def on_feed_download(self, feed):
+        """
+            call download plugin to generate the temp files we will load
+            into deluge then verify they are valid torrents
+        """
+        config = self.get_config(feed)
+        if not config['enabled']:
+            return
+        # If the download plugin is not enabled, we need to call it to get
+        # our temp .torrent files
+        if not 'download' in feed.config:
+            download = get_plugin_by_name('download')
+            download.instance.get_temp_files(feed)
+
     def on_feed_output(self, feed):
         """ event handler """
         config = self.get_config(feed)
@@ -98,7 +112,7 @@ class PluginTransmissionrpc:
 
         if 'path' in opt_dic:
             options['add']['download_dir'] = os.path.expanduser(opt_dic['path'])
-        if 'addpaused' in opt_dic and opt_dic['addpaused']: 
+        if 'addpaused' in opt_dic and opt_dic['addpaused']:
             options['add']['paused'] = True
         if 'maxconnections' in opt_dic:
             options['add']['peer_limit'] = opt_dic['maxconnections']
@@ -149,9 +163,9 @@ class PluginTransmissionrpc:
 
         else:
 
-            if 'username' in conf: 
+            if 'username' in conf:
                 user = conf['username']
-            if 'password' in conf: 
+            if 'password' in conf:
                 password = conf['password']
 
         cli = transmissionrpc.Client(conf['host'], conf['port'], user, password)
@@ -162,18 +176,32 @@ class PluginTransmissionrpc:
                 continue
             options = self._make_torrent_options_dict(feed, entry)
 
-            try:
-                # TODO: Private trackers may need certain cookie headers, so
-                # do something similar to what the deluge plugin does to
-                # allow downloading the torrent file and adding using the
-                # path to the downloaded file, or the "metainfo"
-                # (base64-encoded .torrent content.
-                r = cli.add(None, 30, filename=entry['url'], **options['add'])
+            # Check that file is downloaded
+            if not 'file' in entry:
+                feed.fail(entry, 'file missing?')
+                continue
 
-                if len(options['change'].keys()) > 0:
+            # Verify the temp file exists
+            if not os.path.exists(entry['file']):
+                tmp_path = os.path.join(feed.manager.config_base, 'temp')
+                log.debug('entry: %s' % entry)
+                log.debug('temp: %s' % ', '.join(os.listdir(tmp_path)))
+                feed.fail(entry, "Downloaded temp file '%s' doesn't exist!?" % entry['file'])
+                continue
+
+            try:
+                r = cli.add(None, 30, filename=entry['file'], **options['add'])
+                log.info("%s torrent added to transmission" % (entry['title']))
+                if options['change'].keys():
                     for id in r.keys():
                         cli.change(id, 30, **options['change'])
             except TransmissionError, e:
                 log.error(e.message)
+
+            # Clean up temp file if download plugin is not configured for
+            # this feed.
+            if not 'download' in feed.config:
+                os.remove(entry['file'])
+                del(entry['file'])
 
 register_plugin(PluginTransmissionrpc, 'transmissionrpc')
