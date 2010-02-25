@@ -86,7 +86,7 @@ class TestImdb(FlexGetBase):
             'The Matrix should\'ve been accepted'
         assert not self.feed.find_entry('rejected', imdb_name='The Terminator'), \
             'The The Terminator have been rejected'
-    
+
     @attr(online=True)
     def test_directors(self):
         self.execute_feed('director')
@@ -101,7 +101,7 @@ class TestImdb(FlexGetBase):
             'The Matrix should\'ve been accepted'
         assert not self.feed.find_entry('rejected', imdb_name='The Terminator'), \
             'The The Terminator have been rejected'
-    
+
 
 class TestScanImdb(FlexGetBase):
 
@@ -112,14 +112,19 @@ class TestScanImdb(FlexGetBase):
               - {title: 'Scan Test 1', description: 'title: Foo Bar Asdf\n imdb-url: http://www.imdb.com/title/tt0330793/ more text'}
               - {title: 'Scan Test 2', description: '<a href="http://imdb.com/title/tt0472198/">IMDb</a>'}
               - {title: 'Scan Test 3', description: 'nothing here'}
+              - {title: 'Scan Test 4', description: 'imdb.com/title/tt66666 http://imdb.com/title/tt99999'}
     """
 
     def test_scan_imdb(self):
         self.execute_feed('test')
         assert self.feed.find_entry(imdb_url='http://www.imdb.com/title/tt0330793'), \
-            'Failed pick url from test 1'
-        assert self.feed.find_entry(imdb_url='http://imdb.com/title/tt0472198'), \
-            'Failed pick url from test 2'
+            'Failed to pick url from test 1'
+        assert self.feed.find_entry(imdb_url='http://www.imdb.com/title/tt0472198'), \
+            'Failed to pick url from test 2'
+        assert not self.feed.find_entry(imdb_url='http://www.imdb.com/title/tt66666'), \
+            'Failed to ignore multiple imdb urls in test 4'
+        assert not self.feed.find_entry(imdb_url='http://www.imdb.com/title/tt99999'), \
+            'Failed to ignore multiple imdb urls in test 4'
 
 
 class TestImdbRequired(FlexGetBase):
@@ -132,7 +137,7 @@ class TestImdbRequired(FlexGetBase):
               - {title: 'ASDFASDFASDF'}
             imdb_required: yes
     """
-    
+
     @attr(online=True)
     def test_imdb_required(self):
         self.execute_feed('test')
