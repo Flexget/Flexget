@@ -117,7 +117,7 @@ class OutputEmail:
             config['to'] = [config['to']]
         return config
 
-    def on_feed_download(self, feed):
+    def on_feed_output(self, feed):
         """Count the email as an output"""
 
     def on_feed_exit(self, feed):
