@@ -84,22 +84,21 @@ class PluginAdvExec:
             
             for entry in entries:
                 try:
-                    cmd = feed.config[self.NAME][event_name][operation] % entry
+                    cmd = feed.config[self.NAME][event_name][operation]
+                    
+                    args = [] 
+                    # shlex is documented to not work on unicode 
+                    for arg in shlex.split(cmd.encode('utf-8'), comments=True):
+                        arg = unicode(arg, 'utf-8')
+                        formatted = arg % entry
+                        if formatted != arg:
+                            arg = pipes.quote(formatted)
+                        args.append(arg)
+                    cmd = ' '.join(args)
+                    
                 except KeyError, e:
                     log.error('Entry %s does not have required field %s' % (entry['title'], e.message))
                     continue
-                
-                """
-                args = [] 
-                # shlex is documented to not work on unicode 
-                for arg in shlex.split(cmd.encode('utf-8'), comments=True):
-                    arg = unicode(arg, 'utf-8')
-                    formatted = arg % entry
-                    if formatted != arg:
-                        arg = pipes.quote(formatted)
-                    args.append(arg)
-                cmd = ' '.join(args)
-                """
                     
                 log.debug('event_name: %s operation: %s cmd: %s' % (event_name, operation, cmd))
                 self.execute_cmd(cmd)
