@@ -1,5 +1,7 @@
-import subprocess
 import logging
+import pipes
+import shlex
+import subprocess
 from flexget.plugin import *
 
 log = logging.getLogger('exec')
@@ -8,14 +10,14 @@ log = logging.getLogger('exec')
 class OutputExec:
     """
     Execute command for entries that reach output.
-    
+
     Example:
-    
+
     exec: echo 'found %(title)s at %(url)s > file
-    
+
     You can use all (available) entry fields in the command.
     """
-    
+
     def validator(self):
         from flexget import validator
         return validator.factory('text')
@@ -23,7 +25,16 @@ class OutputExec:
     def on_feed_output(self, feed):
         for entry in feed.accepted:
             try:
-                cmd = feed.config['exec'] % entry
+                cmd = feed.config['exec']
+                args = []
+                # shlex is documented to not work on unicode
+                for arg in shlex.split(cmd.encode('utf-8'), comments=True):
+                    arg = unicode(arg, 'utf-8')
+                    formatted = arg % entry
+                    if formatted != arg:
+                        arg = pipes.quote(formatted)
+                    args.append(arg)
+                cmd = ' '.join(args)
             except KeyError, e:
                 log.error('Entry %s does not have required field %s' % (entry['title'], e.message))
                 continue
