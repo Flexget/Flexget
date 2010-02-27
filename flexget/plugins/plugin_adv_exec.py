@@ -1,5 +1,7 @@
 import subprocess
 import logging
+import shlex
+import pipes
 from flexget.plugin import *
 
 log = logging.getLogger('adv_exec')
@@ -81,8 +83,19 @@ class PluginAdvExec:
             log.debug('running event_name: %s operation: %s entries: %s' % (event_name, operation, len(entries)))
             
             for entry in entries:
-                try:    
+                try:
                     cmd = feed.config[self.NAME][event_name][operation] % entry
+
+                    args = [] 
+                    # shlex is documented to not work on unicode 
+                    for arg in shlex.split(cmd.encode('utf-8'), comments=True):
+                        arg = unicode(arg, 'utf-8')
+                        formatted = arg % entry
+                        if formatted != arg:
+                            arg = pipes.quote(formatted)
+                        args.append(arg)
+                    cmd = ' '.join(args)
+
                 except KeyError, e:
                     log.error('Entry %s does not have required field %s' % (entry['title'], e.message))
                     continue
