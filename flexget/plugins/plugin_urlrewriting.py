@@ -46,7 +46,7 @@ class PluginUrlRewriting:
         while self.url_rewritable(feed, entry):
             tries += 1
             if (tries > 300):
-                raise UrlRewritingError('Resolve was left in infinite loop while rewriting url for %s, some rewriter is returning always True' % entry)
+                raise UrlRewritingError('URL rewriting was left in infinite loop while rewriting url for %s, some rewriter is returning always True' % entry)
             for urlrewriter in get_plugins_by_group('urlrewriter'):
                 name = urlrewriter.name
                 try:
@@ -58,7 +58,9 @@ class PluginUrlRewriting:
                     # increase failcount
                     #count = self.shared_cache.storedefault(entry['url'], 1)
                     #count += 1
-                    raise UrlRewritingError('Resolver %s failed: %s' % (name, r.value))
+                    raise UrlRewritingError('URL rewriting %s failed: %s' % (name, r.value))
+                except PluginError, e:
+                    raise UrlRewritingError('URL rewriting %s failed: %s' % (name, e.value))
                 except Exception, e:
                     log.exception(e)
                     raise UrlRewritingError('%s: Internal error with url %s' % (name, entry['url']))

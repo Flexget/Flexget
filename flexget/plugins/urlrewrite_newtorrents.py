@@ -31,7 +31,7 @@ class NewTorrents:
             try:
                 url = self.url_from_search(url, entry['title'])
             except PluginWarning, e:
-                raise UrlRewritingError(e)
+                raise UrlRewritingError(e.value)
         else:
             url = self.url_from_page(url)
 
@@ -45,7 +45,8 @@ class NewTorrents:
     def search(self, feed, entry):
         search_url = 'http://www.newtorrents.info/search/%s' % entry['title']
         return self.url_from_search(search_url, entry['title'])
-    
+
+    @internet(log)
     def url_from_page(self, url):
         """Parses torrent url from newtorrents download page"""
         try:
@@ -63,7 +64,7 @@ class NewTorrents:
             
     def clean(self, s):
         """Formalize names"""
-        return s.replace('.',' ').replace('_',' ').strip().lower()
+        return s.replace('.', ' ').replace('_', ' ').strip().lower()
 
     @internet(log)
     def url_from_search(self, url, name):
@@ -94,8 +95,8 @@ class NewTorrents:
             else:
                 log.debug('rejecting search result: %s != %s' % (release_name, name))
         # sort with seed number Reverse order
-        torrents = [(seeds[i],torrents[i]) for i in range(len(torrents)) ]
-        torrents.sort(lambda x, y: y-x)
+        torrents = [(seeds[i], torrents[i]) for i in range(len(torrents))]
+        torrents.sort(lambda x, y: y - x)
         # choose the torrent
         if not torrents:
             raise PluginWarning('No matches for %s' % name, log, log_once=True)
