@@ -614,7 +614,7 @@ class FilterSeries(SeriesPlugin):
             # set custom download path
             if 'path' in config:
                 log.debug('setting %s custom path to %s' % (entry['title'], config.get('path')))
-                entry['path'] = config.get('path')
+                entry['path'] = config.get('path') % entry
 
             # accept info from set: and place into the entry
             if 'set' in config:
