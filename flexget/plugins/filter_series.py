@@ -343,8 +343,7 @@ class FilterSeries(SeriesPlugin):
         def build_options(options):
             options.accept('text', key='path')
             # set
-            set = options.accept('dict', key='set')
-            set.accept_any_key('any')
+            options.accept('dict', key='set').accept_any_key('any')
             # regexes can be given in as a single string ..
             options.accept('regexp', key='name_regexp')
             options.accept('regexp', key='ep_regexp')
@@ -369,12 +368,14 @@ class FilterSeries(SeriesPlugin):
         def build_list(series):
             """Build series list to series."""
             series.accept('text')
+            series.accept('number')
             bundle = series.accept('dict')
             # prevent invalid indentation level
             bundle.reject_keys(['set', 'path', 'timeframe', 'name_regexp', \
                 'ep_regexp', 'id_regexp', 'watched', 'quality', 'min_quality', \
                 'max_quality', 'qualities', 'exact'], \
                 'Option \'$key\' has invalid indentation level. It needs 2 more spaces.')
+            bundle.accept_any_key('path')
             options = bundle.accept_any_key('dict')
             build_options(options)
 
@@ -460,6 +461,9 @@ class FilterSeries(SeriesPlugin):
                     series, series_settings = series.items()[0]
                     if series_settings is None:
                         raise Exception('Series %s has unexpected \':\'' % series)
+                # make sure series name is a string to accomadate for "24"
+                if not isinstance(series, basestring):
+                    series = str(series)
                 # if series have given path instead of dict, convert it into a dict
                 if isinstance(series_settings, basestring):
                     series_settings = {'path': series_settings}
