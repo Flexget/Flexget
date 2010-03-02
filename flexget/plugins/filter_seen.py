@@ -123,7 +123,7 @@ class FilterSeen(object):
                 
             session.commit()
             
-            log.info('Forgot %s memories' % count)
+            log.info('Forgot %s memories from %s' % (count, forget))
             
             if count == 0:
                 log.info('Perhaps feed / given value does not exists?')
