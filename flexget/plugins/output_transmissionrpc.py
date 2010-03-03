@@ -168,7 +168,12 @@ class PluginTransmissionrpc:
             if 'password' in conf:
                 password = conf['password']
 
+        # Hack to prevent failing when the headers plugin is used.
+        import urllib2
+        prev_opener = urllib2._opener
+        urllib2.install_opener(None)
         cli = transmissionrpc.Client(conf['host'], conf['port'], user, password)
+        urllib2.install_opener(prev_opener)
 
         for entry in feed.accepted:
             if feed.manager.options.test:
