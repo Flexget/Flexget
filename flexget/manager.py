@@ -124,7 +124,7 @@ class Manager:
                     sys.exit(1)
                 # config loaded successfully
                 self.config_name = os.path.splitext(os.path.basename(config))[0]
-                self.config_base = base
+                self.config_base = os.path.normpath(base)
                 log.debug('config_name: %s' % self.config_name)
                 log.debug('config_base: %s' % self.config_base)
                 return

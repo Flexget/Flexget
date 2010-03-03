@@ -128,8 +128,7 @@ class InputRSS:
 
         # get the feed & parse
         if urllib2._opener:
-            rss = feedparser.parse(url, etag=etag, modified=modified,
-                handlers=urllib2._opener.handlers)
+            rss = feedparser.parse(url, etag=etag, modified=modified, handlers=urllib2._opener.handlers)
         else:
             rss = feedparser.parse(url, etag=etag, modified=modified)
 
@@ -165,7 +164,25 @@ class InputRSS:
                 log.debug('ignoring feedparser.CharacterEncodingOverride')
                 ignore = True
             elif isinstance(ex, xml.sax._exceptions.SAXParseException):
-                raise PluginError('Invalid XML received from %s' % feed.name)
+                req = urllib2.urlopen(url)
+                data = req.read()
+                log.critical('Invalid XML received from feed %s' % feed.name)
+                ext = 'xml'
+                if '<html>' in data.lower():
+                    log.critical('Received content is HTML page, not an RSS feed')
+                    ext = 'html'
+                if 'login' in data.lower():
+                    log.critical('Received content looks a bit like login page')
+                import os
+                received = os.path.join(feed.manager.config_base, 'received')
+                if not os.path.isdir(received):
+                    os.mkdir(received)
+                filename = os.path.join(received, '%s.%s' % (feed.name, ext))
+                f = open(filename, 'w')
+                f.write(data)
+                f.close()
+                log.critical('I have saved the invalid content to %s for you to view' % filename)
+                raise PluginError('Invalid RSS content')
             elif isinstance(ex, httplib.BadStatusLine) or \
                  isinstance(ex, IOError):
                 raise ex # let the @internet decorator handle
