@@ -171,7 +171,7 @@ class InputRSS:
                 if '<html>' in data.lower():
                     log.critical('Received content is HTML page, not an RSS feed')
                     ext = 'html'
-                if 'login' in data.lower():
+                if 'login' in data.lower() or 'username' in data.lower():
                     log.critical('Received content looks a bit like login page')
                 import os
                 received = os.path.join(feed.manager.config_base, 'received')
