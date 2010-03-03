@@ -175,6 +175,8 @@ class PluginTransmissionrpc:
             urllib2.install_opener(None)
             cli = transmissionrpc.Client(conf['host'], conf['port'], user, password)
             urllib2.install_opener(prev_opener)
+        else:
+            cli = transmissionrpc.Client(conf['host'], conf['port'], user, password)
 
         for entry in feed.accepted:
             if feed.manager.options.test:
