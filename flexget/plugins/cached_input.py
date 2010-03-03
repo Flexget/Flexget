@@ -33,7 +33,7 @@ class cached(object):
             # get feed from method parameters
             feed = args[1]
 
-            # get name for a cache from feed's configuration
+            # get name for a cache from feeds configuration
             if not self.name in feed.config:
                 raise Exception('@cache config name %s is not configured in feed %s' % (self.name, feed.name))
             config = feed.config[self.name]

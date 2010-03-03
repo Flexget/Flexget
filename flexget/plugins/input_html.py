@@ -91,7 +91,7 @@ class InputHtml:
                 if title is None:
                     continue
 
-            # stip unicode whitespaces
+            # strip unicode whitespaces
             title = title.replace(u'\u200B', u'').strip()
             
             if not title: 
@@ -140,7 +140,7 @@ class InputHtml:
                     continue
                 log.debug('uniqued title to %s' % title)
 
-            # in case the title contains xxxxxxx.torrent - foooo.torrent clean it a bit (get upto first .torrent)
+            # in case the title contains xxxxxxx.torrent - foooo.torrent clean it a bit (get up to first .torrent)
             # TODO: hack
             if title.lower().find('.torrent') > 0:
                 title = title[:title.lower().find('.torrent')]

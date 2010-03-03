@@ -369,7 +369,7 @@ class Manager:
             log.critical('Configuration file is empty.')
             return
 
-        # separated for future when flexget runs continously in the background
+        # separated for future when flexget runs continuously in the background
         self.create_feeds()
 
         failed = []
@@ -402,7 +402,7 @@ class Manager:
                 print '**** Keyboard Interrupt ****'
                 return
             finally:
-                # note: this will cause db rollback if error occured (session has not been committed)
+                # note: this will cause db rollback if error occurred (session has not been committed)
                 if feed.session:
                     feed.session.close()
 

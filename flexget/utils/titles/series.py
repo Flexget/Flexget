@@ -27,7 +27,7 @@ class SeriesParser(TitleParser):
         self.data = ''
         self.expect_ep = False
 
-        # if set to true, episode or id must follow immediattely after name
+        # if set to true, episode or id must follow immediately after name
         self.strict_name = False
 
         self.ep_regexps = ['s(\d+)e(\d+)', 's(\d+)ep(\d+)', 's(\d+).e(\d+)', \
@@ -198,7 +198,7 @@ class SeriesParser(TitleParser):
 
         if self.expect_ep:
             # we should be getting season, ep !
-            # try to look up idiotic numberin scheme 101,102,103,201,202
+            # try to look up idiotic numbering scheme 101,102,103,201,202
             # ressu: Added matching for 0101, 0102... It will fail on
             #        season 11 though
             log.debug('expect_ep enabled')
@@ -245,9 +245,9 @@ class SeriesParser(TitleParser):
         else:
             return self.id
 
-    @property            
+    @property
     def proper(self):
-        return self.proper_or_repack 
+        return self.proper_or_repack
 
     def __str__(self):
         # for some fucking reason it's impossible to print self.field here, if someone figures out why please

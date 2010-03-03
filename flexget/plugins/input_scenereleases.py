@@ -59,7 +59,7 @@ class InputScenereleases:
                     log.debug('found imdb link %s' % link_href)
                     release['imdb_url'] = link_href
 
-                # test if entry with this url would be resolvable (downloadable)
+                # test if entry with this url would be rewritable by known plugins (ie. downloadable)
                 temp = {}
                 temp['title'] = release['title']
                 temp['url'] = link_href

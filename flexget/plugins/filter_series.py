@@ -419,7 +419,7 @@ class FilterSeries(SeriesPlugin):
         # generate unified configuration in complex form, requires complex code as well :)
         config = {}
         if isinstance(feed_config, list):
-            # convert simpliest configuration internally grouped format
+            # convert simplest configuration internally grouped format
             config['settings'] = {}
             config['simple'] = []
             for series in feed_config:
@@ -579,7 +579,7 @@ class FilterSeries(SeriesPlugin):
                 parser.id_regexps = get_as_array(config, 'id_regexp') + parser.id_regexps
                 parser.strict_name = config.get('exact', False)
                 parser.field = field
-                # do not use builtin list for id when ep configigured and vice versa
+                # do not use builtin list for id when ep configured and vice versa
                 if 'ep_regexp' in config and not 'id_regexp' in config:
                     parser.id_regexps = []
                 if 'id_regexp' in config and not 'ep_regexp' in config:
@@ -641,7 +641,7 @@ class FilterSeries(SeriesPlugin):
 
             log.debug('start with episodes: %s' % [e.data for e in eps])
 
-            # reject episodes that have been marked as watched in configig file
+            # reject episodes that have been marked as watched in config file
             if 'watched' in config:
                 log.debug('-' * 20 + ' watched -->')
                 if self.process_watched(feed, config, eps):
@@ -909,7 +909,7 @@ class FilterSeries(SeriesPlugin):
                 feed.reject(entry, 'wrong quality')
             return True
         else:
-            # just verboses waiting
+            # just verbose waiting
             diff = datetime.now() - self.get_first_seen(feed.session, best)
             if diff.seconds < 60:
                 import math

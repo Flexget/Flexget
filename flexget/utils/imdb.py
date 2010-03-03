@@ -19,9 +19,9 @@ def extract_id(url):
 class ImdbSearch:
 
     def __init__(self):
-        # depriorize aka matches a bit
+        # de-prioritize aka matches a bit
         self.aka_weight = 0.9
-        # priorize popular matches a bit
+        # prioritize popular matches a bit
         self.unpopular_weight = 0.95
         self.min_match = 0.5
         self.min_diff = 0.01
@@ -106,7 +106,7 @@ class ImdbSearch:
         actual_url = page.geturl()
 
         movies = []
-        # incase we got redirected to movie page (perfect match)
+        # in case we got redirected to movie page (perfect match)
         re_m = re.match('.*\.imdb\.com\/title\/tt\d+\/', actual_url)
         if re_m:
             actual_url = re_m.group(0)
@@ -171,7 +171,7 @@ class ImdbSearch:
                     if aka_ratio > ratio:
                         log.debug('- aka %s has better ratio %s' % (aka, aka_ratio))
                         ratio = aka_ratio
-                # priorize popular titles
+                # prioritize popular titles
                 if section != sections[0]:
                     ratio = ratio * self.unpopular_weight
                 else:
@@ -259,7 +259,7 @@ class ImdbParser:
 
         # get genres
         for link in soup.findAll('a', attrs={'href': re.compile('^/Sections/Genres/')}):
-            # skip links that have javascipr onclick (not in genrelist)
+            # skip links that have javascript onclick (not in genrelist)
             if link.has_key('onclick'): 
                 continue
             self.genres.append(link.contents[0].lower())

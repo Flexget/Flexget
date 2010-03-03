@@ -165,7 +165,7 @@ class PluginDownload:
         # get content
         if 'basic_auth_password' in entry and 'basic_auth_username' in entry:
             # TODO: should just add handler if default opener is present, now this will lose all other
-            # handlers that other plugins have potentialy added
+            # handlers that other plugins have potentially added
             log.debug('Basic auth enabled. User: %s Password: %s' % (entry['basic_auth_username'], entry['basic_auth_password']))
             passman = urllib2.HTTPPasswordMgrWithDefaultRealm()
             passman.add_password(None, url, entry['basic_auth_username'], entry['basic_auth_password'])
@@ -313,11 +313,11 @@ class PluginDownload:
             if path is None:
                 raise PluginError('Unreachable situation?')
 
-            # override path from commandline parameter
+            # override path from command line parameter
             if feed.manager.options.dl_path:
                 path = feed.manager.options.dl_path
 
-            # make filename, if entry has perefered filename attribute use it, if not use title
+            # make filename, if entry has preferred filename attribute use it, if not use title
             if not 'filename' in entry:
                 html_mimes = ['html', 'text/html']
                 if entry.get('mime-type') in html_mimes and config['fail_html']:

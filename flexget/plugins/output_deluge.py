@@ -245,7 +245,7 @@ class OutputDeluge:
             if feed.manager.options.test:
             
                 def on_disconnect(result):
-                    log.debug('Done adding torrents to deluge.' % result)
+                    log.debug('Done adding torrents to deluge.')
                     reactor.callLater(0.1, pause_reactor, 0)
                     
                 client.disconnect().addCallback(on_disconnect)

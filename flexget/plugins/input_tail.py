@@ -95,7 +95,7 @@ class InputTail:
 
                 # if all fields have been found
                 if len(used) == len(entry_config):
-                    # check that entry has atleast title and url
+                    # check that entry has at least title and url
                     if not entry.isvalid():
                         log.info('Invalid data, constructed entry is missing mandatory fields (title or url)')
                     else:

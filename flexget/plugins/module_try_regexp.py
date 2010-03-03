@@ -14,7 +14,7 @@ class PluginTryRegexp:
         self.abort = False
 
     def validator(self):
-        # this is not ment to be configured .. :)
+        # this is not meant to be configured .. :)
         from flexget import validator
         return validator.factory('any')
         

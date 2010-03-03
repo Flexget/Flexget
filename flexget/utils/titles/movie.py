@@ -16,7 +16,7 @@ class MovieParser(TitleParser):
         self.quality = None
 
     def __str__(self):
-        return "MovieParser(%s, %s, %s)" % self.name, self.year, self.quality
+        return "MovieParser(%s, %s, %s)" % (self.name, self.year, self.quality)
 
     def parse(self):
         """Parse movie name, returns name, year"""
@@ -46,7 +46,7 @@ class MovieParser(TitleParser):
                     year = part
                     if parts.index(part) < cut_pos:
                         cut_pos = parts.index(part)
-            # if length > 3 and whole word in uppers, consider as cutword (most likelly a group name)
+            # if length > 3 and whole word in uppers, consider as cut word (most likely a group name)
             if len(part) > 3 and part.isupper() and part.isalpha():
                 if parts.index(part) < cut_pos:
                     cut_pos = parts.index(part)

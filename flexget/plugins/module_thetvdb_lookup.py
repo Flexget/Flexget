@@ -151,7 +151,7 @@ class ModuleThetvdbLookup:
         if get_new_info:
             feed.verbose_progress('Requesting %s information from TheTvDB.com' % entry['series_name'])
             # get my series data.
-            # TODO: need to impliment error handling around grabbing url.
+            # TODO: need to implement error handling around grabbing url.
             xmldata = BeautifulStoneSoup(urllib.urlopen("http://thetvdb.com/api/GetSeries.php?seriesname=%s" % entry["series_name"])).data
             # Yeah, I'm lazy. Grabbing the one with the latest airing date, 
             # instead of trying to see what's the closest match.
@@ -166,7 +166,7 @@ class ModuleThetvdbLookup:
                     series_id = i.seriesid.string
                 if i.seriesname.string == entry['series_name']:
                     series_id = i.seriesid.string
-                    # Don't really need to store this, but just for consistancies sake so we always have it available
+                    # Don't really need to store this, but just for consistencies sake so we always have it available
                     newest_series_first_aired = this_series_air_date
                     break
             if series_id == None:

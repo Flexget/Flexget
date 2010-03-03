@@ -8,21 +8,25 @@ class TestTorrentSize(FlexGetBase):
     __yaml__ = """
         presets:
           global:
-            mock:
-              - {title: 'test', file: 'tests/copy_of_test.torrent'}
             disable_builtins:
               - seen
 
         feeds:
           test_min:
+            mock:
+              - {title: 'test', file: 'tests/test_min.torrent'}
             torrent_size:
               min: 2000
 
           test_max:
+            mock:
+              - {title: 'test', file: 'tests/test_max.torrent'}
             torrent_size:
               max: 10
               
           test_strict:
+            mock:
+              - {title: 'test', file: 'tests/test_strict.torrent'}
             preset:
               - no_global
             mock:
@@ -33,38 +37,35 @@ class TestTorrentSize(FlexGetBase):
 
     """
 
-    def setup(self):
-        self.create_copy()
-        FlexGetBase.setup(self)
+    testfiles = ['tests/test_min.torrent', 'tests/test_max.torrent', 'tests/test_strict.torrent']
 
-    def create_copy(self):
-        if not os.path.exists('tests/copy_of_test.torrent'):
-            shutil.copy('tests/test.torrent', 'tests/copy_of_test.torrent')
+    def setup(self):
+        FlexGetBase.setup(self)
+        for filename in self.testfiles:
+            shutil.copy('tests/test.torrent', filename)
 
     def teardown(self):
         FlexGetBase.setup(self)
-        if os.path.exists('tests/copy_of_test.torrent'):
-            os.remove('tests/copy_of_test.torrent')
+        for filename in self.testfiles:
+            if os.path.exists(filename):
+                os.remove(filename)
 
     def test_min(self):
-        self.create_copy()
         self.execute_feed('test_min')
         assert self.feed.find_entry('rejected', title='test'), \
             'should have rejected, minimum size'
 
     def test_max(self):
-        self.create_copy()
         self.execute_feed('test_max')
         assert self.feed.find_entry('rejected', title='test'), \
             'should have rejected, maximum size'
             
     def test_strict(self):
-        self.create_copy()
         self.execute_feed('test_strict')
         assert self.feed.find_entry('rejected', title='test'), \
             'should have rejected non torrent'
 
-
+        
 class TestInfoHash(FlexGetBase):
 
     __yaml__ = """
