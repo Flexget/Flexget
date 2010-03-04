@@ -70,6 +70,9 @@ class RlsLog:
                 if not link.contents:
                     log.log(5, 'link content empty, skipping')
                     continue
+                if not link.has_key('href'):
+                    log.log(5, 'link %s missing href' % link)
+                    continue
                     
                 link_name = link.contents[0]
                 link_name_ok = True
