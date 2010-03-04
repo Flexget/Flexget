@@ -7,64 +7,9 @@ import shutil
 import filecmp
 import zlib
 from flexget.plugin import *
-from sqlalchemy import Column, String, Integer, DateTime
-from flexget.manager import Base
-from datetime import datetime
 from httplib import BadStatusLine
 
 log = logging.getLogger('download')
-
-
-class Download(Base):
-
-    __tablename__ = 'download_history'
-    
-    id = Column(Integer, primary_key=True)
-    feed = Column(String)
-    filename = Column(String)
-    url = Column(String)
-    title = Column(String)
-    time = Column(DateTime)
-    details = Column(String)
-    
-    def __init__(self):
-        self.time = datetime.now()
-    
-    def __str__(self):
-        return '<Download(filename=%s,feed=%s)>' % (self.filename, self.feed)
-
-
-class PluginDownloads:
-
-    """
-        Provides --downloads
-    """
-
-    def on_process_start(self, feed):
-
-        # temp hack for database change
-        from flexget.manager import Session
-        from flexget.utils.sqlalchemy_utils import table_columns, table_schema
-        columns = table_columns('download_history', Session())
-        if not 'details' in columns:
-            log.critical('Please see bleeding edge news for neccessary actions')
-            log.critical('Re-cap run: sqlite3 %s "drop table download_history;"' % feed.manager.db_filename)
-            import sys
-            sys.exit(1)
-
-        if feed.manager.options.downloads:
-            from flexget.manager import Session
-            feed.manager.disable_feeds()
-            session = Session()
-            print '-- Downloads: ' + '-' * 65
-            for download in session.query(Download).order_by(Download.time)[-50:]:
-                print ' Title   : %s' % download.title
-                print ' Url     : %s' % download.url
-                print ' Stored  : %s' % download.filename
-                print ' Time    : %s' % download.time.strftime("%c")
-                print ' Details : %s' % download.details
-                print '-' * 79
-            session.close()
 
 
 class PluginDownload:
@@ -371,22 +316,6 @@ class PluginDownload:
 
             # store final destination as output key
             entry['output'] = destfile
-            
-            # add to download history
-            download = Download()
-            download.feed = feed.name
-            download.filename = destfile
-            download.title = entry['title']
-            download.url = entry['url']
-            reason = ''
-            if 'reason' in entry:
-                reason = ' (reason: %s)' % entry['reason']
-            download.details = 'Accepted by %s%s' % (entry.get('accepted_by', '<unknown>'), reason)
-            feed.session.add(download)
-            
-            # test
-            import time
-            time.sleep(2)
 
         finally:
             if os.path.exists(entry['file']):
@@ -395,8 +324,5 @@ class PluginDownload:
             del(entry['file'])
 
 register_plugin(PluginDownload, 'download')
-register_plugin(PluginDownloads, 'downloads', builtin=True)
 register_parser_option('--dl-path', action='store', dest='dl_path', default=False,
                        metavar='PATH', help='Override path for download plugin. Applies to all executed feeds.')
-register_parser_option('--downloads', action='store_true', dest='downloads', default=False,
-                       help='List latest downloads (50).')
