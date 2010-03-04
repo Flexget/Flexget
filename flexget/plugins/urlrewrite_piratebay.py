@@ -4,6 +4,7 @@ import logging
 from plugin_urlrewriting import UrlRewritingError
 from flexget.plugin import *
 from flexget.utils.soup import get_soup
+import difflib
 
 log = logging.getLogger('piratebay')
 
@@ -64,13 +65,30 @@ class UrlRewritePirateBay:
         name = name.replace('.', ' ').lower()
         if not url:
             url = 'http://thepiratebay.org/search/' + urllib.quote(name)
+            log.debug('Using %s as piratebay search url' % url)
         page = urllib2.urlopen(url)
         
         soup = get_soup(page)
         torrents = []
+        possibilities = {}
         for link in soup.findAll('a', attrs={'class': 'detLink'}):
-            if not link.contents[0].replace('.', ' ').lower() == name:
-                continue
+            # dict of {linktextlowered: linkobj}
+            possibilities[link.contents[0].lower()] = link
+        # Get the closest 5 (or less) matches to the torrent name, with a confidence of at least 0.9
+        matches = difflib.get_close_matches(name.lower(), possibilities.keys(), n=5, cutoff=0.9)
+        log.debug('found %i matches. Matches are: %s' % (len(matches), str(matches)))
+        for linktext in matches:
+            # simpler to just use difflib.get_close_matches like above for what we're doing
+            ## assign confidence score of how close this link is to the name you're looking for. .6 and above is "close"
+            #confidence = difflib.SequenceMatcher(lambda x: x in ' -._', # junk characters
+            #                           link.contents[0].lower(),
+            #                           name.lower()).ratio()
+            #log.debug('name: %s' % name.lower())
+            #log.debug('found name: %s' % link.contents[0].lower())
+            #log.debug('confidence: %s' % str(confidence))
+            #if confidence < 0.9:
+            #    continue
+            link = possibilities[linktext]
             torrent = {}
             torrent['name'] = link.contents[0]
             torrent['link'] = 'http://thepiratebay.org' + link.get('href')
@@ -80,7 +98,7 @@ class UrlRewritePirateBay:
             torrents.append(torrent)
             
         if not torrents:
-            raise PluginWarning('No matches for %s' % name, log, log_once=True)
+            raise PluginWarning('No close matches for %s' % name, log, log_once=True)
             
         def best(a, b):
             score_a = a['seed'] * 2 + a['leech']

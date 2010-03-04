@@ -65,8 +65,8 @@ class FilterImdbQueue:
                     continue
 
                 if not 'quality' in entry:
-                    log.warning("No quality found for %s, skipping..." % entry['title'])
-                    continue
+                    log.warning("No quality found for %s, assigning unknown." % entry['title'])
+                    entry['quality'] = 'unknown'
 
                 item = feed.session.query(ImdbQueue).filter(ImdbQueue.imdb_id == imdb_id).\
                                                      filter((ImdbQueue.quality == entry['quality']) | (ImdbQueue.quality == "ANY")).first()
