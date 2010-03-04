@@ -4,6 +4,7 @@ import re
 from plugin_urlrewriting import UrlRewritingError
 from flexget.plugin import *
 from flexget.utils.soup import get_soup
+import difflib
 
 timeout = 10
 import socket
@@ -89,11 +90,15 @@ class NewTorrents:
             release_name = self.clean(link.parent.next.get('title'))
             # quick dirty hack
             seed = link.findNext('td', attrs={'class': re.compile('s')}).renderContents()
-            if release_name == name:
+            
+            confidence = difflib.SequenceMatcher(lambda x: x in ' -._', # junk characters
+                                       release_name.lower(),
+                                       name.lower()).ratio()
+            if confidence < 0.9:
                 torrents.append(torrent_url)
                 seeds.append(seed)
             else:
-                log.debug('rejecting search result: %s != %s' % (release_name, name))
+                log.debug('rejecting search result: %s !~ %s' % (release_name, name))
         # sort with seed number Reverse order
         torrents = [(seeds[i], torrents[i]) for i in range(len(torrents))]
         torrents.sort(lambda x, y: y - x)
