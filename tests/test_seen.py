@@ -75,7 +75,8 @@ class TestFilterSeenMovies(FlexGetBase):
     
     def test_seen_movies(self):
         self.execute_feed('test_1')
-        
+        assert not (self.feed.find_entry(title='Seen movie title 1') and self.feed.find_entry(title='Seen movie title 2')), 'Movie accepted twice in one run'
+
         # execute again
         self.feed.execute()
         assert not self.feed.find_entry(title='Seen movie title 1'), 'Test movie entry 1 should be rejected in second execution'

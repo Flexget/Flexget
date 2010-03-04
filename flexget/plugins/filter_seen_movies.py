@@ -4,6 +4,7 @@ from flexget.plugin import *
 
 log = logging.getLogger('seenmovies')
 
+
 class FilterSeenMovies(FilterSeen):
     """
         Prevents movies being downloaded twice.
@@ -32,5 +33,14 @@ class FilterSeenMovies(FilterSeen):
                     feed.reject(entry, 'missing imdb url, strict')
         # call super
         super(FilterSeenMovies, self).on_feed_filter(feed)
+        # check that two copies of a movie have not been accepted this run
+        movies = []
+        for entry in feed.accepted:
+            if entry.get('imdb_url'):
+                if not entry['imdb_url'] in movies:
+                    movies.append(entry['imdb_url'])
+                else:
+                    feed.reject(entry, 'already accepted once in feed')
 
-register_plugin(FilterSeenMovies, 'seen_movies', priorities=dict(filter=64))
+#We run last (-255) to make sure we don't reject duplicates before all the other plugins get a chance to reject.
+register_plugin(FilterSeenMovies, 'seen_movies', priorities={'filter': -255})
