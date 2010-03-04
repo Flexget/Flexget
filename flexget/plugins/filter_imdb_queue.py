@@ -69,7 +69,8 @@ class FilterImdbQueue:
                     continue
 
                 item = feed.session.query(ImdbQueue).filter(ImdbQueue.imdb_id == imdb_id).\
-                                                     filter(ImdbQueue.quality == entry['quality']).first()
+                                                     filter((ImdbQueue.quality == entry['quality']) | (ImdbQueue.quality == "ANY")).first()
+
                 if item:
                     entry['immortal'] = item.immortal
                     log.info("Accepting %s from queue with quality %s. Force: %s" % (entry['title'], entry['quality'], entry['immortal']))
@@ -111,7 +112,7 @@ class ImdbQueueManager:
         if len(parser.rargs) >= 3:
             ImdbQueueManager.options['quality'] = parser.rargs[2]
         else:
-            ImdbQueueManager.options['quality'] = 'dvd' # TODO: Get default from config somehow?
+            ImdbQueueManager.options['quality'] = 'ANY' # TODO: Get default from config somehow?
 
         # 4, force download
         if len(parser.rargs) >= 4:
@@ -168,9 +169,10 @@ class ImdbQueueManager:
 
         # Check that the quality is valid
         from flexget.utils.titles.parser import TitleParser
-        if quality not in TitleParser.qualities:
+        if (quality != "ANY") and (quality not in TitleParser.qualities):
             print 'Unknown quality: %s' % quality
             print 'Recognized qualities are %s' % ', '.join(TitleParser.qualities)
+            print 'ANY is the default, and can also be used explicitly, to specify that quality should be ignored.'
             return
 
         session = Session()
