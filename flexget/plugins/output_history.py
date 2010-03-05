@@ -40,7 +40,7 @@ class PluginHistory:
             session = Session()
             print '-- History: ' + '-' * 67
             for item in reversed(session.query(History).order_by(desc(History.time)).limit(50).all()):
-                print ' Title   : %s' % item.title
+                print ' Title   : %s' % item.title.encode('utf-8')
                 print ' Url     : %s' % item.url
                 if item.filename:
                     print ' Stored  : %s' % item.filename
