@@ -114,6 +114,8 @@ class InputHtml:
             elif title_from == 'title' and link.has_key('title'):
                 title = link['title']
                 log.debug('title from title: %s' % title)
+            elif title_from == 'contents':
+                pass
             else:
                 # automatic mode, check if title is unique
                 if title_exists(title):
