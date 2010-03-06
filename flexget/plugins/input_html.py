@@ -14,15 +14,15 @@ class InputHtml:
     """
         Parses urls from html page. Usefull on sites which have direct download
         links of any type (mp3, jpg, torrent, ...).
-        
+
         Many anime-fansubbers do not provide RSS-feed, this works well in many cases.
-        
+
         Configuration expects url parameter.
 
         Note: This returns ALL links on url so you need to configure filters
         to match only to desired content.
     """
-    
+
     def validator(self):
         from flexget import validator
         root = validator.factory()
@@ -46,7 +46,7 @@ class InputHtml:
         page = urllib2.urlopen(pageurl)
         soup = get_soup(page)
         log.debug('Detected encoding %s' % soup.originalEncoding)
-        
+
         # dump received content into a file
         if 'dump' in config:
             name = config['dump']
@@ -55,7 +55,7 @@ class InputHtml:
             f = open(name, 'w')
             f.write(data)
             f.close()
-            
+
         self.create_entries(feed, pageurl, soup, config)
 
     def create_entries(self, feed, pageurl, soup, config):
@@ -69,7 +69,7 @@ class InputHtml:
             for entry in entries:
                 if entry['title'] == title:
                     return True
-        
+
         for link in soup.findAll('a'):
             # not a valid link
             if not link.has_key('href'):
@@ -77,26 +77,26 @@ class InputHtml:
             # no content in link
             if not link.contents:
                 continue
-            
+
             title = link.contents[0]
-            
+
             # tag inside link
             if isinstance(title, BeautifulSoup.Tag):
                 log.log(5, 'title is tag: %s' % title)
                 continue
 
             # just unable to get any decent title
-            if title is None: 
+            if title is None:
                 title = link.next.string
                 if title is None:
                     continue
 
             # strip unicode whitespaces
             title = title.replace(u'\u200B', u'').strip()
-            
-            if not title: 
+
+            if not title:
                 continue
-            
+
             url = link['href']
 
             # fix broken urls
