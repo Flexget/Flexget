@@ -262,11 +262,12 @@ class Manager:
 
         self.lockfile = os.path.join(self.config_base, ".%s-lock" % self.config_name)
         if os.path.exists(self.lockfile):
-            f = file(self.lockfile)
-            pid = f.read()
-            f.close()
-            print >> sys.stderr, "Another process (%s) is running, will exit." % pid.strip()
-            print >> sys.stderr, "If you're sure there is no other instance running, delete %s" % self.lockfile
+            if not self.options.quiet:
+                f = file(self.lockfile)
+                pid = f.read()
+                f.close()
+                print >> sys.stderr, "Another process (%s) is running, will exit." % pid.strip()
+                print >> sys.stderr, "If you're sure there is no other instance running, delete %s" % self.lockfile
             sys.exit(1)
 
         f = file(self.lockfile, 'w')
