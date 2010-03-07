@@ -7,6 +7,7 @@ from flexget.utils.log import log_once
 from flexget.utils.soup import get_soup
 from flexget.plugins.cached_input import cached
 from BeautifulSoup import NavigableString
+from flexget.utils.tools import urlopener
 
 log = logging.getLogger('rlslog')
 
@@ -42,7 +43,7 @@ class RlsLog:
     def parse_rlslog(self, rlslog_url, feed):
         """Parse configured url and return releases array"""
         
-        page = urllib2.urlopen(rlslog_url)
+        page = urlopener(rlslog_url, log)
         soup = get_soup(page)
             
         releases = []
@@ -120,8 +121,8 @@ class RlsLog:
         if url.endswith('feed/'):
             raise PluginWarning('Invalid URL. Remove trailing feed/ from the url.')
 
-        # retry rlslog (badly responding) up to 10 times
-        for number in range(10):
+        # retry rlslog (badly responding) up to 5 times
+        for number in range(5):
             try:
                 releases = self.parse_rlslog(url, feed)
             except urllib2.URLError, e:

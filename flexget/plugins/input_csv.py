@@ -1,8 +1,8 @@
-import urllib2
 import logging
 from flexget.feed import Entry
 from flexget.plugin import *
 from flexget.plugins.cached_input import cached
+from flexget.utils.tools import urlopener
 
 log = logging.getLogger('csv')
 
@@ -46,7 +46,7 @@ class InputCSV:
         url = feed.config['csv'].get('url', None)
         if not url:
             raise Exception('CSV in %s is missing url' % feed.name)
-        page = urllib2.urlopen(url)
+        page = urlopener(url, log)
         for line in page.readlines():
             data = line.split(",")
             entry = Entry()

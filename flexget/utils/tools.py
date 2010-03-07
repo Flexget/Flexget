@@ -1,6 +1,9 @@
 """Contains miscellaneous helpers"""
 
 import sgmllib
+import urllib2
+import socket
+import time
 
 
 def str_to_boolean(string):
@@ -154,3 +157,28 @@ def merge_dict_from_to(d1, d2):
                 raise MergeException('Merging key %s failed, conflicting datatypes.' % (k))
         else:
             d2[k] = v
+
+
+def urlopener(url, logger, **kwargs):
+    """Utility function for pulling back a url, with a retry of 3 times, increasing the timeout, etc. 
+    Should be grabbing all urls this way eventually, to keep error handling code in the same place."""
+    # get the old timeout for sockets, so we can set it back to that when done. This is NOT threadsafe by the way.
+    # In order to avoid requiring python 2.6, we're not using the urlopen timeout parameter. That really should be used
+    # after checking for python 2.6.
+    oldtimeout = socket.getdefaulttimeout()
+    socket.setdefaulttimeout(15.0)
+    for i in range(3): # retry getting the url up to 3 times.
+        try:
+            retrieved = urllib2.urlopen(url)
+        except urllib2.URLError, e:
+            log.debug('Failed to retrieve url (try %i/3): %s' % (i + 1, str(e.reason)))
+        except urllib2.HTTPError, e:
+            log.debug('HTTP error (try %i/3): %s' % (i + 1, str(e.code)))
+        else:
+            socket.setdefaulttimeout(oldtimeout)
+            return retrieved
+        finally:
+            time.sleep(3)
+    log.warning('Could not retrieve url: %s' % url)
+    socket.setdefaulttimeout(oldtimeout)
+    raise urllib2.URLError("Could not retrieve url after 3 retries.")

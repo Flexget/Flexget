@@ -1,4 +1,3 @@
-import urllib2
 import urlparse
 import logging
 import BeautifulSoup
@@ -6,6 +5,7 @@ from flexget.feed import Entry
 from flexget.plugin import *
 from flexget.utils.soup import get_soup
 from flexget.plugins.cached_input import cached
+from flexget.utils.tools import urlopener
 
 log = logging.getLogger('html')
 
@@ -43,7 +43,7 @@ class InputHtml:
 
         log.debug('InputPlugin html requesting url %s' % pageurl)
 
-        page = urllib2.urlopen(pageurl)
+        page = urlopener(pageurl, log)
         soup = get_soup(page)
         log.debug('Detected encoding %s' % soup.originalEncoding)
 

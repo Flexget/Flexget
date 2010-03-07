@@ -10,6 +10,7 @@ from flexget.feed import Entry
 from flexget.plugin import *
 from flexget.utils.log import log_once
 from flexget.plugins.cached_input import cached
+from flexget.utils.tools import urlopener
 
 log = logging.getLogger('rss')
 
@@ -165,7 +166,7 @@ class InputRSS:
                 ignore = True
             elif isinstance(ex, xml.sax._exceptions.SAXParseException):
                 log.critical('Invalid XML received from feed %s' % feed.name)
-                req = urllib2.urlopen(url)
+                req = urlopener(url, log)
                 data = req.read()
                 ext = 'xml'
                 if '<html>' in data.lower():

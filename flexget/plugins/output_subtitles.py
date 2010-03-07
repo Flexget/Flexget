@@ -1,5 +1,4 @@
 from xmlrpclib import ServerProxy
-import urllib2
 import re
 import difflib
 import os.path
@@ -10,6 +9,7 @@ from flexget.manager import Session, Base
 from flexget.plugin import *
 from sqlalchemy import Column, Integer, String, DateTime, PickleType
 from datetime import datetime, timedelta
+from flexget.utils.tools import urlopener
 
 """ 
 
@@ -50,10 +50,12 @@ log = logging.getLogger('subtitles')
 # xmlrpc spec
 # http://trac.opensubtitles.org/projects/opensubtitles/wiki/XMLRPC
 
+
 class Subtitles:
     """
     Fetch subtitles from opensubtitles.org
     """
+
     def validator(self):
         from flexget import validator
         subs = validator.factory('dict')
@@ -108,7 +110,7 @@ class Subtitles:
             # dig out the raw imdb id 
             m = re.search("tt(\d+)/$", entry['imdb_url'])
             if not m:
-                log.debug("no match for "+entry['imdb_url'])
+                log.debug("no match for %s" % entry['imdb_url'])
                 continue
 
             imdbid = m.group(1)
@@ -121,7 +123,8 @@ class Subtitles:
             subtitles = subtitles['data']
 
             # nothing found -> continue
-            if not subtitles: continue
+            if not subtitles: 
+                continue
             
             # filter bad subs
             subtitles = filter(lambda x: x['SubBad'] == '0', subtitles)
@@ -155,7 +158,7 @@ class Subtitles:
             for sub in filtered_subs:
                 log.debug('SUBS FOUND: ', sub['MovieReleaseName'], sub['SubRating'], sub['SubLanguageID'])
 
-                f = urllib2.urlopen(sub['ZipDownloadLink'])
+                f = urlopener(sub['ZipDownloadLink'], log)
                 subfilename = re.match('^attachment; filename="(.*)"$', f.info()['content-disposition']).group(1)
                 outfile = os.path.join(config['output'], subfilename)
                 fp = file(outfile, 'w')

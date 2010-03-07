@@ -1,10 +1,10 @@
-import urllib2
 import logging
 from flexget.feed import Entry
 from flexget.plugin import *
 from flexget.utils.soup import get_soup
 from flexget.plugins.cached_input import cached
 from BeautifulSoup import NavigableString
+from flexget.utils.tools import urlopener
 
 log = logging.getLogger('scenereleases')
 
@@ -25,7 +25,7 @@ class InputScenereleases:
     def parse_site(self, url, feed):
         """Parse configured url and return releases array"""
         
-        page = urllib2.urlopen(url)
+        page = urlopener(url, log)
         soup = get_soup(page)
             
         releases = []

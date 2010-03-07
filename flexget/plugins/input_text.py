@@ -1,9 +1,9 @@
-import urllib2
 from flexget.feed import Entry
 from flexget.plugin import *
 from flexget.plugins.cached_input import cached
 import re
 import logging
+from flexget.utils.tools import urlopener
 
 log = logging.getLogger('text')
 
@@ -54,7 +54,7 @@ class InputText:
     @internet(log)
     def on_feed_input(self, feed):
         url = feed.config['text']['url']
-        content = urllib2.urlopen(url)
+        content = urlopener(url, log)
 
         entry_config = feed.config['text'].get('entry')
         format_config = feed.config['text'].get('format', {})

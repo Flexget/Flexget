@@ -8,6 +8,7 @@ import filecmp
 import zlib
 from flexget.plugin import *
 from httplib import BadStatusLine
+from flexget.utils.tools import urlopener
 
 log = logging.getLogger('download')
 
@@ -121,7 +122,7 @@ class PluginDownload:
             if urllib2._opener:
                 handlers = [h.__class__.__name__ for h in urllib2._opener.handlers]
                 log.debug('default opener present, handlers: %s' % ', '.join(handlers))
-            f = urllib2.urlopen(url)
+            f = urlopener(url, log)
 
         mimetype = f.headers.gettype()
 

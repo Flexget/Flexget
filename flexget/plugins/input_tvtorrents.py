@@ -1,10 +1,10 @@
-import urllib2
 import urlparse
 import logging
 from flexget.feed import Entry
 from flexget.plugin import *
 from flexget.utils.soup import get_soup
 from flexget.plugins.cached_input import cached
+from flexget.utils.tools import urlopener
 
 log = logging.getLogger('tvtorrents')
 
@@ -38,7 +38,7 @@ class InputTVTorrents:
         pageurl = "http://tvtorrents.com/loggedin/recently_aired.do"
         log.debug("InputPlugin tvtorrents requesting url %s" % pageurl)
 
-        page = urllib2.urlopen(pageurl)
+        page = urlopener(pageurl, log)
         soup = get_soup(page)
         
         hscript = soup.find('script', src=None).contents[0]

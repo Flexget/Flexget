@@ -4,6 +4,7 @@ import logging
 from flexget.plugins.plugin_urlrewriting import UrlRewritingError
 from flexget.plugin import *
 from flexget.utils.soup import get_soup
+from flexget.utils.tools import urlopener
 
 log = logging.getLogger('google_cse')
 
@@ -25,7 +26,7 @@ class UrlRewriteGoogleCse:
             # need to fake user agent
             txheaders = {'User-agent': 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'}
             req = urllib2.Request(entry['url'], None, txheaders)
-            page = urllib2.urlopen(req)
+            page = urlopener(req, log)
             soup = get_soup(page)
             results = soup.findAll('a', attrs={'class': 'l'})
             if not results:

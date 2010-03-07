@@ -1,8 +1,8 @@
 import urllib
-import urllib2
 import logging
 from plugin_urlrewriting import UrlRewritingError
 from flexget.plugin import *
+from flexget.utils.tools import urlopener
 from flexget.utils.soup import get_soup
 import difflib
 
@@ -41,7 +41,7 @@ class UrlRewritePirateBay:
 
     @internet(log)
     def parse_download_page(self, url):
-        page = urllib2.urlopen(url)
+        page = urlopener(url, log)
         try:
             soup = get_soup(page)
             tag_div = soup.find('div', attrs={'class': 'download'})
@@ -70,7 +70,7 @@ class UrlRewritePirateBay:
         if not url:
             url = 'http://thepiratebay.org/search/' + urllib.quote(name)
             log.debug('Using %s as piratebay search url' % url)
-        page = urllib2.urlopen(url)
+        page = urlopener(url, log)
         # do this here so I don't have to do it constantly below.
         cleanname = name.replace('.', ' ').replace('-', '').replace('_', ' ').lower()
 

@@ -5,6 +5,7 @@ from plugin_urlrewriting import UrlRewritingError
 from flexget.plugin import *
 from flexget.utils.soup import get_soup
 import difflib
+from flexget.utils.tools import urlopener
 
 timeout = 10
 import socket
@@ -51,7 +52,7 @@ class NewTorrents:
     def url_from_page(self, url):
         """Parses torrent url from newtorrents download page"""
         try:
-            page = urllib2.urlopen(url)
+            page = urlopener(url, log)
             data = page.read()
         except urllib2.URLError:
             raise UrlRewritingError('URLerror when retrieving page')
@@ -76,7 +77,7 @@ class NewTorrents:
 
         log.debug('search url: %s' % url)
 
-        html = urllib2.urlopen(url).read()
+        html = urlopener(url, log).read()
         # fix </SCR'+'IPT> so that BS does not crash
         # TODO: should use beautifulsoup massage
         html = re.sub(r'(</SCR.*?)...(.*?IPT>)', r'\1\2', html)

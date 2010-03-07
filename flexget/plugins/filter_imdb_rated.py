@@ -3,9 +3,9 @@ from flexget.plugin import *
 from BeautifulSoup import BeautifulSoup
 from flexget.manager import Base
 from sqlalchemy import Column, Integer, Float, String, DateTime
-import urllib2
 import re
 import datetime
+from flexget.utils.tools import urlopener
 
 log = logging.getLogger('imdb_rated')
 
@@ -77,7 +77,7 @@ class FilterImdbRated:
 
         massage = [(re.compile('"}'), lambda match: '"'), (re.compile('/\'""'), lambda match: '/\'"')]
         
-        data = urllib2.urlopen(config['url'])
+        data = urlopener(config['url'], log)
         soup = BeautifulSoup(data, markupMassage=massage)
 
         count = 0

@@ -4,6 +4,7 @@ import logging
 import re
 from flexget.plugin import *
 from flexget.utils.soup import get_soup
+from flexget.utils.tools import urlopener
 
 log = logging.getLogger("newzleech")
 
@@ -17,7 +18,7 @@ class UrlRewriteNewzleech:
     # Search API
     @internet(log)
     def search(self, feed, entry):
-        url = u'http://newzleech.com/?' + urllib.urlencode({'q':entry['title'].encode('latin1'), 'm':'search', 'group':'', 'min':'min', 'max':'max', 'age':'', 'minage':'', 'adv':''})
+        url = u'http://newzleech.com/?%s' % str(urllib.urlencode({'q': entry['title'].encode('latin1'), 'm': 'search', 'group': '', 'min': 'min', 'max': 'max', 'age': '', 'minage': '', 'adv': ''}))
         #log.debug('Search url: %s' % url)
         
         txheaders = {
@@ -30,18 +31,18 @@ class UrlRewriteNewzleech:
         }
         
         req = urllib2.Request(url, None, txheaders)
-        page = urllib2.urlopen(req)
+        page = urlopener(req, log)
 
         soup = get_soup(page)
         
         nzbs = []
         
-        for item in soup.findAll('table', attrs={'class':'contentt'}):
-            subject_tag = item.find('td', attrs={'class':'subject'}).next
+        for item in soup.findAll('table', attrs={'class': 'contentt'}):
+            subject_tag = item.find('td', attrs={'class': 'subject'}).next
             subject = ''.join(subject_tag.findAll(text=True))
-            complete = item.find('td', attrs={'class':'complete'}).contents[0]
-            size = item.find('td', attrs={'class':'size'}).contents[0]
-            nzb_url = 'http://newzleech.com/' + item.find('td', attrs={'class':'get'}).next.get('href')
+            complete = item.find('td', attrs={'class': 'complete'}).contents[0]
+            size = item.find('td', attrs={'class': 'size'}).contents[0]
+            nzb_url = 'http://newzleech.com/' + item.find('td', attrs={'class': 'get'}).next.get('href')
             
             # generate regexp from entry title and see if it matches subject
             regexp = entry['title']

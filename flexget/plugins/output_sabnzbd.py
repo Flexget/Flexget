@@ -1,5 +1,6 @@
 import logging
 from flexget.plugin import *
+from flexget.utils.tools import urlopener
 
 log = logging.getLogger('sabnzbd')
 
@@ -64,7 +65,6 @@ class OutputSabnzbd:
     def on_feed_output(self, feed):
 
         import urllib
-        import urllib2
         
         # convert config into url parameters
         config = feed.config['sabnzbd']
@@ -86,7 +86,7 @@ class OutputSabnzbd:
             request_url = baseurl + urllib.urlencode(params)
             log.debug('request_url: %s' % request_url)
             try:            
-                response = urllib2.urlopen(request_url).read()
+                response = urlopener(request_url, log).read()
             except Exception, e:
                 log.critical('Failed to use sabnzbd. Requested %s' % request_url)
                 log.critical('Result was: %s' % e)
