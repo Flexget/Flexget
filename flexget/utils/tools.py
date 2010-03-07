@@ -141,13 +141,14 @@ def sanitize_list(content, logger=None):
 
 def merge_dict_from_to(d1, d2):
     """Merges dictionary d1 into dictionary d2. d1 will remain in original form."""
+    import copy
     for k, v in d1.items():
         if k in d2:
             if type(v) == type(d2[k]):
                 if isinstance(v, dict):
                     merge_dict_from_to(d1[k], d2[k])
                 elif isinstance(v, list):
-                    d2[k].extend(v)
+                    d2[k].extend(copy.deepcopy(v))
                 elif isinstance(v, basestring) or isinstance(v, bool) or \
                      isinstance(v, int) or isinstance(v, float):
                     pass
@@ -156,7 +157,7 @@ def merge_dict_from_to(d1, d2):
             else:
                 raise MergeException('Merging key %s failed, conflicting datatypes.' % (k))
         else:
-            d2[k] = v
+            d2[k] = copy.deepcopy(v)
 
 
 def urlopener(url, logger, **kwargs):
