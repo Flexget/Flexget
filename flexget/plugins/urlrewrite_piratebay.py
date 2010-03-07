@@ -25,6 +25,10 @@ class UrlRewritePirateBay:
         
     # urlrewriter API
     def url_rewrite(self, feed, entry):
+        if not 'url' in entry:
+            log.error("Didn't actually get a URL...")
+        else:
+            log.debug("Got the URL: %s" % entry['url'])
         if entry['url'].startswith('http://thepiratebay.org/search/'):
             # use search
             try:
@@ -67,28 +71,22 @@ class UrlRewritePirateBay:
             url = 'http://thepiratebay.org/search/' + urllib.quote(name)
             log.debug('Using %s as piratebay search url' % url)
         page = urllib2.urlopen(url)
+        # do this here so I don't have to do it constantly below.
+        cleanname = name.replace('.', ' ').replace('-', '').replace('_', ' ').lower()
+
         
         soup = get_soup(page)
         torrents = []
-        possibilities = {}
         for link in soup.findAll('a', attrs={'class': 'detLink'}):
-            # dict of {linktextlowered: linkobj}
-            possibilities[link.contents[0].lower()] = link
-        # Get the closest 5 (or less) matches to the torrent name, with a confidence of at least 0.9
-        matches = difflib.get_close_matches(name.lower(), possibilities.keys(), n=5, cutoff=0.9)
-        log.debug('found %i matches. Matches are: %s' % (len(matches), str(matches)))
-        for linktext in matches:
-            # simpler to just use difflib.get_close_matches like above for what we're doing
-            ## assign confidence score of how close this link is to the name you're looking for. .6 and above is "close"
-            #confidence = difflib.SequenceMatcher(lambda x: x in ' -._', # junk characters
-            #                           link.contents[0].lower(),
-            #                           name.lower()).ratio()
-            #log.debug('name: %s' % name.lower())
-            #log.debug('found name: %s' % link.contents[0].lower())
-            #log.debug('confidence: %s' % str(confidence))
-            #if confidence < 0.9:
-            #    continue
-            link = possibilities[linktext]
+            # assign confidence score of how close this link is to the name you're looking for. .6 and above is "close"
+            confidence = difflib.SequenceMatcher(lambda x: x in ' -._', # junk characters
+                                       link.contents[0].lower().replace('.', ' ').replace('-', '').replace('_', ' '),
+                                       cleanname).ratio()
+            log.debug('name: %s' % cleanname)
+            log.debug('found name: %s' % link.contents[0].lower().replace('.', ' ').replace('-', '').replace('_', ' '))
+            log.debug('confidence: %s' % str(confidence))
+            if confidence < 0.9:
+                continue
             torrent = {}
             torrent['name'] = link.contents[0]
             torrent['link'] = 'http://thepiratebay.org' + link.get('href')

@@ -80,17 +80,17 @@ class internet(object):
             except urllib2.HTTPError, e:
                 raise PluginError('HTTPError %s' % e.code, self.log)
             except urllib2.URLError, e:
-                log.debug('decorator catched urlerror')
+                log.debug('decorator caught urlerror')
                 raise PluginError('URLError %s' % e.reason, self.log)
             except BadStatusLine:
-                log.debug('decorator catched badstatusline')
+                log.debug('decorator caught badstatusline')
                 raise PluginError('Got BadStatusLine', self.log)
             except IOError, e:
-                log.debug('decorator catched ioerror')
+                log.debug('decorator caught ioerror')
                 if hasattr(e, 'reason'):
                     raise PluginError('Failed to reach server. Reason: %s' % e.reason, self.log)
                 elif hasattr(e, 'code'):
-                    raise PluginError('The server couldn''t fulfill the request. Error code: %s' % e.code, self.log)
+                    raise PluginError('The server couldn\'t fulfill the request. Error code: %s' % e.code, self.log)
         return wrapped_func
 
 

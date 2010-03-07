@@ -124,13 +124,20 @@ class RlsLog:
         for number in range(10):
             try:
                 releases = self.parse_rlslog(url, feed)
-            except:
-                if number == 9:
+            except urllib2.URLError, e:
+                if number == 4:
                     raise
                 else:
                     import time
-                    feed.verbose_progress('No response, retrying in 10s. Try [%s of 10].' % str(number + 1))
-                    time.sleep(10)
+                    feed.verbose_progress('Error retrieving the URL, retrying in 5s. Try [%s of 5]. Error: %s' % (str(number + 1), str(e.reason)))
+                    time.sleep(5)
+            except urllib2.HTTPError, e:
+                if number == 4:
+                    raise
+                else:
+                    import time
+                    feed.verbose_progress('Error recieving content, retrying in 5s. Try [%s of 5]. HTTP Error Code: %s' % (str(number + 1), str(e.code)))
+                    time.sleep(5)
 
         for release in releases:
             # construct entry from release

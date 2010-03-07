@@ -58,9 +58,9 @@ class PluginUrlRewriting:
                     # increase failcount
                     #count = self.shared_cache.storedefault(entry['url'], 1)
                     #count += 1
-                    raise UrlRewritingError('URL rewriting %s failed: %s' % (name, r.value))
+                    raise UrlRewritingError('URL rewriting %s failed: %s' % (name, str(r.value)))
                 except PluginError, e:
-                    raise UrlRewritingError('URL rewriting %s failed: %s' % (name, e.value))
+                    raise UrlRewritingError('URL rewriting %s failed: %s' % (name, str(e.value)))
                 except Exception, e:
                     log.exception(e)
                     raise UrlRewritingError('%s: Internal error with url %s' % (name, entry['url']))
