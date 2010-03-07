@@ -160,7 +160,7 @@ def merge_dict_from_to(d1, d2):
             d2[k] = copy.deepcopy(v)
 
 
-def urlopener(url, logger, **kwargs):
+def urlopener(url, log, **kwargs):
     """Utility function for pulling back a url, with a retry of 3 times, increasing the timeout, etc. 
     Should be grabbing all urls this way eventually, to keep error handling code in the same place."""
     # get the old timeout for sockets, so we can set it back to that when done. This is NOT threadsafe by the way.

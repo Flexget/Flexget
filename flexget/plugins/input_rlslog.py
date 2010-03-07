@@ -122,22 +122,22 @@ class RlsLog:
             raise PluginWarning('Invalid URL. Remove trailing feed/ from the url.')
 
         # retry rlslog (badly responding) up to 5 times
-        for number in range(5):
+        for number in range(3):
             try:
                 releases = self.parse_rlslog(url, feed)
             except urllib2.URLError, e:
-                if number == 4:
+                if number == 2:
                     raise
                 else:
                     import time
-                    feed.verbose_progress('Error retrieving the URL, retrying in 5s. Try [%s of 5]. Error: %s' % (str(number + 1), str(e.reason)))
+                    feed.verbose_progress('Error retrieving the URL, retrying in 5s. Try [%s of 3]. Error: %s' % (str(number + 1), str(e.reason)))
                     time.sleep(5)
             except urllib2.HTTPError, e:
-                if number == 4:
+                if number == 2:
                     raise
                 else:
                     import time
-                    feed.verbose_progress('Error recieving content, retrying in 5s. Try [%s of 5]. HTTP Error Code: %s' % (str(number + 1), str(e.code)))
+                    feed.verbose_progress('Error recieving content, retrying in 5s. Try [%s of 3]. HTTP Error Code: %s' % (str(number + 1), str(e.code)))
                     time.sleep(5)
 
         for release in releases:
