@@ -33,7 +33,7 @@ class Episode(Base):
     season = Column(Integer)
     number = Column(Integer)
 
-    series_id = Column(Integer, ForeignKey('series.id'))
+    series_id = Column(Integer, ForeignKey('series.id'), nullable=False)
     releases = relation('Release', backref='episode')
 
     def __repr__(self):
@@ -45,7 +45,8 @@ class Release(Base):
     __tablename__ = 'episode_releases'
 
     id = Column(Integer, primary_key=True)
-    episode_id = Column(Integer, ForeignKey('series_episodes.id'))
+    episode_id = Column(Integer, ForeignKey('series_episodes.id'),
+            nullable=False)
     quality = Column(String)
     downloaded = Column(Boolean, default=False)
     proper = Column(Boolean, default=False)
