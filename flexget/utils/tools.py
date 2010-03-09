@@ -171,11 +171,11 @@ def urlopener(url, log, **kwargs):
     oldtimeout = socket.getdefaulttimeout()
     socket.setdefaulttimeout(15.0)
     # Apparently isinstance is considered unpythonic. So doing this instead.
-    try:
-        url.add_header("Accept-encoding", "gzip, deflate")
-    except AttributeError:
-        url = urllib2.Request(url)
-        url.add_header("Accept-encoding", "gzip, deflate")
+    #try:
+    #    url.add_header("Accept-encoding", "gzip, deflate")
+    #except AttributeError:
+    #    url = urllib2.Request(url)
+    #    url.add_header("Accept-encoding", "gzip, deflate")
     for i in range(3): # retry getting the url up to 3 times.
         try:
             retrieved = urllib2.urlopen(url)
@@ -185,11 +185,11 @@ def urlopener(url, log, **kwargs):
             log.debug('HTTP error (try %i/3): %s' % (i + 1, str(e.code)))
         else:
             socket.setdefaulttimeout(oldtimeout)
-            data = retrieved.read()
-            if retrieved.headers.get('content-encoding', None) == 'gzip':
-                log.debug("found gzipped response")
-                data = gzip.GzipFile(fileobj=StringIO.StringIO(data)).read()
-            return data
+            #data = retrieved.read()
+            #if retrieved.headers.get('content-encoding', None) == 'gzip':
+            #    log.debug("found gzipped response")
+            #    data = gzip.GzipFile(fileobj=StringIO.StringIO(data)).read()
+            return retrieved
         finally:
             time.sleep(3)
     log.warning('Could not retrieve url: %s' % url)
