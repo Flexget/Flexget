@@ -43,7 +43,7 @@ class Manager:
         self.lockfile = None
 
         self.config = {}
-        self.feeds = {}
+        self.feeds = []
 
         # shelve
         self.shelve_session = None
@@ -321,14 +321,29 @@ class Manager:
         from flexget.feed import Feed
 
         # construct feed list
-        feeds = self.config.get('feeds', {}).keys()
+        feeds = self.config.get('feeds', [])
         if not feeds:
             log.critical('There are no feeds in the configuration file!')
+        if isinstance(feeds, dict):
+            feeds = [{k:v} for k, v in feeds.iteritems()]
 
-        for name in feeds:
+        for feed in feeds:
+            error = None
+            if 1 < feed.keys():
+                from flexget.plugin import plugins
+                for k, v in feed.iteritems():
+                    if k in plugins:
+                        log.error('\'%s\' is known keyword, but in wrong indentation level. \
+                        Please indent it correctly under a feed. Reminder: keyword should have 2 \
+                        more spaces than feed name.' % k)
+                        error = 1
+                if error:
+                    continue
+
             # validate (TODO: make use of validator?)
-            if not isinstance(self.config['feeds'][name], dict):
-                if isinstance(self.config['feeds'][name], basestring):
+            name, feed = feed.items()[0]
+            if not isinstance(feed, dict):
+                if isinstance(feed, basestring):
                     from flexget.plugin import plugins
                     if name in plugins:
                         log.error('\'%s\' is known keyword, but in wrong indentation level. \
@@ -338,8 +353,8 @@ class Manager:
                 log.error('\'%s\' is not a properly configured feed, please check indentation levels.' % name)
                 continue
 
-            # create feed
-            feed = Feed(self, name, self.config['feeds'][name])
+            # create feed object
+            feed = Feed(self, name, feed)
             # if feed name is prefixed with _ it's disabled
             if name.startswith('_'):
                 feed.enabled = False
@@ -347,20 +362,20 @@ class Manager:
             if self.options.onlyfeed:
                 if name.lower() != self.options.onlyfeed.lower():
                     feed.enabled = False
-            self.feeds[name] = feed
+            self.feeds.append(feed)
 
         if self.options.onlyfeed:
-            if not [feed for feed in self.feeds.itervalues() if feed.enabled]:
+            if not [feed for feed in self.feeds if feed.enabled]:
                 log.critical('Could not find feed %s' % self.options.onlyfeed)
 
     def disable_feeds(self):
         """Disables all feeds."""
-        for feed in self.feeds.itervalues():
+        for feed in self.feeds:
             feed.enabled = False
 
     def enable_feeds(self):
         """Enables all feeds."""
-        for feed in self.feeds.itervalues():
+        for feed in self.feeds:
             feed.enabled = True
 
     def execute(self):
@@ -376,25 +391,25 @@ class Manager:
         failed = []
 
         # execute process_start to all feeds
-        for name, feed in self.feeds.iteritems():
+        for feed in self.feeds:
             if not feed.enabled:
                 continue
             try:
-                log.log(5, 'calling process_start on a feed %s' % name)
+                log.log(5, 'calling process_start on a feed %s' % feed.name)
                 feed.process_start()
             except Exception, e:
-                failed.append(name)
+                failed.append(feed.name)
                 log.exception('Feed %s process_start: %s' % (feed.name, e))
 
-        for name, feed in self.feeds.iteritems():
+        for feed in self.feeds:
             if not feed.enabled:
                 continue
-            if name in failed:
+            if feed.name in failed:
                 continue
             try:
                 feed.execute()
             except Exception, e:
-                failed.append(name)
+                failed.append(feed.name)
                 log.exception('Feed %s: %s' % (feed.name, e))
             except KeyboardInterrupt:
                 # show real stack trace in debug mode
@@ -408,16 +423,16 @@ class Manager:
                     feed.session.close()
 
         # execute process_end to all feeds
-        for name, feed in self.feeds.iteritems():
+        for feed in self.feeds:
             if not feed.enabled:
                 continue
-            if name in failed:
+            if feed.name in failed:
                 continue
             try:
-                log.log(5, 'calling process_end on a feed %s' % name)
+                log.log(5, 'calling process_end on a feed %s' % feed.name)
                 feed.process_end()
             except Exception, e:
-                log.exception('Feed %s process_end: %s' % (name, e))
+                log.exception('Feed %s process_end: %s' % (feed.name, e))
 
     def shutdown(self):
         """Application is being exited"""
