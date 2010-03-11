@@ -45,7 +45,7 @@ class TestTorrentSize(FlexGetBase):
             shutil.copy('tests/test.torrent', filename)
 
     def teardown(self):
-        FlexGetBase.setup(self)
+        FlexGetBase.teardown(self)
         for filename in self.testfiles:
             if os.path.exists(filename):
                 os.remove(filename)
