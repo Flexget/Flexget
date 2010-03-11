@@ -43,7 +43,6 @@ class RepairSeen(object):
         print '-' * 79
         
         from flexget.manager import Session
-        
         session = Session()
         
         index = 0
@@ -68,6 +67,25 @@ class RepairSeen(object):
         print ' Removed %s duplicates' % removed
         print ' %s items remaining' % total
         print '-' * 79
+
+
+class SearchSeen(object):
+
+    def on_process_start(self, feed):
+        if not feed.manager.options.seen_search:
+            return
+
+        feed.manager.disable_feeds()
+
+        print '-- Seen ---------------- Feed --------------  Field ---- Value -----------'
+
+        from flexget.manager import Session
+        import time
+        session = Session()
+        for seen in session.query(Seen).filter(Seen.value.like('%' + feed.manager.options.seen_search + '%')).all():
+            print '%-24s %-20s %-10s %s' % (seen.added.strftime('%c'), seen.feed, seen.field, seen.value)
+
+        session.close()
 
 
 class FilterSeen(object):
@@ -205,9 +223,13 @@ class FilterSeen(object):
 
 register_plugin(FilterSeen, 'seen', builtin=True, priorities=dict(filter=255))
 register_plugin(RepairSeen, '--repair-seen', builtin=True)
+register_plugin(SearchSeen, '--seen-search', builtin=True)
+
 register_parser_option('--forget', action='store', dest='forget', default=False,
                        metavar='FEED|VALUE', help='Forget feed (completely) or given title or url.')
 register_parser_option('--seen', action='store', dest='seen', default=False,
                        metavar='VALUE', help='Add title or url to what has been seen in feeds.')
 register_parser_option('--repair-seen', action='store_true', dest='repair_seen', default=False,
                        help='Repair seen database by removing duplicate lines.')
+register_parser_option('--seen-search', action='store', dest='seen_search', default=False,
+                       metavar='VALUE', help='Search given text from seen database.')
