@@ -11,7 +11,8 @@ class ParseWarning(Warning):
 class TitleParser(object):
     
     qualities = ['1080p', '1080', '720p', '720', 'hr', 'dvd', 'bdrip', 'dvdrip', '480p', '480',
-                 'bdscr', 'dvdscr', 'hdtv', 'pdtv', 'dsr', 'dsrip', 'r5', 'cam', 'unknown']
+                 'bdscr', 'dvdscr', 'hdtv', 'pdtv', 'sdtv', 'dsr', 'dsrip', 'r5', 'preair', 'cam',
+                 'workprint', 'unknown']
     
     propers = ['proper', 'repack', 'rerip', 'real']
     
