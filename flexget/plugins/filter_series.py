@@ -65,6 +65,8 @@ class SeriesPlugin(object):
         """Return datetime when this episode of series was first seen"""
         episode = session.query(Episode).select_from(join(Episode, Series)).\
             filter(Series.name == parser.name.lower()).filter(Episode.identifier == parser.identifier).first()
+        if not episode:
+            return datetime.now()
         return episode.first_seen
 
     def get_latest_info(self, session, name):
