@@ -164,16 +164,25 @@ class SeriesParser(TitleParser):
             if part in self.specials:
                 self.special = True
 
-        # remove unwanted words (qualities and such) from data for ep / id parsing
-        # need to remove them from the original string, as they might not match to cleaned string
-        new_data = self.remove_words(self.data, self.remove + self.qualities + self.codecs + self.sounds)
-        new_data = self.clean(new_data)
-        data = remove_dirt(new_data)
+        # Remove unwanted words (qualities and such) from data for ep / id
+        # parsing need to remove them from the original string, as they
+        # might not match to cleaned string.
+        # Ensure the series name isn't accidentally munged.
+        pre_data = ''
+        if name_start:
+            pre_data = self.remove_words(self.data[0:name_start-1], self.remove + self.qualities + self.codecs + self.sounds)
+            pre_data = self.clean(pre_data)
+            pre_data = remove_dirt(pre_data)
+            name_start -= len(pre_data)
+        post_data = ''
+        if name_end < len(self.data) - 1:
+            post_data = self.remove_words(self.data[name_end:], self.remove + self.qualities + self.codecs + self.sounds)
+            post_data = self.clean(post_data)
+            post_data = remove_dirt(post_data)
+            name_end -= len(pre_data)
 
-        # remove series name from the data 
-        name_in_data = data[name_start:name_end-1]
-        log.log(5, "name_in_data '%s'" % name_in_data)
-        data = data.replace(name_in_data, '')
+        # remove series name from the data
+        data = ' '.join([pre_data, post_data])
 
         log.debug("data for id/ep parsing '%s'" % data)
 

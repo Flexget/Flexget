@@ -209,7 +209,7 @@ class TestSeriesParser(object):
         assert s.season == 7, 'season missing'
         assert s.episode == 6, 'episode missing'
         assert s.identifier == 'S07E06', 'identifier broken'
-        
+
     def test_idiotic_invalid(self):
         """SeriesParser: idiotic confused by invalid"""
         s = SeriesParser()
@@ -279,3 +279,11 @@ class TestSeriesParser(object):
         s.name = 'Storage 13'
         s.data = 'Storage 13 no ep number'
         assert_raises(ParseWarning, s.parse)
+
+    def test_name_uncorrupted(self):
+        """SeriesParser: test name doesn't get corrupted when cleaned"""
+        s = self.parse(name='The New Adventures of Old Christine', data='The.New.Adventures.of.Old.Christine.S05E16.HDTV.XviD-LOL')
+        assert s.name == 'The New Adventures of Old Christine'
+        assert s.season == 5
+        assert s.episode == 16
+        assert s.quality == 'hdtv'
