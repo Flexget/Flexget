@@ -240,7 +240,7 @@ class SeriesParser(TitleParser):
                     self.valid = True
                     return
 
-        raise ParseWarning('\'%s\' looks like series \'%s\' but I cannot find any episode or id numbering!' % (data, self.name))
+        raise ParseWarning('\'%s\' looks like series \'%s\' but I cannot find any episode or id numbering!' % (self.data, self.name))
 
     @property
     def identifier(self):
