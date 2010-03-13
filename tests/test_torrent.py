@@ -37,6 +37,13 @@ class TestTorrentSize(FlexGetBase):
 
     """
 
+    testfiles = ['tests/test_min.torrent', 'tests/test_max.torrent', 'tests/test_strict.torrent']
+
+    def setup(self):
+        FlexGetBase.setup(self)
+        for filename in self.testfiles:
+            shutil.copy('tests/test.torrent', filename)
+
     def test_min(self):
         self.execute_feed('test_min')
         assert self.feed.find_entry('rejected', title='test'), \
