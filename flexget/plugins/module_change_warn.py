@@ -30,6 +30,10 @@ class ChangeWarn:
             if key not in allow:
                 log.critical('Keyword \'%s\' is not allowed in the root level!' % key)
 
+        # priority (dict) was renamed to plugin_priority
+        if isinstance(feed.config.get('priority', None), dict):
+            log.critical('Plugin \'priority\' was renamed to \'plugin_priority\'')
+
         session = Session()
 
         # database changes
