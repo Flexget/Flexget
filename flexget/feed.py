@@ -308,7 +308,7 @@ class Feed:
             keyword = method.plugin.name
             if keyword in self.config or method.plugin.builtin:
                 # performance
-                start_time = time.clock()
+                start_time = time.time()
 
                 # store execute info
                 self.current_event = event
@@ -342,7 +342,7 @@ class Feed:
                     if self.manager.unit_test:
                         raise
                 # store performance information
-                took = time.clock() - start_time
+                took = time.time() - start_time
                 self.performance[keyword] = self.performance.get(keyword, 0) + took
 
                 # purge entries between plugins

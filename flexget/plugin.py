@@ -292,7 +292,7 @@ def load_plugins_from_dirs(dirs):
     for d in dirs:
         if not d:
             continue
-        log.debug('looking for plugins in %s', d)
+        log.debug('Looking for plugins in %s', d)
         if os.path.isdir(d):
             load_plugins_from_dir(d)
 
@@ -345,11 +345,11 @@ def load_plugins(parser):
     import warnings
     warnings.simplefilter('ignore', DeprecationWarning)
 
-    start_time = time.clock()
+    start_time = time.time()
     _parser = parser
     load_plugins_from_dirs(get_standard_plugins_path())
     _parser = None
-    took = time.clock() - start_time
+    took = time.time() - start_time
     plugins_loaded = True
     return took
 
