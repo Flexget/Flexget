@@ -33,7 +33,9 @@ class SeriesParser(TitleParser):
         self.ep_regexps = ['s(\d+)e(\d+)', 's(\d+)ep(\d+)', 's(\d+).e(\d+)', \
                            '[^\d]([\d]{1,2})[\s]?x[\s]?(\d+)']
         self.id_regexps = ['(\d\d\d\d).(\d+).(\d+)', '(\d+).(\d+).(\d\d\d\d)', \
-                           '(\d\d\d\d)x(\d+)\.(\d+)', '[^s\d](\d{1,3})[^p\d]']
+                           '(\d\d\d\d)x(\d+)\.(\d+)', \
+                           '(pt|part)\s?(\d+|IX|IV|V?I{0,3})', \
+                           '[^s\d](\d{1,3})[^p\d]']
         self.clean_regexps = ['\[.*?\]', '\(.*?\)']
         self.name_regexps = []
 
@@ -182,6 +184,7 @@ class SeriesParser(TitleParser):
             name_end -= len(pre_data)
 
         # remove series name from the data
+        # TODO: stripping leading space from this will cause unit tests to fail -> investigate
         data = ' '.join([pre_data, post_data])
 
         log.debug("data for id/ep parsing '%s'" % data)
@@ -233,11 +236,11 @@ class SeriesParser(TitleParser):
                         if match.start() - name_end >= 2:
                             return
 
-                    log.debug('found id with regexp %s' % id_re)
                     self.id = '-'.join(match.groups())
                     if self.special:
                         self.id += '-SPECIAL'
                     self.valid = True
+                    log.debug('found id \'%s\' with regexp \'%s\'' % (self.id, id_re))
                     return
 
         raise ParseWarning('\'%s\' looks like series \'%s\' but I cannot find any episode or id numbering!' % (self.data, self.name))

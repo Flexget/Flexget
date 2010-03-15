@@ -282,8 +282,19 @@ class TestSeriesParser(object):
 
     def test_name_uncorrupted(self):
         """SeriesParser: test name doesn't get corrupted when cleaned"""
-        s = self.parse(name='The New Adventures of Old Christine', data='The.New.Adventures.of.Old.Christine.S05E16.HDTV.XviD-LOL')
+        s = self.parse(name='The New Adventures of Old Christine', data='The.New.Adventures.of.Old.Christine.S05E16.HDTV.XviD-FlexGet')
         assert s.name == 'The New Adventures of Old Christine'
         assert s.season == 5
         assert s.episode == 16
         assert s.quality == 'hdtv'
+
+    def test_part(self):
+        """SeriesParser: test parsing part numeral"""
+        s = self.parse(name='Test', data='Test.Pt.I.720p-FlexGet')
+        assert s.id == 'pt-i'
+        s = self.parse(name='Test', data='Test.Pt.VI.720p-FlexGet')
+        assert s.id == 'pt-vi'
+        s = self.parse(name='Test', data='Test.Part.2.720p-FlexGet')
+        assert s.id == 'part-2'
+        s = self.parse(name='Test', data='Test.Part3.720p-FlexGet')
+        assert s.id == 'part-3'
