@@ -367,6 +367,8 @@ class FilterSeries(SeriesPlugin):
             watched = options.accept('dict', key='watched')
             watched.accept('number', key='season')
             watched.accept('number', key='episode')
+            # from group
+            options.accept('text', key='from_group')
 
         def build_list(series):
             """Build series list to series."""
@@ -581,6 +583,7 @@ class FilterSeries(SeriesPlugin):
                 parser.ep_regexps = get_as_array(config, 'ep_regexp') + parser.ep_regexps
                 parser.id_regexps = get_as_array(config, 'id_regexp') + parser.id_regexps
                 parser.strict_name = config.get('exact', False)
+                parser.from_group = config.get('from_group', None)
                 parser.field = field
                 # do not use builtin list for id when ep configured and vice versa
                 if 'ep_regexp' in config and not 'id_regexp' in config:

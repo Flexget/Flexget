@@ -26,6 +26,7 @@ class SeriesParser(TitleParser):
         self.name = ''
         self.data = ''
         self.expect_ep = False
+        self.from_group = None
 
         # if set to true, episode or id must follow immediately after name
         self.strict_name = False
@@ -35,7 +36,7 @@ class SeriesParser(TitleParser):
         self.id_regexps = ['(\d\d\d\d).(\d+).(\d+)', '(\d+).(\d+).(\d\d\d\d)', \
                            '(\d\d\d\d)x(\d+)\.(\d+)', \
                            '(pt|part)\s?(\d+|IX|IV|V?I{0,3})', \
-                           '[^s\d](\d{1,3})[^p\d]']
+                           '[^s\d](\d{1,3})(?:[^p\d]|$)']
         self.clean_regexps = ['\[.*?\]', '\(.*?\)']
         self.name_regexps = []
 
@@ -152,6 +153,15 @@ class SeriesParser(TitleParser):
             name_start = match.start()
             name_end = match.end()
 
+        # from group
+        if self.from_group:
+            from_group = self.from_group.lower()
+            orig_data = self.data.lower()
+            if not ('[%s]' % from_group in orig_data or
+                    '-%s' % from_group in orig_data):
+                log.debug('%s is not from group %s' % (orig_data, from_group))
+                return # leave invalid
+
         # search tags and quality
         for part in data_parts:
             if part in self.qualities:
@@ -205,6 +215,7 @@ class SeriesParser(TitleParser):
                 self.episode = int(episode)
                 self.valid = True
                 return
+        log.debug('-> no luck with ep_regexps')
 
         # search for ids later as last since they contain somewhat broad matches
 
@@ -242,6 +253,7 @@ class SeriesParser(TitleParser):
                     self.valid = True
                     log.debug('found id \'%s\' with regexp \'%s\'' % (self.id, id_re))
                     return
+            log.debug('-> no luck with id_regexps')
 
         raise ParseWarning('\'%s\' looks like series \'%s\' but I cannot find any episode or id numbering!' % (self.data, self.name))
 

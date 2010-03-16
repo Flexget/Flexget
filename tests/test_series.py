@@ -769,3 +769,24 @@ class TestManipulate(FlexGetBase):
         assert not self.feed.accepted, 'series rejecte even with prefix?'
         self.execute_feed('test_2')
         assert self.feed.accepted, 'manipulate failed to pre-clean title'
+
+
+class TestFromGroup(FlexGetBase):
+
+    __yaml__ = """
+        feeds:
+          test:
+            mock:
+              - {title: '[Ignored] Test 12'}
+              - {title: '[FlexGet] Test 12'}
+              - {title: 'Test.13.HDTV-Ignored'}
+              - {title: 'Test.13.HDTV-FlexGet'}
+            series:
+              - test: {from_group: FlexGet}
+    """
+
+    def testFromGroup(self):
+        """Series plugin: test from_group"""
+        self.execute_feed('test')
+        assert self.feed.find_entry('accepted', title='[FlexGet] Test 12')
+        assert self.feed.find_entry('accepted', title='Test.13.HDTV-FlexGet')
