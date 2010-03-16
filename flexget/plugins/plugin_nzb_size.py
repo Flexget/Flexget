@@ -16,8 +16,6 @@ class NzbSize(object):
         """
         from pynzb import nzb_parser
 
-        # TODO CRITICAL: do only when mime-type or filename suggests nzb file!
-
         for entry in feed.accepted:
 
             if not entry.get('mime-type', None) == u'text/nzb' or not entry.get('filename', '').endswith('.nzb'):
