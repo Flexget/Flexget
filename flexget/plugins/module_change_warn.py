@@ -64,7 +64,21 @@ try:
     import os.path
     dir = os.path.normpath(sys.path[0] + '/../flexget/plugins/')
     for name in os.listdir(dir):
+        require_clean = False
         if 'resolver' in name:
+            require_clean = True
+
+        if 'filter_torrent_size' in name:
+            require_clean = True
+
+        if 'filter_nzb_size' in name:
+            require_clean = True
+
+        if 'module_priority' in name:
+            require_clean = True
+
+        
+        if require_clean:
             log.critical('-' * 79)
             log.critical('IMPORTANT: Please remove all pre-compiled .pyc and .pyo files from')
             log.critical('           path: %s' % dir)

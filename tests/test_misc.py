@@ -53,7 +53,7 @@ class TestPriority(FlexGetBase):
             mock:
               - {title: 'Smoke'}
             accept_all: yes
-            priority:
+            plugin_priority:
               accept_all: 100
     """
 

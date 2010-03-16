@@ -15,13 +15,15 @@ class TestTorrentSize(FlexGetBase):
           test_min:
             mock:
               - {title: 'test', file: 'tests/test_min.torrent'}
-            torrent_size:
+            accept_all: yes
+            content_size:
               min: 2000
 
           test_max:
             mock:
               - {title: 'test', file: 'tests/test_max.torrent'}
-            torrent_size:
+            accept_all: yes
+            content_size:
               max: 10
               
           test_strict:
@@ -31,7 +33,8 @@ class TestTorrentSize(FlexGetBase):
               - no_global
             mock:
               - {title: 'test'}
-            torrent_size:
+            accept_all: yes
+            content_size:
               min: 1
               strict: yes
 
