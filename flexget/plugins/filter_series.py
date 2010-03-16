@@ -610,8 +610,12 @@ class FilterSeries(SeriesPlugin):
 
             # add series, season and episode to entry
             entry['series_name'] = series_name
-            entry['series_season'] = parser.season
-            entry['series_episode'] = parser.episode
+            if parser.season and parser.episode:
+                entry['series_season'] = parser.season
+                entry['series_episode'] = parser.episode
+            else:
+                import time
+                entry['series_season'] = time.gmtime().tm_year 
             entry['series_id'] = parser.identifier
 
             # set custom download path
