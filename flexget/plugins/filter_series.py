@@ -951,7 +951,11 @@ class FilterSeries(SeriesPlugin):
         downloaded_releases = self.get_downloaded(feed.session, eps[0].name, eps[0].identifier)
         log.debug('downloaded_releases: %s' % downloaded_releases)
 
+        accepted_qualities = []
+
         def is_quality_downloaded(quality):
+            if quality in accepted_qualities:
+                return True
             for release in downloaded_releases:
                 if release.quality == quality:
                     return True
@@ -967,6 +971,7 @@ class FilterSeries(SeriesPlugin):
                 feed.reject(self.parser2entry[ep], 'quality downloaded')
             else:
                 feed.accept(self.parser2entry[ep], 'quality wanted')
+                accepted_qualities.append(ep.quality) # don't accept more
 
     # TODO: get rid of, see how feed.reject is called, consistency!
     def accept_series(self, feed, parser, reason):
