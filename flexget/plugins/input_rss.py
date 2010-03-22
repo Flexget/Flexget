@@ -174,6 +174,8 @@ class InputRSS:
                     ext = 'html'
                 if 'login' in data.lower() or 'username' in data.lower():
                     log.critical('Received content looks a bit like login page')
+                if 'error' in data.lower():
+                    log.critical('Received content looks a bit like error page')
                 import os
                 received = os.path.join(feed.manager.config_base, 'received')
                 if not os.path.isdir(received):

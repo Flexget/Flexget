@@ -900,12 +900,13 @@ class FilterSeries(SeriesPlugin):
 
         # expire timeframe, accept anything
         first_seen = self.get_first_seen(feed.session, best)
+        expires = first_seen + timeframe
         log.debug('timeframe: %s' % timeframe)
         log.debug('first_seen: %s' % first_seen)
-        log.debug('timeframe expires: %s' % str(first_seen + timeframe))
-
+        log.debug('timeframe expires: %s' % str(expires))
+        
         stop = feed.manager.options.stop_waiting == series_name
-        if first_seen + timeframe <= datetime.now() or stop:
+        if expires <= datetime.now() or stop:
             entry = self.parser2entry[best]
             if stop:
                 log.info('Stopped timeframe, accepting %s' % (entry['title']))
@@ -919,25 +920,24 @@ class FilterSeries(SeriesPlugin):
                 feed.reject(entry, 'wrong quality')
             return True
         else:
-            # just verbose waiting
-            diff = datetime.now() - self.get_first_seen(feed.session, best)
-            if diff.seconds < 60:
-                import math
-                entry = self.parser2entry[best]
-                remain = math.ceil(timeframe.seconds / float(60) ** 2)
-                log.info('Timeframe waiting %s for %1d hours, currently best is %s' % \
-                    (series_name, remain, entry['title']))
+            # verbose waiting, add to backlog
+            diff = expires - datetime.now()
+            
+            hours, remainder = divmod(diff.seconds, 3600)
+            minutes, seconds = divmod(remainder, 60)
+            
+            entry = self.parser2entry[best]
+            log.info('Timeframe waiting %s for %sh:%smin, currently best is %s' % \
+                (series_name, hours, minutes, entry['title']))
 
             # reject all episodes that are in timeframe
             log.debug('timeframe waiting %s episode %s, rejecting all occurrences' % (series_name, best.identifier))
             for ep in eps:
                 feed.reject(self.parser2entry[ep], 'timeframe is waiting')
-                # add entry to backlog (backlog prevents duplicates)
+                # add entry to backlog (backlog is able to handle duplicate adds)
                 if self.backlog:
-                    # set expiring timeframe length + 10%
-                    expires = timedelta(seconds=timeframe.seconds * 1.10)
-                    log.debug('timeframe expires: %s hours' % (int(expires.seconds) / 60))
-                    self.backlog.add_backlog(feed, self.parser2entry[ep], '%s seconds' % expires.seconds)
+                    # set expiring timeframe length, extending a day
+                    self.backlog.add_backlog(feed, self.parser2entry[ep], '%s hours' % (hours + 24))
             return True
 
     # TODO: whitelist deprecated ?
