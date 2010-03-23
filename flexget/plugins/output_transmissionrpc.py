@@ -64,7 +64,7 @@ class PluginTransmissionrpc:
         '''event handler'''
         set_plugin = get_plugin_by_name('set')
 
-        set_plugin.instance.register_keys({'path': 'path', \
+        set_plugin.instance.register_keys({'path': 'text', \
                                            'addpaused': 'boolean', \
                                            'maxconnections': 'number', \
                                            'maxupspeed': 'number',  \
