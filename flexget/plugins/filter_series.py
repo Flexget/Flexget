@@ -810,7 +810,7 @@ class FilterSeries(SeriesPlugin):
             accepted_qualities.append(config['quality'])
         else:
             qualities = SeriesParser.qualities
-            min = config.get('min_quality', qualities[-1]).lower()
+            min = config.get('min_quality', qualities[-2]).lower() # -2 leaves the unknown quality out
             max = config.get('max_quality', qualities[0]).lower()
             min_index = qualities.index(min) + 1
             max_index = qualities.index(max)

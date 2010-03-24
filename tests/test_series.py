@@ -61,6 +61,13 @@ class TestQuality(FlexGetBase):
               - MinMaxQTest:
                   min_quality: pdtv
                   max_quality: hr
+                  
+          max_unknown_quality:
+            mock:
+              - {title: 'MaxUnknownQTest.S01E01.XViD-FlexGet'}
+            series:
+              - MaxUnknownQTest:
+                  max_quality: hdtv
     """
 
     def test_best_quality(self):
@@ -90,6 +97,11 @@ class TestQuality(FlexGetBase):
         assert self.feed.find_entry('accepted', title='MinMaxQTest.S01E01.HR.XViD-FlexGet'), \
             'MinMaxQTest.S01E01.HR.XViD-FlexGet should have been accepted'
         assert len(self.feed.accepted) == 1, 'should have accepted only one'
+        
+    def test_max_unknown_quality(self):
+        """Series plugin: max quality with unknown quality"""
+        self.execute_feed('max_unknown_quality')
+        assert len(self.feed.accepted) == 0, 'should not have accepted'
 
 
 class TestDatabase(FlexGetBase):
