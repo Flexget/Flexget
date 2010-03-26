@@ -34,13 +34,14 @@ class RepairSeen(object):
     def on_process_start(self, feed):
         if not feed.manager.options.repair_seen:
             return
-    
+
         feed.manager.disable_feeds()
-        
-        print '-' * 79
-        print ' Removing faulty duplicate items from seen database'
-        print ' This may take a while ...'
-        print '-' * 79
+            
+        try:
+            from progressbar import ProgressBar, Percentage, Bar, ETA
+        except:
+            print 'Critical: progressbar library not found, try running `bin/easy_install progressbar` ?'
+            return
         
         from flexget.manager import Session
         session = Session()
@@ -48,10 +49,16 @@ class RepairSeen(object):
         index = 0
         removed = 0
         total = session.query(Seen).count()
+        
+        print ''
+        
+        widgets = ['Repairing: ', ETA(), ' ', Percentage(), ' ', Bar(left='[', right=']')]
+        bar = ProgressBar(widgets=widgets, maxval=total).start()
+        
         for seen in session.query(Seen).all():
             index += 1
-            if (index % 500 == 0):
-                print ' %s / %s' % (index, total)
+            if (index % 10 == 0):
+                bar.update(index)
             amount = 0
             for dupe in session.query(Seen).filter(Seen.value == seen.value):
                 amount += 1
@@ -61,12 +68,12 @@ class RepairSeen(object):
         
         session.commit()
         session.close()
+        
+        bar.finish()
 
         total = session.query(Seen).count()
-        print '-' * 79
-        print ' Removed %s duplicates' % removed
-        print ' %s items remaining' % total
-        print '-' * 79
+        print '\nRemoved %s duplicates' % removed
+        print '%s items remaining\n' % total
 
 
 class SearchSeen(object):
