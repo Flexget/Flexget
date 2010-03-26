@@ -32,7 +32,6 @@ class NzbSize(object):
 
             try:
                 nzbfiles = nzb_parser.parse(xmldata)
-                print entry
             except:
                 log.debug('%s is not a valid nzb' % entry['title'])
                 continue
