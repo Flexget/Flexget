@@ -1,6 +1,8 @@
 import urlparse
 import logging
 import BeautifulSoup
+import urllib
+import zlib
 from flexget.feed import Entry
 from flexget.plugin import *
 from flexget.utils.soup import get_soup
@@ -31,6 +33,8 @@ class InputHtml:
         advanced.accept('url', key='url', required=True)
         advanced.accept('text', key='dump')
         advanced.accept('text', key='title_from')
+        regexps = advanced.accept('list', key='links_re')
+        regexps.accept('regexp')
         return root
 
     @cached('html', 'url')
@@ -60,13 +64,13 @@ class InputHtml:
 
     def create_entries(self, feed, pageurl, soup, config):
 
-        entries = []
+        queue = []
         duplicates = {}
         duplicate_limit = 4
 
         def title_exists(title):
             """Helper method. Return True if title is already added to entries"""
-            for entry in entries:
+            for entry in queue:
                 if entry['title'] == title:
                     return True
 
@@ -74,9 +78,22 @@ class InputHtml:
             # not a valid link
             if not link.has_key('href'):
                 continue
-            # no content in link
+            # no content in the link
             if not link.contents:
                 continue
+
+            url = link['href']
+
+            # get only links matching regexp
+            regexps = config.get('links_re', None)
+            if regexps:
+                import re
+                accept = False
+                for regexp in regexps:
+                    if re.search(regexp, url):
+                        accept = True
+                if not accept:
+                    continue
 
             title = link.contents[0]
 
@@ -91,13 +108,11 @@ class InputHtml:
                 if title is None:
                     continue
 
-            # strip unicode whitespaces
+            # strip unicode white spaces
             title = title.replace(u'\u200B', u'').strip()
 
             if not title:
                 continue
-
-            url = link['href']
 
             # fix broken urls
             if url.startswith('//'):
@@ -107,17 +122,18 @@ class InputHtml:
 
             title_from = config.get('title_from', 'auto')
             if title_from == 'url':
-                import urllib
                 parts = urllib.splitquery(url[url.rfind('/')+1:])
                 title = urllib.unquote_plus(parts[0])
                 log.debug('title from url: %s' % title)
-            elif title_from == 'title' and link.has_key('title'):
+            elif title_from == 'title':
+                if not link.has_key('title'):
+                    log.warning('Link %s doesn\t have title attribute, ignored.')
+                    continue
                 title = link['title']
                 log.debug('title from title: %s' % title)
-            elif title_from == 'contents':
-                pass
-            else:
+            elif title_from == 'auto':
                 # automatic mode, check if title is unique
+                # if there are too many duplicate titles, switch to title_from: url
                 if title_exists(title):
                     # ignore index links as a counter
                     if 'index' in title and len(title) < 10:
@@ -125,15 +141,25 @@ class InputHtml:
                     duplicates.setdefault(title, 0)
                     duplicates[title] += 1
                     if duplicates[title] > duplicate_limit:
-                        log.info('Link names seem to be useless, auto-enabling \'title_from: url\'')
+                        log.info('Link names seem to be useless, auto-enabling \'title_from: url\'. This may not work well, you might need to configure it.')
                         config['title_from'] = 'url'
                         # start from the beginning  ...
                         self.create_entries(feed, pageurl, soup, config)
                         return
+            elif title_from == 'link':
+                # link from link name
+                log.debug('title from link: %s' % title)
+                pass
+            else:
+                raise PluginError('Unknown title_from value %s' % title_from)
 
+            # in case the title contains xxxxxxx.torrent - foooo.torrent clean it a bit (get up to first .torrent)
+            # TODO: hack
+            if title.lower().find('.torrent') > 0:
+                title = title[:title.lower().find('.torrent')]
+                
             if title_exists(title):
                 # title link should be unique, add CRC32 to end if it's not
-                import zlib
                 hash = zlib.crc32(url)
                 crc32 = '%08X' % (hash & 0xFFFFFFFF)
                 title = '%s [%s]' % (title, crc32)
@@ -142,19 +168,14 @@ class InputHtml:
                     continue
                 log.debug('uniqued title to %s' % title)
 
-            # in case the title contains xxxxxxx.torrent - foooo.torrent clean it a bit (get up to first .torrent)
-            # TODO: hack
-            if title.lower().find('.torrent') > 0:
-                title = title[:title.lower().find('.torrent')]
-
             entry = Entry()
             entry['url'] = url
             entry['title'] = title
 
-            entries.append(entry)
+            queue.append(entry)
 
         # add from queue to feed
-        feed.entries.extend(entries)
+        feed.entries.extend(queue)
 
 
 register_plugin(InputHtml, 'html')
