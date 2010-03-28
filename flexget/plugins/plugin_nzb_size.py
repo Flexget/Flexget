@@ -18,7 +18,8 @@ class NzbSize(object):
 
         for entry in feed.accepted:
 
-            if not entry.get('mime-type', None) == u'text/nzb' or not entry.get('filename', '').endswith('.nzb'):
+            if entry.get('mime-type', None) not in [u'text/nzb', u'application/x-nzb'] or \
+               not entry.get('filename', '').endswith('.nzb'):
                 log.debug('%s does not seem to be nzb' % entry['title'])
                 continue
 
