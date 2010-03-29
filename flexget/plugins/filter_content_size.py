@@ -36,9 +36,9 @@ class FilterContentSize(object):
                     feed.reject(entry, 'maximum size (%s MB)' % config['max'])
                     rejected = True
             else:
-                if config.get('strict', False):
-                    log.debug('Entry %s size is unknown, rejecting because of strict mode' % entry['title'])
-                    feed.reject(entry, 'strict enabled and no size available')
+                if config.get('strict', True):
+                    log.debug('Entry %s size is unknown, rejecting because of strict mode (default)' % entry['title'])
+                    feed.reject(entry, 'no size available')
                     rejected = True
 
             # learn this as seen that it won't be re-downloaded & rejected on every execution

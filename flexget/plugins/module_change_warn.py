@@ -22,7 +22,16 @@ class ChangeWarn:
         feed.abort()
 
     def on_process_start(self, feed):
+        found_deprecated = False
         config = feed.manager.config
+        
+        if 'torrent_size' in feed.config:
+            log.critical('Plugin torrent_size is deprecated, use content_size instead')
+            found_deprecated = True
+        
+        if 'nzb_size' in feed.config:
+            log.critical('Plugin nzb_size is deprecated, use content_size instead')
+            found_deprecated = True
 
         # prevent useless keywords in root level
         allow = ['feeds', 'presets', 'variables']
@@ -76,7 +85,6 @@ try:
 
         if 'module_priority' in name:
             require_clean = True
-
         
         if require_clean:
             log.critical('-' * 79)
