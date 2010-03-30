@@ -161,8 +161,10 @@ class PluginDownload:
             # store temp filename into entry so other plugins may read and modify content
             # temp file is moved into final destination at self.output
             entry['file'] = datafile
+            log.debug('%s file attr set to %s' % (entry['title'], entry['file']))
         except:
             # don't leave futile files behind
+            log.debug('Download interrupted, removing datafile')
             os.remove(datafile)
             raise
 
@@ -244,13 +246,14 @@ class PluginDownload:
 
         config = self.get_config(feed)
 
-        # check if entry must have a path (download: yes)
+        # check if entry must have a path (eg. download: yes)
         if 'require_path' in config and 'path' not in entry:
             log.debug('%s can\'t be written, no path specified for it' % entry['title'])
             feed.fail(entry, 'no path specified')
             return
 
-        if not 'file' in entry:
+        if 'file' not in entry:
+            log.debug('file missing, entry: %s' % entry)
             raise Exception('Entry %s has no temp file associated with' % entry['title'])
 
         try:
