@@ -208,7 +208,7 @@ class Feed:
         if entry.get('immortal'):
             reason_str = ''
             if reason:
-                reason_str = ' (%s)' % reason
+                reason_str = '(%s)' % reason
             log.info('Tried to reject immortal %s %s' % (entry['title'], reason_str))
             return
 
@@ -397,7 +397,7 @@ class Feed:
                     (len(self.accepted), len(self.rejected), \
                     len(self.entries) - len(self.accepted), len(self.failed)))
 
-        log.debug('committing session')
+        log.debug('committing session, abort=%s' % self._abort)
         self.session.commit()
 
         # display performance

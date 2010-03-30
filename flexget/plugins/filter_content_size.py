@@ -42,11 +42,12 @@ class FilterContentSize(object):
                     rejected = True
 
             # learn this as seen that it won't be re-downloaded & rejected on every execution
-            if rejected:
+            if entry in feed.rejected:
                 get_plugin_by_name('seen').instance.learn(feed, entry)
                 # clean up temporary files
                 if not feed.manager.unit_test:
                     if os.path.exists(entry.get('file', '')):
+                        log.debug('removing temp %s' % entry['file'])
                         os.remove(entry['file'])
                         del(entry['file'])
 

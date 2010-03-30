@@ -15,7 +15,6 @@ class YamlDump:
         return validator.factory('boolean')
 
     def on_feed_output(self, feed):
-        log.debug('dump_entries: %s' % feed.manager.options.dump_entries)
         if not 'dump' in feed.config and not feed.manager.options.dump_entries:
             return
         #from flexget.utils.tools import sanitize

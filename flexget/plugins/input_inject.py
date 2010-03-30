@@ -12,9 +12,9 @@ class InputInject:
         
         Syntax:
         
-        --inject <title> 
+        --inject <TITLE> [URL] [ACCEPTED] [IMMORTAL]
         
-        Random url will be generated. All other inputs are disabled.
+        Random url will be generated. All other inputs from freed(s) are disabled.
 
         
         Example use:
@@ -34,7 +34,7 @@ class InputInject:
 
     @staticmethod
     def optik_series(option, opt, value, parser):
-        """--inject <TITLE> [URL] [FORCE]"""
+        """--inject <TITLE> [URL] [ACCEPTED] [IMMORTAL]"""
         #InputInject.options
         index = 0
         for arg in parser.rargs:

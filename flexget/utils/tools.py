@@ -177,8 +177,10 @@ def urlopener(url, log, **kwargs):
     #    url = urllib2.Request(url)
     #    url.add_header("Accept-encoding", "gzip, deflate")
     for i in range(3): # retry getting the url up to 3 times.
+        sleep = True
         try:
             retrieved = urllib2.urlopen(url)
+            sleep = False
         except urllib2.URLError, e:
             log.debug('Failed to retrieve url (try %i/3): %s' % (i + 1, str(e.reason)))
         except urllib2.HTTPError, e:
@@ -191,7 +193,8 @@ def urlopener(url, log, **kwargs):
             #    data = gzip.GzipFile(fileobj=StringIO.StringIO(data)).read()
             return retrieved
         finally:
-            time.sleep(3)
+            if sleep:
+                time.sleep(3)
     log.warning('Could not retrieve url: %s' % url)
     socket.setdefaulttimeout(oldtimeout)
     raise urllib2.URLError("Could not retrieve url after 3 retries.")
