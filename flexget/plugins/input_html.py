@@ -146,7 +146,7 @@ class InputHtml:
                         # start from the beginning  ...
                         self.create_entries(feed, pageurl, soup, config)
                         return
-            elif title_from == 'link':
+            elif title_from == 'link' or title_from == 'contents':
                 # link from link name
                 log.debug('title from link: %s' % title)
                 pass
