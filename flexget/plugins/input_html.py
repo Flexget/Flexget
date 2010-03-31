@@ -131,8 +131,6 @@ class InputHtml:
                     continue
                 title = link['title']
                 log.debug('title from title: %s' % title)
-            elif title_from == 'contents':
-                pass
             elif title_from == 'auto':
                 # automatic mode, check if title is unique
                 # if there are too many duplicate titles, switch to title_from: url
