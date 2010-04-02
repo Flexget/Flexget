@@ -31,8 +31,12 @@ class Manipulate:
                         break
                     match = re.match(config['regexp'], entry[config['from']])
                     if match:
-                        entry[field] = ' '.join(match.groups())
-                        feed.verbose_details('field %s is now %s' % (field, entry[field]))
+                        groups = [x for x in match.groups() if x is not None]
+                        log.debug('groups: %s' % groups)
+                        entry[field] = ' '.join(groups)
+                        # remove duplicate spacexs
+                        entry[field] = ' '.join(entry[field].split())
+                        feed.verbose_details('Field %s is now %s' % (field, entry[field]))
                         log.debug('field %s is now %s' % (field, entry[field]))
 
 register_plugin(Manipulate, 'manipulate', priorities={filter: 255})
