@@ -218,17 +218,6 @@ class Manager:
             connection = 'sqlite:///:memory:'
         else:
             self.db_filename = os.path.join(self.config_base, 'db-%s.sqlite' % self.config_name)
-            # this is mainly to handle fixing one bug without causing havoc ..
-            if not os.path.exists(self.db_filename) and not self.options.initdb and not self.options.test:
-                print ''
-                print 'Configuration file \'%s\' doesn\'t have a initialized database.' % self.config_name
-                print 'Run FlexGet once with --initdb parameter to verify that you mean to start a new database.'
-                print ''
-                print 'Important: If you\'re old user and didn\'t expect this, see bleeding edge news!'
-                print ''
-                sys.exit(1)
-            if os.path.exists(self.db_filename) and self.options.initdb:
-                log.warning('Database has already been initialized.')
             if self.options.test:
                 db_test_filename = os.path.join(self.config_base, 'test-%s.sqlite' % self.config_name)
                 log.info('Test mode, creating a copy from database ...')

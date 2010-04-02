@@ -10,8 +10,6 @@ class OptionParser(OptParser):
 
         self.add_option('-v', action='store_true', dest='details', default=0,
                         help='Verbose process. Display entry accept and reject info. HIGHLY USEFULL.')
-        self.add_option('--initdb', action='store_true', dest='initdb', default=0,
-                        help='Verify starting new database.')
         self.add_option('--log-start', action='store_true', dest='log_start', default=0,
                         help=SUPPRESS_HELP)
         self.add_option('--test', action='store_true', dest='test', default=0,
