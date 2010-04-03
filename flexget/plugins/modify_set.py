@@ -60,7 +60,7 @@ class ModifySet:
                 try:
                     conf[key] = value % entry
                 except KeyError as e:
-                    log.warning("Could not set '%s' for %s: does not contain the field '%s.'" % (key, entry['title'], e))
+                    log.error("Could not set '%s' for %s: does not contain the field '%s.'" % (key, entry['title'], e))
             else:
                 conf[key] = value
         
