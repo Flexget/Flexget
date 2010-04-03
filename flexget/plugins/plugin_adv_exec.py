@@ -40,6 +40,8 @@ class PluginAdvExec:
         
         for name in ['on_start', 'on_input', 'on_filter', 'on_output', 'on_end']:
             add(name)
+        
+        root.accept('boolean', key='fail_entries')
             
         return root
 
@@ -97,7 +99,11 @@ class PluginAdvExec:
                     cmd = ' '.join(args)
                     
                 except KeyError, e:
-                    log.error('Entry %s does not have required field %s' % (entry['title'], e.message))
+                    msg = 'Entry %s does not have required field %s' % (entry['title'], e.message)
+                    log.error(msg)
+                    # fail the entry if configured to do so
+                    if feed.config[self.NAME].get('fail_entries'):
+                        feed.fail(entry, msg)
                     continue
                     
                 log.debug('event_name: %s operation: %s cmd: %s' % (event_name, operation, cmd))
