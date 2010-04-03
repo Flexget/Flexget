@@ -52,9 +52,17 @@ class ModifySet:
         """
         this can be called from a plugin to add set values to an entry
         """
-        #run string replacement on all string variables before validation
-        conf = copy.deepcopy(config)
-        conf.update(dict([(key, value % entry) for (key, value) in config.iteritems() if isinstance(value, basestring)]))
+        #create a new dict so we don't overwrite the set config with string replaced values.
+        conf = {}
+        #loop through config copying items into conf, and doing string replacement where necessary
+        for key, value in config.iteritems():
+            if isinstance(value, basestring):
+                try:
+                    conf[key] = value % entry
+                except KeyError as e:
+                    log.warning("Could not set '%s' for %s: does not contain the field '%s.'" % (key, entry['title'], e))
+            else:
+                conf[key] = value
         
         if validate:
             from flexget import validator
