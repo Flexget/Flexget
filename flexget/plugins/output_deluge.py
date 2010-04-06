@@ -37,6 +37,7 @@ class OutputDeluge:
         deluge.accept('boolean', key='removeatratio')
         deluge.accept('boolean', key='addpaused')
         deluge.accept('boolean', key='compact')
+        deluge.accept('text', key='content_filename')
         deluge.accept('boolean', key='enabled')
         return root
 
@@ -72,7 +73,7 @@ class OutputDeluge:
             'queuetotop': 'boolean', 'label': 'text', 'automanaged': 'boolean', \
             'maxupspeed': 'decimal', 'maxdownspeed': 'decimal', 'maxupslots': 'number', \
             'maxconnections': 'number', 'ratio': 'decimal', 'removeatratio': 'boolean', \
-            'addpaused': 'boolean', 'compact': 'boolean'})
+            'addpaused': 'boolean', 'compact': 'boolean', 'content_filename': 'text'})
         if not self.deluge12:
             try:
                 log.debug("Testing for deluge 1.1 API")
@@ -274,15 +275,51 @@ class OutputDeluge:
                     else:
                         dlist.append(client.core.queue_bottom([torrent_id]))
                         log.debug("%s moved to bottom of queue" % entry['title'])
+                if opts.get('content_filename'):
+
+                    def on_get_torrent_status(status, d2):
+                        for file in status['files']:
+                            # Only rename file if it is > 90% of the content
+                            if file['size'] > (status['total_size'] * 0.9):
+                                filename = opts['content_filename'] + os.path.splitext(file['path'])[1]
+                                counter = 1
+
+                                def file_exists():
+                                    # Checks the download path as well as the move completed path for existence of the file
+                                    if os.path.exists(os.path.join(status['save_path'], filename)):
+                                        return True
+                                    elif status.get('move_on_completed') and status.get('move_on_completed_path'):
+                                        if os.path.exists(os.path.join(status['move_on_completed_path'], filename)):
+                                            return True
+                                    else:
+                                        return False
+
+                                while file_exists():
+                                    # Try appending a (#) suffix till a unique filename is found
+                                    filename = ''.join([opts['content_filename'], '(', str(counter), ')', os.path.splitext(file['path'])[1]])
+                                    counter += 1
+                                log.debug("File %s in %s renamed to %s" % (file['path'], entry['title'], filename))
+                                client.core.rename_files(torrent_id, [(file['index'], filename)]).addBoth(d2.callback)
+                                break
+                        else:
+                            log.debug("No files in %s are > 90% of content size, no files renamed." % entry['title'])
+                            d2.callback(None)
+
+                    # d2 will callback when the renaming is complete
+                    d2 = defer.Deferred()
+                    status_keys = ['files', 'total_size', 'save_path', 'move_on_completed_path', 'move_on_completed']
+                    client.core.get_torrent_status(torrent_id, status_keys).addCallback(on_get_torrent_status, d2)
+                    dlist.append(d2)
+                # Callback the deferred passed to us when all jobs are complete
                 defer.DeferredList(dlist).addBoth(d.callback)
 
             def on_fail(result, feed, entry):
                 log.info("%s was not added to deluge! %s" % (entry['title'], result))
                 feed.fail(entry, "Could not be added to deluge")
             
-            #dlist is a list of deferreds that must complete before we exit
+            # dlist is a list of deferreds that must complete before we exit
             dlist = []
-            #loop through entries to get a list of labels to add
+            # loop through entries to get a list of labels to add
             labels = []
             if config.get('label'):
                 labels.append(config['label'].lower())
@@ -333,6 +370,7 @@ class OutputDeluge:
                 opts['movedone'] = os.path.expanduser(entry.get('movedone', config['movedone']) % entry)
                 opts['label'] = entry.get('label', config['label']).lower()
                 opts['queuetotop'] = entry.get('queuetotop', config.get('queuetotop'))
+                opts['content_filename'] = entry.get('content_filename')
                 #create a deferred here which we will callback after all work in on_success is done
                 d = defer.Deferred()
                 addresult.addCallbacks(on_success, on_fail, callbackArgs=(entry, opts, d), errbackArgs=(feed, entry))
