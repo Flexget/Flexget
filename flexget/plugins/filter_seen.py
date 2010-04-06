@@ -112,7 +112,7 @@ class MigrateSeen(object):
         removed = 0
         total = session.query(Seen).count() + 1
 
-        widgets = ['Repairing: ', ETA(), ' ', Percentage(), ' ', Bar(left='[', right=']')]
+        widgets = ['Repairing - ', ETA(), ' ', Percentage(), ' ', Bar(left='[', right=']')]
         bar = ProgressBar(widgets=widgets, maxval=total).start()
 
         for seen in session.query(Seen).all():
@@ -129,7 +129,7 @@ class MigrateSeen(object):
 
         # MIGRATE
         total = session.query(Seen).count() + 1 
-        widgets = ['Upgrading: ', ETA(), ' ', Percentage(), ' ', Bar(left='[', right=']')]
+        widgets = ['Upgrading - ', ETA(), ' ', Percentage(), ' ', Bar(left='[', right=']')]
         bar = ProgressBar(widgets=widgets, maxval=total).start()
 
         index = 0
