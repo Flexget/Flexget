@@ -1,60 +1,120 @@
 import logging
 from flexget.manager import Base
 from flexget.plugin import *
-from sqlalchemy import Column, Integer, String, DateTime
+from sqlalchemy import Column, Integer, String, DateTime, Unicode, asc
+from sqlalchemy.schema import ForeignKey
+from sqlalchemy.orm import relation, join
 from datetime import datetime
+from flexget.manager import Session
 
 log = logging.getLogger('seen')
 
 
-class Seen(Base):
-    
-    __tablename__ = 'seen'
+class SeenEntry(Base):
 
+    __tablename__ = 'seen_entry'
+    
     id = Column(Integer, primary_key=True)
-    field = Column(String)
-    value = Column(String, index=True)
-    feed = Column(String)
+    title = Column(Unicode)
+    reason = Column(Unicode)
+    feed = Column(Unicode)
     added = Column(DateTime)
     
-    def __init__(self, field, value, feed):
+    fields = relation('SeenField', backref='seen_entry', cascade='all, delete, delete-orphan')
+    
+    def __init__(self, title, feed, reason=None):
+        self.title = title
+        self.reason = reason
+        self.feed = feed
+        self.added = datetime.now()
+        
+    def __str__(self):
+        return '<SeenEntry(title=%s,reason=%s,feed=%s,added=%s)>' % (self.title, self.reason, self.feed, self.added)
+
+
+class SeenField(Base):
+
+    __tablename__ = 'seen_field'
+    
+    id = Column(Integer, primary_key=True)
+    seen_entry_id = Column(Integer, ForeignKey('seen_entry.id'), nullable=False)
+    field = Column(Unicode)
+    value = Column(Unicode, index=True)
+    added = Column(DateTime)
+    
+    def __init__(self, field, value):
         self.field = field
         self.value = value
-        self.feed = feed
         self.added = datetime.now()
     
     def __str__(self):
-        return '<Seen(%s=%s)>' % (self.field, self.value)
+        return '<SeenField(field=%s,value=%s,added=%s)>' % (self.field, self.value, self.added)
+                                        
 
+class MigrateSeen(object):
 
-class RepairSeen(object):
+    def migrate(self, feed):
+        """Migrates 0.9 session data into new database"""
 
-    """Repair seen database by removing duplicate items."""
+        session = Session()
+        try:
+            shelve = feed.manager.shelve_session
+            count = 0
+            log.info('If this crashes, you can\'t migrate 0.9 data to 1.0 ... sorry')
+            for name, data in shelve.iteritems():
+                if not 'seen' in data:
+                    continue
+                seen = data['seen']
+                for k, v in seen.iteritems():
+                    se = SeenEntry(u'N/A', seen.feed, u'migrated')
+                    se.fields.append(SeenField(u'unknown', k))
+                    session.add(se)
+                    count += 1
+            session.commit()
+            log.info('It worked! Migrated %s seen items' % count)
+        except Exception, e:
+            log.critical('It crashed :(')
+        finally:
+            session.close()
 
-    def on_process_start(self, feed):
-        if not feed.manager.options.repair_seen:
-            return
+    def migrate2(self):
+        session = Session()
 
-        feed.manager.disable_feeds()
-            
         try:
             from progressbar import ProgressBar, Percentage, Bar, ETA
         except:
             print 'Critical: progressbar library not found, try running `bin/easy_install progressbar` ?'
             return
-        
-        from flexget.manager import Session
-        session = Session()
-        
+
+        class Seen(Base):
+
+            __tablename__ = 'seen'
+
+            id = Column(Integer, primary_key=True)
+            field = Column(String)
+            value = Column(String, index=True)
+            feed = Column(String)
+            added = Column(DateTime)
+
+            def __init__(self, field, value, feed):
+                self.field = field
+                self.value = value
+                self.feed = feed
+                self.added = datetime.now()
+
+            def __str__(self):
+                return '<Seen(%s=%s)>' % (self.field, self.value)
+
         index = 0
         removed = 0
         total = session.query(Seen).count()
-        
+
         print ''
-        
+
+        # REPAIR / REMOVE DUPLICATES
         widgets = ['Repairing: ', ETA(), ' ', Percentage(), ' ', Bar(left='[', right=']')]
         bar = ProgressBar(widgets=widgets, maxval=total).start()
-        
+
         for seen in session.query(Seen).all():
             index += 1
             if (index % 10 == 0):
@@ -65,18 +125,41 @@ class RepairSeen(object):
                 if amount > 1:
                     removed += 1
                     session.delete(dupe)
-        
-        session.commit()
-        session.close()
-        
+
+        # MIGRATE
+        total = session.query(Seen).count()
+        widgets = ['Upgrading: ', ETA(), ' ', Percentage(), ' ', Bar(left='[', right=']')]
+        bar = ProgressBar(widgets=widgets, maxval=total).start()
+
+        index = 0
+        for seen in session.query(Seen).all():
+            index += 1
+            if (index % 10 == 0):
+                bar.update(index)
+            se = SeenEntry(u'N/A', seen.feed, u'migrated')
+            se.added = seen.added
+            se.fields.append(SeenField(seen.field, seen.value))
+            session.add(se)
+
         bar.finish()
 
-        total = session.query(Seen).count()
-        print '\nRemoved %s duplicates' % removed
-        print '%s items remaining\n' % total
+        session.execute('drop table seen;')
+        session.commit()
+
+    def on_process_start(self, feed):
+        # migrate shelve -> sqlalchemy
+        if feed.manager.shelve_session:
+            self.migrate(feed)
+
+        # migrate seen to seen_entry
+        session = Session()
+        from flexget.utils.sqlalchemy_utils import table_exists
+        if table_exists('seen', session):
+            self.migrate2()
+        session.close()
 
 
-class SearchSeen(object):
+class SeenSearch(object):
 
     def on_process_start(self, feed):
         if not feed.manager.options.seen_search:
@@ -84,15 +167,74 @@ class SearchSeen(object):
 
         feed.manager.disable_feeds()
 
-        print '-- Seen ---------------- Feed --------------  Field ---- Value -----------'
-
-        from flexget.manager import Session
         import time
         session = Session()
-        for seen in session.query(Seen).filter(Seen.value.like('%' + feed.manager.options.seen_search + '%')).all():
-            print '%-24s %-20s %-10s %s' % (seen.added.strftime('%c'), seen.feed, seen.field, seen.value)
+        for field in session.query(SeenField).\
+            filter(SeenField.value.like(unicode('%' + feed.manager.options.seen_search + '%'))).\
+            order_by(asc(SeenField.added)).all():
+
+            se = session.query(SeenEntry).filter(SeenEntry.id == field.seen_entry_id).first()
+            if not se:
+                print 'ERROR: <SeenEntry(id=%s)> missing' % field.seen_entry_id  
+                continue
+
+            print 'Name: %s Feed: %s Added: %s' % (se.title, se.feed, se.added.strftime('%c'))
+            for sf in se.fields:
+                print ' %s: %s' % (sf.field, sf.value)
+
+            print ''
+        else:
+            print 'No results'
 
         session.close()
+
+
+class SeenForget(object):
+
+    def on_process_start(self, feed):
+        if not feed.manager.options.forget:
+            return
+
+        feed.manager.disable_feeds()
+
+        forget = unicode(feed.manager.options.forget)
+        session = Session()
+        count = 0
+        fcount = 0
+        for se in session.query(SeenEntry).filter(SeenEntry.title == forget).all():
+            fcount += len(se.fields)
+            count += 1
+            session.delete(se)
+
+        print 'Removed %s titles (%s fields)' % (count, fcount)
+            
+        for sf in session.query(SeenField).filter(SeenField.value == forget).all():
+            se = session.query(SeenEntry).filter(SeenEntry.id == sf.seen_entry_id).first()
+            fcount += len(se.fields)
+            count += 1
+            session.delete(se)
+
+        print 'Removed %s titles (%s fields)' % (count, fcount)
+
+        session.commit()
+
+
+class SeenCmd(object):
+
+    def on_process_start(self, feed):
+        if not feed.manager.options.seen:
+            return
+
+        feed.manager.disable_feeds()
+
+        session = Session()
+        se = SeenEntry(u'--seen', unicode(feed.name))
+        sf = SeenField(u'--seen', unicode(feed.manager.options.seen))
+        se.fields.append(sf)
+        session.add(se)
+        session.commit()
+
+        log.info('Added %s as seen. This will affect all feeds.' % feed.manager.options.seen)
 
 
 class FilterSeen(object):
@@ -107,7 +249,7 @@ class FilterSeen(object):
 
     def __init__(self):
         # remember and filter by these fields
-        self.fields = ['url', 'title', 'original_url']
+        self.fields = ['title', 'url', 'original_url']
         self.keyword = 'seen'
 
     def validator(self):
@@ -117,51 +259,6 @@ class FilterSeen(object):
         root.accept('text')
         return root
 
-    # TODO: separate to own class!
-    def on_process_start(self, feed):
-        """Implements --forget <feed> and --seen <value>"""
-
-        # migrate shelve -> sqlalchemy
-        if feed.manager.shelve_session:
-            self.migrate(feed)
-        
-        if feed.manager.options.forget or feed.manager.options.seen:
-            # don't run any feeds
-            feed.manager.disable_feeds()
-            
-            # in process_start the feed.session is not available
-            from flexget.manager import Session
-        
-        if feed.manager.options.forget:
-
-            forget = feed.manager.options.forget
-
-            session = Session()
-            count = 0
-            for seen in session.query(Seen).filter(Seen.feed == forget):
-                session.delete(seen)
-                count += 1
-                
-            for seen in session.query(Seen).filter(Seen.value == forget):
-                session.delete(seen)
-                count += 1
-                
-            session.commit()
-            
-            log.info('Forgot %s memories from %s' % (count, forget))
-            
-            if count == 0:
-                log.info('Perhaps feed / given value does not exists?')
-            
-        if feed.manager.options.seen:
-
-            session = Session()
-            seen = Seen('', feed.manager.options.seen, '--seen')
-            session.add(seen)
-            session.commit()
-            
-            log.info('Added %s as seen. This will affect all feeds.' % feed.manager.options.seen)
-        
     def on_feed_filter(self, feed):
         """Filter seen entries"""
         if not feed.config.get(self.keyword, True):
@@ -174,7 +271,7 @@ class FilterSeen(object):
                 if not field in entry:
                     continue
                 queries += 1
-                if feed.session.query(Seen).filter(Seen.value == entry[field]).first():
+                if feed.session.query(SeenField).filter(SeenField.value == entry[field]).first():
                     log.debug("Rejecting '%s' '%s' because of seen '%s'" % (entry['url'], entry['title'], field))
                     feed.reject(entry)
                     break
@@ -195,48 +292,34 @@ class FilterSeen(object):
             if feed.manager.options.learn:
                 log.info("Learned '%s' (will skip this in the future)" % (entry['title']))
     
-    def learn(self, feed, entry, fields=[]):
+    def learn(self, feed, entry, fields=None, reason=None):
         """Marks entry as seen"""
         # no explicit fields given, use default
         if not fields:
             fields = self.fields
+        se = SeenEntry(entry['title'], unicode(feed.name), reason)
         remembered = []
         for field in fields:
             if not field in entry:
                 continue
+            # removes duplicate values (eg. url, original_url)
             if entry[field] in remembered:
                 continue
-            seen = Seen(field, entry[field], feed.name)
-            feed.session.add(seen)
-            remembered.append(entry[field])
+            sf = SeenField(unicode(field), unicode(entry[field]))
+            se.fields.append(sf)
             log.debug("Learned '%s' (field: %s)" % (entry[field], field))
+        feed.session.add(se)
                 
-    def migrate(self, feed):
-        """Migrates 0.9 session data into new database"""
-        from flexget.manager import Session
-        session = Session()
-        shelve = feed.manager.shelve_session
-        count = 0
-        for name, data in shelve.iteritems():
-            if not self.keyword in data:
-                continue
-            seen = data[self.keyword]
-            for k, v in seen.iteritems():
-                seen = Seen('unknown', k, 'unknown')
-                session.add(seen)
-                count += 1
-        session.commit()
-        log.info('Migrated %s seen items' % count)
 
 register_plugin(FilterSeen, 'seen', builtin=True, priorities=dict(filter=255))
-register_plugin(RepairSeen, '--repair-seen', builtin=True)
-register_plugin(SearchSeen, '--seen-search', builtin=True)
+register_plugin(SeenSearch, '--seen-search', builtin=True)
+register_plugin(SeenCmd, '--seen', builtin=True)
+register_plugin(SeenForget, '--forget', builtin=True)
+register_plugin(MigrateSeen, 'migrate_seen', builtin=True)
 
 register_parser_option('--forget', action='store', dest='forget', default=False,
                        metavar='FEED|VALUE', help='Forget feed (completely) or given title or url.')
 register_parser_option('--seen', action='store', dest='seen', default=False,
                        metavar='VALUE', help='Add title or url to what has been seen in feeds.')
-register_parser_option('--repair-seen', action='store_true', dest='repair_seen', default=False,
-                       help='Repair seen database by removing duplicate lines.')
 register_parser_option('--seen-search', action='store', dest='seen_search', default=False,
                        metavar='VALUE', help='Search given text from seen database.')

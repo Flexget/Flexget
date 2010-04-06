@@ -4,7 +4,7 @@ def table_exists(name, session):
     from sqlalchemy.exceptions import NoSuchTableError
     from sqlalchemy import Table, MetaData
     try:
-        meta = MetaData()
+        meta = MetaData(bind=session.connection())
         Table(name, meta, autoload=True, autoload_with=session.connection())
     except NoSuchTableError:
         return False
@@ -17,7 +17,7 @@ def table_schema(name, session):
     from sqlalchemy.exceptions import NoSuchTableError
     from sqlalchemy import Table, MetaData
     try:
-        meta = MetaData()
+        meta = MetaData(bind=session.connection())
         reflect = Table(name, meta, autoload=True, autoload_with=session.connection())
         return reflect
     except NoSuchTableError:
