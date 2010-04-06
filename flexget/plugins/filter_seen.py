@@ -105,13 +105,13 @@ class MigrateSeen(object):
             def __str__(self):
                 return '<Seen(%s=%s)>' % (self.field, self.value)
 
-        index = 0
-        removed = 0
-        total = session.query(Seen).count()
-
         print ''
 
         # REPAIR / REMOVE DUPLICATES
+        index = 0
+        removed = 0
+        total = session.query(Seen).count() + 1
+
         widgets = ['Repairing: ', ETA(), ' ', Percentage(), ' ', Bar(left='[', right=']')]
         bar = ProgressBar(widgets=widgets, maxval=total).start()
 
@@ -125,9 +125,10 @@ class MigrateSeen(object):
                 if amount > 1:
                     removed += 1
                     session.delete(dupe)
+        bar.finish()
 
         # MIGRATE
-        total = session.query(Seen).count()
+        total = session.query(Seen).count() + 1 
         widgets = ['Upgrading: ', ETA(), ' ', Percentage(), ' ', Bar(left='[', right=']')]
         bar = ProgressBar(widgets=widgets, maxval=total).start()
 
@@ -140,7 +141,6 @@ class MigrateSeen(object):
             se.added = seen.added
             se.fields.append(SeenField(seen.field, seen.value))
             session.add(se)
-
         bar.finish()
 
         session.execute('drop table seen;')
