@@ -526,7 +526,7 @@ class FilterSeries(SeriesPlugin):
                 self.process_series(feed, series, series_name, series_config)
 
                 took = time.clock() - start_time
-                log.debug('processing %s took %s' % (series_name, took))
+                log.log(5, 'processing %s took %s' % (series_name, took))
 
     def parse_series(self, feed, series_name, config):
         """
@@ -556,11 +556,13 @@ class FilterSeries(SeriesPlugin):
 
         # determine if series is known to be in season, episode format
         expect_ep = False
+        """
         latest = self.get_latest_info(feed.session, series_name)
         if latest:
             if latest.get('season') and latest.get('episode'):
-                log.debug('auto enabling expect_ep for %s' % series_name)
+                log.log(5, 'auto enabling expect_ep for %s' % series_name)
                 expect_ep = True
+        """
 
         # don't try to parse these fields
         ignore_fields = ['uid', 'feed', 'url', 'original_url']
@@ -606,10 +608,12 @@ class FilterSeries(SeriesPlugin):
                 continue
 
             # check for auto enable expect_ep
+            """
             if not expect_ep:
                 if parser.season and parser.episode:
                     expect_ep = True
-                    log.debug('auto enabling expect_ep for %s' % series_name)
+                    log.log(5, 'auto enabling expect_ep for %s' % series_name)
+            """
 
             # add series, season and episode to entry
             entry['series_name'] = series_name

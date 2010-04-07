@@ -31,6 +31,13 @@ class FilterExistsSeries:
         return config
 
     def on_feed_filter(self, feed):
+        for entry in feed.entries:
+            if 'series_parser' in entry:
+                break
+        else:
+            log.debug('Scanning not needed')
+            return
+    
         config = self.get_config(feed)
         for path in config:
             feed.verbose_progress('Scanning %s' % path, log)

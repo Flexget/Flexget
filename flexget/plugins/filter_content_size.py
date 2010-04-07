@@ -38,6 +38,7 @@ class FilterContentSize(object):
             else:
                 if config.get('strict', True):
                     log.debug('Entry %s size is unknown, rejecting because of strict mode (default)' % entry['title'])
+                    log.info('No size information available for %s, rejecting' % entry['title'])
                     feed.reject(entry, 'no size available')
                     rejected = True
 
