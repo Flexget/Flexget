@@ -316,7 +316,16 @@ class PluginDownload:
             
             # move temp file
             logging.debug('moving %s to %s' % (entry['file'], destfile))
-            shutil.move(entry['file'], destfile)
+            
+            try:
+                shutil.move(entry['file'], destfile)
+            except OSError, err:
+                # ignore permission errors, see ticket #555
+                import errno
+                if not os.path.exists(destfile):
+                    raise PluginError('Unable to write %s' % destfile)
+                if err.errno != errno.EPERM:
+                    raise
 
             # store final destination as output key
             entry['output'] = destfile
