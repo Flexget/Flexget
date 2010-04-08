@@ -415,12 +415,10 @@ class Feed:
                 except:
                     print "+ %-8s %-12s %s (warning: unable to print unicode)" % ('undecided', '', repr(entry['title']))
 
-    @useFeedLogging
     def process_start(self):
         """Execute process_start event"""
         self.__run_event('process_start')
 
-    @useFeedLogging
     def process_end(self):
         """Execute terminate event for this feed"""
         if self.manager.options.validate:
