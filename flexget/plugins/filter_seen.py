@@ -169,6 +169,7 @@ class SeenSearch(object):
 
         import time
         session = Session()
+        shown = []
         for field in session.query(SeenField).\
             filter(SeenField.value.like(unicode('%' + feed.manager.options.seen_search + '%'))).\
             order_by(asc(SeenField.added)).all():
@@ -178,12 +179,17 @@ class SeenSearch(object):
                 print 'ERROR: <SeenEntry(id=%s)> missing' % field.seen_entry_id  
                 continue
 
-            print 'Name: %s Feed: %s Added: %s' % (se.title, se.feed, se.added.strftime('%c'))
+            # don't show duplicates                
+            if se.id in shown:
+                continue
+            shown.append(se.id)
+
+            print 'ID: %s Name: %s Feed: %s Added: %s' % (se.id, se.title, se.feed, se.added.strftime('%c'))
             for sf in se.fields:
                 print ' %s: %s' % (sf.field, sf.value)
-
             print ''
-        else:
+
+        if not shown:        
             print 'No results'
 
         session.close()
@@ -206,7 +212,7 @@ class SeenForget(object):
             count += 1
             session.delete(se)
 
-        print 'Removed %s titles (%s fields)' % (count, fcount)
+        #print 'Removed %s titles (%s fields)' % (count, fcount)
             
         for sf in session.query(SeenField).filter(SeenField.value == forget).all():
             se = session.query(SeenEntry).filter(SeenEntry.id == sf.seen_entry_id).first()
@@ -302,13 +308,22 @@ class FilterSeen(object):
         for field in fields:
             if not field in entry:
                 continue
-            # removes duplicate values (eg. url, original_url)
+            # removes duplicate values (eg. url, original_url are usually same)
             if entry[field] in remembered:
                 continue
+            remembered.append(entry[field])
             sf = SeenField(unicode(field), unicode(entry[field]))
             se.fields.append(sf)
             log.debug("Learned '%s' (field: %s)" % (entry[field], field))
         feed.session.add(se)
+        
+    def forget(self, feed, title):
+        """Forget SeenEntry with :title:. Return True if forgotten."""
+        se = feed.session.query(SeenEntry).filter(SeenEntry.title == title).first()
+        if se:
+            log.debug("Forgotten '%s' (%s fields)" % (title, len(se.fields)))
+            feed.session.delete(se)
+            return True
                 
 
 register_plugin(FilterSeen, 'seen', builtin=True, priorities=dict(filter=255))
