@@ -16,7 +16,7 @@ class Series(Base):
 
     id = Column(Integer, primary_key=True)
     name = Column(Unicode)
-    episodes = relation('Episode', backref='series')
+    episodes = relation('Episode', backref='series', cascade='all, delete, delete-orphan')
 
     def __repr__(self):
         return '<Series(name=%s)>' % (self.name)
@@ -28,13 +28,16 @@ class Episode(Base):
 
     id = Column(Integer, primary_key=True)
     identifier = Column(String)
-    first_seen = Column(DateTime, default=datetime.now())
+    first_seen = Column(DateTime)
 
     season = Column(Integer)
     number = Column(Integer)
 
     series_id = Column(Integer, ForeignKey('series.id'), nullable=False)
-    releases = relation('Release', backref='episode')
+    releases = relation('Release', backref='episode', cascade='all, delete, delete-orphan')
+    
+    def __init__(self):
+        self.first_seen = datetime.now()
 
     def __repr__(self):
         return '<Episode(identifier=%s)>' % (self.identifier)
@@ -45,8 +48,7 @@ class Release(Base):
     __tablename__ = 'episode_releases'
 
     id = Column(Integer, primary_key=True)
-    episode_id = Column(Integer, ForeignKey('series_episodes.id'),
-            nullable=False)
+    episode_id = Column(Integer, ForeignKey('series_episodes.id'), nullable=False)
     quality = Column(String)
     downloaded = Column(Boolean, default=False)
     proper = Column(Boolean, default=False)
@@ -300,9 +302,13 @@ class SeriesForget(object):
                 if identifier and name:
                     series = session.query(Series).filter(Series.name == name.lower()).first()
                     if series:
-                        episode = session.query(Episode).filter(Episode.identifier == identifier).first()
+                        episode = session.query(Episode).filter(Episode.identifier == identifier).\
+                            filter(Episode.series_id == series.id).first()
                         if episode:
                             print 'Removed %s %s' % (name.capitalize(), identifier)
+                            log.debug('episode: %s' % episode)
+                            for rel in episode.releases:
+                                log.debug('release: %s' % rel)
                             session.delete(episode)
                         else:
                             print 'Didn\'t find %s episode identified by %s' % (name.capitalize(), identifier)
