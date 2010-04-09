@@ -1,6 +1,7 @@
 import logging
 import re
 from flexget.utils.titles.parser import TitleParser
+from flexget.utils import qualities
 
 log = logging.getLogger('movieparser')
 
@@ -56,7 +57,7 @@ class MovieParser(TitleParser):
                     if parts.index(part) < cut_pos:
                         cut_pos = parts.index(part)
             # check for qualities, these are already cutoff words (self.cutoffs)
-            if part.lower() in self.qualities and not self.quality:
+            if not self.quality and part.lower() in qualities.registry:
                 self.quality = part
 
         # make cut

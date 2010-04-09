@@ -20,7 +20,7 @@ class NzbSize(object):
 
             if entry.get('mime-type', None) not in [u'text/nzb', u'application/x-nzb'] or \
                not entry.get('filename', '').endswith('.nzb'):
-                log.debug('%s does not seem to be nzb' % entry['title'])
+                log.log(5, '%s does not seem to be nzb' % entry['title'])
                 continue
 
             if 'file' not in entry:

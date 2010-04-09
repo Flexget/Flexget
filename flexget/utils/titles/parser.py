@@ -1,4 +1,5 @@
 import re
+from flexget.utils import qualities
 
 
 class ParseWarning(Warning):
@@ -7,19 +8,15 @@ class ParseWarning(Warning):
         self.value = value
         self.kwargs = kwargs
 
-
+        
 class TitleParser(object):
-    
-    qualities = ['1080p', '1080i', '1080', '720p', '720', 'hr', 'dvd', 'bdrip', 'dvdrip', '480p', '480',
-                 'bdscr', 'dvdscr', 'hdtv', 'pdtv', 'sdtv', 'dsr', 'dsrip', 'r5', 'preair', 'cam',
-                 'workprint', 'unknown']
-    
+
     propers = ['proper', 'repack', 'rerip', 'real']
     
     specials = ['special']
     
     cutoffs = ['limited', 'xvid', 'h264', 'x264', 'h.264', 'x.264', 'screener', 'unrated', '3d', 'extended',
-               'directors', 'bluray', 'multisubs'] + propers + specials + qualities
+               'directors', 'bluray', 'multisubs'] + propers + specials + qualities.registry.keys()
     
     remove = ['imax']
 

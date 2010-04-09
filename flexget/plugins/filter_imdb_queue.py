@@ -169,9 +169,10 @@ class ImdbQueueManager:
 
         # Check that the quality is valid
         from flexget.utils.titles.parser import TitleParser
-        if (quality != "ANY") and (quality not in TitleParser.qualities):
+        from flexget.utils import qualities
+        if (quality != "ANY") and (quality not in qualities.registry):
             print 'Unknown quality: %s' % quality
-            print 'Recognized qualities are %s' % ', '.join(TitleParser.qualities)
+            print 'Recognized qualities are %s' % ', '.join(qualities.registry.keys())
             print 'ANY is the default, and can also be used explicitly, to specify that quality should be ignored.'
             return
 
@@ -180,10 +181,12 @@ class ImdbQueueManager:
         # check if the item is already queued
         item = session.query(ImdbQueue).filter(ImdbQueue.imdb_id == imdb_id).first()
         if not item:
-            item = ImdbQueue(imdb_id, quality, self.options['force'])
+            # get the common, eg. 1280x720 will be turned into 720p
+            common_name = qualities.common_name(quality)
+            item = ImdbQueue(imdb_id, common_name, self.options['force'])
             session.add(item)
             session.commit()
-            print "Added %s to queue with quality %s" % (imdb_id, quality)
+            print "Added %s to queue with quality %s" % (imdb_id, common_name)
         else:
             log.info("%s is already in the queue" % imdb_id)
 
@@ -198,10 +201,11 @@ class ImdbQueueManager:
         item = session.query(ImdbQueue).filter(ImdbQueue.imdb_id == imdb_id).first()
         if item:
             session.delete(item)
-            session.commit()
             print 'Deleted %s from queue' % (imdb_id)
         else:
             log.info('%s is not in the queue' % imdb_id)
+
+        session.commit()
 
     def queue_list(self):
         """List IMDb queue"""
@@ -217,6 +221,8 @@ class ImdbQueueManager:
 
         if not found:
             print 'IMDb queue is empty'
+
+        session.close()
                 
 register_plugin(FilterImdbQueue, 'imdb_queue', priorities={'filter': 129})
 register_plugin(ImdbQueueManager, 'imdb_queue_manager', builtin=True)

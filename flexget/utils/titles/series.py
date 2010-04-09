@@ -1,6 +1,8 @@
 import logging
 import re
 from flexget.utils.titles.parser import TitleParser, ParseWarning
+from flexget.utils.qualities import Quality
+from flexget.utils import qualities
 
 log = logging.getLogger('seriesparser')
 
@@ -73,7 +75,7 @@ class SeriesParser(TitleParser):
                     # TODO: check if match contain valid episode number ?
                     log.log(5, 'match: %s' % match)
                     safe = True
-                    for quality in self.qualities:
+                    for quality in qualities.registry.keys(): # TODO: rewrite ...
                         if quality.lower() in match.lower():
                             safe = False
                             break
@@ -163,11 +165,15 @@ class SeriesParser(TitleParser):
                 return # leave invalid
 
         # search tags and quality
+        log.debug('parsing quality ->')
         for part in data_parts:
-            if part in self.qualities:
-                if self.qualities.index(part) < self.qualities.index(self.quality):
-                    log.debug('%s storing quality %s' % (self.name, part))
-                    self.quality = part
+            log.log(5, 'testing %s for quality' % part)
+            if part in qualities.registry:
+                log.log(5, 'part %s is a known quality' % part)
+                if qualities.get(part).value > qualities.get(self.quality).value:
+                    quality = qualities.get(part).name
+                    log.debug('%s quality is %s (from %s)' % (self.name, quality, part))
+                    self.quality = quality
                 else:
                     pass
                     #log.debug('%s ignoring quality tag %s because found better %s' % (self.name, part, self.quality))
@@ -182,13 +188,13 @@ class SeriesParser(TitleParser):
         # Ensure the series name isn't accidentally munged.
         pre_data = ''
         if name_start:
-            pre_data = self.remove_words(self.data[0:name_start-1], self.remove + self.qualities + self.codecs + self.sounds)
+            pre_data = self.remove_words(self.data[0:name_start-1], self.remove + qualities.registry.keys() + self.codecs + self.sounds)
             pre_data = self.clean(pre_data)
             pre_data = remove_dirt(pre_data)
             name_start -= len(pre_data)
         post_data = ''
         if name_end < len(self.data) - 1:
-            post_data = self.remove_words(self.data[name_end:], self.remove + self.qualities + self.codecs + self.sounds)
+            post_data = self.remove_words(self.data[name_end:], self.remove + qualities.registry.keys() + self.codecs + self.sounds)
             post_data = self.clean(post_data)
             post_data = remove_dirt(post_data)
             name_end -= len(pre_data)
@@ -289,7 +295,7 @@ class SeriesParser(TitleParser):
         other = (self.qualities.index(other.quality), other.name)
         return cmp(me, other)
         """
-        return cmp(self.qualities.index(self.quality), self.qualities.index(other.quality))
+        return cmp(qualities.get(self.quality).value, qualities.get(other.quality).value)
 
     def __eq__(self, other):
         return self is other

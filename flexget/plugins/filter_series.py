@@ -1,6 +1,7 @@
 import logging
 from datetime import datetime, timedelta
 from flexget.utils.titles import SeriesParser, ParseWarning
+from flexget.utils import qualities
 from flexget.manager import Base
 from flexget.plugin import *
 from sqlalchemy import Column, Integer, String, Unicode, DateTime, Boolean, desc
@@ -382,9 +383,9 @@ class FilterSeries(SeriesPlugin):
             series.accept('number')
             bundle = series.accept('dict')
             # prevent invalid indentation level
-            bundle.reject_keys(['set', 'path', 'timeframe', 'name_regexp', \
-                'ep_regexp', 'id_regexp', 'watched', 'quality', 'min_quality', \
-                'max_quality', 'qualities', 'exact'], \
+            bundle.reject_keys(['set', 'path', 'timeframe', 'name_regexp',
+                'ep_regexp', 'id_regexp', 'watched', 'quality', 'min_quality',
+                'max_quality', 'qualities', 'exact', 'from_group'],
                 'Option \'$key\' has invalid indentation level. It needs 2 more spaces.')
             bundle.accept_any_key('path')
             options = bundle.accept_any_key('dict')
@@ -458,7 +459,7 @@ class FilterSeries(SeriesPlugin):
                 # at least empty settings
                 config['settings'][group_name] = {}
                 # if known quality, convenience create settings with that quality
-                if group_name in SeriesParser.qualities:
+                if group_name in qualities.registry:
                     config['settings'][group_name]['quality'] = group_name
 
         # generate groups from settings groups
@@ -657,7 +658,7 @@ class FilterSeries(SeriesPlugin):
             whitelist = []
 
             # sort episodes in order of quality
-            eps.sort()
+            eps.sort(reverse=True)
 
             log.debug('start with episodes: %s' % [e.data for e in eps])
 
@@ -687,7 +688,7 @@ class FilterSeries(SeriesPlugin):
 
             # qualities
             if 'qualities' in config:
-                log.debug('-' * 20 + ' qualities -->')
+                log.debug('-' * 20 + ' process_qualities -->')
                 self.process_qualities(feed, config, eps, whitelist)
                 continue
 
@@ -814,26 +815,32 @@ class FilterSeries(SeriesPlugin):
 
     def process_quality(self, feed, config, eps):
         """Accepts episodes that meet configured qualities"""
-
-        accepted_qualities = []
+        
+        min = qualities.min()
+        max = qualities.max()
         if 'quality' in config:
-            accepted_qualities.append(config['quality'])
+            quality = qualities.get(config['quality'])
+            min, max = quality, quality
         else:
-            qualities = SeriesParser.qualities
-            min = config.get('min_quality', qualities[-2]).lower() # -2 leaves the unknown quality out
-            max = config.get('max_quality', qualities[0]).lower()
-            min_index = qualities.index(min) + 1
-            max_index = qualities.index(max)
-            log.debug('min: %s (%s) max: %s (%s)' % (min, min_index, max, max_index))
-            for quality in qualities[max_index:min_index]:
-                accepted_qualities.append(quality)
-            log.debug('accepted qualities are %s' % accepted_qualities)
+            min_name = config.get('min_quality', qualities.min().name)
+            max_name = config.get('max_quality', qualities.max().name)
+            if min_name.lower() not in qualities.registry:
+                raise PluginError('Unknown quality %s' % min_name)
+            if max_name.lower() not in qualities.registry:
+                raise PluginError('Unknown quality %s' % max_name)
+            log.debug('min_name: %s max_name: %s' % (min_name, max_name))
+            # get range
+            min = qualities.get(min_name)
+            max = qualities.get(max_name)
         # see if any of the eps match accepted qualities
         for ep in eps:
-            log.log(5, 'testing %s (quality: %s) for qualities' % (ep.data, ep.quality))
-            if ep.quality in accepted_qualities:
+            quality = qualities.get(ep.quality)
+            log.debug('ep: %s min: %s max: %s quality: %s' % (ep.data, min.value, max.value, quality.value))
+            if quality <= max and quality >= min:
                 self.accept_series(feed, ep, 'meets quality')
                 break
+        else:
+            log.debug('no quality meets requirements')
 
     def process_watched(self, feed, config, eps):
         """Rejects all episodes older than defined in watched, returns True when this happens."""
@@ -889,20 +896,15 @@ class FilterSeries(SeriesPlugin):
             timeframe = timedelta(**params)
         except TypeError:
             raise PluginWarning('Invalid time format', log)
-        quality = config.get('quality', '720p')
-        if not quality in SeriesParser.qualities:
-            log.error('Parameter quality has unknown value: %s' % quality)
+
+        quality_name = config.get('quality', '720p')
+        if quality_name not in qualities.registry:
+            log.error('Parameter quality has unknown value: %s' % quality_name)
+        quality = qualities.get(quality_name)
 
         # scan for quality, starting from worst quality (reverse) (old logic, see note below)
-        eps.reverse()
-
-        def cmp_quality(q1, q2):
-            return cmp(SeriesParser.qualities.index(q1), SeriesParser.qualities.index(q2))
-
-        # scan for episode that meets defined quality
-        for ep in eps:
-            # Note: switch == operator to >= if wish to enable old behaviour
-            if cmp_quality(quality, ep.quality) == 0: # 1=greater, 0=equal, -1=does not meet
+        for ep in reversed(eps):
+            if quality == qualities.get(ep.quality):
                 entry = self.parser2entry[ep]
                 log.debug('Timeframe accepting. %s meets quality %s' % (entry['title'], quality))
                 self.accept_series(feed, ep, 'quality met, timeframe unnecessary')
@@ -956,7 +958,7 @@ class FilterSeries(SeriesPlugin):
             Accepts all wanted qualities.
             Accepts whitelisted episodes even if downloaded.
         """
-
+        
         # get list of downloaded releases
         downloaded_releases = self.get_downloaded(feed.session, eps[0].name, eps[0].identifier)
         log.debug('downloaded_releases: %s' % downloaded_releases)
@@ -967,21 +969,22 @@ class FilterSeries(SeriesPlugin):
             if quality in accepted_qualities:
                 return True
             for release in downloaded_releases:
-                if release.quality == quality:
+                if qualities.get(release.quality) == quality:
                     return True
 
-        qualities = [quality.lower() for quality in config['qualities']]
-        log.debug('qualities: %s' % qualities)
+        wanted_qualities = [qualities.get(name) for name in config['qualities']]
+        log.debug('qualities: %s' % wanted_qualities)
         for ep in eps:
-            log.debug('qualities, quality: %s' % ep.quality)
-            if not ep.quality.lower() in qualities:
+            quality = qualities.get(ep.quality)
+            log.debug('ep: %s quality: %s' % (ep.data, quality))
+            if quality not in wanted_qualities:
                 log.debug('%s is unwanted quality' % ep.quality)
                 continue
-            if is_quality_downloaded(ep.quality) and ep not in whitelist:
+            if is_quality_downloaded(quality) and ep not in whitelist:
                 feed.reject(self.parser2entry[ep], 'quality downloaded')
             else:
                 feed.accept(self.parser2entry[ep], 'quality wanted')
-                accepted_qualities.append(ep.quality) # don't accept more
+                accepted_qualities.append(quality) # don't accept more of these
 
     # TODO: get rid of, see how feed.reject is called, consistency!
     def accept_series(self, feed, parser, reason):
