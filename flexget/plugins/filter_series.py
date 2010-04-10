@@ -73,7 +73,7 @@ class SeriesPlugin(object):
         return episode.first_seen
 
     def get_latest_info(self, session, name):
-        """Return latest known identifier in dict (season, episode) for series name"""
+        """Return latest known identifier in dict (season, episode, name) for series name"""
         episode = session.query(Episode).select_from(join(Episode, Series)).\
             filter(Episode.season != None).\
             filter(Series.name == name.lower()).\
@@ -85,6 +85,30 @@ class SeriesPlugin(object):
         #log.log(5, 'get_latest_info, series: %s season: %s episode: %s' % \
         #    (name, episode.season, episode.number))
         return {'season': episode.season, 'episode': episode.number, 'name': name}
+
+    def get_latest_download(self, session, name):
+        """Return latest downloaded episode (season, episode, name) for series name"""
+        series = session.query(Series).filter(Series.name == name).first()
+        if not series:
+            return False
+
+        latest_season = 0
+        latest_episode = 0
+
+        def episode_downloaded(episode):
+            for release in episode.releases:
+                if release.downloaded:
+                    return True
+
+        for episode in series.episodes:
+            if episode_downloaded(episode) and episode.season >= latest_season and episode.number > latest_episode:
+                latest_season = episode.season
+                latest_episode = episode.number
+
+        if latest_season == 0 or latest_episode == 0:
+            return False
+                
+        return {'season': latest_season, 'episode': latest_episode, 'name': name} 
 
     def get_releases(self, session, name, identifier):
         """Return all releases for series by identifier."""
@@ -858,19 +882,25 @@ class FilterSeries(SeriesPlugin):
             return True
 
     def process_episode_advancement(self, feed, eps, series):
-        """Rjects all episodes that are too old (advancement), return True when this happens."""
+        """Rjects all episodes that are too old or new (advancement), return True when this happens."""
 
         current = eps[0]
-        latest = self.get_latest_info(feed.session, current.name)
+        latest = self.get_latest_download(feed.session, current.name)
         log.debug('latest: %s' % latest)
         log.debug('current: %s' % current)
         if latest:
             # allow few episodes "backwards" in case of missed eps
             grace = len(series) + 2
             if (current.season < latest['season']) or (current.season == latest['season'] and current.episode < (latest['episode'] - grace)):
-                log.debug('%s episode %s does not meet episode advancement, rejecting all occurrences' % (current.name, current.identifier))
+                log.debug('too old! rejecting all occurrences')
                 for ep in eps:
-                    feed.reject(self.parser2entry[ep], 'episode advancement')
+                    feed.reject(self.parser2entry[ep], 'too much in the past from latest downloaded episode S%02dE%02d' % (latest['season'], latest['episode']))
+                return True
+
+            if (current.season > latest['season'] + 1):
+                log.debug('too new! rejecting all occurences')
+                for ep in eps:
+                    feed.reject(self.parser2entry[ep], 'too much in the future from latest downloaded episode S%02dE%02d' % (latest['season'], latest['episode']))
                 return True
 
     def process_timeframe(self, feed, config, eps, series_name):

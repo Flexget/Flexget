@@ -30,7 +30,7 @@ class FailedEntry(Base):
         return '<Failed(title=%s)>' % (self.title)
 
 
-class Manager:
+class Manager(object):
     unit_test = False
     options = None
 

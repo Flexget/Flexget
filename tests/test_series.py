@@ -211,13 +211,30 @@ class TestEpisodeAdvancement(FlexGetBase):
     __yaml__ = """
         feeds:
 
-          test_simple:
+          test_backwards_1:
             mock:
-              - {title: 'foobar s01e12'}
-              - {title: 'foobar s01e10'}
-              - {title: 'foobar s01e01'}
+              - {title: 'backwards s01e12'}
+              - {title: 'backwards s01e10'}
             series:
-              - foobar
+              - backwards
+
+          test_backwards_2:
+            mock:
+              - {title: 'backwards s01e01'}
+            series:
+              - backwards
+
+          test_forwards_1:
+            mock:
+              - {title: 'forwards s01e12'}
+            series:
+              - forwards
+
+          test_forwards_2:
+            mock:
+              - {title: 'forwards s03e10'}
+            series:
+              - forwards
 
           test_unordered:
             mock:
@@ -235,17 +252,29 @@ class TestEpisodeAdvancement(FlexGetBase):
               - {title: 'zzz s01e01'}
             series:
               - zzz
+
     """
-    
-    def test_simple(self):
-        """Series plugin: simple episode advancement"""
-        self.execute_feed('test_simple')
-        assert self.feed.find_entry('accepted', title='foobar s01e12'), \
-            'foobar s01e12 should have been accepted'
-        assert self.feed.find_entry('accepted', title='foobar s01e10'), \
-            'foobar s01e10 should have been accepted within grace margin'
-        assert self.feed.find_entry('rejected', title='foobar s01e01'), \
-            'foobar s01e01 should have been rejected, too old'
+
+    def test_backwards(self):
+        """Series plugin: episode advancement (backwards)"""
+        self.execute_feed('test_backwards_1')
+        assert self.feed.find_entry('accepted', title='backwards s01e12'), \
+            'backwards s01e12 should have been accepted'
+        assert self.feed.find_entry('accepted', title='backwards s01e10'), \
+            'backwards s01e10 should have been accepted within grace margin'
+        self.execute_feed('test_backwards_2')
+        assert self.feed.find_entry('rejected', title='backwards s01e01'), \
+            'backwards s01e01 should have been rejected, too old'
+        
+    def test_forwards(self):
+        """Series plugin: episode advancement (future)"""
+        self.execute_feed('test_forwards_1')
+        assert self.feed.find_entry('accepted', title='forwards s01e12'), \
+            'forwards s01e12 should have been accepted'
+
+        self.execute_feed('test_forwards_2')
+        assert self.feed.find_entry('rejected', title='forwards s03e10'), \
+            'forwards s03e10 should have been rejected, too new'
 
     def test_unordered(self):
         """Series plugin: unordered episode advancement"""
