@@ -9,7 +9,7 @@ from flexget.utils.tools import urlopener
 log = logging.getLogger('tvtorrents')
 
 
-class InputTVTorrents:
+class InputTVTorrents(object):
     """
         A customized HTML input plugin. Parses out full torrent URLs from 
         TVTorrents' page for Recently Aired TV shows.
@@ -32,7 +32,7 @@ class InputTVTorrents:
         from flexget import validator
         return validator.factory('url')
 
-    @cached('tvtorrents')
+    @cached('tvt')
     @internet(log)
     def on_feed_input(self, feed):
         pageurl = "http://tvtorrents.com/loggedin/recently_aired.do"
@@ -63,7 +63,7 @@ class InputTVTorrents:
                 url = hashurl % (infohash,)
             else:
                 continue
-            if title == None:
+            if title is None:
                 continue
 
             title = title.strip()
