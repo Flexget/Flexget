@@ -212,6 +212,12 @@ class SeenForget(object):
             count += 1
             session.delete(se)
 
+        # todo: merge with previous statement by utilizing or-clause
+        for se in session.query(SeenEntry).filter(SeenEntry.feed == forget).all():
+            fcount += len(se.fields)
+            count += 1
+            session.delete(se)
+
         #print 'Removed %s titles (%s fields)' % (count, fcount)
             
         for sf in session.query(SeenField).filter(SeenField.value == forget).all():
@@ -220,7 +226,7 @@ class SeenForget(object):
             count += 1
             session.delete(se)
 
-        print 'Removed %s titles (%s fields)' % (count, fcount)
+        log.info('Removed %s titles (%s fields)' % (count, fcount))
 
         session.commit()
 
