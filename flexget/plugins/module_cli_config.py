@@ -3,7 +3,8 @@ from flexget.plugin import *
 
 log = logging.getLogger('cli_config')
 
-class CliConfig:
+
+class CliConfig(object):
 
     """
         Allows specifying yml configuration values from commandline parameters.
@@ -33,22 +34,24 @@ class CliConfig:
         return validator.factory('any')
     
     def replace_dict(self, d, replaces):
-        for k,v in d.items():
+        for k, v in d.items():
             if isinstance(v, basestring):
-                nv = replaces.get(v[1:], False)
-                if nv and v.startswith('$'):
-                    log.debug('Replacing key %s (%s -> %s)' % (k, v, nv))
-                    d[k] = nv
+                for key, value in replaces.iteritems():
+                    if '$%s' % key in v:
+                        nv = v.replace('$%s' % key, value)
+                        log.debug('Replacing key %s (%s -> %s)' % (k, v, nv))
+                        d[k] = nv
             if isinstance(v, list):
                 for lv in v[:]:
                     if isinstance(lv, dict):
                         self.replace_dict(lv, replaces)
-                    else:
-                        nv = replaces.get(lv[1:], False)
-                        if nv and lv.startswith('$'):
-                            log.debug('Replacing list item %s (%s -> %s)' % (k, lv, nv))
-                            i = v.index(lv)
-                            v[i] = nv
+                    elif isinstance(lv, basestring):
+                        for key, value in replaces.iteritems():
+                            if '$%s' % key in lv:
+                                nv = lv.replace('$%s' % key, value)
+                                log.debug('Replacing list item %s (%s -> %s)' % (k, lv, nv))
+                                i = v.index(lv)
+                                v[i] = nv
             if isinstance(v, dict):
                 self.replace_dict(v, replaces)
 
@@ -66,7 +69,7 @@ class CliConfig:
             except ValueError:
                 log.critical('Invalid --cli-config, no name for %s' % item)
                 continue
-            value = item[item.index('=')+1:]
+            value = item[item.index('=') + 1:]
             self.replaces[key.strip()] = value.strip()
         return True
 
