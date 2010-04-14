@@ -74,7 +74,7 @@ class ArchiveInject(object):
         try:
             ArchiveInject.id = int(parser.rargs[0])
         except:
-            print 'Value %s is not valid ID' % args[0]
+            print 'Value %s is not valid ID' % parser.rargs[0]
             return            
         if len(parser.rargs) >= 2:
             from flexget.utils.tools import str_to_boolean
@@ -91,6 +91,8 @@ class ArchiveInject(object):
             if not self.inject_entry:
                 raise PluginError('There\'s no archive with ID %s' % self.id)
             session.close()
+
+            # TODO: disable other feeds here, remove aborting from on_feed_input
             
     def on_feed_input(self, feed):
         if not self.inject_entry:
