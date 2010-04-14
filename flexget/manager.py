@@ -72,7 +72,7 @@ class Manager(object):
             # explicit path given, don't try anything too fancy
             possible[self.options.config] = config_path
         else:
-            log.debug('Figuring out lookup paths')
+            log.debug('Figuring out config load paths')
             # normal lookup locations
             possible[os.path.join(startup_path, self.options.config)] = startup_path
             possible[os.path.join(home_path, self.options.config)] = home_path
@@ -328,7 +328,7 @@ class Manager(object):
                 continue
 
             # create feed
-            feed = Feed(self, name, self.config['feeds'][name])
+            feed = Feed(self, unicode(name), self.config['feeds'][name])
             # if feed name is prefixed with _ it's disabled
             if name.startswith('_'):
                 feed.enabled = False
