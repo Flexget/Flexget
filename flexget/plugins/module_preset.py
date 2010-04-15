@@ -4,7 +4,7 @@ from flexget.plugin import *
 log = logging.getLogger('preset')
 
 
-class PluginPreset:
+class PluginPreset(object):
     """
         Use presets.
         
@@ -69,7 +69,7 @@ class PluginPreset:
                 raise PluginError('Failed to merge preset %s to feed %s, incompatible datatypes' % (preset, feed.name))
                 
                 
-class DisablePlugin:
+class DisablePlugin(object):
     """
     Allows disabling plugins when using presets.
 
