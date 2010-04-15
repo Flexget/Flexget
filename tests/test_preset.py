@@ -31,7 +31,6 @@ class TestPreset(FlexGetBase):
 
     def test_preset2(self):
         self.execute_feed('test2')
-        self.dump()
         assert not self.feed.find_entry(title='global'), 'test2, preset global applied'
         assert not self.feed.find_entry(title='movies'), 'test2, preset movies applied'
 
