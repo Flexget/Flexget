@@ -119,7 +119,7 @@ def useFeedLogging(func):
     return wrapper
 
 
-class Feed:
+class Feed(object):
 
     def __init__(self, manager, name, config):
         """
