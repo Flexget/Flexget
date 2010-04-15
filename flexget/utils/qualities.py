@@ -64,6 +64,15 @@ registry = {'1080p': Quality(1000, '1080p'),
             'unknown': UnknownQuality()}
 
 
+def all():
+    """Return all Qualities in order of best to worst"""
+    res = []
+    for quality in registry.itervalues():
+        res.append(quality)
+    res.sort(reverse=True)
+    return res
+
+
 def get(name):
     """Return Quality object for :name: (case insensitive)"""
     return registry.get(name.lower(), UnknownQuality())

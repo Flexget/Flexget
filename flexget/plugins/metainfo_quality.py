@@ -5,7 +5,7 @@ from flexget.utils import qualities
 log = logging.getLogger('metainfo_quality')
 
 
-class MetainfoQuality:
+class MetainfoQuality(object):
     """
     Utility:
 
@@ -22,15 +22,16 @@ class MetainfoQuality:
             if not feed.config['metainfo_quality']:
                 return
         for entry in feed.entries:
-            for possible_quality in qualities.registry.keys():
+            quals = qualities.all()
+            for quality in quals:
                 for field_name, field_value in entry.iteritems():
                     if not isinstance(field_value, basestring):
                         continue
-                    if possible_quality.lower() in field_value.lower():
-                        quality_name = qualities.common_name(possible_quality)
+                    if quality.name.lower() in field_value.lower():
+                        quality_name = qualities.common_name(quality.name)
                         entry['quality'] = quality_name
                         log.log(5, 'Found quality %s (%s) for %s from field %s' % \
-                            (quality_name, possible_quality, entry['title'], field_name))
+                            (quality_name, quality.name, entry['title'], field_name))
                         break
                 if 'quality' in entry:
                     break
