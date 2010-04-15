@@ -258,7 +258,8 @@ class TestSeriesParser(object):
 
     def test_quality_as_ep(self):
         """SeriesParser: test that qualities are not picked as ep"""
-        for quality in SeriesParser.qualities:
+        from flexget.utils import qualities
+        for quality in qualities.registry.keys():
             s = SeriesParser()
             s.expect_ep = True
             s.name = 'FooBar'
