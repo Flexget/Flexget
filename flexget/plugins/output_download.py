@@ -171,10 +171,7 @@ class PluginDownload:
         entry['mime-type'] = mimetype
         # prefer content-disposition naming
         self.filename_from_headers(entry, f)
-        # if there is still no specified filename, use mime-type
-        #if not 'filename' in entry:
-        #that check is made by filename_from_mime
-        self.filename_from_mime(entry)
+        self.filename_ext_from_mime(entry)
         # TODO: LAST option, try to scrap url?
 
     def filename_from_headers(self, entry, response):
@@ -211,14 +208,14 @@ class PluginDownload:
                 log.debug('Overriding filename %s with %s from content-disposition' % (entry['filename'], filename))
             entry['filename'] = filename
 
-    def filename_from_mime(self, entry):
-        """Tries to set filename (extensions) from mime-type"""
+    def filename_ext_from_mime(self, entry):
+        """Tries to set filename extension from mime-type"""
         import mimetypes
         extension = mimetypes.guess_extension(entry['mime-type'])
         if extension:
             log.debug('Mimetypes guess for %s is %s ' % (entry['mime-type'], extension))
             if 'filename' in entry:
-                if entry['filename'].endswith('%s' % extension):
+                if entry['filename'].endswith(extension):
                     log.debug('Filename %s extension matches to mime-type' % entry['filename'])
                 else:
                     log.debug('Adding mime-type extension %s to %s' % (extension, entry['filename']))
@@ -277,7 +274,7 @@ class PluginDownload:
                     log.warning('Unable to figure proper filename / extension for %s, using title. Mime-type: %s' % (entry['title'], entry.get('mime-type', 'N/A')))
                     # try to append an extension to the title
                     entry['filename'] = entry['title']
-                    self.filename_from_mime(entry)
+                    self.filename_ext_from_mime(entry)
 
             # make path
             path = os.path.expanduser(path)

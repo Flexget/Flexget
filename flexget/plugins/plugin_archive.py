@@ -48,7 +48,8 @@ class ArchiveSearch(object):
 
         session = Session()
         
-        keyword = unicode(feed.manager.options.archive_search)
+        keyword = unicode(feed.manager.options.archive_search).replace(' ', '%')
+
         for ae in session.query(ArchiveEntry).filter(or_(ArchiveEntry.title.like('%' + keyword + '%'), 
             ArchiveEntry.title.like('%' + keyword + '%'), ArchiveEntry.feed == keyword)).all():
             print_ae(ae)
@@ -92,35 +93,35 @@ class ArchiveInject(object):
                 raise PluginError('There\'s no archive with ID %s' % self.id)
             session.close()
 
-            # TODO: disable other feeds here, remove aborting from on_feed_input
-            
+        if feed.name != self.inject_entry.feed:
+            feed.enabled = False
+            feed.abort(silent=True)
+
     def on_feed_input(self, feed):
         if not self.inject_entry:
             return
-        if self.inject_entry.feed == feed.name:
+        if self.inject_entry.feed != feed.name:
+            raise PluginError('BUG: Feed disabling has failed')
             
-            # disable other inputs
-            for input in get_plugins_by_event('input'):
-                if input.name in feed.config:
-                    events = get_events_by_plugin(input.name)
-                    if len(events) == 1:
-                        log.info('Disabling plugin %s' % input.name)
-                        del(feed.config[input.name])
-        
-            log.info('Injecting %s' % self.inject_entry.title)
-            entry = Entry(self.inject_entry.title, self.inject_entry.url)
-            if self.inject_entry.description:
-                entry['description'] = self.inject_entry.description
-            if self.immortal:
-                log.debug('Injecting as immortal')
-                entry['immortal'] = True
-            feed.entries.append(entry)
-            feed.accept(entry, '--archive-inject')
-            self.injected = True
-        else:
-            log.debug('wrong feed, aborting')
-            feed.abort(silent=True)
-            
+        # disable other inputs
+        for input in get_plugins_by_event('input'):
+            if input.name in feed.config:
+                events = get_events_by_plugin(input.name)
+                if len(events) == 1:
+                    log.info('Disabling plugin %s' % input.name)
+                    del(feed.config[input.name])
+
+        log.info('Injecting %s' % self.inject_entry.title)
+        entry = Entry(self.inject_entry.title, self.inject_entry.url)
+        if self.inject_entry.description:
+            entry['description'] = self.inject_entry.description
+        if self.immortal:
+            log.debug('Injecting as immortal')
+            entry['immortal'] = True
+        feed.entries.append(entry)
+        feed.accept(entry, '--archive-inject')
+        self.injected = True
+
     def on_process_end(self, feed):
         if self.inject_entry and not self.injected and not self.complained:
             log.critical('Didn\'t inject the entry, perhaps the original feed %s was not ran?' % self.inject_entry.feed)
@@ -154,9 +155,9 @@ class Archive(object):
         
 register_plugin(Archive, 'archive', priorities=dict(input=-255))
 register_plugin(ArchiveSearch, '--archive-search', builtin=True)
-register_plugin(ArchiveInject, '--archive-inject', builtin=True, priorities={'input': 255})
+register_plugin(ArchiveInject, '--archive-inject', builtin=True, priorities={'input': 255, 'process_start': 512})
 
 register_parser_option('--archive-search', action='store', dest='archive_search', default=False,
-                       metavar='TEXT', help='Search from the archive.')
+                       metavar='TXT', help='Search from the archive.')
 register_parser_option('--archive-inject', action='callback', callback=ArchiveInject.optik,
-                       metavar='ID', help='Inject entry from archive to a feed it was archived. Usage: ID [IMMORTAL]')
+                       metavar='ID', help='Inject entry from the archive into a feed where it was archived from. Usage: ID [IMMORTAL]')
