@@ -149,10 +149,10 @@ class Archive(object):
             if 'description' in entry:
                 ae.description = entry['description']
             ae.feed = feed.name
-            log.debug('Addin %s to archive' % ae)
+            log.debug('Adding %s to archive' % ae)
             feed.session.add(ae)
         
-register_plugin(Archive, 'archive', builtin=True, priorities=dict(input=-255))
+register_plugin(Archive, 'archive', priorities=dict(input=-255))
 register_plugin(ArchiveSearch, '--archive-search', builtin=True)
 register_plugin(ArchiveInject, '--archive-inject', builtin=True, priorities={'input': 255})
 
