@@ -4,7 +4,8 @@ from flexget.plugin import *
 
 log = logging.getLogger('exists')
 
-class FilterExists:
+
+class FilterExists(object):
 
     """
         Reject entries that already exist in given path.
@@ -29,6 +30,7 @@ class FilterExists:
             config = [config]
         return config
 
+    @priority(-1)
     def on_feed_filter(self, feed):
         config = self.get_config(feed)
         for path in config:
@@ -46,4 +48,4 @@ class FilterExists:
                         log.debug('Found %s in %s' % (name, root))
                         feed.reject(entry, '%s/%s' % (name, root))
 
-register_plugin(FilterExists, 'exists', priorities={'filter': -1})
+register_plugin(FilterExists, 'exists')

@@ -27,7 +27,8 @@ class PluginPreset(object):
         presets = root.accept('list')
         presets.accept('text')
         return root
-        
+
+    @priority(255)
     def on_process_start(self, feed):
         config = feed.config.get('preset', 'global')
         if isinstance(config, basestring):
@@ -100,7 +101,8 @@ class DisablePlugin(object):
         presets = root.accept('list')
         presets.accept('text')
         return root
-    
+
+    @priority(250)
     def on_feed_start(self, feed):
         config = feed.config['disable_plugin']
         if isinstance(config, basestring):
@@ -111,8 +113,8 @@ class DisablePlugin(object):
                 log.debug('disabling %s' % disable)
                 del(feed.config[disable])
 
-register_plugin(PluginPreset, 'preset', builtin=True, priorities={'process_start': 255})
-register_plugin(DisablePlugin, 'disable_plugin', priorities={'process_start': 250})
+register_plugin(PluginPreset, 'preset', builtin=True)
+register_plugin(DisablePlugin, 'disable_plugin')
 
 register_parser_option('--preset', action='store', dest='preset', default=False,
                        metavar='NAME', help='Execute feeds with given preset.')

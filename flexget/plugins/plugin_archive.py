@@ -81,6 +81,7 @@ class ArchiveInject(object):
             from flexget.utils.tools import str_to_boolean
             ArchiveInject.immortal = str_to_boolean(parser.rargs[1])
 
+    @priority(512)
     def on_process_start(self, feed):
         if not self.id:
             return
@@ -97,6 +98,7 @@ class ArchiveInject(object):
             feed.enabled = False
             feed.abort(silent=True)
 
+    @priority(255)
     def on_feed_input(self, feed):
         if not self.inject_entry:
             return
@@ -136,6 +138,7 @@ class Archive(object):
         from flexget import validator
         return validator.factory('boolean')
 
+    @priority(-255)
     def on_feed_input(self, feed):
         """Add new entries into archive"""
         for entry in feed.entries:
@@ -153,9 +156,9 @@ class Archive(object):
             log.debug('Adding %s to archive' % ae)
             feed.session.add(ae)
         
-register_plugin(Archive, 'archive', priorities=dict(input=-255))
+register_plugin(Archive, 'archive')
 register_plugin(ArchiveSearch, '--archive-search', builtin=True)
-register_plugin(ArchiveInject, '--archive-inject', builtin=True, priorities={'input': 255, 'process_start': 512})
+register_plugin(ArchiveInject, '--archive-inject', builtin=True)
 
 register_parser_option('--archive-search', action='store', dest='archive_search', default=False,
                        metavar='TXT', help='Search from the archive.')

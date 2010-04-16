@@ -5,7 +5,7 @@ from flexget.plugin import *
 log = logging.getLogger('metainfo_imdb_url')
 
 
-class MetainfoImdbUrl:
+class MetainfoImdbUrl(object):
     """
         Scan entry information for imdb url.
     """
@@ -14,7 +14,13 @@ class MetainfoImdbUrl:
         from flexget import validator
         return validator.factory('boolean')
 
+    def on_feed_input(self, feed):
+        print '-' * 80
+
     def on_feed_metainfo(self, feed):
+        print '*' * 80
+
+
         # check if disabled (value set to false)
         if 'scan_imdb' in feed.config:
             if not feed.config['scan_imdb']:

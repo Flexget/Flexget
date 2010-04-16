@@ -30,7 +30,7 @@ class ImdbQueue(Base):
         return '<ImdbQueue(imdb_id=%s,quality=%s,force=%s)>' % (self.imdb_id, self.quality, self.immortal)
 
 
-class FilterImdbQueue:
+class FilterImdbQueue(object):
     """
     Allows a queue of upcoming movies that will be forcibly allowed if the given quality matches
 
@@ -43,6 +43,7 @@ class FilterImdbQueue:
         from flexget import validator
         return validator.factory('boolean')
 
+    @priority(129)
     def on_feed_filter(self, feed):
         for entry in feed.entries:
             # make sure the entry has IMDB fields filled
@@ -81,7 +82,7 @@ class FilterImdbQueue:
                     log.debug("%s not in queue, skipping" % entry['title'])
 
 
-class ImdbQueueManager:
+class ImdbQueueManager(object):
     """
     Handle IMDb queue management; add, delete and list
     """
@@ -224,7 +225,7 @@ class ImdbQueueManager:
 
         session.close()
                 
-register_plugin(FilterImdbQueue, 'imdb_queue', priorities={'filter': 129})
+register_plugin(FilterImdbQueue, 'imdb_queue')
 register_plugin(ImdbQueueManager, 'imdb_queue_manager', builtin=True)
 
 register_parser_option('--imdb-queue', action='callback', callback=ImdbQueueManager.optik_imdb_queue,

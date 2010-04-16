@@ -50,9 +50,10 @@ class TestImdb(FlexGetBase):
 
     @attr(online=True)
     def test_lookup(self):
+        """IMDB: Test Lookup (ONLINE)"""
         self.execute_feed('test')
         assert self.feed.find_entry(imdb_name='Sen to Chihiro no kamikakushi'), \
-            'Failed IMDB lookup (search)'
+            'Failed IMDB lookup (search chihiro)'
         assert self.feed.find_entry(imdb_name='Mononoke-hime'), \
             'Failed imdb lookup (direct)'
         assert self.feed.find_entry(imdb_name='Taken', imdb_url='http://www.imdb.com/title/tt0936501/'), \

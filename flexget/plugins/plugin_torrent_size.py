@@ -5,11 +5,12 @@ from sys import maxint
 log = logging.getLogger('torrent_size')
 
 
-class TorrentSize:
+class TorrentSize(object):
     """
     Provides file size information when dealing with torrents
     """
 
+    @priority(200)
     def on_feed_modify(self, feed):
         for entry in feed.accepted + feed.entries:
             if 'torrent' in entry:
@@ -18,4 +19,4 @@ class TorrentSize:
                 entry['content_size'] = size
 
 
-register_plugin(TorrentSize, 'torrent_size', builtin=True, priorities={'modify': 200})
+register_plugin(TorrentSize, 'torrent_size', builtin=True)

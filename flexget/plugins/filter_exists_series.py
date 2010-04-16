@@ -6,7 +6,7 @@ from flexget.utils.titles import SeriesParser, ParseWarning
 log = logging.getLogger('exists_series')
 
 
-class FilterExistsSeries:
+class FilterExistsSeries(object):
     """
         Intelligent series aware exists rejecting.
 
@@ -30,6 +30,7 @@ class FilterExistsSeries:
             config = [config]
         return config
 
+    @priority(-1)
     def on_feed_filter(self, feed):
         for entry in feed.entries:
             if 'series_parser' in entry:
@@ -90,4 +91,4 @@ class FilterExistsSeries:
                     else:
                         log.log(5, '%s doesn\'t seem to be known series' % entry['title'])
 
-register_plugin(FilterExistsSeries, 'exists_series', groups=['exists'], priorities={'filter': -1})
+register_plugin(FilterExistsSeries, 'exists_series', groups=['exists'])

@@ -27,7 +27,7 @@ class TheTvDB(Base):
         return '<Thetvdb(%s=%s)>' % (self.series_name, self.series_xml)
 
 
-class ModuleThetvdbLookup:
+class ModuleThetvdbLookup(object):
     """
         Retrieves TheTVDB information for entries. Uses series_name, 
         series_season, series_episode from series plugin.
@@ -77,6 +77,7 @@ class ModuleThetvdbLookup:
         from flexget import validator
         return validator.factory('boolean')
 
+    @priority(100)
     def on_feed_filter(self, feed):
         from flexget.utils.log import log_once
         for entry in feed.entries:
@@ -226,4 +227,4 @@ class ModuleThetvdbLookup:
         if not 'ep_name' in entry:
             log.info("Didn't find an episode on thetvdb for %(series_name)s - S%(series_season)sE%(series_episode)s" % entry)
 
-register_plugin(ModuleThetvdbLookup, 'thetvdb_lookup', priorities={'filter': 100})
+register_plugin(ModuleThetvdbLookup, 'thetvdb_lookup')

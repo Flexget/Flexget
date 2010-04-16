@@ -4,7 +4,7 @@ from flexget.plugin import *
 log = logging.getLogger('limit_new')
 
 
-class FilterLimitNew:
+class FilterLimitNew(object):
     """
         Limit number of new items.
 
@@ -23,6 +23,7 @@ class FilterLimitNew:
         from flexget import validator
         return validator.factory('number')
 
+    @priority(-255)
     def on_feed_filter(self, feed):
         amount = feed.config.get('limit_new', len(feed.entries))
         i = 1
@@ -42,4 +43,4 @@ class FilterLimitNew:
             i += 1
         log.debug('Rejected: %s Passed: %s' % (rejected, len(passed)))
 
-register_plugin(FilterLimitNew, 'limit_new', priorities={'filter': -255})
+register_plugin(FilterLimitNew, 'limit_new')

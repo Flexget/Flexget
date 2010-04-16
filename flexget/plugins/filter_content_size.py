@@ -16,6 +16,7 @@ class FilterContentSize(object):
         config.accept('boolean', key='strict')
         return config
 
+    @priority(150)
     def on_feed_modify(self, feed):
         if feed.manager.options.test:
             log.info('Plugin is disabled in test mode as size information is not available')
@@ -52,4 +53,4 @@ class FilterContentSize(object):
                         os.remove(entry['file'])
                         del(entry['file'])
 
-register_plugin(FilterContentSize, 'content_size', priorities={'modify': 150})
+register_plugin(FilterContentSize, 'content_size')

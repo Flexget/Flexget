@@ -9,7 +9,7 @@ from httplib import BadStatusLine
 log = logging.getLogger('deluge')
         
 
-class OutputDeluge:
+class OutputDeluge(object):
 
     """
         Add the torrents directly to deluge, supporting custom save paths.
@@ -63,6 +63,7 @@ class OutputDeluge:
             'automanaged': 'auto_managed', 'ratio': 'stop_ratio', 'removeatratio': 'remove_at_ratio', \
             'addpaused': 'add_paused', 'compact': 'compact_allocation'}
 
+    @priority(120)
     def on_process_start(self, feed):
         """
             Register the usable set: keywords. Detect what version of deluge
@@ -94,7 +95,8 @@ class OutputDeluge:
             else:
                 log.info("Using deluge 1.1 api")
                 self.deluge12 = False
-                
+
+    @priority(120)
     def on_feed_download(self, feed):
         """
             call download plugin to generate the temp files we will load into deluge
@@ -122,6 +124,7 @@ class OutputDeluge:
                     os.remove(entry['file'])
                     del(entry['file'])
 
+    @priority(135)
     def on_feed_output(self, feed):
         """Add torrents to deluge at exit."""
         config = self.get_config(feed)
@@ -418,4 +421,4 @@ class OutputDeluge:
             reactor.fireSystemEvent('shutdown')
             self.reactorRunning = 0
 
-register_plugin(OutputDeluge, 'deluge', priorities=dict(output=129, process_start=127, download=127))
+register_plugin(OutputDeluge, 'deluge')

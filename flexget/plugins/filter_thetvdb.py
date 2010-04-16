@@ -5,7 +5,7 @@ from flexget.utils.log import log_once
 log = logging.getLogger('thetvdb')
 
 
-class FilterTvdb:
+class FilterTvdb(object):
     """
         This plugin allows filtering based on thetvdb series rating, 
         episode rating, status, genres, runtime, content-rating, 
@@ -142,7 +142,8 @@ class FilterTvdb:
                         if entryitem in configlist:
                             return True
                     return False
-    
+
+    @priority(126)
     def on_feed_filter(self, feed):
         config = feed.config['thetvdb']
         
@@ -229,4 +230,4 @@ class FilterTvdb:
                 log.debug('Accepting %s' % (entry))
                 feed.accept(entry)
 
-register_plugin(FilterTvdb, 'thetvdb', priorities={'filter': 126})
+register_plugin(FilterTvdb, 'thetvdb')

@@ -5,7 +5,7 @@ from flexget.plugin import *
 log = logging.getLogger('regexp')
 
 
-class FilterRegexp:
+class FilterRegexp(object):
 
     """
         All possible forms.
@@ -66,7 +66,8 @@ class FilterRegexp:
             
         conf.accept('text', key='rest') # TODO: accept only ['accept','filter','reject']
         return conf
-        
+
+    @priority(172)
     def on_feed_filter(self, feed):
         match_methods = {'accept': feed.accept, 'reject': feed.reject}
         non_match_methods = {'accept_excluding': feed.accept, 'reject_excluding': feed.reject}
@@ -178,4 +179,4 @@ class FilterRegexp:
         else:
             return None
 
-register_plugin(FilterRegexp, 'regexp', priorities={'filter': 172})
+register_plugin(FilterRegexp, 'regexp')

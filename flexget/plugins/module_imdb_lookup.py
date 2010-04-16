@@ -114,7 +114,7 @@ class SearchResult(Base):
 log = logging.getLogger('imdb_lookup')
 
 
-class ModuleImdbLookup:
+class ModuleImdbLookup(object):
     """
         Retrieves imdb information for entries.
 
@@ -129,6 +129,7 @@ class ModuleImdbLookup:
         from flexget import validator
         return validator.factory('boolean')
 
+    @priority(100)
     def on_feed_filter(self, feed):
         from flexget.utils.log import log_once
         for entry in feed.entries:
@@ -298,5 +299,5 @@ class ModuleImdbLookup:
             log.log(5, 'committing session')
             session.commit()
         
-register_plugin(ModuleImdbLookup, 'imdb_lookup', priorities={'filter': 100})
+register_plugin(ModuleImdbLookup, 'imdb_lookup')
 register_parser_option('--retry-lookup', action='store_true', dest='retry_lookup', default=0, help=SUPPRESS_HELP)

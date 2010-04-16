@@ -1,10 +1,11 @@
 import logging
 from flexget import plugin
-  
+from flexget.plugin import *
+
 log = logging.getLogger('builtins')
 
 
-class PluginDisableBuiltins:
+class PluginDisableBuiltins(object):
     """
         Disables all builtin plugins from a feed.
     """
@@ -35,7 +36,8 @@ class PluginDisableBuiltins:
                     info.builtin = False
                     self.disabled.append(name)
         log.debug('Disabled builtin plugin %s' % ', '.join(self.disabled))
-        
+
+    @priority(-255)
     def on_feed_exit(self, feed):
         names = []
         for name in self.disabled:
@@ -46,4 +48,4 @@ class PluginDisableBuiltins:
         
     on_feed_abort = on_feed_exit
 
-plugin.register_plugin(PluginDisableBuiltins, 'disable_builtins', priorities={'exit': -255})
+plugin.register_plugin(PluginDisableBuiltins, 'disable_builtins')
