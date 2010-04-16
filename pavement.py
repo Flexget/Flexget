@@ -84,8 +84,7 @@ def test(options):
         argv.extend(['--attr=!online'])
         
     argv.append('-v')
-    argv.append('--nocapture')
-    #argv.append('--processes=4')
+    argv.append('--processes=4')
     
     nose.run(argv=argv, config=cfg)
 
