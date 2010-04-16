@@ -36,8 +36,6 @@ class PluginPriority(object):
                 originals[method.method_name] = method.priority
                 log.debug('stored %s original value %s' % (method.name, method.priority))
                 
-            print originals
-
         log.debug('Changed priority for: %s' % ', '.join(names))
 
     def on_feed_exit(self, feed):

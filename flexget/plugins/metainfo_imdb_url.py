@@ -14,13 +14,7 @@ class MetainfoImdbUrl(object):
         from flexget import validator
         return validator.factory('boolean')
 
-    def on_feed_input(self, feed):
-        print '-' * 80
-
     def on_feed_metainfo(self, feed):
-        print '*' * 80
-
-
         # check if disabled (value set to false)
         if 'scan_imdb' in feed.config:
             if not feed.config['scan_imdb']:

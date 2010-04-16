@@ -12,10 +12,10 @@ class TestManualAutomatic(FlexGetBase):
 
     __yaml__ = """
         feeds:
-            test:
-                manual: true
-                mock:
-                    - {title: 'nodownload', url: 'http://localhost/nodownload'}
+          test:
+            manual: true
+            mock:
+              - {title: 'nodownload', url: 'http://localhost/nodownload'}
     """
 
     def test_manual_without_onlyfeed(self):
@@ -31,10 +31,10 @@ class TestManualOnlyfeed(FlexGetBase):
 
     __yaml__ = """
         feeds:
-            test2:
-                manual: true
-                mock:
-                    - {title: 'download', url: 'http://localhost/download'}
+          test2:
+            manual: true
+            mock:
+              - {title: 'download', url: 'http://localhost/download'}
     """
 
     def test_manual_with_onlyfeed(self):

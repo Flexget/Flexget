@@ -216,6 +216,11 @@ class PluginInfo(dict):
         self.event_handlers = {}
         self.build_event_handlers()
 
+    def reset_event_handlers(self):
+        """Temporary utility method"""
+        self.event_handlers = {}
+        self.build_event_handlers()
+
     def build_event_handlers(self):
         """(Re)build event_handlers in this plugin"""
         for event, method_name in EVENT_METHODS.iteritems():
