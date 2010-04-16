@@ -198,13 +198,14 @@ class PluginTransmissionrpc:
                 continue
 
             try:
-                r = cli.add(None, 30, filename=entry['file'], **options['add'])
+                r = cli.add(None, 30, filename=os.path.abspath(entry['file']), **options['add'])
                 log.info("%s torrent added to transmission" % (entry['title']))
                 if options['change'].keys():
                     for id in r.keys():
                         cli.change(id, 30, **options['change'])
             except TransmissionError, e:
                 log.error(e.message)
+                feed.fail(entry)
 
             # Clean up temp file if download plugin is not configured for
             # this feed.
