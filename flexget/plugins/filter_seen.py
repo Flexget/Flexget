@@ -271,6 +271,7 @@ class FilterSeen(object):
         root.accept('text')
         return root
 
+    @priority(255)
     def on_feed_filter(self, feed):
         """Filter seen entries"""
         if not feed.config.get(self.keyword, True):
@@ -332,7 +333,7 @@ class FilterSeen(object):
             return True
                 
 
-register_plugin(FilterSeen, 'seen', builtin=True, priorities=dict(filter=255))
+register_plugin(FilterSeen, 'seen', builtin=True)
 register_plugin(SeenSearch, '--seen-search', builtin=True)
 register_plugin(SeenCmd, '--seen', builtin=True)
 register_plugin(SeenForget, '--forget', builtin=True)

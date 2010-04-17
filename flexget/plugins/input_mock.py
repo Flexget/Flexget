@@ -5,7 +5,7 @@ from flexget.plugin import *
 log = logging.getLogger('mock')
 
 
-class InputMock:
+class InputMock(object):
     """
         Allows adding mock input entries. Example:
         

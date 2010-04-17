@@ -21,7 +21,7 @@ class DelayedEntry(Base):
         return '<DelayedEntry(title=%s)>' % (self.title)
 
 
-class FilterDelay:
+class FilterDelay(object):
     """
         Add delay to a feed. This is usefull for de-priorizing expensive / bad-quality feeds.
         
@@ -63,7 +63,8 @@ class FilterDelay:
             feed.entries.append(entry)
             # remove from queue
             feed.session.delete(delayed_entry)
-        
+
+    @priority(250)
     def on_feed_filter(self, feed):
         expire_time = datetime.now() + self.get_delay(feed)
         for entry in feed.entries:
@@ -82,4 +83,4 @@ class FilterDelay:
                 feed.reject(entry, 'delaying')
                 feed.session.add(delay_entry)
 
-register_plugin(FilterDelay, 'delay', priorities={'filter': 250})
+register_plugin(FilterDelay, 'delay')

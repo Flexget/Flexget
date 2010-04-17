@@ -302,7 +302,8 @@ class Feed(object):
                 if method.plugin.name in self.config:
                     break
             else:
-                log.warning('Feed doesn\'t have any %s plugins, you should add some!' % (event))
+                if not self.manager.unit_test:
+                    log.warning('Feed doesn\'t have any %s plugins, you should add some!' % (event))
 
         for method in methods:
             keyword = method.plugin.name
@@ -313,7 +314,7 @@ class Feed(object):
                 # store execute info
                 self.current_event = event
                 self.current_plugin = keyword
-                log.log(5, 'Running %s method %s' % (keyword, method))
+                #log.log(5, 'Running %s method %s' % (keyword, method))
                 # call the plugin
                 try:
                     method(self)

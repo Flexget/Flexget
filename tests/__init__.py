@@ -5,7 +5,7 @@ import sys
 from nose.tools import *
 from nose.plugins.attrib import attr
 from flexget.manager import Manager, Session
-from flexget.plugin import get_plugin_by_name, load_plugins
+from flexget.plugin import get_plugin_by_name, load_plugins, plugins
 from flexget.options import OptionParser
 from flexget.feed import Feed
 from flexget import initialize_logging

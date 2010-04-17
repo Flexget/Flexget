@@ -3,7 +3,8 @@ from flexget.plugin import *
 
 log = logging.getLogger('imdb_required')
 
-class FilterImdbRequired:
+
+class FilterImdbRequired(object):
     """
         Rejects entries without imdb url.
 
@@ -11,10 +12,12 @@ class FilterImdbRequired:
 
         imdb_required: yes
     """
+    
     def validator(self):
         from flexget import validator
         return validator.factory('boolean')
 
+    @priority(32)
     def on_feed_filter(self, feed):
         for entry in feed.entries:
             try:
@@ -24,4 +27,4 @@ class FilterImdbRequired:
             if not 'imdb_url' in entry:
                 feed.reject(entry, 'imdb required')
 
-register_plugin(FilterImdbRequired, 'imdb_required', priorities={'filter': 32})
+register_plugin(FilterImdbRequired, 'imdb_required')

@@ -6,7 +6,8 @@ from flexget.feed import Entry
 
 log = logging.getLogger('exists_movie')
 
-class FilterExistsMovie:
+
+class FilterExistsMovie(object):
 
     """
         Reject existing movies.
@@ -33,6 +34,7 @@ class FilterExistsMovie:
             config = [config]
         return config
 
+    @priority(-1)
     def on_feed_filter(self, feed):
         config = self.get_config(feed)
         imdb_lookup = get_plugin_by_name('imdb_lookup').instance.lookup
@@ -63,4 +65,4 @@ class FilterExistsMovie:
                     else:
                         log.debug('entry %s is not imdb compatible' % entry['title'])
 
-register_plugin(FilterExistsMovie, 'exists_movie', groups=['exists'], priorities={'filter': -1})
+register_plugin(FilterExistsMovie, 'exists_movie', groups=['exists'])

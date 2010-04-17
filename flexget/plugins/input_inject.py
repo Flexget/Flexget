@@ -6,7 +6,7 @@ from flexget.utils.tools import str_to_boolean
 log = logging.getLogger('inject')
 
 
-class InputInject:
+class InputInject(object):
     """
         Allows injecting imaginary entry for FlexGet to process.
         
@@ -58,6 +58,7 @@ class InputInject:
             else:
                 log.critical('Unknown --inject parameter %s' % arg)
 
+    @priority(255)
     def on_feed_input(self, feed):
         if not InputInject.options:
             return
@@ -92,7 +93,7 @@ class InputInject:
             feed.accept(entry, '--inject accepted')
 
 
-register_plugin(InputInject, '--inject', debug=True, builtin=True, priorities={'input': 255})
+register_plugin(InputInject, '--inject', debug=True, builtin=True)
 
 register_parser_option('--inject', action='callback', callback=InputInject.optik_series,
                        help='Injects entry to all executed feeds: <TITLE> [URL] [ACCEPT] [FORCE]')

@@ -10,6 +10,7 @@ class NzbSize(object):
     Provides entry size information when dealing with nzb files
     """
 
+    @priority(200)
     def on_feed_modify(self, feed):
         """
         The downloaded file is accessible in modify event
@@ -47,4 +48,4 @@ class NzbSize(object):
             entry['content_size'] = size_mb
 
 
-register_plugin(NzbSize, 'nzb_size', builtin=True, priorities={'modify': 200})
+register_plugin(NzbSize, 'nzb_size', builtin=True)

@@ -1,11 +1,11 @@
 import logging
 from optparse import SUPPRESS_HELP
-from flexget.plugin import register_plugin, register_parser_option, plugins, FEED_EVENTS, get_plugins_by_event
+from flexget.plugin import register_plugin, register_parser_option, plugins, FEED_EVENTS, EVENT_METHODS, get_plugins_by_event
 
 log = logging.getLogger('plugins')
 
 
-class PluginsList:
+class PluginsList(object):
     """
         Implements --plugins
     """
@@ -34,7 +34,17 @@ class PluginsList:
 
             # build roles list
             for info in event_plugins:
-                priority = info.priorities.get(event, '?')
+                method_name = EVENT_METHODS[event]
+                priority = info.event_handlers[method_name].priority
+
+                """
+                if info.name == 'seen':
+                    from IPython.Shell import IPShellEmbed
+                    args = []
+                    ipshell = IPShellEmbed(args)
+                    ipshell()"""
+
+
                 if info['name'] in roles:
                     roles[info['name']].append('%s(%s)' % (event, priority))
                 else:

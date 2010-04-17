@@ -5,7 +5,7 @@ from flexget.plugin import *
 log = logging.getLogger('metainfo_imdb_url')
 
 
-class MetainfoImdbUrl:
+class MetainfoImdbUrl(object):
     """
         Scan entry information for imdb url.
     """

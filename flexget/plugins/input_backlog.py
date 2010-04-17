@@ -21,7 +21,7 @@ class BacklogEntry(Base):
         return '<BacklogEntry(title=%s)>' % (self.title)
 
 
-class InputBacklog:
+class InputBacklog(object):
     """
     Keeps feed history for given amount of time.
 
@@ -45,8 +45,9 @@ class InputBacklog:
             return timedelta(**params)
         except TypeError:
             raise PluginWarning('Invalid time format', log)
-        
-    def inject_backlog(self, feed):
+
+    @priority(-255)
+    def on_feed_input(self, feed):
         """Insert missing entries from backlog."""
         # purge expired
         for backlog_entry in feed.session.query(BacklogEntry).filter(datetime.now() > BacklogEntry.expire).all():
@@ -67,7 +68,8 @@ class InputBacklog:
         if count:
             feed.verbose_progress('Added %s entries from backlog' % count, log)
 
-    def learn_backlog(self, feed, amount=''):
+    @priority(255)
+    def on_feed_filter(self, feed, amount=''):
         """Learn current entries into backlog. All feed inputs must have been executed."""
         for entry in feed.entries:
             self.add_backlog(feed, entry, amount)
@@ -85,8 +87,8 @@ class InputBacklog:
             backlog_entry.expire = expire_time
             feed.session.add(backlog_entry)
         
-    on_feed_input = inject_backlog
-    on_feed_filter = learn_backlog
+    inject_backlog = on_feed_input
+    learn_backlog = on_feed_filter
             
 
-register_plugin(InputBacklog, 'backlog', priorities=dict(input=-250, filter=255))
+register_plugin(InputBacklog, 'backlog')

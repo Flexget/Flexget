@@ -8,7 +8,7 @@ log = logging.getLogger('modify_torrent')
 # Test scripts and other short code fragments can be considered as being in the public domain.
 
 
-class Torrent:
+class Torrent(object):
     """Represents a torrent"""
 
     def __init__(self, content):
@@ -182,13 +182,14 @@ class Torrent:
         return self.encode_func[type(data)](data)
             
 
-class TorrentFilename:
+class TorrentFilename(object):
 
     """
         Makes sure that entries containing torrent-file have .torrent
         extension. This is enabled always by default (builtins).
     """
 
+    @priority(255)
     def on_feed_modify(self, feed):
         idstr = 'd8:announce'
         for entry in feed.accepted + feed.entries:
@@ -250,4 +251,4 @@ class TorrentFilename:
         log.debug('make_filename made %s' % fn)
         return fn
 
-register_plugin(TorrentFilename, 'torrent', builtin=True, priorities=dict(modify=255))
+register_plugin(TorrentFilename, 'torrent', builtin=True)

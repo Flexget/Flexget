@@ -5,7 +5,7 @@ from flexget.utils.log import log_once
 log = logging.getLogger('imdb')
 
 
-class FilterImdb:
+class FilterImdb(object):
     """
         This plugin allows filtering based on IMDB score, votes and genres etc.
 
@@ -65,6 +65,7 @@ class FilterImdb:
         imdb.accept('list', key='accept_directors').accept('text')
         return imdb
 
+    @priority(128)
     def on_feed_filter(self, feed):
         config = feed.config['imdb']
         
@@ -159,4 +160,4 @@ class FilterImdb:
                 log.debug('Accepting %s' % (entry))
                 feed.accept(entry)
 
-register_plugin(FilterImdb, 'imdb', priorities={'filter': 128})
+register_plugin(FilterImdb, 'imdb')

@@ -13,7 +13,7 @@ class UrlRewritingError(Exception):
         return repr(self.value)
 
 
-class PluginUrlRewriting:
+class PluginUrlRewriting(object):
 
     """
     Provides URL rewriting framework
@@ -40,6 +40,7 @@ class PluginUrlRewriting:
                 return True
         return False
 
+    @priority(255)
     def url_rewrite(self, feed, entry):
         """Rewrites given entry url. Raises UrlRewritingError if failed."""
         tries = 0
@@ -65,5 +66,5 @@ class PluginUrlRewriting:
                     log.exception(e)
                     raise UrlRewritingError('%s: Internal error with url %s' % (name, entry['url']))
 
-register_plugin(PluginUrlRewriting, 'urlrewriting', builtin=True, priorities={'urlrewrite': 255})
+register_plugin(PluginUrlRewriting, 'urlrewriting', builtin=True)
 register_feed_event(PluginUrlRewriting, 'urlrewrite', before='download')

@@ -12,7 +12,7 @@ __all__ = ['PluginWarning', 'PluginError',
            'get_plugin_by_name', 'get_plugins_by_group',
            'get_plugin_keywords', 'get_plugins_by_event',
            'get_methods_by_event', 'get_events_by_plugin',
-           'internet']
+           'internet', 'priority']
 
 
 class PluginDependencyError(Exception):
@@ -94,6 +94,15 @@ class internet(object):
         return wrapped_func
 
 
+def priority(value):
+    """Priority decorator for event methods"""
+
+    def decorator(target):
+        target.priority = value
+        return target
+    return decorator        
+
+
 def _strip_trailing_sep(path):
     return path.rstrip("\\/")
 
@@ -125,14 +134,14 @@ _plugin_options = []
 _new_event_queue = {}
 
 
-def register_plugin(plugin_class, name, groups=[], builtin=False, debug=False, priorities={}):
+def register_plugin(plugin_class, name, groups=[], builtin=False, debug=False):
     """Registers a plugin."""
     global plugins
     if name in plugins:
         log.critical('Error while registering plugin %s. %s' % \
             (name, ('A plugin with the name %s is already registered' % name)))
         return
-    plugins[name] = PluginInfo(name, plugin_class, groups, builtin, debug, priorities)
+    plugins[name] = PluginInfo(name, plugin_class, groups, builtin, debug)
 
 
 def register_parser_option(*args, **kwargs):
@@ -168,14 +177,10 @@ def register_feed_event(plugin_class, name, before=None, after=None):
         if after is None:
             FEED_EVENTS.insert(FEED_EVENTS.index(before), event_name)
 
-        # update PluginInfo events flag
+        # create possibly newly available event handlers
         for loaded_plugin in plugins:
-            if plugins[loaded_plugin].events:
-                continue
-            if hasattr(plugins[loaded_plugin].instance, 'on_feed_' + name):
-                if callable(getattr(plugins[loaded_plugin].instance, 'on_feed_' + name)):
-                    plugins[loaded_plugin].events = True
-                    continue
+            plugins[loaded_plugin].build_event_handlers()
+
         return True
 
     # if can't add yet (dependencies) queue addition
@@ -193,7 +198,7 @@ class PluginInfo(dict):
         attributes.  Also instantiates a plugin and initializes properties.
     """
 
-    def __init__(self, name, item_class, groups=[], builtin=False, debug=False, priorities={}):
+    def __init__(self, name, item_class, groups=[], builtin=False, debug=False):
         dict.__init__(self)
 
         self.name = name
@@ -208,15 +213,24 @@ class PluginInfo(dict):
         self.groups = groups
         self.builtin = builtin
         self.debug = debug
+        self.event_handlers = {}
+        self.build_event_handlers()
 
-        self.events = False
-        for method_name in EVENT_METHODS.itervalues():
-            if hasattr(instance, method_name):
-                if callable(getattr(instance, method_name)):
-                    self.events = True
-                    break
+    def reset_event_handlers(self):
+        """Temporary utility method"""
+        self.event_handlers = {}
+        self.build_event_handlers()
 
-        self.priorities = priorities
+    def build_event_handlers(self):
+        """(Re)build event_handlers in this plugin"""
+        for event, method_name in EVENT_METHODS.iteritems():
+            if method_name in self.event_handlers:
+                continue
+            if hasattr(self.instance, method_name):
+                method = getattr(self.instance, method_name)
+                if not callable(method):
+                    continue
+                self.event_handlers[method_name] = PluginMethod(self, method_name, event)
 
     def __getattr__(self, attr):
         if attr in self:
@@ -242,7 +256,11 @@ class PluginMethod(object):
         self.plugin = plugin
         self.method_name = method_name
         self.event_name = event_name
-        self.priority = plugin.priorities.get(event_name, DEFAULT_PRIORITY)
+        method = getattr(plugin.instance, method_name)
+        if hasattr(method, 'priority'):
+            self.priority = method.priority
+        else:
+            self.priority = DEFAULT_PRIORITY
 
     def __getattr__(self, attr):
         if attr in self.plugin:
@@ -258,8 +276,17 @@ class PluginMethod(object):
         #print "kwargs:%s" % kwargs
         return getattr(self.plugin.instance, self.method_name)(*args, **kwargs)
 
+    def __eq__(self, other):
+        return self.priority == other.priority
+
+    def __lt__(self, other):
+        return self.priority < other.priority
+
+    def __gt__(self, other):
+        return self.priority > other.priority
+
     def __str__(self):
-        return '<PluginMethod(name=%s,method=%s,priority=%s)>' % (self.plugin['name'], self.method_name, self.priority)
+        return '<PluginMethod(plugin=%s,method=%s,priority=%s)>' % (self.plugin['name'], self.method_name, self.priority)
 
     __repr__ = __str__
 
@@ -355,7 +382,7 @@ def load_plugins(parser):
 
 
 def get_plugins_by_event(event):
-    """Return all plugins that hook event in order of priority."""
+    """Return list of all plugins that hook :event:"""
     result = []
     if not event in EVENT_METHODS:
         raise Exception('Unknown event %s' % event)
@@ -366,37 +393,29 @@ def get_plugins_by_event(event):
             continue
         if callable(getattr(instance, method_name)):
             result.append(info)
-    # sort plugins into proper order
-    result.sort(lambda x, y: cmp(x.get('priorities', {}).get(event, DEFAULT_PRIORITY), \
-                                 y.get('priorities', {}).get(event, DEFAULT_PRIORITY)), reverse=True)
     return result
 
 
 def get_methods_by_event(event):
-    """Return plugin methods that hook event in order of priority."""
+    """Return plugin methods that hook :event: in order of priority (highest first)."""
     result = []
     if not event in EVENT_METHODS:
         raise Exception('Unknown event %s' % event)
-    method = EVENT_METHODS[event]
+    method_name = EVENT_METHODS[event]
     for info in plugins.itervalues():
-        instance = info.instance
-        if not hasattr(instance, method):
-            continue
-        if callable(getattr(instance, method)):
-            result.append(info)
-    # sort plugins into proper order
-    result.sort(lambda x, y: cmp(x.get('priorities', {}).get(event, DEFAULT_PRIORITY), \
-                                 y.get('priorities', {}).get(event, DEFAULT_PRIORITY)), reverse=True)
-    # create plugin methods from the result
-    return map(lambda info: PluginMethod(info, method, event), result)
+        method = info.event_handlers.get(method_name, None)
+        if method:
+            result.append(method)
+    result.sort(reverse=True)
+    return result
 
 
 def get_events_by_plugin(name):
     """Return all events plugin :name: hooks"""
     plugin = get_plugin_by_name(name)
     events = []
-    for event_name, event in EVENT_METHODS.iteritems():
-        if hasattr(plugin.instance, event):
+    for event_name, method_name in EVENT_METHODS.iteritems():
+        if hasattr(plugin.instance, method_name):
             events.append(event_name)
     return events
 

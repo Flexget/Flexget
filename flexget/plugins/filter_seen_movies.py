@@ -23,7 +23,8 @@ class FilterSeenMovies(FilterSeen):
         # remember and filter by these fields
         self.fields = ['imdb_url']
         self.keyword = 'seen_movies'
-        
+
+    @priority(-255)
     def on_feed_filter(self, feed):
         # strict method
         if feed.config['seen_movies'] == 'strict':
@@ -43,4 +44,4 @@ class FilterSeenMovies(FilterSeen):
                     feed.reject(entry, 'already accepted once in feed')
 
 #We run last (-255) to make sure we don't reject duplicates before all the other plugins get a chance to reject.
-register_plugin(FilterSeenMovies, 'seen_movies', priorities={'filter': -255})
+register_plugin(FilterSeenMovies, 'seen_movies')

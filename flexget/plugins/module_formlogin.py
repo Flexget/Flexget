@@ -3,21 +3,18 @@ from flexget.feed import Entry
 from flexget.plugin import *
 import urllib2
 
-mechanize_present = True
-try:
-    from mechanize import Browser
-except ImportError:
-    mechanize_present = False
-
 log = logging.getLogger('formlogin')
 
-class InputFormLogin:
+
+class InputFormLogin(object):
     """
     Login on form
     """
 
-    def on_feed_input(self, feed):
-        if not mechanize_present:
+    def on_feed_start(self, feed):
+        try:
+            from mechanize import Browser
+        except ImportError:
             raise PluginError('mechanize module required.', log)
         url = feed.config['form']['url']
         username = feed.config['form']['username']
@@ -46,4 +43,4 @@ class InputFormLogin:
         opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cookiejar))
         urllib2.install_opener(opener)                                
 
-register_plugin(InputFormLogin, 'form', priorities=dict(input=255))
+register_plugin(InputFormLogin, 'form')

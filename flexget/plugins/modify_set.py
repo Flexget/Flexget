@@ -5,7 +5,7 @@ import copy
 log = logging.getLogger('set')
 
 
-class ModifySet:
+class ModifySet(object):
 
     """
         Allows adding information to a feed entry for use later.
@@ -40,6 +40,7 @@ class ModifySet:
         for key, value in keys.iteritems():
             self.register_key(key, value)
 
+    @priority(-255)
     def on_feed_filter(self, feed):
         """
         Adds the set dict to all accepted entries. This is not really a filter plugin,
@@ -80,4 +81,4 @@ class ModifySet:
         entry.update(conf)
 
 #filter priority is -255 so we run after all filters are finished
-register_plugin(ModifySet, 'set', priorities={'filter': -255})
+register_plugin(ModifySet, 'set')

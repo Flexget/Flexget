@@ -5,7 +5,7 @@ from flexget.plugin import *
 log = logging.getLogger('manipulate')
 
 
-class Manipulate:
+class Manipulate(object):
     """
         Usage:
         
@@ -23,6 +23,7 @@ class Manipulate:
         edit.accept('regexp', key='regexp')
         return root
 
+    @priority(255)
     def on_feed_filter(self, feed):
         for entries in [feed.entries, feed.rejected]:
             for entry in entries:
@@ -39,4 +40,4 @@ class Manipulate:
                         feed.verbose_details('Field %s is now %s' % (field, entry[field]))
                         log.debug('field %s is now %s' % (field, entry[field]))
 
-register_plugin(Manipulate, 'manipulate', priorities={filter: 255})
+register_plugin(Manipulate, 'manipulate')
