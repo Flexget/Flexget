@@ -181,10 +181,14 @@ def urlopener(url, log, **kwargs):
         try:
             retrieved = urllib2.urlopen(url)
             sleep = False
-        except urllib2.URLError, e:
-            log.debug('Failed to retrieve url (try %i/3): %s' % (i + 1, str(e.reason)))
         except urllib2.HTTPError, e:
             log.debug('HTTP error (try %i/3): %s' % (i + 1, str(e.code)))
+        except urllib2.URLError, e:
+            if hasattr(e, 'reason'):
+                reason = str(e.reason)
+            else:
+                reason = 'N/A'
+            log.debug('Failed to retrieve url (try %i/3): %s' % (i + 1, reason))
         else:
             socket.setdefaulttimeout(oldtimeout)
             #data = retrieved.read()
