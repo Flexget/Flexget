@@ -18,34 +18,33 @@ class NzbSize(object):
         from pynzb import nzb_parser
 
         for entry in feed.accepted:
+            if entry.get('mime-type', None) in [u'text/nzb', u'application/x-nzb'] or \
+               entry.get('filename', '').endswith('.nzb'):
 
-            if entry.get('mime-type', None) not in [u'text/nzb', u'application/x-nzb'] or \
-               not entry.get('filename', '').endswith('.nzb'):
+                if 'file' not in entry:
+                    log.warning('%s does not have a to get size from' % entry['title'])
+                    continue
+
+                filename = entry['file']
+                log.debug('reading %s' % filename)
+                xmldata = file(filename).read()
+
+                try:
+                    nzbfiles = nzb_parser.parse(xmldata)
+                except:
+                    log.debug('%s is not a valid nzb' % entry['title'])
+                    continue
+
+                size = 0
+                for nzbfile in nzbfiles:
+                    for segment in nzbfile.segments:
+                        size += segment.bytes
+
+                size_mb = size / 1024 / 1024
+                log.debug('%s content size: %s MB' % (entry['title'], size_mb))
+                entry['content_size'] = size_mb
+            else:
                 log.log(5, '%s does not seem to be nzb' % entry['title'])
-                continue
-
-            if 'file' not in entry:
-                log.warning('%s does not have a to get size from' % entry['title'])
-                continue
-
-            filename = entry['file']
-            log.debug('reading %s' % filename)
-            xmldata = file(filename).read()
-
-            try:
-                nzbfiles = nzb_parser.parse(xmldata)
-            except:
-                log.debug('%s is not a valid nzb' % entry['title'])
-                continue
-
-            size = 0
-            for nzbfile in nzbfiles:
-                for segment in nzbfile.segments:
-                    size += segment.bytes
-
-            size_mb = size / 1024 / 1024
-            log.debug('%s content size: %s MB' % (entry['title'], size_mb))
-            entry['content_size'] = size_mb
 
 
 register_plugin(NzbSize, 'nzb_size', builtin=True)

@@ -276,7 +276,7 @@ class ModuleImdbLookup(object):
             log.log(5, 'imdb.actors: %s' % imdb.actors)
             log.log(5, 'imdb.directors: %s' % imdb.directors)
             
-            # store to entries
+            # store to entry
             # TODO: I really don't like this shoveling!
             entry['imdb_url'] = imdb.url
             entry['imdb_id'] = imdb.imdb_id

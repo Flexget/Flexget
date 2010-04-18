@@ -65,12 +65,10 @@ class FilterImdb(object):
         imdb.accept('list', key='accept_directors').accept('text')
         return imdb
 
-    @priority(128)
     def on_feed_filter(self, feed):
         config = feed.config['imdb']
         
         lookup = get_plugin_by_name('imdb_lookup').instance.lookup
-
         
         for entry in feed.entries:
             force_accept = False
