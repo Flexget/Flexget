@@ -12,7 +12,7 @@ from flexget.utils.tools import urlopener
 log = logging.getLogger('html')
 
 
-class InputHtml:
+class InputHtml(object):
     """
         Parses urls from html page. Usefull on sites which have direct download
         links of any type (mp3, jpg, torrent, ...).
@@ -160,7 +160,7 @@ class InputHtml:
                 
             if title_exists(title):
                 # title link should be unique, add CRC32 to end if it's not
-                hash = zlib.crc32(url)
+                hash = zlib.crc32(url.encode("utf-8"))
                 crc32 = '%08X' % (hash & 0xFFFFFFFF)
                 title = '%s [%s]' % (title, crc32)
                 # truly duplicate, title + url crc already exists in queue

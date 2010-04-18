@@ -7,7 +7,7 @@ from flexget.plugin import *
 log = logging.getLogger('adv_exec')
 
 
-class PluginAdvExec:
+class PluginAdvExec(object):
     """
     Execute commands
     
