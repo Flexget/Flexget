@@ -992,7 +992,7 @@ class FilterSeries(SeriesPlugin):
         log.debug('first_seen: %s' % first_seen)
         log.debug('timeframe expires: %s' % str(expires))
         
-        stop = feed.manager.options.stop_waiting == series_name.lower()
+        stop = feed.manager.options.stop_waiting.lower() == series_name.lower()
         if expires <= datetime.now() or stop:
             entry = self.parser2entry[best]
             if stop:
