@@ -18,10 +18,10 @@ class FilterContentSize(object):
 
     @priority(150)
     def on_feed_modify(self, feed):
-        if feed.manager.options.test:
-            log.info('Plugin is disabled in test mode as size information is not available')
+        if feed.manager.options.test or feed.manager.options.learn:
+            log.info('Plugin is disabled with --test and --learn because size information is not available')
             return
-
+            
         config = feed.config.get('content_size', {})
         for entry in feed.accepted:
             if 'content_size' in entry:
