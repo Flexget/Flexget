@@ -157,7 +157,7 @@ class TestMetainfoQuality(FlexGetBase):
         entry = self.feed.find_entry(title='FooBar.S01E02.720p.HDTV')
         assert entry, 'entry not found?'
         assert 'quality' in entry, 'failed to pick up quality'
-        assert entry['quality'] == '720p', 'picked up wrong quality'
+        assert entry['quality'] == '720p', 'picked up wrong quality %s' % entry.get('quality', None)
 
 
 class TestEntryUnicodeError(FlexGetBase):

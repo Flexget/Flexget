@@ -37,6 +37,17 @@ class Episode(Base):
     series_id = Column(Integer, ForeignKey('series.id'), nullable=False)
     releases = relation('Release', backref='episode', cascade='all, delete, delete-orphan')
     
+    @property
+    def age(self):
+        diff = datetime.now() - self.first_seen
+        age_days = diff.days
+        age_hours = diff.seconds / 60 / 60
+        age = ''
+        if age_days:
+            age += '%sd ' % age_days
+        age += '%sh' % age_hours
+        return age
+    
     def __init__(self):
         self.first_seen = datetime.now()
 
@@ -247,6 +258,7 @@ class SeriesReport(SeriesPlugin):
     def display_details(self):
         """Display detailed series information"""
         from flexget.manager import Session
+        
         session = Session()
 
         name = unicode(self.options['name'].lower())
@@ -263,7 +275,7 @@ class SeriesReport(SeriesPlugin):
             if episode.identifier is None:
                 print ' None <--- Broken!'
             else:
-                print ' %s' % episode.identifier
+                print ' %s - %s' % (episode.identifier, episode.age)
             
             for release in episode.releases:
                 status = release.quality
@@ -307,9 +319,9 @@ class SeriesReport(SeriesPlugin):
 
             if episode:
                 if not episode.season or not episode.number:
-                    latest = '%s (uid)' % episode.identifier
+                    latest = '%s (id) - %s' % (episode.identifier, episode.age)
                 else:
-                    latest = 's%se%s' % (str(episode.season).zfill(2), str(episode.number).zfill(2))
+                    latest = 'S%sE%s - %s' % (str(episode.season).zfill(2), str(episode.number).zfill(2), episode.age)
 
                 for release in self.get_releases(session, series.name, episode.identifier):
                     if release.downloaded:
@@ -322,7 +334,7 @@ class SeriesReport(SeriesPlugin):
                 latest = 'N/A'
                 status = 'N/A'
 
-            print ' %-30s%-20s%-21s' % (series.name, latest, status)
+            print ' %-30s%-20s%-21s' % (series.name.capitalize(), latest, status)
 
         print '-' * 79
         print ' * = downloaded'
