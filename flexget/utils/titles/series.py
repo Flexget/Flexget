@@ -19,7 +19,8 @@ class SeriesParser(TitleParser):
 
     :name: series name
     :data: data to parse
-    :expect_ep: expect series to be in season, ep format
+    :expect_ep: expect series to be in season, ep format (ep_regexps)
+    :expect_id: expect series to be in id format (id_regexps)
 
     """
 
@@ -28,6 +29,7 @@ class SeriesParser(TitleParser):
         self.name = ''
         self.data = ''
         self.expect_ep = False
+        self.expect_id = False
         self.from_group = None
 
         # if set to true, episode or id must follow immediately after name
@@ -66,7 +68,7 @@ class SeriesParser(TitleParser):
         object.__setattr__(self, name, value)
 
     def clean(self, data):
-        # perform data cleaner regexps
+        """Perform data cleaner regexps"""
         for clean_re in self.clean_regexps:
             matches = re.findall(clean_re, data, re.IGNORECASE | re.UNICODE)
             # remove all matches from data, unless they happen to contain relevant information
@@ -87,15 +89,16 @@ class SeriesParser(TitleParser):
                         break
                     else:
                         data = data.replace(match, '').strip()
-
         log.log(5, 'cleaned data: %s' % data)
-
         return data
 
     def parse(self):
         if not self.name or not self.data:
             raise Exception('SeriesParser initialization error, name: %s data: %s' % \
                (repr(self.name), repr(self.data)))
+               
+        if self.expect_ep and self.expect_id:
+            raise Exception('Flags expect_ep and expect_id are mutually exclusive')
 
         data = self.clean(self.data)
 
@@ -214,6 +217,10 @@ class SeriesParser(TitleParser):
                 if self.strict_name:
                     if match.start() > 1:
                         return
+                        
+                if self.expect_id:
+                    log.debug('found episode number, but expecting id, aborting!')
+                    return
 
                 log.debug('found episode number with regexp %s' % ep_re)
                 season, episode = match.groups()
@@ -261,7 +268,7 @@ class SeriesParser(TitleParser):
                     return
             log.debug('-> no luck with id_regexps')
 
-        raise ParseWarning('\'%s\' looks like series \'%s\' but I cannot find any episode or id numbering!' % (self.data, self.name))
+        raise ParseWarning('Title \'%s\' looks like series \'%s\' but I cannot find any episode or id numbering' % (self.data, self.name))
 
     @property
     def identifier(self):

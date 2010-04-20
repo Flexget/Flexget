@@ -85,6 +85,42 @@ class SeriesPlugin(object):
         #log.log(5, 'get_latest_info, series: %s season: %s episode: %s' % \
         #    (name, episode.season, episode.number))
         return {'season': episode.season, 'episode': episode.number, 'name': name}
+        
+    def identified_by_ep(self, session, name, min=4, min_percent=50):
+        """Determine if series :name: should be considered episodic"""
+        series = session.query(Series).filter(Series.name == name).first()
+        if not series:
+            return False
+        
+        total = len(series.episodes)
+        if total < min:
+            return False
+        episodic = 0
+        for episode in series.episodes:
+            if episode.season and episode.number:
+                episodic += 1
+        percent = (float(episodic) / float(total)) * 100
+        log.debug('series %s episodic check: %s/%s (%s percent)' % (name, episodic, total, percent))
+        if percent > min_percent:
+            return True
+            
+    def identified_by_id(self, session, name, min=4, min_percent=50):
+        """Determine if series :name: should be considered identified by id"""
+        series = session.query(Series).filter(Series.name == name).first()
+        if not series:
+            return False
+
+        total = len(series.episodes)
+        if total < min:
+            return False
+        non_episodic = 0
+        for episode in series.episodes:
+            if not episode.season and not episode.number:
+                non_episodic += 1
+        percent = (float(non_episodic) / float(total)) * 100
+        log.debug('series %s id-format check: %s/%s (%s percent)' % (name, non_episodic, total, percent))
+        if percent > min_percent:
+            return True
 
     def get_latest_download(self, session, name):
         """Return latest downloaded episode (season, episode, name) for series name"""
@@ -391,6 +427,9 @@ class FilterSeries(SeriesPlugin):
             options.accept('list', key='qualities').accept('text')   # TODO: ^^
             options.accept('text', key='min_quality')                # TODO: ^^
             options.accept('text', key='max_quality')                # TODO: ^^
+            # expect flags
+            options.accept('text', key='identified_by')
+            # timeframe
             options.accept('regexp_match', key='timeframe').accept('\d+ (minutes|hours|days|weeks)')
             # strict naming
             options.accept('boolean', key='exact')
@@ -585,16 +624,29 @@ class FilterSeries(SeriesPlugin):
 
             return cmp(index(a), index(b))
 
-        # determine if series is known to be in season, episode format
+        # expect flags
         expect_ep = False
-        """
-        latest = self.get_latest_info(feed.session, series_name)
-        if latest:
-            if latest.get('season') and latest.get('episode'):
-                log.log(5, 'auto enabling expect_ep for %s' % series_name)
-                expect_ep = True
-        """
-
+        expect_id = False
+        if 'identified_by' not in config:
+            # set expect flags automatically
+        
+            # determine if series is known to be in season, episode format or idenfied by id
+            expect_ep = self.identified_by_ep(feed.session, series_name)
+            expect_id = self.identified_by_id(feed.session, series_name)
+            
+            if expect_ep and expect_id:
+                log.critical('Series %s cannot be determined to be either episodic or identified by id, ' % series_name +
+                             'you should specify either expect_ep or expect_id flag for it!')
+                expect_ep = False
+                expect_id = False
+        else:
+            # set expect flags manually from config
+            by = config.get('identified_by', 'auto')
+            if by not in ['ep', 'id', 'auto']:
+                raise PluginError('Unknown identified_by value %s for the series %s' % (by, series_name))          
+            expect_ep = by == 'ep'
+            expect_id = by == 'id'
+                         
         # don't try to parse these fields
         ignore_fields = ['uid', 'feed', 'url', 'original_url']
 
@@ -613,6 +665,7 @@ class FilterSeries(SeriesPlugin):
                 parser.name = series_name
                 parser.data = data
                 parser.expect_ep = expect_ep
+                parser.expect_id = expect_id
                 parser.ep_regexps = get_as_array(config, 'ep_regexp') + parser.ep_regexps
                 parser.id_regexps = get_as_array(config, 'id_regexp') + parser.id_regexps
                 parser.strict_name = config.get('exact', False)
@@ -637,14 +690,6 @@ class FilterSeries(SeriesPlugin):
                     break
             else:
                 continue
-
-            # check for auto enable expect_ep
-            """
-            if not expect_ep:
-                if parser.season and parser.episode:
-                    expect_ep = True
-                    log.log(5, 'auto enabling expect_ep for %s' % series_name)
-            """
 
             # add series, season and episode to entry
             entry['series_name'] = series_name
@@ -947,7 +992,7 @@ class FilterSeries(SeriesPlugin):
         log.debug('first_seen: %s' % first_seen)
         log.debug('timeframe expires: %s' % str(expires))
         
-        stop = feed.manager.options.stop_waiting == series_name
+        stop = feed.manager.options.stop_waiting == series_name.lower()
         if expires <= datetime.now() or stop:
             entry = self.parser2entry[best]
             if stop:
@@ -1050,5 +1095,5 @@ register_parser_option('--series', action='callback', callback=SeriesReport.opti
 register_parser_option('--series-forget', action='callback', callback=SeriesForget.optik_series_forget,
                        help='Remove complete series or single episode from database: <NAME> [EPISODE]')
 
-register_parser_option('--stop-waiting', action='store', dest='stop_waiting', default=False,
+register_parser_option('--stop-waiting', action='store', dest='stop_waiting', default='',
                        metavar='NAME', help='Stop timeframe for a given series.')
