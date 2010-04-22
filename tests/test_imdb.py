@@ -118,13 +118,13 @@ class TestScanImdb(FlexGetBase):
 
     def test_scan_imdb(self):
         self.execute_feed('test')
-        assert self.feed.find_entry(imdb_url='http://www.imdb.com/title/tt0330793'), \
+        assert self.feed.find_entry(imdb_url='http://www.imdb.com/title/tt0330793/'), \
             'Failed to pick url from test 1'
-        assert self.feed.find_entry(imdb_url='http://www.imdb.com/title/tt0472198'), \
+        assert self.feed.find_entry(imdb_url='http://www.imdb.com/title/tt0472198/'), \
             'Failed to pick url from test 2'
-        assert not self.feed.find_entry(imdb_url='http://www.imdb.com/title/tt66666'), \
+        assert not self.feed.find_entry(imdb_url='http://www.imdb.com/title/tt66666/'), \
             'Failed to ignore multiple imdb urls in test 4'
-        assert not self.feed.find_entry(imdb_url='http://www.imdb.com/title/tt99999'), \
+        assert not self.feed.find_entry(imdb_url='http://www.imdb.com/title/tt99999/'), \
             'Failed to ignore multiple imdb urls in test 4'
 
 

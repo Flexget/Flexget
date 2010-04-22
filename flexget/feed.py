@@ -58,6 +58,12 @@ class Entry(dict):
                 raise PluginError('Tried to set title to %s' % \
                     (repr(value)))
 
+        # TODO: HACK! Implement via plugin once #348 (entry events) is implemented
+        # enforces imdb_url in same format
+        if key == 'imdb_url':
+            from flexget.utils.imdb import extract_id
+            value = u'http://www.imdb.com/title/%s/' % extract_id(value)
+
         dict.__setitem__(self, key, value)
 
         # calculate uid

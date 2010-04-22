@@ -56,7 +56,7 @@ class FilterImdbQueue(object):
             # entry has imdb url
             if 'imdb_url' in entry:
                 # get an imdb id
-                if 'imdb_id' in entry and entry['imdb_id'] != None:
+                if 'imdb_id' in entry and entry['imdb_id'] is not None:
                     imdb_id = entry['imdb_id']
                 else:
                     imdb_id = extract_id(entry['imdb_url'])
@@ -79,7 +79,7 @@ class FilterImdbQueue(object):
                     # and remove from database
                     feed.session.delete(item)
                 else:
-                    log.debug("%s not in queue, skipping" % entry['title'])
+                    log.debug("%s not in queue with wanted quality, skipping" % entry['title'])
 
 
 class ImdbQueueManager(object):

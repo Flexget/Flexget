@@ -16,7 +16,7 @@ def extract_id(url):
         return m.group(1)
 
 
-class ImdbSearch:
+class ImdbSearch(object):
 
     def __init__(self):
         # de-prioritize aka matches a bit
@@ -187,7 +187,7 @@ class ImdbSearch:
         return movies
 
 
-class ImdbParser:
+class ImdbParser(object):
     """Quick-hack to parse relevant imdb details"""
 
     def __init__(self):
