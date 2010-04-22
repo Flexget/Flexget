@@ -241,9 +241,17 @@ class Manager(object):
             sys.exit(1)
         Session.configure(bind=self.engine)
         # create all tables, doesn't do anything to existing tables
-        if self.options.reset:
-            Base.metadata.drop_all(bind=self.engine)
-        Base.metadata.create_all(bind=self.engine)
+        from sqlalchemy.exc import OperationalError
+        try:
+            if self.options.reset:
+                Base.metadata.drop_all(bind=self.engine)
+            Base.metadata.create_all(bind=self.engine)
+        except OperationalError, e:
+            if os.path.exists(self.db_filename):
+                print >> sys.stderr, '%s - make sure you have write permissions to file %s' % (e.message, self.db_filename)
+            else:
+                print >> sys.stderr, '%s - make sure you have write permissions to directory %s' % (e.message, self.config_base)
+            raise Exception(e.message)
 
     def acquire_lock(self):
         if self.options.log_start:
@@ -375,10 +383,10 @@ class Manager(object):
                 failed.append(name)
                 log.exception('Feed %s process_start: %s' % (feed.name, e))
 
-        for name, feed in self.feeds.iteritems():
+        for feed in sorted(self.feeds.values()):
             if not feed.enabled:
                 continue
-            if name in failed:
+            if feed.name in failed:
                 continue
             try:
                 feed.execute()

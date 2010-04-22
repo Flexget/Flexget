@@ -133,6 +133,8 @@ class Feed(object):
         self.manager = manager
         self.enabled = True
         self.session = None
+        
+        self.priority = 65535
 
         # simple persistence
         self.simple_persistence = SimplePersistence(self)
@@ -157,6 +159,12 @@ class Feed(object):
         self.current_plugin = None
 
         self.performance = {}
+        
+    def __cmp__(self, other):
+        return cmp(self.priority, other.priority)
+        
+    def __str__(self):
+        return '<Feed(name=%s,aborted=%s)>' % (self.name, str(self._abort))
         
     def purge(self):
         """
