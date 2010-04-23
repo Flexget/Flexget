@@ -5,6 +5,44 @@ from flexget.plugin import *
 log = logging.getLogger('seenmovies')
 
 
+class RepairSeenMovies(object):
+
+    def on_process_start(self, feed):
+        if not feed.manager.options.repair_seen_movies:
+            return
+            
+        feed.manager.disable_feeds()
+        
+        from progressbar import ProgressBar, Percentage, Bar, ETA
+        from flexget.manager import Session
+        from filter_seen import SeenField
+        from flexget.utils.imdb import extract_id
+        
+        session = Session()
+
+        index = 0
+        count = 0
+        total = session.query(SeenField).filter(SeenField.field == u'imdb_url').count()
+        
+        widgets = ['Repairing: ', ETA(), ' ', Percentage(), ' ', Bar(left='[', right=']')]
+        bar = ProgressBar(widgets=widgets, maxval=total).start()
+        
+        for seen in session.query(SeenField).filter(SeenField.field == u'imdb_url').all():
+            index += 1
+            if (index % 5 == 0):
+                bar.update(index)
+            value = u'http://www.imdb.com/title/%s/' % extract_id(seen.value)
+            if value != seen.value:
+                count += 1
+                seen.value = value
+                seen.field = unicode('imdb_url')
+            
+        bar.finish()
+        session.commit()
+        
+        print 'Fixed %s/%s URLs' % (count, total)
+            
+            
 class FilterSeenMovies(FilterSeen):
     """
         Prevents movies being downloaded twice.
@@ -45,3 +83,7 @@ class FilterSeenMovies(FilterSeen):
                     feed.reject(entry, 'already accepted once in feed')
 
 register_plugin(FilterSeenMovies, 'seen_movies')
+register_plugin(RepairSeenMovies, '--repair-seen-movies', builtin=True)
+
+register_parser_option('--repair-seen-movies', action='store_true', dest='repair_seen_movies', default=False,
+                       help='Repair seen movies database (required only when upgrading from old problematic version)')
