@@ -5,7 +5,7 @@ from flexget.plugin import *
 log = logging.getLogger('urlrewrite')
 
 
-class UrlRewrite:
+class UrlRewrite(object):
     """
         Generic configurable urlrewriter.
         

@@ -802,8 +802,7 @@ class TestManipulate(FlexGetBase):
               - test
             manipulate:
               title:
-                from: title
-                regexp: '^PREFIX: (.*)'
+                extract: '^PREFIX: (.*)'
     """
 
     def testManipulate(self):
