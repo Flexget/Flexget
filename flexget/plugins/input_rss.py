@@ -15,7 +15,7 @@ from flexget.utils.tools import urlopener
 log = logging.getLogger('rss')
 
 
-class InputRSS:
+class InputRSS(object):
     """
         Parses RSS feed.
 
@@ -165,27 +165,37 @@ class InputRSS:
                 log.debug('ignoring feedparser.CharacterEncodingOverride')
                 ignore = True
             elif isinstance(ex, xml.sax._exceptions.SAXParseException):
-                log.critical('Invalid XML received from feed %s' % feed.name)
-                req = urlopener(url, log)
-                data = req.read()
-                ext = 'xml'
-                if '<html>' in data.lower():
-                    log.critical('Received content is HTML page, not an RSS feed')
-                    ext = 'html'
-                if 'login' in data.lower() or 'username' in data.lower():
-                    log.critical('Received content looks a bit like login page')
-                if 'error' in data.lower():
-                    log.critical('Received content looks a bit like error page')
-                import os
-                received = os.path.join(feed.manager.config_base, 'received')
-                if not os.path.isdir(received):
-                    os.mkdir(received)
-                filename = os.path.join(received, '%s.%s' % (feed.name, ext))
-                f = open(filename, 'w')
-                f.write(data)
-                f.close()
-                log.critical('I have saved the invalid content to %s for you to view' % filename)
-                raise PluginError('Received invalid RSS content')
+                if len(rss.entries) == 0:
+                    # save invalid data for review, this is a bit ugly but users seem to really confused when
+                    # html pages (login pages) are received 
+                    log.critical('Invalid XML received from feed %s' % feed.name)
+                    req = urlopener(url, log)
+                    data = req.read()
+                    ext = 'xml'
+                    if '<html>' in data.lower():
+                        log.critical('Received content is HTML page, not an RSS feed')
+                        ext = 'html'
+                    if 'login' in data.lower() or 'username' in data.lower():
+                        log.critical('Received content looks a bit like login page')
+                    if 'error' in data.lower():
+                        log.critical('Received content looks a bit like error page')
+                    import os
+                    received = os.path.join(feed.manager.config_base, 'received')
+                    if not os.path.isdir(received):
+                        os.mkdir(received)
+                    filename = os.path.join(received, '%s.%s' % (feed.name, ext))
+                    f = open(filename, 'w')
+                    f.write(data)
+                    f.close()
+                    log.critical('I have saved the invalid content to %s for you to view' % filename)
+                    raise PluginError('Received invalid RSS content')
+                else:
+                    msg = 'Invalid XML received. However feedparser still produced entries. Ignoring the error ...'
+                    if not config.get('silent', False):
+                        log.info(msg)
+                    else:
+                        log.debug(msg)
+                    ignore = True
             elif isinstance(ex, httplib.BadStatusLine) or \
                  isinstance(ex, IOError):
                 raise ex # let the @internet decorator handle
