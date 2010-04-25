@@ -88,21 +88,6 @@ class InputRSS(object):
             config = {}
         url = feed.get_input_url('rss')
 
-        # get input caching facility
-        cache = None
-        """
-        try:
-            cache = get_plugin_by_name('input_cache').instance
-        except PluginDependencyError:
-            pass
-        """
-        
-        # check if cache is available for this url
-        if cache:
-            if cache.restore(feed, url):
-                log.info('Using cached data')
-                return
-
         # use basic auth when needed
         if 'username' in config and 'password' in config:
             url = self.passwordize(url, config['username'], config['password'])
@@ -324,9 +309,5 @@ class InputRSS(object):
         if ignored:
             if not config.get('silent'):
                 log.warning('Skipped %s RSS-entries without required information (title, link or enclosures)' % ignored)
-
-        # store to cache
-        if cache:
-            cache.store(feed, url)
 
 register_plugin(InputRSS, 'rss')
