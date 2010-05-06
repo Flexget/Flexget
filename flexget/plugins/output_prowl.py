@@ -15,7 +15,8 @@ class OutputProwl:
     """
     prowl:
       apikey: xxxxxxx
-      [event: event title]
+      [application: application name, default FlexGet]
+      [event: event title, default New Release]
       [priority: -2 - 2 (2 = highest), default 0]
     """
     
@@ -23,6 +24,7 @@ class OutputProwl:
         from flexget import validator
         config = validator.factory('dict')
         config.accept('text', key='apikey', required=True)
+        config.accept('text', key='application')
         config.accept('text', key='event')
         config.accept('number', key='priority')
         return config
@@ -36,6 +38,7 @@ class OutputProwl:
             # get the parameters
             config = feed.config['prowl']
             apikey = config['apikey']
+            application = config.get('application', 'FlexGet')
             event = config.get('event', 'New release')
             priority = config.get('priority', 0)
             description = entry['title']
@@ -44,7 +47,7 @@ class OutputProwl:
             h = HTTPSConnection('prowl.weks.net')
             
             # Send the request
-            data = {'priority': priority, 'application': 'FlexGet', 'apikey': apikey, 'event': event, 'description': description}
+            data = {'priority': priority, 'application': application, 'apikey': apikey, 'event': event, 'description': description}
             h.request("POST", "/publicapi/add", headers=headers, body=urlencode(data))
 
             # Check if it succeeded
