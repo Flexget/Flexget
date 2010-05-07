@@ -322,6 +322,10 @@ class TestPropers(FlexGetBase):
                   min_quality: HR
                   max_quality: 1080p
               - V
+              - tftest:
+                  propers: 3 hours 
+              - notest:
+                  propers: no    
 
         feeds:
           propers_1:
@@ -367,9 +371,48 @@ class TestPropers(FlexGetBase):
           min_max_quality_2:
             mock:
               - {title: 'asfd.S01E01.720p.Proper-FlexGet'}
+          
+          proper_timeframe_1:
+            mock:
+              - {title: 'TFTest.S01E01.720p-FlexGet'}
+              
+          proper_timeframe_2:
+            mock:
+              - {title: 'TFTest.S01E01.720p.proper-FlexGet'}
+        
+          no_propers_1:
+            mock:
+              - {title: 'NoTest.S01E01.720p-FlexGet'}
+              
+          no_propers_2:
+            mock:
+              - {title: 'NoTest.S01E01.720p.proper-FlexGet'}
+                
+              
         """
+    
+    def test_propers_timeframe(self):
+        """Series plugin: propers timeframe"""    
+        self.execute_feed('proper_timeframe_1')
+        assert self.feed.find_entry('accepted', title='TFTest.S01E01.720p-FlexGet'), \
+            'Did not accept before timeframe'
+        
+        # let 6 hours pass
+        age_series(hours=6)
+        
+        self.execute_feed('proper_timeframe_2')
+        assert self.feed.find_entry('rejected', title='TFTest.S01E01.720p.proper-FlexGet'), \
+            'Did not reject after proper timeframe'
+ 
+    def test_no_propers(self):
+        """Series plugin: no propers at all"""
+        self.execute_feed('no_propers_1')
+        assert len(self.feed.accepted) == 1, 'broken badly'
+        self.execute_feed('no_propers_2')
+        assert len(self.feed.rejected) == 1, 'accepted proper'
 
     def test_min_max_propers(self):
+        """Series plugin: min max propers"""
         self.execute_feed('min_max_quality_1')
         assert len(self.feed.accepted) == 1, 'uhh, broken badly'
         self.execute_feed('min_max_quality_2')

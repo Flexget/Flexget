@@ -80,6 +80,7 @@ class SeriesPlugin(object):
         episode = session.query(Episode).select_from(join(Episode, Series)).\
             filter(Series.name == parser.name.lower()).filter(Episode.identifier == parser.identifier).first()
         if not episode:
+            log.log(5, '%s not seen, return current time' % parser)
             return datetime.now()
         return episode.first_seen
 
@@ -439,6 +440,9 @@ class FilterSeries(SeriesPlugin):
             options.accept('list', key='qualities').accept('text')   # TODO: ^^
             options.accept('text', key='min_quality')                # TODO: ^^
             options.accept('text', key='max_quality')                # TODO: ^^
+            # propers
+            options.accept('boolean', key='propers')
+            options.accept('regexp_match', key='propers').accept('\d+ (minutes|hours|days|weeks)') 
             # expect flags
             options.accept('text', key='identified_by')
             # timeframe
@@ -751,7 +755,7 @@ class FilterSeries(SeriesPlugin):
 
             # proper handling
             log.debug('-' * 20 + ' process_propers -->')
-            removed, new_propers = self.process_propers(feed, eps)
+            removed, new_propers = self.process_propers(feed, config, eps)
             whitelist.extend(new_propers)
 
             for ep in removed:
@@ -813,7 +817,7 @@ class FilterSeries(SeriesPlugin):
                 reason = 'choose best'
             self.accept_series(feed, best, reason)
 
-    def process_propers(self, feed, eps):
+    def process_propers(self, feed, config, eps):
         """
             Rejects downloaded propers, nukes episodes from which there exists proper.
             Returns a list of removed episodes and a list of new propers.
@@ -853,6 +857,38 @@ class FilterSeries(SeriesPlugin):
                 if ep.quality == proper.quality:
                     feed.reject(self.parser2entry[ep], 'nuked')
                     removed.append(ep)
+                    
+        # nuke propers after timeframe
+        if 'propers' in config:
+            if isinstance(config['propers'], bool):
+                if not config['propers']:
+                    # no propers
+                    for proper in new_propers[:]:
+                        feed.reject(self.parser2entry[proper], 'no propers')
+                        removed.append(proper)
+                        new_propers.remove(proper)
+            else:
+                # propers with timeframe
+                amount, unit = config['propers'].split(' ')   
+                log.debug('amount: %s unit: %s' % (repr(amount), repr(unit)))
+                params = {unit: int(amount)}
+                try:
+                    timeframe = timedelta(**params)
+                except TypeError:
+                    raise PluginWarning('Invalid time format', log)
+                    
+                first_seen = self.get_first_seen(feed.session, eps[0])
+                expires = first_seen + timeframe
+                log.debug('propers timeframe: %s' % timeframe)
+                log.debug('first_seen: %s' % first_seen)
+                log.debug('propers ignore after: %s' % str(expires))
+                
+                if datetime.now() > expires:
+                    log.debug('propers timeframe expired')
+                    for proper in new_propers[:]:
+                        feed.reject(self.parser2entry[proper], 'propers timeframe expired')
+                        removed.append(proper)
+                        new_propers.remove(proper)
 
         log.debug('new_propers: %s' % [e.data for e in new_propers])
         return removed, new_propers
