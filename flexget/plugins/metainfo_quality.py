@@ -22,18 +22,17 @@ class MetainfoQuality(object):
             if not feed.config['metainfo_quality']:
                 return
         for entry in feed.entries:
-            quals = qualities.all()
-            for quality in quals:
+            found_quality = qualities.UnknownQuality()
+            for qualname, quality in qualities.registry.iteritems():
                 for field_name, field_value in entry.iteritems():
                     if not isinstance(field_value, basestring):
                         continue
-                    if quality.name.lower() in field_value.lower():
-                        quality_name = qualities.common_name(quality.name)
-                        entry['quality'] = quality_name
-                        log.log(5, 'Found quality %s (%s) for %s from field %s' % \
-                            (quality_name, quality.name, entry['title'], field_name))
-                        break
-                if 'quality' in entry:
-                    break
+                    if qualname.lower() in field_value.lower():
+                        if quality > found_quality:
+                            found_quality = quality
+            entry['quality'] = found_quality.name
+            log.log(5, 'Found quality %s (%s) for %s from field %s' % \
+            (entry['quality'], quality, entry['title'], field_name))
+                            
             
 register_plugin(MetainfoQuality, 'metainfo_quality', builtin=True)
