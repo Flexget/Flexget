@@ -76,4 +76,4 @@ class CacheClearer:
         global cache
         cache = {}
 
-register_plugin(CacheClearer, 'cache_clearer')
+register_plugin(CacheClearer, 'cache_clearer', builtin=True)

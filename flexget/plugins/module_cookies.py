@@ -53,12 +53,17 @@ class PluginCookies:
         failed = 0
 
         log.debug('fetching all cookies')
+        
+        def notabs(val):
+            if isinstance(val, basestring):
+                return val.replace('\t', '')
+            return val
 
         while True:
             try:
                 item = cur.next()
                 # remove \t from item (#582)
-                item = [si.replace('\t', '') for si in item]
+                item = [notabs(field) for field in item]
                 try:
                     s.write('%s\t%s\t%s\t%s\t%s\t%s\t%s\n' % (item[0], ftstr[item[0].startswith('.')], item[1],
                                                               ftstr[item[2]], item[3], item[4], item[5]))
