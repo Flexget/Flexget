@@ -136,7 +136,7 @@ class SeriesPlugin(object):
 
     def get_latest_download(self, session, name):
         """Return latest downloaded episode (season, episode, name) for series name"""
-        series = session.query(Series).filter(Series.name == name).first()
+        series = session.query(Series).filter(Series.name == name.lower()).first()
         if not series:
             log.debug('get_latest_download returning false, series %s does not exists' % name)
             return False
