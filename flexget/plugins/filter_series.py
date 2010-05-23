@@ -36,7 +36,7 @@ class Episode(Base):
 
     series_id = Column(Integer, ForeignKey('series.id'), nullable=False)
     releases = relation('Release', backref='episode', cascade='all, delete, delete-orphan')
-    
+
     @property
     def age(self):
         diff = datetime.now() - self.first_seen
@@ -47,7 +47,7 @@ class Episode(Base):
             age += '%sd ' % age_days
         age += '%sh' % age_hours
         return age
-    
+
     def __init__(self):
         self.first_seen = datetime.now()
 
@@ -97,13 +97,13 @@ class SeriesPlugin(object):
         #log.log(5, 'get_latest_info, series: %s season: %s episode: %s' % \
         #    (name, episode.season, episode.number))
         return {'season': episode.season, 'episode': episode.number, 'name': name}
-        
+
     def identified_by_ep(self, session, name, min=4, min_percent=50):
         """Determine if series :name: should be considered episodic"""
         series = session.query(Series).filter(Series.name == name).first()
         if not series:
             return False
-        
+
         total = len(series.episodes)
         if total < min:
             return False
@@ -115,7 +115,7 @@ class SeriesPlugin(object):
         log.debug('series %s episodic check: %s/%s (%s percent)' % (name, episodic, total, percent))
         if percent > min_percent:
             return True
-            
+
     def identified_by_id(self, session, name, min=4, min_percent=50):
         """Determine if series :name: should be considered identified by id"""
         series = session.query(Series).filter(Series.name == name).first()
@@ -138,6 +138,7 @@ class SeriesPlugin(object):
         """Return latest downloaded episode (season, episode, name) for series name"""
         series = session.query(Series).filter(Series.name == name).first()
         if not series:
+            log.debug('get_latest_download returning false, series %s does not exists' % name)
             return False
 
         latest_season = 0
@@ -154,9 +155,10 @@ class SeriesPlugin(object):
                 latest_episode = episode.number
 
         if latest_season == 0 or latest_episode == 0:
+            log.debug('get_latest_download returning false, latest_season: %s latest_episode: %s' % (latest_season, latest_episode))
             return False
-                
-        return {'season': latest_season, 'episode': latest_episode, 'name': name} 
+
+        return {'season': latest_season, 'episode': latest_episode, 'name': name}
 
     def get_releases(self, session, name, identifier):
         """Return all releases for series by identifier."""
@@ -259,7 +261,7 @@ class SeriesReport(SeriesPlugin):
     def display_details(self):
         """Display detailed series information"""
         from flexget.manager import Session
-        
+
         session = Session()
 
         name = unicode(self.options['name'].lower())
@@ -272,12 +274,12 @@ class SeriesReport(SeriesPlugin):
         print '-' * 79
 
         for episode in series.episodes:
-        
+
             if episode.identifier is None:
                 print ' None <--- Broken!'
             else:
                 print ' %s - %s' % (episode.identifier, episode.age)
-            
+
             for release in episode.releases:
                 status = release.quality
                 title = release.title
@@ -442,7 +444,7 @@ class FilterSeries(SeriesPlugin):
             options.accept('text', key='max_quality')                # TODO: ^^
             # propers
             options.accept('boolean', key='propers')
-            options.accept('regexp_match', key='propers').accept('\d+ (minutes|hours|days|weeks)') 
+            options.accept('regexp_match', key='propers').accept('\d+ (minutes|hours|days|weeks)')
             # expect flags
             options.accept('text', key='identified_by')
             # timeframe
@@ -628,6 +630,33 @@ class FilterSeries(SeriesPlugin):
                 return [v]
             return v
 
+        # expect flags
+
+        expect_ep = False
+        expect_id = False
+
+        identified_by = config.get('identified_by', 'auto')
+        if identified_by not in ['ep', 'id', 'auto']:
+            raise PluginError('Unknown identified_by value %s for the series %s' % (identified_by, series_name))
+
+        if 'identified_by' == 'auto':
+            # set expect flags automatically
+
+            # determine if series is known to be in season, episode format or identified by id
+            expect_ep = self.identified_by_ep(feed.session, series_name)
+            expect_id = self.identified_by_id(feed.session, series_name)
+
+            # in case identified by both, we have a unresolvable situation
+            if expect_ep and expect_id:
+                log.critical('Series %s cannot be determined to be either episodic or identified by id, ' % series_name +
+                             'you should specify `identified_by` (ep|id) for it!')
+                expect_ep = False
+                expect_id = False
+        else:
+            # set expect flags manually from config
+            expect_ep = identified_by == 'ep'
+            expect_id = identified_by == 'id'
+
         # helper function, iterate entry fields in certain order
         def field_order(a, b):
             order = ['title', 'description']
@@ -640,29 +669,6 @@ class FilterSeries(SeriesPlugin):
 
             return cmp(index(a), index(b))
 
-        # expect flags
-        expect_ep = False
-        expect_id = False
-        if 'identified_by' not in config:
-            # set expect flags automatically
-        
-            # determine if series is known to be in season, episode format or idenfied by id
-            expect_ep = self.identified_by_ep(feed.session, series_name)
-            expect_id = self.identified_by_id(feed.session, series_name)
-            
-            if expect_ep and expect_id:
-                log.critical('Series %s cannot be determined to be either episodic or identified by id, ' % series_name +
-                             'you should specify either expect_ep or expect_id flag for it!')
-                expect_ep = False
-                expect_id = False
-        else:
-            # set expect flags manually from config
-            by = config.get('identified_by', 'auto')
-            if by not in ['ep', 'id', 'auto']:
-                raise PluginError('Unknown identified_by value %s for the series %s' % (by, series_name))          
-            expect_ep = by == 'ep'
-            expect_id = by == 'id'
-                         
         # don't try to parse these fields
         ignore_fields = ['uid', 'feed', 'url', 'original_url']
 
@@ -714,7 +720,7 @@ class FilterSeries(SeriesPlugin):
                 entry['series_episode'] = parser.episode
             else:
                 import time
-                entry['series_season'] = time.gmtime().tm_year 
+                entry['series_season'] = time.gmtime().tm_year
             entry['series_id'] = parser.identifier
 
             # set custom download path
@@ -857,7 +863,7 @@ class FilterSeries(SeriesPlugin):
                 if ep.quality == proper.quality:
                     feed.reject(self.parser2entry[ep], 'nuked')
                     removed.append(ep)
-                    
+
         # nuke propers after timeframe
         if 'propers' in config:
             if isinstance(config['propers'], bool):
@@ -869,20 +875,20 @@ class FilterSeries(SeriesPlugin):
                         new_propers.remove(proper)
             else:
                 # propers with timeframe
-                amount, unit = config['propers'].split(' ')   
+                amount, unit = config['propers'].split(' ')
                 log.debug('amount: %s unit: %s' % (repr(amount), repr(unit)))
                 params = {unit: int(amount)}
                 try:
                     timeframe = timedelta(**params)
                 except TypeError:
                     raise PluginWarning('Invalid time format', log)
-                    
+
                 first_seen = self.get_first_seen(feed.session, eps[0])
                 expires = first_seen + timeframe
                 log.debug('propers timeframe: %s' % timeframe)
                 log.debug('first_seen: %s' % first_seen)
                 log.debug('propers ignore after: %s' % str(expires))
-                
+
                 if datetime.now() > expires:
                     log.debug('propers timeframe expired')
                     for proper in new_propers[:]:
@@ -932,7 +938,7 @@ class FilterSeries(SeriesPlugin):
 
     def process_quality(self, feed, config, eps):
         """Accepts episodes that meet configured qualities"""
-        
+
         min = qualities.min()
         max = qualities.max()
         if 'quality' in config:
@@ -979,8 +985,9 @@ class FilterSeries(SeriesPlugin):
 
         current = eps[0]
         latest = self.get_latest_download(feed.session, current.name)
-        log.debug('latest: %s' % latest)
+        log.debug('latest download: %s' % latest)
         log.debug('current: %s' % current)
+
         if latest:
             # allow few episodes "backwards" in case of missed eps
             grace = len(series) + 2
@@ -1039,7 +1046,7 @@ class FilterSeries(SeriesPlugin):
         log.debug('timeframe: %s' % timeframe)
         log.debug('first_seen: %s' % first_seen)
         log.debug('timeframe expires: %s' % str(expires))
-        
+
         stop = feed.manager.options.stop_waiting.lower() == series_name.lower()
         if expires <= datetime.now() or stop:
             entry = self.parser2entry[best]
@@ -1057,10 +1064,10 @@ class FilterSeries(SeriesPlugin):
         else:
             # verbose waiting, add to backlog
             diff = expires - datetime.now()
-            
+
             hours, remainder = divmod(diff.seconds, 3600)
             minutes, seconds = divmod(remainder, 60)
-            
+
             entry = self.parser2entry[best]
             log.info('Timeframe waiting %s for %sh:%smin, currently best is %s' % \
                 (series_name, hours, minutes, entry['title']))
@@ -1081,7 +1088,7 @@ class FilterSeries(SeriesPlugin):
             Accepts all wanted qualities.
             Accepts whitelisted episodes even if downloaded.
         """
-        
+
         # get list of downloaded releases
         downloaded_releases = self.get_downloaded(feed.session, eps[0].name, eps[0].identifier)
         log.debug('downloaded_releases: %s' % downloaded_releases)
