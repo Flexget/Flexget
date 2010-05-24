@@ -230,8 +230,11 @@ class ImdbParser(object):
         tag_name = soup.find('h1')
         if tag_name:
             if tag_name.next:
-                self.name = tag_name.next.string.strip()
-                log.debug('Detected name: %s' % self.name)
+                # Handle a page not found in IMDB. tag_name.string is 
+                # "<br/> Page Not Found" and there is no next tag. Thus, None.
+                if tag_name.next.string != None:
+                    self.name = tag_name.next.string.strip()
+                    log.debug('Detected name: %s' % self.name)
         else:
             log.warning('Unable to get name for %s - plugin needs update?' % url)
             
