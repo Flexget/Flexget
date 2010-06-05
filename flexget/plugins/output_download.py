@@ -49,6 +49,7 @@ class PluginDownload:
         advanced = root.accept('dict')
         advanced.accept('path', key='path')
         advanced.accept('boolean', key='fail_html')
+        advanced.accept('boolean', key='overwrite')
         return root
 
     def get_config(self, feed):
@@ -305,8 +306,9 @@ class PluginDownload:
                 if filecmp.cmp(entry['file'], destfile):
                     log.debug("Identical destination file '%s' already exists", destfile)
                     return
+                elif config.get('overwrite'):
+                    log.debug("Overwriting already existing file %s" % destfile)
                 else:
-                    # TODO: Rethink the best course of action in this case.
                     log.info('File \'%s\' already exists and is not identical, download failed.' % destfile)
                     feed.fail(entry, 'File \'%s\' already exists and is not identical.' % destfile)
                     return
