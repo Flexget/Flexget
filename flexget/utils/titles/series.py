@@ -36,11 +36,11 @@ class SeriesParser(TitleParser):
         self.strict_name = False
 
         self.ep_regexps = ['s(\d+)e(\d+)', 's(\d+)ep(\d+)', 's(\d+).e(\d+)', \
-                           '[^\d]([\d]{1,2})[\s]?x[\s]?(\d+)']
+                           '(?:^|\D)([\d]{1,2})[\s]?x[\s]?(\d+)']
         self.id_regexps = ['(\d\d\d\d).(\d+).(\d+)', '(\d+).(\d+).(\d\d\d\d)', \
                            '(\d\d\d\d)x(\d+)\.(\d+)', \
                            '(pt|part)\s?(\d+|IX|IV|V?I{0,3})', \
-                           '[^s\d](\d{1,3})(?:[^p\d]|$)']
+                           '(?:^|[^s\d])(\d{1,3})(?:[^p\d]|$)']
         self.clean_regexps = ['\[.*?\]', '\(.*?\)']
         self.name_regexps = []
 
@@ -121,7 +121,7 @@ class SeriesParser(TitleParser):
             res = re.sub(blank + '+', ' ', name)
             res = res.strip()
             res = re.sub(' +', blank + '*', res)
-            res = '^' + (blank + '*') + res + (blank + '+')
+            res = '^(?:\[[^\[\]]*\])?' + (blank + '*') + '(' + res + ')' + (blank + '+')
             return res
 
         log.debug('name: %s data: %s' % (name, data))
@@ -137,10 +137,9 @@ class SeriesParser(TitleParser):
             name_matches = False
             # use all specified regexps to this data
             for name_re in self.name_regexps:
-                match = re.search(name_re, data, re.IGNORECASE | re.UNICODE)
+                match = re.search(name_re, self.data, re.IGNORECASE | re.UNICODE)
                 if match:
-                    name_start = match.start()
-                    name_end = match.end()
+                    name_start, name_end = match.span()
                     name_matches = True
                     break
             if not name_matches:
@@ -150,13 +149,12 @@ class SeriesParser(TitleParser):
         else:
             # Use a regexp generated from the name as a fallback.
             name_re = name_to_re(name)
-            match = re.search(name_re, data, re.IGNORECASE | re.UNICODE)
+            match = re.search(name_re, self.data, re.IGNORECASE | re.UNICODE)
             if not match:
                 #log.debug('FAIL: regexp %s does not match %s' % (name_re, data))
                 # leave this invalid
                 return
-            name_start = match.start()
-            name_end = match.end()
+            name_start, name_end = match.span(1)
 
         # from group
         if self.from_group:
@@ -169,42 +167,25 @@ class SeriesParser(TitleParser):
 
         # search tags and quality
         log.debug('parsing quality ->')
+        #remove series name from raw data
+        data_noname = self.data[:name_start] + self.data[name_end:]
+        log.debug('data noname: %s' % data_noname)
+        self.quality = qualities.parse_quality(data_noname).name
+        
         for part in data_parts:
-            log.log(5, 'testing %s for quality' % part)
-            if part in qualities.registry:
-                log.log(5, 'part %s is a known quality' % part)
-                if qualities.get(part).value > qualities.get(self.quality).value:
-                    quality = qualities.get(part).name
-                    log.debug('%s quality is %s (from %s)' % (self.name, quality, part))
-                    self.quality = quality
-                else:
-                    pass
-                    #log.debug('%s ignoring quality tag %s because found better %s' % (self.name, part, self.quality))
             if part in self.propers:
                 self.proper_or_repack = True
             if part in self.specials:
                 self.special = True
-
+        
         # Remove unwanted words (qualities and such) from data for ep / id
         # parsing need to remove them from the original string, as they
         # might not match to cleaned string.
         # Ensure the series name isn't accidentally munged.
-        pre_data = ''
-        if name_start:
-            pre_data = self.remove_words(self.data[0:name_start-1], self.remove + qualities.registry.keys() + self.codecs + self.sounds)
-            pre_data = self.clean(pre_data)
-            pre_data = remove_dirt(pre_data)
-            name_start -= len(pre_data)
-        post_data = ''
-        if name_end < len(self.data) - 1:
-            post_data = self.remove_words(self.data[name_end:], self.remove + qualities.registry.keys() + self.codecs + self.sounds)
-            post_data = self.clean(post_data)
-            post_data = remove_dirt(post_data)
-            name_end -= len(pre_data)
 
-        # remove series name from the data
-        # TODO: stripping leading space from this will cause unit tests to fail -> investigate
-        data = ' '.join([pre_data, post_data])
+        data = self.remove_words(self.data[name_end:], self.remove + qualities.registry.keys() + self.codecs + self.sounds)
+        data = remove_dirt(data)
+        data = self.clean(data)
 
         log.debug("data for id/ep parsing '%s'" % data)
 
@@ -238,7 +219,7 @@ class SeriesParser(TitleParser):
             # ressu: Added matching for 0101, 0102... It will fail on
             #        season 11 though
             log.debug('expect_ep enabled')
-            match = re.search('\D(0?\d)(\d\d)\D', data, re.IGNORECASE | re.UNICODE)
+            match = re.search('(?:^|\D)(0?\d)(\d\d)\D', data, re.IGNORECASE | re.UNICODE)
             if match:
                 # strict_name
                 if self.strict_name:

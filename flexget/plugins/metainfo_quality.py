@@ -22,15 +22,14 @@ class MetainfoQuality(object):
             if not feed.config['metainfo_quality']:
                 return
         for entry in feed.entries:
-            found_quality = qualities.UnknownQuality()
-            for qualname, quality in qualities.registry.iteritems():
-                for field_name, field_value in entry.iteritems():
-                    if not isinstance(field_value, basestring):
-                        continue
-                    if qualname.lower() in field_value.lower():
-                        if quality > found_quality:
-                            found_quality = quality
-            entry['quality'] = found_quality.name
+            best_quality = qualities.UnknownQuality()
+            for field_name, field_value in entry.iteritems():
+                if not isinstance(field_value, basestring):
+                    continue
+                quality = qualities.parse_quality(field_value)
+                if quality > best_quality:
+                    best_quality = quality
+            entry['quality'] = best_quality.name
             log.log(5, 'Found quality %s (%s) for %s from field %s' % \
             (entry['quality'], quality, entry['title'], field_name))
                             

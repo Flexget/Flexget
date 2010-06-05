@@ -132,6 +132,7 @@ class TestMetainfoQuality(FlexGetBase):
           test:
             mock:
               - {title: 'FooBar.S01E02.720p.HDTV'}
+              - {title: 'ShowB.S04E19.Name of Ep.720p.WEB-DL.DD5.1.H.264'}
     """
 
     def test_quality(self):
@@ -140,6 +141,10 @@ class TestMetainfoQuality(FlexGetBase):
         assert entry, 'entry not found?'
         assert 'quality' in entry, 'failed to pick up quality'
         assert entry['quality'] == '720p', 'picked up wrong quality %s' % entry.get('quality', None)
+        entry = self.feed.find_entry(title='ShowB.S04E19.Name of Ep.720p.WEB-DL.DD5.1.H.264')
+        assert entry, 'entry not found?'
+        assert 'quality' in entry, 'failed to pick up quality'
+        assert entry['quality'] == 'web-dl', 'picked up wrong quality %s' % entry.get('quality', None)
 
 
 class TestEntryUnicodeError(FlexGetBase):

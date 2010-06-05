@@ -113,3 +113,13 @@ def common_name(name):
     ie.
     names 1280x720, 720 and 720p will all return 720p"""
     return registry.get(name.lower(), UnknownQuality()).name
+
+
+def parse_quality(title):
+    """Find the highest know quality in a given string"""
+    bestfound = UnknownQuality()
+    for qual in registry:
+        if qual.lower() in title.lower():
+            if registry[qual] > bestfound:
+                bestfound = registry[qual]
+    return bestfound

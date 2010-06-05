@@ -121,7 +121,10 @@ class TestSeriesParser(object):
         assert s.quality == '720p', 'failed to parse quality from %s' % s.data
 
         s = self.parse(name='30 Suck', data='30 Suck 4x4 [HDTV - FlexGet]')
-        assert s.quality == 'hdtv', 'failed to parse quality %s' % s
+        assert s.quality == 'hdtv', 'failed to parse quality %s' % s.data
+
+        s = self.parse(name='ShowB', data='ShowB.S04E19.Name of Ep.720p.WEB-DL.DD5.1.H.264')
+        assert s.quality == 'web-dl', 'failed to parse quality %s' % s.data
 
     def test_quality_parenthesis(self):
         """SeriesParser: quality in parenthesis"""
@@ -130,6 +133,10 @@ class TestSeriesParser(object):
         assert (s.quality == '720p'), 'failed to parse quality from %s' % s.data
 
         s = self.parse(name='Foo Bar', data='Foo.Bar.S01E01.(720p).HDTV.x264-FlexGet')
+        assert (s.season == 1 and s.episode == 1), 'failed to parse episodes from %s' % s.data
+        assert (s.quality == '720p'), 'failed to parse quality from %s' % s.data
+
+        s = self.parse(name='Foo Bar', data='[720p]Foo.Bar.S01E01.HDTV.x264-FlexGet')
         assert (s.season == 1 and s.episode == 1), 'failed to parse episodes from %s' % s.data
         assert (s.quality == '720p'), 'failed to parse quality from %s' % s.data
 
