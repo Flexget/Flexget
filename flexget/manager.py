@@ -147,6 +147,7 @@ class Manager(object):
 
         file = open(fn)
         line_num = 0
+        duplicates = {}
         # flags
         prev_indentation = 0
         prev_mapping = False
@@ -184,6 +185,18 @@ class Manager(object):
             if prev_list and not prev_mapping and indentation > prev_indentation:
                 # after a list item that does NOT start mapping indentation increases
                 log.warning('Config line %s is likely missing ":" at the end' % (line_num - 1))
+
+            # notify if user is trying to set same key multiple times in a feed (a common mistake)
+            for level in duplicates.iterkeys():
+                # when indentation goes down, delete everything indented more than that
+                if indentation < level:
+                    duplicates[level] = {}
+            if ':' in line:
+                name = line.split(':', 1)[0].strip()
+                ns = duplicates.setdefault(indentation, {})
+                if name in ns:
+                    log.warning('Trying to set value for `%s` in the line %s, but it is already defined in the line %s!' % (name, line_num, ns[name]))
+                ns[name] = line_num
 
             prev_indentation = indentation
             # this line is a mapping (ends with :)
