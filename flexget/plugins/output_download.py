@@ -17,29 +17,29 @@ class PluginDownload:
 
     """
         Downloads content from entry url and writes it into a file.
-        
+
         Example:
 
         download: ~/torrents/
-        
+
         Allow HTML content:
-        
+
         By default download plugin reports failure if received content
         is a html. Usually this is some sort of custom error page without
-        proper http code and thus entry is assumed to be downloaded 
+        proper http code and thus entry is assumed to be downloaded
         incorrectly.
-        
+
         In the rare case you actually need to retrieve html-pages you must
         disable this feature.
-        
+
         download:
           path: ~/something/
           fail_html: no
 
-        You may use commandline parameter --dl-path to temporarily override 
+        You may use commandline parameter --dl-path to temporarily override
         all paths to another location.
     """
-    
+
     def validator(self):
         """Return config validator"""
         from flexget import validator
@@ -63,7 +63,7 @@ class PluginDownload:
                 config['path'] = feed.config['download']
             config['fail_html'] = True
         return config
-        
+
     def on_process_start(self, feed):
         """
             Register the usable set: keywords.
@@ -132,7 +132,7 @@ class PluginDownload:
         else:
             decompressor = None
 
-        # generate temp file, with random md5 sum .. 
+        # generate temp file, with random md5 sum ..
         # url alone is not random enough, it has happened that there are two entries with same url
         import hashlib
         m = hashlib.md5()
@@ -142,7 +142,7 @@ class PluginDownload:
         if not os.path.isdir(tmp_path):
             logging.debug('creating tmp_path %s' % tmp_path)
             os.mkdir(tmp_path)
-        datafile = os.path.join(tmp_path, m.hexdigest()) 
+        datafile = os.path.join(tmp_path, m.hexdigest())
 
         # download and write data into a temp file
         buffer_size = 1024
@@ -181,7 +181,7 @@ class PluginDownload:
         import email
 
         data = str(response.info())
-        
+
         # try to decode/encode, afaik this is against the specs but some servers do it anyway
         try:
             data = data.decode('utf-8')
@@ -192,11 +192,11 @@ class PluginDownload:
                 log.debug('response info unicoded')
             except:
                 pass
-        
-        # now we should have unicode string, let's convert into proper format where non-ascii 
+
+        # now we should have unicode string, let's convert into proper format where non-ascii
         # chars are entities
         data = encode_html(data)
-        
+
         try:
             filename = email.message_from_string(data).get_filename(failobj=False)
         except:
@@ -286,7 +286,7 @@ class PluginDownload:
                     os.makedirs(path)
                 except:
                     raise PluginError('Cannot create path %s' % path, log)
-            
+
             # check that temp file is present
             if not os.path.exists(entry['file']):
                 tmp_path = os.path.join(feed.manager.config_base, 'temp')
@@ -312,10 +312,10 @@ class PluginDownload:
                     log.info('File \'%s\' already exists and is not identical, download failed.' % destfile)
                     feed.fail(entry, 'File \'%s\' already exists and is not identical.' % destfile)
                     return
-            
+
             # move temp file
             logging.debug('moving %s to %s' % (entry['file'], destfile))
-            
+
             try:
                 shutil.move(entry['file'], destfile)
             except OSError, err:

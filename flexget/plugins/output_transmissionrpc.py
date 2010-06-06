@@ -3,7 +3,8 @@ from netrc import netrc, NetrcParseError
 import logging
 from flexget.plugin import *
 from flexget import validator
-log = logging.getLogger('transmissionrpc')
+
+log = logging.getLogger('transmission')
 
 
 class PluginTransmissionrpc:
@@ -19,17 +20,15 @@ class PluginTransmissionrpc:
         username: myusername
         password: mypassword
         path: the download location
-        debug: True
-        removewhendone: True
+        removewhendone: yes
 
     Default values for the config elements:
 
     transmissionrpc:
         host: localhost
         port: 9091
-        enabled: True
-        debug: False
-        removewhendone: False
+        enabled: yes
+        removewhendone: no
     """
 
     def validator(self):
@@ -38,7 +37,7 @@ class PluginTransmissionrpc:
         advanced = root.accept('dict')
         advanced.accept('text', key='host')
         advanced.accept('number', key='port')
-        """note that password is optional in transmission"""
+        # note that password is optional in transmission
         advanced.accept('file', key='netrc', required=False)
         advanced.accept('text', key='username', required=False)
         advanced.accept('text', key='password', required=False)
@@ -49,8 +48,6 @@ class PluginTransmissionrpc:
         advanced.accept('number', key='maxdownspeed', required=False)
         advanced.accept('decimal', key='ratio', required=False)
         advanced.accept('boolean', key='enabled')
-        advanced.accept('boolean', key='debug')
-        advanced.accept('text', key='loglevel')
         advanced.accept('boolean', key='removewhendone')
         return root
 
@@ -59,14 +56,13 @@ class PluginTransmissionrpc:
         if isinstance(config, bool):
             config = {'enabled': config}
         config.setdefault('enabled', True)
-        config.setdefault('debug', False)
         config.setdefault('host', 'localhost')
         config.setdefault('port', 9091)
         config.setdefault('removewhendone', False)
         return config
 
     def on_process_start(self, feed):
-        '''event handler'''
+        """Event handler"""
         self.client = None
         set_plugin = get_plugin_by_name('set')
         set_plugin.instance.register_keys({'path': 'text', \
@@ -82,7 +78,7 @@ class PluginTransmissionrpc:
 
     def on_feed_download(self, feed):
         """
-            call download plugin to generate the temp files we will load
+            Call download plugin to generate the temp files we will load
             into deluge then verify they are valid torrents
         """
         config = self.get_config(feed)
@@ -95,7 +91,7 @@ class PluginTransmissionrpc:
             download.instance.get_temp_files(feed)
 
     def on_feed_output(self, feed):
-        """ event handler """
+        """Event handler"""
         config = self.get_config(feed)
         # don't add when learning
         if feed.manager.options.learn:
@@ -105,7 +101,7 @@ class PluginTransmissionrpc:
         # Do not run if there is nothing to do
         if len(feed.accepted) == 0:
             return
-        if self.client == None:
+        if self.client is None:
             self.client = self.create_rpc_client(feed)
         self.add_to_transmission(self.client, feed)
 
@@ -113,16 +109,13 @@ class PluginTransmissionrpc:
 
         opt_dic = {}
 
-        for opt_key in \
-        ['path', 'addpaused', 'maxconnections', 'maxupspeed', 'maxdownspeed', 'ratio']:
+        for opt_key in ['path', 'addpaused', 'maxconnections', 'maxupspeed', 'maxdownspeed', 'ratio']:
             if opt_key in entry:
                 opt_dic[opt_key] = entry[opt_key]
             elif opt_key in feed.config['transmissionrpc']:
                 opt_dic[opt_key] = feed.config['transmissionrpc'][opt_key]
 
-        options = {}
-        options['add'] = {}
-        options['change'] = {}
+        options = {'add': {}, 'change': {}}
 
         if 'path' in opt_dic:
             options['add']['download_dir'] = os.path.expanduser(opt_dic['path'])
@@ -141,12 +134,10 @@ class PluginTransmissionrpc:
         if 'ratio' in opt_dic:
             options['change']['seedRatioLimit'] = opt_dic['ratio']
             if opt_dic['ratio'] == -1:
-                '''
-                seedRatioMode:
-                0 follow the global settings
-                1 override the global settings, seeding until a certain ratio
-                2 override the global settings, seeding regardless of ratio
-                '''
+                # seedRatioMode:
+                # 0 follow the global settings
+                # 1 override the global settings, seeding until a certain ratio
+                # 2 override the global settings, seeding regardless of ratio
                 options['change']['seedRatioMode'] = 2
             else:
                 options['change']['seedRatioMode'] = 1
@@ -154,50 +145,42 @@ class PluginTransmissionrpc:
         return options
 
     def create_rpc_client(self, feed):
-        conf = self.get_config(feed)
+        config = self.get_config(feed)
         try:
             import transmissionrpc
             from transmissionrpc.transmission import TransmissionError
         except:
             raise PluginError('Transmissionrpc module required.', log)
-        # Set log level with loglevel
-        if 'loglevel' in conf:
-            levels = {'debug': logging.DEBUG, 'info': logging.INFO, 'warning': logging.WARNING, 'error': logging.ERROR, }
-            if conf['loglevel'] in levels.keys():
-                log.setLevel(levels[conf['loglevel']])
-        # Override log level with debug
-        if conf['debug']:
-            log.setLevel(logging.DEBUG)
 
         user, password = None, None
 
-        if 'netrc' in conf:
+        if 'netrc' in config:
             try:
-                user, account, password = netrc(conf['netrc']).authenticators(conf['host'])
+                user, account, password = netrc(config['netrc']).authenticators(config['host'])
             except IOError, e:
                 log.error('netrc: unable to open: %s' % e.filename)
             except NetrcParseError, e:
-                log.error('netrc: %s, file: %s, line: %n' % (e.msg, e.filename, e.line))
+                log.error('netrc: %s, file: %s, line: %s' % (e.msg, e.filename, e.line))
         else:
-            if 'username' in conf:
-                user = conf['username']
-            if 'password' in conf:
-                password = conf['password']
+            if 'username' in config:
+                user = config['username']
+            if 'password' in config:
+                password = config['password']
 
         # Hack to prevent failing when the headers plugin is used.
         if 'headers' in feed.config:
             import urllib2
             prev_opener = urllib2._opener
             urllib2.install_opener(None)
-            cli = transmissionrpc.Client(conf['host'], conf['port'], user, password)
+            cli = transmissionrpc.Client(config['host'], config['port'], user, password)
             urllib2.install_opener(prev_opener)
         else:
-            cli = transmissionrpc.Client(conf['host'], conf['port'], user, password)
-        
+            cli = transmissionrpc.Client(config['host'], config['port'], user, password)
+
         return cli
 
     def add_to_transmission(self, cli, feed):
-        """ adds accepted entries to transmission """
+        """Adds accepted entries to transmission """
         for entry in feed.accepted:
             if feed.manager.options.test:
                 log.info('Would add %s to transmission' % entry['url'])
@@ -232,14 +215,15 @@ class PluginTransmissionrpc:
             if not 'download' in feed.config:
                 os.remove(entry['file'])
                 del(entry['file'])
-        
+
     def remove_finished(self, cli):
         # Get a list of active transfers
         transfers = cli.info(arguments=['id', 'hashString', 'name', 'status', 'uploadRatio', 'seedRatioLimit'])
         remove_ids = []
         # Go through the list of active transfers and add finished transfers to remove_ids.
         for tid, transfer in transfers.iteritems():
-            log.debug('Transfer "%s": status: "%s" upload ratio: %.2f seed ratio: %.2f' % (transfer.name, transfer.status, transfer.uploadRatio, transfer.seedRatioLimit))
+            log.debug('Transfer "%s": status: "%s" upload ratio: %.2f seed ratio: %.2f' % \
+                (transfer.name, transfer.status, transfer.uploadRatio, transfer.seedRatioLimit))
             if transfer.status == 'stopped' and transfer.uploadRatio >= transfer.seedRatioLimit:
                 log.info('Remove torrent "%s" from transmission' % (transfer.name))
                 remove_ids.append(transfer.id)
