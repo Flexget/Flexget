@@ -147,6 +147,34 @@ class TestMetainfoQuality(FlexGetBase):
         assert entry['quality'] == 'web-dl', 'picked up wrong quality %s' % entry.get('quality', None)
 
 
+class TestFilterQuality(FlexGetBase):
+
+    __yaml__ = """
+        feeds:
+          test:
+            mock:
+              - {title: 'Smoke.720p'}
+              - {title: 'Smoke.HDTV'}
+              - {title: 'Smoke.cam'}
+            quality:
+              - hdtv
+              - 720p
+            accept_all: yes
+    """
+
+    def test_quality(self):
+        self.execute_feed('test')
+        entry = self.feed.find_entry(title='Smoke.cam')
+        assert entry, 'entry not found?'
+        assert entry in self.feed.rejected, 'cam quality should be rejected'
+        
+        entry = self.feed.find_entry(title='Smoke.720p')
+        assert entry, 'entry not found?'
+        assert entry in self.feed.accepted, '720p should be accepted'
+        assert len(self.feed.rejected) == 1, 'wrong number of entries rejected'
+        assert len(self.feed.accepted) == 2, 'wrong number of entries accepted'
+
+
 class TestEntryUnicodeError(FlexGetBase):
 
     @raises(EntryUnicodeError)
