@@ -69,6 +69,7 @@ class PluginAdvExec(object):
         w.close()
         if response:
             log.info('Stdout: %s' % response)
+        return p.wait() 
 
     def execute(self, feed, event_name):
         if not event_name in feed.config[self.NAME]:
@@ -110,7 +111,9 @@ class PluginAdvExec(object):
                 if feed.manager.options.test:
                     log.info('Would execute: %s' % cmd)
                 else:
-                    self.execute_cmd(cmd)
+                    # Run the command, fail entries with non-zero return code if configured to
+                    if self.execute_cmd(cmd) != 0 and feed.config[self.NAME].get('fail_entries'):
+                        feed.fail(entry, "adv_exec return code was non-zero")
 
         # event keyword in this
         if 'event' in feed.config[self.NAME][event_name]:
