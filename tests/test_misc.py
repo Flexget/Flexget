@@ -181,3 +181,33 @@ class TestEntryUnicodeError(FlexGetBase):
     def test_encoding(self):
         e = Entry('title', 'url')
         e['invalid'] = '\x8e'
+
+
+class TestFilterRequireField(FlexGetBase):
+
+    __yaml__ = """
+        feeds:
+          test:
+            mock:
+              - {title: 'Taken[2008]DvDrip[Eng]-FOO', imdb_url: 'http://www.imdb.com/title/tt0936501/'}
+              - {title: 'ASDFASDFASDF'}
+            require_field: imdb_url
+          test2:
+            mock:
+              - {title: 'Entry.S01E05.720p', series_name: 'Entry'}
+              - {title: 'Entry2.is.a.Movie'}
+            require_field: series_name
+    """
+
+    def test_field_required(self):
+        self.execute_feed('test')
+        assert not self.feed.find_entry('rejected', title='Taken[2008]DvDrip[Eng]-FOO'), \
+            'Taken should NOT have been rejected'
+        assert self.feed.find_entry('rejected', title='ASDFASDFASDF'), \
+            'ASDFASDFASDF should have been rejected'
+
+        self.execute_feed('test2')
+        assert not self.feed.find_entry('rejected', title='Entry.S01E05.720p'), \
+            'Entry should NOT have been rejected'
+        assert self.feed.find_entry('rejected', title='Entry2.is.a.Movie'), \
+            'Entry2 should have been rejected'

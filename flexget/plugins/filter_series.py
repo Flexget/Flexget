@@ -715,6 +715,7 @@ class FilterSeries(SeriesPlugin):
 
             # add series, season and episode to entry
             entry['series_name'] = series_name
+            entry['quality'] = parser.quality
             if parser.season and parser.episode:
                 entry['series_season'] = parser.season
                 entry['series_episode'] = parser.episode
