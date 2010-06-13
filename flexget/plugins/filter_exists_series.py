@@ -21,26 +21,34 @@ class FilterExistsSeries(object):
         root.accept('path')
         bundle = root.accept('list')
         bundle.accept('path')
+        advform = root.accept('dict')
+        advform.accept('boolean', key='accept_qualities')
+        advform.accept('path', key='path')
+        advform.accept('list', key='path').accept('path')
         return root
         
     def get_config(self, feed):
         config = feed.config.get('exists_series', [])
+        # if config is not a dict, assign value to 'path' key
+        if not isinstance(config, dict):
+            config = {'path': config}
         # if only a single path is passed turn it into a 1 element list
-        if isinstance(config, basestring):
-            config = [config]
+        if isinstance(config['path'], basestring):
+            config['path'] = [config['path']]
         return config
 
     @priority(-1)
     def on_feed_filter(self, feed):
-        for entry in feed.entries:
+        for entry in feed.entries + feed.accepted:
             if 'series_parser' in entry:
                 break
         else:
-            log.debug('Scanning not needed')
+            if feed.entries:
+                log.info('No entries have series information. exists_series must be used with series plugin')
             return
     
         config = self.get_config(feed)
-        for path in config:
+        for path in config.get('path'):
             feed.verbose_progress('Scanning %s' % path, log)
             path = os.path.expanduser(path)
             if not os.path.exists(path):
@@ -77,7 +85,7 @@ class FilterExistsSeries(object):
                                 if disk_parser.identifier != series_parser.identifier:
                                     log.log(5, 'wrong identifier')
                                     continue
-                                if disk_parser.quality != series_parser.quality:
+                                if config.get('accept_qualities') and disk_parser.quality != series_parser.quality:
                                     log.log(5, 'wrong quality')
                                     continue
                                 if disk_parser.proper and not series_parser.proper:
