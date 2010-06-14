@@ -22,7 +22,7 @@ class FilterExistsSeries(object):
         bundle = root.accept('list')
         bundle.accept('path')
         advform = root.accept('dict')
-        advform.accept('boolean', key='accept_qualities')
+        advform.accept('boolean', key='allow_qualities')
         advform.accept('path', key='path')
         advform.accept('list', key='path').accept('path')
         return root
@@ -85,7 +85,7 @@ class FilterExistsSeries(object):
                                 if disk_parser.identifier != series_parser.identifier:
                                     log.log(5, 'wrong identifier')
                                     continue
-                                if config.get('accept_qualities') and disk_parser.quality != series_parser.quality:
+                                if config.get('allow_qualities') and disk_parser.quality != series_parser.quality:
                                     log.log(5, 'wrong quality')
                                     continue
                                 if disk_parser.proper and not series_parser.proper:
