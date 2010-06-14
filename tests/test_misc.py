@@ -164,9 +164,8 @@ class TestFilterQuality(FlexGetBase):
 
     def test_quality(self):
         self.execute_feed('test')
-        entry = self.feed.find_entry(title='Smoke.cam')
-        assert entry, 'entry not found?'
-        assert entry in self.feed.rejected, 'cam quality should be rejected'
+        entry = self.feed.find_entry('rejected', title='Smoke.cam')
+        assert entry, 'Smoke.cam should have been rejected'
         
         entry = self.feed.find_entry(title='Smoke.720p')
         assert entry, 'entry not found?'
