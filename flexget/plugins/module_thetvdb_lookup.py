@@ -153,7 +153,7 @@ class ModuleThetvdbLookup(object):
             feed.verbose_progress('Requesting %s information from TheTvDB.com' % entry['series_name'])
             # get my series data.
             # TODO: need to implement error handling around grabbing url.
-            xmldata = BeautifulStoneSoup(urllib.urlopen("http://thetvdb.com/api/GetSeries.php?seriesname=%s" % entry["series_name"]))
+            xmldata = BeautifulStoneSoup(urllib.urlopen("http://thetvdb.com/api/GetSeries.php?seriesname=%s" % entry["series_name"])).data
             # Yeah, I'm lazy. Grabbing the one with the latest airing date, 
             # instead of trying to see what's the closest match.
             # If there's an exact match, return that immediately. Could
@@ -176,11 +176,11 @@ class ModuleThetvdbLookup(object):
             
             # Grab the url, and parse it out into BSS. Store it's root element as data.
             # TODO: need to impliment error handling around grabbing url.
-            data = BeautifulStoneSoup(urllib.urlopen("http://thetvdb.com/data/series/%s/all/" % str(series_id)))
+            data = BeautifulStoneSoup(urllib.urlopen("http://thetvdb.com/data/series/%s/all/" % str(series_id))).data
             session.add(TheTvDB(unicode(entry['series_name']), unicode(data)))
         else:
             log.debug('Loaded seriesdata from cache for %s' % entry['series_name'])
-            data = BeautifulStoneSoup(cachedata.series_xml)
+            data = BeautifulStoneSoup(cachedata.series_xml).data
         
         session.commit()
         
