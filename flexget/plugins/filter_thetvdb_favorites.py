@@ -35,7 +35,7 @@ class FilterThetvdbFavorites:
             log.info("Didn't find any thetvdb.com favorites.")
             return
         tvdb_series_config = {}
-        series_group = config.get('series_group', 'thetvdb')
+        series_group = config.get('series_group', 'thetvdb_favs')
         tvdb_series_config[series_group] = []
         for fid in favorite_ids:
             data = BeautifulStoneSoup(urllib.urlopen("http://thetvdb.com/data/series/%s/" % str(fid)))
