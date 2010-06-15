@@ -39,12 +39,17 @@ class FilterExistsSeries(object):
 
     @priority(-1)
     def on_feed_filter(self, feed):
+        if not feed.config.get('series'):
+            log.error('series plugin is not enabled on this feed. exists_series only works with series plugin.')
+            return
         for entry in feed.entries + feed.accepted:
             if 'series_parser' in entry:
                 break
         else:
-            if feed.entries:
-                log.info('No entries have series information. exists_series must be used with series plugin')
+            if feed.accepted:
+                log.warning('No accepted entries have series information. exists_series cannot filter them')
+            else:
+                log.debug('Scanning not needed')
             return
     
         config = self.get_config(feed)

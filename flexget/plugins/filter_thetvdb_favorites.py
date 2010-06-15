@@ -52,7 +52,6 @@ class FilterThetvdbFavorites:
             merge_dict_from_to(tvdb_series_config, feed.config['series'])
         except MergeException:
             raise PluginError('Failed to merge thetvdb favorites to feed %s, incompatible datatypes' % feed.name)
-        log.info(feed.config['series'])
 
 
 register_plugin(FilterThetvdbFavorites, 'thetvdb_favorites')
