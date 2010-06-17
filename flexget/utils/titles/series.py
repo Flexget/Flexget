@@ -30,7 +30,7 @@ class SeriesParser(TitleParser):
         self.data = ''
         self.expect_ep = False
         self.expect_id = False
-        self.from_group = None
+        self.allow_groups = []
 
         # if set to true, episode or id must follow immediately after name
         self.strict_name = False
@@ -53,6 +53,8 @@ class SeriesParser(TitleParser):
         self.quality = 'unknown'
         self.proper_or_repack = False
         self.special = False
+        # TODO: group is only produced with allow_groups
+        self.group = None
 
         # false if item does not match series
         self.valid = False
@@ -156,13 +158,17 @@ class SeriesParser(TitleParser):
                 return
             name_start, name_end = match.span(1)
 
-        # from group
-        if self.from_group:
-            from_group = self.from_group.lower()
-            orig_data = self.data.lower()
-            if not ('[%s]' % from_group in orig_data or
-                    '-%s' % from_group in orig_data):
-                log.debug('%s is not from group %s' % (orig_data, from_group))
+        # allow group(s)
+        if self.allow_groups:
+            for group in self.allow_groups:
+                group = group.lower()
+                orig_data = self.data.lower()
+                if '[%s]' % group in orig_data or '-%s' % group in orig_data:
+                    log.debug('%s is from group %s' % (orig_data, group))
+                    self.group = group
+                    break
+            else:
+                log.debug('%s is not from groups %s' % (self.data, self.allow_groups))
                 return # leave invalid
 
         # search tags and quality

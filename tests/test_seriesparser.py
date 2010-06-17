@@ -306,3 +306,12 @@ class TestSeriesParser(object):
         assert s.id == 'part-2'
         s = self.parse(name='Test', data='Test.Part3.720p-FlexGet')
         assert s.id == 'part-3'
+
+    def test_from_groups(self):
+        """SeriesParser: test from groups"""
+        s = SeriesParser()
+        s.name = 'Test'
+        s.data = 'Test.S01E01-Group'
+        s.allow_groups = ['xxxx', 'group']
+        s.parse()
+        assert s.group == 'group', 'did not get group'

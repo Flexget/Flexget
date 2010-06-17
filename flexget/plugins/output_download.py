@@ -170,8 +170,12 @@ class PluginDownload:
             raise
 
         entry['mime-type'] = mimetype
-        # prefer content-disposition naming
-        self.filename_from_headers(entry, f)
+        # prefer content-disposition naming, note: content-disposition can be disabled completely by setting entry
+        # field `content-disposition` to False
+        if entry.get('content-disposition', True):
+            self.filename_from_headers(entry, f)
+        else:
+            log.info('Content-disposition disabled for %s' % entry['title'])
         self.filename_ext_from_mime(entry)
         # TODO: LAST option, try to scrap url?
 

@@ -868,8 +868,9 @@ class TestFromGroup(FlexGetBase):
               - {title: '[FlexGet] Test 12'}
               - {title: 'Test.13.HDTV-Ignored'}
               - {title: 'Test.13.HDTV-FlexGet'}
+              - {title: 'Test.14.HDTV-Name'}
             series:
-              - test: {from_group: FlexGet}
+              - test: {from_group: [Name, FlexGet]}
     """
 
     def testFromGroup(self):
@@ -877,3 +878,4 @@ class TestFromGroup(FlexGetBase):
         self.execute_feed('test')
         assert self.feed.find_entry('accepted', title='[FlexGet] Test 12')
         assert self.feed.find_entry('accepted', title='Test.13.HDTV-FlexGet')
+        assert self.feed.find_entry('accepted', title='Test.14.HDTV-Name')
