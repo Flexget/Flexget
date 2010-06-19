@@ -63,6 +63,11 @@ class PluginTransmissionrpc:
 
     def on_process_start(self, feed):
         """Event handler"""
+        try:
+            import transmissionrpc
+            from transmissionrpc.transmission import TransmissionError
+        except:
+            raise PluginError('Transmissionrpc module required.', log)
         self.client = None
         set_plugin = get_plugin_by_name('set')
         set_plugin.instance.register_keys({'path': 'text', \
@@ -145,13 +150,9 @@ class PluginTransmissionrpc:
         return options
 
     def create_rpc_client(self, feed):
-        config = self.get_config(feed)
-        try:
-            import transmissionrpc
-            from transmissionrpc.transmission import TransmissionError
-        except:
-            raise PluginError('Transmissionrpc module required.', log)
+        import transmissionrpc
 
+        config = self.get_config(feed)
         user, password = None, None
 
         if 'netrc' in config:
@@ -166,21 +167,24 @@ class PluginTransmissionrpc:
                 user = config['username']
             if 'password' in config:
                 password = config['password']
-
-        # Hack to prevent failing when the headers plugin is used.
-        if 'headers' in feed.config:
-            import urllib2
-            prev_opener = urllib2._opener
-            urllib2.install_opener(None)
-            cli = transmissionrpc.Client(config['host'], config['port'], user, password)
-            urllib2.install_opener(prev_opener)
-        else:
-            cli = transmissionrpc.Client(config['host'], config['port'], user, password)
-
+        
+        try:
+            # Hack to prevent failing when the headers plugin is used.
+            if 'headers' in feed.config:
+                import urllib2
+                prev_opener = urllib2._opener
+                urllib2.install_opener(None)
+                cli = transmissionrpc.Client(config['host'], config['port'], user, password)
+                urllib2.install_opener(prev_opener)
+            else:
+                cli = transmissionrpc.Client(config['host'], config['port'], user, password)
+        except:
+            raise PluginError('Cannot connect to transmission. Is it running?', log)
         return cli
 
     def add_to_transmission(self, cli, feed):
         """Adds accepted entries to transmission """
+        from transmissionrpc.transmission import TransmissionError
         for entry in feed.accepted:
             if feed.manager.options.test:
                 log.info('Would add %s to transmission' % entry['url'])
