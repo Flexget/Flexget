@@ -77,9 +77,13 @@ class PluginTransmissionrpc:
                                            'maxdownspeed': 'number', \
                                            'ratio': 'decimal'})
         config = self.get_config(feed)
-        if config['enabled'] and config['removewhendone']:
-            self.client = self.create_rpc_client(feed)
-            self.remove_finished(self.client)
+        if config['enabled']:
+            if feed.manager.options.test:
+                log.info('Trying to connect to transmission...')
+                self.client = self.create_rpc_client(feed)
+            elif config['removewhendone']:
+                self.client = self.create_rpc_client(feed)
+                self.remove_finished(self.client)
 
     def on_feed_download(self, feed):
         """
@@ -151,6 +155,8 @@ class PluginTransmissionrpc:
 
     def create_rpc_client(self, feed):
         import transmissionrpc
+        from transmissionrpc.transmission import TransmissionError
+        from transmissionrpc.httphandler import HTTPHandlerError
 
         config = self.get_config(feed)
         user, password = None, None
@@ -178,8 +184,18 @@ class PluginTransmissionrpc:
                 urllib2.install_opener(prev_opener)
             else:
                 cli = transmissionrpc.Client(config['host'], config['port'], user, password)
-        except:
-            raise PluginError('Cannot connect to transmission. Is it running?', log)
+        except TransmissionError, e:
+            if isinstance(e.original, HTTPHandlerError):
+                if e.original.code == 111:
+                    raise PluginError("Cannot connect to transmission. Is it running?")
+                elif e.original.code == 401:
+                    raise PluginError("Username/password for transmission is incorrect. Cannot connect.")
+                elif e.original.code == 110:
+                    raise PluginError("Cannot connect to transmission: Connection timed out.")
+                else:
+                    raise PluginError("Error connecting to transmission: %s" % e.original.message)
+            else:
+                raise PluginError("Error connecting to transmission: %s" % e.message)
         return cli
 
     def add_to_transmission(self, cli, feed):
