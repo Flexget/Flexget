@@ -34,6 +34,7 @@ class PluginTransmissionrpc:
     def validator(self):
         """Return config validator"""
         root = validator.factory()
+        root.accept('boolean')
         advanced = root.accept('dict')
         advanced.accept('text', key='host')
         advanced.accept('number', key='port')
