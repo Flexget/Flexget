@@ -131,7 +131,7 @@ class OutputDeluge(object):
         # don't add when learning
         if feed.manager.options.learn:
             return
-        if not feed.accepted or not config['enabled']:
+        if not config['enabled'] or not (feed.accepted or feed.manager.options.test):
             return
             
         if self.deluge12:
@@ -249,7 +249,7 @@ class OutputDeluge(object):
             if feed.manager.options.test:
             
                 def on_disconnect(result):
-                    log.debug('Done adding torrents to deluge.')
+                    log.debug('Test connection to deluge daemon successfull.')
                     reactor.callLater(0.1, pause_reactor, 0)
                     
                 client.disconnect().addCallback(on_disconnect)
@@ -352,7 +352,11 @@ class OutputDeluge(object):
                     del(entry['file'])
                     continue
                 filedump = base64.encodestring(open(entry['file'], 'rb').read())
-                path = os.path.expanduser(entry.get('path', config['path']) % entry)
+                path = ''
+                try:
+                    path = os.path.expanduser(entry.get('path', config['path']) % entry)
+                except KeyError, e:
+                    log.error("Could not set path for %s: does not contain the field '%s.'" % (entry['title'], e))
                 opts = {}
                 if path:
                     opts['download_location'] = path
@@ -370,7 +374,11 @@ class OutputDeluge(object):
 
                 # Make a new set of options, that get set after the torrent has been added
                 opts = {}
-                opts['movedone'] = os.path.expanduser(entry.get('movedone', config['movedone']) % entry)
+                try:
+                    opts['movedone'] = os.path.expanduser(entry.get('movedone', config['movedone']) % entry)
+                except KeyError, e:
+                    log.error("Could not set movedone for %s: does not contain the field '%s.'" % (entry['title'], e))
+                    opts['movedone'] = ''
                 opts['label'] = entry.get('label', config['label']).lower()
                 opts['queuetotop'] = entry.get('queuetotop', config.get('queuetotop'))
                 opts['content_filename'] = entry.get('content_filename')

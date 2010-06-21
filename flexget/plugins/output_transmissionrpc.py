@@ -82,6 +82,10 @@ class PluginTransmissionrpc:
             if feed.manager.options.test:
                 log.info('Trying to connect to transmission...')
                 self.client = self.create_rpc_client(feed)
+                if self.client:
+                    log.info('Successfully connected to transmission.')
+                else:
+                    log.error('It looks like there was a problem connecting to transmission.')
             elif config['removewhendone']:
                 self.client = self.create_rpc_client(feed)
                 self.remove_finished(self.client)
