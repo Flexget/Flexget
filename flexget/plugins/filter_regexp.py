@@ -40,7 +40,7 @@ class FilterRegexp(object):
             # bundle is a dictionary form
             bundle = regexps.accept('dict')
             # path as a single parameter
-            bundle.accept_any_key('text') 
+            bundle.accept_any_key('text')
             
             # advanced configuration as a parameter
             advanced = bundle.accept_any_key('dict')
@@ -130,6 +130,8 @@ class FilterRegexp(object):
                 if isinstance(regexp_raw, dict):
                     #log.debug('complex regexp: %s' % regexp_raw)
                     regexp_raw, value = regexp_raw.items()[0]
+                    # make sure regxp is a string for series like '24'
+                    regexp_raw = str(regexp_raw)
                     # advanced configuration
                     if isinstance(value, dict):
                         path = value.get('path', None)
