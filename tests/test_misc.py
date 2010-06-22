@@ -53,15 +53,34 @@ class TestPriority(FlexGetBase):
         feeds:
           test:
             mock:
-              - {title: 'Smoke'}
+              - {title: 'Smoke hdtv'}
             accept_all: yes
+            set:
+              quality: 720p
+            quality: 720p
             plugin_priority:
-              accept_all: 100
+              accept_all: 3
+              set: 2
+              quality: 1
+
+          test2:
+            mock:
+              - {title: 'Smoke hdtv'}
+            accept_all: yes
+            set:
+              quality: 720p
+            quality: 720p
+            plugin_priority:
+              accept_all: 3
+              quality: 2
+              set: 1
     """
 
     def test_smoke(self):
         self.execute_feed('test')
-        assert self.feed.entries, 'no entries created'
+        assert self.feed.accepted, 'set plugin should have changed quality before quality plugin was run'
+        self.execute_feed('test2')
+        assert self.feed.rejected, 'quality plugin should have rejected Smoke as hdtv'
 
 
 class TestImmortal(FlexGetBase):

@@ -35,6 +35,8 @@ class PluginPriority(object):
             for method in plugins[name].event_handlers.itervalues():
                 originals[method.method_name] = method.priority
                 log.debug('stored %s original value %s' % (method.name, method.priority))
+                method.priority = priority
+                log.debug('set %s new value %s' % (method.method_name, priority))
                 
         log.debug('Changed priority for: %s' % ', '.join(names))
 
