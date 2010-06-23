@@ -432,6 +432,7 @@ class Manager(object):
     def shutdown(self):
         """Application is being exited"""
 
+        self.engine.dispose()
         # remove temporary database used in test mode
         if self.options.test:
             if not 'test' in self.db_filename:
