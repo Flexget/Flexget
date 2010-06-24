@@ -90,6 +90,7 @@ class PluginTransmissionrpc:
                 self.client = self.create_rpc_client(feed)
                 self.remove_finished(self.client)
 
+    @priority(120)
     def on_feed_download(self, feed):
         """
             Call download plugin to generate the temp files we will load
@@ -104,6 +105,7 @@ class PluginTransmissionrpc:
             download = get_plugin_by_name('download')
             download.instance.get_temp_files(feed)
 
+    @priority(135)
     def on_feed_output(self, feed):
         """Event handler"""
         config = self.get_config(feed)
@@ -122,12 +124,13 @@ class PluginTransmissionrpc:
     def _make_torrent_options_dict(self, feed, entry):
 
         opt_dic = {}
+        config = self.get_config(feed)
 
         for opt_key in ['path', 'addpaused', 'maxconnections', 'maxupspeed', 'maxdownspeed', 'ratio']:
             if opt_key in entry:
                 opt_dic[opt_key] = entry[opt_key]
-            elif opt_key in feed.config['transmissionrpc']:
-                opt_dic[opt_key] = feed.config['transmissionrpc'][opt_key]
+            elif opt_key in config:
+                opt_dic[opt_key] = config[opt_key]
 
         options = {'add': {}, 'change': {}}
 
