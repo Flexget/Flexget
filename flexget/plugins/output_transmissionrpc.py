@@ -119,7 +119,21 @@ class PluginTransmissionrpc:
             return
         if self.client is None:
             self.client = self.create_rpc_client(feed)
-        self.add_to_transmission(self.client, feed)
+            if self.client:
+                log.debug('Successfully connected to transmission.')
+            else:
+                raise PluginError("Couldn't connect to transmission.")
+        # Hack to prevent failing when the headers plugin is used.
+        if 'headers' in feed.config:
+            import urllib2
+            prev_opener = urllib2._opener
+            urllib2.install_opener(None)
+            try:
+                self.add_to_transmission(self.client, feed)
+            finally:
+                urllib2.install_opener(prev_opener)
+        else:
+            self.add_to_transmission(self.client, feed)
 
     def _make_torrent_options_dict(self, feed, entry):
 
