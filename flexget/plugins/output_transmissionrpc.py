@@ -70,6 +70,7 @@ class PluginTransmissionrpc:
         except:
             raise PluginError('Transmissionrpc module required.', log)
         self.client = None
+        self.opener = None
         set_plugin = get_plugin_by_name('set')
         set_plugin.instance.register_keys({'path': 'text', \
                                            'addpaused': 'boolean', \
@@ -88,8 +89,17 @@ class PluginTransmissionrpc:
                     log.error('It looks like there was a problem connecting to transmission.')
             elif config['removewhendone']:
                 self.client = self.create_rpc_client(feed)
-                self.remove_finished(self.client)
-
+                if 'headers' in feed.config:
+                    import urllib2
+                    prev_opener = urllib2._opener
+                    urllib2.install_opener(self.opener)
+                    try:
+                        self.remove_finished(self.client)
+                    finally:
+                        urllib2.install_opener(prev_opener)
+                else:
+                    self.remove_finished(self.client)
+                
     @priority(120)
     def on_feed_download(self, feed):
         """
@@ -127,7 +137,7 @@ class PluginTransmissionrpc:
         if 'headers' in feed.config:
             import urllib2
             prev_opener = urllib2._opener
-            urllib2.install_opener(None)
+            urllib2.install_opener(self.opener)
             try:
                 self.add_to_transmission(self.client, feed)
             finally:
@@ -202,8 +212,12 @@ class PluginTransmissionrpc:
                 import urllib2
                 prev_opener = urllib2._opener
                 urllib2.install_opener(None)
-                cli = transmissionrpc.Client(config['host'], config['port'], user, password)
-                urllib2.install_opener(prev_opener)
+                try:
+                    cli = transmissionrpc.Client(config['host'], config['port'], user, password)
+                    # transmissionrpc also modifies the default opener, so we must save it.
+                    self.opener = urllib2._opener
+                finally:
+                    urllib2.install_opener(prev_opener)
             else:
                 cli = transmissionrpc.Client(config['host'], config['port'], user, password)
         except TransmissionError, e:
