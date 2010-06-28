@@ -203,7 +203,7 @@ class SeriesPlugin(object):
         # if episode does not exist in series, add new
         episode = session.query(Episode).filter(Episode.series_id == series.id).\
             filter(Episode.identifier == parser.identifier).first()
-        if not episode:
+        if not episode or series.id == None:
             log.debug('adding episode %s into series %s' % (parser.identifier, parser.name))
             episode = Episode()
             episode.identifier = parser.identifier
@@ -225,7 +225,7 @@ class SeriesPlugin(object):
             filter(Release.episode_id != None).\
             filter(Release.quality == parser.quality).\
             filter(Release.proper == parser.proper_or_repack).first()
-        if not release:
+        if not release or episode.id == None:
             log.debug('addding release %s into episode' % parser)
             release = Release()
             release.quality = parser.quality
