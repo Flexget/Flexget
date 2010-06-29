@@ -315,3 +315,11 @@ class TestSeriesParser(object):
         s.allow_groups = ['xxxx', 'group']
         s.parse()
         assert s.group == 'group', 'did not get group'
+    
+    def test_id_and_hash(self):
+        """SeriesParser: Series with confusing hash"""
+        s = self.parse(name='Something', data='Something 63 [560D3414]')
+        assert (s.id == '63'), 'failed to parse %s' % s.data
+
+        s = self.parse(name='Something', data='Something 62 [293A8395]')
+        assert (s.id == '62'), 'failed to parse %s' % s.data

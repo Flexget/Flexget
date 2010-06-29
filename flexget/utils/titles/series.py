@@ -35,12 +35,14 @@ class SeriesParser(TitleParser):
         # if set to true, episode or id must follow immediately after name
         self.strict_name = False
 
-        self.ep_regexps = ['s(\d+)e(\d+)', 's(\d+)ep(\d+)', 's(\d+).e(\d+)', \
-                           '(?:^|\D)([\d]{1,2})[\s]?x[\s]?(\d+)']
-        self.id_regexps = ['(\d\d\d\d).(\d+).(\d+)', '(\d+).(\d+).(\d\d\d\d)', \
-                           '(\d\d\d\d)x(\d+)\.(\d+)', \
-                           '(pt|part)\s?(\d+|IX|IV|V?I{0,3})', \
-                           '(?:^|[^s\d])(\d{1,3})(?:[^p\d]|$)']
+        separators = '[!/+,:;|~ x]'
+        self.ep_regexps = ['s(\d+)e(\d+)', 's(\d+)ep(\d+)', 's(\d+).e(\d+)',
+                '(?:^|\D)([\d]{1,2})[\s]?x[\s]?(\d+)']
+        self.id_regexps = [
+                '(\d{4})%s(\d+)%s(\d+)' % (separators, separators),
+                '(\d+)%s(\d+)%s(\d{4})' % (separators, separators),
+                '(\d{4})x(\d+)\.(\d+)', '(pt|part)\s?(\d+|IX|IV|V?I{0,3})',
+                '(?:^|[^s\d])(\d{1,3})(?:[^p\d]|$)']
         self.clean_regexps = ['\[.*?\]', '\(.*?\)']
         self.name_regexps = []
 
