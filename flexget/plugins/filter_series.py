@@ -192,7 +192,8 @@ class SeriesPlugin(object):
     def store(self, session, parser):
         """Push series information into database. Returns added/existing release."""
         # if series does not exist in database, add new
-        series = session.query(Series).filter(Series.name == parser.name.lower()).first()
+        series = session.query(Series).filter(Series.name == parser.name.lower()).\
+            filter(Series.id != None).first()
         if not series:
             log.debug('adding series %s into db' % parser.name)
             series = Series()
@@ -202,8 +203,9 @@ class SeriesPlugin(object):
 
         # if episode does not exist in series, add new
         episode = session.query(Episode).filter(Episode.series_id == series.id).\
-            filter(Episode.identifier == parser.identifier).first()
-        if not episode or series.id == None:
+            filter(Episode.identifier == parser.identifier).\
+            filter(Episode.series_id != None).first()
+        if not episode:
             log.debug('adding episode %s into series %s' % (parser.identifier, parser.name))
             episode = Episode()
             episode.identifier = parser.identifier
@@ -222,10 +224,10 @@ class SeriesPlugin(object):
         # to database but doesn't have episode_id, this causes all kinds of havoc with the plugin.
         # perhaps a bug in sqlalchemy?
         release = session.query(Release).filter(Release.episode_id == episode.id).\
-            filter(Release.episode_id != None).\
             filter(Release.quality == parser.quality).\
-            filter(Release.proper == parser.proper_or_repack).first()
-        if not release or episode.id == None:
+            filter(Release.proper == parser.proper_or_repack).\
+            filter(Release.episode_id != None).first()
+        if not release:
             log.debug('addding release %s into episode' % parser)
             release = Release()
             release.quality = parser.quality
