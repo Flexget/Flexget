@@ -63,7 +63,7 @@ class PluginTransmissionrpc:
         advanced.accept('file', key='netrc', required=False)
         advanced.accept('text', key='username', required=False)
         advanced.accept('text', key='password', required=False)
-        advanced.accept('path', key='path', required=False)
+        advanced.accept('text', key='path', required=False)
         advanced.accept('boolean', key='addpaused', required=False)
         advanced.accept('number', key='maxconnections', required=False)
         advanced.accept('number', key='maxupspeed', required=False)
@@ -161,7 +161,10 @@ class PluginTransmissionrpc:
         options = {'add': {}, 'change': {}}
 
         if 'path' in opt_dic:
-            options['add']['download_dir'] = os.path.expanduser(opt_dic['path'])
+            try:
+                options['add']['download_dir'] = os.path.expanduser(opt_dic['path'] % entry)
+            except KeyError, e:
+                log.error("Could not set path for %s: does not contain the field '%s.'" % (entry['title'], e))
         if 'addpaused' in opt_dic and opt_dic['addpaused']:
             options['add']['paused'] = True
         if 'maxconnections' in opt_dic:

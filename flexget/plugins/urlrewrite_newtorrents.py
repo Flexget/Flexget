@@ -23,6 +23,8 @@ class NewTorrents:
     # UrlRewriter plugin API
     def url_rewritable(self, feed, entry):
         # Return true only for urls that can and should be resolved
+        if entry['url'].startswith('http://www.newtorrents.info/down.php?'):
+            return False
         return entry['url'].startswith('http://www.newtorrents.info') and not entry['url'] in self.resolved
         
     # UrlRewriter plugin API
@@ -85,7 +87,6 @@ class NewTorrents:
         soup = get_soup(html)
         # saving torrents in dict
         torrents = []
-        seeds = []
         for link in soup.findAll('a', attrs={'href': re.compile('down.php')}):
             torrent_url = 'http://www.newtorrents.info%s' % link.get('href')
             release_name = self.clean(link.parent.next.get('title'))
@@ -95,14 +96,12 @@ class NewTorrents:
             confidence = difflib.SequenceMatcher(lambda x: x in ' -._', # junk characters
                                        release_name.lower(),
                                        name.lower()).ratio()
-            if confidence < 0.9:
-                torrents.append(torrent_url)
-                seeds.append(seed)
+            if confidence >= 0.9:
+                torrents.append((seed, torrent_url))
             else:
                 log.debug('rejecting search result: %s !~ %s' % (release_name, name))
         # sort with seed number Reverse order
-        torrents = [(seeds[i], torrents[i]) for i in range(len(torrents))]
-        torrents.sort(lambda x, y: y - x)
+        torrents.sort(reverse=True)
         # choose the torrent
         if not torrents:
             raise PluginWarning('No matches for %s' % name, log, log_once=True)

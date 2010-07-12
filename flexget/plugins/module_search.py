@@ -45,7 +45,7 @@ class PluginSearch:
         search.accept('text')
         return search
 
-    def on_feed_resolve(self, feed):
+    def on_feed_urlrewrite(self, feed):
         # no searches in unit test mode
         if feed.manager.unit_test: 
             return 
