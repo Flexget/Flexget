@@ -263,9 +263,12 @@ class OutputDeluge(object):
                     return
                 log.info("%s successfully added to deluge." % entry['title'])
                 if opts['movedone']:
-                    if not os.path.isdir(opts['movedone']):
-                        log.debug("movedone path %s doesn't exist, creating" % opts['movedone'])
-                        os.makedirs(opts['movedone'])
+                    if client.is_localhost():
+                        if not os.path.isdir(opts['movedone']):
+                            log.debug("movedone path %s doesn't exist, creating" % opts['movedone'])
+                            os.makedirs(opts['movedone'])
+                    else:
+                        log.warning("If movedone path does not exist on the machine running the daemon, movedone will fail.")
                     dlist.append(client.core.set_torrent_move_completed(torrent_id, True))
                     dlist.append(client.core.set_torrent_move_completed_path(torrent_id, opts['movedone']))
                     log.debug("%s move on complete set to %s" % (entry['title'], opts['movedone']))
@@ -297,15 +300,18 @@ class OutputDeluge(object):
                                     else:
                                         return False
 
-                                while file_exists():
-                                    # Try appending a (#) suffix till a unique filename is found
-                                    filename = ''.join([opts['content_filename'], '(', str(counter), ')', os.path.splitext(file['path'])[1]])
-                                    counter += 1
+                                if client.is_localhost():
+                                    while file_exists():
+                                        # Try appending a (#) suffix till a unique filename is found
+                                        filename = ''.join([opts['content_filename'], '(', str(counter), ')', os.path.splitext(file['path'])[1]])
+                                        counter += 1
+                                else:
+                                    log.debug("Cannot ensure content_filename is unique when adding to a remote deluge daemon.")
                                 log.debug("File %s in %s renamed to %s" % (file['path'], entry['title'], filename))
                                 client.core.rename_files(torrent_id, [(file['index'], filename)]).addBoth(d2.callback)
                                 break
                         else:
-                            log.debug("No files in %s are > 90% of content size, no files renamed." % entry['title'])
+                            log.warning("No files in %s are > 90% of content size, no files renamed." % entry['title'])
                             d2.callback(None)
 
                     # d2 will callback when the renaming is complete
@@ -381,7 +387,7 @@ class OutputDeluge(object):
                     opts['movedone'] = ''
                 opts['label'] = entry.get('label', config['label']).lower()
                 opts['queuetotop'] = entry.get('queuetotop', config.get('queuetotop'))
-                opts['content_filename'] = entry.get('content_filename')
+                opts['content_filename'] = entry.get('content_filename', config.get('content_filename'))
                 #create a deferred here which we will callback after all work in on_success is done
                 d = defer.Deferred()
                 addresult.addCallbacks(on_success, on_fail, callbackArgs=(entry, opts, d), errbackArgs=(feed, entry))
