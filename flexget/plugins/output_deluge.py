@@ -388,6 +388,11 @@ class OutputDeluge(object):
                 opts['label'] = entry.get('label', config['label']).lower()
                 opts['queuetotop'] = entry.get('queuetotop', config.get('queuetotop'))
                 opts['content_filename'] = entry.get('content_filename', config.get('content_filename'))
+                try:
+                    opts['content_filename'] = entry.get('content_filename', config.get('content_filename')) % entry
+                except KeyError, e:
+                    log.error("Could not set content_filename for %s: does not contain the field '%s.'" % (entry['title'], e))
+                    opts['content_filename'] = ''
                 #create a deferred here which we will callback after all work in on_success is done
                 d = defer.Deferred()
                 addresult.addCallbacks(on_success, on_fail, callbackArgs=(entry, opts, d), errbackArgs=(feed, entry))
