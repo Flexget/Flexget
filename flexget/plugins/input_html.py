@@ -127,7 +127,10 @@ class InputHtml(object):
                 log.debug('title from url: %s' % title)
             elif title_from == 'title':
                 if not link.has_key('title'):
-                    log.warning('Link %s doesn\t have title attribute, ignored.')
+                    safelink = link.encode('ascii', 'ignore')
+                    safelink = safelink.replace('\n', '')
+                    safelink = safelink.replace('\r', '')
+                    log.warning('Link %s doesn\'t have title attribute, ignored.' % safelink)
                     continue
                 title = link['title']
                 log.debug('title from title: %s' % title)

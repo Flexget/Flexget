@@ -1,11 +1,10 @@
 import logging
 from flexget.plugin import *
 
-__pychecker__ = 'unusednames=parser'
-
 log = logging.getLogger('extension')
 
-class ModifyExtension:
+
+class ModifyExtension(object):
 
     """
         Allows specifying file extension explicitly when all other built-in detection mechanisms fail.
@@ -14,6 +13,7 @@ class ModifyExtension:
 
         extension: nzb
     """
+    
     def validator(self):
         from flexget import validator
         root = validator.factory()
