@@ -387,9 +387,8 @@ class OutputDeluge(object):
                     opts['movedone'] = ''
                 opts['label'] = entry.get('label', config['label']).lower()
                 opts['queuetotop'] = entry.get('queuetotop', config.get('queuetotop'))
-                opts['content_filename'] = entry.get('content_filename', config.get('content_filename'))
                 try:
-                    opts['content_filename'] = entry.get('content_filename', config.get('content_filename')) % entry
+                    opts['content_filename'] = entry.get('content_filename', config.get('content_filename', '')) % entry
                 except KeyError, e:
                     log.error("Could not set content_filename for %s: does not contain the field '%s.'" % (entry['title'], e))
                     opts['content_filename'] = ''
