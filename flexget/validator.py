@@ -147,7 +147,7 @@ class ChoiceValidator(Validator):
 
     def validate(self, data):
         if not self.validate_item(data, self.valid):
-            l = [r.name for r in self.valid]
+            l = [r.valid for r in self.valid]
             self.errors.add('must be one of values %s' % (', '.join(l)))
         return True
 

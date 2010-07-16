@@ -20,7 +20,19 @@ class PluginCookies:
 
     def validator(self):
         from flexget import validator
-        return validator.factory('file')
+        root = validator.factory()
+        root.accept('file')
+        cookies = root.accept('dict')
+        cookies.accept('file', key='file')
+        cookies.accept('choice', key='type').accept_choices(['firefox3', 'mozilla', 'lwp'])
+        return root
+
+    def get_config(self, feed):
+        config = feed.config.get('cookies', {})
+        if isinstance(config, basestring):
+            config = {'file': config}
+        config.setdefault('type', 'firefox3')
+        return config
 
     def sqlite2cookie(self, filename):
         from cStringIO import StringIO
@@ -39,7 +51,10 @@ class PluginCookies:
             raise PluginError('Unable to open cookies sqlite database')
  
         cur = con.cursor()
-        cur.execute('select host, path, isSecure, expiry, name, value from moz_cookies')
+        try:
+            cur.execute('select host, path, isSecure, expiry, name, value from moz_cookies')
+        except:
+            raise PluginError('%s does not appear to be a valid Firefox 3 cookies file' % filename, log)
  
         ftstr = ['FALSE', 'TRUE']
  
@@ -100,7 +115,28 @@ class PluginCookies:
     def on_feed_start(self, feed):
         import os
         """Feed starting, install cookiejar"""
-        cj = self.sqlite2cookie(os.path.expanduser(feed.config['cookies']))
+        config = self.get_config(feed)
+        cookie_type = config.get('type')
+        cookie_file = os.path.expanduser(config.get('file'))
+        if cookie_type == 'firefox3':
+            log.debug('Loading %s cookies' % cookie_type)
+            cj = self.sqlite2cookie(cookie_file)
+        else:
+            if cookie_type == 'mozilla':
+                log.debug('Loading %s cookies' % cookie_type)
+                cj = cookielib.MozillaCookieJar()
+            elif cookie_type == 'lwp':
+                log.debug('Loading %s cookies' % cookie_type)
+                cj = cookielib.LWPCookieJar()
+            else:
+                raise PluginError('Unknown cookie type %s' % cookie_type, log)
+
+            try:
+                cj.load(filename=cookie_file, ignore_expires=True)
+                log.debug('%s cookies loaded' % cookie_type)
+            except (cookielib.LoadError, IOError):
+                import sys
+                raise PluginError('Cookies could not be loaded: %s' % sys.exc_info()[1], log)
         
         # create new opener for urllib2
         log.debug('Installing urllib2 opener')
