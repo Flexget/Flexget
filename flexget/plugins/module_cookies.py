@@ -31,7 +31,12 @@ class PluginCookies:
         config = feed.config.get('cookies', {})
         if isinstance(config, basestring):
             config = {'file': config}
-        config.setdefault('type', 'firefox3')
+        if config['file'].endswith('.txt'):
+            config.setdefault('type', 'mozilla')
+        elif config['file'].endswith('.lwp'):
+            config.setdefault('type', 'lwp')
+        else:
+            config.setdefault('type', 'firefox3')
         return config
 
     def sqlite2cookie(self, filename):
