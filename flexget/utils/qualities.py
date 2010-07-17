@@ -69,7 +69,8 @@ def all():
     """Return all Qualities in order of best to worst"""
     res = []
     for quality in registry.itervalues():
-        res.append(quality)
+        if not quality in res:
+            res.append(quality)
     res.sort(reverse=True)
     return res
 

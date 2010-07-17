@@ -426,6 +426,9 @@ class FilterSeries(SeriesPlugin):
 
     def validator(self):
         from flexget import validator
+        import flexget.utils.qualities
+
+        qualities = [q.name for q in flexget.utils.qualities.all()]
 
         def build_options(options):
             options.accept('text', key='path')
@@ -440,10 +443,10 @@ class FilterSeries(SeriesPlugin):
             options.accept('list', key='ep_regexp').accept('regexp')
             options.accept('list', key='id_regexp').accept('regexp')
             # quality
-            options.accept('text', key='quality')                    # TODO: allow only SeriesParser.qualities
-            options.accept('list', key='qualities').accept('text')   # TODO: ^^
-            options.accept('text', key='min_quality')                # TODO: ^^
-            options.accept('text', key='max_quality')                # TODO: ^^
+            options.accept('choice', key='quality').accept_choices(qualities)
+            options.accept('list', key='qualities').accept('choice').accept_choices(qualities)
+            options.accept('choice', key='min_quality').accept_choices(qualities)
+            options.accept('choice', key='max_quality').accept_choices(qualities)
             # propers
             options.accept('boolean', key='propers')
             options.accept('regexp_match', key='propers').accept('\d+ (minutes|hours|days|weeks)')

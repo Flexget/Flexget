@@ -143,13 +143,19 @@ class ChoiceValidator(Validator):
             self.accept(value)
 
     def validateable(self, data):
-        return True
+        from numbers import Number as number
+        if isinstance(data, basestring) or isinstance(data, number):
+            return True
+        else:
+            return False
 
     def validate(self, data):
         if not self.validate_item(data, self.valid):
             l = [r.valid for r in self.valid]
             self.errors.add('must be one of values %s' % (', '.join(l)))
-        return True
+            return False
+        else:
+            return True
 
 
 class AnyValidator(Validator):
@@ -172,7 +178,11 @@ class EqualsValidator(Validator):
         self.valid = value
 
     def validateable(self, data):
-        return True
+        from numbers import Number as number
+        if isinstance(data, basestring) or isinstance(data, number):
+            return True
+        else:
+            return False
     
     def validate(self, data):
         return self.valid == data

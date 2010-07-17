@@ -4,7 +4,7 @@ from flexget.plugin import *
 log = logging.getLogger('quality')
 
 
-class FilterQuality:
+class FilterQuality(object):
     """
         Rejects all entries that don't have one of the specified qualities
         
@@ -16,9 +16,13 @@ class FilterQuality:
 
     def validator(self):
         from flexget import validator
+        import flexget.utils.qualities
+
+        qualities = [q.name for q in flexget.utils.qualities.all()]
+
         root = validator.factory()
-        root.accept('text')
-        root.accept('list').accept('text')
+        root.accept('choice').accept_choices(qualities)
+        root.accept('list').accept('choice').accept_choices(qualities)
         return root
 
     def on_feed_filter(self, feed):
