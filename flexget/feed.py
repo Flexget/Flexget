@@ -425,6 +425,8 @@ class Feed(object):
         # verbose undecided entries
         if self.manager.options.details:
             for entry in self.entries:
+                if entry in self.accepted:
+                    continue
                 try:
                     print "+ %-8s %-12s %s" % ('undecided', '', entry['title'])
                 except:
