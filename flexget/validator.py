@@ -132,30 +132,31 @@ class RootValidator(Validator):
 class ChoiceValidator(Validator):
     name = 'choice'
 
+    def __init__(self, parent=None):
+        self.valid_ic = []
+        Validator.__init__(self, parent)
+
     def accept(self, value, **kwargs):
-        v = self.get_validator('equals')
-        v.accept(value)
-        self.valid.append(v)
-        return v
+        if not isinstance(value, basestring):
+            raise Exception('Choice validator only accepts strings')
+        if kwargs.get('ignore_case'):
+            self.valid_ic.append(value.lower())
+        else:        
+            self.valid.append(value)
         
-    def accept_choices(self, values):
+    def accept_choices(self, values, **kwargs):
         for value in values:
-            self.accept(value)
+            self.accept(value, **kwargs)
 
     def validateable(self, data):
-        from numbers import Number as number
-        if isinstance(data, basestring) or isinstance(data, number):
-            return True
-        else:
-            return False
+        return isinstance(data, basestring)
 
     def validate(self, data):
-        if not self.validate_item(data, self.valid):
-            l = [r.valid for r in self.valid]
-            self.errors.add('must be one of values %s' % (', '.join(l)))
-            return False
-        else:
+        if data in self.valid or data.lower() in self.valid_ic:
             return True
+        else:
+            self.errors.add('must be one of values %s' % ', '.join(self.valid + self.valid_ic))
+            return False
 
 
 class AnyValidator(Validator):
@@ -179,10 +180,7 @@ class EqualsValidator(Validator):
 
     def validateable(self, data):
         from numbers import Number as number
-        if isinstance(data, basestring) or isinstance(data, number):
-            return True
-        else:
-            return False
+        return isinstance(data, basestring) or isinstance(data, number)
     
     def validate(self, data):
         return self.valid == data

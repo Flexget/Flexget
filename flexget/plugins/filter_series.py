@@ -443,10 +443,10 @@ class FilterSeries(SeriesPlugin):
             options.accept('list', key='ep_regexp').accept('regexp')
             options.accept('list', key='id_regexp').accept('regexp')
             # quality
-            options.accept('choice', key='quality').accept_choices(qualities)
-            options.accept('list', key='qualities').accept('choice').accept_choices(qualities)
-            options.accept('choice', key='min_quality').accept_choices(qualities)
-            options.accept('choice', key='max_quality').accept_choices(qualities)
+            options.accept('choice', key='quality').accept_choices(qualities, ignore_case=True)
+            options.accept('list', key='qualities').accept('choice').accept_choices(qualities, ignore_case=True)
+            options.accept('choice', key='min_quality').accept_choices(qualities, ignore_case=True)
+            options.accept('choice', key='max_quality').accept_choices(qualities, ignore_case=True)
             # propers
             options.accept('boolean', key='propers')
             options.accept('regexp_match', key='propers').accept('\d+ (minutes|hours|days|weeks)')

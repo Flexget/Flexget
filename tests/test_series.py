@@ -47,7 +47,7 @@ class TestQuality(FlexGetBase):
               - {title: 'MaxQTest.S01E01.720p.XViD-FlexGet'}
             series:
               - MaxQTest:
-                  max_quality: hdtv
+                  max_quality: HDTV
 
           min_max_quality:
             mock:
@@ -59,7 +59,7 @@ class TestQuality(FlexGetBase):
               - {title: 'MinMaxQTest.S01E01.1080p.XViD-FlexGet'}
             series:
               - MinMaxQTest:
-                  min_quality: pdtv
+                  min_quality: sdtv
                   max_quality: hr
                   
           max_unknown_quality:
@@ -323,9 +323,9 @@ class TestPropers(FlexGetBase):
                   max_quality: 1080p
               - V
               - tftest:
-                  propers: 3 hours 
+                  propers: 3 hours
               - notest:
-                  propers: no    
+                  propers: no
 
         feeds:
           propers_1:
@@ -577,7 +577,7 @@ class TestQualities(FlexGetBase):
             series:
               - FooBar:
                   qualities:
-                    - PDTV
+                    - SDTV
                     - 720p
                     - 1080p
         feeds:
