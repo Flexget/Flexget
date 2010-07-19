@@ -64,6 +64,8 @@ class Entry(dict):
             from flexget.utils.imdb import extract_id
             value = u'http://www.imdb.com/title/%s/' % extract_id(value)
 
+        log.log(5, 'ENTRY %s = %s' % (key, value))
+
         dict.__setitem__(self, key, value)
 
         # calculate uid
@@ -75,7 +77,7 @@ class Entry(dict):
                     m.update(value.encode('ascii', 'ignore'))
                 else:
                     m.update(value)
-                    
+
             just_fucking_do_it(self['original_url'])
             just_fucking_do_it(self['title'])
             uid = m.hexdigest()
@@ -121,7 +123,7 @@ def useFeedLogging(func):
         finally:
             for handler in log.parent.handlers:
                 handler.setFormatter(formatters[handler])
-       
+
     return wrapper
 
 
@@ -139,7 +141,7 @@ class Feed(object):
         self.manager = manager
         self.enabled = True
         self.session = None
-        
+
         self.priority = 65535
 
         # simple persistence
@@ -165,13 +167,13 @@ class Feed(object):
         self.current_plugin = None
 
         self.performance = {}
-        
+
     def __cmp__(self, other):
         return cmp(self.priority, other.priority)
-        
+
     def __str__(self):
         return '<Feed(name=%s,aborted=%s)>' % (self.name, str(self._abort))
-        
+
     def purge(self):
         """
             Purge rejected and failed entries.
@@ -378,7 +380,7 @@ class Feed(object):
             if not errors:
                 print 'Feed \'%s\' passed' % self.name
             return
-            
+
         log.debug('starting session')
         self.session = Session()
 

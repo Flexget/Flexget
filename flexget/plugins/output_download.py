@@ -9,6 +9,7 @@ import zlib
 from flexget.plugin import *
 from httplib import BadStatusLine
 from flexget.utils.tools import urlopener
+import mimetypes
 
 log = logging.getLogger('download')
 
@@ -162,7 +163,7 @@ class PluginDownload:
             # store temp filename into entry so other plugins may read and modify content
             # temp file is moved into final destination at self.output
             entry['file'] = datafile
-            log.debug('%s file attr set to %s' % (entry['title'], entry['file']))
+            log.debug('%s field file set to: %s' % (entry['title'], entry['file']))
         except:
             # don't leave futile files behind
             log.debug('Download interrupted, removing datafile')
@@ -215,10 +216,9 @@ class PluginDownload:
 
     def filename_ext_from_mime(self, entry):
         """Tries to set filename extension from mime-type"""
-        import mimetypes
         extension = mimetypes.guess_extension(entry['mime-type'])
         if extension:
-            log.debug('Mimetypes guess for %s is %s ' % (entry['mime-type'], extension))
+            log.debug('Mimetype guess for %s is %s ' % (entry['mime-type'], extension))
             if 'filename' in entry:
                 if entry['filename'].endswith(extension):
                     log.debug('Filename %s extension matches to mime-type' % entry['filename'])
@@ -268,18 +268,25 @@ class PluginDownload:
             if feed.manager.options.dl_path:
                 path = feed.manager.options.dl_path
 
-            # make filename, if entry has preferred filename attribute use it, if not use title
+            # disallow html content
+            html_mimes = ['html', 'text/html']
+            if entry.get('mime-type') in html_mimes and config['fail_html']:
+                feed.fail(entry, 'unexpected html content')
+                log.error('Unexpected html content received from %s' % entry['url'])
+                return
+
+            # if we still don't have a filename, try making one from title (last resort)
             if not 'filename' in entry:
-                html_mimes = ['html', 'text/html']
-                if entry.get('mime-type') in html_mimes and config['fail_html']:
-                    feed.fail(entry, 'unexpected html content')
-                    log.error('Unexpected html content received from %s' % entry['url'])
-                    return
+                entry['filename'] = entry['title']
+                log.debug('set filename from title %s' % entry['filename'])
+                if not 'mime-type' in entry:
+                    log.warning('Unable to figure proper filename for %s. Using title.' % entry['title'])
                 else:
-                    log.warning('Unable to figure proper filename / extension for %s, using title. Mime-type: %s' % (entry['title'], entry.get('mime-type', 'N/A')))
-                    # try to append an extension to the title
-                    entry['filename'] = entry['title']
-                    self.filename_ext_from_mime(entry)
+                    guess = mimetypes.guess_extension(entry['mime-type'])
+                    if not guess:
+                        log.warning('Unable to guess extension with mime-type %s' % guess)
+                    else:
+                        self.filename_ext_from_mime(entry)
 
             # make path
             path = os.path.expanduser(path)
@@ -305,6 +312,7 @@ class PluginDownload:
             # remove duplicate spaces
             name = ' '.join(name.split())
             destfile = os.path.join(path, name)
+            log.debug('destfile: %s' % destfile)
 
             if os.path.exists(destfile):
                 if filecmp.cmp(entry['file'], destfile):
@@ -318,7 +326,7 @@ class PluginDownload:
                     return
 
             # move temp file
-            logging.debug('moving %s to %s' % (entry['file'], destfile))
+            log.debug('moving %s to %s' % (entry['file'], destfile))
 
             try:
                 shutil.move(entry['file'], destfile)

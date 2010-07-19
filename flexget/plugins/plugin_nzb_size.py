@@ -3,6 +3,10 @@ from flexget.plugin import *
 
 log = logging.getLogger('nzb_size')
 
+# a bit hacky, add nzb as a known mimetype
+import mimetypes
+mimetypes.add_type('application/x-nzb', '.nzb')
+
 
 class NzbSize(object):
 

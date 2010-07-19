@@ -29,32 +29,32 @@ class InputRSS(object):
           url: <url>
           username: <name>
           password: <password>
-          
+
         Advanced usages:
-        
+
         You may wish to clean up the entry by stripping out all non-ascii characters.
         This can be done by setting ascii value to yes.
-        
+
         Example:
-        
+
         rss:
           url: <url>
           ascii: yes
-        
-        Incase RSS-feed uses some nonstandard field for urls and automatic detection fails 
+
+        Incase RSS-feed uses some nonstandard field for urls and automatic detection fails
         you can configure plugin to use url from any feedparser entry attribute.
-        
+
         Example:
-        
+
         rss:
           url: <url>
           link: guid
-          
+
         You can disable few possibly annoying warnings by setting silent value to
         yes on feeds where there are frequently invalid items.
-       
+
         Example:
-       
+
         rss:
           url: <url>
           silent: yes
@@ -71,6 +71,7 @@ class InputRSS(object):
         advanced.accept('text', key='link')
         advanced.accept('boolean', key='silent')
         advanced.accept('boolean', key='ascii')
+        advanced.accept('boolean', key='filename')
         return root
 
     def passwordize(self, url, user, password):
@@ -78,7 +79,7 @@ class InputRSS(object):
         parts = list(urlparse.urlsplit(url))
         parts[1] = user + ':' + password + '@' + parts[1]
         url = urlparse.urlunsplit(parts)
-        return url        
+        return url
 
     @cached('rss', 'url')
     @internet(log)
@@ -95,7 +96,7 @@ class InputRSS(object):
         log.debug('Checking feed %s (%s)', feed.name, url)
 
         # check etags and last modified -headers
-        
+
         # let's not, flexget works better when feed contains all entries all the time ?
         etag = None
         modified = None
@@ -136,7 +137,7 @@ class InputRSS(object):
                 raise PluginError('Internal server exception on feed %s' % feed.name, log)
         else:
             log.debug('RSS does not have status (normal if processing a file)')
-            
+
         # check for bozo
         ex = rss.get('bozo_exception', False)
         ignore = False
@@ -152,7 +153,7 @@ class InputRSS(object):
             elif isinstance(ex, xml.sax._exceptions.SAXParseException):
                 if len(rss.entries) == 0:
                     # save invalid data for review, this is a bit ugly but users seem to really confused when
-                    # html pages (login pages) are received 
+                    # html pages (login pages) are received
                     log.critical('Invalid XML received from feed %s' % feed.name)
                     req = urlopener(url, log)
                     data = req.read()
@@ -192,7 +193,7 @@ class InputRSS(object):
             log.error(rss)
             log.error('Bozo feed exception on %s' % feed.name)
             return
-            
+
         log.debug('encoding %s' % rss.encoding)
 
         # update etag, use last modified if no etag exists
@@ -206,14 +207,14 @@ class InputRSS(object):
                 feed.cache.store('modified', rss.modified, 90)
                 log.debug('last modified saved for feed %s', feed.name)
         """
-        
-        # field name for url can be configured by setting link. 
+
+        # field name for url can be configured by setting link.
         # default value is auto but for example guid is used in some feeds
         curl = config.get('link', 'auto')
         ignored = 0
         for entry in rss.entries:
 
-            # ignore entries without title            
+            # ignore entries without title
             if not entry.title:
                 log.debug('skipping entry without title')
                 ignored += 1
@@ -224,17 +225,17 @@ class InputRSS(object):
                 log.debug('%s does not have link or enclosure' % entry.title)
                 ignored += 1
                 continue
-        
+
             # convert title to ascii (cleanup)
             if config.get('ascii', False):
                 entry.title = entry.title.encode('ascii', 'ignore')
-        
+
             # fix for crap feeds with no ID
             if not 'id' in entry:
                 entry['id'] = entry.link
 
             # remove annoying zero width spaces
-            entry.title = entry.title.replace(u'\u200B', u'') 
+            entry.title = entry.title.replace(u'\u200B', u'')
 
             # helper
             def add_entry(ea):
@@ -250,7 +251,7 @@ class InputRSS(object):
                     ea['basic_auth_username'] = config['username']
                     ea['basic_auth_password'] = config['password']
                 feed.entries.append(ea)
-                
+
             # create from enclosures if present
             enclosures = entry.get('enclosures', [])
             if enclosures:
@@ -262,12 +263,12 @@ class InputRSS(object):
                         continue
                     ee['url'] = enclosure['href']
                     # get optional meta-data
-                    if 'length' in enclosure: 
+                    if 'length' in enclosure:
                         try:
                             ee['size'] = int(enclosure['length'])
                         except:
                             ee['size'] = 0
-                    if 'type' in enclosure: 
+                    if 'type' in enclosure:
                         ee['type'] = enclosure['type']
                     # if enclosure has size OR there are multiple enclosures use filename from url
                     if ee.get('size', 0) != 0 or len(enclosures) > 1:
@@ -275,15 +276,15 @@ class InputRSS(object):
                             # parse filename from enclosure url
                             # TODO: better and perhaps join/in download plugin? also see urlparse module
                             match = re.search('.*\/([^?#]*)', ee['url'])
-                            if match:
+                            if match and config.get('filename', True):
                                 ee['filename'] = match.group(1)
-                                #log.debug('filename %s from enclosure' % ee['filename'])
+                                log.log(5, 'filename %s from enclosure' % ee['filename'])
                     add_entry(ee)
                 continue
 
             # create flexget entry
             e = Entry()
-                
+
             # automaticly determine url from available fields
             if curl == 'auto':
                 # try from link, guid
@@ -294,7 +295,7 @@ class InputRSS(object):
                 else:
                     if not config.get('silent'):
                         log_once('Failed to auto-detect RSS-entry %s link' % (entry.title), log)
-                    ignored += 1    
+                    ignored += 1
                     continue
             else:
                 # manual configuration
@@ -303,9 +304,9 @@ class InputRSS(object):
                     ignored += 1
                     continue
                 e['url'] = getattr(entry, curl)
-          
+
             add_entry(e)
-            
+
         if ignored:
             if not config.get('silent'):
                 log.warning('Skipped %s RSS-entries without required information (title, link or enclosures)' % ignored)
