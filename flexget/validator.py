@@ -94,11 +94,17 @@ class Validator(object):
             Helper method. Validate item against list of rules (validators).
             Return True if item passed any of the rules, False if none of the rules pass item.
         """
+        count = self.errors.count()
         for rule in rules:
             #print 'validating %s' % rule.name
             if rule.validateable(item):
                 if rule.validate(item):
                     return True
+        # If no validators matched or reported errors, and one of them has a custom error message, display it.
+        if count == self.errors.count():
+            for rule in rules:
+                if hasattr(rule, 'message') and rule.message:
+                    self.errors.add(rule.message)
         return False
 
     def __str__(self):
@@ -276,6 +282,7 @@ class RegexpMatchValidator(Validator):
 
     def __init__(self, parent=None):
         self.regexps = []
+        self.message = None
         Validator.__init__(self, parent)
     
     def accept(self, regexp, **kwargs):
@@ -283,6 +290,8 @@ class RegexpMatchValidator(Validator):
             self.regexps.append(re.compile(regexp))
         except:
             raise Exception('Invalid regexp given to match_regexp')
+        if kwargs.get('message'):
+            self.message = kwargs['message']
         
     def validateable(self, data):
         return isinstance(data, basestring)
@@ -294,7 +303,10 @@ class RegexpMatchValidator(Validator):
         for regexp in self.regexps:
             if regexp.match(data):
                 return True
-        self.errors.add('%s is not valid value')
+        if self.message:
+            self.errors.add(self.message)
+        else:
+            self.errors.add('%s does not match regexp' % data)
         return False
     
 
