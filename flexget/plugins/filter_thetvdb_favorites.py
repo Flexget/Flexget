@@ -38,7 +38,8 @@ class FilterThetvdbFavorites:
         series_group = config.get('series_group', 'thetvdb_favs')
         tvdb_series_config[series_group] = []
         for fid in favorite_ids:
-            data = BeautifulStoneSoup(urllib.urlopen("http://thetvdb.com/data/series/%s/" % str(fid)))
+            data = BeautifulStoneSoup(urllib.urlopen("http://thetvdb.com/data/series/%s/" % str(fid)), \
+                convertEntities=BeautifulStoneSoup.HTML_ENTITIES)
             tvdb_series_config[series_group].append(data.series.seriesname.string)
         # If the series plugin is not configured on this feed, make a blank config
         if not 'series' in feed.config:

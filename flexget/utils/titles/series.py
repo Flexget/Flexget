@@ -108,7 +108,7 @@ class SeriesParser(TitleParser):
 
         def remove_dirt(str):
             """Helper, just replace crap with spaces"""
-            return re.sub(r'[-_.\[\]\(\)]+', ' ', str).strip().lower()
+            return re.sub(r'[-_.\[\]\(\):]+', ' ', str).strip().lower()
 
         name = remove_dirt(self.name)
         data = remove_dirt(data)
@@ -121,7 +121,7 @@ class SeriesParser(TitleParser):
             """Convert 'foo bar' to '^[^...]*foo[^...]*bar[^...]+"""
             # TODO: Still doesn't handle the case where the user wants
             # "Schmost" and the feed contains "Schmost at Sea".
-            blank = r'[^0-9a-zA-Z:]'
+            blank = r'[^0-9a-zA-Z]'
             res = re.sub(blank + '+', ' ', name)
             res = res.strip()
             res = re.sub(' +', blank + '*', res)
@@ -137,28 +137,27 @@ class SeriesParser(TitleParser):
         name_end = 0
 
         # regexp name matching
-        if self.name_regexps:
-            name_matches = False
-            # use all specified regexps to this data
-            for name_re in self.name_regexps:
-                match = re.search(name_re, self.data, re.IGNORECASE | re.UNICODE)
-                if match:
-                    name_start, name_end = match.span()
-                    name_matches = True
-                    break
-            if not name_matches:
-                # leave this invalid
-                log.debug('FAIL: name regexps do not match')
-                return
-        else:
-            # Use a regexp generated from the name as a fallback.
-            name_re = name_to_re(name)
+        re_from_name = False
+        if not self.name_regexps:
+            # if we don't have name_regexps, generate one from the name
+            self.name_regexps = [name_to_re(name)]
+            re_from_name = True
+            if '&' in name:
+                # if & is in the name, also add a regexp that accepts 'and' instead
+                self.name_regexps.append(name_to_re(name.replace('&', 'and')))
+        # use all specified regexps to this data
+        for name_re in self.name_regexps:
             match = re.search(name_re, self.data, re.IGNORECASE | re.UNICODE)
-            if not match:
-                #log.debug('FAIL: regexp %s does not match %s' % (name_re, data))
-                # leave this invalid
-                return
-            name_start, name_end = match.span(1)
+            if match:
+                if re_from_name:
+                    name_start, name_end = match.span(1)
+                else:
+                    name_start, name_end = match.span()
+                break
+        else:
+            # leave this invalid
+            log.debug('FAIL: name regexps do not match')
+            return
 
         # allow group(s)
         if self.allow_groups:
