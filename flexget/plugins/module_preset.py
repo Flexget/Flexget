@@ -7,17 +7,20 @@ log = logging.getLogger('preset')
 class PluginPreset(object):
     """
         Use presets.
-        
+
         Example:
-        
+
         preset: movies
-        
+
         Example, list of presets:
-        
+
         preset:
           - movies
           - imdb
     """
+
+    def __init__(self):
+        self.warned = False
 
     def validator(self):
         from flexget import validator
@@ -42,7 +45,7 @@ class PluginPreset(object):
             if feed.manager.options.preset not in config:
                 feed.enabled = False
                 return
-        
+
         # add global in except when disabled with no_global
         if 'no_global' in config:
             config.remove('no_global')
@@ -50,16 +53,25 @@ class PluginPreset(object):
                 config.remove('global')
         elif not 'global' in config:
             config.append('global')
-                
+
         log.log(5, 'presets: %s' % config)
 
         toplevel_presets = feed.manager.config.get('presets', {})
-        
+
+        # check for indentation error (plugin as a preset)
+        if not self.warned:
+            plugins = get_plugin_keywords()
+            for name in toplevel_presets.iterkeys():
+                if name in plugins:
+                    log.error('Plugin \'%s\' seems to be in the wrong place? You probably wanted to put it in a preset. Please fix the indentation level!' % name)
+            self.warned = True
+
+        # apply presets
         for preset in config:
             if preset != 'global':
                 log.debug('Merging preset %s into feed %s' % (preset, feed.name))
             if not preset in toplevel_presets:
-                if preset == 'global': 
+                if preset == 'global':
                     continue
                 raise PluginError('Unable to find preset %s for feed %s' % (preset, feed.name), log)
             # merge
@@ -68,8 +80,8 @@ class PluginPreset(object):
                 merge_dict_from_to(toplevel_presets[preset], feed.config)
             except MergeException:
                 raise PluginError('Failed to merge preset %s to feed %s, incompatible datatypes' % (preset, feed.name))
-                
-                
+
+
 class DisablePlugin(object):
     """
     Allows disabling plugins when using presets.
@@ -93,7 +105,7 @@ class DisablePlugin(object):
 
         Feed nzbs uses all other configuration from preset movies but removes the download plugin
     """
-    
+
     def validator(self):
         from flexget import validator
         root = validator.factory()
