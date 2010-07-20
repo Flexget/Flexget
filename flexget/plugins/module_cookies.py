@@ -23,7 +23,7 @@ class PluginCookies:
         root = validator.factory()
         root.accept('file')
         cookies = root.accept('dict')
-        cookies.accept('file', key='file')
+        cookies.accept('file', key='file', required=True)
         cookies.accept('choice', key='type').accept_choices(['firefox3', 'mozilla', 'lwp'])
         return root
 

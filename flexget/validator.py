@@ -455,10 +455,10 @@ class DictValidator(Validator):
                 if count == self.errors.count():
                     l = [r.name for r in rules]
                     self.errors.add('value \'%s\' is not valid %s' % (value, ', '.join(l)))
+        self.errors.path_remove_level()
         for required in self.required_keys:
             if not required in data:
                 self.errors.add('key \'%s\' required' % required)
-        self.errors.path_remove_level()
         return count == self.errors.count()
 
 
