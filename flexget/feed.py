@@ -464,6 +464,9 @@ class Feed(object):
                     log.critical('Invalid validator method in plugin %s' % keyword)
                     log.exception(e)
                     continue
+                if not validator.name == 'root':
+                    # if validator is not root type, add root validator as it's parent
+                    validator = validator.add_root_parent()
                 if not validator.validate(self.config[keyword]):
                     for msg in validator.errors.messages:
                         validate_errors.append('%s %s' % (keyword, msg))

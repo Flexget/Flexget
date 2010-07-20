@@ -72,6 +72,16 @@ class Validator(object):
             raise Exception('Validator %s is missing class-attribute name' % validator.__class__.__name__)
         self.validators[validator.name] = validator
 
+    def add_root_parent(self):
+        if self.name == 'root':
+            return self
+        validator = self.get_validator('root')
+        validator.errors = self.errors
+        validator.validators = self.validators
+        validator.valid.append(self)
+        self.parent = validator
+        return validator
+
     def get_validator(self, name):
         if not self.validators.get(name):
             raise Exception('Asked unknown validator \'%s\'' % name)
