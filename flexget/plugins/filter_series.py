@@ -449,13 +449,13 @@ class FilterSeries(SeriesPlugin):
             options.accept('choice', key='max_quality').accept_choices(qualities, ignore_case=True)
             # propers
             options.accept('boolean', key='propers')
-            options.accept('regexp_match', key='propers').accept('\d+ (minutes|hours|days|weeks)', \
-                message="should be in format 'x (minutes|hours|days|weeks)' i.e. '5 days' or yes/no")
+            message = "should be in format 'x (minutes|hours|days|weeks)' i.e. '5 days'"
+            time_regexp = '\d+ (minutes|hours|days|weeks)'
+            options.accept('regexp_match', key='propers', message=message + ' or yes/no').accept(time_regexp)
             # expect flags
             options.accept('text', key='identified_by')
             # timeframe
-            options.accept('regexp_match', key='timeframe').accept('\d+ (minutes|hours|days|weeks)', \
-                message="should be in format 'x (minutes|hours|days|weeks)' i.e. '5 days'")
+            options.accept('regexp_match', key='timeframe', message=message).accept(time_regexp)
             # strict naming
             options.accept('boolean', key='exact')
             # watched

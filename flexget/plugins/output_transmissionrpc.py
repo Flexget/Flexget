@@ -63,7 +63,7 @@ class PluginTransmissionrpc:
         advanced.accept('file', key='netrc', required=False)
         advanced.accept('text', key='username', required=False)
         advanced.accept('text', key='password', required=False)
-        advanced.accept('text', key='path', required=False)
+        advanced.accept('path', key='path', required=False, allow_replacement=True)
         advanced.accept('boolean', key='addpaused', required=False)
         advanced.accept('number', key='maxconnections', required=False)
         advanced.accept('number', key='maxupspeed', required=False)

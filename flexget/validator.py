@@ -41,18 +41,19 @@ class Errors:
         self.path[self.path_level] = value
 
 
-def factory(name='root'):
+def factory(name='root', **kwargs):
     """Factory method, returns validator instance."""
     v = Validator()
-    return v.get_validator(name)
+    return v.get_validator(name, **kwargs)
 
 
 class Validator(object):
 
     name = 'validator'
 
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, message=None, **kwargs):
         self.valid = []
+        self.message = message
         if parent is None:
             self.errors = Errors()
             self.validators = {}
@@ -82,11 +83,11 @@ class Validator(object):
         self.parent = validator
         return validator
 
-    def get_validator(self, name):
+    def get_validator(self, name, **kwargs):
         if not self.validators.get(name):
             raise Exception('Asked unknown validator \'%s\'' % name)
         #print 'returning %s' % name
-        return self.validators[name](self)
+        return self.validators[name](self, **kwargs)
 
     def accept(self, name, **kwargs):
         raise Exception('Validator %s should override accept method' % self.__class__.__name__)
@@ -113,7 +114,7 @@ class Validator(object):
         # If no validators matched or reported errors, and one of them has a custom error message, display it.
         if count == self.errors.count():
             for rule in rules:
-                if hasattr(rule, 'message') and rule.message:
+                if rule.message:
                     self.errors.add(rule.message)
         return False
 
@@ -125,7 +126,7 @@ class RootValidator(Validator):
     name = 'root'
 
     def accept(self, name, **kwargs):
-        v = self.get_validator(name)
+        v = self.get_validator(name, **kwargs)
         self.valid.append(v)
         return v
     
@@ -134,10 +135,8 @@ class RootValidator(Validator):
     
     def validate(self, data):
         count = self.errors.count()
-        for v in self.valid:
-            if v.validateable(data):
-                if v.validate(data):
-                    return True
+        if self.validate_item(data, self.valid):
+            return True
         # containers should only add errors if inner validators did not
         if count == self.errors.count():
             acceptable = [v.name for v in self.valid]
@@ -148,9 +147,9 @@ class RootValidator(Validator):
 class ChoiceValidator(Validator):
     name = 'choice'
 
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, **kwargs):
         self.valid_ic = []
-        Validator.__init__(self, parent)
+        Validator.__init__(self, parent, **kwargs)
 
     def accept(self, value, **kwargs):
         if not isinstance(value, basestring):
@@ -290,10 +289,9 @@ class RegexpValidator(Validator):
 class RegexpMatchValidator(Validator):
     name = 'regexp_match'
 
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, **kwargs):
         self.regexps = []
-        self.message = None
-        Validator.__init__(self, parent)
+        Validator.__init__(self, parent, **kwargs)
     
     def accept(self, regexp, **kwargs):
         try:
@@ -322,9 +320,10 @@ class RegexpMatchValidator(Validator):
 
 class FileValidator(TextValidator):
     name = 'file'
-    
+
     def validate(self, data):
         import os
+
         if not os.path.isfile(os.path.expanduser(data)):
             self.errors.add('File %s does not exist' % data)
             return False
@@ -333,11 +332,33 @@ class FileValidator(TextValidator):
 
 class PathValidator(TextValidator):
     name = 'path'
+
+    def __init__(self, parent=None, allow_replacement=False, **kwargs):
+        self.allow_replacement = allow_replacement
+        Validator.__init__(self, parent, **kwargs)
     
     def validate(self, data):
         import os
-        if not os.path.isdir(os.path.expanduser(data)):
-            self.errors.add('Path %s does not exist' % data)
+
+        path = data
+        if self.allow_replacement:
+            # If string replacement is allowed, only validate the part of the
+            # path before the first identifier to be replaced
+            pat = re.compile(r'''
+                %                     # Start with percent,
+                (?:\( ([^()]*) \))    # name in parens (do not capture parens),
+                [-+ #0]*              # zero or more flags
+                (?:\*|[0-9]*)         # optional minimum field width
+                (?:\.(?:\*|[0-9]*))?  # optional dot and length modifier
+                [EGXcdefgiorsux%]     # type code (or [formatted] percent character)
+                ''', re.VERBOSE)
+
+            result = pat.search(data)
+            if result:
+                path = os.path.dirname(data[0:result.start()])
+
+        if not os.path.isdir(os.path.expanduser(path)):
+            self.errors.add('Path %s does not exist' % path)
             return False
         return True
 
@@ -360,7 +381,7 @@ class ListValidator(Validator):
     name = 'list'
 
     def accept(self, name, **kwargs):
-        v = self.get_validator(name)
+        v = self.get_validator(name, **kwargs)
         self.valid.append(v)
         return v
 
@@ -387,11 +408,11 @@ class ListValidator(Validator):
 class DictValidator(Validator):
     name = 'dict'
 
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, **kwargs):
         self.reject = {}
         self.any_key = []
         self.required_keys = []
-        Validator.__init__(self, parent)
+        Validator.__init__(self, parent, **kwargs)
         # TODO: not dictionary?
         self.valid = {}
 
@@ -401,13 +422,17 @@ class DictValidator(Validator):
             raise Exception('%s.accept() must specify key' % self.name)
 
         key = kwargs['key']
-        v = self.get_validator(name)
-        self.valid.setdefault(key, []).append(v)
         # complain from old format
         if 'require' in kwargs:
             print 'Deprecated validator api, should use required=bool instead of require=bool'
         if kwargs.get('required', False):
             self.require_key(key)
+        # clean our keys from kwargs, so they can be passed to Validator constuctor
+        for k in ['key', 'require', 'required']:
+            if k in kwargs:
+                del kwargs[k]
+        v = self.get_validator(name, **kwargs)
+        self.valid.setdefault(key, []).append(v)
         return v
 
     def reject_key(self, key, message=None):
@@ -426,7 +451,7 @@ class DictValidator(Validator):
 
     def accept_any_key(self, name, **kwargs):
         """Accepts any key with given type"""
-        v = self.get_validator(name)
+        v = self.get_validator(name, **kwargs)
         #v.accept(name, **kwargs)
         self.any_key.append(v)
         return v

@@ -45,10 +45,10 @@ class PluginDownload:
         """Return config validator"""
         from flexget import validator
         root = validator.factory()
-        root.accept('path')
+        root.accept('path', allow_replacement=True)
         root.accept('boolean')
         advanced = root.accept('dict')
-        advanced.accept('path', key='path')
+        advanced.accept('path', key='path', allow_replacement=True)
         advanced.accept('boolean', key='fail_html')
         advanced.accept('boolean', key='overwrite')
         return root
@@ -289,7 +289,13 @@ class PluginDownload:
                         self.filename_ext_from_mime(entry)
 
             # make path
-            path = os.path.expanduser(path)
+            try:
+                path = os.path.expanduser(path % entry)
+            except KeyError, e:
+                feed.fail(entry, "Could not set path for %s: does not contain the field '%s'." % (entry['title'], e))
+                log.error("Download Failed: Couldn't set path for %s. Does not contain field '%s'." % (entry['title'], e))
+                return
+            
 
             if not os.path.isdir(path):
                 log.info('Creating directory %s' % path)
