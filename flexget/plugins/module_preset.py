@@ -63,7 +63,7 @@ class PluginPreset(object):
             plugins = get_plugin_keywords()
             for name in toplevel_presets.iterkeys():
                 if name in plugins:
-                    log.error('Plugin \'%s\' seems to be in the wrong place? You probably wanted to put it in a preset. Please fix the indentation level!' % name)
+                    log.warning('Plugin \'%s\' seems to be in the wrong place? You probably wanted to put it in a preset. Please fix the indentation level!' % name)
             self.warned = True
 
         # apply presets

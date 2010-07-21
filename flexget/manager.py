@@ -171,20 +171,17 @@ class Manager(object):
                 log.warning('Line %s has tabs, use only spaces!' % line_num)
             if isodd(indentation):
                 log.warning('Config line %s has odd (uneven) indentation' % line_num)
-            if indentation > prev_indentation + 2 and not prev_mapping:
-                # line increases indentation, but previously didn't start mapping
+            if indentation > prev_indentation and not prev_mapping:
+                # line increases indentation, but previous didn't start mapping
                 log.warning('Config line %s is likely missing ":" at the end' % (line_num - 1))
             if indentation > prev_indentation + 2 and prev_mapping and not prev_list:
                 # mapping value after non list indented more than 2
                 log.warning('Config line %s is indented too much' % line_num)
-            if indentation < prev_indentation + 2 and prev_mapping and prev_list:
+            if indentation <= prev_indentation + 2 and prev_mapping and prev_list:
                 log.warning('Config line %s is not indented enough' % line_num)
             if prev_mapping and indentation <= prev_indentation:
                 # after opening a map, indentation decreases
                 log.warning('Config line %s is indented incorrectly (previous line ends with ":")' % line_num)
-            if prev_list and not prev_mapping and indentation > prev_indentation:
-                # after a list item that does NOT start mapping indentation increases
-                log.warning('Config line %s is likely missing ":" at the end' % (line_num - 1))
 
             # notify if user is trying to set same key multiple times in a feed (a common mistake)
             for level in duplicates.iterkeys():
