@@ -59,7 +59,7 @@ class PluginPreset(object):
         toplevel_presets = feed.manager.config.get('presets', {})
 
         # check for indentation error (plugin as a preset)
-        if not self.warned:
+        if (feed.manager.options.test or feed.manager.options.validate) and not self.warned:
             plugins = get_plugin_keywords()
             for name in toplevel_presets.iterkeys():
                 if name in plugins:
