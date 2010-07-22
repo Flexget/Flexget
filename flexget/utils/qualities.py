@@ -118,9 +118,11 @@ def common_name(name):
 
 def parse_quality(title):
     """Find the highest know quality in a given string"""
+    import re
     bestfound = UnknownQuality()
     for qual in registry:
-        if qual.lower() in title.lower():
+        regexp = r'([^a-zA-Z0-9]|\A)' + qual + r'([^a-zA-Z0-9]|\Z)'
+        if re.search(regexp, title, re.IGNORECASE):
             if registry[qual] > bestfound:
                 bestfound = registry[qual]
     return bestfound
