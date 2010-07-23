@@ -40,11 +40,11 @@ class FilterRegexp(object):
             # bundle is a dictionary form
             bundle = regexps.accept('dict')
             # path as a single parameter
-            bundle.accept_any_key('path')
+            bundle.accept_any_key('path', allow_replacement=True)
             
             # advanced configuration as a parameter
             advanced = bundle.accept_any_key('dict')
-            advanced.accept('path', key='path')
+            advanced.accept('path', key='path', allow_replacement=True)
             # accept set parameters
             set = advanced.accept('dict', key='set')
             set.accept_any_key('any')
