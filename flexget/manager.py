@@ -197,7 +197,7 @@ class Manager(object):
 
             prev_indentation = indentation
             # this line is a mapping (ends with :)
-            prev_mapping = line[-1] == ':'
+            prev_mapping = line[-1] in [':', '|', '>']
             # this line is a list
             prev_list = line.strip()[0] == '-'
 
