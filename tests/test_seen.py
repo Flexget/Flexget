@@ -56,14 +56,14 @@ class TestFilterSeenMovies(FlexGetBase):
                - {title: 'Seen movie title 1', url: 'http://localhost/seen_movie1', imdb_url: 'http://www.imdb.com/title/tt0103064/'}
                - {title: 'Seen movie title 2', url: 'http://localhost/seen_movie2', imdb_url: 'http://www.imdb.com/title/tt0103064/'}
             accept_all: yes
-            seen_movies: true
+            seen_movies: loose
          
           test_2:
             mock:
               - {title: 'Seen movie title 3', url: 'http://localhost/seen_movie3', imdb_url: 'http://www.imdb.com/title/tt0103064/'}
               - {title: 'Seen movie title 4', url: 'http://localhost/seen_movie4', imdb_url: 'http://www.imdb.com/title/tt0103064/'}
               - {title: 'Seen movie title 5', url: 'http://localhost/seen_movie5', imdb_url: 'http://www.imdb.com/title/tt0231264/'}
-            seen_movies: true
+            seen_movies: loose
 
           strict:
             mock:

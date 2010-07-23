@@ -26,7 +26,7 @@ class Quality(object):
         return self.value >= other.value
         
     def __str__(self):
-        return '<Quality(name=%s,value=%s)>' % (self.name, self.value)
+        return '<Quality(name=%s,value=%s,regexp=%s)>' % (self.name, self.value, self.regexp)
         
     __repr__ = __str__
 

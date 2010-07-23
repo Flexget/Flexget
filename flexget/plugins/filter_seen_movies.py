@@ -62,6 +62,12 @@ class FilterSeenMovies(FilterSeen):
         self.fields = ['imdb_url']
         self.keyword = 'seen_movies'
 
+    def validator(self):
+        from flexget import validator
+        root = validator.factory('choice', message="must be one of the following: strict, loose")
+        root.accept_choices(['strict', 'loose'])
+        return root
+
     #We run last (-255) to make sure we don't reject duplicates before all the other plugins get a chance to reject.
     @priority(-255)
     def on_feed_filter(self, feed):

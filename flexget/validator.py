@@ -170,7 +170,7 @@ class ChoiceValidator(Validator):
         if data in self.valid or data.lower() in self.valid_ic:
             return True
         else:
-            self.errors.add('must be one of values %s' % ', '.join(self.valid + self.valid_ic))
+            self.errors.add('must be one of the following: %s' % ', '.join(self.valid + self.valid_ic))
             return False
 
 
