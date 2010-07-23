@@ -189,11 +189,13 @@ class Manager(object):
                 if indentation < level:
                     duplicates[level] = {}
             if ':' in line:
-                name = line.split(':', 1)[0].strip()
-                ns = duplicates.setdefault(indentation, {})
-                if name in ns:
-                    log.warning('Trying to set value for `%s` in the line %s, but it is already defined in the line %s!' % (name, line_num, ns[name]))
-                ns[name] = line_num
+                # Check that : is not embedded in a string, like 'd:\files'
+                if not line.split(':', 1)[1] or line.split(':', 1)[1].startswith(' '):
+                    name = line.split(':', 1)[0].strip()
+                    ns = duplicates.setdefault(indentation, {})
+                    if name in ns:
+                        log.warning('Trying to set value for `%s` in line %s, but it is already defined in line %s!' % (stripped, line_num, ns[name]))
+                    ns[name] = line_num
 
             prev_indentation = indentation
             # this line is a mapping (ends with :)
