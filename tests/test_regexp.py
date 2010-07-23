@@ -24,9 +24,9 @@ class TestRegexp(FlexGetBase):
             regexp:
               accept:
                 - regexp1
-                - regexp2: ~/custom_path/2/
+                - regexp2: ~
                 - regexp3:
-                    path: ~/custom_path/3/
+                    path: ~
                 - regexp4:
                     not:
                       - exp4
@@ -66,8 +66,8 @@ class TestRegexp(FlexGetBase):
         assert self.feed.find_entry('accepted', title='regexp2'), 'regexp2 should have been accepted'
         assert self.feed.find_entry('accepted', title='regexp3'), 'regexp3 should have been accepted'
         assert self.feed.find_entry('entries', title='regexp4'), 'regexp4 should have been left'
-        assert self.feed.find_entry('accepted', title='regexp2', path='~/custom_path/2/'), 'regexp2 should have been accepter with custom path'
-        assert self.feed.find_entry('accepted', title='regexp3', path='~/custom_path/3/'), 'regexp3 should have been accepter with custom path'
+        assert self.feed.find_entry('accepted', title='regexp2', path='~'), 'regexp2 should have been accepter with custom path'
+        assert self.feed.find_entry('accepted', title='regexp3', path='~/'), 'regexp3 should have been accepter with custom path'
 
     def test_reject(self):
         self.execute_feed('test_reject')

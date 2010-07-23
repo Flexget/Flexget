@@ -64,7 +64,7 @@ class FilterRegexp(object):
             regexps = conf.accept('list', key=operation)
             build_list(regexps)
             
-        conf.accept('choice', key='rest').accept_choices(['accept', 'filter', 'reject'])
+        conf.accept('choice', key='rest').accept_choices(['accept', 'reject'])
         return conf
 
     @priority(172)
