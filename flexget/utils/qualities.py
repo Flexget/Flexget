@@ -67,12 +67,15 @@ def all():
     return sorted(qualities, reverse=True)
 
 
-def get(name):
+def get(name, fallback=UnknownQuality()):
     """Return Quality object for :name: (case insensitive)"""
     name = name.lower()
     if name in registry:
         return registry[name]
-    return parse_quality(name)
+    q = parse_quality(name, True)
+    if q.value:
+        return q
+    return fallback
 
 
 def value(name):
@@ -99,12 +102,18 @@ def common_name(name):
     return get(name).name
 
 
-def parse_quality(title):
+def parse_quality(title, exact=False):
     """Find the highest know quality in a given string"""
     import re
     qualities.sort(reverse=True)
+    if exact:
+        title = title.strip(' -_.[]():')
+        (lcap, rcap) = (r'\A', r'\Z')
+    else:
+        (lcap, rcap) = (r'([^a-zA-Z0-9]|\A)', r'([^a-zA-Z0-9]|\Z)')
+        
     for qual in qualities:
-        regexp = r'([^a-zA-Z0-9]|\A)' + qual.regexp + r'([^a-zA-Z0-9]|\Z)'
+        regexp = lcap + qual.regexp + rcap
         if re.search(regexp, title, re.IGNORECASE):
             return qual
     return UnknownQuality()

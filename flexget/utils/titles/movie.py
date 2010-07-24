@@ -54,11 +54,12 @@ class MovieParser(TitleParser):
             # check for cutoff words
             if part.lower() in self.cutoffs:
                 if parts.index(part) < cut_pos:
-                    if parts.index(part) < cut_pos:
-                        cut_pos = parts.index(part)
-            # check for qualities, these are already cutoff words (self.cutoffs)
-            if not self.quality and part.lower() in qualities.registry:
-                self.quality = part
+                    cut_pos = parts.index(part)
+            # check for qualities
+            if not self.quality and qualities.get(part, False):
+                self.quality = qualities.common_name(part)
+                if parts.index(part) < cut_pos:
+                    cut_pos = parts.index(part)
 
         # make cut
         s = ' '.join(parts[:cut_pos])

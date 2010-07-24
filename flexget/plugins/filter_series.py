@@ -426,9 +426,8 @@ class FilterSeries(SeriesPlugin):
 
     def validator(self):
         from flexget import validator
-        import flexget.utils.qualities
 
-        qualities = [q.name for q in flexget.utils.qualities.all()]
+        quals = [q.name for q in qualities.all()]
 
         def build_options(options):
             options.accept('text', key='path')
@@ -443,10 +442,10 @@ class FilterSeries(SeriesPlugin):
             options.accept('list', key='ep_regexp').accept('regexp')
             options.accept('list', key='id_regexp').accept('regexp')
             # quality
-            options.accept('choice', key='quality').accept_choices(qualities, ignore_case=True)
-            options.accept('list', key='qualities').accept('choice').accept_choices(qualities, ignore_case=True)
-            options.accept('choice', key='min_quality').accept_choices(qualities, ignore_case=True)
-            options.accept('choice', key='max_quality').accept_choices(qualities, ignore_case=True)
+            options.accept('choice', key='quality').accept_choices(quals, ignore_case=True)
+            options.accept('list', key='qualities').accept('choice').accept_choices(quals, ignore_case=True)
+            options.accept('choice', key='min_quality').accept_choices(quals, ignore_case=True)
+            options.accept('choice', key='max_quality').accept_choices(quals, ignore_case=True)
             # propers
             options.accept('boolean', key='propers')
             message = "should be in format 'x (minutes|hours|days|weeks)' i.e. '5 days'"

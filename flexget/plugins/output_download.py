@@ -288,7 +288,7 @@ class PluginDownload:
                     else:
                         self.filename_ext_from_mime(entry)
 
-            # make path
+            # expand variables in path
             try:
                 path = os.path.expanduser(path % entry)
             except KeyError, e:
@@ -296,7 +296,7 @@ class PluginDownload:
                 log.error("Download Failed: Couldn't set path for %s. Does not contain field '%s'." % (entry['title'], e))
                 return
             
-
+            # make path
             if not os.path.isdir(path):
                 log.info('Creating directory %s' % path)
                 try:

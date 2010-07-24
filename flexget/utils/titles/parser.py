@@ -16,7 +16,7 @@ class TitleParser(object):
     specials = ['special']
     
     cutoffs = ['limited', 'xvid', 'h264', 'x264', 'h.264', 'x.264', 'screener', 'unrated', '3d', 'extended',
-               'directors', 'bluray', 'multisubs'] + propers + specials + qualities.registry.keys()
+               'directors', 'bluray', 'multisubs'] + propers + specials
     
     remove = ['imax']
 
