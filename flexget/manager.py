@@ -152,6 +152,7 @@ class Manager(object):
         prev_indentation = 0
         prev_mapping = False
         prev_list = True
+        prev_scalar = True
         for line in file:
             line_num += 1
             # remove linefeed
@@ -163,6 +164,12 @@ class Manager(object):
             if line.strip().startswith('#'):
                 continue
             indentation = get_indentation(line)
+
+            if prev_scalar:
+                if indentation <= prev_indentation:
+                    prev_scalar = False
+                else:
+                    continue
 
             #print '%i - %i: %s' % (line_num, indentation, line)
             #print 'prev_mapping: %s, prev_list: %s, prev_ind: %s' % (prev_mapping, prev_list, prev_indentation)
@@ -199,7 +206,8 @@ class Manager(object):
 
             prev_indentation = indentation
             # this line is a mapping (ends with :)
-            prev_mapping = line[-1] in [':', '|', '>']
+            prev_mapping = line[-1] == ':'
+            prev_scalar = line[-1] in '|>'
             # this line is a list
             prev_list = line.strip()[0] == '-'
 

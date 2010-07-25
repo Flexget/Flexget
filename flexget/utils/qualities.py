@@ -106,11 +106,7 @@ def parse_quality(title, exact=False):
     """Find the highest know quality in a given string"""
     import re
     qualities.sort(reverse=True)
-    if exact:
-        title = title.strip(' -_.[]():')
-        (lcap, rcap) = (r'\A', r'\Z')
-    else:
-        (lcap, rcap) = (r'([^a-zA-Z0-9]|\A)', r'([^a-zA-Z0-9]|\Z)')
+    (lcap, rcap) = (r'\A', r'\Z') if exact else (r'([^a-zA-Z0-9]|\A)', r'([^a-zA-Z0-9]|\Z)')
         
     for qual in qualities:
         regexp = lcap + qual.regexp + rcap
