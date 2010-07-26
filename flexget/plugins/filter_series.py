@@ -449,7 +449,7 @@ class FilterSeries(SeriesPlugin):
             # propers
             options.accept('boolean', key='propers')
             message = "should be in format 'x (minutes|hours|days|weeks)' i.e. '5 days'"
-            time_regexp = '\d+ (minutes|hours|days|weeks)'
+            time_regexp = r'\d+ (minutes|hours|days|weeks)'
             options.accept('regexp_match', key='propers', message=message + ' or yes/no').accept(time_regexp)
             # expect flags
             options.accept('text', key='identified_by')

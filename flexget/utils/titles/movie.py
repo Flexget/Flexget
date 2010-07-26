@@ -39,6 +39,7 @@ class MovieParser(TitleParser):
         parts = s.split(' ')
         year = None
         cut_pos = 256
+        self.quality = 'unknown'
         for part in parts:
             # check for year
             if part.isdigit():
@@ -56,7 +57,7 @@ class MovieParser(TitleParser):
                 if parts.index(part) < cut_pos:
                     cut_pos = parts.index(part)
             # check for qualities
-            if not self.quality and qualities.get(part, False):
+            if qualities.get(self.quality) < qualities.get(part):
                 self.quality = qualities.common_name(part)
                 if parts.index(part) < cut_pos:
                     cut_pos = parts.index(part)
@@ -66,9 +67,6 @@ class MovieParser(TitleParser):
 
         # save results
         self.name = s
-
-        if self.quality == None:
-            self.quality = 'unknown'
 
         if year:
             if year.isdigit():

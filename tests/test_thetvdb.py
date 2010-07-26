@@ -23,8 +23,8 @@ class TestThetvdbLookup(FlexGetBase):
         entry = self.feed.find_entry(title='House.S01E02.HDTV.XViD-FlexGet')
         assert entry['ep_name'] == 'Paternity', \
             '%s ep_name should be Paternity' % entry['title']
-        assert int(entry['series_runtime']) == 40, \
-            'runtime for %s is %s, should be 40' % (entry['title'], entry['series_runtime'])
+        assert int(entry['series_runtime']) == 60, \
+            'runtime for %s is %s, should be 60' % (entry['title'], entry['series_runtime'])
         assert self.feed.find_entry(ep_name='School Reunion'), \
             'Failed imdb lookup Doctor Who 2005 S02E03'
 

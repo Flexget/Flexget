@@ -67,7 +67,7 @@ def all():
     return sorted(qualities, reverse=True)
 
 
-def get(name, fallback=UnknownQuality()):
+def get(name, *args):
     """Return Quality object for :name: (case insensitive)"""
     name = name.lower()
     if name in registry:
@@ -75,7 +75,7 @@ def get(name, fallback=UnknownQuality()):
     q = parse_quality(name, True)
     if q.value:
         return q
-    return fallback
+    return args[0] if args else UnknownQuality()
 
 
 def value(name):
