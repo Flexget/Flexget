@@ -238,9 +238,13 @@ class InputRSS(object):
             entry.title = entry.title.replace(u'\u200B', u'')
 
             # helper
+            # TODO: confusing? refactor into class member ...
+
             def add_entry(ea):
                 from flexget.utils.tools import decode_html
                 ea['title'] = entry.title
+                if 'author' in entry:
+                    ea['author'] = entry.author
                 if 'description' in entry:
                     try:
                         ea['description'] = decode_html(entry.description)

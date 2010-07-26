@@ -448,7 +448,7 @@ class FilterSeries(SeriesPlugin):
             options.accept('choice', key='max_quality').accept_choices(quals, ignore_case=True)
             # propers
             options.accept('boolean', key='propers')
-            message = "should be in format 'x (minutes|hours|days|weeks)' i.e. '5 days'"
+            message = "should be in format 'x (minutes|hours|days|weeks)' e.g. '5 days'"
             time_regexp = r'\d+ (minutes|hours|days|weeks)'
             options.accept('regexp_match', key='propers', message=message + ' or yes/no').accept(time_regexp)
             # expect flags

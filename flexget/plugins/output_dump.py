@@ -5,9 +5,9 @@ import logging
 log = logging.getLogger('dump')
 
 
-class YamlDump:
+class OutputDump(object):
     """
-        Dummy plugin for testing, outputs all entries in yaml
+        Dummy plugin for testing, outputs all entries to stdout
     """
 
     def validator(self):
@@ -18,14 +18,22 @@ class YamlDump:
         if not 'dump' in feed.config and not feed.manager.options.dump_entries:
             return
         #from flexget.utils.tools import sanitize
-        import yaml
+        #import yaml
         
         def dump(values):
             for entry in values:
                 #c = entry.copy()
                 #sanitize(c)
                 #print yaml.safe_dump(entry)
-                print entry
+                for field in entry:
+                    value = entry[field]
+                    if isinstance(value, basestring):
+                        print '%-15s: %s' % (field, value.replace('\r', '').replace('\n', ''))
+                    elif isinstance(value, int) or isinstance(value, float):
+                        print '%-15s: %s' % (field, value)
+                    else:
+                        print '%-15s: [not printable]' % (field, value)
+                print ''
                 
         if feed.entries:
             print '-- Entries: ----------------------------'
@@ -37,7 +45,5 @@ class YamlDump:
             print '-- Rejected: ---------------------------'
             dump(feed.rejected)
             
-register_plugin(YamlDump, 'dump', builtin=True)
-
-# for some fucking reason this --dump does not work
+register_plugin(OutputDump, 'dump', builtin=True)
 register_parser_option('--dump', action='store_true', dest='dump_entries', default=False, help=SUPPRESS_HELP)
