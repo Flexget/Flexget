@@ -245,14 +245,11 @@ class OutputDeluge(object):
         def on_connect_success(result, feed):
             if not result:
                 # TODO: connect failed? do something
-                pass
+                log.debug("on_connect_success returned a failed result. BUG?")
+
             if feed.manager.options.test:
-            
-                def on_disconnect(result):
-                    log.debug('Test connection to deluge daemon successfull.')
-                    reactor.callLater(0.1, pause_reactor, 0)
-                    
-                client.disconnect().addCallback(on_disconnect)
+                log.debug('Test connection to deluge daemon successful.')
+                client.disconnect()
                 return
                 
             def on_success(torrent_id, entry, opts, d):
@@ -322,19 +319,17 @@ class OutputDeluge(object):
                 # Callback the deferred passed to us when all jobs are complete
                 defer.DeferredList(dlist).addBoth(d.callback)
 
-            def on_fail(result, feed, entry):
+            def on_fail(result, feed, entry, d):
                 log.info("%s was not added to deluge! %s" % (entry['title'], result))
                 feed.fail(entry, "Could not be added to deluge")
+                d.callback(None)
             
             # dlist is a list of deferreds that must complete before we exit
             dlist = []
             # loop through entries to get a list of labels to add
-            labels = []
+            labels = set([entry['label'].lower() for entry in feed.accepted if entry.get('label')])
             if config.get('label'):
-                labels.append(config['label'].lower())
-            for entry in feed.accepted:
-                if entry.get('label') and not entry['label'].lower() in labels:
-                    labels.append(entry['label'].lower())
+                labels.add(config['label'].lower())
             if labels:
                 client.core.enable_plugin('Label')
 
@@ -394,21 +389,11 @@ class OutputDeluge(object):
                     opts['content_filename'] = ''
                 #create a deferred here which we will callback after all work in on_success is done
                 d = defer.Deferred()
-                addresult.addCallbacks(on_success, on_fail, callbackArgs=(entry, opts, d), errbackArgs=(feed, entry))
+                addresult.addCallbacks(on_success, on_fail, callbackArgs=(entry, opts, d), errbackArgs=(feed, entry, d))
                 dlist.append(d)
                 
             def on_complete(result):
-
-                def on_disconnect(result):
-                    log.debug('Done adding torrents to deluge. result: %s' % result)
-                    reactor.callLater(0.1, pause_reactor, 0)
-                    
-                def on_disconnect_fail(result):
-                    log.debug('Disconnect from deluge daemon failed, result: %s' % result)
-                    reactor.callLater(0.1, pause_reactor, 0)
-                    
-                #deferLater(reactor, 0.1, client.disconnect).addCallbacks(on_disconnect, errback=on_disconnect_fail)
-                client.disconnect().addCallbacks(on_disconnect, errback=on_disconnect_fail)
+                client.disconnect()
 
             defer.DeferredList(dlist, consumeErrors=True).addBoth(on_complete)
             
@@ -421,8 +406,14 @@ class OutputDeluge(object):
                         os.remove(entry['file'])
                         del(entry['file'])
             log.debug('Connect to deluge daemon failed, result: %s' % result)
-            reactor.callLater(0.1, pause_reactor, -1)
-            
+            reactor.callLater(0, pause_reactor, -1)
+
+        def on_disconnected():
+            # pause the reactor when we get disconnected from the daemon, so flexget can continue
+            reactor.callLater(0, pause_reactor, 0)
+
+        client.set_disconnect_callback(on_disconnected)
+
         d = client.connect(
             host=config['host'],
             port=config['port'],
