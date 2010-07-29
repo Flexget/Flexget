@@ -271,7 +271,7 @@ class OutputDeluge(object):
                     log.debug("%s move on complete set to %s" % (entry['title'], opts['movedone']))
                 if opts['label']:
                     dlist.append(client.label.set_torrent(torrent_id, opts['label']))
-                if opts['queuetotop'] != None:
+                if 'queuetotop' in opts:
                     if opts['queuetotop']:
                         dlist.append(client.core.queue_top([torrent_id]))
                         log.debug("%s moved to top of queue" % entry['title'])
@@ -316,8 +316,14 @@ class OutputDeluge(object):
                     status_keys = ['files', 'total_size', 'save_path', 'move_on_completed_path', 'move_on_completed']
                     client.core.get_torrent_status(torrent_id, status_keys).addCallback(on_get_torrent_status, d2)
                     dlist.append(d2)
+
+                def on_timeout(result, entry, opts, d):
+                    log.warning('Timed out while setting deluge options for %s.' % entry['title'])
+                    log.debug('opts: %s, dlist: %s' % (opts, result.resultList))
+                    d.callback(None)
+
                 # Callback the deferred passed to us when all jobs are complete
-                defer.DeferredList(dlist).addBoth(d.callback)
+                defer.DeferredList(dlist).addBoth(d.callback).setTimeout(15, on_timeout, entry, opts, d)
 
             def on_fail(result, feed, entry, d):
                 log.info("%s was not added to deluge! %s" % (entry['title'], result))
@@ -389,13 +395,25 @@ class OutputDeluge(object):
                     opts['content_filename'] = ''
                 #create a deferred here which we will callback after all work in on_success is done
                 d = defer.Deferred()
-                addresult.addCallbacks(on_success, on_fail, callbackArgs=(entry, opts, d), errbackArgs=(feed, entry, d))
+
+                def inner_error(result):
+                    #This is to make sure we disconnect from the daemon if we encounter an unexpected error
+                    log.error('unhandled error in on_success: %s' % result)
+                    client.disconnect()
+
+                addresult.addCallbacks(on_success, on_fail, callbackArgs=(entry, opts, d), errbackArgs=(feed, entry, d)).addErrback(inner_error)
                 dlist.append(d)
                 
             def on_complete(result):
                 client.disconnect()
 
-            defer.DeferredList(dlist, consumeErrors=True).addBoth(on_complete)
+            def on_timeout(result):
+                # Schedule a disconnect to happen in 30 seconds if FlexGet hangs while connected to Deluge
+                log.error('Timed out while adding torrents to deluge.')
+                log.debug('labels+accepted: %s, dlist: %s' % (len(feed.accepted) + 1, result.resultList))
+                client.disconnect()
+
+            defer.DeferredList(dlist, consumeErrors=True).addBoth(on_complete).setTimeout(30, on_timeout)
             
         def on_connect_fail(result, feed):
             log.info('connect failed result: %s' % result)
@@ -408,11 +426,11 @@ class OutputDeluge(object):
             log.debug('Connect to deluge daemon failed, result: %s' % result)
             reactor.callLater(0, pause_reactor, -1)
 
-        def on_disconnected():
+        def on_disconnect():
             # pause the reactor when we get disconnected from the daemon, so flexget can continue
             reactor.callLater(0, pause_reactor, 0)
 
-        client.set_disconnect_callback(on_disconnected)
+        client.set_disconnect_callback(on_disconnect)
 
         d = client.connect(
             host=config['host'],
@@ -420,7 +438,6 @@ class OutputDeluge(object):
             username=config['user'],
             password=config['pass'])
 
-        #d.addCallbacks(on_connect_success, on_connect_fail, (feed), None, (feed))
         d.addCallback(on_connect_success, feed).addErrback(on_connect_fail, feed)
         start_reactor()
         
