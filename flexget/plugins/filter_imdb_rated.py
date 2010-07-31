@@ -29,7 +29,7 @@ class ImdbRated(Base):
         return '<ImdbRated(%s at %s)>' % (self.imdb_url, self.url)
 
 
-class FilterImdbRated:
+class FilterImdbRated(object):
     """
         Reject already voted entries based on user imdb vote history.
         
@@ -67,15 +67,24 @@ class FilterImdbRated:
         feed.simple_persistence.set('next_time', datetime.datetime.now() + datetime.timedelta(hours=4))
         log.debug('updating my movies from %s' % config['url'])
         
+        massage = []
+        
         # fix imdb html, just enough to pass parser
         #
         # <td class=list bgcolor="#CCCCCC"} colspan="4">
         #                                 ^ god damn noobs
-        #
+        
+        massage.append((re.compile('"}'), lambda match: '"'))
+        
         # onclick="(new Image()).src='/rg/home/navbar/images/b.gif?link=/'"">IMDb</a>
         #                                                                 ^ are you even trying?
 
-        massage = [(re.compile('"}'), lambda match: '"'), (re.compile('/\'""'), lambda match: '/\'"')]
+        massage.append((re.compile('/\'""'), lambda match: '/\'"'))
+        
+        # <table class="footer" id="amazon-affiliates"">
+        #                                             ^ ffs, I don't think they are even trying ...
+        
+        massage.append((re.compile('amazon-affiliates""'), lambda match: 'amazon-affiliates"'))
         
         data = urlopener(config['url'], log)
         soup = BeautifulSoup(data, markupMassage=massage)
