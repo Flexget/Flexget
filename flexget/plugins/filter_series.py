@@ -102,10 +102,12 @@ class SeriesPlugin(object):
         """Determine if series :name: should be considered episodic"""
         series = session.query(Series).filter(Series.name == name).first()
         if not series:
+            log.debug('series %s episodic check: aborted, unknown series' % name)
             return False
 
         total = len(series.episodes)
         if total < min:
+            log.debug('series %s episodic check: aborted, not enough history' % name)
             return False
         episodic = 0
         for episode in series.episodes:
@@ -120,10 +122,12 @@ class SeriesPlugin(object):
         """Determine if series :name: should be considered identified by id"""
         series = session.query(Series).filter(Series.name == name).first()
         if not series:
+            log.debug('series %s id-format check: aborted, unknown series' % name)
             return False
 
         total = len(series.episodes)
         if total < min:
+            log.debug('series %s id-format check: aborted, not enough history' % name)
             return False
         non_episodic = 0
         for episode in series.episodes:
@@ -645,8 +649,8 @@ class FilterSeries(SeriesPlugin):
         identified_by = config.get('identified_by', 'auto')
         if identified_by not in ['ep', 'id', 'auto']:
             raise PluginError('Unknown identified_by value %s for the series %s' % (identified_by, series_name))
-
-        if 'identified_by' == 'auto':
+        
+        if identified_by == 'auto':
             # set expect flags automatically
 
             # determine if series is known to be in season, episode format or identified by id
