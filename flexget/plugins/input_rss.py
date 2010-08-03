@@ -303,7 +303,7 @@ class InputRSS(object):
                     continue
             else:
                 # manual configuration
-                if not 'curl' in entry:
+                if not curl in entry:
                     log_once('RSS-entry %s does not contain configured link attributes: %s' % (entry.title, curl), log)
                     ignored += 1
                     continue

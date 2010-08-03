@@ -1,6 +1,7 @@
 from tests import FlexGetBase
 from nose.plugins.attrib import attr
 
+
 class TestInputRSS(FlexGetBase):
     
     __yaml__ = """
@@ -9,6 +10,11 @@ class TestInputRSS(FlexGetBase):
             rss: 
               url: tests/rss.xml
               silent: true
+          test2:
+            rss:
+              url: tests/rss.xml
+              silent: true
+              link: otherlink
     """
     
     def test_rss(self):
@@ -50,6 +56,12 @@ class TestInputRSS(FlexGetBase):
         # empty title, should be skipped
         assert not self.feed.find_entry(description='Description, empty title'), \
             'RSS entry without title should be skipped'
+
+        # custom link field
+        self.execute_feed('test2')
+        assert self.feed.find_entry(title='Guid link', url='http://localhost/otherlink'), \
+            'Custom field link not found'
+
 
 class TestRssOnline(FlexGetBase):
     

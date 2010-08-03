@@ -44,6 +44,7 @@
       <guid>http://localhost/guid</guid>
       <pubDate>Sun, 28 Dec 2008 14:20:00 -0200</pubDate>
       <description>Description, guid</description>
+      <otherlink>http://localhost/otherlink</otherlink>
     </item>
 
     <item>
