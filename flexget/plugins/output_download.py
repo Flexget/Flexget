@@ -108,8 +108,26 @@ class PluginDownload:
                     log.error('The server couldn\'t fulfill the request. Error code: %s' % e.code)
 
     def download(self, feed, entry):
-        url = urllib.quote(entry['url'].encode('latin1'), safe=':/~?=&%')
+        """Downloads :entry:. May raise exception(s) PluginWarning"""
+    
+        # see http://bugs.python.org/issue1712522
+        # note, url is already unicode ...
+        url = entry['url']
+        
+        try:
+            url = url.encode('latin1')
+        except UnicodeEncodeError:
+            log.warning('URL for `%s` is garbled' % entry['title'])
+
+        try:
+            url = urllib.quote(url, safe=':/~?=&%')
+        except:
+            try:
+                url = urllib.quote(url.encode('utf-8'), safe=':/~?=&%')
+            except:
+                log.warning('Unable to URL-encode URL for `%s`' % entry['title'])
         log.debug('Downloading url \'%s\'' % url)
+
         # get content
         if 'basic_auth_password' in entry and 'basic_auth_username' in entry:
             # TODO: should just add handler if default opener is present, now this will lose all other

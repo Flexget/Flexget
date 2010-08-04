@@ -34,7 +34,7 @@ class Torrent(object):
         # single file torrent
         if 'length' in self.content['info']:
             t = {}
-            t['name'] = self.content['info']['name']
+            t['name'] = self.content['info']['name'].decode('utf-8')
             t['size'] = self.content['info']['length']
             t['path'] = ''
             files.append(t)
@@ -43,7 +43,7 @@ class Torrent(object):
             for item in self.content['info']['files']:
                 t = {}
                 t['path'] = '/'.join(item['path'][:-1])
-                t['name'] = item['path'][-1:]
+                t['name'] = item['path'][-1:].decode('utf-8')
                 t['size'] = item['length']
                 files.append(t)
         return files
@@ -233,6 +233,7 @@ class TorrentFilename(object):
 
     def make_filename(self, torrent, entry):
         """Build a filename for this torrent"""
+        
         title = entry['title']
         files = torrent.get_filelist()
         if len(files) == 1:
@@ -244,7 +245,9 @@ class TorrentFilename(object):
         # neatify title
         title = title.replace('/', '_')
         title = title.replace(' ', '_')
-        title = title.encode('iso8859-1', 'ignore') # Damn \u200b -character, how I loathe thee
+        title = title.replace('\u200b', '')
+        
+        #title = title.encode('iso8859-1', 'ignore') # Damn \u200b -character, how I loathe thee
         # TODO: replace only zero width spaces, leave unicode alone?
 
         fn = '%s.torrent' % title
