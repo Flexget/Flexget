@@ -669,16 +669,9 @@ class FilterSeries(SeriesPlugin):
             expect_id = identified_by == 'id'
 
         # helper function, iterate entry fields in certain order
-        def field_order(a, b):
+        def field_order(x):
             order = ['title', 'description']
-
-            def index(c):
-                try:
-                    return order.index(c[0])
-                except ValueError:
-                    return 1
-
-            return cmp(index(a), index(b))
+            return order.index(x[0]) if x[0] in order else len(order)
 
         # don't try to parse these fields
         ignore_fields = ['uid', 'feed', 'url', 'original_url']
@@ -687,7 +680,7 @@ class FilterSeries(SeriesPlugin):
         # value: seriesparser
         series = {}
         for entry in feed.entries:
-            for field, data in sorted(entry.items(), cmp=field_order):
+            for field, data in sorted(entry.items(), key=field_order):
                 # skip invalid fields
                 if not isinstance(data, basestring) or not data:
                     continue
