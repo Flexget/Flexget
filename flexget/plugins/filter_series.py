@@ -456,7 +456,7 @@ class FilterSeries(SeriesPlugin):
             time_regexp = r'\d+ (minutes|hours|days|weeks)'
             options.accept('regexp_match', key='propers', message=message + ' or yes/no').accept(time_regexp)
             # expect flags
-            options.accept('text', key='identified_by')
+            options.accept('choice', key='identified_by').accept_choices(['ep', 'id', 'auto'])
             # timeframe
             options.accept('regexp_match', key='timeframe', message=message).accept(time_regexp)
             # strict naming
