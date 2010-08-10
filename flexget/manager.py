@@ -201,7 +201,7 @@ class Manager(object):
                     name = line.split(':', 1)[0].strip()
                     ns = duplicates.setdefault(indentation, {})
                     if name in ns:
-                        log.warning('Trying to set value for `%s` in line %s, but it is already defined in line %s!' % (stripped, line_num, ns[name]))
+                        log.warning('Trying to set value for `%s` in line %s, but it is already defined in line %s!' % (name, line_num, ns[name]))
                     ns[name] = line_num
 
             prev_indentation = indentation
