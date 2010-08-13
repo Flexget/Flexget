@@ -27,21 +27,14 @@ class FormLogin(object):
         except ImportError:
             raise PluginError('mechanize required (python module), please install it.', log)
 
-        config = feed.config['form'] 
+        config = feed.config['form']
+        
+        userfield = config.get('userfield', 'username')
+        passfield = config.get('passfield', 'password')
 
-        if 'userfield' in config:
-            userfield = feed.config['form']['userfield'] 
-        else: 
-            userfield = "username" 
-
-        if 'passfield' in config:
-            passfield = feed.config['form']['passfield'] 
-        else:
-            passfield = "password" 
-  
-        url = feed.config['form']['url']
-        username = feed.config['form']['username']
-        password = feed.config['form']['password']
+        url = config['url']
+        username = config['username']
+        password = config['password']
 
         br = Browser()
         br.set_handle_robots(False)

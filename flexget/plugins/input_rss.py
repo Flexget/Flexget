@@ -243,13 +243,16 @@ class InputRSS(object):
             def add_entry(ea):
                 from flexget.utils.tools import decode_html
                 ea['title'] = entry.title
-                if 'author' in entry:
-                    ea['author'] = entry.author
-                if 'description' in entry:
-                    try:
-                        ea['description'] = decode_html(entry.description)
-                    except UnicodeDecodeError:
-                        log.warning('Failed to decode entry %s description' % ea['title'])
+
+                # grab fields
+                fields = ['author', 'description']
+                for field in fields:
+                    if field in entry:
+                        try:
+                            ea[field] = decode_html(getattr(entry, field))
+                        except UnicodeDecodeError:
+                            log.warning('Failed to decode entry %s field %s' % (ea['title'], field))
+
                 # store basic auth info
                 if 'username' in config and 'password' in config:
                     ea['basic_auth_username'] = config['username']
