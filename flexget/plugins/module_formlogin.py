@@ -17,6 +17,8 @@ class FormLogin(object):
         root.accept('url', key='url', required=True)
         root.accept('text', key='username', required=True)
         root.accept('text', key='password', required=True)
+        root.accept('text', key='userfield') 
+        root.accept('text', key='passfield')
         return root
 
     def on_feed_start(self, feed):
@@ -25,6 +27,18 @@ class FormLogin(object):
         except ImportError:
             raise PluginError('mechanize required (python module), please install it.', log)
 
+        config = feed.config['form'] 
+
+        if 'userfield' in config:
+            userfield = feed.config['form']['userfield'] 
+        else: 
+            userfield = "username" 
+
+        if 'passfield' in config:
+            passfield = feed.config['form']['passfield'] 
+        else:
+            passfield = "password" 
+  
         url = feed.config['form']['url']
         username = feed.config['form']['username']
         password = feed.config['form']['password']
@@ -44,8 +58,11 @@ class FormLogin(object):
         for form in br.forms():
             loginform = form
 
-        loginform['username'] = username
-        loginform['password'] = password
+        try: 
+            loginform[userfield] = username 
+            loginform[passfield] = password 
+        except Exception, e: 
+            raise PluginError('Unable to find login fields', log) 
 
         br.form = loginform
 
