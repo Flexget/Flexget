@@ -212,6 +212,7 @@ class Feed(object):
             self.accepted.append(entry)
             self.verbose_details('Accepted %s' % entry['title'], reason)
             # store metainfo into entry (plugin in the future?)
+            entry.pop('reason', None) # remove old reason by previous state
             if reason:
                 entry['reason'] = reason
             entry['accepted_by'] = self.current_plugin
@@ -232,6 +233,7 @@ class Feed(object):
             self.rejected.append(entry)
             self.verbose_details('Rejected %s' % entry['title'], reason)
         # store metainfo into entry (plugin in the future?)
+        entry.pop('reason', None) # remove old reason by previous state
         if reason:
             entry['reason'] = reason
         entry['rejected_by'] = self.current_plugin
