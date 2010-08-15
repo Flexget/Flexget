@@ -252,11 +252,10 @@ class OutputDeluge(object):
                 client.disconnect()
                 return
                 
-            def on_success(torrent_id, entry, opts, d):
+            def on_success(torrent_id, entry, opts):
                 dlist = []
                 if not torrent_id:
                     log.info("%s is already loaded in deluge, cannot set options." % entry['title'])
-                    d.callback(None)
                     return
                 log.info("%s successfully added to deluge." % entry['title'])
                 if opts['movedone']:
@@ -280,7 +279,7 @@ class OutputDeluge(object):
                         log.debug("%s moved to bottom of queue" % entry['title'])
                 if opts.get('content_filename'):
 
-                    def on_get_torrent_status(status, d2):
+                    def on_get_torrent_status(status):
                         for file in status['files']:
                             # Only rename file if it is > 90% of the content
                             if file['size'] > (status['total_size'] * 0.9):
@@ -305,30 +304,22 @@ class OutputDeluge(object):
                                 else:
                                     log.debug("Cannot ensure content_filename is unique when adding to a remote deluge daemon.")
                                 log.debug("File %s in %s renamed to %s" % (file['path'], entry['title'], filename))
-                                client.core.rename_files(torrent_id, [(file['index'], filename)]).addBoth(d2.callback)
-                                break
+                                return client.core.rename_files(torrent_id, [(file['index'], filename)])
                         else:
                             log.warning("No files in %s are > 90% of content size, no files renamed." % entry['title'])
-                            d2.callback(None)
 
-                    # d2 will callback when the renaming is complete
-                    d2 = defer.Deferred()
                     status_keys = ['files', 'total_size', 'save_path', 'move_on_completed_path', 'move_on_completed']
-                    client.core.get_torrent_status(torrent_id, status_keys).addCallback(on_get_torrent_status, d2)
-                    dlist.append(d2)
+                    dlist.append(client.core.get_torrent_status(torrent_id, status_keys).addCallback(on_get_torrent_status))
 
-                def on_timeout(result, entry, opts, d):
+                def on_timeout(result, entry, opts):
                     log.warning('Timed out while setting deluge options for %s.' % entry['title'])
                     log.debug('opts: %s, dlist: %s' % (opts, result.resultList))
-                    d.callback(None)
 
-                # Callback the deferred passed to us when all jobs are complete
-                defer.DeferredList(dlist).addBoth(d.callback).setTimeout(15, on_timeout, entry, opts, d)
+                return defer.DeferredList(dlist).setTimeout(15, on_timeout, entry, opts)
 
-            def on_fail(result, feed, entry, d):
+            def on_fail(result, feed, entry):
                 log.info("%s was not added to deluge! %s" % (entry['title'], result))
                 feed.fail(entry, "Could not be added to deluge")
-                d.callback(None)
             
             # dlist is a list of deferreds that must complete before we exit
             dlist = []
@@ -339,15 +330,14 @@ class OutputDeluge(object):
             if labels:
                 client.core.enable_plugin('Label')
 
-                def on_get_labels(d_labels, labels, d):
+                def on_get_labels(d_labels, labels):
+                    dlist = []
                     for label in labels:
                         if not label in d_labels:
-                            client.label.add(label)
-                    d.callback(None)
+                            dlist.append(client.label.add(label))
+                    return defer.DeferredList(dlist)
 
-                d = defer.Deferred()
-                client.label.get_labels().addCallback(on_get_labels, labels, d)
-                dlist.append(d)
+                dlist.append(client.label.get_labels().addCallback(on_get_labels, labels))
             # add the torrents
             for entry in feed.accepted:
                 # see that temp file is present
@@ -393,16 +383,8 @@ class OutputDeluge(object):
                 except KeyError, e:
                     log.error("Could not set content_filename for %s: does not contain the field '%s.'" % (entry['title'], e))
                     opts['content_filename'] = ''
-                #create a deferred here which we will callback after all work in on_success is done
-                d = defer.Deferred()
 
-                def inner_error(result):
-                    #This is to make sure we disconnect from the daemon if we encounter an unexpected error
-                    log.error('unhandled error in on_success: %s' % result)
-                    client.disconnect()
-
-                addresult.addCallbacks(on_success, on_fail, callbackArgs=(entry, opts, d), errbackArgs=(feed, entry, d)).addErrback(inner_error)
-                dlist.append(d)
+                dlist.append(addresult.addCallbacks(on_success, on_fail, callbackArgs=(entry, opts), errbackArgs=(feed, entry)))
                 
             def on_complete(result):
                 client.disconnect()
