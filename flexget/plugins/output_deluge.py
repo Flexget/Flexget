@@ -66,8 +66,7 @@ class OutputDeluge(object):
     @priority(120)
     def on_process_start(self, feed):
         """
-            Register the usable set: keywords. Detect what version of deluge
-            is loaded, start the reactor process if using the deluge 1.2 api.
+            Register the usable set: keywords. Detect what version of deluge is loaded.
         """
         set_plugin = get_plugin_by_name('set')
         set_plugin.instance.register_keys({'path': 'text', 'movedone': 'text', \
@@ -76,6 +75,7 @@ class OutputDeluge(object):
             'maxconnections': 'number', 'ratio': 'decimal', 'removeatratio': 'boolean', \
             'addpaused': 'boolean', 'compact': 'boolean', 'content_filename': 'text'})
         if not self.deluge12:
+            logger = log.info if feed.manager.options.test else log.debug
             try:
                 log.debug("Testing for deluge 1.1 API")
                 from deluge.ui.client import sclient
@@ -90,10 +90,10 @@ class OutputDeluge(object):
                     from twisted.internet import reactor
                 except:
                     raise PluginError('Twisted module required', log)
-                log.info("Using deluge 1.2 api")
+                logger("Using deluge 1.2 api")
                 self.deluge12 = True
             else:
-                log.info("Using deluge 1.1 api")
+                logger("Using deluge 1.1 api")
                 self.deluge12 = False
 
     @priority(120)
@@ -133,11 +133,9 @@ class OutputDeluge(object):
             return
         if not config['enabled'] or not (feed.accepted or feed.manager.options.test):
             return
-            
-        if self.deluge12:
-            self.add_to_deluge12(feed, config)
-        else:
-            self.add_to_deluge11(feed, config)
+
+        add_to_deluge = self.add_to_deluge12 if self.deluge12 else self.add_to_deluge11
+        add_to_deluge(feed, config)
 
     def add_to_deluge11(self, feed, config):
         """ Add torrents to deluge using deluge 1.1.x api. """
@@ -327,17 +325,41 @@ class OutputDeluge(object):
             labels = set([entry['label'].lower() for entry in feed.accepted if entry.get('label')])
             if config.get('label'):
                 labels.add(config['label'].lower())
+            label_deferred = defer.succeed(True)
             if labels:
-                client.core.enable_plugin('Label')
+                # Make sure the label plugin is available and enabled, then add appropriate labels
 
-                def on_get_labels(d_labels, labels):
-                    dlist = []
-                    for label in labels:
-                        if not label in d_labels:
-                            dlist.append(client.label.add(label))
-                    return defer.DeferredList(dlist)
+                def on_get_enabled_plugins(plugins):
 
-                dlist.append(client.label.get_labels().addCallback(on_get_labels, labels))
+                    def on_label_enabled(result):
+                        """ This runs when we verify the label plugin is enabled. """
+
+                        def on_get_labels(d_labels):
+                            dlist = []
+                            for label in labels:
+                                if not label in d_labels:
+                                    log.debug("Adding the label %s to deluge" % label)
+                                    dlist.append(client.label.add(label))
+                            return defer.DeferredList(dlist)
+
+                        return client.label.get_labels().addCallback(on_get_labels)
+
+                    if 'Label' in plugins:
+                        return on_label_enabled(True)
+                    else:
+
+                        def on_get_available_plugins(plugins):
+                            if 'Label' in plugins:
+                                log.debug("Enabling label plugin in deluge")
+                                return client.core.enable_plugin('Label').addCallback(on_label_enabled)
+                            else:
+                                log.error("Label plugin is not installed in deluge")
+
+                        return client.core.get_available_plugins().addCallback(on_get_available_plugins)
+
+                label_deferred = client.core.get_enabled_plugins().addCallback(on_get_enabled_plugins)
+                dlist.append(label_deferred)
+
             # add the torrents
             for entry in feed.accepted:
                 # see that temp file is present
@@ -363,7 +385,14 @@ class OutputDeluge(object):
                         opts[dopt] = value
                         if fopt == 'ratio':
                             opts['stop_at_ratio'] = True
-                addresult = client.core.add_torrent_file(entry['title'], filedump, opts)
+
+                def on_add_torrent(result, title, filedump, opts):
+                    log.info("adding torrent")
+                    return client.core.add_torrent_file(title, filedump, opts)
+
+                # Make sure our labels have been added before adding the torrents
+                addresult = label_deferred.addCallback(on_add_torrent, entry['title'], filedump, opts)
+
                 # clean up temp file if download plugin is not configured for this feed
                 if not 'download' in feed.config:
                     os.remove(entry['file'])
@@ -384,7 +413,8 @@ class OutputDeluge(object):
                     log.error("Could not set content_filename for %s: does not contain the field '%s.'" % (entry['title'], e))
                     opts['content_filename'] = ''
 
-                dlist.append(addresult.addCallbacks(on_success, on_fail, callbackArgs=(entry, opts), errbackArgs=(feed, entry)))
+                addresult.addCallbacks(on_success, on_fail, callbackArgs=(entry, opts), errbackArgs=(feed, entry))
+                dlist.append(addresult)
                 
             def on_complete(result):
                 client.disconnect()
@@ -395,7 +425,7 @@ class OutputDeluge(object):
                 log.debug('labels+accepted: %s, dlist: %s' % (len(feed.accepted) + 1, result.resultList))
                 client.disconnect()
 
-            defer.DeferredList(dlist, consumeErrors=True).addBoth(on_complete).setTimeout(30, on_timeout)
+            defer.DeferredList(dlist).addBoth(on_complete).setTimeout(30, on_timeout)
             
         def on_connect_fail(result, feed):
             log.info('connect failed result: %s' % result)
