@@ -1,6 +1,7 @@
 import os
 from netrc import netrc, NetrcParseError
 import logging
+import base64
 from flexget.plugin import *
 from flexget import validator
 
@@ -250,7 +251,8 @@ class PluginTransmissionrpc:
                 continue
 
             try:
-                r = cli.add(None, 30, filename=os.path.abspath(entry['file']), **options['add'])
+                filedump = base64.encodestring(open(entry['file'], 'rb').read())
+                r = cli.add(filedump, 30, **options['add'])
                 log.info("%s torrent added to transmission" % (entry['title']))
                 if options['change'].keys():
                     for id in r.keys():
