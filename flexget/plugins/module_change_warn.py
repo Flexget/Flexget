@@ -55,6 +55,10 @@ class ChangeWarn:
         columns = table_columns('make_rss', session)
         if not 'rsslink' in columns:
             self.old_database(feed, '(rsslink missing from make_rss table)')
+            
+        columns = table_columns('imdb_queue', session)
+        if not 'title' in columns:
+            self.old_database(feed, '(title missing from imdb_queue table)')
 
         if table_exists('episode_qualities', session):
             self.old_database(feed, '(old series format)')

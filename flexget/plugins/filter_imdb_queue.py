@@ -3,8 +3,8 @@ import datetime
 from flexget.manager import Session
 from flexget.plugin import *
 from flexget.manager import Base
-from sqlalchemy import Column, Integer, String, DateTime, Boolean
-from flexget.utils.imdb import extract_id, ImdbSearch
+from sqlalchemy import Column, Integer, String, DateTime, Boolean, Unicode
+from flexget.utils.imdb import extract_id, ImdbSearch, ImdbParser, log as imdb_log
 from flexget.utils.tools import str_to_boolean
 
 log = logging.getLogger('imdb_queue')
@@ -17,6 +17,7 @@ class ImdbQueue(Base):
     id = Column(Integer, primary_key=True)
     imdb_id = Column(String)
     quality = Column(String)
+    title = Column(Unicode)
     immortal = Column(Boolean)
     added = Column(DateTime)
 
@@ -66,7 +67,7 @@ class FilterImdbQueue(object):
                     continue
 
                 if not 'quality' in entry:
-                    log.warning("No quality found for %s, assigning unknown." % entry['title'])
+                    log.warning('No quality found for %s, assigning unknown.' % entry['title'])
                     entry['quality'] = 'unknown'
 
                 item = feed.session.query(ImdbQueue).filter(ImdbQueue.imdb_id == imdb_id).\
@@ -141,12 +142,16 @@ class ImdbQueueManager(object):
             self.error('No URL or NAME given')
             return
             
-        if action == 'add':            
-            self.queue_add()
-        elif action == 'del':
-            self.queue_del()
-        elif action == 'list':
-            self.queue_list()
+        from sqlalchemy.exceptions import OperationalError
+        try:
+            if action == 'add':            
+                self.queue_add()
+            elif action == 'del':
+                self.queue_del()
+            elif action == 'list':
+                self.queue_list()
+        except OperationalError:
+            log.critical('OperationalError')
 
     def error(self, msg):
         print 'IMDb Queue error: %s' % msg
@@ -154,7 +159,19 @@ class ImdbQueueManager(object):
     def queue_add(self):
         """Add an item to the queue with the specified quality"""
 
+        # Check that the quality is valid
+        quality = self.options['quality']
+
+        from flexget.utils.titles.parser import TitleParser
+        from flexget.utils import qualities
+        if (quality != 'ANY') and (quality not in qualities.registry):
+            print 'ERROR! Unknown quality `%s`' % quality
+            print 'Recognized qualities are %s' % ', '.join(qualities.registry.keys())
+            print 'ANY is the default and can also be used explicitly to specify that quality should be ignored.'
+            return
+
         imdb_id = extract_id(self.options['what'])
+        title = None
 
         if not imdb_id:
             # try to do imdb search
@@ -162,20 +179,10 @@ class ImdbQueueManager(object):
             search = ImdbSearch()
             result = search.smart_match(self.options['what'])
             if not result:
-                print 'Unable to find any such movie from imdb, use imdb url instead.'
+                print 'ERROR: Unable to find any such movie from imdb, use imdb url instead.'
                 return
             imdb_id = extract_id(result['url'])
-
-        quality = self.options['quality']
-
-        # Check that the quality is valid
-        from flexget.utils.titles.parser import TitleParser
-        from flexget.utils import qualities
-        if (quality != "ANY") and (quality not in qualities.registry):
-            print 'Unknown quality: %s' % quality
-            print 'Recognized qualities are %s' % ', '.join(qualities.registry.keys())
-            print 'ANY is the default, and can also be used explicitly, to specify that quality should be ignored.'
-            return
+            title = result['name']
 
         session = Session()
 
@@ -185,11 +192,12 @@ class ImdbQueueManager(object):
             # get the common, eg. 1280x720 will be turned into 720p
             common_name = qualities.common_name(quality)
             item = ImdbQueue(imdb_id, common_name, self.options['force'])
+            item.title = title
             session.add(item)
             session.commit()
-            print "Added %s to queue with quality %s" % (imdb_id, common_name)
+            print 'Added %s to queue with quality %s' % (imdb_id, common_name)
         else:
-            log.info("%s is already in the queue" % imdb_id)
+            print 'ERROR: %s is already in the queue' % imdb_id
 
     def queue_del(self):
         """Delete the given item from the queue"""
@@ -202,7 +210,7 @@ class ImdbQueueManager(object):
         item = session.query(ImdbQueue).filter(ImdbQueue.imdb_id == imdb_id).first()
         if item:
             session.delete(item)
-            print 'Deleted %s from queue' % (imdb_id)
+            print 'Deleted %s from the queue' % (imdb_id)
         else:
             log.info('%s is not in the queue' % imdb_id)
 
@@ -214,15 +222,30 @@ class ImdbQueueManager(object):
         session = Session()            
 
         items = session.query(ImdbQueue)
-        found = False
-        print "%-40s %-8s %-5s" % ("URL", "Quality", "Force")
+        print '-' * 79
+        print '%-10s %-45s %-8s %s' % ('IMDB id', 'Title', 'Quality', 'Force')
+        print '-' * 79
         for item in items:
-            found = True
-            print "%-40s %-8s %-5s" % ('http://www.imdb.com/title/' + item.imdb_id, item.quality, item.immortal)
+            if not item.title:
+                # old database does not have title / title not retrieved
+                imdb_log.setLevel(logging.CRITICAL)
+                parser = ImdbParser()
+                try:
+                    result = parser.parse('http://www.imdb.com/title/' + item.imdb_id)
+                except:
+                    pass
+                if parser.name:
+                    item.title = parser.name
+                else:
+                    item.title = 'N/A'
+            print '%-10s %-45s %-8s %s' % (item.imdb_id, item.title, item.quality, item.immortal)
 
-        if not found:
-            print 'IMDb queue is empty'
+        if not items:
+            print 'IMDB queue is empty'
 
+        print '-' * 79
+        
+        session.commit()
         session.close()
                 
 register_plugin(FilterImdbQueue, 'imdb_queue')
