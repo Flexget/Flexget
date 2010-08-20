@@ -1,3 +1,4 @@
+from __future__ import with_statement
 import os
 from netrc import netrc, NetrcParseError
 import logging
@@ -251,7 +252,8 @@ class PluginTransmissionrpc:
                 continue
 
             try:
-                filedump = base64.encodestring(open(entry['file'], 'rb').read())
+                with open(entry['file'], 'rb') as f:
+                    filedump = base64.encodestring(f.read())
                 r = cli.add(filedump, 30, **options['add'])
                 log.info("%s torrent added to transmission" % (entry['title']))
                 if options['change'].keys():

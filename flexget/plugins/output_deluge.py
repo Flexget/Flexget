@@ -1,3 +1,4 @@
+from __future__ import with_statement
 import logging
 import time
 import os
@@ -370,7 +371,8 @@ class OutputDeluge(object):
                     feed.fail(entry, "Downloaded temp file '%s' doesn't exist!" % entry['file'])
                     del(entry['file'])
                     continue
-                filedump = base64.encodestring(open(entry['file'], 'rb').read())
+                with open(entry['file'], 'rb') as f:
+                    filedump = base64.encodestring(f.read())
                 path = ''
                 try:
                     path = os.path.expanduser(entry.get('path', config['path']) % entry)
