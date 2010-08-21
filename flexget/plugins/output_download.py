@@ -137,12 +137,12 @@ class PluginDownload:
             passman.add_password(None, url, entry['basic_auth_username'], entry['basic_auth_password'])
             handler = urllib2.HTTPBasicAuthHandler(passman)
             opener = urllib2.build_opener(handler)
-            f = opener.open(url)
         else:
             if urllib2._opener:
                 handlers = [h.__class__.__name__ for h in urllib2._opener.handlers]
                 log.debug('default opener present, handlers: %s' % ', '.join(handlers))
-            f = urlopener(url, log)
+            opener = None
+        f = urlopener(url, log, opener=opener)
 
         mimetype = f.headers.gettype()
 

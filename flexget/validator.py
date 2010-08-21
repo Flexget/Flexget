@@ -22,6 +22,11 @@ class Errors:
         msg = '[/%s] %s' % ('/'.join(path), msg)
         self.messages.append(msg)
 
+    def back_out_errors(self, num=1):
+        """Remove last num errors from list"""
+        if num > 0:
+            del self.messages[0 - num:]
+
     def path_add_level(self, value='?'):
         """Adds level into error message path"""
         self.path_level = len(self.path)
@@ -110,7 +115,10 @@ class Validator(object):
             #print 'validating %s' % rule.name
             if rule.validateable(item):
                 if rule.validate(item):
+                    # item is valid, remove added errors before returning
+                    self.errors.back_out_errors(self.errors.count() - count)
                     return True
+                        
         # If no validators matched or reported errors, and one of them has a custom error message, display it.
         if count == self.errors.count():
             for rule in rules:
@@ -170,7 +178,7 @@ class ChoiceValidator(Validator):
         if data in self.valid or data.lower() in self.valid_ic:
             return True
         else:
-            self.errors.add('must be one of the following: %s' % ', '.join(self.valid + self.valid_ic))
+            self.errors.add("'%s' is not one of acceptable values: %s" % (data, ', '.join(self.valid + self.valid_ic)))
             return False
 
 
@@ -463,7 +471,7 @@ class DictValidator(Validator):
         if not isinstance(data, dict):
             self.errors.add('value must be a dictionary')
             return False
-        
+
         count = self.errors.count()
         self.errors.path_add_level()
         for key, value in data.iteritems():
@@ -486,8 +494,8 @@ class DictValidator(Validator):
             rules = self.valid.get(key, [])
             rules.extend(self.any_key)
             if not self.validate_item(value, rules):
-                # containers should only add errors if inner validators did not
-                if count == self.errors.count():
+                # if all rules did not add their own error message, display the valid types
+                if self.errors.count() < count + len(rules):
                     l = [r.name for r in rules]
                     self.errors.add('value \'%s\' is not valid %s' % (value, ', '.join(l)))
         self.errors.path_remove_level()

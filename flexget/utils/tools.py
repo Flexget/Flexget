@@ -176,10 +176,15 @@ def urlopener(url, log, **kwargs):
     #except AttributeError:
     #    url = urllib2.Request(url)
     #    url.add_header("Accept-encoding", "gzip, deflate")
+
+    if kwargs.get('opener'):
+        opener = kwargs['opener'].open
+    else:
+        opener = urllib2.urlopen
     for i in range(3): # retry getting the url up to 3 times.
         sleep = True
         try:
-            retrieved = urllib2.urlopen(url)
+            retrieved = opener(url)
             sleep = False
         except urllib2.HTTPError, e:
             log.debug('HTTP error (try %i/3): %s' % (i + 1, str(e.code)))

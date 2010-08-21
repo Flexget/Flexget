@@ -64,15 +64,34 @@ class InputRSS(object):
         from flexget import validator
         root = validator.factory()
         root.accept('url')
+        root.accept('file')
         advanced = root.accept('dict')
-        advanced.accept('text', key='url', required=True) # TODO: accept only url, file
+        advanced.accept('url', key='url', required=True)
+        advanced.accept('file', key='url')
         advanced.accept('text', key='username')
         advanced.accept('text', key='password')
         advanced.accept('text', key='link')
+        advanced.accept('list', key='link').accept('text')
         advanced.accept('boolean', key='silent')
         advanced.accept('boolean', key='ascii')
         advanced.accept('boolean', key='filename')
         return root
+
+    def get_config(self, feed):
+        config = feed.config['rss']
+        if isinstance(config, basestring):
+            config = {'url': config}
+        if isinstance(config.get('link'), basestring):
+            config['link'] = [config['link']]
+        if config.get('link'):
+            config['link'] = [link.lower() for link in config['link']]
+        # set the default link fields to 'link' and 'guid'
+        if not config.get('link') or 'auto' in config['link']:
+            config['link'] = ['link', 'guid']
+        # use basic auth when needed
+        if 'username' in config and 'password' in config:
+            config['url'] = self.passwordize(config['url'], config['username'], config['password'])
+        return config
 
     def passwordize(self, url, user, password):
         """Add username and password to url"""
@@ -84,19 +103,11 @@ class InputRSS(object):
     @cached('rss', 'url')
     @internet(log)
     def on_feed_input(self, feed):
-        config = feed.config['rss']
-        if not isinstance(config, dict):
-            config = {}
-        url = feed.get_input_url('rss')
+        config = self.get_config(feed)
 
-        # use basic auth when needed
-        if 'username' in config and 'password' in config:
-            url = self.passwordize(url, config['username'], config['password'])
-
-        log.debug('Checking feed %s (%s)', feed.name, url)
+        log.debug('Checking feed %s (%s)' % (feed.name, config['url']))
 
         # check etags and last modified -headers
-
         # let's not, flexget works better when feed contains all entries all the time ?
         etag = None
         modified = None
@@ -115,28 +126,27 @@ class InputRSS(object):
 
         # get the feed & parse
         if urllib2._opener:
-            rss = feedparser.parse(url, etag=etag, modified=modified, handlers=urllib2._opener.handlers)
+            rss = feedparser.parse(config['url'], etag=etag, modified=modified, handlers=urllib2._opener.handlers)
         else:
-            rss = feedparser.parse(url, etag=etag, modified=modified)
+            rss = feedparser.parse(config['url'], etag=etag, modified=modified)
 
         # restore original timeout
         socket.setdefaulttimeout(orig_timout)
 
         # status checks
         status = rss.get('status', False)
-        if status:
-            if status == 304:
-                log.debug('Feed %s hasn\'t changed, skipping' % feed.name)
-                return
-            elif status == 401:
-                raise PluginError('Authentication needed for feed %s: %s' % \
-                    (feed.name, rss.headers['www-authenticate']), log)
-            elif status == 404:
-                raise PluginError('RSS Feed %s not found' % feed.name, log)
-            elif status == 500:
-                raise PluginError('Internal server exception on feed %s' % feed.name, log)
-        else:
+        if not status:
             log.debug('RSS does not have status (normal if processing a file)')
+        elif status == 304:
+            log.debug('Feed %s hasn\'t changed, skipping' % feed.name)
+            return
+        elif status == 401:
+            raise PluginError('Authentication needed for feed %s: %s' % \
+                (feed.name, rss.headers['www-authenticate']), log)
+        elif status == 404:
+            raise PluginError('RSS Feed %s not found' % feed.name, log)
+        elif status == 500:
+            raise PluginError('Internal server exception on feed %s' % feed.name, log)
 
         # check for bozo
         ex = rss.get('bozo_exception', False)
@@ -155,8 +165,9 @@ class InputRSS(object):
                     # save invalid data for review, this is a bit ugly but users seem to really confused when
                     # html pages (login pages) are received
                     log.critical('Invalid XML received from feed %s' % feed.name)
-                    req = urlopener(url, log)
+                    req = urlopener(config['url'], log)
                     data = req.read()
+                    req.close()
                     ext = 'xml'
                     if '<html>' in data.lower():
                         log.critical('Received content is HTML page, not an RSS feed')
@@ -210,19 +221,12 @@ class InputRSS(object):
 
         # field name for url can be configured by setting link.
         # default value is auto but for example guid is used in some feeds
-        curl = config.get('link', 'auto')
         ignored = 0
         for entry in rss.entries:
 
             # ignore entries without title
             if not entry.title:
                 log.debug('skipping entry without title')
-                ignored += 1
-                continue
-
-            # ignore entries without link
-            if not 'link' in entry and not 'enclosures' in entry:
-                log.debug('%s does not have link or enclosure' % entry.title)
                 ignored += 1
                 continue
 
@@ -292,25 +296,16 @@ class InputRSS(object):
             # create flexget entry
             e = Entry()
 
-            # automaticly determine url from available fields
-            if curl == 'auto':
-                # try from link, guid
-                if 'link' in entry:
-                    e['url'] = entry['link']
-                elif 'guid' in entry:
-                    e['url'] = entry['guid']
-                else:
-                    if not config.get('silent'):
-                        log_once('Failed to auto-detect RSS-entry %s link' % (entry.title), log)
-                    ignored += 1
-                    continue
+            # search for known url fields
+            for url_field in config['link']:
+                if url_field in entry:
+                    e['url'] = entry[url_field]
+                    break
             else:
-                # manual configuration
-                if not curl in entry:
-                    log_once('RSS-entry %s does not contain configured link attributes: %s' % (entry.title, curl), log)
-                    ignored += 1
-                    continue
-                e['url'] = getattr(entry, curl)
+                logger = log.debug if config.get('silent') else log.info
+                logger('%s does not have link (%s) or enclosure' % (entry.title, ', '.join(config['link'])))
+                ignored += 1
+                continue
 
             add_entry(e)
 
