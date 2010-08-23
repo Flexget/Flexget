@@ -12,7 +12,7 @@ class PluginPriority(object):
 
         Example:
 
-        priority:
+        plugin_priority:
           ignore: 50
           series: 100
     """
@@ -37,24 +37,15 @@ class PluginPriority(object):
                 log.debug('stored %s original value %s' % (method.name, method.priority))
                 method.priority = priority
                 log.debug('set %s new value %s' % (method.method_name, priority))
-                
         log.debug('Changed priority for: %s' % ', '.join(names))
 
     def on_feed_exit(self, feed):
         names = []
         for name in feed.config.get('plugin_priority', {}).keys():
             names.append(name)
-
-            """
-            from IPython.Shell import IPShellEmbed
-            args = []
-            ipshell = IPShellEmbed(args)
-            ipshell()"""
-            
             originals = self.priorities[name]
             for method_name, priority in originals.iteritems():
                 plugins[name].event_handlers[method_name].priority = priority
-                    
         log.debug('Restored priority for: %s' % ', '.join(names))
 
     on_feed_abort = on_feed_exit
