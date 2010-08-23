@@ -234,10 +234,6 @@ class InputRSS(object):
             if config.get('ascii', False):
                 entry.title = entry.title.encode('ascii', 'ignore')
 
-            # fix for crap feeds with no ID
-            if not 'id' in entry:
-                entry['id'] = entry.link
-
             # remove annoying zero width spaces
             entry.title = entry.title.replace(u'\u200B', u'')
 
@@ -302,8 +298,7 @@ class InputRSS(object):
                     e['url'] = entry[url_field]
                     break
             else:
-                logger = log.debug if config.get('silent') else log.info
-                logger('%s does not have link (%s) or enclosure' % (entry.title, ', '.join(config['link'])))
+                log.debug('%s does not have link (%s) or enclosure' % (entry.title, ', '.join(config['link'])))
                 ignored += 1
                 continue
 

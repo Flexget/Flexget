@@ -1,9 +1,10 @@
 import logging
 from flexget.plugin import *
 from flexget.manager import Base, Session
+from flexget.utils.tools import urlopener
+import urllib
 from sqlalchemy import Column, Integer, Unicode, UnicodeText, DateTime
 from BeautifulSoup import BeautifulStoneSoup
-import urllib
 import datetime
 
 log = logging.getLogger('thetvdb')
@@ -124,11 +125,11 @@ class ModuleThetvdbLookup(object):
             log.debug("series_name not given for %s. Entry not parsed through series plugin" % entry["title"])
             return
         if not 'series_season' in entry:
-            log.warning("failed getting series_season for %s, but given series_name. Series plugin bug?" % entry["series_name"])
-            raise PluginError('TheTVDB Lookup fails due to missing series_season')
+            log.warning("failed getting series_season for %s, but given series_name. Series plugin bug?" % entry['title'])
+            return
         if not 'series_episode' in entry:
-            log.warning("failed getting series_episode for %s, but given series_name. Series plugin bug?" % entry["series_name"])
-            raise PluginError('TheTVDB Lookup fails due to missing series_episode')
+            log.warning("failed getting series_episode for %s, but given series_name. Series plugin bug?" % entry['title'])
+            return
         
         log.debug("Retrieved internal series info for %(series_name)s - S%(series_season)sE%(series_episode)s" % entry)
         
@@ -152,8 +153,17 @@ class ModuleThetvdbLookup(object):
         if get_new_info:
             feed.verbose_progress('Requesting %s information from TheTvDB.com' % entry['series_name'])
             # get my series data.
-            # TODO: need to implement error handling around grabbing url.
-            xmldata = BeautifulStoneSoup(urllib.urlopen("http://thetvdb.com/api/GetSeries.php?seriesname=%s" % entry["series_name"])).data
+            url = "http://thetvdb.com/api/GetSeries.php?seriesname=%s" % urllib.quote(entry['series_name'])
+            log.debug("url for thetvdb search for %s: %s" % (entry['series_name'], url))
+            try:
+                page = urlopener(url, log)
+            except Exception, e:
+                log.error("Unable to grab series info for %s: %s" % (entry['series_name'], e))
+                return
+            xmldata = BeautifulStoneSoup(page).data
+            if not xmldata:
+                log.error("Didn't get a return from tvdb on the series search for %s" % entry['series_name'])
+                return
             # Yeah, I'm lazy. Grabbing the one with the latest airing date, 
             # instead of trying to see what's the closest match.
             # If there's an exact match, return that immediately. Could
@@ -171,8 +181,8 @@ class ModuleThetvdbLookup(object):
                     newest_series_first_aired = this_series_air_date
                     break
             if series_id == None:
-                log.warning("Didn't get a return from tvdb on the series search for %s" % entry["series_name"])
-                raise PluginWarning('No return on series lookup')
+                log.error("Didn't get a return from tvdb on the series search for %s" % entry['series_name'])
+                return
             
             # Grab the url, and parse it out into BSS. Store it's root element as data.
             # TODO: need to impliment error handling around grabbing url.

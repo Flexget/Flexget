@@ -165,27 +165,22 @@ def merge_dict_from_to(d1, d2):
 def urlopener(url, log, **kwargs):
     """Utility function for pulling back a url, with a retry of 3 times, increasing the timeout, etc. 
     Should be grabbing all urls this way eventually, to keep error handling code in the same place."""
+
     # get the old timeout for sockets, so we can set it back to that when done. This is NOT threadsafe by the way.
     # In order to avoid requiring python 2.6, we're not using the urlopen timeout parameter. That really should be used
     # after checking for python 2.6.
     oldtimeout = socket.getdefaulttimeout()
     socket.setdefaulttimeout(15.0)
-    # Apparently isinstance is considered unpythonic. So doing this instead.
-    #try:
-    #    url.add_header("Accept-encoding", "gzip, deflate")
-    #except AttributeError:
-    #    url = urllib2.Request(url)
-    #    url.add_header("Accept-encoding", "gzip, deflate")
 
     if kwargs.get('opener'):
-        opener = kwargs['opener'].open
+        opener = kwargs['opener']
     else:
         opener = urllib2.urlopen
     for i in range(3): # retry getting the url up to 3 times.
-        sleep = True
+        if i > 0:
+            time.sleep(3)
         try:
             retrieved = opener(url)
-            sleep = False
         except urllib2.HTTPError, e:
             log.debug('HTTP error (try %i/3): %s' % (i + 1, str(e.code)))
         except urllib2.URLError, e:
@@ -196,14 +191,18 @@ def urlopener(url, log, **kwargs):
             log.debug('Failed to retrieve url (try %i/3): %s' % (i + 1, reason))
         else:
             socket.setdefaulttimeout(oldtimeout)
-            #data = retrieved.read()
-            #if retrieved.headers.get('content-encoding', None) == 'gzip':
-            #    log.debug("found gzipped response")
-            #    data = gzip.GzipFile(fileobj=StringIO.StringIO(data)).read()
+            # make the returned instance usable in a with statement by adding __enter__ and __exit__ methods
+
+            def enter(self):
+                return self
+
+            def exit(self, exc_type, exc_val, exc_tb):
+                self.close()
+
+            retrieved.__class__.__enter__ = enter
+            retrieved.__class__.__exit__ = exit
             return retrieved
-        finally:
-            if sleep:
-                time.sleep(3)
+
     log.warning('Could not retrieve url: %s' % url)
     socket.setdefaulttimeout(oldtimeout)
     raise urllib2.URLError("Could not retrieve url after 3 retries.")

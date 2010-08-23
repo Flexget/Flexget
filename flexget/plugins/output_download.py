@@ -113,19 +113,16 @@ class PluginDownload:
         # see http://bugs.python.org/issue1712522
         # note, url is already unicode ...
         url = entry['url']
-        
         try:
             url = url.encode('latin1')
         except UnicodeEncodeError:
-            log.warning('URL for `%s` is garbled' % entry['title'])
-
-        try:
-            url = urllib.quote(url, safe=':/~?=&%')
-        except:
+            log.debug('URL for `%s` could not be encoded in latin1' % entry['title'])
             try:
-                url = urllib.quote(url.encode('utf-8'), safe=':/~?=&%')
+                url = url.encode('utf-8')
             except:
                 log.warning('Unable to URL-encode URL for `%s`' % entry['title'])
+        if not isinstance(url, unicode):
+            url = urllib.quote(url, safe=':/~?=&%')
         log.debug('Downloading url \'%s\'' % url)
 
         # get content
@@ -136,20 +133,21 @@ class PluginDownload:
             passman = urllib2.HTTPPasswordMgrWithDefaultRealm()
             passman.add_password(None, url, entry['basic_auth_username'], entry['basic_auth_password'])
             handler = urllib2.HTTPBasicAuthHandler(passman)
-            opener = urllib2.build_opener(handler)
+            opener = urllib2.build_opener(handler).open
         else:
             if urllib2._opener:
                 handlers = [h.__class__.__name__ for h in urllib2._opener.handlers]
                 log.debug('default opener present, handlers: %s' % ', '.join(handlers))
             opener = None
+
         f = urlopener(url, log, opener=opener)
 
         mimetype = f.headers.gettype()
 
         if f.headers.get('content-encoding') in ('gzip', 'x-gzip', 'deflate'):
-            decompressor = zlib.decompressobj(15 + 32)
+            decompress = zlib.decompressobj(15 + 32).decompress
         else:
-            decompressor = None
+            decompress = None
 
         # generate temp file, with random md5 sum ..
         # url alone is not random enough, it has happened that there are two entries with same url
@@ -163,30 +161,34 @@ class PluginDownload:
             os.mkdir(tmp_path)
         datafile = os.path.join(tmp_path, m.hexdigest())
 
-        # download and write data into a temp file
-        buffer_size = 1024
-        outfile = open(datafile, 'wb')
-        try:
-            while 1:
-                if decompressor:
-                    data = decompressor.decompress(f.read(buffer_size))
-                else:
-                    data = f.read(buffer_size)
-                if not data:
-                    log.debug('wrote file %s' % datafile)
+        def read_chunks(data, buffer_size=1024):
+            """ Helper generator to iterate over data in chunks """
+            while True:
+                chunk = data.read(buffer_size)
+                if not chunk:
                     break
-                outfile.write(data)
-            outfile.close()
-            f.close()
+                yield chunk
+
+        # download and write data into a temp file
+        try:
+            outfile = open(datafile, 'wb')
+            for chunk in read_chunks(f):
+                outfile.write(decompress(chunk) if decompress else chunk)
             # store temp filename into entry so other plugins may read and modify content
             # temp file is moved into final destination at self.output
             entry['file'] = datafile
             log.debug('%s field file set to: %s' % (entry['title'], entry['file']))
         except:
             # don't leave futile files behind
+            # outfile has to be closed before we can delete it on Windows
+            outfile.close()
             log.debug('Download interrupted, removing datafile')
             os.remove(datafile)
             raise
+        else:
+            outfile.close()
+        finally:
+            f.close()
 
         entry['mime-type'] = mimetype
         # prefer content-disposition naming, note: content-disposition can be disabled completely by setting entry

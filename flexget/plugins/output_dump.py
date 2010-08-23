@@ -32,7 +32,7 @@ class OutputDump(object):
                     elif isinstance(value, int) or isinstance(value, float):
                         print '%-15s: %s' % (field, value)
                     else:
-                        print '%-15s: [not printable]' % (field, value)
+                        print '%-15s: [not printable]' % field
                 print ''
                 
         if feed.entries:
