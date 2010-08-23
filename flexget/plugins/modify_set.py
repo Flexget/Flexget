@@ -46,7 +46,7 @@ class ModifySet(object):
         Adds the set dict to all accepted entries. This is not really a filter plugin,
         but it needs to be run before feed_download, so it is run last in the filter chain.
         """
-        for entry in feed.accepted:
+        for entry in feed.entries + feed.rejected:
             self.modify(entry, feed.config['set'], False)
             
     def modify(self, entry, config, validate=True):

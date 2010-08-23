@@ -37,9 +37,8 @@ class Manipulate(object):
 
     @priority(255)
     def on_feed_filter(self, feed):
-        for entries in [feed.entries, feed.rejected, feed.accepted]:
-            for entry in entries:
-                self.process(feed, entry)
+        for entry in feed.entries + feed.rejected:
+            self.process(feed, entry)
 
     def process(self, feed, entry):
         config = feed.config['manipulate']

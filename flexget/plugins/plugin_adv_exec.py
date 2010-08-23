@@ -38,7 +38,7 @@ class PluginAdvExec(object):
             event.accept('text', key='for_rejected')
             event.accept('text', key='for_failed')
 
-        for name in ['on_start', 'on_input', 'on_filter', 'on_output', 'on_end']:
+        for name in ['on_start', 'on_input', 'on_filter', 'on_output', 'on_exit']:
             add(name)
 
         root.accept('boolean', key='fail_entries')
