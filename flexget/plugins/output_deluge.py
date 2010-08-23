@@ -310,11 +310,7 @@ class OutputDeluge(object):
                     status_keys = ['files', 'total_size', 'save_path', 'move_on_completed_path', 'move_on_completed']
                     dlist.append(client.core.get_torrent_status(torrent_id, status_keys).addCallback(on_get_torrent_status))
 
-                def on_timeout(result, entry, opts):
-                    log.warning('Timed out while setting deluge options for %s.' % entry['title'])
-                    log.debug('opts: %s, dlist: %s' % (opts, result.resultList))
-
-                return defer.DeferredList(dlist).setTimeout(15, on_timeout, entry, opts)
+                return defer.DeferredList(dlist)
 
             def on_fail(result, feed, entry):
                 log.info("%s was not added to deluge! %s" % (entry['title'], result))
@@ -420,14 +416,14 @@ class OutputDeluge(object):
                 
             def on_complete(result):
                 client.disconnect()
+            tasks = defer.DeferredList(dlist).addBoth(on_complete)
 
+            # Schedule a disconnect to happen in 30 seconds if FlexGet hangs while connected to Deluge
             def on_timeout(result):
-                # Schedule a disconnect to happen in 30 seconds if FlexGet hangs while connected to Deluge
                 log.error('Timed out while adding torrents to deluge.')
-                log.debug('labels+accepted: %s, dlist: %s' % (len(feed.accepted) + 1, result.resultList))
+                log.debug('dlist: %s' % result.resultList)
                 client.disconnect()
-
-            defer.DeferredList(dlist).addBoth(on_complete).setTimeout(30, on_timeout)
+            reactor.callLater(30, lambda: tasks.called or on_timeout(tasks))
             
         def on_connect_fail(result, feed):
             log.info('connect failed result: %s' % result)
