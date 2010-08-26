@@ -80,7 +80,7 @@ class FilterImdbQueue(object):
                     # and remove from database
                     feed.session.delete(item)
                 else:
-                    log.debug("%s not in queue with wanted quality, skipping" % entry['title'])
+                    log.log(5, "%s not in queue with wanted quality, skipping" % entry['title'])
 
 
 class ImdbQueueManager(object):
@@ -100,6 +100,8 @@ class ImdbQueueManager(object):
         """
         if len(parser.rargs) == 0:
             print 'Usage: --imdb-queue (add|del|list) [IMDB_URL|NAME] [QUALITY] [FORCE]'
+            # set some usage option so that feeds will be disabled later
+            ImdbQueueManager.options['usage'] = True
             return
 
         ImdbQueueManager.options['action'] = parser.rargs[0].lower()
@@ -131,6 +133,9 @@ class ImdbQueueManager(object):
             return
 
         feed.manager.disable_feeds()
+        
+        if 'usage' in self.options:
+            return
 
         action = self.options['action']
         if action not in self.valid_actions:
