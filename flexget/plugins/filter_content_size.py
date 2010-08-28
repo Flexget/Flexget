@@ -27,11 +27,13 @@ class FilterContentSize(object):
             if 'content_size' in entry:
                 size = entry['content_size']
                 log.debug('%s size %s MB' % (entry['title'], size))
+                # Avoid confusion by printing a reject message to info log, as
+                # download plugin has alredy printed a downloading message.
                 if size < config.get('min', 0):
-                    log.debug('Entry %s too small, rejecting' % entry['title'])
+                    log.info('Entry %s too small, rejecting' % entry['title'])
                     feed.reject(entry, 'minimum size (%s MB)' % config['min'])
                 if size > config.get('max', maxint):
-                    log.debug('Entry %s too big, rejecting' % entry['title'])
+                    log.info('Entry %s too big, rejecting' % entry['title'])
                     feed.reject(entry, 'maximum size (%s MB)' % config['max'])
             else:
                 if config.get('strict', True):
