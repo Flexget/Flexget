@@ -197,8 +197,30 @@ class InputRSS(object):
                  isinstance(ex, IOError):
                 raise ex # let the @internet decorator handle
             else:
-                raise PluginWarning('Unhandled bozo_exception. Type: %s (feed: %s)' % \
-                    (ex.__class__.__name__, feed.name), log)
+                # all other bozo errors
+                # TODO: refactor the dumping into a own method, DUPLICATED CODE
+                if len(rss.entries) == 0:
+                    log.critical('Invalid RSS received from feed %s' % feed.name)
+                    req = urlopener(config['url'], log)
+                    data = req.read()
+                    req.close()
+                    import os
+                    received = os.path.join(feed.manager.config_base, 'received')
+                    if not os.path.isdir(received):
+                        os.mkdir(received)
+                    filename = os.path.join(received, '%s.%s' % (feed.name, ext))
+                    f = open(filename, 'w')
+                    f.write(data)
+                    f.close()
+                    log.critical('I have saved the invalid content to %s for you to view' % filename)
+                    raise PluginError('Unhandled bozo_exception. Type: %s (feed: %s)' % \
+                        (ex.__class__.__name__, feed.name), log)
+                else:
+                    msg = 'Invalid RSS received. However feedparser still produced entries. Ignoring the error ...'
+                    if not config.get('silent', False):
+                        log.info(msg)
+                    else:
+                        log.debug(msg)
 
         if rss['bozo'] and not ignore:
             log.error(rss)
