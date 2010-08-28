@@ -204,6 +204,7 @@ class InputRSS(object):
                     req = urlopener(config['url'], log)
                     data = req.read()
                     req.close()
+                    ext = 'xml'
                     import os
                     received = os.path.join(feed.manager.config_base, 'received')
                     if not os.path.isdir(received):
