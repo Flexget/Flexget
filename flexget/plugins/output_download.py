@@ -79,6 +79,8 @@ class PluginDownload:
     def get_temp_files(self, feed, require_path=False):
         """Download all feed content and store in temporary folder"""
         for entry in feed.accepted:
+            if entry['url'].startswith('magnet:'):
+                continue
             try:
                 if feed.manager.options.test:
                     log.info('Would download: %s' % entry['title'])

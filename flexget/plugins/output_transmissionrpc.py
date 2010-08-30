@@ -238,13 +238,15 @@ class PluginTransmissionrpc:
                 continue
             options = self._make_torrent_options_dict(feed, entry)
 
+            download = not(entry['url'].startswith('magnet:'))
+
             # Check that file is downloaded
-            if not 'file' in entry:
+            if download and not 'file' in entry:
                 feed.fail(entry, 'file missing?')
                 continue
 
             # Verify the temp file exists
-            if not os.path.exists(entry['file']):
+            if download and not os.path.exists(entry['file']):
                 tmp_path = os.path.join(feed.manager.config_base, 'temp')
                 log.debug('entry: %s' % entry)
                 log.debug('temp: %s' % ', '.join(os.listdir(tmp_path)))
@@ -252,9 +254,13 @@ class PluginTransmissionrpc:
                 continue
 
             try:
-                with open(entry['file'], 'rb') as f:
-                    filedump = base64.encodestring(f.read())
-                r = cli.add(filedump, 30, **options['add'])
+                if download:
+                    with open(entry['file'], 'rb') as f:
+                        filedump = base64.encodestring(f.read())
+                    r = cli.add(filedump, 30, **options['add'])
+                else:
+                    r = cli.add(None, filename=entry['url'],
+                                timeout=30, **options['add'])
                 log.info("%s torrent added to transmission" % (entry['title']))
                 if options['change'].keys():
                     for id in r.keys():
@@ -265,7 +271,7 @@ class PluginTransmissionrpc:
 
             # Clean up temp file if download plugin is not configured for
             # this feed.
-            if not 'download' in feed.config:
+            if download and not 'download' in feed.config:
                 os.remove(entry['file'])
                 del(entry['file'])
 
