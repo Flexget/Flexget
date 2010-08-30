@@ -111,7 +111,7 @@ class PluginDownload:
 
     def download(self, feed, entry):
         """Downloads :entry:. May raise exception(s) PluginWarning"""
-    
+
         # see http://bugs.python.org/issue1712522
         # note, url is already unicode ...
         url = entry['url']
@@ -193,6 +193,10 @@ class PluginDownload:
             f.close()
 
         entry['mime-type'] = mimetype
+
+        if 'content-length' in f.headers:
+            entry['content-length'] = int(f.headers.get('content-length'))
+
         # prefer content-disposition naming, note: content-disposition can be disabled completely by setting entry
         # field `content-disposition` to False
         if entry.get('content-disposition', True):
@@ -317,7 +321,7 @@ class PluginDownload:
                 feed.fail(entry, "Could not set path for %s: does not contain the field '%s'." % (entry['title'], e))
                 log.error("Download Failed: Couldn't set path for %s. Does not contain field '%s'." % (entry['title'], e))
                 return
-            
+
             # make path
             if not os.path.isdir(path):
                 log.info('Creating directory %s' % path)

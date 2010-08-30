@@ -2,7 +2,7 @@ import re
 import logging
 from flexget.plugin import *
 
-log = logging.getLogger('modify_torrent')
+log = logging.getLogger('modif_torrent')
 
 # Torrent decoding is a short fragment from effbot.org. Site copyright says:
 # Test scripts and other short code fragments can be considered as being in the public domain.
@@ -13,7 +13,7 @@ class Torrent(object):
 
     def __init__(self, content):
         """Accepts torrent file as string"""
-        
+
         # valid torrent files start with an announce block
         if not content.startswith('d8:announce'):
             raise Exception('Invalid content for a torrent')
@@ -47,7 +47,7 @@ class Torrent(object):
                 t['size'] = item['length']
                 files.append(t)
         return files
-        
+
     def get_size(self):
         """Return total size of the torrent"""
         size = 0
@@ -106,7 +106,7 @@ class Torrent(object):
 
     def __str__(self):
         return '<Torrent instance. Files: %s>' % self.get_filelist()
-        
+
     def tokenize(self, text, match=re.compile("([idel])|(\d+):|(-?\d+)").match):
         i = 0
         while i < len(text):
@@ -153,7 +153,7 @@ class Torrent(object):
         return data
 
     # encoding implementation by d0b
-    
+
     def encode_string(self, data):
         return "%d:%s" % (len(data), data)
 
@@ -180,7 +180,7 @@ class Torrent(object):
     def encode(self):
         data = self.content
         return self.encode_func[type(data)](data)
-            
+
 
 class TorrentFilename(object):
 
@@ -206,7 +206,7 @@ class TorrentFilename(object):
                 continue
             else:
                 log.debug('%s seems to be a torrent' % entry['title'])
-            
+
             # create torrent object from torrent
             try:
                 f = open(entry['file'], 'rb')
@@ -214,8 +214,21 @@ class TorrentFilename(object):
                 # a small torrent file since it starts with idstr
                 data = f.read()
                 f.close()
+
+                if 'content-length' in entry:
+                    if len(data) != entry['content-length']:
+                        feed.fail(entry, 'Torrent file length doesn\'t match to the one reported by the server')
+                        self.purge(entry)
+                        continue
+
                 # construct torrent object
-                torrent = Torrent(data)
+                try:
+                    torrent = Torrent(data)
+                except SyntaxError, e:
+                    feed.fail(entry, '%s - Torrent could not be parsed' % e.message.capitalize())
+                    self.purge(entry)
+                    continue
+
                 entry['torrent'] = torrent
                 entry['torrent_info_hash'] = torrent.get_info_hash()
                 # if we do not have good filename (by download plugin)
@@ -228,12 +241,11 @@ class TorrentFilename(object):
                     # generate filename from torrent or fall back to title plus extension
                     entry['filename'] = self.make_filename(torrent, entry)
             except Exception, e:
-                log.critical('Unable to parse torrent file?')
                 log.exception(e)
 
     def make_filename(self, torrent, entry):
         """Build a filename for this torrent"""
-        
+
         title = entry['title']
         files = torrent.get_filelist()
         if len(files) == 1:
@@ -246,12 +258,20 @@ class TorrentFilename(object):
         title = title.replace('/', '_')
         title = title.replace(' ', '_')
         title = title.replace('\u200b', '')
-        
+
         #title = title.encode('iso8859-1', 'ignore') # Damn \u200b -character, how I loathe thee
         # TODO: replace only zero width spaces, leave unicode alone?
 
         fn = '%s.torrent' % title
         log.debug('make_filename made %s' % fn)
         return fn
+
+    def purge(self, entry):
+        import os
+        if os.path.exists(entry['file']):
+            log.debug('removing temp file %s from %s' % (entry['file'], entry['title']))
+            os.remove(entry['file'])
+        del(entry['file'])
+
 
 register_plugin(TorrentFilename, 'torrent', builtin=True)

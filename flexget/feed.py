@@ -244,7 +244,7 @@ class Feed(object):
         if not entry in self.failed:
             self.failed.append(entry)
             self.manager.add_failed(entry)
-            self.verbose_details('Failed %s' % entry['title'], reason)
+            log.error('Failed %s (%s)' % (entry['title'], reason))
 
     def abort(self, **kwargs):
         """Abort this feed execution, no more plugins will be executed."""
