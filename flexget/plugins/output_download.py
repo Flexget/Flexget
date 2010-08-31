@@ -194,7 +194,7 @@ class PluginDownload:
 
         entry['mime-type'] = mimetype
 
-        if 'content-length' in f.headers:
+        if 'content-length' in f.headers and not decompress:
             entry['content-length'] = int(f.headers.get('content-length'))
 
         # prefer content-disposition naming, note: content-disposition can be disabled completely by setting entry
