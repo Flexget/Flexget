@@ -37,7 +37,7 @@ class SeriesParser(TitleParser):
 
         separators = '[!/+,:;|~ x]'
         self.ep_regexps = ['s(\d+)e(\d+)', 's(\d+)ep(\d+)', 's(\d+).e(\d+)',
-                '(?:^|\D)([\d]{1,2})[\s]?x[\s]?(\d+)']
+                '(?:^|\D)([\d]{1,2})[\s]?x[\s]?(\d+)', 'season.{0,2}(\d+).{0,2}episode.{0,2}(\d+)']
         self.id_regexps = [
                 '(\d{4})%s(\d+)%s(\d+)' % (separators, separators),
                 '(\d+)%s(\d+)%s(\d{4})' % (separators, separators),

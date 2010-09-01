@@ -102,6 +102,17 @@ class TestSeriesParser(object):
         # FIX: #402 .. a bit hard to do
         s = self.parse(name='Something', data='Something [S01] [E02]')
         assert (s.season == 1 and s.episode == 2), 'failed to parse %s' % s
+        
+    def test_season_episode(self):
+        """SeriesParser: season X, episode Y"""
+        s = self.parse(name='Something', data='Something - Season 1, Episode 2')
+        assert (s.season == 1 and s.episode == 2), 'failed to parse %s' % s
+        
+        s = self.parse(name='Something', data='Something - Season1, Episode2')
+        assert (s.season == 1 and s.episode == 2), 'failed to parse %s' % s
+        
+        s = self.parse(name='Something', data='Something - Season1 Episode2')
+        assert (s.season == 1 and s.episode == 2), 'failed to parse %s' % s
 
     def test_digits(self):
         """SeriesParser: digits (UID)"""

@@ -100,7 +100,7 @@ class Manager(object):
                     print ' o Indentation error'
                     print ' o Missing : from end of the line'
                     print ' o Non ASCII characters (use UTF8)'
-                    print " o If text contains any of :[]{}% characters it must be single-quoted ('')\n"
+                    print " o If text contains any of :[]{}% characters it must be single-quoted (eg. value{1} should be 'value{1}')\n"
                     lines = 0
                     if e.problem is not None:
                         print ' Reason: %s\n' % e.problem
@@ -338,11 +338,16 @@ class Manager(object):
         """Creates instances of all configured feeds"""
         from flexget.feed import Feed
 
+        if not 'feeds' in self.config:
+            log.critical('There are no feeds in the configuration file!')
+            return
+
+        if not isinstance(self.config['feeds'], dict):
+            log.critical('Feeds is in wrong datatype, please read configuration guides')
+            return
+
         # construct feed list
         feeds = self.config.get('feeds', {}).keys()
-        if not feeds:
-            log.critical('There are no feeds in the configuration file!')
-
         for name in feeds:
             # validate (TODO: make use of validator?)
             if not isinstance(self.config['feeds'][name], dict):
