@@ -1,4 +1,3 @@
-from __future__ import with_statement
 import logging
 import time
 import os
@@ -432,7 +431,6 @@ class OutputDeluge(object):
             reactor.callLater(30, lambda: tasks.called or on_timeout(tasks))
             
         def on_connect_fail(result, feed):
-            log.info('connect failed result: %s' % result)
             # clean up temp file if download plugin is not configured for this feed
             if not 'download' in feed.config:
                 for entry in feed.accepted:
