@@ -259,7 +259,7 @@ class OutputDeluge(object):
                 log.info("%s successfully added to deluge." % entry['title'])
                 if opts['movedone']:
                     if client.is_localhost():
-                        if not os.path.isdir(opts['movedone']):
+                        if not os.path.isdir(opts['movedone']) and False:
                             log.debug("movedone path %s doesn't exist, creating" % opts['movedone'])
                             os.makedirs(opts['movedone'])
                     else:
@@ -359,16 +359,19 @@ class OutputDeluge(object):
 
             # add the torrents
             for entry in feed.accepted:
-                # see that temp file is present
-                if not os.path.exists(entry['file']):
-                    tmp_path = os.path.join(feed.manager.config_base, 'temp')
-                    log.debug('entry: %s' % entry)
-                    log.debug('temp: %s' % ', '.join(os.listdir(tmp_path)))
-                    feed.fail(entry, "Downloaded temp file '%s' doesn't exist!" % entry['file'])
-                    del(entry['file'])
-                    continue
-                with open(entry['file'], 'rb') as f:
-                    filedump = base64.encodestring(f.read())
+                magnet, filedump = None, None
+                if entry.get('url', '').startswith('magnet:'):
+                    magnet = entry['url']
+                else:
+                    if not os.path.exists(entry['file']):
+                        feed.fail(entry, "Downloaded temp file '%s' doesn't exist!" % entry['file'])
+                        del(entry['file'])
+                        continue
+                    try:
+                        f = open(entry['file'], 'rb')
+                        filedump = base64.encodestring(f.read())
+                    finally:
+                        f.close()
                 path = ''
                 try:
                     path = os.path.expanduser(entry.get('path', config['path']) % entry)
@@ -384,15 +387,18 @@ class OutputDeluge(object):
                         if fopt == 'ratio':
                             opts['stop_at_ratio'] = True
 
-                def on_add_torrent(result, title, filedump, opts):
-                    log.info("adding torrent")
-                    return client.core.add_torrent_file(title, filedump, opts)
+                def on_add_torrent(result, title, filedump, opts, magnet=False):
+                    log.debug("Adding %s to deluge." % title)
+                    if magnet:
+                        return client.core.add_torrent_magnet(magnet, opts)
+                    else:
+                        return client.core.add_torrent_file(title, filedump, opts)
 
                 # Make sure our labels have been added before adding the torrents
-                addresult = label_deferred.addCallback(on_add_torrent, entry['title'], filedump, opts)
+                addresult = label_deferred.addCallback(on_add_torrent, entry['title'], filedump, opts, magnet)
 
                 # clean up temp file if download plugin is not configured for this feed
-                if not 'download' in feed.config:
+                if not magnet and not 'download' in feed.config:
                     os.remove(entry['file'])
                     del(entry['file'])
 
