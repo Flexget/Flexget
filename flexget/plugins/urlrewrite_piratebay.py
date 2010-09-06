@@ -22,7 +22,7 @@ class UrlRewritePirateBay:
         if url.startswith('http://torrents.thepiratebay.org/'):
             return True
         return False
-        
+
     # urlrewriter API
     def url_rewrite(self, feed, entry):
         if not 'url' in entry:
@@ -51,8 +51,8 @@ class UrlRewritePirateBay:
             torrent_url = tag_a.get('href')
             return torrent_url
         except Exception, e:
-            raise UrlRewritingError(e)    
-            
+            raise UrlRewritingError(e)
+
     # search API
     def search(self, feed, entry):
         url = self.search_title(entry['title'])
@@ -65,24 +65,24 @@ class UrlRewritePirateBay:
             Search for name from piratebay.
             If optional search :url: is passed it will be used instead of internal search.
         """
-        
+
         name = name.replace('.', ' ').lower()
         if not url:
             url = 'http://thepiratebay.org/search/' + urllib.quote(name)
             log.debug('Using %s as piratebay search url' % url)
         page = urlopener(url, log)
-        # do this here so I don't have to do it constantly below.
-        cleanname = name.replace('.', ' ').replace('-', '').replace('_', ' ').lower()
 
-        
+        # do this here so I don't have to do it constantly below.
+        clean_name = name.replace('.', ' ').replace('-', '').replace('_', ' ').lower()
+
         soup = get_soup(page)
         torrents = []
         for link in soup.findAll('a', attrs={'class': 'detLink'}):
             # assign confidence score of how close this link is to the name you're looking for. .6 and above is "close"
             confidence = difflib.SequenceMatcher(lambda x: x in ' -._', # junk characters
                                        link.contents[0].lower().replace('.', ' ').replace('-', '').replace('_', ' '),
-                                       cleanname).ratio()
-            log.debug('name: %s' % cleanname)
+                                       clean_name).ratio()
+            log.debug('name: %s' % clean_name)
             log.debug('found name: %s' % link.contents[0].lower().replace('.', ' ').replace('-', '').replace('_', ' '))
             log.debug('confidence: %s' % str(confidence))
             if confidence < 0.9:
@@ -90,14 +90,14 @@ class UrlRewritePirateBay:
             torrent = {}
             torrent['name'] = link.contents[0]
             torrent['link'] = 'http://thepiratebay.org' + link.get('href')
-            tds = link.parent.parent.parent.findAll('td') 
+            tds = link.parent.parent.parent.findAll('td')
             torrent['seed'] = int(tds[-2].contents[0])
             torrent['leech'] = int(tds[-1].contents[0])
             torrents.append(torrent)
-            
+
         if not torrents:
             raise PluginWarning('No close matches for %s' % name, log, log_once=True)
-            
+
         def best(a, b):
             score_a = a['seed'] * 2 + a['leech']
             score_b = b['seed'] * 2 + b['leech']

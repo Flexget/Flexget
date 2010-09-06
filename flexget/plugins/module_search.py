@@ -4,7 +4,7 @@ from flexget.plugin import *
 log = logging.getLogger('search')
 
 
-class SearchPlugins:
+class SearchPlugins(object):
 
     """
         Implements --search-plugins
@@ -21,23 +21,23 @@ class SearchPlugins:
             print '-' * 79
 
 
-class PluginSearch:
+class PluginSearch(object):
     """
         Search entry from sites. Accepts list of known search plugins, list is in priority order.
         Once hit has been found no more searches are performed. Should be used only when
-        there is no other way to get working download url, ie. when input plugin does not provide 
+        there is no other way to get working download url, ie. when input plugin does not provide
         any downloadable urls.
-        
+
         Example:
-        
+
         search:
           - newtorrents
           - piratebay
-          
-        Notes: 
-        - Some resolvers will use search plugins automaticly if enry url points into a search page.
+
+        Notes:
+        - Some url rewriters will use search plugins automaticly if enry url points into a search page.
     """
-    
+
     def validator(self):
         # TODO: should only accept registered search plugins
         from flexget import validator
@@ -47,13 +47,13 @@ class PluginSearch:
 
     def on_feed_urlrewrite(self, feed):
         # no searches in unit test mode
-        if feed.manager.unit_test: 
-            return 
-        
+        if feed.manager.unit_test:
+            return
+
         plugins = {}
         for plugin in get_plugins_by_group('search'):
             plugins[plugin.name] = plugin.instance
-            
+
         for entry in feed.accepted:
             found = False
             # loop trough configured searches
@@ -62,14 +62,18 @@ class PluginSearch:
                     log.error('Search plugins %s not found' % name)
                     log.debug('Registered: %s' % ', '.join(plugins.keys()))
                     continue
-                else:
-                    log.debug('Issuing search from %s' % name)
+                log.debug('Issuing search from %s' % name)
+                try:
                     url = plugins[name].search(feed, entry)
-                    if url:
-                        log.debug('Found url: %s' % url)
-                        entry['url'] = url
-                        found = True
-                        break
+                except PluginWarning, pw:
+                    log.debug('Search failed: %s' % pw.value)
+                    continue
+                if url:
+                    log.debug('Found url: %s' % url)
+                    entry['url'] = url
+                    found = True
+                    break
+
             # failed
             if not found:
                 feed.reject(entry, 'search failed')
