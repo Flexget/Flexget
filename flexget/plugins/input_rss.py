@@ -58,6 +58,17 @@ class InputRSS(object):
         rss:
           url: <url>
           silent: yes
+
+        You can group all the links of an item, to make the download plugin tolerant
+        to broken urls: it will try to download each url until one works.
+        Links are enclosures plus item fields given by the link value, in that order.
+        The value to set is "group links".
+
+        Example:
+
+        rss:
+          url: <url>
+          group links: yes
     """
 
     def validator(self):
@@ -75,6 +86,7 @@ class InputRSS(object):
         advanced.accept('boolean', key='silent')
         advanced.accept('boolean', key='ascii')
         advanced.accept('boolean', key='filename')
+        advanced.accept('boolean', key='group links')
         return root
 
     def get_config(self, feed):
@@ -88,6 +100,9 @@ class InputRSS(object):
         # set the default link fields to 'link' and 'guid'
         if not config.get('link') or 'auto' in config['link']:
             config['link'] = ['link', 'guid']
+        # set default value for group links as deactivated
+        if not config.get('group links') or config['group links'] == 'auto':
+            config['group links'] = False
         # use basic auth when needed
         if 'username' in config and 'password' in config:
             config['url'] = self.passwordize(config['url'], config['username'], config['password'])
@@ -284,12 +299,17 @@ class InputRSS(object):
 
             # create from enclosures if present
             enclosures = entry.get('enclosures', [])
+            if config.get('group links'):
+                enclosures_urls = []
             if enclosures:
                 #log.debug('adding %i entries from enclosures' % len(enclosures))
                 for enclosure in enclosures:
                     ee = Entry()
                     if not 'href' in enclosure:
                         log_once('RSS-entry %s enclosure does not have url' % entry.title, log)
+                        continue
+                    if config.get('group links'):
+                        enclosures_urls.append(enclosure['href'])
                         continue
                     ee['url'] = enclosure['href']
                     # get optional meta-data
@@ -310,12 +330,19 @@ class InputRSS(object):
                                 ee['filename'] = match.group(1)
                                 log.log(5, 'filename %s from enclosure' % ee['filename'])
                     add_entry(ee)
-                continue
+                if not config.get('group links'):
+                    continue
 
             # create flexget entry
             e = Entry()
 
             # search for known url fields
+            if config.get('group links'):
+                e['urls'] = enclosures_urls
+                for url_field in config['link']:
+                    if url_field in entry:
+                        e['urls'].append(entry[url_field])
+
             for url_field in config['link']:
                 if url_field in entry:
                     e['url'] = entry[url_field]

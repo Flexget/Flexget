@@ -79,42 +79,58 @@ class PluginDownload:
     def get_temp_files(self, feed, require_path=False):
         """Download all feed content and store in temporary folder"""
         for entry in feed.accepted:
-            if entry['url'].startswith('magnet:'):
-                continue
-            try:
-                if feed.manager.options.test:
-                    log.info('Would download: %s' % entry['title'])
-                else:
-                    if not feed.manager.unit_test:
-                        log.info('Downloading: %s' % entry['title'])
-                    # check if entry must have a path (download: yes)
-                    if require_path and 'path' not in entry:
-                        log.info('%s can\'t be downloaded, no path specified for entry' % entry['title'])
-                        feed.fail(entry, 'no path specified for entry')
-                        continue
-                    self.download(feed, entry)
-            except urllib2.HTTPError, e:
-                feed.fail(entry, 'HTTP error')
-                log.error('HTTPError %s' % e.code)
-            except urllib2.URLError, e:
-                feed.fail(entry, 'URL Error')
-                log.error('URLError %s' % e.reason)
-            except BadStatusLine:
-                feed.fail(entry, 'BadStatusLine')
-                log.error('Failed to reach server. Reason: %s' % e.reason)
-            except IOError, e:
-                feed.fail(entry, 'IOError')
-                if hasattr(e, 'reason'):
-                    log.error('Failed to reach server. Reason: %s' % e.reason)
-                elif hasattr(e, 'code'):
-                    log.error('The server couldn\'t fulfill the request. Error code: %s' % e.code)
+            if entry.get('urls'):
+                urls = entry.get('urls')
+            else:
+                urls = [entry['url']]
+            errors = []
+            for url in urls:
+                error = self.download_url(feed, entry, url, require_path)
+                errors.append(error)
+                if not error:
+                    break
+            else:
+                feed.fail(entry, ", ".join(errors))
 
-    def download(self, feed, entry):
+    def download_url(self, feed, entry, url, require_path):
+        """Downloads :url:.
+           Do not fail the :entry: if there is a network issue, instead just log and return a string error."""
+        if url.startswith('magnet:'):
+            return
+        try:
+            if feed.manager.options.test:
+                log.info('Would download: %s' % entry['title'])
+            else:
+                if not feed.manager.unit_test:
+                    log.info('Downloading: %s' % entry['title'])
+                # check if entry must have a path (download: yes)
+                # TODO: move this in get_temp_files? requires to also move magnet link check...
+                if require_path and 'path' not in entry:
+                    log.info('%s can\'t be downloaded, no path specified for entry' % entry['title'])
+                    feed.fail(entry, 'no path specified for entry')
+                    return
+                self.download(feed, entry, url)
+        except urllib2.HTTPError, e:
+            log.warning('HTTPError %s' % e.code)
+            return 'HTTP error'
+        except urllib2.URLError, e:
+            log.warning('URLError %s' % e.reason)
+            return 'URL Error'
+        except BadStatusLine:
+            log.warning('Failed to reach server. Reason: %s' % e.reason)
+            return 'BadStatusLine'
+        except IOError, e:
+            if hasattr(e, 'reason'):
+                log.warning('Failed to reach server. Reason: %s' % e.reason)
+            elif hasattr(e, 'code'):
+                log.warning('The server couldn\'t fulfill the request. Error code: %s' % e.code)
+            return 'IOError'
+
+    def download(self, feed, entry, url):
         """Downloads :entry:. May raise exception(s) PluginWarning"""
 
         # see http://bugs.python.org/issue1712522
         # note, url is already unicode ...
-        url = entry['url']
         try:
             url = url.encode('latin1')
         except UnicodeEncodeError:
