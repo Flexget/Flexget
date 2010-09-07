@@ -46,10 +46,12 @@ class ModifySet(object):
         Adds the set dict to all accepted entries. This is not really a filter plugin,
         but it needs to be run before feed_download, so it is run last in the filter chain.
         """
-        for entry in feed.entries + feed.rejected:
+        for entry in feed.entries:
             self.modify(entry, feed.config['set'], False)
+        for entry in feed.rejected:
+            self.modify(entry, feed.config['set'], False, False)
             
-    def modify(self, entry, config, validate=True):
+    def modify(self, entry, config, validate=True, errors=True):
         """
         this can be called from a plugin to add set values to an entry
         """
@@ -61,7 +63,8 @@ class ModifySet(object):
                 try:
                     conf[key] = value % entry
                 except KeyError, e:
-                    log.error("Could not set '%s' for %s: does not contain the field '%s.'" % (key, entry['title'], e))
+                    logger = log.error if errors else log.debug
+                    logger("Could not set '%s' for %s: does not contain the field '%s.'" % (key, entry['title'], e))
             else:
                 conf[key] = value
         
