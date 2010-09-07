@@ -101,7 +101,7 @@ class TestQuality(FlexGetBase):
     def test_max_unknown_quality(self):
         """Series plugin: max quality with unknown quality"""
         self.execute_feed('max_unknown_quality')
-        assert len(self.feed.accepted) == 0, 'should not have accepted'
+        assert len(self.feed.accepted) == 1, 'should have accepted'
 
 
 class TestDatabase(FlexGetBase):

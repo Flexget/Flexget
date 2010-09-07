@@ -944,14 +944,14 @@ class FilterSeries(SeriesPlugin):
     def process_quality(self, feed, config, eps):
         """Accepts episodes that meet configured qualities"""
 
-        min = qualities.min()
+        min = qualities.UnknownQuality()
         max = qualities.max()
         if 'quality' in config:
             quality = qualities.get(config['quality'])
             min, max = quality, quality
         else:
-            min_name = config.get('min_quality', qualities.min().name)
-            max_name = config.get('max_quality', qualities.max().name)
+            min_name = config.get('min_quality', min.name)
+            max_name = config.get('max_quality', max.name)
             if min_name.lower() not in qualities.registry:
                 raise PluginError('Unknown quality %s' % min_name)
             if max_name.lower() not in qualities.registry:
