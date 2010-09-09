@@ -183,6 +183,7 @@ def release(args):
     shutil.move('FlexGet.egg-info-backup', 'FlexGet.egg-info')
 
 
+# TODO: I don't think it is working / needed anymore?
 @task
 @cmdopts([
     ('pylint-command=', 'c', 'Specify a custom pylint executable'),
@@ -235,3 +236,34 @@ def pylint(options):
                 raise paver.tasks.BuildFailure('PyLint finished with a non-zero exit code')
     
     return dry('bin/pylint ' + ' '.join(arguments), run_pylint)
+
+
+@task
+def install_tools():
+    """Install development / hudson tools and dependencies"""
+    
+    try:
+        import pip
+    except:
+        print 'Unable to import pip, please install it'
+        return
+    
+    try:
+        import pylint
+        print 'Pylint INSTALLED'
+    except:
+        pip.main(['install', 'pylint']) # OR instead of pylint logilab.pylintinstaller ?
+    
+    try:
+        import coverage
+        print 'Coverage INSTALLED'
+    except:
+        pip.main(['install', 'coverage'])
+    
+    try:
+        import nosexcover
+        print 'Nose-xcover INSTALLED'
+    except:
+        pip.main(['install', 'http://github.com/cmheisel/nose-xcover/zipball/master'])
+        
+    
