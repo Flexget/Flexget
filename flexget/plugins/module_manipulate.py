@@ -1,6 +1,6 @@
 import logging
 import re
-from flexget.plugin import *
+from flexget.plugin import priority, register_plugin
 
 log = logging.getLogger('manipulate')
 
@@ -63,16 +63,18 @@ class Manipulate(object):
                     if match:
                         groups = [x for x in match.groups() if x is not None]
                         log.debug('groups: %s' % groups)
-                        entry[field] = ''.join(groups)
-                        feed.verbose_details('Field %s is now %s' % (field, entry[field]))
-                        log.debug('field %s is now %s' % (field, entry[field]))
+                        field_value = ''.join(groups)
+                        log.debug('field %s after extract: %s' % (field, field_value))
 
                 if 'replace' in config:
                     if not field_value:
                         log.warning('Cannot replace, field %s is not present' % from_field)
                         continue
                     replace_config = config['replace']
-                    entry[field] = re.sub(replace_config['regexp'], replace_config['format'], field_value)
-                    feed.verbose_details('Field %s is now %s' % (field, entry[field]))
+                    field_value = re.sub(replace_config['regexp'], replace_config['format'], field_value)
+                    log.debug('field %s after replace: %s' % (field, field_value))
+
+                entry[field] = field_value
+                feed.verbose_details('Field %s is now %s' % (field, entry[field]))
 
 register_plugin(Manipulate, 'manipulate')
