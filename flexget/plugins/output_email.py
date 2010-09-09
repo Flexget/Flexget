@@ -7,7 +7,7 @@ from flexget.plugin import *
 log = logging.getLogger('email')
 
 
-class OutputEmail:
+class OutputEmail(object):
 
     """
         Send an e-mail with the list of all succeeded (downloaded) entries.
@@ -152,7 +152,7 @@ FlexGet has just downloaded %d new entries for feed %s :
         content += "\n\n"
 
         # prepare email message
-        message = email.Message.Message()
+        message = email.Message.Message() # pylint:disable=E0611
         message["To"] = ','.join(config['to'])
         message["From"] = config['from']
         message["Subject"] = subject

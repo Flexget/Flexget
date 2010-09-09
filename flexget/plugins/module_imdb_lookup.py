@@ -27,9 +27,9 @@ directors_table = Table('imdb_movie_directors', Base.metadata,
 
 
 class Movie(Base):
-    
+
     __tablename__ = 'imdb_movies'
-    
+
     id = Column(Integer, primary_key=True)
     title = Column(String)
     url = Column(String)
@@ -39,7 +39,7 @@ class Movie(Base):
     languages = relation('Language', secondary=languages_table, backref='movies')
     actors = relation('Actor', secondary=actors_table, backref='movies')
     directors = relation('Director', secondary=directors_table, backref='movies')
-    
+
     score = Column(Float)
     votes = Column(Integer)
     year = Column(Integer)
@@ -51,23 +51,23 @@ class Movie(Base):
 
 
 class Language(Base):
-    
+
     __tablename__ = 'imdb_languages'
 
     id = Column(Integer, primary_key=True)
     name = Column(String)
-    
+
     def __init__(self, name):
         self.name = name
 
 
 class Genre(Base):
-    
+
     __tablename__ = 'imdb_genres'
-    
+
     id = Column(Integer, primary_key=True)
     name = Column(String)
-    
+
     def __init__(self, name):
         self.name = name
 
@@ -105,8 +105,8 @@ class SearchResult(Base):
     id = Column(Integer, primary_key=True)
     title = Column(String)
     url = Column(String)
-    fails = Column(Boolean, default=False) 
-    
+    fails = Column(Boolean, default=False)
+
     def __init__(self, title, url=None):
         self.title = title
         self.url = url
@@ -121,7 +121,7 @@ class ModuleImdbLookup(object):
         Example:
 
         imdb_lookup: yes
-        
+
         Also provides imdb lookup functionality to all other imdb related plugins.
     """
 
@@ -143,10 +143,10 @@ class ModuleImdbLookup(object):
     @internet(log)
     def lookup(self, feed, entry, search_allowed=True):
         """Perform imdb lookup for entry. Raises PluginError with failure reason."""
-            
+
         take_a_break = False
         session = Session()
-        
+
         try:
             # entry sanity checks
             for field in ['imdb_votes', 'imdb_score']:
@@ -154,7 +154,7 @@ class ModuleImdbLookup(object):
                     value = entry[field]
                     if not isinstance(value, int) and not isinstance(value, float):
                         raise PluginError('Entry field %s should be a number!' % field)
-        
+
             # make sure imdb url is valid
             if 'imdb_url' in entry:
                 imdb_id = extract_id(entry['imdb_url'])
@@ -199,7 +199,7 @@ class ModuleImdbLookup(object):
                     raise PluginError('Title lookup failed')
 
             imdb = ImdbParser()
-            
+
             # check if this imdb page has been parsed & cached
             cached = session.query(Movie).filter(Movie.url == entry['imdb_url']).first()
             if not cached:
@@ -208,7 +208,7 @@ class ModuleImdbLookup(object):
                 try:
                     take_a_break = True
                     imdb.parse(entry['imdb_url'])
-                    
+
                     # store to database
                     movie = Movie()
                     movie.photo = imdb.photo
@@ -222,24 +222,24 @@ class ModuleImdbLookup(object):
                         genre = session.query(Genre).filter(Genre.name == name).first()
                         if not genre:
                             genre = Genre(name)
-                        movie.genres.append(genre) # pylint: disable-msg=E1101
+                        movie.genres.append(genre) # pylint:disable=E1101
                     for name in imdb.languages:
                         language = session.query(Language).filter(Language.name == name).first()
                         if not language:
                             language = Language(name)
-                        movie.languages.append(language) # pylint: disable-msg=E1101
+                        movie.languages.append(language) # pylint:disable=E1101
                     for imdb_id, name in imdb.actors.iteritems():
                         actor = session.query(Actor).filter(Actor.imdb_id == imdb_id).first()
                         if not actor:
                             actor = Actor(imdb_id, name)
-                        movie.actors.append(actor) # pylint: disable-msg=E1101
+                        movie.actors.append(actor) # pylint:disable=E1101
                     for imdb_id, name in imdb.directors.iteritems():
                         director = session.query(Director).filter(Director.imdb_id == imdb_id).first()
                         if not director:
                             director = Director(imdb_id, name)
-                        movie.directors.append(director) # pylint: disable-msg=E1101
-                    session.add(movie)                        
-                    
+                        movie.directors.append(director) # pylint:disable=E1101
+                    session.add(movie)
+
                 except UnicodeDecodeError:
                     log.error('Unable to determine encoding for %s. Installing chardet library may help.' % entry['imdb_url'])
                     # store cache so this will not be tried again
@@ -275,7 +275,7 @@ class ModuleImdbLookup(object):
             log.log(5, 'imdb.languages: %s' % imdb.languages)
             log.log(5, 'imdb.actors: %s' % imdb.actors)
             log.log(5, 'imdb.directors: %s' % imdb.directors)
-            
+
             # store to entry
             # TODO: I really don't like this shoveling!
             entry['imdb_url'] = imdb.url
@@ -290,7 +290,7 @@ class ModuleImdbLookup(object):
             entry['imdb_languages'] = imdb.languages
             entry['imdb_actors'] = imdb.actors
             entry['imdb_directors'] = imdb.directors
-            
+
             # give imdb a little break between requests (see: http://flexget.com/ticket/129#comment:1)
             if take_a_break and not feed.manager.options.debug and not feed.manager.unit_test:
                 import time
@@ -298,6 +298,6 @@ class ModuleImdbLookup(object):
         finally:
             log.log(5, 'committing session')
             session.commit()
-        
+
 register_plugin(ModuleImdbLookup, 'imdb_lookup')
 register_parser_option('--retry-lookup', action='store_true', dest='retry_lookup', default=0, help=SUPPRESS_HELP)

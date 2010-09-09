@@ -217,7 +217,7 @@ class SeriesPlugin(object):
             if parser.season and parser.episode:
                 episode.season = parser.season
                 episode.number = parser.episode
-            series.episodes.append(episode) # pylint: disable-msg=E1103
+            series.episodes.append(episode) # pylint:disable=E1103
             log.debug('-> added %s' % episode)
 
         # if release does not exists in episodes, add new
@@ -237,7 +237,7 @@ class SeriesPlugin(object):
             release.quality = parser.quality
             release.proper = parser.proper_or_repack
             release.title = parser.data
-            episode.releases.append(release) # pylint: disable-msg=E1103
+            episode.releases.append(release) # pylint:disable=E1103
             log.debug('-> added %s' % release)
         return release
 
@@ -649,7 +649,7 @@ class FilterSeries(SeriesPlugin):
         identified_by = config.get('identified_by', 'auto')
         if identified_by not in ['ep', 'id', 'auto']:
             raise PluginError('Unknown identified_by value %s for the series %s' % (identified_by, series_name))
-        
+
         if identified_by == 'auto':
             # set expect flags automatically
 
