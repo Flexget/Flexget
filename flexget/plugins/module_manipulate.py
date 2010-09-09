@@ -36,7 +36,7 @@ class Manipulate(object):
         edit.accept('regexp', key='extract')
         replace = edit.accept('dict', key='replace')
         replace.accept('regexp', key='regexp', required=True)
-        replace.accept('regexp', key='format', required=True)
+        replace.accept('text', key='format', required=True)
         return root
 
     @priority(255)
