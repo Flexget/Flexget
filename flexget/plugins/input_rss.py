@@ -175,6 +175,10 @@ class InputRSS(object):
                 # see: ticket 88
                 log.debug('ignoring feedparser.CharacterEncodingOverride')
                 ignore = True
+            elif isinstance(ex, UnicodeEncodeError):
+                if len(rss.entries):
+                    log.info('Feed has UnicodeEncodeError but seems to produce entries, ignoring the error ...')
+                    ignore = True
             elif isinstance(ex, xml.sax._exceptions.SAXParseException):
                 if len(rss.entries) == 0:
                     # save invalid data for review, this is a bit ugly but users seem to really confused when
@@ -240,7 +244,7 @@ class InputRSS(object):
 
         if rss['bozo'] and not ignore:
             log.error(rss)
-            log.error('Bozo feed exception on %s' % feed.name)
+            log.error('Bozo exception %s on feed %s' % (type(ex), feed.name))
             return
 
         log.debug('encoding %s' % rss.encoding)
