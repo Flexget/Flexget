@@ -96,7 +96,7 @@ class InputRSS(object):
         if isinstance(config.get('link'), basestring):
             config['link'] = [config['link']]
         if config.get('link'):
-            config['link'] = [link.lower() for link in config['link']]
+            config['link'] = [link.replace(':', '_').lower() for link in config['link']]
         # set the default link fields to 'link' and 'guid'
         if not config.get('link') or 'auto' in config['link']:
             config['link'] = ['link', 'guid']
