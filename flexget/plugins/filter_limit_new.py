@@ -29,7 +29,7 @@ class FilterLimitNew(object):
         i = 1
         rejected = 0
         passed = []
-        for entry in feed.accepted + [i for i in feed.entries if i not in feed.entries]:
+        for entry in feed.accepted + [i for i in feed.entries if i not in feed.accepted]:
             # if entry is marked as passed, don't remove it
             # this is because we used accepted + entries and it may be listed in both ..
             if entry in passed:

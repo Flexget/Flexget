@@ -189,7 +189,7 @@ class TorrentFilename(object):
 
     @priority(255)
     def on_feed_modify(self, feed):
-        for entry in feed.accepted + [i for i in feed.entries if i not in feed.entries]:
+        for entry in feed.accepted + [i for i in feed.entries if i not in feed.accepted]:
             # skip if entry does not have file assigned
             if not 'file' in entry:
                 log.log(5, '%s doesn\'t have a file associated' % entry['title'])
