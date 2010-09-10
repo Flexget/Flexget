@@ -3,7 +3,7 @@ from flexget.manager import Base
 from flexget.plugin import *
 from sqlalchemy import Column, Integer, String, DateTime, Unicode, asc
 from sqlalchemy.schema import ForeignKey
-from sqlalchemy.orm import relation, join
+from sqlalchemy.orm import relation
 from datetime import datetime
 from flexget.manager import Session
 
@@ -13,21 +13,21 @@ log = logging.getLogger('seen')
 class SeenEntry(Base):
 
     __tablename__ = 'seen_entry'
-    
+
     id = Column(Integer, primary_key=True)
     title = Column(Unicode)
     reason = Column(Unicode)
     feed = Column(Unicode)
     added = Column(DateTime)
-    
+
     fields = relation('SeenField', backref='seen_entry', cascade='all, delete, delete-orphan')
-    
+
     def __init__(self, title, feed, reason=None):
         self.title = title
         self.reason = reason
         self.feed = feed
         self.added = datetime.now()
-        
+
     def __str__(self):
         return '<SeenEntry(title=%s,reason=%s,feed=%s,added=%s)>' % (self.title, self.reason, self.feed, self.added)
 
@@ -35,21 +35,21 @@ class SeenEntry(Base):
 class SeenField(Base):
 
     __tablename__ = 'seen_field'
-    
+
     id = Column(Integer, primary_key=True)
     seen_entry_id = Column(Integer, ForeignKey('seen_entry.id'), nullable=False)
     field = Column(Unicode)
     value = Column(Unicode, index=True)
     added = Column(DateTime)
-    
+
     def __init__(self, field, value):
         self.field = field
         self.value = value
         self.added = datetime.now()
-    
+
     def __str__(self):
         return '<SeenField(field=%s,value=%s,added=%s)>' % (self.field, self.value, self.added)
-                                        
+
 
 class MigrateSeen(object):
 
@@ -128,7 +128,7 @@ class MigrateSeen(object):
         bar.finish()
 
         # MIGRATE
-        total = session.query(Seen).count() + 1 
+        total = session.query(Seen).count() + 1
         widgets = ['Upgrading - ', ETA(), ' ', Percentage(), ' ', Bar(left='[', right=']')]
         bar = ProgressBar(widgets=widgets, maxval=total).start()
 
@@ -176,10 +176,10 @@ class SeenSearch(object):
 
             se = session.query(SeenEntry).filter(SeenEntry.id == field.seen_entry_id).first()
             if not se:
-                print 'ERROR: <SeenEntry(id=%s)> missing' % field.seen_entry_id  
+                print 'ERROR: <SeenEntry(id=%s)> missing' % field.seen_entry_id
                 continue
 
-            # don't show duplicates                
+            # don't show duplicates
             if se.id in shown:
                 continue
             shown.append(se.id)
@@ -189,7 +189,7 @@ class SeenSearch(object):
                 print ' %s: %s' % (sf.field, sf.value)
             print ''
 
-        if not shown:        
+        if not shown:
             print 'No results'
 
         session.close()
@@ -212,14 +212,12 @@ class SeenForget(object):
             count += 1
             session.delete(se)
 
-        # todo: merge with previous statement by utilizing or-clause
+        # TODO: merge with previous statement by utilizing or-clause
         for se in session.query(SeenEntry).filter(SeenEntry.feed == forget).all():
             fcount += len(se.fields)
             count += 1
             session.delete(se)
 
-        #print 'Removed %s titles (%s fields)' % (count, fcount)
-            
         for sf in session.query(SeenField).filter(SeenField.value == forget).all():
             se = session.query(SeenEntry).filter(SeenEntry.id == sf.seen_entry_id).first()
             fcount += len(se.fields)
@@ -277,7 +275,7 @@ class FilterSeen(object):
         if not feed.config.get(self.keyword, True):
             log.debug('%s is disabled' % self.keyword)
             return
-        
+
         queries = 0
         for entry in feed.entries:
             for field in self.fields:
@@ -304,7 +302,7 @@ class FilterSeen(object):
             # verbose if in learning mode
             if feed.manager.options.learn:
                 log.info("Learned '%s' (will skip this in the future)" % (entry['title']))
-    
+
     def learn(self, feed, entry, fields=None, reason=None):
         """Marks entry as seen"""
         # no explicit fields given, use default
@@ -323,7 +321,7 @@ class FilterSeen(object):
             se.fields.append(sf)
             log.debug("Learned '%s' (field: %s)" % (entry[field], field))
         feed.session.add(se)
-        
+
     def forget(self, feed, title):
         """Forget SeenEntry with :title:. Return True if forgotten."""
         se = feed.session.query(SeenEntry).filter(SeenEntry.title == title).first()
@@ -331,7 +329,7 @@ class FilterSeen(object):
             log.debug("Forgotten '%s' (%s fields)" % (title, len(se.fields)))
             feed.session.delete(se)
             return True
-                
+
 
 register_plugin(FilterSeen, 'seen', builtin=True)
 register_plugin(SeenSearch, '--seen-search', builtin=True)

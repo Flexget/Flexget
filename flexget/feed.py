@@ -136,7 +136,7 @@ class Feed(object):
             name - name of the feed
             config - yaml configuration (dict)
         """
-        self.name = name
+        self.name = unicode(name)
         self.config = config
         self.manager = manager
         self.enabled = True

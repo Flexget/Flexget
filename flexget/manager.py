@@ -362,7 +362,7 @@ class Manager(object):
                 continue
 
             # create feed
-            feed = Feed(self, unicode(name), self.config['feeds'][name])
+            feed = Feed(self, name, self.config['feeds'][name])
             # if feed name is prefixed with _ it's disabled
             if name.startswith('_'):
                 feed.enabled = False
