@@ -258,7 +258,7 @@ class OutputDeluge(object):
                 log.info("%s successfully added to deluge." % entry['title'])
                 if opts['movedone']:
                     if client.is_localhost():
-                        if not os.path.isdir(opts['movedone']) and False:
+                        if not os.path.isdir(opts['movedone']):
                             log.debug("movedone path %s doesn't exist, creating" % opts['movedone'])
                             os.makedirs(opts['movedone'])
                     else:
