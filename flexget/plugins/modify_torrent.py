@@ -7,16 +7,14 @@ log = logging.getLogger('modif_torrent')
 # Torrent decoding is a short fragment from effbot.org. Site copyright says:
 # Test scripts and other short code fragments can be considered as being in the public domain.
 
+TORRENT_RE = re.compile(r'^d\d{1,3}:')
+
 
 class Torrent(object):
     """Represents a torrent"""
 
     def __init__(self, content):
         """Accepts torrent file as string"""
-
-        # valid torrent files start with an announce block
-        if not content.startswith('d8:announce'):
-            raise Exception('Invalid content for a torrent')
 
         self.encode_func = {}
         self.encode_func[type(str())] = self.encode_string
@@ -191,16 +189,15 @@ class TorrentFilename(object):
 
     @priority(255)
     def on_feed_modify(self, feed):
-        idstr = 'd8:announce'
-        for entry in feed.accepted + feed.entries:
+        for entry in feed.accepted + [i for i in feed.entries if i not in feed.entries]:
             # skip if entry does not have file assigned
             if not 'file' in entry:
                 log.log(5, '%s doesn\'t have a file associated' % entry['title'])
                 continue
             f = open(entry['file'], 'rb')
-            data = f.read(len(idstr))
+            data = f.read(200)
             f.close()
-            if not data == idstr:
+            if not TORRENT_RE.match(data):
                 # not a torrent file at all, skip
                 log.log(5, '%s doesn\'t seem to be a torrent' % entry['title'])
                 continue
