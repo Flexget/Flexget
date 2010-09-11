@@ -100,7 +100,7 @@ def priority(value):
     def decorator(target):
         target.priority = value
         return target
-    return decorator        
+    return decorator
 
 
 def _strip_trailing_sep(path):
@@ -123,7 +123,7 @@ EVENT_METHODS = {
     'abort': 'on_feed_abort',
     'process_start': 'on_process_start',
     'process_end': 'on_process_end'}
-    
+
 PREFIXES = FEED_EVENTS + ['module', 'plugin', 'source']
 
 plugins = {}
@@ -137,6 +137,8 @@ _new_event_queue = {}
 def register_plugin(plugin_class, name, groups=[], builtin=False, debug=False):
     """Registers a plugin."""
     global plugins
+    if name is None:
+        name = plugin_class.__name__
     if name in plugins:
         log.critical('Error while registering plugin %s. %s' % \
             (name, ('A plugin with the name %s is already registered' % name)))

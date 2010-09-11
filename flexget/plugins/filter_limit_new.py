@@ -21,6 +21,7 @@ class FilterLimitNew(object):
 
     def validator(self):
         from flexget import validator
+
         return validator.factory('number')
 
     @priority(-255)

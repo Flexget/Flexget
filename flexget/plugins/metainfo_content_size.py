@@ -30,16 +30,20 @@ class MetainfoContentSize(object):
         for entry in feed.entries:
             match = SIZE_RE.search(entry.get('description', ''))
             if match:
-                amount = match.group(1).replace(',', '.')
+                try:
+                    amount = float(match.group(1).replace(',', '.'))
+                except:
+                    log.error('BUG: Unable to convert %s into float' % match.group(1))
+                    continue
                 unit = match.group(2).lower()
                 count += 1
                 if unit == 'gb':
-                    amount = math.ceil(float(amount) * 1024)
+                    amount = math.ceil(amount * 1024)
                 log.log(5, 'setting content size to %s' % amount)
                 entry['content_size'] = int(amount)
-                
+
         if count:
             log.info('Found content size information from %s entries' % count)
-                            
-            
+
+
 register_plugin(MetainfoContentSize, 'metainfo_content_size', builtin=True)
