@@ -19,4 +19,4 @@ class TorrentSize(object):
                 entry['content_size'] = size
 
 
-register_plugin(TorrentSize, None, builtin=True)
+register_plugin(TorrentSize, 'torrent_size', builtin=True)
