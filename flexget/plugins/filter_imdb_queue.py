@@ -96,7 +96,7 @@ class ImdbQueueManager(object):
     def optik_imdb_queue(option, opt, value, parser):
         """
         Callback for Optik
-        --imdb-queue (add|del|list) IMDB-URL [quality]
+        --imdb-queue (add|del|list) [IMDB_URL|NAME] [quality]
         """
         if len(parser.rargs) == 0:
             print 'Usage: --imdb-queue (add|del|list) [IMDB_URL|NAME] [QUALITY] [FORCE]'
@@ -257,4 +257,4 @@ register_plugin(FilterImdbQueue, 'imdb_queue')
 register_plugin(ImdbQueueManager, 'imdb_queue_manager', builtin=True)
 
 register_parser_option('--imdb-queue', action='callback', callback=ImdbQueueManager.optik_imdb_queue,
-                       help='(add|del|list) [IMDB_URL] [QUALITY]')
+                       help='(add|del|list) [IMDB_URL|NAME] [QUALITY]')
