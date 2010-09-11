@@ -36,8 +36,13 @@ class SeriesParser(TitleParser):
         self.strict_name = False
 
         separators = '[!/+,:;|~ x]'
-        self.ep_regexps = ['s(\d+)e(\d+)', 's(\d+)ep(\d+)', 's(\d+).e(\d+)',
-                '(?:^|\D)([\d]{1,2})[\s]?x[\s]?(\d+)', 'season.{0,2}(\d+).{0,2}episode.{0,2}(\d+)']
+        self.ep_regexps = [
+                '(?:series|season|s)\s?(\d{1,3})\s?(?:episode|ep|e|part|pt)\s?(\d{1,3})',
+                '(?:episode|part|pt)\s?(\d{1,3}|IX|XI{0,4}|VI{0,4}|IV|V|I{1,4})',
+                '(?:ep)\s?(\d{1,3}|IX|XI{0,4}|VI{0,4}|IV|V|I{1,4})',
+                '(?:series|season)\s?(\d{1,3})\s(\d{1,3})\s?of\s?(?:\d{1,3})',
+                '(\d{1,3})\s?of\s?(?:\d{1,3})',
+                '(?:^|\D)([\d]{1,2})[\s]?x[\s]?(\d+)']
         self.id_regexps = [
                 '(\d{4})%s(\d+)%s(\d+)' % (separators, separators),
                 '(\d+)%s(\d+)%s(\d{4})' % (separators, separators),
@@ -100,7 +105,7 @@ class SeriesParser(TitleParser):
         if not self.name or not self.data:
             raise Exception('SeriesParser initialization error, name: %s data: %s' % \
                (repr(self.name), repr(self.data)))
-               
+
         if self.expect_ep and self.expect_id:
             raise Exception('Flags expect_ep and expect_id are mutually exclusive')
 
@@ -178,13 +183,13 @@ class SeriesParser(TitleParser):
         data_noname = self.data[:name_start] + self.data[name_end:]
         log.debug('data noname: %s' % data_noname)
         self.quality = qualities.parse_quality(data_noname).name
-        
+
         for part in data_parts:
             if part in self.propers:
                 self.proper_or_repack = True
             if part in self.specials:
                 self.special = True
-        
+
         # Remove unwanted words (qualities and such) from data for ep / id
         # parsing need to remove them from the original string, as they
         # might not match to cleaned string.
@@ -205,13 +210,26 @@ class SeriesParser(TitleParser):
                 if self.strict_name:
                     if match.start() > 1:
                         return
-                        
+
                 if self.expect_id:
                     log.debug('found episode number, but expecting id, aborting!')
                     return
 
                 log.debug('found episode number with regexp %s' % ep_re)
-                season, episode = match.groups()
+                matches = match.groups()
+                if len(matches) == 2:
+                    season = matches[0]
+                    episode = matches[1]
+                else:
+                    # assume season 1 if the season was not specified
+                    season = 1
+                    episode = matches[0]
+                    if not episode.isdigit():
+                        roman_to_arabic = {
+                            'i': '1', 'ii': '2', 'iii': '3', 'iiii': '4', 'iv': '4', 'v': '5',
+                            'vi': '6', 'vii': '7', 'viii': '8', 'viiii': '9', 'ix': '9',
+                            'x': '10', 'xi': '11', 'xii': '12', 'xiii': '13'}
+                        episode = roman_to_arabic.get(episode)
                 self.season = int(season)
                 self.episode = int(episode)
                 self.valid = True
