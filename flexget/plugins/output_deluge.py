@@ -56,7 +56,7 @@ class OutputDeluge(object):
         return config
 
     def __init__(self):
-        self.deluge12 = False
+        self.deluge12 = None
         self.reactorRunning = 0
         self.options = {'maxupspeed': 'max_upload_speed', 'maxdownspeed': 'max_download_speed', \
             'maxconnections': 'max_connections', 'maxupslots': 'max_upload_slots', \
@@ -74,7 +74,7 @@ class OutputDeluge(object):
             'maxupspeed': 'decimal', 'maxdownspeed': 'decimal', 'maxupslots': 'number', \
             'maxconnections': 'number', 'ratio': 'decimal', 'removeatratio': 'boolean', \
             'addpaused': 'boolean', 'compact': 'boolean', 'content_filename': 'text'})
-        if not self.deluge12:
+        if self.deluge12 == None:
             logger = log.info if feed.manager.options.test else log.debug
             try:
                 log.debug("Testing for deluge 1.1 API")
@@ -257,12 +257,20 @@ class OutputDeluge(object):
                     return
                 log.info("%s successfully added to deluge." % entry['title'])
                 if opts['movedone']:
-                    if client.is_localhost():
-                        if not os.path.isdir(opts['movedone']):
-                            log.debug("movedone path %s doesn't exist, creating" % opts['movedone'])
-                            os.makedirs(opts['movedone'])
-                    else:
-                        log.warning("If movedone path does not exist on the machine running the daemon, movedone will fail.")
+
+                    def on_get_daemon_info(ver):
+                        # Before 1.3, deluge would not create a non-existent movedone directory, so we need to.
+                        from deluge.common import VersionSplit
+                        log.info('version %s, local %s' % (ver, client.is_localhost()))
+                        if VersionSplit(ver) < VersionSplit('1.3.0'):
+                            if client.is_localhost():
+                                if not os.path.isdir(opts['movedone']):
+                                    log.debug("movedone path %s doesn't exist, creating" % opts['movedone'])
+                                    os.makedirs(opts['movedone'])
+                            else:
+                                log.warning("If movedone path does not exist on the machine running the daemon, movedone will fail.")
+
+                    dlist.append(client.daemon.info().addCallback(on_get_daemon_info))
                     dlist.append(client.core.set_torrent_move_completed(torrent_id, True))
                     dlist.append(client.core.set_torrent_move_completed_path(torrent_id, opts['movedone']))
                     log.debug("%s move on complete set to %s" % (entry['title'], opts['movedone']))

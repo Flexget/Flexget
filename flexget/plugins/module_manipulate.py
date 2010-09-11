@@ -10,18 +10,18 @@ class Manipulate(object):
         Usage:
         
         manipulate:
-          <destination field>:
-            [from]: <source field>
-            [extract]: <regexp>
-            [replace]:
-              regexp: <regexp>
-              format: <regexp>
+          - <destination field>:
+              [from]: <source field>
+              [extract]: <regexp>
+              [replace]:
+                regexp: <regexp>
+                format: <regexp>
 
         Example:
 
         manipulate:
-          title:
-            extract: \[\d\d\d\d\](.*)
+          - title:
+              extract: \[\d\d\d\d\](.*)
     """
     
     def validator(self):

@@ -124,6 +124,18 @@ class Validator(object):
             for rule in rules:
                 if rule.message:
                     self.errors.add(rule.message)
+            # If there are still no errors, list the valid types, as well as what was actually received
+            if count == self.errors.count():
+                acceptable = [v.name for v in rules]
+                # Make acceptable into an english list, with commas and 'or'
+                acceptable = ', '.join(acceptable[:-2] + ['']) + ' or '.join(acceptable[-2:])
+                self.errors.add('must be a %s value' % acceptable)
+                if isinstance(item, dict):
+                    self.errors.add('got a dict instead of %s' % acceptable)
+                elif isinstance(item, list):
+                    self.errors.add('got a list instead of %s' % acceptable)
+                else:
+                    self.errors.add('value "%s" is not valid %s' % (item, acceptable))
         return False
 
     def __str__(self):
@@ -143,13 +155,7 @@ class RootValidator(Validator):
     
     def validate(self, data):
         count = self.errors.count()
-        if self.validate_item(data, self.valid):
-            return True
-        # containers should only add errors if inner validators did not
-        if count == self.errors.count():
-            acceptable = [v.name for v in self.valid]
-            self.errors.add('failed to pass as %s' % ', '.join(acceptable))
-        return False
+        return self.validate_item(data, self.valid)
 
 
 class ChoiceValidator(Validator):
@@ -404,11 +410,7 @@ class ListValidator(Validator):
         count = self.errors.count()
         for item in data:
             self.errors.path_update_value('list:%i' % data.index(item))
-            if not self.validate_item(item, self.valid):
-                # containers should only add errors if inner validators did not
-                if count == self.errors.count():
-                    l = [r.name for r in self.valid]
-                    self.errors.add('is not valid %s' % (', '.join(l)))
+            self.validate_item(item, self.valid)
         self.errors.path_remove_level()
         return count == self.errors.count()
 
@@ -493,11 +495,7 @@ class DictValidator(Validator):
             # rules specified for any key
             rules = self.valid.get(key, [])
             rules.extend(self.any_key)
-            if not self.validate_item(value, rules):
-                # if all rules did not add their own error message, display the valid types
-                if self.errors.count() < count + len(rules):
-                    l = [r.name for r in rules]
-                    self.errors.add('value \'%s\' is not valid %s' % (value, ', '.join(l)))
+            self.validate_item(value, rules)
         self.errors.path_remove_level()
         for required in self.required_keys:
             if not required in data:
