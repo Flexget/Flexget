@@ -104,30 +104,6 @@ class TestImdb(FlexGetBase):
             'The The Terminator have been rejected'
 
 
-class TestScanImdb(FlexGetBase):
-
-    __yaml__ = """
-        feeds:
-          test:
-            mock:
-              - {title: 'Scan Test 1', description: 'title: Foo Bar Asdf\n imdb-url: http://www.imdb.com/title/tt0330793/ more text'}
-              - {title: 'Scan Test 2', description: '<a href="http://imdb.com/title/tt0472198/">IMDb</a>'}
-              - {title: 'Scan Test 3', description: 'nothing here'}
-              - {title: 'Scan Test 4', description: 'imdb.com/title/tt66666 http://imdb.com/title/tt99999'}
-    """
-
-    def test_scan_imdb(self):
-        self.execute_feed('test')
-        assert self.feed.find_entry(imdb_url='http://www.imdb.com/title/tt0330793/'), \
-            'Failed to pick url from test 1'
-        assert self.feed.find_entry(imdb_url='http://www.imdb.com/title/tt0472198/'), \
-            'Failed to pick url from test 2'
-        assert not self.feed.find_entry(imdb_url='http://www.imdb.com/title/tt66666/'), \
-            'Failed to ignore multiple imdb urls in test 4'
-        assert not self.feed.find_entry(imdb_url='http://www.imdb.com/title/tt99999/'), \
-            'Failed to ignore multiple imdb urls in test 4'
-
-
 class TestImdbRequired(FlexGetBase):
 
     __yaml__ = """

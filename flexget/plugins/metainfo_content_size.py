@@ -6,7 +6,7 @@ from flexget.utils import qualities
 
 log = logging.getLogger('metainfo_csize')
 
-SIZE_RE = re.compile(r'Size[^\d]{0,7}([\.,\d]+).{0,5}(MB|GB)', re.IGNORECASE)
+SIZE_RE = re.compile(r'Size[^\d]{0,7}(\d*\.?\d+).{0,5}(MB|GB)', re.IGNORECASE)
 
 
 class MetainfoContentSize(object):
@@ -33,7 +33,7 @@ class MetainfoContentSize(object):
                 try:
                     amount = float(match.group(1).replace(',', '.'))
                 except:
-                    log.error('BUG: Unable to convert %s into float' % match.group(1))
+                    log.error('BUG: Unable to convert %s into float (%s)' % (match.group(1), entry['title']))
                     continue
                 unit = match.group(2).lower()
                 count += 1
