@@ -45,8 +45,8 @@ class MergeException(Exception):
 
 def decode_html(value):
     """Decode HTML entities from :value: and return it"""
-    from BeautifulSoup import BeautifulStoneSoup
-    return unicode(BeautifulStoneSoup(value, convertEntities=BeautifulStoneSoup.HTML_ENTITIES))
+    from BeautifulSoup import BeautifulSoup
+    return unicode(BeautifulSoup(value, convertEntities=BeautifulSoup.HTML_ENTITIES))
 
 
 def encode_html(unicode_data, encoding='ascii'):
