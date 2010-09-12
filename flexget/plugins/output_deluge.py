@@ -2,9 +2,7 @@ import logging
 import time
 import os
 import base64
-import urllib2
 from flexget.plugin import *
-from httplib import BadStatusLine
 
 log = logging.getLogger('deluge')
         
@@ -57,6 +55,7 @@ class OutputDeluge(object):
 
     def __init__(self):
         self.deluge12 = None
+        self.deluge_version = None
         self.reactorRunning = 0
         self.options = {'maxupspeed': 'max_upload_speed', 'maxdownspeed': 'max_download_speed', \
             'maxconnections': 'max_connections', 'maxupslots': 'max_upload_slots', \
@@ -117,12 +116,9 @@ class OutputDeluge(object):
                 #Check if downloaded file is a valid torrent file
                 try:
                     info = deluge.ui.common.TorrentInfo(entry['file'])
-                except Exception, e:
+                except Exception:
                     feed.fail(entry, 'Invalid torrent file')
                     log.error("Torrent file appears invalid for: %s", entry['title'])
-                    #clean up invalid torrent file
-                    os.remove(entry['file'])
-                    del(entry['file'])
 
     @priority(135)
     def on_feed_output(self, feed):
@@ -136,6 +132,12 @@ class OutputDeluge(object):
 
         add_to_deluge = self.add_to_deluge12 if self.deluge12 else self.add_to_deluge11
         add_to_deluge(feed, config)
+        # Clean up temp file if download plugin is not configured for this feed
+        if not 'download' in feed.config:
+            for entry in feed.accepted + feed.failed:
+                if os.path.exists(entry.get('file', '')):
+                    os.remove(entry['file'])
+                    del(entry['file'])
 
     def add_to_deluge11(self, feed, config):
         """ Add torrents to deluge using deluge 1.1.x api. """
@@ -178,10 +180,6 @@ class OutputDeluge(object):
 
             sclient.add_torrent_file([entry['file']], [opts])
             log.info("%s torrent added to deluge with options %s" % (entry['title'], opts))
-            # clean up temp file if download plugin is not configured for this feed
-            if not 'download' in feed.config:
-                os.remove(entry['file'])
-                del(entry['file'])
                 
             movedone = entry.get('movedone', config['movedone'])
             label = entry.get('label', config['label']).lower()
@@ -221,9 +219,9 @@ class OutputDeluge(object):
         
         from deluge.ui.client import client
         from twisted.internet import reactor, defer
-        from twisted.internet.task import deferLater
         
         def start_reactor():
+            """This runs the reactor loop."""
             #if this is the first this function is being called, we have to call startRunning
             if self.reactorRunning < 2:
                 reactor.startRunning(True)
@@ -238,11 +236,12 @@ class OutputDeluge(object):
             self.reactorRunning = 2
                 
         def pause_reactor(result):
+            """This exits the reactor loop so flexget can continue."""
             self.reactorRunning = result
 
         def on_connect_success(result, feed):
+            """Gets called when successfully connected to a daemon."""
             if not result:
-                # TODO: connect failed? do something
                 log.debug("on_connect_success returned a failed result. BUG?")
 
             if feed.manager.options.test:
@@ -251,6 +250,7 @@ class OutputDeluge(object):
                 return
                 
             def on_success(torrent_id, entry, opts):
+                """Gets called when a torrent was successfully added to the daemon."""
                 dlist = []
                 if not torrent_id:
                     log.info("%s is already loaded in deluge, cannot set options." % entry['title'])
@@ -258,11 +258,11 @@ class OutputDeluge(object):
                 log.info("%s successfully added to deluge." % entry['title'])
                 if opts['movedone']:
 
-                    def on_get_daemon_info(ver):
-                        # Before 1.3, deluge would not create a non-existent movedone directory, so we need to.
+                    def create_movedone_path(result):
+                        """Gets called after torrent added to deluge and deluge version verified."""
                         from deluge.common import VersionSplit
-                        log.info('version %s, local %s' % (ver, client.is_localhost()))
-                        if VersionSplit(ver) < VersionSplit('1.3.0'):
+                        # Before 1.3, deluge would not create a non-existent movedone directory, so we need to.
+                        if VersionSplit('1.3.0') > VersionSplit(self.deluge_version):
                             if client.is_localhost():
                                 if not os.path.isdir(opts['movedone']):
                                     log.debug("movedone path %s doesn't exist, creating" % opts['movedone'])
@@ -270,12 +270,17 @@ class OutputDeluge(object):
                             else:
                                 log.warning("If movedone path does not exist on the machine running the daemon, movedone will fail.")
 
-                    dlist.append(client.daemon.info().addCallback(on_get_daemon_info))
+                    dlist.append(version_deferred.addCallback(create_movedone_path))
                     dlist.append(client.core.set_torrent_move_completed(torrent_id, True))
                     dlist.append(client.core.set_torrent_move_completed_path(torrent_id, opts['movedone']))
                     log.debug("%s move on complete set to %s" % (entry['title'], opts['movedone']))
                 if opts['label']:
-                    dlist.append(client.label.set_torrent(torrent_id, opts['label']))
+
+                    def apply_label(result, torrent_id, label):
+                        """Gets called after labels and torrent were added to deluge."""
+                        return client.label.set_torrent(torrent_id, label)
+
+                    dlist.append(label_deferred.addCallback(apply_label, torrent_id, opts['label']))
                 if 'queuetotop' in opts:
                     if opts['queuetotop']:
                         dlist.append(client.core.queue_top([torrent_id]))
@@ -286,6 +291,8 @@ class OutputDeluge(object):
                 if opts.get('content_filename'):
 
                     def on_get_torrent_status(status):
+                        """Gets called with torrent status, including file info.
+                        Loops through files and renames anything qualifies for content renaming."""
                         for file in status['files']:
                             # Only rename file if it is > 90% of the content
                             if file['size'] > (status['total_size'] * 0.9):
@@ -320,6 +327,7 @@ class OutputDeluge(object):
                 return defer.DeferredList(dlist)
 
             def on_fail(result, feed, entry):
+                """Gets called when daemon reports a failure adding the torrent."""
                 log.info("%s was not added to deluge! %s" % (entry['title'], result))
                 feed.fail(entry, "Could not be added to deluge")
             
@@ -334,11 +342,13 @@ class OutputDeluge(object):
                 # Make sure the label plugin is available and enabled, then add appropriate labels
 
                 def on_get_enabled_plugins(plugins):
+                    """Gets called with the list of enabled deluge plugins."""
 
                     def on_label_enabled(result):
                         """ This runs when we verify the label plugin is enabled. """
 
                         def on_get_labels(d_labels):
+                            """Gets available labels from deluge, and adds any new labels we need."""
                             dlist = []
                             for label in labels:
                                 if not label in d_labels:
@@ -351,8 +361,10 @@ class OutputDeluge(object):
                     if 'Label' in plugins:
                         return on_label_enabled(True)
                     else:
+                        # Label plugin isn't enabled, so we check if it's available and enable it.
 
                         def on_get_available_plugins(plugins):
+                            """Gets plugins available to deluge, enables Label plugin if available."""
                             if 'Label' in plugins:
                                 log.debug("Enabling label plugin in deluge")
                                 return client.core.enable_plugin('Label').addCallback(on_label_enabled)
@@ -363,6 +375,14 @@ class OutputDeluge(object):
 
                 label_deferred = client.core.get_enabled_plugins().addCallback(on_get_enabled_plugins)
                 dlist.append(label_deferred)
+                
+            def on_get_daemon_info(ver):
+                """Gets called with the daemon version info, stores it in self."""
+                log.debug('deluge version %s' % ver)
+                self.deluge_version = ver
+            
+            version_deferred = client.daemon.info().addCallback(on_get_daemon_info)
+            dlist.append(version_deferred)
 
             # add the torrents
             for entry in feed.accepted:
@@ -394,20 +414,15 @@ class OutputDeluge(object):
                         if fopt == 'ratio':
                             opts['stop_at_ratio'] = True
 
-                def on_add_torrent(result, title, filedump, opts, magnet=False):
+                def add_torrent(title, filedump, opts, magnet=False):
+                    """Calls the appropriate add_torrent function on daemon, returns the deferred."""
                     log.debug("Adding %s to deluge." % title)
                     if magnet:
                         return client.core.add_torrent_magnet(magnet, opts)
                     else:
                         return client.core.add_torrent_file(title, filedump, opts)
 
-                # Make sure our labels have been added before adding the torrents
-                addresult = label_deferred.addCallback(on_add_torrent, entry['title'], filedump, opts, magnet)
-
-                # clean up temp file if download plugin is not configured for this feed
-                if not magnet and not 'download' in feed.config:
-                    os.remove(entry['file'])
-                    del(entry['file'])
+                addresult = add_torrent(entry['title'], filedump, opts, magnet)
 
                 # Make a new set of options, that get set after the torrent has been added
                 opts = {}
@@ -428,28 +443,28 @@ class OutputDeluge(object):
                 dlist.append(addresult)
                 
             def on_complete(result):
+                """Gets called when all of our tasks for deluge daemon are complete."""
                 client.disconnect()
             tasks = defer.DeferredList(dlist).addBoth(on_complete)
 
-            # Schedule a disconnect to happen in 30 seconds if FlexGet hangs while connected to Deluge
             def on_timeout(result):
+                """Gets called if tasks have not completed in 30 seconds.
+                Should only happen when something goes wrong."""
                 log.error('Timed out while adding torrents to deluge.')
                 log.debug('dlist: %s' % result.resultList)
                 client.disconnect()
+                
+            # Schedule a disconnect to happen in 30 seconds if FlexGet hangs while connected to Deluge
             reactor.callLater(30, lambda: tasks.called or on_timeout(tasks))
             
         def on_connect_fail(result, feed):
-            # clean up temp file if download plugin is not configured for this feed
-            if not 'download' in feed.config:
-                for entry in feed.accepted:
-                    if os.path.exists(entry.get('file', '')):
-                        os.remove(entry['file'])
-                        del(entry['file'])
+            """Gets called when connection to deluge daemon fails."""
             log.debug('Connect to deluge daemon failed, result: %s' % result)
             reactor.callLater(0, pause_reactor, -1)
 
         def on_disconnect():
-            # pause the reactor when we get disconnected from the daemon, so flexget can continue
+            """Gets called when we disconnect from the daemon."""
+            # pause the reactor, so flexget can continue
             reactor.callLater(0, pause_reactor, 0)
 
         client.set_disconnect_callback(on_disconnect)
@@ -464,6 +479,7 @@ class OutputDeluge(object):
         start_reactor()
         
     def on_process_end(self, feed):
+        """Shut down the twisted reactor after all feeds have run."""
         if self.deluge12 and self.reactorRunning == 2:
             from twisted.internet import reactor
             reactor.fireSystemEvent('shutdown')
