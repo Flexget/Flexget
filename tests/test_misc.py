@@ -29,7 +29,7 @@ class TestDisableBuiltins(FlexGetBase):
 
     def test_disable_builtins(self):
         return
-        
+
         self.execute_feed('test')
         assert self.feed.find_entry(title='dupe1') and self.feed.find_entry(title='dupe2'), 'disable_builtins is not working?'
 
@@ -198,7 +198,7 @@ class TestFilterQuality(FlexGetBase):
         self.execute_feed('qual')
         entry = self.feed.find_entry('rejected', title='Smoke.cam')
         assert entry, 'Smoke.cam should have been rejected'
-        
+
         entry = self.feed.find_entry(title='Smoke.1280x720')
         assert entry, 'entry not found?'
         assert entry in self.feed.accepted, '720p should be accepted'
@@ -209,7 +209,7 @@ class TestFilterQuality(FlexGetBase):
         self.execute_feed('min')
         entry = self.feed.find_entry('rejected', title='Smoke.HDTV')
         assert entry, 'Smoke.HDTV should have been rejected'
-        
+
         entry = self.feed.find_entry(title='Smoke.1280x720')
         assert entry, 'entry not found?'
         assert entry in self.feed.accepted, '720p should be accepted'
@@ -220,7 +220,7 @@ class TestFilterQuality(FlexGetBase):
         self.execute_feed('max')
         entry = self.feed.find_entry('rejected', title='Smoke.1280x720')
         assert entry, 'Smoke.1280x720 should have been rejected'
-        
+
         entry = self.feed.find_entry(title='Smoke.cam')
         assert entry, 'entry not found?'
         assert entry in self.feed.accepted, 'cam should be accepted'
@@ -231,7 +231,7 @@ class TestFilterQuality(FlexGetBase):
         self.execute_feed('min_max')
         entry = self.feed.find_entry('rejected', title='Smoke.1280x720')
         assert entry, 'Smoke.1280x720 should have been rejected'
-        
+
         entry = self.feed.find_entry(title='Smoke.HR')
         assert entry, 'entry not found?'
         assert entry in self.feed.accepted, 'HR should be accepted'
@@ -275,3 +275,20 @@ class TestFilterRequireField(FlexGetBase):
             'Entry should NOT have been rejected'
         assert self.feed.find_entry('rejected', title='Entry2.is.a.Movie'), \
             'Entry2 should have been rejected'
+
+
+class TestHtmlUtils(object):
+
+    def test_decode_html(self):
+        """utils decode_html"""
+        from flexget.utils.tools import decode_html
+        assert decode_html('&lt;&#51;') == u'<3'
+
+    def test_encode_html(self):
+        """utils encode_html (DISABLED)"""
+        return
+
+        # why this does not encode < ?
+        from flexget.utils.tools import encode_html
+        print encode_html('<3')
+        assert encode_html('<3') == '&lt;3'

@@ -34,27 +34,6 @@ def convert_bytes(bytes):
     return size
 
 
-class HtmlParser(sgmllib.SGMLParser):
-    from htmlentitydefs import entitydefs
-
-    def __init__(self, s=None):
-        sgmllib.SGMLParser.__init__(self)
-        self.result = ''
-        if s:
-            self.feed(s)
-
-    def handle_entityref(self, name):
-        if name in self.entitydefs:
-            x = ';'
-        else:
-            x = ''
-        self.result = '%s&%s%s' % (self.result, name, x)
-
-    def handle_data(self, data):
-        if data:
-            self.result += data
-
-
 class MergeException(Exception):
 
     def __init__(self, value):
@@ -65,9 +44,9 @@ class MergeException(Exception):
 
 
 def decode_html(value):
-    """Decode HTML entities from string and return it"""
-    parser = HtmlParser(value)
-    return parser.result
+    """Decode HTML entities from :value: and return it"""
+    from BeautifulSoup import BeautifulStoneSoup
+    return unicode(BeautifulStoneSoup(value, convertEntities=BeautifulStoneSoup.HTML_ENTITIES))
 
 
 def encode_html(unicode_data, encoding='ascii'):
@@ -161,7 +140,7 @@ def merge_dict_from_to(d1, d2):
 
 
 def urlopener(url, log, **kwargs):
-    """Utility function for pulling back a url, with a retry of 3 times, increasing the timeout, etc. 
+    """Utility function for pulling back a url, with a retry of 3 times, increasing the timeout, etc.
     Should be grabbing all urls this way eventually, to keep error handling code in the same place."""
 
     # get the old timeout for sockets, so we can set it back to that when done. This is NOT threadsafe by the way.
