@@ -145,20 +145,14 @@ class PluginDownload:
 
         # get content
         if 'basic_auth_password' in entry and 'basic_auth_username' in entry:
-            # TODO: should just add handler if default opener is present, now this will lose all other
-            # handlers that other plugins have potentially added
             log.debug('Basic auth enabled. User: %s Password: %s' % (entry['basic_auth_username'], entry['basic_auth_password']))
             passman = urllib2.HTTPPasswordMgrWithDefaultRealm()
             passman.add_password(None, url, entry['basic_auth_username'], entry['basic_auth_password'])
-            handler = urllib2.HTTPBasicAuthHandler(passman)
-            opener = urllib2.build_opener(handler).open
+            handlers = [urllib2.HTTPBasicAuthHandler(passman)]
         else:
-            if urllib2._opener:
-                handlers = [h.__class__.__name__ for h in urllib2._opener.handlers]
-                log.debug('default opener present, handlers: %s' % ', '.join(handlers))
-            opener = None
+            handlers = None
 
-        f = urlopener(url, log, opener=opener)
+        f = urlopener(url, log, handlers=handlers)
 
         mimetype = f.headers.gettype()
 

@@ -4,8 +4,6 @@ import sgmllib
 import urllib2
 import socket
 import time
-import gzip
-import StringIO
 
 
 def str_to_boolean(string):
@@ -172,10 +170,15 @@ def urlopener(url, log, **kwargs):
     oldtimeout = socket.getdefaulttimeout()
     socket.setdefaulttimeout(15.0)
 
-    if kwargs.get('opener'):
-        opener = kwargs['opener']
-    else:
-        opener = urllib2.urlopen
+    handlers = []
+    if urllib2._opener:
+        handlers.extend(urllib2._opener.handlers)
+    if kwargs.get('handlers'):
+        handlers.extend(kwargs['handlers'])
+    if handlers:
+        handler_names = [h.__class__.__name__ for h in handlers]
+        log.debug('Handlers have been specified for this urlopen: %s' % ', '.join(handler_names))
+    opener = urllib2.build_opener(*handlers).open
     for i in range(3): # retry getting the url up to 3 times.
         if i > 0:
             time.sleep(3)

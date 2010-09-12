@@ -2,6 +2,7 @@ import urlparse
 import logging
 import BeautifulSoup
 import urllib
+import urllib2
 import zlib
 from flexget.feed import Entry
 from flexget.plugin import *
@@ -31,36 +32,64 @@ class InputHtml(object):
         root.accept('text')
         advanced = root.accept('dict')
         advanced.accept('url', key='url', required=True)
+        advanced.accept('text', key='username')
+        advanced.accept('text', key='password')
         advanced.accept('text', key='dump')
         advanced.accept('text', key='title_from')
         regexps = advanced.accept('list', key='links_re')
         regexps.accept('regexp')
         return root
 
+    def get_config(self, feed):
+    
+        def get_auth_from_url():
+            """Moves basic authentication from url to username and password fields"""
+            parts = list(urlparse.urlsplit(config['url']))
+            split = parts[1].split('@')
+            if len(split) > 1:
+                auth = split[0].split(':')
+                if len(auth) == 2:
+                    config['username'], config['password'] = auth[0], auth[1]
+                else:
+                    log.warning('Invalid basic authentication in url: %s' % config['url'])
+                parts[1] = split[1]
+                config['url'] = urlparse.urlunsplit(parts)
+    
+        config = feed.config['html']
+        if isinstance(config, basestring):
+            config = {'url': config}
+        get_auth_from_url()
+        log.info(config)
+        return config
+        
+
     @cached('html', 'url')
     @internet(log)
     def on_feed_input(self, feed):
-        config = feed.config['html']
-        if not isinstance(config, dict):
-            config = {}
-        pageurl = feed.get_input_url('html')
+        config = self.get_config(feed)
+        log.debug('InputPlugin html requesting url %s' % config['url'])
 
-        log.debug('InputPlugin html requesting url %s' % pageurl)
-
-        page = urlopener(pageurl, log)
+        if config.get('username') and config.get('password'):
+            log.debug('Basic auth enabled. User: %s Password: %s' % (config['username'], config['password']))
+            passman = urllib2.HTTPPasswordMgrWithDefaultRealm()
+            passman.add_password(None, config['url'], config['username'], config['password'])
+            handlers = [urllib2.HTTPBasicAuthHandler(passman)]
+        else:
+            handlers = None
+        page = urlopener(config['url'], log, handlers=handlers)
         soup = get_soup(page)
         log.debug('Detected encoding %s' % soup.originalEncoding)
 
         # dump received content into a file
         if 'dump' in config:
             name = config['dump']
-            log.info('Dumping %s into %s' % (pageurl, name))
+            log.info('Dumping %s into %s' % (config['url'], name))
             data = soup.prettify()
             f = open(name, 'w')
             f.write(data)
             f.close()
 
-        self.create_entries(feed, pageurl, soup, config)
+        self.create_entries(feed, config['url'], soup, config)
 
     def create_entries(self, feed, pageurl, soup, config):
 
