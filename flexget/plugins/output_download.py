@@ -56,13 +56,13 @@ class PluginDownload:
     def get_config(self, feed):
         """Return plugin configuration in advanced form"""
         config = feed.config['download']
+        if isinstance(config, basestring):
+            config = {'path': config}
         if not isinstance(config, dict):
             config = {}
-            if isinstance(feed.config['download'], bool):
-                config['require_path'] = True
-            else:
-                config['path'] = feed.config['download']
-            config['fail_html'] = True
+        config.setdefault('fail_html', True)
+        if not config.get('path'):
+            config['require_path'] = True
         return config
 
     def on_process_start(self, feed):
@@ -85,30 +85,39 @@ class PluginDownload:
                 urls = [entry['url']]
             errors = []
             for url in urls:
-                error = self.download_url(feed, entry, url, require_path)
+                if url.startswith('magnet:'):
+                    # Set magnet link as main url, so a torrent client plugin can grab it
+                    log.debug('Acceping magnet url for %s' % entry['title'])
+                    entry['url'] = url
+                    break
+                if require_path and 'path' not in entry:
+                    # Don't fail here, there might be a magnet later in the list of urls
+                    log.debug('Skipping url %s because there is no path for download' % url)
+                    continue
+                error = self.download_url(feed, entry, url)
                 errors.append(error)
                 if not error:
+                    # Set the main url, so we know where this file actually came from
+                    log.debug('Successfully retrieved %s from %s' % (entry['title'], url))
+                    entry['url'] = url
                     break
             else:
-                feed.fail(entry, ", ".join(errors))
+                # check if entry must have a path (download: yes)
+                if require_path and 'path' not in entry:
+                    log.error('%s can\'t be downloaded, no path specified for entry' % entry['title'])
+                    feed.fail(entry, 'no path specified for entry')
+                else:
+                    feed.fail(entry, ", ".join(errors))
 
-    def download_url(self, feed, entry, url, require_path):
+    def download_url(self, feed, entry, url):
         """Downloads :url:.
            Do not fail the :entry: if there is a network issue, instead just log and return a string error."""
-        if url.startswith('magnet:'):
-            return
         try:
             if feed.manager.options.test:
                 log.info('Would download: %s' % entry['title'])
             else:
                 if not feed.manager.unit_test:
                     log.info('Downloading: %s' % entry['title'])
-                # check if entry must have a path (download: yes)
-                # TODO: move this in get_temp_files? requires to also move magnet link check...
-                if require_path and 'path' not in entry:
-                    log.info('%s can\'t be downloaded, no path specified for entry' % entry['title'])
-                    feed.fail(entry, 'no path specified for entry')
-                    return
                 self.download(feed, entry, url)
         except urllib2.HTTPError, e:
             log.warning('HTTPError %s' % e.code)
@@ -284,10 +293,8 @@ class PluginDownload:
 
         config = self.get_config(feed)
 
-        # check if entry must have a path (eg. download: yes)
-        if 'require_path' in config and 'path' not in entry:
-            log.debug('%s can\'t be written, no path specified for it' % entry['title'])
-            feed.fail(entry, 'no path specified')
+        if entry['url'].startswith('magnet:'):
+            log.warning('%s has a magnet url, could not be downloaded.' % entry['title'])
             return
 
         if 'file' not in entry:
