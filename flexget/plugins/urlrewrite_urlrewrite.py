@@ -8,9 +8,9 @@ log = logging.getLogger('urlrewrite')
 class UrlRewrite(object):
     """
         Generic configurable urlrewriter.
-        
+
         Example:
-        
+
         urlrewrite:
           demonoid:
             regexp: http://www\.demonoid\.com/files/details/
@@ -20,7 +20,7 @@ class UrlRewrite(object):
     resolves = {}
 
     # built-in resolves
-    
+
 #    resolves = yaml.safe_load("""
 #    tvsubtitles:
 #      match: http://www.tvsubtitles.net/subtitle-
@@ -35,7 +35,7 @@ class UrlRewrite(object):
         config.accept('regexp', key='regexp', required=True)
         config.accept('text', key='format', required=True)
         return root
-    
+
     def on_feed_start(self, feed):
         for name, config in feed.config.get('urlrewrite', {}).iteritems():
             match = re.compile(config['regexp'])
@@ -49,15 +49,15 @@ class UrlRewrite(object):
         for name, config in self.resolves.iteritems():
             regexp = config['regexp_compiled']
             log.log(5, 'testing %s' % config['regexp'])
-            if regexp.match(entry['url']):
+            if regexp.search(entry['url']):
                 return True
         return False
-        
+
     def url_rewrite(self, feed, entry):
         for name, config in self.resolves.iteritems():
             regexp = config['regexp_compiled']
             format = config['format']
-            if regexp.match(entry['url']):
+            if regexp.search(entry['url']):
                 log.debug('Regexp resolving %s with %s' % (entry['url'], name))
 
                 # run the regexp
