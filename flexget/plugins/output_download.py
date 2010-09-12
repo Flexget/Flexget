@@ -76,7 +76,7 @@ class PluginDownload:
         config = self.get_config(feed)
         self.get_temp_files(feed, require_path=config.get('require_path', False))
 
-    def get_temp_files(self, feed, require_path=False):
+    def get_temp_files(self, feed, require_path=False, handle_magnets=False):
         """Download all feed content and store in temporary folder"""
         for entry in feed.accepted:
             if entry.get('urls'):
@@ -86,10 +86,15 @@ class PluginDownload:
             errors = []
             for url in urls:
                 if url.startswith('magnet:'):
-                    # Set magnet link as main url, so a torrent client plugin can grab it
-                    log.debug('Acceping magnet url for %s' % entry['title'])
-                    entry['url'] = url
-                    break
+                    if handle_magnets:
+                        # Set magnet link as main url, so a torrent client plugin can grab it
+                        log.debug('Acceping magnet url for %s' % entry['title'])
+                        entry['url'] = url
+                        break
+                    else:
+                        log.warning('Can\'t download magnet url')
+                        errors.append('Magnet  Url')
+                        continue
                 if require_path and 'path' not in entry:
                     # Don't fail here, there might be a magnet later in the list of urls
                     log.debug('Skipping url %s because there is no path for download' % url)
@@ -292,10 +297,6 @@ class PluginDownload:
         """Moves temp-file into final destination"""
 
         config = self.get_config(feed)
-
-        if entry['url'].startswith('magnet:'):
-            log.warning('%s has a magnet url, could not be downloaded.' % entry['title'])
-            return
 
         if 'file' not in entry:
             log.debug('file missing, entry: %s' % entry)

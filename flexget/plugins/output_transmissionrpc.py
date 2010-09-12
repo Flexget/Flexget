@@ -126,7 +126,7 @@ class PluginTransmissionrpc:
         # our temp .torrent files
         if not 'download' in feed.config:
             download = get_plugin_by_name('download')
-            download.instance.get_temp_files(feed)
+            download.instance.get_temp_files(feed, handle_magnets=True)
 
     @priority(135)
     @save_opener
