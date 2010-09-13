@@ -10,7 +10,7 @@ class PluginCookies:
     """
         Adds cookie to all requests (rss, resolvers, download). Anything
         that uses urllib2 to be exact.
-        
+
         Currently supports Firefox 3 cookies only.
 
         Example:
@@ -54,15 +54,15 @@ class PluginCookies:
             con = sqlite.connect(filename)
         except:
             raise PluginError('Unable to open cookies sqlite database')
- 
+
         cur = con.cursor()
         try:
             cur.execute('select host, path, isSecure, expiry, name, value from moz_cookies')
         except:
             raise PluginError('%s does not appear to be a valid Firefox 3 cookies file' % filename, log)
- 
+
         ftstr = ['FALSE', 'TRUE']
- 
+
         s = StringIO()
         s.write("""\
 # Netscape HTTP Cookie File
@@ -73,7 +73,7 @@ class PluginCookies:
         failed = 0
 
         log.debug('fetching all cookies')
-        
+
         def notabs(val):
             if isinstance(val, basestring):
                 return val.replace('\t', '')
@@ -109,17 +109,17 @@ class PluginCookies:
                 break
 
         log.debug('Added %s cookies to jar. %s failed (non-ascii)' % (count, failed))
- 
+
         s.seek(0)
         con.close()
- 
+
         cookie_jar = cookielib.MozillaCookieJar()
         cookie_jar._really_load(s, '', True, True)
         return cookie_jar
 
     def on_feed_start(self, feed):
-        import os
         """Feed starting, install cookiejar"""
+        import os
         config = self.get_config(feed)
         cookie_type = config.get('type')
         cookie_file = os.path.expanduser(config.get('file'))
@@ -142,17 +142,17 @@ class PluginCookies:
             except (cookielib.LoadError, IOError):
                 import sys
                 raise PluginError('Cookies could not be loaded: %s' % sys.exc_info()[1], log)
-        
+
         # create new opener for urllib2
         log.debug('Installing urllib2 opener')
         opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cj))
         urllib2.install_opener(opener)
-        
+
     def on_feed_exit(self, feed):
         """Feed exiting, remove cookiejar"""
         log.debug('Removing urllib2 opener')
         urllib2.install_opener(None)
-        
+
     # Feed aborted, unhook the cookiejar
     on_feed_abort = on_feed_exit
 

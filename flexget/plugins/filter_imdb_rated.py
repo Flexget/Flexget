@@ -32,19 +32,19 @@ class ImdbRated(Base):
 class FilterImdbRated(object):
     """
         Reject already voted entries based on user imdb vote history.
-        
+
         Example:
-        
+
         imdb_rated: http://www.imdb.com/mymovies/list?l=<YOUR USER ID>
-        
+
         Reverse, reject unvoted:
-        
+
         Example:
-        
+
         imdb_rated:
           url: http://www.imdb.com/mymovies/list?l=<YOUR USER ID>
           reverse: yes
-        
+
         Note: in theory this should work with any other page containing imdb urls.
     """
 
@@ -66,40 +66,40 @@ class FilterImdbRated(object):
             return
         feed.simple_persistence.set('next_time', datetime.datetime.now() + datetime.timedelta(hours=4))
         log.debug('updating my movies from %s' % config['url'])
-        
+
         massage = []
-        
+
         # fix imdb html, just enough to pass parser
         #
         # <td class=list bgcolor="#CCCCCC"} colspan="4">
         #                                 ^ god damn noobs
-        
+
         massage.append((re.compile('"}'), lambda match: '"'))
-        
+
         # onclick="(new Image()).src='/rg/home/navbar/images/b.gif?link=/'"">IMDb</a>
         #                                                                 ^ are you even trying?
 
         massage.append((re.compile('/\'""'), lambda match: '/\'"'))
-        
+
         # <table class="footer" id="amazon-affiliates"">
         #                                             ^ ffs, I don't think they are even trying ...
-        
+
         massage.append((re.compile('amazon-affiliates""'), lambda match: 'amazon-affiliates"'))
-        
+
         data = urlopener(config['url'], log)
         soup = BeautifulSoup(data, markupMassage=massage)
 
         count = 0
-        for a_imdb_link in soup.findAll('a', attrs={'href': re.compile('\/title\/tt\d+')}):
+        for a_imdb_link in soup.findAll('a', attrs={'href': re.compile(r'/title/tt\d+')}):
             imdb_url = 'http://www.imdb.com%s' % a_imdb_link.get('href')
-            
+
             if not feed.session.query(ImdbRated).filter(ImdbRated.url == config['url']).\
                                                  filter(ImdbRated.imdb_url == imdb_url).first():
                 rated = ImdbRated(config['url'], imdb_url)
                 feed.session.add(rated)
                 log.debug('adding %s' % rated)
                 count += 1
-                
+
         if count > 0:
             log.info('Added %s new movies' % count)
 
@@ -108,10 +108,10 @@ class FilterImdbRated(object):
         if isinstance(config, basestring):
             config = {}
             config['url'] = feed.config['imdb_rated']
-        
+
         self.update_rated(feed, config)
         for entry in feed.entries:
-            
+
             # if no imdb_url perform lookup
             if not 'imdb_url' in entry:
                 try:
@@ -122,19 +122,19 @@ class FilterImdbRated(object):
             # ignore entries without imdb_url
             if not 'imdb_url' in entry:
                 continue
-            
+
             is_rated = feed.session.query(ImdbRated).\
                        filter(ImdbRated.url == config['url']).\
                        filter(ImdbRated.imdb_url == entry['imdb_url']).first() is not None
-                       
+
             if config.get('reverse', False):
                 # reversed, reject unrated
                 if not is_rated:
                     feed.reject(entry, 'imdb rated reverse')
             else:
                 # normal mode, reject rated
-                if is_rated: 
+                if is_rated:
                     feed.reject(entry, 'imdb rated')
-                
+
 
 register_plugin(FilterImdbRated, 'imdb_rated')

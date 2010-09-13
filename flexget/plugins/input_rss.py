@@ -303,8 +303,8 @@ class InputRSS(object):
 
             # create from enclosures if present
             enclosures = entry.get('enclosures', [])
-            if config.get('group links'):
-                enclosures_urls = []
+            enclosures_urls = []
+
             if enclosures:
                 #log.debug('adding %i entries from enclosures' % len(enclosures))
                 for enclosure in enclosures:
@@ -329,7 +329,7 @@ class InputRSS(object):
                         if ee['url'].rfind != -1:
                             # parse filename from enclosure url
                             # TODO: better and perhaps join/in download plugin? also see urlparse module
-                            match = re.search('.*\/([^?#]*)', ee['url'])
+                            match = re.search(r'.*/([^?#]*)', ee['url'])
                             if match and config.get('filename', True):
                                 ee['filename'] = match.group(1)
                                 log.log(5, 'filename %s from enclosure' % ee['filename'])

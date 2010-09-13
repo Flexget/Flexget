@@ -11,11 +11,11 @@ class Errors:
         self.messages = []
         self.path = []
         self.path_level = None
-        
+
     def count(self):
         """Return number of errors."""
         return len(self.messages)
-    
+
     def add(self, msg):
         """Add new error message to current path."""
         path = [str(p) for p in self.path]
@@ -62,7 +62,7 @@ class Validator(object):
         if parent is None:
             self.errors = Errors()
             self.validators = {}
-            
+
             # register default validators
             register = [RootValidator, ListValidator, DictValidator, TextValidator, FileValidator,
                         PathValidator, AnyValidator, NumberValidator, BooleanValidator, RegexpMatchValidator,
@@ -96,15 +96,15 @@ class Validator(object):
 
     def accept(self, name, **kwargs):
         raise Exception('Validator %s should override accept method' % self.__class__.__name__)
-    
+
     def validateable(self, data):
         """Return True if validator can be used to validate given data, False otherwise."""
         raise Exception('Validator %s should override validateable method' % self.__class__.__name__)
-        
+
     def validate(self, data):
         """Validate given data and log errors, return True if passed and False if not."""
         raise Exception('Validator %s should override validate method' % self.__class__.__name__)
-        
+
     def validate_item(self, item, rules):
         """
             Helper method. Validate item against list of rules (validators).
@@ -118,7 +118,7 @@ class Validator(object):
                     # item is valid, remove added errors before returning
                     self.errors.back_out_errors(self.errors.count() - count)
                     return True
-                        
+
         # If no validators matched or reported errors, and one of them has a custom error message, display it.
         if count == self.errors.count():
             for rule in rules:
@@ -140,7 +140,7 @@ class Validator(object):
 
     def __str__(self):
         return '<%s>' % self.name
-        
+
 
 class RootValidator(Validator):
     name = 'root'
@@ -149,10 +149,10 @@ class RootValidator(Validator):
         v = self.get_validator(name, **kwargs)
         self.valid.append(v)
         return v
-    
+
     def validateable(self, data):
         return True
-    
+
     def validate(self, data):
         count = self.errors.count()
         return self.validate_item(data, self.valid)
@@ -170,9 +170,9 @@ class ChoiceValidator(Validator):
             raise Exception('Choice validator only accepts strings')
         if kwargs.get('ignore_case'):
             self.valid_ic.append(value.lower())
-        else:        
+        else:
             self.valid.append(value)
-        
+
     def accept_choices(self, values, **kwargs):
         for value in values:
             self.accept(value, **kwargs)
@@ -196,7 +196,7 @@ class AnyValidator(Validator):
 
     def validateable(self, data):
         return True
-    
+
     def validate(self, data):
         return True
 
@@ -210,7 +210,7 @@ class EqualsValidator(Validator):
     def validateable(self, data):
         from numbers import Number as number
         return isinstance(data, basestring) or isinstance(data, number)
-    
+
     def validate(self, data):
         return self.valid == data
 
@@ -265,7 +265,7 @@ class DecimalValidator(Validator):
 
 class TextValidator(Validator):
     name = 'text'
-    
+
     def accept(self, name, **kwargs):
         pass
 
@@ -281,7 +281,7 @@ class TextValidator(Validator):
 
 class RegexpValidator(Validator):
     name = 'regexp'
-    
+
     def accept(self, name, **kwargs):
         pass
 
@@ -298,7 +298,7 @@ class RegexpValidator(Validator):
             self.errors.add('%s is not a valid regular expression' % data)
             return False
         return True
-        
+
 
 class RegexpMatchValidator(Validator):
     name = 'regexp_match'
@@ -306,7 +306,7 @@ class RegexpMatchValidator(Validator):
     def __init__(self, parent=None, **kwargs):
         self.regexps = []
         Validator.__init__(self, parent, **kwargs)
-    
+
     def accept(self, regexp, **kwargs):
         try:
             self.regexps.append(re.compile(regexp))
@@ -314,10 +314,10 @@ class RegexpMatchValidator(Validator):
             raise Exception('Invalid regexp given to match_regexp')
         if kwargs.get('message'):
             self.message = kwargs['message']
-        
+
     def validateable(self, data):
         return isinstance(data, basestring)
-    
+
     def validate(self, data):
         if not isinstance(data, basestring):
             self.errors.add('Value should be text')
@@ -330,7 +330,7 @@ class RegexpMatchValidator(Validator):
         else:
             self.errors.add('%s does not match regexp' % data)
         return False
-    
+
 
 class FileValidator(TextValidator):
     name = 'file'
@@ -350,7 +350,7 @@ class PathValidator(TextValidator):
     def __init__(self, parent=None, allow_replacement=False, **kwargs):
         self.allow_replacement = allow_replacement
         Validator.__init__(self, parent, **kwargs)
-    
+
     def validate(self, data):
         import os
 
@@ -379,17 +379,17 @@ class PathValidator(TextValidator):
 
 class UrlValidator(TextValidator):
     name = 'url'
-    
+
     def validate(self, data):
         regexp = '(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?'
         if not isinstance(data, basestring):
             self.errors.add('expecting text')
             return False
-        valid = re.match(regexp, data) != None
+        valid = re.match(regexp, data) is not None
         if not valid:
             self.errors.add('value %s is not a valid url' % data)
         return valid
-        
+
 
 class ListValidator(Validator):
     name = 'list'
@@ -468,7 +468,7 @@ class DictValidator(Validator):
 
     def validateable(self, data):
         return isinstance(data, dict)
-    
+
     def validate(self, data):
         if not isinstance(data, dict):
             self.errors.add('value must be a dictionary')

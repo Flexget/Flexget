@@ -5,7 +5,7 @@ import base64
 from flexget.plugin import *
 
 log = logging.getLogger('deluge')
-        
+
 
 class OutputDeluge(object):
 
@@ -73,7 +73,7 @@ class OutputDeluge(object):
             'maxupspeed': 'decimal', 'maxdownspeed': 'decimal', 'maxupslots': 'number', \
             'maxconnections': 'number', 'ratio': 'decimal', 'removeatratio': 'boolean', \
             'addpaused': 'boolean', 'compact': 'boolean', 'content_filename': 'text'})
-        if self.deluge12 == None:
+        if self.deluge12 is None:
             logger = log.info if feed.manager.options.test else log.debug
             try:
                 log.debug("Testing for deluge 1.1 API")
@@ -164,12 +164,12 @@ class OutputDeluge(object):
                     opts[dopt] = value
                     if fopt == 'ratio':
                         opts['stop_at_ratio'] = True
-            
+
             # check that file is downloaded
             if not 'file' in entry:
                 feed.fail(entry, 'file missing?')
                 continue
-                
+
             # see that temp file is present
             if not os.path.exists(entry['file']):
                 tmp_path = os.path.join(feed.manager.config_base, 'temp')
@@ -180,7 +180,7 @@ class OutputDeluge(object):
 
             sclient.add_torrent_file([entry['file']], [opts])
             log.info("%s torrent added to deluge with options %s" % (entry['title'], opts))
-                
+
             movedone = entry.get('movedone', config['movedone'])
             label = entry.get('label', config['label']).lower()
             queuetotop = entry.get('queuetotop', config.get('queuetotop'))
@@ -211,15 +211,15 @@ class OutputDeluge(object):
                         sclient.queue_top([item])
                     break
             else:
-                log.info("%s is already loaded in deluge. Cannot change label, movedone, or queuetotop" % entry['title'])                
-                
+                log.info("%s is already loaded in deluge. Cannot change label, movedone, or queuetotop" % entry['title'])
+
     def add_to_deluge12(self, feed, config):
-    
+
         """ This is the new add to deluge method, using reactor.iterate """
-        
+
         from deluge.ui.client import client
         from twisted.internet import reactor, defer
-        
+
         def start_reactor():
             """This runs the reactor loop."""
             #if this is the first this function is being called, we have to call startRunning
@@ -234,7 +234,7 @@ class OutputDeluge(object):
                 self.reactorRunning = 2
                 raise PluginError('Could not connect to deluge daemon', log)
             self.reactorRunning = 2
-                
+
         def pause_reactor(result):
             """This exits the reactor loop so flexget can continue."""
             self.reactorRunning = result
@@ -248,7 +248,7 @@ class OutputDeluge(object):
                 log.debug('Test connection to deluge daemon successful.')
                 client.disconnect()
                 return
-                
+
             def on_success(torrent_id, entry, opts):
                 """Gets called when a torrent was successfully added to the daemon."""
                 dlist = []
@@ -319,7 +319,7 @@ class OutputDeluge(object):
                                 log.debug("File %s in %s renamed to %s" % (file['path'], entry['title'], filename))
                                 return client.core.rename_files(torrent_id, [(file['index'], filename)])
                         else:
-                            log.warning("No files in %s are > 90% of content size, no files renamed." % entry['title'])
+                            log.warning("No files in %s are > 90%% of content size, no files renamed." % entry['title'])
 
                     status_keys = ['files', 'total_size', 'save_path', 'move_on_completed_path', 'move_on_completed']
                     dlist.append(client.core.get_torrent_status(torrent_id, status_keys).addCallback(on_get_torrent_status))
@@ -330,7 +330,7 @@ class OutputDeluge(object):
                 """Gets called when daemon reports a failure adding the torrent."""
                 log.info("%s was not added to deluge! %s" % (entry['title'], result))
                 feed.fail(entry, "Could not be added to deluge")
-            
+
             # dlist is a list of deferreds that must complete before we exit
             dlist = []
             # loop through entries to get a list of labels to add
@@ -375,12 +375,12 @@ class OutputDeluge(object):
 
                 label_deferred = client.core.get_enabled_plugins().addCallback(on_get_enabled_plugins)
                 dlist.append(label_deferred)
-                
+
             def on_get_daemon_info(ver):
                 """Gets called with the daemon version info, stores it in self."""
                 log.debug('deluge version %s' % ver)
                 self.deluge_version = ver
-            
+
             version_deferred = client.daemon.info().addCallback(on_get_daemon_info)
             dlist.append(version_deferred)
 
@@ -409,7 +409,7 @@ class OutputDeluge(object):
                     opts['download_location'] = path
                 for fopt, dopt in self.options.iteritems():
                     value = entry.get(fopt, config.get(fopt))
-                    if value != None:
+                    if value is not None:
                         opts[dopt] = value
                         if fopt == 'ratio':
                             opts['stop_at_ratio'] = True
@@ -441,7 +441,7 @@ class OutputDeluge(object):
 
                 addresult.addCallbacks(on_success, on_fail, callbackArgs=(entry, opts), errbackArgs=(feed, entry))
                 dlist.append(addresult)
-                
+
             def on_complete(result):
                 """Gets called when all of our tasks for deluge daemon are complete."""
                 client.disconnect()
@@ -453,10 +453,10 @@ class OutputDeluge(object):
                 log.error('Timed out while adding torrents to deluge.')
                 log.debug('dlist: %s' % result.resultList)
                 client.disconnect()
-                
+
             # Schedule a disconnect to happen in 30 seconds if FlexGet hangs while connected to Deluge
             reactor.callLater(30, lambda: tasks.called or on_timeout(tasks))
-            
+
         def on_connect_fail(result, feed):
             """Gets called when connection to deluge daemon fails."""
             log.debug('Connect to deluge daemon failed, result: %s' % result)
@@ -477,7 +477,7 @@ class OutputDeluge(object):
 
         d.addCallback(on_connect_success, feed).addErrback(on_connect_fail, feed)
         start_reactor()
-        
+
     def on_process_end(self, feed):
         """Shut down the twisted reactor after all feeds have run."""
         if self.deluge12 and self.reactorRunning == 2:

@@ -9,6 +9,24 @@ from flexget import validator
 log = logging.getLogger('transmission')
 
 
+def save_opener(f):
+    """
+        Transmissionrpc sets a new default opener for urllib2
+        We use this as a decorator to capture and restore it when needed
+    """
+
+    def new_f(self, *args, **kwargs):
+        import urllib2
+        prev_opener = urllib2._opener
+        urllib2.install_opener(self.opener)
+        try:
+            f(self, *args, **kwargs)
+            self.opener = urllib2._opener
+        finally:
+            urllib2.install_opener(prev_opener)
+    return new_f
+
+
 class PluginTransmissionrpc:
     """
       Add url from entry url to transmission
@@ -36,23 +54,6 @@ class PluginTransmissionrpc:
     def __init__(self):
         self.client = None
         self.opener = None
-
-    def save_opener(f):
-        """
-            Transmissionrpc sets a new default opener for urllib2
-            We use this as a decorator to capture and restore it when needed
-        """
-
-        def new_f(self, *args, **kwargs):
-            import urllib2
-            prev_opener = urllib2._opener
-            urllib2.install_opener(self.opener)
-            try:
-                f(self, *args, **kwargs)
-                self.opener = urllib2._opener
-            finally:
-                urllib2.install_opener(prev_opener)
-        return new_f
 
     def validator(self):
         """Return config validator"""
@@ -112,7 +113,7 @@ class PluginTransmissionrpc:
             elif config['removewhendone']:
                 self.client = self.create_rpc_client(feed)
                 self.remove_finished(self.client)
-                
+
     @priority(120)
     def on_feed_download(self, feed):
         """
@@ -212,7 +213,7 @@ class PluginTransmissionrpc:
                 user = config['username']
             if 'password' in config:
                 password = config['password']
-        
+
         try:
             cli = transmissionrpc.Client(config['host'], config['port'], user, password)
         except TransmissionError, e:

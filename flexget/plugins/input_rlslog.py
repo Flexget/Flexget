@@ -28,24 +28,24 @@ class RlsLog:
         score = None
         votes = None
         re_votes = re.compile('\((\d*).votes\)', re.IGNORECASE)
-        re_score = [re.compile('(\d\.\d)'), re.compile('(\d)\/10')]
+        re_score = [re.compile('(\d\.\d)'), re.compile('(\d)/10')]
         for r in re_score:
             f = r.search(s)
-            if f != None:
+            if f is not None:
                 score = float(f.group(1))
                 break
         f = re_votes.search(s.replace(',', ''))
-        if f != None:
+        if f is not None:
             votes = int(f.group(1))
         #log.debug("parse_imdb returning score: '%s' votes: '%s' from: '%s'" % (str(score), str(votes), s))
         return (score, votes)
 
     def parse_rlslog(self, rlslog_url, feed):
         """Parse configured url and return releases array"""
-        
+
         page = urlopener(rlslog_url, log)
         soup = get_soup(page)
-            
+
         releases = []
         for entry in soup.findAll('div', attrs={'class': 'entry'}):
             release = {}
@@ -61,12 +61,12 @@ class RlsLog:
 
             log.log(5, 'Processing title %s' % (release['title']))
 
-            rating = entrybody.find('strong', text=re.compile('imdb rating\:', re.IGNORECASE))
-            if rating != None:
+            rating = entrybody.find('strong', text=re.compile(r'imdb rating:', re.IGNORECASE))
+            if rating is not None:
                 score_raw = rating.next.string
-                if score_raw != None:
+                if score_raw is not None:
                     release['imdb_score'], release['imdb_votes'] = self.parse_imdb(score_raw)
-            
+
             for link in entrybody.findAll('a'):
                 if not link.contents:
                     log.log(5, 'link content empty, skipping')
@@ -74,10 +74,10 @@ class RlsLog:
                 if not link.has_key('href'):
                     log.log(5, 'link %s missing href' % link)
                     continue
-                    
+
                 link_name = link.contents[0]
                 link_name_ok = True
-                if link_name == None:
+                if link_name is None:
                     log.log(5, 'link_name is none')
                     link_name_ok = False
                 if not isinstance(link_name, NavigableString):
@@ -92,7 +92,7 @@ class RlsLog:
                     if link_name == 'imdb':
                         release['imdb_url'] = link_href
                         score_raw = link.next.next.string
-                        if not 'imdb_score' in release and not 'imdb_votes' in release and score_raw != None:
+                        if not 'imdb_score' in release and not 'imdb_votes' in release and score_raw is not None:
                             release['imdb_score'], release['imdb_votes'] = self.parse_imdb(score_raw)
 
                 # test if entry with this url would be recognized
@@ -121,23 +121,25 @@ class RlsLog:
         if url.endswith('feed/'):
             raise PluginWarning('Invalid URL. Remove trailing feed/ from the url.')
 
+        releases = []
+
         # retry rlslog (badly responding) up to 5 times
         for number in range(3):
             try:
                 releases = self.parse_rlslog(url, feed)
-            except urllib2.URLError, e:
-                if number == 2:
-                    raise
-                else:
-                    import time
-                    feed.verbose_progress('Error retrieving the URL, retrying in 5s. Try [%s of 3]. Error: %s' % (str(number + 1), str(e.reason)))
-                    time.sleep(5)
             except urllib2.HTTPError, e:
                 if number == 2:
                     raise
                 else:
                     import time
                     feed.verbose_progress('Error recieving content, retrying in 5s. Try [%s of 3]. HTTP Error Code: %s' % (str(number + 1), str(e.code)))
+                    time.sleep(5)
+            except urllib2.URLError, e:
+                if number == 2:
+                    raise
+                else:
+                    import time
+                    feed.verbose_progress('Error retrieving the URL, retrying in 5s. Try [%s of 3]. Error: %s' % (str(number + 1), str(e.reason)))
                     time.sleep(5)
 
         for release in releases:
@@ -146,7 +148,7 @@ class RlsLog:
 
             def apply_field(d_from, d_to, f):
                 if f in d_from:
-                    if d_from[f] == None:
+                    if d_from[f] is None:
                         return # None values are not wanted!
                     d_to[f] = d_from[f]
 

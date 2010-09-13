@@ -273,8 +273,8 @@ class ModuleImdbLookup(object):
             log.log(5, 'imdb.year: %s' % imdb.year)
             log.log(5, 'imdb.genres: %s' % imdb.genres)
             log.log(5, 'imdb.languages: %s' % imdb.languages)
-            log.log(5, 'imdb.actors: %s' % imdb.actors)
-            log.log(5, 'imdb.directors: %s' % imdb.directors)
+            log.log(5, 'imdb.actors: %s' % ', '.join(imdb.actors))
+            log.log(5, 'imdb.directors: %s' % ', '.join(imdb.directors))
 
             # store to entry
             # TODO: I really don't like this shoveling!

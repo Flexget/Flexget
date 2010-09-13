@@ -17,17 +17,17 @@ class InputScenereleases:
 
         scenereleases: http://scenereleases.info/category/movies/movies-dvd-rip
     """
-    
+
     def validator(self):
         from flexget import validator
         return validator.factory('url')
 
     def parse_site(self, url, feed):
         """Parse configured url and return releases array"""
-        
+
         page = urlopener(url, log)
         soup = get_soup(page)
-            
+
         releases = []
         for entry in soup.findAll('div', attrs={'class': 'entry'}):
             release = {}
@@ -72,7 +72,7 @@ class InputScenereleases:
 
             # reject if no torrent link
             if not 'url' in release:
-                from flexget.utils.log import log_once 
+                from flexget.utils.log import log_once
                 log_once('%s skipped due to missing or unsupported (unresolvable) download link' % (release['title']), log)
             else:
                 releases.append(release)
@@ -87,10 +87,10 @@ class InputScenereleases:
         for release in releases:
             # construct entry from release
             entry = Entry()
-            
+
             def apply_field(d_from, d_to, f):
                 if d_from.has_key(f):
-                    if d_from[f] == None:
+                    if d_from[f] is None:
                         return # None values are not wanted!
                     d_to[f] = d_from[f]
 

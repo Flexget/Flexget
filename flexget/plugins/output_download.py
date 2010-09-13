@@ -130,7 +130,7 @@ class PluginDownload:
         except urllib2.URLError, e:
             log.warning('URLError %s' % e.reason)
             return 'URL Error'
-        except BadStatusLine:
+        except BadStatusLine, e:
             log.warning('Failed to reach server. Reason: %s' % e.reason)
             return 'BadStatusLine'
         except IOError, e:

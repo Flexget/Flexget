@@ -28,9 +28,9 @@ class ImdbSearch(object):
         self.debug = False
 
         self.remove = ['imax']
-        
+
         self.ignore_types = ['VG']
-        
+
     def ireplace(self, str, old, new, count=0):
         """Case insensitive string replace"""
         pattern = re.compile(re.escape(old), re.I)
@@ -53,7 +53,7 @@ class ImdbSearch(object):
     def best_match(self, name, year=None):
         """Return single movie that best matches name criteria or None"""
         movies = self.search(name)
-        
+
         if not movies:
             log.debug('search did not return any movies')
             return None
@@ -77,8 +77,8 @@ class ImdbSearch(object):
         if not movies:
             log.debug('no movies remain')
             return None
-        
-        # if only one remains ..        
+
+        # if only one remains ..
         if len(movies) == 1:
             log.debug('only one movie remains')
             return movies[0]
@@ -107,7 +107,7 @@ class ImdbSearch(object):
 
         movies = []
         # in case we got redirected to movie page (perfect match)
-        re_m = re.match('.*\.imdb\.com\/title\/tt\d+\/', actual_url)
+        re_m = re.match(r'.*\.imdb\.com/title/tt\d+/', actual_url)
         if re_m:
             actual_url = re_m.group(0)
             log.debug('Perfect hit. Search got redirected to %s' % actual_url)
@@ -135,28 +135,28 @@ class ImdbSearch(object):
             except AttributeError:
                 log.debug('Section % does not have a table?' % section)
                 continue
-            
-            links = section_table.findAll('a', attrs={'href': re.compile('\/title\/tt')})
+
+            links = section_table.findAll('a', attrs={'href': re.compile(r'/title/tt')})
             if not links:
                 log.debug('section %s does not have links' % section)
             for link in links:
                 # skip links with div as a parent (not movies, somewhat rare links in additional details)
-                if link.parent.name == u'div': 
+                if link.parent.name == u'div':
                     continue
-                    
+
                 # skip links without text value, these are small pictures before title
                 if len(link.contents) == 1 and not isinstance(link.contents[0], NavigableString):
                     continue
 
                 #log.debug('processing link %s' % link)
-                    
+
                 movie = {}
                 additional = re.findall('\((.*?)\)', link.next.next)
                 if len(additional) > 0:
                     movie['year'] = filter(unicode.isdigit, additional[0]) # strip non numbers ie. 2008/I
                 if len(additional) > 1:
                     movie['type'] = additional[1]
-                
+
                 movie['name'] = link.contents[0]
                 movie['url'] = "http://www.imdb.com" + link.get('href')
                 log.debug('processing name: %s url: %s' % (movie['name'], movie['url']))
@@ -182,7 +182,7 @@ class ImdbSearch(object):
 
         def cmp_movie(m1, m2):
             return cmp(m2['match'], m1['match'])
-        
+
         movies.sort(cmp_movie)
         return movies
 
@@ -206,16 +206,16 @@ class ImdbParser(object):
 
     def __str__(self):
         return '<ImdbParser(name=%s,imdb_id=%s)>' % (self.name, self.imdb_id)
-    
+
     def parse(self, url):
         self.url = url
         try:
             page = urllib2.urlopen(url)
         except ValueError:
             raise ValueError('Invalid url %s' % url)
-        
+
         self.imdb_id = extract_id(self.url)
-    
+
         soup = get_soup(page)
 
         # get photo
@@ -230,14 +230,14 @@ class ImdbParser(object):
         tag_name = soup.find('h1')
         if tag_name:
             if tag_name.next:
-                # Handle a page not found in IMDB. tag_name.string is 
+                # Handle a page not found in IMDB. tag_name.string is
                 # "<br/> Page Not Found" and there is no next tag. Thus, None.
-                if tag_name.next.string != None:
+                if tag_name.next.string is not None:
                     self.name = tag_name.next.string.strip()
                     log.debug('Detected name: %s' % self.name)
         else:
             log.warning('Unable to get name for %s - plugin needs update?' % url)
-            
+
         # get votes
         tag_votes = soup.find('b', text=re.compile('\d votes'))
         if tag_votes:
@@ -251,7 +251,7 @@ class ImdbParser(object):
         tag_score = soup.find('b', text=re.compile('\d.\d/10'))
         if tag_score:
             str_score = tag_score.string
-            re_score = re.compile("(\d.\d)\/10")
+            re_score = re.compile(r'(\d*\.?\d+)/10')
             match = re_score.search(str_score)
             if match:
                 str_score = match.group(1)
@@ -263,7 +263,7 @@ class ImdbParser(object):
         # get genres
         for link in soup.findAll('a', attrs={'href': re.compile('^/Sections/Genres/')}):
             # skip links that have javascript onclick (not in genrelist)
-            if link.has_key('onclick'): 
+            if link.has_key('onclick'):
                 continue
             self.genres.append(link.contents[0].lower())
 
@@ -310,8 +310,8 @@ class ImdbParser(object):
                 if isinstance(director_name, Tag):
                     director_name = None
                 self.directors[director_id] = director_name
-                                
+
         log.debug('Detected genres: %s' % self.genres)
         log.debug('Detected languages: %s' % self.languages)
-        log.debug('Detected director(s): %s' % self.directors)
-        log.debug('Detected actors: %s' % self.actors)
+        log.debug('Detected director(s): %s' % ', '.join(self.directors))
+        log.debug('Detected actors: %s' % ', '.join(self.actors))

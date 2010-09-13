@@ -643,9 +643,6 @@ class FilterSeries(SeriesPlugin):
 
         # expect flags
 
-        expect_ep = False
-        expect_id = False
-
         identified_by = config.get('identified_by', 'auto')
         if identified_by not in ['ep', 'id', 'auto']:
             raise PluginError('Unknown identified_by value %s for the series %s' % (identified_by, series_name))

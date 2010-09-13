@@ -37,14 +37,6 @@ class PluginsList(object):
                 method_name = EVENT_METHODS[event]
                 priority = info.event_handlers[method_name].priority
 
-                """
-                if info.name == 'seen':
-                    from IPython.Shell import IPShellEmbed
-                    args = []
-                    ipshell = IPShellEmbed(args)
-                    ipshell()"""
-
-
                 if info['name'] in roles:
                     roles[info['name']].append('%s(%s)' % (event, priority))
                 else:

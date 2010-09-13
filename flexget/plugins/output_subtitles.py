@@ -11,36 +11,36 @@ from sqlalchemy import Column, Integer, String, DateTime, PickleType
 from datetime import datetime, timedelta
 from flexget.utils.tools import urlopener
 
-""" 
+"""
 
 DRAFT
 
 class SubtitleQueue(Base):
-    
+
     __tablename__ = 'subtitle_queue'
 
     id = Column(Integer, primary_key=True)
     feed = Column(String)
     imdb_id = Column(String)
     added = Column(DateTime)
-    
+
     def __init__(self, feed, imdb_id):
         self.feed = feed
         self.imdb_id = imdb_id
         self.added = datetime.now()
-    
+
     def __str__(self):
         return '<SubtitleQueue(%s=%s)>' % (self.feed, self.imdb_id)
-        
+
 TODO:
- 
+
  * add new option, retry: [n] days
  * add everything into queue using above class
  * consume queue (look up by feed name), configuration is available from feed
  * remove successful downloads
- * remove queue items that are part retry: n days 
-        
-"""        
+ * remove queue items that are part retry: n days
+
+"""
 
 log = logging.getLogger('subtitles')
 
@@ -64,7 +64,7 @@ class Subtitles:
         subs.accept('decimal', key='min_sub_rating')
         subs.accept('decimal', key='match_limit')
         return subs
-        
+
     def get_config(self, feed):
         config = feed.config['subtitles']
         if not isinstance(config, dict):
@@ -80,7 +80,7 @@ class Subtitles:
 
         # filter all entries that have IMDB ID set
         try:
-            entries = filter(lambda x: x['imdb_url'] != None, feed.accepted)
+            entries = filter(lambda x: x['imdb_url'] is not None, feed.accepted)
         except KeyError:
             # No imdb urls on this feed, skip it
             return
@@ -104,28 +104,28 @@ class Subtitles:
         languages = config['languages']
         min_sub_rating = config['min_sub_rating']
         match_limit = config['match_limit'] # no need to change this, but it should be configurable
-        
+
         # loop through the entries
-        for entry in entries:            
-            # dig out the raw imdb id 
+        for entry in entries:
+            # dig out the raw imdb id
             m = re.search("tt(\d+)/$", entry['imdb_url'])
             if not m:
                 log.debug("no match for %s" % entry['imdb_url'])
                 continue
 
             imdbid = m.group(1)
-            
+
             query = []
             for language in languages:
                 query.append({'sublanguageid': language, 'imdbid': imdbid})
-            
+
             subtitles = s.SearchSubtitles(token, query)
             subtitles = subtitles['data']
 
             # nothing found -> continue
-            if not subtitles: 
+            if not subtitles:
                 continue
-            
+
             # filter bad subs
             subtitles = filter(lambda x: x['SubBad'] == '0', subtitles)
             # some quality required (0.0 == not reviewed)
@@ -166,5 +166,5 @@ class Subtitles:
                 fp.close()
                 f.close()
 
-        s.LogOut(token)     
+        s.LogOut(token)
 register_plugin(Subtitles, 'subtitles')

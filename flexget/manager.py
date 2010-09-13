@@ -417,7 +417,7 @@ class Manager(object):
             try:
                 feed.execute()
             except Exception, e:
-                failed.append(name)
+                failed.append(feed.name)
                 log.exception('Feed %s: %s' % (feed.name, e))
             except KeyboardInterrupt:
                 # show real stack trace in debug mode
