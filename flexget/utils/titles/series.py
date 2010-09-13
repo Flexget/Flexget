@@ -118,7 +118,8 @@ class SeriesParser(TitleParser):
         name = remove_dirt(self.name)
         data = remove_dirt(data)
         # remove duplicate spaces
-        data = ' '.join(data.split())
+        data_parts = data.split()
+        data = ' '.join(data_parts)
 
         log.log(5, 'data fully-cleaned: %s' % data)
 
@@ -134,8 +135,6 @@ class SeriesParser(TitleParser):
             return res
 
         log.debug('name: %s data: %s' % (name, data))
-
-        data_parts = data.split(' ')
 
         # name end position
         name_start = 0
