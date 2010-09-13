@@ -19,7 +19,7 @@ class UrlFix(object):
             if not feed.config['urlfix']:
                 return
         for entry in feed.entries:
-            if entry['url'].find('&amp;'):
+            if '&amp;' in entry['url']:
                 log.info('Corrected `%s` url (replaced &amp; with &)' % entry['title'])
                 entry['url'] = entry['url'].replace('&amp;', '&')
 
