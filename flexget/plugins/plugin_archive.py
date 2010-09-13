@@ -41,10 +41,12 @@ class ArchiveSearch(object):
         feed.manager.disable_feeds()
         
         def print_ae(ae):
-            print 'ID: %s Feed: %s Title: %s URL: %s Added: %s' % (ae.id, ae.feed, ae.title, ae.url, ae.added)
+            diff = datetime.now() - ae.added
+
+            print 'ID: %-6s | Feed: %-10s | Title: %s\nAdded: %s (%d days ago)\nURL: %s' % (ae.id, ae.feed, ae.title, ae.added, diff.days, ae.url)
             if ae.description:
                 print 'Description: %s' % ae.description
-            print ''
+            print '---'
 
         session = Session()
         
