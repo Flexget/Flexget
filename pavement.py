@@ -4,21 +4,15 @@ import paver.setuputils
 from paver import svn
 from paver.setuputils import setup, find_package_data, find_packages
 
-# TODO:
-#  * pylint is not listed as dependency (task: pylint)
-#    * the correct package to install is bin/easy_install logilab.pylintinstaller
-#      this will however give tons of errors, and still work ..
-#  * coverage is not listed as dependency (task: release_coverage)
-
 PROJECT_DIR = path(__file__).dirname()
 
 options = environment.options
 setup(
     name='FlexGet',
-    version='1.0-svn',
+    version='1.0', # our tasks append the r1234 (current svn revision) to the version number
     description='FlexGet is a program aimed to automate downloading or processing content (torrents, podcasts, etc.) from different sources like RSS-feeds, html-pages, various sites and more.',
     author='Marko Koivusalo',
-    author_email='',
+    author_email='marko.koivusalo@gmail.com',
     url='http://flexget.com',
     install_requires=['FeedParser', 'SQLAlchemy>0.5', 'PyYAML', 'BeautifulSoup', 'html5lib>=0.11', 'pygooglechart', \
                       'PyRSS2Gen', 'pynzb', 'progressbar'],
@@ -61,10 +55,48 @@ def freplace(name, what_str, with_str):
 
 
 @task
-@needs(['minilib', 'generate_setup', 'setuptools.command.sdist'])
+#@needs(['minilib', 'generate_setup', 'setuptools.command.sdist'])
 def sdist():
-    """Generates the tar.gz"""
-    pass
+    """Build tar.gz distribution package"""
+
+    revision = svn.info().get('last_changed_rev')
+
+    # clean previous build
+    print 'Cleaning build...'
+    for p in ['build']:
+        pth = path(p)
+        if pth.isdir():
+            pth.rmtree()
+        elif pth.isfile():
+            pth.remove()
+        else:
+            print 'Unable to remove %s' % pth
+
+    # remove pre-compiled pycs from tests, I don't know why paver even tries to include them ...
+    # seems to happen only with sdist though
+    for pyc in path('tests/').files('*.pyc'):
+        pyc.remove()
+
+    ver = '%sr%s' % (options['version'], revision)
+
+    print 'Building %s' % ver
+
+    # replace version number
+    freplace('flexget/__init__.py', "__version__ = '{subversion}'", "__version__ = '%s'" % ver)
+
+    # hack version number into setup( ... options='1.0' ...)
+    from paver import tasks
+    setup_section = tasks.environment.options.setdefault("setup", Bunch())
+    setup_section.update(version=ver)
+
+    for t in ['minilib', 'generate_setup', 'setuptools.command.sdist']:
+        call_task(t)
+
+    #egg_options = ['-d', '/var/www/flexget_dist/unstable'] # hmph, how can I pass params to it? doesn't seem to work ..
+    #bdist_egg(egg_options)
+
+    # restore version ...
+    freplace('flexget/__init__.py', "__version__ = '%s'" % ver, "__version__ = '{subversion}'")
 
 
 @task
@@ -82,10 +114,10 @@ def test(options):
 
     if not hasattr(options, 'online'):
         argv.extend(['--attr=!online'])
-        
+
     argv.append('-v')
     argv.append('--processes=4')
-    
+
     nose.run(argv=argv, config=cfg)
 
 
@@ -106,15 +138,14 @@ def clean():
 def bdist_egg():
     pass
 
-
 @task
 def coverage():
     """Make coverage.flexget.com"""
     # --with-coverage --cover-package=flexget --cover-html --cover-html-dir /var/www/flexget_coverage/
-    
+
     import nose
     from nose.plugins.manager import DefaultPluginManager
-    
+
     cfg = nose.config.Config(plugins=DefaultPluginManager(), verbosity=2)
     argv = ['bin/paver']
     argv.extend(['--attr=!online'])
@@ -123,7 +154,7 @@ def coverage():
     argv.extend(['--cover-package', 'flexget'])
     argv.extend(['--cover-html-dir', '/var/www/flexget_coverage/'])
     nose.run(argv=argv, config=cfg)
-    
+
     print 'Coverage generated'
 
 
@@ -147,13 +178,13 @@ def release(args):
         print 'Version number must be specified, ie. paver release 1.0b9'
         return
     ver = args[0]
-    
+
     # replace version number
     freplace('flexget/__init__.py', "__version__ = '{subversion}'", "__version__ = '%s'" % ver)
 
     # run unit tests
     test(environment.options) # dunno if param is correct ..
-    
+
     import shutil
     shutil.copytree('FlexGet.egg-info', 'FlexGet.egg-info-backup')
 
@@ -161,15 +192,15 @@ def release(args):
     from paver import tasks
     setup_section = tasks.environment.options.setdefault("setup", Bunch())
     setup_section.update(version=ver)
-    
+
     egg_options = ['-d', '/var/www/flexget_dist/unstable'] # hmph, how can I pass params to it? doesn't seem to work ..
     bdist_egg(egg_options)
-    
+
     # hack since -d does not work .. copy build to release folder
     import os
     import shutil
     dest = '/var/www/flexget_dist/unstable/'
-    
+
     for fname in os.listdir('dist'):
         shutil.copy(os.path.join('dist', fname), os.path.join(dest, fname))
 
@@ -192,38 +223,38 @@ def release(args):
     ('ignore', 'i', 'Ignore PyLint errors')
 ])
 def pylint(options):
-    
+
     import os.path
     if not os.path.exists('bin/pylint'):
         raise paver.tasks.BuildFailure('PyLint not installed!\n'+\
                                        'Run bin/easy_install logilab.pylintinstaller\n' + \
                                        'Do not be alarmed by the errors it may give, it still works ..')
-        
-    
+
+
     """Check the source code using PyLint."""
     from pylint import lint
-    
+
     # Initial command.
     arguments = []
-    
+
     if options.pylint.quiet:
         arguments.extend(options.pylint.quiet_args)
-        
+
     if 'pylint_args' in options.pylint:
         arguments.extend(list(options.pylint.pylint_args))
-    
+
     if not options.pylint.verbose:
         arguments.append('--errors-only')
-    
+
     # Add the list of paths containing the modules to check using PyLint.
     arguments.extend(str(PROJECT_DIR / module) for module in options.check_modules)
-    
+
     # By placing run_pylint into its own function, it allows us to do dry runs
     # without actually running PyLint.
     def run_pylint():
         # Add app folder to path.
         sys.path.insert(0, PROJECT_DIR)
-        
+
         print 'Running pylint (this may take a while)'
         # Runs the PyLint command.
         try:
@@ -234,36 +265,34 @@ def pylint(options):
             return_code = exc.args[0]
             if return_code != 0 and (not options.pylint.ignore):
                 raise paver.tasks.BuildFailure('PyLint finished with a non-zero exit code')
-    
+
     return dry('bin/pylint ' + ' '.join(arguments), run_pylint)
 
 
 @task
 def install_tools():
     """Install development / hudson tools and dependencies"""
-    
+
     try:
         import pip
     except:
         print 'Unable to import pip, please install it'
         return
-    
+
     try:
         import pylint
         print 'Pylint INSTALLED'
     except:
         pip.main(['install', 'pylint']) # OR instead of pylint logilab.pylintinstaller ?
-    
+
     try:
         import coverage
         print 'Coverage INSTALLED'
     except:
         pip.main(['install', 'coverage'])
-    
+
     try:
         import nosexcover
         print 'Nose-xcover INSTALLED'
     except:
         pip.main(['install', 'http://github.com/cmheisel/nose-xcover/zipball/master'])
-        
-    
