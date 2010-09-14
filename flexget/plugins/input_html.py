@@ -59,7 +59,6 @@ class InputHtml(object):
         if isinstance(config, basestring):
             config = {'url': config}
         get_auth_from_url()
-        log.info(config)
         return config
         
 
