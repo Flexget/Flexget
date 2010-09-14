@@ -43,6 +43,9 @@ class SeriesParser(TitleParser):
                 '(?:series|season)\s?(\d{1,3})\s(\d{1,3})\s?of\s?(?:\d{1,3})',
                 '(\d{1,3})\s?of\s?(?:\d{1,3})',
                 '(?:^|\D)([\d]{1,2})[\s]?x[\s]?(\d+)']
+        self.unwanted_ep_regexps = [
+                 '(\d{1,3})\s?x\s?(0+)[^1-9]',
+                 '(\d{1,3})\s?x\s?(all)']
         self.id_regexps = [
                 '(\d{4})%s(\d+)%s(\d+)' % (separators, separators),
                 '(\d+)%s(\d+)%s(\d{4})' % (separators, separators),
@@ -200,6 +203,14 @@ class SeriesParser(TitleParser):
 
         log.debug("data for id/ep parsing '%s'" % data)
 
+        # check for unwanted season/episode formats
+        
+        for ep_unwanted_re in self.unwanted_ep_regexps:
+            match = re.search(ep_unwanted_re, data, re.IGNORECASE | re.UNICODE)
+            if match:
+                log.debug('ignoring episode %s' % match.group(2))
+                return
+            
         # search for season and episode number
 
         for ep_re in self.ep_regexps:
