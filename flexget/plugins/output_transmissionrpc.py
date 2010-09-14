@@ -1,4 +1,3 @@
-from __future__ import with_statement
 import os
 from netrc import netrc, NetrcParseError
 import logging
@@ -92,8 +91,9 @@ class PluginTransmissionrpc:
         try:
             import transmissionrpc
             from transmissionrpc.transmission import TransmissionError
+            from transmissionrpc.httphandler import HTTPHandlerError
         except:
-            raise PluginError('Transmissionrpc module required.', log)
+            raise PluginError('Transmissionrpc module version 0.5 or higher required.', log)
         set_plugin = get_plugin_by_name('set')
         set_plugin.instance.register_keys({'path': 'text', \
                                            'addpaused': 'boolean', \
@@ -256,8 +256,11 @@ class PluginTransmissionrpc:
 
             try:
                 if download:
-                    with open(entry['file'], 'rb') as f:
+                    try:
+                        f = open(entry['file'], 'rb')
                         filedump = base64.encodestring(f.read())
+                    finally:
+                        f.close()
                     r = cli.add(filedump, 30, **options['add'])
                 else:
                     r = cli.add(None, filename=entry['url'],
@@ -281,7 +284,7 @@ class PluginTransmissionrpc:
         transfers = cli.info(arguments=['id', 'hashString', 'name', 'status', 'uploadRatio', 'seedRatioLimit'])
         remove_ids = []
         # Go through the list of active transfers and add finished transfers to remove_ids.
-        for tid, transfer in transfers.iteritems():
+        for transfer in transfers.itervalues():
             log.debug('Transfer "%s": status: "%s" upload ratio: %.2f seed ratio: %.2f' % \
                 (transfer.name, transfer.status, transfer.uploadRatio, transfer.seedRatioLimit))
             if transfer.status == 'stopped' and transfer.uploadRatio >= transfer.seedRatioLimit:
