@@ -95,6 +95,8 @@ class ModuleThetvdbLookup(object):
         1986-12-17
         and spit out a datetime object
         """
+        if not date_to_convert:
+            return
         converted_date = None
         try:
             converted_date = datetime.date(*map(int, date_to_convert.split("-")))
