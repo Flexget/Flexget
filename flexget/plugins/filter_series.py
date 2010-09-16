@@ -100,7 +100,7 @@ class SeriesPlugin(object):
 
     def identified_by_ep(self, session, name, min=4, min_percent=50):
         """Determine if series :name: should be considered episodic"""
-        series = session.query(Series).filter(Series.name == name).first()
+        series = session.query(Series).filter(Series.name == name.lower()).first()
         if not series:
             log.debug('series %s episodic check: aborted, unknown series' % name)
             return False
@@ -120,7 +120,7 @@ class SeriesPlugin(object):
 
     def identified_by_id(self, session, name, min=4, min_percent=50):
         """Determine if series :name: should be considered identified by id"""
-        series = session.query(Series).filter(Series.name == name).first()
+        series = session.query(Series).filter(Series.name == name.lower()).first()
         if not series:
             log.debug('series %s id-format check: aborted, unknown series' % name)
             return False
