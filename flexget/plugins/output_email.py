@@ -2,7 +2,6 @@ import logging
 import smtplib
 import socket
 from email.message import Message
-from ssl import SSLError
 from flexget.plugin import *
 
 log = logging.getLogger('email')
@@ -183,7 +182,7 @@ class OutputEmail(object):
 
             try:
                 mailServer.sendmail(message['From'], config['to'], message.as_string())
-            except SSLError, e:
+            except IOError, e:
                 # Ticket #686
                 raise PluginWarning('Unable to send email, SSLError %s' % e.message, log)
 
