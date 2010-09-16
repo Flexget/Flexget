@@ -1,7 +1,8 @@
 import logging
 import smtplib
-import email.Message
 import socket
+from email.message import Message
+from ssl import SSLError
 from flexget.plugin import *
 
 log = logging.getLogger('email')
@@ -137,11 +138,10 @@ class OutputEmail(object):
 
         # generate email content
         entries_count = len(feed.accepted)
-        subject = "[FlexGet] %s : %d new entries downloaded" % (feed.name, entries_count)
-        content = u"""Hi,
+        subject = '[FlexGet] %s : %d new entries downloaded' % (feed.name, entries_count)
+        content = (u'Hi,\n'
+                    'FlexGet has just downloaded %d new entries for feed %s :' % (entries_count, feed.name))
 
-FlexGet has just downloaded %d new entries for feed %s :
-        """ % (entries_count, feed.name)
         for entry in feed.accepted:
             content += "\n - %s (%s)" % (entry['title'], entry['url'])
             entry_path = entry.get('path', feed.config.get('download'))
@@ -152,10 +152,10 @@ FlexGet has just downloaded %d new entries for feed %s :
         content += "\n\n"
 
         # prepare email message
-        message = email.Message.Message() # pylint:disable=E0611
-        message["To"] = ','.join(config['to'])
-        message["From"] = config['from']
-        message["Subject"] = subject
+        message = Message()
+        message['To'] = ','.join(config['to'])
+        message['From'] = config['from']
+        message['Subject'] = subject
         message.set_payload(content.encode('utf-8'))
         message.set_charset('utf-8')
 
@@ -181,7 +181,12 @@ FlexGet has just downloaded %d new entries for feed %s :
             if config['smtp_login']:
                 mailServer.login(config['smtp_username'], config['smtp_password'])
 
-            mailServer.sendmail(message["From"], config['to'], message.as_string())
+            try:
+                mailServer.sendmail(message['From'], config['to'], message.as_string())
+            except SSLError, e:
+                # Ticket #686
+                raise PluginWarning('Unable to send email, SSLError %s' % e.message, log)
+
             mailServer.quit()
 
 register_plugin(OutputEmail, 'email')
