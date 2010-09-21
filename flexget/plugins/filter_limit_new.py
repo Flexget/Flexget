@@ -21,11 +21,14 @@ class FilterLimitNew(object):
 
     def validator(self):
         from flexget import validator
-
         return validator.factory('number')
 
     @priority(-255)
     def on_feed_filter(self, feed):
+        if feed.manager.options.learn:
+            log.info('Plugin limit_new is disabled with --learn / --reset')
+            return
+            
         amount = feed.config.get('limit_new', len(feed.entries))
         i = 1
         rejected = 0
