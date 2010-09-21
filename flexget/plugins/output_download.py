@@ -198,21 +198,21 @@ class PluginDownload:
         # download and write data into a temp file
         try:
             outfile = open(datafile, 'wb')
-            for chunk in read_chunks(f):
-                outfile.write(decompress(chunk) if decompress else chunk)
+            try:
+                for chunk in read_chunks(f):
+                    outfile.write(decompress(chunk) if decompress else chunk)
+            except:
+                # don't leave futile files behind
+                # outfile has to be closed before we can delete it on Windows
+                outfile.close()
+                log.debug('Download interrupted, removing datafile')
+                os.remove(datafile)
+                raise
+            outfile.close()
             # store temp filename into entry so other plugins may read and modify content
             # temp file is moved into final destination at self.output
             entry['file'] = datafile
             log.debug('%s field file set to: %s' % (entry['title'], entry['file']))
-        except:
-            # don't leave futile files behind
-            # outfile has to be closed before we can delete it on Windows
-            outfile.close()
-            log.debug('Download interrupted, removing datafile')
-            os.remove(datafile)
-            raise
-        else:
-            outfile.close()
         finally:
             f.close()
 
