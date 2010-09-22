@@ -280,13 +280,19 @@ class Manager(object):
 
         self.lockfile = os.path.join(self.config_base, ".%s-lock" % self.config_name)
         if os.path.exists(self.lockfile):
-            if not self.options.quiet:
-                f = file(self.lockfile)
-                pid = f.read()
-                f.close()
-                print >> sys.stderr, "Another process (%s) is running, will exit." % pid.strip()
-                print >> sys.stderr, "If you're sure there is no other instance running, delete %s" % self.lockfile
-            sys.exit(1)
+            # check the lock age
+            from datetime import datetime
+            lock_time = datetime.fromtimestamp(os.path.getmtime(self.lockfile))
+            if (datetime.now() - lock_time).seconds > 3600:
+                log.warning('Lock file over 1 hour in age, ignoring it ...')
+            else:
+                if not self.options.quiet:
+                    f = file(self.lockfile)
+                    pid = f.read()
+                    f.close()
+                    print >> sys.stderr, "Another process (%s) is running, will exit." % pid.strip()
+                    print >> sys.stderr, "If you're sure there is no other instance running, delete %s" % self.lockfile
+                sys.exit(1)
 
         f = file(self.lockfile, 'w')
         f.write("PID: %s\n" % os.getpid())
