@@ -1,5 +1,6 @@
 import logging
 from flexget.plugin import *
+from flexget.utils.log import log_once
 
 log = logging.getLogger('urlfix')
 
@@ -20,7 +21,7 @@ class UrlFix(object):
                 return
         for entry in feed.entries:
             if '&amp;' in entry['url']:
-                log.info('Corrected `%s` url (replaced &amp; with &)' % entry['title'])
+                log_once('Corrected `%s` url (replaced &amp; with &)' % entry['title'], logger=log)
                 entry['url'] = entry['url'].replace('&amp;', '&')
 
 
