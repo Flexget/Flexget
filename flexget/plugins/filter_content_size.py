@@ -5,6 +5,7 @@ from sqlalchemy import Column, Integer, DateTime, Unicode, String, Boolean
 from datetime import datetime
 from flexget.plugin import *
 from flexget.manager import Base
+from flexget.utils.log import log_once
 
 log = logging.getLogger('content_size')
 
@@ -49,10 +50,10 @@ class FilterContentSize(object):
             # Avoid confusion by printing a reject message to info log, as
             # download plugin has already printed a downloading message.
             if size < config.get('min', 0):
-                log.info('Entry %s too small, rejecting' % entry['title'])
+                log_once('Entry %s too small, rejecting' % entry['title'], log)
                 feed.reject(entry, 'minimum size (%s MB)' % config['min'])
             if size > config.get('max', maxint):
-                log.info('Entry %s too big, rejecting' % entry['title'])
+                log_once('Entry %s too big, rejecting' % entry['title'], log)
                 feed.reject(entry, 'maximum size (%s MB)' % config['max'])
 
     def on_feed_filter(self, feed):
