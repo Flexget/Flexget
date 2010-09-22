@@ -98,6 +98,13 @@ class TestSeriesParser(object):
         assert not s.season, 'Should not have season'
         assert not s.valid, 'Should not be valid'
 
+    def test_unwanted_disc(self):
+        """SeriesParser: unwanted disc releases"""
+        s = self.parse(name='Something', data='Something.S01D2.DVDR-FlexGet')
+        assert not s.episode, 'Should not have episode'
+        assert not s.season, 'Should not have season'
+        assert not s.valid, 'Should not be valid'
+
     def test_season_x_ep(self):
         """SeriesParser: 01x02"""
         # Test 01x02 format

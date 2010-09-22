@@ -45,6 +45,7 @@ class SeriesParser(TitleParser):
                 '(?:^|\D)([\d]{1,2})[\s]?x[\s]?(\d+)']
         self.unwanted_ep_regexps = [
                  '(\d{1,3})\s?x\s?(0+)[^1-9]',
+                 'S(\d{1,3})D(\d{1,3})',
                  '(\d{1,3})\s?x\s?(all)']
         self.id_regexps = [
                 '(\d{4})%s(\d+)%s(\d+)' % (separators, separators),
