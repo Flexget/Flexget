@@ -4,7 +4,7 @@ import math
 from flexget.plugin import *
 from flexget.utils import qualities
 
-log = logging.getLogger('metainfo_csize')
+log = logging.getLogger('metanfo_csize')
 
 SIZE_RE = re.compile(r'Size[^\d]{0,7}(\d*\.?\d+).{0,5}(MB|GB)', re.IGNORECASE)
 
@@ -43,7 +43,7 @@ class MetainfoContentSize(object):
                 entry['content_size'] = int(amount)
 
         if count:
-            log.info('Found content size information from %s entries' % count)
+            log.debug('Found content size information from %s entries' % count)
 
 
 register_plugin(MetainfoContentSize, 'metainfo_content_size', builtin=True)
