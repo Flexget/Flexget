@@ -62,7 +62,7 @@ class ModifySet(object):
                     conf[key] = value % entry
                 except KeyError, e:
                     logger = log.error if errors else log.debug
-                    logger("Could not set '%s' for %s: does not contain the field '%s.'" % (key, entry['title'], e))
+                    logger("Could not set '%s' for %s: does not contain the field '%s'." % (key, entry['title'], e))
             else:
                 conf[key] = value
         
