@@ -694,6 +694,10 @@ class FilterSeries(SeriesPlugin):
                 parser.strict_name = config.get('exact', False)
                 parser.allow_groups = get_as_array(config, 'from_group')
                 parser.field = field
+                # incase quality will not be found from title, set it from entry['quality'] if available
+                if parser.quality == 'unknown' and 'quality' in entry:
+                    log.debug('Setting quality %s from entry field to parser' % entry['quality'])
+                    parser.quality = entry['quality']
                 # do not use builtin list for id when ep configured and vice versa
                 if 'ep_regexp' in config and not 'id_regexp' in config:
                     parser.id_regexps = []
@@ -716,7 +720,8 @@ class FilterSeries(SeriesPlugin):
 
             # add series, season and episode to entry
             entry['series_name'] = series_name
-            entry['quality'] = parser.quality
+            if not 'quality' in entry:
+                entry['quality'] = parser.quality
             if parser.season and parser.episode:
                 entry['series_season'] = parser.season
                 entry['series_episode'] = parser.episode

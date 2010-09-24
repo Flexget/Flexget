@@ -68,6 +68,13 @@ class TestQuality(FlexGetBase):
             series:
               - MaxUnknownQTest:
                   max_quality: hdtv
+                  
+          description_quality:
+            mock:
+              - {'title': 'Description.S01E01', 'description': 'The quality should be 720p'}
+            series:
+              - description: {quality: 720p}
+              
     """
 
     def test_best_quality(self):
@@ -101,6 +108,11 @@ class TestQuality(FlexGetBase):
     def test_max_unknown_quality(self):
         """Series plugin: max quality with unknown quality"""
         self.execute_feed('max_unknown_quality')
+        assert len(self.feed.accepted) == 1, 'should have accepted'
+        
+    def test_quality_from_description(self):
+        """Series plugin: quality from description"""
+        self.execute_feed('description_quality')
         assert len(self.feed.accepted) == 1, 'should have accepted'
 
 

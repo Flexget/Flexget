@@ -176,11 +176,12 @@ class SeriesParser(TitleParser):
                 return # leave invalid
 
         # search tags and quality
-        log.debug('parsing quality ->')
-        #remove series name from raw data
-        data_noname = self.data[:name_start] + self.data[name_end:]
-        log.debug('data noname: %s' % data_noname)
-        self.quality = qualities.parse_quality(data_noname).name
+        if self.quality == 'unknown':
+            log.debug('parsing quality ->')
+            # remove series name from raw data
+            data_noname = self.data[:name_start] + self.data[name_end:]
+            log.debug('data noname: %s' % data_noname)
+            self.quality = qualities.parse_quality(data_noname).name
 
         for part in data_parts:
             if part in self.propers:
