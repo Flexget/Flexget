@@ -56,6 +56,10 @@ class TestInputRSS(FlexGetBase):
         # empty title, should be skipped
         assert not self.feed.find_entry(description='Description, empty title'), \
             'RSS entry without title should be skipped'
+        
+        # reset input cache so that the cache is not used for second execution
+        from flexget.plugins.cached_input import cached
+        cached.cache = {}
 
         # custom link field
         self.execute_feed('test2')
