@@ -4,8 +4,6 @@ from flexget.plugin import *
 
 log = logging.getLogger('cached')
 
-cache = {}
-
 
 class cached(object):
 
@@ -21,6 +19,8 @@ class cached(object):
     Configuration assumptions may make this unusable in some (future) inputs
     """
 
+    cache = {}
+
     def __init__(self, name, key=None):
         self.name = name
         self.key = key
@@ -28,8 +28,7 @@ class cached(object):
     def __call__(self, func):
 
         def wrapped_func(*args, **kwargs):
-            global cache
-            
+
             # get feed from method parameters
             feed = args[1]
 
@@ -47,22 +46,24 @@ class cached(object):
             else:
                 name = feed.config[self.name]
 
-            log.debug('cache name: %s' % name)
+            log.debug('cache name: %s (has: %s)' % (name, ', '.join(self.cache.keys())))
 
-            if name in cache:
+            if name in self.cache:
+                log.log(5, 'cache hit')
                 count = 0
-                for entry in cache[name]:
+                for entry in self.cache[name]:
                     fresh = copy.deepcopy(entry)
                     feed.entries.append(fresh)
                     count += 1
                 if count > 0:
                     feed.verbose_progress('Restored %s entries from cache' % count, log)
             else:
+                log.log(5, 'cache miss')
                 # call input event
                 func(*args, **kwargs)
                 # store results to cache
                 log.debug('storing to cache %s %s entries' % (name, len(feed.entries)))
-                cache[name] = copy.deepcopy(feed.entries)
+                self.cache[name] = copy.deepcopy(feed.entries)
 
         return wrapped_func
 
