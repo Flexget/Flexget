@@ -51,3 +51,22 @@ class TestMetainfoImdb(FlexGetBase):
             'Failed to ignore multiple imdb urls in test 4'
         assert not self.feed.find_entry(imdb_url='http://www.imdb.com/title/tt99999/'), \
             'Failed to ignore multiple imdb urls in test 4'
+
+
+class TestMetainfoSeries(FlexGetBase):
+    __yaml__ = """
+        feeds:
+          test:
+            mock:
+              - {title: 'FlexGet.S01E02.TheName.HDTV.xvid'}
+              - {title: 'Some.Series.S03E14.Title.Here.720p'}
+            metainfo_series: yes
+    """
+
+    def test_imdb(self):
+        """Metainfo: imdb url"""
+        self.execute_feed('test')
+        assert self.feed.find_entry(series_name='FlexGet', series_season=1, series_episode=2, quality='hdtv'), \
+            'Failed to parse series info'
+        assert self.feed.find_entry(series_name='Some Series', series_season=3, series_episode=14), \
+            'Failed to parse series info'

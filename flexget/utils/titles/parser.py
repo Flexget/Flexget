@@ -32,6 +32,11 @@ class TitleParser(object):
 
         return s
 
+    @staticmethod
+    def remove_dirt(data):
+            """Helper, just replace crap with spaces"""
+            return re.sub(r'[-_.\[\]\(\):]+', ' ', data).strip().lower()
+
     @classmethod
     def remove_words(cls, text, words):
         """Clean all given :words: from :text: case insensitivively"""

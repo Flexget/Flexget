@@ -114,12 +114,8 @@ class SeriesParser(TitleParser):
 
         data = self.clean(self.data)
 
-        def remove_dirt(data):
-            """Helper, just replace crap with spaces"""
-            return re.sub(r'[-_.\[\]\(\):]+', ' ', data).strip().lower()
-
-        name = remove_dirt(self.name)
-        data = remove_dirt(data)
+        name = self.remove_dirt(self.name)
+        data = self.remove_dirt(data)
         # remove duplicate spaces
         data_parts = data.split()
         data = ' '.join(data_parts)
@@ -198,7 +194,7 @@ class SeriesParser(TitleParser):
         # Ensure the series name isn't accidentally munged.
 
         data = self.remove_words(self.data[name_end:], self.remove + qualities.registry.keys() + self.codecs + self.sounds)
-        data = remove_dirt(data)
+        data = self.remove_dirt(data)
         data = self.clean(data)
 
         log.debug("data for id/ep parsing '%s'" % data)
