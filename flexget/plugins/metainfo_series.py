@@ -20,15 +20,16 @@ class MetainfoSeries(object):
         if not feed.config.get('metainfo_series', True):
             return
         for entry in feed.entries:
-            ser = self.guess_series(entry['title'])
-            if ser:
-                entry['series_name'] = ser[0]
-                entry['series_season'] = ser[1]
-                entry['series_episode'] = ser[2]
+            match = self.guess_series(entry['title'])
+            if match:
+                entry['series_name'] = match[0]
+                entry['series_season'] = match[1]
+                entry['series_episode'] = match[2]
+                entry['series_parser'] = match[3]
                 entry['series_guessed'] = True
 
     def guess_series(self, title):
-        """Returns tuple of (series_name, season, episode) if found, else None"""
+        """Returns tuple of (series_name, season, episode, parser) if found, else None"""
         
         # Clean the data for parsing
         parser = SeriesParser()
@@ -49,6 +50,10 @@ class MetainfoSeries(object):
                 name = re.sub('[\._]', ' ', name)
                 season = match[0]
                 episode = match[1]
-                return (name, season, episode)
+                parser.name = name
+                parser.data = title
+                parser.season = season
+                parser.episode = episode
+                return (name, season, episode, parser)
 
 register_plugin(MetainfoSeries, 'metainfo_series')

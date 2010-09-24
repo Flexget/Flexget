@@ -891,3 +891,27 @@ class TestFromGroup(FlexGetBase):
         assert self.feed.find_entry('accepted', title='[FlexGet] Test 12')
         assert self.feed.find_entry('accepted', title='Test.13.HDTV-FlexGet')
         assert self.feed.find_entry('accepted', title='Test.14.HDTV-Name')
+
+
+class TestSeriesPremiere(FlexGetBase):
+
+    __yaml__ = """
+        presets:
+          global:
+            metainfo_series: yes
+            series_premiere: yes
+        feeds:
+          test:
+            mock:
+              - {title: 'FooBar.S01E01.PDTV-FlexGet'}
+              - {title: 'FooBar.S01E11.1080p-FlexGet'}
+              - {title: 'FooBar.S02E02.HR-FlexGet'}
+    """
+      
+    def testOnlyPremieres(self):
+        """Test series premiere"""
+        self.execute_feed('test')
+        assert self.feed.find_entry('accepted', title='FooBar.S01E01.PDTV-FlexGet', \
+            series_name='FooBar', series_season=1, series_episode=1), 'Series premiere should have been accepted'
+        assert len(self.feed.accepted) == 1
+    # TODO: Add more tests, test interaction with series plugin and series_exists

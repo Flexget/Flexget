@@ -64,7 +64,7 @@ class TestMetainfoSeries(FlexGetBase):
     """
 
     def test_imdb(self):
-        """Metainfo: imdb url"""
+        """Metainfo: series name/episode"""
         self.execute_feed('test')
         assert self.feed.find_entry(series_name='FlexGet', series_season=1, series_episode=2, quality='hdtv'), \
             'Failed to parse series info'

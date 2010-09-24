@@ -39,7 +39,7 @@ class FilterExistsSeries(object):
 
     @priority(-1)
     def on_feed_filter(self, feed):
-        if not feed.config.get('series'):
+        if not feed.config.get('series') and not feed.config.get('series_premiere'):
             log.error('series plugin is not enabled on this feed. exists_series only works with series plugin.')
             return
         for entry in feed.entries + feed.accepted:
