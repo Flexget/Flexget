@@ -256,8 +256,8 @@ class PluginTransmissionrpc:
 
             try:
                 if download:
+                    f = open(entry['file'], 'rb')
                     try:
-                        f = open(entry['file'], 'rb')
                         filedump = base64.encodestring(f.read())
                     finally:
                         f.close()

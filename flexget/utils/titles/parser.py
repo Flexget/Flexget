@@ -1,5 +1,4 @@
 import re
-from flexget.utils import qualities
 
 
 class ParseWarning(Warning):
@@ -24,7 +23,8 @@ class TitleParser(object):
 
     sounds = ['AC3', 'DD5.1']
 
-    def strip_spaces(self, text):
+    @staticmethod
+    def strip_spaces(text):
         """Removes all unnecessary duplicate spaces from a text"""
         s = text.strip()
         while s.find('  ') != -1:
@@ -32,15 +32,17 @@ class TitleParser(object):
 
         return s
 
-    def remove_words(self, text, words):
+    @classmethod
+    def remove_words(cls, text, words):
         """Clean all given :words: from :text: case insensitivively"""
         for word in words:
-            text = self.ireplace(text, word, '')
+            text = cls.ireplace(text, word, '')
         # remove duplicate spaces
         text = ' '.join(text.split())
         return text
 
-    def ireplace(self, str, old, new, count=0):
+    @staticmethod
+    def ireplace(data, old, new, count=0):
         """Case insensitive string replace"""
         pattern = re.compile(re.escape(old), re.I)
-        return re.sub(pattern, new, str, count)
+        return re.sub(pattern, new, data, count)
