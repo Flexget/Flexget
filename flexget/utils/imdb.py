@@ -284,7 +284,11 @@ class ImdbParser(object):
         # get plot outline
         tag_outline = soup.find('h5', text=re.compile('Plot.*:'))
         if tag_outline:
-            self.plot_outline = tag_outline.parent.parent.find('div').next.string.strip()
+            tag_outline = tag_outline.parent.parent.find('div')
+            if tag_outline:
+                self.plot_outline = tag_outline.next.string.strip()
+            else:
+                log.debug('ERROR: Unable to find div from tag_outline')
             log.debug('Detected plot outline: %s' % self.plot_outline)
         else:
             log.debug('No h5 plot found')
