@@ -46,6 +46,13 @@ class TestImdb(FlexGetBase):
                 - nm0905154
               reject_directors:
                 - nm0000116
+
+          score:
+            mock:
+              - {title: 'The Matrix', imdb_url: 'http://www.imdb.com/title/tt0133093/'}
+              - {title: 'Battlefield Earth', imdb_url: 'http://www.imdb.com/title/tt0185183/'}
+            imdb:
+              min_score: 5.0
     """
 
     @attr(online=True)
@@ -102,6 +109,22 @@ class TestImdb(FlexGetBase):
             'The Matrix should\'ve been accepted'
         assert not self.feed.find_entry('rejected', imdb_name='The Terminator'), \
             'The The Terminator have been rejected'
+
+    @attr(online=True)
+    def test_score(self):
+        self.execute_feed('score')
+        matrix = float(self.feed.find_entry(imdb_name='The Matrix')['imdb_score'])
+        # Currently The Matrix has an 8.7, check a range in case it changes
+        assert matrix > 8.6 and matrix < 8.8, \
+            'The Matrix should have score 8.7 not %s. (Did the rating change?)' % matrix
+        bfe = float(self.feed.find_entry(title='Battlefield Earth')['imdb_score'])
+        # Currently Battlefield Earth has an 2.3, check a range in case it changes
+        assert bfe > 2.2 and bfe < 2.4, \
+            'Battlefield Earth should have score 2.3 not %s. (Did the rating change?)' % bfe
+        assert self.feed.find_entry('accepted', imdb_name='The Matrix'), \
+            'The Matrix should\'ve been accepted'
+        assert not self.feed.find_entry('accepted', title='Battlefield Earth'), \
+            'Battlefield Earth shouldn\'t have been accepted'
 
 
 class TestImdbRequired(FlexGetBase):
