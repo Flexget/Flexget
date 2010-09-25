@@ -696,7 +696,7 @@ class FilterSeries(SeriesPlugin):
                 parser.field = field
                 # incase quality will not be found from title, set it from entry['quality'] if available
                 if qualities.get(entry.get('quality', '')) > qualities.UnknownQuality():
-                    log.debug('Setting quality %s from entry field to parser' % entry['quality'])
+                    log.log(5, 'Setting quality %s from entry field to parser' % entry['quality'])
                     parser.quality = entry['quality']
                 # do not use builtin list for id when ep configured and vice versa
                 if 'ep_regexp' in config and not 'id_regexp' in config:
