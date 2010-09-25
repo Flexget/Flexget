@@ -51,6 +51,8 @@ class ArchiveSearch(object):
         session = Session()
         
         keyword = unicode(feed.manager.options.archive_search).replace(' ', '%')
+        
+        print 'Searching ...'
 
         for ae in session.query(ArchiveEntry).filter(or_(ArchiveEntry.title.like('%' + keyword + '%'), 
             ArchiveEntry.title.like('%' + keyword + '%'), ArchiveEntry.feed == keyword)).all():
