@@ -74,11 +74,10 @@ class SeriesPremiere(object):
             if 'path' in config:
                 try:
                     path = config['path'] % entry
+                    entry['path'] = path
                 except KeyError, e:
-                    logger = log.error if errors else log.debug
-                    logger("Could not set path for %s: does not contain the field '%s'." % (entry['title'], e))
-                entry['path'] = path
+                    log.error("Could not set path for %s: does not contain the field '%s'." % (entry['title'], e))
             feed.accept(entry, 'series premiere episode')
             log.debug("Premiere found for: %s" % (entry['series_name']))
 
-register_plugin(SeriesPremiere, 'series_premiere', debug=True)
+register_plugin(SeriesPremiere, 'series_premiere')
