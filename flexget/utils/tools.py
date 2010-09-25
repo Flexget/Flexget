@@ -4,6 +4,8 @@ import sgmllib
 import urllib2
 import socket
 import time
+from htmlentitydefs import name2codepoint
+import re
 
 
 def str_to_boolean(string):
@@ -42,11 +44,43 @@ class MergeException(Exception):
     def __str__(self):
         return repr(self.value)
 
+# This pattern matches a character entity reference (a decimal numeric
+# references, a hexadecimal numeric reference, or a named reference).
+charrefpat = re.compile(r'&(#(\d+|x[\da-fA-F]+)|[\w.:-]+);?')
+
+
+def _htmldecode(text):
+    """Decode HTML entities in the given text."""
+    # From screpe.py - licensed under apache 2.0 .. should not be a problem for a MIT afaik
+    if type(text) is unicode:
+        uchr = unichr
+    else:
+        uchr = lambda value: value > 127 and unichr(value) or chr(value)
+
+    def entitydecode(match, uchr=uchr):
+        entity = match.group(1)
+        if entity.startswith('#x'):
+            return uchr(int(entity[2:], 16))
+        elif entity.startswith('#'):
+            return uchr(int(entity[1:]))
+        elif entity in name2codepoint:
+            return uchr(name2codepoint[entity])
+        else:
+            return match.group(0)
+    return charrefpat.sub(entitydecode, text)
+
 
 def decode_html(value):
     """Decode HTML entities from :value: and return it"""
+
+    """
+    fails to decode &#x2500;
+
     from BeautifulSoup import BeautifulSoup
     return unicode(BeautifulSoup(value, convertEntities=BeautifulSoup.HTML_ENTITIES))
+    """
+
+    return _htmldecode(value)
 
 
 def encode_html(unicode_data, encoding='ascii'):

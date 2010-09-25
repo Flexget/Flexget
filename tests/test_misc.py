@@ -283,6 +283,7 @@ class TestHtmlUtils(object):
         """utils decode_html"""
         from flexget.utils.tools import decode_html
         assert decode_html('&lt;&#51;') == u'<3'
+        assert decode_html('&#x2500;') == u'\u2500'
 
     def test_encode_html(self):
         """utils encode_html (DISABLED)"""
