@@ -38,10 +38,10 @@ class SeriesParser(TitleParser):
         roman_numeral_re = 'X{0,3}(?:IX|XI{0,4}|VI{0,4}|IV|V|I{1,4})'
         self.ep_regexps = [
                 '(?:series|season|s)\s?(\d{1,3})\s?(?:episode|ep|e|part|pt)\s?(\d{1,3})',
-                '(?:episode|ep|part|pt)\s?(\d{1,3}|%s)' % roman_numeral_re,
                 '(?:series|season)\s?(\d{1,3})\s(\d{1,3})\s?of\s?(?:\d{1,3})',
                 '(\d{1,3})\s?of\s?(?:\d{1,3})',
-                '(?:^|\D)([\d]{1,2})[\s]?x[\s]?(\d+)']
+                '(?:^|\D)([\d]{1,2})[\s]?x[\s]?(\d+)',
+                '(?:episode|ep|part|pt)\s?(\d{1,3}|%s)' % roman_numeral_re]
         self.unwanted_ep_regexps = [
                  '(\d{1,3})\s?x\s?(0+)[^1-9]',
                  'S(\d{1,3})D(\d{1,3})',
