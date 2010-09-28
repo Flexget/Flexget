@@ -671,58 +671,67 @@ class FilterSeries(SeriesPlugin):
             return order.index(x[0]) if x[0] in order else len(order)
 
         # don't try to parse these fields
-        ignore_fields = ['uid', 'feed', 'url', 'original_url']
+        ignore_fields = ['uid', 'feed', 'url', 'original_url', 'type', 'quality']
 
         # key: series (episode) identifier ie. S01E02
         # value: seriesparser
         series = {}
         for entry in feed.entries:
-            for field, data in sorted(entry.items(), key=field_order):
-                # skip invalid fields
-                if not isinstance(data, basestring) or not data:
+            if entry.get('series_parser') and entry['series_parser'].valid:
+                # This entry already has a valid series parser, use it. (probably from backlog)
+                parser = entry['series_parser']
+                if parser.name.lower() != series_name.lower():
+                    # This was detected as another series, we can skip it.
                     continue
-                # skip ignored
-                if field in ignore_fields:
-                    continue
-                parser = SeriesParser()
-                parser.name = series_name
-                parser.data = data
-                parser.expect_ep = expect_ep
-                parser.expect_id = expect_id
-                parser.ep_regexps = get_as_array(config, 'ep_regexp') + parser.ep_regexps
-                parser.id_regexps = get_as_array(config, 'id_regexp') + parser.id_regexps
-                parser.strict_name = config.get('exact', False)
-                parser.allow_groups = get_as_array(config, 'from_group')
-                parser.field = field
-                # incase quality will not be found from title, set it from entry['quality'] if available
-                if qualities.get(entry.get('quality', '')) > qualities.UnknownQuality():
-                    log.log(5, 'Setting quality %s from entry field to parser' % entry['quality'])
-                    parser.quality = entry['quality']
-                # do not use builtin list for id when ep configured and vice versa
-                if 'ep_regexp' in config and not 'id_regexp' in config:
-                    parser.id_regexps = []
-                if 'id_regexp' in config and not 'ep_regexp' in config:
-                    parser.ep_regexps = []
-                parser.name_regexps.extend(get_as_array(config, 'name_regexp'))
-                try:
-                    parser.parse()
-                except ParseWarning, pw:
-                    from flexget.utils.log import log_once
-                    log_once(pw.value, logger=log)
-
-                if parser.valid:
-                    log.debug('%s detected as %s, field: %s' % (entry['title'], parser, parser.field))
-                    self.parser2entry[parser] = entry
-                    entry['series_parser'] = parser
-                    break
             else:
-                continue
+                for field, data in sorted(entry.items(), key=field_order):
+                    # skip invalid fields
+                    if not isinstance(data, basestring) or not data:
+                        continue
+                    # skip ignored
+                    if field in ignore_fields:
+                        continue
+                    parser = SeriesParser()
+                    parser.name = series_name
+                    parser.data = data
+                    parser.expect_ep = expect_ep
+                    parser.expect_id = expect_id
+                    parser.ep_regexps = get_as_array(config, 'ep_regexp') + parser.ep_regexps
+                    parser.id_regexps = get_as_array(config, 'id_regexp') + parser.id_regexps
+                    parser.strict_name = config.get('exact', False)
+                    parser.allow_groups = get_as_array(config, 'from_group')
+                    parser.field = field
+                    # incase quality will not be found from title, set it from entry['quality'] if available
+                    if qualities.get(entry.get('quality', '')) > qualities.UnknownQuality():
+                        log.log(5, 'Setting quality %s from entry field to parser' % entry['quality'])
+                        parser.quality = entry['quality']
+                    # do not use builtin list for id when ep configured and vice versa
+                    if 'ep_regexp' in config and not 'id_regexp' in config:
+                        parser.id_regexps = []
+                    if 'id_regexp' in config and not 'ep_regexp' in config:
+                        parser.ep_regexps = []
+                    parser.name_regexps.extend(get_as_array(config, 'name_regexp'))
+                    try:
+                        parser.parse()
+                    except ParseWarning, pw:
+                        from flexget.utils.log import log_once
+                        log_once(pw.value, logger=log)
 
+                    if parser.valid:
+                        break
+                else:
+                    continue
+
+            log.debug('%s detected as %s, field: %s' % (entry['title'], parser, parser.field))
+            self.parser2entry[parser] = entry
+            entry['series_parser'] = parser
             # add series, season and episode to entry
             entry['series_name'] = series_name
             entry['series_guessed'] = False
-            if not 'quality' in entry:
-                entry['quality'] = parser.quality
+            if 'quality' in entry and entry['quality'] != parser.quality:
+                log.warning('Found different quality for %s. Was %s, overriding with %s.' % \
+                    (entry['title'], entry['quality'], parser.quality))
+            entry['quality'] = parser.quality
             if parser.season and parser.episode:
                 entry['series_season'] = parser.season
                 entry['series_episode'] = parser.episode
@@ -1084,10 +1093,10 @@ class FilterSeries(SeriesPlugin):
             log.debug('timeframe waiting %s episode %s, rejecting all occurrences' % (series_name, best.identifier))
             for ep in eps:
                 feed.reject(self.parser2entry[ep], 'timeframe is waiting')
-                # add entry to backlog (backlog is able to handle duplicate adds)
-                if self.backlog:
-                    # set expiring timeframe length, extending a day
-                    self.backlog.add_backlog(feed, self.parser2entry[ep], '%s hours' % (hours + 24))
+            # add best entry to backlog (backlog is able to handle duplicate adds)
+            if self.backlog:
+                # set expiring timeframe length, extending a day
+                self.backlog.add_backlog(feed, entry, '%s hours' % (hours + 24))
             return True
 
     # TODO: whitelist deprecated ?
