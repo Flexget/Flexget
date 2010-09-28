@@ -1,6 +1,7 @@
 import logging
 from flexget.plugin import *
 import copy
+from flexget.utils.tools import replace_from_entry
 
 log = logging.getLogger('set')
 
@@ -58,11 +59,8 @@ class ModifySet(object):
         # Loop through config copying items into conf, and doing string replacement where necessary.
         for key, value in config.iteritems():
             if isinstance(value, basestring):
-                try:
-                    conf[key] = value % entry
-                except KeyError, e:
-                    logger = log.error if errors else log.debug
-                    logger("Could not set '%s' for %s: does not contain the field '%s'." % (key, entry['title'], e))
+                logger = log.error if errors else log.debug
+                conf[key] = replace_from_entry(value, entry, key, logger)
             else:
                 conf[key] = value
         

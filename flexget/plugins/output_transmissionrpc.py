@@ -4,6 +4,7 @@ import logging
 import base64
 from flexget.plugin import *
 from flexget import validator
+from flexget.utils.tools import replace_from_entry
 
 log = logging.getLogger('transmission')
 
@@ -164,10 +165,9 @@ class PluginTransmissionrpc:
         options = {'add': {}, 'change': {}}
 
         if 'path' in opt_dic:
-            try:
-                options['add']['download_dir'] = os.path.expanduser(opt_dic['path'] % entry)
-            except KeyError, e:
-                log.error("Could not set path for %s: does not contain the field '%s.'" % (entry['title'], e))
+            opt_dic['path'] = replace_from_entry(opt_dic['path'], entry, 'path', log.error)
+            if opt_dic['path']:
+                options['add']['download_dir'] = os.path.expanduser(opt_dic['path'])
         if 'addpaused' in opt_dic and opt_dic['addpaused']:
             options['add']['paused'] = True
         if 'maxconnections' in opt_dic:

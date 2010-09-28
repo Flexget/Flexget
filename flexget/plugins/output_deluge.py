@@ -2,6 +2,7 @@ import logging
 import time
 import os
 import base64
+from flexget.utils.tools import replace_from_entry
 from flexget.plugin import *
 
 log = logging.getLogger('deluge')
@@ -191,14 +192,14 @@ class OutputDeluge(object):
             for item in after:
                 # find torrentid of just added torrent
                 if not item in before:
-                    # entry['deluge_torrentid'] = item
+                    movedone = replace_from_entry(movedone, entry, 'movedone', log.error)
                     if movedone:
-                        if not os.path.isdir(os.path.expanduser(movedone % entry)):
-                            log.debug("movedone path %s doesn't exist, creating" % (movedone % entry))
-                            os.makedirs(os.path.expanduser(movedone % entry))
-                        log.debug("%s move on complete set to %s" % (entry['title'], movedone % entry))
+                        if not os.path.isdir(os.path.expanduser(movedone)):
+                            log.debug("movedone path %s doesn't exist, creating" % (movedone))
+                            os.makedirs(os.path.expanduser(movedone))
+                        log.debug("%s move on complete set to %s" % (entry['title'], movedone))
                         sclient.set_torrent_move_on_completed(item, True)
-                        sclient.set_torrent_move_on_completed_path(item, os.path.expanduser(movedone % entry))
+                        sclient.set_torrent_move_on_completed_path(item, os.path.expanduser(movedone))
                     if label:
                         if not "label" in sclient.get_enabled_plugins():
                             sclient.enable_plugin("label")
@@ -399,12 +400,8 @@ class OutputDeluge(object):
                         filedump = base64.encodestring(f.read())
                     finally:
                         f.close()
-                path = ''
-                try:
-                    path = os.path.expanduser(entry.get('path', config['path']) % entry)
-                except KeyError, e:
-                    log.error("Could not set path for %s: does not contain the field '%s.'" % (entry['title'], e))
                 opts = {}
+                path = replace_from_entry(entry.get('path', config['path']), entry, 'path', log.error)
                 if path:
                     opts['download_location'] = path
                 for fopt, dopt in self.options.iteritems():
@@ -426,18 +423,11 @@ class OutputDeluge(object):
 
                 # Make a new set of options, that get set after the torrent has been added
                 opts = {}
-                try:
-                    opts['movedone'] = os.path.expanduser(entry.get('movedone', config['movedone']) % entry)
-                except KeyError, e:
-                    log.error("Could not set movedone for %s: does not contain the field '%s.'" % (entry['title'], e))
-                    opts['movedone'] = ''
+                opts['movedone'] = replace_from_entry(entry.get('movedone', config['movedone']), entry, 'movedone', log.error)
                 opts['label'] = entry.get('label', config['label']).lower()
                 opts['queuetotop'] = entry.get('queuetotop', config.get('queuetotop'))
-                try:
-                    opts['content_filename'] = entry.get('content_filename', config.get('content_filename', '')) % entry
-                except KeyError, e:
-                    log.error("Could not set content_filename for %s: does not contain the field '%s.'" % (entry['title'], e))
-                    opts['content_filename'] = ''
+                content_filename = entry.get('content_filename', config.get('content_filename', ''))
+                opts['content_filename'] = replace_from_entry(content_filename, entry, 'content_filename', log.error)
 
                 addresult.addCallbacks(on_success, on_fail, callbackArgs=(entry, opts), errbackArgs=(feed, entry))
                 dlist.append(addresult)

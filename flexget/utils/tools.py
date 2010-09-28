@@ -222,3 +222,19 @@ def urlopener(url, log, **kwargs):
     log.warning('Could not retrieve url: %s' % url)
     socket.setdefaulttimeout(oldtimeout)
     raise urllib2.URLError("Could not retrieve url after 3 retries.")
+
+
+def replace_from_entry(field, entry, field_name, logger, default=''):
+    """This is a helper function to do string replacement from an entry dict. 
+    It catches exceptions from the string replacement and prints errors to the given log.
+    field_name is the description to use when printing the error.
+    Returns the result of the replacemnt, or default if there is an error."""
+    try:
+        result = field % entry
+    except KeyError, e:
+        logger("Could not set %s for %s: does not contain the field '%s'." % (field_name, entry['title'], e))
+        result = default
+    except ValueError, e:
+        from flexget.plugin import PluginError
+        raise PluginError("%s has invalid string replacement: %s: %s" % (field_name, e, field))
+    return result

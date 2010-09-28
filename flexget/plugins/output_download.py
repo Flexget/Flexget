@@ -8,7 +8,7 @@ import filecmp
 import zlib
 from flexget.plugin import *
 from httplib import BadStatusLine
-from flexget.utils.tools import urlopener
+from flexget.utils.tools import urlopener, replace_from_entry
 import mimetypes
 
 log = logging.getLogger('download')
@@ -333,11 +333,9 @@ class PluginDownload:
                         self.filename_ext_from_mime(entry)
 
             # expand variables in path
-            try:
-                path = os.path.expanduser(path % entry)
-            except KeyError, e:
-                feed.fail(entry, "Could not set path for %s: does not contain the field '%s'." % (entry['title'], e))
-                log.error("Download Failed: Couldn't set path for %s. Does not contain field '%s'." % (entry['title'], e))
+            path = replace_from_entry(path, entry, 'path', log.error)
+            if not path:
+                feed.fail(entry, 'Could not set path. Does not contain all fields for string replacement.')
                 return
 
             # make path

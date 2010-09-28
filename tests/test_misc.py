@@ -144,28 +144,6 @@ class TestDownload(FlexGetBase):
         assert os.path.exists(self.testfile), 'download file does not exists'
 
 
-class TestMetainfoQuality(FlexGetBase):
-
-    __yaml__ = """
-        feeds:
-          test:
-            mock:
-              - {title: 'FooBar.S01E02.720p.HDTV'}
-              - {title: 'ShowB.S04E19.Name of Ep.720p.WEB-DL.DD5.1.H.264'}
-    """
-
-    def test_quality(self):
-        self.execute_feed('test')
-        entry = self.feed.find_entry(title='FooBar.S01E02.720p.HDTV')
-        assert entry, 'entry not found?'
-        assert 'quality' in entry, 'failed to pick up quality'
-        assert entry['quality'] == '720p', 'picked up wrong quality %s' % entry.get('quality', None)
-        entry = self.feed.find_entry(title='ShowB.S04E19.Name of Ep.720p.WEB-DL.DD5.1.H.264')
-        assert entry, 'entry not found?'
-        assert 'quality' in entry, 'failed to pick up quality'
-        assert entry['quality'] == 'web-dl', 'picked up wrong quality %s' % entry.get('quality', None)
-
-
 class TestFilterQuality(FlexGetBase):
 
     __yaml__ = """
@@ -293,3 +271,31 @@ class TestHtmlUtils(object):
         from flexget.utils.tools import encode_html
         print encode_html('<3')
         assert encode_html('<3') == '&lt;3'
+
+
+class TestSetPlugin(FlexGetBase):
+
+    __yaml__ = """
+        feeds:
+          test:
+            mock:
+              - {title: 'Entry 1'}
+            set:
+              thefield: TheValue
+          test2:
+            mock:
+              - {title: 'Entry 1', series_name: 'Value'}
+              - {title: 'Entry 2'}
+            set:
+              field: 'The%(series_name)s'
+    """
+    
+    def test_set(self):
+        self.execute_feed('test')
+        assert self.feed.find_entry('entries', title='Entry 1')['thefield'] == 'TheValue'
+
+    def test_string_replacement(self):
+        self.execute_feed('test2')
+        assert self.feed.find_entry('entries', title='Entry 1')['field'] == 'TheValue'
+        # The string repalcement should fail, an error will be shown, and the field will get a blank value.
+        assert self.feed.find_entry('entries', title='Entry 2')['field'] == ''
