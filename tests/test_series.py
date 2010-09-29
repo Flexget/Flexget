@@ -74,7 +74,17 @@ class TestQuality(FlexGetBase):
               - {'title': 'Description.S01E01', 'description': 'The quality should be 720p'}
             series:
               - description: {quality: 720p}
-              
+
+          quality_from_group:
+            mock:
+              - {title: 'GroupQual.S01E01.HDTV.XViD-FlexGet'}
+              - {title: 'GroupQual.S01E01.PDTV.XViD-FlexGet'}
+              - {title: 'GroupQual.S01E01.DSR.XViD-FlexGet'}
+              - {title: 'GroupQual.S01E01.1080p.XViD-FlexGet'}
+              - {title: 'GroupQual.S01E01.720p.XViD-FlexGet'}
+            series:
+              720P:
+              - GroupQual
     """
 
     def test_best_quality(self):
@@ -114,6 +124,13 @@ class TestQuality(FlexGetBase):
         """Series plugin: quality from description"""
         self.execute_feed('description_quality')
         assert len(self.feed.accepted) == 1, 'should have accepted'
+
+    def test_group_quality(self):
+        """Series plugin: quality from group name"""
+        self.execute_feed('quality_from_group')
+        assert self.feed.find_entry('accepted', title='GroupQual.S01E01.720p.XViD-FlexGet'), \
+            'GroupQual.S01E01.720p.XViD-FlexGet should have been accepted'
+        assert len(self.feed.accepted) == 1, 'should have accepted only one'
 
 
 class TestDatabase(FlexGetBase):
