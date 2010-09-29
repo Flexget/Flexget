@@ -402,3 +402,9 @@ class TestSeriesParser(object):
 
         s = self.parse(name='Something', data='Something 62 [293A8395]')
         assert (s.id == '62'), 'failed to parse %s' % s.data
+
+    def test_ticket_700(self):
+        """SeriesParser: Series with confusing name"""
+        s = self.parse(name='Something', data='Something 9x02 - Episode 2')
+        assert s.season == 9, 'failed to parse season'
+        assert s.episode == 2, 'failed to parse episode'
