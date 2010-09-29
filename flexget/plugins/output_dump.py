@@ -19,7 +19,7 @@ class OutputDump(object):
             return
         #from flexget.utils.tools import sanitize
         #import yaml
-        
+
         def dump(values):
             for entry in values:
                 #c = entry.copy()
@@ -32,9 +32,9 @@ class OutputDump(object):
                     elif isinstance(value, int) or isinstance(value, float):
                         print '%-15s: %s' % (field, value)
                     else:
-                        print '%-15s: [not printable]' % field
+                        print '%-15s: [not printable] (%s)' % (field, value)
                 print ''
-                
+
         if feed.entries:
             print '-- Entries: ----------------------------'
             dump(feed.entries)
@@ -44,6 +44,6 @@ class OutputDump(object):
         if feed.rejected:
             print '-- Rejected: ---------------------------'
             dump(feed.rejected)
-            
+
 register_plugin(OutputDump, 'dump', builtin=True)
 register_parser_option('--dump', action='store_true', dest='dump_entries', default=False, help=SUPPRESS_HELP)

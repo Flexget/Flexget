@@ -10,9 +10,9 @@ class FilterImdb(object):
         This plugin allows filtering based on IMDB score, votes and genres etc.
 
         Configuration:
-        
+
         Note: All parameters are optional. Some are mutually exclusive.
-    
+
         min_score: <num>
         min_votes: <num>
         min_year: <num>
@@ -43,12 +43,12 @@ class FilterImdb(object):
         # accept all movies by these directors
         accept_directors:
             - nm0000318
-   
+
         # reject movies by these directors
         reject_directors:
-            - nm0093051       
+            - nm0093051
     """
-    
+
     def validator(self):
         """Validate given configuration"""
         from flexget import validator
@@ -67,12 +67,12 @@ class FilterImdb(object):
 
     def on_feed_filter(self, feed):
         config = feed.config['imdb']
-        
+
         lookup = get_plugin_by_name('imdb_lookup').instance.lookup
-        
+
         for entry in feed.entries:
             force_accept = False
-            
+
             try:
                 lookup(feed, entry)
             except PluginError, e:
@@ -81,7 +81,7 @@ class FilterImdb(object):
                 if not log_once(msg, logger=log):
                     feed.verbose_progress(msg, log)
                 continue
-            
+
             # Check defined conditions, TODO: rewrite into functions?
             reasons = []
             if 'min_score' in config:
@@ -121,7 +121,7 @@ class FilterImdb(object):
                     if actor_id in rejected or actor_name in rejected:
                         reasons.append('reject_actors %s' % actor_name or actor_id)
                         break
-                    
+
             # Accept if actors contains an accepted actor, but don't reject otherwise
             if 'accept_actors' in config:
                 accepted = config['accept_actors']
@@ -137,7 +137,7 @@ class FilterImdb(object):
                     if director_id in rejected or director_name in rejected:
                         reasons.append('reject_directors %s' % director_name or director_id)
                         break
-                    
+
             # Accept if the director is in the accept list, but do not reject if the director is unknown
             if 'accept_directors' in config:
                 accepted = config['accept_directors']
@@ -155,7 +155,7 @@ class FilterImdb(object):
                 else:
                     log_once(msg, log)
             else:
-                log.debug('Accepting %s' % (entry))
+                log.debug('Accepting %s' % (entry['title']))
                 feed.accept(entry)
 
 register_plugin(FilterImdb, 'imdb')

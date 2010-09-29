@@ -154,11 +154,12 @@ class SeriesPlugin(object):
                     return True
 
         for episode in series.episodes:
-            if episode_downloaded(episode) and episode.season >= latest_season and episode.number > latest_episode:
+            if episode_downloaded(episode) and ((episode.number > latest_episode and episode.season >= latest_season) \
+               or episode.season > latest_season):
                 latest_season = episode.season
                 latest_episode = episode.number
 
-        if latest_season == 0 or latest_episode == 0:
+        if latest_season == 0 and latest_episode == 0:
             log.debug('get_latest_download returning false, latest_season: %s latest_episode: %s' % (latest_season, latest_episode))
             return False
 

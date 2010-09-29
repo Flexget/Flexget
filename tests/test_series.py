@@ -255,13 +255,25 @@ class TestEpisodeAdvancement(FlexGetBase):
 
           test_forwards_1:
             mock:
-              - {title: 'forwards s01e12'}
+              - {title: 'forwards s01e01'}
             series:
               - forwards
 
           test_forwards_2:
             mock:
-              - {title: 'forwards s03e10'}
+              - {title: 'forwards s02e01'}
+            series:
+              - forwards
+              
+          test_forwards_3:
+            mock:
+              - {title: 'forwards s03e01'}
+            series:
+              - forwards
+              
+          test_forwards_4:
+            mock:
+              - {title: 'forwards s05e01'}
             series:
               - forwards
 
@@ -298,12 +310,17 @@ class TestEpisodeAdvancement(FlexGetBase):
     def test_forwards(self):
         """Series plugin: episode advancement (future)"""
         self.execute_feed('test_forwards_1')
-        assert self.feed.find_entry('accepted', title='forwards s01e12'), \
-            'forwards s01e12 should have been accepted'
-
+        assert self.feed.find_entry('accepted', title='forwards s01e01'), \
+            'forwards s01e01 should have been accepted'
         self.execute_feed('test_forwards_2')
-        assert self.feed.find_entry('rejected', title='forwards s03e10'), \
-            'forwards s03e10 should have been rejected, too new'
+        assert self.feed.find_entry('accepted', title='forwards s02e01'), \
+            'forwards s02e01 should have been accepted'
+        self.execute_feed('test_forwards_3')
+        assert self.feed.find_entry('accepted', title='forwards s03e01'), \
+            'forwards s03e01 should have been accepted'
+        self.execute_feed('test_forwards_4')
+        assert self.feed.find_entry('rejected', title='forwards s05e01'), \
+            'forwards s02e01 should have been rejected'
 
     def test_unordered(self):
         """Series plugin: unordered episode advancement"""
