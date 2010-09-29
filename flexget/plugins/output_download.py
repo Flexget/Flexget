@@ -334,6 +334,7 @@ class PluginDownload:
 
             # expand variables in path
             path = replace_from_entry(path, entry, 'path', log.error)
+            path = os.path.expanduser(path)
             if not path:
                 feed.fail(entry, 'Could not set path. Does not contain all fields for string replacement.')
                 return

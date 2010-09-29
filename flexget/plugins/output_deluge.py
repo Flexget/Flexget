@@ -193,13 +193,14 @@ class OutputDeluge(object):
                 # find torrentid of just added torrent
                 if not item in before:
                     movedone = replace_from_entry(movedone, entry, 'movedone', log.error)
+                    movedone = os.path.expanduser(movedone)
                     if movedone:
-                        if not os.path.isdir(os.path.expanduser(movedone)):
+                        if not os.path.isdir(movedone):
                             log.debug("movedone path %s doesn't exist, creating" % (movedone))
-                            os.makedirs(os.path.expanduser(movedone))
+                            os.makedirs(movedone)
                         log.debug("%s move on complete set to %s" % (entry['title'], movedone))
                         sclient.set_torrent_move_on_completed(item, True)
-                        sclient.set_torrent_move_on_completed_path(item, os.path.expanduser(movedone))
+                        sclient.set_torrent_move_on_completed_path(item, movedone)
                     if label:
                         if not "label" in sclient.get_enabled_plugins():
                             sclient.enable_plugin("label")
@@ -403,7 +404,7 @@ class OutputDeluge(object):
                 opts = {}
                 path = replace_from_entry(entry.get('path', config['path']), entry, 'path', log.error)
                 if path:
-                    opts['download_location'] = path
+                    opts['download_location'] = os.path.expanduser(path)
                 for fopt, dopt in self.options.iteritems():
                     value = entry.get(fopt, config.get(fopt))
                     if value is not None:
@@ -424,6 +425,7 @@ class OutputDeluge(object):
                 # Make a new set of options, that get set after the torrent has been added
                 opts = {}
                 opts['movedone'] = replace_from_entry(entry.get('movedone', config['movedone']), entry, 'movedone', log.error)
+                opts['movedone'] = os.path.expanduser(opts['movedone'])
                 opts['label'] = entry.get('label', config['label']).lower()
                 opts['queuetotop'] = entry.get('queuetotop', config.get('queuetotop'))
                 content_filename = entry.get('content_filename', config.get('content_filename', ''))
