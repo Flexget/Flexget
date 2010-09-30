@@ -470,6 +470,20 @@ class OutputDeluge(object):
         d.addCallback(on_connect_success, feed).addErrback(on_connect_fail, feed)
         start_reactor()
 
+    def on_feed_exit(self, feed):
+        """Make sure all temp files are cleaned up when feed exits"""
+        # If download plugin is enabled, it will handle cleanup.
+        if not 'download' in feed.config:
+            download = get_plugin_by_name('download')
+            download.instance.cleanup_temp_files(feed)
+
+    def on_feed_abort(self, feed):
+        """Make sure all temp files are cleaned up when feed is aborted."""
+        # If download plugin is enabled, it will handle cleanup.
+        if not 'download' in feed.config:
+            download = get_plugin_by_name('download')
+            download.instance.cleanup_temp_files(feed)
+
     def on_process_end(self, feed):
         """Shut down the twisted reactor after all feeds have run."""
         if self.deluge12 and self.reactorRunning == 2:

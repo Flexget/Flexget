@@ -334,10 +334,10 @@ class PluginDownload:
 
             # expand variables in path
             path = replace_from_entry(path, entry, 'path', log.error)
-            path = os.path.expanduser(path)
             if not path:
                 feed.fail(entry, 'Could not set path. Does not contain all fields for string replacement.')
                 return
+            path = os.path.expanduser(path)
 
             # make path
             if not os.path.isdir(path):
@@ -395,6 +395,23 @@ class PluginDownload:
                 log.debug('removing temp file %s from %s' % (entry['file'], entry['title']))
                 os.remove(entry['file'])
             del(entry['file'])
+
+    def on_feed_exit(self, feed):
+        """Make sure all temp files are cleaned up when feed exits"""
+        self.cleanup_temp_files(feed)
+
+    def on_feed_abort(self, feed):
+        """Make sure all temp files are cleaned up when feed is aborted."""
+        self.cleanup_temp_files(feed)
+
+    def cleanup_temp_files(self, feed):
+        """Checks all entries for leftover temp files and deletes them."""
+        for entry in feed.entries + feed.rejected + feed.failed:
+            if entry.get('file'):
+                if os.path.exists(entry['file']):
+                    log.debug('removing temp file %s from %s' % (entry['file'], entry['title']))
+                    os.remove(entry['file'])
+                del(entry['file'])
 
 register_plugin(PluginDownload, 'download')
 register_parser_option('--dl-path', action='store', dest='dl_path', default=False,

@@ -294,4 +294,18 @@ class PluginTransmissionrpc:
         if len(remove_ids) > 0:
             cli.remove(remove_ids)
 
+    def on_feed_exit(self, feed):
+        """Make sure all temp files are cleaned up when feed exits"""
+        # If download plugin is enabled, it will handle cleanup.
+        if not 'download' in feed.config:
+            download = get_plugin_by_name('download')
+            download.instance.cleanup_temp_files(feed)
+
+    def on_feed_abort(self, feed):
+        """Make sure all temp files are cleaned up when feed is aborted."""
+        # If download plugin is enabled, it will handle cleanup.
+        if not 'download' in feed.config:
+            download = get_plugin_by_name('download')
+            download.instance.cleanup_temp_files(feed)
+
 register_plugin(PluginTransmissionrpc, 'transmissionrpc')
