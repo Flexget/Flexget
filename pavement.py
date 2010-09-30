@@ -14,7 +14,7 @@ setup(
     author='Marko Koivusalo',
     author_email='marko.koivusalo@gmail.com',
     url='http://flexget.com',
-    install_requires=['FeedParser', 'SQLAlchemy>0.5', 'PyYAML', 'BeautifulSoup', 'html5lib>=0.11', 'pygooglechart', \
+    install_requires=['FeedParser', 'SQLAlchemy>0.5', 'PyYAML', 'BeautifulSoup', 'html5lib>=0.11', \
                       'PyRSS2Gen', 'pynzb', 'progressbar'],
     packages=['flexget', 'flexget.plugins', 'flexget.utils', 'flexget.utils.titles'],
     package_data=find_package_data('flexget', package='flexget', only_in_packages=False),
