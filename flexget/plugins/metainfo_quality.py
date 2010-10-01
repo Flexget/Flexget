@@ -27,13 +27,16 @@ class MetainfoQuality(object):
             for field_name, field_value in entry.iteritems():
                 if not isinstance(field_value, basestring):
                     continue
+                # ignore some fields ...
+                if field_name in ['feed']:
+                    continue
                 quality = qualities.parse_quality(field_value)
                 if quality > best_quality:
                     best_quality = quality
                     best_field = field_name
             entry['quality'] = best_quality.name
             log.log(5, 'Found quality %s (%s) for %s from field %s' % \
-            (entry['quality'], best_quality, entry['title'], best_field))
+                (entry['quality'], best_quality, entry['title'], best_field))
                             
             
 register_plugin(MetainfoQuality, 'metainfo_quality', builtin=True)
