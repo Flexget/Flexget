@@ -407,7 +407,7 @@ class PluginDownload:
     def cleanup_temp_files(self, feed):
         """Checks all entries for leftover temp files and deletes them."""
         for entry in feed.entries + feed.rejected + feed.failed:
-            if entry.get('file'):
+            if 'file' in entry:
                 if os.path.exists(entry['file']):
                     log.debug('removing temp file %s from %s' % (entry['file'], entry['title']))
                     os.remove(entry['file'])

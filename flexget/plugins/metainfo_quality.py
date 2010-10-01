@@ -28,7 +28,7 @@ class MetainfoQuality(object):
                 if not isinstance(field_value, basestring):
                     continue
                 # ignore some fields ...
-                if field_name in ['feed']:
+                if field_name in ['feed', 'uid']:
                     continue
                 quality = qualities.parse_quality(field_value)
                 if quality > best_quality:
