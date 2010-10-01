@@ -7,6 +7,8 @@ from input_rss import InputRSS
 from flexget.plugin import *
 from flexget.utils.tools import urlopener
 from flexget.utils.soup import get_soup
+from flexget.plugins.cached_input import cached
+
 
 log = logging.getLogger('apple_trailers')
 
@@ -17,7 +19,7 @@ class AppleTrailers(InputRSS):
 
         apple_trailers: 480p
 
-        Choice of quality if one of: ipod, 320, 480, 640w, 480p, 720p, 1080p
+        Choice of quality is one of: ipod, '320', '480', 640w, 480p, 720p, 1080p
     """
 
     def __init__(self):
