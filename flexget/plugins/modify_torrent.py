@@ -25,6 +25,7 @@ class Torrent(object):
 
         # decoded torrent structure
         self.content = self.decode(content)
+        self.modified = False
 
     def get_filelist(self):
         """Return array containing fileinfo dictionaries (name, length, path)"""
@@ -85,12 +86,14 @@ class Torrent(object):
 
     def set_comment(self, comment):
         self.content['comment'] = comment
+        self.modified = True
 
     def remove_multitracker(self, tracker):
         """Removes passed multi-tracker from this torrent"""
         for tl in self.content.get('announce-list', [])[:]:
             try:
                 tl.remove(tracker)
+                self.modified = True
                 # if no trackers left in list, remove whole list
                 if not tl:
                     self.content['announce-list'].remove(tl)
@@ -101,6 +104,7 @@ class Torrent(object):
         """Appends multi-tracker to this torrent"""
         self.content.setdefault('announce-list', [])
         self.content['announce-list'].append(tracker)
+        self.modified = True
 
     def __str__(self):
         return '<Torrent instance. Files: %s>' % self.get_filelist()
@@ -189,7 +193,7 @@ class TorrentFilename(object):
 
     @priority(255)
     def on_feed_modify(self, feed):
-        for entry in feed.accepted + [i for i in feed.entries if i not in feed.accepted]:
+        for entry in feed.entries:
             # skip if entry does not have file assigned
             if not 'file' in entry:
                 log.log(5, '%s doesn\'t have a file associated' % entry['title'])
@@ -239,6 +243,17 @@ class TorrentFilename(object):
                     entry['filename'] = self.make_filename(torrent, entry)
             except Exception, e:
                 log.exception(e)
+
+    @priority(255)
+    def on_feed_output(self, feed):
+        for entry in feed.entries:
+            if 'torrent' in entry:
+                if entry['torrent'].modified:
+                    # re-write data into a file
+                    log.debug('Writing modified torrent file for %s' % entry['title'])
+                    f = open(entry['file'], 'w+')
+                    f.write(entry['torrent'].encode())
+                    f.close()
 
     def make_filename(self, torrent, entry):
         """Build a filename for this torrent"""

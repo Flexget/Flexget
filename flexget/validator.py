@@ -383,8 +383,14 @@ class PathValidator(TextValidator):
 class UrlValidator(TextValidator):
     name = 'url'
 
+    def __init__(self, parent=None, **kwargs):
+        self.protocols = ['ftp', 'http', 'https']
+        if 'protocols' in kwargs:
+            self.protocols = kwargs['protocols']
+        Validator.__init__(self, parent, **kwargs)
+
     def validate(self, data):
-        regexp = '(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?'
+        regexp = '(' + '|'.join(self.protocols) + '):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?'
         if not isinstance(data, basestring):
             self.errors.add('expecting text')
             return False
