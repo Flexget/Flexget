@@ -166,9 +166,9 @@ class ChoiceValidator(Validator):
         Validator.__init__(self, parent, **kwargs)
 
     def accept(self, value, **kwargs):
-        if not isinstance(value, basestring):
-            raise Exception('Choice validator only accepts strings')
-        if kwargs.get('ignore_case'):
+        if not isinstance(value, (basestring, int, float)):
+            raise Exception('Choice validator only accepts strings and numbers')
+        if isinstance(value, basestring) and kwargs.get('ignore_case'):
             self.valid_ic.append(value.lower())
         else:
             self.valid.append(value)
@@ -178,13 +178,16 @@ class ChoiceValidator(Validator):
             self.accept(value, **kwargs)
 
     def validateable(self, data):
-        return isinstance(data, basestring)
+        return isinstance(data, (basestring, int, float))
 
     def validate(self, data):
-        if data in self.valid or data.lower() in self.valid_ic:
+        if data in self.valid:
+            return True
+        elif isinstance(data, basestring) and data.lower() in self.valid_ic:
             return True
         else:
-            self.errors.add("'%s' is not one of acceptable values: %s" % (data, ', '.join(self.valid + self.valid_ic)))
+            acceptable = [str(value) for value in self.valid + self.valid_ic]
+            self.errors.add("'%s' is not one of acceptable values: %s" % (data, ', '.join(acceptable)))
             return False
 
 
