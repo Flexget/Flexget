@@ -32,7 +32,7 @@ class AddTrackers(object):
             if 'torrent' in entry:
                 for url in trackers:
                     if not url in entry['torrent'].get_multitrackers():
-                        entry['torrent'].add_multitracker([url])
+                        entry['torrent'].add_multitracker(url)
                         log.info('Added %s tracker to %s' % (url, entry['title']))
 
 
