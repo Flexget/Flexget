@@ -2,12 +2,10 @@ import re
 import logging
 from flexget.plugin import *
 
-__pychecker__ = 'unusednames=parser'
-
 log = logging.getLogger('modify_trackers')
 
 
-class AddTrackers:
+class AddTrackers(object):
 
     """
         Adds tracker URL to torrent files.
@@ -38,7 +36,7 @@ class AddTrackers:
                         log.info('Added %s tracker to %s' % (url, entry['title']))
 
 
-class RemoveTrackers:
+class RemoveTrackers(object):
 
     """
         Removes trackers from torrent files using regexp matching.
@@ -55,7 +53,7 @@ class RemoveTrackers:
     def validator(self):
         from flexget import validator
         trackers = validator.factory('list')
-        trackers.accept('text')
+        trackers.accept('regexp')
         return trackers
 
     def on_feed_modify(self, feed):
