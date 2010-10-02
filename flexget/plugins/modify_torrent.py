@@ -103,7 +103,7 @@ class Torrent(object):
     def add_multitracker(self, tracker):
         """Appends multi-tracker to this torrent"""
         self.content.setdefault('announce-list', [])
-        self.content['announce-list'].append(tracker)
+        self.content['announce-list'].append([tracker])
         self.modified = True
 
     def __str__(self):
