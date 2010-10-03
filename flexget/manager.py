@@ -187,7 +187,7 @@ class Manager(object):
             if indentation <= prev_indentation + 2 and prev_mapping and prev_list:
                 log.warning('Config line %s is not indented enough' % line_num)
             if prev_mapping and indentation <= prev_indentation:
-                # after opening a map, indentation decreases
+                # after opening a map, indentation doesn't increase
                 log.warning('Config line %s is indented incorrectly (previous line ends with ":")' % line_num)
 
             # notify if user is trying to set same key multiple times in a feed (a common mistake)
@@ -196,13 +196,11 @@ class Manager(object):
                 if indentation < level:
                     duplicates[level] = {}
             if ':' in line:
-                # Check that : is not embedded in a string, like 'd:\files'
-                if not line.split(':', 1)[1] or line.split(':', 1)[1].startswith(' '):
-                    name = line.split(':', 1)[0].strip()
-                    ns = duplicates.setdefault(indentation, {})
-                    if name in ns:
-                        log.warning('Trying to set value for `%s` in line %s, but it is already defined in line %s!' % (name, line_num, ns[name]))
-                    ns[name] = line_num
+                name = line.split(':', 1)[0].strip()
+                ns = duplicates.setdefault(indentation, {})
+                if name in ns:
+                    log.warning('Trying to set value for `%s` in line %s, but it is already defined in line %s!' % (name, line_num, ns[name]))
+                ns[name] = line_num
 
             prev_indentation = indentation
             # this line is a mapping (ends with :)
@@ -210,6 +208,9 @@ class Manager(object):
             prev_scalar = line[-1] in '|>'
             # this line is a list
             prev_list = line.strip()[0] == '-'
+            if prev_list:
+                # This line is in a list, so clear the duplicates, as duplicates are not always wrong in a list. see #697
+                duplicates[indentation] = {}
 
         file.close()
         log.debug('Pre-checked %s configuration lines' % line_num)
