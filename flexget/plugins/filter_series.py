@@ -552,7 +552,7 @@ class FilterSeries(SeriesPlugin):
                 # at least empty settings
                 config['settings'][group_name] = {}
                 # if known quality, convenience create settings with that quality
-                if group_name.lower() in qualities.registry:
+                if isinstance(group_name, basestring) and group_name.lower() in qualities.registry:
                     config['settings'][group_name]['quality'] = group_name
 
         # generate groups from settings groups

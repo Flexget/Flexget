@@ -84,7 +84,10 @@ class TestQuality(FlexGetBase):
               - {title: 'GroupQual.S01E01.720p.XViD-FlexGet'}
             series:
               720P:
-              - GroupQual
+                - GroupQual
+              #Test that an integer group name doesn't cause an exception.
+              1080:
+                - Test
     """
 
     def test_best_quality(self):
