@@ -29,9 +29,10 @@ class Manipulate(object):
         root = validator.factory()
         bundle = root.accept('list').accept('dict')
         # prevent invalid indentation level
-        bundle.reject_keys(['from', 'extract', 'replace'],
+        bundle.reject_keys(['from', 'extract', 'replace', 'event'],
             'Option \'$key\' has invalid indentation level. It needs 2 more spaces.')
         edit = bundle.accept_any_key('dict')
+        edit.accept('choice', key='event').accept_choices(['metainfo', 'filter'], ignore_case=True)
         edit.accept('text', key='from')
         edit.accept('regexp', key='extract')
         replace = edit.accept('dict', key='replace')
@@ -39,15 +40,29 @@ class Manipulate(object):
         replace.accept('text', key='format', required=True)
         return root
 
+    def on_process_start(self, feed):
+        """Separates the config into a dict with a list of jobs per event."""
+        config = feed.config['manipulate']
+        self.event_jobs = {'filter': [], 'metainfo': []}
+        for item in config:
+            for item_config in item.itervalues():
+                # TODO: The default event is the filter event to maintain old behavior, but maybe it should be metainfo.
+                event = item_config.get('event', 'filter')
+                self.event_jobs[event].append(item)
+
+    @priority(255)
+    def on_feed_metainfo(self, feed):
+        for entry in feed.entries:
+            self.process(feed, entry, self.event_jobs['metainfo'])
+            
     @priority(255)
     def on_feed_filter(self, feed):
         for entry in feed.entries + feed.rejected:
-            self.process(feed, entry)
+            self.process(feed, entry, self.event_jobs['filter'])
 
-    def process(self, feed, entry):
-        config = feed.config['manipulate']
+    def process(self, feed, entry, jobs):
 
-        for item in config:
+        for item in jobs:
             for field, config in item.iteritems():
                 from_field = field
                 if 'from' in config:
@@ -59,7 +74,7 @@ class Manipulate(object):
                     if not field_value:
                         log.warning('Cannot extract, field %s is not present' % from_field)
                         continue
-                    match = re.match(config['extract'], field_value)
+                    match = re.search(config['extract'], field_value)
                     if match:
                         groups = [x for x in match.groups() if x is not None]
                         log.debug('groups: %s' % groups)
