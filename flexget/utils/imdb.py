@@ -268,7 +268,7 @@ class ImdbParser(object):
             self.genres.append(link.contents[0].lower())
 
         # get languages
-        for link in soup.findAll('a', attrs={'href': re.compile('^/Sections/Languages/')}):
+        for link in soup.findAll('a', attrs={'href': re.compile('^/language/')}):
             lang = link.contents[0].lower()
             if not lang in self.languages:
                 self.languages.append(lang.strip())

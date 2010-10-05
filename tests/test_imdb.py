@@ -53,6 +53,26 @@ class TestImdb(FlexGetBase):
               - {title: 'Battlefield Earth', imdb_url: 'http://www.imdb.com/title/tt0185183/'}
             imdb:
               min_score: 5.0
+
+          genre:
+            mock:
+              - {title: 'The Matrix', imdb_url: 'http://www.imdb.com/title/tt0133093/'}
+              - {title: 'Terms of Endearment', imdb_url: 'http://www.imdb.com/title/tt0086425/'}
+            imdb:
+              reject_genres:
+                - drama
+            # No accept_genres?!
+            accept_all: yes
+
+          language:
+            mock:
+              - {title: 'The Matrix', imdb_url: 'http://www.imdb.com/title/tt0133093/'}
+              - {title: '22 Bullets', imdb_url: 'http://www.imdb.com/title/tt1167638/'}
+            imdb:
+              accept_languages:
+                - english
+              reject_languages:
+                - french
     """
 
     @attr(online=True)
@@ -125,6 +145,34 @@ class TestImdb(FlexGetBase):
             'The Matrix should\'ve been accepted'
         assert not self.feed.find_entry('accepted', title='Battlefield Earth'), \
             'Battlefield Earth shouldn\'t have been accepted'
+
+    @attr(online=True)
+    def test_genre(self):
+        self.execute_feed('genre')
+        matrix = (self.feed.find_entry(imdb_name='The Matrix')['imdb_genres'])
+        assert matrix == ['action', 'adventure', 'sci-fi'], \
+            'Could not find genres for The Matrix'
+        toe = (self.feed.find_entry(imdb_name='Terms of Endearment')['imdb_genres'])
+        assert toe == ['romance', 'comedy', 'drama'], \
+            'Could not find genres for Terms of Endearment'
+        assert self.feed.find_entry('accepted', imdb_name='The Matrix'), \
+            'The Matrix should\'ve been accepted'
+        assert not self.feed.find_entry('rejected', title='Terms of Endearment'), \
+            'Terms of Endearment should have been rejected'
+
+    @attr(online=True)
+    def test_language(self):
+        self.execute_feed('language')
+        matrix = (self.feed.find_entry(imdb_name='The Matrix')['imdb_languages'])
+        assert matrix == ['english'], \
+            'Could not find languages for The Matrix'
+        bullets = (self.feed.find_entry(imdb_name='22 Bullets')['imdb_languages'])
+        assert bullets == ['french'], \
+            'Could not find languages for 22 Bullets'
+        assert self.feed.find_entry('accepted', imdb_name='The Matrix'), \
+            'The Matrix should\'ve been accepted'
+        assert not self.feed.find_entry('rejected', title='22 Bullets'), \
+            '22 Bullets should have been rejected'
 
 
 class TestImdbRequired(FlexGetBase):
