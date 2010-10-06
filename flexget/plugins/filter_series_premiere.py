@@ -2,12 +2,25 @@ import logging
 import re
 from flexget.utils.titles import SeriesParser
 from flexget.utils import qualities
+from flexget.manager import Base, Session
+from sqlalchemy import Column, Integer, Unicode
 from flexget.plugin import *
 
 log = logging.getLogger('series_premiere')
 
 
-class SeriesPremiere(object):
+class SeriesPremiere(Base):
+
+    __tablename__ = 'series_premieres'
+
+    id = Column(Integer, primary_key=True)
+    series_name = Column(Unicode, index=True)
+
+    def __repr__(self):
+        return '<series_premieres(series_name=%s)>' % (self.series_name)
+
+
+class FilterSeriesPremiere(object):
     """
     Accept an entry that appears to be the first episode of any series.
 
@@ -27,6 +40,7 @@ class SeriesPremiere(object):
 
     TODO:
         - integrate thetvdb to allow refining by genres, etc.
+        - handle propers
     """
 
     # Run after filter_series which has the default priority of 128.
@@ -48,7 +62,7 @@ class SeriesPremiere(object):
         elif isinstance(config, bool):
             config = {'enabled': config}
         return config
-        
+
     def on_feed_filter(self, feed):
         config = self.get_config(feed)
         # Store found premieres in {series_name: (quality, entry)} format
@@ -69,15 +83,29 @@ class SeriesPremiere(object):
 
             found_premieres[entry['series_name']] = (qual, entry)
 
+        if not len(found_premieres):
+            return
+
+        session = Session()
+
         # Accept all the premieres we found
         for entry in [e[1] for e in found_premieres.itervalues()]:
+            premiere = session.query(SeriesPremiere).filter(SeriesPremiere.series_name == unicode(entry['series_name'])).first()
+            if premiere:
+                continue
+
             if 'path' in config:
                 try:
                     path = config['path'] % entry
                     entry['path'] = path
                 except KeyError, e:
                     log.error("Could not set path for %s: does not contain the field '%s'." % (entry['title'], e))
+
             feed.accept(entry, 'series premiere episode')
             log.debug("Premiere found for: %s" % (entry['series_name']))
 
-register_plugin(SeriesPremiere, 'series_premiere')
+            premiere = SeriesPremiere()
+            premiere.series_name = unicode(entry['series_name'])
+            session.add(premiere)
+
+register_plugin(FilterSeriesPremiere, 'series_premiere')
