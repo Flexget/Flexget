@@ -83,7 +83,7 @@ class FilterSeriesPremiere(object):
 
             found_premieres[entry['series_name']] = (qual, entry)
 
-        if not len(found_premieres):
+        if not found_premieres:
             return
 
         # Accept all the premieres we found
