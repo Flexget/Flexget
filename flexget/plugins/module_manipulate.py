@@ -11,6 +11,7 @@ class Manipulate(object):
         
         manipulate:
           - <destination field>:
+              [event]: <event>
               [from]: <source field>
               [extract]: <regexp>
               [replace]:
@@ -46,8 +47,7 @@ class Manipulate(object):
         self.event_jobs = {'filter': [], 'metainfo': []}
         for item in config:
             for item_config in item.itervalues():
-                # TODO: The default event is the filter event to maintain old behavior, but maybe it should be metainfo.
-                event = item_config.get('event', 'filter')
+                event = item_config.get('event', 'metainfo')
                 self.event_jobs[event].append(item)
 
     @priority(255)
