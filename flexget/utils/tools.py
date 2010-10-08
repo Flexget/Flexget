@@ -2,6 +2,7 @@
 
 import sgmllib
 import urllib2
+import httplib
 import socket
 import time
 from htmlentitydefs import name2codepoint
@@ -173,6 +174,19 @@ def merge_dict_from_to(d1, d2):
             d2[k] = copy.deepcopy(v)
 
 
+class SmartRedirectHandler(urllib2.HTTPRedirectHandler):
+
+    def http_error_301(self, req, fp, code, msg, headers):  
+        result = urllib2.HTTPRedirectHandler.http_error_301(self, req, fp, code, msg, headers)              
+        result.status = code
+        return result                                       
+
+    def http_error_302(self, req, fp, code, msg, headers):
+        result = urllib2.HTTPRedirectHandler.http_error_302(self, req, fp, code, msg, headers)              
+        result.status = code                                
+        return result                
+
+
 def urlopener(url, log, **kwargs):
     """Utility function for pulling back a url, with a retry of 3 times, increasing the timeout, etc.
     Should be grabbing all urls this way eventually, to keep error handling code in the same place."""
@@ -183,14 +197,14 @@ def urlopener(url, log, **kwargs):
     oldtimeout = socket.getdefaulttimeout()
     socket.setdefaulttimeout(15.0)
 
-    handlers = []
+    handlers = [SmartRedirectHandler()]
     if urllib2._opener:
         handlers.extend(urllib2._opener.handlers)
     if kwargs.get('handlers'):
         handlers.extend(kwargs['handlers'])
-    if handlers:
+    if len(handlers) > 1:
         handler_names = [h.__class__.__name__ for h in handlers]
-        log.debug('Handlers have been specified for this urlopen: %s' % ', '.join(handler_names))
+        log.debug('Additional handlers have been specified for this urlopen: %s' % ', '.join(handler_names))
     opener = urllib2.build_opener(*handlers).open
     for i in range(3): # retry getting the url up to 3 times.
         if i > 0:
@@ -205,6 +219,9 @@ def urlopener(url, log, **kwargs):
             else:
                 reason = 'N/A'
             log.debug('Failed to retrieve url (try %i/3): %s' % (i + 1, reason))
+        except httplib.IncompleteRead, e:
+            log.critical('Incomplete read - see python bug 6312')
+            break
         else:
             socket.setdefaulttimeout(oldtimeout)
             # make the returned instance usable in a with statement by adding __enter__ and __exit__ methods
@@ -221,7 +238,7 @@ def urlopener(url, log, **kwargs):
 
     log.warning('Could not retrieve url: %s' % url)
     socket.setdefaulttimeout(oldtimeout)
-    raise urllib2.URLError("Could not retrieve url after 3 retries.")
+    raise urllib2.URLError('Could not retrieve url after 3 retries.')
 
 
 def replace_from_entry(field, entry, field_name, logger, default=''):
