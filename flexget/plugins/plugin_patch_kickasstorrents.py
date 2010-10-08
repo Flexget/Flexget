@@ -3,6 +3,7 @@ import httplib
 from flexget.plugin import *
 
 log = logging.getLogger('kat_patch')
+triggered = False
 
 
 def monkeypatched_read_chunked(self, amt):
@@ -26,6 +27,8 @@ def monkeypatched_read_chunked(self, amt):
                 import logging
                 log = logging.getLogger('monkeypatch')
                 log.warning('IncompleteRead %s (expected)' % ''.join(value))
+                global triggered
+                triggered = True
                 break
                 #raise IncompleteRead(''.join(value))
             if chunk_left == 0:
@@ -87,6 +90,8 @@ class MonkeypatchKickassTorrents(object):
     
     def on_feed_exit(self, feed):
         if self.patched:
+            if not triggered and feed.accepted:
+                log.info('Looks like kickasstorrents monkeypatch was not needed, please notify FlexGet developers')
             log.info('Removing monkeypatch')
             httplib.HTTPResponse._read_chunked = self.original
         
