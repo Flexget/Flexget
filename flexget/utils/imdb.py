@@ -248,20 +248,15 @@ class ImdbParser(object):
             log.warning('Unable to get votes for %s - plugin needs update?' % url)
 
         # get score
-        tag_score = soup.find('b', text=re.compile('\d.\d/10'))
+        tag_score = soup.find('span', attrs={'class': 'rating-rating'})
         if tag_score:
-            str_score = tag_score.string
-            re_score = re.compile(r'(\d*\.?\d+)/10')
-            match = re_score.search(str_score)
-            if match:
-                str_score = match.group(1)
-                self.score = float(str_score)
+                self.score = float(tag_score.contents[0])
                 log.debug('Detected score: %s' % self.score)
         else:
             log.warning('Unable to get score for %s - plugin needs update?' % url)
 
         # get genres
-        for link in soup.findAll('a', attrs={'href': re.compile('^/Sections/Genres/')}):
+        for link in soup.findAll('a', attrs={'href': re.compile('^/genre/')}):
             # skip links that have javascript onclick (not in genrelist)
             if link.has_key('onclick'):
                 continue
@@ -294,7 +289,7 @@ class ImdbParser(object):
             log.debug('No h5 plot found')
 
         # get main cast
-        tag_cast = soup.find('table', 'cast')
+        tag_cast = soup.find('table', 'cast_list')
         if tag_cast:
             for actor in tag_cast.findAll('a', href=re.compile('/name/nm')):
                 actor_id = extract_id(actor['href'])
