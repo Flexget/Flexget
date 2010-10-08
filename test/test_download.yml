@@ -1,8 +1,0 @@
-# unittest
-
-feeds:
-  test:
-    # make test data
-    input_mock:
-      - {title: 'README', url: 'http://svn.flexget.com/trunk/test/README', 'filename': 'flexget_test'}
-    download: ~/

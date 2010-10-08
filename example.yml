@@ -1,8 +1,0 @@
-# Configuration should be written in here. See documentation at http://flexget.com/wiki/Configuration
-
-#feeds:
-#  my_feed:
-#    rss: http://example.com/rss.xml
-#    patterns:
-#      - something.rexexp
-#    download: ~/downloads/

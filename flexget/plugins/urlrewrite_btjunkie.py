@@ -1,0 +1,17 @@
+import logging
+from flexget.plugin import *
+
+log = logging.getLogger("btjunkie")
+
+
+class UrlRewriteBtJunkie:
+    """BtJunkie urlrewriter."""
+
+    def url_rewritable(self, feed, entry):
+        return entry['url'].startswith('http://btjunkie.org')
+        
+    def url_rewrite(self, feed, entry):
+        entry['url'] = entry['url'].replace('btjunkie.org', 'dl.btjunkie.org')
+        entry['url'] = entry['url'] + "/download.torrent"
+
+register_plugin(UrlRewriteBtJunkie, 'btjunkie', groups=['urlrewriter'])
