@@ -24,9 +24,7 @@ def monkeypatched_read_chunked(self, amt):
                 # close the connection as protocol synchronisation is
                 # probably lost
                 self.close()
-                import logging
-                log = logging.getLogger('monkeypatch')
-                log.warning('IncompleteRead %s (expected)' % ''.join(value))
+                log.warning('IncompleteRead error (expected)')
                 global triggered
                 triggered = True
                 break
@@ -80,7 +78,8 @@ class MonkeypatchKickassTorrents(object):
         self.patched = False
         self.original = httplib.HTTPResponse._read_chunked
 
-    def on_feed_filter(self, feed):
+    @priority(-255)
+    def on_feed_urlrewrite(self, feed):
         for entry in feed.entries:
             if 'kickasstorrent' in entry['url'] and not self.patched:
                 log.info('Monkeypatching httplib to overcome kickasstorrents failure')
@@ -94,6 +93,7 @@ class MonkeypatchKickassTorrents(object):
                 log.info('Looks like kickasstorrents monkeypatch was not needed, please notify FlexGet developers')
             log.info('Removing monkeypatch')
             httplib.HTTPResponse._read_chunked = self.original
+            self.patched = False
         
     on_feed_abort = on_feed_exit
 
