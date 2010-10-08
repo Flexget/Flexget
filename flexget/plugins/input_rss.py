@@ -242,10 +242,13 @@ class InputRSS(object):
                     else:
                         log.debug(msg)
 
-        if rss['bozo'] and not ignore:
-            log.error(rss)
-            log.error('Bozo exception %s on feed %s' % (type(ex), feed.name))
-            return
+        if 'bozo' in rss:
+            if rss.bozo and not ignore:
+                log.error(rss)
+                log.error('Bozo exception %s on feed %s' % (type(ex), feed.name))
+                return
+        else:
+            log.warn('feedparser bozo bit missing, feedparser bug? (FlexGet ticket #721)')
 
         log.debug('encoding %s' % rss.encoding)
 
