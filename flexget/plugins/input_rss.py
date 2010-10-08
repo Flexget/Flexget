@@ -287,7 +287,7 @@ class InputRSS(object):
                 ea['title'] = entry.title
 
                 # grab fields
-                fields = ['author', 'description']
+                fields = ['guid', 'author', 'description']
                 for field in fields:
                     if field in entry:
                         try:

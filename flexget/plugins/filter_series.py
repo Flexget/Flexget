@@ -672,7 +672,7 @@ class FilterSeries(SeriesPlugin):
             return order.index(x[0]) if x[0] in order else len(order)
 
         # don't try to parse these fields
-        ignore_fields = ['uid', 'feed', 'url', 'original_url', 'type', 'quality']
+        ignore_fields = ['uid', 'guid', 'feed', 'url', 'original_url', 'type', 'quality']
 
         # key: series (episode) identifier ie. S01E02
         # value: seriesparser
