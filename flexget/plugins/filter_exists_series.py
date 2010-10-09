@@ -39,7 +39,7 @@ class FilterExistsSeries(object):
 
     @priority(-1)
     def on_feed_filter(self, feed):
-        for entry in feed.entries + feed.accepted:
+        for entry in feed.accepted:
             if 'series_parser' in entry:
                 break
         else:
@@ -60,7 +60,8 @@ class FilterExistsSeries(object):
                 # convert filelists into utf-8 to avoid unicode problems
                 dirs = [x.decode('utf-8', 'ignore') for x in dirs]
                 files = [x.decode('utf-8', 'ignore') for x in files]
-                for entry in feed.entries + feed.accepted:
+                # For speed, only test accepted entries since our priority should be after everything is accepted.
+                for entry in feed.accepted:
                     if 'series_parser' in entry:
                         for name in files + dirs:
                             # make new parser from parser in entry
