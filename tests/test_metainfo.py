@@ -82,7 +82,6 @@ class TestMetainfoSeries(FlexGetBase):
             mock:
               - {title: 'FlexGet.S01E02.TheName.HDTV.xvid'}
               - {title: 'Some.Series.S03E14.Title.Here.720p'}
-            metainfo_series: yes
     """
 
     def test_imdb(self):

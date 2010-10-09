@@ -39,9 +39,6 @@ class FilterExistsSeries(object):
 
     @priority(-1)
     def on_feed_filter(self, feed):
-        if not feed.config.get('series') and not feed.config.get('series_premiere'):
-            log.error('series plugin is not enabled on this feed. exists_series only works with series plugin.')
-            return
         for entry in feed.entries + feed.accepted:
             if 'series_parser' in entry:
                 break
@@ -86,6 +83,8 @@ class FilterExistsSeries(object):
                                 log.debug('series_parser.identifier = %s' % series_parser.identifier)
                                 log.debug('disk_parser.quality = %s' % disk_parser.quality)
                                 log.debug('series_parser.quality = %s' % series_parser.quality)
+                                log.debug('disk_parser.proper = %s' % disk_parser.proper)
+                                log.debug('series_parser.proper = %s' % series_parser.proper)
                                 
                                 if disk_parser.identifier != series_parser.identifier:
                                     log.log(5, 'wrong identifier')
@@ -94,7 +93,7 @@ class FilterExistsSeries(object):
                                     log.log(5, 'wrong quality')
                                     continue
                                 if disk_parser.proper and not series_parser.proper:
-                                    feed.reject(entry, 'proper already already exists')
+                                    feed.reject(entry, 'proper already exists')
                                     continue
                                 if series_parser.proper and not disk_parser.proper:
                                     log.log(5, 'new one is proper, disk is not')

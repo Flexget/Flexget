@@ -211,6 +211,13 @@ class TestFilterSeries(FlexGetBase):
               - date series
               - filename series
               - empty description
+
+          metainfo_series_override:
+            mock:
+              - {title: 'Test.Series.with.extra.crap.S01E02.PDTV.XViD-FlexGet'}
+              - {title: 'Other.Show.with.extra.crap.S02E01.PDTV.XViD-FlexGet'}
+            series:
+              - Test Series
     """
 
     def test_smoke(self):
@@ -236,6 +243,20 @@ class TestFilterSeries(FlexGetBase):
         # chaining with regexp plugin
         assert self.feed.find_entry('rejected', title='Another.Series.S01E21.1080p.H264-FlexGet'), \
             'regexp chaining'
+
+    def test_metainfo_series_override(self):
+        """Series plugin: override metainfo_series"""
+        self.execute_feed('metainfo_series_override')
+        # Make sure the metainfo_series plugin is working first
+        entry = self.feed.find_entry('entries', title='Other.Show.with.extra.crap.S02E01.PDTV.XViD-FlexGet')
+        assert entry['series_guessed'], 'series should have been guessed'
+        assert entry['series_name'] == entry['series_parser'].name == 'Other Show with extra crap', \
+            'metainfo_series is not running'
+        # Make sure the good series data overrode metainfo data for the listed series
+        entry = self.feed.find_entry('accepted', title='Test.Series.with.extra.crap.S01E02.PDTV.XViD-FlexGet')
+        assert not entry.get('series_guessed'), 'series plugin should override series_guessed'
+        assert entry['series_name'] == entry['series_parser'].name == 'Test Series', \
+            'Series name should be \'Test Series\', was: entry: %s, parser: %s' % (entry['series_name'], entry['series_parser'].name)
 
 
 class TestEpisodeAdvancement(FlexGetBase):

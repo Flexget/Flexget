@@ -54,6 +54,7 @@ class MetainfoSeries(object):
                 parser.data = title
                 parser.season = season
                 parser.episode = episode
+                parser.valid = True
                 return (name, season, episode, parser)
 
 register_plugin(MetainfoSeries, 'metainfo_series', builtin=True)
