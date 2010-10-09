@@ -135,7 +135,7 @@ def main():
         log_level = getattr(logging, options.loglevel.upper())
     else:
         log_level = 5
-        
+
     if options.version:
         print 'FlexGet %s' % __version__
         return
@@ -159,6 +159,9 @@ def main():
             manager.print_failed()
         elif options.clear_failed:
             manager.clear_failed()
+        elif options.webui:
+            import webui
+            webui.start(manager)
         else:
             manager.execute()
     finally:

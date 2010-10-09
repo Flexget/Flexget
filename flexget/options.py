@@ -34,6 +34,8 @@ class OptionParser(OptParser):
                         help='Specify configuration file. Default is config.yml')
         self.add_option('--cron', action='store_true', dest='quiet', default=False,
                         help='Disables stdout and stderr output, log file used. Reduces logging level slightly.')
+        self.add_option('--webui', action='store_true', dest='webui', default=False,
+                        help='Start FlexGet webui prototype')
 
         self.add_option('--experimental', action='store_true', dest='experimental', default=0,
                         help=SUPPRESS_HELP)
@@ -50,10 +52,10 @@ class OptionParser(OptParser):
                         help=SUPPRESS_HELP)
         self.add_option('--validate', action='store_true', dest='validate', default=False,
                         help=SUPPRESS_HELP)
-        
+
         self.add_option('-V', '--version', action='store_true', dest='version', default=False,
                         help='Print FlexGet version and exit.')
-        
+
         self.add_option('--migrate', action='store', dest='migrate', default=None,
                         help=SUPPRESS_HELP)
 
@@ -68,7 +70,7 @@ class OptionParser(OptParser):
         options = result[0]
         if options.test and options.learn:
             self.error('--test and --learn are mutually exclusive')
-            
+
         if options.test and options.reset:
             self.error('--test and --reset are mutually exclusive')
 
