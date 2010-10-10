@@ -41,7 +41,7 @@ class Manipulate(object):
         replace.accept('text', key='format', required=True)
         return root
 
-    def on_process_start(self, feed):
+    def on_feed_start(self, feed):
         """Separates the config into a dict with a list of jobs per event."""
         config = feed.config['manipulate']
         self.event_jobs = {'filter': [], 'metainfo': []}
