@@ -13,7 +13,7 @@ class OutputHtml:
         root = validator.factory('dict')
         root.accept('file', key='template')
         root.accept('text', key='file')
-        return validator.factory('text')
+        return root
 
     def on_feed_output(self, feed):
         try:
@@ -38,7 +38,7 @@ class OutputHtml:
         template.entries = feed.entries
 
         f = open(output, 'w')
-        f.write(template.__str__())
+        f.write(template.respond().encode('utf-8'))
         f.close()
 
 register_plugin(OutputHtml, 'make_html')
