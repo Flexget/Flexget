@@ -105,6 +105,7 @@ def sdist():
 ])
 def test(options):
     """Run FlexGet unit tests"""
+    options.setdefault('test', Bunch())
     import nose
     from nose.plugins.manager import DefaultPluginManager
 
@@ -112,13 +113,14 @@ def test(options):
 
     argv = ['bin/paver']
 
-    if not hasattr(options, 'online'):
+    if not options.test.get('online'):
         argv.extend(['--attr=!online'])
 
     argv.append('-v')
     argv.append('--processes=4')
+    argv.append('-x')
 
-    nose.run(argv=argv, config=cfg)
+    return nose.run(argv=argv, config=cfg)
 
 
 @task
@@ -159,10 +161,14 @@ def coverage():
 
 
 @task
-@consume_args
-def release(args):
+@cmdopts([
+    ('online', None, 'runs online unit tests'),
+    ('dist-dir=', 'd', 'directory to put final built distributions in'),
+    ('no-tests', None, 'skips unit tests')
+])
+def release(options):
     """Make a FlexGet release. Same as bdist_egg but adds version information."""
-
+    options.setdefault('release', Bunch())
     # clean previous build
     print 'Cleaning build...'
     for p in ['build']:
@@ -174,17 +180,19 @@ def release(args):
         else:
             print 'Unable to remove %s' % pth
 
-    if len(args) != 1:
-        print 'Version number must be specified, ie. paver release 1.0b9'
-        return
-    ver = args[0]
+    revision = svn.info().get('last_changed_rev')
+    ver = '%sr%s' % (options['version'], revision)
 
     # replace version number
     freplace('flexget/__init__.py', "__version__ = '{subversion}'", "__version__ = '%s'" % ver)
 
     # run unit tests
-    test(environment.options) # dunno if param is correct ..
-
+    if options.release.get('online'):
+        options.setdefault('test', Bunch())['online'] = True
+    if not options.release.get('no_tests'):
+        if not test():
+            print 'Unit tests did not pass'
+            return
     import shutil
     shutil.copytree('FlexGet.egg-info', 'FlexGet.egg-info-backup')
 
@@ -193,16 +201,9 @@ def release(args):
     setup_section = tasks.environment.options.setdefault("setup", Bunch())
     setup_section.update(version=ver)
 
-    egg_options = ['-d', '/var/www/flexget_dist/unstable'] # hmph, how can I pass params to it? doesn't seem to work ..
-    bdist_egg(egg_options)
-
-    # hack since -d does not work .. copy build to release folder
-    import os
-    import shutil
-    dest = '/var/www/flexget_dist/unstable/'
-
-    for fname in os.listdir('dist'):
-        shutil.copy(os.path.join('dist', fname), os.path.join(dest, fname))
+    if options.release.get('dist_dir'):
+        options.setdefault('bdist_egg', Bunch())['dist_dir'] = options.release.dist_dir
+    bdist_egg()
 
     # restore version ...
     freplace('flexget/__init__.py', "__version__ = '%s'" % ver, "__version__ = '{subversion}'")
