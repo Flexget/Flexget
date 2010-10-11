@@ -54,11 +54,9 @@ class SeriesParser(TitleParser):
         self.clean_regexps = ['\[.*?\]', '\(.*?\)']
         # ignore prefix regexpes must be passive groups with 0 or 1 occurrences  eg. (?:prefix)?
         self.ignore_prefix_regexps = [
-                '(?:\[[^\[\]]*\])?', # ignores group names before the name, eg [foobar] name
-                '(?:HD.720p:)?',
-                '(?:HD.720:)?',
-                '(?:HD.1080p:)?',
-                '(?:HD.1080:)?']
+                '(?:\[[^\[\]]*\])', # ignores group names before the name, eg [foobar] name
+                '(?:HD.720p?:)',
+                '(?:HD.1080p?:)']
         self.name_regexps = []
 
         self.field = None
@@ -134,10 +132,11 @@ class SeriesParser(TitleParser):
             # TODO: Still doesn't handle the case where the user wants
             # "Schmost" and the feed contains "Schmost at Sea".
             blank = r'[^0-9a-zA-Z]'
+            ignore = '(?:' + '|'.join(self.ignore_prefix_regexps) + ')?'
             res = re.sub(blank + '+', ' ', name)
             res = res.strip()
             res = re.sub(' +', blank + '*', res)
-            res = '^' + ''.join(self.ignore_prefix_regexps) + (blank + '*') + '(' + res + ')' + (blank + '+')
+            res = '^' + ignore + (blank + '*') + '(' + res + ')' + (blank + '+')
             return res
 
         log.debug('name: %s data: %s' % (name, data))
