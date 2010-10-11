@@ -283,9 +283,12 @@ class SeriesParser(TitleParser):
                 log.debug('ignoring episode %s' % match.group(2))
                 return (None,)
             
+        # Make sure there are non alphanumeric characters surrounding our identifier
+        (lcap, rcap) = (r'(?<![a-zA-Z0-9])', r'(?![a-zA-Z0-9])')
         # search for season and episode number
         for ep_re in self.ep_regexps:
-            match = re.search(ep_re, data, re.IGNORECASE | re.UNICODE)
+            match = re.search(lcap + ep_re + rcap, data, re.IGNORECASE | re.UNICODE)
+            
             if match:
                 log.debug('found episode number with regexp %s' % ep_re)
                 matches = match.groups()

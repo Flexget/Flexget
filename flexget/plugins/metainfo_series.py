@@ -48,6 +48,9 @@ class MetainfoSeries(object):
                 # Replace . and _ with spaces
                 name = re.sub('[\._]', ' ', name)
                 name = ' '.join(name.split())
+                # If we didn't get a series name, return
+                if not name:
+                    return
                 season = match[0]
                 episode = match[1]
                 parser.name = name

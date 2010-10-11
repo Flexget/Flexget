@@ -84,10 +84,16 @@ class TestMetainfoSeries(FlexGetBase):
               - {title: 'Some.Series.S03E14.Title.Here.720p'}
               - {title: '[the.group] Some.Series.S03E15.Title.Two.720p'}
               - {title: 'HD 720p: Some.Series.S03E16.Title.Three'}
+          false_positives:
+            mock:
+              - {title: 'FlexGet.epic'}
+              - {title: 'FlexGet.Apt.1'}
+              - {title: 'FlexGet.aptitude'}
+              - {title: 'FlexGet.Step1'}
     """
 
-    def test_imdb(self):
-        """Metainfo: series name/episode"""
+    def test_metainfo_series(self):
+        """Metainfo series: name/episode"""
         self.execute_feed('test')
         assert self.feed.find_entry(series_name='FlexGet', series_season=1, series_episode=2, quality='hdtv'), \
             'Failed to parse series info'
@@ -98,3 +104,13 @@ class TestMetainfoSeries(FlexGetBase):
             'Failed to parse series info'
         assert self.feed.find_entry(series_name='Some Series', series_season=3, series_episode=16, quality='720p'), \
             'Failed to parse series info'
+
+    def test_false_positives(self):
+        """Metainfo series: check for false positives"""
+        self.execute_feed('false_positives')
+        for entry in self.feed.entries:
+            # None of these should be detected as series
+            error = '%s sholud not be detected as a series' % entry['title']
+            assert 'series_name' not in entry, error
+            assert 'series_guessed' not in entry, error
+            assert 'series_parser' not in entry, error
