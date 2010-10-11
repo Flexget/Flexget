@@ -227,11 +227,19 @@ class TestSeriesParser(object):
         s = self.parse(name='90120', data='90120.1x2-FlexGet')
         assert (s.season == 1 and s.episode == 2), 'failed to parse %s' % s.data
 
+    def test_group_prefix(self):
+        """SeriesParser: [group] before name"""
         s = self.parse(name='Foo Bar', data='[l.u.l.z] Foo Bar - 11 (H.264) [5235532D].mkv')
         assert (s.id == '11'), 'failed to parse %s' % s.data
 
         s = self.parse(name='Foo Bar', data='[7.1.7.5] Foo Bar - 11 (H.264) [5235532D].mkv')
         assert (s.id == '11'), 'failed to parse %s' % s.data
+        
+    def test_hd_prefix(self):
+        """SeriesParser: HD 720p before name"""
+        s = self.parse(name='Foo Bar', data='HD 720p: Foo Bar - 11 (H.264) [5235532D].mkv')
+        assert (s.id == '11'), 'failed to parse %s' % s.data
+        assert (s.quality == '720p'), 'failed to pick up quality'
 
     def test_partially_numeric(self):
         """SeriesParser: partially numeric names"""

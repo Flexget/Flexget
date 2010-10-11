@@ -52,6 +52,13 @@ class SeriesParser(TitleParser):
                 '(\d{4})x(\d+)\.(\d+)', '(pt|part)\s?(\d+|%s)' % roman_numeral_re,
                 '(?:^|[^s\d])(\d{1,3})(?:[^p\d]|$)']
         self.clean_regexps = ['\[.*?\]', '\(.*?\)']
+        # ignore prefix regexpes must be passive groups with 0 or 1 occurrences  eg. (?:prefix)?
+        self.ignore_prefix_regexps = [
+                '(?:\[[^\[\]]*\])?', # ignores group names before the name, eg [foobar] name
+                '(?:HD.720p:)?',
+                '(?:HD.720:)?',
+                '(?:HD.1080p:)?',
+                '(?:HD.1080:)?']
         self.name_regexps = []
 
         self.field = None
@@ -130,7 +137,7 @@ class SeriesParser(TitleParser):
             res = re.sub(blank + '+', ' ', name)
             res = res.strip()
             res = re.sub(' +', blank + '*', res)
-            res = '^(?:\[[^\[\]]*\])?' + (blank + '*') + '(' + res + ')' + (blank + '+')
+            res = '^' + ''.join(self.ignore_prefix_regexps) + (blank + '*') + '(' + res + ')' + (blank + '+')
             return res
 
         log.debug('name: %s data: %s' % (name, data))
