@@ -251,7 +251,7 @@ class TorrentFilename(object):
                 if entry['torrent'].modified:
                     # re-write data into a file
                     log.debug('Writing modified torrent file for %s' % entry['title'])
-                    f = open(entry['file'], 'w+')
+                    f = open(entry['file'], 'wb+')
                     f.write(entry['torrent'].encode())
                     f.close()
 
