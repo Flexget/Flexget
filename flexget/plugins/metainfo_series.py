@@ -35,7 +35,6 @@ class MetainfoSeries(object):
         parser = SeriesParser()
         data = parser.clean(title)
         data = parser.remove_dirt(data)
-        data = ' '.join(data.split())
         
         match = parser.parse_episode(data)
         if match:
@@ -48,6 +47,7 @@ class MetainfoSeries(object):
                 name = title[:len(name)]
                 # Replace . and _ with spaces
                 name = re.sub('[\._]', ' ', name)
+                name = ' '.join(name.split())
                 season = match[0]
                 episode = match[1]
                 parser.name = name
