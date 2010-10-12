@@ -216,6 +216,8 @@ class Feed(object):
             if reason:
                 entry['reason'] = reason
             entry['accepted_by'] = self.current_plugin
+        # Run on_entry_accept event
+        self.__run_event('accept', entry, reason)
 
     def reject(self, entry, reason=None):
         """Reject this entry immediately and permanently with optional reason"""
@@ -237,6 +239,8 @@ class Feed(object):
         if reason:
             entry['reason'] = reason
         entry['rejected_by'] = self.current_plugin
+        # Run on_entry_reject event
+        self.__run_event('reject', entry, reason)
 
     def fail(self, entry, reason=None):
         """Mark entry as failed."""
@@ -245,6 +249,8 @@ class Feed(object):
             self.failed.append(entry)
             self.manager.add_failed(entry)
             log.error('Failed %s (%s)' % (entry['title'], reason))
+            # Run on_entry_fail event
+            self.__run_event('fail', entry=entry, reason=reason)
 
     def abort(self, **kwargs):
         """Abort this feed execution, no more plugins will be executed."""
@@ -309,10 +315,14 @@ class Feed(object):
         else:
             log.debug('event: %s plugin: %s msg: %s%s' % (self.current_event, self.current_plugin, msg, reason_str))
 
-    def __run_event(self, event):
+    def __run_event(self, event, entry=None, reason=None):
         """Execute all configured plugins in :event:"""
         methods = get_methods_by_event(event)
         #log.log(5, 'Event %s methods %s' % (event, methods))
+
+        # fail when trying to run an on_entry_* event without an entry
+        if event in ['accept', 'reject', 'fail'] and not entry:
+            raise Exception('Entry must be specified when running the %s event' % event)
 
         # warn if no filters or outputs in the feed
         if event in ['filter', 'output']:
@@ -335,7 +345,11 @@ class Feed(object):
                 #log.log(5, 'Running %s method %s' % (keyword, method))
                 # call the plugin
                 try:
-                    method(self)
+                    if event in ['accept', 'reject', 'fail']:
+                        # Add extra parameters for the on_entry_* events
+                        method(self, entry, reason)
+                    else:
+                        method(self)
                 except PluginWarning, warn:
                     # check if this warning should be logged only once (may keep repeating)
                     if warn.kwargs.get('log_once', False):

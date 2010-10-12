@@ -121,6 +121,9 @@ EVENT_METHODS = {
     'output': 'on_feed_output',
     'exit': 'on_feed_exit',
     'abort': 'on_feed_abort',
+    'accept': 'on_entry_accept',
+    'reject': 'on_entry_reject',
+    'fail': 'on_entry_fail',
     'process_start': 'on_process_start',
     'process_end': 'on_process_end'}
 
