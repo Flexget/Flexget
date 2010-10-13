@@ -61,6 +61,8 @@ class TestMetainfoQuality(FlexGetBase):
             mock:
               - {title: 'FooBar.S01E02.720p.HDTV'}
               - {title: 'ShowB.S04E19.Name of Ep.720p.WEB-DL.DD5.1.H.264'}
+              - {title: 'Good.Movie', description: '720p'}
+              - {title: 'Good.Movie.hdtv', description: '720p'}
     """
 
     def test_quality(self):
@@ -73,6 +75,14 @@ class TestMetainfoQuality(FlexGetBase):
         assert entry, 'entry not found?'
         assert 'quality' in entry, 'failed to pick up quality'
         assert entry['quality'] == 'web-dl', 'picked up wrong quality %s' % entry.get('quality', None)
+        # Check that quality gets picked up from description when not in title
+        entry = self.feed.find_entry(title='Good.Movie')
+        assert 'quality' in entry, 'failed to pick up quality from description'
+        assert entry['quality'] == '720p', 'picked up wrong quality %s' % entry.get('quality', None)
+        # quality in description should not override one found in title
+        entry = self.feed.find_entry(title='Good.Movie.hdtv')
+        assert 'quality' in entry, 'failed to pick up quality'
+        assert entry['quality'] == 'hdtv', 'picked up wrong quality %s' % entry.get('quality', None)
 
 
 class TestMetainfoSeries(FlexGetBase):
