@@ -47,16 +47,23 @@ class Manipulate(object):
         self.event_jobs = {'filter': [], 'metainfo': []}
         for item in config:
             for item_config in item.itervalues():
+                # Get the event specified for this item, or use default of metainfo
                 event = item_config.get('event', 'metainfo')
                 self.event_jobs[event].append(item)
 
     @priority(255)
     def on_feed_metainfo(self, feed):
+        if not self.event_jobs['metainfo']:
+            # return if no jobs for this event
+            return
         for entry in feed.entries:
             self.process(feed, entry, self.event_jobs['metainfo'])
             
     @priority(255)
     def on_feed_filter(self, feed):
+        if not self.event_jobs['filter']:
+            # return if no jobs for this event
+            return
         for entry in feed.entries + feed.rejected:
             self.process(feed, entry, self.event_jobs['filter'])
 
@@ -90,6 +97,6 @@ class Manipulate(object):
                     log.debug('field %s after replace: %s' % (field, field_value))
 
                 entry[field] = field_value
-                feed.verbose_details('Field %s is now %s' % (field, entry[field]))
+                feed.verbose_progress('Field %s is now %s' % (field, entry[field]))
 
 register_plugin(Manipulate, 'manipulate')

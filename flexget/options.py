@@ -8,8 +8,6 @@ class OptionParser(OptParser):
 
         self._unit_test = unit_test
 
-        self.add_option('-v', action='store_true', dest='details', default=0,
-                        help='Verbose process. Display entry accept and reject info. HIGHLY USEFULL.')
         self.add_option('--log-start', action='store_true', dest='log_start', default=0,
                         help=SUPPRESS_HELP)
         self.add_option('--test', action='store_true', dest='test', default=0,
@@ -59,8 +57,6 @@ class OptionParser(OptParser):
 
         # provides backward compatibility to --cron and -d
         self.add_option('-q', '--quiet', action='store_true', dest='quiet', default=False,
-                        help=SUPPRESS_HELP)
-        self.add_option('-d', action='store_true', dest='details', default=0,
                         help=SUPPRESS_HELP)
 
     def parse_args(self):

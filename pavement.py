@@ -53,6 +53,14 @@ def freplace(name, what_str, with_str):
             line = line.replace(what_str, with_str)
         print line,
 
+def set_init_version(ver):
+    """Replaces the version with :ver: in __init__.py"""
+    import fileinput
+    for line in fileinput.FileInput('flexget/__init__.py', inplace=1):
+        if line.startswith('__version__ = '):
+            line = "__version__ = '%s'\n" % ver
+        print line,
+
 
 @task
 #@needs(['minilib', 'generate_setup', 'setuptools.command.sdist'])
@@ -82,7 +90,8 @@ def sdist():
     print 'Building %s' % ver
 
     # replace version number
-    freplace('flexget/__init__.py', "__version__ = '{subversion}'", "__version__ = '%s'" % ver)
+    #freplace('flexget/__init__.py', "__version__ = '{subversion}'", "__version__ = '%s'" % ver)
+    set_init_version(ver)
 
     # hack version number into setup( ... options='1.0' ...)
     from paver import tasks
@@ -96,7 +105,8 @@ def sdist():
     #bdist_egg(egg_options)
 
     # restore version ...
-    freplace('flexget/__init__.py', "__version__ = '%s'" % ver, "__version__ = '{subversion}'")
+    #freplace('flexget/__init__.py', "__version__ = '%s'" % ver, "__version__ = '{subversion}'")
+    set_init_version('{subversion}')
 
 
 @task
@@ -184,7 +194,8 @@ def release(options):
     ver = '%sr%s' % (options['version'], revision)
 
     # replace version number
-    freplace('flexget/__init__.py', "__version__ = '{subversion}'", "__version__ = '%s'" % ver)
+    #freplace('flexget/__init__.py', "__version__ = '{subversion}'", "__version__ = '%s'" % ver)
+    set_init_version(ver)
 
     # run unit tests
     if options.release.get('online'):
@@ -206,7 +217,8 @@ def release(options):
     bdist_egg()
 
     # restore version ...
-    freplace('flexget/__init__.py', "__version__ = '%s'" % ver, "__version__ = '{subversion}'")
+    #freplace('flexget/__init__.py', "__version__ = '%s'" % ver, "__version__ = '{subversion}'")
+    set_init_version('{subversion}')
 
     # restore egg info from backup
     print 'Removing FlexGet.egg-info ...'

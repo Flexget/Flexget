@@ -210,14 +210,13 @@ class Feed(object):
             log.debug('tried to accept rejected %s' % repr(entry))
         if entry not in self.accepted and entry not in self.rejected:
             self.accepted.append(entry)
-            self.verbose_details('Accepted %s' % entry['title'], reason)
             # store metainfo into entry (plugin in the future?)
             entry.pop('reason', None) # remove old reason by previous state
             if reason:
                 entry['reason'] = reason
             entry['accepted_by'] = self.current_plugin
-        # Run on_entry_accept event
-        self.__run_event('accept', entry, reason)
+            # Run on_entry_accept event
+            self.__run_event('accept', entry, reason)
 
     def reject(self, entry, reason=None):
         """Reject this entry immediately and permanently with optional reason"""
@@ -233,14 +232,13 @@ class Feed(object):
 
         if not entry in self.rejected:
             self.rejected.append(entry)
-            self.verbose_details('Rejected %s' % entry['title'], reason)
+            # Run on_entry_reject event
+            self.__run_event('reject', entry, reason)
         # store metainfo into entry (plugin in the future?)
         entry.pop('reason', None) # remove old reason by previous state
         if reason:
             entry['reason'] = reason
         entry['rejected_by'] = self.current_plugin
-        # Run on_entry_reject event
-        self.__run_event('reject', entry, reason)
 
     def fail(self, entry, reason=None):
         """Mark entry as failed."""
@@ -301,28 +299,14 @@ class Feed(object):
         if not self.manager.options.quiet and not self.manager.unit_test:
             logger.info(s)
 
-    def verbose_details(self, msg, reason=''):
-        """Verbose if details option is enabled"""
-        # TODO: implement trough own logger?
-        reason_str = ''
-        if reason:
-            reason_str = ' (%s)' % reason
-        if self.manager.options.details:
-            try:
-                print "+ %-8s %-12s %s%s" % (self.current_event, self.current_plugin, msg, reason_str)
-            except:
-                print "+ %-8s %-12s %s%s (warning: unable to print unicode)" % (self.current_event, self.current_plugin, repr(msg), reason_str)
-        else:
-            log.debug('event: %s plugin: %s msg: %s%s' % (self.current_event, self.current_plugin, msg, reason_str))
-
     def __run_event(self, event, entry=None, reason=None):
         """Execute all configured plugins in :event:"""
+        entry_events = ['accept', 'reject', 'fail']
+        # fail when trying to run an on_entry_* event without an entry
+        if event in entry_events and not entry:
+            raise Exception('Entry must be specified when running the %s event' % event)
         methods = get_methods_by_event(event)
         #log.log(5, 'Event %s methods %s' % (event, methods))
-
-        # fail when trying to run an on_entry_* event without an entry
-        if event in ['accept', 'reject', 'fail'] and not entry:
-            raise Exception('Entry must be specified when running the %s event' % event)
 
         # warn if no filters or outputs in the feed
         if event in ['filter', 'output']:
@@ -338,14 +322,14 @@ class Feed(object):
             if keyword in self.config or method.plugin.builtin:
                 # performance
                 start_time = time.time()
-
-                # store execute info
-                self.current_event = event
-                self.current_plugin = keyword
+                if event not in entry_events:
+                    # store execute info, except during entry events
+                    self.current_event = event
+                    self.current_plugin = keyword
                 #log.log(5, 'Running %s method %s' % (keyword, method))
                 # call the plugin
                 try:
-                    if event in ['accept', 'reject', 'fail']:
+                    if event in entry_events:
                         # Add extra parameters for the on_entry_* events
                         method(self, entry, reason)
                     else:
@@ -378,8 +362,9 @@ class Feed(object):
                 took = time.time() - start_time
                 self.performance[keyword] = self.performance.get(keyword, 0) + took
 
-                # purge entries between plugins
-                self.purge()
+                if event not in entry_events:
+                    # purge entries between plugins
+                    self.purge()
                 # check for priority operations
                 if self._abort:
                     return
@@ -439,16 +424,6 @@ class Feed(object):
                 if value < 0.01:
                     continue
                 log.info('%-20s took %-5s sec' % (key, value))
-
-        # verbose undecided entries
-        if self.manager.options.details:
-            for entry in self.entries:
-                if entry in self.accepted:
-                    continue
-                try:
-                    print "+ %-8s %-12s %s" % ('undecided', '', entry['title'])
-                except:
-                    print "+ %-8s %-12s %s (warning: unable to print unicode)" % ('undecided', '', repr(entry['title']))
 
     def process_start(self):
         """Execute process_start event"""
