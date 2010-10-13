@@ -22,6 +22,8 @@ class OutputExec:
         from flexget import validator
         return validator.factory('text')
 
+    # Make sure we run after download so exec can use the output
+    @priority(100)
     def on_feed_output(self, feed):
         for entry in feed.accepted:
             try:

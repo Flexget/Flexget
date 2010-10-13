@@ -48,12 +48,18 @@ class PluginAdvExec(object):
     def on_feed_start(self, feed):
         self.execute(feed, 'on_start')
 
+    # Make sure we run after other plugins so exec can use their output
+    @priority(100)
     def on_feed_input(self, feed):
         self.execute(feed, 'on_input')
 
+    # Make sure we run after other plugins so exec can use their output
+    @priority(100)
     def on_feed_filter(self, feed):
         self.execute(feed, 'on_filter')
 
+    # Make sure we run after other plugins so exec can use their output
+    @priority(100)
     def on_feed_output(self, feed):
         self.execute(feed, 'on_output')
 
