@@ -50,6 +50,14 @@ class InputRSS(object):
           url: <url>
           link: guid
 
+        If you want to keep information in another rss field attached to the flexget entry, you can use the other_fields option.
+        
+        Example:
+        
+        rss:
+          url: <url>
+          other_fields: [date]
+
         You can disable few possibly annoying warnings by setting silent value to
         yes on feeds where there are frequently invalid items.
 
@@ -83,6 +91,7 @@ class InputRSS(object):
         advanced.accept('text', key='password')
         advanced.accept('text', key='link')
         advanced.accept('list', key='link').accept('text')
+        advanced.accept('list', key='other_fields').accept('text')
         advanced.accept('boolean', key='silent')
         advanced.accept('boolean', key='ascii')
         advanced.accept('boolean', key='filename')
@@ -100,6 +109,9 @@ class InputRSS(object):
         # set the default link fields to 'link' and 'guid'
         if not config.get('link') or 'auto' in config['link']:
             config['link'] = ['link', 'guid']
+        # Replace : with _ and lower case other fields so they can be found in rss
+        if config.get('other_fields'):
+            config['other_fields'] = [field.replace(':', '_').lower() for field in config['other_fields']]
         # set default value for group links as deactivated
         if not config.get('group links') or config['group links'] == 'auto':
             config['group links'] = False
@@ -291,10 +303,21 @@ class InputRSS(object):
 
                 # grab fields
                 fields = ['guid', 'author', 'description']
+                # extend the list of fields to grab from other_fields list in config
+                fields.extend(config.get('other_fields', []))
                 for field in fields:
                     if field in entry:
+                        if not isinstance(getattr(entry, field), basestring):
+                            # Error if this field is not a string
+                            log.error('Cannot grab non string field \'%s\' from rss.' % field)
+                            # Remove field from list of fields to avoid repeated error
+                            config['other_fields'].remove(field)
+                            continue
                         try:
                             ea[field] = decode_html(getattr(entry, field))
+                            if field in config.get('other_fields', []):
+                                # Print a debug message for custom added fields
+                                log.debug('Field %s set to %s for %s' % (field, ea[field], ea['title']))
                         except UnicodeDecodeError:
                             log.warning('Failed to decode entry %s field %s' % (ea['title'], field))
 
