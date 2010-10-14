@@ -35,7 +35,7 @@ class MetainfoSeries(object):
         parser = SeriesParser()
         match = parser.parse_episode(title)
         if match:
-            if match[0] is None:
+            if parser.parse_unwanted(title):
                 return
             elif match[2].start() > 1:
                 # Look for unwanted prefixes to find out where the series title starts

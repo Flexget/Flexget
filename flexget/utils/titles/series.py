@@ -281,8 +281,7 @@ class SeriesParser(TitleParser):
         """
         Parses data for an episode identifier.
         If found, returns a tuple of season#, episode# and the regexp match object
-        If an unwanted episdoe id is found a tuple of (None,) is returned
-        If no episdoe id is found returns False
+        If no episode id is found returns False
         """
 
             
