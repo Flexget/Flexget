@@ -7,11 +7,11 @@ log = logging.getLogger('thetvdb')
 
 class FilterTvdb(object):
     """
-        This plugin allows filtering based on thetvdb series rating, 
-        episode rating, status, genres, runtime, content-rating, 
+        This plugin allows filtering based on thetvdb series rating,
+        episode rating, status, genres, runtime, content-rating,
         languages, directors, writers, network, guest stars, episode
         rating, and actors
-               
+
         series info:
             series_rating
             series_status (Continuing or Ended)
@@ -29,46 +29,46 @@ class FilterTvdb(object):
             ep_air_date
 
         Configuration:
-        
+
         Note: All parameters are optional. Some are mutually exclusive.
-    
+
         min_series_rating: <num>
         min_episode_rating: <num>
         min_episode_air_year: <num>
         max_episode_air_year: <num>
         min_episode_runtime: <num>
         max_episode_runtime: <num>
-        
+
         # reject if genre contains any of these
         reject_content_rating:
             - TV-MA
         # accept only this content rating
         accept_content_rating:
             - TV-PG
-        
+
         # accept only these networks
         accept_network:
             - NBC
         # reject if this network
         reject_network:
             - ABC
-        
+
         # reject if genre contains any of these
         reject_genres:
             - drama
             - romance
-        
+
         # reject if status contains any of these
         reject_status:
             - Ended
-        
+
         # reject if language contain any of these
         reject_languages:
             - fr
         # accept only this language
         accept_languages:
             - en
-        
+
         # Actors below take into account series actors, and guest stars
         # accept episode with any of these actors
         accept_actors:
@@ -78,7 +78,7 @@ class FilterTvdb(object):
         reject_actors:
             - Cher
             - Tamala Jones
-        
+
         # accept all episodes by these writers
         accept_writers:
             - Andrew W. Marlowe
@@ -93,17 +93,17 @@ class FilterTvdb(object):
         reject_directors:
             - John Terlesky
     """
-    
+
     def validator(self):
         """Validate given configuration"""
         from flexget import validator
         thetvdb = validator.factory('dict')
         thetvdb.accept('decimal', key='min_series_rating')
         thetvdb.accept('decimal', key='min_episode_rating')
-        thetvdb.accept('numbers', key='min_episode_air_year')
-        thetvdb.accept('numbers', key='max_episode_air_year')
-        thetvdb.accept('numbers', key='min_episode_runtime')
-        thetvdb.accept('numbers', key='max_episode_runtime')
+        thetvdb.accept('number', key='min_episode_air_year')
+        thetvdb.accept('number', key='max_episode_air_year')
+        thetvdb.accept('number', key='min_episode_runtime')
+        thetvdb.accept('number', key='max_episode_runtime')
         thetvdb.accept('list', key='reject_content_rating').accept('text')
         thetvdb.accept('list', key='accept_content_rating').accept('text')
         thetvdb.accept('list', key='accept_network').accept('text')
@@ -119,12 +119,12 @@ class FilterTvdb(object):
         thetvdb.accept('list', key='accept_directors').accept('text')
         thetvdb.accept('list', key='reject_directors').accept('text')
         return thetvdb
-    
+
     def is_in_set(self, config, configkey, entryitem,):
         '''
-        this takes the config object, config key (to a list), and entry 
-        item so it can return True if the object matches, 
-        (be that a subset of the list, or if the entry item is contained 
+        this takes the config object, config key (to a list), and entry
+        item so it can return True if the object matches,
+        (be that a subset of the list, or if the entry item is contained
         within the config object list) or false if it does not.
         '''
         # will want to port this over to filter_imdb as well, for code
@@ -146,19 +146,19 @@ class FilterTvdb(object):
     @priority(126)
     def on_feed_filter(self, feed):
         config = feed.config['thetvdb']
-        
+
         lookup = get_plugin_by_name('thetvdb_lookup').instance.lookup
 
-        
+
         for entry in feed.entries:
             force_accept = False
-            
+
             try:
                 lookup(feed, entry)
             except PluginError, e:
                 log.error('Skipping %s because of an error: %s' % (entry['title'], e.value))
                 continue
-            
+
             # Check defined conditions
             reasons = []
             if 'min_series_rating' in config:
@@ -173,52 +173,52 @@ class FilterTvdb(object):
             if 'max_episode_air_year' in config:
                 if entry['ep_air_date'].strftime("%Y") > config['max_episode_air_year']:
                     reasons.append('ep_air_date (%s < %s)' % (entry['ep_air_date'].strftime("%Y"), config['max_episode_air_year']))
-            
+
             if self.is_in_set(config, 'reject_content_rating', entry['series_content_rating']):
                 reasons.append('reject_content_rating')
-            
+
             if not self.is_in_set(config, 'accept_content_rating', entry['series_content_rating']):
                 reasons.append('accept_content_rating')
-            
+
             if self.is_in_set(config, 'reject_network', entry['series_network']):
                 reasons.append('reject_network')
-            
+
             if not self.is_in_set(config, 'accept_network', entry['series_network']):
                 reasons.append('accept_network')
-            
+
             if self.is_in_set(config, 'reject_genres', entry['series_genres']):
                 reasons.append('reject_genres')
-            
+
             if self.is_in_set(config, 'reject_status', entry['series_status']):
                 reasons.append('reject_status')
-            
+
             if self.is_in_set(config, 'reject_languages', entry['series_language']):
                 reasons.append('reject_languages')
-            
+
             if not self.is_in_set(config, 'accept_languages', entry['series_language']):
                 reasons.append('accept_languages')
-            
+
             # Accept if actors contains an accepted actor, but don't reject otherwise
             if self.is_in_set(config, 'accept_actors', entry['series_actors'] + entry['ep_guest_stars']):
                 force_accept = True
-            
+
             if self.is_in_set(config, 'reject_actors', entry['series_actors'] + entry['ep_guest_stars']):
                 reasons.append('reject_genres')
-            
+
             # Accept if writer is an accepted writer, but don't reject otherwise
             if self.is_in_set(config, 'accept_writers', entry['ep_writer']):
                 force_accept = True
-            
+
             if self.is_in_set(config, 'reject_writers', entry['ep_writer']):
                 reasons.append('reject_writers')
-            
+
             # Accept if director is an accepted director, but don't reject otherwise
             if self.is_in_set(config, 'accept_directors', entry['ep_director']):
                 force_accept = True
-            
+
             if self.is_in_set(config, 'reject_directors', entry['ep_director']):
                 reasons.append('reject_directors')
-            
+
             if reasons and not force_accept:
                 msg = 'Skipping %s because of rule(s) %s' % \
                     (entry.get('series_name_thetvdb', None) or entry['title'], ', '.join(reasons))
