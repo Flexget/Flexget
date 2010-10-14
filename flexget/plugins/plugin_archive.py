@@ -37,6 +37,8 @@ class ArchiveSearch(object):
     def on_process_start(self, feed):
         if not feed.manager.options.archive_search:
             return
+            
+        from flexget.utils.tools import strip_html
 
         feed.manager.disable_feeds()
         
@@ -45,7 +47,7 @@ class ArchiveSearch(object):
 
             print 'ID: %-6s | Feed: %-10s | Title: %s\nAdded: %s (%d days ago)\nURL: %s' % (ae.id, ae.feed, ae.title, ae.added, diff.days, ae.url)
             if ae.description:
-                print 'Description: %s' % ae.description
+                print 'Description: %s' % strip_html(ae.description)
             print '---'
 
         session = Session()

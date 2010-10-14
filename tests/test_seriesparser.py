@@ -14,7 +14,7 @@ from flexget.utils.titles import SeriesParser, ParseWarning
 # enable enable_logging and add --nologcapture to nosetest to see debug
 # (should not be needed, logging is not initialized properly?)
 
-enable_logging = False
+enable_logging = True
 
 if enable_logging:
     level = 5
@@ -87,32 +87,35 @@ class TestSeriesParser(object):
         assert s.valid, 'should not valid'
 
     def test_unwanted_episode(self):
-        """SeriesParser: unwanted episodes (e.g. complete season)"""
+        """SeriesParser: unwanted hits (e.g. complete season)"""
         s = self.parse(name='Something', data='Something.1x0.Complete.Season-FlexGet')
-        assert not s.episode, 'Should not have episode'
-        assert not s.season, 'Should not have season'
-        assert not s.valid, 'Should not be valid'
+        assert not s.valid, 'data %s should not be valid' % s.data
 
         s = self.parse(name='Something', data='Something.1xAll.Season.Complete-FlexGet')
-        assert not s.episode, 'Should not have episode'
-        assert not s.season, 'Should not have season'
-        assert not s.valid, 'Should not be valid'
+        assert not s.valid, 'data %s should not be valid' % s.data
+        
+        s = self.parse(name='Something', data='Something Seasons 1 & 2 - Complete')
+        assert not s.valid, 'data %s should not be valid' % s.data
+        
+        s = self.parse(name='Something', data='Something Seasons 4 Complete')
+        assert not s.valid, 'data %s should not be valid' % s.data
 
     def test_unwanted_disc(self):
         """SeriesParser: unwanted disc releases"""
         s = self.parse(name='Something', data='Something.S01D2.DVDR-FlexGet')
-        assert not s.episode, 'Should not have episode'
-        assert not s.season, 'Should not have season'
-        assert not s.valid, 'Should not be valid'
+        assert not s.valid, 'data %s should not be valid' % s.data
 
     def test_season_x_ep(self):
         """SeriesParser: 01x02"""
-        # Test 01x02 format
         s = self.parse(name='Something', data='Something.01x02-FlexGet')
         assert (s.season == 1 and s.episode == 2), 'failed to parse 01x02'
 
         s = self.parse(name='Something', data='Something 1 x 2-FlexGet')
         assert (s.season == 1 and s.episode == 2), 'failed to parse 1 x 2'
+        
+        # Ticket #732
+        s = self.parse(name='Something', data='Something - This is the Subtitle 14x9 [Group-Name]')
+        assert (s.season == 14 and s.episode == 9), 'failed to parse %s' % s.data
 
     def test_ep_in_square_brackets(self):
         """SeriesParser: [S01] [E02] NOT IMPLEMENTED"""

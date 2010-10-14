@@ -40,12 +40,13 @@ class SeriesParser(TitleParser):
                 '(?:series|season|s)\s?(\d{1,3})\s?(?:episode|ep|e|part|pt)\s?(\d{1,3})',
                 '(?:series|season)\s?(\d{1,3})\s(\d{1,3})\s?of\s?(?:\d{1,3})',
                 '(\d{1,3})\s?of\s?(?:\d{1,3})',
-                '(?:^|\D)([\d]{1,2})[\s]?x[\s]?(\d+)',
+                '(\d{1,2})\s?x\s?(\d+)',
                 '(?:episode|ep|part|pt)\s?(\d{1,3}|%s)' % roman_numeral_re]
         self.unwanted_ep_regexps = [
                  '(\d{1,3})\s?x\s?(0+)[^1-9]',
                  'S(\d{1,3})D(\d{1,3})',
-                 '(\d{1,3})\s?x\s?(all)']
+                 '(\d{1,3})\s?x\s?(all)',
+                 'season(?:s)?\s?\d\s?(?:&\s?\d)?[\s-]*complete']
         self.id_regexps = [
                 '(\d{4})%s(\d+)%s(\d+)' % (separators, separators),
                 '(\d+)%s(\d+)%s(\d{4})' % (separators, separators),
@@ -205,13 +206,13 @@ class SeriesParser(TitleParser):
         data = self.clean(data)
 
         log.debug("data for id/ep parsing '%s'" % data)
+        
+        if self.parse_unwanted(data):
+            # title appears to be unwanted, abort
+            return
 
         ep_match = self.parse_episode(data)
         if ep_match:
-            # parse_episode returns none if we should skip
-            if ep_match[0] is None:
-                return
-                
             # strict_name
             if self.strict_name:
                 if ep_match[2].start() > 1:
@@ -267,6 +268,14 @@ class SeriesParser(TitleParser):
             log.debug('-> no luck with id_regexps')
 
         raise ParseWarning('Title \'%s\' looks like series \'%s\' but I cannot find any episode or id numbering' % (self.data, self.name))
+        
+    def parse_unwanted(self, data):
+        """Parses data for an unwanted hits. Return True if the data contains unwanted hits."""
+        for ep_unwanted_re in self.unwanted_ep_regexps:
+            match = re.search(ep_unwanted_re, data, re.IGNORECASE | re.UNICODE)
+            if match:
+                log.debug('unwanted regexp %s matched %s' % (ep_unwanted_re, match.groups()))
+                return True
 
     def parse_episode(self, data):
         """
@@ -276,12 +285,6 @@ class SeriesParser(TitleParser):
         If no episdoe id is found returns False
         """
 
-        # check for unwanted season/episode formats
-        for ep_unwanted_re in self.unwanted_ep_regexps:
-            match = re.search(ep_unwanted_re, data, re.IGNORECASE | re.UNICODE)
-            if match:
-                log.debug('ignoring episode %s' % match.group(2))
-                return (None,)
             
         # Make sure there are non alphanumeric characters surrounding our identifier
         (lcap, rcap) = (r'(?<![a-zA-Z0-9])', r'(?![a-zA-Z0-9])')
