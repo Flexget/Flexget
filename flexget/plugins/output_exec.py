@@ -33,8 +33,8 @@ class OutputExec:
                 for arg in shlex.split(cmd.encode('utf-8'), comments=True):
                     arg = unicode(arg, 'utf-8')
                     formatted = arg % entry
-                    if formatted != arg:
-                        arg = pipes.quote(formatted)
+                    # shlex.split does not include the quotes, so we have to add them back if appropriate
+                    arg = pipes.quote(formatted)
                     args.append(arg)
                 cmd = ' '.join(args)
             except KeyError, e:
