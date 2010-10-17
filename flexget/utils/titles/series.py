@@ -43,10 +43,12 @@ class SeriesParser(TitleParser):
                 '(\d{1,2})\s?x\s?(\d+)',
                 '(?:episode|ep|part|pt)\s?(\d{1,3}|%s)' % roman_numeral_re]
         self.unwanted_ep_regexps = [
-                 '(\d{1,3})\s?x\s?(0+)[^1-9]',
-                 'S(\d{1,3})D(\d{1,3})',
-                 '(\d{1,3})\s?x\s?(all)',
-                 'season(?:s)?\s?\d\s?(?:&\s?\d)?[\s-]*complete']
+                 '(\d{1,3})\s?x\s?(0+)[^1-9]', # 5x0
+                 'S(\d{1,3})D(\d{1,3})', # S3D1
+                 '(\d{1,3})\s?x\s?(all)', # 1xAll
+                 'season(?:s)?\s?\d\s?(?:&\s?\d)?[\s-]*complete',
+                 'seasons\s(\d\s){2,}',
+                 's\d+.?e\d+-\d+'] # S6 E1-4
         self.id_regexps = [
                 '(\d{4})%s(\d+)%s(\d+)' % (separators, separators),
                 '(\d+)%s(\d+)%s(\d{4})' % (separators, separators),
@@ -110,6 +112,10 @@ class SeriesParser(TitleParser):
         log.log(5, 'cleaned data: %s' % data)
         return data
 
+    def remove_dirt(self, data):
+        """Replaces some characters with spaces"""
+        return re.sub(r'[_.\[\]\(\):]+', ' ', data).strip().lower()
+
     def parse(self):
         if not self.name or not self.data:
             raise Exception('SeriesParser initialization error, name: %s data: %s' % \
@@ -118,12 +124,15 @@ class SeriesParser(TitleParser):
         if self.expect_ep and self.expect_id:
             raise Exception('Flags expect_ep and expect_id are mutually exclusive')
 
-        data = self.clean(self.data)
-
         name = self.remove_dirt(self.name)
+        data = self.clean(self.data)
         data = self.remove_dirt(data)
-        # remove duplicate spaces
-        data_parts = data.split()
+
+        # check if data appears to be unwanted (abort)
+        if self.parse_unwanted(data):
+            return
+
+        data_parts = re.split('\W+', data)
         data = ' '.join(data_parts)
 
         log.log(5, 'data fully-cleaned: %s' % data)
@@ -202,14 +211,10 @@ class SeriesParser(TitleParser):
         # Ensure the series name isn't accidentally munged.
 
         data = self.remove_words(self.data[name_end:], self.remove + qualities.registry.keys() + self.codecs + self.sounds)
-        data = self.remove_dirt(data)
         data = self.clean(data)
+        data = self.remove_dirt(data)
 
         log.debug("data for id/ep parsing '%s'" % data)
-        
-        if self.parse_unwanted(data):
-            # title appears to be unwanted, abort
-            return
 
         ep_match = self.parse_episode(data)
         if ep_match:
@@ -226,7 +231,7 @@ class SeriesParser(TitleParser):
             self.episode = ep_match[1]
             self.valid = True
             return
-        
+
         log.debug('-> no luck with ep_regexps')
 
         # search for ids later as last since they contain somewhat broad matches
@@ -268,7 +273,7 @@ class SeriesParser(TitleParser):
             log.debug('-> no luck with id_regexps')
 
         raise ParseWarning('Title \'%s\' looks like series \'%s\' but I cannot find any episode or id numbering' % (self.data, self.name))
-        
+
     def parse_unwanted(self, data):
         """Parses data for an unwanted hits. Return True if the data contains unwanted hits."""
         for ep_unwanted_re in self.unwanted_ep_regexps:
@@ -284,15 +289,14 @@ class SeriesParser(TitleParser):
         If no episode id is found returns False
         """
 
-            
         # Make sure there are non alphanumeric characters surrounding our identifier
         (lcap, rcap) = (r'(?<![a-zA-Z0-9])', r'(?![a-zA-Z0-9])')
         # search for season and episode number
         for ep_re in self.ep_regexps:
             match = re.search(lcap + ep_re + rcap, data, re.IGNORECASE | re.UNICODE)
-            
+
             if match:
-                log.debug('found episode number with regexp %s' % ep_re)
+                log.debug('found episode number with regexp %s (%s)' % (ep_re, match.groups()))
                 matches = match.groups()
                 if len(matches) == 2:
                     season = matches[0]
@@ -303,20 +307,19 @@ class SeriesParser(TitleParser):
                     episode = matches[0]
                     if not episode.isdigit():
                         episode = self.roman_to_int(episode)
-                        # If we can't parse the roman numeral, contine the search
+                        # If we can't parse the roman numeral, continue the search
                         if not episode:
                             continue
                 break
         else:
             return False
         return (int(season), int(episode), match)
-        
-    @staticmethod
-    def roman_to_int(roman):
+
+    def roman_to_int(self, roman):
         """Converts roman numerals up to 39 to integers"""
         roman_map = [('X', 10), ('IX', 9), ('V', 5), ('IV', 4), ('I', 1)]
         roman = roman.upper()
-        
+
         # Return False if this is not a roman numeral we can translate
         for char in roman:
             if char not in 'XVI':

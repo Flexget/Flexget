@@ -86,7 +86,7 @@ class TestSeriesParser(object):
         assert s.id == '2008-12-13', 'invalid id'
         assert s.valid, 'should not valid'
 
-    def test_unwanted_episode(self):
+    def test_unwanted(self):
         """SeriesParser: unwanted hits (e.g. complete season)"""
         s = self.parse(name='Something', data='Something.1x0.Complete.Season-FlexGet')
         assert not s.valid, 'data %s should not be valid' % s.data
@@ -98,6 +98,12 @@ class TestSeriesParser(object):
         assert not s.valid, 'data %s should not be valid' % s.data
         
         s = self.parse(name='Something', data='Something Seasons 4 Complete')
+        assert not s.valid, 'data %s should not be valid' % s.data
+        
+        s = self.parse(name='Something', data='Something Seasons 1 2 3 4')
+        assert not s.valid, 'data %s should not be valid' % s.data
+        
+        s = self.parse(name='Something', data='Something S6 E1-4')
         assert not s.valid, 'data %s should not be valid' % s.data
 
     def test_unwanted_disc(self):

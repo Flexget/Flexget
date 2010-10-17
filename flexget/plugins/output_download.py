@@ -14,7 +14,7 @@ import mimetypes
 log = logging.getLogger('download')
 
 
-class PluginDownload:
+class PluginDownload(object):
 
     """
         Downloads content from entry url and writes it into a file.
@@ -316,7 +316,7 @@ class PluginDownload:
             html_mimes = ['html', 'text/html']
             if entry.get('mime-type') in html_mimes and config['fail_html']:
                 feed.fail(entry, 'unexpected html content')
-                log.error('Unexpected html content received from %s' % entry['url'])
+                log.error('Unexpected html content received from %s (a login page?)' % entry['url'])
                 return
 
             # if we still don't have a filename, try making one from title (last resort)
