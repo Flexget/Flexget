@@ -63,53 +63,6 @@ def set_init_version(ver):
 
 
 @task
-#@needs(['minilib', 'generate_setup', 'setuptools.command.sdist'])
-def sdist():
-    """Build tar.gz distribution package"""
-
-    revision = svn.info().get('last_changed_rev')
-
-    # clean previous build
-    print 'Cleaning build...'
-    for p in ['build']:
-        pth = path(p)
-        if pth.isdir():
-            pth.rmtree()
-        elif pth.isfile():
-            pth.remove()
-        else:
-            print 'Unable to remove %s' % pth
-
-    # remove pre-compiled pycs from tests, I don't know why paver even tries to include them ...
-    # seems to happen only with sdist though
-    for pyc in path('tests/').files('*.pyc'):
-        pyc.remove()
-
-    ver = '%sr%s' % (options['version'], revision)
-
-    print 'Building %s' % ver
-
-    # replace version number
-    #freplace('flexget/__init__.py', "__version__ = '{subversion}'", "__version__ = '%s'" % ver)
-    set_init_version(ver)
-
-    # hack version number into setup( ... options='1.0' ...)
-    from paver import tasks
-    setup_section = tasks.environment.options.setdefault("setup", Bunch())
-    setup_section.update(version=ver)
-
-    for t in ['minilib', 'generate_setup', 'setuptools.command.sdist']:
-        call_task(t)
-
-    #egg_options = ['-d', '/var/www/flexget_dist/unstable'] # hmph, how can I pass params to it? doesn't seem to work ..
-    #bdist_egg(egg_options)
-
-    # restore version ...
-    #freplace('flexget/__init__.py', "__version__ = '%s'" % ver, "__version__ = '{subversion}'")
-    set_init_version('{subversion}')
-
-
-@task
 @cmdopts([
     ('online', None, 'Run online tests')
 ])
@@ -144,11 +97,90 @@ def clean():
         elif pth.isfile():
             pth.remove()
 
+@task
+@cmdopts([
+    ('dist-dir=', 'd', 'directory to put final built distributions in')
+])
+def sdist(options):
+    """Build tar.gz distribution package"""
+
+    revision = svn.info().get('last_changed_rev')
+
+    # clean previous build
+    print 'Cleaning build...'
+    for p in ['build']:
+        pth = path(p)
+        if pth.isdir():
+            pth.rmtree()
+        elif pth.isfile():
+            pth.remove()
+        else:
+            print 'Unable to remove %s' % pth
+
+    # remove pre-compiled pycs from tests, I don't know why paver even tries to include them ...
+    # seems to happen only with sdist though
+    for pyc in path('tests/').files('*.pyc'):
+        pyc.remove()
+
+    ver = '%sr%s' % (options['version'], revision)
+
+    print 'Building %s' % ver
+
+    if options.release.get('dist_dir'):
+        options.setdefault('sdist', Bunch())['dist_dir'] = options.release.dist_dir
+
+    # replace version number
+    set_init_version(ver)
+
+    # hack version number into setup( ... options='1.0' ...)
+    from paver import tasks
+    setup_section = tasks.environment.options.setdefault("setup", Bunch())
+    setup_section.update(version=ver)
+
+    for t in ['minilib', 'generate_setup', 'setuptools.command.sdist']:
+        call_task(t)
+
+    # restore version ...
+    set_init_version('{subversion}')
+
 
 @task
-@needs(["minilib", "generate_setup", "setuptools.command.bdist_egg"])
-def bdist_egg():
-    pass
+@cmdopts([
+    ('dist-dir=', 'd', 'directory to put final built distributions in')
+])
+def bdist_egg(options):
+    options.setdefault('release', Bunch())
+
+    revision = svn.info().get('last_changed_rev')
+    ver = '%sr%s' % (options['version'], revision)
+
+    # hack version number into setup( ... options='1.0-svn' ...)
+    from paver import tasks
+    setup_section = tasks.environment.options.setdefault("setup", Bunch())
+    setup_section.update(version=ver)
+
+    # replace version number
+    set_init_version(ver)
+
+    print 'Making egg release'
+    import shutil
+    shutil.copytree('FlexGet.egg-info', 'FlexGet.egg-info-backup')
+
+    if options.release.get('dist_dir'):
+        options.setdefault('bdist_egg', Bunch())['dist_dir'] = options.release.dist_dir
+
+    for t in ["minilib", "generate_setup", "setuptools.command.bdist_egg"]:
+        call_task(t)
+
+    # restore version ...
+    set_init_version('{subversion}')
+
+    # restore egg info from backup
+    print 'Removing FlexGet.egg-info ...'
+    shutil.rmtree('FlexGet.egg-info')
+    print 'Restoring FlexGet.egg-info'
+    shutil.move('FlexGet.egg-info-backup', 'FlexGet.egg-info')
+
 
 @task
 def coverage():
@@ -174,12 +206,16 @@ def coverage():
 @cmdopts([
     ('online', None, 'runs online unit tests'),
     ('dist-dir=', 'd', 'directory to put final built distributions in'),
-    ('no-tests', None, 'skips unit tests')
+    ('no-tests', None, 'skips unit tests'),
+    ('type=', None, 'type of release (src | egg)')
 ])
 def release(options):
     """Make a FlexGet release. Same as bdist_egg but adds version information."""
-    options.setdefault('release', Bunch())
-    # clean previous build
+
+    if options.release.get('type') not in ['src', 'egg']:
+        print 'Invalid type'
+        return
+
     print 'Cleaning build...'
     for p in ['build']:
         pth = path(p)
@@ -190,13 +226,6 @@ def release(options):
         else:
             print 'Unable to remove %s' % pth
 
-    revision = svn.info().get('last_changed_rev')
-    ver = '%sr%s' % (options['version'], revision)
-
-    # replace version number
-    #freplace('flexget/__init__.py', "__version__ = '{subversion}'", "__version__ = '%s'" % ver)
-    set_init_version(ver)
-
     # run unit tests
     if options.release.get('online'):
         options.setdefault('test', Bunch())['online'] = True
@@ -204,27 +233,13 @@ def release(options):
         if not test():
             print 'Unit tests did not pass'
             return
-    import shutil
-    shutil.copytree('FlexGet.egg-info', 'FlexGet.egg-info-backup')
 
-    # hack version number into setup( ... options='1.0-svn' ...)
-    from paver import tasks
-    setup_section = tasks.environment.options.setdefault("setup", Bunch())
-    setup_section.update(version=ver)
-
-    if options.release.get('dist_dir'):
-        options.setdefault('bdist_egg', Bunch())['dist_dir'] = options.release.dist_dir
-    bdist_egg()
-
-    # restore version ...
-    #freplace('flexget/__init__.py', "__version__ = '%s'" % ver, "__version__ = '{subversion}'")
-    set_init_version('{subversion}')
-
-    # restore egg info from backup
-    print 'Removing FlexGet.egg-info ...'
-    shutil.rmtree('FlexGet.egg-info')
-    print 'Restoring FlexGet.egg-info'
-    shutil.move('FlexGet.egg-info-backup', 'FlexGet.egg-info')
+    if options.release.get('type') == 'egg':
+        print 'Making egg release'
+        bdist_egg(options)
+    else:
+        print 'Making src release'
+        sdist(options)
 
 
 # TODO: I don't think it is working / needed anymore?
