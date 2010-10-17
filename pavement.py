@@ -232,7 +232,8 @@ def release(options):
     if not options.release.get('no_tests'):
         if not test():
             print 'Unit tests did not pass'
-            return
+            import sys
+            sys.exit(1)
 
     if options.release.get('type') == 'egg':
         print 'Making egg release'
