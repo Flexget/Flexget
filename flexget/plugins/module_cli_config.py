@@ -73,7 +73,7 @@ class CliConfig(object):
             self.replaces[key.strip()] = value.strip()
         return True
 
-    def on_feed_start(self, feed):
+    def on_process_start(self, feed):
         if self.parse_replaces(feed):
             self.replace_dict(feed.config, self.replaces)
             log.debug(feed.config)
