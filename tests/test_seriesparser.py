@@ -93,16 +93,16 @@ class TestSeriesParser(object):
 
         s = self.parse(name='Something', data='Something.1xAll.Season.Complete-FlexGet')
         assert not s.valid, 'data %s should not be valid' % s.data
-        
+
         s = self.parse(name='Something', data='Something Seasons 1 & 2 - Complete')
         assert not s.valid, 'data %s should not be valid' % s.data
-        
+
         s = self.parse(name='Something', data='Something Seasons 4 Complete')
         assert not s.valid, 'data %s should not be valid' % s.data
-        
+
         s = self.parse(name='Something', data='Something Seasons 1 2 3 4')
         assert not s.valid, 'data %s should not be valid' % s.data
-        
+
         s = self.parse(name='Something', data='Something S6 E1-4')
         assert not s.valid, 'data %s should not be valid' % s.data
 
@@ -118,7 +118,7 @@ class TestSeriesParser(object):
 
         s = self.parse(name='Something', data='Something 1 x 2-FlexGet')
         assert (s.season == 1 and s.episode == 2), 'failed to parse 1 x 2'
-        
+
         # Ticket #732
         s = self.parse(name='Something', data='Something - This is the Subtitle 14x9 [Group-Name]')
         assert (s.season == 14 and s.episode == 9), 'failed to parse %s' % s.data
@@ -130,15 +130,20 @@ class TestSeriesParser(object):
         # FIX: #402 .. a bit hard to do
         s = self.parse(name='Something', data='Something [S01] [E02]')
         assert (s.season == 1 and s.episode == 2), 'failed to parse %s' % s
-        
+
+    def test_ep_in_parenthesis(self):
+        """SeriesParser: test ep in parenthesis"""
+        s = self.parse(name='Something', data='Something (S01E02)')
+        assert (s.season == 1 and s.episode == 2), 'failed to parse %s' % s
+
     def test_season_episode(self):
         """SeriesParser: season X, episode Y"""
         s = self.parse(name='Something', data='Something - Season 1, Episode 2')
         assert (s.season == 1 and s.episode == 2), 'failed to parse %s' % s
-        
+
         s = self.parse(name='Something', data='Something - Season1, Episode2')
         assert (s.season == 1 and s.episode == 2), 'failed to parse %s' % s
-        
+
         s = self.parse(name='Something', data='Something - Season1 Episode2')
         assert (s.season == 1 and s.episode == 2), 'failed to parse %s' % s
 
@@ -146,10 +151,10 @@ class TestSeriesParser(object):
         """SeriesParser: series X, episode Y"""
         s = self.parse(name='Something', data='Something - Series 1, Episode 2')
         assert (s.season == 1 and s.episode == 2), 'failed to parse %s' % s
-        
+
         s = self.parse(name='Something', data='Something - Series1, Episode2')
         assert (s.season == 1 and s.episode == 2), 'failed to parse %s' % s
-        
+
         s = self.parse(name='Something', data='Something - Series1 Episode2')
         assert (s.season == 1 and s.episode == 2), 'failed to parse %s' % s
 
@@ -243,7 +248,7 @@ class TestSeriesParser(object):
 
         s = self.parse(name='Foo Bar', data='[7.1.7.5] Foo Bar - 11 (H.264) [5235532D].mkv')
         assert (s.id == '11'), 'failed to parse %s' % s.data
-        
+
     def test_hd_prefix(self):
         """SeriesParser: HD 720p before name"""
         s = self.parse(name='Foo Bar', data='HD 720p: Foo Bar - 11 (H.264) [5235532D].mkv')
@@ -411,7 +416,7 @@ class TestSeriesParser(object):
         s.allow_groups = ['xxxx', 'group']
         s.parse()
         assert s.group == 'group', 'did not get group'
-    
+
     def test_id_and_hash(self):
         """SeriesParser: Series with confusing hash"""
         s = self.parse(name='Something', data='Something 63 [560D3414]')
@@ -421,7 +426,7 @@ class TestSeriesParser(object):
         assert (s.id == '62'), 'failed to parse %s' % s.data
 
     def test_ticket_700(self):
-        """SeriesParser: Series with confusing name"""
+        """SeriesParser: confusing name (#700)"""
         s = self.parse(name='Something', data='Something 9x02 - Episode 2')
         assert s.season == 9, 'failed to parse season'
         assert s.episode == 2, 'failed to parse episode'

@@ -105,6 +105,10 @@ class SeriesParser(TitleParser):
                         if proper.lower() in match.lower():
                             safe = False
                             break
+                    if self.parse_episode(match):
+                        log.log(5, '%s looks like a valid episode identifier' % match)
+                        safe = False
+                        break
                     if not safe:
                         break
                     else:
