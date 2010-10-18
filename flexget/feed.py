@@ -257,8 +257,11 @@ class Feed(object):
         if not kwargs.get('silent', False):
             log.info('Aborting feed (plugin: %s)' % (self.current_plugin))
         log.debug('Aborting feed (plugin: %s)' % (self.current_plugin))
-        self._abort = True
-        self.__run_event('abort')
+        # Run the abort event before we set the _abort flag
+        try:
+            self.__run_event('abort')
+        finally:
+            self._abort = True
 
     def find_entry(self, category='entries', **values):
         """Find and return entry with given attributes from feed or None"""

@@ -78,6 +78,14 @@ class ModuleThetvdbLookup(object):
         from flexget import validator
         return validator.factory('boolean')
 
+    @priority(120)
+    def on_process_start(self, feed):
+        """
+            Register the usable set: keywords.
+        """
+        set_plugin = get_plugin_by_name('set')
+        set_plugin.instance.register_key('thetvdb_id', 'number')
+
     @priority(100)
     def on_feed_filter(self, feed):
         from flexget.utils.log import log_once
@@ -156,7 +164,7 @@ class ModuleThetvdbLookup(object):
             series_id = None
             if 'thetvdb_id' in entry:
                 series_id = entry['thetvdb_id']
-                log.info("thetvdb ID: %(thetvdb_id)s passed in from config for %(series_name)s - S%(series_season)sE%(series_episode)s" % entry)
+                log.debug("Read thetvdb_id \'%(thetvdb_id)d\' from entry for %(title)s" % entry)
             else:
                 feed.verbose_progress('Requesting %s information from TheTvDB.com' % entry['series_name'])
                 # get my series data.

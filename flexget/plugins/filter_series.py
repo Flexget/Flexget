@@ -510,10 +510,6 @@ class FilterSeries(SeriesPlugin):
 
         return root
 
-    def on_feed_input(self, feed):
-        if self.backlog:
-            self.backlog.inject_backlog(feed)
-
     def generate_config(self, feed):
         """Generate configuration dictionary from configuration. Converts simple format into advanced.
         This way we don't need to handle two different configuration formats in the logic.
