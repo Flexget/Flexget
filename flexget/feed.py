@@ -245,7 +245,6 @@ class Feed(object):
         log.debug("Marking entry '%s' as failed" % entry['title'])
         if not entry in self.failed:
             self.failed.append(entry)
-            self.manager.add_failed(entry)
             log.error('Failed %s (%s)' % (entry['title'], reason))
             # Run on_entry_fail event
             self.__run_event('fail', entry=entry, reason=reason)

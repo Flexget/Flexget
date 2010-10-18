@@ -24,10 +24,6 @@ class OptionParser(OptParser):
                         help='Forgets everything that has been done and learns current matches.')
         self.add_option('--doc', action='store', dest='doc',
                         metavar='PLUGIN', help='Display plugin documentation. See also --plugins.')
-        self.add_option('--failed', action='store_true', dest='failed', default=0,
-                        help='List recently failed entries.')
-        self.add_option('--clear', action='store_true', dest='clear_failed', default=0,
-                        help='Clear recently failed list.')
         self.add_option('-c', action='store', dest='config', default='config.yml',
                         help='Specify configuration file. Default is config.yml')
         self.add_option('--cron', action='store_true', dest='quiet', default=False,
