@@ -38,7 +38,7 @@ class PluginFailed(object):
             self.print_failed()
             return
         if feed.manager.options.clear_failed:
-            self.manager.disable_feeds()
+            feed.manager.disable_feeds()
             self.clear_failed()
             return
 
