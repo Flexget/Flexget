@@ -13,11 +13,14 @@ setup(
     description='FlexGet is a program aimed to automate downloading or processing content (torrents, podcasts, etc.) from different sources like RSS-feeds, html-pages, various sites and more.',
     author='Marko Koivusalo',
     author_email='marko.koivusalo@gmail.com',
+    license='MIT',
     url='http://flexget.com',
     install_requires=['FeedParser', 'SQLAlchemy>0.5', 'PyYAML', 'BeautifulSoup', 'html5lib>=0.11', \
                       'PyRSS2Gen', 'pynzb', 'progressbar'],
     packages=['flexget', 'flexget.plugins', 'flexget.utils', 'flexget.utils.titles'],
-    package_data=find_package_data('flexget', package='flexget', only_in_packages=False),
+    package_data=find_package_data('flexget', package='flexget', \
+                                   exclude=['FlexGet.egg-info', '*.pyc'], \
+                                   only_in_packages=False), # NOTE: the exclude does not seem to work
     zip_safe=False,
     test_suite='nose.collector',
     setup_requires=['nose>=0.11'],
@@ -26,6 +29,7 @@ setup(
         flexget = flexget:main
     """
 )
+
 options(
     minilib=Bunch(
         extra_files=['virtual', 'svn']
@@ -34,14 +38,6 @@ options(
         packages_to_install=['nose>=0.11'],
         paver_command_line='develop',
         unzip_setuptools=True
-    ),
-    pylint = Bunch(
-        check_modules = ['flexget'],
-        quiet = False,
-        verbose = False,
-        quiet_args = ['--reports=no', '--disable-checker=similarities'],
-        pylint_args = ['--rcfile=pylint.rc', '--include-ids=y'],
-        ignore = False
     )
 )
 
@@ -106,6 +102,8 @@ def sdist(options):
 
     revision = svn.info().get('last_changed_rev')
 
+    print 'Revision: %s' % revision
+
     # clean previous build
     print 'Cleaning build...'
     for p in ['build']:
@@ -126,8 +124,13 @@ def sdist(options):
 
     print 'Building %s' % ver
 
-    if options.release.get('dist_dir'):
-        options.setdefault('sdist', Bunch())['dist_dir'] = options.release.dist_dir
+    # hack for getting options from release task
+    if hasattr(options, 'release'):
+        if options.release.get('dist_dir'):
+            options.setdefault('sdist', Bunch())['dist_dir'] = options.release.dist_dir
+    else:
+        if options.sdist.get('dist_dir'):
+            options.setdefault('sdist', Bunch())['dist_dir'] = options.sdist.dist_dir
 
     # replace version number
     set_init_version(ver)
@@ -153,6 +156,7 @@ def bdist_egg():
     ('dist-dir=', 'd', 'directory to put final built distributions in')
 ])
 def make_egg(options):
+    # naming this task to bdist_egg will make egg installation fail
     options.setdefault('release', Bunch())
 
     revision = svn.info().get('last_changed_rev')
@@ -172,6 +176,14 @@ def make_egg(options):
 
     if options.release.get('dist_dir'):
         options.setdefault('bdist_egg', Bunch())['dist_dir'] = options.release.dist_dir
+
+    # hack for getting options from release task
+    if hasattr(options, 'release'):
+        if options.release.get('dist_dir'):
+            options.setdefault('bdist_egg', Bunch())['dist_dir'] = options.release.dist_dir
+    else:
+        if options.sdist.get('dist_dir'):
+            options.setdefault('bdist_egg', Bunch())['dist_dir'] = options.sdist.dist_dir
 
     for t in ["minilib", "generate_setup", "setuptools.command.bdist_egg"]:
         call_task(t)
@@ -245,61 +257,6 @@ def release(options):
     else:
         print 'Making src release'
         sdist(options)
-
-
-# TODO: I don't think it is working / needed anymore?
-@task
-@cmdopts([
-    ('pylint-command=', 'c', 'Specify a custom pylint executable'),
-    ('quiet', 'q', 'Disables a lot of the pylint output'),
-    ('verbose', 'v', 'Enables detailed output'),
-    ('ignore', 'i', 'Ignore PyLint errors')
-])
-def pylint(options):
-
-    import os.path
-    if not os.path.exists('bin/pylint'):
-        raise paver.tasks.BuildFailure('PyLint not installed!\n'+\
-                                       'Run bin/easy_install logilab.pylintinstaller\n' + \
-                                       'Do not be alarmed by the errors it may give, it still works ..')
-
-
-    """Check the source code using PyLint."""
-    from pylint import lint
-
-    # Initial command.
-    arguments = []
-
-    if options.pylint.quiet:
-        arguments.extend(options.pylint.quiet_args)
-
-    if 'pylint_args' in options.pylint:
-        arguments.extend(list(options.pylint.pylint_args))
-
-    if not options.pylint.verbose:
-        arguments.append('--errors-only')
-
-    # Add the list of paths containing the modules to check using PyLint.
-    arguments.extend(str(PROJECT_DIR / module) for module in options.check_modules)
-
-    # By placing run_pylint into its own function, it allows us to do dry runs
-    # without actually running PyLint.
-    def run_pylint():
-        # Add app folder to path.
-        sys.path.insert(0, PROJECT_DIR)
-
-        print 'Running pylint (this may take a while)'
-        # Runs the PyLint command.
-        try:
-            lint.Run(arguments)
-        # PyLint will `sys.exit()` when it has finished, so we need to catch
-        # the exception and process it accordingly.
-        except SystemExit, exc:
-            return_code = exc.args[0]
-            if return_code != 0 and (not options.pylint.ignore):
-                raise paver.tasks.BuildFailure('PyLint finished with a non-zero exit code')
-
-    return dry('bin/pylint ' + ' '.join(arguments), run_pylint)
 
 
 @task

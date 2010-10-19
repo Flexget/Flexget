@@ -1,7 +1,7 @@
 import logging
-from flexget.plugin import *
+from flexget.plugin import register_plugin, register_parser_option
 from flexget.manager import Base, Session
-from sqlalchemy import Column, Integer, String, Unicode, DateTime, Boolean, desc
+from sqlalchemy import Column, Integer, String, Unicode, DateTime
 
 log = logging.getLogger('failed')
 
@@ -27,7 +27,7 @@ class PluginFailed(object):
     """
     Provides tracking for failures and related commandline utilities.
     """
-    
+
     def validator(self):
         from flexget import validator
         return validator.factory('boolean')
@@ -53,6 +53,7 @@ class PluginFailed(object):
             print '%16s - %s' % (entry.tof.strftime('%Y-%m-%d %H:%M'), entry.title)
         failed.close()
 
+    # TODO: add reason support
     def add_failed(self, entry):
         """Adds entry to internal failed list, displayed with --failed"""
         failed = Session()
@@ -79,7 +80,7 @@ class PluginFailed(object):
         session.commit()
         session.close()
 
-    def on_entry_fail(self, feed, reason):
+    def on_entry_fail(self, feed, entry, reason):
         self.add_failed(entry)
 
 register_plugin(PluginFailed, '--failed', builtin=True)
