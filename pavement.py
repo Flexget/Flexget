@@ -143,12 +143,16 @@ def sdist(options):
     # restore version ...
     set_init_version('{subversion}')
 
+@task
+@needs(["minilib", "generate_setup", "setuptools.command.bdist_egg"])
+def bdist_egg():
+    pass
 
 @task
 @cmdopts([
     ('dist-dir=', 'd', 'directory to put final built distributions in')
 ])
-def bdist_egg(options):
+def make_egg(options):
     options.setdefault('release', Bunch())
 
     revision = svn.info().get('last_changed_rev')
@@ -237,7 +241,7 @@ def release(options):
 
     if options.release.get('type') == 'egg':
         print 'Making egg release'
-        bdist_egg(options)
+        make_egg(options)
     else:
         print 'Making src release'
         sdist(options)
