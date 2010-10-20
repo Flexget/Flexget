@@ -2,8 +2,8 @@ import time
 import hashlib
 import logging
 from flexget.manager import Session
-from flexget.plugin import *
-from flexget.plugin import FEED_EVENTS
+from flexget.plugin import get_methods_by_event, get_plugins_by_event, get_plugin_by_name, \
+    FEED_EVENTS, PluginWarning, PluginError, PluginDependencyError
 from flexget.utils.simple_persistence import SimplePersistence
 
 log = logging.getLogger('feed')
@@ -84,7 +84,7 @@ class Entry(dict):
             dict.__setitem__(self, 'uid', uid)
 
     def safe_str(self):
-        return "%s | %s" % (self['title'], self['url'])
+        return '%s | %s' % (self['title'], self['url'])
 
     def isvalid(self):
         """Return True if entry is valid. Return False if this cannot be used."""
@@ -242,7 +242,7 @@ class Feed(object):
 
     def fail(self, entry, reason=None):
         """Mark entry as failed."""
-        log.debug("Marking entry '%s' as failed" % entry['title'])
+        log.debug('Marking entry \'%s\' as failed' % entry['title'])
         if not entry in self.failed:
             self.failed.append(entry)
             log.error('Failed %s (%s)' % (entry['title'], reason))
@@ -257,10 +257,8 @@ class Feed(object):
             log.info('Aborting feed (plugin: %s)' % (self.current_plugin))
         log.debug('Aborting feed (plugin: %s)' % (self.current_plugin))
         # Run the abort event before we set the _abort flag
-        try:
-            self.__run_event('abort')
-        finally:
-            self._abort = True
+        self._abort = True
+        self.__run_event('abort')
 
     def find_entry(self, category='entries', **values):
         """Find and return entry with given attributes from feed or None"""
@@ -308,7 +306,7 @@ class Feed(object):
         if event in entry_events and not entry:
             raise Exception('Entry must be specified when running the %s event' % event)
         methods = get_methods_by_event(event)
-        #log.log(5, 'Event %s methods %s' % (event, methods))
+        # log.log(5, 'Event %s methods %s' % (event, methods))
 
         # warn if no filters or outputs in the feed
         if event in ['filter', 'output']:
@@ -328,7 +326,7 @@ class Feed(object):
                     # store execute info, except during entry events
                     self.current_event = event
                     self.current_plugin = keyword
-                #log.log(5, 'Running %s method %s' % (keyword, method))
+                # log.log(5, 'Running %s method %s' % (keyword, method))
                 # call the plugin
                 try:
                     if event in entry_events:
@@ -368,7 +366,7 @@ class Feed(object):
                     # purge entries between plugins
                     self.purge()
                 # check for priority operations
-                if self._abort:
+                if self._abort and event != 'abort':
                     return
 
     @useFeedLogging
