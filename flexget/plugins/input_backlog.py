@@ -1,6 +1,6 @@
 import logging
-from flexget.manager import Base
-from flexget.plugin import *
+from flexget.manager import Base, Session
+from flexget.plugin import register_plugin, priority, PluginWarning
 from datetime import datetime, timedelta
 from sqlalchemy import Column, Integer, String, DateTime, PickleType
 
@@ -65,8 +65,9 @@ class InputBacklog(object):
 
     def add_backlog(self, feed, entry, amount=''):
         """Add single entry to feed backlog"""
+        session = Session()
         expire_time = datetime.now() + self.get_amount(amount)
-        backlog_entry = feed.session.query(BacklogEntry).filter(BacklogEntry.title == entry['title']).\
+        backlog_entry = session.query(BacklogEntry).filter(BacklogEntry.title == entry['title']).\
                                                 filter(BacklogEntry.feed == feed.name).first()
         if backlog_entry:
             # If there is already a backlog entry for this, update the expiry time if necessary.
@@ -80,7 +81,8 @@ class InputBacklog(object):
             backlog_entry.entry = entry
             backlog_entry.feed = feed.name
             backlog_entry.expire = expire_time
-            feed.session.add(backlog_entry)
+            session.add(backlog_entry)
+        session.commit()
 
     def learn_backlog(self, feed, amount=''):
         """Learn current entries into backlog. All feed inputs must have been executed."""

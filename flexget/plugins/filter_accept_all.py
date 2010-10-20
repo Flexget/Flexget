@@ -1,7 +1,8 @@
 import logging
-from flexget.plugin import *
+from flexget.plugin import register_plugin
 
 log = logging.getLogger('accept_all')
+
 
 class FilterAcceptAll:
     """
@@ -11,6 +12,7 @@ class FilterAcceptAll:
         
         accept_all: true
     """
+
     def validator(self):
         from flexget import validator
         return validator.factory('boolean')
