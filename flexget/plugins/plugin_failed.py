@@ -2,6 +2,7 @@ import logging
 from flexget.plugin import register_plugin, register_parser_option
 from flexget.manager import Base, Session
 from sqlalchemy import Column, Integer, String, Unicode, DateTime
+from datetime import datetime
 
 log = logging.getLogger('failed')
 
