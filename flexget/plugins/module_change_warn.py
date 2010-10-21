@@ -24,11 +24,11 @@ class ChangeWarn:
     def on_process_start(self, feed):
         found_deprecated = False
         config = feed.manager.config
-        
+
         if 'torrent_size' in feed.config:
             log.critical('Plugin torrent_size is deprecated, use content_size instead')
             found_deprecated = True
-        
+
         if 'nzb_size' in feed.config:
             log.critical('Plugin nzb_size is deprecated, use content_size instead')
             found_deprecated = True
@@ -55,7 +55,7 @@ class ChangeWarn:
         columns = table_columns('make_rss', session)
         if not 'rsslink' in columns:
             self.old_database(feed, '(rsslink missing from make_rss table)')
-            
+
         columns = table_columns('imdb_queue', session)
         if not 'title' in columns:
             self.old_database(feed, '(title missing from imdb_queue table)')
@@ -89,7 +89,10 @@ try:
 
         if 'module_priority' in name:
             require_clean = True
-        
+
+        if 'ignore_feed' in name:
+            require_clean = True
+
         if require_clean:
             log.critical('-' * 79)
             log.critical('IMPORTANT: Please remove all pre-compiled .pyc and .pyo files from')

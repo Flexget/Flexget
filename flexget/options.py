@@ -16,8 +16,6 @@ class OptionParser(OptParser):
                         help='Validate configuration file and print errors.')
         self.add_option('--learn', action='store_true', dest='learn', default=0,
                         help='Matches are not downloaded but will be skipped in the future.')
-        self.add_option('--feed', action='store', dest='onlyfeed', default=None,
-                        metavar='FEED', help='Run only specified feed.')
         self.add_option('--no-cache', action='store_true', dest='nocache', default=0,
                         help='Disable caches. Works only in plugins that have explicit support.')
         self.add_option('--reset', action='store_true', dest='reset', default=0,
