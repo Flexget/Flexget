@@ -1,7 +1,7 @@
 import logging
 import os
 from flexget.manager import Session
-from flexget.plugin import *
+from flexget.plugin import register_plugin
 
 log = logging.getLogger('change')
 found_deprecated = False
@@ -17,7 +17,7 @@ class ChangeWarn:
     """
 
     def old_database(self, feed, reason=''):
-        log.critical('You\'re running old database! Please see bleeding edge news for necessary actions! %s' % reason)
+        log.critical('You\'re running old database! Please see \'Upgrade Actions\' at flexget.com for necessary actions! %s' % reason)
         feed.manager.disable_feeds()
         feed.abort()
 
