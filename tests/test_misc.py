@@ -122,7 +122,7 @@ class TestDownload(FlexGetBase):
         FlexGetBase.__init__(self)
 
     def teardown(self):
-        FlexGetBase.tearDown(self)
+        FlexGetBase.teardown(self)
         if hasattr(self, 'testfile') and os.path.exists(self.testfile):
             os.remove(self.testfile)
         temp_dir = os.path.join(self.manager.config_base, 'temp')

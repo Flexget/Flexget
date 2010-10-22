@@ -21,7 +21,7 @@ class TestURLRewriters(FlexGetBase):
     """
 
     def setup(self):
-        FlexGetBase.setUp(self)
+        FlexGetBase.setup(self)
         self.execute_feed('test')
 
     def get_urlrewriter(self, name):

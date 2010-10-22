@@ -66,10 +66,6 @@ class FlexGetBase(object):
         except:
             pass
 
-    # backwards compatibility, safe to remove once all test are converted
-    setUp = setup
-    tearDown = teardown
-
     def execute_feed(self, name):
         """Use to execute one test feed from config"""
         log.info('********** Running feed: %s ********** ' % name)
@@ -80,22 +76,25 @@ class FlexGetBase(object):
         self.feed = Feed(self.manager, name, config)
         self.feed.session = Session()
         self.feed.process_start()
-        self.feed.execute()
+        if self.feed.enabled:
+            self.feed.execute()
+        else:
+            log.debug('Feed \'%s\' has been disabled, not running' % self.feed.name)
         self.feed.process_end()
         self.feed.session.commit()
 
     def dump(self):
         """Helper method for debugging"""
         from flexget.utils.tools import sanitize
-        #entries = sanitize(self.feed.entries)
-        #accepted = sanitize(self.feed.accepted)
-        #rejected = sanitize(self.feed.rejected)
+        # entries = sanitize(self.feed.entries)
+        # accepted = sanitize(self.feed.accepted)
+        # rejected = sanitize(self.feed.rejected)
         print '-- ENTRIES: -----------------------------------------------------'
-        #print yaml.safe_dump(entries)
+        # print yaml.safe_dump(entries)
         print self.feed.entries
         print '-- ACCEPTED: ----------------------------------------------------'
-        #print yaml.safe_dump(accepted)
+        # print yaml.safe_dump(accepted)
         print self.feed.accepted
         print '-- REJECTED: ----------------------------------------------------'
-        #print yaml.safe_dump(rejected)
+        # print yaml.safe_dump(rejected)
         print self.feed.rejected

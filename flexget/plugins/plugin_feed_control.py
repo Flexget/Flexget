@@ -35,7 +35,7 @@ class OnlyFeed(object):
             feed.enabled = False
 
 
-class IgnoreFeed(object):
+class ManualFeed(object):
     """Only execute feed when specified with --feed"""
 
     def validator(self):
@@ -44,7 +44,7 @@ class IgnoreFeed(object):
 
     def on_process_start(self, feed):
         # Make sure we need to run
-        if not feed.config['ignore_feed']:
+        if not feed.config['manual']:
             return
         # If --feed hasn't been specified disable this plugin
         if not feed.manager.options.onlyfeed:
@@ -52,6 +52,6 @@ class IgnoreFeed(object):
             feed.enabled = False
 
 register_plugin(OnlyFeed, '--feed', builtin=True)
-register_plugin(IgnoreFeed, 'ignore_feed')
+register_plugin(ManualFeed, 'manual')
 register_parser_option('--feed', action='store', dest='onlyfeed', default=None,
                        metavar='FEED', help='Run only specified feed.')

@@ -85,7 +85,7 @@ class TestQuality(FlexGetBase):
             series:
               720P:
                 - GroupQual
-              #Test that an integer group name doesn't cause an exception.
+              # Test that an integer group name doesn't cause an exception.
               1080:
                 - Test
     """
@@ -519,7 +519,6 @@ class TestPropers(FlexGetBase):
 
         # reject downloaded proper
         self.execute_feed('propers_2')
-        #assert not self.feed.accepted, 'downloaded proper accepted'
         assert self.feed.find_entry('rejected', title='Test.S01E01.720p.Proper-FlexGet'), \
             'downloaded proper should have been rejected'
 
@@ -548,12 +547,12 @@ class TestSimilarNames(FlexGetBase):
               - {title: 'FooBar: SecondAlt.S01E01.DSR-FlexGet'}
             series:
               - FooBar
-              - "FooBar: FirstAlt"
-              - "FooBar: SecondAlt"
+              - 'FooBar: FirstAlt'
+              - 'FooBar: SecondAlt'
     """
 
     def setup(self):
-        FlexGetBase.setUp(self)
+        FlexGetBase.setup(self)
         self.execute_feed('test')
 
     def test_names(self):
