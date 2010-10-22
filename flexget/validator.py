@@ -91,7 +91,7 @@ class Validator(object):
     def get_validator(self, name, **kwargs):
         if not self.validators.get(name):
             raise Exception('Asked unknown validator \'%s\'' % name)
-        #print 'returning %s' % name
+        # print 'returning %s' % name
         return self.validators[name](self, **kwargs)
 
     def accept(self, name, **kwargs):
@@ -112,7 +112,7 @@ class Validator(object):
         """
         count = self.errors.count()
         for rule in rules:
-            #print 'validating %s' % rule.name
+            # print 'validating %s' % rule.name
             if rule.validateable(item):
                 if rule.validate(item):
                     # item is valid, remove added errors before returning
@@ -135,7 +135,7 @@ class Validator(object):
                 elif isinstance(item, list):
                     self.errors.add('got a list instead of %s' % acceptable)
                 else:
-                    self.errors.add('value "%s" is not valid %s' % (item, acceptable))
+                    self.errors.add('value \'%s\' is not valid %s' % (item, acceptable))
         return False
 
     def __str__(self):
@@ -185,9 +185,11 @@ class ChoiceValidator(Validator):
             return True
         elif isinstance(data, basestring) and data.lower() in self.valid_ic:
             return True
+        elif isinstance(data, (int, float)) and str(data) in self.valid + self.valid_ic:
+            return True
         else:
             acceptable = [str(value) for value in self.valid + self.valid_ic]
-            self.errors.add("'%s' is not one of acceptable values: %s" % (data, ', '.join(acceptable)))
+            self.errors.add('\'%s\' is not one of acceptable values: %s' % (data, ', '.join(acceptable)))
             return False
 
 
@@ -471,7 +473,7 @@ class DictValidator(Validator):
     def accept_any_key(self, name, **kwargs):
         """Accepts any key with given type"""
         v = self.get_validator(name, **kwargs)
-        #v.accept(name, **kwargs)
+        # v.accept(name, **kwargs)
         self.any_key.append(v)
         return v
 
