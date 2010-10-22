@@ -185,8 +185,6 @@ class ChoiceValidator(Validator):
             return True
         elif isinstance(data, basestring) and data.lower() in self.valid_ic:
             return True
-        elif isinstance(data, (int, float)) and str(data) in self.valid + self.valid_ic:
-            return True
         else:
             acceptable = [str(value) for value in self.valid + self.valid_ic]
             self.errors.add('\'%s\' is not one of acceptable values: %s' % (data, ', '.join(acceptable)))
