@@ -93,6 +93,9 @@ try:
         if 'ignore_feed' in name:
             require_clean = True
 
+        if 'module_manual' in name:
+            require_clean = True
+
         if require_clean:
             log.critical('-' * 79)
             log.critical('IMPORTANT: Please remove all pre-compiled .pyc and .pyo files from')
