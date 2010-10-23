@@ -1,5 +1,5 @@
 import logging
-from flexget.plugin import *
+from flexget.plugin import register_plugin, priority
 import copy
 from flexget.utils.tools import replace_from_entry
 
@@ -10,16 +10,16 @@ class ModifySet(object):
 
     """
         Allows adding information to a feed entry for use later.
-    
+
         Example:
 
         set:
           path: ~/download/path/
     """
-    
+
     def __init__(self):
         self.keys = {}
-            
+
     def validator(self):
         from flexget import validator
         v = validator.factory('dict')
@@ -33,7 +33,7 @@ class ModifySet(object):
         if key:
             if not key in self.keys:
                 self.keys[key] = type
-            
+
     def register_keys(self, keys):
         """
         for easy registration of multiple keys
@@ -41,6 +41,7 @@ class ModifySet(object):
         for key, value in keys.iteritems():
             self.register_key(key, value)
 
+    # Filter priority is -255 so we run after all filters are finished
     @priority(-255)
     def on_feed_filter(self, feed):
         """
@@ -49,7 +50,7 @@ class ModifySet(object):
         """
         for entry in feed.entries + feed.rejected:
             self.modify(entry, feed.config['set'], False, entry in feed.accepted)
-            
+
     def modify(self, entry, config, validate=True, errors=True):
         """
         this can be called from a plugin to add set values to an entry
@@ -63,7 +64,7 @@ class ModifySet(object):
                 conf[key] = replace_from_entry(value, entry, key, logger)
             else:
                 conf[key] = value
-        
+
         if validate:
             from flexget import validator
             v = validator.factory('dict')
@@ -77,8 +78,7 @@ class ModifySet(object):
 
         # If there are valid items in the config, apply to entry.
         if conf:
-            log.debug('adding set: info to entry:"%s" %s' % (entry['title'], conf))
+            log.debug('adding set: info to entry:\'%s\' %s' % (entry['title'], conf))
             entry.update(conf)
 
-#filter priority is -255 so we run after all filters are finished
 register_plugin(ModifySet, 'set')

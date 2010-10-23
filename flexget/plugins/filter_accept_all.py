@@ -7,9 +7,9 @@ log = logging.getLogger('accept_all')
 class FilterAcceptAll:
     """
         Just accepts all entries.
-        
+
         Example:
-        
+
         accept_all: true
     """
 
