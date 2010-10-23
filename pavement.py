@@ -157,11 +157,11 @@ def bdist_egg(options):
     import os
     if not os.path.exists('paver-minilib.zip'):
         call_task('minilib')
-        
+
     # set path
     if options.bdist_egg.get('dist_dir'):
         options.setdefault('bdist_egg', Bunch())['dist_dir'] = options.bdist_egg.dist_dir
-        
+
     for t in ['generate_setup', 'setuptools.command.bdist_egg']:
         call_task(t)
 
@@ -300,3 +300,14 @@ def install_tools():
         print 'Nose-xcover INSTALLED'
     except:
         pip.main(['install', 'http://github.com/cmheisel/nose-xcover/zipball/master'])
+
+
+@task
+def clean_compiled():
+    import os
+    for root, dirs, files in os.walk('.'):
+        for name in files:
+            fqn = os.path.join(root, name)
+            if fqn[-3:] == 'pyc' or fqn[-3:] == 'pyo' or fqn[-5:] == 'cover':
+                print 'Deleting %s' % fqn
+                os.remove(fqn)
