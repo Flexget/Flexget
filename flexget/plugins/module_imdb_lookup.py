@@ -1,6 +1,6 @@
 import logging
 from optparse import SUPPRESS_HELP
-from flexget.plugin import register_plugin, register_plugin_option, PluginError, PluginWarning
+from flexget.plugin import register_plugin, register_parser_option, priority, internet, PluginError, PluginWarning
 from flexget.manager import Base, Session
 from flexget.utils.log import log_once
 from flexget.utils.imdb import ImdbSearch, ImdbParser, extract_id
