@@ -1,10 +1,8 @@
 import logging
-import re
-from flexget.utils.titles import SeriesParser
 from flexget.utils import qualities
 from flexget.manager import Base
 from sqlalchemy import Column, Integer, Unicode
-from flexget.plugin import *
+from flexget.plugin import register_plugin, priority
 
 log = logging.getLogger('series_premiere')
 

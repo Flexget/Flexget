@@ -1,5 +1,5 @@
 import logging
-from flexget.plugin import *
+from flexget.plugin import register_plugin
 import flexget.utils.qualities as quals
 
 log = logging.getLogger('quality')
@@ -8,9 +8,9 @@ log = logging.getLogger('quality')
 class FilterQuality(object):
     """
         Rejects all entries that don't have one of the specified qualities
-        
+
         Example:
-        
+
         quality:
           - hdtv
     """

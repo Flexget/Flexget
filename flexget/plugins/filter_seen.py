@@ -1,7 +1,7 @@
 import logging
 from flexget.manager import Base
-from flexget.plugin import *
-from sqlalchemy import Column, Integer, String, DateTime, Unicode, asc
+from flexget.plugin import register_plugin, priority, register_parser_option
+from sqlalchemy import Column, Integer, String, DateTime, Unicode, asc, or_
 from sqlalchemy.schema import ForeignKey
 from sqlalchemy.orm import relation
 from datetime import datetime
@@ -72,7 +72,7 @@ class MigrateSeen(object):
                     count += 1
             session.commit()
             log.info('It worked! Migrated %s seen items' % count)
-        except Exception, e:
+        except Exception:
             log.critical('It crashed :(')
         finally:
             session.close()
@@ -167,7 +167,6 @@ class SeenSearch(object):
 
         feed.manager.disable_feeds()
 
-        import time
         session = Session()
         shown = []
         for field in session.query(SeenField).\
@@ -207,13 +206,7 @@ class SeenForget(object):
         session = Session()
         count = 0
         fcount = 0
-        for se in session.query(SeenEntry).filter(SeenEntry.title == forget).all():
-            fcount += len(se.fields)
-            count += 1
-            session.delete(se)
-
-        # TODO: merge with previous statement by utilizing or-clause
-        for se in session.query(SeenEntry).filter(SeenEntry.feed == forget).all():
+        for se in session.query(SeenEntry).filter(or_(SeenEntry.title == forget, SeenEntry.feed == forget)).all():
             fcount += len(se.fields)
             count += 1
             session.delete(se)

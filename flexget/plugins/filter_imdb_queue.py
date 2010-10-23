@@ -1,7 +1,7 @@
 import logging
 import datetime
 from flexget.manager import Session
-from flexget.plugin import *
+from flexget.plugin import register_plugin, PluginError, get_plugin_by_name, priority, register_parser_option
 from flexget.manager import Base
 from sqlalchemy import Column, Integer, String, DateTime, Boolean, Unicode
 from flexget.utils.imdb import extract_id, ImdbSearch, ImdbParser, log as imdb_log
@@ -62,7 +62,7 @@ class FilterImdbQueue(object):
                 else:
                     imdb_id = extract_id(entry['imdb_url'])
 
-                if not imdb_id: 
+                if not imdb_id:
                     log.warning("No imdb id could be determined for %s" % entry['title'])
                     continue
 
@@ -128,12 +128,12 @@ class ImdbQueueManager(object):
         """
         Handle IMDb queue management
         """
-        
+
         if not self.options:
             return
 
         feed.manager.disable_feeds()
-        
+
         if 'usage' in self.options:
             return
 
@@ -146,10 +146,10 @@ class ImdbQueueManager(object):
         if action != 'list' and not 'what' in self.options:
             self.error('No URL or NAME given')
             return
-            
+
         from sqlalchemy.exceptions import OperationalError
         try:
-            if action == 'add':            
+            if action == 'add':
                 self.queue_add()
             elif action == 'del':
                 self.queue_del()
@@ -167,7 +167,6 @@ class ImdbQueueManager(object):
         # Check that the quality is valid
         quality = self.options['quality']
 
-        from flexget.utils.titles.parser import TitleParser
         from flexget.utils import qualities
         if (quality != 'ANY') and (quality not in qualities.registry):
             print 'ERROR! Unknown quality `%s`' % quality
@@ -224,7 +223,7 @@ class ImdbQueueManager(object):
     def queue_list(self):
         """List IMDb queue"""
 
-        session = Session()            
+        session = Session()
 
         items = session.query(ImdbQueue)
         print '-' * 79
@@ -249,10 +248,10 @@ class ImdbQueueManager(object):
             print 'IMDB queue is empty'
 
         print '-' * 79
-        
+
         session.commit()
         session.close()
-                
+
 register_plugin(FilterImdbQueue, 'imdb_queue')
 register_plugin(ImdbQueueManager, 'imdb_queue_manager', builtin=True)
 

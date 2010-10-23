@@ -1,5 +1,5 @@
 import logging
-from flexget.plugin import *
+from flexget.plugin import register_plugin, priority, get_plugin_by_name, PluginError
 
 log = logging.getLogger('imdb_required')
 
@@ -12,7 +12,7 @@ class FilterImdbRequired(object):
 
         imdb_required: yes
     """
-    
+
     def validator(self):
         from flexget import validator
         return validator.factory('boolean')

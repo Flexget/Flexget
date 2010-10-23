@@ -1,5 +1,5 @@
 import logging
-from flexget.plugin import *
+from flexget.plugin import register_plugin, get_plugin_by_name, PluginError
 from flexget.utils.log import log_once
 
 log = logging.getLogger('imdb')

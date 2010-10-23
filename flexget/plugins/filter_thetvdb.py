@@ -1,5 +1,5 @@
 import logging
-from flexget.plugin import *
+from flexget.plugin import register_plugin, priority, get_plugin_by_name, PluginError
 from flexget.utils.log import log_once
 
 log = logging.getLogger('thetvdb')
@@ -129,19 +129,16 @@ class FilterTvdb(object):
         '''
         # will want to port this over to filter_imdb as well, for code
         # clarity in that module.
-        if isinstance(entryitem, list):
-            if configkey in config:
-                    configlist = config[configkey]
-                    if entryitem in configlist:
+        if configkey in config:
+            configlist = config[configkey]
+            if isinstance(entryitem, list):
+                for item in entryitem:
+                    if item in configlist:
                         return True
-                    return False
-        else:
-            if configkey in config:
-                    configlist = config[configkey]
-                    for language in entryitem:
-                        if entryitem in configlist:
-                            return True
-                    return False
+            else:
+                if entryitem in configlist:
+                    return True
+        return False
 
     @priority(126)
     def on_feed_filter(self, feed):

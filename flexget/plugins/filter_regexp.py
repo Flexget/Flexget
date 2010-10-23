@@ -1,6 +1,6 @@
 import logging
 import re
-from flexget.plugin import *
+from flexget.plugin import register_plugin, PluginWarning, priority, get_plugin_by_name
 
 log = logging.getLogger('regexp')
 
@@ -9,7 +9,7 @@ class FilterRegexp(object):
 
     """
         All possible forms.
-        
+
         regexp:
           [operation]:           # operation to perform on matches
             - [regexp]           # simple regexp
@@ -21,14 +21,14 @@ class FilterRegexp(object):
             - [regexp]:
                 [path]: <path>   # override path
                 [not]:           # list of not match regexps
-                  - <regexp>    
+                  - <regexp>
                 [from]:          # search only from these fields
                   - <field>
           [operation]:
             - <regexp>
           [rest]: <operation>   # non matching entries are
-        
-        Possible operations: accept, reject, accept_excluding, reject_excluding        
+
+        Possible operations: accept, reject, accept_excluding, reject_excluding
     """
 
     def validator(self):
@@ -36,12 +36,12 @@ class FilterRegexp(object):
 
         def build_list(regexps):
             regexps.accept('regexp')
-            
+
             # bundle is a dictionary form
             bundle = regexps.accept('dict')
             # path as a single parameter
             bundle.accept_any_key('path', allow_replacement=True)
-            
+
             # advanced configuration as a parameter
             advanced = bundle.accept_any_key('dict')
             advanced.accept('path', key='path', allow_replacement=True)
@@ -52,18 +52,18 @@ class FilterRegexp(object):
             advanced.accept('regexp', key='not')
             # from as a single parameter
             advanced.accept('text', key='from')
-            
+
             # not in a list form
             advanced.accept('list', key='not').accept('regexp')
 
             # from in a list form
             advanced.accept('list', key='from').accept('text')
-            
+
         conf = validator.factory('dict')
         for operation in ['accept', 'reject', 'accept_excluding', 'reject_excluding']:
             regexps = conf.accept('list', key=operation)
             build_list(regexps)
-            
+
         conf.accept('choice', key='rest').accept_choices(['accept', 'reject'])
         return conf
 
@@ -71,7 +71,7 @@ class FilterRegexp(object):
     def on_feed_filter(self, feed):
         match_methods = {'accept': feed.accept, 'reject': feed.reject}
         non_match_methods = {'accept_excluding': feed.accept, 'reject_excluding': feed.reject}
-        
+
         # TODO: what if accept and accept_excluding configured? Should raise error ...
 
         rest = []
@@ -84,7 +84,7 @@ class FilterRegexp(object):
             r = self.filter(feed, match_method, non_match_method, regexps)
             if isinstance(r, list):
                 rest.extend(r)
-            
+
         if 'rest' in config:
             rest_method = match_methods.get(config['rest'])
             if not rest_method:
@@ -92,8 +92,8 @@ class FilterRegexp(object):
             for entry in rest:
                 log.debug('Rest method %s for %s' % (rest_method.__name__, entry['title']))
                 rest_method(entry)
-        
-    def matches(self, entry, regexp, find_from=[]):
+
+    def matches(self, entry, regexp, find_from=None):
         """Check if :entry: has any string fields that matches :regexp:.
         Optional :find_from: can be given to limit searching fields"""
         unquote = ['url']
@@ -115,7 +115,7 @@ class FilterRegexp(object):
             match_method - method is called with a entry as a parameter when entry matches
             non_match_method - method is called with a entry as a parameter when entry does NOT match
             regepx - list of regular expressions
-            
+
             Return list of entries that didn't match regexps or None if match_method and non_match_method were given
         """
         rest = []
@@ -128,7 +128,7 @@ class FilterRegexp(object):
                 secondary = []
                 from_fields = []
                 if isinstance(regexp_raw, dict):
-                    #log.debug('complex regexp: %s' % regexp_raw)
+                    # log.debug('complex regexp: %s' % regexp_raw)
                     regexp_raw, value = regexp_raw.items()[0]
                     # make sure regxp is a string for series like '24'
                     regexp_raw = str(regexp_raw)
@@ -138,9 +138,9 @@ class FilterRegexp(object):
                         setconfig = value.get('set', {})
                         from_fields = value.get('from', [])
                         if 'not' in value:
-                            if isinstance(value['not'], list): 
+                            if isinstance(value['not'], list):
                                 secondary.extend(value['not'])
-                            else: 
+                            else:
                                 secondary.append(value['not'])
                     else:
                         path = value
@@ -154,7 +154,7 @@ class FilterRegexp(object):
                         if self.matches(entry, secondary_re):
                             log.debug("Secondary filter regexp '%s' matched '%s'" % (entry['title'], secondary_re))
                             match = False
-                            
+
                 if match:
                     if path:
                         entry['path'] = path
@@ -164,7 +164,7 @@ class FilterRegexp(object):
                         set.instance.modify(entry, setconfig)
                     log.debug('regexp %s matched to field %s' % (regexp_raw, field))
                     break
-                    
+
             if match:
                 if match_method:
                     match_method(entry, 'regexp %s matched to field %s' % (regexp_raw, field))

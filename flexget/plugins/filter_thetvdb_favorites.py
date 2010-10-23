@@ -1,5 +1,5 @@
 import logging
-from flexget.plugin import *
+from flexget.plugin import register_plugin, internet, get_plugin_by_name, PluginError
 from BeautifulSoup import BeautifulStoneSoup
 import urllib
 
@@ -9,9 +9,9 @@ log = logging.getLogger('thetvdb_favorites')
 class FilterThetvdbFavorites:
     """
         Creates a series config containing all your thetvdb.com favorites
-        
+
         Example:
-        
+
         thetvdb_favorites:
           account_id: 23098230
     """

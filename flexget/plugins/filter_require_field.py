@@ -1,5 +1,5 @@
 import logging
-from flexget.plugin import *
+from flexget.plugin import register_plugin, priority
 
 log = logging.getLogger('require_field')
 
@@ -12,7 +12,7 @@ class FilterRequireField(object):
 
         require_field: imdb_url
     """
-    
+
     def validator(self):
         from flexget import validator
         root = validator.factory()

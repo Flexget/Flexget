@@ -1,7 +1,6 @@
 import os
 import logging
 from flexget.plugin import register_plugin, priority, PluginError, get_plugin_by_name
-from flexget.utils.titles import SeriesParser
 from flexget.feed import Entry
 
 log = logging.getLogger('exists_movie')
@@ -61,7 +60,7 @@ class FilterExistsMovie(object):
             for root, dirs, files in os.walk(path):
                 # convert filelists into utf-8 to avoid unicode problems
                 dirs = [x.decode('utf-8', 'ignore') for x in dirs]
-                files = [x.decode('utf-8', 'ignore') for x in files]
+                # files = [x.decode('utf-8', 'ignore') for x in files]
 
                 # TODO: add also video files?
 
