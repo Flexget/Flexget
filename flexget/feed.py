@@ -32,6 +32,7 @@ class Entry(dict):
     """
 
     def __init__(self, *args):
+        self.trace = []
         if len(args) == 2:
             self['title'] = args[0]
             self['url'] = args[1]
@@ -248,6 +249,10 @@ class Feed(object):
             log.error('Failed %s (%s)' % (entry['title'], reason))
             # Run on_entry_fail event
             self.__run_event('fail', entry=entry, reason=reason)
+            
+    def trace(self, entry, message):
+        """Add tracing message to entry."""
+        entry.trace.append((self.current_plugin, message))
 
     def abort(self, **kwargs):
         """Abort this feed execution, no more plugins will be executed."""

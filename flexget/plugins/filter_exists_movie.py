@@ -36,6 +36,10 @@ class FilterExistsMovie(object):
 
     @priority(-1)
     def on_feed_filter(self, feed):
+        if not feed.accepted:
+            log.debug('nothing accepted, aborting')
+            return
+    
         config = self.get_config(feed)
         imdb_lookup = get_plugin_by_name('imdb_lookup').instance.lookup
 
@@ -82,7 +86,7 @@ class FilterExistsMovie(object):
         log.debug('-- Start filtering entries ----------------------------------')
 
         # do actual filtering
-        for entry in feed.entries + feed.accepted:
+        for entry in feed.accepted:
             count_entries += 1
             if not 'imdb_url' in entry:
                 try:
@@ -95,7 +99,7 @@ class FilterExistsMovie(object):
                 feed.reject(entry, 'movie exists')
 
         if incompatible_dirs or incompatible_entries:
-            log.warning('There were some incompatible items. %s of %s entries and %s of %s directories could not be verified.' % \
-                (incompatible_entries, count_entries, incompatible_dirs, count_dirs))
+            feed.verbose_progress('There were some incompatible items. %s of %s entries and %s of %s directories could not be verified.' % \
+                (incompatible_entries, count_entries, incompatible_dirs, count_dirs), log)
 
 register_plugin(FilterExistsMovie, 'exists_movie', groups=['exists'])

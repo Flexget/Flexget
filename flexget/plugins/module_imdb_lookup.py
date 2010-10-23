@@ -1,6 +1,6 @@
 import logging
 from optparse import SUPPRESS_HELP
-from flexget.plugin import *
+from flexget.plugin import register_plugin, register_plugin_option, PluginError, PluginWarning
 from flexget.manager import Base, Session
 from flexget.utils.log import log_once
 from flexget.utils.imdb import ImdbSearch, ImdbParser, extract_id
@@ -248,6 +248,7 @@ class ModuleImdbLookup(object):
                     session.add(movie)
                     raise PluginWarning('UnicodeDecodeError')
                 except ValueError, e:
+                    # TODO: might be a little too broad catch, what was this for anyway? ;P
                     if feed.manager.options.debug:
                         log.exception(e)
                     raise PluginError('Invalid parameter: %s' % entry['imdb_url'], log)
