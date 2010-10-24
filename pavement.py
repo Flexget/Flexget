@@ -305,7 +305,7 @@ def install_tools():
 @task
 def clean_compiled():
     import os
-    for root, dirs, files in os.walk('.'):
+    for root, dirs, files in os.walk('flexget'):
         for name in files:
             fqn = os.path.join(root, name)
             if fqn[-3:] == 'pyc' or fqn[-3:] == 'pyo' or fqn[-5:] == 'cover':
