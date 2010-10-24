@@ -37,7 +37,7 @@ class ChangeWarn:
         allow = ['feeds', 'presets', 'variables']
         for key in config.iterkeys():
             if key not in allow:
-                log.critical('Keyword \'%s\' is not allowed in the root level!' % key)
+                log.critical('Keyword \'%s\' is not allowed in the root level of configuration!' % key)
 
         # priority (dict) was renamed to plugin_priority
         if isinstance(feed.config.get('priority', None), dict):
