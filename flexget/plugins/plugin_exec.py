@@ -118,7 +118,8 @@ class PluginExec(object):
                         arg = unicode(arg, 'utf-8')
                         formatted = arg % entry
                         # shlex.split does not include the quotes, so we have to add them back if appropriate
-                        arg = pipes.quote(formatted)
+                        if formatted != arg:
+                            arg = pipes.quote(formatted)
                         args.append(arg)
                     cmd = ' '.join(args)
 
