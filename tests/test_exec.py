@@ -24,7 +24,7 @@ class TestExec(FlexGetBase):
               - {title: entry1, location: '/path/with spaces/thefile'}
             exec:
               on_download:
-                for_entries: python tests/exec.py %(temp_dir)s %(title)s %(location)s /the/final-destinaton/
+                for_entries: python tests/exec.py %(temp_dir)s %(title)s %(location)s '/the/final destinaton/'
     """
 
     def __init__(self):
@@ -55,4 +55,4 @@ class TestExec(FlexGetBase):
                 line = infile.readline().rstrip('\n')
                 assert line == '/path/with spaces/thefile', '%s != /path/with spaces/thefile' % line
                 line = infile.readline().rstrip('\n')
-                assert line == '/the/final-destinaton/', '%s != /the/final-destinaton/' % line
+                assert line == '/the/final-destinaton/', '%s != /the/final destinaton/' % line
