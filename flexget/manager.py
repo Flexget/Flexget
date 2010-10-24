@@ -265,8 +265,8 @@ class Manager(object):
         if os.path.exists(self.lockfile):
             # check the lock age
             lock_time = datetime.fromtimestamp(os.path.getmtime(self.lockfile))
-            if (datetime.now() - lock_time).seconds > 3600:
-                log.warning('Lock file over 1 hour in age, ignoring it ...')
+            if (datetime.now() - lock_time).seconds > 36000:
+                log.warning('Lock file over 10 hour in age, ignoring it ...')
             else:
                 if not self.options.quiet:
                     f = file(self.lockfile)
