@@ -1,6 +1,7 @@
 import re
 import logging
-from flexget.plugin import *
+from flexget.plugin import register_plugin, priority, PluginError
+import os
 
 log = logging.getLogger('modif_torrent')
 
@@ -198,12 +199,14 @@ class TorrentFilename(object):
             if not 'file' in entry:
                 log.log(5, '%s doesn\'t have a file associated' % entry['title'])
                 continue
+            if not os.path.exists(entry['file']):
+                raise PluginError('File %s does not exists' % entry['file'])
             f = open(entry['file'], 'rb')
             data = f.read(200)
             f.close()
             if not TORRENT_RE.match(data):
                 # not a torrent file at all, skip
-                log.log(5, '%s doesn\'t seem to be a torrent' % entry['title'])
+                log.log(5, '%s doesn\'t seem to be a torrent, got %s (hex)' % (entry['title'], data.encode('hex')))
                 continue
             else:
                 log.debug('%s seems to be a torrent' % entry['title'])
@@ -212,7 +215,7 @@ class TorrentFilename(object):
             try:
                 f = open(entry['file'], 'rb')
                 # NOTE: this reads entire file into memory, but we're pretty sure it's
-                # a small torrent file since it starts with idstr
+                # a small torrent file since it starts with TORRENT_RE
                 data = f.read()
                 f.close()
 
@@ -271,7 +274,7 @@ class TorrentFilename(object):
         title = title.replace(' ', '_')
         title = title.replace('\u200b', '')
 
-        #title = title.encode('iso8859-1', 'ignore') # Damn \u200b -character, how I loathe thee
+        # title = title.encode('iso8859-1', 'ignore') # Damn \u200b -character, how I loathe thee
         # TODO: replace only zero width spaces, leave unicode alone?
 
         fn = '%s.torrent' % title
