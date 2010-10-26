@@ -37,7 +37,7 @@ class SeriesParser(TitleParser):
         separators = '[!/+,:;|~ x-]'
         roman_numeral_re = 'X{0,3}(?:IX|XI{0,4}|VI{0,4}|IV|V|I{1,4})'
         self.ep_regexps = [
-                '(?:series|season|s)\s?(\d{1,3})\s?(?:episode|ep|e|part|pt)\s?(\d{1,3})',
+                '(?:series|season|s)\s?(\d{1,3})(?:\s(?:.*?\s)?)?(?:episode|ep|e|part|pt)\s?(\d{1,3}|%s)' % roman_numeral_re,
                 '(?:series|season)\s?(\d{1,3})\s(\d{1,3})\s?of\s?(?:\d{1,3})',
                 '(\d{1,3})\s?of\s?(?:\d{1,3})',
                 '(\d{1,2})\s?x\s?(\d+)',
