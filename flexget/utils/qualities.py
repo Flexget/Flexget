@@ -47,11 +47,11 @@ qualities = [Quality(1000, '1080p', '(?:1920x)?1080p?'),
             Quality(380, 'bdrip', 'b(?:[dr]rip|luray)'),
             Quality(350, 'dvdrip', 'dvd(?:rip)?'),
             Quality(300, '480p', '480p?'),
-            Quality(290, 'hdtv', 'hdtv(?:[\W_]?rip)?'),
+            Quality(290, 'hdtv', 'hdtv(?:rip)?'),
             Quality(280, 'bdscr'),
             Quality(250, 'dvdscr'),
-            Quality(100, 'sdtv', '[sp]dtv|dvb(?:[\W_]rip)?'),
-            Quality(80, 'dsr', 'dsr|ds[\W_]rip'),
+            Quality(100, 'sdtv', '(?:[sp]dtv|dvb)(?:rip)?'),
+            Quality(80, 'dsr', 'ds(?:r|[\W_]?rip)'),
             Quality(50, 'r5'),
             Quality(40, 'tc'),
             Quality(30, 'preair'),
@@ -106,7 +106,9 @@ def parse_quality(title, exact=False):
     """Find the highest know quality in a given string"""
     import re
     qualities.sort(reverse=True)
-    (lcap, rcap) = (r'\A', r'\Z') if exact else (r'([^a-zA-Z0-9]|\A)', r'([^a-zA-Z0-9]|\Z)')
+    # If exact mode make sure quality identifier is the entire string.
+    # Otherwise make sure it is surrounded by non word characters.
+    (lcap, rcap) = (r'\A', r'\Z') if exact else (r'([\W_]|\A)', r'([\W_]|\Z)')
 
     for qual in qualities:
         regexp = lcap + qual.regexp + rcap
