@@ -12,22 +12,22 @@ class Quality(object):
 
     def __ne__(self, other):
         return not self.__eq__(other)
-        
+
     def __lt__(self, other):
         return self.value < other.value
-        
+
     def __le__(self, other):
         return self.value <= other.value
-        
+
     def __gt__(self, other):
         return self.value > other.value
-        
+
     def __ge__(self, other):
         return self.value >= other.value
-        
+
     def __str__(self):
         return '<Quality(name=%s,value=%s,regexp=%s)>' % (self.name, self.value, self.regexp)
-        
+
     __repr__ = __str__
 
 
@@ -38,20 +38,20 @@ class UnknownQuality(Quality):
         self.name = 'unknown'
         self.regexp = None
 
-qualities = [Quality(1000, '1080p', '(1920x)?1080p?'),
+qualities = [Quality(1000, '1080p', '(?:1920x)?1080p?'),
             Quality(750, '1080i'),
             Quality(600, 'web-dl'),
-            Quality(500, '720p', '(1280x)?720p?'),
+            Quality(500, '720p', '(?:1280x)?720p?'),
             Quality(450, '720i'),
             Quality(400, 'hr'),
-            Quality(380, 'bdrip', 'b((d|r)rip|luray)'),
-            Quality(350, 'dvdrip', 'dvd(rip)?'),
+            Quality(380, 'bdrip', 'b(?:[dr]rip|luray)'),
+            Quality(350, 'dvdrip', 'dvd(?:rip)?'),
             Quality(300, '480p', '480p?'),
-            Quality(290, 'hdtv'),
+            Quality(290, 'hdtv', 'hdtv(?:[\W_]?rip)?'),
             Quality(280, 'bdscr'),
             Quality(250, 'dvdscr'),
-            Quality(100, 'sdtv', '(s|p)dtv'),
-            Quality(80, 'dsr', 'dsr(ip)?'),
+            Quality(100, 'sdtv', '[sp]dtv|dvb(?:[\W_]rip)?'),
+            Quality(80, 'dsr', 'dsr|ds[\W_]rip'),
             Quality(50, 'r5'),
             Quality(40, 'tc'),
             Quality(30, 'preair'),
@@ -88,13 +88,13 @@ def min():
     qualities.sort()
     return qualities[0]
 
-    
+
 def max():
     """Return highest known Quality."""
     qualities.sort(reverse=True)
     return qualities[0]
 
-    
+
 def common_name(name):
     """Return `common name` for :name: (case insensitive)
     ie.
@@ -107,7 +107,7 @@ def parse_quality(title, exact=False):
     import re
     qualities.sort(reverse=True)
     (lcap, rcap) = (r'\A', r'\Z') if exact else (r'([^a-zA-Z0-9]|\A)', r'([^a-zA-Z0-9]|\Z)')
-        
+
     for qual in qualities:
         regexp = lcap + qual.regexp + rcap
         if re.search(regexp, title, re.IGNORECASE):
