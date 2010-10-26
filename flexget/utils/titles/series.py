@@ -94,13 +94,9 @@ class SeriesParser(TitleParser):
             # remove all matches from data, unless they happen to contain relevant information
             if matches:
                 for match in matches:
-                    # TODO: check if match contain valid episode number ?
                     log.log(5, 'match: %s' % match)
                     safe = True
-                    for quality in qualities.registry.keys(): # TODO: rewrite ...
-                        if quality.lower() in match.lower():
-                            safe = False
-                            break
+                    # Qualities can be safely removed, because they are detected from raw data
                     for proper in self.propers:
                         if proper.lower() in match.lower():
                             safe = False
@@ -136,11 +132,6 @@ class SeriesParser(TitleParser):
         if self.parse_unwanted(data):
             return
 
-        data_parts = re.split('\W+', data)
-        data = ' '.join(data_parts)
-
-        log.log(5, 'data fully-cleaned: %s' % data)
-
         def name_to_re(name):
             """Convert 'foo bar' to '^[^...]*foo[^...]*bar[^...]+"""
             # TODO: Still doesn't handle the case where the user wants
@@ -153,7 +144,7 @@ class SeriesParser(TitleParser):
             res = '^' + ignore + (blank + '*') + '(' + res + ')' + (blank + '+')
             return res
 
-        log.debug('name: %s data: %s' % (name, data))
+        log.debug('name: %s data: %s' % (name, self.data))
 
         # name end position
         name_start = 0
@@ -182,11 +173,16 @@ class SeriesParser(TitleParser):
             log.debug('FAIL: name regexps do not match')
             return
 
+
+        # remove series name from raw data
+        data_noname = self.data[:name_start] + self.data[name_end:]
+        log.debug('data noname: %s' % data_noname)
+
         # allow group(s)
         if self.allow_groups:
             for group in self.allow_groups:
                 group = group.lower()
-                orig_data = self.data.lower()
+                orig_data = data_noname.lower()
                 if '[%s]' % group in orig_data or '-%s' % group in orig_data:
                     log.debug('%s is from group %s' % (orig_data, group))
                     self.group = group
@@ -198,10 +194,9 @@ class SeriesParser(TitleParser):
         # search tags and quality
         if self.quality == 'unknown':
             log.debug('parsing quality ->')
-            # remove series name from raw data
-            data_noname = self.data[:name_start] + self.data[name_end:]
-            log.debug('data noname: %s' % data_noname)
             self.quality = qualities.parse_quality(data_noname).name
+
+        data_parts = re.split('\W+', data)
 
         for part in data_parts:
             if part in self.propers:
