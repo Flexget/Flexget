@@ -34,7 +34,7 @@ class SeriesParser(TitleParser):
         # if set to true, episode or id must follow immediately after name
         self.strict_name = False
 
-        separators = '[!/+,:;|~ x]'
+        separators = '[!/+,:;|~ x-]'
         roman_numeral_re = 'X{0,3}(?:IX|XI{0,4}|VI{0,4}|IV|V|I{1,4})'
         self.ep_regexps = [
                 '(?:series|season|s)\s?(\d{1,3})\s?(?:episode|ep|e|part|pt)\s?(\d{1,3})',

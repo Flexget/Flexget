@@ -430,3 +430,10 @@ class TestSeriesParser(object):
         s = self.parse(name='Something', data='Something 9x02 - Episode 2')
         assert s.season == 9, 'failed to parse season'
         assert s.episode == 2, 'failed to parse episode'
+
+    def test_date_id(self):
+        """SeriesParser: Series with dates"""
+        s = self.parse(name='Something', data='Something.2010.10.25')
+        assert (s.id == '2010-10-25'), 'failed to parse %s' % s.data
+        s = self.parse(name='Something', data='Something 2010-10-25')
+        assert (s.id == '2010-10-25'), 'failed to parse %s' % s.data
