@@ -800,7 +800,7 @@ class FilterSeries(SeriesPlugin):
             # reject downloaded
             log.debug('-' * 20 + ' downloaded -->')
             for ep in self.process_downloaded(feed, eps, whitelist):
-                feed.reject(self.parser2entry[ep], 'already downloaded')
+                feed.reject(self.parser2entry[ep], 'already downloaded episode with id \'%s\'' % str(ep.identifier))
                 log.debug('downloaded removed: %s' % ep)
                 eps.remove(ep)
 
