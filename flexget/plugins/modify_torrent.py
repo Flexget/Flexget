@@ -201,12 +201,16 @@ class TorrentFilename(object):
                 continue
             if not os.path.exists(entry['file']):
                 raise PluginError('File %s does not exists' % entry['file'])
+            if os.path.getsize(entry['file']) == 0:
+                raise PluginError('File %s is 0 bytes in size' % entry['file'])
+                
+            # read first 200 bytes to verify if a file is a torrent or not
             f = open(entry['file'], 'rb')
             data = f.read(200)
             f.close()
             if not TORRENT_RE.match(data):
                 # not a torrent file at all, skip
-                log.log(5, '%s doesn\'t seem to be a torrent, got %s (hex)' % (entry['title'], data.encode('hex')))
+                log.log(5, '%s doesn\'t seem to be a torrent, got `%s` (hex)' % (entry['title'], data.encode('hex')))
                 continue
             else:
                 log.debug('%s seems to be a torrent' % entry['title'])
