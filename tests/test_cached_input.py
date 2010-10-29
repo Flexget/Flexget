@@ -1,6 +1,5 @@
 import os
-from tests import FlexGetBase
-import shutil
+from tests import FlexGetBase, with_filecopy
 
 
 class TestInputCache(FlexGetBase):
@@ -15,14 +14,7 @@ class TestInputCache(FlexGetBase):
               url: tests/cached.xml
     """
 
-    def setup(self):
-        FlexGetBase.setup(self)
-        shutil.copy('tests/rss.xml', 'tests/cached.xml')
-
-    def teardown(self):
-        if os.path.exists('tests/cached.xml'):
-            os.remove('tests/cached.xml')
-
+    @with_filecopy('tests/rss.xml', 'tests/cached.xml')
     def test_cache(self):
         """Test input caching"""
         self.execute_feed('test_1')

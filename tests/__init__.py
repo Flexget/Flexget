@@ -98,3 +98,29 @@ class FlexGetBase(object):
         print '-- REJECTED: ----------------------------------------------------'
         # print yaml.safe_dump(rejected)
         print self.feed.rejected
+
+
+class with_filecopy(object):
+    """
+        @with_filecopy decorator
+        make a copy of src to dst for test case and deleted file afterwards
+    """
+
+    def __init__(self, src, dst):
+        self.src = src
+        self.dst = dst
+
+    def __call__(self, func):
+
+        def wrapper(*args, **kwargs):
+            import shutil
+            import os
+            shutil.copy(self.src, self.dst)
+            try:
+                return func(*args, **kwargs)
+            finally:
+                os.remove(self.dst)
+
+        from nose.tools import make_decorator
+        wrapper = make_decorator(func)(wrapper)
+        return wrapper

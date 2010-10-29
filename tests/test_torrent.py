@@ -1,5 +1,4 @@
-import shutil
-from tests import FlexGetBase
+from tests import FlexGetBase, with_filecopy
 from flexget.plugins.modify_torrent import Torrent
 
 
@@ -37,25 +36,20 @@ class TestModifyTrackers(FlexGetBase):
               - ubuntu
     """
 
-    testfiles = ['tests/test_add_trackers.torrent', 'tests/test_remove_trackers.torrent']
-
-    def setup(self):
-        FlexGetBase.setup(self)
-        for filename in self.testfiles:
-            shutil.copy('tests/test.torrent', filename)
-
     def load_torrent(self, filename):
         f = open(filename, 'rb')
         data = f.read()
         f.close()
         return Torrent(data)
 
+    @with_filecopy('tests/test.torrent', 'tests/test_add_trackers.torrent')
     def test_add_trackers(self):
         self.execute_feed('test_add_trackers')
         torrent = self.load_torrent('tests/test_add_trackers.torrent')
         assert 'udp://thetracker.com/announce' in torrent.get_multitrackers(), \
             'udp://thetracker.com/announce should have been added to trackers'
 
+    @with_filecopy('tests/test.torrent', 'tests/test_remove_trackers.torrent')
     def test_remove_trackers(self):
         self.execute_feed('test_remove_trackers')
         torrent = self.load_torrent('tests/test_remove_trackers.torrent')
