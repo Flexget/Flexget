@@ -1,11 +1,13 @@
 class Quality(object):
 
     def __init__(self, value, name, regexp=None):
+        import re
         self.value = value
         self.name = name
         if not regexp:
             regexp = name
-        self.regexp = regexp
+        # Make sure regexp is surrounded by non word characters.
+        self.regexp = re.compile('(?<![^\W_])' + regexp + '(?![^\W_])', re.IGNORECASE)
 
     def __eq__(self, other):
         return self.value == other.value
@@ -26,7 +28,7 @@ class Quality(object):
         return self.value >= other.value
 
     def __str__(self):
-        return '<Quality(name=%s,value=%s,regexp=%s)>' % (self.name, self.value, self.regexp)
+        return '<Quality(name=%s,value=%s)>' % (self.name, self.value)
 
     __repr__ = __str__
 
@@ -112,14 +114,11 @@ def common_name(name):
 
 def parse_quality(title, exact=False):
     """Find the highest know quality in a given string"""
-    import re
     qualities.sort(reverse=True)
-    # If exact mode make sure quality identifier is the entire string.
-    # Otherwise make sure it is surrounded by non word characters.
-    (lcap, rcap) = (r'\A', r'\Z') if exact else (r'(?<![^\W_])', r'(?![^\W_])')
-
     for qual in qualities:
-        regexp = lcap + qual.regexp + rcap
-        if re.search(regexp, title, re.IGNORECASE):
-            return qual
+        match = qual.regexp.search(title)
+        if match:
+            # If exact mode make sure quality identifier is the entire string.
+            if not exact or match.span(0) == (0, len(title)):
+                return qual
     return UnknownQuality()
