@@ -74,7 +74,7 @@ class TestMetainfoQuality(FlexGetBase):
         entry = self.feed.find_entry(title='ShowB.S04E19.Name of Ep.720p.WEB-DL.DD5.1.H.264')
         assert entry, 'entry not found?'
         assert 'quality' in entry, 'failed to pick up quality'
-        assert entry['quality'] == 'web-dl', 'picked up wrong quality %s' % entry.get('quality', None)
+        assert entry['quality'] == '720p web-dl', 'picked up wrong quality %s' % entry.get('quality', None)
         # Check that quality gets picked up from description when not in title
         entry = self.feed.find_entry(title='Good.Movie')
         assert 'quality' in entry, 'failed to pick up quality from description'

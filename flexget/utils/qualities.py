@@ -38,14 +38,22 @@ class UnknownQuality(Quality):
         self.name = 'unknown'
         self.regexp = None
 
-qualities = [Quality(1000, '1080p', '(?:1920x)?1080p?'),
+re_webdl = 'web[\W_]?dl'
+re_720p = '(?:1280x)?720p?'
+re_1080p = '(?:1920x)?1080p?'
+# Helper to return a re that matches the webdl re before or after ::x::
+webdl_hybrid = lambda x: '(?P<webdl>' + re_webdl + '.*)?' + x + '(?(webdl)|.*' + re_webdl + ')'
+
+qualities = [Quality(1000, '1080p web-dl', webdl_hybrid(re_1080p)),
+            Quality(800, '1080p', re_1080p),
             Quality(750, '1080i'),
-            Quality(600, 'web-dl'),
-            Quality(500, '720p', '(?:1280x)?720p?'),
+            Quality(600, '720p web-dl', webdl_hybrid(re_720p)),
+            Quality(500, '720p', re_720p),
             Quality(450, '720i'),
             Quality(400, 'hr'),
             Quality(380, 'bdrip', 'b(?:[dr][\W_]?rip|luray)'),
             Quality(350, 'dvdrip', 'dvd(?:[\W_]?rip)?'),
+            Quality(320, 'web-dl', re_webdl),
             Quality(300, '480p', '480p?'),
             Quality(290, 'hdtv', 'hdtv(?:[\W_]?rip)?'),
             Quality(280, 'bdscr'),
@@ -108,7 +116,7 @@ def parse_quality(title, exact=False):
     qualities.sort(reverse=True)
     # If exact mode make sure quality identifier is the entire string.
     # Otherwise make sure it is surrounded by non word characters.
-    (lcap, rcap) = (r'\A', r'\Z') if exact else (r'([\W_]|\A)', r'([\W_]|\Z)')
+    (lcap, rcap) = (r'\A', r'\Z') if exact else (r'(?<![^\W_])', r'(?![^\W_])')
 
     for qual in qualities:
         regexp = lcap + qual.regexp + rcap
