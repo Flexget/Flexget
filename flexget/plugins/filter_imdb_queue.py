@@ -143,9 +143,25 @@ class ImdbQueueManager(object):
             return
 
         # all actions except list require imdb_url to work
-        if action != 'list' and not 'what' in self.options:
-            self.error('No URL or NAME given')
-            return
+        if action != 'list':
+            if not 'what' in self.options:
+                self.error('No URL or NAME given')
+                return
+            else:
+                # Generate imdb_id and movie title from movie name, or imdb_url
+                self.options['imdb_id'] = extract_id(self.options['what'])
+                self.options['title'] = self.options['what']
+
+                if not self.options['imdb_id']:
+                    # try to do imdb search
+                    print 'Searching imdb for %s' % self.options['what']
+                    search = ImdbSearch()
+                    result = search.smart_match(self.options['what'])
+                    if not result:
+                        print 'ERROR: Unable to find any such movie from imdb, use imdb url instead.'
+                        return
+                    self.options['imdb_id'] = extract_id(result['url'])
+                    self.options['title'] = result['name']
 
         from sqlalchemy.exceptions import OperationalError
         try:
@@ -168,45 +184,37 @@ class ImdbQueueManager(object):
         quality = self.options['quality']
 
         from flexget.utils import qualities
-        if (quality != 'ANY') and (quality not in qualities.registry):
+        # Make sure quality is in the format we expect
+        if quality.upper() == 'ANY':
+            quality = 'ANY'
+        elif qualities.get(quality, False):
+            quality = qualities.common_name(quality)
+        else:
             print 'ERROR! Unknown quality `%s`' % quality
-            print 'Recognized qualities are %s' % ', '.join(qualities.registry.keys())
+            print 'Recognized qualities are %s' % ', '.join([qual.name for qual in qualities.all()])
             print 'ANY is the default and can also be used explicitly to specify that quality should be ignored.'
             return
 
-        imdb_id = extract_id(self.options['what'])
-        title = None
-
-        if not imdb_id:
-            # try to do imdb search
-            print 'Searching imdb for %s' % self.options['what']
-            search = ImdbSearch()
-            result = search.smart_match(self.options['what'])
-            if not result:
-                print 'ERROR: Unable to find any such movie from imdb, use imdb url instead.'
-                return
-            imdb_id = extract_id(result['url'])
-            title = result['name']
+        imdb_id = self.options['imdb_id']
+        title = self.options['title']
 
         session = Session()
 
         # check if the item is already queued
         item = session.query(ImdbQueue).filter(ImdbQueue.imdb_id == imdb_id).first()
         if not item:
-            # get the common, eg. 1280x720 will be turned into 720p
-            common_name = qualities.common_name(quality)
-            item = ImdbQueue(imdb_id, common_name, self.options['force'])
+            item = ImdbQueue(imdb_id, quality, self.options['force'])
             item.title = title
             session.add(item)
             session.commit()
-            print 'Added %s to queue with quality %s' % (imdb_id, common_name)
+            print 'Added %s to queue with quality %s' % (imdb_id, quality)
         else:
             print 'ERROR: %s is already in the queue' % imdb_id
 
     def queue_del(self):
         """Delete the given item from the queue"""
 
-        imdb_id = extract_id(self.options['what'])
+        imdb_id = self.options['imdb_id']
 
         session = Session()
 
@@ -235,7 +243,7 @@ class ImdbQueueManager(object):
                 imdb_log.setLevel(logging.CRITICAL)
                 parser = ImdbParser()
                 try:
-                    result = parser.parse('http://www.imdb.com/title/' + item.imdb_id)
+                    parser.parse('http://www.imdb.com/title/' + item.imdb_id)
                 except:
                     pass
                 if parser.name:
