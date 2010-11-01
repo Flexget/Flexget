@@ -1,5 +1,5 @@
 import logging
-from flexget.plugin import *
+from flexget.plugin import register_plugin, priority, PluginWarning, PluginError
 from flexget.manager import Base, Session
 from flexget.utils.tools import urlopener
 import urllib
@@ -113,6 +113,7 @@ class ModuleThetvdbLookup(object):
 
         return converted_date
 
+    # TODO: this does not utilize exceptions on errors, raise PluginWarning instead of logging error and returning
     def lookup(self, feed, entry):
         """
         Get theTVDB information for the included series_name,
@@ -195,8 +196,9 @@ class ModuleThetvdbLookup(object):
                           
                     if i.seriesname.string == entry['series_name']:
                         series_id = i.seriesid.string
-                        # Don't really need to store this, but just for consistencies sake so we always have it available
-                        newest_series_first_aired = this_series_air_date
+                        if i.firstaired:
+                            # Don't really need to store this, but just for consistencies sake so we always have it available
+                            newest_series_first_aired = this_series_air_date
                         break
                 
                 if series_id is None:
@@ -251,7 +253,7 @@ class ModuleThetvdbLookup(object):
         log.debug("searching for correct episode %(series_name)s - S%(series_season)sE%(series_episode)s from the data" % entry)
 
         for i in data.findAll("episode", recursive=False):
-            #print "%s %s %s %s" % (i.combined_season.string, i.episodenumber.string, entry['series_season'], entry['series_episode'])
+            # print "%s %s %s %s" % (i.combined_season.string, i.episodenumber.string, entry['series_season'], entry['series_episode'])
             if int(i.combined_season.string) == int(entry['series_season']):
                 if int(i.episodenumber.string) == int(entry['series_episode']):
                     entry['ep_name'] = i.episodename.string

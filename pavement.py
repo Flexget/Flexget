@@ -150,7 +150,7 @@ def sdist(options):
 # due workaround we need to add this manually
 @cmdopts([
     ('dist-dir=', 'd', 'directory to put final built distributions in')
-    ])
+])
 def bdist_egg(options):
     # workaround for http://code.google.com/p/paver/issues/detail?id=49
     # the minilib task crashes on bdist_egg with easy_install, but since the zip is already there there's no need to run it
@@ -300,6 +300,12 @@ def install_tools():
         print 'Nose-xcover INSTALLED'
     except:
         pip.main(['install', 'http://github.com/cmheisel/nose-xcover/zipball/master'])
+        
+    try:
+        import epydoc
+        print 'epydoc INSTALLED'
+    except:
+        pip.main(['install', 'epydoc'])
 
 
 @task
