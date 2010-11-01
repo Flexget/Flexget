@@ -7,6 +7,7 @@ import os
 import shutil
 import errno
 
+
 def mkdir(*a, **kw):
     try:
         os.mkdir(*a, **kw)
@@ -16,11 +17,13 @@ def mkdir(*a, **kw):
         else:
             raise
 
+
 def find_test_name():
     try:
         from nose.case import Test
         from nose.suite import ContextSuite
         import types
+
         def get_nose_name(its_self):
             if isinstance(its_self, Test):
                 file_, module, class_ = its_self.address()
@@ -34,6 +37,7 @@ def find_test_name():
         from nose.case import FunctionTestCase, MethodTestCase
         from nose.suite import TestModule
         from nose.util import test_address
+
         def get_nose_name(its_self):
             if isinstance(its_self, (FunctionTestCase, MethodTestCase)):
                 file_, module, class_ = test_address(its_self)
@@ -54,11 +58,13 @@ def find_test_name():
             if name is not None:
                 return name
 
+
 def maketemp():
     tmp = os.path.join(os.path.dirname(__file__), 'tmp')
     mkdir(tmp)
 
-    name = find_test_name()
+    # Colons are not valid characters in directories on Windows
+    name = find_test_name().replace(':', '_')
     tmp = os.path.join(tmp, name)
     try:
         shutil.rmtree(tmp)

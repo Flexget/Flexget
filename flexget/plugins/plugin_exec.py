@@ -1,7 +1,6 @@
 import subprocess
 import logging
 import shlex
-import pipes
 from flexget.plugin import register_plugin, priority
 
 log = logging.getLogger('exec')
@@ -119,7 +118,16 @@ class PluginExec(object):
                         formatted = arg % entry
                         # shlex.split does not include the quotes, so we have to add them back if appropriate
                         if formatted != arg:
-                            arg = pipes.quote(formatted)
+                            # On windows we need to use a different quoter
+                            import os
+                            if os.name == 'nt':
+                                from distutils.spawn import _nt_quote_args
+                                quoter = lambda x: _nt_quote_args([x])[0]
+                            else:
+                                import pipes
+                                quoter = pipes.quote
+                            arg = quoter(formatted)
+
                         args.append(arg)
                     cmd = ' '.join(args)
 
