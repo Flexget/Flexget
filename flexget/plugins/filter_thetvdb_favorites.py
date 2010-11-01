@@ -27,6 +27,7 @@ class FilterThetvdbFavorites:
     def on_process_start(self, feed):
         config = feed.config.get('thetvdb_favorites')
         url = "http://thetvdb.com/api/User_Favorites.php?accountid=%s" % str(config['account_id'])
+        log.debug('requesting %s' % url)
         data = BeautifulStoneSoup(urllib.urlopen(url))
         favorite_ids = []
         for i in data.favorites.findAll("series", recursive=False):

@@ -1,5 +1,5 @@
 import logging
-from flexget.plugin import register_plugin, priority, PluginWarning, PluginError
+from flexget.plugin import register_plugin, priority, get_plugin_by_name, PluginWarning, PluginError
 from flexget.manager import Base, Session
 from flexget.utils.tools import urlopener
 import urllib
