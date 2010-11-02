@@ -114,7 +114,7 @@ class SeriesParser(TitleParser):
 
     def remove_dirt(self, data):
         """Replaces some characters with spaces"""
-        return re.sub(r'[_.\[\]\(\):]+', ' ', data).strip().lower()
+        return re.sub(r'[_.,\[\]\(\): ]+', ' ', data).strip().lower()
 
     def parse(self):
         if not self.name or not self.data:

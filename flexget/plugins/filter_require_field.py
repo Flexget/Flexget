@@ -29,6 +29,7 @@ class FilterRequireField(object):
             for field in config:
                 if field not in entry or entry[field] == '':
                     feed.reject(entry, 'Required field %s is not present' % field)
+                    break
 
 
 register_plugin(FilterRequireField, 'require_field')
