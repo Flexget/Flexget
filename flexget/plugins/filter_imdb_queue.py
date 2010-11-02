@@ -40,6 +40,9 @@ class FilterImdbQueue(object):
     imdb_queue: yes
     """
 
+    # Dict of entries accepted by this plugin {imdb_id: entry} format
+    accepted_entries = {}
+
     def validator(self):
         from flexget import validator
         return validator.factory('boolean')
@@ -77,10 +80,21 @@ class FilterImdbQueue(object):
                     entry['immortal'] = item.immortal
                     log.info("Accepting %s from queue with quality %s. Force: %s" % (entry['title'], entry['quality'], entry['immortal']))
                     feed.accept(entry, 'imdb-queue - force: %s' % entry['immortal'])
-                    # and remove from database
-                    feed.session.delete(item)
+                    # Keep track of entries we accepted, so they can be removed from queue on feed_exit if successful
+                    self.accepted_entries[imdb_id] = entry
                 else:
                     log.log(5, "%s not in queue with wanted quality, skipping" % entry['title'])
+
+    def on_feed_exit(self, feed):
+        """
+        Removes any entries that have not been rejected by another plugin or failed from the queue.
+        """
+        for imdb_id, entry in self.accepted_entries.iteritems():
+            if entry in feed.accepted and entry not in feed.failed:
+                # If entry was not rejected or failed, remove from database
+                item = feed.session.query(ImdbQueue).filter(ImdbQueue.imdb_id == imdb_id).first()
+                feed.session.delete(item)
+                log.debug('%s was successful, removing from imdb-queue' % entry['title'])
 
 
 class ImdbQueueManager(object):
