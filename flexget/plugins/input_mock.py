@@ -1,6 +1,6 @@
 import logging
 from flexget.feed import Entry
-from flexget.plugin import *
+from flexget.plugin import register_plugin
 
 log = logging.getLogger('mock')
 
@@ -8,7 +8,7 @@ log = logging.getLogger('mock')
 class InputMock(object):
     """
         Allows adding mock input entries. Example:
-        
+
         mock:
           - {title: foobar, url: http://some.com }
           - {title: mock, url: http://another.com }
@@ -22,6 +22,7 @@ class InputMock(object):
         entry.accept('url', key='url')
         entry.accept_any_key('text')
         entry.accept_any_key('number')
+        entry.accept_any_key('list').accept('any')
         return container
 
     def on_feed_input(self, feed):
