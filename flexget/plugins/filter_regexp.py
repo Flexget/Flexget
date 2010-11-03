@@ -148,9 +148,9 @@ class FilterRegexp(object):
                     value = urllib.unquote(value)
                     # If none of the not_regexps match
                 if re.search(regexp, value, re.IGNORECASE | re.UNICODE):
-                    # Check the not_regexps before returning
+                    # Make sure the not_regexps do not match for this field
                     for not_regexp in not_regexps or []:
-                        if re.search(not_regexp, value, re.IGNORECASE | re.UNICODE):
+                        if self.matches(entry, not_regexp, find_from=field):
                             break
                     else: # None of the not_regexps matched
                         return field

@@ -16,7 +16,7 @@ class TestRegexp(FlexGetBase):
               - {title: 'regexp7', 'imdb_score': 5}
               - {title: 'regexp8', 'imdb_score': 5}
               - {title: 'regexp9', 'imdb_score': 5}
-              - {title: 'regular', otherfield: 'genre1'}
+              - {title: 'regular', otherfield: 'genre1', genre: ['genre2', 'genre3']}
               - {title: 'expression', genre: ['genre1', 'genre2']}
             seen: false
 
@@ -88,6 +88,8 @@ class TestRegexp(FlexGetBase):
               from: genre
               accept:
                 - genre1
+                - genre2:
+                    not: genre3
     """
 
     def test_accept(self):
