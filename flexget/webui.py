@@ -2,25 +2,40 @@ import logging
 import os
 from flask import Flask, render_template
 
-app = Flask(__name__)
-manager = None
 log = logging.getLogger('webui')
 
-menu = [{'href': 'foobar', 
-         'caption': 'Test'},
-        {'href': '/help',
-         'caption': 'Help'}]
+app = Flask(__name__)
+manager = None
+
+_menu = []
 
 
-# TODO: move to own plugin ...
-@app.route('/')
-def index():
-    return render('index.html', test='foo')
-    
+class menu_current(object):
+    """Decorator which updates menu items current flag to the given value"""
+
+    def __init__(self, name):
+        self.name = name
+        
+    def __call__(self, f):
+        log.debug('updating current menu #1')
+
+        def wrapped_f(*args, **kwargs):
+            log.debug('updating current menu #2')
+            for item in _menu:
+                if item['caption'].lower() == self.name.lower():
+                    item['current'] = True
+                    log.debug('current menu item %s' % self.name)
+                else:
+                    if 'current' in item:
+                        item.pop('current')
+            return f(*args, **kwargs)
+        return wrapped_f
+
 
 def render(template, **context):
     # fill built in variables to context
-    context['menu'] = menu
+    context['menu'] = _menu
+    context['manager'] = manager
     return render_template(template, **context)
 
 
@@ -59,10 +74,15 @@ def load_ui_plugins():
 
 
 def register_menu(href, caption, order=128):
-    menu.append({'href': href, 'caption': caption})
+    global _menu
+    _menu.append({'href': href, 'caption': caption, 'order': order})
+    _menu = sorted(_menu, key=lambda item: item['order'])
 
 
 def start(mg):
+    global manager
     manager = mg
+    # initialize
+    manager.create_feeds()
     load_ui_plugins()
     app.run(host='0.0.0.0', port=5050, use_reloader=False, debug=True)

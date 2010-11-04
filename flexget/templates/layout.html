@@ -6,6 +6,8 @@
   <title>FlexGet</title>
   <link rel="stylesheet" href="/static/menu.css" type="text/css" media="screen" />
   <link rel="stylesheet" href="/static/style.css" type="text/css" media="screen" />
+  {% block head %}
+  {% endblock %}
 </head>
 
 <body>
@@ -26,18 +28,15 @@
 </ul>
 
 <div id="leftmenu">
-  {% block menu %}
-  <h2>right column</h2>
-  <ul>
-    <li>foo</li>
-    <li>bar</li>
-  </ul>
+  {% block left %}
   {% endblock %}
 </div>
 
 <div id="content">
   {% block content %}
-  Content not set!
+  <p>
+    <b>Error:</b> Content not set!
+  </p>
   {% endblock %}
 </div>
 
