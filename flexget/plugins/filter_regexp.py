@@ -133,11 +133,13 @@ class FilterRegexp(object):
 
     def matches(self, entry, regexp, find_from=None, not_regexps=None):
         """Check if :entry: has any string fields or strings in a list field that match :regexp:.
-        Optional :find_from: can be given to limit searching fields"""
+        Optional :find_from: can be given as a list to limit searching fields"""
         unquote = ['url']
-        for field, values in entry.iteritems():
-            if find_from and field not in find_from:
+        for field in find_from or entry:
+            if not entry.get(field):
                 continue
+            # Make all fields into lists to search
+            values = entry[field]
             if not isinstance(values, list):
                 values = [values]
             for value in values:
@@ -150,7 +152,7 @@ class FilterRegexp(object):
                 if re.search(regexp, value, re.IGNORECASE | re.UNICODE):
                     # Make sure the not_regexps do not match for this field
                     for not_regexp in not_regexps or []:
-                        if self.matches(entry, not_regexp, find_from=field):
+                        if self.matches(entry, not_regexp, find_from=[field]):
                             break
                     else: # None of the not_regexps matched
                         return field
@@ -173,7 +175,6 @@ class FilterRegexp(object):
                 regexp, opts = regexp_opts.items()[0]
 
                 # check if entry matches given regexp, also makes sure it doesn't match secondary
-                print regexp, entry['title']
                 field = self.matches(entry, regexp, opts.get('from'), opts.get('not'))
                 # Run if we are in match mode and have a hit, or are in non-match mode and don't have a hit
                 if match_mode == bool(field):
