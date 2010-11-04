@@ -42,10 +42,10 @@ class FilterRegexp(object):
             # bundle is a dictionary form
             bundle = regexps.accept('dict')
             # path as a single parameter
-            bundle.accept_any_key('path', allow_replacement=True)
+            bundle.accept_valid_keys('path', allow_replacement=True, key_type='regexp')
 
             # advanced configuration as a parameter
-            advanced = bundle.accept_any_key('dict')
+            advanced = bundle.accept_valid_keys('dict', key_type='regexp')
             advanced.accept('path', key='path', allow_replacement=True)
             # accept set parameters
             set = advanced.accept('dict', key='set')
