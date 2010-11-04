@@ -203,7 +203,7 @@ class TorrentFilename(object):
                 raise PluginError('File %s does not exists' % entry['file'])
             if os.path.getsize(entry['file']) == 0:
                 raise PluginError('File %s is 0 bytes in size' % entry['file'])
-                
+
             # read first 200 bytes to verify if a file is a torrent or not
             f = open(entry['file'], 'rb')
             data = f.read(200)
@@ -241,10 +241,10 @@ class TorrentFilename(object):
                 entry['torrent_info_hash'] = torrent.get_info_hash()
                 # if we do not have good filename (by download plugin)
                 # for this entry, try to generate one from torrent content
-                if 'filename' in entry:
+                if entry.get('filename'):
                     if not entry['filename'].lower().endswith('.torrent'):
                         # filename present but without .torrent extension, add it
-                        entry['filename'] = '%s.torrent' % entry['filename']
+                        entry['filename'] = entry['filename'] + '.torrent'
                 else:
                     # generate filename from torrent or fall back to title plus extension
                     entry['filename'] = self.make_filename(torrent, entry)
