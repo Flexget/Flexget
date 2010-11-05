@@ -22,7 +22,7 @@
     <ul id="navbar">
       {% for item in menu %}
       <li><a href="{{ item.href }}"
-      {% if item.current is defined %}class="current"{% endif %}
+      {% if item.current is defined %} class="current" {% endif %}
       >{{ item.caption }}</a></li>
       <!--
       <li><a href="#" title="" class="current">Products</a></li>
@@ -30,16 +30,25 @@
       {% endfor %}
     </ul>
 
-    <div id="menu">
-      {% block menu %}
-      {% endblock %}
+    <div id="content-container">
+
+        <div id="menu">
+          {% block menu %}
+          {% endblock %}
+        </div>
+
+        <div id="main">
+          {% block main %}
+          <p>
+            <b>Error:</b> Main content not set!
+          </p>
+          {% endblock %}
+        </div>
+
     </div>
 
-    <div id="main">
-      {% block main %}
-      <p>
-        <b>Error:</b> Main content not set!
-      </p>
+    <div id="footer">
+      {% block footer %}
       {% endblock %}
     </div>
 

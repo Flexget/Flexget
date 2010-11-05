@@ -1,8 +1,13 @@
 * {margin: 0; padding: 0;}
 
+/* display scrollbar always */
+html {
+    overflow-y: scroll;
+}
+
 #container {
     margin: 0 auto;
-    width: 900px;
+    width: 1150px;
 }
 
 body {
@@ -17,6 +22,7 @@ h1 {
     font-size: 14px;
     text-transform: uppercase;
     margin: 0;
+    margin-bottom: 1em;
 }
 
 a {
@@ -26,18 +32,23 @@ a {
     text-decoration: none;
 }
 
+#content-container {
+    float: left;
+    width: 1150px;
+    background-color: #fff;
+}
+
 #menu {
-    position: absolute;
+    float: left;
     width: 200px;
-    left: 20px;
     background-color: #ccc;
-    padding:0;
-    margin:0;
 }
 
 #main {
-    margin-left: 200px;
-    background-color: #fff;
+    float: right;
+    clear: right;
+    display: inline;
+    width: 923px; /* WTF? */
     padding: 1em;
 }
 
@@ -49,4 +60,14 @@ a {
     background-attachment:fixed;
     background-color: #fff;
     background-position: 50% 10px;
+}
+
+#footer
+{
+	clear: left;
+	background: #ccc;
+	text-align: right;
+	height: 1.5em;
+    padding: 0.4em;
+    margin-bottom: 2em;
 }
