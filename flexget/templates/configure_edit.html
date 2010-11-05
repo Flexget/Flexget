@@ -4,7 +4,7 @@
 <p>Fully UI-based editing will be implemented later</p>
 
 <form action="/configure/{{ root }}/{{ name }}" method="post">
-    <textarea name="config" cols=80 rows=30>{{ config }}</textarea>
+    <textarea name="config" cols=80 rows=30 wrap="off">{{ config }}</textarea>
     <div>
         <button type="submit" id="submit">Submit</button>
     </div>

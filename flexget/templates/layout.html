@@ -8,6 +8,13 @@
     <link rel="stylesheet" href="/static/menu.css" type="text/css" media="screen"/>
     <link rel="stylesheet" href="/static/style.css" type="text/css" media="screen"/>
     <link rel="stylesheet" href="/static/forms.css" type="text/css" media="screen"/>
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $('#flash').click(function() {
+                $('#flash').fadeOut(500);
+            });
+        });
+    </script>
     {% block head %}
     {% endblock %}
 </head>

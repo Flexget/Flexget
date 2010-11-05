@@ -84,6 +84,7 @@ a {
     background: #FEA662;
     padding: 1em;
     margin-bottom: 1em;
+    cursor: pointer;
 }
 
 #flash ul {
