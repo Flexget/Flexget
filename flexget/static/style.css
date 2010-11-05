@@ -72,10 +72,20 @@ a {
 
 #footer
 {
-	clear: left;
-	background: #ccc;
-	text-align: right;
-	height: 1.5em;
+    clear: left;
+    background: #ccc;
+    text-align: right;
+    height: 1.5em;
     padding: 0.4em;
     margin-bottom: 2em;
+}
+
+#flash {
+    background: #FEA662;
+    padding: 1em;
+    margin-bottom: 1em;
+}
+
+#flash ul {
+    margin-left: 1em;
 }

@@ -10,7 +10,7 @@ def configure():
 
 @app.route('/configure/<root>/<name>', methods=['POST', 'GET'])
 def edit(root, name):
-    config = manager.feeds[name].config
+    config = manager.config[root][name]
 
     if request.method == 'POST':
         # TODO: validate configuration
