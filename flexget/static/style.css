@@ -1,3 +1,10 @@
+* {margin: 0; padding: 0;}
+
+#container {
+    margin: 0 auto;
+    width: 900px;
+}
+
 body {
     background-color: #666;
     font-size: 13px;
@@ -31,12 +38,15 @@ a {
 #main {
     margin-left: 200px;
     background-color: #fff;
-    overflow: auto;
     padding: 1em;
 }
 
 #header
 {
-    height: 60px;
-    background: #FFF url("FlexGet2.png") top left no-repeat;
+    height: 80px;
+    background-image:url('FlexGet2.png');
+    background-repeat:no-repeat;
+    background-attachment:fixed;
+    background-color: #fff;
+    background-position: 50% 10px;
 }

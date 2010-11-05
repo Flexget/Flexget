@@ -2,43 +2,49 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
-  <title>FlexGet</title>
-  <link rel="stylesheet" href="/static/menu.css" type="text/css" media="screen" />
-  <link rel="stylesheet" href="/static/style.css" type="text/css" media="screen" />
-  {% block head %}
-  {% endblock %}
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <title>FlexGet</title>
+    <link rel="stylesheet" href="/static/menu.css" type="text/css" media="screen"/>
+    <link rel="stylesheet" href="/static/style.css" type="text/css" media="screen"/>
+    <link rel="stylesheet" href="/static/forms.css" type="text/css" media="screen"/>
+    {% block head %}
+    {% endblock %}
 </head>
 
 <body>
 
-<div id="header">
-{% block header %}&nbsp;{% endblock %}
-</div>
+<div id="container">
 
-<ul id="navbar">
-  {% for item in menu %}
-  <li><a href="{{ item.href }}" 
-  {% if item.current is defined %}class="current"{% endif %}
-  >{{ item.caption }}</a></li>
-  <!--
-  <li><a href="#" title="" class="current">Products</a></li>
-  -->
-  {% endfor %}
-</ul>
+    <div id="header">
+    {% block header %}&nbsp;{% endblock %}
+    </div>
 
-<div id="menu">
-  {% block menu %}
-  {% endblock %}
-</div>
+    <ul id="navbar">
+      {% for item in menu %}
+      <li><a href="{{ item.href }}"
+      {% if item.current is defined %}class="current"{% endif %}
+      >{{ item.caption }}</a></li>
+      <!--
+      <li><a href="#" title="" class="current">Products</a></li>
+      -->
+      {% endfor %}
+    </ul>
 
-<div id="main">
-  {% block main %}
-  <p>
-    <b>Error:</b> Main content not set!
-  </p>
-  {% endblock %}
+    <div id="menu">
+      {% block menu %}
+      {% endblock %}
+    </div>
+
+    <div id="main">
+      {% block main %}
+      <p>
+        <b>Error:</b> Main content not set!
+      </p>
+      {% endblock %}
+    </div>
+
 </div>
 
 </body>
 </html>
+
