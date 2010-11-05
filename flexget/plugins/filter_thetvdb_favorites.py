@@ -1,5 +1,5 @@
 import logging
-from flexget.plugin import register_plugin, register_parser_option, internet, get_plugin_by_name, PluginError
+from flexget.plugin import register_plugin, internet, get_plugin_by_name, PluginError
 from flexget.manager import Base, Session
 from flexget.utils.tools import urlopener
 from BeautifulSoup import BeautifulStoneSoup
@@ -68,7 +68,8 @@ class FilterThetvdbFavorites:
                     data = BeautifulStoneSoup(urlopener("http://thetvdb.com/data/series/%s/" % str(fid), log), \
                         convertEntities=BeautifulStoneSoup.HTML_ENTITIES)
                     items.append(ThetvdbFavorites(account_id, data.series.seriesname.string))
-            except (urllib2.URLError, IOError):
+            except (urllib2.URLError, IOError, AttributeError):
+                # If there are errors getting the favorites or parsing the xml, fall back on cache
                 log.error('Error retrieving favorites from thetvdb, using cache.')
             else:
                 # Successfully updated from tvdb, update the database
