@@ -1,4 +1,5 @@
-form {
+
+form.data {
     background: #f2f2f2;
     padding: 1em;
     margin: 1em 0;
@@ -6,7 +7,7 @@ form {
     width: 27em;
 }
 
-fieldset div {
+form.data fieldset div {
     margin: 0.3em 0;
     clear: both;
 }
@@ -41,7 +42,7 @@ input {
 input:hover, input:focus {
     border-color: #c5c5c5;
     background: #f6f6f6;
-} 
+}
 
 fieldset {
     border: 1px solid #aaa;

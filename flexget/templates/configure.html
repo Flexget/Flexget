@@ -1,16 +1,19 @@
 {% extends "layout.html" %}
 
 {% block main %}
-<h1>Configure</h1>
 
-<p>Please select feed to configure</p>
+    {% block configure %}
+    <h1>Configure</h1>
+    <p>Please select feed to configure</p>
+    {% endblock %}
+
 {% endblock %}
 
 
 {% block menu %}
-  <ul>
-  {% for feed in manager.feeds.itervalues() %}
-    <li><a href="/configure/feeds/{{ feed.name }}">{{ feed.name }}</a></li>
-  {% endfor %}
-  </ul>
+    <ul>
+    {% for feed in manager.feeds.itervalues() %}
+        <li><a href="/configure/feeds/{{ feed.name }}">{{ feed.name }}</a></li>
+    {% endfor %}
+    </ul>
 {% endblock %}
