@@ -1,6 +1,6 @@
 import os
 import logging
-from flexget.plugin import *
+from flexget.plugin import register_plugin, priority, PluginWarning
 
 log = logging.getLogger('exists')
 
@@ -22,10 +22,10 @@ class FilterExists(object):
         bundle = root.accept('list')
         bundle.accept('path')
         return root
-        
+
     def get_config(self, feed):
         config = feed.config.get('exists', None)
-        #if only a single path is passed turn it into a 1 element list
+        # If only a single path is passed turn it into a 1 element list
         if isinstance(config, basestring):
             config = [config]
         return config

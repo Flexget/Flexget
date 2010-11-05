@@ -2,7 +2,7 @@ import os
 from netrc import netrc, NetrcParseError
 import logging
 import base64
-from flexget.plugin import *
+from flexget.plugin import register_plugin, priority, get_plugin_by_name, PluginError
 from flexget import validator
 from flexget.utils.tools import replace_from_entry
 
@@ -207,7 +207,7 @@ class PluginTransmissionrpc:
             except IOError, e:
                 log.error('netrc: unable to open: %s' % e.filename)
             except NetrcParseError, e:
-                log.error('netrc: %s, file: %s, line: %s' % (e.msg, e.filename, e.line))
+                log.error('netrc: %s, file: %s, line: %s' % (e.msg, e.filename, e.lineno))
         else:
             if 'username' in config:
                 user = config['username']

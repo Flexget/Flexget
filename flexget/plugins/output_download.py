@@ -6,7 +6,7 @@ import logging
 import shutil
 import filecmp
 import zlib
-from flexget.plugin import *
+from flexget.plugin import register_plugin, register_parser_option, get_plugin_by_name, PluginWarning, PluginError
 from httplib import BadStatusLine
 from flexget.utils.tools import urlopener, replace_from_entry
 import mimetypes
@@ -14,7 +14,7 @@ import mimetypes
 log = logging.getLogger('download')
 
 
-class PluginDownload:
+class PluginDownload(object):
 
     """
         Downloads content from entry url and writes it into a file.
@@ -269,12 +269,12 @@ class PluginDownload:
         extension = mimetypes.guess_extension(entry['mime-type'])
         if extension:
             log.debug('Mimetype guess for %s is %s ' % (entry['mime-type'], extension))
-            if 'filename' in entry:
+            if entry.get('filename'):
                 if entry['filename'].endswith(extension):
                     log.debug('Filename %s extension matches to mime-type' % entry['filename'])
                 else:
                     log.debug('Adding mime-type extension %s to %s' % (extension, entry['filename']))
-                    entry['filename'] = '%s%s' % (entry['filename'], extension)
+                    entry['filename'] = entry['filename'] + extension
         else:
             log.debug('Python doesn\'t know extension for mime-type: %s' % entry['mime-type'])
 
@@ -316,11 +316,11 @@ class PluginDownload:
             html_mimes = ['html', 'text/html']
             if entry.get('mime-type') in html_mimes and config['fail_html']:
                 feed.fail(entry, 'unexpected html content')
-                log.error('Unexpected html content received from %s' % entry['url'])
+                log.error('Unexpected html content received from %s (a login page?)' % entry['url'])
                 return
 
             # if we still don't have a filename, try making one from title (last resort)
-            if not 'filename' in entry:
+            if not entry.get('filename'):
                 entry['filename'] = entry['title']
                 log.debug('set filename from title %s' % entry['filename'])
                 if not 'mime-type' in entry:

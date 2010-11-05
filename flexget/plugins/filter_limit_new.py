@@ -1,5 +1,5 @@
 import logging
-from flexget.plugin import *
+from flexget.plugin import register_plugin, priority
 
 log = logging.getLogger('limit_new')
 
@@ -28,7 +28,7 @@ class FilterLimitNew(object):
         if feed.manager.options.learn:
             log.info('Plugin limit_new is disabled with --learn / --reset')
             return
-            
+
         amount = feed.config.get('limit_new', len(feed.entries))
         i = 1
         rejected = 0

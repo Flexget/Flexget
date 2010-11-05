@@ -8,8 +8,6 @@ class OptionParser(OptParser):
 
         self._unit_test = unit_test
 
-        self.add_option('-v', action='store_true', dest='details', default=0,
-                        help='Verbose process. Display entry accept and reject info. HIGHLY USEFULL.')
         self.add_option('--log-start', action='store_true', dest='log_start', default=0,
                         help=SUPPRESS_HELP)
         self.add_option('--test', action='store_true', dest='test', default=0,
@@ -18,18 +16,12 @@ class OptionParser(OptParser):
                         help='Validate configuration file and print errors.')
         self.add_option('--learn', action='store_true', dest='learn', default=0,
                         help='Matches are not downloaded but will be skipped in the future.')
-        self.add_option('--feed', action='store', dest='onlyfeed', default=None,
-                        metavar='FEED', help='Run only specified feed.')
         self.add_option('--no-cache', action='store_true', dest='nocache', default=0,
                         help='Disable caches. Works only in plugins that have explicit support.')
         self.add_option('--reset', action='store_true', dest='reset', default=0,
                         help='Forgets everything that has been done and learns current matches.')
         self.add_option('--doc', action='store', dest='doc',
                         metavar='PLUGIN', help='Display plugin documentation. See also --plugins.')
-        self.add_option('--failed', action='store_true', dest='failed', default=0,
-                        help='List recently failed entries.')
-        self.add_option('--clear', action='store_true', dest='clear_failed', default=0,
-                        help='Clear recently failed list.')
         self.add_option('-c', action='store', dest='config', default='config.yml',
                         help='Specify configuration file. Default is config.yml')
         self.add_option('--cron', action='store_true', dest='quiet', default=False,
@@ -61,8 +53,6 @@ class OptionParser(OptParser):
 
         # provides backward compatibility to --cron and -d
         self.add_option('-q', '--quiet', action='store_true', dest='quiet', default=False,
-                        help=SUPPRESS_HELP)
-        self.add_option('-d', action='store_true', dest='details', default=0,
                         help=SUPPRESS_HELP)
 
     def parse_args(self):

@@ -1,5 +1,5 @@
 import logging
-from flexget.plugin import *
+from flexget.plugin import register_plugin, PluginError, get_plugin_by_name
 from BeautifulSoup import BeautifulSoup
 from flexget.manager import Base
 from sqlalchemy import Column, Integer, Float, String, DateTime
@@ -106,8 +106,7 @@ class FilterImdbRated(object):
     def on_feed_filter(self, feed):
         config = feed.config['imdb_rated']
         if isinstance(config, basestring):
-            config = {}
-            config['url'] = feed.config['imdb_rated']
+            config = {'url': feed.config['imdb_rated']}
 
         self.update_rated(feed, config)
         for entry in feed.entries:

@@ -121,6 +121,9 @@ EVENT_METHODS = {
     'output': 'on_feed_output',
     'exit': 'on_feed_exit',
     'abort': 'on_feed_abort',
+    'accept': 'on_entry_accept',
+    'reject': 'on_entry_reject',
+    'fail': 'on_entry_fail',
     'process_start': 'on_process_start',
     'process_end': 'on_process_end'}
 
@@ -134,8 +137,10 @@ _plugin_options = []
 _new_event_queue = {}
 
 
-def register_plugin(plugin_class, name, groups=[], builtin=False, debug=False):
+def register_plugin(plugin_class, name, groups=None, builtin=False, debug=False):
     """Registers a plugin."""
+    if groups is None:
+        groups = []
     global plugins
     if name is None:
         name = plugin_class.__name__
@@ -200,7 +205,9 @@ class PluginInfo(dict):
         attributes.  Also instantiates a plugin and initializes properties.
     """
 
-    def __init__(self, name, item_class, groups=[], builtin=False, debug=False):
+    def __init__(self, name, item_class, groups=None, builtin=False, debug=False):
+        if groups is None:
+            groups = []
         dict.__init__(self)
 
         self.name = name
@@ -273,9 +280,6 @@ class PluginMethod(object):
         return self.plugin[key]
 
     def __call__(self, *args, **kwargs):
-        #print self
-        #print "args:%s" % args
-        #print "kwargs:%s" % kwargs
         return getattr(self.plugin.instance, self.method_name)(*args, **kwargs)
 
     def __eq__(self, other):
@@ -339,7 +343,6 @@ def load_plugins_from_dir(d):
         path = os.path.join(d, f)
         if os.path.isfile(path):
             f_base, ext = os.path.splitext(f)
-            #path_parts = f_base.split('_')
             if ext in valid_suffixes:
                 if f_base == '__init__':
                     continue # don't load __init__.py again
@@ -357,8 +360,8 @@ def load_plugins_from_dir(d):
 
     if _new_event_queue:
         for event, args in _new_event_queue.iteritems():
-            log.error('Plugin %s requested new event %s, but it could not be created at requested \
-            point (before, after). Plugin is not working properly.' % (args[0], event))
+            log.error(('Plugin %s requested new event %s, but it could not be created at requested '
+                       'point (before, after). Plugin is not working properly.') % (args[0], event))
 
 
 def load_plugins(parser):

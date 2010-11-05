@@ -91,7 +91,7 @@ class Validator(object):
     def get_validator(self, name, **kwargs):
         if not self.validators.get(name):
             raise Exception('Asked unknown validator \'%s\'' % name)
-        #print 'returning %s' % name
+        # print 'returning %s' % name
         return self.validators[name](self, **kwargs)
 
     def accept(self, name, **kwargs):
@@ -112,7 +112,7 @@ class Validator(object):
         """
         count = self.errors.count()
         for rule in rules:
-            #print 'validating %s' % rule.name
+            # print 'validating %s' % rule.name
             if rule.validateable(item):
                 if rule.validate(item):
                     # item is valid, remove added errors before returning
@@ -135,7 +135,7 @@ class Validator(object):
                 elif isinstance(item, list):
                     self.errors.add('got a list instead of %s' % acceptable)
                 else:
-                    self.errors.add('value "%s" is not valid %s' % (item, acceptable))
+                    self.errors.add('value \'%s\' is not valid %s' % (item, acceptable))
         return False
 
     def __str__(self):
@@ -187,7 +187,7 @@ class ChoiceValidator(Validator):
             return True
         else:
             acceptable = [str(value) for value in self.valid + self.valid_ic]
-            self.errors.add("'%s' is not one of acceptable values: %s" % (data, ', '.join(acceptable)))
+            self.errors.add('\'%s\' is not one of acceptable values: %s' % (data, ', '.join(acceptable)))
             return False
 
 
@@ -431,6 +431,7 @@ class DictValidator(Validator):
         self.reject = {}
         self.any_key = []
         self.required_keys = []
+        self.validated_keys = {}
         Validator.__init__(self, parent, **kwargs)
         # TODO: not dictionary?
         self.valid = {}
@@ -471,8 +472,20 @@ class DictValidator(Validator):
     def accept_any_key(self, name, **kwargs):
         """Accepts any key with given type"""
         v = self.get_validator(name, **kwargs)
-        #v.accept(name, **kwargs)
+        # v.accept(name, **kwargs)
         self.any_key.append(v)
+        return v
+        
+    def accept_valid_keys(self, name, **kwargs):
+        """Accepts key with name type"""
+        if not 'key_type' in kwargs:
+            raise Exception('%s.accept_valid_keys() must specify key_type' % self.name)
+        key_types = kwargs['key_type']
+        if isinstance(key_types, basestring):
+            key_types = [key_types]
+        v = self.get_validator(name, **kwargs)
+        for key_type in key_types:
+            self.validated_keys.setdefault(key_type, []).append(v)
         return v
 
     def validateable(self, data):
@@ -487,9 +500,6 @@ class DictValidator(Validator):
         self.errors.path_add_level()
         for key, value in data.iteritems():
             self.errors.path_update_value('dict:%s' % key)
-            if not key in self.valid and not self.any_key:
-                self.errors.add('key \'%s\' is not recognized' % key)
-                continue
             # reject keys
             if key in self.reject:
                 msg = self.reject[key]
@@ -500,10 +510,26 @@ class DictValidator(Validator):
                 else:
                     self.errors.add('key \'%s\' is forbidden here' % key)
                 continue
-            # rules contain rules specified for this key AND
-            # rules specified for any key
-            rules = self.valid.get(key, [])
-            rules.extend(self.any_key)
+            # Get rules for key, most specific rules will be used
+            rules = []
+            if key in self.valid:
+                # Rules for explicitly allowed keys
+                rules = self.valid.get(key, [])
+            else:
+                for v_type in self.validated_keys:
+                    v = self.get_validator(v_type)
+                    if v.validateable(key) and v.validate(key):
+                        # Rules for a validated_key
+                        rules = self.validated_keys[v_type]
+                        break
+                else:
+                    if self.any_key:
+                        # Rules for any key
+                        rules = self.any_key
+            if not rules:
+                self.errors.add('key \'%s\' is not recognized' % key)
+                # TODO: print the valid options
+                continue
             self.validate_item(value, rules)
         self.errors.path_remove_level()
         for required in self.required_keys:

@@ -1,5 +1,5 @@
 import logging
-from flexget.plugin import *
+from flexget.plugin import register_plugin, priority, get_plugin_by_name, PluginWarning, PluginError
 from flexget.manager import Base, Session
 from flexget.utils.tools import urlopener
 import urllib
@@ -78,6 +78,14 @@ class ModuleThetvdbLookup(object):
         from flexget import validator
         return validator.factory('boolean')
 
+    @priority(120)
+    def on_process_start(self, feed):
+        """
+            Register the usable set: keywords.
+        """
+        set_plugin = get_plugin_by_name('set')
+        set_plugin.instance.register_key('thetvdb_id', 'number')
+
     @priority(100)
     def on_feed_filter(self, feed):
         from flexget.utils.log import log_once
@@ -105,6 +113,7 @@ class ModuleThetvdbLookup(object):
 
         return converted_date
 
+    # TODO: this does not utilize exceptions on errors, raise PluginWarning instead of logging error and returning
     def lookup(self, feed, entry):
         """
         Get theTVDB information for the included series_name,
@@ -153,38 +162,48 @@ class ModuleThetvdbLookup(object):
             get_new_info = False
 
         if get_new_info:
-            feed.verbose_progress('Requesting %s information from TheTvDB.com' % entry['series_name'])
-            # get my series data.
-            url = "http://thetvdb.com/api/GetSeries.php?seriesname=%s" % urllib.quote(entry['series_name'])
-            log.debug("url for thetvdb search for %s: %s" % (entry['series_name'], url))
-            try:
-                page = urlopener(url, log)
-            except Exception, e:
-                log.error("Unable to grab series info for %s: %s" % (entry['series_name'], e))
-                return
-            xmldata = BeautifulStoneSoup(page).data
-            if not xmldata:
-                log.error("Didn't get a return from tvdb on the series search for %s" % entry['series_name'])
-                return
-            # Yeah, I'm lazy. Grabbing the one with the latest airing date,
-            # instead of trying to see what's the closest match.
-            # If there's an exact match, return that immediately. Could
-            # run into issues with queries with multiple exact matches.
-            newest_series_first_aired = datetime.date(1800, 1, 1)
             series_id = None
-            for i in xmldata.findAll('series', recursive=False):
-                this_series_air_date = self._convert_date(i.firstaired.string)
-                if this_series_air_date > newest_series_first_aired:
-                    newest_series_first_aired = this_series_air_date
-                    series_id = i.seriesid.string
-                if i.seriesname.string == entry['series_name']:
-                    series_id = i.seriesid.string
-                    # Don't really need to store this, but just for consistencies sake so we always have it available
-                    newest_series_first_aired = this_series_air_date
-                    break
-            if series_id is None:
-                log.error("Didn't get a return from tvdb on the series search for %s" % entry['series_name'])
-                return
+            if 'thetvdb_id' in entry:
+                series_id = entry['thetvdb_id']
+                log.debug("Read thetvdb_id \'%(thetvdb_id)d\' from entry for %(title)s" % entry)
+            else:
+                feed.verbose_progress('Requesting %s information from TheTvDB.com' % entry['series_name'])
+                # get my series data.
+                url = "http://thetvdb.com/api/GetSeries.php?seriesname=%s" % urllib.quote(entry['series_name'])
+                log.debug("url for thetvdb search for %s: %s" % (entry['series_name'], url))
+                try:
+                    page = urlopener(url, log)
+                except Exception, e:
+                    log.error("Unable to grab series info for %s: %s" % (entry['series_name'], e))
+                    return
+                xmldata = BeautifulStoneSoup(page).data
+                if not xmldata:
+                    log.error("Didn't get a return from tvdb on the series search for %s" % entry['series_name'])
+                    return
+                # Yeah, I'm lazy. Grabbing the one with the latest airing date,
+                # instead of trying to see what's the closest match.
+                # If there's an exact match, return that immediately. Could
+                # run into issues with queries with multiple exact matches.
+                newest_series_first_aired = datetime.date(1800, 1, 1)
+                for i in xmldata.findAll('series', recursive=False):
+                    if i.firstaired:
+                        this_series_air_date = self._convert_date(i.firstaired.string)
+                        if this_series_air_date > newest_series_first_aired:
+                            newest_series_first_aired = this_series_air_date
+                            series_id = i.seriesid.string
+                        else:
+                            this_series_air_date = ""
+                          
+                    if i.seriesname.string == entry['series_name']:
+                        series_id = i.seriesid.string
+                        if i.firstaired:
+                            # Don't really need to store this, but just for consistencies sake so we always have it available
+                            newest_series_first_aired = this_series_air_date
+                        break
+                
+                if series_id is None:
+                    log.error("Didn't get a return from tvdb on the series search for %s" % entry['series_name'])
+                    return
 
             # Grab the url, and parse it out into BSS. Store it's root element as data.
             # TODO: need to impliment error handling around grabbing url.
@@ -196,21 +215,36 @@ class ModuleThetvdbLookup(object):
 
         session.commit()
 
-        entry['series_name_tvdb'] = data.series.seriesname.string
-        entry['series_rating'] = data.series.rating.string
-        entry['series_status'] = data.series.status.string
-        entry['series_runtime'] = data.series.runtime.string
-        entry['series_first_air_date'] = self._convert_date(data.series.firstaired.string)
-        entry['series_air_time'] = data.series.airs_time.string
-        entry['series_content_rating'] = data.series.contentrating.string
-        entry['series_genres'] = data.series.genre.string.strip("|").split("|")
-        entry['series_network'] = data.series.network.string
-        entry['series_banner_url'] = "http://www.thetvdb.com/banners/%s" % data.series.banner.string
-        entry['series_fanart_url'] = "http://www.thetvdb.com/banners/%s" % data.series.fanart.string
-        entry['series_poster_url'] = "http://www.thetvdb.com/banners/%s" % data.series.poster.string
-        entry['series_airs_day_of_week'] = data.series.airs_dayofweek.string
-        entry['series_actors'] = data.series.actors.string.strip("|").split("|")
-        entry['series_language'] = data.series.language.string
+        if data.series.seriesname:
+            entry['series_name_tvdb'] = data.series.seriesname.string
+        if data.series.rating:
+            entry['series_rating'] = data.series.rating.string
+        if data.series.status:
+            entry['series_status'] = data.series.status.string
+        if data.series.runtime:
+            entry['series_runtime'] = data.series.runtime.string
+        if data.series.firstaired:
+            entry['series_first_air_date'] = self._convert_date(data.series.firstaired.string)
+        if data.series.airs_time:
+            entry['series_air_time'] = data.series.airs_time.string
+        if data.series.contentrating:
+            entry['series_content_rating'] = data.series.contentrating.string
+        if data.series.genre.string:
+            entry['series_genres'] = data.series.genre.string.strip("|").split("|")
+        if data.series.network:
+            entry['series_network'] = data.series.network.string
+        if data.series.banner:
+            entry['series_banner_url'] = "http://www.thetvdb.com/banners/%s" % data.series.banner.string
+        if data.series.fanart:
+            entry['series_fanart_url'] = "http://www.thetvdb.com/banners/%s" % data.series.fanart.string
+        if data.series.poster:
+            entry['series_poster_url'] = "http://www.thetvdb.com/banners/%s" % data.series.poster.string
+        if data.series.airs_dayofweek:
+            entry['series_airs_day_of_week'] = data.series.airs_dayofweek.string
+        if data.series.actors:
+            entry['series_actors'] = data.series.actors.string.strip("|").split("|")
+        if data.series.language:
+            entry['series_language'] = data.series.language.string
         if data.series.imdb_id.string:
             entry["imdb_url"] = "http://www.imdb.com/title/%s" % data.series.imdb_id.string
         if data.series.zap2it_id.string:
@@ -219,7 +253,7 @@ class ModuleThetvdbLookup(object):
         log.debug("searching for correct episode %(series_name)s - S%(series_season)sE%(series_episode)s from the data" % entry)
 
         for i in data.findAll("episode", recursive=False):
-            #print "%s %s %s %s" % (i.combined_season.string, i.episodenumber.string, entry['series_season'], entry['series_episode'])
+            # print "%s %s %s %s" % (i.combined_season.string, i.episodenumber.string, entry['series_season'], entry['series_episode'])
             if int(i.combined_season.string) == int(entry['series_season']):
                 if int(i.episodenumber.string) == int(entry['series_episode']):
                     entry['ep_name'] = i.episodename.string

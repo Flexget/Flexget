@@ -3,7 +3,8 @@ from datetime import datetime, timedelta
 from flexget.utils.titles import SeriesParser, ParseWarning
 from flexget.utils import qualities
 from flexget.manager import Base
-from flexget.plugin import *
+from flexget.plugin import register_plugin, register_parser_option, get_plugin_by_name, get_plugin_keywords, \
+    PluginWarning, PluginError
 from sqlalchemy import Column, Integer, String, Unicode, DateTime, Boolean, desc
 from sqlalchemy.schema import ForeignKey
 from sqlalchemy.orm import relation, join
@@ -92,9 +93,9 @@ class SeriesPlugin(object):
             order_by(desc(Episode.season)).\
             order_by(desc(Episode.number)).first()
         if not episode:
-            #log.log(5, 'get_latest_info: no info available for %s' % name)
+            # log.log(5, 'get_latest_info: no info available for %s' % name)
             return False
-        #log.log(5, 'get_latest_info, series: %s season: %s episode: %s' % \
+        # log.log(5, 'get_latest_info, series: %s season: %s episode: %s' % \
         #    (name, episode.season, episode.number))
         return {'season': episode.season, 'episode': episode.number, 'name': name}
 
@@ -423,7 +424,6 @@ class FilterSeries(SeriesPlugin):
         self.backlog = None
 
     def on_process_start(self, feed):
-
         try:
             self.backlog = get_plugin_by_name('backlog').instance
         except:
@@ -509,10 +509,6 @@ class FilterSeries(SeriesPlugin):
         build_list(group)
 
         return root
-
-    def on_feed_input(self, feed):
-        if self.backlog:
-            self.backlog.inject_backlog(feed)
 
     def generate_config(self, feed):
         """Generate configuration dictionary from configuration. Converts simple format into advanced.
@@ -672,13 +668,13 @@ class FilterSeries(SeriesPlugin):
             return order.index(x[0]) if x[0] in order else len(order)
 
         # don't try to parse these fields
-        ignore_fields = ['uid', 'guid', 'feed', 'url', 'original_url', 'type', 'quality']
+        ignore_fields = ['uid', 'guid', 'feed', 'url', 'original_url', 'type', 'quality', 'series_name']
 
         # key: series (episode) identifier ie. S01E02
         # value: seriesparser
         series = {}
         for entry in feed.entries:
-            if entry.get('series_parser') and entry['series_parser'].valid:
+            if entry.get('series_parser') and entry['series_parser'].valid and not entry.get('series_guessed'):
                 # This entry already has a valid series parser, use it. (probably from backlog)
                 parser = entry['series_parser']
                 if parser.name.lower() != series_name.lower():
@@ -804,7 +800,7 @@ class FilterSeries(SeriesPlugin):
             # reject downloaded
             log.debug('-' * 20 + ' downloaded -->')
             for ep in self.process_downloaded(feed, eps, whitelist):
-                feed.reject(self.parser2entry[ep], 'already downloaded')
+                feed.reject(self.parser2entry[ep], 'already downloaded episode with id \'%s\'' % str(ep.identifier))
                 log.debug('downloaded removed: %s' % ep)
                 eps.remove(ep)
 
@@ -1101,7 +1097,7 @@ class FilterSeries(SeriesPlugin):
             return True
 
     # TODO: whitelist deprecated ?
-    def process_qualities(self, feed, config, eps, whitelist=[]):
+    def process_qualities(self, feed, config, eps, whitelist=None):
         """
             Accepts all wanted qualities.
             Accepts whitelisted episodes even if downloaded.
@@ -1128,7 +1124,7 @@ class FilterSeries(SeriesPlugin):
             if quality not in wanted_qualities:
                 log.debug('%s is unwanted quality' % ep.quality)
                 continue
-            if is_quality_downloaded(quality) and ep not in whitelist:
+            if is_quality_downloaded(quality) and ep not in (whitelist or []):
                 feed.reject(self.parser2entry[ep], 'quality downloaded')
             else:
                 feed.accept(self.parser2entry[ep], 'quality wanted')

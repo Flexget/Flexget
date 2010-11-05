@@ -1,9 +1,8 @@
 import logging
-import os
 from sys import maxint
-from sqlalchemy import Column, Integer, DateTime, Unicode, String, Boolean
+from sqlalchemy import Column, Integer, DateTime, Unicode, Boolean
 from datetime import datetime
-from flexget.plugin import *
+from flexget.plugin import register_plugin, priority
 from flexget.manager import Base
 from flexget.utils.log import log_once
 

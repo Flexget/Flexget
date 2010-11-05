@@ -7,7 +7,7 @@ import urllib2
 import httplib
 import socket
 from flexget.feed import Entry
-from flexget.plugin import *
+from flexget.plugin import register_plugin, internet, PluginError
 from flexget.utils.log import log_once
 from flexget.plugins.cached_input import cached
 from flexget.utils.tools import urlopener
@@ -50,6 +50,14 @@ class InputRSS(object):
           url: <url>
           link: guid
 
+        If you want to keep information in another rss field attached to the flexget entry, you can use the other_fields option.
+
+        Example:
+
+        rss:
+          url: <url>
+          other_fields: [date]
+
         You can disable few possibly annoying warnings by setting silent value to
         yes on feeds where there are frequently invalid items.
 
@@ -83,6 +91,7 @@ class InputRSS(object):
         advanced.accept('text', key='password')
         advanced.accept('text', key='link')
         advanced.accept('list', key='link').accept('text')
+        advanced.accept('list', key='other_fields').accept('text')
         advanced.accept('boolean', key='silent')
         advanced.accept('boolean', key='ascii')
         advanced.accept('boolean', key='filename')
@@ -100,6 +109,9 @@ class InputRSS(object):
         # set the default link fields to 'link' and 'guid'
         if not config.get('link') or 'auto' in config['link']:
             config['link'] = ['link', 'guid']
+        # Replace : with _ and lower case other fields so they can be found in rss
+        if config.get('other_fields'):
+            config['other_fields'] = [field.replace(':', '_').lower() for field in config['other_fields']]
         # set default value for group links as deactivated
         if not config.get('group links') or config['group links'] == 'auto':
             config['group links'] = False
@@ -242,10 +254,13 @@ class InputRSS(object):
                     else:
                         log.debug(msg)
 
-        if rss['bozo'] and not ignore:
-            log.error(rss)
-            log.error('Bozo exception %s on feed %s' % (type(ex), feed.name))
-            return
+        if 'bozo' in rss:
+            if rss.bozo and not ignore:
+                log.error(rss)
+                log.error('Bozo exception %s on feed %s' % (type(ex), feed.name))
+                return
+        else:
+            log.warn('feedparser bozo bit missing, feedparser bug? (FlexGet ticket #721)')
 
         log.debug('encoding %s' % rss.encoding)
 
@@ -288,10 +303,21 @@ class InputRSS(object):
 
                 # grab fields
                 fields = ['guid', 'author', 'description']
+                # extend the list of fields to grab from other_fields list in config
+                fields.extend(config.get('other_fields', []))
                 for field in fields:
                     if field in entry:
+                        if not isinstance(getattr(entry, field), basestring):
+                            # Error if this field is not a string
+                            log.error('Cannot grab non string field \'%s\' from rss.' % field)
+                            # Remove field from list of fields to avoid repeated error
+                            config['other_fields'].remove(field)
+                            continue
                         try:
                             ea[field] = decode_html(getattr(entry, field))
+                            if field in config.get('other_fields', []):
+                                # Print a debug message for custom added fields
+                                log.debug('Field %s set to %s for %s' % (field, ea[field], ea['title']))
                         except UnicodeDecodeError:
                             log.warning('Failed to decode entry %s field %s' % (ea['title'], field))
 
@@ -306,7 +332,7 @@ class InputRSS(object):
             enclosures_urls = []
 
             if enclosures:
-                #log.debug('adding %i entries from enclosures' % len(enclosures))
+                # log.debug('adding %i entries from enclosures' % len(enclosures))
                 for enclosure in enclosures:
                     ee = Entry()
                     if not 'href' in enclosure:
@@ -329,7 +355,7 @@ class InputRSS(object):
                         if ee['url'].rfind != -1:
                             # parse filename from enclosure url
                             # TODO: better and perhaps join/in download plugin? also see urlparse module
-                            match = re.search(r'.*/([^?#]*)', ee['url'])
+                            match = re.search(r'.*/([^?#]+)', ee['url'])
                             if match and config.get('filename', True):
                                 ee['filename'] = match.group(1)
                                 log.log(5, 'filename %s from enclosure' % ee['filename'])

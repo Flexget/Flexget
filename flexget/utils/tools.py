@@ -45,6 +45,17 @@ class MergeException(Exception):
     def __str__(self):
         return repr(self.value)
 
+
+def strip_html(text):
+    """Tries to strip all HTML tags from :text:. If unsuccessful returns original text."""
+    from BeautifulSoup import BeautifulSoup
+    try:
+        text = ' '.join(BeautifulSoup(text).findAll(text=True))
+        return ' '.join(text.split())
+    except:
+        return text
+    
+
 # This pattern matches a character entity reference (a decimal numeric
 # references, a hexadecimal numeric reference, or a named reference).
 charrefpat = re.compile(r'&(#(\d+|x[\da-fA-F]+)|[\w.:-]+);?')

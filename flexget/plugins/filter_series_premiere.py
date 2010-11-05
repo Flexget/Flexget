@@ -1,10 +1,8 @@
 import logging
-import re
-from flexget.utils.titles import SeriesParser
 from flexget.utils import qualities
 from flexget.manager import Base
 from sqlalchemy import Column, Integer, Unicode
-from flexget.plugin import *
+from flexget.plugin import register_plugin, priority
 
 log = logging.getLogger('series_premiere')
 
@@ -88,7 +86,7 @@ class FilterSeriesPremiere(object):
 
         # Accept all the premieres we found
         for entry in [e[1] for e in found_premieres.itervalues()]:
-            premiere = feed.session.query(SeriesPremiere).filter(SeriesPremiere.series_name == unicode(entry['series_name'])).first()
+            premiere = feed.session.query(SeriesPremiere).filter(SeriesPremiere.series_name == unicode(entry['series_name']).lower()).first()
             if premiere:
                 continue
 
@@ -103,7 +101,7 @@ class FilterSeriesPremiere(object):
             log.debug("Premiere found for: %s" % (entry['series_name']))
 
             premiere = SeriesPremiere()
-            premiere.series_name = unicode(entry['series_name'])
+            premiere.series_name = unicode(entry['series_name']).lower()
             feed.session.add(premiere)
 
 register_plugin(FilterSeriesPremiere, 'series_premiere')

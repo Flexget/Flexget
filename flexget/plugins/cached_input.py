@@ -1,6 +1,6 @@
 import copy
 import logging
-from flexget.plugin import *
+from flexget.plugin import register_plugin
 
 log = logging.getLogger('cached')
 

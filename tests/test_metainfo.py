@@ -61,6 +61,8 @@ class TestMetainfoQuality(FlexGetBase):
             mock:
               - {title: 'FooBar.S01E02.720p.HDTV'}
               - {title: 'ShowB.S04E19.Name of Ep.720p.WEB-DL.DD5.1.H.264'}
+              - {title: 'Good.Movie', description: '720p'}
+              - {title: 'Good.Movie.hdtv', description: '720p'}
     """
 
     def test_quality(self):
@@ -72,7 +74,15 @@ class TestMetainfoQuality(FlexGetBase):
         entry = self.feed.find_entry(title='ShowB.S04E19.Name of Ep.720p.WEB-DL.DD5.1.H.264')
         assert entry, 'entry not found?'
         assert 'quality' in entry, 'failed to pick up quality'
-        assert entry['quality'] == 'web-dl', 'picked up wrong quality %s' % entry.get('quality', None)
+        assert entry['quality'] == '720p web-dl', 'picked up wrong quality %s' % entry.get('quality', None)
+        # Check that quality gets picked up from description when not in title
+        entry = self.feed.find_entry(title='Good.Movie')
+        assert 'quality' in entry, 'failed to pick up quality from description'
+        assert entry['quality'] == '720p', 'picked up wrong quality %s' % entry.get('quality', None)
+        # quality in description should not override one found in title
+        entry = self.feed.find_entry(title='Good.Movie.hdtv')
+        assert 'quality' in entry, 'failed to pick up quality'
+        assert entry['quality'] == 'hdtv', 'picked up wrong quality %s' % entry.get('quality', None)
 
 
 class TestMetainfoSeries(FlexGetBase):
@@ -82,13 +92,40 @@ class TestMetainfoSeries(FlexGetBase):
             mock:
               - {title: 'FlexGet.S01E02.TheName.HDTV.xvid'}
               - {title: 'Some.Series.S03E14.Title.Here.720p'}
-            metainfo_series: yes
+              - {title: '[the.group] Some.Series.S03E15.Title.Two.720p'}
+              - {title: 'HD 720p: Some.Series.S03E16.Title.Three'}
+          false_positives:
+            mock:
+              - {title: 'FlexGet.epic'}
+              - {title: 'FlexGet.Apt.1'}
+              - {title: 'FlexGet.aptitude'}
+              - {title: 'FlexGet.Step1'}
+              - {title: 'Something.1x0.Complete.Season-FlexGet'}
+              - {title: 'Something.1xAll.Season.Complete-FlexGet'}
+              - {title: 'Something Seasons 1 & 2 - Complete'}
+              - {title: 'Something Seasons 4 Complete'}
+              - {title: 'Something.S01D2.DVDR-FlexGet'}
     """
 
-    def test_imdb(self):
-        """Metainfo: series name/episode"""
+    def test_metainfo_series(self):
+        """Metainfo series: name/episode"""
         self.execute_feed('test')
         assert self.feed.find_entry(series_name='FlexGet', series_season=1, series_episode=2, quality='hdtv'), \
             'Failed to parse series info'
-        assert self.feed.find_entry(series_name='Some Series', series_season=3, series_episode=14), \
+        assert self.feed.find_entry(series_name='Some Series', series_season=3, series_episode=14, quality='720p'), \
             'Failed to parse series info'
+        # Test unwanted prefixes get stripped from series name
+        assert self.feed.find_entry(series_name='Some Series', series_season=3, series_episode=15, quality='720p'), \
+            'Failed to parse series info'
+        assert self.feed.find_entry(series_name='Some Series', series_season=3, series_episode=16, quality='720p'), \
+            'Failed to parse series info'
+
+    def test_false_positives(self):
+        """Metainfo series: check for false positives"""
+        self.execute_feed('false_positives')
+        for entry in self.feed.entries:
+            # None of these should be detected as series
+            error = '%s sholud not be detected as a series' % entry['title']
+            assert 'series_name' not in entry, error
+            assert 'series_guessed' not in entry, error
+            assert 'series_parser' not in entry, error

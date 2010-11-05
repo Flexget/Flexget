@@ -1,6 +1,6 @@
 import logging
 from flexget.manager import Base
-from flexget.plugin import *
+from flexget.plugin import register_plugin, priority, PluginWarning
 from datetime import datetime, timedelta
 from sqlalchemy import Column, Integer, String, DateTime, PickleType
 
@@ -8,9 +8,9 @@ log = logging.getLogger('delay')
 
 
 class DelayedEntry(Base):
-    
+
     __tablename__ = 'delay'
-    
+
     id = Column(Integer, primary_key=True)
     feed = Column(String)
     title = Column(String)
@@ -24,11 +24,11 @@ class DelayedEntry(Base):
 class FilterDelay(object):
     """
         Add delay to a feed. This is usefull for de-priorizing expensive / bad-quality feeds.
-        
+
         Format: [n] [minutes|hours|days|months]
-        
+
         Example:
-        
+
         delay: 2 hours
     """
 
@@ -37,7 +37,7 @@ class FilterDelay(object):
         root = validator.factory('regexp_match')
         root.accept('\d+ (minutes|hours|days|weeks)')
         return root
-    
+
     def get_delay(self, feed):
         amount, unit = feed.config.get('delay').split(' ')
         log.debug('amount: %s unit: %s' % (repr(amount), repr(unit)))

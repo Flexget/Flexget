@@ -3,7 +3,6 @@ import sys
 import logging
 import sqlalchemy
 from datetime import datetime
-from sqlalchemy import Column, Integer, String, DateTime
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 
@@ -11,23 +10,6 @@ log = logging.getLogger('manager')
 
 Base = declarative_base()
 Session = sessionmaker()
-
-
-class FailedEntry(Base):
-    __tablename__ = 'failed'
-
-    id = Column(Integer, primary_key=True)
-    title = Column(String)
-    url = Column(String)
-    tof = Column(DateTime)
-
-    def __init__(self, title, url):
-        self.title = title
-        self.url = url
-        self.tof = datetime.now()
-
-    def __str__(self):
-        return '<Failed(title=%s)>' % (self.title)
 
 
 class Manager(object):
@@ -100,7 +82,7 @@ class Manager(object):
                     print ' o Indentation error'
                     print ' o Missing : from end of the line'
                     print ' o Non ASCII characters (use UTF8)'
-                    print " o If text contains any of :[]{}% characters it must be single-quoted (eg. value{1} should be 'value{1}')\n"
+                    print ' o If text contains any of :[]{}% characters it must be single-quoted (eg. value{1} should be \'value{1}\')\n'
                     lines = 0
                     if e.problem is not None:
                         print ' Reason: %s\n' % e.problem
@@ -138,7 +120,7 @@ class Manager(object):
 
         def get_indentation(line):
             i, n = 0, len(line)
-            while i < n and line[i] == " ":
+            while i < n and line[i] == ' ':
                 i += 1
             return i
 
@@ -171,8 +153,8 @@ class Manager(object):
                 else:
                     continue
 
-            #print '%i - %i: %s' % (line_num, indentation, line)
-            #print 'prev_mapping: %s, prev_list: %s, prev_ind: %s' % (prev_mapping, prev_list, prev_indentation)
+            # print '%i - %i: %s' % (line_num, indentation, line)
+            # print 'prev_mapping: %s, prev_list: %s, prev_ind: %s' % (prev_mapping, prev_list, prev_indentation)
 
             if '\t' in line:
                 log.warning('Line %s has tabs, use only spaces!' % line_num)
@@ -180,7 +162,7 @@ class Manager(object):
                 log.warning('Config line %s has odd (uneven) indentation' % line_num)
             if indentation > prev_indentation and not prev_mapping:
                 # line increases indentation, but previous didn't start mapping
-                log.warning('Config line %s is likely missing ":" at the end' % (line_num - 1))
+                log.warning('Config line %s is likely missing \':\' at the end' % (line_num - 1))
             if indentation > prev_indentation + 2 and prev_mapping and not prev_list:
                 # mapping value after non list indented more than 2
                 log.warning('Config line %s is indented too much' % line_num)
@@ -188,7 +170,7 @@ class Manager(object):
                 log.warning('Config line %s is not indented enough' % line_num)
             if prev_mapping and indentation <= prev_indentation:
                 # after opening a map, indentation doesn't increase
-                log.warning('Config line %s is indented incorrectly (previous line ends with ":")' % line_num)
+                log.warning('Config line %s is indented incorrectly (previous line ends with \':\')' % line_num)
 
             # notify if user is trying to set same key multiple times in a feed (a common mistake)
             for level in duplicates.iterkeys():
@@ -279,67 +261,29 @@ class Manager(object):
         if self.options.log_start:
             log.info('FlexGet started (PID: %s)' % os.getpid())
 
-        self.lockfile = os.path.join(self.config_base, ".%s-lock" % self.config_name)
+        self.lockfile = os.path.join(self.config_base, '.%s-lock' % self.config_name)
         if os.path.exists(self.lockfile):
             # check the lock age
-            from datetime import datetime
             lock_time = datetime.fromtimestamp(os.path.getmtime(self.lockfile))
-            if (datetime.now() - lock_time).seconds > 3600:
-                log.warning('Lock file over 1 hour in age, ignoring it ...')
+            if (datetime.now() - lock_time).seconds > 36000:
+                log.warning('Lock file over 10 hour in age, ignoring it ...')
             else:
                 if not self.options.quiet:
                     f = file(self.lockfile)
                     pid = f.read()
                     f.close()
-                    print >> sys.stderr, "Another process (%s) is running, will exit." % pid.strip()
-                    print >> sys.stderr, "If you're sure there is no other instance running, delete %s" % self.lockfile
+                    print >> sys.stderr, 'Another process (%s) is running, will exit.' % pid.strip()
+                    print >> sys.stderr, 'If you\'re sure there is no other instance running, delete %s' % self.lockfile
                 sys.exit(1)
 
         f = file(self.lockfile, 'w')
-        f.write("PID: %s\n" % os.getpid())
+        f.write('PID: %s\n' % os.getpid())
         f.close()
 
     def release_lock(self):
         if self.options.log_start:
             log.info('FlexGet stopped (PID: %s)' % os.getpid())
         os.remove(self.lockfile)
-
-    def print_failed(self):
-        """Parameter --failed"""
-
-        failed = Session()
-        results = failed.query(FailedEntry).all()
-        if not results:
-            print 'No failed entries recorded'
-        for entry in results:
-            print '%16s - %s' % (entry.tof.strftime('%Y-%m-%d %H:%M'), entry.title)
-        failed.close()
-
-    def add_failed(self, entry):
-        """Adds entry to internal failed list, displayed with --failed"""
-        failed = Session()
-        failedentry = FailedEntry(entry['title'], entry['url'])
-        # query item's existence
-        if not failed.query(FailedEntry).filter(FailedEntry.title == entry['title']).first():
-            failed.add(failedentry)
-        # limit item number to 25
-        i = 0
-        for row in failed.query(FailedEntry).order_by(FailedEntry.tof.desc()).all():
-            i += 1
-            if (i > 25):
-                failed.delete(row)
-        failed.commit()
-        failed.close()
-
-    def clear_failed(self):
-        """Clears list of failed entries"""
-        session = Session()
-        results = session.query(FailedEntry).all()
-        for row in results:
-            session.delete(row)
-        print 'Cleared %i items.' % len(results)
-        session.commit()
-        session.close()
 
     def create_feeds(self):
         """Creates instances of all configured feeds"""
@@ -373,15 +317,7 @@ class Manager(object):
             # if feed name is prefixed with _ it's disabled
             if name.startswith('_'):
                 feed.enabled = False
-            # if executing only one feed, disable others
-            if self.options.onlyfeed:
-                if name.lower() != self.options.onlyfeed.lower():
-                    feed.enabled = False
             self.feeds[name] = feed
-
-        if self.options.onlyfeed:
-            if not [feed for feed in self.feeds.itervalues() if feed.enabled]:
-                log.critical('Could not find feed %s' % self.options.onlyfeed)
 
     def disable_feeds(self):
         """Disables all feeds."""

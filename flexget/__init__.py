@@ -155,10 +155,6 @@ def main():
     try:
         if options.doc:
             plugin.print_doc(options.doc)
-        elif options.failed:
-            manager.print_failed()
-        elif options.clear_failed:
-            manager.clear_failed()
         elif options.webui:
             import webui
             webui.start(manager)

@@ -1,5 +1,5 @@
 import shutil
-from tests import FlexGetBase
+from tests import FlexGetBase, with_filecopy
 
 
 class TestTorrentSize(FlexGetBase):
@@ -43,25 +43,21 @@ class TestTorrentSize(FlexGetBase):
               min: 2000
     """
 
-    testfiles = ['tests/test_min.torrent', 'tests/test_max.torrent', 'tests/test_strict.torrent']
-
-    def setup(self):
-        FlexGetBase.setup(self)
-        for filename in self.testfiles:
-            shutil.copy('tests/test.torrent', filename)
-
+    @with_filecopy('tests/test.torrent', 'tests/test_min.torrent')
     def test_min(self):
         """Content Size: torrent with min size"""
         self.execute_feed('test_min')
         assert self.feed.find_entry('rejected', title='test'), \
             'should have rejected, minimum size'
 
+    @with_filecopy('tests/test.torrent', 'tests/test_max.torrent')
     def test_max(self):
         """Content Size: torrent with max size"""
         self.execute_feed('test_max')
         assert self.feed.find_entry('rejected', title='test'), \
             'should have rejected, maximum size'
 
+    @with_filecopy('tests/test.torrent', 'tests/test_strict.torrent')
     def test_strict(self):
         """Content Size: strict enabled"""
         self.execute_feed('test_strict')
@@ -87,29 +83,25 @@ class TestFileSize(FlexGetBase):
         feeds:
           test_min:
             mock:
-              - {title: 'test', location: 'tests/test.file'}
+              - {title: 'test', location: 'tests/min.file'}
             accept_all: yes
             content_size:
               min: 2000
 
           test_max:
             mock:
-              - {title: 'test', location: 'tests/test.file'}
+              - {title: 'test', location: 'tests/max.file'}
             accept_all: yes
             content_size:
               max: 2000
+
           test_torrent:
             mock:
               # content_size should not be read for this directly, as it is a torrent file
               - {title: 'test', location: 'tests/test.torrent'}
     """
 
-    def setup(self):
-        FlexGetBase.setup(self)
-        # Use the test torrent for lack of a better test file
-        # .torrents will not have their size read directly, so rename it.
-        shutil.copy('tests/test.torrent', 'tests/test.file')
-
+    @with_filecopy('tests/test.torrent', 'tests/min.file')
     def test_min(self):
         """Content Size: torrent with min size"""
         self.execute_feed('test_min')
@@ -118,6 +110,7 @@ class TestFileSize(FlexGetBase):
         assert entry['content_size'] == 0, \
             'content_size was not detected'
 
+    @with_filecopy('tests/test.torrent', 'tests/max.file')
     def test_max(self):
         """Content Size: torrent with max size"""
         self.execute_feed('test_max')

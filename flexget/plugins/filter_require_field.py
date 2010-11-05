@@ -1,5 +1,5 @@
 import logging
-from flexget.plugin import *
+from flexget.plugin import register_plugin, priority
 
 log = logging.getLogger('require_field')
 
@@ -12,7 +12,7 @@ class FilterRequireField(object):
 
         require_field: imdb_url
     """
-    
+
     def validator(self):
         from flexget import validator
         root = validator.factory()
@@ -27,7 +27,9 @@ class FilterRequireField(object):
             config = [config]
         for entry in feed.entries:
             for field in config:
-                if not field in entry:
+                if field not in entry or entry[field] == '':
                     feed.reject(entry, 'Required field %s is not present' % field)
+                    break
+
 
 register_plugin(FilterRequireField, 'require_field')

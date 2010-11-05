@@ -14,7 +14,7 @@ from flexget.utils.titles import SeriesParser, ParseWarning
 # enable enable_logging and add --nologcapture to nosetest to see debug
 # (should not be needed, logging is not initialized properly?)
 
-enable_logging = False
+enable_logging = True
 
 if enable_logging:
     level = 5
@@ -86,33 +86,42 @@ class TestSeriesParser(object):
         assert s.id == '2008-12-13', 'invalid id'
         assert s.valid, 'should not valid'
 
-    def test_unwanted_episode(self):
-        """SeriesParser: unwanted episodes (e.g. complete season)"""
+    def test_unwanted(self):
+        """SeriesParser: unwanted hits (e.g. complete season)"""
         s = self.parse(name='Something', data='Something.1x0.Complete.Season-FlexGet')
-        assert not s.episode, 'Should not have episode'
-        assert not s.season, 'Should not have season'
-        assert not s.valid, 'Should not be valid'
+        assert not s.valid, 'data %s should not be valid' % s.data
 
         s = self.parse(name='Something', data='Something.1xAll.Season.Complete-FlexGet')
-        assert not s.episode, 'Should not have episode'
-        assert not s.season, 'Should not have season'
-        assert not s.valid, 'Should not be valid'
+        assert not s.valid, 'data %s should not be valid' % s.data
+
+        s = self.parse(name='Something', data='Something Seasons 1 & 2 - Complete')
+        assert not s.valid, 'data %s should not be valid' % s.data
+
+        s = self.parse(name='Something', data='Something Seasons 4 Complete')
+        assert not s.valid, 'data %s should not be valid' % s.data
+
+        s = self.parse(name='Something', data='Something Seasons 1 2 3 4')
+        assert not s.valid, 'data %s should not be valid' % s.data
+
+        s = self.parse(name='Something', data='Something S6 E1-4')
+        assert not s.valid, 'data %s should not be valid' % s.data
 
     def test_unwanted_disc(self):
         """SeriesParser: unwanted disc releases"""
         s = self.parse(name='Something', data='Something.S01D2.DVDR-FlexGet')
-        assert not s.episode, 'Should not have episode'
-        assert not s.season, 'Should not have season'
-        assert not s.valid, 'Should not be valid'
+        assert not s.valid, 'data %s should not be valid' % s.data
 
     def test_season_x_ep(self):
         """SeriesParser: 01x02"""
-        # Test 01x02 format
         s = self.parse(name='Something', data='Something.01x02-FlexGet')
         assert (s.season == 1 and s.episode == 2), 'failed to parse 01x02'
 
         s = self.parse(name='Something', data='Something 1 x 2-FlexGet')
         assert (s.season == 1 and s.episode == 2), 'failed to parse 1 x 2'
+
+        # Ticket #732
+        s = self.parse(name='Something', data='Something - This is the Subtitle 14x9 [Group-Name]')
+        assert (s.season == 14 and s.episode == 9), 'failed to parse %s' % s.data
 
     def test_ep_in_square_brackets(self):
         """SeriesParser: [S01] [E02] NOT IMPLEMENTED"""
@@ -121,28 +130,33 @@ class TestSeriesParser(object):
         # FIX: #402 .. a bit hard to do
         s = self.parse(name='Something', data='Something [S01] [E02]')
         assert (s.season == 1 and s.episode == 2), 'failed to parse %s' % s
-        
+
+    def test_ep_in_parenthesis(self):
+        """SeriesParser: test ep in parenthesis"""
+        s = self.parse(name='Something', data='Something (S01E02)')
+        assert (s.season == 1 and s.episode == 2), 'failed to parse %s' % s
+
     def test_season_episode(self):
         """SeriesParser: season X, episode Y"""
-        s = self.parse(name='Something', data='Something - Season 1, Episode 2')
-        assert (s.season == 1 and s.episode == 2), 'failed to parse %s' % s
-        
-        s = self.parse(name='Something', data='Something - Season1, Episode2')
-        assert (s.season == 1 and s.episode == 2), 'failed to parse %s' % s
-        
-        s = self.parse(name='Something', data='Something - Season1 Episode2')
-        assert (s.season == 1 and s.episode == 2), 'failed to parse %s' % s
+        s = self.parse(name='Something', data='Something - Season 3, Episode 2')
+        assert (s.season == 3 and s.episode == 2), 'failed to parse %s' % s
+
+        s = self.parse(name='Something', data='Something - Season2, Episode2')
+        assert (s.season == 2 and s.episode == 2), 'failed to parse %s' % s
+
+        s = self.parse(name='Something', data='Something - Season2 Episode2')
+        assert (s.season == 2 and s.episode == 2), 'failed to parse %s' % s
 
     def test_series_episode(self):
         """SeriesParser: series X, episode Y"""
-        s = self.parse(name='Something', data='Something - Series 1, Episode 2')
-        assert (s.season == 1 and s.episode == 2), 'failed to parse %s' % s
-        
-        s = self.parse(name='Something', data='Something - Series1, Episode2')
-        assert (s.season == 1 and s.episode == 2), 'failed to parse %s' % s
-        
-        s = self.parse(name='Something', data='Something - Series1 Episode2')
-        assert (s.season == 1 and s.episode == 2), 'failed to parse %s' % s
+        s = self.parse(name='Something', data='Something - Series 2, Episode 2')
+        assert (s.season == 2 and s.episode == 2), 'failed to parse %s' % s
+
+        s = self.parse(name='Something', data='Something - Series3, Episode2')
+        assert (s.season == 3 and s.episode == 2), 'failed to parse %s' % s
+
+        s = self.parse(name='Something', data='Something - Series4 Episode2')
+        assert (s.season == 4 and s.episode == 2), 'failed to parse %s' % s
 
     def test_episode(self):
         """SeriesParser: episode X (assume season 1)"""
@@ -168,11 +182,11 @@ class TestSeriesParser(object):
 
     def test_season_episode_of_total(self):
         """SeriesParser: season X YofZ"""
-        s = self.parse(name='Something', data='Something Season 1 2of12')
-        assert (s.season == 1 and s.episode == 2), 'failed to parse %s' % s
+        s = self.parse(name='Something', data='Something Season 2 2of12')
+        assert (s.season == 2 and s.episode == 2), 'failed to parse %s' % s
 
-        s = self.parse(name='Something', data='Something Season 1, 2 of 12')
-        assert (s.season == 1 and s.episode == 2), 'failed to parse %s' % s
+        s = self.parse(name='Something', data='Something Season 2, 2 of 12')
+        assert (s.season == 2 and s.episode == 2), 'failed to parse %s' % s
 
     def test_episode_of_total(self):
         """SeriesParser: YofZ (assume season 1)"""
@@ -203,7 +217,7 @@ class TestSeriesParser(object):
         assert s.quality == 'hdtv', 'failed to parse quality %s' % s.data
 
         s = self.parse(name='ShowB', data='ShowB.S04E19.Name of Ep.720p.WEB-DL.DD5.1.H.264')
-        assert s.quality == 'web-dl', 'failed to parse quality %s' % s.data
+        assert s.quality == '720p web-dl', 'failed to parse quality %s' % s.data
 
     def test_quality_parenthesis(self):
         """SeriesParser: quality in parenthesis"""
@@ -227,11 +241,19 @@ class TestSeriesParser(object):
         s = self.parse(name='90120', data='90120.1x2-FlexGet')
         assert (s.season == 1 and s.episode == 2), 'failed to parse %s' % s.data
 
+    def test_group_prefix(self):
+        """SeriesParser: [group] before name"""
         s = self.parse(name='Foo Bar', data='[l.u.l.z] Foo Bar - 11 (H.264) [5235532D].mkv')
         assert (s.id == '11'), 'failed to parse %s' % s.data
 
         s = self.parse(name='Foo Bar', data='[7.1.7.5] Foo Bar - 11 (H.264) [5235532D].mkv')
         assert (s.id == '11'), 'failed to parse %s' % s.data
+
+    def test_hd_prefix(self):
+        """SeriesParser: HD 720p before name"""
+        s = self.parse(name='Foo Bar', data='HD 720p: Foo Bar - 11 (H.264) [5235532D].mkv')
+        assert (s.id == '11'), 'failed to parse %s' % s.data
+        assert (s.quality == '720p'), 'failed to pick up quality'
 
     def test_partially_numeric(self):
         """SeriesParser: partially numeric names"""
@@ -394,7 +416,7 @@ class TestSeriesParser(object):
         s.allow_groups = ['xxxx', 'group']
         s.parse()
         assert s.group == 'group', 'did not get group'
-    
+
     def test_id_and_hash(self):
         """SeriesParser: Series with confusing hash"""
         s = self.parse(name='Something', data='Something 63 [560D3414]')
@@ -404,7 +426,20 @@ class TestSeriesParser(object):
         assert (s.id == '62'), 'failed to parse %s' % s.data
 
     def test_ticket_700(self):
-        """SeriesParser: Series with confusing name"""
+        """SeriesParser: confusing name (#700)"""
         s = self.parse(name='Something', data='Something 9x02 - Episode 2')
         assert s.season == 9, 'failed to parse season'
         assert s.episode == 2, 'failed to parse episode'
+
+    def test_date_id(self):
+        """SeriesParser: Series with dates"""
+        s = self.parse(name='Something', data='Something.2010.10.25')
+        assert (s.id == '2010-10-25'), 'failed to parse %s' % s.data
+        s = self.parse(name='Something', data='Something 2010-10-25')
+        assert (s.id == '2010-10-25'), 'failed to parse %s' % s.data
+
+    def test_season_title_episode(self):
+        """SeriesParser: Series with title between season and episode"""
+        s = self.parse(name='Something', data='Something.S5.Drunk.Santa.Part1')
+        assert s.season == 5, 'failed to parse season'
+        assert s.episode == 1, 'failed to parse episode'

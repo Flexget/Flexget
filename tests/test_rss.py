@@ -15,6 +15,11 @@ class TestInputRSS(FlexGetBase):
               url: tests/rss.xml
               silent: true
               link: otherlink
+          test3:
+            rss:
+              url: tests/rss.xml
+              silent: true
+              other_fields: ['Otherfield']
     """
     
     def test_rss(self):
@@ -56,15 +61,26 @@ class TestInputRSS(FlexGetBase):
         # empty title, should be skipped
         assert not self.feed.find_entry(description='Description, empty title'), \
             'RSS entry without title should be skipped'
-        
+
+    def test_rss2(self):
         # reset input cache so that the cache is not used for second execution
         from flexget.plugins.cached_input import cached
         cached.cache = {}
-
         # custom link field
         self.execute_feed('test2')
         assert self.feed.find_entry(title='Guid link', url='http://localhost/otherlink'), \
             'Custom field link not found'
+
+    def test_rss3(self):
+        # reset input cache so that the cache is not used for second execution
+        from flexget.plugins.cached_input import cached
+        cached.cache = {}
+        # grab other_fields and attach to entry
+        self.execute_feed('test3')
+        for entry in self.feed.rejected:
+            print entry['title']
+        assert self.feed.find_entry(title='Other fields', otherfield='otherfield'), \
+            'Specified other_field not attached to entry'
 
 
 class TestRssOnline(FlexGetBase):

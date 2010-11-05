@@ -34,24 +34,32 @@ class SeriesParser(TitleParser):
         # if set to true, episode or id must follow immediately after name
         self.strict_name = False
 
-        separators = '[!/+,:;|~ x]'
+        separators = '[!/+,:;|~ x-]'
         roman_numeral_re = 'X{0,3}(?:IX|XI{0,4}|VI{0,4}|IV|V|I{1,4})'
         self.ep_regexps = [
-                '(?:series|season|s)\s?(\d{1,3})\s?(?:episode|ep|e|part|pt)\s?(\d{1,3})',
+                '(?:series|season|s)\s?(\d{1,3})(?:\s(?:.*?\s)?)?(?:episode|ep|e|part|pt)\s?(\d{1,3}|%s)' % roman_numeral_re,
                 '(?:series|season)\s?(\d{1,3})\s(\d{1,3})\s?of\s?(?:\d{1,3})',
                 '(\d{1,3})\s?of\s?(?:\d{1,3})',
-                '(?:^|\D)([\d]{1,2})[\s]?x[\s]?(\d+)',
+                '(\d{1,2})\s?x\s?(\d+)',
                 '(?:episode|ep|part|pt)\s?(\d{1,3}|%s)' % roman_numeral_re]
         self.unwanted_ep_regexps = [
-                 '(\d{1,3})\s?x\s?(0+)[^1-9]',
-                 'S(\d{1,3})D(\d{1,3})',
-                 '(\d{1,3})\s?x\s?(all)']
+                 '(\d{1,3})\s?x\s?(0+)[^1-9]', # 5x0
+                 'S(\d{1,3})D(\d{1,3})', # S3D1
+                 '(\d{1,3})\s?x\s?(all)', # 1xAll
+                 'season(?:s)?\s?\d\s?(?:&\s?\d)?[\s-]*complete',
+                 'seasons\s(\d\s){2,}',
+                 's\d+.?e\d+-\d+'] # S6 E1-4
         self.id_regexps = [
                 '(\d{4})%s(\d+)%s(\d+)' % (separators, separators),
                 '(\d+)%s(\d+)%s(\d{4})' % (separators, separators),
                 '(\d{4})x(\d+)\.(\d+)', '(pt|part)\s?(\d+|%s)' % roman_numeral_re,
                 '(?:^|[^s\d])(\d{1,3})(?:[^p\d]|$)']
         self.clean_regexps = ['\[.*?\]', '\(.*?\)']
+        # ignore prefix regexpes must be passive groups with 0 or 1 occurrences  eg. (?:prefix)?
+        self.ignore_prefix_regexps = [
+                '(?:\[[^\[\]]*\])', # ignores group names before the name, eg [foobar] name
+                '(?:HD.720p?:)',
+                '(?:HD.1080p?:)']
         self.name_regexps = []
 
         self.field = None
@@ -86,23 +94,27 @@ class SeriesParser(TitleParser):
             # remove all matches from data, unless they happen to contain relevant information
             if matches:
                 for match in matches:
-                    # TODO: check if match contain valid episode number ?
                     log.log(5, 'match: %s' % match)
                     safe = True
-                    for quality in qualities.registry.keys(): # TODO: rewrite ...
-                        if quality.lower() in match.lower():
-                            safe = False
-                            break
+                    # Qualities can be safely removed, because they are detected from raw data
                     for proper in self.propers:
                         if proper.lower() in match.lower():
                             safe = False
                             break
+                    if self.parse_episode(match):
+                        log.log(5, '%s looks like a valid episode identifier' % match)
+                        safe = False
+                        break
                     if not safe:
                         break
                     else:
                         data = data.replace(match, '').strip()
         log.log(5, 'cleaned data: %s' % data)
         return data
+
+    def remove_dirt(self, data):
+        """Replaces some characters with spaces"""
+        return re.sub(r'[_.,\[\]\(\): ]+', ' ', data).strip().lower()
 
     def parse(self):
         if not self.name or not self.data:
@@ -112,28 +124,27 @@ class SeriesParser(TitleParser):
         if self.expect_ep and self.expect_id:
             raise Exception('Flags expect_ep and expect_id are mutually exclusive')
 
-        data = self.clean(self.data)
-
         name = self.remove_dirt(self.name)
+        data = self.clean(self.data)
         data = self.remove_dirt(data)
-        # remove duplicate spaces
-        data_parts = data.split()
-        data = ' '.join(data_parts)
 
-        log.log(5, 'data fully-cleaned: %s' % data)
+        # check if data appears to be unwanted (abort)
+        if self.parse_unwanted(data):
+            return
 
         def name_to_re(name):
             """Convert 'foo bar' to '^[^...]*foo[^...]*bar[^...]+"""
             # TODO: Still doesn't handle the case where the user wants
             # "Schmost" and the feed contains "Schmost at Sea".
             blank = r'[^0-9a-zA-Z]'
+            ignore = '(?:' + '|'.join(self.ignore_prefix_regexps) + ')?'
             res = re.sub(blank + '+', ' ', name)
             res = res.strip()
             res = re.sub(' +', blank + '*', res)
-            res = '^(?:\[[^\[\]]*\])?' + (blank + '*') + '(' + res + ')' + (blank + '+')
+            res = '^' + ignore + (blank + '*') + '(' + res + ')' + (blank + '+')
             return res
 
-        log.debug('name: %s data: %s' % (name, data))
+        log.debug('name: %s data: %s' % (name, self.data))
 
         # name end position
         name_start = 0
@@ -162,11 +173,16 @@ class SeriesParser(TitleParser):
             log.debug('FAIL: name regexps do not match')
             return
 
+
+        # remove series name from raw data
+        data_noname = self.data[:name_start] + self.data[name_end:]
+        log.debug('data noname: %s' % data_noname)
+
         # allow group(s)
         if self.allow_groups:
             for group in self.allow_groups:
                 group = group.lower()
-                orig_data = self.data.lower()
+                orig_data = data_noname.lower()
                 if '[%s]' % group in orig_data or '-%s' % group in orig_data:
                     log.debug('%s is from group %s' % (orig_data, group))
                     self.group = group
@@ -178,10 +194,9 @@ class SeriesParser(TitleParser):
         # search tags and quality
         if self.quality == 'unknown':
             log.debug('parsing quality ->')
-            # remove series name from raw data
-            data_noname = self.data[:name_start] + self.data[name_end:]
-            log.debug('data noname: %s' % data_noname)
             self.quality = qualities.parse_quality(data_noname).name
+
+        data_parts = re.split('\W+', data)
 
         for part in data_parts:
             if part in self.propers:
@@ -195,17 +210,13 @@ class SeriesParser(TitleParser):
         # Ensure the series name isn't accidentally munged.
 
         data = self.remove_words(self.data[name_end:], self.remove + qualities.registry.keys() + self.codecs + self.sounds)
-        data = self.remove_dirt(data)
         data = self.clean(data)
+        data = self.remove_dirt(data)
 
         log.debug("data for id/ep parsing '%s'" % data)
 
         ep_match = self.parse_episode(data)
         if ep_match:
-            # parse_episode returns none if we should skip
-            if ep_match[0] is None:
-                return
-                
             # strict_name
             if self.strict_name:
                 if ep_match[2].start() > 1:
@@ -219,7 +230,7 @@ class SeriesParser(TitleParser):
             self.episode = ep_match[1]
             self.valid = True
             return
-        
+
         log.debug('-> no luck with ep_regexps')
 
         # search for ids later as last since they contain somewhat broad matches
@@ -262,26 +273,29 @@ class SeriesParser(TitleParser):
 
         raise ParseWarning('Title \'%s\' looks like series \'%s\' but I cannot find any episode or id numbering' % (self.data, self.name))
 
+    def parse_unwanted(self, data):
+        """Parses data for an unwanted hits. Return True if the data contains unwanted hits."""
+        for ep_unwanted_re in self.unwanted_ep_regexps:
+            match = re.search(ep_unwanted_re, data, re.IGNORECASE | re.UNICODE)
+            if match:
+                log.debug('unwanted regexp %s matched %s' % (ep_unwanted_re, match.groups()))
+                return True
+
     def parse_episode(self, data):
         """
         Parses data for an episode identifier.
         If found, returns a tuple of season#, episode# and the regexp match object
-        If an unwanted episdoe id is found a tuple of (None,) is returned
-        If no episdoe id is found returns False
+        If no episode id is found returns False
         """
 
-        # check for unwanted season/episode formats
-        for ep_unwanted_re in self.unwanted_ep_regexps:
-            match = re.search(ep_unwanted_re, data, re.IGNORECASE | re.UNICODE)
-            if match:
-                log.debug('ignoring episode %s' % match.group(2))
-                return (None,)
-            
+        # Make sure there are non alphanumeric characters surrounding our identifier
+        (lcap, rcap) = (r'(?<![a-zA-Z0-9])', r'(?![a-zA-Z0-9])')
         # search for season and episode number
         for ep_re in self.ep_regexps:
-            match = re.search(ep_re, data, re.IGNORECASE | re.UNICODE)
+            match = re.search(lcap + ep_re + rcap, data, re.IGNORECASE | re.UNICODE)
+
             if match:
-                log.debug('found episode number with regexp %s' % ep_re)
+                log.debug('found episode number with regexp %s (%s)' % (ep_re, match.groups()))
                 matches = match.groups()
                 if len(matches) == 2:
                     season = matches[0]
@@ -292,20 +306,19 @@ class SeriesParser(TitleParser):
                     episode = matches[0]
                     if not episode.isdigit():
                         episode = self.roman_to_int(episode)
-                        # If we can't parse the roman numeral, contine the search
+                        # If we can't parse the roman numeral, continue the search
                         if not episode:
                             continue
                 break
         else:
             return False
         return (int(season), int(episode), match)
-        
-    @staticmethod
-    def roman_to_int(roman):
+
+    def roman_to_int(self, roman):
         """Converts roman numerals up to 39 to integers"""
         roman_map = [('X', 10), ('IX', 9), ('V', 5), ('IV', 4), ('I', 1)]
         roman = roman.upper()
-        
+
         # Return False if this is not a roman numeral we can translate
         for char in roman:
             if char not in 'XVI':

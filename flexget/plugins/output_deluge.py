@@ -3,7 +3,7 @@ import time
 import os
 import base64
 from flexget.utils.tools import replace_from_entry
-from flexget.plugin import *
+from flexget.plugin import register_plugin, PluginError, priority, get_plugin_by_name
 
 log = logging.getLogger('deluge')
 
@@ -77,11 +77,11 @@ class OutputDeluge(object):
         if self.deluge12 is None:
             logger = log.info if feed.manager.options.test else log.debug
             try:
-                log.debug("Testing for deluge 1.1 API")
+                log.debug('Testing for deluge 1.1 API')
                 from deluge.ui.client import sclient
-                log.debug("1.1 API found")
+                log.debug('1.1 API found')
             except:
-                log.debug("Testing for deluge 1.2 API")
+                log.debug('Testing for deluge 1.2 API')
                 try:
                     from deluge.ui.client import client
                 except ImportError, e:
@@ -90,10 +90,10 @@ class OutputDeluge(object):
                     from twisted.internet import reactor
                 except:
                     raise PluginError('Twisted module required', log)
-                logger("Using deluge 1.2 api")
+                logger('Using deluge 1.2 api')
                 self.deluge12 = True
             else:
-                logger("Using deluge 1.1 api")
+                logger('Using deluge 1.1 api')
                 self.deluge12 = False
 
     @priority(120)
@@ -106,20 +106,20 @@ class OutputDeluge(object):
         config = self.get_config(feed)
         if not config['enabled']:
             return
-        #If the download plugin is not enabled, we need to call it to get our temp .torrent files
+        # If the download plugin is not enabled, we need to call it to get our temp .torrent files
         if not 'download' in feed.config:
             download = get_plugin_by_name('download')
             download.instance.get_temp_files(feed, handle_magnets=True)
 
-        #Check torrent files are valid
+        # Check torrent files are valid
         for entry in feed.accepted:
             if os.path.exists(entry.get('file', '')):
-                #Check if downloaded file is a valid torrent file
+                # Check if downloaded file is a valid torrent file
                 try:
                     info = deluge.ui.common.TorrentInfo(entry['file'])
                 except Exception:
                     feed.fail(entry, 'Invalid torrent file')
-                    log.error("Torrent file appears invalid for: %s", entry['title'])
+                    log.error('Torrent file appears invalid for: %s', entry['title'])
 
     @priority(135)
     def on_feed_output(self, feed):
@@ -176,11 +176,11 @@ class OutputDeluge(object):
                 tmp_path = os.path.join(feed.manager.config_base, 'temp')
                 log.debug('entry: %s' % entry)
                 log.debug('temp: %s' % ', '.join(os.listdir(tmp_path)))
-                feed.fail(entry, "Downloaded temp file '%s' doesn't exist!?" % entry['file'])
+                feed.fail(entry, 'Downloaded temp file \'%s\' doesn\'t exist!?' % entry['file'])
                 continue
 
             sclient.add_torrent_file([entry['file']], [opts])
-            log.info("%s torrent added to deluge with options %s" % (entry['title'], opts))
+            log.info('%s torrent added to deluge with options %s' % (entry['title'], opts))
 
             movedone = entry.get('movedone', config['movedone'])
             label = entry.get('label', config['label']).lower()
@@ -196,24 +196,24 @@ class OutputDeluge(object):
                     movedone = os.path.expanduser(movedone)
                     if movedone:
                         if not os.path.isdir(movedone):
-                            log.debug("movedone path %s doesn't exist, creating" % (movedone))
+                            log.debug('movedone path %s doesn\'t exist, creating' % (movedone))
                             os.makedirs(movedone)
-                        log.debug("%s move on complete set to %s" % (entry['title'], movedone))
+                        log.debug('%s move on complete set to %s' % (entry['title'], movedone))
                         sclient.set_torrent_move_on_completed(item, True)
                         sclient.set_torrent_move_on_completed_path(item, movedone)
                     if label:
-                        if not "label" in sclient.get_enabled_plugins():
-                            sclient.enable_plugin("label")
+                        if not 'label' in sclient.get_enabled_plugins():
+                            sclient.enable_plugin('label')
                         if not label in sclient.label_get_labels():
                             sclient.label_add(label)
-                        log.debug("%s label set to '%s'" % (entry['title'], label))
+                        log.debug('%s label set to \'%s\'' % (entry['title'], label))
                         sclient.label_set_torrent(item, label)
                     if queuetotop:
-                        log.debug("%s moved to top of queue" % entry['title'])
+                        log.debug('%s moved to top of queue' % entry['title'])
                         sclient.queue_top([item])
                     break
             else:
-                log.info("%s is already loaded in deluge. Cannot change label, movedone, or queuetotop" % entry['title'])
+                log.info('%s is already loaded in deluge. Cannot change label, movedone, or queuetotop' % entry['title'])
 
     def add_to_deluge12(self, feed, config):
 
@@ -224,14 +224,14 @@ class OutputDeluge(object):
 
         def start_reactor():
             """This runs the reactor loop."""
-            #if this is the first this function is being called, we have to call startRunning
+            # if this is the first this function is being called, we have to call startRunning
             if self.reactorRunning < 2:
                 reactor.startRunning(True)
             self.reactorRunning = 1
             while self.reactorRunning == 1:
                 reactor.iterate()
-            #if there was an error requiring an exception during reactor running, it should be
-            #   thrown here so the reactor loop doesn't exit prematurely
+            # If there was an error requiring an exception during reactor running, it should be
+            # thrown here so the reactor loop doesn't exit prematurely
             if self.reactorRunning < 0:
                 self.reactorRunning = 2
                 raise PluginError('Could not connect to deluge daemon', log)
@@ -244,7 +244,7 @@ class OutputDeluge(object):
         def on_connect_success(result, feed):
             """Gets called when successfully connected to a daemon."""
             if not result:
-                log.debug("on_connect_success returned a failed result. BUG?")
+                log.debug('on_connect_success returned a failed result. BUG?')
 
             if feed.manager.options.test:
                 log.debug('Test connection to deluge daemon successful.')
@@ -255,9 +255,9 @@ class OutputDeluge(object):
                 """Gets called when a torrent was successfully added to the daemon."""
                 dlist = []
                 if not torrent_id:
-                    log.info("%s is already loaded in deluge, cannot set options." % entry['title'])
+                    log.info('%s is already loaded in deluge, cannot set options.' % entry['title'])
                     return
-                log.info("%s successfully added to deluge." % entry['title'])
+                log.info('%s successfully added to deluge.' % entry['title'])
                 if opts['movedone']:
 
                     def create_movedone_path(result):
@@ -267,15 +267,15 @@ class OutputDeluge(object):
                         if VersionSplit('1.3.0') > VersionSplit(self.deluge_version):
                             if client.is_localhost():
                                 if not os.path.isdir(opts['movedone']):
-                                    log.debug("movedone path %s doesn't exist, creating" % opts['movedone'])
+                                    log.debug('movedone path %s doesn\'t exist, creating' % opts['movedone'])
                                     os.makedirs(opts['movedone'])
                             else:
-                                log.warning("If movedone path does not exist on the machine running the daemon, movedone will fail.")
+                                log.warning('If movedone path does not exist on the machine running the daemon, movedone will fail.')
 
                     dlist.append(version_deferred.addCallback(create_movedone_path))
                     dlist.append(client.core.set_torrent_move_completed(torrent_id, True))
                     dlist.append(client.core.set_torrent_move_completed_path(torrent_id, opts['movedone']))
-                    log.debug("%s move on complete set to %s" % (entry['title'], opts['movedone']))
+                    log.debug('%s move on complete set to %s' % (entry['title'], opts['movedone']))
                 if opts['label']:
 
                     def apply_label(result, torrent_id, label):
@@ -286,10 +286,10 @@ class OutputDeluge(object):
                 if 'queuetotop' in opts:
                     if opts['queuetotop']:
                         dlist.append(client.core.queue_top([torrent_id]))
-                        log.debug("%s moved to top of queue" % entry['title'])
+                        log.debug('%s moved to top of queue' % entry['title'])
                     else:
                         dlist.append(client.core.queue_bottom([torrent_id]))
-                        log.debug("%s moved to bottom of queue" % entry['title'])
+                        log.debug('%s moved to bottom of queue' % entry['title'])
                 if opts.get('content_filename'):
 
                     def on_get_torrent_status(status):
@@ -317,11 +317,11 @@ class OutputDeluge(object):
                                         filename = ''.join([opts['content_filename'], '(', str(counter), ')', os.path.splitext(file['path'])[1]])
                                         counter += 1
                                 else:
-                                    log.debug("Cannot ensure content_filename is unique when adding to a remote deluge daemon.")
-                                log.debug("File %s in %s renamed to %s" % (file['path'], entry['title'], filename))
+                                    log.debug('Cannot ensure content_filename is unique when adding to a remote deluge daemon.')
+                                log.debug('File %s in %s renamed to %s' % (file['path'], entry['title'], filename))
                                 return client.core.rename_files(torrent_id, [(file['index'], filename)])
                         else:
-                            log.warning("No files in %s are > 90%% of content size, no files renamed." % entry['title'])
+                            log.warning('No files in %s are > 90%% of content size, no files renamed.' % entry['title'])
 
                     status_keys = ['files', 'total_size', 'save_path', 'move_on_completed_path', 'move_on_completed']
                     dlist.append(client.core.get_torrent_status(torrent_id, status_keys).addCallback(on_get_torrent_status))
@@ -330,8 +330,8 @@ class OutputDeluge(object):
 
             def on_fail(result, feed, entry):
                 """Gets called when daemon reports a failure adding the torrent."""
-                log.info("%s was not added to deluge! %s" % (entry['title'], result))
-                feed.fail(entry, "Could not be added to deluge")
+                log.info('%s was not added to deluge! %s' % (entry['title'], result))
+                feed.fail(entry, 'Could not be added to deluge')
 
             # dlist is a list of deferreds that must complete before we exit
             dlist = []
@@ -354,7 +354,7 @@ class OutputDeluge(object):
                             dlist = []
                             for label in labels:
                                 if not label in d_labels:
-                                    log.debug("Adding the label %s to deluge" % label)
+                                    log.debug('Adding the label %s to deluge' % label)
                                     dlist.append(client.label.add(label))
                             return defer.DeferredList(dlist)
 
@@ -368,10 +368,10 @@ class OutputDeluge(object):
                         def on_get_available_plugins(plugins):
                             """Gets plugins available to deluge, enables Label plugin if available."""
                             if 'Label' in plugins:
-                                log.debug("Enabling label plugin in deluge")
+                                log.debug('Enabling label plugin in deluge')
                                 return client.core.enable_plugin('Label').addCallback(on_label_enabled)
                             else:
-                                log.error("Label plugin is not installed in deluge")
+                                log.error('Label plugin is not installed in deluge')
 
                         return client.core.get_available_plugins().addCallback(on_get_available_plugins)
 
@@ -393,7 +393,7 @@ class OutputDeluge(object):
                     magnet = entry['url']
                 else:
                     if not os.path.exists(entry['file']):
-                        feed.fail(entry, "Downloaded temp file '%s' doesn't exist!" % entry['file'])
+                        feed.fail(entry, 'Downloaded temp file \'%s\' doesn\'t exist!' % entry['file'])
                         del(entry['file'])
                         continue
                     try:
@@ -414,7 +414,7 @@ class OutputDeluge(object):
 
                 def add_torrent(title, filedump, opts, magnet=False):
                     """Calls the appropriate add_torrent function on daemon, returns the deferred."""
-                    log.debug("Adding %s to deluge." % title)
+                    log.debug('Adding %s to deluge.' % title)
                     if magnet:
                         return client.core.add_torrent_magnet(magnet, opts)
                     else:

@@ -1,6 +1,7 @@
 import re
 import logging
-from flexget.plugin import *
+from flexget.plugin import register_plugin, priority, PluginError
+import os
 
 log = logging.getLogger('modif_torrent')
 
@@ -198,12 +199,18 @@ class TorrentFilename(object):
             if not 'file' in entry:
                 log.log(5, '%s doesn\'t have a file associated' % entry['title'])
                 continue
+            if not os.path.exists(entry['file']):
+                raise PluginError('File %s does not exists' % entry['file'])
+            if os.path.getsize(entry['file']) == 0:
+                raise PluginError('File %s is 0 bytes in size' % entry['file'])
+
+            # read first 200 bytes to verify if a file is a torrent or not
             f = open(entry['file'], 'rb')
             data = f.read(200)
             f.close()
             if not TORRENT_RE.match(data):
                 # not a torrent file at all, skip
-                log.log(5, '%s doesn\'t seem to be a torrent' % entry['title'])
+                log.log(5, '%s doesn\'t seem to be a torrent, got `%s` (hex)' % (entry['title'], data.encode('hex')))
                 continue
             else:
                 log.debug('%s seems to be a torrent' % entry['title'])
@@ -212,7 +219,7 @@ class TorrentFilename(object):
             try:
                 f = open(entry['file'], 'rb')
                 # NOTE: this reads entire file into memory, but we're pretty sure it's
-                # a small torrent file since it starts with idstr
+                # a small torrent file since it starts with TORRENT_RE
                 data = f.read()
                 f.close()
 
@@ -234,10 +241,10 @@ class TorrentFilename(object):
                 entry['torrent_info_hash'] = torrent.get_info_hash()
                 # if we do not have good filename (by download plugin)
                 # for this entry, try to generate one from torrent content
-                if 'filename' in entry:
+                if entry.get('filename'):
                     if not entry['filename'].lower().endswith('.torrent'):
                         # filename present but without .torrent extension, add it
-                        entry['filename'] = '%s.torrent' % entry['filename']
+                        entry['filename'] = entry['filename'] + '.torrent'
                 else:
                     # generate filename from torrent or fall back to title plus extension
                     entry['filename'] = self.make_filename(torrent, entry)
@@ -251,7 +258,7 @@ class TorrentFilename(object):
                 if entry['torrent'].modified:
                     # re-write data into a file
                     log.debug('Writing modified torrent file for %s' % entry['title'])
-                    f = open(entry['file'], 'w+')
+                    f = open(entry['file'], 'wb+')
                     f.write(entry['torrent'].encode())
                     f.close()
 
@@ -271,7 +278,7 @@ class TorrentFilename(object):
         title = title.replace(' ', '_')
         title = title.replace('\u200b', '')
 
-        #title = title.encode('iso8859-1', 'ignore') # Damn \u200b -character, how I loathe thee
+        # title = title.encode('iso8859-1', 'ignore') # Damn \u200b -character, how I loathe thee
         # TODO: replace only zero width spaces, leave unicode alone?
 
         fn = '%s.torrent' % title

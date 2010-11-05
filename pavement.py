@@ -13,11 +13,14 @@ setup(
     description='FlexGet is a program aimed to automate downloading or processing content (torrents, podcasts, etc.) from different sources like RSS-feeds, html-pages, various sites and more.',
     author='Marko Koivusalo',
     author_email='marko.koivusalo@gmail.com',
+    license='MIT',
     url='http://flexget.com',
     install_requires=['FeedParser', 'SQLAlchemy>0.5', 'PyYAML', 'BeautifulSoup', 'html5lib>=0.11', \
                       'PyRSS2Gen', 'pynzb', 'progressbar'],
     packages=['flexget', 'flexget.plugins', 'flexget.utils', 'flexget.utils.titles'],
-    package_data=find_package_data('flexget', package='flexget', only_in_packages=False),
+    package_data=find_package_data('flexget', package='flexget', \
+                                   exclude=['FlexGet.egg-info', '*.pyc'], \
+                                   only_in_packages=False), # NOTE: the exclude does not seem to work
     zip_safe=False,
     test_suite='nose.collector',
     setup_requires=['nose>=0.11'],
@@ -26,6 +29,7 @@ setup(
         flexget = flexget:main
     """
 )
+
 options(
     minilib=Bunch(
         extra_files=['virtual', 'svn']
@@ -34,14 +38,6 @@ options(
         packages_to_install=['nose>=0.11'],
         paver_command_line='develop',
         unzip_setuptools=True
-    ),
-    pylint = Bunch(
-        check_modules = ['flexget'],
-        quiet = False,
-        verbose = False,
-        quiet_args = ['--reports=no', '--disable-checker=similarities'],
-        pylint_args = ['--rcfile=pylint.rc', '--include-ids=y'],
-        ignore = False
     )
 )
 
@@ -53,13 +49,60 @@ def freplace(name, what_str, with_str):
             line = line.replace(what_str, with_str)
         print line,
 
+def set_init_version(ver):
+    """Replaces the version with :ver: in __init__.py"""
+    import fileinput
+    for line in fileinput.FileInput('flexget/__init__.py', inplace=1):
+        if line.startswith('__version__ = '):
+            line = "__version__ = '%s'\n" % ver
+        print line,
+
 
 @task
-#@needs(['minilib', 'generate_setup', 'setuptools.command.sdist'])
-def sdist():
+@cmdopts([
+    ('online', None, 'Run online tests')
+])
+def test(options):
+    """Run FlexGet unit tests"""
+    options.setdefault('test', Bunch())
+    import nose
+    from nose.plugins.manager import DefaultPluginManager
+
+    cfg = nose.config.Config(plugins=DefaultPluginManager(), verbosity=2)
+
+    argv = ['bin/paver']
+
+    if not options.test.get('online'):
+        argv.extend(['--attr=!online'])
+
+    argv.append('-v')
+    argv.append('--processes=4')
+    argv.append('-x')
+
+    return nose.run(argv=argv, config=cfg)
+
+
+@task
+def clean():
+    """Cleans up the virtualenv"""
+    for p in ('bin', 'build', 'dist', 'docs', 'include', 'lib', 'man',
+            'share', 'FlexGet.egg-info', 'paver-minilib.zip', 'setup.py'):
+        pth = path(p)
+        if pth.isdir():
+            pth.rmtree()
+        elif pth.isfile():
+            pth.remove()
+
+@task
+@cmdopts([
+    ('dist-dir=', 'd', 'directory to put final built distributions in')
+])
+def sdist(options):
     """Build tar.gz distribution package"""
 
     revision = svn.info().get('last_changed_rev')
+
+    print 'Revision: %s' % revision
 
     # clean previous build
     print 'Cleaning build...'
@@ -81,8 +124,16 @@ def sdist():
 
     print 'Building %s' % ver
 
+    # hack for getting options from release task
+    if hasattr(options, 'release'):
+        if options.release.get('dist_dir'):
+            options.setdefault('sdist', Bunch())['dist_dir'] = options.release.dist_dir
+    else:
+        if options.sdist.get('dist_dir'):
+            options.setdefault('sdist', Bunch())['dist_dir'] = options.sdist.dist_dir
+
     # replace version number
-    freplace('flexget/__init__.py', "__version__ = '{subversion}'", "__version__ = '%s'" % ver)
+    set_init_version(ver)
 
     # hack version number into setup( ... options='1.0' ...)
     from paver import tasks
@@ -92,51 +143,74 @@ def sdist():
     for t in ['minilib', 'generate_setup', 'setuptools.command.sdist']:
         call_task(t)
 
-    #egg_options = ['-d', '/var/www/flexget_dist/unstable'] # hmph, how can I pass params to it? doesn't seem to work ..
-    #bdist_egg(egg_options)
-
     # restore version ...
-    freplace('flexget/__init__.py', "__version__ = '%s'" % ver, "__version__ = '{subversion}'")
+    set_init_version('{subversion}')
 
+@task
+# due workaround we need to add this manually
+@cmdopts([
+    ('dist-dir=', 'd', 'directory to put final built distributions in')
+])
+def bdist_egg(options):
+    # workaround for http://code.google.com/p/paver/issues/detail?id=49
+    # the minilib task crashes on bdist_egg with easy_install, but since the zip is already there there's no need to run it
+    import os
+    if not os.path.exists('paver-minilib.zip'):
+        call_task('minilib')
+
+    # set path
+    if options.bdist_egg.get('dist_dir'):
+        options.setdefault('bdist_egg', Bunch())['dist_dir'] = options.bdist_egg.dist_dir
+
+    for t in ['generate_setup', 'setuptools.command.bdist_egg']:
+        call_task(t)
 
 @task
 @cmdopts([
-    ('online', None, 'Run online tests')
+    ('dist-dir=', 'd', 'directory to put final built distributions in')
 ])
-def test(options):
-    """Run FlexGet unit tests"""
-    import nose
-    from nose.plugins.manager import DefaultPluginManager
+def make_egg(options):
+    # naming this task to bdist_egg will make egg installation fail
+    options.setdefault('release', Bunch())
 
-    cfg = nose.config.Config(plugins=DefaultPluginManager(), verbosity=2)
+    revision = svn.info().get('last_changed_rev')
+    ver = '%sr%s' % (options['version'], revision)
 
-    argv = ['bin/paver']
+    # hack version number into setup( ... options='1.0-svn' ...)
+    from paver import tasks
+    setup_section = tasks.environment.options.setdefault("setup", Bunch())
+    setup_section.update(version=ver)
 
-    if not hasattr(options, 'online'):
-        argv.extend(['--attr=!online'])
+    # replace version number
+    set_init_version(ver)
 
-    argv.append('-v')
-    argv.append('--processes=4')
+    print 'Making egg release'
+    import shutil
+    shutil.copytree('FlexGet.egg-info', 'FlexGet.egg-info-backup')
 
-    nose.run(argv=argv, config=cfg)
+    if options.release.get('dist_dir'):
+        options.setdefault('bdist_egg', Bunch())['dist_dir'] = options.release.dist_dir
 
+    # hack for getting options from release task
+    if hasattr(options, 'release'):
+        if options.release.get('dist_dir'):
+            options.setdefault('bdist_egg', Bunch())['dist_dir'] = options.release.dist_dir
+    else:
+        if options.sdist.get('dist_dir'):
+            options.setdefault('bdist_egg', Bunch())['dist_dir'] = options.sdist.dist_dir
 
-@task
-def clean():
-    """Cleans up the virtualenv"""
-    for p in ('bin', 'build', 'dist', 'docs', 'include', 'lib', 'man',
-            'share', 'FlexGet.egg-info', 'paver-minilib.zip', 'setup.py'):
-        pth = path(p)
-        if pth.isdir():
-            pth.rmtree()
-        elif pth.isfile():
-            pth.remove()
+    for t in ["minilib", "generate_setup", "setuptools.command.bdist_egg"]:
+        call_task(t)
 
+    # restore version ...
+    set_init_version('{subversion}')
 
-@task
-@needs(["minilib", "generate_setup", "setuptools.command.bdist_egg"])
-def bdist_egg():
-    pass
+    # restore egg info from backup
+    print 'Removing FlexGet.egg-info ...'
+    shutil.rmtree('FlexGet.egg-info')
+    print 'Restoring FlexGet.egg-info'
+    shutil.move('FlexGet.egg-info-backup', 'FlexGet.egg-info')
+
 
 @task
 def coverage():
@@ -159,11 +233,19 @@ def coverage():
 
 
 @task
-@consume_args
-def release(args):
+@cmdopts([
+    ('online', None, 'runs online unit tests'),
+    ('dist-dir=', 'd', 'directory to put final built distributions in'),
+    ('no-tests', None, 'skips unit tests'),
+    ('type=', None, 'type of release (src | egg)')
+])
+def release(options):
     """Make a FlexGet release. Same as bdist_egg but adds version information."""
 
-    # clean previous build
+    if options.release.get('type') not in ['src', 'egg']:
+        print 'Invalid type'
+        return
+
     print 'Cleaning build...'
     for p in ['build']:
         pth = path(p)
@@ -174,99 +256,21 @@ def release(args):
         else:
             print 'Unable to remove %s' % pth
 
-    if len(args) != 1:
-        print 'Version number must be specified, ie. paver release 1.0b9'
-        return
-    ver = args[0]
-
-    # replace version number
-    freplace('flexget/__init__.py', "__version__ = '{subversion}'", "__version__ = '%s'" % ver)
-
     # run unit tests
-    test(environment.options) # dunno if param is correct ..
+    if options.release.get('online'):
+        options.setdefault('test', Bunch())['online'] = True
+    if not options.release.get('no_tests'):
+        if not test():
+            print 'Unit tests did not pass'
+            import sys
+            sys.exit(1)
 
-    import shutil
-    shutil.copytree('FlexGet.egg-info', 'FlexGet.egg-info-backup')
-
-    # hack version number into setup( ... options='1.0-svn' ...)
-    from paver import tasks
-    setup_section = tasks.environment.options.setdefault("setup", Bunch())
-    setup_section.update(version=ver)
-
-    egg_options = ['-d', '/var/www/flexget_dist/unstable'] # hmph, how can I pass params to it? doesn't seem to work ..
-    bdist_egg(egg_options)
-
-    # hack since -d does not work .. copy build to release folder
-    import os
-    import shutil
-    dest = '/var/www/flexget_dist/unstable/'
-
-    for fname in os.listdir('dist'):
-        shutil.copy(os.path.join('dist', fname), os.path.join(dest, fname))
-
-    # restore version ...
-    freplace('flexget/__init__.py', "__version__ = '%s'" % ver, "__version__ = '{subversion}'")
-
-    # restore egg info from backup
-    print 'Removing FlexGet.egg-info ...'
-    shutil.rmtree('FlexGet.egg-info')
-    print 'Restoring FlexGet.egg-info'
-    shutil.move('FlexGet.egg-info-backup', 'FlexGet.egg-info')
-
-
-# TODO: I don't think it is working / needed anymore?
-@task
-@cmdopts([
-    ('pylint-command=', 'c', 'Specify a custom pylint executable'),
-    ('quiet', 'q', 'Disables a lot of the pylint output'),
-    ('verbose', 'v', 'Enables detailed output'),
-    ('ignore', 'i', 'Ignore PyLint errors')
-])
-def pylint(options):
-
-    import os.path
-    if not os.path.exists('bin/pylint'):
-        raise paver.tasks.BuildFailure('PyLint not installed!\n'+\
-                                       'Run bin/easy_install logilab.pylintinstaller\n' + \
-                                       'Do not be alarmed by the errors it may give, it still works ..')
-
-
-    """Check the source code using PyLint."""
-    from pylint import lint
-
-    # Initial command.
-    arguments = []
-
-    if options.pylint.quiet:
-        arguments.extend(options.pylint.quiet_args)
-
-    if 'pylint_args' in options.pylint:
-        arguments.extend(list(options.pylint.pylint_args))
-
-    if not options.pylint.verbose:
-        arguments.append('--errors-only')
-
-    # Add the list of paths containing the modules to check using PyLint.
-    arguments.extend(str(PROJECT_DIR / module) for module in options.check_modules)
-
-    # By placing run_pylint into its own function, it allows us to do dry runs
-    # without actually running PyLint.
-    def run_pylint():
-        # Add app folder to path.
-        sys.path.insert(0, PROJECT_DIR)
-
-        print 'Running pylint (this may take a while)'
-        # Runs the PyLint command.
-        try:
-            lint.Run(arguments)
-        # PyLint will `sys.exit()` when it has finished, so we need to catch
-        # the exception and process it accordingly.
-        except SystemExit, exc:
-            return_code = exc.args[0]
-            if return_code != 0 and (not options.pylint.ignore):
-                raise paver.tasks.BuildFailure('PyLint finished with a non-zero exit code')
-
-    return dry('bin/pylint ' + ' '.join(arguments), run_pylint)
+    if options.release.get('type') == 'egg':
+        print 'Making egg release'
+        make_egg(options)
+    else:
+        print 'Making src release'
+        sdist(options)
 
 
 @task
@@ -296,3 +300,20 @@ def install_tools():
         print 'Nose-xcover INSTALLED'
     except:
         pip.main(['install', 'http://github.com/cmheisel/nose-xcover/zipball/master'])
+        
+    try:
+        import epydoc
+        print 'epydoc INSTALLED'
+    except:
+        pip.main(['install', 'epydoc'])
+
+
+@task
+def clean_compiled():
+    import os
+    for root, dirs, files in os.walk('flexget'):
+        for name in files:
+            fqn = os.path.join(root, name)
+            if fqn[-3:] == 'pyc' or fqn[-3:] == 'pyo' or fqn[-5:] == 'cover':
+                print 'Deleting %s' % fqn
+                os.remove(fqn)

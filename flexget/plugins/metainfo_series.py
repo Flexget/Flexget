@@ -33,27 +33,31 @@ class MetainfoSeries(object):
         
         # Clean the data for parsing
         parser = SeriesParser()
-        data = parser.clean(title)
-        data = parser.remove_dirt(data)
-        data = ' '.join(data.split())
-        
-        match = parser.parse_episode(data)
+        match = parser.parse_episode(title)
         if match:
-            if match[0] is None:
+            if parser.parse_unwanted(title):
                 return
             elif match[2].start() > 1:
+                # Look for unwanted prefixes to find out where the series title starts
+                start = 0
+                prefix = re.match('|'.join(parser.ignore_prefix_regexps), title)
+                if prefix:
+                    start = prefix.end()
                 # If an episode id is found, assume everything before it is series name
-                name = data[:match[2].start()].rstrip()
-                # Grab the name from the original title to preserve formatting
-                name = title[:len(name)]
+                name = title[start:match[2].start()]
                 # Replace . and _ with spaces
                 name = re.sub('[\._]', ' ', name)
+                name = ' '.join(name.split())
+                # If we didn't get a series name, return
+                if not name:
+                    return
                 season = match[0]
                 episode = match[1]
                 parser.name = name
                 parser.data = title
                 parser.season = season
                 parser.episode = episode
+                parser.valid = True
                 return (name, season, episode, parser)
 
 register_plugin(MetainfoSeries, 'metainfo_series', builtin=True)

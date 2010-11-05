@@ -1,6 +1,6 @@
 import os
 import logging
-from flexget.plugin import *
+from flexget.plugin import register_plugin, priority, PluginWarning
 from flexget.utils.titles import SeriesParser, ParseWarning
 
 log = logging.getLogger('exists_series')
@@ -26,7 +26,7 @@ class FilterExistsSeries(object):
         advform.accept('path', key='path')
         advform.accept('list', key='path').accept('path')
         return root
-        
+
     def get_config(self, feed):
         config = feed.config.get('exists_series', [])
         # if config is not a dict, assign value to 'path' key
@@ -39,10 +39,7 @@ class FilterExistsSeries(object):
 
     @priority(-1)
     def on_feed_filter(self, feed):
-        if not feed.config.get('series') and not feed.config.get('series_premiere'):
-            log.error('series plugin is not enabled on this feed. exists_series only works with series plugin.')
-            return
-        for entry in feed.entries + feed.accepted:
+        for entry in feed.accepted:
             if 'series_parser' in entry:
                 break
         else:
@@ -51,7 +48,7 @@ class FilterExistsSeries(object):
             else:
                 log.debug('Scanning not needed')
             return
-    
+
         config = self.get_config(feed)
         for path in config.get('path'):
             feed.verbose_progress('Scanning %s' % path, log)
@@ -63,12 +60,16 @@ class FilterExistsSeries(object):
                 # convert filelists into utf-8 to avoid unicode problems
                 dirs = [x.decode('utf-8', 'ignore') for x in dirs]
                 files = [x.decode('utf-8', 'ignore') for x in files]
-                for entry in feed.entries + feed.accepted:
+                # For speed, only test accepted entries since our priority should be after everything is accepted.
+                for entry in feed.accepted:
                     if 'series_parser' in entry:
+                        series_parser = entry['series_parser']
+                        if not series_parser.valid:
+                            log.debug('entry %s series_parser invalid' % entry['title'])
+                            continue
                         for name in files + dirs:
                             # make new parser from parser in entry
                             disk_parser = SeriesParser()
-                            series_parser = entry['series_parser']
                             disk_parser.name = series_parser.name
                             disk_parser.strict_name = series_parser.strict_name
                             disk_parser.ep_regexps = series_parser.ep_regexps
@@ -86,7 +87,9 @@ class FilterExistsSeries(object):
                                 log.debug('series_parser.identifier = %s' % series_parser.identifier)
                                 log.debug('disk_parser.quality = %s' % disk_parser.quality)
                                 log.debug('series_parser.quality = %s' % series_parser.quality)
-                                
+                                log.debug('disk_parser.proper = %s' % disk_parser.proper)
+                                log.debug('series_parser.proper = %s' % series_parser.proper)
+
                                 if disk_parser.identifier != series_parser.identifier:
                                     log.log(5, 'wrong identifier')
                                     continue
@@ -94,13 +97,13 @@ class FilterExistsSeries(object):
                                     log.log(5, 'wrong quality')
                                     continue
                                 if disk_parser.proper and not series_parser.proper:
-                                    feed.reject(entry, 'proper already already exists')
+                                    feed.reject(entry, 'proper already exists')
                                     continue
                                 if series_parser.proper and not disk_parser.proper:
                                     log.log(5, 'new one is proper, disk is not')
                                     continue
-                                
-                                feed.reject(entry, 'episode already exists')    
+
+                                feed.reject(entry, 'episode already exists')
                     else:
                         log.log(5, '%s doesn\'t seem to be known series' % entry['title'])
 

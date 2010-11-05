@@ -4,7 +4,7 @@ import string
 import urllib2
 from flexget.feed import Entry
 from input_rss import InputRSS
-from flexget.plugin import *
+from flexget.plugin import priority, register_plugin
 from flexget.utils.tools import urlopener
 from flexget.utils.soup import get_soup
 from flexget.plugins.cached_input import cached
@@ -24,7 +24,7 @@ class AppleTrailers(InputRSS):
 
     def __init__(self):
         self.rss_url = 'http://trailers.apple.com/trailers/home/rss/newtrailers.rss'
-        self.qualities = ['ipod', '320', '480', '640w', '480p', '720p', '1080p']
+        self.qualities = ['ipod', 320, '320', 480, '480', '640w', '480p', '720p', '1080p']
 
     def validator(self):
         from flexget import validator

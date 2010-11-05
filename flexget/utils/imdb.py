@@ -11,7 +11,7 @@ log = logging.getLogger('utils.imdb')
 
 def extract_id(url):
     """Return IMDb ID of the given URL"""
-    m = re.search("((?:nm|tt)[\d]{7})", url)
+    m = re.search(r'((?:nm|tt)[\d]{7})', url)
     if m:
         return m.group(1)
 
@@ -148,8 +148,6 @@ class ImdbSearch(object):
                 if len(link.contents) == 1 and not isinstance(link.contents[0], NavigableString):
                     continue
 
-                #log.debug('processing link %s' % link)
-
                 movie = {}
                 additional = re.findall('\((.*?)\)', link.next.next)
                 if len(additional) > 0:
@@ -158,7 +156,7 @@ class ImdbSearch(object):
                     movie['type'] = additional[1]
 
                 movie['name'] = link.contents[0]
-                movie['url'] = "http://www.imdb.com" + link.get('href')
+                movie['url'] = 'http://www.imdb.com' + link.get('href')
                 log.debug('processing name: %s url: %s' % (movie['name'], movie['url']))
                 # calc & set best matching ratio
                 seq = difflib.SequenceMatcher(lambda x: x == ' ', movie['name'], name)
@@ -250,8 +248,11 @@ class ImdbParser(object):
         # get score
         tag_score = soup.find('span', attrs={'class': 'rating-rating'})
         if tag_score:
+            try:
                 self.score = float(tag_score.contents[0])
-                log.debug('Detected score: %s' % self.score)
+            except ValueError:
+                log.debug('tag_score %s is not valid float' % tag_score.contents[0])
+            log.debug('Detected score: %s' % self.score)
         else:
             log.warning('Unable to get score for %s - plugin needs update?' % url)
 

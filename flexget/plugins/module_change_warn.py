@@ -1,7 +1,7 @@
 import logging
 import os
 from flexget.manager import Session
-from flexget.plugin import *
+from flexget.plugin import register_plugin
 
 log = logging.getLogger('change')
 found_deprecated = False
@@ -17,18 +17,18 @@ class ChangeWarn:
     """
 
     def old_database(self, feed, reason=''):
-        log.critical('You\'re running old database! Please see bleeding edge news for necessary actions! %s' % reason)
+        log.critical('You\'re running old database! Please see \'Upgrade Actions\' at flexget.com for necessary actions! %s' % reason)
         feed.manager.disable_feeds()
         feed.abort()
 
     def on_process_start(self, feed):
         found_deprecated = False
         config = feed.manager.config
-        
+
         if 'torrent_size' in feed.config:
             log.critical('Plugin torrent_size is deprecated, use content_size instead')
             found_deprecated = True
-        
+
         if 'nzb_size' in feed.config:
             log.critical('Plugin nzb_size is deprecated, use content_size instead')
             found_deprecated = True
@@ -37,7 +37,7 @@ class ChangeWarn:
         allow = ['feeds', 'presets', 'variables']
         for key in config.iterkeys():
             if key not in allow:
-                log.critical('Keyword \'%s\' is not allowed in the root level!' % key)
+                log.critical('Keyword \'%s\' is not allowed in the root level of configuration!' % key)
 
         # priority (dict) was renamed to plugin_priority
         if isinstance(feed.config.get('priority', None), dict):
@@ -55,7 +55,7 @@ class ChangeWarn:
         columns = table_columns('make_rss', session)
         if not 'rsslink' in columns:
             self.old_database(feed, '(rsslink missing from make_rss table)')
-            
+
         columns = table_columns('imdb_queue', session)
         if not 'title' in columns:
             self.old_database(feed, '(title missing from imdb_queue table)')
@@ -89,7 +89,19 @@ try:
 
         if 'module_priority' in name:
             require_clean = True
-        
+
+        if 'ignore_feed' in name:
+            require_clean = True
+
+        if 'module_manual' in name:
+            require_clean = True
+
+        if 'output_exec' in name:
+            require_clean = True
+
+        if 'plugin_adv_exec' in name:
+            require_clean = True
+
         if require_clean:
             log.critical('-' * 79)
             log.critical('IMPORTANT: Please remove all pre-compiled .pyc and .pyo files from')

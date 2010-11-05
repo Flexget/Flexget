@@ -1,7 +1,7 @@
 import logging
 import datetime
 from flexget.manager import Session
-from flexget.plugin import *
+from flexget.plugin import register_plugin, PluginError, get_plugin_by_name, priority, register_parser_option
 from flexget.manager import Base
 from sqlalchemy import Column, Integer, String, DateTime, Boolean, Unicode
 from flexget.utils.imdb import extract_id, ImdbSearch, ImdbParser, log as imdb_log
@@ -40,6 +40,9 @@ class FilterImdbQueue(object):
     imdb_queue: yes
     """
 
+    # Dict of entries accepted by this plugin {imdb_id: entry} format
+    accepted_entries = {}
+
     def validator(self):
         from flexget import validator
         return validator.factory('boolean')
@@ -62,7 +65,7 @@ class FilterImdbQueue(object):
                 else:
                     imdb_id = extract_id(entry['imdb_url'])
 
-                if not imdb_id: 
+                if not imdb_id:
                     log.warning("No imdb id could be determined for %s" % entry['title'])
                     continue
 
@@ -77,10 +80,21 @@ class FilterImdbQueue(object):
                     entry['immortal'] = item.immortal
                     log.info("Accepting %s from queue with quality %s. Force: %s" % (entry['title'], entry['quality'], entry['immortal']))
                     feed.accept(entry, 'imdb-queue - force: %s' % entry['immortal'])
-                    # and remove from database
-                    feed.session.delete(item)
+                    # Keep track of entries we accepted, so they can be removed from queue on feed_exit if successful
+                    self.accepted_entries[imdb_id] = entry
                 else:
                     log.log(5, "%s not in queue with wanted quality, skipping" % entry['title'])
+
+    def on_feed_exit(self, feed):
+        """
+        Removes any entries that have not been rejected by another plugin or failed from the queue.
+        """
+        for imdb_id, entry in self.accepted_entries.iteritems():
+            if entry in feed.accepted and entry not in feed.failed:
+                # If entry was not rejected or failed, remove from database
+                item = feed.session.query(ImdbQueue).filter(ImdbQueue.imdb_id == imdb_id).first()
+                feed.session.delete(item)
+                log.debug('%s was successful, removing from imdb-queue' % entry['title'])
 
 
 class ImdbQueueManager(object):
@@ -128,12 +142,12 @@ class ImdbQueueManager(object):
         """
         Handle IMDb queue management
         """
-        
+
         if not self.options:
             return
 
         feed.manager.disable_feeds()
-        
+
         if 'usage' in self.options:
             return
 
@@ -143,13 +157,29 @@ class ImdbQueueManager(object):
             return
 
         # all actions except list require imdb_url to work
-        if action != 'list' and not 'what' in self.options:
-            self.error('No URL or NAME given')
-            return
-            
+        if action != 'list':
+            if not 'what' in self.options:
+                self.error('No URL or NAME given')
+                return
+            else:
+                # Generate imdb_id and movie title from movie name, or imdb_url
+                self.options['imdb_id'] = extract_id(self.options['what'])
+                self.options['title'] = self.options['what']
+
+                if not self.options['imdb_id']:
+                    # try to do imdb search
+                    print 'Searching imdb for %s' % self.options['what']
+                    search = ImdbSearch()
+                    result = search.smart_match(self.options['what'])
+                    if not result:
+                        print 'ERROR: Unable to find any such movie from imdb, use imdb url instead.'
+                        return
+                    self.options['imdb_id'] = extract_id(result['url'])
+                    self.options['title'] = result['name']
+
         from sqlalchemy.exceptions import OperationalError
         try:
-            if action == 'add':            
+            if action == 'add':
                 self.queue_add()
             elif action == 'del':
                 self.queue_del()
@@ -167,47 +197,38 @@ class ImdbQueueManager(object):
         # Check that the quality is valid
         quality = self.options['quality']
 
-        from flexget.utils.titles.parser import TitleParser
         from flexget.utils import qualities
-        if (quality != 'ANY') and (quality not in qualities.registry):
+        # Make sure quality is in the format we expect
+        if quality.upper() == 'ANY':
+            quality = 'ANY'
+        elif qualities.get(quality, False):
+            quality = qualities.common_name(quality)
+        else:
             print 'ERROR! Unknown quality `%s`' % quality
-            print 'Recognized qualities are %s' % ', '.join(qualities.registry.keys())
+            print 'Recognized qualities are %s' % ', '.join([qual.name for qual in qualities.all()])
             print 'ANY is the default and can also be used explicitly to specify that quality should be ignored.'
             return
 
-        imdb_id = extract_id(self.options['what'])
-        title = None
-
-        if not imdb_id:
-            # try to do imdb search
-            print 'Searching imdb for %s' % self.options['what']
-            search = ImdbSearch()
-            result = search.smart_match(self.options['what'])
-            if not result:
-                print 'ERROR: Unable to find any such movie from imdb, use imdb url instead.'
-                return
-            imdb_id = extract_id(result['url'])
-            title = result['name']
+        imdb_id = self.options['imdb_id']
+        title = self.options['title']
 
         session = Session()
 
         # check if the item is already queued
         item = session.query(ImdbQueue).filter(ImdbQueue.imdb_id == imdb_id).first()
         if not item:
-            # get the common, eg. 1280x720 will be turned into 720p
-            common_name = qualities.common_name(quality)
-            item = ImdbQueue(imdb_id, common_name, self.options['force'])
+            item = ImdbQueue(imdb_id, quality, self.options['force'])
             item.title = title
             session.add(item)
             session.commit()
-            print 'Added %s to queue with quality %s' % (imdb_id, common_name)
+            print 'Added %s to queue with quality %s' % (imdb_id, quality)
         else:
             print 'ERROR: %s is already in the queue' % imdb_id
 
     def queue_del(self):
         """Delete the given item from the queue"""
 
-        imdb_id = extract_id(self.options['what'])
+        imdb_id = self.options['imdb_id']
 
         session = Session()
 
@@ -224,7 +245,7 @@ class ImdbQueueManager(object):
     def queue_list(self):
         """List IMDb queue"""
 
-        session = Session()            
+        session = Session()
 
         items = session.query(ImdbQueue)
         print '-' * 79
@@ -236,7 +257,7 @@ class ImdbQueueManager(object):
                 imdb_log.setLevel(logging.CRITICAL)
                 parser = ImdbParser()
                 try:
-                    result = parser.parse('http://www.imdb.com/title/' + item.imdb_id)
+                    parser.parse('http://www.imdb.com/title/' + item.imdb_id)
                 except:
                     pass
                 if parser.name:
@@ -249,10 +270,10 @@ class ImdbQueueManager(object):
             print 'IMDB queue is empty'
 
         print '-' * 79
-        
+
         session.commit()
         session.close()
-                
+
 register_plugin(FilterImdbQueue, 'imdb_queue')
 register_plugin(ImdbQueueManager, 'imdb_queue_manager', builtin=True)
 

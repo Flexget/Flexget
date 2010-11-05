@@ -1,5 +1,5 @@
 import logging
-from flexget.plugin import *
+from flexget.plugin import register_plugin, priority
 import flexget.utils.qualities as quals
 
 log = logging.getLogger('quality')
@@ -8,9 +8,9 @@ log = logging.getLogger('quality')
 class FilterQuality(object):
     """
         Rejects all entries that don't have one of the specified qualities
-        
+
         Example:
-        
+
         quality:
           - hdtv
     """
@@ -38,6 +38,8 @@ class FilterQuality(object):
             config['quality'] = [config['quality']]
         return config
 
+    # Run before series and imdb plugins, so correct qualities are chosen
+    @priority(130)
     def on_feed_filter(self, feed):
         config = self.get_config(feed)
         for entry in feed.entries:

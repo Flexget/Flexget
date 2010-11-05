@@ -24,7 +24,7 @@ class TestDuplicates(FlexGetBase):
 
           test_dupes_across_feeds_2:
             mock:
-              - {title: 'Foo Bar S01E01 HDTV XviD-2HD[DMG]'}
+              - {title: 'foo bar s01e01 dsr xvid-2hd[dmg]'}
             series_premiere: yes
     """
 
