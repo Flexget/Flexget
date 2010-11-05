@@ -1,42 +1,42 @@
 body {
-  background-color: #666;
-  font-size: 13px;
-  font-family: Arial, SunSans-Regular, Sans-Serif;
-  padding: 0 20px;
-  margin: 0;
+    background-color: #666;
+    font-size: 13px;
+    font-family: Arial, SunSans-Regular, Sans-Serif;
+    padding: 0 20px;
+    margin: 0;
 }
 
 h1 {
-  font-size: 14px;
-  text-transform: uppercase;
-  padding: 5px 15px;
-  margin: 0;
+    font-size: 14px;
+    text-transform: uppercase;
+    margin: 0;
 }
 
 a {
-  color: #ff0000;
-  font-size: 11px;
-  background-color: transparent;
-  text-decoration: none;
+    color: #ff0000;
+    font-size: 11px;
+    background-color: transparent;
+    text-decoration: none;
 }
 
-#leftmenu {
-  position: absolute;
-  width: 200px;
-  left: 20px;
-  background-color: #ccc;
-  padding:0;
-  margin:0;
+#menu {
+    position: absolute;
+    width: 200px;
+    left: 20px;
+    background-color: #ccc;
+    padding:0;
+    margin:0;
 }
 
-#content {
-  margin-left: 200px;
-  background-color: #fff;
-  overflow: auto;
+#main {
+    margin-left: 200px;
+    background-color: #fff;
+    overflow: auto;
+    padding: 1em;
 }
 
 #header
 {
-  height: 60px;
-  background: #FFF url("FlexGet2.png") top left no-repeat;
+    height: 60px;
+    background: #FFF url("FlexGet2.png") top left no-repeat;
 }

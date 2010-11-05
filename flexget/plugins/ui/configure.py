@@ -1,8 +1,7 @@
-from flexget.webui import app, render, manager, register_menu, menu_current
+from flexget.webui import app, render, manager, register_menu
 
 
 @app.route('/configure')
-@menu_current('configure')
 def plugins():
     return render('configure.html')
     

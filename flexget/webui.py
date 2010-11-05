@@ -10,32 +10,32 @@ manager = None
 _menu = []
 
 
-class menu_current(object):
-    """Decorator which updates menu items current flag to the given value"""
-
-    def __init__(self, name):
-        self.name = name
-        
-    def __call__(self, f):
-        log.debug('updating current menu #1')
-
-        def wrapped_f(*args, **kwargs):
-            log.debug('updating current menu #2')
-            for item in _menu:
-                if item['caption'].lower() == self.name.lower():
-                    item['current'] = True
-                    log.debug('current menu item %s' % self.name)
-                else:
-                    if 'current' in item:
-                        item.pop('current')
-            return f(*args, **kwargs)
-        return wrapped_f
+def _update_menu(root):
+    for item in _menu:
+        if item['href'].startswith(root):
+            item['current'] = True
+            log.debug('current menu item %s' % root)
+        else:
+            if 'current' in item:
+                item.pop('current')
 
 
+@app.context_processor
+def flexget_variables():
+    from flask import request
+    import urllib
+    path = urllib.splitquery(request.path)[0]
+    root = '/' + path.split('/', 2)[1]
+    log.debug('root is: %s' % root)
+    _update_menu(root)
+    return {'menu': _menu, 'manager': manager}
+
+
+# TODO: remove
 def render(template, **context):
     # fill built in variables to context
-    context['menu'] = _menu
-    context['manager'] = manager
+#    context['menu'] = _menu
+#    context['manager'] = manager
     return render_template(template, **context)
 
 

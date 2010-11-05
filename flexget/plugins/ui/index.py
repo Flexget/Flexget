@@ -1,8 +1,7 @@
-from flexget.webui import app, render, register_menu, menu_current
+from flexget.webui import app, render, register_menu
 
 
 @app.route('/')
-@menu_current('home')
 def index():
     return render('index.html')
 

@@ -16,7 +16,7 @@
 {% block header %}&nbsp;{% endblock %}
 </div>
 
-<ul id="menu">
+<ul id="navbar">
   {% for item in menu %}
   <li><a href="{{ item.href }}" 
   {% if item.current is defined %}class="current"{% endif %}
@@ -27,15 +27,15 @@
   {% endfor %}
 </ul>
 
-<div id="leftmenu">
-  {% block left %}
+<div id="menu">
+  {% block menu %}
   {% endblock %}
 </div>
 
-<div id="content">
-  {% block content %}
+<div id="main">
+  {% block main %}
   <p>
-    <b>Error:</b> Content not set!
+    <b>Error:</b> Main content not set!
   </p>
   {% endblock %}
 </div>
