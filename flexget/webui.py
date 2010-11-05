@@ -1,16 +1,18 @@
 import logging
 import os
-from flask import Flask, render_template
+from flask import Flask, render_template, redirect, url_for, abort
 
 log = logging.getLogger('webui')
 
 app = Flask(__name__)
 manager = None
 
+_home = None
 _menu = []
 
 
 def _update_menu(root):
+    """Iterates trough menu navigation and sets the item selected based on the :root:"""
     for item in _menu:
         if item['href'].startswith(root):
             item['current'] = True
@@ -18,6 +20,13 @@ def _update_menu(root):
         else:
             if 'current' in item:
                 item.pop('current')
+
+
+@app.route('/')
+def start():
+    if not _home:
+        abort(404)
+    return redirect(url_for(_home))
 
 
 @app.context_processor
@@ -77,6 +86,14 @@ def register_menu(href, caption, order=128):
     global _menu
     _menu.append({'href': href, 'caption': caption, 'order': order})
     _menu = sorted(_menu, key=lambda item: item['order'])
+    
+
+def register_home(route):
+    """Registers homepage for web ui"""
+    global _home
+    if _home is not None:
+        raise Exception('Home is already registered')
+    _home = route
 
 
 def start(mg):
