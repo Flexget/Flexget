@@ -3,19 +3,19 @@
 
 <h1>Schedule execution</h1>
 
-<form action="/schedule">
-<p>Please complete the form below.</p>
-<fieldset class="login">
-    <legend>Scheduling</legend>
-    <div>
-        <label for="username">Interval</label>
-        <input type="text" id="interval" name="interval" value="1234">
-    </div>
-</fieldset>
+<form action="/schedule" method="post">
+    <p>Please complete the form below.</p>
+    <fieldset class="login">
+        <legend>Scheduling</legend>
+        <div>
+            <label for="username">Interval</label>
+            <input type="text" id="interval" name="interval" value="1234">
+        </div>
+    </fieldset>
 
-<div>
-    <button type="submit" id="submit">Submit</button>
-</div>
+    <div>
+        <button type="submit" id="submit">Submit</button>
+    </div>
 </form>
 
 {% endblock %}

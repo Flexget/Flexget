@@ -4,6 +4,7 @@
 <head>
     <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
     <title>FlexGet</title>
+    <script type="text/javascript" src="/static/jquery-1.4.3.min.js"></script>
     <link rel="stylesheet" href="/static/menu.css" type="text/css" media="screen"/>
     <link rel="stylesheet" href="/static/style.css" type="text/css" media="screen"/>
     <link rel="stylesheet" href="/static/forms.css" type="text/css" media="screen"/>
@@ -33,11 +34,25 @@
     <div id="content-container">
 
         <div id="menu">
-          {% block menu %}
-          {% endblock %}
+            {% block menu %}
+            {% endblock %}
         </div>
 
         <div id="main">
+
+          <!-- flash messages -->
+          {% with messages = get_flashed_messages() %}
+            {% if messages %}
+              <div id="flash">
+              <ul>
+              {% for message in messages %}
+                <li>{{ message }}</li>
+              {% endfor %}
+              </ul>
+              </div>
+            {% endif %}
+          {% endwith %}
+
           {% block main %}
           <p>
             <b>Error:</b> Main content not set!

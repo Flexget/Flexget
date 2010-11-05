@@ -1,9 +1,10 @@
-from flexget.webui import app, render, register_menu, register_home
+from flexget.webui import app, register_menu
+from flask import render_template
 
 
 @app.route('/log')
 def log():
-    return render('log.html')
+    return render_template('log.html')
 
 
 register_menu('/log', 'Log', order=256)

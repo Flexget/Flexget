@@ -1,4 +1,4 @@
-from flexget.webui import app, render, manager
+from flexget.webui import app, manager
 
 
 @app.route('/feeds')

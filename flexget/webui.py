@@ -1,6 +1,7 @@
 import logging
 import os
-from flask import Flask, render_template, redirect, url_for, abort
+import urllib
+from flask import Flask, redirect, url_for, abort, request
 
 log = logging.getLogger('webui')
 
@@ -24,6 +25,7 @@ def _update_menu(root):
 
 @app.route('/')
 def start():
+    """Redirect user to registered home plugin"""
     if not _home:
         abort(404)
     return redirect(url_for(_home))
@@ -31,21 +33,11 @@ def start():
 
 @app.context_processor
 def flexget_variables():
-    from flask import request
-    import urllib
     path = urllib.splitquery(request.path)[0]
     root = '/' + path.split('/', 2)[1]
     log.debug('root is: %s' % root)
     _update_menu(root)
     return {'menu': _menu, 'manager': manager}
-
-
-# TODO: remove
-def render(template, **context):
-    # fill built in variables to context
-#    context['menu'] = _menu
-#    context['manager'] = manager
-    return render_template(template, **context)
 
 
 def load_ui_plugins():
@@ -69,8 +61,6 @@ def load_ui_plugins():
                 # elif getattr(_plugins_mod, f_base, None):
                 #    log.warning('Plugin named %s already loaded' % f_base)
                 plugin_names.add(f_base)
-                
-    print 'found: %s' % plugin_names
 
     for name in plugin_names:
         try:
@@ -86,7 +76,7 @@ def register_menu(href, caption, order=128):
     global _menu
     _menu.append({'href': href, 'caption': caption, 'order': order})
     _menu = sorted(_menu, key=lambda item: item['order'])
-    
+
 
 def register_home(route):
     """Registers homepage for web ui"""
@@ -102,4 +92,6 @@ def start(mg):
     # initialize
     manager.create_feeds()
     load_ui_plugins()
+
+    app.secret_key = os.urandom(24)
     app.run(host='0.0.0.0', port=5050, use_reloader=False, debug=True)

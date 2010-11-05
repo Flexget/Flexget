@@ -8,6 +8,10 @@ html {
 #container {
     margin: 0 auto;
     width: 1150px;
+    -moz-box-shadow: 0 0 20px #000;
+    -webkit-box-shadow: 0 0 20px #000;
+    box-shadow: 0 0 20px #000;
+
 }
 
 body {
@@ -55,7 +59,7 @@ a {
 #header
 {
     height: 80px;
-    background-image:url('FlexGet2.png');
+    background-image:url('FlexGet.png');
     background-repeat:no-repeat;
     background-attachment:fixed;
     background-color: #fff;
