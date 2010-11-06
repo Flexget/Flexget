@@ -65,11 +65,19 @@ def load_ui_plugins():
     for name in plugin_names:
         try:
             log.info('Loading UI plugin %s' % name)
-            exec "import flexget.plugins.ui.%s" % name in {}
+            exec "import flexget.plugins.ui.%s" % name
         except Exception, e:
             log.critical('Exception while loading plugin %s' % name)
             log.exception(e)
             raise
+
+
+def register_plugin(plugin, menu=None, order=128, home=False):
+    app.register_module(plugin, url_prefix='/' + plugin.name)
+    if menu:
+        register_menu('/' + plugin.name, menu, order=order)
+    if home:
+        register_home(plugin.name + '.index')
 
 
 def register_menu(href, caption, order=128):

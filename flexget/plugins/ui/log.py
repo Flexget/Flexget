@@ -1,10 +1,12 @@
-from flexget.webui import app, register_menu
-from flask import render_template
+from flexget.webui import register_plugin
+from flask import render_template, Module
+
+log = Module(__name__)
 
 
-@app.route('/log')
-def log():
+@log.route('/')
+def index():
     return render_template('log.html')
 
 
-register_menu('/log', 'Log', order=256)
+register_plugin(log, menu='Log', order=256)

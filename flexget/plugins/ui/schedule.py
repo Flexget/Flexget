@@ -1,16 +1,17 @@
 import logging
-from flexget.webui import app, register_menu
-from flask import request, render_template, flash
+from flexget.webui import register_plugin
+from flask import request, render_template, flash, Module
 
 log = logging.getLogger('ui.schedule')
+schedule = Module(__name__)
 
 
-@app.route('/schedule', methods=['POST', 'GET'])
-def scheduler():
+@schedule.route('/', methods=['POST', 'GET'])
+def index():
     if request.method == 'POST':
         log.info('new interval: %s' % request.form['interval'])
         flash('Updated interval')
     return render_template('schedule.html')
 
 
-register_menu('/schedule', 'Schedule')
+register_plugin(schedule, menu='Schedule')

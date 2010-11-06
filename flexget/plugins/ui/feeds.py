@@ -1,7 +1,12 @@
-from flexget.webui import app, manager
+from flexget.webui import register_plugin
+from flask import render_template, Module
+
+feeds = Module(__name__)
 
 
-@app.route('/feeds')
-def plugins():
+@feeds.route('/')
+def index():
     names = ['foo', 'bar']
-    render('feeds.html', names)
+    return render_template('feeds.html')
+
+register_plugin(feeds)

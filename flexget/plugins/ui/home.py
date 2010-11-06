@@ -1,11 +1,11 @@
-from flexget.webui import app, register_menu, register_home
-from flask import render_template
+from flexget.webui import register_plugin
+from flask import render_template, Module
+
+home = Module(__name__, url_prefix='/home')
 
 
-@app.route('/home')
-def home():
+@home.route('/')
+def index():
     return render_template('home.html')
 
-
-register_menu('/home', 'Home', order=0)
-register_home('home')
+register_plugin(home, menu='Home', order=0, home=True)
