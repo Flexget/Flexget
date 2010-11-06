@@ -72,10 +72,11 @@ def load_ui_plugins():
             raise
 
 
-def register_plugin(plugin, menu=None, order=128, home=False):
-    app.register_module(plugin, url_prefix='/' + plugin.name)
+def register_plugin(plugin, url_prefix=None, menu=None, order=128, home=False):
+    url_prefix = url_prefix or '/' + plugin.name
+    app.register_module(plugin, url_prefix=url_prefix)
     if menu:
-        register_menu('/' + plugin.name, menu, order=order)
+        register_menu(url_prefix, menu, order=order)
     if home:
         register_home(plugin.name + '.index')
 
