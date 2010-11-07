@@ -94,6 +94,7 @@ class TestMetainfoSeries(FlexGetBase):
               - {title: 'Some.Series.S03E14.Title.Here.720p'}
               - {title: '[the.group] Some.Series.S03E15.Title.Two.720p'}
               - {title: 'HD 720p: Some.Series.S03E16.Title.Three'}
+              - {title: 'Something.Season.2.1of4.Ep.Title.HDTV.torrent'}
           false_positives:
             mock:
               - {title: 'FlexGet.epic'}
@@ -113,6 +114,8 @@ class TestMetainfoSeries(FlexGetBase):
         assert self.feed.find_entry(series_name='FlexGet', series_season=1, series_episode=2, quality='hdtv'), \
             'Failed to parse series info'
         assert self.feed.find_entry(series_name='Some Series', series_season=3, series_episode=14, quality='720p'), \
+            'Failed to parse series info'
+        assert self.feed.find_entry(series_name='Something', series_season=2, series_episode=1, quality='hdtv'), \
             'Failed to parse series info'
         # Test unwanted prefixes get stripped from series name
         assert self.feed.find_entry(series_name='Some Series', series_season=3, series_episode=15, quality='720p'), \

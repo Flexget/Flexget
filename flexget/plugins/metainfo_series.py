@@ -10,7 +10,7 @@ class MetainfoSeries(object):
     """
     Check if entry appears to be a series, and populate series info if so.
     """
-    
+
     def validator(self):
         from flexget import validator
         return validator.factory('boolean')
@@ -30,14 +30,17 @@ class MetainfoSeries(object):
 
     def guess_series(self, title):
         """Returns tuple of (series_name, season, episode, parser) if found, else None"""
-        
-        # Clean the data for parsing
+
         parser = SeriesParser()
-        match = parser.parse_episode(title)
+        # We need to replace certain characters with spaces to make sure episode parsing works right
+        # We don't remove anything, as the match positions should line up with the original title
+        clean_title = re.sub('[_.,\[\]\(\):]', ' ', title)
+        match = parser.parse_episode(clean_title)
         if match:
-            if parser.parse_unwanted(title):
+            if parser.parse_unwanted(clean_title):
                 return
             elif match[2].start() > 1:
+                # We start using the original title here, so we can properly ignore unwanted prefixes.
                 # Look for unwanted prefixes to find out where the series title starts
                 start = 0
                 prefix = re.match('|'.join(parser.ignore_prefix_regexps), title)
