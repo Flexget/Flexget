@@ -20,6 +20,8 @@ p {
 
 body {
     background-color: #666;
+    background-image: url('construction.png');
+    background-repeat: repeat-x;
     font-size: 13px;
     font-family: Arial, SunSans-Regular, Sans-Serif;
     padding: 0 20px;
@@ -64,11 +66,7 @@ a {
 #header
 {
     height: 80px;
-    background-image:url('FlexGet.png');
-    background-repeat:no-repeat;
-    background-attachment:fixed;
-    background-color: #fff;
-    background-position: 50% 10px;
+    background: #fff url('FlexGet.png') no-repeat 50% 10px;
 }
 
 #footer
