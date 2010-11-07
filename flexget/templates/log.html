@@ -1,10 +1,27 @@
 {% extends "layout.html" %}
 {% block main %}
 
+<script type=text/javascript>
+    $(document).ready(function(){
+        timestamp = 0.0;
+        get_updates();
+        inter = setInterval('get_updates();', 10000);
+    });
+    function get_updates(){
+        $.getJSON('/log/_get_updates', {
+              last_time: timestamp
+            }, function(data) {
+                timestamp = data.time;
+                $.each(data.items, function(i,item){
+                    $("#logarea").append(item + '\n');
+                });
+            });
+    }
+</script>
 <h1>FlexGet log messages</h1>
 
 <p>
-TODO: implement
+    <textarea rows=40 cols=100 readonly id="logarea"></textarea>
 </p>
 
 {% endblock %}
