@@ -1,8 +1,8 @@
 import logging
-from flexget.webui import register_plugin, manager
+from flexget.webui import register_plugin, manager, db_session
 from flexget.manager import Base, Session
 from flask import render_template, Module, jsonify, request
-from sqlalchemy import Column, DateTime, Integer, Unicode, String
+from sqlalchemy import Column, DateTime, Integer, Unicode, String, asc, desc
 import time
 from datetime import datetime
 
@@ -42,18 +42,31 @@ def index():
     return render_template('log.html')
 
 
-@log_viewer.route('/_get_updates')
-def get_updates():
-    last_time = datetime.fromtimestamp(float(request.args.get('last_time', 0)))
-    results = Session().query(LogEntry).filter(LogEntry.created > last_time)
-    items = []
-    for entry in results:
-        args = {'asctime': entry.created.strftime('%Y-%m-%d %H:%M'),
-                'levelname': logging.getLevelName(entry.levelno),
-                'logger': entry.logger,
-                'message': entry.message}
-        items.append('%(asctime)-15s %(levelname)-6s %(logger)-10s %(message)s' % args)
-    return jsonify(items=items, time=time.mktime(datetime.now().timetuple()))
+@log_viewer.route('/_get_logdata.json')
+def get_logdata():
+    page = int(request.args.get('page'))
+    limit = int(request.args.get('rows'))
+    sidx = request.args.get('sidx')
+    sord = request.args.get('sord', 'asc')
+    sord = asc if sord == 'asc' else desc
+    count = db_session.query(LogEntry).count()
+    # Use a trick to do ceiling division
+    total_pages = 0 - ((0 - count) / limit)
+    if page > total_pages:
+        page = total_pages
+    start = limit * page - limit
+    json = {'total': total_pages,
+            'page': page,
+            'records': limit,
+            'rows': []}
+    result = db_session.query(LogEntry).order_by(sord(sidx))[start:start + limit]
+    for entry in result:
+        json['rows'].append({'id': entry.id,
+                             'created': entry.created.strftime('%Y-%m-%d %H:%M'),
+                             'level': logging.getLevelName(entry.levelno),
+                             'logger': entry.logger,
+                             'message': entry.message})
+    return jsonify(json)
 
 
 def on_load():
