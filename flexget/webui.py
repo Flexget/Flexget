@@ -2,11 +2,14 @@ import logging
 import os
 import urllib
 from flask import Flask, redirect, url_for, abort, request
+from sqlalchemy.orm import scoped_session
+from sqlalchemy.orm.session import sessionmaker
 
 log = logging.getLogger('webui')
 
 app = Flask(__name__)
 manager = None
+db_session = None
 
 _home = None
 _menu = []
@@ -95,12 +98,25 @@ def register_home(route):
     _home = route
 
 
+@app.after_request
+def shutdown_session(response):
+    """Remove db_session after request"""
+    db_session.remove()
+    return response
+
+
 def start(mg):
     global manager
     manager = mg
+    # create sqlachemy session
+    global db_session
+    db_session = scoped_session(sessionmaker(autocommit=False,
+                                             autoflush=False,
+                                             bind=manager.engine))
+    if db_session is None:
+        raise Exception('db_session is None')
     # initialize
     manager.create_feeds()
     load_ui_plugins()
-
     app.secret_key = os.urandom(24)
     app.run(host='0.0.0.0', port=5050, use_reloader=False, debug=True)

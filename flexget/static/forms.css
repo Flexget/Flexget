@@ -12,6 +12,8 @@ form.data fieldset div {
     clear: both;
 }
 
+/*
+
 label {
     float: left;
     width: 10em;
@@ -99,7 +101,6 @@ input.default {
   margin-top: 1em;
 }
 
-/*
 #submit {
     margin-top: 1em;
     width: 69px;

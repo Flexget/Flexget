@@ -44,12 +44,13 @@ a {
     float: left;
     width: 1150px;
     background-color: #fff;
+    background-image:url('menu.png');
+    background-repeat:repeat-y;
 }
 
 #menu {
     float: left;
     width: 200px;
-    background-color: #ccc;
 }
 
 #main {
@@ -89,4 +90,26 @@ a {
 
 #flash ul {
     margin-left: 1em;
+}
+
+/* search results */
+
+table.search-results {
+    border: 0px none gray;
+    border-spacing: 1px;
+    border-collapse: separate;
+	background-color: white;
+    width: 100%;
+}
+table.search-results th {
+    border: 0px none gray;
+    padding: 3px;
+    background-color: #000;
+    color: #fff;
+    text-align: left;
+}
+table.search-results td {
+    border: 0px none gray;
+    padding: 3px;
+    background-color: rgb(204, 204, 204);
 }
