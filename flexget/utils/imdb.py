@@ -75,12 +75,12 @@ class ImdbSearch(object):
                 continue
 
         if not movies:
-            log.debug('no movies remain')
+            log.debug('FAILURE: no movies remain')
             return None
 
         # if only one remains ..
         if len(movies) == 1:
-            log.debug('only one movie remains')
+            log.debug('SUCCESS: only one movie remains')
             return movies[0]
 
         # check min difference between best two hits
@@ -101,6 +101,7 @@ class ImdbSearch(object):
         except:
             log.warning('Problems with encoding %s, string possibly corrupted? Ignoring troublesome characters.' % name)
             url = u'http://www.imdb.com/find?' + urllib.urlencode({'q': name.encode('latin1', 'ignore'), 's': 'all'})
+            
         log.debug('Serch query: %s' % repr(url))
         page = urllib2.urlopen(url)
         actual_url = page.geturl()
@@ -119,8 +120,9 @@ class ImdbSearch(object):
             movies.append(movie)
             return movies
 
+        # the god damn page has declared a wrong encoding
         soup = get_soup(page)
-
+        
         sections = ['Popular Titles', 'Titles (Exact Matches)',
                     'Titles (Partial Matches)', 'Titles (Approx Matches)']
 
@@ -149,7 +151,7 @@ class ImdbSearch(object):
                     continue
 
                 movie = {}
-                additional = re.findall('\((.*?)\)', link.next.next)
+                additional = re.findall(r'\((.*?)\)', link.next.next)
                 if len(additional) > 0:
                     movie['year'] = filter(unicode.isdigit, additional[0]) # strip non numbers ie. 2008/I
                 if len(additional) > 1:
@@ -158,22 +160,31 @@ class ImdbSearch(object):
                 movie['name'] = link.contents[0]
                 movie['url'] = 'http://www.imdb.com' + link.get('href')
                 log.debug('processing name: %s url: %s' % (movie['name'], movie['url']))
+
                 # calc & set best matching ratio
                 seq = difflib.SequenceMatcher(lambda x: x == ' ', movie['name'], name)
                 ratio = seq.ratio()
+
                 # check if some of the akas have better ratio
-                for aka in [l for l in link.parent.findAll(text=re.compile('".*"')) if l.parent.name == 'em']:
-                    aka = aka.replace('"', '')
+                for aka in link.parent.findAll('p', attrs={'class': 'find-aka'}):
+                    aka = aka.next.string
+                    match = re.search('".*"', aka)
+                    if not match:
+                        log.debug('aka `%s` is invalid' % aka)
+                    aka = match.group(0).replace('"', '')
+                    log.log(5, 'processing aka %s' % aka)
                     seq = difflib.SequenceMatcher(lambda x: x == ' ', aka.lower(), name.lower())
                     aka_ratio = seq.ratio() * self.aka_weight
                     if aka_ratio > ratio:
                         log.debug('- aka %s has better ratio %s' % (aka, aka_ratio))
                         ratio = aka_ratio
+
                 # prioritize popular titles
                 if section != sections[0]:
                     ratio = ratio * self.unpopular_weight
                 else:
                     log.debug('- priorizing popular title')
+
                 # store ratio
                 movie['match'] = ratio
                 movies.append(movie)
