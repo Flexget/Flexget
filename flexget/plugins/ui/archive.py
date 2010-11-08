@@ -5,18 +5,25 @@ from flask import request, render_template, flash, Module
 from flexget.plugins.plugin_archive import ArchiveEntry
 
 log = logging.getLogger('ui.archive')
-schedule = Module(__name__)
+archive = Module(__name__)
 
 
-@schedule.route('/', methods=['POST', 'GET'])
+@archive.route('/', methods=['POST', 'GET'])
 def index():
-
-    context = {
-        'count': db_session.query(ArchiveEntry).count()}
-
+    context = {}
     if request.method == 'POST':
         pass
     return render_template('archive.html', **context)
 
 
-register_plugin(schedule, menu='Archive')
+@archive.route('/count')
+def count():
+    return str(db_session.query(ArchiveEntry).count())
+
+
+@archive.route('/inject')
+def inject():
+    raise Exception('Not implemented')
+
+
+register_plugin(archive, menu='Archive')
