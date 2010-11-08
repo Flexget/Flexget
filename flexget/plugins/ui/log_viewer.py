@@ -45,10 +45,11 @@ def index():
 @log_viewer.route('/_get_logdata.json')
 def get_logdata():
     page = int(request.args.get('page'))
-    limit = int(request.args.get('rows'))
+    limit = int(request.args.get('rows', 0))
     sidx = request.args.get('sidx')
-    sord = request.args.get('sord', 'asc')
-    sord = asc if sord == 'asc' else desc
+    sord = request.args.get('sord')
+    sord = desc if sord == 'desc' else asc
+    npages = request.args.get('npages')
     count = db_session.query(LogEntry).count()
     # Use a trick to do ceiling division
     total_pages = 0 - ((0 - count) / limit)
@@ -57,7 +58,7 @@ def get_logdata():
     start = limit * page - limit
     json = {'total': total_pages,
             'page': page,
-            'records': limit,
+            'records': count,
             'rows': []}
     result = db_session.query(LogEntry).order_by(sord(sidx))[start:start + limit]
     for entry in result:

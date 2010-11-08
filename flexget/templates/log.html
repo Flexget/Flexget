@@ -7,27 +7,32 @@
             url:'/log/_get_logdata.json',
             datatype: 'json',
             mtype: 'GET',
-            colNames:['Date','Level','Logger','Message'],
-            colModel :[
-                {name:'created', width:100},
-                {name:'level', width:60},
-                {name:'logger', width:80},
-                {name:'message', width:300}
+            colNames: ['Date','Level','Logger','Message'],
+            colModel: [
+                {name:'created', width:150},
+                {name:'level', width:65},
+                {name:'logger', width:100},
+                {name:'message', width:900}
             ],
-            pager: '#pager',
-            rowNum:10,
-            rowList:[10,20,30],
+            autowidth: true,
+            height: 500,
+            width: 700,
+            scroll: 1,
+            rowNum: 50,
             sortname: 'created',
             sortorder: 'desc',
             viewrecords: true,
             caption: 'Log viewer',
-            jsonReader : {
-                root:"rows",
-                page: "page",
-                total: "total",
-                records: "records",
+            jsonReader: {
+                root: 'rows',
+                page: 'page',
+                total: 'total',
+                records: 'records',
                 repeatitems: false,
                 id: "id"
+            },
+            prmNames: {
+                npages: 'npages'
             }
         });
     });
