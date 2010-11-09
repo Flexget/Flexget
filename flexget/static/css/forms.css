@@ -108,7 +108,7 @@ input.default {
     text-indent: -9999px;
     overflow: hidden;
     border: 0;
-    background: url(submit.gif) no-repeat 0 0;
+    background: url(/static/img/submit.gif) no-repeat 0 0;
     display: block;
     cursor: pointer !important; cursor:hand;
 }

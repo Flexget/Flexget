@@ -64,7 +64,7 @@ def get_logdata():
     for entry in result:
         json['rows'].append({'id': entry.id,
                              'created': entry.created.strftime('%Y-%m-%d %H:%M'),
-                             'level': logging.getLevelName(entry.levelno),
+                             'levelno': logging.getLevelName(entry.levelno),
                              'logger': entry.logger,
                              'message': entry.message})
     return jsonify(json)

@@ -4,16 +4,17 @@
 <script type=text/javascript>
     $(function(){
         $("#logarea").jqGrid({
-            url:'/log/_get_logdata.json',
+            url:"{{ url_for('get_logdata') }}",
             datatype: 'json',
             mtype: 'GET',
             colNames: ['Date','Level','Logger','Message'],
             colModel: [
-                {name:'created', width:150},
-                {name:'level', width:65},
-                {name:'logger', width:100},
-                {name:'message', width:900}
+                {name:'created', width:150, align: 'right'},
+                {name:'levelno', width:65, sortable: false},
+                {name:'logger', width:100, sortable: false},
+                {name:'message', width:900, sortable: false}
             ],
+            pager: '#pager',
             autowidth: true,
             height: 500,
             width: 700,
@@ -34,9 +35,12 @@
             prmNames: {
                 npages: 'npages'
             }
-        });
+        }).navGrid('#pager', {refresh: true, search:false, del:false, edit:false, add:false});
+        //inter = setInterval('refreshGrid();', 10000);
     });
-
+    function refreshGrid(){
+         $("#logarea").trigger("reloadGrid"); // no good, brings up the loading screen
+    }
 </script>
 <h1>FlexGet log messages</h1>
 

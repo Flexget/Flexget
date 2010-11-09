@@ -20,7 +20,7 @@ p {
 
 body {
     background-color: #666;
-    background-image: url('construction.png');
+    background-image: url('/static/img/construction.png');
     background-repeat: repeat-x;
     font-size: 13px;
     font-family: Arial, SunSans-Regular, Sans-Serif;
@@ -46,7 +46,7 @@ a {
     float: left;
     width: 1150px;
     background-color: #fff;
-    background-image:url('menu.png');
+    background-image:url('/static/img/menu.png');
     background-repeat:repeat-y;
 }
 
@@ -66,7 +66,7 @@ a {
 #header
 {
     height: 80px;
-    background: #fff url('FlexGet.png') no-repeat 50% 10px;
+    background: #fff url('/static/img/FlexGet.png') no-repeat 50% 10px;
 }
 
 #footer
