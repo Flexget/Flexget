@@ -21,10 +21,11 @@ class TestExec(FlexGetBase):
             accept_all: yes
           test_adv_format:
             mock:
-              - {title: entry1, location: '/path/with spaces/thefile', quotefield: 'with"quote'}
+              - {title: entry1, location: '/path/with spaces', quotefield: 'with"quote'}
             exec:
               on_download:
-                for_entries: python tests/exec.py '%(temp_dir)s' '%(title)s' '%(location)s' '/the/final destinaton/' "%(quotefield)s"
+                for_entries: python tests/exec.py '%(temp_dir)s' '%(title)s' '%(location)s' '/the/final destinaton/'\
+                                                  "a %(quotefield)s" "/a hybrid %(location)s"
     """
 
     def __init__(self):
@@ -53,8 +54,10 @@ class TestExec(FlexGetBase):
         for entry in self.feed.accepted:
             with open(os.path.join(self.test_home, entry['title']), 'r') as infile:
                 line = infile.readline().rstrip('\n')
-                assert line == '/path/with spaces/thefile', '%s != /path/with spaces/thefile' % line
+                assert line == '/path/with spaces/thefile', '%s != /path/with spaces' % line
                 line = infile.readline().rstrip('\n')
                 assert line == '/the/final-destinaton/', '%s != /the/final destinaton/' % line
                 line = infile.readline().rstrip('\n')
-                assert line == 'with"quote', '%s != with"quote' % line
+                assert line == 'a with"quote', '%s != a with"quote' % line
+                line = infile.readline().rstrip('\n')
+                assert line == '/a hybrid /path/with spaces', '%s != /a hybrid /path/with spaces' % line
