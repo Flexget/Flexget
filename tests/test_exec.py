@@ -17,14 +17,14 @@ class TestExec(FlexGetBase):
             mock:
               - {title: 'replace'}
               - {title: 'replace with spaces'}
-            exec: python tests/exec.py %(temp_dir)s %(title)s
+            exec: python tests/exec.py "%(temp_dir)s" "%(title)s"
             accept_all: yes
           test_adv_format:
             mock:
-              - {title: entry1, location: '/path/with spaces/thefile'}
+              - {title: entry1, location: '/path/with spaces/thefile', quotefield: 'with"quote'}
             exec:
               on_download:
-                for_entries: python tests/exec.py %(temp_dir)s %(title)s %(location)s '/the/final destinaton/'
+                for_entries: python tests/exec.py '%(temp_dir)s' '%(title)s' '%(location)s' '/the/final destinaton/' "%(quotefield)s"
     """
 
     def __init__(self):
@@ -56,3 +56,5 @@ class TestExec(FlexGetBase):
                 assert line == '/path/with spaces/thefile', '%s != /path/with spaces/thefile' % line
                 line = infile.readline().rstrip('\n')
                 assert line == '/the/final-destinaton/', '%s != /the/final destinaton/' % line
+                line = infile.readline().rstrip('\n')
+                assert line == 'with"quote', '%s != with"quote' % line
