@@ -7,13 +7,13 @@ import re
 log = logging.getLogger('exec')
 
 
-class DictQuoteEscaper(dict):
+class EscapingDict(dict):
     """Helper class, same as a dict, but returns all string value with quotes escaped."""
     
     def __getitem__(self, key):
         value = dict.__getitem__(self, key)
         if isinstance(value, basestring):
-            value = re.sub('([\'"])', '\\\1', value)
+            value = re.escape(value)
         return value
 
 
@@ -62,6 +62,7 @@ class PluginExec(object):
             add(name)
 
         adv.accept('boolean', key='fail_entries')
+        adv.accept('boolean', key='auto_escape')
 
         return root
 
@@ -121,8 +122,9 @@ class PluginExec(object):
             for entry in entries:
                 try:
                     cmd = config[event_name][operation]
+                    entrydict = EscapingDict(entry) if config.get('auto_escape') else entry
                     # Do string replacement from entry, but make sure quotes get escaped
-                    cmd = cmd % DictQuoteEscaper(entry)
+                    cmd = cmd % entrydict
                 except KeyError, e:
                     msg = 'Entry %s does not have required field %s' % (entry['title'], e.message)
                     log.error(msg)
