@@ -32,7 +32,8 @@ class Manager(object):
 
         self.initialize()
 
-        log.debug('Default encoding: %s' % sys.getdefaultencoding())
+        log.debug('sys.defaultencoding: %s' % sys.getdefaultencoding())
+        log.debug('sys.getfilesystemencoding: %s' % sys.getfilesystemencoding())
 
     def initialize(self):
         """Separated from __init__ so that unit tests can modify options before loading config."""

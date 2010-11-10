@@ -1,6 +1,6 @@
 import os
 from flexget.feed import Entry
-from flexget.plugin import *
+from flexget.plugin import register_plugin
 from flexget.plugins.cached_input import cached
 import re
 import logging
@@ -8,7 +8,7 @@ import logging
 log = logging.getLogger('tail')
 
 
-class InputTail:
+class InputTail(object):
 
     """
     Parse any text for entries using regular expression.
@@ -23,11 +23,11 @@ class InputTail:
 
     Example:
 
-    text:
+    tail:
       file: ~/irclogs/some/log
       entry:
-        title: TITLE: (.*) URL:"
-        url: URL: (.*)
+        title: 'TITLE: (.*) URL:'
+        url: 'URL: (.*)'
     """
 
     def validator(self):
@@ -83,7 +83,7 @@ class InputTail:
                             self.format_entry(entry, format_config)
                             feed.entries.append(entry)
                         else:
-                            log.info('Invalid data, entry field %s is already found. Ignoring entry.' % field)
+                            log.info('Invalid data, entry field %s is already found once. Ignoring entry.' % field)
                         # start new entry
                         entry = Entry()
                         used = {}
