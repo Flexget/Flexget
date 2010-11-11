@@ -211,7 +211,6 @@ class EqualsValidator(Validator):
         self.valid = value
 
     def validateable(self, data):
-        from numbers import Number as number
         return isinstance(data, (basestring, int, float))
 
     def validate(self, data):
