@@ -668,10 +668,10 @@ class FilterSeries(SeriesPlugin):
         # helper function, iterate entry fields in certain order
         def field_order(x):
             order = ['title', 'description']
-            return order.index(x[0]) if x in order else len(order)
+            return order.index(x[0]) if x[0] in order else len(order)
 
         # don't try to parse these fields
-        ignore_fields = ['uid', 'guid', 'feed', 'url', 'original_url', 'type', 'quality', 'series_name']
+        ignore_fields = ['uid', 'guid', 'feed', 'url', 'original_url', 'type', 'quality', 'series_name', 'series_id', 'accepted_by', 'reason']
 
         # key: series (episode) identifier ie. S01E02
         # value: seriesparser
