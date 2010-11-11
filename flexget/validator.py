@@ -212,7 +212,7 @@ class EqualsValidator(Validator):
 
     def validateable(self, data):
         from numbers import Number as number
-        return isinstance(data, basestring) or isinstance(data, number)
+        return isinstance(data, (basestring, int, float))
 
     def validate(self, data):
         return self.valid == data
@@ -475,7 +475,7 @@ class DictValidator(Validator):
         # v.accept(name, **kwargs)
         self.any_key.append(v)
         return v
-        
+
     def accept_valid_keys(self, name, **kwargs):
         """Accepts key with name type"""
         if not 'key_type' in kwargs:
