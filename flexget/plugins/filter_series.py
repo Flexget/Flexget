@@ -548,6 +548,7 @@ class FilterSeries(SeriesPlugin):
             # convert group series into complex types
             complex_series = []
             if config.get(group_name) == 'all':
+                group_settings['series_guessed'] = True
                 # Generate a list of unique series that metainfo_series has parsed for this feed
                 guessed_series = set()
                 for entry in feed.entries:
@@ -726,7 +727,7 @@ class FilterSeries(SeriesPlugin):
             entry['series_parser'] = parser
             # add series, season and episode to entry
             entry['series_name'] = series_name
-            entry['series_guessed'] = False
+            entry['series_guessed'] = config.get('series_guessed')
             if 'quality' in entry and entry['quality'] != parser.quality:
                 log.warning('Found different quality for %s. Was %s, overriding with %s.' % \
                     (entry['title'], entry['quality'], parser.quality))

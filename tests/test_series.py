@@ -270,7 +270,8 @@ class TestFilterSeries(FlexGetBase):
         self.execute_feed('test_all_series_mode')
         assert self.feed.find_entry('accepted', title='Test.Series.S01E02.PDTV.XViD-FlexGet')
         assert self.feed.find_entry('accepted', title='Test.Series.1x03.PDTV.XViD-FlexGet')
-        assert self.feed.find_entry('accepted', title='Other.Show.S02E01.PDTV.XViD-FlexGet')
+        entry = self.feed.find_entry('accepted', title='Other.Show.S02E01.PDTV.XViD-FlexGet')
+        assert entry['series_guessed']
 
 
 class TestEpisodeAdvancement(FlexGetBase):
