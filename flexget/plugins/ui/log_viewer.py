@@ -71,6 +71,7 @@ def get_logdata():
 
 
 def on_load():
+    # Make the table NOW since otherwise logging to it will crash
     Base.metadata.create_all(bind=manager.engine)
     # Register db handler with base logger
     logger = logging.getLogger()

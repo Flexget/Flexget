@@ -152,13 +152,10 @@ def main():
 
     start_logging(os.path.join(manager.config_base, 'flexget.log'), log_level, quiet=options.quiet)
 
-    try:
-        if options.doc:
-            plugin.print_doc(options.doc)
-        elif options.webui:
-            import webui
-            webui.start(manager)
-        else:
-            manager.execute()
-    finally:
-        manager.shutdown()
+    if options.doc:
+        plugin.print_doc(options.doc)
+    elif options.webui:
+        import webui
+        webui.start(manager)
+    else:
+        manager.execute()

@@ -33,6 +33,9 @@ class Manager(object):
         self.initialize()
 
         log.debug('Default encoding: %s' % sys.getdefaultencoding())
+        
+        import atexit
+        atexit.register(self.shutdown)
 
     def initialize(self):
         """Separated from __init__ so that unit tests can modify options before loading config."""
@@ -268,6 +271,9 @@ class Manager(object):
             if (datetime.now() - lock_time).seconds > 36000:
                 log.warning('Lock file over 10 hour in age, ignoring it ...')
             else:
+                if self.options.autoreload:
+                    log.info('autoreload enabled, ignoring existing lock file')
+                    return
                 if not self.options.quiet:
                     f = file(self.lockfile)
                     pid = f.read()
@@ -283,7 +289,11 @@ class Manager(object):
     def release_lock(self):
         if self.options.log_start:
             log.info('FlexGet stopped (PID: %s)' % os.getpid())
-        os.remove(self.lockfile)
+        if os.path.exists(self.lockfile):
+            os.remove(self.lockfile)
+            log.debug('Removed %s' % self.lockfile)
+        else:
+            log.debug('Lockfile %s not found' % self.lockfile)
 
     def create_feeds(self):
         """Creates instances of all configured feeds"""
@@ -387,6 +397,7 @@ class Manager(object):
 
     def shutdown(self):
         """Application is being exited"""
+        log.debug('Shutting down')
 
         self.engine.dispose()
         # remove temporary database used in test mode

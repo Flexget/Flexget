@@ -3,13 +3,12 @@
 
 <h1>Schedule execution</h1>
 
-<form action="/schedule" method="post" class="data">
-    <p>Please complete the form below.</p>
+<form action="{{ url_for('index') }}" method="post">
     <fieldset class="login">
         <legend>Scheduling</legend>
         <div>
-            <label for="username">Interval</label>
-            <input type="text" id="interval" name="interval" value="1234">
+            <label for="interval">Interval</label>
+            <input type="text" id="interval" name="interval" value="{{ interval }}">
         </div>
     </fieldset>
 

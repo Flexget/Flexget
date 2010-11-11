@@ -108,15 +108,20 @@ def shutdown_session(response):
 def start(mg):
     global manager
     manager = mg
-    # create sqlachemy session
+    # create sqlachemy session for Flask usage
     global db_session
     db_session = scoped_session(sessionmaker(autocommit=False,
                                              autoflush=False,
                                              bind=manager.engine))
     if db_session is None:
         raise Exception('db_session is None')
-    # initialize
+    # initialize manager
     manager.create_feeds()
     load_ui_plugins()
+    # quick hack: since ui plugins may add tables to SQLAlchemy too and they're not initialized because create
+    # was called when instantiating manager .. so we need to call it again
+    from flexget.manager import Base
+    Base.metadata.create_all(bind=manager.engine)
+    # start Flask
     app.secret_key = os.urandom(24)
-    app.run(host='0.0.0.0', port=5050, use_reloader=False, debug=True)
+    app.run(host='0.0.0.0', port=5050, use_reloader=manager.options.autoreload, debug=True)
