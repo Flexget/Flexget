@@ -112,13 +112,17 @@ def common_name(name):
     return get(name).name
 
 
-def parse_quality(title, exact=False):
-    """Find the highest know quality in a given string"""
+def quality_match(title, exact=False):
     qualities.sort(reverse=True)
     for qual in qualities:
         match = qual.regexp.search(title)
         if match:
             # If exact mode make sure quality identifier is the entire string.
             if not exact or match.span(0) == (0, len(title)):
-                return qual
-    return UnknownQuality()
+                return qual, match
+    return UnknownQuality(), None
+
+
+def parse_quality(title, exact=False):
+    """Find the highest know quality in a given string"""
+    return quality_match(title, exact)[0]

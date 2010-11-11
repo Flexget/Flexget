@@ -91,9 +91,9 @@ class TestMetainfoSeries(FlexGetBase):
           test:
             mock:
               - {title: 'FlexGet.S01E02.TheName.HDTV.xvid'}
-              - {title: 'Some.Series.S03E14.Title.Here.720p'}
+              - {title: 'some.series.S03E14.Title.Here.720p'}
               - {title: '[the.group] Some.Series.S03E15.Title.Two.720p'}
-              - {title: 'HD 720p: Some.Series.S03E16.Title.Three'}
+              - {title: 'HD 720p: Some series.S03E16.Title.Three'}
               - {title: 'Something.Season.2.1of4.Ep.Title.HDTV.torrent'}
           false_positives:
             mock:
@@ -110,8 +110,9 @@ class TestMetainfoSeries(FlexGetBase):
 
     def test_metainfo_series(self):
         """Metainfo series: name/episode"""
+        # We search for series name in title case to make sure case is being normalized
         self.execute_feed('test')
-        assert self.feed.find_entry(series_name='FlexGet', series_season=1, series_episode=2, quality='hdtv'), \
+        assert self.feed.find_entry(series_name='Flexget', series_season=1, series_episode=2, quality='hdtv'), \
             'Failed to parse series info'
         assert self.feed.find_entry(series_name='Some Series', series_season=3, series_episode=14, quality='720p'), \
             'Failed to parse series info'

@@ -51,6 +51,8 @@ class MetainfoSeries(object):
                 # Replace . and _ with spaces
                 name = re.sub('[\._]', ' ', name)
                 name = ' '.join(name.split())
+                # Normalize capitalization to title case
+                name = name.title()
                 # If we didn't get a series name, return
                 if not name:
                     return

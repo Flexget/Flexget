@@ -224,6 +224,7 @@ class TestFilterSeries(FlexGetBase):
               - {title: 'Test.Series.S01E02.PDTV.XViD-FlexGet'}
               - {title: 'Test.Series.1x03.PDTV.XViD-FlexGet'}
               - {title: 'Other.Show.S02E01.PDTV.XViD-FlexGet'}
+              - {title: 'other show season 2 episode 2'}
             series: all
     """
 
@@ -257,7 +258,7 @@ class TestFilterSeries(FlexGetBase):
         # Make sure the metainfo_series plugin is working first
         entry = self.feed.find_entry('entries', title='Other.Show.with.extra.crap.S02E01.PDTV.XViD-FlexGet')
         assert entry['series_guessed'], 'series should have been guessed'
-        assert entry['series_name'] == entry['series_parser'].name == 'Other Show with extra crap', \
+        assert entry['series_name'] == entry['series_parser'].name == 'Other Show With Extra Crap', \
             'metainfo_series is not running'
         # Make sure the good series data overrode metainfo data for the listed series
         entry = self.feed.find_entry('accepted', title='Test.Series.with.extra.crap.S01E02.PDTV.XViD-FlexGet')
@@ -272,6 +273,9 @@ class TestFilterSeries(FlexGetBase):
         assert self.feed.find_entry('accepted', title='Test.Series.1x03.PDTV.XViD-FlexGet')
         entry = self.feed.find_entry('accepted', title='Other.Show.S02E01.PDTV.XViD-FlexGet')
         assert entry['series_guessed']
+        entry2 = self.feed.find_entry('accepted', title='other show season 2 episode 2')
+        # Make sure case is normalized so series are marked with the same name no matter the case in the title
+        assert entry['series_name'] == entry2['series_name'] == 'Other Show', 'Series names should be in title case'
 
 
 class TestEpisodeAdvancement(FlexGetBase):
@@ -975,15 +979,15 @@ class TestSeriesPremiere(FlexGetBase):
         feeds:
           test:
             mock:
-              - {title: 'FooBar.S01E01.PDTV-FlexGet'}
-              - {title: 'FooBar.S01E11.1080p-FlexGet'}
-              - {title: 'FooBar.S02E02.HR-FlexGet'}
+              - {title: 'Foobar.S01E01.PDTV-FlexGet'}
+              - {title: 'Foobar.S01E11.1080p-FlexGet'}
+              - {title: 'Foobar.S02E02.HR-FlexGet'}
     """
 
     def testOnlyPremieres(self):
         """Test series premiere"""
         self.execute_feed('test')
-        assert self.feed.find_entry('accepted', title='FooBar.S01E01.PDTV-FlexGet', \
-            series_name='FooBar', series_season=1, series_episode=1), 'Series premiere should have been accepted'
+        assert self.feed.find_entry('accepted', title='Foobar.S01E01.PDTV-FlexGet', \
+            series_name='Foobar', series_season=1, series_episode=1), 'Series premiere should have been accepted'
         assert len(self.feed.accepted) == 1
     # TODO: Add more tests, test interaction with series plugin and series_exists
