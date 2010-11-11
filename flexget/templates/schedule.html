@@ -3,18 +3,17 @@
 
 <h1>Schedule execution</h1>
 
-<form action="{{ url_for('index') }}" method="post">
-    <fieldset class="login">
+<form action="{{ url_for('index') }}" method="post" class="simple">
+    <fieldset>
         <legend>Scheduling</legend>
         <div>
             <label for="interval">Interval</label>
             <input type="text" id="interval" name="interval" value="{{ interval }}">
         </div>
+        <div class="buttons">
+            <button type="submit" id="submit">Submit</button>
+        </div>
     </fieldset>
-
-    <div>
-        <button type="submit" id="submit">Submit</button>
-    </div>
 </form>
 
 {% endblock %}
