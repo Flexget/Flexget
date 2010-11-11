@@ -37,6 +37,7 @@ class OutputDeluge(object):
         deluge.accept('boolean', key='addpaused')
         deluge.accept('boolean', key='compact')
         deluge.accept('text', key='content_filename')
+        deluge.accept('boolean', key='main_file_only')
         deluge.accept('boolean', key='enabled')
         return root
 
@@ -73,7 +74,7 @@ class OutputDeluge(object):
             'queuetotop': 'boolean', 'label': 'text', 'automanaged': 'boolean', \
             'maxupspeed': 'decimal', 'maxdownspeed': 'decimal', 'maxupslots': 'number', \
             'maxconnections': 'number', 'ratio': 'decimal', 'removeatratio': 'boolean', \
-            'addpaused': 'boolean', 'compact': 'boolean', 'content_filename': 'text'})
+            'addpaused': 'boolean', 'compact': 'boolean', 'content_filename': 'text', 'main_file_only': 'boolean'})
         if self.deluge12 is None:
             logger = log.info if feed.manager.options.test else log.debug
             try:
@@ -116,7 +117,7 @@ class OutputDeluge(object):
             if os.path.exists(entry.get('file', '')):
                 # Check if downloaded file is a valid torrent file
                 try:
-                    info = deluge.ui.common.TorrentInfo(entry['file'])
+                    deluge.ui.common.TorrentInfo(entry['file'])
                 except Exception:
                     feed.fail(entry, 'Invalid torrent file')
                     log.error('Torrent file appears invalid for: %s', entry['title'])
@@ -161,7 +162,7 @@ class OutputDeluge(object):
                 opts['download_location'] = os.path.expanduser(path % entry)
             for fopt, dopt in self.options.iteritems():
                 value = entry.get(fopt, config.get(fopt))
-                if value != None:
+                if value is not None:
                     opts[dopt] = value
                     if fopt == 'ratio':
                         opts['stop_at_ratio'] = True
@@ -290,36 +291,42 @@ class OutputDeluge(object):
                     else:
                         dlist.append(client.core.queue_bottom([torrent_id]))
                         log.debug('%s moved to bottom of queue' % entry['title'])
-                if opts.get('content_filename'):
+                if opts.get('content_filename') or opts.get('main_file_only'):
 
                     def on_get_torrent_status(status):
                         """Gets called with torrent status, including file info.
                         Loops through files and renames anything qualifies for content renaming."""
+
+                        def file_exists():
+                            # Checks the download path as well as the move completed path for existence of the file
+                            if os.path.exists(os.path.join(status['save_path'], filename)):
+                                return True
+                            elif status.get('move_on_completed') and status.get('move_on_completed_path'):
+                                if os.path.exists(os.path.join(status['move_on_completed_path'], filename)):
+                                    return True
+                            else:
+                                return False
+
+                        main_file_dlist = []
                         for file in status['files']:
                             # Only rename file if it is > 90% of the content
                             if file['size'] > (status['total_size'] * 0.9):
-                                filename = opts['content_filename'] + os.path.splitext(file['path'])[1]
-                                counter = 1
-
-                                def file_exists():
-                                    # Checks the download path as well as the move completed path for existence of the file
-                                    if os.path.exists(os.path.join(status['save_path'], filename)):
-                                        return True
-                                    elif status.get('move_on_completed') and status.get('move_on_completed_path'):
-                                        if os.path.exists(os.path.join(status['move_on_completed_path'], filename)):
-                                            return True
+                                if opts.get('content_filename'):
+                                    filename = opts['content_filename'] + os.path.splitext(file['path'])[1]
+                                    counter = 1
+                                    if client.is_localhost():
+                                        while file_exists():
+                                            # Try appending a (#) suffix till a unique filename is found
+                                            filename = ''.join([opts['content_filename'], '(', str(counter), ')', os.path.splitext(file['path'])[1]])
+                                            counter += 1
                                     else:
-                                        return False
-
-                                if client.is_localhost():
-                                    while file_exists():
-                                        # Try appending a (#) suffix till a unique filename is found
-                                        filename = ''.join([opts['content_filename'], '(', str(counter), ')', os.path.splitext(file['path'])[1]])
-                                        counter += 1
-                                else:
-                                    log.debug('Cannot ensure content_filename is unique when adding to a remote deluge daemon.')
-                                log.debug('File %s in %s renamed to %s' % (file['path'], entry['title'], filename))
-                                return client.core.rename_files(torrent_id, [(file['index'], filename)])
+                                        log.debug('Cannot ensure content_filename is unique when adding to a remote deluge daemon.')
+                                    log.debug('File %s in %s renamed to %s' % (file['path'], entry['title'], filename))
+                                    main_file_dlist.append(client.core.rename_files(torrent_id, [(file['index'], filename)]))
+                                if opts.get('main_file_only'):
+                                    file_priorities = [1 if f['index'] == file['index'] else 0 for f in status['files']]
+                                    main_file_dlist.append(client.core.set_torrent_file_priorities(torrent_id, file_priorities))
+                                return defer.DeferredList(main_file_dlist)
                         else:
                             log.warning('No files in %s are > 90%% of content size, no files renamed.' % entry['title'])
 
@@ -423,13 +430,13 @@ class OutputDeluge(object):
                 addresult = add_torrent(entry['title'], filedump, opts, magnet)
 
                 # Make a new set of options, that get set after the torrent has been added
-                opts = {}
-                opts['movedone'] = replace_from_entry(entry.get('movedone', config['movedone']), entry, 'movedone', log.error)
-                opts['movedone'] = os.path.expanduser(opts['movedone'])
-                opts['label'] = entry.get('label', config['label']).lower()
-                opts['queuetotop'] = entry.get('queuetotop', config.get('queuetotop'))
                 content_filename = entry.get('content_filename', config.get('content_filename', ''))
-                opts['content_filename'] = replace_from_entry(content_filename, entry, 'content_filename', log.error)
+                movedone = replace_from_entry(entry.get('movedone', config['movedone']), entry, 'movedone', log.error)
+                opts = {'movedone': os.path.expanduser(movedone),
+                        'label': entry.get('label', config['label']).lower(),
+                        'queuetotop': entry.get('queuetotop', config.get('queuetotop')),
+                        'content_filename': replace_from_entry(content_filename, entry, 'content_filename', log.error),
+                        'main_file_only': entry.get('main_file_only', config.get('main_file_only', False))}
 
                 addresult.addCallbacks(on_success, on_fail, callbackArgs=(entry, opts), errbackArgs=(feed, entry))
                 dlist.append(addresult)

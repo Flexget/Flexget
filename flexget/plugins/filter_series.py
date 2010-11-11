@@ -492,6 +492,7 @@ class FilterSeries(SeriesPlugin):
 
         simple = root.accept('list')
         build_list(simple)
+        root.accept('equals').accept('all')
 
         # advanced format:
         #   settings:
@@ -507,6 +508,7 @@ class FilterSeries(SeriesPlugin):
 
         group = advanced.accept_any_key('list')
         build_list(group)
+        advanced.accept_any_key('equals').accept('all')
 
         return root
 
@@ -515,33 +517,23 @@ class FilterSeries(SeriesPlugin):
         This way we don't need to handle two different configuration formats in the logic.
         Applies group settings with advanced form."""
 
-        feed_config = feed.config.get('series', [])
+        config = feed.config.get('series', [])
 
         # generate unified configuration in complex form, requires complex code as well :)
-        config = {}
-        if isinstance(feed_config, list):
+        #config = {}
+        if not isinstance(config, dict):
             # convert simplest configuration internally grouped format
-            config['settings'] = {}
-            config['simple'] = []
-            for series in feed_config:
-                # convert into dict-form if necessary
-                series_settings = {}
-                if isinstance(series, dict):
-                    series, series_settings = series.items()[0]
-                    if series_settings is None:
-                        raise Exception('Series %s has unexpected \':\'' % series)
-                config['simple'].append({series: series_settings})
+            config = {'simple': config,
+                      'settings': {}}
         else:
             # already in grouped format, just get settings from there
-            import copy
-            config = copy.deepcopy(feed_config)
             if not 'settings' in config:
                 config['settings'] = {}
 
         # TODO: what if same series is configured in multiple groups?!
 
         # generate quality settings from group name and empty settings if not present (required)
-        for group_name, _ in config.iteritems():
+        for group_name in config:
             if group_name == 'settings':
                 continue
             if not group_name in config['settings']:
@@ -555,23 +547,33 @@ class FilterSeries(SeriesPlugin):
         for group_name, group_settings in config['settings'].iteritems():
             # convert group series into complex types
             complex_series = []
-            for series in config.get(group_name, []):
-                # convert into dict-form if necessary
-                series_settings = {}
-                if isinstance(series, dict):
-                    series, series_settings = series.items()[0]
-                    if series_settings is None:
-                        raise Exception('Series %s has unexpected \':\'' % series)
-                # make sure series name is a string to accomadate for "24"
-                if not isinstance(series, basestring):
-                    series = str(series)
-                # if series have given path instead of dict, convert it into a dict
-                if isinstance(series_settings, basestring):
-                    series_settings = {'path': series_settings}
-                # merge group settings into this series settings
-                from flexget.utils.tools import merge_dict_from_to
-                merge_dict_from_to(group_settings, series_settings)
-                complex_series.append({series: series_settings})
+            if config.get(group_name) == 'all':
+                # Generate a list of unique series that metainfo_series has parsed for this feed
+                guessed_series = set()
+                for entry in feed.entries:
+                    if entry.get('series_guessed') and entry.get('series_name'):
+                        guessed_series.add(entry['series_name'])
+                # Generate a series group containing all guessed series names from the feed
+                for series in guessed_series:
+                    complex_series.append({series: group_settings})
+            else:
+                for series in config.get(group_name, []):
+                    # convert into dict-form if necessary
+                    series_settings = {}
+                    if isinstance(series, dict):
+                        series, series_settings = series.items()[0]
+                        if series_settings is None:
+                            raise Exception('Series %s has unexpected \':\'' % series)
+                    # make sure series name is a string to accomadate for "24"
+                    if not isinstance(series, basestring):
+                        series = str(series)
+                    # if series have given path instead of dict, convert it into a dict
+                    if isinstance(series_settings, basestring):
+                        series_settings = {'path': series_settings}
+                    # merge group settings into this series settings
+                    from flexget.utils.tools import merge_dict_from_to
+                    merge_dict_from_to(group_settings, series_settings)
+                    complex_series.append({series: series_settings})
             # add generated complex series into config
             config[group_name] = complex_series
 
