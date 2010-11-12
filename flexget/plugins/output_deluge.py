@@ -490,6 +490,8 @@ class OutputDeluge(object):
         if not 'download' in feed.config:
             download = get_plugin_by_name('download')
             download.instance.cleanup_temp_files(feed)
+        # stop the reactor when we abort
+        self.on_process_end(feed)
 
     def on_process_end(self, feed):
         """Shut down the twisted reactor after all feeds have run."""

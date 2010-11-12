@@ -378,7 +378,7 @@ class Manager(object):
         for name, feed in self.feeds.iteritems():
             if not feed.enabled:
                 continue
-            if name in failed:
+            if name in failed or feed._abort:
                 continue
             try:
                 log.log(5, 'calling process_end on a feed %s' % name)
