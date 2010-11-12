@@ -12,7 +12,10 @@ class TestQualityParser(object):
                 ('Test.File.720p.h264.web.dl', '720p web-dl'),
                 ('Test.File.web-dl', 'web-dl'),
                 ('Test.File.720P', '720p'),
-                ('Test.File.1920x1080', '1080p')]
+                ('Test.File.1920x1080', '1080p'),
+                ('Test File blurayrip', 'bdrip'),
+                ('Test.File.br-rip', 'bdrip')]
+
         for item in items:
             quality = quals.parse_quality(item[0]).name
             assert quality == item[1], 'quality should be %s not %s' % (item[1], quality)
