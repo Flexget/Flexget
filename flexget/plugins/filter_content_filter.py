@@ -45,6 +45,15 @@ class CFFile(Base):
 
 
 class FilterContentFilter(object):
+    """
+    Rejects entries based on the filenames in the content. Torrent files only right now.
+
+    Example:
+    content_filter:
+      require:
+        - '*.avi'
+        - '*.mkv'
+    """
 
     def validator(self):
         from flexget import validator

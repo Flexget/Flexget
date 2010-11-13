@@ -46,8 +46,9 @@ class SeriesParser(TitleParser):
                  '(\d{1,3})\s?x\s?(0+)[^1-9]', # 5x0
                  'S(\d{1,3})D(\d{1,3})', # S3D1
                  '(\d{1,3})\s?x\s?(all)', # 1xAll
-                 'season(?:s)?\s?\d\s?(?:&\s?\d)?[\s-]*complete',
+                 'season(?:s)?\s?\d\s?(?:&\s?\d)?[\s-]*(?:complete|full)',
                  'seasons\s(\d\s){2,}',
+                 'disc\s\d',
                  's\d+.?e\d+-\d+'] # S6 E1-4
         self.id_regexps = [
                 '(\d{4})%s(\d+)%s(\d+)' % (separators, separators),
@@ -172,7 +173,7 @@ class SeriesParser(TitleParser):
             return
 
 
-        # remove series name from raw data, move any prefix to end of string 
+        # remove series name from raw data, move any prefix to end of string
         data_noname = self.data[name_end:] + ' ' + self.data[:name_start]
         data_noname = data_noname.lower()
         log.debug('data noname: %s' % data_noname)
@@ -216,7 +217,7 @@ class SeriesParser(TitleParser):
             if part in self.specials:
                 self.special = True
                 data_parts.remove(part)
-        
+
         data = ' '.join(data_parts)
 
         log.debug("data for id/ep parsing '%s'" % data)
