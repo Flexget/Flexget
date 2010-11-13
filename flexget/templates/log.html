@@ -1,4 +1,16 @@
 {% extends "layout.html" %}
+{% block head %}
+    <link rel="stylesheet" href="/static/css/ui.jqgrid.css" type="text/css" media="screen"/>
+    <script type="text/javascript" src="/static/js/grid.locale-en.js"></script>
+    <script type="text/javascript" src="/static/js/jquery.jqGrid.min.js"></script>
+    <style type="text/css">
+        .ui-jqgrid tr.jqgrow td {
+            white-space: normal !important;
+        }
+
+    </style>
+{% endblock %}
+
 {% block main %}
 
 <script type=text/javascript>

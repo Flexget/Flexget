@@ -249,7 +249,7 @@ class Feed(object):
             log.error('Failed %s (%s)' % (entry['title'], reason))
             # Run on_entry_fail event
             self.__run_event('fail', entry=entry, reason=reason)
-            
+
     def trace(self, entry, message):
         """Add tracing message to entry."""
         entry.trace.append((self.current_plugin, message))
@@ -442,10 +442,23 @@ class Feed(object):
         self.__run_event('process_end')
 
     def validate(self):
-        """Plugin configuration validation. Return array of error messages that were detected."""
+        """Called during feed execution. Validates config, prints errors and aborts feed if invalid."""
+        errors = self.validate_config(self.config)
+        # log errors and abort
+        if errors:
+            log.critical('Feed \'%s\' has configuration errors:' % self.name)
+            for error in errors:
+                log.error(error)
+            # feed has errors, abort it
+            self.abort()
+        return errors
+
+    @staticmethod
+    def validate_config(config):
+        """Plugin configuration validation. Return list of error messages that were detected."""
         validate_errors = []
         # validate all plugins
-        for keyword in self.config:
+        for keyword in config:
             if keyword.startswith('_'):
                 continue
             try:
@@ -463,18 +476,10 @@ class Feed(object):
                 if not validator.name == 'root':
                     # if validator is not root type, add root validator as it's parent
                     validator = validator.add_root_parent()
-                if not validator.validate(self.config[keyword]):
+                if not validator.validate(config[keyword]):
                     for msg in validator.errors.messages:
                         validate_errors.append('%s %s' % (keyword, msg))
             else:
                 log.warning('Used plugin %s does not support validating. Please notify author!' % keyword)
-
-        # log errors and abort
-        if validate_errors:
-            log.critical('Feed \'%s\' has configuration errors:' % self.name)
-            for error in validate_errors:
-                log.error(error)
-            # feed has errors, abort it
-            self.abort()
 
         return validate_errors

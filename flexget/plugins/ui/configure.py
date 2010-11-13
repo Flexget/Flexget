@@ -1,4 +1,5 @@
 from flexget.webui import manager, register_plugin
+from flexget.feed import Feed
 from flask import render_template, request, flash, Module
 import yaml
 
@@ -20,15 +21,24 @@ def index():
 def edit(root, name):
     config = manager.config[root][name]
 
-    if request.method == 'POST':
-        # TODO: validate configuration
-        flash('Configuration saved')
-        config = yaml.load(request.form['config'])
-
     context = {
         'name': name,
-        'root': root,
-        'config': yaml.dump(config, Dumper=FGDumper, default_flow_style=False)}
+        'root': root}
+
+    if request.method == 'POST':
+        # TODO: validate configuration
+        config = yaml.load(request.form['config'])
+        errors = Feed.validate_config(config)
+        if not errors:
+            # If no errors are returned from validator
+            flash('Configuration saved')
+            context['config'] = yaml.dump(config, Dumper=FGDumper, default_flow_style=False)
+        else:
+            flash('Invalid config')
+            context['config'] = request.form['config']
+            context['errors'] = errors
+    else:
+        context['config'] = yaml.dump(config, Dumper=FGDumper, default_flow_style=False)
 
     return render_template('configure_edit.html', **context)
 
