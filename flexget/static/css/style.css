@@ -14,25 +14,27 @@ html {
 
 }
 
+#layout {
+    background: url('/static/img/construction.png') repeat-x;
+    padding: 0 20px;
+}
+
 p {
     margin-bottom: 0.8em;
 }
 
 body {
-    background-color: #666;
-    background-image: url('/static/img/construction.png');
-    background-repeat: repeat-x;
+    background-image: url('/static/img/background.gif');
     font-size: 13px;
     font-family: Arial, SunSans-Regular, Sans-Serif;
-    padding: 0 20px;
+    padding: 0;
     margin: 0;
 }
 
 h1 {
     font-size: 14px;
     text-transform: uppercase;
-    margin: 0;
-    margin-bottom: 1em;
+    margin: 0 0 1em;
 }
 
 a {
@@ -45,9 +47,7 @@ a {
 #content-container {
     float: left;
     width: 1150px;
-    background-color: #fff;
-    background-image:url('/static/img/menu.png');
-    background-repeat:repeat-y;
+    background: #fff url('/static/img/menu.png') repeat-y;
 }
 
 #menu {
@@ -78,6 +78,8 @@ a {
     margin-bottom: 2em;
 }
 
+/* flash messaging */
+
 #flash {
     background: #FEA662;
     padding: 1em;
@@ -86,7 +88,18 @@ a {
 }
 
 #flash ul {
-    margin-left: 1em;
+}
+
+#flash ul li.error {
+    padding-left: 1.8em;
+    background: url('/static/img/fatcow-icons/16x16/exclamation.png') no-repeat;
+    list-style: none;
+}
+
+#flash ul li.info {
+    padding-left: 1.8em;
+    background: url('/static/img/fatcow-icons/16x16/information.png') no-repeat;
+    list-style: none;
 }
 
 /* search results */

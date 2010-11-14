@@ -2,8 +2,11 @@ from flexget.webui import manager, register_plugin
 from flexget.feed import Feed
 from flask import render_template, request, flash, Module
 import yaml
+import logging
 
 configure = Module(__name__, url_prefix='/configure')
+
+log = logging.getLogger('ui.configure')
 
 
 class FGDumper(yaml.Dumper):
@@ -19,25 +22,30 @@ def index():
 
 @configure.route('/<root>/<name>', methods=['POST', 'GET'])
 def edit(root, name):
-    config = manager.config[root][name]
 
     context = {
         'name': name,
         'root': root}
 
     if request.method == 'POST':
-        # TODO: validate configuration
-        config = yaml.load(request.form['config'])
-        errors = Feed.validate_config(config)
-        if not errors:
-            # If no errors are returned from validator
-            flash('Configuration saved')
-            context['config'] = yaml.dump(config, Dumper=FGDumper, default_flow_style=False)
+        context['config'] = request.form['config']
+        try:
+            config = yaml.load(request.form['config'])
+        except yaml.scanner.ScannerError, e:
+            flash('Invalid YAML document: %s' % e, 'error')
+            log.exception(e)
         else:
-            flash('Invalid config')
-            context['config'] = request.form['config']
-            context['errors'] = errors
+            # valid yaml, not run validator
+            errors = Feed.validate_config(config)
+            if errors:
+                for error in errors:
+                    flash(error, 'error')
+                context['config'] = request.form['config']
+            else:
+                flash('Configuration saved', 'info')
+                context['config'] = yaml.dump(config, Dumper=FGDumper, default_flow_style=False)
     else:
+        config = manager.config[root][name]
         context['config'] = yaml.dump(config, Dumper=FGDumper, default_flow_style=False)
 
     return render_template('configure_edit.html', **context)

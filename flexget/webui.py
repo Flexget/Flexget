@@ -38,7 +38,7 @@ def start():
 def flexget_variables():
     path = urllib.splitquery(request.path)[0]
     root = '/' + path.split('/', 2)[1]
-    log.debug('root is: %s' % root)
+    # log.debug('root is: %s' % root)
     _update_menu(root)
     return {'menu': _menu, 'manager': manager}
 
@@ -76,6 +76,10 @@ def load_ui_plugins():
 
 
 def register_plugin(plugin, url_prefix=None, menu=None, order=128, home=False):
+    """Registers UI plugin.
+    :plugin: Flask Module instance for the plugin
+    """
+    log.info('Registering UI plugin %s' % plugin.name)
     url_prefix = url_prefix or '/' + plugin.name
     app.register_module(plugin, url_prefix=url_prefix)
     if menu:
@@ -90,9 +94,10 @@ def register_menu(href, caption, order=128):
     _menu = sorted(_menu, key=lambda item: item['order'])
 
 
-def register_home(route):
-    """Registers homepage for web ui"""
+def register_home(route, order=128):
+    """Registers homepage elements"""
     global _home
+    # TODO: currently supports only one plugin
     if _home is not None:
         raise Exception('Home is already registered')
     _home = route

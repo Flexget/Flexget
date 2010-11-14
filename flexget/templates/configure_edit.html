@@ -4,12 +4,6 @@
 <p>Fully UI-based editing will be implemented later</p>
 
 <form action="/configure/{{ root }}/{{ name }}" method="post">
-    {% if errors %}
-        <ul class="ui-state-error">
-        {% for error in errors %}<li>{{ error }}{% endfor %}
-        </ul>
-    {% endif %}
-
     <textarea name="config" cols=80 rows=25 spellcheck="false" wrap="off">{{ config }}</textarea>
     <div>
         <button type="submit" id="submit">Submit</button>
