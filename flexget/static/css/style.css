@@ -90,6 +90,10 @@ a {
 #flash ul {
 }
 
+#flash ul li { /* fallback when without category */
+    margin-left: 1.2em;
+}
+
 #flash ul li.error {
     padding-left: 1.8em;
     background: url('/static/img/fatcow-icons/16x16/exclamation.png') no-repeat;
@@ -105,21 +109,21 @@ a {
 /* search results */
 
 table.search-results {
-    border: 0px none gray;
+    border: 0 none gray;
     border-spacing: 1px;
     border-collapse: separate;
 	background-color: white;
     width: 100%;
 }
 table.search-results th {
-    border: 0px none gray;
+    border: 0 none gray;
     padding: 3px;
     background-color: #000;
     color: #fff;
     text-align: left;
 }
 table.search-results td {
-    border: 0px none gray;
+    border: 0 none gray;
     padding: 3px;
     background-color: rgb(204, 204, 204);
 }
