@@ -27,13 +27,13 @@ def save_opener(f):
     return new_f
 
 
-class PluginTransmissionrpc:
+class PluginTransmission(object):
     """
       Add url from entry url to transmission
 
       Example:
 
-      transmissionrpc:
+      transmission:
         host: localhost
         port: 9091
         netrc: /home/flexget/.tmnetrc
@@ -44,7 +44,7 @@ class PluginTransmissionrpc:
 
     Default values for the config elements:
 
-    transmissionrpc:
+    transmission:
         host: localhost
         port: 9091
         enabled: yes
@@ -77,7 +77,7 @@ class PluginTransmissionrpc:
         return root
 
     def get_config(self, feed):
-        config = feed.config['transmissionrpc']
+        config = feed.config['transmission']
         if isinstance(config, bool):
             config = {'enabled': config}
         config.setdefault('enabled', True)
@@ -94,7 +94,9 @@ class PluginTransmissionrpc:
             from transmissionrpc import TransmissionError
             from transmissionrpc import HTTPHandlerError
         except:
-            raise PluginError('Transmissionrpc module version 0.5 or higher required.', log)
+            raise PluginError('Transmissionrpc module version 0.6 or higher required.', log)
+        if float(transmissionrpc.__version__) < 0.6:
+            raise PluginError('Transmissionrpc module version 0.6 or higher required, please upgrade', log)
         set_plugin = get_plugin_by_name('set')
         set_plugin.instance.register_keys({'path': 'text', \
                                            'addpaused': 'boolean', \
@@ -308,4 +310,4 @@ class PluginTransmissionrpc:
             download = get_plugin_by_name('download')
             download.instance.cleanup_temp_files(feed)
 
-register_plugin(PluginTransmissionrpc, 'transmissionrpc')
+register_plugin(PluginTransmission, 'transmission')
