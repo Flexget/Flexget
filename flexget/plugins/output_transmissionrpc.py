@@ -91,8 +91,8 @@ class PluginTransmissionrpc:
         """Event handler"""
         try:
             import transmissionrpc
-            from transmissionrpc.transmission import TransmissionError
-            from transmissionrpc.httphandler import HTTPHandlerError
+            from transmissionrpc import TransmissionError
+            from transmissionrpc import HTTPHandlerError
         except:
             raise PluginError('Transmissionrpc module version 0.5 or higher required.', log)
         set_plugin = get_plugin_by_name('set')
@@ -195,8 +195,8 @@ class PluginTransmissionrpc:
 
     def create_rpc_client(self, feed):
         import transmissionrpc
-        from transmissionrpc.transmission import TransmissionError
-        from transmissionrpc.httphandler import HTTPHandlerError
+        from transmissionrpc import TransmissionError
+        from transmissionrpc import HTTPHandlerError
 
         config = self.get_config(feed)
         user, password = None, None
@@ -232,7 +232,7 @@ class PluginTransmissionrpc:
 
     def add_to_transmission(self, cli, feed):
         """Adds accepted entries to transmission """
-        from transmissionrpc.transmission import TransmissionError
+        from transmissionrpc import TransmissionError
         for entry in feed.accepted:
             if feed.manager.options.test:
                 log.info('Would add %s to transmission' % entry['url'])
@@ -265,7 +265,7 @@ class PluginTransmissionrpc:
                 else:
                     r = cli.add(None, filename=entry['url'],
                                 timeout=30, **options['add'])
-                log.info("%s torrent added to transmission" % (entry['title']))
+                log.info('"%s" torrent added to transmission' % (entry['title']))
                 if options['change'].keys():
                     for id in r.keys():
                         cli.change(id, 30, **options['change'])
