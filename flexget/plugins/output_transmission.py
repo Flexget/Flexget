@@ -95,7 +95,7 @@ class PluginTransmission(object):
             from transmissionrpc import HTTPHandlerError
         except:
             raise PluginError('Transmissionrpc module version 0.6 or higher required.', log)
-        if float(transmissionrpc.__version__) < 0.6:
+        if [int(part) for part in transmissionrpc.__version__.split('.')] < [0, 6, 0]:
             raise PluginError('Transmissionrpc module version 0.6 or higher required, please upgrade', log)
         set_plugin = get_plugin_by_name('set')
         set_plugin.instance.register_keys({'path': 'text', \
