@@ -59,7 +59,7 @@ class FilterContentFilter(object):
         from flexget import validator
         config = validator.factory('dict')
         config.accept('text', key='require')
-        config.accept('list', key='requrire').accept('text')
+        config.accept('list', key='require').accept('text')
         config.accept('text', key='reject')
         config.accept('list', key='reject').accept('text')
         config.accept('boolean', key='strict')
