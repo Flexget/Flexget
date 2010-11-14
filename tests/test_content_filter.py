@@ -25,7 +25,9 @@ class TestContentFilter(FlexGetBase):
               - {title: 'test', file: 'tests/test_require1.torrent'}
             accept_all: yes
             content_filter:
-              require: '*.iso'
+              require:
+                - '*.bin'
+                - '*.iso'
 
           test_require2:
             mock:
