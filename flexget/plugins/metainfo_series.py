@@ -15,21 +15,27 @@ class MetainfoSeries(object):
         from flexget import validator
         return validator.factory('boolean')
 
+    # Run after series plugin so we don't try to re-parse it's entries
+    @priority(120)
     def on_feed_metainfo(self, feed):
         # Don't run if we are disabled
         if not feed.config.get('metainfo_series', True):
             return
         for entry in feed.entries:
-            match = self.guess_series(entry['title'])
-            if match:
-                entry['series_name'] = match[0]
-                entry['series_season'] = match[1]
-                entry['series_episode'] = match[2]
-                entry['series_parser'] = match[3]
+            # If series plugin already parsed this, don't touch it.
+            if entry.get('series_name'):
+                continue
+            parser = self.guess_series(entry['title'])
+            if parser:
+                entry['series_name'] = parser.name
+                entry['series_season'] = parser.season
+                entry['series_episode'] = parser.episode
+                entry['series_id'] = parser.identifier
                 entry['series_guessed'] = True
+                entry['series_parser'] = parser
 
     def guess_series(self, title):
-        """Returns tuple of (series_name, season, episode, parser) if found, else None"""
+        """Returns a valid series parser if this etnry appears to be a series"""
 
         parser = SeriesParser()
         # We need to replace certain characters with spaces to make sure episode parsing works right
@@ -49,20 +55,16 @@ class MetainfoSeries(object):
                 # If an episode id is found, assume everything before it is series name
                 name = title[start:match[2].start()]
                 # Replace . and _ with spaces
-                name = re.sub('[\._]', ' ', name)
-                name = ' '.join(name.split())
+                name = re.sub('[\._ ]+', ' ', name).strip()
                 # Normalize capitalization to title case
                 name = name.title()
                 # If we didn't get a series name, return
                 if not name:
                     return
-                season = match[0]
-                episode = match[1]
                 parser.name = name
                 parser.data = title
-                parser.season = season
-                parser.episode = episode
-                parser.valid = True
-                return (name, season, episode, parser)
+                parser.parse()
+                if parser.valid:
+                    return parser
 
 register_plugin(MetainfoSeries, 'metainfo_series', builtin=True)

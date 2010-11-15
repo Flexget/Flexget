@@ -4,7 +4,7 @@ from flexget.utils.titles import SeriesParser, ParseWarning
 from flexget.utils import qualities
 from flexget.manager import Base
 from flexget.plugin import register_plugin, register_parser_option, get_plugin_by_name, get_plugin_keywords, \
-    PluginWarning, PluginError
+    PluginWarning, PluginError, priority
 from sqlalchemy import Column, Integer, String, Unicode, DateTime, Boolean, desc
 from sqlalchemy.schema import ForeignKey
 from sqlalchemy.orm import relation, join
@@ -601,16 +601,11 @@ class FilterSeries(SeriesPlugin):
                         log.info('Auto enabling exact matching for series %s (reason %s)' % (series_name, name))
                         series_config['exact'] = True
 
-    def on_feed_filter(self, feed):
-        """Filter series"""
-
-        # TEMP: bugfix, convert all series to lowercase
-        for series in feed.session.query(Series).all():
-            series.name = series.name.lower()
-
+    # Run after metainfo_quality and before metainfo_series
+    @priority(125)
+    def on_feed_metainfo(self, feed):
         config = self.generate_config(feed)
         self.auto_exact(config)
-
         for group_series in config.itervalues():
             for series_item in group_series:
                 series_name, series_config = series_item.items()[0]
@@ -621,8 +616,50 @@ class FilterSeries(SeriesPlugin):
                 import time
                 start_time = time.clock()
 
-                series = self.parse_series(feed, series_name, series_config)
-                self.process_series(feed, series, series_name, series_config)
+                self.parse_series(feed, series_name, series_config)
+                took = time.clock() - start_time
+                log.log(5, 'parsing %s took %s' % (series_name, took))
+
+    def on_feed_filter(self, feed):
+        """Filter series"""
+        # Parsing was done in metainfo event, create the dicts to pass to process_series from the feed entries
+        # key: series (episode) identifier ie. S01E02
+        # value: seriesparser
+        found_series = {}
+        guessed_series = {}
+        for entry in feed.entries:
+            if entry.get('series_name') and entry.get('series_id') and entry.get('series_parser'):
+                self.parser2entry[entry['series_parser']] = entry
+                target = guessed_series if entry.get('series_guessed') else found_series
+                target.setdefault(entry['series_name'], {}).setdefault(entry['series_id'], []).append(entry['series_parser'])
+
+        # TEMP: bugfix, convert all series to lowercase
+        for series in feed.session.query(Series).all():
+            series.name = series.name.lower()
+
+        config = self.generate_config(feed)
+
+        for group_series in config.itervalues():
+            for series_item in group_series:
+                series_name, series_config = series_item.items()[0]
+                # yaml loads ascii only as str
+                series_name = unicode(series_name)
+                source = guessed_series if series_config.get('series_guessed') else found_series
+                # If we didn't find any episodes for this series, continue
+                if not source.get(series_name):
+                    log.log(5, 'No entries found for %s this run.' % series_name)
+                    continue
+                for id, eps in source[series_name].iteritems():
+                    for parser in eps:
+                        # store found episodes into database and save reference for later use
+                        release = self.store(feed.session, parser)
+                        self.parser2entry[parser]['series_release'] = release
+                log.log(5, 'series_name: %s series_config: %s' % (series_name, series_config))
+
+                import time
+                start_time = time.clock()
+
+                self.process_series(feed, source[series_name], series_name, series_config)
 
                 took = time.clock() - start_time
                 log.log(5, 'processing %s took %s' % (series_name, took))
@@ -673,9 +710,6 @@ class FilterSeries(SeriesPlugin):
         # don't try to parse these fields
         ignore_fields = ['uid', 'guid', 'feed', 'url', 'original_url', 'type', 'quality', 'series_name', 'series_id', 'accepted_by', 'reason']
 
-        # key: series (episode) identifier ie. S01E02
-        # value: seriesparser
-        series = {}
         for entry in feed.entries:
             if entry.get('series_parser') and entry['series_parser'].valid and not entry.get('series_guessed'):
                 # This entry already has a valid series parser, use it. (probably from backlog)
@@ -723,11 +757,10 @@ class FilterSeries(SeriesPlugin):
                     continue
 
             log.debug('%s detected as %s, field: %s' % (entry['title'], parser, parser.field))
-            self.parser2entry[parser] = entry
             entry['series_parser'] = parser
             # add series, season and episode to entry
             entry['series_name'] = series_name
-            entry['series_guessed'] = config.get('series_guessed')
+            entry['series_guessed'] = config.get('series_guessed', False)
             if 'quality' in entry and entry['quality'] != parser.quality:
                 log.warning('Found different quality for %s. Was %s, overriding with %s.' % \
                     (entry['title'], entry['quality'], parser.quality))
@@ -750,19 +783,11 @@ class FilterSeries(SeriesPlugin):
                 set = get_plugin_by_name('set')
                 set.instance.modify(entry, config.get('set'))
 
-            # add this episode into list of available episodes
-            eps = series.setdefault(parser.identifier, [])
-            eps.append(parser)
-
-            # store this episode into database and save reference for later use
-            release = self.store(feed.session, parser)
-            entry['series_release'] = release
-
-        return series
-
     def process_series(self, feed, series, series_name, config):
         """Accept or Reject episode from available releases, or postpone choosing."""
         for eps in series.itervalues():
+            if not eps:
+                continue
             whitelist = []
 
             # sort episodes in order of quality
