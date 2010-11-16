@@ -47,6 +47,13 @@ class MockManager(Manager):
             print 'Invalid configuration'
             raise
 
+    # no lock files with unit testing
+    def acquire_lock(self):
+        pass
+
+    def release_lock(self):
+        pass
+
 
 class FlexGetBase(object):
     __yaml__ = """# Yaml goes here"""
@@ -74,14 +81,14 @@ class FlexGetBase(object):
             if hasattr(self, 'session'):
                 self.feed.session.close() # pylint: disable-msg=E0203
         self.feed = Feed(self.manager, name, config)
-        self.feed.session = Session()
+        # self.feed.session = Session()
         self.feed.process_start()
         if self.feed.enabled:
             self.feed.execute()
         else:
             log.debug('Feed \'%s\' has been disabled, not running' % self.feed.name)
         self.feed.process_end()
-        self.feed.session.commit()
+        # self.feed.session.commit()
 
     def dump(self):
         """Helper method for debugging"""

@@ -3,8 +3,8 @@ from flexget.webui import register_plugin, manager, db_session
 from flexget.manager import Base, Session
 from flask import render_template, Module, jsonify, request
 from sqlalchemy import Column, DateTime, Integer, Unicode, String, asc, desc
-import time
 from datetime import datetime
+from flexget.event import event
 
 log_viewer = Module(__name__)
 
@@ -16,10 +16,10 @@ class LogEntry(Base):
     created = Column(DateTime)
     logger = Column(String)
     levelno = Column(Integer)
-    message = Column(String)
+    message = Column(Unicode)
 
     def __init__(self, record):
-        self.created = datetime.fromtimestamp(record.created) #datetime.now()
+        self.created = datetime.fromtimestamp(record.created)
         self.logger = record.name
         self.levelno = record.levelno
         self.message = record.getMessage()
@@ -70,14 +70,11 @@ def get_logdata():
     return jsonify(json)
 
 
-def on_load():
-    # Make the table NOW since otherwise logging to it will crash
-    Base.metadata.create_all(bind=manager.engine)
+@event('webui.start')
+def initialize():
     # Register db handler with base logger
     logger = logging.getLogger()
     handler = DBLogHandler(Session())
     logger.addHandler(handler)
 
-
-on_load()
 register_plugin(log_viewer, url_prefix='/log', menu='Log', order=256)

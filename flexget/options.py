@@ -28,7 +28,9 @@ class OptionParser(OptParser):
                         help='Disables stdout and stderr output, log file used. Reduces logging level slightly.')
         self.add_option('--webui', action='store_true', dest='webui', default=False,
                         help='Start FlexGet webui prototype')
-                        
+        self.add_option('--port', action='store', type="int", dest='port', default=5050,
+                        help='Run FlexGet webui in port [default: %default]')
+
         # enable flask autoreloading (development)
         self.add_option('--autoreload', action='store_true', dest='autoreload', default=False,
                         help=SUPPRESS_HELP)

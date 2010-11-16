@@ -33,7 +33,7 @@ class Manager(object):
         self.initialize()
 
         log.debug('Default encoding: %s' % sys.getdefaultencoding())
-        
+
         import atexit
         atexit.register(self.shutdown)
 
@@ -41,6 +41,7 @@ class Manager(object):
         """Separated from __init__ so that unit tests can modify options before loading config."""
         self.load_config()
         self.init_sqlalchemy()
+        self.create_feeds()
 
     def load_config(self):
         """Load the configuration file"""
@@ -342,12 +343,9 @@ class Manager(object):
     def execute(self):
         """Iterate trough all feeds and run them."""
 
-        if not self.config:
-            log.critical('Configuration file is empty.')
+        if not self.feeds:
+            log.warning('There are no feeds to execute, please add some feeds')
             return
-
-        # separated for future when flexget runs continuously in the background
-        self.create_feeds()
 
         failed = []
 
@@ -378,10 +376,6 @@ class Manager(object):
                     raise
                 print '**** Keyboard Interrupt ****'
                 return
-            finally:
-                # note: this will cause db rollback if error occurred (session has not been committed)
-                if feed.session:
-                    feed.session.close()
 
         # execute process_end to all feeds
         for name, feed in self.feeds.iteritems():

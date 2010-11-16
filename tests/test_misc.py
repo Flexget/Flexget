@@ -144,7 +144,7 @@ class TestDownload(FlexGetBase):
         assert os.path.exists(self.testfile), 'download file does not exists'
 
 
-class TestEntryUnicodeError(FlexGetBase):
+class TestEntryUnicodeError(object):
 
     @raises(EntryUnicodeError)
     def test_encoding(self):

@@ -134,28 +134,33 @@ class Feed(object):
         """
             Represents one feed in configuration.
 
-            name - name of the feed
-            config - yaml configuration (dict)
+            :name: name of the feed
+            :config: feed configuration (dict)
         """
         self.name = unicode(name)
         self.config = config
         self.manager = manager
-        self.enabled = True
-        self.session = None
-
-        self.priority = 65535
 
         # simple persistence
         self.simple_persistence = SimplePersistence(self)
 
+        # use reset to init variables when creating
+        self._reset()
+
+    def _reset(self):
+        """Reset feed state"""
+        log.debug('reseting')
+        self.enabled = True
+        self.session = None
+        self.priority = 65535
+
         # undecided entries in the feed (created by input)
         self.entries = []
 
-        # You should NOT change these arrays, use reject / accept methods!
-
+        # You should NOT change these arrays, use reject, accept and fail methods!
         self.accepted = [] # accepted entries, can still be rejected
         self.rejected = [] # rejected entries
-        self.failed = []
+        self.failed = []   # failed entries
 
         # TODO: feed.abort() should be done by using exception? not a flag that has to be checked everywhere
 
@@ -292,7 +297,7 @@ class Feed(object):
         """
         if isinstance(self.config[keyword], dict):
             if not 'url' in self.config[keyword]:
-                raise Exception('Input %s has invalid configuration, url is missing.' % keyword)
+                raise PluginError('Input %s has invalid configuration, url is missing.' % keyword)
             return self.config[keyword]['url']
         else:
             return self.config[keyword]
@@ -378,10 +383,16 @@ class Feed(object):
     def execute(self):
         """Execute this feed"""
 
+        log.debug('excecuting %s' % self.name)
+
+        self._reset()
+
         # validate configuration
         errors = self.validate()
-        if self._abort:
+        if self._abort: # todo: bad practice
             return
+        if errors and self.manager.unit_test: # todo: bad practice
+            raise Exception('configuration errors')
         if self.manager.options.validate:
             if not errors:
                 print 'Feed \'%s\' passed' % self.name
@@ -390,38 +401,43 @@ class Feed(object):
         log.debug('starting session')
         self.session = Session()
 
-        # run events
-        for event in FEED_EVENTS:
-            # when learning, skip few events
-            if self.manager.options.learn:
-                if event in ['download', 'output']:
-                    # log keywords not executed
-                    plugins = get_plugins_by_event(event)
-                    for plugin in plugins:
-                        if plugin.name in self.config:
-                            log.info('Plugin %s is not executed because of --learn / --reset' % (plugin.name))
-                    continue
+        try:
+            # run events
+            for event in FEED_EVENTS:
+                # when learning, skip few events
+                if self.manager.options.learn:
+                    if event in ['download', 'output']:
+                        # log keywords not executed
+                        plugins = get_plugins_by_event(event)
+                        for plugin in plugins:
+                            if plugin.name in self.config:
+                                log.info('Plugin %s is not executed because of --learn / --reset' % (plugin.name))
+                        continue
 
-            # run all plugins with this event
-            self.__run_event(event)
+                # run all plugins with this event
+                self.__run_event(event)
 
-            # if abort flag has been set feed should be aborted now
-            if self._abort:
-                return
+                # if abort flag has been set feed should be aborted now
+                if self._abort:
+                    return
 
-            # verbose some progress
-            if event == 'input':
-                if not self.entries:
-                    self.verbose_progress('Feed didn\'t produce any entries. This is likely due to a mis-configured or non-functional input.')
-                else:
-                    self.verbose_progress('Produced %s entries.' % (len(self.entries)))
-            if event == 'filter':
-                self.verbose_progress('Accepted: %s (Rejected: %s Undecided: %s Failed: %s)' % \
-                    (len(self.accepted), len(self.rejected), \
-                    len(self.entries) - len(self.accepted), len(self.failed)))
+                # verbose some progress
+                if event == 'input':
+                    if not self.entries:
+                        self.verbose_progress('Feed didn\'t produce any entries. This is likely due to a mis-configured or non-functional input.')
+                    else:
+                        self.verbose_progress('Produced %s entries.' % (len(self.entries)))
+                if event == 'filter':
+                    self.verbose_progress('Accepted: %s (Rejected: %s Undecided: %s Failed: %s)' % \
+                        (len(self.accepted), len(self.rejected), \
+                        len(self.entries) - len(self.accepted), len(self.failed)))
 
-        log.debug('committing session, abort=%s' % self._abort)
-        self.session.commit()
+            log.debug('committing session, abort=%s' % self._abort)
+            self.session.commit()
+        except:
+            log.debug('db rollback on exception')
+            self.session.close()
+            raise
 
         # display performance
         if self.manager.options.debug_perf:

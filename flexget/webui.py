@@ -4,6 +4,7 @@ import urllib
 from flask import Flask, redirect, url_for, abort, request
 from sqlalchemy.orm import scoped_session
 from sqlalchemy.orm.session import sessionmaker
+from flexget.event import fire_event
 
 log = logging.getLogger('webui')
 
@@ -127,6 +128,10 @@ def start(mg):
     # was called when instantiating manager .. so we need to call it again
     from flexget.manager import Base
     Base.metadata.create_all(bind=manager.engine)
+
+    fire_event('webui.start')
+
     # start Flask
     app.secret_key = os.urandom(24)
-    app.run(host='0.0.0.0', port=5050, use_reloader=manager.options.autoreload, debug=True)
+    app.run(host='0.0.0.0', port=manager.options.port,
+            use_reloader=manager.options.autoreload, debug=manager.options.debug)

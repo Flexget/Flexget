@@ -2,10 +2,12 @@ from tests import FlexGetBase
 from flexget.plugin import PluginDependencyError
 from nose.tools import raises
 
-class TestPluginApi(FlexGetBase):
+
+class TestPluginApi(object):
     """
     Contains plugin api related tests
     """
+
     @raises(PluginDependencyError)
     def test_unknown_plugin(self):
         from flexget.plugin import get_plugin_by_name
