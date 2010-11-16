@@ -1,11 +1,12 @@
 import logging
-from flexget.plugin import register_plugin, internet, get_plugin_by_name, PluginError
+from flexget.plugin import register_plugin, internet
 from flexget.manager import Base, Session
 from flexget.utils.tools import urlopener
 from BeautifulSoup import BeautifulStoneSoup
 from sqlalchemy import Column, Integer, Unicode, DateTime, String
 from datetime import datetime, timedelta
 import urllib2
+from flexget.plugins.filter_series import FilterSeriesBase
 
 log = logging.getLogger('thetvdb_favorites')
 
@@ -28,7 +29,7 @@ class ThetvdbFavorites(Base):
         return '<series_favorites(account_id=%s, series_name=%s)>' % (self.account_id, self.series_name)
 
 
-class FilterThetvdbFavorites:
+class FilterThetvdbFavorites(FilterSeriesBase):
     """
         Creates a series config containing all your thetvdb.com favorites
 
@@ -43,6 +44,7 @@ class FilterThetvdbFavorites:
         root = validator.factory('dict')
         root.accept('text', key='account_id', required=True)
         root.accept('text', key='series_group')
+        self.build_options_validator(root)
         return root
 
     @internet(log)
@@ -81,23 +83,14 @@ class FilterThetvdbFavorites:
         if not cache.count():
             log.info("Didn't find any thetvdb.com favorites.")
             return
-        tvdb_series_config = {}
         series_group = config.get('series_group', 'thetvdb_favs')
-        tvdb_series_config[series_group] = []
+        # Pass all config options to series plugin except our two
+        group_config = dict([(key, config[key]) for key in config if not key in ['account_id', 'series_group']])
+        tvdb_series_config = {'settings': {series_group: group_config}, series_group: []}
         for series in cache:
             tvdb_series_config[series_group].append(series.series_name)
-        # If the series plugin is not configured on this feed, make a blank config
-        if not 'series' in feed.config:
-            feed.config['series'] = {}
-        elif not isinstance(feed.config['series'], dict):
-            # Call series plugin generate_config to expand series config to group format
-            feed.config['series'] = get_plugin_by_name('series').instance.generate_config(feed)
-        # Merge the tvdb shows in to the main series config
-        from flexget.utils.tools import MergeException, merge_dict_from_to
-        try:
-            merge_dict_from_to(tvdb_series_config, feed.config['series'])
-        except MergeException:
-            raise PluginError('Failed to merge thetvdb favorites to feed %s, incompatible datatypes' % feed.name)
+        # Merge the our config in to the main series config
+        self.merge_config(feed, tvdb_series_config)
 
 
 register_plugin(FilterThetvdbFavorites, 'thetvdb_favorites')

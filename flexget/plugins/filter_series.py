@@ -411,106 +411,46 @@ class SeriesForget(object):
             session.commit()
 
 
-class FilterSeries(SeriesPlugin):
+class FilterSeriesBase(object):
+    """Class that contains helper methods for both filter_series as well as plugins that configure it,
+     such as thetvdb_favorites, all_series and series_premiere."""
 
-    """
-        Intelligent filter for tv-series.
-
-        http://flexget.com/wiki/FilterSeries
-    """
-
-    def __init__(self):
-        self.parser2entry = {}
-        self.backlog = None
-
-    def on_process_start(self, feed):
-        try:
-            self.backlog = get_plugin_by_name('backlog').instance
-        except:
-            log.warning('Unable utilize backlog plugin, episodes may slip trough timeframe')
-
-    def validator(self):
-        from flexget import validator
-
+    def build_options_validator(self, options):
         quals = [q.name for q in qualities.all()]
-
-        def build_options(options):
-            options.accept('text', key='path')
-            # set
-            options.accept('dict', key='set').accept_any_key('any')
-            # regexes can be given in as a single string ..
-            options.accept('regexp', key='name_regexp')
-            options.accept('regexp', key='ep_regexp')
-            options.accept('regexp', key='id_regexp')
-            # .. or as list containing strings
-            options.accept('list', key='name_regexp').accept('regexp')
-            options.accept('list', key='ep_regexp').accept('regexp')
-            options.accept('list', key='id_regexp').accept('regexp')
-            # quality
-            options.accept('choice', key='quality').accept_choices(quals, ignore_case=True)
-            options.accept('list', key='qualities').accept('choice').accept_choices(quals, ignore_case=True)
-            options.accept('choice', key='min_quality').accept_choices(quals, ignore_case=True)
-            options.accept('choice', key='max_quality').accept_choices(quals, ignore_case=True)
-            # propers
-            options.accept('boolean', key='propers')
-            message = "should be in format 'x (minutes|hours|days|weeks)' e.g. '5 days'"
-            time_regexp = r'\d+ (minutes|hours|days|weeks)'
-            options.accept('regexp_match', key='propers', message=message + ' or yes/no').accept(time_regexp)
-            # expect flags
-            options.accept('choice', key='identified_by').accept_choices(['ep', 'id', 'auto'])
-            # timeframe
-            options.accept('regexp_match', key='timeframe', message=message).accept(time_regexp)
-            # strict naming
-            options.accept('boolean', key='exact')
-            # watched
-            watched = options.accept('dict', key='watched')
-            watched.accept('number', key='season')
-            watched.accept('number', key='episode')
-            # from group
-            options.accept('text', key='from_group')
-            options.accept('list', key='from_group').accept('text')
-
-        def build_list(series):
-            """Build series list to series."""
-            series.accept('text')
-            series.accept('number')
-            bundle = series.accept('dict')
-            # prevent invalid indentation level
-            bundle.reject_keys(['set', 'path', 'timeframe', 'name_regexp',
-                'ep_regexp', 'id_regexp', 'watched', 'quality', 'min_quality',
-                'max_quality', 'qualities', 'exact', 'from_group'],
-                'Option \'$key\' has invalid indentation level. It needs 2 more spaces.')
-            bundle.accept_any_key('path')
-            options = bundle.accept_any_key('dict')
-            build_options(options)
-
-        root = validator.factory()
-
-        # simple format:
-        #   - series
-        #   - another series
-
-        simple = root.accept('list')
-        build_list(simple)
-        root.accept('equals').accept('all')
-
-        # advanced format:
-        #   settings:
-        #     group: {...}
-        #   group:
-        #     {...}
-
-        advanced = root.accept('dict')
-        settings = advanced.accept('dict', key='settings')
-        settings.reject_keys(get_plugin_keywords())
-        settings_group = settings.accept_any_key('dict')
-        build_options(settings_group)
-
-        group = advanced.accept_any_key('list')
-        build_list(group)
-        advanced.accept_any_key('equals').accept('all')
-
-        return root
+        options.accept('text', key='path')
+        # set
+        options.accept('dict', key='set').accept_any_key('any')
+        # regexes can be given in as a single string ..
+        options.accept('regexp', key='name_regexp')
+        options.accept('regexp', key='ep_regexp')
+        options.accept('regexp', key='id_regexp')
+        # .. or as list containing strings
+        options.accept('list', key='name_regexp').accept('regexp')
+        options.accept('list', key='ep_regexp').accept('regexp')
+        options.accept('list', key='id_regexp').accept('regexp')
+        # quality
+        options.accept('choice', key='quality').accept_choices(quals, ignore_case=True)
+        options.accept('list', key='qualities').accept('choice').accept_choices(quals, ignore_case=True)
+        options.accept('choice', key='min_quality').accept_choices(quals, ignore_case=True)
+        options.accept('choice', key='max_quality').accept_choices(quals, ignore_case=True)
+        # propers
+        options.accept('boolean', key='propers')
+        message = "should be in format 'x (minutes|hours|days|weeks)' e.g. '5 days'"
+        time_regexp = r'\d+ (minutes|hours|days|weeks)'
+        options.accept('regexp_match', key='propers', message=message + ' or yes/no').accept(time_regexp)
+        # expect flags
+        options.accept('choice', key='identified_by').accept_choices(['ep', 'id', 'auto'])
+        # timeframe
+        options.accept('regexp_match', key='timeframe', message=message).accept(time_regexp)
+        # strict naming
+        options.accept('boolean', key='exact')
+        # watched
+        watched = options.accept('dict', key='watched')
+        watched.accept('number', key='season')
+        watched.accept('number', key='episode')
+        # from group
+        options.accept('text', key='from_group')
+        options.accept('list', key='from_group').accept('text')
 
     def generate_config(self, feed):
         """Generate configuration dictionary from configuration. Converts simple format into advanced.
@@ -547,40 +487,99 @@ class FilterSeries(SeriesPlugin):
         for group_name, group_settings in config['settings'].iteritems():
             # convert group series into complex types
             complex_series = []
-            if config.get(group_name) == 'all':
-                group_settings['series_guessed'] = True
-                # Generate a list of unique series that metainfo_series has parsed for this feed
-                guessed_series = set()
-                for entry in feed.entries:
-                    if entry.get('series_guessed') and entry.get('series_name'):
-                        guessed_series.add(entry['series_name'])
-                # Generate a series group containing all guessed series names from the feed
-                for series in guessed_series:
-                    complex_series.append({series: group_settings})
-            else:
-                for series in config.get(group_name, []):
-                    # convert into dict-form if necessary
-                    series_settings = {}
-                    if isinstance(series, dict):
-                        series, series_settings = series.items()[0]
-                        if series_settings is None:
-                            raise Exception('Series %s has unexpected \':\'' % series)
-                    # make sure series name is a string to accomadate for "24"
-                    if not isinstance(series, basestring):
-                        series = str(series)
-                    # if series have given path instead of dict, convert it into a dict
-                    if isinstance(series_settings, basestring):
-                        series_settings = {'path': series_settings}
-                    # merge group settings into this series settings
-                    from flexget.utils.tools import merge_dict_from_to
-                    merge_dict_from_to(group_settings, series_settings)
-                    complex_series.append({series: series_settings})
+            for series in config.get(group_name, []):
+                # convert into dict-form if necessary
+                series_settings = {}
+                if isinstance(series, dict):
+                    series, series_settings = series.items()[0]
+                    if series_settings is None:
+                        raise Exception('Series %s has unexpected \':\'' % series)
+                # make sure series name is a string to accomadate for "24"
+                if not isinstance(series, basestring):
+                    series = str(series)
+                # if series have given path instead of dict, convert it into a dict
+                if isinstance(series_settings, basestring):
+                    series_settings = {'path': series_settings}
+                # merge group settings into this series settings
+                from flexget.utils.tools import merge_dict_from_to
+                merge_dict_from_to(group_settings, series_settings)
+                complex_series.append({series: series_settings})
             # add generated complex series into config
             config[group_name] = complex_series
 
         # settings is not needed anymore, just confuses
         del(config['settings'])
         return config
+
+    def merge_config(self, feed, config):
+        """Merges another series config dict in with the current one."""
+        from flexget.utils.tools import MergeException, merge_dict_from_to
+        feed.config['series'] = self.generate_config(feed)
+        try:
+            merge_dict_from_to(config, feed.config['series'])
+        except MergeException:
+            raise PluginError('Failed to merge thetvdb favorites to feed %s, incompatible datatypes' % feed.name)
+
+
+class FilterSeries(SeriesPlugin, FilterSeriesBase):
+    """
+        Intelligent filter for tv-series.
+
+        http://flexget.com/wiki/FilterSeries
+    """
+
+    def __init__(self):
+        self.parser2entry = {}
+        self.backlog = None
+
+    def on_process_start(self, feed):
+        try:
+            self.backlog = get_plugin_by_name('backlog').instance
+        except:
+            log.warning('Unable utilize backlog plugin, episodes may slip trough timeframe')
+
+    def validator(self):
+        from flexget import validator
+
+        def build_list(series):
+            """Build series list to series."""
+            series.accept('text')
+            series.accept('number')
+            bundle = series.accept('dict')
+            # prevent invalid indentation level
+            bundle.reject_keys(['set', 'path', 'timeframe', 'name_regexp',
+                'ep_regexp', 'id_regexp', 'watched', 'quality', 'min_quality',
+                'max_quality', 'qualities', 'exact', 'from_group'],
+                'Option \'$key\' has invalid indentation level. It needs 2 more spaces.')
+            bundle.accept_any_key('path')
+            options = bundle.accept_any_key('dict')
+            self.build_options_validator(options)
+
+        root = validator.factory()
+
+        # simple format:
+        #   - series
+        #   - another series
+
+        simple = root.accept('list')
+        build_list(simple)
+
+        # advanced format:
+        #   settings:
+        #     group: {...}
+        #   group:
+        #     {...}
+
+        advanced = root.accept('dict')
+        settings = advanced.accept('dict', key='settings')
+        settings.reject_keys(get_plugin_keywords())
+        settings_group = settings.accept_any_key('dict')
+        self.build_options_validator(settings_group)
+
+        group = advanced.accept_any_key('list')
+        build_list(group)
+
+        return root
 
     def auto_exact(self, config):
         """Automatically enable exact naming option for series that look like a problem"""

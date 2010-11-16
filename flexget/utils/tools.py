@@ -54,7 +54,7 @@ def strip_html(text):
         return ' '.join(text.split())
     except:
         return text
-    
+
 
 # This pattern matches a character entity reference (a decimal numeric
 # references, a hexadecimal numeric reference, or a named reference).
@@ -187,15 +187,15 @@ def merge_dict_from_to(d1, d2):
 
 class SmartRedirectHandler(urllib2.HTTPRedirectHandler):
 
-    def http_error_301(self, req, fp, code, msg, headers):  
-        result = urllib2.HTTPRedirectHandler.http_error_301(self, req, fp, code, msg, headers)              
+    def http_error_301(self, req, fp, code, msg, headers):
+        result = urllib2.HTTPRedirectHandler.http_error_301(self, req, fp, code, msg, headers)
         result.status = code
-        return result                                       
+        return result
 
     def http_error_302(self, req, fp, code, msg, headers):
-        result = urllib2.HTTPRedirectHandler.http_error_302(self, req, fp, code, msg, headers)              
-        result.status = code                                
-        return result                
+        result = urllib2.HTTPRedirectHandler.http_error_302(self, req, fp, code, msg, headers)
+        result.status = code
+        return result
 
 
 def urlopener(url, log, **kwargs):
@@ -253,7 +253,7 @@ def urlopener(url, log, **kwargs):
 
 
 def replace_from_entry(field, entry, field_name, logger, default=''):
-    """This is a helper function to do string replacement from an entry dict. 
+    """This is a helper function to do string replacement from an entry dict.
     It catches exceptions from the string replacement and prints errors to the given log.
     field_name is the description to use when printing the error.
     Returns the result of the replacemnt, or default if there is an error."""

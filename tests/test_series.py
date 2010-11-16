@@ -225,7 +225,7 @@ class TestFilterSeries(FlexGetBase):
               - {title: 'Test.Series.1x03.PDTV.XViD-FlexGet'}
               - {title: 'Other.Show.S02E01.PDTV.XViD-FlexGet'}
               - {title: 'other show season 2 episode 2'}
-            series: all
+            all_series: yes
     """
 
     def test_smoke(self):

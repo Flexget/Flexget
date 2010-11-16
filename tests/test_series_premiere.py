@@ -1,7 +1,7 @@
 from tests import FlexGetBase
 
 
-class TestDuplicates(FlexGetBase):
+class TestSeriesPremiere(FlexGetBase):
 
     __yaml__ = """
 
@@ -11,10 +11,11 @@ class TestDuplicates(FlexGetBase):
               - seen
 
         feeds:
-          test_dupes_in_same_feed:
+          test_only_one:
             mock:
               - {title: 'Foo.2009.S01E01.HDTV.XviD-2HD[FlexGet]'}
               - {title: 'Foo 2009 S01E01 HDTV XviD-2HD[ASDF]'}
+              - {title: 'Foo 2009 S01E02 HDTV Xvid-2HD[AOEU]'}
             series_premiere: yes
 
           test_dupes_across_feeds_1:
@@ -28,12 +29,12 @@ class TestDuplicates(FlexGetBase):
             series_premiere: yes
     """
 
-    def test_dupes_in_same_feed(self):
-        self.execute_feed('test_dupes_in_same_feed')
-        assert len(self.feed.accepted) == 1, 'accepted both'
+    def test_only_one(self):
+        self.execute_feed('test_only_one')
+        assert len(self.feed.accepted) == 1, 'should only have accepted one'
 
     def test_dupes_across_feeds(self):
         self.execute_feed('test_dupes_across_feeds_1')
-        assert len(self.feed.accepted) == 1, 'accepted first premiere'
+        assert len(self.feed.accepted) == 1, 'didn\'t accept first premiere'
         self.execute_feed('test_dupes_across_feeds_2')
         assert len(self.feed.accepted) == 0, 'accepted duplicate premiere'
