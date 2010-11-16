@@ -32,7 +32,8 @@ class Manager(object):
 
         self.initialize()
 
-        log.debug('Default encoding: %s' % sys.getdefaultencoding())
+        log.debug('sys.defaultencoding: %s' % sys.getdefaultencoding())
+        log.debug('sys.getfilesystemencoding: %s' % sys.getfilesystemencoding())
 
         import atexit
         atexit.register(self.shutdown)
@@ -381,7 +382,7 @@ class Manager(object):
         for name, feed in self.feeds.iteritems():
             if not feed.enabled:
                 continue
-            if name in failed:
+            if name in failed or feed._abort:
                 continue
             try:
                 log.log(5, 'calling process_end on a feed %s' % name)

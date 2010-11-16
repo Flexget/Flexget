@@ -28,16 +28,9 @@ class TestTorrentSize(FlexGetBase):
               min: 1
               strict: yes
 
-          test_cache_1:
+          test_cache:
             mock:
               - {title: 'test', url: 'http://localhost/', file: 'tests/test.torrent'}
-            accept_all: yes
-            content_size:
-              min: 2000
-
-          test_cache_2:
-            mock:
-              - {title: 'test', url: 'http://localhost/'}
             accept_all: yes
             content_size:
               min: 2000
@@ -66,11 +59,13 @@ class TestTorrentSize(FlexGetBase):
 
     def test_cache(self):
         """Content Size: caching"""
-        self.execute_feed('test_cache_1')
+        self.execute_feed('test_cache')
         assert self.feed.find_entry('rejected', title='test'), \
             'should have rejected, too small'
 
-        self.execute_feed('test_cache_2')
+        # Remove the torrent from the mock entry and make sure it is still rejected
+        del self.manager.config['feeds']['test_cache']['mock'][0]['file']
+        self.execute_feed('test_cache')
         assert self.feed.find_entry('rejected', title='test'), \
             'should have rejected, size present from the cache'
 

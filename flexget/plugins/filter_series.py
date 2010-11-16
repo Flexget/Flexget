@@ -4,7 +4,7 @@ from flexget.utils.titles import SeriesParser, ParseWarning
 from flexget.utils import qualities
 from flexget.manager import Base
 from flexget.plugin import register_plugin, register_parser_option, get_plugin_by_name, get_plugin_keywords, \
-    PluginWarning, PluginError
+    PluginWarning, PluginError, priority
 from sqlalchemy import Column, Integer, String, Unicode, DateTime, Boolean, desc
 from sqlalchemy.schema import ForeignKey
 from sqlalchemy.orm import relation, join
@@ -411,137 +411,69 @@ class SeriesForget(object):
             session.commit()
 
 
-class FilterSeries(SeriesPlugin):
+class FilterSeriesBase(object):
+    """Class that contains helper methods for both filter_series as well as plugins that configure it,
+     such as thetvdb_favorites, all_series and series_premiere."""
 
-    """
-        Intelligent filter for tv-series.
-
-        http://flexget.com/wiki/FilterSeries
-    """
-
-    def __init__(self):
-        self.parser2entry = {}
-        self.backlog = None
-
-    def on_process_start(self, feed):
-        try:
-            self.backlog = get_plugin_by_name('backlog').instance
-        except:
-            log.warning('Unable utilize backlog plugin, episodes may slip trough timeframe')
-
-    def validator(self):
-        from flexget import validator
-
+    def build_options_validator(self, options):
         quals = [q.name for q in qualities.all()]
-
-        def build_options(options):
-            options.accept('text', key='path')
-            # set
-            options.accept('dict', key='set').accept_any_key('any')
-            # regexes can be given in as a single string ..
-            options.accept('regexp', key='name_regexp')
-            options.accept('regexp', key='ep_regexp')
-            options.accept('regexp', key='id_regexp')
-            # .. or as list containing strings
-            options.accept('list', key='name_regexp').accept('regexp')
-            options.accept('list', key='ep_regexp').accept('regexp')
-            options.accept('list', key='id_regexp').accept('regexp')
-            # quality
-            options.accept('choice', key='quality').accept_choices(quals, ignore_case=True)
-            options.accept('list', key='qualities').accept('choice').accept_choices(quals, ignore_case=True)
-            options.accept('choice', key='min_quality').accept_choices(quals, ignore_case=True)
-            options.accept('choice', key='max_quality').accept_choices(quals, ignore_case=True)
-            # propers
-            options.accept('boolean', key='propers')
-            message = "should be in format 'x (minutes|hours|days|weeks)' e.g. '5 days'"
-            time_regexp = r'\d+ (minutes|hours|days|weeks)'
-            options.accept('regexp_match', key='propers', message=message + ' or yes/no').accept(time_regexp)
-            # expect flags
-            options.accept('choice', key='identified_by').accept_choices(['ep', 'id', 'auto'])
-            # timeframe
-            options.accept('regexp_match', key='timeframe', message=message).accept(time_regexp)
-            # strict naming
-            options.accept('boolean', key='exact')
-            # watched
-            watched = options.accept('dict', key='watched')
-            watched.accept('number', key='season')
-            watched.accept('number', key='episode')
-            # from group
-            options.accept('text', key='from_group')
-            options.accept('list', key='from_group').accept('text')
-
-        def build_list(series):
-            """Build series list to series."""
-            series.accept('text')
-            series.accept('number')
-            bundle = series.accept('dict')
-            # prevent invalid indentation level
-            bundle.reject_keys(['set', 'path', 'timeframe', 'name_regexp',
-                'ep_regexp', 'id_regexp', 'watched', 'quality', 'min_quality',
-                'max_quality', 'qualities', 'exact', 'from_group'],
-                'Option \'$key\' has invalid indentation level. It needs 2 more spaces.')
-            bundle.accept_any_key('path')
-            options = bundle.accept_any_key('dict')
-            build_options(options)
-
-        root = validator.factory()
-
-        # simple format:
-        #   - series
-        #   - another series
-
-        simple = root.accept('list')
-        build_list(simple)
-
-        # advanced format:
-        #   settings:
-        #     group: {...}
-        #   group:
-        #     {...}
-
-        advanced = root.accept('dict')
-        settings = advanced.accept('dict', key='settings')
-        settings.reject_keys(get_plugin_keywords())
-        settings_group = settings.accept_any_key('dict')
-        build_options(settings_group)
-
-        group = advanced.accept_any_key('list')
-        build_list(group)
-
-        return root
+        options.accept('text', key='path')
+        # set
+        options.accept('dict', key='set').accept_any_key('any')
+        # regexes can be given in as a single string ..
+        options.accept('regexp', key='name_regexp')
+        options.accept('regexp', key='ep_regexp')
+        options.accept('regexp', key='id_regexp')
+        # .. or as list containing strings
+        options.accept('list', key='name_regexp').accept('regexp')
+        options.accept('list', key='ep_regexp').accept('regexp')
+        options.accept('list', key='id_regexp').accept('regexp')
+        # quality
+        options.accept('choice', key='quality').accept_choices(quals, ignore_case=True)
+        options.accept('list', key='qualities').accept('choice').accept_choices(quals, ignore_case=True)
+        options.accept('choice', key='min_quality').accept_choices(quals, ignore_case=True)
+        options.accept('choice', key='max_quality').accept_choices(quals, ignore_case=True)
+        # propers
+        options.accept('boolean', key='propers')
+        message = "should be in format 'x (minutes|hours|days|weeks)' e.g. '5 days'"
+        time_regexp = r'\d+ (minutes|hours|days|weeks)'
+        options.accept('regexp_match', key='propers', message=message + ' or yes/no').accept(time_regexp)
+        # expect flags
+        options.accept('choice', key='identified_by').accept_choices(['ep', 'id', 'auto'])
+        # timeframe
+        options.accept('regexp_match', key='timeframe', message=message).accept(time_regexp)
+        # strict naming
+        options.accept('boolean', key='exact')
+        # watched
+        watched = options.accept('dict', key='watched')
+        watched.accept('number', key='season')
+        watched.accept('number', key='episode')
+        # from group
+        options.accept('text', key='from_group')
+        options.accept('list', key='from_group').accept('text')
 
     def generate_config(self, feed):
         """Generate configuration dictionary from configuration. Converts simple format into advanced.
         This way we don't need to handle two different configuration formats in the logic.
         Applies group settings with advanced form."""
 
-        feed_config = feed.config.get('series', [])
+        config = feed.config.get('series', [])
 
         # generate unified configuration in complex form, requires complex code as well :)
-        config = {}
-        if isinstance(feed_config, list):
+        #config = {}
+        if not isinstance(config, dict):
             # convert simplest configuration internally grouped format
-            config['settings'] = {}
-            config['simple'] = []
-            for series in feed_config:
-                # convert into dict-form if necessary
-                series_settings = {}
-                if isinstance(series, dict):
-                    series, series_settings = series.items()[0]
-                    if series_settings is None:
-                        raise Exception('Series %s has unexpected \':\'' % series)
-                config['simple'].append({series: series_settings})
+            config = {'simple': config,
+                      'settings': {}}
         else:
             # already in grouped format, just get settings from there
-            import copy
-            config = copy.deepcopy(feed_config)
             if not 'settings' in config:
                 config['settings'] = {}
 
         # TODO: what if same series is configured in multiple groups?!
 
         # generate quality settings from group name and empty settings if not present (required)
-        for group_name, _ in config.iteritems():
+        for group_name in config:
             if group_name == 'settings':
                 continue
             if not group_name in config['settings']:
@@ -579,6 +511,76 @@ class FilterSeries(SeriesPlugin):
         del(config['settings'])
         return config
 
+    def merge_config(self, feed, config):
+        """Merges another series config dict in with the current one."""
+        from flexget.utils.tools import MergeException, merge_dict_from_to
+        feed.config['series'] = self.generate_config(feed)
+        try:
+            merge_dict_from_to(config, feed.config['series'])
+        except MergeException:
+            raise PluginError('Failed to merge thetvdb favorites to feed %s, incompatible datatypes' % feed.name)
+
+
+class FilterSeries(SeriesPlugin, FilterSeriesBase):
+    """
+        Intelligent filter for tv-series.
+
+        http://flexget.com/wiki/FilterSeries
+    """
+
+    def __init__(self):
+        self.parser2entry = {}
+        self.backlog = None
+
+    def on_process_start(self, feed):
+        try:
+            self.backlog = get_plugin_by_name('backlog').instance
+        except:
+            log.warning('Unable utilize backlog plugin, episodes may slip trough timeframe')
+
+    def validator(self):
+        from flexget import validator
+
+        def build_list(series):
+            """Build series list to series."""
+            series.accept('text')
+            series.accept('number')
+            bundle = series.accept('dict')
+            # prevent invalid indentation level
+            bundle.reject_keys(['set', 'path', 'timeframe', 'name_regexp',
+                'ep_regexp', 'id_regexp', 'watched', 'quality', 'min_quality',
+                'max_quality', 'qualities', 'exact', 'from_group'],
+                'Option \'$key\' has invalid indentation level. It needs 2 more spaces.')
+            bundle.accept_any_key('path')
+            options = bundle.accept_any_key('dict')
+            self.build_options_validator(options)
+
+        root = validator.factory()
+
+        # simple format:
+        #   - series
+        #   - another series
+
+        simple = root.accept('list')
+        build_list(simple)
+
+        # advanced format:
+        #   settings:
+        #     group: {...}
+        #   group:
+        #     {...}
+
+        advanced = root.accept('dict')
+        settings = advanced.accept('dict', key='settings')
+        settings.reject_keys(get_plugin_keywords())
+        settings_group = settings.accept_any_key('dict')
+        self.build_options_validator(settings_group)
+
+        group = advanced.accept_any_key('list')
+        build_list(group)
+
+        return root
+
     def auto_exact(self, config):
         """Automatically enable exact naming option for series that look like a problem"""
 
@@ -598,16 +600,11 @@ class FilterSeries(SeriesPlugin):
                         log.info('Auto enabling exact matching for series %s (reason %s)' % (series_name, name))
                         series_config['exact'] = True
 
-    def on_feed_filter(self, feed):
-        """Filter series"""
-
-        # TEMP: bugfix, convert all series to lowercase
-        for series in feed.session.query(Series).all():
-            series.name = series.name.lower()
-
+    # Run after metainfo_quality and before metainfo_series
+    @priority(125)
+    def on_feed_metainfo(self, feed):
         config = self.generate_config(feed)
         self.auto_exact(config)
-
         for group_series in config.itervalues():
             for series_item in group_series:
                 series_name, series_config = series_item.items()[0]
@@ -618,8 +615,50 @@ class FilterSeries(SeriesPlugin):
                 import time
                 start_time = time.clock()
 
-                series = self.parse_series(feed, series_name, series_config)
-                self.process_series(feed, series, series_name, series_config)
+                self.parse_series(feed, series_name, series_config)
+                took = time.clock() - start_time
+                log.log(5, 'parsing %s took %s' % (series_name, took))
+
+    def on_feed_filter(self, feed):
+        """Filter series"""
+        # Parsing was done in metainfo event, create the dicts to pass to process_series from the feed entries
+        # key: series (episode) identifier ie. S01E02
+        # value: seriesparser
+        found_series = {}
+        guessed_series = {}
+        for entry in feed.entries:
+            if entry.get('series_name') and entry.get('series_id') and entry.get('series_parser'):
+                self.parser2entry[entry['series_parser']] = entry
+                target = guessed_series if entry.get('series_guessed') else found_series
+                target.setdefault(entry['series_name'], {}).setdefault(entry['series_id'], []).append(entry['series_parser'])
+
+        # TEMP: bugfix, convert all series to lowercase
+        for series in feed.session.query(Series).all():
+            series.name = series.name.lower()
+
+        config = self.generate_config(feed)
+
+        for group_series in config.itervalues():
+            for series_item in group_series:
+                series_name, series_config = series_item.items()[0]
+                # yaml loads ascii only as str
+                series_name = unicode(series_name)
+                source = guessed_series if series_config.get('series_guessed') else found_series
+                # If we didn't find any episodes for this series, continue
+                if not source.get(series_name):
+                    log.log(5, 'No entries found for %s this run.' % series_name)
+                    continue
+                for id, eps in source[series_name].iteritems():
+                    for parser in eps:
+                        # store found episodes into database and save reference for later use
+                        release = self.store(feed.session, parser)
+                        self.parser2entry[parser]['series_release'] = release
+                log.log(5, 'series_name: %s series_config: %s' % (series_name, series_config))
+
+                import time
+                start_time = time.clock()
+
+                self.process_series(feed, source[series_name], series_name, series_config)
 
                 took = time.clock() - start_time
                 log.log(5, 'processing %s took %s' % (series_name, took))
@@ -668,11 +707,8 @@ class FilterSeries(SeriesPlugin):
             return order.index(x[0]) if x[0] in order else len(order)
 
         # don't try to parse these fields
-        ignore_fields = ['uid', 'guid', 'feed', 'url', 'original_url', 'type', 'quality', 'series_name']
+        ignore_fields = ['uid', 'guid', 'feed', 'url', 'original_url', 'type', 'quality', 'series_name', 'series_id', 'accepted_by', 'reason']
 
-        # key: series (episode) identifier ie. S01E02
-        # value: seriesparser
-        series = {}
         for entry in feed.entries:
             if entry.get('series_parser') and entry['series_parser'].valid and not entry.get('series_guessed'):
                 # This entry already has a valid series parser, use it. (probably from backlog)
@@ -720,11 +756,10 @@ class FilterSeries(SeriesPlugin):
                     continue
 
             log.debug('%s detected as %s, field: %s' % (entry['title'], parser, parser.field))
-            self.parser2entry[parser] = entry
             entry['series_parser'] = parser
             # add series, season and episode to entry
             entry['series_name'] = series_name
-            entry['series_guessed'] = False
+            entry['series_guessed'] = config.get('series_guessed', False)
             if 'quality' in entry and entry['quality'] != parser.quality:
                 log.warning('Found different quality for %s. Was %s, overriding with %s.' % \
                     (entry['title'], entry['quality'], parser.quality))
@@ -747,19 +782,11 @@ class FilterSeries(SeriesPlugin):
                 set = get_plugin_by_name('set')
                 set.instance.modify(entry, config.get('set'))
 
-            # add this episode into list of available episodes
-            eps = series.setdefault(parser.identifier, [])
-            eps.append(parser)
-
-            # store this episode into database and save reference for later use
-            release = self.store(feed.session, parser)
-            entry['series_release'] = release
-
-        return series
-
     def process_series(self, feed, series, series_name, config):
         """Accept or Reject episode from available releases, or postpone choosing."""
         for eps in series.itervalues():
+            if not eps:
+                continue
             whitelist = []
 
             # sort episodes in order of quality

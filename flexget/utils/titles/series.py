@@ -46,8 +46,9 @@ class SeriesParser(TitleParser):
                  '(\d{1,3})\s?x\s?(0+)[^1-9]', # 5x0
                  'S(\d{1,3})D(\d{1,3})', # S3D1
                  '(\d{1,3})\s?x\s?(all)', # 1xAll
-                 'season(?:s)?\s?\d\s?(?:&\s?\d)?[\s-]*complete',
+                 'season(?:s)?\s?\d\s?(?:&\s?\d)?[\s-]*(?:complete|full)',
                  'seasons\s(\d\s){2,}',
+                 'disc\s\d',
                  's\d+.?e\d+-\d+'] # S6 E1-4
         self.id_regexps = [
                 '(\d{4})%s(\d+)%s(\d+)' % (separators, separators),
@@ -125,11 +126,9 @@ class SeriesParser(TitleParser):
             raise Exception('Flags expect_ep and expect_id are mutually exclusive')
 
         name = self.remove_dirt(self.name)
-        data = self.clean(self.data)
-        data = self.remove_dirt(data)
 
         # check if data appears to be unwanted (abort)
-        if self.parse_unwanted(data):
+        if self.parse_unwanted(self.remove_dirt(self.clean(self.data))):
             return
 
         def name_to_re(name):
@@ -141,7 +140,7 @@ class SeriesParser(TitleParser):
             res = re.sub(blank + '+', ' ', name)
             res = res.strip()
             res = re.sub(' +', blank + '*', res)
-            res = '^' + ignore + (blank + '*') + '(' + res + ')' + (blank + '+')
+            res = '^' + ignore + blank + '*' + '(' + res + ')' + blank + '+'
             return res
 
         log.debug('name: %s data: %s' % (name, self.data))
@@ -174,18 +173,22 @@ class SeriesParser(TitleParser):
             return
 
 
-        # remove series name from raw data
-        data_noname = self.data[:name_start] + self.data[name_end:]
+        # remove series name from raw data, move any prefix to end of string
+        data_noname = self.data[name_end:] + ' ' + self.data[:name_start]
+        data_noname = data_noname.lower()
         log.debug('data noname: %s' % data_noname)
 
         # allow group(s)
         if self.allow_groups:
             for group in self.allow_groups:
                 group = group.lower()
-                orig_data = data_noname.lower()
-                if '[%s]' % group in orig_data or '-%s' % group in orig_data:
-                    log.debug('%s is from group %s' % (orig_data, group))
-                    self.group = group
+                for fmt in ['[%s]', '-%s']:
+                    if fmt % group in data_noname:
+                        log.debug('%s is from group %s' % (self.data, group))
+                        self.group = group
+                        data_noname = data_noname.replace(fmt % group, '')
+                        break
+                if self.group:
                     break
             else:
                 log.debug('%s is not from groups %s' % (self.data, self.allow_groups))
@@ -194,24 +197,28 @@ class SeriesParser(TitleParser):
         # search tags and quality
         if self.quality == 'unknown':
             log.debug('parsing quality ->')
-            self.quality = qualities.parse_quality(data_noname).name
+            quality, match = qualities.quality_match(data_noname)
+            self.quality = quality.name
+            if match:
+                # Remove quality string from data
+                data_noname = data_noname[:match.start()] + data_noname[match.end():]
+
+        # Remove unwanted words (qualities and such) from data for ep / id
+        data = self.remove_words(data_noname, self.remove + qualities.registry.keys() + self.codecs + self.sounds)
+        data = self.clean(data)
+        data = self.remove_dirt(data)
 
         data_parts = re.split('\W+', data)
 
         for part in data_parts:
             if part in self.propers:
                 self.proper_or_repack = True
+                data_parts.remove(part)
             if part in self.specials:
                 self.special = True
+                data_parts.remove(part)
 
-        # Remove unwanted words (qualities and such) from data for ep / id
-        # parsing need to remove them from the original string, as they
-        # might not match to cleaned string.
-        # Ensure the series name isn't accidentally munged.
-
-        data = self.remove_words(self.data[name_end:], self.remove + qualities.registry.keys() + self.codecs + self.sounds)
-        data = self.clean(data)
-        data = self.remove_dirt(data)
+        data = ' '.join(data_parts)
 
         log.debug("data for id/ep parsing '%s'" % data)
 

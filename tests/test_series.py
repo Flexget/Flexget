@@ -61,14 +61,14 @@ class TestQuality(FlexGetBase):
               - MinMaxQTest:
                   min_quality: sdtv
                   max_quality: hr
-                  
+
           max_unknown_quality:
             mock:
               - {title: 'MaxUnknownQTest.S01E01.XViD-FlexGet'}
             series:
               - MaxUnknownQTest:
                   max_quality: hdtv
-                  
+
           description_quality:
             mock:
               - {'title': 'Description.S01E01', 'description': 'The quality should be 720p'}
@@ -117,12 +117,12 @@ class TestQuality(FlexGetBase):
         assert self.feed.find_entry('accepted', title='MinMaxQTest.S01E01.HR.XViD-FlexGet'), \
             'MinMaxQTest.S01E01.HR.XViD-FlexGet should have been accepted'
         assert len(self.feed.accepted) == 1, 'should have accepted only one'
-        
+
     def test_max_unknown_quality(self):
         """Series plugin: max quality with unknown quality"""
         self.execute_feed('max_unknown_quality')
         assert len(self.feed.accepted) == 1, 'should have accepted'
-        
+
     def test_quality_from_description(self):
         """Series plugin: quality from description"""
         self.execute_feed('description_quality')
@@ -218,6 +218,14 @@ class TestFilterSeries(FlexGetBase):
               - {title: 'Other.Show.with.extra.crap.S02E01.PDTV.XViD-FlexGet'}
             series:
               - Test Series
+
+          test_all_series_mode:
+            mock:
+              - {title: 'Test.Series.S01E02.PDTV.XViD-FlexGet'}
+              - {title: 'Test.Series.1x03.PDTV.XViD-FlexGet'}
+              - {title: 'Other.Show.S02E01.PDTV.XViD-FlexGet'}
+              - {title: 'other show season 2 episode 2'}
+            all_series: yes
     """
 
     def test_smoke(self):
@@ -250,7 +258,7 @@ class TestFilterSeries(FlexGetBase):
         # Make sure the metainfo_series plugin is working first
         entry = self.feed.find_entry('entries', title='Other.Show.with.extra.crap.S02E01.PDTV.XViD-FlexGet')
         assert entry['series_guessed'], 'series should have been guessed'
-        assert entry['series_name'] == entry['series_parser'].name == 'Other Show with extra crap', \
+        assert entry['series_name'] == entry['series_parser'].name == 'Other Show With Extra Crap', \
             'metainfo_series is not running'
         # Make sure the good series data overrode metainfo data for the listed series
         entry = self.feed.find_entry('accepted', title='Test.Series.with.extra.crap.S01E02.PDTV.XViD-FlexGet')
@@ -258,9 +266,20 @@ class TestFilterSeries(FlexGetBase):
         assert entry['series_name'] == entry['series_parser'].name == 'Test Series', \
             'Series name should be \'Test Series\', was: entry: %s, parser: %s' % (entry['series_name'], entry['series_parser'].name)
 
+    def test_all_series_mode(self):
+        """Series plugin: test all option"""
+        self.execute_feed('test_all_series_mode')
+        assert self.feed.find_entry('accepted', title='Test.Series.S01E02.PDTV.XViD-FlexGet')
+        assert self.feed.find_entry('accepted', title='Test.Series.1x03.PDTV.XViD-FlexGet')
+        entry = self.feed.find_entry('accepted', title='Other.Show.S02E01.PDTV.XViD-FlexGet')
+        assert entry['series_guessed']
+        entry2 = self.feed.find_entry('accepted', title='other show season 2 episode 2')
+        # Make sure case is normalized so series are marked with the same name no matter the case in the title
+        assert entry['series_name'] == entry2['series_name'] == 'Other Show', 'Series names should be in title case'
+
 
 class TestEpisodeAdvancement(FlexGetBase):
-    
+
     __yaml__ = """
         feeds:
 
@@ -288,13 +307,13 @@ class TestEpisodeAdvancement(FlexGetBase):
               - {title: 'forwards s02e01'}
             series:
               - forwards
-              
+
           test_forwards_3:
             mock:
               - {title: 'forwards s03e01'}
             series:
               - forwards
-              
+
           test_forwards_4:
             mock:
               - {title: 'forwards s05e01'}
@@ -330,7 +349,7 @@ class TestEpisodeAdvancement(FlexGetBase):
         self.execute_feed('test_backwards_2')
         assert self.feed.find_entry('rejected', title='backwards s01e01'), \
             'backwards s01e01 should have been rejected, too old'
-        
+
     def test_forwards(self):
         """Series plugin: episode advancement (future)"""
         self.execute_feed('test_forwards_1')
@@ -441,39 +460,39 @@ class TestPropers(FlexGetBase):
           min_max_quality_2:
             mock:
               - {title: 'asfd.S01E01.720p.Proper-FlexGet'}
-          
+
           proper_timeframe_1:
             mock:
               - {title: 'TFTest.S01E01.720p-FlexGet'}
-              
+
           proper_timeframe_2:
             mock:
               - {title: 'TFTest.S01E01.720p.proper-FlexGet'}
-        
+
           no_propers_1:
             mock:
               - {title: 'NoTest.S01E01.720p-FlexGet'}
-              
+
           no_propers_2:
             mock:
               - {title: 'NoTest.S01E01.720p.proper-FlexGet'}
-                
-              
+
+
         """
-    
+
     def test_propers_timeframe(self):
-        """Series plugin: propers timeframe"""    
+        """Series plugin: propers timeframe"""
         self.execute_feed('proper_timeframe_1')
         assert self.feed.find_entry('accepted', title='TFTest.S01E01.720p-FlexGet'), \
             'Did not accept before timeframe'
-        
+
         # let 6 hours pass
         age_series(hours=6)
-        
+
         self.execute_feed('proper_timeframe_2')
         assert self.feed.find_entry('rejected', title='TFTest.S01E01.720p.proper-FlexGet'), \
             'Did not reject after proper timeframe'
- 
+
     def test_no_propers(self):
         """Series plugin: no propers at all"""
         self.execute_feed('no_propers_1')
@@ -726,7 +745,7 @@ class TestIdioticNumbering(FlexGetBase):
     def test_idiotic(self):
         """Series plugin: idiotic numbering scheme DISABLED"""
         return
-        
+
         self.execute_feed('test_1')
         self.execute_feed('test_2')
         entry = self.feed.find_entry(title='FooBar.102.PDTV-FlexGet')
@@ -779,7 +798,7 @@ class TestMixedNumbering(FlexGetBase):
     def test_mixednumbering(self):
         """Series plugin: Mixed series numbering - DISABLED!"""
         return
-        
+
         self.execute_feed('test_1')
         assert self.feed.find_entry('accepted', title='FooBar.S03E07.PDTV-FlexGet')
         self.execute_feed('test_2')
@@ -960,15 +979,15 @@ class TestSeriesPremiere(FlexGetBase):
         feeds:
           test:
             mock:
-              - {title: 'FooBar.S01E01.PDTV-FlexGet'}
-              - {title: 'FooBar.S01E11.1080p-FlexGet'}
-              - {title: 'FooBar.S02E02.HR-FlexGet'}
+              - {title: 'Foobar.S01E01.PDTV-FlexGet'}
+              - {title: 'Foobar.S01E11.1080p-FlexGet'}
+              - {title: 'Foobar.S02E02.HR-FlexGet'}
     """
-      
+
     def testOnlyPremieres(self):
         """Test series premiere"""
         self.execute_feed('test')
-        assert self.feed.find_entry('accepted', title='FooBar.S01E01.PDTV-FlexGet', \
-            series_name='FooBar', series_season=1, series_episode=1), 'Series premiere should have been accepted'
+        assert self.feed.find_entry('accepted', title='Foobar.S01E01.PDTV-FlexGet', \
+            series_name='Foobar', series_season=1, series_episode=1), 'Series premiere should have been accepted'
         assert len(self.feed.accepted) == 1
     # TODO: Add more tests, test interaction with series plugin and series_exists

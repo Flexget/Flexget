@@ -1,5 +1,5 @@
 from flexget.feed import Entry
-from flexget.plugin import *
+from flexget.plugin import register_plugin, internet
 from flexget.plugins.cached_input import cached
 import re
 import logging
@@ -8,7 +8,7 @@ from flexget.utils.tools import urlopener
 log = logging.getLogger('text')
 
 
-class InputText:
+class InputText(object):
 
     """
     Parse any text for entries using regular expression.
@@ -77,7 +77,7 @@ class InputText:
                             self.format_entry(entry, format_config)
                             feed.entries.append(entry)
                         else:
-                            log.info('Invalid data, entry field %s is already found. Ignoring entry.' % field)
+                            log.info('Invalid data, entry field %s is already found once. Ignoring entry.' % field)
                         # start new entry
                         entry = Entry()
                         used = {}

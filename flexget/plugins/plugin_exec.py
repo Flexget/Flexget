@@ -2,8 +2,19 @@ import subprocess
 import logging
 import shlex
 from flexget.plugin import register_plugin, priority
+import re
 
 log = logging.getLogger('exec')
+
+
+class EscapingDict(dict):
+    """Helper class, same as a dict, but returns all string value with quotes escaped."""
+    
+    def __getitem__(self, key):
+        value = dict.__getitem__(self, key)
+        if isinstance(value, basestring):
+            value = re.escape(value)
+        return value
 
 
 class PluginExec(object):
@@ -51,6 +62,7 @@ class PluginExec(object):
             add(name)
 
         adv.accept('boolean', key='fail_entries')
+        adv.accept('boolean', key='auto_escape')
 
         return root
 
@@ -110,27 +122,9 @@ class PluginExec(object):
             for entry in entries:
                 try:
                     cmd = config[event_name][operation]
-
-                    args = []
-                    # shlex is documented to not work on unicode
-                    for arg in shlex.split(cmd.encode('utf-8'), comments=True):
-                        arg = unicode(arg, 'utf-8')
-                        formatted = arg % entry
-                        # shlex.split does not include the quotes, so we have to add them back if appropriate
-                        if formatted != arg:
-                            # On windows we need to use a different quoter
-                            import os
-                            if os.name == 'nt':
-                                from distutils.spawn import _nt_quote_args
-                                quoter = lambda x: _nt_quote_args([x])[0]
-                            else:
-                                import pipes
-                                quoter = pipes.quote
-                            arg = quoter(formatted)
-
-                        args.append(arg)
-                    cmd = ' '.join(args)
-
+                    entrydict = EscapingDict(entry) if config.get('auto_escape') else entry
+                    # Do string replacement from entry, but make sure quotes get escaped
+                    cmd = cmd % entrydict
                 except KeyError, e:
                     msg = 'Entry %s does not have required field %s' % (entry['title'], e.message)
                     log.error(msg)

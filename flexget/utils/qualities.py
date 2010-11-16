@@ -53,14 +53,14 @@ qualities = [Quality(1000, '1080p web-dl', webdl_hybrid(re_1080p)),
             Quality(500, '720p', re_720p),
             Quality(450, '720i'),
             Quality(400, 'hr'),
-            Quality(380, 'bdrip', 'b(?:[dr][\W_]?rip|luray)'),
+            Quality(380, 'bdrip', '(?:b[dr][\W_]?rip)|(?:bluray(?:[\W_]?rip)?)'),
             Quality(350, 'dvdrip', 'dvd(?:[\W_]?rip)?'),
             Quality(320, 'web-dl', re_webdl),
             Quality(300, '480p', '480p?'),
             Quality(290, 'hdtv', 'hdtv(?:[\W_]?rip)?'),
             Quality(280, 'bdscr'),
             Quality(250, 'dvdscr'),
-            Quality(100, 'sdtv', '(?:[sp]dtv|dvb)(?:[\W_]?rip)?|tv[\W_]?rip'),
+            Quality(100, 'sdtv', '(?:[sp]dtv|dvb)(?:[\W_]?rip)?|(?:t|pp)v[\W_]?rip'),
             Quality(80, 'dsr', 'ds(?:r|[\W_]?rip)'),
             Quality(50, 'r5'),
             Quality(40, 'tc'),
@@ -112,13 +112,17 @@ def common_name(name):
     return get(name).name
 
 
-def parse_quality(title, exact=False):
-    """Find the highest know quality in a given string"""
+def quality_match(title, exact=False):
     qualities.sort(reverse=True)
     for qual in qualities:
         match = qual.regexp.search(title)
         if match:
             # If exact mode make sure quality identifier is the entire string.
             if not exact or match.span(0) == (0, len(title)):
-                return qual
-    return UnknownQuality()
+                return qual, match
+    return UnknownQuality(), None
+
+
+def parse_quality(title, exact=False):
+    """Find the highest know quality in a given string"""
+    return quality_match(title, exact)[0]
