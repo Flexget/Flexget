@@ -1,6 +1,5 @@
 import logging
-from flexget.plugin import plugins, FEED_EVENTS, EVENT_METHODS
-from flexget.plugin import *
+from flexget.plugin import plugins, register_plugin
 
 log = logging.getLogger('p_priority')
 
@@ -32,11 +31,11 @@ class PluginPriority(object):
         for name, priority in feed.config.get('plugin_priority', {}).iteritems():
             names.append(name)
             originals = self.priorities.setdefault(name, {})
-            for method in plugins[name].event_handlers.itervalues():
-                originals[method.method_name] = method.priority
-                log.debug('stored %s original value %s' % (method.name, method.priority))
-                method.priority = priority
-                log.debug('set %s new value %s' % (method.method_name, priority))
+            for handler_name, event in plugins[name].event_handlers.iteritems():
+                originals[handler_name] = event.priority
+                log.debug('stored %s original value %s' % (handler_name, event.priority))
+                event.priority = priority
+                log.debug('set %s new value %s' % (handler_name, priority))
         log.debug('Changed priority for: %s' % ', '.join(names))
 
     def on_feed_exit(self, feed):
@@ -44,8 +43,8 @@ class PluginPriority(object):
         for name in feed.config.get('plugin_priority', {}).keys():
             names.append(name)
             originals = self.priorities[name]
-            for method_name, priority in originals.iteritems():
-                plugins[name].event_handlers[method_name].priority = priority
+            for handler_name, priority in originals.iteritems():
+                plugins[name].event_handlers[handler_name].priority = priority
         log.debug('Restored priority for: %s' % ', '.join(names))
 
     on_feed_abort = on_feed_exit

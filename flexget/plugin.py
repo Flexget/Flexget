@@ -1,8 +1,10 @@
 from flexget import plugins as _plugins_mod
+from flexget.event import Event
 import os
 import sys
 import logging
 import time
+from event import add_event_handler
 
 log = logging.getLogger('plugin')
 
@@ -239,7 +241,15 @@ class PluginInfo(dict):
                 method = getattr(self.instance, method_name)
                 if not callable(method):
                     continue
-                self.event_handlers[method_name] = PluginMethod(self, method_name, event)
+                # check for priority decorator
+                if hasattr(method, 'priority'):
+                    priority = method.priority
+                else:
+                    priority = DEFAULT_PRIORITY
+                event = add_event_handler('plugin.%s.%s' % (self.name, event), method, priority)
+                # provides backwards compatibility
+                event.plugin = self
+                self.event_handlers[method_name] = event
 
     def __getattr__(self, attr):
         if attr in self:
@@ -251,48 +261,6 @@ class PluginInfo(dict):
 
     def __str__(self):
         return '<PluginInfo(name=%s)>' % self.name
-
-    __repr__ = __str__
-
-
-class PluginMethod(object):
-    """
-        Proxies an event for a plugin to be used as a callable object
-        while also allowing accessing the plugin's attributes directly.
-    """
-
-    def __init__(self, plugin, method_name, event_name):
-        self.plugin = plugin
-        self.method_name = method_name
-        self.event_name = event_name
-        method = getattr(plugin.instance, method_name)
-        if hasattr(method, 'priority'):
-            self.priority = method.priority
-        else:
-            self.priority = DEFAULT_PRIORITY
-
-    def __getattr__(self, attr):
-        if attr in self.plugin:
-            return self.plugin[attr]
-        return object.__getattribute__(self, attr)
-
-    def __getitem__(self, key):
-        return self.plugin[key]
-
-    def __call__(self, *args, **kwargs):
-        return getattr(self.plugin.instance, self.method_name)(*args, **kwargs)
-
-    def __eq__(self, other):
-        return self.priority == other.priority
-
-    def __lt__(self, other):
-        return self.priority < other.priority
-
-    def __gt__(self, other):
-        return self.priority > other.priority
-
-    def __str__(self):
-        return '<PluginMethod(plugin=%s,method=%s,priority=%s)>' % (self.plugin['name'], self.method_name, self.priority)
 
     __repr__ = __str__
 

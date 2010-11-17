@@ -28,6 +28,8 @@ class Event(object):
     def __str__(self):
         return '<Event(name=%s,func=%s,priority=%s)>' % (self.name, self.func.__name__, self.priority)
 
+    __repr__ = __str__
+
 
 def event(name, priority=128):
     """Register event to function with a decorator"""
@@ -48,14 +50,16 @@ def get_events(name):
 
 
 def add_event_handler(name, func, priority=128):
-    """Attach event to :func: under a name :name: with :priority:"""
+    """Attach event to :func: under a name :name: with :priority:. Returns Event created."""
 
     events = _events.setdefault(name, [])
     for event in events:
         if event.func == func:
             raise Exception('%s has already been registered as event listener under name %s' % (func.__name__, name))
     log.debug('registered function %s to event %s' % (func.__name__, name))
-    events.append(Event(name, func, priority))
+    event = Event(name, func, priority)
+    events.append(event)
+    return event
 
 
 def remove_event_handler(name, func):
