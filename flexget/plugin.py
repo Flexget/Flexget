@@ -4,7 +4,7 @@ import os
 import sys
 import logging
 import time
-from event import add_event_handler
+from event import add_event_handler, remove_event_handler
 
 log = logging.getLogger('plugin')
 
@@ -231,6 +231,9 @@ class PluginInfo(dict):
         """Temporary utility method"""
         self.event_handlers = {}
         self.build_event_handlers()
+        # TODO: should unregister events (from flexget.event)
+        # this method is not used at the moment anywhere ...
+        raise Exception('Implementation unfinished')
 
     def build_event_handlers(self):
         """(Re)build event_handlers in this plugin"""
