@@ -1,7 +1,7 @@
 import logging
 import datetime
 import os
-from flexget.plugin import *
+from flexget.plugin import register_plugin, PluginWarning
 from flexget.manager import Base
 from sqlalchemy import Column, Integer, String, DateTime
 
@@ -27,7 +27,7 @@ class RSSEntry(Base):
     published = Column(DateTime, default=datetime.datetime.utcnow())
 
 
-class OutputRSS:
+class OutputRSS(object):
     """
         Write RSS containing succeeded (downloaded) entries.
         
@@ -119,6 +119,7 @@ class OutputRSS:
         rss.accept('number', key='items')
         rss.accept('boolean', key='history')
         rss.accept('text', key='rsslink')
+        rss.accept('text', key='encoding') # TODO: only valid choices
         links = rss.accept('list', key='link')
         links.accept('text')
         return root
@@ -134,6 +135,7 @@ class OutputRSS:
         config.setdefault('days', 7)
         config.setdefault('items', -1)
         config.setdefault('history', True)
+        config.setdefault('encoding', 'iso-8859-1')
         config.setdefault('link', ['imdb_url', 'input_url'])
         # add url as last resort
         config['link'].append('url')
@@ -239,11 +241,15 @@ class OutputRSS:
         # write rss
         fn = os.path.expanduser(config['file'])
         try:
-            rss.write_xml(open(fn, 'w'))
+            rss.write_xml(open(fn, 'w'), encoding=config['encoding'])
+        except LookupError:
+            log.critical('Unknown encoding %s' % config['encoding'])
+            return
         except IOError:
             # TODO: plugins cannot raise PluginWarnings in terminate event ..
-            log.error('Unable to write %s' % fn)
+            log.critical('Unable to write %s' % fn)
             return
         self.written[config['file']] = True
+
 
 register_plugin(OutputRSS, 'make_rss')
