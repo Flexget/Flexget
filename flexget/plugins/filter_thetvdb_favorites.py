@@ -67,12 +67,15 @@ class FilterThetvdbFavorites(FilterSeriesBase):
                 # We found new data, remove old cached data
                 items = []
                 for fid in favorite_ids:
+                    log.debug('Looking up series info for %s' % str(fid))
                     data = BeautifulStoneSoup(urlopener("http://thetvdb.com/data/series/%s/" % str(fid), log), \
                         convertEntities=BeautifulStoneSoup.HTML_ENTITIES)
                     items.append(ThetvdbFavorites(account_id, data.series.seriesname.string))
             except (urllib2.URLError, IOError, AttributeError):
+                import traceback
                 # If there are errors getting the favorites or parsing the xml, fall back on cache
                 log.error('Error retrieving favorites from thetvdb, using cache.')
+                log.debug(traceback.format_exc())
             else:
                 # Successfully updated from tvdb, update the database
                 log.debug('Successfully updated favorites from thetvdb.com')
