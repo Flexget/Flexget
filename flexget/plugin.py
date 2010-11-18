@@ -233,7 +233,7 @@ class PluginInfo(dict):
         self.build_event_handlers()
         # TODO: should unregister events (from flexget.event)
         # this method is not used at the moment anywhere ...
-        raise Exception('Implementation unfinished')
+        raise NotImplementedError
 
     def build_event_handlers(self):
         """(Re)build event_handlers in this plugin"""

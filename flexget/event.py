@@ -64,7 +64,7 @@ def add_event_handler(name, func, priority=128):
 
 def remove_event_handler(name, func):
     # TODO: implement
-    raise Exception('not implemented')
+    raise NotImplementedError
 
 
 def fire_event(name, *args, **kwargs):
