@@ -83,8 +83,6 @@ def execute():
 
 @event('webui.start')
 def start_timer():
-    return
-
     interval = get_global_interval()
     global timer
     timer = Timer(interval * 60, execute)
