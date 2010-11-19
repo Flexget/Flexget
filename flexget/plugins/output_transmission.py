@@ -69,7 +69,7 @@ class PluginTransmission(object):
         advanced.accept('path', key='path', allow_replacement=True)
         advanced.accept('boolean', key='addpaused')
         advanced.accept('boolean', key='honourlimits')
-        advanced.accept('numer', key='bandwidthpriority')
+        advanced.accept('number', key='bandwidthpriority')
         advanced.accept('number', key='maxconnections')
         advanced.accept('number', key='maxupspeed')
         advanced.accept('number', key='maxdownspeed')
@@ -105,7 +105,7 @@ class PluginTransmission(object):
                                            'honourlimits': 'boolean',
                                            'bandwidthpriority': 'number',
                                            'maxconnections': 'number',
-                                           'maxupspeed': 'number', 
+                                           'maxupspeed': 'number',
                                            'maxdownspeed': 'number',
                                            'ratio': 'decimal'})
         config = self.get_config(feed)
@@ -162,7 +162,7 @@ class PluginTransmission(object):
         opt_dic = {}
         config = self.get_config(feed)
 
-        for opt_key in ('path', 'addpaused', 'honourlimits', 'bandwidthpriority', 
+        for opt_key in ('path', 'addpaused', 'honourlimits', 'bandwidthpriority',
                         'maxconnections', 'maxupspeed', 'maxdownspeed', 'ratio'):
             if opt_key in entry:
                 opt_dic[opt_key] = entry[opt_key]
