@@ -83,6 +83,8 @@ def execute():
 
 @event('webui.start')
 def start_timer():
+    return # disabled because seems to cause problems with autoreload
+
     interval = get_global_interval()
     global timer
     timer = Timer(interval * 60, execute)

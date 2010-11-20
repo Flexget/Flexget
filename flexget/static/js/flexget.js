@@ -47,3 +47,19 @@ $(document).ready(function(){
         });
     }
 });
+
+/* menu list element actions */
+
+$(document).ready(function(){
+
+    if ($("#cat")) {
+        $("#cat dd ul li div.item").hover(
+            function () {
+                $(this).find("div.actions").show();
+            },
+            function () {
+                $(this).find("div.actions").hide();
+            });
+    }
+
+});

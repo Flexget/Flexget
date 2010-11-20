@@ -17,9 +17,20 @@
     <dd>
         <ul>
             {% for name in manager.config[category].iterkeys() %}
-                <li><a href="/configure/{{ category }}/{{ name }}">{{ name }}</a></li>
+                <li>
+                    <div class="item">
+                        <a href="/configure/edit/{{ category }}/{{ name }}">{{ name }}</a>
+                        <div class="actions">
+                            <a href="/configure/delete/{{ category }}/{{ name }}"><img src="/static/img/fatcow-icons/16x16/delete.png" alt="Delete"/></a>
+                        </div>
+                    </div>
+                </li>
             {% endfor %}
-            <li class="new"><a href="">Create new</a></li>
+            <li class="new">
+                <div class="item">
+                    <a href="">Create new</a>
+                </div>
+            </li>
         </ul>
     </dd>
     {% endfor %}

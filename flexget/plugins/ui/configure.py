@@ -1,8 +1,9 @@
 from flexget.webui import manager, register_plugin
 from flexget.feed import Feed
-from flask import render_template, request, flash, Module
+from flask import render_template, request, flash, redirect, Module
 import yaml
 import logging
+from flask.helpers import url_for
 
 configure = Module(__name__, url_prefix='/configure')
 
@@ -20,7 +21,13 @@ def index():
     return render_template('configure.html')
 
 
-@configure.route('/<root>/<name>', methods=['POST', 'GET'])
+@configure.route('/delete/<root>/<name>')
+def delete(root, name):
+    log.info('Deleting %s %s' % (root, name))
+    return redirect(url_for('index'))
+
+
+@configure.route('/edit/<root>/<name>', methods=['POST', 'GET'])
 def edit(root, name):
 
     context = {
