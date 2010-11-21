@@ -1,6 +1,7 @@
 import logging
-from flexget.plugin import *
+from flexget.plugin import priority, register_plugin
 from flexget.utils.titles import SeriesParser
+from flexget.utils.titles.parser import ParseWarning
 import re
 
 log = logging.getLogger('metanfo_series')
@@ -63,7 +64,10 @@ class MetainfoSeries(object):
                     return
                 parser.name = name
                 parser.data = title
-                parser.parse()
+                try:
+                    parser.parse()
+                except ParseWarning, pw:
+                    log.debug('ParseWarning: %s' % pw.value)
                 if parser.valid:
                     return parser
 
