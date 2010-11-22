@@ -68,7 +68,7 @@ ul#navbar li a.current {
     color: #fff;
     text-decoration: none;
 }
-#menu li a.selected
+#menu li div.item.selected
 {
     border-left: 10px solid #FF702E;
 }
