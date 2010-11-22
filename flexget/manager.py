@@ -12,6 +12,21 @@ Base = declarative_base()
 Session = sessionmaker()
 
 
+def useExecLogging(func):
+
+    def wrapper(self, *args, **kw):
+        # Set the feed name in the logger
+        from flexget import logger
+        import time
+        logger.set_execution(str(time.time()))
+        try:
+            return func(self, *args, **kw)
+        finally:
+            logger.set_execution('')
+
+    return wrapper
+
+
 class Manager(object):
     unit_test = False
     options = None
@@ -341,6 +356,7 @@ class Manager(object):
         for feed in self.feeds.itervalues():
             feed.enabled = True
 
+    @useExecLogging
     def execute(self):
         """Iterate trough all feeds and run them."""
 

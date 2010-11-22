@@ -19,11 +19,17 @@
             url:"{{ url_for('get_logdata') }}",
             datatype: 'json',
             mtype: 'GET',
-            colNames: ['Date','Level','Logger','Message'],
+            postData: {
+                log_type:  function () {return $("input[name='log_type']:checked").val();},
+                feed:  function () {return $("#feedlist > li > a.selected").attr('id')},
+                exec: function () {return $("#execlist > li > a.selected").attr('id')}
+            },
+            colNames: ['Date','Level','Logger', 'Feed', 'Message'],
             colModel: [
                 {name:'created', width:150, align: 'right'},
                 {name:'levelno', width:65, sortable: false},
                 {name:'logger', width:100, sortable: false},
+                {name:'feed', width:100, sortable: false},
                 {name:'message', width:900, sortable: false}
             ],
             pager: '#pager',
@@ -48,17 +54,67 @@
                 npages: 'npages'
             }
         }).navGrid('#pager', {refresh: true, search:false, del:false, edit:false, add:false});
-        //inter = setInterval('refreshGrid();', 10000);
+        $("input[name='log_type']").change(function() {
+            $("#execlist > li > a").removeClass('selected')
+            $("#execlist > li > a:first").addClass('selected')
+            $("#feedlist > li > a").removeClass('selected')
+            $("#feedlist > li > a:first").addClass('selected')
+            refreshGrid();
+        });
+        $("#feedlist > li > a").click(function() {
+            $("#feedlist > li > a").removeClass('selected');
+            $(this).addClass('selected');
+            $("input[name='log_type']").filter("[value='core']").attr("checked", true);
+            refreshGrid();
+        });
+        $("#execlist > li > a").click(function() {
+            $("#execlist > li > a").removeClass('selected');
+            $(this).addClass('selected');
+            $("input[name='log_type']").filter("[value='core']").attr("checked", true);
+            refreshGrid();
+        });
+        function refreshGrid(){
+            if ($("input[name='log_type']:checked").val() == 'webui')
+                $("#logarea").hideCol("feed");
+            else
+                $("#logarea").showCol("feed");
+            $("#logarea").trigger("reloadGrid");
+        };
     });
-    function refreshGrid(){
-         $("#logarea").trigger("reloadGrid"); // no good, brings up the loading screen
-    }
 </script>
 <h1>FlexGet log messages</h1>
 
 <p>
+    <table><tr>
+        <td><input type="radio" name="log_type" value="core" checked> Core </td>
+        <td><input type="radio" name="log_type" value="webui"> Webui </td>
+        <td><input type="radio" name="log_type" value="all"> All <br></td>
+    </tr></table>
     <table id="logarea"></table>
     <div id="pager"></div>
 </p>
 
+{% endblock %}
+
+{% block menu %}
+<dl>
+    <dt><div><b>Executions</b></div></dt>
+    <dd>
+    <ul id="execlist">
+        <li><a href="#" class="selected" id="">All</a></li>
+        {% for exec in menu_execs -%}
+        <li><a href="#" id="{{  exec[0]  }}">{{ exec[1] }}</a></li>
+        {% endfor %}
+    </ul>
+    </dd>
+    <dt><div><b>Feeds</b></div></dt>
+    <dd>
+    <ul id="feedlist">
+        <li><a href="#" class="selected" id="">All</a></li>
+        {% for feed in menu_feeds -%}
+        <li><a href="#" id="{{ feed }}">{{ feed }}</a></li>
+        {% endfor %}
+    </ul>
+    </dd>
+</dl>
 {% endblock %}

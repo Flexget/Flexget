@@ -103,27 +103,13 @@ class Entry(dict):
 def useFeedLogging(func):
 
     def wrapper(self, *args, **kw):
-        # re-format logging
-        padding = 15
-        feed_name = self.name
-        while len(feed_name) <= padding:
-            feed_name += ' '
-        if len(feed_name) > padding:
-            feed_name = feed_name[:padding]
-
-        log_format = ['%(asctime)-15s %(levelname)-8s %(name)-13s ' + feed_name + ' %(message)s', '%Y-%m-%d %H:%M']
-        formatter = logging.Formatter(*log_format)
-
-        formatters = {}
-        for handler in log.parent.handlers:
-            formatters[handler] = handler.formatter
-            handler.setFormatter(formatter)
-
+        # Set the feed name in the logger
+        from flexget import logger
+        logger.set_feed(self.name)
         try:
             return func(self, *args, **kw)
         finally:
-            for handler in log.parent.handlers:
-                handler.setFormatter(formatters[handler])
+            logger.set_feed('')
 
     return wrapper
 
