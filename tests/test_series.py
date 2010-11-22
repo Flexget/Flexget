@@ -198,6 +198,7 @@ class TestFilterSeries(FlexGetBase):
               - {title: 'Date.Series.10.12.2008.XViD'}
               - {title: 'Date.Series.2008-10-13.XViD'}
               - {title: 'Date.Series.2008x10.14.XViD'}
+              - {title: 'Date Series 2010 11 17 XViD'}
               - {title: 'Useless title', filename: 'Filename.Series.S01E26.XViD'}
               - {title: 'Empty.Description.S01E22.XViD', description: ''}
 
@@ -237,10 +238,13 @@ class TestFilterSeries(FlexGetBase):
             'Another.Series.S01E20.720p.XViD-FlexGet should have passed'
 
         # date formats
-        df = ['Date.Series.10-11-2008.XViD', 'Date.Series.10.12.2008.XViD', \
+        df = ['Date.Series.10-11-2008.XViD', 'Date.Series.10.12.2008.XViD', 'Date Series 2010 11 17 XViD',
               'Date.Series.2008-10-13.XViD', 'Date.Series.2008x10.14.XViD']
         for d in df:
-            assert self.feed.find_entry(title=d), 'Date format did not match %s' % d
+            entry = self.feed.find_entry(title=d)
+            assert entry, 'Date format did not match %s' % d
+            assert 'series_parser' in entry, 'series_parser missing from %s' % d
+            assert len(entry['series_parser'].id_groups) == 3, '%s did not return three groups for dates' % d
 
         # parse from filename
         assert self.feed.find_entry(filename='Filename.Series.S01E26.XViD'), 'Filename parsing failed'
