@@ -710,12 +710,10 @@ class FilterSeries(SeriesPlugin, FilterSeriesBase):
         ignore_fields = ['uid', 'guid', 'feed', 'url', 'original_url', 'type', 'quality', 'series_name', 'series_id', 'accepted_by', 'reason']
 
         for entry in feed.entries:
-            if entry.get('series_parser') and entry['series_parser'].valid and not entry.get('series_guessed'):
-                # This entry already has a valid series parser, use it. (probably from backlog)
-                parser = entry['series_parser']
-                if parser.name.lower() != series_name.lower():
-                    # This was detected as another series, we can skip it.
-                    continue
+            if entry.get('series_parser') and entry['series_parser'].valid and not entry.get('series_guessed') and \
+               entry['series_parser'].name.lower() != series_name.lower():
+                # This was detected as another series, we can skip it.
+                continue
             else:
                 for field, data in sorted(entry.items(), key=field_order):
                     # skip invalid fields
