@@ -665,9 +665,7 @@ class FilterSeries(SeriesPlugin, FilterSeriesBase):
 
     def parse_series(self, feed, series_name, config):
         """
-            Search for :series_name: and return dict containing all episodes from it
-            in a dict where key is the episode identifier and value is a list of episodes
-            in form of SeriesParser.
+            Search for :series_name: and populate all series_* fields in entries when successfully parsed
         """
 
         def get_as_array(config, key):

@@ -214,6 +214,7 @@ class TestFilterSeries(FlexGetBase):
               - empty description
 
           metainfo_series_override:
+            metainfo_series: yes
             mock:
               - {title: 'Test.Series.with.extra.crap.S01E02.PDTV.XViD-FlexGet'}
               - {title: 'Other.Show.with.extra.crap.S02E01.PDTV.XViD-FlexGet'}

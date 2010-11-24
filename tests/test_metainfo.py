@@ -87,6 +87,9 @@ class TestMetainfoQuality(FlexGetBase):
 
 class TestMetainfoSeries(FlexGetBase):
     __yaml__ = """
+        presets:
+          global:
+            metainfo_series: yes
         feeds:
           test:
             mock:

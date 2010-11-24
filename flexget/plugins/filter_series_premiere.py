@@ -1,4 +1,4 @@
-from flexget.plugin import register_plugin, priority
+from flexget.plugin import register_plugin, priority, get_plugin_by_name
 from flexget.plugins.filter_series import FilterSeriesBase
 
 
@@ -47,10 +47,13 @@ class FilterSeriesPremiere(FilterSeriesBase):
             group_settings = config
         group_settings['series_guessed'] = True
         # Generate a list of unique series that have premieres
+        metainfo_series = get_plugin_by_name('metainfo_series')
+        guess_entry = metainfo_series.instance.guess_entry
         guessed_series = set()
         for entry in feed.entries:
-            if entry.get('series_guessed') and entry.get('series_name') and entry.get('series_id') == 'S01E01':
-                guessed_series.add(entry['series_name'])
+            if guess_entry(entry):
+                if entry['series_id'] == 'S01E01':
+                    guessed_series.add(entry['series_name'])
         # Reject any further episodes in those series
         for entry in feed.entries:
             for series in guessed_series:
