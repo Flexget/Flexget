@@ -1,0 +1,16 @@
+{% extends "layout.html" %}
+{% block main %}
+
+<h1>Series report</h1>
+
+{% if report %}
+    <ul>
+    {% for series in report %}
+        <li><a href="/series/{{ series.name }}">{{ series.name }}</a></li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No series downloaded</p>
+{% endif %}
+
+{% endblock %}

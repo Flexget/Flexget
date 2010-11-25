@@ -1,0 +1,21 @@
+{% extends "layout.html" %}
+{% block main %}
+
+<h1>Series report</h1>
+
+{% if episodes %}
+    <ul>
+    {% for episode in episodes %}
+        <li>{{ episode.identifier }}</li>
+        <ul>
+            {% for release in episode.releases %}
+                <li>{{ release.title }}</li>
+            {% endfor %}
+        </ul>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No episodes for {{ name }}</p>
+{% endif %}
+
+{% endblock %}
