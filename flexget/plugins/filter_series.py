@@ -665,9 +665,7 @@ class FilterSeries(SeriesPlugin, FilterSeriesBase):
 
     def parse_series(self, feed, series_name, config):
         """
-            Search for :series_name: and return dict containing all episodes from it
-            in a dict where key is the episode identifier and value is a list of episodes
-            in form of SeriesParser.
+            Search for :series_name: and populate all series_* fields in entries when successfully parsed
         """
 
         def get_as_array(config, key):
@@ -710,12 +708,10 @@ class FilterSeries(SeriesPlugin, FilterSeriesBase):
         ignore_fields = ['uid', 'guid', 'feed', 'url', 'original_url', 'type', 'quality', 'series_name', 'series_id', 'accepted_by', 'reason']
 
         for entry in feed.entries:
-            if entry.get('series_parser') and entry['series_parser'].valid and not entry.get('series_guessed'):
-                # This entry already has a valid series parser, use it. (probably from backlog)
-                parser = entry['series_parser']
-                if parser.name.lower() != series_name.lower():
-                    # This was detected as another series, we can skip it.
-                    continue
+            if entry.get('series_parser') and entry['series_parser'].valid and not entry.get('series_guessed') and \
+               entry['series_parser'].name.lower() != series_name.lower():
+                # This was detected as another series, we can skip it.
+                continue
             else:
                 for field, data in sorted(entry.items(), key=field_order):
                     # skip invalid fields

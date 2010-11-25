@@ -63,15 +63,17 @@ class PluginTransmission(object):
         advanced.accept('text', key='host')
         advanced.accept('number', key='port')
         # note that password is optional in transmission
-        advanced.accept('file', key='netrc', required=False)
-        advanced.accept('text', key='username', required=False)
-        advanced.accept('text', key='password', required=False)
-        advanced.accept('path', key='path', required=False, allow_replacement=True)
-        advanced.accept('boolean', key='addpaused', required=False)
-        advanced.accept('number', key='maxconnections', required=False)
-        advanced.accept('number', key='maxupspeed', required=False)
-        advanced.accept('number', key='maxdownspeed', required=False)
-        advanced.accept('decimal', key='ratio', required=False)
+        advanced.accept('file', key='netrc')
+        advanced.accept('text', key='username')
+        advanced.accept('text', key='password')
+        advanced.accept('path', key='path', allow_replacement=True)
+        advanced.accept('boolean', key='addpaused')
+        advanced.accept('boolean', key='honourlimits')
+        advanced.accept('number', key='bandwidthpriority')
+        advanced.accept('number', key='maxconnections')
+        advanced.accept('number', key='maxupspeed')
+        advanced.accept('number', key='maxdownspeed')
+        advanced.accept('decimal', key='ratio')
         advanced.accept('boolean', key='enabled')
         advanced.accept('boolean', key='removewhendone')
         return root
@@ -98,11 +100,13 @@ class PluginTransmission(object):
         if [int(part) for part in transmissionrpc.__version__.split('.')] < [0, 6, 0]:
             raise PluginError('Transmissionrpc module version 0.6 or higher required, please upgrade', log)
         set_plugin = get_plugin_by_name('set')
-        set_plugin.instance.register_keys({'path': 'text', \
-                                           'addpaused': 'boolean', \
-                                           'maxconnections': 'number', \
-                                           'maxupspeed': 'number',  \
-                                           'maxdownspeed': 'number', \
+        set_plugin.instance.register_keys({'path': 'text',
+                                           'addpaused': 'boolean',
+                                           'honourlimits': 'boolean',
+                                           'bandwidthpriority': 'number',
+                                           'maxconnections': 'number',
+                                           'maxupspeed': 'number',
+                                           'maxdownspeed': 'number',
                                            'ratio': 'decimal'})
         config = self.get_config(feed)
         if config['enabled']:
@@ -158,7 +162,8 @@ class PluginTransmission(object):
         opt_dic = {}
         config = self.get_config(feed)
 
-        for opt_key in ['path', 'addpaused', 'maxconnections', 'maxupspeed', 'maxdownspeed', 'ratio']:
+        for opt_key in ('path', 'addpaused', 'honourlimits', 'bandwidthpriority',
+                        'maxconnections', 'maxupspeed', 'maxdownspeed', 'ratio'):
             if opt_key in entry:
                 opt_dic[opt_key] = entry[opt_key]
             elif opt_key in config:
@@ -172,6 +177,10 @@ class PluginTransmission(object):
                 options['add']['download_dir'] = os.path.expanduser(opt_dic['path'])
         if 'addpaused' in opt_dic and opt_dic['addpaused']:
             options['add']['paused'] = True
+        if 'honourlimits' in opt_dic and not opt_dic['honourlimits']:
+            options['add']['honorsSessionLimits'] = False
+        if 'bandwidthpriority' in opt_dic:
+            options['add']['bandwidthPriority'] = opt_dic['bandwidthpriority']
         if 'maxconnections' in opt_dic:
             options['add']['peer_limit'] = opt_dic['maxconnections']
 

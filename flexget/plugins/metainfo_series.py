@@ -1,6 +1,7 @@
 import logging
-from flexget.plugin import *
+from flexget.plugin import priority, register_plugin
 from flexget.utils.titles import SeriesParser
+from flexget.utils.titles.parser import ParseWarning
 import re
 
 log = logging.getLogger('metanfo_series')
@@ -25,14 +26,23 @@ class MetainfoSeries(object):
             # If series plugin already parsed this, don't touch it.
             if entry.get('series_name'):
                 continue
-            parser = self.guess_series(entry['title'])
-            if parser:
-                entry['series_name'] = parser.name
-                entry['series_season'] = parser.season
-                entry['series_episode'] = parser.episode
-                entry['series_id'] = parser.identifier
-                entry['series_guessed'] = True
-                entry['series_parser'] = parser
+            self.guess_entry(entry)
+
+    def guess_entry(self, entry):
+        """Populates series_* fields for entries that are successfully parsed."""
+        if entry.get('series_parser') and entry['series_parser'].valid:
+            # Return true if we already parsed this, false if series plugin parsed it
+            return entry.get('series_guessed')
+        parser = self.guess_series(entry['title'])
+        if parser:
+            entry['series_name'] = parser.name
+            entry['series_season'] = parser.season
+            entry['series_episode'] = parser.episode
+            entry['series_id'] = parser.identifier
+            entry['series_guessed'] = True
+            entry['series_parser'] = parser
+            return True
+        return False
 
     def guess_series(self, title):
         """Returns a valid series parser if this etnry appears to be a series"""
@@ -63,8 +73,11 @@ class MetainfoSeries(object):
                     return
                 parser.name = name
                 parser.data = title
-                parser.parse()
+                try:
+                    parser.parse()
+                except ParseWarning, pw:
+                    log.debug('ParseWarning: %s' % pw.value)
                 if parser.valid:
                     return parser
 
-register_plugin(MetainfoSeries, 'metainfo_series', builtin=True)
+register_plugin(MetainfoSeries, 'metainfo_series')

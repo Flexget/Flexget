@@ -1,4 +1,4 @@
-from flexget.plugin import register_plugin, priority
+from flexget.plugin import register_plugin, priority, get_plugin_by_name
 from flexget.plugins.filter_series import FilterSeriesBase
 
 
@@ -38,10 +38,12 @@ class FilterAllSeries(FilterSeriesBase):
         if isinstance(config, dict):
             group_settings = config
         group_settings['series_guessed'] = True
-        # Generate a list of unique series that metainfo_series has parsed for this feed
+        # Generate a list of unique series that metainfo_series can parse for this feed
+        metainfo_series = get_plugin_by_name('metainfo_series')
+        guess_entry = metainfo_series.instance.guess_entry
         guessed_series = set()
         for entry in feed.entries:
-            if entry.get('series_guessed') and entry.get('series_name'):
+            if guess_entry(entry):
                 guessed_series.add(entry['series_name'])
         # Combine settings and series into series plugin config format
         allseries = {'settings': {'all_series': group_settings}, 'all_series': list(guessed_series)}

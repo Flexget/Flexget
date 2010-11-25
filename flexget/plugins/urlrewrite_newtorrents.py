@@ -104,7 +104,11 @@ class NewTorrents:
         torrents.sort(reverse=True)
         # choose the torrent
         if not torrents:
-            raise PluginWarning('No matches for %s' % name, log, log_once=True)
+            dashindex = name.rfind('-')
+            if dashindex != -1:
+                return self.url_from_search(url, name[:dashindex])
+            else:
+                raise PluginWarning('No matches for %s' % name, log, log_once=True)
         else:
             if len(torrents) == 1:
                 log.debug('found only one matching search result.')

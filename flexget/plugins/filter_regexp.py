@@ -106,7 +106,7 @@ class FilterRegexp(object):
                 if 'not' in opts and isinstance(opts['not'], basestring):
                     opts['not'] = [opts['not']]
                 # make sure regxp is a string for series like '24'
-                regexp = str(regexp)
+                regexp = unicode(regexp)
                 out_config.setdefault(operation, []).append({regexp: opts})
         return out_config
 

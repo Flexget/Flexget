@@ -69,6 +69,7 @@ class SeriesParser(TitleParser):
         self.season = None
         self.episode = None
         self.id = None
+        self.id_groups = None
         self.quality = 'unknown'
         self.proper_or_repack = False
         self.special = False
@@ -271,6 +272,7 @@ class SeriesParser(TitleParser):
                             return
 
                     self.id = '-'.join(match.groups())
+                    self.id_groups = match.groups()
                     if self.special:
                         self.id += '-SPECIAL'
                     self.valid = True
