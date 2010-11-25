@@ -44,6 +44,7 @@ class FilterThetvdbFavorites(FilterSeriesBase):
         root = validator.factory('dict')
         root.accept('text', key='account_id', required=True)
         root.accept('text', key='series_group')
+        root.accept('boolean', key='strip_dates')
         self.build_options_validator(root)
         return root
 
@@ -99,9 +100,9 @@ class FilterThetvdbFavorites(FilterSeriesBase):
                 else:
                     series_entry = {series_name: group_config}
                     if "name_regexp" in series_entry[series_name]:
-                        series_entry["name_regexp"].append(series_regex)
+                        series_entry[series_name]["name_regexp"].append(series_regex)
                     else:
-                        series_entry["name_regexp"] = [series_regex]
+                        series_entry[series_name]["name_regexp"] = [series_regex]
             else:
                 if group_config == {}:
                     series_entry = series.series_name.replace("(", "").replace(")", "")
