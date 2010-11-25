@@ -85,7 +85,7 @@ class UrlRewritePirateBay:
             log.debug('name: %s' % clean_name)
             log.debug('found name: %s' % link.contents[0].lower().replace('.', ' ').replace('-', '').replace('_', ' '))
             log.debug('confidence: %s' % str(confidence))
-            if confidence < 0.9:
+            if confidence < 0.8:
                 continue
             torrent = {}
             torrent['name'] = link.contents[0]
@@ -96,7 +96,11 @@ class UrlRewritePirateBay:
             torrents.append(torrent)
 
         if not torrents:
-            raise PluginWarning('No close matches for %s' % name, log, log_once=True)
+            dashindex = name.rfind('-')
+            if dashindex != -1:
+                return self.search_title(name[:dashindex])
+            else:
+                raise PluginWarning('No close matches for %s' % name, log, log_once=True)
 
         def best(a, b):
             score_a = a['seed'] * 2 + a['leech']

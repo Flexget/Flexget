@@ -87,13 +87,29 @@ class FilterThetvdbFavorites(FilterSeriesBase):
             log.info("Didn't find any thetvdb.com favorites.")
             return
         series_group = config.get('series_group', 'thetvdb_favs')
-        # Pass all config options to series plugin except our two
-        group_config = dict([(key, config[key]) for key in config if not key in ['account_id', 'series_group']])
-        tvdb_series_config = {'settings': {series_group: group_config}, series_group: []}
+        # Pass all config options to series plugin except our special ones
+        group_config = dict([(key, config[key]) for key in config if not key in ['account_id', 'series_group', 'strip_dates']])
+        tvdb_series_config = {series_group: []}
         for series in cache:
-            tvdb_series_config[series_group].append(series.series_name)
+            if ("strip_dates" in config) and (config['strip_dates']) and (series.series_name[-1] == ')'):
+                series_regex = "^" + series.series_name.rstrip('()1234567890').replace("(", "").replace(")", "").replace(" ", ".?").lower()
+                series_name = series.series_name.replace("(", "").replace(")", "")
+                if group_config == {}:
+                    series_entry = {series_name: {"name_regexp": series_regex}}
+                else:
+                    series_entry = {series_name: group_config}
+                    if "name_regexp" in series_entry[series_name]:
+                        series_entry["name_regexp"].append(series_regex)
+                    else:
+                        series_entry["name_regexp"] = [series_regex]
+            else:
+                if group_config == {}:
+                    series_entry = series.series_name.replace("(", "").replace(")", "")
+                else:
+                    series_entry = {series.series_name.replace("(", "").replace(")", ""): group_config}
+            tvdb_series_config[series_group].append(series_entry)
         # Merge the our config in to the main series config
         self.merge_config(feed, tvdb_series_config)
 
-
+# needs to occur prior to the series plugin, in order to deal with the group settings stuff.
 register_plugin(FilterThetvdbFavorites, 'thetvdb_favorites')
