@@ -8,6 +8,10 @@
             white-space: normal !important;
         }
 
+        div#log_type div {
+            float: left;
+            margin-right: 1em;
+        }
     </style>
 {% endblock %}
 
@@ -85,11 +89,13 @@
 <h1>FlexGet log messages</h1>
 
 <p>
-    <table><tr>
-        <td><input type="radio" name="log_type" value="core" checked> Core </td>
-        <td><input type="radio" name="log_type" value="webui"> Webui </td>
-        <td><input type="radio" name="log_type" value="all"> All <br></td>
-    </tr></table>
+    <div id="log_type">
+        <div><input type="radio" name="log_type" value="core" checked> Core</div>
+        <div><input type="radio" name="log_type" value="webui"> Webui</div>
+        <div><input type="radio" name="log_type" value="all"> All</div>
+    </div>
+    <div style="clear:left"></div>
+
     <table id="logarea"></table>
     <div id="pager"></div>
 </p>

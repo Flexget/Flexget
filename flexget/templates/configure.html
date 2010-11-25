@@ -19,7 +19,7 @@
             {% for name in manager.config[category].iterkeys() %}
                 <li>
                     <div class="item">
-                        <a href="/configure/edit/{{ category }}/{{ name }}">{{ name }}</a>
+                        <a href="/configure/edit/text/{{ category }}/{{ name }}">{{ name }}</a>
                         <div class="actions">
                             <a href="/configure/delete/{{ category }}/{{ name }}"><img src="/static/img/fatcow-icons/16x16/delete.png" alt="Delete"/></a>
                         </div>

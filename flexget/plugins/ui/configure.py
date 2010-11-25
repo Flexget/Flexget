@@ -27,8 +27,8 @@ def delete(root, name):
     return redirect(url_for('index'))
 
 
-@configure.route('/edit/<root>/<name>', methods=['POST', 'GET'])
-def edit(root, name):
+@configure.route('/edit/text/<root>/<name>', methods=['POST', 'GET'])
+def edit_text(root, name):
 
     context = {
         'name': name,
@@ -55,6 +55,6 @@ def edit(root, name):
         config = manager.config[root][name]
         context['config'] = yaml.dump(config, Dumper=FGDumper, default_flow_style=False)
 
-    return render_template('configure_edit.html', **context)
+    return render_template('configure_text.html', **context)
 
 register_plugin(configure, menu='Configure', order=10)

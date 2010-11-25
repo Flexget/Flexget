@@ -133,5 +133,5 @@ def start(mg):
 
     # start Flask
     app.secret_key = os.urandom(24)
-    app.run(host='0.0.0.0', port=manager.options.port,
+    app.run(host='0.0.0.0', port=manager.options.port, threaded=True,
             use_reloader=manager.options.autoreload, debug=manager.options.debug)

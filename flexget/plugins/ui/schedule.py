@@ -83,7 +83,10 @@ def execute():
 
 @event('webui.start')
 def start_timer():
-    return # disabled because seems to cause problems with autoreload
+    # autoreload will fail if there are pending timers
+    if manager.options.autoreload:
+        log.info('Aborting start_timer() because --autoreload is enabled')
+        return
 
     interval = get_global_interval()
     global timer
