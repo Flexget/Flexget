@@ -1,8 +1,12 @@
 import logging
 from flexget.webui import register_plugin, db_session
 from flask import request, render_template, flash, Module
+from flexget.plugin import PluginDependencyError
 
-from flexget.plugins.plugin_archive import ArchiveEntry
+try:
+    from flexget.plugins.plugin_archive import ArchiveEntry
+except ImportError:
+    raise PluginDependencyError('Requires archive plugin', 'archive')
 
 log = logging.getLogger('ui.archive')
 archive = Module(__name__)
