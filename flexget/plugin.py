@@ -214,13 +214,7 @@ class PluginInfo(dict):
 
         self.name = name
         self.item_class = item_class
-
-        try:
-            instance = item_class()
-        except Exception:
-            raise
-
-        self.instance = instance
+        self.instance = item_class()
         self.groups = groups
         self.builtin = builtin
         self.debug = debug

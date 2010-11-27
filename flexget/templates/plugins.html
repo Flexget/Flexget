@@ -1,0 +1,35 @@
+{% extends "layout.html" %}
+{% block main %}
+
+<h1>Plugins</h1>
+
+{% for name, plugin_info in plugins|dictsort %}
+
+    {# TODO: clicking the h4 should hide/show details div #}
+    <h4>{{ name }}</h4>
+
+    <div id="{{ name }}">
+        <pre>{{ plugin_info.instance.__doc__ }}</pre>
+
+        {% if plugin_info.groups %}
+            <h5>Groups</h5>
+            <ul>
+            {% for group in plugin_info.groups %}
+                <li>{{ group }}</li>
+            {% endfor %}
+            </ul>
+        {% endif %}
+
+        {% if plugin_info.event_handlers %}
+            <h5>Event handlers</h5>
+            <ul>
+                {% for name, handler in plugin_info.event_handlers.iteritems() %}
+                    <li>{{ name }} ({{ handler.priority }})</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+
+    </div>
+{% endfor %}
+
+{% endblock %}
