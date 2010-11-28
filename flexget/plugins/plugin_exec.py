@@ -9,7 +9,7 @@ log = logging.getLogger('exec')
 
 class EscapingDict(dict):
     """Helper class, same as a dict, but returns all string value with quotes escaped."""
-    
+
     def __getitem__(self, key):
         value = dict.__getitem__(self, key)
         if isinstance(value, basestring):
@@ -63,6 +63,7 @@ class PluginExec(object):
 
         adv.accept('boolean', key='fail_entries')
         adv.accept('boolean', key='auto_escape')
+        adv.accept('boolean', key='allow_background')
 
         return root
 
@@ -93,15 +94,16 @@ class PluginExec(object):
     def on_feed_exit(self, feed):
         self.execute(feed, 'on_exit')
 
-    def execute_cmd(self, cmd):
+    def execute_cmd(self, cmd, allow_background):
         p = subprocess.Popen(cmd, shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE, \
             stderr=subprocess.STDOUT, close_fds=False)
-        (r, w) = (p.stdout, p.stdin)
-        response = r.read()
-        r.close()
-        w.close()
-        if response:
-            log.info('Stdout: %s' % response)
+        if not allow_background:
+            (r, w) = (p.stdout, p.stdin)
+            response = r.read()
+            r.close()
+            w.close()
+            if response:
+                log.info('Stdout: %s' % response)
         return p.wait()
 
     def execute(self, feed, event_name):
@@ -113,6 +115,7 @@ class PluginExec(object):
         name_map = {'for_entries': feed.entries, 'for_accepted': feed.accepted, \
             'for_rejected': feed.rejected, 'for_failed': feed.failed}
 
+        allow_background = config.get('allow_background')
         for operation, entries in name_map.iteritems():
             if not operation in config[event_name]:
                 continue
@@ -138,7 +141,7 @@ class PluginExec(object):
                     log.info('Would execute: %s' % cmd)
                 else:
                     # Run the command, fail entries with non-zero return code if configured to
-                    if self.execute_cmd(cmd) != 0 and config.get('fail_entries'):
+                    if self.execute_cmd(cmd, allow_background) != 0 and config.get('fail_entries'):
                         feed.fail(entry, "adv_exec return code was non-zero")
 
         # event keyword in this
@@ -148,7 +151,7 @@ class PluginExec(object):
             if feed.manager.options.test:
                 log.info('Would execute: %s' % cmd)
             else:
-                self.execute_cmd(cmd)
+                self.execute_cmd(cmd, allow_background)
 
 
 register_plugin(PluginExec, 'exec')
