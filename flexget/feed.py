@@ -249,7 +249,7 @@ class Feed(object):
             log.error('Failed %s (%s)' % (entry['title'], reason))
             # Run on_entry_fail event
             self.__run_event('fail', entry=entry, reason=reason)
-            
+
     def trace(self, entry, message):
         """Add tracing message to entry."""
         entry.trace.append((self.current_plugin, message))
@@ -408,17 +408,6 @@ class Feed(object):
             # if abort flag has been set feed should be aborted now
             if self._abort:
                 return
-
-            # verbose some progress
-            if event == 'input':
-                if not self.entries:
-                    self.verbose_progress('Feed didn\'t produce any entries. This is likely due to a mis-configured or non-functional input.')
-                else:
-                    self.verbose_progress('Produced %s entries.' % (len(self.entries)))
-            if event == 'filter':
-                self.verbose_progress('Accepted: %s (Rejected: %s Undecided: %s Failed: %s)' % \
-                    (len(self.accepted), len(self.rejected), \
-                    len(self.entries) - len(self.accepted), len(self.failed)))
 
         log.debug('committing session, abort=%s' % self._abort)
         self.session.commit()
