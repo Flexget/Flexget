@@ -69,7 +69,7 @@ class FilterThetvdbFavorites(FilterSeriesBase):
                 items = []
                 for fid in favorite_ids:
                     log.debug('Looking up series info for %s' % str(fid))
-                    data = BeautifulStoneSoup(urlopener("http://thetvdb.com/data/series/%s/" % str(fid), log), \
+                    data = BeautifulStoneSoup(urlopener("http://thetvdb.com//data/series/%s/" % str(fid), log), \
                         convertEntities=BeautifulStoneSoup.HTML_ENTITIES)
                     items.append(ThetvdbFavorites(account_id, data.series.seriesname.string))
             except (urllib2.URLError, IOError, AttributeError):
