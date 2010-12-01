@@ -62,10 +62,10 @@ class ChangeWarn(object):
             self.old_database(feed, 'photo missing from imdb_movies table')
         if not 'updated' in columns:
             self.old_database(feed, 'updated missing from imdb_movies table',
-                'sqlite3 db-config.sqlite "ALTER TABLE imdb_movies ADD updated DateTime;"')
+                'sqlite3 %s "ALTER TABLE imdb_movies ADD updated DateTime;"' % feed.manager.db_filename)
         if not 'mpaa_rating' in columns:
             self.old_database(feed, 'mpaa_rating missing from imdb_movies table',
-                'sqlite3 db-config.sqlite "ALTER TABLE imdb_movies ADD mpaa_rating VARCHAR;"')
+                'sqlite3 %s "ALTER TABLE imdb_movies ADD mpaa_rating VARCHAR;"' % feed.manager.db_filename)
 
         columns = table_columns('make_rss', session)
         if not 'rsslink' in columns:
@@ -81,7 +81,7 @@ class ChangeWarn(object):
         columns = table_columns('thetvdb_favorites', session)
         if not 'series_id' in columns:
             self.old_database(feed, 'series_id missing from thetvdb_favorites table',
-                'sqlite3 db-config.sqlite "ALTER TABLE thetvdb_favorites ADD series_id Unicode;"')
+                'sqlite3 %s "ALTER TABLE thetvdb_favorites ADD series_id Unicode;"' % feed.manager.db_filename)
 
         if found_deprecated:
             feed.manager.disable_feeds()
