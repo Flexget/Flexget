@@ -7,7 +7,7 @@ log = logging.getLogger('change')
 found_deprecated = False
 
 
-class ChangeWarn:
+class ChangeWarn(object):
     """
         Gives warning if user has deprecated / changed configuration in the root level.
 
@@ -15,11 +15,20 @@ class ChangeWarn:
 
         Contains ugly hacks, better to include all deprecation warnings here during 1.0 BETA phase
     """
+    
+    def __init__(self):
+        self.warned = False
 
-    def old_database(self, feed, reason=''):
-        log.critical('You\'re running old database! Please see \'Upgrade Actions\' at flexget.com for necessary actions! %s' % reason)
-        feed.manager.disable_feeds()
-        feed.abort()
+    def old_database(self, feed, reason='', solution=''):
+        if not self.warned:
+            feed.manager.disable_feeds()
+            feed.abort()
+            log.critical('You\'re running old database! Please see \'Upgrade Actions\' at flexget.com for necessary actions!')
+            self.warned = True
+        if reason:
+            log.critical('Reason     : %s' % reason)
+        if solution:
+            log.critical('Please run : %s' % solution)
 
     def on_process_start(self, feed):
         found_deprecated = False
@@ -50,18 +59,29 @@ class ChangeWarn:
 
         columns = table_columns('imdb_movies', session)
         if not 'photo' in columns:
-            self.old_database(feed, '(photo missing from imdb_movies table)')
+            self.old_database(feed, 'photo missing from imdb_movies table')
+        if not 'updated' in columns:
+            self.old_database(feed, 'updated missing from imdb_movies table',
+                'sqlite3 db-config.sqlite "ALTER TABLE imdb_movies ADD updated DateTime;"')
+        if not 'mpaa_rating' in columns:
+            self.old_database(feed, 'mpaa_rating missing from imdb_movies table',
+                'sqlite3 db-config.sqlite "ALTER TABLE imdb_movies ADD mpaa_rating VARCHAR;"')
 
         columns = table_columns('make_rss', session)
         if not 'rsslink' in columns:
-            self.old_database(feed, '(rsslink missing from make_rss table)')
+            self.old_database(feed, 'rsslink missing from make_rss table')
 
         columns = table_columns('imdb_queue', session)
         if not 'title' in columns:
-            self.old_database(feed, '(title missing from imdb_queue table)')
+            self.old_database(feed, 'title missing from imdb_queue table')
 
         if table_exists('episode_qualities', session):
-            self.old_database(feed, '(old series format)')
+            self.old_database(feed, 'old series format)')
+            
+        columns = table_columns('thetvdb_favorites', session)
+        if not 'series_id' in columns:
+            self.old_database(feed, 'series_id missing from thetvdb_favorites table',
+                'sqlite3 db-config.sqlite "ALTER TABLE thetvdb_favorites ADD series_id Unicode;"')
 
         if found_deprecated:
             feed.manager.disable_feeds()
