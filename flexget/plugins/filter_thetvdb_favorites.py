@@ -18,11 +18,13 @@ class ThetvdbFavorites(Base):
     id = Column(Integer, primary_key=True)
     account_id = Column(String, index=True)
     series_name = Column(Unicode)
+    series_id = Column(Unicode)
     added = Column(DateTime)
 
-    def __init__(self, account_id, series_name):
+    def __init__(self, account_id, series_name, series_id):
         self.series_name = series_name
         self.account_id = account_id
+        self.series_id = series_id
         self.added = datetime.now()
 
     def __repr__(self):
@@ -53,25 +55,42 @@ class FilterThetvdbFavorites(FilterSeriesBase):
         config = feed.config.get('thetvdb_favorites')
         account_id = str(config['account_id'])
         session = Session()
-        cache = session.query(ThetvdbFavorites).filter(ThetvdbFavorites.account_id == account_id)
-        if cache.count() and cache.first().added > datetime.now() - timedelta(minutes=1):
-            log.debug('Using cached thetvdb favorites')
+        # Check when the last time the user information (favorites) were updated.
+        # The user info is stored where a series_id == ""
+        user_update = session.query(ThetvdbFavorites).filter(ThetvdbFavorites.account_id == account_id).filter(ThetvdbFavorites.series_id == unicode(""))
+        # Grab all info from cache just in case.
+        cache = session.query(ThetvdbFavorites).filter(ThetvdbFavorites.account_id == account_id).filter(ThetvdbFavorites.series_id != unicode(""))
+        if cache.count() and user_update.count() and user_update.first().added > datetime.now() - timedelta(minutes=1):
+            log.debug('Using cached thetvdb favorite series information for account ID %s' % account_id)
         else:
-            log.debug('Updating favorites from thetvdb.com')
+            # Wipe out previous user info update time
+            user_update.delete()
+            session.add(ThetvdbFavorites(account_id, unicode("User Series List Update Time"), unicode("")))
+            session.commit()
+            log.debug('Updating favorite series information from thetvdb.com for account ID %s' % account_id)
             try:
                 url = 'http://thetvdb.com/api/User_Favorites.php?accountid=%s' % account_id
                 log.debug('requesting %s' % url)
                 data = BeautifulStoneSoup(urlopener(url, log))
                 favorite_ids = []
                 for i in data.favorites.findAll("series", recursive=False):
-                    favorite_ids.append(int(i.string))
-                # We found new data, remove old cached data
+                    favorite_ids.append(i.string)
+                # We found new data, check each show, and if older than
+                # 3 hours, update the individual series information
                 items = []
                 for fid in favorite_ids:
-                    log.debug('Looking up series info for %s' % str(fid))
-                    data = BeautifulStoneSoup(urlopener("http://thetvdb.com//data/series/%s/" % str(fid), log), \
-                        convertEntities=BeautifulStoneSoup.HTML_ENTITIES)
-                    items.append(ThetvdbFavorites(account_id, data.series.seriesname.string))
+                    fidcache = cache.filter(ThetvdbFavorites.series_id == fid)
+                    if fidcache.count() and fidcache.first().added > datetime.now() - timedelta(hours=3):
+                        series_name = fidcache.first().series_name
+                        log.debug('Using series info from cache for %s - %s' % (str(fid), str(series_name)))
+                        items.append(ThetvdbFavorites(account_id, series_name, fid))
+                    else:
+                        log.debug('Looking up series info for %s' % str(fid))
+                        data = BeautifulStoneSoup(urlopener("http://thetvdb.com//data/series/%s/" % str(fid), log), \
+                            convertEntities=BeautifulStoneSoup.HTML_ENTITIES)
+                        items.append(ThetvdbFavorites(account_id, data.series.seriesname.string, data.series.id.string))
+                        if len(items) % 10 == 0:
+                            log.info("Parsed %i of %i series from thetvdb favorites" % (len(items), len(favorite_ids)))
             except (urllib2.URLError, IOError, AttributeError):
                 import traceback
                 # If there are errors getting the favorites or parsing the xml, fall back on cache
@@ -83,15 +102,15 @@ class FilterThetvdbFavorites(FilterSeriesBase):
                 cache.delete()
                 session.add_all(items)
                 session.commit()
-                cache = session.query(ThetvdbFavorites).filter(ThetvdbFavorites.account_id == account_id)
+                cache = session.query(ThetvdbFavorites).filter(ThetvdbFavorites.account_id == account_id).filter(ThetvdbFavorites.series_id != unicode(""))
         if not cache.count():
             log.info("Didn't find any thetvdb.com favorites.")
             return
         series_group = config.get('series_group', 'thetvdb_favs')
         # Pass all config options to series plugin except our special ones
-        group_config = dict([(key, config[key]) for key in config if not key in ['account_id', 'series_group', 'strip_dates']])
         tvdb_series_config = {series_group: []}
         for series in cache:
+            group_config = dict([(key, config[key]) for key in config if not key in ['account_id', 'series_group', 'strip_dates']])
             if ("strip_dates" in config) and (config['strip_dates']) and (series.series_name[-1] == ')'):
                 series_regex = "^" + series.series_name.rstrip('()1234567890').replace("(", "").replace(")", "").replace(" ", ".?").lower()
                 series_name = series.series_name.replace("(", "").replace(")", "")
