@@ -47,6 +47,18 @@ class FilterImdb(object):
         # reject movies by these directors
         reject_directors:
             - nm0093051
+        
+        # reject movies/TV shows with any of these ratings
+        reject_mpaa_ratings:
+            - PG_13
+            - R
+            - X
+            
+        # accept movies/TV shows with only these ratings
+        accept_mpaa_ratings:
+            - PG
+            - G
+            - TV_Y
     """
 
     def validator(self):
@@ -63,6 +75,8 @@ class FilterImdb(object):
         imdb.accept('list', key='accept_actors').accept('text')
         imdb.accept('list', key='reject_directors').accept('text')
         imdb.accept('list', key='accept_directors').accept('text')
+        imdb.accept('list', key='reject_mpaa_rating').accept('text')
+        imdb.accept('list', key='accept_mpaa_rating').accept('text')
         return imdb
 
     def on_feed_filter(self, feed):
@@ -146,6 +160,18 @@ class FilterImdb(object):
                         log.debug("Accepting because of accept_directors %s" % director_name or director_id)
                         force_accept = True
                         break
+            
+            if 'reject_mpaa_ratings' in config:
+                rejected = config['reject_mpaa_ratings']
+                if entry["imdb_mpaa_rating"] in rejected:
+                    reasons.append('reject_mpaa_ratings %s' % entry["imdb_mpaa_rating"])
+                    break
+
+            if 'accept_mpaa_ratings' in config:
+                accepted = config['accept_mpaa_ratings']
+                if entry["imdb_mpaa_rating"] not in accepted:
+                    reasons.append("accept_mpaa_ratings %s" % entry["imdb_mpaa_rating"])
+                    break
 
             if reasons and not force_accept:
                 msg = 'Skipping %s because of rule(s) %s' % \

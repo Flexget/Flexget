@@ -212,6 +212,7 @@ class ImdbParser(object):
         self.url = None
         self.imdb_id = None
         self.photo = None
+        self.mpaa_rating = ""
 
     def __str__(self):
         return '<ImdbParser(name=%s,imdb_id=%s)>' % (self.name, self.imdb_id)
@@ -234,7 +235,26 @@ class ImdbParser(object):
             if tag_img:
                 self.photo = tag_img.get('src')
                 log.debug('Detected photo: %s' % self.photo)
-
+        
+        # get rating. Always the first absmiddle.
+        tag_infobar_div = soup.find('div', attrs={'class': 'infobar'})
+        if tag_infobar_div:
+            tag_mpaa_rating = tag_infobar_div.find('img', attrs={'class': 'absmiddle'})
+            if tag_mpaa_rating:
+                if (tag_mpaa_rating['alt'] != tag_mpaa_rating['title']):
+                    # If we've found something of class absmiddle in the infobar, 
+                    # it should be mpaa_rating, since that's the only one in there.
+                    log.warning("MPAA rating alt and title don't match for URL %s - plugin needs an update?" % url)
+                else:
+                    self.mpaa_rating = tag_mpaa_rating["alt"]
+                    log.debug('Detected mpaa rating: %s' % self.mpaa_rating)
+            else:
+                log.debug('Unable to match signature of mpaa rating for %s - could be a TV episode, or plugin needs update?' % url)
+        else:
+            # We should match the infobar, it's an integral part of the IMDB page.
+            log.warning('Unable to get infodiv class for %s - plugin needs update?' % url)
+        
+        
         # get name
         tag_name = soup.find('h1')
         if tag_name:
