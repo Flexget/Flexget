@@ -99,45 +99,34 @@ class SeriesPlugin(object):
         #    (name, episode.season, episode.number))
         return {'season': episode.season, 'episode': episode.number, 'name': name}
 
-    def identified_by_ep(self, session, name, min=4, min_percent=50):
-        """Determine if series :name: should be considered episodic"""
-        series = session.query(Series).filter(Series.name == name.lower()).first()
-        if not series:
-            log.debug('series %s episodic check: aborted, unknown series' % name)
-            return False
+    def auto_identified_by(self, session, name):
+        """
+        Determine if series :name: should be considered identified by episode or id format
 
-        total = len(series.episodes)
-        if total < min:
-            log.debug('series %s episodic check: aborted, not enough history' % name)
-            return False
+        Returns 'ep' or 'id' if 3 of the first 5 were parsed as such. Returns 'ep' in the event of a tie.
+        Returns 'auto' if there is not enough history to determine the format yet
+        """
+        releases = session.query(Release).join(Episode).join(Series).filter(Series.name == name.lower())
+        total = releases.count()
+        if total == 0:
+            log.debug('series %s auto ep/id check: aborted, unknown series' % name)
+            return 'auto'
+        elif total < 3:
+            log.debug('series %s auto ep/id check: aborted, not enough history' % name)
+            return 'auto'
         episodic = 0
-        for episode in series.episodes:
-            if episode.season and episode.number:
+        for release in releases:
+            if release.episode.season and release.episode.number:
                 episodic += 1
-        percent = (float(episodic) / float(total)) * 100
-        log.debug('series %s episodic check: %s/%s (%s percent)' % (name, episodic, total, percent))
-        if percent > min_percent:
-            return True
-
-    def identified_by_id(self, session, name, min=4, min_percent=50):
-        """Determine if series :name: should be considered identified by id"""
-        series = session.query(Series).filter(Series.name == name.lower()).first()
-        if not series:
-            log.debug('series %s id-format check: aborted, unknown series' % name)
-            return False
-
-        total = len(series.episodes)
-        if total < min:
-            log.debug('series %s id-format check: aborted, not enough history' % name)
-            return False
-        non_episodic = 0
-        for episode in series.episodes:
-            if not episode.season and not episode.number:
-                non_episodic += 1
-        percent = (float(non_episodic) / float(total)) * 100
-        log.debug('series %s id-format check: %s/%s (%s percent)' % (name, non_episodic, total, percent))
-        if percent > min_percent:
-            return True
+        non_episodic = total - episodic
+        log.debug('series %s auto ep/id check: %s/%s' % (name, episodic, non_episodic))
+        # Best of 5, episodic wins in a tie
+        if episodic >= 3 >= non_episodic:
+            return 'ep'
+        elif non_episodic >= 3 > episodic:
+            return 'id'
+        else:
+            return 'auto'
 
     def get_latest_download(self, session, name):
         """Return latest downloaded episode (season, episode, name) for series name"""
@@ -682,22 +671,10 @@ class FilterSeries(SeriesPlugin, FilterSeriesBase):
             raise PluginError('Unknown identified_by value %s for the series %s' % (identified_by, series_name))
 
         if identified_by == 'auto':
-            # set expect flags automatically
-
             # determine if series is known to be in season, episode format or identified by id
-            expect_ep = self.identified_by_ep(feed.session, series_name)
-            expect_id = self.identified_by_id(feed.session, series_name)
-
-            # in case identified by both, we have a unresolvable situation
-            if expect_ep and expect_id:
-                log.critical('Series %s cannot be determined to be either episodic or identified by id, ' % series_name +
-                             'you should specify `identified_by` (ep|id) for it!')
-                expect_ep = False
-                expect_id = False
-        else:
-            # set expect flags manually from config
-            expect_ep = identified_by == 'ep'
-            expect_id = identified_by == 'id'
+            identified_by = self.auto_identified_by(feed.session, series_name)
+            if identified_by != 'auto':
+                log.debug('identified_by set to \'%s\' based on series history' % identified_by)
 
         # helper function, iterate entry fields in certain order
         def field_order(x):
@@ -723,8 +700,8 @@ class FilterSeries(SeriesPlugin, FilterSeriesBase):
                     parser = SeriesParser()
                     parser.name = series_name
                     parser.data = data
-                    parser.expect_ep = expect_ep
-                    parser.expect_id = expect_id
+                    parser.expect_ep = identified_by == 'ep'
+                    parser.expect_id = identified_by == 'id'
                     parser.ep_regexps = get_as_array(config, 'ep_regexp') + parser.ep_regexps
                     parser.id_regexps = get_as_array(config, 'id_regexp') + parser.id_regexps
                     parser.strict_name = config.get('exact', False)
