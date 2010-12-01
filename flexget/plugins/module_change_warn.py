@@ -52,10 +52,10 @@ class ChangeWarn(object):
         if isinstance(feed.config.get('priority', None), dict):
             log.critical('Plugin \'priority\' was renamed to \'plugin_priority\'')
 
-        session = Session()
-
         # database changes
         from flexget.utils.sqlalchemy_utils import table_columns, table_exists
+        
+        session = Session()
 
         columns = table_columns('imdb_movies', session)
         if not 'photo' in columns:
@@ -81,7 +81,7 @@ class ChangeWarn(object):
         columns = table_columns('thetvdb_favorites', session)
         if not 'series_id' in columns:
             self.old_database(feed, 'series_id missing from thetvdb_favorites table',
-                'sqlite3 %s "ALTER TABLE thetvdb_favorites ADD series_id Unicode;"' % feed.manager.db_filename)
+                'sqlite3 %s "ALTER TABLE thetvdb_favorites ADD series_id VARCHAR;"' % feed.manager.db_filename)
 
         if found_deprecated:
             feed.manager.disable_feeds()
@@ -95,8 +95,8 @@ register_plugin(ChangeWarn, 'change_warn', builtin=True)
 try:
     import sys
     import os.path
-    dir = os.path.normpath(sys.path[0] + '/../flexget/plugins/')
-    for name in os.listdir(dir):
+    plugin_dir = os.path.normpath(sys.path[0] + '/../flexget/plugins/')
+    for name in os.listdir(plugin_dir):
         require_clean = False
         if 'resolver' in name:
             require_clean = True
@@ -128,7 +128,7 @@ try:
         if require_clean:
             log.critical('-' * 79)
             log.critical('IMPORTANT: Please remove all pre-compiled .pyc and .pyo files from')
-            log.critical('           path: %s' % dir)
+            log.critical('           path: %s' % plugin_dir)
             log.critical('           After this FlexGet should run again normally')
             log.critical('-' * 79)
             found_deprecated = True
