@@ -8,16 +8,16 @@ log = logging.getLogger('sabnzbd')
 class OutputSabnzbd:
     """
         Example:
-        
+
         sabnzbd:
           apikey: 123456
           url: http://localhost/sabnzbd/api?
           category: movies
-          
+
         Note: url has default value of 'http://localhost:8080/sabnzbd/api?'
-          
+
         All parameters:
-        
+
         sabnzbd:
           apikey: ...
           url: ...
@@ -65,16 +65,16 @@ class OutputSabnzbd:
     def on_feed_output(self, feed):
 
         import urllib
-        
+
         # convert config into url parameters
         config = feed.config['sabnzbd']
         baseurl = config['url']
-        
+
         for entry in feed.accepted:
             if feed.manager.options.test:
                 log.info('Would add into sabnzbd: %s' % entry['title'])
                 continue
-                
+
             params = self.get_params(config)
             # allow overriding the category
             if 'category' in entry:
@@ -85,7 +85,7 @@ class OutputSabnzbd:
 
             request_url = baseurl + urllib.urlencode(params)
             log.debug('request_url: %s' % request_url)
-            try:            
+            try:
                 response = urlopener(request_url, log).read()
             except Exception, e:
                 log.critical('Failed to use sabnzbd. Requested %s' % request_url)
@@ -94,8 +94,10 @@ class OutputSabnzbd:
                 if feed.manager.options.debug:
                     log.exception(e)
                 continue
-            
+
             if 'error' in response.lower():
                 feed.fail(entry, response.replace('\n', ''))
-            
+            else:
+                log.info('"%s" added to sabnzbd' % (entry['title']))
+
 register_plugin(OutputSabnzbd, 'sabnzbd')
