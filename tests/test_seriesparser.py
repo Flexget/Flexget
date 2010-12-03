@@ -109,6 +109,9 @@ class TestSeriesParser(object):
         s = self.parse(name='Something', data='Something_Season_1_Full_Season_2_EP_1-7_HD')
         assert not s.valid, 'data %s should not be valid' % s.data
 
+        s = self.parse(name='Something', data='Something - Season 10 - FlexGet')
+        assert not s.valid, 'data %s should not be valid' % s.data
+
         s = self.parse(name='Something', data='Something_ DISC_1_OF_2 MANofKENT INVICTA RG')
         assert not s.valid, 'data %s should not be valid' % s.data
 
