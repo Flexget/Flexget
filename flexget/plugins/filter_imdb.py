@@ -16,6 +16,7 @@ class FilterImdb(object):
         min_score: <num>
         min_votes: <num>
         min_year: <num>
+        max_year: <num>
 
         # reject if genre contains any of these
         reject_genres:
@@ -47,13 +48,13 @@ class FilterImdb(object):
         # reject movies by these directors
         reject_directors:
             - nm0093051
-        
+
         # reject movies/TV shows with any of these ratings
         reject_mpaa_ratings:
             - PG_13
             - R
             - X
-            
+
         # accept movies/TV shows with only these ratings
         accept_mpaa_ratings:
             - PG
@@ -66,6 +67,7 @@ class FilterImdb(object):
         from flexget import validator
         imdb = validator.factory('dict')
         imdb.accept('number', key='min_year')
+        imdb.accept('number', key='max_year')
         imdb.accept('number', key='min_votes')
         imdb.accept('decimal', key='min_score')
         imdb.accept('list', key='reject_genres').accept('text')
@@ -107,7 +109,9 @@ class FilterImdb(object):
             if 'min_year' in config:
                 if entry['imdb_year'] < config['min_year']:
                     reasons.append('min_year (%s < %s)' % (entry['imdb_year'], config['min_year']))
-
+            if 'max_year' in config:
+                if entry['imdb_year'] == 0 or entry['imdb_year'] > config['max_year']:
+                    reasons.append('max_year (%s > %s)' % (entry['imdb_year'], config['max_year']))
             if 'reject_genres' in config:
                 rejected = config['reject_genres']
                 for genre in entry['imdb_genres']:
@@ -160,7 +164,7 @@ class FilterImdb(object):
                         log.debug("Accepting because of accept_directors %s" % director_name or director_id)
                         force_accept = True
                         break
-            
+
             if 'reject_mpaa_ratings' in config:
                 rejected = config['reject_mpaa_ratings']
                 if entry["imdb_mpaa_rating"] in rejected:

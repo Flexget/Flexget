@@ -23,8 +23,10 @@ class TestImdb(FlexGetBase):
             mock:
               - {title: 'Princess Mononoke', imdb_url: 'http://www.imdb.com/title/tt0119698/'}
               - {title: 'Taken[2008]DvDrip[Eng]-FOO', imdb_url: 'http://www.imdb.com/title/tt0936501/'}
+              - {title: 'Inglourious Basterds 2009', imdb_url: 'http://www.imdb.com/title/tt0361748/'}
             imdb:
               min_year: 2003
+              max_year: 2008
 
           actor:
             mock:
@@ -98,6 +100,8 @@ class TestImdb(FlexGetBase):
             'Mononoke-hime should not have been accepted'
         assert not self.feed.find_entry('rejected', imdb_name='Mononoke-hime'), \
             'Mononoke-hime should not have been rejected'
+        assert not self.feed.find_entry('accepted', imdb_name='Inglourious Basterds 2009'), \
+            'Inglourious Basterds should not have been accepted'
 
     @attr(online=True)
     def test_actors(self):
