@@ -12,6 +12,7 @@ log = logging.getLogger('webui')
 app = Flask(__name__)
 manager = None
 db_session = None
+server = None
 
 _home = None
 _menu = []
@@ -137,5 +138,18 @@ def start(mg):
 
     # start Flask
     app.secret_key = os.urandom(24)
+    """
     app.run(host='0.0.0.0', port=manager.options.port,
             use_reloader=manager.options.autoreload, debug=manager.options.debug)
+    """
+
+    global server
+    from werkzeug.serving import make_server
+    server = make_server('0.0.0.0', manager.options.port, app, threaded=True,
+                         processes=1, request_handler=None,
+                         passthrough_errors=False, ssl_context=None)
+    log.debug('server %s' % server)
+    server.serve_forever()
+
+    log.debug('serve forever exited')
+    fire_event('webui.stop')

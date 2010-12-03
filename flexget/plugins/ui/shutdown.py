@@ -15,7 +15,10 @@ def index():
 
 @shutdown.route('/now')
 def now():
-    raise NotImplementedError
+    from flexget.webui import server
+    log.debug('calling %s shutdown' % server)
+    server.shutdown()
+    log.debug('shutdown call success')
 
 
 register_plugin(shutdown, menu='Shutdown', order=512)

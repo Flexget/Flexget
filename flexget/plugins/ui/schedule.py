@@ -95,4 +95,12 @@ def start_timer():
     timer.start()
 
 
+@event('webui.stop')
+def stop_timer():
+    log.info('Terminating')
+    global timer
+    if timer:
+        timer.cancel()
+
+
 register_plugin(schedule, menu='Schedule')
