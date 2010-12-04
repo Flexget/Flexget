@@ -19,6 +19,7 @@ def now():
     log.debug('calling %s shutdown' % server)
     server.shutdown()
     log.debug('shutdown call success')
+    return ''
 
 
 register_plugin(shutdown, menu='Shutdown', order=512)

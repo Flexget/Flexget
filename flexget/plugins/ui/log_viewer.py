@@ -25,8 +25,8 @@ class LogEntry(Base):
         self.logger = record.name
         self.levelno = record.levelno
         self.message = record.getMessage()
-        self.feed = record.feed
-        self.execution = record.execution
+        self.feed = getattr(record, 'feed', '')
+        self.execution = getattr(record, 'execution', '')
 
 
 class DBLogHandler(logging.Handler):

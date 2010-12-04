@@ -14,6 +14,22 @@ class FlexGetLogger(logging.Logger):
         return logging.Logger.makeRecord(self, name, level, fn, lno, msg, args, exc_info, func, extra)
 
 
+class FlexGetFormatter(logging.Formatter):
+    """Custom formatter that can handle both regular log records and those created by FlexGetLogger"""
+    plain_fmt = '%(asctime)-15s %(levelname)-8s %(name)-29s %(message)s'
+    flexget_fmt = '%(asctime)-15s %(levelname)-8s %(name)-13s %(feed)-15s %(message)s'
+
+    def __init__(self):
+        logging.Formatter.__init__(self, self.plain_fmt, '%Y-%m-%d %H:%M')
+
+    def format(self, record):
+        if hasattr(record, 'feed'):
+            self._fmt = self.flexget_fmt
+        else:
+            self._fmt = self.plain_fmt
+        return logging.Formatter.format(self, record)
+
+
 def set_execution(execution):
     FlexGetLogger.execution = execution
 
@@ -64,9 +80,7 @@ def initialize(unit_test=False):
         # root logger
         logger = logging.getLogger()
 
-        # time format is same format of strftime
-        log_format = ['%(asctime)-15s %(levelname)-8s %(name)-13s %(feed)-15s %(message)s', '%Y-%m-%d %H:%M']
-        formatter = logging.Formatter(*log_format)
+        formatter = FlexGetFormatter()
 
         _mem_handler = logging.handlers.MemoryHandler(1000 * 1000, 100)
         _mem_handler.setFormatter(formatter)
