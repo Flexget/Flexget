@@ -45,13 +45,13 @@ class Movie(Base):
     votes = Column(Integer)
     year = Column(Integer)
     plot_outline = Column(String)
-    mpaa_rating = Column(String, default="")
+    mpaa_rating = Column(String, default='')
     photo = Column(String)
-    
+
     # updated time, so we can grab new rating counts after 48 hours
     # set a default, so existing data gets updated with a rating
     updated = Column(DateTime)
-    
+
     def __repr__(self):
         return '<Movie(name=%s,votes=%s,year=%s)>' % (self.title, self.votes, self.year)
 
@@ -208,7 +208,7 @@ class ModuleImdbLookup(object):
 
             # check if this imdb page has been parsed & cached
             cached = session.query(Movie).filter(Movie.url == entry['imdb_url']).first()
-            if (not cached) or (cached.updated == None) or (cached.updated < datetime.now() - timedelta(days=2)):
+            if (not cached) or (cached.updated is None) or (cached.updated < datetime.now() - timedelta(days=2)):
                 # Remove the old movie, we'll store another one later.
                 session.query(Movie).filter(Movie.url == entry['imdb_url']).delete()
                 # search and store to cache
@@ -249,7 +249,7 @@ class ModuleImdbLookup(object):
                     # so that we can track how long since we've updated the info later
                     movie.updated = datetime.now()
                     output = session.add(movie)
-                    
+
                 except UnicodeDecodeError:
                     log.error('Unable to determine encoding for %s. Installing chardet library may help.' % entry['imdb_url'])
                     # store cache so this will not be tried again
@@ -279,10 +279,10 @@ class ModuleImdbLookup(object):
                     imdb.actors[actor.imdb_id] = actor.name
                 for director in cached.directors:
                     imdb.directors[director.imdb_id] = director.name
-            
-            if imdb.mpaa_rating == None:
-                imdb.mpaa_rating = ""
-            
+
+            if imdb.mpaa_rating is None:
+                imdb.mpaa_rating = ''
+
             log.log(5, 'imdb.score: %s' % imdb.score)
             log.log(5, 'imdb.votes: %s' % imdb.votes)
             log.log(5, 'imdb.year: %s' % imdb.year)
