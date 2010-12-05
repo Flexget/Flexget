@@ -1,16 +1,16 @@
 import logging
 import logging.handlers
 import re
+import threading
 
 
 class FlexGetLogger(logging.Logger):
     """Custom logger that adds feed and execution info to log records."""
-    execution = ''
-    feed = ''
+    local = threading.local()
 
     def makeRecord(self, name, level, fn, lno, msg, args, exc_info, func=None, extra=None):
-        extra = {'feed': FlexGetLogger.feed,
-                 'execution': FlexGetLogger.execution}
+        extra = {'feed': getattr(FlexGetLogger.local, 'feed', ''),
+                 'execution': getattr(FlexGetLogger.local, 'execution', '')}
         return logging.Logger.makeRecord(self, name, level, fn, lno, msg, args, exc_info, func, extra)
 
 
@@ -31,11 +31,11 @@ class FlexGetFormatter(logging.Formatter):
 
 
 def set_execution(execution):
-    FlexGetLogger.execution = execution
+    FlexGetLogger.local.execution = execution
 
 
 def set_feed(feed):
-    FlexGetLogger.feed = feed
+    FlexGetLogger.local.feed = feed
 
 
 class PrivacyFilter(logging.Filter):
