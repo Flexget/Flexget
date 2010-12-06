@@ -3,11 +3,12 @@ At the moment scheduler supports just one global interval for all feeds.
 """
 
 import logging
-from flexget.webui import register_plugin, db_session, manager
-from flask import request, render_template, flash, Module
-from flexget.manager import Base
+from datetime import datetime, timedelta
+import threading
 from sqlalchemy import Column, Integer, Unicode
-from threading import Timer
+from flask import request, render_template, flash, Module
+from flexget.webui import register_plugin, db_session, manager
+from flexget.manager import Base
 from flexget.event import event, fire_event
 
 log = logging.getLogger('ui.schedule')
@@ -30,6 +31,55 @@ class Schedule(Base):
         self.interval = interval
 
 
+class RepeatingTimer(threading.Thread):
+    """Call a function every certain number of seconds"""
+
+    def __init__(self, interval, function, args=[], kwargs={}):
+        threading.Thread.__init__(self)
+        self.interval = interval
+        self.function = function
+        self.args = args
+        self.kwargs = kwargs
+        self.finished = threading.Event()
+        self.waiting = threading.Event()
+        self.forced = threading.Event()
+
+    def change_interval(self, interval):
+        """Change the interval for the repeating"""
+        self.interval = interval
+        self.waiting.set()
+
+    def exec_now(self):
+        """Causes the timer to stop waiting and execute now"""
+        self.forced.set()
+        self.waiting.set()
+
+    def cancel(self):
+        """Stop the repeating"""
+        self.finished.set()
+        self.waiting.set()
+
+    def run(self):
+        last_run = datetime.now()
+        while not self.finished.is_set():
+            self.waiting.clear()
+            self.forced.clear()
+            wait_delta = (last_run + timedelta(seconds=self.interval) - datetime.now())
+            wait_secs = (wait_delta.seconds + wait_delta.days * 24 * 3600)
+            if wait_secs > 0:
+                log.debug('Waiting %s to execute.' % wait_secs)
+                self.waiting.wait(wait_secs)
+            else:
+                log.debug('We were scheduled to execute %d seconds ago, executing now.' % - wait_secs)
+            if self.waiting.is_set():
+                if not self.forced.is_set():
+                    # If waiting was cancelled but the forced flag is not true
+                    continue
+            if not self.finished.is_set():
+                last_run = datetime.now()
+                self.function(*self.args, **self.kwargs)
+
+
 def set_global_interval(interval):
     global_interval = db_session.query(Schedule).filter(Schedule.feed == u'__GLOBAL__').first()
     if global_interval:
@@ -50,18 +100,28 @@ def get_global_interval():
 
 @schedule.route('/', methods=['POST', 'GET'])
 def index():
+    global timer
     if request.method == 'POST':
-        interval = int(request.form['interval'])
-        if interval == 0:
-            flash('Interval cannot be zero!')
+        if request.form.get('submit') == 'Run Now':
+            log.info('Manual execution forced')
+            flash('Manual execution has been started.', 'info')
+            timer.exec_now()
+        try:
+            interval = float(request.form['interval'])
+        except ValueError:
+            flash('Interval must be a number!', 'error')
         else:
-            log.info('new interval: %s' % interval)
-            set_global_interval(interval)
-            flash('Scheduling updated successfully')
-            # cancel old timer and create new one
-            if timer is not None:
-                timer.cancel()
-            start_timer()
+            if interval <= 0:
+                flash('Interval must be greater than zero!', 'error')
+            else:
+                unit = request.form['unit']
+                delta = timedelta(**{unit: interval})
+                # Convert the timedelta to integer minutes
+                interval = int((delta.seconds + delta.days * 24 * 3600) / 60.0 + 0.5)
+                log.info('new interval: %s minutes' % interval)
+                set_global_interval(interval)
+                flash('Scheduling updated successfully.', 'success')
+                timer.change_interval(interval * 60)
 
     context = {}
     global_interval = get_global_interval()
@@ -77,8 +137,6 @@ def execute():
     log.info('Executing feeds')
     fire_event('scheduler.execute')
     manager.execute()
-    # restart timer
-    start_timer()
 
 
 @event('webui.start')
@@ -90,9 +148,10 @@ def start_timer():
 
     interval = get_global_interval()
     global timer
-    timer = Timer(interval * 60, execute)
-    log.debug('Starting scheduler (%s minutes)' % interval)
-    timer.start()
+    if timer is None:
+        timer = RepeatingTimer(interval * 60, execute)
+        log.debug('Starting scheduler (%s minutes)' % interval)
+        timer.start()
 
 
 @event('webui.stop')

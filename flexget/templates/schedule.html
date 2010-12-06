@@ -8,10 +8,16 @@
         <legend>Scheduling</legend>
         <div>
             <label for="interval">Interval</label>
-            <input type="text" id="interval" name="interval" value="{{ interval }}">
+            <input type="text" id="interval" name="interval" value="{{ interval }}" size="10" style="text-align: right">
+            <select name="unit">
+                <option value="minutes" selected>minutes</option>
+                <option value="hours">hours</option>
+                <option value="days">days</option>
+            </select>
         </div>
         <div class="buttons">
-            <button type="submit" id="submit">Submit</button>
+            <button type="submit" name="submit" value="Run Now">Run Now</button>
+            <button type="submit" name="submit" value="Change Interval">Change Interval</button>
         </div>
     </fieldset>
 </form>

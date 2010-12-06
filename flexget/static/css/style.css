@@ -106,6 +106,12 @@ a {
     list-style: none;
 }
 
+#flash ul li.success {
+    padding-left: 1.8em;
+    background: url('/static/img/fatcow-icons/16x16/accept.png') no-repeat;
+    list-style: none;
+}
+
 /* search results */
 
 table.search-results {
