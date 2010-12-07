@@ -641,7 +641,19 @@ class FilterSeries(SeriesPlugin, FilterSeriesBase):
                     for parser in eps:
                         # store found episodes into database and save reference for later use
                         release = self.store(feed.session, parser)
-                        self.parser2entry[parser]['series_release'] = release
+                        entry = self.parser2entry[parser]
+                        entry['series_release'] = release
+
+                        # set custom download path
+                        if 'path' in series_config:
+                            log.debug('setting %s custom path to %s' % (entry['title'], series_config.get('path')))
+                            entry['path'] = series_config.get('path') % entry
+
+                        # accept info from set: and place into the entry
+                        if 'set' in series_config:
+                            set = get_plugin_by_name('set')
+                            set.instance.modify(entry, series_config.get('set'))
+
                 log.log(5, 'series_name: %s series_config: %s' % (series_name, series_config))
 
                 import time
@@ -744,16 +756,6 @@ class FilterSeries(SeriesPlugin, FilterSeriesBase):
                 import time
                 entry['series_season'] = time.gmtime().tm_year
             entry['series_id'] = parser.identifier
-
-            # set custom download path
-            if 'path' in config:
-                log.debug('setting %s custom path to %s' % (entry['title'], config.get('path')))
-                entry['path'] = config.get('path') % entry
-
-            # accept info from set: and place into the entry
-            if 'set' in config:
-                set = get_plugin_by_name('set')
-                set.instance.modify(entry, config.get('set'))
 
     def process_series(self, feed, series, series_name, config):
         """Accept or Reject episode from available releases, or postpone choosing."""
