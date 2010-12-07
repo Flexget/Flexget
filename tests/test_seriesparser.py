@@ -373,6 +373,13 @@ class TestSeriesParser(object):
         s.parse()
         assert s.valid, 'strict AB failed'
 
+        s = SeriesParser()
+        s.strict_name = True
+        s.name = 'Red Tomato'
+        s.data = 'Red Tomato (US) S01E02 720p-FlexGet'
+        s.parse()
+        assert not s.valid, 'Red Tomato (US) should not match Red Tomato in exact mode'
+
     def test_quality_as_ep(self):
         """SeriesParser: test that qualities are not picked as ep"""
         from flexget.utils import qualities
