@@ -206,8 +206,8 @@ class SeriesParser(TitleParser):
 
         # Remove unwanted words (qualities and such) from data for ep / id
         data = self.remove_words(data_noname, self.remove + qualities.registry.keys() + self.codecs + self.sounds)
-        data = self.clean(data)
         data = self.remove_dirt(data)
+        data = self.clean(data)
 
         data_parts = re.split('\W+', data)
 
