@@ -144,3 +144,22 @@ table.search-results td {
     padding: 3px;
     background-color: rgb(204, 204, 204);
 }
+
+/* episode pages */
+
+ul#episodes hr{
+    margin: 10px 0 10px 0;
+}
+
+ul#episode-files {
+    line-height:1.4;
+    list-style-type:none;
+}
+ul.episode-files li{
+    padding-left:20px;
+    background:transparent url(/static/img/cross.png) no-repeat;
+}
+ul.episode-files li.downloaded{
+    padding-left:20px;
+    background:transparent url(/static/img/tick.png) no-repeat;
+}
