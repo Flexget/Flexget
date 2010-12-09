@@ -13,16 +13,19 @@
 
 <h1>Shutdown FlexGet</h1>
 
-<p>Unfortunately shutdown is not implemented yet. In fact it's going to be quite hard to implement ...</p>
+<p>Terminates the FlexGet WebUI. Your feeds will not run until you re-launch FlexGet.</p>
 
 <script type="text/javascript">
     $(document).ready(function() {
         $("#shutdown").click(function() {
-            $.blockUI.defaults.overlayCSS.backgroundColor = '#000';
-            $.blockUI.defaults.overlayCSS.opacity = .8;
-            $.blockUI.defaults.overlayCSS.cursor = 'default';
-            $.blockUI({ message: 'See you Space Cowboy...'});
-            $('#shutdown').load("{{ url_for('now') }}");
+            var ans = confirm("Are you sure you want to quit?")
+            if(ans){
+                $.blockUI.defaults.overlayCSS.backgroundColor = '#000';
+                $.blockUI.defaults.overlayCSS.opacity = .8;
+                $.blockUI.defaults.overlayCSS.cursor = 'default';
+                $.blockUI({ message: 'See you Space Cowboy...'});
+                $('#shutdown').load("{{ url_for('now') }}");
+            }
         });
     });
 </script>
