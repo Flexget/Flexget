@@ -139,7 +139,13 @@ def start(mg):
                       threading.enumerate())
         log.info('Daemonizing.')
         newpid = daemonize()
-        # TODO: change pid in .config-lock
+        # Write new pid to lock file
+        log.debug('Writing new pid %d to lock file %s' % (newpid, manager.lockfile))
+        lockfile = file(manager.lockfile, 'w')
+        try:
+            lockfile.write('%d\n' % newpid)
+        finally:
+            lockfile.close()
 
     # quick hack: since ui plugins may add tables to SQLAlchemy too and they're not initialized because create
     # was called when instantiating manager .. so we need to call it again
