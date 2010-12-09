@@ -136,6 +136,7 @@ def index():
 def execute():
     log.info('Executing feeds')
     fire_event('scheduler.execute')
+    manager.create_feeds()
     manager.execute()
 
 

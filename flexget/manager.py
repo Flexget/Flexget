@@ -2,6 +2,7 @@ import os
 import sys
 import logging
 import sqlalchemy
+import yaml
 from datetime import datetime
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
@@ -10,6 +11,12 @@ log = logging.getLogger('manager')
 
 Base = declarative_base()
 Session = sessionmaker()
+
+
+class FGDumper(yaml.Dumper):
+
+    def increase_indent(self, flow=False, indentless=False):
+        return super(FGDumper, self).increase_indent(flow, False)
 
 
 def useExecLogging(func):
@@ -89,7 +96,6 @@ class Manager(object):
         for config, base in possible.iteritems():
             if os.path.exists(config):
                 self.pre_check_config(config)
-                import yaml
                 try:
                     self.config = yaml.safe_load(file(config))
                 except Exception, e:
@@ -132,6 +138,14 @@ class Manager(object):
                 return
         log.info('Tried to read from: %s' % ', '.join(possible))
         raise IOError('Failed to find configuration file %s' % self.options.config)
+
+    def save_config(self):
+        """Dumps current config to yaml config file"""
+        config_file = file(os.path.join(self.config_base, self.config_name) + '.yml', 'w')
+        try:
+            config_file.write(yaml.dump(self.config, Dumper=FGDumper, default_flow_style=False))
+        finally:
+            config_file.close()
 
     def pre_check_config(self, fn):
         """

@@ -10,12 +10,6 @@ configure = Module(__name__, url_prefix='/configure')
 log = logging.getLogger('ui.configure')
 
 
-class FGDumper(yaml.Dumper):
-
-    def increase_indent(self, flow=False, indentless=False):
-        return super(FGDumper, self).increase_indent(flow, False)
-
-
 @configure.route('/')
 def index():
     return render_template('configure.html')
@@ -29,7 +23,7 @@ def delete(root, name):
 
 @configure.route('/edit/text/<root>/<name>', methods=['POST', 'GET'])
 def edit_text(root, name):
-
+    from flexget.manager import FGDumper
     context = {
         'name': name,
         'root': root}
@@ -49,6 +43,8 @@ def edit_text(root, name):
                     flash(error, 'error')
                 context['config'] = request.form['config']
             else:
+                manager.config[root][name] = config
+                manager.save_config()
                 flash('Configuration saved', 'info')
                 context['config'] = yaml.dump(config, Dumper=FGDumper, default_flow_style=False)
     else:
