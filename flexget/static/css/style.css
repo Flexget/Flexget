@@ -7,7 +7,9 @@ html {
 
 #container {
     margin: 0 auto;
-    width: 1150px;
+    width: 100%;
+    min-width: 800px;
+    max-width: 1200px;
     -moz-box-shadow: 0 0 20px #000;
     -webkit-box-shadow: 0 0 20px #000;
     box-shadow: 0 0 20px #000;
@@ -46,21 +48,30 @@ a {
 
 #content-container {
     float: left;
-    width: 1150px;
+    width: 100%;
+
     background: #fff url('/static/img/menu.png') repeat-y;
 }
 
 #menu {
+    display:block;
+    position: relative;
     float: left;
+    top: 0;
+    bottom: 0; 
+    left: 0;
     width: 200px;
+    height: 100%;
+    padding-bottom:1px;
+    overflow: hidden;
 }
 
 #main {
-    float: right;
-    clear: right;
-    display: inline;
-    width: 923px; /* WTF? */
-    padding: 1em;
+    left: 200px;
+    right: 0;
+    bottom: 0;
+    overflow: auto; 
+    padding:10px;
 }
 
 #header
