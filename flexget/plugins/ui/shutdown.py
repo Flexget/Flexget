@@ -1,4 +1,4 @@
-from flexget.webui import register_plugin
+from flexget.webui import register_plugin, stop_server
 from flask import render_template, Module
 
 import logging
@@ -15,11 +15,8 @@ def index():
 
 @shutdown.route('/now')
 def now():
-    from flexget.webui import server
-    log.debug('calling %s shutdown' % server)
-    server.shutdown()
-    log.debug('shutdown call success')
-    return ''
+    stop_server()
+    return 'Shutdown Complete'
 
 
 register_plugin(shutdown, menu='Shutdown', order=512)

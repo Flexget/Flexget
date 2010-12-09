@@ -1,6 +1,8 @@
 import logging
 import os
 import urllib
+import threading
+import sys
 from flask import Flask, redirect, url_for, abort, request
 from sqlalchemy.orm import scoped_session
 from sqlalchemy.orm.session import sessionmaker
@@ -129,6 +131,16 @@ def start(mg):
     # initialize manager
     manager.create_feeds()
     load_ui_plugins()
+    # Daemonize after we load the ui plugins as they are loading from relative paths right now
+    if os.name != 'nt' and manager.options.daemon:
+        if threading.activeCount() != 1:
+            log.error('There are %r active threads. '
+                      'Daemonizing now may cause strange failures.' %
+                      threading.enumerate())
+        log.info('Daemonizing.')
+        newpid = daemonize()
+        # TODO: change pid in .config-lock
+
     # quick hack: since ui plugins may add tables to SQLAlchemy too and they're not initialized because create
     # was called when instantiating manager .. so we need to call it again
     from flexget.manager import Base
@@ -143,13 +155,110 @@ def start(mg):
             use_reloader=manager.options.autoreload, debug=manager.options.debug)
     """
 
+    set_exit_handler(stop_server)
+
+    start_server()
+
+    log.debug('server loop exited')
+    fire_event('webui.stop')
+
+
+def start_server():
+    global server
+    from cherrypy import wsgiserver
+    d = wsgiserver.WSGIPathInfoDispatcher({'/': app})
+    server = wsgiserver.CherryPyWSGIServer(('0.0.0.0', manager.options.port), d)
+
+    log.debug('server %s' % server)
+    try:
+        server.start()
+    except KeyboardInterrupt:
+        stop_server()
+
+
+def stop_server(*args):
+    log.debug('Shutting down server')
+    if server:
+        server.stop()
+
+""" werkzeug server
+def start_server():
     global server
     from werkzeug.serving import make_server
     server = make_server('0.0.0.0', manager.options.port, app, threaded=True,
                          processes=1, request_handler=None,
                          passthrough_errors=False, ssl_context=None)
     log.debug('server %s' % server)
-    server.serve_forever()
+    try:
+        server.serve_forever()
+    except select.error:
+        log.exception('select error during serve forever')
 
     log.debug('serve forever exited')
     fire_event('webui.stop')
+    sys.exit(0)
+
+def stop_server(*args):
+    log.debug('Shutting down server')
+    if server:
+        threading.Thread(target=server.shutdown).start()
+"""
+
+
+def set_exit_handler(func):
+    """Sets a callback function for term signal on windows or linux"""
+    if os.name == 'nt':
+        try:
+            import win32api
+            win32api.SetConsoleCtrlHandler(func, True)
+        except ImportError:
+            version = '.'.join(map(str, sys.version_info[:2]))
+            raise Exception('pywin32 not installed for Python ' + version)
+    else:
+        import signal
+        signal.signal(signal.SIGTERM, func)
+
+        
+def daemonize(stdin='/dev/null', stdout='/dev/null', stderr='/dev/null'):
+    """Daemonizes the current process. Returns the new pid"""
+    import atexit
+
+    try:
+        pid = os.fork()
+        if pid > 0:
+            # Don't run the exit handlers on the parent
+            atexit._exithandlers = []
+            # exit first parent
+            sys.exit(0)
+    except OSError, e:
+        sys.stderr.write("fork #1 failed: %d (%s)\n" % (e.errno, e.strerror))
+        sys.exit(1)
+
+    # decouple from parent environment
+    os.chdir('/')
+    os.setsid()
+    os.umask(0)
+
+    # do second fork
+    try:
+        pid = os.fork()
+        if pid > 0:
+            # Don't run the exit handlers on the parent
+            atexit._exithandlers = []
+            # exit from second parent
+            sys.exit(0)
+    except OSError, e:
+        sys.stderr.write("fork #2 failed: %d (%s)\n" % (e.errno, e.strerror))
+        sys.exit(1)
+
+    # redirect standard file descriptors
+    sys.stdout.flush()
+    sys.stderr.flush()
+    si = file(stdin, 'r')
+    so = file(stdout, 'a+')
+    se = file(stderr, 'a+', 0)
+    os.dup2(si.fileno(), sys.stdin.fileno())
+    os.dup2(so.fileno(), sys.stdout.fileno())
+    os.dup2(se.fileno(), sys.stderr.fileno())
+
+    return os.getpid()

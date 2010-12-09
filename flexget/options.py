@@ -1,10 +1,43 @@
+import os
 from optparse import OptionParser as OptParser, SUPPRESS_HELP
+import flexget
 
 
 class OptionParser(OptParser):
+    """Contains all the options that both the core and webui should have"""
+    
+    def __init__(self, **kwargs):
+        OptParser.__init__(self, **kwargs)
 
-    def __init__(self, unit_test=False):
-        OptParser.__init__(self)
+        self.version = flexget.__version__
+        self.add_option('-V', '--version', action='version',
+                        help='Print FlexGet version and exit.')
+        self.add_option('--debug', action='callback', callback=self._debug_callback, dest='debug',
+                        help=SUPPRESS_HELP)
+        self.add_option('--debug-all', action='callback', callback=self._debug_callback, dest='debug_all',
+                        help=SUPPRESS_HELP)
+        self.add_option('--debug-perf', action='store_true', dest='debug_perf', default=False,
+                        help=SUPPRESS_HELP)
+        self.add_option('--loglevel', action='store', type='choice', default='info', dest='loglevel',
+                        choices=['none', 'critical', 'error', 'warning', 'info', 'debug', 'debugall'],
+                        help=SUPPRESS_HELP)
+        self.add_option('--debug-sql', action='store_true', dest='debug_sql', default=False,
+                        help=SUPPRESS_HELP)
+
+    def _debug_callback(self, option, opt, value, parser):
+        setattr(parser.values, option.dest, 1)
+        if option.dest == 'debug':
+            setattr(parser.values, 'loglevel', 'debug')
+        elif option.dest == 'debug_all':
+            setattr(parser.values, 'debug', 1)
+            setattr(parser.values, 'loglevel', 'debugall')
+
+            
+class CoreOptionParser(OptionParser):
+    """Contains all the options that should only be used when running without a ui"""
+
+    def __init__(self, unit_test=False, **kwargs):
+        OptionParser.__init__(self, **kwargs)
 
         self._unit_test = unit_test
 
@@ -26,33 +59,12 @@ class OptionParser(OptParser):
                         help='Specify configuration file. Default is config.yml')
         self.add_option('--cron', action='store_true', dest='quiet', default=False,
                         help='Disables stdout and stderr output, log file used. Reduces logging level slightly.')
-        self.add_option('--webui', action='store_true', dest='webui', default=False,
-                        help='Start FlexGet webui prototype')
-        self.add_option('--port', action='store', type="int", dest='port', default=5050,
-                        help='Run FlexGet webui in port [default: %default]')
-
-        # enable flask autoreloading (development)
-        self.add_option('--autoreload', action='store_true', dest='autoreload', default=False,
-                        help=SUPPRESS_HELP)
 
         self.add_option('--experimental', action='store_true', dest='experimental', default=0,
-                        help=SUPPRESS_HELP)
-        self.add_option('--debug', action='callback', callback=self._debug_callback, dest='debug',
-                        help=SUPPRESS_HELP)
-        self.add_option('--debug-all', action='callback', callback=self._debug_callback, dest='debug_all',
-                        help=SUPPRESS_HELP)
-        self.add_option('--debug-perf', action='store_true', dest='debug_perf', default=False,
-                        help=SUPPRESS_HELP)
-        self.add_option('--loglevel', action='store', type='choice', default='info', dest='loglevel',
-                        choices=['none', 'critical', 'error', 'warning', 'info', 'debug', 'debugall'],
-                        help=SUPPRESS_HELP)
-        self.add_option('--debug-sql', action='store_true', dest='debug_sql', default=False,
                         help=SUPPRESS_HELP)
         self.add_option('--validate', action='store_true', dest='validate', default=False,
                         help=SUPPRESS_HELP)
 
-        self.add_option('-V', '--version', action='store_true', dest='version', default=False,
-                        help='Print FlexGet version and exit.')
 
         self.add_option('--migrate', action='store', dest='migrate', default=None,
                         help=SUPPRESS_HELP)
@@ -76,10 +88,18 @@ class OptionParser(OptParser):
 
         return result
 
-    def _debug_callback(self, option, opt, value, parser):
-        setattr(parser.values, option.dest, 1)
-        if option.dest == 'debug':
-            setattr(parser.values, 'loglevel', 'debug')
-        elif option.dest == 'debug_all':
-            setattr(parser.values, 'debug', 1)
-            setattr(parser.values, 'loglevel', 'debugall')
+
+class UIOptionParser(OptionParser):
+    """Contains the options for the webui"""
+
+    def __init__(self):
+        OptionParser.__init__(self)
+        self.add_option('--port', action='store', type="int", dest='port', default=5050,
+                        help='Run FlexGet webui in port [default: %default]')
+        if os.name != 'nt':
+            self.add_option('-d', '--daemonize', action='store_true', dest='daemon', default=False,
+                            help='Causes webui to daemonize after starting')
+
+        # enable flask autoreloading (development)
+        self.add_option('--autoreload', action='store_true', dest='autoreload', default=False,
+                        help=SUPPRESS_HELP)
