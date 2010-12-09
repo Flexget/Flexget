@@ -3,9 +3,9 @@
 import os
 import sys
 import flexget.logger
-from flexget.manager import Manager, Session
-from flexget.plugin import get_plugin_by_name, load_plugins, plugins
-from flexget.options import OptionParser
+from flexget.manager import Manager
+from flexget.plugin import load_plugins
+from flexget.options import CoreOptionParser
 from flexget.feed import Feed
 import yaml
 import logging
@@ -20,7 +20,7 @@ def setup_once():
     global plugins_loaded, test_options
     if not plugins_loaded:
         flexget.logger.initialize(True)
-        parser = OptionParser(True)
+        parser = CoreOptionParser(True)
         load_plugins(parser)
         # store options for MockManager
         test_options = parser.parse_args()[0]
