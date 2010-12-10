@@ -15,11 +15,13 @@
     {% else %}
         <p>No series catalogued.</p>
     {% endif %}
+    
 {% endblock %}
 
 {% block main %}
-    <h1>{{ name|title }}</h1>
-    {% if episodes %}
+   
+    {% if name %}
+        <h1>{{ name|title }}</h1>
         <ul id="episodes">
         {% for episode in episodes %}
             <li class="identifier">
@@ -35,7 +37,15 @@
         {% endfor %}
         </ul>
     {% else %}
-        <p>Select a series to view it's activity.</p>
+        <h1>Latest</h1>
+        <ul id="episodes" class="episode-files">
+            {% for release in releases %}
+                <li class="{% if release.downloaded %}downloaded{% endif %}{{ loop.cycle('', ' episode-box') }}">
+                    {{ release.title }}<br />
+                    <span style="color:#999;font-size:10px;">{{ release.episode.first_seen }}</span>
+                </li>
+            {% endfor %}
+        </ul>
     {% endif %}
 {% endblock %}
 
