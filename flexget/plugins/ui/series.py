@@ -19,9 +19,13 @@ def index():
 
 @series_module.route('/<name>')
 def episodes(name):
+
+    context = {'report': db_session.query(Series).order_by(asc(Series.name)).all()}
+
     series = db_session.query(Series).filter(Series.name == name).first()
-    context = {'episodes': series.episodes, 'name': name}
-    return render_template('series_episodes.html', **context)
+    context.update({'episodes': series.episodes, 'name': name})
+    
+    return render_template('series.html', **context)
 
 
 register_plugin(series_module, menu='Series')

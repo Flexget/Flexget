@@ -22,7 +22,7 @@ class Series(Base):
 
     def __repr__(self):
         return '<Series(name=%s)>' % (self.name)
-
+    
 
 class Episode(Base):
 
