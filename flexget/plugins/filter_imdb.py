@@ -168,13 +168,13 @@ class FilterImdb(object):
             if 'reject_mpaa_ratings' in config:
                 rejected = config['reject_mpaa_ratings']
                 if entry["imdb_mpaa_rating"] in rejected:
-                    reasons.append('reject_mpaa_ratings %s' % entry["imdb_mpaa_ratings"])
+                    reasons.append('reject_mpaa_ratings %s' % entry["imdb_mpaa_rating"])
                     break
 
             if 'accept_mpaa_ratings' in config:
                 accepted = config['accept_mpaa_ratings']
                 if entry["imdb_mpaa_rating"] not in accepted:
-                    reasons.append("accept_mpaa_ratings %s" % entry["imdb_mpaa_ratings"])
+                    reasons.append("accept_mpaa_ratings %s" % entry["imdb_mpaa_rating"])
                     break
 
             if reasons and not force_accept:
