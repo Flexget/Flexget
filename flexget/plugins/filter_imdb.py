@@ -77,8 +77,8 @@ class FilterImdb(object):
         imdb.accept('list', key='accept_actors').accept('text')
         imdb.accept('list', key='reject_directors').accept('text')
         imdb.accept('list', key='accept_directors').accept('text')
-        imdb.accept('list', key='reject_mpaa_rating').accept('text')
-        imdb.accept('list', key='accept_mpaa_rating').accept('text')
+        imdb.accept('list', key='reject_mpaa_ratings').accept('text')
+        imdb.accept('list', key='accept_mpaa_ratings').accept('text')
         return imdb
 
     def on_feed_filter(self, feed):
@@ -168,13 +168,13 @@ class FilterImdb(object):
             if 'reject_mpaa_ratings' in config:
                 rejected = config['reject_mpaa_ratings']
                 if entry["imdb_mpaa_rating"] in rejected:
-                    reasons.append('reject_mpaa_ratings %s' % entry["imdb_mpaa_rating"])
+                    reasons.append('reject_mpaa_ratings %s' % entry["imdb_mpaa_ratings"])
                     break
 
             if 'accept_mpaa_ratings' in config:
                 accepted = config['accept_mpaa_ratings']
                 if entry["imdb_mpaa_rating"] not in accepted:
-                    reasons.append("accept_mpaa_ratings %s" % entry["imdb_mpaa_rating"])
+                    reasons.append("accept_mpaa_ratings %s" % entry["imdb_mpaa_ratings"])
                     break
 
             if reasons and not force_accept:
