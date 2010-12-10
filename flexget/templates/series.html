@@ -42,7 +42,7 @@
             {% for release in releases %}
                 <li class="{% if release.downloaded %}downloaded{% endif %}{{ loop.cycle('', ' episode-box') }}">
                     {{ release.title }}<br />
-                    <span style="color:#999;font-size:10px;">First seen: {{ release.episode.first_seen }}</span>
+                    <span style="color:#999;font-size:10px;">First seen: {{ release.episode.first_seen|pretty_age }}</span>
                 </li>
             {% endfor %}
         </ul>
