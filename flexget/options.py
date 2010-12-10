@@ -95,6 +95,9 @@ class StoreErrorOptionParser(CoreOptionParser):
     def __init__(self, baseparser):
         """Duplicates optios from another OptionParser"""
         CoreOptionParser.__init__(self, option_list=baseparser.option_list, conflict_handler="resolve")
+        # Remove the options that exit the program
+        self.remove_option('-h')
+        self.remove_option('-V')
         self.error_msg = ''
 
     def parse_args(self, args):
@@ -109,6 +112,13 @@ class StoreErrorOptionParser(CoreOptionParser):
     def error(self, msg):
         # Store error message for later
         self.error_msg = msg
+
+    def get_help(self):
+        # Remove the usage string from the help message
+        result = self.format_help()
+        first_newline = result.find('\n')
+        result = result[first_newline:]
+        return result
 
 
 class UIOptionParser(OptionParser):
