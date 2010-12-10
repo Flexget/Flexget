@@ -17,28 +17,26 @@
     {% endif %}
 {% endblock %}
 
-
 {% block main %}
-<h1>{{ name|title }}</h1>
-{% if episodes %}
-    <ul id="episodes">
-    {% for episode in episodes %}
-        <li>
-            <h4>{{ episode.identifier }}</h4>
-            <ul class="episode-files">
-                {% for release in episode.releases %}
-                    <li{% if release.downloaded %} class="downloaded"{% endif %}>
-                        {{ release.title }}
-                    </li>
-                {% endfor %}
-            </ul>
-        </li>
-        {% if not loop.last %}<hr />{% endif %}
-    {% endfor %}
-    </ul>
-{% else %}
-    <p>Select a series to view it's activity.</p>
-{% endif %}
+    <h1>{{ name|title }}</h1>
+    {% if episodes %}
+        <ul id="episodes">
+        {% for episode in episodes %}
+            <li class="identifier">
+                <h4>{{ episode.identifier }}</h4>
+                <ul class="episode-files">
+                    {% for release in episode.releases %}
+                        <li{% if release.downloaded %} class="downloaded"{% endif %}>
+                            {{ release.title }}
+                        </li>
+                    {% endfor %}
+                </ul>
+            </li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p>Select a series to view it's activity.</p>
+    {% endif %}
 {% endblock %}
 
 
