@@ -7,6 +7,7 @@ from flexget import plugin
 import os
 import sys
 import logging
+from options import StoreErrorOptionParser
 
 __version__ = '{subversion}'
 
@@ -32,6 +33,7 @@ def main(webui=False):
 
     try:
         manager = Manager(options)
+        manager.parser = StoreErrorOptionParser(parser)
     except IOError, e:
         # failed to load config
         log.critical(e.message)

@@ -5,7 +5,7 @@ import flexget
 
 class OptionParser(OptParser):
     """Contains all the options that both the core and webui should have"""
-    
+
     def __init__(self, **kwargs):
         OptParser.__init__(self, **kwargs)
 
@@ -32,7 +32,7 @@ class OptionParser(OptParser):
             setattr(parser.values, 'debug', 1)
             setattr(parser.values, 'loglevel', 'debugall')
 
-            
+
 class CoreOptionParser(OptionParser):
     """Contains all the options that should only be used when running without a ui"""
 
@@ -73,8 +73,8 @@ class CoreOptionParser(OptionParser):
         self.add_option('-q', '--quiet', action='store_true', dest='quiet', default=False,
                         help=SUPPRESS_HELP)
 
-    def parse_args(self):
-        result = OptParser.parse_args(self, self._unit_test and ['flexget', '--reset'] or None)
+    def parse_args(self, args=None):
+        result = OptParser.parse_args(self, args or self._unit_test and ['flexget', '--reset'] or None)
         options = result[0]
         if options.test and options.learn:
             self.error('--test and --learn are mutually exclusive')
@@ -87,6 +87,28 @@ class CoreOptionParser(OptionParser):
             options.learn = True
 
         return result
+
+
+class StoreErrorOptionParser(CoreOptionParser):
+    """Parses options from a string instead of cli, doesn't exit on parser errors, stores them in error_msg attribute"""
+
+    def __init__(self, baseparser):
+        """Duplicates optios from another OptionParser"""
+        CoreOptionParser.__init__(self, option_list=baseparser.option_list, conflict_handler="resolve")
+        self.error_msg = ''
+
+    def parse_args(self, args):
+        # Clear error message before parsing
+        self.error_msg = ''
+        # If args is a string, split it into an args list
+        if isinstance(args, basestring):
+            import shlex
+            args = ['flexget'] + shlex.split(args.encode('utf-8'))
+        return CoreOptionParser.parse_args(self, args)
+
+    def error(self, msg):
+        # Store error message for later
+        self.error_msg = msg
 
 
 class UIOptionParser(OptionParser):

@@ -1,0 +1,18 @@
+{% extends "layout.html" %}
+{% block main %}
+
+<h1>Manually start execution</h1>
+
+<form action="{{ url_for('index') }}" method="post" class="simple">
+    <fieldset>
+        <legend>Execute FlexGet</legend>
+        <div>
+            <label for="options">Options</label>
+            <input type="text" id="options" name="options" value="{{ options }}" size="40">
+        </div>
+        <div class="buttons">
+            <button type="submit">Start Execution</button>
+        </div>
+    </fieldset>
+</form>
+{% endblock %}

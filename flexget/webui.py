@@ -8,6 +8,7 @@ from sqlalchemy.orm import scoped_session
 from sqlalchemy.orm.session import sessionmaker
 from flexget.event import fire_event
 from plugin import PluginDependencyError
+from Queue import Queue
 
 log = logging.getLogger('webui')
 
@@ -15,9 +16,38 @@ app = Flask(__name__)
 manager = None
 db_session = None
 server = None
+executor = None
 
 _home = None
 _menu = []
+
+
+class ExecThread(threading.Thread):
+    """Thread that does the execution. It can accept options with an execution, and queues execs if necessary."""
+
+    def __init__(self):
+        threading.Thread.__init__(self)
+        self.daemon = True
+        self.queue = Queue()
+
+    def run(self):
+        while True:
+            opts = self.queue.get()
+            # Store the managers options to be restored after our execution
+            oldopts = manager.options
+            if opts:
+                manager.options = opts
+            try:
+                # Re-create the feeds with the current config and run them
+                manager.create_feeds()
+                manager.execute()
+            finally:
+                # Restore manager's previous options
+                manager.options = oldopts
+
+    def execute(self, options=None):
+        """Adds an execution to the queue. Options for the exec can be specified"""
+        self.queue.put_nowait(options)
 
 
 def _update_menu(root):
@@ -152,6 +182,10 @@ def start(mg):
     from flexget.manager import Base
     Base.metadata.create_all(bind=manager.engine)
 
+    # Start the executor thread
+    global executor
+    executor = ExecThread()
+    executor.start()
     fire_event('webui.start')
 
     # start Flask
@@ -224,7 +258,7 @@ def set_exit_handler(func):
         import signal
         signal.signal(signal.SIGTERM, func)
 
-        
+
 def daemonize(stdin='/dev/null', stdout='/dev/null', stderr='/dev/null'):
     """Daemonizes the current process. Returns the new pid"""
     import atexit

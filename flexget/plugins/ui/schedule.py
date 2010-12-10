@@ -36,22 +36,17 @@ class RepeatingTimer(threading.Thread):
 
     def __init__(self, interval, function, args=[], kwargs={}):
         threading.Thread.__init__(self)
+        self.daemon = True
         self.interval = interval
         self.function = function
         self.args = args
         self.kwargs = kwargs
         self.finished = threading.Event()
         self.waiting = threading.Event()
-        self.forced = threading.Event()
 
     def change_interval(self, interval):
         """Change the interval for the repeating"""
         self.interval = interval
-        self.waiting.set()
-
-    def exec_now(self):
-        """Causes the timer to stop waiting and execute now"""
-        self.forced.set()
         self.waiting.set()
 
     def cancel(self):
@@ -63,7 +58,6 @@ class RepeatingTimer(threading.Thread):
         last_run = datetime.now()
         while not self.finished.is_set():
             self.waiting.clear()
-            self.forced.clear()
             wait_delta = (last_run + timedelta(seconds=self.interval) - datetime.now())
             wait_secs = (wait_delta.seconds + wait_delta.days * 24 * 3600)
             if wait_secs > 0:
@@ -72,9 +66,8 @@ class RepeatingTimer(threading.Thread):
             else:
                 log.debug('We were scheduled to execute %d seconds ago, executing now.' % - wait_secs)
             if self.waiting.is_set():
-                if not self.forced.is_set():
-                    # If waiting was cancelled but the forced flag is not true
-                    continue
+                # If waiting was cancelled do not execute the function
+                continue
             if not self.finished.is_set():
                 last_run = datetime.now()
                 self.function(*self.args, **self.kwargs)
@@ -102,10 +95,6 @@ def get_global_interval():
 def index():
     global timer
     if request.method == 'POST':
-        if request.form.get('submit') == 'Run Now':
-            log.info('Manual execution forced')
-            flash('Manual execution has been started.', 'info')
-            timer.exec_now()
         try:
             interval = float(request.form['interval'])
         except ValueError:
@@ -117,7 +106,9 @@ def index():
                 unit = request.form['unit']
                 delta = timedelta(**{unit: interval})
                 # Convert the timedelta to integer minutes
-                interval = int((delta.seconds + delta.days * 24 * 3600) / 60.0 + 0.5)
+                interval = int((delta.seconds + delta.days * 24 * 3600) / 60.0)
+                if interval <= 0:
+                    interval = 1
                 log.info('new interval: %s minutes' % interval)
                 set_global_interval(interval)
                 flash('Scheduling updated successfully.', 'success')
@@ -130,15 +121,15 @@ def index():
     else:
         flash('Interval not set')
         context['interval'] = ''
-    
+
     return render_template('schedule.html', **context)
 
 
 def execute():
     log.info('Executing feeds')
     fire_event('scheduler.execute')
-    manager.create_feeds()
-    manager.execute()
+    from flexget.webui import executor
+    executor.execute()
 
 
 @event('webui.start')
