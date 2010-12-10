@@ -147,19 +147,19 @@ table.search-results td {
 
 /* episode pages */
 
-ul#episodes hr{
+ul#episodes, ul#episode-files {
+    line-height:1.4;
+    list-style: none;
+}
+ul#episodes hr {
     margin: 10px 0 10px 0;
 }
 
-ul#episode-files {
-    line-height:1.4;
-    list-style-type:none;
-}
 ul.episode-files li{
     padding-left:20px;
     background:transparent url(/static/img/cross.png) no-repeat;
+    list-style: none;
 }
 ul.episode-files li.downloaded{
-    padding-left:20px;
-    background:transparent url(/static/img/tick.png) no-repeat;
+    background-image: url(/static/img/tick.png);
 }
