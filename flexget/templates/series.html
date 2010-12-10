@@ -1,7 +1,11 @@
 {% extends "layout.html" %}
 
+{% block head %}
+    <link rel="stylesheet" href="/static/css/series.css" type="text/css" media="screen"/>
+{% endblock %}
+
 {% block menu %}
-    <h2>Series</d2>
+
     {% if report %}
         <ul id="cat">
             {% for series in report %}
@@ -10,16 +14,16 @@
                         <a href="/series/{{ series.name }}">{{ series.name|title }}</a>
                     </div>
                 </li>
-            {% endfor %}    
+            {% endfor %}
         </ul>
     {% else %}
         <p>No series catalogued.</p>
     {% endif %}
-    
+
 {% endblock %}
 
 {% block main %}
-   
+
     {% if name %}
         <h1>{{ name|title }}</h1>
         <ul id="episodes">
@@ -50,5 +54,3 @@
         <a href="/log" style="color: #333;text-decoration: underline">View more in the logs</a>
     {% endif %}
 {% endblock %}
-
-

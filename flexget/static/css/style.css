@@ -58,7 +58,7 @@ a {
     position: relative;
     float: left;
     top: 0;
-    bottom: 0; 
+    bottom: 0;
     left: 0;
     width: 200px;
     height: 100%;
@@ -70,7 +70,7 @@ a {
     left: 200px;
     right: 0;
     bottom: 0;
-    overflow: auto; 
+    overflow: auto;
     padding:10px;
 }
 
@@ -144,29 +144,3 @@ table.search-results td {
     padding: 3px;
     background-color: rgb(204, 204, 204);
 }
-
-/* series pages */
-
-ul#episodes, ul#episode-files {
-    line-height: 1.4;
-    list-style: none;
-}
-ul#episodes hr {
-    margin: 10px 0 10px 0;
-}
-ul#episodes li.identifier {
-    background: #ddd;
-    padding: 5px;
-    margin: 5px 0 5px 0;
-}
-ul.episode-files li {
-    padding-left: 20px;
-    background: transparent url(/static/img/cross.png) no-repeat;
-    list-style: none;
-    color: #666;
-}
-ul.episode-files li.downloaded {
-    background-image: url(/static/img/tick.png);
-    color: #000;
-}
-

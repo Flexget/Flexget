@@ -19,6 +19,7 @@ $(document).ready(function() {
 
 $(document).ready(function(){
     if ($("#cat")) {
+        // TODO: get rid of this hide call, it causes flickering ...
         $("#cat dd").hide();
         $("#cat dt div").addClass("expand");
         $("#cat dt div").click(function() {
@@ -45,8 +46,14 @@ $(document).ready(function(){
             }
             return false;
         });
-        //Open up categories with a selected item
-        $("#cat dt div.selected").click();
+        //Open up category with a selected item
+        var selected = $("#cat dt div.selected");
+        if (selected) {
+            $(selected).parent().next().show();
+            // set state to shown
+            $(selected).removeClass();
+            $(selected).addClass("collapse");
+        }
     }
 });
 
