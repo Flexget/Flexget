@@ -45,6 +45,8 @@ $(document).ready(function(){
             }
             return false;
         });
+        //Open up categories with a selected item
+        $("#cat dt div.selected").click();
     }
 });
 

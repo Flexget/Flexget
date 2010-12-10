@@ -329,6 +329,8 @@ class Manager(object):
     def create_feeds(self):
         """Creates instances of all configured feeds"""
         from flexget.feed import Feed
+        # Clear feeds dict
+        self.feeds = {}
 
         if not 'feeds' in self.config:
             log.critical('There are no feeds in the configuration file!')

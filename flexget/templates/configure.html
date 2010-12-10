@@ -13,15 +13,15 @@
 
 <dl id="cat">
     {% for category in manager.config.iterkeys() %}
-    <dt><div>{{ category }}</div></dt>
+    <dt><div{% if category == root|default('') %} class="selected"{% endif %}>{{ category }}</div></dt>
     <dd>
         <ul>
-            {% for name in manager.config[category].iterkeys() %}
+            {% for a_name in manager.config[category].iterkeys() %}
                 <li>
-                    <div class="item">
-                        <a href="/configure/edit/text/{{ category }}/{{ name }}">{{ name }}</a>
+                    <div class="item{% if a_name == name|default('') %} selected{% endif %}">
+                        <a href="/configure/edit/text/{{ category }}/{{ a_name }}">{{ a_name }}</a>
                         <div class="actions">
-                            <a href="/configure/delete/{{ category }}/{{ name }}"><img src="/static/img/fatcow-icons/16x16/delete.png" alt="Delete"/></a>
+                            <a href="/configure/delete/{{ category }}/{{ a_name }}"><img src="/static/img/fatcow-icons/16x16/delete.png" alt="Delete"/></a>
                         </div>
                     </div>
                 </li>
