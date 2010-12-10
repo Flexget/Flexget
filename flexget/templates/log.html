@@ -1,4 +1,5 @@
 {% extends "layout.html" %}
+
 {% block head %}
     <link rel="stylesheet" href="/static/css/ui.jqgrid.css" type="text/css" media="screen"/>
     <script type="text/javascript" src="/static/js/grid.locale-en.js"></script>
@@ -16,7 +17,6 @@
 {% endblock %}
 
 {% block main %}
-
 <script type=text/javascript>
     $(function(){
         $("#logarea").jqGrid({
@@ -98,7 +98,6 @@
     <table id="logarea"></table>
     <div id="pager"></div>
 </p>
-
 {% endblock %}
 
 {% block menu %}
