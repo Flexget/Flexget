@@ -4,9 +4,10 @@ from flexget.plugin import register_plugin, register_parser_option, priority, in
 from flexget.manager import Base, Session
 from flexget.utils.log import log_once
 from flexget.utils.imdb import ImdbSearch, ImdbParser, extract_id
-from sqlalchemy import Table, Column, Integer, Float, String, Boolean
+from sqlalchemy import Table, Column, Integer, Float, String, Boolean, DateTime
 from sqlalchemy.schema import ForeignKey
 from sqlalchemy.orm import relation
+from datetime import datetime, timedelta
 
 # association tables
 genres_table = Table('imdb_movie_genres', Base.metadata,
@@ -44,7 +45,12 @@ class Movie(Base):
     votes = Column(Integer)
     year = Column(Integer)
     plot_outline = Column(String)
+    mpaa_rating = Column(String, default='')
     photo = Column(String)
+
+    # updated time, so we can grab new rating counts after 48 hours
+    # set a default, so existing data gets updated with a rating
+    updated = Column(DateTime)
 
     def __repr__(self):
         return '<Movie(name=%s,votes=%s,year=%s)>' % (self.title, self.votes, self.year)
@@ -202,13 +208,14 @@ class ModuleImdbLookup(object):
 
             # check if this imdb page has been parsed & cached
             cached = session.query(Movie).filter(Movie.url == entry['imdb_url']).first()
-            if not cached:
+            if (not cached) or (cached.updated is None) or (cached.updated < datetime.now() - timedelta(days=2)):
+                # Remove the old movie, we'll store another one later.
+                session.query(Movie).filter(Movie.url == entry['imdb_url']).delete()
                 # search and store to cache
                 feed.verbose_progress('Parsing imdb for %s' % entry['title'])
                 try:
                     take_a_break = True
                     imdb.parse(entry['imdb_url'])
-
                     # store to database
                     movie = Movie()
                     movie.photo = imdb.photo
@@ -216,6 +223,7 @@ class ModuleImdbLookup(object):
                     movie.score = imdb.score
                     movie.votes = imdb.votes
                     movie.year = imdb.year
+                    movie.mpaa_rating = imdb.mpaa_rating
                     movie.plot_outline = imdb.plot_outline
                     movie.url = entry['imdb_url']
                     for name in imdb.genres:
@@ -238,7 +246,9 @@ class ModuleImdbLookup(object):
                         if not director:
                             director = Director(imdb_id, name)
                         movie.directors.append(director) # pylint:disable=E1101
-                    session.add(movie)
+                    # so that we can track how long since we've updated the info later
+                    movie.updated = datetime.now()
+                    output = session.add(movie)
 
                 except UnicodeDecodeError:
                     log.error('Unable to determine encoding for %s. Installing chardet library may help.' % entry['imdb_url'])
@@ -261,6 +271,7 @@ class ModuleImdbLookup(object):
                 imdb.year = cached.year
                 imdb.votes = cached.votes
                 imdb.score = cached.score
+                imdb.mpaa_rating = cached.mpaa_rating
                 imdb.plot_outline = cached.plot_outline
                 imdb.genres = [genre.name for genre in cached.genres]
                 imdb.languages = [lang.name for lang in cached.languages]
@@ -269,6 +280,9 @@ class ModuleImdbLookup(object):
                 for director in cached.directors:
                     imdb.directors[director.imdb_id] = director.name
 
+            if imdb.mpaa_rating is None:
+                imdb.mpaa_rating = ''
+
             log.log(5, 'imdb.score: %s' % imdb.score)
             log.log(5, 'imdb.votes: %s' % imdb.votes)
             log.log(5, 'imdb.year: %s' % imdb.year)
@@ -276,6 +290,7 @@ class ModuleImdbLookup(object):
             log.log(5, 'imdb.languages: %s' % imdb.languages)
             log.log(5, 'imdb.actors: %s' % ', '.join(imdb.actors))
             log.log(5, 'imdb.directors: %s' % ', '.join(imdb.directors))
+            log.log(5, 'imdb.mpaa_rating: %s' % ', '.join(imdb.mpaa_rating))
 
             # store to entry
             # TODO: I really don't like this shoveling!
@@ -291,6 +306,7 @@ class ModuleImdbLookup(object):
             entry['imdb_languages'] = imdb.languages
             entry['imdb_actors'] = imdb.actors
             entry['imdb_directors'] = imdb.directors
+            entry['imdb_mpaa_rating'] = imdb.mpaa_rating
 
             # give imdb a little break between requests (see: http://flexget.com/ticket/129#comment:1)
             if take_a_break and not feed.manager.options.debug and not feed.manager.unit_test:

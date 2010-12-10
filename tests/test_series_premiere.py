@@ -27,6 +27,11 @@ class TestSeriesPremiere(FlexGetBase):
             mock:
               - {title: 'foo bar s01e01 dsr xvid-2hd[dmg]'}
             series_premiere: yes
+          test_path_set:
+            mock:
+              - {title: 'foo bar s01e01 hdtv'}
+            series_premiere:
+              path: test
     """
 
     def test_only_one(self):
@@ -38,3 +43,7 @@ class TestSeriesPremiere(FlexGetBase):
         assert len(self.feed.accepted) == 1, 'didn\'t accept first premiere'
         self.execute_feed('test_dupes_across_feeds_2')
         assert len(self.feed.accepted) == 0, 'accepted duplicate premiere'
+
+    def test_path_set(self):
+        self.execute_feed('test_path_set')
+        assert self.feed.find_entry(title='foo bar s01e01 hdtv', path='test')

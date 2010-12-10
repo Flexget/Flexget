@@ -37,24 +37,26 @@ class SeriesParser(TitleParser):
         separators = '[!/+,:;|~ x-]'
         roman_numeral_re = 'X{0,3}(?:IX|XI{0,4}|VI{0,4}|IV|V|I{1,4})'
         self.ep_regexps = [
-                '(?:series|season|s)\s?(\d{1,3})(?:\s(?:.*?\s)?)?(?:episode|ep|e|part|pt)\s?(\d{1,3}|%s)' % roman_numeral_re,
-                '(?:series|season)\s?(\d{1,3})\s(\d{1,3})\s?of\s?(?:\d{1,3})',
-                '(\d{1,3})\s?of\s?(?:\d{1,3})',
-                '(\d{1,2})\s?x\s?(\d+)',
-                '(?:episode|ep|part|pt)\s?(\d{1,3}|%s)' % roman_numeral_re]
+            '(?:series|season|s)\s?(\d{1,3})(?:\s(?:.*?\s)?)?(?:episode|ep|e|part|pt)\s?(\d{1,3}|%s)' % roman_numeral_re,
+            '(?:series|season)\s?(\d{1,3})\s(\d{1,3})\s?of\s?(?:\d{1,3})',
+            '(\d{1,3})\s?of\s?(?:\d{1,3})',
+            '(\d{1,2})\s?x\s?(\d+)',
+            '(?:episode|ep|part|pt)\s?(\d{1,3}|%s)' % roman_numeral_re]
         self.unwanted_ep_regexps = [
-                 '(\d{1,3})\s?x\s?(0+)[^1-9]', # 5x0
-                 'S(\d{1,3})D(\d{1,3})', # S3D1
-                 '(\d{1,3})\s?x\s?(all)', # 1xAll
-                 'season(?:s)?\s?\d\s?(?:&\s?\d)?[\s-]*(?:complete|full)',
-                 'seasons\s(\d\s){2,}',
-                 'disc\s\d',
-                 's\d+.?e\d+-\d+'] # S6 E1-4
+             '(\d{1,3})\s?x\s?(0+)[^1-9]', # 5x0
+             'S(\d{1,3})D(\d{1,3})', # S3D1
+             '(\d{1,3})\s?x\s?(all)', # 1xAll
+             'season(?:s)?\s?\d\s?(?:&\s?\d)?[\s-]*(?:complete|full)',
+             'seasons\s(\d\s){2,}',
+             'disc\s\d',
+             's\d+.?e\d+-\d+'] # S6 E1-4
         self.id_regexps = [
-                '(\d{4})%s(\d+)%s(\d+)' % (separators, separators),
-                '(\d+)%s(\d+)%s(\d{4})' % (separators, separators),
-                '(\d{4})x(\d+)\.(\d+)', '(pt|part)\s?(\d+|%s)' % roman_numeral_re,
-                '(?:^|[^s\d])(\d{1,3})(?:[^p\d]|$)']
+            '(\d{4})%s(\d+)%s(\d+)' % (separators, separators),
+            '(\d+)%s(\d+)%s(\d{4})' % (separators, separators),
+            '(\d{4})x(\d+)\.(\d+)', '(pt|part)\s?(\d+|%s)' % roman_numeral_re,
+            '(?:^|[^s\d])(\d{1,3})(?:[^p\d]|$)']
+        self.unwanted_id_regexps = [
+            'seasons?\s?\d{1,2}']
         self.clean_regexps = ['\[.*?\]', '\(.*?\)']
         # ignore prefix regexpes must be passive groups with 0 or 1 occurrences  eg. (?:prefix)?
         self.ignore_prefix_regexps = [
@@ -263,6 +265,8 @@ class SeriesParser(TitleParser):
                 return
             log.debug('-> no luck with the expect_ep')
         else:
+            if self.parse_unwanted_id(data):
+                return
             for id_re in self.id_regexps:
                 match = re.search(id_re, data, re.IGNORECASE | re.UNICODE)
                 if match:
@@ -288,6 +292,14 @@ class SeriesParser(TitleParser):
             match = re.search(ep_unwanted_re, data, re.IGNORECASE | re.UNICODE)
             if match:
                 log.debug('unwanted regexp %s matched %s' % (ep_unwanted_re, match.groups()))
+                return True
+
+    def parse_unwanted_id(self, data):
+        """Parses data for an unwanted id hits. Return True if the data contains unwanted hits."""
+        for id_unwanted_re in self.unwanted_id_regexps:
+            match = re.search(id_unwanted_re, data, re.IGNORECASE | re.UNICODE)
+            if match:
+                log.debug('unwanted id regexp %s matched %s' % (id_unwanted_re, match.groups()))
                 return True
 
     def parse_episode(self, data):

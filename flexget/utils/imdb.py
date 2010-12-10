@@ -101,7 +101,7 @@ class ImdbSearch(object):
         except:
             log.warning('Problems with encoding %s, string possibly corrupted? Ignoring troublesome characters.' % name)
             url = u'http://www.imdb.com/find?' + urllib.urlencode({'q': name.encode('latin1', 'ignore'), 's': 'all'})
-            
+
         log.debug('Serch query: %s' % repr(url))
         page = urllib2.urlopen(url)
         actual_url = page.geturl()
@@ -122,7 +122,7 @@ class ImdbSearch(object):
 
         # the god damn page has declared a wrong encoding
         soup = get_soup(page)
-        
+
         sections = ['Popular Titles', 'Titles (Exact Matches)',
                     'Titles (Partial Matches)', 'Titles (Approx Matches)']
 
@@ -212,6 +212,7 @@ class ImdbParser(object):
         self.url = None
         self.imdb_id = None
         self.photo = None
+        self.mpaa_rating = ''
 
     def __str__(self):
         return '<ImdbParser(name=%s,imdb_id=%s)>' % (self.name, self.imdb_id)
@@ -234,6 +235,25 @@ class ImdbParser(object):
             if tag_img:
                 self.photo = tag_img.get('src')
                 log.debug('Detected photo: %s' % self.photo)
+
+        # get rating. Always the first absmiddle.
+        tag_infobar_div = soup.find('div', attrs={'class': 'infobar'})
+        if tag_infobar_div:
+            tag_mpaa_rating = tag_infobar_div.find('img', attrs={'class': 'absmiddle'})
+            if tag_mpaa_rating:
+                if (tag_mpaa_rating['alt'] != tag_mpaa_rating['title']):
+                    # If we've found something of class absmiddle in the infobar,
+                    # it should be mpaa_rating, since that's the only one in there.
+                    log.warning("MPAA rating alt and title don't match for URL %s - plugin needs an update?" % url)
+                else:
+                    self.mpaa_rating = tag_mpaa_rating['alt']
+                    log.debug('Detected mpaa rating: %s' % self.mpaa_rating)
+            else:
+                log.debug('Unable to match signature of mpaa rating for %s - could be a TV episode, or plugin needs update?' % url)
+        else:
+            # We should match the infobar, it's an integral part of the IMDB page.
+            log.warning('Unable to get infodiv class for %s - plugin needs update?' % url)
+
 
         # get name
         tag_name = soup.find('h1')
@@ -286,19 +306,16 @@ class ImdbParser(object):
             self.year = int(tag_year.contents[0])
             log.debug('Detected year: %s' % self.year)
         else:
-            log.warning('Unable to get year for %s - plugin needs update?' % url)
-
-        # get plot outline
-        tag_outline = soup.find('h5', text=re.compile('Plot.*:'))
-        if tag_outline:
-            tag_outline = tag_outline.parent.parent.find('div')
-            if tag_outline:
-                self.plot_outline = tag_outline.next.string.strip()
+            tag_year = soup.find('span', text=re.compile(r'^\(Video \d+\)'))
+            if tag_year:
+                m = re.search('(\d{4})', unicode(tag_year))
+                if m:
+                    self.year = int(m.group())
+                    log.debug('Detected year: %s' % self.year)
+                else:
+                    log.warning('Unable to get year for %s (regexp mismatch) - plugin needs update?' % url)
             else:
-                log.debug('ERROR: Unable to find div from tag_outline')
-            log.debug('Detected plot outline: %s' % self.plot_outline)
-        else:
-            log.debug('No h5 plot found')
+                log.warning('Unable to get year for %s (tag not found) - plugin needs update?' % url)
 
         # get main cast
         tag_cast = soup.find('table', 'cast_list')
@@ -312,9 +329,9 @@ class ImdbParser(object):
                 self.actors[actor_id] = actor_name
 
         # get director(s)
-        tag_directors = soup.find('div', id='director-info')
-        if tag_directors:
-            for director in tag_directors.findAll('a', href=re.compile('/name/nm')):
+        h4_director = soup.find('h4', text=re.compile('Director'))
+        if h4_director:
+            for director in h4_director.parent.parent.findAll('a', href=re.compile('/name/nm')):
                 director_id = extract_id(director['href'])
                 director_name = director.contents[0]
                 # tag instead of name
@@ -326,3 +343,20 @@ class ImdbParser(object):
         log.debug('Detected languages: %s' % self.languages)
         log.debug('Detected director(s): %s' % ', '.join(self.directors))
         log.debug('Detected actors: %s' % ', '.join(self.actors))
+
+        # get plot (another page)
+        plot_url = self.url
+        if not self.url.endswith('/'):
+            plot_url += '/'
+        plot_url += 'plotsummary'
+
+        log.debug('Requesting %s' % plot_url)
+        page = urllib2.urlopen(plot_url)
+        soup = get_soup(page)
+
+        p_plot = soup.find('p', attrs={'class': 'plotpar'})
+        if p_plot:
+            self.plot_outline = p_plot.next.string.strip()
+            log.debug('Detected plot outline: %s' % self.plot_outline)
+        else:
+            log.debug('Failed to find plot')

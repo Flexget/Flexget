@@ -74,7 +74,7 @@ registry['unknown'] = UnknownQuality()
 
 def all():
     """Return all Qualities in order of best to worst"""
-    return sorted(qualities, reverse=True)
+    return sorted(qualities, reverse=True) + [UnknownQuality()]
 
 
 def get(name, *args):

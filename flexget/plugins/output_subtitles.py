@@ -6,7 +6,7 @@ import sys
 import logging
 
 from flexget.manager import Session, Base
-from flexget.plugin import *
+from flexget.plugin import register_plugin
 from sqlalchemy import Column, Integer, String, DateTime, PickleType
 from datetime import datetime, timedelta
 from flexget.utils.tools import urlopener
@@ -51,7 +51,7 @@ log = logging.getLogger('subtitles')
 # http://trac.opensubtitles.org/projects/opensubtitles/wiki/XMLRPC
 
 
-class Subtitles:
+class Subtitles(object):
     """
     Fetch subtitles from opensubtitles.org
     """
@@ -63,6 +63,7 @@ class Subtitles:
         langs.accept('text')
         subs.accept('decimal', key='min_sub_rating')
         subs.accept('decimal', key='match_limit')
+        subs.accept('path', key='output')
         return subs
 
     def get_config(self, feed):
@@ -83,8 +84,8 @@ class Subtitles:
             entries = filter(lambda x: x['imdb_url'] is not None, feed.accepted)
         except KeyError:
             # No imdb urls on this feed, skip it
+            # TODO: should do lookup via imdb_lookup plugin?
             return
-
 
         try:
             s = ServerProxy("http://api.opensubtitles.org/xml-rpc")
@@ -167,4 +168,5 @@ class Subtitles:
                 f.close()
 
         s.LogOut(token)
+        
 register_plugin(Subtitles, 'subtitles')

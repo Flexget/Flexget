@@ -1,11 +1,40 @@
 import os
 from flexget.feed import Entry
-from flexget.plugin import register_plugin
+from flexget.plugin import register_plugin, register_parser_option, get_plugin_by_name, PluginDependencyError
 from flexget.plugins.cached_input import cached
 import re
 import logging
 
 log = logging.getLogger('tail')
+
+
+class ResetTail(object):
+    """Adds --tail-reset"""
+
+    def on_process_start(self, feed):
+        if not feed.manager.options.tail_reset:
+            return
+
+        feed.manager.disable_feeds()
+
+        from flexget.utils.simple_persistence import SimpleKeyValue
+        from flexget.manager import Session
+
+        session = Session()
+        try:
+            poses = session.query(SimpleKeyValue).filter(SimpleKeyValue.key == feed.manager.options.tail_reset).all()
+            if not poses:
+                print 'No position stored for file %s' % feed.manager.options.tail_reset
+                print 'Note that file must give in same format as in config, ie. ~/logs/log can not be given as /home/user/logs/log'
+            for pos in poses:
+                if pos.value == 0:
+                    print 'Feed %s tail position is already zero' % pos.feed
+                else:
+                    print 'Feed %s tail position (%s) reseted to zero' % (pos.feed, pos.value)
+                    pos.value = 0
+            session.commit()
+        finally:
+            session.close()
 
 
 class InputTail(object):
@@ -49,10 +78,22 @@ class InputTail(object):
     @cached('tail', 'file')
     def on_feed_input(self, feed):
 
+        try:
+            details = get_plugin_by_name('details').instance
+            if feed.name not in details.no_entries_ok:
+                log.debug('appending %s to details plugin no_entries_ok' % feed.name)
+                details.no_entries_ok.append(feed.name)
+        except PluginDependencyError:
+            log.debug('unable to get details plugin')
+
         filename = os.path.expanduser(feed.config['tail']['file'])
         file = open(filename, 'r')
 
         last_pos = feed.simple_persistence.setdefault(filename, 0)
+        if os.path.getsize(filename) < last_pos:
+            log.info('File size is smaller than in previous execution, reseting to beginning of the file')
+            last_pos = 0
+
         file.seek(last_pos)
 
         log.debug('continuing from last position %s' % last_pos)
@@ -87,7 +128,7 @@ class InputTail(object):
                         # start new entry
                         entry = Entry()
                         used = {}
-                        
+
                     # add field to entry
                     entry[field] = match.group(1)
                     used[field] = True
@@ -107,3 +148,6 @@ class InputTail(object):
                         used = {}
 
 register_plugin(InputTail, 'tail')
+register_plugin(ResetTail, '--tail-reset', builtin=True)
+register_parser_option('--tail-reset', action='store', dest='tail_reset', default=False, metavar='FILE',
+    help='Reset tail position for a file.')

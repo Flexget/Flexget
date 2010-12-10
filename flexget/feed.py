@@ -407,17 +407,6 @@ class Feed(object):
                 if self._abort:
                     return
 
-                # verbose some progress
-                if event == 'input':
-                    if not self.entries:
-                        self.verbose_progress('Feed didn\'t produce any entries. This is likely due to a mis-configured or non-functional input.')
-                    else:
-                        self.verbose_progress('Produced %s entries.' % (len(self.entries)))
-                if event == 'filter':
-                    self.verbose_progress('Accepted: %s (Rejected: %s Undecided: %s Failed: %s)' % \
-                        (len(self.accepted), len(self.rejected), \
-                        len(self.entries) - len(self.accepted), len(self.failed)))
-
             log.debug('committing session, abort=%s' % self._abort)
             self.session.commit()
         except:

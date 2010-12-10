@@ -51,11 +51,12 @@ class FormLogin(object):
         for form in br.forms():
             loginform = form
 
-        try: 
-            loginform[userfield] = username 
-            loginform[passfield] = password 
-        except Exception, e: 
-            raise PluginError('Unable to find login fields', log) 
+            try:
+                loginform[userfield] = username
+                loginform[passfield] = password
+                break
+            except Exception, e:
+                raise PluginError('Unable to find login fields', log)
 
         br.form = loginform
 

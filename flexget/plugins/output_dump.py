@@ -35,9 +35,10 @@ class OutputDump(object):
                         print '%-15s: [not printable] (%s)' % (field, value)
                 print ''
 
-        if feed.entries:
-            print '-- Entries: ----------------------------'
-            dump(feed.entries)
+        undecided = [entry for entry in feed.entries if not entry in feed.accepted]
+        if undecided:
+            print '-- Undecided: --------------------------'
+            dump(undecided)
         if feed.accepted:
             print '-- Accepted: ---------------------------'
             dump(feed.accepted)
