@@ -5,13 +5,11 @@ At the moment scheduler supports just one global interval for all feeds.
 import logging
 from datetime import datetime, timedelta
 import threading
-from sqlalchemy import Column, Integer, Unicode, asc, desc
+from sqlalchemy import Column, Integer, Unicode
 from flask import request, render_template, flash, Module
 from flexget.webui import register_plugin, db_session, manager
 from flexget.manager import Base
 from flexget.event import event, fire_event
-
-from log_viewer import LogEntry
 
 log = logging.getLogger('ui.schedule')
 schedule = Module(__name__)
@@ -98,19 +96,6 @@ def get_global_interval():
     if global_interval:
         return global_interval.interval
     return DEFAULT_INTERVAL
-
-
-@schedule.context_processor
-def update_menus():
-    import time
-
-    strftime = lambda secs: time.strftime('%Y-%m-%d %H:%M', time.localtime(float(secs)))
-    menu_feeds = [i[0] for i in db_session.query(LogEntry.feed).filter(LogEntry.feed != '')
-                                          .distinct().order_by(asc('feed'))[:]]
-    menu_execs = [(i[0], strftime(i[0])) for i in db_session.query(LogEntry.execution)
-                                                            .filter(LogEntry.execution != '')
-                                                            .distinct().order_by(desc('execution'))[:10]]
-    return {'menu_feeds': menu_feeds, 'menu_execs': menu_execs}
 
 
 @schedule.route('/', methods=['POST', 'GET'])
