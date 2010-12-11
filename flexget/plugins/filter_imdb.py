@@ -182,7 +182,10 @@ class FilterImdb(object):
                 if feed.manager.options.debug:
                     log.debug(msg)
                 else:
-                    log_once(msg, log)
+                    if feed.manager.options.quiet:
+                        log_once(msg, log)
+                    else:
+                        log.info(msg)
             else:
                 log.debug('Accepting %s' % (entry['title']))
                 feed.accept(entry)

@@ -4,7 +4,7 @@ from flexget.plugin import register_plugin, register_parser_option, priority, in
 from flexget.manager import Base, Session
 from flexget.utils.log import log_once
 from flexget.utils.imdb import ImdbSearch, ImdbParser, extract_id
-from sqlalchemy import Table, Column, Integer, Float, String, Boolean, DateTime
+from sqlalchemy import Table, Column, Integer, Float, String, Unicode, Boolean, DateTime
 from sqlalchemy.schema import ForeignKey
 from sqlalchemy.orm import relation
 from datetime import datetime, timedelta
@@ -32,8 +32,8 @@ class Movie(Base):
     __tablename__ = 'imdb_movies'
 
     id = Column(Integer, primary_key=True)
-    title = Column(String)
-    url = Column(String)
+    title = Column(Unicode)
+    url = Column(String, index=True)
 
     # many-to-many relations
     genres = relation('Genre', secondary=genres_table, backref='movies')
@@ -44,7 +44,7 @@ class Movie(Base):
     score = Column(Float)
     votes = Column(Integer)
     year = Column(Integer)
-    plot_outline = Column(String)
+    plot_outline = Column(Unicode)
     mpaa_rating = Column(String, default='')
     photo = Column(String)
 
@@ -61,7 +61,7 @@ class Language(Base):
     __tablename__ = 'imdb_languages'
 
     id = Column(Integer, primary_key=True)
-    name = Column(String)
+    name = Column(Unicode)
 
     def __init__(self, name):
         self.name = name
@@ -84,7 +84,7 @@ class Actor(Base):
 
     id = Column(Integer, primary_key=True)
     imdb_id = Column(String)
-    name = Column(String)
+    name = Column(Unicode)
 
     def __init__(self, imdb_id, name=None):
         self.imdb_id = imdb_id
@@ -97,7 +97,7 @@ class Director(Base):
 
     id = Column(Integer, primary_key=True)
     imdb_id = Column(String)
-    name = Column(String)
+    name = Column(Unicode)
 
     def __init__(self, imdb_id, name=None):
         self.imdb_id = imdb_id
@@ -109,7 +109,7 @@ class SearchResult(Base):
     __tablename__ = 'imdb_search'
 
     id = Column(Integer, primary_key=True)
-    title = Column(String)
+    title = Column(Unicode, index=True)
     url = Column(String)
     fails = Column(Boolean, default=False)
 
@@ -149,6 +149,8 @@ class ModuleImdbLookup(object):
     @internet(log)
     def lookup(self, feed, entry, search_allowed=True):
         """Perform imdb lookup for entry. Raises PluginError with failure reason."""
+        
+        log.debug('lookup for %s' % entry['title'])
 
         take_a_break = False
         session = Session()
