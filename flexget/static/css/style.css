@@ -156,7 +156,7 @@ ul#progress {
 }
 ul#progress li {
     font-family: Andale Mono, Monaco, Courier New, Courier;
-    font-weight: lighter;
+    font-size:12px;
     color:#ddd;
     margin:5px
 }

@@ -1,4 +1,4 @@
-{"progress_lines": {
-{% for line in progress %}    "{{line}}": {{ loop.index0 }}{% if not loop.last %},
+{
+{% for line in progress %}    "{{ loop.index0 }}": "{{line}}"{% if not loop.last %},
 {% endif %}{% endfor %}
- }
+}

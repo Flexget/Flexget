@@ -4,23 +4,20 @@
     {% if execute_progress %}
     <script type="application/javascript">
         function update_progress() {  
-            alert("update_progress() run.")
+        
+            var progress = $('#progress');
             
-            $.ajax({ 
-                url: "/execute/progress.json", 
-                async: false, 
-                cache: false,
-                dataType: "json",
-                success: function(){
-                    alert("success")
-                },
-                ajaxError: function(){
-                    alert("error")
-                }
+            $.getJSON('/execute/progress.json', function(data) {
+                $.each(data, function(key, value) { 
+                    progress.append('<li>' + value + '</li>');
+                });
             });
-/*             setTimeout('update_progress()', 1000);  */
+            
+            progress.animate({ scrollTop: progress.attr("scrollHeight") }, 500);
+            
+            setTimeout('update_progress()', 1000);
         }
-        $(document).ready(update_progress); 
+        $(document).ready(update_progress);
     </script>
     {% endif %}
 {% endblock %}

@@ -33,14 +33,6 @@ def progress(return_list=False):
     context = {'progress':    
         ["Did something on a file.", # < v Fill me in order.
         "Downloading Inception.2.Thought Police.(2012).axxo.avi",
-        "Did something on a file.", # < v Fill me in order.
-        "Downloading Inception.2.Thought Police.(2012).axxo.avi",
-        "Did something on a file.", # < v Fill me in order.
-        "Downloading Inception.2.Thought Police.(2012).axxo.avi",
-        "Did something on a file.", # < v Fill me in order.
-        "Downloading Inception.2.Thought Police.(2012).axxo.avi",
-        "Did something on a file.", # < v Fill me in order.
-        "Downloading Inception.2.Thought Police.(2012).axxo.avi",
         "Rejected something becasue you've downloaded it already. (yeah right, eheh)"]}
         
     if return_list:
