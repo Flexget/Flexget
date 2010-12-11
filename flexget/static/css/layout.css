@@ -1,3 +1,11 @@
+/*
+
+FlexGet webui layout
+
+NOTE: This shouldn't contain any plugin specific styles, only generic ones
+
+*/
+
 * {margin: 0; padding: 0;}
 
 /* display scrollbar always */
@@ -123,6 +131,24 @@ a {
     list-style: none;
 }
 
+/* help box */
+
+div.help {
+    margin-top: 0.75em;
+    border: 1px solid #444;
+    width: 25em;
+    padding: 1em;
+    background-color: #222;
+    -moz-border-radius: 0.4em;
+    -khtml-border-radius: 0.4em;
+    color: white;
+}
+
+div.help p:last-child {
+    margin-bottom: 0;
+}
+
+
 /* search results */
 
 table.search-results {
@@ -143,20 +169,4 @@ table.search-results td {
     border: 0 none gray;
     padding: 3px;
     background-color: rgb(204, 204, 204);
-}
-
-/* execute */
-
-ul#progress {
-    margin: 10px 0 0 0;
-    background: #222;
-    display:block;
-    height: 400px;
-    overflow: auto;
-}
-ul#progress li {
-    font-family: Andale Mono, Monaco, Courier New, Courier;
-    font-size:12px;
-    color:#ddd;
-    margin:5px
 }

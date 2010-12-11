@@ -1,5 +1,5 @@
 import logging
-from flask import render_template, request, Response, redirect, flash
+from flask import render_template, request, redirect, flash
 from flask import Module, escape
 from flexget.webui import register_plugin, manager, BufferQueue
 from Queue import Empty
@@ -21,7 +21,6 @@ def index():
             flash(escape(manager.parser.error_msg), 'error')
             context['options'] = request.form['options']
         else:
-            flash('Manual execution started.', 'success')
             from flexget.webui import executor
             executor.execute(options=options, output=bufferqueue)
             context['execute_progress'] = True
@@ -32,9 +31,9 @@ def index():
 
 @execute.route('/progress.json')
 def progress(as_list=False):
-    '''
+    """
     Gives takes messages from the queue and exports them to JSON.
-    '''
+    """
     result = {'items': []}
     try:
         while 1:

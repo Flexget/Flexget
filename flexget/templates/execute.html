@@ -1,6 +1,8 @@
 {% extends "layout.html" %}
 
 {% block head %}
+    <link rel="stylesheet" href="/static/css/execute.css" type="text/css" media="screen"/>
+
     {% if execute_progress %}
     <script type="application/javascript">
         function update_progress() {
@@ -18,7 +20,7 @@
                     }
                 });
             });
-            var timer = window.setTimeout('update_progress()', 1000);
+            timer = window.setTimeout('update_progress()', 1000);
         }
         $(document).ready(update_progress);
     </script>
@@ -26,25 +28,37 @@
 {% endblock %}
 
 {% block main %}
-<form action="{{ url_for('index') }}" method="post" class="simple">
-    <fieldset style="width:26em">
-        <legend>Execute FlexGet</legend>
-        <div>
-            <label for="options">Options</label>
-            <input type="text" id="options" name="options" value="{{ options }}" size="50">
+
+    <div>
+        <form action="{{ url_for('index') }}" method="post" class="simple" style="float: left">
+            <fieldset style="width:26em">
+                <legend>Execute FlexGet</legend>
+                <div>
+                    <label for="options">Options</label>
+                    <input type="text" id="options" name="options" value="{{ options }}" size="50">
+                </div>
+                <div class="buttons">
+                    <button type="submit">Start Execution</button>
+                </div>
+            </fieldset>
+        </form>
+
+        <div class="help" style="float: right;">
+            <p>FlexGet has strong roots in Command Line Interface. This allows you to access
+            commandline features from WEB. More and more features are being added to WEB-UI but
+            it will take time until all major features are usable with nice User Interface.</p>
         </div>
-        <div class="buttons">
-            <button type="submit">Start Execution</button>
-        </div>
-    </fieldset>
-</form>
-<div>
-    <ul id="progress">
-        {% if progress %}
-        {% for item in progress %}
-        <li><pre>{{ item }}</pre></li>
-        {% endfor %}
-        {% endif %}
-    </ul>
-</div>
+
+        <div style="clear: both;"></div>
+    </div>
+
+    <div>
+        <ul id="progress">
+            {% if progress %}
+            {% for item in progress %}
+            <li><pre>{{ item }}</pre></li>
+            {% endfor %}
+            {% endif %}
+        </ul>
+    </div>
 {% endblock %}
