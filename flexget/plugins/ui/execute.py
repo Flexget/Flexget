@@ -20,18 +20,31 @@ def index():
             flash('Manual execution started.', 'success')
             from flexget.webui import executor
             executor.execute(options)
+            context['execute_progress'] = progress(return_list=True)
+        
     return render_template('execute.html', **context)
 
 
 @execute.route('/progress.json')
-def progress():
+def progress(return_list=False):
     '''
     Gives takes messages from the queue and exports them to JSON.
     '''
     context = {'progress':    
         ["Did something on a file.", # < v Fill me in order.
         "Downloading Inception.2.Thought Police.(2012).axxo.avi",
+        "Did something on a file.", # < v Fill me in order.
+        "Downloading Inception.2.Thought Police.(2012).axxo.avi",
+        "Did something on a file.", # < v Fill me in order.
+        "Downloading Inception.2.Thought Police.(2012).axxo.avi",
+        "Did something on a file.", # < v Fill me in order.
+        "Downloading Inception.2.Thought Police.(2012).axxo.avi",
+        "Did something on a file.", # < v Fill me in order.
+        "Downloading Inception.2.Thought Police.(2012).axxo.avi",
         "Rejected something becasue you've downloaded it already. (yeah right, eheh)"]}
+        
+    if return_list:
+        return context['progress']
         
     json_rendered = render_template('execute_progress.json', **context)
     return Response(json_rendered, mimetype='application/json')

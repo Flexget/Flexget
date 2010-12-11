@@ -1,5 +1,30 @@
 {% extends "layout.html" %}
 
+{% block head %}
+    <script type="application/javascript">
+        function update_progress() {  
+            alert("update_progress() run.")
+            
+            $.ajax({ 
+                url: "/execute/progress.json", 
+                async: false, 
+                cache: false,
+                dataType: "json",
+                success: function(){
+                    alert("success")
+                },
+                ajaxError: function(){
+                    alert("error")
+                }
+            });
+/*             setTimeout('update_progress()', 1000);  */
+        }
+        $(document).ready(function(){
+            update_progress()
+        }); 
+    </script>
+{% endblock %}
+
 {% block main %}
 <h1>Manually start execution</h1>
 
@@ -16,6 +41,14 @@
     </fieldset>
 </form>
 <div>
+    {% if execute_progress %}
+    <ul id="progress">
+        {% for item in execute_progress %}
+        <li>{{ item }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
     <pre>{{ help }}</pre>
+    
 </div>
 {% endblock %}

@@ -144,3 +144,19 @@ table.search-results td {
     padding: 3px;
     background-color: rgb(204, 204, 204);
 }
+
+/* execute */
+
+ul#progress {
+    margin: 10px 0 0 0;
+    background: #222;
+    display:block;
+    height: 200px;
+    overflow: scroll
+}
+ul#progress li {
+    font-family: Andale Mono, Monaco, Courier New, Courier;
+    font-weight: lighter;
+    color:#ddd;
+    margin:5px
+}
