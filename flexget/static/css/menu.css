@@ -71,6 +71,7 @@ ul#navbar li a.current {
 #menu li div.item.selected
 {
     border-left: 10px solid #FF702E;
+    background-color: #666;
 }
 
 #menu li div.item:hover {
