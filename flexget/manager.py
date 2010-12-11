@@ -3,6 +3,7 @@ import sys
 import logging
 import sqlalchemy
 import yaml
+from copy import deepcopy
 from datetime import datetime
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
@@ -435,3 +436,14 @@ class Manager(object):
             log.info('Removed test database')
 
         self.release_lock()
+
+
+class UIManager(Manager):
+
+    def execute(self):
+        # Backup config before execution
+        config = deepcopy(self.config)
+        Manager.execute(self)
+        self.config_executed = self.config
+        # Restore config
+        self.config = config

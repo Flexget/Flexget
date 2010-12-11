@@ -1,13 +1,12 @@
 #!/usr/bin/python
 
 from flexget import logger
-from flexget.options import CoreOptionParser, UIOptionParser
-from flexget.manager import Manager
+from flexget.options import CoreOptionParser, UIOptionParser, StoreErrorOptionParser
+from flexget.manager import Manager, UIManager
 from flexget import plugin
 import os
 import sys
 import logging
-from options import StoreErrorOptionParser
 
 __version__ = '{subversion}'
 
@@ -31,8 +30,9 @@ def main(webui=False):
     else:
         options = parser.parse_args()[0]
 
+    ManagerClass = UIManager if webui else Manager
     try:
-        manager = Manager(options)
+        manager = ManagerClass(options)
         manager.parser = StoreErrorOptionParser(parser)
     except IOError, e:
         # failed to load config
