@@ -17,7 +17,9 @@ def index():
 
 @configure.route('/delete/<root>/<name>')
 def delete(root, name):
-    log.info('Deleting %s %s' % (root, name))
+    if root in manager.config and name in manager.config[root]:
+        log.info('Deleting %s %s' % (root, name))
+        del manager.config[root][name]
     return redirect(url_for('index'))
 
 

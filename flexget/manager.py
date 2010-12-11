@@ -441,9 +441,39 @@ class Manager(object):
 class UIManager(Manager):
 
     def execute(self):
+        # Update feed instances to match config
+        self.update_feeds()
         # Backup config before execution
         config = deepcopy(self.config)
         Manager.execute(self)
         self.config_executed = self.config
         # Restore config
         self.config = config
+
+    def update_feeds(self):
+        """Updates instances of all configured feeds from config"""
+        from flexget.feed import Feed
+
+        if not isinstance(self.config['feeds'], dict):
+            log.critical('Feeds is in wrong datatype, please read configuration guides')
+            return
+
+        # construct feed list
+        for name in self.config.get('feeds', {}):
+            if not isinstance(self.config['feeds'][name], dict):
+                continue
+            if name in self.feeds:
+                # This feed already has an instance, update it
+                self.feeds[name].config = self.config['feeds'][name]
+                if not name.startswith('_'):
+                    self.feeds[name].enabled = True
+            else:
+                # Create feed
+                feed = Feed(self, name, self.config['feeds'][name])
+                # If feed name is prefixed with _ it's disabled
+                if name.startswith('_'):
+                    feed.enabled = False
+                self.feeds[name] = feed
+        # Delete any feed instances that are no longer in the config
+        for name in [n for n in self.feeds if n not in self.config['feeds']]:
+            del self.feeds[name]

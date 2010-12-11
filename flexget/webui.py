@@ -41,7 +41,7 @@ class ExecThread(threading.Thread):
 
     def run(self):
         while True:
-            kwargs = self.queue.get()
+            kwargs = self.queue.get() or {}
             opts = kwargs.get('options')
             output = kwargs.get('output')
             # Store the managers options and current stdout to be restored after our execution
@@ -50,14 +50,14 @@ class ExecThread(threading.Thread):
                 manager.options = opts
             if output:
                 old_stdout = sys.stdout
+                old_stderr = sys.stderr
                 sys.stdout = output
+                sys.stderr = output
                 streamhandler = logging.StreamHandler(output)
                 streamhandler.setFormatter(FlexGetFormatter())
                 logging.getLogger().addHandler(streamhandler)
                 self.queue.all_tasks_done
             try:
-                # TODO: Update feeds instead of re-creating
-                manager.create_feeds()
                 manager.execute()
             finally:
                 # Inform queue we are done processing this item.
@@ -68,6 +68,7 @@ class ExecThread(threading.Thread):
                 if output:
                     print 'EOF'
                     sys.stdout = old_stdout
+                    sys.stderr = old_stderr
                     logging.getLogger().removeHandler(streamhandler)
 
     def execute(self, **kwargs):
@@ -78,7 +79,11 @@ class ExecThread(threading.Thread):
         options: Values from an OptionParser to be used for this execution
         output: a BufferQueue object that will be filled with output from the execution.
         """
+        if kwargs.get('output') and self.queue.unfinished_tasks:
+            kwargs['output'].write('There is already an execution running. ' +
+                                   'This execution will start when the previous completes.')
         self.queue.put_nowait(kwargs)
+        self.queue.unfinished_tasks
 
 
 def _update_menu(root):
