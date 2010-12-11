@@ -3,18 +3,18 @@
 {% block head %}
     {% if execute_progress %}
     <script type="application/javascript">
-        function update_progress() {  
-        
+        function update_progress() {
+
             var progress = $('#progress');
-            
+
             $.getJSON('/execute/progress.json', function(data) {
-                $.each(data, function(key, value) { 
+                $.each(data, function(key, value) {
                     progress.append('<li>' + value + '</li>');
                 });
             });
-            
+
             progress.animate({ scrollTop: progress.attr("scrollHeight") }, 500);
-            
+
             setTimeout('update_progress()', 1000);
         }
         $(document).ready(update_progress);
@@ -38,7 +38,7 @@
     </fieldset>
 </form>
 <div>
-    {% if execute_progress %}
+    {% if aexecute_progress %}
     <ul id="progress">
         {% for item in execute_progress %}
         <li>{{ item }}</li>
@@ -46,6 +46,5 @@
     </ul>
     {% endif %}
     <pre>{{ help }}</pre>
-    
 </div>
 {% endblock %}

@@ -3,6 +3,7 @@ import os
 import urllib
 import threading
 import sys
+from StringIO import StringIO
 from flask import Flask, redirect, url_for, abort, request
 from sqlalchemy.orm import scoped_session
 from sqlalchemy.orm.session import sessionmaker
@@ -22,6 +23,12 @@ _home = None
 _menu = []
 
 
+class BufferQueue(Queue):
+
+    def write(self, txt):
+        self.put_nowait(txt)
+
+
 class ExecThread(threading.Thread):
     """Thread that does the execution. It can accept options with an execution, and queues execs if necessary."""
 
@@ -32,22 +39,36 @@ class ExecThread(threading.Thread):
 
     def run(self):
         while True:
-            opts = self.queue.get()
-            # Store the managers options to be restored after our execution
-            oldopts = manager.options
+            kwargs = self.queue.get()
+            opts = kwargs.get('options')
+            output = kwargs.get('output')
+            # Store the managers options and current stdout to be restored after our execution
+            old_opts = manager.options
+            old_stdout = sys.stdout
             if opts:
                 manager.options = opts
+            if output:
+                sys.stdout = output
             try:
-                # Re-create the feeds with the current config and run them
+                # TODO: Update feeds instead of re-creating
                 manager.create_feeds()
                 manager.execute()
             finally:
-                # Restore manager's previous options
-                manager.options = oldopts
+                # Inform queue we are done processing this item.
+                self.queue.task_done()
+                # Restore manager's previous options and stdout
+                manager.options = old_opts
+                sys.stdout = old_stdout
 
-    def execute(self, options=None):
-        """Adds an execution to the queue. Options for the exec can be specified"""
-        self.queue.put_nowait(options)
+    def execute(self, **kwargs):
+        """
+        Adds an execution to the queue.
+
+        keyword arguments:
+        options: Values from an OptionParser to be used for this execution
+        output: a BufferQueue object that will be filled with output from the execution.
+        """
+        self.queue.put_nowait(kwargs)
 
 
 def _update_menu(root):

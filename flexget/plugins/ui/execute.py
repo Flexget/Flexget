@@ -1,11 +1,15 @@
 import logging
 from flask import render_template, request, Response, redirect, flash
 from flask import Module, escape
-from flexget.webui import register_plugin, manager
+from flexget.webui import register_plugin, manager, BufferQueue
+from Queue import Empty
+from flask.helpers import jsonify
 
 execute = Module(__name__, url_prefix='/execute')
 
 log = logging.getLogger('ui.execute')
+
+bufferqueue = BufferQueue()
 
 
 @execute.route('/', methods=['POST', 'GET'])
@@ -19,27 +23,26 @@ def index():
         else:
             flash('Manual execution started.', 'success')
             from flexget.webui import executor
-            executor.execute(options)
-            context['execute_progress'] = progress(return_list=True)
-        
+            executor.execute(options=options, output=bufferqueue)
+
     return render_template('execute.html', **context)
 
 
 @execute.route('/progress.json')
-def progress(return_list=False):
+def progress():
     '''
     Gives takes messages from the queue and exports them to JSON.
     '''
-    context = {'progress':    
-        ["Did something on a file.", # < v Fill me in order.
-        "Downloading Inception.2.Thought Police.(2012).axxo.avi",
-        "Rejected something becasue you've downloaded it already. (yeah right, eheh)"]}
-        
-    if return_list:
-        return context['progress']
-        
-    json_rendered = render_template('execute_progress.json', **context)
-    return Response(json_rendered, mimetype='application/json')
+    result = {'items': []}
+    try:
+        while 1:
+            item = bufferqueue.get_nowait()
+            if item != '\n':
+                result['items'].append(item)
+    except Empty:
+        pass
+
+    return jsonify(result)
 
 
 register_plugin(execute, menu='Execute')
