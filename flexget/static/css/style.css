@@ -151,7 +151,7 @@ ul#progress {
     margin: 10px 0 0 0;
     background: #222;
     display:block;
-    height: 200px;
+    height: 250px;
     overflow: scroll;
 }
 ul#progress li {

@@ -4,17 +4,21 @@
     {% if execute_progress %}
     <script type="application/javascript">
         function update_progress() {
-
+        
             var progress = $('#progress');
-
+            var timer;
+            
             $.getJSON('/execute/progress.json', function(data) {
                 $.each(data.items, function(key, value) {
-                    progress.append('<li>' + value + '</li>');
-                    progress.attr({ scrollTop: progress.attr("scrollHeight") });
+                    if (value == "EOF") { 
+                        clearTimeout(timer); 
+                    } else {
+                        progress.append('<li>' + value + '</li>');
+                        progress.attr({ scrollTop: progress.attr("scrollHeight") });
+                    }
                 });
             });
-
-            setTimeout('update_progress()', 1000);
+            var timer = window.setTimeout('update_progress()', 1000);
         }
         $(document).ready(update_progress);
     </script>
