@@ -6,6 +6,8 @@ from sqlalchemy.sql.expression import desc, asc
 from flexget.plugin import PluginDependencyError
 from flexget.webui import register_plugin, db_session, app
 
+from log_viewer import LogEntry
+
 
 import datetime
 import time
@@ -36,7 +38,7 @@ def pretty_age_filter(value):
 
 @movies_module.route('/')
 def index():
-    movies = db_session.query(ImdbQueue).all()# order_by(desc(Release.id)).slice(0, 10)
+    movies = db_session.query(LogEntry).filter(LogEntry.logger == 'imdb').order_by(desc(LogEntry.created)).all()
     context = {'movies': movies}
     return render_template('movies.html', **context)
 
