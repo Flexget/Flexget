@@ -14,7 +14,7 @@ bufferqueue = BufferQueue()
 
 @execute.route('/', methods=['POST', 'GET'])
 def index():
-    context = {'help': manager.parser.get_help()}
+    context = {'progress': manager.parser.get_help().split('\n')}
     if request.method == 'POST':
         options = manager.parser.parse_args(request.form.get('options', ''))[0]
         if manager.parser.error_msg:

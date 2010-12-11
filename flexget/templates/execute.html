@@ -4,16 +4,16 @@
     {% if execute_progress %}
     <script type="application/javascript">
         function update_progress() {
-        
+
             var progress = $('#progress');
             var timer;
-            
+
             $.getJSON('/execute/progress.json', function(data) {
                 $.each(data.items, function(key, value) {
-                    if (value == "EOF") { 
-                        clearTimeout(timer); 
+                    if (value == "EOF") {
+                        clearTimeout(timer);
                     } else {
-                        progress.append('<li>' + value + '</li>');
+                        progress.append('<li><pre>' + value + '</pre></li>');
                         progress.attr({ scrollTop: progress.attr("scrollHeight") });
                     }
                 });
@@ -26,14 +26,12 @@
 {% endblock %}
 
 {% block main %}
-<h1>Manually start execution</h1>
-
 <form action="{{ url_for('index') }}" method="post" class="simple">
-    <fieldset>
+    <fieldset style="width:26em">
         <legend>Execute FlexGet</legend>
         <div>
             <label for="options">Options</label>
-            <input type="text" id="options" name="options" value="{{ options }}" size="40">
+            <input type="text" id="options" name="options" value="{{ options }}" size="50">
         </div>
         <div class="buttons">
             <button type="submit">Start Execution</button>
@@ -41,13 +39,12 @@
     </fieldset>
 </form>
 <div>
-    {% if execute_progress %}
     <ul id="progress">
+        {% if progress %}
         {% for item in progress %}
-        <li>{{ item }}</li>
+        <li><pre>{{ item }}</pre></li>
         {% endfor %}
+        {% endif %}
     </ul>
-    {% endif %}
-    <pre>{{ help }}</pre>
 </div>
 {% endblock %}

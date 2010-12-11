@@ -151,8 +151,8 @@ ul#progress {
     margin: 10px 0 0 0;
     background: #222;
     display:block;
-    height: 250px;
-    overflow: scroll;
+    height: 400px;
+    overflow: auto;
 }
 ul#progress li {
     font-family: Andale Mono, Monaco, Courier New, Courier;

@@ -117,7 +117,7 @@ class StoreErrorOptionParser(CoreOptionParser):
         # Remove the usage string from the help message
         result = self.format_help()
         first_newline = result.find('\n')
-        result = result[first_newline:]
+        result = result[first_newline:].lstrip('\n')
         return result
 
 
