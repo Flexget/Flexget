@@ -10,10 +10,9 @@
             $.getJSON('/execute/progress.json', function(data) {
                 $.each(data.items, function(key, value) {
                     progress.append('<li>' + value + '</li>');
+                    progress.attr({ scrollTop: progress.attr("scrollHeight") });
                 });
             });
-
-            progress.animate({ scrollTop: progress.attr("scrollHeight") }, 500);
 
             setTimeout('update_progress()', 1000);
         }
