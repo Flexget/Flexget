@@ -38,7 +38,8 @@ def progress(as_list=False):
     try:
         while 1:
             item = bufferqueue.get_nowait()
-            if item != '\n':
+            item = item.rstrip('\n')
+            if item:
                 item
                 result['items'].append(item)
             bufferqueue.task_done()

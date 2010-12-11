@@ -3,13 +3,13 @@ import os
 import urllib
 import threading
 import sys
-from StringIO import StringIO
+from Queue import Queue
 from flask import Flask, redirect, url_for, abort, request
 from sqlalchemy.orm import scoped_session
 from sqlalchemy.orm.session import sessionmaker
 from flexget.event import fire_event
-from plugin import PluginDependencyError
-from Queue import Queue
+from flexget.plugin import PluginDependencyError
+from flexget.logger import FlexGetFormatter
 
 log = logging.getLogger('webui')
 
@@ -43,12 +43,15 @@ class ExecThread(threading.Thread):
             opts = kwargs.get('options')
             output = kwargs.get('output')
             # Store the managers options and current stdout to be restored after our execution
-            old_opts = manager.options
-            old_stdout = sys.stdout
             if opts:
+                old_opts = manager.options
                 manager.options = opts
             if output:
+                old_stdout = sys.stdout
                 sys.stdout = output
+                streamhandler = logging.StreamHandler(output)
+                streamhandler.setFormatter(FlexGetFormatter())
+                logging.getLogger().addHandler(streamhandler)
             try:
                 # TODO: Update feeds instead of re-creating
                 manager.create_feeds()
@@ -57,8 +60,11 @@ class ExecThread(threading.Thread):
                 # Inform queue we are done processing this item.
                 self.queue.task_done()
                 # Restore manager's previous options and stdout
-                manager.options = old_opts
-                sys.stdout = old_stdout
+                if opts:
+                    manager.options = old_opts
+                if output:
+                    sys.stdout = old_stdout
+                    logging.getLogger().removeHandler(streamhandler)
 
     def execute(self, **kwargs):
         """
