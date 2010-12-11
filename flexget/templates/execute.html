@@ -3,13 +3,11 @@
 {% block head %}
     {% if execute_progress %}
     <script type="application/javascript">
-    alert("TEST")
         function update_progress() {
 
             var progress = $('#progress');
 
-            $.getJSON('/execute/progress.json', function(data, status) {
-                alert(status)
+            $.getJSON('/execute/progress.json', function(data) {
                 $.each(data.item, function(key, value) {
                     progress.append('<li>' + value + '</li>');
                 });
@@ -42,8 +40,7 @@
 <div>
     {% if execute_progress %}
     <ul id="progress">
-        list here
-        {% for item in execute_progress %}
+        {% for item in progress %}
         <li>{{ item }}</li>
         {% endfor %}
     </ul>

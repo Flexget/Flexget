@@ -24,7 +24,8 @@ def index():
             flash('Manual execution started.', 'success')
             from flexget.webui import executor
             executor.execute(options=options, output=bufferqueue)
-            context['execute_progress'] = progress(as_list=True)
+            context['execute_progress'] = True
+            context['progress'] = progress(as_list=True)
             
     return render_template('execute.html', **context)
 
