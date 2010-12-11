@@ -26,7 +26,7 @@ def index():
             executor.execute(options=options, output=bufferqueue)
             context['execute_progress'] = True
             context['progress'] = progress(as_list=True)
-            
+
     return render_template('execute.html', **context)
 
 
@@ -39,10 +39,7 @@ def progress(as_list=False):
     try:
         while 1:
             item = bufferqueue.get_nowait()
-            item = item.rstrip('\n')
-            if item:
-                item
-                result['items'].append(item)
+            result['items'].append(item)
             bufferqueue.task_done()
     except Empty:
         pass

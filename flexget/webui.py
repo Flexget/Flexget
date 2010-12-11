@@ -26,7 +26,9 @@ _menu = []
 class BufferQueue(Queue):
 
     def write(self, txt):
-        self.put_nowait(txt)
+        txt = txt.rstrip('\n')
+        if txt:
+            self.put_nowait(txt)
 
 
 class ExecThread(threading.Thread):
@@ -52,6 +54,7 @@ class ExecThread(threading.Thread):
                 streamhandler = logging.StreamHandler(output)
                 streamhandler.setFormatter(FlexGetFormatter())
                 logging.getLogger().addHandler(streamhandler)
+                self.queue.all_tasks_done
             try:
                 # TODO: Update feeds instead of re-creating
                 manager.create_feeds()
@@ -63,6 +66,7 @@ class ExecThread(threading.Thread):
                 if opts:
                     manager.options = old_opts
                 if output:
+                    print 'EOF'
                     sys.stdout = old_stdout
                     logging.getLogger().removeHandler(streamhandler)
 
