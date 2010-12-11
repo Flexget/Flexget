@@ -1,6 +1,7 @@
 {% extends "layout.html" %}
 
 {% block head %}
+    {% if execute_progress %}
     <script type="application/javascript">
         function update_progress() {  
             alert("update_progress() run.")
@@ -19,10 +20,9 @@
             });
 /*             setTimeout('update_progress()', 1000);  */
         }
-        $(document).ready(function(){
-            update_progress()
-        }); 
+        $(document).ready(update_progress); 
     </script>
+    {% endif %}
 {% endblock %}
 
 {% block main %}
