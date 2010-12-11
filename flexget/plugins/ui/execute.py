@@ -39,6 +39,7 @@ def progress():
             item = bufferqueue.get_nowait()
             if item != '\n':
                 result['items'].append(item)
+            bufferqueue.task_done()
     except Empty:
         pass
 
