@@ -24,12 +24,13 @@ def index():
             flash('Manual execution started.', 'success')
             from flexget.webui import executor
             executor.execute(options=options, output=bufferqueue)
-
+            context['execute_progress'] = progress(as_list=True)
+            
     return render_template('execute.html', **context)
 
 
 @execute.route('/progress.json')
-def progress():
+def progress(as_list=False):
     '''
     Gives takes messages from the queue and exports them to JSON.
     '''
@@ -38,10 +39,14 @@ def progress():
         while 1:
             item = bufferqueue.get_nowait()
             if item != '\n':
+                item
                 result['items'].append(item)
             bufferqueue.task_done()
     except Empty:
         pass
+
+    if as_list:
+        return result['items']
 
     return jsonify(result)
 
