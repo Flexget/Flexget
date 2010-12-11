@@ -9,7 +9,8 @@
 
             var progress = $('#progress');
             var timer;
-
+            
+            $.ajaxSetup({ cache: false });
             $.getJSON('/execute/progress.json', function(data) {
                 $.each(data.items, function(key, value) {
                     if (value == "EOF") {
