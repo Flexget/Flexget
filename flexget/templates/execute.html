@@ -7,7 +7,8 @@
 
             var progress = $('#progress');
 
-            $.getJSON('/execute/progress.json', function(data) {
+            $.getJSON('/execute/progress.json', function(data, status) {
+                alert(status)
                 $.each(data, function(key, value) {
                     progress.append('<li>' + value + '</li>');
                 });
