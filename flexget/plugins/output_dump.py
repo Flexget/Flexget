@@ -1,5 +1,4 @@
-from optparse import SUPPRESS_HELP
-from flexget.plugin import *
+from flexget.plugin import register_plugin, register_parser_option
 import logging
 
 log = logging.getLogger('dump')
@@ -32,7 +31,8 @@ class OutputDump(object):
                     elif isinstance(value, int) or isinstance(value, float):
                         print '%-15s: %s' % (field, value)
                     else:
-                        print '%-15s: [not printable] (%s)' % (field, value)
+                        if feed.manager.options.debug:
+                            print '%-15s: [not printable] (%s)' % (field, value)
                 print ''
 
         undecided = [entry for entry in feed.entries if not entry in feed.accepted]
@@ -47,4 +47,4 @@ class OutputDump(object):
             dump(feed.rejected)
 
 register_plugin(OutputDump, 'dump', builtin=True)
-register_parser_option('--dump', action='store_true', dest='dump_entries', default=False, help=SUPPRESS_HELP)
+register_parser_option('--dump', action='store_true', dest='dump_entries', default=False, help='Display all feed entries')
