@@ -19,8 +19,10 @@ ul#navbar li {
 }
 
 ul#navbar li a {
+    font-size: 11px;
     height: 35px;
     color: #777;
+    background-color: transparent;
     text-decoration: none;
     display: block;
     float: left;

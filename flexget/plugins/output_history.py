@@ -1,7 +1,7 @@
 from datetime import datetime
 from sqlalchemy import Column, String, Integer, DateTime, Unicode, desc
 from flexget.manager import Base, Session
-from flexget.plugin import *
+from flexget.plugin import register_parser_option, register_plugin
 from optparse import SUPPRESS_HELP
 from datetime import datetime
 import logging
@@ -28,7 +28,7 @@ class History(Base):
         return '<History(filename=%s,feed=%s)>' % (self.filename, self.feed)
 
 
-class PluginHistory:
+class PluginHistory(object):
 
     """
         Provides --history

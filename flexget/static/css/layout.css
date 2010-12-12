@@ -33,6 +33,15 @@ p {
     margin-bottom: 0.8em;
 }
 
+a {
+    color: #0079B2;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
 body {
     background-image: url('/static/img/background.gif');
     font-size: 13px;
@@ -51,13 +60,6 @@ h2 {
     font-size: 18px;
     text-transform: uppercase;
     margin: 0 0 1em;
-}
-
-a {
-    color: #ff0000;
-    font-size: 11px;
-    background-color: transparent;
-    text-decoration: none;
 }
 
 #content-container {
