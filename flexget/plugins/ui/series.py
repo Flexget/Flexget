@@ -13,7 +13,7 @@ import logging
 from utils import pretty_date
 
 try:
-    from flexget.plugins.filter_series import Series, Episode, Release, SeriesForget
+    from flexget.plugins.filter_series import Series, Episode, Release, forget_series_episode
 except ImportError:
     raise PluginDependencyError('Requires series plugin', 'series')
 
@@ -87,7 +87,7 @@ def forget_episode(rel_id):
         
     if request.method == 'POST':
         if request.form.get('really', False):
-            response = SeriesForget().forget_series_episode(release.episode.series.name, release.episode.identifier)
+            response = forget_series_episode(release.episode.series.name, release.episode.identifier)
             if response:
                 flash(response)
         return redirect('/series')  
