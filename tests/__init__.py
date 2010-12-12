@@ -2,13 +2,11 @@
 
 import os
 import sys
-from nose.tools import *
-from nose.plugins.attrib import attr
-from flexget.manager import Manager, Session
-from flexget.plugin import get_plugin_by_name, load_plugins, plugins
-from flexget.options import OptionParser
+import flexget.logger
+from flexget.manager import Manager
+from flexget.plugin import load_plugins
+from flexget.options import CoreOptionParser
 from flexget.feed import Feed
-from flexget import initialize_logging
 import yaml
 import logging
 
@@ -21,8 +19,8 @@ plugins_loaded = False
 def setup_once():
     global plugins_loaded, test_options
     if not plugins_loaded:
-        initialize_logging(True)
-        parser = OptionParser(True)
+        flexget.logger.initialize(True)
+        parser = CoreOptionParser(True)
         load_plugins(parser)
         # store options for MockManager
         test_options = parser.parse_args()[0]
@@ -39,13 +37,20 @@ class MockManager(Manager):
         self.config_base = None
         Manager.__init__(self, test_options)
 
-    def load_config(self):
+    def find_config(self):
         try:
             self.config = yaml.safe_load(self.config_text)
             self.config_base = os.path.dirname(os.path.abspath(sys.path[0]))
         except Exception:
             print 'Invalid configuration'
             raise
+
+    # no lock files with unit testing
+    def acquire_lock(self):
+        pass
+
+    def release_lock(self):
+        pass
 
 
 class FlexGetBase(object):
@@ -74,14 +79,14 @@ class FlexGetBase(object):
             if hasattr(self, 'session'):
                 self.feed.session.close() # pylint: disable-msg=E0203
         self.feed = Feed(self.manager, name, config)
-        self.feed.session = Session()
+        # self.feed.session = Session()
         self.feed.process_start()
         if self.feed.enabled:
             self.feed.execute()
         else:
             log.debug('Feed \'%s\' has been disabled, not running' % self.feed.name)
         self.feed.process_end()
-        self.feed.session.commit()
+        # self.feed.session.commit()
 
     def dump(self):
         """Helper method for debugging"""

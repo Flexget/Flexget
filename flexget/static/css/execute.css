@@ -1,0 +1,17 @@
+/* Execute plugin */
+
+ul#progress {
+    margin: 10px 0 0 0;
+    background: #222;
+    display: block;
+    height: 400px;
+    overflow: auto;
+    list-style-type: none;
+}
+
+ul#progress li {
+    font-family: Andale Mono, Monaco, Courier New, Courier, serif;
+    font-size: 12px;
+    color: #ddd;
+    margin: 5px
+}

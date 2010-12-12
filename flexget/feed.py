@@ -103,27 +103,13 @@ class Entry(dict):
 def useFeedLogging(func):
 
     def wrapper(self, *args, **kw):
-        # re-format logging
-        padding = 15
-        feed_name = self.name
-        while len(feed_name) <= padding:
-            feed_name += ' '
-        if len(feed_name) > padding:
-            feed_name = feed_name[:padding]
-
-        log_format = ['%(asctime)-15s %(levelname)-8s %(name)-13s ' + feed_name + ' %(message)s', '%Y-%m-%d %H:%M']
-        formatter = logging.Formatter(*log_format)
-
-        formatters = {}
-        for handler in log.parent.handlers:
-            formatters[handler] = handler.formatter
-            handler.setFormatter(formatter)
-
+        # Set the feed name in the logger
+        from flexget import logger
+        logger.set_feed(self.name)
         try:
             return func(self, *args, **kw)
         finally:
-            for handler in log.parent.handlers:
-                handler.setFormatter(formatters[handler])
+            logger.set_feed('')
 
     return wrapper
 
@@ -134,28 +120,33 @@ class Feed(object):
         """
             Represents one feed in configuration.
 
-            name - name of the feed
-            config - yaml configuration (dict)
+            :name: name of the feed
+            :config: feed configuration (dict)
         """
         self.name = unicode(name)
         self.config = config
         self.manager = manager
-        self.enabled = True
-        self.session = None
-
-        self.priority = 65535
 
         # simple persistence
         self.simple_persistence = SimplePersistence(self)
 
+        # use reset to init variables when creating
+        self._reset()
+
+    def _reset(self):
+        """Reset feed state"""
+        log.debug('reseting')
+        self.enabled = True
+        self.session = None
+        self.priority = 65535
+
         # undecided entries in the feed (created by input)
         self.entries = []
 
-        # You should NOT change these arrays, use reject / accept methods!
-
+        # You should NOT change these arrays, use reject, accept and fail methods!
         self.accepted = [] # accepted entries, can still be rejected
         self.rejected = [] # rejected entries
-        self.failed = []
+        self.failed = []   # failed entries
 
         # TODO: feed.abort() should be done by using exception? not a flag that has to be checked everywhere
 
@@ -292,7 +283,7 @@ class Feed(object):
         """
         if isinstance(self.config[keyword], dict):
             if not 'url' in self.config[keyword]:
-                raise Exception('Input %s has invalid configuration, url is missing.' % keyword)
+                raise PluginError('Input %s has invalid configuration, url is missing.' % keyword)
             return self.config[keyword]['url']
         else:
             return self.config[keyword]
@@ -378,10 +369,16 @@ class Feed(object):
     def execute(self):
         """Execute this feed"""
 
+        log.debug('excecuting %s' % self.name)
+
+        self._reset()
+
         # validate configuration
         errors = self.validate()
-        if self._abort:
+        if self._abort: # todo: bad practice
             return
+        if errors and self.manager.unit_test: # todo: bad practice
+            raise Exception('configuration errors')
         if self.manager.options.validate:
             if not errors:
                 print 'Feed \'%s\' passed' % self.name
@@ -390,27 +387,32 @@ class Feed(object):
         log.debug('starting session')
         self.session = Session()
 
-        # run events
-        for event in FEED_EVENTS:
-            # when learning, skip few events
-            if self.manager.options.learn:
-                if event in ['download', 'output']:
-                    # log keywords not executed
-                    plugins = get_plugins_by_event(event)
-                    for plugin in plugins:
-                        if plugin.name in self.config:
-                            log.info('Plugin %s is not executed because of --learn / --reset' % (plugin.name))
-                    continue
+        try:
+            # run events
+            for event in FEED_EVENTS:
+                # when learning, skip few events
+                if self.manager.options.learn:
+                    if event in ['download', 'output']:
+                        # log keywords not executed
+                        plugins = get_plugins_by_event(event)
+                        for plugin in plugins:
+                            if plugin.name in self.config:
+                                log.info('Plugin %s is not executed because of --learn / --reset' % (plugin.name))
+                        continue
 
-            # run all plugins with this event
-            self.__run_event(event)
+                # run all plugins with this event
+                self.__run_event(event)
 
-            # if abort flag has been set feed should be aborted now
-            if self._abort:
-                return
+                # if abort flag has been set feed should be aborted now
+                if self._abort:
+                    return
 
-        log.debug('committing session, abort=%s' % self._abort)
-        self.session.commit()
+            log.debug('committing session, abort=%s' % self._abort)
+            self.session.commit()
+        except:
+            log.debug('db rollback on exception')
+            self.session.close()
+            raise
 
         # display performance
         if self.manager.options.debug_perf:
@@ -431,10 +433,23 @@ class Feed(object):
         self.__run_event('process_end')
 
     def validate(self):
-        """Plugin configuration validation. Return array of error messages that were detected."""
+        """Called during feed execution. Validates config, prints errors and aborts feed if invalid."""
+        errors = self.validate_config(self.config)
+        # log errors and abort
+        if errors:
+            log.critical('Feed \'%s\' has configuration errors:' % self.name)
+            for error in errors:
+                log.error(error)
+            # feed has errors, abort it
+            self.abort()
+        return errors
+
+    @staticmethod
+    def validate_config(config):
+        """Plugin configuration validation. Return list of error messages that were detected."""
         validate_errors = []
         # validate all plugins
-        for keyword in self.config:
+        for keyword in config:
             if keyword.startswith('_'):
                 continue
             try:
@@ -452,18 +467,10 @@ class Feed(object):
                 if not validator.name == 'root':
                     # if validator is not root type, add root validator as it's parent
                     validator = validator.add_root_parent()
-                if not validator.validate(self.config[keyword]):
+                if not validator.validate(config[keyword]):
                     for msg in validator.errors.messages:
                         validate_errors.append('%s %s' % (keyword, msg))
             else:
                 log.warning('Used plugin %s does not support validating. Please notify author!' % keyword)
-
-        # log errors and abort
-        if validate_errors:
-            log.critical('Feed \'%s\' has configuration errors:' % self.name)
-            for error in validate_errors:
-                log.error(error)
-            # feed has errors, abort it
-            self.abort()
 
         return validate_errors

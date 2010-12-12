@@ -19,8 +19,8 @@ enable_logging = True
 if enable_logging:
     level = 5
     import logging
-    from flexget import initialize_logging
-    initialize_logging(True)
+    import flexget.logger
+    flexget.logger.initialize(True)
     log = logging.getLogger()
     log.setLevel(level)
     # switch seriesparser logging to debug

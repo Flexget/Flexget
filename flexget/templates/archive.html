@@ -1,0 +1,55 @@
+{% extends "layout.html" %}
+{% block main %}
+
+<div style="float: left;">
+    <h1>Archive</h1>
+</div>
+
+<div style="float: right;">
+    <form action="{{ url_for('index') }}" method="post" class="search">
+        <div>
+            <label for="keyword">Search</label>
+            <input type="text" id="keyword" name="keyword" value="">
+            <button type="submit" id="submit">Submit</button>
+        </div>
+    </form>
+</div>
+<div style="clear: both;"></div>
+
+{% if count == 0 %}
+    <div class="warning">
+        <p>Your archive seems to be empty. To use archive feature you need to have feed(s) with archive plugin enabled.</p>
+    </div>
+{% else %}
+    <p>There are currently <b id="count"><img src="/static/img/ajax-loader.gif" style="width: 13px; height: 13px;"/></b> items in the archive</p>
+{% endif %}
+
+<script language="JavaScript">
+    $('#count').load("{{ url_for('count') }}");
+</script>
+
+<div>
+    <h2>Search results:</h2>
+
+    <form action="{{ url_for('inject') }}" method="post">
+        <table class="search-results">
+            <tr>
+                <th style="width: 1em;">&nbsp</th>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Added</th>
+            </tr>
+            <tr>
+                <td><input type="checkbox"></td>
+                <td>Mock</td>
+                <td>Description of the item, this comes from the rss etc</td>
+                <td>01-01-2010</td>
+            </tr>
+        </table>
+        <div>
+            <button type="submit" id="inject selected">Inject</button>
+        </div>
+    </form>
+</div>
+
+{% endblock %}

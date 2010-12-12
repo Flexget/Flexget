@@ -1,0 +1,63 @@
+{% extends "layout.html" %}
+
+{% block head %}
+    <link rel="stylesheet" href="/static/css/series.css" type="text/css" media="screen"/>
+{% endblock %}
+
+{% block menu %}
+
+    {% if report %}
+        <ul id="cat">
+            {% for series in report %}
+                <li>
+                    <div class="item{% if series.name == name %} selected{% endif %}">
+                        <a href="/series/{{ series.name }}">{{ series.name|title }}</a>
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No series catalogued.</p>
+    {% endif %}
+
+{% endblock %}
+
+{% block main %}
+
+    {% if name %}
+        <h1>{{ name|title }}</h1>
+        <ul id="episodes">
+        {% for episode in episodes %}
+            <li class="identifier">
+                <h4>{{ episode.identifier }}</h4>
+                <ul class="episode-files">
+                    {% for release in episode.releases %}
+                        <li{% if release.downloaded %} class="downloaded"{% endif %}>
+                            {{ release.title }}
+                        </li>
+                    {% endfor %}
+                </ul>
+            </li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <h1>Latest 10 Releases</h1>
+        <ul id="episodes" class="episode-files">
+            {% for release in releases %}
+                <li class="{% if release.downloaded %}downloaded{% endif %}">
+                    <a href="forget/{{ release.id }}" style="float:right;color:#999">Forget</a>
+                    {{ release.title }}<br />
+                    <span style="color:#999;font-size:10px;">
+                        {% if release.previous %}
+                        <img src="/static/img/tick.png" />Succesfully downloaded "{{ release.previous.title }}" {{ release.episode.first_seen|pretty_age }}
+                        {% else %}
+                        Downloaded {{ release.episode.first_seen|pretty_age }}
+                        {% endif %}
+                    </span>
+                </li>
+            {% endfor %}
+        </ul>
+        <br />
+        <a href="/log" style="color: #333;text-decoration: underline">View more in the logs</a>
+    {% endif %}
+{% endblock %}

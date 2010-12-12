@@ -2,6 +2,8 @@ import os
 import sys
 import logging
 import sqlalchemy
+import yaml
+from copy import deepcopy
 from datetime import datetime
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
@@ -10,6 +12,27 @@ log = logging.getLogger('manager')
 
 Base = declarative_base()
 Session = sessionmaker()
+
+
+class FGDumper(yaml.Dumper):
+
+    def increase_indent(self, flow=False, indentless=False):
+        return super(FGDumper, self).increase_indent(flow, False)
+
+
+def useExecLogging(func):
+
+    def wrapper(self, *args, **kw):
+        # Set the feed name in the logger
+        from flexget import logger
+        import time
+        logger.set_execution(str(time.time()))
+        try:
+            return func(self, *args, **kw)
+        finally:
+            logger.set_execution('')
+
+    return wrapper
 
 
 class Manager(object):
@@ -35,13 +58,17 @@ class Manager(object):
         log.debug('sys.defaultencoding: %s' % sys.getdefaultencoding())
         log.debug('sys.getfilesystemencoding: %s' % sys.getfilesystemencoding())
 
+        import atexit
+        atexit.register(self.shutdown)
+
     def initialize(self):
         """Separated from __init__ so that unit tests can modify options before loading config."""
-        self.load_config()
+        self.find_config()
         self.init_sqlalchemy()
+        self.create_feeds()
 
-    def load_config(self):
-        """Load the configuration file"""
+    def find_config(self):
+        """Find the configuration file and load it"""
         startup_path = os.path.dirname(os.path.abspath(sys.path[0]))
         home_path = os.path.join(os.path.expanduser('~'), '.flexget')
         current_path = os.getcwd()
@@ -50,69 +77,80 @@ class Manager(object):
         config_path = os.path.dirname(self.options.config)
         path_given = config_path != ''
 
-        possible = {}
+        possible = []
         if path_given:
             # explicit path given, don't try anything too fancy
-            possible[self.options.config] = config_path
+            possible.append(self.options.config)
         else:
             log.debug('Figuring out config load paths')
             # normal lookup locations
-            possible[os.path.join(startup_path, self.options.config)] = startup_path
-            possible[os.path.join(home_path, self.options.config)] = home_path
+            possible.append(startup_path)
+            possible.append(home_path)
             # for virtualenv / dev sandbox
             from flexget import __version__ as version
             if version == '{subversion}':
                 log.debug('Running subversion, adding virtualenv / sandbox paths')
-                possible[os.path.join(sys.path[0], '..', self.options.config)] = os.path.join(sys.path[0], '..')
-                possible[os.path.join(current_path, self.options.config)] = current_path
-                possible[os.path.join(exec_path, self.options.config)] = exec_path
+                possible.append(os.path.join(exec_path, '..'))
+                possible.append(current_path)
+                possible.append(exec_path)
 
-        for config, base in possible.iteritems():
+        for path in possible:
+            config = os.path.join(path, self.options.config)
             if os.path.exists(config):
-                self.pre_check_config(config)
-                import yaml
-                try:
-                    self.config = yaml.safe_load(file(config))
-                except Exception, e:
-                    log.critical(e)
-                    print ''
-                    print '-' * 79
-                    print ' Malformed configuration file, common reasons:'
-                    print '-' * 79
-                    print ''
-                    print ' o Indentation error'
-                    print ' o Missing : from end of the line'
-                    print ' o Non ASCII characters (use UTF8)'
-                    print ' o If text contains any of :[]{}% characters it must be single-quoted (eg. value{1} should be \'value{1}\')\n'
-                    lines = 0
-                    if e.problem is not None:
-                        print ' Reason: %s\n' % e.problem
-                        if e.problem == 'mapping values are not allowed here':
-                            print ' ----> MOST LIKELY REASON: Missing : from end of the line!'
-                            print ''
-                    if e.context_mark is not None:
-                        print ' Check configuration near line %s, column %s' % (e.context_mark.line, e.context_mark.column)
-                        lines += 1
-                    if e.problem_mark is not None:
-                        print ' Check configuration near line %s, column %s' % (e.problem_mark.line, e.problem_mark.column)
-                        lines += 1
-                    if lines:
-                        print ''
-                    if lines == 1:
-                        print ' Fault is almost always in this or previous line\n'
-                    if lines == 2:
-                        print ' Fault is almost always in one of these lines or previous ones\n'
-                    if self.options.debug:
-                        raise
-                    sys.exit(1)
-                # config loaded successfully
-                self.config_name = os.path.splitext(os.path.basename(config))[0]
-                self.config_base = os.path.normpath(base)
-                log.debug('config_name: %s' % self.config_name)
-                log.debug('config_base: %s' % self.config_base)
+                self.load_config(config)
                 return
         log.info('Tried to read from: %s' % ', '.join(possible))
         raise IOError('Failed to find configuration file %s' % self.options.config)
+
+    def load_config(self, config):
+        self.pre_check_config(config)
+        try:
+            self.config = yaml.safe_load(file(config)) or {}
+        except Exception, e:
+            log.critical(e)
+            print ''
+            print '-' * 79
+            print ' Malformed configuration file, common reasons:'
+            print '-' * 79
+            print ''
+            print ' o Indentation error'
+            print ' o Missing : from end of the line'
+            print ' o Non ASCII characters (use UTF8)'
+            print ' o If text contains any of :[]{}% characters it must be single-quoted (eg. value{1} should be \'value{1}\')\n'
+            lines = 0
+            if e.problem is not None:
+                print ' Reason: %s\n' % e.problem
+                if e.problem == 'mapping values are not allowed here':
+                    print ' ----> MOST LIKELY REASON: Missing : from end of the line!'
+                    print ''
+            if e.context_mark is not None:
+                print ' Check configuration near line %s, column %s' % (e.context_mark.line, e.context_mark.column)
+                lines += 1
+            if e.problem_mark is not None:
+                print ' Check configuration near line %s, column %s' % (e.problem_mark.line, e.problem_mark.column)
+                lines += 1
+            if lines:
+                print ''
+            if lines == 1:
+                print ' Fault is almost always in this or previous line\n'
+            if lines == 2:
+                print ' Fault is almost always in one of these lines or previous ones\n'
+            if self.options.debug:
+                raise
+            sys.exit(1)
+        # config loaded successfully
+        self.config_name = os.path.splitext(os.path.basename(config))[0]
+        self.config_base = os.path.normpath(os.path.dirname(config))
+        log.debug('config_name: %s' % self.config_name)
+        log.debug('config_base: %s' % self.config_base)
+
+    def save_config(self):
+        """Dumps current config to yaml config file"""
+        config_file = file(os.path.join(self.config_base, self.config_name) + '.yml', 'w')
+        try:
+            config_file.write(yaml.dump(self.config, Dumper=FGDumper, default_flow_style=False))
+        finally:
+            config_file.close()
 
     def pre_check_config(self, fn):
         """
@@ -269,6 +307,9 @@ class Manager(object):
             if (datetime.now() - lock_time).seconds > 36000:
                 log.warning('Lock file over 10 hour in age, ignoring it ...')
             else:
+                if self.options.autoreload:
+                    log.info('autoreload enabled, ignoring existing lock file')
+                    return
                 if not self.options.quiet:
                     f = file(self.lockfile)
                     pid = f.read()
@@ -284,11 +325,17 @@ class Manager(object):
     def release_lock(self):
         if self.options.log_start:
             log.info('FlexGet stopped (PID: %s)' % os.getpid())
-        os.remove(self.lockfile)
+        if os.path.exists(self.lockfile):
+            os.remove(self.lockfile)
+            log.debug('Removed %s' % self.lockfile)
+        else:
+            log.debug('Lockfile %s not found' % self.lockfile)
 
     def create_feeds(self):
         """Creates instances of all configured feeds"""
         from flexget.feed import Feed
+        # Clear feeds dict
+        self.feeds = {}
 
         if not 'feeds' in self.config:
             log.critical('There are no feeds in the configuration file!')
@@ -330,15 +377,13 @@ class Manager(object):
         for feed in self.feeds.itervalues():
             feed.enabled = True
 
+    @useExecLogging
     def execute(self):
         """Iterate trough all feeds and run them."""
 
-        if not self.config:
-            log.critical('Configuration file is empty.')
+        if not self.feeds:
+            log.warning('There are no feeds to execute, please add some feeds')
             return
-
-        # separated for future when flexget runs continuously in the background
-        self.create_feeds()
 
         failed = []
 
@@ -369,10 +414,6 @@ class Manager(object):
                     raise
                 print '**** Keyboard Interrupt ****'
                 return
-            finally:
-                # note: this will cause db rollback if error occurred (session has not been committed)
-                if feed.session:
-                    feed.session.close()
 
         # execute process_end to all feeds
         for name, feed in self.feeds.iteritems():
@@ -388,6 +429,7 @@ class Manager(object):
 
     def shutdown(self):
         """Application is being exited"""
+        log.debug('Shutting down')
 
         self.engine.dispose()
         # remove temporary database used in test mode
@@ -398,3 +440,58 @@ class Manager(object):
             log.info('Removed test database')
 
         self.release_lock()
+
+
+class UIManager(Manager):
+
+    def find_config(self):
+        """If no config file is found by the webui, a blank one is created."""
+        try:
+            Manager.find_config(self)
+        except IOError:
+            # No config file found, create a blank one in the home path
+            config_path = os.path.join(os.path.expanduser('~'), '.flexget', self.options.config)
+            log.info('Config file %s not found. Creating new config %s' % (self.options.config, config_path))
+            newconfig = file(config_path, 'w')
+            # Write empty feeds and presets to the config
+            newconfig.write(yaml.dump({'presets': {}, 'feeds': {}}))
+            newconfig.close()
+            self.load_config(config_path)
+
+    def execute(self):
+        # Update feed instances to match config
+        self.update_feeds()
+        # Backup config before execution
+        config = deepcopy(self.config)
+        Manager.execute(self)
+        self.config_executed = self.config
+        # Restore config
+        self.config = config
+
+    def update_feeds(self):
+        """Updates instances of all configured feeds from config"""
+        from flexget.feed import Feed
+
+        if not isinstance(self.config['feeds'], dict):
+            log.critical('Feeds is in wrong datatype, please read configuration guides')
+            return
+
+        # construct feed list
+        for name in self.config.get('feeds', {}):
+            if not isinstance(self.config['feeds'][name], dict):
+                continue
+            if name in self.feeds:
+                # This feed already has an instance, update it
+                self.feeds[name].config = self.config['feeds'][name]
+                if not name.startswith('_'):
+                    self.feeds[name].enabled = True
+            else:
+                # Create feed
+                feed = Feed(self, name, self.config['feeds'][name])
+                # If feed name is prefixed with _ it's disabled
+                if name.startswith('_'):
+                    feed.enabled = False
+                self.feeds[name] = feed
+        # Delete any feed instances that are no longer in the config
+        for name in [n for n in self.feeds if n not in self.config['feeds']]:
+            del self.feeds[name]

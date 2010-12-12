@@ -1,0 +1,25 @@
+/* series ui plugin */
+
+ul#episodes, ul#episode-files {
+    line-height: 1.4;
+    list-style: none;
+}
+ul#episodes hr {
+    margin: 10px 0 10px 0;
+}
+ul#episodes li.identifier {
+    background: #ddd;
+    padding: 5px;
+    margin: 5px 0 5px 0;
+}
+ul.episode-files li {
+    padding-left: 20px;
+    background: transparent url(/static/img/cross.png) no-repeat;
+    list-style: none;
+    color: #666;
+}
+ul.episode-files li.downloaded {
+    background-image: url(/static/img/tick.png);
+    color: #000;
+}
+

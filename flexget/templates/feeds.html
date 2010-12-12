@@ -1,0 +1,12 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<h2>Current feeds:</h2>
+
+<ul>
+  {% for feed in feeds %}
+  <li>{{ feed.name }}</li>
+  {% endfor %}
+</ul>
+
+{% endblock %}
