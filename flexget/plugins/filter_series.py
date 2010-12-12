@@ -52,7 +52,9 @@ class Episode(Base):
     @property
     def is_premiere(self):
         if self.season == 1 and self.number == 1:
-            return True
+            return 'Series Premiere'
+        elif self.number == 1:
+            return 'Season Premiere'
         return False
 
     def __init__(self):

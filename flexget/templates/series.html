@@ -30,7 +30,7 @@
         <h1>{{ name|title }}</h1>
         {% for episode in episodes %}
         <a href="forget/{{ episode.releases.0.id }}" style="float:right;color:#999">Forget</a>
-        <h4>{{ episode.identifier }}{% if episode.is_premiere %} - Season Premiere{% endif %}</h4>
+        <h4>{{ episode.identifier }}{% if episode.is_premiere %} - {{ episode.is_premiere }}{% endif %}</h4>
         <ul class="releases">
             {% for release in episode.releases %}
             <li class="{% if release.downloaded %}downloaded{% endif %}">
@@ -48,7 +48,7 @@
                 <li class="{% if release.downloaded %}downloaded{% endif %}">
                     <a href="forget/{{ release.id }}" style="float:right;color:#999">Forget</a>
                     <a href="/series/{{ release.episode.series.name }}">{{ release.title }}</a>
-                    {% if release.episode.is_premiere %} - Season Premiere{% endif %}<br />
+                    {% if release.episode.is_premiere %} - {{ release.episode.is_premiere }}{% endif %}<br />
                     <span>
                         {% if release.previous %}
                         <img src="/static/img/tick.png" /> Succesfully downloaded "{{ release.previous.title }}" {{ release.episode.first_seen|pretty_age }}

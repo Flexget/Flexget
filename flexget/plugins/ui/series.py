@@ -41,7 +41,6 @@ def index():
                 if prev_rel.downloaded:
                     release.previous = prev_rel
 
-
     context = {'releases': releases}
     return render_template('series.html', **context)
 
