@@ -87,7 +87,7 @@ def forget_episode(rel_id):
         
     if request.method == 'POST':
         if request.form.get('really', False):
-            SeriesForget().forget_series_episode(release.series.name, release.episode.identifier)
+            SeriesForget().forget_series_episode(release.episode.series.name, release.episode.identifier)
             
         return redirect('/series')  
         
