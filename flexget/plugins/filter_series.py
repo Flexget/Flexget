@@ -4,7 +4,7 @@ from flexget.utils.titles import SeriesParser, ParseWarning
 from flexget.utils import qualities
 from flexget.manager import Base, Session
 from flexget.plugin import register_plugin, register_parser_option, get_plugin_by_name, get_plugin_keywords, \
-    PluginWarning, PluginError, priority
+    PluginWarning, PluginError, PluginDependencyError, priority
 from sqlalchemy import Column, Integer, String, Unicode, DateTime, Boolean, desc
 from sqlalchemy.schema import ForeignKey
 from sqlalchemy.orm import relation, join
@@ -21,7 +21,7 @@ class Series(Base):
     episodes = relation('Episode', backref='series', cascade='all, delete, delete-orphan')
 
     def __repr__(self):
-        return '<Series(name=%s)>' % (self.name)
+        return '<Series(name=%s)>' % self.name
 
 
 class Episode(Base):
@@ -243,7 +243,7 @@ class SeriesReport(SeriesPlugin):
     def optik_series(option, opt, value, parser):
         """--series [NAME]"""
         SeriesReport.options['got'] = True
-        if len(parser.rargs) != 0:
+        if parser.rargs:
             SeriesReport.options['name'] = parser.rargs[0]
 
     def on_process_start(self, feed):
@@ -353,7 +353,7 @@ class SeriesForget(object):
         Callback for Optik
         --series-forget NAME [ID]
         """
-        if len(parser.rargs) == 0:
+        if not parser.rargs:
             return # how to handle invalid?
         if len(parser.rargs) > 0:
             SeriesForget.options['name'] = parser.rargs[0]
@@ -376,10 +376,10 @@ class SeriesForget(object):
                 self.forget_series(name)
 
     def forget_series(self, name):
-        """Remove a whole series from db."""
+        """Remove a whole series :name: from database."""
+        # TODO: get rid of prints, left over from refactoring
         session = Session()
-        series = session.query(Series).\
-                 filter(Series.name == name.lower()).first()
+        series = session.query(Series).filter(Series.name == name.lower()).first()
         if series:
             session.delete(series)
             session.commit()
@@ -389,6 +389,8 @@ class SeriesForget(object):
             print 'Unknown series %s' % name
 
     def forget_series_episode(self, name, identifier):
+        """Remove all episodes by :identifier: from series :name: from database."""
+        # TODO: get rid of prints, left over from refactoring
         session = Session()
         series = session.query(Series).filter(Series.name == name.lower()).first()
         if series:
@@ -531,7 +533,7 @@ class FilterSeries(SeriesPlugin, FilterSeriesBase):
     def on_process_start(self, feed):
         try:
             self.backlog = get_plugin_by_name('backlog').instance
-        except:
+        except PluginDependencyError:
             log.warning('Unable utilize backlog plugin, episodes may slip trough timeframe')
 
     def validator(self):
