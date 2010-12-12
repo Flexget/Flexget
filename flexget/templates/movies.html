@@ -3,8 +3,14 @@
 {% block main %}
 <ul>
     {% for movie in movies %}
-    <li>{{ movie.message }}<br />
-    <span style="color:#999;font-size:10px;">{{ movie.created }}</span></li>
+    <li style="clear:both;">
+        <img src="{{ movie.thumb }}" style="float:left;margin:0 5px 15px 0;" />
+        <div style="padding-left:100px; width:50%">
+            <h3>{{ movie.title }} ({{ movie.year }})</h3>
+            <br />
+            <p style="font-size:12px; color:#666">{{ movie.overview }}</p>
+        </div>
+    </li>
     {% endfor %}
 </ul>
 {% endblock %}
