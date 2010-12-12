@@ -15,13 +15,23 @@ def index():
     return render_template('configure.html')
 
 
-@configure.route('/new/<root>')
+@configure.route('/new/<root>', methods=['POST', 'GET'])
 def new_text(root):
     if root not in ['feeds', 'presets']:
         flash('Invalid root.', 'error')
         return redirect(url_for('index'))
+    config_type = root.rstrip('s')
     context = {'root': root,
                'config': ''}
+    if request.method == 'POST':
+        name = request.form.get('name')
+        if not name:
+            flash('Enter a name for this %s' % config_type, 'error')
+            context['config'] = request.form.get('config')
+        else:
+            # forward to edit_text
+            pass
+
     return render_template('configure_text.html', **context)
 
 

@@ -341,6 +341,35 @@ class SeriesReport(SeriesPlugin):
         session.close()
 
 
+def forget_series(name):
+    """Remove a whole series :name: from database."""
+    session = Session()
+    series = session.query(Series).filter(Series.name == name.lower()).first()
+    if series:
+        session.delete(series)
+        session.commit()
+        log.debug('Removed series %s from database.' % name)
+    else:
+        raise ValueError('Unknown series %s' % name)
+
+
+def forget_series_episode(name, identifier):
+    """Remove all episodes by :identifier: from series :name: from database."""
+    session = Session()
+    series = session.query(Series).filter(Series.name == name.lower()).first()
+    if series:
+        episode = session.query(Episode).filter(Episode.identifier == identifier).\
+            filter(Episode.series_id == series.id).first()
+        if episode:
+            session.delete(episode)
+            session.commit()
+            log.debug('Episode %s from series %s removed from database.' % (identifier, name))
+        else:
+            raise ValueError('Unknown identifier %s for series %s' % (identifier, name.capitalize()))
+    else:
+        raise ValueError('Unknown series %s' % name)
+
+
 class SeriesForget(object):
 
     """Provides --series-forget"""
@@ -370,47 +399,18 @@ class SeriesForget(object):
                 # remove by id
                 identifier = self.options.get('episode').upper()
                 if identifier and name:
-                    self.forget_series_episode(name, identifier)
+                    try:
+                        forget_series_episode(name, identifier)
+                        print 'Episode %s from series %s removed.' % (identifier, name.capitalize())
+                    except ValueError, e:
+                        print e.message
             else:
                 # remove whole series
-                self.forget_series(name)
-
-    def forget_series(self, name):
-        """Remove a whole series :name: from database."""
-        # TODO: get rid of prints, left over from refactoring
-        session = Session()
-        series = session.query(Series).filter(Series.name == name.lower()).first()
-        if series:
-            session.delete(series)
-            session.commit()
-            print 'Removed %s' % name
-            log.debug('Removed series %s from database.' % name)
-        else:
-            print 'Unknown series %s' % name
-
-    def forget_series_episode(self, name, identifier):
-        """Remove all episodes by :identifier: from series :name: from database."""
-        # TODO: get rid of prints, left over from refactoring
-        session = Session()
-        series = session.query(Series).filter(Series.name == name.lower()).first()
-        response = ''
-        if series:
-            episode = session.query(Episode).filter(Episode.identifier == identifier).\
-                filter(Episode.series_id == series.id).first()
-            if episode:
-                session.delete(episode)
-                session.commit()
-                print 'Removed %s %s' % (name.capitalize(), identifier)
-                log.debug('Episode %s from series %s removed from database.' % (identifier, name))
-                for rel in episode.releases:
-                    log.debug('release: %s' % rel)
-            else:
-                response = 'Didn\'t find %s episode identified by %s' % (name.capitalize(), identifier)
-        else:
-            response = 'Unknown series %s' % name
-            
-        print response
-        return response
+                try:
+                    forget_series(name)
+                    print 'Removed series %s from database.' % name.capitalize()
+                except ValueError, e:
+                    print e.message
 
 
 class FilterSeriesBase(object):
