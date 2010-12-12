@@ -13,7 +13,7 @@ import logging
 from utils import pretty_date
 
 try:
-    from flexget.plugins.filter_series import Series, Episode, Release
+    from flexget.plugins.filter_series import Series, Episode, Release, SeriesForget
 except ImportError:
     raise PluginDependencyError('Requires series plugin', 'series')
 
@@ -87,17 +87,7 @@ def forget_episode(rel_id):
         
     if request.method == 'POST':
         if request.form.get('really', False):
-            log.info('Executing command: %s' % context['command'])
-            from flexget.webui import executor
-            options = manager.parser.parse_args(context['command'])[0]
-            executor.execute(options=options)
-
-    # HACK: Delete the Episode from the db. 
-    #       Done by execute command eventually, but doesn't show immediately on redirect.
-    #
-    #       db_session.delete(release.episode)
-    #       log.info('Removing %s %s from the database.' % (
-    #           release.episode.series.name, release.episode.identifier))
+            SeriesForget().forget_series_episode(release.series.name, release.episode.identifier)
             
         return redirect('/series')  
         
