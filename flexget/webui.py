@@ -185,25 +185,29 @@ def shutdown_session(response):
 
 
 def start(mg):
+    """Start WEB UI"""
+
     global manager
     manager = mg
-    # create sqlachemy session for Flask usage
+
+    # Create sqlachemy session for Flask usage
     global db_session
     db_session = scoped_session(sessionmaker(autocommit=False,
                                              autoflush=False,
                                              bind=manager.engine))
     if db_session is None:
         raise Exception('db_session is None')
-    # initialize manager
+
+    # Initialize manager
     manager.create_feeds()
     load_ui_plugins()
+
     # Daemonize after we load the ui plugins as they are loading from relative paths right now
     if os.name != 'nt' and manager.options.daemon:
         if threading.activeCount() != 1:
-            log.error('There are %r active threads. '
-                      'Daemonizing now may cause strange failures.' %
-                      threading.enumerate())
-        log.info('Daemonizing.')
+            log.critical('There are %r active threads. '
+                         'Daemonizing now may cause strange failures.' % threading.enumerate())
+        log.info('Creating FlexGet Daemon.')
         newpid = daemonize()
         # Write new pid to lock file
         log.debug('Writing new pid %d to lock file %s' % (newpid, manager.lockfile))
@@ -218,13 +222,14 @@ def start(mg):
     from flexget.manager import Base
     Base.metadata.create_all(bind=manager.engine)
 
+    fire_event('webui.start')
+
     # Start the executor thread
     global executor
     executor = ExecThread()
     executor.start()
-    fire_event('webui.start')
 
-    # start Flask
+    # Start Flask
     app.secret_key = os.urandom(24)
     """
     app.run(host='0.0.0.0', port=manager.options.port,
@@ -235,7 +240,7 @@ def start(mg):
 
     start_server()
 
-    log.debug('server loop exited')
+    log.debug('server exited')
     fire_event('webui.stop')
 
 
@@ -256,29 +261,6 @@ def stop_server(*args):
     log.debug('Shutting down server')
     if server:
         server.stop()
-
-""" werkzeug server
-def start_server():
-    global server
-    from werkzeug.serving import make_server
-    server = make_server('0.0.0.0', manager.options.port, app, threaded=True,
-                         processes=1, request_handler=None,
-                         passthrough_errors=False, ssl_context=None)
-    log.debug('server %s' % server)
-    try:
-        server.serve_forever()
-    except select.error:
-        log.exception('select error during serve forever')
-
-    log.debug('serve forever exited')
-    fire_event('webui.stop')
-    sys.exit(0)
-
-def stop_server(*args):
-    log.debug('Shutting down server')
-    if server:
-        threading.Thread(target=server.shutdown).start()
-"""
 
 
 def set_exit_handler(func):
