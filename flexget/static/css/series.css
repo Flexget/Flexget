@@ -1,13 +1,13 @@
 /* series ui plugin */
 
-ul#episodes, ul#episode-files {
+ul.episode-files {
     line-height: 1.4;
     list-style: none;
 }
-ul#episodes hr {
+ul.episode-files hr {
     margin: 10px 0 10px 0;
 }
-ul#episodes li.identifier {
+ul.episode-files li.identifier {
     background: #ddd;
     padding: 5px;
     margin: 5px 0 5px 0;
