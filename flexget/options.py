@@ -23,6 +23,8 @@ class OptionParser(OptParser):
                         help=SUPPRESS_HELP)
         self.add_option('--debug-sql', action='store_true', dest='debug_sql', default=False,
                         help=SUPPRESS_HELP)
+        self.add_option('-c', action='store', dest='config', default='config.yml',
+                        help='Specify configuration file. Default is config.yml')
 
     def _debug_callback(self, option, opt, value, parser):
         setattr(parser.values, option.dest, 1)
@@ -55,8 +57,6 @@ class CoreOptionParser(OptionParser):
                         help='Forgets everything that has been done and learns current matches.')
         self.add_option('--doc', action='store', dest='doc',
                         metavar='PLUGIN', help='Display plugin documentation. See also --plugins.')
-        self.add_option('-c', action='store', dest='config', default='config.yml',
-                        help='Specify configuration file. Default is config.yml')
         self.add_option('--cron', action='store_true', dest='quiet', default=False,
                         help='Disables stdout and stderr output, log file used. Reduces logging level slightly.')
 
@@ -95,9 +95,10 @@ class StoreErrorOptionParser(CoreOptionParser):
     def __init__(self, baseparser):
         """Duplicates optios from another OptionParser"""
         CoreOptionParser.__init__(self, option_list=baseparser.option_list, conflict_handler="resolve")
-        # Remove the options that exit the program
+        # Remove the options inappropriate to change mid-run
         self.remove_option('-h')
         self.remove_option('-V')
+        self.remove_option('-c')
         self.error_msg = ''
 
     def parse_args(self, args):

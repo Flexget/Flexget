@@ -20,6 +20,7 @@ def delete(root, name):
     if root in manager.config and name in manager.config[root]:
         log.info('Deleting %s %s' % (root, name))
         del manager.config[root][name]
+        manager.save_config()
     return redirect(url_for('index'))
 
 

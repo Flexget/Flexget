@@ -63,12 +63,12 @@ class Manager(object):
 
     def initialize(self):
         """Separated from __init__ so that unit tests can modify options before loading config."""
-        self.load_config()
+        self.find_config()
         self.init_sqlalchemy()
         self.create_feeds()
 
-    def load_config(self):
-        """Load the configuration file"""
+    def find_config(self):
+        """Find the configuration file and load it"""
         startup_path = os.path.dirname(os.path.abspath(sys.path[0]))
         home_path = os.path.join(os.path.expanduser('~'), '.flexget')
         current_path = os.getcwd()
@@ -96,49 +96,52 @@ class Manager(object):
 
         for config, base in possible.iteritems():
             if os.path.exists(config):
-                self.pre_check_config(config)
-                try:
-                    self.config = yaml.safe_load(file(config))
-                except Exception, e:
-                    log.critical(e)
-                    print ''
-                    print '-' * 79
-                    print ' Malformed configuration file, common reasons:'
-                    print '-' * 79
-                    print ''
-                    print ' o Indentation error'
-                    print ' o Missing : from end of the line'
-                    print ' o Non ASCII characters (use UTF8)'
-                    print ' o If text contains any of :[]{}% characters it must be single-quoted (eg. value{1} should be \'value{1}\')\n'
-                    lines = 0
-                    if e.problem is not None:
-                        print ' Reason: %s\n' % e.problem
-                        if e.problem == 'mapping values are not allowed here':
-                            print ' ----> MOST LIKELY REASON: Missing : from end of the line!'
-                            print ''
-                    if e.context_mark is not None:
-                        print ' Check configuration near line %s, column %s' % (e.context_mark.line, e.context_mark.column)
-                        lines += 1
-                    if e.problem_mark is not None:
-                        print ' Check configuration near line %s, column %s' % (e.problem_mark.line, e.problem_mark.column)
-                        lines += 1
-                    if lines:
-                        print ''
-                    if lines == 1:
-                        print ' Fault is almost always in this or previous line\n'
-                    if lines == 2:
-                        print ' Fault is almost always in one of these lines or previous ones\n'
-                    if self.options.debug:
-                        raise
-                    sys.exit(1)
-                # config loaded successfully
-                self.config_name = os.path.splitext(os.path.basename(config))[0]
-                self.config_base = os.path.normpath(base)
-                log.debug('config_name: %s' % self.config_name)
-                log.debug('config_base: %s' % self.config_base)
+                self.load_config(config)
                 return
         log.info('Tried to read from: %s' % ', '.join(possible))
         raise IOError('Failed to find configuration file %s' % self.options.config)
+
+    def load_config(self, config):
+        self.pre_check_config(config)
+        try:
+            self.config = yaml.safe_load(file(config)) or {}
+        except Exception, e:
+            log.critical(e)
+            print ''
+            print '-' * 79
+            print ' Malformed configuration file, common reasons:'
+            print '-' * 79
+            print ''
+            print ' o Indentation error'
+            print ' o Missing : from end of the line'
+            print ' o Non ASCII characters (use UTF8)'
+            print ' o If text contains any of :[]{}% characters it must be single-quoted (eg. value{1} should be \'value{1}\')\n'
+            lines = 0
+            if e.problem is not None:
+                print ' Reason: %s\n' % e.problem
+                if e.problem == 'mapping values are not allowed here':
+                    print ' ----> MOST LIKELY REASON: Missing : from end of the line!'
+                    print ''
+            if e.context_mark is not None:
+                print ' Check configuration near line %s, column %s' % (e.context_mark.line, e.context_mark.column)
+                lines += 1
+            if e.problem_mark is not None:
+                print ' Check configuration near line %s, column %s' % (e.problem_mark.line, e.problem_mark.column)
+                lines += 1
+            if lines:
+                print ''
+            if lines == 1:
+                print ' Fault is almost always in this or previous line\n'
+            if lines == 2:
+                print ' Fault is almost always in one of these lines or previous ones\n'
+            if self.options.debug:
+                raise
+            sys.exit(1)
+        # config loaded successfully
+        self.config_name = os.path.splitext(os.path.basename(config))[0]
+        self.config_base = os.path.normpath(os.path.dirname(config))
+        log.debug('config_name: %s' % self.config_name)
+        log.debug('config_base: %s' % self.config_base)
 
     def save_config(self):
         """Dumps current config to yaml config file"""
@@ -439,6 +442,18 @@ class Manager(object):
 
 
 class UIManager(Manager):
+
+    def find_config(self):
+        """If no config file is found by the webui, a blank one is created."""
+        try:
+            Manager.find_config(self)
+        except IOError:
+            # No config file found, create a blank one in the home path
+            config_path = os.path.join(os.path.expanduser('~'), '.flexget', self.options.config)
+            newconfig = file(config_path, 'w')
+            newconfig.write('\n')
+            newconfig.close()
+            self.load_config(config_path)
 
     def execute(self):
         # Update feed instances to match config
