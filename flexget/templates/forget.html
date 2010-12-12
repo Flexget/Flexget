@@ -6,13 +6,14 @@
 
 {% block main %}
 <h2>Forget {{ release.episode.series.name|title }} {{ release.episode.identifier }}?</h2>
-<br />
 <p>
     This will clear all records of this episode from the database.<br />
     This operation will forget this episode:
     <h4>{{ release.episode.series.name|title }} {{ release.episode.identifier }}</h4>
     <br />
     and these releases:
+    <br />
+    <br />
     <ul class="releases">
         {% for release in release.episode.releases %}
             <li class="{% if release.downloaded %}downloaded{% endif %}">
