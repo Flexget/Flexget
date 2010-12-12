@@ -35,9 +35,7 @@
             {% for release in episode.releases %}
             <li class="{% if release.downloaded %}downloaded{% endif %}">
                 {{ release.title }}<br />
-                <span>
-                    First seen {{ release.episode.first_seen|pretty_age }}
-                </span>
+                <span>First seen {{ release.episode.first_seen|pretty_age }}</span>
             </li>
             {% endfor %}
         </ul>
@@ -49,10 +47,10 @@
             {% for release in releases %}
                 <li class="{% if release.downloaded %}downloaded{% endif %}">
                     <a href="forget/{{ release.id }}" style="float:right;color:#999">Forget</a>
-                    {{ release.title }}<br />
+                    <a href="/series/{{ release.episode.series.name }}">{{ release.title }}</a><br />
                     <span>
                         {% if release.previous %}
-                        <img src="/static/img/tick.png" />Succesfully downloaded "{{ release.previous.title }}" {{ release.episode.first_seen|pretty_age }}
+                        <img src="/static/img/tick.png" /> Succesfully downloaded "{{ release.previous.title }}" {{ release.episode.first_seen|pretty_age }}
                         {% else %}
                         Downloaded {{ release.episode.first_seen|pretty_age }}
                         {% endif %}
