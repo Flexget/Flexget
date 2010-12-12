@@ -1,5 +1,16 @@
 {% extends "layout.html" %}
 
+{% block head %}
+    <script type="text/javascript">
+        function on_delete(root, name){
+            var ans = confirm("Really delete "+name+"?")
+            if(ans){
+                location.href = "/configure/delete/"+root+"/"+name;
+            }
+        }
+    </script>
+{% endblock %}
+
 {% block main %}
 
     {% block configure %}
@@ -21,7 +32,7 @@
                     <div class="item{% if a_name == name|default('') %} selected{% endif %}">
                         <a href="/configure/edit/text/{{ category }}/{{ a_name }}">{{ a_name }}</a>
                         <div class="actions">
-                            <a href="/configure/delete/{{ category }}/{{ a_name }}"><img src="/static/img/fatcow-icons/16x16/delete.png" alt="Delete"/></a>
+                            <a href="#" onclick="on_delete('{{ category }}','{{ a_name }}')"><img src="/static/img/fatcow-icons/16x16/delete.png" alt="Delete"/></a>
                         </div>
                     </div>
                 </li>
