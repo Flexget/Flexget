@@ -89,12 +89,13 @@ def forget_episode(rel_id):
         if request.form.get('really', False):
             try:
                 forget_series_episode(release.episode.series.name, release.episode.identifier)
+                flash('Removed %s %s.' % (
+                    release.episode.series.name, release.episode.identifier), 'error')
             except ValueError, e:
-                flash(e.message, 'error')
-            else:
-                flash('%s %s forgotten.' % (release.episode.series.name, release.episode.identifier))
-        return redirect(url_for('index'))
-
+                flash(e, 'error')    
+            
+        return redirect('/series')  
+        
     return render_template('forget.html', **context)
 
 
