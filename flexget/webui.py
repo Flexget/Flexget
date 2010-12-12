@@ -238,7 +238,20 @@ def start(mg):
 
     set_exit_handler(stop_server)
 
-    start_server()
+    if manager.options.autoreload:
+        # Create and destroy a socket so that any exceptions are raised before
+        # we spawn a separate Python interpreter and lose this ability.
+        import socket
+        from werkzeug.serving import run_with_reloader
+        reloader_interval = 1
+        extra_files = None
+        test_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        test_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        test_socket.bind(('0.0.0.0', manager.options.port))
+        test_socket.close()
+        run_with_reloader(start_server, extra_files, reloader_interval)
+    else:
+        start_server()
 
     log.debug('server exited')
     fire_event('webui.stop')

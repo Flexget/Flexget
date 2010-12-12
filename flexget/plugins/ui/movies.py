@@ -7,7 +7,7 @@ from flexget.webui import register_plugin, db_session, app
 try:
     from flexget.plugins.filter_imdb_queue import ImdbQueue
 except ImportError:
-    raise PluginDependencyError('Requires imdb plugin', 'movies')
+    raise PluginDependencyError('Requires imdb plugin', 'imdb_queue')
 
 
 movies_module = Module(__name__, url_prefix='/movies')
