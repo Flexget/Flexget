@@ -81,10 +81,9 @@ def forget_episode(rel_id):
     Redirects back to the series index.
     '''
     release = db_session.query(Release).get(rel_id)
-    episode = release.episode
     
-    context = {'release': release,
-        'command': '--series-forget "%s" %s' % (episode.series.name, episode.identifier)}
+    context = {'release': release, 'command': '--series-forget "%s" %s' % (
+        release.episode.series.name, release.episode.identifier)}
         
     if request.method == 'POST':
         if request.form.get('really', False):
@@ -92,6 +91,13 @@ def forget_episode(rel_id):
             from flexget.webui import executor
             options = manager.parser.parse_args(context['command'])[0]
             executor.execute(options=options)
+
+            # Delete the Episode from the db 
+            # (done by execute command eventually, but doesn't show immediately on redirect)
+            #
+            # db_session.delete(release.episode)
+            # log.info('Removing %s %s from the database.' % (
+            #     release.episode.series.name, release.episode.identifier))
             
         return redirect('/series')  
         
