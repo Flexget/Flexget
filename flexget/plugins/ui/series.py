@@ -1,6 +1,6 @@
 from itertools import groupby
 
-from flask import redirect, render_template, render_template_string, Module, request
+from flask import redirect, render_template, render_template_string, Module, request, flash
 from sqlalchemy.sql.expression import desc, asc
 
 from flexget.plugin import PluginDependencyError
@@ -34,13 +34,14 @@ def pretty_age_filter(value):
 
 @series_module.route('/')
 def index():
-    
+    get_flashed_messages
     releases = db_session.query(Release).order_by(desc(Release.id)).slice(0, 10)
     for release in releases:
         if release.downloaded == False and len(release.episode.releases) > 1:
             for prev_rel in release.episode.releases:
                 if prev_rel.downloaded:
                     release.previous = prev_rel
+    
     
     context = {'releases': releases}
     return render_template('series.html', **context)
@@ -87,8 +88,9 @@ def forget_episode(rel_id):
         
     if request.method == 'POST':
         if request.form.get('really', False):
-            SeriesForget().forget_series_episode(release.episode.series.name, release.episode.identifier)
-            
+            response = SeriesForget().forget_series_episode(release.episode.series.name, release.episode.identifier)
+            if response:
+                flash(response)
         return redirect('/series')  
         
     return render_template('forget.html', **context)

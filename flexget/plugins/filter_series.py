@@ -393,6 +393,7 @@ class SeriesForget(object):
         # TODO: get rid of prints, left over from refactoring
         session = Session()
         series = session.query(Series).filter(Series.name == name.lower()).first()
+        response = ''
         if series:
             episode = session.query(Episode).filter(Episode.identifier == identifier).\
                 filter(Episode.series_id == series.id).first()
@@ -404,9 +405,12 @@ class SeriesForget(object):
                 for rel in episode.releases:
                     log.debug('release: %s' % rel)
             else:
-                print 'Didn\'t find %s episode identified by %s' % (name.capitalize(), identifier)
+                response = 'Didn\'t find %s episode identified by %s' % (name.capitalize(), identifier)
         else:
-            print 'Unknown series %s' % name
+            response = 'Unknown series %s' % name
+            
+        print response
+        return response
 
 
 class FilterSeriesBase(object):
