@@ -39,7 +39,7 @@ def index():
     try:
         from themoviedb import tmdb
     except ImportError:
-        raise Exception("You need to install themoviedb: easy_install https://github.com/joshuajonah/themoviedb/tarball/master")
+        raise Exception("You need to install themoviedb: easy_install https://github.com/doganaydin/themoviedb/tarball/master")
     
     for item in movies:
         movie = tmdb.imdb(id=item.imdb_id)
