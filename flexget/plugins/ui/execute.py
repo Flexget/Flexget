@@ -32,7 +32,7 @@ def index():
 @execute.route('/progress.json')
 def progress(as_list=False):
     """
-    Gives takes messages from the queue and exports them to JSON.
+    Gets messages from the queue and exports them to JSON.
     """
     result = {'items': []}
     try:

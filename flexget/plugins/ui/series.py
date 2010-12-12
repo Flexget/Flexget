@@ -1,10 +1,10 @@
 from itertools import groupby
 
-from flask import redirect, render_template, Module
+from flask import redirect, render_template, render_template_string, Module, request
 from sqlalchemy.sql.expression import desc, asc
 
 from flexget.plugin import PluginDependencyError
-from flexget.webui import register_plugin, db_session, app
+from flexget.webui import register_plugin, db_session, app, manager
 
 import datetime
 import time
@@ -73,4 +73,31 @@ def mark_not_downloaded(rel_id):
     return redirect('/series')
     
     
+@series_module.route('/forget/<int:rel_id>', methods=['POST', 'GET'])
+def forget_episode(rel_id):
+    '''
+    Executes a --series-forget statement for an episode.
+    Redirects back to the series index.
+    '''
+    release = db_session.query(Release).get(rel_id)
+    episode = release.episode
+    
+    context = {
+        'release': release,
+        'episode_string': 'S%sE%s' % (str(episode.season).zfill(2), str(episode.number).zfill(2)),
+    }
+    context['command'] = "--series-forget '%s' %s" % (episode.series.name, context['episode_string']) 
+        
+    if request.method == 'POST':
+        if request.form.get('really', False):
+            log.info('Executing command: %s' % context['command'])
+            from flexget.webui import executor
+            options = manager.parser.parse_args(context['command'])[0]
+            executor.execute(options=options)
+            
+        return redirect('/series')  
+        
+    return render_template('forget.html', **context)
+    
+
 register_plugin(series_module, menu='Series')
