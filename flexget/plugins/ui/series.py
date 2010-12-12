@@ -92,12 +92,12 @@ def forget_episode(rel_id):
             options = manager.parser.parse_args(context['command'])[0]
             executor.execute(options=options)
 
-            # Delete the Episode from the db 
-            # (done by execute command eventually, but doesn't show immediately on redirect)
-            #
-            # db_session.delete(release.episode)
-            # log.info('Removing %s %s from the database.' % (
-            #     release.episode.series.name, release.episode.identifier))
+    # HACK: Delete the Episode from the db. 
+    #       Done by execute command eventually, but doesn't show immediately on redirect.
+    #
+    #       db_session.delete(release.episode)
+    #       log.info('Removing %s %s from the database.' % (
+    #           release.episode.series.name, release.episode.identifier))
             
         return redirect('/series')  
         
