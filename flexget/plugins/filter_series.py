@@ -48,6 +48,12 @@ class Episode(Base):
             age += '%sd ' % age_days
         age += '%sh' % age_hours
         return age
+    
+    @property
+    def is_premiere(self):
+        if self.season == 1 and self.number == 1:
+            return True
+        return False
 
     def __init__(self):
         self.first_seen = datetime.now()
