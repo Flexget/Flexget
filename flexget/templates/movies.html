@@ -1,15 +1,28 @@
 {% extends "layout.html" %}
 
+{% block head %}
+<link rel="stylesheet" href="/static/css/movies.css" type="text/css" media="screen"/>
+{% endblock %}
+
 {% block main %}
-<ul>
+<h2>IMDB Queued Movies</h2>
+<br />
+<ul id="queued_movies">
     {% for movie in movies %}
-    <li style="clear:both;">
-        <img src="{{ movie.thumb }}" style="float:left;margin:0 5px 15px 0;" />
-        <div style="padding-left:100px; width:50%">
+    <li>
+        <div class="thumb"><img src="{{ movie.thumb }}" /></div>
+        <div class="movie_text">
             <h3>{{ movie.title }} ({{ movie.year }})</h3>
             <br />
-            <p style="font-size:12px; color:#666">{{ movie.overview }}</p>
+            <p>{{ movie.overview }}</p>
         </div>
+        <ul class="quality">
+            <li{% if movie.quality == "1080p" %} class="active"{% endif %}>1080p</li>
+            <li{% if movie.quality == "720p" %} class="active"{% endif %}>720p</li>
+            <li{% if movie.quality == "HDTV" %} class="active"{% endif %}>HDTV</li>
+            <li{% if movie.quality == "ANY" %} class="active"{% endif %}>Any</li>
+        </ul>
+        
     </li>
     {% endfor %}
 </ul>

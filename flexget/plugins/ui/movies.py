@@ -43,9 +43,9 @@ def index():
     
     for item in movies:
         movie = tmdb.imdb(id=item.imdb_id)
-        item.overview = movie.getOverview(0)
         item.thumb = movie.getPoster(0, 'thumb')[0]
         item.year = movie.getReleased(0).split('-')[0]
+        item.overview = movie.getOverview(0)
         
     context = {'movies': movies}
     return render_template('movies.html', **context)
