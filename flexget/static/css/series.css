@@ -1,25 +1,30 @@
 /* series ui plugin */
 
-ul.episode-files {
+ul.releases {
     line-height: 1.4;
     list-style: none;
 }
-ul.episode-files hr {
+ul.releases hr {
     margin: 10px 0 10px 0;
 }
-ul.episode-files li.identifier {
+ul.releases li.identifier {
     background: #ddd;
     padding: 5px;
     margin: 5px 0 5px 0;
 }
-ul.episode-files li {
+ul.releases li {
     padding-left: 20px;
     background: transparent url(/static/img/cross.png) no-repeat;
     list-style: none;
     color: #666;
 }
-ul.episode-files li.downloaded {
+ul.releases li.downloaded {
     background-image: url(/static/img/tick.png);
     color: #000;
 }
-
+ul.releases span {
+    color: #999;
+    font-size: 10px;
+    margin-bottom: 5px;
+    display: block;
+}

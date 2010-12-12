@@ -13,7 +13,7 @@
     <h4>{{ release.episode.series.name|title }} {{ release.episode.identifier }}</h4>
     <br />
     and these releases:
-    <ul id="episodes" class="episode-files">
+    <ul class="releases">
         {% for release in release.episode.releases %}
             <li class="{% if release.downloaded %}downloaded{% endif %}">
                 {{ release.title }}
