@@ -47,6 +47,12 @@ h1 {
     margin: 0 0 1em;
 }
 
+h2 {
+    font-size: 18px;
+    text-transform: uppercase;
+    margin: 0 0 1em;
+}
+
 a {
     color: #ff0000;
     font-size: 11px;
@@ -128,6 +134,12 @@ a {
 #flash ul li.success {
     padding-left: 1.8em;
     background: url('/static/img/fatcow-icons/16x16/accept.png') no-repeat;
+    list-style: none;
+}
+
+#flash ul li.delete {
+    padding-left: 1.8em;
+    background: url('/static/img/fatcow-icons/16x16/delete.png') no-repeat;
     list-style: none;
 }
 

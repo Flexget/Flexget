@@ -15,12 +15,23 @@ def index():
     return render_template('configure.html')
 
 
+@configure.route('/new/<root>')
+def new_text(root):
+    if root not in ['feeds', 'presets']:
+        flash('Invalid root.', 'error')
+        return redirect(url_for('index'))
+    context = {'root': root,
+               'config': ''}
+    return render_template('configure_text.html', **context)
+
+
 @configure.route('/delete/<root>/<name>')
 def delete(root, name):
     if root in manager.config and name in manager.config[root]:
         log.info('Deleting %s %s' % (root, name))
         del manager.config[root][name]
         manager.save_config()
+        flash('Deleted %s.' % name, 'delete')
     return redirect(url_for('index'))
 
 

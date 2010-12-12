@@ -37,7 +37,7 @@ class MockManager(Manager):
         self.config_base = None
         Manager.__init__(self, test_options)
 
-    def load_config(self):
+    def find_config(self):
         try:
             self.config = yaml.safe_load(self.config_text)
             self.config_base = os.path.dirname(os.path.abspath(sys.path[0]))

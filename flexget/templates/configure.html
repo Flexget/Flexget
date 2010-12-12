@@ -38,8 +38,8 @@
                 </li>
             {% endfor %}
             <li class="new">
-                <div class="item">
-                    <a href="">Create new</a>
+                <div class="item{% if root == category %}{% if name is undefined %} selected{% endif %}{% endif %}">
+                    <a href="{{ url_for('new_text', root=category) }}">Create new</a>
                 </div>
             </li>
         </ul>

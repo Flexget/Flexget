@@ -77,24 +77,25 @@ class Manager(object):
         config_path = os.path.dirname(self.options.config)
         path_given = config_path != ''
 
-        possible = {}
+        possible = []
         if path_given:
             # explicit path given, don't try anything too fancy
-            possible[self.options.config] = config_path
+            possible.append(self.options.config)
         else:
             log.debug('Figuring out config load paths')
             # normal lookup locations
-            possible[os.path.join(startup_path, self.options.config)] = startup_path
-            possible[os.path.join(home_path, self.options.config)] = home_path
+            possible.append(startup_path)
+            possible.append(home_path)
             # for virtualenv / dev sandbox
             from flexget import __version__ as version
             if version == '{subversion}':
                 log.debug('Running subversion, adding virtualenv / sandbox paths')
-                possible[os.path.join(sys.path[0], '..', self.options.config)] = os.path.join(sys.path[0], '..')
-                possible[os.path.join(current_path, self.options.config)] = current_path
-                possible[os.path.join(exec_path, self.options.config)] = exec_path
+                possible.append(os.path.join(exec_path, '..'))
+                possible.append(current_path)
+                possible.append(exec_path)
 
-        for config, base in possible.iteritems():
+        for path in possible:
+            config = os.path.join(path, self.options.config)
             if os.path.exists(config):
                 self.load_config(config)
                 return
@@ -450,8 +451,10 @@ class UIManager(Manager):
         except IOError:
             # No config file found, create a blank one in the home path
             config_path = os.path.join(os.path.expanduser('~'), '.flexget', self.options.config)
+            log.info('Config file %s not found. Creating new config %s' % (self.options.config, config_path))
             newconfig = file(config_path, 'w')
-            newconfig.write('\n')
+            # Write empty feeds and presets to the config
+            newconfig.write(yaml.dump({'presets': {}, 'feeds': {}}))
             newconfig.close()
             self.load_config(config_path)
 
