@@ -9,11 +9,13 @@
     {% if report %}
         <ul id="cat">
             {% for series in report %}
+                {% if series.episodes %}
                 <li>
                     <div class="item{% if series.name == name %} selected{% endif %}">
                         <a href="/series/{{ series.name }}">{{ series.name|title }}</a>
                     </div>
                 </li>
+                {% endif %}
             {% endfor %}
         </ul>
     {% else %}
