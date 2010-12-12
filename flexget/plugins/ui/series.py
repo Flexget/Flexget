@@ -90,7 +90,7 @@ def forget_episode(rel_id):
             try:
                 forget_series_episode(release.episode.series.name, release.episode.identifier)
                 flash('Removed %s %s.' % (
-                    release.episode.series.name, release.episode.identifier), 'error')
+                    release.episode.series.name, release.episode.identifier))
             except ValueError, e:
                 flash(e, 'error')    
             
