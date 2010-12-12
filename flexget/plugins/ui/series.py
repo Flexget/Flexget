@@ -56,6 +56,7 @@ def series_list():
 def episodes(name):
     series = db_session.query(Series).filter(Series.name == name).first()
     context = {'episodes': series.episodes, 'name': name}
+    
     return render_template('series.html', **context)
     
 
@@ -82,11 +83,8 @@ def forget_episode(rel_id):
     release = db_session.query(Release).get(rel_id)
     episode = release.episode
     
-    context = {
-        'release': release,
-        'episode_string': 'S%sE%s' % (str(episode.season).zfill(2), str(episode.number).zfill(2)),
-    }
-    context['command'] = "--series-forget '%s' %s" % (episode.series.name, context['episode_string']) 
+    context = {'release': release,
+        'command': '--series-forget "%s" %s' % (episode.series.name, episode.identifier)}
         
     if request.method == 'POST':
         if request.form.get('really', False):
