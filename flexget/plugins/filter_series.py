@@ -2,7 +2,7 @@ import logging
 from datetime import datetime, timedelta
 from flexget.utils.titles import SeriesParser, ParseWarning
 from flexget.utils import qualities
-from flexget.manager import Base
+from flexget.manager import Base, Session
 from flexget.plugin import register_plugin, register_parser_option, get_plugin_by_name, get_plugin_keywords, \
     PluginWarning, PluginError, priority
 from sqlalchemy import Column, Integer, String, Unicode, DateTime, Boolean, desc
@@ -22,7 +22,7 @@ class Series(Base):
 
     def __repr__(self):
         return '<Series(name=%s)>' % (self.name)
-    
+
 
 class Episode(Base):
 
@@ -366,38 +366,45 @@ class SeriesForget(object):
 
             name = unicode(self.options.get('name'))
 
-            from flexget.manager import Session
-            session = Session()
-
             if self.options.get('episode'):
                 # remove by id
                 identifier = self.options.get('episode').upper()
                 if identifier and name:
-                    series = session.query(Series).filter(Series.name == name.lower()).first()
-                    if series:
-                        episode = session.query(Episode).filter(Episode.identifier == identifier).\
-                            filter(Episode.series_id == series.id).first()
-                        if episode:
-                            print 'Removed %s %s' % (name.capitalize(), identifier)
-                            log.debug('episode: %s' % episode)
-                            for rel in episode.releases:
-                                log.debug('release: %s' % rel)
-                            session.delete(episode)
-                        else:
-                            print 'Didn\'t find %s episode identified by %s' % (name.capitalize(), identifier)
-                    else:
-                        print 'Unknown series %s' % name
+                    self.forget_series_episode(name, identifier)
             else:
                 # remove whole series
-                series = session.query(Series).\
-                         filter(Series.name == name.lower()).first()
-                if series:
-                    print 'Removed %s' % name
-                    session.delete(series)
-                else:
-                    print 'Unknown series %s' % name
+                self.forget_series(name)
 
+    def forget_series(self, name):
+        """Remove a whole series from db."""
+        session = Session()
+        series = session.query(Series).\
+                 filter(Series.name == name.lower()).first()
+        if series:
+            session.delete(series)
             session.commit()
+            print 'Removed %s' % name
+            log.debug('Removed series %s from database.' % name)
+        else:
+            print 'Unknown series %s' % name
+
+    def forget_series_episode(self, name, identifier):
+        session = Session()
+        series = session.query(Series).filter(Series.name == name.lower()).first()
+        if series:
+            episode = session.query(Episode).filter(Episode.identifier == identifier).\
+                filter(Episode.series_id == series.id).first()
+            if episode:
+                session.delete(episode)
+                session.commit()
+                print 'Removed %s %s' % (name.capitalize(), identifier)
+                log.debug('Episode %s from series %s removed from database.' % (identifier, name))
+                for rel in episode.releases:
+                    log.debug('release: %s' % rel)
+            else:
+                print 'Didn\'t find %s episode identified by %s' % (name.capitalize(), identifier)
+        else:
+            print 'Unknown series %s' % name
 
 
 class FilterSeriesBase(object):
