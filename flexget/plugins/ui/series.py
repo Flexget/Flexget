@@ -1,6 +1,6 @@
 from itertools import groupby
 
-from flask import render_template, Module
+from flask import redirect, render_template, Module
 from sqlalchemy.sql.expression import desc, asc
 
 from flexget.plugin import PluginDependencyError
@@ -34,6 +34,7 @@ def pretty_age_filter(value):
 
 @series_module.route('/')
 def index():
+    
     releases = db_session.query(Release).order_by(desc(Release.id)).slice(0, 10)
     for release in releases:
         if release.downloaded == False and len(release.episode.releases) > 1:
@@ -43,8 +44,8 @@ def index():
     
     context = {'releases': releases}
     return render_template('series.html', **context)
-
-
+    
+    
 @series_module.context_processor
 def series_list():
     """Add series list to all pages under series"""
@@ -56,6 +57,20 @@ def episodes(name):
     series = db_session.query(Series).filter(Series.name == name).first()
     context = {'episodes': series.episodes, 'name': name}
     return render_template('series.html', **context)
+    
 
-
+@series_module.route('/mark/downloaded/<int:rel_id>')
+def mark_downloaded(rel_id):
+    db_session.query(Release).get(rel_id).downloaded = True
+    db_session.commit()
+    return redirect('/series')
+    
+    
+@series_module.route('/mark/not_downloaded/<int:rel_id>')
+def mark_not_downloaded(rel_id):
+    db_session.query(Release).get(rel_id).downloaded = False
+    db_session.commit()
+    return redirect('/series')
+    
+    
 register_plugin(series_module, menu='Series')

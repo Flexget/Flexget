@@ -44,8 +44,14 @@
         <h1>Latest 10 Releases</h1>
         <ul id="episodes" class="episode-files">
             {% for release in releases %}
-                <li class="{% if release.downloaded %}downloaded{% endif %}{{ loop.cycle('', ' episode-box') }}">
+                <li class="{% if release.downloaded %}downloaded{% endif %}">
+                    {% if release.downloaded %}
+                    <a href="mark/not_downloaded/{{ release.id }}" style="float:right;">Mark not downloaded</a>
+                    {% else %}
+                    <a href="mark/downloaded/{{ release.id }}" style="float:right;">Mark downloaded</a>
+                    {% endif %}
                     {{ release.title }}<br />
+                    
                     <span style="color:#999;font-size:10px;">
                         {% if release.previous %}
                         <img src="/static/img/tick.png" />Succesfully downloaded "{{ release.previous.title }}" {{ release.episode.first_seen|pretty_age }}
