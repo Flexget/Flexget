@@ -94,7 +94,7 @@ def forget_episode(rel_id):
             except ValueError, e:
                 flash(e, 'error')    
             
-        return redirect('/series')  
+        return redirect(url_for('index'))
         
     return render_template('forget.html', **context)
 
