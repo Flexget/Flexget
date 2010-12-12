@@ -34,7 +34,6 @@ def pretty_age_filter(value):
 
 @series_module.route('/')
 def index():
-    get_flashed_messages
     releases = db_session.query(Release).order_by(desc(Release.id)).slice(0, 10)
     for release in releases:
         if release.downloaded == False and len(release.episode.releases) > 1:
