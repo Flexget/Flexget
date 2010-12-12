@@ -37,7 +37,7 @@ def index():
     movies = db_session.query(ImdbQueue).all()
     
     try:
-        from themovedb import tmdb
+        from themoviedb import tmdb
     except ImportError:
         raise Exception("You need to install themoviedb: easy_install https://github.com/joshuajonah/themoviedb/tarball/master")
     
