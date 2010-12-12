@@ -87,9 +87,11 @@ def forget_episode(rel_id):
         
     if request.method == 'POST':
         if request.form.get('really', False):
-            response = forget_series_episode(release.episode.series.name, release.episode.identifier)
-            if response:
-                flash(response)
+            try:
+                forget_series_episode(release.episode.series.name, release.episode.identifier)
+            except ValueError, e:
+                flash(e)
+                
         return redirect('/series')  
         
     return render_template('forget.html', **context)
