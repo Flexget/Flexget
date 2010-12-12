@@ -1,6 +1,6 @@
 from itertools import groupby
 
-from flask import redirect, render_template, render_template_string, Module, request, flash
+from flask import redirect, render_template, render_template_string, Module, request, flash, url_for
 from sqlalchemy.sql.expression import desc, asc
 
 from flexget.plugin import PluginDependencyError
@@ -13,7 +13,7 @@ import logging
 from utils import pretty_date
 
 try:
-    from flexget.plugins.filter_series import Series, Episode, Release, forget_series_episode
+    from flexget.plugins.filter_series import Series, Episode, Release, forget_series, forget_series_episode
 except ImportError:
     raise PluginDependencyError('Requires series plugin', 'series')
 
@@ -40,12 +40,12 @@ def index():
             for prev_rel in release.episode.releases:
                 if prev_rel.downloaded:
                     release.previous = prev_rel
-    
-    
+
+
     context = {'releases': releases}
     return render_template('series.html', **context)
-    
-    
+
+
 @series_module.context_processor
 def series_list():
     """Add series list to all pages under series"""
@@ -58,22 +58,22 @@ def episodes(name):
     episodes = query.filter(Series.name == name).order_by(desc(Episode.identifier)).all()
     context = {'episodes': episodes, 'name': name}
     return render_template('series.html', **context)
-    
+
 
 @series_module.route('/mark/downloaded/<int:rel_id>')
 def mark_downloaded(rel_id):
     db_session.query(Release).get(rel_id).downloaded = True
     db_session.commit()
     return redirect('/series')
-    
-    
+
+
 @series_module.route('/mark/not_downloaded/<int:rel_id>')
 def mark_not_downloaded(rel_id):
     db_session.query(Release).get(rel_id).downloaded = False
     db_session.commit()
     return redirect('/series')
-    
-    
+
+
 @series_module.route('/forget/<int:rel_id>', methods=['POST', 'GET'])
 def forget_episode(rel_id):
     '''
@@ -81,20 +81,21 @@ def forget_episode(rel_id):
     Redirects back to the series index.
     '''
     release = db_session.query(Release).get(rel_id)
-    
+
     context = {'release': release, 'command': '--series-forget "%s" %s' % (
         release.episode.series.name, release.episode.identifier)}
-        
+
     if request.method == 'POST':
         if request.form.get('really', False):
             try:
                 forget_series_episode(release.episode.series.name, release.episode.identifier)
             except ValueError, e:
-                flash(e)
-                
-        return redirect('/series')  
-        
+                flash(e.message, 'error')
+            else:
+                flash('%s %s forgotten.' % (release.episode.series.name, release.episode.identifier))
+        return redirect(url_for('index'))
+
     return render_template('forget.html', **context)
-    
+
 
 register_plugin(series_module, menu='Series')
