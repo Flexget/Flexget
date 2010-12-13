@@ -8,19 +8,19 @@ class TestInputCache(FlexGetBase):
         feeds:
           test_1:
             rss:
-              url: tests/cached.xml
+              url: cached.xml
           test_2:
             rss:
-              url: tests/cached.xml
+              url: cached.xml
     """
 
-    @with_filecopy('tests/rss.xml', 'tests/cached.xml')
+    @with_filecopy('rss.xml', 'cached.xml')
     def test_cache(self):
         """Test input caching"""
         self.execute_feed('test_1')
         assert self.feed.entries, 'should have created entries at the start'
-        os.remove('tests/cached.xml')
-        f = open('tests/cached.xml', 'w')
+        os.remove('cached.xml')
+        f = open('cached.xml', 'w')
         f.write('')
         f.close()
         self.execute_feed('test_2')

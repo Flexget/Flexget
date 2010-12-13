@@ -17,21 +17,21 @@ class TestExec(FlexGetBase):
             mock:
               - {title: 'replace'}
               - {title: 'replace with spaces'}
-            exec: python tests/exec.py "%(temp_dir)s" "%(title)s"
+            exec: python exec.py "%(temp_dir)s" "%(title)s"
             accept_all: yes
           test_adv_format:
             mock:
               - {title: entry1, location: '/path/with spaces', quotefield: "with'quote"}
             exec:
               on_download:
-                for_entries: python tests/exec.py '%(temp_dir)s' '%(title)s' '%(location)s' '/the/final destinaton/'\
+                for_entries: python exec.py '%(temp_dir)s' '%(title)s' '%(location)s' '/the/final destinaton/'\
                                                   "a %(quotefield)s" '/a hybrid %(location)s'
           test_auto_escape:
             mock:
               - {title: entry2, quotes: single ' double", otherchars: '% a $a! ` *'}
             exec:
               on_download:
-                for_entries: python tests/exec.py '%(temp_dir)s' '%(title)s' %(quotes)s /start/%(quotes)s %(otherchars)s
+                for_entries: python exec.py '%(temp_dir)s' '%(title)s' %(quotes)s /start/%(quotes)s %(otherchars)s
     """
 
     def __init__(self):

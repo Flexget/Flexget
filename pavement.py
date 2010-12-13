@@ -72,16 +72,15 @@ def test(options):
 
     cfg = nose.config.Config(plugins=DefaultPluginManager(), verbosity=2)
 
-    argv = ['bin/paver']
-
+    args = []
+    args.append('-v')
+    args.append('--processes=4')
+    args.append('-x')
     if not options.test.get('online'):
-        argv.extend(['--attr=!online'])
+        args.extend(['--attr=!online'])
+    args.append('--where=tests')
 
-    argv.append('-v')
-    argv.append('--processes=4')
-    argv.append('-x')
-
-    return nose.run(argv=argv, config=cfg)
+    return nose.run(argv=args, config=cfg)
 
 
 @task
@@ -302,7 +301,7 @@ def install_tools():
         print 'Nose-xcover INSTALLED'
     except:
         pip.main(['install', 'http://github.com/cmheisel/nose-xcover/zipball/master'])
-        
+
     try:
         import epydoc
         print 'epydoc INSTALLED'

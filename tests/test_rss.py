@@ -8,16 +8,16 @@ class TestInputRSS(FlexGetBase):
         feeds:
           test:
             rss:
-              url: tests/rss.xml
+              url: rss.xml
               silent: true
           test2:
             rss:
-              url: tests/rss.xml
+              url: rss.xml
               silent: true
               link: otherlink
           test3:
             rss:
-              url: tests/rss.xml
+              url: rss.xml
               silent: true
               other_fields: ['Otherfield']
     """

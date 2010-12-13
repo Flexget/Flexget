@@ -8,7 +8,7 @@ class TestInfoHash(FlexGetBase):
         feeds:
           test:
             mock:
-              - {title: 'test', file: 'tests/test.torrent'}
+              - {title: 'test', file: 'test.torrent'}
     """
 
     def test_infohash(self):
@@ -25,13 +25,13 @@ class TestModifyTrackers(FlexGetBase):
         feeds:
           test_add_trackers:
             mock:
-              - {title: 'test', file: 'tests/test_add_trackers.torrent'}
+              - {title: 'test', file: 'test_add_trackers.torrent'}
             add_trackers:
               - udp://thetracker.com/announce
 
           test_remove_trackers:
             mock:
-              - {title: 'test', file: 'tests/test_remove_trackers.torrent'}
+              - {title: 'test', file: 'test_remove_trackers.torrent'}
             remove_trackers:
               - ubuntu
     """
@@ -42,16 +42,16 @@ class TestModifyTrackers(FlexGetBase):
         f.close()
         return Torrent(data)
 
-    @with_filecopy('tests/test.torrent', 'tests/test_add_trackers.torrent')
+    @with_filecopy('test.torrent', 'test_add_trackers.torrent')
     def test_add_trackers(self):
         self.execute_feed('test_add_trackers')
-        torrent = self.load_torrent('tests/test_add_trackers.torrent')
+        torrent = self.load_torrent('test_add_trackers.torrent')
         assert 'udp://thetracker.com/announce' in torrent.get_multitrackers(), \
             'udp://thetracker.com/announce should have been added to trackers'
 
-    @with_filecopy('tests/test.torrent', 'tests/test_remove_trackers.torrent')
+    @with_filecopy('test.torrent', 'test_remove_trackers.torrent')
     def test_remove_trackers(self):
         self.execute_feed('test_remove_trackers')
-        torrent = self.load_torrent('tests/test_remove_trackers.torrent')
+        torrent = self.load_torrent('test_remove_trackers.torrent')
         assert 'http://torrent.ubuntu.com:6969/announce' not in torrent.get_multitrackers(), \
             'ubuntu tracker should have been removed'

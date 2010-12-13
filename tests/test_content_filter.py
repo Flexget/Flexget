@@ -8,21 +8,21 @@ class TestContentFilter(FlexGetBase):
         feeds:
           test_reject1:
             mock:
-              - {title: 'test', file: 'tests/test_reject1.torrent'}
+              - {title: 'test', file: 'test_reject1.torrent'}
             accept_all: yes
             content_filter:
               reject: '*.iso'
 
           test_reject2:
             mock:
-              - {title: 'test', file: 'tests/test_reject2.torrent'}
+              - {title: 'test', file: 'test_reject2.torrent'}
             accept_all: yes
             content_filter:
               reject: '*.avi'
 
           test_require1:
             mock:
-              - {title: 'test', file: 'tests/test_require1.torrent'}
+              - {title: 'test', file: 'test_require1.torrent'}
             accept_all: yes
             content_filter:
               require:
@@ -31,7 +31,7 @@ class TestContentFilter(FlexGetBase):
 
           test_require2:
             mock:
-              - {title: 'test', file: 'tests/test_require2.torrent'}
+              - {title: 'test', file: 'test_require2.torrent'}
             accept_all: yes
             content_filter:
               require: '*.avi'
@@ -46,41 +46,41 @@ class TestContentFilter(FlexGetBase):
 
           test_cache:
             mock:
-              - {title: 'test', url: 'http://localhost/', file: 'tests/test.torrent'}
+              - {title: 'test', url: 'http://localhost/', file: 'test.torrent'}
             accept_all: yes
             content_filter:
               reject: '*.iso'
     """
 
-    @with_filecopy('tests/test.torrent', 'tests/test_reject1.torrent')
+    @with_filecopy('test.torrent', 'test_reject1.torrent')
     def test_reject1(self):
         """Content Size: torrent with min size"""
         self.execute_feed('test_reject1')
         assert self.feed.find_entry('rejected', title='test'), \
             'should have rejected, contains *.iso'
 
-    @with_filecopy('tests/test.torrent', 'tests/test_reject2.torrent')
+    @with_filecopy('test.torrent', 'test_reject2.torrent')
     def test_reject2(self):
         """Content Size: torrent with max size"""
         self.execute_feed('test_reject2')
         assert self.feed.find_entry('accepted', title='test'), \
             'should have accepted, doesn\t contain *.avi'
 
-    @with_filecopy('tests/test.torrent', 'tests/test_require1.torrent')
+    @with_filecopy('test.torrent', 'test_require1.torrent')
     def test_require1(self):
         """Content Size: torrent with min size"""
         self.execute_feed('test_require1')
         assert self.feed.find_entry('accepted', title='test'), \
             'should have accepted, contains *.iso'
 
-    @with_filecopy('tests/test.torrent', 'tests/test_require2.torrent')
+    @with_filecopy('test.torrent', 'test_require2.torrent')
     def test_require2(self):
         """Content Size: torrent with max size"""
         self.execute_feed('test_require2')
         assert self.feed.find_entry('rejected', title='test'), \
             'should have rejected, doesn\t contain *.avi'
 
-    @with_filecopy('tests/test.torrent', 'tests/test_strict.torrent')
+    @with_filecopy('test.torrent', 'test_strict.torrent')
     def test_strict(self):
         """Content Size: strict enabled"""
         self.execute_feed('test_strict')

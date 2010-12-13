@@ -8,14 +8,14 @@ class TestTorrentSize(FlexGetBase):
         feeds:
           test_min:
             mock:
-              - {title: 'test', file: 'tests/test_min.torrent'}
+              - {title: 'test', file: 'test_min.torrent'}
             accept_all: yes
             content_size:
               min: 2000
 
           test_max:
             mock:
-              - {title: 'test', file: 'tests/test_max.torrent'}
+              - {title: 'test', file: 'test_max.torrent'}
             accept_all: yes
             content_size:
               max: 10
@@ -30,27 +30,27 @@ class TestTorrentSize(FlexGetBase):
 
           test_cache:
             mock:
-              - {title: 'test', url: 'http://localhost/', file: 'tests/test.torrent'}
+              - {title: 'test', url: 'http://localhost/', file: 'test.torrent'}
             accept_all: yes
             content_size:
               min: 2000
     """
 
-    @with_filecopy('tests/test.torrent', 'tests/test_min.torrent')
+    @with_filecopy('test.torrent', 'test_min.torrent')
     def test_min(self):
         """Content Size: torrent with min size"""
         self.execute_feed('test_min')
         assert self.feed.find_entry('rejected', title='test'), \
             'should have rejected, minimum size'
 
-    @with_filecopy('tests/test.torrent', 'tests/test_max.torrent')
+    @with_filecopy('test.torrent', 'test_max.torrent')
     def test_max(self):
         """Content Size: torrent with max size"""
         self.execute_feed('test_max')
         assert self.feed.find_entry('rejected', title='test'), \
             'should have rejected, maximum size'
 
-    @with_filecopy('tests/test.torrent', 'tests/test_strict.torrent')
+    @with_filecopy('test.torrent', 'test_strict.torrent')
     def test_strict(self):
         """Content Size: strict enabled"""
         self.execute_feed('test_strict')
@@ -78,14 +78,14 @@ class TestFileSize(FlexGetBase):
         feeds:
           test_min:
             mock:
-              - {title: 'test', location: 'tests/min.file'}
+              - {title: 'test', location: 'min.file'}
             accept_all: yes
             content_size:
               min: 2000
 
           test_max:
             mock:
-              - {title: 'test', location: 'tests/max.file'}
+              - {title: 'test', location: 'max.file'}
             accept_all: yes
             content_size:
               max: 2000
@@ -93,10 +93,10 @@ class TestFileSize(FlexGetBase):
           test_torrent:
             mock:
               # content_size should not be read for this directly, as it is a torrent file
-              - {title: 'test', location: 'tests/test.torrent'}
+              - {title: 'test', location: 'test.torrent'}
     """
 
-    @with_filecopy('tests/test.torrent', 'tests/min.file')
+    @with_filecopy('test.torrent', 'min.file')
     def test_min(self):
         """Content Size: torrent with min size"""
         self.execute_feed('test_min')
@@ -105,7 +105,7 @@ class TestFileSize(FlexGetBase):
         assert entry['content_size'] == 0, \
             'content_size was not detected'
 
-    @with_filecopy('tests/test.torrent', 'tests/max.file')
+    @with_filecopy('test.torrent', 'max.file')
     def test_max(self):
         """Content Size: torrent with max size"""
         self.execute_feed('test_max')
