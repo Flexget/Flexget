@@ -12,7 +12,7 @@
                 {% if series.episodes %}
                 <li>
                     <div class="item{% if series.name == name %} selected{% endif %}">
-                        <a href="/series/{{ series.name }}">{{ series.name|title }}</a>
+                        <a href="{{ url_for('episodes', name=series.name) }}">{{ series.name|title }}</a>
                     </div>
                 </li>
                 {% endif %}
