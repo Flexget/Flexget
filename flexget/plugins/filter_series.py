@@ -1,5 +1,6 @@
 import logging
 from datetime import datetime, timedelta
+from flexget.event import event
 from flexget.utils.titles import SeriesParser, ParseWarning
 from flexget.utils import qualities
 from flexget.manager import Base, Session
@@ -8,6 +9,7 @@ from flexget.plugin import register_plugin, register_parser_option, get_plugin_b
 from sqlalchemy import Column, Integer, String, Unicode, DateTime, Boolean, desc
 from sqlalchemy.schema import ForeignKey
 from sqlalchemy.orm import relation, join
+
 
 log = logging.getLogger('series')
 
@@ -48,11 +50,11 @@ class Episode(Base):
             age += '%sd ' % age_days
         age += '%sh' % age_hours
         return age
-    
+
     @property
     def is_premiere(self):
         if self.season == 1 and self.number == 1:
-            return 'Series Premiere' 
+            return 'Series Premiere'
         elif self.number == 1:
             return 'Season Premiere'
         return False
@@ -78,6 +80,17 @@ class Release(Base):
     def __repr__(self):
         return '<Release(id=%s,quality=%s,downloaded=%s,proper=%s,title=%s)>' % \
             (self.id, self.quality, self.downloaded, self.proper, self.title)
+
+
+@event('manager.startup')
+def repair():
+    """Perform database repairing at startup. For some reason at least I have some releases in
+    database which don't belong to any episode."""
+    session = Session()
+    for release in session.query(Release).filter(Release.episode == None).all():
+        log.info('Purging orphan release %s from database' % release.title)
+        session.delete(release)
+    session.commit()
 
 
 class SeriesPlugin(object):

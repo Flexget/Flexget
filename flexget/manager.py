@@ -7,6 +7,7 @@ from copy import deepcopy
 from datetime import datetime
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
+from flexget.event import fire_event
 
 log = logging.getLogger('manager')
 
@@ -60,6 +61,8 @@ class Manager(object):
 
         import atexit
         atexit.register(self.shutdown)
+
+        fire_event('manager.startup')
 
     def initialize(self):
         """Separated from __init__ so that unit tests can modify options before loading config."""
