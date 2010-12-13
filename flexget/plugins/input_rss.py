@@ -9,7 +9,7 @@ import socket
 from flexget.feed import Entry
 from flexget.plugin import register_plugin, internet, PluginError
 from flexget.utils.log import log_once
-from flexget.plugins.cached_input import cached
+from flexget.utils.cached_input import cached
 from flexget.utils.tools import urlopener
 
 log = logging.getLogger('rss')

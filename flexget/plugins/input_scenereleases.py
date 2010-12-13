@@ -2,7 +2,7 @@ import logging
 from flexget.feed import Entry
 from flexget.plugin import *
 from flexget.utils.soup import get_soup
-from flexget.plugins.cached_input import cached
+from flexget.utils.cached_input import cached
 from BeautifulSoup import NavigableString
 from flexget.utils.tools import urlopener
 

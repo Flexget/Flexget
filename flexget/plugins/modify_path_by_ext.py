@@ -4,12 +4,13 @@ from flexget.plugin import *
 
 log = logging.getLogger('path_by_ext')
 
-class PluginPathByExt:
+
+class PluginPathByExt(object):
     """
         Allows specifying path based on content-type
-        
+
         Example:
-    
+
         path_by_ext:
           torrent: ~/watch/torrent/
           nzb: ~/watch/nzb/
@@ -26,8 +27,8 @@ class PluginPathByExt:
 
     def set_path(self, entry, path):
         log.debug('Setting %s path to %s' % (entry['title'], path))
-        entry['path'] = path    
-    
+        entry['path'] = path
+
     def ext(self, feed, callback):
         config = feed.config
         for entry in feed.entries:
@@ -45,7 +46,7 @@ class PluginPathByExt:
             else:
                 # try to find from url
                 for ext, path in config.iteritems():
-                    if entry['url'].endswith('.'+ext):
+                    if entry['url'].endswith('.' + ext):
                         callback(entry, path)
 
 register_plugin(PluginPathByExt, 'path_by_ext')

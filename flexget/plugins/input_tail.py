@@ -1,7 +1,7 @@
 import os
 from flexget.feed import Entry
 from flexget.plugin import register_plugin, register_parser_option, get_plugin_by_name, PluginDependencyError
-from flexget.plugins.cached_input import cached
+from flexget.utils.cached_input import cached
 import re
 import logging
 

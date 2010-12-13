@@ -15,7 +15,7 @@ class ChangeWarn(object):
 
         Contains ugly hacks, better to include all deprecation warnings here during 1.0 BETA phase
     """
-    
+
     def __init__(self):
         self.warned = False
 
@@ -54,7 +54,7 @@ class ChangeWarn(object):
 
         # database changes
         from flexget.utils.sqlalchemy_utils import table_columns, table_exists
-        
+
         session = Session()
 
         columns = table_columns('imdb_movies', session)
@@ -77,7 +77,7 @@ class ChangeWarn(object):
 
         if table_exists('episode_qualities', session):
             self.old_database(feed, 'old series format)')
-            
+
         columns = table_columns('thetvdb_favorites', session)
         if not 'series_id' in columns:
             self.old_database(feed, 'series_id missing from thetvdb_favorites table',
@@ -98,6 +98,10 @@ try:
     plugin_dir = os.path.normpath(sys.path[0] + '/../flexget/plugins/')
     for name in os.listdir(plugin_dir):
         require_clean = False
+
+        if name.startswith('module'):
+            require_clean = True
+
         if 'resolver' in name:
             require_clean = True
 
@@ -130,6 +134,10 @@ try:
             log.critical('IMPORTANT: Please remove all pre-compiled .pyc and .pyo files from')
             log.critical('           path: %s' % plugin_dir)
             log.critical('           After this FlexGet should run again normally')
+            log.critical('')
+            log.critical('           If you are using bootstrapped subversion checkout you can run:')
+            log.critical('           bin/paver clean_compiled')
+
             log.critical('-' * 79)
             found_deprecated = True
             break

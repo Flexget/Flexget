@@ -7,7 +7,7 @@ from input_rss import InputRSS
 from flexget.plugin import priority, register_plugin
 from flexget.utils.tools import urlopener
 from flexget.utils.soup import get_soup
-from flexget.plugins.cached_input import cached
+from flexget.utils.cached_input import cached
 
 
 log = logging.getLogger('apple_trailers')

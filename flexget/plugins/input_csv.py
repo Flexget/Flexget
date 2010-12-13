@@ -1,7 +1,7 @@
 import logging
 from flexget.feed import Entry
 from flexget.plugin import *
-from flexget.plugins.cached_input import cached
+from flexget.utils.cached_input import cached
 from flexget.utils.tools import urlopener
 
 log = logging.getLogger('csv')
@@ -31,7 +31,7 @@ class InputCSV(object):
         Fields title and url are mandatory. First field is 1.
         List of other common (optional) fields can be found from wiki.
     """
-    
+
     def validator(self):
         from flexget import validator
         config = validator.factory('dict')

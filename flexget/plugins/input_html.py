@@ -7,7 +7,7 @@ import zlib
 from flexget.feed import Entry
 from flexget.plugin import *
 from flexget.utils.soup import get_soup
-from flexget.plugins.cached_input import cached
+from flexget.utils.cached_input import cached
 from flexget.utils.tools import urlopener
 
 log = logging.getLogger('html')
@@ -41,7 +41,7 @@ class InputHtml(object):
         return root
 
     def get_config(self, feed):
-    
+
         def get_auth_from_url():
             """Moves basic authentication from url to username and password fields"""
             parts = list(urlparse.urlsplit(config['url']))
@@ -54,13 +54,13 @@ class InputHtml(object):
                     log.warning('Invalid basic authentication in url: %s' % config['url'])
                 parts[1] = split[1]
                 config['url'] = urlparse.urlunsplit(parts)
-    
+
         config = feed.config['html']
         if isinstance(config, basestring):
             config = {'url': config}
         get_auth_from_url()
         return config
-        
+
 
     @cached('html', 'url')
     @internet(log)
@@ -188,7 +188,7 @@ class InputHtml(object):
             # TODO: hack
             if title.lower().find('.torrent') > 0:
                 title = title[:title.lower().find('.torrent')]
-                
+
             if title_exists(title):
                 # title link should be unique, add CRC32 to end if it's not
                 hash = zlib.crc32(url.encode("utf-8"))

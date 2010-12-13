@@ -128,8 +128,6 @@ EVENT_METHODS = {
     'process_start': 'on_process_start',
     'process_end': 'on_process_end'}
 
-PREFIXES = FEED_EVENTS + ['module', 'plugin', 'source']
-
 plugins = {}
 plugins_loaded = False
 
@@ -177,8 +175,6 @@ def register_feed_event(plugin_class, name, before=None, after=None):
             return False
         # add method name to event -> method lookup table
         EVENT_METHODS[event_name] = 'on_feed_' + event_name
-        # queue plugin loading for this type
-        PREFIXES.append(name)
         # place event in event list
         if before is None:
             FEED_EVENTS.insert(FEED_EVENTS.index(after) + 1, event_name)
@@ -294,19 +290,24 @@ def load_plugins_from_dirs(dirs):
             load_plugins_from_dir(d)
 
 
-def load_plugins_from_dir(d):
+def load_plugins_from_dir(dir):
     # Get the list of valid python suffixes for plugins
     # this includes .py, .pyc, and .pyo (depending on if we are running -O)
     # but it doesn't include compiled modules (.so, .dll, etc)
     global _new_event_queue
-    import imp
-    valid_suffixes = [suffix for suffix, mod_type, flags in imp.get_suffixes()
-                              if flags in (imp.PY_SOURCE, imp.PY_COMPILED)]
+    #
+    # This causes quite a bit problems when renaming plugins and is there really need to import .pyc / pyo?
+    #
+    # import imp
+    # valid_suffixes = [suffix for suffix, mod_type, flags in imp.get_suffixes()
+    #                         if flags in (imp.PY_SOURCE, imp.PY_COMPILED)]
+    valid_suffixes = ['.py']
+
     plugin_names = set()
-    for f in os.listdir(d):
-        path = os.path.join(d, f)
+    for fn in os.listdir(dir):
+        path = os.path.join(dir, fn)
         if os.path.isfile(path):
-            f_base, ext = os.path.splitext(f)
+            f_base, ext = os.path.splitext(fn)
             if ext in valid_suffixes:
                 if f_base == '__init__':
                     continue # don't load __init__.py again
@@ -324,8 +325,8 @@ def load_plugins_from_dir(d):
 
     if _new_event_queue:
         for event, args in _new_event_queue.iteritems():
-            log.error(('Plugin %s requested new event %s, but it could not be created at requested '
-                       'point (before, after). Plugin is not working properly.') % (args[0], event))
+            log.error('Plugin %s requested new event %s, but it could not be created at requested '
+                      'point (before, after). Plugin is not working properly.' % (args[0], event))
 
 
 def load_plugins(parser):

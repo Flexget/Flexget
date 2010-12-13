@@ -1,6 +1,6 @@
 from flexget.feed import Entry
 from flexget.plugin import register_plugin, internet
-from flexget.plugins.cached_input import cached
+from flexget.utils.cached_input import cached
 import re
 import logging
 from flexget.utils.tools import urlopener
@@ -81,7 +81,7 @@ class InputText(object):
                         # start new entry
                         entry = Entry()
                         used = {}
-                        
+
                     # add field to entry
                     entry[field] = match.group(1)
                     used[field] = True

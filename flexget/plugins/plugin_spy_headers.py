@@ -1,7 +1,11 @@
-import logging, urllib2, httplib, socket
-from flexget.plugin import *
+import logging
+import urllib2
+import httplib
+import socket
+from flexget.plugin import register_plugin
 
 log = logging.getLogger('spy_headers')
+
 
 class CustomHTTPConnection(httplib.HTTPConnection):
 
@@ -12,6 +16,7 @@ class CustomHTTPConnection(httplib.HTTPConnection):
     def putheader(self, header, value):
         self.stored_headers.append((header, value))
         httplib.HTTPConnection.putheader(self, header, value)
+
 
 class HTTPCaptureHeaderHandler(urllib2.AbstractHTTPHandler):
 
@@ -64,12 +69,14 @@ class HTTPCaptureHeaderHandler(urllib2.AbstractHTTPHandler):
 
         return resp
 
-class PluginSpyHeaders:
+
+class PluginSpyHeaders(object):
     """
         Logs all headers sent in http requests. Useful for resolving issues.
-        
+
         WARNING: At the moment this modifies requests somehow!
     """
+
     def validator(self):
         from flexget import validator
         return validator.factory('any')
@@ -82,14 +89,14 @@ class PluginSpyHeaders:
             log.debug('Creating new opener and installing it')
             opener = urllib2.build_opener(HTTPCaptureHeaderHandler())
             urllib2.install_opener(opener)
-        
+
     def on_feed_exit(self, feed):
         """Feed exiting, remove additions"""
         if urllib2._opener:
             log.debug('Removing urllib2 default opener')
             # TODO: this uninstalls all other handlers as well, but does it matter?
             urllib2.install_opener(None)
-    
+
     # remove also on abort
     on_feed_abort = on_feed_exit
 
