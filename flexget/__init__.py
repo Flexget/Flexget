@@ -2,7 +2,6 @@
 
 from flexget import logger
 from flexget.options import CoreOptionParser, UIOptionParser, StoreErrorOptionParser
-from flexget.manager import Manager, UIManager
 from flexget import plugin
 import os
 import sys
@@ -29,14 +28,16 @@ def main(webui=False):
         options._update(UIOptionParser().parse_args()[0].__dict__, 'loose')
     else:
         options = parser.parse_args()[0]
-
-    ManagerClass = UIManager if webui else Manager
+    if webui:
+        from flexget.ui.uimanager import UIManager as Manager
+    else:
+        from flexget.manager import Manager
     try:
-        manager = ManagerClass(options)
+        manager = Manager(options)
         manager.parser = StoreErrorOptionParser(parser)
     except IOError, e:
         # failed to load config
-        log.critical(e.message)
+        log.exception(e.message)
         logger.flush()
         sys.exit(1)
 
@@ -48,8 +49,8 @@ def main(webui=False):
     if options.doc:
         plugin.print_doc(options.doc)
     elif webui:
-        import flexget.webui
-        flexget.webui.start(manager)
+        import flexget.ui.webui
+        flexget.ui.webui.start(manager)
     else:
         manager.execute()
 

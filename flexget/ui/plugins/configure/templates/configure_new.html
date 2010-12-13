@@ -1,0 +1,15 @@
+{% extends "configure/configure.html" %}
+{% block configure %}
+    <form action="" method="post" class="simple">
+        <fieldset>
+            <legend>Create New {{ config_type|capitalize }}</legend>
+            <div>
+                <label for="name">Name</label>
+                <input type="text" id="name" name="name" value="new {{ config_type }}">
+            </div>
+            <div class="buttons">
+                <button type="submit">Create {{ config_type|capitalize }}</button>
+            </div>
+        </fieldset>
+    </form>
+{% endblock %}

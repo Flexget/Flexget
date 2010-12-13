@@ -1,0 +1,71 @@
+{% extends "layout.html" %}
+
+{% block head %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/series.css') }}" type="text/css" media="screen"/>
+{% endblock %}
+
+{% block menu %}
+
+    {% if report %}
+        <ul id="cat">
+            {% for series in report %}
+                {% if series.episodes %}
+                <li>
+                    <div class="item{% if series.name == name %} selected{% endif %}">
+                        <a href="{{ url_for('episodes', name=series.name) }}">{{ series.name|title }}</a>
+                    </div>
+                </li>
+                {% endif %}
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No series catalogued.</p>
+    {% endif %}
+
+{% endblock %}
+
+{% block main %}
+
+    {% if name %}
+        <h1>{{ name|title }}</h1>
+        {% for episode in episodes %}
+        <a href="{{ url_for('forget_episode', rel_id=episode.releases.0.id) }}" style="float:right;color:#999">Forget</a>
+        <h4>{{ episode.identifier }}{% if episode.is_premiere %} - {{ episode.is_premiere }}{% endif %}</h4>
+        <ul class="releases">
+            {% for release in episode.releases %}
+            <li class="{% if release.downloaded %}downloaded{% endif %}">
+                {{ release.title }}<br />
+                <span>First seen {{ release.episode.first_seen|pretty_age }}</span>
+            </li>
+            {% endfor %}
+        </ul>
+        {% endfor %}
+        
+    {% else %}
+        <h1>Latest 10 Releases</h1>
+        <ul class="releases">
+            {% for release in releases %}
+                <li class="{% if release.downloaded %}downloaded{% endif %}">
+                    <a href="{{ url_for('forget_episode', rel_id=release.id) }}" 
+                        style="float:right;color:#999">Forget</a>
+                    <a href="{{ url_for('episodes',name=release.episode.series.name) }}">
+                        {{ release.title }}</a>
+                    {% if release.episode.is_premiere %} - 
+                        {{ release.episode.is_premiere }}
+                    {% endif %}<br />
+                    <span>
+                    {% if release.previous %}
+                        <img src="{{ url_for('.static', filename='img/tick.png') }}" />
+                        Succesfully downloaded "{{ release.previous.title }}" 
+                        {{ release.episode.first_seen|pretty_age }}
+                    {% else %}
+                        Downloaded {{ release.episode.first_seen|pretty_age }}
+                    {% endif %}
+                    </span>
+                </li>
+            {% endfor %}
+        </ul>
+        <br />
+        <a href="/log" style="color: #333;text-decoration: underline">View more in the logs</a>
+    {% endif %}
+{% endblock %}
