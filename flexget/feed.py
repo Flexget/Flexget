@@ -448,6 +448,10 @@ class Feed(object):
     def validate_config(config):
         """Plugin configuration validation. Return list of error messages that were detected."""
         validate_errors = []
+        # validate config is a dictionary
+        if not isinstance(config, dict):
+            validate_errors.append('Config is not a dictionary.')
+            return validate_errors
         # validate all plugins
         for keyword in config:
             if keyword.startswith('_'):

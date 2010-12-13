@@ -1,0 +1,8 @@
+{% extends "configure.html" %}
+{% block configure %}
+    <form action="" method="post">
+        Input name for new {{ config_type }}:
+        <input name="name" value="new {{ config_type }}">
+        <input type="submit">
+    </form>
+{% endblock %}

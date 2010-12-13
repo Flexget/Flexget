@@ -14,7 +14,7 @@ Base = declarative_base()
 Session = sessionmaker()
 
 
-class FGDumper(yaml.Dumper):
+class FGDumper(yaml.SafeDumper):
 
     def increase_indent(self, flow=False, indentless=False):
         return super(FGDumper, self).increase_indent(flow, False)
@@ -148,6 +148,7 @@ class Manager(object):
         """Dumps current config to yaml config file"""
         config_file = file(os.path.join(self.config_base, self.config_name) + '.yml', 'w')
         try:
+            yaml.safe_dump
             config_file.write(yaml.dump(self.config, Dumper=FGDumper, default_flow_style=False))
         finally:
             config_file.close()

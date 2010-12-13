@@ -22,17 +22,19 @@ def new_text(root):
         return redirect(url_for('index'))
     config_type = root.rstrip('s')
     context = {'root': root,
-               'config': ''}
+               'config_type': config_type}
     if request.method == 'POST':
+        context['config'] = request.form.get('config')
         name = request.form.get('name')
         if not name:
-            flash('Enter a name for this %s' % config_type, 'error')
-            context['config'] = request.form.get('config')
+            flash('You must enter a name for this %s' % config_type, 'error')
+        elif name in manager.config[root]:
+            flash('%s with name %s already exists' % (config_type.capitalize(), name), 'error')
         else:
-            # forward to edit_text
-            pass
+            manager.config[root][name] = {}
+            return redirect(url_for('edit_text', root=root, name=name))
 
-    return render_template('configure_text.html', **context)
+    return render_template('configure_new.html', **context)
 
 
 @configure.route('/delete/<root>/<name>')
@@ -48,9 +50,11 @@ def delete(root, name):
 @configure.route('/edit/text/<root>/<name>', methods=['POST', 'GET'])
 def edit_text(root, name):
     from flexget.manager import FGDumper
+    config_type = root.rstrip('s')
     context = {
         'name': name,
-        'root': root}
+        'root': root,
+        'config_type': config_type}
 
     if request.method == 'POST':
         context['config'] = request.form['config']
@@ -60,7 +64,7 @@ def edit_text(root, name):
             flash('Invalid YAML document: %s' % e, 'error')
             log.exception(e)
         else:
-            # valid yaml, not run validator
+            # valid yaml, now run validator
             errors = Feed.validate_config(config)
             if errors:
                 for error in errors:
@@ -69,11 +73,26 @@ def edit_text(root, name):
             else:
                 manager.config[root][name] = config
                 manager.save_config()
-                flash('Configuration saved', 'info')
                 context['config'] = yaml.dump(config, Dumper=FGDumper, default_flow_style=False)
+                if request.form.get('name') != name:
+                    # Renaming
+                    new_name = request.form.get('name')
+                    if new_name in manager.config[root]:
+                        flash('%s with name %s already exists' % (config_type.capitalize(), new_name), 'error')
+                    else:
+                        # Do the rename
+                        manager.config[root][new_name] = manager.config[root][name]
+                        del manager.config[root][name]
+                        flash('%s %s renamed to %s.' % (config_type.capitalize(), name, new_name), 'success')
+                        return redirect(url_for('edit_text', root=root, name=new_name))
+                else:
+                    flash('Configuration saved', 'success')
     else:
         config = manager.config[root][name]
-        context['config'] = yaml.dump(config, Dumper=FGDumper, default_flow_style=False)
+        if config:
+            context['config'] = yaml.dump(config, Dumper=FGDumper, default_flow_style=False)
+        else:
+            context['config'] = ''
 
     return render_template('configure_text.html', **context)
 
