@@ -21,7 +21,7 @@ class Series(Base):
     episodes = relation('Episode', backref='series', cascade='all, delete, delete-orphan')
 
     def __repr__(self):
-        return '<Series(name=%s)>' % self.name
+        return '<Series(id=%s,name=%s)>' % (self.id, self.name)
 
 
 class Episode(Base):
@@ -52,7 +52,7 @@ class Episode(Base):
     @property
     def is_premiere(self):
         if self.season == 1 and self.number == 1:
-            return 'Series Premiere'
+            return 'Series Premiere' 
         elif self.number == 1:
             return 'Season Premiere'
         return False
@@ -61,7 +61,7 @@ class Episode(Base):
         self.first_seen = datetime.now()
 
     def __repr__(self):
-        return '<Episode(identifier=%s)>' % (self.identifier)
+        return '<Episode(id=%s,identifier=%s)>' % (self.id, self.identifier)
 
 
 class Release(Base):
@@ -76,8 +76,8 @@ class Release(Base):
     title = Column(Unicode)
 
     def __repr__(self):
-        return '<Release(quality=%s,downloaded=%s,proper=%s,title=%s)>' % \
-            (self.quality, self.downloaded, self.proper, self.title)
+        return '<Release(id=%s,quality=%s,downloaded=%s,proper=%s,title=%s)>' % \
+            (self.id, self.quality, self.downloaded, self.proper, self.title)
 
 
 class SeriesPlugin(object):

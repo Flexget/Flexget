@@ -118,31 +118,38 @@ h2 {
 }
 
 #flash ul li { /* fallback when without category */
-    margin-left: 1.2em;
+    margin-left: 0.6em;
+    margin-bottom: 0.2em;
 }
 
-#flash ul li.error {
+#flash ul li:last-child {
+    margin-bottom: 0;
+}
+
+#flash ul li.info,
+#flash ul li.error,
+#flash ul li.success,
+#flash ul li.delete
+{
     padding-left: 1.8em;
-    background: url('/static/img/fatcow-icons/16x16/exclamation.png') no-repeat;
+    margin-left: 0; /* remove fallback margin */
     list-style: none;
 }
 
 #flash ul li.info {
-    padding-left: 1.8em;
     background: url('/static/img/fatcow-icons/16x16/information.png') no-repeat;
-    list-style: none;
+}
+
+#flash ul li.error {
+    background: url('/static/img/fatcow-icons/16x16/exclamation.png') no-repeat;
 }
 
 #flash ul li.success {
-    padding-left: 1.8em;
     background: url('/static/img/fatcow-icons/16x16/accept.png') no-repeat;
-    list-style: none;
 }
 
 #flash ul li.delete {
-    padding-left: 1.8em;
     background: url('/static/img/fatcow-icons/16x16/delete.png') no-repeat;
-    list-style: none;
 }
 
 /* help box */

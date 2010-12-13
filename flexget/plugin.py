@@ -1,10 +1,9 @@
 from flexget import plugins as _plugins_mod
-from flexget.event import Event
 import os
 import sys
 import logging
 import time
-from event import add_event_handler, remove_event_handler
+from event import add_event_handler
 
 log = logging.getLogger('plugin')
 
