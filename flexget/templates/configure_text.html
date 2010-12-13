@@ -5,7 +5,7 @@
             $('#name_input').hide();
         });
         function edit_name(){
-            $('#name_label').replaceWith($('#edit_input'));
+            $('#name_label').replaceWith($('#name_input'));
             $('#name_input').show();
         }
     </script>
@@ -14,7 +14,7 @@
         <h2 id="name_label">{{ name }}
         <img onclick="edit_name()" src="{{ url_for('.static', filename='img/fatcow-icons/16x16/script_edit.png') }}"
              alt="Edit Name"></h2>
-        <input id="name_input" type="text" name="name" value="{{ name }}" style="font-size: 18px;">
+        <h2 id="name_input"><input type="text" name="name" value="{{ name }}" style="font-size: 18px;"></h2>
         <p>Fully UI-based editing will be implemented later</p>
 
         <textarea name="config" cols=80 rows=25 spellcheck="false" wrap="off">{{ config }}</textarea>
