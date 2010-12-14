@@ -1,12 +1,11 @@
 from itertools import groupby
 
-from flask import redirect, render_template, render_template_string, Module, request, flash, url_for
+from flask import redirect, render_template, Module, request, flash, url_for
 from sqlalchemy.sql.expression import desc, asc
 
 from flexget.plugin import PluginDependencyError
-from flexget.ui.webui import register_plugin, db_session, app, manager
+from flexget.ui.webui import register_plugin, db_session, app
 
-import datetime
 import time
 import logging
 
@@ -26,8 +25,8 @@ log = logging.getLogger('ui.series')
 #       also flexget/plugins/ui/utils.py needs to be removed
 #       ... mainly because we have flexget/utils for that :)
 #
-# Josh  Changing the package layout to use 'flexget.ui.utils' instead   
-# says  seems to illeviated the need to do this no? I don't think this 
+# Josh  Changing the package layout to use 'flexget.ui.utils' instead
+# says  seems to illeviated the need to do this no? I don't think this
 #       will be of use for anything but UI related functions.
 
 

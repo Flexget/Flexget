@@ -1,4 +1,4 @@
-from flexget.ui.webui import manager, register_plugin
+from flexget.ui.webui import manager, register_plugin, app
 from flexget.feed import Feed
 from flask import render_template, request, flash, redirect, Module
 import yaml
@@ -93,7 +93,31 @@ def edit_text(root, name):
             context['config'] = yaml.dump(config, Dumper=FGDumper, default_flow_style=False)
         else:
             context['config'] = ''
-
+    context['related'] = get_related(root, name)
     return render_template('configure/configure_text.html', **context)
+
+
+@app.template_filter('other_type')
+def other_type(root):
+    if root == 'feeds':
+        return 'presets'
+    return 'feeds'
+
+
+def get_related(root, name):
+    """Returns a list of related feeds/presets for a given preset/feed"""
+    if root == 'feeds':
+        presets = manager.config[root][name].get('preset', [])
+        if isinstance(presets, basestring):
+            presets = [presets]
+        return presets
+    elif root == 'presets':
+        feeds = []
+        for feed, config in manager.config['feeds'].iteritems():
+            if config.get('preset'):
+                if name == config['preset'] or name in config['preset']:
+                    feeds.append(feed)
+        return feeds
+
 
 register_plugin(configure, menu='Configure', order=10)
