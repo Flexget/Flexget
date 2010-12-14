@@ -21,7 +21,7 @@ def index():
             flash(escape(manager.parser.error_msg), 'error')
             context['options'] = request.form['options']
         else:
-            from flexget.ui import executor
+            from flexget.ui.webui import executor
             executor.execute(options=options, output=bufferqueue)
             context['execute_progress'] = True
             context['progress'] = progress(as_list=True)

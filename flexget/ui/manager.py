@@ -3,10 +3,16 @@ import logging
 import yaml
 from copy import deepcopy
 from flexget.manager import Manager
+from flexget.ui.options import StoreErrorOptionParser
 
 log = logging.getLogger('ui.manager')
 
+
 class UIManager(Manager):
+
+    def __init__(self, options, coreparser):
+        Manager.__init__(self, options)
+        self.parser = StoreErrorOptionParser(coreparser)
 
     def find_config(self):
         """If no config file is found by the webui, a blank one is created."""
@@ -59,3 +65,9 @@ class UIManager(Manager):
         # Delete any feed instances that are no longer in the config
         for name in [n for n in self.feeds if n not in self.config['feeds']]:
             del self.feeds[name]
+
+    def check_lock(self):
+        if self.options.autoreload:
+            log.info('autoreload enabled, not checking for lock file')
+            return False
+        return Manager.check_lock(self)

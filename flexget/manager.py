@@ -3,7 +3,7 @@ import sys
 import logging
 import sqlalchemy
 import yaml
-from copy import deepcopy
+import atexit
 from datetime import datetime
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
@@ -59,7 +59,6 @@ class Manager(object):
         log.debug('sys.defaultencoding: %s' % sys.getdefaultencoding())
         log.debug('sys.getfilesystemencoding: %s' % sys.getfilesystemencoding())
 
-        import atexit
         atexit.register(self.shutdown)
 
         fire_event('manager.startup')
@@ -144,6 +143,7 @@ class Manager(object):
         # config loaded successfully
         self.config_name = os.path.splitext(os.path.basename(config))[0]
         self.config_base = os.path.normpath(os.path.dirname(config))
+        self.lockfile = os.path.join(self.config_base, '.%s-lock' % self.config_name)
         log.debug('config_name: %s' % self.config_name)
         log.debug('config_base: %s' % self.config_base)
 
@@ -300,31 +300,35 @@ class Manager(object):
                 print >> sys.stderr, '%s - make sure you have write permissions to directory %s' % (e.message, self.config_base)
             raise Exception(e.message)
 
-    def acquire_lock(self):
-        if self.options.log_start:
-            log.info('FlexGet started (PID: %s)' % os.getpid())
-
-        self.lockfile = os.path.join(self.config_base, '.%s-lock' % self.config_name)
+    def check_lock(self):
+        """Checks if there is already a lock, returns True if there is."""
         if os.path.exists(self.lockfile):
             # check the lock age
             lock_time = datetime.fromtimestamp(os.path.getmtime(self.lockfile))
             if (datetime.now() - lock_time).seconds > 36000:
                 log.warning('Lock file over 10 hour in age, ignoring it ...')
             else:
-                if self.options.autoreload:
-                    log.info('autoreload enabled, ignoring existing lock file')
-                    return
-                if not self.options.quiet:
-                    f = file(self.lockfile)
-                    pid = f.read()
-                    f.close()
-                    print >> sys.stderr, 'Another process (%s) is running, will exit.' % pid.strip()
-                    print >> sys.stderr, 'If you\'re sure there is no other instance running, delete %s' % self.lockfile
-                sys.exit(1)
+                return True
+        return False
+
+    def acquire_lock(self):
+        if self.options.log_start:
+            log.info('FlexGet started (PID: %s)' % os.getpid())
+
+        # Exit if there is an existing lock.
+        if self.check_lock():
+            if not self.options.quiet:
+                f = file(self.lockfile)
+                pid = f.read()
+                f.close()
+                print >> sys.stderr, 'Another process (%s) is running, will exit.' % pid.strip()
+                print >> sys.stderr, 'If you\'re sure there is no other instance running, delete %s' % self.lockfile
+            sys.exit(1)
 
         f = file(self.lockfile, 'w')
         f.write('PID: %s\n' % os.getpid())
         f.close()
+        atexit.register(self.release_lock)
 
     def release_lock(self):
         if self.options.log_start:
@@ -442,8 +446,3 @@ class Manager(object):
                 raise Exception('trying to delete non test database?')
             os.remove(self.db_filename)
             log.info('Removed test database')
-
-        self.release_lock()
-
-
-

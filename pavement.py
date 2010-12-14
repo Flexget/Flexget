@@ -28,7 +28,7 @@ setup(
         [console_scripts]
         flexget = flexget:main
         [gui_scripts]
-        flexget-webui = flexget:webui_main
+        flexget-webui = flexget.ui:main
     """
 )
 

@@ -21,7 +21,7 @@ log = logging.getLogger('ui.movies')
 
 @app.template_filter('pretty_age')
 def pretty_age_filter(value):
-    from utils import pretty_date
+    from flexget.ui.utils import pretty_date
     return pretty_date(time.mktime(value.timetuple()))
 
 
