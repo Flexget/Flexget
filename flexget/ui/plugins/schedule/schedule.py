@@ -128,7 +128,7 @@ def index():
 def execute():
     log.info('Executing feeds')
     fire_event('scheduler.execute')
-    from flexget.ui import executor
+    from flexget.ui.webui import executor
     executor.execute()
 
 
