@@ -25,6 +25,10 @@ log = logging.getLogger('ui.series')
 # TODO: refactor this filter to some globally usable place (webui.py?)
 #       also flexget/plugins/ui/utils.py needs to be removed
 #       ... mainly because we have flexget/utils for that :)
+#
+# Josh  Changing the package layout to use 'flexget.ui.utils' instead   
+# says  seems to illeviated the need to do this no? I don't think this 
+#       will be of use for anything but UI related functions.
 
 
 @app.template_filter('pretty_age')
