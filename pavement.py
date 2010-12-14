@@ -80,7 +80,13 @@ def test(options):
         args.extend(['--attr=!online'])
     args.append('--where=tests')
 
-    return nose.run(argv=args, config=cfg)
+    # Store current path since --where changes it, restore when leaving
+    import os
+    cwd = os.getcwd()
+    try:
+        return nose.run(argv=args, config=cfg)
+    finally:
+        os.chdir(cwd)
 
 
 @task
