@@ -83,7 +83,7 @@ class Release(Base):
 
 
 @event('manager.startup')
-def repair():
+def repair(manager):
     """Perform database repairing at startup. For some reason at least I have some releases in
     database which don't belong to any episode."""
     session = Session()

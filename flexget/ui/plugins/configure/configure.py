@@ -97,6 +97,12 @@ def edit_text(root, name):
     return render_template('configure/configure_text.html', **context)
 
 
+@configure.route('/edit/<root>/<name>', methods=['POST', 'GET'])
+def edit(root, name):
+    context = {'name': name}
+    return render_template('configure/edit.html', **context)
+
+
 @app.template_filter('other_type')
 def other_type(root):
     if root == 'feeds':

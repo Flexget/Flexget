@@ -18,6 +18,7 @@ class ChangeWarn(object):
 
     def __init__(self):
         self.warned = False
+        self.executed = False
 
     def old_database(self, feed, reason='', solution=''):
         if not self.warned:
@@ -31,6 +32,11 @@ class ChangeWarn(object):
             log.critical('Please run : %s' % solution)
 
     def on_process_start(self, feed):
+        # Run only once
+        if self.executed:
+            return
+            
+        self.executed = True
         found_deprecated = False
         config = feed.manager.config
 

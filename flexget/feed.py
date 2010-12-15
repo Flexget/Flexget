@@ -1,10 +1,10 @@
-import time
 import hashlib
 import logging
 from flexget.manager import Session
 from flexget.plugin import get_methods_by_event, get_plugins_by_event, get_plugin_by_name, \
     FEED_EVENTS, PluginWarning, PluginError, PluginDependencyError
 from flexget.utils.simple_persistence import SimplePersistence
+from flexget.event import fire_event
 
 log = logging.getLogger('feed')
 
@@ -117,11 +117,28 @@ def useFeedLogging(func):
 class Feed(object):
 
     def __init__(self, manager, name, config):
-        """
-            Represents one feed in configuration.
+        """Represents one feed in configuration.
 
-            :name: name of the feed
-            :config: feed configuration (dict)
+        :name: name of the feed
+        :config: feed configuration (dict)
+
+        Fires events:
+
+        feed.execute.before_plugin:
+          Before a plugin is about to be executed. Note that since this will also include all
+          builtin plugins the amount of calls can be quite high
+
+          parameters: feed, keyword
+
+        feed.execute.after_plugin:
+          After a plugin has been executed.
+
+          parameters: feed, keyword
+
+        feed.execute.completed:
+          After feed execution has been completed
+
+          parameters: feed
         """
         self.name = unicode(name)
         self.config = config
@@ -157,8 +174,6 @@ class Feed(object):
         # current state
         self.current_event = None
         self.current_plugin = None
-
-        self.performance = {}
 
     def __cmp__(self, other):
         return cmp(self.priority, other.priority)
@@ -316,12 +331,12 @@ class Feed(object):
         for method in methods:
             keyword = method.plugin.name
             if keyword in self.config or method.plugin.builtin:
-                # performance
-                start_time = time.time()
+
                 if event not in entry_events:
                     # store execute info, except during entry events
                     self.current_event = event
                     self.current_plugin = keyword
+
                 # log.log(5, 'Running %s method %s' % (keyword, method))
                 # call the plugin
                 try:
@@ -329,7 +344,11 @@ class Feed(object):
                         # Add extra parameters for the on_entry_* events
                         method(self, entry, reason)
                     else:
-                        method(self)
+                        fire_event('feed.execute.before_plugin', self, keyword)
+                        try:
+                            method(self)
+                        finally:
+                            fire_event('feed.execute.after_plugin', self, keyword)
                 except PluginWarning, warn:
                     # check if this warning should be logged only once (may keep repeating)
                     if warn.kwargs.get('log_once', False):
@@ -354,9 +373,6 @@ class Feed(object):
                     # don't handle plugin errors gracefully with unit test
                     if self.manager.unit_test:
                         raise
-                # store performance information
-                took = time.time() - start_time
-                self.performance[keyword] = self.performance.get(keyword, 0) + took
 
                 if event not in entry_events:
                     # purge entries between plugins
@@ -409,17 +425,11 @@ class Feed(object):
 
             log.debug('committing session, abort=%s' % self._abort)
             self.session.commit()
+            fire_event('feed.execute.completed', self)
         except:
             log.debug('db rollback on exception')
             self.session.close()
             raise
-
-        # display performance
-        if self.manager.options.debug_perf:
-            for key, value in self.performance.iteritems():
-                if value < 0.01:
-                    continue
-                log.info('%-20s took %-5s sec' % (key, value))
 
     def process_start(self):
         """Execute process_start event"""

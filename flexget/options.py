@@ -16,8 +16,6 @@ class OptionParser(OptParser):
                         help=SUPPRESS_HELP)
         self.add_option('--debug-all', action='callback', callback=self._debug_callback, dest='debug_all',
                         help=SUPPRESS_HELP)
-        self.add_option('--debug-perf', action='store_true', dest='debug_perf', default=False,
-                        help=SUPPRESS_HELP)
         self.add_option('--loglevel', action='store', type='choice', default='info', dest='loglevel',
                         choices=['none', 'critical', 'error', 'warning', 'info', 'debug', 'debugall'],
                         help=SUPPRESS_HELP)

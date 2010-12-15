@@ -37,6 +37,18 @@ def useExecLogging(func):
 
 
 class Manager(object):
+
+    """Manager class for FlexGet
+
+    Fires events:
+
+    manager.startup
+      After manager has been initialized. This is when application becomes ready to use
+
+    manager.execute.completed
+      After manager has executed all Feeds
+    """
+
     unit_test = False
     options = None
 
@@ -61,7 +73,7 @@ class Manager(object):
 
         atexit.register(self.shutdown)
 
-        fire_event('manager.startup')
+        fire_event('manager.startup', self)
 
     def initialize(self):
         """Separated from __init__ so that unit tests can modify options before loading config."""
@@ -157,9 +169,7 @@ class Manager(object):
             config_file.close()
 
     def pre_check_config(self, fn):
-        """
-            Checks configuration file for common mistakes that are easily detectable
-        """
+        """Checks configuration file for common mistakes that are easily detectable"""
 
         def get_indentation(line):
             i, n = 0, len(line)
@@ -280,7 +290,7 @@ class Manager(object):
         log.debug('connecting to: %s' % connection)
         try:
             self.engine = sqlalchemy.create_engine(connection, echo=self.options.debug_sql)
-        except ImportError, e:
+        except ImportError:
             print >> sys.stderr, ('FATAL: Unable to use SQLite. Are you running Python 2.5.x or 2.6.x ?\n'
             'Python should normally have SQLite support built in.\n'
             'If you\'re running correct version of Python then it is not equipped with SQLite.\n'
@@ -434,6 +444,8 @@ class Manager(object):
                 feed.process_end()
             except Exception, e:
                 log.exception('Feed %s process_end: %s' % (name, e))
+
+        fire_event('manager.execute.completed', self)
 
     def shutdown(self):
         """Application is being exited"""

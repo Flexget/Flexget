@@ -281,9 +281,7 @@ class FilterSeen(object):
                     break
             else:
                 continue
-        if feed.manager.options.debug_perf:
-            log.info('Executed %s queries' % queries)
-
+                
     def on_feed_exit(self, feed):
         """Remember succeeded entries"""
         if not feed.config.get('seen', True):

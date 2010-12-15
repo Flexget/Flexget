@@ -37,7 +37,7 @@ def pretty_age_filter(value):
 
 @series_module.route('/')
 def index():
-    releases = db_session.query(Release).order_by(desc(Release.id)).all()
+    releases = db_session.query(Release).order_by(desc(Release.id)).limit(10).all()
     for release in releases:
         if release.downloaded == False and len(release.episode.releases) > 1:
             for prev_rel in release.episode.releases:

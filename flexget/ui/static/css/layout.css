@@ -162,6 +162,18 @@ div.help p:last-child {
     margin-bottom: 0;
 }
 
+/* jQuery tools */
+
+.tooltip {
+    display:none;
+    background:transparent url(/static/img/tooltip/black_arrow.png);
+    font-size:12px;
+    height:70px;
+    width:160px;
+    padding:25px;
+    color:#fff; 
+}
+
 
 /* search results */
 
@@ -184,3 +196,4 @@ table.search-results td {
     padding: 3px;
     background-color: rgb(204, 204, 204);
 }
+
