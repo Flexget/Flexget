@@ -70,8 +70,8 @@ def remove_event_handler(name, func):
 def fire_event(name, *args, **kwargs):
     """Trigger an event"""
     if not name in _events:
-        log.debug('nothing registered for event %s' % name)
+        log.log(5, 'nothing registered for event %s' % name)
         return
     for event in get_events(name):
-        log.debug('calling %s' % event)
+        log.log(5, 'calling %s' % event)
         event(*args, **kwargs)
