@@ -169,10 +169,12 @@ class SeriesParser(TitleParser):
                     name_start, name_end = match.span(1)
                 else:
                     name_start, name_end = match.span()
+
+                log.debug('NAME SUCCESS: %s matched to %s' % (name_re, self.data))
                 break
         else:
             # leave this invalid
-            log.debug('FAIL: name regexps do not match')
+            log.debug('FAIL: name regexps %s do not match %s' % (self.name_regexps, self.data))
             return
 
 

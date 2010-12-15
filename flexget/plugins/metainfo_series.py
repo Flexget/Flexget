@@ -45,7 +45,7 @@ class MetainfoSeries(object):
         return False
 
     def guess_series(self, title):
-        """Returns a valid series parser if this etnry appears to be a series"""
+        """Returns a valid series parser if this :title: appears to be a series"""
 
         parser = SeriesParser()
         # We need to replace certain characters with spaces to make sure episode parsing works right
