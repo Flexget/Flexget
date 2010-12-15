@@ -91,7 +91,7 @@ class FilterContentFilter(object):
             # download plugin has already printed a downloading message.
             if config.get('require'):
                 if not matching_mask(files, config['require']):
-                    log_once('Entry %s does not have any of the required filetypes, rejecting', log)
+                    log_once('Entry %s does not have any of the required filetypes, rejecting' % entry['title'], log)
                     feed.reject(entry, 'does not have any of the required filetypes')
             if config.get('reject'):
                 mask = matching_mask(files, config['reject'])
