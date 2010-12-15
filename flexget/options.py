@@ -23,6 +23,8 @@ class OptionParser(OptParser):
                         help=SUPPRESS_HELP)
         self.add_option('-c', action='store', dest='config', default='config.yml',
                         help='Specify configuration file. Default is config.yml')
+        self.add_option('--experimental', action='store_true', dest='experimental', default=False,
+                        help=SUPPRESS_HELP)
 
     def _debug_callback(self, option, opt, value, parser):
         setattr(parser.values, option.dest, 1)
@@ -58,8 +60,6 @@ class CoreOptionParser(OptionParser):
         self.add_option('--cron', action='store_true', dest='quiet', default=False,
                         help='Disables stdout and stderr output, log file used. Reduces logging level slightly.')
 
-        self.add_option('--experimental', action='store_true', dest='experimental', default=False,
-                        help=SUPPRESS_HELP)
         self.add_option('--validate', action='store_true', dest='validate', default=False,
                         help=SUPPRESS_HELP)
 

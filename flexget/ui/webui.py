@@ -232,6 +232,8 @@ def start(mg):
 
     set_exit_handler(stop_server)
 
+    log.info('Starting server on port %s' % manager.options.port)
+
     if manager.options.autoreload:
         # Create and destroy a socket so that any exceptions are raised before
         # we spawn a separate Python interpreter and lose this ability.

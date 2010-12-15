@@ -2,7 +2,7 @@ import time
 import logging
 from flask import render_template, Module
 from flexget.plugin import PluginDependencyError
-from flexget.ui.webui import register_plugin, db_session, app
+from flexget.ui.webui import register_plugin, db_session, app, manager
 
 try:
     from flexget.plugins.filter_imdb_queue import ImdbQueue
@@ -48,4 +48,5 @@ def index():
     return render_template('movies/movies.html', **context)
 
 
-register_plugin(movies_module, menu='Movies')
+if manager.options.experimental:
+    register_plugin(movies_module, menu='Movies')

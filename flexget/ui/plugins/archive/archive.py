@@ -1,5 +1,5 @@
 import logging
-from flexget.ui.webui import register_plugin, db_session
+from flexget.ui.webui import register_plugin, db_session, manager
 from flask import request, render_template, flash, Module
 from flexget.plugin import PluginDependencyError
 
@@ -29,5 +29,5 @@ def count():
 def inject():
     raise Exception('Not implemented')
 
-
-register_plugin(archive, menu='Archive')
+if manager.options.experimental:
+    register_plugin(archive, menu='Archive')
