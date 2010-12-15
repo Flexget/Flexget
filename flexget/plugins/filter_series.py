@@ -127,18 +127,11 @@ class SeriesPlugin(object):
         Returns 'ep' or 'id' if 3 of the first 5 were parsed as such. Returns 'ep' in the event of a tie.
         Returns 'auto' if there is not enough history to determine the format yet
         """
-        releases = session.query(Release).join(Episode).join(Series).filter(Series.name == name.lower())
-        total = releases.count()
-        if total == 0:
-            log.debug('series %s auto ep/id check: aborted, unknown series' % name)
-            return 'auto'
-        elif total < 3:
-            log.debug('series %s auto ep/id check: aborted, not enough history' % name)
-            return 'auto'
-        episodic = 0
-        for release in releases:
-            if release.episode.season and release.episode.number:
-                episodic += 1
+        total = session.query(Release).join(Episode).join(Series).filter(Series.name == name.lower()).count()
+        episodic = session.query(Release).join(Episode).join(Series).\
+            filter(Series.name == name.lower()).\
+            filter(Episode.season != None).\
+            filter(Episode.number != None).count()
         non_episodic = total - episodic
         log.debug('series %s auto ep/id check: %s/%s' % (name, episodic, non_episodic))
         # Best of 5, episodic wins in a tie

@@ -34,7 +34,7 @@ def new_text(root):
             manager.config[root][name] = {}
             return redirect(url_for('edit_text', root=root, name=name))
 
-    return render_template('configure/configure_new.html', **context)
+    return render_template('configure/new.html', **context)
 
 
 @configure.route('/delete/<root>/<name>')
@@ -94,7 +94,7 @@ def edit_text(root, name):
         else:
             context['config'] = ''
     context['related'] = get_related(root, name)
-    return render_template('configure/configure_text.html', **context)
+    return render_template('configure/edit_text.html', **context)
 
 
 @configure.route('/edit/<root>/<name>', methods=['POST', 'GET'])

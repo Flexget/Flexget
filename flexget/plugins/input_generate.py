@@ -5,7 +5,8 @@ from flexget.plugin import *
 log = logging.getLogger('generate')
 
 
-class InputGenerate:
+class InputGenerate(object):
+    """Generates n number of random entries. Used for debugging purposes."""
 
     def validator(self):
         from flexget import validator
