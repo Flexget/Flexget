@@ -29,20 +29,26 @@ def pretty_age_filter(value):
 def index():
     movies = db_session.query(ImdbQueue).all()
 
-    try:
-        from themoviedb import tmdb
-    except ImportError:
-        raise Exception('You need to install themoviedb: easy_install https://github.com/doganaydin/themoviedb/tarball/master')
+    from themoviedb import TMDB
+    import yaml
+    
+    tmdb = TMDB()
 
     for item in movies:
-        movie = tmdb.imdb(id=item.imdb_id)
-        if not movie.movie:
+        movie = yaml.load(tmdb.imdb_results(item.imdb_id))[0]
+        
+        if not hasattr(movie, 'keys'):
             log.debug('No themoviedb result for imdb id %s' % item.imdb_id)
             continue
-        log.debug('processing %s' % movie.getName(0))
-        item.thumb = movie.getPoster(0, 'thumb')[0]
-        item.year = movie.getReleased(0).split('-')[0]
-        item.overview = movie.getOverview(0)
+            
+        log.debug('processing %s' % movie['name'])
+        
+        for poster in movie['posters']:
+            if poster['image']['size'] == 'thumb':
+                item.thumb = poster['image']['url']
+                break
+        item.year = movie['released'].split('-')[0]
+        item.overview = movie['overview']
 
     context = {'movies': movies}
     return render_template('movies/movies.html', **context)

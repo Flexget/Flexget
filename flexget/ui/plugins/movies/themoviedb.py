@@ -24,7 +24,6 @@ class TMDB(object):
             client = urllib.urlopen(url)
             data = client.read()
             client.close()
-            log.debug('Recieved data: %s' % data)
         except Exception, e:
             log.debug('Connection failure: %s' % e)
         return data
