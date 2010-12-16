@@ -14,6 +14,8 @@ log = logging.getLogger('main')
 
 
 def main():
+    """Main entry point for FlexGet UI"""
+
     logger.initialize()
 
     # The core plugins need a core parser to add their options to
@@ -29,7 +31,7 @@ def main():
         manager = UIManager(options, core_parser)
     except IOError, e:
         # failed to load config
-        log.exception(e.message)
+        log.critical(e.message)
         logger.flush()
         sys.exit(1)
 

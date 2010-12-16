@@ -14,6 +14,8 @@ log = logging.getLogger('main')
 
 
 def main():
+    """Main entry point for Command Line Interface"""
+
     logger.initialize()
 
     parser = CoreOptionParser()

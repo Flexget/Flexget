@@ -116,12 +116,9 @@ def flexget_variables():
 
 def load_ui_plugins():
 
-    # TODO: load from proper paths
+    # TODO: load from ~/.flexget/ui/plugins too (or something like that)
 
-    d = 'flexget/ui/plugins'
-    import imp
-    valid_suffixes = [suffix for suffix, mod_type, flags in imp.get_suffixes()
-                      if flags in (imp.PY_SOURCE, imp.PY_COMPILED)]
+    d = os.path.join('flexget', 'ui', 'plugins')
 
     plugin_names = set()
     for f in os.listdir(d):
@@ -225,10 +222,6 @@ def start(mg):
 
     # Start Flask
     app.secret_key = os.urandom(24)
-    """
-    app.run(host='0.0.0.0', port=manager.options.port,
-            use_reloader=manager.options.autoreload, debug=manager.options.debug)
-    """
 
     set_exit_handler(stop_server)
 
