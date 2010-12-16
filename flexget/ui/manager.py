@@ -20,13 +20,16 @@ class UIManager(Manager):
             Manager.find_config(self)
         except IOError:
             # No config file found, create a blank one in the home path
-            config_path = os.path.join(os.path.expanduser('~'), '.flexget', self.options.config)
-            log.info('Config file %s not found. Creating new config %s' % (self.options.config, config_path))
-            newconfig = file(config_path, 'w')
+            config_path = os.path.join(os.path.expanduser('~'), '.flexget')
+            if not os.path.exists(config_path):
+                os.mkdir(config_path)
+            config_filename = os.path.join(config_path, self.options.config)
+            log.info('Config file %s not found. Creating new config %s' % (self.options.config, config_filename))
+            newconfig = file(config_filename, 'w')
             # Write empty feeds and presets to the config
             newconfig.write(yaml.dump({'presets': {}, 'feeds': {}}))
             newconfig.close()
-            self.load_config(config_path)
+            self.load_config(config_filename)
 
     def execute(self):
         # Update feed instances to match config

@@ -133,6 +133,8 @@ def load_ui_plugins():
         except PluginDependencyError, e:
             # plugin depends on another plugin that was not imported successfully
             log.error(e.value)
+        except EnvironmentError, e:
+            log.info('Plugin %s: %s' % (name, e.message))
         except Exception, e:
             log.critical('Exception while loading plugin %s' % name)
             log.exception(e)
