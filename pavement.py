@@ -15,8 +15,8 @@ setup(
     author_email='marko.koivusalo@gmail.com',
     license='MIT',
     url='http://flexget.com',
-    install_requires=['FeedParser', 'SQLAlchemy>0.5', 'PyYAML', 'BeautifulSoup', 'html5lib>=0.11', \
-                      'PyRSS2Gen', 'pynzb', 'progressbar'],
+    install_requires=['FeedParser', 'SQLAlchemy>=0.6', 'PyYAML', 'BeautifulSoup', 'html5lib>=0.11', \
+                      'PyRSS2Gen', 'pynzb', 'progressbar', 'flask', 'cherrypy'],
     packages=['flexget', 'flexget.plugins', 'flexget.utils', 'flexget.utils.titles'],
     package_data=find_package_data('flexget', package='flexget', \
                                    exclude=['FlexGet.egg-info', '*.pyc'], \
@@ -92,8 +92,8 @@ def test(options):
 @task
 def clean():
     """Cleans up the virtualenv"""
-    for p in ('bin', 'build', 'dist', 'docs', 'include', 'lib', 'man',
-            'share', 'FlexGet.egg-info', 'paver-minilib.zip', 'setup.py'):
+    for p in ('bin', 'Scripts', 'build', 'dist', 'docs', 'include', 'lib', 'man',
+              'share', 'FlexGet.egg-info', 'paver-minilib.zip', 'setup.py'):
         pth = path(p)
         if pth.isdir():
             pth.rmtree()

@@ -27,7 +27,7 @@ def main():
         manager = Manager(options)
     except IOError, e:
         # failed to load config
-        log.exception(e.message)
+        log.critical(e.message)
         logger.flush()
         sys.exit(1)
 
