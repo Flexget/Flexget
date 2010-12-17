@@ -6,7 +6,7 @@ from flexget.utils.log import log_once
 from flexget.utils.imdb import ImdbSearch, ImdbParser, extract_id
 from sqlalchemy import Table, Column, Integer, Float, String, Unicode, Boolean, DateTime
 from sqlalchemy.schema import ForeignKey
-from sqlalchemy.orm import relation
+from sqlalchemy.orm import relation, joinedload_all
 from datetime import datetime, timedelta
 
 # association tables
@@ -149,7 +149,7 @@ class ModuleImdbLookup(object):
     @internet(log)
     def lookup(self, feed, entry, search_allowed=True):
         """Perform imdb lookup for entry. Raises PluginError with failure reason."""
-        
+
         log.debug('lookup for %s' % entry['title'])
 
         take_a_break = False
@@ -209,7 +209,9 @@ class ModuleImdbLookup(object):
             imdb = ImdbParser()
 
             # check if this imdb page has been parsed & cached
-            cached = session.query(Movie).filter(Movie.url == entry['imdb_url']).first()
+            cached = session.query(Movie).\
+                options(joinedload_all(Movie.genres, Movie.languages, Movie.actors, Movie.directors)).\
+                filter(Movie.url == entry['imdb_url']).first()
             if (not cached) or (cached.updated is None) or (cached.updated < datetime.now() - timedelta(days=2)):
                 # Remove the old movie, we'll store another one later.
                 session.query(Movie).filter(Movie.url == entry['imdb_url']).delete()

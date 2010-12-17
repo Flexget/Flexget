@@ -318,6 +318,8 @@ def load_plugins_from_dir(dir):
     for name in plugin_names:
         try:
             exec "import flexget.plugins.%s" % name in {}
+        except PluginDependencyError, e:
+            log.warning('Plugin %s required: %s' % (e.plugin, e.value))
         except Exception, e:
             log.critical('Exception while loading plugin %s' % name)
             log.exception(e)
