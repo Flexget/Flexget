@@ -98,7 +98,8 @@ class InputBacklog(object):
 
         # add missing from backlog
         count = 0
-        for backlog_entry in feed.session.query(BacklogEntry).filter(BacklogEntry.feed == feed.name).all():
+        entries = feed.session.query(BacklogEntry).filter(BacklogEntry.feed == feed.name)
+        for backlog_entry in entries.all():
             entry = backlog_entry.entry
 
             # this is already in the feed
@@ -109,5 +110,7 @@ class InputBacklog(object):
             feed.entries.append(entry)
         if count:
             feed.verbose_progress('Added %s entries from backlog' % count, log)
+        # Clear entries from backlog after injection
+        entries.delete()
 
 register_plugin(InputBacklog, 'backlog', builtin=True)

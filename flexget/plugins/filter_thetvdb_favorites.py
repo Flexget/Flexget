@@ -51,7 +51,7 @@ class FilterThetvdbFavorites(FilterSeriesBase):
         return root
 
     @internet(log)
-    def on_process_start(self, feed):
+    def on_feed_start(self, feed):
         config = feed.config.get('thetvdb_favorites')
         account_id = str(config['account_id'])
         session = Session()
