@@ -252,6 +252,10 @@ class Manager(object):
 
     def init_sqlalchemy(self):
         """Initialize SQLAlchemy"""
+        if [int(part) for part in sqlalchemy.__version__.split('.')] < [0, 6, 0]:
+            print >> sys.stderr, 'FATAL: SQLAlchemy 0.6.0 or newer required. Please upgrade your SQLAlchemy.'
+            sys.exit(1)
+
         import shutil
 
         # load old shelve session
