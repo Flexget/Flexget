@@ -131,27 +131,33 @@ class Manager(object):
             print ' o Missing : from end of the line'
             print ' o Non ASCII characters (use UTF8)'
             print ' o If text contains any of :[]{}% characters it must be single-quoted (eg. value{1} should be \'value{1}\')\n'
-            lines = 0
-            if e.problem is not None:
-                print ' Reason: %s\n' % e.problem
-                if e.problem == 'mapping values are not allowed here':
-                    print ' ----> MOST LIKELY REASON: Missing : from end of the line!'
+
+            # Not very good practice but we get several kind of exceptions here, I'm not even sure all of them
+            # At least: ReaderError, YmlScannerError (or something like that)
+            if hasattr(e, 'problem') and hasattr(e, 'context_mark') and hasattr(e, 'problem_mark'):
+                lines = 0
+                if e.problem is not None:
+                    print ' Reason: %s\n' % e.problem
+                    if e.problem == 'mapping values are not allowed here':
+                        print ' ----> MOST LIKELY REASON: Missing : from end of the line!'
+                        print ''
+                if e.context_mark is not None:
+                    print ' Check configuration near line %s, column %s' % (e.context_mark.line, e.context_mark.column)
+                    lines += 1
+                if e.problem_mark is not None:
+                    print ' Check configuration near line %s, column %s' % (e.problem_mark.line, e.problem_mark.column)
+                    lines += 1
+                if lines:
                     print ''
-            if e.context_mark is not None:
-                print ' Check configuration near line %s, column %s' % (e.context_mark.line, e.context_mark.column)
-                lines += 1
-            if e.problem_mark is not None:
-                print ' Check configuration near line %s, column %s' % (e.problem_mark.line, e.problem_mark.column)
-                lines += 1
-            if lines:
-                print ''
-            if lines == 1:
-                print ' Fault is almost always in this or previous line\n'
-            if lines == 2:
-                print ' Fault is almost always in one of these lines or previous ones\n'
+                if lines == 1:
+                    print ' Fault is almost always in this or previous line\n'
+                if lines == 2:
+                    print ' Fault is almost always in one of these lines or previous ones\n'
+
             if self.options.debug:
                 raise
             sys.exit(1)
+
         # config loaded successfully
         self.config_name = os.path.splitext(os.path.basename(config))[0]
         self.config_base = os.path.normpath(os.path.dirname(config))
