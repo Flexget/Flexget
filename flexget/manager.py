@@ -252,9 +252,12 @@ class Manager(object):
 
     def init_sqlalchemy(self):
         """Initialize SQLAlchemy"""
-        if [int(part) for part in sqlalchemy.__version__.split('.')] < [0, 6, 0]:
-            print >> sys.stderr, 'FATAL: SQLAlchemy 0.6.0 or newer required. Please upgrade your SQLAlchemy.'
-            sys.exit(1)
+        try:
+            if [int(part) for part in sqlalchemy.__version__.split('.')] < [0, 6, 0]:
+                print >> sys.stderr, 'FATAL: SQLAlchemy 0.6.0 or newer required. Please upgrade your SQLAlchemy.'
+                sys.exit(1)
+        except ValueError, e:
+            log.critical('Failed to check SQLAlchemy version, you may need to upgrade it')
 
         import shutil
 
