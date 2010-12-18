@@ -38,7 +38,4 @@ def main():
     log_level = logging.getLevelName(options.loglevel.upper())
     logger.start(os.path.join(manager.config_base, 'flexget.log'), log_level, quiet=options.quiet)
 
-    if options.doc:
-        plugin.print_doc(options.doc)
-    else:
-        manager.execute()
+    manager.execute()

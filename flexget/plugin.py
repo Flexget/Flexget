@@ -414,19 +414,3 @@ def get_plugin_by_name(name):
     if not name in plugins:
         raise PluginDependencyError('Unknown plugin %s' % name, name)
     return plugins[name]
-
-
-# TODO: separate to plugin
-def print_doc(plugin_name):
-    """Parameter --doc <plugin_name>"""
-    found = False
-    plugin = plugins.get(plugin_name, None)
-    if plugin:
-        found = True
-        if not plugin.instance.__doc__:
-            print 'Plugin %s does not have documentation' % plugin_name
-        else:
-            print plugin.instance.__doc__
-        return
-    if not found:
-        print 'Could not find plugin %s' % plugin_name

@@ -55,8 +55,6 @@ class CoreOptionParser(OptionParser):
                         help='Disable caches. Works only in plugins that have explicit support.')
         self.add_option('--reset', action='store_true', dest='reset', default=0,
                         help='Forgets everything that has been done and learns current matches.')
-        self.add_option('--doc', action='store', dest='doc',
-                        metavar='PLUGIN', help='Display plugin documentation. See also --plugins.')
         self.add_option('--cron', action='store_true', dest='quiet', default=False,
                         help='Disables stdout and stderr output, log file used. Reduces logging level slightly.')
 
