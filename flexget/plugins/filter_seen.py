@@ -270,15 +270,18 @@ class FilterSeen(object):
             return
 
         for entry in feed.entries:
+            # construct list of values looked
+            values = []
             for field in self.fields:
                 if not field in entry:
                     continue
-                if feed.session.query(SeenField).filter(SeenField.value == entry[field]).first():
-                    log.debug("Rejecting '%s' '%s' because of seen '%s'" % (entry['url'], entry['title'], field))
-                    feed.reject(entry)
-                    break
-            else:
-                continue
+                values.append(entry[field])
+            # check if SeenField.value is any of the values
+            found = feed.session.query(SeenField).filter(or_(*[SeenField.value == x for x in values])).first()
+            if found:
+                log.debug("Rejecting '%s' '%s' because of seen '%s'" % (entry['url'], entry['title'], found.value))
+                feed.reject(entry, 'Entry with `%s` is already seen' % found.value)
+                break
 
     def on_feed_exit(self, feed):
         """Remember succeeded entries"""
