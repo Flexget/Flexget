@@ -79,30 +79,29 @@ class FlexGetBase(object):
             if hasattr(self, 'session'):
                 self.feed.session.close() # pylint: disable-msg=E0203
         self.feed = Feed(self.manager, name, config)
-        # self.feed.session = Session()
         self.feed.process_start()
         if self.feed.enabled:
             self.feed.execute()
         else:
             log.debug('Feed \'%s\' has been disabled, not running' % self.feed.name)
         self.feed.process_end()
-        # self.feed.session.commit()
 
     def dump(self):
         """Helper method for debugging"""
+        from flexget.plugins.output_dump import dump
         from flexget.utils.tools import sanitize
         # entries = sanitize(self.feed.entries)
         # accepted = sanitize(self.feed.accepted)
         # rejected = sanitize(self.feed.rejected)
-        print '-- ENTRIES: -----------------------------------------------------'
+        print '\n-- ENTRIES: -----------------------------------------------------'
         # print yaml.safe_dump(entries)
-        print self.feed.entries
+        dump(self.feed.entries, True)
         print '-- ACCEPTED: ----------------------------------------------------'
         # print yaml.safe_dump(accepted)
-        print self.feed.accepted
+        dump(self.feed.entries, True)
         print '-- REJECTED: ----------------------------------------------------'
         # print yaml.safe_dump(rejected)
-        print self.feed.rejected
+        dump(self.feed.entries, True)
 
 
 class with_filecopy(object):

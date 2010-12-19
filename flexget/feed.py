@@ -169,7 +169,6 @@ class Feed(object):
 
         # flags and counters
         self._abort = False
-        self.__purged = 0
 
         # current state
         self.current_event = None
@@ -183,31 +182,30 @@ class Feed(object):
 
     def purge(self):
         """
-            Purge rejected and failed entries.
-            Failed entries will be removed from entries, accepted and rejected
-            Rejected entries will be removed from entries and accepted
+        Purge rejected and failed entries.
+        Failed entries will be removed from entries, accepted and rejected
+        Rejected entries will be removed from entries and accepted
         """
         self.__purge_failed()
         self.__purge_rejected()
 
     def __purge_failed(self):
         """Purge failed entries from feed."""
-        self.__purge(self.failed, self.entries, False)
-        self.__purge(self.failed, self.rejected, False)
-        self.__purge(self.failed, self.accepted, False)
+        self.__purge(self.failed, self.entries)
+        self.__purge(self.failed, self.rejected)
+        self.__purge(self.failed, self.accepted)
 
     def __purge_rejected(self):
         """Purge rejected entries from feed."""
         self.__purge(self.rejected, self.entries)
         self.__purge(self.rejected, self.accepted)
 
-    def __purge(self, purge_what, purge_from, count=True):
+    def __purge(self, purge_what, purge_from):
         """Purge entries in list from feed.entries"""
+        # TODO: there is probably more efficient way to do this now that I got rid of __count
         for entry in purge_what:
             if entry in purge_from:
                 purge_from.remove(entry)
-                if count:
-                    self.__purged += 1
 
     def accept(self, entry, reason=None):
         """Accepts this entry with optional reason."""
@@ -241,7 +239,7 @@ class Feed(object):
             self.rejected.append(entry)
             # Run on_entry_reject event
             self.__run_event('reject', entry, reason)
-        # store metainfo into entry (plugin in the future?)
+        # TODO: store metainfo into entry (plugin in the future? yes please)
         entry.pop('reason', None) # remove old reason by previous state
         if reason:
             entry['reason'] = reason
@@ -413,7 +411,7 @@ class Feed(object):
                         plugins = get_plugins_by_event(event)
                         for plugin in plugins:
                             if plugin.name in self.config:
-                                log.info('Plugin %s is not executed because of --learn / --reset' % (plugin.name))
+                                log.info('Plugin %s is not executed because of --learn / --reset' % plugin.name)
                         continue
 
                 # run all plugins with this event
@@ -426,10 +424,9 @@ class Feed(object):
             log.debug('committing session, abort=%s' % self._abort)
             self.session.commit()
             fire_event('feed.execute.completed', self)
-        except:
-            log.debug('db rollback on exception')
+        finally:
+            # this will cause database rollback on exception and feed.abort
             self.session.close()
-            raise
 
     def process_start(self):
         """Execute process_start event"""
