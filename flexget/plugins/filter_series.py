@@ -1,4 +1,5 @@
 import logging
+from copy import copy
 from datetime import datetime, timedelta
 from flexget.event import event
 from flexget.utils.titles import SeriesParser, ParseWarning
@@ -572,6 +573,14 @@ class FilterSeries(SeriesPlugin, FilterSeriesBase):
         # don't try to parse these fields
         ignore_fields = ['uid', 'guid', 'feed', 'url', 'original_url', 'type', 'quality', 'series_name', 'series_id', 'accepted_by', 'reason']
 
+        parser = SeriesParser(name=series_name,
+                              identified_by=identified_by,
+                              name_regexps=get_as_array(config, 'name_regexp'),
+                              ep_regexps=get_as_array(config, 'ep_regexp'),
+                              id_regexps=get_as_array(config, 'id_regexp'),
+                              strict_name=config.get('exact', False),
+                              allow_groups=get_as_array(config, 'from_group'))
+
         for entry in feed.entries:
             if entry.get('series_parser') and entry['series_parser'].valid and not entry.get('series_guessed') and \
                entry['series_parser'].name.lower() != series_name.lower():
@@ -585,28 +594,13 @@ class FilterSeries(SeriesPlugin, FilterSeriesBase):
                     # skip ignored
                     if field in ignore_fields:
                         continue
-                    parser = SeriesParser()
-                    parser.name = series_name
-                    parser.data = data
-                    parser.expect_ep = identified_by == 'ep'
-                    parser.expect_id = identified_by == 'id'
-                    parser.ep_regexps = get_as_array(config, 'ep_regexp') + parser.ep_regexps
-                    parser.id_regexps = get_as_array(config, 'id_regexp') + parser.id_regexps
-                    parser.strict_name = config.get('exact', False)
-                    parser.allow_groups = get_as_array(config, 'from_group')
-                    parser.field = field
                     # incase quality will not be found from title, set it from entry['quality'] if available
+                    quality = None
                     if qualities.get(entry.get('quality', '')) > qualities.UnknownQuality():
                         log.log(5, 'Setting quality %s from entry field to parser' % entry['quality'])
-                        parser.quality = entry['quality']
-                    # do not use builtin list for id when ep configured and vice versa
-                    if 'ep_regexp' in config and not 'id_regexp' in config:
-                        parser.id_regexps = []
-                    if 'id_regexp' in config and not 'ep_regexp' in config:
-                        parser.ep_regexps = []
-                    parser.name_regexps.extend(get_as_array(config, 'name_regexp'))
+                        quality = entry['quality']
                     try:
-                        parser.parse()
+                        parser.parse(data, field=field, quality=quality)
                     except ParseWarning, pw:
                         from flexget.utils.log import log_once
                         log_once(pw.value, logger=log)
@@ -617,7 +611,7 @@ class FilterSeries(SeriesPlugin, FilterSeriesBase):
                     continue
 
             log.debug('%s detected as %s, field: %s' % (entry['title'], parser, parser.field))
-            entry['series_parser'] = parser
+            entry['series_parser'] = copy(parser)
             # add series, season and episode to entry
             entry['series_name'] = series_name
             entry['series_guessed'] = config.get('series_guessed', False)

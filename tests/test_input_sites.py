@@ -2,7 +2,7 @@ from tests import FlexGetBase
 from nose.plugins.attrib import attr
 
 
-class TestRlsLog(FlexGetBase):
+class TestInputSites(FlexGetBase):
 
     __yaml__ = """
         feeds:

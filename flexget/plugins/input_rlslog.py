@@ -123,12 +123,12 @@ class RlsLog:
 
         releases = []
 
-        # retry rlslog (badly responding) up to 5 times
-        for number in range(3):
+        # retry rlslog (badly responding) up to 6 times (our urlopener tries 3 times per each of our tries here)
+        for number in range(2):
             try:
                 releases = self.parse_rlslog(url, feed)
             except urllib2.HTTPError, e:
-                if number == 2:
+                if number == 1:
                     raise
                 else:
                     import time

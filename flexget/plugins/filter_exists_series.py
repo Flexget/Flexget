@@ -1,3 +1,4 @@
+import copy
 import os
 import logging
 from flexget.plugin import register_plugin, priority, PluginWarning
@@ -39,10 +40,14 @@ class FilterExistsSeries(object):
 
     @priority(-1)
     def on_feed_filter(self, feed):
+        accepted_series = {}
         for entry in feed.accepted:
             if 'series_parser' in entry:
-                break
-        else:
+                if entry['series_parser'].valid:
+                    accepted_series.setdefault(entry['series_parser'].name, []).append(entry)
+                else:
+                    log.debug('entry %s series_parser invalid' % entry['title'])
+        if not accepted_series:
             if feed.accepted:
                 log.warning('No accepted entries have series information. exists_series cannot filter them')
             else:
@@ -61,50 +66,41 @@ class FilterExistsSeries(object):
                 dirs = [x.decode('utf-8', 'ignore') for x in dirs]
                 files = [x.decode('utf-8', 'ignore') for x in files]
                 # For speed, only test accepted entries since our priority should be after everything is accepted.
-                for entry in feed.accepted:
-                    if 'series_parser' in entry:
-                        series_parser = entry['series_parser']
-                        if not series_parser.valid:
-                            log.debug('entry %s series_parser invalid' % entry['title'])
-                            continue
-                        for name in files + dirs:
-                            # make new parser from parser in entry
-                            disk_parser = SeriesParser()
-                            disk_parser.name = series_parser.name
-                            disk_parser.strict_name = series_parser.strict_name
-                            disk_parser.ep_regexps = series_parser.ep_regexps
-                            disk_parser.id_regexps = series_parser.id_regexps
-                            # run parser on filename data
-                            disk_parser.data = name
-                            try:
-                                disk_parser.parse()
-                            except ParseWarning, pw:
-                                from flexget.utils.log import log_once
-                                log_once(pw.value, logger=log)
-                            if disk_parser.valid:
-                                log.debug('name %s is same series as %s' % (name, entry['title']))
-                                log.debug('disk_parser.identifier = %s' % disk_parser.identifier)
-                                log.debug('series_parser.identifier = %s' % series_parser.identifier)
-                                log.debug('disk_parser.quality = %s' % disk_parser.quality)
-                                log.debug('series_parser.quality = %s' % series_parser.quality)
-                                log.debug('disk_parser.proper = %s' % disk_parser.proper)
-                                log.debug('series_parser.proper = %s' % series_parser.proper)
+                for series in accepted_series:
+                    # make new parser from parser in entry
+                    disk_parser = copy.copy(accepted_series[series][0]['series_parser'])
+                    for name in files + dirs:
+                        # run parser on filename data
+                        disk_parser.data = name
+                        try:
+                            disk_parser.parse(data=name)
+                        except ParseWarning, pw:
+                            from flexget.utils.log import log_once
+                            log_once(pw.value, logger=log)
+                        if disk_parser.valid:
+                            log.debug('name %s is same series as %s' % (name, series))
+                            log.debug('disk_parser.identifier = %s' % disk_parser.identifier)
+                            log.debug('disk_parser.quality = %s' % disk_parser.quality)
+                            log.debug('disk_parser.proper = %s' % disk_parser.proper)
 
-                                if disk_parser.identifier != series_parser.identifier:
+                            for entry in accepted_series[series]:
+                                log.debug('series_parser.identifier = %s' % entry['series_parser'].identifier)
+                                if disk_parser.identifier != entry['series_parser'].identifier:
                                     log.log(5, 'wrong identifier')
                                     continue
-                                if config.get('allow_different_qualities') and disk_parser.quality != series_parser.quality:
+                                log.debug('series_parser.quality = %s' % entry['series_parser'].quality)
+                                if config.get('allow_different_qualities') and \
+                                   disk_parser.quality != entry['series_parser'].quality:
                                     log.log(5, 'wrong quality')
                                     continue
-                                if disk_parser.proper and not series_parser.proper:
+                                log.debug('entry parser.proper = %s' % entry['series_parser'].proper)
+                                if disk_parser.proper and not entry['series_parser'].proper:
                                     feed.reject(entry, 'proper already exists')
                                     continue
-                                if series_parser.proper and not disk_parser.proper:
+                                if entry['series_parser'].proper and not disk_parser.proper:
                                     log.log(5, 'new one is proper, disk is not')
                                     continue
 
                                 feed.reject(entry, 'episode already exists')
-                    else:
-                        log.log(5, '%s doesn\'t seem to be known series' % entry['title'])
 
 register_plugin(FilterExistsSeries, 'exists_series', groups=['exists'])

@@ -2,6 +2,7 @@ import logging
 import re
 from flexget.utils.titles.parser import TitleParser, ParseWarning
 from flexget.utils import qualities
+from flexget.utils.tools import ReList
 
 log = logging.getLogger('seriesparser')
 
@@ -22,51 +23,62 @@ class SeriesParser(TitleParser):
     :expect_id: expect series to be in id format (id_regexps)
 
     """
+    separators = '[!/+,:;|~ x-]'
+    roman_numeral_re = 'X{0,3}(?:IX|XI{0,4}|VI{0,4}|IV|V|I{1,4})'
+    re_not_in_word = lambda regexp: r'(?<![^\W_])' + regexp + r'(?![^\W_])'
 
-    def __init__(self):
+    ep_regexps = ReList([re_not_in_word(regexp) for regexp in [
+        '(?:series|season|s)\s?(\d{1,3})(?:\s(?:.*?\s)?)?(?:episode|ep|e|part|pt)\s?(\d{1,3}|%s)' % roman_numeral_re,
+        '(?:series|season)\s?(\d{1,3})\s(\d{1,3})\s?of\s?(?:\d{1,3})',
+        '(\d{1,3})\s?of\s?(?:\d{1,3})',
+        '(\d{1,2})\s?x\s?(\d+)',
+        '(?:episode|ep|part|pt)\s?(\d{1,3}|%s)' % roman_numeral_re]])
+    unwanted_ep_regexps = ReList([
+         '(\d{1,3})\s?x\s?(0+)[^1-9]', # 5x0
+         'S(\d{1,3})D(\d{1,3})', # S3D1
+         '(\d{1,3})\s?x\s?(all)', # 1xAll
+         'season(?:s)?\s?\d\s?(?:&\s?\d)?[\s-]*(?:complete|full)',
+         'seasons\s(\d\s){2,}',
+         'disc\s\d',
+         's\d+.?e\d+-\d+']) # S6 E1-4
+    id_regexps = ReList([
+        '(\d{4})%s(\d+)%s(\d+)' % (separators, separators),
+        '(\d+)%s(\d+)%s(\d{4})' % (separators, separators),
+        '(\d{4})x(\d+)\.(\d+)', '(pt|part)\s?(\d+|%s)' % roman_numeral_re,
+        '(?:^|[^s\d])(\d{1,3})(?:[^p\d]|$)'])
+    unwanted_id_regexps = ReList([
+        'seasons?\s?\d{1,2}'])
+    clean_regexps = ReList(['\[.*?\]', '\(.*?\)'])
+    # ignore prefix regexpes must be passive groups with 0 or 1 occurrences  eg. (?:prefix)?
+    ignore_prefixes = [
+            '(?:\[[^\[\]]*\])', # ignores group names before the name, eg [foobar] name
+            '(?:HD.720p?:)',
+            '(?:HD.1080p?:)']
+
+    def __init__(self, name='', identified_by='auto', name_regexps=None, ep_regexps=None, id_regexps=None,
+                 strict_name=False, allow_groups=None):
         # parser settings
-        self.name = ''
+        self.name = name
         self.data = ''
-        self.expect_ep = False
-        self.expect_id = False
-        self.allow_groups = []
+        self.expect_ep = identified_by == 'ep'
+        self.expect_id = identified_by == 'id'
+        self.name_regexps = ReList(name_regexps or [])
+        self.re_from_name = False
+        if ep_regexps:
+            self.ep_regexps = ReList(ep_regexps + SeriesParser.ep_regexps)
+            self.id_regexps = []
+        elif id_regexps:
+            self.id_regexps = ReList(id_regexps + SeriesParser.id_regexps)
+            self.ep_regexps = []
 
         # if set to true, episode or id must follow immediately after name
-        self.strict_name = False
-
-        separators = '[!/+,:;|~ x-]'
-        roman_numeral_re = 'X{0,3}(?:IX|XI{0,4}|VI{0,4}|IV|V|I{1,4})'
-        self.ep_regexps = [
-            '(?:series|season|s)\s?(\d{1,3})(?:\s(?:.*?\s)?)?(?:episode|ep|e|part|pt)\s?(\d{1,3}|%s)' % roman_numeral_re,
-            '(?:series|season)\s?(\d{1,3})\s(\d{1,3})\s?of\s?(?:\d{1,3})',
-            '(\d{1,3})\s?of\s?(?:\d{1,3})',
-            '(\d{1,2})\s?x\s?(\d+)',
-            '(?:episode|ep|part|pt)\s?(\d{1,3}|%s)' % roman_numeral_re]
-        self.unwanted_ep_regexps = [
-             '(\d{1,3})\s?x\s?(0+)[^1-9]', # 5x0
-             'S(\d{1,3})D(\d{1,3})', # S3D1
-             '(\d{1,3})\s?x\s?(all)', # 1xAll
-             'season(?:s)?\s?\d\s?(?:&\s?\d)?[\s-]*(?:complete|full)',
-             'seasons\s(\d\s){2,}',
-             'disc\s\d',
-             's\d+.?e\d+-\d+'] # S6 E1-4
-        self.id_regexps = [
-            '(\d{4})%s(\d+)%s(\d+)' % (separators, separators),
-            '(\d+)%s(\d+)%s(\d{4})' % (separators, separators),
-            '(\d{4})x(\d+)\.(\d+)', '(pt|part)\s?(\d+|%s)' % roman_numeral_re,
-            '(?:^|[^s\d])(\d{1,3})(?:[^p\d]|$)']
-        self.unwanted_id_regexps = [
-            'seasons?\s?\d{1,2}']
-        self.clean_regexps = ['\[.*?\]', '\(.*?\)']
-        # ignore prefix regexpes must be passive groups with 0 or 1 occurrences  eg. (?:prefix)?
-        self.ignore_prefix_regexps = [
-                '(?:\[[^\[\]]*\])', # ignores group names before the name, eg [foobar] name
-                '(?:HD.720p?:)',
-                '(?:HD.1080p?:)']
-        self.name_regexps = []
+        self.strict_name = strict_name
+        self.allow_groups = allow_groups or []
 
         self.field = None
+        self._reset()
 
+    def _reset(self):
         # parse produces these
         self.season = None
         self.episode = None
@@ -85,16 +97,19 @@ class SeriesParser(TitleParser):
         """Convert name and data to unicode transparently"""
         if name == 'name' or name == 'data':
             if isinstance(value, str):
-                object.__setattr__(self, name, unicode(value))
-                return
+                value = unicode(value)
             elif not isinstance(value, unicode):
                 raise Exception('%s cannot be %s' % (name, repr(value)))
+        elif name.endswith('_regexps'):
+            # Transparently turn regular lists into ReLists
+            value = ReList(value)
         object.__setattr__(self, name, value)
 
     def clean(self, data):
-        """Perform data cleaner regexps"""
+        """Perform data cleaner regexps."""
+        # TODO: This method is no longer used, should it be removed?
         for clean_re in self.clean_regexps:
-            matches = re.findall(clean_re, data, re.IGNORECASE | re.UNICODE)
+            matches = re.findall(clean_re, data)
             # remove all matches from data, unless they happen to contain relevant information
             if matches:
                 for match in matches:
@@ -120,7 +135,13 @@ class SeriesParser(TitleParser):
         """Replaces some characters with spaces"""
         return re.sub(r'[_.,\[\]\(\): ]+', ' ', data).strip().lower()
 
-    def parse(self):
+    def parse(self, data=None, field=None, quality=None):
+        # Clear the output variables before parsing
+        self._reset()
+        self.field = field
+        self.quality = quality
+        if data:
+            self.data = data
         if not self.name or not self.data:
             raise Exception('SeriesParser initialization error, name: %s data: %s' % \
                (repr(self.name), repr(self.data)))
@@ -131,15 +152,15 @@ class SeriesParser(TitleParser):
         name = self.remove_dirt(self.name)
 
         # check if data appears to be unwanted (abort)
-        if self.parse_unwanted(self.remove_dirt(self.clean(self.data))):
+        if self.parse_unwanted(self.remove_dirt(self.data)):
             return
 
         def name_to_re(name):
             """Convert 'foo bar' to '^[^...]*foo[^...]*bar[^...]+"""
             # TODO: Still doesn't handle the case where the user wants
             # "Schmost" and the feed contains "Schmost at Sea".
-            blank = r'[^0-9a-zA-Z]'
-            ignore = '(?:' + '|'.join(self.ignore_prefix_regexps) + ')?'
+            blank = r'[\W_]'
+            ignore = '(?:' + '|'.join(self.ignore_prefixes) + ')?'
             res = re.sub(blank + '+', ' ', name)
             res = res.strip()
             res = re.sub(' +', blank + '*', res)
@@ -153,28 +174,28 @@ class SeriesParser(TitleParser):
         name_end = 0
 
         # regexp name matching
-        re_from_name = False
         if not self.name_regexps:
             # if we don't have name_regexps, generate one from the name
             self.name_regexps = [name_to_re(name)]
-            re_from_name = True
+            self.re_from_name = True
             if '&' in name:
                 # if & is in the name, also add a regexp that accepts 'and' instead
                 self.name_regexps.append(name_to_re(name.replace('&', 'and')))
-        # use all specified regexps to this data
+        # try all specified regexps on this data
         for name_re in self.name_regexps:
-            match = re.search(name_re, self.data, re.IGNORECASE | re.UNICODE)
+            match = re.search(name_re, self.data)
             if match:
-                if re_from_name:
+                if self.re_from_name:
                     name_start, name_end = match.span(1)
                 else:
                     name_start, name_end = match.span()
 
-                log.debug('NAME SUCCESS: %s matched to %s' % (name_re, self.data))
+                log.debug('NAME SUCCESS: %s matched to %s' % (name_re.pattern, self.data))
                 break
         else:
             # leave this invalid
-            log.debug('FAIL: name regexps %s do not match %s' % (self.name_regexps, self.data))
+            log.debug('FAIL: name regexps %s do not match %s' % ([regexp.pattern for regexp in self.name_regexps],
+                                                                 self.data))
             return
 
 
@@ -199,8 +220,8 @@ class SeriesParser(TitleParser):
                 log.debug('%s is not from groups %s' % (self.data, self.allow_groups))
                 return # leave invalid
 
-        # search tags and quality
-        if self.quality == 'unknown':
+        # search tags and quality if one was not provided to parse method
+        if not quality or quality == 'unknown':
             log.debug('parsing quality ->')
             quality, match = qualities.quality_match(data_noname)
             self.quality = quality.name
@@ -211,7 +232,6 @@ class SeriesParser(TitleParser):
         # Remove unwanted words (qualities and such) from data for ep / id
         data = self.remove_words(data_noname, self.remove + qualities.registry.keys() + self.codecs + self.sounds)
         data = self.remove_dirt(data)
-        data = self.clean(data)
 
         data_parts = re.split('\W+', data)
 
@@ -270,7 +290,7 @@ class SeriesParser(TitleParser):
             if self.parse_unwanted_id(data):
                 return
             for id_re in self.id_regexps:
-                match = re.search(id_re, data, re.IGNORECASE | re.UNICODE)
+                match = re.search(id_re, data)
                 if match:
                     # strict_name
                     if self.strict_name:
@@ -291,7 +311,7 @@ class SeriesParser(TitleParser):
     def parse_unwanted(self, data):
         """Parses data for an unwanted hits. Return True if the data contains unwanted hits."""
         for ep_unwanted_re in self.unwanted_ep_regexps:
-            match = re.search(ep_unwanted_re, data, re.IGNORECASE | re.UNICODE)
+            match = re.search(ep_unwanted_re, data)
             if match:
                 log.debug('unwanted regexp %s matched %s' % (ep_unwanted_re, match.groups()))
                 return True
@@ -299,7 +319,7 @@ class SeriesParser(TitleParser):
     def parse_unwanted_id(self, data):
         """Parses data for an unwanted id hits. Return True if the data contains unwanted hits."""
         for id_unwanted_re in self.unwanted_id_regexps:
-            match = re.search(id_unwanted_re, data, re.IGNORECASE | re.UNICODE)
+            match = re.search(id_unwanted_re, data)
             if match:
                 log.debug('unwanted id regexp %s matched %s' % (id_unwanted_re, match.groups()))
                 return True
@@ -311,11 +331,9 @@ class SeriesParser(TitleParser):
         If no episode id is found returns False
         """
 
-        # Make sure there are non alphanumeric characters surrounding our identifier
-        (lcap, rcap) = (r'(?<![a-zA-Z0-9])', r'(?![a-zA-Z0-9])')
         # search for season and episode number
         for ep_re in self.ep_regexps:
-            match = re.search(lcap + ep_re + rcap, data, re.IGNORECASE | re.UNICODE)
+            match = re.search(ep_re, data)
 
             if match:
                 log.debug('found episode number with regexp %s (%s)' % (ep_re, match.groups()))
@@ -335,7 +353,7 @@ class SeriesParser(TitleParser):
                 break
         else:
             return False
-        return (int(season), int(episode), match)
+        return int(season), int(episode), match
 
     def roman_to_int(self, roman):
         """Converts roman numerals up to 39 to integers"""

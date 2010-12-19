@@ -31,10 +31,8 @@ if enable_logging:
 class TestSeriesParser(object):
 
     def parse(self, **kwargs):
-        s = SeriesParser()
-        s.name = kwargs['name']
-        s.data = kwargs['data']
-        s.parse()
+        s = SeriesParser(name=kwargs['name'])
+        s.parse(data=kwargs['data'])
         return s
 
     def test_proper(self):
@@ -61,7 +59,7 @@ class TestSeriesParser(object):
         assert not s.valid, 'Should not be valid'
 
         s = self.parse(name='25', data='25.And.More.S01E02-FlexGet')
-        assert s.valid, 'Fix the implementation, should not be valid'
+        assert s.valid, 'Fix the implementation, should be valid'
         assert s.identifier == 'S01E02', 'identifier broken'
 
     @raises(Exception)

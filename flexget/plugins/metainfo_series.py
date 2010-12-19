@@ -47,7 +47,7 @@ class MetainfoSeries(object):
     def guess_series(self, title):
         """Returns a valid series parser if this :title: appears to be a series"""
 
-        parser = SeriesParser()
+        parser = SeriesParser(identified_by='ep')
         # We need to replace certain characters with spaces to make sure episode parsing works right
         # We don't remove anything, as the match positions should line up with the original title
         clean_title = re.sub('[_.,\[\]\(\):]', ' ', title)
@@ -59,7 +59,7 @@ class MetainfoSeries(object):
                 # We start using the original title here, so we can properly ignore unwanted prefixes.
                 # Look for unwanted prefixes to find out where the series title starts
                 start = 0
-                prefix = re.match('|'.join(parser.ignore_prefix_regexps), title)
+                prefix = re.match('|'.join(parser.ignore_prefixes), title)
                 if prefix:
                     start = prefix.end()
                 # If an episode id is found, assume everything before it is series name
@@ -74,7 +74,7 @@ class MetainfoSeries(object):
                 parser.name = name
                 parser.data = title
                 try:
-                    parser.parse()
+                    parser.parse(data=title)
                 except ParseWarning, pw:
                     log.debug('ParseWarning: %s' % pw.value)
                 if parser.valid:
