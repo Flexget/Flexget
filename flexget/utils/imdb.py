@@ -306,7 +306,7 @@ class ImdbParser(object):
             self.year = int(tag_year.contents[0])
             log.debug('Detected year: %s' % self.year)
         else:
-            tag_year = soup.find('span', text=re.compile(r'^\(Video \d+\)'))
+            tag_year = soup.find('span', text=re.compile(r'^\((?:Video|TV) \d+\)'))
             if tag_year:
                 m = re.search('(\d{4})', unicode(tag_year))
                 if m:
