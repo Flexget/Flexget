@@ -57,7 +57,18 @@ class SeriesParser(TitleParser):
 
     def __init__(self, name='', identified_by='auto', name_regexps=None, ep_regexps=None, id_regexps=None,
                  strict_name=False, allow_groups=None):
-        # parser settings
+        """Init SeriesParser.
+
+        :name: Name of the series parser is going to try to parse.
+
+        :identified_by: What kind of episode numbering scheme is expected, valid values are ep, id and auto (default).
+        :name_regexps: List of regexps for name matching or None (default), by default regexp is generated from name.
+        :ep_regexp: List of regexps detecting episode,season format. Given list is prioritized over built-in regexps.
+        :id_regexp: List of regexps detecting id format. Given list is prioritized over built in regexps.
+        :strict_name: Boolean value, if True name must be immediately be followed by episode identifier.
+        :allow_groups: List of release group names that are allowed. This will also populate attribute `group`.
+        """
+
         self.name = name
         self.data = ''
         self.expect_ep = identified_by == 'ep'
@@ -70,8 +81,6 @@ class SeriesParser(TitleParser):
         elif id_regexps:
             self.id_regexps = ReList(id_regexps + SeriesParser.id_regexps)
             self.ep_regexps = []
-
-        # if set to true, episode or id must follow immediately after name
         self.strict_name = strict_name
         self.allow_groups = allow_groups or []
 
@@ -94,7 +103,11 @@ class SeriesParser(TitleParser):
         self.valid = False
 
     def __setattr__(self, name, value):
-        """Convert name and data to unicode transparently"""
+        """
+        Some conversions when setting attributes.
+        `self.name` and `self.data` are converted to unicode.
+        `self.*_regexps` are converted to ReList.
+        """
         if name == 'name' or name == 'data':
             if isinstance(value, str):
                 value = unicode(value)
@@ -326,7 +339,7 @@ class SeriesParser(TitleParser):
 
     def parse_episode(self, data):
         """
-        Parses data for an episode identifier.
+        Parses :data: for an episode identifier.
         If found, returns a tuple of season#, episode# and the regexp match object
         If no episode id is found returns False
         """
@@ -375,7 +388,7 @@ class SeriesParser(TitleParser):
 
     @property
     def identifier(self):
-        """Return identifier for parsed episode"""
+        """Return String identifier for parsed episode, eg. S01E02"""
         if not self.valid:
             raise Exception('Series flagged invalid')
         if isinstance(self.season, int) and isinstance(self.episode, int):
