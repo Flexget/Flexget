@@ -686,6 +686,11 @@ class FilterSeries(SeriesPlugin, FilterSeriesBase):
             Returns a list of removed episodes and a list of new propers.
         """
 
+        proper_eps = [ep for ep in eps if ep.proper_or_repack]
+        # Return if there are no propers for this episode
+        if not proper_eps:
+            return [], []
+
         downloaded_releases = self.get_downloaded(feed.session, eps[0].name, eps[0].identifier)
         downloaded_qualities = [d.quality for d in downloaded_releases]
 
@@ -699,14 +704,13 @@ class FilterSeries(SeriesPlugin, FilterSeriesBase):
 
         new_propers = []
         removed = []
-        for ep in eps:
-            if ep.proper_or_repack:
-                if not proper_downloaded():
-                    log.debug('found new proper %s' % ep)
-                    new_propers.append(ep)
-                else:
-                    feed.reject(self.parser2entry[ep], 'proper already downloaded')
-                    removed.append(ep)
+        for ep in proper_eps:
+            if not proper_downloaded():
+                log.debug('found new proper %s' % ep)
+                new_propers.append(ep)
+            else:
+                feed.reject(self.parser2entry[ep], 'proper already downloaded')
+                removed.append(ep)
 
         if downloaded_qualities:
             for proper in new_propers[:]:
@@ -761,6 +765,8 @@ class FilterSeries(SeriesPlugin, FilterSeriesBase):
             Accepts all propers from qualities already downloaded.
             :return: list of accepted
         """
+        if not new_propers:
+            return []
 
         downloaded_releases = self.get_downloaded(feed.session, eps[0].name, eps[0].identifier)
         downloaded_qualities = [d.quality for d in downloaded_releases]
