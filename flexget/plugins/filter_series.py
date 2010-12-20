@@ -145,56 +145,27 @@ class SeriesPlugin(object):
 
     def get_latest_download(self, session, name):
         """Return latest downloaded episode (season, episode, name) for series name"""
-        series = session.query(Series).filter(Series.name == name.lower()).first()
-        if not series:
-            log.debug('get_latest_download returning false, series %s does not exists' % name)
+        latest_download = session.query(Episode).join(Release, Series).filter(Series.name == name.lower()).\
+            filter(Release.downloaded == True).order_by(desc(Episode.season), desc(Episode.number)).first()
+
+        if not latest_download:
+            log.debug('get_latest_download returning false, no downloaded episodes found for: %s' % name)
             return False
 
-        latest_season = 0
-        latest_episode = 0
-
-        def episode_downloaded(episode):
-            for release in episode.releases:
-                if release.downloaded:
-                    return True
-
-        for episode in series.episodes:
-            if episode_downloaded(episode) and ((episode.number > latest_episode and episode.season >= latest_season) \
-               or episode.season > latest_season):
-                latest_season = episode.season
-                latest_episode = episode.number
-
-        if latest_season == 0 and latest_episode == 0:
-            log.debug('get_latest_download returning false, latest_season: %s latest_episode: %s' % (latest_season, latest_episode))
-            return False
-
-        return {'season': latest_season, 'episode': latest_episode, 'name': name}
+        return {'season': latest_download.season, 'episode': latest_download.number, 'name': name}
 
     def get_releases(self, session, name, identifier):
         """Return all releases for series by identifier."""
-        episode = session.query(Episode).select_from(join(Episode, Series)).\
+        return session.query(Release).join(Episode, Series).\
             filter(Series.name == name.lower()).\
-            filter(Episode.identifier == identifier).first()
-        if not episode:
-            return []
-        releases = []
-        for release in session.query(Release).filter(Release.episode_id == episode.id).\
-            order_by(desc(Release.quality)).all():
-            releases.append(release)
-        return releases
+            filter(Episode.identifier == identifier).all()
 
     def get_downloaded(self, session, name, identifier):
         """Return list of downloaded releases for this episode"""
-        episode = session.query(Episode).select_from(join(Episode, Series)).\
+        downloaded = session.query(Release).join(Episode, Series).\
             filter(Series.name == name.lower()).\
-            filter(Episode.identifier == identifier).first()
-        if not episode:
-            log.debug('get_downloaded: episode or series does not exist')
-            return []
-        downloaded = []
-        for release in session.query(Release).filter(Release.episode_id == episode.id).\
-            filter(Release.downloaded == True).all():
-            downloaded.append(release)
+            filter(Episode.identifier == identifier).\
+            filter(Release.downloaded == True).all()
         if not downloaded:
             log.debug('get_downloaded: no %s downloads recorded for %s' % (identifier, name))
         return downloaded
@@ -883,7 +854,7 @@ class FilterSeries(SeriesPlugin, FilterSeriesBase):
                     feed.reject(self.parser2entry[ep], 'too much in the past from latest downloaded episode S%02dE%02d' % (latest['season'], latest['episode']))
                 return True
 
-            if (current.season > latest['season'] + 1):
+            if current.season > latest['season'] + 1:
                 log.debug('too new! rejecting all occurences')
                 for ep in eps:
                     feed.reject(self.parser2entry[ep], 'too much in the future from latest downloaded episode S%02dE%02d' % (latest['season'], latest['episode']))

@@ -109,7 +109,7 @@ class SeriesReport(SeriesPlugin):
                 latest = 'N/A'
                 status = 'N/A'
 
-            print ' %-30s%-20s%-21s' % (series.name.capitalize(), latest, status)
+            print ' %-30s%-20s%-21s' % (series.name.title(), latest, status)
 
         print '-' * 79
         print ' * = downloaded'
