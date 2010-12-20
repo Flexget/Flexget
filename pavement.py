@@ -100,6 +100,7 @@ def clean():
         elif pth.isfile():
             pth.remove()
 
+
 @task
 @cmdopts([
     ('dist-dir=', 'd', 'directory to put final built distributions in')
@@ -153,24 +154,6 @@ def sdist(options):
     # restore version ...
     set_init_version('{subversion}')
 
-@task
-# due workaround we need to add this manually
-@cmdopts([
-    ('dist-dir=', 'd', 'directory to put final built distributions in')
-])
-def bdist_egg(options):
-    # workaround for http://code.google.com/p/paver/issues/detail?id=49
-    # the minilib task crashes on bdist_egg with easy_install, but since the zip is already there there's no need to run it
-    import os
-    if not os.path.exists('paver-minilib.zip'):
-        call_task('minilib')
-
-    # set path
-    if options.bdist_egg.get('dist_dir'):
-        options.setdefault('bdist_egg', Bunch())['dist_dir'] = options.bdist_egg.dist_dir
-
-    for t in ['generate_setup', 'setuptools.command.bdist_egg']:
-        call_task(t)
 
 @task
 @cmdopts([
