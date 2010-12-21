@@ -3,7 +3,7 @@ import logging
 from sqlalchemy import Column, Integer, String, Unicode, ForeignKey
 from sqlalchemy.orm import relation, eagerload
 from flexget.manager import Base
-from flexget.plugin import register_plugin, register_parser_option, priority
+from flexget.plugin import register_plugin, register_parser_option, priority, get_plugin_by_name, PluginDependencyError
 
 log = logging.getLogger('only_new')
 
@@ -55,6 +55,14 @@ class FilterOnlyNew(object):
             for entry in feed.entries:
                 if entry['uid'] in seen_uids:
                     feed.reject(entry, 'Entry was processed on previous run.')
+            # Make sure details plugin doesn't complain when there are no entries
+            try:
+                details = get_plugin_by_name('details').instance
+                if feed.name not in details.no_entries_ok:
+                    log.debug('appending %s to details plugin no_entries_ok' % feed.name)
+                    details.no_entries_ok.append(feed.name)
+            except PluginDependencyError:
+                log.debug('unable to get details plugin')
 
         if old_feed:
             # We will reuse this object to write the new entries
