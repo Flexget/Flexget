@@ -233,17 +233,18 @@ def create_icon():
 
     icon_file = os.path.join('flexget', 'ui', 'plugins', 'tasktray_win32', 'flexget.ico')
 
-    def hello(sysTrayIcon):
-        print "Hello World."
+    def view(sysTrayIcon):
+        # View FlexGet in default web browser
+        from flexget.ui.webui import manager
+        import webbrowser
+        webbrowser.open('http://127.0.0.1:%d' % manager.options.port)
 
-    def simon(sysTrayIcon):
-        print "Hello Simon."
-
-    menu_options = (('Say Hello', None, hello), ('Switch Icon', None, simon))
+    menu_options = (('View FlexGet', None, view), )
 
     def bye(sysTrayIcon):
-        # TODO: shutdown FlexGet
-        print 'TODO: Shutdown ...'
+        # Shutdown FlexGet
+        from flexget.ui.webui import stop_server
+        stop_server()
 
     SysTrayIcon(icon_file, hover_text, menu_options, on_quit=bye, default_menu_index=1)
 
