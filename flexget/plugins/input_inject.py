@@ -9,21 +9,21 @@ log = logging.getLogger('inject')
 class InputInject(object):
     """
         Allows injecting imaginary entry for FlexGet to process.
-        
+
         Syntax:
-        
+
         --inject <TITLE> [URL] [ACCEPTED] [IMMORTAL]
-        
+
         Random url will be generated. All other inputs from freed(s) are disabled.
 
-        
+
         Example use:
-        
+
         flexget --inject "Some.Series.S02E12.Imaginary" --feed my-series --learn
-        
+
         This would inject imaginary series into a single feed and learn it as a downloaded,
         assuming feed accepts the injected entry.
-        
+
     """
 
     def validator(self):
@@ -58,8 +58,7 @@ class InputInject(object):
             else:
                 log.critical('Unknown --inject parameter %s' % arg)
 
-    @priority(255)
-    def on_feed_input(self, feed):
+    def on_feed_start(self, feed):
         if not InputInject.options:
             return
 
@@ -70,7 +69,13 @@ class InputInject(object):
                 if len(events) == 1:
                     log.info('Disabling plugin %s' % input.name)
                     del(feed.config[input.name])
-        
+
+    # Make sure we inject after only_new has done it's filtering
+    @priority(100)
+    def on_feed_input(self, feed):
+        if not InputInject.options:
+            return
+
         # create our injected entry
         import string
         import random
