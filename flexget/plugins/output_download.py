@@ -139,6 +139,10 @@ class PluginDownload(object):
             elif hasattr(e, 'code'):
                 log.warning('The server couldn\'t fulfill the request. Error code: %s' % e.code)
             return 'IOError'
+        except ValueError, e:
+            # Probably unknown url type
+            log.warning(e.message)
+            return e.message
 
     def download(self, feed, entry, url):
         """Downloads :entry:. May raise exception(s) PluginWarning"""
