@@ -2,6 +2,7 @@ import logging
 import time
 import os
 import base64
+import re
 from flexget.utils.tools import replace_from_entry
 from flexget.plugin import register_plugin, PluginError, priority, get_plugin_by_name
 
@@ -223,6 +224,10 @@ class OutputDeluge(object):
         from deluge.ui.client import client
         from twisted.internet import reactor, defer
 
+        def format_label(label):
+            """Makes a string compliant with deluge label naming rules"""
+            return re.sub('[^\w-]+', '_', label.lower())
+
         def start_reactor():
             """This runs the reactor loop."""
             # if this is the first this function is being called, we have to call startRunning
@@ -343,9 +348,9 @@ class OutputDeluge(object):
             # dlist is a list of deferreds that must complete before we exit
             dlist = []
             # loop through entries to get a list of labels to add
-            labels = set([entry['label'].lower() for entry in feed.accepted if entry.get('label')])
+            labels = set([format_label(entry['label']) for entry in feed.accepted if entry.get('label')])
             if config.get('label'):
-                labels.add(config['label'].lower())
+                labels.add(format_label(config['label']))
             label_deferred = defer.succeed(True)
             if labels:
                 # Make sure the label plugin is available and enabled, then add appropriate labels
@@ -433,7 +438,7 @@ class OutputDeluge(object):
                 content_filename = entry.get('content_filename', config.get('content_filename', ''))
                 movedone = replace_from_entry(entry.get('movedone', config['movedone']), entry, 'movedone', log.error)
                 opts = {'movedone': os.path.expanduser(movedone),
-                        'label': entry.get('label', config['label']).lower(),
+                        'label': format_label(entry.get('label', config['label'])),
                         'queuetotop': entry.get('queuetotop', config.get('queuetotop')),
                         'content_filename': replace_from_entry(content_filename, entry, 'content_filename', log.error),
                         'main_file_only': entry.get('main_file_only', config.get('main_file_only', False))}
