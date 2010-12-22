@@ -1,23 +1,66 @@
 {% extends "layout.html" %}
+
+{% block head %}
+    <script type="text/javascript">
+        function on_delete(feed){
+            var ans = confirm("Really delete schedule for "+feed+"?")
+            if(ans){
+                location.href = "/schedule/delete/"+feed;
+            }
+        }
+        function on_add(){
+            var feed = $("#add_feed").val()
+            if(feed){
+                location.href = "/schedule/add/"+feed;
+            }
+        }
+    </script>
+{% endblock %}
+
 {% block main %}
 
 <h1>Schedule execution</h1>
 
 <form action="{{ url_for('index') }}" method="post" class="simple">
-    <fieldset>
+    <fieldset style="width: 24em">
         <legend>Scheduling</legend>
         <div>
-            <label for="interval">Interval</label>
-            <input type="text" id="interval" name="interval" value="{{ interval }}" size="10" style="text-align: right">
-            <select name="unit">
+        <table>
+        {%- for item in schedule_items %}
+            <tr>
+            <td align="center">
+            {{ item.feed }}
+            </td>
+            <td align="right">
+            <input name="{{ item.feed }}_interval" value="{{ item.interval }}" size="10" style="text-align: right;">
+            <select name="{{ item.feed }}_unit">
                 <option value="minutes" selected>minutes</option>
                 <option value="hours">hours</option>
                 <option value="days">days</option>
             </select>
+            <button type="button" onclick="on_delete('{{ item.feed }}')">
+                <img src="{{ url_for('.static', filename='img/fatcow-icons/16x16/delete.png') }}" alt="Delete">
+            </button>
+            </td>
+            </tr>
+        {% endfor -%}
+        {% if feeds %}
+            <tr><td align="center">
+            <select id="add_feed">
+                {% for feed in feeds %}<option value="{{ feed }}">{{ feed }}</option>{% endfor %}
+            </select></td>
+            <td>
+            <button type="button" onclick="on_add()">
+                <img src="{{ url_for(".static", filename="img/fatcow-icons/16x16/add.png") }}" alt="Add">
+            </button>
+            </td></tr>
+        {% endif %}
+        </table>
         </div>
         <div class="buttons">
-            <button type="submit">Change Interval</button>
+            <button type="submit" name="submit" value="change">Change Interval</button>
         </div>
     </fieldset>
+
 </form>
 {% endblock %}

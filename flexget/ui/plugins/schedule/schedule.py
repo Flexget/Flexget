@@ -1,13 +1,13 @@
 """
 At the moment scheduler supports just one global interval for all feeds.
 """
-
+from copy import copy
 import logging
 from datetime import datetime, timedelta
 import threading
 from sqlalchemy import Column, Integer, Unicode
-from flask import request, render_template, flash, Module
-from flexget.ui.webui import register_plugin, db_session, manager
+from flask import request, render_template, flash, Module, redirect, url_for
+from flexget.ui.webui import register_plugin, db_session, manager, executor
 from flexget.manager import Base
 from flexget.event import event, fire_event
 
@@ -16,7 +16,7 @@ schedule = Module(__name__)
 
 DEFAULT_INTERVAL = 60
 
-timer = None
+timers = {}
 
 
 class Schedule(Base):
@@ -73,86 +73,149 @@ class RepeatingTimer(threading.Thread):
                 self.function(*self.args, **self.kwargs)
 
 
-def set_global_interval(interval):
-    global_interval = db_session.query(Schedule).filter(Schedule.feed == u'__GLOBAL__').first()
-    if global_interval:
-        log.debug('Updating global interval')
-        global_interval.interval = interval
+def get_feed_interval(feed):
+    feed_interval = db_session.query(Schedule).filter(Schedule.feed == feed).first()
+    if feed_interval:
+        return feed_interval.interval
+
+
+def set_feed_interval(feed, interval):
+    feed_interval = db_session.query(Schedule).filter(Schedule.feed == feed).first()
+    if feed_interval:
+        log.debug('Updating %s interval' % feed)
+        feed_interval.interval = interval
     else:
-        log.debug('Creating new global interval')
-        db_session.add(Schedule(u'__GLOBAL__', interval))
+        log.debug('Creating new %s interval' % feed)
+        db_session.add(Schedule(feed, interval))
     db_session.commit()
 
 
-def get_global_interval():
-    global_interval = db_session.query(Schedule).filter(Schedule.feed == u'__GLOBAL__').first()
-    if global_interval:
-        return global_interval.interval
-    return DEFAULT_INTERVAL
+@schedule.context_processor
+def get_intervals():
+    schedule_items = db_session.query(Schedule).all()
+    return {'schedule_items': schedule_items,
+            'feeds': set(get_all_feeds() + [u'__GLOBAL__']) - set(get_scheduled_feeds())}
+
+
+def update_interval(form, feed):
+    try:
+        interval = float(form[feed + '_interval'])
+    except ValueError:
+        flash('%s interval must be a number!' % feed.capitalize(), 'error')
+    else:
+        if interval <= 0:
+            flash('%s nterval must be greater than zero!' % feed.capitalize(), 'error')
+        else:
+            unit = form[feed + '_unit']
+            delta = timedelta(**{unit: interval})
+            # Convert the timedelta to integer minutes
+            interval = int((delta.seconds + delta.days * 24 * 3600) / 60.0)
+            if interval <= 0:
+                interval = 1
+            log.info('new interval for %s: %d minutes' % (feed, interval))
+            set_feed_interval(feed, interval)
+            flash('%s scheduling updated successfully.' % feed.capitalize(), 'success')
+            timers[feed].change_interval(interval * 60)
 
 
 @schedule.route('/', methods=['POST', 'GET'])
 def index():
+    # TODO: Only allow global interval if --feed plugin isn't available
     global timer
     if request.method == 'POST':
-        try:
-            interval = float(request.form['interval'])
-        except ValueError:
-            flash('Interval must be a number!', 'error')
+        if request.form.get('submit') == 'add':
+            if request.form.get('add_feed') in manager.config['feeds']:
+                set_feed_interval(request.form['add_feed'], DEFAULT_INTERVAL)
+                start_timer(request.form['add_feed'], DEFAULT_INTERVAL)
+
         else:
-            if interval <= 0:
-                flash('Interval must be greater than zero!', 'error')
-            else:
-                unit = request.form['unit']
-                delta = timedelta(**{unit: interval})
-                # Convert the timedelta to integer minutes
-                interval = int((delta.seconds + delta.days * 24 * 3600) / 60.0)
-                if interval <= 0:
-                    interval = 1
-                log.info('new interval: %s minutes' % interval)
-                set_global_interval(interval)
-                flash('Scheduling updated successfully.', 'success')
-                timer.change_interval(interval * 60)
+            for feed in manager.config['feeds'].keys() + [u'__GLOBAL__']:
+                if request.form.get(feed + '_interval'):
+                    update_interval(request.form, feed)
 
-    context = {}
-    global_interval = get_global_interval()
-    if global_interval:
-        context['interval'] = global_interval
+    return render_template('schedule/schedule.html')
+
+
+@schedule.route('/delete/<feed>')
+def delete_schedule(feed):
+    stop_timer(feed)
+    db_session.query(Schedule).filter(Schedule.feed == feed).delete()
+    db_session.commit()
+    return redirect(url_for('index'))
+
+
+@schedule.route('/add/<feed>')
+def add_schedule(feed):
+    schedule = db_session.query(Schedule).filter(Schedule.feed == feed).first()
+    if not schedule:
+        schedule = Schedule(feed, DEFAULT_INTERVAL)
+    db_session.merge(schedule)
+    db_session.commit()
+    start_timer(feed, DEFAULT_INTERVAL)
+    return redirect(url_for('index'))
+
+
+def get_all_feeds():
+    return [feed for feed in manager.config.get('feeds', {}).keys() if not feed.startswith('_')]
+
+
+def get_scheduled_feeds():
+    return [item.feed for item in db_session.query(Schedule).all()]
+
+
+def execute(feed):
+    """Adds a run to the executor"""
+    # Get a copy of the options from the manager
+    run_opts = copy(manager.options)
+    if feed == u'__GLOBAL__':
+        # Get a list of all feeds that do not have their own schedule
+        feeds = set(get_all_feeds()) - set(get_scheduled_feeds())
+        # Use the --feed plugin to run only desired feeds
+        run_opts.onlyfeed = ','.join(feeds)
+        log.info('Executing feeds: %s' % ", ".join(feeds))
     else:
-        flash('Interval not set')
-        context['interval'] = ''
-
-    return render_template('schedule/schedule.html', **context)
-
-
-def execute():
-    log.info('Executing feeds')
+        # Only run the passed feed
+        run_opts.onlyfeed = feed
+        log.info('Executing feed: %s' % feed)
     fire_event('scheduler.execute')
-    from flexget.ui.webui import executor
-    executor.execute()
+    executor.execute(options=run_opts)
 
 
-@event('webui.start')
-def start_timer():
+def start_timer(feed, interval):
     # autoreload will fail if there are pending timers
     if manager.options.autoreload:
         log.info('Aborting start_timer() because --autoreload is enabled')
         return
 
-    interval = get_global_interval()
-    global timer
-    if timer is None:
-        timer = RepeatingTimer(interval * 60, execute)
-        log.debug('Starting scheduler (%s minutes)' % interval)
-        timer.start()
+    log.debug('Starting %s scheduler (%s minutes)' % (feed, interval))
+    global timers
+    if not timers.get(feed):
+        timers[feed] = RepeatingTimer(interval * 60, execute, (feed,))
+        timers[feed].start()
+    else:
+        timers[feed].change_interval(interval * 60)
+
+
+def stop_timer(feed):
+    global timers
+    if timers.get(feed):
+        timers[feed].cancel()
+        del timers[feed]
+
+
+@event('webui.start')
+def on_webui_start():
+    # Start timers for all schedules
+    for item in db_session.query(Schedule):
+        start_timer(item.feed, item.interval)
 
 
 @event('webui.stop')
-def stop_timer():
+def on_webui_stop():
     log.info('Terminating')
-    global timer
-    if timer:
-        timer.cancel()
+    # Stop all running timers
+    for feed in [f for f in timers]:
+        stop_timer(feed)
 
 
 register_plugin(schedule, menu='Schedule')

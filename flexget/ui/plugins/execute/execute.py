@@ -1,9 +1,10 @@
 import logging
+from Queue import Empty
 from flask import render_template, request, redirect, flash
 from flask import Module, escape
-from flexget.ui.webui import register_plugin, manager, BufferQueue
-from Queue import Empty
 from flask.helpers import jsonify
+from flexget.ui.webui import register_plugin, manager, executor
+from flexget.ui.executor import BufferQueue
 
 execute = Module(__name__, url_prefix='/execute')
 
@@ -21,7 +22,6 @@ def index():
             flash(escape(manager.parser.error_msg), 'error')
             context['options'] = request.form['options']
         else:
-            from flexget.ui.webui import executor
             executor.execute(options=options, output=bufferqueue)
             context['execute_progress'] = True
             context['progress'] = progress(as_list=True)
