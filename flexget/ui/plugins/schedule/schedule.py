@@ -92,9 +92,15 @@ def set_feed_interval(feed, interval):
 
 @schedule.context_processor
 def get_intervals():
-    schedule_items = db_session.query(Schedule).all()
-    return {'schedule_items': schedule_items,
-            'feeds': set(get_all_feeds() + [u'__GLOBAL__']) - set(get_scheduled_feeds())}
+    schedule_items = db_session.query(Schedule).filter(Schedule.feed != '__DEFAULT__').all()
+    default_interval = db_session.query(Schedule).filter(Schedule.feed == '__DEFAULT__').first()
+    if default_interval:
+        default_interval = default_interval.interval
+    else:
+        default_interval = DEFAULT_INTERVAL
+    return {'default_interval': default_interval,
+            'schedule_items': schedule_items,
+            'feeds': set(get_all_feeds()) - set(get_scheduled_feeds())}
 
 
 def update_interval(form, feed):
@@ -114,8 +120,8 @@ def update_interval(form, feed):
                 interval = 1
             log.info('new interval for %s: %d minutes' % (feed, interval))
             set_feed_interval(feed, interval)
+            start_timer(feed, interval)
             flash('%s scheduling updated successfully.' % feed.capitalize(), 'success')
-            timers[feed].change_interval(interval * 60)
 
 
 @schedule.route('/', methods=['POST', 'GET'])
@@ -123,15 +129,9 @@ def index():
     # TODO: Only allow global interval if --feed plugin isn't available
     global timer
     if request.method == 'POST':
-        if request.form.get('submit') == 'add':
-            if request.form.get('add_feed') in manager.config['feeds']:
-                set_feed_interval(request.form['add_feed'], DEFAULT_INTERVAL)
-                start_timer(request.form['add_feed'], DEFAULT_INTERVAL)
-
-        else:
-            for feed in manager.config['feeds'].keys() + [u'__GLOBAL__']:
-                if request.form.get(feed + '_interval'):
-                    update_interval(request.form, feed)
+        for feed in get_all_feeds() + [u'__DEFAULT__']:
+            if request.form.get(feed + '_interval'):
+                update_interval(request.form, feed)
 
     return render_template('schedule/schedule.html')
 

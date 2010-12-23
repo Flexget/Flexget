@@ -1,6 +1,14 @@
 {% extends "layout.html" %}
 
 {% block head %}
+    <style type="text/css">
+        table.add_table {
+            padding: 2px;
+            background-color: #FF702E;
+            -moz-border-radius: 0.4em;
+            -khtml-border-radius: 0.4em;
+        }
+    </style>
     <script type="text/javascript">
         function on_delete(feed){
             var ans = confirm("Really delete schedule for "+feed+"?")
@@ -14,6 +22,9 @@
                 location.href = "/schedule/add/"+feed;
             }
         }
+        function show_add_area(){
+            $("#add_area").show("slide", {direction: "up"}, 500)
+        }
     </script>
 {% endblock %}
 
@@ -22,43 +33,62 @@
 <h1>Schedule execution</h1>
 
 <form action="{{ url_for('index') }}" method="post" class="simple">
-    <fieldset style="width: 24em">
+    <fieldset style="width: 22em;">
         <legend>Scheduling</legend>
         <div>
-        <table>
+        <table cellspacing="5">
+            <tr>
+            <td align="center">
+            Default
+            </td>
+            <td>
+            <input name="__DEFAULT___interval" value="{{ default_interval }}" size="10" style="text-align: right;">
+            <select name="__DEFAULT___unit">
+                <option value="minutes" selected>minutes</option>
+                <option value="hours">hours</option>
+                <option value="days">days</option>
+            </select>
+            </td>
+            </tr>
+        {% if schedule_items %}<tr><td> </td></tr>{% endif %}
         {%- for item in schedule_items %}
             <tr>
             <td align="center">
             {{ item.feed }}
             </td>
-            <td align="right">
+            <td>
             <input name="{{ item.feed }}_interval" value="{{ item.interval }}" size="10" style="text-align: right;">
             <select name="{{ item.feed }}_unit">
                 <option value="minutes" selected>minutes</option>
                 <option value="hours">hours</option>
                 <option value="days">days</option>
             </select>
-            <button type="button" onclick="on_delete('{{ item.feed }}')">
-                <img src="{{ url_for('.static', filename='img/fatcow-icons/16x16/delete.png') }}" alt="Delete">
-            </button>
+            <td>
+            <img src="{{ url_for('.static', filename='img/fatcow-icons/16x16/delete.png') }}" alt="Delete"
+                    onclick="on_delete('{{ item.feed }}')">
+            </td>
             </td>
             </tr>
         {% endfor -%}
-        {% if feeds %}
-            <tr><td align="center">
+        </table>
+        <div id="add_area" style="display:none;">
+        <table class="add_table"><tr><td>
             <select id="add_feed">
                 {% for feed in feeds %}<option value="{{ feed }}">{{ feed }}</option>{% endfor %}
-            </select></td>
-            <td>
-            <button type="button" onclick="on_add()">
-                <img src="{{ url_for(".static", filename="img/fatcow-icons/16x16/add.png") }}" alt="Add">
-            </button>
-            </td></tr>
-        {% endif %}
-        </table>
+            </select>
+        </td><td>
+            <img src="{{ url_for(".static", filename="img/fatcow-icons/16x16/add.png") }}" alt="Add" onclick="on_add()">
+        </td></tr></table>
+        </div>
         </div>
         <div class="buttons">
-            <button type="submit" name="submit" value="change">Change Interval</button>
+            {% if feeds %}
+            <button type="button" onclick="show_add_area()">
+                <img src="{{ url_for(".static", filename="img/fatcow-icons/16x16/add.png") }}" alt="Add" align="top">
+                Add Feed
+            </button>
+            {% endif %}
+            <button type="submit" name="submit" value="change">Save Changes</button>
         </div>
     </fieldset>
 
