@@ -38,11 +38,12 @@
         <div>
         <table cellspacing="5">
             <tr>
-            <td align="center">
+            <td align="center" style="width: 6em">
             Default
             </td>
             <td>
             <input name="__DEFAULT___interval" value="{{ default_interval }}" size="10" style="text-align: right;">
+            </td><td>
             <select name="__DEFAULT___unit">
                 <option value="minutes" selected>minutes</option>
                 <option value="hours">hours</option>
@@ -58,6 +59,7 @@
             </td>
             <td>
             <input name="{{ item.feed }}_interval" value="{{ item.interval }}" size="10" style="text-align: right;">
+            </td><td>
             <select name="{{ item.feed }}_unit">
                 <option value="minutes" selected>minutes</option>
                 <option value="hours">hours</option>
