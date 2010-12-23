@@ -167,7 +167,7 @@ def execute(feed):
     """Adds a run to the executor"""
     # Get a copy of the options from the manager
     run_opts = copy(manager.options)
-    if feed == u'__GLOBAL__':
+    if feed == u'__DEFAULT__':
         # Get a list of all feeds that do not have their own schedule
         feeds = set(get_all_feeds()) - set(get_scheduled_feeds())
         # Use the --feed plugin to run only desired feeds

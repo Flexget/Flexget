@@ -590,6 +590,7 @@ class FilterSeries(SeriesPlugin, FilterSeriesBase):
                 log.warning('Found different quality for %s. Was %s, overriding with %s.' % \
                     (entry['title'], entry['quality'], parser.quality))
             entry['quality'] = parser.quality
+            entry['proper'] = parser.proper
             if parser.season and parser.episode:
                 entry['series_season'] = parser.season
                 entry['series_episode'] = parser.episode
