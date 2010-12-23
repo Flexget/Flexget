@@ -83,6 +83,7 @@ def edit_text(root, name):
                         # Do the rename
                         manager.config[root][new_name] = manager.config[root][name]
                         del manager.config[root][name]
+                        manager.save_config()
                         flash('%s %s renamed to %s.' % (config_type.capitalize(), name, new_name), 'success')
                         return redirect(url_for('edit_text', root=root, name=new_name))
                 else:
