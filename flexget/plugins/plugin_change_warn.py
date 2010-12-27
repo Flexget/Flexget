@@ -35,7 +35,7 @@ class ChangeWarn(object):
         # Run only once
         if self.executed:
             return
-            
+
         self.executed = True
         found_deprecated = False
         config = feed.manager.config
@@ -137,13 +137,20 @@ try:
 
         if require_clean:
             log.critical('-' * 79)
-            log.critical('IMPORTANT: Please remove all pre-compiled .pyc and .pyo files from')
-            log.critical('           path: %s' % plugin_dir)
-            log.critical('           After this FlexGet should run again normally')
+            log.critical('IMPORTANT: Your installation has some files from older FlexGet!')
             log.critical('')
-            log.critical('           If you are using bootstrapped subversion checkout you can run:')
-            log.critical('           bin/paver clean_compiled')
+            log.critical('           Please remove all pre-compiled .pyc and .pyo files from %s' % plugin_dir)
+            log.critical('           Offending file: %s' % name)
+            log.critical('')
+            log.critical('           After getting rid of these FlexGet should run again normally')
 
+            from flexget import __version__ as version
+            if version == '{subversion}':
+                log.critical('')
+                log.critical('           If you are using bootstrapped subversion checkout you can run:')
+                log.critical('           bin/paver clean_compiled')
+
+            log.critical('')
             log.critical('-' * 79)
             found_deprecated = True
             break
