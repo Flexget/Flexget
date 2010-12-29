@@ -39,6 +39,9 @@ class PluginPriority(object):
         log.debug('Changed priority for: %s' % ', '.join(names))
 
     def on_feed_exit(self, feed):
+        if not self.priorities:
+            log.debug('nothing changed, aborting restore')
+            return
         names = []
         for name in feed.config.get('plugin_priority', {}).keys():
             names.append(name)
@@ -46,6 +49,7 @@ class PluginPriority(object):
             for handler_name, priority in originals.iteritems():
                 plugins[name].event_handlers[handler_name].priority = priority
         log.debug('Restored priority for: %s' % ', '.join(names))
+        self.priorities = {}
 
     on_feed_abort = on_feed_exit
 
