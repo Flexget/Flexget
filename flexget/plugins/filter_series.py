@@ -209,7 +209,7 @@ class SeriesPlugin(object):
             filter(Release.proper == parser.proper_or_repack).\
             filter(Release.episode_id != None).first()
         if not release:
-            log.debug('addding release %s into episode' % parser)
+            log.debug('adding release %s into episode' % parser)
             release = Release()
             release.quality = parser.quality
             release.proper = parser.proper_or_repack
@@ -331,7 +331,7 @@ class FilterSeriesBase(object):
                     series, series_settings = series.items()[0]
                     if series_settings is None:
                         raise Exception('Series %s has unexpected \':\'' % series)
-                # make sure series name is a string to accomadate for "24"
+                # make sure series name is a string to accommodate for "24"
                 if not isinstance(series, basestring):
                     series = str(series)
                 # if series have given path instead of dict, convert it into a dict
@@ -565,7 +565,7 @@ class FilterSeries(SeriesPlugin, FilterSeriesBase):
                     # skip ignored
                     if field in ignore_fields:
                         continue
-                    # incase quality will not be found from title, set it from entry['quality'] if available
+                    # in case quality will not be found from title, set it from entry['quality'] if available
                     quality = None
                     if qualities.get(entry.get('quality', '')) > qualities.UnknownQuality():
                         log.log(5, 'Setting quality %s from entry field to parser' % entry['quality'])
@@ -716,7 +716,7 @@ class FilterSeries(SeriesPlugin, FilterSeriesBase):
         if downloaded_qualities:
             for proper in new_propers[:]:
                 if proper.quality not in downloaded_qualities:
-                    log.debug('proper %s quality missmatch' % proper)
+                    log.debug('proper %s quality mismatch' % proper)
                     new_propers.remove(proper)
 
         # nuke qualities which there is proper available
@@ -845,7 +845,7 @@ class FilterSeries(SeriesPlugin, FilterSeriesBase):
             return True
 
     def process_episode_advancement(self, feed, eps, series):
-        """Rjects all episodes that are too old or new (advancement), return True when this happens."""
+        """Rejects all episodes that are too old or new (advancement), return True when this happens."""
 
         current = eps[0]
         latest = self.get_latest_download(feed.session, current.name)
@@ -862,7 +862,7 @@ class FilterSeries(SeriesPlugin, FilterSeriesBase):
                 return True
 
             if current.season > latest['season'] + 1:
-                log.debug('too new! rejecting all occurences')
+                log.debug('too new! rejecting all occurrences')
                 for ep in eps:
                     feed.reject(self.parser2entry[ep], 'too much in the future from latest downloaded episode S%02dE%02d' % (latest['season'], latest['episode']))
                 return True
