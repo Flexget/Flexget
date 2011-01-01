@@ -8,12 +8,13 @@ log = logging.getLogger('manipulate')
 class Manipulate(object):
     """
         Usage:
-        
+
         manipulate:
           - <destination field>:
               [event]: <event>
               [from]: <source field>
               [extract]: <regexp>
+              [separator]: <text>
               [replace]:
                 regexp: <regexp>
                 format: <regexp>
@@ -24,7 +25,7 @@ class Manipulate(object):
           - title:
               extract: \[\d\d\d\d\](.*)
     """
-    
+
     def validator(self):
         from flexget import validator
         root = validator.factory()
@@ -36,6 +37,7 @@ class Manipulate(object):
         edit.accept('choice', key='event').accept_choices(['metainfo', 'filter'], ignore_case=True)
         edit.accept('text', key='from')
         edit.accept('regexp', key='extract')
+        edit.accept('text', key='separator')
         replace = edit.accept('dict', key='replace')
         replace.accept('regexp', key='regexp', required=True)
         replace.accept('text', key='format', required=True)
@@ -58,7 +60,7 @@ class Manipulate(object):
             return
         for entry in feed.entries:
             self.process(feed, entry, self.event_jobs['metainfo'])
-            
+
     @priority(255)
     def on_feed_filter(self, feed):
         if not self.event_jobs['filter']:
@@ -85,7 +87,7 @@ class Manipulate(object):
                     if match:
                         groups = [x for x in match.groups() if x is not None]
                         log.debug('groups: %s' % groups)
-                        field_value = ''.join(groups)
+                        field_value = config.get('separator', ' ').join(groups)
                         log.debug('field %s after extract: %s' % (field, field_value))
 
                 if 'replace' in config:

@@ -21,7 +21,7 @@ class FailedEntry(Base):
         self.tof = datetime.now()
 
     def __str__(self):
-        return '<Failed(title=%s)>' % (self.title)
+        return '<Failed(title=%s)>' % self.title
 
 
 class PluginFailed(object):
@@ -66,7 +66,7 @@ class PluginFailed(object):
         i = 0
         for row in failed.query(FailedEntry).order_by(FailedEntry.tof.desc()).all():
             i += 1
-            if (i > 25):
+            if i > 25:
                 failed.delete(row)
         failed.commit()
         failed.close()
