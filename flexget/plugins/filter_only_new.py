@@ -78,6 +78,15 @@ class FilterOnlyNew(object):
         # Write the new info to the db
         feed.session.merge(new_feed)
 
+    def on_entry_fail(self, feed, entry, reason):
+        if not feed.config.get('only_new', True):
+            return
+        # Remove failed entry from the only_new database so that it can be retried next run
+        db_entry = feed.session.query(OnlyNewEntry).join(OnlyNewFeed).filter(OnlyNewFeed.name == feed.name).\
+            filter(OnlyNewEntry.uid == entry['uid']).first()
+        if db_entry:
+            feed.session.delete(db_entry)
+
 
 register_plugin(FilterOnlyNew, 'only_new')
 register_parser_option('--no-only-new', action='store_true', dest='no_only_new', default=0,
