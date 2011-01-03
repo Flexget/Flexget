@@ -78,10 +78,13 @@ class OutputSabnzbd:
             params = self.get_params(config)
             # allow overriding the category
             if 'category' in entry:
-                params['cat'] = entry['category']
-            params['name'] = entry['url']
+                # Dirty hack over the next few lines to strip out non-ascii 
+                # chars. We're going to urlencode this, which causes 
+                # serious issues in python2.x if it's not ascii input.
+                params['cat'] = ''.join([x for x in entry['category'] if ord(x) < 128])
+            params['name'] = ''.join([x for x in entry['url'] if ord(x) < 128])
             # add cleaner nzb name (undocumented api feature)
-            params['nzbname'] = entry['title']
+            params['nzbname'] = ''.join([x for x in entry['title'] if ord(x) < 128])
 
             request_url = baseurl + urllib.urlencode(params)
             log.debug('request_url: %s' % request_url)
