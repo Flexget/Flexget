@@ -4,9 +4,10 @@ from flexget.plugin import register_plugin
 
 log = logging.getLogger('cached')
 
+cache = {}
+
 
 class cached(object):
-
     """
     Implements transparent caching decorator @cached for inputs.
 
@@ -19,8 +20,6 @@ class cached(object):
     Configuration assumptions may make this unusable in some (future) inputs
     """
 
-    cache = {}
-
     def __init__(self, name, key=None):
         self.name = name
         self.key = key
@@ -28,6 +27,7 @@ class cached(object):
     def __call__(self, func):
 
         def wrapped_func(*args, **kwargs):
+            global cache
 
             # get feed from method parameters
             feed = args[1]
@@ -46,12 +46,12 @@ class cached(object):
             else:
                 name = feed.config[self.name]
 
-            log.debug('cache name: %s (has: %s)' % (name, ', '.join(self.cache.keys())))
+            log.debug('cache name: %s (has: %s)' % (name, ', '.join(cache.keys())))
 
-            if name in self.cache:
+            if name in cache:
                 log.log(5, 'cache hit')
                 count = 0
-                for entry in self.cache[name]:
+                for entry in cache[name]:
                     fresh = copy.deepcopy(entry)
                     feed.entries.append(fresh)
                     count += 1
@@ -63,7 +63,7 @@ class cached(object):
                 func(*args, **kwargs)
                 # store results to cache
                 log.debug('storing to cache %s %s entries' % (name, len(feed.entries)))
-                self.cache[name] = copy.deepcopy(feed.entries)
+                cache[name] = copy.deepcopy(feed.entries)
 
         return wrapped_func
 

@@ -408,6 +408,31 @@ class Manager(object):
         for feed in self.feeds.itervalues():
             feed.enabled = True
 
+    def process_start(self):
+        """Execute process_start for all feeds"""
+        for name, feed in self.feeds.iteritems():
+            if not feed.enabled:
+                continue
+            try:
+                log.log(5, 'calling process_start on a feed %s' % name)
+                feed.process_start()
+            except Exception, e:
+                feed.enabled = False
+                log.exception('Feed %s process_start: %s' % (feed.name, e))
+
+    def process_end(self):
+        """Execute process_end for all feeds"""
+        for name, feed in self.feeds.iteritems():
+            if not feed.enabled:
+                continue
+            if feed._abort:
+                continue
+            try:
+                log.log(5, 'calling process_end on a feed %s' % name)
+                feed.process_end()
+            except Exception, e:
+                log.exception('Feed %s process_end: %s' % (name, e))
+
     @useExecLogging
     def execute(self):
         """Iterate trough all feeds and run them."""
@@ -416,28 +441,15 @@ class Manager(object):
             log.warning('There are no feeds to execute, please add some feeds')
             return
 
-        failed = []
-
-        # execute process_start to all feeds
-        for name, feed in self.feeds.iteritems():
-            if not feed.enabled:
-                continue
-            try:
-                log.log(5, 'calling process_start on a feed %s' % name)
-                feed.process_start()
-            except Exception, e:
-                failed.append(name)
-                log.exception('Feed %s process_start: %s' % (feed.name, e))
+        self.process_start()
 
         for feed in sorted(self.feeds.values()):
             if not feed.enabled:
                 continue
-            if feed.name in failed:
-                continue
             try:
                 feed.execute()
             except Exception, e:
-                failed.append(feed.name)
+                feed.enabled = False
                 log.exception('Feed %s: %s' % (feed.name, e))
             except KeyboardInterrupt:
                 # show real stack trace in debug mode
@@ -446,17 +458,7 @@ class Manager(object):
                 print '**** Keyboard Interrupt ****'
                 return
 
-        # execute process_end to all feeds
-        for name, feed in self.feeds.iteritems():
-            if not feed.enabled:
-                continue
-            if name in failed or feed._abort:
-                continue
-            try:
-                log.log(5, 'calling process_end on a feed %s' % name)
-                feed.process_end()
-            except Exception, e:
-                log.exception('Feed %s process_end: %s' % (name, e))
+        self.process_end()
 
         fire_event('manager.execute.completed', self)
 

@@ -232,7 +232,7 @@ class OutputDeluge(object):
             """This runs the reactor loop."""
             # if this is the first this function is being called, we have to call startRunning
             if self.reactorRunning < 2:
-                reactor.startRunning(True)
+                reactor.startRunning(False)
             self.reactorRunning = 1
             while self.reactorRunning == 1:
                 reactor.iterate()

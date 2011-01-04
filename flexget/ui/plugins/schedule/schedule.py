@@ -126,7 +126,6 @@ def update_interval(form, feed):
 
 @schedule.route('/', methods=['POST', 'GET'])
 def index():
-    # TODO: Only allow global interval if --feed plugin isn't available
     global timer
     if request.method == 'POST':
         for feed in get_all_feeds() + [u'__DEFAULT__']:
@@ -170,6 +169,7 @@ def execute(feed):
     if feed == u'__DEFAULT__':
         # Get a list of all feeds that do not have their own schedule
         feeds = set(get_all_feeds()) - set(get_scheduled_feeds())
+        # TODO: Don't use the --feed plugin
         # Use the --feed plugin to run only desired feeds
         run_opts.onlyfeed = ','.join(feeds)
         log.info('Executing feeds: %s' % ", ".join(feeds))
