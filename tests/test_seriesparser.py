@@ -457,3 +457,8 @@ class TestSeriesParser(object):
         s = self.parse(name='Something', data='Something.S5.Drunk.Santa.Part1')
         assert s.season == 5, 'failed to parse season'
         assert s.episode == 1, 'failed to parse episode'
+
+    def test_specials(self):
+        """SeriesParser: Special episodes with no id"""
+        s = self.parse(name='The Show', data='The Show 2005 A Christmas Carol 2010 Special 720p HDTV x264')
+        assert s.valid == True, 'Special episode should be valid'

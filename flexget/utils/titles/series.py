@@ -25,9 +25,8 @@ class SeriesParser(TitleParser):
     """
     separators = '[!/+,:;|~ x-]'
     roman_numeral_re = 'X{0,3}(?:IX|XI{0,4}|VI{0,4}|IV|V|I{1,4})'
-    re_not_in_word = lambda regexp: r'(?<![^\W_])' + regexp + r'(?![^\W_])'
 
-    ep_regexps = ReList([re_not_in_word(regexp) for regexp in [
+    ep_regexps = ReList([TitleParser.re_not_in_word(regexp) for regexp in [
         '(?:series|season|s)\s?(\d{1,3})(?:\s(?:.*?\s)?)?(?:episode|ep|e|part|pt)\s?(\d{1,3}|%s)' % roman_numeral_re,
         '(?:series|season)\s?(\d{1,3})\s(\d{1,3})\s?of\s?(?:\d{1,3})',
         '(\d{1,3})\s?of\s?(?:\d{1,3})',
@@ -213,19 +212,19 @@ class SeriesParser(TitleParser):
 
 
         # remove series name from raw data, move any prefix to end of string
-        data_noname = self.data[name_end:] + ' ' + self.data[:name_start]
-        data_noname = data_noname.lower()
-        log.debug('data noname: %s' % data_noname)
+        data_stripped = self.data[name_end:] + ' ' + self.data[:name_start]
+        data_stripped = data_stripped.lower()
+        log.debug('data stripped: %s' % data_stripped)
 
         # allow group(s)
         if self.allow_groups:
             for group in self.allow_groups:
                 group = group.lower()
                 for fmt in ['[%s]', '-%s']:
-                    if fmt % group in data_noname:
+                    if fmt % group in data_stripped:
                         log.debug('%s is from group %s' % (self.data, group))
                         self.group = group
-                        data_noname = data_noname.replace(fmt % group, '')
+                        data_stripped = data_stripped.replace(fmt % group, '')
                         break
                 if self.group:
                     break
@@ -236,17 +235,18 @@ class SeriesParser(TitleParser):
         # search tags and quality if one was not provided to parse method
         if not quality or quality == 'unknown':
             log.debug('parsing quality ->')
-            quality, match = qualities.quality_match(data_noname)
+            quality, match = qualities.quality_match(data_stripped)
             self.quality = quality.name
             if match:
                 # Remove quality string from data
-                data_noname = data_noname[:match.start()] + data_noname[match.end():]
+                data_stripped = data_stripped[:match.start()] + data_stripped[match.end():]
 
-        # Remove unwanted words (qualities and such) from data for ep / id
-        data = self.remove_words(data_noname, self.remove + qualities.registry.keys() + self.codecs + self.sounds)
-        data = self.remove_dirt(data)
+        # Remove unwanted words (qualities and such) from data for ep / id parsing
+        data_stripped = self.remove_words(data_stripped, self.remove + qualities.registry.keys() +\
+                                                         self.codecs + self.sounds, not_in_word=True)
+        data_stripped = self.remove_dirt(data_stripped)
 
-        data_parts = re.split('\W+', data)
+        data_parts = re.split('\W+', data_stripped)
 
         for part in data_parts:
             if part in self.propers:
@@ -254,13 +254,12 @@ class SeriesParser(TitleParser):
                 data_parts.remove(part)
             if part in self.specials:
                 self.special = True
-                data_parts.remove(part)
 
-        data = ' '.join(data_parts)
+        data_stripped = ' '.join(data_parts).strip()
 
-        log.debug("data for id/ep parsing '%s'" % data)
+        log.debug("data for id/ep parsing '%s'" % data_stripped)
 
-        ep_match = self.parse_episode(data)
+        ep_match = self.parse_episode(data_stripped)
         if ep_match:
             # strict_name
             if self.strict_name:
@@ -286,7 +285,7 @@ class SeriesParser(TitleParser):
             # ressu: Added matching for 0101, 0102... It will fail on
             #        season 11 though
             log.debug('expect_ep enabled')
-            match = re.search('(?:^|\D)(0?\d)(\d\d)\D', data, re.IGNORECASE | re.UNICODE)
+            match = re.search('(?:^|\D)(0?\d)(\d\d)\D', data_stripped, re.IGNORECASE | re.UNICODE)
             if match:
                 # strict_name
                 if self.strict_name:
@@ -300,10 +299,10 @@ class SeriesParser(TitleParser):
                 return
             log.debug('-> no luck with the expect_ep')
         else:
-            if self.parse_unwanted_id(data):
+            if self.parse_unwanted_id(data_stripped):
                 return
             for id_re in self.id_regexps:
-                match = re.search(id_re, data)
+                match = re.search(id_re, data_stripped)
                 if match:
                     # strict_name
                     if self.strict_name:
@@ -318,6 +317,14 @@ class SeriesParser(TitleParser):
                     log.debug('found id \'%s\' with regexp \'%s\'' % (self.id, id_re))
                     return
             log.debug('-> no luck with id_regexps')
+
+        # No id found, check if this is a special
+        if self.special:
+            # Attempt to set id as the title of the special
+            self.id = data_stripped
+            self.valid = True
+            log.debug('found special, setting id to \'%s\'' % self.id)
+            return
 
         raise ParseWarning('Title \'%s\' looks like series \'%s\' but I cannot find any episode or id numbering' % (self.data, self.name))
 
