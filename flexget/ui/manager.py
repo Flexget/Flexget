@@ -34,12 +34,7 @@ class UIManager(Manager):
     def execute(self):
         # Update feed instances to match config
         self.update_feeds()
-        # Backup config before execution
-        config = deepcopy(self.config)
         Manager.execute(self)
-        self.config_executed = self.config
-        # Restore config
-        self.config = config
 
     def update_feeds(self):
         """Updates instances of all configured feeds from config"""
@@ -55,12 +50,12 @@ class UIManager(Manager):
                 continue
             if name in self.feeds:
                 # This feed already has an instance, update it
-                self.feeds[name].config = self.config['feeds'][name]
+                self.feeds[name].config = deepcopy(self.config['feeds'][name])
                 if not name.startswith('_'):
                     self.feeds[name].enabled = True
             else:
                 # Create feed
-                feed = Feed(self, name, self.config['feeds'][name])
+                feed = Feed(self, name, deepcopy(self.config['feeds'][name]))
                 # If feed name is prefixed with _ it's disabled
                 if name.startswith('_'):
                     feed.enabled = False

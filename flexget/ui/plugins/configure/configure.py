@@ -28,10 +28,10 @@ def new_text(root):
         name = request.form.get('name')
         if not name:
             flash('You must enter a name for this %s' % config_type, 'error')
-        elif name in manager.config[root]:
+        elif name in manager.config.get(root, []):
             flash('%s with name %s already exists' % (config_type.capitalize(), name), 'error')
         else:
-            manager.config[root][name] = {}
+            manager.config.setdefault(root, {})[name] = {}
             return redirect(url_for('edit_text', root=root, name=name))
 
     return render_template('configure/new.html', **context)
