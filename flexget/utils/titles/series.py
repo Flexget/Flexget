@@ -27,7 +27,7 @@ class SeriesParser(TitleParser):
     roman_numeral_re = 'X{0,3}(?:IX|XI{0,4}|VI{0,4}|IV|V|I{1,4})'
 
     ep_regexps = ReList([TitleParser.re_not_in_word(regexp) for regexp in [
-        '(?:series|season|s)\s?(\d{1,3})(?:\s(?:.*?\s)?)?(?:episode|ep|e|part|pt)\s?(\d{1,3}|%s)' % roman_numeral_re,
+        '(?:series|season|s)\s?(\d{1,3})(?:\s(?:.*\s)?)?(?:episode|ep|e|part|pt)\s?(\d{1,3}|%s)(?:\s?e?(\d{1,2}))?' % roman_numeral_re,
         '(?:series|season)\s?(\d{1,3})\s(\d{1,3})\s?of\s?(?:\d{1,3})',
         '(\d{1,3})\s?of\s?(?:\d{1,3})',
         '(\d{1,2})\s?x\s?(\d+)',
@@ -38,8 +38,7 @@ class SeriesParser(TitleParser):
          '(\d{1,3})\s?x\s?(all)', # 1xAll
          'season(?:s)?\s?\d\s?(?:&\s?\d)?[\s-]*(?:complete|full)',
          'seasons\s(\d\s){2,}',
-         'disc\s\d',
-         's\d+.?e\d+-\d+']) # S6 E1-4
+         'disc\s\d'])
     id_regexps = ReList([
         '(\d{4})%s(\d+)%s(\d+)' % (separators, separators),
         '(\d+)%s(\d+)%s(\d{4})' % (separators, separators),
@@ -116,32 +115,6 @@ class SeriesParser(TitleParser):
             # Transparently turn regular lists into ReLists
             value = ReList(value)
         object.__setattr__(self, name, value)
-
-    def clean(self, data):
-        """Perform data cleaner regexps."""
-        # TODO: This method is no longer used, should it be removed?
-        for clean_re in self.clean_regexps:
-            matches = re.findall(clean_re, data)
-            # remove all matches from data, unless they happen to contain relevant information
-            if matches:
-                for match in matches:
-                    log.log(5, 'match: %s' % match)
-                    safe = True
-                    # Qualities can be safely removed, because they are detected from raw data
-                    for proper in self.propers:
-                        if proper.lower() in match.lower():
-                            safe = False
-                            break
-                    if self.parse_episode(match):
-                        log.log(5, '%s looks like a valid episode identifier' % match)
-                        safe = False
-                        break
-                    if not safe:
-                        break
-                    else:
-                        data = data.replace(match, '').strip()
-        log.log(5, 'cleaned data: %s' % data)
-        return data
 
     def remove_dirt(self, data):
         """Replaces some characters with spaces"""
@@ -263,15 +236,22 @@ class SeriesParser(TitleParser):
         if ep_match:
             # strict_name
             if self.strict_name:
-                if ep_match[2].start() > 1:
+                if ep_match['match'].start() > 1:
                     return
 
             if self.expect_id:
                 log.debug('found episode number, but expecting id, aborting!')
                 return
 
-            self.season = ep_match[0]
-            self.episode = ep_match[1]
+            if ep_match['end_episode'] > ep_match['episode'] + 2:
+                # This is a pack of too many episodes, ignore it.
+                log.debug('Series pack contains too many episodes (%d). Rejecting' %
+                          (ep_match['end_episode'] - ep_match['episode']))
+                return
+            
+            self.season = ep_match['season']
+            self.episode = ep_match['episode']
+            self.end_episode = ep_match['end_episode']
             self.valid = True
             return
 
@@ -333,7 +313,7 @@ class SeriesParser(TitleParser):
         for ep_unwanted_re in self.unwanted_ep_regexps:
             match = re.search(ep_unwanted_re, data)
             if match:
-                log.debug('unwanted regexp %s matched %s' % (ep_unwanted_re, match.groups()))
+                log.debug('unwanted regexp %s matched %s' % (ep_unwanted_re.pattern, match.groups()))
                 return True
 
     def parse_unwanted_id(self, data):
@@ -347,7 +327,7 @@ class SeriesParser(TitleParser):
     def parse_episode(self, data):
         """
         Parses :data: for an episode identifier.
-        If found, returns a tuple of season#, episode# and the regexp match object
+        If found, returns a dict with keys for season, episode, end_episode and the regexp match object
         If no episode id is found returns False
         """
 
@@ -356,11 +336,11 @@ class SeriesParser(TitleParser):
             match = re.search(ep_re, data)
 
             if match:
-                log.debug('found episode number with regexp %s (%s)' % (ep_re, match.groups()))
+                log.debug('found episode number with regexp %s (%s)' % (ep_re.pattern, match.groups()))
                 matches = match.groups()
-                if len(matches) == 2:
-                    season = matches[0]
-                    episode = matches[1]
+                if len(matches) >= 2:
+                    season = int(matches[0])
+                    episode = int(matches[1])
                 else:
                     # assume season 1 if the season was not specified
                     season = 1
@@ -370,10 +350,20 @@ class SeriesParser(TitleParser):
                         # If we can't parse the roman numeral, continue the search
                         if not episode:
                             continue
-                break
-        else:
-            return False
-        return int(season), int(episode), match
+                    else:
+                        episode = int(episode)
+                end_episode = None
+                if len(matches) == 3 and matches[2]:
+                    end_episode = int(matches[2])
+                    if end_episode <= episode:
+                        # end episode should be greater than start, ignore this
+                        end_episode = None
+                # Successfully found an identifier, return the results
+                return {'season': season,
+                        'episode': episode,
+                        'end_episode': end_episode,
+                        'match': match}
+        return False
 
     def roman_to_int(self, roman):
         """Converts roman numerals up to 39 to integers"""

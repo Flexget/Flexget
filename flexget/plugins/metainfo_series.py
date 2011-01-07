@@ -56,7 +56,7 @@ class MetainfoSeries(object):
         if match:
             if parser.parse_unwanted(clean_title):
                 return
-            elif match[2].start() > 1:
+            elif match['match'].start() > 1:
                 # We start using the original title here, so we can properly ignore unwanted prefixes.
                 # Look for unwanted prefixes to find out where the series title starts
                 start = 0
@@ -64,7 +64,7 @@ class MetainfoSeries(object):
                 if prefix:
                     start = prefix.end()
                 # If an episode id is found, assume everything before it is series name
-                name = title[start:match[2].start()]
+                name = title[start:match['match'].start()]
                 # Replace . and _ with spaces
                 name = re.sub('[\._ ]+', ' ', name).strip(' -')
                 # Normalize capitalization to title case
