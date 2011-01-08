@@ -18,12 +18,12 @@ class DelayedEntry(Base):
     entry = Column(PickleType(mutable=False))
 
     def __repr__(self):
-        return '<DelayedEntry(title=%s)>' % (self.title)
+        return '<DelayedEntry(title=%s)>' % self.title
 
 
 class FilterDelay(object):
     """
-        Add delay to a feed. This is usefull for de-priorizing expensive / bad-quality feeds.
+        Add delay to a feed. This is useful for de-prioritizing expensive / bad-quality feeds.
 
         Format: [n] [minutes|hours|days|months]
 

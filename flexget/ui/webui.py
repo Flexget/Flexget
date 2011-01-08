@@ -1,3 +1,13 @@
+"""
+Fires events:
+
+webui.start
+  When webui is being started, this is just before WSGI server is started. Everything else is already initialized.
+
+webui.stop
+  When webui is being shut down, the WSGI server has exited the "serve forever" loop.
+"""
+
 import logging
 import os
 import urllib
@@ -119,7 +129,7 @@ def start(mg):
     global manager
     manager = mg
 
-    # Create sqlachemy session for Flask usage
+    # Create sqlalchemy session for Flask usage
     global db_session
     db_session = scoped_session(sessionmaker(autocommit=False,
                                              autoflush=False,
@@ -157,7 +167,6 @@ def start(mg):
     Base.metadata.create_all(bind=manager.engine)
 
     fire_event('webui.start')
-
 
     # Start Flask
     app.secret_key = os.urandom(24)

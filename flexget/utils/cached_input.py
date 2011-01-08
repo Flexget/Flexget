@@ -4,8 +4,6 @@ from flexget.plugin import register_plugin
 
 log = logging.getLogger('cached')
 
-cache = {}
-
 
 class cached(object):
     """
@@ -23,12 +21,11 @@ class cached(object):
     def __init__(self, name, key=None):
         self.name = name
         self.key = key
+        self.cache = {}
 
     def __call__(self, func):
 
         def wrapped_func(*args, **kwargs):
-            global cache
-
             # get feed from method parameters
             feed = args[1]
 
@@ -46,12 +43,12 @@ class cached(object):
             else:
                 name = feed.config[self.name]
 
-            log.debug('cache name: %s (has: %s)' % (name, ', '.join(cache.keys())))
+            log.debug('cache name: %s (has: %s)' % (name, ', '.join(self.cache.keys())))
 
-            if name in cache:
+            if name in self.cache:
                 log.log(5, 'cache hit')
                 count = 0
-                for entry in cache[name]:
+                for entry in self.cache[name]:
                     fresh = copy.deepcopy(entry)
                     feed.entries.append(fresh)
                     count += 1
@@ -63,18 +60,21 @@ class cached(object):
                 func(*args, **kwargs)
                 # store results to cache
                 log.debug('storing to cache %s %s entries' % (name, len(feed.entries)))
-                cache[name] = copy.deepcopy(feed.entries)
+                try:
+                    self.cache[name] = copy.deepcopy(feed.entries)
+                except TypeError:
+                    log.critical('Unable to save feed content into cache, if problem persists longer than a day please report this as a bug')
 
         return wrapped_func
 
 
-class CacheClearer:
+class CacheClearer(object):
 
     def on_process_start(self, feed):
         """Internal. Clears the input cache on every process"""
         # as flexget runs only once process per run this is not necessary,
         # will be needed in the future tough
-        global cache
-        cache = {}
+        log.debug('clearing cache')
+        cached.cache = {}
 
 register_plugin(CacheClearer, 'cache_clearer', builtin=True)
