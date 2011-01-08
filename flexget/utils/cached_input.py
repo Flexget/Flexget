@@ -18,10 +18,11 @@ class cached(object):
     Configuration assumptions may make this unusable in some (future) inputs
     """
 
+    cache = {}
+
     def __init__(self, name, key=None):
         self.name = name
         self.key = key
-        self.cache = {}
 
     def __call__(self, func):
 
