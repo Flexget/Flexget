@@ -479,3 +479,6 @@ class TestSeriesParser(object):
         # Test that too large a range is not accepted
         s = self.parse(name='Something', data='Something.S04E05E09')
         assert s.valid == False, 'large episode range should not be valid'
+        # Make sure regular identifier doesn't have end_episode
+        s = self.parse(name='Something', data='Something.S04E05')
+        assert s.end_episode is None, 'should not have detected end_episode'

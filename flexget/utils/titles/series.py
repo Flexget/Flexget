@@ -89,6 +89,7 @@ class SeriesParser(TitleParser):
         # parse produces these
         self.season = None
         self.episode = None
+        self.end_episode = None
         self.id = None
         self.id_groups = None
         self.quality = 'unknown'
