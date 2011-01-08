@@ -30,7 +30,7 @@ class SeriesParser(TitleParser):
         '(?:series|season|s)\s?(\d{1,3})(?:\s(?:.*\s)?)?(?:episode|ep|e|part|pt)\s?(\d{1,3}|%s)(?:\s?e?(\d{1,2}))?' % roman_numeral_re,
         '(?:series|season)\s?(\d{1,3})\s(\d{1,3})\s?of\s?(?:\d{1,3})',
         '(\d{1,3})\s?of\s?(?:\d{1,3})',
-        '(\d{1,2})\s?x\s?(\d+)',
+        '(\d{1,2})\s?x\s?(\d+)(?:\s(\d{1,2}))?',
         '(?:episode|ep|part|pt)\s?(\d{1,3}|%s)' % roman_numeral_re]])
     unwanted_ep_regexps = ReList([
          '(\d{1,3})\s?x\s?(0+)[^1-9]', # 5x0
@@ -217,9 +217,9 @@ class SeriesParser(TitleParser):
         # Remove unwanted words (qualities and such) from data for ep / id parsing
         data_stripped = self.remove_words(data_stripped, self.remove + qualities.registry.keys() +\
                                                          self.codecs + self.sounds, not_in_word=True)
-        data_stripped = self.remove_dirt(data_stripped)
 
-        data_parts = re.split('\W+', data_stripped)
+
+        data_parts = re.split('[\W_]+', data_stripped)
 
         for part in data_parts:
             if part in self.propers:
@@ -248,7 +248,7 @@ class SeriesParser(TitleParser):
                 log.debug('Series pack contains too many episodes (%d). Rejecting' %
                           (ep_match['end_episode'] - ep_match['episode']))
                 return
-            
+
             self.season = ep_match['season']
             self.episode = ep_match['episode']
             self.end_episode = ep_match['end_episode']

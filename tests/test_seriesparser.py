@@ -462,3 +462,20 @@ class TestSeriesParser(object):
         """SeriesParser: Special episodes with no id"""
         s = self.parse(name='The Show', data='The Show 2005 A Christmas Carol 2010 Special 720p HDTV x264')
         assert s.valid == True, 'Special episode should be valid'
+
+    def test_double_episodes(self):
+        s = self.parse(name='Something', data='Something.S04E05-06')
+        assert s.season == 4, 'failed to parse season'
+        assert s.episode == 5, 'failed to parse episode'
+        assert s.end_episode == 6, 'failed to parse episode range'
+        s = self.parse(name='Something', data='Something.S04E05E06')
+        assert s.season == 4, 'failed to parse season'
+        assert s.episode == 5, 'failed to parse episode'
+        assert s.end_episode == 6, 'failed to parse episode range'
+        s = self.parse(name='Something', data='Something.4x05-06')
+        assert s.season == 4, 'failed to parse season'
+        assert s.episode == 5, 'failed to parse episode'
+        assert s.end_episode == 6, 'failed to parse episode range'
+        # Test that too large a range is not accepted
+        s = self.parse(name='Something', data='Something.S04E05E09')
+        assert s.valid == False, 'large episode range should not be valid'
