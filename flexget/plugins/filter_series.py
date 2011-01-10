@@ -144,9 +144,12 @@ class SeriesPlugin(object):
             return 'auto'
 
     def get_latest_download(self, session, name):
-        """Return latest downloaded episode (season, episode, name) for series name"""
+        """Return latest downloaded episode (season, episode, name) for series :name:"""
         latest_download = session.query(Episode).join(Release, Series).filter(Series.name == name.lower()).\
-            filter(Release.downloaded == True).order_by(desc(Episode.season), desc(Episode.number)).first()
+            filter(Release.downloaded == True).\
+            filter(Episode.season != None).\
+            filter(Episode.number != None).\
+            order_by(desc(Episode.season), desc(Episode.number)).first()
 
         if not latest_download:
             log.debug('get_latest_download returning false, no downloaded episodes found for: %s' % name)
