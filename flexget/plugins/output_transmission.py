@@ -177,13 +177,13 @@ class PluginTransmission(object):
                 options['add']['download_dir'] = os.path.expanduser(opt_dic['path'])
         if 'addpaused' in opt_dic and opt_dic['addpaused']:
             options['add']['paused'] = True
-        if 'honourlimits' in opt_dic and not opt_dic['honourlimits']:
-            options['add']['honorsSessionLimits'] = False
         if 'bandwidthpriority' in opt_dic:
             options['add']['bandwidthPriority'] = opt_dic['bandwidthpriority']
         if 'maxconnections' in opt_dic:
             options['add']['peer_limit'] = opt_dic['maxconnections']
 
+        if 'honourlimits' in opt_dic and not opt_dic['honourlimits']: 
+            options['change']['honorsSessionLimits'] = False 
         if 'maxupspeed' in opt_dic:
             options['change']['uploadLimit'] = opt_dic['maxupspeed']
             options['change']['uploadLimited'] = True
