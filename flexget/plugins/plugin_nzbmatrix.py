@@ -93,7 +93,8 @@ class NzbMatrix:
         import difflib
         log.debug("Sleeping to respect nzbmatrix rules about hammering the API")
         time.sleep(10)
-        apireturn = self.parse_nzb_matrix_api(urlopener(url, log).read())
+        apireturn = self.parse_nzb_matrix_api(urlopener(url, log).read(),
+                                              entry['title'])
         if len(apireturn) == 0:
             return None
         else:
@@ -117,9 +118,14 @@ class NzbMatrix:
                 # Return an NZBID
                 return result['NZBID']
                    
-    def parse_nzb_matrix_api(self, apireturn):
+    def parse_nzb_matrix_api(self, apireturn, title):
         import re
         apireturn = str(apireturn)
+        if apireturn == "error:nothing_found":
+            log.debug("Nothing found from nzbmatrix for search on %s" % title)
+            return []
+        elif apireturn[:6] == 'error:':
+            log.error("Error recieved from nzbmatrix API: %s" % apireturn[6:])
         results = []
         api_result = {}
         apire = re.compile(r"([A-Z_]+):(.+);$")
