@@ -275,7 +275,7 @@ class FilterSeen(object):
             for field in self.fields:
                 if not field in entry:
                     continue
-                if entry[field] not in values:
+                if entry[field] not in values and entry[field] != '':
                     values.append(entry[field])
             log.log(5, 'querying for: %s' % ', '.join(values))
             # check if SeenField.value is any of the values

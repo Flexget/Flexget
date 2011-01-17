@@ -53,7 +53,9 @@ class Movie(Base):
     updated = Column(DateTime)
 
     def __repr__(self):
-        return '<Movie(name=%s,votes=%s,year=%s)>' % (self.title, self.votes, self.year)
+        return '<Movie(name=%s,votes=%s,year=%s)>' % (self.title, 
+                                                      self.votes, 
+                                                      self.year)
 
 
 class Language(Base):
@@ -148,9 +150,19 @@ class ModuleImdbLookup(object):
 
     @internet(log)
     def lookup(self, feed, entry, search_allowed=True):
-        """Perform imdb lookup for entry. Raises PluginError with failure reason."""
+        """Perform imdb lookup for entry. 
+        Raises PluginError with failure reason."""
 
-        log.debug('lookup for %s' % entry['title'])
+        if 'title' in entry:
+            log.debug('lookup for %s' % entry['title'])
+        elif 'imdb_url' in entry:
+            log.debug('No title passed. Lookup for %s' % entry['imdb_url'])
+        elif 'imdb_id' in entry:
+            log.debug('No title passed. Lookup for %s' % entry['imdb_id'])
+        else:
+            log.error('looking up IMDB for entry failed, no title, '
+                      'imdb_url or imdb_id passed.')
+            return
 
         take_a_break = False
         session = Session()
@@ -160,21 +172,31 @@ class ModuleImdbLookup(object):
             for field in ['imdb_votes', 'imdb_score']:
                 if field in entry:
                     value = entry[field]
-                    if not isinstance(value, int) and not isinstance(value, float):
-                        raise PluginError('Entry field %s should be a number!' % field)
+                    if (not isinstance(value, int) and 
+                        not isinstance(value, float)):
+                        raise PluginError('Entry field %s should be a number!'\
+                                          % field)
 
+            # if imdb_id is included, build the url.
+            if 'imdb_id' in entry and not 'imdb_url' in entry:
+                entry['imdb_url'] = 'http://www.imdb.com/title/%s' %\
+                     entry['imdb_id']
+            
             # make sure imdb url is valid
             if 'imdb_url' in entry:
                 imdb_id = extract_id(entry['imdb_url'])
                 if imdb_id:
                     entry['imdb_url'] = 'http://www.imdb.com/title/%s' % imdb_id
                 else:
-                    log.debug('imdb url %s is invalid, removing it' % entry['imdb_url'])
+                    log.debug('imdb url %s is invalid, removing it' %\
+                              entry['imdb_url'])
                     del(entry['imdb_url'])
 
-            # no imdb_url, check if there is cached result for it or if the search is known to fail
+            # no imdb_url, check if there is cached result for it or if the 
+            # search is known to fail
             if not 'imdb_url' in entry:
-                result = session.query(SearchResult).filter(SearchResult.title == entry['title']).first()
+                result = session.query(SearchResult).filter(SearchResult.title 
+                                                    == entry['title']).first()
                 if result:
                     if result.fails and not feed.manager.options.retry_lookup:
                         # this movie cannot be found, not worth trying again ...
@@ -182,7 +204,8 @@ class ModuleImdbLookup(object):
                         raise PluginError('Title lookup fails')
                     else:
                         if result.url:
-                            log.log(5, 'Setting imdb url for %s from db' % entry['title'])
+                            log.log(5, 'Setting imdb url for %s from db' % 
+                                    entry['title'])
                             entry['imdb_url'] = result.url
 
             # no imdb url, but information required, try searching
@@ -194,7 +217,8 @@ class ModuleImdbLookup(object):
                 search_result = search.smart_match(entry['title'])
                 if search_result:
                     entry['imdb_url'] = search_result['url']
-                    # store url for this movie, so we don't have to search on every run
+                    # store url for this movie, so we don't have to search on 
+                    # every run
                     result = SearchResult(entry['title'], entry['imdb_url'])
                     session.add(result)
                     feed.verbose_progress('Found %s' % (entry['imdb_url']), log)
@@ -210,13 +234,21 @@ class ModuleImdbLookup(object):
 
             # check if this imdb page has been parsed & cached
             cached = session.query(Movie).\
-                options(joinedload_all(Movie.genres, Movie.languages, Movie.actors, Movie.directors)).\
+                options(joinedload_all(Movie.genres, Movie.languages, 
+                                       Movie.actors, Movie.directors)).\
                 filter(Movie.url == entry['imdb_url']).first()
-            if (not cached) or (cached.updated is None) or (cached.updated < datetime.now() - timedelta(days=2)):
+            if (not cached) or (cached.updated is None) or (cached.updated < 
+                                            datetime.now() - timedelta(days=2)):
                 # Remove the old movie, we'll store another one later.
-                session.query(Movie).filter(Movie.url == entry['imdb_url']).delete()
+                session.query(Movie).filter(Movie.url == entry['imdb_url'])\
+                       .delete()
                 # search and store to cache
-                feed.verbose_progress('Parsing imdb for %s' % entry['title'])
+                if 'title' in entry:
+                    feed.verbose_progress('Parsing imdb for %s' % 
+                                          entry['title'])
+                else:
+                    feed.verbose_progress('Parsing imdb for %s' % 
+                                          entry['imdb_id'])
                 try:
                     take_a_break = True
                     imdb.parse(entry['imdb_url'])
@@ -231,22 +263,26 @@ class ModuleImdbLookup(object):
                     movie.plot_outline = imdb.plot_outline
                     movie.url = entry['imdb_url']
                     for name in imdb.genres:
-                        genre = session.query(Genre).filter(Genre.name == name).first()
+                        genre = session.query(Genre).filter(Genre.name == name)\
+                              .first()
                         if not genre:
                             genre = Genre(name)
                         movie.genres.append(genre) # pylint:disable=E1101
                     for name in imdb.languages:
-                        language = session.query(Language).filter(Language.name == name).first()
+                        language = session.query(Language).filter(Language.name 
+                                                            == name).first()
                         if not language:
                             language = Language(name)
                         movie.languages.append(language) # pylint:disable=E1101
                     for imdb_id, name in imdb.actors.iteritems():
-                        actor = session.query(Actor).filter(Actor.imdb_id == imdb_id).first()
+                        actor = session.query(Actor).filter(Actor.imdb_id 
+                                                            == imdb_id).first()
                         if not actor:
                             actor = Actor(imdb_id, name)
                         movie.actors.append(actor) # pylint:disable=E1101
                     for imdb_id, name in imdb.directors.iteritems():
-                        director = session.query(Director).filter(Director.imdb_id == imdb_id).first()
+                        director = session.query(Director)\
+                                 .filter(Director.imdb_id == imdb_id).first()
                         if not director:
                             director = Director(imdb_id, name)
                         movie.directors.append(director) # pylint:disable=E1101
@@ -265,7 +301,8 @@ class ModuleImdbLookup(object):
                     # TODO: might be a little too broad catch, what was this for anyway? ;P
                     if feed.manager.options.debug:
                         log.exception(e)
-                    raise PluginError('Invalid parameter: %s' % entry['imdb_url'], log)
+                    raise PluginError('Invalid parameter: %s' % 
+                                      entry['imdb_url'], log)
             else:
                 # Set values from cache
                 # TODO: I don't like this shoveling ...
@@ -286,7 +323,8 @@ class ModuleImdbLookup(object):
 
             if imdb.mpaa_rating is None:
                 imdb.mpaa_rating = ''
-
+            
+            log.log(5, 'imdb.name: %s' % imdb.name)
             log.log(5, 'imdb.score: %s' % imdb.score)
             log.log(5, 'imdb.votes: %s' % imdb.votes)
             log.log(5, 'imdb.year: %s' % imdb.year)
@@ -311,9 +349,13 @@ class ModuleImdbLookup(object):
             entry['imdb_actors'] = imdb.actors
             entry['imdb_directors'] = imdb.directors
             entry['imdb_mpaa_rating'] = imdb.mpaa_rating
+            if not 'title' in entry:
+                entry['title'] = imdb.name
 
             # give imdb a little break between requests (see: http://flexget.com/ticket/129#comment:1)
-            if take_a_break and not feed.manager.options.debug and not feed.manager.unit_test:
+            if (take_a_break and 
+                not feed.manager.options.debug and 
+                not feed.manager.unit_test):
                 import time
                 time.sleep(3)
         finally:
@@ -321,4 +363,5 @@ class ModuleImdbLookup(object):
             session.commit()
 
 register_plugin(ModuleImdbLookup, 'imdb_lookup')
-register_parser_option('--retry-lookup', action='store_true', dest='retry_lookup', default=0, help=SUPPRESS_HELP)
+register_parser_option('--retry-lookup', action='store_true', 
+                       dest='retry_lookup', default=0, help=SUPPRESS_HELP)

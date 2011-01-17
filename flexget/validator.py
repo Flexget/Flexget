@@ -81,12 +81,14 @@ class Validator(object):
     def add_root_parent(self):
         if self.name == 'root':
             return self
-        validator = self.get_validator('root')
-        validator.errors = self.errors
-        validator.validators = self.validators
-        validator.valid.append(self)
-        self.parent = validator
-        return validator
+        return self.add_parent(self.get_validator('root'))
+    
+    def add_parent(self, parent, name=None):
+        parent.errors = self.errors
+        parent.validators = self.validators
+        parent.valid.append(self)
+        self.parent = parent
+        return parent
 
     def get_validator(self, name, **kwargs):
         if not self.validators.get(name):

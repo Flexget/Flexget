@@ -38,13 +38,28 @@ class PluginSearch(object):
         - Some url rewriters will use search plugins automaticly if enry url points into a search page.
     """
 
-    def validator(self):
-        # TODO: should only accept registered search plugins
+    def validator(self):        
         from flexget import validator
         search = validator.factory('list')
-        search.accept('text')
+        plugins = {}
+        names = []
+        for plugin in get_plugins_by_group('search'):
+            # If the plugin has a validator, get it's validator and make it a 
+            # child of the search plugin's
+            if not hasattr(plugin.instance, 'validator'):
+                # Create choice validator for plugins without validators later
+                names.append(plugin.name)
+            else:
+                plugin_validator = plugin.instance.validator()
+                if isinstance(plugin_validator, validator.Validator):
+                    plugin_validator.add_parent(search, plugin.name)
+                else:
+                    log.error("plugin %s has a validator method, but does not "
+                              "return a validator instance when called with "
+                              "search plugin." % plugin.name)
+        search.accept('choice').accept_choices(names)
         return search
-
+    
     def on_feed_urlrewrite(self, feed):
         # no searches in unit test mode
         if feed.manager.unit_test:
@@ -56,12 +71,12 @@ class PluginSearch(object):
 
         for entry in feed.accepted:
             found = False
-            # loop trough configured searches
-            for name in feed.config.get('search', []):
-                if not name in plugins:
-                    log.error('Search plugins %s not found' % name)
-                    log.debug('Registered: %s' % ', '.join(plugins.keys()))
-                    continue
+            # loop through configured searches
+            search_plugins = feed.config.get('search', [])
+            for name in search_plugins:
+                if isinstance(name, dict):
+                    # assume the name is the first/only key in the dict.
+                    name = name.keys()[0]
                 log.debug('Issuing search from %s' % name)
                 try:
                     url = plugins[name].search(feed, entry)
@@ -76,7 +91,13 @@ class PluginSearch(object):
 
             # failed
             if not found:
+                # If I don't have a URL, doesn't matter if I'm immortal...
+                entry['immortal'] = False
                 feed.reject(entry, 'search failed')
+            else:
+                # Populate quality
+                get_plugin_by_name('metainfo_quality')\
+                       .instance.get_quality(entry)
 
 register_plugin(PluginSearch, 'search')
 register_plugin(SearchPlugins, '--search-plugins', builtin=True)

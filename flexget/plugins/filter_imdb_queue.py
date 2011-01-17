@@ -1,11 +1,12 @@
 import logging
 import datetime
 from flexget.manager import Session
-from flexget.plugin import register_plugin, PluginError, get_plugin_by_name, priority, register_parser_option
+from flexget.plugin import register_plugin, PluginError, get_plugin_by_name, priority, register_parser_option, register_feed_event
 from flexget.manager import Base
 from sqlalchemy import Column, Integer, String, DateTime, Boolean, Unicode
 from flexget.utils.imdb import extract_id, ImdbSearch, ImdbParser, log as imdb_log
 from flexget.utils.tools import str_to_boolean
+from flexget.utils import qualities
 
 log = logging.getLogger('imdb_queue')
 
@@ -46,10 +47,53 @@ class FilterImdbQueue(object):
     def validator(self):
         from flexget import validator
         return validator.factory('boolean')
-
+    
     @priority(129)
     def on_feed_filter(self, feed):
+        # Doing this so that I register as a filter plugin. Just need to filter
+        # after urlrewrite happens, just before download.
+        # Also have to accept anything with an IMDB url that matches, even if 
+        # rejecting later.
+        rejected = []
         for entry in feed.entries:
+            # make sure the entry has IMDB fields filled
+            try:
+                get_plugin_by_name('imdb_lookup').instance.lookup(feed, entry)
+            except PluginError:
+                # no IMDB data, can't do anything
+                continue
+
+            # entry has imdb url
+            if 'imdb_url' in entry:
+                # get an imdb id
+                if 'imdb_id' in entry and entry['imdb_id'] is not None:
+                    imdb_id = entry['imdb_id']
+                else:
+                    imdb_id = extract_id(entry['imdb_url'])
+
+                if not imdb_id:
+                    log.warning("No imdb id could be determined for %s" % entry['title'])
+                    continue
+
+                item = feed.session.query(ImdbQueue).filter(ImdbQueue.imdb_id == imdb_id).first()
+
+                if item:
+                    entry['immortal'] = item.immortal
+                    log.debug("Pre-accepting %s from queue" % (entry['title']))
+                    feed.accept(entry, 'imdb-queue pre-accept')
+                    # Keep track of entries we accepted, so they can be removed from queue on feed_exit if successful
+                    self.accepted_entries[imdb_id] = entry
+                else:
+                    log.log(5, "%s not in queue, skipping" % entry['title'])
+    
+    def on_feed_imdbqueue(self, feed):
+        rejected = []
+        for entry in feed.entries:
+            if entry['url'] == '':
+                feed.reject(entry, 'imdb-queue - no URL in entry: '
+                            '%s' % entry['title'])
+                rejected.append(entry['title'])
+                continue
             # make sure the entry has IMDB fields filled
             try:
                 get_plugin_by_name('imdb_lookup').instance.lookup(feed, entry)
@@ -73,17 +117,39 @@ class FilterImdbQueue(object):
                     log.warning('No quality found for %s, assigning unknown.' % entry['title'])
                     entry['quality'] = 'unknown'
 
-                item = feed.session.query(ImdbQueue).filter(ImdbQueue.imdb_id == imdb_id).\
-                                                     filter((ImdbQueue.quality == entry['quality']) | (ImdbQueue.quality == "ANY")).first()
-
+                item = feed.session.query(ImdbQueue).filter(ImdbQueue.imdb_id == imdb_id).first()
+                
                 if item:
-                    entry['immortal'] = item.immortal
-                    log.info("Accepting %s from queue with quality %s. Force: %s" % (entry['title'], entry['quality'], entry['immortal']))
-                    feed.accept(entry, 'imdb-queue - force: %s' % entry['immortal'])
-                    # Keep track of entries we accepted, so they can be removed from queue on feed_exit if successful
-                    self.accepted_entries[imdb_id] = entry
+                    # This will return UnknownQuality if 'ANY' quality
+                    minquality = qualities.parse_quality(item.quality)
+                    if 'quality' in entry:
+                        entry_quality = qualities.parse_quality(entry['quality'])
+                    if entry_quality >= minquality:
+                        entry['immortal'] = item.immortal
+                        log.debug("found %s quality for %s. Need minimum %s" % 
+                                  (entry['title'], entry['quality'], 
+                                   item.quality))
+                        log.info("Accepting %s from queue with quality %s. Force: %s" % (entry['title'], entry['quality'], entry['immortal']))
+                        feed.accept(entry, 'imdb-queue - force: %s' % entry['immortal'])
+                        # Keep track of entries we accepted, so they can be removed from queue on feed_exit if successful
+                        self.accepted_entries[imdb_id] = entry
+                    else:
+                        log.debug("imdb-queue rejecting - found "
+                                  "%s quality for %s. Need minimum %s" % 
+                                  (entry['title'], entry['quality'], 
+                                   item.quality))
+                        # Rejecting, as imdb-queue overrides anything. Don't
+                        # want to accidentally grab lower quality than desired.
+                        entry['immortal'] = False
+                        feed.reject(entry, 'imdb-queue quality '
+                                    '%s below minimum %s for %s' % 
+                                    (entry_quality.name, minquality.name, 
+                                     entry['title']))
                 else:
                     log.log(5, "%s not in queue with wanted quality, skipping" % entry['title'])
+        if len(rejected):
+            log.info("Rejected due to no URL in entry (URLRewrite probably failed):"
+                     " %s" % ', '.join(rejected))
 
     def on_feed_exit(self, feed):
         """
@@ -266,16 +332,41 @@ class ImdbQueueManager(object):
                     item.title = 'N/A'
             print '%-10s %-45s %-8s %s' % (item.imdb_id, item.title, item.quality, item.immortal)
 
-        if not items:
+        if items.count() == 0:
             print 'IMDB queue is empty'
 
         print '-' * 79
 
         session.commit()
         session.close()
+    
+    def queue_get(self, session):
+        """Get the current IMDb queue, as a list of tuples,
+        (title, imdb_id)"""
+        items = session.query(ImdbQueue)
+        imdb_entries = []
+        for item in items:
+            if not item.title:
+                # old database does not have title / title not retrieved
+                imdb_log.setLevel(logging.CRITICAL)
+                parser = ImdbParser()
+                try:
+                    parser.parse('http://www.imdb.com/title/' + item.imdb_id)
+                except:
+                    pass
+                if parser.name:
+                    item.title = parser.name
+                else:
+                    continue
+            imdb_entries.append((item.title, item.imdb_id))
+        if items.count() == 0:
+            log.info("IMDB Queue is empty")
+        return imdb_entries
 
 register_plugin(FilterImdbQueue, 'imdb_queue')
 register_plugin(ImdbQueueManager, 'imdb_queue_manager', builtin=True)
+# Handle if a urlrewrite happens, need to get accurate quality.
+register_feed_event(FilterImdbQueue, 'imdbqueue', after='urlrewrite')
 
 register_parser_option('--imdb-queue', action='callback', callback=ImdbQueueManager.optik_imdb_queue,
                        help='(add|del|list) [IMDB_URL|NAME] [QUALITY]')
