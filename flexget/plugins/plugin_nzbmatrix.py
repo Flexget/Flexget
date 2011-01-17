@@ -121,11 +121,13 @@ class NzbMatrix:
     def parse_nzb_matrix_api(self, apireturn, title):
         import re
         apireturn = str(apireturn)
-        if apireturn == "error:nothing_found":
+        if (apireturn == "error:nothing_found" or
+            apireturn == "error:no_nzb_found"):
             log.debug("Nothing found from nzbmatrix for search on %s" % title)
             return []
         elif apireturn[:6] == 'error:':
             log.error("Error recieved from nzbmatrix API: %s" % apireturn[6:])
+            return []
         results = []
         api_result = {}
         apire = re.compile(r"([A-Z_]+):(.+);$")
