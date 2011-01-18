@@ -65,7 +65,9 @@ class MetainfoSeries(object):
                     start = prefix.end()
                 # If an episode id is found, assume everything before it is series name
                 name = title[start:match['match'].start()]
-                # Replace . and _ with spaces
+                # Remove possible episode title from series name (anything after a ' - ')
+                name = name.split(' - ')[0]
+                # Replace some special characters with spaces
                 name = re.sub('[\._\(\) ]+', ' ', name).strip(' -')
                 # Normalize capitalization to title case
                 name = name.title()

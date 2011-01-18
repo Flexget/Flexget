@@ -98,6 +98,7 @@ class TestMetainfoSeries(FlexGetBase):
               - {title: '[the.group] Some.Series.S03E15.Title.Two.720p'}
               - {title: 'HD 720p: Some series.S03E16.Title.Three'}
               - {title: 'Something.Season.2.1of4.Ep.Title.HDTV.torrent'}
+              - {title: 'Show-A (US) - Episode Title S02E09 hdtv'}
           false_positives:
             mock:
               - {title: 'FlexGet.epic'}
@@ -125,6 +126,9 @@ class TestMetainfoSeries(FlexGetBase):
         assert self.feed.find_entry(series_name='Some Series', series_season=3, series_episode=15, quality='720p'), \
             'Failed to parse series info'
         assert self.feed.find_entry(series_name='Some Series', series_season=3, series_episode=16, quality='720p'), \
+            'Failed to parse series info'
+        # Test episode title and parentheses are stripped from series name
+        assert self.feed.find_entry(series_name='Show-A Us', series_season=2, series_episode=9, quality='hdtv'), \
             'Failed to parse series info'
 
     def test_false_positives(self):
