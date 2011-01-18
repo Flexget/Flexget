@@ -15,6 +15,7 @@ class TestSeriesPremiere(FlexGetBase):
             mock:
               - {title: 'Foo.2009.S01E01.HDTV.XviD-2HD[FlexGet]'}
               - {title: 'Foo 2009 S01E01 HDTV XviD-2HD[ASDF]'}
+              - {title: 'Foo (2009) S01E01HDTV XviD-2HD[AOEU]'}
               - {title: 'Foo 2009 S01E02 HDTV Xvid-2HD[AOEU]'}
             series_premiere: yes
 
