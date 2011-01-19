@@ -152,7 +152,7 @@ class Feed(object):
 
     def _reset(self):
         """Reset feed state"""
-        log.debug('reseting')
+        log.debug('resetting')
         self.enabled = True
         self.session = None
         self.priority = 65535
@@ -301,7 +301,6 @@ class Feed(object):
         else:
             return self.config[keyword]
 
-    # TODO: all these verbose methods are confusing
     def verbose_progress(self, s, logger=log):
         """Verbose progress, outputs only without --cron or -q"""
         # TODO: implement trough own logger?
@@ -324,7 +323,7 @@ class Feed(object):
                     break
             else:
                 if not self.manager.unit_test:
-                    log.warning('Feed doesn\'t have any %s plugins, you should add some!' % (event))
+                    log.warning('Feed doesn\'t have any %s plugins, you should add some!' % event)
 
         for method in methods:
             keyword = method.plugin.name
@@ -344,7 +343,18 @@ class Feed(object):
                     else:
                         fire_event('feed.execute.before_plugin', self, keyword)
                         try:
-                            method(self)
+                            response = []
+                            if method.plugin.api_ver == 1:
+                                # backwards compatibility
+                                # pass method only feed (old behaviour)
+                                response = method(self)
+                            else:
+                                # pass method feed, config
+                                config = self.config[keyword]
+                                response = method(self, config)
+                            if response:
+                                # add entries returned by input to self.entries
+                                self.entries.extend(response)
                         finally:
                             fire_event('feed.execute.after_plugin', self, keyword)
                 except PluginWarning, warn:
@@ -366,7 +376,7 @@ class Feed(object):
                         (self.current_plugin, e.plugin))
                     self.abort()
                 except Exception, e:
-                    log.exception('Unhandled error in plugin %s: %s' % (keyword, e))
+                    log.exception('BUG: Unhandled error in plugin %s: %s' % (keyword, e))
                     self.abort()
                     # don't handle plugin errors gracefully with unit test
                     if self.manager.unit_test:
@@ -383,7 +393,7 @@ class Feed(object):
     def execute(self):
         """Execute this feed"""
 
-        log.debug('excecuting %s' % self.name)
+        log.debug('executing %s' % self.name)
 
         self._reset()
 

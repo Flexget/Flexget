@@ -14,7 +14,7 @@ class Event(object):
         self.priority = priority
 
     def __call__(self, *args, **kwargs):
-        self.func(*args, **kwargs)
+        return self.func(*args, **kwargs)
 
     def __eq__(self, other):
         return self.priority == other.priority

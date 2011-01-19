@@ -12,6 +12,8 @@ class InputMock(object):
         mock:
           - {title: foobar, url: http://some.com }
           - {title: mock, url: http://another.com }
+
+        If url is not given a random url pointing to localhost will be generated.
     """
 
     def validator(self):
@@ -25,8 +27,8 @@ class InputMock(object):
         entry.accept_any_key('list').accept('any')
         return container
 
-    def on_feed_input(self, feed):
-        config = feed.config.get('mock', [])
+    def on_feed_input(self, feed, config):
+        entries = []
         for line in config:
             entry = Entry()
             for k, v in line.iteritems():
@@ -36,6 +38,7 @@ class InputMock(object):
                 import string
                 import random
                 entry['url'] = 'http://localhost/mock/%s' % ''.join([random.choice(string.letters + string.digits) for x in range(1, 30)])
-            feed.entries.append(entry)
+            entries.append(entry)
+        return entries
 
-register_plugin(InputMock, 'mock', debug=True)
+register_plugin(InputMock, 'mock', api_ver=2)

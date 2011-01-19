@@ -4,7 +4,7 @@ from flexget.plugin import register_plugin
 log = logging.getLogger('listdir')
 
 
-class InputListdir:
+class InputListdir(object):
     """
         Uses local path content as an input.
 
@@ -21,27 +21,24 @@ class InputListdir:
         bundle.accept('path')
         return root
 
-    def get_config(self, feed):
-        config = feed.config.get('listdir', None)
+    def on_feed_input(self, feed, config):
+        from flexget.feed import Entry
+        import os
         # If only a single path is passed turn it into a 1 element list
         if isinstance(config, basestring):
             config = [config]
-        return config
-
-    def on_feed_input(self, feed):
-        from flexget.feed import Entry
-        import os
-        config = self.get_config(feed)
+        entries = []
         for path in config:
             for name in os.listdir(unicode(path)):
                 e = Entry()
                 e['title'] = name
                 filepath = os.path.join(path, name)
-                # Windows paths need an extra / prepended to them
+                # Windows paths need an extra / preceded to them
                 if not filepath.startswith('/'):
-                    filepath = '/' + filepath
-                e['url'] = 'file://%s' % (filepath)
+                    filepath += '/'
+                e['url'] = 'file://%s' % filepath
                 e['location'] = os.path.join(path, name)
-                feed.entries.append(e)
+                entries.append(e)
+        return entries
 
-register_plugin(InputListdir, 'listdir')
+register_plugin(InputListdir, 'listdir', api_ver=2)

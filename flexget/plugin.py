@@ -136,7 +136,7 @@ _plugin_options = []
 _new_event_queue = {}
 
 
-def register_plugin(plugin_class, name, groups=None, builtin=False, debug=False):
+def register_plugin(plugin_class, name, groups=None, builtin=False, debug=False, api_ver=1):
     """Registers a plugin."""
     if groups is None:
         groups = []
@@ -147,7 +147,7 @@ def register_plugin(plugin_class, name, groups=None, builtin=False, debug=False)
         log.critical('Error while registering plugin %s. %s' % \
             (name, ('A plugin with the name %s is already registered' % name)))
         return
-    plugins[name] = PluginInfo(name, plugin_class, groups, builtin, debug)
+    plugins[name] = PluginInfo(name, plugin_class, groups, builtin, debug, api_ver)
 
 
 def register_parser_option(*args, **kwargs):
@@ -202,11 +202,12 @@ class PluginInfo(dict):
         attributes.  Also instantiates a plugin and initializes properties.
     """
 
-    def __init__(self, name, item_class, groups=None, builtin=False, debug=False):
+    def __init__(self, name, item_class, groups=None, builtin=False, debug=False, api_ver=1):
         if groups is None:
             groups = []
         dict.__init__(self)
 
+        self.api_ver = api_ver
         self.name = name
         self.item_class = item_class
         self.instance = item_class()
