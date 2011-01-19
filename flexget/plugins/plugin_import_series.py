@@ -2,16 +2,16 @@ from flexget.plugin import register_plugin, get_plugin_by_name, PluginError
 from flexget.plugins.filter_series import FilterSeriesBase
 import logging
 
-log = logging.getLogger('gen_series')
+log = logging.getLogger('imp_series')
 
 
-class GenerateSeries(FilterSeriesBase):
+class ImportSeries(FilterSeriesBase):
 
-    """Generate series configuration from any input supporting API version 2
+    """Generates series configuration from any input (supporting API version 2, soon all)
 
     Configuration:
 
-    generate_series:
+    import_series:
       [settings]:
          # same configuration as series plugin
       from:
@@ -19,13 +19,12 @@ class GenerateSeries(FilterSeriesBase):
 
     Example:
 
-    generate_series:
+    import_series:
       settings:
         quality: 720p
       from:
         listdir:
           - /media/series
-
     """
 
     def on_feed_start(self, feed, config):
@@ -57,4 +56,4 @@ class GenerateSeries(FilterSeriesBase):
         self.merge_config(feed, series_config)
 
 
-register_plugin(GenerateSeries, 'generate_series', api_ver=2)
+register_plugin(ImportSeries, 'import_series', api_ver=2)
