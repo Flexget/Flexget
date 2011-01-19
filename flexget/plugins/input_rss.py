@@ -282,7 +282,7 @@ class InputRSS(object):
         for entry in rss.entries:
 
             # ignore entries without title
-            if not entry.title:
+            if not getattr(entry, 'title', None):
                 log.debug('skipping entry without title')
                 ignored += 1
                 continue
