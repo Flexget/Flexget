@@ -7,7 +7,7 @@ import feedparser
 
 log = logging.getLogger('torrentz')
 
-REGEXP = re.compile(r'http://www\.torrentz\.com/(?P<hash>[a-f0-9]{40})')
+REGEXP = re.compile(r'http://torrentz\.eu/(?P<hash>[a-f0-9]{40})')
 
 
 class UrlRewriteTorrentz(object):
@@ -26,7 +26,7 @@ class UrlRewriteTorrentz(object):
         return url
 
     def search_title(self, name):
-        url = 'http://www.torrentz.com/feed?q=%s' % urllib.quote(name)
+        url = 'http://torrentz.eu/feed?q=%s' % urllib.quote(name)
         log.debug('requesting: %s' % url)
         rss = feedparser.parse(url)
         clean_name = name.replace('.', ' ').replace('-', '').replace('_', ' ').lower()
