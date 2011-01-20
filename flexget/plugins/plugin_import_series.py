@@ -1,4 +1,4 @@
-from flexget.plugin import register_plugin, get_plugin_by_name, PluginError
+from flexget.plugin import register_plugin, get_plugin_by_name, get_plugins_by_event, PluginError
 from flexget.plugins.filter_series import FilterSeriesBase
 import logging
 
@@ -26,6 +26,21 @@ class ImportSeries(FilterSeriesBase):
         listdir:
           - /media/series
     """
+
+    def validator(self):
+        from flexget import validator
+        root = validator.factory('dict')
+        self.build_options_validator(root.accept('dict', key='settings'))
+        from_section = root.accept('dict', key='from', required=True)
+        # Get a list of apiv2 input plugins
+        valid_inputs = [plugin for plugin in get_plugins_by_event('input') if plugin.api_ver > 1]
+        # Build a dict validator that accepts the available input plugins and their settings
+        for plugin in valid_inputs:
+            if hasattr(plugin.instance, 'validator'):
+                from_section.valid[plugin.name] = [plugin.instance.validator()]
+            else:
+                from_section.valid[plugin.name] = [validator.factory('any')]
+        return root
 
     def on_feed_start(self, feed, config):
 
