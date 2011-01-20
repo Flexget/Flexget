@@ -40,7 +40,7 @@ class InputHtml(object):
         regexps.accept('regexp')
         return root
 
-    def get_config(self, feed):
+    def build_config(self, config):
 
         def get_auth_from_url():
             """Moves basic authentication from url to username and password fields"""
@@ -55,7 +55,6 @@ class InputHtml(object):
                 parts[1] = split[1]
                 config['url'] = urlparse.urlunsplit(parts)
 
-        config = feed.config['html']
         if isinstance(config, basestring):
             config = {'url': config}
         get_auth_from_url()
@@ -64,8 +63,9 @@ class InputHtml(object):
 
     @cached('html', 'url')
     @internet(log)
-    def on_feed_input(self, feed):
-        config = self.get_config(feed)
+    def on_feed_input(self, feed, config):
+        config = self.build_config(config)
+        
         log.debug('InputPlugin html requesting url %s' % config['url'])
 
         if config.get('username') and config.get('password'):
@@ -88,9 +88,9 @@ class InputHtml(object):
             f.write(data)
             f.close()
 
-        self.create_entries(feed, config['url'], soup, config)
+        return self.create_entries(config['url'], soup, config)
 
-    def create_entries(self, feed, pageurl, soup, config):
+    def create_entries(self, pageurl, soup, config):
 
         queue = []
         duplicates = {}
@@ -175,7 +175,7 @@ class InputHtml(object):
                         log.info('Link names seem to be useless, auto-enabling \'title_from: url\'. This may not work well, you might need to configure it.')
                         config['title_from'] = 'url'
                         # start from the beginning  ...
-                        self.create_entries(feed, pageurl, soup, config)
+                        self.create_entries(pageurl, soup, config)
                         return
             elif title_from == 'link' or title_from == 'contents':
                 # link from link name
@@ -206,7 +206,7 @@ class InputHtml(object):
             queue.append(entry)
 
         # add from queue to feed
-        feed.entries.extend(queue)
+        return queue
 
 
-register_plugin(InputHtml, 'html')
+register_plugin(InputHtml, 'html', api_ver=2)

@@ -4,7 +4,7 @@ from flexget.plugin import register_plugin
 log = logging.getLogger('find')
 
 
-class InputFind:
+class InputFind(object):
     """
         Uses local path content as an input, recurses through directories and creates entries for files that match mask.
 
@@ -15,6 +15,8 @@ class InputFind:
         find:
           path: /storage/movies/
           mask: *.avi
+          
+        Example:
 
         find:
           path:
@@ -33,9 +35,8 @@ class InputFind:
         root.accept('boolean', key='recursive')
         return root
 
-    def get_config(self, feed):
+    def prepare_config(self, config):
         from fnmatch import translate
-        config = feed.config.get('find', None)
         # If only a single path is passed turn it into a 1 element list
         if isinstance(config['path'], basestring):
             config['path'] = [config['path']]
@@ -46,16 +47,16 @@ class InputFind:
         # If no mask or regexp specified, accept all files
         if not config.get('regexp'):
             config['regexp'] = '.'
-        return config
 
-    def on_feed_input(self, feed):
+    def on_feed_input(self, feed, config):
         from flexget.feed import Entry
         import os
         import re
-        config = self.get_config(feed)
+        self.prepare_config(config)
+        entries = []
         match = re.compile(config['regexp'], re.IGNORECASE).match
         for path in config['path']:
-            for item in os.walk(unicode(path)):
+            for item in os.walk(path):
                 for name in item[2]:
                     #If mask fails continue
                     if match(name) is None:
@@ -68,9 +69,10 @@ class InputFind:
                     if not filepath.startswith('/'):
                         filepath = '/' + filepath
                     e['url'] = 'file://%s' % (filepath)
-                    feed.entries.append(e)
+                    entries.append(e)
                 # If we are not searching recursively, break after first (base) directory
                 if not config['recursive']:
                     break
+        return entries
 
-register_plugin(InputFind, 'find')
+register_plugin(InputFind, 'find', api_ver=2)

@@ -98,8 +98,8 @@ class InputRSS(object):
         advanced.accept('boolean', key='group links')
         return root
 
-    def get_config(self, feed):
-        config = feed.config['rss']
+    def build_config(self, config):
+        """Set default values to config"""
         if isinstance(config, basestring):
             config = {'url': config}
         if isinstance(config.get('link'), basestring):
@@ -129,9 +129,9 @@ class InputRSS(object):
 
     @cached('rss', 'url')
     @internet(log)
-    def on_feed_input(self, feed):
-        config = self.get_config(feed)
-
+    def on_feed_input(self, feed, config):
+        config = self.build_config(config)
+        
         log.debug('Checking feed %s (%s)' % (feed.name, config['url']))
 
         # check etags and last modified -headers
@@ -275,6 +275,9 @@ class InputRSS(object):
                 feed.cache.store('modified', rss.modified, 90)
                 log.debug('last modified saved for feed %s', feed.name)
         """
+        
+        # new entries to be created
+        entries = []
 
         # field name for url can be configured by setting link.
         # default value is auto but for example guid is used in some feeds
@@ -309,7 +312,7 @@ class InputRSS(object):
                     if field in entry:
                         if not isinstance(getattr(entry, field), basestring):
                             # Error if this field is not a string
-                            log.error('Cannot grab non string field \'%s\' from rss.' % field)
+                            log.error('Cannot grab non text field `%s` from rss.' % field)
                             # Remove field from list of fields to avoid repeated error
                             config['other_fields'].remove(field)
                             continue
@@ -317,15 +320,15 @@ class InputRSS(object):
                             ea[field] = decode_html(getattr(entry, field))
                             if field in config.get('other_fields', []):
                                 # Print a debug message for custom added fields
-                                log.debug('Field %s set to %s for %s' % (field, ea[field], ea['title']))
+                                log.debug('Field `%s` set to `%s` for `%s`' % (field, ea[field], ea['title']))
                         except UnicodeDecodeError:
-                            log.warning('Failed to decode entry %s field %s' % (ea['title'], field))
+                            log.warning('Failed to decode entry `%s` field `%s`' % (ea['title'], field))
 
                 # store basic auth info
                 if 'username' in config and 'password' in config:
                     ea['basic_auth_username'] = config['username']
                     ea['basic_auth_password'] = config['password']
-                feed.entries.append(ea)
+                entries.append(ea)
 
             # create from enclosures if present
             enclosures = entry.get('enclosures', [])
@@ -336,7 +339,7 @@ class InputRSS(object):
                 for enclosure in enclosures:
                     ee = Entry()
                     if not 'href' in enclosure:
-                        log_once('RSS-entry %s enclosure does not have url' % entry.title, log)
+                        log_once('RSS-entry `%s` enclosure does not have URL' % entry.title, log)
                         continue
                     if config.get('group links'):
                         enclosures_urls.append(enclosure['href'])
@@ -358,7 +361,7 @@ class InputRSS(object):
                             match = re.search(r'.*/([^?#]+)', ee['url'])
                             if match and config.get('filename', True):
                                 ee['filename'] = match.group(1)
-                                log.log(5, 'filename %s from enclosure' % ee['filename'])
+                                log.log(5, 'filename `%s` from enclosure' % ee['filename'])
                     add_entry(ee)
                 if not config.get('group links'):
                     continue
@@ -387,5 +390,7 @@ class InputRSS(object):
         if ignored:
             if not config.get('silent'):
                 log.warning('Skipped %s RSS-entries without required information (title, link or enclosures)' % ignored)
+                
+        return entries
 
-register_plugin(InputRSS, 'rss')
+register_plugin(InputRSS, 'rss', api_ver=2)
