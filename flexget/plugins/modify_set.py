@@ -1,7 +1,10 @@
 import logging
 from flexget.plugin import register_plugin, priority
-import copy
 from flexget.utils.tools import replace_from_entry
+try:
+    from jinja2 import Template
+except ImportError:
+    Template = False
 
 log = logging.getLogger('set')
 
@@ -41,6 +44,11 @@ class ModifySet(object):
         for key, value in keys.iteritems():
             self.register_key(key, value)
 
+    def on_feed_start(self, feed):
+        """Checks that jinja2 is available"""
+        if not Template:
+            log.warning("jinja2 module is not available, set plugin will only work with python string replacement.")
+
     # Filter priority is -255 so we run after all filters are finished
     @priority(-255)
     def on_feed_filter(self, feed):
@@ -51,19 +59,26 @@ class ModifySet(object):
         for entry in feed.entries + feed.rejected:
             self.modify(entry, feed.config['set'], False, entry in feed.accepted)
 
-    def modify(self, entry, config, validate=True, errors=True):
+    def modify(self, entry, config, validate=False, errors=True):
         """
         this can be called from a plugin to add set values to an entry
         """
         # Create a new dict so we don't overwrite the set config with string replaced values.
         conf = {}
         # Loop through config copying items into conf, and doing string replacement where necessary.
-        for key, value in config.iteritems():
+        for field, value in config.iteritems():
             if isinstance(value, basestring):
                 logger = log.error if errors else log.debug
-                conf[key] = replace_from_entry(value, entry, key, logger)
+                conf[field] = replace_from_entry(value, entry, field, logger)
             else:
-                conf[key] = value
+                conf[field] = value
+
+        if Template:
+            # If jinja2 is available do template replacement
+            for field, template_string in conf.iteritems():
+                template = Template(template_string)
+                result = template.render(entry)
+                conf[field] = result
 
         if validate:
             from flexget import validator

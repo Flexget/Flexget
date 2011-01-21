@@ -209,12 +209,18 @@ class TestSetPlugin(FlexGetBase):
               - {title: 'Entry 1'}
             set:
               thefield: TheValue
-          test2:
+          test_string_replacement:
             mock:
               - {title: 'Entry 1', series_name: 'Value'}
               - {title: 'Entry 2'}
             set:
               field: 'The%(series_name)s'
+          test_jinja:
+            mock:
+              - {title: 'Entry 1', series_name: 'Value'}
+              - {title: 'Entry 2'}
+            set:
+              field: 'The {{ series_name|upper }}'
     """
 
     def test_set(self):
@@ -222,7 +228,14 @@ class TestSetPlugin(FlexGetBase):
         assert self.feed.find_entry('entries', title='Entry 1')['thefield'] == 'TheValue'
 
     def test_string_replacement(self):
-        self.execute_feed('test2')
+        self.execute_feed('test_string_replacement')
         assert self.feed.find_entry('entries', title='Entry 1')['field'] == 'TheValue'
         # The string repalcement should fail, an error will be shown, and the field will get a blank value.
         assert self.feed.find_entry('entries', title='Entry 2')['field'] == ''
+
+    def test_jinja(self):
+        self.execute_feed('test_jinja')
+        assert self.feed.find_entry('entries', title='Entry 1')['field'] == 'The VALUE'
+        # TODO: The string replacement does not fail with jinja. Instead an empty string is inserted
+        # in the place of the undefined variable. Figure out a way to catch this.
+        # assert self.feed.find_entry('entries', title='Entry 2')['field'] == ''
