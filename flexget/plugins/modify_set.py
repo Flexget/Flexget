@@ -1,12 +1,9 @@
 import logging
 from flexget.plugin import register_plugin, priority
 from flexget.utils.tools import replace_from_entry
-try:
-    from jinja2 import Template
-except ImportError:
-    Template = False
 
 log = logging.getLogger('set')
+jinja = False
 
 
 class ModifySet(object):
@@ -22,6 +19,12 @@ class ModifySet(object):
 
     def __init__(self):
         self.keys = {}
+        try:
+            from jinja2 import Environment
+        except ImportError:
+            self.jinja = False
+        else:
+            self.jinja = True
 
     def validator(self):
         from flexget import validator
@@ -46,7 +49,7 @@ class ModifySet(object):
 
     def on_feed_start(self, feed):
         """Checks that jinja2 is available"""
-        if not Template:
+        if not self.jinja:
             log.warning("jinja2 module is not available, set plugin will only work with python string replacement.")
 
     # Filter priority is -255 so we run after all filters are finished
@@ -73,12 +76,17 @@ class ModifySet(object):
             else:
                 conf[field] = value
 
-        if Template:
-            # If jinja2 is available do template replacement
+        # If jinja2 is available do template replacement
+        if self.jinja:
+            from jinja2 import Environment, StrictUndefined, UndefinedError
+            env = Environment(undefined=StrictUndefined)
             for field, template_string in conf.iteritems():
                 if isinstance(template_string, basestring):
-                    template = Template(template_string)
-                    result = template.render(entry)
+                    template = env.from_string(template_string)
+                    try:
+                        result = template.render(entry)
+                    except UndefinedError:
+                        result = ''
                     conf[field] = result
 
         if validate:

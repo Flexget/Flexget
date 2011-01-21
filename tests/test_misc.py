@@ -239,6 +239,4 @@ class TestSetPlugin(FlexGetBase):
     def test_jinja(self):
         self.execute_feed('test_jinja')
         assert self.feed.find_entry('entries', title='Entry 1')['field'] == 'The VALUE'
-        # TODO: The string replacement does not fail with jinja. Instead an empty string is inserted
-        # in the place of the undefined variable. Figure out a way to catch this.
-        # assert self.feed.find_entry('entries', title='Entry 2')['field'] == ''
+        assert self.feed.find_entry('entries', title='Entry 2')['field'] == ''
