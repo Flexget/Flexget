@@ -209,6 +209,7 @@ class TestSetPlugin(FlexGetBase):
               - {title: 'Entry 1'}
             set:
               thefield: TheValue
+              otherfield: 3.0
           test_string_replacement:
             mock:
               - {title: 'Entry 1', series_name: 'Value'}
@@ -225,7 +226,9 @@ class TestSetPlugin(FlexGetBase):
 
     def test_set(self):
         self.execute_feed('test')
-        assert self.feed.find_entry('entries', title='Entry 1')['thefield'] == 'TheValue'
+        entry = self.feed.find_entry('entries', title='Entry 1')
+        assert entry['thefield'] == 'TheValue'
+        assert entry['otherfield'] == 3.0
 
     def test_string_replacement(self):
         self.execute_feed('test_string_replacement')

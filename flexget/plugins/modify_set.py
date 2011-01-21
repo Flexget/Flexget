@@ -76,9 +76,10 @@ class ModifySet(object):
         if Template:
             # If jinja2 is available do template replacement
             for field, template_string in conf.iteritems():
-                template = Template(template_string)
-                result = template.render(entry)
-                conf[field] = result
+                if isinstance(template_string, basestring):
+                    template = Template(template_string)
+                    result = template.render(entry)
+                    conf[field] = result
 
         if validate:
             from flexget import validator
