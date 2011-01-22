@@ -47,12 +47,12 @@ class FilterImdbQueue(object):
     def validator(self):
         from flexget import validator
         return validator.factory('boolean')
-    
+
     @priority(129)
     def on_feed_filter(self, feed):
         # Doing this so that I register as a filter plugin. Just need to filter
         # after urlrewrite happens, just before download.
-        # Also have to accept anything with an IMDB url that matches, even if 
+        # Also have to accept anything with an IMDB url that matches, even if
         # rejecting later.
         rejected = []
         for entry in feed.entries:
@@ -85,7 +85,7 @@ class FilterImdbQueue(object):
                     self.accepted_entries[imdb_id] = entry
                 else:
                     log.log(5, "%s not in queue, skipping" % entry['title'])
-    
+
     def on_feed_imdbqueue(self, feed):
         rejected = []
         for entry in feed.entries:
@@ -118,7 +118,7 @@ class FilterImdbQueue(object):
                     entry['quality'] = 'unknown'
 
                 item = feed.session.query(ImdbQueue).filter(ImdbQueue.imdb_id == imdb_id).first()
-                
+
                 if item:
                     # This will return UnknownQuality if 'ANY' quality
                     minquality = qualities.parse_quality(item.quality)
@@ -126,8 +126,8 @@ class FilterImdbQueue(object):
                         entry_quality = qualities.parse_quality(entry['quality'])
                     if entry_quality >= minquality:
                         entry['immortal'] = item.immortal
-                        log.debug("found %s quality for %s. Need minimum %s" % 
-                                  (entry['title'], entry['quality'], 
+                        log.debug("found %s quality for %s. Need minimum %s" %
+                                  (entry['title'], entry['quality'],
                                    item.quality))
                         log.info("Accepting %s from queue with quality %s. Force: %s" % (entry['title'], entry['quality'], entry['immortal']))
                         feed.accept(entry, 'imdb-queue - force: %s' % entry['immortal'])
@@ -135,15 +135,15 @@ class FilterImdbQueue(object):
                         self.accepted_entries[imdb_id] = entry
                     else:
                         log.debug("imdb-queue rejecting - found "
-                                  "%s quality for %s. Need minimum %s" % 
-                                  (entry['title'], entry['quality'], 
+                                  "%s quality for %s. Need minimum %s" %
+                                  (entry['title'], entry['quality'],
                                    item.quality))
                         # Rejecting, as imdb-queue overrides anything. Don't
                         # want to accidentally grab lower quality than desired.
                         entry['immortal'] = False
                         feed.reject(entry, 'imdb-queue quality '
-                                    '%s below minimum %s for %s' % 
-                                    (entry_quality.name, minquality.name, 
+                                    '%s below minimum %s for %s' %
+                                    (entry_quality.name, minquality.name,
                                      entry['title']))
                 else:
                     log.log(5, "%s not in queue with wanted quality, skipping" % entry['title'])
@@ -232,8 +232,17 @@ class ImdbQueueManager(object):
                 self.options['imdb_id'] = extract_id(self.options['what'])
                 self.options['title'] = self.options['what']
 
-                if not self.options['imdb_id']:
-                    # try to do imdb search
+                if self.options['imdb_id']:
+                    # Given an imdb id, find title
+                    parser = ImdbParser()
+                    try:
+                        parser.parse('http://www.imdb.com/title/%s' % self.options['imdb_id'])
+                    except Exception:
+                        print 'Error parsing info from imdb for %s' % self.options['imdb_id']
+                    if parser.name:
+                        self.options['title'] = parser.name
+                else:
+                    # Given a title, try to do imdb search for id
                     print 'Searching imdb for %s' % self.options['what']
                     search = ImdbSearch()
                     result = search.smart_match(self.options['what'])
@@ -287,7 +296,7 @@ class ImdbQueueManager(object):
             item.title = title
             session.add(item)
             session.commit()
-            print 'Added %s to queue with quality %s' % (imdb_id, quality)
+            print 'Added %s to queue with quality %s' % (title, quality)
         else:
             print 'ERROR: %s is already in the queue' % imdb_id
 
@@ -339,7 +348,7 @@ class ImdbQueueManager(object):
 
         session.commit()
         session.close()
-    
+
     def queue_get(self, session):
         """Get the current IMDb queue, as a list of tuples,
         (title, imdb_id)"""
