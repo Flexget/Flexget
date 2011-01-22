@@ -1,3 +1,4 @@
+from copy import copy
 import logging
 from flexget.plugin import register_plugin, priority
 from flexget.utils.tools import replace_from_entry
@@ -67,14 +68,7 @@ class ModifySet(object):
         this can be called from a plugin to add set values to an entry
         """
         # Create a new dict so we don't overwrite the set config with string replaced values.
-        conf = {}
-        # Loop through config copying items into conf, and doing string replacement where necessary.
-        for field, value in config.iteritems():
-            if isinstance(value, basestring):
-                logger = log.error if errors else log.debug
-                conf[field] = replace_from_entry(value, entry, field, logger)
-            else:
-                conf[field] = value
+        conf = copy(config)
 
         # If jinja2 is available do template replacement
         if self.jinja:
@@ -88,6 +82,12 @@ class ModifySet(object):
                     except UndefinedError:
                         result = ''
                     conf[field] = result
+
+        # Do string replacement
+        for field, value in conf.iteritems():
+            if isinstance(value, basestring):
+                logger = log.error if errors else log.debug
+                conf[field] = replace_from_entry(value, entry, field, logger)
 
         if validate:
             from flexget import validator

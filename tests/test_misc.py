@@ -222,6 +222,7 @@ class TestSetPlugin(FlexGetBase):
               - {title: 'Entry 2'}
             set:
               field: 'The {{ series_name|upper }}'
+              otherfield: '{% if series_name is not defined %}no series{% endif %}'
     """
 
     def test_set(self):
@@ -238,5 +239,9 @@ class TestSetPlugin(FlexGetBase):
 
     def test_jinja(self):
         self.execute_feed('test_jinja')
-        assert self.feed.find_entry('entries', title='Entry 1')['field'] == 'The VALUE'
-        assert self.feed.find_entry('entries', title='Entry 2')['field'] == ''
+        entry = self.feed.find_entry('entries', title='Entry 1')
+        assert entry['field'] == 'The VALUE'
+        assert entry['otherfield'] == ''
+        entry = self.feed.find_entry('entries', title='Entry 2')
+        assert entry['field'] == ''
+        assert entry['otherfield'] == 'no series'
