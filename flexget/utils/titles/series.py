@@ -42,9 +42,7 @@ class SeriesParser(TitleParser):
         '(\d{4})%s(\d+)%s(\d+)' % (separators, separators),
         '(\d+)%s(\d+)%s(\d{4})' % (separators, separators),
         '(\d{4})x(\d+)\.(\d+)', '(pt|part)\s?(\d+|%s)' % roman_numeral_re,
-        '(?:^|[^\dA-Za-z])(\d{1,3})(?:[^\dA-Za-z]|$)']) # \d prevents matching to numbers like 123456789
-                                                        # A-Za-z prevents words like CRAPL3SS
-                                                        # |^ and |$ are needed for strings beginning or ending with num
+        '(?<![^\W_])(\d{1,3})(?![^\W_])']) # 3 numbers cannot be surrounded with invalid characters
     unwanted_id_regexps = ReList([
         'seasons?\s?\d{1,2}'])
     clean_regexps = ReList(['\[.*?\]', '\(.*?\)'])
