@@ -1,12 +1,12 @@
 """Contains miscellaneous helpers"""
 
-import sgmllib
 import urllib2
 import httplib
 import socket
 import time
 from htmlentitydefs import name2codepoint
 import re
+import ntpath
 
 
 def str_to_boolean(string):
@@ -297,3 +297,13 @@ class ReList(list):
     def __iter__(self):
         for i in range(len(self)):
             yield self[i]
+
+
+def make_valid_path(path):
+    """Removes invalid characters from windows pathnames"""
+    drive, path = ntpath.splitdrive(path)
+    if drive:
+        # If a drive is found, this is a windows path, and we should remove invalid characters.
+        for char in ':<>*?"|':
+            path = path.replace(char, '')
+    return drive + path

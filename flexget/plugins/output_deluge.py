@@ -3,7 +3,7 @@ import time
 import os
 import base64
 import re
-from flexget.utils.tools import replace_from_entry
+from flexget.utils.tools import replace_from_entry, make_valid_path
 from flexget.plugin import register_plugin, PluginError, priority, get_plugin_by_name
 
 log = logging.getLogger('deluge')
@@ -416,7 +416,7 @@ class OutputDeluge(object):
                 opts = {}
                 path = replace_from_entry(entry.get('path', config['path']), entry, 'path', log.error)
                 if path:
-                    opts['download_location'] = os.path.expanduser(path)
+                    opts['download_location'] = make_valid_path(os.path.expanduser(path))
                 for fopt, dopt in self.options.iteritems():
                     value = entry.get(fopt, config.get(fopt))
                     if value is not None:
@@ -437,7 +437,7 @@ class OutputDeluge(object):
                 # Make a new set of options, that get set after the torrent has been added
                 content_filename = entry.get('content_filename', config.get('content_filename', ''))
                 movedone = replace_from_entry(entry.get('movedone', config['movedone']), entry, 'movedone', log.error)
-                opts = {'movedone': os.path.expanduser(movedone),
+                opts = {'movedone': make_valid_path(os.path.expanduser(movedone)),
                         'label': format_label(entry.get('label', config['label'])),
                         'queuetotop': entry.get('queuetotop', config.get('queuetotop')),
                         'content_filename': replace_from_entry(content_filename, entry, 'content_filename', log.error),
