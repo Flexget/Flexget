@@ -285,7 +285,7 @@ class ReList(list):
         if 'flags' in kwargs:
             self.flags = kwargs['flags']
             del kwargs['flags']
-        return list.__init__(self, *args, **kwargs)
+        list.__init__(self, *args, **kwargs)
 
     def __getitem__(self, k):
         item = list.__getitem__(self, k)

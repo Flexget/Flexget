@@ -21,7 +21,7 @@ class TitleParser(object):
 
     codecs = ['x264', 'x.264', 'h264', 'h.264', 'XViD']
 
-    sounds = ['AC3', 'DD5.1']
+    sounds = ['AC3', 'DD5.1', 'DTS']
 
     @staticmethod
     def re_not_in_word(regexp):
@@ -32,7 +32,7 @@ class TitleParser(object):
         return ' '.join(text.split())
 
     def remove_words(self, text, words, not_in_word=False):
-        """Clean all given :words: from :text: case insensitivively"""
+        """Clean all given :words: from :text: case insensitively"""
         for word in words:
             text = self.ireplace(text, word, '', not_in_word=not_in_word)
         # remove duplicate spaces

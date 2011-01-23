@@ -113,6 +113,10 @@ class TestSeriesParser(object):
         s = self.parse(name='Something', data='Something_ DISC_1_OF_2 MANofKENT INVICTA RG')
         assert not s.valid, 'data %s should not be valid' % s.data
 
+    @raises(ParseWarning)
+    def test_invalid(self):
+        s = self.parse(name='Something', data='Something S06 AC3-CRAPL3SS')
+
     def test_unwanted_disc(self):
         """SeriesParser: unwanted disc releases"""
         s = self.parse(name='Something', data='Something.S01D2.DVDR-FlexGet')
@@ -210,6 +214,9 @@ class TestSeriesParser(object):
 
         s = self.parse(name='Something', data='Something-121.H264.FlexGet')
         assert (s.id == '121'), 'failed to parse %s' % s.data
+
+        s = self.parse(name='Something', data='Something 1 AC3')
+        assert (s.id == '1'), 'failed to parse %s' % s.data
 
     def test_quality(self):
         """SeriesParser: quality"""

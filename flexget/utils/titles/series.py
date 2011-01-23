@@ -14,15 +14,14 @@ log.setLevel(logging.INFO)
 class SeriesParser(TitleParser):
 
     """
-
     Parse series.
 
     :name: series name
     :data: data to parse
     :expect_ep: expect series to be in season, ep format (ep_regexps)
     :expect_id: expect series to be in id format (id_regexps)
-
     """
+
     separators = '[!/+,:;|~ x-]'
     roman_numeral_re = 'X{0,3}(?:IX|XI{0,4}|VI{0,4}|IV|V|I{1,4})'
 
@@ -43,11 +42,13 @@ class SeriesParser(TitleParser):
         '(\d{4})%s(\d+)%s(\d+)' % (separators, separators),
         '(\d+)%s(\d+)%s(\d{4})' % (separators, separators),
         '(\d{4})x(\d+)\.(\d+)', '(pt|part)\s?(\d+|%s)' % roman_numeral_re,
-        '(?:^|[^s\d])(\d{1,3})(?:[^p\d]|$)'])
+        '(?:^|[^\dA-Za-z])(\d{1,3})(?:[^\dA-Za-z]|$)']) # \d prevents matching to numbers like 123456789
+                                                        # A-Za-z prevents words like CRAPL3SS
+                                                        # |^ and |$ are needed for strings beginning or ending with num
     unwanted_id_regexps = ReList([
         'seasons?\s?\d{1,2}'])
     clean_regexps = ReList(['\[.*?\]', '\(.*?\)'])
-    # ignore prefix regexpes must be passive groups with 0 or 1 occurrences  eg. (?:prefix)?
+    # ignore prefix regexps must be passive groups with 0 or 1 occurrences  eg. (?:prefix)?
     ignore_prefixes = [
             '(?:\[[^\[\]]*\])', # ignores group names before the name, eg [foobar] name
             '(?:HD.720p?:)',
@@ -216,7 +217,7 @@ class SeriesParser(TitleParser):
                 data_stripped = data_stripped[:match.start()] + data_stripped[match.end():]
 
         # Remove unwanted words (qualities and such) from data for ep / id parsing
-        data_stripped = self.remove_words(data_stripped, self.remove + qualities.registry.keys() +\
+        data_stripped = self.remove_words(data_stripped, self.remove + qualities.registry.keys() +
                                                          self.codecs + self.sounds, not_in_word=True)
 
 
@@ -266,7 +267,7 @@ class SeriesParser(TitleParser):
             # ressu: Added matching for 0101, 0102... It will fail on
             #        season 11 though
             log.debug('expect_ep enabled')
-            match = re.search('(?:^|\D)(0?\d)(\d\d)\D', data_stripped, re.IGNORECASE | re.UNICODE)
+            match = re.search(r'(?:^|\D)(0?\d)(\d\d)\D', data_stripped, re.IGNORECASE | re.UNICODE)
             if match:
                 # strict_name
                 if self.strict_name:
@@ -295,7 +296,7 @@ class SeriesParser(TitleParser):
                     if self.special:
                         self.id += '-SPECIAL'
                     self.valid = True
-                    log.debug('found id \'%s\' with regexp \'%s\'' % (self.id, id_re))
+                    log.debug('found id \'%s\' with regexp \'%s\'' % (self.id, id_re.pattern))
                     return
             log.debug('-> no luck with id_regexps')
 
