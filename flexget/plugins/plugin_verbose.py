@@ -8,7 +8,7 @@ class Verbose(object):
 
     """
         Enables verbose log output.
-        
+
         Prints a line in the log when entries are accepted, rejected or failed.
         Contains event, plugin and reason for action.
     """
@@ -50,4 +50,4 @@ class Verbose(object):
 
 register_plugin(Verbose, 'verbose', builtin=True)
 register_parser_option('-v', '--verbose', action='store_true', dest='verbose', default=False,
-    help='Verbose process. Display entry accept and reject info. HIGHLY USEFULL.')
+    help='Verbose process. Display entry accept and reject info. Very useful for viewing what happens in feed(s).')
