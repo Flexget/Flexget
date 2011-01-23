@@ -25,8 +25,10 @@ class SeriesParser(TitleParser):
     separators = '[!/+,:;|~ x-]'
     roman_numeral_re = 'X{0,3}(?:IX|XI{0,4}|VI{0,4}|IV|V|I{1,4})'
 
+    # Make sure none of these are found embedded within a word or other numbers
     ep_regexps = ReList([TitleParser.re_not_in_word(regexp) for regexp in [
-        '(?:series|season|s)\s?(\d{1,3})(?:\s(?:.*\s)?)?(?:episode|ep|e|part|pt)\s?(\d{1,3}|%s)(?:\s?e?(\d{1,2}))?' % roman_numeral_re,
+        '(?:series|season|s)\s?(\d{1,3})(?:\s(?:.*\s)?)?(?:episode|ep|e|part|pt)\s?(\d{1,3}|%s)(?:\s?e?(\d{1,2}))?' %
+            roman_numeral_re,
         '(?:series|season)\s?(\d{1,3})\s(\d{1,3})\s?of\s?(?:\d{1,3})',
         '(\d{1,3})\s?of\s?(?:\d{1,3})',
         '(\d{1,2})\s?x\s?(\d+)(?:\s(\d{1,2}))?',
@@ -38,11 +40,13 @@ class SeriesParser(TitleParser):
          'season(?:s)?\s?\d\s?(?:&\s?\d)?[\s-]*(?:complete|full)',
          'seasons\s(\d\s){2,}',
          'disc\s\d'])
-    id_regexps = ReList([
+    # Make sure none of these are found embedded within a word or other numbers
+    id_regexps = ReList([TitleParser.re_not_in_word(regexp) for regexp in [
         '(\d{4})%s(\d+)%s(\d+)' % (separators, separators),
         '(\d+)%s(\d+)%s(\d{4})' % (separators, separators),
-        '(\d{4})x(\d+)\.(\d+)', '(pt|part)\s?(\d+|%s)' % roman_numeral_re,
-        '(?<![^\W_])(\d{1,3})(?![^\W_])']) # 3 numbers cannot be surrounded with invalid characters
+        '(\d{4})x(\d+)\.(\d+)',
+        '(pt|part)\s?(\d+|%s)' % roman_numeral_re,
+        '(\d{1,3})']])
     unwanted_id_regexps = ReList([
         'seasons?\s?\d{1,2}'])
     clean_regexps = ReList(['\[.*?\]', '\(.*?\)'])
