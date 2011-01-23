@@ -461,7 +461,7 @@ class FilterSeries(SeriesPlugin, FilterSeriesBase):
 
     def on_feed_filter(self, feed):
         """Filter series"""
-        # Parsing was done in metainfo event, create the dicts to pass to process_series from the feed entries
+        # Parsing was done in metainfo phase, create the dicts to pass to process_series from the feed entries
         # key: series (episode) identifier ie. S01E02
         # value: seriesparser
         found_series = {}

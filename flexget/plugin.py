@@ -3,16 +3,16 @@ import os
 import sys
 import logging
 import time
-from event import add_event_handler
+from event import add_phase_handler
 
 log = logging.getLogger('plugin')
 
 __all__ = ['PluginWarning', 'PluginError',
            'PluginDependencyError', 'register_plugin',
-           'register_parser_option', 'register_feed_event',
+           'register_parser_option', 'register_feed_phase',
            'get_plugin_by_name', 'get_plugins_by_group',
-           'get_plugin_keywords', 'get_plugins_by_event',
-           'get_methods_by_event', 'get_events_by_plugin',
+           'get_plugin_keywords', 'get_plugins_by_phase',
+           'get_methods_by_phase', 'get_phases_by_plugin',
            'internet', 'priority']
 
 
@@ -60,7 +60,7 @@ class PluginError(Exception):
 
 class internet(object):
     """
-        @internet decorator for plugin event methods.
+        @internet decorator for plugin phase methods.
         Catches all internet related exceptions and raises PluginError with relevant message.
         Feed handles PluginErrors by aborting the feed.
     """
@@ -96,7 +96,7 @@ class internet(object):
 
 
 def priority(value):
-    """Priority decorator for event methods"""
+    """Priority decorator for phase methods"""
 
     def decorator(target):
         target.priority = value
@@ -109,10 +109,10 @@ def _strip_trailing_sep(path):
 
 DEFAULT_PRIORITY = 128
 
-FEED_EVENTS = ['start', 'input', 'metainfo', 'filter', 'download', 'modify', 'output', 'exit']
+FEED_PHASES = ['start', 'input', 'metainfo', 'filter', 'download', 'modify', 'output', 'exit']
 
-# map event names to method names
-EVENT_METHODS = {
+# map phase names to method names
+PHASE_METHODS = {
     'start': 'on_feed_start',
     'input': 'on_feed_input',
     'metainfo': 'on_feed_metainfo',
@@ -133,7 +133,7 @@ plugins_loaded = False
 
 _parser = None
 _plugin_options = []
-_new_event_queue = {}
+_new_phase_queue = {}
 
 
 def register_plugin(plugin_class, name, groups=None, builtin=False, debug=False, api_ver=1):
@@ -157,43 +157,43 @@ def register_parser_option(*args, **kwargs):
     _plugin_options.append((args, kwargs))
 
 
-def register_feed_event(plugin_class, name, before=None, after=None):
-    """Adds a new feed event to the available events."""
-    global _new_event_queue, plugins
+def register_feed_phase(plugin_class, name, before=None, after=None):
+    """Adds a new feed phase to the available phases."""
+    global _new_phase_queue, plugins
 
     if before and after:
-        raise RegisterException('You can only give either before or after for a event.')
+        raise RegisterException('You can only give either before or after for a phase.')
     if not before and not after:
-        raise RegisterException('You must specify either a before or after event.')
-    if name in FEED_EVENTS or name in _new_event_queue:
-        raise RegisterException('Event %s already exists.' % name)
+        raise RegisterException('You must specify either a before or after phase.')
+    if name in FEED_PHASES or name in _new_phase_queue:
+        raise RegisterException('Phase %s already exists.' % name)
 
-    def add_event(event_name, plugin_class, before, after):
-        if not before is None and not before in FEED_EVENTS:
+    def add_phase(phase_name, plugin_class, before, after):
+        if not before is None and not before in FEED_PHASES:
             return False
-        if not after is None and not after in FEED_EVENTS:
+        if not after is None and not after in FEED_PHASES:
             return False
-        # add method name to event -> method lookup table
-        EVENT_METHODS[event_name] = 'on_feed_' + event_name
-        # place event in event list
+        # add method name to phase -> method lookup table
+        PHASE_METHODS[phase_name] = 'on_feed_' + phase_name
+        # place phase in phase list
         if before is None:
-            FEED_EVENTS.insert(FEED_EVENTS.index(after) + 1, event_name)
+            FEED_PHASES.insert(FEED_PHASES.index(after) + 1, phase_name)
         if after is None:
-            FEED_EVENTS.insert(FEED_EVENTS.index(before), event_name)
+            FEED_PHASES.insert(FEED_PHASES.index(before), phase_name)
 
-        # create possibly newly available event handlers
+        # create possibly newly available phase handlers
         for loaded_plugin in plugins:
-            plugins[loaded_plugin].build_event_handlers()
+            plugins[loaded_plugin].build_phase_handlers()
 
         return True
 
     # if can't add yet (dependencies) queue addition
-    if not add_event(name, plugin_class.__name__, before, after):
-        _new_event_queue[name] = [plugin_class.__name__, before, after]
+    if not add_phase(name, plugin_class.__name__, before, after):
+        _new_phase_queue[name] = [plugin_class.__name__, before, after]
 
-    for event_name, args in _new_event_queue.items():
-        if add_event(event_name, *args):
-            del _new_event_queue[event_name]
+    for phase_name, args in _new_phase_queue.items():
+        if add_phase(phase_name, *args):
+            del _new_phase_queue[phase_name]
 
 
 class PluginInfo(dict):
@@ -214,21 +214,21 @@ class PluginInfo(dict):
         self.groups = groups
         self.builtin = builtin
         self.debug = debug
-        self.event_handlers = {}
-        self.build_event_handlers()
+        self.phase_handlers = {}
+        self.build_phase_handlers()
 
-    def reset_event_handlers(self):
+    def reset_phase_handlers(self):
         """Temporary utility method"""
-        self.event_handlers = {}
-        self.build_event_handlers()
+        self.phase_handlers = {}
+        self.build_phase_handlers()
         # TODO: should unregister events (from flexget.event)
         # this method is not used at the moment anywhere ...
         raise NotImplementedError
 
-    def build_event_handlers(self):
-        """(Re)build event_handlers in this plugin"""
-        for event, method_name in EVENT_METHODS.iteritems():
-            if method_name in self.event_handlers:
+    def build_phase_handlers(self):
+        """(Re)build phase_handlers in this plugin"""
+        for event, method_name in PHASE_METHODS.iteritems():
+            if method_name in self.phase_handlers:
                 continue
             if hasattr(self.instance, method_name):
                 method = getattr(self.instance, method_name)
@@ -239,10 +239,10 @@ class PluginInfo(dict):
                     priority = method.priority
                 else:
                     priority = DEFAULT_PRIORITY
-                event = add_event_handler('plugin.%s.%s' % (self.name, event), method, priority)
+                event = add_phase_handler('plugin.%s.%s' % (self.name, event), method, priority)
                 # provides backwards compatibility
                 event.plugin = self
-                self.event_handlers[method_name] = event
+                self.phase_handlers[method_name] = event
 
     def __getattr__(self, attr):
         if attr in self:
@@ -295,7 +295,7 @@ def load_plugins_from_dir(dir):
     # Get the list of valid python suffixes for plugins
     # this includes .py, .pyc, and .pyo (depending on if we are running -O)
     # but it doesn't include compiled modules (.so, .dll, etc)
-    global _new_event_queue
+    global _new_phase_queue
     #
     # This causes quite a bit problems when renaming plugins and is there really need to import .pyc / pyo?
     #
@@ -329,10 +329,10 @@ def load_plugins_from_dir(dir):
             log.exception(e)
             raise
 
-    if _new_event_queue:
-        for event, args in _new_event_queue.iteritems():
-            log.error('Plugin %s requested new event %s, but it could not be created at requested '
-                      'point (before, after). Plugin is not working properly.' % (args[0], event))
+    if _new_phase_queue:
+        for phase, args in _new_phase_queue.iteritems():
+            log.error('Plugin %s requested new phase %s, but it could not be created at requested '
+                      'point (before, after). Plugin is not working properly.' % (args[0], phase))
 
 
 def load_plugins(parser):
@@ -357,12 +357,12 @@ def load_plugins(parser):
     return took
 
 
-def get_plugins_by_event(event):
-    """Return list of all plugins that hook :event:"""
+def get_plugins_by_phase(phase):
+    """Return list of all plugins that hook :phase:"""
     result = []
-    if not event in EVENT_METHODS:
-        raise Exception('Unknown event %s' % event)
-    method_name = EVENT_METHODS[event]
+    if not phase in PHASE_METHODS:
+        raise Exception('Unknown phase %s' % phase)
+    method_name = PHASE_METHODS[phase]
     for info in plugins.itervalues():
         instance = info.instance
         if not hasattr(instance, method_name):
@@ -372,28 +372,28 @@ def get_plugins_by_event(event):
     return result
 
 
-def get_methods_by_event(event):
-    """Return plugin methods that hook :event: in order of priority (highest first)."""
+def get_methods_by_phase(phase):
+    """Return plugin methods that hook :phase: in order of priority (highest first)."""
     result = []
-    if not event in EVENT_METHODS:
-        raise Exception('Unknown event %s' % event)
-    method_name = EVENT_METHODS[event]
+    if not phase in PHASE_METHODS:
+        raise Exception('Unknown phase %s' % phase)
+    method_name = PHASE_METHODS[phase]
     for info in plugins.itervalues():
-        method = info.event_handlers.get(method_name, None)
+        method = info.phase_handlers.get(method_name, None)
         if method:
             result.append(method)
     result.sort(reverse=True)
     return result
 
 
-def get_events_by_plugin(name):
-    """Return all events plugin :name: hooks"""
+def get_phases_by_plugin(name):
+    """Return all phases plugin :name: hooks"""
     plugin = get_plugin_by_name(name)
-    events = []
-    for event_name, method_name in EVENT_METHODS.iteritems():
+    phases = []
+    for phase_name, method_name in PHASE_METHODS.iteritems():
         if hasattr(plugin.instance, method_name):
-            events.append(event_name)
-    return events
+            phases.append(phase_name)
+    return phases
 
 
 def get_plugins_by_group(group):
@@ -414,7 +414,7 @@ def get_plugin_keywords():
 
 
 def get_plugin_by_name(name):
-    """Get plugin by name, prefered way since this structure may be changed at some point."""
+    """Get plugin by name, preferred way since this structure may be changed at some point."""
     if not name in plugins:
         raise PluginDependencyError('Unknown plugin %s' % name, name)
     return plugins[name]

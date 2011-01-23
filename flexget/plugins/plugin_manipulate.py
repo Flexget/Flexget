@@ -11,7 +11,7 @@ class Manipulate(object):
 
         manipulate:
           - <destination field>:
-              [event]: <event>
+              [phase]: <phase>
               [from]: <source field>
               [extract]: <regexp>
               [separator]: <text>
@@ -31,10 +31,10 @@ class Manipulate(object):
         root = validator.factory()
         bundle = root.accept('list').accept('dict')
         # prevent invalid indentation level
-        bundle.reject_keys(['from', 'extract', 'replace', 'event'],
+        bundle.reject_keys(['from', 'extract', 'replace', 'phase'],
             'Option \'$key\' has invalid indentation level. It needs 2 more spaces.')
         edit = bundle.accept_any_key('dict')
-        edit.accept('choice', key='event').accept_choices(['metainfo', 'filter'], ignore_case=True)
+        edit.accept('choice', key='phase').accept_choices(['metainfo', 'filter'], ignore_case=True)
         edit.accept('text', key='from')
         edit.accept('regexp', key='extract')
         edit.accept('text', key='separator')
@@ -44,30 +44,30 @@ class Manipulate(object):
         return root
 
     def on_feed_start(self, feed):
-        """Separates the config into a dict with a list of jobs per event."""
+        """Separates the config into a dict with a list of jobs per phase."""
         config = feed.config['manipulate']
-        self.event_jobs = {'filter': [], 'metainfo': []}
+        self.phase_jobs = {'filter': [], 'metainfo': []}
         for item in config:
             for item_config in item.itervalues():
-                # Get the event specified for this item, or use default of metainfo
-                event = item_config.get('event', 'metainfo')
-                self.event_jobs[event].append(item)
+                # Get the phase specified for this item, or use default of metainfo
+                phase = item_config.get('phase', 'metainfo')
+                self.phase_jobs[phase].append(item)
 
     @priority(255)
     def on_feed_metainfo(self, feed):
-        if not self.event_jobs['metainfo']:
-            # return if no jobs for this event
+        if not self.phase_jobs['metainfo']:
+            # return if no jobs for this phase
             return
         for entry in feed.entries:
-            self.process(feed, entry, self.event_jobs['metainfo'])
+            self.process(feed, entry, self.phase_jobs['metainfo'])
 
     @priority(255)
     def on_feed_filter(self, feed):
-        if not self.event_jobs['filter']:
-            # return if no jobs for this event
+        if not self.phase_jobs['filter']:
+            # return if no jobs for this phase
             return
         for entry in feed.entries + feed.rejected:
-            self.process(feed, entry, self.event_jobs['filter'])
+            self.process(feed, entry, self.phase_jobs['filter'])
 
     def process(self, feed, entry, jobs):
 

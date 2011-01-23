@@ -1,5 +1,5 @@
 import logging
-from flexget.plugin import plugins, FEED_EVENTS, EVENT_METHODS
+from flexget.plugin import plugins, FEED_PHASES, PHASE_METHODS
 from flexget.plugin import *
 
 log = logging.getLogger('priority')

@@ -143,7 +143,7 @@ class FilterContentFilter(object):
             if not 'content_files' in entry and config.get('strict'):
                 feed.reject(entry, 'no content files parsed for entry')
             if entry in feed.rejected:
-                # record this in database that it can be rejected at filter event next time
+                # record this in database that it can be rejected at filter phase next time
                 cf = CFEntry()
                 cf.title = entry['title']
                 cf.url = entry['url']

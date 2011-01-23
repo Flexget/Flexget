@@ -13,17 +13,17 @@ log = logging.getLogger('archive')
 class ArchiveEntry(Base):
 
     __tablename__ = 'archive_entry'
-    
+
     id = Column(Integer, primary_key=True)
     title = Column(Unicode, index=True)
     url = Column(Unicode, index=True)
     description = Column(Unicode)
     feed = Column(Unicode)
     added = Column(DateTime, index=True)
-    
+
     def __init__(self):
         self.added = datetime.now()
-        
+
     def __str__(self):
         return '<ArchiveEntry(title=%s,url=%s,feed=%s)>' % (self.title, self.url, self.feed)
 
@@ -37,11 +37,11 @@ class ArchiveSearch(object):
     def on_process_start(self, feed):
         if not feed.manager.options.archive_search:
             return
-            
+
         from flexget.utils.tools import strip_html
 
         feed.manager.disable_feeds()
-        
+
         def print_ae(ae):
             diff = datetime.now() - ae.added
 
@@ -51,12 +51,12 @@ class ArchiveSearch(object):
             print '---'
 
         session = Session()
-        
+
         keyword = unicode(feed.manager.options.archive_search).replace(' ', '%')
-        
+
         print 'Searching ...'
 
-        for ae in session.query(ArchiveEntry).filter(or_(ArchiveEntry.title.like('%' + keyword + '%'), 
+        for ae in session.query(ArchiveEntry).filter(or_(ArchiveEntry.title.like('%' + keyword + '%'),
             ArchiveEntry.title.like('%' + keyword + '%'), ArchiveEntry.feed == keyword)).all():
             print_ae(ae)
 
@@ -68,7 +68,7 @@ class ArchiveInject(object):
     id = None
     inject_entry = None
     immortal = False
-    
+
     injected = False
     complained = False
 
@@ -82,7 +82,7 @@ class ArchiveInject(object):
             ArchiveInject.id = int(parser.rargs[0])
         except:
             print 'Value %s is not valid ID' % parser.rargs[0]
-            return            
+            return
         if len(parser.rargs) >= 2:
             from flexget.utils.tools import str_to_boolean
             ArchiveInject.immortal = str_to_boolean(parser.rargs[1])
@@ -91,7 +91,7 @@ class ArchiveInject(object):
     def on_process_start(self, feed):
         if not self.id:
             return
-            
+
         if not self.inject_entry:
             # get the entry to be injected
             session = Session()
@@ -110,12 +110,12 @@ class ArchiveInject(object):
             return
         if self.inject_entry.feed != feed.name:
             raise PluginError('BUG: Feed disabling has failed')
-            
+
         # disable other inputs
-        for input in get_plugins_by_event('input'):
+        for input in get_plugins_by_phase('input'):
             if input.name in feed.config:
-                events = get_events_by_plugin(input.name)
-                if len(events) == 1:
+                phases = get_phases_by_plugin(input.name)
+                if len(phases) == 1:
                     log.info('Disabling plugin %s' % input.name)
                     del(feed.config[input.name])
 
@@ -161,7 +161,7 @@ class Archive(object):
             ae.feed = feed.name
             log.debug('Adding %s to archive' % ae)
             feed.session.add(ae)
-        
+
 register_plugin(Archive, 'archive')
 register_plugin(ArchiveSearch, '--archive-search', builtin=True)
 register_plugin(ArchiveInject, '--archive-inject', builtin=True)

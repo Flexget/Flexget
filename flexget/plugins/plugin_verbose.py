@@ -10,7 +10,7 @@ class Verbose(object):
         Enables verbose log output.
 
         Prints a line in the log when entries are accepted, rejected or failed.
-        Contains event, plugin and reason for action.
+        Contains phase, plugin and reason for action.
     """
 
     def on_entry_accept(self, feed, entry, reason):
@@ -29,13 +29,13 @@ class Verbose(object):
             reason_str = ' (%s)' % reason
         if feed.manager.options.verbose:
             try:
-                print "+ %-8s %-12s %s%s" % (feed.current_event, feed.current_plugin, msg, reason_str)
+                print "+ %-8s %-12s %s%s" % (feed.current_phase, feed.current_plugin, msg, reason_str)
             except:
                 print "+ %-8s %-12s %s%s (warning: unable to print unicode)" % \
-                    (feed.current_event, feed.current_plugin, repr(msg), reason_str)
+                    (feed.current_phase, feed.current_plugin, repr(msg), reason_str)
         else:
-            log.debug('event: %s plugin: %s msg: %s%s' % \
-                (feed.current_event, feed.current_plugin, msg, reason_str))
+            log.debug('phase: %s plugin: %s msg: %s%s' % \
+                (feed.current_phase, feed.current_plugin, msg, reason_str))
 
     def on_feed_exit(self, feed):
         # verbose undecided entries

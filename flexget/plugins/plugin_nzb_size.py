@@ -17,7 +17,7 @@ class NzbSize(object):
     @priority(200)
     def on_feed_modify(self, feed):
         """
-        The downloaded file is accessible in modify event
+        The downloaded file is accessible in modify phase
         """
         from pynzb import nzb_parser
 

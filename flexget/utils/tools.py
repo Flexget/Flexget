@@ -113,7 +113,7 @@ def encode_html(unicode_data, encoding='ascii'):
 def _xmlcharref_encode(unicode_data, encoding):
     """Emulate Python 2.3's 'xmlcharrefreplace' encoding error handler."""
     chars = []
-    # Step through the unicode_data string one character at a time in
+    # Phase through the unicode_data string one character at a time in
     # order to catch unencodable characters:
     for char in unicode_data:
         try:

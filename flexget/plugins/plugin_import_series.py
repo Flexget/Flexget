@@ -1,4 +1,4 @@
-from flexget.plugin import register_plugin, get_plugin_by_name, get_plugins_by_event, PluginError
+from flexget.plugin import register_plugin, get_plugin_by_name, get_plugins_by_phase, PluginError
 from flexget.plugins.filter_series import FilterSeriesBase
 import logging
 
@@ -33,7 +33,7 @@ class ImportSeries(FilterSeriesBase):
         self.build_options_validator(root.accept('dict', key='settings'))
         from_section = root.accept('dict', key='from', required=True)
         # Get a list of apiv2 input plugins
-        valid_inputs = [plugin for plugin in get_plugins_by_event('input') if plugin.api_ver > 1]
+        valid_inputs = [plugin for plugin in get_plugins_by_phase('input') if plugin.api_ver > 1]
         # Build a dict validator that accepts the available input plugins and their settings
         for plugin in valid_inputs:
             if hasattr(plugin.instance, 'validator'):
@@ -55,7 +55,7 @@ class ImportSeries(FilterSeriesBase):
             if input.api_ver == 1:
                 raise PluginError('Plugin %s does not support API v2' % input_name)
 
-            method = input.event_handlers['on_feed_input']
+            method = input.phase_handlers['on_feed_input']
             result = method(feed, input_config)
             if not result:
                 log.warning('Input %s did not return anything' % input_name)

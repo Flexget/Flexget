@@ -1,7 +1,7 @@
 import logging
 import datetime
 from flexget.manager import Session
-from flexget.plugin import register_plugin, PluginError, get_plugin_by_name, priority, register_parser_option, register_feed_event
+from flexget.plugin import register_plugin, PluginError, get_plugin_by_name, priority, register_parser_option, register_feed_phase
 from flexget.manager import Base
 from sqlalchemy import Column, Integer, String, DateTime, Boolean, Unicode
 from flexget.utils.imdb import extract_id, ImdbSearch, ImdbParser, log as imdb_log
@@ -375,7 +375,7 @@ class ImdbQueueManager(object):
 register_plugin(FilterImdbQueue, 'imdb_queue')
 register_plugin(ImdbQueueManager, 'imdb_queue_manager', builtin=True)
 # Handle if a urlrewrite happens, need to get accurate quality.
-register_feed_event(FilterImdbQueue, 'imdbqueue', after='urlrewrite')
+register_feed_phase(FilterImdbQueue, 'imdbqueue', after='urlrewrite')
 
 register_parser_option('--imdb-queue', action='callback', callback=ImdbQueueManager.optik_imdb_queue,
                        help='(add|del|list) [IMDB_URL|NAME] [QUALITY]')

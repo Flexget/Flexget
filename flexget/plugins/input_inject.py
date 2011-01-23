@@ -63,10 +63,10 @@ class InputInject(object):
             return
 
         # disable other inputs
-        for input in get_plugins_by_event('input'):
+        for input in get_plugins_by_phase('input'):
             if input.name in feed.config:
-                events = get_events_by_plugin(input.name)
-                if len(events) == 1:
+                phases = get_phases_by_plugin(input.name)
+                if len(phases) == 1:
                     log.info('Disabling plugin %s' % input.name)
                     del(feed.config[input.name])
 

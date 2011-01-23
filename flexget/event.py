@@ -35,7 +35,7 @@ def event(name, priority=128):
     """Register event to function with a decorator"""
 
     def decorator(func):
-        add_event_handler(name, func, priority)
+        add_phase_handler(name, func, priority)
         return func
 
     return decorator
@@ -49,7 +49,7 @@ def get_events(name):
     return _events[name]
 
 
-def add_event_handler(name, func, priority=128):
+def add_phase_handler(name, func, priority=128):
     """Attach event to :func: under a name :name: with :priority:. Returns Event created."""
 
     events = _events.setdefault(name, [])

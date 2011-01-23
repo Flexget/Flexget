@@ -8,7 +8,7 @@ class UrlRewritingError(Exception):
 
     def __init__(self, value):
         self.value = value
-        
+
     def __str__(self):
         return repr(self.value)
 
@@ -21,7 +21,7 @@ class PluginUrlRewriting(object):
 
     def on_feed_urlrewrite(self, feed):
         # no urlrewriting in unit test mode
-        if feed.manager.unit_test: 
+        if feed.manager.unit_test:
             return
         log.debug('Checking %s entries' % len(feed.accepted))
         # try to urlrewrite all accepted
@@ -67,4 +67,4 @@ class PluginUrlRewriting(object):
                     raise UrlRewritingError('%s: Internal error with url %s' % (name, entry['url']))
 
 register_plugin(PluginUrlRewriting, 'urlrewriting', builtin=True)
-register_feed_event(PluginUrlRewriting, 'urlrewrite', before='download')
+register_feed_phase(PluginUrlRewriting, 'urlrewrite', before='download')

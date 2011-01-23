@@ -1,6 +1,5 @@
 import subprocess
 import logging
-import shlex
 from flexget.plugin import register_plugin, priority
 import re
 
@@ -30,7 +29,7 @@ class PluginExec(object):
 
     exec:
       on_start:
-        event: echo "Started"
+        phase: echo "Started"
       on_input:
         for_entries: echo 'got %(title)s'
       on_output:
@@ -51,12 +50,12 @@ class PluginExec(object):
         adv = root.accept('dict')
 
         def add(name):
-            event = adv.accept('dict', key=name)
-            event.accept('text', key='event')
-            event.accept('text', key='for_entries')
-            event.accept('text', key='for_accepted')
-            event.accept('text', key='for_rejected')
-            event.accept('text', key='for_failed')
+            phase = adv.accept('dict', key=name)
+            phase.accept('text', key='phase')
+            phase.accept('text', key='for_entries')
+            phase.accept('text', key='for_accepted')
+            phase.accept('text', key='for_rejected')
+            phase.accept('text', key='for_failed')
 
         for name in ['on_start', 'on_input', 'on_filter', 'on_output', 'on_exit']:
             add(name)
@@ -106,10 +105,10 @@ class PluginExec(object):
                 log.info('Stdout: %s' % response)
         return p.wait()
 
-    def execute(self, feed, event_name):
+    def execute(self, feed, phase_name):
         config = self.get_config(feed)
-        if not event_name in config:
-            log.debug('event %s not configured' % event_name)
+        if not phase_name in config:
+            log.debug('phase %s not configured' % phase_name)
             return
 
         name_map = {'for_entries': feed.entries, 'for_accepted': feed.accepted, \
@@ -117,14 +116,14 @@ class PluginExec(object):
 
         allow_background = config.get('allow_background')
         for operation, entries in name_map.iteritems():
-            if not operation in config[event_name]:
+            if not operation in config[phase_name]:
                 continue
 
-            log.debug('running event_name: %s operation: %s entries: %s' % (event_name, operation, len(entries)))
+            log.debug('running phase_name: %s operation: %s entries: %s' % (phase_name, operation, len(entries)))
 
             for entry in entries:
                 try:
-                    cmd = config[event_name][operation]
+                    cmd = config[phase_name][operation]
                     entrydict = EscapingDict(entry) if config.get('auto_escape') else entry
                     # Do string replacement from entry, but make sure quotes get escaped
                     cmd = cmd % entrydict
@@ -136,7 +135,7 @@ class PluginExec(object):
                         feed.fail(entry, msg)
                     continue
 
-                log.debug('event_name: %s operation: %s cmd: %s' % (event_name, operation, cmd))
+                log.debug('phase_name: %s operation: %s cmd: %s' % (phase_name, operation, cmd))
                 if feed.manager.options.test:
                     log.info('Would execute: %s' % cmd)
                 else:
@@ -144,10 +143,10 @@ class PluginExec(object):
                     if self.execute_cmd(cmd, allow_background) != 0 and config.get('fail_entries'):
                         feed.fail(entry, "adv_exec return code was non-zero")
 
-        # event keyword in this
-        if 'event' in config[event_name]:
-            cmd = config[event_name]['event']
-            log.debug('event cmd: %s' % cmd)
+        # phase keyword in this
+        if 'phase' in config[phase_name]:
+            cmd = config[phase_name]['phase']
+            log.debug('phase cmd: %s' % cmd)
             if feed.manager.options.test:
                 log.info('Would execute: %s' % cmd)
             else:

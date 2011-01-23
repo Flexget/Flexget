@@ -1,6 +1,6 @@
 import logging
 from optparse import SUPPRESS_HELP
-from flexget.plugin import register_plugin, register_parser_option, plugins, FEED_EVENTS, EVENT_METHODS, get_plugins_by_event
+from flexget.plugin import register_plugin, register_parser_option, plugins, FEED_PHASES, PHASE_METHODS, get_plugins_by_phase
 
 log = logging.getLogger('plugins')
 
@@ -23,9 +23,9 @@ class PluginsList(object):
         # build the list
         plugins = []
         roles = {}
-        for event in FEED_EVENTS:
-            event_plugins = get_plugins_by_event(event)
-            for info in event_plugins:
+        for phase in FEED_PHASES:
+            plugins_in_phase = get_plugins_by_phase(phase)
+            for info in plugins_in_phase:
                 for plugin in plugins:
                     if plugin['name'] == info['name']:
                         break
@@ -33,14 +33,14 @@ class PluginsList(object):
                     plugins.append(info)
 
             # build roles list
-            for info in event_plugins:
-                method_name = EVENT_METHODS[event]
+            for info in plugins_in_phase:
+                method_name = PHASE_METHODS[phase]
                 priority = info.event_handlers[method_name].priority
 
                 if info['name'] in roles:
-                    roles[info['name']].append('%s(%s)' % (event, priority))
+                    roles[info['name']].append('%s(%s)' % (phase, priority))
                 else:
-                    roles[info['name']] = ['%s(%s)' % (event, priority)]
+                    roles[info['name']] = ['%s(%s)' % (phase, priority)]
 
         # print the list
         for plugin in plugins:

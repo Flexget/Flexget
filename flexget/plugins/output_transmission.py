@@ -90,7 +90,6 @@ class PluginTransmission(object):
 
     @save_opener
     def on_process_start(self, feed):
-        """Event handler"""
         try:
             import transmissionrpc
             from transmissionrpc import TransmissionError
@@ -139,7 +138,6 @@ class PluginTransmission(object):
     @priority(135)
     @save_opener
     def on_feed_output(self, feed):
-        """Event handler"""
         config = self.get_config(feed)
         # don't add when learning
         if feed.manager.options.learn:

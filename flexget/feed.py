@@ -1,8 +1,8 @@
 import hashlib
 import logging
 from flexget.manager import Session
-from flexget.plugin import get_methods_by_event, get_plugins_by_event, get_plugin_by_name, \
-    FEED_EVENTS, PluginWarning, PluginError, PluginDependencyError
+from flexget.plugin import get_methods_by_phase, get_plugins_by_phase, get_plugin_by_name, \
+    FEED_PHASES, PluginWarning, PluginError, PluginDependencyError
 from flexget.utils.simple_persistence import SimplePersistence
 from flexget.event import fire_event
 
@@ -171,7 +171,7 @@ class Feed(object):
         self._abort = False
 
         # current state
-        self.current_event = None
+        self.current_phase = None
         self.current_plugin = None
 
     def __cmp__(self, other):
@@ -220,8 +220,8 @@ class Feed(object):
             if reason:
                 entry['reason'] = reason
             entry['accepted_by'] = self.current_plugin
-            # Run on_entry_accept event
-            self.__run_event('accept', entry, reason)
+            # Run on_entry_accept phase
+            self.__run_phase('accept', entry, reason)
 
     def reject(self, entry, reason=None):
         """Reject this entry immediately and permanently with optional reason"""
@@ -237,8 +237,8 @@ class Feed(object):
 
         if not entry in self.rejected:
             self.rejected.append(entry)
-            # Run on_entry_reject event
-            self.__run_event('reject', entry, reason)
+            # Run on_entry_reject phase
+            self.__run_phase('reject', entry, reason)
         # TODO: store metainfo into entry (plugin in the future? yes please)
         entry.pop('reason', None) # remove old reason by previous state
         if reason:
@@ -251,8 +251,8 @@ class Feed(object):
         if not entry in self.failed:
             self.failed.append(entry)
             log.error('Failed %s (%s)' % (entry['title'], reason))
-            # Run on_entry_fail event
-            self.__run_event('fail', entry=entry, reason=reason)
+            # Run on_entry_fail phase
+            self.__run_phase('fail', entry=entry, reason=reason)
 
     def trace(self, entry, message):
         """Add tracing message to entry."""
@@ -265,9 +265,9 @@ class Feed(object):
         if not kwargs.get('silent', False):
             log.info('Aborting feed (plugin: %s)' % self.current_plugin)
         log.debug('Aborting feed (plugin: %s)' % self.current_plugin)
-        # Run the abort event before we set the _abort flag
+        # Run the abort phase before we set the _abort flag
         self._abort = True
-        self.__run_event('abort')
+        self.__run_phase('abort')
 
     def find_entry(self, category='entries', **values):
         """Find and return entry with given attributes from feed or None"""
@@ -307,37 +307,38 @@ class Feed(object):
         if not self.manager.options.quiet and not self.manager.unit_test:
             logger.info(s)
 
-    def __run_event(self, event, entry=None, reason=None):
-        """Execute all configured plugins in :event:"""
+    def __run_phase(self, phase, entry=None, reason=None):
+        """Execute all configured plugins in :phase:"""
+        # TODO: entry events are not very elegant, refactor into real (new) events or something ...
         entry_events = ['accept', 'reject', 'fail']
         # fail when trying to run an on_entry_* event without an entry
-        if event in entry_events and not entry:
-            raise Exception('Entry must be specified when running the %s event' % event)
-        methods = get_methods_by_event(event)
+        if phase in entry_events and not entry:
+            raise Exception('Entry must be specified when running the %s phase' % phase)
+        methods = get_methods_by_phase(phase)
         # log.log(5, 'Event %s methods %s' % (event, methods))
 
         # warn if no filters or outputs in the feed
-        if event in ['filter', 'output']:
+        if phase in ['filter', 'output']:
             for method in methods:
                 if method.plugin.name in self.config:
                     break
             else:
                 if not self.manager.unit_test:
-                    log.warning('Feed doesn\'t have any %s plugins, you should add some!' % event)
+                    log.warning('Feed doesn\'t have any %s plugins, you should add some!' % phase)
 
         for method in methods:
             keyword = method.plugin.name
             if keyword in self.config or method.plugin.builtin:
 
-                if event not in entry_events:
+                if phase not in entry_events:
                     # store execute info, except during entry events
-                    self.current_event = event
+                    self.current_phase = phase
                     self.current_plugin = keyword
 
                 # log.log(5, 'Running %s method %s' % (keyword, method))
                 # call the plugin
                 try:
-                    if event in entry_events:
+                    if phase in entry_events:
                         # Add extra parameters for the on_entry_* events
                         method(self, entry, reason)
                     else:
@@ -382,11 +383,11 @@ class Feed(object):
                     if self.manager.unit_test:
                         raise
 
-                if event not in entry_events:
+                if phase not in entry_events:
                     # purge entries between plugins
                     self.purge()
                 # check for priority operations
-                if self._abort and event != 'abort':
+                if self._abort and phase != 'abort':
                     return
 
     @useFeedLogging
@@ -412,20 +413,20 @@ class Feed(object):
         self.session = Session()
 
         try:
-            # run events
-            for event in FEED_EVENTS:
-                # when learning, skip few events
+            # run phases
+            for phase in FEED_PHASES:
+                # when learning, skip few phases
                 if self.manager.options.learn:
-                    if event in ['download', 'output']:
+                    if phase in ['download', 'output']:
                         # log keywords not executed
-                        plugins = get_plugins_by_event(event)
+                        plugins = get_plugins_by_phase(phase)
                         for plugin in plugins:
                             if plugin.name in self.config:
                                 log.info('Plugin %s is not executed because of --learn / --reset' % plugin.name)
                         continue
 
-                # run all plugins with this event
-                self.__run_event(event)
+                # run all plugins with this phase
+                self.__run_phase(phase)
 
                 # if abort flag has been set feed should be aborted now
                 if self._abort:
@@ -439,15 +440,15 @@ class Feed(object):
             self.session.close()
 
     def process_start(self):
-        """Execute process_start event"""
-        self.__run_event('process_start')
+        """Execute process_start phase"""
+        self.__run_phase('process_start')
 
     def process_end(self):
-        """Execute terminate event for this feed"""
+        """Execute terminate phase for this feed"""
         if self.manager.options.validate:
-            log.debug('No process_end event with --check')
+            log.debug('No process_end phase with --check')
             return
-        self.__run_event('process_end')
+        self.__run_phase('process_end')
 
     def validate(self):
         """Called during feed execution. Validates config, prints errors and aborts feed if invalid."""
