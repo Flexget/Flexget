@@ -3,9 +3,6 @@ import time
 import urllib
 import urllib2
 import logging
-import shutil
-import filecmp
-import zlib
 from flexget.plugin import register_plugin, register_parser_option, get_plugin_by_name, PluginWarning, PluginError
 from httplib import BadStatusLine
 from flexget.utils.tools import urlopener, replace_from_entry
@@ -66,18 +63,20 @@ class PluginDownload(object):
         return config
 
     def on_process_start(self, feed):
-        """
-            Register the usable set: keywords.
-        """
+        """Register the usable set keywords."""
         set_plugin = get_plugin_by_name('set')
         set_plugin.instance.register_keys({'path': 'text'})
 
     def on_feed_download(self, feed):
         config = self.get_config(feed)
-        self.get_temp_files(feed, require_path=config.get('require_path', False))
+        self.get_temp_files(feed, require_path=config.get('require_path', False), fail_html=config['fail_html'])
 
-    def get_temp_files(self, feed, require_path=False, handle_magnets=False):
-        """Download all feed content and store in temporary folder"""
+    def get_temp_files(self, feed, require_path=False, handle_magnets=False, fail_html=True):
+        """Download all feed content and store in temporary folder.
+
+        :require_path: whether or not entries without 'path' field are ignored
+        :handle_magnets: when used any of urls containing magnet link will replace url, otherwise warning is printed.
+        """
         for entry in feed.accepted:
             if entry.get('urls'):
                 urls = entry.get('urls')
@@ -88,24 +87,31 @@ class PluginDownload(object):
                 if url.startswith('magnet:'):
                     if handle_magnets:
                         # Set magnet link as main url, so a torrent client plugin can grab it
-                        log.debug('Acceping magnet url for %s' % entry['title'])
+                        log.debug('Accepting magnet url for %s' % entry['title'])
                         entry['url'] = url
                         break
                     else:
                         log.warning('Can\'t download magnet url')
-                        errors.append('Magnet  Url')
+                        errors.append('Magnet URL')
                         continue
                 if require_path and 'path' not in entry:
                     # Don't fail here, there might be a magnet later in the list of urls
                     log.debug('Skipping url %s because there is no path for download' % url)
                     continue
-                error = self.download_url(feed, entry, url)
-                errors.append(error)
+                error = self.process_entry(feed, entry, url)
+
+                # disallow html content
+                html_mimes = ['html', 'text/html']
+                if entry.get('mime-type') in html_mimes and fail_html:
+                    error = 'Unexpected html content received from `%s` - maybe a login page?' % entry['url']
+
                 if not error:
                     # Set the main url, so we know where this file actually came from
                     log.debug('Successfully retrieved %s from %s' % (entry['title'], url))
                     entry['url'] = url
                     break
+                else:
+                    errors.append(error)
             else:
                 # check if entry must have a path (download: yes)
                 if require_path and 'path' not in entry:
@@ -114,16 +120,16 @@ class PluginDownload(object):
                 else:
                     feed.fail(entry, ", ".join(errors))
 
-    def download_url(self, feed, entry, url):
-        """Downloads :url:.
-           Do not fail the :entry: if there is a network issue, instead just log and return a string error."""
+    def process_entry(self, feed, entry, url):
+        """Processes :entry: by using :url: from it.
+           Does not fail the :entry: if there is a network issue, instead just log and return a string error."""
         try:
             if feed.manager.options.test:
                 log.info('Would download: %s' % entry['title'])
             else:
                 if not feed.manager.unit_test:
                     log.info('Downloading: %s' % entry['title'])
-                self.download(feed, entry, url)
+                self.download_entry(feed, entry, url)
         except urllib2.HTTPError, e:
             log.warning('HTTPError %s' % e.code)
             return 'HTTP error'
@@ -144,8 +150,9 @@ class PluginDownload(object):
             log.warning(e.message)
             return e.message
 
-    def download(self, feed, entry, url):
-        """Downloads :entry:. May raise exception(s) PluginWarning"""
+    def download_entry(self, feed, entry, url):
+        """Downloads :entry: by using :url:.
+        May raise several types of exception(s) or PluginWarning"""
 
         # see http://bugs.python.org/issue1712522
         # note, url is already unicode ...
@@ -170,11 +177,9 @@ class PluginDownload(object):
         else:
             handlers = None
 
-        f = urlopener(url, log, handlers=handlers)
-
-        mimetype = f.headers.gettype()
-
-        if f.headers.get('content-encoding') in ('gzip', 'x-gzip', 'deflate'):
+        opener = urlopener(url, log, handlers=handlers)
+        if opener.headers.get('content-encoding') in ('gzip', 'x-gzip', 'deflate'):
+            import zlib
             decompress = zlib.decompressobj(15 + 32).decompress
         else:
             decompress = None
@@ -203,7 +208,7 @@ class PluginDownload(object):
         try:
             outfile = open(datafile, 'wb')
             try:
-                for chunk in read_chunks(f):
+                for chunk in read_chunks(opener):
                     outfile.write(decompress(chunk) if decompress else chunk)
             except:
                 # don't leave futile files behind
@@ -218,21 +223,21 @@ class PluginDownload(object):
             entry['file'] = datafile
             log.debug('%s field file set to: %s' % (entry['title'], entry['file']))
         finally:
-            f.close()
+            opener.close()
 
-        entry['mime-type'] = mimetype
+        entry['mime-type'] = opener.headers.gettype()
 
-        if 'content-length' in f.headers and not decompress:
-            entry['content-length'] = int(f.headers.get('content-length'))
+        if 'content-length' in opener.headers and not decompress:
+            entry['content-length'] = int(opener.headers.get('content-length'))
 
-        # prefer content-disposition naming, note: content-disposition can be disabled completely by setting entry
-        # field `content-disposition` to False
+        # prefer content-disposition naming, note: content-disposition can be disabled completely
+        # by setting entry field `content-disposition` to False
         if entry.get('content-disposition', True):
-            self.filename_from_headers(entry, f)
+            self.filename_from_headers(entry, opener)
         else:
             log.info('Content-disposition disabled for %s' % entry['title'])
         self.filename_ext_from_mime(entry)
-        # TODO: LAST option, try to scrap url?
+        # TODO: LAST resort, try to scrap url for filename?
 
     def filename_from_headers(self, entry, response):
         """Checks entry filename if it's found from content-disposition"""
@@ -255,7 +260,6 @@ class PluginDownload(object):
         # now we should have unicode string, let's convert into proper format where non-ascii
         # chars are entities
         data = encode_html(data)
-
         try:
             filename = email.message_from_string(data).get_filename(failobj=False)
         except:
@@ -304,7 +308,7 @@ class PluginDownload(object):
 
         if 'file' not in entry:
             log.debug('file missing, entry: %s' % entry)
-            raise Exception('Entry %s has no temp file associated with' % entry['title'])
+            raise PluginError('Entry %s has no temp file associated with' % entry['title'])
 
         try:
             # use path from entry if has one, otherwise use from download definition parameter
@@ -315,13 +319,6 @@ class PluginDownload(object):
             # override path from command line parameter
             if feed.manager.options.dl_path:
                 path = feed.manager.options.dl_path
-
-            # disallow html content
-            html_mimes = ['html', 'text/html']
-            if entry.get('mime-type') in html_mimes and config['fail_html']:
-                feed.fail(entry, 'unexpected html content')
-                log.error('Unexpected html content received from %s (a login page?)' % entry['url'])
-                return
 
             # if we still don't have a filename, try making one from title (last resort)
             if not entry.get('filename'):
@@ -368,6 +365,7 @@ class PluginDownload(object):
             log.debug('destfile: %s' % destfile)
 
             if os.path.exists(destfile):
+                import filecmp
                 if filecmp.cmp(entry['file'], destfile):
                     log.debug("Identical destination file '%s' already exists", destfile)
                     return
@@ -382,6 +380,7 @@ class PluginDownload(object):
             log.debug('moving %s to %s' % (entry['file'], destfile))
 
             try:
+                import shutil
                 shutil.move(entry['file'], destfile)
             except OSError, err:
                 # ignore permission errors, see ticket #555

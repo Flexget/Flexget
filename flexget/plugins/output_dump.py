@@ -13,12 +13,14 @@ def dump(entries, debug=False):
         for field in entry:
             value = entry[field]
             if isinstance(value, basestring):
-                print '%-15s: %s' % (field, value.replace('\r', '').replace('\n', ''))
-            elif isinstance(value, int) or isinstance(value, float):
-                print '%-15s: %s' % (field, value)
+                print '%-17s: %s' % (field, value.replace('\r', '').replace('\n', ''))
+            elif isinstance(value, (int, float, list, dict)):
+                print '%-17s: %s' % (field, value)
+            elif value is None:
+                print '%-17s: %s' % (field, value)                
             else:
                 if debug:
-                    print '%-15s: [not printable] (%s)' % (field, value)
+                    print '%-17s: [not printable] (%s)' % (field, value)
         print ''
 
 

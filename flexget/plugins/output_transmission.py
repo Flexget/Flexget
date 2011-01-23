@@ -134,7 +134,7 @@ class PluginTransmission(object):
         # our temp .torrent files
         if not 'download' in feed.config:
             download = get_plugin_by_name('download')
-            download.instance.get_temp_files(feed, handle_magnets=True)
+            download.instance.get_temp_files(feed, handle_magnets=True, fail_html=True)
 
     @priority(135)
     @save_opener
@@ -147,7 +147,7 @@ class PluginTransmission(object):
         if not config['enabled']:
             return
         # Do not run if there is nothing to do
-        if len(feed.accepted) == 0:
+        if not feed.accepted:
             return
         if self.client is None:
             self.client = self.create_rpc_client(feed)
@@ -182,8 +182,8 @@ class PluginTransmission(object):
         if 'maxconnections' in opt_dic:
             options['add']['peer_limit'] = opt_dic['maxconnections']
 
-        if 'honourlimits' in opt_dic and not opt_dic['honourlimits']: 
-            options['change']['honorsSessionLimits'] = False 
+        if 'honourlimits' in opt_dic and not opt_dic['honourlimits']:
+            options['change']['honorsSessionLimits'] = False
         if 'maxupspeed' in opt_dic:
             options['change']['uploadLimit'] = opt_dic['maxupspeed']
             options['change']['uploadLimited'] = True
@@ -250,15 +250,15 @@ class PluginTransmission(object):
                 continue
             options = self._make_torrent_options_dict(feed, entry)
 
-            download = not(entry['url'].startswith('magnet:'))
+            downloaded = not(entry['url'].startswith('magnet:'))
 
             # Check that file is downloaded
-            if download and not 'file' in entry:
+            if downloaded and not 'file' in entry:
                 feed.fail(entry, 'file missing?')
                 continue
 
             # Verify the temp file exists
-            if download and not os.path.exists(entry['file']):
+            if downloaded and not os.path.exists(entry['file']):
                 tmp_path = os.path.join(feed.manager.config_base, 'temp')
                 log.debug('entry: %s' % entry)
                 log.debug('temp: %s' % ', '.join(os.listdir(tmp_path)))
@@ -266,7 +266,7 @@ class PluginTransmission(object):
                 continue
 
             try:
-                if download:
+                if downloaded:
                     f = open(entry['file'], 'rb')
                     try:
                         filedump = base64.encodestring(f.read())
@@ -286,7 +286,7 @@ class PluginTransmission(object):
 
             # Clean up temp file if download plugin is not configured for
             # this feed.
-            if download and not 'download' in feed.config:
+            if downloaded and not 'download' in feed.config:
                 os.remove(entry['file'])
                 del(entry['file'])
 
@@ -299,10 +299,10 @@ class PluginTransmission(object):
             log.debug('Transfer "%s": status: "%s" upload ratio: %.2f seed ratio: %.2f' % \
                 (transfer.name, transfer.status, transfer.uploadRatio, transfer.seedRatioLimit))
             if transfer.status == 'stopped' and transfer.uploadRatio >= transfer.seedRatioLimit:
-                log.info('Remove torrent "%s" from transmission' % (transfer.name))
+                log.info('Removing finished torrent `%s` from transmission' % transfer.name)
                 remove_ids.append(transfer.id)
         # Remove finished transfers
-        if len(remove_ids) > 0:
+        if remove_ids:
             cli.remove(remove_ids)
 
     def on_feed_exit(self, feed):
@@ -312,11 +312,6 @@ class PluginTransmission(object):
             download = get_plugin_by_name('download')
             download.instance.cleanup_temp_files(feed)
 
-    def on_feed_abort(self, feed):
-        """Make sure all temp files are cleaned up when feed is aborted."""
-        # If download plugin is enabled, it will handle cleanup.
-        if not 'download' in feed.config:
-            download = get_plugin_by_name('download')
-            download.instance.cleanup_temp_files(feed)
+    on_feed_abort = on_feed_exit
 
 register_plugin(PluginTransmission, 'transmission')
