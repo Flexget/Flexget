@@ -539,14 +539,6 @@ class FilterSeries(SeriesPlugin, FilterSeriesBase):
             if identified_by != 'auto':
                 log.debug('identified_by set to \'%s\' based on series history' % identified_by)
 
-        # helper function, iterate entry fields in certain order
-        def field_order(x):
-            order = ['title', 'description']
-            return order.index(x[0]) if x[0] in order else len(order)
-
-        # don't try to parse these fields
-        ignore_fields = ['uid', 'guid', 'feed', 'url', 'original_url', 'type', 'quality', 'series_name', 'series_id', 'accepted_by', 'reason']
-
         parser = SeriesParser(name=series_name,
                               identified_by=identified_by,
                               name_regexps=get_as_array(config, 'name_regexp'),
@@ -561,12 +553,10 @@ class FilterSeries(SeriesPlugin, FilterSeriesBase):
                 # This was detected as another series, we can skip it.
                 continue
             else:
-                for field, data in sorted(entry.items(), key=field_order):
+                for field in ['title', 'description']:
+                    data = entry.get(field)
                     # skip invalid fields
                     if not isinstance(data, basestring) or not data:
-                        continue
-                    # skip ignored
-                    if field in ignore_fields:
                         continue
                     # in case quality will not be found from title, set it from entry['quality'] if available
                     quality = None
@@ -651,7 +641,7 @@ class FilterSeries(SeriesPlugin, FilterSeriesBase):
                 log.debug('downloaded removed: %s' % ep)
                 eps.remove(ep)
 
-            # no episodes left, continue to next series
+            # no releases left, continue to next episode
             if not eps:
                 continue
 
@@ -791,16 +781,15 @@ class FilterSeries(SeriesPlugin, FilterSeriesBase):
             Doesn't reject reject anything in :whitelist:.
         """
 
-        downloaded = []
+        downloaded = set()
         downloaded_releases = self.get_downloaded(feed.session, eps[0].name, eps[0].identifier)
         log.debug('downloaded: %s' % [e.title for e in downloaded_releases])
         if downloaded_releases and eps:
             log.debug('identifier %s is downloaded' % eps[0].identifier)
             for ep in eps[:]:
                 if ep not in whitelist:
-                    # same episode can appear multiple times, so add it just once to the list
-                    if ep not in downloaded:
-                        downloaded.append(ep)
+                    # same episode can appear multiple times, so use a set to avoid duplicates
+                    downloaded.add(ep)
         return downloaded
 
     def process_quality(self, feed, config, eps):
