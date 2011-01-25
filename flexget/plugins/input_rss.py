@@ -341,8 +341,9 @@ class InputRSS(object):
                     if not 'href' in enclosure:
                         log_once('RSS-entry `%s` enclosure does not have URL' % entry.title, log)
                         continue
+                    enclosures_urls.append(enclosure['href'])
                     if config.get('group links'):
-                        enclosures_urls.append(enclosure['href'])
+                        # If group_links is enabled we don't want to create an Entry for each enclosure
                         continue
                     ee['url'] = enclosure['href']
                     # get optional meta-data
@@ -363,7 +364,9 @@ class InputRSS(object):
                                 ee['filename'] = match.group(1)
                                 log.log(5, 'filename `%s` from enclosure' % ee['filename'])
                     add_entry(ee)
-                if not config.get('group links'):
+                if enclosures_urls and not config.get('group links'):
+                    # If we found urls from enclosures and group_links is not enabled
+                    # we should not create an Entry for the main rss item
                     continue
 
             # create flexget entry
