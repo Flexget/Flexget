@@ -104,6 +104,7 @@ class PluginDownload(object):
                 html_mimes = ['html', 'text/html']
                 if entry.get('mime-type') in html_mimes and fail_html:
                     error = 'Unexpected html content received from `%s` - maybe a login page?' % entry['url']
+                    self.cleanup_temp_file(entry)
 
                 if not error:
                     # Set the main url, so we know where this file actually came from
@@ -394,10 +395,7 @@ class PluginDownload(object):
             entry['output'] = destfile
 
         finally:
-            if os.path.exists(entry['file']):
-                log.debug('removing temp file %s from %s' % (entry['file'], entry['title']))
-                os.remove(entry['file'])
-            del(entry['file'])
+            self.cleanup_temp_file(entry)
 
     def on_feed_exit(self, feed):
         """Make sure all temp files are cleaned up when feed exits"""
@@ -407,14 +405,17 @@ class PluginDownload(object):
         """Make sure all temp files are cleaned up when feed is aborted."""
         self.cleanup_temp_files(feed)
 
+    def cleanup_temp_file(self, entry):
+        if 'file' in entry:
+            if os.path.exists(entry['file']):
+                log.debug('removing temp file %s from %s' % (entry['file'], entry['title']))
+                os.remove(entry['file'])
+            del(entry['file'])
+
     def cleanup_temp_files(self, feed):
         """Checks all entries for leftover temp files and deletes them."""
         for entry in feed.entries + feed.rejected + feed.failed:
-            if 'file' in entry:
-                if os.path.exists(entry['file']):
-                    log.debug('removing temp file %s from %s' % (entry['file'], entry['title']))
-                    os.remove(entry['file'])
-                del(entry['file'])
+            self.cleanup_temp_file(entry)
 
 register_plugin(PluginDownload, 'download')
 register_parser_option('--dl-path', action='store', dest='dl_path', default=False,
