@@ -1,14 +1,13 @@
 import logging
 import urlparse
 import xml.sax
-import re
+import posixpath
 import feedparser
 import urllib2
 import httplib
 import socket
 from flexget.feed import Entry
 from flexget.plugin import register_plugin, internet, PluginError
-from flexget.utils.log import log_once
 from flexget.utils.cached_input import cached
 from flexget.utils.tools import urlopener
 
@@ -70,13 +69,13 @@ class InputRSS(object):
         You can group all the links of an item, to make the download plugin tolerant
         to broken urls: it will try to download each url until one works.
         Links are enclosures plus item fields given by the link value, in that order.
-        The value to set is "group links".
+        The value to set is "group_links".
 
         Example:
 
         rss:
           url: <url>
-          group links: yes
+          group_links: yes
     """
 
     def validator(self):
@@ -95,26 +94,20 @@ class InputRSS(object):
         advanced.accept('boolean', key='silent')
         advanced.accept('boolean', key='ascii')
         advanced.accept('boolean', key='filename')
-        advanced.accept('boolean', key='group links')
+        advanced.accept('boolean', key='group_links')
         return root
 
     def build_config(self, config):
         """Set default values to config"""
         if isinstance(config, basestring):
             config = {'url': config}
-        if isinstance(config.get('link'), basestring):
-            config['link'] = [config['link']]
-        if config.get('link'):
-            config['link'] = [link.replace(':', '_').lower() for link in config['link']]
-        # set the default link fields to 'link' and 'guid'
-        if not config.get('link') or 'auto' in config['link']:
-            config['link'] = ['link', 'guid']
+        # set the default link value to 'auto'
+        config.setdefault('link', 'auto')
         # Replace : with _ and lower case other fields so they can be found in rss
         if config.get('other_fields'):
             config['other_fields'] = [field.replace(':', '_').lower() for field in config['other_fields']]
-        # set default value for group links as deactivated
-        if not config.get('group links') or config['group links'] == 'auto':
-            config['group links'] = False
+        # set default value for group_links as deactivated
+        config.setdefault('group_links', False)
         # use basic auth when needed
         if 'username' in config and 'password' in config:
             config['url'] = self.passwordize(config['url'], config['username'], config['password'])
@@ -127,11 +120,30 @@ class InputRSS(object):
         url = urlparse.urlunsplit(parts)
         return url
 
+    def add_enclosure_info(self, entry, enclosure, filename=True, multiple=False):
+        """Stores information from an rss enclosure into an Entry."""
+        entry['url'] = enclosure['href']
+        # get optional meta-data
+        if 'length' in enclosure:
+            try:
+                entry['size'] = int(enclosure['length'])
+            except:
+                entry['size'] = 0
+        if 'type' in enclosure:
+            entry['type'] = enclosure['type']
+        # TODO: better and perhaps join/in download plugin?
+        # Parse filename from enclosure url
+        basename = posixpath.basename(urlparse.urlsplit(entry['url']).path)
+        # If enclosure has size OR there are multiple enclosures use filename from url
+        if entry.get('size') or multiple and basename and filename:
+            entry['filename'] = basename
+            log.log(5, 'filename `%s` from enclosure' % entry['filename'])
+
     @cached('rss', 'url')
     @internet(log)
     def on_feed_input(self, feed, config):
         config = self.build_config(config)
-        
+
         log.debug('Checking feed %s (%s)' % (feed.name, config['url']))
 
         # check etags and last modified -headers
@@ -192,7 +204,7 @@ class InputRSS(object):
                     log.info('Feed has UnicodeEncodeError but seems to produce entries, ignoring the error ...')
                     ignore = True
             elif isinstance(ex, xml.sax._exceptions.SAXParseException):
-                if len(rss.entries) == 0:
+                if not rss.entries:
                     # save invalid data for review, this is a bit ugly but users seem to really confused when
                     # html pages (login pages) are received
                     log.critical('Invalid XML received from feed %s' % feed.name)
@@ -230,7 +242,7 @@ class InputRSS(object):
             else:
                 # all other bozo errors
                 # TODO: refactor the dumping into a own method, DUPLICATED CODE
-                if len(rss.entries) == 0:
+                if not rss.entries:
                     log.critical('Invalid RSS received from feed %s' % feed.name)
                     req = urlopener(config['url'], log)
                     data = req.read()
@@ -275,7 +287,7 @@ class InputRSS(object):
                 feed.cache.store('modified', rss.modified, 90)
                 log.debug('last modified saved for feed %s', feed.name)
         """
-        
+
         # new entries to be created
         entries = []
 
@@ -317,7 +329,7 @@ class InputRSS(object):
                             config['other_fields'].remove(field)
                             continue
                         try:
-                            ea[field] = decode_html(getattr(entry, field))
+                            ea[field] = decode_html(entry[field])
                             if field in config.get('other_fields', []):
                                 # Print a debug message for custom added fields
                                 log.debug('Field `%s` set to `%s` for `%s`' % (field, ea[field], ea['title']))
@@ -332,59 +344,55 @@ class InputRSS(object):
 
             # create from enclosures if present
             enclosures = entry.get('enclosures', [])
-            enclosures_urls = []
 
-            if enclosures:
-                # log.debug('adding %i entries from enclosures' % len(enclosures))
+            if len(enclosures) > 1 and not config.get('group_links'):
+                # There is more than 1 enclosure, create an Entry for each of them
+                log.debug('adding %i entries from enclosures' % len(enclosures))
                 for enclosure in enclosures:
-                    ee = Entry()
                     if not 'href' in enclosure:
-                        log_once('RSS-entry `%s` enclosure does not have URL' % entry.title, log)
+                        log.debug('RSS-entry `%s` enclosure does not have URL' % entry.title)
                         continue
-                    enclosures_urls.append(enclosure['href'])
-                    if config.get('group links'):
-                        # If group_links is enabled we don't want to create an Entry for each enclosure
-                        continue
-                    ee['url'] = enclosure['href']
-                    # get optional meta-data
-                    if 'length' in enclosure:
-                        try:
-                            ee['size'] = int(enclosure['length'])
-                        except:
-                            ee['size'] = 0
-                    if 'type' in enclosure:
-                        ee['type'] = enclosure['type']
-                    # if enclosure has size OR there are multiple enclosures use filename from url
-                    if ee.get('size', 0) != 0 or len(enclosures) > 1:
-                        if ee['url'].rfind != -1:
-                            # parse filename from enclosure url
-                            # TODO: better and perhaps join/in download plugin? also see urlparse module
-                            match = re.search(r'.*/([^?#]+)', ee['url'])
-                            if match and config.get('filename', True):
-                                ee['filename'] = match.group(1)
-                                log.log(5, 'filename `%s` from enclosure' % ee['filename'])
+                    # There is a valid url for this enclosure, create an Entry for it
+                    ee = Entry()
+                    self.add_enclosure_info(ee, enclosure, config.get('filename', True), True)
                     add_entry(ee)
-                if enclosures_urls and not config.get('group links'):
-                    # If we found urls from enclosures and group_links is not enabled
-                    # we should not create an Entry for the main rss item
-                    continue
+                # If we created entries for enclosures, we should not create an Entry for the main rss item
+                continue
 
             # create flexget entry
             e = Entry()
+            urls = []
 
-            # search for known url fields
-            if config.get('group links'):
-                e['urls'] = enclosures_urls
-                for url_field in config['link']:
-                    if url_field in entry:
-                        e['urls'].append(entry[url_field])
-
-            for url_field in config['link']:
-                if url_field in entry:
-                    e['url'] = entry[url_field]
-                    break
+            if not isinstance(config.get('link'), list):
+                # If the link field is not a list, search for first valid url
+                if config['link'] == 'auto':
+                    # Auto mode, check for a single enclosure url first
+                    if len(entry.get('enclosures', [])) == 1 and entry['enclosures'][0].get('href'):
+                        self.add_enclosure_info(e, entry['enclosures'][0], config.get('filename', True))
+                    else:
+                        # If there is no enclosure url, check link, then guid field for urls
+                        for field in ['link', 'guid']:
+                            if entry.get(field):
+                                e['url'] = entry[field]
+                                break
+                else:
+                    if entry.get(config['link']):
+                        e['url'] = entry[config['link']]
             else:
-                log.debug('%s does not have link (%s) or enclosure' % (entry.title, ', '.join(config['link'])))
+                # If link was passed as a list, we create a list of urls
+                for field in config['link']:
+                    if entry.get(field):
+                        e.setdefault('url', entry[field])
+                        if entry[field] not in e.setdefault('urls', []):
+                            e['urls'].append(entry[field])
+
+            if config.get('group_links'):
+                # Append a list of urls from enclosures to the urls field if group_links is enabled
+                e.setdefault('urls', [e['url']]).extend(
+                        [enc.href for enc in entry.get('enclosures', []) if enc.get('href') not in e['urls']])
+
+            if not e.get('url'):
+                log.debug('%s does not have link (%s) or enclosure' % (entry.title, config['link']))
                 ignored += 1
                 continue
 
@@ -393,7 +401,7 @@ class InputRSS(object):
         if ignored:
             if not config.get('silent'):
                 log.warning('Skipped %s RSS-entries without required information (title, link or enclosures)' % ignored)
-                
+
         return entries
 
 register_plugin(InputRSS, 'rss', api_ver=2)
