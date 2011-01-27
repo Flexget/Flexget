@@ -234,7 +234,7 @@ class OutputRSS(object):
 
         # make rss
         rss = PyRSS2Gen.RSS2(title='FlexGet',
-                             link=config.get('rsslink', None),
+                             link=config.get('rsslink', 'http://flexget.com'),
                              description='FlexGet generated RSS feed',
                              lastBuildDate=datetime.datetime.utcnow(),
                              items=rss_items)

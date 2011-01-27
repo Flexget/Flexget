@@ -120,6 +120,34 @@ class InputRSS(object):
         url = urlparse.urlunsplit(parts)
         return url
 
+    def process_invalid_content(self, feed, url):
+        """If feedparser reports error, save the received data and log error."""
+        log.critical('Invalid XML received from feed %s' % feed.name)
+        try:
+            req = urlopener(url, log)
+        except ValueError:
+            log.debug('invalid url %s (ok for a file)' % url)
+            return
+        data = req.read()
+        req.close()
+        ext = 'xml'
+        if '<html>' in data.lower():
+            log.critical('Received content is HTML page, not an RSS feed')
+            ext = 'html'
+        if 'login' in data.lower() or 'username' in data.lower():
+            log.critical('Received content looks a bit like login page')
+        if 'error' in data.lower():
+            log.critical('Received content looks a bit like error page')
+        import os
+        received = os.path.join(feed.manager.config_base, 'received')
+        if not os.path.isdir(received):
+            os.mkdir(received)
+        filename = os.path.join(received, '%s.%s' % (feed.name, ext))
+        f = open(filename, 'w')
+        f.write(data)
+        f.close()
+        log.critical('I have saved the invalid content to %s for you to view' % filename)
+
     def add_enclosure_info(self, entry, enclosure, filename=True, multiple=False):
         """Stores information from an rss enclosure into an Entry."""
         entry['url'] = enclosure['href']
@@ -200,34 +228,16 @@ class InputRSS(object):
                 log.debug('ignoring feedparser.CharacterEncodingOverride')
                 ignore = True
             elif isinstance(ex, UnicodeEncodeError):
-                if len(rss.entries):
+                if rss.entries:
                     log.info('Feed has UnicodeEncodeError but seems to produce entries, ignoring the error ...')
                     ignore = True
             elif isinstance(ex, xml.sax._exceptions.SAXParseException):
                 if not rss.entries:
                     # save invalid data for review, this is a bit ugly but users seem to really confused when
                     # html pages (login pages) are received
-                    log.critical('Invalid XML received from feed %s' % feed.name)
-                    req = urlopener(config['url'], log)
-                    data = req.read()
-                    req.close()
-                    ext = 'xml'
-                    if '<html>' in data.lower():
-                        log.critical('Received content is HTML page, not an RSS feed')
-                        ext = 'html'
-                    if 'login' in data.lower() or 'username' in data.lower():
-                        log.critical('Received content looks a bit like login page')
-                    if 'error' in data.lower():
-                        log.critical('Received content looks a bit like error page')
-                    import os
-                    received = os.path.join(feed.manager.config_base, 'received')
-                    if not os.path.isdir(received):
-                        os.mkdir(received)
-                    filename = os.path.join(received, '%s.%s' % (feed.name, ext))
-                    f = open(filename, 'w')
-                    f.write(data)
-                    f.close()
-                    log.critical('I have saved the invalid content to %s for you to view' % filename)
+                    self.process_invalid_content(feed, config['url'])
+                    if feed.manager.options.debug:
+                        log.exception(ex)
                     raise PluginError('Received invalid RSS content')
                 else:
                     msg = 'Invalid XML received. However feedparser still produced entries. Ignoring the error ...'
@@ -241,22 +251,8 @@ class InputRSS(object):
                 raise ex # let the @internet decorator handle
             else:
                 # all other bozo errors
-                # TODO: refactor the dumping into a own method, DUPLICATED CODE
                 if not rss.entries:
-                    log.critical('Invalid RSS received from feed %s' % feed.name)
-                    req = urlopener(config['url'], log)
-                    data = req.read()
-                    req.close()
-                    ext = 'xml'
-                    import os
-                    received = os.path.join(feed.manager.config_base, 'received')
-                    if not os.path.isdir(received):
-                        os.mkdir(received)
-                    filename = os.path.join(received, '%s.%s' % (feed.name, ext))
-                    f = open(filename, 'w')
-                    f.write(data)
-                    f.close()
-                    log.critical('I have saved the invalid content to %s for you to view' % filename)
+                    self.process_invalid_content(feed, config['url'])
                     raise PluginError('Unhandled bozo_exception. Type: %s (feed: %s)' % \
                         (ex.__class__.__name__, feed.name), log)
                 else:
