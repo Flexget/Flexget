@@ -56,7 +56,9 @@ class FormLogin(object):
                 loginform[passfield] = password
                 break
             except Exception, e:
-                raise PluginError('Unable to find login fields', log)
+                pass
+        else:
+            raise PluginError('Unable to find login fields', log)
 
         br.form = loginform
 
