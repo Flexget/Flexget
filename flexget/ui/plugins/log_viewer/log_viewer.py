@@ -30,15 +30,11 @@ class LogEntry(Base):
 
 
 class DBLogHandler(logging.Handler):
-
-    def __init__(self, session):
-        logging.Handler.__init__(self)
-        self.session = session
-
+    
     def emit(self, record):
-        logentry = LogEntry(record)
-        self.session.add(logentry)
-        self.session.commit()
+        session = Session()
+        session.add(LogEntry(record))
+        session.commit()
 
 
 @log_viewer.context_processor
@@ -104,7 +100,7 @@ def get_logdata():
 def initialize():
     # Register db handler with base logger
     logger = logging.getLogger()
-    handler = DBLogHandler(Session())
+    handler = DBLogHandler()
     logger.addHandler(handler)
 
 register_plugin(log_viewer, url_prefix='/log', menu='Log', order=256)
