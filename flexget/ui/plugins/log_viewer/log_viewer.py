@@ -35,6 +35,7 @@ class DBLogHandler(logging.Handler):
         session = Session()
         session.add(LogEntry(record))
         session.commit()
+        session.close()
 
 
 @log_viewer.context_processor
