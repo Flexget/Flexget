@@ -1,4 +1,5 @@
 import logging
+import re
 from flexget.plugin import register_plugin, internet
 from flexget.manager import Base, Session
 from flexget.utils.tools import urlopener
@@ -56,18 +57,18 @@ class FilterThetvdbFavorites(FilterSeriesBase):
         account_id = str(config['account_id'])
         session = Session()
         # Check when the last time the user information (favorites) were updated.
-        # The user info is stored where a series_id == ""
+        # The user info is stored where a series_id == ''
         user_update = session.query(ThetvdbFavorites).filter(ThetvdbFavorites.account_id == account_id).\
-            filter(ThetvdbFavorites.series_id == unicode(""))
+            filter(ThetvdbFavorites.series_id == u'')
         # Grab all info from cache just in case.
         cache = session.query(ThetvdbFavorites).filter(ThetvdbFavorites.account_id == account_id).\
-            filter(ThetvdbFavorites.series_id != unicode(""))
+            filter(ThetvdbFavorites.series_id != u'')
         if cache.count() and user_update.count() and user_update.first().added > datetime.now() - timedelta(minutes=1):
             log.debug('Using cached thetvdb favorite series information for account ID %s' % account_id)
         else:
             # Wipe out previous user info update time
             user_update.delete()
-            session.add(ThetvdbFavorites(account_id, unicode("User Series List Update Time"), unicode("")))
+            session.add(ThetvdbFavorites(account_id, u'User Series List Update Time', u''))
             session.commit()
             log.debug('Updating favorite series information from thetvdb.com for account ID %s' % account_id)
             try:
@@ -84,15 +85,15 @@ class FilterThetvdbFavorites(FilterSeriesBase):
                     fidcache = cache.filter(ThetvdbFavorites.series_id == fid)
                     if fidcache.count() and fidcache.first().added > datetime.now() - timedelta(hours=3):
                         series_name = fidcache.first().series_name
-                        log.debug('Using series info from cache for %s - %s' % (str(fid), str(series_name)))
+                        log.debug('Using series info from cache for %s - %s' % (fid, series_name))
                         items.append(ThetvdbFavorites(account_id, series_name, fid))
                     else:
                         log.debug('Looking up series info for %s' % str(fid))
-                        data = BeautifulStoneSoup(urlopener("http://thetvdb.com//data/series/%s/" % str(fid), log), \
+                        data = BeautifulStoneSoup(urlopener('http://thetvdb.com//data/series/%s/' % fid, log), \
                             convertEntities=BeautifulStoneSoup.HTML_ENTITIES)
                         items.append(ThetvdbFavorites(account_id, data.series.seriesname.string, data.series.id.string))
                         if not len(items) % 10:
-                            log.info("Parsed %i of %i series from thetvdb favorites" % (len(items), len(favorite_ids)))
+                            log.info('Parsed %i of %i series from thetvdb favorites' % (len(items), len(favorite_ids)))
             except (urllib2.URLError, IOError, AttributeError):
                 import traceback
                 # If there are errors getting the favorites or parsing the xml, fall back on cache
@@ -105,36 +106,23 @@ class FilterThetvdbFavorites(FilterSeriesBase):
                 session.add_all(items)
                 session.commit()
                 cache = session.query(ThetvdbFavorites).filter(ThetvdbFavorites.account_id == account_id).\
-                    filter(ThetvdbFavorites.series_id != unicode(""))
+                    filter(ThetvdbFavorites.series_id != u'')
         if not cache.count():
-            log.info("Didn't find any thetvdb.com favorites.")
+            log.info('Didn\'t find any thetvdb.com favorites.')
             return
-        series_group = config.get('series_group', 'thetvdb_favs')
 
+        # Construct series plugin config
+        series_group = config.get('series_group', 'thetvdb_favs')
         # Pass all config options to series plugin except our special ones
-        tvdb_series_config = {series_group: []}
+        group_config = dict([(key, config[key]) for key in config if key not in ['account_id', 'series_group', 'strip_dates']])
+        tvdb_series_config = {'settings': {series_group: group_config}, series_group: []}
         for series in cache:
-            group_config = dict([(key, config[key]) for key in config if not key in ['account_id', 'series_group', 'strip_dates']])
-            if ("strip_dates" in config) and (config['strip_dates']) and (series.series_name[-1] == ')'):
-                series_regex = "^" + series.series_name.rstrip('()1234567890').replace("(", "").\
-                    replace(")", "").replace(" ", ".?").lower()
-                series_name = series.series_name.replace("(", "").replace(")", "")
-                if group_config == {}:
-                    series_entry = {series_name: {"name_regexp": series_regex}}
-                else:
-                    series_entry = {series_name: group_config}
-                    if "name_regexp" in series_entry[series_name]:
-                        series_entry[series_name]["name_regexp"].append(series_regex)
-                    else:
-                        series_entry[series_name]["name_regexp"] = [series_regex]
-            else:
-                if group_config == {}:
-                    series_entry = series.series_name.replace("(", "").replace(")", "")
-                else:
-                    series_entry = {series.series_name.replace("(", "").replace(")", ""): group_config}
-            tvdb_series_config[series_group].append(series_entry)
-        # Merge the our config in to the main series config
+            series_name = series.series_name
+            if config.get('strip_dates'):
+                # Remove year from end of series name if present
+                series_name = re.sub('\s+\(\d{4}\)$', '', series_name)
+            tvdb_series_config[series_group].append(series_name)
+        # Merge our config in to the main series config
         self.merge_config(feed, tvdb_series_config)
 
-# needs to occur prior to the series plugin, in order to deal with the group settings stuff.
 register_plugin(FilterThetvdbFavorites, 'thetvdb_favorites')
