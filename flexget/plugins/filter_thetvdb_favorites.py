@@ -88,10 +88,13 @@ class FilterThetvdbFavorites(FilterSeriesBase):
                         log.debug('Using series info from cache for %s - %s' % (fid, series_name))
                         items.append(ThetvdbFavorites(account_id, series_name, fid))
                     else:
-                        log.debug('Looking up series info for %s' % str(fid))
+                        log.debug('Looking up series info for %s' % fid)
                         data = BeautifulStoneSoup(urlopener('http://thetvdb.com//data/series/%s/' % fid, log), \
                             convertEntities=BeautifulStoneSoup.HTML_ENTITIES)
-                        items.append(ThetvdbFavorites(account_id, data.series.seriesname.string, data.series.id.string))
+                        if data.series.seriesname.string:
+                            items.append(ThetvdbFavorites(account_id, data.series.seriesname.string, fid))
+                        else:
+                            log.warning('thetvdb did not return a series name for favorite with id %s' % fid)
                         if not len(items) % 10:
                             log.info('Parsed %i of %i series from thetvdb favorites' % (len(items), len(favorite_ids)))
             except (urllib2.URLError, IOError, AttributeError):
