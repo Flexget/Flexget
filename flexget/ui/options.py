@@ -17,11 +17,11 @@ class UIOptionParser(OptionParser):
 
         # TODO: make a register_parser_option for webui and move these to authentication plugin?
         self.add_option('--no-auth', action='store_true', dest='no_auth',
-                        help='Runs with no username/password needed.')
-        self.add_option('--username', action='store', dest='username',
-                        help='Changes the username needed to connect.')
-        self.add_option('--password', action='store', dest='password',
-                        help='Changes the password needed to connect.')
+                        help='Runs without authentication required (dangerous).')
+        self.add_option('--username', action='store', dest='username', default='flexget',
+                        help='Username needed to login [default: %default]')
+        self.add_option('--password', action='store', dest='password', default='flexget',
+                        help='Password needed to login [default: %default]')
 
         # enable flask autoreloading (development)
         self.add_option('--autoreload', action='store_true', dest='autoreload', default=False,
