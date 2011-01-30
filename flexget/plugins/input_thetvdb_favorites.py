@@ -1,13 +1,13 @@
 import logging
+import urllib2
 import re
+from datetime import datetime, timedelta
+from BeautifulSoup import BeautifulStoneSoup
+from sqlalchemy import Column, Integer, Unicode, DateTime, String
 from flexget.plugin import register_plugin, internet
 from flexget.manager import Base, Session
 from flexget.utils.tools import urlopener
-from BeautifulSoup import BeautifulStoneSoup
-from sqlalchemy import Column, Integer, Unicode, DateTime, String
-from datetime import datetime, timedelta
-import urllib2
-from flexget.plugins.filter_series import FilterSeriesBase
+from flexget.feed import Entry
 
 log = logging.getLogger('thetvdb_favorites')
 
@@ -32,12 +32,13 @@ class ThetvdbFavorites(Base):
         return '<series_favorites(account_id=%s, series_name=%s)>' % (self.account_id, self.series_name)
 
 
-class FilterThetvdbFavorites(FilterSeriesBase):
-    """
-        Creates a series config containing all your thetvdb.com favorites
+class InputThetvdbFavorites(object):
+    """Creates a list of entries for your series marked as favorites at thetvdb.com for use in import_series.
 
-        Example:
+    Example:
 
+    import_series:
+      from:
         thetvdb_favorites:
           account_id: 23098230
     """
@@ -46,14 +47,11 @@ class FilterThetvdbFavorites(FilterSeriesBase):
         from flexget import validator
         root = validator.factory('dict')
         root.accept('text', key='account_id', required=True)
-        root.accept('text', key='series_group')
         root.accept('boolean', key='strip_dates')
-        self.build_options_validator(root)
         return root
 
     @internet(log)
-    def on_feed_start(self, feed):
-        config = feed.config.get('thetvdb_favorites')
+    def on_feed_input(self, feed, config):
         account_id = str(config['account_id'])
         session = Session()
         # Check when the last time the user information (favorites) were updated.
@@ -114,18 +112,14 @@ class FilterThetvdbFavorites(FilterSeriesBase):
             log.info('Didn\'t find any thetvdb.com favorites.')
             return
 
-        # Construct series plugin config
-        series_group = config.get('series_group', 'thetvdb_favs')
-        # Pass all config options to series plugin except our special ones
-        group_config = dict([(key, config[key]) for key in config if key not in ['account_id', 'series_group', 'strip_dates']])
-        tvdb_series_config = {'settings': {series_group: group_config}, series_group: []}
+        # Construct list of entries with our series names
+        entries = []
         for series in cache:
             series_name = series.series_name
             if config.get('strip_dates'):
                 # Remove year from end of series name if present
                 series_name = re.sub('\s+\(\d{4}\)$', '', series_name)
-            tvdb_series_config[series_group].append(series_name)
-        # Merge our config in to the main series config
-        self.merge_config(feed, tvdb_series_config)
+            entries.append(Entry(series_name, ''))
+        return entries
 
-register_plugin(FilterThetvdbFavorites, 'thetvdb_favorites')
+register_plugin(InputThetvdbFavorites, 'thetvdb_favorites', api_ver=2)

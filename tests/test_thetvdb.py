@@ -40,10 +40,6 @@ class TestThetvdbFavorites(FlexGetBase):
     """
 
     __yaml__ = """
-        presets:
-          global:
-            thetvdb_favorites:
-              account_id: 80FB8BD0720CA5EC
         feeds:
           test:
             mock:
@@ -51,10 +47,13 @@ class TestThetvdbFavorites(FlexGetBase):
               - {title: 'Doctor.Who.2005.S02E03.PDTV.XViD-FlexGet'}
               - {title: 'Lost.S03E02.720p-FlexGet'}
               - {title: 'Penn.and.Teller.Bullshit.S02E02.720p.x264'}
+            import_series:
+              from:
+                thetvdb_favorites:
+                  account_id: 80FB8BD0720CA5EC
           test_strip_dates:
-            mock:
-              - {title: 'Hawaii.Five-0.S01E01.HDTV.XViD-FlexGet'}
             thetvdb_favorites:
+              account_id: 80FB8BD0720CA5EC
               strip_dates: yes
     """
 
@@ -76,5 +75,5 @@ class TestThetvdbFavorites(FlexGetBase):
     @attr(online=True)
     def test_strip_date(self):
         self.execute_feed('test_strip_dates')
-        assert self.feed.find_entry('accepted', title='Hawaii.Five-0.S01E01.HDTV.XViD-FlexGet'), \
-            'series Hawaii Five-0 should have been accepted'
+        assert self.feed.find_entry(title='Hawaii Five-0'), \
+            'series Hawaii Five-0 (2010) should have date stripped'

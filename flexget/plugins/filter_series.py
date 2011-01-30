@@ -292,15 +292,8 @@ class FilterSeriesBase(object):
         options.accept('text', key='from_group')
         options.accept('list', key='from_group').accept('text')
 
-    def generate_config(self, feed):
-        """Generate configuration dictionary from configuration. Converts simple format into advanced.
-        This way we don't need to handle two different configuration formats in the logic.
-        Applies group settings with advanced form."""
-
-        config = feed.config.get('series', [])
-
-        # generate unified configuration in complex form, requires complex code as well :)
-        #config = {}
+    def make_grouped_config(self, config):
+        """Turns a simple series list into grouped format with a settings dict"""
         if not isinstance(config, dict):
             # convert simplest configuration internally grouped format
             config = {'simple': config,
@@ -310,6 +303,17 @@ class FilterSeriesBase(object):
             if not 'settings' in config:
                 config['settings'] = {}
 
+        return config
+
+    def generate_config(self, feed):
+        """Generate configuration dictionary from configuration. Converts simple format into advanced.
+        This way we don't need to handle two different configuration formats in the logic.
+        Applies group settings with advanced form."""
+
+        config = feed.config.get('series', [])
+
+        # generate unified configuration in complex form, requires complex code as well :)
+        config = self.make_grouped_config(config)
         # TODO: what if same series is configured in multiple groups?!
 
         # generate quality settings from group name and empty settings if not present (required)
@@ -353,12 +357,44 @@ class FilterSeriesBase(object):
 
     def merge_config(self, feed, config):
         """Merges another series config dict in with the current one."""
-        from flexget.utils.tools import MergeException, merge_dict_from_to
-        feed.config['series'] = self.generate_config(feed)
-        try:
-            merge_dict_from_to(config, feed.config['series'])
-        except MergeException:
-            raise PluginError('Failed to merge thetvdb favorites to feed %s, incompatible datatypes' % feed.name)
+        from flexget.utils.tools import merge_dict_from_to
+
+        # Make sure we start with both configs in grouped format
+        series_config = self.make_grouped_config(feed.config.get('series', {}))
+        config = self.make_grouped_config(config)
+
+        # First merge the settings dicts
+        merge_dict_from_to(config['settings'], series_config['settings'])
+        # Since series names can be either a string or a key in a single element dictionary,
+        # loop through series to prevent duplicates and preserve custom settings
+        for group in config:
+            if group == 'settings':
+                continue
+            if group in series_config:
+                series_map = {}
+                # Seed the series map with the series already in the main series config
+                for series in series_config[group]:
+                    if isinstance(series, dict):
+                        series_map[series.items()[0][0]] = series
+                    else:
+                        series_map[series] = {}
+                # Add the series and settings for them from the merging config, if not already present
+                for series in config[group]:
+                    if isinstance(series, dict):
+                        series_name = series.items()[0][0]
+                        if series_name in series_map:
+                            merge_dict_from_to(series, series_map[series_name])
+                        else:
+                            series_map[series_name] = series
+                    else:
+                        if series not in series_map:
+                            series_map[series] = {}
+                # Turn the series map back into a list of series
+                series_config[group] = [series_map[series] or series for series in series_map]
+            else:
+                series_config[group] = config[group]
+
+        feed.config['series'] = series_config
 
 
 class FilterSeries(SeriesPlugin, FilterSeriesBase):
