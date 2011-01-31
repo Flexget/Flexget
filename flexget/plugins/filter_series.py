@@ -1,15 +1,17 @@
 import logging
 from copy import copy
 from datetime import datetime, timedelta
-from flexget.event import event
-from flexget.utils.titles import SeriesParser, ParseWarning
-from flexget.utils import qualities
-from flexget.manager import Base, Session
-from flexget.plugin import register_plugin, register_parser_option, get_plugin_by_name, get_plugin_keywords, \
-    PluginWarning, PluginError, PluginDependencyError, priority
+from flexget.utils.log import log_once
 from sqlalchemy import Column, Integer, String, Unicode, DateTime, Boolean, desc
 from sqlalchemy.schema import ForeignKey
 from sqlalchemy.orm import relation, join
+from flexget.event import event
+from flexget.utils.titles import SeriesParser, ParseWarning
+from flexget.utils import qualities
+from flexget.utils.tools import merge_dict_from_to
+from flexget.manager import Base, Session
+from flexget.plugin import register_plugin, register_parser_option, get_plugin_by_name, get_plugin_keywords, \
+    PluginWarning, PluginError, PluginDependencyError, priority
 
 
 log = logging.getLogger('series')
@@ -305,35 +307,22 @@ class FilterSeriesBase(object):
 
         return config
 
-    def generate_config(self, feed):
-        """Generate configuration dictionary from configuration. Converts simple format into advanced.
-        This way we don't need to handle two different configuration formats in the logic.
-        Applies group settings with advanced form."""
+    def apply_group_options(self, config):
+        """Applies group settings to each item in series group and removes settings dict."""
 
-        config = feed.config.get('series', [])
-
-        # generate unified configuration in complex form, requires complex code as well :)
+        # Make sure config is in grouped format first
         config = self.make_grouped_config(config)
-        # TODO: what if same series is configured in multiple groups?!
-
-        # generate quality settings from group name and empty settings if not present (required)
         for group_name in config:
             if group_name == 'settings':
                 continue
-            if not group_name in config['settings']:
-                # at least empty settings
-                config['settings'][group_name] = {}
-                # if known quality, convenience create settings with that quality
-                if isinstance(group_name, basestring) and group_name.lower() in qualities.registry:
-                    config['settings'][group_name]['quality'] = group_name
-
-        # generate groups from settings groups
-        for group_name, group_settings in config['settings'].iteritems():
-            # convert group series into complex types
-            complex_series = []
-            for series in config.get(group_name, []):
+            group_series = []
+            # if group name is known quality, convenience create settings with that quality
+            if isinstance(group_name, basestring) and group_name.lower() in qualities.registry:
+                config['settings'].setdefault(group_name, {}).setdefault('quality', group_name)
+            for series in config[group_name]:
                 # convert into dict-form if necessary
                 series_settings = {}
+                group_settings = config['settings'].get(group_name, {})
                 if isinstance(series, dict):
                     series, series_settings = series.items()[0]
                     if series_settings is None:
@@ -345,56 +334,47 @@ class FilterSeriesBase(object):
                 if isinstance(series_settings, basestring):
                     series_settings = {'path': series_settings}
                 # merge group settings into this series settings
-                from flexget.utils.tools import merge_dict_from_to
                 merge_dict_from_to(group_settings, series_settings)
-                complex_series.append({series: series_settings})
-            # add generated complex series into config
-            config[group_name] = complex_series
-
-        # settings is not needed anymore, just confuses
-        del(config['settings'])
+                group_series.append({series: series_settings})
+            config[group_name] = group_series
+        del config['settings']
         return config
+
+    def prepare_config(self, config):
+        """Generate a list of unique series from configuration.
+        This way we don't need to handle two different configuration formats in the logic.
+        Applies group settings with advanced form."""
+
+        config = self.apply_group_options(config)
+        return self.combine_series_lists(*config.values())
+
+    def combine_series_lists(self, *series_lists, **kwargs):
+        """Combines the series from multiple lists, making sure there are no doubles.
+
+        If keyword argument log_once is set to True, an error message will be printed if a series
+        is listed more than once, otherwise log_once will be used."""
+        unique_series = {}
+        for series_list in series_lists:
+            for series in series_list:
+                series, series_settings = series.items()[0]
+                if series not in unique_series:
+                    unique_series[series] = series_settings
+                else:
+                    if kwargs.get('log_once'):
+                        log_once('Series %s is already configured in series plugin' % series, log)
+                    else:
+                        log.error('Series %s is configured multiple times in series plugin.' % series)
+        # Turn our all_series dict back into a list
+        return [{series: settings} for (series, settings) in unique_series.iteritems()]
 
     def merge_config(self, feed, config):
         """Merges another series config dict in with the current one."""
-        from flexget.utils.tools import merge_dict_from_to
 
-        # Make sure we start with both configs in grouped format
-        series_config = self.make_grouped_config(feed.config.get('series', {}))
-        config = self.make_grouped_config(config)
-
-        # First merge the settings dicts
-        merge_dict_from_to(config['settings'], series_config['settings'])
-        # Since series names can be either a string or a key in a single element dictionary,
-        # loop through series to prevent duplicates and preserve custom settings
-        for group in config:
-            if group == 'settings':
-                continue
-            if group in series_config:
-                series_map = {}
-                # Seed the series map with the series already in the main series config
-                for series in series_config[group]:
-                    if isinstance(series, dict):
-                        series_map[series.items()[0][0]] = series
-                    else:
-                        series_map[series] = {}
-                # Add the series and settings for them from the merging config, if not already present
-                for series in config[group]:
-                    if isinstance(series, dict):
-                        series_name = series.items()[0][0]
-                        if series_name in series_map:
-                            merge_dict_from_to(series, series_map[series_name])
-                        else:
-                            series_map[series_name] = series
-                    else:
-                        if series not in series_map:
-                            series_map[series] = {}
-                # Turn the series map back into a list of series
-                series_config[group] = [series_map[series] or series for series in series_map]
-            else:
-                series_config[group] = config[group]
-
-        feed.config['series'] = series_config
+        # Make sure we start with both configs as a list of complex series
+        native_series = self.prepare_config(feed.config.get('series', {}))
+        merging_series = self.prepare_config(config)
+        feed.config['series'] = self.combine_series_lists(native_series, merging_series, log_once=True)
+        return feed.config['series']
 
 
 class FilterSeries(SeriesPlugin, FilterSeriesBase):
@@ -462,10 +442,9 @@ class FilterSeries(SeriesPlugin, FilterSeriesBase):
 
         # generate list of all series in one dict
         all_series = {}
-        for group_series in config.itervalues():
-            for series_item in group_series:
-                series_name, series_config = series_item.items()[0]
-                all_series[series_name] = series_config
+        for series_item in config:
+            series_name, series_config = series_item.items()[0]
+            all_series[series_name] = series_config
 
         # scan for problematic names, enable exact mode for them
         for series_name, series_config in all_series.iteritems():
@@ -479,21 +458,20 @@ class FilterSeries(SeriesPlugin, FilterSeriesBase):
     # Run after metainfo_quality and before metainfo_series
     @priority(125)
     def on_feed_metainfo(self, feed):
-        config = self.generate_config(feed)
+        config = self.prepare_config(feed.config.get('series', {}))
         self.auto_exact(config)
-        for group_series in config.itervalues():
-            for series_item in group_series:
-                series_name, series_config = series_item.items()[0]
-                # yaml loads ascii only as str
-                series_name = unicode(series_name)
-                log.log(5, 'series_name: %s series_config: %s' % (series_name, series_config))
+        for series_item in config:
+            series_name, series_config = series_item.items()[0]
+            # yaml loads ascii only as str
+            series_name = unicode(series_name)
+            log.log(5, 'series_name: %s series_config: %s' % (series_name, series_config))
 
-                import time
-                start_time = time.clock()
+            import time
+            start_time = time.clock()
 
-                self.parse_series(feed, series_name, series_config)
-                took = time.clock() - start_time
-                log.log(5, 'parsing %s took %s' % (series_name, took))
+            self.parse_series(feed, series_name, series_config)
+            took = time.clock() - start_time
+            log.log(5, 'parsing %s took %s' % (series_name, took))
 
     def on_feed_filter(self, feed):
         """Filter series"""
@@ -512,44 +490,43 @@ class FilterSeries(SeriesPlugin, FilterSeriesBase):
         for series in feed.session.query(Series).all():
             series.name = series.name.lower()
 
-        config = self.generate_config(feed)
+        config = self.prepare_config(feed.config.get('series', {}))
 
-        for group_series in config.itervalues():
-            for series_item in group_series:
-                series_name, series_config = series_item.items()[0]
-                # yaml loads ascii only as str
-                series_name = unicode(series_name)
-                source = guessed_series if series_config.get('series_guessed') else found_series
-                # If we didn't find any episodes for this series, continue
-                if not source.get(series_name):
-                    log.log(5, 'No entries found for %s this run.' % series_name)
-                    continue
-                for id, eps in source[series_name].iteritems():
-                    for parser in eps:
-                        # store found episodes into database and save reference for later use
-                        release = self.store(feed.session, parser)
-                        entry = self.parser2entry[parser]
-                        entry['series_release'] = release
+        for series_item in config:
+            series_name, series_config = series_item.items()[0]
+            # yaml loads ascii only as str
+            series_name = unicode(series_name)
+            source = guessed_series if series_config.get('series_guessed') else found_series
+            # If we didn't find any episodes for this series, continue
+            if not source.get(series_name):
+                log.log(5, 'No entries found for %s this run.' % series_name)
+                continue
+            for id, eps in source[series_name].iteritems():
+                for parser in eps:
+                    # store found episodes into database and save reference for later use
+                    release = self.store(feed.session, parser)
+                    entry = self.parser2entry[parser]
+                    entry['series_release'] = release
 
-                        # set custom download path
-                        if 'path' in series_config:
-                            log.debug('setting %s custom path to %s' % (entry['title'], series_config.get('path')))
-                            entry['path'] = series_config.get('path') % entry
+                    # set custom download path
+                    if 'path' in series_config:
+                        log.debug('setting %s custom path to %s' % (entry['title'], series_config.get('path')))
+                        entry['path'] = series_config.get('path') % entry
 
-                        # accept info from set: and place into the entry
-                        if 'set' in series_config:
-                            set = get_plugin_by_name('set')
-                            set.instance.modify(entry, series_config.get('set'))
+                    # accept info from set: and place into the entry
+                    if 'set' in series_config:
+                        set = get_plugin_by_name('set')
+                        set.instance.modify(entry, series_config.get('set'))
 
-                log.log(5, 'series_name: %s series_config: %s' % (series_name, series_config))
+            log.log(5, 'series_name: %s series_config: %s' % (series_name, series_config))
 
-                import time
-                start_time = time.clock()
+            import time
+            start_time = time.clock()
 
-                self.process_series(feed, source[series_name], series_name, series_config)
+            self.process_series(feed, source[series_name], series_name, series_config)
 
-                took = time.clock() - start_time
-                log.log(5, 'processing %s took %s' % (series_name, took))
+            took = time.clock() - start_time
+            log.log(5, 'processing %s took %s' % (series_name, took))
 
     def parse_series(self, feed, series_name, config):
         """
