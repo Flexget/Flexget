@@ -174,13 +174,11 @@ class ModuleImdbLookup(object):
                     value = entry[field]
                     if (not isinstance(value, int) and 
                         not isinstance(value, float)):
-                        raise PluginError('Entry field %s should be a number!'\
-                                          % field)
+                        raise PluginError('Entry field %s should be a number!' % field)
 
             # if imdb_id is included, build the url.
             if 'imdb_id' in entry and not 'imdb_url' in entry:
-                entry['imdb_url'] = 'http://www.imdb.com/title/%s' %\
-                     entry['imdb_id']
+                entry['imdb_url'] = 'http://www.imdb.com/title/%s' % entry['imdb_id']
             
             # make sure imdb url is valid
             if 'imdb_url' in entry:
@@ -188,15 +186,14 @@ class ModuleImdbLookup(object):
                 if imdb_id:
                     entry['imdb_url'] = 'http://www.imdb.com/title/%s' % imdb_id
                 else:
-                    log.debug('imdb url %s is invalid, removing it' %\
-                              entry['imdb_url'])
+                    log.debug('imdb url %s is invalid, removing it' % entry['imdb_url'])
                     del(entry['imdb_url'])
 
             # no imdb_url, check if there is cached result for it or if the 
             # search is known to fail
             if not 'imdb_url' in entry:
-                result = session.query(SearchResult).filter(SearchResult.title 
-                                                    == entry['title']).first()
+                result = session.query(SearchResult).\
+                         filter(SearchResult.title == entry['title']).first()
                 if result:
                     if result.fails and not feed.manager.options.retry_lookup:
                         # this movie cannot be found, not worth trying again ...
@@ -204,8 +201,7 @@ class ModuleImdbLookup(object):
                         raise PluginError('Title lookup fails')
                     else:
                         if result.url:
-                            log.log(5, 'Setting imdb url for %s from db' % 
-                                    entry['title'])
+                            log.log(5, 'Setting imdb url for %s from db' % entry['title'])
                             entry['imdb_url'] = result.url
 
             # no imdb url, but information required, try searching
@@ -235,20 +231,19 @@ class ModuleImdbLookup(object):
             # check if this imdb page has been parsed & cached
             cached = session.query(Movie).\
                 options(joinedload_all(Movie.genres, Movie.languages, 
-                                       Movie.actors, Movie.directors)).\
+                Movie.actors, Movie.directors)).\
                 filter(Movie.url == entry['imdb_url']).first()
-            if (not cached) or (cached.updated is None) or (cached.updated < 
-                                            datetime.now() - timedelta(days=2)):
+                    
+            if (not cached) or \
+               (cached.updated is None) or \
+               (cached.updated < datetime.now() - timedelta(days=2)):
                 # Remove the old movie, we'll store another one later.
-                session.query(Movie).filter(Movie.url == entry['imdb_url'])\
-                       .delete()
+                session.query(Movie).filter(Movie.url == entry['imdb_url']).delete()
                 # search and store to cache
                 if 'title' in entry:
-                    feed.verbose_progress('Parsing imdb for %s' % 
-                                          entry['title'])
+                    feed.verbose_progress('Parsing imdb for %s' % entry['title'])
                 else:
-                    feed.verbose_progress('Parsing imdb for %s' % 
-                                          entry['imdb_id'])
+                    feed.verbose_progress('Parsing imdb for %s' % entry['imdb_id'])
                 try:
                     take_a_break = True
                     imdb.parse(entry['imdb_url'])
@@ -263,26 +258,26 @@ class ModuleImdbLookup(object):
                     movie.plot_outline = imdb.plot_outline
                     movie.url = entry['imdb_url']
                     for name in imdb.genres:
-                        genre = session.query(Genre).filter(Genre.name == name)\
-                              .first()
+                        genre = session.query(Genre).\
+                            filter(Genre.name == name).first()
                         if not genre:
                             genre = Genre(name)
                         movie.genres.append(genre) # pylint:disable=E1101
                     for name in imdb.languages:
-                        language = session.query(Language).filter(Language.name 
-                                                            == name).first()
+                        language = session.query(Language).\
+                            filter(Language.name == name).first()
                         if not language:
                             language = Language(name)
                         movie.languages.append(language) # pylint:disable=E1101
                     for imdb_id, name in imdb.actors.iteritems():
-                        actor = session.query(Actor).filter(Actor.imdb_id 
-                                                            == imdb_id).first()
+                        actor = session.query(Actor).\
+                            filter(Actor.imdb_id == imdb_id).first()
                         if not actor:
                             actor = Actor(imdb_id, name)
                         movie.actors.append(actor) # pylint:disable=E1101
                     for imdb_id, name in imdb.directors.iteritems():
-                        director = session.query(Director)\
-                                 .filter(Director.imdb_id == imdb_id).first()
+                        director = session.query(Director).\
+                            filter(Director.imdb_id == imdb_id).first()
                         if not director:
                             director = Director(imdb_id, name)
                         movie.directors.append(director) # pylint:disable=E1101
@@ -301,8 +296,7 @@ class ModuleImdbLookup(object):
                     # TODO: might be a little too broad catch, what was this for anyway? ;P
                     if feed.manager.options.debug:
                         log.exception(e)
-                    raise PluginError('Invalid parameter: %s' % 
-                                      entry['imdb_url'], log)
+                    raise PluginError('Invalid parameter: %s' % entry['imdb_url'], log)
             else:
                 # Set values from cache
                 # TODO: I don't like this shoveling ...

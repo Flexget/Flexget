@@ -55,6 +55,8 @@ class FilterExistsMovie(object):
             if not os.path.exists(path):
                 log.critical('Path %s does not exist' % path)
                 continue
+                
+            feed.verbose_progress('Scanning path %s ...' % path, log)
 
             # scan through
             for root, dirs, files in os.walk(path):
