@@ -233,10 +233,17 @@ class ModuleImdbLookup(object):
                 options(joinedload_all(Movie.genres, Movie.languages, 
                 Movie.actors, Movie.directors)).\
                 filter(Movie.url == entry['imdb_url']).first()
+                
+            refresh_interval = 2
+            if (cached):
+                if cached.year:
+                    age = (datetime.now().year - cached.year)
+                    refresh_interval += age * 5
+                    log.debug('cached movie %s age %s refresh interval %s days' % (cached.title, age, refresh_interval))
                     
             if (not cached) or \
                (cached.updated is None) or \
-               (cached.updated < datetime.now() - timedelta(days=2)):
+               (cached.updated < datetime.now() - timedelta(days=refresh_interval)):
                 # Remove the old movie, we'll store another one later.
                 session.query(Movie).filter(Movie.url == entry['imdb_url']).delete()
                 # search and store to cache
@@ -300,6 +307,8 @@ class ModuleImdbLookup(object):
             else:
                 # Set values from cache
                 # TODO: I don't like this shoveling ...
+                
+                # TODO: For some reason iterating troug cached.genres etc do emit queries despite joinedload_all
                 imdb.url = cached.url
                 imdb.photo = cached.photo
                 imdb.name = cached.title
