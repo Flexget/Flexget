@@ -2,7 +2,7 @@ from flexget.plugin import register_plugin, get_plugin_by_name, get_plugins_by_p
 from flexget.plugins.filter_series import FilterSeriesBase
 import logging
 
-log = logging.getLogger('imp_series')
+log = logging.getLogger('import_series')
 
 
 class ImportSeries(FilterSeriesBase):
@@ -59,6 +59,7 @@ class ImportSeries(FilterSeriesBase):
             result = method(feed, input_config)
             if not result:
                 log.warning('Input %s did not return anything' % input_name)
+                continue
 
             series_names = [x['title'] for x in result]
             series = set.union(series, set(series_names))
