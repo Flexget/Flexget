@@ -53,9 +53,7 @@ class Movie(Base):
     updated = Column(DateTime)
 
     def __repr__(self):
-        return '<Movie(name=%s,votes=%s,year=%s)>' % (self.title, 
-                                                      self.votes, 
-                                                      self.year)
+        return '<Movie(name=%s,votes=%s,year=%s)>' % (self.title, self.votes, self.year)
 
 
 class Language(Base):
@@ -150,7 +148,7 @@ class ModuleImdbLookup(object):
 
     @internet(log)
     def lookup(self, feed, entry, search_allowed=True):
-        """Perform imdb lookup for entry. 
+        """Perform imdb lookup for entry.
         Raises PluginError with failure reason."""
 
         if 'title' in entry:
@@ -160,8 +158,7 @@ class ModuleImdbLookup(object):
         elif 'imdb_id' in entry:
             log.debug('No title passed. Lookup for %s' % entry['imdb_id'])
         else:
-            log.error('looking up IMDB for entry failed, no title, '
-                      'imdb_url or imdb_id passed.')
+            log.error('looking up IMDB for entry failed, no title, imdb_url or imdb_id passed.')
             return
 
         take_a_break = False
@@ -172,14 +169,13 @@ class ModuleImdbLookup(object):
             for field in ['imdb_votes', 'imdb_score']:
                 if field in entry:
                     value = entry[field]
-                    if (not isinstance(value, int) and 
-                        not isinstance(value, float)):
+                    if not isinstance(value, (int, float)):
                         raise PluginError('Entry field %s should be a number!' % field)
 
             # if imdb_id is included, build the url.
             if 'imdb_id' in entry and not 'imdb_url' in entry:
                 entry['imdb_url'] = 'http://www.imdb.com/title/%s' % entry['imdb_id']
-            
+
             # make sure imdb url is valid
             if 'imdb_url' in entry:
                 imdb_id = extract_id(entry['imdb_url'])
@@ -189,7 +185,7 @@ class ModuleImdbLookup(object):
                     log.debug('imdb url %s is invalid, removing it' % entry['imdb_url'])
                     del(entry['imdb_url'])
 
-            # no imdb_url, check if there is cached result for it or if the 
+            # no imdb_url, check if there is cached result for it or if the
             # search is known to fail
             if not 'imdb_url' in entry:
                 result = session.query(SearchResult).\
@@ -213,7 +209,7 @@ class ModuleImdbLookup(object):
                 search_result = search.smart_match(entry['title'])
                 if search_result:
                     entry['imdb_url'] = search_result['url']
-                    # store url for this movie, so we don't have to search on 
+                    # store url for this movie, so we don't have to search on
                     # every run
                     result = SearchResult(entry['title'], entry['imdb_url'])
                     session.add(result)
@@ -230,20 +226,19 @@ class ModuleImdbLookup(object):
 
             # check if this imdb page has been parsed & cached
             cached = session.query(Movie).\
-                options(joinedload_all(Movie.genres, Movie.languages, 
+                options(joinedload_all(Movie.genres, Movie.languages,
                 Movie.actors, Movie.directors)).\
                 filter(Movie.url == entry['imdb_url']).first()
-                
+
             refresh_interval = 2
-            if (cached):
+            if cached:
                 if cached.year:
                     age = (datetime.now().year - cached.year)
                     refresh_interval += age * 5
                     log.debug('cached movie %s age %s refresh interval %s days' % (cached.title, age, refresh_interval))
-                    
-            if (not cached) or \
-               (cached.updated is None) or \
-               (cached.updated < datetime.now() - timedelta(days=refresh_interval)):
+
+            if not cached or cached.updated is None or \
+               cached.updated < datetime.now() - timedelta(days=refresh_interval):
                 # Remove the old movie, we'll store another one later.
                 session.query(Movie).filter(Movie.url == entry['imdb_url']).delete()
                 # search and store to cache
@@ -307,7 +302,7 @@ class ModuleImdbLookup(object):
             else:
                 # Set values from cache
                 # TODO: I don't like this shoveling ...
-                
+
                 # TODO: For some reason iterating troug cached.genres etc do emit queries despite joinedload_all
                 imdb.url = cached.url
                 imdb.photo = cached.photo
@@ -326,7 +321,7 @@ class ModuleImdbLookup(object):
 
             if imdb.mpaa_rating is None:
                 imdb.mpaa_rating = ''
-            
+
             log.log(5, 'imdb.name: %s' % imdb.name)
             log.log(5, 'imdb.score: %s' % imdb.score)
             log.log(5, 'imdb.votes: %s' % imdb.votes)
@@ -356,8 +351,8 @@ class ModuleImdbLookup(object):
                 entry['title'] = imdb.name
 
             # give imdb a little break between requests (see: http://flexget.com/ticket/129#comment:1)
-            if (take_a_break and 
-                not feed.manager.options.debug and 
+            if (take_a_break and
+                not feed.manager.options.debug and
                 not feed.manager.unit_test):
                 import time
                 time.sleep(3)
@@ -366,5 +361,5 @@ class ModuleImdbLookup(object):
             session.commit()
 
 register_plugin(ModuleImdbLookup, 'imdb_lookup')
-register_parser_option('--retry-lookup', action='store_true', 
+register_parser_option('--retry-lookup', action='store_true',
                        dest='retry_lookup', default=0, help=SUPPRESS_HELP)
