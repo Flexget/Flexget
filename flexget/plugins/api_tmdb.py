@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 import urllib
 import logging
 import yaml
@@ -59,7 +59,7 @@ class TMDBMovie(TMDBContainer, Base):
     certification = Column(String)
     overview = Column(Unicode)
     released = Column(DateTime)
-    posters = relation('TMDBPoster', backref='movie', lazy='joined')
+    posters = relation('TMDBPoster', backref='movie', lazy='joined', cascade='all, delete, delete-orphan')
     genres = relation('TMDBGenre', secondary=genres_table, backref='movies', lazy='joined')
 
 
@@ -121,7 +121,19 @@ class ApiTmdb(object):
                 if found and found.movie:
                     movie = found.movie
         if movie:
-            log.debug('Movie information restored from cache.')
+            # Movie found in cache, check if cache has expired.
+            refresh_time = timedelta(days=2)
+            if movie.released > datetime.now() - timedelta(days=7):
+                # Movie is less than a week old, expire after 1 day
+                refresh_time = timedelta(days=1)
+            else:
+                age_in_years = (datetime.now() - movie.released).days / 365
+                refresh_time += timedelta(days=age_in_years * 5)
+            if movie.updated < datetime.now() - refresh_time:
+                log.debug('Cache has expired, attempting to refresh from TMDb.')
+                self.get_movie_details(movie, session)
+            else:
+                log.debug('Movie information restored from cache.')
         else:
             # There was no movie found in the cache, do a lookup from tmdb
             log.debug('Movie not found in cache, looking up from tmdb.')
@@ -141,8 +153,7 @@ class ApiTmdb(object):
                         session.add(movie)
                     if title.lower() != movie.name.lower():
                         session.add(TMDBSearchResult({'search': title, 'movie': movie}))
-            session.commit()
-        # TODO: Probably need to load relationship fields before closing session
+        session.commit()
         session.close()
         if not movie:
             log.debug('No results found from tmdb')
