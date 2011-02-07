@@ -69,7 +69,8 @@ def load_ui_plugins():
 
     # TODO: load from ~/.flexget/ui/plugins too (or something like that)
 
-    d = os.path.join('flexget', 'ui', 'plugins')
+    import flexget.ui.plugins
+    d = flexget.ui.plugins.__path__[0]
 
     plugin_names = set()
     for f in os.listdir(d):
@@ -142,16 +143,6 @@ def start(mg):
     if db_session is None:
         raise Exception('db_session is None')
 
-    # Start the executor thread
-    global executor
-    executor = ExecThread()
-    executor.start()
-
-    # Initialize manager
-    manager.create_feeds()
-    load_ui_plugins()
-
-    # Daemonize after we load the ui plugins as they are loading from relative paths right now
     if os.name != 'nt' and manager.options.daemon:
         if threading.activeCount() != 1:
             log.critical('There are %r active threads. '
@@ -165,6 +156,15 @@ def start(mg):
             lockfile.write('%d\n' % newpid)
         finally:
             lockfile.close()
+
+    # Start the executor thread
+    global executor
+    executor = ExecThread()
+    executor.start()
+
+    # Initialize manager
+    manager.create_feeds()
+    load_ui_plugins()
 
     # quick hack: since ui plugins may add tables to SQLAlchemy too and they're not initialized because create
     # was called when instantiating manager .. so we need to call it again
