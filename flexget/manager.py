@@ -13,6 +13,7 @@ log = logging.getLogger('manager')
 
 Base = declarative_base()
 Session = sessionmaker()
+manager = None
 
 
 class FGDumper(yaml.SafeDumper):
@@ -53,6 +54,9 @@ class Manager(object):
     options = None
 
     def __init__(self, options):
+        global manager
+        assert not manager, 'Only one instance of Manager should be created at a time!'
+        manager = self
         self.options = options
         self.config_base = None
         self.config_name = None
@@ -74,6 +78,10 @@ class Manager(object):
         atexit.register(self.shutdown)
 
         fire_event('manager.startup', self)
+
+    def __del__(self):
+        global manager
+        manager = None
 
     def initialize(self):
         """Separated from __init__ so that unit tests can modify options before loading config."""

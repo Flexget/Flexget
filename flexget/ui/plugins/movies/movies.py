@@ -1,7 +1,8 @@
 import time
 import logging
 from flask import render_template, Module
-from flexget.plugin import PluginDependencyError
+from flask.helpers import url_for
+from flexget.plugin import PluginDependencyError, get_plugin_by_name
 from flexget.ui.webui import register_plugin, db_session, app, manager
 
 try:
@@ -27,30 +28,23 @@ def pretty_age_filter(value):
 
 @movies_module.route('/')
 def index():
-    movies = db_session.query(ImdbQueue).all()
-
-    from themoviedb import TMDB
-    import yaml
-    
-    tmdb = TMDB()
-
-    for item in movies:
-        movie = yaml.load(tmdb.imdb_results(item.imdb_id))[0]
-        
-        if not hasattr(movie, 'keys'):
+    imdb_queue = db_session.query(ImdbQueue).all()
+    tmdb_lookup = get_plugin_by_name('api_tmdb').instance.lookup
+    for item in imdb_queue:
+        movie = tmdb_lookup(imdb_id=item.imdb_id)
+        if not movie:
             log.debug('No themoviedb result for imdb id %s' % item.imdb_id)
             continue
-            
-        log.debug('processing %s' % movie['name'])
-        
-        for poster in movie['posters']:
-            if poster['image']['size'] == 'thumb':
-                item.thumb = poster['image']['url']
-                break
-        item.year = movie['released'].split('-')[0]
-        item.overview = movie['overview']
 
-    context = {'movies': movies}
+        for poster in movie.posters:
+            if poster.size == 'thumb':
+                item.thumb = url_for('.userstatic', filename=poster.get_file())
+                break
+        item.title = movie.name
+        item.year = movie.released.year
+        item.overview = movie.overview
+
+    context = {'movies': imdb_queue}
     return render_template('movies/movies.html', **context)
 
 

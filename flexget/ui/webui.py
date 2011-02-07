@@ -13,7 +13,7 @@ import os
 import urllib
 import threading
 import sys
-from flask import Flask, redirect, url_for, abort, request
+from flask import Flask, redirect, url_for, abort, request, send_from_directory
 from sqlalchemy.orm import scoped_session
 from sqlalchemy.orm.session import sessionmaker
 from flexget.event import fire_event
@@ -49,6 +49,11 @@ def start():
     if not _home:
         abort(404)
     return redirect(url_for(_home))
+
+
+@app.route('/userstatic/<path:filename>')
+def userstatic(filename):
+    return send_from_directory(os.path.join(manager.config_base, 'userstatic'), filename)
 
 
 @app.context_processor

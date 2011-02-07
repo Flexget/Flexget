@@ -70,6 +70,7 @@ class FlexGetBase(object):
             self.feed.session.close()
         except:
             pass
+        self.manager.__del__()
 
     def execute_feed(self, name):
         """Use to execute one test feed from config"""

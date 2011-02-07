@@ -6,8 +6,7 @@ import os
 import posixpath
 from sqlalchemy import Table, Column, Integer, Float, String, Unicode, Boolean, DateTime, func
 from sqlalchemy.schema import ForeignKey
-from sqlalchemy.orm import relation
-from sqlalchemy.orm.properties import ColumnProperty
+from sqlalchemy.orm import relation, joinedload_all
 from flexget.utils.tools import urlopener
 from flexget.manager import Base, Session
 from flexget.plugin import register_plugin
@@ -43,7 +42,7 @@ class TMDBContainer(object):
 class TMDBMovie(TMDBContainer, Base):
     __tablename__ = 'tmdb_movies'
     id = Column(Integer, primary_key=True, autoincrement=False, nullable=False)
-    updated = Column(DateTime)
+    updated = Column(DateTime, default=datetime.now(), nullable=False)
     popularity = Column(Integer)
     translated = Column(Boolean)
     adult = Column(Boolean)
@@ -59,8 +58,8 @@ class TMDBMovie(TMDBContainer, Base):
     certification = Column(String)
     overview = Column(Unicode)
     released = Column(DateTime)
-    posters = relation('TMDBPoster', backref='movie', lazy='joined', cascade='all, delete, delete-orphan')
-    genres = relation('TMDBGenre', secondary=genres_table, backref='movies', lazy='joined')
+    posters = relation('TMDBPoster', backref='movie', cascade='all, delete, delete-orphan')
+    genres = relation('TMDBGenre', secondary=genres_table, backref='movies')
 
 
 class TMDBGenre(TMDBContainer, Base):
@@ -81,15 +80,33 @@ class TMDBPoster(TMDBContainer, Base):
 
     def get_file(self):
         """Downloads this poster to a local cache and returns the path"""
-        if os.path.exists(self.file):
+        from flexget.manager import manager
+        base_dir = os.path.join(manager.config_base, 'userstatic')
+        if os.path.isfile(os.path.join(base_dir, self.file or '')):
             return self.file
         # If we don't already have a local copy, download one.
-        filename = posixpath.basename(self.url)
-        #TODO: figure a path
-        thefile = file(filename, 'wb')
+        log.debug('Downloading poster %s' % self.url)
+        dirname = os.path.join('tmdb', 'posters', str(self.movie_id))
+        # Create folders if the don't exist
+        try:
+            os.makedirs(os.path.join(base_dir, dirname))
+        except WindowsError, e:
+            # Ignore already exists errors on windows
+            if e.errno == 183:
+                pass
+        filename = os.path.join(dirname, posixpath.basename(self.url))
+        thefile = file(os.path.join(base_dir, filename), 'wb')
         thefile.write(urlopener(self.url, log).read())
         self.file = filename
-        return thefile.name
+        # If we are detached from a session, update the db
+        if not Session.object_session(self):
+            session = Session()
+            poster = session.query(TMDBPoster).filter(TMDBPoster.db_id == self.db_id).first()
+            if poster:
+                poster.file = filename
+                session.commit()
+            session.close()
+        return filename
 
 
 class TMDBSearchResult(Base):
@@ -117,18 +134,20 @@ class ApiTmdb(object):
         if not movie and title:
             movie = session.query(TMDBMovie).filter(func.lower(TMDBMovie.name) == title.lower()).first()
             if not movie:
-                found = session.query(TMDBSearchResult).filter(func.lower(TMDBSearchResult.search) == title.lower).first()
+                found = session.query(TMDBSearchResult). \
+                        filter(func.lower(TMDBSearchResult.search) == title.lower()).first()
                 if found and found.movie:
                     movie = found.movie
         if movie:
             # Movie found in cache, check if cache has expired.
             refresh_time = timedelta(days=2)
-            if movie.released > datetime.now() - timedelta(days=7):
-                # Movie is less than a week old, expire after 1 day
-                refresh_time = timedelta(days=1)
-            else:
-                age_in_years = (datetime.now() - movie.released).days / 365
-                refresh_time += timedelta(days=age_in_years * 5)
+            if movie.released:
+                if movie.released > datetime.now() - timedelta(days=7):
+                    # Movie is less than a week old, expire after 1 day
+                    refresh_time = timedelta(days=1)
+                else:
+                    age_in_years = (datetime.now() - movie.released).days / 365
+                    refresh_time += timedelta(days=age_in_years * 5)
             if movie.updated < datetime.now() - refresh_time:
                 log.debug('Cache has expired, attempting to refresh from TMDb.')
                 self.get_movie_details(movie, session)
@@ -142,7 +161,8 @@ class ApiTmdb(object):
                 movie.id = tmdb_id
                 movie.imdb_id = imdb_id
                 self.get_movie_details(movie, session)
-                session.add(movie)
+                if movie.name:
+                    session.add(movie)
             elif title:
                 result = get_first_result('search', title)
                 if result:
@@ -154,6 +174,9 @@ class ApiTmdb(object):
                     if title.lower() != movie.name.lower():
                         session.add(TMDBSearchResult({'search': title, 'movie': movie}))
         session.commit()
+        # We need to query again to force the relationships to eager load before we detach from session
+        movie = session.query(TMDBMovie).options(joinedload_all(TMDBMovie.posters, TMDBMovie.genres)). \
+                filter(TMDBMovie.id == movie.id).first()
         session.close()
         if not movie:
             log.debug('No results found from tmdb')
@@ -203,7 +226,10 @@ def get_first_result(tmdb_function, value):
     url = '%s/2.1/Movie.%s/%s/yaml/%s/%s' % (server, tmdb_function, lang, api_key, value)
     data = urlopener(url, log)
     result = yaml.load(data)
-    if len(result):
-        return result[0]
+    # Make sure there is a valid result to return
+    if isinstance(result, list) and len(result):
+        result = result[0]
+        if isinstance(result, dict) and result.get('id'):
+            return result
 
 register_plugin(ApiTmdb, 'api_tmdb')
