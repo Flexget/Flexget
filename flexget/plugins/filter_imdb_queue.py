@@ -204,6 +204,35 @@ class ImdbQueueManager(object):
         else:
             ImdbQueueManager.options['force'] = True
 
+    def parse_what(self, what):
+        """Given an imdb_id or movie title, looks up from imdb and returns a dict with imdb_id and title keys"""
+        imdb_id = extract_id(what)
+        title = what
+
+        if imdb_id:
+            # Given an imdb id, find title
+            parser = ImdbParser()
+            try:
+                parser.parse('http://www.imdb.com/title/%s' % imdb_id)
+            except Exception:
+                print 'Error parsing info from imdb for %s' % imdb_id
+            if parser.name:
+                title = parser.name
+        else:
+            # Given a title, try to do imdb search for id
+            print 'Searching imdb for %s' % what
+            search = ImdbSearch()
+            result = search.smart_match(what)
+            if not result:
+                print 'ERROR: Unable to find any such movie from imdb, use imdb url instead.'
+                return
+            imdb_id = extract_id(result['url'])
+            title = result['name']
+
+        self.options['imdb_id'] = imdb_id
+        self.options['title'] = title
+        return {'title': title, 'imdb_id': imdb_id}
+
     def on_process_start(self, feed):
         """
         Handle IMDb queue management
@@ -229,33 +258,16 @@ class ImdbQueueManager(object):
                 return
             else:
                 # Generate imdb_id and movie title from movie name, or imdb_url
-                self.options['imdb_id'] = extract_id(self.options['what'])
-                self.options['title'] = self.options['what']
-
-                if self.options['imdb_id']:
-                    # Given an imdb id, find title
-                    parser = ImdbParser()
-                    try:
-                        parser.parse('http://www.imdb.com/title/%s' % self.options['imdb_id'])
-                    except Exception:
-                        print 'Error parsing info from imdb for %s' % self.options['imdb_id']
-                    if parser.name:
-                        self.options['title'] = parser.name
-                else:
-                    # Given a title, try to do imdb search for id
-                    print 'Searching imdb for %s' % self.options['what']
-                    search = ImdbSearch()
-                    result = search.smart_match(self.options['what'])
-                    if not result:
-                        print 'ERROR: Unable to find any such movie from imdb, use imdb url instead.'
-                        return
-                    self.options['imdb_id'] = extract_id(result['url'])
-                    self.options['title'] = result['name']
+                self.options.update(parse_what(self.options['what']))
+            if not self.options.get('title') or not self.options.get('imdb_id'):
+                print 'could not determine movie to add' # TODO: Rethink errors
+                return
 
         from sqlalchemy.exceptions import OperationalError
         try:
             if action == 'add':
-                self.queue_add()
+                self.queue_add(title=self.options['title'], imdb_id=self.options['imdb_id'],
+                               quality=self.options['quality'], force=self.options['force'])
             elif action == 'del':
                 self.queue_del()
             elif action == 'list':
@@ -266,12 +278,19 @@ class ImdbQueueManager(object):
     def error(self, msg):
         print 'IMDb Queue error: %s' % msg
 
-    def queue_add(self):
+    def queue_add(self, what=None, title=None, imdb_id=None, quality='ANY', force=False):
         """Add an item to the queue with the specified quality"""
 
-        # Check that the quality is valid
-        quality = self.options['quality']
+        if not title or not imdb_id:
+            # We don't have all the info we need to add movie, do a lookup for more info
+            result = self.parse_what(what or title)
+            if not result:
+                # TODO: Raise error somehow
+                return
+            title = result['title']
+            imdb_id = result['imdb_id']
 
+        # Check that the quality is valid
         from flexget.utils import qualities
         # Make sure quality is in the format we expect
         if quality.upper() == 'ANY':
@@ -284,19 +303,17 @@ class ImdbQueueManager(object):
             print 'ANY is the default and can also be used explicitly to specify that quality should be ignored.'
             return
 
-        imdb_id = self.options['imdb_id']
-        title = self.options['title']
-
         session = Session()
 
         # check if the item is already queued
         item = session.query(ImdbQueue).filter(ImdbQueue.imdb_id == imdb_id).first()
         if not item:
-            item = ImdbQueue(imdb_id, quality, self.options['force'])
+            item = ImdbQueue(imdb_id, quality, force)
             item.title = title
             session.add(item)
             session.commit()
             print 'Added %s to queue with quality %s' % (title, quality)
+            return title
         else:
             print 'ERROR: %s is already in the queue' % imdb_id
 

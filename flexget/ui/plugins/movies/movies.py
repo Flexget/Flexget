@@ -1,6 +1,6 @@
 import time
 import logging
-from flask import render_template, Module
+from flask import render_template, Module, request, redirect, flash
 from flask.helpers import url_for
 from flexget.plugin import PluginDependencyError, get_plugin_by_name
 from flexget.ui.webui import register_plugin, db_session, app, manager
@@ -33,6 +33,7 @@ def index():
     for item in imdb_queue:
         movie = tmdb_lookup(imdb_id=item.imdb_id)
         if not movie:
+            item.overview = "No "
             log.debug('No themoviedb result for imdb id %s' % item.imdb_id)
             continue
 
@@ -47,6 +48,18 @@ def index():
     context = {'movies': imdb_queue}
     return render_template('movies/movies.html', **context)
 
+
+@movies_module.route('/add/<what>', methods=['GET', 'POST'])
+def add_to_queue(what):
+    quality = request.values.get('quality', 'ANY')
+    force = request.values.get('force', False)
+    queue_manager = get_plugin_by_name('imdb_queue_manager').instance
+    title = queue_manager.queue_add(what=what, quality=quality, force=force)
+    if title:
+        flash('%s successfully added to queue.' % what, 'success')
+    else:
+        flash('%s was not added to queue' % what, 'error')
+    return redirect(url_for('index'))
 
 if manager.options.experimental:
     register_plugin(movies_module, menu='Movies')
