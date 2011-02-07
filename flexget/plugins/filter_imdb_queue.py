@@ -178,7 +178,7 @@ class ImdbQueueManager(object):
         Callback for Optik
         --imdb-queue (add|del|list) [IMDB_URL|NAME] [quality]
         """
-        if len(parser.rargs) == 0:
+        if not parser.rargs:
             print 'Usage: --imdb-queue (add|del|list) [IMDB_URL|NAME] [QUALITY] [FORCE]'
             # set some usage option so that feeds will be disabled later
             ImdbQueueManager.options['usage'] = True
@@ -253,12 +253,13 @@ class ImdbQueueManager(object):
 
         # all actions except list require imdb_url to work
         if action != 'list':
-            if not 'what' in self.options:
+            if not self.options.get('what'):
                 self.error('No URL or NAME given')
                 return
             else:
                 # Generate imdb_id and movie title from movie name, or imdb_url
-                self.options.update(parse_what(self.options['what']))
+                what = self.parse_what(self.options['what'])
+                self.options.update(what or {})
             if not self.options.get('title') or not self.options.get('imdb_id'):
                 print 'could not determine movie to add' # TODO: Rethink errors
                 return
@@ -328,7 +329,7 @@ class ImdbQueueManager(object):
         item = session.query(ImdbQueue).filter(ImdbQueue.imdb_id == imdb_id).first()
         if item:
             session.delete(item)
-            print 'Deleted %s from the queue' % (imdb_id)
+            print 'Deleted %s from the queue' % imdb_id
         else:
             log.info('%s is not in the queue' % imdb_id)
 
@@ -358,7 +359,7 @@ class ImdbQueueManager(object):
                     item.title = 'N/A'
             print '%-10s %-45s %-8s %s' % (item.imdb_id, item.title, item.quality, item.immortal)
 
-        if items.count() == 0:
+        if not items.count():
             print 'IMDB queue is empty'
 
         print '-' * 79
@@ -385,7 +386,7 @@ class ImdbQueueManager(object):
                 else:
                     continue
             imdb_entries.append((item.title, item.imdb_id))
-        if items.count() == 0:
+        if not items.count():
             log.info("IMDB Queue is empty")
         return imdb_entries
 

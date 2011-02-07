@@ -33,7 +33,7 @@ def index():
     for item in imdb_queue:
         movie = tmdb_lookup(imdb_id=item.imdb_id)
         if not movie:
-            item.overview = "No "
+            item.overview = "TMDb lookup was not successful."
             log.debug('No themoviedb result for imdb id %s' % item.imdb_id)
             continue
 
