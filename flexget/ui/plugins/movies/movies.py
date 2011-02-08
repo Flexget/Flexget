@@ -49,11 +49,12 @@ def index():
     return render_template('movies/movies.html', **context)
 
 
-@movies_module.route('/add/<what>', methods=['GET', 'POST'])
-def add_to_queue(what):
+@movies_module.route('/add', methods=['GET', 'POST'])
+def add_to_queue():
+    what = request.values.get('what')
     imdb_id = request.values.get('imdb_id')
     quality = request.values.get('quality', 'ANY')
-    force = request.values.get('force', False)
+    force = request.values.get('force') == 'on'
     queue_manager = get_plugin_by_name('imdb_queue_manager').instance
     try:
         title = queue_manager.queue_add(title=what, imdb_id=imdb_id, quality=quality, force=force)['title']
@@ -64,8 +65,9 @@ def add_to_queue(what):
     return redirect(url_for('index'))
 
 
-@movies_module.route('/del/<imdb_id>')
-def del_from_queue(imdb_id):
+@movies_module.route('/del')
+def del_from_queue():
+    imdb_id = request.values.get('imdb_id')
     queue_manager = get_plugin_by_name('imdb_queue_manager').instance
     try:
         title = queue_manager.queue_del(imdb_id)
@@ -73,6 +75,21 @@ def del_from_queue(imdb_id):
         flash(e.message, 'error')
     else:
         flash('%s removed from queue.' % title, 'delete')
+    return redirect(url_for('index'))
+
+
+@movies_module.route('/edit')
+def edit_movie_quality():
+    imdb_id = request.values.get('imdb_id')
+    quality = request.values.get('quality')
+    queue_manager = get_plugin_by_name('imdb_queue_manager').instance
+    try:
+        queue_manager.queue_edit(imdb_id, quality)
+    except QueueError, e:
+        flash(e.message, 'error')
+    else:
+        # TODO: Display movie name instead of id
+        flash('%s quality changed to %s' % (imdb_id, quality), 'success')
     return redirect(url_for('index'))
 
 if manager.options.experimental:

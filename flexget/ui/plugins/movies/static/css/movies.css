@@ -39,9 +39,11 @@ ul.quality {
     font-size: 1.2em;
     float: left;
     display: block;
-    color: #aaa;
     list-style-position: outside;
+}
 
+ul.quality li a {
+    color: #aaa;
 }
 
 ul.quality li.active {

@@ -5,23 +5,24 @@
 {% endblock %}
 
 {% block main %}
-    <!-- what is this script needed for? -->
-    <script type=text/javascript>
-        $(function(){
-            $("#add_button").click(function() {
-                $("#add_form").attr("action", "{{ url_for("add_to_queue", what='') }}" + $("#add_what").val());
-            });
-        });
-    </script>
-
     <div style="float: left;">
         <h1>Queued Movies (imdb)</h1>
     </div>
     
     <div style="float: right;">
-        <form method="post" id="add_form">
-            <input type="text" name="what" id="add_what">
-            <input type="submit" id="add_button" value="Add">
+        <form method="post" action="{{ url_for('add_to_queue') }}">
+            <strong>Add Movie:</strong>
+            <input type="text" name="what">
+            Quality:
+            <select name="quality">
+                <option value="ANY">ANY</option>
+                <option value="dvdrip">DVDrip</option>
+                <option value="720p">720p</option>
+                <option value="1080p">1080p</option>
+            </select>
+            Force:
+            <input type="checkbox" name="force" checked="">
+            <input type="submit" value="Add">
         </form>
     </div>
     <div style="clear: both;"></div>
@@ -45,10 +46,13 @@
             </div>
             
             <ul class="quality">
-                <li{% if movie.quality == "1080p" %} class="active"{% endif %}>1080p</li>
-                <li{% if movie.quality == "720p" %} class="active"{% endif %}>720p</li>
-                <li{% if movie.quality == "HDTV" %} class="active"{% endif %}>HDTV</li>
-                <li{% if movie.quality == "ANY" %} class="active"{% endif %}>Any</li>
+                {% for qual in ['1080p', '720p', 'dvdrip', 'ANY'] %}
+                    {% if movie.quality == qual %}
+                        <li class="active">{{ qual }}</li>
+                    {% else %}
+                        <li><a href="{{ url_for('edit_movie_quality') }}?imdb_id={{ movie.imdb_id }}&quality={{ qual }}">{{ qual }}</a></li>
+                    {% endif %}
+                {% endfor %}
             </ul>
         </li>
         {% endfor %}

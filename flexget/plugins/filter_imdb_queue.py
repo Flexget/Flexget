@@ -305,7 +305,17 @@ class ImdbQueueManager(object):
     def error(self, msg):
         print 'IMDb Queue error: %s' % msg
 
-    def queue_add(self, title=None, imdb_id=None, quality='ANY', force=False):
+    def validate_quality(self, quality):
+        # Check that the quality is valid
+        # Make sure quality is in the format we expect
+        if quality.upper() == 'ANY':
+            return 'ANY'
+        elif qualities.get(quality, False):
+            return qualities.common_name(quality)
+        else:
+            raise QueueError('ERROR! Unknown quality `%s`' % quality, errno=1)
+
+    def queue_add(self, title=None, imdb_id=None, quality='ANY', force=True):
         """Add an item to the queue with the specified quality"""
 
         if not title or not imdb_id:
@@ -313,15 +323,7 @@ class ImdbQueueManager(object):
             result = self.parse_what(imdb_id or title)
             title = result['title']
             imdb_id = result['imdb_id']
-
-        # Check that the quality is valid
-        # Make sure quality is in the format we expect
-        if quality.upper() == 'ANY':
-            quality = 'ANY'
-        elif qualities.get(quality, False):
-            quality = qualities.common_name(quality)
-        else:
-            raise QueueError('ERROR! Unknown quality `%s`' % quality, errno=1)
+        quality = self.validate_quality(quality)
 
         session = Session()
 
@@ -340,12 +342,24 @@ class ImdbQueueManager(object):
         """Delete the given item from the queue"""
 
         session = Session()
-
         # check if the item is queued
         item = session.query(ImdbQueue).filter(ImdbQueue.imdb_id == imdb_id).first()
         if item:
             title = item.title
             session.delete(item)
+            session.commit()
+            return title
+        else:
+            raise QueueError('%s is not in the queue' % imdb_id)
+
+    def queue_edit(self, imdb_id, quality):
+        """Change the required quality for a movie in the queue"""
+        self.validate_quality(quality)
+        session = Session()
+        # check if the item is queued
+        item = session.query(ImdbQueue).filter(ImdbQueue.imdb_id == imdb_id).first()
+        if item:
+            item.quality = quality
             session.commit()
             return item.title
         else:
