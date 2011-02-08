@@ -1,40 +1,56 @@
 {% extends "layout.html" %}
 
 {% block head %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/movies.css') }}" type="text/css" media="screen"/>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/movies.css') }}" type="text/css" media="screen"/>
 {% endblock %}
 
 {% block main %}
-<script type=text/javascript>
-    $(function(){
-        $("#add_button").click(function() {
-            $("#add_form").attr("action", "{{ url_for("add_to_queue", what='') }}" + $("#add_what").val());
+    <!-- what is this script needed for? -->
+    <script type=text/javascript>
+        $(function(){
+            $("#add_button").click(function() {
+                $("#add_form").attr("action", "{{ url_for("add_to_queue", what='') }}" + $("#add_what").val());
+            });
         });
-    });
-</script>
-<form method="post" id="add_form">
-    <input type="text" name="what" id="add_what">
-    <input type="submit" id="add_button" value="Add">
-</form>
-<h2>IMDB Queued Movies</h2>
-<br />
-<ul id="queued_movies">
-    {% for movie in movies %}
-    <li>
-        <div class="thumb"><img src="{{ movie.thumb }}" /></div>
-        <div class="movie_text">
-            <h3>{{ movie.title }} ({{ movie.year }})</h3>
-            <br />
-            <p>{{ movie.overview }}</p>
-        </div>
-        <ul class="quality">
-            <li{% if movie.quality == "1080p" %} class="active"{% endif %}>1080p</li>
-            <li{% if movie.quality == "720p" %} class="active"{% endif %}>720p</li>
-            <li{% if movie.quality == "HDTV" %} class="active"{% endif %}>HDTV</li>
-            <li{% if movie.quality == "ANY" %} class="active"{% endif %}>Any</li>
-        </ul>
+    </script>
 
-    </li>
-    {% endfor %}
-</ul>
+    <div style="float: left;">
+        <h1>Queued Movies (imdb)</h1>
+    </div>
+    
+    <div style="float: right;">
+        <form method="post" id="add_form">
+            <input type="text" name="what" id="add_what">
+            <input type="submit" id="add_button" value="Add">
+        </form>
+    </div>
+    <div style="clear: both;"></div>
+
+    <!-- movie list -->
+    <ul id="queued_movies">
+        {% for movie in movies %}
+        <li>
+            <div class="thumb">
+                {% if movie.thumb %}
+                    <img src="{{ movie.thumb }}" />
+                {% else %}
+                    <div class="nothumb">?</div>
+                {% endif %}
+            </div>
+            
+            <div class="movie_text">
+                <h3>{{ movie.title }} ({{ movie.year }})</h3>
+                <br />
+                <p>{{ movie.overview }}</p>
+            </div>
+            
+            <ul class="quality">
+                <li{% if movie.quality == "1080p" %} class="active"{% endif %}>1080p</li>
+                <li{% if movie.quality == "720p" %} class="active"{% endif %}>720p</li>
+                <li{% if movie.quality == "HDTV" %} class="active"{% endif %}>HDTV</li>
+                <li{% if movie.quality == "ANY" %} class="active"{% endif %}>Any</li>
+            </ul>
+        </li>
+        {% endfor %}
+    </ul>
 {% endblock %}

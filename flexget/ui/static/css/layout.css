@@ -51,15 +51,19 @@ body {
 }
 
 h1 {
-    font-size: 14px;
+    font-size: 18px;
     text-transform: uppercase;
     margin: 0 0 1em;
 }
 
 h2 {
-    font-size: 18px;
+    font-size: 16px;
     text-transform: uppercase;
     margin: 0 0 1em;
+}
+
+h3 {
+    font-size: 14px;
 }
 
 #content-container {
