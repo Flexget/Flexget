@@ -90,7 +90,7 @@ class TMDBPoster(TMDBContainer, Base):
         # Create folders if the don't exist
         try:
             os.makedirs(os.path.join(base_dir, dirname))
-        except WindowsError, e:
+        except OSError, e:
             # Ignore already exists errors on windows
             if e.errno == 183:
                 pass
