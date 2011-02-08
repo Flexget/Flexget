@@ -3,10 +3,10 @@ import logging
 from flask import render_template, Module, request, redirect, flash
 from flask.helpers import url_for
 from flexget.plugin import PluginDependencyError, get_plugin_by_name
-from flexget.ui.webui import register_plugin, db_session, app, manager
+from flexget.ui.webui import register_plugin, app, manager
 
 try:
-    from flexget.plugins.filter_imdb_queue import ImdbQueue
+    from flexget.plugins.filter_imdb_queue import QueueError
 except ImportError:
     raise PluginDependencyError('Requires imdb plugin', 'imdb_queue')
 
@@ -28,12 +28,12 @@ def pretty_age_filter(value):
 
 @movies_module.route('/')
 def index():
-    imdb_queue = db_session.query(ImdbQueue).all()
+    imdb_queue = get_plugin_by_name('imdb_queue_manager').instance.queue_get()
     tmdb_lookup = get_plugin_by_name('api_tmdb').instance.lookup
     for item in imdb_queue:
         movie = tmdb_lookup(imdb_id=item.imdb_id)
         if not movie:
-            item.overview = "TMDb lookup was not successful."
+            item.overview = "TMDb lookup was not successful, no overview available."
             log.debug('No themoviedb result for imdb id %s' % item.imdb_id)
             continue
 
@@ -51,14 +51,28 @@ def index():
 
 @movies_module.route('/add/<what>', methods=['GET', 'POST'])
 def add_to_queue(what):
+    imdb_id = request.values.get('imdb_id')
     quality = request.values.get('quality', 'ANY')
     force = request.values.get('force', False)
     queue_manager = get_plugin_by_name('imdb_queue_manager').instance
-    title = queue_manager.queue_add(what=what, quality=quality, force=force)
-    if title:
-        flash('%s successfully added to queue.' % what, 'success')
+    try:
+        title = queue_manager.queue_add(title=what, imdb_id=imdb_id, quality=quality, force=force)['title']
+    except QueueError, e:
+        flash(e.message, 'error')
     else:
-        flash('%s was not added to queue' % what, 'error')
+        flash('%s successfully added to queue.' % title, 'success')
+    return redirect(url_for('index'))
+
+
+@movies_module.route('/del/<imdb_id>')
+def del_from_queue(imdb_id):
+    queue_manager = get_plugin_by_name('imdb_queue_manager').instance
+    try:
+        title = queue_manager.queue_del(imdb_id)
+    except QueueError, e:
+        flash(e.message, 'error')
+    else:
+        flash('%s removed from queue.' % title, 'delete')
     return redirect(url_for('index'))
 
 if manager.options.experimental:
