@@ -5,6 +5,17 @@
 {% endblock %}
 
 {% block main %}
+<script type=text/javascript>
+    $(function(){
+        $("#add_button").click(function() {
+            $("#add_form").attr("action", "{{ url_for("add_to_queue", what='') }}" + $("#add_what").val());
+        });
+    });
+</script>
+<form method="post" id="add_form">
+    <input type="text" name="what" id="add_what">
+    <input type="submit" id="add_button" value="Add">
+</form>
 <h2>IMDB Queued Movies</h2>
 <br />
 <ul id="queued_movies">
