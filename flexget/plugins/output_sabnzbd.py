@@ -101,6 +101,6 @@ class OutputSabnzbd:
             if 'error' in response.lower():
                 feed.fail(entry, response.replace('\n', ''))
             else:
-                log.info('"%s" added to sabnzbd' % (entry['title']))
+                log.info('Added `%s` to SABnzbd' % (entry['title']))
 
 register_plugin(OutputSabnzbd, 'sabnzbd')

@@ -77,28 +77,28 @@ class Manipulate(object):
                 if 'from' in config:
                     from_field = config['from']
                 field_value = entry.get(from_field)
-                log.debug('field: %s from_field: %s field_value: %s' % (field, from_field, field_value))
+                log.debug('field: `%s` from_field: `%s` field_value: `%s`' % (field, from_field, field_value))
 
                 if 'extract' in config:
                     if not field_value:
-                        log.warning('Cannot extract, field %s is not present' % from_field)
+                        log.warning('Cannot extract, field `%s` is not present' % from_field)
                         continue
                     match = re.search(config['extract'], field_value)
                     if match:
                         groups = [x for x in match.groups() if x is not None]
                         log.debug('groups: %s' % groups)
                         field_value = config.get('separator', ' ').join(groups)
-                        log.debug('field %s after extract: %s' % (field, field_value))
+                        log.debug('field `%s` after extract: `%s`' % (field, field_value))
 
                 if 'replace' in config:
                     if not field_value:
-                        log.warning('Cannot replace, field %s is not present' % from_field)
+                        log.warning('Cannot replace, field `%s` is not present' % from_field)
                         continue
                     replace_config = config['replace']
                     field_value = re.sub(replace_config['regexp'], replace_config['format'], field_value)
-                    log.debug('field %s after replace: %s' % (field, field_value))
+                    log.debug('field `%s` after replace: `%s`' % (field, field_value))
 
                 entry[field] = field_value
-                feed.verbose_progress('Field %s is now %s' % (field, entry[field]), log)
+                feed.verbose_progress('Field `%s` is now `%s`' % (field, entry[field]), log)
 
 register_plugin(Manipulate, 'manipulate')

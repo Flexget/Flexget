@@ -32,8 +32,8 @@ class SeriesReport(SeriesPlugin):
 
     def display_details(self):
         """Display detailed series information"""
+        
         from flexget.manager import Session
-
         session = Session()
 
         name = unicode(self.options['name'].lower())
@@ -45,7 +45,11 @@ class SeriesReport(SeriesPlugin):
         print ' %-63s%-15s' % ('Identifier, Title', 'Quality')
         print '-' * 79
 
-        for episode in series.episodes:
+        # Query episodes in sane order instead of iterating from series.episodes
+        episodes = session.query(Episode).filter(Episode.series_id == series.id).\
+            order_by(Episode.identifier).all()
+
+        for episode in episodes:
 
             if episode.identifier is None:
                 print ' None <--- Broken!'
@@ -70,6 +74,7 @@ class SeriesReport(SeriesPlugin):
 
     def display_summary(self):
         """Display series summary"""
+        
         print ' %-30s%-20s%-21s' % ('Name', 'Latest', 'Status')
         print '-' * 79
 
@@ -147,14 +152,14 @@ class SeriesForget(object):
                 if identifier and name:
                     try:
                         forget_series_episode(name, identifier)
-                        print 'Episode %s from series %s removed.' % (identifier, name.capitalize())
+                        print 'Removed episode `%s` from series `%s`.' % (identifier, name.capitalize())
                     except ValueError, e:
                         print e.message
             else:
                 # remove whole series
                 try:
                     forget_series(name)
-                    print 'Removed series %s from database.' % name.capitalize()
+                    print 'Removed series `%s` from database.' % name.capitalize()
                 except ValueError, e:
                     print e.message
 

@@ -324,6 +324,10 @@ def load_plugins_from_dir(dir):
         except ImportError, e:
             log.critical('Plugin %s failed to import dependencies' % name)
             log.exception(e)
+            # TODO: logging does not seem to work from here
+            import sys
+            import traceback
+            traceback.print_exc(file=sys.stdout)
         except Exception, e:
             log.critical('Exception while loading plugin %s' % name)
             log.exception(e)
