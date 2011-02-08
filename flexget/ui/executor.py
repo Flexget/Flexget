@@ -1,3 +1,4 @@
+from copy import copy
 import logging
 import sys
 import threading
@@ -28,11 +29,15 @@ class ExecThread(threading.Thread):
         while True:
             kwargs = self.queue.get() or {}
             opts = kwargs.get('options')
+            parsed_options = kwargs.get('parsed_options')
             output = kwargs.get('output')
-            # Store the manager's options and current stdout to be restored after our execution
             if opts:
+                # make copy of original options and apply options from opts
+                old_opts = copy(manager.options)
+                self._apply_options(manager.options, opts)
+            if parsed_options:
                 old_opts = manager.options
-                manager.options = opts
+                manager.options = parsed_options
             if output:
                 old_stdout = sys.stdout
                 old_stderr = sys.stderr
@@ -50,19 +55,45 @@ class ExecThread(threading.Thread):
                 if opts:
                     manager.options = old_opts
                 if output:
-                    print 'EOF'
+                    print 'EOF' # TODO: what is this? no printing! :)
                     sys.stdout = old_stdout
                     sys.stderr = old_stderr
                     logging.getLogger().removeHandler(streamhandler)
+
+    def _apply_options(self, parser, options):
+        """Applies dict :options: to OptParse parser results"""
+
+        from IPython.Shell import IPShellEmbed
+        ipshell = IPShellEmbed([])
+        ipshell()
+
+        for name, value in options.iteritems():
+            if hasattr(parser, name):
+                log.debug('setting options %s to %s' % (name, value))
+                setattr(parser, name, value)
+            else:
+                log.error('Option %s does not exist, ignoring it' % name)
 
     def execute(self, **kwargs):
         """
         Adds an execution to the queue.
 
         keyword arguments:
-        options: Values from an OptionParser to be used for this execution
+
+        options: Dict containing option, value pairs for this execution
+        parsed_options: Parsed OptionParser to be used for this execution
         output: a BufferQueue object that will be filled with output from the execution.
+
+        kwargs options and parsed_options are mutually exclusive
         """
+
+        if 'options' in kwargs:
+            if not isinstance(kwargs['options'], dict):
+                raise ValueError('options should be a dict, got %s' % type(kwargs['options']))
+
+        if 'options' in kwargs and 'parsed_options' in kwargs:
+            raise ValueError('options and parsed_options are mutually exclusive')
+
         if kwargs.get('output') and self.queue.unfinished_tasks:
             kwargs['output'].write('There is already an execution running. ' +
                                    'This execution will start when the previous completes.')

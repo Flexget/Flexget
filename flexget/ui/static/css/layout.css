@@ -175,7 +175,7 @@ div.help p:last-child {
     height:70px;
     width:160px;
     padding:25px;
-    color:#fff; 
+    color:#fff;
 }
 
 
@@ -195,9 +195,14 @@ table.search-results th {
     color: #fff;
     text-align: left;
 }
-table.search-results td {
+table.search-results tr.odd td {
     border: 0 none gray;
     padding: 3px;
-    background-color: rgb(204, 204, 204);
+    background-color: #ccc;
 }
 
+table.search-results tr.even td {
+    border: 0 none gray;
+    padding: 3px;
+    background-color: #bbb;
+}

@@ -22,8 +22,8 @@ form.simple legend
 form.simple label
 {
     width: 4em;
-    float: left;
-    text-align: right;
+    /*float: left;*/
+    /*text-align: right;*/
     margin-right: 0.5em;
     display: block;
     color: #fff;

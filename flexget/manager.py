@@ -46,6 +46,10 @@ class Manager(object):
     manager.startup
       After manager has been initialized. This is when application becomes ready to use
 
+    manager.execute.started
+      When execute is about the be started, this happens before any feed phases,
+      including on_process_start
+
     manager.execute.completed
       After manager has executed all Feeds
     """
@@ -448,6 +452,8 @@ class Manager(object):
         if not self.feeds:
             log.warning('There are no feeds to execute, please add some feeds')
             return
+
+        fire_event('manager.execute.started', self)
 
         self.process_start()
 

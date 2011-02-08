@@ -1,6 +1,6 @@
 import logging
 from Queue import Empty
-from flask import render_template, request, redirect, flash
+from flask import render_template, request, flash
 from flask import Module, escape
 from flask.helpers import jsonify
 from flexget.ui.webui import register_plugin, manager, executor
@@ -17,12 +17,12 @@ bufferqueue = BufferQueue()
 def index():
     context = {'progress': manager.parser.get_help().split('\n')}
     if request.method == 'POST':
-        options = manager.parser.parse_args(request.form.get('options', ''))[0]
+        parser = manager.parser.parse_args(request.form.get('options', ''))[0]
         if manager.parser.error_msg:
             flash(escape(manager.parser.error_msg), 'error')
             context['options'] = request.form['options']
         else:
-            executor.execute(options=options, output=bufferqueue)
+            executor.execute(parsed_options=parser, output=bufferqueue)
             context['execute_progress'] = True
             context['progress'] = progress(as_list=True)
 
@@ -36,7 +36,7 @@ def progress(as_list=False):
     """
     result = {'items': []}
     try:
-        while 1:
+        while True:
             item = bufferqueue.get_nowait()
             result['items'].append(item)
             bufferqueue.task_done()
