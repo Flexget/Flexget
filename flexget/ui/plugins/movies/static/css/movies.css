@@ -29,6 +29,10 @@ div.movie_text {
     display: block;
 }
 
+div.movie_text a {
+    color: #000;
+}
+
 div.movie_text p {
     font-size: 12px;
     color: #555;
