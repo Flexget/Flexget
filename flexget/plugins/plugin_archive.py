@@ -81,7 +81,7 @@ class ArchiveInject(object):
     @priority(512)
     def on_process_start(self, feed):
         inject_id = feed.manager.options.archive_inject_id
-        if not id:
+        if not inject_id:
             return
 
         # get the entry to be injected
