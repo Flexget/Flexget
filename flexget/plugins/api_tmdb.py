@@ -1,5 +1,4 @@
 from datetime import datetime, timedelta
-import urllib
 import logging
 import yaml
 import os
@@ -78,12 +77,14 @@ class TMDBPoster(TMDBContainer, Base):
     type = Column(String)
     file = Column(Unicode)
 
-    def get_file(self):
+    def get_file(self, only_cached=False):
         """Downloads this poster to a local cache and returns the path"""
         from flexget.manager import manager
         base_dir = os.path.join(manager.config_base, 'userstatic')
         if os.path.isfile(os.path.join(base_dir, self.file or '')):
             return self.file
+        elif only_cached:
+            return
         # If we don't already have a local copy, download one.
         log.debug('Downloading poster %s' % self.url)
         dirname = os.path.join('tmdb', 'posters', str(self.movie_id))
@@ -117,71 +118,83 @@ class TMDBSearchResult(Base):
 class ApiTmdb(object):
     """Does lookups to TMDb and provides movie information. Caches lookups."""
 
-    def lookup(self, title=None, tmdb_id=None, imdb_id=None):
+    def lookup(self, title=None, tmdb_id=None, imdb_id=None, only_cached=False):
         if not title and not tmdb_id and not imdb_id:
             log.error('No criteria specified for tvdb lookup')
             return
         log.debug('Looking up tmdb information for %r' % {'title': title, 'tmdb_id': tmdb_id, 'imdb_id': imdb_id})
+        
         session = Session(expire_on_commit=False, autoflush=True)
         movie = None
-        if tmdb_id:
-            movie = session.query(TMDBMovie).filter(TMDBMovie.id == tmdb_id).first()
-        if not movie and imdb_id:
-            movie = session.query(TMDBMovie).filter(TMDBMovie.imdb_id == imdb_id).first()
-        if not movie and title:
-            movie = session.query(TMDBMovie).filter(func.lower(TMDBMovie.name) == title.lower()).first()
-            if not movie:
-                found = session.query(TMDBSearchResult). \
-                        filter(func.lower(TMDBSearchResult.search) == title.lower()).first()
-                if found and found.movie:
-                    movie = found.movie
-        if movie:
-            # Movie found in cache, check if cache has expired.
-            refresh_time = timedelta(days=2)
-            if movie.released:
-                if movie.released > datetime.now() - timedelta(days=7):
-                    # Movie is less than a week old, expire after 1 day
-                    refresh_time = timedelta(days=1)
+        
+        def id_str():
+            return '<title=%s,tmdb_id=%s,imdb_id=%s>' % (title, tmdb_id, imdb_id)
+        
+        try:
+            if tmdb_id:
+                movie = session.query(TMDBMovie).filter(TMDBMovie.id == tmdb_id).first()
+            if not movie and imdb_id:
+                movie = session.query(TMDBMovie).filter(TMDBMovie.imdb_id == imdb_id).first()
+            if not movie and title:
+                movie = session.query(TMDBMovie).filter(func.lower(TMDBMovie.name) == title.lower()).first()
+                if not movie:
+                    found = session.query(TMDBSearchResult). \
+                            filter(func.lower(TMDBSearchResult.search) == title.lower()).first()
+                    if found and found.movie:
+                        movie = found.movie
+            if movie:
+                # Movie found in cache, check if cache has expired.
+                refresh_time = timedelta(days=2)
+                if movie.released:
+                    if movie.released > datetime.now() - timedelta(days=7):
+                        # Movie is less than a week old, expire after 1 day
+                        refresh_time = timedelta(days=1)
+                    else:
+                        age_in_years = (datetime.now() - movie.released).days / 365
+                        refresh_time += timedelta(days=age_in_years * 5)
+                if movie.updated < datetime.now() - refresh_time and not only_cached:
+                    log.debug('Cache has expired for %s, attempting to refresh from TMDb.' % id_str())
+                    self.get_movie_details(movie, session)
                 else:
-                    age_in_years = (datetime.now() - movie.released).days / 365
-                    refresh_time += timedelta(days=age_in_years * 5)
-            if movie.updated < datetime.now() - refresh_time:
-                log.debug('Cache has expired, attempting to refresh from TMDb.')
-                self.get_movie_details(movie, session)
+                    log.debug('Movie %s information restored from cache.' % id_str())
             else:
-                log.debug('Movie information restored from cache.')
-        else:
-            # There was no movie found in the cache, do a lookup from tmdb
-            log.debug('Movie not found in cache, looking up from tmdb.')
-            if tmdb_id or imdb_id:
-                movie = TMDBMovie()
-                movie.id = tmdb_id
-                movie.imdb_id = imdb_id
-                self.get_movie_details(movie, session)
-                if movie.name:
-                    session.add(movie)
-            elif title:
-                result = get_first_result('search', title)
-                if result:
-                    movie = session.query(TMDBMovie).filter(TMDBMovie.id == result['id']).first()
-                    if not movie:
-                        movie = TMDBMovie(result)
-                        self.get_movie_details(movie, session)
+                if only_cached:
+                    log.debug('Movie %s not found from cache' % id_str())
+                    return
+                # There was no movie found in the cache, do a lookup from tmdb
+                log.debug('Movie %s not found in cache, looking up from tmdb.' % id_str())
+                if tmdb_id or imdb_id:
+                    movie = TMDBMovie()
+                    movie.id = tmdb_id
+                    movie.imdb_id = imdb_id
+                    self.get_movie_details(movie, session)
+                    if movie.name:
                         session.add(movie)
-                    if title.lower() != movie.name.lower():
-                        session.add(TMDBSearchResult({'search': title, 'movie': movie}))
-        session.commit()
-        # We need to query again to force the relationships to eager load before we detach from session
-        movie = session.query(TMDBMovie).options(joinedload(TMDBMovie.posters), joinedload(TMDBMovie.genres)). \
-                filter(TMDBMovie.id == movie.id).first()
-        session.close()
-        if not movie:
-            log.debug('No results found from tmdb')
-        else:
-            return movie
+                elif title:
+                    result = get_first_result('search', title)
+                    if result:
+                        movie = session.query(TMDBMovie).filter(TMDBMovie.id == result['id']).first()
+                        if not movie:
+                            movie = TMDBMovie(result)
+                            self.get_movie_details(movie, session)
+                            session.add(movie)
+                        if title.lower() != movie.name.lower():
+                            session.add(TMDBSearchResult({'search': title, 'movie': movie}))
+            session.commit()
+            
+            # We need to query again to force the relationships to eager load before we detach from session
+            movie = session.query(TMDBMovie).options(joinedload(TMDBMovie.posters), joinedload(TMDBMovie.genres)). \
+                    filter(TMDBMovie.id == movie.id).first()
+            if not movie:
+                log.debug('No results found from tmdb for %s' % id_str())
+            else:
+                return movie
+        finally:
+            session.close()
 
     def get_movie_details(self, movie, session):
-        """Populate details for this movie from TMDb"""
+        """Populate details for this :movie: from TMDb"""
+        
         if not movie.id and movie.imdb_id:
             # If we have an imdb_id, do a lookup for tmdb id
             result = get_first_result('imdbLookup', movie.imdb_id)
@@ -219,9 +232,16 @@ class ApiTmdb(object):
 
 def get_first_result(tmdb_function, value):
     if isinstance(value, basestring):
+        import urllib
         value = urllib.quote_plus(value)
     url = '%s/2.1/Movie.%s/%s/yaml/%s/%s' % (server, tmdb_function, lang, api_key, value)
-    data = urlopener(url, log)
+    from urllib2 import URLError
+    try:
+        data = urlopener(url, log)
+    except URLError, e:
+        log.warning('Request failed %s' % url)
+        return
+    
     result = yaml.load(data)
     # Make sure there is a valid result to return
     if isinstance(result, list) and len(result):

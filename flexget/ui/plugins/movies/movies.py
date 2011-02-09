@@ -1,6 +1,6 @@
 import time
 import logging
-from flask import render_template, Module, request, redirect, flash
+from flask import render_template, Module, request, redirect, flash, send_file
 from flask.helpers import url_for
 from flexget.plugin import PluginDependencyError, get_plugin_by_name
 from flexget.ui.webui import register_plugin, app, manager
@@ -31,16 +31,29 @@ def index():
     imdb_queue = get_plugin_by_name('imdb_queue_manager').instance.queue_get()
     tmdb_lookup = get_plugin_by_name('api_tmdb').instance.lookup
     for item in imdb_queue:
-        movie = tmdb_lookup(imdb_id=item.imdb_id)
+        movie = tmdb_lookup(imdb_id=item.imdb_id, only_cached=True)
         if not movie:
-            item.overview = "TMDb lookup was not successful, no overview available."
+            item.overview = ('TMDb lookup was not successful, no overview available.'
+                             'Lookup is being retried in the background.')
             log.debug('No themoviedb result for imdb id %s' % item.imdb_id)
+            
+            # this is probably not needed since non cached movies are retried also
+            # in the cover function
+            #
+            #import thread
+            #thread.start_new_thread(tmdb_lookup, (), {'imdb_id': item.imdb_id})
             continue
 
+        # set thumb, but only if already in cache because retrieving is too slow here
+        # movies without cached thumb use img tag reading /cover/<imdb_id> which will
+        # retrieve the image and thus allows rendering the page immediattely
         for poster in movie.posters:
             if poster.size == 'thumb':
-                item.thumb = url_for('.userstatic', filename=poster.get_file())
+                thumb = poster.get_file(only_cached=True)
+                if thumb:
+                    item.thumb = url_for('.userstatic', filename=thumb)
                 break
+                
         item.title = movie.name
         item.year = movie.released.year
         item.overview = movie.overview
@@ -91,6 +104,35 @@ def edit_movie_quality():
         # TODO: Display movie name instead of id
         flash('%s quality changed to %s' % (imdb_id, quality), 'success')
     return redirect(url_for('index'))
+    
 
-if manager.options.experimental:
-    register_plugin(movies_module, menu='Movies')
+@movies_module.route('/cover/<imdb_id>')
+def cover(imdb_id):
+    import os
+    
+    # TODO: return '' should be replaced with something sane, http error 404 ?
+    
+    tmdb_lookup = get_plugin_by_name('api_tmdb').instance.lookup
+    movie = tmdb_lookup(imdb_id=imdb_id)
+    if not movie:
+        log.error('No cached data for %s' % imdb_id)
+        return ''
+
+    filepath = None
+    for poster in movie.posters:
+        if poster.size == 'thumb':
+            filepath = os.path.join(manager.config_base, 'userstatic', poster.get_file())
+            break
+            
+    if filepath is None:
+        log.error('No cover for %s' % imdb_id)
+        return ''
+    elif not os.path.exists(filepath):
+        log.error('File %s does not exist' % filepath)
+        return ''
+    
+    log.debug('sending thumb file %s' % filepath)
+    return send_file(filepath, mimetype='image/png')    
+    
+
+register_plugin(movies_module, menu='Movies')

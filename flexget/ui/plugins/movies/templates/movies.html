@@ -32,11 +32,22 @@
         {% for movie in movies %}
         <li>
             <div class="thumb">
+                {#
                 {% if movie.thumb %}
                     <img src="{{ movie.thumb }}" />
                 {% else %}
                     <div class="nothumb">?</div>
                 {% endif %}
+                #}
+                <div style="height: 133px; width: 92px; background: #ccc;">
+                    {% if movie.thumb %}
+                        {# use straight from the cache #}
+                        <img src="{{ movie.thumb }}" />
+                    {% else %}
+                        {# try to retrieve (slow) #}
+                        <img src="cover/{{ movie.imdb_id }}" />
+                    {% endif %}
+                </div>
             </div>
 
             <div class="movie_text">

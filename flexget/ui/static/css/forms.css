@@ -22,12 +22,11 @@ form.simple legend
 form.simple label
 {
     width: 4em;
-    /*float: left;*/
-    /*text-align: right;*/
     margin-right: 0.5em;
     display: block;
     color: #fff;
     margin-top: 0.15em;
+    margin-bottom: 0.5em;
 }
 
 form.simple .submit input
@@ -57,111 +56,3 @@ form.simple div.buttons
     text-align: center;
     margin-top: 1em;
 }
-
-
-
-/*
-
-label {
-    float: left;
-    width: 10em;
-    text-align: right;
-    margin-right: 1em;
-}
-
-legend {
-    color: #0079B2;
-    font-size: 1.2em;
-}
-
-legend span {
-    width: 10em;
-    text-align: right;
-}
-
-input {
-    padding: 0.15em;
-    width: 10em;
-    border: 1px solid #ddd;
-    background: #fafafa;
-    font: bold 0.95em arial, sans-serif;
-    -moz-border-radius: 0.4em;
-    -khtml-border-radius: 0.4em;
-}
-
-input:hover, input:focus {
-    border-color: #c5c5c5;
-    background: #f6f6f6;
-}
-
-fieldset {
-    border: 1px solid #aaa;
-    padding: 0 0.5em 0.5em;
-}
-
-.radio, .date {
-    position: relative;
-}
-
-.radio fieldset, .date fieldset {
-    border: none;
-    width: auto;
-    padding: 1px 0 0 11em;
-}
-
-.radio legend, .date legend {
-    font-size: 1em;
-    color: #000;
-}
-
-.radio legend span, .date legend span {
-    position: absolute;
-    left: 0;
-    top: 0.3em;
-    width: 10em;
-    display: block;
-}
-
-.radio label, .radio input {
-    vertical-align: middle;
-    display: inline;
-    float: none;
-    width: auto;
-    background: none;
-    border: none;
-}
-
-.radio div {
-    float: left;
-    white-space: nowrap;
-    clear: none;
-}
-
-.email {
-    width: 14em;
-}
-
-input.default {
-    color: #bbb;
-}
-
-#submit {
-  margin-top: 1em;
-}
-
-#submit {
-    margin-top: 1em;
-    width: 69px;
-    height: 26px;
-    text-indent: -9999px;
-    overflow: hidden;
-    border: 0;
-    background: url(/static/img/submit.gif) no-repeat 0 0;
-    display: block;
-    cursor: pointer !important; cursor:hand;
-}
-
-#submit:hover {
-    background-position:0 -26px;
-}
-*/
