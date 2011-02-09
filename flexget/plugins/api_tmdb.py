@@ -6,7 +6,7 @@ import os
 import posixpath
 from sqlalchemy import Table, Column, Integer, Float, String, Unicode, Boolean, DateTime, func
 from sqlalchemy.schema import ForeignKey
-from sqlalchemy.orm import relation, joinedload_all
+from sqlalchemy.orm import relation, joinedload
 from flexget.utils.tools import urlopener
 from flexget.manager import Base, Session
 from flexget.plugin import register_plugin
@@ -88,12 +88,9 @@ class TMDBPoster(TMDBContainer, Base):
         log.debug('Downloading poster %s' % self.url)
         dirname = os.path.join('tmdb', 'posters', str(self.movie_id))
         # Create folders if the don't exist
-        try:
-            os.makedirs(os.path.join(base_dir, dirname))
-        except OSError, e:
-            # Ignore already exists errors on windows
-            if e.errno != 183:
-                raise
+        fullpath = os.path.join(base_dir, dirname)
+        if not os.path.isdir(fullpath):
+            os.makedirs(fullpath)
         filename = os.path.join(dirname, posixpath.basename(self.url))
         thefile = file(os.path.join(base_dir, filename), 'wb')
         thefile.write(urlopener(self.url, log).read())
@@ -175,7 +172,7 @@ class ApiTmdb(object):
                         session.add(TMDBSearchResult({'search': title, 'movie': movie}))
         session.commit()
         # We need to query again to force the relationships to eager load before we detach from session
-        movie = session.query(TMDBMovie).options(joinedload_all(TMDBMovie.posters, TMDBMovie.genres)). \
+        movie = session.query(TMDBMovie).options(joinedload(TMDBMovie.posters), joinedload(TMDBMovie.genres)). \
                 filter(TMDBMovie.id == movie.id).first()
         session.close()
         if not movie:
