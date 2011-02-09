@@ -92,8 +92,8 @@ class TMDBPoster(TMDBContainer, Base):
             os.makedirs(os.path.join(base_dir, dirname))
         except OSError, e:
             # Ignore already exists errors on windows
-            if e.errno == 183:
-                pass
+            if e.errno != 183:
+                raise
         filename = os.path.join(dirname, posixpath.basename(self.url))
         thefile = file(os.path.join(base_dir, filename), 'wb')
         thefile.write(urlopener(self.url, log).read())

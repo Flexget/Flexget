@@ -25,12 +25,38 @@ div.nothumb {
 
 div.movie_text {
     float: left;
-    width: 60%;
+    width: 70%;
     display: block;
 }
 
-div.movie_text a {
+div.movie_title {
+    /* fallback (Opera) */
+    background: #CCCCCC;
+    /* Mozilla: */
+    background: -moz-linear-gradient(left, #FFFFFF, #CCCCCC);
+    /* Chrome, Safari:*/
+    background: -webkit-gradient(linear, left top, right top, from(#FFFFFF), to(#CCCCCC));
+    /* MSIE */
+    filter: progid:DXImageTransform.Microsoft.Gradient(StartColorStr='#FFFFFF', EndColorStr='#CCCCCC', GradientType=1);
+    width: 100%;
+    position: relative;
+    height: 2em;
+}
+
+div.movie_title h3 {
+    position: absolute;
+    padding: 4px;
+}
+
+div.movie_title a {
     color: #000;
+}
+
+div.movie_title img {
+    position: absolute;
+    right: 5px;
+    top: 50%;
+    margin-top: -8px;
 }
 
 div.movie_text p {
@@ -41,7 +67,7 @@ div.movie_text p {
 ul.quality {
     margin-left: 1em;
     font-size: 1.2em;
-    float: left;
+    float: right;
     display: block;
     list-style-position: outside;
 }
@@ -52,4 +78,8 @@ ul.quality li a {
 
 ul.quality li.active {
     color: #000;
+}
+
+div.movie_right a {
+    display: block;
 }
