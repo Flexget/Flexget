@@ -2,6 +2,15 @@
 
 {% block head %}
     <link rel="stylesheet" href="{{ url_for('static', filename='css/movies.css') }}" type="text/css" media="screen"/>
+
+<script type="text/javascript">
+    function show_add_area(){
+        $("#add_button").hide();
+        $("#add_area").show("slide", {direction: "up"}, 500);
+    }
+</script>
+
+
 {% endblock %}
 
 {% block main %}
@@ -9,7 +18,13 @@
         <h1>Queued Movies (imdb)</h1>
     </div>
 
-    <div style="float: right;">
+    <div style="float: right;" id="add_button">
+        <button type="button" class="add" onclick="show_add_area()">
+            Add
+        </button>
+    </div>
+
+    <div id="add_area" class="add">
         <form method="post" action="{{ url_for('add_to_queue') }}">
             <strong>Add Movie:</strong>
             <input type="text" name="what">

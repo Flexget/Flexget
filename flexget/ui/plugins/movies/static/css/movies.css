@@ -72,6 +72,10 @@ ul.quality {
     list-style-position: outside;
 }
 
+ul.quality li {
+  text-align: right;
+}
+
 ul.quality li a {
     color: #aaa;
 }
@@ -82,4 +86,35 @@ ul.quality li.active {
 
 div.movie_right a {
     display: block;
+}
+
+#add_area {
+    display: none;
+    float: right;
+    padding: 0.5em;
+    background: #FF702E;
+}
+
+button.add {
+    width: 32px;
+    height: 32px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    margin-top: 10px;
+    background: transparent url("/static/img/fatcow-icons/32x32/add.png") no-repeat center top;
+    text-indent: -1000em;
+    cursor: pointer; /* hand-shaped cursor */
+    cursor: hand; /* for IE 5.x */
+}
+
+/* override default layout.css values to make add slide effect start from the menu, the padding prevents it */
+
+#main {
+    padding-top: 0 !important;
+}
+
+/* add padding to h1 to make it appear in same position as in elsewhere */
+h1 {
+    padding-top: 10px;
 }

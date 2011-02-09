@@ -40,7 +40,9 @@ class TMDBContainer(object):
 
 
 class TMDBMovie(TMDBContainer, Base):
+
     __tablename__ = 'tmdb_movies'
+
     id = Column(Integer, primary_key=True, autoincrement=False, nullable=False)
     updated = Column(DateTime, default=datetime.now(), nullable=False)
     popularity = Column(Integer)
@@ -63,13 +65,17 @@ class TMDBMovie(TMDBContainer, Base):
 
 
 class TMDBGenre(TMDBContainer, Base):
+
     __tablename__ = 'tmdb_genres'
+
     id = Column(Integer, primary_key=True, autoincrement=False)
     name = Column(String, nullable=False)
 
 
 class TMDBPoster(TMDBContainer, Base):
+
     __tablename__ = 'tmdb_posters'
+
     db_id = Column(Integer, primary_key=True)
     movie_id = Column(Integer, ForeignKey('tmdb_movies.id'))
     size = Column(String)
@@ -109,7 +115,9 @@ class TMDBPoster(TMDBContainer, Base):
 
 
 class TMDBSearchResult(Base):
+
     __tablename__ = 'tmdb_search_results'
+
     id = Column(Integer, primary_key=True)
     search = Column(Unicode, nullable=False)
     movie_id = Column(Integer, ForeignKey('tmdb_movies.id'), nullable=True)
@@ -124,13 +132,13 @@ class ApiTmdb(object):
             log.error('No criteria specified for tvdb lookup')
             return
         log.debug('Looking up tmdb information for %r' % {'title': title, 'tmdb_id': tmdb_id, 'imdb_id': imdb_id})
-        
+
         session = Session(expire_on_commit=False, autoflush=True)
         movie = None
-        
+
         def id_str():
             return '<title=%s,tmdb_id=%s,imdb_id=%s>' % (title, tmdb_id, imdb_id)
-        
+
         try:
             if tmdb_id:
                 movie = session.query(TMDBMovie).filter(TMDBMovie.id == tmdb_id).first()
@@ -190,7 +198,7 @@ class ApiTmdb(object):
                     return
                 else:
                     session.commit()
-            
+
             # We need to query again to force the relationships to eager load before we detach from session
             movie = session.query(TMDBMovie).options(joinedload(TMDBMovie.posters), joinedload(TMDBMovie.genres)). \
                     filter(TMDBMovie.id == movie.id).first()
@@ -203,7 +211,7 @@ class ApiTmdb(object):
 
     def get_movie_details(self, movie, session):
         """Populate details for this :movie: from TMDb"""
-        
+
         if not movie.id and movie.imdb_id:
             # If we have an imdb_id, do a lookup for tmdb id
             result = get_first_result('imdbLookup', movie.imdb_id)
@@ -250,7 +258,7 @@ def get_first_result(tmdb_function, value):
     except URLError, e:
         log.warning('Request failed %s' % url)
         return
-    
+
     result = yaml.load(data)
     # Make sure there is a valid result to return
     if isinstance(result, list) and len(result):
