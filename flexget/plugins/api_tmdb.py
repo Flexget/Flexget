@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 import logging
+from urllib2 import URLError
 import yaml
 import os
 import posixpath
@@ -154,7 +155,10 @@ class ApiTmdb(object):
                         refresh_time += timedelta(days=age_in_years * 5)
                 if movie.updated < datetime.now() - refresh_time and not only_cached:
                     log.debug('Cache has expired for %s, attempting to refresh from TMDb.' % id_str())
-                    self.get_movie_details(movie, session)
+                    try:
+                        self.get_movie_details(movie, session)
+                    except URLError:
+                        log.error('Error refreshing movie details from TMDb, cached info being used.')
                 else:
                     log.debug('Movie %s information restored from cache.' % id_str())
             else:
@@ -163,24 +167,29 @@ class ApiTmdb(object):
                     return
                 # There was no movie found in the cache, do a lookup from tmdb
                 log.debug('Movie %s not found in cache, looking up from tmdb.' % id_str())
-                if tmdb_id or imdb_id:
-                    movie = TMDBMovie()
-                    movie.id = tmdb_id
-                    movie.imdb_id = imdb_id
-                    self.get_movie_details(movie, session)
-                    if movie.name:
-                        session.add(movie)
-                elif title:
-                    result = get_first_result('search', title)
-                    if result:
-                        movie = session.query(TMDBMovie).filter(TMDBMovie.id == result['id']).first()
-                        if not movie:
-                            movie = TMDBMovie(result)
-                            self.get_movie_details(movie, session)
+                try:
+                    if tmdb_id or imdb_id:
+                        movie = TMDBMovie()
+                        movie.id = tmdb_id
+                        movie.imdb_id = imdb_id
+                        self.get_movie_details(movie, session)
+                        if movie.name:
                             session.add(movie)
-                        if title.lower() != movie.name.lower():
-                            session.add(TMDBSearchResult({'search': title, 'movie': movie}))
-            session.commit()
+                    elif title:
+                        result = get_first_result('search', title)
+                        if result:
+                            movie = session.query(TMDBMovie).filter(TMDBMovie.id == result['id']).first()
+                            if not movie:
+                                movie = TMDBMovie(result)
+                                self.get_movie_details(movie, session)
+                                session.add(movie)
+                            if title.lower() != movie.name.lower():
+                                session.add(TMDBSearchResult({'search': title, 'movie': movie}))
+                except URLError:
+                    log.error('Error looking up movie from TMDb')
+                    return
+                else:
+                    session.commit()
             
             # We need to query again to force the relationships to eager load before we detach from session
             movie = session.query(TMDBMovie).options(joinedload(TMDBMovie.posters), joinedload(TMDBMovie.genres)). \
