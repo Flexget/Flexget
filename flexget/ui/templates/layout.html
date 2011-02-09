@@ -12,6 +12,9 @@
     {% block head %}
         {# UI plugin templates can insert content here #}
     {% endblock %}
+
+    {# keep scripts after css to avoid flash of unstyled layout #}
+    <script type="text/javascript" src="{{ url_for('.static', filename='js/jquery-1.4.3.min.js') }}"></script>
 </head>
 
 <body>
@@ -76,7 +79,6 @@
 </div>
 
 {# javascripts should be positioned at the bottom of the html since they block other requests #}
-<script type="text/javascript" src="{{ url_for('.static', filename='js/jquery-1.4.3.min.js') }}"></script>
 <script type="text/javascript" src="{{ url_for('.static', filename='js/flexget.js') }}"></script>
 <script type="text/javascript" src="{{ url_for('.static', filename='js/jquery.blockUI.js') }}"></script>
 <script type="text/javascript" src="{{ url_for('.static', filename='js/jquery.tools.min.js') }}"></script>

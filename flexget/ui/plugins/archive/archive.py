@@ -48,6 +48,7 @@ def index():
 
 @archive.route('/count')
 def count():
+    log.debug('getting count for archive')
     return str(db_session.query(ArchiveEntry).count())
 
 
