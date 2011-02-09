@@ -2,7 +2,7 @@ import logging
 from copy import copy
 from datetime import datetime, timedelta
 from flexget.utils.log import log_once
-from sqlalchemy import Column, Integer, String, Unicode, DateTime, Boolean, desc
+from sqlalchemy import Column, Integer, String, Unicode, DateTime, Boolean, desc, func
 from sqlalchemy.schema import ForeignKey
 from sqlalchemy.orm import relation, join
 from flexget.event import event
@@ -103,7 +103,7 @@ class SeriesPlugin(object):
     def get_first_seen(self, session, parser):
         """Return datetime when this episode of series was first seen"""
         episode = session.query(Episode).select_from(join(Episode, Series)).\
-            filter(Series.name == parser.name.lower()).filter(Episode.identifier == parser.identifier).first()
+            filter(func.lower(Series.name) == parser.name.lower()).filter(Episode.identifier == parser.identifier).first()
         if not episode:
             log.log(5, '%s not seen, return current time' % parser)
             return datetime.now()
@@ -113,7 +113,7 @@ class SeriesPlugin(object):
         """Return latest known identifier in dict (season, episode, name) for series name"""
         episode = session.query(Episode).select_from(join(Episode, Series)).\
             filter(Episode.season != None).\
-            filter(Series.name == name.lower()).\
+            filter(func.lower(Series.name) == name.lower()).\
             order_by(desc(Episode.season)).\
             order_by(desc(Episode.number)).first()
         if not episode:
@@ -130,9 +130,9 @@ class SeriesPlugin(object):
         Returns 'ep' or 'id' if 3 of the first 5 were parsed as such. Returns 'ep' in the event of a tie.
         Returns 'auto' if there is not enough history to determine the format yet
         """
-        total = session.query(Release).join(Episode).join(Series).filter(Series.name == name.lower()).count()
+        total = session.query(Release).join(Episode).join(Series).filter(func.lower(Series.name) == name.lower()).count()
         episodic = session.query(Release).join(Episode).join(Series).\
-            filter(Series.name == name.lower()).\
+            filter(func.lower(Series.name) == name.lower()).\
             filter(Episode.season != None).\
             filter(Episode.number != None).count()
         non_episodic = total - episodic
@@ -147,7 +147,7 @@ class SeriesPlugin(object):
 
     def get_latest_download(self, session, name):
         """Return latest downloaded episode (season, episode, name) for series :name:"""
-        latest_download = session.query(Episode).join(Release, Series).filter(Series.name == name.lower()).\
+        latest_download = session.query(Episode).join(Release, Series).filter(func.lower(Series.name) == name.lower()).\
             filter(Release.downloaded == True).\
             filter(Episode.season != None).\
             filter(Episode.number != None).\
@@ -162,13 +162,13 @@ class SeriesPlugin(object):
     def get_releases(self, session, name, identifier):
         """Return all releases for series by identifier."""
         return session.query(Release).join(Episode, Series).\
-            filter(Series.name == name.lower()).\
+            filter(func.lower(Series.name) == name.lower()).\
             filter(Episode.identifier == identifier).all()
 
     def get_downloaded(self, session, name, identifier):
         """Return list of downloaded releases for this episode"""
         downloaded = session.query(Release).join(Episode, Series).\
-            filter(Series.name == name.lower()).\
+            filter(func.lower(Series.name) == name.lower()).\
             filter(Episode.identifier == identifier).\
             filter(Release.downloaded == True).all()
         if not downloaded:
@@ -178,12 +178,12 @@ class SeriesPlugin(object):
     def store(self, session, parser):
         """Push series information into database. Returns added/existing release."""
         # if series does not exist in database, add new
-        series = session.query(Series).filter(Series.name == parser.name.lower()).\
+        series = session.query(Series).filter(func.lower(Series.name) == parser.name.lower()).\
             filter(Series.id != None).first()
         if not series:
             log.debug('adding series %s into db' % parser.name)
             series = Series()
-            series.name = parser.name.lower()
+            series.name = parser.name
             session.add(series)
             log.debug('-> added %s' % series)
 
@@ -227,7 +227,7 @@ class SeriesPlugin(object):
 def forget_series(name):
     """Remove a whole series :name: from database."""
     session = Session()
-    series = session.query(Series).filter(Series.name == name.lower()).first()
+    series = session.query(Series).filter(func.lower(Series.name) == name.lower()).first()
     if series:
         session.delete(series)
         session.commit()
@@ -239,7 +239,7 @@ def forget_series(name):
 def forget_series_episode(name, identifier):
     """Remove all episodes by :identifier: from series :name: from database."""
     session = Session()
-    series = session.query(Series).filter(Series.name == name.lower()).first()
+    series = session.query(Series).filter(func.lower(Series.name) == name.lower()).first()
     if series:
         episode = session.query(Episode).filter(Episode.identifier == identifier).\
             filter(Episode.series_id == series.id).first()
@@ -486,16 +486,16 @@ class FilterSeries(SeriesPlugin, FilterSeriesBase):
                 target = guessed_series if entry.get('series_guessed') else found_series
                 target.setdefault(entry['series_name'], {}).setdefault(entry['series_id'], []).append(entry['series_parser'])
 
-        # TEMP: bugfix, convert all series to lowercase
-        for series in feed.session.query(Series).all():
-            series.name = series.name.lower()
-
         config = self.prepare_config(feed.config.get('series', {}))
 
         for series_item in config:
             series_name, series_config = series_item.items()[0]
             # yaml loads ascii only as str
             series_name = unicode(series_name)
+            # Update database with capitalization from config
+            db_series = feed.session.query(Series).filter(func.lower(Series.name) == series_name.lower()).first()
+            if db_series:
+                db_series.name = series_name
             source = guessed_series if series_config.get('series_guessed') else found_series
             # If we didn't find any episodes for this series, continue
             if not source.get(series_name):
