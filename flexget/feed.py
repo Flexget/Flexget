@@ -31,8 +31,10 @@ class Entry(dict):
         and otherwise that information would be lost.
     """
 
-    def __init__(self, *args):
+    def __init__(self, *args, **kwargs):
         self.trace = []
+        # Store kwargs into our internal dict
+        self.update(kwargs)
         if len(args) == 2:
             self['title'] = args[0]
             self['url'] = args[1]
@@ -400,14 +402,19 @@ class Feed(object):
                     return
 
     @useFeedLogging
-    def execute(self, disable_phases=None):
+    def execute(self, disable_phases=None, entries=None):
         """Execute this feed"""
 
         log.debug('executing %s' % self.name)
 
         self._reset()
+        # Handle keyword args
         if disable_phases:
             map(self.disable_phase, disable_phases)
+        if entries:
+            # If entries are passed for this execution, disable the input phase
+            self.disable_phase('input')
+            self.entries.extend(entries)
 
         # validate configuration
         errors = self.validate()
@@ -432,7 +439,7 @@ class Feed(object):
                     for plugin in plugins:
                         if plugin.name in self.config:
                             log.info('Plugin %s is not executed because %s phase is disabled' %
-                                     (plugin.name, plugin.phase))
+                                     (plugin.name, phase))
                     continue
 
                 # run all plugins with this phase

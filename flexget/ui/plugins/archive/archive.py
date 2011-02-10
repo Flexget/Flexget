@@ -32,7 +32,7 @@ def index():
         if text == '':
             flash('Empty search?', 'error')
         elif len(text) < 5:
-            flash('Too short search text, use at least 5 characters', 'error')
+            flash('Search text is too short, use at least 5 characters', 'error')
         else:
             results = search(db_session, text)
             if not results:
@@ -40,7 +40,7 @@ def index():
             else:
                 # not sure if this len check is a good idea, I think it forces to load all items from db ?
                 if len(results) > 500:
-                    flash('Too much results, displaying first 500', 'error')
+                    flash('Too many results, displaying first 500', 'error')
                     results = results[0:500]
                 context['results'] = results
     return render_template('archive/archive.html', **context)

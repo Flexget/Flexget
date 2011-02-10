@@ -455,7 +455,7 @@ class Manager(object):
                 log.exception('Feed %s process_end: %s' % (feed.name, e))
 
     @useExecLogging
-    def execute(self, feeds=None, disable_phases=None):
+    def execute(self, feeds=None, disable_phases=None, entries=None):
         """Iterate trough feeds and run them."""
         # Make a list of Feed instances to execute
         if feeds is None:
@@ -492,7 +492,7 @@ class Manager(object):
             if not feed.enabled:
                 continue
             try:
-                feed.execute(disable_phases=disable_phases)
+                feed.execute(disable_phases=disable_phases, entries=entries)
             except Exception, e:
                 feed.enabled = False
                 log.exception('Feed %s: %s' % (feed.name, e))

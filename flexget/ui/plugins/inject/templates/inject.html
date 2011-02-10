@@ -1,0 +1,18 @@
+{% extends "layout.html" %}
+{% block main %}
+    <form action="{{ url_for('do_inject') }}" method="post" class="simple">
+        <fieldset>
+            <legend>Inject Entry</legend>
+
+            <label for="title">Title</label>
+            <input type="text" name="title">
+
+            <label for="url">URL</label>
+            <input type="text" name="url">
+
+            <div class="buttons">
+                <button type="submit">Inject Entry</button>
+            </div>
+        </fieldset>
+    </form>
+{% endblock %}
