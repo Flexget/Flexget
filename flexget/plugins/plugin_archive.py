@@ -110,12 +110,8 @@ class ArchiveInject(object):
             raise PluginError('BUG: Feed disabling has failed')
 
         # disable other inputs
-        for input in get_plugins_by_phase('input'):
-            if input.name in feed.config:
-                phases = get_phases_by_plugin(input.name)
-                if len(phases) == 1:
-                    log.info('Disabling plugin %s' % input.name)
-                    del(feed.config[input.name])
+        log.info('Disabling the rest of the input phase.')
+        feed.disable_phase('input')
 
         log.info('Injecting %s' % self.inject_entry.title)
         entry = Entry(self.inject_entry.title, self.inject_entry.url)

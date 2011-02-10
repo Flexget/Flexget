@@ -28,9 +28,9 @@ class ExecThread(threading.Thread):
         from flexget.ui.webui import manager
         while True:
             kwargs = self.queue.get() or {}
-            opts = kwargs.get('options')
-            parsed_options = kwargs.get('parsed_options')
-            output = kwargs.get('output')
+            opts = kwargs.pop('options', None)
+            parsed_options = kwargs.pop('parsed_options', None)
+            output = kwargs.pop('output', None)
             if opts:
                 # make copy of original options and apply options from opts
                 old_opts = copy(manager.options)
@@ -47,7 +47,7 @@ class ExecThread(threading.Thread):
                 streamhandler.setFormatter(FlexGetFormatter())
                 logging.getLogger().addHandler(streamhandler)
             try:
-                manager.execute(feeds=kwargs.get('feeds'))
+                manager.execute(**kwargs)
             finally:
                 # Inform queue we are done processing this item.
                 self.queue.task_done()
@@ -80,6 +80,7 @@ class ExecThread(threading.Thread):
         parsed_options: Parsed OptionParser to be used for this execution
         output: a BufferQueue object that will be filled with output from the execution.
 
+        all other keyword arguments will be passed to manager.execute
         kwargs options and parsed_options are mutually exclusive
         """
 

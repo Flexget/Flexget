@@ -455,7 +455,7 @@ class Manager(object):
                 log.exception('Feed %s process_end: %s' % (feed.name, e))
 
     @useExecLogging
-    def execute(self, feeds=None):
+    def execute(self, feeds=None, disable_phases=None):
         """Iterate trough feeds and run them."""
         # Make a list of Feed instances to execute
         if feeds is None:
@@ -477,6 +477,13 @@ class Manager(object):
             log.warning('There are no feeds to execute, please add some feeds')
             return
 
+        disable_phases = disable_phases or []
+        # when learning, skip few phases
+        if self.options.learn:
+            log.info('Disabling download and output phases because of %s' %
+                     ('--reset' if self.options.reset else '--learn'))
+            disable_phases.extend(['download', 'output'])
+
         fire_event('manager.execute.started', self)
 
         self.process_start(feeds=run_feeds)
@@ -485,7 +492,7 @@ class Manager(object):
             if not feed.enabled:
                 continue
             try:
-                feed.execute()
+                feed.execute(disable_phases=disable_phases)
             except Exception, e:
                 feed.enabled = False
                 log.exception('Feed %s: %s' % (feed.name, e))

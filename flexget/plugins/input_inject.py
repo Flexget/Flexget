@@ -58,23 +58,14 @@ class InputInject(object):
             else:
                 log.critical('Unknown --inject parameter %s' % arg)
 
-    def on_feed_start(self, feed):
+    @priority(255)
+    def on_feed_input(self, feed):
         if not InputInject.options:
             return
 
         # disable other inputs
-        for input in get_plugins_by_phase('input'):
-            if input.name in feed.config:
-                phases = get_phases_by_plugin(input.name)
-                if len(phases) == 1:
-                    log.info('Disabling plugin %s' % input.name)
-                    del(feed.config[input.name])
-
-    # Make sure we inject after only_new has done it's filtering
-    @priority(100)
-    def on_feed_input(self, feed):
-        if not InputInject.options:
-            return
+        log.info('Disabling the rest of the input phase.')
+        feed.disable_phase('input')
 
         # create our injected entry
         import string

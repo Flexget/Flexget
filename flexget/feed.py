@@ -165,9 +165,9 @@ class Feed(object):
         self.rejected = [] # rejected entries
         self.failed = []   # failed entries
 
-        # TODO: feed.abort() should be done by using exception? not a flag that has to be checked everywhere
+        self.disabled_phases = []
 
-        # flags and counters
+        # TODO: feed.abort() should be done by using exception? not a flag that has to be checked everywhere
         self._abort = False
 
         # current state
@@ -206,6 +206,12 @@ class Feed(object):
         for entry in purge_what:
             if entry in purge_from:
                 purge_from.remove(entry)
+
+    def disable_phase(self, phase):
+        if phase not in FEED_PHASES:
+            raise ValueError('%s is not a valid phase' % phase)
+        log.debug('Disabling %s phase' % phase)
+        self.disabled_phases.append(phase)
 
     def accept(self, entry, reason=None):
         """Accepts this entry with optional reason."""
@@ -313,7 +319,7 @@ class Feed(object):
         entry_events = ['accept', 'reject', 'fail']
         # fail when trying to run an on_entry_* event without an entry
         if phase in entry_events and not entry:
-            raise Exception('Entry must be specified when running the %s phase' % phase)
+            raise Exception('Entry must be specified when running the %s event' % phase)
         methods = get_methods_by_phase(phase)
         # log.log(5, 'Event %s methods %s' % (event, methods))
 
@@ -327,6 +333,9 @@ class Feed(object):
                     log.warning('Feed doesn\'t have any %s plugins, you should add some!' % phase)
 
         for method in methods:
+            # Abort this phase if one of the plugins disables it
+            if phase in self.disabled_phases:
+                return
             keyword = method.plugin.name
             if keyword in self.config or method.plugin.builtin:
 
@@ -391,12 +400,14 @@ class Feed(object):
                     return
 
     @useFeedLogging
-    def execute(self):
+    def execute(self, disable_phases=None):
         """Execute this feed"""
 
         log.debug('executing %s' % self.name)
 
         self._reset()
+        if disable_phases:
+            map(self.disable_phase, disable_phases)
 
         # validate configuration
         errors = self.validate()
@@ -415,15 +426,14 @@ class Feed(object):
         try:
             # run phases
             for phase in FEED_PHASES:
-                # when learning, skip few phases
-                if self.manager.options.learn:
-                    if phase in ['download', 'output']:
-                        # log keywords not executed
-                        plugins = get_plugins_by_phase(phase)
-                        for plugin in plugins:
-                            if plugin.name in self.config:
-                                log.info('Plugin %s is not executed because of --learn / --reset' % plugin.name)
-                        continue
+                if phase in self.disabled_phases:
+                    # log keywords not executed
+                    plugins = get_plugins_by_phase(phase)
+                    for plugin in plugins:
+                        if plugin.name in self.config:
+                            log.info('Plugin %s is not executed because %s phase is disabled' %
+                                     (plugin.name, plugin.phase))
+                    continue
 
                 # run all plugins with this phase
                 self.__run_phase(phase)
