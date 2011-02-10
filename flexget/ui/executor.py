@@ -47,7 +47,7 @@ class ExecThread(threading.Thread):
                 streamhandler.setFormatter(FlexGetFormatter())
                 logging.getLogger().addHandler(streamhandler)
             try:
-                manager.execute()
+                manager.execute(feeds=kwargs.get('feeds'))
             finally:
                 # Inform queue we are done processing this item.
                 self.queue.task_done()
@@ -62,10 +62,6 @@ class ExecThread(threading.Thread):
 
     def _apply_options(self, parser, options):
         """Applies dict :options: to OptParse parser results"""
-
-        from IPython.Shell import IPShellEmbed
-        ipshell = IPShellEmbed([])
-        ipshell()
 
         for name, value in options.iteritems():
             if hasattr(parser, name):
@@ -87,9 +83,11 @@ class ExecThread(threading.Thread):
         kwargs options and parsed_options are mutually exclusive
         """
 
-        if 'options' in kwargs:
-            if not isinstance(kwargs['options'], dict):
-                raise ValueError('options should be a dict, got %s' % type(kwargs['options']))
+        if 'options' in kwargs and not isinstance(kwargs['options'], dict):
+            raise TypeError('options should be a dict, got %s' % type(kwargs['options']))
+
+        if 'feeds' in kwargs and not hasattr(kwargs['feeds'], '__iter__'):
+            raise TypeError('feeds should be iterable, got %s' % type(kwargs['feeds']))
 
         if 'options' in kwargs and 'parsed_options' in kwargs:
             raise ValueError('options and parsed_options are mutually exclusive')

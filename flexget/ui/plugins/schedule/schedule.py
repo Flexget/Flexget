@@ -44,11 +44,6 @@ class RepeatingTimer(threading.Thread):
         self.finished = threading.Event()
         self.waiting = threading.Event()
 
-    def change_interval(self, interval):
-        """Change the interval for the repeating"""
-        self.interval = interval
-        self.waiting.set()
-
     def cancel(self):
         """Stop the repeating"""
         self.finished.set()
@@ -88,6 +83,7 @@ def set_feed_interval(feed, interval):
         log.debug('Creating new %s interval' % feed)
         db_session.add(Schedule(feed, interval))
     db_session.commit()
+    stop_empty_timers()
 
 
 @schedule.context_processor
@@ -110,17 +106,17 @@ def update_interval(form, feed):
         flash('%s interval must be a number!' % feed.capitalize(), 'error')
     else:
         if interval <= 0:
-            flash('%s nterval must be greater than zero!' % feed.capitalize(), 'error')
+            flash('%s interval must be greater than zero!' % feed.capitalize(), 'error')
         else:
             unit = form[feed + '_unit']
             delta = timedelta(**{unit: interval})
             # Convert the timedelta to integer minutes
             interval = int((delta.seconds + delta.days * 24 * 3600) / 60.0)
-            if interval <= 0:
+            if interval < 1:
                 interval = 1
             log.info('new interval for %s: %d minutes' % (feed, interval))
             set_feed_interval(feed, interval)
-            start_timer(feed, interval)
+            start_timer(interval)
             flash('%s scheduling updated successfully.' % feed.capitalize(), 'success')
 
 
@@ -137,9 +133,9 @@ def index():
 
 @schedule.route('/delete/<feed>')
 def delete_schedule(feed):
-    stop_timer(feed)
     db_session.query(Schedule).filter(Schedule.feed == feed).delete()
     db_session.commit()
+    stop_empty_timers()
     return redirect(url_for('index'))
 
 
@@ -148,9 +144,9 @@ def add_schedule(feed):
     schedule = db_session.query(Schedule).filter(Schedule.feed == feed).first()
     if not schedule:
         schedule = Schedule(feed, DEFAULT_INTERVAL)
-    db_session.merge(schedule)
-    db_session.commit()
-    start_timer(feed, DEFAULT_INTERVAL)
+        db_session.add(schedule)
+        db_session.commit()
+    start_timer(DEFAULT_INTERVAL)
     return redirect(url_for('index'))
 
 
@@ -162,60 +158,69 @@ def get_scheduled_feeds():
     return [item.feed for item in db_session.query(Schedule).all()]
 
 
-def execute(feed):
+def execute(interval):
     """Adds a run to the executor"""
-    # Get a copy of the options from the manager
-    run_opts = copy(manager.options)
-    if feed == u'__DEFAULT__':
+
+    # Make a list of feeds that run on this interval
+    schedules = db_session.query(Schedule).filter(Schedule.interval == interval).all()
+    feeds = set([sch.feed for sch in schedules])
+    if u'__DEFAULT__' in feeds:
+        feeds.remove(u'__DEFAULT__')
         # Get a list of all feeds that do not have their own schedule
-        feeds = set(get_all_feeds()) - set(get_scheduled_feeds())
-        # TODO: Don't use the --feed plugin
-        # Use the --feed plugin to run only desired feeds
-        run_opts.onlyfeed = ','.join(feeds)
-        log.info('Executing feeds: %s' % ", ".join(feeds))
-    else:
-        # Only run the passed feed
-        run_opts.onlyfeed = feed
-        log.info('Executing feed: %s' % feed)
+        default_feeds = set(get_all_feeds()) - set(get_scheduled_feeds())
+        feeds.update(default_feeds)
+
+    if not feeds:
+        # No feeds scheduled to run at this interval, stop the timer
+        stop_timer(interval)
+        return
+
+    log.info('Executing feeds: %s' % ", ".join(feeds))
     fire_event('scheduler.execute')
-    executor.execute(options=run_opts)
+    executor.execute(feeds=feeds)
 
 
-def start_timer(feed, interval):
+def start_timer(interval):
     # autoreload will fail if there are pending timers
     if manager.options.autoreload:
         log.info('Aborting start_timer() because --autoreload is enabled')
         return
 
-    log.debug('Starting %s scheduler (%s minutes)' % (feed, interval))
     global timers
-    if not timers.get(feed):
-        timers[feed] = RepeatingTimer(interval * 60, execute, (feed,))
-        timers[feed].start()
-    else:
-        timers[feed].change_interval(interval * 60)
+    if not timers.get(interval):
+        log.debug('Starting scheduler (%s minutes)' % interval)
+        timers[interval] = RepeatingTimer(interval * 60, execute, (interval,))
+        timers[interval].start()
 
 
-def stop_timer(feed):
+def stop_timer(interval):
     global timers
-    if timers.get(feed):
-        timers[feed].cancel()
-        del timers[feed]
+    if timers.get(interval):
+        timers[interval].cancel()
+        del timers[interval]
+
+
+def stop_empty_timers():
+    """Stops timers that don't have any more feeds using them."""
+    current_intervals = set([i.interval for i in db_session.query(Schedule).all()])
+    for interval in timers.keys():
+        if interval not in current_intervals:
+            stop_timer(interval)
 
 
 @event('webui.start')
 def on_webui_start():
     # Start timers for all schedules
-    for item in db_session.query(Schedule):
-        start_timer(item.feed, item.interval)
+    for interval in set([item.interval for item in db_session.query(Schedule).all()]):
+        start_timer(interval)
 
 
 @event('webui.stop')
 def on_webui_stop():
     log.info('Terminating')
     # Stop all running timers
-    for feed in [f for f in timers]:
-        stop_timer(feed)
+    for interval in timers.keys():
+        stop_timer(interval)
 
 
 register_plugin(schedule, menu='Schedule')

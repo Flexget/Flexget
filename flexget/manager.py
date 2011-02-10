@@ -1,3 +1,5 @@
+from sqlalchemy.interfaces import PoolListener
+from sqlalchemy.pool import SingletonThreadPool
 import os
 import sys
 import logging
@@ -420,44 +422,66 @@ class Manager(object):
         for feed in self.feeds.itervalues():
             feed.enabled = True
 
-    def process_start(self):
-        """Execute process_start for all feeds"""
-        for name, feed in self.feeds.iteritems():
+    def process_start(self, feeds=None):
+        """Execute process_start for feeds.
+        :feeds: can be specified as a list of Feed instances, defaults to all feeds"""
+        if feeds is None:
+            feeds = self.feeds.values()
+
+        for feed in feeds:
             if not feed.enabled:
                 continue
             try:
-                log.log(5, 'calling process_start on a feed %s' % name)
+                log.log(5, 'calling process_start on a feed %s' % feed.name)
                 feed.process_start()
             except Exception, e:
                 feed.enabled = False
                 log.exception('Feed %s process_start: %s' % (feed.name, e))
 
-    def process_end(self):
+    def process_end(self, feeds=None):
         """Execute process_end for all feeds"""
-        for name, feed in self.feeds.iteritems():
+        if feeds is None:
+            feeds = self.feeds.values()
+
+        for feed in feeds:
             if not feed.enabled:
                 continue
             if feed._abort:
                 continue
             try:
-                log.log(5, 'calling process_end on a feed %s' % name)
+                log.log(5, 'calling process_end on a feed %s' % feed.name)
                 feed.process_end()
             except Exception, e:
-                log.exception('Feed %s process_end: %s' % (name, e))
+                log.exception('Feed %s process_end: %s' % (feed.name, e))
 
     @useExecLogging
-    def execute(self):
-        """Iterate trough all feeds and run them."""
+    def execute(self, feeds=None):
+        """Iterate trough feeds and run them."""
+        # Make a list of Feed instances to execute
+        if feeds is None:
+            # Default to all feeds if none are specified
+            run_feeds = self.feeds.values()
+        else:
+            # Turn the list of feed names or instances into a list of instances
+            run_feeds = []
+            for feed in feeds:
+                if isinstance(feed, basestring):
+                    if feed in self.feeds:
+                        run_feeds.append(self.feeds[feed])
+                    else:
+                        log.error('Feed `%s` does not exist.' % feed)
+                else:
+                    run_feeds.append(feed)
 
-        if not self.feeds:
+        if not run_feeds:
             log.warning('There are no feeds to execute, please add some feeds')
             return
 
         fire_event('manager.execute.started', self)
 
-        self.process_start()
+        self.process_start(feeds=run_feeds)
 
-        for feed in sorted(self.feeds.values()):
+        for feed in sorted(run_feeds):
             if not feed.enabled:
                 continue
             try:
@@ -472,7 +496,7 @@ class Manager(object):
                 print '**** Keyboard Interrupt ****'
                 return
 
-        self.process_end()
+        self.process_end(feeds=run_feeds)
 
         fire_event('manager.execute.completed', self)
 

@@ -80,12 +80,7 @@ class FlexGetBase(object):
             if hasattr(self, 'session'):
                 self.feed.session.close() # pylint: disable-msg=E0203
         self.feed = Feed(self.manager, name, config)
-        self.feed.process_start()
-        if self.feed.enabled:
-            self.feed.execute()
-        else:
-            log.debug('Feed \'%s\' has been disabled, not running' % self.feed.name)
-        self.feed.process_end()
+        self.manager.execute(feeds=[self.feed])
 
     def dump(self):
         """Helper method for debugging"""

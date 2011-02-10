@@ -31,10 +31,10 @@ class UIManager(Manager):
             newconfig.close()
             self.load_config(config_filename)
 
-    def execute(self):
+    def execute(self, feeds=None):
         # Update feed instances to match config
         self.update_feeds()
-        Manager.execute(self)
+        Manager.execute(self, feeds=feeds)
 
     def update_feeds(self):
         """Updates instances of all configured feeds from config"""
