@@ -231,7 +231,7 @@ def create_icon():
 
     hover_text = "FlexGet"
 
-    icon_file = os.path.join('flexget', 'ui', 'plugins', 'tasktray_win32', 'flexget.ico')
+    icon_file = os.path.join(os.path.dirname(__file__), 'flexget.ico')
 
     def view(sysTrayIcon):
         # View FlexGet in default web browser

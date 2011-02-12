@@ -17,7 +17,7 @@ setup(
     url='http://flexget.com',
     install_requires=['FeedParser', 'SQLAlchemy>=0.6', 'PyYAML', 'BeautifulSoup', 'html5lib>=0.11', \
                       'PyRSS2Gen', 'pynzb', 'progressbar', 'flask', 'cherrypy'],
-    packages=['flexget', 'flexget.plugins', 'flexget.utils', 'flexget.utils.titles'],
+    packages=find_packages(exclude=['tests']),
     package_data=find_package_data('flexget', package='flexget', \
                                    exclude=['FlexGet.egg-info', '*.pyc'], \
                                    only_in_packages=False), # NOTE: the exclude does not seem to work
