@@ -27,8 +27,8 @@ class ModifyExtension(object):
             ext = ext[1:]
 
         for entry in feed.entries:
-            log.debug('%s filename is %s' % (entry['title'], entry.get('filename', 'N/A')))
+            log.debug('`%s` filename is `%s`' % (entry['title'], entry.get('filename', 'N/A')))
             entry['filename'] = '%s.%s' % (entry.get('filename', entry['title']), ext)
-            log.debug('setting filename %s' % entry['filename'])
+            log.debug('filename is now `%s`' % entry['filename'])
 
 register_plugin(ModifyExtension, 'extension')
