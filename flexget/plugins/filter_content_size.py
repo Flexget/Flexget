@@ -50,11 +50,14 @@ class FilterContentSize(object):
             # download plugin has already printed a downloading message.
             if size < config.get('min', 0):
                 log_once('Entry `%s` too small, rejecting' % entry['title'], log)
-                feed.reject(entry, 'minimum size (%s MB)' % config['min'])
+                feed.reject(entry, 'minimum size %s MB, got %s MB' % (config['min'], size))
+                return True
             if size > config.get('max', maxint):
                 log_once('Entry `%s` too big, rejecting' % entry['title'], log)
-                feed.reject(entry, 'maximum size (%s MB)' % config['max'])
+                feed.reject(entry, 'maximum size %s MB, got %s MB' % (config['max'], size))
+                return True
 
+    @priority(150)
     def on_feed_filter(self, feed):
         for entry in feed.entries:
             # check cache
@@ -86,7 +89,12 @@ class FilterContentSize(object):
         for entry in feed.accepted:
             failed = False
             if 'content_size' in entry:
-                self.process_entry(feed, entry)
+                rejected = self.process_entry(feed, entry)
+                if rejected:
+                    # rerun only when in modify phase, this is when we have actually downloaded something
+                    # to determine what is the size, in filter phase previously filtered items are already
+                    # rejected, ie. this effectively affects only new items
+                    feed.rerun()
             else:
                 if config.get('strict', True):
                     failed = True

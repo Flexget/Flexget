@@ -30,17 +30,16 @@ div.movie_text {
 }
 
 div.movie_title {
-    /* fallback (Opera) */
-    background: #CCCCCC;
-    /* Mozilla: */
-    background: -moz-linear-gradient(left, #FFFFFF, #CCCCCC);
-    /* Chrome, Safari:*/
-    background: -webkit-gradient(linear, left top, right top, from(#FFFFFF), to(#CCCCCC));
-    /* MSIE */
-    filter: progid:DXImageTransform.Microsoft.Gradient(StartColorStr='#FFFFFF', EndColorStr='#CCCCCC', GradientType=1);
+    background: #EDEDED; /* old browsers */
+    background: -moz-linear-gradient(top, #CDCDCD 0%, #EDEDED 100%); /* firefox */
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#CDCDCD), color-stop(100%,#EDEDED)); /* webkit */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#CDCDCD', endColorstr='#EDEDED',GradientType=0 ); /* ie */
     width: 100%;
     position: relative;
     height: 2em;
+/*
+    border-bottom: 3px solid #0079B2;
+*/
 }
 
 div.movie_title h3 {

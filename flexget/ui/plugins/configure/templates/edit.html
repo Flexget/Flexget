@@ -55,6 +55,23 @@
     
     
     <div class="plugins">
+        
+        {% for plugin, config in config.iteritems() %}
+        
+        <div class="plugin input"> {# TODO: type! #}
+            <div class="name">
+                <span>{{ plugin }}</span>
+                <img src="{{ url_for('.static', filename='img/fatcow-icons/16x16/delete.png') }}" alt="Delete">
+            </div>
+            <div class="config">
+                {{ config }}
+            </div>
+        </div>
+        
+        {% endfor %}
+    
+        {#
+        mocks
     
         <div class="plugin input">
             <div class="name">
@@ -77,6 +94,8 @@
                 </ul>
             </div>
         </div>
+        #}
+
    </div>
         
 {% endblock %}

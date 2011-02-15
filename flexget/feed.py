@@ -118,6 +118,8 @@ def useFeedLogging(func):
 
 class Feed(object):
 
+    max_reruns = 5
+
     def __init__(self, manager, name, config):
         """Represents one feed in configuration.
 
@@ -148,13 +150,16 @@ class Feed(object):
 
         # simple persistence
         self.simple_persistence = SimplePersistence(self)
+        
+        # not to be reseted
+        self._rerun_count = 0
 
         # use reset to init variables when creating
         self._reset()
 
     def _reset(self):
         """Reset feed state"""
-        log.debug('resetting')
+        log.debug('resetting %s' % self.name)
         self.enabled = True
         self.session = None
         self.priority = 65535
@@ -171,6 +176,8 @@ class Feed(object):
 
         # TODO: feed.abort() should be done by using exception? not a flag that has to be checked everywhere
         self._abort = False
+        
+        self._rerun = False
 
         # current state
         self.current_phase = None
@@ -210,6 +217,7 @@ class Feed(object):
                 purge_from.remove(entry)
 
     def disable_phase(self, phase):
+        """Disable :phase: from execution"""
         if phase not in FEED_PHASES:
             raise ValueError('%s is not a valid phase' % phase)
         log.debug('Disabling %s phase' % phase)
@@ -400,10 +408,20 @@ class Feed(object):
                 # check for priority operations
                 if self._abort and phase != 'abort':
                     return
+                    
+    def rerun(self):
+        """Immediattely re-run the feed after execute has completed."""
+        self._rerun = True
+        log.info('Plugin %s has marked feed to be ran again after execution has completed.' % self.current_plugin)
 
     @useFeedLogging
     def execute(self, disable_phases=None, entries=None):
-        """Execute this feed"""
+        """Executes the feed.
+        
+        :disable_phases: Disable given phases during execution
+        :entries: Entries to be used in execution instead
+            of using the input. Disables input phase.
+        """
 
         log.debug('executing %s' % self.name)
 
@@ -446,6 +464,7 @@ class Feed(object):
                 self.__run_phase(phase)
 
                 # if abort flag has been set feed should be aborted now
+                # since this calls return rerun will not be done
                 if self._abort:
                     return
 
@@ -455,6 +474,17 @@ class Feed(object):
         finally:
             # this will cause database rollback on exception and feed.abort
             self.session.close()
+            
+        # rerun feed
+        if self._rerun:
+            if self._rerun_count >= self.max_reruns:
+                log.info('Feed has been rerunning already %s times, stopping for now' % self._rerun_count)
+                # reset the counter for future runs (neccessary only with webui)
+                self._rerun_count = 0
+            else:
+                log.info('Rerunning the feed')
+                self._rerun_count += 1
+                self.execute(disable_phases=disable_phases, entries=entries)
 
     def process_start(self):
         """Execute process_start phase"""

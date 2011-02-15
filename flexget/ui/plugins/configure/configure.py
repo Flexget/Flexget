@@ -101,6 +101,7 @@ def edit_text(root, name):
 @configure.route('/edit/<root>/<name>', methods=['POST', 'GET'])
 def edit(root, name):
     context = {'name': name}
+    context['config'] = manager.config[root][name]
     return render_template('configure/edit.html', **context)
 
 

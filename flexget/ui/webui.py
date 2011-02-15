@@ -126,6 +126,7 @@ def register_home(route, order=128):
 def shutdown_session(response):
     """Remove db_session after request"""
     db_session.remove()
+    log.debug('db_session removed')
     return response
 
 

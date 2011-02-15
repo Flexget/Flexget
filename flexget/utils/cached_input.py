@@ -100,9 +100,9 @@ class cached(object):
 class CacheClearer(object):
 
     def on_process_start(self, feed):
-        """Internal. Clears the input cache on every process"""
-        # as flexget runs only once process per run this is not necessary,
-        # will be needed in the future tough
+        """Internal. Clears the input cache on every process start.
+        This is neccessary for webui or otherwise it will only use cache.
+        """
         log.debug('clearing cache')
         cached.cache = {}
 
