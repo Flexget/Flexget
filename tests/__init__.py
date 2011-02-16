@@ -85,7 +85,7 @@ class FlexGetBase(object):
     def dump(self):
         """Helper method for debugging"""
         from flexget.plugins.output_dump import dump
-        from flexget.utils.tools import sanitize
+        #from flexget.utils.tools import sanitize
         # entries = sanitize(self.feed.entries)
         # accepted = sanitize(self.feed.accepted)
         # rejected = sanitize(self.feed.rejected)

@@ -55,3 +55,21 @@ class TestModifyTrackers(FlexGetBase):
         torrent = self.load_torrent('test_remove_trackers.torrent')
         assert 'http://torrent.ubuntu.com:6969/announce' not in torrent.get_multitrackers(), \
             'ubuntu tracker should have been removed'
+
+
+class TestPrivateTorrents(FlexGetBase):
+
+    __yaml__ = """
+        feeds:
+          test:
+            mock:
+              - {title: 'test_private', file: 'private.torrent'}
+              - {title: 'test_public', file: 'test.torrent'}
+            accept_all: yes
+            private_torrents: no
+    """
+    
+    def test_private_torrents(self):
+        self.execute_feed('test')
+        assert self.feed.find_entry('rejected', title='test_private'), 'did not reject private torrent'
+        assert self.feed.find_entry('accepted', title='test_public'), 'did not pass public torrent'

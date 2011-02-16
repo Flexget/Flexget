@@ -59,6 +59,10 @@ class Torrent(object):
             for item in self.content['info']['files']:
                 size += int(item['length'])
         return size
+        
+    @property
+    def private(self):
+        return self.content['info'].get('private', False)
 
     def get_multitrackers(self):
         """

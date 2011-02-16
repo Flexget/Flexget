@@ -56,6 +56,7 @@ class RemoveTrackers(object):
         trackers.accept('regexp')
         return trackers
 
+    @priority(127)
     def on_feed_modify(self, feed):
         for entry in feed.entries:
             if 'torrent' in entry:
