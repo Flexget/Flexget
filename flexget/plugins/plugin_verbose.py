@@ -13,13 +13,13 @@ class Verbose(object):
         Contains phase, plugin and reason for action.
     """
 
-    def on_entry_accept(self, feed, entry, reason):
+    def on_entry_accept(self, feed, entry, reason='', **kwargs):
         self.verbose_details(feed, 'Accepted %s' % entry['title'], reason)
 
-    def on_entry_reject(self, feed, entry, reason):
+    def on_entry_reject(self, feed, entry, reason='', **kwargs):
         self.verbose_details(feed, 'Rejected %s' % entry['title'], reason)
 
-    def on_entry_fail(self, feed, entry, reason):
+    def on_entry_fail(self, feed, entry, reason='', **kwargs):
         self.verbose_details(feed, 'Failed %s' % entry['title'], reason)
 
     def verbose_details(self, feed, msg, reason=''):

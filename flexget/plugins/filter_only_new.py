@@ -78,7 +78,7 @@ class FilterOnlyNew(object):
         # Write the new info to the db
         feed.session.merge(new_feed)
 
-    def on_entry_fail(self, feed, entry, reason):
+    def on_entry_fail(self, feed, entry, **kwargs):
         if not feed.config.get('only_new', True):
             return
         # Remove failed entry from the only_new database so that it can be retried next run

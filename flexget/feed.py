@@ -150,7 +150,7 @@ class Feed(object):
 
         # simple persistence
         self.simple_persistence = SimplePersistence(self)
-        
+
         # not to be reseted
         self._rerun_count = 0
 
@@ -176,7 +176,7 @@ class Feed(object):
 
         # TODO: feed.abort() should be done by using exception? not a flag that has to be checked everywhere
         self._abort = False
-        
+
         self._rerun = False
 
         # current state
@@ -223,7 +223,7 @@ class Feed(object):
         log.debug('Disabling %s phase' % phase)
         self.disabled_phases.append(phase)
 
-    def accept(self, entry, reason=None):
+    def accept(self, entry, reason=None, **kwargs):
         """Accepts this entry with optional reason."""
         if not isinstance(entry, Entry):
             raise Exception('Trying to accept non entry, %s' % repr(entry))
@@ -231,44 +231,33 @@ class Feed(object):
             log.debug('tried to accept rejected %s' % repr(entry))
         if entry not in self.accepted and entry not in self.rejected:
             self.accepted.append(entry)
-            # store metainfo into entry (plugin in the future?)
-            entry.pop('reason', None) # remove old reason by previous state
-            if reason:
-                entry['reason'] = reason
-            entry['accepted_by'] = self.current_plugin
             # Run on_entry_accept phase
-            self.__run_phase('accept', entry, reason)
+            self.__run_phase('accept', entry, reason=reason, **kwargs)
 
-    def reject(self, entry, reason=None):
+    def reject(self, entry, reason=None, **kwargs):
         """Reject this entry immediately and permanently with optional reason"""
         if not isinstance(entry, Entry):
             raise Exception('Trying to reject non entry, %s' % repr(entry))
         # ignore rejections on immortal entries
         if entry.get('immortal'):
-            reason_str = ''
-            if reason:
-                reason_str = '(%s)' % reason
+            reason_str = '(%s)' % reason if reason else ''
             log.info('Tried to reject immortal %s %s' % (entry['title'], reason_str))
+            self.trace(entry, 'Tried to reject immortal %s' % reason_str)
             return
 
         if not entry in self.rejected:
             self.rejected.append(entry)
             # Run on_entry_reject phase
-            self.__run_phase('reject', entry, reason)
-        # TODO: store metainfo into entry (plugin in the future? yes please)
-        entry.pop('reason', None) # remove old reason by previous state
-        if reason:
-            entry['reason'] = reason
-        entry['rejected_by'] = self.current_plugin
+            self.__run_phase('reject', entry, reason=reason, **kwargs)
 
-    def fail(self, entry, reason=None):
+    def fail(self, entry, reason=None, **kwargs):
         """Mark entry as failed."""
         log.debug('Marking entry \'%s\' as failed' % entry['title'])
         if not entry in self.failed:
             self.failed.append(entry)
             log.error('Failed %s (%s)' % (entry['title'], reason))
             # Run on_entry_fail phase
-            self.__run_phase('fail', entry=entry, reason=reason)
+            self.__run_phase('fail', entry, reason=reason, **kwargs)
 
     def trace(self, entry, message):
         """Add tracing message to entry."""
@@ -323,7 +312,7 @@ class Feed(object):
         if not self.manager.options.quiet and not self.manager.unit_test:
             logger.info(s)
 
-    def __run_phase(self, phase, entry=None, reason=None):
+    def __run_phase(self, phase, entry=None, **kwargs):
         """Execute all configured plugins in :phase:"""
         # TODO: entry events are not very elegant, refactor into real (new) events or something ...
         entry_events = ['accept', 'reject', 'fail']
@@ -359,7 +348,7 @@ class Feed(object):
                 try:
                     if phase in entry_events:
                         # Add extra parameters for the on_entry_* events
-                        method(self, entry, reason)
+                        method(self, entry, **kwargs)
                     else:
                         fire_event('feed.execute.before_plugin', self, keyword)
                         try:
@@ -408,7 +397,7 @@ class Feed(object):
                 # check for priority operations
                 if self._abort and phase != 'abort':
                     return
-                    
+
     def rerun(self):
         """Immediattely re-run the feed after execute has completed."""
         self._rerun = True
@@ -417,7 +406,7 @@ class Feed(object):
     @useFeedLogging
     def execute(self, disable_phases=None, entries=None):
         """Executes the feed.
-        
+
         :disable_phases: Disable given phases during execution
         :entries: Entries to be used in execution instead
             of using the input. Disables input phase.
@@ -474,7 +463,7 @@ class Feed(object):
         finally:
             # this will cause database rollback on exception and feed.abort
             self.session.close()
-            
+
         # rerun feed
         if self._rerun:
             if self._rerun_count >= self.max_reruns:

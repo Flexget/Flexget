@@ -81,7 +81,7 @@ class PluginFailed(object):
         session.commit()
         session.close()
 
-    def on_entry_fail(self, feed, entry, reason):
+    def on_entry_fail(self, feed, entry, **kwargs):
         self.add_failed(entry)
 
 register_plugin(PluginFailed, '--failed', builtin=True)

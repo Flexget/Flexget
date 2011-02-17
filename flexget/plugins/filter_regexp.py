@@ -129,7 +129,8 @@ class FilterRegexp(object):
             rest_method = feed.accept if config['rest'] == 'accept' else feed.reject
             for entry in rest:
                 log.debug('Rest method %s for %s' % (config['rest'], entry['title']))
-                rest_method(entry)
+                # The remember keyword causes the remember_rejected plugin to filter this next time
+                rest_method(entry, 'regexp `rest`', remember=True)
 
     def matches(self, entry, regexp, find_from=None, not_regexps=None):
         """Check if :entry: has any string fields or strings in a list field that match :regexp:.
@@ -188,7 +189,7 @@ class FilterRegexp(object):
                         log.debug('adding set: info to entry:"%s" %s' % (entry['title'], opts['set']))
                         set = get_plugin_by_name('set')
                         set.instance.modify(entry, opts['set'])
-                    method(entry, matchtext)
+                    method(entry, matchtext, remember=True)
                     # We had a match so break out of the regexp loop.
                     break
             else:
