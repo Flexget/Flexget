@@ -20,6 +20,7 @@ class FilterContentSize(object):
         return config
 
     def process_entry(self, feed, entry):
+        """Rejects this entry if it does not pass content_size requirements. Returns true if the entry was rejected."""
         config = feed.config.get('content_size', {})
         if 'content_size' in entry:
             size = entry['content_size']
@@ -42,27 +43,21 @@ class FilterContentSize(object):
             return
 
         config = feed.config.get('content_size', {})
-        rerun = False
+        num_rejected = len(feed.rejected)
         for entry in feed.accepted:
             if 'content_size' in entry:
-                rejected = self.process_entry(feed, entry)
-                if rejected:
-                    # rerun only when in modify phase, this is when we have actually downloaded something
-                    # to determine what is the size, in filter phase previously filtered items are already
-                    # rejected, ie. this effectively affects only new items
-                    rerun = True
-            else:
-                if config.get('strict', True):
-                    log.debug('Entry %s size is unknown, rejecting because of strict mode (default)' % entry['title'])
-                    log.info('No size information available for %s, rejecting' % entry['title'])
-                    if not 'file' in entry:
-                        # Don't remember this reject, maybe the file will be available next time
-                        feed.reject(entry, 'no size available, file unavailable')
-                    else:
-                        feed.reject(entry, 'no size available from downloaded file', remember=True)
-                        rerun = True
-        if rerun:
-            # If we rejected anything during modify phase, rerun the feed so alternate versions can be accepted
+                self.process_entry(feed, entry)
+            elif config.get('strict', True):
+                log.debug('Entry %s size is unknown, rejecting because of strict mode (default)' % entry['title'])
+                log.info('No size information available for %s, rejecting' % entry['title'])
+                if not 'file' in entry:
+                    feed.reject(entry, 'no size available, file unavailable', remember=True)
+                else:
+                    feed.reject(entry, 'no size available from downloaded file', remember=True)
+                    
+        if len(feed.rejected) > num_rejected:
+            # Since we are rejecting after the filter event,
+            # re-run this feed to see if there is an alternate entry to accept
             feed.rerun()
 
 
