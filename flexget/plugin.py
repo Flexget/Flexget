@@ -16,6 +16,7 @@ __all__ = ['PluginWarning', 'PluginError',
            'internet', 'priority']
 
 
+# TODO: remove
 class PluginDependencyError(Exception):
     """A plugin has requested another plugin by name, but this plugin does not exists"""
 
@@ -25,6 +26,39 @@ class PluginDependencyError(Exception):
 
     def __str__(self):
         return '%s plugin: %s' % (repr(self.value), repr(self.plugin))
+        
+
+class DependencyError(PluginDependencyError):
+    # inherited from PluginDependencyError for backwards compatibility
+    # this should replace the PluginDependencyError        
+    """Plugin depends on other plugin, but it cannot be loaded.
+    
+    Args:
+    
+    who: name of the plugin trying to do the import
+    what: name of the plugin imported
+    message: user readable error message
+    
+    All args are optional.
+    """
+
+    def __init__(self, who=None, what=None, message=None):
+        self.who = who
+        self.what = what
+        self.message = message
+    
+    # backwards compatibilities
+    @property
+    def value(self):
+        return self.what
+
+    @property
+    def plugin(self):
+        return self.who
+        
+    def __str__(self):
+        return '<DependencyError(who=%s,what=%s,message=%s)>' % \
+            (self.who, self.what, self.message)
 
 
 class RegisterException(Exception):
@@ -59,10 +93,10 @@ class PluginError(Exception):
 
 
 class internet(object):
-    """
-        @internet decorator for plugin phase methods.
-        Catches all internet related exceptions and raises PluginError with relevant message.
-        Feed handles PluginErrors by aborting the feed.
+    """@internet decorator for plugin phase methods.
+
+    Catches all internet related exceptions and raises PluginError with relevant message.
+    Feed handles PluginErrors by aborting the feed.
     """
 
     def __init__(self, logger=None):
@@ -320,7 +354,7 @@ def load_plugins_from_dir(dir):
         try:
             exec "import flexget.plugins.%s" % name in {}
         except PluginDependencyError, e:
-            log.warning('Plugin %s required: %s' % (e.plugin, e.value))
+            log.warning('Plugin %s required: %s' % (e.plugin or name, e.value or 'N/A'))
         except ImportError, e:
             log.critical('Plugin %s failed to import dependencies' % name)
             log.exception(e)
