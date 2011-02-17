@@ -15,7 +15,7 @@ class TestURLRewriters(FlexGetBase):
             mock:
               - {title: 'something', url: 'http://thepiratebay.org/tor/8492471/Test.avi'}
               - {title: 'bar', url: 'http://thepiratebay.org/search/something'}
-              - {title: 'nyaa', url: 'http://www.nyaatorrents.org/?page=torrentinfo&tid=12345'}
+              - {title: 'nyaa', url: 'http://www.nyaa.eu/?page=torrentinfo&tid=12345'}
               - {title: 'isohunt search', url: 'http://isohunt.com/torrents/?ihq=Query.Here'}
               - {title: 'isohunt direct', url: 'http://isohunt.com/torrent_details/123456789/Name.Here'}
     """
@@ -42,11 +42,11 @@ class TestURLRewriters(FlexGetBase):
 
     def test_nyaa_torrents(self):
         entry = self.feed.entries[2]
-        urlrewriter = self.get_urlrewriter('nyaatorrents')
-        assert entry['url'] == 'http://www.nyaatorrents.org/?page=torrentinfo&tid=12345'
+        urlrewriter = self.get_urlrewriter('nyaa')
+        assert entry['url'] == 'http://www.nyaa.eu/?page=torrentinfo&tid=12345'
         assert_true(urlrewriter.url_rewritable(self.feed, entry))
         urlrewriter.url_rewrite(self.feed, entry)
-        assert entry['url'] == 'http://www.nyaatorrents.org/?page=download&tid=12345'
+        assert entry['url'] == 'http://www.nyaa.eu/?page=download&tid=12345'
 
     def test_isohunt(self):
         entry = self.feed.find_entry(title='isohunt search')
