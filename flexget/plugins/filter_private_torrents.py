@@ -41,14 +41,10 @@ class FilterPrivateTorrents(object):
             
             
             if not private_torrents and private:
-                feed.reject(entry, 'torrent is marked as private')
+                feed.reject(entry, 'torrent is marked as private', remember=True)
                 rejected = True
             if private_torrents and not private:
-                feed.reject(entry, 'public torrent')
+                feed.reject(entry, 'public torrent', remember=True)
                 rejected = True
-                
-        # TODO: need some way to reject this in rerun ...
-        # if rejected:
-        #    feed.rerun()
         
 register_plugin(FilterPrivateTorrents, 'private_torrents')

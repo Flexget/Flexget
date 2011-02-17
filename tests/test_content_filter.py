@@ -49,7 +49,7 @@ class TestContentFilter(FlexGetBase):
               - {title: 'test', url: 'http://localhost/', file: 'test.torrent'}
             accept_all: yes
             content_filter:
-              reject: '*.iso'
+              reject: ['*.iso']
     """
 
     @with_filecopy('test.torrent', 'test_reject1.torrent')
@@ -90,11 +90,11 @@ class TestContentFilter(FlexGetBase):
     def test_cache(self):
         """Content Size: caching"""
         self.execute_feed('test_cache')
-        assert self.feed.find_entry('rejected', title='test'), \
+        
+        assert self.feed.find_entry('rejected', title='test', rejected_by='content_filter'), \
             'should have rejected, contains *.iso'
 
-        # Remove the torrent from the mock entry and make sure it is still rejected
-        del self.manager.config['feeds']['test_cache']['mock'][0]['file']
+        # Test that remember_rejected rejects the entry before us next time
         self.execute_feed('test_cache')
-        assert self.feed.find_entry('rejected', title='test'), \
+        assert self.feed.find_entry('rejected', title='test', rejected_by='remember_rejected'), \
             'should have rejected, content files present from the cache'

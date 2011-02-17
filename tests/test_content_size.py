@@ -63,10 +63,9 @@ class TestTorrentSize(FlexGetBase):
         assert self.feed.find_entry('rejected', title='test'), \
             'should have rejected, too small'
 
-        # Remove the torrent from the mock entry and make sure it is still rejected
-        del self.manager.config['feeds']['test_cache']['mock'][0]['file']
+        # Make sure remember_rejected rejects on the second execution
         self.execute_feed('test_cache')
-        assert self.feed.find_entry('rejected', title='test'), \
+        assert self.feed.find_entry('rejected', title='test', rejected_by='remember_rejected'), \
             'should have rejected, size present from the cache'
 
 

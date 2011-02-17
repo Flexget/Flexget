@@ -11,39 +11,6 @@ from sqlalchemy.schema import ForeignKey
 log = logging.getLogger('content_filter')
 
 
-class CFEntry(Base):
-
-    __tablename__ = 'content_filter'
-
-    id = Column(Integer, primary_key=True)
-    title = Column(Unicode)
-    url = Column(Unicode)
-    feed = Column(Unicode)
-    added = Column(DateTime)
-    files = relation('CFFile', backref='entry', cascade='all, delete, delete-orphan')
-
-    def __init__(self):
-        self.added = datetime.now()
-
-    def __str__(self):
-        return '<CFEntry(title=%s,feed=%s,url=%s,added=%s)>' % (self.title, self.feed, self.url, \
-            self.added)
-
-    __repr__ = __str__
-
-
-class CFFile(Base):
-
-    __tablename__ = 'content_filter_files'
-
-    id = Column(Integer, primary_key=True)
-    entry_id = Column(Integer, ForeignKey('content_filter.id'), nullable=False)
-    name = Column(Unicode)
-
-    def __init__(self, name):
-        self.name = name
-
-
 class FilterContentFilter(object):
     """
     Rejects entries based on the filenames in the content. Torrent files only right now.
@@ -92,35 +59,12 @@ class FilterContentFilter(object):
             if config.get('require'):
                 if not matching_mask(files, config['require']):
                     log_once('Entry %s does not have any of the required filetypes, rejecting' % entry['title'], log)
-                    feed.reject(entry, 'does not have any of the required filetypes')
+                    feed.reject(entry, 'does not have any of the required filetypes', remember=True)
             if config.get('reject'):
                 mask = matching_mask(files, config['reject'])
                 if mask:
                     log_once('Entry %s has banned file %s, rejecting' % (entry['title'], mask), log)
-                    feed.reject(entry, 'has banned file %s' % mask)
-
-    def on_feed_filter(self, feed):
-        config = self.get_config(feed)
-        for entry in feed.entries:
-            # check cache
-            cached = feed.session.query(CFEntry).\
-                filter(CFEntry.feed == feed.name).\
-                filter(CFEntry.title == entry['title']).\
-                filter(CFEntry.url == entry['url']).first()
-            if cached:
-                if not cached.files:
-                    if config.get('strict'):
-                        # if no files were parsed and we are in strict mode, reject
-                        feed.reject(entry, 'no content files parsed for entry')
-                else:
-                    # set files from cache, maybe configuration has changed to allow it ...
-                    if not 'content_files' in entry:
-                        entry['content_files'] = [item.name for item in cached.files]
-                        log.debug('set content_files from cache (%s)' % entry['content_files'])
-            else:
-                log.log(5, 'no hit from cache (%s)' % entry['title'])
-
-            self.process_entry(feed, entry)
+                    feed.reject(entry, 'has banned file %s' % mask, remember=True)
 
     def parse_torrent_files(self, entry):
         if 'torrent' in entry:
@@ -141,17 +85,6 @@ class FilterContentFilter(object):
             self.parse_torrent_files(entry)
             self.process_entry(feed, entry)
             if not 'content_files' in entry and config.get('strict'):
-                feed.reject(entry, 'no content files parsed for entry')
-            if entry in feed.rejected:
-                # record this in database that it can be rejected at filter phase next time
-                cf = CFEntry()
-                cf.title = entry['title']
-                cf.url = entry['url']
-                cf.feed = feed.name
-                feed.session.add(cf)
-                if 'content_files' in entry:
-                    for file in entry['content_files']:
-                        cf.files.append(CFFile(file))
-                log.log(5, 'caching %s' % cf)
+                feed.reject(entry, 'no content files parsed for entry', remember=True)
 
 register_plugin(FilterContentFilter, 'content_filter')
