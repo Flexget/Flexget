@@ -40,6 +40,14 @@ class ChangeWarn(object):
         found_deprecated = False
         config = feed.manager.config
 
+        if 'imdb_queue_input' in feed.config:
+            log.critical('imdb_queue_input was renamed to emit_imdb_queue')
+            found_deprecated = True
+
+        if 'transmissionrpc' in feed.config:
+            log.critical('transmissionrpc was renamed to transmission')
+            found_deprecated = True
+
         if 'torrent_size' in feed.config:
             log.critical('Plugin torrent_size is deprecated, use content_size instead')
             found_deprecated = True
