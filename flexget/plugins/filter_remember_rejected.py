@@ -40,7 +40,7 @@ class FilterRememberRejected(object):
         feed.reject(entry, 'message', remember=True)
     """
 
-    # This runs at the beginning of metainfo event to avoid re-parsing metainfo for entries that will be rejected
+    # This runs at the beginning of metainfo phase to avoid re-parsing metainfo for entries that will be rejected
     @priority(255)
     def on_feed_metainfo(self, feed):
         """Purge remembered entries if the config has changed and write new hash"""
