@@ -4,6 +4,7 @@ from flexget.plugin import *
 
 log = logging.getLogger('headers')
 
+
 class HTTPHeadersProcessor(urllib2.BaseHandler):
 
     # run first
@@ -25,20 +26,21 @@ class HTTPHeadersProcessor(urllib2.BaseHandler):
     https_request = http_request
     https_response = http_response
 
+
 class PluginHeaders:
-    """
-        Allow setting up any headers in all requests (which use urllib2)
+    """Allow setting up any headers in all requests (which use urllib2)
         
-        Example:
-        
-        headers:
-          cookie: uid=<YOUR UID>; pass=<YOUR PASS>
+    Example:
+
+    headers:
+      cookie: uid=<YOUR UID>; pass=<YOUR PASS>
     """
+
     def validator(self):
         from flexget import validator
         config = validator.factory('dict')
         config.accept_any_key('text')
-        config.accept_any_key('number')
+        config.accept_any_key('integer')
         return config
 
     def on_feed_start(self, feed):

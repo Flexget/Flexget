@@ -66,10 +66,10 @@ class FilterImdb(object):
         """Validate given configuration"""
         from flexget import validator
         imdb = validator.factory('dict')
-        imdb.accept('number', key='min_year')
-        imdb.accept('number', key='max_year')
-        imdb.accept('number', key='min_votes')
-        imdb.accept('decimal', key='min_score')
+        imdb.accept('integer', key='min_year')
+        imdb.accept('integer', key='max_year')
+        imdb.accept('integer', key='min_votes')
+        imdb.accept('number', key='min_score')
         imdb.accept('list', key='reject_genres').accept('text')
         imdb.accept('list', key='reject_languages').accept('text')
         imdb.accept('list', key='accept_languages').accept('text')

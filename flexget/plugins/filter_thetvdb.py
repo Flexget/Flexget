@@ -98,10 +98,10 @@ class FilterTvdb(object):
         """Validate given configuration"""
         from flexget import validator
         thetvdb = validator.factory('dict')
-        thetvdb.accept('decimal', key='min_series_rating')
-        thetvdb.accept('decimal', key='min_episode_rating')
-        thetvdb.accept('number', key='min_episode_air_year')
-        thetvdb.accept('number', key='max_episode_air_year')
+        thetvdb.accept('number', key='min_series_rating')
+        thetvdb.accept('number', key='min_episode_rating')
+        thetvdb.accept('integer', key='min_episode_air_year')
+        thetvdb.accept('integer', key='max_episode_air_year')
         thetvdb.accept('number', key='min_episode_runtime')
         thetvdb.accept('number', key='max_episode_runtime')
         thetvdb.accept('list', key='reject_content_rating').accept('text')

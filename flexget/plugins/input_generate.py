@@ -10,7 +10,7 @@ class InputGenerate(object):
 
     def validator(self):
         from flexget import validator
-        return validator.factory('number')
+        return validator.factory('integer')
 
     def on_feed_input(self, feed):
         amount = feed.config.get('generate', 0)

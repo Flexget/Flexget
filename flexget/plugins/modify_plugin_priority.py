@@ -19,7 +19,7 @@ class PluginPriority(object):
     def validator(self):
         from flexget import validator
         config = validator.factory('dict')
-        config.accept_any_key('number')
+        config.accept_any_key('integer')
         return config
 
     def __init__(self):

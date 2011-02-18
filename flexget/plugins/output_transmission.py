@@ -61,7 +61,7 @@ class PluginTransmission(object):
         root.accept('boolean')
         advanced = root.accept('dict')
         advanced.accept('text', key='host')
-        advanced.accept('number', key='port')
+        advanced.accept('integer', key='port')
         # note that password is optional in transmission
         advanced.accept('file', key='netrc')
         advanced.accept('text', key='username')
@@ -69,11 +69,11 @@ class PluginTransmission(object):
         advanced.accept('path', key='path', allow_replacement=True)
         advanced.accept('boolean', key='addpaused')
         advanced.accept('boolean', key='honourlimits')
-        advanced.accept('number', key='bandwidthpriority')
-        advanced.accept('number', key='maxconnections')
+        advanced.accept('integer', key='bandwidthpriority')
+        advanced.accept('integer', key='maxconnections')
         advanced.accept('number', key='maxupspeed')
         advanced.accept('number', key='maxdownspeed')
-        advanced.accept('decimal', key='ratio')
+        advanced.accept('number', key='ratio')
         advanced.accept('boolean', key='enabled')
         advanced.accept('boolean', key='removewhendone')
         return root
@@ -102,11 +102,11 @@ class PluginTransmission(object):
         set_plugin.instance.register_keys({'path': 'text',
                                            'addpaused': 'boolean',
                                            'honourlimits': 'boolean',
-                                           'bandwidthpriority': 'number',
-                                           'maxconnections': 'number',
+                                           'bandwidthpriority': 'integer',
+                                           'maxconnections': 'integer',
                                            'maxupspeed': 'number',
                                            'maxdownspeed': 'number',
-                                           'ratio': 'decimal'})
+                                           'ratio': 'number'})
         config = self.get_config(feed)
         if config['enabled']:
             if feed.manager.options.test:

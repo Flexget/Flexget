@@ -24,7 +24,7 @@ class FilterLimitNew(object):
 
     def validator(self):
         from flexget import validator
-        return validator.factory('number')
+        return validator.factory('integer')
 
     def on_process_start(self, feed):
         try:
@@ -56,6 +56,6 @@ class FilterLimitNew(object):
                 passed.append(entry)
                 feed.verbose_progress('Allowed %s (%s)' % (entry['title'], entry['url']))
             i += 1
-        log.debug('Rejected: %s Passed: %s' % (rejected, len(passed)))
+        log.debug('Rejected: %s Allowed: %s' % (rejected, len(passed)))
 
 register_plugin(FilterLimitNew, 'limit_new')

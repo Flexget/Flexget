@@ -115,8 +115,8 @@ class OutputRSS(object):
         root.accept('text') # TODO: path / file
         rss = root.accept('dict')
         rss.accept('text', key='file', required=True)
-        rss.accept('number', key='days')
-        rss.accept('number', key='items')
+        rss.accept('integer', key='days')
+        rss.accept('integer', key='items')
         rss.accept('boolean', key='history')
         rss.accept('text', key='rsslink')
         rss.accept('text', key='encoding') # TODO: only valid choices

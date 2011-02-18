@@ -95,7 +95,7 @@ class OutputEmail(object):
         email.accept('list', key='to', required=True).accept('text')
         email.accept('text', key='from', required=True)
         email.accept('text', key='smtp_host')
-        email.accept('number', key='smtp_port')
+        email.accept('integer', key='smtp_port')
         email.accept('boolean', key='smtp_login')
         email.accept('text', key='smtp_username')
         email.accept('text', key='smtp_password')

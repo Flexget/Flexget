@@ -28,7 +28,7 @@ class OutputProwl(object):
         config.accept('text', key='apikey', required=True)
         config.accept('text', key='application')
         config.accept('text', key='event')
-        config.accept('number', key='priority')
+        config.accept('integer', key='priority')
         return config
 
     def on_process_start(self, feed):
@@ -37,7 +37,7 @@ class OutputProwl(object):
         """ 
         set_plugin = get_plugin_by_name('set') 
         set_plugin.instance.register_keys({'apikey': 'text', 'application': 'text', \
-                                           'event': 'text', 'priority': 'number'})
+                                           'event': 'text', 'priority': 'integer'})
 
     def get_config(self, feed):
         config = feed.config.get('prowl', {})

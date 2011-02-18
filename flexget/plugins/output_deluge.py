@@ -21,7 +21,7 @@ class OutputDeluge(object):
         root.accept('boolean')
         deluge = root.accept('dict')
         deluge.accept('text', key='host')
-        deluge.accept('number', key='port')
+        deluge.accept('integer', key='port')
         deluge.accept('text', key='user')
         deluge.accept('text', key='pass')
         deluge.accept('path', key='path', allow_replacement=True)
@@ -29,11 +29,11 @@ class OutputDeluge(object):
         deluge.accept('text', key='label')
         deluge.accept('boolean', key='queuetotop')
         deluge.accept('boolean', key='automanaged')
-        deluge.accept('decimal', key='maxupspeed')
-        deluge.accept('decimal', key='maxdownspeed')
-        deluge.accept('number', key='maxconnections')
-        deluge.accept('number', key='maxupslots')
-        deluge.accept('decimal', key='ratio')
+        deluge.accept('number', key='maxupspeed')
+        deluge.accept('number', key='maxdownspeed')
+        deluge.accept('integer', key='maxconnections')
+        deluge.accept('integer', key='maxupslots')
+        deluge.accept('number', key='ratio')
         deluge.accept('boolean', key='removeatratio')
         deluge.accept('boolean', key='addpaused')
         deluge.accept('boolean', key='compact')
@@ -73,8 +73,8 @@ class OutputDeluge(object):
         set_plugin = get_plugin_by_name('set')
         set_plugin.instance.register_keys({'path': 'text', 'movedone': 'text', \
             'queuetotop': 'boolean', 'label': 'text', 'automanaged': 'boolean', \
-            'maxupspeed': 'decimal', 'maxdownspeed': 'decimal', 'maxupslots': 'number', \
-            'maxconnections': 'number', 'ratio': 'decimal', 'removeatratio': 'boolean', \
+            'maxupspeed': 'number', 'maxdownspeed': 'number', 'maxupslots': 'integer', \
+            'maxconnections': 'integer', 'ratio': 'number', 'removeatratio': 'boolean', \
             'addpaused': 'boolean', 'compact': 'boolean', 'content_filename': 'text', 'main_file_only': 'boolean'})
         if self.deluge12 is None:
             logger = log.info if feed.manager.options.test else log.debug

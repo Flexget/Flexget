@@ -292,8 +292,8 @@ class FilterSeriesBase(object):
         options.accept('boolean', key='exact')
         # watched
         watched = options.accept('dict', key='watched')
-        watched.accept('number', key='season')
-        watched.accept('number', key='episode')
+        watched.accept('integer', key='season')
+        watched.accept('integer', key='episode')
         # from group
         options.accept('text', key='from_group')
         options.accept('list', key='from_group').accept('text')

@@ -84,7 +84,7 @@ class ModuleThetvdbLookup(object):
             Register the usable set: keywords.
         """
         set_plugin = get_plugin_by_name('set')
-        set_plugin.instance.register_key('thetvdb_id', 'number')
+        set_plugin.instance.register_key('thetvdb_id', 'integer')
 
     @priority(100)
     def on_feed_filter(self, feed):

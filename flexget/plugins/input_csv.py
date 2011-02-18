@@ -37,7 +37,7 @@ class InputCSV(object):
         config = validator.factory('dict')
         config.accept('url', key='url', required=True)
         values = config.accept('dict', key='values', required=True)
-        values.accept_any_key('number')
+        values.accept_any_key('integer')
         return config
 
     @cached('csv', 'url')

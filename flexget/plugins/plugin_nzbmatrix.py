@@ -19,19 +19,19 @@ class NzbMatrix:
         from flexget import validator
         root = validator.factory('dict')
         nzbmatrix = root.accept('dict', key='nzbmatrix')
-        nzbmatrix.accept('number', key='catid')
-        nzbmatrix.accept('number', key='num')
-        nzbmatrix.accept('number', key='age')
+        nzbmatrix.accept('integer', key='catid')
+        nzbmatrix.accept('integer', key='num')
+        nzbmatrix.accept('integer', key='age')
         nzbmatrix.accept('choice', key='region').accept_choices(
             ['1', '2', '3', 'PAL', 'NTSC', 'FREE'], ignore_case=True)
         nzbmatrix.accept('text', key='group')
         nzbmatrix.accept('text', key='username', required=True)
         nzbmatrix.accept('text', key='apikey', required=True)
-        nzbmatrix.accept('number', key='larger')
-        nzbmatrix.accept('number', key='smaller')
-        nzbmatrix.accept('number', key='minhits')
-        nzbmatrix.accept('number', key='maxhits')
-        nzbmatrix.accept('number', key='maxage')
+        nzbmatrix.accept('integer', key='larger')
+        nzbmatrix.accept('integer', key='smaller')
+        nzbmatrix.accept('integer', key='minhits')
+        nzbmatrix.accept('integer', key='maxhits')
+        nzbmatrix.accept('integer', key='maxage')
         nzbmatrix.accept('boolean', key='englishonly')
         # TODO: I should overwrite this below. If there's an IMDB ID, I should 
         # search on it via weblink

@@ -64,9 +64,9 @@ class Validator(object):
             self.validators = {}
 
             # register default validators
-            register = [RootValidator, ListValidator, DictValidator, TextValidator, FileValidator,
-                        PathValidator, AnyValidator, NumberValidator, BooleanValidator, RegexpMatchValidator,
-                        DecimalValidator, UrlValidator, RegexpValidator, EqualsValidator, ChoiceValidator]
+            register = [RootValidator, ListValidator, DictValidator, TextValidator, FileValidator, PathValidator,
+                        AnyValidator, NumberValidator, IntegerValidator, DecimalValidator, BooleanValidator,
+                        RegexpMatchValidator, UrlValidator, RegexpValidator, EqualsValidator, ChoiceValidator]
             for v in register:
                 self.register(v)
         else:
@@ -226,28 +226,28 @@ class NumberValidator(Validator):
         pass
 
     def validateable(self, data):
-        return isinstance(data, int)
+        return isinstance(data, (int, float))
 
     def validate(self, data):
-        valid = isinstance(data, int)
+        valid = isinstance(data, (int, float))
         if not valid:
             self.errors.add('value %s is not valid number' % data)
         return valid
 
 
-class BooleanValidator(Validator):
-    name = 'boolean'
+class IntegerValidator(Validator):
+    name = 'integer'
 
     def accept(self, name, **kwargs):
         pass
 
     def validateable(self, data):
-        return isinstance(data, bool)
+        return isinstance(data, int)
 
     def validate(self, data):
-        valid = isinstance(data, bool)
+        valid = isinstance(data, int)
         if not valid:
-            self.errors.add('value %s is not valid boolean' % data)
+            self.errors.add('value %s is not valid integer' % data)
         return valid
 
 
@@ -264,6 +264,22 @@ class DecimalValidator(Validator):
         valid = isinstance(data, float)
         if not valid:
             self.errors.add('value %s is not valid decimal number' % data)
+        return valid
+
+
+class BooleanValidator(Validator):
+    name = 'boolean'
+
+    def accept(self, name, **kwargs):
+        pass
+
+    def validateable(self, data):
+        return isinstance(data, bool)
+
+    def validate(self, data):
+        valid = isinstance(data, bool)
+        if not valid:
+            self.errors.add('value %s is not valid boolean' % data)
         return valid
 
 

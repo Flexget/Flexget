@@ -61,8 +61,8 @@ class Subtitles(object):
         subs = validator.factory('dict')
         langs = subs.accept('list', key='languages')
         langs.accept('text')
-        subs.accept('decimal', key='min_sub_rating')
-        subs.accept('decimal', key='match_limit')
+        subs.accept('number', key='min_sub_rating')
+        subs.accept('number', key='match_limit')
         subs.accept('path', key='output')
         return subs
 

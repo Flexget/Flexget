@@ -1,19 +1,16 @@
 import logging
-from flexget.plugin import plugins, FEED_PHASES, PHASE_METHODS
-from flexget.plugin import *
+from flexget.plugin import register_plugin
 
 log = logging.getLogger('priority')
 
 
 class FeedPriority(object):
 
-    """
-        Set feed priorities
-    """
+    """Set feed priorities"""
 
     def validator(self):
         from flexget import validator
-        return validator.factory('number')
+        return validator.factory('integer')
 
     def on_process_start(self, feed):
         feed.priority = feed.config.get('priority', 0)
