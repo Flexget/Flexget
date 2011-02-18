@@ -25,9 +25,11 @@ class PluginFreeSpace(object):
         root = validator.factory()
         # Allow just the free space at the root
         root.accept('decimal')
+        root.accept('number')
         # Also allow a dict with path and free space
         advanced = root.accept('dict')
         advanced.accept('decimal', key='space', required=True)
+        advanced.accept('number', key='space')
         advanced.accept('path', key='path')
         return root
 
