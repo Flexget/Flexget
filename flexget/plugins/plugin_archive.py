@@ -70,62 +70,82 @@ class ArchiveSearch(object):
 
 @event('manager.execute.started')
 def reset_archive_inject(manager):
-    log.debug('reseting complaint flag')
-    ArchiveInject.inject_entry = None
+    log.debug('reseting injection')
+    ArchiveInject.inject_entries = []
 
 
 class ArchiveInject(object):
 
-    inject_entry = None
+    inject_entries = []
 
     @priority(512)
     def on_process_start(self, feed):
-        inject_id = feed.manager.options.archive_inject_id
-        if not inject_id:
+        inject_ids = feed.manager.options.archive_inject_id
+        if not inject_ids:
             return
 
-        # get the entry to be injected
-        if not self.inject_entry:
+        # get the entries to be injected
+        if not self.inject_entries:
             session = Session()
             try:
-                self.inject_entry = session.query(ArchiveEntry).filter(ArchiveEntry.id == inject_id).first()
-                if not self.inject_entry:
-                    raise PluginError('There\'s no archive with ID `%s`' % inject_id)
+                for id_str in inject_ids.split(','):
+                    try:
+                        id = int(id_str.strip())
+                    except ValueError:
+                        raise PluginError('Given ID `%s` is not a valid number' % id_str.strip())
+                    archive_entry = session.query(ArchiveEntry).filter(ArchiveEntry.id == id).first()
+                    
+                    # not found
+                    if not archive_entry:
+                        log.critical('There\'s no archive with ID `%s`' % id)
+                        continue
+                        
+                    # feed no longer exists
+                    if archive_entry.feed not in feed.manager.feeds:
+                        log.critical('Feed `%s` does not seem to exists anymore, cannot inject from archive' % archive_entry.feed)
+                        continue
+                                    
+                    self.inject_entries.append(archive_entry)
             finally:
                 session.close()
-
-            if self.inject_entry.feed not in feed.manager.feeds:
-                log.critical('Feed `%s` does not seem to exists anymore, cannot inject from archive' % self.inject_entry.feed)
-
-        if feed.name != self.inject_entry.feed:
+                
+        # if this feed is not going to be injected into, abort it
+        injecting_into = [x.feed for x in self.inject_entries]
+        log.debug('injecting_into=%s' % injecting_into)
+        if feed.name not in injecting_into:
+            log.debug('not injecting to %s, aborting, disabling' % feed.name)
             feed.enabled = False
             feed.abort(silent=True)
+        else:
+            log.debug('injecting to %s, keeping it' % feed.name)
 
     @priority(255)
     def on_feed_input(self, feed):
         if not feed.manager.options.archive_inject_id:
             return
 
-        if self.inject_entry.feed != feed.name:
-            raise PluginError('BUG: Feed disabling has failed')
-
         # disable other inputs
-        log.info('Disabling the rest of the input phase.')
+        log.info('Disabling all other inputs in the feed.')
         feed.disable_phase('input')
 
-        log.info('Injecting %s' % self.inject_entry.title)
-        entry = Entry(self.inject_entry.title, self.inject_entry.url)
-        if self.inject_entry.description:
-            entry['description'] = self.inject_entry.description
-        if feed.manager.options.archive_inject_immortal:
-            log.debug('Injecting as immortal')
-            entry['immortal'] = True
-        feed.entries.append(entry)
-        feed.accept(entry, '--archive-inject')
+        for inject_entry in self.inject_entries:
+            if inject_entry.feed != feed.name:
+                # wrong feed, continue to next item
+                continue
+            log.info('Injecting from archive `%s`' % inject_entry.title)
+            entry = Entry(inject_entry.title, inject_entry.url)
+            if inject_entry.description:
+                entry['description'] = inject_entry.description
+            if feed.manager.options.archive_inject_immortal:
+                log.debug('Injecting as immortal')
+                entry['immortal'] = True
+            feed.entries.append(entry)
+            feed.accept(entry, '--archive-inject')
 
 
 class Archive(object):
     """
+    Archives all seen items into database where they can be later searched and injected.
     """
 
     def validator(self):
@@ -139,7 +159,7 @@ class Archive(object):
             if feed.session.query(ArchiveEntry).\
                filter(ArchiveEntry.title == entry['title']).\
                filter(ArchiveEntry.feed == feed.name).first():
-                log.debug('Entry %s already archived' % entry['title'])
+                log.debug('Entry `%s` already archived' % entry['title'])
                 continue
             ae = ArchiveEntry()
             ae.title = entry['title']
@@ -147,22 +167,19 @@ class Archive(object):
             if 'description' in entry:
                 ae.description = entry['description']
             ae.feed = feed.name
-            log.debug('Adding %s to archive' % ae)
+            log.debug('Adding `%s` to archive' % ae)
             feed.session.add(ae)
 
 
 def archive_inject(option, opt, value, parser):
-    import sys
-
+    """Option parser function"""
+    
     if not parser.rargs:
         print 'Usage: --archive-inject ID [IMMORTAL]'
+        import sys
         sys.exit(1)
 
-    try:
-        parser.values.archive_inject_id = int(parser.rargs[0])
-    except:
-        print 'Value %s is not valid ID' % parser.rargs[0]
-        sys.exit(1)
+    parser.values.archive_inject_id = parser.rargs[0]
 
     if len(parser.rargs) >= 2:
         from flexget.utils.tools import str_to_boolean
@@ -176,7 +193,8 @@ register_plugin(ArchiveInject, '--archive-inject', builtin=True)
 register_parser_option('--archive-search', action='store', dest='archive_search', default=False,
                        metavar='TXT', help='Search from the archive.')
 register_parser_option('--archive-inject', action='callback', callback=archive_inject,
-                       metavar='ID', help='Inject entry from the archive into a feed where it was archived from. Usage: ID [IMMORTAL]')
+                       metavar='ID(s)', 
+                       help='Inject entries from the archive into a feed where it was archived from. Usage: ID[,ID] [FORCE]')
 
 # kludge to make these option keys available always, even when not using archive_inject callback
 register_parser_option('--archive-inject-id', action='store', dest='archive_inject_id', default=False,

@@ -424,7 +424,11 @@ class Manager(object):
 
     def process_start(self, feeds=None):
         """Execute process_start for feeds.
-        :feeds: can be specified as a list of Feed instances, defaults to all feeds"""
+        
+        Args:
+        
+        :feeds: can be specified as a list of Feed instances, defaults to all feeds
+        """
         if feeds is None:
             feeds = self.feeds.values()
 
@@ -439,7 +443,11 @@ class Manager(object):
                 log.exception('Feed %s process_start: %s' % (feed.name, e))
 
     def process_end(self, feeds=None):
-        """Execute process_end for all feeds"""
+        """Execute process_end for all feeds.
+        Args:
+        
+        :feeds: can be specified as a list of Feed instances, defaults to all feeds
+        """
         if feeds is None:
             feeds = self.feeds.values()
 
