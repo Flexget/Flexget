@@ -1,5 +1,5 @@
 from sqlalchemy.orm import join
-from sqlalchemy import desc
+from sqlalchemy import desc, func
 from flexget.plugin import register_plugin, register_parser_option, PluginDependencyError
 
 try:
@@ -31,15 +31,15 @@ class SeriesReport(SeriesPlugin):
                 self.display_details()
 
     def display_details(self):
-        """Display detailed series information"""
+        """Display detailed series information, ie. --series NAME"""
         
         from flexget.manager import Session
         session = Session()
 
         name = unicode(self.options['name'].lower())
-        series = session.query(Series).filter(Series.name == name.lower()).first()
+        series = session.query(Series).filter(func.lower(Series.name) == name.lower()).first()
         if not series:
-            print 'Unknown series %s' % name
+            print 'Unknown series `%s`' % name
             return
 
         print ' %-63s%-15s' % ('Identifier, Title', 'Quality')
@@ -73,7 +73,7 @@ class SeriesReport(SeriesPlugin):
         session.close()
 
     def display_summary(self):
-        """Display series summary"""
+        """Display series summary. ie --series"""
         
         print ' %-30s%-20s%-21s' % ('Name', 'Latest', 'Status')
         print '-' * 79
@@ -85,13 +85,16 @@ class SeriesReport(SeriesPlugin):
 
             # get latest episode in episodic format
             episode = session.query(Episode).select_from(join(Episode, Series)).\
-                      filter(Series.name == series.name.lower()).filter(Episode.season != None).\
-                      order_by(desc(Episode.season)).order_by(desc(Episode.number)).first()
+                      filter(func.lower(Series.name) == series.name.lower()).\
+                      filter(Episode.season != None).\
+                      order_by(desc(Episode.season)).\
+                      order_by(desc(Episode.number)).first()
 
             # no luck, try uid format
             if not episode:
                 episode = session.query(Episode).select_from(join(Episode, Series)).\
-                          filter(Series.name == series.name.lower()).filter(Episode.season == None).\
+                          filter(func.lower(Series.name) == series.name.lower()).\
+                          filter(Episode.season == None).\
                           order_by(desc(Episode.first_seen)).first()
 
             latest = ''
