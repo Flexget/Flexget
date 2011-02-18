@@ -103,7 +103,8 @@ class SeriesPlugin(object):
     def get_first_seen(self, session, parser):
         """Return datetime when this episode of series was first seen"""
         episode = session.query(Episode).select_from(join(Episode, Series)).\
-            filter(func.lower(Series.name) == parser.name.lower()).filter(Episode.identifier == parser.identifier).first()
+            filter(func.lower(Series.name) == parser.name.lower()).\
+            filter(Episode.identifier == parser.identifier).first()
         if not episode:
             log.log(5, '%s not seen, return current time' % parser)
             return datetime.now()
@@ -130,7 +131,8 @@ class SeriesPlugin(object):
         Returns 'ep' or 'id' if 3 of the first 5 were parsed as such. Returns 'ep' in the event of a tie.
         Returns 'auto' if there is not enough history to determine the format yet
         """
-        total = session.query(Release).join(Episode).join(Series).filter(func.lower(Series.name) == name.lower()).count()
+        total = session.query(Release).join(Episode).join(Series).\
+            filter(func.lower(Series.name) == name.lower()).count()
         episodic = session.query(Release).join(Episode).join(Series).\
             filter(func.lower(Series.name) == name.lower()).\
             filter(Episode.season != None).\
@@ -147,7 +149,8 @@ class SeriesPlugin(object):
 
     def get_latest_download(self, session, name):
         """Return latest downloaded episode (season, episode, name) for series :name:"""
-        latest_download = session.query(Episode).join(Release, Series).filter(func.lower(Series.name) == name.lower()).\
+        latest_download = session.query(Episode).join(Release, Series).\
+            filter(func.lower(Series.name) == name.lower()).\
             filter(Release.downloaded == True).\
             filter(Episode.season != None).\
             filter(Episode.number != None).\
@@ -178,7 +181,8 @@ class SeriesPlugin(object):
     def store(self, session, parser):
         """Push series information into database. Returns added/existing release."""
         # if series does not exist in database, add new
-        series = session.query(Series).filter(func.lower(Series.name) == parser.name.lower()).\
+        series = session.query(Series).\
+            filter(func.lower(Series.name) == parser.name.lower()).\
             filter(Series.id != None).first()
         if not series:
             log.debug('adding series %s into db' % parser.name)
