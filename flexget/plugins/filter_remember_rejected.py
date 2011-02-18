@@ -31,9 +31,16 @@ class RememberEntry(Base):
 
 
 class FilterRememberRejected(object):
-    """Rejects entries which have been rejected in the past."""
+    """Internal.
+    Rejects entries which have been rejected in the past.
 
-    # This runs at the begining of metainfo event to avoid re-parsing metainfo for entries that will be rejected
+    This is enabled when item is rejected with remember=True flag.
+
+    Example:
+        feed.reject(entry, 'message', remember=True)
+    """
+
+    # This runs at the beginning of metainfo event to avoid re-parsing metainfo for entries that will be rejected
     @priority(255)
     def on_feed_metainfo(self, feed):
         """Purge remembered entries if the config has changed and write new hash"""

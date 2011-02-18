@@ -40,10 +40,10 @@ class FilterLimitNew(object):
                 continue
             if i > amount:
                 rejected += 1
-                feed.reject(entry, 'limit exceeded')
+                feed.reject(entry, 'limit exceeded', remember=True)
             else:
                 passed.append(entry)
-                feed.verbose_progress('Passed %s (%s)' % (entry['title'], entry['url']))
+                feed.verbose_progress('Allowed %s (%s)' % (entry['title'], entry['url']))
             i += 1
         log.debug('Rejected: %s Passed: %s' % (rejected, len(passed)))
 
