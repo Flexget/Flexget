@@ -26,19 +26,19 @@ class PluginDependencyError(Exception):
 
     def __str__(self):
         return '%s plugin: %s' % (repr(self.value), repr(self.plugin))
-        
+
 
 class DependencyError(PluginDependencyError):
     # inherited from PluginDependencyError for backwards compatibility
-    # this should replace the PluginDependencyError        
+    # this should replace the PluginDependencyError
     """Plugin depends on other plugin, but it cannot be loaded.
-    
+
     Args:
-    
+
     who: name of the plugin trying to do the import
     what: name of the plugin imported
     message: user readable error message
-    
+
     All args are optional.
     """
 
@@ -46,7 +46,7 @@ class DependencyError(PluginDependencyError):
         self.who = who
         self.what = what
         self.message = message
-    
+
     # backwards compatibilities
     @property
     def value(self):
@@ -55,7 +55,7 @@ class DependencyError(PluginDependencyError):
     @property
     def plugin(self):
         return self.who
-        
+
     def __str__(self):
         return '<DependencyError(who=%s,what=%s,message=%s)>' % \
             (self.who, self.what, self.message)
@@ -120,6 +120,9 @@ class internet(object):
             except BadStatusLine:
                 log.debug('decorator caught badstatusline')
                 raise PluginError('Got BadStatusLine', self.log)
+            except ValueError, e:
+                log.debug('decorator caught ValueError')
+                raise PluginError(e.message)
             except IOError, e:
                 log.debug('decorator caught ioerror')
                 if hasattr(e, 'reason'):

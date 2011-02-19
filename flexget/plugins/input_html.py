@@ -65,7 +65,7 @@ class InputHtml(object):
     @internet(log)
     def on_feed_input(self, feed, config):
         config = self.build_config(config)
-        
+
         log.debug('InputPlugin html requesting url %s' % config['url'])
 
         if config.get('username') and config.get('password'):
@@ -175,8 +175,7 @@ class InputHtml(object):
                         log.info('Link names seem to be useless, auto-enabling \'title_from: url\'. This may not work well, you might need to configure it.')
                         config['title_from'] = 'url'
                         # start from the beginning  ...
-                        self.create_entries(pageurl, soup, config)
-                        return
+                        return self.create_entries(pageurl, soup, config)
             elif title_from == 'link' or title_from == 'contents':
                 # link from link name
                 log.debug('title from link: %s' % title)
