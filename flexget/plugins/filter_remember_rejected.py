@@ -62,14 +62,16 @@ class FilterRememberRejected(object):
             for entry in old_feed.entries:
                 remembered_uids[entry.uid] = entry
             for entry in feed.entries:
-                if entry['uid'] in remembered_uids:
+                if entry.get('uid') in remembered_uids:
                     feed.reject(entry, 'Rejected by %s plugin on a previous run' %
                                        remembered_uids[entry['uid']].rejected_by)
 
-    def on_entry_reject(self, feed, entry, **kwargs):
+    def on_entry_reject(self, feed, entry, remember=None, **kwargs):
         # We only remember rejections that specify the remember keyword argument
-        if not kwargs.get('remember'):
+        if not remember or not entry.get('uid'):
             return
+        if entry.get('imaginary'):
+            log.debug('Not remembering rejection for imaginary entry `%s`' % entry['title'])
         remember_feed = feed.session.query(RememberFeed).filter(RememberFeed.name == feed.name).first()
         remember_feed.entries.append(RememberEntry(uid=entry['uid'], rejected_by=feed.current_plugin))
         feed.session.merge(remember_feed)
