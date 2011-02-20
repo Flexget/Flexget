@@ -23,19 +23,19 @@ class MetainfoQuality(object):
                 return
         for entry in feed.entries:
             self.get_quality(entry)
-            
+
     def field_order(self, x):
         """helper function, iterate entry fields in certain order"""
         order = ['title', 'description']
         return order.index(x[0]) if x[0] in order else len(order)
-            
+
     def get_quality(self, entry):
-        for field_name, field_value in sorted(entry.items(), 
+        for field_name, field_value in sorted(entry.items(),
                                               key=self.field_order):
             if not isinstance(field_value, basestring):
                 continue
             # ignore some fields ...
-            if field_name in ['feed', 'uid']:
+            if field_name in ['feed']:
                 continue
             quality = qualities.parse_quality(field_value)
             if quality > qualities.UnknownQuality():
@@ -45,5 +45,5 @@ class MetainfoQuality(object):
         log.log(5, 'Found quality %s (%s) for %s from field %s' % \
             (entry['quality'], quality, entry['title'], field_name))
         return entry
-            
+
 register_plugin(MetainfoQuality, 'metainfo_quality', builtin=True)

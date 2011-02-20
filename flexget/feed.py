@@ -49,11 +49,11 @@ class Entry(dict):
 
         # url and original_url handling
         if key == 'url':
-            if not 'original_url' in self:
-                self['original_url'] = value
             if not isinstance(value, basestring):
                 raise PluginError('Tried to set %s url to %s' % \
                     (repr(self.get('title')), repr(value)))
+            if not 'original_url' in self:
+                self['original_url'] = value
 
         # title handling
         if key == 'title':
@@ -70,21 +70,6 @@ class Entry(dict):
         log.log(5, 'ENTRY %s = %s' % (key, value))
 
         dict.__setitem__(self, key, value)
-
-        # calculate uid
-        if self.get('title') and self.get('original_url'):
-            m = hashlib.md5()
-
-            def just_fucking_do_it(value):
-                if isinstance(value, unicode):
-                    m.update(value.encode('ascii', 'ignore'))
-                else:
-                    m.update(value)
-
-            just_fucking_do_it(self['original_url'])
-            just_fucking_do_it(self['title'])
-            uid = m.hexdigest()
-            dict.__setitem__(self, 'uid', uid)
 
     def safe_str(self):
         return '%s | %s' % (self['title'], self['url'])
