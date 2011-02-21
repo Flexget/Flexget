@@ -1,6 +1,5 @@
 import logging
 import os
-import ctypes
 from flexget.plugin import register_plugin, priority
 
 log = logging.getLogger('free_space')
@@ -9,6 +8,7 @@ log = logging.getLogger('free_space')
 def get_free_space(folder):
     """ Return folder/drive free space (in megabytes)"""
     if os.name == 'nt':
+        import ctypes
         free_bytes = ctypes.c_ulonglong(0)
         ctypes.windll.kernel32.GetDiskFreeSpaceExW(ctypes.c_wchar_p(folder), None, None, ctypes.pointer(free_bytes))
         return free_bytes.value / (1024 * 1024)
