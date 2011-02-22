@@ -99,7 +99,7 @@ class TVDBSeries(TVDBContainer, Base):
         except URLError, e:
             log.warning('Request failed %s' % url)
             return
-        result = BeautifulStoneSoup(data).find('series')
+        result = BeautifulStoneSoup(data, convertEntities=BeautifulStoneSoup.HTML_ENTITIES).find('series')
         if result:
             self.update_from_bss(result)
 

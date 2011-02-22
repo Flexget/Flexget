@@ -1,5 +1,5 @@
 import logging
-from flexget.plugin import register_plugin
+from flexget.plugin import register_plugin, FEED_PHASES
 
 log = logging.getLogger('disable_phases')
 
@@ -18,7 +18,7 @@ class PluginDisablePhases(object):
     def validator(self):
         from flexget import validator
         root = validator.factory('list')
-        root.accept('text')
+        root.accept('choice').accept_choices(FEED_PHASES)
         return root
 
     def on_feed_start(self, feed, config):

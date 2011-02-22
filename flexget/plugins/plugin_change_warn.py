@@ -93,14 +93,14 @@ class ChangeWarn(object):
             self.old_database(feed, 'old series format)')
 
         columns = table_columns('thetvdb_favorites', session)
-        if not 'series_id' in columns:
-            self.old_database(feed, 'series_id missing from thetvdb_favorites table',
-                'sqlite3 %s "ALTER TABLE thetvdb_favorites ADD series_id VARCHAR;"' % feed.manager.db_filename)
+        if not 'series_ids' in columns:
+            self.old_database(feed, 'thetvdb_favorites table is an old version',
+                'sqlite3 %s "DROP TABLE thetvdb_favorites;"' % feed.manager.db_filename)
 
         columns = table_columns('remember_rejected_entry', session)
         if 'uid' in columns:
             self.old_database(feed, 'remember_rejected_entry table should not contain uid column',
-                'sqlite3 %s "drop table remember_rejected_entry;"' % feed.manager.db_filename)
+                'sqlite3 %s "DROP TABLE remember_rejected_entry;"' % feed.manager.db_filename)
 
         if found_deprecated:
             feed.manager.disable_feeds()

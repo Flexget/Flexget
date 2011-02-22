@@ -1,5 +1,9 @@
-from flexget.plugin import get_plugin_by_name, priority, register_plugin
-from flexget.plugins.api_tvdb import lookup_episode
+from flexget.plugin import get_plugin_by_name, priority, register_plugin, PluginDependencyError
+
+try:
+    from flexget.plugins.api_tvdb import lookup_episode
+except ImportError:
+    raise PluginDependencyError('thetvdb_lookup requires the `api_tvdb` plugin', 'api_tvdb')
 
 
 class PluginThetvdbLookup(object):
@@ -49,8 +53,11 @@ class PluginThetvdbLookup(object):
 
     def on_process_start(self, feed):
         """Register the usable set plugin keywords"""
-        set_plugin = get_plugin_by_name('set')
-        set_plugin.instance.register_key('thetvdb_id', 'integer')
+        try:
+            set_plugin = get_plugin_by_name('set')
+            set_plugin.instance.register_key('thetvdb_id', 'integer')
+        except PluginDependencyError:
+            pass
 
     @priority(120)
     def on_feed_filter(self, feed):
