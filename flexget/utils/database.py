@@ -5,13 +5,12 @@ def with_session(func):
     """"Creates a session if one was not passed via keyword argument to the function"""
 
     def wrapper(*args, **kwargs):
-        passed_session = kwargs.get('session')
-        if not passed_session:
-            session = Session(autoflush=True)
+        if not kwargs.get('session'):
+            kwargs['session'] = Session(autoflush=True)
             try:
-                return func(*args, session=session, **kwargs)
+                return func(*args, **kwargs)
             finally:
-                session.close()
+                kwargs['session'].close()
         else:
             return func(*args, **kwargs)
     return wrapper
