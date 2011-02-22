@@ -1,16 +1,16 @@
 import logging
-from flexget.manager import Base
 from datetime import datetime
 from sqlalchemy import Column, Integer, String, DateTime, PickleType
+from flexget.manager import Base, Session
 
 log = logging.getLogger('util.simple_persistence')
 
 
 class SimpleKeyValue(Base):
     """Declarative"""
-    
+
     __tablename__ = 'simple_persistence'
-    
+
     id = Column(Integer, primary_key=True)
     feed = Column(String)
     plugin = Column(String)
@@ -23,37 +23,47 @@ class SimpleKeyValue(Base):
         self.plugin = plugin
         self.key = key
         self.value = value
-    
+
     def __repr__(self):
         return "<SimpleKeyValue('%s','%s','%s')>" % (self.feed, self.key, self.value)
 
 
 class SimplePersistence(object):
-    
-    def __init__(self, feed):
-        self.feed = feed
-        
+
+    def __init__(self, plugin, session=None):
+        self.feedname = None
+        self.plugin = plugin
+        self.session = session
+
     def set(self, key, value):
-        skv = self.feed.session.query(SimpleKeyValue).filter(SimpleKeyValue.feed == self.feed.name).\
-            filter(SimpleKeyValue.plugin == self.feed.current_plugin).filter(SimpleKeyValue.key == key).first()
+        session = self.session or Session()
+        skv = session.query(SimpleKeyValue).filter(SimpleKeyValue.feed == self.feedname).\
+                filter(SimpleKeyValue.plugin == self.plugin).filter(SimpleKeyValue.key == key).first()
         if skv:
             # update existing
             log.debug('updating key %s value %s' % (key, repr(value)))
             skv.value = value
         else:
             # add new key
-            skv = SimpleKeyValue(self.feed.name, self.feed.current_plugin, key, value)
+            skv = SimpleKeyValue(self.feedname, self.plugin, key, value)
             log.debug('adding key %s value %s' % (key, repr(value)))
-            self.feed.session.add(skv)
-    
+            session.add(skv)
+        if not self.session:
+            # If we created a temporary session for this call, make sure we commit
+            session.commit()
+            session.close()
+
     def get(self, key, default=None):
-        skv = self.feed.session.query(SimpleKeyValue).filter(SimpleKeyValue.feed == self.feed.name).\
-            filter(SimpleKeyValue.plugin == self.feed.current_plugin).filter(SimpleKeyValue.key == key).first()
+        session = self.session or Session()
+        skv = session.query(SimpleKeyValue).filter(SimpleKeyValue.feed == self.feedname).\
+            filter(SimpleKeyValue.plugin == self.plugin).filter(SimpleKeyValue.key == key).first()
+        if not self.session:
+            session.close()
         if not skv:
             return default
         else:
             return skv.value
-        
+
     def setdefault(self, key, default):
         empty = object()
         got = self.get(key, empty)
@@ -63,3 +73,21 @@ class SimplePersistence(object):
             return default
         else:
             return got
+
+
+class SimpleFeedPersistence(SimplePersistence):
+
+    def __init__(self, feed):
+        self.feed = feed
+
+    @property
+    def plugin(self):
+        return self.feed.current_plugin
+
+    @property
+    def feedname(self):
+        return self.feed.name
+
+    @property
+    def session(self):
+        return self.feed.session

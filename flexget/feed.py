@@ -1,9 +1,8 @@
-import hashlib
 import logging
 from flexget.manager import Session
 from flexget.plugin import get_methods_by_phase, get_plugins_by_phase, get_plugin_by_name, \
     FEED_PHASES, PluginWarning, PluginError, PluginDependencyError
-from flexget.utils.simple_persistence import SimplePersistence
+from flexget.utils.simple_persistence import SimpleFeedPersistence
 from flexget.event import fire_event
 
 log = logging.getLogger('feed')
@@ -134,7 +133,7 @@ class Feed(object):
         self.manager = manager
 
         # simple persistence
-        self.simple_persistence = SimplePersistence(self)
+        self.simple_persistence = SimpleFeedPersistence(self)
 
         # not to be reseted
         self._rerun_count = 0

@@ -1,5 +1,3 @@
-from sqlalchemy.interfaces import PoolListener
-from sqlalchemy.pool import SingletonThreadPool
 import os
 import sys
 import logging
@@ -424,9 +422,9 @@ class Manager(object):
 
     def process_start(self, feeds=None):
         """Execute process_start for feeds.
-        
+
         Args:
-        
+
         :feeds: can be specified as a list of Feed instances, defaults to all feeds
         """
         if feeds is None:
@@ -445,7 +443,7 @@ class Manager(object):
     def process_end(self, feeds=None):
         """Execute process_end for all feeds.
         Args:
-        
+
         :feeds: can be specified as a list of Feed instances, defaults to all feeds
         """
         if feeds is None:

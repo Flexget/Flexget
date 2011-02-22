@@ -6,7 +6,7 @@ import os
 import posixpath
 from sqlalchemy import Table, Column, Integer, Float, String, Unicode, Boolean, DateTime, func
 from sqlalchemy.schema import ForeignKey
-from sqlalchemy.orm import relation, joinedload
+from sqlalchemy.orm import relation, joinedload, synonym
 from flexget.utils.tools import urlopener
 from flexget.manager import Base, Session
 from flexget.plugin import register_plugin
@@ -34,9 +34,9 @@ class TMDBContainer(object):
 
     def update_from_dict(self, update_dict):
         """Populates any simple (string or number) attributes from a dict"""
-        for key in update_dict:
-            if hasattr(self, key) and isinstance(update_dict[key], (basestring, int, float)):
-                setattr(self, key, update_dict[key])
+        for col in self.__table__.columns:
+            if isinstance(update_dict.get(col.name), (basestring, int, float)):
+                setattr(self, col.name, update_dict[col.name])
 
 
 class TMDBMovie(TMDBContainer, Base):
@@ -59,9 +59,23 @@ class TMDBMovie(TMDBContainer, Base):
     rating = Column(Float)
     certification = Column(String)
     overview = Column(Unicode)
-    released = Column(DateTime)
+    _released = Column('released', DateTime)
     posters = relation('TMDBPoster', backref='movie', cascade='all, delete, delete-orphan')
     genres = relation('TMDBGenre', secondary=genres_table, backref='movies')
+
+    @property
+    def released(self):
+        return self._released
+
+    @released.setter
+    def released(self, released):
+        # This transparently converts date format returned by TMDb into datetime object
+        if isinstance(released, basestring):
+            self._released = datetime.strptime(released, '%Y-%m-%d')
+        else:
+            self._released = released
+
+    released = synonym('_released', descriptor=released)
 
 
 class TMDBGenre(TMDBContainer, Base):
@@ -95,7 +109,7 @@ class TMDBPoster(TMDBContainer, Base):
         # If we don't already have a local copy, download one.
         log.debug('Downloading poster %s' % self.url)
         dirname = os.path.join('tmdb', 'posters', str(self.movie_id))
-        # Create folders if the don't exist
+        # Create folders if they don't exist
         fullpath = os.path.join(base_dir, dirname)
         if not os.path.isdir(fullpath):
             os.makedirs(fullpath)
@@ -129,7 +143,7 @@ class ApiTmdb(object):
 
     def lookup(self, title=None, tmdb_id=None, imdb_id=None, only_cached=False):
         if not title and not tmdb_id and not imdb_id:
-            log.error('No criteria specified for tvdb lookup')
+            log.error('No criteria specified for tmdb lookup')
             return
         log.debug('Looking up tmdb information for %r' % {'title': title, 'tmdb_id': tmdb_id, 'imdb_id': imdb_id})
 
@@ -192,7 +206,7 @@ class ApiTmdb(object):
                                 self.get_movie_details(movie, session)
                                 session.add(movie)
                             if title.lower() != movie.name.lower():
-                                session.add(TMDBSearchResult({'search': title, 'movie': movie}))
+                                session.add(TMDBSearchResult(search=title, movie=movie))
                 except URLError:
                     log.error('Error looking up movie from TMDb')
                     return
@@ -223,9 +237,6 @@ class ApiTmdb(object):
         result = get_first_result('getInfo', movie.id)
         if result:
             movie.update_from_dict(result)
-            released = result.get('released')
-            if released:
-                movie.released = datetime.strptime(released, '%Y-%m-%d')
             posters = result.get('posters')
             if posters:
                 # Add any posters we don't already have
