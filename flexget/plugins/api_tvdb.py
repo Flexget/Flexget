@@ -10,7 +10,7 @@ from sqlalchemy import Column, Integer, Float, String, Unicode, Boolean, DateTim
 from sqlalchemy.schema import ForeignKey
 from sqlalchemy.orm import relation, synonym
 from flexget.utils.tools import urlopener
-from flexget.utils.database import with_session
+from flexget.utils.database import with_session, pipe_list_synonym, text_date_synonym
 from flexget.manager import Base, Session
 from flexget.utils.simple_persistence import SimplePersistence
 
@@ -42,38 +42,6 @@ def get_mirror(type='xml'):
                     _mirrors.setdefault(t[1], set()).add(mirrorpath)
     if _mirrors.get(type):
         return sample(_mirrors[type], 1)[0] + ('/banners/' if type == 'banner' else '/api/')
-
-
-def pipe_list_synonym(name):
-    """Converts pipe separated text into a list"""
-
-    def getter(self):
-        attr = getattr(self, name)
-        if attr:
-            return attr.strip('|').split('|')
-
-    def setter(self, value):
-        if isinstance(value, basestring):
-            setattr(self, name, value)
-        else:
-            setattr(self, name, '|'.join(value))
-
-    return synonym(name, descriptor=property(getter, setter))
-
-
-def text_date_synonym(name):
-    """Converts TVDb date strings into datetime objects"""
-
-    def getter(self):
-        return getattr(self, name)
-
-    def setter(self, value):
-        if isinstance(value, basestring):
-            setattr(self, name, datetime.strptime(value, '%Y-%m-%d'))
-        else:
-            setattr(self, name, value)
-
-    return synonym(name, descriptor=property(getter, setter))
 
 
 class TVDBContainer(object):

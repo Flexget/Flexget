@@ -6,8 +6,9 @@ import os
 import posixpath
 from sqlalchemy import Table, Column, Integer, Float, String, Unicode, Boolean, DateTime, func
 from sqlalchemy.schema import ForeignKey
-from sqlalchemy.orm import relation, joinedload, synonym
+from sqlalchemy.orm import relation, joinedload
 from flexget.utils.tools import urlopener
+from flexget.utils.database import text_date_synonym
 from flexget.manager import Base, Session
 from flexget.plugin import register_plugin
 
@@ -60,22 +61,9 @@ class TMDBMovie(TMDBContainer, Base):
     certification = Column(String)
     overview = Column(Unicode)
     _released = Column('released', DateTime)
+    released = text_date_synonym('_released')
     posters = relation('TMDBPoster', backref='movie', cascade='all, delete, delete-orphan')
     genres = relation('TMDBGenre', secondary=genres_table, backref='movies')
-
-    @property
-    def released(self):
-        return self._released
-
-    @released.setter
-    def released(self, released):
-        # This transparently converts date format returned by TMDb into datetime object
-        if isinstance(released, basestring):
-            self._released = datetime.strptime(released, '%Y-%m-%d')
-        else:
-            self._released = released
-
-    released = synonym('_released', descriptor=released)
 
 
 class TMDBGenre(TMDBContainer, Base):
