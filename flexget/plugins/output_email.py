@@ -174,8 +174,8 @@ class OutputEmail(object):
                     if config['smtp_tls']:
                         mailServer.ehlo()
                         mailServer.starttls()
-            except socket.error, (value, message):
-                raise PluginWarning('Socket error: ' + message)
+            except socket.error, e:
+                raise PluginWarning('Socket error: %s' % e)
 
             if config['smtp_login']:
                 mailServer.login(config['smtp_username'], config['smtp_password'])
