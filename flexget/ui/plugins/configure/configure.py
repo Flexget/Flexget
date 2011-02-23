@@ -49,7 +49,6 @@ def delete(root, name):
 
 @configure.route('/edit/text/<root>/<name>', methods=['POST', 'GET'])
 def edit_text(root, name):
-    from flexget.manager import FGDumper
     config_type = root.rstrip('s')
     context = {
         'name': name,
@@ -73,7 +72,7 @@ def edit_text(root, name):
             else:
                 manager.config[root][name] = config
                 manager.save_config()
-                context['config'] = yaml.dump(config, Dumper=FGDumper, default_flow_style=False)
+                context['config'] = yaml.dump(config, default_flow_style=False)
                 if request.form.get('name') != name:
                     # Renaming
                     new_name = request.form.get('name')
@@ -91,7 +90,7 @@ def edit_text(root, name):
     else:
         config = manager.config[root][name]
         if config:
-            context['config'] = yaml.dump(config, Dumper=FGDumper, default_flow_style=False)
+            context['config'] = yaml.dump(config, default_flow_style=False)
         else:
             context['config'] = ''
     context['related'] = get_related(root, name)

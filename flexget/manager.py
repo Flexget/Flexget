@@ -16,12 +16,6 @@ Session = sessionmaker()
 manager = None
 
 
-class FGDumper(yaml.SafeDumper):
-
-    def increase_indent(self, flow=False, indentless=False):
-        return super(FGDumper, self).increase_indent(flow, False)
-
-
 def useExecLogging(func):
 
     def wrapper(self, *args, **kw):
@@ -89,9 +83,36 @@ class Manager(object):
 
     def initialize(self):
         """Separated from __init__ so that unit tests can modify options before loading config."""
+        self.setup_yaml()
         self.find_config()
         self.init_sqlalchemy()
         self.create_feeds()
+
+    def setup_yaml(self):
+
+        # Set up the yaml loader to return unicode objects for strings by default
+        def construct_yaml_str(self, node):
+            # Override the default string handling function
+            # to always return unicode objects
+            return self.construct_scalar(node)
+        yaml.Loader.add_constructor(u'tag:yaml.org,2002:str', construct_yaml_str)
+        yaml.SafeLoader.add_constructor(u'tag:yaml.org,2002:str', construct_yaml_str)
+
+        # Set up the dumper to not tag every string with !!python/unicode
+        def unicode_representer(dumper, uni):
+            node = yaml.ScalarNode(tag=u'tag:yaml.org,2002:str', value=uni)
+            return node
+        yaml.add_representer(unicode, unicode_representer)
+
+        # Set up the dumper to increase the indent for lists
+        def increase_indent_wrapper(func):
+
+            def increase_indent(self, flow=False, indentless=False):
+                func(self, flow, False)
+            return increase_indent
+
+        yaml.Dumper.increase_indent = increase_indent_wrapper(yaml.Dumper.increase_indent)
+        yaml.SafeDumper.increase_indent = increase_indent_wrapper(yaml.SafeDumper.increase_indent)
 
     def find_config(self):
         """Find the configuration file and load it"""
@@ -182,7 +203,7 @@ class Manager(object):
         config_file = file(os.path.join(self.config_base, self.config_name) + '.yml', 'w')
         try:
             yaml.safe_dump
-            config_file.write(yaml.dump(self.config, Dumper=FGDumper, default_flow_style=False))
+            config_file.write(yaml.dump(self.config, default_flow_style=False))
         finally:
             config_file.close()
 
@@ -314,7 +335,7 @@ class Manager(object):
         # fire up the engine
         log.debug('connecting to: %s' % connection)
         try:
-            self.engine = sqlalchemy.create_engine(connection, echo=self.options.debug_sql)
+            self.engine = sqlalchemy.create_engine(connection, echo=self.options.debug_sql, )
         except ImportError:
             print >> sys.stderr, ('FATAL: Unable to use SQLite. Are you running Python 2.5.x or 2.6.x ?\n'
             'Python should normally have SQLite support built in.\n'

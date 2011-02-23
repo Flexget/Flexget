@@ -26,7 +26,7 @@ class RememberEntry(Base):
     id = Column(Integer, primary_key=True)
     title = Column(Unicode)
     url = Column(String)
-    rejected_by = Column(Unicode)
+    rejected_by = Column(String)
 
     feed_id = Column(Integer, ForeignKey('remember_rejected_feeds.id'), nullable=False)
 

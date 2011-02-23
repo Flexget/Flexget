@@ -17,13 +17,6 @@ class Torrent(object):
     def __init__(self, content):
         """Accepts torrent file as string"""
 
-        self.encode_func = {}
-        self.encode_func[type(str())] = self.encode_string
-        self.encode_func[type(int())] = self.encode_integer
-        self.encode_func[type(long())] = self.encode_integer
-        self.encode_func[type(list())] = self.encode_list
-        self.encode_func[type(dict())] = self.encode_dictionary
-
         # decoded torrent structure
         self.content = self.decode(content)
         self.modified = False
@@ -59,7 +52,7 @@ class Torrent(object):
             for item in self.content['info']['files']:
                 size += int(item['length'])
         return size
-        
+
     @property
     def private(self):
         return self.content['info'].get('private', False)
@@ -164,13 +157,16 @@ class Torrent(object):
     def encode_string(self, data):
         return "%d:%s" % (len(data), data)
 
+    def encode_unicode(self, data):
+        return self.encode_string(str(data))
+
     def encode_integer(self, data):
         return "i%de" % data
 
     def encode_list(self, data):
         encoded = "l"
         for item in data:
-            encoded += self.encode_func[type(item)](item)
+            encoded += self.encode_func(item)
         encoded += "e"
         return encoded
 
@@ -180,13 +176,23 @@ class Torrent(object):
         items.sort()
         for (key, value) in items:
             encoded += self.encode_string(key)
-            encoded += self.encode_func[type(value)](value)
+            encoded += self.encode_func(value)
         encoded += "e"
         return encoded
 
+    def encode_func(self, data):
+        encode_func = {
+            str: self.encode_string,
+            unicode: self.encode_unicode,
+            int: self.encode_integer,
+            long: self.encode_integer,
+            list: self.encode_list,
+            dict: self.encode_dictionary}
+        return encode_func[type(data)](data)
+
     def encode(self):
         data = self.content
-        return self.encode_func[type(data)](data)
+        return self.encode_func(data)
 
 
 class TorrentFilename(object):

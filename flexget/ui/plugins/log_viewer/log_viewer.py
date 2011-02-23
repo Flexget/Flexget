@@ -24,13 +24,13 @@ class LogEntry(Base):
         self.created = datetime.fromtimestamp(record.created)
         self.logger = record.name
         self.levelno = record.levelno
-        self.message = record.getMessage()
-        self.feed = getattr(record, 'feed', '')
+        self.message = unicode(record.getMessage())
+        self.feed = getattr(record, 'feed', u'')
         self.execution = getattr(record, 'execution', '')
 
 
 class DBLogHandler(logging.Handler):
-    
+
     def emit(self, record):
         session = Session()
         session.add(LogEntry(record))

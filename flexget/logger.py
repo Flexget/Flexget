@@ -9,7 +9,7 @@ class FlexGetLogger(logging.Logger):
     local = threading.local()
 
     def makeRecord(self, name, level, fn, lno, msg, args, exc_info, func=None, extra=None):
-        extra = {'feed': getattr(FlexGetLogger.local, 'feed', ''),
+        extra = {'feed': getattr(FlexGetLogger.local, 'feed', u''),
                  'execution': getattr(FlexGetLogger.local, 'execution', '')}
         return logging.Logger.makeRecord(self, name, level, fn, lno, msg, args, exc_info, func, extra)
 
