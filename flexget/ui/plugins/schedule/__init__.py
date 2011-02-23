@@ -1,1 +1,1 @@
-from .schedule import *
+from schedule import *

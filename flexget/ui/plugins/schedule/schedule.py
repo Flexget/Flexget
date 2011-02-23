@@ -88,8 +88,8 @@ def set_feed_interval(feed, interval):
 
 @schedule.context_processor
 def get_intervals():
-    schedule_items = db_session.query(Schedule).filter(Schedule.feed != '__DEFAULT__').all()
-    default_interval = db_session.query(Schedule).filter(Schedule.feed == '__DEFAULT__').first()
+    schedule_items = db_session.query(Schedule).filter(Schedule.feed != u'__DEFAULT__').all()
+    default_interval = db_session.query(Schedule).filter(Schedule.feed == u'__DEFAULT__').first()
     if default_interval:
         default_interval = default_interval.interval
     else:

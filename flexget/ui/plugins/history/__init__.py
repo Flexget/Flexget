@@ -1,1 +1,1 @@
-from .history import *
+from history import *

@@ -1,1 +1,1 @@
-from .authentication import *
+from authentication import *

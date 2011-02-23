@@ -1,1 +1,1 @@
-from .log_viewer import *
+from log_viewer import *

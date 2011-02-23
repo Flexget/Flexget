@@ -1,1 +1,1 @@
-from .inject import *
+from inject import *

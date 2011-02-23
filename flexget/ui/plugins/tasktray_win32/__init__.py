@@ -1,1 +1,1 @@
-from .icon import *
+from icon import *
