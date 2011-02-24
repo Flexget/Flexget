@@ -177,14 +177,14 @@ class OutputEmail(object):
             except socket.error, e:
                 raise PluginWarning('Socket error: %s' % e)
 
-            if config['smtp_login']:
-                mailServer.login(config['smtp_username'], config['smtp_password'])
 
             try:
+                if config['smtp_login']:
+                    mailServer.login(config['smtp_username'], config['smtp_password'])
                 mailServer.sendmail(message['From'], config['to'], message.as_string())
             except IOError, e:
                 # Ticket #686
-                raise PluginWarning('Unable to send email, SSLError %s' % e.message, log)
+                raise PluginWarning('Unable to send email, IOError %s' % e.message, log)
 
             mailServer.quit()
 
