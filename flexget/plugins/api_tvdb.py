@@ -344,10 +344,11 @@ def mark_expired(session=None):
         except URLError:
             log.error('Could not get server time from tvdb')
             return
-        new_server = int(updates.find('time').string)
-        expired_series = [int(series.string) for series in updates.findall('series')]
-        expired_episodes = [int(ep.string) for ep in updates.findall('episode')]
-        # Update our cache to mark the items that have expired
-        session.query(TVDBSeries).filter(TVDBSeries.id.in_(expired_series)).update(values={'expired': True})
-        session.query(TVDBEpisode).filter(TVDBEpisode.id.in_(expired_episodes)).update(values={'expired': True})
-        session.commit()
+        if updates:
+            new_server = int(updates.find('time').string)
+            expired_series = [int(series.string) for series in updates.findall('series')]
+            expired_episodes = [int(ep.string) for ep in updates.findall('episode')]
+            # Update our cache to mark the items that have expired
+            session.query(TVDBSeries).filter(TVDBSeries.id.in_(expired_series)).update(values={'expired': True})
+            session.query(TVDBEpisode).filter(TVDBEpisode.id.in_(expired_episodes)).update(values={'expired': True})
+            session.commit()
