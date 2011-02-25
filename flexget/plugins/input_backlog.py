@@ -1,8 +1,9 @@
 import logging
-from flexget.manager import Base, Session
-from flexget.plugin import register_plugin, priority, PluginWarning
 from datetime import datetime, timedelta
 from sqlalchemy import Column, Integer, String, DateTime, PickleType
+from flexget.manager import Base, Session
+from flexget.feed import Entry
+from flexget.plugin import register_plugin, priority, PluginWarning
 
 log = logging.getLogger('backlog')
 
@@ -34,7 +35,7 @@ class InputBacklog(object):
 
     def validator(self):
         from flexget import validator
-        root = validator.factory('regexp_match')
+        root = validator.factory('regexp_match', message='Must be in format <number> <hours|minutes|days|weeks>')
         root.accept('\d+ (minute|hour|day|week)s?')
         return root
 
@@ -51,12 +52,16 @@ class InputBacklog(object):
             raise PluginWarning('Invalid time format \'%s\'' % value, log)
 
     @priority(-255)
-    def on_feed_input(self, feed):
-        if 'backlog' in feed.config:
+    def on_feed_input(self, feed, config):
+        # Take a snapshot of the entries' states after the input event in case we have to store them to backlog
+        for entry in feed.entries:
+            entry.take_snapshot('after_input')
+        injections = self.get_injections(feed)
+        if config:
             # If backlog is manually enabled for this feed, learn the entries.
-            self.learn_backlog(feed, feed.config['backlog'])
-        # Add backlog to feed
-        self.inject_backlog(feed)
+            self.learn_backlog(feed, config)
+        # Return the entries from backlog that are not already in the feed
+        return injections
 
     def on_feed_abort(self, feed):
         """Remember all entries for 12 hours when feed gets aborted."""
@@ -65,6 +70,10 @@ class InputBacklog(object):
 
     def add_backlog(self, feed, entry, amount=''):
         """Add single entry to feed backlog"""
+        snapshot = entry.snapshots.get('after_input')
+        if not snapshot:
+            log.warning('No input snapshot available for `%s`, using current state' % entry['title'])
+            snapshot = dict(entry)
         session = Session()
         expire_time = datetime.now() + self.get_amount(amount)
         backlog_entry = session.query(BacklogEntry).filter(BacklogEntry.title == entry['title']).\
@@ -78,7 +87,7 @@ class InputBacklog(object):
             log.debug('Saving %s' % entry['title'])
             backlog_entry = BacklogEntry()
             backlog_entry.title = entry['title']
-            backlog_entry.entry = entry
+            backlog_entry.entry = snapshot
             backlog_entry.feed = feed.name
             backlog_entry.expire = expire_time
             session.add(backlog_entry)
@@ -89,7 +98,7 @@ class InputBacklog(object):
         for entry in feed.entries:
             self.add_backlog(feed, entry, amount)
 
-    def inject_backlog(self, feed):
+    def get_injections(self, feed):
         """Insert missing entries from backlog."""
         # purge expired
         for backlog_entry in feed.session.query(BacklogEntry).filter(datetime.now() > BacklogEntry.expire).all():
@@ -97,20 +106,19 @@ class InputBacklog(object):
             feed.session.delete(backlog_entry)
 
         # add missing from backlog
-        count = 0
-        entries = feed.session.query(BacklogEntry).filter(BacklogEntry.feed == feed.name)
-        for backlog_entry in entries.all():
-            entry = backlog_entry.entry
+        entries = []
+        backlog_entries = feed.session.query(BacklogEntry).filter(BacklogEntry.feed == feed.name).all()
+        for backlog_entry in backlog_entries:
+            entry = Entry(backlog_entry.entry)
 
             # this is already in the feed
             if feed.find_entry(title=entry['title'], url=entry['url']):
                 continue
             log.debug('Restoring %s' % entry['title'])
-            count += 1
-            feed.entries.append(entry)
-        if count:
-            feed.verbose_progress('Added %s entries from backlog' % count, log)
-        # Clear entries from backlog after injection
-        entries.delete()
+            entries.append(entry)
+            feed.session.delete(backlog_entry)
+        if entries:
+            feed.verbose_progress('Added %s entries from backlog' % len(entries), log)
+        return entries
 
-register_plugin(InputBacklog, 'backlog', builtin=True)
+register_plugin(InputBacklog, 'backlog', builtin=True, api_ver=2)

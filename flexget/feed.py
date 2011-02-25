@@ -1,4 +1,5 @@
 import logging
+import copy
 from flexget.manager import Session
 from flexget.plugin import get_methods_by_phase, get_plugins_by_phase, get_plugin_by_name, \
     FEED_PHASES, PluginWarning, PluginError, PluginDependencyError
@@ -33,10 +34,12 @@ class Entry(dict):
     def __init__(self, *args, **kwargs):
         self.trace = []
         # Store kwargs into our internal dict
-        self.update(kwargs)
         if len(args) == 2:
-            self['title'] = args[0]
-            self['url'] = args[1]
+            kwargs['title'] = args[0]
+            kwargs['url'] = args[1]
+            args = []
+        dict.__init__(self, *args, **kwargs)
+        self.snapshots = {}
 
     def __setitem__(self, key, value):
         # enforce unicode compatibility
@@ -84,6 +87,13 @@ class Entry(dict):
         if not isinstance(self['title'], basestring):
             return False
         return True
+
+    def take_snapshot(self, name):
+        if name in self.snapshots:
+            log.warning('Snapshot `%s` is being overwritten' % name)
+        snapshot = self.snapshots[name] = {}
+        for key, value in self.iteritems():
+            snapshot[key] = copy.copy(value)
 
 
 def useFeedLogging(func):
@@ -343,7 +353,7 @@ class Feed(object):
                                 response = method(self)
                             else:
                                 # pass method feed, config
-                                config = self.config[keyword]
+                                config = self.config.get(keyword)
                                 response = method(self, config)
                             if response:
                                 # add entries returned by input to self.entries
