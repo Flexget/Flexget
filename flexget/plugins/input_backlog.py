@@ -63,7 +63,7 @@ class InputBacklog(object):
         # Return the entries from backlog that are not already in the feed
         return injections
 
-    def on_feed_abort(self, feed):
+    def on_feed_abort(self, feed, config):
         """Remember all entries for 12 hours when feed gets aborted."""
         log.debug('Remembering all entries to backlog for 12 hours because of feed abort.')
         self.learn_backlog(feed, '12 hours')
