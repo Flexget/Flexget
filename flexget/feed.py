@@ -91,9 +91,7 @@ class Entry(dict):
     def take_snapshot(self, name):
         if name in self.snapshots:
             log.warning('Snapshot `%s` is being overwritten' % name)
-        snapshot = self.snapshots[name] = {}
-        for key, value in self.iteritems():
-            snapshot[key] = copy.copy(value)
+        self.snapshots[name] = copy.deepcopy(dict(self))
 
 
 def useFeedLogging(func):
