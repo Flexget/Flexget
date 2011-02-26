@@ -951,8 +951,7 @@ class FilterSeries(SeriesPlugin, FilterSeriesBase):
                 feed.reject(self.parser2entry[ep], 'timeframe is waiting')
             # add best entry to backlog (backlog is able to handle duplicate adds)
             if self.backlog:
-                # set expiring timeframe length, extending a day
-                self.backlog.add_backlog(feed, entry, '%s hours' % (hours + 24))
+                self.backlog.add_backlog(feed, entry)
             return True
 
     # TODO: whitelist deprecated ?

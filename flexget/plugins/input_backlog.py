@@ -40,6 +40,9 @@ class InputBacklog(object):
         return root
 
     def get_amount(self, value):
+        if not value:
+            # If no time is given, default to 0 (entry will only be injected on next execution)
+            return timedelta()
         amount, unit = value.split(' ')
         # Make sure unit name is plural.
         if not unit.endswith('s'):
@@ -53,10 +56,11 @@ class InputBacklog(object):
 
     @priority(-255)
     def on_feed_input(self, feed, config):
+        # Get a list of entries to inject 
+        injections = self.get_injections(feed)
         # Take a snapshot of the entries' states after the input event in case we have to store them to backlog
         for entry in feed.entries:
             entry.take_snapshot('after_input')
-        injections = self.get_injections(feed)
         if config:
             # If backlog is manually enabled for this feed, learn the entries.
             self.learn_backlog(feed, config)
@@ -64,12 +68,14 @@ class InputBacklog(object):
         return injections
 
     def on_feed_abort(self, feed, config):
-        """Remember all entries for 12 hours when feed gets aborted."""
-        log.debug('Remembering all entries to backlog for 12 hours because of feed abort.')
-        self.learn_backlog(feed, '12 hours')
+        """Remember all entries until next execution when feed gets aborted."""
+        log.debug('Remembering all entries to backlog because of feed abort.')
+        self.learn_backlog(feed)
 
     def add_backlog(self, feed, entry, amount=''):
-        """Add single entry to feed backlog"""
+        """Add single entry to feed backlog
+
+        If :amount: is not specified, entry will only be injected on next execution."""
         snapshot = entry.snapshots.get('after_input')
         if not snapshot:
             log.warning('No input snapshot available for `%s`, using current state' % entry['title'])
@@ -100,15 +106,9 @@ class InputBacklog(object):
 
     def get_injections(self, feed):
         """Insert missing entries from backlog."""
-        # purge expired
-        for backlog_entry in feed.session.query(BacklogEntry).filter(datetime.now() > BacklogEntry.expire).all():
-            log.debug('Purging %s' % backlog_entry.title)
-            feed.session.delete(backlog_entry)
-
-        # add missing from backlog
         entries = []
-        backlog_entries = feed.session.query(BacklogEntry).filter(BacklogEntry.feed == feed.name).all()
-        for backlog_entry in backlog_entries:
+        feed_backlog = feed.session.query(BacklogEntry).filter(BacklogEntry.feed == feed.name)
+        for backlog_entry in feed_backlog.all():
             entry = Entry(backlog_entry.entry)
 
             # this is already in the feed
@@ -116,9 +116,14 @@ class InputBacklog(object):
                 continue
             log.debug('Restoring %s' % entry['title'])
             entries.append(entry)
-            feed.session.delete(backlog_entry)
         if entries:
             feed.verbose_progress('Added %s entries from backlog' % len(entries), log)
+
+        # purge expired
+        for backlog_entry in feed_backlog.filter(datetime.now() > BacklogEntry.expire).all():
+            log.debug('Purging %s' % backlog_entry.title)
+            feed.session.delete(backlog_entry)
+
         return entries
 
 register_plugin(InputBacklog, 'backlog', builtin=True, api_ver=2)
