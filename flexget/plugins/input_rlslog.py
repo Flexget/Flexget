@@ -59,7 +59,7 @@ class RlsLog:
                 log.debug('FAIL: No entrybody')
                 continue
 
-            log.log(5, 'Processing title %s' % (release['title']))
+            log.debugall('Processing title %s' % (release['title']))
 
             rating = entrybody.find('strong', text=re.compile(r'imdb rating:', re.IGNORECASE))
             if rating is not None:
@@ -69,19 +69,19 @@ class RlsLog:
 
             for link in entrybody.findAll('a'):
                 if not link.contents:
-                    log.log(5, 'link content empty, skipping')
+                    log.debugall('link content empty, skipping')
                     continue
                 if not link.has_key('href'):
-                    log.log(5, 'link %s missing href' % link)
+                    log.debugall('link %s missing href' % link)
                     continue
 
                 link_name = link.contents[0]
                 link_name_ok = True
                 if link_name is None:
-                    log.log(5, 'link_name is none')
+                    log.debugall('link_name is none')
                     link_name_ok = False
                 if not isinstance(link_name, NavigableString):
-                    log.log(5, 'link_name is NavigableString')
+                    log.debugall('link_name is NavigableString')
                     link_name_ok = False
 
                 link_href = link['href']
@@ -102,9 +102,9 @@ class RlsLog:
                 urlrewriting = get_plugin_by_name('urlrewriting')
                 if urlrewriting['instance'].url_rewritable(feed, temp):
                     release['url'] = link_href
-                    log.log(5, '--> accepting %s (known url pattern)' % link_href)
+                    log.debugall('--> accepting %s (known url pattern)' % link_href)
                 else:
-                    log.log(5, '<-- ignoring %s (unknown url pattern)' % link_href)
+                    log.debugall('<-- ignoring %s (unknown url pattern)' % link_href)
 
             # reject if no torrent link
             if not 'url' in release:

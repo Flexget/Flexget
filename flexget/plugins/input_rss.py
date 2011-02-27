@@ -165,7 +165,7 @@ class InputRSS(object):
         # If enclosure has size OR there are multiple enclosures use filename from url
         if (entry.get('size') or multiple and basename) and filename:
             entry['filename'] = basename
-            log.log(5, 'filename `%s` from enclosure' % entry['filename'])
+            log.debugall('filename `%s` from enclosure' % entry['filename'])
 
     @cached('rss', 'url')
     @internet(log)

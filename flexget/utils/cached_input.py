@@ -29,12 +29,12 @@ class cached(object):
         def wrapped_func(*args, **kwargs):
             # get feed from method parameters
             feed = args[1]
-            
+
             # detect api version
             api_ver = 1
             if len(args) == 3:
                 api_ver = 2
-            
+
             if api_ver == 1:
                 # get name for a cache from feeds configuration
                 if not self.name in feed.config:
@@ -43,10 +43,10 @@ class cached(object):
             else:
                 config = args[2]
 
-            log.log(5, 'config: %s' % config)
-            log.log(5, 'self.name: %s' % self.name)
-            log.log(5, 'self.key: %s' % self.key)
-            
+            log.debugall('config: %s' % config)
+            log.debugall('self.name: %s' % self.name)
+            log.debugall('self.key: %s' % self.key)
+
             if api_ver == 1:
                 if isinstance(config, dict) and self.key in config:
                     name = feed.config[self.name][self.key]
@@ -62,7 +62,7 @@ class cached(object):
 
             if name in self.cache:
                 # return from the cache
-                log.log(5, 'cache hit')
+                log.debugall('cache hit')
                 count = 0
                 entries = []
                 for entry in self.cache[name]:
@@ -73,7 +73,7 @@ class cached(object):
                     feed.verbose_progress('Restored %s entries from cache' % count, log)
                 return entries
             else:
-                log.log(5, 'cache miss')
+                log.debugall('cache miss')
                 # call input event
                 response = func(*args, **kwargs)
                 # store results to cache
@@ -92,7 +92,7 @@ class cached(object):
                         # might be caused because of backlog restoring some idiotic stuff, so not neccessarily a bug
                         log.critical('Unable to save feed content into cache, if problem persists longer than a day please report this as a bug')
                 return response
-                    
+
 
         return wrapped_func
 

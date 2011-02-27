@@ -88,7 +88,7 @@ class PluginCookies:
                     s.write('%s\t%s\t%s\t%s\t%s\t%s\t%s\n' % (item[0], ftstr[item[0].startswith('.')], item[1],
                                                               ftstr[item[2]], item[3], item[4], item[5]))
 
-                    log.log(5, 'Adding cookie for %s. key: %s value: %s' % (item[0], item[4], item[5]))
+                    log.debugall('Adding cookie for %s. key: %s value: %s' % (item[0], item[4], item[5]))
                     count += 1
                 except:
                     to_hex = lambda x: ''.join([hex(ord(c))[2:].zfill(2) for c in x])

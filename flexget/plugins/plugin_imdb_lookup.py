@@ -197,7 +197,7 @@ class ModuleImdbLookup(object):
                         raise PluginError('Title lookup fails')
                     else:
                         if result.url:
-                            log.log(5, 'Setting imdb url for %s from db' % entry['title'])
+                            log.debugall('Setting imdb url for %s from db' % entry['title'])
                             entry['imdb_url'] = result.url
 
             # no imdb url, but information required, try searching
@@ -322,15 +322,15 @@ class ModuleImdbLookup(object):
             if imdb.mpaa_rating is None:
                 imdb.mpaa_rating = ''
 
-            log.log(5, 'imdb.name: %s' % imdb.name)
-            log.log(5, 'imdb.score: %s' % imdb.score)
-            log.log(5, 'imdb.votes: %s' % imdb.votes)
-            log.log(5, 'imdb.year: %s' % imdb.year)
-            log.log(5, 'imdb.genres: %s' % imdb.genres)
-            log.log(5, 'imdb.languages: %s' % imdb.languages)
-            log.log(5, 'imdb.actors: %s' % ', '.join(imdb.actors))
-            log.log(5, 'imdb.directors: %s' % ', '.join(imdb.directors))
-            log.log(5, 'imdb.mpaa_rating: %s' % ', '.join(imdb.mpaa_rating))
+            log.debugall('imdb.name: %s' % imdb.name)
+            log.debugall('imdb.score: %s' % imdb.score)
+            log.debugall('imdb.votes: %s' % imdb.votes)
+            log.debugall('imdb.year: %s' % imdb.year)
+            log.debugall('imdb.genres: %s' % imdb.genres)
+            log.debugall('imdb.languages: %s' % imdb.languages)
+            log.debugall('imdb.actors: %s' % ', '.join(imdb.actors))
+            log.debugall('imdb.directors: %s' % ', '.join(imdb.directors))
+            log.debugall('imdb.mpaa_rating: %s' % ', '.join(imdb.mpaa_rating))
 
             # store to entry
             # TODO: I really don't like this shoveling!
@@ -357,7 +357,7 @@ class ModuleImdbLookup(object):
                 import time
                 time.sleep(3)
         finally:
-            log.log(5, 'committing session')
+            log.debugall('committing session')
             session.commit()
 
 register_plugin(ModuleImdbLookup, 'imdb_lookup')

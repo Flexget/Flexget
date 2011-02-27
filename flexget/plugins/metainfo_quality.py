@@ -42,7 +42,7 @@ class MetainfoQuality(object):
                 # if we find a quality in this field, stop searching
                 break
         entry['quality'] = quality.name
-        log.log(5, 'Found quality %s (%s) for %s from field %s' % \
+        log.debugall('Found quality %s (%s) for %s from field %s' % \
             (entry['quality'], quality, entry['title'], field_name))
         return entry
 

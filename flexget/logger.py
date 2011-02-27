@@ -13,6 +13,9 @@ class FlexGetLogger(logging.Logger):
                  'execution': getattr(FlexGetLogger.local, 'execution', '')}
         return logging.Logger.makeRecord(self, name, level, fn, lno, msg, args, exc_info, func, extra)
 
+    def debugall(self, msg, *args, **kwargs):
+        self.log(5, msg, *args, **kwargs)
+
 
 class FlexGetFormatter(logging.Formatter):
     """Custom formatter that can handle both regular log records and those created by FlexGetLogger"""

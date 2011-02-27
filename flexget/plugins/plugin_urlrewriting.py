@@ -35,7 +35,7 @@ class PluginUrlRewriting(object):
     def url_rewritable(self, feed, entry):
         """Return True if entry is urlrewritable by registered rewriter."""
         for urlrewriter in get_plugins_by_group('urlrewriter'):
-            log.log(5, 'checking urlrewriter %s' % urlrewriter.name)
+            log.debugall('checking urlrewriter %s' % urlrewriter.name)
             if urlrewriter.instance.url_rewritable(self, entry):
                 return True
         return False

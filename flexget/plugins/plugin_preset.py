@@ -54,7 +54,7 @@ class PluginPreset(object):
         elif not 'global' in config:
             config.append('global')
 
-        log.log(5, 'presets: %s' % config)
+        log.debugall('presets: %s' % config)
 
         toplevel_presets = feed.manager.config.get('presets', {})
 

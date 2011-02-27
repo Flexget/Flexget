@@ -42,7 +42,7 @@ class MetainfoContentSize(object):
                 count += 1
                 if unit == 'gb':
                     amount = math.ceil(amount * 1024)
-                log.log(5, 'setting content size to %s' % amount)
+                log.debugall('setting content size to %s' % amount)
                 entry['content_size'] = int(amount)
                 continue
             # If this entry has a local file, (it was added by listdir) grab the size.
@@ -53,7 +53,7 @@ class MetainfoContentSize(object):
                 if os.path.isfile(entry['location']):
                     amount = os.path.getsize(entry['location'])
                     amount = int(amount / (1024 * 1024))
-                    log.log(5, 'setting content size to %s' % amount)
+                    log.debugall('setting content size to %s' % amount)
                     entry['content_size'] = amount
                     continue
 

@@ -92,7 +92,7 @@ class FilterImdbQueue(object):
                     # Keep track of entries we accepted, so they can be removed from queue on feed_exit if successful
                     self.accepted_entries[imdb_id] = entry
                 else:
-                    log.log(5, "%s not in queue, skipping" % entry['title'])
+                    log.debugall("%s not in queue, skipping" % entry['title'])
 
     def on_feed_imdbqueue(self, feed):
         rejected = []
@@ -154,7 +154,7 @@ class FilterImdbQueue(object):
                                     (entry_quality.name, minquality.name,
                                      entry['title']))
                 else:
-                    log.log(5, "%s not in queue with wanted quality, skipping" % entry['title'])
+                    log.debugall("%s not in queue with wanted quality, skipping" % entry['title'])
         if len(rejected):
             log.info("Rejected due to no URL in entry (URLRewrite probably failed):"
                      " %s" % ', '.join(rejected))

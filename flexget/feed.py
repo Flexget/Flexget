@@ -69,7 +69,7 @@ class Entry(dict):
             from flexget.utils.imdb import extract_id
             value = u'http://www.imdb.com/title/%s/' % extract_id(value)
 
-        log.log(5, 'ENTRY %s = %s' % (key, value))
+        log.debugall('ENTRY %s = %s' % (key, value))
 
         dict.__setitem__(self, key, value)
 
@@ -312,7 +312,7 @@ class Feed(object):
         if phase in entry_events and not entry:
             raise Exception('Entry must be specified when running the %s event' % phase)
         methods = get_methods_by_phase(phase)
-        # log.log(5, 'Event %s methods %s' % (event, methods))
+        # log.debugall('Event %s methods %s' % (event, methods))
 
         # warn if no filters or outputs in the feed
         if phase in ['filter', 'output']:
@@ -335,7 +335,7 @@ class Feed(object):
                     self.current_phase = phase
                     self.current_plugin = keyword
 
-                # log.log(5, 'Running %s method %s' % (keyword, method))
+                # log.debugall('Running %s method %s' % (keyword, method))
                 # call the plugin
                 try:
                     if phase in entry_events:

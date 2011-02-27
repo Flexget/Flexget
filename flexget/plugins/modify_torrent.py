@@ -207,7 +207,7 @@ class TorrentFilename(object):
         for entry in feed.entries:
             # skip if entry does not have file assigned
             if not 'file' in entry:
-                log.log(5, '%s doesn\'t have a file associated' % entry['title'])
+                log.debugall('%s doesn\'t have a file associated' % entry['title'])
                 continue
             if not os.path.exists(entry['file']):
                 raise PluginError('File %s does not exists' % entry['file'])
@@ -220,7 +220,7 @@ class TorrentFilename(object):
             f.close()
             if not TORRENT_RE.match(data):
                 # not a torrent file at all, skip
-                log.log(5, '%s doesn\'t seem to be a torrent, got `%s` (hex)' % (entry['title'], data.encode('hex')))
+                log.debugall('%s doesn\'t seem to be a torrent, got `%s` (hex)' % (entry['title'], data.encode('hex')))
                 continue
             else:
                 log.debug('%s seems to be a torrent' % entry['title'])
