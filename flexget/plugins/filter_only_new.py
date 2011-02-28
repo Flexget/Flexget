@@ -1,9 +1,5 @@
-import hashlib
 import logging
-from sqlalchemy import Column, Integer, String, Unicode, ForeignKey
-from sqlalchemy.orm import relation, eagerload
-from flexget.manager import Base
-from flexget.plugin import register_plugin, register_parser_option, priority, get_plugin_by_name, PluginDependencyError
+from flexget.plugin import register_plugin, get_plugin_by_name
 
 log = logging.getLogger('only_new')
 
@@ -24,9 +20,9 @@ class FilterOnlyNew(object):
         """Reject all undecided entries so remember_rejected will reject them next time"""
         if not feed.config.get('only_new', True):
             return
-        log.debug('Rejecting undecided entries so they are')
+        log.debug('Rejecting undecided entries so they are not processed next time.')
         for entry in feed.entries[:]:
             feed.reject(entry, 'Already processed new entry', remember=True)
-    
+
 
 register_plugin(FilterOnlyNew, 'only_new')

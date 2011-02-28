@@ -3,7 +3,7 @@ import logging
 from sqlalchemy import Column, Integer, String, Unicode, ForeignKey
 from sqlalchemy.orm import relation
 from flexget.manager import Base
-from flexget.plugin import register_plugin, priority
+from flexget.plugin import register_plugin, priority, register_parser_option
 
 log = logging.getLogger('remember_rejected')
 
@@ -50,8 +50,11 @@ class FilterRememberRejected(object):
         config_hash = hashlib.md5(str(feed.config.items())).hexdigest()
         # See if the feed has the same hash as last run
         old_feed = feed.session.query(RememberFeed).filter(RememberFeed.name == feed.name).first()
-        if old_feed and old_feed.hash != config_hash:
-            log.debug('Config has changed since last run, purging remembered entries.')
+        if old_feed and (old_feed.hash != config_hash or feed.manager.options.forget_rejected):
+            if feed.manager.options.forget_rejected:
+                log.info('Forgetting previous rejections.')
+            else:
+                log.debug('Config has changed since last run, purging remembered entries.')
             feed.session.delete(old_feed)
             feed.session.flush()
             old_feed = None
@@ -83,3 +86,5 @@ class FilterRememberRejected(object):
 
 
 register_plugin(FilterRememberRejected, 'remember_rejected', builtin=True)
+register_parser_option('--forget-rejected', action='store_true', dest='forget_rejected',
+                       help='Forget all previous rejections so entries can be processed again.')
