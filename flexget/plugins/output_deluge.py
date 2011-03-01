@@ -500,7 +500,8 @@ class OutputDeluge(object):
 
     def on_process_end(self, feed):
         """Shut down the twisted reactor after all feeds have run."""
-        if self.deluge12 and self.reactorRunning == 2:
+        if self.deluge12:
+            log.debug('Stopping twisted reactor.')
             from twisted.internet import reactor
             reactor.fireSystemEvent('shutdown')
             self.reactorRunning = 0
