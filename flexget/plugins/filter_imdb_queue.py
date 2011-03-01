@@ -381,17 +381,20 @@ class ImdbQueueManager(object):
         print '-' * 79
 
     def queue_get(self):
-        """Get the current IMDb queue"""
+        """Get the movie titles from current IMDb queue."""
         session = Session()
-        items = session.query(ImdbQueue).all()
-        for item in items:
-            if not item.title:
-                # old database does not have title / title not retrieved
-                try:
-                    item.title = self.parse_what(item.imdb_id)['title']
-                except QueueError:
-                    item.title = 'N/A'
-        return items
+        try:
+            items = session.query(ImdbQueue).all()
+            for item in items:
+                if not item.title:
+                    # old database does not have title / title not retrieved
+                    try:
+                        item.title = self.parse_what(item.imdb_id)['title']
+                    except QueueError:
+                        item.title = 'N/A'
+            return items
+        finally:
+            session.close()
 
 register_plugin(FilterImdbQueue, 'imdb_queue')
 register_plugin(ImdbQueueManager, 'imdb_queue_manager', builtin=True)
