@@ -381,7 +381,12 @@ class ImdbQueueManager(object):
         print '-' * 79
 
     def queue_get(self):
-        """Get the movie titles from current IMDb queue."""
+        """Get the current IMDb queue.
+        
+        Returns:
+        
+        List of ImdbQueue objects (detached from session)
+        """
         session = Session()
         try:
             items = session.query(ImdbQueue).all()
