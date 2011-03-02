@@ -8,6 +8,74 @@ from flexget.plugin import register_plugin, PluginError, priority, get_plugin_by
 
 log = logging.getLogger('deluge')
 
+try:
+    from twisted.python import log as twisted_log
+    from twisted.internet.main import installReactor
+    from twisted.internet.selectreactor import SelectReactor
+
+    class PausingReactor(SelectReactor):
+        """A SelectReactor that can be paused and resumed."""
+
+        def __init__(self):
+            SelectReactor.__init__(self)
+            self.paused = False
+            self._return_value = None
+            self._release_requested = False
+            self._mainLoopGen = None
+
+        def _mainLoopGenerator(self):
+            """Generator that acts as mainLoop, but yields when requested."""
+            while self._started:
+                try:
+                    while self._started:
+                        # Advance simulation time in delayed event
+                        # processors.
+                        self.runUntilCurrent()
+                        t2 = self.timeout()
+                        t = self.running and t2
+                        self.doIteration(t)
+
+                        if self._release_requested:
+                            self._release_requested = False
+                            self.paused = True
+                            yield self._return_value
+                except:
+                    twisted_log.msg("Unexpected error in main loop.")
+                    twisted_log.err()
+                else:
+                    twisted_log.msg('Main loop terminated.')
+
+        def run(self, *args, **kwargs):
+            """Starts or resumes the reactor."""
+            if not self._started:
+                self.startRunning(*args, **kwargs)
+                self._mainLoopGen = self._mainLoopGenerator()
+            try:
+                self.paused = False
+                return self._mainLoopGen.next()
+            except StopIteration:
+                pass
+
+        def pause(self, return_value=None):
+            """Causes reactor to pause after this iteration.
+            If :return_value: is specified, it will be returned by the reactor.run call."""
+            self._return_value = return_value
+            self._release_requested = True
+
+        def stop(self):
+            """Stops the reactor."""
+            SelectReactor.stop(self)
+            # If this was called while the reactor was paused we have to resume in order for it to complete
+            if self.paused:
+                self.run()
+
+    # Configure twisted to use the PausingReactor.
+    installReactor(PausingReactor())
+
+except ImportError:
+    # If twisted is not found, errors will be shown later
+    pass
+
 
 class OutputDeluge(object):
 
@@ -228,25 +296,6 @@ class OutputDeluge(object):
             """Makes a string compliant with deluge label naming rules"""
             return re.sub('[^\w-]+', '_', label.lower())
 
-        def start_reactor():
-            """This runs the reactor loop."""
-            # if this is the first this function is being called, we have to call startRunning
-            if self.reactorRunning < 2:
-                reactor.startRunning(False)
-            self.reactorRunning = 1
-            while self.reactorRunning == 1:
-                reactor.iterate()
-            # If there was an error requiring an exception during reactor running, it should be
-            # thrown here so the reactor loop doesn't exit prematurely
-            if self.reactorRunning < 0:
-                self.reactorRunning = 2
-                raise PluginError('Could not connect to deluge daemon', log)
-            self.reactorRunning = 2
-
-        def pause_reactor(result):
-            """This exits the reactor loop so flexget can continue."""
-            self.reactorRunning = result
-
         def on_connect_success(result, feed):
             """Gets called when successfully connected to a daemon."""
             if not result:
@@ -464,12 +513,12 @@ class OutputDeluge(object):
         def on_connect_fail(result, feed):
             """Gets called when connection to deluge daemon fails."""
             log.debug('Connect to deluge daemon failed, result: %s' % result)
-            reactor.callLater(0, pause_reactor, -1)
+            reactor.callLater(0, reactor.pause, PluginError('Could not connect to deluge daemon', log))
 
         def on_disconnect():
             """Gets called when we disconnect from the daemon."""
             # pause the reactor, so flexget can continue
-            reactor.callLater(0, pause_reactor, 0)
+            reactor.callLater(0, reactor.pause)
 
         client.set_disconnect_callback(on_disconnect)
 
@@ -480,7 +529,10 @@ class OutputDeluge(object):
             password=config['pass'])
 
         d.addCallback(on_connect_success, feed).addErrback(on_connect_fail, feed)
-        start_reactor()
+        result = reactor.run()
+        if isinstance(result, Exception):
+            # If an exception was returned from the reactor run, raise it here
+            raise result
 
     def on_feed_exit(self, feed):
         """Make sure all temp files are cleaned up when feed exits"""
@@ -501,9 +553,9 @@ class OutputDeluge(object):
     def on_process_end(self, feed):
         """Shut down the twisted reactor after all feeds have run."""
         if self.deluge12:
-            log.debug('Stopping twisted reactor.')
             from twisted.internet import reactor
-            reactor.fireSystemEvent('shutdown')
-            self.reactorRunning = 0
+            if not reactor._stopped:
+                log.debug('Stopping twisted reactor.')
+                reactor.stop()
 
 register_plugin(OutputDeluge, 'deluge')

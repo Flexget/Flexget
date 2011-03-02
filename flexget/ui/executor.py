@@ -43,6 +43,7 @@ class ExecThread(threading.Thread):
                 old_stderr = sys.stderr
                 sys.stdout = output
                 sys.stderr = output
+                # TODO: Use a filter to capture only the logging for this execution
                 streamhandler = logging.StreamHandler(output)
                 streamhandler.setFormatter(FlexGetFormatter())
                 logging.getLogger().addHandler(streamhandler)
@@ -55,7 +56,8 @@ class ExecThread(threading.Thread):
                 if opts:
                     manager.options = old_opts
                 if output:
-                    print 'EOF' # TODO: what is this? no printing! :)
+                    # Write EOF to the output, so that a listener knows when the output is over
+                    output.write('EOF')
                     sys.stdout = old_stdout
                     sys.stderr = old_stderr
                     logging.getLogger().removeHandler(streamhandler)
