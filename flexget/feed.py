@@ -264,7 +264,8 @@ class Feed(object):
             return
         if not kwargs.get('silent', False):
             log.info('Aborting feed (plugin: %s)' % self.current_plugin)
-        log.debug('Aborting feed (plugin: %s)' % self.current_plugin)
+        else:
+            log.debug('Aborting feed (plugin: %s)' % self.current_plugin)
         # Run the abort phase before we set the _abort flag
         self._abort = True
         self.__run_phase('abort')

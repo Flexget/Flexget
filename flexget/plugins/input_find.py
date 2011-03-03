@@ -56,13 +56,20 @@ class InputFind(object):
         entries = []
         match = re.compile(config['regexp'], re.IGNORECASE).match
         for path in config['path']:
-            for item in os.walk(path):
+            # unicode causes problems in here (#989)
+            for item in os.walk(str(path)):
                 for name in item[2]:
-                    #If mask fails continue
+                    # If mask fails continue
                     if match(name) is None:
                         continue
                     e = Entry()
-                    e['title'] = name
+                    try:
+                        e['title'] = unicode(name)
+                    except UnicodeDecodeError:
+                        # TODO: if we hadn't casted path to str this would not be a problem
+                        # how to support everything?
+                        log.warning('Filename `%s` in `%s` encoding broken?' % (repr(name)[1:-1], item[0]))
+                        continue
                     filepath = os.path.join(item[0], name)
                     e['location'] = filepath
                     # Windows paths need an extra / prepended to them for url
