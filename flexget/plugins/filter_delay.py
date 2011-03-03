@@ -1,4 +1,5 @@
 import logging
+from flexget.feed import Entry
 from flexget.manager import Base
 from flexget.plugin import register_plugin, priority, PluginWarning
 from datetime import datetime, timedelta
@@ -60,7 +61,10 @@ class FilterDelay(object):
                 if fe['title'] == entry['title']:
                     feed.entries.remove(fe)
             # add expired entry
-            feed.entries.append(entry)
+            # HACK: we have made some changes to the Entry class, these changes are
+            # not reflected into the database. Construct new Entry class instance
+            fresh_entry = Entry(**dict(entry))
+            feed.entries.append(fresh_entry)
             # remove from queue
             feed.session.delete(delayed_entry)
 

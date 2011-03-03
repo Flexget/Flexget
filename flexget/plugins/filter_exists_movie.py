@@ -51,7 +51,8 @@ class FilterExistsMovie(object):
         imdb_urls = []
 
         for path in config:
-            path = os.path.expanduser(path)
+            # with unicode it crashes on some paths ..
+            path = str(os.path.expanduser(path))
             if not os.path.exists(path):
                 log.critical('Path %s does not exist' % path)
                 continue
