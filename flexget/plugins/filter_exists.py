@@ -34,7 +34,8 @@ class FilterExists(object):
     def on_feed_filter(self, feed):
         config = self.get_config(feed)
         for path in config:
-            path = os.path.expanduser(path)
+            # unicode path causes crashes on some paths
+            path = str(os.path.expanduser(path))
             if not os.path.exists(path):
                 raise PluginWarning('Path %s does not exist' % path, log)
             # scan through
