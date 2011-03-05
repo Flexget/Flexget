@@ -78,8 +78,8 @@ class PluginPreset(object):
             from flexget.utils.tools import MergeException, merge_dict_from_to
             try:
                 merge_dict_from_to(toplevel_presets[preset], feed.config)
-            except MergeException:
-                raise PluginError('Failed to merge preset %s to feed %s, incompatible datatypes' % (preset, feed.name))
+            except MergeException, exc:
+                raise PluginError('Failed to merge preset %s to feed %s due to %s' % (preset, feed.name, exc))
 
 
 class DisablePlugin(object):

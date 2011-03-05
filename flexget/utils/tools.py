@@ -180,7 +180,8 @@ def merge_dict_from_to(d1, d2):
                 else:
                     raise Exception('Unknown type: %s value: %s in dictionary' % (type(v), repr(v)))
             else:
-                raise MergeException('Merging key %s failed, conflicting datatypes.' % (k))
+                raise MergeException('Merging key %s failed, conflicting datatypes %r vs. %r.' % (
+                    k, type(v).__name__, type(d2[k]).__name__))
         else:
             d2[k] = copy.deepcopy(v)
 
