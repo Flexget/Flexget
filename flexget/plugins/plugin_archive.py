@@ -38,7 +38,7 @@ def search(session, text):
     """Search by :text: from archive"""
     keyword = unicode(text).replace(' ', '%')
     return session.query(ArchiveEntry).filter(or_(ArchiveEntry.title.like('%' + keyword + '%'),
-        ArchiveEntry.title.like('%' + keyword + '%'), ArchiveEntry.feed == keyword)).all()
+        ArchiveEntry.feed == keyword)).all()
 
 
 class ArchiveSearch(object):
@@ -169,7 +169,20 @@ class Archive(object):
             ae.feed = feed.name
             log.debug('Adding `%s` to archive' % ae)
             feed.session.add(ae)
+            
+            
+class UrlrewriteArchive(object):
 
+    def search(self, feed, entry):
+        """Search plugin API method"""
+        log.debug('looking for %s' % entry['title'])
+        results = search(feed.session, entry['title'])
+
+        # TODO: some logic to return best match? what about quality?
+        if results:
+            log.debug('found %s' % results)
+            return results[0].url
+                                
 
 def archive_inject(option, opt, value, parser):
     """Option parser function"""
@@ -187,6 +200,7 @@ def archive_inject(option, opt, value, parser):
 
 
 register_plugin(Archive, 'archive')
+register_plugin(UrlrewriteArchive, 'flexget_archive', groups=['search'])
 register_plugin(ArchiveSearch, '--archive-search', builtin=True)
 register_plugin(ArchiveInject, '--archive-inject', builtin=True)
 

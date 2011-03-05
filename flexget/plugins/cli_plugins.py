@@ -1,6 +1,6 @@
 import logging
 from optparse import SUPPRESS_HELP
-from flexget.plugin import register_plugin, register_parser_option, plugins, FEED_PHASES, PHASE_METHODS, get_plugins_by_phase
+from flexget.plugin import register_plugin, register_parser_option, plugins, feed_phases, phase_methods, get_plugins_by_phase
 
 log = logging.getLogger('plugins')
 
@@ -23,7 +23,7 @@ class PluginsList(object):
         # build the list
         plugins = []
         roles = {}
-        for phase in FEED_PHASES:
+        for phase in feed_phases:
             plugins_in_phase = get_plugins_by_phase(phase)
             for info in plugins_in_phase:
                 for plugin in plugins:
@@ -34,7 +34,7 @@ class PluginsList(object):
 
             # build roles list
             for info in plugins_in_phase:
-                method_name = PHASE_METHODS[phase]
+                method_name = phase_methods[phase]
                 priority = info.phase_handlers[method_name].priority
 
                 if info['name'] in roles:

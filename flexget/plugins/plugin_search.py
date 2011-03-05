@@ -69,7 +69,8 @@ class PluginSearch(object):
         for plugin in get_plugins_by_group('search'):
             plugins[plugin.name] = plugin.instance
 
-        for entry in feed.accepted:
+        # search accepted and imaginary entries
+        for entry in feed.accepted + [e for e in feed.entries if e.get('imaginary')]:
             found = False
             # loop through configured searches
             search_plugins = feed.config.get('search', [])

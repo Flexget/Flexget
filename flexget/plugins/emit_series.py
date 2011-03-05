@@ -33,9 +33,13 @@ class EmitSeries(SeriesPlugin):
             # TODO: do this only after average time between episode has been passed since
             # last episode
 
-            # try next episode
+            # try next episode (eg. S01E02)
             title = '%s S%02dE%02d' % (series.name, latest['season'], latest['episode'] + 1)
-            feed.entries.append(Entry(title=title, url=''))
+            feed.entries.append(Entry(title=title, url='', imaginary=True))
+            
+            # different syntax (eg. 01x02)
+            title = '%s %02dx%02d' % (series.name, latest['season'], latest['episode'] + 1)
+            feed.entries.append(Entry(title=title, url='', imaginary=True))
 
             # TODO: do this only if there hasn't been new episode in few weeks
 

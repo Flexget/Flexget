@@ -1,7 +1,7 @@
 import logging
 from flexget.manager import Session
 from flexget.plugin import get_methods_by_phase, get_plugins_by_phase, get_plugin_by_name, \
-    FEED_PHASES, PluginWarning, PluginError, PluginDependencyError
+    feed_phases, PluginWarning, PluginError, PluginDependencyError
 from flexget.utils.simple_persistence import SimpleFeedPersistence
 from flexget.event import fire_event
 
@@ -212,11 +212,16 @@ class Feed(object):
                 purge_from.remove(entry)
 
     def disable_phase(self, phase):
-        """Disable :phase: from execution"""
-        if phase not in FEED_PHASES:
+        """Disable :phase: from execution.
+
+        All disabled phases are re-enabled after feed execution has been completed.
+        See self._reset()
+        """
+        if phase not in feed_phases:
             raise ValueError('%s is not a valid phase' % phase)
-        log.debug('Disabling %s phase' % phase)
-        self.disabled_phases.append(phase)
+        if phase not in self.disabled_phases:
+            log.debug('Disabling %s phase' % phase)
+            self.disabled_phases.append(phase)
 
     def accept(self, entry, reason=None, **kwargs):
         """Accepts this entry with optional reason."""
@@ -435,7 +440,7 @@ class Feed(object):
 
         try:
             # run phases
-            for phase in FEED_PHASES:
+            for phase in feed_phases:
                 if phase in self.disabled_phases:
                     # log keywords not executed
                     plugins = get_plugins_by_phase(phase)

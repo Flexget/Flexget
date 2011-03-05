@@ -29,13 +29,12 @@
     </div>
 
     <ul id="navbar">
-      {% for item in menu -%}
-      <li><a href="{{ item.href }}"
-      {%- if item.current is defined %} class="current" {% endif -%}
-      >{{ item.caption }}</a></li>
-      {# <!--
-      <li><a href="#" title="" class="current">Products</a></li>
-      --> -#}
+        {% for item in menu -%}
+            <li>
+                <a href="{{ item.href }}" {%- if item.current is defined %} class="current" {% endif -%}>
+                    {{ item.caption }}
+                </a>
+            </li>
       {% endfor %}
     </ul>
 

@@ -1,6 +1,6 @@
 from flexget import plugins as _plugins_mod
-import os
 import sys
+import os
 import logging
 import time
 from event import add_phase_handler
@@ -146,10 +146,10 @@ def _strip_trailing_sep(path):
 
 DEFAULT_PRIORITY = 128
 
-FEED_PHASES = ['start', 'input', 'metainfo', 'filter', 'download', 'modify', 'output', 'exit']
+feed_phases = ['start', 'input', 'metainfo', 'filter', 'download', 'modify', 'output', 'exit']
 
 # map phase names to method names
-PHASE_METHODS = {
+phase_methods = {
     'start': 'on_feed_start',
     'input': 'on_feed_input',
     'metainfo': 'on_feed_metainfo',
@@ -202,21 +202,21 @@ def register_feed_phase(plugin_class, name, before=None, after=None):
         raise RegisterException('You can only give either before or after for a phase.')
     if not before and not after:
         raise RegisterException('You must specify either a before or after phase.')
-    if name in FEED_PHASES or name in _new_phase_queue:
+    if name in feed_phases or name in _new_phase_queue:
         raise RegisterException('Phase %s already exists.' % name)
 
     def add_phase(phase_name, plugin_class, before, after):
-        if not before is None and not before in FEED_PHASES:
+        if not before is None and not before in feed_phases:
             return False
-        if not after is None and not after in FEED_PHASES:
+        if not after is None and not after in feed_phases:
             return False
         # add method name to phase -> method lookup table
-        PHASE_METHODS[phase_name] = 'on_feed_' + phase_name
+        phase_methods[phase_name] = 'on_feed_' + phase_name
         # place phase in phase list
         if before is None:
-            FEED_PHASES.insert(FEED_PHASES.index(after) + 1, phase_name)
+            feed_phases.insert(feed_phases.index(after) + 1, phase_name)
         if after is None:
-            FEED_PHASES.insert(FEED_PHASES.index(before), phase_name)
+            feed_phases.insert(feed_phases.index(before), phase_name)
 
         # create possibly newly available phase handlers
         for loaded_plugin in plugins:
@@ -264,7 +264,7 @@ class PluginInfo(dict):
 
     def build_phase_handlers(self):
         """(Re)build phase_handlers in this plugin"""
-        for event, method_name in PHASE_METHODS.iteritems():
+        for event, method_name in phase_methods.iteritems():
             if method_name in self.phase_handlers:
                 continue
             if hasattr(self.instance, method_name):
@@ -362,7 +362,6 @@ def load_plugins_from_dir(dir):
             log.critical('Plugin %s failed to import dependencies' % name)
             log.exception(e)
             # TODO: logging does not seem to work from here
-            import sys
             import traceback
             traceback.print_exc(file=sys.stdout)
         except Exception, e:
@@ -401,9 +400,9 @@ def load_plugins(parser):
 def get_plugins_by_phase(phase):
     """Return list of all plugins that hook :phase:"""
     result = []
-    if not phase in PHASE_METHODS:
+    if not phase in phase_methods:
         raise Exception('Unknown phase %s' % phase)
-    method_name = PHASE_METHODS[phase]
+    method_name = phase_methods[phase]
     for info in plugins.itervalues():
         instance = info.instance
         if not hasattr(instance, method_name):
@@ -416,9 +415,9 @@ def get_plugins_by_phase(phase):
 def get_methods_by_phase(phase):
     """Return plugin methods that hook :phase: in order of priority (highest first)."""
     result = []
-    if not phase in PHASE_METHODS:
+    if not phase in phase_methods:
         raise Exception('Unknown phase %s' % phase)
-    method_name = PHASE_METHODS[phase]
+    method_name = phase_methods[phase]
     for info in plugins.itervalues():
         method = info.phase_handlers.get(method_name, None)
         if method:
@@ -431,7 +430,7 @@ def get_phases_by_plugin(name):
     """Return all phases plugin :name: hooks"""
     plugin = get_plugin_by_name(name)
     phases = []
-    for phase_name, method_name in PHASE_METHODS.iteritems():
+    for phase_name, method_name in phase_methods.iteritems():
         if hasattr(plugin.instance, method_name):
             phases.append(phase_name)
     return phases
