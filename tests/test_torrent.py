@@ -26,12 +26,18 @@ class TestModifyTrackers(FlexGetBase):
           test_add_trackers:
             mock:
               - {title: 'test', file: 'test_add_trackers.torrent'}
+              - {title: 'test_magnet'}
+            set:
+              url: 'magnet:?xt=urn:btih:HASH&dn=title'
             add_trackers:
               - udp://thetracker.com/announce
 
           test_remove_trackers:
             mock:
               - {title: 'test', file: 'test_remove_trackers.torrent'}
+              - title: 'test_magnet'
+            set:
+              url: 'magnet:?xt=urn:btih:HASH&dn=title&tr=http://torrent.ubuntu.com:6969/announce'
             remove_trackers:
               - ubuntu
     """
@@ -48,6 +54,8 @@ class TestModifyTrackers(FlexGetBase):
         torrent = self.load_torrent('test_add_trackers.torrent')
         assert 'udp://thetracker.com/announce' in torrent.get_multitrackers(), \
             'udp://thetracker.com/announce should have been added to trackers'
+        # Check magnet url
+        assert 'tr=udp://thetracker.com/announce' in self.feed.find_entry(title='test_magnet')['url']
 
     @with_filecopy('test.torrent', 'test_remove_trackers.torrent')
     def test_remove_trackers(self):
@@ -55,6 +63,8 @@ class TestModifyTrackers(FlexGetBase):
         torrent = self.load_torrent('test_remove_trackers.torrent')
         assert 'http://torrent.ubuntu.com:6969/announce' not in torrent.get_multitrackers(), \
             'ubuntu tracker should have been removed'
+        # Check magnet url
+        assert 'tr=http://torrent.ubuntu.com:6969/announce' not in self.feed.find_entry(title='test_magnet')['url']
 
 
 class TestPrivateTorrents(FlexGetBase):
@@ -68,7 +78,7 @@ class TestPrivateTorrents(FlexGetBase):
             accept_all: yes
             private_torrents: no
     """
-    
+
     def test_private_torrents(self):
         self.execute_feed('test')
         assert self.feed.find_entry('rejected', title='test_private'), 'did not reject private torrent'
