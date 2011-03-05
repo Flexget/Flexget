@@ -1,5 +1,6 @@
 import time
 import logging
+import posixpath
 from flask import render_template, Module, request, redirect, flash, send_file
 from flask.helpers import url_for
 from flexget.plugin import PluginDependencyError, get_plugin_by_name
@@ -36,7 +37,7 @@ def index():
             item.overview = ('TMDb lookup was not successful, no overview available.'
                              'Lookup is being retried in the background.')
             log.debug('No themoviedb result for imdb id %s' % item.imdb_id)
-            
+
             # this is probably not needed since non cached movies are retried also
             # in the cover function
             #
@@ -51,9 +52,9 @@ def index():
             if poster.size == 'thumb':
                 thumb = poster.get_file(only_cached=True)
                 if thumb:
-                    item.thumb = url_for('.userstatic', filename=thumb)
+                    item.thumb = url_for('.userstatic', filename=posixpath.join(*thumb))
                 break
-                
+
         item.title = movie.name
         item.year = movie.released.year
         item.overview = movie.overview
@@ -104,14 +105,14 @@ def edit_movie_quality():
         # TODO: Display movie name instead of id
         flash('%s quality changed to %s' % (imdb_id, quality), 'success')
     return redirect(url_for('index'))
-    
+
 
 @movies_module.route('/cover/<imdb_id>')
 def cover(imdb_id):
     import os
-    
+
     # TODO: return '' should be replaced with something sane, http error 404 ?
-    
+
     tmdb_lookup = get_plugin_by_name('api_tmdb').instance.lookup
     movie = tmdb_lookup(imdb_id=imdb_id)
     if not movie:
@@ -121,18 +122,18 @@ def cover(imdb_id):
     filepath = None
     for poster in movie.posters:
         if poster.size == 'thumb':
-            filepath = os.path.join(manager.config_base, 'userstatic', poster.get_file())
+            filepath = os.path.join(manager.config_base, 'userstatic', *poster.get_file())
             break
-            
+
     if filepath is None:
         log.error('No cover for %s' % imdb_id)
         return ''
     elif not os.path.exists(filepath):
         log.error('File %s does not exist' % filepath)
         return ''
-    
+
     log.debug('sending thumb file %s' % filepath)
-    return send_file(filepath, mimetype='image/png')    
-    
+    return send_file(filepath, mimetype='image/png')
+
 
 register_plugin(movies_module, menu='Movies')

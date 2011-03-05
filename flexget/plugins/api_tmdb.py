@@ -87,11 +87,12 @@ class TMDBPoster(TMDBContainer, Base):
     file = Column(Unicode)
 
     def get_file(self, only_cached=False):
-        """Downloads this poster to a local cache and returns the path"""
+        """Makes sure the poster is downloaded to the local cache (in userstatic folder) and
+        returns the path split into a list of directory and file components"""
         from flexget.manager import manager
         base_dir = os.path.join(manager.config_base, 'userstatic')
-        if os.path.isfile(os.path.join(base_dir, self.file or '')):
-            return self.file
+        if self.file and os.path.isfile(os.path.join(base_dir, self.file)):
+            return self.file.split(os.sep)
         elif only_cached:
             return
         # If we don't already have a local copy, download one.
@@ -113,7 +114,7 @@ class TMDBPoster(TMDBContainer, Base):
                 poster.file = filename
                 session.commit()
             session.close()
-        return filename
+        return filename.split(os.sep)
 
 
 class TMDBSearchResult(Base):
