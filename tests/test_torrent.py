@@ -1,3 +1,5 @@
+import os
+
 from tests import FlexGetBase, with_filecopy
 from flexget.utils.bittorrent import Torrent 
 
@@ -83,3 +85,78 @@ class TestPrivateTorrents(FlexGetBase):
         self.execute_feed('test')
         assert self.feed.find_entry('rejected', title='test_private'), 'did not reject private torrent'
         assert self.feed.find_entry('accepted', title='test_public'), 'did not pass public torrent'
+
+
+class TestTorrentScrub(FlexGetBase):
+
+    __yaml__ = """
+        feeds:
+          test_all:
+            mock:
+              - {title: 'test', file: 'tmp/test.torrent'}
+              - {title: 'LICENSE', file: 'tmp/LICENSE.torrent'}
+              - {title: 'LICENSE-resume', file: 'tmp/LICENSE-resume.torrent'}
+            accept_all: yes
+            torrent_scrub: all
+
+          test_off:
+            mock:
+              - {title: 'LICENSE-resume', file: 'tmp/LICENSE-resume.torrent'}
+            accept_all: yes
+            torrent_scrub: off
+    """
+
+    filenames = (
+        (True, 'test.torrent'), 
+        (False, 'LICENSE.torrent'), 
+        (False, 'LICENSE-resume.torrent'),
+    )
+
+    @with_filecopy("*.torrent", "tmp/")
+    def test_torrent_scrub(self):
+        # Run feed        
+        self.execute_feed('test_all')
+
+        for clean, filename in self.filenames: 
+            original = Torrent.from_file(filename)
+            modified = self.feed.find_entry(title=os.path.splitext(filename)[0])['torrent']
+            osize = os.path.getsize(filename)
+            msize = os.path.getsize("tmp/" + filename)
+
+            # Dump small torrents on demand
+            if 0 and not clean:
+                print "original=%r" % original.content
+                print "modified=%r" % modified.content
+
+            # Make sure essentials survived
+            assert 'announce' in modified.content
+            assert 'info' in modified.content
+            assert 'name' in modified.content['info']  
+            assert 'piece length' in modified.content['info']  
+            assert 'pieces' in modified.content['info']  
+
+            # Check that hashes have changed accordingly
+            if clean:
+                assert osize == msize, "Filesizes aren't supposed to differ!"
+                assert original.get_info_hash() == modified.get_info_hash(), 'info dict changed in ' + filename
+            else:
+                assert osize > msize, "Filesizes must be different!"
+                assert original.get_info_hash() != modified.get_info_hash(), filename + " wasn't scrubbed!"  
+
+            # Check essential keys were scrubbed
+            if filename == 'LICENSE.torrent':
+                assert 'x_cross_seed' in original.content['info']  
+                assert 'x_cross_seed' not in modified.content['info']
+
+            if filename == 'LICENSE-resume.torrent':
+                assert 'libtorrent_resume' in original.content  
+                assert 'libtorrent_resume' not in modified.content
+
+    @with_filecopy("*.torrent", "tmp/")
+    def test_torrent_scrub_off(self):
+        self.execute_feed('test_off')
+
+        for clean, filename in self.filenames: 
+            osize = os.path.getsize(filename)
+            msize = os.path.getsize("tmp/" + filename)
+            assert osize == msize, "Filesizes aren't supposed to differ!"
