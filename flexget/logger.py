@@ -3,6 +3,9 @@ import logging.handlers
 import re
 import threading
 
+# A level more detailed than DEBUG
+DEBUGALL = 5
+
 
 class FlexGetLogger(logging.Logger):
     """Custom logger that adds feed and execution info to log records."""
@@ -14,7 +17,8 @@ class FlexGetLogger(logging.Logger):
         return logging.Logger.makeRecord(self, name, level, fn, lno, msg, args, exc_info, func, extra)
 
     def debugall(self, msg, *args, **kwargs):
-        self.log(5, msg, *args, **kwargs)
+        """Log at DEBUGALL level (more detailed than DEBUG)."""
+        self.log(DEBUGALL, msg, *args, **kwargs)
 
 
 class FlexGetFormatter(logging.Formatter):
@@ -73,7 +77,7 @@ def initialize(unit_test=False):
     global _logging_configured, _mem_handler
 
     if not _logging_configured:
-        logging.addLevelName(5, 'DEBUGALL')
+        logging.addLevelName(DEBUGALL, 'DEBUGALL')
         _logging_configured = True
 
         if unit_test:
