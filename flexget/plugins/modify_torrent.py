@@ -8,13 +8,13 @@ log = logging.getLogger('modif_torrent')
 
 
 class TorrentFilename(object):
-
     """
         Makes sure that entries containing torrent-file have .torrent
         extension. This is enabled always by default (builtins).
     """
+    TORRENT_PRIO = 255
 
-    @priority(255)
+    @priority(TORRENT_PRIO)
     def on_feed_modify(self, feed):
         for entry in feed.entries:
             # skip if entry does not have file assigned
@@ -66,7 +66,7 @@ class TorrentFilename(object):
             except Exception, e:
                 log.exception(e)
 
-    @priority(255)
+    @priority(TORRENT_PRIO)
     def on_feed_output(self, feed):
         for entry in feed.entries:
             if 'torrent' in entry:
