@@ -1,5 +1,5 @@
 from tests import FlexGetBase, with_filecopy
-from flexget.plugins.modify_torrent import Torrent
+from flexget.utils.bittorrent import Torrent 
 
 
 class TestInfoHash(FlexGetBase):
