@@ -10,6 +10,29 @@ log = logging.getLogger('torrent')
 TORRENT_RE = re.compile(r'^d\d{1,3}:')
 
 
+def is_torrent_file(metafilepath):
+    """ Check whether a file looks like a metafile by peeking into its content.
+    
+        Note that this doesn't ensure that the file is a complete and valid torrent,
+        it just allows fast filtering of candidate files.
+        
+        @param metafilepath: Path to the file to check, must have read permissions for it.
+        @return: True if there is a high probability this is a metafile. 
+    """
+    f = open(metafilepath, 'rb')
+    try:
+        # read first 200 bytes to verify if a file is a torrent or not
+        data = f.read(200)
+    finally:
+        f.close()
+
+    magic_marker = bool(TORRENT_RE.match(data))
+    if not magic_marker:
+        log.debugall('%s doesn\'t seem to be a torrent, got `%s` (hex)' % (metafilepath, data.encode('hex')))
+
+    return bool(magic_marker)
+
+
 class Torrent(object):
     """Represents a torrent"""
 

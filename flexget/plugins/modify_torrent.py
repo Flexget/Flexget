@@ -1,7 +1,7 @@
 import logging
 from flexget.plugin import register_plugin, priority, PluginError
 # TORRENT_RE is redundant by now, but keep it here, in case someone was crazy enough to import it
-from flexget.utils.bittorrent import Torrent, TORRENT_RE 
+from flexget.utils.bittorrent import Torrent, is_torrent_file, TORRENT_RE 
 import os
 
 log = logging.getLogger('modif_torrent')
@@ -26,16 +26,9 @@ class TorrentFilename(object):
             if os.path.getsize(entry['file']) == 0:
                 raise PluginError('File %s is 0 bytes in size' % entry['file'])
 
-            # read first 200 bytes to verify if a file is a torrent or not
-            f = open(entry['file'], 'rb')
-            data = f.read(200)
-            f.close()
-            if not TORRENT_RE.match(data):
-                # not a torrent file at all, skip
-                log.debugall('%s doesn\'t seem to be a torrent, got `%s` (hex)' % (entry['title'], data.encode('hex')))
+            if not is_torrent_file(entry['file']):
                 continue
-            else:
-                log.debug('%s seems to be a torrent' % entry['title'])
+            log.debug('%s seems to be a torrent' % entry['title'])
 
             # create torrent object from torrent
             try:
