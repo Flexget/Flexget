@@ -114,12 +114,27 @@ class with_filecopy(object):
 
         def wrapper(*args, **kwargs):
             import shutil
+            import glob
             import os
-            shutil.copy(self.src, self.dst)
+            
+            files = glob.glob(self.src)
+            if files[0] != self.src:
+                # Glob expansion, "dst" is a prefix
+                pairs = [(i, self.dst + i) for i in files]
+            else:
+                # Explicit source and destination names
+                pairs = [(self.src, self.dst)]
+   
+            for src, dst in pairs:
+                log.debugall("Copying %r to %r" % (src, dst))            
+                shutil.copy(src, dst)
             try:
                 return func(*args, **kwargs)
             finally:
-                os.remove(self.dst)
+                for _, dst in pairs:             
+                    if os.path.exists(dst):
+                        log.debugall("Removing %r" % dst)            
+                        os.remove(dst)
 
         from nose.tools import make_decorator
         wrapper = make_decorator(func)(wrapper)
