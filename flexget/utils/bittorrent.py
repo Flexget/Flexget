@@ -9,6 +9,60 @@ log = logging.getLogger('torrent')
 # Magic indicator used to quickly recognize torrent files
 TORRENT_RE = re.compile(r'^d\d{1,3}:')
 
+# List of all standard keys in a metafile
+# See http://packages.python.org/pyrocore/apidocs/pyrocore.util.metafile-module.html#METAFILE_STD_KEYS
+METAFILE_STD_KEYS = [i.split('.') for i in (
+    "announce",
+    "comment",
+    "created by",
+    "creation date",
+    "encoding",
+    "info",
+    "info.length",
+    "info.name",
+    "info.piece length",
+    "info.pieces",
+    "info.private",
+    "info.files",
+    "info.files.length",
+    "info.files.path",
+)]
+
+
+def clean_meta(meta, including_info=False, logger=None):
+    """ Clean meta dict. Optionally log changes to the given logger at INFO level.
+    
+        See also http://packages.python.org/pyrocore/apidocs/pyrocore.util.metafile-pysrc.html#clean_meta
+        
+        @return: True if C{meta} was modified.
+    """
+    modified = False
+
+    for key in meta.keys():
+        if [key] not in METAFILE_STD_KEYS:
+            if logger:
+                logger.info("Removing key %r..." % (key,))
+            del meta[key]
+            modified = True
+
+    if including_info:
+        for key in meta["info"].keys():
+            if ["info", key] not in METAFILE_STD_KEYS:
+                if logger: 
+                    logger.info("Removing key %r..." % ("info." + key,))
+                del meta["info"][key]
+                modified = True
+
+        for idx, entry in enumerate(meta["info"].get("files", [])):
+            for key in entry.keys():
+                if ["info", "files", key] not in METAFILE_STD_KEYS:
+                    if logger: 
+                        logger.info("Removing key %r from file #%d..." % (key, idx + 1))
+                    del entry[key]
+                    modified = True
+
+    return modified
+
 
 def is_torrent_file(metafilepath):
     """ Check whether a file looks like a metafile by peeking into its content.
@@ -35,6 +89,15 @@ def is_torrent_file(metafilepath):
 
 class Torrent(object):
     """Represents a torrent"""
+
+    @classmethod
+    def from_file(cls, filename):
+        """Create torrent from file on disk."""
+        handle = open(filename, 'rb')
+        try:
+            return cls(handle.read())
+        finally:
+            handle.close()
 
     def __init__(self, content):
         """Accepts torrent file as string"""
