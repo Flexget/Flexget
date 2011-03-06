@@ -20,9 +20,11 @@ class ImdbSearch(object):
 
     def __init__(self):
         # de-prioritize aka matches a bit
-        self.aka_weight = 0.9
-        # prioritize popular matches a bit
-        self.unpopular_weight = 0.95
+        self.aka_weight = 0.95
+        # prioritize popular matches a bit by depriorizing others
+        self.unpopular_weight = 0.85
+        # de-prioritize tv results
+        self.tv_weight = 0.75
         self.min_match = 0.5
         self.min_diff = 0.01
         self.debug = False
@@ -86,7 +88,8 @@ class ImdbSearch(object):
         # check min difference between best two hits
         diff = movies[0]['match'] - movies[1]['match']
         if diff < self.min_diff:
-            log.debug('unable to determine correct movie, min_diff too small')
+            log.debug('unable to determine correct movie, min_diff too small (`%s` <-?-> `%s`)' %
+                (movies[0], movies[1]))
             for m in movies:
                 log.debug('remain: %s (match: %s) %s' % (m['name'], m['match'], m['url']))
             return None
@@ -162,28 +165,35 @@ class ImdbSearch(object):
                 log.debug('processing name: %s url: %s' % (movie['name'], movie['url']))
 
                 # calc & set best matching ratio
-                seq = difflib.SequenceMatcher(lambda x: x == ' ', movie['name'], name)
+                seq = difflib.SequenceMatcher(lambda x: x == ' ', movie['name'].lower(), name.lower())
                 ratio = seq.ratio()
+
+                # deprioritize tv results
+                if movie.get('type') == 'TV':
+                    log.debug('deprioritize tv')
+                    ratio = ratio * self.tv_weight
 
                 # check if some of the akas have better ratio
                 for aka in link.parent.findAll('p', attrs={'class': 'find-aka'}):
                     aka = aka.next.string
-                    match = re.search('".*"', aka)
+                    match = re.search(r'".*"', aka)
                     if not match:
                         log.debug('aka `%s` is invalid' % aka)
+                        continue
                     aka = match.group(0).replace('"', '')
                     log.debugall('processing aka %s' % aka)
                     seq = difflib.SequenceMatcher(lambda x: x == ' ', aka.lower(), name.lower())
-                    aka_ratio = seq.ratio() * self.aka_weight
+                    aka_ratio = seq.ratio()
                     if aka_ratio > ratio:
-                        log.debug('- aka %s has better ratio %s' % (aka, aka_ratio))
-                        ratio = aka_ratio
+                        ratio = aka_ratio * self.aka_weight
+                        log.debug('- aka `%s` matches better to `%s` ratio %s (weighted to %s)' %
+                                  (aka, name, aka_ratio, ratio))
 
                 # prioritize popular titles
                 if section != sections[0]:
                     ratio = ratio * self.unpopular_weight
                 else:
-                    log.debug('- priorizing popular title')
+                    log.debug('- priorizing popular %s' % movie['url'])
 
                 # store ratio
                 movie['match'] = ratio
