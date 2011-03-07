@@ -99,6 +99,15 @@ class TestTorrentScrub(FlexGetBase):
             accept_all: yes
             torrent_scrub: all
 
+          test_fields:
+            mock:
+              - {title: 'LICENSE', file: 'tmp/LICENSE.torrent'}
+            accept_all: yes
+            torrent_scrub:
+              - comment
+              - info.x_cross_seed
+              - field.that.never.exists
+
           test_off:
             mock:
               - {title: 'LICENSE-resume', file: 'tmp/LICENSE-resume.torrent'}
@@ -151,6 +160,14 @@ class TestTorrentScrub(FlexGetBase):
             if filename == 'LICENSE-resume.torrent':
                 assert 'libtorrent_resume' in original.content  
                 assert 'libtorrent_resume' not in modified.content
+
+    @with_filecopy("*.torrent", "tmp/")
+    def test_torrent_scrub_fields(self):
+        self.execute_feed('test_fields')
+        torrent = self.feed.find_entry(title='LICENSE')['torrent']
+        assert 'name' in torrent.content['info'], "'info.name' was lost"
+        assert 'comment' not in torrent.content, "'comment' not scrubbed"
+        assert 'x_cross_seed' not in torrent.content['info'], "'info.x_cross_seed' not scrubbed"
 
     @with_filecopy("*.torrent", "tmp/")
     def test_torrent_scrub_off(self):

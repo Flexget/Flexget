@@ -36,16 +36,20 @@ class PluginTorrentScrubber(object):
         root = validator.factory()
         root.accept("boolean")
         root.accept("choice").accept_choices(self.SCRUB_MODES, ignore_case=True)
+        root.accept("list").accept("text") # list of keys to scrub
         return root
 
     @plugin.priority(SCRUB_PRIO)
     def on_feed_modify(self, feed, config):
         """ Scrub items that are torrents, if they're affected.
         """
-        mode = str(config).lower()
-        if mode in ("off", "false"):
-            LOG.debug("Plugin configured, but disabled")
-            return
+        if isinstance(config, list):
+            mode = "fields"
+        else:
+            mode = str(config).lower()
+            if mode in ("off", "false"):
+                LOG.debug("Plugin configured, but disabled")
+                return
 
         for entry in feed.entries:
             # Skip non-torrents
@@ -65,8 +69,28 @@ class PluginTorrentScrubber(object):
 
                 for key in self.RT_KEYS:
                     if key in metainfo:
-                        LOG.info("Removing key %r..." % (key,))
+                        LOG.info("Removing key '%s'..." % (key,))
                         del metainfo[key]
+                        modified = True
+            elif mode == "fields":
+                # Scrub all configured fields
+                for key in config:
+                    fieldname = key # store for logging
+                    key = bittorrent.Torrent.KEY_TYPE(key)
+                    field = metainfo
+
+                    while field and '.' in key:
+                        name, key = key.split('.')
+                        try:
+                            field = field[name]
+                        except KeyError, exc:
+                            # Key not found in this entry
+                            field = None
+                        LOG.debugall((key, field))
+
+                    if field and key in field: 
+                        LOG.info("Removing key '%s'..." % (fieldname,))
+                        del field[key]
                         modified = True
             else:
                 raise ValueError("INTERNAL ERROR: Unknown mode %r" % mode)
@@ -78,7 +102,7 @@ class PluginTorrentScrubber(object):
                 LOG.info("Torrent '%s' was scrubbed!" % entry['title'])
                 new_infohash = entry["torrent"].get_info_hash()
                 if infohash != new_infohash:
-                    LOG.warn("Info hash changed from #%s to #%s in %s" % (infohash, new_infohash, entry['filename']))
+                    LOG.warn("Info hash changed from #%s to #%s in '%s'" % (infohash, new_infohash, entry['filename']))
                 
 
 plugin.register_plugin(PluginTorrentScrubber, NAME, api_ver=2)

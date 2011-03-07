@@ -89,6 +89,9 @@ def is_torrent_file(metafilepath):
 
 class Torrent(object):
     """Represents a torrent"""
+    # string type used for keys, if this ever changes, stuff like "x in y"
+    # gets broken unless you coerce to this type
+    KEY_TYPE = str
 
     @classmethod
     def from_file(cls, filename):
