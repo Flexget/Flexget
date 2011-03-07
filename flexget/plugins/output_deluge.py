@@ -45,10 +45,10 @@ try:
                 else:
                     twisted_log.msg('Main loop terminated.')
 
-        def run(self, *args, **kwargs):
+        def run(self, installSignalHandlers=False):
             """Starts or resumes the reactor."""
             if not self._started:
-                self.startRunning(*args, **kwargs)
+                self.startRunning(installSignalHandlers)
                 self._mainLoopGen = self._mainLoopGenerator()
             try:
                 self.paused = False
