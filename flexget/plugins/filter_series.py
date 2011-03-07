@@ -668,9 +668,12 @@ class FilterSeries(SeriesPlugin, FilterSeriesBase):
 
             # episode advancement. used only with season based series
             if best.season and best.episode:
-                log.debug('-' * 20 + ' episode advancement -->')
-                if self.process_episode_advancement(feed, eps, series):
-                    continue
+                if feed.manager.options.disable_advancement:
+                    log.debug('episode advancement disabled')
+                else:
+                    log.debug('-' * 20 + ' episode advancement -->')
+                    if self.process_episode_advancement(feed, eps, series):
+                        continue
 
             # timeframe
             if 'timeframe' in config:
@@ -1013,3 +1016,5 @@ class FilterSeries(SeriesPlugin, FilterSeriesBase):
 register_plugin(FilterSeries, 'series')
 register_parser_option('--stop-waiting', action='store', dest='stop_waiting', default='',
                        metavar='NAME', help='Stop timeframe for a given series.')
+register_parser_option('--disable-advancement', action='store_true', dest='disable_advancement', default=False,
+                       help='Disable episode advancement for this run.')
