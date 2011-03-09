@@ -286,8 +286,7 @@ class OutputDeluge(object):
                 log.info('%s is already loaded in deluge. Cannot change label, movedone, or queuetotop' % entry['title'])
 
     def add_to_deluge12(self, feed, config):
-
-        """ This is the new add to deluge method, using reactor.iterate """
+        """Adds torrents to Deluge using the 1.2+ api and our custom twisted PausingReactor"""
 
         from deluge.ui.client import client
         from twisted.internet import reactor, defer
@@ -306,28 +305,34 @@ class OutputDeluge(object):
                 client.disconnect()
                 return
 
-            def on_success(torrent_id, entry, opts):
-                """Gets called when a torrent was successfully added to the daemon."""
+            def set_torrent_options(torrent_id, entry, opts):
+                """Gets called when a torrent was added to the daemon."""
                 dlist = []
                 if not torrent_id:
-                    log.info('%s is already loaded in deluge, cannot set options.' % entry['title'])
+                    log.error('There was an error adding %s to deluge.' % entry['title'])
+                    # TODO: Fail entry? How can this happen still now?
                     return
                 log.info('%s successfully added to deluge.' % entry['title'])
+                entry['deluge_id'] = torrent_id
+
+                def create_path(result, path):
+                    """Creates the specified path if deluge is older than 1.3"""
+                    from deluge.common import VersionSplit
+                    # Before 1.3, deluge would not create a non-existent move directory, so we need to.
+                    if VersionSplit('1.3.0') > VersionSplit(self.deluge_version):
+                        if client.is_localhost():
+                            if not os.path.isdir(path):
+                                log.debug('path %s doesn\'t exist, creating' % path)
+                                os.makedirs(path)
+                        else:
+                            log.warning('If path does not exist on the machine running the daemon, move will fail.')
+
+                if opts.get('path'):
+                    dlist.append(version_deferred.addCallback(create_path, opts['path']))
+                    log.debug('Moving storage for %s to %s' % (entry['title'], opts['path']))
+                    dlist.append(client.core.move_storage([torrent_id], opts['path']))
                 if opts['movedone']:
-
-                    def create_movedone_path(result):
-                        """Gets called after torrent added to deluge and deluge version verified."""
-                        from deluge.common import VersionSplit
-                        # Before 1.3, deluge would not create a non-existent movedone directory, so we need to.
-                        if VersionSplit('1.3.0') > VersionSplit(self.deluge_version):
-                            if client.is_localhost():
-                                if not os.path.isdir(opts['movedone']):
-                                    log.debug('movedone path %s doesn\'t exist, creating' % opts['movedone'])
-                                    os.makedirs(opts['movedone'])
-                            else:
-                                log.warning('If movedone path does not exist on the machine running the daemon, movedone will fail.')
-
-                    dlist.append(version_deferred.addCallback(create_movedone_path))
+                    dlist.append(version_deferred.addCallback(create_path, opts['movedone']))
                     dlist.append(client.core.set_torrent_move_completed(torrent_id, True))
                     dlist.append(client.core.set_torrent_move_completed_path(torrent_id, opts['movedone']))
                     log.debug('%s move on complete set to %s' % (entry['title'], opts['movedone']))
@@ -447,53 +452,69 @@ class OutputDeluge(object):
             version_deferred = client.daemon.info().addCallback(on_get_daemon_info)
             dlist.append(version_deferred)
 
-            # add the torrents
-            for entry in feed.accepted:
-                magnet, filedump = None, None
-                if entry.get('url', '').startswith('magnet:'):
-                    magnet = entry['url']
-                else:
-                    if not os.path.exists(entry['file']):
-                        feed.fail(entry, 'Downloaded temp file \'%s\' doesn\'t exist!' % entry['file'])
-                        del(entry['file'])
-                        continue
-                    try:
-                        f = open(entry['file'], 'rb')
-                        filedump = base64.encodestring(f.read())
-                    finally:
-                        f.close()
-                opts = {}
-                path = replace_from_entry(entry.get('path', config['path']), entry, 'path', log.error)
-                if path:
-                    opts['download_location'] = make_valid_path(os.path.expanduser(path))
-                for fopt, dopt in self.options.iteritems():
-                    value = entry.get(fopt, config.get(fopt))
-                    if value is not None:
-                        opts[dopt] = value
-                        if fopt == 'ratio':
-                            opts['stop_at_ratio'] = True
+            def on_get_session_state(torrent_ids):
+                """Gets called with a list of torrent_ids loaded in the deluge session.
+                Adds new torrents and modifies the settings for ones already in the session."""
+                dlist = []
+                # add the torrents
+                for entry in feed.accepted:
 
-                def add_torrent(title, filedump, opts, magnet=False):
-                    """Calls the appropriate add_torrent function on daemon, returns the deferred."""
-                    log.debug('Adding %s to deluge.' % title)
-                    if magnet:
-                        return client.core.add_torrent_magnet(magnet, opts)
+                    def add_entry(entry, opts):
+                        magnet, filedump = None, None
+                        """Adds an entry to the deluge session"""
+                        if entry.get('url', '').startswith('magnet:'):
+                            magnet = entry['url']
+                        else:
+                            if not os.path.exists(entry['file']):
+                                feed.fail(entry, 'Downloaded temp file \'%s\' doesn\'t exist!' % entry['file'])
+                                del(entry['file'])
+                                return
+                            try:
+                                f = open(entry['file'], 'rb')
+                                filedump = base64.encodestring(f.read())
+                            finally:
+                                f.close()
+
+                        log.debug('Adding %s to deluge.' % entry['title'])
+                        if magnet:
+                            return client.core.add_torrent_magnet(magnet, opts)
+                        else:
+                            return client.core.add_torrent_file(entry['title'], filedump, opts)
+
+                    # Generate deluge options dict for torrent add
+                    path = replace_from_entry(entry.get('path', config['path']), entry, 'path', log.error)
+                    add_opts = {}
+                    if path:
+                        add_opts['download_location'] = make_valid_path(os.path.expanduser(path))
+                    for fopt, dopt in self.options.iteritems():
+                        value = entry.get(fopt, config.get(fopt))
+                        if value is not None:
+                            add_opts[dopt] = value
+                            if fopt == 'ratio':
+                                add_opts['stop_at_ratio'] = True
+                    # Make another set of options, that get set after the torrent has been added
+                    content_filename = entry.get('content_filename', config.get('content_filename', ''))
+                    movedone = replace_from_entry(entry.get('movedone', config['movedone']), entry, 'movedone', log.error)
+                    modify_opts = {'movedone': make_valid_path(os.path.expanduser(movedone)),
+                            'label': format_label(entry.get('label', config['label'])),
+                            'queuetotop': entry.get('queuetotop', config.get('queuetotop')),
+                            'content_filename': replace_from_entry(content_filename, entry, 'content_filename', log.error),
+                            'main_file_only': entry.get('main_file_only', config.get('main_file_only', False))}
+
+                    torrent_id = entry.get('deluge_id') or entry.get('torrent_info_hash')
+                    torrent_id = torrent_id and torrent_id.lower()
+                    if torrent_id in torrent_ids:
+                        log.info('%s is already loaded in deluge, setting options' % entry['title'])
+                        # Entry has a deluge id, verify the torrent is still in the deluge session and apply options
+                        # Since this is already loaded in deluge, we may also need to change the path
+                        modify_opts['path'] = add_opts.pop('download_location', None)
+                        dlist.extend([set_torrent_options(torrent_id, entry, modify_opts),
+                                      client.core.set_torrent_options([torrent_id], add_opts)])
                     else:
-                        return client.core.add_torrent_file(title, filedump, opts)
-
-                addresult = add_torrent(entry['title'], filedump, opts, magnet)
-
-                # Make a new set of options, that get set after the torrent has been added
-                content_filename = entry.get('content_filename', config.get('content_filename', ''))
-                movedone = replace_from_entry(entry.get('movedone', config['movedone']), entry, 'movedone', log.error)
-                opts = {'movedone': make_valid_path(os.path.expanduser(movedone)),
-                        'label': format_label(entry.get('label', config['label'])),
-                        'queuetotop': entry.get('queuetotop', config.get('queuetotop')),
-                        'content_filename': replace_from_entry(content_filename, entry, 'content_filename', log.error),
-                        'main_file_only': entry.get('main_file_only', config.get('main_file_only', False))}
-
-                addresult.addCallbacks(on_success, on_fail, callbackArgs=(entry, opts), errbackArgs=(feed, entry))
-                dlist.append(addresult)
+                        dlist.append(add_entry(entry, add_opts).addCallbacks(set_torrent_options, on_fail,
+                                callbackArgs=(entry, modify_opts), errbackArgs=(feed, entry)))
+                return defer.DeferredList(dlist)
+            dlist.append(client.core.get_session_state().addCallback(on_get_session_state))
 
             def on_complete(result):
                 """Gets called when all of our tasks for deluge daemon are complete."""
