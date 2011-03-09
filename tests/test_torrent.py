@@ -89,26 +89,20 @@ class TestPrivateTorrents(FlexGetBase):
 
 class TestTorrentScrub(FlexGetBase):
 
-    TMP = "tmp%d." % os.getpid()
-    filenames = (
-        (True, 'test.torrent'), 
-        (False, 'LICENSE.torrent'), 
-        (False, 'LICENSE-resume.torrent'),
-    )
-
+    __tmp__ = True
     __yaml__ = """
         feeds:
           test_all:
             mock:
-              - {title: 'TMP#test', file: 'TMP#test.torrent'}
-              - {title: 'TMP#LICENSE', file: 'TMP#LICENSE.torrent'}
-              - {title: 'TMP#LICENSE-resume', file: 'TMP#LICENSE-resume.torrent'}
+              - {title: 'test', file: '__tmp__test.torrent'}
+              - {title: 'LICENSE', file: '__tmp__LICENSE.torrent'}
+              - {title: 'LICENSE-resume', file: '__tmp__LICENSE-resume.torrent'}
             accept_all: yes
             torrent_scrub: all
 
           test_fields:
             mock:
-              - {title: 'TMP#fields.LICENSE', file: 'TMP#LICENSE.torrent'}
+              - {title: 'fields.LICENSE', file: '__tmp__LICENSE.torrent'}
             accept_all: yes
             torrent_scrub:
               - comment
@@ -117,25 +111,33 @@ class TestTorrentScrub(FlexGetBase):
 
           test_off:
             mock:
-              - {title: 'TMP#off.LICENSE-resume', file: 'TMP#LICENSE-resume.torrent'}
+              - {title: 'off.LICENSE-resume', file: '__tmp__LICENSE-resume.torrent'}
             accept_all: yes
             torrent_scrub: off
-    """.replace("TMP#", TMP)
+    """
 
-    @with_filecopy("*.torrent", TMP)
+    filenames = (
+        (True, 'test.torrent'), 
+        (False, 'LICENSE.torrent'), 
+        (False, 'LICENSE-resume.torrent'),
+    )
+
+    @with_filecopy("*.torrent", "__tmp__")
     def test_torrent_scrub(self):
         # Run feed        
         self.execute_feed('test_all')
 
         for clean, filename in self.filenames: 
             original = Torrent.from_file(filename)
-            try:
-                title = self.TMP + os.path.splitext(filename)[0]
-                modified = self.feed.find_entry(title=title)['torrent']
-            except (KeyError, TypeError), exc:
-                raise AssertionError("%r cannot be found in %r" % (title, self.feed))
+            title = os.path.splitext(filename)[0]
+
+            modified = self.feed.find_entry(title=title)
+            assert modified, "%r cannot be found in %r" % (title, self.feed)
+            modified = modified.get('torrent')
+            assert modified, "No 'torrent' key in %r" % (title,)
+
             osize = os.path.getsize(filename)
-            msize = os.path.getsize(self.TMP + filename)
+            msize = os.path.getsize(self.__tmp__ + filename)
 
             # Dump small torrents on demand
             if 0 and not clean:
@@ -166,20 +168,25 @@ class TestTorrentScrub(FlexGetBase):
                 assert 'libtorrent_resume' in original.content  
                 assert 'libtorrent_resume' not in modified.content
 
-    @with_filecopy("*.torrent", TMP)
+    @with_filecopy("*.torrent", "__tmp__")
     def test_torrent_scrub_fields(self):
         self.execute_feed('test_fields')
-        torrent = self.feed.find_entry(title=self.TMP + 'fields.LICENSE')['torrent']
+        title = 'fields.LICENSE'
+        torrent = self.feed.find_entry(title=title)
+        assert torrent, "%r cannot be found in %r" % (title, self.feed)
+        torrent = torrent.get('torrent')
+        assert torrent, "No 'torrent' key in %r" % (title,)
+
         assert 'name' in torrent.content['info'], "'info.name' was lost"
         assert 'comment' not in torrent.content, "'comment' not scrubbed"
         assert 'x_cross_seed' not in torrent.content['info'], "'info.x_cross_seed' not scrubbed"
 
-    @with_filecopy("*.torrent", TMP)
+    @with_filecopy("*.torrent", "__tmp__")
     def test_torrent_scrub_off(self):
         self.execute_feed('test_off')
 
         for clean, filename in self.filenames: 
             osize = os.path.getsize(filename)
-            msize = os.path.getsize(self.TMP + filename)
+            msize = os.path.getsize(self.__tmp__ + filename)
             assert osize == msize, "Filesizes aren't supposed to differ (%r %d, %r %d)!" % (
-                filename, osize, self.TMP + filename, msize)
+                filename, osize, self.__tmp__ + filename, msize)
