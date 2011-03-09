@@ -1,14 +1,18 @@
 """ Rtorrent connector plugin.
+
+    If you use the plugins contained in this module, you MUST easy_install pyrocore
+    as an additional dependency.
 """
 
 import os
 import logging
 from flexget import plugin, validator
 from flexget import feed as flexfeed
+from flexget.utils import bittorrent 
+##from flexget.plugins import plugin_torrent
 
 # Global constants
-NAME = __name__.split('.')[-1].split('_', 1)[1]
-LOG = logging.getLogger(NAME)
+LOG = logging.getLogger("rtorrent")
 
 
 def _make_validator(schema):
@@ -29,8 +33,6 @@ def _make_validator(schema):
 class PluginRtorrent(object):
     """ Opens a rtorrent connection and does things to it.
 
-        If you use this plugin, you MUST easy_install pyrocore as an additional dependency.
-    
         Example for dumping torrents matching a filter condition:
             feeds:
               pyrotest:
@@ -47,6 +49,7 @@ class PluginRtorrent(object):
                   overrides:
                     rtorrent_rc: ~/bittorrent/rtorrent.rc
     """
+    NAME = "rtorrent"
 
     # Only plugins below this prio can rely on the rtorrent connection
     PROXY_PRIO = 250
@@ -79,8 +82,10 @@ class PluginRtorrent(object):
             # Enabled or disabled, with only defaults
             config = {"enabled": config}
         elif isinstance(config, basestring):
-            # Only path to rtorrent config given
+            # Only path to pyroscope config given
             config = {"config_dir": config}
+        else:
+            config = config.copy()
         
         for key, (_, val) in self.PARAMS.items():
             config.setdefault(key, val)
@@ -115,7 +120,7 @@ class PluginRtorrent(object):
                 self.proxy = config.engine.open()
                 LOG.info(config.engine) # where are we connected?
             except error.LoggableError, exc:
-                raise plugin.PluginError(exc)
+                raise plugin.PluginError(str(exc))
 
         return self.proxy
 
@@ -125,7 +130,7 @@ class PluginRtorrent(object):
         """
         ##LOG.warn("PROCSTART %r with %r" % (feed, config))
         if self.global_config is None:
-            rtorrent_preset = feed.manager.config.get("presets", {}).get("global", {}).get(NAME, {})
+            rtorrent_preset = feed.manager.config.get("presets", {}).get("global", {}).get(self.NAME, {})
             ##LOG.warn("PRESET %r" % (rtorrent_preset,))
             self.global_config = self._sanitize_config(rtorrent_preset)
             self._open_proxy() # make things fail fast if they do
@@ -140,11 +145,8 @@ class PluginRtorrent(object):
     def on_feed_start(self, feed, config):
         """ Feed starting.
         """
-        if self.proxy:
-            ##LOG.warn("FEEDSTART %r with %r" % (feed, config))
-            self.config = self._sanitize_config(feed.config.get(NAME, {}))
-
-            # XXX: ?Make sure global values aren't used on the local level?
+        self.config = self._sanitize_config(config)
+        # XXX: ?Make sure global values aren't used on the local level?
             
     def on_feed_exit(self, feed, config):
         """ Feed exiting.
@@ -154,9 +156,13 @@ class PluginRtorrent(object):
     # Feed aborted, clean up
     on_feed_abort = on_feed_exit
 
-    def on_feed_input(self, feed, config):
+    def on_feed_input(self, feed, _):
         """ Produce entries from rtorrent items.
         """
+        if not self.config["enabled"]:
+            LOG.debugall("plugin disabled")
+            return
+        
         if self.proxy and self.config["feed_query"]:
             from pyrocore import error
             from pyrocore.torrent import engine
@@ -165,10 +171,8 @@ class PluginRtorrent(object):
             try:
                 matcher = engine.parse_filter_conditions(self.config["feed_query"])
                 view = pyrocfg.engine.view(self.config["view"], matcher)
-                matches = list(view.items())
-                #matches.sort(key=sort_key, reverse=self.options.reverse_sort)
 
-                for item in matches:
+                for item in view.items():
                     entry = flexfeed.Entry()
                     
                     entry["title"] = item.name
@@ -180,4 +184,10 @@ class PluginRtorrent(object):
             except error.LoggableError, exc:
                 raise plugin.PluginError(exc)
 
-plugin.register_plugin(PluginRtorrent, NAME, api_ver=2)
+
+def _reg(clazz):
+    "Registration helper"
+    plugin.register_plugin(clazz, clazz.NAME, api_ver=2)
+
+_reg(PluginRtorrent)
+del _reg
