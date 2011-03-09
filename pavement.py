@@ -74,7 +74,7 @@ def test(options):
 
     args = []
     args.append('-v')
-    args.append('--processes=1')
+    args.append('--processes=4')
     args.append('-x')
     if not options.test.get('online'):
         args.extend(['--attr=!online'])
