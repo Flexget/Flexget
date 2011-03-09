@@ -72,6 +72,7 @@ class Manager(object):
 
         log.debug('sys.defaultencoding: %s' % sys.getdefaultencoding())
         log.debug('sys.getfilesystemencoding: %s' % sys.getfilesystemencoding())
+        log.debug('os.path.supports_unicode_filenames: %s' % os.path.supports_unicode_filenames)
 
         atexit.register(self.shutdown)
 
