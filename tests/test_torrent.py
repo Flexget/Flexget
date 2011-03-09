@@ -176,4 +176,5 @@ class TestTorrentScrub(FlexGetBase):
         for clean, filename in self.filenames: 
             osize = os.path.getsize(filename)
             msize = os.path.getsize("tmp/" + filename)
-            assert osize == msize, "Filesizes aren't supposed to differ!"
+            assert osize == msize, "Filesizes aren't supposed to differ (%r %d, %r %d)!" % (
+                filename, osize, "tmp/" + filename, msize)
