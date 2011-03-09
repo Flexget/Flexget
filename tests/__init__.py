@@ -57,13 +57,12 @@ class MockManager(Manager):
 class FlexGetBase(object):
     __yaml__ = """# Yaml goes here"""
 
-    # Set this to True to get a UNIQUE tmpdir; the tmpdir is created in
-    # setup as "./tmp/<testname>" and automatically removed in teardown.
+    # Set this to True to get a UNIQUE tmpdir; the tmpdir is created on
+    # setup as "./tmp/<testname>" and automatically removed on teardown.
     #
     # The instance variable __tmp__ is set to the absolute name of the tmpdir
-    # (ending with "os.sep"), and so is a global preset variable of that name.
-    # Any occurence of "__tmp__" in __yaml__ or a @with_filecopy destination
-    # is also replaced with it.
+    # (ending with "os.sep"), and any occurence of "__tmp__" in __yaml__ or
+    # a @with_filecopy destination is also replaced with it.
     __tmp__ = False
 
     def __init__(self):
@@ -77,8 +76,6 @@ class FlexGetBase(object):
             self.__tmp__ = util.maketemp() + os.sep
             self.__yaml__ = self.__yaml__.replace("__tmp__", self.__tmp__)
         self.manager = MockManager(self.__yaml__, self.__class__.__name__)
-        if self.__tmp__:
-            self.manager.config.setdefault('presets', {}).setdefault('global', {}).setdefault('set', {})['__tmp__'] = self.__tmp__
 
     def teardown(self):
         try:
