@@ -89,19 +89,26 @@ class TestPrivateTorrents(FlexGetBase):
 
 class TestTorrentScrub(FlexGetBase):
 
+    TMP = "tmp%d." % os.getpid()
+    filenames = (
+        (True, 'test.torrent'), 
+        (False, 'LICENSE.torrent'), 
+        (False, 'LICENSE-resume.torrent'),
+    )
+
     __yaml__ = """
         feeds:
           test_all:
             mock:
-              - {title: 'test', file: 'tmp/test.torrent'}
-              - {title: 'LICENSE', file: 'tmp/LICENSE.torrent'}
-              - {title: 'LICENSE-resume', file: 'tmp/LICENSE-resume.torrent'}
+              - {title: 'test', file: 'TMP/test.torrent'}
+              - {title: 'LICENSE', file: 'TMP/LICENSE.torrent'}
+              - {title: 'LICENSE-resume', file: 'TMP/LICENSE-resume.torrent'}
             accept_all: yes
             torrent_scrub: all
 
           test_fields:
             mock:
-              - {title: 'LICENSE', file: 'tmp/LICENSE.torrent'}
+              - {title: 'LICENSE', file: 'TMP/LICENSE.torrent'}
             accept_all: yes
             torrent_scrub:
               - comment
@@ -110,18 +117,12 @@ class TestTorrentScrub(FlexGetBase):
 
           test_off:
             mock:
-              - {title: 'LICENSE-resume', file: 'tmp/LICENSE-resume.torrent'}
+              - {title: 'LICENSE-resume', file: 'TMP/LICENSE-resume.torrent'}
             accept_all: yes
             torrent_scrub: off
-    """
+    """.replace("TMP/", TMP)
 
-    filenames = (
-        (True, 'test.torrent'), 
-        (False, 'LICENSE.torrent'), 
-        (False, 'LICENSE-resume.torrent'),
-    )
-
-    @with_filecopy("*.torrent", "tmp/")
+    @with_filecopy("*.torrent", TMP)
     def test_torrent_scrub(self):
         # Run feed        
         self.execute_feed('test_all')
@@ -130,7 +131,7 @@ class TestTorrentScrub(FlexGetBase):
             original = Torrent.from_file(filename)
             modified = self.feed.find_entry(title=os.path.splitext(filename)[0])['torrent']
             osize = os.path.getsize(filename)
-            msize = os.path.getsize("tmp/" + filename)
+            msize = os.path.getsize(self.TMP + filename)
 
             # Dump small torrents on demand
             if 0 and not clean:
@@ -161,7 +162,7 @@ class TestTorrentScrub(FlexGetBase):
                 assert 'libtorrent_resume' in original.content  
                 assert 'libtorrent_resume' not in modified.content
 
-    @with_filecopy("*.torrent", "tmp/")
+    @with_filecopy("*.torrent", TMP)
     def test_torrent_scrub_fields(self):
         self.execute_feed('test_fields')
         torrent = self.feed.find_entry(title='LICENSE')['torrent']
@@ -169,12 +170,12 @@ class TestTorrentScrub(FlexGetBase):
         assert 'comment' not in torrent.content, "'comment' not scrubbed"
         assert 'x_cross_seed' not in torrent.content['info'], "'info.x_cross_seed' not scrubbed"
 
-    @with_filecopy("*.torrent", "tmp/")
+    @with_filecopy("*.torrent", TMP)
     def test_torrent_scrub_off(self):
         self.execute_feed('test_off')
 
         for clean, filename in self.filenames: 
             osize = os.path.getsize(filename)
-            msize = os.path.getsize("tmp/" + filename)
+            msize = os.path.getsize(self.TMP + filename)
             assert osize == msize, "Filesizes aren't supposed to differ (%r %d, %r %d)!" % (
-                filename, osize, "tmp/" + filename, msize)
+                filename, osize, self.TMP + filename, msize)
