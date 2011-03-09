@@ -7,6 +7,7 @@ from flexget.manager import Manager
 from flexget.plugin import load_plugins
 from flexget.options import CoreOptionParser
 from flexget.feed import Feed
+from tests import util
 import yaml
 import logging
 
@@ -56,6 +57,15 @@ class MockManager(Manager):
 class FlexGetBase(object):
     __yaml__ = """# Yaml goes here"""
 
+    # Set this to True to get a UNIQUE tmpdir; the tmpdir is created in
+    # setup as "./tmp/<testname>" and automatically removed in teardown.
+    #
+    # The instance variable __tmp__ is set to the absolute name of the tmpdir
+    # (ending with "os.sep"), and so is a global preset variable of that name.
+    # Any occurence of "__tmp__" in __yaml__ or a @with_filecopy destination
+    # is also replaced with it.
+    __tmp__ = False
+
     def __init__(self):
         self.manager = None
         self.feed = None
@@ -63,14 +73,25 @@ class FlexGetBase(object):
     def setup(self):
         """Set up test env"""
         setup_once()
+        if self.__tmp__:
+            self.__tmp__ = util.maketemp() + os.sep
+            self.__yaml__ = self.__yaml__.replace("__tmp__", self.__tmp__)
         self.manager = MockManager(self.__yaml__, self.__class__.__name__)
+        if self.__tmp__:
+            self.manager.config.setdefault('presets', {}).setdefault('global', {}).setdefault('set', {})['__tmp__'] = self.__tmp__
 
     def teardown(self):
         try:
-            self.feed.session.close()
-        except:
-            pass
-        self.manager.__del__()
+            try:
+                self.feed.session.close()
+            except:
+                pass
+            self.manager.__del__()
+        finally:
+            if self.__tmp__:
+                import shutil
+                log.debugall('Removing tmpdir %r' % self.__tmp__)
+                shutil.rmtree(self.__tmp__.rstrip(os.sep))
 
     def execute_feed(self, name):
         """Use to execute one test feed from config"""
@@ -111,22 +132,26 @@ class with_filecopy(object):
         self.dst = dst
 
     def __call__(self, func):
-
+    
         def wrapper(*args, **kwargs):
             import shutil
             import glob
             import os
             
+            dst = self.dst
+            if "__tmp__" in dst:
+                dst = dst.replace('__tmp__', 'tmp/%s/' % util.find_test_name().replace(':', '_'))
+            
             files = glob.glob(self.src)
             if files[0] != self.src:
                 # Glob expansion, "dst" is a prefix
-                pairs = [(i, self.dst + i) for i in files]
+                pairs = [(i, dst + i) for i in files]
             else:
                 # Explicit source and destination names
-                pairs = [(self.src, self.dst)]
+                pairs = [(self.src, dst)]
    
             for src, dst in pairs:
-                log.debugall("Copying %r to %r (in %r)" % (src, dst, os.getcwd()))
+                log.debugall("Copying %r to %r" % (src, dst))
                 shutil.copy(src, dst)
             try:
                 return func(*args, **kwargs)

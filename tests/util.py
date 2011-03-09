@@ -6,6 +6,9 @@ import sys
 import os
 import shutil
 import errno
+import logging
+
+log = logging.getLogger('tests.util')
 
 
 def mkdir(*a, **kw):
@@ -59,13 +62,16 @@ def find_test_name():
                 return name
 
 
-def maketemp():
+def maketemp(name=None):
     tmp = os.path.join(os.path.dirname(__file__), 'tmp')
     mkdir(tmp)
 
-    # Colons are not valid characters in directories on Windows
-    name = find_test_name().replace(':', '_')
+    if not name:
+        # Colons are not valid characters in directories on Windows
+        name = find_test_name().replace(':', '_')
+
     tmp = os.path.join(tmp, name)
+    log.debugall("Creating empty tmpdir %r" % tmp)
     try:
         shutil.rmtree(tmp)
     except OSError, e:
