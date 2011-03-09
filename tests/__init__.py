@@ -126,7 +126,7 @@ class with_filecopy(object):
                 pairs = [(self.src, self.dst)]
    
             for src, dst in pairs:
-                log.debugall("Copying %r to %r" % (src, dst))            
+                log.debugall("Copying %r to %r (in %r)" % (src, dst, os.getcwd()))
                 shutil.copy(src, dst)
             try:
                 return func(*args, **kwargs)
