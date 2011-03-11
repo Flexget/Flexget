@@ -25,23 +25,31 @@ class DependencyError(Exception):
 
     Args:
 
-    who: name of the plugin trying to do the import
-    what: name of the plugin imported
+    issued_by: name of the plugin trying to do the import
+    missing: name of the plugin or library that is missing
     message: user readable error message
 
     All args are optional.
     """
 
-    def __init__(self, who=None, what=None, message=None, silent=False):
+    def __init__(self, issued_by=None, missing=None, message=None, silent=False):
         super(DependencyError, self).__init__()
-        self.who = who
-        self.what = what
+        self.issued_by = issued_by
+        self.missing = missing
         self.message = message
         self.silent = silent
 
+    def _get_message(self):
+        return self._message
+
+    def _set_message(self, message):
+        self._message = message
+
+    message = property(_get_message, _set_message)
+
     def __str__(self):
-        return '<DependencyError(who=%s,what=%s,message=%s)>' % \
-            (self.who, self.what, self.message)
+        return '<DependencyError(issued_by=%s,missing=%s,user_message=%s)>' % \
+            (self.issued_by, self.missing, self.user_message)
 
 
 class RegisterException(Exception):
@@ -452,8 +460,8 @@ def get_plugin_keywords():
     return keywords
 
 
-def get_plugin_by_name(name, who='???'):
+def get_plugin_by_name(name, issued_by='???'):
     """Get plugin by name, preferred way since this structure may be changed at some point."""
     if not name in plugins:
-        raise DependencyError(who=who, what=name, message='Unknown plugin %s' % name)
+        raise DependencyError(issued_by=issued_by, missing=name, message='Unknown plugin %s' % name)
     return plugins[name]

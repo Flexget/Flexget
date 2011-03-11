@@ -8,7 +8,7 @@ try:
     from flexget.plugins.filter_series import Series, Episode, SeriesPlugin
 except ImportError, e:
     log.error(e.message)
-    raise DependencyError(who='emit_series', what='series')
+    raise DependencyError(issued_by='emit_series', missing='series')
 
 
 class EmitSeries(SeriesPlugin):
@@ -36,7 +36,7 @@ class EmitSeries(SeriesPlugin):
             # try next episode (eg. S01E02)
             title = '%s S%02dE%02d' % (series.name, latest['season'], latest['episode'] + 1)
             feed.entries.append(Entry(title=title, url='', imaginary=True))
-            
+
             # different syntax (eg. 01x02)
             title = '%s %02dx%02d' % (series.name, latest['season'], latest['episode'] + 1)
             feed.entries.append(Entry(title=title, url='', imaginary=True))

@@ -9,7 +9,7 @@ from flexget.ui.webui import register_plugin, app, manager
 try:
     from flexget.plugins.filter_imdb_queue import QueueError
 except ImportError:
-    raise DependencyError(who='ui.movies', what='imdb_queue')
+    raise DependencyError(issued_by='ui.movies', missing='imdb_queue')
 
 
 movies_module = Module(__name__, url_prefix='/movies')

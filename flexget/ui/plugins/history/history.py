@@ -7,7 +7,7 @@ from flexget.plugin import DependencyError
 try:
     from flexget.plugins.output_history import History
 except ImportError:
-    raise DependencyError(who='ui.history', what='history')
+    raise DependencyError(issued_by='ui.history', missing='history')
 
 log = logging.getLogger('ui.history')
 history = Module(__name__)

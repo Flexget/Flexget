@@ -3,7 +3,7 @@ from flexget.plugin import get_plugin_by_name, priority, register_plugin, Depend
 try:
     from flexget.plugins.api_tvdb import lookup_episode
 except ImportError:
-    raise DependencyError(who='thetvdb_lookup', what='api_tvdb',
+    raise DependencyError(issued_by='thetvdb_lookup', missing='api_tvdb',
                           message='thetvdb_lookup requires the `api_tvdb` plugin')
 
 

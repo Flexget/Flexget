@@ -6,7 +6,7 @@ from flexget.plugin import DependencyError
 try:
     from flexget.plugins.plugin_archive import ArchiveEntry, search
 except ImportError:
-    raise DependencyError(who='ui.archive', what='archive')
+    raise DependencyError(issued_by='ui.archive', missing='archive')
 
 log = logging.getLogger('ui.archive')
 archive = Module(__name__)

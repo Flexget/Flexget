@@ -23,7 +23,7 @@ class NzbSize(object):
             from pynzb import nzb_parser
         except ImportError:
             # TODO: remove builtin status so this won't get repeated on every feed execution
-            raise DependencyError(who='nzb_size', what='lib pynzb')
+            raise DependencyError(issued_by='nzb_size', missing='lib pynzb')
 
         for entry in feed.accepted:
             if entry.get('mime-type', None) in [u'text/nzb', u'application/x-nzb'] or \

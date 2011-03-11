@@ -383,7 +383,7 @@ class Feed(object):
                     self.abort()
                 except DependencyError, e:
                     log.critical('Plugin `%s` cannot be used because `%s` is missing.' % \
-                        (e.who, e.what))
+                        (e.issued_by, e.missing))
                     self.abort()
                 except Exception, e:
                     log.exception('BUG: Unhandled error in plugin %s: %s' % (keyword, e))

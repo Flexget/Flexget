@@ -14,7 +14,7 @@ from flexget.ui.utils import pretty_date
 try:
     from flexget.plugins.filter_series import Series, Episode, Release, forget_series, forget_series_episode
 except ImportError:
-    raise DependencyError(who='ui.series', what='series')
+    raise DependencyError(issued_by='ui.series', missing='series')
 
 
 series_module = Module(__name__, url_prefix='/series')

@@ -13,7 +13,7 @@ from flexget.feed import Entry
 try:
     from flexget.plugins.api_tvdb import lookup_series
 except ImportError:
-    raise DependencyError(who='thetvdb_favorites', what='api_tvdb',
+    raise DependencyError(issued_by='thetvdb_favorites', missing='api_tvdb',
                           message='thetvdb_lookup requires the `api_tvdb` plugin')
 
 log = logging.getLogger('thetvdb_favorites')
