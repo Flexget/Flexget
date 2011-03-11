@@ -1,3 +1,6 @@
+""" Plugin Loading & Management.
+"""
+
 from flexget import plugins as _plugins_mod
 import sys
 import os
@@ -165,7 +168,10 @@ phase_methods = {
     'process_start': 'on_process_start',
     'process_end': 'on_process_end'}
 
+# Mapping of plugin name to plugin instance (logical singletons)
 plugins = {}
+
+# Loading done?
 plugins_loaded = False
 
 _parser = None
@@ -174,7 +180,15 @@ _new_phase_queue = {}
 
 
 def register_plugin(plugin_class, name, groups=None, builtin=False, debug=False, api_ver=1):
-    """Registers a plugin."""
+    """ Register a plugin.
+        
+        @param plugin_class: The plugin factory.
+        @param Name of the plugin (if not given, default to factory class name).  
+        @param groups: Groups this plugin belongs to.  
+        @param builtin: Auto-activated?  
+        @param debug: ???  
+        @param api_ver: Signature of callback hooks (1=feed; 2=feed,config).   
+    """
     if groups is None:
         groups = []
     global plugins
