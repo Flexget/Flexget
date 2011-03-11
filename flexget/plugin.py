@@ -4,6 +4,7 @@
 from flexget import plugins as _plugins_mod
 import sys
 import os
+import re
 import logging
 import time
 from event import add_phase_handler
@@ -161,20 +162,22 @@ _plugin_options = []
 _new_phase_queue = {}
 
 
-def register_plugin(plugin_class, name, groups=None, builtin=False, debug=False, api_ver=1):
+def register_plugin(plugin_class, name=None, groups=None, builtin=False, debug=False, api_ver=1):
     """ Register a plugin.
 
         @param plugin_class: The plugin factory.
-        @param Name of the plugin (if not given, default to factory class name).
+        @param name: Name of the plugin (if not given, default to factory class name in underscore form).  
         @param groups: Groups this plugin belongs to.
         @param builtin: Auto-activated?
         @param debug: ???
-        @param api_ver: Signature of callback hooks (1=feed; 2=feed,config).
+        @param api_ver: Signature of callback hooks (1=feed; 2=feed,config).   
     """
     if groups is None:
         groups = []
     if name is None:
-        name = plugin_class.__name__
+        # Convention is to take camel-case class name and rewrite it to an underscore form
+        # e.g. "PluginName" to "plugin_name"
+        name = re.sub('[A-Z]+', lambda i: '_' + i.group(0).lower(), plugin_class.__name__).lstrip('_')
     if name in plugins:
         log.critical('Error while registering plugin %s. %s' % \
             (name, ('A plugin with the name %s is already registered' % name)))
