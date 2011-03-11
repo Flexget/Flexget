@@ -224,6 +224,57 @@ def coverage():
 
 @task
 @cmdopts([
+    ('docs-dir=', 'd', 'directory to put the api documetation in'),
+    ('excludes=', 'x', 'list of packages to exclude'),
+])
+def docs():
+    """ Create documentation.
+    """
+    from epydoc import cli
+
+    # get package list, without sub-packages
+    doc_packages  = set(options.setup.packages)
+    for pkg in list(doc_packages):
+        doc_packages -= set(p for p in doc_packages if str(p).startswith(pkg + '.'))
+    doc_packages = list(doc_packages)
+
+    # clean up previous docs
+    docs_dir = options.docs.get('docs_dir', 'docs')
+    path(docs_dir).rmtree()
+
+    # set up excludes
+    try:
+        exclude_names = options.docs.excludes
+    except AttributeError:
+        exclude_names = []
+    else:
+        exclude_names = exclude_names.replace(',', ' ').split()
+
+    excludes = []
+    for pkg in exclude_names:
+        excludes.append("--exclude")
+        excludes.append('^' + re.escape(pkg))
+
+    # call epydoc in-process
+    sys_argv = sys.argv
+    try:
+        sys.argv = [
+            sys.argv[0] + "::epydoc",
+            "-v",
+            "--inheritance", "listed",
+            "--output", docs_dir,
+            "--name", "%s %s" % (options.setup.name, options.setup.version),
+            "--url", options.setup.url,
+            "--graph", "umlclasstree",
+        ] + excludes + doc_packages
+        sys.stderr.write("Running '%s'\n" % ("' '".join(sys.argv)))
+        cli.cli()
+    finally:
+        sys.argv = sys_argv
+
+
+@task
+@cmdopts([
     ('online', None, 'runs online unit tests'),
     ('dist-dir=', 'd', 'directory to put final built distributions in'),
     ('no-tests', None, 'skips unit tests'),
