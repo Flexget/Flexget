@@ -160,7 +160,7 @@ class ImdbSearch(object):
                 if len(additional) > 1:
                     movie['type'] = additional[1]
 
-                movie['name'] = link.contents[0]
+                movie['name'] = unicode(link.contents[0])
                 movie['url'] = 'http://www.imdb.com' + link.get('href')
                 log.debug('processing name: %s url: %s' % (movie['name'], movie['url']))
 
@@ -251,7 +251,7 @@ class ImdbParser(object):
         if tag_infobar_div:
             tag_mpaa_rating = tag_infobar_div.find('img', attrs={'class': 'absmiddle'})
             if tag_mpaa_rating:
-                if (tag_mpaa_rating['alt'] != tag_mpaa_rating['title']):
+                if tag_mpaa_rating['alt'] != tag_mpaa_rating['title']:
                     # If we've found something of class absmiddle in the infobar,
                     # it should be mpaa_rating, since that's the only one in there.
                     log.warning("MPAA rating alt and title don't match for URL %s - plugin needs an update?" % url)
@@ -302,11 +302,11 @@ class ImdbParser(object):
             # skip links that have javascript onclick (not in genrelist)
             if link.has_key('onclick'):
                 continue
-            self.genres.append(link.contents[0].lower())
+            self.genres.append(unicode(link.contents[0].lower()))
 
         # get languages
         for link in soup.findAll('a', attrs={'href': re.compile('^/language/')}):
-            lang = link.contents[0].lower()
+            lang = unicode(link.contents[0].lower())
             if not lang in self.languages:
                 self.languages.append(lang.strip())
 
@@ -332,7 +332,7 @@ class ImdbParser(object):
         if tag_cast:
             for actor in tag_cast.findAll('a', href=re.compile('/name/nm')):
                 actor_id = extract_id(actor['href'])
-                actor_name = actor.contents[0]
+                actor_name = unicode(actor.contents[0])
                 # tag instead of name
                 if isinstance(actor_name, Tag):
                     actor_name = None
@@ -343,7 +343,7 @@ class ImdbParser(object):
         if h4_director:
             for director in h4_director.parent.parent.findAll('a', href=re.compile('/name/nm')):
                 director_id = extract_id(director['href'])
-                director_name = director.contents[0]
+                director_name = unicode(director.contents[0])
                 # tag instead of name
                 if isinstance(director_name, Tag):
                     director_name = None

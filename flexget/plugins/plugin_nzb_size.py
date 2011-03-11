@@ -1,5 +1,5 @@
 import logging
-from flexget.plugin import *
+from flexget.plugin import register_plugin, priority, DependencyError
 
 log = logging.getLogger('nzb_size')
 
@@ -19,7 +19,11 @@ class NzbSize(object):
         """
         The downloaded file is accessible in modify phase
         """
-        from pynzb import nzb_parser
+        try:
+            from pynzb import nzb_parser
+        except ImportError:
+            # TODO: remove builtin status so this won't get repeated on every feed execution
+            raise DependencyError(who='nzb_size', what='lib pynzb')
 
         for entry in feed.accepted:
             if entry.get('mime-type', None) in [u'text/nzb', u'application/x-nzb'] or \

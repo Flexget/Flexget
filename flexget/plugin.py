@@ -27,6 +27,7 @@ class PluginDependencyError(Exception):
         super(PluginDependencyError, self).__init__()
         self.what = value
         self.who = plugin
+        self.silent = False
 
     # backwards compatibility
     @property
@@ -57,12 +58,12 @@ class DependencyError(PluginDependencyError):
     All args are optional.
     """
 
-    # XXX: first two args are REVERSED compared to base class :(
-    def __init__(self, who=None, what=None, message=None):
+    def __init__(self, who=None, what=None, message=None, silent=False):
         super(DependencyError, self).__init__()
         self.who = who
         self.what = what
         self.message = message
+        self.silent = silent
 
     def __str__(self):
         return '<DependencyError(who=%s,what=%s,message=%s)>' % \
@@ -189,13 +190,13 @@ _new_phase_queue = {}
 
 def register_plugin(plugin_class, name, groups=None, builtin=False, debug=False, api_ver=1):
     """ Register a plugin.
-        
+
         @param plugin_class: The plugin factory.
-        @param Name of the plugin (if not given, default to factory class name).  
-        @param groups: Groups this plugin belongs to.  
-        @param builtin: Auto-activated?  
-        @param debug: ???  
-        @param api_ver: Signature of callback hooks (1=feed; 2=feed,config).   
+        @param Name of the plugin (if not given, default to factory class name).
+        @param groups: Groups this plugin belongs to.
+        @param builtin: Auto-activated?
+        @param debug: ???
+        @param api_ver: Signature of callback hooks (1=feed; 2=feed,config).
     """
     if groups is None:
         groups = []
@@ -372,9 +373,13 @@ def load_plugins_from_dir(dir):
 
     for name in plugin_names:
         try:
-            exec "import flexget.plugins.%s" % name in {}
+            exec 'import flexget.plugins.%s' % name in {}
         except PluginDependencyError, e:
-            log.warning('Plugin %s required: %s' % (e.plugin or name, e.value or 'N/A'))
+            msg = 'Plugin %s required: %s' % (e.plugin or name, e.value or 'N/A')
+            if not e.silent:
+                log.warning(msg)
+            else:
+                log.debug(msg)
         except ImportError, e:
             log.critical('Plugin %s failed to import dependencies' % name)
             log.exception(e)
