@@ -238,9 +238,8 @@ def docs():
         doc_packages -= set(p for p in doc_packages if str(p).startswith(pkg + '.'))
     doc_packages = list(doc_packages)
 
-    # clean up previous docs
+    # get storage path
     docs_dir = options.docs.get('docs_dir', 'build/apidocs')
-    path(docs_dir).rmtree()
 
     # set up excludes
     try:
