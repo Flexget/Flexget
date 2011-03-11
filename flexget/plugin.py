@@ -174,11 +174,11 @@ def register_plugin(plugin_class, name=None, groups=None, builtin=False, debug=F
     """ Register a plugin.
 
         @param plugin_class: The plugin factory.
-        @param name: Name of the plugin (if not given, default to factory class name in underscore form).  
+        @param name: Name of the plugin (if not given, default to factory class name in underscore form).
         @param groups: Groups this plugin belongs to.
         @param builtin: Auto-activated?
         @param debug: ???
-        @param api_ver: Signature of callback hooks (1=feed; 2=feed,config).   
+        @param api_ver: Signature of callback hooks (1=feed; 2=feed,config).
     """
     if groups is None:
         groups = []
@@ -359,7 +359,7 @@ def load_plugins_from_dir(dir):
         try:
             exec 'import flexget.plugins.%s' % name in {}
         except DependencyError, e:
-            msg = 'Plugin %s required: %s' % (e.plugin or name, e.value or 'N/A')
+            msg = 'Plugin `%s` requires `%s` to load.' % (e.issued_by or name, e.missing or 'N/A')
             if not e.silent:
                 log.warning(msg)
             else:
