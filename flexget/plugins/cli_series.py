@@ -32,7 +32,7 @@ class SeriesReport(SeriesPlugin):
 
     def display_details(self):
         """Display detailed series information, ie. --series NAME"""
-        
+
         from flexget.manager import Session
         session = Session()
 
@@ -57,7 +57,7 @@ class SeriesReport(SeriesPlugin):
                 print ' %s - %s' % (episode.identifier, episode.age)
 
             for release in episode.releases:
-                status = release.quality
+                status = release.quality.name
                 title = release.title
                 if len(title) > 55:
                     title = title[:55] + '...'
@@ -74,7 +74,7 @@ class SeriesReport(SeriesPlugin):
 
     def display_summary(self):
         """Display series summary. ie --series"""
-        
+
         print ' %-30s%-20s%-21s' % ('Name', 'Latest', 'Status')
         print '-' * 79
 
@@ -109,7 +109,7 @@ class SeriesReport(SeriesPlugin):
                 for release in self.get_releases(session, series.name, episode.identifier):
                     if release.downloaded:
                         status += '*'
-                    status += release.quality
+                    status += release.quality.name
                     if release.proper:
                         status += '-Proper'
                     status += ' '

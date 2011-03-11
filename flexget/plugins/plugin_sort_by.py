@@ -1,10 +1,10 @@
 import logging
-from flexget.plugin import *
+from flexget.plugin import register_plugin, priority
 
 log = logging.getLogger('sort_by')
 
 
-class ModuleSortBy:
+class PluginSortBy:
 
     """
         Sort feed entries based on a field
@@ -35,15 +35,14 @@ class ModuleSortBy:
         complex.accept('boolean', key='reverse')
         return root
 
-    def on_feed_modify(self, feed):
-        if isinstance(feed.config['sort_by'], basestring):
-            field = feed.config['sort_by']
-            revert = False
+    def on_feed_filter(self, feed, config):
+        if isinstance(config, basestring):
+            field = config
+            reverse = False
         else:
-            field = feed.config['sort_by'].get('field', None)
-            revert = feed.config['sort_by'].get('reverse', False)
+            field = config.get('field', None)
+            reverse = config.get('reverse', False)
 
-        config = feed.config['sort_by']
         log.debug('sorting entries by: %s' % config)
 
         if not field:
@@ -56,7 +55,7 @@ class ModuleSortBy:
             vb = b.get(field, 0)
             return cmp(va, vb)
 
-        feed.entries.sort(cmp_helper, reverse=revert)
-        feed.accepted.sort(cmp_helper, reverse=revert)
+        feed.entries.sort(cmp_helper, reverse=reverse)
+        feed.accepted.sort(cmp_helper, reverse=reverse)
 
-register_plugin(ModuleSortBy, 'sort_by')
+register_plugin(PluginSortBy, 'sort_by', api_ver=2)

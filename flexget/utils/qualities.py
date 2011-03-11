@@ -9,36 +9,43 @@ class Quality(object):
         # Make sure regexp is surrounded by non word characters.
         self.regexp = re.compile('(?<![^\W_])' + regexp + '(?![^\W_])', re.IGNORECASE)
 
+    def __hash__(self):
+        return self.value
+
     def __eq__(self, other):
-        return self.value == other.value
+        if isinstance(other, basestring):
+            other = get(other, None)
+        if hasattr(other, 'value'):
+            return self.value == other.value
+        else:
+            return NotImplemented
 
     def __ne__(self, other):
         return not self.__eq__(other)
 
     def __lt__(self, other):
+        if isinstance(other, basestring):
+            other = get(other, other)
+        if not hasattr(other, 'value'):
+            raise TypeError('%r is not a valid quality' % other)
         return self.value < other.value
 
+    def __ge__(self, other):
+        return not self.__lt__(other)
+
     def __le__(self, other):
-        return self.value <= other.value
+        return self.__lt__(other) or self.__eq__(other)
 
     def __gt__(self, other):
-        return self.value > other.value
+        return not self.__le__(other)
 
-    def __ge__(self, other):
-        return self.value >= other.value
-
-    def __str__(self):
+    def __repr__(self):
         return '<Quality(name=%s,value=%s)>' % (self.name, self.value)
 
-    __repr__ = __str__
+    def __str__(self):
+        return self.name
 
-
-class UnknownQuality(Quality):
-
-    def __init__(self):
-        self.value = 0
-        self.name = 'unknown'
-        self.regexp = None
+UNKNOWN = Quality(0, 'unknown')
 
 re_webdl = 'web[\W_]?dl'
 re_720p = '(?:1280x)?720p?'
@@ -69,12 +76,12 @@ qualities = [Quality(1000, '1080p web-dl', webdl_hybrid(re_1080p)),
             Quality(10, 'workprint')]
 
 registry = dict([(qual.name.lower(), qual) for qual in qualities])
-registry['unknown'] = UnknownQuality()
+registry['unknown'] = UNKNOWN
 
 
 def all():
     """Return all Qualities in order of best to worst"""
-    return sorted(qualities, reverse=True) + [UnknownQuality()]
+    return sorted(qualities, reverse=True) + [UNKNOWN]
 
 
 def get(name, *args):
@@ -85,7 +92,7 @@ def get(name, *args):
     q = parse_quality(name, True)
     if q.value:
         return q
-    return args[0] if args else UnknownQuality()
+    return args[0] if args else UNKNOWN
 
 
 def value(name):
@@ -120,7 +127,7 @@ def quality_match(title, exact=False):
             # If exact mode make sure quality identifier is the entire string.
             if not exact or match.span(0) == (0, len(title)):
                 return qual, match
-    return UnknownQuality(), None
+    return UNKNOWN, None
 
 
 def parse_quality(title, exact=False):

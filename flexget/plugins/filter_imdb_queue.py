@@ -128,7 +128,7 @@ class FilterImdbQueue(object):
                 item = feed.session.query(ImdbQueue).filter(ImdbQueue.imdb_id == imdb_id).first()
 
                 if item:
-                    # This will return UnknownQuality if 'ANY' quality
+                    # This will return UNKNOWN quality if 'ANY' quality
                     minquality = qualities.parse_quality(item.quality)
                     if 'quality' in entry:
                         entry_quality = qualities.parse_quality(entry['quality'])
@@ -382,9 +382,9 @@ class ImdbQueueManager(object):
 
     def queue_get(self):
         """Get the current IMDb queue.
-        
+
         Returns:
-        
+
         List of ImdbQueue objects (detached from session)
         """
         session = Session()

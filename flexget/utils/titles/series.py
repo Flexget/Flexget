@@ -95,7 +95,7 @@ class SeriesParser(TitleParser):
         self.end_episode = None
         self.id = None
         self.id_groups = None
-        self.quality = 'unknown'
+        self.quality = qualities.UNKNOWN
         self.proper_or_repack = False
         self.special = False
         # TODO: group is only produced with allow_groups
@@ -124,7 +124,7 @@ class SeriesParser(TitleParser):
         """Replaces some characters with spaces"""
         return re.sub(r'[_.,\[\]\(\): ]+', ' ', data).strip().lower()
 
-    def parse(self, data=None, field=None, quality=None):
+    def parse(self, data=None, field=None, quality=qualities.UNKNOWN):
         # Clear the output variables before parsing
         self._reset()
         self.field = field
@@ -210,10 +210,10 @@ class SeriesParser(TitleParser):
                 return # leave invalid
 
         # search tags and quality if one was not provided to parse method
-        if not quality or quality == 'unknown':
+        if not quality or quality == qualities.UNKNOWN:
             log.debug('parsing quality ->')
             quality, match = qualities.quality_match(data_stripped)
-            self.quality = quality.name
+            self.quality = quality
             if match:
                 # Remove quality string from data
                 data_stripped = data_stripped[:match.start()] + data_stripped[match.end():]
@@ -419,7 +419,7 @@ class SeriesParser(TitleParser):
         other = (self.qualities.index(other.quality), other.name)
         return cmp(me, other)
         """
-        return cmp(qualities.get(self.quality).value, qualities.get(other.quality).value)
+        return cmp(self.quality, other.quality)
 
     def __eq__(self, other):
         return self is other

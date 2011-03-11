@@ -38,10 +38,10 @@ class MetainfoQuality(object):
             if field_name in ['feed']:
                 continue
             quality = qualities.parse_quality(field_value)
-            if quality > qualities.UnknownQuality():
+            if quality > qualities.UNKNOWN:
                 # if we find a quality in this field, stop searching
                 break
-        entry['quality'] = quality.name
+        entry['quality'] = quality
         log.debugall('Found quality %s (%s) for %s from field %s' % \
             (entry['quality'], quality, entry['title'], field_name))
         return entry

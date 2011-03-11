@@ -22,7 +22,7 @@ class TestQualityParser(object):
 
     def test_exact_match(self):
         assert quals.parse_quality('720p and stuff') == quals.registry['720p']
-        assert quals.parse_quality('720p and stuff', exact=True) == quals.UnknownQuality()
+        assert quals.parse_quality('720p and stuff', exact=True) == quals.UNKNOWN
 
 
 class TestFilterQuality(FlexGetBase):
