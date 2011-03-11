@@ -228,8 +228,7 @@ def coverage():
     ('excludes=', 'x', 'list of packages to exclude'),
 ])
 def docs():
-    """ Create documentation.
-    """
+    """Create documentation."""
     from epydoc import cli
 
     # get package list, without sub-packages
