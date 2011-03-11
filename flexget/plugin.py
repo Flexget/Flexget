@@ -24,8 +24,20 @@ class PluginDependencyError(Exception):
     """A plugin has requested another plugin by name, but this plugin does not exists"""
 
     def __init__(self, value, plugin):
-        self.value = value
-        self.plugin = plugin
+        super(PluginDependencyError, self).__init__()
+        self.what = value
+        self.who = plugin
+
+    # backwards compatibility
+    @property
+    def value(self):
+        "DEPRECATED, use C{what}"
+        return self.what
+
+    @property
+    def plugin(self):
+        "DEPRECATED, use C{who}"
+        return self.who
 
     def __str__(self):
         return '%s plugin: %s' % (repr(self.value), repr(self.plugin))
@@ -45,19 +57,12 @@ class DependencyError(PluginDependencyError):
     All args are optional.
     """
 
+    # XXX: first two args are REVERSED compared to base class :(
     def __init__(self, who=None, what=None, message=None):
+        super(DependencyError, self).__init__()
         self.who = who
         self.what = what
         self.message = message
-
-    # backwards compatibilities
-    @property
-    def value(self):
-        return self.what
-
-    @property
-    def plugin(self):
-        return self.who
 
     def __str__(self):
         return '<DependencyError(who=%s,what=%s,message=%s)>' % \
@@ -67,6 +72,7 @@ class DependencyError(PluginDependencyError):
 class RegisterException(Exception):
 
     def __init__(self, value):
+        super(RegisterException, self).__init__()
         self.value = value
 
     def __str__(self):
@@ -76,6 +82,7 @@ class RegisterException(Exception):
 class PluginWarning(Warning):
 
     def __init__(self, value, logger=log, **kwargs):
+        super(PluginWarning, self).__init__()
         self.value = value
         self.log = logger
         self.kwargs = kwargs
@@ -87,6 +94,7 @@ class PluginWarning(Warning):
 class PluginError(Exception):
 
     def __init__(self, value, logger=log, **kwargs):
+        super(PluginError, self).__init__()
         self.value = value
         self.log = logger
         self.kwargs = kwargs
@@ -191,7 +199,6 @@ def register_plugin(plugin_class, name, groups=None, builtin=False, debug=False,
     """
     if groups is None:
         groups = []
-    global plugins
     if name is None:
         name = plugin_class.__name__
     if name in plugins:
@@ -203,15 +210,12 @@ def register_plugin(plugin_class, name, groups=None, builtin=False, debug=False,
 
 def register_parser_option(*args, **kwargs):
     """Adds a parser option to the global parser."""
-    global _parser, _plugin_options
     _parser.add_option(*args, **kwargs)
     _plugin_options.append((args, kwargs))
 
 
 def register_feed_phase(plugin_class, name, before=None, after=None):
     """Adds a new feed phase to the available phases."""
-    global _new_phase_queue, plugins
-
     if before and after:
         raise RegisterException('You can only give either before or after for a phase.')
     if not before and not after:
@@ -287,10 +291,10 @@ class PluginInfo(dict):
                     continue
                 # check for priority decorator
                 if hasattr(method, 'priority'):
-                    priority = method.priority
+                    handler_prio = method.priority
                 else:
-                    priority = DEFAULT_PRIORITY
-                event = add_phase_handler('plugin.%s.%s' % (self.name, event), method, priority)
+                    handler_prio = DEFAULT_PRIORITY
+                event = add_phase_handler('plugin.%s.%s' % (self.name, event), method, handler_prio)
                 # provides backwards compatibility
                 event.plugin = self
                 self.phase_handlers[method_name] = event
@@ -346,7 +350,6 @@ def load_plugins_from_dir(dir):
     # Get the list of valid python suffixes for plugins
     # this includes .py, .pyc, and .pyo (depending on if we are running -O)
     # but it doesn't include compiled modules (.so, .dll, etc)
-    global _new_phase_queue
     #
     # This causes quite a bit problems when renaming plugins and is there really need to import .pyc / pyo?
     #
@@ -391,7 +394,8 @@ def load_plugins_from_dir(dir):
 
 def load_plugins(parser):
     """Load plugins from the standard plugin paths."""
-    global plugins_loaded, _parser, _plugin_options
+    global plugins_loaded, _parser
+
     if plugins_loaded:
         if parser is not None:
             for args, kwargs in _plugin_options:
