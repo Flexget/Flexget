@@ -1,13 +1,13 @@
 import logging
 from flexget.event import event
 from flexget.manager import Base
-from flexget.plugin import *
 from flexget.feed import Entry
 from sqlalchemy import Column, Integer, String, DateTime, Unicode, Index, asc, or_
 from sqlalchemy.orm import join
 from datetime import datetime
 from flexget.manager import Session
 from optparse import SUPPRESS_HELP
+from flexget.plugin import priority, register_parser_option, register_plugin, PluginError
 
 log = logging.getLogger('archive')
 
@@ -94,21 +94,21 @@ class ArchiveInject(object):
                     except ValueError:
                         raise PluginError('Given ID `%s` is not a valid number' % id_str.strip())
                     archive_entry = session.query(ArchiveEntry).filter(ArchiveEntry.id == id).first()
-                    
+
                     # not found
                     if not archive_entry:
                         log.critical('There\'s no archive with ID `%s`' % id)
                         continue
-                        
+
                     # feed no longer exists
                     if archive_entry.feed not in feed.manager.feeds:
                         log.critical('Feed `%s` does not seem to exists anymore, cannot inject from archive' % archive_entry.feed)
                         continue
-                                    
+
                     self.inject_entries.append(archive_entry)
             finally:
                 session.close()
-                
+
         # if this feed is not going to be injected into, abort it
         injecting_into = [x.feed for x in self.inject_entries]
         log.debug('injecting_into=%s' % injecting_into)
@@ -169,8 +169,8 @@ class Archive(object):
             ae.feed = feed.name
             log.debug('Adding `%s` to archive' % ae)
             feed.session.add(ae)
-            
-            
+
+
 class UrlrewriteArchive(object):
 
     def search(self, feed, entry):
@@ -182,11 +182,11 @@ class UrlrewriteArchive(object):
         if results:
             log.debug('found %s' % results)
             return results[0].url
-                                
+
 
 def archive_inject(option, opt, value, parser):
     """Option parser function"""
-    
+
     if not parser.rargs:
         print 'Usage: --archive-inject ID [IMMORTAL]'
         import sys
@@ -207,7 +207,7 @@ register_plugin(ArchiveInject, '--archive-inject', builtin=True)
 register_parser_option('--archive-search', action='store', dest='archive_search', default=False,
                        metavar='TXT', help='Search from the archive.')
 register_parser_option('--archive-inject', action='callback', callback=archive_inject,
-                       metavar='ID(s)', 
+                       metavar='ID(s)',
                        help='Inject entries from the archive into a feed where it was archived from. Usage: ID[,ID] [FORCE]')
 
 # kludge to make these option keys available always, even when not using archive_inject callback

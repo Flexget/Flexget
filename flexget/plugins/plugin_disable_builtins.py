@@ -1,6 +1,6 @@
 import logging
 from flexget import plugin
-from flexget.plugin import *
+from flexget.plugin import priority, register_plugin
 
 log = logging.getLogger('builtins')
 
@@ -17,13 +17,13 @@ class PluginDisableBuiltins(object):
         from flexget import validator
         # TODO: accept only list (of texts) or boolean
         return validator.factory('any')
-    
+
     def debug(self):
         for name, info in plugin.plugins.iteritems():
             if not info.builtin:
                 continue
-            log.debug('Builtin plugin: %s' % (name))
-        
+            log.debug('Builtin plugin: %s' % name)
+
     def on_feed_start(self, feed):
         for name, info in plugin.plugins.iteritems():
             if info.builtin:
@@ -31,7 +31,7 @@ class PluginDisableBuiltins(object):
                     if info.name in feed.config['disable_builtins']:
                         info.builtin = False
                         self.disabled.append(name)
-                else: 
+                else:
                     # disabling all builtins
                     info.builtin = False
                     self.disabled.append(name)
@@ -45,7 +45,7 @@ class PluginDisableBuiltins(object):
             plugin.plugins[name].builtin = True
         self.disabled = []
         log.debug('Enabled builtin plugins %s' % ', '.join(names))
-        
+
     on_feed_abort = on_feed_exit
 
-plugin.register_plugin(PluginDisableBuiltins, 'disable_builtins')
+register_plugin(PluginDisableBuiltins, 'disable_builtins')

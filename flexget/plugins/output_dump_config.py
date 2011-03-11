@@ -1,10 +1,11 @@
 import logging
-from flexget.plugin import *
 from optparse import SUPPRESS_HELP
+from flexget.plugin import register_plugin, register_parser_option
 
 log = logging.getLogger('dump_config')
 
-class OutputDumpConfig:
+
+class OutputDumpConfig(object):
     """
         Dumps feed config in STDOUT in yaml at exit or abort event.
     """
@@ -23,9 +24,7 @@ class OutputDumpConfig:
             print feed.config
 
 register_plugin(OutputDumpConfig, 'dump_config', debug=True, builtin=True)
-
 register_parser_option('--dump-config', action='store_true', dest='dump_config', default=False, \
                        help=SUPPRESS_HELP)
-
 register_parser_option('--dump-config-python', action='store_true', dest='dump_config_python', default=False, \
                        help=SUPPRESS_HELP)

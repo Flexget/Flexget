@@ -1,5 +1,5 @@
 import logging
-from flexget.plugin import *
+from flexget.plugin import get_plugin_by_name, register_plugin
 from flexget.utils.tools import urlopener
 
 log = logging.getLogger('sabnzbd')
@@ -78,8 +78,8 @@ class OutputSabnzbd:
             params = self.get_params(config)
             # allow overriding the category
             if 'category' in entry:
-                # Dirty hack over the next few lines to strip out non-ascii 
-                # chars. We're going to urlencode this, which causes 
+                # Dirty hack over the next few lines to strip out non-ascii
+                # chars. We're going to urlencode this, which causes
                 # serious issues in python2.x if it's not ascii input.
                 params['cat'] = ''.join([x for x in entry['category'] if ord(x) < 128])
             params['name'] = ''.join([x for x in entry['url'] if ord(x) < 128])

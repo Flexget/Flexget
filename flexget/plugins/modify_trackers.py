@@ -1,6 +1,6 @@
 import re
 import logging
-from flexget.plugin import *
+from flexget.plugin import priority, register_plugin
 
 log = logging.getLogger('modify_trackers')
 

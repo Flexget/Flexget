@@ -1,6 +1,6 @@
 import logging
 import httplib
-from flexget.plugin import *
+from flexget.plugin import priority, register_plugin
 
 log = logging.getLogger('kat_patch')
 triggered = False
@@ -73,7 +73,7 @@ class MonkeypatchKickassTorrents(object):
     """
     A hack to get KickassTorrents to work
     """
-    
+
     def __init__(self):
         self.patched = False
         self.original = httplib.HTTPResponse._read_chunked
@@ -86,7 +86,7 @@ class MonkeypatchKickassTorrents(object):
                 httplib.HTTPResponse._read_chunked = monkeypatched_read_chunked
                 self.patched = True
                 break
-    
+
     def on_feed_exit(self, feed):
         if self.patched:
             if not triggered and feed.accepted:
@@ -94,7 +94,7 @@ class MonkeypatchKickassTorrents(object):
             log.info('Removing monkeypatch')
             httplib.HTTPResponse._read_chunked = self.original
             self.patched = False
-        
+
     on_feed_abort = on_feed_exit
 
 register_plugin(MonkeypatchKickassTorrents, 'ka_patch', builtin=True)

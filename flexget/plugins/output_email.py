@@ -2,7 +2,7 @@ import logging
 import smtplib
 import socket
 from email.message import Message
-from flexget.plugin import *
+from flexget.plugin import PluginError, PluginWarning, register_plugin
 
 log = logging.getLogger('email')
 

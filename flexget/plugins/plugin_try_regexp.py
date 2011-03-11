@@ -1,6 +1,5 @@
 import logging
-import re
-from flexget.plugin import *
+from flexget.plugin import register_plugin, register_parser_option
 
 log = logging.getLogger('try_regexp')
 
@@ -17,22 +16,23 @@ class PluginTryRegexp:
         # this is not meant to be configured .. :)
         from flexget import validator
         return validator.factory('any')
-        
+
     def matches(self, entry, regexp):
         """Return True if any of the entry string fields match given regexp"""
+        import re
         for field, value in entry.iteritems():
             if not isinstance(value, basestring):
                 continue
             if re.search(regexp, value, re.IGNORECASE | re.UNICODE):
                 return (True, field)
         return (False, None)
-        
+
     def on_feed_filter(self, feed):
         if not feed.manager.options.try_regexp and not 'try_regexp' in feed.config:
             return
-        if self.abort: 
+        if self.abort:
             return
-        
+
         print '-' * 79
         print 'Hi there, welcome to try regexps in realtime!'
         print 'Press ^D or type \'exit\' to continue. Type \'continue\' to continue non-interactive execution.'
@@ -47,7 +47,7 @@ class PluginTryRegexp:
                     break
             except EOFError:
                 break
-            
+
             count = 0
             for entry in feed.entries:
                 try:

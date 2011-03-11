@@ -1,6 +1,5 @@
 import logging
-from flexget.plugin import *
-from sys import maxint
+from flexget.plugin import priority, register_plugin
 
 log = logging.getLogger('torrent_size')
 

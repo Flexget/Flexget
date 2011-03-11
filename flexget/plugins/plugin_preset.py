@@ -1,5 +1,5 @@
 import logging
-from flexget.plugin import *
+from flexget.plugin import priority, register_plugin, get_plugin_keywords, PluginError, register_parser_option
 
 log = logging.getLogger('preset')
 

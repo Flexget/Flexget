@@ -1,7 +1,6 @@
 import logging
-from flexget.feed import Entry
-from flexget.plugin import *
 import urllib2
+from flexget.plugin import PluginError, register_plugin
 
 log = logging.getLogger('formlogin')
 
@@ -17,7 +16,7 @@ class FormLogin(object):
         root.accept('url', key='url', required=True)
         root.accept('text', key='username', required=True)
         root.accept('text', key='password', required=True)
-        root.accept('text', key='userfield') 
+        root.accept('text', key='userfield')
         root.accept('text', key='passfield')
         return root
 
@@ -28,7 +27,7 @@ class FormLogin(object):
             raise PluginError('mechanize required (python module), please install it.', log)
 
         config = feed.config['form']
-        
+
         userfield = config.get('userfield', 'username')
         passfield = config.get('passfield', 'password')
 
@@ -67,7 +66,7 @@ class FormLogin(object):
         cookiejar = br._ua_handlers["_cookies"].cookiejar
 
         opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cookiejar))
-        urllib2.install_opener(opener)                                
+        urllib2.install_opener(opener)
 
     def on_feed_exit(self, feed):
         """Feed exiting, remove cookiejar"""
@@ -75,6 +74,6 @@ class FormLogin(object):
         urllib2.install_opener(None)
 
     # Feed aborted, unhook the cookiejar
-    on_feed_abort = on_feed_exit                                    
+    on_feed_abort = on_feed_exit
 
 register_plugin(FormLogin, 'form')

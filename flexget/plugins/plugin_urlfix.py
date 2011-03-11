@@ -1,5 +1,5 @@
 import logging
-from flexget.plugin import *
+from flexget.plugin import priority, register_plugin
 from flexget.utils.log import log_once
 
 log = logging.getLogger('urlfix')

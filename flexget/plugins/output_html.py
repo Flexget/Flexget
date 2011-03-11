@@ -1,6 +1,6 @@
 import os
 import logging
-from flexget.plugin import *
+from flexget.plugin import PluginError, register_plugin
 
 log = logging.getLogger('make_html')
 

@@ -1,5 +1,5 @@
 import logging
-from flexget.plugin import *
+from flexget.plugin import register_plugin, register_parser_option
 
 log = logging.getLogger('cli_config')
 
@@ -8,31 +8,31 @@ class CliConfig(object):
 
     """
         Allows specifying yml configuration values from commandline parameters.
-        
-        Yml variables are prefixed with dollar sign ($). 
+
+        Yml variables are prefixed with dollar sign ($).
         Commandline parameter must be comma separated list of variable=values.
-        
+
         Configuration example:
-        
+
         feeds:
           my feed:
             rss: $url
             download: $path
-        
+
         Commandline example:
-        
+
         --cli-config "url=http://some.url/, path=~/downloads"
-        
+
     """
 
     def __init__(self):
         self.replaces = {}
 
     def validator(self):
-        # there is no way to misconfigure this .. 
+        # there is no way to misconfigure this ..
         from flexget import validator
         return validator.factory('any')
-    
+
     def replace_dict(self, d, replaces):
         for k, v in d.items():
             if isinstance(v, basestring):

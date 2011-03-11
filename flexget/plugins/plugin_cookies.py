@@ -1,7 +1,7 @@
 import logging
 import urllib2
 import cookielib
-from flexget.plugin import *
+from flexget.plugin import PluginWarning, PluginError, register_plugin
 
 log = logging.getLogger('cookies')
 

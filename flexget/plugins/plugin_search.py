@@ -1,5 +1,6 @@
 import logging
-from flexget.plugin import *
+from flexget.plugin import get_plugins_by_group, PluginWarning, register_parser_option, register_plugin, \
+    get_plugin_by_name
 
 log = logging.getLogger('search')
 
@@ -38,13 +39,13 @@ class PluginSearch(object):
         - Some url rewriters will use search plugins automaticly if enry url points into a search page.
     """
 
-    def validator(self):        
+    def validator(self):
         from flexget import validator
         search = validator.factory('list')
         plugins = {}
         names = []
         for plugin in get_plugins_by_group('search'):
-            # If the plugin has a validator, get it's validator and make it a 
+            # If the plugin has a validator, get it's validator and make it a
             # child of the search plugin's
             if not hasattr(plugin.instance, 'validator'):
                 # Create choice validator for plugins without validators later
@@ -59,7 +60,7 @@ class PluginSearch(object):
                               "search plugin." % plugin.name)
         search.accept('choice').accept_choices(names)
         return search
-    
+
     def on_feed_urlrewrite(self, feed):
         # no searches in unit test mode
         if feed.manager.unit_test:
@@ -97,8 +98,7 @@ class PluginSearch(object):
                 feed.reject(entry, 'search failed')
             else:
                 # Populate quality
-                get_plugin_by_name('metainfo_quality')\
-                       .instance.get_quality(entry)
+                get_plugin_by_name('metainfo_quality').instance.get_quality(entry)
 
 register_plugin(PluginSearch, 'search')
 register_plugin(SearchPlugins, '--search-plugins', builtin=True)

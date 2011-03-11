@@ -1,6 +1,6 @@
 import logging
 import mimetypes
-from flexget.plugin import *
+from flexget.plugin import register_plugin
 
 log = logging.getLogger('path_by_ext')
 

@@ -1,5 +1,5 @@
 import logging
-from flexget.plugin import *
+from flexget.plugin import get_plugins_by_group, priority, PluginError, register_plugin, register_feed_phase
 
 log = logging.getLogger('urlrewriter')
 
@@ -46,7 +46,7 @@ class PluginUrlRewriting(object):
         tries = 0
         while self.url_rewritable(feed, entry):
             tries += 1
-            if (tries > 300):
+            if tries > 300:
                 raise UrlRewritingError('URL rewriting was left in infinite loop while rewriting url for %s, some rewriter is returning always True' % entry)
             for urlrewriter in get_plugins_by_group('urlrewriter'):
                 name = urlrewriter.name

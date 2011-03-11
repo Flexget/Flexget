@@ -1,8 +1,5 @@
-import urllib2
 import logging
-import re
-from flexget.plugin import *
-import difflib
+from flexget.plugin import internet, register_plugin
 from flexget.utils.tools import urlopener
 
 timeout = 10
@@ -14,8 +11,8 @@ log = logging.getLogger('nzbmatrix')
 
 class NzbMatrix:
     """NZBMatrix search plugin."""
-    
-    def validator(self):        
+
+    def validator(self):
         from flexget import validator
         root = validator.factory('dict')
         nzbmatrix = root.accept('dict', key='nzbmatrix')
@@ -33,7 +30,7 @@ class NzbMatrix:
         nzbmatrix.accept('integer', key='maxhits')
         nzbmatrix.accept('integer', key='maxage')
         nzbmatrix.accept('boolean', key='englishonly')
-        # TODO: I should overwrite this below. If there's an IMDB ID, I should 
+        # TODO: I should overwrite this below. If there's an IMDB ID, I should
         # search on it via weblink
         nzbmatrix.accept('choice', key='searchin').accept_choices(
             ['name', 'subject', 'weblink'], ignore_case=True)
@@ -50,7 +47,7 @@ class NzbMatrix:
         if nzbid == None:
             return
         else:
-            download_params = {"username": params['username'], 
+            download_params = {"username": params['username'],
                       'apikey': params['apikey'],
                       'id': nzbid}
             return "http://api.nzbmatrix.com/v1.1/download.php?" + \
@@ -79,7 +76,7 @@ class NzbMatrix:
             else:
                 del params['englishonly']
         return params
-    
+
     def clean(self, s):
         """clean the title name for search"""
         #return s
@@ -95,7 +92,7 @@ class NzbMatrix:
         time.sleep(10)
         apireturn = self.parse_nzb_matrix_api(urlopener(url, log).read(),
                                               entry['title'])
-        if len(apireturn) == 0:
+        if not apireturn:
             return None
         else:
             names = []
@@ -117,7 +114,7 @@ class NzbMatrix:
                 entry["language"] = result['LANGUAGE']
                 # Return an NZBID
                 return result['NZBID']
-                   
+
     def parse_nzb_matrix_api(self, apireturn, title):
         import re
         apireturn = str(apireturn)

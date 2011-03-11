@@ -1,6 +1,6 @@
 import logging
 import datetime
-from flexget.plugin import *
+from flexget.plugin import PluginWarning, register_plugin, register_parser_option
 
 log = logging.getLogger('interval')
 
@@ -11,9 +11,9 @@ class PluginInterval:
         Allows specifying minimum interval for feed execution.
 
         Format: [n] [minutes|hours|days|months]
-        
+
         Example:
-        
+
         interval: 7 days
     """
 
