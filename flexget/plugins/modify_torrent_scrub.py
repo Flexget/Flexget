@@ -9,17 +9,16 @@ from flexget.utils import bittorrent
 from flexget.plugins import modify_torrent
 
 # Global constants
-NAME = __name__.split('.')[-1].split('_', 1)[1]
-LOG = logging.getLogger(NAME)
+LOG = logging.getLogger(__name__.rsplit('.')[-1])
 
 
-class PluginTorrentScrubber(object):
+class TorrentScrub(object):
     """ Scrubs torrents from unwanted keys.
 
         Example:
             feeds:
               rutorrent-fast-resume-infected-feed:
-                rtorrent_scrub: resume
+                torrent_scrub: resume
     """
     # Scrub at high level, but BELOW "torrent"
     SCRUB_PRIO = modify_torrent.TorrentFilename.TORRENT_PRIO - 10
@@ -105,4 +104,4 @@ class PluginTorrentScrubber(object):
                     LOG.warn("Info hash changed from #%s to #%s in '%s'" % (infohash, new_infohash, entry['filename']))
                 
 
-plugin.register_plugin(PluginTorrentScrubber, NAME, api_ver=2)
+plugin.register_plugin(TorrentScrub, api_ver=2)
