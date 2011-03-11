@@ -239,7 +239,7 @@ def docs():
     doc_packages = list(doc_packages)
 
     # clean up previous docs
-    docs_dir = options.docs.get('docs_dir', 'docs')
+    docs_dir = options.docs.get('docs_dir', 'build/apidocs')
     path(docs_dir).rmtree()
 
     # set up excludes
