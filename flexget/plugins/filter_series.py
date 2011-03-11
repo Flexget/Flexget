@@ -11,7 +11,7 @@ from flexget.utils import qualities
 from flexget.utils.tools import merge_dict_from_to
 from flexget.manager import Base, Session
 from flexget.plugin import register_plugin, register_parser_option, get_plugin_by_name, get_plugin_keywords, \
-    PluginWarning, PluginError, PluginDependencyError, priority
+    PluginWarning, PluginError, DependencyError, priority
 
 
 log = logging.getLogger('series')
@@ -403,7 +403,7 @@ class FilterSeries(SeriesPlugin, FilterSeriesBase):
     def on_process_start(self, feed):
         try:
             self.backlog = get_plugin_by_name('backlog').instance
-        except PluginDependencyError:
+        except DependencyError:
             log.warning('Unable utilize backlog plugin, episodes may slip trough timeframe')
 
     def validator(self):

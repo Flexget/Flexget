@@ -1,5 +1,5 @@
 import logging
-from flexget.plugin import register_plugin, priority, PluginDependencyError, get_plugin_by_name
+from flexget.plugin import register_plugin, priority, DependencyError, get_plugin_by_name
 
 log = logging.getLogger('limit_new')
 
@@ -29,7 +29,7 @@ class FilterLimitNew(object):
     def on_process_start(self, feed):
         try:
             self.backlog = get_plugin_by_name('backlog').instance
-        except PluginDependencyError:
+        except DependencyError:
             log.warning('Unable utilize backlog plugin, entries may slip trough limit_new in some rare cases')
 
     @priority(-255)

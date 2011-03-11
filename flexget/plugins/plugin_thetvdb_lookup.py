@@ -1,9 +1,10 @@
-from flexget.plugin import get_plugin_by_name, priority, register_plugin, PluginDependencyError
+from flexget.plugin import get_plugin_by_name, priority, register_plugin, DependencyError
 
 try:
     from flexget.plugins.api_tvdb import lookup_episode
 except ImportError:
-    raise PluginDependencyError('thetvdb_lookup requires the `api_tvdb` plugin', 'api_tvdb')
+    raise DependencyError(who='thetvdb_lookup', what='api_tvdb',
+                          message='thetvdb_lookup requires the `api_tvdb` plugin')
 
 
 class PluginThetvdbLookup(object):

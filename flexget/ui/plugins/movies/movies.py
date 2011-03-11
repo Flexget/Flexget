@@ -3,13 +3,13 @@ import logging
 import posixpath
 from flask import render_template, Module, request, redirect, flash, send_file
 from flask.helpers import url_for
-from flexget.plugin import PluginDependencyError, get_plugin_by_name
+from flexget.plugin import DependencyError, get_plugin_by_name
 from flexget.ui.webui import register_plugin, app, manager
 
 try:
     from flexget.plugins.filter_imdb_queue import QueueError
 except ImportError:
-    raise PluginDependencyError('Requires imdb plugin', 'imdb_queue')
+    raise DependencyError(who='ui.movies', what='imdb_queue')
 
 
 movies_module = Module(__name__, url_prefix='/movies')

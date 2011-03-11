@@ -1,11 +1,11 @@
 from sqlalchemy.orm import join
 from sqlalchemy import desc, func
-from flexget.plugin import register_plugin, register_parser_option, PluginDependencyError
+from flexget.plugin import register_plugin, register_parser_option, DependencyError
 
 try:
     from flexget.plugins.filter_series import SeriesPlugin, Series, Episode, forget_series, forget_series_episode
 except ImportError:
-    raise PluginDependencyError('Series commandline interface not loaded', 'series')
+    raise DependencyError(who='cli_series', what='series', message='Series commandline interface not loaded')
 
 
 class SeriesReport(SeriesPlugin):

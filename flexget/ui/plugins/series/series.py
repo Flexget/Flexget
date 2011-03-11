@@ -3,7 +3,7 @@ from itertools import groupby
 from flask import redirect, render_template, Module, request, flash, url_for
 from sqlalchemy.sql.expression import desc, asc
 
-from flexget.plugin import PluginDependencyError
+from flexget.plugin import DependencyError
 from flexget.ui.webui import register_plugin, db_session, app
 
 import time
@@ -14,7 +14,7 @@ from flexget.ui.utils import pretty_date
 try:
     from flexget.plugins.filter_series import Series, Episode, Release, forget_series, forget_series_episode
 except ImportError:
-    raise PluginDependencyError('Requires series plugin', 'series')
+    raise DependencyError(who='ui.series', what='series')
 
 
 series_module = Module(__name__, url_prefix='/series')

@@ -1,7 +1,7 @@
 import logging
 from flexget.manager import Session
 from flexget.plugin import get_methods_by_phase, get_plugins_by_phase, get_plugin_by_name, \
-    feed_phases, PluginWarning, PluginError, PluginDependencyError, DependencyError
+    feed_phases, PluginWarning, PluginError, DependencyError
 from flexget.utils.simple_persistence import SimpleFeedPersistence
 from flexget.event import fire_event
 
@@ -384,10 +384,6 @@ class Feed(object):
                 except DependencyError, e:
                     log.critical('Plugin `%s` cannot be used because `%s` is missing.' % \
                         (e.who, e.what))
-                except PluginDependencyError, e:
-                    # TODO: deprecate
-                    log.critical('Plugin %s has requested another plugin %s which is not available.' % \
-                        (self.current_plugin, e.plugin))
                     self.abort()
                 except Exception, e:
                     log.exception('BUG: Unhandled error in plugin %s: %s' % (keyword, e))

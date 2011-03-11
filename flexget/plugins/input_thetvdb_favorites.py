@@ -4,7 +4,7 @@ import re
 from datetime import datetime, timedelta
 from BeautifulSoup import BeautifulStoneSoup
 from sqlalchemy import Column, Integer, Unicode, DateTime, String
-from flexget.plugin import register_plugin, internet, PluginDependencyError
+from flexget.plugin import register_plugin, internet, DependencyError
 from flexget.manager import Base, Session
 from flexget.utils.tools import urlopener
 from flexget.utils.database import pipe_list_synonym, with_session
@@ -13,7 +13,8 @@ from flexget.feed import Entry
 try:
     from flexget.plugins.api_tvdb import lookup_series
 except ImportError:
-    raise PluginDependencyError('thetvdb_lookup requires the `api_tvdb` plugin', 'api_tvdb')
+    raise DependencyError(who='thetvdb_favorites', what='api_tvdb',
+                          message='thetvdb_lookup requires the `api_tvdb` plugin')
 
 log = logging.getLogger('thetvdb_favorites')
 

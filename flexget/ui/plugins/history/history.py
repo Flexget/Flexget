@@ -2,12 +2,12 @@ import logging
 from sqlalchemy import desc
 from flexget.ui.webui import register_plugin, db_session
 from flask import request, render_template, flash, Module
-from flexget.plugin import PluginDependencyError
+from flexget.plugin import DependencyError
 
 try:
     from flexget.plugins.output_history import History
 except ImportError:
-    raise PluginDependencyError('Requires archive plugin', 'archive')
+    raise DependencyError(who='ui.history', what='history')
 
 log = logging.getLogger('ui.history')
 history = Module(__name__)

@@ -1,6 +1,6 @@
 import os
 from flexget.feed import Entry
-from flexget.plugin import register_plugin, register_parser_option, get_plugin_by_name, PluginDependencyError
+from flexget.plugin import register_plugin, register_parser_option, get_plugin_by_name, DependencyError
 from flexget.utils.cached_input import cached
 import re
 import logging
@@ -79,11 +79,12 @@ class InputTail(object):
     def on_feed_input(self, feed):
 
         try:
+            # details plugin will complain if no entries are created, with this we disable that
             details = get_plugin_by_name('details').instance
             if feed.name not in details.no_entries_ok:
                 log.debug('appending %s to details plugin no_entries_ok' % feed.name)
                 details.no_entries_ok.append(feed.name)
-        except PluginDependencyError:
+        except DependencyError:
             log.debug('unable to get details plugin')
 
         filename = os.path.expanduser(feed.config['tail']['file'])

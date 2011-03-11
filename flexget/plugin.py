@@ -11,42 +11,15 @@ from event import add_phase_handler
 log = logging.getLogger('plugin')
 
 __all__ = ['PluginWarning', 'PluginError',
-           'PluginDependencyError', 'register_plugin',
-           'register_parser_option', 'register_feed_phase',
+           'register_plugin', 'register_parser_option',
+           'register_feed_phase',
            'get_plugin_by_name', 'get_plugins_by_group',
            'get_plugin_keywords', 'get_plugins_by_phase',
            'get_methods_by_phase', 'get_phases_by_plugin',
            'internet', 'priority']
 
 
-# TODO: remove
-class PluginDependencyError(Exception):
-    """A plugin has requested another plugin by name, but this plugin does not exists"""
-
-    def __init__(self, value, plugin):
-        super(PluginDependencyError, self).__init__()
-        self.what = value
-        self.who = plugin
-        self.silent = False
-
-    # backwards compatibility
-    @property
-    def value(self):
-        "DEPRECATED, use C{what}"
-        return self.what
-
-    @property
-    def plugin(self):
-        "DEPRECATED, use C{who}"
-        return self.who
-
-    def __str__(self):
-        return '%s plugin: %s' % (repr(self.value), repr(self.plugin))
-
-
-class DependencyError(PluginDependencyError):
-    # inherited from PluginDependencyError for backwards compatibility
-    # this should replace the PluginDependencyError
+class DependencyError(Exception):
     """Plugin depends on other plugin, but it cannot be loaded.
 
     Args:
@@ -374,7 +347,7 @@ def load_plugins_from_dir(dir):
     for name in plugin_names:
         try:
             exec 'import flexget.plugins.%s' % name in {}
-        except PluginDependencyError, e:
+        except DependencyError, e:
             msg = 'Plugin %s required: %s' % (e.plugin or name, e.value or 'N/A')
             if not e.silent:
                 log.warning(msg)
@@ -476,8 +449,8 @@ def get_plugin_keywords():
     return keywords
 
 
-def get_plugin_by_name(name):
+def get_plugin_by_name(name, who='???'):
     """Get plugin by name, preferred way since this structure may be changed at some point."""
     if not name in plugins:
-        raise PluginDependencyError('Unknown plugin %s' % name, name)
+        raise DependencyError(who=who, what=name, message='Unknown plugin %s' % name)
     return plugins[name]

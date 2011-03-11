@@ -17,7 +17,7 @@ from flask import Flask, redirect, url_for, abort, request, send_from_directory
 from sqlalchemy.orm import scoped_session
 from sqlalchemy.orm.session import sessionmaker
 from flexget.event import fire_event
-from flexget.plugin import PluginDependencyError
+from flexget.plugin import DependencyError
 from flexget.ui.executor import ExecThread
 
 log = logging.getLogger('webui')
@@ -82,7 +82,7 @@ def load_ui_plugins():
         try:
             log.info('Loading UI plugin %s' % name)
             exec "import flexget.ui.plugins.%s" % name
-        except PluginDependencyError, e:
+        except DependencyError, e:
             # plugin depends on another plugin that was not imported successfully
             log.error(e.value)
         except EnvironmentError, e:

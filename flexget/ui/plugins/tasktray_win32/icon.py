@@ -6,7 +6,7 @@
 
 import os
 from flexget.event import event
-from flexget.plugin import PluginDependencyError
+from flexget.plugin import DependencyError
 
 if os.name != 'nt':
     raise EnvironmentError('win32 only')
@@ -21,7 +21,8 @@ try:
     except ImportError:
         import win32gui
 except ImportError:
-    raise PluginDependencyError('Task tray icon requires win32 extensions', 'task_tray')
+    raise DependencyError(who='ui.win32tray', what='win32 extensions',
+                          message='Task tray icon requires win32 extensions')
 
 
 class SysTrayIcon(object):
