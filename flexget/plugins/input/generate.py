@@ -12,8 +12,8 @@ class Generate(plugin.DebugPlugin):
     def validator(self):
         return validator.factory('integer')
 
-    def on_feed_input(self, feed):
-        amount = feed.config.get('generate', 0)
+    def on_feed_input(self, feed, config):
+        amount = config or 0 # make sure it's an int, and not None etc.
         for i in range(amount):
             entry = Entry()
             import string
