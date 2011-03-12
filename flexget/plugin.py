@@ -413,7 +413,7 @@ def load_plugins_from_dir(basepath, subpkg=None):
                 if f_base == '__init__':
                     continue # don't load __init__.py again
                 if (namespace + f_base) in _loaded_plugins:
-                    log.warning('Duplicate plugin module `%s` in `%s` ignored, `%s` already loaded!' % (
+                    log.debug('Duplicate plugin module `%s` in `%s` ignored, `%s` already loaded!' % (
                         namespace + f_base, dirpath, _loaded_plugins[namespace + f_base]))
                 else:
                     _loaded_plugins[namespace + f_base] = path
