@@ -174,29 +174,6 @@ _plugin_options = []
 _new_phase_queue = {}
 
 
-def register_plugin(plugin_class, name=None, groups=None, builtin=False, debug=False, api_ver=1):
-    """ Register a plugin.
-
-        @param plugin_class: The plugin factory.
-        @param name: Name of the plugin (if not given, default to factory class name in underscore form).
-        @param groups: Groups this plugin belongs to.
-        @param builtin: Auto-activated?
-        @param debug: ???
-        @param api_ver: Signature of callback hooks (1=feed; 2=feed,config).
-    """
-    if groups is None:
-        groups = []
-    if name is None:
-        # Convention is to take camel-case class name and rewrite it to an underscore form
-        # e.g. "PluginName" to "plugin_name"
-        name = re.sub('[A-Z]+', lambda i: '_' + i.group(0).lower(), plugin_class.__name__).lstrip('_')
-    if name in plugins:
-        log.critical('Error while registering plugin %s. %s' % \
-            (name, ('A plugin with the name %s is already registered' % name)))
-        return
-    plugins[name] = PluginInfo(name, plugin_class, groups, builtin, debug, api_ver)
-
-
 def register_parser_option(*args, **kwargs):
     """Adds a parser option to the global parser."""
     _parser.add_option(*args, **kwargs)
@@ -240,26 +217,63 @@ def register_feed_phase(plugin_class, name, before=None, after=None):
             del _new_phase_queue[phase_name]
 
 
+class Plugin(object):
+    """
+        Base class for auto-registering plugins.
+
+        Note that inheriting form this class implies API version 2.
+    """
+    __plugin_info__ = dict(api_ver=2)
+
+
+class BuiltinPlugin(Plugin):
+    """
+        A builtin plugin.
+    """
+    __plugin_info__ = Plugin.__plugin_info__.copy() 
+    __plugin_info__.update(builtin=True)
+
+
 class PluginInfo(dict):
     """
         Allows accessing key/value pairs of this dictionary subclass via
         attributes.  Also instantiates a plugin and initializes properties.
     """
 
-    def __init__(self, name, item_class, groups=None, builtin=False, debug=False, api_ver=1):
+    def __init__(self, plugin_class, name=None, groups=None, builtin=False, debug=False, api_ver=1):
+        """ Register a plugin.
+    
+            @param plugin_class: The plugin factory.
+            @param name: Name of the plugin (if not given, default to factory class name in underscore form).
+            @param groups: Groups this plugin belongs to.
+            @param builtin: Auto-activated?
+            @param debug: ???
+            @param api_ver: Signature of callback hooks (1=feed; 2=feed,config).
+        """
+        dict.__init__(self)
+
         if groups is None:
             groups = []
-        dict.__init__(self)
+        if name is None:
+            # Convention is to take camel-case class name and rewrite it to an underscore form
+            # e.g. "PluginName" to "plugin_name"
+            name = re.sub('[A-Z]+', lambda i: '_' + i.group(0).lower(), plugin_class.__name__).lstrip('_')
 
         self.api_ver = api_ver
         self.name = name
-        self.item_class = item_class
-        self.instance = item_class()
+        self.item_class = plugin_class
+        self.instance = self.item_class()
         self.groups = groups
         self.builtin = builtin
         self.debug = debug
         self.phase_handlers = {}
-        self.build_phase_handlers()
+
+        if self.name in plugins:
+            log.critical('Error while registering plugin %s. %s' % \
+                (self.name, ('A plugin with the name %s is already registered' % self.name)))
+        else:
+            self.build_phase_handlers()
+            plugins[self.name] = self 
 
     def reset_phase_handlers(self):
         """Temporary utility method"""
@@ -300,6 +314,9 @@ class PluginInfo(dict):
         return '<PluginInfo(name=%s)>' % self.name
 
     __repr__ = __str__
+
+
+register_plugin = PluginInfo
 
 
 def get_standard_plugins_path():
@@ -404,10 +421,19 @@ def load_plugins_from_dir(basepath, subpkg=None):
             log.exception(e)
             raise
         else:
-            # TODO: We could auto-register the plugins by introspection here,
-            # after all we get the module object here; could be easily done
-            # by having a PluginBase class
             log.debugall('Loaded module %s from %s' % (modulename[len(PLUGIN_NAMESPACE) + 1:], dirpath))
+
+            # Auto-register plugins that inherit from plugin base classes
+            for obj in vars(sys.modules[modulename]).values():
+                try:
+                    if not issubclass(obj, Plugin):
+                        continue
+                except TypeError:
+                    continue # not a class
+                else:
+                    info = obj.__plugin_info__
+                    register_plugin(obj, info.get('name'), info.get('groups'),
+                        info.get('builtin', False), info.get('debug', False), info.get('api_ver', 1))                     
 
     if _new_phase_queue:
         for phase, args in _new_phase_queue.iteritems():

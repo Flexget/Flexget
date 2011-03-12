@@ -3,6 +3,7 @@
 
 import os
 import logging
+
 from flexget import plugin, validator
 from flexget import feed as flexfeed
 from flexget.utils import bittorrent 
@@ -12,7 +13,7 @@ from flexget.plugins import modify_torrent
 LOG = logging.getLogger(__name__.rsplit('.')[-1])
 
 
-class TorrentScrub(object):
+class TorrentScrub(plugin.Plugin):
     """ Scrubs torrents from unwanted keys.
 
         Example:
@@ -102,6 +103,3 @@ class TorrentScrub(object):
                 new_infohash = entry["torrent"].get_info_hash()
                 if infohash != new_infohash:
                     LOG.warn("Info hash changed from #%s to #%s in '%s'" % (infohash, new_infohash, entry['filename']))
-                
-
-plugin.register_plugin(TorrentScrub, api_ver=2)
