@@ -173,6 +173,7 @@ plugins = {}
 plugins_loaded = False
 
 _parser = None
+_loaded_plugins = {}
 _plugin_options = []
 _new_phase_queue = {}
 
@@ -411,10 +412,11 @@ def load_plugins_from_dir(basepath, subpkg=None):
             if ext in valid_suffixes:
                 if f_base == '__init__':
                     continue # don't load __init__.py again
-                if (namespace + f_base) in found_plugins:
-                    log.warning('Duplicate plugin module `%s` in `%s` ignored, `%r` already loaded!' % (
-                        namespace + f_base, dirpath, sys.modules[namespace + f_base]))
+                if (namespace + f_base) in _loaded_plugins:
+                    log.warning('Duplicate plugin module `%s` in `%s` ignored, `%s` already loaded!' % (
+                        namespace + f_base, dirpath, _loaded_plugins[namespace + f_base]))
                 else:
+                    _loaded_plugins[namespace + f_base] = path
                     found_plugins.add(namespace + f_base)
 
     for modulename in found_plugins:
