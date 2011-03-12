@@ -92,6 +92,8 @@ def test(options):
 @task
 def clean():
     """Cleans up the virtualenv"""
+    import os, glob
+    
     for p in ('bin', 'Scripts', 'build', 'dist', 'docs', 'include', 'lib', 'man',
               'share', 'FlexGet.egg-info', 'paver-minilib.zip', 'setup.py'):
         pth = path(p)
@@ -99,6 +101,10 @@ def clean():
             pth.rmtree()
         elif pth.isfile():
             pth.remove()
+
+    for pkg in set(options.setup.packages) | set(('tests',)):
+        for filename in glob.glob(pkg.replace('.', os.sep) + "/*.py[oc~]"):
+            path(filename).remove()
 
 
 @task
@@ -230,6 +236,8 @@ def coverage():
 def docs():
     """Create documentation."""
     from epydoc import cli
+
+    path('build').exists() or path('build').makedirs()
 
     # get package list, without sub-packages
     doc_packages  = set(options.setup.packages)
