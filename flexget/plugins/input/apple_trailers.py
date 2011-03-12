@@ -1,14 +1,10 @@
 import logging
 import re
-import string
-import urllib2
 from flexget.feed import Entry
-from input_rss import InputRSS
+from flexget.plugins.input.rss import InputRSS
 from flexget.plugin import priority, register_plugin
 from flexget.utils.tools import urlopener
 from flexget.utils.soup import get_soup
-from flexget.utils.cached_input import cached
-
 
 log = logging.getLogger('apple_trailers')
 
@@ -40,13 +36,13 @@ class AppleTrailers(InputRSS):
         self.quality = feed.config['apple_trailers']
 
     @priority(127)
-    def on_feed_input(self, feed):
-        super(AppleTrailers, self).on_feed_input(feed)
+    def on_feed_input(self, feed, config):
+        rss_entries = super(AppleTrailers, self).on_feed_input(feed, config)
 
         # Multiple entries can point to the same movie page (trailer 1, clip
         # 1, etc.)
         entries = {}
-        for entry in feed.entries:
+        for entry in rss_entries:
             url = entry['original_url']
             if url in entries:
                 continue
@@ -54,7 +50,7 @@ class AppleTrailers(InputRSS):
                 title = entry['title']
                 entries[url] = title[:title.rfind('-')].rstrip()
 
-        feed.entries = []
+        result = []
 
         for url, title in entries.iteritems():
             inc_url = url + 'includes/playlists/web.inc'
@@ -79,7 +75,9 @@ class AppleTrailers(InputRSS):
                 match = re.search(r'.*/([^?#]*)', url)
                 entry['filename'] = match.group(1)
 
-                feed.entries.append(entry)
+                result.append(entry)
                 log.debug('found trailer %s', url)
 
-register_plugin(AppleTrailers, 'apple_trailers')
+        return result
+
+register_plugin(AppleTrailers, 'apple_trailers', api_ver=2)

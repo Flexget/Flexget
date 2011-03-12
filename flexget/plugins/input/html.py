@@ -60,7 +60,6 @@ class InputHtml(object):
         get_auth_from_url()
         return config
 
-
     @cached('html', 'url')
     @internet(log)
     def on_feed_input(self, feed, config):
@@ -150,7 +149,7 @@ class InputHtml(object):
 
             title_from = config.get('title_from', 'auto')
             if title_from == 'url':
-                parts = urllib.splitquery(url[url.rfind('/')+1:])
+                parts = urllib.splitquery(url[url.rfind('/') + 1:])
                 title = urllib.unquote_plus(parts[0])
                 log.debug('title from url: %s' % title)
             elif title_from == 'title':
