@@ -1,11 +1,12 @@
 """ Plugin Loading & Management.
 """
 
-from flexget import plugins as _plugins_mod
+from flexget import plugins as _plugins_pkg
 import sys
 import os
 import re
 import imp
+import glob
 import logging
 import time
 from event import add_phase_handler
@@ -342,7 +343,7 @@ def get_standard_plugins_path():
     # Get rid of trailing slashes, since Python can't handle them when
     # it tries to import modules.
     path = map(_strip_trailing_sep, path)
-    path.append(os.path.abspath(os.path.dirname(_plugins_mod.__file__)))
+    path.append(os.path.abspath(os.path.dirname(_plugins_pkg.__file__)))
     # search the arch independent path if we can determine that and
     # the plugin is found nowhere else
     if sys.platform != 'win32':
@@ -359,11 +360,13 @@ def get_standard_plugins_path():
 
 
 def load_plugins_from_dirs(dirs):
-    _plugins_mod.__path__ = map(_strip_trailing_sep, dirs)
+    _plugins_pkg.__path__ = map(_strip_trailing_sep, dirs)
 
     # Import existing feed namespaces
     for subpkg in PLUGIN_PACKAGES[:]:
-        if os.path.isdir(os.path.join(os.path.dirname(_plugins_mod.__file__), subpkg)):
+        if os.path.isdir(os.path.join(os.path.dirname(_plugins_pkg.__file__), subpkg)):
+            # Import sub-package and manipulate its search path so that all existing subdirs
+            # in our plugin path are bound to it
             getattr(__import__(PLUGIN_NAMESPACE, fromlist=[subpkg], level=0), subpkg).__path__ = [
                 _strip_trailing_sep(os.path.join(i, subpkg))
                 for i in dirs
