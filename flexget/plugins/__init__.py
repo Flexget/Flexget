@@ -1,0 +1,1 @@
+"""Standard plugin package."""
