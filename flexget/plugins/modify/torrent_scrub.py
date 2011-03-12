@@ -80,7 +80,7 @@ class TorrentScrub(plugin.Plugin):
                     field = metainfo
 
                     while field and '.' in key:
-                        name, key = key.split('.')
+                        name, key = key.split('.', 1)
                         try:
                             field = field[name]
                         except KeyError, exc:
