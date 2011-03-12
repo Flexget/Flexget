@@ -37,11 +37,16 @@ class TestPluginApi(object):
         class TestPlugin(object):
             pass
 
+        class Oneword(object):
+            pass
+
         class TestHTML(object):
             pass
 
         assert 'test_plugin' not in plugin.plugins
         plugin.register_plugin(TestPlugin)
+        plugin.register_plugin(Oneword)
         plugin.register_plugin(TestHTML)
         assert 'test_plugin' in plugin.plugins
+        assert 'oneword' in plugin.plugins
         assert 'test_html' in plugin.plugins
