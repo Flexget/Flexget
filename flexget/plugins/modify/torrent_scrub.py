@@ -100,3 +100,5 @@ class TorrentScrub(plugin.Plugin):
                 new_infohash = entry["torrent"].get_info_hash()
                 if infohash != new_infohash:
                     log.warn("Info hash changed from #%s to #%s in '%s'" % (infohash, new_infohash, entry['filename']))
+
+plugin.register(TorrentScrub, groups=["torrent"])

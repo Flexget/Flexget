@@ -259,6 +259,11 @@ class PluginInfo(dict):
     # Counts duplicate registrations
     dupe_counter = 0
 
+    @classmethod
+    def name_from_class(cls, plugin_class):
+        """Convention is to take camel-case class name and rewrite it to an underscore form, e.g. 'PluginName' to 'plugin_name'"""
+        return re.sub('[A-Z]+', lambda i: '_' + i.group(0).lower(), plugin_class.__name__).lstrip('_')
+
     def __init__(self, plugin_class, name=None, groups=None, builtin=False, debug=False, api_ver=1):
         """ Register a plugin.
 
@@ -274,14 +279,12 @@ class PluginInfo(dict):
         if groups is None:
             groups = []
         if name is None:
-            # Convention is to take camel-case class name and rewrite it to an underscore form
-            # e.g. "PluginName" to "plugin_name"
-            name = re.sub('[A-Z]+', lambda i: '_' + i.group(0).lower(), plugin_class.__name__).lstrip('_')
+            name = PluginInfo.name_from_class(plugin_class)
 
         self.api_ver = api_ver
         self.name = name
-        self.item_class = plugin_class
-        self.instance = self.item_class()
+        self.plugin_class = plugin_class
+        self.instance = self.plugin_class()
         self.groups = groups
         self.builtin = builtin
         self.debug = debug
@@ -338,6 +341,27 @@ class PluginInfo(dict):
 
 register_plugin = PluginInfo
 
+
+def register(plugin_class, groups=None):
+    """ Register plugin with attributes according to C{PLUGIN_INFO} class variable.
+        Additional groups can be optionally provided.
+        
+        @return: Plugin info. or None if already registered. 
+    """
+    info = plugin_class.PLUGIN_INFO
+    name = PluginInfo.name_from_class(plugin_class)
+
+    # If this very class was already registered, that's OK
+    if name in plugins and plugin_class is plugins[name].plugin_class:
+        log.debugall("Ignoring dupe registration of same class %s.%s" % (
+            plugin_class.__module__, plugin_class.__name__))
+        if groups:
+            plugins[name].groups = list(set(groups) | set(plugins[name].groups))
+        return plugins[name]
+    else:
+        return PluginInfo(plugin_class, name, list(set(info.get('groups', []) + (groups or []))),
+            info.get('builtin', False), info.get('debug', False), info.get('api_ver', 1))
+    
 
 def get_standard_plugins_path():
     """Determine a plugin path suitable for general use."""
@@ -447,7 +471,8 @@ def load_plugins_from_dir(basepath, subpkg=None):
         else:
             log.debugall('Loaded module %s from %s' % (modulename[len(PLUGIN_NAMESPACE) + 1:], dirpath))
 
-            # Auto-register plugins that inherit from plugin base classes
+            # Auto-register plugins that inherit from plugin base classes,
+            # and weren't already registered manually
             for obj in vars(sys.modules[modulename]).values():
                 try:
                     if not issubclass(obj, Plugin):
@@ -455,9 +480,7 @@ def load_plugins_from_dir(basepath, subpkg=None):
                 except TypeError:
                     continue # not a class
                 else:
-                    info = obj.PLUGIN_INFO
-                    register_plugin(obj, info.get('name'), info.get('groups'),
-                        info.get('builtin', False), info.get('debug', False), info.get('api_ver', 1))
+                    register(obj)
 
     if _new_phase_queue:
         for phase, args in _new_phase_queue.iteritems():
