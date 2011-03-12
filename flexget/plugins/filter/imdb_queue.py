@@ -130,9 +130,7 @@ class FilterImdbQueue(object):
                 if item:
                     # This will return UNKNOWN quality if 'ANY' quality
                     minquality = qualities.parse_quality(item.quality)
-                    if 'quality' in entry:
-                        entry_quality = qualities.parse_quality(entry['quality'])
-                    if entry_quality >= minquality:
+                    if entry.get('quality', qualities.UNKNOWN) >= minquality:
                         entry['immortal'] = item.immortal
                         log.debug("found %s quality for %s. Need minimum %s" %
                                   (entry['title'], entry['quality'],
@@ -149,10 +147,8 @@ class FilterImdbQueue(object):
                         # Rejecting, as imdb-queue overrides anything. Don't
                         # want to accidentally grab lower quality than desired.
                         entry['immortal'] = False
-                        feed.reject(entry, 'imdb-queue quality '
-                                    '%s below minimum %s for %s' %
-                                    (entry_quality.name, minquality.name,
-                                     entry['title']))
+                        feed.reject(entry, 'imdb-queue quality %s below minimum %s for %s' %
+                                           (entry.get('quality'), minquality.name, entry['title']))
                 else:
                     log.debugall("%s not in queue with wanted quality, skipping" % entry['title'])
         if len(rejected):
