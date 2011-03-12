@@ -5,9 +5,11 @@ from flexget import plugins as _plugins_mod
 import sys
 import os
 import re
+import imp
 import logging
 import time
 from event import add_phase_handler
+from uuid import NAMESPACE_DNS
 
 log = logging.getLogger('plugin')
 
@@ -141,6 +143,8 @@ def _strip_trailing_sep(path):
 DEFAULT_PRIORITY = 128
 
 feed_phases = ['start', 'input', 'metainfo', 'filter', 'download', 'modify', 'output', 'exit']
+PLUGIN_NAMESPACE = 'flexget.plugins'
+PLUGIN_PACKAGES = feed_phases + ['generic'] 
 
 # map phase names to method names
 phase_methods = {
@@ -323,15 +327,34 @@ def get_standard_plugins_path():
 
 def load_plugins_from_dirs(dirs):
     _plugins_mod.__path__ = map(_strip_trailing_sep, dirs)
-    for d in dirs:
-        if not d:
+
+    # Import existing feed namespaces
+    for subpkg in PLUGIN_PACKAGES[:]:
+        if os.path.isdir(os.path.join(os.path.dirname(_plugins_mod.__file__), subpkg)):
+            getattr(__import__(PLUGIN_NAMESPACE, fromlist=[subpkg], level=0), subpkg).__path__ = [
+                _strip_trailing_sep(os.path.join(i, subpkg))
+                for i in dirs
+                if os.path.isfile(os.path.join(i, subpkg, '__init__.py'))]
+        else:
+            PLUGIN_PACKAGES.remove(subpkg)
+    
+    for dirpath in dirs:
+        if not dirpath:
             continue
-        log.debug('Looking for plugins in %s', d)
-        if os.path.isdir(d):
-            load_plugins_from_dir(d)
+        log.debug('Looking for plugins in %s', dirpath)
+        if os.path.isdir(dirpath):
+            load_plugins_from_dir(dirpath)
+            
+            # Also look in subpackages named like the feed phases, plus "generic"
+            for subpkg in PLUGIN_PACKAGES:
+                subpath = os.path.join(dirpath, subpkg)
+                if os.path.isdir(subpath):
+                    # Only log existing subdirs
+                    log.debug("Looking for sub-plugins in '%s'", subpath)
+                    load_plugins_from_dir(dirpath, subpkg)
 
 
-def load_plugins_from_dir(dir):
+def load_plugins_from_dir(basepath, subpkg=None):
     # Get the list of valid python suffixes for plugins
     # this includes .py, .pyc, and .pyo (depending on if we are running -O)
     # but it doesn't include compiled modules (.so, .dll, etc)
@@ -342,38 +365,49 @@ def load_plugins_from_dir(dir):
     # valid_suffixes = [suffix for suffix, mod_type, flags in imp.get_suffixes()
     #                         if flags in (imp.PY_SOURCE, imp.PY_COMPILED)]
     valid_suffixes = ['.py']
+    namespace = PLUGIN_NAMESPACE + '.'
+    dirpath = basepath
+    if subpkg:
+        namespace += subpkg + '.' 
+        dirpath = os.path.join(dirpath, subpkg)
 
-    plugin_names = set()
-    for fn in os.listdir(dir):
-        path = os.path.join(dir, fn)
+    found_plugins = set()
+    for filename in os.listdir(dirpath):
+        path = os.path.join(dirpath, filename)
         if os.path.isfile(path):
-            f_base, ext = os.path.splitext(fn)
+            f_base, ext = os.path.splitext(filename)
             if ext in valid_suffixes:
                 if f_base == '__init__':
                     continue # don't load __init__.py again
-                elif getattr(_plugins_mod, f_base, None):
-                    log.warning('Plugin named %s already loaded' % f_base)
-                plugin_names.add(f_base)
+                if (namespace + f_base) in sys.modules:
+                    log.warning('Duplicate plugin module %s in %s ignored' % (namespace + f_base, dirpath))
+                else:
+                    found_plugins.add(namespace + f_base)
 
-    for name in plugin_names:
+    for modulename in found_plugins:
         try:
-            exec 'import flexget.plugins.%s' % name in {}
+            __import__(modulename, level=0)
         except DependencyError, e:
-            msg = 'Plugin `%s` requires `%s` to load.' % (e.issued_by or name, e.missing or 'N/A')
+            msg = 'Plugin `%s` requires `%s` to load.' % (e.issued_by or modulename, e.missing or 'N/A')
             if not e.silent:
                 log.warning(msg)
             else:
                 log.debug(msg)
         except ImportError, e:
-            log.critical('Plugin %s failed to import dependencies' % name)
+            log.critical('Plugin %s failed to import dependencies' % modulename)
             log.exception(e)
             # TODO: logging does not seem to work from here
             import traceback
             traceback.print_exc(file=sys.stdout)
         except Exception, e:
-            log.critical('Exception while loading plugin %s' % name)
+            log.critical('Exception while loading plugin %s' % modulename)
             log.exception(e)
             raise
+        else:
+            # TODO: We could auto-register the plugins by introspection here,
+            # after all we get the module object here; could be easily done
+            # by having a PluginBase class
+            log.debugall('Loaded module %s from %s' % (modulename[len(PLUGIN_NAMESPACE) + 1:], dirpath))
 
     if _new_phase_queue:
         for phase, args in _new_phase_queue.iteritems():
@@ -397,8 +431,10 @@ def load_plugins(parser):
 
     start_time = time.time()
     _parser = parser
-    load_plugins_from_dirs(get_standard_plugins_path())
-    _parser = None
+    try:
+        load_plugins_from_dirs(get_standard_plugins_path())
+    finally:
+        _parser = None
     took = time.time() - start_time
     plugins_loaded = True
     return took
