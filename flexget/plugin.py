@@ -50,9 +50,9 @@ class DependencyError(Exception):
     message = property(_get_message, _set_message)
 
     def __str__(self):
-        return '<DependencyError(issued_by=%s,missing=%s,user_message=%s)>' % \
-            (self.issued_by, self.missing, self.user_message)
-
+        return '<DependencyError(issued_by=%r,missing=%r,message=%r,silent=%r)>' % \
+            (self.issued_by, self.missing, self.message, self.silent)
+            
 
 class RegisterException(Exception):
 
