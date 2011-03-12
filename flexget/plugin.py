@@ -142,28 +142,31 @@ def _strip_trailing_sep(path):
 
 DEFAULT_PRIORITY = 128
 
+# feed phases, in order of their execution; note that this can be extended by
+# registering new phases at runtime
 feed_phases = ['start', 'input', 'metainfo', 'filter', 'download', 'modify', 'output', 'exit']
-PLUGIN_NAMESPACE = 'flexget.plugins'
-PLUGIN_PACKAGES = feed_phases + ['generic'] 
 
 # map phase names to method names
 phase_methods = {
-    'start': 'on_feed_start',
-    'input': 'on_feed_input',
-    'metainfo': 'on_feed_metainfo',
-    'filter': 'on_feed_filter',
-    'download': 'on_feed_download',
-    'modify': 'on_feed_modify',
-    'output': 'on_feed_output',
-    'exit': 'on_feed_exit',
-    'abort': 'on_feed_abort',
+    # feed
+    'abort': 'on_feed_abort', # special; not a feed phase that gets called normally
+
+    # entry handling
     'accept': 'on_entry_accept',
     'reject': 'on_entry_reject',
     'fail': 'on_entry_fail',
+    
+    # lifecycle
     'process_start': 'on_process_start',
-    'process_end': 'on_process_end'}
+    'process_end': 'on_process_end',
+}
+phase_methods.update((_phase, 'on_feed_' + _phase) for _phase in feed_phases) # DRY
 
-# Mapping of plugin name to plugin instance (logical singletons)
+# Plugin package naming
+PLUGIN_NAMESPACE = 'flexget.plugins'
+PLUGIN_PACKAGES = feed_phases + ['generic', 'local'] 
+
+# Mapping of plugin name to PluginInfo instance (logical singletons)
 plugins = {}
 
 # Loading done?
@@ -223,15 +226,15 @@ class Plugin(object):
 
         Note that inheriting form this class implies API version 2.
     """
-    __plugin_info__ = dict(api_ver=2)
+    PLUGIN_INFO = dict(api_ver=2)
 
 
 class BuiltinPlugin(Plugin):
     """
         A builtin plugin.
     """
-    __plugin_info__ = Plugin.__plugin_info__.copy() 
-    __plugin_info__.update(builtin=True)
+    PLUGIN_INFO = Plugin.PLUGIN_INFO.copy() # inherit base info
+    PLUGIN_INFO.update(builtin=True)
 
 
 class DebugPlugin(Plugin):
@@ -239,8 +242,8 @@ class DebugPlugin(Plugin):
         A plugin for debugging purposes.
     """
     # Note that debug plugins are never builtin, so we don't need a mixin
-    __plugin_info__ = Plugin.__plugin_info__.copy() 
-    __plugin_info__.update(debug=True)
+    PLUGIN_INFO = Plugin.PLUGIN_INFO.copy() # inherit base info
+    PLUGIN_INFO.update(debug=True)
 
 
 class PluginInfo(dict):
@@ -443,7 +446,7 @@ def load_plugins_from_dir(basepath, subpkg=None):
                 except TypeError:
                     continue # not a class
                 else:
-                    info = obj.__plugin_info__
+                    info = obj.PLUGIN_INFO
                     register_plugin(obj, info.get('name'), info.get('groups'),
                         info.get('builtin', False), info.get('debug', False), info.get('api_ver', 1))                     
 
