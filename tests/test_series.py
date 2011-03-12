@@ -2,7 +2,7 @@ from tests import FlexGetBase
 
 
 def age_series(**kwargs):
-    from flexget.plugins.filter_series import Series
+    from flexget.plugins.filter.series import Series
     from flexget.manager import Session
     import datetime
     session = Session()

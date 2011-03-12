@@ -5,7 +5,7 @@ from flask import request, render_template, flash, Module
 from flexget.plugin import DependencyError
 
 try:
-    from flexget.plugins.output_history import History
+    from flexget.plugins.output.history import History
 except ImportError:
     raise DependencyError(issued_by='ui.history', missing='history')
 

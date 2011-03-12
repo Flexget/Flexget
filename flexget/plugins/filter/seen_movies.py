@@ -1,5 +1,5 @@
 import logging
-from filter_seen import FilterSeen
+from seen import FilterSeen
 from flexget.plugin import register_plugin, priority, register_parser_option
 
 log = logging.getLogger('seenmovies')
@@ -15,7 +15,7 @@ class RepairSeenMovies(object):
 
         from progressbar import ProgressBar, Percentage, Bar, ETA
         from flexget.manager import Session
-        from filter_seen import SeenField
+        from seen import SeenField
         from flexget.utils.imdb import extract_id
 
         session = Session()

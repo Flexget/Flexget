@@ -5,7 +5,7 @@ from flexget.plugin import register_plugin, DependencyError
 log = logging.getLogger('emit_series')
 
 try:
-    from flexget.plugins.filter_series import Series, Episode, SeriesPlugin
+    from flexget.plugins.filter.series import Series, Episode, SeriesPlugin
 except ImportError, e:
     log.error(e.message)
     raise DependencyError(issued_by='emit_series', missing='series')

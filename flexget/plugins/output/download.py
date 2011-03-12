@@ -243,7 +243,7 @@ class PluginDownload(object):
     def filename_from_headers(self, entry, response):
         """Checks entry filename if it's found from content-disposition"""
         from flexget.utils.tools import encode_html, decode_html
-        import email
+        import send_email
 
         data = str(response.info())
 
@@ -262,7 +262,7 @@ class PluginDownload(object):
         # chars are entities
         data = encode_html(data)
         try:
-            filename = email.message_from_string(data).get_filename(failobj=False)
+            filename = send_email.message_from_string(data).get_filename(failobj=False)
         except:
             log.error('Failed to decode filename from response: %s' % ''.join(['%02x' % ord(x) for x in data]))
             return

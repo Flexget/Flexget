@@ -12,7 +12,7 @@ import logging
 from flexget.ui.utils import pretty_date
 
 try:
-    from flexget.plugins.filter_series import Series, Episode, Release, forget_series, forget_series_episode
+    from flexget.plugins.filter.series import Series, Episode, Release, forget_series, forget_series_episode
 except ImportError:
     raise DependencyError(issued_by='ui.series', missing='series')
 

@@ -1,5 +1,5 @@
 from flexget.plugin import register_plugin, priority, get_plugin_by_name
-from flexget.plugins.filter_series import FilterSeriesBase
+from flexget.plugins.filter.series import FilterSeriesBase
 
 
 class FilterAllSeries(FilterSeriesBase):

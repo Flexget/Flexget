@@ -102,7 +102,7 @@ class FlexGetBase(object):
 
     def dump(self):
         """Helper method for debugging"""
-        from flexget.plugins.output_dump import dump
+        from flexget.plugins.output.dump import dump
         #from flexget.utils.tools import sanitize
         # entries = sanitize(self.feed.entries)
         # accepted = sanitize(self.feed.accepted)
@@ -129,16 +129,16 @@ class with_filecopy(object):
         self.dst = dst
 
     def __call__(self, func):
-    
+
         def wrapper(*args, **kwargs):
             import shutil
             import glob
             import os
-            
+
             dst = self.dst
             if "__tmp__" in dst:
                 dst = dst.replace('__tmp__', 'tmp/%s/' % util.find_test_name().replace(':', '_'))
-            
+
             files = glob.glob(self.src)
             if files[0] != self.src:
                 # Glob expansion, "dst" is a prefix
@@ -146,16 +146,16 @@ class with_filecopy(object):
             else:
                 # Explicit source and destination names
                 pairs = [(self.src, dst)]
-   
+
             for src, dst in pairs:
                 log.debugall("Copying %r to %r" % (src, dst))
                 shutil.copy(src, dst)
             try:
                 return func(*args, **kwargs)
             finally:
-                for _, dst in pairs:             
+                for _, dst in pairs:
                     if os.path.exists(dst):
-                        log.debugall("Removing %r" % dst)            
+                        log.debugall("Removing %r" % dst)
                         os.remove(dst)
 
         from nose.tools import make_decorator

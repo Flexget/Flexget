@@ -7,7 +7,7 @@ from flexget.plugin import DependencyError, get_plugin_by_name
 from flexget.ui.webui import register_plugin, app, manager
 
 try:
-    from flexget.plugins.filter_imdb_queue import QueueError
+    from flexget.plugins.filter.imdb_queue import QueueError
 except ImportError:
     raise DependencyError(issued_by='ui.movies', missing='imdb_queue')
 

@@ -1,5 +1,5 @@
 from flexget.plugin import register_plugin, get_plugin_by_name, get_plugins_by_phase, PluginError
-from flexget.plugins.filter_series import FilterSeriesBase
+from flexget.plugins.filter.series import FilterSeriesBase
 import logging
 
 log = logging.getLogger('import_series')

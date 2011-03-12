@@ -266,7 +266,7 @@ def forget_series_episode(name, identifier):
 
 
 class FilterSeriesBase(object):
-    """Class that contains helper methods for both filter_series as well as plugins that configure it,
+    """Class that contains helper methods for both filter.series as well as plugins that configure it,
      such as thetvdb_favorites, all_series and series_premiere."""
 
     def build_options_validator(self, options):

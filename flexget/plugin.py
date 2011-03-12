@@ -52,7 +52,7 @@ class DependencyError(Exception):
     def __str__(self):
         return '<DependencyError(issued_by=%r,missing=%r,message=%r,silent=%r)>' % \
             (self.issued_by, self.missing, self.message, self.silent)
-            
+
 
 class RegisterException(Exception):
 
@@ -155,7 +155,7 @@ phase_methods = {
     'accept': 'on_entry_accept',
     'reject': 'on_entry_reject',
     'fail': 'on_entry_fail',
-    
+
     # lifecycle
     'process_start': 'on_process_start',
     'process_end': 'on_process_end',
@@ -164,7 +164,7 @@ phase_methods.update((_phase, 'on_feed_' + _phase) for _phase in feed_phases) # 
 
 # Plugin package naming
 PLUGIN_NAMESPACE = 'flexget.plugins'
-PLUGIN_PACKAGES = feed_phases + ['generic', 'local'] 
+PLUGIN_PACKAGES = feed_phases + ['generic', 'local']
 
 # Mapping of plugin name to PluginInfo instance (logical singletons)
 plugins = {}
@@ -256,7 +256,7 @@ class PluginInfo(dict):
 
     def __init__(self, plugin_class, name=None, groups=None, builtin=False, debug=False, api_ver=1):
         """ Register a plugin.
-    
+
             @param plugin_class: The plugin factory.
             @param name: Name of the plugin (if not given, default to factory class name in underscore form).
             @param groups: Groups this plugin belongs to.
@@ -288,7 +288,7 @@ class PluginInfo(dict):
                 (self.name, ('A plugin with the name %s is already registered' % self.name)))
         else:
             self.build_phase_handlers()
-            plugins[self.name] = self 
+            plugins[self.name] = self
 
     def reset_phase_handlers(self):
         """Temporary utility method"""
@@ -369,14 +369,14 @@ def load_plugins_from_dirs(dirs):
                 if os.path.isfile(os.path.join(i, subpkg, '__init__.py'))]
         else:
             PLUGIN_PACKAGES.remove(subpkg)
-    
+
     for dirpath in dirs:
         if not dirpath:
             continue
         log.debug('Looking for plugins in %s', dirpath)
         if os.path.isdir(dirpath):
             load_plugins_from_dir(dirpath)
-            
+
             # Also look in subpackages named like the feed phases, plus "generic"
             for subpkg in PLUGIN_PACKAGES:
                 subpath = os.path.join(dirpath, subpkg)
@@ -400,7 +400,7 @@ def load_plugins_from_dir(basepath, subpkg=None):
     namespace = PLUGIN_NAMESPACE + '.'
     dirpath = basepath
     if subpkg:
-        namespace += subpkg + '.' 
+        namespace += subpkg + '.'
         dirpath = os.path.join(dirpath, subpkg)
 
     found_plugins = set()
@@ -412,7 +412,7 @@ def load_plugins_from_dir(basepath, subpkg=None):
                 if f_base == '__init__':
                     continue # don't load __init__.py again
                 if (namespace + f_base) in found_plugins:
-                    log.warning('Duplicate plugin module %s in %s ignored, %r already loaded!' % (
+                    log.warning('Duplicate plugin module `%s` in `%s` ignored, `%r` already loaded!' % (
                         namespace + f_base, dirpath, sys.modules[namespace + f_base]))
                 else:
                     found_plugins.add(namespace + f_base)
@@ -427,7 +427,7 @@ def load_plugins_from_dir(basepath, subpkg=None):
             else:
                 log.debug(msg)
         except ImportError, e:
-            log.critical('Plugin %s failed to import dependencies' % modulename)
+            log.critical('Plugin `%s` failed to import dependencies' % modulename)
             log.exception(e)
             # TODO: logging does not seem to work from here
             import traceback
@@ -449,7 +449,7 @@ def load_plugins_from_dir(basepath, subpkg=None):
                 else:
                     info = obj.PLUGIN_INFO
                     register_plugin(obj, info.get('name'), info.get('groups'),
-                        info.get('builtin', False), info.get('debug', False), info.get('api_ver', 1))                     
+                        info.get('builtin', False), info.get('debug', False), info.get('api_ver', 1))
 
     if _new_phase_queue:
         for phase, args in _new_phase_queue.iteritems():

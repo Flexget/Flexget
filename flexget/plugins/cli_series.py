@@ -3,7 +3,7 @@ from sqlalchemy import desc, func
 from flexget.plugin import register_plugin, register_parser_option, DependencyError
 
 try:
-    from flexget.plugins.filter_series import SeriesPlugin, Series, Episode, forget_series, forget_series_episode
+    from flexget.plugins.filter.series import SeriesPlugin, Series, Episode, forget_series, forget_series_episode
 except ImportError:
     raise DependencyError(issued_by='cli_series', missing='series', message='Series commandline interface not loaded')
 
