@@ -1,4 +1,4 @@
-"""Plugin for filesystem feeds."""
+"""Plugin for mocking feed data."""
 import logging
 from flexget.feed import Entry
 from flexget import plugin
