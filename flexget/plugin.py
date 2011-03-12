@@ -39,11 +39,14 @@ class DependencyError(Exception):
         super(DependencyError, self).__init__()
         self.issued_by = issued_by
         self.missing = missing
-        self.message = message
+        self._message = message
         self.silent = silent
 
     def _get_message(self):
-        return self._message
+        if self._message:
+            return self._message
+        else:
+            return 'Plugin `%s` requires dependency `%s`' % (self.issued_by, self.missing)
 
     def _set_message(self, message):
         self._message = message

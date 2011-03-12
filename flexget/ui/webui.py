@@ -84,7 +84,7 @@ def load_ui_plugins():
             exec "import flexget.ui.plugins.%s" % name
         except DependencyError, e:
             # plugin depends on another plugin that was not imported successfully
-            log.error(e.value)
+            log.error(e.message)
         except EnvironmentError, e:
             log.info('Plugin %s: %s' % (name, e.message))
         except Exception, e:
