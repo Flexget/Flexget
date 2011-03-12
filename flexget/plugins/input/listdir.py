@@ -1,10 +1,11 @@
+"""Plugin for filesystem feeds."""
 import logging
-from flexget.plugin import register_plugin
+from flexget import plugin
 
 log = logging.getLogger('listdir')
 
 
-class InputListdir(object):
+class Listdir(plugin.Plugin):
     """
         Uses local path content as an input.
 
@@ -40,5 +41,3 @@ class InputListdir(object):
                 e['location'] = os.path.join(path, name)
                 entries.append(e)
         return entries
-
-register_plugin(InputListdir, 'listdir', api_ver=2)

@@ -1,14 +1,15 @@
-from flexget.feed import Entry
-from flexget.plugin import register_plugin, internet
-from flexget.utils.cached_input import cached
+"""Plugin for text file or URL feeds via regex."""
 import re
 import logging
+from flexget.feed import Entry
+from flexget import plugin
+from flexget.utils.cached_input import cached
 from flexget.utils.tools import urlopener
 
 log = logging.getLogger('text')
 
 
-class InputText(object):
+class Text(plugin.Plugin):
 
     """
     Parse any text for entries using regular expression.
@@ -51,13 +52,13 @@ class InputText(object):
             entry[k] = v % entry
 
     @cached('text', 'url')
-    @internet(log)
-    def on_feed_input(self, feed):
-        url = feed.config['text']['url']
+    @plugin.internet(log)
+    def on_feed_input(self, feed, config):
+        url = config['url']
         content = urlopener(url, log)
 
-        entry_config = feed.config['text'].get('entry')
-        format_config = feed.config['text'].get('format', {})
+        entry_config = config.get('entry')
+        format_config = config.get('format', {})
 
         # keep track what fields have been found
         used = {}
@@ -99,5 +100,3 @@ class InputText(object):
                         # start new entry
                         entry = Entry()
                         used = {}
-
-register_plugin(InputText, 'text')

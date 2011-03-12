@@ -1,11 +1,13 @@
+"""Plugin for filesystem feeds."""
 import logging
 from flexget.feed import Entry
-from flexget.plugin import register_plugin
+from flexget import plugin
 
 log = logging.getLogger('mock')
 
 
-class InputMock(object):
+# XXX: Shouldn't mock be "debug"?
+class Mock(plugin.Plugin):
     """
         Allows adding mock input entries. Example:
 
@@ -40,5 +42,3 @@ class InputMock(object):
                 entry['url'] = 'http://localhost/mock/%s' % ''.join([random.choice(string.letters + string.digits) for x in range(1, 30)])
             entries.append(entry)
         return entries
-
-register_plugin(InputMock, 'mock', api_ver=2)
