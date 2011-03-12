@@ -346,7 +346,7 @@ def register(plugin_class, groups=None):
     """ Register plugin with attributes according to C{PLUGIN_INFO} class variable.
         Additional groups can be optionally provided.
         
-        @return: Plugin info. or None if already registered. 
+        @return: Plugin info of registered plugin. 
     """
     info = plugin_class.PLUGIN_INFO
     name = PluginInfo.name_from_class(plugin_class)
