@@ -1,15 +1,15 @@
 import logging
 from flexget.feed import Entry
-from flexget.plugin import *
+from flexget import plugin, validator
 
-log = logging.getLogger('generate')
+# Global constants
+log = logging.getLogger(__name__.rsplit('.')[-1])
 
 
-class InputGenerate(object):
+class Generate(plugin.DebugPlugin):
     """Generates n number of random entries. Used for debugging purposes."""
 
     def validator(self):
-        from flexget import validator
         return validator.factory('integer')
 
     def on_feed_input(self, feed):
@@ -21,5 +21,3 @@ class InputGenerate(object):
             entry['url'] = 'http://localhost/generate/%s/%s' % (i, ''.join([random.choice(string.letters + string.digits) for x in range(1, 30)]))
             entry['title'] = ''.join([random.choice(string.letters + string.digits) for x in range(1, 30)])
             feed.entries.append(entry)
-
-register_plugin(InputGenerate, 'generate', debug=True)

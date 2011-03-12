@@ -234,11 +234,22 @@ class BuiltinPlugin(Plugin):
     __plugin_info__.update(builtin=True)
 
 
+class DebugPlugin(Plugin):
+    """
+        A plugin for debugging purposes.
+    """
+    # Note that debug plugins are never builtin, so we don't need a mixin
+    __plugin_info__ = Plugin.__plugin_info__.copy() 
+    __plugin_info__.update(debug=True)
+
+
 class PluginInfo(dict):
     """
         Allows accessing key/value pairs of this dictionary subclass via
         attributes.  Also instantiates a plugin and initializes properties.
     """
+    # Counts duplicate registrations
+    dupe_counter = 0
 
     def __init__(self, plugin_class, name=None, groups=None, builtin=False, debug=False, api_ver=1):
         """ Register a plugin.
@@ -247,7 +258,7 @@ class PluginInfo(dict):
             @param name: Name of the plugin (if not given, default to factory class name in underscore form).
             @param groups: Groups this plugin belongs to.
             @param builtin: Auto-activated?
-            @param debug: ???
+            @param debug: True if plugin is for debugging purposes.
             @param api_ver: Signature of callback hooks (1=feed; 2=feed,config).
         """
         dict.__init__(self)
@@ -269,6 +280,7 @@ class PluginInfo(dict):
         self.phase_handlers = {}
 
         if self.name in plugins:
+            PluginInfo.dupe_counter += 1
             log.critical('Error while registering plugin %s. %s' % \
                 (self.name, ('A plugin with the name %s is already registered' % self.name)))
         else:
