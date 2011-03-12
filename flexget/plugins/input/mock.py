@@ -6,7 +6,7 @@ from flexget import plugin
 log = logging.getLogger('mock')
 
 
-# XXX: Shouldn't mock be "debug"?
+# Mainly used in unit tests, but can be useful for users too (i.e. not "debug")
 class Mock(plugin.Plugin):
     """
         Allows adding mock input entries. Example:
