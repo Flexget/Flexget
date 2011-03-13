@@ -51,6 +51,9 @@ class DependencyError(Exception):
     def _set_message(self, message):
         self._message = message
 
+    def has_message(self):
+        return self._message is not None
+
     message = property(_get_message, _set_message)
 
     def __str__(self):
@@ -453,7 +456,10 @@ def load_plugins_from_dir(basepath, subpkg=None):
         try:
             __import__(modulename, level=0)
         except DependencyError, e:
-            msg = 'Plugin `%s` requires `%s` to load.' % (e.issued_by or modulename, e.missing or 'N/A')
+            if e.has_message():
+                msg = e.message
+            else:
+                msg = 'Plugin `%s` requires `%s` to load.' % (e.issued_by or modulename, e.missing or 'N/A')
             if not e.silent:
                 log.warning(msg)
             else:

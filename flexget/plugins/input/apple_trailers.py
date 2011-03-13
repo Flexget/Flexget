@@ -1,10 +1,13 @@
 import logging
 import re
 from flexget.feed import Entry
-from flexget.plugins.input.rss import InputRSS
-from flexget.plugin import priority, register_plugin, get_plugin_by_name
+from flexget.plugin import priority, register_plugin, get_plugin_by_name, DependencyError
 from flexget.utils.tools import urlopener
 from flexget.utils.soup import get_soup
+try:
+    from flexget.plugins.input.rss import InputRSS
+except ImportError:
+    raise DependencyError(issued_by='apple_trailers', missing='rss')
 
 log = logging.getLogger('apple_trailers')
 
