@@ -126,7 +126,7 @@ class InputRSS(object):
         try:
             req = urlopener(url, log)
         except ValueError:
-            log.debug('invalid url %s (ok for a file)' % url)
+            log.debug('invalid url `%s` (ok for a file)' % url)
             return
         data = req.read()
         req.close()
@@ -172,7 +172,7 @@ class InputRSS(object):
     def on_feed_input(self, feed, config):
         config = self.build_config(config)
 
-        log.debug('Checking feed %s (%s)' % (feed.name, config['url']))
+        log.debug('Requesting feed `%s` url `%s`' % (feed.name, config['url']))
 
         # check etags and last modified -headers
         # let's not, flexget works better when feed contains all entries all the time ?

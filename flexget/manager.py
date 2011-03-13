@@ -347,7 +347,7 @@ class Manager(object):
         # create all tables, doesn't do anything to existing tables
         from sqlalchemy.exc import OperationalError
         try:
-            if self.options.reset:
+            if self.options.reset or self.options.del_db:
                 Base.metadata.drop_all(bind=self.engine)
             Base.metadata.create_all(bind=self.engine)
         except OperationalError, e:

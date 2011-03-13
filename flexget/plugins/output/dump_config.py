@@ -14,7 +14,7 @@ class OutputDumpConfig(object):
         from flexget import validator
         return validator.factory('boolean')
 
-    def on_process_end(self, feed):
+    def on_feed_exit(self, feed):
         if feed.manager.options.dump_config:
             import yaml
             print '--- config from feed: %s' % feed.name
@@ -22,6 +22,8 @@ class OutputDumpConfig(object):
             print '---'
         if feed.manager.options.dump_config_python:
             print feed.config
+
+    on_feed_abort = on_feed_exit
 
 register_plugin(OutputDumpConfig, 'dump_config', debug=True, builtin=True)
 register_parser_option('--dump-config', action='store_true', dest='dump_config', default=False, \

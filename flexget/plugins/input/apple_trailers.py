@@ -2,7 +2,7 @@ import logging
 import re
 from flexget.feed import Entry
 from flexget.plugins.input.rss import InputRSS
-from flexget.plugin import priority, register_plugin
+from flexget.plugin import priority, register_plugin, get_plugin_by_name
 from flexget.utils.tools import urlopener
 from flexget.utils.soup import get_soup
 
@@ -30,14 +30,18 @@ class AppleTrailers(InputRSS):
         config.accept('choice').accept_choices(self.qualities, ignore_case=True)
         return config
 
-    def on_feed_start(self, feed):
-        feed.config['rss'] = self.rss_url
+    def on_feed_start(self, feed, config):
+        # make sure we have dependencies available, will throw DependencyError if not
+        get_plugin_by_name('headers')
+        # configure them
         feed.config['headers'] = {'User-Agent': 'QuickTime/7.6.6'}
-        self.quality = feed.config['apple_trailers']
+        self.quality = config
 
     @priority(127)
     def on_feed_input(self, feed, config):
-        rss_entries = super(AppleTrailers, self).on_feed_input(feed, config)
+        # use rss plugin
+        rss_config = {'url': self.rss_url}
+        rss_entries = super(AppleTrailers, self).on_feed_input(feed, rss_config)
 
         # Multiple entries can point to the same movie page (trailer 1, clip
         # 1, etc.)
