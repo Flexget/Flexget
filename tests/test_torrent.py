@@ -116,18 +116,19 @@ class TestTorrentScrub(FlexGetBase):
             torrent_scrub: off
     """
 
-    filenames = (
+    test_cases = (
         (True, 'test.torrent'), 
         (False, 'LICENSE.torrent'), 
         (False, 'LICENSE-resume.torrent'),
     )
+    test_files = [i[1] for i in test_cases]
 
-    @with_filecopy("*.torrent", "__tmp__")
+    @with_filecopy(test_files, "__tmp__")
     def test_torrent_scrub(self):
         # Run feed        
         self.execute_feed('test_all')
 
-        for clean, filename in self.filenames: 
+        for clean, filename in self.test_cases: 
             original = Torrent.from_file(filename)
             title = os.path.splitext(filename)[0]
 
@@ -168,7 +169,7 @@ class TestTorrentScrub(FlexGetBase):
                 assert 'libtorrent_resume' in original.content  
                 assert 'libtorrent_resume' not in modified.content
 
-    @with_filecopy("*.torrent", "__tmp__")
+    @with_filecopy(test_files, "__tmp__")
     def test_torrent_scrub_fields(self):
         self.execute_feed('test_fields')
         title = 'fields.LICENSE'
@@ -181,11 +182,11 @@ class TestTorrentScrub(FlexGetBase):
         assert 'comment' not in torrent.content, "'comment' not scrubbed"
         assert 'x_cross_seed' not in torrent.content['info'], "'info.x_cross_seed' not scrubbed"
 
-    @with_filecopy("*.torrent", "__tmp__")
+    @with_filecopy(test_files, "__tmp__")
     def test_torrent_scrub_off(self):
         self.execute_feed('test_off')
 
-        for clean, filename in self.filenames: 
+        for filename in self.test_files: 
             osize = os.path.getsize(filename)
             msize = os.path.getsize(self.__tmp__ + filename)
             assert osize == msize, "Filesizes aren't supposed to differ (%r %d, %r %d)!" % (

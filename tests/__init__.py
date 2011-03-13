@@ -122,6 +122,9 @@ class with_filecopy(object):
     """
         @with_filecopy decorator
         make a copy of src to dst for test case and deleted file afterwards
+
+        src can be also be a glob pattern, or a list of patterns; in both
+        cases, dst is then handled as a prefix (preferably a temp dir)
     """
 
     def __init__(self, src, dst):
@@ -133,14 +136,19 @@ class with_filecopy(object):
         def wrapper(*args, **kwargs):
             import shutil
             import glob
-            import os
 
             dst = self.dst
             if "__tmp__" in dst:
                 dst = dst.replace('__tmp__', 'tmp/%s/' % util.find_test_name().replace(':', '_'))
 
-            files = glob.glob(self.src)
-            if files[0] != self.src:
+            src = self.src
+            if isinstance(src, basestring):
+                src = [self.src]
+            files = []
+            for pattern in src:
+                files.extend(glob.glob(pattern))
+
+            if len(src) > 1 or set(files) != set(src):
                 # Glob expansion, "dst" is a prefix
                 pairs = [(i, dst + i) for i in files]
             else:
