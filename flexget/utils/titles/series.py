@@ -46,7 +46,7 @@ class SeriesParser(TitleParser):
         '(\d+)%s(\d+)%s(\d{4})' % (separators, separators),
         '(\d{4})x(\d+)\.(\d+)',
         '(pt|part)\s?(\d+|%s)' % roman_numeral_re,
-        '(\d{1,3})']])
+        '(\d{1,3})(?:v(?P<version>\d))?']])
     unwanted_id_regexps = ReList([
         'seasons?\s?\d{1,2}'])
     clean_regexps = ReList(['\[.*?\]', '\(.*?\)'])
@@ -96,7 +96,7 @@ class SeriesParser(TitleParser):
         self.id = None
         self.id_groups = None
         self.quality = qualities.UNKNOWN
-        self.proper_or_repack = False
+        self.proper_count = 0
         self.special = False
         # TODO: group is only produced with allow_groups
         self.group = None
@@ -150,8 +150,12 @@ class SeriesParser(TitleParser):
             # "Schmost" and the feed contains "Schmost at Sea".
             blank = r'[\W_]'
             ignore = '(?:' + '|'.join(self.ignore_prefixes) + ')?'
+            # accept either '&' or 'and'
+            name = name.replace('&', '(?:and|&)')
             res = re.sub(blank + '+', ' ', name)
             res = res.strip()
+            # check for 'and' surrounded by spaces so it is not replaced within a word or from above replacement
+            res = res.replace(' and ', ' (?:and|&) ')
             res = re.sub(' +', blank + '*', res)
             res = '^' + ignore + blank + '*' + '(' + res + ')' + blank + '+'
             return res
@@ -167,9 +171,6 @@ class SeriesParser(TitleParser):
             # if we don't have name_regexps, generate one from the name
             self.name_regexps = [name_to_re(name)]
             self.re_from_name = True
-            if '&' in name:
-                # if & is in the name, also add a regexp that accepts 'and' instead
-                self.name_regexps.append(name_to_re(name.replace('&', 'and')))
         # try all specified regexps on this data
         for name_re in self.name_regexps:
             match = re.search(name_re, self.data)
@@ -225,12 +226,13 @@ class SeriesParser(TitleParser):
 
         data_parts = re.split('[\W_]+', data_stripped)
 
-        for part in data_parts:
+        for part in data_parts[:]:
             if part in self.propers:
-                self.proper_or_repack = True
+                self.proper_count += 1
                 data_parts.remove(part)
-            if part in self.specials:
+            elif part in self.specials:
                 self.special = True
+                data_parts.remove(part)
 
         data_stripped = ' '.join(data_parts).strip()
 
@@ -292,8 +294,12 @@ class SeriesParser(TitleParser):
                     if self.strict_name:
                         if match.start() - name_end >= 2:
                             return
-
-                    self.id = '-'.join(match.groups())
+                    if 'version' in match.groupdict():
+                        if match.group('version'):
+                            self.proper_count = int(match.group('version')) - 1
+                        self.id = match.group(1)
+                    else:
+                        self.id = '-'.join(match.groups())
                     self.id_groups = match.groups()
                     if self.special:
                         self.id += '-SPECIAL'
@@ -401,7 +407,7 @@ class SeriesParser(TitleParser):
 
     @property
     def proper(self):
-        return self.proper_or_repack
+        return self.proper_count > 0
 
     def __str__(self):
         # for some fucking reason it's impossible to print self.field here, if someone figures out why please
@@ -411,15 +417,14 @@ class SeriesParser(TitleParser):
             valid = 'OK'
         return '<SeriesParser(data=%s,name=%s,id=%s,season=%s,episode=%s,quality=%s,proper=%s,status=%s)>' % \
             (self.data, self.name, str(self.id), self.season, self.episode, \
-             self.quality, self.proper_or_repack, valid)
+             self.quality, self.proper_count, valid)
 
     def __cmp__(self, other):
-        """
-        me = (self.qualities.index(self.quality), self.name)
-        other = (self.qualities.index(other.quality), other.name)
-        return cmp(me, other)
-        """
-        return cmp(self.quality, other.quality)
+        """Compares quality of parsers, if quality is equal, compares proper_count."""
+        quality_cmp = cmp(self.quality, other.quality)
+        if quality_cmp == 0:
+            return cmp(self.proper_count, other.proper_count)
+        return quality_cmp
 
     def __eq__(self, other):
         return self is other

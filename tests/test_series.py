@@ -483,7 +483,13 @@ class TestPropers(FlexGetBase):
             mock:
               - {title: 'NoTest.S01E01.720p.proper-FlexGet'}
 
+          proper_upgrade_1:
+            mock:
+              - {title: 'Test.S02E01.hdtv.proper'}
 
+          proper_upgrade_2:
+            mock:
+              - {title: 'Test.S02E01.hdtv.real.proper'}
         """
 
     def test_propers_timeframe(self):
@@ -557,6 +563,13 @@ class TestPropers(FlexGetBase):
         self.execute_feed('proper_at_first')
         assert self.feed.find_entry('accepted', title='Foobar.S01E01.720p.proper.FlexGet'), \
             'Foobar.S01E01.720p.proper.FlexGet should have been accepted'
+
+    def test_proper_upgrade(self):
+        """Series plugin: real proper after proper"""
+        self.execute_feed('proper_upgrade_1')
+        assert self.feed.find_entry('accepted', title='Test.S02E01.hdtv.proper')
+        self.execute_feed('proper_upgrade_2')
+        assert self.feed.find_entry('accepted', title='Test.S02E01.hdtv.real.proper')
 
 
 class TestSimilarNames(FlexGetBase):

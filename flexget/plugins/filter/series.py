@@ -1,10 +1,12 @@
 import logging
+from flexget.utils.sqlalchemy_utils import table_columns
+import re
 from copy import copy
 from datetime import datetime, timedelta
-from flexget.utils.log import log_once
 from sqlalchemy import Column, Integer, String, Unicode, DateTime, Boolean, desc, func
 from sqlalchemy.schema import ForeignKey
 from sqlalchemy.orm import relation, join, synonym
+from flexget.utils.log import log_once
 from flexget.event import event
 from flexget.utils.titles import SeriesParser, ParseWarning
 from flexget.utils import qualities
@@ -77,7 +79,7 @@ class Release(Base):
     episode_id = Column(Integer, ForeignKey('series_episodes.id'), nullable=False)
     _quality = Column('quality', String)
     downloaded = Column(Boolean, default=False)
-    proper = Column(Boolean, default=False)
+    proper_count = Column(Integer, default=0)
     title = Column(Unicode)
 
     def get_quality(self):
@@ -89,15 +91,23 @@ class Release(Base):
     quality = synonym('_quality', descriptor=property(get_quality, set_quality))
 
     def __repr__(self):
-        return '<Release(id=%s,quality=%s,downloaded=%s,proper=%s,title=%s)>' % \
-            (self.id, self.quality, self.downloaded, self.proper, self.title)
+        return '<Release(id=%s,quality=%s,downloaded=%s,proper_count=%s,title=%s)>' % \
+            (self.id, self.quality, self.downloaded, self.proper_count, self.title)
 
 
 @event('manager.startup')
 def repair(manager):
-    """Perform database repairing at startup. For some reason at least I have some releases in
-    database which don't belong to any episode."""
+    """Perform database repairing and upgrading at startup."""
     session = Session()
+    # Upgrade episode_releases table to have a proper count and seed it with appropriate numbers
+    columns = table_columns('episode_releases', session)
+    if not 'proper_count' in columns:
+        log.info('Upgrading episode_release table to have proper_count column')
+        session.execute('ALTER TABLE episode_releases ADD proper_count INTEGER DEFAULT NULL')
+        for release in session.query(Release).all():
+            release.proper_count = len([part for part in re.split('[\W_]+', release.title.lower())
+                                        if part in SeriesParser.propers])
+    # For some reason at least I have some releases in database which don't belong to any episode.
     for release in session.query(Release).filter(Release.episode == None).all():
         log.info('Purging orphan release %s from database' % release.title)
         session.delete(release)
@@ -223,13 +233,13 @@ class SeriesPlugin(object):
         # perhaps a bug in sqlalchemy?
         release = session.query(Release).filter(Release.episode_id == episode.id).\
             filter(Release.quality == parser.quality.name).\
-            filter(Release.proper == parser.proper_or_repack).\
+            filter(Release.proper_count == parser.proper_count).\
             filter(Release.episode_id != None).first()
         if not release:
             log.debug('adding release %s into episode' % parser)
             release = Release()
             release.quality = parser.quality
-            release.proper = parser.proper_or_repack
+            release.proper_count = parser.proper_count
             release.title = parser.data
             episode.releases.append(release) # pylint:disable=E1103
             log.debug('-> added %s' % release)
@@ -640,16 +650,13 @@ class FilterSeries(SeriesPlugin, FilterSeriesBase):
             removed, new_propers = self.process_propers(feed, config, eps)
             whitelist.extend(new_propers)
 
+            # Remove the nuked eps
             for ep in removed:
-                log.debug('propers removed: %s' % ep)
+                log.debug('removing nuked ep: %s' % ep)
                 eps.remove(ep)
 
             if not eps:
                 continue
-
-            log.debug('-' * 20 + ' accept_propers -->')
-            accepted = self.accept_propers(feed, eps, whitelist)
-            whitelist.extend(accepted)
 
             log.debug('current episodes: %s' % [e.data for e in eps])
 
@@ -704,58 +711,34 @@ class FilterSeries(SeriesPlugin, FilterSeriesBase):
 
     def process_propers(self, feed, config, eps):
         """
-            Rejects downloaded propers, nukes episodes from which there exists proper.
-            Returns a list of removed episodes and a list of new propers.
+            Accepts needed propers. Nukes episodes from which there exists proper.
+            Returns a list of removed episodes.
         """
 
-        proper_eps = [ep for ep in eps if ep.proper_or_repack]
+        proper_eps = [ep for ep in eps if ep.proper]
         # Return if there are no propers for this episode
         if not proper_eps:
             return [], []
 
-        downloaded_releases = self.get_downloaded(feed.session, eps[0].name, eps[0].identifier)
-        downloaded_qualities = [d.quality for d in downloaded_releases]
-
-        log.debug('downloaded qualities: %s' % downloaded_qualities)
-
-        def proper_downloaded():
-            for release in downloaded_releases:
-                if release.proper:
-                    return True
-
-
-        new_propers = []
+        new_propers = {} # {quality: parser} format
         removed = []
         for ep in proper_eps:
-            if not proper_downloaded():
-                log.debug('found new proper %s' % ep)
-                new_propers.append(ep)
-            else:
-                feed.reject(self.parser2entry[ep], 'proper already downloaded')
-                removed.append(ep)
-
-        if downloaded_qualities:
-            for proper in new_propers[:]:
-                if proper.quality not in downloaded_qualities:
-                    log.debug('proper %s quality mismatch' % proper)
-                    new_propers.remove(proper)
+            new_propers.setdefault(ep.quality, ep)
+            if ep.quality not in new_propers or ep.proper_count > new_propers[ep.quality].proper_count:
+                new_propers[ep.quality] = ep
 
         # nuke qualities which there is proper available
-        for proper in new_propers:
-            for ep in set(eps) - set(removed) - set(new_propers):
-                if ep.quality == proper.quality:
+        for quality, proper_ep in new_propers.iteritems():
+            for ep in set(eps) - set(removed):
+                if ep.quality == quality and ep.proper_count < proper_ep.proper_count:
                     feed.reject(self.parser2entry[ep], 'nuked')
                     removed.append(ep)
 
-        # nuke propers after timeframe
+        # If propers support is turned off, or proper timeframe has expired just return the nuked episodes
         if 'propers' in config:
             if isinstance(config['propers'], bool):
                 if not config['propers']:
-                    # no propers
-                    for proper in new_propers[:]:
-                        feed.reject(self.parser2entry[proper], 'no propers')
-                        removed.append(proper)
-                        new_propers.remove(proper)
+                    return removed, []
             else:
                 # propers with timeframe
                 amount, unit = config['propers'].split(' ')
@@ -774,34 +757,29 @@ class FilterSeries(SeriesPlugin, FilterSeriesBase):
 
                 if datetime.now() > expires:
                     log.debug('propers timeframe expired')
-                    for proper in new_propers[:]:
-                        feed.reject(self.parser2entry[proper], 'propers timeframe expired')
-                        removed.append(proper)
-                        new_propers.remove(proper)
-
-        log.debug('new_propers: %s' % [e.data for e in new_propers])
-        return removed, new_propers
-
-    def accept_propers(self, feed, eps, new_propers):
-        """
-            Accepts all propers from qualities already downloaded.
-            :return: list of accepted
-        """
-        if not new_propers:
-            return []
+                    return removed, []
 
         downloaded_releases = self.get_downloaded(feed.session, eps[0].name, eps[0].identifier)
         downloaded_qualities = [d.quality for d in downloaded_releases]
 
-        accepted = []
+        log.debug('downloaded qualities: %s' % downloaded_qualities)
 
-        for proper in new_propers:
-            if proper.quality in downloaded_qualities:
-                log.debug('we\'ve downloaded quality %s, accepting proper from it' % proper.quality)
-                feed.accept(self.parser2entry[proper], 'proper')
-                accepted.append(proper)
+        def proper_downloaded(parser):
+            for release in downloaded_releases:
+                if release.quality == parser.quality and release.proper_count >= parser.proper_count:
+                    return True
 
-        return accepted
+        # Make a list of propers we actually need
+        needed_propers = []
+        for quality, ep in new_propers.items():
+            if quality in downloaded_qualities and not proper_downloaded(ep):
+                needed_propers.append(ep)
+
+        log.debug('needed new_propers: %s' % [e.data for e in needed_propers])
+        for ep in needed_propers:
+            feed.accept(self.parser2entry[ep], 'proper')
+
+        return removed, needed_propers
 
     def process_downloaded(self, feed, eps, whitelist):
         """

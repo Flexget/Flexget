@@ -41,9 +41,9 @@ class TestSeriesParser(object):
         assert s.season == 1
         assert s.episode == 2
         assert s.quality == 'unknown'
-        assert s.proper_or_repack, 'did not detect proper from %s' % s.data
+        assert s.proper, 'did not detect proper from %s' % s.data
         s = self.parse(name='foobar', data='foobar 720p proper s01e01')
-        assert s.proper_or_repack, 'did not detect proper from %s' % s.data
+        assert s.proper, 'did not detect proper from %s' % s.data
 
     def test_non_proper(self):
         """SeriesParser: non-proper"""
@@ -51,7 +51,16 @@ class TestSeriesParser(object):
         assert s.season == 1
         assert s.episode == 2
         assert s.quality == 'unknown'
-        assert not s.proper_or_repack, 'detected proper'
+        assert not s.proper, 'detected proper'
+
+    def test_anime_proper(self):
+        """SeriesParser: anime fansub style proper (13v2)"""
+        s = self.parse(name='Anime', data='[aoeu] Anime 19v2 [23BA98]')
+        assert s.identifier == '19'
+        assert s.proper_count == 1
+        s = self.parse(name='Anime', data='Anime_-_19v3')
+        assert s.identifier == '19'
+        assert s.proper_count == 2
 
     def test_basic(self):
         """SeriesParser: basic parsing"""
@@ -489,3 +498,14 @@ class TestSeriesParser(object):
         # Make sure regular identifier doesn't have end_episode
         s = self.parse(name='Something', data='Something.S04E05')
         assert s.end_episode is None, 'should not have detected end_episode'
+
+    def test_and_replacement(self):
+        titles = ['Alpha.&.Beta.S01E02.hdtv', 'alpha.and.beta.S01E02.hdtv', 'alpha&beta.S01E02.hdtv']
+        for title in titles:
+            s = self.parse(name='Alpha & Beta', data=title)
+            assert s.valid
+            s = self.parse(name='Alpha and Beta', data=title)
+            assert s.valid
+        # Test 'and' isn't replaced within a word
+        s = self.parse(name='Sandy Dunes', data='S&y Dunes.S01E01.hdtv')
+        assert not s.valid
