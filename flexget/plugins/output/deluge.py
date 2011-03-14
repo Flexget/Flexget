@@ -5,7 +5,7 @@ import os
 import base64
 import re
 from flexget.utils.tools import replace_from_entry, make_valid_path
-from flexget.plugin import register_plugin, PluginError, priority, get_plugin_by_name
+from flexget.plugin import register_plugin, PluginError, priority, get_plugin_by_name, DependencyError
 
 log = logging.getLogger('deluge')
 
@@ -156,11 +156,11 @@ class OutputDeluge(object):
                 try:
                     from deluge.ui.client import client
                 except ImportError, e:
-                    raise PluginError('Deluge module and it\'s dependencies required. ImportError: %s' % e, log)
+                    raise DependencyError('output_deluge', 'deluge', 'Deluge module and it\'s dependencies required. ImportError: %s' % e)
                 try:
                     from twisted.internet import reactor
                 except:
-                    raise PluginError('Twisted module required', log)
+                    raise DependencyError('output_deluge', 'twisted', 'Twisted module required')
                 logger('Using deluge 1.2 api')
                 self.deluge12 = True
             else:
