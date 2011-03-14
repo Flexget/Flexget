@@ -89,6 +89,10 @@ class Release(Base):
         self._quality = value.name
 
     quality = synonym('_quality', descriptor=property(get_quality, set_quality))
+    
+    @property
+    def proper(self):
+        return self.proper_count > 0
 
     def __repr__(self):
         return '<Release(id=%s,quality=%s,downloaded=%s,proper_count=%s,title=%s)>' % \
