@@ -243,7 +243,7 @@ class PluginDownload(object):
     def filename_from_headers(self, entry, response):
         """Checks entry filename if it's found from content-disposition"""
         from flexget.utils.tools import encode_html, decode_html
-        import send_email
+        import email
 
         data = str(response.info())
 
@@ -251,20 +251,22 @@ class PluginDownload(object):
         try:
             data = data.decode('utf-8')
             log.debug('response info UTF-8 decoded')
-        except:
+        except UnicodeError:
             try:
                 data = unicode(data)
                 log.debug('response info unicoded')
-            except:
+            except UnicodeError:
                 pass
 
         # now we should have unicode string, let's convert into proper format where non-ascii
         # chars are entities
         data = encode_html(data)
         try:
-            filename = send_email.message_from_string(data).get_filename(failobj=False)
+            filename = email.message_from_string(data).get_filename(failobj=False)
+        except (AttributeError, SystemExit, KeyboardInterrupt):
+            raise # at least rethrow the most common stuff before catch-all
         except:
-            log.error('Failed to decode filename from response: %s' % ''.join(['%02x' % ord(x) for x in data]))
+            log.error('Failed to decode filename from response: %r' % data)
             return
         if filename:
             filename = decode_html(filename)
