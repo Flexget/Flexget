@@ -92,6 +92,9 @@ class Release(Base):
     
     @property
     def proper(self):
+        # TODO: TEMP
+        import warnings
+        warnings.warn("accessing deprecated release.proper, use release.proper_count instead")
         return self.proper_count > 0
 
     def __repr__(self):

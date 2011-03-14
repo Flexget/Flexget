@@ -61,8 +61,10 @@ class SeriesReport(SeriesPlugin):
                 title = release.title
                 if len(title) > 55:
                     title = title[:55] + '...'
-                if release.proper:
-                    status += '-Proper'
+                if release.proper_count:
+                    status += '-proper'
+                    if release.proper_count > 1:
+                        status += str(release.proper_count)
                 if release.downloaded:
                     print '  * %-60s%-15s' % (title, status)
                 else:
@@ -110,8 +112,10 @@ class SeriesReport(SeriesPlugin):
                     if release.downloaded:
                         status += '*'
                     status += release.quality.name
-                    if release.proper:
-                        status += '-Proper'
+                    if release.proper_count:
+                        status += '-proper'
+                        if release.proper_count > 1:
+                            status += str(release.proper_count)
                     status += ' '
             else:
                 latest = 'N/A'
