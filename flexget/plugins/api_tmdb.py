@@ -185,7 +185,7 @@ class ApiTmdb(object):
                         movie.imdb_id = imdb_id
                         self.get_movie_details(movie, session)
                         if movie.name:
-                            session.add(movie)
+                            session.merge(movie)
                     elif title:
                         result = get_first_result('search', title)
                         if result:
@@ -193,9 +193,9 @@ class ApiTmdb(object):
                             if not movie:
                                 movie = TMDBMovie(result)
                                 self.get_movie_details(movie, session)
-                                session.add(movie)
+                                session.merge(movie)
                             if title.lower() != movie.name.lower():
-                                session.add(TMDBSearchResult(search=title, movie=movie))
+                                session.merge(TMDBSearchResult(search=title, movie=movie))
                 except URLError:
                     log.error('Error looking up movie from TMDb')
                     return
