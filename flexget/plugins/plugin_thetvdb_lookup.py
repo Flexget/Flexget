@@ -57,7 +57,7 @@ class PluginThetvdbLookup(object):
         try:
             set_plugin = get_plugin_by_name('set')
             set_plugin.instance.register_key('thetvdb_id', 'integer')
-        except PluginDependencyError:
+        except DependencyError:
             pass
 
     @priority(120)
