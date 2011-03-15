@@ -63,14 +63,12 @@ class cached(object):
             if name in self.cache:
                 # return from the cache
                 log.debugall('cache hit')
-                count = 0
                 entries = []
                 for entry in self.cache[name]:
                     fresh = copy.deepcopy(entry)
                     entries.append(fresh)
-                count += 1
-                if count > 0:
-                    feed.verbose_progress('Restored %s entries from cache' % count, log)
+                if entries:
+                    feed.verbose_progress('Restored %s entries from cache' % len(entries), log)
                 return entries
             else:
                 log.debugall('cache miss')
