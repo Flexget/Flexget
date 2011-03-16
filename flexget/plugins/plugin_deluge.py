@@ -35,6 +35,9 @@ try:
                             self._release_requested = False
                             self.paused = True
                             yield self._return_value
+                            self.paused = False
+                except GeneratorExit:
+                    raise
                 except:
                     twisted_log.msg("Unexpected error in main loop.")
                     twisted_log.err()
@@ -47,7 +50,6 @@ try:
                 self.startRunning(installSignalHandlers)
                 self._mainLoopGen = self._mainLoopGenerator()
             try:
-                self.paused = False
                 return self._mainLoopGen.next()
             except StopIteration:
                 pass
@@ -164,7 +166,7 @@ class InputDeluge(DelugePlugin):
         'hash': 'torrent_info_hash',
         'num_peers': 'torrent_peers',
         'num_seeds': 'torrent_seeds',
-        'private': 'torrent_private',
+        'private': 'deluge_private',
         'state': 'deluge_state',
         'eta': 'deluge_eta',
         'ratio': 'deluge_ratio',
@@ -187,7 +189,7 @@ class InputDeluge(DelugePlugin):
         filter = advanced.accept('dict', key='filter')
         filter.accept('text', key='label')
         filter.accept('choice', key='state').accept_choices(
-            ['Paused', 'Downloading', 'Seeding', 'Queued'], ignore_case=True)
+            ['active', 'downloading', 'seeding', 'queued', 'paused'], ignore_case=True)
         return root
 
     def prepare_config(self, config):
