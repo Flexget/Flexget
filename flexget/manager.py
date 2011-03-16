@@ -517,7 +517,7 @@ class Manager(object):
         self.process_start(feeds=run_feeds)
 
         for feed in sorted(run_feeds):
-            if not feed.enabled:
+            if not feed.enabled or feed._abort:
                 continue
             try:
                 feed.execute(disable_phases=disable_phases, entries=entries)
