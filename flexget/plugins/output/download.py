@@ -71,6 +71,55 @@ class PluginDownload(object):
         config = self.get_config(feed)
         self.get_temp_files(feed, require_path=config.get('require_path', False), fail_html=config['fail_html'])
 
+    def get_temp_file(self, feed, entry, require_path, handle_magnets, fail_html):
+        """Download entry content and store in temporary folder.
+
+        :require_path: whether or not entries without 'path' field are ignored
+        :handle_magnets: when used any of urls containing magnet link will replace url, otherwise warning is printed.
+        """
+        if entry.get('urls'):
+            urls = entry.get('urls')
+        else:
+            urls = [entry['url']]
+        errors = []
+        for url in urls:
+            if url.startswith('magnet:'):
+                if handle_magnets:
+                    # Set magnet link as main url, so a torrent client plugin can grab it
+                    log.debug('Accepting magnet url for %s' % entry['title'])
+                    entry['url'] = url
+                    break
+                else:
+                    log.warning('Can\'t download magnet url')
+                    errors.append('Magnet URL')
+                    continue
+            if require_path and 'path' not in entry:
+                # Don't fail here, there might be a magnet later in the list of urls
+                log.debug('Skipping url %s because there is no path for download' % url)
+                continue
+            error = self.process_entry(feed, entry, url)
+
+            # disallow html content
+            html_mimes = ['html', 'text/html']
+            if entry.get('mime-type') in html_mimes and fail_html:
+                error = 'Unexpected html content received from `%s` - maybe a login page?' % entry['url']
+                self.cleanup_temp_file(entry)
+
+            if not error:
+                # Set the main url, so we know where this file actually came from
+                log.debug('Successfully retrieved %s from %s' % (entry['title'], url))
+                entry['url'] = url
+                break
+            else:
+                errors.append(error)
+        else:
+            # check if entry must have a path (download: yes)
+            if require_path and 'path' not in entry:
+                log.error('%s can\'t be downloaded, no path specified for entry' % entry['title'])
+                feed.fail(entry, 'no path specified for entry')
+            else:
+                feed.fail(entry, ", ".join(errors))
+
     def get_temp_files(self, feed, require_path=False, handle_magnets=False, fail_html=True):
         """Download all feed content and store in temporary folder.
 
@@ -78,48 +127,7 @@ class PluginDownload(object):
         :handle_magnets: when used any of urls containing magnet link will replace url, otherwise warning is printed.
         """
         for entry in feed.accepted:
-            if entry.get('urls'):
-                urls = entry.get('urls')
-            else:
-                urls = [entry['url']]
-            errors = []
-            for url in urls:
-                if url.startswith('magnet:'):
-                    if handle_magnets:
-                        # Set magnet link as main url, so a torrent client plugin can grab it
-                        log.debug('Accepting magnet url for %s' % entry['title'])
-                        entry['url'] = url
-                        break
-                    else:
-                        log.warning('Can\'t download magnet url')
-                        errors.append('Magnet URL')
-                        continue
-                if require_path and 'path' not in entry:
-                    # Don't fail here, there might be a magnet later in the list of urls
-                    log.debug('Skipping url %s because there is no path for download' % url)
-                    continue
-                error = self.process_entry(feed, entry, url)
-
-                # disallow html content
-                html_mimes = ['html', 'text/html']
-                if entry.get('mime-type') in html_mimes and fail_html:
-                    error = 'Unexpected html content received from `%s` - maybe a login page?' % entry['url']
-                    self.cleanup_temp_file(entry)
-
-                if not error:
-                    # Set the main url, so we know where this file actually came from
-                    log.debug('Successfully retrieved %s from %s' % (entry['title'], url))
-                    entry['url'] = url
-                    break
-                else:
-                    errors.append(error)
-            else:
-                # check if entry must have a path (download: yes)
-                if require_path and 'path' not in entry:
-                    log.error('%s can\'t be downloaded, no path specified for entry' % entry['title'])
-                    feed.fail(entry, 'no path specified for entry')
-                else:
-                    feed.fail(entry, ", ".join(errors))
+            self.get_temp_file(feed, entry, require_path, handle_magnets, fail_html)
 
     def process_entry(self, feed, entry, url):
         """Processes :entry: by using :url: from it.

@@ -3,6 +3,7 @@ import time
 import os
 import base64
 import re
+from flexget.feed import Entry
 from flexget.utils.tools import replace_from_entry, make_valid_path
 from flexget.plugin import register_plugin, PluginError, priority, get_plugin_by_name, DependencyError
 
@@ -72,6 +73,7 @@ except ImportError:
     pass
 
 
+# Define a base class with some methods that are used for all deluge versions
 class DelugePlugin(object):
     """Base class for deluge plugins, contains settings and methods for connecting to a deluge daemon."""
 
@@ -87,82 +89,155 @@ class DelugePlugin(object):
         config.setdefault('user', '')
         config.setdefault('pass', '')
 
-    def on_disconnect(self):
-        """Pauses the reactor. Gets called when we disconnect from the daemon."""
-        from twisted.internet import reactor
-        # pause the reactor, so flexget can continue
-        reactor.callLater(0, reactor.pause)
+    def on_process_start(self, feed, config):
+        """Raise a DependencyError if our dependencies aren't available"""
+        # This is overridden by OutputDeluge to add deluge 1.1 support
+        try:
+            from deluge.ui.client import client
+        except ImportError, e:
+            raise DependencyError('output_deluge', 'deluge', 'Deluge module and it\'s dependencies required. ImportError: %s' % e, log)
+        try:
+            from twisted.internet import reactor
+        except:
+            raise DependencyError('output_deluge', 'twisted.internet', 'Twisted.internet package required', log)
+        log.debug('Using deluge 1.2 api')
 
-    def on_connect_fail(result):
-        """Pauses the reactor, returns PluginError. Gets called when connection to deluge daemon fails."""
-        from twisted.internet import reactor
-        log.debug('Connect to deluge daemon failed, result: %s' % result)
-        reactor.callLater(0, reactor.pause, PluginError('Could not connect to deluge daemon', log))
+    def on_feed_abort(self, feed, config):
+        pass
 
-    def on_connect_success(self, result, feed, config):
-        """Gets called when successfully connected to the daemon. Should do the work then call client.disconnect"""
-        raise NotImplementedError
+# Add some more methods to the base class if we are using deluge 1.2+
+try:
+    from twisted.internet import reactor
+    from deluge.ui.client import client
 
-    def connect(self, feed, config):
-        """Connects to the deluge daemon and returns the deferred."""
-        from deluge.ui.client import client
-        from twisted.internet import reactor
+    class DelugePlugin(DelugePlugin):
 
-        client.set_disconnect_callback(self.on_disconnect)
+        def on_disconnect(self):
+            """Pauses the reactor. Gets called when we disconnect from the daemon."""
+            # pause the reactor, so flexget can continue
+            reactor.callLater(0, reactor.pause)
 
-        d = client.connect(
-            host=config['host'],
-            port=config['port'],
-            username=config['user'],
-            password=config['pass'])
+        def on_connect_fail(self, result):
+            """Pauses the reactor, returns PluginError. Gets called when connection to deluge daemon fails."""
+            log.debug('Connect to deluge daemon failed, result: %s' % result)
+            reactor.callLater(0, reactor.pause, PluginError('Could not connect to deluge daemon', log))
 
-        d.addCallback(self.on_connect_success, feed, config).addErrback(self.on_connect_fail)
-        result = reactor.run()
-        if isinstance(result, Exception):
-            raise result
-        return result
+        def on_connect_success(self, result, feed, config):
+            """Gets called when successfully connected to the daemon. Should do the work then call client.disconnect"""
+            raise NotImplementedError
+
+        def connect(self, feed, config):
+            """Connects to the deluge daemon and runs on_connect_success """
+
+            client.set_disconnect_callback(self.on_disconnect)
+
+            d = client.connect(
+                host=config['host'],
+                port=config['port'],
+                username=config['user'],
+                password=config['pass'])
+
+            d.addCallback(self.on_connect_success, feed, config).addErrback(self.on_connect_fail)
+            result = reactor.run()
+            if isinstance(result, Exception):
+                raise result
+            return result
+
+        def on_process_end(self, feed, config):
+            """Shut down the twisted reactor after all feeds have run."""
+            if not reactor._stopped:
+                log.debug('Stopping twisted reactor.')
+                reactor.stop()
+
+        def on_feed_abort(self, feed, config):
+            self.on_process_end(feed, config)
+
+except ImportError:
+    pass
 
 
 class InputDeluge(DelugePlugin):
     """Create entries for torrents in the deluge session."""
+    #
+    settings_map = {
+        'name': 'title',
+        'hash': 'torrent_info_hash',
+        'num_peers': 'torrent_peers',
+        'num_seeds': 'torrent_seeds',
+        'private': 'torrent_private',
+        'state': 'deluge_state',
+        'eta': 'deluge_eta',
+        'ratio': 'deluge_ratio',
+        'move_on_completed_path': 'deluge_movedone',
+        'save_path': 'deluge_path',
+        'label': 'deluge_label',
+        'total_size': ('content_size', lambda size: size / 1024 / 1024),
+        'files': ('content_files', lambda file_dicts: [os.path.basename(f['path']) for f in file_dicts])}
+
+    def __init__(self):
+        self.entries = []
 
     def validator(self):
         from flexget import validator
         root = validator.factory()
         root.accept('boolean')
-        self.validate_connection_info(root.accept('dict'))
+        advanced = root.accept('dict')
+        advanced.accept('path', key='config_path')
+        self.validate_connection_info(advanced)
+        filter = advanced.accept('dict', key='filter')
+        filter.accept('text', key='label')
+        filter.accept('choice', key='state').accept_choices(
+            ['Paused', 'Downloading', 'Seeding', 'Queued'], ignore_case=True)
         return root
 
     def prepare_config(self, config):
         if isinstance(config, bool):
             config = {}
+        if 'filter' in config:
+            filter = config['filter']
+            if 'label' in filter:
+                filter['label'] = filter['label'].lower()
+            if 'state' in filter:
+                filter['state'] = filter['state'].capitalize()
         self.prepare_connection_info(config)
         return config
 
-    def on_process_start(self, feed, config):
-        # TODO: validate deps are present
-        pass
-
     def on_feed_input(self, feed, config):
+        """Generates and returns a list of entries from the deluge daemon."""
+        # Reset the entries list
+        self.entries = []
+        # Call connect, entries get generated if everything is successful
         self.connect(feed, self.prepare_config(config))
+        return self.entries
 
     def on_connect_success(self, result, feed, config):
+        """Creates a list of FlexGet entries from items loaded in deluge and stores them to self.entries"""
         from deluge.ui.client import client
 
         def on_get_torrents_status(torrents):
-            for key, value in torrents.iteritems():
-                log.info('%s ------------------->' % key)
-                for okey in sorted(value):
-                    log.info('%s: %s' % (okey, value[okey]))
+            config_path = os.path.expanduser(config.get('config_path', ''))
+            for hash, torrent_dict in torrents.iteritems():
+                # Make sure it has a url so no plugins crash
+                entry = Entry(deluge_id=hash, url='')
+                if config_path:
+                    torrent_path = os.path.join(config_path, 'state', hash + '.torrent')
+                    if os.path.isfile(torrent_path):
+                        entry['location'] = torrent_path
+                        if not torrent_path.startswith('/'):
+                            torrent_path = '/' + torrent_path
+                        entry['url'] = 'file://' + torrent_path
+                    else:
+                        log.warning('Did not find torrent file at %s' % torrent_path)
+                for key, value in torrent_dict.iteritems():
+                    flexget_key = self.settings_map[key]
+                    if isinstance(flexget_key, tuple):
+                        flexget_key, format_func = flexget_key
+                        value = format_func(value)
+                    entry[flexget_key] = value
+                self.entries.append(entry)
             client.disconnect()
-        client.core.get_torrents_status(None, []).addCallback(on_get_torrents_status)
-
-    def on_process_end(self, feed, config):
-        """Shut down the twisted reactor after all feeds have run."""
-        from twisted.internet import reactor
-        if not reactor._stopped:
-            log.debug('Stopping twisted reactor.')
-            reactor.stop()
+        filter = config.get('filter', {})
+        client.core.get_torrents_status(filter, self.settings_map.keys()).addCallback(on_get_torrents_status)
 
 
 class OutputDeluge(DelugePlugin):
@@ -224,19 +299,12 @@ class OutputDeluge(DelugePlugin):
         if self.deluge12 is None:
             logger = log.info if feed.manager.options.test else log.debug
             try:
-                log.debug('Testing for deluge 1.1 API')
+                log.debug('Looking for deluge 1.1 API')
                 from deluge.ui.client import sclient
                 log.debug('1.1 API found')
-            except:
-                log.debug('Testing for deluge 1.2 API')
-                try:
-                    from deluge.ui.client import client
-                except ImportError, e:
-                    raise DependencyError('output_deluge', 'deluge', 'Deluge module and it\'s dependencies required. ImportError: %s' % e, log)
-                try:
-                    from twisted.internet import reactor
-                except:
-                    raise DependencyError('output_deluge', 'twisted.internet', 'Twisted.internet package required', log)
+            except ImportError:
+                log.debug('Looking for deluge 1.2 API')
+                DelugePlugin.on_process_start(self, feed, config)
                 logger('Using deluge 1.2 api')
                 self.deluge12 = True
             else:
@@ -256,7 +324,9 @@ class OutputDeluge(DelugePlugin):
         # If the download plugin is not enabled, we need to call it to get our temp .torrent files
         if not 'download' in feed.config:
             download = get_plugin_by_name('download')
-            download.instance.get_temp_files(feed, handle_magnets=True)
+            for entry in feed.accepted:
+                if not entry.get('deluge_id'):
+                    download.instance.get_temp_file(feed, entry, handle_magnets=True)
 
         # Check torrent files are valid
         for entry in feed.accepted:
@@ -343,7 +413,7 @@ class OutputDeluge(DelugePlugin):
                     movedone = os.path.expanduser(movedone)
                     if movedone:
                         if not os.path.isdir(movedone):
-                            log.debug('movedone path %s doesn\'t exist, creating' % (movedone))
+                            log.debug('movedone path %s doesn\'t exist, creating' % movedone)
                             os.makedirs(movedone)
                         log.debug('%s move on complete set to %s' % (entry['title'], movedone))
                         sclient.set_torrent_move_on_completed(item, True)
@@ -418,7 +488,7 @@ class OutputDeluge(DelugePlugin):
                     return client.label.set_torrent(torrent_id, label)
 
                 dlist.append(label_deferred.addCallback(apply_label, torrent_id, opts['label']))
-            if 'queuetotop' in opts:
+            if opts.get('queuetotop') is not None:
                 if opts['queuetotop']:
                     dlist.append(client.core.queue_top([torrent_id]))
                     log.debug('%s moved to top of queue' % entry['title'])
@@ -572,7 +642,7 @@ class OutputDeluge(DelugePlugin):
                 movedone = replace_from_entry(entry.get('movedone', config['movedone']), entry, 'movedone', log.error)
                 modify_opts = {'movedone': make_valid_path(os.path.expanduser(movedone)),
                         'label': format_label(entry.get('label', config['label'])),
-                        'queuetotop': entry.get('queuetotop', config.get('queuetotop')),
+                        'queuetotop': entry.get('queuetotop', config.get('queuetotop', None)),
                         'content_filename': replace_from_entry(content_filename, entry, 'content_filename', log.error),
                         'main_file_only': entry.get('main_file_only', config.get('main_file_only', False))}
 
@@ -614,21 +684,10 @@ class OutputDeluge(DelugePlugin):
             download.instance.cleanup_temp_files(feed)
 
     def on_feed_abort(self, feed, config):
-        """Make sure all temp files are cleaned up when feed is aborted."""
-        # If download plugin is enabled, it will handle cleanup.
-        if not 'download' in feed.config:
-            download = get_plugin_by_name('download')
-            download.instance.cleanup_temp_files(feed)
-        # stop the reactor when we abort
-        self.on_process_end(feed, config)
+        """Make sure normal cleanup tasks still happen on abort."""
+        DelugePlugin.on_feed_abort(feed, config)
+        self.on_feed_exit(feed, config)
 
-    def on_process_end(self, feed, config):
-        """Shut down the twisted reactor after all feeds have run."""
-        if self.deluge12:
-            from twisted.internet import reactor
-            if not reactor._stopped:
-                log.debug('Stopping twisted reactor.')
-                reactor.stop()
 
-#register_plugin(InputDeluge, 'input_deluge', api_ver=2)
+register_plugin(InputDeluge, 'input_deluge', api_ver=2)
 register_plugin(OutputDeluge, 'deluge', api_ver=2)
