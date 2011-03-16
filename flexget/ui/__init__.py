@@ -35,8 +35,6 @@ def main():
         logger.flush()
         sys.exit(1)
 
-    manager.acquire_lock()
-
     log_level = logging.getLevelName(options.loglevel.upper())
     logger.start(os.path.join(manager.config_base, 'flexget.log'), log_level, quiet=options.quiet)
 

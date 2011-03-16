@@ -86,6 +86,7 @@ class Manager(object):
         """Separated from __init__ so that unit tests can modify options before loading config."""
         self.setup_yaml()
         self.find_config()
+        self.acquire_lock()
         self.init_sqlalchemy()
         self.create_feeds()
 
