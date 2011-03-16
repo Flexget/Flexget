@@ -71,7 +71,7 @@ class PluginDownload(object):
         config = self.get_config(feed)
         self.get_temp_files(feed, require_path=config.get('require_path', False), fail_html=config['fail_html'])
 
-    def get_temp_file(self, feed, entry, require_path, handle_magnets, fail_html):
+    def get_temp_file(self, feed, entry, require_path=False, handle_magnets=False, fail_html=True):
         """Download entry content and store in temporary folder.
 
         :require_path: whether or not entries without 'path' field are ignored

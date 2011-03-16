@@ -685,7 +685,7 @@ class OutputDeluge(DelugePlugin):
 
     def on_feed_abort(self, feed, config):
         """Make sure normal cleanup tasks still happen on abort."""
-        DelugePlugin.on_feed_abort(feed, config)
+        DelugePlugin.on_feed_abort(self, feed, config)
         self.on_feed_exit(feed, config)
 
 
