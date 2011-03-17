@@ -57,6 +57,7 @@ class CoreOptionParser(OptionParser):
                         help='Disable caches. Works only in plugins that have explicit support.')
         self.add_option('--reset', action='store_true', dest='reset', default=0,
                         help='Forgets everything that has been done and learns current matches.')
+        # TODO: rename dest to cron, since this does more than just quiet
         self.add_option('--cron', action='store_true', dest='quiet', default=False,
                         help='Disables stdout and stderr output, log file used. Reduces logging level slightly.')
 
@@ -84,6 +85,6 @@ class CoreOptionParser(OptionParser):
 
         # Lower the log level when executed with --cron
         if options.quiet:
-            options.loglevel.default = 'info'
+            options.loglevel = 'info'
 
         return options, args
