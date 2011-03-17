@@ -56,7 +56,7 @@ class FilterExistsSeries(object):
 
         config = self.get_config(feed)
         for path in config.get('path'):
-            feed.verbose_progress('Scanning %s' % path, log)
+            log.verbose('Scanning %s' % path)
             # crashes on some paths with unicode
             path = str(os.path.expanduser(path))
             if not os.path.exists(path):

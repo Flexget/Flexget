@@ -30,6 +30,10 @@ class MetainfoContentSize(object):
 
         count = 0
         for entry in feed.entries:
+            if entry.get('content_size'):
+                # Don't override if already set
+                log.debugall('skipping content size check because it is already set for %r' % entry['title'])
+                continue
             # Try to parse size from description
             match = SIZE_RE.search(entry.get('description', ''))
             if match:

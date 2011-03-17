@@ -132,14 +132,14 @@ class RlsLog:
                     raise
                 else:
                     import time
-                    feed.verbose_progress('Error recieving content, retrying in 5s. Try [%s of 3]. HTTP Error Code: %s' % (str(number + 1), str(e.code)))
+                    log.verbose('Error recieving content, retrying in 5s. Try [%s of 3]. HTTP Error Code: %s' % (str(number + 1), str(e.code)))
                     time.sleep(5)
             except urllib2.URLError, e:
                 if number == 2:
                     raise
                 else:
                     import time
-                    feed.verbose_progress('Error retrieving the URL, retrying in 5s. Try [%s of 3]. Error: %s' % (str(number + 1), str(e.reason)))
+                    log.verbose('Error retrieving the URL, retrying in 5s. Try [%s of 3]. Error: %s' % (str(number + 1), str(e.reason)))
                     time.sleep(5)
 
         for release in releases:

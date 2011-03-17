@@ -56,7 +56,7 @@ class InputBacklog(object):
 
     @priority(-255)
     def on_feed_input(self, feed, config):
-        # Get a list of entries to inject 
+        # Get a list of entries to inject
         injections = self.get_injections(feed)
         # Take a snapshot of the entries' states after the input event in case we have to store them to backlog
         for entry in feed.entries:
@@ -117,7 +117,7 @@ class InputBacklog(object):
             log.debug('Restoring %s' % entry['title'])
             entries.append(entry)
         if entries:
-            feed.verbose_progress('Added %s entries from backlog' % len(entries), log)
+            log.verbose('Added %s entries from backlog' % len(entries))
 
         # purge expired
         for backlog_entry in feed_backlog.filter(datetime.now() > BacklogEntry.expire).all():

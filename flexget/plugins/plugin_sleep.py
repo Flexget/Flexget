@@ -15,8 +15,7 @@ class PluginSleep(object):
     @priority(255)
     def on_feed_start(self, feed, config):
         if config:
-            logger = log.debug if feed.manager.options.quiet else log.info
-            logger('Sleeping for %d seconds.' % config)
+            log.verbose('Sleeping for %d seconds.' % config)
             time.sleep(config)
 
 register_plugin(PluginSleep, 'sleep', api_ver=2)

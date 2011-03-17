@@ -54,7 +54,7 @@ class FilterLimitNew(object):
                     self.backlog.add_backlog(feed, entry, '48 hours')
             else:
                 passed.append(entry)
-                feed.verbose_progress('Allowed %s (%s)' % (entry['title'], entry['url']))
+                log.verbose('Allowed %s (%s)' % (entry['title'], entry['url']))
             i += 1
         log.debug('Rejected: %s Allowed: %s' % (rejected, len(passed)))
 

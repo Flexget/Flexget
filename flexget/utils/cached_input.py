@@ -68,7 +68,7 @@ class cached(object):
                     fresh = copy.deepcopy(entry)
                     entries.append(fresh)
                 if entries:
-                    feed.verbose_progress('Restored %s entries from cache' % len(entries), log)
+                    log.verbose('Restored %s entries from cache' % len(entries))
                 return entries
             else:
                 log.debugall('cache miss')

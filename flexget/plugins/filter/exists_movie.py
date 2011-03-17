@@ -57,7 +57,7 @@ class FilterExistsMovie(object):
                 log.critical('Path %s does not exist' % path)
                 continue
 
-            feed.verbose_progress('Scanning path %s ...' % path, log)
+            log.verbose('Scanning path %s ...' % path)
 
             # scan through
             for root, dirs, files in os.walk(path):
@@ -101,7 +101,7 @@ class FilterExistsMovie(object):
                 feed.reject(entry, 'movie exists')
 
         if incompatible_dirs or incompatible_entries:
-            feed.verbose_progress('There were some incompatible items. %s of %s entries and %s of %s directories could not be verified.' % \
-                (incompatible_entries, count_entries, incompatible_dirs, count_dirs), log)
+            log.verbose('There were some incompatible items. %s of %s entries and %s of %s directories could not be verified.' %
+                (incompatible_entries, count_entries, incompatible_dirs, count_dirs))
 
 register_plugin(FilterExistsMovie, 'exists_movie', groups=['exists'])

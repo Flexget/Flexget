@@ -202,7 +202,7 @@ class ModuleImdbLookup(object):
 
             # no imdb url, but information required, try searching
             if not 'imdb_url' in entry and search_allowed:
-                feed.verbose_progress('Searching from imdb %s' % entry['title'])
+                log.verbose('Searching from imdb %s' % entry['title'])
 
                 take_a_break = True
                 search = ImdbSearch()
@@ -213,7 +213,7 @@ class ModuleImdbLookup(object):
                     # every run
                     result = SearchResult(entry['title'], entry['imdb_url'])
                     session.add(result)
-                    feed.verbose_progress('Found %s' % (entry['imdb_url']), log)
+                    log.verbose('Found %s' % (entry['imdb_url']))
                 else:
                     log_once('Imdb lookup failed for %s' % entry['title'], log)
                     # store FAIL for this title
@@ -243,9 +243,9 @@ class ModuleImdbLookup(object):
                 session.query(Movie).filter(Movie.url == entry['imdb_url']).delete()
                 # search and store to cache
                 if 'title' in entry:
-                    feed.verbose_progress('Parsing imdb for %s' % entry['title'])
+                    log.verbose('Parsing imdb for %s' % entry['title'])
                 else:
-                    feed.verbose_progress('Parsing imdb for %s' % entry['imdb_id'])
+                    log.verbose('Parsing imdb for %s' % entry['imdb_id'])
                 try:
                     take_a_break = True
                     imdb.parse(entry['imdb_url'])

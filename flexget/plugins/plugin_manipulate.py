@@ -99,6 +99,6 @@ class Manipulate(object):
                     log.debug('field `%s` after replace: `%s`' % (field, field_value))
 
                 entry[field] = field_value
-                feed.verbose_progress('Field `%s` is now `%s`' % (field, entry[field]), log)
+                log.verbose('Field `%s` is now `%s`' % (field, entry[field]))
 
 register_plugin(Manipulate, 'manipulate')

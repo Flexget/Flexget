@@ -16,8 +16,8 @@ class OptionParser(OptParser):
                         help=SUPPRESS_HELP)
         self.add_option('--debug-all', action='callback', callback=self._debug_callback, dest='debug_all',
                         help=SUPPRESS_HELP)
-        self.add_option('--loglevel', action='store', type='choice', default='info', dest='loglevel',
-                        choices=['none', 'critical', 'error', 'warning', 'info', 'debug', 'debugall'],
+        self.add_option('--loglevel', action='store', type='choice', default='verbose', dest='loglevel',
+                        choices=['none', 'critical', 'error', 'warning', 'info', 'verbose', 'debug', 'debugall'],
                         help=SUPPRESS_HELP)
         self.add_option('--debug-sql', action='store_true', dest='debug_sql', default=False,
                         help=SUPPRESS_HELP)
@@ -74,14 +74,16 @@ class CoreOptionParser(OptionParser):
     def parse_args(self, args=None):
         result = OptParser.parse_args(self, args or self._unit_test and ['flexget', '--reset'] or None)
         options = result[0]
-        if options.test and options.learn:
-            self.error('--test and --learn are mutually exclusive')
 
-        if options.test and options.reset:
-            self.error('--test and --reset are mutually exclusive')
+        if options.test and (options.learn or options.reset):
+            self.error('--test and %s are mutually exclusive' % ('--learn' if options.learn else '--reset'))
 
         # reset and migrate should be executed with learn
         if (options.reset and not self._unit_test) or options.migrate:
             options.learn = True
 
-        return result
+        # Lower the log level when executed with --cron
+        if options.quiet:
+            options.loglevel.default = 'info'
+
+        return options, args

@@ -32,13 +32,13 @@ class Entry(dict):
     """
 
     def __init__(self, *args, **kwargs):
-        self.trace = []
         # Store kwargs into our internal dict
         if len(args) == 2:
             kwargs['title'] = args[0]
             kwargs['url'] = args[1]
             args = []
         dict.__init__(self, *args, **kwargs)
+        self.trace = []
         self.snapshots = {}
 
     def __setitem__(self, key, value):
@@ -310,12 +310,6 @@ class Feed(object):
             return self.config[keyword]['url']
         else:
             return self.config[keyword]
-
-    def verbose_progress(self, s, logger=log):
-        """Verbose progress, outputs only without --cron or -q"""
-        # TODO: implement trough own logger?
-        if not self.manager.options.quiet and not self.manager.unit_test:
-            logger.info(s)
 
     def __run_phase(self, phase, entry=None, **kwargs):
         """Execute all configured plugins in :phase:"""

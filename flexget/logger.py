@@ -5,6 +5,8 @@ import threading
 
 # A level more detailed than DEBUG
 DEBUGALL = 5
+# A level more detailed than INFO
+VERBOSE = 15
 
 
 class FlexGetLogger(logging.Logger):
@@ -19,6 +21,10 @@ class FlexGetLogger(logging.Logger):
     def debugall(self, msg, *args, **kwargs):
         """Log at DEBUGALL level (more detailed than DEBUG)."""
         self.log(DEBUGALL, msg, *args, **kwargs)
+
+    def verbose(self, msg, *args, **kwargs):
+        """Log at VERBOSE level (displayed when FlexGet is run interactively.)"""
+        self.log(VERBOSE, msg, *args, **kwargs)
 
 
 class FlexGetFormatter(logging.Formatter):
@@ -78,6 +84,7 @@ def initialize(unit_test=False):
 
     if not _logging_configured:
         logging.addLevelName(DEBUGALL, 'DEBUGALL')
+        logging.addLevelName(VERBOSE, 'VERBOSE')
         _logging_configured = True
 
         if unit_test:
@@ -101,7 +108,7 @@ def initialize(unit_test=False):
 
 
 def start(filename=None, level=logging.INFO, debug=False, quiet=False):
-    global _logging_configured, _mem_handler, _logging_started
+    global _logging_started
 
     if not _logging_started:
         if debug:
@@ -119,7 +126,6 @@ def start(filename=None, level=logging.INFO, debug=False, quiet=False):
         logger.addHandler(hdlr)
         logger.addFilter(PrivacyFilter())
         logger.setLevel(level)
-        logger.getEffectiveLevel()
 
         if not debug and not quiet:
             console = logging.StreamHandler()
