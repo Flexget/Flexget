@@ -26,7 +26,7 @@ class FilterDelay(object):
     """
         Add delay to a feed. This is useful for de-prioritizing expensive / bad-quality feeds.
 
-        Format: [n] [minutes|hours|days|months]
+        Format: n [minutes|hours|days|months]
 
         Example:
 
@@ -59,8 +59,9 @@ class FilterDelay(object):
         for entry in feed.entries:
             log.debug('Delaying %s' % entry['title'])
             # check if already in queue
-            if not feed.session.query(DelayedEntry).filter(DelayedEntry.title == entry['title']).\
-                                  filter(DelayedEntry.feed == feed.name).first():
+            if not feed.session.query(DelayedEntry).\
+                   filter(DelayedEntry.title == entry['title']).\
+                   filter(DelayedEntry.feed == feed.name).first():
                 delay_entry = DelayedEntry()
                 delay_entry.title = entry['title']
                 delay_entry.entry = dict(entry)
@@ -72,8 +73,9 @@ class FilterDelay(object):
         feed.entries = []
 
         # Generate the list of entries whose delay has passed
-        passed_delay = feed.session.query(DelayedEntry).filter(datetime.now() > DelayedEntry.expire).\
-                                     filter(DelayedEntry.feed == feed.name)
+        passed_delay = feed.session.query(DelayedEntry).\
+            filter(datetime.now() > DelayedEntry.expire).\
+            filter(DelayedEntry.feed == feed.name)
         delayed_entries = [Entry(item.entry, passed_delay=True) for item in passed_delay.all()]
         for entry in delayed_entries:
             log.debug('Releasing %s' % entry['title'])
