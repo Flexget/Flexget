@@ -1,4 +1,5 @@
 import logging
+import copy
 from flexget.manager import Session
 from flexget.plugin import get_methods_by_phase, get_plugins_by_phase, get_plugin_by_name, \
     feed_phases, PluginWarning, PluginError, DependencyError
@@ -88,13 +89,16 @@ class Entry(dict):
         return True
 
     def take_snapshot(self, name):
-        if name in self.snapshots:
-            log.warning('Snapshot `%s` is being overwritten for `%s`' % (name, self['title']))
-        import copy
-        try:
-            self.snapshots[name] = copy.deepcopy(dict(self))
-        except TypeError:
-            log.warning('Unable to take snapshot `%s` for `%s`' % (name, self['title']))
+        snapshot = {}
+        for field, value in self.iteritems():
+            try:
+                snapshot[field] = copy.deepcopy(value)
+            except TypeError:
+                log.warning('Unable to take `%s` snapshot for field `%s` in `%s`' % (name, field, self['title']))
+        if snapshot:
+            if name in self.snapshots:
+                log.warning('Snapshot `%s` is being overwritten for `%s`' % (name, self['title']))
+            self.snapshots[name] = snapshot
 
 
 def useFeedLogging(func):

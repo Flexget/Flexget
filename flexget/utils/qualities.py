@@ -1,7 +1,10 @@
+import re
+import copy
+
+
 class Quality(object):
 
     def __init__(self, value, name, regexp=None):
-        import re
         self.value = value
         self.name = name
         if not regexp:
@@ -44,6 +47,10 @@ class Quality(object):
 
     def __str__(self):
         return self.name
+
+    def __deepcopy__(self, memo={}):
+        # No mutable attributes, return a regular copy
+        return copy.copy(self)
 
 UNKNOWN = Quality(0, 'unknown')
 

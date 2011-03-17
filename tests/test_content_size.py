@@ -1,4 +1,3 @@
-import shutil
 from tests import FlexGetBase, with_filecopy
 
 

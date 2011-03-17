@@ -37,7 +37,9 @@ try:
                             yield self._return_value
                             self.paused = False
                 except GeneratorExit:
-                    raise
+                    # GeneratorExit means stop the generator; Do it cleanly by stopping the whole reactor.
+                    self.paused = False
+                    self.stop()
                 except:
                     twisted_log.msg("Unexpected error in main loop.")
                     twisted_log.err()

@@ -1,7 +1,7 @@
 import logging
 from flexget.feed import Entry
 from flexget.manager import Base
-from flexget.plugin import register_plugin, priority, PluginWarning
+from flexget.plugin import register_plugin, priority, PluginError
 from datetime import datetime, timedelta
 from sqlalchemy import Column, Integer, String, DateTime, PickleType
 
@@ -35,56 +35,53 @@ class FilterDelay(object):
 
     def validator(self):
         from flexget import validator
+        message = "should be in format 'x (minutes|hours|days|weeks)' e.g. '5 days'"
         root = validator.factory('regexp_match')
-        root.accept('\d+ (minutes|hours|days|weeks)')
+        root.accept('\d+ (minute|hour|day|week)s?', message=message)
         return root
 
-    def get_delay(self, feed):
-        amount, unit = feed.config.get('delay').split(' ')
-        log.debug('amount: %s unit: %s' % (repr(amount), repr(unit)))
-        params = {unit: int(amount)}
+    def get_delay(self, config):
+        amount, unit = config.split(' ')
+        if not unit.endswith('s'):
+            unit += 's'
+        log.debug('amount: %r unit: %r' % (amount, unit))
         try:
-            return timedelta(**params)
-        except TypeError:
-            raise PluginWarning('Invalid time format', log)
+            return timedelta(**{unit: int(amount)})
+        except (TypeError, ValueError):
+            raise PluginError('Invalid time format', log)
 
-    def on_feed_input(self, feed):
-        entries = feed.session.query(DelayedEntry).filter(datetime.now() > DelayedEntry.expire).\
-                                     filter(DelayedEntry.feed == feed.name).all()
-        for delayed_entry in entries:
-            entry = delayed_entry.entry
-            log.debug('Releasing %s' % entry['title'])
-            # internal flag
-            entry['passed_delay'] = True
-            # if there is same entry already in the feed, remove it to reduce confusion
-            for fe in feed.entries[:]:
-                if fe['title'] == entry['title']:
-                    feed.entries.remove(fe)
-            # add expired entry
-            # HACK: we have made some changes to the Entry class, these changes are
-            # not reflected into the database. Construct new Entry class instance
-            fresh_entry = Entry(**dict(entry))
-            feed.entries.append(fresh_entry)
-            # remove from queue
-            feed.session.delete(delayed_entry)
-
-    @priority(250)
-    def on_feed_filter(self, feed):
-        expire_time = datetime.now() + self.get_delay(feed)
+    @priority(-1)
+    def on_feed_input(self, feed, config):
+        """Captures the current input then replaces it with entries that have passed the delay."""
+        log.debug('Delaying new entries for %s' % config)
+        # First learn the current entries in the feed to the database
+        expire_time = datetime.now() + self.get_delay(config)
         for entry in feed.entries:
-            if 'passed_delay' in entry:
-                continue
+            log.debug('Delaying %s' % entry['title'])
             # check if already in queue
-            if feed.session.query(DelayedEntry).filter(DelayedEntry.title == entry['title']).\
+            if not feed.session.query(DelayedEntry).filter(DelayedEntry.title == entry['title']).\
                                   filter(DelayedEntry.feed == feed.name).first():
-                feed.reject(entry, 'in delay')
-            else:
                 delay_entry = DelayedEntry()
                 delay_entry.title = entry['title']
-                delay_entry.entry = entry
+                delay_entry.entry = dict(entry)
                 delay_entry.feed = feed.name
                 delay_entry.expire = expire_time
-                feed.reject(entry, 'delaying')
                 feed.session.add(delay_entry)
 
-register_plugin(FilterDelay, 'delay')
+        # Clear the current entries from the feed now that they are stored
+        feed.entries = []
+
+        # Generate the list of entries whose delay has passed
+        passed_delay = feed.session.query(DelayedEntry).filter(datetime.now() > DelayedEntry.expire).\
+                                     filter(DelayedEntry.feed == feed.name)
+        delayed_entries = [Entry(item.entry, passed_delay=True) for item in passed_delay.all()]
+        for entry in delayed_entries:
+            log.debug('Releasing %s' % entry['title'])
+        # Delete the entries from the db we are about to inject
+        passed_delay.delete()
+
+        # Return our delayed entries
+        return delayed_entries
+
+
+register_plugin(FilterDelay, 'delay', api_ver=2)
