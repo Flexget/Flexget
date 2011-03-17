@@ -7,6 +7,7 @@ _events = {}
 
 
 class Event(object):
+    """Registered event"""
 
     def __init__(self, name, func, priority=128):
         self.name = name
@@ -35,7 +36,7 @@ def event(name, priority=128):
     """Register event to function with a decorator"""
 
     def decorator(func):
-        add_phase_handler(name, func, priority)
+        add_event_handler(name, func, priority)
         return func
 
     return decorator
@@ -49,9 +50,8 @@ def get_events(name):
     return _events[name]
 
 
-def add_phase_handler(name, func, priority=128):
+def add_event_handler(name, func, priority=128):
     """Attach event to :func: under a name :name: with :priority:. Returns Event created."""
-
     events = _events.setdefault(name, [])
     for event in events:
         if event.func == func:
