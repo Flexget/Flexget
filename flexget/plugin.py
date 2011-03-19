@@ -288,6 +288,7 @@ class PluginInfo(dict):
         self.name = name
         self.plugin_class = plugin_class
         self.instance = self.plugin_class()
+        self.instance.plugin_info = self # give plugin easy access to its own info
         self.groups = groups
         self.builtin = builtin
         self.debug = debug
