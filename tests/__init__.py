@@ -17,10 +17,23 @@ test_options = None
 plugins_loaded = False
 
 
+def setup_logging_level():
+    # set logging level according to nosetests verbosity
+    level = logging.DEBUG
+    if "--verbose" in sys.argv or "-v" in sys.argv:
+        level = flexget.logger.DEBUGALL
+    elif "--quiet" in sys.argv or "-q" in sys.argv:
+        level = logging.INFO
+
+    logging.getLogger().setLevel(level)
+    return level
+
+
 def setup_once():
     global plugins_loaded, test_options
     if not plugins_loaded:
         flexget.logger.initialize(True)
+        setup_logging_level()
         parser = CoreOptionParser(True)
         load_plugins(parser)
         # store options for MockManager

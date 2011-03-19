@@ -17,15 +17,16 @@ from flexget.utils.titles import SeriesParser, ParseWarning
 enable_logging = True
 
 if enable_logging:
-    level = 5
-    import logging
+    #level = 5
+    #import logging
     import flexget.logger
     flexget.logger.initialize(True)
-    log = logging.getLogger()
-    log.setLevel(level)
+    ##log = logging.getLogger()
+    ##log.setLevel(level)
     # switch seriesparser logging to debug
+    import tests
     from flexget.utils.titles.series import log as parser_log
-    parser_log.setLevel(level)
+    parser_log.setLevel(tests.setup_logging_level())
 
 
 class TestSeriesParser(object):
