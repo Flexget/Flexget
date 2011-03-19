@@ -109,6 +109,13 @@ class Torrent(object):
         self.content = self.decode(content)
         self.modified = False
 
+    def __repr__(self):
+        return "%s(%s, %s)" % (self.__class__.__name__, 
+            ", ".join("%s=%r" % (key, self.content["info"].get(key))
+               for key in ("name", "length", "private",)),
+            ", ".join("%s=%r" % (key, self.content.get(key))
+               for key in ("announce", "comment",)))
+
     def get_filelist(self):
         """Return array containing fileinfo dictionaries (name, length, path)"""
         files = []
