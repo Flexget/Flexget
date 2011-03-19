@@ -15,28 +15,42 @@ class TestCondition(FlexGetBase):
     __yaml__ = """
         presets:
           global:
+            disable_builtins: [seen]
             mock:
               - {title: 'test', year: 2000}
               - {title: 'brilliant', rating: 9.9}
               - {title: 'fresh', year: 2011}
 
         feeds:
-          test_reject:
+          test_condition_reject:
             reject_if: year<2011
-          test_accept:
+
+          test_condition_accept:
             accept_if:
               - year>=2010
               - rating>9
+
+          test_condition_and1:
+            accept_if: ?*t rating>9
+          test_condition_and2:
+            accept_if: ?*t
     """
 
     def test_reject(self):
         if pyrocore:
-            self.execute_feed('test_reject')
+            self.execute_feed('test_condition_reject')
             count = len(self.feed.rejected) 
             assert count == 1
 
     def test_accept(self):
         if pyrocore:
-            self.execute_feed('test_accept')
+            self.execute_feed('test_condition_accept')
             count = len(self.feed.accepted)
             assert count == 2
+
+    def test_implicit_and(self):
+        if pyrocore:
+            for i in "12":
+                self.execute_feed('test_condition_and' + i)
+                count = len(self.feed.accepted)
+                assert count == int(i)
