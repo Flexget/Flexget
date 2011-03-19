@@ -24,6 +24,13 @@ setup(
     zip_safe=False,
     test_suite='nose.collector',
     setup_requires=['nose>=0.11'],
+    extras_require={
+        'Conditions':   ['pyrocore>=0.4'],
+        'memusage':     ['guppy'],
+        'NZB':          ['pynzb'],
+        'RTorrent':     ['pyrocore>=0.3.10'],
+        'TaskTray':     ['pywin32'],
+    },
     entry_points="""
         [console_scripts]
         flexget = flexget:main
@@ -290,7 +297,7 @@ def release(options):
     """Make a FlexGet release. Same as bdist_egg but adds version information."""
 
     if options.release.get('type') not in ['src', 'egg']:
-        print 'Invalid type'
+        print 'Invalid --type, must be src or egg'
         return
 
     print 'Cleaning build...'
