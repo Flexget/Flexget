@@ -82,3 +82,34 @@ class TestDownloadCondition(FlexGetBase):
                 count = len(self.feed.rejected)
                 assert count == int(i), "Expected %s rejects, got %d" % (i, count)
                 assert i != "1" or self.feed.rejected[0]["title"] == "prv"
+
+
+class TestQualityCondition(FlexGetBase):
+
+    __yaml__ = """
+        presets:
+          global:
+            disable_builtins: [seen]
+            mock:
+              - {title: 'Smoke.1280x720'}
+              - {title: 'Smoke.720p'}
+              - {title: 'Smoke.1080i'}
+              - {title: 'Smoke.HDTV'}
+              - {title: 'Smoke.cam'}
+              - {title: 'Smoke.HR'}
+            accept_all: yes
+
+        feeds:
+          test_condition_quality_name_2:
+            reject_if: quality.name~(1080|720)p
+
+          test_condition_quality_value_3:
+            reject_if: quality.value<500
+    """
+
+    def test_quality(self):
+        for feedname in self.manager.config['feeds']:
+            self.execute_feed(feedname)
+            count = len(self.feed.rejected)
+            expected = int(feedname[-1])
+            assert count == expected, "Expected %s rejects, got %d" % (expected, count)
