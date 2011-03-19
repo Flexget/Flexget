@@ -106,10 +106,11 @@ class FilterProperMovies(object):
                 filter(ProperMovie.quality == quality).\
                 order_by(desc(ProperMovie.proper_count)).first()
 
-            highest_proper_count = 0
-            if proper_movie:
-                highest_proper_count = proper_movie.proper_count
+            if not proper_movie:
+                log.debug('no previous download recorded for %s' % entry['imdb_id'])
+                continue
 
+            highest_proper_count = proper_movie.proper_count
             log.debug('highest_proper_count: %i' % highest_proper_count)
 
             accept_proper = False
