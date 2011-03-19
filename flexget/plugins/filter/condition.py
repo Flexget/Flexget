@@ -100,9 +100,10 @@ class ConditionPlugin(plugin.Plugin):
 
         warnings = 0
         for entry in feed.entries:
+            wrapped_entry = AttributeAccessor(entry)
             for check in conditions:
                 try:
-                    truth = check(AttributeAccessor(entry))
+                    truth = check(wrapped_entry)
                     log.debugall("%r from applying %s to %r" % (truth, check, entry))
                     if truth:
                         if matched:
