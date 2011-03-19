@@ -108,8 +108,9 @@ class TestQualityCondition(FlexGetBase):
     """
 
     def test_quality(self):
-        for feedname in self.manager.config['feeds']:
-            self.execute_feed(feedname)
-            count = len(self.feed.rejected)
-            expected = int(feedname[-1])
-            assert count == expected, "Expected %s rejects, got %d" % (expected, count)
+        if pyrocore:
+            for feedname in self.manager.config['feeds']:
+                self.execute_feed(feedname)
+                count = len(self.feed.rejected)
+                expected = int(feedname[-1])
+                assert count == expected, "Expected %s rejects, got %d" % (expected, count)
