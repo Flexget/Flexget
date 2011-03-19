@@ -2,10 +2,54 @@
 """
 import logging
 
-#from flexget.feed import Entry
 from flexget import plugin, validator
 
 log = logging.getLogger(__name__.rsplit('.')[-1])
+
+
+class AttributeAccessor(object):
+    """ Wrapper for entries that allows deep field access by 
+        either the dict or the object protocol.
+    """
+    
+    def __init__(self, obj):
+        self.obj = obj
+
+    def _getfield(self, key, lookup_error):
+        fullname = key # store for logging
+        obj = self.obj
+
+        while key is not None:
+            try:
+                name, key = key.split('.', 1)
+            except ValueError:
+                name, key = key, None
+            optional = name.startswith('?')
+            if optional:
+                name = name[1:]
+
+            try:
+                obj = obj[name]
+            except (TypeError, KeyError):
+                try:
+                    obj = getattr(obj, name)
+                except AttributeError, exc:
+                    if optional:
+                        log.debugall("AttributeAccessor: ?%s[.%s] ==> None" % (name, key))
+                        return None
+                    if name != fullname:
+                        raise lookup_error("%s while trying to access %s" % (exc, fullname))
+                    else:
+                        raise lookup_error(str(exc))
+            log.debugall("AttributeAccessor: %s[.%s] ==> %.200s..." % (name, key, repr(obj)))
+
+        return obj
+
+    def __getitem__(self, name):
+        return self._getfield(name, KeyError)
+
+    def __getattr__(self, name):
+        return self._getfield(name, AttributeError)
 
 
 class ConditionPlugin(plugin.Plugin):
@@ -32,7 +76,8 @@ class ConditionPlugin(plugin.Plugin):
         if isinstance(config, basestring):
             config = [config]        
         conditions = []
-        parser = matching.ConditionParser(lambda _: {"matcher": matching.MagicFilter}, "title")
+        parser = matching.ConditionParser(matching.ConditionParser.AMENABLE, 
+            default_field="title", ident_re=r"(?:\??[_A-Za-z0-9]+\.?)*\??[_A-Za-z0-9]+")
         for cond in config:
             try:
                 conditions.append(parser.parse(cond))
@@ -53,19 +98,18 @@ class ConditionPlugin(plugin.Plugin):
         """
         conditions, matching = self.parse(config)
 
-        from pyrocore.util.types import Bunch
-
         warnings = 0
         for entry in feed.entries:
             for check in conditions:
                 try:
-                    log.debugall("Applying %s to %r" % (check, entry))
-                    if check(Bunch(entry)):
+                    truth = check(AttributeAccessor(entry))
+                    log.debugall("%r from applying %s to %r" % (truth, check, entry))
+                    if truth:
                         if matched:
                             matched(entry)
                         break
                 except (TypeError, ValueError, AttributeError, matching.FilterError), exc:
-                    log.debug("%s while applying %s to %r" % (exc, check, entry))
+                    log.debug("%s:%s while applying %s to %r" % (type(exc).__name__, exc, check, entry))
                     if not warnings:
                         log.warning("Condition filtering problem: %s" % (exc,))
                     warnings += 1
@@ -89,6 +133,8 @@ class RejectIf(ConditionPlugin):
     """
 
     def on_feed_filter(self, feed, config):
+        """ Reject entries meeting any of the given conditions.
+        """
         self.process(feed, config, matched=feed.reject)
 
 
@@ -100,4 +146,35 @@ class AcceptIf(ConditionPlugin):
     """
 
     def on_feed_filter(self, feed, config):
+        """ Accept entries meeting any of the given conditions.
+        """
+        self.process(feed, config, matched=feed.accept)
+
+
+class RejectIfDownload(ConditionPlugin):
+    """ Reject downloaded items that match a condition.
+
+        Example:
+            reject_if_download: ?torrent.content.info.?private=1
+    """
+
+    @plugin.priority(64)
+    def on_feed_modify(self, feed, config):
+        """ Reject entries meeting any of the given conditions.
+        """
+        self.process(feed, config, matched=feed.reject)
+
+
+class AcceptIfDownload(ConditionPlugin):
+    """ Accept downloaded items that match a condition.
+
+        Example:
+            # Accept by tracker
+            accept_if_download: ?torrent.content.announce=*ubuntu.com/*
+    """
+
+    @plugin.priority(64)
+    def on_feed_modify(self, feed, config):
+        """ Accept entries meeting any of the given conditions.
+        """
         self.process(feed, config, matched=feed.accept)
