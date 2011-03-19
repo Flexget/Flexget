@@ -76,8 +76,9 @@ class TestDownloadCondition(FlexGetBase):
     """
 
     def test_field_access(self):
-        for i in "12":
-            self.execute_feed('test_condition_field_access' + i)
-            count = len(self.feed.rejected)
-            assert count == int(i), "Expected %s rejects, got %d" % (i, count)
-            assert i != "1" or self.feed.rejected[0]["title"] == "prv"
+        if pyrocore:
+            for i in "12":
+                self.execute_feed('test_condition_field_access' + i)
+                count = len(self.feed.rejected)
+                assert count == int(i), "Expected %s rejects, got %d" % (i, count)
+                assert i != "1" or self.feed.rejected[0]["title"] == "prv"
