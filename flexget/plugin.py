@@ -346,23 +346,33 @@ class PluginInfo(dict):
 register_plugin = PluginInfo
 
 
-def register(plugin_class, groups=None):
+def register(plugin_class, groups=None, auto=False):
     """ Register plugin with attributes according to C{PLUGIN_INFO} class variable.
         Additional groups can be optionally provided.
         
         @return: Plugin info of registered plugin. 
     """
+    # Base classes outside of plugin modules are NEVER auto-registered; if you have ones
+    # in a plugin module, use the "*PluginBase" naming convention
+    if auto and plugin_class.__name__.endswith("PluginBase"): 
+        log.debugall("NOT auto-registering plugin base class %s.%s" % (
+            plugin_class.__module__, plugin_class.__name__))
+        return 
+    
     info = plugin_class.PLUGIN_INFO
     name = PluginInfo.name_from_class(plugin_class)
 
     # If this very class was already registered, that's OK
     if name in plugins and plugin_class is plugins[name].plugin_class:
-        log.debugall("Ignoring dupe registration of same class %s.%s" % (
-            plugin_class.__module__, plugin_class.__name__))
+        if not auto:
+            log.debugall("Ignoring dupe registration of same class %s.%s" % (
+                plugin_class.__module__, plugin_class.__name__))
         if groups:
             plugins[name].groups = list(set(groups) | set(plugins[name].groups))
         return plugins[name]
     else:
+        if auto:
+            log.debugall("Auto-registering plugin %s" % name) 
         return PluginInfo(plugin_class, name, list(set(info.get('groups', []) + (groups or []))),
             info.get('builtin', False), info.get('debug', False), info.get('api_ver', 1))
     
@@ -487,7 +497,7 @@ def load_plugins_from_dir(basepath, subpkg=None):
                 except TypeError:
                     continue # not a class
                 else:
-                    register(obj)
+                    register(obj, auto=True)
 
     if _new_phase_queue:
         for phase, args in _new_phase_queue.iteritems():

@@ -52,7 +52,7 @@ class AttributeAccessor(object):
         return self._getfield(name, AttributeError)
 
 
-class ConditionPlugin(plugin.Plugin):
+class ConditionPluginBase(plugin.Plugin):
     """ Base class for condition filter plugins.
     """
 
@@ -124,7 +124,7 @@ class ConditionPlugin(plugin.Plugin):
             log.warning("%d problems encountered during processing %d entries" % (warnings, len(feed.entries)))
 
 
-class RejectIf(ConditionPlugin):
+class RejectIf(ConditionPluginBase):
     """ Reject items that match a condition.
 
         Example:
@@ -139,7 +139,7 @@ class RejectIf(ConditionPlugin):
         self.process(feed, config, matched=feed.reject)
 
 
-class AcceptIf(ConditionPlugin):
+class AcceptIf(ConditionPluginBase):
     """ Accept items that match a condition.
 
         Example:
@@ -152,7 +152,7 @@ class AcceptIf(ConditionPlugin):
         self.process(feed, config, matched=feed.accept)
 
 
-class RejectIfDownload(ConditionPlugin):
+class RejectIfDownload(ConditionPluginBase):
     """ Reject downloaded items that match a condition.
 
         Example:
@@ -166,7 +166,7 @@ class RejectIfDownload(ConditionPlugin):
         self.process(feed, config, matched=feed.reject)
 
 
-class AcceptIfDownload(ConditionPlugin):
+class AcceptIfDownload(ConditionPluginBase):
     """ Accept downloaded items that match a condition.
 
         Example:
