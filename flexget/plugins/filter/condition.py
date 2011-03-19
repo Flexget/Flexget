@@ -171,7 +171,7 @@ class AcceptIfDownload(ConditionPlugin):
 
         Example:
             # Accept by tracker
-            accept_if_download: ?torrent.content.announce=*ubuntu.com/*
+            accept_if_download: ?torrent.content.announce=*ubuntu.com[:/]*
     """
 
     @plugin.priority(64)
