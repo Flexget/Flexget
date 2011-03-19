@@ -1,4 +1,16 @@
+"""
+    Listens events:
+
+    forget (string)
+
+        Given string can be feed name, remembered field (url, imdb_url) or a title. If given value is a
+        feed name then everything in that feed will be forgotten. With title all learned fields from it and the
+        title will be forgotten. With field value only that particular field is forgotten.
+
+"""
+
 import logging
+from flexget.event import event
 from flexget.manager import Base
 from flexget.plugin import register_plugin, priority, register_parser_option
 from sqlalchemy import Column, Integer, String, DateTime, Unicode, asc, or_
@@ -49,6 +61,32 @@ class SeenField(Base):
 
     def __str__(self):
         return '<SeenField(field=%s,value=%s,added=%s)>' % (self.field, self.value, self.added)
+
+
+@event('forget')
+def forget(value):
+    log.debug('forget called with %s' % value)
+    session = Session()
+
+    try:
+        count = 0
+        field_count = 0
+        for se in session.query(SeenEntry).filter(or_(SeenEntry.title == value, SeenEntry.feed == value)).all():
+            field_count += len(se.fields)
+            count += 1
+            log.debug('forgetting %s' % se)
+            session.delete(se)
+
+        for sf in session.query(SeenField).filter(SeenField.value == value).all():
+            se = session.query(SeenEntry).filter(SeenEntry.id == sf.seen_entry_id).first()
+            field_count += len(se.fields)
+            count += 1
+            log.debug('forgetting %s' % se)
+            session.delete(se)
+        return count, field_count
+    finally:
+        session.commit()
+        session.close()
 
 
 class MigrateSeen(object):
@@ -117,7 +155,7 @@ class MigrateSeen(object):
 
         for seen in session.query(Seen).all():
             index += 1
-            if (index % 10 == 0):
+            if index % 10 == 0:
                 bar.update(index)
             amount = 0
             for dupe in session.query(Seen).filter(Seen.value == seen.value):
@@ -201,25 +239,8 @@ class SeenForget(object):
             return
 
         feed.manager.disable_feeds()
-
-        forget = unicode(feed.manager.options.forget)
-        session = Session()
-        count = 0
-        fcount = 0
-        for se in session.query(SeenEntry).filter(or_(SeenEntry.title == forget, SeenEntry.feed == forget)).all():
-            fcount += len(se.fields)
-            count += 1
-            session.delete(se)
-
-        for sf in session.query(SeenField).filter(SeenField.value == forget).all():
-            se = session.query(SeenEntry).filter(SeenEntry.id == sf.seen_entry_id).first()
-            fcount += len(se.fields)
-            count += 1
-            session.delete(se)
-
+        count, fcount = forget(unicode(feed.manager.options.forget))
         log.info('Removed %s titles (%s fields)' % (count, fcount))
-
-        session.commit()
 
 
 class SeenCmd(object):

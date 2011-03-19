@@ -120,7 +120,7 @@ class SearchResult(Base):
 log = logging.getLogger('imdb_lookup')
 
 
-class ModuleImdbLookup(object):
+class ImdbLookup(object):
     """
         Retrieves imdb information for entries.
 
@@ -137,7 +137,6 @@ class ModuleImdbLookup(object):
 
     @priority(100)
     def on_feed_filter(self, feed):
-        from flexget.utils.log import log_once
         for entry in feed.entries:
             try:
                 self.lookup(feed, entry)
@@ -151,12 +150,12 @@ class ModuleImdbLookup(object):
         """Perform imdb lookup for entry.
         Raises PluginError with failure reason."""
 
-        if 'title' in entry:
-            log.debug('lookup for %s' % entry['title'])
-        elif 'imdb_url' in entry:
+        if 'imdb_url' in entry:
             log.debug('No title passed. Lookup for %s' % entry['imdb_url'])
         elif 'imdb_id' in entry:
             log.debug('No title passed. Lookup for %s' % entry['imdb_id'])
+        elif 'title' in entry:
+            log.debug('lookup for %s' % entry['title'])
         else:
             log.error('looking up IMDB for entry failed, no title, imdb_url or imdb_id passed.')
             return
@@ -235,7 +234,7 @@ class ModuleImdbLookup(object):
                 if cached.year:
                     age = (datetime.now().year - cached.year)
                     refresh_interval += age * 5
-                    log.debug('cached movie %s age %s refresh interval %s days' % (cached.title, age, refresh_interval))
+                    log.debug('cached movie `%s` age %i refresh interval %i days' % (cached.title, age, refresh_interval))
 
             if not cached or cached.updated is None or \
                cached.updated < datetime.now() - timedelta(days=refresh_interval):
@@ -335,7 +334,7 @@ class ModuleImdbLookup(object):
             # store to entry
             # TODO: I really don't like this shoveling!
             entry['imdb_url'] = imdb.url
-            entry['imdb_id'] = imdb.imdb_id
+            entry['imdb_id'] = extract_id(entry['imdb_url']) # imdb.imdb_id is not always set
             entry['imdb_name'] = imdb.name
             entry['imdb_photo'] = imdb.photo
             entry['imdb_plot_outline'] = imdb.plot_outline
@@ -360,6 +359,6 @@ class ModuleImdbLookup(object):
             log.debugall('committing session')
             session.commit()
 
-register_plugin(ModuleImdbLookup, 'imdb_lookup')
+register_plugin(ImdbLookup, 'imdb_lookup')
 register_parser_option('--retry-lookup', action='store_true',
                        dest='retry_lookup', default=0, help=SUPPRESS_HELP)

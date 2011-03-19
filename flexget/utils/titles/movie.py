@@ -7,7 +7,7 @@ log = logging.getLogger('movieparser')
 
 
 class MovieParser(TitleParser):
-    
+
     def __init__(self):
         self.data = None
 
@@ -15,28 +15,30 @@ class MovieParser(TitleParser):
         self.name = None
         self.year = None
         self.quality = None
+        self.proper_count = 0
+        TitleParser.__init__(self)
 
     def __str__(self):
-        return "MovieParser(%s, %s, %s)" % (self.name, self.year, self.quality)
+        return "<MovieParser(name=%s,year=%s,quality=%s)>" % (self.name, self.year, self.quality)
 
     def parse(self):
         """Parse movie name, returns name, year"""
-        s = self.data
+        data = self.data
 
         for char in '[]()_,.':
-            s = s.replace(char, ' ')
+            data = data.replace(char, ' ')
 
         # if there are no spaces
-        if s.find(' ') == -1:
-            s = s.replace('-', ' ')
+        if data.find(' ') == -1:
+            data = data.replace('-', ' ')
 
         # remove unwanted words (imax, ..)
-        self.remove_words(s, self.remove)
-            
-        s = self.strip_spaces(s)
+        self.remove_words(data, self.remove)
 
-        # split to parts        
-        parts = s.split(' ')
+        data = self.strip_spaces(data)
+
+        # split to parts
+        parts = data.split(' ')
         year = None
         cut_pos = 256
         self.quality = 'unknown'
@@ -61,12 +63,15 @@ class MovieParser(TitleParser):
                 self.quality = qualities.common_name(part)
                 if parts.index(part) < cut_pos:
                     cut_pos = parts.index(part)
+            # check for propers
+            if part.lower() in self.propers:
+                self.proper_count += 1
 
         # make cut
-        s = ' '.join(parts[:cut_pos])
+        data = ' '.join(parts[:cut_pos])
 
         # save results
-        self.name = s
+        self.name = data
 
         if year:
             if year.isdigit():

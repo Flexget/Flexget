@@ -23,6 +23,7 @@ class NzbSize(object):
             from pynzb import nzb_parser
         except ImportError:
             # TODO: remove builtin status so this won't get repeated on every feed execution
+            # TODO: this will get loaded even without any need for nzb
             raise DependencyError(issued_by='nzb_size', missing='lib pynzb')
 
         for entry in feed.accepted:
