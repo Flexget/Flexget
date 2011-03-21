@@ -25,10 +25,8 @@ setup(
     test_suite='nose.collector',
     setup_requires=['nose>=0.11'],
     extras_require={
-        'Conditions':   ['pyrocore>=0.4'],
         'memusage':     ['guppy'],
         'NZB':          ['pynzb'],
-        'RTorrent':     ['pyrocore>=0.3.10'],
         'TaskTray':     ['pywin32'],
     },
     entry_points="""
