@@ -52,7 +52,7 @@ class PluginThetvdbLookup(object):
         from flexget import validator
         return validator.factory('boolean')
 
-    def on_process_start(self, feed):
+    def on_process_start(self, feed, config):
         """Register the usable set plugin keywords"""
         try:
             set_plugin = get_plugin_by_name('set')
@@ -60,8 +60,10 @@ class PluginThetvdbLookup(object):
         except DependencyError:
             pass
 
-    @priority(120)
-    def on_feed_filter(self, feed):
+    @priority(100)
+    def on_feed_filter(self, feed, config):
+        if not config:
+            return
         for entry in feed.entries:
             if not (entry.get('series_name') or entry.get('thetvdb_id')) or not \
                     entry.get('series_season') or not entry.get('series_episode'):
@@ -100,4 +102,4 @@ class PluginThetvdbLookup(object):
                 entry['ep_guest_stars'] = episode.guest_stars
 
 
-register_plugin(PluginThetvdbLookup, 'thetvdb_lookup')
+register_plugin(PluginThetvdbLookup, 'thetvdb_lookup', api_ver=2)

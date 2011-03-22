@@ -136,7 +136,9 @@ class ImdbLookup(object):
         return validator.factory('boolean')
 
     @priority(100)
-    def on_feed_filter(self, feed):
+    def on_feed_filter(self, feed, config):
+        if not config:
+            return
         for entry in feed.entries:
             try:
                 self.lookup(feed, entry)
@@ -359,6 +361,6 @@ class ImdbLookup(object):
             log.debugall('committing session')
             session.commit()
 
-register_plugin(ImdbLookup, 'imdb_lookup')
+register_plugin(ImdbLookup, 'imdb_lookup', api_ver=2)
 register_parser_option('--retry-lookup', action='store_true',
                        dest='retry_lookup', default=0, help=SUPPRESS_HELP)

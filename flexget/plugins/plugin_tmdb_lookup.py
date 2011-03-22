@@ -16,7 +16,9 @@ class PluginTmdbLookup(object):
         return validator.factory('boolean')
 
     @priority(100)
-    def on_feed_filter(self, feed):
+    def on_feed_filter(self, feed, config):
+        if not config:
+            return
         lookup = get_plugin_by_name('api_tmdb').instance.lookup
         for entry in feed.entries:
             imdb_id = entry.get('imdb_id') or imdb.extract_id(entry.get('imdb_url', ''))
@@ -31,4 +33,4 @@ class PluginTmdbLookup(object):
                 entry['tmdb_genres'] = [genre.name for genre in movie.genres]
                 # TODO: other fields?
 
-register_plugin(PluginTmdbLookup, 'tmdb_lookup')
+register_plugin(PluginTmdbLookup, 'tmdb_lookup', api_ver=2)

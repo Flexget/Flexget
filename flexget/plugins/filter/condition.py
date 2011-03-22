@@ -1,6 +1,6 @@
 import logging
 from flexget.feed import Feed
-from flexget.plugin import register_plugin, get_plugins_by_phase, get_plugin_by_name
+from flexget.plugin import register_plugin, get_plugins_by_phase, get_plugin_by_name, priority
 import re
 
 log = logging.getLogger('if')
@@ -44,6 +44,7 @@ class FilterIf(object):
                 filter_action.valid[plugin.name] = [validator.factory('any')]
         return root
 
+    @priority(80)
     def on_feed_filter(self, feed, config):
         entry_actions = {
             'accept': feed.accept,
