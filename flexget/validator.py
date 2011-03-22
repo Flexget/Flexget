@@ -82,7 +82,7 @@ class Validator(object):
         if self.name == 'root':
             return self
         return self.add_parent(self.get_validator('root'))
-    
+
     def add_parent(self, parent, name=None):
         parent.errors = self.errors
         parent.validators = self.validators
@@ -324,16 +324,23 @@ class RegexpMatchValidator(Validator):
     name = 'regexp_match'
 
     def __init__(self, parent=None, **kwargs):
-        self.regexps = []
         Validator.__init__(self, parent, **kwargs)
+        self.regexps = []
+        self.reject_regexps = []
 
-    def accept(self, regexp, **kwargs):
+    def add_regexp(self, regexp_list, regexp):
         try:
-            self.regexps.append(re.compile(regexp))
+            regexp_list.append(re.compile(regexp))
         except:
             raise Exception('Invalid regexp given to match_regexp')
+
+    def accept(self, regexp, **kwargs):
+        self.add_regexp(self.regexps, regexp)
         if kwargs.get('message'):
             self.message = kwargs['message']
+
+    def reject(self, regexp):
+        self.add_regexp(self.reject_regexps, regexp)
 
     def validateable(self, data):
         return isinstance(data, basestring)
@@ -342,9 +349,13 @@ class RegexpMatchValidator(Validator):
         if not isinstance(data, basestring):
             self.errors.add('Value should be text')
             return False
-        for regexp in self.regexps:
+        for regexp in self.reject_regexps:
             if regexp.match(data):
-                return True
+                break
+        else:
+            for regexp in self.regexps:
+                if regexp.match(data):
+                    return True
         if self.message:
             self.errors.add(self.message)
         else:
@@ -448,7 +459,7 @@ class DictValidator(Validator):
         self.reject = {}
         self.any_key = []
         self.required_keys = []
-        self.validated_keys = {}
+        self.key_validators = []
         Validator.__init__(self, parent, **kwargs)
         # TODO: not dictionary?
         self.valid = {}
@@ -494,15 +505,24 @@ class DictValidator(Validator):
         return v
 
     def accept_valid_keys(self, name, **kwargs):
-        """Accepts key with name type"""
-        if not 'key_type' in kwargs:
-            raise Exception('%s.accept_valid_keys() must specify key_type' % self.name)
-        key_types = kwargs['key_type']
-        if isinstance(key_types, basestring):
-            key_types = [key_types]
+        """Accepts keys that pass a given validator"""
+        key_types = kwargs.pop('key_type', None)
+        key_validator = kwargs.pop('key_validator', None)
+        if key_types and key_validator:
+            raise Exception('key_types and key_validator are mutually exclusive')
+        if key_validator:
+            # Make sure errors show up in our list
+            key_validator.errors = self.errors
+        elif key_types:
+            if isinstance(key_types, basestring):
+                key_types = [key_types]
+            key_validator = self.get_validator('root')
+            for key_type in key_types:
+                key_validator.accept(key_type)
+        else:
+            raise Exception('%s.accept_valid_keys() must specify key_type or key_validator' % self.name)
         v = self.get_validator(name, **kwargs)
-        for key_type in key_types:
-            self.validated_keys.setdefault(key_type, []).append(v)
+        self.key_validators.append((key_validator, v))
         return v
 
     def validateable(self, data):
@@ -533,16 +553,19 @@ class DictValidator(Validator):
                 # Rules for explicitly allowed keys
                 rules = self.valid.get(key, [])
             else:
-                for v_type in self.validated_keys:
-                    v = self.get_validator(v_type)
-                    if v.validateable(key) and v.validate(key):
+                errors_before_key_val = self.errors.count()
+                for key_validator, value_validator in self.key_validators:
+                    # Use validate_item to make sure error message is added
+                    if key_validator.validateable(key) and key_validator.validate(key):
                         # Rules for a validated_key
-                        rules = self.validated_keys[v_type]
+                        rules = [value_validator]
                         break
                 else:
                     if self.any_key:
                         # Rules for any key
                         rules = self.any_key
+                if rules:
+                    self.errors.back_out_errors(self.errors.count() - errors_before_key_val)
             if not rules:
                 self.errors.add('key \'%s\' is not recognized' % key)
                 # TODO: print the valid options

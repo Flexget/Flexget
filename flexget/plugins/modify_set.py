@@ -48,20 +48,20 @@ class ModifySet(object):
         for key, value in keys.iteritems():
             self.register_key(key, value)
 
-    def on_feed_start(self, feed):
+    def on_feed_start(self, feed, config):
         """Checks that jinja2 is available"""
         if not self.jinja:
             log.warning("jinja2 module is not available, set plugin will only work with python string replacement.")
 
     # Filter priority is -255 so we run after all filters are finished
     @priority(-255)
-    def on_feed_filter(self, feed):
+    def on_feed_filter(self, feed, config):
         """
         Adds the set dict to all accepted entries. This is not really a filter plugin,
         but it needs to be run before feed_download, so it is run last in the filter chain.
         """
         for entry in feed.entries + feed.rejected:
-            self.modify(entry, feed.config['set'], False, entry in feed.accepted)
+            self.modify(entry, config, False, entry in feed.accepted)
 
     def modify(self, entry, config, validate=False, errors=True):
         """
@@ -105,4 +105,4 @@ class ModifySet(object):
             log.debug('adding set: info to entry:\'%s\' %s' % (entry['title'], conf))
             entry.update(conf)
 
-register_plugin(ModifySet, 'set')
+register_plugin(ModifySet, 'set', api_ver=2)

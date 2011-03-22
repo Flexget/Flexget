@@ -13,6 +13,7 @@ class TestQualityParser(object):
                 ('Test.File.web-dl', 'web-dl'),
                 ('Test.File.720P', '720p'),
                 ('Test.File.1920x1080', '1080p'),
+                ('Test.File.1080i', '1080i'),
                 ('Test File blurayrip', 'bdrip'),
                 ('Test.File.br-rip', 'bdrip')]
 
