@@ -301,10 +301,7 @@ class PluginDownload(object):
         """Move downloaded content from temp folder to final destination"""
         for entry in feed.accepted:
             try:
-                if feed.manager.options.test:
-                    log.info('Would write: %s' % entry['title'])
-                else:
-                    self.output(feed, entry)
+                self.output(feed, entry)
             except PluginWarning, e:
                 feed.fail(entry)
                 log.error('Plugin error while writing: %s' % e)
@@ -317,7 +314,7 @@ class PluginDownload(object):
 
         config = self.get_config(feed)
 
-        if 'file' not in entry:
+        if 'file' not in entry and not feed.manager.options.test:
             log.debug('file missing, entry: %s' % entry)
             raise PluginError('Entry %s has no temp file associated with' % entry['title'])
 
@@ -331,25 +328,20 @@ class PluginDownload(object):
             if feed.manager.options.dl_path:
                 path = feed.manager.options.dl_path
 
-            # if we still don't have a filename, try making one from title (last resort)
-            if not entry.get('filename'):
-                entry['filename'] = entry['title']
-                log.debug('set filename from title %s' % entry['filename'])
-                if not 'mime-type' in entry:
-                    log.warning('Unable to figure proper filename for %s. Using title.' % entry['title'])
-                else:
-                    guess = mimetypes.guess_extension(entry['mime-type'])
-                    if not guess:
-                        log.warning('Unable to guess extension with mime-type %s' % guess)
-                    else:
-                        self.filename_ext_from_mime(entry)
-
             # expand variables in path
             path = replace_from_entry(path, entry, 'path', log.error)
+            path = os.path.expanduser(path)
+
+            # If we are in test mode, report and return
+            if feed.manager.options.test:
+                log.info('Would write `%s` to `%s`' % (entry['title'], path))
+                # Set a fake location, so the exec plugin can do string replacement during --test #1015
+                entry['output'] = os.path.join(path, 'TEST_MODE_NO_OUTPUT')
+                return
+
             if not path:
                 feed.fail(entry, 'Could not set path. Does not contain all fields for string replacement.')
                 return
-            path = os.path.expanduser(path)
 
             # make path
             if not os.path.isdir(path):
@@ -365,6 +357,19 @@ class PluginDownload(object):
                 log.debug('entry: %s' % entry)
                 log.debug('temp: %s' % ', '.join(os.listdir(tmp_path)))
                 raise PluginWarning("Downloaded temp file '%s' doesn't exist!?" % entry['file'])
+
+            # if we still don't have a filename, try making one from title (last resort)
+            if not entry.get('filename'):
+                entry['filename'] = entry['title']
+                log.debug('set filename from title %s' % entry['filename'])
+                if not 'mime-type' in entry:
+                    log.warning('Unable to figure proper filename for %s. Using title.' % entry['title'])
+                else:
+                    guess = mimetypes.guess_extension(entry['mime-type'])
+                    if not guess:
+                        log.warning('Unable to guess extension with mime-type %s' % guess)
+                    else:
+                        self.filename_ext_from_mime(entry)
 
             # combine to full path + filename, replace / from filename (replaces: #208, #325, #353)
             name = entry.get('filename', entry['title'])
