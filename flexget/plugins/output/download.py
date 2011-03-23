@@ -330,6 +330,9 @@ class PluginDownload(object):
 
             # expand variables in path
             path = replace_from_entry(path, entry, 'path', log.error)
+            if not path:
+                feed.fail(entry, 'Could not set path. Does not contain all fields for string replacement.')
+                return
             path = os.path.expanduser(path)
 
             # If we are in test mode, report and return
@@ -337,10 +340,6 @@ class PluginDownload(object):
                 log.info('Would write `%s` to `%s`' % (entry['title'], path))
                 # Set a fake location, so the exec plugin can do string replacement during --test #1015
                 entry['output'] = os.path.join(path, 'TEST_MODE_NO_OUTPUT')
-                return
-
-            if not path:
-                feed.fail(entry, 'Could not set path. Does not contain all fields for string replacement.')
                 return
 
             # make path
