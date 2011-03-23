@@ -24,6 +24,10 @@ try:
             self._release_requested = False
             self._mainLoopGen = None
 
+            # Older versions of twisted do not have the _started attribute, make it a synonym for running in that case
+            if not hasattr(self, '_started'):
+                self._started = property(lambda self: self.running)
+
         def _mainLoopGenerator(self):
             """Generator that acts as mainLoop, but yields when requested."""
             while self._started:
