@@ -71,7 +71,7 @@ class FilterRegexp(object):
         conf.accept('text', key='from')
         return conf
 
-    def get_config(self, feed):
+    def prepare_config(self, config):
         """
         Returns the config in standard format
 
@@ -82,7 +82,6 @@ class FilterRegexp(object):
                 from: a list of fields in entry for the regexps to match against
                 not: a list of regexps that if matching, will disqualify the main match
         """
-        config = feed.config.get('regexp', {})
         out_config = {}
         if 'rest' in config:
             out_config['rest'] = config['rest']
@@ -112,9 +111,9 @@ class FilterRegexp(object):
         return out_config
 
     @priority(172)
-    def on_feed_filter(self, feed):
+    def on_feed_filter(self, feed, config):
         # TODO: what if accept and accept_excluding configured? Should raise error ...
-        config = self.get_config(feed)
+        config = self.prepare_config(config)
         rest = []
         for operation, regexps in config.iteritems():
             if operation == 'rest':
@@ -198,4 +197,4 @@ class FilterRegexp(object):
                 rest.append(entry)
         return rest
 
-register_plugin(FilterRegexp, 'regexp')
+register_plugin(FilterRegexp, 'regexp', api_ver=2)

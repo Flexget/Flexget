@@ -78,6 +78,7 @@ class FilterIf(object):
                         else:
                             # Other filters were specified to run on this entry
                             fake_feed = Feed(feed.manager, feed.name, feed.config)
+                            fake_feed.session = feed.session
                             fake_feed.entries = [entry]
                             try:
                                 for filter_name, filter_config in action.iteritems():
