@@ -3,8 +3,8 @@
 import logging
 
 from flexget import plugin, validator
-from flexget.utils import bittorrent 
-from flexget.plugins import modify_torrent
+from flexget.utils import bittorrent
+from flexget.plugins.modify import torrent as modify_torrent
 
 # Global constants
 log = logging.getLogger(__name__.rsplit('.')[-1])
@@ -53,7 +53,7 @@ class TorrentScrub(plugin.Plugin):
             if "torrent" not in entry:
                 continue
 
-            # Scrub keys as configured            
+            # Scrub keys as configured
             modified = False
             metainfo = entry["torrent"].content
             infohash = entry["torrent"].get_info_hash()
@@ -85,7 +85,7 @@ class TorrentScrub(plugin.Plugin):
                             field = None
                         log.debugall((key, field))
 
-                    if field and key in field: 
+                    if field and key in field:
                         log.info("Removing key '%s'..." % (fieldname,))
                         del field[key]
                         modified = True

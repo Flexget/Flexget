@@ -38,7 +38,7 @@ class AppleTrailers(InputRSS):
         get_plugin_by_name('headers')
         # configure them
         feed.config['headers'] = {'User-Agent': 'QuickTime/7.6.6'}
-        self.quality = config
+        self.quality = str(config)
 
     @priority(127)
     def on_feed_input(self, feed, config):
