@@ -1,8 +1,5 @@
 import re
-import logging
 from flexget.plugin import priority, register_plugin
-
-log = logging.getLogger('modify_trackers')
 
 
 class AddTrackers(object):
@@ -32,7 +29,7 @@ class AddTrackers(object):
                 for url in config:
                     if not url in entry['torrent'].get_multitrackers():
                         entry['torrent'].add_multitracker(url)
-                        log.info('Added %s tracker to %s' % (url, entry['title']))
+                        self.log.info('Added %s tracker to %s' % (url, entry['title']))
             if entry['url'].startswith('magnet:'):
                 entry['url'] += ''.join(['&tr=' + url for url in config])
 
@@ -65,10 +62,10 @@ class RemoveTrackers(object):
                 for tracker in trackers:
                     for regexp in config or []:
                         if re.search(regexp, tracker, re.IGNORECASE | re.UNICODE):
-                            log.debug('remove_trackers removing %s because of %s' % (tracker, regexp))
+                            self.log.debug('remove_trackers removing %s because of %s' % (tracker, regexp))
                             # remove tracker
                             entry['torrent'].remove_multitracker(tracker)
-                            log.info('Removed %s' % tracker)
+                            self.log.info('Removed %s' % tracker)
             if entry['url'].startswith('magnet:'):
                 for regexp in config:
                     # Replace any tracker strings that match the regexp with nothing
