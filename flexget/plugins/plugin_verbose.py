@@ -1,5 +1,6 @@
 import logging
-from flexget.plugin import *
+from flexget.utils.tools import console
+from flexget.plugin import register_plugin, register_parser_option
 
 log = logging.getLogger('verbose')
 
@@ -29,10 +30,10 @@ class Verbose(object):
             reason_str = ' (%s)' % reason
         if feed.manager.options.verbose:
             try:
-                print "+ %-8s %-12s %s%s" % (feed.current_phase, feed.current_plugin, msg, reason_str)
+                console("+ %-8s %-12s %s%s" % (feed.current_phase, feed.current_plugin, msg, reason_str))
             except:
-                print "+ %-8s %-12s %s%s (warning: unable to print unicode)" % \
-                    (feed.current_phase, feed.current_plugin, repr(msg), reason_str)
+                console("+ %-8s %-12s %s%s (warning: unable to print unicode)" % \
+                    (feed.current_phase, feed.current_plugin, repr(msg), reason_str))
         else:
             log.debug('phase: %s plugin: %s msg: %s%s' % \
                 (feed.current_phase, feed.current_plugin, msg, reason_str))
@@ -44,9 +45,9 @@ class Verbose(object):
                 if entry in feed.accepted:
                     continue
                 try:
-                    print "+ %-8s %-12s %s" % ('undecided', '', entry['title'])
-                except:
-                    print "+ %-8s %-12s %s (warning: unable to print unicode)" % ('undecided', '', repr(entry['title']))
+                    console("+ %-8s %-12s %s" % ('undecided', '', entry['title']))
+                except UnicodeDecodeError:
+                    console("+ %-8s %-12s %s (warning: unable to print unicode)" % ('undecided', '', repr(entry['title'])))
 
 register_plugin(Verbose, 'verbose', builtin=True)
 register_parser_option('-v', '--verbose', action='store_true', dest='verbose', default=False,

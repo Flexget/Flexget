@@ -2,12 +2,13 @@ import logging
 from flexget.event import event
 from flexget.manager import Base
 from flexget.feed import Entry
+from flexget.plugin import priority, register_parser_option, register_plugin, PluginError
+from flexget.utils.tools import console
 from sqlalchemy import Column, Integer, String, DateTime, Unicode, Index, asc, or_
 from sqlalchemy.orm import join
 from datetime import datetime
 from flexget.manager import Session
 from optparse import SUPPRESS_HELP
-from flexget.plugin import priority, register_parser_option, register_plugin, PluginError
 
 log = logging.getLogger('archive')
 
@@ -54,14 +55,15 @@ class ArchiveSearch(object):
         def print_ae(ae):
             diff = datetime.now() - ae.added
 
-            print 'ID: %-6s | Feed: %-10s | Title: %s\nAdded: %s (%d days ago)\nURL: %s' % (ae.id, ae.feed, ae.title, ae.added, diff.days, ae.url)
+            console('ID: %-6s | Feed: %-10s | Title: %s\nAdded: %s (%d days ago)\nURL: %s' % \
+                (ae.id, ae.feed, ae.title, ae.added, diff.days, ae.url))
             if ae.description:
-                print 'Description: %s' % strip_html(ae.description)
-            print '---'
+                console('Description: %s' % strip_html(ae.description))
+            console('---')
 
         session = Session()
         try:
-            print 'Searching ...'
+            console('Searching ...')
             for ae in search(session, feed.manager.options.archive_search):
                 print_ae(ae)
         finally:
@@ -188,7 +190,7 @@ def archive_inject(option, opt, value, parser):
     """Option parser function"""
 
     if not parser.rargs:
-        print 'Usage: --archive-inject ID [IMMORTAL]'
+        console('Usage: --archive-inject ID [IMMORTAL]')
         import sys
         sys.exit(1)
 

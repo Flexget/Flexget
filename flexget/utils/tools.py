@@ -312,3 +312,13 @@ def make_valid_path(path):
         for char in ':<>*?"|':
             path = path.replace(char, '')
     return drive + path
+
+
+def console(text):
+    """Safe print to console."""
+    
+    if isinstance(text, str):
+        print text
+        return
+        
+    print unicode(text).encode('utf8')

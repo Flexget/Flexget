@@ -3,16 +3,20 @@ import datetime
 from flexget.manager import Session
 from flexget.plugin import register_plugin, PluginError, get_plugin_by_name, priority, register_parser_option, register_feed_phase
 from flexget.manager import Base
-from sqlalchemy import Column, Integer, String, DateTime, Boolean, Unicode
 from flexget.utils.imdb import extract_id, ImdbSearch, ImdbParser, log as imdb_log
-from flexget.utils.tools import str_to_boolean
+from flexget.utils.tools import str_to_boolean, console
 from flexget.utils import qualities
+from sqlalchemy import Column, Integer, String, DateTime, Boolean, Unicode
+from sqlalchemy.exceptions import OperationalError
 
 log = logging.getLogger('imdb_queue')
 
 
 class QueueError(Exception):
     """Exception raised if there is an error with a queue operation"""
+
+    # TODO: I think message was removed from exception baseclass and is now masked
+    # some other custom exception (DependencyError) had to make so tweaks to make it work ..
 
     def __init__(self, message, errno=0):
         self.message = message
@@ -183,7 +187,7 @@ class ImdbQueueManager(object):
         --imdb-queue (add|del|list) [IMDB_URL|NAME] [quality]
         """
         if not parser.rargs:
-            print 'Usage: --imdb-queue (add|del|list) [IMDB_URL|NAME] [QUALITY] [FORCE]'
+            console('Usage: --imdb-queue (add|del|list) [IMDB_URL|NAME] [QUALITY] [FORCE]')
             # set some usage option so that feeds will be disabled later
             ImdbQueueManager.options['usage'] = True
             return
@@ -224,7 +228,7 @@ class ImdbQueueManager(object):
                 title = parser.name
         else:
             # Given a title, try to do imdb search for id
-            print 'Searching imdb for %s' % what
+            console('Searching imdb for %s' % what)
             search = ImdbSearch()
             result = search.smart_match(what)
             if not result:
@@ -264,42 +268,42 @@ class ImdbQueueManager(object):
                 try:
                     what = self.parse_what(self.options['what'])
                 except QueueError, e:
-                    print e.message
+                    console(e.message)
                 else:
                     self.options.update(what)
 
             if not self.options.get('title') or not self.options.get('imdb_id'):
-                print 'could not determine movie to add' # TODO: Rethink errors
+                console('could not determine movie to add') # TODO: Rethink errors
                 return
 
-        from sqlalchemy.exceptions import OperationalError
         try:
             if action == 'add':
                 try:
                     added = self.queue_add(title=self.options['title'], imdb_id=self.options['imdb_id'],
-                               quality=self.options['quality'], force=self.options['force'])
+                        quality=self.options['quality'], force=self.options['force'])
                 except QueueError, e:
-                    print e.message
+                    console(e.message)
                     if e.errno == 1:
                         # This is an invalid quality error, display some more info
-                        print 'Recognized qualities are %s' % ', '.join([qual.name for qual in qualities.all()])
-                        print 'ANY is the default and can also be used explicitly to specify that quality should be ignored.'
+                        console('Recognized qualities are %s' % ', '.join([qual.name for qual in qualities.all()]))
+                        console('ANY is the default and can also be used explicitly to specify that quality should be ignored.')
                 else:
-                    print 'Added %s to queue with quality %s' % (added['title'], added['quality'])
+                    console('Added %s to queue with quality %s' % (added['title'], added['quality']))
             elif action == 'del':
                 try:
                     title = self.queue_del(self.options['imdb_id'])
                 except QueueError, e:
-                    print e.message
+                    console(e.message)
                 else:
-                    print '%s removed from queue.' % title
+                    console('Removed %s from queue' % title)
             elif action == 'list':
                 self.queue_list()
         except OperationalError:
             log.critical('OperationalError')
 
+    # TODO: a bit useless?
     def error(self, msg):
-        print 'IMDb Queue error: %s' % msg
+        console('IMDb Queue error: %s' % msg)
 
     def validate_quality(self, quality):
         # Check that the quality is valid
@@ -365,16 +369,16 @@ class ImdbQueueManager(object):
         """List IMDb queue"""
 
         items = self.queue_get()
-        print '-' * 79
-        print '%-10s %-45s %-8s %s' % ('IMDB id', 'Title', 'Quality', 'Force')
-        print '-' * 79
+        console('-' * 79)
+        console('%-10s %-45s %-8s %s' % ('IMDB id', 'Title', 'Quality', 'Force'))
+        console('-' * 79)
         for item in items:
-            print '%-10s %-45s %-8s %s' % (item.imdb_id, item.title, item.quality, item.immortal)
+            console('%-10s %-45s %-8s %s' % (item.imdb_id, item.title, item.quality, item.immortal))
 
         if not items:
-            print 'IMDB queue is empty'
+            console('IMDB queue is empty')
 
-        print '-' * 79
+        console('-' * 79)
 
     def queue_get(self):
         """Get the current IMDb queue.

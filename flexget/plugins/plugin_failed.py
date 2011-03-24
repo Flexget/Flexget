@@ -1,6 +1,7 @@
 import logging
 from flexget.plugin import register_plugin, register_parser_option
 from flexget.manager import Base, Session
+from flexget.utils.tools import console
 from sqlalchemy import Column, Integer, String, Unicode, DateTime
 from datetime import datetime
 
@@ -47,39 +48,45 @@ class PluginFailed(object):
         """Parameter --failed"""
 
         failed = Session()
-        results = failed.query(FailedEntry).all()
-        if not results:
-            print 'No failed entries recorded'
-        for entry in results:
-            print '%16s - %s' % (entry.tof.strftime('%Y-%m-%d %H:%M'), entry.title)
-        failed.close()
+        try:
+            results = failed.query(FailedEntry).all()
+            if not results:
+                console('No failed entries recorded')
+            for entry in results:
+                console('%16s - %s' % (entry.tof.strftime('%Y-%m-%d %H:%M'), entry.title))
+        finally:
+            failed.close()
 
     # TODO: add reason support
     def add_failed(self, entry):
         """Adds entry to internal failed list, displayed with --failed"""
         failed = Session()
-        failedentry = FailedEntry(entry['title'], entry['url'])
-        # query item's existence
-        if not failed.query(FailedEntry).filter(FailedEntry.title == entry['title']).first():
-            failed.add(failedentry)
-        # limit item number to 25
-        i = 0
-        for row in failed.query(FailedEntry).order_by(FailedEntry.tof.desc()).all():
-            i += 1
-            if i > 25:
-                failed.delete(row)
-        failed.commit()
-        failed.close()
+        try:
+            failedentry = FailedEntry(entry['title'], entry['url'])
+            # query item's existence
+            if not failed.query(FailedEntry).filter(FailedEntry.title == entry['title']).first():
+                failed.add(failedentry)
+            # limit item number to 25
+            i = 0
+            for row in failed.query(FailedEntry).order_by(FailedEntry.tof.desc()).all():
+                i += 1
+                if i > 25:
+                    failed.delete(row)
+            failed.commit()
+        finally:
+            failed.close()
 
     def clear_failed(self):
         """Clears list of failed entries"""
         session = Session()
-        results = session.query(FailedEntry).all()
-        for row in results:
-            session.delete(row)
-        print 'Cleared %i items.' % len(results)
-        session.commit()
-        session.close()
+        try:
+            results = session.query(FailedEntry).all()
+            for row in results:
+                session.delete(row)
+            console('Cleared %i items.' % len(results))
+            session.commit()
+        finally:
+            session.close()
 
     def on_entry_fail(self, feed, entry, **kwargs):
         self.add_failed(entry)
