@@ -1,13 +1,8 @@
 """ Torrent Scrubber Plugin.
 """
-import logging
-
 from flexget import plugin, validator
 from flexget.utils import bittorrent
 from flexget.plugins.modify import torrent as modify_torrent
-
-# Global constants
-log = logging.getLogger(__name__.rsplit('.')[-1])
 
 
 class TorrentScrub(plugin.Plugin):
@@ -45,7 +40,7 @@ class TorrentScrub(plugin.Plugin):
         else:
             mode = str(config).lower()
             if mode in ("off", "false"):
-                log.debug("Plugin configured, but disabled")
+                self.log.debug("Plugin configured, but disabled")
                 return
 
         for entry in feed.entries:
@@ -59,14 +54,14 @@ class TorrentScrub(plugin.Plugin):
             infohash = entry["torrent"].get_info_hash()
 
             if mode in ("on", "all", "true"):
-                modified = bittorrent.clean_meta(metainfo, including_info=(mode == "all"), logger=log)
+                modified = bittorrent.clean_meta(metainfo, including_info=(mode == "all"), logger=self.log)
             elif mode in ("resume", "rtorrent"):
                 if mode == "resume":
                     self.RT_KEYS = self.RT_KEYS[:1]
 
                 for key in self.RT_KEYS:
                     if key in metainfo:
-                        log.info("Removing key '%s'..." % (key,))
+                        self.log.info("Removing key '%s'..." % (key,))
                         del metainfo[key]
                         modified = True
             elif mode == "fields":
@@ -83,10 +78,10 @@ class TorrentScrub(plugin.Plugin):
                         except KeyError:
                             # Key not found in this entry
                             field = None
-                        log.debugall((key, field))
+                        self.log.debugall((key, field))
 
                     if field and key in field:
-                        log.info("Removing key '%s'..." % (fieldname,))
+                        self.log.info("Removing key '%s'..." % (fieldname,))
                         del field[key]
                         modified = True
             else:
@@ -96,9 +91,9 @@ class TorrentScrub(plugin.Plugin):
             if modified:
                 entry["torrent"].content = metainfo
                 entry["torrent"].modified = True
-                log.info("Torrent '%s' was scrubbed!" % entry['title'])
+                self.log.info("Torrent '%s' was scrubbed!" % entry['title'])
                 new_infohash = entry["torrent"].get_info_hash()
                 if infohash != new_infohash:
-                    log.warn("Info hash changed from #%s to #%s in '%s'" % (infohash, new_infohash, entry['filename']))
+                    self.log.warn("Info hash changed from #%s to #%s in '%s'" % (infohash, new_infohash, entry['filename']))
 
 plugin.register(TorrentScrub, groups=["torrent"])

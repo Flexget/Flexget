@@ -235,12 +235,16 @@ class Plugin(object):
         Note that inheriting form this class implies API version 2.
     """
     PLUGIN_INFO = dict(api_ver=2)
+    LOGGER_NAME = None # use default name
+
+    def __init__(self, plugin_info, *args, **kw):
+        """Initialize basic plugin attributes."""
+        self.plugin_info = plugin_info
+        self.log = logging.getLogger(self.LOGGER_NAME or self.plugin_info.name) 
 
 
 class BuiltinPlugin(Plugin):
-    """
-        A builtin plugin.
-    """
+    """A builtin plugin."""
     PLUGIN_INFO = Plugin.PLUGIN_INFO.copy() # inherit base info
     PLUGIN_INFO.update(builtin=True)
 
@@ -284,15 +288,29 @@ class PluginInfo(dict):
         if name is None:
             name = PluginInfo.name_from_class(plugin_class)
 
+        # Set basic info attributes
         self.api_ver = api_ver
         self.name = name
-        self.plugin_class = plugin_class
-        self.instance = self.plugin_class()
-        self.instance.plugin_info = self # give plugin easy access to its own info
         self.groups = groups
         self.builtin = builtin
         self.debug = debug
         self.phase_handlers = {}
+
+        # Create plugin instance
+        self.plugin_class = plugin_class
+        if issubclass(self.plugin_class, Plugin):
+            # Base class init needs plugin info immediately
+            try:
+                self.instance = self.plugin_class(self)
+            except: # OK, gets re-raised
+                log.error("Could not create plugin '%s' from class %s.%s" % (
+                    self.name, self.plugin_class.__module__, self.plugin_class.__name__))
+                raise
+        else: 
+            # Manually registered
+            self.instance = self.plugin_class()
+            self.instance.plugin_info = self # give plugin easy access to its own info
+            self.instance.log = logging.getLogger(getattr(self.instance, "LOGGER_NAME", None) or self.name) 
 
         if self.name in plugins:
             PluginInfo.dupe_counter += 1
