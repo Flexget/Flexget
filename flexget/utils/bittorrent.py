@@ -30,36 +30,37 @@ METAFILE_STD_KEYS = [i.split('.') for i in (
 
 
 def clean_meta(meta, including_info=False, logger=None):
-    """ Clean meta dict. Optionally log changes to the given logger at INFO level.
+    """ Clean meta dict. Optionally log changes using the given logger.
     
         See also http://packages.python.org/pyrocore/apidocs/pyrocore.util.metafile-pysrc.html#clean_meta
-        
-        @return: True if C{meta} was modified.
+
+        @param logger: If given, a callable accepting a string message. 
+        @return: Set of keys removed from C{meta}.
     """
-    modified = False
+    modified = set()
 
     for key in meta.keys():
         if [key] not in METAFILE_STD_KEYS:
             if logger:
-                logger.info("Removing key %r..." % (key,))
+                logger("Removing key %r..." % (key,))
             del meta[key]
-            modified = True
+            modified.add(key)
 
     if including_info:
         for key in meta["info"].keys():
             if ["info", key] not in METAFILE_STD_KEYS:
                 if logger: 
-                    logger.info("Removing key %r..." % ("info." + key,))
+                    logger("Removing key %r..." % ("info." + key,))
                 del meta["info"][key]
-                modified = True
+                modified.add("info." + key)
 
         for idx, entry in enumerate(meta["info"].get("files", [])):
             for key in entry.keys():
                 if ["info", "files", key] not in METAFILE_STD_KEYS:
                     if logger: 
-                        logger.info("Removing key %r from file #%d..." % (key, idx + 1))
+                        logger("Removing key %r from file #%d..." % (key, idx + 1))
                     del entry[key]
-                    modified = True
+                    modified.add("info.files." + key)
 
     return modified
 

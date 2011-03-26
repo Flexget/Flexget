@@ -49,21 +49,21 @@ class TorrentScrub(plugin.Plugin):
                 continue
 
             # Scrub keys as configured
-            modified = False
+            modified = set()
             metainfo = entry["torrent"].content
             infohash = entry["torrent"].get_info_hash()
 
             if mode in ("on", "all", "true"):
-                modified = bittorrent.clean_meta(metainfo, including_info=(mode == "all"), logger=self.log)
+                modified = bittorrent.clean_meta(metainfo, including_info=(mode == "all"), logger=self.log.debug)
             elif mode in ("resume", "rtorrent"):
                 if mode == "resume":
                     self.RT_KEYS = self.RT_KEYS[:1]
 
                 for key in self.RT_KEYS:
                     if key in metainfo:
-                        self.log.info("Removing key '%s'..." % (key,))
+                        self.log.debug("Removing key '%s'..." % (key,))
                         del metainfo[key]
-                        modified = True
+                        modified.add(key)
             elif mode == "fields":
                 # Scrub all configured fields
                 for key in config:
@@ -81,9 +81,9 @@ class TorrentScrub(plugin.Plugin):
                         self.log.debugall((key, field))
 
                     if field and key in field:
-                        self.log.info("Removing key '%s'..." % (fieldname,))
+                        self.log.debug("Removing key '%s'..." % (fieldname,))
                         del field[key]
-                        modified = True
+                        modified.add(fieldname)
             else:
                 raise ValueError("INTERNAL ERROR: Unknown mode %r" % mode)
 
@@ -91,7 +91,8 @@ class TorrentScrub(plugin.Plugin):
             if modified:
                 entry["torrent"].content = metainfo
                 entry["torrent"].modified = True
-                self.log.info("Torrent '%s' was scrubbed!" % entry['title'])
+                self.log.info((("Key %s was" if len(modified) == 1 else "Keys %s were") 
+                    + " scrubbed from torrent '%s'!") % (", ".join(sorted(modified)), entry['title']))
                 new_infohash = entry["torrent"].get_info_hash()
                 if infohash != new_infohash:
                     self.log.warn("Info hash changed from #%s to #%s in '%s'" % (infohash, new_infohash, entry['filename']))
