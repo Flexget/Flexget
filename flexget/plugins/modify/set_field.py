@@ -1,10 +1,52 @@
 from copy import copy
+import os
+import re
+import sys
 import logging
 from flexget.plugin import register_plugin, priority
 from flexget.utils.tools import replace_from_entry
 
 log = logging.getLogger('set')
 jinja = False
+
+
+def filter_pathbase(val):
+    """ Base name of a path.
+    """
+    return os.path.basename(val or '')
+
+
+def filter_pathname(val):
+    """ Base name of a path, without its extension.
+    """
+    return os.path.splitext(os.path.basename(val or ''))[0]
+
+
+def filter_pathext(val):
+    """ Extension of a path (including the '.').
+    """
+    return os.path.splitext(val or '')[1]
+
+
+def filter_pathdir(val):
+    """ Directory containing the given path.
+    """
+    return os.path.dirname(val or '')
+
+
+def filter_pathscrub(val, ascii=False):
+    """ Replace problematic characters in a path.
+    """
+    if ascii:
+        repl = {'"': '`', "'": '`'}
+        if sys.platform.startswith("win"):
+            repl.update({':': ';', '?': '_'})
+    else:
+        repl = {'"': u'\u201d', "'": u'\u2019'}
+        if sys.platform.startswith("win"):
+            repl.update({':': u'\u02d0', '?': u'\u061f'})
+
+    return re.sub('[%s]' % ''.join(repl), lambda i: repl[i.group(0)], val or '')
 
 
 class ModifySet(object):
@@ -74,6 +116,10 @@ class ModifySet(object):
         if self.jinja:
             from jinja2 import Environment, StrictUndefined, UndefinedError
             env = Environment(undefined=StrictUndefined)
+            env.filters.update((name.split('_', 1)[1], filt) 
+                for name, filt in globals().items()
+                if name.startswith("filter_"))
+
             for field, template_string in conf.iteritems():
                 if isinstance(template_string, basestring):
                     template = env.from_string(template_string)
