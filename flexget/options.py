@@ -12,6 +12,9 @@ class OptionParser(OptParser):
         self.version = flexget.__version__
         self.add_option('-V', '--version', action='version',
                         help='Print FlexGet version and exit.')
+        self.add_option('--bugreport', action='callback', callback=self._debug_tb_callback, dest='debug_tb',
+                        help="Use this option to create a detailed bug report,"
+                             " note that the output might contain PRIVATE data, so edit that out")
         self.add_option('--debug', action='callback', callback=self._debug_callback, dest='debug',
                         help=SUPPRESS_HELP)
         self.add_option('--debug-all', action='callback', callback=self._debug_callback, dest='debug_all',
@@ -35,6 +38,10 @@ class OptionParser(OptParser):
         elif option.dest == 'debug_all':
             setattr(parser.values, 'debug', 1)
             setattr(parser.values, 'loglevel', 'debugall')
+
+    def _debug_tb_callback(self, option, opt, value, parser):
+        import cgitb
+        cgitb.enable(format="text")
 
 
 class CoreOptionParser(OptionParser):
