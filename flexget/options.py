@@ -1,4 +1,5 @@
 import os
+import sys
 from optparse import OptionParser as OptParser, SUPPRESS_HELP
 import flexget
 
@@ -7,6 +8,10 @@ class OptionParser(OptParser):
     """Contains all the options that both the core and webui should have"""
 
     def __init__(self, **kwargs):
+        # Do this early, so even option processing stuff is caught
+        if '--bugreport' in sys.argv:
+            self._debug_tb_callback()
+    
         OptParser.__init__(self, **kwargs)
 
         self.version = flexget.__version__
@@ -39,7 +44,7 @@ class OptionParser(OptParser):
             setattr(parser.values, 'debug', 1)
             setattr(parser.values, 'loglevel', 'debugall')
 
-    def _debug_tb_callback(self, option, opt, value, parser):
+    def _debug_tb_callback(self, *dummy):
         import cgitb
         cgitb.enable(format="text")
 
