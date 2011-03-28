@@ -397,24 +397,36 @@ def register(plugin_class, groups=None, auto=False):
 
 def get_standard_plugins_path():
     """Determine a plugin path suitable for general use."""
-    path = os.environ.get('FLEXGET_PLUGIN_PATH',
-                          os.path.join(os.path.expanduser('~'), '.flexget', 'plugins')).split(os.pathsep)
-    # Get rid of trailing slashes, since Python can't handle them when
-    # it tries to import modules.
-    path = map(_strip_trailing_sep, path)
+    # Get basic path from enironment
+    env_path = os.environ.get('FLEXGET_PLUGIN_PATH', None)
+    if env_path:
+        # Get rid of trailing slashes, since Python can't handle them when
+        # it tries to import modules.
+        path = map(_strip_trailing_sep, env_path.split(os.pathsep))
+    else:
+        # Use standard default
+        path = [os.path.join(os.path.expanduser('~'), '.flexget', 'plugins')]
+
+    # Add flexget.plugins directory (core plugins)
     path.append(os.path.abspath(os.path.dirname(_plugins_pkg.__file__)))
-    # search the arch independent path if we can determine that and
-    # the plugin is found nowhere else
-    if sys.platform != 'win32':
-        try:
-            from distutils.sysconfig import get_python_lib
-        except ImportError:
-            # If distutuils is not available, we just won't add that path
-            pass
-        else:
-            archless_path = os.path.join(get_python_lib(), 'flexget', 'plugins')
-            if archless_path not in path:
-                path.append(archless_path)
+
+    # Leads to problems if flexget is imported via PYTHONPATH and another copy
+    # is installed into site-packages, remove this altogether if nobody has any problems
+    # (and those that have can use FLEXGET_PLUGIN_PATH explicitely)
+    ## Search the arch independent path if we can determine that and
+    ## the plugin is found nowhere else, and we're in default mode
+    #if not env_path and sys.platform != 'win32':
+    #    try:
+    #        from distutils.sysconfig import get_python_lib
+    #    except ImportError:
+    #        # If distutuils is not available, we just won't add that path
+    #        log.debug('FYI: Not adding archless plugin path due to distutils missing')
+    #    else:
+    #        archless_path = os.path.join(get_python_lib(), 'flexget', 'plugins')
+    #        if archless_path not in path:
+    #            log.debug("FYI: Adding archless plugin path '%s' from distutils" % archless_path)
+    #            path.append(archless_path)
+
     return path
 
 
@@ -436,8 +448,8 @@ def load_plugins_from_dirs(dirs):
     for dirpath in dirs:
         if not dirpath:
             continue
-        log.debug('Looking for plugins in %s', dirpath)
         if os.path.isdir(dirpath):
+            log.debug('Looking for plugins in %s', dirpath)
             load_plugins_from_dir(dirpath)
 
             # Also look in subpackages named like the feed phases, plus "generic"
@@ -447,6 +459,8 @@ def load_plugins_from_dirs(dirs):
                     # Only log existing subdirs
                     log.debug("Looking for sub-plugins in '%s'", subpath)
                     load_plugins_from_dir(dirpath, subpkg)
+        else:
+            log.debug('Ignoring non-existant plugin directory %s', dirpath)
 
 
 def load_plugins_from_dir(basepath, subpkg=None):
