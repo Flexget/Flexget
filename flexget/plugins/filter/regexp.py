@@ -53,12 +53,10 @@ class FilterRegexp(object):
             set.accept_any_key('any')
             # not as a single parameter
             advanced.accept('regexp', key='not')
-            # from as a single parameter
-            advanced.accept('text', key='from')
-
             # not in a list form
             advanced.accept('list', key='not').accept('regexp')
-
+            # from as a single parameter
+            advanced.accept('text', key='from')
             # from in a list form
             advanced.accept('list', key='from').accept('text')
 
@@ -69,6 +67,7 @@ class FilterRegexp(object):
 
         conf.accept('choice', key='rest').accept_choices(['accept', 'reject'])
         conf.accept('text', key='from')
+        conf.accept('list', key='from').accept('text')
         return conf
 
     def prepare_config(self, config):
