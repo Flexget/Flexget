@@ -241,7 +241,8 @@ class InputRSS(object):
                         log.exception(ex)
                     raise PluginError('Received invalid RSS content')
                 else:
-                    msg = 'Invalid XML received. However feedparser still produced entries. Ignoring the error ...'
+                    msg = ('Invalid XML received (%s). However feedparser still produced entries.'
+                        ' Ignoring the error...' % str(ex).replace('<unknown>:', 'line '))
                     if not config.get('silent', False):
                         log.info(msg)
                     else:
