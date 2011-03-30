@@ -189,16 +189,17 @@ class InputRSS(object):
 
         # set timeout to one minute
         orig_timout = socket.getdefaulttimeout()
-        socket.setdefaulttimeout(60)
+        try:
+            socket.setdefaulttimeout(60)
 
-        # get the feed & parse
-        if urllib2._opener:
-            rss = feedparser.parse(config['url'], etag=etag, modified=modified, handlers=urllib2._opener.handlers)
-        else:
-            rss = feedparser.parse(config['url'], etag=etag, modified=modified)
-
-        # restore original timeout
-        socket.setdefaulttimeout(orig_timout)
+            # get the feed & parse
+            if urllib2._opener:
+                rss = feedparser.parse(config['url'], etag=etag, modified=modified, handlers=urllib2._opener.handlers)
+            else:
+                rss = feedparser.parse(config['url'], etag=etag, modified=modified)
+        finally:
+            # restore original timeout
+            socket.setdefaulttimeout(orig_timout)
 
         # status checks
         status = rss.get('status', False)
