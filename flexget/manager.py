@@ -39,9 +39,12 @@ class Manager(object):
 
     manager.startup
       After manager has been initialized. This is when application becomes ready to use
+      
+    manager.upgrade
+      Upgrade plugin database schemas etc
 
     manager.execute.started
-      When execute is about the be started, this happens before any feed phases,
+      When execute is about the be started, this happens before any feed phases occur
       including on_process_start
 
     manager.execute.completed
@@ -65,7 +68,7 @@ class Manager(object):
         self.config = {}
         self.feeds = {}
 
-        # shelve
+        # shelve (FlexGet 0.9.x)
         self.shelve_session = None
 
         self.initialize()
@@ -76,6 +79,7 @@ class Manager(object):
 
         atexit.register(self.shutdown)
 
+        fire_event('manager.upgrade', self)
         fire_event('manager.startup', self)
 
     def __del__(self):

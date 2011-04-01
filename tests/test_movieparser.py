@@ -16,7 +16,7 @@ class TestMovieParser:
 
         movie = self.parse('WALL-E 720p BluRay x264-FlexGet')
         assert movie.name == 'WALL-E', 'failed to parse %s' % movie.data
-        assert movie.quality == '720p', 'failed to parse quality from %s' % movie.data
+        assert movie.quality == '720p bluray', 'failed to parse quality from %s' % movie.data
 
         movie = self.parse('The.Pianist.2002.HDDVD.1080p.DTS.x264-FlexGet')
         assert movie.name == 'The Pianist', 'failed to parse %s' % movie.data
@@ -30,7 +30,7 @@ class TestMovieParser:
 
         movie = self.parse('Coraline.3D.1080p.BluRay.x264-FlexGet')
         assert movie.name == 'Coraline', 'failed to parse %s' % movie.data
-        assert movie.quality == '1080p', 'failed to parse quality from %s' % movie.data
+        assert movie.quality == '1080p bluray', 'failed to parse quality from %s' % movie.data
 
         movie = self.parse('Slumdog.Millionaire.DVDRip.XviD-DASH')
         assert movie.name == 'Slumdog Millionaire', 'failed to parse %s' % movie.data

@@ -4,26 +4,28 @@ from flexget.utils import qualities as quals
 
 class TestQualityParser(object):
 
-    def test_quals(self):
+    def test_qualities(self):
         items = [('Test.File 1080p.web-dl', '1080p web-dl'),
-                ('Test.File.web-dl.1080p', '1080p web-dl'),
-                ('Test.File.720p.webdl', '720p web-dl'),
-                ('Test.File.1280x720_web dl', '720p web-dl'),
-                ('Test.File.720p.h264.web.dl', '720p web-dl'),
-                ('Test.File.web-dl', 'web-dl'),
-                ('Test.File.720P', '720p'),
-                ('Test.File.1920x1080', '1080p'),
-                ('Test.File.1080i', '1080i'),
-                ('Test File blurayrip', 'bdrip'),
-                ('Test.File.br-rip', 'bdrip')]
+                 ('Test.File.web-dl.1080p', '1080p web-dl'),
+                 ('Test.File.720p.bluray', '720p bluray'),
+                 ('Test.File.1080p.bluray', '1080p bluray'),
+
+                 ('Test.File.720p.bluray.r5', '720p bluray rc'),
+                 ('Test.File.1080p.bluray.rc', '1080p bluray rc'),
+
+                 ('Test.File.720p.webdl', '720p web-dl'),
+                 ('Test.File.1280x720_web dl', '720p web-dl'),
+                 ('Test.File.720p.h264.web.dl', '720p web-dl'),
+                 ('Test.File.web-dl', 'web-dl'),
+                 ('Test.File.720P', '720p'),
+                 ('Test.File.1920x1080', '1080p'),
+                 ('Test.File.1080i', '1080i'),
+                 ('Test File blurayrip', 'bdrip'),
+                 ('Test.File.br-rip', 'bdrip')]
 
         for item in items:
             quality = quals.parse_quality(item[0]).name
-            assert quality == item[1], 'quality should be %s not %s' % (item[1], quality)
-
-    def test_exact_match(self):
-        assert quals.parse_quality('720p and stuff') == quals.registry['720p']
-        assert quals.parse_quality('720p and stuff', exact=True) == quals.UNKNOWN
+            assert quality == item[1], '`%s` quality should be `%s` not `%s`' % (item[0], item[1], quality)
 
 
 class TestFilterQuality(FlexGetBase):

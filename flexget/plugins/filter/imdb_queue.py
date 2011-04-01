@@ -2,6 +2,8 @@ import logging
 import datetime
 from flexget.manager import Session
 from flexget.plugin import register_plugin, PluginError, get_plugin_by_name, priority, register_parser_option, register_feed_phase
+from flexget.event import event
+from flexget import schema
 from flexget.manager import Base
 from flexget.utils.imdb import extract_id, ImdbSearch, ImdbParser, log as imdb_log
 from flexget.utils.tools import str_to_boolean, console
@@ -10,6 +12,26 @@ from sqlalchemy import Column, Integer, String, DateTime, Boolean, Unicode
 from sqlalchemy.exceptions import OperationalError
 
 log = logging.getLogger('imdb_queue')
+
+
+@event('manager.upgrade')
+def upgrade(manager):
+    ver = schema.get_version('imdb_queue')
+    if (ver == 0):
+        log.info('Upgrading imdb queue qualities naming ...')
+        session = Session()
+        try:
+            for queued in session.query(ImdbQueue).all():
+                if queued.quality in ('720p', '720'):
+                    queued.quality = '720p bluray'
+                if queued.quality in ('1080p', '1080'):
+                    queued.quality = '1080p bluray'
+            session.commit()
+        finally:
+            session.close()
+        ver = 1
+    # save updated schema version number
+    schema.set_version('imdb_queue', ver)
 
 
 class QueueError(Exception):
@@ -370,10 +392,10 @@ class ImdbQueueManager(object):
 
         items = self.queue_get()
         console('-' * 79)
-        console('%-10s %-45s %-8s %s' % ('IMDB id', 'Title', 'Quality', 'Force'))
+        console('%-10s %-45s %-15s %s' % ('IMDB id', 'Title', 'Quality', 'Force'))
         console('-' * 79)
         for item in items:
-            console('%-10s %-45s %-8s %s' % (item.imdb_id, item.title, item.quality, item.immortal))
+            console('%-10s %-45s %-15s %s' % (item.imdb_id, item.title, item.quality, item.immortal))
 
         if not items:
             console('IMDB queue is empty')
@@ -404,7 +426,10 @@ class ImdbQueueManager(object):
 register_plugin(FilterImdbQueue, 'imdb_queue')
 register_plugin(ImdbQueueManager, 'imdb_queue_manager', builtin=True)
 # Handle if a urlrewrite happens, need to get accurate quality.
+# TODO: what if urlrewrite is not even present? 
+#       maybe after should be list of phases and have at least one default phase?
 register_feed_phase(FilterImdbQueue, 'imdbqueue', after='urlrewrite')
 
-register_parser_option('--imdb-queue', action='callback', callback=ImdbQueueManager.optik_imdb_queue,
+register_parser_option('--imdb-queue', action='callback', 
+                       callback=ImdbQueueManager.optik_imdb_queue,
                        help='(add|del|list) [IMDB_URL|NAME] [QUALITY]')

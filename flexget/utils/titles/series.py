@@ -213,11 +213,12 @@ class SeriesParser(TitleParser):
         # search tags and quality if one was not provided to parse method
         if not quality or quality == qualities.UNKNOWN:
             log.debug('parsing quality ->')
-            quality, match = qualities.quality_match(data_stripped)
+            quality, remaining = qualities.quality_match(data_stripped)
             self.quality = quality
-            if match:
+            if remaining:
                 # Remove quality string from data
-                data_stripped = data_stripped[:match.start()] + data_stripped[match.end():]
+                log.debug('quality detected, using remaining data `%s`' % remaining)
+                data_stripped = remaining
 
         # Remove unwanted words (qualities and such) from data for ep / id parsing
         data_stripped = self.remove_words(data_stripped, self.remove + qualities.registry.keys() +
