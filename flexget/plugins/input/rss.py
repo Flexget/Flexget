@@ -125,8 +125,8 @@ class InputRSS(object):
         log.critical('Invalid XML received from feed %s' % feed.name)
         try:
             req = urlopener(url, log)
-        except ValueError:
-            log.debug('invalid url `%s` (ok for a file)' % url)
+        except ValueError, exc:
+            log.debug('invalid url `%s` due to %s (ok for a file)' % (url, exc))
             return
         data = req.read()
         req.close()
