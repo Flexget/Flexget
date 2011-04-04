@@ -49,6 +49,13 @@ def filter_pathscrub(val, ascii=False):
     return re.sub('[%s]' % ''.join(repl), lambda i: repl[i.group(0)], val or '')
 
 
+def filter_re_replace(val, pattern, repl):
+    """ Perform a regexp replacement on the given string.
+    """
+
+    return re.sub(pattern, repl, unicode(val))
+
+
 class ModifySet(object):
 
     """
@@ -116,7 +123,7 @@ class ModifySet(object):
         if self.jinja:
             from jinja2 import Environment, StrictUndefined, UndefinedError
             env = Environment(undefined=StrictUndefined)
-            env.filters.update((name.split('_', 1)[1], filt) 
+            env.filters.update((name.split('_', 1)[1], filt)
                 for name, filt in globals().items()
                 if name.startswith("filter_"))
 

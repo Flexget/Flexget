@@ -1,12 +1,7 @@
 import logging
-from sqlalchemy import Column, Integer, DateTime, Unicode
-from datetime import datetime
 from flexget.plugin import register_plugin, priority
-from flexget.manager import Base
 from flexget.utils.log import log_once
 from fnmatch import fnmatch
-from sqlalchemy.orm import relation
-from sqlalchemy.schema import ForeignKey
 
 log = logging.getLogger('content_filter')
 
