@@ -1,4 +1,5 @@
 import logging
+import os
 import urllib2
 from flexget.plugin import PluginError, register_plugin
 
@@ -57,6 +58,14 @@ class FormLogin(object):
             except Exception, e:
                 pass
         else:
+            received = os.path.join(feed.manager.config_base, 'received')
+            if not os.path.isdir(received):
+                os.mkdir(received)
+            filename = os.path.join(received, '%s.formlogin.html' % feed.name)
+            f = open(filename, 'w')
+            f.write(br.response().get_data())
+            f.close()
+            log.critical('I have saved the login page content to %s for you to view' % filename)
             raise PluginError('Unable to find login fields', log)
 
         br.form = loginform
