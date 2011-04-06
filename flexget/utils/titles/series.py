@@ -350,8 +350,12 @@ class SeriesParser(TitleParser):
                 log.debug('found episode number with regexp %s (%s)' % (ep_re.pattern, match.groups()))
                 matches = match.groups()
                 if len(matches) >= 2:
-                    season = int(matches[0])
-                    episode = int(matches[1])
+                    try:
+                        season = int(matches[0])
+                        episode = int(matches[1])
+                    except ValueError:
+                        log.critical('Invalid episode number match %s returned with regexp `%s`' % (match.groups(), ep_re.pattern))
+                        raise
                 else:
                     # assume season 1 if the season was not specified
                     season = 1

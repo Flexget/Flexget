@@ -195,7 +195,7 @@ class ImdbLookup(object):
                     if result.fails and not feed.manager.options.retry_lookup:
                         # this movie cannot be found, not worth trying again ...
                         log.debug('%s will fail lookup' % entry['title'])
-                        raise PluginError('Title lookup fails')
+                        raise PluginError('Title `%s` lookup fails' % entry['title'])
                     else:
                         if result.url:
                             log.debugall('Setting imdb url for %s from db' % entry['title'])
@@ -221,7 +221,7 @@ class ImdbLookup(object):
                     result = SearchResult(entry['title'])
                     result.fails = True
                     session.add(result)
-                    raise PluginError('Title lookup failed')
+                    raise PluginError('Title `%s` lookup failed' % entry['title'])
 
             imdb = ImdbParser()
 
@@ -244,9 +244,9 @@ class ImdbLookup(object):
                 session.query(Movie).filter(Movie.url == entry['imdb_url']).delete()
                 # search and store to cache
                 if 'title' in entry:
-                    log.verbose('Parsing imdb for %s' % entry['title'])
+                    log.verbose('Parsing imdb for `%s`' % entry['title'])
                 else:
-                    log.verbose('Parsing imdb for %s' % entry['imdb_id'])
+                    log.verbose('Parsing imdb for `%s`' % entry['imdb_id'])
                 try:
                     take_a_break = True
                     imdb.parse(entry['imdb_url'])
