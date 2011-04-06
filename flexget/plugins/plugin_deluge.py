@@ -33,13 +33,15 @@ try:
             while self._started:
                 try:
                     while self._started:
-                        self.iterate()
-
                         if self._release_requested:
                             self._release_requested = False
                             self.paused = True
                             yield self._return_value
                             self.paused = False
+                        self.iterate()
+                except KeyboardInterrupt:
+                    # Keyboard interrupt pauses the reactor
+                    self.pause()
                 except GeneratorExit:
                     # GeneratorExit means stop the generator; Do it cleanly by stopping the whole reactor.
                     self.paused = False
@@ -72,6 +74,10 @@ try:
             # If this was called while the reactor was paused we have to resume in order for it to complete
             if self.paused:
                 self.run()
+
+            # These need to be re-registered so that the PausingReactor can be safely restarted after a stop
+            self.addSystemEventTrigger('during', 'shutdown', self.crash)
+            self.addSystemEventTrigger('during', 'shutdown', self.disconnectAll)
 
     # Configure twisted to use the PausingReactor.
     installReactor(PausingReactor())
