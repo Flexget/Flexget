@@ -89,7 +89,7 @@ class Release(Base):
         self._quality = value.name
 
     quality = synonym('_quality', descriptor=property(get_quality, set_quality))
-    
+
     @property
     def proper(self):
         # TODO: TEMP
@@ -165,9 +165,9 @@ class SeriesPlugin(object):
         non_episodic = total - episodic
         log.debug('series %s auto ep/id check: %s/%s' % (name, episodic, non_episodic))
         # Best of 5, episodic wins in a tie
-        if episodic >= 3 >= non_episodic:
+        if episodic >= 3 and episodic >= non_episodic:
             return 'ep'
-        elif non_episodic >= 3 > episodic:
+        elif non_episodic >= 3 and non_episodic > episodic:
             return 'id'
         else:
             return 'auto'
