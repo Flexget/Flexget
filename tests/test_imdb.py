@@ -70,6 +70,8 @@ class TestImdb(FlexGetBase):
             mock:
               - {title: 'The Matrix', imdb_url: 'http://www.imdb.com/title/tt0133093/'}
               - {title: '22 Bullets', imdb_url: 'http://www.imdb.com/title/tt1167638/'}
+              - {title: 'Crank', imdb_url: 'http://www.imdb.com/title/tt0479884/'}
+              - {title: 'The Damned United', imdb_url: 'http://www.imdb.com/title/tt1226271/'}
             imdb:
               accept_languages:
                 - english
@@ -168,14 +170,15 @@ class TestImdb(FlexGetBase):
     @attr(online=True)
     def test_language(self):
         self.execute_feed('language')
-        matrix = (self.feed.find_entry(imdb_name='The Matrix')['imdb_languages'])
+        matrix = self.feed.find_entry(imdb_name='The Matrix')['imdb_languages']
         assert matrix == ['english'], \
             'Could not find languages for The Matrix'
-        bullets = (self.feed.find_entry(imdb_name='22 Bullets')['imdb_languages'])
+        bullets = self.feed.find_entry(imdb_name='22 Bullets')['imdb_languages']
         assert bullets == ['french'], \
             'Could not find languages for 22 Bullets'
-        assert self.feed.find_entry('accepted', imdb_name='The Matrix'), \
-            'The Matrix should\'ve been accepted'
+        for movie in ['The Matrix', 'Crank', 'The Damned United']:
+            assert self.feed.find_entry('accepted', imdb_name=movie), \
+                '%s should\'ve been accepted' % movie
         assert not self.feed.find_entry('rejected', title='22 Bullets'), \
             '22 Bullets should have been rejected'
 

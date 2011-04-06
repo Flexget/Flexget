@@ -27,7 +27,7 @@ class FilterImdb(object):
         reject_languages:
             - language1
 
-        # accept only this language
+        # accept only these primary languages
         accept_languages:
             - language1
 
@@ -97,8 +97,8 @@ class FilterImdb(object):
                 if not log_once(msg, logger=log):
                     log.verbose(msg)
                 continue
-            if entry["imdb_mpaa_rating"] == '':
-                entry["imdb_mpaa_rating"] = "NONE"
+            if not entry.get('imdb_mpaa_rating'):
+                entry['imdb_mpaa_rating'] = 'NONE'
             # Check defined conditions, TODO: rewrite into functions?
             reasons = []
             if 'min_score' in config:
@@ -129,10 +129,9 @@ class FilterImdb(object):
 
             if 'accept_languages' in config:
                 accepted = config['accept_languages']
-                for language in entry['imdb_languages']:
-                    if language not in accepted:
-                        reasons.append('accept_languages')
-                        break
+                if entry.get('imdb_languages', [''])[0] not in accepted:
+                    # Reject if the first (primary) language is not among acceptable languages
+                    reasons.append('accept_languages')
 
             if 'reject_actors' in config:
                 rejected = config['reject_actors']
