@@ -14,6 +14,12 @@ class TestThetvdbLookup(FlexGetBase):
               - House
               - Doctor Who 2005
             thetvdb_lookup: yes
+          test_unknown_series:
+            mock:
+              - {title: 'Aoeu.Htns.S01E01.htvd'}
+            series:
+              - Aoeu Htns
+            thetvdb_lookup: yes
     """
 
     @attr(online=True)
@@ -27,6 +33,14 @@ class TestThetvdbLookup(FlexGetBase):
             'runtime for %s is %s, should be 60' % (entry['title'], entry['series_runtime'])
         assert self.feed.find_entry(ep_name='School Reunion'), \
             'Failed imdb lookup Doctor Who 2005 S02E03'
+
+    @attr(online=True)
+    def test_unknown_series(self):
+        # Test an unknown series does not cause any exceptions
+        self.execute_feed('test_unknown_series')
+        # Make sure it didn't make a false match
+        entry = self.feed.find_entry('accepted', title='Aoeu.Htns.S01E01.htvd')
+        assert 'thetvdb_id' not in entry, 'should not have populated tvdb data'
 
 
 class TestThetvdbFavorites(FlexGetBase):

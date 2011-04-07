@@ -95,8 +95,11 @@ class InputThetvdbFavorites(object):
         entries = []
         for series_id in user_favorites.series_ids:
             # Lookup the series name from the id
-            series = lookup_series(tvdb_id=series_id)
-            if series and series.seriesname:
+            try:
+                series = lookup_series(tvdb_id=series_id)
+            except LookupError, e:
+                log.error('Error looking up %s from thetvdb: %s' % (series_id, e.message))
+            else:
                 series_name = series.seriesname
                 if config.get('strip_dates'):
                     # Remove year from end of series name if present

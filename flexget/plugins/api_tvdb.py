@@ -32,8 +32,7 @@ def get_mirror(type='xml'):
         try:
             data = BeautifulStoneSoup(urlopener(server + api_key + '/mirrors.xml', log))
         except URLError:
-            log.error('Could not retrieve mirror list from thetvdb')
-            return
+            raise LookupError('Could not retrieve mirror list from thetvdb')
         for mirror in  data.findAll('mirror'):
             type_mask = int(mirror.typemask.string)
             mirrorpath = mirror.mirrorpath.string
@@ -91,17 +90,17 @@ class TVDBSeries(TVDBContainer, Base):
 
     def update(self):
         if not self.id:
-            log.error('Cannot update a series without a tvdb id.')
-            return
+            raise LookupError('Cannot update a series without a tvdb id.')
         url = get_mirror() + api_key + '/series/%s/%s.xml' % (self.id, language)
         try:
             data = urlopener(url, log)
         except URLError, e:
-            log.warning('Request failed %s' % url)
-            return
+            raise LookupError('Request failed %s' % url)
         result = BeautifulStoneSoup(data, convertEntities=BeautifulStoneSoup.HTML_ENTITIES).find('series')
         if result:
             self.update_from_bss(result)
+        else:
+            raise LookupError('Could not retrieve information from thetvdb')
 
     def get_poster(self, only_cached=False):
         """Downloads this poster to a local cache and returns the path"""
@@ -159,17 +158,18 @@ class TVDBEpisode(TVDBContainer, Base):
 
     def update(self):
         if not self.id:
-            log.error('Cannot update an episode without an episode id.')
+            raise LookupError('Cannot update an episode without an episode id.')
         url = get_mirror() + api_key + '/episodes/%s/%s.xml' % (self.id, language)
         from urllib2 import URLError
         try:
             data = urlopener(url, log)
         except URLError, e:
-            log.warning('Request failed %s' % url)
-            return
+            raise LookupError('Request failed %s' % url)
         result = BeautifulStoneSoup(data).find('episode')
         if result:
             self.update_from_bss(result)
+        else:
+            raise LookupError('Could not retrieve information from thetvdb')
 
     def __repr__(self):
         return '<TVDBEpisode series=%s,season=%s,episode=%s>' %\
@@ -192,8 +192,7 @@ def find_series_id(name):
     try:
         page = urlopener(url, log)
     except URLError, e:
-        log.error("Unable to get search results for %s: %s" % (name, e))
-        return
+        raise LookupError("Unable to get search results for %s: %s" % (name, e))
     xmldata = BeautifulStoneSoup(page).data
     if not xmldata:
         log.error("Didn't get a return from tvdb on the series search for %s" % name)
@@ -209,13 +208,14 @@ def find_series_id(name):
     if series_list:
         series_list.sort(key=lambda s: s[0], reverse=True)
         return series_list[0][1]
+    else:
+        raise LookupError('No results for `%s`' % name)
 
 
 @with_session
 def lookup_series(name=None, tvdb_id=None, only_cached=False, session=None):
     if not name and not tvdb_id:
-        log.error('No criteria specified for tvdb lookup')
-        return
+        raise LookupError('No criteria specified for tvdb lookup')
 
     log.debug('Looking up tvdb information for %r' % {'name': name, 'tvdb_id': tvdb_id})
 
@@ -240,14 +240,17 @@ def lookup_series(name=None, tvdb_id=None, only_cached=False, session=None):
             session.refresh(series)
         if series.expired and not only_cached:
             log.info('Data for %s has expired, refreshing from tvdb' % series.seriesname)
-            series.update()
-            session.commit()
+            try:
+                series.update()
+            except LookupError, e:
+                log.warning('Error while updating from tvdb (%s), using cached data.' % e.message)
+            else:
+                session.commit()
         else:
             log.debug('Series %s information restored from cache.' % id_str())
     else:
         if only_cached:
-            log.debug('Series %s not found from cache' % id_str())
-            return
+            raise LookupError('Series %s not found from cache' % id_str())
         # There was no series found in the cache, do a lookup from tvdb
         log.debug('Series %s not found in cache, looking up from tvdb.' % id_str())
         try:
@@ -268,14 +271,13 @@ def lookup_series(name=None, tvdb_id=None, only_cached=False, session=None):
                         session.add(series)
                     if name.lower() != series.seriesname.lower():
                         session.add(TVDBSearchResult(search=name, series=series))
-        except URLError:
-            log.error('Error looking up series from TVDb')
-            return
+        except URLError, e:
+            raise LookupError('Error looking up series from TVDb (%s)' % e)
         else:
             session.commit()
 
     if not series:
-        log.debug('No results found from tvdb for %s' % id_str())
+        raise LookupError('No results found from tvdb for %s' % id_str())
     else:
         # Refresh the object before returning
         session.refresh(series)
@@ -287,8 +289,7 @@ def lookup_episode(name=None, seasonnum=None, episodenum=None, tvdb_id=None, onl
     # First make sure we have the series data
     series = lookup_series(name=name, tvdb_id=tvdb_id, only_cached=only_cached, session=session)
     if not series:
-        log.error('Could not identify series')
-        return
+        raise LookupError('Could not identify series')
     # See if we have this episode cached
     episode = session.query(TVDBEpisode).filter(TVDBEpisode.series_id == series.id).\
                                          filter(TVDBEpisode.seasonnumber == seasonnum).\
@@ -296,14 +297,17 @@ def lookup_episode(name=None, seasonnum=None, episodenum=None, tvdb_id=None, onl
     if episode:
         if episode.expired and not only_cached:
             log.info('Data for %r has expired, refreshing from tvdb' % episode)
-            episode.update()
-            session.commit()
+            try:
+                episode.update()
+            except LookupError, e:
+                log.warning('Error while updating from tvdb (%s), using cached data.' % e.message)
+            else:
+                session.commit()
         else:
             log.debug('Using episode info from cache.')
     else:
         if only_cached:
-            log.debug('Episode %s not found from cache')
-            return
+            raise LookupError('Episode %s not found from cache')
         # There was no episode found in the cache, do a lookup from tvdb
         log.debug('Episode %s not found in cache, looking up from tvdb.')
         url = get_mirror() + api_key + '/series/%d/default/%d/%d/%s.xml' % (series.id, seasonnum, episodenum, language)
@@ -316,8 +320,7 @@ def lookup_episode(name=None, seasonnum=None, episodenum=None, tvdb_id=None, onl
                     series.episodes.append(episode)
                     session.merge(series)
         except URLError, e:
-            log.error('Error looking up movie from TVDb')
-            return
+            raise LookupError('Error looking up movie from TVDb (%s)' % e)
         else:
             session.commit()
     if episode:
@@ -325,6 +328,8 @@ def lookup_episode(name=None, seasonnum=None, episodenum=None, tvdb_id=None, onl
         # Access the series attribute to force it to load before returning
         episode.series
         return episode
+    else:
+        raise LookupError('No results found for ')
 
 
 @with_session

@@ -1,3 +1,4 @@
+import logging
 from flexget.plugin import get_plugin_by_name, priority, register_plugin, DependencyError
 
 try:
@@ -5,6 +6,8 @@ try:
 except ImportError:
     raise DependencyError(issued_by='thetvdb_lookup', missing='api_tvdb',
                           message='thetvdb_lookup requires the `api_tvdb` plugin')
+
+log = logging.getLogger('thetvdb_lookup')
 
 
 class PluginThetvdbLookup(object):
@@ -69,9 +72,12 @@ class PluginThetvdbLookup(object):
                     entry.get('series_season') or not entry.get('series_episode'):
                 # If entry does not have series info we cannot do lookup
                 continue
-            episode = lookup_episode(entry.get('series_name'), entry['series_season'], entry['series_episode'],
-                                     tvdb_id=entry.get('thetvdb_id'))
-            if episode:
+            try:
+                episode = lookup_episode(entry.get('series_name'), entry['series_season'],
+                                         entry['series_episode'], tvdb_id=entry.get('thetvdb_id'))
+            except LookupError, e:
+                log.debug('Error looking up tvdb information for %s: %s' % (entry['title'], e.message))
+            else:
                 # Series info
                 entry['series_name_tvdb'] = episode.series.seriesname
                 entry['series_rating'] = episode.series.rating
