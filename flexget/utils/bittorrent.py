@@ -140,7 +140,7 @@ class Torrent(object):
         for item in files:
             for field in ('name', 'path'):
                 # The standard mandates UTF-8, but try other common things
-                for encoding in ('utf-8', self.content.get('encoding', None), 'cp-1252'):
+                for encoding in ('utf-8', self.content.get('encoding', None), 'cp1252'):
                     if encoding:
                         try:
                             item[field] = item[field].decode(encoding)
