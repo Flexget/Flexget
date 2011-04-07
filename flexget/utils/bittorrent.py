@@ -61,7 +61,7 @@ def clean_meta(meta, including_info=False, logger=None):
                         logger("Removing key %r from file #%d..." % (key, idx + 1))
                     del entry[key]
                     modified.add("info.files." + key)
-
+    
     return modified
 
 
@@ -120,10 +120,10 @@ class Torrent(object):
     def get_filelist(self):
         """Return array containing fileinfo dictionaries (name, length, path)"""
         files = []
-        # single file torrent
         if 'length' in self.content['info']:
+            # single file torrent
             t = {}
-            t['name'] = self.content['info']['name'].decode('utf-8')
+            t['name'] = self.content['info']['name']
             t['size'] = self.content['info']['length']
             t['path'] = ''
             files.append(t)
@@ -132,9 +132,28 @@ class Torrent(object):
             for item in self.content['info']['files']:
                 t = {}
                 t['path'] = '/'.join(item['path'][:-1])
-                t['name'] = item['path'][-1].decode('utf-8')
+                t['name'] = item['path'][-1]
                 t['size'] = item['length']
                 files.append(t)
+
+        # Decode strings
+        for item in files:
+            for field in ('name', 'path'):
+                # The standard mandates UTF-8, but try other common things
+                for encoding in ('utf-8', self.content.get('encoding', None), 'cp-1252'):
+                    if encoding:
+                        try:
+                            item[field] = item[field].decode(encoding)
+                            break
+                        except UnicodeError:
+                            continue
+                else:
+                    # Broken beyond anything reasonable
+                    fallback = unicode(item[field], 'utf-8', 'replace').replace(u'\ufffd', '_')
+                    log.warning("%s=%r field in torrent %r is wrongly encoded, falling back to '%s'" % (
+                        field, item[field], self.content['info']['name'], fallback))
+                    item[field] = fallback
+
         return files
 
     def get_size(self):
