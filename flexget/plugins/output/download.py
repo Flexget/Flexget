@@ -226,11 +226,17 @@ class PluginDownload(object):
                 log.debug('Download interrupted, removing datafile')
                 os.remove(datafile)
                 raise
-            outfile.close()
-            # store temp filename into entry so other plugins may read and modify content
-            # temp file is moved into final destination at self.output
-            entry['file'] = datafile
-            log.debug('%s field file set to: %s' % (entry['title'], entry['file']))
+            else:
+                outfile.close()
+                # Do a sanity check on downloaded file
+                if os.path.getsize(datafile) == 0:
+                    feed.fail(entry, 'File %s is 0 bytes in size' % datafile)
+                    return
+                # store temp filename into entry so other plugins may read and modify content
+                # temp file is moved into final destination at self.output
+                entry['file'] = datafile
+                log.debug('%s field file set to: %s' % (entry['title'], entry['file']))
+
         finally:
             opener.close()
 

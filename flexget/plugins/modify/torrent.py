@@ -1,5 +1,5 @@
 import logging
-from flexget.plugin import register_plugin, priority, PluginError
+from flexget.plugin import register_plugin, priority
 # TORRENT_RE is redundant by now, but keep it here, in case someone was crazy enough to import it
 from flexget.utils.bittorrent import Torrent, is_torrent_file, TORRENT_RE
 import os
