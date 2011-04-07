@@ -5,7 +5,7 @@ from sqlalchemy.orm import relation
 from flexget.manager import Base
 from flexget.plugin import register_plugin, priority, register_parser_option
 
-log = logging.getLogger('remember_rejected')
+log = logging.getLogger('remember_rej')
 
 
 class RememberFeed(Base):
@@ -78,6 +78,7 @@ class FilterRememberRejected(object):
         if not entry.get('title') or not entry.get('original_url'):
             log.debug('Can\'t remember rejection for entry without title or url.')
             return
+        log.info('Remembering rejection of `%s`' % entry['title'])
         remember_feed = feed.session.query(RememberFeed).filter(RememberFeed.name == feed.name).first()
         remember_feed.entries.append(RememberEntry(title=entry['title'], url=entry['original_url'],
                                                    rejected_by=feed.current_plugin))

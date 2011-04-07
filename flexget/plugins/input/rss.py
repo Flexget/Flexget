@@ -197,6 +197,8 @@ class InputRSS(object):
                 rss = feedparser.parse(config['url'], etag=etag, modified=modified, handlers=urllib2._opener.handlers)
             else:
                 rss = feedparser.parse(config['url'], etag=etag, modified=modified)
+        except LookupError, e:
+            raise PluginError('Unable to parse the RSS: %s' % e)
         finally:
             # restore original timeout
             socket.setdefaulttimeout(orig_timout)
