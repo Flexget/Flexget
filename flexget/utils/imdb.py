@@ -26,7 +26,7 @@ class ImdbSearch(object):
         # de-prioritize tv results
         self.tv_weight = 0.75
         # prioritize first
-        self.first_weigth = 1.02
+        self.first_weight = 1.02
         self.min_match = 0.5
         self.min_diff = 0.01
         self.debug = False
@@ -200,7 +200,7 @@ class ImdbSearch(object):
                 # prioritize first item
                 if count == 1:
                     log.debug('- prioritizing first hit `%s`' % movie['url'])
-                    ratio = ratio * self.first_weigth
+                    ratio = ratio * self.first_weight
 
                 # store ratio
                 movie['match'] = ratio
