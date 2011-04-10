@@ -69,7 +69,10 @@ class Entry(dict):
             from flexget.utils.imdb import extract_id
             value = u'http://www.imdb.com/title/%s/' % extract_id(value)
 
-        log.debugall('ENTRY %s = %s' % (key, value))
+        try:
+            log.debugall('ENTRY %s = %s' % (key, value))
+        except Exception, e:
+            log.debug('trying to debug key `%s` value threw exception: %s' % (key, e))
 
         dict.__setitem__(self, key, value)
 

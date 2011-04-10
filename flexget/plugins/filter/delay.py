@@ -1,9 +1,14 @@
 import logging
+import sys
+from sqlalchemy.types import Unicode
+from flexget import schema
+from flexget.event import event
 from flexget.feed import Entry
-from flexget.manager import Base
+from flexget.manager import Base, Session
 from flexget.plugin import register_plugin, priority, PluginError
 from datetime import datetime, timedelta
 from sqlalchemy import Column, Integer, String, DateTime, PickleType
+from flexget.utils.tools import console
 
 log = logging.getLogger('delay')
 
@@ -14,12 +19,36 @@ class DelayedEntry(Base):
 
     id = Column(Integer, primary_key=True)
     feed = Column(String)
-    title = Column(String)
+    title = Column(Unicode)
     expire = Column(DateTime)
     entry = Column(PickleType(mutable=False))
 
     def __repr__(self):
         return '<DelayedEntry(title=%s)>' % self.title
+
+# TODO: index "feed, title" and "expire, feed"
+
+
+@event('manager.upgrade')
+def upgrade(manager):
+    ver = schema.get_version('delay')
+    if ver == 0:
+        log.info('Fixing delay table from erroneous data ...')
+        session = Session()
+        try:
+            all = session.query(DelayedEntry).all()
+            for de in all:
+                for key, value in de.entry.iteritems():
+                    if not isinstance(value, (basestring, bool, int, float, list, dict)):
+                        log.warning('Removing `%s` with erroneous data' % de.title)
+                        session.delete(de)
+                        break
+            session.commit()
+        finally:
+            session.close()
+        ver = 1
+    # save updated schema version number
+    schema.set_version('delay', ver)
 
 
 class FilterDelay(object):

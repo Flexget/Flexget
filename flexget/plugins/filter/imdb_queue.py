@@ -17,7 +17,7 @@ log = logging.getLogger('imdb_queue')
 @event('manager.upgrade')
 def upgrade(manager):
     ver = schema.get_version('imdb_queue')
-    if (ver == 0):
+    if ver == 0:
         log.info('Upgrading imdb queue qualities naming ...')
         session = Session()
         try:
@@ -426,10 +426,10 @@ class ImdbQueueManager(object):
 register_plugin(FilterImdbQueue, 'imdb_queue')
 register_plugin(ImdbQueueManager, 'imdb_queue_manager', builtin=True)
 # Handle if a urlrewrite happens, need to get accurate quality.
-# TODO: what if urlrewrite is not even present? 
+# TODO: what if urlrewrite is not even present?
 #       maybe after should be list of phases and have at least one default phase?
 register_feed_phase(FilterImdbQueue, 'imdbqueue', after='urlrewrite')
 
-register_parser_option('--imdb-queue', action='callback', 
+register_parser_option('--imdb-queue', action='callback',
                        callback=ImdbQueueManager.optik_imdb_queue,
                        help='(add|del|list) [IMDB_URL|NAME] [QUALITY]')
