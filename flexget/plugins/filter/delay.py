@@ -1,5 +1,4 @@
 import logging
-import sys
 from sqlalchemy.types import Unicode
 from flexget import schema
 from flexget.event import event
@@ -8,7 +7,6 @@ from flexget.manager import Base, Session
 from flexget.plugin import register_plugin, priority, PluginError
 from datetime import datetime, timedelta
 from sqlalchemy import Column, Integer, String, DateTime, PickleType
-from flexget.utils.tools import console
 
 log = logging.getLogger('delay')
 
