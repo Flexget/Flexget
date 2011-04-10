@@ -25,6 +25,8 @@ class ImdbSearch(object):
         self.unpopular_weight = 0.85
         # de-prioritize tv results
         self.tv_weight = 0.75
+        # prioritize first
+        self.first_weigth = 1.02
         self.min_match = 0.5
         self.min_diff = 0.01
         self.debug = False
@@ -138,13 +140,13 @@ class ImdbSearch(object):
             try:
                 section_table = section_tag.parent.parent.nextSibling
             except AttributeError:
-                log.debug('Section % does not have a table?' % section)
+                log.debug('Section %s does not have a table?' % section)
                 continue
 
             links = section_table.findAll('a', attrs={'href': re.compile(r'/title/tt')})
             if not links:
                 log.debug('section %s does not have links' % section)
-            for link in links:
+            for count, link in enumerate(links):
                 # skip links with div as a parent (not movies, somewhat rare links in additional details)
                 if link.parent.name == u'div':
                     continue
@@ -194,6 +196,11 @@ class ImdbSearch(object):
                     ratio = ratio * self.unpopular_weight
                 else:
                     log.debug('- priorizing popular %s' % movie['url'])
+
+                # prioritize first item
+                if count == 1:
+                    log.debug('- prioritizing first hit `%s`' % movie['url'])
+                    ratio = ratio * self.first_weigth
 
                 # store ratio
                 movie['match'] = ratio
