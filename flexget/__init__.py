@@ -28,8 +28,8 @@ def main():
     try:
         manager = Manager(options)
     except IOError, e:
-        # failed to load config
-        log.critical(e.message)
+        # failed to load config, why should it be handled here?
+        log.exception(e)
         logger.flush()
         sys.exit(1)
 
