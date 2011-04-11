@@ -59,7 +59,7 @@ class InputBacklog(object):
         # Get a list of entries to inject
         injections = self.get_injections(feed)
         # Take a snapshot of the entries' states after the input event in case we have to store them to backlog
-        for entry in feed.entries:
+        for entry in feed.entries + injections:
             entry.take_snapshot('after_input')
         if config:
             # If backlog is manually enabled for this feed, learn the entries.
@@ -76,7 +76,11 @@ class InputBacklog(object):
         """Add single entry to feed backlog
 
         If :amount: is not specified, entry will only be injected on next execution."""
-        snapshot = entry.snapshots.get('after_input')
+        # Use the input snapshot unless we are in the input phase
+        if feed.current_phase == 'input':
+            snapshot = dict(entry)
+        else:
+            snapshot = entry.snapshots.get('after_input')
         if not snapshot:
             log.warning('No input snapshot available for `%s`, using current state' % entry['title'])
             snapshot = dict(entry)
