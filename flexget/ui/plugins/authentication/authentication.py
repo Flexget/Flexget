@@ -45,9 +45,11 @@ def enable_authentication():
     if not credentials:
         credentials = AuthCredentials('flexget', 'flexget')
         db_session.add(credentials)
-        
-    credentials.username = manager.options.username
-    credentials.password = manager.options.password
+
+    if manager.options.username:
+        credentials.username = manager.options.username
+    if manager.options.password:
+        credentials.password = manager.options.password
     db_session.commit()
 
     app.before_request(check_authenticated)
