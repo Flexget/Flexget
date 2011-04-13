@@ -219,3 +219,4 @@ class TestImdbLookup(FlexGetBase):
         # check that these were created
         assert self.feed.entries[0]['imdb_score'], 'didn\'t get score'
         assert self.feed.entries[0]['imdb_year'], 'didn\'t get year'
+        assert self.feed.entries[0]['imdb_plot_outline'], 'didn\'t get plot'

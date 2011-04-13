@@ -361,17 +361,8 @@ class ImdbParser(object):
         log.debug('Detected director(s): %s' % ', '.join(self.directors))
         log.debug('Detected actors: %s' % ', '.join(self.actors))
 
-        # get plot (another page)
-        plot_url = self.url
-        if not self.url.endswith('/'):
-            plot_url += '/'
-        plot_url += 'plotsummary'
-
-        log.debug('Requesting %s' % plot_url)
-        page = urllib2.urlopen(plot_url)
-        soup = get_soup(page)
-
-        p_plot = soup.find('p', attrs={'class': 'plotpar'})
+        # get plot
+        p_plot = soup.find('h2', text='Storyline').findNext('p')
         if p_plot:
             self.plot_outline = p_plot.next.string.strip()
             log.debug('Detected plot outline: %s' % self.plot_outline)
