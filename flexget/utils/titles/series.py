@@ -350,23 +350,22 @@ class SeriesParser(TitleParser):
                 log.debug('found episode number with regexp %s (%s)' % (ep_re.pattern, match.groups()))
                 matches = match.groups()
                 if len(matches) >= 2:
-                    try:
-                        season = int(matches[0])
-                        episode = int(matches[1])
-                    except ValueError:
-                        log.critical('Invalid episode number match %s returned with regexp `%s`' % (match.groups(), ep_re.pattern))
-                        raise
+                    season = matches[0]
+                    episode = matches[1]
                 else:
                     # assume season 1 if the season was not specified
                     season = 1
                     episode = matches[0]
+                # Convert season and episode to integers
+                try:
+                    season = int(season)
                     if not episode.isdigit():
                         episode = self.roman_to_int(episode)
-                        # If we can't parse the roman numeral, continue the search
-                        if not episode:
-                            continue
                     else:
                         episode = int(episode)
+                except ValueError:
+                    log.critical('Invalid episode number match %s returned with regexp `%s`' % (match.groups(), ep_re.pattern))
+                    raise
                 end_episode = None
                 if len(matches) == 3 and matches[2]:
                     end_episode = int(matches[2])
@@ -388,7 +387,7 @@ class SeriesParser(TitleParser):
         # Return False if this is not a roman numeral we can translate
         for char in roman:
             if char not in 'XVI':
-                return False
+                raise ValueError('`%s` is not a valid roman numeral' % roman)
 
         # Add up the parts of the numeral
         i = result = 0
