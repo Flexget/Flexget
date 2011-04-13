@@ -31,9 +31,9 @@ if enable_logging:
 
 class TestSeriesParser(object):
 
-    def parse(self, **kwargs):
-        s = SeriesParser(name=kwargs['name'])
-        s.parse(data=kwargs['data'])
+    def parse(self, name=None, data=None, **kwargs):
+        s = SeriesParser(name, **kwargs)
+        s.parse(data)
         return s
 
     def test_proper(self):
@@ -126,6 +126,8 @@ class TestSeriesParser(object):
     @raises(ParseWarning)
     def test_invalid(self):
         s = self.parse(name='Something', data='Something S06 AC3-CRAPL3SS')
+        s = self.parse(name='Something', data='Something SEASON 1 2010 540p BluRay QEBS AAC ANDROID IPAD MP4 FASM',
+                       identified_by='ep')
 
     def test_unwanted_disc(self):
         """SeriesParser: unwanted disc releases"""
