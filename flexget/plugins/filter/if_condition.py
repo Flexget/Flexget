@@ -7,7 +7,10 @@ log = logging.getLogger('if')
 
 
 def safer_eval(statement, locals):
-    """A safer eval function. Does not allow __ or try statements, does not include any globals in the namespace."""
+    """A safer eval function. Does not allow __ or try statements, only includes certain 'safe' builtins."""
+    allowed_builtins = ['True', 'False', 'len', 'any']
+    for name in allowed_builtins:
+        locals[name] = globals()['__builtins__'].get(name)
     if re.search(r'__|try\s*:', statement):
         raise ValueError('\'__\' or try blocks not allowed in if statements.')
     return eval(statement, {'__builtins__': None}, locals)
@@ -51,10 +54,8 @@ class FilterIf(object):
             'reject': feed.reject,
             'fail': feed.fail}
         for entry in feed.entries:
-            eval_locals = {
-                'has_field': lambda f: entry.has_key(f),
-                'True': True,
-                'False': False}
+            # Make entry fields and other utilities available in the eval namespace
+            eval_locals = {'has_field': lambda f: entry.has_key(f)}
             eval_locals.update(entry)
             for item in config:
                 requirement, action = item.items()[0]
