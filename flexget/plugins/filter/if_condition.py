@@ -1,14 +1,15 @@
 import logging
+import re
+import datetime
 from flexget.feed import Feed
 from flexget.plugin import register_plugin, get_plugins_by_phase, get_plugin_by_name, priority
-import re
 
 log = logging.getLogger('if')
 
 
 def safer_eval(statement, locals):
     """A safer eval function. Does not allow __ or try statements, only includes certain 'safe' builtins."""
-    allowed_builtins = ['True', 'False', 'len', 'any']
+    allowed_builtins = ['True', 'False', 'len', 'any', 'all']
     for name in allowed_builtins:
         locals[name] = globals()['__builtins__'].get(name)
     if re.search(r'__|try\s*:', statement):
@@ -55,7 +56,9 @@ class FilterIf(object):
             'fail': feed.fail}
         for entry in feed.entries:
             # Make entry fields and other utilities available in the eval namespace
-            eval_locals = {'has_field': lambda f: entry.has_key(f)}
+            eval_locals = {'has_field': lambda f: entry.has_key(f),
+                           'timedelta': datetime.timedelta,
+                           'now': datetime.datetime.now()}
             eval_locals.update(entry)
             for item in config:
                 requirement, action = item.items()[0]
