@@ -362,9 +362,13 @@ class ImdbParser(object):
         log.debug('Detected actors: %s' % ', '.join(self.actors))
 
         # get plot
-        p_plot = soup.find('h2', text='Storyline').findNext('p')
-        if p_plot:
-            self.plot_outline = p_plot.next.string.strip()
-            log.debug('Detected plot outline: %s' % self.plot_outline)
+        h2_plot = soup.find('h2', text='Storyline')
+        if h2_plot:
+            p_plot = h2_plot.findNext('p')
+            if p_plot:
+                self.plot_outline = p_plot.next.string.strip()
+                log.debug('Detected plot outline: %s' % self.plot_outline)
+            else:
+                log.debug('Plot does not have p-tag')
         else:
             log.debug('Failed to find plot')
