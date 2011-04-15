@@ -150,6 +150,7 @@ class Manager(object):
         for path in possible:
             config = os.path.join(path, self.options.config)
             if os.path.exists(config):
+                log.debug('Found config: %s' % config)
                 self.load_config(config)
                 return
         log.info('Tried to read from: %s' % ', '.join(possible))
