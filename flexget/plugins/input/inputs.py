@@ -57,13 +57,13 @@ class PluginInputs(object):
                     if entry['title'] in entry_titles:
                         log.debug('Title `%s` already in entry list, skipping.' % entry['title'])
                         continue
-                    if any(url in entry_urls for url in [entry.get('url')] + entry.get('urls', [])):
+                    urls = ([entry['url']] if entry.get('url') else []) + entry.get('urls', [])
+                    if any(url in entry_urls for url in urls):
                         log.debug('URL for `%s` already in entry list, skipping.' % entry['title'])
                         continue
                     entries.append(entry)
                     entry_titles.add(entry['title'])
-                    for url in [entry.get('url')] + entry.get('urls', []):
-                        entry_urls.add(url)
+                    entry_urls.update(urls)
         return entries
 
 

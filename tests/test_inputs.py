@@ -20,6 +20,12 @@ class TestInputs(FlexGetBase):
                   - {title: 'title1b', url: 'http://url1'}
                   - {title: 'title1c', url: 'http://other', urls: ['http://url1']}
                   - {title: 'title2', url: 'http://url2b'}
+          test_no_url:
+            inputs:
+              - mock:
+                  - title: title1
+              - mock:
+                  - title: title2
     """
 
     def test_inputs(self):
@@ -31,3 +37,7 @@ class TestInputs(FlexGetBase):
         assert len(self.feed.entries) == 2, 'Should only have created 2 entries'
         assert self.feed.find_entry(title='title1a'), 'title1a should be in entries'
         assert self.feed.find_entry(title='title2'), 'title2 should be in entries'
+
+    def test_no_url(self):
+        self.execute_feed('test_no_url')
+        assert len(self.feed.entries) == 2, 'Should have created 2 entries'
