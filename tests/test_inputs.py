@@ -38,6 +38,8 @@ class TestInputs(FlexGetBase):
         assert self.feed.find_entry(title='title1a'), 'title1a should be in entries'
         assert self.feed.find_entry(title='title2'), 'title2 should be in entries'
 
-    def test_no_url(self):
+    """def test_no_url(self):
+        # Oops, this test doesn't do anything, as the mock plugin adds a fake url to entries
+        # TODO: fix this
         self.execute_feed('test_no_url')
-        assert len(self.feed.entries) == 2, 'Should have created 2 entries'
+        assert len(self.feed.entries) == 2, 'Should have created 2 entries'"""
