@@ -1,9 +1,11 @@
 import os
 from flexget.feed import Entry
-from flexget.plugin import register_plugin, register_parser_option, get_plugin_by_name, DependencyError
+from flexget.plugin import register_plugin, register_parser_option, get_plugin_by_name, DependencyError, PluginError
 from flexget.utils.cached_input import cached
 import re
 import logging
+import io
+import sys
 
 log = logging.getLogger('tail')
 
@@ -50,6 +52,10 @@ class InputTail(object):
 
     Note: each entry must have atleast two fields, title and url
 
+    You may wish to specify encoding used by file so file can be properly
+    decoded. List of encodings 
+    at http://docs.python.org/library/codecs.html#standard-encodings.
+
     Example:
 
     tail:
@@ -57,12 +63,14 @@ class InputTail(object):
       entry:
         title: 'TITLE: (.*) URL:'
         url: 'URL: (.*)'
+      encoding: utf8
     """
 
     def validator(self):
         from flexget import validator
         root = validator.factory('dict')
         root.accept('file', key='file', required=True)
+        root.accept('text', key='encoding')
         entry = root.accept('dict', key='entry', required=True)
         entry.accept('regexp', key='url', required=True)
         entry.accept('regexp', key='title', required=True)
@@ -88,7 +96,8 @@ class InputTail(object):
             log.debug('unable to get details plugin')
 
         filename = os.path.expanduser(feed.config['tail']['file'])
-        file = open(filename, 'r')
+        encoding = feed.config['tail'].get('encoding', None)
+        file = io.open(filename, 'r', encoding=encoding)
 
         last_pos = feed.simple_persistence.setdefault(filename, 0)
         if os.path.getsize(filename) < last_pos:
@@ -107,8 +116,14 @@ class InputTail(object):
         entry = Entry()
 
         # now parse text
+        
         while True:
-            line = file.readline()
+            try:
+                line = file.readline()
+            except ValueError:
+                raise PluginError('Failed to decode file using %s. Check encoding.' % \
+                    (encoding if encoding is not None else sys.getfilesystemencoding()))
+
             if not line:
                 feed.simple_persistence.set(filename, file.tell())
                 break
