@@ -290,6 +290,7 @@ def lookup_episode(name=None, seasonnum=None, episodenum=None, tvdb_id=None, onl
     series = lookup_series(name=name, tvdb_id=tvdb_id, only_cached=only_cached, session=session)
     if not series:
         raise LookupError('Could not identify series')
+    ep_description = '%s.S%sE%s' % (series.seriesname, seasonnum, episodenum)
     # See if we have this episode cached
     episode = session.query(TVDBEpisode).filter(TVDBEpisode.series_id == series.id).\
                                          filter(TVDBEpisode.seasonnumber == seasonnum).\
@@ -307,16 +308,21 @@ def lookup_episode(name=None, seasonnum=None, episodenum=None, tvdb_id=None, onl
             log.debug('Using episode info from cache.')
     else:
         if only_cached:
-            raise LookupError('Episode %s not found from cache')
+            raise LookupError('Episode %s not found from cache' % ep_description)
         # There was no episode found in the cache, do a lookup from tvdb
-        log.debug('Episode %s not found in cache, looking up from tvdb.')
+        log.debug('Episode %s not found in cache, looking up from tvdb.' % ep_description)
         url = get_mirror() + api_key + '/series/%d/default/%d/%d/%s.xml' % (series.id, seasonnum, episodenum, language)
         try:
             data = BeautifulStoneSoup(urlopener(url, log)).data
             if data:
                 ep_data = data.find('episode')
                 if ep_data:
-                    episode = TVDBEpisode(ep_data)
+                    # Check if this episode id is already in our db
+                    episode = session.query(TVDBEpisode).filter(TVDBEpisode.id == ep_data.id.string).first()
+                    if episode:
+                        episode.update_from_bss(ep_data)
+                    else:
+                        episode = TVDBEpisode(ep_data)
                     series.episodes.append(episode)
                     session.merge(series)
         except URLError, e:
