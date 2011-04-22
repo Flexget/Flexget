@@ -1,5 +1,8 @@
-import logging
+from flexget.feed import Entry
 from flexget.plugin import register_plugin
+import logging
+import os
+import re
 
 log = logging.getLogger('find')
 
@@ -49,17 +52,17 @@ class InputFind(object):
             config['regexp'] = '.'
 
     def on_feed_input(self, feed, config):
-        from flexget.feed import Entry
-        import os
-        import re
         self.prepare_config(config)
         entries = []
         match = re.compile(config['regexp'], re.IGNORECASE).match
         for path in config['path']:
+            log.debug('scanning %s' % path)
             # unicode causes problems in here (#989)
             for item in os.walk(str(path)):
+                log.debug('item: %s' % str(item))
                 for name in item[2]:
                     # If mask fails continue
+                    log.debug('testing %s to %s' % (name, config['regexp']))
                     if match(name) is None:
                         continue
                     e = Entry()
