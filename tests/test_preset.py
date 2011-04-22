@@ -10,6 +10,13 @@ class TestPreset(FlexGetBase):
           movies:
             mock:
               - {title: 'movies'}
+          a:
+            mock:
+              - {title: 'a'}
+            preset: b
+          b:
+            mock:
+              - {title: 'b'}
 
         feeds:
           test1:
@@ -21,6 +28,11 @@ class TestPreset(FlexGetBase):
           test3:
             preset:
               - movies
+              - no_global
+
+          test_nested:
+            preset:
+              - a
               - no_global
     """
 
@@ -38,6 +50,12 @@ class TestPreset(FlexGetBase):
         self.execute_feed('test3')
         assert not self.feed.find_entry(title='global'), 'test3, preset global applied'
         assert self.feed.find_entry(title='movies'), 'test3, preset movies not applied'
+
+    def test_nested(self):
+        self.execute_feed('test_nested')
+        assert self.feed.find_entry(title='a'), 'Entry from preset a was not created'
+        assert self.feed.find_entry(title='b'), 'Entry from preset b was not created'
+        assert len(self.feed.entries) == 2, 'Should only have been 2 entries created'
 
 
 class TestPresetMerge(FlexGetBase):
