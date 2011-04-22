@@ -235,7 +235,8 @@ class TestSetPlugin(FlexGetBase):
         self.execute_feed('test_string_replacement')
         assert self.feed.find_entry('entries', title='Entry 1')['field'] == 'TheValue'
         # The string repalcement should fail, an error will be shown, and the field will get a blank value.
-        assert self.feed.find_entry('entries', title='Entry 2')['field'] == ''
+        assert 'field' not in self.feed.find_entry('entries', title='Entry 2'),\
+                '`field` should not have been created when string replacement fails'
 
     def test_jinja(self):
         self.execute_feed('test_jinja')
@@ -243,5 +244,6 @@ class TestSetPlugin(FlexGetBase):
         assert entry['field'] == 'The VALUE'
         assert entry['otherfield'] == ''
         entry = self.feed.find_entry('entries', title='Entry 2')
-        assert entry['field'] == ''
+        assert 'field' not in entry,\
+                '`field` should not have been created when jinja rendering fails'
         assert entry['otherfield'] == 'no series'

@@ -127,20 +127,28 @@ class ModifySet(object):
                 for name, filt in globals().items()
                 if name.startswith("filter_"))
 
-            for field, template_string in conf.iteritems():
+            for field, template_string in conf.items():
                 if isinstance(template_string, basestring):
                     template = env.from_string(template_string)
                     try:
                         result = template.render(entry)
                     except UndefinedError:
-                        result = ''
-                    conf[field] = result
+                        # If the replacement failed, remove this key from the update dict
+                        log.debug('%s did not have the required fields for jinja2 template' % entry['title'])
+                        del conf[field]
+                    else:
+                        conf[field] = result
 
         # Do string replacement
         for field, value in conf.iteritems():
             if isinstance(value, basestring):
                 logger = log.error if errors else log.debug
-                conf[field] = replace_from_entry(value, entry, field, logger)
+                result = replace_from_entry(value, entry, field, logger, default=None)
+                if result is None:
+                    # If the replacement failed, remove this key from the update dict
+                    del conf[field]
+                else:
+                    conf[field] = result
 
         if validate:
             from flexget import validator
