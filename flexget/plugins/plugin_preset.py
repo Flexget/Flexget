@@ -32,12 +32,10 @@ class PluginPreset(object):
         return root
 
     def prepare_config(self, config):
-        if config is None or config is True:
-            config = ['global']
+        if config is None or isinstance(config, bool):
+            config = []
         elif isinstance(config, basestring):
             config = [config]
-        elif config is False:
-            config = []
         return config
 
     @priority(255)
@@ -89,6 +87,8 @@ class PluginPreset(object):
                 for nested_preset in nested_presets:
                     if nested_preset not in config:
                         config.append(nested_preset)
+                    else:
+                        log.warning('Presets contain eachother in a loop.')
                 # Replace preset_config with a copy without the preset key, to avoid merging errors
                 preset_config = dict(preset_config)
                 del preset_config['preset']
