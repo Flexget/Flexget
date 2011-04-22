@@ -62,7 +62,6 @@ class InputFind(object):
                 log.debug('item: %s' % str(item))
                 for name in item[2]:
                     # If mask fails continue
-                    log.debug('testing %s to %s' % (name, config['regexp']))
                     if match(name) is None:
                         continue
                     e = Entry()
