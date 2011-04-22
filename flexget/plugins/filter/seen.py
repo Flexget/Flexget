@@ -298,12 +298,13 @@ class FilterSeen(object):
                     continue
                 if entry[field] not in values and entry[field] != '':
                     values.append(entry[field])
-            log.debugall('querying for: %s' % ', '.join(values))
-            # check if SeenField.value is any of the values
-            found = feed.session.query(SeenField).filter(SeenField.value.in_(values)).first()
-            if found:
-                log.debug("Rejecting '%s' '%s' because of seen '%s'" % (entry['url'], entry['title'], found.value))
-                feed.reject(entry, 'Entry with %s `%s` is already seen' % (found.field, found.value))
+            if values:
+                log.debugall('querying for: %s' % ', '.join(values))
+                # check if SeenField.value is any of the values
+                found = feed.session.query(SeenField).filter(SeenField.value.in_(values)).first()
+                if found:
+                    log.debug("Rejecting '%s' '%s' because of seen '%s'" % (entry['url'], entry['title'], found.value))
+                    feed.reject(entry, 'Entry with %s `%s` is already seen' % (found.field, found.value))
 
     def on_feed_exit(self, feed, config):
         """Remember succeeded entries"""
