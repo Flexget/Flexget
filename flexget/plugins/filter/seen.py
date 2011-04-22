@@ -284,9 +284,9 @@ class FilterSeen(object):
         return root
 
     @priority(255)
-    def on_feed_filter(self, feed):
+    def on_feed_filter(self, feed, config):
         """Filter seen entries"""
-        if not feed.config.get(self.keyword, True):
+        if config is False:
             log.debug('%s is disabled' % self.keyword)
             return
 
@@ -294,20 +294,20 @@ class FilterSeen(object):
             # construct list of values looked
             values = []
             for field in self.fields:
-                if not field in entry:
+                if field not in entry:
                     continue
                 if entry[field] not in values and entry[field] != '':
                     values.append(entry[field])
             log.debugall('querying for: %s' % ', '.join(values))
             # check if SeenField.value is any of the values
-            found = feed.session.query(SeenField).filter(or_(*[SeenField.value == x for x in values])).first()
+            found = feed.session.query(SeenField).filter(SeenField.value.in_(values)).first()
             if found:
                 log.debug("Rejecting '%s' '%s' because of seen '%s'" % (entry['url'], entry['title'], found.value))
-                feed.reject(entry, 'Entry with `%s` is already seen' % found.value)
+                feed.reject(entry, 'Entry with %s `%s` is already seen' % (found.field, found.value))
 
-    def on_feed_exit(self, feed):
+    def on_feed_exit(self, feed, config):
         """Remember succeeded entries"""
-        if not feed.config.get('seen', True):
+        if config is False:
             log.debug('disabled')
             return
 
@@ -334,7 +334,9 @@ class FilterSeen(object):
             sf = SeenField(unicode(field), unicode(entry[field]))
             se.fields.append(sf)
             log.debug("Learned '%s' (field: %s)" % (entry[field], field))
-        feed.session.add(se)
+        # Only add the entry to the session if it has one of the required fields
+        if se.fields:
+            feed.session.add(se)
 
     def forget(self, feed, title):
         """Forget SeenEntry with :title:. Return True if forgotten."""
@@ -345,7 +347,7 @@ class FilterSeen(object):
             return True
 
 
-register_plugin(FilterSeen, 'seen', builtin=True)
+register_plugin(FilterSeen, 'seen', builtin=True, api_ver=2)
 register_plugin(SeenSearch, '--seen-search', builtin=True)
 register_plugin(SeenCmd, '--seen', builtin=True)
 register_plugin(SeenForget, '--forget', builtin=True)

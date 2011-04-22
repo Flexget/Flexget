@@ -1,7 +1,7 @@
 import os
 
 from tests import FlexGetBase, with_filecopy
-from flexget.utils.bittorrent import Torrent 
+from flexget.utils.bittorrent import Torrent
 
 
 class TestInfoHash(FlexGetBase):
@@ -19,6 +19,39 @@ class TestInfoHash(FlexGetBase):
         hash = self.feed.entries[0].get('torrent_info_hash')
         assert hash == '20AE692114DC343C86DF5B07C276E5077E581766', \
             'InfoHash does not match (got %s)' % hash
+
+
+class TestSeenInfoHash(FlexGetBase):
+
+    __yaml__ = """
+        feeds:
+          test:
+            mock:
+              - {title: test, file: test.torrent}
+            accept_all: yes
+          test2:
+            mock:
+              - {title: test2, file: test2.torrent}
+            accept_all: yes
+          test_same_run:
+            mock:
+              - {title: test, torrent_info_hash: 20AE692114DC343C86DF5B07C276E5077E581766}
+              - {title: test2, torrent_info_hash: 20ae692114dc343c86df5b07c276e5077e581766}
+            accept_all: yes
+    """
+
+    @with_filecopy('test.torrent', 'test2.torrent')
+    def test_seen_info_hash(self):
+        self.execute_feed('test')
+        assert self.feed.find_entry('accepted', title='test'), 'torrent should have been accepted on first run'
+        self.execute_feed('test2')
+        assert self.feed.find_entry('rejected', title='test2'), 'torrent should have been rejected on second run'
+
+    def test_same_run(self):
+        # Test that 2 entries with the same info hash don't get accepted on the same run.
+        # Also tests that the plugin compares info hash case insensitively.
+        self.execute_feed('test_same_run')
+        assert len(self.feed.accepted) == 1, 'Should not have accepted both entries with the same info hash'
 
 
 class TestModifyTrackers(FlexGetBase):
@@ -99,6 +132,7 @@ class TestTorrentScrub(FlexGetBase):
               - {title: 'LICENSE-resume', file: '__tmp__LICENSE-resume.torrent'}
             accept_all: yes
             torrent_scrub: all
+            disable_builtins: [seen_info_hash]
 
           test_fields:
             mock:
@@ -117,18 +151,18 @@ class TestTorrentScrub(FlexGetBase):
     """
 
     test_cases = (
-        (True, 'test.torrent'), 
-        (False, 'LICENSE.torrent'), 
+        (True, 'test.torrent'),
+        (False, 'LICENSE.torrent'),
         (False, 'LICENSE-resume.torrent'),
     )
     test_files = [i[1] for i in test_cases]
 
     @with_filecopy(test_files, "__tmp__")
     def test_torrent_scrub(self):
-        # Run feed        
+        # Run feed
         self.execute_feed('test_all')
 
-        for clean, filename in self.test_cases: 
+        for clean, filename in self.test_cases:
             original = Torrent.from_file(filename)
             title = os.path.splitext(filename)[0]
 
@@ -148,9 +182,9 @@ class TestTorrentScrub(FlexGetBase):
             # Make sure essentials survived
             assert 'announce' in modified.content
             assert 'info' in modified.content
-            assert 'name' in modified.content['info']  
-            assert 'piece length' in modified.content['info']  
-            assert 'pieces' in modified.content['info']  
+            assert 'name' in modified.content['info']
+            assert 'piece length' in modified.content['info']
+            assert 'pieces' in modified.content['info']
 
             # Check that hashes have changed accordingly
             if clean:
@@ -158,15 +192,15 @@ class TestTorrentScrub(FlexGetBase):
                 assert original.get_info_hash() == modified.get_info_hash(), 'info dict changed in ' + filename
             else:
                 assert osize > msize, "Filesizes must be different!"
-                assert original.get_info_hash() != modified.get_info_hash(), filename + " wasn't scrubbed!"  
+                assert original.get_info_hash() != modified.get_info_hash(), filename + " wasn't scrubbed!"
 
             # Check essential keys were scrubbed
             if filename == 'LICENSE.torrent':
-                assert 'x_cross_seed' in original.content['info']  
+                assert 'x_cross_seed' in original.content['info']
                 assert 'x_cross_seed' not in modified.content['info']
 
             if filename == 'LICENSE-resume.torrent':
-                assert 'libtorrent_resume' in original.content  
+                assert 'libtorrent_resume' in original.content
                 assert 'libtorrent_resume' not in modified.content
 
     @with_filecopy(test_files, "__tmp__")
@@ -186,7 +220,7 @@ class TestTorrentScrub(FlexGetBase):
     def test_torrent_scrub_off(self):
         self.execute_feed('test_off')
 
-        for filename in self.test_files: 
+        for filename in self.test_files:
             osize = os.path.getsize(filename)
             msize = os.path.getsize(self.__tmp__ + filename)
             assert osize == msize, "Filesizes aren't supposed to differ (%r %d, %r %d)!" % (

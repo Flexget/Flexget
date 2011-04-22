@@ -316,25 +316,30 @@ class InputRSS(object):
                 from flexget.utils.tools import decode_html
                 ea['title'] = entry.title
 
-                # grab fields
-                fields = ['guid', 'author', 'description']
-                # extend the list of fields to grab from other_fields list in config
-                fields.extend(config.get('other_fields', []))
-                for field in fields:
-                    if field in entry:
-                        if not isinstance(getattr(entry, field), basestring):
+                # Dict with fields to grab mapping from rss field name to FlexGet field name
+                fields = {'guid': 'guid',
+                          'author': 'author',
+                          'description': 'description',
+                          'infohash': 'torrent_info_hash'}
+                # extend the dict of fields to grab with other_fields list in config
+                for field in config.get('other_fields', []):
+                    fields[field] = field
+
+                for rss_field, flexget_field in fields.iteritems():
+                    if rss_field in entry:
+                        if not isinstance(getattr(entry, rss_field), basestring):
                             # Error if this field is not a string
-                            log.error('Cannot grab non text field `%s` from rss.' % field)
+                            log.error('Cannot grab non text field `%s` from rss.' % rss_field)
                             # Remove field from list of fields to avoid repeated error
-                            config['other_fields'].remove(field)
+                            config['other_fields'].remove(rss_field)
                             continue
                         try:
-                            ea[field] = decode_html(entry[field])
-                            if field in config.get('other_fields', []):
+                            ea[flexget_field] = decode_html(entry[rss_field])
+                            if rss_field in config.get('other_fields', []):
                                 # Print a debug message for custom added fields
-                                log.debug('Field `%s` set to `%s` for `%s`' % (field, ea[field], ea['title']))
+                                log.debug('Field `%s` set to `%s` for `%s`' % (rss_field, ea[rss_field], ea['title']))
                         except UnicodeDecodeError:
-                            log.warning('Failed to decode entry `%s` field `%s`' % (ea['title'], field))
+                            log.warning('Failed to decode entry `%s` field `%s`' % (ea['title'], rss_field))
 
                 # store basic auth info
                 if 'username' in config and 'password' in config:

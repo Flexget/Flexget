@@ -1,5 +1,5 @@
 import logging
-from seen import FilterSeen
+from flexget.plugins.filter.seen import FilterSeen
 from flexget.plugin import register_plugin, priority, register_parser_option
 
 log = logging.getLogger('seenmovies')
@@ -66,15 +66,15 @@ class FilterSeenMovies(FilterSeen):
 
     # We run last (-255) to make sure we don't reject duplicates before all the other plugins get a chance to reject.
     @priority(-255)
-    def on_feed_filter(self, feed):
+    def on_feed_filter(self, feed, config):
         # strict method
-        if feed.config['seen_movies'] == 'strict':
+        if config == 'strict':
             for entry in feed.entries:
                 if not 'imdb_url' in entry:
                     log.info('Rejecting %s because of missing imdb url' % entry['title'])
                     feed.reject(entry, 'missing imdb url, strict')
         # call super
-        super(FilterSeenMovies, self).on_feed_filter(feed)
+        super(FilterSeenMovies, self).on_feed_filter(feed, True)
         # check that two copies of a movie have not been accepted this run
         movies = []
         for entry in feed.accepted:
@@ -84,7 +84,7 @@ class FilterSeenMovies(FilterSeen):
                 else:
                     feed.reject(entry, 'already accepted once in feed')
 
-register_plugin(FilterSeenMovies, 'seen_movies')
+register_plugin(FilterSeenMovies, 'seen_movies', api_ver=2)
 register_plugin(RepairSeenMovies, '--repair-seen-movies', builtin=True)
 
 register_parser_option('--repair-seen-movies', action='store_true', dest='repair_seen_movies', default=False,
