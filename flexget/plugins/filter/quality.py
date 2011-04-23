@@ -30,8 +30,7 @@ class FilterQuality(object):
         advanced.accept('list', key='quality').accept('choice').accept_choices(qualities, ignore_case=True)
         return root
 
-    def get_config(self, feed):
-        config = feed.config.get('quality', None)
+    def prepare_config(self, feed, config):
         if not isinstance(config, dict):
             config = {'quality': config}
         if isinstance(config.get('quality'), basestring):
@@ -40,8 +39,8 @@ class FilterQuality(object):
 
     # Run before series and imdb plugins, so correct qualities are chosen
     @priority(130)
-    def on_feed_filter(self, feed):
-        config = self.get_config(feed)
+    def on_feed_filter(self, feed, config):
+        config = self.prepare_config(feed, config)
         for entry in feed.entries:
             if config.get('quality'):
                 if not entry.get('quality') in config['quality']:
@@ -53,4 +52,4 @@ class FilterQuality(object):
                 if config.get('max'):
                     if entry.get('quality') > config['max']:
                         feed.reject(entry, 'quality %s not <= %s' % (entry['quality'], config['max']), remember=True)
-register_plugin(FilterQuality, 'quality')
+register_plugin(FilterQuality, 'quality', api_ver=2)
