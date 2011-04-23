@@ -140,7 +140,7 @@ class ModifySet(object):
                         conf[field] = result
 
         # Do string replacement
-        for field, value in conf.iteritems():
+        for field, value in conf.items():
             if isinstance(value, basestring):
                 logger = log.error if errors else log.debug
                 result = replace_from_entry(value, entry, field, logger, default=None)

@@ -65,14 +65,12 @@ class FilterIf(object):
                 try:
                     # Restrict eval namespace to have no globals and locals only from eval_locals
                     passed = safer_eval(requirement, eval_locals)
-                except ValueError, e:
-                    log.error(e)
-                except SyntaxError, e:
-                    log.exception('There is a syntax error in if statement, traceback follows')
                 except NameError, e:
                     # Extract the name that did not exist
                     missing_field = e.message.split('\'')[1]
                     log.debug('%s does not contain the field %s' % (entry['title'], missing_field))
+                except Exception, e:
+                    log.error('Error occurred in if statement: %r' % e)
                 else:
                     if passed:
                         log.debug('%s matched requirement %s' % (entry['title'], requirement))
