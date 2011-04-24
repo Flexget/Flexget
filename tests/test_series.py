@@ -988,6 +988,42 @@ class TestFromGroup(FlexGetBase):
         assert self.feed.find_entry('accepted', title='Test.14.HDTV-Name')
 
 
+class TestWatched(FlexGetBase):
+
+    __yaml__ = """
+        presets:
+          global:
+            mock:
+              - {title: 'WTest.S02E03.HDTV.XViD-FlexGet'}
+              - {title: 'W2Test.S02E03.HDTV.XViD-FlexGet'}
+        feeds:
+          watched_test:
+            series:
+              - WTest:
+                  watched: S02E04
+              - W2Test:
+                  watched:
+                    season: 3
+                    episode: 1
+          unwatched_test:
+            series:
+              - WTest:
+                  watched: s02e02
+              - W2Test:
+                  watched:
+                    season: 1
+                    episode: 3
+    """
+
+    def test_watched(self):
+        self.execute_feed('watched_test')
+        assert not self.feed.accepted, 'No entries should have been accepted, as they have been watched'
+
+    def test_unwatched(self):
+        self.execute_feed('unwatched_test')
+        assert len(self.feed.accepted) == 2, 'Entries should have been accepted, they are after the watched episode'
+
+
 class TestSeriesPremiere(FlexGetBase):
 
     __yaml__ = """

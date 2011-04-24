@@ -315,13 +315,18 @@ class FilterSeriesBase(object):
         options.accept('regexp_match', key='timeframe', message=message).accept(time_regexp)
         # strict naming
         options.accept('boolean', key='exact')
-        # watched
+        # watched in SXXEXX form
+        watched = options.accept('regexp_match', key='watched')
+        watched.accept('(?i)s\d\de\d\d$', message='Must be in SXXEXX format')
+        # watched in dict form
         watched = options.accept('dict', key='watched')
         watched.accept('integer', key='season')
         watched.accept('integer', key='episode')
         # from group
         options.accept('text', key='from_group')
         options.accept('list', key='from_group').accept('text')
+        # parse only
+        options.accept('boolean', key='parse_only')
 
     def make_grouped_config(self, config):
         """Turns a simple series list into grouped format with a settings dict"""
@@ -364,6 +369,12 @@ class FilterSeriesBase(object):
                     series_settings = {'path': series_settings}
                 # merge group settings into this series settings
                 merge_dict_from_to(group_settings, series_settings)
+                # Convert to dict if watched is in SXXEXX format
+                if isinstance(series_settings.get('watched'), basestring):
+                    season, episode = series_settings['watched'].upper().split('E')
+                    season = season.lstrip('S')
+                    series_settings['watched'] = {'season': int(season), 'episode': int(episode)}
+
                 group_series.append({series: series_settings})
             config[group_name] = group_series
         del config['settings']
@@ -519,6 +530,9 @@ class FilterSeries(SeriesPlugin, FilterSeriesBase):
 
         for series_item in config:
             series_name, series_config = series_item.items()[0]
+            if series_config.get('parse_only'):
+                log.debug('Skipping filtering of series %s because of parse_only' % series_name)
+                continue
             # yaml loads ascii only as str
             series_name = unicode(series_name)
             # Update database with capitalization from config

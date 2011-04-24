@@ -69,8 +69,9 @@ class InputBacklog(object):
 
     def on_feed_abort(self, feed, config):
         """Remember all entries until next execution when feed gets aborted."""
-        log.debug('Remembering all entries to backlog because of feed abort.')
-        self.learn_backlog(feed)
+        if feed.entries:
+            log.debug('Remembering all entries to backlog because of feed abort.')
+            self.learn_backlog(feed)
 
     def add_backlog(self, feed, entry, amount=''):
         """Add single entry to feed backlog
