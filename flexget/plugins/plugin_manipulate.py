@@ -87,7 +87,7 @@ class Manipulate(object):
                     if match:
                         groups = [x for x in match.groups() if x is not None]
                         log.debug('groups: %s' % groups)
-                        field_value = config.get('separator', ' ').join(groups)
+                        field_value = config.get('separator', ' ').join(groups).strip()
                         log.debug('field `%s` after extract: `%s`' % (field, field_value))
 
                 if 'replace' in config:
@@ -95,7 +95,7 @@ class Manipulate(object):
                         log.warning('Cannot replace, field `%s` is not present' % from_field)
                         continue
                     replace_config = config['replace']
-                    field_value = re.sub(replace_config['regexp'], replace_config['format'], field_value)
+                    field_value = re.sub(replace_config['regexp'], replace_config['format'], field_value).strip()
                     log.debug('field `%s` after replace: `%s`' % (field, field_value))
 
                 entry[field] = field_value

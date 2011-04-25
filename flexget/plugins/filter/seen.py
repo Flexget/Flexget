@@ -284,7 +284,7 @@ class FilterSeen(object):
         return root
 
     @priority(255)
-    def on_feed_filter(self, feed, config):
+    def on_feed_filter(self, feed, config, remember_rejected=False):
         """Filter seen entries"""
         if config is False:
             log.debug('%s is disabled' % self.keyword)
@@ -304,7 +304,8 @@ class FilterSeen(object):
                 found = feed.session.query(SeenField).filter(SeenField.value.in_(values)).first()
                 if found:
                     log.debug("Rejecting '%s' '%s' because of seen '%s'" % (entry['url'], entry['title'], found.value))
-                    feed.reject(entry, 'Entry with %s `%s` is already seen' % (found.field, found.value))
+                    feed.reject(entry, 'Entry with %s `%s` is already seen' % (found.field, found.value),
+                                remember=remember_rejected)
 
     def on_feed_exit(self, feed, config):
         """Remember succeeded entries"""

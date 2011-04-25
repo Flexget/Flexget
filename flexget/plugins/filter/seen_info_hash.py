@@ -23,7 +23,7 @@ class FilterSeenInfoHash(FilterSeen):
         for entry in feed.entries:
             if isinstance(entry.get('torrent_info_hash'), basestring):
                 entry['torrent_info_hash'] = entry['torrent_info_hash'].upper()
-        FilterSeen.on_feed_filter(self, feed, config)
+        FilterSeen.on_feed_filter(self, feed, config, remember_rejected=True)
 
     def on_feed_modify(self, feed, config):
         # Return if we are disabled.
