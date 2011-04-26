@@ -71,16 +71,18 @@ class FilterRegexp(object):
         return conf
 
     def prepare_config(self, config):
-        """
-        Returns the config in standard format
+        """Returns the config in standard format.
 
         All regexps are turned into dictionaries in the form {regexp: options}
-            options is a dict that can (but may not) contain the following keys
-                path: will be attached to entries that match
-                set: a dict of values to be attached to entries that match via set plugin
-                from: a list of fields in entry for the regexps to match against
-                not: a list of regexps that if matching, will disqualify the main match
+
+        Options is a dict that can (but may not) contain the following keys
+        
+            path: will be attached to entries that match
+            set: a dict of values to be attached to entries that match via set plugin
+            from: a list of fields in entry for the regexps to match against
+            not: a list of regexps that if matching, will disqualify the main match
         """
+        
         out_config = {}
         if 'rest' in config:
             out_config['rest'] = config['rest']
@@ -185,6 +187,7 @@ class FilterRegexp(object):
                     if opts.get('path'):
                         entry['path'] = opts['path']
                     if opts.get('set'):
+                        # invoke set plugin with given configuration
                         log.debug('adding set: info to entry:"%s" %s' % (entry['title'], opts['set']))
                         set = get_plugin_by_name('set')
                         set.instance.modify(entry, opts['set'])

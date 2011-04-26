@@ -29,7 +29,7 @@ class RepairSeenMovies(object):
 
         for seen in session.query(SeenField).filter(SeenField.field == u'imdb_url').all():
             index += 1
-            if (index % 5 == 0):
+            if index % 5 == 0:
                 bar.update(index)
             value = u'http://www.imdb.com/title/%s/' % extract_id(seen.value)
             if value != seen.value:

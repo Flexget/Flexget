@@ -4,7 +4,6 @@ from flexget.plugin import register_plugin, register_parser_option, get_plugin_b
 from flexget.utils.cached_input import cached
 import re
 import logging
-import io
 import sys
 
 log = logging.getLogger('tail')
@@ -53,7 +52,7 @@ class InputTail(object):
     Note: each entry must have atleast two fields, title and url
 
     You may wish to specify encoding used by file so file can be properly
-    decoded. List of encodings 
+    decoded. List of encodings
     at http://docs.python.org/library/codecs.html#standard-encodings.
 
     Example:
@@ -97,7 +96,7 @@ class InputTail(object):
 
         filename = os.path.expanduser(feed.config['tail']['file'])
         encoding = feed.config['tail'].get('encoding', None)
-        file = io.open(filename, 'r', encoding=encoding)
+        file = open(filename, 'r')
 
         last_pos = feed.simple_persistence.setdefault(filename, 0)
         if os.path.getsize(filename) < last_pos:
@@ -116,13 +115,14 @@ class InputTail(object):
         entry = Entry()
 
         # now parse text
-        
+
         while True:
-            try:
-                line = file.readline()
-            except ValueError:
-                raise PluginError('Failed to decode file using %s. Check encoding.' % \
-                    (encoding if encoding is not None else sys.getfilesystemencoding()))
+            line = file.readline()
+            if encoding:
+                try:
+                    line = line.decode(encoding)
+                except UnicodeError:
+                    raise PluginError('Failed to decode file using %s. Check encoding.' % encoding)
 
             if not line:
                 feed.simple_persistence.set(filename, file.tell())
