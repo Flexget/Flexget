@@ -2,7 +2,7 @@ import hashlib
 import logging
 from sqlalchemy import Column, Integer, String, Unicode, ForeignKey
 from sqlalchemy.orm import relation
-from flexget.manager import Base
+from flexget.manager import Base, Session
 from flexget.plugin import register_plugin, priority, register_parser_option
 
 log = logging.getLogger('remember_rej')
@@ -41,27 +41,32 @@ class FilterRememberRejected(object):
         feed.reject(entry, 'message', remember=True)
     """
 
-    # This runs at the beginning of metainfo phase to avoid re-parsing metainfo for entries that will be rejected
-    @priority(255)
-    def on_feed_metainfo(self, feed):
+    def on_process_start(self, feed, config):
         """Purge remembered entries if the config has changed and write new hash"""
-
+        # No session on process start, make our own
+        session = Session()
         # Generate hash for current config
         config_hash = hashlib.md5(str(feed.config.items())).hexdigest()
         # See if the feed has the same hash as last run
-        old_feed = feed.session.query(RememberFeed).filter(RememberFeed.name == feed.name).first()
+        old_feed = session.query(RememberFeed).filter(RememberFeed.name == feed.name).first()
         if old_feed and (old_feed.hash != config_hash or feed.manager.options.forget_rejected):
             if feed.manager.options.forget_rejected:
                 log.info('Forgetting previous rejections.')
             else:
-                log.debug('Config has changed since last run, purging remembered entries.')
-            feed.session.delete(old_feed)
-            feed.session.flush()
+                log.verbose('Config has changed since last run, purging remembered entries.')
+            session.delete(old_feed)
             old_feed = None
         if not old_feed:
-            feed.session.add(RememberFeed(name=feed.name, hash=config_hash))
-            feed.session.flush()
-        else:
+            # Create this feed in the db if not present
+            session.add(RememberFeed(name=feed.name, hash=config_hash))
+        session.commit()
+
+    # This runs at the beginning of metainfo phase to avoid re-parsing metainfo for entries that will be rejected
+    @priority(255)
+    def on_feed_metainfo(self, feed, config):
+        """Reject any remembered entries from previous runs"""
+        old_feed = feed.session.query(RememberFeed).filter(RememberFeed.name == feed.name).first()
+        if old_feed:
             # Reject all the remembered entries
             for entry in feed.entries:
                 for old_entry in old_feed.entries:
@@ -86,6 +91,6 @@ class FilterRememberRejected(object):
         feed.session.flush()
 
 
-register_plugin(FilterRememberRejected, 'remember_rejected', builtin=True)
+register_plugin(FilterRememberRejected, 'remember_rejected', builtin=True, api_ver=2)
 register_parser_option('--forget-rejected', action='store_true', dest='forget_rejected',
                        help='Forget all previous rejections so entries can be processed again.')
