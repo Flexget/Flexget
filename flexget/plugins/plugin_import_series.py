@@ -42,7 +42,7 @@ class ImportSeries(FilterSeriesBase):
                     # If a root validator is returned, grab the list of child validators
                     from_section.valid[plugin.name] = validator.valid
                 else:
-                    from_section.valid[plugin.name] = [plugin.instance.validator()]
+                    from_section.valid[plugin.name] = [validator]
             else:
                 from_section.valid[plugin.name] = [validator.factory('any')]
         return root
@@ -61,19 +61,18 @@ class ImportSeries(FilterSeriesBase):
                 log.warning('Input %s did not return anything' % input_name)
                 continue
 
-            series_names = [x['title'] for x in result]
-            series = set.union(series, set(series_names))
+            series.update([x['title'] for x in result])
 
         if not series:
             log.info('Did not get any series to generate series configuration')
             return
 
-        series_config = {}
+        # Make a series config with the found series
+        series_config = {'generated_series': list(series)}
+        # If options were specified, add them to the series config
         if 'settings' in config:
-            series_config.setdefault('settings', {})
-            series_config['settings'].setdefault('generated_series', config['settings'])
-        series_config.setdefault('generated_series', list(series))
-
+            series_config['settings'] = {'generated_series': config['settings']}
+        # Merge our series config in with the base series config
         self.merge_config(feed, series_config)
 
 

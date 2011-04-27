@@ -1,7 +1,7 @@
 import hashlib
 import logging
-from sqlalchemy import Column, Integer, String, Unicode, ForeignKey
-from sqlalchemy.orm import relation
+from sqlalchemy import Column, Integer, String, Unicode, ForeignKey, and_
+from sqlalchemy.orm import relation, join
 from flexget.manager import Base, Session
 from flexget.plugin import register_plugin, priority, register_parser_option
 
@@ -65,13 +65,18 @@ class FilterRememberRejected(object):
     @priority(255)
     def on_feed_metainfo(self, feed, config):
         """Reject any remembered entries from previous runs"""
-        old_feed = feed.session.query(RememberFeed).filter(RememberFeed.name == feed.name).first()
-        if old_feed:
+        (feed_id,) = feed.session.query(RememberFeed.id).filter(RememberFeed.name == feed.name).first()
+        reject_entries = feed.session.query(RememberEntry).filter(RememberEntry.feed_id == feed_id)
+        if reject_entries.count():
             # Reject all the remembered entries
             for entry in feed.entries:
-                for old_entry in old_feed.entries:
-                    if entry['title'] == old_entry.title and entry.get('original_url') == old_entry.url:
-                        feed.reject(entry, 'Rejected by %s plugin on a previous run' % old_entry.rejected_by)
+                if not entry.get('url'):
+                    # We don't record or reject any entries without url
+                    continue
+                reject_entry = reject_entries.filter(and_(RememberEntry.title == entry['title'],
+                                                          RememberEntry.url == entry['url'])).first()
+                if reject_entry:
+                    feed.reject(entry, 'Rejected by %s plugin on a previous run' % reject_entry.rejected_by)
 
     def on_entry_reject(self, feed, entry, remember=None, **kwargs):
         # We only remember rejections that specify the remember keyword argument

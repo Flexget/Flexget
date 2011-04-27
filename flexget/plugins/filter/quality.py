@@ -44,12 +44,12 @@ class FilterQuality(object):
         for entry in feed.entries:
             if config.get('quality'):
                 if not entry.get('quality') in config['quality']:
-                    feed.reject(entry, 'quality is %s' % entry['quality'], remember=True)
+                    feed.reject(entry, 'quality is %s' % entry['quality'])
             else:
                 if config.get('min'):
                     if entry.get('quality') < config['min']:
-                        feed.reject(entry, 'quality %s not >= %s' % (entry['quality'], config['min']), remember=True)
+                        feed.reject(entry, 'quality %s not >= %s' % (entry['quality'], config['min']))
                 if config.get('max'):
                     if entry.get('quality') > config['max']:
-                        feed.reject(entry, 'quality %s not <= %s' % (entry['quality'], config['max']), remember=True)
+                        feed.reject(entry, 'quality %s not <= %s' % (entry['quality'], config['max']))
 register_plugin(FilterQuality, 'quality', api_ver=2)

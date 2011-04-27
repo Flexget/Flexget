@@ -76,13 +76,13 @@ class FilterRegexp(object):
         All regexps are turned into dictionaries in the form {regexp: options}
 
         Options is a dict that can (but may not) contain the following keys
-        
+
             path: will be attached to entries that match
             set: a dict of values to be attached to entries that match via set plugin
             from: a list of fields in entry for the regexps to match against
             not: a list of regexps that if matching, will disqualify the main match
         """
-        
+
         out_config = {}
         if 'rest' in config:
             out_config['rest'] = config['rest']
@@ -130,8 +130,7 @@ class FilterRegexp(object):
             rest_method = feed.accept if config['rest'] == 'accept' else feed.reject
             for entry in rest:
                 log.debug('Rest method %s for %s' % (config['rest'], entry['title']))
-                # The remember keyword causes the remember_rejected plugin to filter this next time
-                rest_method(entry, 'regexp `rest`', remember=True)
+                rest_method(entry, 'regexp `rest`')
 
     def matches(self, entry, regexp, find_from=None, not_regexps=None):
         """Check if :entry: has any string fields or strings in a list field that match :regexp:.
@@ -191,7 +190,7 @@ class FilterRegexp(object):
                         log.debug('adding set: info to entry:"%s" %s' % (entry['title'], opts['set']))
                         set = get_plugin_by_name('set')
                         set.instance.modify(entry, opts['set'])
-                    method(entry, matchtext, remember=True)
+                    method(entry, matchtext)
                     # We had a match so break out of the regexp loop.
                     break
             else:
