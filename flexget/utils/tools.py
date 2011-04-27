@@ -203,7 +203,7 @@ class SmartRedirectHandler(urllib2.HTTPRedirectHandler):
         return result
 
 
-def urlopener(url, log, **kwargs):
+def     urlopener(url, log, **kwargs):
     """Utility function for pulling back a url, with a retry of 3 times, increasing the timeout, etc.
     Should be grabbing all urls this way eventually, to keep error handling code in the same place."""
 
@@ -229,7 +229,11 @@ def urlopener(url, log, **kwargs):
             try:
                 retrieved = opener(url)
             except urllib2.HTTPError, e:
-                log.debug('HTTP error (try %i/3): %s' % (i + 1, str(e.code)))
+                if e.code < 500:
+                    # If it was not a server error, don't keep retrying.
+                    log.warning('Could not retrieve url (HTTP %s error): %s' % (e.code, url))
+                    raise
+                log.debug('HTTP error (try %i/3): %s' % (i + 1, e.code))
             except urllib2.URLError, e:
                 if hasattr(e, 'reason'):
                     reason = str(e.reason)
@@ -317,9 +321,9 @@ def make_valid_path(path):
 
 def console(text):
     """Safe print to console."""
-    
+
     if isinstance(text, str):
         print text
         return
-        
+
     print unicode(text).encode('utf8')

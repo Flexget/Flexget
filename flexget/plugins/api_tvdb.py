@@ -326,7 +326,7 @@ def lookup_episode(name=None, seasonnum=None, episodenum=None, tvdb_id=None, onl
                     series.episodes.append(episode)
                     session.merge(series)
         except URLError, e:
-            raise LookupError('Error looking up movie from TVDb (%s)' % e)
+            raise LookupError('Error looking up episode from TVDb (%s)' % e)
         else:
             session.commit()
     if episode:
