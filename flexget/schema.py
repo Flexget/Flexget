@@ -50,7 +50,7 @@ def set_version(plugin, version):
                 raise ValueError('Tried to set plugin %s schema version to lower value' % plugin)
             if version != schema.version:
                 log.debug('updating plugin %s schema version to %i' % (plugin, version))
-                schema.version(version)
+                schema.version = version
         session.commit()
     finally:
         session.close()
@@ -61,22 +61,29 @@ def versioned_base(schema_name, schema_version):
 
     class Meta(type):
 
-        def __new__(cls, classname, bases, dict_):
-            # Only work on subclasses of VersionedBase, not VersionedBase itself
-            if classname != 'VersionedBase':
+        def __new__(mcs, metaname, bases, dict_):
+            """This gets called when a class that subclasses VersionedBase is defined."""
+            if '__tablename__' in dict_:
                 # Record the table name to schema version mapping
                 global table_schemas
-                if '__tablename__' in dict_:
-                    table_schemas[dict_['__tablename__']] = (schema_name, schema_version)
-                # Make sure this class also inherits from Base
+                table_schemas[dict_['__tablename__']] = (schema_name, schema_version)
+                # Make sure the resulting class also inherits from Base
                 bases = (Base,) + bases
 
-                # The metaclass for a class must inherit from the metaclass of all subclasses
-                class cls(type(Base), cls):
+                # Since Base and VersionedBase have 2 different metaclasses, a class that subclasses both of them
+                # must have a metaclass that subclasses both of their metaclasses.
+
+                class mcs(type(Base), mcs):
                     pass
-            return type.__new__(cls, classname, bases, dict_)
+            return type.__new__(mcs, metaname, bases, dict_)
+
+        def __getattr__(self, item):
+            """Transparently return attributes of Base instead of our own."""
+            return getattr(Base, item)
 
     class VersionedBase(object):
+        """Subclassing this class causes your table names to be registered into the schema registry,
+        as well as causing your class to also subclass Base."""
         __metaclass__ = Meta
 
     return VersionedBase
