@@ -3,12 +3,13 @@ from sqlalchemy.types import Unicode
 from flexget import schema
 from flexget.event import event
 from flexget.feed import Entry
-from flexget.manager import Base, Session
+from flexget.manager import Session
 from flexget.plugin import register_plugin, priority, PluginError
 from datetime import datetime, timedelta
 from sqlalchemy import Column, Integer, String, DateTime, PickleType
 
 log = logging.getLogger('delay')
+Base = schema.versioned_base('delay', 1)
 
 
 class DelayedEntry(Base):
@@ -30,7 +31,7 @@ class DelayedEntry(Base):
 @event('manager.upgrade')
 def upgrade(manager):
     ver = schema.get_version('delay')
-    if ver == 0:
+    if ver is None:
         log.info('Fixing delay table from erroneous data ...')
         session = Session()
         try:

@@ -1,9 +1,11 @@
+import logging
 from flexget.manager import Base, Session
 from sqlalchemy import Column, Integer, String
-from sqlalchemy.schema import ForeignKey
-import logging
 
 log = logging.getLogger('schema')
+
+# Stores a mapping of {table_name: (schema_name, schema_version)}
+table_schemas = {}
 
 
 class PluginSchema(Base):
@@ -28,7 +30,7 @@ def get_version(plugin):
         schema = session.query(PluginSchema).filter(PluginSchema.plugin == plugin).first()
         if not schema:
             log.debug('no schema version stored for %s' % plugin)
-            return 0
+            return None
         else:
             return schema.version
     finally:
@@ -52,3 +54,40 @@ def set_version(plugin, version):
         session.commit()
     finally:
         session.close()
+
+
+def versioned_base(schema_name, schema_version):
+    """Returns a class which can be used like Base, but automatically stores schema version when tables are created."""
+
+    class Meta(type):
+
+        def __new__(cls, classname, bases, dict_):
+            # Only work on subclasses of VersionedBase, not VersionedBase itself
+            if classname != 'VersionedBase':
+                # Record the table name to schema version mapping
+                global table_schemas
+                if '__tablename__' in dict_:
+                    table_schemas[dict_['__tablename__']] = (schema_name, schema_version)
+                # Make sure this class also inherits from Base
+                bases = (Base,) + bases
+
+                # The metaclass for a class must inherit from the metaclass of all subclasses
+                class cls(type(Base), cls):
+                    pass
+            return type.__new__(cls, classname, bases, dict_)
+
+    class VersionedBase(object):
+        __metaclass__ = Meta
+
+    return VersionedBase
+
+
+def after_table_create(event, target, bind, tables=None):
+    """Sets the schema version to most recent for a plugin when it's tables are freshly created."""
+    if tables:
+        for table in tables:
+            if table.name in table_schemas:
+                set_version(*table_schemas[table.name])
+
+# Register a listener to be called after tables are created
+Base.metadata.append_ddl_listener('after-create', after_table_create)

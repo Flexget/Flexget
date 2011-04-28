@@ -4,20 +4,20 @@ from flexget.manager import Session
 from flexget.plugin import register_plugin, PluginError, get_plugin_by_name, priority, register_parser_option, register_feed_phase
 from flexget.event import event
 from flexget import schema
-from flexget.manager import Base
-from flexget.utils.imdb import extract_id, ImdbSearch, ImdbParser, log as imdb_log
+from flexget.utils.imdb import extract_id, ImdbSearch, ImdbParser
 from flexget.utils.tools import str_to_boolean, console
 from flexget.utils import qualities
 from sqlalchemy import Column, Integer, String, DateTime, Boolean, Unicode
 from sqlalchemy.exceptions import OperationalError
 
 log = logging.getLogger('imdb_queue')
+Base = schema.versioned_base('imdb_queue', 1)
 
 
 @event('manager.upgrade')
 def upgrade(manager):
     ver = schema.get_version('imdb_queue')
-    if ver == 0:
+    if ver is None:
         log.info('Upgrading imdb queue qualities naming ...')
         session = Session()
         try:
