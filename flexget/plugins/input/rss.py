@@ -88,6 +88,7 @@ class InputRSS(object):
         advanced.accept('file', key='url')
         advanced.accept('text', key='username')
         advanced.accept('text', key='password')
+        advanced.accept('text', key='title')
         advanced.accept('text', key='link')
         advanced.accept('list', key='link').accept('text')
         advanced.accept('list', key='other_fields').accept('text')
@@ -296,11 +297,16 @@ class InputRSS(object):
         ignored = 0
         for entry in rss.entries:
 
+            # Check if title field is overridden in config
+            title_field = config.get('title', 'title')
             # ignore entries without title
-            if not getattr(entry, 'title', None):
+            if not entry.get(title_field):
                 log.debug('skipping entry without title')
                 ignored += 1
                 continue
+
+            # Set the title from the source field
+            entry.title = entry[title_field]
 
             # convert title to ascii (cleanup)
             if config.get('ascii', False):
