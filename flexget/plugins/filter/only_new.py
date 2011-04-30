@@ -22,7 +22,7 @@ class FilterOnlyNew(object):
             return
         log.debug('Rejecting undecided entries so they are not processed next time.')
         for entry in feed.entries[:]:
-            feed.reject(entry, 'Already processed new entry', remember=True)
+            feed.reject(entry, 'Already processed entry', remember=True)
 
 
 register_plugin(FilterOnlyNew, 'only_new')

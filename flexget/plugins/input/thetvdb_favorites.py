@@ -31,6 +31,8 @@ def upgrade(ver, session):
             drop_tables(['thetvdb_favorites'], session)
             # Create new table from the current model
             Base.metadata.create_all(bind=session.bind)
+        ver = 0
+    return ver
 
 
 class ThetvdbFavorites(Base):

@@ -39,6 +39,10 @@ def get_version(plugin):
 
 
 def set_version(plugin, version):
+    if plugin not in plugin_schemas:
+        raise ValueError('Tried to set schema version for %s plugin with no versioned_base.' % plugin)
+    if version > plugin_schemas[plugin]['version']:
+        raise ValueError('Tried to set %s plugin schema version higher than defined in versioned_base.' % plugin)
     session = Session()
     try:
         schema = session.query(PluginSchema).filter(PluginSchema.plugin == plugin).first()
@@ -73,16 +77,16 @@ def upgrade(plugin):
             session = Session()
             try:
                 new_ver = func(ver, session)
-            except Exception:
-                log.critical('Failed to upgrade database for plugin %s' % plugin)
-                raise
-            else:
                 if new_ver > ver:
-                    session.commit()
                     set_version(plugin, new_ver)
+                    session.commit()
                 elif new_ver < ver:
-                    log.critical('A lower schema version was returned (%s) from the upgrade function '
-                                 'than passed in (%s)' % (new_ver, ver))
+                    log.critical('A lower schema version was returned (%s) from the %s upgrade function '
+                                 'than passed in (%s)' % (new_ver, plugin, ver))
+                    manager.disable_feeds()
+            except Exception:
+                log.exception('Failed to upgrade database for plugin %s' % plugin)
+                manager.disable_feeds()
             finally:
                 session.close()
 

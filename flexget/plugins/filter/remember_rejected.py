@@ -8,7 +8,7 @@ from flexget.plugin import register_plugin, priority, register_parser_option
 from flexget.utils.sqlalchemy_utils import table_columns, drop_tables
 
 log = logging.getLogger('remember_rej')
-Base = schema.versioned_base('remember_rejected', 0)
+Base = schema.versioned_base('remember_rejected', 1)
 
 
 @schema.upgrade('remember_rejected')
@@ -21,7 +21,15 @@ def upgrade(ver, session):
             drop_tables(['remember_rejected_entry'], session)
             # Create new table from the current model
             Base.metadata.create_all(bind=session.bind)
-        ver = 0
+            # We go directly to version 1, as remember_rejected_entries table has just been made from current model
+            # TODO: Fix this somehow. Just avoid dropping tables?
+            ver = 1
+        else:
+            ver = 0
+    if ver is 0:
+        log.info('Adding reason column to remember_rejected_entry table.')
+        session.execute('ALTER TABLE remember_rejected_entry ADD reason VARCHAR')
+        ver = 1
     return ver
 
 
@@ -44,6 +52,7 @@ class RememberEntry(Base):
     title = Column(Unicode)
     url = Column(String)
     rejected_by = Column(String)
+    reason = Column(String)
 
     feed_id = Column(Integer, ForeignKey('remember_rejected_feeds.id'), nullable=False)
 
@@ -93,7 +102,8 @@ class FilterRememberRejected(object):
                 reject_entry = reject_entries.filter(and_(RememberEntry.title == entry['title'],
                                                           RememberEntry.url == entry['url'])).first()
                 if reject_entry:
-                    feed.reject(entry, 'Rejected by %s plugin on a previous run' % reject_entry.rejected_by)
+                    feed.reject(entry, 'Rejected by %s plugin on a previous run: %s' %
+                                       (reject_entry.rejected_by, reject_entry.reason))
 
     def on_entry_reject(self, feed, entry, remember=None, **kwargs):
         # We only remember rejections that specify the remember keyword argument
@@ -108,7 +118,7 @@ class FilterRememberRejected(object):
         log.info('Remembering rejection of `%s`' % entry['title'])
         remember_feed = feed.session.query(RememberFeed).filter(RememberFeed.name == feed.name).first()
         remember_feed.entries.append(RememberEntry(title=entry['title'], url=entry['original_url'],
-                                                   rejected_by=feed.current_plugin))
+                                                   rejected_by=feed.current_plugin, reason=kwargs.get('reason')))
         feed.session.merge(remember_feed)
         feed.session.flush()
 
