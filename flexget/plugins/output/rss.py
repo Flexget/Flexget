@@ -1,17 +1,30 @@
 import logging
 import datetime
+from flexget.utils.sqlalchemy_utils import table_columns
 import os
-from flexget.plugin import register_plugin, PluginWarning
-from flexget.manager import Base
 from sqlalchemy import Column, Integer, String, DateTime
+from flexget import schema
+from flexget.plugin import register_plugin, PluginWarning
 
 log = logging.getLogger('make_rss')
+Base = schema.versioned_base('make_rss', 0)
 
 rss2gen = True
 try:
     import PyRSS2Gen
 except:
     rss2gen = False
+
+
+@schema.upgrade('make_rss')
+def upgrade(ver, session):
+    if ver is None:
+        columns = table_columns('make_rss', session)
+        if not 'rsslink' in columns:
+            log.info('Adding rsslink column to table make_rss.')
+            session.execute('ALTER TABLE make_rss ADD rsslink VARCHAR')
+        ver = 0
+    return ver
 
 
 class RSSEntry(Base):

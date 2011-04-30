@@ -1,13 +1,17 @@
 import logging
+from datetime import datetime, timedelta
 from optparse import SUPPRESS_HELP
-from flexget.plugin import register_plugin, register_parser_option, priority, internet, PluginError, PluginWarning
-from flexget.manager import Base, Session
-from flexget.utils.log import log_once
-from flexget.utils.imdb import ImdbSearch, ImdbParser, extract_id
+from flexget.utils.sqlalchemy_utils import table_columns
 from sqlalchemy import Table, Column, Integer, Float, String, Unicode, Boolean, DateTime
 from sqlalchemy.schema import ForeignKey
 from sqlalchemy.orm import relation, joinedload_all
-from datetime import datetime, timedelta
+from flexget import schema
+from flexget.plugin import register_plugin, register_parser_option, priority, internet, PluginError, PluginWarning
+from flexget.manager import Session
+from flexget.utils.log import log_once
+from flexget.utils.imdb import ImdbSearch, ImdbParser, extract_id
+
+Base = schema.versioned_base('imdb_lookup', 0)
 
 # association tables
 genres_table = Table('imdb_movie_genres', Base.metadata,
@@ -120,6 +124,24 @@ class SearchResult(Base):
 log = logging.getLogger('imdb_lookup')
 
 
+@schema.upgrade('imdb_lookup')
+def upgrade(ver, session):
+    if ver is None:
+        columns = table_columns('imdb_movies', session)
+        if not 'photo' in columns:
+            log.info('Adding photo column to imdb_movies table.')
+            session.execute('ALTER TABLE imdb_movies ADD photo VARCHAR')
+        if not 'updated' in columns:
+            log.info('Adding updated column to imdb_movies table.')
+            session.execute('ALTER TABLE imdb_movies ADD updated DateTime')
+        if not 'mpaa_rating' in columns:
+            log.info('Adding mpaa_rating column to imdb_movies table.')
+            session.execute('ALTER TABLE imdb_movies ADD mpaa_rating VARCHAR')
+        session.commit()
+        ver = 0
+    return ver
+
+
 class ImdbLookup(object):
     """
         Retrieves imdb information for entries.
@@ -159,8 +181,7 @@ class ImdbLookup(object):
         elif 'title' in entry:
             log.debug('lookup for %s' % entry['title'])
         else:
-            log.error('looking up IMDB for entry failed, no title, imdb_url or imdb_id passed.')
-            return
+            raise PluginError('looking up IMDB for entry failed, no title, imdb_url or imdb_id passed.')
 
         take_a_break = False
         session = Session()
@@ -294,7 +315,7 @@ class ImdbLookup(object):
                     movie = Movie()
                     movie.url = entry['imdb_url']
                     session.add(movie)
-                    raise PluginWarning('UnicodeDecodeError')
+                    raise PluginError('UnicodeDecodeError')
                 except ValueError, e:
                     # TODO: might be a little too broad catch, what was this for anyway? ;P
                     if feed.manager.options.debug:

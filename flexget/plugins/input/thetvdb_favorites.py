@@ -4,10 +4,11 @@ import re
 from datetime import datetime, timedelta
 from BeautifulSoup import BeautifulStoneSoup
 from sqlalchemy import Column, Integer, Unicode, DateTime, String
+from flexget import schema
 from flexget.plugin import register_plugin, internet, DependencyError
-from flexget.manager import Base, Session
 from flexget.utils.tools import urlopener
 from flexget.utils.database import pipe_list_synonym, with_session
+from flexget.utils.sqlalchemy_utils import drop_tables, table_columns
 from flexget.feed import Entry
 
 try:
@@ -17,6 +18,19 @@ except ImportError:
                           message='thetvdb_lookup requires the `api_tvdb` plugin')
 
 log = logging.getLogger('thetvdb_favorites')
+Base = schema.versioned_base('thetvdb_favorites', 0)
+
+
+@schema.upgrade('thetvdb_favorites')
+def upgrade(ver, session):
+    if ver is None:
+        columns = table_columns('thetvdb_favorites', session)
+        if not 'series_ids' in columns:
+            # Drop the old table
+            log.info('Dropping old version of thetvdb_favorites table from db')
+            drop_tables(['thetvdb_favorites'], session)
+            # Create new table from the current model
+            Base.metadata.create_all(bind=session.bind)
 
 
 class ThetvdbFavorites(Base):

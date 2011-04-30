@@ -28,26 +28,19 @@ class DelayedEntry(Base):
 # TODO: index "feed, title" and "expire, feed"
 
 
-@event('manager.upgrade')
-def upgrade(manager):
-    ver = schema.get_version('delay')
+@schema.upgrade('delay')
+def upgrade(ver, session):
     if ver is None:
         log.info('Fixing delay table from erroneous data ...')
-        session = Session()
-        try:
-            all = session.query(DelayedEntry).all()
-            for de in all:
-                for key, value in de.entry.iteritems():
-                    if not isinstance(value, (basestring, bool, int, float, list, dict)):
-                        log.warning('Removing `%s` with erroneous data' % de.title)
-                        session.delete(de)
-                        break
-            session.commit()
-        finally:
-            session.close()
+        all = session.query(DelayedEntry).all()
+        for de in all:
+            for key, value in de.entry.iteritems():
+                if not isinstance(value, (basestring, bool, int, float, list, dict)):
+                    log.warning('Removing `%s` with erroneous data' % de.title)
+                    session.delete(de)
+                    break
         ver = 1
-    # save updated schema version number
-    schema.set_version('delay', ver)
+    return ver
 
 
 class FilterDelay(object):

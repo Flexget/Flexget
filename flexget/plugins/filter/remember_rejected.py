@@ -1,11 +1,28 @@
 import hashlib
 import logging
 from sqlalchemy import Column, Integer, String, Unicode, ForeignKey, and_
-from sqlalchemy.orm import relation, join
-from flexget.manager import Base, Session
+from sqlalchemy.orm import relation
+from flexget import schema
+from flexget.manager import Session
 from flexget.plugin import register_plugin, priority, register_parser_option
+from flexget.utils.sqlalchemy_utils import table_columns, drop_tables
 
 log = logging.getLogger('remember_rej')
+Base = schema.versioned_base('remember_rejected', 0)
+
+
+@schema.upgrade('remember_rejected')
+def upgrade(ver, session):
+    if ver is None:
+        columns = table_columns('remember_rejected_entry', session)
+        if 'uid' in columns:
+            # Drop the old table
+            log.info('Dropping old version of remember_rejected_entry table from db')
+            drop_tables(['remember_rejected_entry'], session)
+            # Create new table from the current model
+            Base.metadata.create_all(bind=session.bind)
+        ver = 0
+    return ver
 
 
 class RememberFeed(Base):

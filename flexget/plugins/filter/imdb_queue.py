@@ -2,11 +2,11 @@ import logging
 import datetime
 from flexget.manager import Session
 from flexget.plugin import register_plugin, PluginError, get_plugin_by_name, priority, register_parser_option, register_feed_phase
-from flexget.event import event
 from flexget import schema
+from flexget.utils import qualities
 from flexget.utils.imdb import extract_id, ImdbSearch, ImdbParser
 from flexget.utils.tools import str_to_boolean, console
-from flexget.utils import qualities
+from flexget.utils.sqlalchemy_utils import table_columns
 from sqlalchemy import Column, Integer, String, DateTime, Boolean, Unicode
 from sqlalchemy.exceptions import OperationalError
 
@@ -14,24 +14,22 @@ log = logging.getLogger('imdb_queue')
 Base = schema.versioned_base('imdb_queue', 1)
 
 
-@event('manager.upgrade')
-def upgrade(manager):
-    ver = schema.get_version('imdb_queue')
+@schema.upgrade('imdb_queue')
+def upgrade(ver, session):
     if ver is None:
+        # Add the title column if needed
+        columns = table_columns('imdb_queue', session)
+        if not 'title' in columns:
+            log.info('Adding title column to imdb_queue table.')
+            session.execute('ALTER TABLE imdb_queue ADD title VARCHAR')
         log.info('Upgrading imdb queue qualities naming ...')
-        session = Session()
-        try:
-            for queued in session.query(ImdbQueue).all():
-                if queued.quality in ('720p', '720'):
-                    queued.quality = '720p bluray'
-                if queued.quality in ('1080p', '1080'):
-                    queued.quality = '1080p bluray'
-            session.commit()
-        finally:
-            session.close()
+        for queued in session.query(ImdbQueue).all():
+            if queued.quality in ('720p', '720'):
+                queued.quality = '720p bluray'
+            if queued.quality in ('1080p', '1080'):
+                queued.quality = '1080p bluray'
         ver = 1
-    # save updated schema version number
-    schema.set_version('imdb_queue', ver)
+    return ver
 
 
 class QueueError(Exception):

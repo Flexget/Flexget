@@ -1,8 +1,10 @@
+from sqlalchemy.schema import Table, MetaData
+from sqlalchemy.exceptions import NoSuchTableError
+
+
 def table_exists(name, session):
     """Hack, return True if table_name exists """
 
-    from sqlalchemy.exceptions import NoSuchTableError
-    from sqlalchemy import Table, MetaData
     try:
         meta = MetaData(bind=session.connection())
         Table(name, meta, autoload=True, autoload_with=session.connection())
@@ -14,8 +16,6 @@ def table_exists(name, session):
 def table_schema(name, session):
     """Hack, return table schema"""
 
-    from sqlalchemy.exceptions import NoSuchTableError
-    from sqlalchemy import Table, MetaData
     try:
         meta = MetaData(bind=session.connection())
         reflect = Table(name, meta, autoload=True, autoload_with=session.connection())
@@ -36,3 +36,11 @@ def table_columns(name, session):
     for column in schema.columns:
         res.append(column.name)
     return res
+
+
+def drop_tables(names, session):
+    """Takes a list of table names and drops them from the database if they exist."""
+    metadata = MetaData(bind=session.bind, reflect=True)
+    for table in metadata.sorted_tables:
+        if table.name in names:
+            table.drop()

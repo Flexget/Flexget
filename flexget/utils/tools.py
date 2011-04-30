@@ -203,7 +203,7 @@ class SmartRedirectHandler(urllib2.HTTPRedirectHandler):
         return result
 
 
-def     urlopener(url, log, **kwargs):
+def urlopener(url, log, **kwargs):
     """Utility function for pulling back a url, with a retry of 3 times, increasing the timeout, etc.
     Should be grabbing all urls this way eventually, to keep error handling code in the same place."""
 

@@ -1,22 +1,45 @@
 import logging
-from flexget.utils.sqlalchemy_utils import table_columns
 import re
 from copy import copy
 from datetime import datetime, timedelta
 from sqlalchemy import Column, Integer, String, Unicode, DateTime, Boolean, desc, func
 from sqlalchemy.schema import ForeignKey
 from sqlalchemy.orm import relation, join, synonym
+from flexget import schema
 from flexget.utils.log import log_once
 from flexget.event import event
 from flexget.utils.titles import SeriesParser, ParseWarning
 from flexget.utils import qualities
+from flexget.utils.sqlalchemy_utils import table_columns, table_exists, drop_tables
 from flexget.utils.tools import merge_dict_from_to
-from flexget.manager import Base, Session
+from flexget.manager import Session
 from flexget.plugin import register_plugin, register_parser_option, get_plugin_by_name, get_plugin_keywords, \
     PluginWarning, PluginError, DependencyError, priority
 
 
 log = logging.getLogger('series')
+Base = schema.versioned_base('series', 0)
+
+
+@schema.upgrade('series')
+def upgrade(ver, session):
+    if ver is None:
+        if table_exists('episode_qualities', session):
+            log.info('Series database format is too old to upgrade, dropping and recreating tables.')
+            # Drop the deprecated data
+            drop_tables(['series', 'series_episodes', 'episode_qualities'], session)
+            # Create new tables from the current models
+            Base.metadata.create_all(bind=session.bind)
+        # Upgrade episode_releases table to have a proper count and seed it with appropriate numbers
+        columns = table_columns('episode_releases', session)
+        if not 'proper_count' in columns:
+            log.info('Upgrading episode_release table to have proper_count column')
+            session.execute('ALTER TABLE episode_releases ADD proper_count INTEGER DEFAULT NULL')
+            for release in session.query(Release).all():
+                release.proper_count = len([part for part in re.split('[\W_]+', release.title.lower())
+                                            if part in SeriesParser.propers])
+        ver = 0
+    return ver
 
 
 class Series(Base):
@@ -106,14 +129,6 @@ class Release(Base):
 def repair(manager):
     """Perform database repairing and upgrading at startup."""
     session = Session()
-    # Upgrade episode_releases table to have a proper count and seed it with appropriate numbers
-    columns = table_columns('episode_releases', session)
-    if not 'proper_count' in columns:
-        log.info('Upgrading episode_release table to have proper_count column')
-        session.execute('ALTER TABLE episode_releases ADD proper_count INTEGER DEFAULT NULL')
-        for release in session.query(Release).all():
-            release.proper_count = len([part for part in re.split('[\W_]+', release.title.lower())
-                                        if part in SeriesParser.propers])
     # For some reason at least I have some releases in database which don't belong to any episode.
     for release in session.query(Release).filter(Release.episode == None).all():
         log.info('Purging orphan release %s from database' % release.title)
