@@ -123,6 +123,7 @@ class DelugePlugin(object):
 try:
     from twisted.internet import reactor
     from deluge.ui.client import client
+    from deluge.ui.common import get_localhost_auth
 
     class DelugePlugin(DelugePlugin):
 
@@ -142,6 +143,15 @@ try:
 
         def connect(self, feed, config):
             """Connects to the deluge daemon and runs on_connect_success """
+
+            if config['host'] in ['localhost', '127.0.0.1'] and not config.get('user'):
+                # If an user is not specified, we have to do a lookup for the localclient username/password
+                auth = get_localhost_auth()
+                if auth[0]:
+                    config['user'], config['pass'] = auth
+                else:
+                    raise PluginError('Unable to get local authentication info for Deluge. '
+                                      'You may need to specify an username and password from your Deluge auth file.')
 
             client.set_disconnect_callback(self.on_disconnect)
 
@@ -301,9 +311,7 @@ class OutputDeluge(DelugePlugin):
 
     @priority(120)
     def on_process_start(self, feed, config):
-        """
-            Register the usable set: keywords. Detect what version of deluge is loaded.
-        """
+        """Register the usable set: keywords. Detect what version of deluge is loaded."""
         set_plugin = get_plugin_by_name('set')
         set_plugin.instance.register_keys({'path': 'text', 'movedone': 'text', \
             'queuetotop': 'boolean', 'label': 'text', 'automanaged': 'boolean', \
