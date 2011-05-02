@@ -1,5 +1,6 @@
 from datetime import datetime
 from sqlalchemy.orm import synonym
+from flexget.feed import Entry
 from flexget.manager import Session
 
 
@@ -46,5 +47,21 @@ def text_date_synonym(name):
             setattr(self, name, datetime.strptime(value, '%Y-%m-%d'))
         else:
             setattr(self, name, value)
+
+    return synonym(name, descriptor=property(getter, setter))
+
+
+def entry_synonym(name):
+    """Sanitizes entries before storing them to database, so they can be loaded again even after code changes."""
+
+    def getter(self):
+        return Entry(getattr(self, name))
+
+    def setter(self, entry):
+        entry_fields = {}
+        for field, value in entry.iteritems():
+            if isinstance(value, (basestring, bool, int, float, list, dict)):
+                entry_fields[field] = value
+        setattr(self, name, entry_fields)
 
     return synonym(name, descriptor=property(getter, setter))

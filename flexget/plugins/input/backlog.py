@@ -1,11 +1,31 @@
 import logging
+import pickle
 from datetime import datetime, timedelta
 from sqlalchemy import Column, Integer, String, DateTime, PickleType
-from flexget.manager import Base, Session
-from flexget.feed import Entry
+from flexget import schema
+from flexget.manager import Session
 from flexget.plugin import register_plugin, priority, PluginWarning
+from flexget.utils.database import entry_synonym
+from flexget.utils.sqlalchemy_utils import table_schema
 
 log = logging.getLogger('backlog')
+Base = schema.versioned_base('backlog', 0)
+
+
+@schema.upgrade('backlog')
+def upgrade(ver, session):
+    if ver is None:
+        # Make sure there is no data we can't load in the backlog table
+        try:
+            backlog_table = table_schema('backlog', session)
+            for item in session.query('entry').select_from(backlog_table).all():
+                pickle.loads(item.entry)
+        except ImportError:
+            # If there were problems, we can drop the data.
+            log.info('Backlog table contains unloadable data, clearing old data.')
+            session.execute(backlog_table.delete())
+        ver = 0
+    return ver
 
 
 class BacklogEntry(Base):
@@ -16,7 +36,8 @@ class BacklogEntry(Base):
     feed = Column(String)
     title = Column(String)
     expire = Column(DateTime)
-    entry = Column(PickleType(mutable=False))
+    _entry = Column('entry', PickleType(mutable=False))
+    entry = entry_synonym('_entry')
 
     def __repr__(self):
         return '<BacklogEntry(title=%s)>' % (self.title)
@@ -77,14 +98,12 @@ class InputBacklog(object):
         """Add single entry to feed backlog
 
         If :amount: is not specified, entry will only be injected on next execution."""
-        # Use the input snapshot unless we are in the input phase
-        if feed.current_phase == 'input':
-            snapshot = dict(entry)
-        else:
-            snapshot = entry.snapshots.get('after_input')
+        snapshot = entry.snapshots.get('after_input')
         if not snapshot:
-            log.warning('No input snapshot available for `%s`, using current state' % entry['title'])
-            snapshot = dict(entry)
+            if feed.current_phase != 'input':
+                # Not having a snapshot is normal during input phase, don't display a warning
+                log.warning('No input snapshot available for `%s`, using current state' % entry['title'])
+            snapshot = entry
         session = Session()
         expire_time = datetime.now() + self.get_amount(amount)
         backlog_entry = session.query(BacklogEntry).filter(BacklogEntry.title == entry['title']).\
@@ -114,7 +133,7 @@ class InputBacklog(object):
         entries = []
         feed_backlog = feed.session.query(BacklogEntry).filter(BacklogEntry.feed == feed.name)
         for backlog_entry in feed_backlog.all():
-            entry = Entry(backlog_entry.entry)
+            entry = backlog_entry.entry
 
             # this is already in the feed
             if feed.find_entry(title=entry['title'], url=entry['url']):

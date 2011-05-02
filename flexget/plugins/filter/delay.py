@@ -1,12 +1,9 @@
 import logging
-from sqlalchemy.types import Unicode
-from flexget import schema
-from flexget.event import event
-from flexget.feed import Entry
-from flexget.manager import Session
-from flexget.plugin import register_plugin, priority, PluginError
 from datetime import datetime, timedelta
-from sqlalchemy import Column, Integer, String, DateTime, PickleType
+from sqlalchemy import Column, Integer, String, Unicode, DateTime, PickleType
+from flexget import schema
+from flexget.plugin import register_plugin, priority, PluginError
+from flexget.utils.database import entry_synonym
 
 log = logging.getLogger('delay')
 Base = schema.versioned_base('delay', 1)
@@ -20,7 +17,8 @@ class DelayedEntry(Base):
     feed = Column(String)
     title = Column(Unicode)
     expire = Column(DateTime)
-    entry = Column(PickleType(mutable=False))
+    _entry = Column('entry', PickleType(mutable=False))
+    entry = entry_synonym('_entry')
 
     def __repr__(self):
         return '<DelayedEntry(title=%s)>' % self.title
@@ -85,7 +83,7 @@ class FilterDelay(object):
                    filter(DelayedEntry.feed == feed.name).first():
                 delay_entry = DelayedEntry()
                 delay_entry.title = entry['title']
-                delay_entry.entry = dict(entry)
+                delay_entry.entry = entry
                 delay_entry.feed = feed.name
                 delay_entry.expire = expire_time
                 feed.session.add(delay_entry)
@@ -97,8 +95,9 @@ class FilterDelay(object):
         passed_delay = feed.session.query(DelayedEntry).\
             filter(datetime.now() > DelayedEntry.expire).\
             filter(DelayedEntry.feed == feed.name)
-        delayed_entries = [Entry(item.entry, passed_delay=True) for item in passed_delay.all()]
+        delayed_entries = [item.entry for item in passed_delay.all()]
         for entry in delayed_entries:
+            entry['passed_delay'] = True
             log.debug('Releasing %s' % entry['title'])
         # Delete the entries from the db we are about to inject
         passed_delay.delete()
