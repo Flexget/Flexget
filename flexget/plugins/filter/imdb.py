@@ -129,7 +129,7 @@ class FilterImdb(object):
 
             if 'accept_languages' in config:
                 accepted = config['accept_languages']
-                if entry.get('imdb_languages', [''])[0] not in accepted:
+                if entry.get('imdb_languages') and entry['imdb_languages'][0] not in accepted:
                     # Reject if the first (primary) language is not among acceptable languages
                     reasons.append('accept_languages')
 
