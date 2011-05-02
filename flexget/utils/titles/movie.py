@@ -89,10 +89,11 @@ class MovieParser(TitleParser):
             # find out position where there is first difference, this is earlies
             # quality bit, anything after that has no relevance to the movie name
             dp = diff_pos(data, remaining)
-            log.debug('quality start: %s' % dp)
-            if dp < abs_cut:
-                log.debug('quality cut is even shorter')
-                abs_cut = dp
+            if dp is not None:
+                log.debug('quality start: %s' % dp)
+                if dp < abs_cut:
+                    log.debug('quality cut is even shorter')
+                    abs_cut = dp
 
         # make cut
         data = data[:abs_cut].strip()
