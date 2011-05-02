@@ -1,9 +1,6 @@
 import logging
 from sys import maxint
-from sqlalchemy import Column, Integer, DateTime, Unicode, Boolean
-from datetime import datetime
 from flexget.plugin import register_plugin, priority
-from flexget.manager import Base
 from flexget.utils.log import log_once
 
 log = logging.getLogger('content_size')
@@ -37,12 +34,11 @@ class FilterContentSize(object):
                 return True
 
     @priority(150)
-    def on_feed_modify(self, feed):
+    def on_feed_modify(self, feed, config):
         if feed.manager.options.test or feed.manager.options.learn:
             log.info('Plugin is partially disabled with --test and --learn because size information may not be available')
             return
 
-        config = feed.config.get('content_size', {})
         num_rejected = len(feed.rejected)
         for entry in feed.accepted:
             if 'content_size' in entry:
@@ -54,11 +50,11 @@ class FilterContentSize(object):
                     feed.reject(entry, 'no size available, file unavailable', remember=True)
                 else:
                     feed.reject(entry, 'no size available from downloaded file', remember=True)
-                    
+
         if len(feed.rejected) > num_rejected:
             # Since we are rejecting after the filter event,
             # re-run this feed to see if there is an alternate entry to accept
             feed.rerun()
 
 
-register_plugin(FilterContentSize, 'content_size')
+register_plugin(FilterContentSize, 'content_size', api_ver=2)

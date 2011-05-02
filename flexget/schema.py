@@ -41,8 +41,8 @@ def get_version(plugin):
 def set_version(plugin, version):
     if plugin not in plugin_schemas:
         raise ValueError('Tried to set schema version for %s plugin with no versioned_base.' % plugin)
-    if version > plugin_schemas[plugin]['version']:
-        raise ValueError('Tried to set %s plugin schema version higher than defined in versioned_base.' % plugin)
+    if version != plugin_schemas[plugin]['version']:
+        raise ValueError('Tried to set %s plugin schema version not equal to that defined in versioned_base.' % plugin)
     session = Session()
     try:
         schema = session.query(PluginSchema).filter(PluginSchema.plugin == plugin).first()

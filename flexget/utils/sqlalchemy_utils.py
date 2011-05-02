@@ -14,14 +14,12 @@ def table_exists(name, session):
 
 
 def table_schema(name, session):
-    """Hack, return table schema"""
+    """Hack, return table schema as it exists in the current db"""
 
-    try:
-        meta = MetaData(bind=session.connection())
-        reflect = Table(name, meta, autoload=True, autoload_with=session.connection())
-        return reflect
-    except NoSuchTableError:
-        return None
+    meta = MetaData(bind=session.bind, reflect=True)
+    for table in meta.sorted_tables:
+        if table.name == name:
+            return table
 
 
 def table_columns(name, session):
