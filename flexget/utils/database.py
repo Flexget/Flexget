@@ -52,16 +52,58 @@ def text_date_synonym(name):
 
 
 def entry_synonym(name):
-    """Sanitizes entries before storing them to database, so they can be loaded again even after code changes."""
+    """Used to store Entry instances into a PickleType column in the database.
+
+    In order to ensure everything can be loaded after code changes, makes sure no custom python classes are pickled.
+    """
+
+    def only_builtins(item):
+        """Casts all subclasses of builtin types to their builtin python type. Works recursively on iterables.
+
+        Raises ValueError if passed an object that doesn't subclass a builtin type.
+        """
+
+        if type(item) in [str, unicode, int, float, bool]:
+            return item
+        elif isinstance(item, dict):
+            result = {}
+            for key, value in item.iteritems():
+                try:
+                    result[key] = only_builtins(value)
+                except ValueError:
+                    continue
+            return result
+        elif isinstance(item, (list, tuple, set)):
+            result = []
+            for value in item:
+                try:
+                    result.append(only_builtins(value))
+                except ValueError:
+                    continue
+            if isinstance(item, list):
+                return result
+            elif isinstance(item, tuple):
+                return tuple(result)
+            else:
+                return set(result)
+        elif isinstance(item, str):
+            return str(item)
+        elif isinstance(item, basestring):
+            return unicode(item)
+        elif isinstance(item, int):
+            return int(item)
+        elif isinstance(item, float):
+            return float(item)
+        elif isinstance(item, bool):
+            return bool(item)
+
+        # If item isn't a subclass of a builtin python type, raise ValueError.
+        raise ValueError('%r is not a subclass of a builtin python type.' % type(item))
 
     def getter(self):
         return Entry(getattr(self, name))
 
     def setter(self, entry):
-        entry_fields = {}
-        for field, value in entry.iteritems():
-            if isinstance(value, (basestring, bool, int, float, list, dict)):
-                entry_fields[field] = value
-        setattr(self, name, entry_fields)
+        setattr(self, name, only_builtins(entry))
 
     return synonym(name, descriptor=property(getter, setter))
