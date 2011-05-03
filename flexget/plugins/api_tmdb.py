@@ -7,6 +7,7 @@ import posixpath
 from sqlalchemy import Table, Column, Integer, Float, String, Unicode, Boolean, DateTime, func
 from sqlalchemy.schema import ForeignKey
 from sqlalchemy.orm import relation, joinedload
+from flexget.utils.titles import MovieParser
 from flexget.utils.tools import urlopener
 from flexget.utils.database import text_date_synonym
 from flexget.manager import Base, Session
@@ -130,7 +131,7 @@ class TMDBSearchResult(Base):
 class ApiTmdb(object):
     """Does lookups to TMDb and provides movie information. Caches lookups."""
 
-    def lookup(self, title=None, tmdb_id=None, imdb_id=None, only_cached=False):
+    def lookup(self, title=None, year=None, tmdb_id=None, imdb_id=None, only_cached=False):
         if not title and not tmdb_id and not imdb_id:
             log.error('No criteria specified for tmdb lookup')
             return
@@ -148,6 +149,14 @@ class ApiTmdb(object):
             if not movie and imdb_id:
                 movie = session.query(TMDBMovie).filter(TMDBMovie.imdb_id == imdb_id).first()
             if not movie and title:
+                if not year:
+                    # If year was not specified manually, parse title and year from the input string
+                    title_parser = MovieParser()
+                    title_parser.data = title
+                    title_parser.parse()
+                    title = title_parser.name
+                    year = title_parser.year
+
                 movie = session.query(TMDBMovie).filter(func.lower(TMDBMovie.name) == title.lower()).first()
                 if not movie:
                     found = session.query(TMDBSearchResult). \
@@ -187,7 +196,10 @@ class ApiTmdb(object):
                         if movie.name:
                             session.merge(movie)
                     elif title:
-                        result = get_first_result('search', title)
+                        search_string = title
+                        if year:
+                            search_string = '%s+%s' % (title, year)
+                        result = get_first_result('search', search_string)
                         if result:
                             movie = session.query(TMDBMovie).filter(TMDBMovie.id == result['id']).first()
                             if not movie:
@@ -202,12 +214,12 @@ class ApiTmdb(object):
                 else:
                     session.commit()
 
-            # We need to query again to force the relationships to eager load before we detach from session
-            movie = session.query(TMDBMovie).options(joinedload(TMDBMovie.posters), joinedload(TMDBMovie.genres)). \
-                    filter(TMDBMovie.id == movie.id).first()
             if not movie:
                 log.debug('No results found from tmdb for %s' % id_str())
             else:
+                # We need to query again to force the relationships to eager load before we detach from session
+                movie = session.query(TMDBMovie).options(joinedload(TMDBMovie.posters), joinedload(TMDBMovie.genres)). \
+                        filter(TMDBMovie.id == movie.id).first()
                 return movie
         finally:
             session.close()

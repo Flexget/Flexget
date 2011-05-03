@@ -27,7 +27,7 @@ class PluginTmdbLookup(object):
                 entry['tmdb_name'] = movie.name
                 entry['tmdb_id'] = movie.id
                 entry['imdb_id'] = movie.imdb_id
-                entry['tmdb_year'] = movie.released.year
+                entry['tmdb_year'] = movie.released and movie.released.year
                 entry['tmdb_popularity'] = movie.popularity
                 entry['tmdb_rating'] = movie.rating
                 entry['tmdb_genres'] = [genre.name for genre in movie.genres]
