@@ -9,7 +9,7 @@ from sqlalchemy.schema import ForeignKey
 from sqlalchemy.orm import relation, joinedload
 from flexget.utils.titles import MovieParser
 from flexget.utils.tools import urlopener
-from flexget.utils.database import text_date_synonym
+from flexget.utils.database import text_date_synonym, year_property
 from flexget.manager import Base, Session
 from flexget.plugin import register_plugin
 
@@ -63,6 +63,7 @@ class TMDBMovie(TMDBContainer, Base):
     overview = Column(Unicode)
     _released = Column('released', DateTime)
     released = text_date_synonym('_released')
+    year = year_property('released')
     posters = relation('TMDBPoster', backref='movie', cascade='all, delete, delete-orphan')
     genres = relation('TMDBGenre', secondary=genres_table, backref='movies')
 
@@ -131,8 +132,16 @@ class TMDBSearchResult(Base):
 class ApiTmdb(object):
     """Does lookups to TMDb and provides movie information. Caches lookups."""
 
-    def lookup(self, title=None, year=None, tmdb_id=None, imdb_id=None, only_cached=False):
-        if not title and not tmdb_id and not imdb_id:
+    def lookup(self, title=None, year=None, tmdb_id=None, imdb_id=None, smart_match=None, only_cached=False):
+        if smart_match:
+            # If smart_match was specified, parse it into a title and year
+            title_parser = MovieParser()
+            title_parser.data = smart_match
+            title_parser.parse()
+            title = title_parser.name
+            year = title_parser.year
+
+        if not (title or tmdb_id or imdb_id):
             log.error('No criteria specified for tmdb lookup')
             return
         log.debug('Looking up tmdb information for %r' % {'title': title, 'tmdb_id': tmdb_id, 'imdb_id': imdb_id})
@@ -149,18 +158,13 @@ class ApiTmdb(object):
             if not movie and imdb_id:
                 movie = session.query(TMDBMovie).filter(TMDBMovie.imdb_id == imdb_id).first()
             if not movie and title:
-                if not year:
-                    # If year was not specified manually, parse title and year from the input string
-                    title_parser = MovieParser()
-                    title_parser.data = title
-                    title_parser.parse()
-                    title = title_parser.name
-                    year = title_parser.year
-
                 movie = session.query(TMDBMovie).filter(func.lower(TMDBMovie.name) == title.lower()).first()
                 if not movie:
+                    search_string = title.lower()
+                    if year:
+                        search_string = '%s %s' % (search_string, year)
                     found = session.query(TMDBSearchResult). \
-                            filter(func.lower(TMDBSearchResult.search) == title.lower()).first()
+                            filter(func.lower(TMDBSearchResult.search) == search_string).first()
                     if found and found.movie:
                         movie = found.movie
             if movie:

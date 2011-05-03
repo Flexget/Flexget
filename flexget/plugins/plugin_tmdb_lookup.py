@@ -22,12 +22,12 @@ class PluginTmdbLookup(object):
         lookup = get_plugin_by_name('api_tmdb').instance.lookup
         for entry in feed.entries:
             imdb_id = entry.get('imdb_id') or imdb.extract_id(entry.get('imdb_url', ''))
-            movie = lookup(title=entry['title'], tmdb_id=entry.get('tmdb_id'), imdb_id=imdb_id)
+            movie = lookup(smart_match=entry['title'], tmdb_id=entry.get('tmdb_id'), imdb_id=imdb_id)
             if movie:
                 entry['tmdb_name'] = movie.name
                 entry['tmdb_id'] = movie.id
                 entry['imdb_id'] = movie.imdb_id
-                entry['tmdb_year'] = movie.released and movie.released.year
+                entry['tmdb_year'] = movie.year
                 entry['tmdb_popularity'] = movie.popularity
                 entry['tmdb_rating'] = movie.rating
                 entry['tmdb_genres'] = [genre.name for genre in movie.genres]

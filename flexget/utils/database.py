@@ -1,4 +1,6 @@
 from datetime import datetime
+from functools import update_wrapper
+from sqlalchemy import extract
 from sqlalchemy.orm import synonym
 from flexget.feed import Entry
 from flexget.manager import Session
@@ -107,3 +109,50 @@ def entry_synonym(name):
         setattr(self, name, only_builtins(entry))
 
     return synonym(name, descriptor=property(getter, setter))
+
+
+class property_(object):
+    """A property for an sqlalchemy model that can also return the proper sql to be used in queries."""
+
+    def __init__(self, fget, fset=None, fdel=None, expr=None):
+        self.fget = fget
+        self.fset = fset
+        self.fdel = fdel
+        self.expr = expr or fget
+        update_wrapper(self, fget)
+
+    def __get__(self, instance, owner):
+        if instance is None:
+            return self.expr(owner)
+        else:
+            return self.fget(instance)
+
+    def __set__(self, instance, value):
+        self.fset(instance, value)
+
+    def __delete__(self, instance):
+        self.fdel(instance)
+
+    def setter(self, fset):
+        self.fset = fset
+        return self
+
+    def deleter(self, fdel):
+        self.fdel = fdel
+        return self
+
+    def expression(self, expr):
+        self.expr = expr
+        return self
+
+
+def year_property(date_attr):
+
+    def getter(self):
+        date = getattr(self, date_attr)
+        return date and date.year
+
+    def expr(cls):
+        return extract('year', getattr(cls, date_attr))
+
+    return property_(getter, expr=expr)
