@@ -78,11 +78,12 @@ def test(options):
     cfg = nose.config.Config(plugins=DefaultPluginManager(), verbosity=2)
 
     args = []
-    args.append('-v')
+    # Adding the -v flag makes the tests fail in python 2.7
+    #args.append('-v')
     args.append('--processes=4')
     args.append('-x')
     if not options.test.get('online'):
-        args.extend(['--attr=!online'])
+        args.append('--attr=!online')
     args.append('--where=tests')
 
     # Store current path since --where changes it, restore when leaving
@@ -98,7 +99,7 @@ def test(options):
 def clean():
     """Cleans up the virtualenv"""
     import os, glob
-    
+
     for p in ('bin', 'Scripts', 'build', 'dist', 'docs', 'include', 'lib', 'man',
               'share', 'FlexGet.egg-info', 'paver-minilib.zip', 'setup.py'):
         pth = path(p)
