@@ -11,7 +11,10 @@ def dump(entries, debug=False):
         #sanitize(c)
         #print yaml.safe_dump(entry)
         for field in entry:
-            value = entry[field]
+            if entry.is_lazy(field):
+                value = '<LazyField>'
+            else:
+                value = entry[field]
             if isinstance(value, basestring):
                 try:
                     print '%-17s: %s' % (field, value.replace('\r', '').replace('\n', ''))

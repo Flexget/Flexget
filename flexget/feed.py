@@ -18,7 +18,25 @@ class EntryUnicodeError(Exception):
         self.value = value
 
     def __str__(self):
-        return 'Field %s is not unicode-compatible (%s)' % (self.key, repr(self.value))
+        return 'Field %s is not unicode-compatible (%r)' % (self.key, self.value)
+
+
+class LazyField(object):
+    """Stores a callback function to populate entry fields. Runs it when called or to get a string representation."""
+
+    def __init__(self, entry, field, func):
+        self.entry = entry
+        self.field = field
+        self.func = func
+
+    def __call__(self):
+        return self.func(self.entry, self.field)
+
+    def __str__(self):
+        return str(self())
+
+    def __unicode__(self):
+        return unicode(self())
 
 
 class Entry(dict):
@@ -52,29 +70,51 @@ class Entry(dict):
         # url and original_url handling
         if key == 'url':
             if not isinstance(value, basestring):
-                raise PluginError('Tried to set %s url to %s' % \
-                    (repr(self.get('title')), repr(value)))
+                raise PluginError('Tried to set %r url to %r' % (self.get('title'), value))
             if not 'original_url' in self:
                 self['original_url'] = value
 
         # title handling
         if key == 'title':
             if not isinstance(value, basestring):
-                raise PluginError('Tried to set title to %s' % \
-                    (repr(value)))
+                raise PluginError('Tried to set title to %r' % value)
 
         # TODO: HACK! Implement via plugin once #348 (entry events) is implemented
         # enforces imdb_url in same format
-        if key == 'imdb_url':
+        if key == 'imdb_url' and isinstance(value, basestring):
             from flexget.utils.imdb import extract_id
             value = u'http://www.imdb.com/title/%s/' % extract_id(value)
 
         try:
-            log.debugall('ENTRY %s = %s' % (key, value))
+            log.debugall('ENTRY %s = %r' % (key, value))
         except Exception, e:
             log.debug('trying to debug key `%s` value threw exception: %s' % (key, e))
 
         dict.__setitem__(self, key, value)
+
+    def __getitem__(self, key):
+        """Supports lazy loading of fields. If a stored value is a LazyField, call it, return the result."""
+        result = dict.__getitem__(self, key)
+        if isinstance(result, LazyField):
+            return result()
+        else:
+            return result
+
+    def register_lazy_fields(self, fields, func):
+        """Register a list of fields to be lazily loaded by callback func."""
+        for field in fields:
+            if not self.get_no_lazy(field):
+                self[field] = LazyField(self, field, func)
+
+    def is_lazy(self, field):
+        """Returns True if field is lazy loading."""
+        return isinstance(dict.get(self, field), LazyField)
+
+    def get_no_lazy(self, field, default=None):
+        """Gets the value of a field if it is not a lazy field."""
+        if self.is_lazy(field):
+            return default
+        return self.get(field, default)
 
     def safe_str(self):
         return '%s | %s' % (self['title'], self['url'])
@@ -233,9 +273,9 @@ class Feed(object):
     def accept(self, entry, reason=None, **kwargs):
         """Accepts this entry with optional reason."""
         if not isinstance(entry, Entry):
-            raise Exception('Trying to accept non entry, %s' % repr(entry))
+            raise Exception('Trying to accept non entry, %r' % entry)
         if entry in self.rejected:
-            log.debug('tried to accept rejected %s' % repr(entry))
+            log.debug('tried to accept rejected %r' % entry)
         if entry not in self.accepted and entry not in self.rejected:
             self.accepted.append(entry)
             # Run on_entry_accept phase
@@ -244,7 +284,7 @@ class Feed(object):
     def reject(self, entry, reason=None, **kwargs):
         """Reject this entry immediately and permanently with optional reason"""
         if not isinstance(entry, Entry):
-            raise Exception('Trying to reject non entry, %s' % repr(entry))
+            raise Exception('Trying to reject non entry, %r' % entry)
         # ignore rejections on immortal entries
         if entry.get('immortal'):
             reason_str = '(%s)' % reason if reason else ''
@@ -376,14 +416,14 @@ class Feed(object):
                     else:
                         warn.log.warning(warn)
                 except EntryUnicodeError, eue:
-                    log.critical('Plugin %s tried to create non-unicode compatible entry (key: %s, value: %s)' % \
-                        (keyword, eue.key, repr(eue.value)))
+                    log.critical('Plugin %s tried to create non-unicode compatible entry (key: %s, value: %r)' %
+                        (keyword, eue.key, eue.value))
                     self.abort()
                 except PluginError, err:
                     err.log.critical(err)
                     self.abort()
                 except DependencyError, e:
-                    log.critical('Plugin `%s` cannot be used because dependency `%s` is missing.' % \
+                    log.critical('Plugin `%s` cannot be used because dependency `%s` is missing.' %
                         (keyword, e.missing))
                     self.abort()
                 except Exception, e:

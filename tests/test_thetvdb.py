@@ -5,6 +5,12 @@ from nose.plugins.attrib import attr
 class TestThetvdbLookup(FlexGetBase):
 
     __yaml__ = """
+        presets:
+          global:
+            thetvdb_lookup: yes
+            # Access a tvdb field to cause lazy loading to occur
+            set:
+              afield: "{{ thetvdb_id }}"
         feeds:
           test:
             mock:
@@ -13,13 +19,11 @@ class TestThetvdbLookup(FlexGetBase):
             series:
               - House
               - Doctor Who 2005
-            thetvdb_lookup: yes
           test_unknown_series:
             mock:
               - {title: 'Aoeu.Htns.S01E01.htvd'}
             series:
               - Aoeu Htns
-            thetvdb_lookup: yes
     """
 
     @attr(online=True)
@@ -40,7 +44,7 @@ class TestThetvdbLookup(FlexGetBase):
         self.execute_feed('test_unknown_series')
         # Make sure it didn't make a false match
         entry = self.feed.find_entry('accepted', title='Aoeu.Htns.S01E01.htvd')
-        assert 'thetvdb_id' not in entry, 'should not have populated tvdb data'
+        assert entry.get('thetvdb_id') is None, 'should not have populated tvdb data'
 
 
 class TestThetvdbFavorites(FlexGetBase):

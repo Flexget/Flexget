@@ -1,5 +1,5 @@
 import logging
-from flexget.plugin import get_plugin_by_name, priority, register_plugin, DependencyError
+from flexget.plugin import get_plugin_by_name, register_plugin, DependencyError, priority
 
 try:
     from flexget.plugins.api_tvdb import lookup_episode
@@ -63,49 +63,72 @@ class PluginThetvdbLookup(object):
         except DependencyError:
             pass
 
-    @priority(100)
-    def on_feed_filter(self, feed, config):
+    # Run after series and metainfo series
+    @priority(115)
+    def on_feed_metainfo(self, feed, config):
         if not config:
             return
+        field_map = {
+            # Series info
+            'series_name_tvdb': 'series.seriesname',
+            'series_rating': 'series.rating',
+            'series_status': 'series.status',
+            'series_runtime': 'series.runtime',
+            'series_first_air_date': 'series.firstaired',
+            'series_air_time': 'series.airs_time',
+            'series_content_rating': 'series.contentrating',
+            'series_genres': 'series.genre',
+            'series_network': 'series.network',
+            'series_banner_url': lambda ep: 'http://www.thetvdb.com/banners/%s' % ep.series.banner,
+            'series_fanart_url': lambda ep: 'http://www.thetvdb.com/banners/%s' % ep.series.fanart,
+            'series_poster_url': lambda ep: 'http://www.thetvdb.com/banners/%s' % ep.series.poster,
+            'series_airs_day_of_week': 'series.airs_dayofweek',
+            'series_language': 'series.language',
+            'imdb_url': lambda ep: 'http://www.imdb.com/title/%s' % ep.series.imdb_id,
+            'imdb_id': 'series.imdb_id',
+            'zap2it_id': 'series.zap2it_id',
+            'thetvdb_id': 'series.id',
+            # Episode info
+            'ep_name': 'episodename',
+            'ep_air_date': 'firstaired',
+            'ep_rating': 'rating',
+            'ep_image_url': lambda ep: 'http://www.thetvdb.com/banners/%s' % ep.filename,
+            'ep_overview': 'overview',
+            'ep_writers': 'writer',
+            'ep_directors': 'director',
+            'ep_guest_stars': 'guest_stars'}
+
+        def populate_fields(entry, episode):
+            """Populates entry fields from episode using the field_map"""
+            for field, value in field_map.iteritems():
+                if isinstance(value, basestring):
+                    # If a string is passed, it is an attribute of episode (supporting nested attributes)
+                    entry[field] = reduce(getattr, value.split('.'), episode)
+                else:
+                    # Otherwise a function that takes episode as an argument
+                    entry[field] = value(episode)
+
+        def lazy_loader(entry, field):
+            """Does the lookup for this entry and populates the entry fields."""
+            try:
+                episode = lookup_episode(entry.get_no_lazy('series_name'), entry['series_season'],
+                                         entry['series_episode'], tvdb_id=entry.get_no_lazy('thetvdb_id'))
+            except LookupError, e:
+                log.debug('Error looking up tvdb information for %s: %s' % (entry['title'], e.message))
+                # Set all of our fields to None if the lookup failed
+                for f in field_map:
+                    if entry.is_lazy(f):
+                        entry[f] = None
+            else:
+                populate_fields(entry, episode)
+            return entry[field]
+
         for entry in feed.entries:
             if not (entry.get('series_name') or entry.get('thetvdb_id')) or not \
                     entry.get('series_season') or not entry.get('series_episode'):
                 # If entry does not have series info we cannot do lookup
                 continue
-            try:
-                episode = lookup_episode(entry.get('series_name'), entry['series_season'],
-                                         entry['series_episode'], tvdb_id=entry.get('thetvdb_id'))
-            except LookupError, e:
-                log.debug('Error looking up tvdb information for %s: %s' % (entry['title'], e.message))
-            else:
-                # Series info
-                entry['series_name_tvdb'] = episode.series.seriesname
-                entry['series_rating'] = episode.series.rating
-                entry['series_status'] = episode.series.status
-                entry['series_runtime'] = episode.series.runtime
-                entry['series_first_air_date'] = episode.series.firstaired
-                entry['series_air_time'] = episode.series.airs_time
-                entry['series_content_rating'] = episode.series.contentrating
-                entry['series_genres'] = episode.series.genre
-                entry['series_network'] = episode.series.network
-                entry['series_banner_url'] = "http://www.thetvdb.com/banners/%s" % episode.series.banner
-                entry['series_fanart_url'] = "http://www.thetvdb.com/banners/%s" % episode.series.fanart
-                entry['series_poster_url'] = "http://www.thetvdb.com/banners/%s" % episode.series.poster
-                entry['series_airs_day_of_week'] = episode.series.airs_dayofweek
-                entry['series_language'] = episode.series.language
-                entry['imdb_url'] = "http://www.imdb.com/title/%s" % episode.series.imdb_id
-                entry['imdb_id'] = episode.series.imdb_id
-                entry['zap2it_id'] = episode.series.zap2it_id
-                entry['thetvdb_id'] = episode.series.id
-                # Episode info
-                entry['ep_name'] = episode.episodename
-                entry['ep_air_date'] = episode.firstaired
-                entry['ep_rating'] = episode.rating
-                entry['ep_image_url'] = "http://www.thetvdb.com/banners/%s" % episode.filename
-                entry['ep_overview'] = episode.overview
-                entry['ep_writers'] = episode.writer
-                entry['ep_directors'] = episode.director
-                entry['ep_guest_stars'] = episode.guest_stars
+            entry.register_lazy_fields(field_map, lazy_loader)
 
 
 register_plugin(PluginThetvdbLookup, 'thetvdb_lookup', api_ver=2)
