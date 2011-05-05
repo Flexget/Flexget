@@ -19,20 +19,27 @@ class MovieParser(TitleParser):
 
     def __init__(self):
         self.data = None
+        self.reset()
+        TitleParser.__init__(self)
 
+    def reset(self):
         # parsing results
         self.name = None
         self.year = None
         self.quality = None
         self.proper_count = 0
-        TitleParser.__init__(self)
 
     def __str__(self):
         return "<MovieParser(name=%s,year=%s,quality=%s)>" % (self.name, self.year, self.quality)
 
-    def parse(self):
-        """Parse movie name, returns name, year"""
-        data = self.data
+    def parse(self, data=None):
+        """Parse movie name. Populates name, year, quality and proper_count attributes"""
+
+        # Reset before parsing, so the parser can be reused.
+        self.reset()
+
+        if not data:
+            data = self.data
 
         for char in '[]()_,.':
             data = data.replace(char, ' ')

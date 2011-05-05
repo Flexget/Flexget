@@ -132,9 +132,9 @@ class ModifySet(object):
                     template = env.from_string(template_string)
                     try:
                         result = template.render(entry)
-                    except UndefinedError:
+                    except UndefinedError, e:
                         # If the replacement failed, remove this key from the update dict
-                        log.debug('%s did not have the required fields for jinja2 template' % entry['title'])
+                        log.debug('%s did not have the required fields for jinja2 template: %s' % (entry['title'], e))
                         del conf[field]
                     else:
                         conf[field] = result

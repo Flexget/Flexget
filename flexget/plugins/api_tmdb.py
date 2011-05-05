@@ -133,15 +133,18 @@ class ApiTmdb(object):
     """Does lookups to TMDb and provides movie information. Caches lookups."""
 
     def lookup(self, title=None, year=None, tmdb_id=None, imdb_id=None, smart_match=None, only_cached=False):
-        if smart_match:
-            # If smart_match was specified, parse it into a title and year
+        if not (tmdb_id or imdb_id or title) and smart_match:
+            # If smart_match was specified, and we don't have more specific criteria, parse it into a title and year
             title_parser = MovieParser()
-            title_parser.data = smart_match
-            title_parser.parse()
+            title_parser.parse(smart_match)
             title = title_parser.name
             year = title_parser.year
 
-        if not (title or tmdb_id or imdb_id):
+        if title:
+            search_string = title.lower()
+            if year:
+                search_string = '%s %s' % (search_string, year)
+        elif not (tmdb_id or imdb_id):
             log.error('No criteria specified for tmdb lookup')
             return
         log.debug('Looking up tmdb information for %r' % {'title': title, 'tmdb_id': tmdb_id, 'imdb_id': imdb_id})
@@ -158,11 +161,11 @@ class ApiTmdb(object):
             if not movie and imdb_id:
                 movie = session.query(TMDBMovie).filter(TMDBMovie.imdb_id == imdb_id).first()
             if not movie and title:
-                movie = session.query(TMDBMovie).filter(func.lower(TMDBMovie.name) == title.lower()).first()
+                movie_filter = session.query(TMDBMovie).filter(func.lower(TMDBMovie.name) == title.lower())
+                if year:
+                    movie_filter = movie_filter.filter(TMDBMovie.year == year)
+                movie = movie_filter.first()
                 if not movie:
-                    search_string = title.lower()
-                    if year:
-                        search_string = '%s %s' % (search_string, year)
                     found = session.query(TMDBSearchResult). \
                             filter(func.lower(TMDBSearchResult.search) == search_string).first()
                     if found and found.movie:
@@ -200,9 +203,6 @@ class ApiTmdb(object):
                         if movie.name:
                             session.merge(movie)
                     elif title:
-                        search_string = title
-                        if year:
-                            search_string = '%s+%s' % (title, year)
                         result = get_first_result('search', search_string)
                         if result:
                             movie = session.query(TMDBMovie).filter(TMDBMovie.id == result['id']).first()
@@ -211,7 +211,7 @@ class ApiTmdb(object):
                                 self.get_movie_details(movie, session)
                                 session.merge(movie)
                             if title.lower() != movie.name.lower():
-                                session.merge(TMDBSearchResult(search=title, movie=movie))
+                                session.merge(TMDBSearchResult(search=search_string, movie=movie))
                 except URLError:
                     log.error('Error looking up movie from TMDb')
                     return
