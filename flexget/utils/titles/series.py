@@ -335,7 +335,7 @@ class SeriesParser(TitleParser):
                 log.debug('unwanted id regexp %s matched %s' % (id_unwanted_re, match.groups()))
                 return True
 
-    def parse_episode(self, data):
+    def parse_episode(self, data, allow_seasonless=True):
         """
         Parses :data: for an episode identifier.
         If found, returns a dict with keys for season, episode, end_episode and the regexp match object
@@ -352,10 +352,13 @@ class SeriesParser(TitleParser):
                 if len(matches) >= 2:
                     season = matches[0]
                     episode = matches[1]
-                else:
+                elif allow_seasonless:
                     # assume season 1 if the season was not specified
                     season = 1
                     episode = matches[0]
+                else:
+                    # Return False if we are not allowing seasonless matches and one is found
+                    return False
                 # Convert season and episode to integers
                 try:
                     season = int(season)

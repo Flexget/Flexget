@@ -52,7 +52,7 @@ class MetainfoSeries(object):
         # We need to replace certain characters with spaces to make sure episode parsing works right
         # We don't remove anything, as the match positions should line up with the original title
         clean_title = re.sub('[_.,\[\]\(\):]', ' ', title)
-        match = parser.parse_episode(clean_title)
+        match = parser.parse_episode(clean_title, allow_seasonless=False)
         if match:
             if parser.parse_unwanted(clean_title):
                 return
