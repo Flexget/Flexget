@@ -48,11 +48,11 @@ class MetainfoSeries(object):
     def guess_series(self, title):
         """Returns a valid series parser if this :title: appears to be a series"""
 
-        parser = SeriesParser(identified_by='ep')
+        parser = SeriesParser(identified_by='ep', allow_seasonless=False)
         # We need to replace certain characters with spaces to make sure episode parsing works right
         # We don't remove anything, as the match positions should line up with the original title
         clean_title = re.sub('[_.,\[\]\(\):]', ' ', title)
-        match = parser.parse_episode(clean_title, allow_seasonless=False)
+        match = parser.parse_episode(clean_title)
         if match:
             if parser.parse_unwanted(clean_title):
                 return
