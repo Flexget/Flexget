@@ -3,9 +3,10 @@ import pickle
 from datetime import datetime, timedelta
 from sqlalchemy import Column, Integer, String, DateTime, PickleType
 from flexget import schema
+from flexget.feed import Entry
 from flexget.manager import Session
 from flexget.plugin import register_plugin, priority, PluginWarning
-from flexget.utils.database import entry_synonym
+from flexget.utils.database import safe_pickle_synonym
 from flexget.utils.sqlalchemy_utils import table_schema
 
 log = logging.getLogger('backlog')
@@ -37,7 +38,7 @@ class BacklogEntry(Base):
     title = Column(String)
     expire = Column(DateTime)
     _entry = Column('entry', PickleType(mutable=False))
-    entry = entry_synonym('_entry')
+    entry = safe_pickle_synonym('_entry')
 
     def __repr__(self):
         return '<BacklogEntry(title=%s)>' % (self.title)
@@ -133,7 +134,7 @@ class InputBacklog(object):
         entries = []
         feed_backlog = feed.session.query(BacklogEntry).filter(BacklogEntry.feed == feed.name)
         for backlog_entry in feed_backlog.all():
-            entry = backlog_entry.entry
+            entry = Entry(backlog_entry.entry)
 
             # this is already in the feed
             if feed.find_entry(title=entry['title'], url=entry['url']):

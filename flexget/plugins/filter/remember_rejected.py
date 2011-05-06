@@ -26,7 +26,7 @@ def upgrade(ver, session):
             ver = 1
         else:
             ver = 0
-    if ver is 0:
+    if ver == 0:
         log.info('Adding reason column to remember_rejected_entry table.')
         session.execute('ALTER TABLE remember_rejected_entry ADD reason VARCHAR')
         ver = 1

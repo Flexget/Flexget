@@ -351,7 +351,7 @@ def mark_expired(session=None):
     if last_local + timedelta(hours=1) < datetime.now():
         try:
             # Get items that have changed since our last update
-            updates = BeautifulStoneSoup(urlopener(server + 'Updates.php?type=all&time=%s', log)).items
+            updates = BeautifulStoneSoup(urlopener(server + 'Updates.php?type=all&time=%s' % last_server, log)).items
         except URLError:
             log.error('Could not get server time from tvdb')
             return

@@ -2,8 +2,9 @@ import logging
 from datetime import datetime, timedelta
 from sqlalchemy import Column, Integer, String, Unicode, DateTime, PickleType
 from flexget import schema
+from flexget.feed import Entry
 from flexget.plugin import register_plugin, priority, PluginError
-from flexget.utils.database import entry_synonym
+from flexget.utils.database import safe_pickle_synonym
 
 log = logging.getLogger('delay')
 Base = schema.versioned_base('delay', 1)
@@ -18,7 +19,7 @@ class DelayedEntry(Base):
     title = Column(Unicode)
     expire = Column(DateTime)
     _entry = Column('entry', PickleType(mutable=False))
-    entry = entry_synonym('_entry')
+    entry = safe_pickle_synonym('_entry')
 
     def __repr__(self):
         return '<DelayedEntry(title=%s)>' % self.title
@@ -95,7 +96,7 @@ class FilterDelay(object):
         passed_delay = feed.session.query(DelayedEntry).\
             filter(datetime.now() > DelayedEntry.expire).\
             filter(DelayedEntry.feed == feed.name)
-        delayed_entries = [item.entry for item in passed_delay.all()]
+        delayed_entries = [Entry(item.entry) for item in passed_delay.all()]
         for entry in delayed_entries:
             entry['passed_delay'] = True
             log.debug('Releasing %s' % entry['title'])

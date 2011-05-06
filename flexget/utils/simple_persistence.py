@@ -1,9 +1,28 @@
 import logging
 from datetime import datetime
-from sqlalchemy import Column, Integer, String, DateTime, PickleType
-from flexget.manager import Base, Session
+from sqlalchemy import Column, Integer, String, DateTime, PickleType, select
+from flexget import schema
+from flexget.manager import Session
+from flexget.utils.database import safe_pickle_synonym
+from flexget.utils.sqlalchemy_utils import table_schema
 
 log = logging.getLogger('util.simple_persistence')
+Base = schema.versioned_base('simple_persistence', 0)
+
+
+@schema.upgrade('simple_persistence')
+def upgrade(ver, session):
+    if ver is None:
+        # Remove any values that are not loadable.
+        table = table_schema('simple_persistence', session)
+        for row in session.execute(select([table.c.id, table.c.plugin, table.c.key])):
+            try:
+                session.execute(select([table.c.value]), table.c.id == row['id'])
+            except Exception, e:
+                log.warning('Couldn\'t load %s:%s removing from db: %s' % (row['plugin'], row['key'], e))
+                session.execute(table.delete().where(table.c.id == row['id']))
+        ver = 0
+    return ver
 
 
 class SimpleKeyValue(Base):
@@ -15,7 +34,8 @@ class SimpleKeyValue(Base):
     feed = Column(String)
     plugin = Column(String)
     key = Column(String)
-    value = Column(PickleType)
+    _value = Column('value', PickleType)
+    value = safe_pickle_synonym('_value')
     added = Column(DateTime, default=datetime.now())
 
     def __init__(self, feed, plugin, key, value):

@@ -2,7 +2,6 @@ from datetime import datetime
 from functools import update_wrapper
 from sqlalchemy import extract
 from sqlalchemy.orm import synonym
-from flexget.feed import Entry
 from flexget.manager import Session
 
 
@@ -53,7 +52,7 @@ def text_date_synonym(name):
     return synonym(name, descriptor=property(getter, setter))
 
 
-def entry_synonym(name):
+def safe_pickle_synonym(name):
     """Used to store Entry instances into a PickleType column in the database.
 
     In order to ensure everything can be loaded after code changes, makes sure no custom python classes are pickled.
@@ -65,7 +64,10 @@ def entry_synonym(name):
         Raises ValueError if passed an object that doesn't subclass a builtin type.
         """
 
-        if type(item) in [str, unicode, int, float, bool]:
+        supported_types = [str, unicode, int, float, bool, datetime]
+        # dict, list, tuple and set are also supported, but handled separately
+
+        if type(item) in supported_types:
             return item
         elif isinstance(item, dict):
             result = {}
@@ -88,22 +90,16 @@ def entry_synonym(name):
                 return tuple(result)
             else:
                 return set(result)
-        elif isinstance(item, str):
-            return str(item)
-        elif isinstance(item, basestring):
-            return unicode(item)
-        elif isinstance(item, int):
-            return int(item)
-        elif isinstance(item, float):
-            return float(item)
-        elif isinstance(item, bool):
-            return bool(item)
+        else:
+            for s_type in supported_types:
+                if isinstance(item, s_type):
+                    return s_type(item)
 
         # If item isn't a subclass of a builtin python type, raise ValueError.
         raise ValueError('%r is not a subclass of a builtin python type.' % type(item))
 
     def getter(self):
-        return Entry(getattr(self, name))
+        return getattr(self, name)
 
     def setter(self, entry):
         setattr(self, name, only_builtins(entry))
