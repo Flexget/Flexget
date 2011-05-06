@@ -11,32 +11,27 @@ jinja = False
 
 
 def filter_pathbase(val):
-    """ Base name of a path.
-    """
+    """Base name of a path."""
     return os.path.basename(val or '')
 
 
 def filter_pathname(val):
-    """ Base name of a path, without its extension.
-    """
+    """Base name of a path, without its extension."""
     return os.path.splitext(os.path.basename(val or ''))[0]
 
 
 def filter_pathext(val):
-    """ Extension of a path (including the '.').
-    """
+    """Extension of a path (including the '.')."""
     return os.path.splitext(val or '')[1]
 
 
 def filter_pathdir(val):
-    """ Directory containing the given path.
-    """
+    """Directory containing the given path."""
     return os.path.dirname(val or '')
 
 
 def filter_pathscrub(val, ascii=False):
-    """ Replace problematic characters in a path.
-    """
+    """Replace problematic characters in a path."""
     if ascii:
         repl = {'"': '`', "'": '`'}
         if sys.platform.startswith("win"):
@@ -50,21 +45,29 @@ def filter_pathscrub(val, ascii=False):
 
 
 def filter_re_replace(val, pattern, repl):
-    """ Perform a regexp replacement on the given string.
-    """
-
+    """Perform a regexp replacement on the given string."""
     return re.sub(pattern, repl, unicode(val))
+
+
+def filter_re_search(val, pattern):
+    """Perform a search for given regexp pattern, return the matching portion of the text."""
+    if not isinstance(val, basestring):
+        return val
+    result = re.search(pattern, val)
+    if result:
+        i = result.group(0)
+        return result.group(0)
+    return ''
 
 
 class ModifySet(object):
 
-    """
-        Allows adding information to a feed entry for use later.
+    """Allows adding information to a feed entry for use later.
 
-        Example:
+    Example:
 
-        set:
-          path: ~/download/path/
+    set:
+      path: ~/download/path/
     """
 
     def __init__(self):

@@ -223,6 +223,7 @@ class TestSetPlugin(FlexGetBase):
             set:
               field: 'The {{ series_name|upper }}'
               otherfield: '{% if series_name is not defined %}no series{% endif %}'
+              alu: '{{ series_name|re_search(".l.") }}'
     """
 
     def test_set(self):
@@ -243,6 +244,7 @@ class TestSetPlugin(FlexGetBase):
         entry = self.feed.find_entry('entries', title='Entry 1')
         assert entry['field'] == 'The VALUE'
         assert entry['otherfield'] == ''
+        assert entry['alu'] == 'alu'
         entry = self.feed.find_entry('entries', title='Entry 2')
         assert 'field' not in entry,\
                 '`field` should not have been created when jinja rendering fails'
