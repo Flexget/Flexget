@@ -1,27 +1,32 @@
 import logging
 from datetime import datetime
+import pickle
 from sqlalchemy import Column, Integer, String, DateTime, PickleType, select
+from UserDict import DictMixin
 from flexget import schema
 from flexget.manager import Session
 from flexget.utils.database import safe_pickle_synonym
 from flexget.utils.sqlalchemy_utils import table_schema
 
 log = logging.getLogger('util.simple_persistence')
-Base = schema.versioned_base('simple_persistence', 0)
+Base = schema.versioned_base('simple_persistence', 1)
 
 
 @schema.upgrade('simple_persistence')
 def upgrade(ver, session):
     if ver is None:
+        # Upgrade to version 0 was a failed attempt at cleaning bad entries from our table, better attempt in ver 1
+        ver = 0
+    if ver == 0:
         # Remove any values that are not loadable.
         table = table_schema('simple_persistence', session)
-        for row in session.execute(select([table.c.id, table.c.plugin, table.c.key])):
+        for row in session.execute(select([table.c.id, table.c.plugin, table.c.key, table.c.value])):
             try:
-                session.execute(select([table.c.value]), table.c.id == row['id'])
+                p = pickle.loads(row['value'])
             except Exception, e:
                 log.warning('Couldn\'t load %s:%s removing from db: %s' % (row['plugin'], row['key'], e))
                 session.execute(table.delete().where(table.c.id == row['id']))
-        ver = 0
+        ver = 1
     return ver
 
 
@@ -48,14 +53,14 @@ class SimpleKeyValue(Base):
         return "<SimpleKeyValue('%s','%s','%s')>" % (self.feed, self.key, self.value)
 
 
-class SimplePersistence(object):
+class SimplePersistence(DictMixin):
 
     def __init__(self, plugin, session=None):
         self.feedname = None
         self.plugin = plugin
         self.session = session
 
-    def set(self, key, value):
+    def __setitem__(self, key, value):
         session = self.session or Session()
         skv = session.query(SimpleKeyValue).filter(SimpleKeyValue.feed == self.feedname).\
                 filter(SimpleKeyValue.plugin == self.plugin).filter(SimpleKeyValue.key == key).first()
@@ -73,26 +78,33 @@ class SimplePersistence(object):
             session.commit()
             session.close()
 
-    def get(self, key, default=None):
+    def __getitem__(self, key):
         session = self.session or Session()
         skv = session.query(SimpleKeyValue).filter(SimpleKeyValue.feed == self.feedname).\
             filter(SimpleKeyValue.plugin == self.plugin).filter(SimpleKeyValue.key == key).first()
         if not self.session:
             session.close()
         if not skv:
-            return default
+            raise KeyError('%s is not contained in the simple_persistence table.' % key)
         else:
             return skv.value
 
-    def setdefault(self, key, default):
-        empty = object()
-        got = self.get(key, empty)
-        if got is empty:
-            log.debug('storing default for %s' % key)
-            self.set(key, default)
-            return default
+    def __delitem__(self, key):
+        session = self.session or Session()
+        session.query(SimpleKeyValue).filter(SimpleKeyValue.feed == self.feedname).\
+            filter(SimpleKeyValue.plugin == self.plugin).filter(SimpleKeyValue.key == key).delete()
+        if not self.session:
+            session.commit()
+            session.close()
+
+    def keys(self):
+        session = self.session or Session()
+        query = session.query(SimpleKeyValue.key).filter(SimpleKeyValue.feed == self.feedname).\
+             filter(SimpleKeyValue.plugin == self.plugin).all()
+        if query:
+            return [item.key for item in query]
         else:
-            return got
+            return []
 
 
 class SimpleFeedPersistence(SimplePersistence):

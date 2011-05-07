@@ -8,7 +8,7 @@ from random import sample
 from BeautifulSoup import BeautifulStoneSoup
 from sqlalchemy import Column, Integer, Float, String, Unicode, Boolean, DateTime, func
 from sqlalchemy.schema import ForeignKey
-from sqlalchemy.orm import relation, synonym
+from sqlalchemy.orm import relation
 from flexget.utils.tools import urlopener
 from flexget.utils.database import with_session, pipe_list_synonym, text_date_synonym
 from flexget.manager import Base, Session
@@ -342,11 +342,16 @@ def lookup_episode(name=None, seasonnum=None, episodenum=None, tvdb_id=None, onl
 def mark_expired(session=None):
     """Marks series and episodes that have expired since we cached them"""
     # Only get the expired list every hour
-    last_local, last_server = persist.get('last_updated') or (None, None)
+    last_server = persist.get('last_server')
+    last_local = persist.get('last_local')
     if not last_local or not last_server:
         # We don't need any updates if this is the first time the method is called, just record the server time
-        new_server = BeautifulStoneSoup(urlopener(server + 'Updates.php?type=none', log)).find('time')
-        persist.set('last_updated', (datetime.now(), new_server))
+        try:
+            new_server = str(BeautifulStoneSoup(urlopener(server + 'Updates.php?type=none', log)).find('time').string)
+            persist['last_server'] = new_server
+        except (URLError, AttributeError):
+            log.debug('Error getting current server time')
+        persist['last_local'] = datetime.now()
         return
     if last_local + timedelta(hours=1) < datetime.now():
         try:
@@ -356,10 +361,13 @@ def mark_expired(session=None):
             log.error('Could not get server time from tvdb')
             return
         if updates:
-            new_server = int(updates.find('time').string)
+            new_server = str(updates.find('time').string)
             expired_series = [int(series.string) for series in updates.findall('series')]
             expired_episodes = [int(ep.string) for ep in updates.findall('episode')]
             # Update our cache to mark the items that have expired
             session.query(TVDBSeries).filter(TVDBSeries.id.in_(expired_series)).update(values={'expired': True})
             session.query(TVDBEpisode).filter(TVDBEpisode.id.in_(expired_episodes)).update(values={'expired': True})
             session.commit()
+            # Save the time of this update
+            persist['last_local'] = datetime.now()
+            persist['last_server'] = new_server
