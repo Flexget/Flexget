@@ -1,4 +1,5 @@
 from copy import copy
+from datetime import datetime, date, time
 import os
 import re
 import sys
@@ -60,6 +61,13 @@ def filter_re_search(val, pattern):
     return ''
 
 
+def filter_formatdate(val, format):
+    """Returns a string representation of a datetime object according to format string."""
+    if not isinstance(val, (datetime, date, time)):
+        return val
+    return val.strftime(format)
+
+
 class ModifySet(object):
 
     """Allows adding information to a feed entry for use later.
@@ -112,7 +120,7 @@ class ModifySet(object):
         Adds the set dict to all accepted entries. This is not really a filter plugin,
         but it needs to be run before feed_download, so it is run last in the filter chain.
         """
-        for entry in feed.entries + feed.rejected:
+        for entry in feed.entries:
             self.modify(entry, config, False, entry in feed.accepted)
 
     def modify(self, entry, config, validate=False, errors=True):
@@ -133,8 +141,10 @@ class ModifySet(object):
             for field, template_string in conf.items():
                 if isinstance(template_string, basestring):
                     template = env.from_string(template_string)
+                    variables = {'now': datetime.now()}
+                    variables.update(entry)
                     try:
-                        result = template.render(entry)
+                        result = template.render(variables)
                     except UndefinedError, e:
                         # If the replacement failed, remove this key from the update dict
                         log.debug('%s did not have the required fields for jinja2 template: %s' % (entry['title'], e))

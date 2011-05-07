@@ -23,30 +23,29 @@ class PluginInterval:
         root.accept('\d+ (minutes|hours|days|weeks)')
         return root
 
-    def on_feed_start(self, feed):
-        if feed.manager.options.interval_ignore or feed.manager.options.learn:
-            log.info('Ignoring feed %s interval' % feed.name)
+    def on_feed_start(self, feed, config):
+        if feed.manager.options.learn:
+            log.info('Ignoring feed %s interval for --learn' % feed.name)
             return
-        last_time = feed.simple_persistence.setdefault('last_time', datetime.datetime.now())
-        log.debug('last_time: %s' % repr(last_time))
-        amount, unit = feed.config.get('interval').split(' ')
-        log.debug('amount: %s unit: %s' % (repr(amount), repr(unit)))
-        params = {unit: int(amount)}
-        try:
-            next_time = last_time + datetime.timedelta(**params)
-        except TypeError:
-            raise PluginWarning('Invalid time format', log)
-        log.debug('next_time: %s' % repr(next_time))
-        if datetime.datetime.now() < next_time:
-            log.debug('interval not met')
-            log.verbose('Interval %s not met on feed %s. Use --now to override.' % (feed.config.get('interval'), feed.name))
-            # don't forget the time! force commit! #392
-            feed.session.commit()
-            feed.abort(silent=True)
+        last_time = feed.simple_persistence.get('last_time')
+        if not last_time:
+            log.info('No previous run recorded, running now')
+        elif feed.manager.options.interval_ignore:
+            log.info('Ignoring interval because of --now')
         else:
-            log.debug('interval passed')
-            feed.simple_persistence.set('last_time', datetime.datetime.now())
+            log.debug('last_time: %r' % last_time)
+            amount, unit = config.split(' ')
+            log.debug('amount: %r unit: %r' % (amount, unit))
+            next_time = last_time + datetime.timedelta(**{unit: int(amount)})
+            log.debug('next_time: %r' % next_time)
+            if datetime.datetime.now() < next_time:
+                log.debug('interval not met')
+                log.verbose('Interval %s not met on feed %s. Use --now to override.' % (config, feed.name))
+                feed.abort(silent=True)
+                return
+        log.debug('interval passed')
+        feed.simple_persistence.set('last_time', datetime.datetime.now())
 
-register_plugin(PluginInterval, 'interval')
+register_plugin(PluginInterval, 'interval', api_ver=2)
 register_parser_option('--now', action='store_true', dest='interval_ignore', default=False,
                        help='Ignore interval(s)')
