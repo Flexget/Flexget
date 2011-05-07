@@ -1,5 +1,7 @@
 from copy import copy
 from datetime import datetime, date, time
+from email.utils import parsedate
+from time import mktime
 import os
 import re
 import sys
@@ -66,6 +68,11 @@ def filter_formatdate(val, format):
     if not isinstance(val, (datetime, date, time)):
         return val
     return val.strftime(format)
+
+
+def filter_parsedate(val):
+    """Attempts to parse a date according to the rules in RFC 2822"""
+    return datetime.fromtimestamp(mktime(parsedate(val)))
 
 
 class ModifySet(object):
