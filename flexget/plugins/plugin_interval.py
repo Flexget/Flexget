@@ -5,8 +5,7 @@ from flexget.plugin import PluginWarning, register_plugin, register_parser_optio
 log = logging.getLogger('interval')
 
 
-class PluginInterval:
-
+class PluginInterval(object):
     """
         Allows specifying minimum interval for feed execution.
 
@@ -44,7 +43,7 @@ class PluginInterval:
                 feed.abort(silent=True)
                 return
         log.debug('interval passed')
-        feed.simple_persistence.set('last_time', datetime.datetime.now())
+        feed.simple_persistence['last_time'] = datetime.datetime.now()
 
 register_plugin(PluginInterval, 'interval', api_ver=2)
 register_parser_option('--now', action='store_true', dest='interval_ignore', default=False,
