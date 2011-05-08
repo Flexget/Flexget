@@ -9,12 +9,14 @@ from BeautifulSoup import BeautifulStoneSoup
 from sqlalchemy import Column, Integer, Float, String, Unicode, Boolean, DateTime, func
 from sqlalchemy.schema import ForeignKey
 from sqlalchemy.orm import relation
+from flexget import schema
 from flexget.utils.tools import urlopener
 from flexget.utils.database import with_session, pipe_list_synonym, text_date_synonym
-from flexget.manager import Base, Session
+from flexget.manager import Session
 from flexget.utils.simple_persistence import SimplePersistence
 
 log = logging.getLogger('api_tvdb')
+Base = schema.versioned_base('api_tvdb', 0)
 
 # This is a FlexGet API key
 api_key = '4D297D8CFDE0E105'
@@ -22,6 +24,15 @@ language = 'en'
 server = 'http://www.thetvdb.com/api/'
 _mirrors = {}
 persist = SimplePersistence('api_tvdb')
+
+
+@schema.upgrade('api_tvdb')
+def upgrade(ver, session):
+    if ver is None:
+        if 'last_updated' in persist:
+            del persist['last_updated']
+        ver = 0
+    return ver
 
 
 def get_mirror(type='xml'):

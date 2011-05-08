@@ -6,13 +6,17 @@ from flexget.manager import Session
 
 
 def with_session(func):
-    """"Creates a session if one was not passed via keyword argument to the function"""
+    """"Creates a session if one was not passed via keyword argument to the function.
+
+    If a session is created, it will be automatically commited unless an Exception is raised."""
 
     def wrapper(*args, **kwargs):
         if not kwargs.get('session'):
             kwargs['session'] = Session(autoflush=True)
             try:
-                return func(*args, **kwargs)
+                result = func(*args, **kwargs)
+                kwargs['session'].commit()
+                return result
             finally:
                 kwargs['session'].close()
         else:
