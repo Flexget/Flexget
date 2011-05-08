@@ -164,6 +164,9 @@ class ModifySet(object):
         # Do string replacement
         for field, value in conf.items():
             if isinstance(value, basestring):
+                if value != config[field]:
+                    # If jinja replacement already occurred, skip this field
+                    continue
                 logger = log.error if errors else log.debug
                 result = replace_from_entry(value, entry, field, logger, default=None)
                 if result is None:
