@@ -125,7 +125,7 @@ class InputTail(object):
                     raise PluginError('Failed to decode file using %s. Check encoding.' % encoding)
 
             if not line:
-                feed.simple_persistence.set(filename, file.tell())
+                feed.simple_persistence[filename] = file.tell()
                 break
 
             for field, regexp in entry_config.iteritems():

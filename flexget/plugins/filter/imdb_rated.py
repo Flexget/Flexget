@@ -64,7 +64,7 @@ class FilterImdbRated(object):
         log.debug('next_time: %s' % next_time)
         if not datetime.datetime.now() > next_time:
             return
-        feed.simple_persistence.set('next_time', datetime.datetime.now() + datetime.timedelta(hours=4))
+        feed.simple_persistence['next_time'] = datetime.datetime.now() + datetime.timedelta(hours=4)
         log.debug('updating my movies from %s' % config['url'])
 
         massage = []
