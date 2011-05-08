@@ -109,7 +109,7 @@ def versioned_base(plugin, version):
                     raise Exception('Two different schema versions recieved for plugin %s' % plugin)
                 plugin_schemas[plugin]['tables'].append(dict_['__tablename__'])
                 # Make sure the resulting class also inherits from Base
-                bases = (Base,) + bases
+                bases = bases + (Base,)
 
                 # Since Base and VersionedBase have 2 different metaclasses, a class that subclasses both of them
                 # must have a metaclass that subclasses both of their metaclasses.
