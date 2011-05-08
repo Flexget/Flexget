@@ -33,15 +33,17 @@ def filter_pathdir(val):
     return os.path.dirname(val or '')
 
 
-def filter_pathscrub(val, ascii=False):
+def filter_pathscrub(val, ascii=False, windows=None):
     """Replace problematic characters in a path."""
+    if windows is None:
+        windows = sys.platform.startswith("win")
     if ascii:
         repl = {'"': '`', "'": '`'}
-        if sys.platform.startswith("win"):
+        if windows:
             repl.update({':': ';', '?': '_'})
     else:
         repl = {'"': u'\u201d', "'": u'\u2019'}
-        if sys.platform.startswith("win"):
+        if windows:
             repl.update({':': u'\u02d0', '?': u'\u061f'})
 
     return re.sub('[%s]' % ''.join(repl), lambda i: repl[i.group(0)], val or '')
