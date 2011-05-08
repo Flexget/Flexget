@@ -141,13 +141,13 @@ class MyEpisodes(object):
         except urllib2.URLError, e:
             log.error('Error searching for myepisodes id: %s' % e)
 
-        matchObj = re.search(r'&showid=([0-9]*)">' + tvdb_name + '</a>', txt, re.MULTILINE | re.IGNORECASE)
+        matchObj = re.search(r'&showid=([0-9]*)">' + tvdb_name + '</a>', txt, re.MULTILINE | re.IGNORECASEmat)
         if matchObj:
             myepisodes_id = matchObj.group(1)
             db_item = session.query(MyEpisodesInfo).filter(MyEpisodesInfo.myepisodes_id == myepisodes_id).first()
             if db_item:
                 log.info('Changing name to %s for series with myepisodes_id %s' % (series_name.lower(), myepisodes_id))
-                db_item.myepisodes_id = myepisodes_id
+                db_item.series_name = series_name.lower()
             else:
                 session.add(MyEpisodesInfo(series_name.lower(), myepisodes_id))
             entry['myepisodes_id'] = myepisodes_id
