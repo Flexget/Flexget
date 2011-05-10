@@ -368,17 +368,18 @@ def mark_expired(session=None):
         try:
             # Get items that have changed since our last update
             updates = BeautifulStoneSoup(urlopener(server + 'Updates.php?type=all&time=%s' % last_server, log)).items
-        except URLError:
-            log.error('Could not get server time from tvdb')
+        except URLError, e:
+            log.error('Could not get update information from tvdb: %s' % e)
             return
         if updates:
-            new_server = str(updates.find('time').string)
+            # Make lists of expired series and episode ids
             expired_series = [int(series.string) for series in updates.findall('series')]
             expired_episodes = [int(ep.string) for ep in updates.findall('episode')]
             # Update our cache to mark the items that have expired
-            session.query(TVDBSeries).filter(TVDBSeries.id.in_(expired_series)).update(values={'expired': True})
-            session.query(TVDBEpisode).filter(TVDBEpisode.id.in_(expired_episodes)).update(values={'expired': True})
+            session.query(TVDBSeries).filter(TVDBSeries.id.in_(expired_series)).update({'expired': True}, 'fetch')
+            session.query(TVDBEpisode).filter(TVDBEpisode.id.in_(expired_episodes)).update({'expired': True}, 'fetch')
             session.commit()
             # Save the time of this update
+            new_server = str(updates.find('time').string)
             persist['last_local'] = datetime.now()
             persist['last_server'] = new_server
