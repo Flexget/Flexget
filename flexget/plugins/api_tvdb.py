@@ -373,8 +373,8 @@ def mark_expired(session=None):
             return
         if updates:
             # Make lists of expired series and episode ids
-            expired_series = [int(series.string) for series in updates.findall('series')]
-            expired_episodes = [int(ep.string) for ep in updates.findall('episode')]
+            expired_series = [int(series.string) for series in updates.findAll('series')]
+            expired_episodes = [int(ep.string) for ep in updates.findAll('episode')]
             # Update our cache to mark the items that have expired
             session.query(TVDBSeries).filter(TVDBSeries.id.in_(expired_series)).update({'expired': True}, 'fetch')
             session.query(TVDBEpisode).filter(TVDBEpisode.id.in_(expired_episodes)).update({'expired': True}, 'fetch')
