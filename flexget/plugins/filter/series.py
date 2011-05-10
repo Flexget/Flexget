@@ -957,6 +957,7 @@ class FilterSeries(SeriesPlugin, FilterSeriesBase):
             diff = expires - datetime.now()
 
             hours, remainder = divmod(diff.seconds, 3600)
+            hours += diff.days * 24
             minutes, seconds = divmod(remainder, 60)
 
             entry = self.parser2entry[best]
