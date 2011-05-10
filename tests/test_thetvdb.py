@@ -1,5 +1,7 @@
-from tests import FlexGetBase
 from nose.plugins.attrib import attr
+from flexget.manager import Session
+from flexget.plugins.api_tvdb import lookup_episode
+from tests import FlexGetBase
 
 
 class TestThetvdbLookup(FlexGetBase):
@@ -24,6 +26,13 @@ class TestThetvdbLookup(FlexGetBase):
               - {title: 'Aoeu.Htns.S01E01.htvd'}
             series:
               - Aoeu Htns
+          test_mark_expired:
+            mock:
+              - {title: 'House.S02E02.hdtv'}
+            metainfo_series: yes
+            accept_all: yes
+            disable_builtins: [seen]
+
     """
 
     @attr(online=True)
@@ -45,6 +54,28 @@ class TestThetvdbLookup(FlexGetBase):
         # Make sure it didn't make a false match
         entry = self.feed.find_entry('accepted', title='Aoeu.Htns.S01E01.htvd')
         assert entry.get('thetvdb_id') is None, 'should not have populated tvdb data'
+
+    @attr(online=True)
+    def test_mark_expired(self):
+
+        def test_run():
+            # Run the feed and check tvdb data was populated.
+            self.execute_feed('test_mark_expired')
+            entry = self.feed.find_entry(title='House.S02E02.hdtv')
+            assert entry['ep_name'] == 'Autopsy'
+
+        # Run the feed once, this populates data from tvdb
+        test_run()
+        # Run the feed again, this should load the data from cache
+        test_run()
+        # Manually mark the data as expired, to test cache update
+        session = Session()
+        ep = lookup_episode(name='House', seasonnum=2, episodenum=2, session=session)
+        ep.expired = True
+        ep.series.expired = True
+        session.commit()
+        session.close()
+        test_run()
 
 
 class TestThetvdbFavorites(FlexGetBase):

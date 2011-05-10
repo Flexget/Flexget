@@ -356,30 +356,34 @@ def mark_expired(session=None):
     last_server = persist.get('last_server')
     last_local = persist.get('last_local')
     if not last_local or not last_server:
-        # We don't need any updates if this is the first time the method is called, just record the server time
-        try:
-            new_server = str(BeautifulStoneSoup(urlopener(server + 'Updates.php?type=none', log)).find('time').string)
-            persist['last_server'] = new_server
-        except (URLError, AttributeError):
-            log.debug('Error getting current server time')
-        persist['last_local'] = datetime.now()
+        last_server = ''
+    elif last_local + timedelta(hours=1) > datetime.now():
+        # It has been less than an hour, don't check again yet
         return
-    if last_local + timedelta(hours=1) < datetime.now():
-        try:
-            # Get items that have changed since our last update
-            updates = BeautifulStoneSoup(urlopener(server + 'Updates.php?type=all&time=%s' % last_server, log)).items
-        except URLError, e:
-            log.error('Could not get update information from tvdb: %s' % e)
-            return
-        if updates:
-            # Make lists of expired series and episode ids
-            expired_series = [int(series.string) for series in updates.findAll('series')]
-            expired_episodes = [int(ep.string) for ep in updates.findAll('episode')]
-            # Update our cache to mark the items that have expired
-            session.query(TVDBSeries).filter(TVDBSeries.id.in_(expired_series)).update({'expired': True}, 'fetch')
-            session.query(TVDBEpisode).filter(TVDBEpisode.id.in_(expired_episodes)).update({'expired': True}, 'fetch')
-            session.commit()
-            # Save the time of this update
-            new_server = str(updates.find('time').string)
-            persist['last_local'] = datetime.now()
-            persist['last_server'] = new_server
+
+    try:
+        # Get items that have changed since our last update
+        updates = BeautifulStoneSoup(urlopener(server + 'Updates.php?type=all&time=%s' % last_server, log)).items
+    except URLError, e:
+        log.error('Could not get update information from tvdb: %s' % e)
+        return
+    if updates:
+        # Make lists of expired series and episode ids
+        expired_series = [int(series.string) for series in updates.findAll('series')]
+        expired_episodes = [int(ep.string) for ep in updates.findAll('episode')]
+
+        def chunked(seq):
+            """Helper to divide our expired lists into sizes sqlite can handle in a query. (<1000)"""
+            for i in xrange(0, len(seq), 9000):
+                yield seq[i:i + 9000]
+
+        # Update our cache to mark the items that have expired
+        for chunk in chunked(expired_series):
+            session.query(TVDBSeries).filter(TVDBSeries.id.in_(chunk)).update({'expired': True}, 'fetch')
+        for chunk in chunked(expired_episodes):
+            session.query(TVDBEpisode).filter(TVDBEpisode.id.in_(chunk)).update({'expired': True}, 'fetch')
+        session.commit()
+        # Save the time of this update
+        new_server = str(updates.find('time').string)
+        persist['last_local'] = datetime.now()
+        persist['last_server'] = new_server
