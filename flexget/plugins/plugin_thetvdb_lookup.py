@@ -2,7 +2,7 @@ import logging
 from flexget.plugin import get_plugin_by_name, register_plugin, DependencyError, priority
 
 try:
-    from flexget.plugins.api_tvdb import lookup_episode
+    from flexget.plugins.api_tvdb import lookup_episode, get_mirror
 except ImportError:
     raise DependencyError(issued_by='thetvdb_lookup', missing='api_tvdb',
                           message='thetvdb_lookup requires the `api_tvdb` plugin')
@@ -79,9 +79,9 @@ class PluginThetvdbLookup(object):
             'series_content_rating': 'series.contentrating',
             'series_genres': 'series.genre',
             'series_network': 'series.network',
-            'series_banner_url': lambda ep: 'http://www.thetvdb.com/banners/%s' % ep.series.banner,
-            'series_fanart_url': lambda ep: 'http://www.thetvdb.com/banners/%s' % ep.series.fanart,
-            'series_poster_url': lambda ep: 'http://www.thetvdb.com/banners/%s' % ep.series.poster,
+            'series_banner_url': lambda ep: get_mirror('banner') + ep.series.banner,
+            'series_fanart_url': lambda ep: get_mirror('banner') + ep.series.fanart,
+            'series_poster_url': lambda ep: get_mirror('banner') + ep.series.poster,
             'series_airs_day_of_week': 'series.airs_dayofweek',
             'series_language': 'series.language',
             'imdb_url': lambda ep: 'http://www.imdb.com/title/%s' % ep.series.imdb_id,
@@ -92,7 +92,7 @@ class PluginThetvdbLookup(object):
             'ep_name': 'episodename',
             'ep_air_date': 'firstaired',
             'ep_rating': 'rating',
-            'ep_image_url': lambda ep: 'http://www.thetvdb.com/banners/%s' % ep.filename,
+            'ep_image_url': lambda ep: get_mirror('banner') + ep.filename,
             'ep_overview': 'overview',
             'ep_writers': 'writer',
             'ep_directors': 'director',

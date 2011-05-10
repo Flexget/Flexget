@@ -68,6 +68,7 @@ class TVDBContainer(object):
             if tag:
                 if tag.string:
                     setattr(self, col.name, tag.string)
+        self.expired = False
 
 
 class TVDBSeries(TVDBContainer, Base):
@@ -248,7 +249,6 @@ def lookup_series(name=None, tvdb_id=None, only_cached=False, session=None):
         # Series found in cache, update if cache has expired.
         if not only_cached:
             mark_expired(session=session)
-            session.refresh(series)
         if series.expired and not only_cached:
             log.info('Data for %s has expired, refreshing from tvdb' % series.seriesname)
             try:
@@ -379,9 +379,11 @@ def mark_expired(session=None):
 
         # Update our cache to mark the items that have expired
         for chunk in chunked(expired_series):
-            session.query(TVDBSeries).filter(TVDBSeries.id.in_(chunk)).update({'expired': True}, 'fetch')
+            num = session.query(TVDBSeries).filter(TVDBSeries.id.in_(chunk)).update({'expired': True}, 'fetch')
+            log.debug('%s series marked as expired' % num)
         for chunk in chunked(expired_episodes):
-            session.query(TVDBEpisode).filter(TVDBEpisode.id.in_(chunk)).update({'expired': True}, 'fetch')
+            num = session.query(TVDBEpisode).filter(TVDBEpisode.id.in_(chunk)).update({'expired': True}, 'fetch')
+            log.debug('%s episodes marked as expired' % num)
         session.commit()
         # Save the time of this update
         new_server = str(updates.find('time').string)
