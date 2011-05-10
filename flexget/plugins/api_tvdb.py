@@ -374,8 +374,8 @@ def mark_expired(session=None):
 
         def chunked(seq):
             """Helper to divide our expired lists into sizes sqlite can handle in a query. (<1000)"""
-            for i in xrange(0, len(seq), 9000):
-                yield seq[i:i + 9000]
+            for i in xrange(0, len(seq), 900):
+                yield seq[i:i + 900]
 
         # Update our cache to mark the items that have expired
         for chunk in chunked(expired_series):
