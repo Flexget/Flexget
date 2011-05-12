@@ -3,7 +3,7 @@ from sqlalchemy import desc, func
 from flexget.plugin import register_plugin, register_parser_option, DependencyError
 
 try:
-    from flexget.plugins.filter.series import SeriesPlugin, Series, Episode, forget_series, forget_series_episode
+    from flexget.plugins.filter.series import SeriesPlugin, Series, Episode, Release, forget_series, forget_series_episode
 except ImportError:
     raise DependencyError(issued_by='cli_series', missing='series', message='Series commandline interface not loaded')
 
@@ -37,7 +37,7 @@ class SeriesReport(SeriesPlugin):
         session = Session()
 
         name = unicode(self.options['name'].lower())
-        series = session.query(Series).filter(func.lower(Series.name) == name.lower()).first()
+        series = session.query(Series).filter(Series.name_lower == name.lower()).first()
         if not series:
             print 'Unknown series `%s`' % name
             return
@@ -87,17 +87,17 @@ class SeriesReport(SeriesPlugin):
 
             # get latest episode in episodic format
             episode = session.query(Episode).select_from(join(Episode, Series)).\
-                      filter(func.lower(Series.name) == series.name.lower()).\
+                      filter(Series.name_lower == series.name_lower).\
                       filter(Episode.season != None).\
                       order_by(desc(Episode.season)).\
                       order_by(desc(Episode.number)).first()
 
             # no luck, try uid format
             if not episode:
-                episode = session.query(Episode).select_from(join(Episode, Series)).\
-                          filter(func.lower(Series.name) == series.name.lower()).\
+                episode = session.query(Episode).join(Series, Release).\
+                          filter(Series.name_lower == series.name_lower).\
                           filter(Episode.season == None).\
-                          order_by(desc(Episode.first_seen)).first()
+                          order_by(desc(Release.first_seen)).first()
 
             latest = ''
             status = ''
