@@ -1,8 +1,9 @@
 from datetime import datetime
 from functools import update_wrapper
-from sqlalchemy import extract
+from sqlalchemy import extract, func, case
 from sqlalchemy.orm import synonym
 from flexget.manager import Session
+from flexget.utils import qualities
 
 
 def with_session(func):
@@ -150,5 +151,33 @@ def year_property(date_attr):
 
     def expr(cls):
         return extract('year', getattr(cls, date_attr))
+
+    return property_(getter, expr=expr)
+
+
+def lower_property(str_attr):
+    """A property based on a text column that returns or queries on the lower case version of the string."""
+
+    def getter(self):
+        string = getattr(self, str_attr)
+        return string and string.lower()
+
+    def expr(cls):
+        return func.lower(getattr(cls, str_attr))
+
+    return property_(getter, expr=expr)
+
+
+def quality_comp_property(str_attr):
+    """Returns the value for the quality stored, which can be filtered against or used to sort queries."""
+
+    def getter(self):
+        return qualities.get(getattr(self, str_attr)).value
+
+    def expr(cls):
+        whens = {}
+        for qual in qualities.all():
+            whens[qual.name] = qual.value
+        return case(value=getattr(cls, str_attr), whens=whens)
 
     return property_(getter, expr=expr)

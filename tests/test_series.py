@@ -2,13 +2,11 @@ from tests import FlexGetBase
 
 
 def age_series(**kwargs):
-    from flexget.plugins.filter.series import Series
+    from flexget.plugins.filter.series import Release
     from flexget.manager import Session
     import datetime
     session = Session()
-    for series in session.query(Series).all():
-        for episode in series.episodes:
-            episode.first_seen = datetime.datetime.now() - datetime.timedelta(**kwargs)
+    session.query(Release).update({'first_seen': datetime.datetime.now() - datetime.timedelta(**kwargs)})
     session.commit()
 
 
@@ -16,7 +14,7 @@ class TestQuality(FlexGetBase):
 
     __yaml__ = """
         feeds:
-          best_quality:
+          exact_quality:
             mock:
               - {title: 'QTest.S01E01.HDTV.XViD-FlexGet'}
               - {title: 'QTest.S01E01.PDTV.XViD-FlexGet'}
@@ -26,6 +24,15 @@ class TestQuality(FlexGetBase):
             series:
               - QTest:
                   quality: 720p
+
+          quality_fail:
+            mock:
+              - {title: 'Q2Test.S01E01.HDTV.XViD-FlexGet'}
+              - {title: 'Q2Test.S01E01.PDTV.XViD-FlexGet'}
+              - {title: 'Q2Test.S01E01.DSR.XViD-FlexGet'}
+            series:
+              - Q2Test:
+                 quality: 720p
 
           min_quality:
             mock:
@@ -90,12 +97,16 @@ class TestQuality(FlexGetBase):
                 - Test
     """
 
-    def test_best_quality(self):
+    def test_exact_quality(self):
         """Series plugin: choose by quality"""
-        self.execute_feed('best_quality')
+        self.execute_feed('exact_quality')
         assert self.feed.find_entry('accepted', title='QTest.S01E01.720p.XViD-FlexGet'), \
             '720p should have been accepted'
         assert len(self.feed.accepted) == 1, 'should have accepted only one'
+
+    def test_quality_fail(self):
+        self.execute_feed('quality_fail')
+        assert not self.feed.accepted, 'No qualities should have matched'
 
     def test_min_quality(self):
         """Series plugin: min_quality"""
@@ -876,6 +887,55 @@ class TestTimeframe(FlexGetBase):
           test_expires:
             mock:
               - {title: 'Test.S01E03.pdtv-FlexGet'}
+
+          test_min_max_fail:
+            series:
+              - mm test:
+                  timeframe: 5 hours
+                  quality: 720p
+                  min_quality: hdtv
+                  max_quality: 720p
+            mock:
+              - {title: 'MM Test.S01E02.pdtv-FlexGet'}
+              - {title: 'MM Test.S01E02.1080p-FlexGet'}
+
+          test_min_max_pass:
+            series:
+              - mm test:
+                  timeframe: 5 hours
+                  quality: 720p
+                  min_quality: hdtv
+                  max_quality: 720p
+            mock:
+              - {title: 'MM Test.S01E02.pdtv-FlexGet'}
+              - {title: 'MM Test.S01E02.hdtv-FlexGet'}
+              - {title: 'MM Test.S01E02.1080p-FlexGet'}
+
+          test_qualities_fail:
+            series:
+              - q test:
+                  timeframe: 5 hours
+                  qualities:
+                    - hdtv
+                    - 1080p
+
+            mock:
+              - {title: 'Q Test.S01E02.pdtv-FlexGet'}
+              - {title: 'Q Test.S01E02.1080p-FlexGet'}
+
+          test_qualities_pass:
+            series:
+              - q test:
+                  timeframe: 5 hours
+                  quality: 720p
+                  qualities:
+                    - sdtv
+                    - 720p
+
+            mock:
+              - {title: 'Q Test.S01E02.hdtv-FlexGet'}
+              - {title: 'Q Test.S01E02.1080p-FlexGet'}
+
     """
 
     def test_no_waiting(self):
@@ -887,7 +947,7 @@ class TestTimeframe(FlexGetBase):
     def test_stop_waiting(self):
         """Series plugin: timeframe quality appears, stop waiting, proper appears"""
         self.execute_feed('test_stop_waiting_1')
-        assert self.feed.rejected
+        assert self.feed.entries and not self.feed.accepted
         self.execute_feed('test_stop_waiting_2')
         assert self.feed.find_entry('accepted', title='Test.S01E02.720p-FlexGet'), \
             '720p should have caused stop waiting'
@@ -911,6 +971,46 @@ class TestTimeframe(FlexGetBase):
         self.execute_feed('test_expires')
         assert self.feed.accepted, 'timeframe didn\'t expire'
 
+    def test_min_max_fail(self):
+        self.execute_feed('test_min_max_fail')
+        assert not self.feed.accepted
+
+        # Let 6 hours pass, timeframe should not even been started, as pdtv doesn't meet min_quality
+        age_series(hours=6)
+        self.execute_feed('test_min_max_fail')
+        assert self.feed.entries and not self.feed.accepted
+
+    def test_min_max_pass(self):
+        self.execute_feed('test_min_max_pass')
+        assert not self.feed.accepted
+
+        # Let 6 hours pass, timeframe should expire and accept hdtv copy
+        age_series(hours=6)
+        self.execute_feed('test_min_max_pass')
+        assert self.feed.find_entry('accepted', title='MM Test.S01E02.hdtv-FlexGet')
+        assert len(self.feed.accepted) == 1
+
+    def test_qualities_fail(self):
+        self.execute_feed('test_qualities_fail')
+        assert self.feed.find_entry('accepted', title='Q Test.S01E02.1080p-FlexGet'),\
+            'should have accepted wanted quality'
+        assert len(self.feed.accepted) == 1
+
+        # Let 6 hours pass, timeframe should not even been started, as we already have one of our qualities
+        age_series(hours=6)
+        self.execute_feed('test_qualities_fail')
+        assert self.feed.entries and not self.feed.accepted
+
+    def test_qualities_pass(self):
+        self.execute_feed('test_qualities_pass')
+        assert not self.feed.accepted, 'None of the qualities should have matched'
+
+        # Let 6 hours pass, timeframe should expire and accept 1080p copy
+        age_series(hours=6)
+        self.execute_feed('test_qualities_pass')
+        assert self.feed.find_entry('accepted', title='Q Test.S01E02.1080p-FlexGet')
+        assert len(self.feed.accepted) == 1
+
 
 class TestBacklog(FlexGetBase):
 
@@ -926,7 +1026,7 @@ class TestBacklog(FlexGetBase):
     def testBacklog(self):
         """Series plugin: backlog"""
         self.execute_feed('backlog')
-        assert self.feed.rejected, 'no entries at the start'
+        assert self.feed.entries and not self.feed.accepted, 'no entries at the start'
         # simulate test going away from the feed
         del(self.manager.config['feeds']['backlog']['mock'])
         age_series(hours=12)

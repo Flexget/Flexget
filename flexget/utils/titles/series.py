@@ -429,10 +429,7 @@ class SeriesParser(TitleParser):
 
     def __cmp__(self, other):
         """Compares quality of parsers, if quality is equal, compares proper_count."""
-        quality_cmp = cmp(self.quality, other.quality)
-        if quality_cmp == 0:
-            return cmp(self.proper_count, other.proper_count)
-        return quality_cmp
+        return cmp((self.quality, self.proper_count), (other.quality, other.proper_count))
 
     def __eq__(self, other):
         return self is other

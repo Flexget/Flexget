@@ -1,3 +1,4 @@
+from sqlalchemy import DateTime
 from sqlalchemy.schema import Table, MetaData
 from sqlalchemy.exceptions import NoSuchTableError
 
@@ -34,6 +35,17 @@ def table_columns(name, session):
     for column in schema.columns:
         res.append(column.name)
     return res
+
+
+def table_add_column(table_name, name, type, session, default=None):
+    """Adds a column to a table"""
+    if name in table_columns(table_name, session):
+        # If the column already exists, we don't have to do anything.
+        return
+    statement = 'ALTER TABLE %s ADD %s %s' % (table_name, name, type)
+    if default:
+        statement += ' DEFAULT %s' % default
+    session.execute(statement)
 
 
 def drop_tables(names, session):

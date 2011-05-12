@@ -84,8 +84,8 @@ def upgrade(plugin):
                     log.critical('A lower schema version was returned (%s) from the %s upgrade function '
                                  'than passed in (%s)' % (new_ver, plugin, ver))
                     manager.disable_feeds()
-            except Exception:
-                log.exception('Failed to upgrade database for plugin %s' % plugin)
+            except Exception, e:
+                log.exception('Failed to upgrade database for plugin %s: %s' % (plugin, e))
                 manager.disable_feeds()
             finally:
                 session.close()

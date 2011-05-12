@@ -2,23 +2,24 @@ import logging
 import re
 from copy import copy
 from datetime import datetime, timedelta
-from sqlalchemy import Column, Integer, String, Unicode, DateTime, Boolean, desc, func
+from sqlalchemy import Column, Integer, String, Unicode, DateTime, Boolean, desc, select, update
 from sqlalchemy.schema import ForeignKey
 from sqlalchemy.orm import relation, join, synonym
 from flexget import schema
-from flexget.utils.log import log_once
 from flexget.event import event
-from flexget.utils.titles import SeriesParser, ParseWarning
 from flexget.utils import qualities
-from flexget.utils.sqlalchemy_utils import table_columns, table_exists, drop_tables
+from flexget.utils.log import log_once
+from flexget.utils.titles import SeriesParser, ParseWarning
+from flexget.utils.sqlalchemy_utils import table_columns, table_exists, drop_tables, table_schema, table_add_column
 from flexget.utils.tools import merge_dict_from_to
+from flexget.utils.database import lower_property, quality_comp_property
 from flexget.manager import Session
-from flexget.plugin import register_plugin, register_parser_option, get_plugin_by_name, get_plugin_keywords, \
-    PluginWarning, PluginError, DependencyError, priority
+from flexget.plugin import (register_plugin, register_parser_option, get_plugin_by_name, get_plugin_keywords,
+    PluginWarning, PluginError, DependencyError, priority)
 
 
 log = logging.getLogger('series')
-Base = schema.versioned_base('series', 0)
+Base = schema.versioned_base('series', 1)
 
 
 @schema.upgrade('series')
@@ -33,12 +34,24 @@ def upgrade(ver, session):
         # Upgrade episode_releases table to have a proper count and seed it with appropriate numbers
         columns = table_columns('episode_releases', session)
         if not 'proper_count' in columns:
-            log.info('Upgrading episode_release table to have proper_count column')
-            session.execute('ALTER TABLE episode_releases ADD proper_count INTEGER DEFAULT NULL')
+            log.info('Upgrading episode_releases table to have proper_count column')
+            table_add_column('episode_releases', 'proper_count', 'INTEGER', default='NULL', session=session)
             for release in session.query(Release).all():
                 release.proper_count = len([part for part in re.split('[\W_]+', release.title.lower())
                                             if part in SeriesParser.propers])
         ver = 0
+    if ver == 0:
+        log.info('Migrating first_seen column from series_episodes to episode_releases table.')
+        # Create the column in episode_releases
+        table_add_column('episode_releases', 'first_seen', 'DateTime', session)
+        # Seed the first_seen value for all the past releases with the first_seen of their episode.
+        episode_table = table_schema('series_episodes', session)
+        release_table = table_schema('episode_releases', session)
+        for row in session.execute(select([episode_table.c.id, episode_table.c.first_seen])):
+            session.execute(update(release_table, release_table.c.episode_id == row['id'],
+                                   {'first_seen': row['first_seen']}))
+        ver = 1
+
     return ver
 
 
@@ -48,6 +61,7 @@ class Series(Base):
 
     id = Column(Integer, primary_key=True)
     name = Column(Unicode)
+    name_lower = lower_property('name')
     episodes = relation('Episode', backref='series', cascade='all, delete, delete-orphan')
 
     def __repr__(self):
@@ -60,7 +74,6 @@ class Episode(Base):
 
     id = Column(Integer, primary_key=True)
     identifier = Column(String)
-    first_seen = Column(DateTime)
 
     season = Column(Integer)
     number = Column(Integer)
@@ -69,7 +82,13 @@ class Episode(Base):
     releases = relation('Release', backref='episode', cascade='all, delete, delete-orphan')
 
     @property
+    def first_seen(self):
+        return min(release.first_seen for release in self.releases)
+
+    @property
     def age(self):
+        if not self.first_seen:
+            return 'No releases seen'
         diff = datetime.now() - self.first_seen
         age_days = diff.days
         age_hours = diff.seconds / 60 / 60
@@ -87,9 +106,6 @@ class Episode(Base):
             return 'Season Premiere'
         return False
 
-    def __init__(self):
-        self.first_seen = datetime.now()
-
     def __repr__(self):
         return '<Episode(id=%s,identifier=%s)>' % (self.id, self.identifier)
 
@@ -104,6 +120,10 @@ class Release(Base):
     downloaded = Column(Boolean, default=False)
     proper_count = Column(Integer, default=0)
     title = Column(Unicode)
+    first_seen = Column(DateTime)
+
+    def __init__(self):
+        self.first_seen = datetime.now()
 
     def get_quality(self):
         return qualities.get(self._quality)
@@ -112,6 +132,7 @@ class Release(Base):
         self._quality = value.name
 
     quality = synonym('_quality', descriptor=property(get_quality, set_quality))
+    qual_comp = quality_comp_property('_quality')
 
     @property
     def proper(self):
@@ -140,21 +161,26 @@ class SeriesPlugin(object):
 
     """Database helpers"""
 
-    def get_first_seen(self, session, parser):
+    def get_first_seen(self, session, parser, min_qual=None, max_qual=None):
         """Return datetime when this episode of series was first seen"""
-        episode = session.query(Episode).select_from(join(Episode, Series)).\
-            filter(func.lower(Series.name) == parser.name.lower()).\
-            filter(Episode.identifier == parser.identifier).first()
-        if not episode:
+        release = session.query(Release.first_seen).join(Episode, Series).\
+            filter(Series.name_lower == parser.name.lower()).\
+            filter(Episode.identifier == parser.identifier)
+        if min_qual:
+            release = release.filter(Release.qual_comp >= min_qual.value)
+        if max_qual:
+            release = release.filter(Release.qual_comp <= max_qual.value)
+        release = release.order_by(Release.first_seen).first()
+        if not release:
             log.debugall('%s not seen, return current time' % parser)
             return datetime.now()
-        return episode.first_seen
+        return release[0]
 
     def get_latest_info(self, session, name):
         """Return latest known identifier in dict (season, episode, name) for series name"""
         episode = session.query(Episode).select_from(join(Episode, Series)).\
             filter(Episode.season != None).\
-            filter(func.lower(Series.name) == name.lower()).\
+            filter(Series.name_lower == name.lower()).\
             order_by(desc(Episode.season)).\
             order_by(desc(Episode.number)).first()
         if not episode:
@@ -171,10 +197,10 @@ class SeriesPlugin(object):
         Returns 'ep' or 'id' if 3 of the first 5 were parsed as such. Returns 'ep' in the event of a tie.
         Returns 'auto' if there is not enough history to determine the format yet
         """
-        total = session.query(Release).join(Episode).join(Series).\
-            filter(func.lower(Series.name) == name.lower()).count()
-        episodic = session.query(Release).join(Episode).join(Series).\
-            filter(func.lower(Series.name) == name.lower()).\
+        total = session.query(Release).join(Episode, Series).\
+            filter(Series.name_lower == name.lower()).count()
+        episodic = session.query(Release).join(Episode, Series).\
+            filter(Series.name_lower == name.lower()).\
             filter(Episode.season != None).\
             filter(Episode.number != None).count()
         non_episodic = total - episodic
@@ -190,7 +216,7 @@ class SeriesPlugin(object):
     def get_latest_download(self, session, name):
         """Return latest downloaded episode (season, episode, name) for series :name:"""
         latest_download = session.query(Episode).join(Release, Series).\
-            filter(func.lower(Series.name) == name.lower()).\
+            filter(Series.name_lower == name.lower()).\
             filter(Release.downloaded == True).\
             filter(Episode.season != None).\
             filter(Episode.number != None).\
@@ -205,13 +231,13 @@ class SeriesPlugin(object):
     def get_releases(self, session, name, identifier):
         """Return all releases for series by identifier."""
         return session.query(Release).join(Episode, Series).\
-            filter(func.lower(Series.name) == name.lower()).\
+            filter(Series.name_lower == name.lower()).\
             filter(Episode.identifier == identifier).all()
 
     def get_downloaded(self, session, name, identifier):
         """Return list of downloaded releases for this episode"""
         downloaded = session.query(Release).join(Episode, Series).\
-            filter(func.lower(Series.name) == name.lower()).\
+            filter(Series.name_lower == name.lower()).\
             filter(Episode.identifier == identifier).\
             filter(Release.downloaded == True).all()
         if not downloaded:
@@ -222,7 +248,7 @@ class SeriesPlugin(object):
         """Push series information into database. Returns added/existing release."""
         # if series does not exist in database, add new
         series = session.query(Series).\
-            filter(func.lower(Series.name) == parser.name.lower()).\
+            filter(Series.name_lower == parser.name.lower()).\
             filter(Series.id != None).first()
         if not series:
             log.debug('adding series %s into db' % parser.name)
@@ -271,7 +297,7 @@ class SeriesPlugin(object):
 def forget_series(name):
     """Remove a whole series :name: from database."""
     session = Session()
-    series = session.query(Series).filter(func.lower(Series.name) == name.lower()).first()
+    series = session.query(Series).filter(Series.name_lower == name.lower()).first()
     if series:
         session.delete(series)
         session.commit()
@@ -283,7 +309,7 @@ def forget_series(name):
 def forget_series_episode(name, identifier):
     """Remove all episodes by :identifier: from series :name: from database."""
     session = Session()
-    series = session.query(Series).filter(func.lower(Series.name) == name.lower()).first()
+    series = session.query(Series).filter(Series.name_lower == name.lower()).first()
     if series:
         episode = session.query(Episode).filter(Episode.identifier == identifier).\
             filter(Episode.series_id == series.id).first()
@@ -389,6 +415,9 @@ class FilterSeriesBase(object):
                     season, episode = series_settings['watched'].upper().split('E')
                     season = season.lstrip('S')
                     series_settings['watched'] = {'season': int(season), 'episode': int(episode)}
+                # Add quality: 720p if timeframe is specified with no quality
+                if 'timeframe' in series_settings:
+                    series_settings.setdefault('quality', '720p')
 
                 group_series.append({series: series_settings})
             config[group_name] = group_series
@@ -551,9 +580,8 @@ class FilterSeries(SeriesPlugin, FilterSeriesBase):
             # yaml loads ascii only as str
             series_name = unicode(series_name)
             # Update database with capitalization from config
-            db_series = feed.session.query(Series).filter(func.lower(Series.name) == series_name.lower()).first()
-            if db_series:
-                db_series.name = series_name
+            feed.session.query(Series).filter(Series.name_lower == series_name.lower()).\
+                update({'name': series_name}, 'fetch')
             source = guessed_series if series_config.get('series_guessed') else found_series
             # If we didn't find any episodes for this series, continue
             if not source.get(series_name):
@@ -668,7 +696,6 @@ class FilterSeries(SeriesPlugin, FilterSeriesBase):
         for eps in series.itervalues():
             if not eps:
                 continue
-            whitelist = []
 
             # sort episodes in order of quality
             eps.sort(reverse=True)
@@ -683,14 +710,7 @@ class FilterSeries(SeriesPlugin, FilterSeriesBase):
 
             # proper handling
             log.debug('-' * 20 + ' process_propers -->')
-            removed, new_propers = self.process_propers(feed, config, eps)
-            whitelist.extend(new_propers)
-
-            # Remove the nuked eps
-            for ep in removed:
-                log.debug('removing nuked ep: %s' % ep)
-                eps.remove(ep)
-
+            eps = self.process_propers(feed, config, eps)
             if not eps:
                 continue
 
@@ -699,15 +719,17 @@ class FilterSeries(SeriesPlugin, FilterSeriesBase):
             # qualities
             if 'qualities' in config:
                 log.debug('-' * 20 + ' process_qualities -->')
-                self.process_qualities(feed, config, eps, whitelist)
-                continue
+                if self.process_qualities(feed, config, eps):
+                    continue
+                else:
+                    # We haven't gotten any of our qualities, check timeframe to see if we should remove the requirement
+                    if self.process_timeframe(feed, config, eps, series_name):
+                        continue
 
             # reject downloaded
             log.debug('-' * 20 + ' downloaded -->')
-            for ep in self.process_downloaded(feed, eps, whitelist):
-                feed.reject(self.parser2entry[ep], 'already downloaded episode with id \'%s\'' % str(ep.identifier))
-                log.debug('downloaded removed: %s' % ep)
-                eps.remove(ep)
+            if self.process_downloaded(feed, eps):
+                continue
 
             # no releases left, continue to next episode
             if not eps:
@@ -726,62 +748,62 @@ class FilterSeries(SeriesPlugin, FilterSeriesBase):
                     if self.process_episode_advancement(feed, eps, series):
                         continue
 
-            # timeframe
-            if 'timeframe' in config:
-                log.debug('-' * 20 + ' timeframe -->')
-                self.process_timeframe(feed, config, eps, series_name)
-                continue
+            # quality
+            if 'quality' in config:
+                if self.process_quality(feed, config, eps):
+                    continue
+                else:
+                    # We didn't make a quality match, check timeframe to see if we should remove the requirement
+                    if self.process_timeframe(feed, config, eps, series_name):
+                        continue
 
-            # quality, min_quality, max_quality and NO timeframe
-            if ('timeframe' not in config and 'qualities' not in config) and \
-               ('quality' in config or 'min_quality' in config or 'max_quality' in config):
-                log.debug('-' * 20 + ' process quality -->')
-                self.process_quality(feed, config, eps)
-                continue
+            # min_ and max_quality
+            if 'min_quality' in config or 'max_quality' in config:
+                eps = self.process_min_max_quality(config, eps)
 
-            # no special configuration, just choose the best
-            reason = 'only choice'
+            # All the remaining match requirements, just choose the best
+            reason = 'last choice'
             if len(eps) > 1:
-                reason = 'choose best'
-            self.accept_series(feed, best, reason)
+                reason = 'choose best remaining'
+            self.accept_series(feed, eps[0], reason)
 
     def process_propers(self, feed, config, eps):
-        """
-            Accepts needed propers. Nukes episodes from which there exists proper.
-            Returns a list of removed episodes.
+        """Accepts needed propers. Nukes episodes from which there exists proper.
+
+        Returns:
+            A list of episodes to continue processing.
         """
 
-        proper_eps = [ep for ep in eps if ep.proper]
         # Return if there are no propers for this episode
-        if not proper_eps:
-            return [], []
+        if not any(ep.proper_count for ep in eps):
+            return eps
 
-        new_propers = {} # {quality: parser} format
-        removed = []
-        for ep in proper_eps:
-            new_propers.setdefault(ep.quality, ep)
-            if ep.quality not in new_propers or ep.proper_count > new_propers[ep.quality].proper_count:
-                new_propers[ep.quality] = ep
+        pass_filter = []
+        best_propers = []
+        # Since eps is sorted by quality then proper_count we always see the highest proper for a quality first.
+        (last_qual, best_proper) = (None, 0)
+        for ep in eps:
+            if not ep.quality == last_qual:
+                last_qual, best_proper = ep.quality, ep.proper_count
+                if ep.proper_count:
+                    best_propers.append(ep)
+            if ep.proper_count < best_proper:
+                # nuke qualities which there is a better proper available
+                feed.reject(self.parser2entry[ep], 'nuked')
+            else:
+                pass_filter.append(ep)
 
-        # nuke qualities which there is proper available
-        for quality, proper_ep in new_propers.iteritems():
-            for ep in set(eps) - set(removed):
-                if ep.quality == quality and ep.proper_count < proper_ep.proper_count:
-                    feed.reject(self.parser2entry[ep], 'nuked')
-                    removed.append(ep)
-
-        # If propers support is turned off, or proper timeframe has expired just return the nuked episodes
+        # If propers support is turned off, or proper timeframe has expired just return the filtered eps list
         if 'propers' in config:
             if isinstance(config['propers'], bool):
                 if not config['propers']:
-                    return removed, []
+                    return pass_filter
             else:
                 # propers with timeframe
                 amount, unit = config['propers'].split(' ')
-                log.debug('amount: %s unit: %s' % (repr(amount), repr(unit)))
-                params = {unit: int(amount)}
+                log.debug('amount: %r unit: %r' % (amount, unit))
                 try:
-                    timeframe = timedelta(**params)
+                    timeframe = timedelta(**{unit: int(amount)})
                 except TypeError:
                     raise PluginWarning('Invalid time format', log)
 
@@ -793,7 +815,7 @@ class FilterSeries(SeriesPlugin, FilterSeriesBase):
 
                 if datetime.now() > expires:
                     log.debug('propers timeframe expired')
-                    return removed, []
+                    return pass_filter
 
         downloaded_releases = self.get_downloaded(feed.session, eps[0].name, eps[0].identifier)
         downloaded_qualities = [d.quality for d in downloaded_releases]
@@ -805,56 +827,60 @@ class FilterSeries(SeriesPlugin, FilterSeriesBase):
                 if release.quality == parser.quality and release.proper_count >= parser.proper_count:
                     return True
 
-        # Make a list of propers we actually need
-        needed_propers = []
-        for quality, ep in new_propers.items():
-            if quality in downloaded_qualities and not proper_downloaded(ep):
-                needed_propers.append(ep)
+        # Accept propers we actually need, and remove them from the list of entries to continue processing
+        for ep in best_propers:
+            if ep.quality in downloaded_qualities and not proper_downloaded(ep):
+                feed.accept(self.parser2entry[ep], 'proper')
+                pass_filter.remove(ep)
 
-        log.debug('needed new_propers: %s' % [e.data for e in needed_propers])
-        for ep in needed_propers:
-            feed.accept(self.parser2entry[ep], 'proper')
+        return pass_filter
 
-        return removed, needed_propers
+    def process_downloaded(self, feed, eps):
+        """Rejects all episodes (regardless of quality) if this episode has been downloaded.
 
-    def process_downloaded(self, feed, eps, whitelist):
-        """
-            Rejects all downloaded episodes (regardless of quality).
-            Doesn't reject reject anything in :whitelist:.
+        Returns:
+            True when episode has already been downloaded
         """
 
-        downloaded = set()
         downloaded_releases = self.get_downloaded(feed.session, eps[0].name, eps[0].identifier)
         log.debug('downloaded: %s' % [e.title for e in downloaded_releases])
         if downloaded_releases and eps:
             log.debug('identifier %s is downloaded' % eps[0].identifier)
-            for ep in eps[:]:
-                if ep not in whitelist:
-                    # same episode can appear multiple times, so use a set to avoid duplicates
-                    downloaded.add(ep)
-        return downloaded
+            for ep in eps:
+                # Reject these episodes
+                feed.reject(self.parser2entry[ep], 'already downloaded episode with id `%s`' % ep.identifier)
+            return True
 
     def process_quality(self, feed, config, eps):
-        """Accepts episodes that meet configured qualities"""
+        quality = qualities.get(config['quality'])
+        # scan for quality
+        for ep in eps:
+            if quality == ep.quality:
+                entry = self.parser2entry[ep]
+                log.debug('Series accepting. %s meets quality %s' % (entry['title'], quality))
+                self.accept_series(feed, ep, 'quality met')
+                return True
 
-        min = qualities.UNKNOWN
-        max = qualities.max()
-        if 'quality' in config:
-            quality = qualities.get(config['quality'])
-            min, max = quality, quality
-        else:
-            min = qualities.get(config.get('min_quality', ''), min)
-            max = qualities.get(config.get('max_quality', ''), max)
-            log.debug('min: %s max: %s' % (min, max))
+    def process_min_max_quality(self, config, eps):
+        """Filters eps that do not fall between min_quality and max_quality.
+
+        Returns:
+            A list of eps that are in the acceptable range
+        """
+
+        min = qualities.get(config.get('min_quality', ''), qualities.UNKNOWN)
+        max = qualities.get(config.get('max_quality', ''), qualities.max())
+        log.debug('min: %s max: %s' % (min, max))
+        result = []
         # see if any of the eps match accepted qualities
         for ep in eps:
             quality = ep.quality
-            log.debug('ep: %s min: %s max: %s quality: %r' % (ep.data, min.value, max.value, quality))
+            log.debug('ep: %s min: %s max: %s' % (ep.data, min.value, max.value,))
             if quality <= max and quality >= min:
-                self.accept_series(feed, ep, 'meets quality')
-                break
-        else:
+                result.append(ep)
+        if not result:
             log.debug('no quality meets requirements')
+        return result
 
     def process_watched(self, feed, config, eps):
         """Rejects all episodes older than defined in watched, returns True when this happens."""
@@ -895,63 +921,41 @@ class FilterSeries(SeriesPlugin, FilterSeriesBase):
                 return True
 
     def process_timeframe(self, feed, config, eps, series_name):
-        """
-            The nasty timeframe logic, too complex even to explain (for now).
-            Returns True when there's no sense trying any other logic.
+        """Runs the timframe logic to determine if we should wait for a better quality.
+
+        Saves current best to backlog if timeframe has not expired.
+
+        Returns:
+            True - if we should keep the quality (or qualities) restriction
+            False - if the quality restriction should be released, due to imeframe expiring
         """
 
-        if 'max_quality' in config:
-            log.warning('Timeframe does not support max_quality (yet)')
-        if 'min_quality' in config:
-            log.warning('Timeframe does not support min_quality (yet)')
-        if 'qualities' in config:
-            log.warning('Timeframe does not support qualities (yet)')
+        if 'timeframe' not in config:
+            return True
 
         best = eps[0]
 
         # parse options
         amount, unit = config['timeframe'].split(' ')
-        log.debug('amount: %s unit: %s' % (repr(amount), repr(unit)))
+        log.debug('amount: %r unit: %r' % (amount, unit))
         params = {unit: int(amount)}
         try:
             timeframe = timedelta(**params)
         except TypeError:
             raise PluginWarning('Invalid time format', log)
 
-        quality_name = config.get('quality', '720p')
-        if quality_name not in qualities.registry:
-            log.error('Parameter quality has unknown value: %s' % quality_name)
-        quality = qualities.get(quality_name)
-
-        # scan for quality, starting from worst quality (reverse) (old logic, see note below)
-        for ep in reversed(eps):
-            if quality == ep.quality:
-                entry = self.parser2entry[ep]
-                log.debug('Timeframe accepting. %s meets quality %s' % (entry['title'], quality))
-                self.accept_series(feed, ep, 'quality met, timeframe unnecessary')
-                return True
-
-        # expire timeframe, accept anything
-        first_seen = self.get_first_seen(feed.session, best)
+        # Make sure we only start timing from the first seen quality that matches min and max requirements.
+        min_quality = config.get('min_quality') and qualities.get(config['min_quality'])
+        max_quality = config.get('max_quality') and qualities.get(config['max_quality'])
+        first_seen = self.get_first_seen(feed.session, best, min_quality, max_quality)
         expires = first_seen + timeframe
-        log.debug('timeframe: %s' % timeframe)
-        log.debug('first_seen: %s' % first_seen)
-        log.debug('timeframe expires: %s' % str(expires))
+        log.debug('timeframe: %s, first_seen: %s, expires: %s' % (timeframe, first_seen, expires))
 
         stop = feed.manager.options.stop_waiting.lower() == series_name.lower()
         if expires <= datetime.now() or stop:
-            entry = self.parser2entry[best]
-            if stop:
-                log.info('Stopped timeframe, accepting %s' % (entry['title']))
-            else:
-                log.info('Timeframe expired, accepting %s' % (entry['title']))
-            self.accept_series(feed, best, 'expired/stopped')
-            for ep in eps:
-                if ep == best:
-                    continue
-                entry = self.parser2entry[ep]
-                feed.reject(entry, 'wrong quality')
-            return True
+            # Expire timeframe, accept anything
+            log.info('Timeframe expired, releasing quality restriction.')
+            return False
         else:
             # verbose waiting, add to backlog
             diff = expires - datetime.now()
@@ -964,20 +968,17 @@ class FilterSeries(SeriesPlugin, FilterSeriesBase):
             log.info('Timeframe waiting %s for %sh:%smin, currently best is %s' % \
                 (series_name, hours, minutes, entry['title']))
 
-            # reject all episodes that are in timeframe
-            log.debug('timeframe waiting %s episode %s, rejecting all occurrences' % (series_name, best.identifier))
-            for ep in eps:
-                feed.reject(self.parser2entry[ep], 'timeframe is waiting')
             # add best entry to backlog (backlog is able to handle duplicate adds)
             if self.backlog:
                 self.backlog.add_backlog(feed, entry)
             return True
 
-    # TODO: whitelist deprecated ?
-    def process_qualities(self, feed, config, eps, whitelist=None):
-        """
-            Accepts all wanted qualities.
-            Accepts whitelisted episodes even if downloaded.
+    def process_qualities(self, feed, config, eps):
+        """Accepts all wanted qualities.
+
+        Returns:
+            True - if at least one wanted quality has been downloaded or accepted
+            False - if no wanted qualities have been accepted
         """
 
         # get list of downloaded releases
@@ -1000,11 +1001,12 @@ class FilterSeries(SeriesPlugin, FilterSeriesBase):
             if ep.quality not in wanted_qualities:
                 log.debug('%s is unwanted quality' % ep.quality)
                 continue
-            if is_quality_downloaded(ep.quality) and ep not in (whitelist or []):
+            if is_quality_downloaded(ep.quality):
                 feed.reject(self.parser2entry[ep], 'quality downloaded')
             else:
                 feed.accept(self.parser2entry[ep], 'quality wanted')
                 accepted_qualities.append(ep.quality) # don't accept more of these
+        return bool(downloaded_releases or accepted_qualities)
 
     # TODO: get rid of, see how feed.reject is called, consistency!
     def accept_series(self, feed, parser, reason):
