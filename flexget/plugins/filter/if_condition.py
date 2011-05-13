@@ -1,6 +1,7 @@
 import logging
 import re
 import datetime
+from copy import copy
 from flexget.feed import Feed
 from flexget.plugin import register_plugin, get_plugins_by_phase, get_plugin_by_name, priority
 
@@ -56,10 +57,11 @@ class FilterIf(object):
             'fail': feed.fail}
         for entry in feed.entries:
             # Make entry fields and other utilities available in the eval namespace
-            eval_locals = {'has_field': lambda f: entry.has_key(f),
-                           'timedelta': datetime.timedelta,
-                           'now': datetime.datetime.now()}
-            eval_locals.update(entry)
+            # We need our namespace to be an Entry instance for lazy loading to work
+            eval_locals = copy(entry)
+            eval_locals.update({'has_field': lambda f: entry.has_key(f),
+                                'timedelta': datetime.timedelta,
+                                'now': datetime.datetime.now()})
             for item in config:
                 requirement, action = item.items()[0]
                 try:
