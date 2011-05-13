@@ -731,10 +731,6 @@ class FilterSeries(SeriesPlugin, FilterSeriesBase):
             if self.process_downloaded(feed, eps):
                 continue
 
-            # no releases left, continue to next episode
-            if not eps:
-                continue
-
             best = eps[0]
             log.debug('continuing w. episodes: %s' % [e.data for e in eps])
             log.debug('best episode is: %s' % best.data)
@@ -760,6 +756,10 @@ class FilterSeries(SeriesPlugin, FilterSeriesBase):
             # min_ and max_quality
             if 'min_quality' in config or 'max_quality' in config:
                 eps = self.process_min_max_quality(config, eps)
+
+            # no releases left, continue to next episode
+            if not eps:
+                continue
 
             # All the remaining match requirements, just choose the best
             reason = 'last choice'
