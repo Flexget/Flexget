@@ -12,7 +12,7 @@ class TestThetvdbLookup(FlexGetBase):
             thetvdb_lookup: yes
             # Access a tvdb field to cause lazy loading to occur
             set:
-              afield: "{{ thetvdb_id }}"
+              afield: "{{ thetvdb_id }}{{ ep_name }}"
         feeds:
           test:
             mock:
