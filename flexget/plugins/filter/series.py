@@ -775,7 +775,7 @@ class FilterSeries(SeriesPlugin, FilterSeriesBase):
         """
 
         # Return if there are no propers for this episode
-        if not any(ep.proper_count for ep in eps):
+        if not any(ep.proper_count > 0 for ep in eps):
             return eps
 
         pass_filter = []
@@ -785,7 +785,7 @@ class FilterSeries(SeriesPlugin, FilterSeriesBase):
         for ep in eps:
             if not ep.quality == last_qual:
                 last_qual, best_proper = ep.quality, ep.proper_count
-                if ep.proper_count:
+                if ep.proper_count > 0:
                     best_propers.append(ep)
             if ep.proper_count < best_proper:
                 # nuke qualities which there is a better proper available

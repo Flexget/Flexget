@@ -112,7 +112,7 @@ class SeriesReport(SeriesPlugin):
                     if release.downloaded:
                         status += '*'
                     status += release.quality.name
-                    if release.proper_count:
+                    if release.proper_count > 0:
                         status += '-proper'
                         if release.proper_count > 1:
                             status += str(release.proper_count)
