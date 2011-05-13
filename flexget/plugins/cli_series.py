@@ -61,7 +61,7 @@ class SeriesReport(SeriesPlugin):
                 title = release.title
                 if len(title) > 55:
                     title = title[:55] + '...'
-                if release.proper_count:
+                if release.proper_count > 0:
                     status += '-proper'
                     if release.proper_count > 1:
                         status += str(release.proper_count)
