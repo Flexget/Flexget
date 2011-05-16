@@ -55,7 +55,7 @@ class ImportSeries(FilterSeriesBase):
             if input.api_ver == 1:
                 raise PluginError('Plugin %s does not support API v2' % input_name)
 
-            method = input.phase_handlers['on_feed_input']
+            method = input.phase_handlers['input']
             result = method(feed, input_config)
             if not result:
                 log.warning('Input %s did not return anything' % input_name)

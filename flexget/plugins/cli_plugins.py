@@ -34,8 +34,7 @@ class PluginsList(object):
 
             # build roles list
             for info in plugins_in_phase:
-                method_name = phase_methods[phase]
-                priority = info.phase_handlers[method_name].priority
+                priority = info.phase_handlers[phase].priority
 
                 if info['name'] in roles:
                     roles[info['name']].append('%s(%s)' % (phase, priority))

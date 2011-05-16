@@ -1,8 +1,8 @@
 import logging
 import copy
 from flexget.manager import Session
-from flexget.plugin import get_methods_by_phase, get_plugins_by_phase, get_plugin_by_name, \
-    feed_phases, PluginWarning, PluginError, DependencyError
+from flexget.plugin import get_plugins_by_phase, get_plugin_by_name, \
+    feed_phases, PluginWarning, PluginError, DependencyError, plugins as all_plugins
 from flexget.utils.simple_persistence import SimpleFeedPersistence
 from flexget.event import fire_event
 
@@ -279,7 +279,7 @@ class Feed(object):
         if entry not in self.accepted and entry not in self.rejected:
             self.accepted.append(entry)
             # Run on_entry_accept phase
-            self.__run_phase('accept', entry, reason=reason, **kwargs)
+            self.__run_entry_phase('accept', entry, reason=reason, **kwargs)
 
     def reject(self, entry, reason=None, **kwargs):
         """Reject this entry immediately and permanently with optional reason"""
@@ -295,7 +295,7 @@ class Feed(object):
         if not entry in self.rejected:
             self.rejected.append(entry)
             # Run on_entry_reject phase
-            self.__run_phase('reject', entry, reason=reason, **kwargs)
+            self.__run_entry_phase('reject', entry, reason=reason, **kwargs)
 
     def fail(self, entry, reason=None, **kwargs):
         """Mark entry as failed."""
@@ -304,7 +304,7 @@ class Feed(object):
             self.failed.append(entry)
             log.error('Failed %s (%s)' % (entry['title'], reason))
             # Run on_entry_fail phase
-            self.__run_phase('fail', entry, reason=reason, **kwargs)
+            self.__run_entry_phase('fail', entry, reason=reason, **kwargs)
 
     def trace(self, entry, message):
         """Add tracing message to entry."""
@@ -320,7 +320,7 @@ class Feed(object):
             log.debug('Aborting feed (plugin: %s)' % self.current_plugin)
         # Run the abort phase before we set the _abort flag
         self._abort = True
-        self.__run_phase('abort')
+        self.__run_feed_phase('abort')
 
     def find_entry(self, category='entries', **values):
         """Find and return entry with given attributes from feed or None"""
@@ -354,91 +354,101 @@ class Feed(object):
         else:
             return self.config[keyword]
 
-    def __run_phase(self, phase, entry=None, **kwargs):
-        """Execute all configured plugins in :phase:"""
-        # TODO: entry events are not very elegant, refactor into real (new) events or something ...
-        entry_events = ['accept', 'reject', 'fail']
-        # fail when trying to run an on_entry_* event without an entry
-        if phase in entry_events and not entry:
-            raise Exception('Entry must be specified when running the %s event' % phase)
-        methods = get_methods_by_phase(phase)
-        # log.debugall('Event %s methods %s' % (event, methods))
+    def plugins(self):
+        """An iterator over PluginInfo instances enabled on this feed."""
+        return (p for p in all_plugins.itervalues() if p.name in self.config or p.builtin)
 
+    def plugins_by_phase(self, phase):
+        """Returns a list of plugins enabled for phase, sorted in the order for that phase."""
+        phase_plugins = (p for p in self.plugins() if phase in p.phase_handlers)
+        return sorted(phase_plugins, key=lambda p: p.phase_handlers[phase], reverse=True)
+
+    def __run_feed_phase(self, phase):
+        if phase not in feed_phases + ['process_start', 'process_end']:
+            raise Exception('%s is not a valid feed phase' % phase)
         # warn if no filters or outputs in the feed
+        phase_plugins = self.plugins_by_phase(phase)
         if phase in ['filter', 'output']:
-            for method in methods:
-                if method.plugin.name in self.config:
-                    break
-            else:
-                if not self.manager.unit_test:
-                    log.warning('Feed doesn\'t have any %s plugins, you should add some!' % phase)
+            if not phase_plugins and not self.manager.unit_test:
+                log.warning('Feed doesn\'t have any %s plugins, you should add some!' % phase)
 
-        for method in methods:
+        for plugin in phase_plugins:
             # Abort this phase if one of the plugins disables it
             if phase in self.disabled_phases:
                 return
-            keyword = method.plugin.name
-            if keyword in self.config or method.plugin.builtin:
+            # store execute info, except during entry events
+            self.current_phase = phase
+            self.current_plugin = plugin.name
 
-                if phase not in entry_events:
-                    # store execute info, except during entry events
-                    self.current_phase = phase
-                    self.current_plugin = keyword
+            if plugin.api_ver == 1:
+                # backwards compatibility
+                # pass method only feed (old behaviour)
+                args = (self,)
+            else:
+                # pass method feed, config
+                args = (self, self.config.get(plugin.name))
 
-                # log.debugall('Running %s method %s' % (keyword, method))
-                # call the plugin
-                try:
-                    if phase in entry_events:
-                        # Add extra parameters for the on_entry_* events
-                        method(self, entry, **kwargs)
-                    else:
-                        fire_event('feed.execute.before_plugin', self, keyword)
-                        try:
-                            response = []
-                            if method.plugin.api_ver == 1:
-                                # backwards compatibility
-                                # pass method only feed (old behaviour)
-                                response = method(self)
-                            else:
-                                # pass method feed, config
-                                config = self.config.get(keyword)
-                                response = method(self, config)
-                            if response:
-                                # add entries returned by input to self.entries
-                                self.entries.extend(response)
-                        finally:
-                            fire_event('feed.execute.after_plugin', self, keyword)
-                except PluginWarning, warn:
-                    # check if this warning should be logged only once (may keep repeating)
-                    if warn.kwargs.get('log_once', False):
-                        from flexget.utils.log import log_once
-                        log_once(warn.value, warn.log)
-                    else:
-                        warn.log.warning(warn)
-                except EntryUnicodeError, eue:
-                    log.critical('Plugin %s tried to create non-unicode compatible entry (key: %s, value: %r)' %
-                        (keyword, eue.key, eue.value))
-                    self.abort()
-                except PluginError, err:
-                    err.log.critical(err)
-                    self.abort()
-                except DependencyError, e:
-                    log.critical('Plugin `%s` cannot be used because dependency `%s` is missing.' %
-                        (keyword, e.missing))
-                    self.abort()
-                except Exception, e:
-                    log.exception('BUG: Unhandled error in plugin %s: %s' % (keyword, e))
-                    self.abort()
-                    # don't handle plugin errors gracefully with unit test
-                    if self.manager.unit_test:
-                        raise
+            try:
+                fire_event('feed.execute.before_plugin', self, plugin.name)
+                response = self.__run_plugin(plugin, phase, args)
+                if phase == 'input' and response:
+                    # add entries returned by input to self.entries
+                    self.entries.extend(response)
+                # purge entries between plugins
+                self.purge()
+            finally:
+                fire_event('feed.execute.after_plugin', self, plugin.name)
 
-                if phase not in entry_events:
-                    # purge entries between plugins
-                    self.purge()
-                # check for priority operations
-                if self._abort and phase != 'abort':
-                    return
+            # Make sure we abort if any plugin sets our abort flag
+            if self._abort and phase != 'abort':
+                return
+
+    def __run_entry_phase(self, phase, entry, **kwargs):
+        # TODO: entry events are not very elegant, refactor into real (new) events or something ...
+        if phase not in ['accept', 'reject', 'fail']:
+            raise Exception('Not a valid entry phase')
+        phase_plugins = self.plugins_by_phase(phase)
+        for plugin in phase_plugins:
+            self.__run_plugin(plugin, phase, (self, entry), kwargs)
+
+    def __run_plugin(self, plugin, phase, args=None, kwargs=None):
+        """Execute given plugin's phase method, with supplied args and kwargs."""
+
+        keyword = plugin.name
+        method = plugin.phase_handlers[phase]
+        if args is None:
+            args = []
+        if kwargs is None:
+            kwargs = {}
+
+        # log.debugall('Running %s method %s' % (keyword, method))
+        # call the plugin
+        try:
+            return method(*args, **kwargs)
+        except PluginWarning, warn:
+            # check if this warning should be logged only once (may keep repeating)
+            if warn.kwargs.get('log_once', False):
+                from flexget.utils.log import log_once
+                log_once(warn.value, warn.log)
+            else:
+                warn.log.warning(warn)
+        except EntryUnicodeError, eue:
+            log.critical('Plugin %s tried to create non-unicode compatible entry (key: %s, value: %r)' %
+                (keyword, eue.key, eue.value))
+            self.abort()
+        except PluginError, err:
+            err.log.critical(err)
+            self.abort()
+        except DependencyError, e:
+            log.critical('Plugin `%s` cannot be used because dependency `%s` is missing.' %
+                (keyword, e.missing))
+            self.abort()
+        except Exception, e:
+            log.exception('BUG: Unhandled error in plugin %s: %s' % (keyword, e))
+            self.abort()
+            # don't handle plugin errors gracefully with unit test
+            if self.manager.unit_test:
+                raise
 
     def rerun(self):
         """Immediattely re-run the feed after execute has completed."""
@@ -492,7 +502,7 @@ class Feed(object):
                     continue
 
                 # run all plugins with this phase
-                self.__run_phase(phase)
+                self.__run_feed_phase(phase)
 
                 # if abort flag has been set feed should be aborted now
                 # since this calls return rerun will not be done
@@ -519,14 +529,14 @@ class Feed(object):
 
     def process_start(self):
         """Execute process_start phase"""
-        self.__run_phase('process_start')
+        self.__run_feed_phase('process_start')
 
     def process_end(self):
         """Execute terminate phase for this feed"""
         if self.manager.options.validate:
             log.debug('No process_end phase with --check')
             return
-        self.__run_phase('process_end')
+        self.__run_feed_phase('process_end')
 
     def validate(self):
         """Called during feed execution. Validates config, prints errors and aborts feed if invalid."""

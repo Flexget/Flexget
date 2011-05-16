@@ -31,11 +31,11 @@ class PluginPriority(object):
         for name, priority in feed.config.get('plugin_priority', {}).iteritems():
             names.append(name)
             originals = self.priorities.setdefault(name, {})
-            for handler_name, phase in plugins[name].phase_handlers.iteritems():
-                originals[handler_name] = phase.priority
-                log.debug('stored %s original value %s' % (handler_name, phase.priority))
-                phase.priority = priority
-                log.debug('set %s new value %s' % (handler_name, priority))
+            for phase, event in plugins[name].phase_handlers.iteritems():
+                originals[phase] = event.priority
+                log.debug('stored %s original value %s' % (phase, event.priority))
+                event.priority = priority
+                log.debug('set %s new value %s' % (phase, priority))
         log.debug('Changed priority for: %s' % ', '.join(names))
 
     def on_feed_exit(self, feed):
@@ -46,8 +46,8 @@ class PluginPriority(object):
         for name in feed.config.get('plugin_priority', {}).keys():
             names.append(name)
             originals = self.priorities[name]
-            for handler_name, priority in originals.iteritems():
-                plugins[name].phase_handlers[handler_name].priority = priority
+            for phase, priority in originals.iteritems():
+                plugins[name].phase_handlers[phase].priority = priority
         log.debug('Restored priority for: %s' % ', '.join(names))
         self.priorities = {}
 

@@ -67,4 +67,4 @@ class PluginUrlRewriting(object):
                     raise UrlRewritingError('%s: Internal error with url %s' % (name, entry['url']))
 
 register_plugin(PluginUrlRewriting, 'urlrewriting', builtin=True)
-register_feed_phase(PluginUrlRewriting, 'urlrewrite', before='download')
+register_feed_phase('urlrewrite', before='download')

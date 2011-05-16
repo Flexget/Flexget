@@ -34,10 +34,9 @@ class FilterSeriesPremiere(FilterSeriesBase):
         self.build_options_validator(options)
         return root
 
-    # Configure the series plugin before any filtering is done
-    @priority(255)
-    def on_feed_filter(self, feed):
-        config = feed.config['series_premiere']
+    # Run after series and metainfo series plugins
+    @priority(115)
+    def on_feed_metainfo(self, feed, config):
         if not config:
             # Don't run when we are disabled
             return
@@ -65,4 +64,4 @@ class FilterSeriesPremiere(FilterSeriesBase):
         self.merge_config(feed, allseries)
 
 
-register_plugin(FilterSeriesPremiere, 'series_premiere')
+register_plugin(FilterSeriesPremiere, 'series_premiere', api_ver=2)

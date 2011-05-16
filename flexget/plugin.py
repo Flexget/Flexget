@@ -14,13 +14,9 @@ from uuid import NAMESPACE_DNS
 
 log = logging.getLogger('plugin')
 
-__all__ = ['PluginWarning', 'PluginError',
-           'register_plugin', 'register_parser_option',
-           'register_feed_phase',
-           'get_plugin_by_name', 'get_plugins_by_group',
-           'get_plugin_keywords', 'get_plugins_by_phase',
-           'get_methods_by_phase', 'get_phases_by_plugin',
-           'internet', 'priority']
+__all__ = ['PluginWarning', 'PluginError', 'register_plugin', 'register_parser_option', 'register_feed_phase',
+           'get_plugin_by_name', 'get_plugins_by_group', 'get_plugin_keywords', 'get_plugins_by_phase',
+           'get_phases_by_plugin', 'internet', 'priority']
 
 
 class DependencyError(Exception):
@@ -191,7 +187,7 @@ def register_parser_option(*args, **kwargs):
     _plugin_options.append((args, kwargs))
 
 
-def register_feed_phase(plugin_class, name, before=None, after=None):
+def register_feed_phase(name, before=None, after=None):
     """Adds a new feed phase to the available phases."""
     if before and after:
         raise RegisterException('You can only give either before or after for a phase.')
@@ -200,7 +196,7 @@ def register_feed_phase(plugin_class, name, before=None, after=None):
     if name in feed_phases or name in _new_phase_queue:
         raise RegisterException('Phase %s already exists.' % name)
 
-    def add_phase(phase_name, plugin_class, before, after):
+    def add_phase(phase_name, before, after):
         if not before is None and not before in feed_phases:
             return False
         if not after is None and not after in feed_phases:
@@ -220,8 +216,8 @@ def register_feed_phase(plugin_class, name, before=None, after=None):
         return True
 
     # if can't add yet (dependencies) queue addition
-    if not add_phase(name, plugin_class.__name__, before, after):
-        _new_phase_queue[name] = [plugin_class.__name__, before, after]
+    if not add_phase(name, before, after):
+        _new_phase_queue[name] = [before, after]
 
     for phase_name, args in _new_phase_queue.items():
         if add_phase(phase_name, *args):
@@ -240,7 +236,7 @@ class Plugin(object):
     def __init__(self, plugin_info, *args, **kw):
         """Initialize basic plugin attributes."""
         self.plugin_info = plugin_info
-        self.log = logging.getLogger(self.LOGGER_NAME or self.plugin_info.name) 
+        self.log = logging.getLogger(self.LOGGER_NAME or self.plugin_info.name)
 
 
 class BuiltinPlugin(Plugin):
@@ -306,11 +302,11 @@ class PluginInfo(dict):
                 log.error("Could not create plugin '%s' from class %s.%s" % (
                     self.name, self.plugin_class.__module__, self.plugin_class.__name__))
                 raise
-        else: 
+        else:
             # Manually registered
             self.instance = self.plugin_class()
             self.instance.plugin_info = self # give plugin easy access to its own info
-            self.instance.log = logging.getLogger(getattr(self.instance, "LOGGER_NAME", None) or self.name) 
+            self.instance.log = logging.getLogger(getattr(self.instance, "LOGGER_NAME", None) or self.name)
 
         if self.name in plugins:
             PluginInfo.dupe_counter += 1
@@ -330,8 +326,8 @@ class PluginInfo(dict):
 
     def build_phase_handlers(self):
         """(Re)build phase_handlers in this plugin"""
-        for event, method_name in phase_methods.iteritems():
-            if method_name in self.phase_handlers:
+        for phase, method_name in phase_methods.iteritems():
+            if phase in self.phase_handlers:
                 continue
             if hasattr(self.instance, method_name):
                 method = getattr(self.instance, method_name)
@@ -342,10 +338,10 @@ class PluginInfo(dict):
                     handler_prio = method.priority
                 else:
                     handler_prio = DEFAULT_PRIORITY
-                event = add_phase_handler('plugin.%s.%s' % (self.name, event), method, handler_prio)
+                event = add_phase_handler('plugin.%s.%s' % (self.name, phase), method, handler_prio)
                 # provides backwards compatibility
                 event.plugin = self
-                self.phase_handlers[method_name] = event
+                self.phase_handlers[phase] = event
 
     def __getattr__(self, attr):
         if attr in self:
@@ -367,16 +363,16 @@ register_plugin = PluginInfo
 def register(plugin_class, groups=None, auto=False):
     """ Register plugin with attributes according to C{PLUGIN_INFO} class variable.
         Additional groups can be optionally provided.
-        
-        @return: Plugin info of registered plugin. 
+
+        @return: Plugin info of registered plugin.
     """
     # Base classes outside of plugin modules are NEVER auto-registered; if you have ones
     # in a plugin module, use the "*PluginBase" naming convention
-    if auto and plugin_class.__name__.endswith("PluginBase"): 
+    if auto and plugin_class.__name__.endswith("PluginBase"):
         log.debugall("NOT auto-registering plugin base class %s.%s" % (
             plugin_class.__module__, plugin_class.__name__))
-        return 
-    
+        return
+
     info = plugin_class.PLUGIN_INFO
     name = PluginInfo.name_from_class(plugin_class)
 
@@ -390,10 +386,10 @@ def register(plugin_class, groups=None, auto=False):
         return plugins[name]
     else:
         if auto:
-            log.debugall("Auto-registering plugin %s" % name) 
+            log.debugall("Auto-registering plugin %s" % name)
         return PluginInfo(plugin_class, name, list(set(info.get('groups', []) + (groups or []))),
             info.get('builtin', False), info.get('debug', False), info.get('api_ver', 1))
-    
+
 
 def get_standard_plugins_path():
     """Determine a plugin path suitable for general use."""
@@ -563,59 +559,25 @@ def load_plugins(parser):
 
 
 def get_plugins_by_phase(phase):
-    """Return list of all plugins that hook :phase:"""
-    result = []
+    """Return an iterator over all plugins that hook :phase:"""
     if not phase in phase_methods:
         raise Exception('Unknown phase %s' % phase)
-    method_name = phase_methods[phase]
-    for info in plugins.itervalues():
-        instance = info.instance
-        if not hasattr(instance, method_name):
-            continue
-        if callable(getattr(instance, method_name)):
-            result.append(info)
-    return result
-
-
-def get_methods_by_phase(phase):
-    """Return plugin methods that hook :phase: in order of priority (highest first)."""
-    result = []
-    if not phase in phase_methods:
-        raise Exception('Unknown phase %s' % phase)
-    method_name = phase_methods[phase]
-    for info in plugins.itervalues():
-        method = info.phase_handlers.get(method_name, None)
-        if method:
-            result.append(method)
-    result.sort(reverse=True)
-    return result
+    return (p for p in plugins.itervalues() if phase in p.phase_handlers)
 
 
 def get_phases_by_plugin(name):
     """Return all phases plugin :name: hooks"""
-    plugin = get_plugin_by_name(name)
-    phases = []
-    for phase_name, method_name in phase_methods.iteritems():
-        if hasattr(plugin.instance, method_name):
-            phases.append(phase_name)
-    return phases
+    return list(get_plugin_by_name(name).phase_handlers)
 
 
 def get_plugins_by_group(group):
-    """Return all plugins with in specified group."""
-    res = []
-    for info in plugins.itervalues():
-        if group in info.get('groups'):
-            res.append(info)
-    return res
+    """Return an iterator over all plugins with in specified group."""
+    return (p for p in plugins.itervalues() if group in p.get('groups'))
 
 
 def get_plugin_keywords():
-    """Return all registered keywords in a list"""
-    keywords = []
-    for name in plugins.iterkeys():
-        keywords.append(name)
-    return keywords
+    """Return iterator over all plugin keywords."""
+    return plugins.iterkeys()
 
 
 def get_plugin_by_name(name, issued_by='???'):

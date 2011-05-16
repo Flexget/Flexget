@@ -87,7 +87,7 @@ class FilterIf(object):
                             try:
                                 for filter_name, filter_config in action.iteritems():
                                     filter = get_plugin_by_name(filter_name)
-                                    method = filter.phase_handlers['on_feed_filter']
+                                    method = filter.phase_handlers['filter']
                                     method(fake_feed, filter_config)
                             except Exception:
                                 raise

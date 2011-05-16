@@ -26,10 +26,9 @@ class FilterAllSeries(FilterSeriesBase):
         self.build_options_validator(options)
         return root
 
-    # Configure the series plugin before any filtering is done
-    @priority(255)
-    def on_feed_filter(self, feed):
-        config = feed.config['all_series']
+    # Run after series and metainfo series plugins
+    @priority(115)
+    def on_feed_metainfo(self, feed, config):
         if not config:
             # Don't run when we are disabled
             return
@@ -51,4 +50,4 @@ class FilterAllSeries(FilterSeriesBase):
         self.merge_config(feed, allseries)
 
 
-register_plugin(FilterAllSeries, 'all_series')
+register_plugin(FilterAllSeries, 'all_series', api_ver=2)
