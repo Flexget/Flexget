@@ -36,9 +36,12 @@ def upgrade(ver, session):
         if not 'proper_count' in columns:
             log.info('Upgrading episode_releases table to have proper_count column')
             table_add_column('episode_releases', 'proper_count', 'INTEGER', default='NULL', session=session)
-            for release in session.query(Release).all():
-                release.proper_count = len([part for part in re.split('[\W_]+', release.title.lower())
-                                            if part in SeriesParser.propers])
+            release_table = table_schema('episode_releases', session)
+            for row in session.execute(select([release_table.c.id, release_table.c.title])):
+                # Recalculate the proper_count from title for old episodes
+                proper_count = len([part for part in re.split('[\W_]+', row['title'].lower())
+                                    if part in SeriesParser.propers])
+                session.execute(update(release_table, release_table.c.id == row['id'], {'proper_count': proper_count}))
         ver = 0
     if ver == 0:
         log.info('Migrating first_seen column from series_episodes to episode_releases table.')
