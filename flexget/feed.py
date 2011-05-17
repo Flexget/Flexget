@@ -364,7 +364,7 @@ class Feed(object):
         return sorted(phase_plugins, key=lambda p: p.phase_handlers[phase], reverse=True)
 
     def __run_feed_phase(self, phase):
-        if phase not in feed_phases + ['process_start', 'process_end']:
+        if phase not in feed_phases + ['abort', 'process_start', 'process_end']:
             raise Exception('%s is not a valid feed phase' % phase)
         # warn if no filters or outputs in the feed
         phase_plugins = self.plugins_by_phase(phase)

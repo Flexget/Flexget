@@ -81,7 +81,7 @@ class RlsLog:
                     log.debugall('link_name is none')
                     link_name_ok = False
                 if not isinstance(link_name, NavigableString):
-                    log.debugall('link_name is NavigableString')
+                    log.debugall('link_name is not NavigableString')
                     link_name_ok = False
 
                 link_href = link['href']

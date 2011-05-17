@@ -121,6 +121,8 @@ class PluginThetvdbLookup(object):
             # Also clear episode fields, since episode lookup cannot succeed without series lookup
             self.clear_lazy_fields(entry, self.episode_map)
 
+        return entry[field]
+
     def lazy_episode_lookup(self, entry, field):
         try:
             episode = lookup_episode(entry.get_no_lazy('series_name'), entry['series_season'],
