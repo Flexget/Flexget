@@ -346,6 +346,7 @@ class FilterSeriesBase(object):
         # quality
         options.accept('choice', key='quality').accept_choices(quals, ignore_case=True)
         options.accept('list', key='qualities').accept('choice').accept_choices(quals, ignore_case=True)
+        options.accept('equals', key='qualities').accept('upgrade')
         options.accept('choice', key='min_quality').accept_choices(quals, ignore_case=True)
         options.accept('choice', key='max_quality').accept_choices(quals, ignore_case=True)
         # propers
@@ -719,6 +720,12 @@ class FilterSeries(SeriesPlugin, FilterSeriesBase):
 
             log.debug('current episodes: %s' % [e.data for e in eps])
 
+            # min_ and max_quality
+            if 'min_quality' in config or 'max_quality' in config:
+                eps = self.process_min_max_quality(config, eps)
+                if not eps:
+                    continue
+
             # qualities
             if 'qualities' in config:
                 log.debug('-' * 20 + ' process_qualities -->')
@@ -755,14 +762,6 @@ class FilterSeries(SeriesPlugin, FilterSeriesBase):
                     # We didn't make a quality match, check timeframe to see if we should remove the requirement
                     if self.process_timeframe(feed, config, eps, series_name):
                         continue
-
-            # min_ and max_quality
-            if 'min_quality' in config or 'max_quality' in config:
-                eps = self.process_min_max_quality(config, eps)
-
-            # no releases left, continue to next episode
-            if not eps:
-                continue
 
             # All the remaining match requirements, just choose the best
             reason = 'last choice'
@@ -997,11 +996,23 @@ class FilterSeries(SeriesPlugin, FilterSeriesBase):
                 if release.quality == quality:
                     return True
 
-        wanted_qualities = [qualities.get(name) for name in config['qualities']]
-        log.debug('qualities: %s' % wanted_qualities)
+        if config['qualities'] == 'upgrade':
+            # Upgrade mode will always get the best quality ep in the feed, unless we already have that quality.
+            best_qual = max(r.quality for r in downloaded_releases) if downloaded_releases else qualities.UNKNOWN
+            log.debug('Wanted qualities: >%s' % best_qual)
+
+            def wanted(quality):
+                return quality > best_qual and not accepted_qualities
+        else:
+            wanted_qualities = [qualities.get(name) for name in config['qualities']]
+            log.debug('Wanted qualities: %s' % wanted_qualities)
+
+            def wanted(quality):
+                return quality in wanted_qualities
+
         for ep in eps:
             log.debug('ep: %s quality: %s' % (ep.data, ep.quality))
-            if ep.quality not in wanted_qualities:
+            if not wanted(ep.quality):
                 log.debug('%s is unwanted quality' % ep.quality)
                 continue
             if is_quality_downloaded(ep.quality):

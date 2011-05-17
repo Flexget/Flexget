@@ -698,6 +698,9 @@ class TestQualities(FlexGetBase):
                     - SDTV
                     - 720p
                     - 1080p
+              - FooBaz:
+                  qualities: upgrade
+                  max_quality: 720p
         feeds:
           test_1:
             mock:
@@ -714,6 +717,21 @@ class TestQualities(FlexGetBase):
           propers_2:
             mock:
               - {title: 'FooBar.S01E02.720p.Proper-FlexGet'}
+
+          upgrade_1:
+            mock:
+              - {title: 'FooBaz.S01E02.pdtv-FlexGet'}
+              - {title: 'FooBaz.S01E02.HR-FlexGet'}
+
+          upgrade_2:
+            mock:
+              - {title: 'FooBaz.S01E02.720p-FlexGet'}
+              - {title: 'FooBaz.S01E02.1080p-FlexGet'}
+
+          upgrade_3:
+            mock:
+              - {title: 'FooBaz.S01E02.hdtv-FlexGet'}
+              - {title: 'FooBaz.S01E02.720p rc-FlexGet'}
     """
 
     def test_qualities(self):
@@ -753,6 +771,16 @@ class TestQualities(FlexGetBase):
         assert self.feed.accepted, 'proper not accepted'
         self.execute_feed('propers_2')
         assert not self.feed.accepted, 'proper accepted again'
+
+    def test_qualities_upgrade(self):
+        self.execute_feed('upgrade_1')
+        assert self.feed.find_entry('accepted', title='FooBaz.S01E02.HR-FlexGet'), 'HR quality should be accepted'
+        assert len(self.feed.accepted) == 1, 'Only best quality should be accepted'
+        self.execute_feed('upgrade_2')
+        assert self.feed.find_entry('accepted', title='FooBaz.S01E02.720p-FlexGet'), '720p quality should be accepted'
+        assert len(self.feed.accepted) == 1, 'Only best quality should be accepted'
+        self.execute_feed('upgrade_3')
+        assert not self.feed.accepted, 'Should not have accepted worse qualities'
 
 
 class TestIdioticNumbering(FlexGetBase):
