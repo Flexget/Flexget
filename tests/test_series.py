@@ -699,8 +699,11 @@ class TestQualities(FlexGetBase):
                     - 720p
                     - 1080p
               - FooBaz:
-                  qualities: upgrade
-                  max_quality: 720p
+                  upgrade: yes
+                  qualities:
+                    - hdtv
+                    - hr
+                    - 720p
         feeds:
           test_1:
             mock:

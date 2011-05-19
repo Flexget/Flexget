@@ -346,7 +346,7 @@ class FilterSeriesBase(object):
         # quality
         options.accept('choice', key='quality').accept_choices(quals, ignore_case=True)
         options.accept('list', key='qualities').accept('choice').accept_choices(quals, ignore_case=True)
-        options.accept('equals', key='qualities').accept('upgrade')
+        options.accept('boolean', key='upgrade')
         options.accept('choice', key='min_quality').accept_choices(quals, ignore_case=True)
         options.accept('choice', key='max_quality').accept_choices(quals, ignore_case=True)
         # propers
@@ -727,7 +727,7 @@ class FilterSeries(SeriesPlugin, FilterSeriesBase):
                     continue
 
             # qualities
-            if 'qualities' in config:
+            if 'qualities' in config or config.get('upgrade'):
                 log.debug('-' * 20 + ' process_qualities -->')
                 if self.process_qualities(feed, config, eps):
                     continue
@@ -976,51 +976,39 @@ class FilterSeries(SeriesPlugin, FilterSeriesBase):
             return True
 
     def process_qualities(self, feed, config, eps):
-        """Accepts all wanted qualities.
+        """Handles all modes that can accept more than one quality per episode. (qualities, upgrade)
 
         Returns:
             True - if at least one wanted quality has been downloaded or accepted
             False - if no wanted qualities have been accepted
         """
 
-        # get list of downloaded releases
-        downloaded_releases = self.get_downloaded(feed.session, eps[0].name, eps[0].identifier)
-        log.debug('downloaded_releases: %s' % downloaded_releases)
+        # Get list of already downloaded qualities
+        downloaded_qualities = [r.quality for r in self.get_downloaded(feed.session, eps[0].name, eps[0].identifier)]
+        log.debug('downloaded_qualities: %s' % downloaded_qualities)
 
-        accepted_qualities = []
+        # If qualities key is configured, we only want qualities defined in it.
+        wanted_qualities = [qualities.get(name) for name in config.get('qualities', [])]
+        log.debug('Wanted qualities: %s' % wanted_qualities)
 
-        def is_quality_downloaded(quality):
-            if quality in accepted_qualities:
-                return True
-            for release in downloaded_releases:
-                if release.quality == quality:
-                    return True
-
-        if config['qualities'] == 'upgrade':
-            # Upgrade mode will always get the best quality ep in the feed, unless we already have that quality.
-            best_qual = max(r.quality for r in downloaded_releases) if downloaded_releases else qualities.UNKNOWN
-            log.debug('Wanted qualities: >%s' % best_qual)
-
-            def wanted(quality):
-                return quality > best_qual and not accepted_qualities
-        else:
-            wanted_qualities = [qualities.get(name) for name in config['qualities']]
-            log.debug('Wanted qualities: %s' % wanted_qualities)
-
-            def wanted(quality):
-                return quality in wanted_qualities
+        def wanted(quality):
+            """Returns True if we want this quality based on the config options."""
+            wanted = not wanted_qualities or quality in wanted_qualities
+            if config.get('upgrade'):
+                wanted = wanted and quality > max(downloaded_qualities or [qualities.UNKNOWN])
+            return wanted
 
         for ep in eps:
             log.debug('ep: %s quality: %s' % (ep.data, ep.quality))
             if not wanted(ep.quality):
                 log.debug('%s is unwanted quality' % ep.quality)
                 continue
-            if is_quality_downloaded(ep.quality):
+            if ep.quality in downloaded_qualities:
                 feed.reject(self.parser2entry[ep], 'quality downloaded')
             else:
                 feed.accept(self.parser2entry[ep], 'quality wanted')
-                accepted_qualities.append(ep.quality) # don't accept more of these
-        return bool(downloaded_releases or accepted_qualities)
+                downloaded_qualities.append(ep.quality) # don't accept more of these
+        return bool(downloaded_qualities)
 
     # TODO: get rid of, see how feed.reject is called, consistency!
     def accept_series(self, feed, parser, reason):
