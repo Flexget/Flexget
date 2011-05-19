@@ -280,7 +280,7 @@ class FilterSeen(object):
         from flexget import validator
         root = validator.factory()
         root.accept('boolean')
-        root.accept('text')
+        root.accept('list').accept('text')
         return root
 
     @priority(255)
@@ -290,10 +290,14 @@ class FilterSeen(object):
             log.debug('%s is disabled' % self.keyword)
             return
 
+        fields = self.fields
+        if isinstance(config, list):
+            fields.extend(config)
+
         for entry in feed.entries:
             # construct list of values looked
             values = []
-            for field in self.fields:
+            for field in fields:
                 if field not in entry:
                     continue
                 if entry[field] not in values and entry[field] != '':
@@ -313,8 +317,12 @@ class FilterSeen(object):
             log.debug('disabled')
             return
 
+        fields = self.fields
+        if isinstance(config, list):
+            fields.extend(config)
+
         for entry in feed.accepted:
-            self.learn(feed, entry)
+            self.learn(feed, entry, fields=fields)
             # verbose if in learning mode
             if feed.manager.options.learn:
                 log.info("Learned '%s' (will skip this in the future)" % (entry['title']))
