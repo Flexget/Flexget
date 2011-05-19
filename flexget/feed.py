@@ -354,20 +354,23 @@ class Feed(object):
         else:
             return self.config[keyword]
 
-    def plugins(self):
-        """An iterator over PluginInfo instances enabled on this feed."""
-        return (p for p in all_plugins.itervalues() if p.name in self.config or p.builtin)
+    def plugins(self, phase=None):
+        """An iterator over PluginInfo instances enabled on this feed.
 
-    def plugins_by_phase(self, phase):
-        """Returns a list of plugins enabled for phase, sorted in the order for that phase."""
-        phase_plugins = (p for p in self.plugins() if phase in p.phase_handlers)
-        return sorted(phase_plugins, key=lambda p: p.phase_handlers[phase], reverse=True)
+        Args:
+            phase: Limits to plugins enabled on given phase, sorted in phase order
+        """
+        if phase:
+            plugins = sorted(get_plugins_by_phase(phase), key=lambda p: p.phase_handlers[phase], reverse=True)
+        else:
+            plugins = all_plugins.itervalues()
+        return (p for p in plugins if p.name in self.config or p.builtin)
 
     def __run_feed_phase(self, phase):
         if phase not in feed_phases + ['abort', 'process_start', 'process_end']:
             raise Exception('%s is not a valid feed phase' % phase)
         # warn if no filters or outputs in the feed
-        phase_plugins = self.plugins_by_phase(phase)
+        phase_plugins = self.plugins(phase)
         if phase in ['filter', 'output']:
             if not phase_plugins and not self.manager.unit_test:
                 log.warning('Feed doesn\'t have any %s plugins, you should add some!' % phase)
@@ -407,7 +410,7 @@ class Feed(object):
         # TODO: entry events are not very elegant, refactor into real (new) events or something ...
         if phase not in ['accept', 'reject', 'fail']:
             raise Exception('Not a valid entry phase')
-        phase_plugins = self.plugins_by_phase(phase)
+        phase_plugins = self.plugins(phase)
         for plugin in phase_plugins:
             self.__run_plugin(plugin, phase, (self, entry), kwargs)
 
@@ -494,8 +497,7 @@ class Feed(object):
             for phase in feed_phases:
                 if phase in self.disabled_phases:
                     # log keywords not executed
-                    plugins = get_plugins_by_phase(phase)
-                    for plugin in plugins:
+                    for plugin in self.plugins(phase):
                         if plugin.name in self.config:
                             log.info('Plugin %s is not executed because %s phase is disabled' %
                                      (plugin.name, phase))
