@@ -1,6 +1,5 @@
-from sqlalchemy import DateTime
 from sqlalchemy.schema import Table, MetaData
-from sqlalchemy.exceptions import NoSuchTableError
+from sqlalchemy.exc import NoSuchTableError
 
 
 def table_exists(name, session):

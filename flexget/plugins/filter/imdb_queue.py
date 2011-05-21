@@ -8,7 +8,7 @@ from flexget.utils.imdb import extract_id, ImdbSearch, ImdbParser
 from flexget.utils.tools import str_to_boolean, console
 from flexget.utils.sqlalchemy_utils import table_columns
 from sqlalchemy import Column, Integer, String, DateTime, Boolean, Unicode
-from sqlalchemy.exceptions import OperationalError
+from sqlalchemy.exc import OperationalError
 
 log = logging.getLogger('imdb_queue')
 Base = schema.versioned_base('imdb_queue', 1)
