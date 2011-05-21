@@ -188,6 +188,7 @@ class InputDeluge(DelugePlugin):
         'hash': 'torrent_info_hash',
         'num_peers': 'torrent_peers',
         'num_seeds': 'torrent_seeds',
+        'progress': 'deluge_progress',
         'private': 'deluge_private',
         'state': 'deluge_state',
         'eta': 'deluge_eta',
