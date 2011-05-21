@@ -1,11 +1,23 @@
 import logging
-from flexget.plugin import register_plugin, register_parser_option
-from flexget.manager import Base, Session
-from flexget.utils.tools import console
-from sqlalchemy import Column, Integer, String, Unicode, DateTime
 from datetime import datetime
+from sqlalchemy import Column, Integer, String, Unicode, DateTime
+from flexget import schema
+from flexget.plugin import register_plugin, register_parser_option, priority
+from flexget.manager import Session
+from flexget.utils.tools import console
+from flexget.utils.sqlalchemy_utils import table_schema, table_add_column
 
 log = logging.getLogger('failed')
+Base = schema.versioned_base('failed', 0)
+
+
+@schema.upgrade('failed')
+def upgrade(ver, session):
+    if ver is None:
+        # add count column
+        table_add_column('failed', 'count', 'INTEGER', session, default=1)
+        ver = 0
+    return ver
 
 
 class FailedEntry(Base):
@@ -15,6 +27,7 @@ class FailedEntry(Base):
     title = Column(Unicode)
     url = Column(String)
     tof = Column(DateTime)
+    count = Column(Integer, default=1)
 
     def __init__(self, title, url):
         self.title = title
@@ -26,15 +39,13 @@ class FailedEntry(Base):
 
 
 class PluginFailed(object):
-    """
-    Provides tracking for failures and related commandline utilities.
-    """
+    """Provides tracking for failures and related commandline utilities."""
 
     def validator(self):
         from flexget import validator
         return validator.factory('boolean')
 
-    def on_process_start(self, feed):
+    def on_process_start(self, feed, config):
         if feed.manager.options.failed:
             feed.manager.disable_feeds()
             self.print_failed()
@@ -53,7 +64,7 @@ class PluginFailed(object):
             if not results:
                 console('No failed entries recorded')
             for entry in results:
-                console('%16s - %s' % (entry.tof.strftime('%Y-%m-%d %H:%M'), entry.title))
+                console('%16s - %s - %s times' % (entry.tof.strftime('%Y-%m-%d %H:%M'), entry.title, entry.count))
         finally:
             failed.close()
 
@@ -62,16 +73,19 @@ class PluginFailed(object):
         """Adds entry to internal failed list, displayed with --failed"""
         failed = Session()
         try:
-            failedentry = FailedEntry(entry['title'], entry['url'])
             # query item's existence
-            if not failed.query(FailedEntry).filter(FailedEntry.title == entry['title']).first():
-                failed.add(failedentry)
+            item = failed.query(FailedEntry).filter(FailedEntry.title == entry['title']).\
+                                             filter(FailedEntry.url == entry['url']).first()
+            if not item:
+                item = FailedEntry(entry['title'], entry['url'])
+            else:
+                item.count += 1
+                item.tof = datetime.now()
+            failed.merge(item)
+
             # limit item number to 25
-            i = 0
-            for row in failed.query(FailedEntry).order_by(FailedEntry.tof.desc()).all():
-                i += 1
-                if i > 25:
-                    failed.delete(row)
+            for row in failed.query(FailedEntry).order_by(FailedEntry.tof.desc())[25:]:
+                failed.delete(row)
             failed.commit()
         finally:
             failed.close()
@@ -91,7 +105,31 @@ class PluginFailed(object):
     def on_entry_fail(self, feed, entry, **kwargs):
         self.add_failed(entry)
 
-register_plugin(PluginFailed, '--failed', builtin=True)
+
+class FilterRejectFailed(object):
+    """Rejects entries that have failed X or more times in the past."""
+
+    def validator(self):
+        from flexget import validator
+        root = validator.factory()
+        root.accept('integer')
+        root.accept('boolean')
+        return root
+
+    @priority(255)
+    def on_feed_filter(self, feed, config):
+        if config is False:
+            return
+        max_count = config if isinstance(config, int) else 3
+        for entry in feed.entries:
+            item = feed.session.query(FailedEntry).filter(FailedEntry.title == entry['title']).\
+                                            filter(FailedEntry.url == entry['url']).\
+                                            filter(FailedEntry.count >= max_count).first()
+            if item:
+                feed.reject(entry, 'Has already failed %s times in the past' % item.count)
+
+register_plugin(PluginFailed, '--failed', builtin=True, api_ver=2)
+register_plugin(FilterRejectFailed, 'reject_failed', builtin=True, api_ver=2)
 register_parser_option('--failed', action='store_true', dest='failed', default=0,
                        help='List recently failed entries.')
 register_parser_option('--clear', action='store_true', dest='clear_failed', default=0,
