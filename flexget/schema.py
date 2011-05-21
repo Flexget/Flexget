@@ -130,7 +130,7 @@ def versioned_base(plugin, version):
     return VersionedBase
 
 
-def after_table_create(event, target, bind, tables=None):
+def after_table_create(event, target, bind, tables=None, **kw):
     """Sets the schema version to most recent for a plugin when it's tables are freshly created."""
     if tables:
         tables = [table.name for table in tables]
