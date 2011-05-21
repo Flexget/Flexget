@@ -10,7 +10,6 @@ import glob
 import logging
 import time
 from event import add_event_handler as add_phase_handler
-from uuid import NAMESPACE_DNS
 
 log = logging.getLogger('plugin')
 
