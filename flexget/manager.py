@@ -1,12 +1,13 @@
 import os
 import sys
 import logging
-import sqlalchemy
 import yaml
 import atexit
 from datetime import datetime
+import sqlalchemy
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.pool import SingletonThreadPool
 from flexget.event import fire_event
 
 log = logging.getLogger('manager')
@@ -39,7 +40,7 @@ class Manager(object):
 
     manager.startup
       After manager has been initialized. This is when application becomes ready to use
-      
+
     manager.upgrade
       Upgrade plugin database schemas etc
 
@@ -342,7 +343,7 @@ class Manager(object):
         # fire up the engine
         log.debug('connecting to: %s' % connection)
         try:
-            self.engine = sqlalchemy.create_engine(connection, echo=self.options.debug_sql, )
+            self.engine = sqlalchemy.create_engine(connection, echo=self.options.debug_sql, poolclass=SingletonThreadPool)
         except ImportError:
             print >> sys.stderr, ('FATAL: Unable to use SQLite. Are you running Python 2.5.x or 2.6.x ?\n'
             'Python should normally have SQLite support built in.\n'
