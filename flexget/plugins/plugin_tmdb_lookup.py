@@ -18,8 +18,7 @@ class PluginTmdbLookup(object):
         from flexget import validator
         return validator.factory('boolean')
 
-    @priority(100)
-    def on_feed_filter(self, feed, config):
+    def on_feed_metainfo(self, feed, config):
         if not config:
             return
         lookup = get_plugin_by_name('api_tmdb').instance.lookup
@@ -28,8 +27,8 @@ class PluginTmdbLookup(object):
         def lazy_loader(entry, field):
             """Does the lookup for this entry and populates the entry fields."""
             imdb_id = entry.get_no_lazy('imdb_id') or imdb.extract_id(entry.get('imdb_url', ''))
-            movie = lookup(smart_match=entry['title'], tmdb_id=entry.get_no_lazy('tmdb_id'), imdb_id=imdb_id)
-            if movie:
+            try:
+                movie = lookup(smart_match=entry['title'], tmdb_id=entry.get_no_lazy('tmdb_id'), imdb_id=imdb_id)
                 entry['tmdb_name'] = movie.name
                 entry['tmdb_id'] = movie.id
                 entry['imdb_id'] = movie.imdb_id
@@ -38,8 +37,8 @@ class PluginTmdbLookup(object):
                 entry['tmdb_rating'] = movie.rating
                 entry['tmdb_genres'] = [genre.name for genre in movie.genres]
                 # TODO: other fields?
-            else:
-                log.debug('Tmdb lookup for %s failed.' % entry['title'])
+            except LookupError, e:
+                log.debug('Tmdb lookup for %s failed: %s' % (entry['title'], e))
                 # Set all of our fields to None if the lookup failed
                 for f in fields:
                     if entry.is_lazy(f):

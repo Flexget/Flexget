@@ -94,40 +94,47 @@ def upgrade(plugin):
     return upgrade
 
 
+def register_plugin_table(tablename, plugin, version):
+    plugin_schemas.setdefault(plugin, {'version': version, 'tables': []})
+    if plugin_schemas[plugin]['version'] != version:
+        raise Exception('Two different schema versions recieved for plugin %s' % plugin)
+    plugin_schemas[plugin]['tables'].append(tablename)
+
+
+class Meta(type):
+    """Metaclass for objects returned by versioned_base factory"""
+
+    def __new__(mcs, metaname, bases, dict_):
+        """This gets called when a class that subclasses VersionedBase is defined."""
+        new_bases = []
+        for base in bases:
+            # Check if we are creating a subclass of VersionedBase
+            if base.__name__ is 'VersionedBase':
+                # Register this table in plugin_schemas
+                register_plugin_table(dict_['__tablename__'], base.plugin, base.version)
+                # Make sure the resulting class also inherits from Base
+                if not any(isinstance(base, type(Base)) for base in bases):
+                    # We are not already subclassing Base, add it in to the list of bases instead of VersionedBase
+                    new_bases.append(Base)
+                    # Since Base and VersionedBase have 2 different metaclasses, a class that subclasses both of them
+                    # must have a metaclass that subclasses both of their metaclasses.
+
+                    class mcs(type(Base), mcs):
+                        pass
+            else:
+                new_bases.append(base)
+
+        return type.__new__(mcs, metaname, tuple(new_bases), dict_)
+
+    def __getattr__(self, item):
+        """Transparently return attributes of Base instead of our own."""
+        return getattr(Base, item)
+
+
 def versioned_base(plugin, version):
     """Returns a class which can be used like Base, but automatically stores schema version when tables are created."""
 
-    class Meta(type):
-
-        def __new__(mcs, metaname, bases, dict_):
-            """This gets called when a class that subclasses VersionedBase is defined."""
-            if '__tablename__' in dict_:
-                # Record the table name to schema version mapping
-                global plugin_schemas
-                plugin_schemas.setdefault(plugin, {'version': version, 'tables': []})
-                if plugin_schemas[plugin]['version'] != version:
-                    raise Exception('Two different schema versions recieved for plugin %s' % plugin)
-                plugin_schemas[plugin]['tables'].append(dict_['__tablename__'])
-                # Make sure the resulting class also inherits from Base
-                bases = bases + (Base,)
-
-                # Since Base and VersionedBase have 2 different metaclasses, a class that subclasses both of them
-                # must have a metaclass that subclasses both of their metaclasses.
-
-                class mcs(type(Base), mcs):
-                    pass
-            return type.__new__(mcs, metaname, bases, dict_)
-
-        def __getattr__(self, item):
-            """Transparently return attributes of Base instead of our own."""
-            return getattr(Base, item)
-
-    class VersionedBase(object):
-        """Subclassing this class causes your table names to be registered into the schema registry,
-        as well as causing your class to also subclass Base."""
-        __metaclass__ = Meta
-
-    return VersionedBase
+    return Meta('VersionedBase', (object,), {'__metaclass__': Meta, 'plugin': plugin, 'version': version})
 
 
 def after_table_create(event, target, bind, tables=None, **kw):

@@ -45,6 +45,10 @@ class ChangeWarn(object):
             log.critical('Plugin nzb_size is deprecated, use content_size instead')
             found_deprecated = True
 
+        if 'imdb_queue' in feed.config:
+            log.critical('Plugin imdb_queue has been replaced by movie_queue, update your config')
+            found_deprecated = True
+
         # prevent useless keywords in root level
         allow = ['feeds', 'presets', 'variables']
         for key in config.iterkeys():

@@ -75,7 +75,7 @@ def safe_pickle_synonym(name):
             for key, value in item.iteritems():
                 try:
                     result[key] = only_builtins(value)
-                except ValueError:
+                except TypeError:
                     continue
             return result
         elif isinstance(item, (list, tuple, set)):
@@ -97,13 +97,28 @@ def safe_pickle_synonym(name):
                     return s_type(item)
 
         # If item isn't a subclass of a builtin python type, raise ValueError.
-        raise ValueError('%r is not a subclass of a builtin python type.' % type(item))
+        raise TypeError('%r is not a subclass of a builtin python type.' % type(item))
 
     def getter(self):
         return getattr(self, name)
 
     def setter(self, entry):
         setattr(self, name, only_builtins(entry))
+
+    return synonym(name, descriptor=property(getter, setter))
+
+
+def quality_synonym(name):
+    """Get and set property as Quality objects, store as text in the database."""
+
+    def getter(self):
+        return qualities.get(getattr(self, name))
+
+    def setter(self, value):
+        if isinstance(value, basestring):
+            setattr(self, name, value)
+        else:
+            setattr(self, name, value.name)
 
     return synonym(name, descriptor=property(getter, setter))
 

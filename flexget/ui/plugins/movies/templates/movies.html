@@ -8,7 +8,7 @@
         $("#add_button").hide();
         $("#add_area").show("slide", {direction: "up"}, 500);
     }
-    
+
     $(document).ready(function() {
         $("div.movie").hover(
             function () {
@@ -24,7 +24,7 @@
                 */
             });
     });
-    
+
 </script>
 
 
@@ -98,12 +98,12 @@
                     </a>
                     #}
                 </div>
-                
+
                 <p>{{ movie.overview }}</p>
             </div>
-            
+
             <div style="clear: both;"></div>
-            
+
             <div class="qualities">
                 <ul class="quality">
                     {% for qual in ['1080p bluray', '720p bluray', 'dvdrip', 'ANY'] %}
@@ -115,7 +115,7 @@
                     {% endfor %}
                 </ul>
             </div>
-            
+
         </div>
         {% endfor %}
     </div>

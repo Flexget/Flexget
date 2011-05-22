@@ -7,9 +7,9 @@ from flexget.plugin import DependencyError, get_plugin_by_name
 from flexget.ui.webui import register_plugin, app, manager
 
 try:
-    from flexget.plugins.filter.imdb_queue import QueueError
+    from flexget.plugins.filter.movie_queue import QueueError, queue_get, queue_add, queue_del, queue_edit
 except ImportError:
-    raise DependencyError(issued_by='ui.movies', missing='imdb_queue')
+    raise DependencyError(issued_by='ui.movies', missing='movie_queue')
 
 
 movies_module = Module(__name__, url_prefix='/movies')
@@ -29,14 +29,15 @@ def pretty_age_filter(value):
 
 @movies_module.route('/')
 def index():
-    imdb_queue = get_plugin_by_name('imdb_queue_manager').instance.queue_get()
+    movie_queue = queue_get()
     tmdb_lookup = get_plugin_by_name('api_tmdb').instance.lookup
-    for item in imdb_queue:
-        movie = tmdb_lookup(imdb_id=item.imdb_id, only_cached=True)
-        if not movie:
+    for item in movie_queue:
+        try:
+            movie = tmdb_lookup(tmdb_id=item.tmdb_id, only_cached=True)
+        except LookupError:
             item.overview = ('TMDb lookup was not successful, no overview available.'
                              'Lookup is being retried in the background.')
-            log.debug('No themoviedb result for imdb id %s' % item.imdb_id)
+            log.debug('No themoviedb result for tmdb id %s' % item.tmdb_id)
 
             # this is probably not needed since non cached movies are retried also
             # in the cover function
@@ -56,10 +57,10 @@ def index():
                 break
 
         item.title = movie.name
-        item.year = movie.released.year
+        item.year = movie.released and movie.released.year
         item.overview = movie.overview
 
-    context = {'movies': imdb_queue}
+    context = {'movies': movie_queue}
     return render_template('movies/movies.html', **context)
 
 
@@ -69,9 +70,8 @@ def add_to_queue():
     imdb_id = request.values.get('imdb_id')
     quality = request.values.get('quality', 'ANY')
     force = request.values.get('force') == 'on'
-    queue_manager = get_plugin_by_name('imdb_queue_manager').instance
     try:
-        title = queue_manager.queue_add(title=what, imdb_id=imdb_id, quality=quality, force=force)['title']
+        title = queue_add(title=what, imdb_id=imdb_id, quality=quality, force=force)['title']
     except QueueError, e:
         flash(e.message, 'error')
     else:
@@ -82,9 +82,8 @@ def add_to_queue():
 @movies_module.route('/del')
 def del_from_queue():
     imdb_id = request.values.get('imdb_id')
-    queue_manager = get_plugin_by_name('imdb_queue_manager').instance
     try:
-        title = queue_manager.queue_del(imdb_id)
+        title = queue_del(imdb_id)
     except QueueError, e:
         flash(e.message, 'error')
     else:
@@ -96,9 +95,8 @@ def del_from_queue():
 def edit_movie_quality():
     imdb_id = request.values.get('imdb_id')
     quality = request.values.get('quality')
-    queue_manager = get_plugin_by_name('imdb_queue_manager').instance
     try:
-        queue_manager.queue_edit(imdb_id, quality)
+        queue_edit(imdb_id, quality)
     except QueueError, e:
         flash(e.message, 'error')
     else:
@@ -114,8 +112,9 @@ def cover(imdb_id):
     # TODO: return '' should be replaced with something sane, http error 404 ?
 
     tmdb_lookup = get_plugin_by_name('api_tmdb').instance.lookup
-    movie = tmdb_lookup(imdb_id=imdb_id)
-    if not movie:
+    try:
+        movie = tmdb_lookup(imdb_id=imdb_id)
+    except LookupError:
         log.error('No cached data for %s' % imdb_id)
         return ''
 

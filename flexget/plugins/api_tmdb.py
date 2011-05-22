@@ -145,8 +145,7 @@ class ApiTmdb(object):
             if year:
                 search_string = '%s %s' % (search_string, year)
         elif not (tmdb_id or imdb_id):
-            log.error('No criteria specified for tmdb lookup')
-            return
+            raise LookupError('No criteria specified for tmdb lookup')
         log.debug('Looking up tmdb information for %r' % {'title': title, 'tmdb_id': tmdb_id, 'imdb_id': imdb_id})
 
         session = Session(expire_on_commit=False, autoflush=True)
@@ -190,8 +189,7 @@ class ApiTmdb(object):
                     log.debug('Movie %s information restored from cache.' % id_str())
             else:
                 if only_cached:
-                    log.debug('Movie %s not found from cache' % id_str())
-                    return
+                    raise LookupError('Movie %s not found from cache' % id_str())
                 # There was no movie found in the cache, do a lookup from tmdb
                 log.debug('Movie %s not found in cache, looking up from tmdb.' % id_str())
                 try:
@@ -213,13 +211,12 @@ class ApiTmdb(object):
                             if title.lower() != movie.name.lower():
                                 session.merge(TMDBSearchResult(search=search_string, movie=movie))
                 except URLError:
-                    log.error('Error looking up movie from TMDb')
-                    return
+                    raise LookupError('Error looking up movie from TMDb')
                 else:
                     session.commit()
 
             if not movie:
-                log.debug('No results found from tmdb for %s' % id_str())
+                raise LookupError('No results found from tmdb for %s' % id_str())
             else:
                 # We need to query again to force the relationships to eager load before we detach from session
                 movie = session.query(TMDBMovie).options(joinedload(TMDBMovie.posters), joinedload(TMDBMovie.genres)). \

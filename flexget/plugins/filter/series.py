@@ -4,7 +4,7 @@ from copy import copy
 from datetime import datetime, timedelta
 from sqlalchemy import Column, Integer, String, Unicode, DateTime, Boolean, desc, select, update
 from sqlalchemy.schema import ForeignKey
-from sqlalchemy.orm import relation, join, synonym
+from sqlalchemy.orm import relation, join
 from flexget import schema
 from flexget.event import event
 from flexget.utils import qualities
@@ -12,7 +12,7 @@ from flexget.utils.log import log_once
 from flexget.utils.titles import SeriesParser, ParseWarning
 from flexget.utils.sqlalchemy_utils import table_columns, table_exists, drop_tables, table_schema, table_add_column
 from flexget.utils.tools import merge_dict_from_to
-from flexget.utils.database import lower_property, quality_comp_property
+from flexget.utils.database import lower_property, quality_comp_property, quality_synonym
 from flexget.manager import Session
 from flexget.plugin import (register_plugin, register_parser_option, get_plugin_by_name, get_plugin_keywords,
     PluginWarning, PluginError, DependencyError, priority)
@@ -120,6 +120,8 @@ class Release(Base):
     id = Column(Integer, primary_key=True)
     episode_id = Column(Integer, ForeignKey('series_episodes.id'), nullable=False)
     _quality = Column('quality', String)
+    quality = quality_synonym('_quality')
+    qual_comp = quality_comp_property('_quality')
     downloaded = Column(Boolean, default=False)
     proper_count = Column(Integer, default=0)
     title = Column(Unicode)
@@ -127,15 +129,6 @@ class Release(Base):
 
     def __init__(self):
         self.first_seen = datetime.now()
-
-    def get_quality(self):
-        return qualities.get(self._quality)
-
-    def set_quality(self, value):
-        self._quality = value.name
-
-    quality = synonym('_quality', descriptor=property(get_quality, set_quality))
-    qual_comp = quality_comp_property('_quality')
 
     @property
     def proper(self):
