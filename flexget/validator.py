@@ -97,15 +97,19 @@ class Validator(object):
         return self.validators[name](self, **kwargs)
 
     def accept(self, name, **kwargs):
-        raise Exception('Validator %s should override accept method' % self.__class__.__name__)
+        raise NotImplementedError('Validator %s should override accept method' % self.__class__.__name__)
 
     def validateable(self, data):
         """Return True if validator can be used to validate given data, False otherwise."""
-        raise Exception('Validator %s should override validateable method' % self.__class__.__name__)
+        raise NotImplementedError('Validator %s should override validateable method' % self.__class__.__name__)
 
     def validate(self, data):
         """Validate given data and log errors, return True if passed and False if not."""
-        raise Exception('Validator %s should override validate method' % self.__class__.__name__)
+        raise NotImplementedError('Validator %s should override validate method' % self.__class__.__name__)
+
+    def schema(self):
+        """Return schema for validator"""
+        raise NotImplementedError(self.__name__)
 
     def validate_item(self, item, rules):
         """
@@ -158,6 +162,9 @@ class RootValidator(Validator):
     def validate(self, data):
         count = self.errors.count()
         return self.validate_item(data, self.valid)
+        
+    def schema(self):
+        return [v.schema() for v in self.valid]
 
 
 class ChoiceValidator(Validator):
@@ -168,6 +175,14 @@ class ChoiceValidator(Validator):
         Validator.__init__(self, parent, **kwargs)
 
     def accept(self, value, **kwargs):
+        """
+        Args:
+            value: accepted text, int or boolean
+
+        Kwargs:
+            ignore_case: boolean
+            
+        """
         if not isinstance(value, (basestring, int, float)):
             raise Exception('Choice validator only accepts strings and numbers')
         if isinstance(value, basestring) and kwargs.get('ignore_case'):
@@ -176,6 +191,7 @@ class ChoiceValidator(Validator):
             self.valid.append(value)
 
     def accept_choices(self, values, **kwargs):
+        """Same as accept but with multiple values (list)"""
         for value in values:
             self.accept(value, **kwargs)
 
@@ -191,6 +207,9 @@ class ChoiceValidator(Validator):
             acceptable = [str(value) for value in self.valid + self.valid_ic]
             self.errors.add('\'%s\' is not one of acceptable values: %s' % (data, ', '.join(acceptable)))
             return False
+            
+    def schema(self):
+        return {'choice': self.valid + self.valid_ic}
 
 
 class AnyValidator(Validator):
@@ -204,6 +223,9 @@ class AnyValidator(Validator):
 
     def validate(self, data):
         return True
+        
+    def schema(self):
+        return 'any'
 
 
 class EqualsValidator(Validator):
@@ -217,6 +239,9 @@ class EqualsValidator(Validator):
 
     def validate(self, data):
         return self.valid == data
+        
+    def schema(self):
+        return {'equals': self.valid}
 
 
 class NumberValidator(Validator):
@@ -233,6 +258,9 @@ class NumberValidator(Validator):
         if not valid:
             self.errors.add('value %s is not valid number' % data)
         return valid
+        
+    def schema(self):
+        return 'number'
 
 
 class IntegerValidator(Validator):
@@ -249,6 +277,9 @@ class IntegerValidator(Validator):
         if not valid:
             self.errors.add('value %s is not valid integer' % data)
         return valid
+        
+    def schema(self):
+        return 'number'
 
 
 class DecimalValidator(Validator):
@@ -265,6 +296,9 @@ class DecimalValidator(Validator):
         if not valid:
             self.errors.add('value %s is not valid decimal number' % data)
         return valid
+        
+    def schema(self):
+        return 'decimal'
 
 
 class BooleanValidator(Validator):
@@ -281,6 +315,9 @@ class BooleanValidator(Validator):
         if not valid:
             self.errors.add('value %s is not valid boolean' % data)
         return valid
+        
+    def schema(self):
+        return 'boolean'
 
 
 class TextValidator(Validator):
@@ -297,6 +334,9 @@ class TextValidator(Validator):
         if not valid:
             self.errors.add('value %s is not valid text' % data)
         return valid
+        
+    def schema(self):
+        return 'text'
 
 
 class RegexpValidator(Validator):
@@ -318,6 +358,9 @@ class RegexpValidator(Validator):
             self.errors.add('%s is not a valid regular expression' % data)
             return False
         return True
+        
+    def schema(self):
+        return 'regexp'
 
 
 class RegexpMatchValidator(Validator):
@@ -332,7 +375,7 @@ class RegexpMatchValidator(Validator):
         try:
             regexp_list.append(re.compile(regexp))
         except:
-            raise Exception('Invalid regexp given to match_regexp')
+            raise ValueError('Invalid regexp given to match_regexp')
 
     def accept(self, regexp, **kwargs):
         self.add_regexp(self.regexps, regexp)
@@ -361,6 +404,11 @@ class RegexpMatchValidator(Validator):
         else:
             self.errors.add('%s does not match regexp' % data)
         return False
+        
+    def schema(self):
+        return {'regexp_match': {
+            'accept': [r.pattern for r in self.regexps], 
+            'reject': [r.pattern for r in self.reject_regexps]}}
 
 
 class FileValidator(TextValidator):
@@ -373,6 +421,9 @@ class FileValidator(TextValidator):
             self.errors.add('File %s does not exist' % data)
             return False
         return True
+        
+    def schema(self):
+        return 'file'
 
 
 class PathValidator(TextValidator):
@@ -406,6 +457,9 @@ class PathValidator(TextValidator):
             self.errors.add('Path %s does not exist' % path)
             return False
         return True
+        
+    def schema(self):
+        return 'path'
 
 
 class UrlValidator(TextValidator):
@@ -426,7 +480,10 @@ class UrlValidator(TextValidator):
         if not valid:
             self.errors.add('value %s is not a valid url' % data)
         return valid
-
+        
+    def schema(self):
+        return 'url'
+            
 
 class ListValidator(Validator):
     name = 'list'
@@ -450,6 +507,9 @@ class ListValidator(Validator):
             self.validate_item(item, self.valid)
         self.errors.path_remove_level()
         return count == self.errors.count()
+        
+    def schema(self):
+        return {'list': [v.schema() for v in self.valid]}
 
 
 class DictValidator(Validator):
@@ -465,18 +525,23 @@ class DictValidator(Validator):
         self.valid = {}
 
     def accept(self, name, **kwargs):
-        """Accepts key with name type"""
+        """
+        Args:
+            name: validator name that represents accepted value
+        
+        Kwargs:
+            key: name of the key in dict
+            required: mark the name as required
+        
+        """
         if not 'key' in kwargs:
             raise Exception('%s.accept() must specify key' % self.name)
 
         key = kwargs['key']
-        # complain from old format
-        if 'require' in kwargs:
-            print 'Deprecated validator api, should use required=bool instead of require=bool'
         if kwargs.get('required', False):
             self.require_key(key)
-        # clean our keys from kwargs, so they can be passed to Validator constuctor
-        for k in ['key', 'require', 'required']:
+        # clean dictvalidator keys from kwargs, so they can be passed to Validator constuctor
+        for k in ['key', 'required']:
             if k in kwargs:
                 del kwargs[k]
         v = self.get_validator(name, **kwargs)
@@ -498,18 +563,18 @@ class DictValidator(Validator):
             self.required_keys.append(key)
 
     def accept_any_key(self, name, **kwargs):
-        """Accepts any key with given type"""
+        """Accepts any key name with given validator type"""
         v = self.get_validator(name, **kwargs)
-        # v.accept(name, **kwargs)
         self.any_key.append(v)
         return v
 
+    # TODO: document, what does this even do?
     def accept_valid_keys(self, name, **kwargs):
         """Accepts keys that pass a given validator"""
         key_types = kwargs.pop('key_type', None)
         key_validator = kwargs.pop('key_validator', None)
         if key_types and key_validator:
-            raise Exception('key_types and key_validator are mutually exclusive')
+            raise ValueError('key_types and key_validator are mutually exclusive')
         if key_validator:
             # Make sure errors show up in our list
             key_validator.errors = self.errors
@@ -520,7 +585,7 @@ class DictValidator(Validator):
             for key_type in key_types:
                 key_validator.accept(key_type)
         else:
-            raise Exception('%s.accept_valid_keys() must specify key_type or key_validator' % self.name)
+            raise ValueError('%s.accept_valid_keys() must specify key_type or key_validator' % self.name)
         v = self.get_validator(name, **kwargs)
         self.key_validators.append((key_validator, v))
         return v
@@ -576,7 +641,133 @@ class DictValidator(Validator):
             if not required in data:
                 self.errors.add('key \'%s\' required' % required)
         return count == self.errors.count()
+        
+    def schema(self):
+        schema = {}
+        valid = {}
+        for name, validators in self.valid.iteritems():
+            if not validators:
+                continue
+            if len(validators) == 1:
+                valid[name] = validators[0].schema()
+            else:
+                valid[name] = [v.schema() for v in validators]
+            
+        schema['valid'] = valid
+        if self.required_keys:
+            schema['required_keys'] = self.required_keys
+        if self.any_key:
+            schema['any_key'] = [v.schema() for v in self.any_key]
+        if self.reject_keys:
+            schema['reject_keys'] = self.reject
+            
+        return schema
+
+
+# ---- TESTING ----
+
+
+def build_options_validator(options):
+    quals = ['720p', '1080p', '720p bluray', 'hdtv']
+    options.accept('text', key='path')
+    # set
+    options.accept('dict', key='set').accept_any_key('any')
+    # regexes can be given in as a single string ..
+    options.accept('regexp', key='name_regexp')
+    options.accept('regexp', key='ep_regexp')
+    options.accept('regexp', key='id_regexp')
+    # .. or as list containing strings
+    options.accept('list', key='name_regexp').accept('regexp')
+    options.accept('list', key='ep_regexp').accept('regexp')
+    options.accept('list', key='id_regexp').accept('regexp')
+    # quality
+    options.accept('choice', key='quality').accept_choices(quals, ignore_case=True)
+    options.accept('list', key='qualities').accept('choice').accept_choices(quals, ignore_case=True)
+    options.accept('boolean', key='upgrade')
+    options.accept('choice', key='min_quality').accept_choices(quals, ignore_case=True)
+    options.accept('choice', key='max_quality').accept_choices(quals, ignore_case=True)
+    # propers
+    options.accept('boolean', key='propers')
+    message = "should be in format 'x (minutes|hours|days|weeks)' e.g. '5 days'"
+    time_regexp = r'\d+ (minutes|hours|days|weeks)'
+    options.accept('regexp_match', key='propers', message=message + ' or yes/no').accept(time_regexp)
+    # expect flags
+    options.accept('choice', key='identified_by').accept_choices(['ep', 'id', 'auto'])
+    # timeframe
+    options.accept('regexp_match', key='timeframe', message=message).accept(time_regexp)
+    # strict naming
+    options.accept('boolean', key='exact')
+    # watched in SXXEXX form
+    watched = options.accept('regexp_match', key='watched')
+    watched.accept('(?i)s\d\de\d\d$', message='Must be in SXXEXX format')
+    # watched in dict form
+    watched = options.accept('dict', key='watched')
+    watched.accept('integer', key='season')
+    watched.accept('integer', key='episode')
+    # from group
+    options.accept('text', key='from_group')
+    options.accept('list', key='from_group').accept('text')
+    # parse only
+    options.accept('boolean', key='parse_only')
+
+
+def complex_test():
+
+    def build_list(series):
+        """Build series list to series."""
+        series.accept('text')
+        series.accept('number')
+        bundle = series.accept('dict')
+        # prevent invalid indentation level
+        """
+        bundle.reject_keys(['set', 'path', 'timeframe', 'name_regexp',
+            'ep_regexp', 'id_regexp', 'watched', 'quality', 'min_quality',
+            'max_quality', 'qualities', 'exact', 'from_group'],
+            'Option \'$key\' has invalid indentation level. It needs 2 more spaces.')
+        """
+        bundle.accept_any_key('path')
+        options = bundle.accept_any_key('dict')
+        build_options_validator(options)
+
+    root = factory()
+    
+    # simple format:
+    #   - series
+    #   - another series
+    
+    simple = root.accept('list')
+    build_list(simple)
+    
+    # advanced format:
+    #   settings:
+    #     group: {...}
+    #   group:
+    #     {...}
+    
+    """
+    advanced = root.accept('dict')
+    settings = advanced.accept('dict', key='settings')
+    settings_group = settings.accept_any_key('dict')
+    build_options_validator(settings_group)
+    
+    group = advanced.accept_any_key('list')
+    build_list(group)
+    """
+
+    return root
 
 
 if __name__ == '__main__':
+
+    v = complex_test()
+    print v.schema()
+    
+    """
     root = factory()
+    list = root.accept('list')
+    list.accept('text')
+    list.accept('regexp')
+    list.accept('choice').accept_choices(['foo', 'bar'])
+    
+    print root.schema()
+    """
