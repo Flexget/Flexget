@@ -1,6 +1,6 @@
 import logging
 from optparse import SUPPRESS_HELP
-from flexget.plugin import register_plugin, register_parser_option, plugins, feed_phases, phase_methods, get_plugins_by_phase
+from flexget.plugin import register_plugin, register_parser_option, plugins
 
 log = logging.getLogger('plugins')
 
@@ -20,29 +20,9 @@ class PluginsList(object):
         print '%-20s%-30s%s' % ('Name', 'Roles (priority)', 'Info')
         print '-' * 79
 
-        # build the list
-        plugins = []
-        roles = {}
-        for phase in feed_phases:
-            plugins_in_phase = get_plugins_by_phase(phase)
-            for info in plugins_in_phase:
-                for plugin in plugins:
-                    if plugin['name'] == info['name']:
-                        break
-                else:
-                    plugins.append(info)
-
-            # build roles list
-            for info in plugins_in_phase:
-                priority = info.phase_handlers[phase].priority
-
-                if info['name'] in roles:
-                    roles[info['name']].append('%s(%s)' % (phase, priority))
-                else:
-                    roles[info['name']] = ['%s(%s)' % (phase, priority)]
-
         # print the list
-        for plugin in plugins:
+        for name in sorted(plugins):
+            plugin = plugins[name]
             # do not include test classes, unless in debug mode
             if plugin.get('debug_plugin', False) and not options.debug:
                 continue
@@ -53,8 +33,9 @@ class PluginsList(object):
                 flags.append('builtin')
             if plugin.debug:
                 flags.append('debug')
-            name = plugin['name']
-            print '%-20s%-30s%s' % (name, ', '.join(roles[name]), ', '.join(flags))
+            handlers = plugin.phase_handlers
+            roles = ', '.join('%s(%s)' % (phase, handlers[phase].priority) for phase in handlers)
+            print '%-20s%-30s%s' % (name, roles, ', '.join(flags))
 
         print '-' * 79
 
