@@ -7,13 +7,18 @@ from flexget.utils import qualities
 
 
 def with_session(func):
-    """"Creates a session if one was not passed via keyword argument to the function"""
+    """"A decorator which creates a session if one was not passed via keyword argument to the function.
+
+    Automatically commits and closes the session if one was created, caller is responsible for commit if passed in.
+    """
 
     def wrapper(*args, **kwargs):
         if not kwargs.get('session'):
-            kwargs['session'] = Session(autoflush=True)
+            kwargs['session'] = Session(autoflush=True, expire_on_commit=False)
             try:
-                return func(*args, **kwargs)
+                result = func(*args, **kwargs)
+                kwargs['session'].commit()
+                return result
             finally:
                 kwargs['session'].close()
         else:

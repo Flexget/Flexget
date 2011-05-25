@@ -255,8 +255,6 @@ def lookup_series(name=None, tvdb_id=None, only_cached=False, session=None):
                 series.update()
             except LookupError, e:
                 log.warning('Error while updating from tvdb (%s), using cached data.' % e.message)
-            else:
-                session.commit()
         else:
             log.debug('Series %s information restored from cache.' % id_str())
     else:
@@ -284,14 +282,11 @@ def lookup_series(name=None, tvdb_id=None, only_cached=False, session=None):
                         session.add(TVDBSearchResult(search=name, series=series))
         except URLError, e:
             raise LookupError('Error looking up series from TVDb (%s)' % e)
-        else:
-            session.commit()
 
     if not series:
         raise LookupError('No results found from tvdb for %s' % id_str())
     else:
-        # Refresh the object before returning
-        session.refresh(series)
+        series.episodes
         return series
 
 
@@ -313,8 +308,6 @@ def lookup_episode(name=None, seasonnum=None, episodenum=None, tvdb_id=None, onl
                 episode.update()
             except LookupError, e:
                 log.warning('Error while updating from tvdb (%s), using cached data.' % e.message)
-            else:
-                session.commit()
         else:
             log.debug('Using episode info from cache.')
     else:
@@ -338,10 +331,7 @@ def lookup_episode(name=None, seasonnum=None, episodenum=None, tvdb_id=None, onl
                     session.merge(series)
         except URLError, e:
             raise LookupError('Error looking up episode from TVDb (%s)' % e)
-        else:
-            session.commit()
     if episode:
-        session.refresh(episode)
         # Access the series attribute to force it to load before returning
         episode.series
         return episode
@@ -384,7 +374,6 @@ def mark_expired(session=None):
         for chunk in chunked(expired_episodes):
             num = session.query(TVDBEpisode).filter(TVDBEpisode.id.in_(chunk)).update({'expired': True}, 'fetch')
             log.debug('%s episodes marked as expired' % num)
-        session.commit()
         # Save the time of this update
         new_server = str(updates.find('time').string)
         persist['last_local'] = datetime.now()

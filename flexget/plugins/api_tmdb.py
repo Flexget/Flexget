@@ -9,7 +9,7 @@ from sqlalchemy.schema import ForeignKey
 from sqlalchemy.orm import relation, joinedload
 from flexget.utils.titles import MovieParser
 from flexget.utils.tools import urlopener
-from flexget.utils.database import text_date_synonym, year_property
+from flexget.utils.database import text_date_synonym, year_property, with_session
 from flexget.manager import Base, Session
 from flexget.plugin import register_plugin
 
@@ -132,7 +132,8 @@ class TMDBSearchResult(Base):
 class ApiTmdb(object):
     """Does lookups to TMDb and provides movie information. Caches lookups."""
 
-    def lookup(self, title=None, year=None, tmdb_id=None, imdb_id=None, smart_match=None, only_cached=False):
+    @with_session
+    def lookup(self, title=None, year=None, tmdb_id=None, imdb_id=None, smart_match=None, only_cached=False, session=None):
         if not (tmdb_id or imdb_id or title) and smart_match:
             # If smart_match was specified, and we don't have more specific criteria, parse it into a title and year
             title_parser = MovieParser()
@@ -148,82 +149,75 @@ class ApiTmdb(object):
             raise LookupError('No criteria specified for tmdb lookup')
         log.debug('Looking up tmdb information for %r' % {'title': title, 'tmdb_id': tmdb_id, 'imdb_id': imdb_id})
 
-        session = Session(expire_on_commit=False, autoflush=True)
         movie = None
 
         def id_str():
             return '<title=%s,tmdb_id=%s,imdb_id=%s>' % (title, tmdb_id, imdb_id)
-
-        try:
-            if tmdb_id:
-                movie = session.query(TMDBMovie).filter(TMDBMovie.id == tmdb_id).first()
-            if not movie and imdb_id:
-                movie = session.query(TMDBMovie).filter(TMDBMovie.imdb_id == imdb_id).first()
-            if not movie and title:
-                movie_filter = session.query(TMDBMovie).filter(func.lower(TMDBMovie.name) == title.lower())
-                if year:
-                    movie_filter = movie_filter.filter(TMDBMovie.year == year)
-                movie = movie_filter.first()
-                if not movie:
-                    found = session.query(TMDBSearchResult). \
-                            filter(func.lower(TMDBSearchResult.search) == search_string).first()
-                    if found and found.movie:
-                        movie = found.movie
-            if movie:
-                # Movie found in cache, check if cache has expired.
-                refresh_time = timedelta(days=2)
-                if movie.released:
-                    if movie.released > datetime.now() - timedelta(days=7):
-                        # Movie is less than a week old, expire after 1 day
-                        refresh_time = timedelta(days=1)
-                    else:
-                        age_in_years = (datetime.now() - movie.released).days / 365
-                        refresh_time += timedelta(days=age_in_years * 5)
-                if movie.updated < datetime.now() - refresh_time and not only_cached:
-                    log.debug('Cache has expired for %s, attempting to refresh from TMDb.' % id_str())
-                    try:
-                        self.get_movie_details(movie, session)
-                    except URLError:
-                        log.error('Error refreshing movie details from TMDb, cached info being used.')
-                else:
-                    log.debug('Movie %s information restored from cache.' % id_str())
-            else:
-                if only_cached:
-                    raise LookupError('Movie %s not found from cache' % id_str())
-                # There was no movie found in the cache, do a lookup from tmdb
-                log.debug('Movie %s not found in cache, looking up from tmdb.' % id_str())
-                try:
-                    if tmdb_id or imdb_id:
-                        movie = TMDBMovie()
-                        movie.id = tmdb_id
-                        movie.imdb_id = imdb_id
-                        self.get_movie_details(movie, session)
-                        if movie.name:
-                            session.merge(movie)
-                    elif title:
-                        result = get_first_result('search', search_string)
-                        if result:
-                            movie = session.query(TMDBMovie).filter(TMDBMovie.id == result['id']).first()
-                            if not movie:
-                                movie = TMDBMovie(result)
-                                self.get_movie_details(movie, session)
-                                session.merge(movie)
-                            if title.lower() != movie.name.lower():
-                                session.merge(TMDBSearchResult(search=search_string, movie=movie))
-                except URLError:
-                    raise LookupError('Error looking up movie from TMDb')
-                else:
-                    session.commit()
-
+        if tmdb_id:
+            movie = session.query(TMDBMovie).filter(TMDBMovie.id == tmdb_id).first()
+        if not movie and imdb_id:
+            movie = session.query(TMDBMovie).filter(TMDBMovie.imdb_id == imdb_id).first()
+        if not movie and title:
+            movie_filter = session.query(TMDBMovie).filter(func.lower(TMDBMovie.name) == title.lower())
+            if year:
+                movie_filter = movie_filter.filter(TMDBMovie.year == year)
+            movie = movie_filter.first()
             if not movie:
-                raise LookupError('No results found from tmdb for %s' % id_str())
+                found = session.query(TMDBSearchResult). \
+                        filter(func.lower(TMDBSearchResult.search) == search_string).first()
+                if found and found.movie:
+                    movie = found.movie
+        if movie:
+            # Movie found in cache, check if cache has expired.
+            refresh_time = timedelta(days=2)
+            if movie.released:
+                if movie.released > datetime.now() - timedelta(days=7):
+                    # Movie is less than a week old, expire after 1 day
+                    refresh_time = timedelta(days=1)
+                else:
+                    age_in_years = (datetime.now() - movie.released).days / 365
+                    refresh_time += timedelta(days=age_in_years * 5)
+            if movie.updated < datetime.now() - refresh_time and not only_cached:
+                log.debug('Cache has expired for %s, attempting to refresh from TMDb.' % id_str())
+                try:
+                    self.get_movie_details(movie, session)
+                except URLError:
+                    log.error('Error refreshing movie details from TMDb, cached info being used.')
             else:
-                # We need to query again to force the relationships to eager load before we detach from session
-                movie = session.query(TMDBMovie).options(joinedload(TMDBMovie.posters), joinedload(TMDBMovie.genres)). \
-                        filter(TMDBMovie.id == movie.id).first()
-                return movie
-        finally:
-            session.close()
+                log.debug('Movie %s information restored from cache.' % id_str())
+        else:
+            if only_cached:
+                raise LookupError('Movie %s not found from cache' % id_str())
+            # There was no movie found in the cache, do a lookup from tmdb
+            log.debug('Movie %s not found in cache, looking up from tmdb.' % id_str())
+            try:
+                if tmdb_id or imdb_id:
+                    movie = TMDBMovie()
+                    movie.id = tmdb_id
+                    movie.imdb_id = imdb_id
+                    self.get_movie_details(movie, session)
+                    if movie.name:
+                        session.merge(movie)
+                elif title:
+                    result = get_first_result('search', search_string)
+                    if result:
+                        movie = session.query(TMDBMovie).filter(TMDBMovie.id == result['id']).first()
+                        if not movie:
+                            movie = TMDBMovie(result)
+                            self.get_movie_details(movie, session)
+                            session.merge(movie)
+                        if title.lower() != movie.name.lower():
+                            session.merge(TMDBSearchResult(search=search_string, movie=movie))
+            except URLError:
+                raise LookupError('Error looking up movie from TMDb')
+
+        if not movie:
+            raise LookupError('No results found from tmdb for %s' % id_str())
+        else:
+            # Access attributes to force the relationships to eager load before we detach from session
+            movie.genres
+            movie.posters
+            return movie
 
     def get_movie_details(self, movie, session):
         """Populate details for this :movie: from TMDb"""

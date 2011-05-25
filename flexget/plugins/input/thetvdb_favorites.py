@@ -102,7 +102,6 @@ class InputThetvdbFavorites(object):
                     user_favorites.series_ids = favorite_ids
                     user_favorites.updated = datetime.now()
                 session.merge(user_favorites)
-                session.commit()
         if not user_favorites.series_ids:
             log.info('Didn\'t find any thetvdb.com favorites.')
             return

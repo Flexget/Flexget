@@ -6,7 +6,7 @@ from flexget import schema
 from flexget.manager import Session
 from flexget.utils import qualities
 from flexget.utils.imdb import extract_id
-from flexget.utils.database import quality_synonym, quality_comp_property
+from flexget.utils.database import quality_comp_property, with_session
 from flexget.utils.tools import console, str_to_boolean
 from flexget.utils.sqlalchemy_utils import table_exists, table_schema
 from flexget.plugin import DependencyError, get_plugin_by_name, register_plugin, register_parser_option
@@ -32,7 +32,7 @@ def migrate_imdb_queue(manager):
             old_table = table_schema('imdb_queue', session)
             for row in session.execute(old_table.select()):
                 try:
-                    queue_add(imdb_id=row['imdb_id'], quality=row['quality'], force=row['immortal'])
+                    queue_add(imdb_id=row['imdb_id'], quality=row['quality'], force=row['immortal'], session=session)
                 except QueueError, e:
                     log.error('Unable to migrate %s from imdb_queue to movie_queue' % row['title'])
             old_table.drop()
@@ -112,7 +112,8 @@ def validate_quality(quality):
         raise QueueError('ERROR! Unknown quality `%s`' % quality, errno=1)
 
 
-def parse_what(what):
+@with_session
+def parse_what(what, session=None):
     """Parses needed movie information for a given search string.
 
     Search string can be one of:
@@ -125,11 +126,11 @@ def parse_what(what):
     imdb_id = extract_id(what)
     try:
         if imdb_id:
-            movie = tmdb_lookup(imdb_id=imdb_id)
+            movie = tmdb_lookup(imdb_id=imdb_id, session=session)
         elif what.startswith('tmdb_id='):
-            movie = tmdb_lookup(tmdb_id=what[8:])
+            movie = tmdb_lookup(tmdb_id=what[8:], session=session)
         else:
-            movie = tmdb_lookup(title=what)
+            movie = tmdb_lookup(title=what, session=session)
     except LookupError, e:
         raise QueueError(e.message)
 
@@ -140,72 +141,62 @@ def parse_what(what):
 
 
 # API functions to edit queue
-def queue_add(title=None, imdb_id=None, tmdb_id=None, quality='ANY', force=True):
+@with_session
+def queue_add(title=None, imdb_id=None, tmdb_id=None, quality='ANY', force=True, session=None):
     """Add an item to the queue with the specified quality"""
 
     if not title or not imdb_id or not tmdb_id:
         # We don't have all the info we need to add movie, do a lookup for more info
-        result = parse_what(imdb_id or title)
+        result = parse_what(imdb_id or title, session=session)
         title = result['title']
         imdb_id = result['imdb_id']
         tmdb_id = result['tmdb_id']
     quality = validate_quality(quality)
 
-    session = Session()
-    try:
-        # check if the item is already queued
-        item = session.query(QueuedMovie).filter(or_(QueuedMovie.imdb_id == imdb_id, QueuedMovie.tmdb_id == tmdb_id)).\
-                                          first()
-        if not item:
-            item = QueuedMovie(title=title, imdb_id=imdb_id, tmdb_id=tmdb_id, quality=quality, immortal=force)
-            session.add(item)
-            session.commit()
-            return {'title': title, 'imdb_id': imdb_id, 'tmdb_id': tmdb_id, 'quality': quality, 'force': force}
-        else:
-            raise QueueError('ERROR: %s is already in the queue' % title)
-    finally:
-        session.close()
+    # check if the item is already queued
+    item = session.query(QueuedMovie).filter(or_(QueuedMovie.imdb_id == imdb_id, QueuedMovie.tmdb_id == tmdb_id)).\
+                                      first()
+    if not item:
+        item = QueuedMovie(title=title, imdb_id=imdb_id, tmdb_id=tmdb_id, quality=quality, immortal=force)
+        session.add(item)
+        return {'title': title, 'imdb_id': imdb_id, 'tmdb_id': tmdb_id, 'quality': quality, 'force': force}
+    else:
+        raise QueueError('ERROR: %s is already in the queue' % title)
 
 
-def queue_del(imdb_id):
+@with_session
+def queue_del(imdb_id, session=None):
     """Delete the given item from the queue"""
 
-    session = Session()
-    try:
-        # check if the item is queued
-        item = session.query(QueuedMovie).filter(QueuedMovie.imdb_id == imdb_id).first()
-        if item:
-            title = item.title
-            session.delete(item)
-            session.commit()
-            return title
-        else:
-            raise QueueError('%s is not in the queue' % imdb_id)
-    finally:
-        session.close()
+    # check if the item is queued
+    item = session.query(QueuedMovie).filter(QueuedMovie.imdb_id == imdb_id).first()
+    if item:
+        title = item.title
+        session.delete(item)
+        return title
+    else:
+        raise QueueError('%s is not in the queue' % imdb_id)
 
 
-def queue_edit(imdb_id, quality):
+@with_session
+def queue_edit(imdb_id, quality, session=None):
     """Change the required quality for a movie in the queue"""
     quality = validate_quality(quality)
-    session = Session()
-    try:
-        # check if the item is queued
-        item = session.query(QueuedMovie).filter(QueuedMovie.imdb_id == imdb_id).first()
-        if item:
-            item.quality = quality
-            session.commit()
-            return item.title
-        else:
-            raise QueueError('%s is not in the queue' % imdb_id)
-    finally:
-        session.close()
+    # check if the item is queued
+    item = session.query(QueuedMovie).filter(QueuedMovie.imdb_id == imdb_id).first()
+    if item:
+        item.quality = quality
+        session.commit()
+        return item.title
+    else:
+        raise QueueError('%s is not in the queue' % imdb_id)
 
 
-def queue_list():
+@with_session
+def queue_list(session=None):
     """List IMDb queue"""
 
-    items = queue_get()
+    items = queue_get(session=session)
     console('-' * 79)
     console('%-10s %-7s %-37s %-15s %s' % ('IMDB id', 'TMDB id', 'Title', 'Quality', 'Force'))
     console('-' * 79)
@@ -218,17 +209,14 @@ def queue_list():
     console('-' * 79)
 
 
-def queue_get():
+@with_session
+def queue_get(session=None):
     """Get the current IMDb queue.
 
     Returns:
         List of QueuedMovie objects (detached from session)
     """
-    session = Session()
-    try:
-        return session.query(QueuedMovie).filter(QueuedMovie.downloaded == None).all()
-    finally:
-        session.close()
+    return session.query(QueuedMovie).filter(QueuedMovie.downloaded == None).all()
 
 
 class MovieQueueManager(object):
@@ -237,7 +225,7 @@ class MovieQueueManager(object):
     """
 
     @staticmethod
-    def optik_imdb_queue(option, opt, value, parser):
+    def optik_movie_queue(option, opt, value, parser):
         """Callback for Optik, parses --movie-queue options and populates movie_queue options value"""
         options = {}
         usage_error = OptionValueError('Usage: --movie-queue (add|del|list) [IMDB_URL|NAME] [QUALITY] [FORCE]')
@@ -323,5 +311,5 @@ register_plugin(FilterMovieQueue, 'movie_queue', api_ver=2)
 
 register_plugin(MovieQueueManager, 'movie_queue_manager', builtin=True)
 register_parser_option('--movie-queue', action='callback',
-                       callback=MovieQueueManager.optik_imdb_queue,
-                       help='(add|del|list) [IMDB_URL|NAME] [QUALITY] [FORCE]')
+                       callback=MovieQueueManager.optik_movie_queue,
+                       help='(add|del|list) [NAME|IMDB_ID|tmdb_id=TMDB_ID] [QUALITY] [FORCE]')
