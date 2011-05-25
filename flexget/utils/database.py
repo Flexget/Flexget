@@ -1,7 +1,7 @@
 from datetime import datetime
-from functools import update_wrapper
 from sqlalchemy import extract, func, case
 from sqlalchemy.orm import synonym
+from sqlalchemy.ext.hybrid import Comparator, hybrid_property
 from flexget.manager import Session
 from flexget.utils import qualities
 
@@ -113,54 +113,76 @@ def safe_pickle_synonym(name):
     return synonym(name, descriptor=property(getter, setter))
 
 
-def quality_synonym(name):
-    """Get and set property as Quality objects, store as text in the database."""
+class CaseInsensitiveWord(Comparator):
+    """Hybrid value representing a lower case representation of a word."""
+
+    def __init__(self, word):
+        if isinstance(word, basestring):
+            self.word = word.lower()
+        elif isinstance(word, CaseInsensitiveWord):
+            self.word = word.word
+        else:
+            self.word = func.lower(word)
+
+    def operate(self, op, other):
+        if not isinstance(other, CaseInsensitiveWord):
+            other = CaseInsensitiveWord(other)
+        return op(self.word, other.word)
+
+    def __clause_element__(self):
+        return self.word
+
+    def __str__(self):
+        return self.word
+
+
+class QualityComparator(Comparator):
+    """Database quality comparator fields which can operate against quality objects or their string equivalents."""
+
+    def operate(self, op, other):
+        if hasattr(other, 'value'):
+            value = other.value
+        elif isinstance(other, basestring):
+            qual = qualities.get(other, False)
+            if qual:
+                value = qual.value
+            else:
+                raise ValueError('%s is not a valid quality' % other)
+        else:
+            raise TypeError('%r cannot be compared to a quality' % other)
+
+        whens = dict((quality.name, quality.value) for quality in qualities.all())
+        return op(case(value=self.__clause_element__(), whens=whens, else_=0), value)
+
+
+def quality_property(text_attr):
 
     def getter(self):
-        return qualities.get(getattr(self, name))
+        return qualities.get(getattr(self, text_attr))
 
     def setter(self, value):
         if isinstance(value, basestring):
-            setattr(self, name, value)
+            setattr(self, text_attr, value)
         else:
-            setattr(self, name, value.name)
+            setattr(self, text_attr, value.name)
 
-    return synonym(name, descriptor=property(getter, setter))
+    def comparator(self):
+        return QualityComparator(getattr(self, text_attr))
+
+    prop = hybrid_property(getter, setter)
+    prop.comparator(comparator)
+    return prop
 
 
-class property_(object):
-    """A property for an sqlalchemy model that can also return the proper sql to be used in queries."""
+def ignore_case_property(text_attr):
 
-    def __init__(self, fget, fset=None, fdel=None, expr=None):
-        self.fget = fget
-        self.fset = fset
-        self.fdel = fdel
-        self.expr = expr or fget
-        update_wrapper(self, fget)
+    def getter(self):
+        return CaseInsensitiveWord(getattr(self, text_attr))
 
-    def __get__(self, instance, owner):
-        if instance is None:
-            return self.expr(owner)
-        else:
-            return self.fget(instance)
+    def setter(self, value):
+        setattr(self, text_attr, value)
 
-    def __set__(self, instance, value):
-        self.fset(instance, value)
-
-    def __delete__(self, instance):
-        self.fdel(instance)
-
-    def setter(self, fset):
-        self.fset = fset
-        return self
-
-    def deleter(self, fdel):
-        self.fdel = fdel
-        return self
-
-    def expression(self, expr):
-        self.expr = expr
-        return self
+    return hybrid_property(getter, setter)
 
 
 def year_property(date_attr):
@@ -172,32 +194,4 @@ def year_property(date_attr):
     def expr(cls):
         return extract('year', getattr(cls, date_attr))
 
-    return property_(getter, expr=expr)
-
-
-def lower_property(str_attr):
-    """A property based on a text column that returns or queries on the lower case version of the string."""
-
-    def getter(self):
-        string = getattr(self, str_attr)
-        return string and string.lower()
-
-    def expr(cls):
-        return func.lower(getattr(cls, str_attr))
-
-    return property_(getter, expr=expr)
-
-
-def quality_comp_property(str_attr):
-    """Returns the value for the quality stored, which can be filtered against or used to sort queries."""
-
-    def getter(self):
-        return qualities.get(getattr(self, str_attr)).value
-
-    def expr(cls):
-        whens = {}
-        for qual in qualities.all():
-            whens[qual.name] = qual.value
-        return case(value=getattr(cls, str_attr), whens=whens)
-
-    return property_(getter, expr=expr)
+    return hybrid_property(getter, expr=expr)

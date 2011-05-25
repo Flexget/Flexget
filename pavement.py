@@ -15,7 +15,7 @@ setup(
     author_email='marko.koivusalo@gmail.com',
     license='MIT',
     url='http://flexget.com',
-    install_requires=['FeedParser', 'SQLAlchemy >=0.6.7, <0.8', 'PyYAML', 'BeautifulSoup', 'html5lib>=0.11', \
+    install_requires=['FeedParser', 'SQLAlchemy >=0.7, <0.8', 'PyYAML', 'BeautifulSoup', 'html5lib>=0.11', \
                       'PyRSS2Gen', 'pynzb', 'progressbar', 'flask', 'cherrypy'],
     packages=find_packages(exclude=['tests']),
     package_data=find_package_data('flexget', package='flexget', \

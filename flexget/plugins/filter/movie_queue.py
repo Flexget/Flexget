@@ -1,12 +1,12 @@
 import logging
 from optparse import OptionValueError
-from sqlalchemy import Column, Integer, String, ForeignKey, or_, select
+from sqlalchemy import Column, Integer, String, ForeignKey, or_
 from sqlalchemy.exc import OperationalError
 from flexget import schema
 from flexget.manager import Session
 from flexget.utils import qualities
 from flexget.utils.imdb import extract_id
-from flexget.utils.database import quality_comp_property, with_session
+from flexget.utils.database import quality_property, with_session
 from flexget.utils.tools import console, str_to_boolean
 from flexget.utils.sqlalchemy_utils import table_exists, table_schema
 from flexget.plugin import DependencyError, get_plugin_by_name, register_plugin, register_parser_option
@@ -48,7 +48,7 @@ class QueuedMovie(queue_base.QueuedItem, Base):
     imdb_id = Column(String)
     tmdb_id = Column(Integer)
     quality = Column('quality', String)
-    quality_comp = quality_comp_property('quality')
+    quality_obj = quality_property('quality')
 
 
 class FilterMovieQueue(queue_base.FilterQueueBase):
@@ -86,8 +86,7 @@ class FilterMovieQueue(queue_base.FilterQueueBase):
 
         return feed.session.query(QueuedMovie).filter(QueuedMovie.downloaded == None).\
                                                filter(or_(*conditions)).\
-                                               filter(or_(QueuedMovie.quality == 'ANY',
-                                                          QueuedMovie.quality_comp <= quality.value)).first()
+                                               filter(QueuedMovie.quality_obj <= quality).first()
 
 
 class QueueError(Exception):
