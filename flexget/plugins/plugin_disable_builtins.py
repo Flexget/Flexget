@@ -1,51 +1,50 @@
 import logging
 from flexget import plugin
-from flexget.plugin import priority, register_plugin
+from flexget.plugin import priority, register_plugin, plugins
 
 log = logging.getLogger('builtins')
 
 
-class PluginDisableBuiltins(object):
-    """
-        Disables all builtin plugins from a feed.
-    """
+def all_builtins():
+    """Helper function to return an iterator over all builtin plugins."""
+    return (plugin for plugin in plugins.itervalues() if plugin.builtin)
 
-    def __init__(self):
-        self.disabled = []
+
+class PluginDisableBuiltins(object):
+    """Disables all (or specific) builtin plugins from a feed."""
 
     def validator(self):
         from flexget import validator
-        # TODO: accept only list (of texts) or boolean
-        return validator.factory('any')
+        root = validator.factory()
+        root.accept('boolean')
+        root.accept('list').accept('choice').accept_choices(plugin.name for plugin in all_builtins())
+        return root
 
     def debug(self):
-        for name, info in plugin.plugins.iteritems():
-            if not info.builtin:
-                continue
-            log.debug('Builtin plugin: %s' % name)
+        log.debug('Builtin plugins: %s' % ', '.join(plugin.name for plugin in all_builtins()))
 
-    def on_feed_start(self, feed):
-        for name, info in plugin.plugins.iteritems():
-            if info.builtin:
-                if isinstance(feed.config['disable_builtins'], list):
-                    if info.name in feed.config['disable_builtins']:
-                        info.builtin = False
-                        self.disabled.append(name)
-                else:
-                    # disabling all builtins
-                    info.builtin = False
-                    self.disabled.append(name)
-        log.debug('Disabled builtin plugin %s' % ', '.join(self.disabled))
+    @priority(255)
+    def on_feed_start(self, feed, config):
+        self.disabled = []
+        if not config:
+            return
+
+        for plugin in all_builtins():
+            if config is True or plugin.name in config:
+                plugin.builtin = False
+                self.disabled.append(plugin.name)
+        log.debug('Disabled builtin plugin(s): %s' % ', '.join(self.disabled))
 
     @priority(-255)
-    def on_feed_exit(self, feed):
-        names = []
+    def on_feed_exit(self, feed, config):
+        if not self.disabled:
+            return
+
         for name in self.disabled:
-            names.append(name)
             plugin.plugins[name].builtin = True
+        log.debug('Enabled builtin plugin(s): %s' % ', '.join(self.disabled))
         self.disabled = []
-        log.debug('Enabled builtin plugins %s' % ', '.join(names))
 
     on_feed_abort = on_feed_exit
 
-register_plugin(PluginDisableBuiltins, 'disable_builtins')
+register_plugin(PluginDisableBuiltins, 'disable_builtins', api_ver=2)
