@@ -679,6 +679,7 @@ class FilterSeries(SeriesPlugin, FilterSeriesBase):
                     (entry['title'], entry['quality'], parser.quality))
             entry['quality'] = parser.quality
             entry['proper'] = parser.proper
+            entry['proper_count'] = parser.proper_count
             if parser.season and parser.episode:
                 entry['series_season'] = parser.season
                 entry['series_episode'] = parser.episode
