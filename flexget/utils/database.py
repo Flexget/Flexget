@@ -114,26 +114,34 @@ def safe_pickle_synonym(name):
 
 
 class CaseInsensitiveWord(Comparator):
-    """Hybrid value representing a lower case representation of a word."""
+    """Hybrid value representing a string that compares case insensitively."""
 
     def __init__(self, word):
-        if isinstance(word, basestring):
-            self.word = word.lower()
-        elif isinstance(word, CaseInsensitiveWord):
+        if isinstance(word, CaseInsensitiveWord):
             self.word = word.word
         else:
-            self.word = func.lower(word)
+            self.word = word
+
+    def _lower(self):
+        if isinstance(self.word, basestring):
+            return self.word.lower()
+        else:
+            return func.lower(self.word)
 
     def operate(self, op, other):
         if not isinstance(other, CaseInsensitiveWord):
             other = CaseInsensitiveWord(other)
-        return op(self.word, other.word)
+        return op(self._lower(), other._lower())
 
     def __clause_element__(self):
-        return self.word
+        return self.lower()
 
     def __str__(self):
         return self.word
+
+    def __getattr__(self, item):
+        """Expose string methods to be called directly on this object."""
+        return getattr(self.word, item)
 
 
 class QualityComparator(Comparator):

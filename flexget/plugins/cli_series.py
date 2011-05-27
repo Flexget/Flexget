@@ -37,7 +37,7 @@ class SeriesReport(SeriesPlugin):
         session = Session()
 
         name = unicode(self.options['name'].lower())
-        series = session.query(Series).filter(Series.name_lower == name.lower()).first()
+        series = session.query(Series).filter(Series.name == name).first()
         if not series:
             print 'Unknown series `%s`' % name
             return
@@ -87,7 +87,7 @@ class SeriesReport(SeriesPlugin):
 
             # get latest episode in episodic format
             episode = session.query(Episode).select_from(join(Episode, Series)).\
-                      filter(Series.name_lower == series.name_lower).\
+                      filter(Series.id == series.id).\
                       filter(Episode.season != None).\
                       order_by(desc(Episode.season)).\
                       order_by(desc(Episode.number)).first()
@@ -95,7 +95,7 @@ class SeriesReport(SeriesPlugin):
             # no luck, try uid format
             if not episode:
                 episode = session.query(Episode).join(Series, Release).\
-                          filter(Series.name_lower == series.name_lower).\
+                          filter(Series.id == series.id).\
                           filter(Episode.season == None).\
                           order_by(desc(Release.first_seen)).first()
 

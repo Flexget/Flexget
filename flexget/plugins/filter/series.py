@@ -63,8 +63,8 @@ class Series(Base):
     __tablename__ = 'series'
 
     id = Column(Integer, primary_key=True)
-    name = Column(Unicode)
-    name_ic = ignore_case_property('name')
+    _name = Column('name', Unicode)
+    name = ignore_case_property('_name')
     episodes = relation('Episode', backref='series', cascade='all, delete, delete-orphan')
 
     def __repr__(self):
@@ -159,7 +159,7 @@ class SeriesPlugin(object):
     def get_first_seen(self, session, parser, min_qual=None, max_qual=None):
         """Return datetime when this episode of series was first seen"""
         release = session.query(Release.first_seen).join(Episode, Series).\
-            filter(Series.name_ic == parser.name).\
+            filter(Series.name == parser.name).\
             filter(Episode.identifier == parser.identifier)
         if min_qual:
             release = release.filter(Release.quality >= min_qual)
@@ -175,7 +175,7 @@ class SeriesPlugin(object):
         """Return latest known identifier in dict (season, episode, name) for series name"""
         episode = session.query(Episode).select_from(join(Episode, Series)).\
             filter(Episode.season != None).\
-            filter(Series.name_ic == name).\
+            filter(Series.name == name).\
             order_by(desc(Episode.season)).\
             order_by(desc(Episode.number)).first()
         if not episode:
@@ -193,9 +193,9 @@ class SeriesPlugin(object):
         Returns 'auto' if there is not enough history to determine the format yet
         """
         total = session.query(Release).join(Episode, Series).\
-            filter(Series.name_ic == name).count()
+            filter(Series.name == name).count()
         episodic = session.query(Release).join(Episode, Series).\
-            filter(Series.name_ic == name).\
+            filter(Series.name == name).\
             filter(Episode.season != None).\
             filter(Episode.number != None).count()
         non_episodic = total - episodic
@@ -211,7 +211,7 @@ class SeriesPlugin(object):
     def get_latest_download(self, session, name):
         """Return latest downloaded episode (season, episode, name) for series :name:"""
         latest_download = session.query(Episode).join(Release, Series).\
-            filter(Series.name_ic == name).\
+            filter(Series.name == name).\
             filter(Release.downloaded == True).\
             filter(Episode.season != None).\
             filter(Episode.number != None).\
@@ -226,13 +226,13 @@ class SeriesPlugin(object):
     def get_releases(self, session, name, identifier):
         """Return all releases for series by identifier."""
         return session.query(Release).join(Episode, Series).\
-            filter(Series.name_ic == name).\
+            filter(Series.name == name).\
             filter(Episode.identifier == identifier).all()
 
     def get_downloaded(self, session, name, identifier):
         """Return list of downloaded releases for this episode"""
         downloaded = session.query(Release).join(Episode, Series).\
-            filter(Series.name_ic == name).\
+            filter(Series.name == name).\
             filter(Episode.identifier == identifier).\
             filter(Release.downloaded == True).all()
         if not downloaded:
@@ -243,7 +243,7 @@ class SeriesPlugin(object):
         """Push series information into database. Returns added/existing release."""
         # if series does not exist in database, add new
         series = session.query(Series).\
-            filter(Series.name_ic == parser.name).\
+            filter(Series.name == parser.name).\
             filter(Series.id != None).first()
         if not series:
             log.debug('adding series %s into db' % parser.name)
@@ -292,7 +292,7 @@ class SeriesPlugin(object):
 def forget_series(name):
     """Remove a whole series :name: from database."""
     session = Session()
-    series = session.query(Series).filter(Series.name_ic == name).first()
+    series = session.query(Series).filter(Series.name == name).first()
     if series:
         session.delete(series)
         session.commit()
@@ -304,7 +304,7 @@ def forget_series(name):
 def forget_series_episode(name, identifier):
     """Remove all episodes by :identifier: from series :name: from database."""
     session = Session()
-    series = session.query(Series).filter(Series.name_ic == name).first()
+    series = session.query(Series).filter(Series.name == name).first()
     if series:
         episode = session.query(Episode).filter(Episode.identifier == identifier).\
             filter(Episode.series_id == series.id).first()
@@ -576,7 +576,7 @@ class FilterSeries(SeriesPlugin, FilterSeriesBase):
             # yaml loads ascii only as str
             series_name = unicode(series_name)
             # Update database with capitalization from config
-            feed.session.query(Series).filter(Series.name_ic == series_name).\
+            feed.session.query(Series).filter(Series.name == series_name).\
                 update({'name': series_name}, 'fetch')
             source = guessed_series if series_config.get('series_guessed') else found_series
             # If we didn't find any episodes for this series, continue
