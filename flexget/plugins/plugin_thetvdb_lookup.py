@@ -135,7 +135,7 @@ class PluginThetvdbLookup(object):
         return entry[field]
 
     # Run after series and metainfo series
-    @priority(115)
+    @priority(110)
     def on_feed_metainfo(self, feed, config):
         if not config:
             return
