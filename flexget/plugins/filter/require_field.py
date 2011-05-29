@@ -21,8 +21,7 @@ class FilterRequireField(object):
         return root
 
     @priority(32)
-    def on_feed_filter(self, feed):
-        config = feed.config.get('require_field')
+    def on_feed_filter(self, feed, config):
         if isinstance(config, basestring):
             config = [config]
         for entry in feed.entries:
@@ -32,4 +31,4 @@ class FilterRequireField(object):
                     break
 
 
-register_plugin(FilterRequireField, 'require_field')
+register_plugin(FilterRequireField, 'require_field', api_ver=2)

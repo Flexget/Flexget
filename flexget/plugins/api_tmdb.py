@@ -1,12 +1,12 @@
 from datetime import datetime, timedelta
 import logging
 from urllib2 import URLError
-import yaml
+import json
 import os
 import posixpath
 from sqlalchemy import Table, Column, Integer, Float, String, Unicode, Boolean, DateTime, func
 from sqlalchemy.schema import ForeignKey
-from sqlalchemy.orm import relation, joinedload
+from sqlalchemy.orm import relation
 from flexget.utils.titles import MovieParser
 from flexget.utils.tools import urlopener
 from flexget.utils.database import text_date_synonym, year_property, with_session
@@ -258,7 +258,7 @@ def get_first_result(tmdb_function, value):
     if isinstance(value, basestring):
         import urllib
         value = urllib.quote_plus(value)
-    url = '%s/2.1/Movie.%s/%s/yaml/%s/%s' % (server, tmdb_function, lang, api_key, value)
+    url = '%s/2.1/Movie.%s/%s/json/%s/%s' % (server, tmdb_function, lang, api_key, value)
     from urllib2 import URLError
     try:
         data = urlopener(url, log)
@@ -266,7 +266,7 @@ def get_first_result(tmdb_function, value):
         log.warning('Request failed %s' % url)
         return
 
-    result = yaml.load(data)
+    result = json.load(data)
     # Make sure there is a valid result to return
     if isinstance(result, list) and len(result):
         result = result[0]
