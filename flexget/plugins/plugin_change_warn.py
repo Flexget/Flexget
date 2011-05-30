@@ -33,6 +33,10 @@ class ChangeWarn(object):
             log.critical('imdb_queue_input was renamed to emit_imdb_queue')
             found_deprecated = True
 
+        if 'emit_imdb_queue' in feed.config:
+            log.critical('emit_imdb_queue was renamed to emit_movie_queue, please update your config')
+            found_deprecated = True
+
         if 'transmissionrpc' in feed.config:
             log.critical('transmissionrpc was renamed to transmission')
             found_deprecated = True
