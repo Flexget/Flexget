@@ -134,6 +134,26 @@ class ApiTmdb(object):
 
     @with_session
     def lookup(self, title=None, year=None, tmdb_id=None, imdb_id=None, smart_match=None, only_cached=False, session=None):
+        """Do a lookup from tmdb for the movie matching the passed arguments.
+
+        Any combination of criteria can be passed, the most specific criteria specified will be used.
+
+        Returns:
+            The Movie object populated with data from tmdb
+
+        Raises:
+            LookupError if a match cannot be found or there are other problems with the lookup
+
+        Args:
+            tmdb_id: tmdb_id of desired movie
+            imdb_id: imdb_id of desired movie
+            title: title of desired movie
+            year: release year of desired movie
+            smart_match: attempt to clean and parse title and year from a string
+            only_cached: if this is specified, an online lookup will not occur if the movie is not in the cache
+            session: optionally specify a session to use, if specified, returned Movie will be live in that session
+        """
+
         if not (tmdb_id or imdb_id or title) and smart_match:
             # If smart_match was specified, and we don't have more specific criteria, parse it into a title and year
             title_parser = MovieParser()
