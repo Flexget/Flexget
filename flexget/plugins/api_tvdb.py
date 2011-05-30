@@ -65,9 +65,14 @@ class TVDBContainer(object):
         """Populates any simple (string or number) attributes from a dict"""
         for col in self.__table__.columns:
             tag = update_bss.find(col.name)
-            if tag:
-                if tag.string:
-                    setattr(self, col.name, tag.string)
+            if tag and tag.string:
+                if isinstance(col.type, Integer):
+                    value = int(tag.string)
+                elif isinstance(col.type, Float):
+                    value = float(tag.string)
+                else:
+                    value = tag.string
+                setattr(self, col.name, value)
         self.expired = False
 
 
@@ -213,13 +218,13 @@ def find_series_id(name):
     # TODO: Check if there are multiple exact matches
     firstmatch = xmldata.find('series')
     if firstmatch and firstmatch.seriesname.string.lower() == name.lower():
-        return firstmatch.seriesid.string
+        return int(firstmatch.seriesid.string)
     # If there is no exact match, sort by airing date and pick the latest
     # TODO: Is there a better way to do this? Maybe weight name similarity and air date
     series_list = [(s.firstaired.string, s.seriesid.string) for s in xmldata.findAll('series', recursive=False) if s.firstaired]
     if series_list:
         series_list.sort(key=lambda s: s[0], reverse=True)
-        return series_list[0][1]
+        return int(series_list[0][1])
     else:
         raise LookupError('No results for `%s`' % name)
 
