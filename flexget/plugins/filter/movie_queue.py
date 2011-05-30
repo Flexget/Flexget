@@ -1,15 +1,13 @@
 import logging
-from optparse import OptionValueError
 from sqlalchemy import Column, Integer, String, ForeignKey, or_
-from sqlalchemy.exc import OperationalError
 from flexget import schema
 from flexget.manager import Session
 from flexget.utils import qualities
 from flexget.utils.imdb import extract_id
 from flexget.utils.database import quality_property, with_session
-from flexget.utils.tools import console, str_to_boolean
+from flexget.utils.tools import console
 from flexget.utils.sqlalchemy_utils import table_exists, table_schema
-from flexget.plugin import DependencyError, get_plugin_by_name, register_plugin, register_parser_option
+from flexget.plugin import DependencyError, get_plugin_by_name, register_plugin
 from flexget.event import event
 
 try:
@@ -54,6 +52,11 @@ class QueuedMovie(queue_base.QueuedItem, Base):
 class FilterMovieQueue(queue_base.FilterQueueBase):
 
     def matches(self, feed, config, entry):
+        # Tell tmdb_lookup to add lazy lookup fields if not already present
+        try:
+            get_plugin_by_name('tmdb_lookup').instance.register_lazy_fields(entry)
+        except DependencyError:
+            log.debug('tmdb_lookup is not available, queue will not work if movie ids are not populated')
         # make sure the entry has a movie id field filled
         conditions = []
         # First see if a movie id is already populated
@@ -67,17 +70,6 @@ class FilterMovieQueue(queue_base.FilterQueueBase):
                 conditions.append(QueuedMovie.imdb_id == entry['imdb_id'])
             elif entry.get('tmdb_id'):
                 conditions.append(QueuedMovie.id == entry['tmdb_id'])
-        # If we still don't have any criteria, try a lookup
-        if not conditions:
-            try:
-                movie = get_plugin_by_name('api_tmdb').instance.lookup(smart_match=entry['title'])
-                conditions.append(QueuedMovie.tmdb_id == movie.id)
-                if movie.imdb_id:
-                    conditions.append(QueuedMovie.imdb_id == movie.imdb_id)
-            except (DependencyError, LookupError), e:
-                log.debug('Cannot lookup movie info: %s' % e)
-                return
-
         if not conditions:
             log.warning("No movie id could be determined for %s" % entry['title'])
             return
@@ -103,7 +95,9 @@ class QueueError(Exception):
 def validate_quality(quality):
     # Check that the quality is valid
     # Make sure quality is in the format we expect
-    if quality.upper() == 'ANY':
+    if isinstance(quality, qualities.Quality):
+        return quality.name
+    elif quality.upper() == 'ANY':
         return 'ANY'
     elif qualities.get(quality, False):
         return qualities.common_name(quality)
@@ -158,6 +152,7 @@ def queue_add(title=None, imdb_id=None, tmdb_id=None, quality='ANY', force=True,
     if not item:
         item = QueuedMovie(title=title, imdb_id=imdb_id, tmdb_id=tmdb_id, quality=quality, immortal=force)
         session.add(item)
+        log.info('Adding %s to movie queue.' % title)
         return {'title': title, 'imdb_id': imdb_id, 'tmdb_id': tmdb_id, 'quality': quality, 'force': force}
     else:
         raise QueueError('ERROR: %s is already in the queue' % title)
@@ -218,97 +213,4 @@ def queue_get(session=None):
     return session.query(QueuedMovie).filter(QueuedMovie.downloaded == None).all()
 
 
-class MovieQueueManager(object):
-    """
-    Handle IMDb queue management; add, delete and list
-    """
-
-    @staticmethod
-    def optik_movie_queue(option, opt, value, parser):
-        """Callback for Optik, parses --movie-queue options and populates movie_queue options value"""
-        options = {}
-        usage_error = OptionValueError('Usage: --movie-queue (add|del|list) [IMDB_URL|NAME] [QUALITY] [FORCE]')
-        if not parser.rargs:
-            raise usage_error
-
-        options['action'] = parser.rargs[0].lower()
-        if options['action'] not in ['add', 'del', 'list']:
-            raise usage_error
-
-        if len(parser.rargs) == 1:
-            if options['action'] != 'list':
-                raise usage_error
-
-        # 2 args is the minimum allowed (operation + item) for actions other than list
-        if len(parser.rargs) >= 2:
-            options['what'] = parser.rargs[1]
-
-        # 3, quality
-        if len(parser.rargs) >= 3:
-            options['quality'] = parser.rargs[2]
-        else:
-            options['quality'] = 'ANY' # TODO: Get default from config somehow?
-
-        # 4, force download
-        if len(parser.rargs) >= 4:
-            options['force'] = str_to_boolean(parser.rargs[3])
-        else:
-            options['force'] = True
-
-        parser.values.movie_queue = options
-
-    def on_process_start(self, feed):
-        """Handle --movie-queue management"""
-
-        if not getattr(feed.manager.options, 'movie_queue', False):
-            return
-
-        feed.manager.disable_feeds()
-        options = feed.manager.options.movie_queue
-
-        if options['action'] == 'list':
-            queue_list()
-            return
-
-        # all actions except list require movie info to work
-        # Generate imdb_id, tmdb_id and movie title from any single one
-        try:
-            what = parse_what(options['what'])
-            options.update(what)
-        except QueueError, e:
-            console(e.message)
-
-        if not options.get('title') or not (options.get('imdb_id') or options.get('tmdb_id')):
-            console('could not determine movie to add') # TODO: Rethink errors
-            return
-
-        try:
-            if options['action'] == 'add':
-                try:
-                    added = queue_add(title=options['title'], imdb_id=options['imdb_id'],
-                        tmdb_id=options['tmdb_id'], quality=options['quality'], force=options['force'])
-                except QueueError, e:
-                    console(e.message)
-                    if e.errno == 1:
-                        # This is an invalid quality error, display some more info
-                        console('Recognized qualities are %s' % ', '.join([qual.name for qual in qualities.all()]))
-                        console('ANY is the default and can also be used explicitly to specify that quality should be ignored.')
-                else:
-                    console('Added %s to queue with quality %s' % (added['title'], added['quality']))
-            elif options['action'] == 'del':
-                try:
-                    title = queue_del(imdb_id=options['imdb_id'])
-                except QueueError, e:
-                    console(e.message)
-                else:
-                    console('Removed %s from queue' % title)
-        except OperationalError:
-            log.critical('OperationalError')
-
-
 register_plugin(FilterMovieQueue, 'movie_queue', api_ver=2)
-
-register_plugin(MovieQueueManager, 'movie_queue_manager', builtin=True)
-register_parser_option('--movie-queue', action='callback',
-                       callback=MovieQueueManager.optik_movie_queue,
-                       help='(add|del|list) [NAME|IMDB_ID|tmdb_id=TMDB_ID] [QUALITY] [FORCE]')

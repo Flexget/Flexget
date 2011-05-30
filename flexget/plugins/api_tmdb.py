@@ -132,8 +132,9 @@ class TMDBSearchResult(Base):
 class ApiTmdb(object):
     """Does lookups to TMDb and provides movie information. Caches lookups."""
 
+    @staticmethod
     @with_session
-    def lookup(self, title=None, year=None, tmdb_id=None, imdb_id=None, smart_match=None, only_cached=False, session=None):
+    def lookup(title=None, year=None, tmdb_id=None, imdb_id=None, smart_match=None, only_cached=False, session=None):
         """Do a lookup from tmdb for the movie matching the passed arguments.
 
         Any combination of criteria can be passed, the most specific criteria specified will be used.
@@ -200,7 +201,7 @@ class ApiTmdb(object):
             if movie.updated < datetime.now() - refresh_time and not only_cached:
                 log.debug('Cache has expired for %s, attempting to refresh from TMDb.' % id_str())
                 try:
-                    self.get_movie_details(movie, session)
+                    ApiTmdb.get_movie_details(movie, session)
                 except URLError:
                     log.error('Error refreshing movie details from TMDb, cached info being used.')
             else:
@@ -215,7 +216,7 @@ class ApiTmdb(object):
                     movie = TMDBMovie()
                     movie.id = tmdb_id
                     movie.imdb_id = imdb_id
-                    self.get_movie_details(movie, session)
+                    ApiTmdb.get_movie_details(movie, session)
                     if movie.name:
                         session.merge(movie)
                 elif title:
@@ -224,7 +225,7 @@ class ApiTmdb(object):
                         movie = session.query(TMDBMovie).filter(TMDBMovie.id == result['id']).first()
                         if not movie:
                             movie = TMDBMovie(result)
-                            self.get_movie_details(movie, session)
+                            ApiTmdb.get_movie_details(movie, session)
                             session.merge(movie)
                         if title.lower() != movie.name.lower():
                             session.merge(TMDBSearchResult(search=search_string, movie=movie))
@@ -239,7 +240,8 @@ class ApiTmdb(object):
             movie.posters
             return movie
 
-    def get_movie_details(self, movie, session):
+    @staticmethod
+    def get_movie_details(movie, session):
         """Populate details for this :movie: from TMDb"""
 
         if not movie.id and movie.imdb_id:
