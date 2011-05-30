@@ -249,9 +249,10 @@ class ApiTmdb(object):
             result = get_first_result('imdbLookup', movie.imdb_id)
             if result:
                 movie.update_from_dict(result)
+            else:
+                raise LookupError('Unable to find %s on tmdb' % movie.imdb_id)
         if not movie.id:
-            log.error('Cannot get tmdb details without tmdb id')
-            return
+            raise LookupError('Cannot get tmdb details without tmdb id')
         result = get_first_result('getInfo', movie.id)
         if result:
             movie.update_from_dict(result)
@@ -274,6 +275,8 @@ class ApiTmdb(object):
                     if db_genre not in movie.genres:
                         movie.genres.append(db_genre)
             movie.updated = datetime.now()
+        else:
+            raise LookupError('No results for tmdb_id %s' % movie.id)
 
 
 def get_first_result(tmdb_function, value):

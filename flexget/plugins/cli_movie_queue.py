@@ -74,7 +74,7 @@ class MovieQueueManager(object):
             console(e.message)
 
         if not options.get('title') or not (options.get('imdb_id') or options.get('tmdb_id')):
-            console('could not determine movie to add') # TODO: Rethink errors
+            console('could not determine movie') # TODO: Rethink errors
             return
 
         try:

@@ -1,4 +1,5 @@
 import logging
+import csv
 from flexget.feed import Entry
 from flexget.plugin import *
 from flexget.utils.cached_input import cached
@@ -42,19 +43,19 @@ class InputCSV(object):
 
     @cached('csv', 'url')
     @internet(log)
-    def on_feed_input(self, feed):
-        url = feed.config['csv'].get('url', None)
-        if not url:
-            raise Exception('CSV in %s is missing url' % feed.name)
-        page = urlopener(url, log)
-        for line in page.readlines():
-            data = line.split(",")
+    def on_feed_input(self, feed, config):
+        entries = []
+        page = urlopener(config['url'], log)
+        for row in csv.reader(page):
+            if not row:
+                continue
             entry = Entry()
             for name, index in feed.config['csv'].get('values', {}).items():
                 try:
-                    entry[name] = data[index-1]
+                    entry[name] = row[index-1]
                 except IndexError:
                     raise Exception('Field %s index is out of range' % name)
-            feed.entries.append(entry)
+            entries.append(entry)
+        return entries
 
-register_plugin(InputCSV, 'csv')
+register_plugin(InputCSV, 'csv', api_ver=2)

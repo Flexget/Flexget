@@ -96,6 +96,8 @@ def validate_quality(quality):
     # Check that the quality is valid
     # Make sure quality is in the format we expect
     if isinstance(quality, qualities.Quality):
+        if quality.value <= 0:
+            return 'ANY'
         return quality.name
     elif quality.upper() == 'ANY':
         return 'ANY'
