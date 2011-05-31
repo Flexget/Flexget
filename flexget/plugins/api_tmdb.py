@@ -1,7 +1,6 @@
 from datetime import datetime, timedelta
 import logging
 from urllib2 import URLError
-import json
 import os
 import posixpath
 from sqlalchemy import Table, Column, Integer, Float, String, Unicode, Boolean, DateTime, func
@@ -11,7 +10,16 @@ from flexget.utils.titles import MovieParser
 from flexget.utils.tools import urlopener
 from flexget.utils.database import text_date_synonym, year_property, with_session
 from flexget.manager import Base, Session
-from flexget.plugin import register_plugin
+from flexget.plugin import register_plugin, DependencyError
+
+try:
+    import simplejson as json
+except ImportError:
+    try:
+        import json
+    except ImportError:
+        raise DependencyError(issued_by='api_tmdb', missing='simplejson', message='api_tmdb requrires either '
+                'simplejson module or python > 2.5')
 
 log = logging.getLogger('api_tmdb')
 
