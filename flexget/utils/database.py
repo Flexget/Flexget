@@ -122,7 +122,7 @@ class CaseInsensitiveWord(Comparator):
         else:
             self.word = word
 
-    def _lower(self):
+    def lower(self):
         if isinstance(self.word, basestring):
             return self.word.lower()
         else:
@@ -131,7 +131,7 @@ class CaseInsensitiveWord(Comparator):
     def operate(self, op, other):
         if not isinstance(other, CaseInsensitiveWord):
             other = CaseInsensitiveWord(other)
-        return op(self._lower(), other._lower())
+        return op(self.lower(), other.lower())
 
     def __clause_element__(self):
         return self.lower()
