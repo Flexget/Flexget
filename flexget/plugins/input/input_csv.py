@@ -1,7 +1,7 @@
 import logging
 import csv
 from flexget.feed import Entry
-from flexget.plugin import *
+from flexget.plugin import register_plugin, internet
 from flexget.utils.cached_input import cached
 from flexget.utils.tools import urlopener
 
@@ -54,7 +54,7 @@ class InputCSV(object):
                 try:
                     entry[name] = row[index-1]
                 except IndexError:
-                    raise Exception('Field %s index is out of range' % name)
+                    raise Exception('Field `%s` index is out of range' % name)
             entries.append(entry)
         return entries
 

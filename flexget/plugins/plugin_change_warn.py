@@ -73,58 +73,64 @@ register_plugin(ChangeWarn, 'change_warn', builtin=True)
 try:
     import sys
     import os.path
-    plugin_dir = os.path.normpath(sys.path[0] + '/../flexget/plugins/')
-    for name in os.listdir(plugin_dir):
-        require_clean = False
+    plugin_dirs = (os.path.normpath(sys.path[0] + '/../flexget/plugins/'),
+                   os.path.normpath(sys.path[0] + '/../flexget/plugins/input/'))
+    for plugin_dir in plugin_dirs:
+        for name in os.listdir(plugin_dir):
+            require_clean = False
 
-        if name.startswith('module'):
-            require_clean = True
+            if name.startswith('module'):
+                require_clean = True
+            
+            if name == 'csv.pyc':
+                require_clean = True
+                
+            if 'resolver' in name:
+                require_clean = True
 
-        if 'resolver' in name:
-            require_clean = True
+            if 'filter_torrent_size' in name:
+                require_clean = True
 
-        if 'filter_torrent_size' in name:
-            require_clean = True
+            if 'filter_nzb_size' in name:
+                require_clean = True
 
-        if 'filter_nzb_size' in name:
-            require_clean = True
+            if 'module_priority' in name:
+                require_clean = True
 
-        if 'module_priority' in name:
-            require_clean = True
+            if 'ignore_feed' in name:
+                require_clean = True
 
-        if 'ignore_feed' in name:
-            require_clean = True
+            if 'module_manual' in name:
+                require_clean = True
 
-        if 'module_manual' in name:
-            require_clean = True
+            if 'output_exec' in name:
+                require_clean = True
 
-        if 'output_exec' in name:
-            require_clean = True
+            if 'plugin_adv_exec' in name:
+                require_clean = True
 
-        if 'plugin_adv_exec' in name:
-            require_clean = True
+            if 'output_transmissionrpc' in name:
+                require_clean = True
 
-        if 'output_transmissionrpc' in name:
-            require_clean = True
-
-        if require_clean:
-            log.critical('-' * 79)
-            log.critical('IMPORTANT: Your installation has some files from older FlexGet!')
-            log.critical('')
-            log.critical('           Please remove all pre-compiled .pyc and .pyo files from %s' % plugin_dir)
-            log.critical('           Offending file: %s' % name)
-            log.critical('')
-            log.critical('           After getting rid of these FlexGet should run again normally')
-
-            from flexget import __version__ as version
-            if version == '{subversion}':
+            if require_clean:
+                log.critical('-' * 79)
+                log.critical('IMPORTANT: Your installation has some files from older FlexGet!')
                 log.critical('')
-                log.critical('           If you are using bootstrapped subversion checkout you can run:')
-                log.critical('           bin/paver clean_compiled')
+                log.critical('           Please remove all pre-compiled .pyc and .pyo files from %s' % plugin_dir)
+                log.critical('           Offending file: %s' % name)
+                log.critical('')
+                log.critical('           After getting rid of these FlexGet should run again normally')
 
-            log.critical('')
-            log.critical('-' * 79)
-            found_deprecated = True
-            break
+                from flexget import __version__ as version
+                if version == '{subversion}':
+                    log.critical('')
+                    log.critical('           If you are using bootstrapped subversion checkout you can run:')
+                    log.critical('           bin/paver clean_compiled')
+
+                log.critical('')
+                log.critical('-' * 79)
+                found_deprecated = True
+                break
+
 except:
     pass
