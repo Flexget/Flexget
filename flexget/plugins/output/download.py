@@ -146,7 +146,7 @@ class PluginDownload(object):
             log.warning('URLError %s' % e.reason)
             return 'URL Error'
         except BadStatusLine, e:
-            log.warning('Failed to reach server. Reason: %s' % e.reason)
+            log.warning('Failed to reach server. Reason: %s' % getattr(e, 'message', 'N/A'))
             return 'BadStatusLine'
         except IOError, e:
             if hasattr(e, 'reason'):
