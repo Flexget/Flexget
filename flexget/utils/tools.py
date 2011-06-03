@@ -210,6 +210,7 @@ def urlopener(url, log, **kwargs):
     # get the old timeout for sockets, so we can set it back to that when done. This is NOT threadsafe by the way.
     # In order to avoid requiring python 2.6, we're not using the urlopen timeout parameter. That really should be used
     # after checking for python 2.6.
+    retries = kwargs.get('retries', 3)
     oldtimeout = socket.getdefaulttimeout()
     try:
         socket.setdefaulttimeout(15.0)
@@ -223,11 +224,11 @@ def urlopener(url, log, **kwargs):
             handler_names = [h.__class__.__name__ for h in handlers]
             log.debug('Additional handlers have been specified for this urlopen: %s' % ', '.join(handler_names))
         opener = urllib2.build_opener(*handlers).open
-        for i in range(3): # retry getting the url up to 3 times.
+        for i in range(retries): # retry getting the url up to 3 times.
             if i > 0:
                 time.sleep(3)
             try:
-                retrieved = opener(url)
+                retrieved = opener(url, kwargs.get('data'))
             except urllib2.HTTPError, e:
                 if e.code < 500:
                     # If it was not a server error, don't keep retrying.
