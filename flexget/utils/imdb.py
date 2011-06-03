@@ -16,6 +16,11 @@ def extract_id(url):
         return m.group(1)
 
 
+def make_url(imdb_id):
+    """Return IMDb URL of the given ID"""
+    return 'http://www.imdb.com/title/%s/' % imdb_id
+
+
 class ImdbSearch(object):
 
     def __init__(self):
@@ -121,6 +126,7 @@ class ImdbSearch(object):
             movie['match'] = 1.0
             movie['name'] = name
             movie['url'] = actual_url
+            movie['imdb_id'] = extract_id(actual_url)
             movie['year'] = None # skips year check
             movies.append(movie)
             return movies
@@ -164,6 +170,7 @@ class ImdbSearch(object):
 
                 movie['name'] = unicode(link.contents[0])
                 movie['url'] = 'http://www.imdb.com' + link.get('href')
+                movie['imdb_id'] = extract_id(movie['url'])
                 log.debug('processing name: %s url: %s' % (movie['name'], movie['url']))
 
                 # calc & set best matching ratio
@@ -234,14 +241,14 @@ class ImdbParser(object):
     def __str__(self):
         return '<ImdbParser(name=%s,imdb_id=%s)>' % (self.name, self.imdb_id)
 
-    def parse(self, url):
+    def parse(self, imdb_id):
+        self.imdb_id = extract_id(imdb_id)
+        url = make_url(self.imdb_id)
         self.url = url
         try:
             page = urllib2.urlopen(url)
         except ValueError:
             raise ValueError('Invalid url %s' % url)
-
-        self.imdb_id = extract_id(self.url)
 
         soup = get_soup(page)
 
