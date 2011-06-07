@@ -980,8 +980,11 @@ class FilterSeries(SeriesPlugin, FilterSeriesBase):
         downloaded_qualities = [r.quality for r in self.get_downloaded(feed.session, eps[0].name, eps[0].identifier)]
         log.debug('downloaded_qualities: %s' % downloaded_qualities)
 
+        # If quality is configured, make sure it is defined in wanted qualities
+        if config.get('quality'):
+            config.setdefault('qualities', []).append(config['quality'])
         # If qualities key is configured, we only want qualities defined in it.
-        wanted_qualities = [qualities.get(name) for name in config.get('qualities', [])]
+        wanted_qualities = set([qualities.get(name) for name in config.get('qualities', [])])
         log.debug('Wanted qualities: %s' % wanted_qualities)
 
         def wanted(quality):
