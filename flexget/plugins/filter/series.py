@@ -906,13 +906,17 @@ class FilterSeries(SeriesPlugin, FilterSeriesBase):
             if (current.season < latest['season']) or (current.season == latest['season'] and current.episode < (latest['episode'] - grace)):
                 log.debug('too old! rejecting all occurrences')
                 for ep in eps:
-                    feed.reject(self.parser2entry[ep], 'too much in the past from latest downloaded episode S%02dE%02d' % (latest['season'], latest['episode']))
+                    feed.reject(self.parser2entry[ep], 'Too much in the past from latest downloaded episode S%02dE%02d' % 
+                        (latest['season'], latest['episode']))
                 return True
 
             if current.season > latest['season'] + 1:
                 log.debug('too new! rejecting all occurrences')
                 for ep in eps:
-                    feed.reject(self.parser2entry[ep], 'too much in the future from latest downloaded episode S%02dE%02d' % (latest['season'], latest['episode']))
+                    feed.reject(self.parser2entry[ep], 
+                        ('Too much in the future from latest downloaded episode S%02dE%02d. '
+                         'See `--disable-advancement` if this should be downloaded.') % 
+                        (latest['season'], latest['episode']))
                 return True
 
     def process_timeframe(self, feed, config, eps, series_name):

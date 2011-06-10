@@ -2,6 +2,7 @@ import logging
 import smtplib
 import socket
 from email.message import Message
+from smtplib import SMTPException
 from flexget.plugin import PluginError, PluginWarning, register_plugin
 
 log = logging.getLogger('email')
@@ -166,7 +167,7 @@ class OutputEmail(object):
                 if config['smtp_ssl']:
                     import sys
                     if sys.version_info < (2, 6, 3):
-                        raise PluginError('SSL email support requires python >= 2.6.3 due to python bug #4066, upgrade python or use TLS')
+                        raise PluginError('SSL email support requires python >= 2.6.3 due to python bug #4066, upgrade python or use TLS', log)
                     # Create a SSL connection to smtp server
                     mailServer = smtplib.SMTP_SSL(config['smtp_host'], config['smtp_port'])
                 else:
@@ -175,8 +176,10 @@ class OutputEmail(object):
                         mailServer.ehlo()
                         mailServer.starttls()
             except socket.error, e:
-                raise PluginWarning('Socket error: %s' % e)
-
+                raise PluginWarning('Socket error: %s' % e, log)
+            except SMTPException, e:
+                # Ticket #1133
+                raise PluginWarning('Unable to send email: %s' % e, log)
 
             try:
                 if config['smtp_login']:
@@ -184,7 +187,7 @@ class OutputEmail(object):
                 mailServer.sendmail(message['From'], config['to'], message.as_string())
             except IOError, e:
                 # Ticket #686
-                raise PluginWarning('Unable to send email, IOError %s' % e.message, log)
+                raise PluginWarning('Unable to send email! IOError: %s' % getattr(e.message, 'N/A'), log)
 
             mailServer.quit()
 
