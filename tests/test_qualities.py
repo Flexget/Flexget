@@ -21,7 +21,11 @@ class TestQualityParser(object):
                  ('Test.File.1920x1080', '1080p'),
                  ('Test.File.1080i', '1080i'),
                  ('Test File blurayrip', 'bdrip'),
-                 ('Test.File.br-rip', 'bdrip')]
+                 ('Test.File.br-rip', 'bdrip'),
+                 
+                 ('Test.File.360p.avi', '360p'),
+                 ('Test.File.[360p].mkv', '360p'),
+                 ('Test.File.368.avi', '368p')]
 
         for item in items:
             quality = quals.parse_quality(item[0]).name
