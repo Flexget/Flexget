@@ -36,7 +36,7 @@ class MovieQueueManager(object):
             if options['action'] not in ('list', 'downloaded'):
                 raise usage_error
 
-        # 2 args is the minimum allowed (operation + item) for actions other than list
+        # 2, args is the minimum allowed (operation + item) for actions other than list
         if len(parser.rargs) >= 2:
             options['what'] = parser.rargs[1]
 
@@ -44,7 +44,10 @@ class MovieQueueManager(object):
         if len(parser.rargs) >= 3:
             options['quality'] = parser.rargs[2]
         else:
-            options['quality'] = 'ANY' # TODO: Get default from config somehow?
+            options['quality'] = 'ANY' 
+            # TODO: Get default from config somehow?
+            # why not use the quality user has queued most, ie option called 'auto' ?
+            # and if none is queued default to something good like '720p bluray'
 
         # 4, force download
         if len(parser.rargs) >= 4:
