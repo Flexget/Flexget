@@ -6,11 +6,13 @@ from flexget.utils.tools import console, str_to_boolean
 from flexget.plugin import DependencyError, register_plugin, register_parser_option
 
 try:
-    from flexget.plugins.filter.movie_queue import QueueError, queue_add, queue_del, queue_list, parse_what
+    from flexget.plugins.filter.movie_queue import QueueError, queue_add, queue_del, queue_get, parse_what
 except ImportError:
     raise DependencyError(issued_by='cli_movie_queue', missing='movie_queue')
 
 log = logging.getLogger('cli_movie_queue')
+
+USAGE = '(add|del|list|downloaded) [NAME|IMDB_ID|tmdb_id=TMDB_ID] [QUALITY] [FORCE]'
 
 
 class MovieQueueManager(object):
@@ -22,16 +24,16 @@ class MovieQueueManager(object):
     def optik_movie_queue(option, opt, value, parser):
         """Callback for Optik, parses --movie-queue options and populates movie_queue options value"""
         options = {}
-        usage_error = OptionValueError('Usage: --movie-queue (add|del|list) [IMDB_URL|NAME] [QUALITY] [FORCE]')
+        usage_error = OptionValueError('Usage: ' + USAGE)
         if not parser.rargs:
             raise usage_error
 
         options['action'] = parser.rargs[0].lower()
-        if options['action'] not in ['add', 'del', 'list']:
+        if options['action'] not in ('add', 'del', 'list', 'downloaded'):
             raise usage_error
 
         if len(parser.rargs) == 1:
-            if options['action'] != 'list':
+            if options['action'] not in ('list', 'downloaded'):
                 raise usage_error
 
         # 2 args is the minimum allowed (operation + item) for actions other than list
@@ -62,7 +64,11 @@ class MovieQueueManager(object):
         options = feed.manager.options.movie_queue
 
         if options['action'] == 'list':
-            queue_list()
+            self.queue_list(feed.session)
+            return
+            
+        if options['action'] == 'downloaded':
+            self.queue_list(feed.session, downloaded=True)
             return
 
         # all actions except list require movie info to work
@@ -82,6 +88,9 @@ class MovieQueueManager(object):
                 try:
                     added = queue_add(title=options['title'], imdb_id=options['imdb_id'],
                         tmdb_id=options['tmdb_id'], quality=options['quality'], force=options['force'])
+                    # warn about a bit silly quality value
+                    if qualities.common_name(options['quality']) == '720p':
+                        console('WARNING: quality 720p in movie contextwill not retrieve BluRay rips. You might want to use "720p bluray" instead!')
                 except QueueError, e:
                     console(e.message)
                     if e.errno == 1:
@@ -100,8 +109,23 @@ class MovieQueueManager(object):
         except OperationalError:
             log.critical('OperationalError')
 
+    def queue_list(self, session, downloaded=False):
+        """List IMDb queue"""
+    
+        items = queue_get(session=session, downloaded=downloaded)
+        console('-' * 79)
+        console('%-10s %-7s %-37s %-15s %s' % ('IMDB id', 'TMDB id', 'Title', 'Quality', 'Force'))
+        console('-' * 79)
+        for item in items:
+            console('%-10s %-7s %-37s %-15s %s' % (item.imdb_id, item.tmdb_id, item.title, item.quality, item.immortal))
+    
+        if not items:
+            console('No results')
+    
+        console('-' * 79)
+
 
 register_plugin(MovieQueueManager, 'movie_queue_manager', builtin=True)
 register_parser_option('--movie-queue', action='callback',
                        callback=MovieQueueManager.optik_movie_queue,
-                       help='(add|del|list) [NAME|IMDB_ID|tmdb_id=TMDB_ID] [QUALITY] [FORCE]')
+                       help=USAGE)

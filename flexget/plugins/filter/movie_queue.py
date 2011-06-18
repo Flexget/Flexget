@@ -5,7 +5,6 @@ from flexget.manager import Session
 from flexget.utils import qualities
 from flexget.utils.imdb import extract_id
 from flexget.utils.database import quality_property, with_session
-from flexget.utils.tools import console
 from flexget.utils.sqlalchemy_utils import table_exists, table_schema
 from flexget.plugin import DependencyError, get_plugin_by_name, register_plugin
 from flexget.event import event
@@ -157,7 +156,10 @@ def queue_add(title=None, imdb_id=None, tmdb_id=None, quality='ANY', force=True,
         log.info('Adding %s to movie queue.' % title)
         return {'title': title, 'imdb_id': imdb_id, 'tmdb_id': tmdb_id, 'quality': quality, 'force': force}
     else:
-        raise QueueError('ERROR: %s is already in the queue' % title)
+        if item.downloaded:
+            raise QueueError('ERROR: %s has already been queued and downloaded' % title)
+        else:
+            raise QueueError('ERROR: %s is already in the queue' % title)
 
 
 @with_session
@@ -189,30 +191,20 @@ def queue_edit(imdb_id, quality, session=None):
 
 
 @with_session
-def queue_list(session=None):
-    """List IMDb queue"""
-
-    items = queue_get(session=session)
-    console('-' * 79)
-    console('%-10s %-7s %-37s %-15s %s' % ('IMDB id', 'TMDB id', 'Title', 'Quality', 'Force'))
-    console('-' * 79)
-    for item in items:
-        console('%-10s %-7s %-37s %-15s %s' % (item.imdb_id, item.tmdb_id, item.title, item.quality, item.immortal))
-
-    if not items:
-        console('Movie queue is empty')
-
-    console('-' * 79)
-
-
-@with_session
-def queue_get(session=None):
+def queue_get(session=None, downloaded=False):
     """Get the current IMDb queue.
+    
+    KWArgs:
+        session: new session is used it not given
+        downloaded: boolean whether or not to return only downloaded
 
     Returns:
         List of QueuedMovie objects (detached from session)
     """
-    return session.query(QueuedMovie).filter(QueuedMovie.downloaded == None).all()
+    if not downloaded:
+        return session.query(QueuedMovie).filter(QueuedMovie.downloaded == None).all()
+    else:
+        return session.query(QueuedMovie).filter(QueuedMovie.downloaded != None).all()
 
 
 register_plugin(FilterMovieQueue, 'movie_queue', api_ver=2)
