@@ -90,7 +90,7 @@ class MovieQueueManager(object):
                         tmdb_id=options['tmdb_id'], quality=options['quality'], force=options['force'])
                     # warn about a bit silly quality value
                     if qualities.common_name(options['quality']) == '720p':
-                        console('WARNING: quality 720p in movie contextwill not retrieve BluRay rips. You might want to use "720p bluray" instead!')
+                        console('WARNING: quality 720p in movie context will not retrieve BluRay rips. You might want to use "720p bluray" instead!')
                 except QueueError, e:
                     console(e.message)
                     if e.errno == 1:
