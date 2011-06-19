@@ -32,7 +32,7 @@ class UrlRewritePirateBay:
         if entry['url'].startswith('http://thepiratebay.org/search/'):
             # use search
             try:
-                entry['url'] = self.search_title(entry['title'])
+                entry['url'] = self.search_title(entry['title'])[0]
             except PluginWarning, e:
                 raise UrlRewritingError(e)
         else:

@@ -183,7 +183,7 @@ class UrlrewriteArchive(object):
         # TODO: some logic to return best match? what about quality?
         if results:
             log.debug('found %s' % results)
-            return results[0].url
+            return [result.url for result in results]
 
 
 def archive_inject(option, opt, value, parser):
