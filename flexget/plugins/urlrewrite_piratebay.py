@@ -55,9 +55,9 @@ class UrlRewritePirateBay:
 
     # search API
     def search(self, feed, entry):
-        url = self.search_title(entry['title'])
-        log.debug('search got %s' % url)
-        return url
+        link_list = self.search_title(entry['title'])
+        log.debug('search got %d results' % len(link_list))
+        return link_list
 
     @internet(log)
     def search_title(self, name, url=None):
@@ -113,6 +113,6 @@ class UrlRewritePirateBay:
         #for torrent in torrents:
         #    log.debug('%s link: %s' % (torrent, torrent['link']))
 
-        return str(torrents[0]['link'])
+        return [torrent['link'] for torrent in torrents] 
 
 register_plugin(UrlRewritePirateBay, 'piratebay', groups=['urlrewriter', 'search'])

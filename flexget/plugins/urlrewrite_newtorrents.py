@@ -113,7 +113,7 @@ class NewTorrents:
             if len(torrents) == 1:
                 log.debug('found only one matching search result.')
             else:
-                log.debug('search result contains multiple matches, using most seeders from: %s' % torrents)
-            return torrents[0][1]
+                log.debug('search result contains multiple matches, sorted %s by most seeders' % torrents)
+            return [torrent[1] for torrent in torrents]
 
 register_plugin(NewTorrents, 'newtorrents', groups=['urlrewriter', 'search'])

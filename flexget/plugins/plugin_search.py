@@ -81,7 +81,7 @@ class PluginSearch(object):
                     name = name.keys()[0]
                 log.debug('Issuing search from %s' % name)
                 try:
-                    url = plugins[name].search(feed, entry)
+                    url = plugins[name].search(feed, entry)[0]
                 except PluginWarning, pw:
                     log.debug('Search failed: %s' % pw.value)
                     continue

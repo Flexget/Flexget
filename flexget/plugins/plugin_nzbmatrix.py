@@ -43,15 +43,16 @@ class NzbMatrix:
         params['search'] = self.clean(entry['title'])
         search_url = 'https://api.nzbmatrix.com/v1.1/search.php?' + \
                    urllib.urlencode(params)
-        nzbid = self.nzbid_from_search(search_url, params['search'], entry)
-        if nzbid == None:
+        results = self.nzbid_from_search(search_url, params['search'], entry)
+        link_list = []
+        if results == None:
             return
         else:
-            download_params = {"username": params['username'],
-                      'apikey': params['apikey'],
-                      'id': nzbid}
-            return "http://api.nzbmatrix.com/v1.1/download.php?" + \
-                                        urllib.urlencode(download_params)
+            for result in results:
+                nzbid = result["NZBID"]
+                download_params = {"username": params['username'], 'apikey': params['apikey'], 'id': nzbid}
+                link_list.append("http://api.nzbmatrix.com/v1.1/download.php?" + urllib.urlencode(download_params))
+            return link_list
 
     def getparams(self, feed):
         for cfg_entry in feed.config.get('search'):
@@ -88,6 +89,7 @@ class NzbMatrix:
         """Parses nzb download url from api results"""
         import time
         import difflib
+        matched_results = []
         log.debug("Sleeping to respect nzbmatrix rules about hammering the API")
         time.sleep(10)
         apireturn = self.parse_nzb_matrix_api(urlopener(url, log).read(),
@@ -105,15 +107,11 @@ class NzbMatrix:
                 for result in apireturn:
                     if result["NZBNAME"] == matches[0]:
                         break
-            if not "NZBID" in result:
-                return None
-            else:
-                # Set the title to the title found
-                entry["title"] = result["NZBNAME"]
-                entry["content_size"] = int(float(result['SIZE']))
-                entry["language"] = result['LANGUAGE']
-                # Return an NZBID
-                return result['NZBID']
+            for match in matches: # Already sorted
+                for result in apireturn:
+                    if result.get(match, False):
+                        matched_results.append(result)
+            return matched_results
 
     def parse_nzb_matrix_api(self, apireturn, title):
         import re

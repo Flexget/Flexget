@@ -21,9 +21,9 @@ class UrlRewriteTorrentz(object):
         entry['url'] = 'http://zoink.it/torrent/%s.torrent' % hash.upper()
 
     def search(self, feed, entry):
-        url = self.search_title(entry['title'])
-        log.debug('Search got %s' % url)
-        return url
+        link_list = self.search_title(entry['title'])
+        log.debug('Search got %d results' % len(link_list))
+        return link_list
 
     def search_title(self, name):
         url = 'http://torrentz.eu/feed?q=%s' % urllib.quote(name)
@@ -75,6 +75,6 @@ class UrlRewriteTorrentz(object):
         torrents.sort(best)
         torrents.reverse()
 
-        return str(torrents[0]['link'])
+        return [torrent['link'] for torrent in torrents] 
 
 register_plugin(UrlRewriteTorrentz, 'torrentz', groups=['urlrewriter', 'search'])

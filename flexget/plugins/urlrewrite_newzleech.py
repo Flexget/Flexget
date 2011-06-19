@@ -87,6 +87,6 @@ class UrlRewriteNewzleech(object):
         # choose largest file
         nzbs.sort(lambda a, b: cmp(a['size'], b['size']), reverse=True)
 
-        entry['url'] = nzbs[0]['url']
+        return [nzb['url'] for nzb in nzbs]
 
 register_plugin(UrlRewriteNewzleech, 'newzleech', groups=['search'])
