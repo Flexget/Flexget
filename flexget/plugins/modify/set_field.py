@@ -141,7 +141,7 @@ class ModifySet(object):
 
         # If jinja2 is available do template replacement
         if self.jinja:
-            from jinja2 import Environment, StrictUndefined, UndefinedError
+            from jinja2 import Environment, StrictUndefined, UndefinedError, meta
             env = Environment(undefined=StrictUndefined)
             env.filters.update((name.split('_', 1)[1], filt)
                 for name, filt in globals().items()
@@ -149,6 +149,11 @@ class ModifySet(object):
 
             for field, template_string in conf.items():
                 if isinstance(template_string, basestring):
+                    # Make sure any LazyFields that are referenced are loaded before rendering
+                    for var in meta.find_undeclared_variables(env.parse(template_string)):
+                        if entry.is_lazy(var):
+                            # Force the load
+                            entry[var]
                     template = env.from_string(template_string)
                     variables = {'now': datetime.now()}
                     variables.update(entry)
