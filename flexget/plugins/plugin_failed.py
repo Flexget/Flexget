@@ -5,7 +5,7 @@ from flexget import schema
 from flexget.plugin import register_plugin, register_parser_option, priority
 from flexget.manager import Session
 from flexget.utils.tools import console
-from flexget.utils.sqlalchemy_utils import table_schema, table_add_column
+from flexget.utils.sqlalchemy_utils import table_add_column
 
 log = logging.getLogger('failed')
 Base = schema.versioned_base('failed', 0)
@@ -15,7 +15,7 @@ Base = schema.versioned_base('failed', 0)
 def upgrade(ver, session):
     if ver is None:
         # add count column
-        table_add_column('failed', 'count', 'INTEGER', session, default=1)
+        table_add_column('failed', 'count', Integer, session, default=1)
         ver = 0
     return ver
 

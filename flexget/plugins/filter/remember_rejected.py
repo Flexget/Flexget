@@ -1,14 +1,15 @@
 import hashlib
 import logging
-from sqlalchemy import Column, Integer, String, Unicode, ForeignKey, and_
+from datetime import datetime
+from sqlalchemy import Column, Integer, String, Unicode, DateTime, ForeignKey, and_
 from sqlalchemy.orm import relation
 from flexget import schema
 from flexget.manager import Session
 from flexget.plugin import register_plugin, priority, register_parser_option
-from flexget.utils.sqlalchemy_utils import table_columns, drop_tables
+from flexget.utils.sqlalchemy_utils import table_columns, drop_tables, table_add_column, table_schema
 
 log = logging.getLogger('remember_rej')
-Base = schema.versioned_base('remember_rejected', 1)
+Base = schema.versioned_base('remember_rejected', 2)
 
 
 @schema.upgrade('remember_rejected')
@@ -28,8 +29,12 @@ def upgrade(ver, session):
             ver = 0
     if ver == 0:
         log.info('Adding reason column to remember_rejected_entry table.')
-        session.execute('ALTER TABLE remember_rejected_entry ADD reason VARCHAR')
+        table_add_column('remember_rejected_entry', 'reason', String, session)
         ver = 1
+    if ver == 1:
+        log.info('Adding `added` column to remember_rejected_entry table.')
+        table_add_column('remember_rejected_entry', 'added', DateTime, session, default=datetime.now())
+        ver = 2
     return ver
 
 
@@ -49,6 +54,7 @@ class RememberEntry(Base):
     __tablename__ = 'remember_rejected_entry'
 
     id = Column(Integer, primary_key=True)
+    added = Column(DateTime, default=datetime.now())
     title = Column(Unicode)
     url = Column(String)
     rejected_by = Column(String)

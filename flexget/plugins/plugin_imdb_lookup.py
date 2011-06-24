@@ -1,15 +1,15 @@
 import logging
 from datetime import datetime, timedelta
-from optparse import SUPPRESS_HELP
 from flexget.utils.sqlalchemy_utils import table_columns
 from sqlalchemy import Table, Column, Integer, Float, String, Unicode, Boolean, DateTime
 from sqlalchemy.schema import ForeignKey
 from sqlalchemy.orm import relation, joinedload_all
 from flexget import schema
-from flexget.plugin import register_plugin, register_parser_option, priority, internet, PluginError, PluginWarning
+from flexget.plugin import register_plugin, priority, internet, PluginError, PluginWarning
 from flexget.manager import Session
 from flexget.utils.log import log_once
 from flexget.utils.imdb import ImdbSearch, ImdbParser, extract_id
+from flexget.utils.sqlalchemy_utils import table_add_column
 
 Base = schema.versioned_base('imdb_lookup', 0)
 
@@ -130,14 +130,13 @@ def upgrade(ver, session):
         columns = table_columns('imdb_movies', session)
         if not 'photo' in columns:
             log.info('Adding photo column to imdb_movies table.')
-            session.execute('ALTER TABLE imdb_movies ADD photo VARCHAR')
+            table_add_column('imdb_movies', 'photo', String, session)
         if not 'updated' in columns:
             log.info('Adding updated column to imdb_movies table.')
-            session.execute('ALTER TABLE imdb_movies ADD updated DateTime')
+            table_add_column('imdb_movies', 'updated', DateTime, session)
         if not 'mpaa_rating' in columns:
             log.info('Adding mpaa_rating column to imdb_movies table.')
-            session.execute('ALTER TABLE imdb_movies ADD mpaa_rating VARCHAR')
-        session.commit()
+            table_add_column('imdb_movies', 'mpaa_rating', String, session)
         ver = 0
     return ver
 
@@ -213,7 +212,7 @@ class ImdbLookup(object):
                 result = session.query(SearchResult).\
                          filter(SearchResult.title == entry['title']).first()
                 if result:
-                    if result.fails and not feed.manager.options.retry_lookup:
+                    if result.fails and not feed.manager.options.retry:
                         # this movie cannot be found, not worth trying again ...
                         log.debug('%s will fail lookup' % entry['title'])
                         raise PluginError('Title `%s` lookup fails' % entry['title'])
@@ -383,5 +382,3 @@ class ImdbLookup(object):
             session.commit()
 
 register_plugin(ImdbLookup, 'imdb_lookup', api_ver=2)
-register_parser_option('--retry-lookup', action='store_true',
-                       dest='retry_lookup', default=0, help=SUPPRESS_HELP)

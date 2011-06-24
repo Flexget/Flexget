@@ -35,7 +35,7 @@ def upgrade(ver, session):
         columns = table_columns('episode_releases', session)
         if not 'proper_count' in columns:
             log.info('Upgrading episode_releases table to have proper_count column')
-            table_add_column('episode_releases', 'proper_count', 'INTEGER', default='NULL', session=session)
+            table_add_column('episode_releases', 'proper_count', Integer, session)
             release_table = table_schema('episode_releases', session)
             for row in session.execute(select([release_table.c.id, release_table.c.title])):
                 # Recalculate the proper_count from title for old episodes
@@ -46,7 +46,7 @@ def upgrade(ver, session):
     if ver == 0:
         log.info('Migrating first_seen column from series_episodes to episode_releases table.')
         # Create the column in episode_releases
-        table_add_column('episode_releases', 'first_seen', 'DateTime', session)
+        table_add_column('episode_releases', 'first_seen', DateTime, session)
         # Seed the first_seen value for all the past releases with the first_seen of their episode.
         episode_table = table_schema('series_episodes', session)
         release_table = table_schema('episode_releases', session)
@@ -906,16 +906,16 @@ class FilterSeries(SeriesPlugin, FilterSeriesBase):
             if (current.season < latest['season']) or (current.season == latest['season'] and current.episode < (latest['episode'] - grace)):
                 log.debug('too old! rejecting all occurrences')
                 for ep in eps:
-                    feed.reject(self.parser2entry[ep], 'Too much in the past from latest downloaded episode S%02dE%02d' % 
+                    feed.reject(self.parser2entry[ep], 'Too much in the past from latest downloaded episode S%02dE%02d' %
                         (latest['season'], latest['episode']))
                 return True
 
             if current.season > latest['season'] + 1:
                 log.debug('too new! rejecting all occurrences')
                 for ep in eps:
-                    feed.reject(self.parser2entry[ep], 
+                    feed.reject(self.parser2entry[ep],
                         ('Too much in the future from latest downloaded episode S%02dE%02d. '
-                         'See `--disable-advancement` if this should be downloaded.') % 
+                         'See `--disable-advancement` if this should be downloaded.') %
                         (latest['season'], latest['episode']))
                 return True
 

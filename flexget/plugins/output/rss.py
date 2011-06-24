@@ -1,10 +1,10 @@
 import logging
 import datetime
-from flexget.utils.sqlalchemy_utils import table_columns
 import os
 from sqlalchemy import Column, Integer, String, DateTime
 from flexget import schema
 from flexget.plugin import register_plugin, PluginWarning
+from flexget.utils.sqlalchemy_utils import table_columns, table_add_column
 
 log = logging.getLogger('make_rss')
 Base = schema.versioned_base('make_rss', 0)
@@ -22,7 +22,7 @@ def upgrade(ver, session):
         columns = table_columns('make_rss', session)
         if not 'rsslink' in columns:
             log.info('Adding rsslink column to table make_rss.')
-            session.execute('ALTER TABLE make_rss ADD rsslink VARCHAR')
+            table_add_column('make_rss', 'rsslink', String, session)
         ver = 0
     return ver
 

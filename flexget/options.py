@@ -11,7 +11,7 @@ class OptionParser(OptParser):
         # Do this early, so even option processing stuff is caught
         if '--bugreport' in sys.argv:
             self._debug_tb_callback()
-    
+
         OptParser.__init__(self, **kwargs)
 
         self.version = flexget.__version__
@@ -72,6 +72,9 @@ class CoreOptionParser(OptionParser):
         # TODO: rename dest to cron, since this does more than just quiet
         self.add_option('--cron', action='store_true', dest='quiet', default=False,
                         help='Disables stdout and stderr output, log file used. Reduces logging level slightly.')
+
+        # Plugins should respect this flag and retry where appropriate
+        self.add_option('--retry', action='store_true', dest='retry', default=0, help=SUPPRESS_HELP)
 
         self.add_option('--validate', action='store_true', dest='validate', default=False,
                         help=SUPPRESS_HELP)
