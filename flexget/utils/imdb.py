@@ -301,12 +301,13 @@ class ImdbParser(object):
             log.warning('Unable to get votes for %s - plugin needs update?' % url)
 
         # get score
-        tag_score = soup.find('span', attrs={'class': 'rating-rating'})
-        if tag_score:
+        span_score = soup.find('span', attrs={'class': 'star-bar-user-rate'})
+        if span_score:
+            b_score = span_score.find('b')
             try:
-                self.score = float(tag_score.contents[0])
+                self.score = float(b_score.contents[0])
             except ValueError:
-                log.debug('tag_score %s is not valid float' % tag_score.contents[0])
+                log.debug('tag_score %s is not valid float' % b_score.contents[0])
             log.debug('Detected score: %s' % self.score)
         else:
             log.warning('Unable to get score for %s - plugin needs update?' % url)
