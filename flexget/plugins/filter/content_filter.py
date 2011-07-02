@@ -1,7 +1,8 @@
 import logging
+import posixpath
+from fnmatch import fnmatch
 from flexget.plugin import register_plugin, priority
 from flexget.utils.log import log_once
-from fnmatch import fnmatch
 
 log = logging.getLogger('content_filter')
 
@@ -63,7 +64,7 @@ class FilterContentFilter(object):
 
     def parse_torrent_files(self, entry):
         if 'torrent' in entry:
-            files = [item['name'] for item in entry['torrent'].get_filelist()]
+            files = [posixpath.join(item['path'], item['name']) for item in entry['torrent'].get_filelist()]
             if files:
                 entry['content_files'] = files
 

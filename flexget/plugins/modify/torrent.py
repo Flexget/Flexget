@@ -16,7 +16,8 @@ class TorrentFilename(object):
 
     @priority(TORRENT_PRIO)
     def on_feed_modify(self, feed):
-        for entry in feed.entries:
+        # Only scan through accepted entries, as the file must have been downloaded in order to parse anything
+        for entry in feed.accepted:
             # skip if entry does not have file assigned
             if not 'file' in entry:
                 log.debugall('%s doesn\'t have a file associated' % entry['title'])

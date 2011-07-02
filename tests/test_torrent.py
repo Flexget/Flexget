@@ -11,6 +11,7 @@ class TestInfoHash(FlexGetBase):
           test:
             mock:
               - {title: 'test', file: 'test.torrent'}
+            accept_all: yes
     """
 
     def test_infohash(self):
@@ -57,6 +58,9 @@ class TestSeenInfoHash(FlexGetBase):
 class TestModifyTrackers(FlexGetBase):
 
     __yaml__ = """
+        presets:
+          global:
+            accept_all: yes
         feeds:
           test_add_trackers:
             mock:

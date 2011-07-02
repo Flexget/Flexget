@@ -5,7 +5,7 @@ from sqlalchemy import Column, Integer, String, Unicode, DateTime, ForeignKey, a
 from sqlalchemy.orm import relation
 from flexget import schema
 from flexget.manager import Session
-from flexget.plugin import register_plugin, priority, register_parser_option
+from flexget.plugin import register_plugin, register_parser_option, register_feed_phase
 from flexget.utils.sqlalchemy_utils import table_columns, drop_tables, table_add_column, table_schema
 
 log = logging.getLogger('remember_rej')
@@ -33,7 +33,7 @@ def upgrade(ver, session):
         ver = 1
     if ver == 1:
         log.info('Adding `added` column to remember_rejected_entry table.')
-        table_add_column('remember_rejected_entry', 'added', DateTime, session, default=datetime.now())
+        table_add_column('remember_rejected_entry', 'added', DateTime, session, default=datetime.now)
         ver = 2
     return ver
 
@@ -54,7 +54,7 @@ class RememberEntry(Base):
     __tablename__ = 'remember_rejected_entry'
 
     id = Column(Integer, primary_key=True)
-    added = Column(DateTime, default=datetime.now())
+    added = Column(DateTime, default=datetime.now)
     title = Column(Unicode)
     url = Column(String)
     rejected_by = Column(String)
@@ -93,9 +93,8 @@ class FilterRememberRejected(object):
             session.add(RememberFeed(name=feed.name, hash=config_hash))
         session.commit()
 
-    # This runs at the beginning of metainfo phase to avoid re-parsing metainfo for entries that will be rejected
-    @priority(255)
-    def on_feed_metainfo(self, feed, config):
+    # This runs before metainfo phase to avoid re-parsing metainfo for entries that will be rejected
+    def on_feed_prefilter(self, feed, config):
         """Reject any remembered entries from previous runs"""
         (feed_id,) = feed.session.query(RememberFeed.id).filter(RememberFeed.name == feed.name).first()
         reject_entries = feed.session.query(RememberEntry).filter(RememberEntry.feed_id == feed_id)
@@ -130,5 +129,6 @@ class FilterRememberRejected(object):
 
 
 register_plugin(FilterRememberRejected, 'remember_rejected', builtin=True, api_ver=2)
+register_feed_phase('prefilter', after='input')
 register_parser_option('--forget-rejected', action='store_true', dest='forget_rejected',
                        help='Forget all previous rejections so entries can be processed again.')
