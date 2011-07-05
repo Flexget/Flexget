@@ -37,6 +37,10 @@ class PluginTmdbLookup(object):
             entry['tmdb_popularity'] = movie.popularity
             entry['tmdb_rating'] = movie.rating
             entry['tmdb_genres'] = [genre.name for genre in movie.genres]
+            entry['tmdb_released'] = movie.released
+            entry['tmdb_votes'] = movie.votes
+            entry['tmdb_certification'] = movie.certification
+            entry['tmdb_posters'] = [poster.url for poster in movie.posters]
             # TODO: other fields?
         except LookupError, e:
             log.debug('Tmdb lookup for %s failed: %s' % (entry['title'], e))
