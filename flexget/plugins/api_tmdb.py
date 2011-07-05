@@ -6,10 +6,12 @@ import posixpath
 from sqlalchemy import Table, Column, Integer, Float, String, Unicode, Boolean, DateTime, func
 from sqlalchemy.schema import ForeignKey
 from sqlalchemy.orm import relation
+from flexget import schema
+from flexget.utils.sqlalchemy_utils import table_add_column, table_schema
 from flexget.utils.titles import MovieParser
 from flexget.utils.tools import urlopener
 from flexget.utils.database import text_date_synonym, year_property, with_session
-from flexget.manager import Base, Session
+from flexget.manager import Session
 from flexget.plugin import register_plugin, DependencyError
 
 try:
@@ -22,11 +24,29 @@ except ImportError:
                 'simplejson module or python > 2.5')
 
 log = logging.getLogger('api_tmdb')
+Base = schema.versioned_base('api_tmdb', 0)
 
 # This is a FlexGet API key
 api_key = 'bdfc018dbdb7c243dc7cb1454ff74b95'
 lang = 'en'
 server = 'http://api.themoviedb.org'
+
+
+@schema.upgrade('api_tmdb')
+def upgrade(ver, session):
+    if ver is None:
+        log.info('Adding columns to tmdb cache table, marking current cache as expired.')
+        table_add_column('tmdb_movies', 'runtime', Integer, session)
+        table_add_column('tmdb_movies', 'tagline', Unicode, session)
+        table_add_column('tmdb_movies', 'budget', Integer, session)
+        table_add_column('tmdb_movies', 'revenue', Integer, session)
+        table_add_column('tmdb_movies', 'homepage', String, session)
+        table_add_column('tmdb_movies', 'trailer', String, session)
+        # Mark all cached movies as expired, so new fields get populated next lookup
+        movie_table = table_schema('tmdb_movies', session)
+        session.execute(movie_table.update(values={'updated': datetime(1970, 1, 1)}))
+        ver = 0
+    return ver
 
 
 # association tables
@@ -54,7 +74,7 @@ class TMDBMovie(TMDBContainer, Base):
     __tablename__ = 'tmdb_movies'
 
     id = Column(Integer, primary_key=True, autoincrement=False, nullable=False)
-    updated = Column(DateTime, default=datetime.now(), nullable=False)
+    updated = Column(DateTime, default=datetime.now, nullable=False)
     popularity = Column(Integer)
     translated = Column(Boolean)
     adult = Column(Boolean)
@@ -69,6 +89,12 @@ class TMDBMovie(TMDBContainer, Base):
     rating = Column(Float)
     certification = Column(String)
     overview = Column(Unicode)
+    runtime = Column(Integer)
+    tagline = Column(Unicode)
+    budget = Column(Integer)
+    revenue = Column(Integer)
+    homepage = Column(String)
+    trailer = Column(String)
     _released = Column('released', DateTime)
     released = text_date_synonym('_released')
     year = year_property('released')
