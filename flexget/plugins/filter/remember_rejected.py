@@ -6,7 +6,7 @@ from sqlalchemy.orm import relation
 from flexget import schema
 from flexget.manager import Session
 from flexget.plugin import register_plugin, register_parser_option, register_feed_phase
-from flexget.utils.sqlalchemy_utils import table_columns, drop_tables, table_add_column, table_schema
+from flexget.utils.sqlalchemy_utils import table_columns, drop_tables, table_add_column
 
 log = logging.getLogger('remember_rej')
 Base = schema.versioned_base('remember_rejected', 2)
@@ -22,9 +22,9 @@ def upgrade(ver, session):
             drop_tables(['remember_rejected_entry'], session)
             # Create new table from the current model
             Base.metadata.create_all(bind=session.bind)
-            # We go directly to version 1, as remember_rejected_entries table has just been made from current model
+            # We go directly to version 2, as remember_rejected_entries table has just been made from current model
             # TODO: Fix this somehow. Just avoid dropping tables?
-            ver = 1
+            ver = 2
         else:
             ver = 0
     if ver == 0:

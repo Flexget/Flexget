@@ -1,80 +1,11 @@
 from copy import copy
-from datetime import datetime, date, time
-from email.utils import parsedate
-from time import mktime
-import os
-import re
-import sys
 import logging
+from jinja2 import UndefinedError
 from flexget.plugin import register_plugin, priority
 from flexget.utils.tools import replace_from_entry
+from flexget.utils.template import render_from_entry
 
 log = logging.getLogger('set')
-jinja = False
-
-
-def filter_pathbase(val):
-    """Base name of a path."""
-    return os.path.basename(val or '')
-
-
-def filter_pathname(val):
-    """Base name of a path, without its extension."""
-    return os.path.splitext(os.path.basename(val or ''))[0]
-
-
-def filter_pathext(val):
-    """Extension of a path (including the '.')."""
-    return os.path.splitext(val or '')[1]
-
-
-def filter_pathdir(val):
-    """Directory containing the given path."""
-    return os.path.dirname(val or '')
-
-
-def filter_pathscrub(val, ascii=False, windows=None):
-    """Replace problematic characters in a path."""
-    if windows is None:
-        windows = sys.platform.startswith("win")
-    if ascii:
-        repl = {'"': '`', "'": '`'}
-        if windows:
-            repl.update({':': ';', '?': '_'})
-    else:
-        repl = {'"': u'\u201d', "'": u'\u2019'}
-        if windows:
-            repl.update({':': u'\u02d0', '?': u'\u061f'})
-
-    return re.sub('[%s]' % ''.join(repl), lambda i: repl[i.group(0)], val or '')
-
-
-def filter_re_replace(val, pattern, repl):
-    """Perform a regexp replacement on the given string."""
-    return re.sub(pattern, repl, unicode(val))
-
-
-def filter_re_search(val, pattern):
-    """Perform a search for given regexp pattern, return the matching portion of the text."""
-    if not isinstance(val, basestring):
-        return val
-    result = re.search(pattern, val)
-    if result:
-        i = result.group(0)
-        return result.group(0)
-    return ''
-
-
-def filter_formatdate(val, format):
-    """Returns a string representation of a datetime object according to format string."""
-    if not isinstance(val, (datetime, date, time)):
-        return val
-    return val.strftime(format)
-
-
-def filter_parsedate(val):
-    """Attempts to parse a date according to the rules in RFC 2822"""
-    return datetime.fromtimestamp(mktime(parsedate(val)))
 
 
 class ModifySet(object):
@@ -125,46 +56,27 @@ class ModifySet(object):
     # Filter priority is -255 so we run after all filters are finished
     @priority(-255)
     def on_feed_filter(self, feed, config):
-        """
-        Adds the set dict to all accepted entries. This is not really a filter plugin,
-        but it needs to be run before feed_download, so it is run last in the filter chain.
-        """
+        """Adds the set dict to all accepted entries."""
         for entry in feed.entries:
             self.modify(entry, config, False, entry in feed.accepted)
 
     def modify(self, entry, config, validate=False, errors=True):
-        """
-        this can be called from a plugin to add set values to an entry
-        """
+        """This can be called from a plugin to add set values to an entry"""
+
         # Create a new dict so we don't overwrite the set config with string replaced values.
         conf = copy(config)
 
-        # If jinja2 is available do template replacement
-        if self.jinja:
-            from jinja2 import Environment, StrictUndefined, UndefinedError, meta
-            env = Environment(undefined=StrictUndefined)
-            env.filters.update((name.split('_', 1)[1], filt)
-                for name, filt in globals().items()
-                if name.startswith("filter_"))
-
-            for field, template_string in conf.items():
-                if isinstance(template_string, basestring):
-                    # Make sure any LazyFields that are referenced are loaded before rendering
-                    for var in meta.find_undeclared_variables(env.parse(template_string)):
-                        if entry.is_lazy(var):
-                            # Force the load
-                            entry[var]
-                    template = env.from_string(template_string)
-                    variables = {'now': datetime.now()}
-                    variables.update(entry)
-                    try:
-                        result = template.render(variables)
-                    except UndefinedError, e:
-                        # If the replacement failed, remove this key from the update dict
-                        log.debug('%s did not have the required fields for jinja2 template: %s' % (entry['title'], e))
-                        del conf[field]
-                    else:
-                        conf[field] = result
+        # Do jinja2 template replacement
+        for field, template_string in conf.items():
+            if isinstance(template_string, basestring):
+                try:
+                    result = render_from_entry(template_string, entry)
+                except UndefinedError, e:
+                    # If the replacement failed, remove this key from the update dict
+                    log.debug('%s did not have the required fields for jinja2 template: %s' % (entry['title'], e))
+                    del conf[field]
+                else:
+                    conf[field] = result
 
         # Do string replacement
         for field, value in conf.items():
