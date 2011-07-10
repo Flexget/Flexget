@@ -4,11 +4,16 @@ import re
 import sys
 from copy import copy
 from datetime import datetime, date, time
+import locale
 from email.utils import parsedate
 from time import mktime
-from jinja2 import Environment, StrictUndefined, PackageLoader
+from jinja2 import Environment, StrictUndefined, ChoiceLoader, FileSystemLoader, PackageLoader
+from flexget.event import event
 
 log = logging.getLogger('utils.template')
+
+# The environment will be created after the manager has started
+environment = None
 
 
 def filter_pathbase(val):
@@ -75,15 +80,38 @@ def filter_parsedate(val):
     return datetime.fromtimestamp(mktime(parsedate(val)))
 
 
-# Create our environment and add our custom filters
-# TODO: Add a filesystem loader for config_base direcotry
-environment = Environment(undefined=StrictUndefined, loader=PackageLoader('flexget'))
-for name, filt in globals().items():
-    if name.startswith('filter_'):
-        environment.filters[name.split('_', 1)[1]] = filt
+def filter_format_number(val, places=None, grouping=True):
+    """Formats a number according to the user's locale."""
+    if not isinstance(val, (int, float, long)):
+        return val
+    if places is not None:
+        format = '%.' + str(places) + 'f'
+    elif isinstance(val, (int, long)):
+        format = '%d'
+    else:
+        format = '%.02f'
+
+    locale.setlocale(locale.LC_ALL, '')
+    return locale.format(format, val, grouping)
+
+
+@event('manager.startup')
+def make_environment(manager):
+    """Create our environment and add our custom filters"""
+    global environment
+    environment = Environment(undefined=StrictUndefined,
+                              loader=ChoiceLoader([PackageLoader('flexget'), FileSystemLoader(manager.config_base)]),
+                              extensions=['jinja2.ext.loopcontrols'])
+    for name, filt in globals().items():
+        if name.startswith('filter_'):
+            environment.filters[name.split('_', 1)[1]] = filt
+
+
+# TODO: list_templates function
 
 
 def get_template(name):
+    # TODO: This should be given a plugin name as well as a template name, and search in the appropriate subfolder
     return environment.get_template(name)
 
 
