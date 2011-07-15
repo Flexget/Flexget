@@ -162,7 +162,7 @@ class RootValidator(Validator):
     def validate(self, data):
         count = self.errors.count()
         return self.validate_item(data, self.valid)
-        
+
     def schema(self):
         return [v.schema() for v in self.valid]
 
@@ -181,7 +181,7 @@ class ChoiceValidator(Validator):
 
         Kwargs:
             ignore_case: boolean
-            
+
         """
         if not isinstance(value, (basestring, int, float)):
             raise Exception('Choice validator only accepts strings and numbers')
@@ -207,7 +207,7 @@ class ChoiceValidator(Validator):
             acceptable = [str(value) for value in self.valid + self.valid_ic]
             self.errors.add('\'%s\' is not one of acceptable values: %s' % (data, ', '.join(acceptable)))
             return False
-            
+
     def schema(self):
         return {'choice': self.valid + self.valid_ic}
 
@@ -223,7 +223,7 @@ class AnyValidator(Validator):
 
     def validate(self, data):
         return True
-        
+
     def schema(self):
         return 'any'
 
@@ -239,7 +239,7 @@ class EqualsValidator(Validator):
 
     def validate(self, data):
         return self.valid == data
-        
+
     def schema(self):
         return {'equals': self.valid}
 
@@ -258,7 +258,7 @@ class NumberValidator(Validator):
         if not valid:
             self.errors.add('value %s is not valid number' % data)
         return valid
-        
+
     def schema(self):
         return 'number'
 
@@ -277,7 +277,7 @@ class IntegerValidator(Validator):
         if not valid:
             self.errors.add('value %s is not valid integer' % data)
         return valid
-        
+
     def schema(self):
         return 'number'
 
@@ -296,7 +296,7 @@ class DecimalValidator(Validator):
         if not valid:
             self.errors.add('value %s is not valid decimal number' % data)
         return valid
-        
+
     def schema(self):
         return 'decimal'
 
@@ -315,7 +315,7 @@ class BooleanValidator(Validator):
         if not valid:
             self.errors.add('value %s is not valid boolean' % data)
         return valid
-        
+
     def schema(self):
         return 'boolean'
 
@@ -334,7 +334,7 @@ class TextValidator(Validator):
         if not valid:
             self.errors.add('value %s is not valid text' % data)
         return valid
-        
+
     def schema(self):
         return 'text'
 
@@ -358,7 +358,7 @@ class RegexpValidator(Validator):
             self.errors.add('%s is not a valid regular expression' % data)
             return False
         return True
-        
+
     def schema(self):
         return 'regexp'
 
@@ -404,10 +404,10 @@ class RegexpMatchValidator(Validator):
         else:
             self.errors.add('%s does not match regexp' % data)
         return False
-        
+
     def schema(self):
         return {'regexp_match': {
-            'accept': [r.pattern for r in self.regexps], 
+            'accept': [r.pattern for r in self.regexps],
             'reject': [r.pattern for r in self.reject_regexps]}}
 
 
@@ -421,7 +421,7 @@ class FileValidator(TextValidator):
             self.errors.add('File %s does not exist' % data)
             return False
         return True
-        
+
     def schema(self):
         return 'file'
 
@@ -457,7 +457,7 @@ class PathValidator(TextValidator):
             self.errors.add('Path %s does not exist' % path)
             return False
         return True
-        
+
     def schema(self):
         return 'path'
 
@@ -466,7 +466,7 @@ class UrlValidator(TextValidator):
     name = 'url'
 
     def __init__(self, parent=None, **kwargs):
-        self.protocols = ['ftp', 'http', 'https']
+        self.protocols = ['ftp', 'http', 'https', 'file']
         if 'protocols' in kwargs:
             self.protocols = kwargs['protocols']
         Validator.__init__(self, parent, **kwargs)
@@ -480,10 +480,10 @@ class UrlValidator(TextValidator):
         if not valid:
             self.errors.add('value %s is not a valid url' % data)
         return valid
-        
+
     def schema(self):
         return 'url'
-            
+
 
 class ListValidator(Validator):
     name = 'list'
@@ -507,7 +507,7 @@ class ListValidator(Validator):
             self.validate_item(item, self.valid)
         self.errors.path_remove_level()
         return count == self.errors.count()
-        
+
     def schema(self):
         return {'list': [v.schema() for v in self.valid]}
 
@@ -528,11 +528,11 @@ class DictValidator(Validator):
         """
         Args:
             name: validator name that represents accepted value
-        
+
         Kwargs:
             key: name of the key in dict
             required: mark the name as required
-        
+
         """
         if not 'key' in kwargs:
             raise Exception('%s.accept() must specify key' % self.name)
@@ -641,7 +641,7 @@ class DictValidator(Validator):
             if not required in data:
                 self.errors.add('key \'%s\' required' % required)
         return count == self.errors.count()
-        
+
     def schema(self):
         schema = {}
         valid = {}
@@ -652,7 +652,7 @@ class DictValidator(Validator):
                 valid[name] = validators[0].schema()
             else:
                 valid[name] = [v.schema() for v in validators]
-            
+
         schema['valid'] = valid
         if self.required_keys:
             schema['required_keys'] = self.required_keys
@@ -660,7 +660,7 @@ class DictValidator(Validator):
             schema['any_key'] = [v.schema() for v in self.any_key]
         if self.reject_keys:
             schema['reject_keys'] = self.reject
-            
+
         return schema
 
 
@@ -730,26 +730,26 @@ def complex_test():
         build_options_validator(options)
 
     root = factory()
-    
+
     # simple format:
     #   - series
     #   - another series
-    
+
     simple = root.accept('list')
     build_list(simple)
-    
+
     # advanced format:
     #   settings:
     #     group: {...}
     #   group:
     #     {...}
-    
+
     """
     advanced = root.accept('dict')
     settings = advanced.accept('dict', key='settings')
     settings_group = settings.accept_any_key('dict')
     build_options_validator(settings_group)
-    
+
     group = advanced.accept_any_key('list')
     build_list(group)
     """
@@ -761,13 +761,13 @@ if __name__ == '__main__':
 
     v = complex_test()
     print v.schema()
-    
+
     """
     root = factory()
     list = root.accept('list')
     list.accept('text')
     list.accept('regexp')
     list.accept('choice').accept_choices(['foo', 'bar'])
-    
+
     print root.schema()
     """
