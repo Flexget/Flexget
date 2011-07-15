@@ -60,6 +60,7 @@ class Text(plugin.Plugin):
         entry_config = config.get('entry')
         format_config = config.get('format', {})
 
+        entries = []
         # keep track what fields have been found
         used = {}
         entry = Entry()
@@ -76,7 +77,7 @@ class Text(plugin.Plugin):
                             log.info('Found field %s again before entry was completed. \
                                       Adding current incomplete, but valid entry and moving to next.' % field)
                             self.format_entry(entry, format_config)
-                            feed.entries.append(entry)
+                            entries.append(entry)
                         else:
                             log.info('Invalid data, entry field %s is already found once. Ignoring entry.' % field)
                         # start new entry
@@ -95,8 +96,9 @@ class Text(plugin.Plugin):
                         log.info('Invalid data, constructed entry is missing mandatory fields (title or url)')
                     else:
                         self.format_entry(entry, format_config)
-                        feed.entries.append(entry)
+                        entries.append(entry)
                         log.debug('Added entry %s' % entry)
                         # start new entry
                         entry = Entry()
                         used = {}
+        return entries
