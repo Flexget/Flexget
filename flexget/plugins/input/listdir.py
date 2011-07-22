@@ -36,7 +36,7 @@ class Listdir(plugin.Plugin):
                 filepath = os.path.join(path, name)
                 # Windows paths need an extra / preceded to them
                 if not filepath.startswith('/'):
-                    filepath += '/'
+                    filepath = '/' + filepath
                 e['url'] = 'file://%s' % filepath
                 e['location'] = os.path.join(path, name)
                 entries.append(e)
