@@ -12,6 +12,10 @@ def all_builtins():
 
 class PluginDisableBuiltins(object):
     """Disables all (or specific) builtin plugins from a feed."""
+    
+    def __init__(self):
+        # cannot trust that on_feed_start would have been executed
+        self.disabled = []
 
     def validator(self):
         from flexget import validator
