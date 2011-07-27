@@ -6,7 +6,7 @@ import cookielib
 from datetime import datetime
 from sqlalchemy import Column, Integer, String, DateTime
 from flexget import schema
-from flexget.plugin import register_plugin, DependencyError
+from flexget.plugin import register_plugin, DependencyError, PluginWarning
 
 
 try:
@@ -42,7 +42,9 @@ class MyEpisodes(object):
     Marks a series episode as acquired in your myepisodes.com account.
 
     Simple Example:
-    Most shows are recognized automatically from their TVDBname. And of course the plugin needs to know your MyEpisodes.com account details.
+    
+    Most shows are recognized automatically from their TVDBname. 
+    And of course the plugin needs to know your MyEpisodes.com account details.
 
     feeds:
       tvshows:
@@ -54,7 +56,10 @@ class MyEpisodes(object):
          - chuck
 
     Advanced Example:
-    In some cases, the TVDB name is either not unique or won't even be discovered. In that case you need to specify the MyEpisodes id manually using the set plugin.
+    
+    In some cases, the TVDB name is either not unique or won't even be discovered. 
+    In that case you need to specify the MyEpisodes id manually using the set plugin.
+    
     feeds:
       tvshows:
         myepisodes:
@@ -99,14 +104,26 @@ class MyEpisodes(object):
             return
 
         if str(username) not in loginsrc:
-            log.error("Login to myepisodes.com failed, please check your account data or see if the site is down.")
-            return
+            raise PluginWarning(('Login to myepisodes.com failed, please check '
+                                 'your account data or see if the site is down.'), log)
 
         for entry in feed.accepted:
-            self.mark_episode(feed, entry, opener)
+            try:
+                self.mark_episode(feed, entry, opener)
+            except PluginWarning, w:
+                log.warning(str(w))
 
     def lookup_myepisodes_id(self, entry, opener, session):
-        """Populates myepisodes_id field for an entry, and returns the id."""
+        """Populates myepisodes_id field for an entry, and returns the id.
+        
+        Call will also set entry field `myepisode_id` if successful.
+        
+        Return:
+            myepisode id
+        
+        Raises:
+            LookupError if entry does not have field series_name
+        """
 
         # Don't need to look it up if we already have it.
         if entry.get('myepisodes_id'):
@@ -124,29 +141,30 @@ class MyEpisodes(object):
 
         # Get the series name from thetvdb to increase match chance on myepisodes
         if entry.get('series_name_tvdb'):
-            tvdb_name = entry['series_name_tvdb']
+            query_name = entry['series_name_tvdb']
         else:
             try:
                 series = lookup_series(name=series_name, tvdb_id=entry.get('thetvdb_id'))
-                tvdb_name = series.seriesname
+                query_name = series.seriesname
             except LookupError, e:
-                log.warning('Unable to lookup series %s from tvdb, using raw name.' % series_name)
-                tvdb_name = series_name
+                log.warning('Unable to lookup series `%s` from tvdb, using raw name.' % series_name)
+                query_name = series_name
 
         baseurl = urllib2.Request('http://myepisodes.com/search.php?')
-        params = urllib.urlencode({'tvshow': tvdb_name, 'action': 'Search myepisodes.com'})
+        params = urllib.urlencode({'tvshow': query_name, 'action': 'Search myepisodes.com'})
         try:
             con = opener.open(baseurl, params)
             txt = con.read()
         except urllib2.URLError, e:
             log.error('Error searching for myepisodes id: %s' % e)
 
-        matchObj = re.search(r'&showid=([0-9]*)">' + tvdb_name + '</a>', txt, re.MULTILINE | re.IGNORECASE)
+        matchObj = re.search(r'&showid=([0-9]*)">' + query_name + '</a>', txt, re.MULTILINE | re.IGNORECASE)
         if matchObj:
             myepisodes_id = matchObj.group(1)
             db_item = session.query(MyEpisodesInfo).filter(MyEpisodesInfo.myepisodes_id == myepisodes_id).first()
             if db_item:
-                log.info('Changing name to %s for series with myepisodes_id %s' % (series_name.lower(), myepisodes_id))
+                log.info('Changing name to `%s` for series with myepisodes_id %s' % 
+                    (series_name.lower(), myepisodes_id))
                 db_item.series_name = series_name.lower()
             else:
                 session.add(MyEpisodesInfo(series_name.lower(), myepisodes_id))
@@ -154,13 +172,23 @@ class MyEpisodes(object):
             return myepisodes_id
 
     def mark_episode(self, feed, entry, opener):
-        if not self.lookup_myepisodes_id(entry, opener, session=feed.session):
-            log.warning('Couldn\'t get myepisodes id for %s' % entry['title'])
-            return
+        """Mark episode as acquired.
+        
+        Required entry fields:
+            - series_name
+            - series_season
+            - series_episode
+            
+        Raises:
+            PluginWarning if operation fails
+        """    
 
-        if 'series_season' not in entry or 'series_episode' not in entry:
-            log.warning('Can\'t mark entry in myepisodes without series_season and series_episode fields')
-            return
+        if 'series_season' not in entry or 'series_episode' not in entry or 'series_name' not in entry:
+            raise PluginWarning('Can\'t mark entry `%s` in myepisodes without series_season, series_episode and series_name fields' %
+                entry['title'], log)
+        
+        if not self.lookup_myepisodes_id(entry, opener, session=feed.session):
+            raise PluginWarning('Couldn\'t get myepisodes id for `%s`' % entry['title'], log)
 
         myepisodes_id = entry['myepisodes_id']
         season = entry['series_season']
@@ -169,7 +197,8 @@ class MyEpisodes(object):
         if feed.manager.options.test:
             log.info('Would mark %s of `%s` as acquired.' % (entry['series_id'], entry['series_name']))
         else:
-            baseurl2 = urllib2.Request('http://myepisodes.com/myshows.php?action=Update&showid=%s&season=%s&episode=%s&seen=0' % (myepisodes_id, season, episode))
+            baseurl2 = urllib2.Request('http://myepisodes.com/myshows.php?action=Update&showid=%s&season=%s&episode=%s&seen=0' % 
+                (myepisodes_id, season, episode))
             opener.open(baseurl2)
             log.info('Marked %s of `%s` as acquired.' % (entry['series_id'], entry['series_name']))
 
