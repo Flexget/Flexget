@@ -108,7 +108,7 @@ class Entry(dict):
             return default
 
     def __contains__(self, key):
-        """Will cause lazy field lookup to occur and will return false if a field exists but is Null."""
+        """Will cause lazy field lookup to occur and will return false if a field exists but is None."""
         return self.get(key) is not None
 
     def register_lazy_fields(self, fields, func):
