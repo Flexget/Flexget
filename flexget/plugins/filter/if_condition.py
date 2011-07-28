@@ -59,7 +59,7 @@ class FilterIf(object):
             # Make entry fields and other utilities available in the eval namespace
             # We need our namespace to be an Entry instance for lazy loading to work
             eval_locals = copy(entry)
-            eval_locals.update({'has_field': lambda f: entry.has_key(f),
+            eval_locals.update({'has_field': lambda f: f in entry,
                                 'timedelta': datetime.timedelta,
                                 'now': datetime.datetime.now()})
             for item in config:

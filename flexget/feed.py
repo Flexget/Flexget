@@ -100,6 +100,17 @@ class Entry(dict):
         else:
             return result
 
+    def get(self, key, default=None):
+        """Overridden so that our __getitem__ gets used for LazyFields"""
+        try:
+            return self[key]
+        except KeyError:
+            return default
+
+    def __contains__(self, key):
+        """Will cause lazy field lookup to occur and will return false if a field exists but is Null."""
+        return self.get(key) is not None
+
     def register_lazy_fields(self, fields, func):
         """Register a list of fields to be lazily loaded by callback func."""
         for field in fields:
