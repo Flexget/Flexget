@@ -4,9 +4,13 @@ import urllib
 import urllib2
 import logging
 from flexget.plugin import register_plugin, register_parser_option, get_plugin_by_name, PluginWarning, PluginError
+from flexget.utils.tools import encode_html, decode_html
 from httplib import BadStatusLine
 from flexget.utils.tools import urlopener, replace_from_entry
 import mimetypes
+import email
+import hashlib
+import shutil
 
 log = logging.getLogger('download')
 
@@ -160,8 +164,12 @@ class PluginDownload(object):
             return e.message
 
     def download_entry(self, feed, entry, url):
-        """Downloads :entry: by using :url:.
-        May raise several types of exception(s) or PluginWarning"""
+        """Downloads :entry: by using :url:
+        
+        Raises:
+            Several types of exceptions ...
+            PluginWarning
+        """
 
         # see http://bugs.python.org/issue1712522
         # note, url is already unicode ...
@@ -195,7 +203,6 @@ class PluginDownload(object):
 
         # generate temp file, with random md5 sum ..
         # url alone is not random enough, it has happened that there are two entries with same url
-        import hashlib
         m = hashlib.md5()
         m.update(url)
         m.update('%s' % time.time())
@@ -256,11 +263,7 @@ class PluginDownload(object):
 
     def filename_from_headers(self, entry, response):
         """Checks entry filename if it's found from content-disposition"""
-        from flexget.utils.tools import encode_html, decode_html
-        import email
-
         data = str(response.info())
-
         # try to decode/encode, afaik this is against the specs but some servers do it anyway
         try:
             data = data.decode('utf-8')
@@ -316,19 +319,23 @@ class PluginDownload(object):
                 log.exception('Exception while writing: %s' % e)
 
     def output(self, feed, entry):
-        """Moves temp-file into final destination"""
+        """Moves temp-file into final destination
+        
+        Raises:
+            PluginError if operation fails
+        """
 
         config = self.get_config(feed)
 
         if 'file' not in entry and not feed.manager.options.test:
             log.debug('file missing, entry: %s' % entry)
-            raise PluginError('Entry %s has no temp file associated with' % entry['title'])
+            raise PluginError('Entry `%s` has no temp file associated with' % entry['title'])
 
         try:
             # use path from entry if has one, otherwise use from download definition parameter
             path = entry.get('path', config.get('path'))
-            if path is None:
-                raise PluginError('Unreachable situation?')
+            if not isinstance(path, basestring):
+                raise PluginError('Invalid `path` in entry `%s`' % entry['title'])
 
             # override path from command line parameter
             if feed.manager.options.dl_path:
@@ -361,7 +368,7 @@ class PluginDownload(object):
                 tmp_path = os.path.join(feed.manager.config_base, 'temp')
                 log.debug('entry: %s' % entry)
                 log.debug('temp: %s' % ', '.join(os.listdir(tmp_path)))
-                raise PluginWarning("Downloaded temp file '%s' doesn't exist!?" % entry['file'])
+                raise PluginWarning('Downloaded temp file `%s` doesn\'t exist!?' % entry['file'])
 
             # if we still don't have a filename, try making one from title (last resort)
             if not entry.get('filename'):
@@ -376,7 +383,7 @@ class PluginDownload(object):
                     else:
                         self.filename_ext_from_mime(entry)
 
-            # combine to full path + filename, replace / from filename (replaces: #208, #325, #353)
+            # combine to full path + filename, replace / from filename (replaces bc tickets #208, #325, #353)
             name = entry.get('filename', entry['title'])
             for char in '/:<>^*?~':
                 name = name.replace(char, ' ')
@@ -393,15 +400,14 @@ class PluginDownload(object):
                 elif config.get('overwrite'):
                     log.debug("Overwriting already existing file %s" % destfile)
                 else:
-                    log.info('File \'%s\' already exists and is not identical, download failed.' % destfile)
-                    feed.fail(entry, 'File \'%s\' already exists and is not identical.' % destfile)
+                    log.info('File `%s` already exists and is not identical, download failed.' % destfile)
+                    feed.fail(entry, 'File `%s` already exists and is not identical.' % destfile)
                     return
 
             # move temp file
             log.debug('moving %s to %s' % (entry['file'], destfile))
 
             try:
-                import shutil
                 shutil.move(entry['file'], destfile)
             except OSError, err:
                 # ignore permission errors, see ticket #555
