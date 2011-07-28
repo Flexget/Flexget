@@ -83,7 +83,12 @@ class Entry(dict):
         # enforces imdb_url in same format
         if key == 'imdb_url' and isinstance(value, basestring):
             from flexget.utils.imdb import extract_id
-            value = u'http://www.imdb.com/title/%s/' % extract_id(value)
+            imdb_id = extract_id(value)
+            if imdb_id:
+                value = u'http://www.imdb.com/title/%s/' % imdb_id
+            else:
+                log.debug('Tried to set imdb_id to invalid imdb url: %s' % value)
+                value = None
 
         try:
             log.debugall('ENTRY %s = %r' % (key, value))

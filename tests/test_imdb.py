@@ -171,11 +171,9 @@ class TestImdb(FlexGetBase):
     def test_language(self):
         self.execute_feed('language')
         matrix = self.feed.find_entry(imdb_name='The Matrix')['imdb_languages']
-        assert matrix == ['english'], \
-            'Could not find languages for The Matrix'
+        assert matrix == ['english'], 'Could not find languages for The Matrix'
         bullets = self.feed.find_entry(imdb_name='22 Bullets')['imdb_languages']
-        assert bullets == ['french'], \
-            'Could not find languages for 22 Bullets'
+        assert bullets[0] == 'french', 'Could not find languages for 22 Bullets'
         for movie in ['The Matrix', 'Crank', 'The Damned United']:
             assert self.feed.find_entry('accepted', imdb_name=movie), \
                 '%s should\'ve been accepted' % movie
