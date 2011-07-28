@@ -195,6 +195,7 @@ class Manager(object):
                 if lines == 2:
                     print ' Fault is almost always in one of these lines or previous ones\n'
 
+            # When --debug escalate to full stacktrace
             if self.options.debug:
                 raise
             sys.exit(1)

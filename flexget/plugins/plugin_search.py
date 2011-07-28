@@ -1,6 +1,6 @@
 import logging
-from flexget.plugin import get_plugins_by_group, PluginWarning, register_parser_option, register_plugin, \
-    get_plugin_by_name
+from flexget.plugin import get_plugins_by_group, PluginWarning, PluginError, \
+    register_parser_option, register_plugin, get_plugin_by_name
 
 log = logging.getLogger('search')
 
@@ -79,25 +79,26 @@ class PluginSearch(object):
                 if isinstance(name, dict):
                     # assume the name is the first/only key in the dict.
                     name = name.keys()[0]
-                log.debug('Issuing search from %s' % name)
+                log.verbose('Searching `%s` from %s' % (entry['title'], name))
                 try:
                     url = plugins[name].search(feed, entry)[0]
-                except PluginWarning, pw:
-                    log.debug('Search failed: %s' % pw.value)
+                    if url:
+                        log.debug('Found url: %s' % url)
+                        entry['url'] = url
+                        found = True
+                        break
+                except (PluginError, PluginWarning), pw:
+                    log.verbose('Failed: %s' % pw.value)
                     continue
-                if url:
-                    log.debug('Found url: %s' % url)
-                    entry['url'] = url
-                    found = True
-                    break
 
-            # failed
+            # Search failed
             if not found:
                 # If I don't have a URL, doesn't matter if I'm immortal...
                 entry['immortal'] = False
                 feed.reject(entry, 'search failed')
             else:
                 # Populate quality
+                # TODO: why does search plugin invoke quality here?
                 get_plugin_by_name('metainfo_quality').instance.get_quality(entry)
 
 register_plugin(PluginSearch, 'search')
