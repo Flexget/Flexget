@@ -94,16 +94,6 @@ class PluginThetvdbLookup(object):
         except DependencyError:
             pass
 
-    def populate_fields(self, entry, map, lookup_item):
-        """Populates entry fields from episode using the field_map"""
-        for field, value in map.iteritems():
-            if isinstance(value, basestring):
-                # If a string is passed, it is an attribute of episode (supporting nested attributes)
-                entry[field] = reduce(getattr, value.split('.'), lookup_item)
-            else:
-                # Otherwise a function that takes episode as an argument
-                entry[field] = value(lookup_item)
-
     def clear_lazy_fields(self, entry, fields):
         # Set all of our fields to None if the lookup failed
         for f in fields:
@@ -114,7 +104,7 @@ class PluginThetvdbLookup(object):
         """Does the lookup for this entry and populates the entry fields."""
         try:
             series = lookup_series(entry.get_no_lazy('series_name'), tvdb_id=entry.get_no_lazy('thetvdb_id'))
-            self.populate_fields(entry, self.series_map, series)
+            entry.update_using_map(self.series_map, series)
         except LookupError, e:
             log.debug('Error looking up tvdb series information for %s: %s' % (entry['title'], e.message))
             self.clear_lazy_fields(entry, self.series_map)
@@ -127,7 +117,7 @@ class PluginThetvdbLookup(object):
         try:
             episode = lookup_episode(entry.get_no_lazy('series_name'), entry['series_season'],
                                      entry['series_episode'], tvdb_id=entry.get_no_lazy('thetvdb_id'))
-            self.populate_fields(entry, self.episode_map, episode)
+            entry.update_using_map(self.episode_map, episode)
         except LookupError, e:
             log.debug('Error looking up tvdb episode information for %s: %s' % (entry['title'], e.message))
             self.clear_lazy_fields(entry, self.episode_map)

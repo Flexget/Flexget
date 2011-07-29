@@ -8,7 +8,7 @@ from flexget import schema
 from flexget.plugin import register_plugin, priority, internet, PluginError, PluginWarning
 from flexget.manager import Session
 from flexget.utils.log import log_once
-from flexget.utils.imdb import ImdbSearch, ImdbParser, extract_id
+from flexget.utils.imdb import ImdbSearch, ImdbParser, extract_id, make_url
 from flexget.utils.sqlalchemy_utils import table_add_column
 
 Base = schema.versioned_base('imdb_lookup', 0)
@@ -152,6 +152,21 @@ class ImdbLookup(object):
         Also provides imdb lookup functionality to all other imdb related plugins.
     """
 
+    field_map = {
+        'imdb_url': 'url',
+        'imdb_id': lambda movie: extract_id(movie.url),
+        'imdb_name': 'title',
+        'imdb_photo': 'photo',
+        'imdb_plot_outline': 'plot_outline',
+        'imdb_score': 'score',
+        'imdb_votes': 'votes',
+        'imdb_year': 'year',
+        'imdb_genres': lambda movie: [genre.name for genre in movie.genres],
+        'imdb_languages': lambda movie: [lang.name for lang in movie.languages],
+        'imdb_actors': lambda movie: dict((actor.imdb_id, actor.name) for actor in movie.actors),
+        'imdb_directors': lambda movie: dict((director.imdb_id, director.name) for director in movie.directors),
+        'imdb_mpaa_rating': 'mpaa_rating'}
+
     def validator(self):
         from flexget import validator
         return validator.factory('boolean')
@@ -195,13 +210,13 @@ class ImdbLookup(object):
 
             # if imdb_id is included, build the url.
             if 'imdb_id' in entry and not 'imdb_url' in entry:
-                entry['imdb_url'] = 'http://www.imdb.com/title/%s' % entry['imdb_id']
+                entry['imdb_url'] = make_url(entry['imdb_id'])
 
             # make sure imdb url is valid
             if 'imdb_url' in entry:
                 imdb_id = extract_id(entry['imdb_url'])
                 if imdb_id:
-                    entry['imdb_url'] = 'http://www.imdb.com/title/%s' % imdb_id
+                    entry['imdb_url'] = make_url(imdb_id)
                 else:
                     log.debug('imdb url %s is invalid, removing it' % entry['imdb_url'])
                     del(entry['imdb_url'])
@@ -243,23 +258,22 @@ class ImdbLookup(object):
                     session.add(result)
                     raise PluginError('Title `%s` lookup failed' % entry['title'])
 
-            imdb = ImdbParser()
 
             # check if this imdb page has been parsed & cached
-            cached = session.query(Movie).\
+            movie = session.query(Movie).\
                 options(joinedload_all(Movie.genres, Movie.languages,
                 Movie.actors, Movie.directors)).\
                 filter(Movie.url == entry['imdb_url']).first()
 
             refresh_interval = 2
-            if cached:
-                if cached.year:
-                    age = (datetime.now().year - cached.year)
+            if movie:
+                if movie.year:
+                    age = (datetime.now().year - movie.year)
                     refresh_interval += age * 5
-                    log.debug('cached movie `%s` age %i refresh interval %i days' % (cached.title, age, refresh_interval))
+                    log.debug('cached movie `%s` age %i refresh interval %i days' % (movie.title, age, refresh_interval))
 
-            if not cached or cached.updated is None or \
-               cached.updated < datetime.now() - timedelta(days=refresh_interval):
+            if not movie or movie.updated is None or \
+               movie.updated < datetime.now() - timedelta(days=refresh_interval):
                 # Remove the old movie, we'll store another one later.
                 session.query(Movie).filter(Movie.url == entry['imdb_url']).delete()
                 # search and store to cache
@@ -269,6 +283,7 @@ class ImdbLookup(object):
                     log.verbose('Parsing imdb for `%s`' % entry['imdb_id'])
                 try:
                     take_a_break = True
+                    imdb = ImdbParser()
                     imdb.parse(entry['imdb_url'])
                     # store to database
                     movie = Movie()
@@ -306,7 +321,7 @@ class ImdbLookup(object):
                         movie.directors.append(director) # pylint:disable=E1101
                     # so that we can track how long since we've updated the info later
                     movie.updated = datetime.now()
-                    output = session.add(movie)
+                    session.add(movie)
 
                 except UnicodeDecodeError:
                     log.error('Unable to determine encoding for %s. Installing chardet library may help.' % entry['imdb_url'])
@@ -320,56 +335,12 @@ class ImdbLookup(object):
                     if feed.manager.options.debug:
                         log.exception(e)
                     raise PluginError('Invalid parameter: %s' % entry['imdb_url'], log)
-            else:
-                # Set values from cache
-                # TODO: I don't like this shoveling ...
 
-                # TODO: For some reason iterating troug cached.genres etc do emit queries despite joinedload_all
-                imdb.url = cached.url
-                imdb.photo = cached.photo
-                imdb.name = cached.title
-                imdb.year = cached.year
-                imdb.votes = cached.votes
-                imdb.score = cached.score
-                imdb.mpaa_rating = cached.mpaa_rating
-                imdb.plot_outline = cached.plot_outline
-                imdb.genres = [genre.name for genre in cached.genres]
-                imdb.languages = [lang.name for lang in cached.languages]
-                for actor in cached.actors:
-                    imdb.actors[actor.imdb_id] = actor.name
-                for director in cached.directors:
-                    imdb.directors[director.imdb_id] = director.name
-
-            if imdb.mpaa_rating is None:
-                imdb.mpaa_rating = ''
-
-            log.debugall('imdb.name: %s' % imdb.name)
-            log.debugall('imdb.score: %s' % imdb.score)
-            log.debugall('imdb.votes: %s' % imdb.votes)
-            log.debugall('imdb.year: %s' % imdb.year)
-            log.debugall('imdb.genres: %s' % imdb.genres)
-            log.debugall('imdb.languages: %s' % imdb.languages)
-            log.debugall('imdb.actors: %s' % ', '.join(imdb.actors))
-            log.debugall('imdb.directors: %s' % ', '.join(imdb.directors))
-            log.debugall('imdb.mpaa_rating: %s' % ', '.join(imdb.mpaa_rating))
+            for att in ['title', 'score', 'votes', 'year', 'genres', 'languages', 'actors', 'directors', 'mpaa_rating']:
+                log.debugall('movie.%s: %s' % (att, getattr(movie, att)))
 
             # store to entry
-            # TODO: I really don't like this shoveling!
-            entry['imdb_url'] = imdb.url
-            entry['imdb_id'] = extract_id(entry['imdb_url']) # imdb.imdb_id is not always set
-            entry['imdb_name'] = imdb.name
-            entry['imdb_photo'] = imdb.photo
-            entry['imdb_plot_outline'] = imdb.plot_outline
-            entry['imdb_score'] = imdb.score
-            entry['imdb_votes'] = imdb.votes
-            entry['imdb_year'] = imdb.year
-            entry['imdb_genres'] = imdb.genres
-            entry['imdb_languages'] = imdb.languages
-            entry['imdb_actors'] = imdb.actors
-            entry['imdb_directors'] = imdb.directors
-            entry['imdb_mpaa_rating'] = imdb.mpaa_rating
-            if not 'title' in entry:
-                entry['title'] = imdb.name
+            entry.update_using_map(self.field_map, movie)
 
             # give imdb a little break between requests (see: http://flexget.com/ticket/129#comment:1)
             if (take_a_break and

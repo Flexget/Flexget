@@ -19,7 +19,24 @@ class PluginTmdbLookup(object):
         tmdb_lookup: yes
     """
 
-    fields = ['tmdb_name', 'tmdb_id', 'imdb_id', 'tmdb_year', 'tmdb_popularity', 'tmdb_rating', 'tmdb_genres']
+    field_map = {
+        'tmdb_name': 'name',
+        'tmdb_id': 'id',
+        'imdb_id': 'imdb_id',
+        'tmdb_year': 'year',
+        'tmdb_popularity': 'popularity',
+        'tmdb_rating': 'rating',
+        'tmdb_genres': lambda movie: [genre.name for genre in movie.genres],
+        'tmdb_released': 'released',
+        'tmdb_votes': 'votes',
+        'tmdb_certification': 'certification',
+        'tmdb_posters': lambda movie: [poster.url for poster in movie.posters],
+        'tmdb_runtime': 'runtime',
+        'tmdb_tagline': 'tagline',
+        'tmdb_budget': 'budget',
+        'tmdb_revenue': 'revenue',
+        'tmdb_homepage': 'homepage',
+        'tmdb_trailer': 'trailer'}
 
     def validator(self):
         from flexget import validator
@@ -27,42 +44,22 @@ class PluginTmdbLookup(object):
 
     def lazy_loader(self, entry, field):
         """Does the lookup for this entry and populates the entry fields."""
-        imdb_id = entry.get_no_lazy('imdb_id') or imdb.extract_id(entry.get('imdb_url', ''))
+        imdb_id = entry.get_no_lazy('imdb_id') or imdb.extract_id(entry.get_no_lazy('imdb_url'))
         try:
             movie = lookup(smart_match=entry['title'], tmdb_id=entry.get_no_lazy('tmdb_id'), imdb_id=imdb_id)
-            entry['tmdb_name'] = movie.name
-            entry['tmdb_id'] = movie.id
-            entry['imdb_id'] = movie.imdb_id
-            entry['tmdb_year'] = movie.year
-            entry['tmdb_popularity'] = movie.popularity
-            entry['tmdb_rating'] = movie.rating
-            entry['tmdb_genres'] = [genre.name for genre in movie.genres]
-            entry['tmdb_released'] = movie.released
-            entry['tmdb_votes'] = movie.votes
-            entry['tmdb_certification'] = movie.certification
-            entry['tmdb_posters'] = [poster.url for poster in movie.posters]
-            entry['tmdb_runtime'] = movie.runtime
-            entry['tmdb_tagline'] = movie.tagline
-            entry['tmdb_budget'] = movie.budget
-            entry['tmdb_revenue'] = movie.revenue
-            entry['tmdb_homepage'] = movie.homepage
-            entry['tmdb_trailer'] = movie.trailer
-            # TODO: other fields?
+            entry.update_using_map(self.field_map, movie)
         except LookupError, e:
             log.debug('Tmdb lookup for %s failed: %s' % (entry['title'], e))
             # Set all of our fields to None if the lookup failed
-            for f in self.fields:
+            for f in self.field_map:
                 if entry.is_lazy(f):
                     entry[f] = None
         return entry[field]
-
-    def register_lazy_fields(self, entry):
-        entry.register_lazy_fields(self.fields, self.lazy_loader)
 
     def on_feed_metainfo(self, feed, config):
         if not config:
             return
         for entry in feed.entries:
-            self.register_lazy_fields(entry)
+            entry.register_lazy_fields(self.field_map, self.lazy_loader)
 
 register_plugin(PluginTmdbLookup, 'tmdb_lookup', api_ver=2)

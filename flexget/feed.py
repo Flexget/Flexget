@@ -82,10 +82,10 @@ class Entry(dict):
         # TODO: HACK! Implement via plugin once #348 (entry events) is implemented
         # enforces imdb_url in same format
         if key == 'imdb_url' and isinstance(value, basestring):
-            from flexget.utils.imdb import extract_id
+            from flexget.utils.imdb import extract_id, make_url
             imdb_id = extract_id(value)
             if imdb_id:
-                value = u'http://www.imdb.com/title/%s/' % imdb_id
+                value = make_url(imdb_id)
             else:
                 log.debug('Tried to set imdb_id to invalid imdb url: %s' % value)
                 value = None
@@ -158,6 +158,22 @@ class Entry(dict):
             if name in self.snapshots:
                 log.warning('Snapshot `%s` is being overwritten for `%s`' % (name, self['title']))
             self.snapshots[name] = snapshot
+
+    def update_using_map(self, field_map, source_item):
+        """Populates entry fields from a source object using a dictionary that maps from entry field names to
+        attribute of the source object.
+
+        Args:
+            field_map: A dictionary mapping entry field names to the attribute in source_item (nested attributes
+                are also supported, separated by a dot,) or a function that takes source_item as an argument
+            source_item: Source of information to be used by the map
+        """
+
+        for field, value in field_map.iteritems():
+            if isinstance(value, basestring):
+                self[field] = reduce(getattr, value.split('.'), source_item)
+            else:
+                self[field] = value(source_item)
 
 
 def useFeedLogging(func):
