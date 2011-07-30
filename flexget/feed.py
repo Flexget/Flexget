@@ -117,7 +117,13 @@ class Entry(dict):
         return self.get(key) is not None
 
     def register_lazy_fields(self, fields, func):
-        """Register a list of fields to be lazily loaded by callback func."""
+        """Register a list of fields to be lazily loaded by callback func.
+
+        Args:
+            fields: List of field names that are registered as lazy fields
+            func: Callback function which is called when lazy field needs to be evaluated.
+                  Function call will get params (entry, field). See `LazyField` class for more details.
+        """
         for field in fields:
             if not self.get_no_lazy(field):
                 self[field] = LazyField(self, field, func)

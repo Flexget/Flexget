@@ -1,5 +1,5 @@
 import logging
-from flexget.plugin import get_plugin_by_name, priority, register_plugin, DependencyError
+from flexget.plugin import register_plugin, DependencyError
 from flexget.utils import imdb
 
 try:
