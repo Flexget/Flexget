@@ -3,7 +3,7 @@ import re
 # TODO: rename all validator.valid -> validator.accepts / accepted / accept ?
 
 
-class Errors:
+class Errors(object):
 
     """Create and hold validator error messages."""
 
@@ -164,7 +164,7 @@ class RootValidator(Validator):
         return self.validate_item(data, self.valid)
 
     def schema(self):
-        return [v.schema() for v in self.valid]
+        return {'type': 'root', 'valid': [v.schema() for v in self.valid]}
 
 
 class ChoiceValidator(Validator):
@@ -209,7 +209,7 @@ class ChoiceValidator(Validator):
             return False
 
     def schema(self):
-        return {'choice': self.valid + self.valid_ic}
+        return {'type': 'choice', 'valid': self.valid + self.valid_ic}
 
 
 class AnyValidator(Validator):
@@ -225,7 +225,7 @@ class AnyValidator(Validator):
         return True
 
     def schema(self):
-        return 'any'
+        return {'type': 'any'}
 
 
 class EqualsValidator(Validator):
@@ -241,7 +241,7 @@ class EqualsValidator(Validator):
         return self.valid == data
 
     def schema(self):
-        return {'equals': self.valid}
+        return {'type': 'equals', 'valid': self.valid}
 
 
 class NumberValidator(Validator):
@@ -260,7 +260,7 @@ class NumberValidator(Validator):
         return valid
 
     def schema(self):
-        return 'number'
+        return {'type': 'number'}
 
 
 class IntegerValidator(Validator):
@@ -279,7 +279,7 @@ class IntegerValidator(Validator):
         return valid
 
     def schema(self):
-        return 'number'
+        return {'type': 'integer'}
 
 
 class DecimalValidator(Validator):
@@ -298,7 +298,7 @@ class DecimalValidator(Validator):
         return valid
 
     def schema(self):
-        return 'decimal'
+        return {'type': 'decimal'}
 
 
 class BooleanValidator(Validator):
@@ -317,7 +317,7 @@ class BooleanValidator(Validator):
         return valid
 
     def schema(self):
-        return 'boolean'
+        return {'type': 'boolean'}
 
 
 class TextValidator(Validator):
@@ -336,7 +336,7 @@ class TextValidator(Validator):
         return valid
 
     def schema(self):
-        return 'text'
+        return {'type': 'text'}
 
 
 class RegexpValidator(Validator):
@@ -360,7 +360,7 @@ class RegexpValidator(Validator):
         return True
 
     def schema(self):
-        return 'regexp'
+        return {'type': 'regexp'}
 
 
 class RegexpMatchValidator(Validator):
@@ -406,7 +406,7 @@ class RegexpMatchValidator(Validator):
         return False
 
     def schema(self):
-        return {'regexp_match': {
+        return {'type': 'regexp_match', 'valid': {
             'accept': [r.pattern for r in self.regexps],
             'reject': [r.pattern for r in self.reject_regexps]}}
 
@@ -423,7 +423,7 @@ class FileValidator(TextValidator):
         return True
 
     def schema(self):
-        return 'file'
+        return {'type': 'file'}
 
 
 class PathValidator(TextValidator):
@@ -459,7 +459,7 @@ class PathValidator(TextValidator):
         return True
 
     def schema(self):
-        return 'path'
+        return {'type': 'path'}
 
 
 class UrlValidator(TextValidator):
@@ -482,7 +482,7 @@ class UrlValidator(TextValidator):
         return valid
 
     def schema(self):
-        return 'url'
+        return {'type': 'url'}
 
 
 class ListValidator(Validator):
@@ -509,7 +509,7 @@ class ListValidator(Validator):
         return count == self.errors.count()
 
     def schema(self):
-        return {'list': [v.schema() for v in self.valid]}
+        return {'type': 'list', 'valid': [v.schema() for v in self.valid]}
 
 
 class DictValidator(Validator):
@@ -643,7 +643,7 @@ class DictValidator(Validator):
         return count == self.errors.count()
 
     def schema(self):
-        schema = {}
+        schema = {'type': 'dict'}
         valid = {}
         for name, validators in self.valid.iteritems():
             if not validators:
@@ -760,7 +760,10 @@ def complex_test():
 if __name__ == '__main__':
 
     v = complex_test()
-    print v.schema()
+    schema = v.schema()
+
+    import yaml
+    print yaml.dump(schema)
 
     """
     root = factory()
