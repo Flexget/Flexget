@@ -105,8 +105,10 @@ class Entry(dict):
         else:
             return result
 
-    def get(self, key, default=None):
+    def get(self, key, default=None, lazy=True):
         """Overridden so that our __getitem__ gets used for LazyFields"""
+        if self.is_lazy(key):
+            return default
         try:
             return self[key]
         except KeyError:
@@ -125,18 +127,13 @@ class Entry(dict):
                   Function call will get params (entry, field). See `LazyField` class for more details.
         """
         for field in fields:
-            if not self.get_no_lazy(field):
+            # Do not overwrite an already populated field with a lazy lookup field
+            if not self.get(field, lazy=False):
                 self[field] = LazyField(self, field, func)
 
     def is_lazy(self, field):
         """Returns True if field is lazy loading."""
         return isinstance(dict.get(self, field), LazyField)
-
-    def get_no_lazy(self, field, default=None):
-        """Gets the value of a field if it is not a lazy field."""
-        if self.is_lazy(field):
-            return default
-        return self.get(field, default)
 
     def safe_str(self):
         return '%s | %s' % (self['title'], self['url'])

@@ -22,20 +22,18 @@ class QueueMovies(object):
         for entry in feed.accepted:
             # Tell tmdb_lookup to add lazy lookup fields if not already present
             try:
-                get_plugin_by_name('tmdb_lookup').instance.register_lazy_fields(entry)
+                get_plugin_by_name('tmdb_lookup').instance.lookup(entry)
             except DependencyError:
                 log.debug('tmdb_lookup is not available, queue will not work if movie ids are not populated')
-            # Find one or both movie id's for this entry
+            # Find one or both movie id's for this entry. See if an id is already populated before incurring lazy lookup
             kwargs = {}
-            if entry.get_no_lazy('imdb_id'):
-                kwargs['imdb_id'] = entry['imdb_id']
-            if entry.get_no_lazy('tmdb_id'):
-                kwargs['tmdb_id'] = entry['tmdb_id']
-            if not kwargs:
-                if entry.get('imdb_id'):
+            for lazy in [False, True]:
+                if entry.get('imdb_id', lazy=lazy):
                     kwargs['imdb_id'] = entry['imdb_id']
-                elif entry.get('tmdb_id'):
+                if entry.get('tmdb_id', lazy=lazy):
                     kwargs['tmdb_id'] = entry['tmdb_id']
+                if kwargs:
+                    break
             if not kwargs:
                 log.warning('Could not determine a movie id for %s, it will not be added to queue.' % entry['title'])
                 continue

@@ -53,22 +53,19 @@ class FilterMovieQueue(queue_base.FilterQueueBase):
     def matches(self, feed, config, entry):
         # Tell tmdb_lookup to add lazy lookup fields if not already present
         try:
-            get_plugin_by_name('tmdb_lookup').instance.register_lazy_fields(entry)
+            get_plugin_by_name('tmdb_lookup').instance.lookup(entry)
         except DependencyError:
             log.debug('tmdb_lookup is not available, queue will not work if movie ids are not populated')
         # make sure the entry has a movie id field filled
         conditions = []
-        # First see if a movie id is already populated
-        if entry.get_no_lazy('imdb_id'):
-            conditions.append(QueuedMovie.imdb_id == entry['imdb_id'])
-        if entry.get_no_lazy('tmdb_id'):
-            conditions.append(QueuedMovie.id == entry['tmdb_id'])
-        # Otherwise see if there is a lazy field available
-        if not conditions:
-            if entry.get('imdb_id'):
+        # Check if a movie id is already populated before incurring a lazy lookup
+        for lazy in [False, True]:
+            if entry.get('imdb_id', lazy=lazy):
                 conditions.append(QueuedMovie.imdb_id == entry['imdb_id'])
-            elif entry.get('tmdb_id'):
+            if entry.get('tmdb_id', lazy=lazy):
                 conditions.append(QueuedMovie.id == entry['tmdb_id'])
+            if conditions:
+                break
         if not conditions:
             log.warning("No movie id could be determined for %s" % entry['title'])
             return
@@ -193,7 +190,7 @@ def queue_edit(imdb_id, quality, session=None):
 @with_session
 def queue_get(session=None, downloaded=False):
     """Get the current IMDb queue.
-    
+
     KWArgs:
         session: new session is used it not given
         downloaded: boolean whether or not to return only downloaded

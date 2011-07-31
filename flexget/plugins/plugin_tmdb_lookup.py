@@ -44,9 +44,9 @@ class PluginTmdbLookup(object):
 
     def lazy_loader(self, entry, field):
         """Does the lookup for this entry and populates the entry fields."""
-        imdb_id = entry.get_no_lazy('imdb_id') or imdb.extract_id(entry.get_no_lazy('imdb_url'))
+        imdb_id = entry.get('imdb_id', lazy=False) or imdb.extract_id(entry.get('imdb_url', lazy=False))
         try:
-            movie = lookup(smart_match=entry['title'], tmdb_id=entry.get_no_lazy('tmdb_id'), imdb_id=imdb_id)
+            movie = lookup(smart_match=entry['title'], tmdb_id=entry.get('tmdb_id', lazy=False), imdb_id=imdb_id)
             entry.update_using_map(self.field_map, movie)
         except LookupError, e:
             log.debug('Tmdb lookup for %s failed: %s' % (entry['title'], e))
@@ -56,10 +56,14 @@ class PluginTmdbLookup(object):
                     entry[f] = None
         return entry[field]
 
+    def lookup(self, entry):
+        """Populates all lazy fields to an Entry. May be called by other plugins requiring tmdb info on an Entry."""
+        entry.register_lazy_fields(self.field_map, self.lazy_loader)
+
     def on_feed_metainfo(self, feed, config):
         if not config:
             return
         for entry in feed.entries:
-            entry.register_lazy_fields(self.field_map, self.lazy_loader)
+            self.lookup(entry)
 
 register_plugin(PluginTmdbLookup, 'tmdb_lookup', api_ver=2)

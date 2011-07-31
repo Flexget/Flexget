@@ -103,7 +103,7 @@ class PluginThetvdbLookup(object):
     def lazy_series_lookup(self, entry, field):
         """Does the lookup for this entry and populates the entry fields."""
         try:
-            series = lookup_series(entry.get_no_lazy('series_name'), tvdb_id=entry.get_no_lazy('thetvdb_id'))
+            series = lookup_series(entry.get('series_name', lazy=False), tvdb_id=entry.get('thetvdb_id', lazy=False))
             entry.update_using_map(self.series_map, series)
         except LookupError, e:
             log.debug('Error looking up tvdb series information for %s: %s' % (entry['title'], e.message))
@@ -115,8 +115,8 @@ class PluginThetvdbLookup(object):
 
     def lazy_episode_lookup(self, entry, field):
         try:
-            episode = lookup_episode(entry.get_no_lazy('series_name'), entry['series_season'],
-                                     entry['series_episode'], tvdb_id=entry.get_no_lazy('thetvdb_id'))
+            episode = lookup_episode(entry.get('series_name', lazy=False), entry['series_season'],
+                                     entry['series_episode'], tvdb_id=entry.get('thetvdb_id', lazy=False))
             entry.update_using_map(self.episode_map, episode)
         except LookupError, e:
             log.debug('Error looking up tvdb episode information for %s: %s' % (entry['title'], e.message))
@@ -132,7 +132,7 @@ class PluginThetvdbLookup(object):
 
         for entry in feed.entries:
             # If there is information for a series lookup, register our series lazy fields
-            if entry.get('series_name') or entry.get_no_lazy('thetvdb_id'):
+            if entry.get('series_name') or entry.get('thetvdb_id', lazy=False):
                 entry.register_lazy_fields(self.series_map, self.lazy_series_lookup)
 
                 # If there is season and ep info as well, register episode lazy fields
