@@ -107,7 +107,7 @@ class Entry(dict):
 
     def get(self, key, default=None, lazy=True):
         """Overridden so that our __getitem__ gets used for LazyFields"""
-        if self.is_lazy(key):
+        if not lazy and self.is_lazy(key):
             return default
         try:
             return self[key]
