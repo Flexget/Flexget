@@ -51,9 +51,7 @@ class PluginTmdbLookup(object):
         except LookupError, e:
             log.debug('Tmdb lookup for %s failed: %s' % (entry['title'], e))
             # Set all of our fields to None if the lookup failed
-            for f in self.field_map:
-                if entry.is_lazy(f):
-                    entry[f] = None
+            entry.deregister_lazy_fields(self.field_map, self.lazy_loader)
         return entry[field]
 
     def lookup(self, entry):

@@ -22,15 +22,19 @@ class EntryUnicodeError(Exception):
 
 
 class LazyField(object):
-    """Stores a callback function to populate entry fields. Runs it when called or to get a string representation."""
+    """Stores callback function(s) to populate entry fields. Runs it when called or to get a string representation."""
 
     def __init__(self, entry, field, func):
         self.entry = entry
         self.field = field
-        self.func = func
+        self.funcs = [func]
 
     def __call__(self):
-        return self.func(self.entry, self.field)
+        # Return a result from the first lookup function which succeeds
+        for func in self.funcs[:]:
+            result = func(self.entry, self.field)
+            if result is not None:
+                return result
 
     def __str__(self):
         return str(self())
@@ -127,9 +131,22 @@ class Entry(dict):
                   Function call will get params (entry, field). See `LazyField` class for more details.
         """
         for field in fields:
-            # Do not overwrite an already populated field with a lazy lookup field
-            if not self.get(field, lazy=False):
+            if self.is_lazy(field):
+                # If the field is already a lazy field, append this function to it's list of functions
+                dict.get(self, field).funcs.append(func)
+            elif not self.get(field, lazy=False):
+                # If it is not a lazy field, and isn't already populated, make it a lazy field
                 self[field] = LazyField(self, field, func)
+
+    def deregister_lazy_fields(self, fields, func):
+        """Clears given lookup function from a list of fields."""
+        for field in fields:
+            if self.is_lazy(field):
+                lazy_funcs = dict.get(self, field).funcs
+                if func in lazy_funcs:
+                    lazy_funcs.remove(func)
+                if not lazy_funcs:
+                    self[field] = None
 
     def is_lazy(self, field):
         """Returns True if field is lazy loading."""

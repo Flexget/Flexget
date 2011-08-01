@@ -94,12 +94,6 @@ class PluginThetvdbLookup(object):
         except DependencyError:
             pass
 
-    def clear_lazy_fields(self, entry, fields):
-        # Set all of our fields to None if the lookup failed
-        for f in fields:
-            if entry.is_lazy(f):
-                entry[f] = None
-
     def lazy_series_lookup(self, entry, field):
         """Does the lookup for this entry and populates the entry fields."""
         try:
@@ -107,9 +101,9 @@ class PluginThetvdbLookup(object):
             entry.update_using_map(self.series_map, series)
         except LookupError, e:
             log.debug('Error looking up tvdb series information for %s: %s' % (entry['title'], e.message))
-            self.clear_lazy_fields(entry, self.series_map)
+            entry.deregister_lazy_fields(self.series_map, self.lazy_series_lookup)
             # Also clear episode fields, since episode lookup cannot succeed without series lookup
-            self.clear_lazy_fields(entry, self.episode_map)
+            entry.deregister_lazy_fields(self.episode_map, self.lazy_episode_lookup)
 
         return entry[field]
 
@@ -120,7 +114,7 @@ class PluginThetvdbLookup(object):
             entry.update_using_map(self.episode_map, episode)
         except LookupError, e:
             log.debug('Error looking up tvdb episode information for %s: %s' % (entry['title'], e.message))
-            self.clear_lazy_fields(entry, self.episode_map)
+            entry.deregister_lazy_fields(self.episode_map, self.lazy_episode_lookup)
 
         return entry[field]
 
