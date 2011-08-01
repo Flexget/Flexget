@@ -67,7 +67,7 @@ def table_add_column(table, name, col_type, session, default=None):
         table = table_schema(table.name, session)
         if not isinstance(default, (ColumnDefault, Sequence)):
             default = ColumnDefault(default)
-        default._set_parent(table.c.added)
+        default._set_parent(getattr(table.c, name))
         statement = table.update().values({name: default.execute(bind=session.bind)})
         session.execute(statement)
 
