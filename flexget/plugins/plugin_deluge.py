@@ -3,11 +3,21 @@ import time
 import os
 import base64
 import re
+import sys
 from flexget.feed import Entry
 from flexget.utils.tools import replace_from_entry, make_valid_path
 from flexget.plugin import register_plugin, PluginError, priority, get_plugin_by_name, DependencyError
 
 log = logging.getLogger('deluge')
+
+# Deluge does not install to python system on Windows, add the install directory to sys.path if it is found
+if sys.platform.startswith('win'):
+    deluge_dir = os.path.join(os.environ['ProgramFiles'], 'Deluge')
+    if os.path.isdir(deluge_dir):
+        sys.path.append(deluge_dir)
+        for item in os.listdir(deluge_dir):
+            if item.endswith('.egg'):
+                sys.path.append(os.path.join(deluge_dir, item))
 
 try:
     from twisted.python import log as twisted_log
