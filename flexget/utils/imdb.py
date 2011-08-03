@@ -294,9 +294,9 @@ class ImdbParser(object):
             log.warning('Unable to get name for %s - plugin needs update?' % url)
 
         # get votes
-        tag_votes = soup.find('b', text=re.compile('\d votes'))
+        tag_votes = soup.find(itemprop='ratingCount')
         if tag_votes:
-            str_votes = ''.join([c for c in tag_votes.string if c.isdigit()])
+            str_votes = ''.join(c for c in tag_votes.string if c.isdigit())
             self.votes = int(str_votes)
             log.debug('Detected votes: %s' % self.votes)
         else:

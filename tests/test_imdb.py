@@ -144,6 +144,8 @@ class TestImdb(FlexGetBase):
         # Currently The Matrix has an 8.7, check a range in case it changes
         assert matrix > 8.6 and matrix < 8.8, \
             'The Matrix should have score 8.7 not %s. (Did the rating change?)' % matrix
+        assert int(self.feed.find_entry(imdb_name='The Matrix')['imdb_votes']) > 450000, \
+            'The Matrix should have more than 450000 votes'
         bfe = float(self.feed.find_entry(title='Battlefield Earth')['imdb_score'])
         # Currently Battlefield Earth has an 2.4, check a range in case it changes
         assert bfe >= 2.3 and bfe <= 2.5, \
