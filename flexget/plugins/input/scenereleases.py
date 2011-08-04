@@ -81,8 +81,9 @@ class InputScenereleases:
 
     @cached('scenereleases', 'url')
     @internet(log)
-    def on_feed_input(self, feed):
+    def on_feed_input(self, feed, config):
         releases = self.parse_site(feed.get_input_url('scenereleases'), feed)
+        entries = []
 
         for release in releases:
             # construct entry from release
@@ -97,6 +98,8 @@ class InputScenereleases:
             for field in ['title', 'url', 'imdb_url', 'imdb_score', 'imdb_votes']:
                 apply_field(release, entry, field)
 
-            feed.entries.append(entry)
+            entries.append(entry)
 
-register_plugin(InputScenereleases, 'scenereleases')
+        return entries
+
+register_plugin(InputScenereleases, 'scenereleases', api_ver=2)

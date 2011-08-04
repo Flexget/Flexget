@@ -9,7 +9,7 @@ class TestInputSites(FlexGetBase):
           test_rlslog:
             rlslog: http://www.rlslog.net/category/movies/dvdrip/
           test_scenereleases:
-            scenereleases: http://scenereleases.info/category/movies/movies-dvd-rip
+            scenereleases: http://sceper.eu/category/movies/movies-dvd-rip?themedemo=SceneRLSv3
           test_apple_trailers:
               apple_trailers: '320'
     """

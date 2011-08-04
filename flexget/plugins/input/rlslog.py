@@ -116,12 +116,13 @@ class RlsLog:
 
     @cached('rlslog', 'url')
     @internet(log)
-    def on_feed_input(self, feed):
+    def on_feed_input(self, feed, config):
         url = feed.get_input_url('rlslog')
         if url.endswith('feed/'):
             raise PluginWarning('Invalid URL. Remove trailing feed/ from the url.')
 
         releases = []
+        entries = []
 
         # retry rlslog (badly responding) up to 6 times (our urlopener tries 3 times per each of our tries here)
         for number in range(2):
@@ -155,6 +156,8 @@ class RlsLog:
             for field in ['title', 'url', 'imdb_url', 'imdb_score', 'imdb_votes']:
                 apply_field(release, entry, field)
 
-            feed.entries.append(entry)
+            entries.append(entry)
 
-register_plugin(RlsLog, 'rlslog')
+        return entries
+
+register_plugin(RlsLog, 'rlslog', api_ver=2)
