@@ -117,7 +117,7 @@ class RlsLog:
     @cached('rlslog', 'url')
     @internet(log)
     def on_feed_input(self, feed, config):
-        url = feed.get_input_url('rlslog')
+        url = config
         if url.endswith('feed/'):
             raise PluginWarning('Invalid URL. Remove trailing feed/ from the url.')
 
