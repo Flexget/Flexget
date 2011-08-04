@@ -389,23 +389,6 @@ class Feed(object):
                 return entry
         return None
 
-    def get_input_url(self, keyword):
-        # TODO: move to better place?
-        """
-            Helper method for plugins. Return url for a specified keyword.
-            Supports configuration in following forms:
-                <keyword>: <address>
-            and
-                <keyword>:
-                    url: <address>
-        """
-        if isinstance(self.config[keyword], dict):
-            if not 'url' in self.config[keyword]:
-                raise PluginError('Input %s has invalid configuration, url is missing.' % keyword)
-            return self.config[keyword]['url']
-        else:
-            return self.config[keyword]
-
     def plugins(self, phase=None):
         """An iterator over PluginInfo instances enabled on this feed.
 
