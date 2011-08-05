@@ -52,6 +52,12 @@ class ChangeWarn(object):
         if 'imdb_queue' in feed.config:
             log.critical('Plugin imdb_queue has been replaced by movie_queue, update your config')
             found_deprecated = True
+            
+        # complain if beautifulsoup is out of date, affects only subversion users (probably)
+        import BeautifulSoup
+        if [int(part) for part in BeautifulSoup.__version__.split('.')] < [3, 2]:
+            log.critical('BeautifulSoup is too old, please upgrade it!')
+            found_deprecated = True
 
         # prevent useless keywords in root level
         allow = ['feeds', 'presets', 'variables']
