@@ -1,12 +1,16 @@
 """ Plugin Loading & Management.
 """
 
-from flexget import plugins as _plugins_pkg
+#
+# NOTE: logging facility does not work currently from this file, this is most likely because logging facility
+# is not yet fully initialized at this point. There was/is flushing system for it, but it is likely broken.
+# Ticket #1113 is somewhat related
+#
+
+from flexget import plugins as plugins_pkg
 import sys
 import os
 import re
-import imp
-import glob
 import logging
 import time
 from event import add_event_handler as add_phase_handler
@@ -22,10 +26,9 @@ class DependencyError(Exception):
     """Plugin depends on other plugin, but it cannot be loaded.
 
     Args:
-
-    issued_by: name of the plugin trying to do the import
-    missing: name of the plugin or library that is missing
-    message: user readable error message
+        issued_by: name of the plugin trying to do the import
+        missing: name of the plugin or library that is missing
+        message: user readable error message
 
     All args are optional.
     """
@@ -166,7 +169,6 @@ phase_methods.update((_phase, 'on_feed_' + _phase) for _phase in feed_phases) # 
 
 # Plugin package naming
 PLUGIN_NAMESPACE = 'flexget.plugins'
-PLUGIN_PACKAGES = feed_phases + ['generic', 'local']
 
 # Mapping of plugin name to PluginInfo instance (logical singletons)
 plugins = {}
@@ -393,7 +395,7 @@ def register(plugin_class, groups=None, auto=False):
 def get_standard_plugins_path():
     """Determine a plugin path suitable for general use."""
     # Get basic path from enironment
-    env_path = os.environ.get('FLEXGET_PLUGIN_PATH', None)
+    env_path = os.environ.get('FLEXGET_PLUGIN_PATH')
     if env_path:
         # Get rid of trailing slashes, since Python can't handle them when
         # it tries to import modules.
@@ -403,7 +405,7 @@ def get_standard_plugins_path():
         path = [os.path.join(os.path.expanduser('~'), '.flexget', 'plugins')]
 
     # Add flexget.plugins directory (core plugins)
-    path.append(os.path.abspath(os.path.dirname(_plugins_pkg.__file__)))
+    path.append(os.path.abspath(os.path.dirname(plugins_pkg.__file__)))
 
     # Leads to problems if flexget is imported via PYTHONPATH and another copy
     # is installed into site-packages, remove this altogether if nobody has any problems
@@ -426,36 +428,52 @@ def get_standard_plugins_path():
 
 
 def load_plugins_from_dirs(dirs):
-    _plugins_pkg.__path__ = map(_strip_trailing_sep, dirs)
+    """
+    Args:
+        dirs: list of directories from where plugins are loaded from
+    """
 
-    # Import existing feed namespaces
-    for subpkg in PLUGIN_PACKAGES[:]:
-        if os.path.isdir(os.path.join(os.path.dirname(_plugins_pkg.__file__), subpkg)):
-            # Import sub-package and manipulate its search path so that all existing subdirs
-            # in our plugin path are bound to it
-            getattr(__import__(PLUGIN_NAMESPACE, fromlist=[subpkg], level=0), subpkg).__path__ = [
-                _strip_trailing_sep(os.path.join(i, subpkg))
-                for i in dirs
-                if os.path.isfile(os.path.join(i, subpkg, '__init__.py'))]
-        else:
-            PLUGIN_PACKAGES.remove(subpkg)
+    # add all dirs to plugins_pkg load path so that plugins are loaded from flexget and from ~/.flexget/plugins/
+    plugins_pkg.__path__ = map(_strip_trailing_sep, dirs)
 
-    for dirpath in dirs:
-        if not dirpath:
+    # construct list of plugin_packages from all load path subdirectories
+    plugin_packages = []
+    for dir in dirs:
+        if not os.path.exists(dir):
             continue
-        if os.path.isdir(dirpath):
-            log.debug('Looking for plugins in %s', dirpath)
-            load_plugins_from_dir(dirpath)
+        plugin_packages.extend([n for n in os.listdir(dir) if os.path.isdir(os.path.join(dir, n))])
 
-            # Also look in subpackages named like the feed phases, plus "generic"
-            for subpkg in PLUGIN_PACKAGES:
-                subpath = os.path.join(dirpath, subpkg)
+    # import plugin packages and manipulate their load paths
+    for subpkg in plugin_packages[:]:
+        # must be a proper python package with __init__.py
+        if os.path.isdir(os.path.join(os.path.dirname(plugins_pkg.__file__), subpkg)) and \
+           os.path.isfile(os.path.join(os.path.dirname(plugins_pkg.__file__), subpkg, '__init__.py')):
+
+            # import sub-package and manipulate its search path so that all existing subdirs are in it
+            getattr(__import__(PLUGIN_NAMESPACE, fromlist=[subpkg], level=0), subpkg).__path__ = [
+                _strip_trailing_sep(os.path.join(package_base, subpkg))
+                for package_base in dirs if os.path.isfile(os.path.join(package_base, subpkg, '__init__.py'))]
+        else:
+            log.debug('removing defunct plugin_package %s' % subpkg)
+            plugin_packages.remove(subpkg)
+
+    # actually load plugins from directories
+    for dir in dirs:
+        if not dir:
+            continue
+        if os.path.isdir(dir):
+            log.debug('Looking for plugins in %s', dir)
+            load_plugins_from_dir(dir)
+
+            # Also look in sub-packages named like the feed phases, plus "generic"
+            for subpkg in plugin_packages:
+                subpath = os.path.join(dir, subpkg)
                 if os.path.isdir(subpath):
                     # Only log existing subdirs
                     log.debug("Looking for sub-plugins in '%s'", subpath)
-                    load_plugins_from_dir(dirpath, subpkg)
+                    load_plugins_from_dir(dir, subpkg)
         else:
-            log.debug('Ignoring non-existant plugin directory %s', dirpath)
+            log.debug('Ignoring non-existing plugin directory %s', dir)
 
 
 def load_plugins_from_dir(basepath, subpkg=None):
