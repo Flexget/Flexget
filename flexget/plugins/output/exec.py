@@ -94,7 +94,7 @@ class PluginExec(object):
         self.execute(feed, 'on_exit')
 
     def execute_cmd(self, cmd, allow_background):
-        p = subprocess.Popen(cmd, shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE, \
+        p = subprocess.Popen(cmd, shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT, close_fds=False)
         if not allow_background:
             (r, w) = (p.stdout, p.stdin)
@@ -111,8 +111,8 @@ class PluginExec(object):
             log.debug('phase %s not configured' % phase_name)
             return
 
-        name_map = {'for_entries': feed.entries, 'for_accepted': feed.accepted, \
-            'for_rejected': feed.rejected, 'for_failed': feed.failed}
+        name_map = {'for_entries': feed.entries, 'for_accepted': feed.accepted,
+                    'for_rejected': feed.rejected, 'for_failed': feed.failed}
 
         allow_background = config.get('allow_background')
         for operation, entries in name_map.iteritems():
@@ -128,7 +128,7 @@ class PluginExec(object):
                     # Do string replacement from entry, but make sure quotes get escaped
                     cmd = cmd % entrydict
                 except KeyError, e:
-                    msg = 'Entry %s does not have required field %s' % (entry['title'], e.message)
+                    msg = 'Entry `%s` does not have required field %s' % (entry['title'], e.message)
                     log.error(msg)
                     # fail the entry if configured to do so
                     if config.get('fail_entries'):
@@ -141,7 +141,7 @@ class PluginExec(object):
                 else:
                     # Run the command, fail entries with non-zero return code if configured to
                     if self.execute_cmd(cmd, allow_background) != 0 and config.get('fail_entries'):
-                        feed.fail(entry, "adv_exec return code was non-zero")
+                        feed.fail(entry, "exec return code was non-zero")
 
         # phase keyword in this
         if 'phase' in config[phase_name]:
