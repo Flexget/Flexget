@@ -157,6 +157,7 @@ class PluginDownload(object):
                 log.warning('Failed to reach server. Reason: %s' % e.reason)
             elif hasattr(e, 'code'):
                 log.warning('The server couldn\'t fulfill the request. Error code: %s' % e.code)
+            log.debug('IOError', exc_info=True)
             return 'IOError'
         except ValueError, e:
             # Probably unknown url type
@@ -165,7 +166,7 @@ class PluginDownload(object):
 
     def download_entry(self, feed, entry, url):
         """Downloads :entry: by using :url:
-        
+
         Raises:
             Several types of exceptions ...
             PluginWarning
@@ -320,7 +321,7 @@ class PluginDownload(object):
 
     def output(self, feed, entry):
         """Moves temp-file into final destination
-        
+
         Raises:
             PluginError if operation fails
         """
