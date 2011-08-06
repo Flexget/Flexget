@@ -78,7 +78,7 @@ class TorrentScrub(plugin.Plugin):
                         except KeyError:
                             # Key not found in this entry
                             field = None
-                        self.log.debugall((key, field))
+                        self.log.trace((key, field))
 
                     if field and key in field:
                         self.log.debug("Removing key '%s'..." % (fieldname,))
@@ -91,7 +91,7 @@ class TorrentScrub(plugin.Plugin):
             if modified:
                 entry["torrent"].content = metainfo
                 entry["torrent"].modified = True
-                self.log.info((("Key %s was" if len(modified) == 1 else "Keys %s were") 
+                self.log.info((("Key %s was" if len(modified) == 1 else "Keys %s were")
                     + " scrubbed from torrent '%s'!") % (", ".join(sorted(modified)), entry['title']))
                 new_infohash = entry["torrent"].get_info_hash()
                 if infohash != new_infohash:

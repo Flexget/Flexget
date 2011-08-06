@@ -71,7 +71,7 @@ def maketemp(name=None):
         name = find_test_name().replace(':', '_')
 
     tmp = os.path.join(tmp, name)
-    log.debugall("Creating empty tmpdir %r" % tmp)
+    log.trace("Creating empty tmpdir %r" % tmp)
     try:
         shutil.rmtree(tmp)
     except OSError, e:

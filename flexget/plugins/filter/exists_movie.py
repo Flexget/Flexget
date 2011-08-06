@@ -78,11 +78,11 @@ class FilterExistsMovie(object):
                         imdb_lookup(feed, fake_entry)
                         imdb_url = fake_entry['imdb_url']
                         if imdb_url in imdb_urls:
-                            log.debugall('duplicate %s' % fake_entry['title'])
+                            log.trace('duplicate %s' % fake_entry['title'])
                             continue
                         imdb_urls.append(imdb_url)
                     except PluginError, e:
-                        log.debugall('%s lookup failed (%s)' % (fake_entry['title'], e.value))
+                        log.trace('%s lookup failed (%s)' % (fake_entry['title'], e.value))
                         incompatible_dirs += 1
 
         log.debug('-- Start filtering entries ----------------------------------')
@@ -94,7 +94,7 @@ class FilterExistsMovie(object):
                 try:
                     imdb_lookup(feed, entry)
                 except PluginError, e:
-                    log.debugall('entry %s imdb failed (%s)' % (entry['title'], e.value))
+                    log.trace('entry %s imdb failed (%s)' % (entry['title'], e.value))
                     incompatible_entries += 1
                     continue
             if entry['imdb_url'] in imdb_urls:

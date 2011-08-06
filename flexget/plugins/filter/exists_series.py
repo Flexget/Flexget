@@ -87,19 +87,19 @@ class FilterExistsSeries(object):
                             for entry in accepted_series[series]:
                                 log.debug('series_parser.identifier = %s' % entry['series_parser'].identifier)
                                 if disk_parser.identifier != entry['series_parser'].identifier:
-                                    log.debugall('wrong identifier')
+                                    log.trace('wrong identifier')
                                     continue
                                 log.debug('series_parser.quality = %s' % entry['series_parser'].quality)
                                 if config.get('allow_different_qualities') and \
                                    disk_parser.quality != entry['series_parser'].quality:
-                                    log.debugall('wrong quality')
+                                    log.trace('wrong quality')
                                     continue
                                 log.debug('entry parser.proper_count = %s' % entry['series_parser'].proper_count)
                                 if disk_parser.proper_count >= entry['series_parser'].proper_count:
                                     feed.reject(entry, 'proper already exists')
                                     continue
                                 else:
-                                    log.debugall('new one is better proper, allowing')
+                                    log.trace('new one is better proper, allowing')
                                     continue
 
                                 feed.reject(entry, 'episode already exists')

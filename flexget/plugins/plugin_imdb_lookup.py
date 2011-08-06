@@ -233,12 +233,12 @@ class ImdbLookup(object):
                         raise PluginError('Title `%s` lookup fails' % entry['title'])
                     else:
                         if result.url:
-                            log.debugall('Setting imdb url for %s from db' % entry['title'])
+                            log.trace('Setting imdb url for %s from db' % entry['title'])
                             entry['imdb_url'] = result.url
 
             # no imdb url, but information required, try searching
             if not 'imdb_url' in entry and search_allowed:
-                log.verbose('Searching from imdb %s' % entry['title'])
+                log.verbose('Searching from imdb `%s`' % entry['title'])
 
                 take_a_break = True
                 search = ImdbSearch()
@@ -337,7 +337,7 @@ class ImdbLookup(object):
                     raise PluginError('Invalid parameter: %s' % entry['imdb_url'], log)
 
             for att in ['title', 'score', 'votes', 'year', 'genres', 'languages', 'actors', 'directors', 'mpaa_rating']:
-                log.debugall('movie.%s: %s' % (att, getattr(movie, att)))
+                log.trace('movie.%s: %s' % (att, getattr(movie, att)))
 
             # store to entry
             entry.update_using_map(self.field_map, movie)
@@ -349,7 +349,7 @@ class ImdbLookup(object):
                 import time
                 time.sleep(3)
         finally:
-            log.debugall('committing session')
+            log.trace('committing session')
             session.commit()
 
 register_plugin(ImdbLookup, 'imdb_lookup', api_ver=2)

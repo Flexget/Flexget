@@ -44,11 +44,11 @@ class UrlRewrite(object):
             log.debug('Added rewrite %s' % name)
 
     def url_rewritable(self, feed, entry):
-        log.debugall('running url_rewritable')
-        log.debugall(self.resolves)
+        log.trace('running url_rewritable')
+        log.trace(self.resolves)
         for name, config in self.resolves.iteritems():
             regexp = config['regexp_compiled']
-            log.debugall('testing %s' % config['regexp'])
+            log.trace('testing %s' % config['regexp'])
             if regexp.search(entry['url']):
                 return True
         return False

@@ -66,9 +66,9 @@ class InputScenereleases:
                 urlrewriting = get_plugin_by_name('urlrewriting')
                 if urlrewriting['instance'].url_rewritable(feed, temp):
                     release['url'] = link_href
-                    log.debugall('--> accepting %s (resolvable)' % link_href)
+                    log.trace('--> accepting %s (resolvable)' % link_href)
                 else:
-                    log.debugall('<-- ignoring %s (non-resolvable)' % link_href)
+                    log.trace('<-- ignoring %s (non-resolvable)' % link_href)
 
             # reject if no torrent link
             if not 'url' in release:

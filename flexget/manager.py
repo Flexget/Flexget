@@ -464,7 +464,7 @@ class Manager(object):
             if not feed.enabled:
                 continue
             try:
-                log.debugall('calling process_start on a feed %s' % feed.name)
+                log.trace('calling process_start on a feed %s' % feed.name)
                 feed.process_start()
             except Exception, e:
                 feed.enabled = False
@@ -485,7 +485,7 @@ class Manager(object):
             if feed._abort:
                 continue
             try:
-                log.debugall('calling process_end on a feed %s' % feed.name)
+                log.trace('calling process_end on a feed %s' % feed.name)
                 feed.process_end()
             except Exception, e:
                 log.exception('Feed %s process_end: %s' % (feed.name, e))

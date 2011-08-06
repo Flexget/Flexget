@@ -43,9 +43,9 @@ class cached(object):
             else:
                 config = args[2]
 
-            log.debugall('config: %s' % config)
-            log.debugall('self.name: %s' % self.name)
-            log.debugall('self.key: %s' % self.key)
+            log.trace('config: %s' % config)
+            log.trace('self.name: %s' % self.name)
+            log.trace('self.key: %s' % self.key)
 
             if api_ver == 1:
                 if isinstance(config, dict) and self.key in config:
@@ -62,7 +62,7 @@ class cached(object):
 
             if name in self.cache:
                 # return from the cache
-                log.debugall('cache hit')
+                log.trace('cache hit')
                 entries = []
                 for entry in self.cache[name]:
                     fresh = copy.deepcopy(entry)
@@ -71,7 +71,7 @@ class cached(object):
                     log.verbose('Restored %s entries from cache' % len(entries))
                 return entries
             else:
-                log.debugall('cache miss')
+                log.trace('cache miss')
                 # call input event
                 response = func(*args, **kwargs)
                 # store results to cache

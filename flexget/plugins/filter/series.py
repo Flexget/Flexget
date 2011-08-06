@@ -167,7 +167,7 @@ class SeriesPlugin(object):
             release = release.filter(Release.quality <= max_qual)
         release = release.order_by(Release.first_seen).first()
         if not release:
-            log.debugall('%s not seen, return current time' % parser)
+            log.trace('%s not seen, return current time' % parser)
             return datetime.now()
         return release[0]
 
@@ -179,9 +179,9 @@ class SeriesPlugin(object):
             order_by(desc(Episode.season)).\
             order_by(desc(Episode.number)).first()
         if not episode:
-            # log.debugall('get_latest_info: no info available for %s' % name)
+            # log.trace('get_latest_info: no info available for %s' % name)
             return False
-        # log.debugall('get_latest_info, series: %s season: %s episode: %s' % \
+        # log.trace('get_latest_info, series: %s season: %s episode: %s' % \
         #    (name, episode.season, episode.number))
         return {'season': episode.season, 'episode': episode.number, 'name': name}
 
@@ -544,14 +544,14 @@ class FilterSeries(SeriesPlugin, FilterSeriesBase):
             series_name, series_config = series_item.items()[0]
             # yaml loads ascii only as str
             series_name = unicode(series_name)
-            log.debugall('series_name: %s series_config: %s' % (series_name, series_config))
+            log.trace('series_name: %s series_config: %s' % (series_name, series_config))
 
             import time
             start_time = time.clock()
 
             self.parse_series(feed, series_name, series_config)
             took = time.clock() - start_time
-            log.debugall('parsing %s took %s' % (series_name, took))
+            log.trace('parsing %s took %s' % (series_name, took))
 
     def on_feed_filter(self, feed):
         """Filter series"""
@@ -581,7 +581,7 @@ class FilterSeries(SeriesPlugin, FilterSeriesBase):
             source = guessed_series if series_config.get('series_guessed') else found_series
             # If we didn't find any episodes for this series, continue
             if not source.get(series_name):
-                log.debugall('No entries found for %s this run.' % series_name)
+                log.trace('No entries found for %s this run.' % series_name)
                 continue
             for id, eps in source[series_name].iteritems():
                 for parser in eps:
@@ -600,7 +600,7 @@ class FilterSeries(SeriesPlugin, FilterSeriesBase):
                         set = get_plugin_by_name('set')
                         set.instance.modify(entry, series_config.get('set'))
 
-            log.debugall('series_name: %s series_config: %s' % (series_name, series_config))
+            log.trace('series_name: %s series_config: %s' % (series_name, series_config))
 
             import time
             start_time = time.clock()
@@ -608,7 +608,7 @@ class FilterSeries(SeriesPlugin, FilterSeriesBase):
             self.process_series(feed, source[series_name], series_name, series_config)
 
             took = time.clock() - start_time
-            log.debugall('processing %s took %s' % (series_name, took))
+            log.trace('processing %s took %s' % (series_name, took))
 
     def parse_series(self, feed, series_name, config):
         """
@@ -656,7 +656,7 @@ class FilterSeries(SeriesPlugin, FilterSeriesBase):
                     # in case quality will not be found from title, set it from entry['quality'] if available
                     quality = None
                     if entry.get('quality', qualities.UNKNOWN) > qualities.UNKNOWN:
-                        log.debugall('Setting quality %s from entry field to parser' % entry['quality'])
+                        log.trace('Setting quality %s from entry field to parser' % entry['quality'])
                         quality = entry['quality']
                     try:
                         parser.parse(data, field=field, quality=quality)

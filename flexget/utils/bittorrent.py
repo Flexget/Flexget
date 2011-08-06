@@ -31,10 +31,10 @@ METAFILE_STD_KEYS = [i.split('.') for i in (
 
 def clean_meta(meta, including_info=False, logger=None):
     """ Clean meta dict. Optionally log changes using the given logger.
-    
+
         See also http://packages.python.org/pyrocore/apidocs/pyrocore.util.metafile-pysrc.html#clean_meta
 
-        @param logger: If given, a callable accepting a string message. 
+        @param logger: If given, a callable accepting a string message.
         @return: Set of keys removed from C{meta}.
     """
     modified = set()
@@ -49,7 +49,7 @@ def clean_meta(meta, including_info=False, logger=None):
     if including_info:
         for key in meta["info"].keys():
             if ["info", key] not in METAFILE_STD_KEYS:
-                if logger: 
+                if logger:
                     logger("Removing key %r..." % ("info." + key,))
                 del meta["info"][key]
                 modified.add("info." + key)
@@ -57,22 +57,22 @@ def clean_meta(meta, including_info=False, logger=None):
         for idx, entry in enumerate(meta["info"].get("files", [])):
             for key in entry.keys():
                 if ["info", "files", key] not in METAFILE_STD_KEYS:
-                    if logger: 
+                    if logger:
                         logger("Removing key %r from file #%d..." % (key, idx + 1))
                     del entry[key]
                     modified.add("info.files." + key)
-    
+
     return modified
 
 
 def is_torrent_file(metafilepath):
     """ Check whether a file looks like a metafile by peeking into its content.
-    
+
         Note that this doesn't ensure that the file is a complete and valid torrent,
         it just allows fast filtering of candidate files.
-        
+
         @param metafilepath: Path to the file to check, must have read permissions for it.
-        @return: True if there is a high probability this is a metafile. 
+        @return: True if there is a high probability this is a metafile.
     """
     f = open(metafilepath, 'rb')
     try:
@@ -83,7 +83,7 @@ def is_torrent_file(metafilepath):
 
     magic_marker = bool(TORRENT_RE.match(data))
     if not magic_marker:
-        log.debugall('%s doesn\'t seem to be a torrent, got `%s` (hex)' % (metafilepath, data.encode('hex')))
+        log.trace('%s doesn\'t seem to be a torrent, got `%s` (hex)' % (metafilepath, data.encode('hex')))
 
     return bool(magic_marker)
 
@@ -111,7 +111,7 @@ class Torrent(object):
         self.modified = False
 
     def __repr__(self):
-        return "%s(%s, %s)" % (self.__class__.__name__, 
+        return "%s(%s, %s)" % (self.__class__.__name__,
             ", ".join("%s=%r" % (key, self.content["info"].get(key))
                for key in ("name", "length", "private",)),
             ", ".join("%s=%r" % (key, self.content.get(key))

@@ -20,7 +20,7 @@ class TorrentFilename(object):
         for entry in feed.accepted:
             # skip if entry does not have file assigned
             if not 'file' in entry:
-                log.debugall('%s doesn\'t have a file associated' % entry['title'])
+                log.trace('%s doesn\'t have a file associated' % entry['title'])
                 continue
             if not os.path.exists(entry['file']):
                 feed.fail(entry, 'File %s does not exists' % entry['file'])

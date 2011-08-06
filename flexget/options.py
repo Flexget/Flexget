@@ -22,10 +22,10 @@ class OptionParser(OptParser):
                              " note that the output might contain PRIVATE data, so edit that out")
         self.add_option('--debug', action='callback', callback=self._debug_callback, dest='debug',
                         help=SUPPRESS_HELP)
-        self.add_option('--debug-all', action='callback', callback=self._debug_callback, dest='debug_all',
+        self.add_option('--debug-trace', action='callback', callback=self._debug_callback, dest='debug_trace',
                         help=SUPPRESS_HELP)
         self.add_option('--loglevel', action='store', type='choice', default='verbose', dest='loglevel',
-                        choices=['none', 'critical', 'error', 'warning', 'info', 'verbose', 'debug', 'debugall'],
+                        choices=['none', 'critical', 'error', 'warning', 'info', 'verbose', 'debug', 'trace'],
                         help=SUPPRESS_HELP)
         self.add_option('--debug-sql', action='store_true', dest='debug_sql', default=False,
                         help=SUPPRESS_HELP)
@@ -40,9 +40,9 @@ class OptionParser(OptParser):
         setattr(parser.values, option.dest, 1)
         if option.dest == 'debug':
             setattr(parser.values, 'loglevel', 'debug')
-        elif option.dest == 'debug_all':
+        elif option.dest == 'debug_trace':
             setattr(parser.values, 'debug', 1)
-            setattr(parser.values, 'loglevel', 'debugall')
+            setattr(parser.values, 'loglevel', 'trace')
 
     def _debug_tb_callback(self, *dummy):
         import cgitb

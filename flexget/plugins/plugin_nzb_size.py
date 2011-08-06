@@ -53,7 +53,7 @@ class NzbSize(object):
                 log.debug('%s content size: %s MB' % (entry['title'], size_mb))
                 entry['content_size'] = size_mb
             else:
-                log.debugall('%s does not seem to be nzb' % entry['title'])
+                log.trace('%s does not seem to be nzb' % entry['title'])
 
 
 register_plugin(NzbSize, 'nzb_size', builtin=True)

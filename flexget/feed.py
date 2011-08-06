@@ -95,7 +95,7 @@ class Entry(dict):
                 value = None
 
         try:
-            log.debugall('ENTRY %s = %r' % (key, value))
+            log.trace('ENTRY %s = %r' % (key, value))
         except Exception, e:
             log.debug('trying to debug key `%s` value threw exception: %s' % (key, e))
 
@@ -459,7 +459,7 @@ class Feed(object):
         if kwargs is None:
             kwargs = {}
 
-        # log.debugall('Running %s method %s' % (keyword, method))
+        # log.trace('Running %s method %s' % (keyword, method))
         # call the plugin
         try:
             return method(*args, **kwargs)

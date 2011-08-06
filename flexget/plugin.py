@@ -370,7 +370,7 @@ def register(plugin_class, groups=None, auto=False):
     # Base classes outside of plugin modules are NEVER auto-registered; if you have ones
     # in a plugin module, use the "*PluginBase" naming convention
     if auto and plugin_class.__name__.endswith("PluginBase"):
-        log.debugall("NOT auto-registering plugin base class %s.%s" % (
+        log.trace("NOT auto-registering plugin base class %s.%s" % (
             plugin_class.__module__, plugin_class.__name__))
         return
 
@@ -380,14 +380,14 @@ def register(plugin_class, groups=None, auto=False):
     # If this very class was already registered, that's OK
     if name in plugins and plugin_class is plugins[name].plugin_class:
         if not auto:
-            log.debugall("Ignoring dupe registration of same class %s.%s" % (
+            log.trace("Ignoring dupe registration of same class %s.%s" % (
                 plugin_class.__module__, plugin_class.__name__))
         if groups:
             plugins[name].groups = list(set(groups) | set(plugins[name].groups))
         return plugins[name]
     else:
         if auto:
-            log.debugall("Auto-registering plugin %s" % name)
+            log.trace("Auto-registering plugin %s" % name)
         return PluginInfo(plugin_class, name, list(set(info.get('groups', []) + (groups or []))),
             info.get('builtin', False), info.get('debug', False), info.get('api_ver', 1))
 
@@ -531,7 +531,7 @@ def load_plugins_from_dir(basepath, subpkg=None):
             log.exception(e)
             raise
         else:
-            log.debugall('Loaded module %s from %s' % (modulename[len(PLUGIN_NAMESPACE) + 1:], dirpath))
+            log.trace('Loaded module %s from %s' % (modulename[len(PLUGIN_NAMESPACE) + 1:], dirpath))
 
             # Auto-register plugins that inherit from plugin base classes,
             # and weren't already registered manually

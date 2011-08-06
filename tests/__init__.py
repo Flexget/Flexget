@@ -21,7 +21,7 @@ def setup_logging_level():
     # set logging level according to nosetests verbosity
     level = logging.DEBUG
     if "--verbose" in sys.argv or "-v" in sys.argv:
-        level = flexget.logger.DEBUGALL
+        level = flexget.logger.TRACE
     elif "--quiet" in sys.argv or "-q" in sys.argv:
         level = logging.INFO
 
@@ -100,7 +100,7 @@ class FlexGetBase(object):
         finally:
             if self.__tmp__:
                 import shutil
-                log.debugall('Removing tmpdir %r' % self.__tmp__)
+                log.trace('Removing tmpdir %r' % self.__tmp__)
                 shutil.rmtree(self.__tmp__.rstrip(os.sep))
 
     def execute_feed(self, name):
@@ -169,14 +169,14 @@ class with_filecopy(object):
                 pairs = [(self.src, dst)]
 
             for src, dst in pairs:
-                log.debugall("Copying %r to %r" % (src, dst))
+                log.trace("Copying %r to %r" % (src, dst))
                 shutil.copy(src, dst)
             try:
                 return func(*args, **kwargs)
             finally:
                 for _, dst in pairs:
                     if os.path.exists(dst):
-                        log.debugall("Removing %r" % dst)
+                        log.trace("Removing %r" % dst)
                         os.remove(dst)
 
         from nose.tools import make_decorator

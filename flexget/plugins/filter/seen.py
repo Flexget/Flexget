@@ -303,7 +303,7 @@ class FilterSeen(object):
                 if entry[field] not in values and entry[field] != '':
                     values.append(entry[field])
             if values:
-                log.debugall('querying for: %s' % ', '.join(values))
+                log.trace('querying for: %s' % ', '.join(values))
                 # check if SeenField.value is any of the values
                 found = feed.session.query(SeenField).filter(SeenField.value.in_(values)).first()
                 if found:

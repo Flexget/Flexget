@@ -4,7 +4,7 @@ import re
 import threading
 
 # A level more detailed than DEBUG
-DEBUGALL = 5
+TRACE = 5
 # A level more detailed than INFO
 VERBOSE = 15
 
@@ -18,13 +18,16 @@ class FlexGetLogger(logging.Logger):
                  'execution': getattr(FlexGetLogger.local, 'execution', '')}
         return logging.Logger.makeRecord(self, name, level, fn, lno, msg, args, exc_info, func, extra)
 
-    def debugall(self, msg, *args, **kwargs):
-        """Log at DEBUGALL level (more detailed than DEBUG)."""
-        self.log(DEBUGALL, msg, *args, **kwargs)
+    def trace(self, msg, *args, **kwargs):
+        """Log at TRACE level (more detailed than DEBUG)."""
+        self.log(TRACE, msg, *args, **kwargs)
 
     def verbose(self, msg, *args, **kwargs):
         """Log at VERBOSE level (displayed when FlexGet is run interactively.)"""
         self.log(VERBOSE, msg, *args, **kwargs)
+
+    # backwards compatibility
+    debugall = trace
 
 
 class FlexGetFormatter(logging.Formatter):
@@ -83,7 +86,7 @@ def initialize(unit_test=False):
     global _logging_configured, _mem_handler
 
     if not _logging_configured:
-        logging.addLevelName(DEBUGALL, 'DEBUGALL')
+        logging.addLevelName(TRACE, 'TRACE')
         logging.addLevelName(VERBOSE, 'VERBOSE')
         _logging_configured = True
 
