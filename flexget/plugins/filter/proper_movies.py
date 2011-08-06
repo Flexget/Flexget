@@ -4,6 +4,7 @@ from sqlalchemy.sql.expression import desc
 from flexget.event import fire_event
 from flexget.manager import Base
 from flexget.plugin import register_plugin, priority, get_plugin_by_name, PluginError
+from flexget.utils.log import log_once
 from flexget.utils.titles.movie import MovieParser
 from sqlalchemy import Column, Integer, String, Unicode, DateTime
 from datetime import datetime, timedelta
@@ -88,7 +89,7 @@ class FilterProperMovies(object):
                 try:
                     imdb_lookup.lookup(feed, entry, search_allowed=True)
                 except PluginError, pe:
-                    log.error(pe.value)
+                    log_once(pe.value)
                     continue
 
             parser = MovieParser()
