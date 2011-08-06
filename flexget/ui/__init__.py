@@ -20,9 +20,7 @@ def main():
 
     # The core plugins need a core parser to add their options to
     core_parser = CoreOptionParser()
-    time_took = plugin.load_plugins(core_parser)
-
-    log.debug('Plugins took %.2f seconds to load' % time_took)
+    plugin.load_plugins(core_parser)
 
     # Use the ui options parser to parse the cli
     parser = UIOptionParser(core_parser)
@@ -32,10 +30,10 @@ def main():
     except IOError, e:
         # failed to load config
         log.critical(e.message)
-        logger.flush()
+        logger.flush_logging_to_console()
         sys.exit(1)
 
     log_level = logging.getLevelName(options.loglevel.upper())
-    logger.start(os.path.join(manager.config_base, 'flexget.log'), log_level, quiet=options.quiet)
+    logger.start(os.path.join(manager.config_base, 'flexget.log'), log_level)
 
     flexget.ui.webui.start(manager)

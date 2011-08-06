@@ -19,21 +19,19 @@ def main():
     logger.initialize()
 
     parser = CoreOptionParser()
-
-    time_took = plugin.load_plugins(parser)
-    log.debug('Plugins took %.2f seconds to load' % time_took)
+    plugin.load_plugins(parser)
 
     options = parser.parse_args()[0]
 
     try:
         manager = Manager(options)
     except IOError, e:
-        # failed to load config, why should it be handled here?
+        # failed to load config, TODO: why should it be handled here?
         log.exception(e)
-        logger.flush()
+        logger.flush_logging_to_console()
         sys.exit(1)
 
     log_level = logging.getLevelName(options.loglevel.upper())
-    logger.start(os.path.join(manager.config_base, 'flexget.log'), log_level, quiet=options.quiet)
+    logger.start(os.path.join(manager.config_base, 'flexget.log'), log_level)
 
     manager.execute()

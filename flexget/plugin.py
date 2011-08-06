@@ -572,7 +572,7 @@ def load_plugins(parser):
         _parser = None
     took = time.time() - start_time
     plugins_loaded = True
-    return took
+    log.debug('Plugins took %.2f seconds to load' % took)
 
 
 def get_plugins_by_phase(phase):
