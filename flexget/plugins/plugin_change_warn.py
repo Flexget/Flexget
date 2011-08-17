@@ -1,4 +1,5 @@
 import logging
+import sys
 import os
 from flexget.manager import Session
 from flexget.plugin import register_plugin
@@ -53,12 +54,6 @@ class ChangeWarn(object):
             log.critical('Plugin imdb_queue has been replaced by movie_queue, update your config')
             found_deprecated = True
             
-        # complain if beautifulsoup is out of date, affects only subversion users (probably)
-        import BeautifulSoup
-        if [int(part) for part in BeautifulSoup.__version__.split('.')] < [3, 2]:
-            log.critical('BeautifulSoup is too old, please upgrade it!')
-            found_deprecated = True
-
         # prevent useless keywords in root level
         allow = ['feeds', 'presets', 'variables']
         for key in config.iterkeys():
@@ -77,7 +72,6 @@ register_plugin(ChangeWarn, 'change_warn', builtin=True)
 
 # check that no old plugins are in pre-compiled form (pyc)
 try:
-    import sys
     import os.path
     plugin_dirs = (os.path.normpath(sys.path[0] + '/../flexget/plugins/'),
                    os.path.normpath(sys.path[0] + '/../flexget/plugins/input/'))
@@ -140,3 +134,24 @@ try:
 
 except:
     pass
+    
+# complain if beautifulsoup is screwed (subversion users / because of broken build)
+try:
+    import BeautifulSoup
+    if [int(part) for part in BeautifulSoup.__version__.split('.')] < [3, 2]:
+        log.critical('BeautifulSoup is too old, please upgrade it!')
+        sys.exit(1)
+except ImportError:
+    try:
+        from bs4 import BeautifulSoup
+        log.critical('-' * 80)
+        log.critical('IMPORTANT:')
+        log.critical('-' * 80)
+        log.critical('BeautifulSoup 4 (beta) is too new, FlexGet requires BeautifulSoup 3.2 !')
+        log.critical('You must downgrade this python library manually.')
+        log.critical('Try `pip install beautifulsoup==3.2.0` for starters (install pip if it''s missing)')
+        log.critical('Help is available via IRC and Trac help tickets if you get truly lost.')
+        log.critical('-' * 80)
+        sys.exit(1)
+    except ImportError:
+        pass # expected, normal state

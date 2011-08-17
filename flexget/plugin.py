@@ -1,12 +1,6 @@
 """ Plugin Loading & Management.
 """
 
-#
-# NOTE: logging facility does not work currently from this file, this is most likely because logging facility
-# is not yet fully initialized at this point. There was/is flushing system for it, but it is likely broken.
-# Ticket #1113 is somewhat related
-#
-
 from flexget import plugins as plugins_pkg
 import sys
 import os
@@ -523,9 +517,6 @@ def load_plugins_from_dir(basepath, subpkg=None):
         except ImportError, e:
             log.critical('Plugin `%s` failed to import dependencies' % modulename)
             log.exception(e)
-            # TODO: logging does not seem to work from here
-            import traceback
-            traceback.print_exc(file=sys.stdout)
         except Exception, e:
             log.critical('Exception while loading plugin %s' % modulename)
             log.exception(e)
