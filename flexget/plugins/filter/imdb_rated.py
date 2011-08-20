@@ -104,7 +104,7 @@ class FilterImdbRated(object):
             log.info('Added %s new movies' % count)
 
     def on_feed_filter(self, feed):
-        raise PluginError('This plugin no longer works with the imdb, replacement will be implemented soon')
+        raise PluginWarning('This plugin no longer works with the imdb, replacement will be implemented soon')
     
     
         config = feed.config['imdb_rated']
