@@ -1,5 +1,5 @@
 import logging
-from flexget.plugin import register_plugin, PluginError, get_plugin_by_name
+from flexget.plugin import register_plugin, PluginWarning, get_plugin_by_name
 from BeautifulSoup import BeautifulSoup
 from flexget.manager import Base
 from sqlalchemy import Column, Integer, Float, String, DateTime
