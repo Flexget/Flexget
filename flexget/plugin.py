@@ -265,12 +265,12 @@ class PluginInfo(dict):
     def __init__(self, plugin_class, name=None, groups=None, builtin=False, debug=False, api_ver=1):
         """ Register a plugin.
 
-            @param plugin_class: The plugin factory.
-            @param name: Name of the plugin (if not given, default to factory class name in underscore form).
-            @param groups: Groups this plugin belongs to.
-            @param builtin: Auto-activated?
-            @param debug: True if plugin is for debugging purposes.
-            @param api_ver: Signature of callback hooks (1=feed; 2=feed,config).
+        :plugin_class: The plugin factory.
+        :name: Name of the plugin (if not given, default to factory class name in underscore form).
+        :groups: Groups this plugin belongs to.
+        :builtin: Auto-activated?
+        :debug: True if plugin is for debugging purposes.
+        :api_ver: Signature of callback hooks (1=feed; 2=feed,config).
         """
         dict.__init__(self)
 
@@ -593,3 +593,65 @@ def get_plugin_by_name(name, issued_by='???'):
     if not name in plugins:
         raise DependencyError(issued_by=issued_by, missing=name, message='Unknown plugin %s' % name)
     return plugins[name]
+
+
+_excluded_recursively = []
+
+
+def add_plugin_validators(validator, phase=None, group=None, excluded=None, api_ver=2):
+    """
+    :param validator: Instance of validator where other plugin validators are added into. (Eg. list or dict validator)
+    :param phase: Name of phase which plugins are added.
+    :param group: Name of group which plugins are added.
+    :param excluded: List of plugin names to excluded.
+    :param api_ver: Add only api_ver plugins (defaults to 2)
+
+    :returns: dict validator wrapping the newly added validators
+    """
+
+    # NOTE:
+    # I'm not entirely happy how this turned out, since plugins are usually configured in dict context
+    # we must use dict wrapper in there (outer_validator), making this somewhat unsuitable for cases where
+    # list should just accept list of plugins (see discover plugin)
+
+    if excluded is None:
+        excluded = []
+
+    _excluded_recursively.extend(excluded)
+
+    # Get a list of plugins
+    valid_plugins = []
+    if phase is not None:
+        if not isinstance(phase, basestring):
+            raise ValueError('Invalid phase `%s`' % repr(phase))
+        valid_plugins.extend([plugin for plugin in get_plugins_by_phase(phase)
+                              if plugin.api_ver == api_ver and plugin.name not in _excluded_recursively])
+
+    if group is not None:
+        if not isinstance(group, basestring):
+            raise ValueError('Invalid group `%s`' % repr(group))
+        valid_plugins.extend([plugin for plugin in get_plugins_by_group(group)
+                              if plugin.name not in _excluded_recursively])
+
+    # log.debug('valid_plugins: %s' % [plugin.name for plugin in valid_plugins])
+    # log.debug('_excluded_recursively: %s' % _excluded_recursively)
+
+    outer_validator = validator.accept('dict')
+    # Build a dict validator that accepts the available input plugins and their settings
+    for plugin in valid_plugins:
+        # log.debug('adding: %s' % plugin.name)
+        if hasattr(plugin.instance, 'validator'):
+            plugin_validator = plugin.instance.validator()
+            if plugin_validator.name == 'root':
+                # If a root validator is returned, grab the list of child validators
+                outer_validator.valid[plugin.name] = plugin_validator.valid
+            else:
+                outer_validator.valid[plugin.name] = [plugin_validator]
+        else:
+            from flexget.validator import factory
+            outer_validator.valid[plugin.name] = [factory('any')]
+
+    for name in excluded:
+        _excluded_recursively.remove(name)
+
+    return outer_validator

@@ -1,5 +1,5 @@
 import logging
-from flexget.plugin import register_plugin, get_plugins_by_phase, get_plugin_by_name, PluginError
+from flexget.plugin import register_plugin, add_plugin_validators, get_plugin_by_name, PluginError
 
 log = logging.getLogger('inputs')
 
@@ -16,22 +16,8 @@ class PluginInputs(object):
     def validator(self):
         from flexget import validator
         root = validator.factory()
-        input_list = root.accept('list')
-        # Get a list of apiv2 input plugins
-        valid_inputs = [plugin for plugin in get_plugins_by_phase('input')
-                        if plugin.api_ver > 1 and plugin.name != 'inputs']
-        input_validator = input_list.accept('dict')
-        # Build a dict validator that accepts the available input plugins and their settings
-        for plugin in valid_inputs:
-            if hasattr(plugin.instance, 'validator'):
-                validator = plugin.instance.validator()
-                if validator.name == 'root':
-                    # If a root validator is returned, grab the list of child validators
-                    input_validator.valid[plugin.name] = validator.valid
-                else:
-                    input_validator.valid[plugin.name] = [plugin.instance.validator()]
-            else:
-                input_validator.valid[plugin.name] = [validator.factory('any')]
+        inputs = root.accept('list')
+        add_plugin_validators(inputs, phase='input', excluded=['inputs'])
         return root
 
     def on_feed_input(self, feed, config):

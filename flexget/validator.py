@@ -4,7 +4,6 @@ import re
 
 
 class Errors(object):
-
     """Create and hold validator error messages."""
 
     def __init__(self):
@@ -53,7 +52,6 @@ def factory(name='root', **kwargs):
 
 
 class Validator(object):
-
     name = 'validator'
 
     def __init__(self, parent=None, message=None, **kwargs):
@@ -93,7 +91,7 @@ class Validator(object):
     def get_validator(self, name, **kwargs):
         if not self.validators.get(name):
             raise Exception('Asked unknown validator \'%s\'' % name)
-        # print 'returning %s' % name
+            # print 'returning %s' % name
         return self.validators[name](self, **kwargs)
 
     def accept(self, name, **kwargs):
@@ -130,12 +128,12 @@ class Validator(object):
             for rule in rules:
                 if rule.message:
                     self.errors.add(rule.message)
-            # If there are still no errors, list the valid types, as well as what was actually received
+                # If there are still no errors, list the valid types, as well as what was actually received
             if count == self.errors.count():
                 acceptable = [v.name for v in rules]
                 # Make acceptable into an english list, with commas and 'or'
                 acceptable = ', '.join(acceptable[:-2] + ['']) + ' or '.join(acceptable[-2:])
-                self.errors.add('must be a %s value' % acceptable)
+                self.errors.add('must be a `%s` value' % acceptable)
                 if isinstance(item, dict):
                     self.errors.add('got a dict instead of %s' % acceptable)
                 elif isinstance(item, list):
@@ -145,7 +143,9 @@ class Validator(object):
         return False
 
     def __str__(self):
-        return '<%s>' % self.name
+        return '<validator:name=%s>' % self.name
+
+    __repr__ = __str__
 
 
 class RootValidator(Validator):
@@ -533,14 +533,17 @@ class DictValidator(Validator):
             key: name of the key in dict
             required: mark the name as required
 
+        Raises:
+            ValueError if key was not given
         """
+
         if not 'key' in kwargs:
-            raise Exception('%s.accept() must specify key' % self.name)
+            raise ValueError('%s.accept() must specify key' % self.name)
 
         key = kwargs['key']
         if kwargs.get('required', False):
             self.require_key(key)
-        # clean dictvalidator keys from kwargs, so they can be passed to Validator constuctor
+            # clean dict-validator keys from kwargs, so they can be passed to Validator constructor
         for k in ['key', 'required']:
             if k in kwargs:
                 del kwargs[k]
@@ -607,12 +610,13 @@ class DictValidator(Validator):
                 msg = self.reject[key]
                 if msg:
                     from string import Template
+
                     template = Template(msg)
                     self.errors.add(template.safe_substitute(key=key))
                 else:
                     self.errors.add('key \'%s\' is forbidden here' % key)
                 continue
-            # Get rules for key, most specific rules will be used
+                # Get rules for key, most specific rules will be used
             rules = []
             if key in self.valid:
                 # Rules for explicitly allowed keys
@@ -712,7 +716,7 @@ def build_options_validator(options):
 
 
 def complex_test():
-
+    
     def build_list(series):
         """Build series list to series."""
         series.accept('text')
@@ -758,11 +762,11 @@ def complex_test():
 
 
 if __name__ == '__main__':
-
     v = complex_test()
     schema = v.schema()
 
     import yaml
+
     print yaml.dump(schema)
 
     """

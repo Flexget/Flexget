@@ -36,7 +36,7 @@ class PluginSearch(object):
           - piratebay
 
         Notes:
-        - Some url rewriters will use search plugins automaticly if enry url points into a search page.
+        - Some url rewriters will use search plugins automatically if enry url points into a search page.
     """
 
     def validator(self):
@@ -46,7 +46,7 @@ class PluginSearch(object):
         names = []
         for plugin in get_plugins_by_group('search'):
             # If the plugin has a validator, get it's validator and make it a
-            # child of the search plugin's
+            # child of the search plugins
             if not hasattr(plugin.instance, 'validator'):
                 # Create choice validator for plugins without validators later
                 names.append(plugin.name)

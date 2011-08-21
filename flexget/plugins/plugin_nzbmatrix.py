@@ -41,8 +41,7 @@ class NzbMatrix:
         import urllib
         params = self.getparams(feed)
         params['search'] = self.clean(entry['title'])
-        search_url = 'https://api.nzbmatrix.com/v1.1/search.php?' + \
-                   urllib.urlencode(params)
+        search_url = 'https://api.nzbmatrix.com/v1.1/search.php?' + urllib.urlencode(params)
         results = self.nzbid_from_search(search_url, params['search'], entry)
         link_list = []
         if results == None:

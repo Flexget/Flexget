@@ -1,7 +1,7 @@
 import urllib
 import logging
 from plugin_urlrewriting import UrlRewritingError
-from flexget.plugin import *
+from flexget.plugin import register_plugin, internet, PluginWarning
 from flexget.utils.tools import urlopener
 from flexget.utils.soup import get_soup
 import difflib
@@ -9,7 +9,7 @@ import difflib
 log = logging.getLogger('piratebay')
 
 
-class UrlRewritePirateBay:
+class UrlRewritePirateBay(object):
     """PirateBay urlrewriter."""
 
     # urlrewriter API
@@ -113,6 +113,6 @@ class UrlRewritePirateBay:
         #for torrent in torrents:
         #    log.debug('%s link: %s' % (torrent, torrent['link']))
 
-        return [torrent['link'] for torrent in torrents] 
+        return [torrent['link'] for torrent in torrents]
 
 register_plugin(UrlRewritePirateBay, 'piratebay', groups=['urlrewriter', 'search'])
