@@ -165,7 +165,10 @@ class ImdbLookup(object):
         'imdb_languages': lambda movie: [lang.name for lang in movie.languages],
         'imdb_actors': lambda movie: dict((actor.imdb_id, actor.name) for actor in movie.actors),
         'imdb_directors': lambda movie: dict((director.imdb_id, director.name) for director in movie.directors),
-        'imdb_mpaa_rating': 'mpaa_rating'}
+        'imdb_mpaa_rating': 'mpaa_rating',
+        # Generic fields filled by all movie lookup plugins:
+        'movie_name': 'title',
+        'movie_year': 'year'}
 
     def validator(self):
         from flexget import validator

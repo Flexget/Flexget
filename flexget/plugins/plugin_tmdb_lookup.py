@@ -36,7 +36,10 @@ class PluginTmdbLookup(object):
         'tmdb_budget': 'budget',
         'tmdb_revenue': 'revenue',
         'tmdb_homepage': 'homepage',
-        'tmdb_trailer': 'trailer'}
+        'tmdb_trailer': 'trailer',
+        # Generic fields filled by all movie lookup plugins:
+        'movie_name': 'name',
+        'movie_year': 'year'}
 
     def validator(self):
         from flexget import validator

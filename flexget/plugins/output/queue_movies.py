@@ -39,10 +39,12 @@ class QueueMovies(object):
                 continue
             if entry.get('quality'):
                 kwargs['quality'] = entry.get('quality')
+            # Provide movie title if it is already available, to avoid movie_queue doing a lookup
+            kwargs['title'] = entry.get('movie_name') or entry.get('imdb_name') or entry.get('tmdb_name')
             try:
                 queue_add(**kwargs)
             except QueueError, e:
-                feed.fail(entry, 'Error addd movie to queue: %s' % e.message)
+                feed.fail(entry, 'Error adding movie to queue: %s' % e.message)
 
 
 register_plugin(QueueMovies, 'queue_movies', api_ver=2)

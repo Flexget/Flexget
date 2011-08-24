@@ -136,7 +136,7 @@ def parse_what(what, session=None):
 def queue_add(title=None, imdb_id=None, tmdb_id=None, quality='ANY', force=True, session=None):
     """Add an item to the queue with the specified quality"""
 
-    if not title or not imdb_id or not tmdb_id:
+    if not title or not (imdb_id or tmdb_id):
         # We don't have all the info we need to add movie, do a lookup for more info
         result = parse_what(imdb_id or title, session=session)
         title = result['title']
