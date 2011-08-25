@@ -2,6 +2,7 @@ from datetime import datetime
 import logging
 from sqlalchemy import Column, Integer, Boolean, String, Unicode, DateTime
 from flexget.schema import versioned_base
+from flexget.plugin import priority
 
 log = logging.getLogger('queue')
 Base = versioned_base('queue', 0)
@@ -43,6 +44,7 @@ class FilterQueueBase(object):
         """This should return the QueueItem object for the match, if this entry is in the queue."""
         raise NotImplementedError
 
+    @priority(129)
     def on_feed_filter(self, feed, config):
         if config is False:
             return
