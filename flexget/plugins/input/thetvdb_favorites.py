@@ -87,7 +87,8 @@ class InputThetvdbFavorites(object):
                 data = BeautifulStoneSoup(urlopener(url, log))
                 favorite_ids = []
                 for i in data.favorites.findAll('series', recursive=False):
-                    favorite_ids.append(i.string)
+                    if i.string:
+                        favorite_ids.append(i.string)
             except (urllib2.URLError, IOError, AttributeError):
                 import traceback
                 # If there are errors getting the favorites or parsing the xml, fall back on cache
@@ -103,7 +104,7 @@ class InputThetvdbFavorites(object):
                     user_favorites.updated = datetime.now()
                 session.merge(user_favorites)
         if not user_favorites.series_ids:
-            log.info('Didn\'t find any thetvdb.com favorites.')
+            log.warning('Didn\'t find any thetvdb.com favorites.')
             return
 
         # Construct list of entries with our series names
