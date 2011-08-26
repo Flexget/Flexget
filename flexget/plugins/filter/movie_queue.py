@@ -1,5 +1,5 @@
 import logging
-from sqlalchemy import Column, Integer, String, ForeignKey, or_
+from sqlalchemy import Column, Integer, String, ForeignKey, or_, and_
 from flexget import schema
 from flexget.manager import Session
 from flexget.utils import qualities
@@ -145,7 +145,8 @@ def queue_add(title=None, imdb_id=None, tmdb_id=None, quality='ANY', force=True,
     quality = validate_quality(quality)
 
     # check if the item is already queued
-    item = session.query(QueuedMovie).filter(or_(QueuedMovie.imdb_id == imdb_id, QueuedMovie.tmdb_id == tmdb_id)).\
+    item = session.query(QueuedMovie).filter(or_(and_(QueuedMovie.imdb_id != None, QueuedMovie.imdb_id == imdb_id),
+                                                 and_(QueuedMovie.tmdb_id != None, QueuedMovie.tmdb_id == tmdb_id))).\
                                       first()
     if not item:
         item = QueuedMovie(title=title, imdb_id=imdb_id, tmdb_id=tmdb_id, quality=quality, immortal=force)
