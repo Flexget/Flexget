@@ -64,13 +64,13 @@ class AppleTrailers(InputRSS):
             page = urlopener(inc_url, log)
 
             soup = get_soup(page)
-            links = soup.findAll('a', attrs={'class': 'target-quicktimeplayer', 'href': re.compile(r'_480p\.mov$')})
+            links = soup.findAll('a', attrs={'class': 'target-quicktimeplayer', 'href': re.compile(r'_h?480p\.mov$')})
             for link in links:
                 url = link.get('href')
                 url = url[:url.rfind('_')]
                 quality = self.quality.lower()
 
-                if 'ipod' == quality:
+                if quality == 'ipod':
                     url += '_i320.m4v'
                 else:
                     url += '_h' + quality + '.mov'
