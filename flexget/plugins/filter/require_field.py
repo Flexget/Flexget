@@ -26,7 +26,7 @@ class FilterRequireField(object):
             config = [config]
         for entry in feed.entries:
             for field in config:
-                if field not in entry or entry[field] == '':
+                if not entry.get(field):
                     feed.reject(entry, 'Required field %s is not present' % field)
                     break
 
