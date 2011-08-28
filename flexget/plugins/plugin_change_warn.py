@@ -38,6 +38,10 @@ class ChangeWarn(object):
             log.critical('emit_imdb_queue was renamed to emit_movie_queue, please update your config')
             found_deprecated = True
 
+        if 'imdb_watchlist' in feed.config:
+            log.critical('imdb_watchlist was renamed to more generic imdb_list, please update your config')
+            found_deprecated = True
+
         if 'transmissionrpc' in feed.config:
             log.critical('transmissionrpc was renamed to transmission')
             found_deprecated = True
@@ -53,7 +57,7 @@ class ChangeWarn(object):
         if 'imdb_queue' in feed.config:
             log.critical('Plugin imdb_queue has been replaced by movie_queue, update your config')
             found_deprecated = True
-            
+
         # prevent useless keywords in root level
         allow = ['feeds', 'presets', 'variables']
         for key in config.iterkeys():
@@ -81,10 +85,10 @@ try:
 
             if name.startswith('module'):
                 require_clean = True
-            
+
             if name == 'csv.pyc':
                 require_clean = True
-                
+
             if 'resolver' in name:
                 require_clean = True
 
@@ -134,7 +138,7 @@ try:
 
 except:
     pass
-    
+
 # complain if beautifulsoup is screwed (subversion users / because of broken build)
 try:
     import BeautifulSoup

@@ -716,7 +716,7 @@ def build_options_validator(options):
 
 
 def complex_test():
-    
+
     def build_list(series):
         """Build series list to series."""
         series.accept('text')
