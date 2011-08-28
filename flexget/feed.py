@@ -39,6 +39,9 @@ class LazyField(object):
     def __str__(self):
         return str(self())
 
+    def __repr__(self):
+        return '<LazyField(field=%s)>' % self.field
+
     def __unicode__(self):
         return unicode(self())
 
@@ -95,7 +98,7 @@ class Entry(dict):
                 value = None
 
         try:
-            log.trace('ENTRY %s = %r' % (key, value))
+            log.trace('ENTRY SET: %s = %r' % (key, value))
         except Exception, e:
             log.debug('trying to debug key `%s` value threw exception: %s' % (key, e))
 
@@ -105,6 +108,7 @@ class Entry(dict):
         """Supports lazy loading of fields. If a stored value is a LazyField, call it, return the result."""
         result = dict.__getitem__(self, key)
         if isinstance(result, LazyField):
+            log.trace('evaluating lazy field %s' % key)
             return result()
         else:
             return result

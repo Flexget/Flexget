@@ -174,8 +174,7 @@ class ImdbLookup(object):
         from flexget import validator
         return validator.factory('boolean')
 
-    @priority(100)
-    def on_feed_filter(self, feed, config):
+    def on_feed_metainfo(self, feed, config):
         if not config:
             return
         for entry in feed.entries:
