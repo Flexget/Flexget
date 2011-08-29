@@ -3,7 +3,7 @@ import sys
 import logging
 import yaml
 import atexit
-from datetime import datetime
+from datetime import datetime, timedelta
 import sqlalchemy
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
@@ -15,6 +15,7 @@ log = logging.getLogger('manager')
 Base = declarative_base()
 Session = sessionmaker()
 manager = None
+DB_CLEANUP_INTERVAL = timedelta(days=1)
 
 
 def useExecLogging(func):
@@ -540,6 +541,19 @@ class Manager(object):
                 return
 
         self.process_end(feeds=run_feeds)
+
+        # Fire the db cleanup periodically
+        from flexget.utils.simple_persistence import SimplePersistence
+        persist = SimplePersistence('manager')
+        if not persist.get('last_cleanup') or persist['last_cleanup'] < datetime.now() - DB_CLEANUP_INTERVAL:
+            log.info('Running database cleanup.')
+            session = Session()
+            fire_event('manager.db_cleanup', session)
+            session.commit()
+            session.close()
+            persist['last_cleanup'] = datetime.now()
+        else:
+            log.debug('Not running db cleanup, last run %s' % persist.get('last_cleanup'))
 
         fire_event('manager.execute.completed', self)
 

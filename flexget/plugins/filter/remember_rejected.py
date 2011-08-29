@@ -1,9 +1,10 @@
 import hashlib
 import logging
-from datetime import datetime
+from datetime import datetime, timedelta
 from sqlalchemy import Column, Integer, String, Unicode, DateTime, ForeignKey, and_
 from sqlalchemy.orm import relation
 from flexget import schema
+from flexget.event import event
 from flexget.manager import Session
 from flexget.plugin import register_plugin, register_parser_option, register_feed_phase
 from flexget.utils.sqlalchemy_utils import table_columns, drop_tables, table_add_column
@@ -126,6 +127,13 @@ class FilterRememberRejected(object):
                                                    rejected_by=feed.current_plugin, reason=kwargs.get('reason')))
         feed.session.merge(remember_feed)
         feed.session.flush()
+
+
+@event('manager.db_cleanup')
+def db_cleanup(session):
+    # Remove entries older than 30 days
+    result = session.query(RememberEntry).filter(RememberEntry.added < datetime.now() - timedelta(days=30)).delete()
+    log.verbose('Removed %d entries from remember rejected table.' % result)
 
 
 register_plugin(FilterRememberRejected, 'remember_rejected', builtin=True, api_ver=2)
