@@ -50,7 +50,7 @@ class ImdbList(object):
             if not row or row[0] == 'position':
                 # Don't use blank rows or the headings row
                 continue
-            entries.append(Entry(title=row[6], url=make_url(row[1]), imdb_id=row[1]))
+            entries.append(Entry(title=row[6], url=make_url(row[1]), imdb_id=row[1], imdb_name=row[6]))
         return entries
 
 

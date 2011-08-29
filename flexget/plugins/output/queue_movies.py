@@ -40,7 +40,7 @@ class QueueMovies(object):
             if entry.get('quality'):
                 kwargs['quality'] = entry.get('quality')
             # Provide movie title if it is already available, to avoid movie_queue doing a lookup
-            kwargs['title'] = entry.get('movie_name') or entry.get('imdb_name') or entry.get('tmdb_name')
+            kwargs['title'] = entry.get('imdb_name') or entry.get('tmdb_name') or entry.get('movie_name')
             try:
                 queue_add(**kwargs)
             except QueueError, e:
