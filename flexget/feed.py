@@ -62,6 +62,18 @@ class Entry(dict):
             kwargs['title'] = args[0]
             kwargs['url'] = args[1]
             args = []
+
+        # consturctor escapes our unicode enforcement in __setitem__
+        if kwargs:
+            updated = {}
+            for key, value in kwargs.iteritems():
+                if isinstance(value, str):
+                    try:
+                        updated[key] = unicode(value)
+                    except UnicodeDecodeError:
+                        raise EntryUnicodeError(key, value)
+            kwargs.update(updated)
+
         dict.__init__(self, *args, **kwargs)
         self.trace = []
         self.snapshots = {}
@@ -142,7 +154,7 @@ class Entry(dict):
                 # If it is not a lazy field, and isn't already populated, make it a lazy field
                 self[field] = LazyField(self, field, func)
 
-    def deregister_lazy_fields(self, fields, func):
+    def unregister_lazy_fields(self, fields, func):
         """Clears given lookup function from a list of fields."""
         for field in fields:
             if self.is_lazy(field):

@@ -30,8 +30,8 @@ class MetainfoQuality(object):
         return order.index(x[0]) if x[0] in order else len(order)
 
     def get_quality(self, entry):
-        for field_name, field_value in sorted(entry.items(),
-                                              key=self.field_order):
+        quality, field_name = None, None
+        for field_name, field_value in sorted(entry.items(), key=self.field_order):
             if not isinstance(field_value, basestring):
                 continue
             # ignore some fields ...
@@ -41,9 +41,12 @@ class MetainfoQuality(object):
             if quality > qualities.UNKNOWN:
                 # if we find a quality in this field, stop searching
                 break
+        if quality is None or field_name is None:
+            return entry
         entry['quality'] = quality
-        log.trace('Found quality %s (%s) for %s from field %s' % \
-            (entry['quality'], quality, entry['title'], field_name))
+        if quality is not qualities.UNKNOWN:
+            log.trace('Found quality %s (%s) for %s from field %s' % \
+                (entry['quality'], quality, entry['title'], field_name))
         return entry
 
 register_plugin(MetainfoQuality, 'metainfo_quality', builtin=True)

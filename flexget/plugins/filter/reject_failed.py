@@ -1,14 +1,17 @@
 import logging
 from datetime import datetime
 from sqlalchemy import Column, Integer, String, Unicode, DateTime
+from sqlalchemy.schema import Index, MetaData
 from flexget import schema
 from flexget.plugin import register_plugin, register_parser_option, priority
 from flexget.manager import Session
 from flexget.utils.tools import console
 from flexget.utils.sqlalchemy_utils import table_add_column
 
+SCHEMA_VER = 1
+
 log = logging.getLogger('failed')
-Base = schema.versioned_base('failed', 0)
+Base = schema.versioned_base('failed', SCHEMA_VER)
 
 
 @schema.upgrade('failed')
@@ -17,6 +20,13 @@ def upgrade(ver, session):
         # add count column
         table_add_column('failed', 'count', Integer, session, default=1)
         ver = 0
+    if ver == 0:
+        # define an index
+        log.info('Adding database index ...')
+        meta = MetaData(bind=session.connection(), reflect=True)
+        failed = meta.tables['failed']
+        Index('failed_title_url', failed.c.title, failed.c.url).create()
+        ver = 1
     return ver
 
 
@@ -36,6 +46,10 @@ class FailedEntry(Base):
 
     def __str__(self):
         return '<Failed(title=%s)>' % self.title
+
+# create indexes, used when creating tables
+columns = Base.metadata.tables['failed'].c
+Index('failed_title_url', columns.title, columns.url)
 
 
 class PluginFailed(object):

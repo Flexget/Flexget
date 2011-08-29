@@ -8,7 +8,7 @@ class TestLazyFields(object):
 
         def lazy_a(entry, field):
             if field == 'a_fail':
-                entry.deregister_lazy_fields(['ab_field', 'a_field', 'a_fail'], lazy_a)
+                entry.unregister_lazy_fields(['ab_field', 'a_field', 'a_fail'], lazy_a)
                 return None
             for f in ['a_field', 'ab_field']:
                 entry[f] = 'a'

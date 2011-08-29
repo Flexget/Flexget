@@ -101,9 +101,9 @@ class PluginThetvdbLookup(object):
             entry.update_using_map(self.series_map, series)
         except LookupError, e:
             log.debug('Error looking up tvdb series information for %s: %s' % (entry['title'], e.message))
-            entry.deregister_lazy_fields(self.series_map, self.lazy_series_lookup)
+            entry.unregister_lazy_fields(self.series_map, self.lazy_series_lookup)
             # Also clear episode fields, since episode lookup cannot succeed without series lookup
-            entry.deregister_lazy_fields(self.episode_map, self.lazy_episode_lookup)
+            entry.unregister_lazy_fields(self.episode_map, self.lazy_episode_lookup)
 
         return entry[field]
 
@@ -114,7 +114,7 @@ class PluginThetvdbLookup(object):
             entry.update_using_map(self.episode_map, episode)
         except LookupError, e:
             log.debug('Error looking up tvdb episode information for %s: %s' % (entry['title'], e.message))
-            entry.deregister_lazy_fields(self.episode_map, self.lazy_episode_lookup)
+            entry.unregister_lazy_fields(self.episode_map, self.lazy_episode_lookup)
 
         return entry[field]
 
