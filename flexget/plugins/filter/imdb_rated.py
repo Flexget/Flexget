@@ -117,7 +117,7 @@ class FilterImdbRated(object):
             # if no imdb_url perform lookup
             if not 'imdb_url' in entry:
                 try:
-                    get_plugin_by_name('imdb_lookup').instance.lookup(feed, entry)
+                    get_plugin_by_name('imdb_lookup').instance.lookup(entry)
                 except PluginError:
                     pass # ignore imdb lookup failures
 

@@ -21,7 +21,7 @@ class FilterImdbRequired(object):
     def on_feed_filter(self, feed):
         for entry in feed.entries:
             try:
-                get_plugin_by_name('imdb_lookup').instance.lookup(feed, entry)
+                get_plugin_by_name('imdb_lookup').instance.lookup(entry)
             except PluginError:
                 feed.reject(entry, 'imdb required')
             if not 'imdb_url' in entry:

@@ -87,7 +87,7 @@ class FilterProperMovies(object):
         for entry in feed.entries:
             if 'imdb_id' not in entry:
                 try:
-                    imdb_lookup.lookup(feed, entry, search_allowed=True)
+                    imdb_lookup.lookup(entry)
                 except PluginError, pe:
                     log_once(pe.value)
                     continue

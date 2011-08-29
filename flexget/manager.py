@@ -15,7 +15,7 @@ log = logging.getLogger('manager')
 Base = declarative_base()
 Session = sessionmaker()
 manager = None
-DB_CLEANUP_INTERVAL = timedelta(days=1)
+DB_CLEANUP_INTERVAL = timedelta(days=7)
 
 
 def useExecLogging(func):

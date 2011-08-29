@@ -10,14 +10,14 @@
 """
 
 import logging
-from flexget.event import event
-from flexget.manager import Base
-from flexget.plugin import register_plugin, priority, register_parser_option
+from datetime import datetime, timedelta
 from sqlalchemy import Column, Integer, String, DateTime, Unicode, asc, or_
 from sqlalchemy.schema import ForeignKey
 from sqlalchemy.orm import relation
-from datetime import datetime
 from flexget.manager import Session
+from flexget.event import event
+from flexget.manager import Base
+from flexget.plugin import register_plugin, priority, register_parser_option
 
 log = logging.getLogger('seen')
 
@@ -355,6 +355,14 @@ class FilterSeen(object):
             log.debug("Forgotten '%s' (%s fields)" % (title, len(se.fields)))
             feed.session.delete(se)
             return True
+
+
+@event('manager.db_cleanup')
+def db_cleanup(session):
+    # Remove seen fields over a year old
+    result = session.query(SeenField).filter(SeenField.added < datetime.now() - timedelta(days=365)).delete()
+    if result:
+        log.verbose('Removed %d seen fields older than 1 year.' % result)
 
 
 register_plugin(FilterSeen, 'seen', builtin=True, api_ver=2)

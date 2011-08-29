@@ -133,7 +133,8 @@ class FilterRememberRejected(object):
 def db_cleanup(session):
     # Remove entries older than 30 days
     result = session.query(RememberEntry).filter(RememberEntry.added < datetime.now() - timedelta(days=30)).delete()
-    log.verbose('Removed %d entries from remember rejected table.' % result)
+    if result:
+        log.verbose('Removed %d entries from remember rejected table.' % result)
 
 
 register_plugin(FilterRememberRejected, 'remember_rejected', builtin=True, api_ver=2)

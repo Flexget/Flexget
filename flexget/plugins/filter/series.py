@@ -1030,8 +1030,17 @@ class FilterSeries(SeriesPlugin, FilterSeriesBase):
             else:
                 log.debug('%s is not a series' % entry['title'])
 
-# Register plugin
+                
+@event('manager.db_cleanup')
+def db_cleanup(session):
+    # Clean up old undownloaded releases
+    result = session.query(Release).filter(Release.downloaded == False).\
+                                    filter(Release.first_seen < datetime.now() - timedelta(days=120)).delete()
+    if result:
+        log.verbose('Removed %d undownloaded episode releases.' % result)
 
+
+# Register plugin
 register_plugin(FilterSeries, 'series')
 register_parser_option('--stop-waiting', action='store', dest='stop_waiting', default='',
                        metavar='NAME', help='Stop timeframe for a given series.')

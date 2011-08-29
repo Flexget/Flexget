@@ -90,7 +90,7 @@ class FilterImdb(object):
             force_accept = False
 
             try:
-                lookup(feed, entry)
+                lookup(entry)
             except PluginError, e:
                 # logs skip message once trough log_once (info) and then only when ran from cmd line (w/o --cron)
                 msg = 'Skipping %s because of an error: %s' % (entry['title'], e.value)

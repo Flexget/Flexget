@@ -5,7 +5,7 @@ from sqlalchemy import Table, Column, Integer, Float, String, Unicode, Boolean, 
 from sqlalchemy.schema import ForeignKey
 from sqlalchemy.orm import relation, joinedload_all
 from flexget import schema
-from flexget.plugin import register_plugin, priority, internet, PluginError, PluginWarning
+from flexget.plugin import register_plugin, internet, PluginError
 from flexget.manager import Session
 from flexget.utils.log import log_once
 from flexget.utils.imdb import ImdbSearch, ImdbParser, extract_id, make_url
@@ -178,23 +178,30 @@ class ImdbLookup(object):
         if not config:
             return
         for entry in feed.entries:
-            try:
-                self.lookup(feed, entry)
-            except PluginError, e:
-                log_once(e.value.capitalize(), logger=log)
-            except PluginWarning, e:
-                log_once(e.value.capitalize(), logger=log)
+            entry.register_lazy_fields(self.field_map, self.lazy_loader)
+
+    def lazy_loader(self, entry, field):
+        """Does the lookup for this entry and populates the entry fields."""
+        try:
+            self.lookup(entry)
+        except PluginError, e:
+            log_once(e.value.capitalize(), logger=log)
+            # Set all of our fields to None if the lookup failed
+            entry.unregister_lazy_fields(self.field_map, self.lazy_loader)
+        return entry[field]
 
     @internet(log)
-    def lookup(self, feed, entry, search_allowed=True):
+    def lookup(self, entry, search_allowed=True):
         """Perform imdb lookup for entry.
         Raises PluginError with failure reason."""
 
-        if 'imdb_url' in entry:
+        from flexget.manager import manager
+
+        if entry.get('imdb_url', lazy=False):
             log.debug('No title passed. Lookup for %s' % entry['imdb_url'])
-        elif 'imdb_id' in entry:
+        elif entry.get('imdb_id', lazy=False):
             log.debug('No title passed. Lookup for %s' % entry['imdb_id'])
-        elif 'title' in entry:
+        elif entry.get('title', lazy=False):
             log.debug('lookup for %s' % entry['title'])
         else:
             raise PluginError('looking up IMDB for entry failed, no title, imdb_url or imdb_id passed.')
@@ -205,17 +212,17 @@ class ImdbLookup(object):
         try:
             # entry sanity checks
             for field in ['imdb_votes', 'imdb_score']:
-                if field in entry:
+                if entry.get(field, lazy=False):
                     value = entry[field]
                     if not isinstance(value, (int, float)):
                         raise PluginError('Entry field %s should be a number!' % field)
 
             # if imdb_id is included, build the url.
-            if 'imdb_id' in entry and not 'imdb_url' in entry:
+            if entry.get('imdb_id', lazy=False) and not entry.get('imdb_url', lazy=False):
                 entry['imdb_url'] = make_url(entry['imdb_id'])
 
             # make sure imdb url is valid
-            if 'imdb_url' in entry:
+            if entry.get('imdb_url', lazy=False):
                 imdb_id = extract_id(entry['imdb_url'])
                 if imdb_id:
                     entry['imdb_url'] = make_url(imdb_id)
@@ -225,11 +232,11 @@ class ImdbLookup(object):
 
             # no imdb_url, check if there is cached result for it or if the
             # search is known to fail
-            if not 'imdb_url' in entry:
+            if not entry.get('imdb_url', lazy=False):
                 result = session.query(SearchResult).\
                          filter(SearchResult.title == entry['title']).first()
                 if result:
-                    if result.fails and not feed.manager.options.retry:
+                    if result.fails and not manager.options.retry:
                         # this movie cannot be found, not worth trying again ...
                         log.debug('%s will fail lookup' % entry['title'])
                         raise PluginError('Title `%s` lookup fails' % entry['title'])
@@ -239,7 +246,7 @@ class ImdbLookup(object):
                             entry['imdb_url'] = result.url
 
             # no imdb url, but information required, try searching
-            if not 'imdb_url' in entry and search_allowed:
+            if not entry.get('imdb_url', lazy=False) and search_allowed:
                 log.verbose('Searching from imdb `%s`' % entry['title'])
 
                 take_a_break = True
@@ -334,7 +341,7 @@ class ImdbLookup(object):
                     raise PluginError('UnicodeDecodeError')
                 except ValueError, e:
                     # TODO: might be a little too broad catch, what was this for anyway? ;P
-                    if feed.manager.options.debug:
+                    if manager.options.debug:
                         log.exception(e)
                     raise PluginError('Invalid parameter: %s' % entry['imdb_url'], log)
 
@@ -346,8 +353,8 @@ class ImdbLookup(object):
 
             # give imdb a little break between requests (see: http://flexget.com/ticket/129#comment:1)
             if (take_a_break and
-                not feed.manager.options.debug and
-                not feed.manager.unit_test):
+                not manager.options.debug and
+                not manager.unit_test):
                 import time
                 time.sleep(3)
         finally:

@@ -75,7 +75,7 @@ class FilterExistsMovie(object):
                     fake_entry['title'] = item
                     fake_entry['url'] = 'file://%s/%s' % (path, item)
                     try:
-                        imdb_lookup(feed, fake_entry)
+                        imdb_lookup(fake_entry)
                         imdb_url = fake_entry['imdb_url']
                         if imdb_url in imdb_urls:
                             log.trace('duplicate %s' % fake_entry['title'])
@@ -92,7 +92,7 @@ class FilterExistsMovie(object):
             count_entries += 1
             if not 'imdb_url' in entry:
                 try:
-                    imdb_lookup(feed, entry)
+                    imdb_lookup(entry)
                 except PluginError, e:
                     log.trace('entry %s imdb failed (%s)' % (entry['title'], e.value))
                     incompatible_entries += 1

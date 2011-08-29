@@ -37,7 +37,7 @@ class EmitIMDBQueue(object):
                 log.debug('queue contains url instead of title')
                 try:
                     get_plugin_by_name('imdb_lookup').instance.\
-                        lookup(feed, entry)
+                        lookup(entry)
                 except PluginError:
                     log.error('Found imdb url in imdb queue, '\
                               'but lookup failed: %s' % entry['imdb_url'])
