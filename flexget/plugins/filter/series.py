@@ -1,5 +1,6 @@
 import logging
 import re
+import time
 from copy import copy
 from datetime import datetime, timedelta
 from sqlalchemy import Column, Integer, String, Unicode, DateTime, Boolean, desc, select, update
@@ -461,7 +462,7 @@ class FilterSeries(SeriesPlugin, FilterSeriesBase):
     """
         Intelligent filter for tv-series.
 
-        http://flexget.com/wiki/FilterSeries
+        http://flexget.com/wiki/Plugins/series
     """
 
     def __init__(self):
@@ -549,14 +550,14 @@ class FilterSeries(SeriesPlugin, FilterSeriesBase):
             import time
             start_time = time.clock()
 
-            self.parse_series(feed, series_name, series_config)
+            self.parse_series(feed.session, feed.entries, series_name, series_config)
             took = time.clock() - start_time
             log.trace('parsing %s took %s' % (series_name, took))
 
     def on_feed_filter(self, feed):
         """Filter series"""
         # Parsing was done in metainfo phase, create the dicts to pass to process_series from the feed entries
-        # key: series (episode) identifier ie. S01E02
+        # key: series episode identifier ie. S01E02
         # value: seriesparser
         found_series = {}
         guessed_series = {}
@@ -610,9 +611,14 @@ class FilterSeries(SeriesPlugin, FilterSeriesBase):
             took = time.clock() - start_time
             log.trace('processing %s took %s' % (series_name, took))
 
-    def parse_series(self, feed, series_name, config):
+    def parse_series(self, session, entries, series_name, config):
         """
-            Search for :series_name: and populate all series_* fields in entries when successfully parsed
+        Search for :series_name: and populate all series_* fields in entries when successfully parsed
+
+        :param session: SQLAlchemy session
+        :param entries: List of entries to process
+        :param series_name: Series name which is being processed
+        :param config: Series config being processed
         """
 
         def get_as_array(config, key):
@@ -630,7 +636,7 @@ class FilterSeries(SeriesPlugin, FilterSeriesBase):
 
         if identified_by == 'auto':
             # determine if series is known to be in season, episode format or identified by id
-            identified_by = self.auto_identified_by(feed.session, series_name)
+            identified_by = self.auto_identified_by(session, series_name)
             if identified_by != 'auto':
                 log.debug('identified_by set to \'%s\' based on series history' % identified_by)
 
@@ -642,32 +648,31 @@ class FilterSeries(SeriesPlugin, FilterSeriesBase):
                               strict_name=config.get('exact', False),
                               allow_groups=get_as_array(config, 'from_group'))
 
-        for entry in feed.entries:
+        for entry in entries:
+            # skip processed entries
             if entry.get('series_parser') and entry['series_parser'].valid and not entry.get('series_guessed') and \
                entry['series_parser'].name.lower() != series_name.lower():
-                # This was detected as another series, we can skip it.
                 continue
-            else:
-                for field in ['title', 'description']:
-                    data = entry.get(field)
-                    # skip invalid fields
-                    if not isinstance(data, basestring) or not data:
-                        continue
-                    # in case quality will not be found from title, set it from entry['quality'] if available
-                    quality = None
-                    if entry.get('quality', qualities.UNKNOWN) > qualities.UNKNOWN:
-                        log.trace('Setting quality %s from entry field to parser' % entry['quality'])
-                        quality = entry['quality']
-                    try:
-                        parser.parse(data, field=field, quality=quality)
-                    except ParseWarning, pw:
-                        from flexget.utils.log import log_once
-                        log_once(pw.value, logger=log)
-
-                    if parser.valid:
-                        break
-                else:
+            # scan from fields
+            for field in ('title', 'description'):
+                data = entry.get(field)
+                # skip invalid fields
+                if not isinstance(data, basestring) or not data:
                     continue
+                # in case quality will not be found from title, set it from entry['quality'] if available
+                quality = None
+                if entry.get('quality', qualities.UNKNOWN) > qualities.UNKNOWN:
+                    log.trace('Setting quality %s from entry field to parser' % entry['quality'])
+                    quality = entry['quality']
+                try:
+                    parser.parse(data, field=field, quality=quality)
+                except ParseWarning, pw:
+                    log_once(pw.value, logger=log)
+
+                if parser.valid:
+                    break
+            else:
+                continue
 
             log.debug('%s detected as %s, field: %s' % (entry['title'], parser, parser.field))
             entry['series_parser'] = copy(parser)
@@ -684,12 +689,19 @@ class FilterSeries(SeriesPlugin, FilterSeriesBase):
                 entry['series_season'] = parser.season
                 entry['series_episode'] = parser.episode
             else:
-                import time
                 entry['series_season'] = time.gmtime().tm_year
             entry['series_id'] = parser.identifier
 
     def process_series(self, feed, series, series_name, config):
-        """Accept or Reject episode from available releases, or postpone choosing."""
+        """
+        Accept or Reject episode from available releases, or postpone choosing.
+
+        :param feed: Current Feed
+        :param series: List of SeriesParser instances (?)
+        :param series_name: Name of series being processed
+        :param config: Series configuration
+        """
+
         for eps in series.itervalues():
             if not eps:
                 continue
@@ -765,8 +777,7 @@ class FilterSeries(SeriesPlugin, FilterSeriesBase):
     def process_propers(self, feed, config, eps):
         """Accepts needed propers. Nukes episodes from which there exists proper.
 
-        Returns:
-            A list of episodes to continue processing.
+        :returns: A list of episodes to continue processing.
         """
 
         # Return if there are no propers for this episode
@@ -833,8 +844,7 @@ class FilterSeries(SeriesPlugin, FilterSeriesBase):
     def process_downloaded(self, feed, eps):
         """Rejects all episodes (regardless of quality) if this episode has been downloaded.
 
-        Returns:
-            True when episode has already been downloaded
+        :returns: True when episode has already been downloaded
         """
 
         downloaded_releases = self.get_downloaded(feed.session, eps[0].name, eps[0].identifier)
@@ -859,8 +869,7 @@ class FilterSeries(SeriesPlugin, FilterSeriesBase):
     def process_min_max_quality(self, config, eps):
         """Filters eps that do not fall between min_quality and max_quality.
 
-        Returns:
-            A list of eps that are in the acceptable range
+        :returns: A list of eps that are in the acceptable range
         """
 
         min = qualities.get(config.get('min_quality', ''), qualities.UNKNOWN)
@@ -878,7 +887,10 @@ class FilterSeries(SeriesPlugin, FilterSeriesBase):
         return result
 
     def process_watched(self, feed, config, eps):
-        """Rejects all episodes older than defined in watched, returns True when this happens."""
+        """Rejects all episodes older than defined in watched.
+
+        :returns: True when rejected because of watched
+        """
 
         from sys import maxint
         best = eps[0]
