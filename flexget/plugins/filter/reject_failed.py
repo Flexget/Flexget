@@ -25,7 +25,7 @@ def upgrade(ver, session):
         log.info('Adding database index ...')
         meta = MetaData(bind=session.connection(), reflect=True)
         failed = meta.tables['failed']
-        Index('failed_title_url', failed.c.title, failed.c.url).create()
+        Index('failed_title_url', failed.c.title, failed.c.url, failed.c.count).create()
         ver = 1
     return ver
 
@@ -49,7 +49,7 @@ class FailedEntry(Base):
 
 # create indexes, used when creating tables
 columns = Base.metadata.tables['failed'].c
-Index('failed_title_url', columns.title, columns.url)
+Index('failed_title_url', columns.title, columns.url, columns.count)
 
 
 class PluginFailed(object):
