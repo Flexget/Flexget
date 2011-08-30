@@ -13,7 +13,9 @@ log = logging.getLogger('deluge')
 # Deluge does not install to python system on Windows, add the install directory to sys.path if it is found
 if sys.platform.startswith('win'):
     deluge_dir = os.path.join(os.environ['ProgramFiles'], 'Deluge')
+    log.debug('Looking for deluge install in %s' % deluge_dir)
     if os.path.isdir(deluge_dir):
+        log.debug('Found deluge install in %s adding to sys.path' % deluge_dir)
         sys.path.append(deluge_dir)
         for item in os.listdir(deluge_dir):
             if item.endswith('.egg'):
