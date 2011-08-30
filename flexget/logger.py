@@ -117,6 +117,8 @@ def initialize(unit_test=False):
         logger.setLevel(logging.DEBUG)
     elif '--debug-trace' in sys.argv:
         logger.setLevel(TRACE)
+    elif '--cron' not in sys.argv:
+        logger.setLevel(VERBOSE)
     else:
         logger.setLevel(logging.INFO)
 
