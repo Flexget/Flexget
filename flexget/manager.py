@@ -75,6 +75,10 @@ class Manager(object):
 
         self.initialize()
 
+        # cannot be imported at module level because of circular references
+        from flexget.utils.simple_persistence import SimplePersistence
+        self.persist = SimplePersistence('manager')
+
         log.debug('sys.defaultencoding: %s' % sys.getdefaultencoding())
         log.debug('sys.getfilesystemencoding: %s' % sys.getfilesystemencoding())
         log.debug('os.path.supports_unicode_filenames: %s' % os.path.supports_unicode_filenames)
@@ -97,8 +101,9 @@ class Manager(object):
         self.create_feeds()
 
     def setup_yaml(self):
+        """ Set up the yaml loader to return unicode objects for strings by default
+        """
 
-        # Set up the yaml loader to return unicode objects for strings by default
         def construct_yaml_str(self, node):
             # Override the default string handling function
             # to always return unicode objects
@@ -212,7 +217,6 @@ class Manager(object):
         """Dumps current config to yaml config file"""
         config_file = file(os.path.join(self.config_base, self.config_name) + '.yml', 'w')
         try:
-            yaml.safe_dump
             config_file.write(yaml.dump(self.config, default_flow_style=False))
         finally:
             config_file.close()
@@ -522,7 +526,6 @@ class Manager(object):
             disable_phases.extend(['download', 'output'])
 
         fire_event('manager.execute.started', self)
-
         self.process_start(feeds=run_feeds)
 
         for feed in sorted(run_feeds):
@@ -541,24 +544,25 @@ class Manager(object):
                 return
 
         self.process_end(feeds=run_feeds)
+        self.db_cleanup()
+        fire_event('manager.execute.completed', self)
 
-        # Fire the db cleanup periodically
-        from flexget.utils.simple_persistence import SimplePersistence
-        persist = SimplePersistence('manager')
-        if not persist.get('last_cleanup') or persist['last_cleanup'] < datetime.now() - DB_CLEANUP_INTERVAL:
+    def db_cleanup(self):
+        """ Perform database cleanup if cleanup interval has been met.
+        """
+        if not self.persist.get('last_cleanup') or self.persist['last_cleanup'] < datetime.now() - DB_CLEANUP_INTERVAL:
             log.info('Running database cleanup.')
             session = Session()
             fire_event('manager.db_cleanup', session)
             session.commit()
             session.close()
-            persist['last_cleanup'] = datetime.now()
+            self.persist['last_cleanup'] = datetime.now()
         else:
-            log.debug('Not running db cleanup, last run %s' % persist.get('last_cleanup'))
-
-        fire_event('manager.execute.completed', self)
+            log.debug('Not running db cleanup, last run %s' % self.persist.get('last_cleanup'))
 
     def shutdown(self):
-        """Application is being exited"""
+        """ Application is being exited
+        """
         if not self.unit_test: # don't scroll "nosetests" summary results when logging is enabled
             log.debug('Shutting down')
         self.engine.dispose()

@@ -18,9 +18,10 @@ from flexget.manager import Session
 from flexget.plugin import (register_plugin, register_parser_option, get_plugin_by_name, get_plugin_keywords,
     PluginWarning, PluginError, DependencyError, priority)
 
+SCHEMA_VER = 2
 
 log = logging.getLogger('series')
-Base = schema.versioned_base('series', 1)
+Base = schema.versioned_base('series', 2)
 
 
 @schema.upgrade('series')
@@ -55,17 +56,47 @@ def upgrade(ver, session):
             session.execute(update(release_table, release_table.c.episode_id == row['id'],
                                    {'first_seen': row['first_seen']}))
         ver = 1
+    if ver == 1:
+        log.info('Adding `identified_by` column to series table.')
+        table_add_column('series', 'identified_by', String, session)
+        ver = 2
 
     return ver
 
 
+@event('manager.db_cleanup')
+def db_cleanup(session):
+    # Clean up old undownloaded releases
+    result = session.query(Release).filter(Release.downloaded == False).\
+                                    filter(Release.first_seen < datetime.now() - timedelta(days=120)).delete()
+    if result:
+        log.verbose('Removed %d undownloaded episode releases.' % result)
+
+
+@event('manager.startup')
+def repair(manager):
+    """Perform database repairing and upgrading at startup."""
+    if not manager.persist.get('series_repaired', False):
+        session = Session()
+        # For some reason at least I have some releases in database which don't belong to any episode.
+        for release in session.query(Release).filter(Release.episode == None).all():
+            log.info('Purging orphan release %s from database' % release.title)
+            session.delete(release)
+        session.commit()
+        manager.persist['series_repaired'] = True
+
+
 class Series(Base):
+
+    """ Name is handled case insensitively transparently
+    """
 
     __tablename__ = 'series'
 
     id = Column(Integer, primary_key=True)
     _name = Column('name', Unicode)
     name = ignore_case_property('_name')
+    identified_by = Column(String)
     episodes = relation('Episode', backref='series', cascade='all, delete, delete-orphan')
 
     def __repr__(self):
@@ -140,17 +171,6 @@ class Release(Base):
     def __repr__(self):
         return '<Release(id=%s,quality=%s,downloaded=%s,proper_count=%s,title=%s)>' % \
             (self.id, self.quality, self.downloaded, self.proper_count, self.title)
-
-
-@event('manager.startup')
-def repair(manager):
-    """Perform database repairing and upgrading at startup."""
-    session = Session()
-    # For some reason at least I have some releases in database which don't belong to any episode.
-    for release in session.query(Release).filter(Release.episode == None).all():
-        log.info('Purging orphan release %s from database' % release.title)
-        session.delete(release)
-    session.commit()
 
 
 class SeriesPlugin(object):
@@ -310,6 +330,7 @@ def forget_series_episode(name, identifier):
         episode = session.query(Episode).filter(Episode.identifier == identifier).\
             filter(Episode.series_id == series.id).first()
         if episode:
+            series.identified_by = '' # reset identified_by flag so that it will be recalculated
             session.delete(episode)
             session.commit()
             log.debug('Episode %s from series %s removed from database.' % (identifier, name))
@@ -631,14 +652,25 @@ class FilterSeries(SeriesPlugin, FilterSeriesBase):
         # expect flags
 
         identified_by = config.get('identified_by', 'auto')
-        if identified_by not in ['ep', 'id', 'auto']:
-            raise PluginError('Unknown identified_by value %s for the series %s' % (identified_by, series_name))
+        series = session.query(Series).filter(Series.name == series_name).first()
+        if series:
+            # configuration always overrides everything
+            if 'identified_by' in config:
+                series.identified_by = config['identified_by']
+            # if series doesn't have identified_by flag already set, calculate one now
+            if not series.identified_by:
+                series.identified_by = self.auto_identified_by(session, series_name)
+                log.debug('identified_by set to \'%s\' based on series history' % series.identified_by)
+            # set flag from database
+            identified_by = series.identified_by
 
+        """
         if identified_by == 'auto':
             # determine if series is known to be in season, episode format or identified by id
             identified_by = self.auto_identified_by(session, series_name)
             if identified_by != 'auto':
                 log.debug('identified_by set to \'%s\' based on series history' % identified_by)
+        """
 
         parser = SeriesParser(name=series_name,
                               identified_by=identified_by,
@@ -932,13 +964,13 @@ class FilterSeries(SeriesPlugin, FilterSeriesBase):
                 return True
 
     def process_timeframe(self, feed, config, eps, series_name):
-        """Runs the timframe logic to determine if we should wait for a better quality.
+        """Runs the timeframe logic to determine if we should wait for a better quality.
 
         Saves current best to backlog if timeframe has not expired.
 
         Returns:
             True - if we should keep the quality (or qualities) restriction
-            False - if the quality restriction should be released, due to imeframe expiring
+            False - if the quality restriction should be released, due to timeframe expiring
         """
 
         if 'timeframe' not in config:
@@ -1041,15 +1073,6 @@ class FilterSeries(SeriesPlugin, FilterSeriesBase):
                 entry['series_release'].downloaded = True
             else:
                 log.debug('%s is not a series' % entry['title'])
-
-                
-@event('manager.db_cleanup')
-def db_cleanup(session):
-    # Clean up old undownloaded releases
-    result = session.query(Release).filter(Release.downloaded == False).\
-                                    filter(Release.first_seen < datetime.now() - timedelta(days=120)).delete()
-    if result:
-        log.verbose('Removed %d undownloaded episode releases.' % result)
 
 
 # Register plugin

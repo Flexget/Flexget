@@ -1,5 +1,5 @@
 from sqlalchemy.orm import join
-from sqlalchemy import desc, func
+from sqlalchemy import desc
 from flexget.plugin import register_plugin, register_parser_option, DependencyError
 
 try:
