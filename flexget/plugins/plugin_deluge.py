@@ -121,6 +121,7 @@ class DelugePlugin(object):
         try:
             from deluge.ui.client import client
         except ImportError, e:
+            log.debug('Error importing deluge: %s' % e)
             raise DependencyError('output_deluge', 'deluge', 'Deluge module and it\'s dependencies required. ImportError: %s' % e, log)
         try:
             from twisted.internet import reactor
