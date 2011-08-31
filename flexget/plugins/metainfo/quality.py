@@ -16,11 +16,10 @@ class MetainfoQuality(object):
         from flexget import validator
         return validator.factory('boolean')
 
-    def on_feed_metainfo(self, feed):
+    def on_feed_metainfo(self, feed, config):
         # check if disabled (value set to false)
-        if 'metainfo_quality' in feed.config:
-            if not feed.config['metainfo_quality']:
-                return
+        if config is False:
+            return
         for entry in feed.entries:
             self.get_quality(entry)
 
@@ -30,6 +29,10 @@ class MetainfoQuality(object):
         return order.index(x[0]) if x[0] in order else len(order)
 
     def get_quality(self, entry):
+        if entry.get('quality'):
+            log.debug('Quality is already set to %s for %s, skipping quality detection.' %
+                      (entry['quality'], entry['title']))
+            return entry
         quality, field_name = None, None
         for field_name, field_value in sorted(entry.items(), key=self.field_order):
             if not isinstance(field_value, basestring):
@@ -49,4 +52,4 @@ class MetainfoQuality(object):
                 (entry['quality'], quality, entry['title'], field_name))
         return entry
 
-register_plugin(MetainfoQuality, 'metainfo_quality', builtin=True)
+register_plugin(MetainfoQuality, 'metainfo_quality', api_ver=2, builtin=True)

@@ -151,7 +151,7 @@ def queue_add(title=None, imdb_id=None, tmdb_id=None, quality='ANY', force=True,
     if not item:
         item = QueuedMovie(title=title, imdb_id=imdb_id, tmdb_id=tmdb_id, quality=quality, immortal=force)
         session.add(item)
-        log.info('Adding %s to movie queue.' % title)
+        log.info('Adding %s to movie queue with quality=%s and force=%s.' % (title, quality, force))
         return {'title': title, 'imdb_id': imdb_id, 'tmdb_id': tmdb_id, 'quality': quality, 'force': force}
     else:
         if item.downloaded:

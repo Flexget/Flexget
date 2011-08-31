@@ -1,4 +1,5 @@
 import logging
+from flexget.utils import qualities
 from flexget.plugin import register_plugin, get_plugin_by_name, DependencyError
 
 try:
@@ -14,11 +15,18 @@ class QueueMovies(object):
 
     def validator(self):
         from flexget import validator
-        return validator.factory('boolean')
-
+        root = validator.factory()
+        root.accept('boolean')
+        opts = root.accept('dict')
+        opts.accept('choice', key='quality').accept_choices([q.name for q in qualities.all()], ignore_case=True)
+        opts.accept('boolean', key='force')
+        return root
+        
     def on_feed_output(self, feed, config):
         if not config:
             return
+        if not isinstance(config, dict):
+            config = {}
         for entry in feed.accepted:
             # Tell tmdb_lookup to add lazy lookup fields if not already present
             try:
@@ -37,8 +45,12 @@ class QueueMovies(object):
             if not kwargs:
                 log.warning('Could not determine a movie id for %s, it will not be added to queue.' % entry['title'])
                 continue
-            if entry.get('quality'):
-                kwargs['quality'] = entry.get('quality')
+            quality = entry.get('quality', config.get('quality'))
+            if quality:
+                kwargs['quality'] = quality
+            force = entry.get('force', config.get('force'))
+            if force is not None:
+                kwargs['force'] = force
             # Provide movie title if it is already available, to avoid movie_queue doing a lookup
             kwargs['title'] = entry.get('imdb_name') or entry.get('tmdb_name') or entry.get('movie_name')
             try:
