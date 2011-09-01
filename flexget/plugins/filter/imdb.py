@@ -81,8 +81,7 @@ class FilterImdb(object):
         imdb.accept('list', key='accept_mpaa_ratings').accept('text')
         return imdb
 
-    def on_feed_filter(self, feed):
-        config = feed.config['imdb']
+    def on_feed_filter(self, feed, config):
 
         lookup = get_plugin_by_name('imdb_lookup').instance.lookup
 
@@ -97,32 +96,34 @@ class FilterImdb(object):
                 if not log_once(msg, logger=log):
                     log.verbose(msg)
                 continue
-            if not entry.get('imdb_mpaa_rating'):
-                entry['imdb_mpaa_rating'] = 'NONE'
+
+            #for key, value in entry.iteritems():
+            #    log.debug('%s = %s (type: %s)' % (key, value, type(value)))
+
             # Check defined conditions, TODO: rewrite into functions?
             reasons = []
             if 'min_score' in config:
-                if entry['imdb_score'] < config['min_score']:
+                if entry.get('imdb_score', 0) < config['min_score']:
                     reasons.append('min_score (%s < %s)' % (entry['imdb_score'], config['min_score']))
             if 'min_votes' in config:
-                if entry['imdb_votes'] < config['min_votes']:
+                if entry.get('imdb_votes', 0) < config['min_votes']:
                     reasons.append('min_votes (%s < %s)' % (entry['imdb_votes'], config['min_votes']))
             if 'min_year' in config:
-                if entry['imdb_year'] < config['min_year']:
+                if entry.get('imdb_year', 0) < config['min_year']:
                     reasons.append('min_year (%s < %s)' % (entry['imdb_year'], config['min_year']))
             if 'max_year' in config:
-                if entry['imdb_year'] == 0 or entry['imdb_year'] > config['max_year']:
+                if entry.get('imdb_year', 0) > config['max_year']:
                     reasons.append('max_year (%s > %s)' % (entry['imdb_year'], config['max_year']))
             if 'reject_genres' in config:
                 rejected = config['reject_genres']
-                for genre in entry['imdb_genres']:
+                for genre in entry.get('imdb_genres', []):
                     if genre in rejected:
                         reasons.append('reject_genres')
                         break
 
             if 'reject_languages' in config:
                 rejected = config['reject_languages']
-                for language in entry['imdb_languages']:
+                for language in entry.get('imdb_languages', []):
                     if language in rejected:
                         reasons.append('reject_languages')
                         break
@@ -135,7 +136,7 @@ class FilterImdb(object):
 
             if 'reject_actors' in config:
                 rejected = config['reject_actors']
-                for actor_id, actor_name in entry['imdb_actors'].iteritems():
+                for actor_id, actor_name in entry.get('imdb_actors', {}).iteritems():
                     if actor_id in rejected or actor_name in rejected:
                         reasons.append('reject_actors %s' % actor_name or actor_id)
                         break
@@ -143,15 +144,15 @@ class FilterImdb(object):
             # Accept if actors contains an accepted actor, but don't reject otherwise
             if 'accept_actors' in config:
                 accepted = config['accept_actors']
-                for actor_id, actor_name in entry['imdb_actors'].iteritems():
+                for actor_id, actor_name in entry.get('imdb_actors', {}).iteritems():
                     if actor_id in accepted or actor_name in accepted:
-                        log.debug("Accepting because of accept_actors %s" % actor_name or actor_id)
+                        log.debug('Accepting because of accept_actors %s' % actor_name or actor_id)
                         force_accept = True
                         break
 
             if 'reject_directors' in config:
                 rejected = config['reject_directors']
-                for director_id, director_name in entry['imdb_directors'].iteritems():
+                for director_id, director_name in entry.get('imdb_directors', {}).iteritems():
                     if director_id in rejected or director_name in rejected:
                         reasons.append('reject_directors %s' % director_name or director_id)
                         break
@@ -159,24 +160,24 @@ class FilterImdb(object):
             # Accept if the director is in the accept list, but do not reject if the director is unknown
             if 'accept_directors' in config:
                 accepted = config['accept_directors']
-                for director_id, director_name in entry['imdb_directors'].iteritems():
+                for director_id, director_name in entry.get('imdb_directors', {}).iteritems():
                     if director_id in accepted or director_name in accepted:
-                        log.debug("Accepting because of accept_directors %s" % director_name or director_id)
+                        log.debug('Accepting because of accept_directors %s' % director_name or director_id)
                         force_accept = True
                         break
 
             if 'reject_mpaa_ratings' in config:
                 rejected = config['reject_mpaa_ratings']
-                if entry["imdb_mpaa_rating"] in rejected:
+                if entry.get('imdb_mpaa_rating') in rejected:
                     reasons.append('reject_mpaa_ratings %s' % entry["imdb_mpaa_rating"])
 
             if 'accept_mpaa_ratings' in config:
                 accepted = config['accept_mpaa_ratings']
                 if entry["imdb_mpaa_rating"] not in accepted:
-                    reasons.append("accept_mpaa_ratings %s" % entry["imdb_mpaa_rating"])
+                    reasons.append('accept_mpaa_ratings %s' % entry["imdb_mpaa_rating"])
 
             if reasons and not force_accept:
-                msg = 'Skipping %s because of rule(s) %s' % \
+                msg = 'Didn\'t accept `%s` because of rule(s) %s' % \
                     (entry.get('imdb_name', None) or entry['title'], ', '.join(reasons))
                 if feed.manager.options.debug:
                     log.debug(msg)
@@ -189,4 +190,4 @@ class FilterImdb(object):
                 log.debug('Accepting %s' % (entry['title']))
                 feed.accept(entry)
 
-register_plugin(FilterImdb, 'imdb')
+register_plugin(FilterImdb, 'imdb', api_ver=2)

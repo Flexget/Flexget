@@ -1,6 +1,7 @@
 import logging
-from flexget.utils.tools import console
-from flexget.plugin import register_plugin, register_parser_option
+from flexget.utils.log import log_once
+from flexget.plugin import register_plugin, register_parser_option, priority
+from flexget.feed import log as feed_log
 
 log = logging.getLogger('verbose')
 
@@ -8,35 +9,25 @@ log = logging.getLogger('verbose')
 class Verbose(object):
 
     """
-        Enables verbose log output.
-
-        Prints a line in the log when entries are accepted, rejected or failed.
-        Contains phase, plugin and reason for action.
+    Verbose entry accept, reject and failure
     """
 
     def on_entry_accept(self, feed, entry, reason='', **kwargs):
-        self.verbose_details(feed, 'Accepted %s' % entry['title'], reason)
+        self.verbose_details(feed, action='Accepted', title=entry['title'], reason=reason)
 
     def on_entry_reject(self, feed, entry, reason='', **kwargs):
-        self.verbose_details(feed, 'Rejected %s' % entry['title'], reason)
+        self.verbose_details(feed, action='Rejected', title=entry['title'], reason=reason)
 
     def on_entry_fail(self, feed, entry, reason='', **kwargs):
-        self.verbose_details(feed, 'Failed %s' % entry['title'], reason)
+        self.verbose_details(feed, action='Failed', title=entry['title'], reason=reason)
 
-    def verbose_details(self, feed, msg, reason=''):
-        """Verbose if verbose option is enabled"""
-        reason_str = ''
-        if reason:
-            reason_str = ' (%s)' % reason
-        if feed.manager.options.verbose:
-            try:
-                console("+ %-8s %-12s %s%s" % (feed.current_phase, feed.current_plugin, msg, reason_str))
-            except:
-                console("+ %-8s %-12s %s%s (warning: unable to print unicode)" % \
-                    (feed.current_phase, feed.current_plugin, repr(msg), reason_str))
-        else:
-            log.debug('phase: %s plugin: %s msg: %s%s' % \
-                (feed.current_phase, feed.current_plugin, msg, reason_str))
+    def verbose_details(self, feed, **kwarg):
+        kwarg['plugin'] = feed.current_plugin
+        kwarg['action'] = kwarg['action'].upper()
+        # lower capitalize first letter of reason
+        if kwarg['reason'] and len(kwarg['reason']) > 2:
+            kwarg['reason'] = kwarg['reason'][0].lower() + kwarg['reason'][1:]
+        feed_log.verbose("%(action)s: `%(title)s` by %(plugin)s plugin because %(reason)s " % kwarg)
 
     def on_feed_exit(self, feed):
         # verbose undecided entries
@@ -44,11 +35,16 @@ class Verbose(object):
             for entry in feed.entries:
                 if entry in feed.accepted:
                     continue
-                try:
-                    console("+ %-8s %-12s %s" % ('undecided', '', entry['title']))
-                except UnicodeDecodeError:
-                    console("+ %-8s %-12s %s (warning: unable to print unicode)" % ('undecided', '', repr(entry['title'])))
+                log.verbose('UNDECIDED: `%s`' % entry['title'])
+
+    @priority(-512)
+    def on_process_end(self, feed):
+        if feed.manager.options.verbose:
+
+            log_once('About undecided entries: They were created by input plugins but were not accepted because '
+                     'no (filter) plugin accepted them. If you want them to reach output, configure filters.',
+                     logger=log)
 
 register_plugin(Verbose, 'verbose', builtin=True)
 register_parser_option('-v', '--verbose', action='store_true', dest='verbose', default=False,
-    help='Verbose process. Display entry accept and reject info. Very useful for viewing what happens in feed(s).')
+                       help='Verbose undecided entries.')

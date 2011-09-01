@@ -28,7 +28,7 @@ class PluginDetails(object):
     def on_feed_download(self, feed):
         # Needs to happen as the first in download, so it runs after urlrewrites
         # and IMDB queue acceptance.
-        log.verbose('Accepted: %s (Rejected: %s Undecided: %s Failed: %s)' %
+        log.verbose('Summary - Accepted: %s (Rejected: %s Undecided: %s Failed: %s)' %
             (len(feed.accepted), len(feed.rejected),
             len(feed.entries) - len(feed.accepted), len(feed.failed)))
 

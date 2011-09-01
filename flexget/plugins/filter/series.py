@@ -664,14 +664,6 @@ class FilterSeries(SeriesPlugin, FilterSeriesBase):
             # set flag from database
             identified_by = series.identified_by
 
-        """
-        if identified_by == 'auto':
-            # determine if series is known to be in season, episode format or identified by id
-            identified_by = self.auto_identified_by(session, series_name)
-            if identified_by != 'auto':
-                log.debug('identified_by set to \'%s\' based on series history' % identified_by)
-        """
-
         parser = SeriesParser(name=series_name,
                               identified_by=identified_by,
                               name_regexps=get_as_array(config, 'name_regexp'),
