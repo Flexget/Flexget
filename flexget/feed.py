@@ -197,17 +197,19 @@ class Entry(dict):
 
     def update_using_map(self, field_map, source_item):
         """Populates entry fields from a source object using a dictionary that maps from entry field names to
-        attribute of the source object.
+        attributes (or keys) in the source object.
 
         Args:
-            field_map: A dictionary mapping entry field names to the attribute in source_item (nested attributes
-                are also supported, separated by a dot,) or a function that takes source_item as an argument
+            field_map: A dictionary mapping entry field names to the attribute in source_item (or keys, if source_item
+                is a dict)(nested attributes/dicts are also supported, separated by a dot,) or a function that takes
+                source_item as an argument
             source_item: Source of information to be used by the map
         """
 
+        func = dict.get if isinstance(source_item, dict) else getattr
         for field, value in field_map.iteritems():
             if isinstance(value, basestring):
-                self[field] = reduce(getattr, value.split('.'), source_item)
+                self[field] = reduce(func, value.split('.'), source_item)
             else:
                 self[field] = value(source_item)
 
