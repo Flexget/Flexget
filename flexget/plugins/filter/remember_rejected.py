@@ -122,10 +122,10 @@ class FilterRememberRejected(object):
             log.debug('Can\'t remember rejection for entry without title or url.')
             return
         log.info('Remembering rejection of `%s`' % entry['title'])
-        remember_feed = feed.session.query(RememberFeed).filter(RememberFeed.name == feed.name).first()
-        remember_feed.entries.append(RememberEntry(title=entry['title'], url=entry['original_url'],
-                                                   rejected_by=feed.current_plugin, reason=kwargs.get('reason')))
-        feed.session.merge(remember_feed)
+        (remember_feed_id,) = feed.session.query(RememberFeed.id).filter(RememberFeed.name == feed.name).first()
+        feed.session.add(RememberEntry(title=entry['title'], url=entry['original_url'], feed_id=remember_feed_id,
+                                       rejected_by=feed.current_plugin, reason=kwargs.get('reason')))
+        # The test stops passing when this is taken out for some reason...
         feed.session.flush()
 
 
