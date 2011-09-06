@@ -10,7 +10,7 @@ except ImportError:
     try:
         import json
     except ImportError:
-        raise DependencyError(issued_by='trakt_list', missing='simplejson', message='api_tmdb requrires either '
+        raise DependencyError(issued_by='trakt_list', missing='simplejson', message='trakt_list requires either '
                 'simplejson module or python > 2.5')
 
 log = logging.getLogger('trakt_list')
