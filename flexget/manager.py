@@ -87,6 +87,7 @@ class Manager(object):
 
         fire_event('manager.upgrade', self)
         fire_event('manager.startup', self)
+        self.db_cleanup()
 
     def __del__(self):
         global manager
@@ -544,13 +545,13 @@ class Manager(object):
                 return
 
         self.process_end(feeds=run_feeds)
-        self.db_cleanup()
         fire_event('manager.execute.completed', self)
 
     def db_cleanup(self):
         """ Perform database cleanup if cleanup interval has been met.
         """
-        if not self.persist.get('last_cleanup') or self.persist['last_cleanup'] < datetime.now() - DB_CLEANUP_INTERVAL:
+        if (self.options.db_cleanup or not self.persist.get('last_cleanup') or
+                self.persist['last_cleanup'] < datetime.now() - DB_CLEANUP_INTERVAL):
             log.info('Running database cleanup.')
             session = Session()
             fire_event('manager.db_cleanup', session)

@@ -72,6 +72,8 @@ class CoreOptionParser(OptionParser):
         # TODO: rename dest to cron, since this does more than just quiet
         self.add_option('--cron', action='store_true', dest='quiet', default=False,
                         help='Disables stdout and stderr output, log file used. Reduces logging level slightly.')
+        self.add_option('--db-cleanup', action='store_true', dest='db_cleanup', default=False,
+                        help='Forces the database cleanup event to run right now.')
 
         # Plugins should respect this flag and retry where appropriate
         self.add_option('--retry', action='store_true', dest='retry', default=0, help=SUPPRESS_HELP)

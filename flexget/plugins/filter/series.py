@@ -71,6 +71,14 @@ def db_cleanup(session):
                                     filter(Release.first_seen < datetime.now() - timedelta(days=120)).delete()
     if result:
         log.verbose('Removed %d undownloaded episode releases.' % result)
+    # Clean up episodes without releases
+    result = session.query(Episode).filter(~Episode.releases.any()).delete(False)
+    if result:
+        log.verbose('Removed %d episodes without releases.' % result)
+    # Clean up series without episodes
+    result = session.query(Series).filter(~Series.episodes.any()).delete(False)
+    if result:
+        log.verbose('Removed %d series without episodes.' % result)
 
 
 @event('manager.startup')
