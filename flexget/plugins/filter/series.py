@@ -285,8 +285,7 @@ class SeriesPlugin(object):
             if parser.season and parser.episode:
                 episode.season = parser.season
                 episode.number = parser.episode
-            episode.series_id = series.id
-            session.add(episode)
+            series.episodes.append(episode) # pylint:disable=E1103
             log.debug('-> added %s' % episode)
 
         # if release does not exists in episodes, add new
@@ -306,8 +305,7 @@ class SeriesPlugin(object):
             release.quality = parser.quality
             release.proper_count = parser.proper_count
             release.title = parser.data
-            release.episode_id = episode.id
-            session.add(release)
+            episode.releases.append(release) # pylint:disable=E1103
             log.debug('-> added %s' % release)
         return release
 
