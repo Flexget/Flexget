@@ -63,3 +63,6 @@ class GenSeries(plugin.DebugPlugin):
             log.info('There are still %d left to be processed!' % len(self.entries))
             feed._rerun = True
             feed._rerun_count = 0
+
+            
+#plugin.register_plugin(GenSeries, 'gen_series_data', api_ver=2, debug=True)
