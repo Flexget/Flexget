@@ -41,7 +41,7 @@ class InputCSV(object):
         values.accept_any_key('integer')
         return config
 
-    @cached('csv', 'url')
+    @cached('csv')
     @internet(log)
     def on_feed_input(self, feed, config):
         entries = []

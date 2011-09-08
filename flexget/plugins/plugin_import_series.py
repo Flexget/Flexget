@@ -37,12 +37,12 @@ class ImportSeries(FilterSeriesBase):
         # Build a dict validator that accepts the available input plugins and their settings
         for plugin in valid_inputs:
             if hasattr(plugin.instance, 'validator'):
-                validator = plugin.instance.validator()
-                if validator.name == 'root':
+                plugin_validator = plugin.instance.validator()
+                if plugin_validator.name == 'root':
                     # If a root validator is returned, grab the list of child validators
-                    from_section.valid[plugin.name] = validator.valid
+                    from_section.valid[plugin.name] = plugin_validator.valid
                 else:
-                    from_section.valid[plugin.name] = [validator]
+                    from_section.valid[plugin.name] = [plugin_validator]
             else:
                 from_section.valid[plugin.name] = [validator.factory('any')]
         return root

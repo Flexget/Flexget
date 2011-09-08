@@ -114,7 +114,7 @@ class RlsLog:
 
         return releases
 
-    @cached('rlslog', 'url')
+    @cached('rlslog')
     @internet(log)
     def on_feed_input(self, feed, config):
         url = config

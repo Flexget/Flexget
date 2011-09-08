@@ -168,7 +168,7 @@ class InputRSS(object):
             entry['filename'] = basename
             log.trace('filename `%s` from enclosure' % entry['filename'])
 
-    @cached('rss', 'url')
+    @cached('rss')
     @internet(log)
     def on_feed_input(self, feed, config):
         config = self.build_config(config)

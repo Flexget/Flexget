@@ -1,13 +1,14 @@
 import logging
 import pickle
-from datetime import datetime, timedelta
+from datetime import datetime
 from sqlalchemy import Column, Integer, String, DateTime, PickleType
 from flexget import schema
 from flexget.feed import Entry
 from flexget.manager import Session
-from flexget.plugin import register_plugin, priority, PluginWarning
+from flexget.plugin import register_plugin, priority
 from flexget.utils.database import safe_pickle_synonym
 from flexget.utils.sqlalchemy_utils import table_schema
+from flexget.utils.tools import parse_timedelta
 
 log = logging.getLogger('backlog')
 Base = schema.versioned_base('backlog', 0)
@@ -61,21 +62,6 @@ class InputBacklog(object):
         root.accept('\d+ (minute|hour|day|week)s?')
         return root
 
-    def get_amount(self, value):
-        if not value:
-            # If no time is given, default to 0 (entry will only be injected on next execution)
-            return timedelta()
-        amount, unit = value.split(' ')
-        # Make sure unit name is plural.
-        if not unit.endswith('s'):
-            unit = unit + 's'
-        log.debug('amount: %s unit: %s' % (repr(amount), repr(unit)))
-        params = {unit: int(amount)}
-        try:
-            return timedelta(**params)
-        except TypeError:
-            raise PluginWarning('Invalid time format \'%s\'' % value, log)
-
     @priority(-255)
     def on_feed_input(self, feed, config):
         # Get a list of entries to inject
@@ -106,7 +92,7 @@ class InputBacklog(object):
                 log.warning('No input snapshot available for `%s`, using current state' % entry['title'])
             snapshot = entry
         session = Session()
-        expire_time = datetime.now() + self.get_amount(amount)
+        expire_time = datetime.now() + parse_timedelta(amount)
         backlog_entry = session.query(BacklogEntry).filter(BacklogEntry.title == entry['title']).\
                                                 filter(BacklogEntry.feed == feed.name).first()
         if backlog_entry:

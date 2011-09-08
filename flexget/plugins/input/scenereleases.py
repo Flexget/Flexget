@@ -79,7 +79,7 @@ class InputScenereleases:
 
         return releases
 
-    @cached('scenereleases', 'url')
+    @cached('scenereleases')
     @internet(log)
     def on_feed_input(self, feed, config):
         releases = self.parse_site(config, feed)

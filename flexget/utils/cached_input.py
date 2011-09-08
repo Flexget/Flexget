@@ -1,8 +1,47 @@
 import copy
 import logging
+import hashlib
+from datetime import datetime
+from sqlalchemy import Column, Integer, String, DateTime, PickleType, Unicode, ForeignKey
+from sqlalchemy.orm import relation
+from flexget import schema
 from flexget.plugin import register_plugin
+from flexget.utils.database import safe_pickle_synonym
+from flexget.utils.tools import parse_timedelta
+from flexget.feed import Entry
 
-log = logging.getLogger('cached')
+log = logging.getLogger('input_cache')
+Base = schema.versioned_base('input_cache', 0)
+
+
+class InputCache(Base):
+
+    __tablename__ = 'input_cache'
+
+    id = Column(Integer, primary_key=True)
+    name = Column(Unicode)
+    hash = Column(String)
+    added = Column(DateTime, default=datetime.now)
+
+    entries = relation('InputCacheEntry', backref='cache', cascade='all, delete, delete-orphan')
+
+
+class InputCacheEntry(Base):
+
+    __tablename__ = 'input_cache_entry'
+
+    id = Column(Integer, primary_key=True)
+    _entry = Column('entry', PickleType)
+    entry = safe_pickle_synonym('_entry')
+
+    cache_id = Column(Integer, ForeignKey('input_cache.id'), nullable=False)
+
+
+def config_hash(config):
+    if isinstance(config, dict):
+        return hashlib.md5(str(sorted(config.items()))).hexdigest()
+    else:
+        return hashlib.md5(str(config)).hexdigest()
 
 
 class cached(object):
@@ -20,9 +59,10 @@ class cached(object):
 
     cache = {}
 
-    def __init__(self, name, key=None):
+    def __init__(self, name, persist=None):
         self.name = name
-        self.key = key
+        # Parse persist time
+        self.persist = persist and parse_timedelta(persist)
 
     def __call__(self, func):
 
@@ -39,58 +79,64 @@ class cached(object):
                 # get name for a cache from feeds configuration
                 if not self.name in feed.config:
                     raise Exception('@cache config name %s is not configured in feed %s' % (self.name, feed.name))
-                config = feed.config[self.name]
+                hash = config_hash(feed.config[self.name])
             else:
-                config = args[2]
+                hash = config_hash(args[2])
 
-            log.trace('config: %s' % config)
             log.trace('self.name: %s' % self.name)
-            log.trace('self.key: %s' % self.key)
+            log.trace('hash: %s' % hash)
 
-            if api_ver == 1:
-                if isinstance(config, dict) and self.key in config:
-                    name = feed.config[self.name][self.key]
-                else:
-                    name = feed.config[self.name]
-            else:
-                if isinstance(config, dict) and self.key in config:
-                    name = config[self.key]
-                else:
-                    name = config
+            cache_name = self.name + '_' + hash
+            log.debug('cache name: %s (has: %s)' % (cache_name, ', '.join(self.cache.keys())))
 
-            log.debug('cache name: %s (has: %s)' % (name, ', '.join(self.cache.keys())))
-
-            if name in self.cache:
+            if cache_name in self.cache:
                 # return from the cache
                 log.trace('cache hit')
                 entries = []
-                for entry in self.cache[name]:
+                for entry in self.cache[cache_name]:
                     fresh = copy.deepcopy(entry)
                     entries.append(fresh)
                 if entries:
                     log.verbose('Restored %s entries from cache' % len(entries))
                 return entries
             else:
+                if self.persist and not feed.manager.options.nocache:
+                    # Check database cache
+                    db_cache = feed.session.query(InputCache).filter(InputCache.name == self.name).\
+                                                              filter(InputCache.hash == hash).\
+                                                              filter(InputCache.added > datetime.now() - self.persist).\
+                                                              first()
+                    if db_cache:
+                        entries = [Entry(e.entry) for e in db_cache.entries]
+                        log.verbose('Restored %s entries from db cache' % len(entries))
+                        # Store to in memory cache
+                        self.cache[cache_name] = copy.deepcopy(entries)
+                        return entries
+
+                # Nothing was restored from db or memory cache, run the function
                 log.trace('cache miss')
                 # call input event
                 response = func(*args, **kwargs)
-                # store results to cache
                 if api_ver == 1:
-                    log.debug('v1 storing to cache %s %s entries' % (name, len(feed.entries)))
-                    try:
-                        self.cache[name] = copy.deepcopy(feed.entries)
-                    except TypeError:
-                        # might be caused because of backlog restoring some idiotic stuff, so not neccessarily a bug
-                        log.critical('Unable to save feed content into cache, if problem persists longer than a day please report this as a bug')
-                else:
-                    log.debug('storing to cache %s %s entries' % (name, len(feed.entries)))
-                    try:
-                        self.cache[name] = copy.deepcopy(response)
-                    except TypeError:
-                        # might be caused because of backlog restoring some idiotic stuff, so not neccessarily a bug
-                        log.critical('Unable to save feed content into cache, if problem persists longer than a day please report this as a bug')
+                    response = feed.entries
+                # store results to cache
+                log.debug('storing to cache %s %s entries' % (cache_name, len(response)))
+                try:
+                    self.cache[cache_name] = copy.deepcopy(response)
+                except TypeError:
+                    # might be caused because of backlog restoring some idiotic stuff, so not neccessarily a bug
+                    log.critical('Unable to save feed content into cache, if problem persists longer than a day please report this as a bug')
+                if self.persist:
+                    # Store to database
+                    log.debug('Storing cache %s to database.' % cache_name)
+                    db_cache = feed.session.query(InputCache).filter(InputCache.name == self.name).\
+                                                              filter(InputCache.hash == hash).first()
+                    if not db_cache:
+                        db_cache = InputCache(name=self.name, hash=hash)
+                    db_cache.entries = [InputCacheEntry(entry=e) for e in response]
+                    db_cache.added = datetime.now()
+                    feed.session.merge(db_cache)
                 return response
-
 
         return wrapped_func
 

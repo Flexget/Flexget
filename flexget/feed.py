@@ -441,8 +441,8 @@ class Feed(object):
                 # pass method only feed (old behaviour)
                 args = (self,)
             else:
-                # pass method feed, config
-                args = (self, self.config.get(plugin.name))
+                # pass method feed, copy of config (so plugin cannot modify it)
+                args = (self, copy.copy(self.config.get(plugin.name)))
 
             try:
                 fire_event('feed.execute.before_plugin', self, plugin.name)

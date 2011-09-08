@@ -60,7 +60,7 @@ class InputHtml(object):
         get_auth_from_url()
         return config
 
-    @cached('html', 'url')
+    @cached('html')
     @internet(log)
     def on_feed_input(self, feed, config):
         config = self.build_config(config)

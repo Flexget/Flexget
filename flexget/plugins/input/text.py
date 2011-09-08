@@ -51,7 +51,7 @@ class Text(plugin.Plugin):
         for k, v in d.iteritems():
             entry[k] = v % entry
 
-    @cached('text', 'url')
+    @cached('text')
     @plugin.internet(log)
     def on_feed_input(self, feed, config):
         url = config['url']

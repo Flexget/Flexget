@@ -4,6 +4,7 @@ import urllib
 import urllib2
 from functools import partial
 from flexget.utils.imdb import make_url
+from flexget.utils.cached_input import cached
 from flexget.utils.tools import urlopener as _urlopener, decode_html
 from flexget.plugin import register_plugin, PluginError
 from flexget.feed import Entry
@@ -24,6 +25,7 @@ class ImdbList(object):
         root.accept('text', key='list', required=True)
         return root
 
+    @cached('imdb_list', persist='6 hours')
     def on_feed_input(self, feed, config):
         urlopener = partial(_urlopener, log=log, retries=2)
         if config.get('username') and config.get('password'):

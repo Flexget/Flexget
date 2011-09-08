@@ -82,7 +82,7 @@ class InputTail(object):
         for k, v in d.iteritems():
             entry[k] = v % entry
 
-    @cached('tail', 'file')
+    @cached('tail')
     def on_feed_input(self, feed):
 
         try:

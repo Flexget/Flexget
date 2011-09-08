@@ -7,6 +7,7 @@ import time
 from htmlentitydefs import name2codepoint
 import re
 import ntpath
+from datetime import timedelta
 
 
 def str_to_boolean(string):
@@ -328,3 +329,21 @@ def console(text):
         return
 
     print unicode(text).encode('utf8')
+
+
+def parse_timedelta(value):
+    if isinstance(value, timedelta):
+        # Allow timedelta objects to pass through
+        return value
+    if not value:
+        # If no time is given, default to 0
+        return timedelta()
+    amount, unit = value.lower().split(' ')
+    # Make sure unit name is plural.
+    if not unit.endswith('s'):
+        unit += 's'
+    params = {unit: int(amount)}
+    try:
+        return timedelta(**params)
+    except TypeError:
+        raise ValueError('Invalid time format \'%s\'' % value)
