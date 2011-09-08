@@ -9,6 +9,7 @@ from flexget.plugin import register_plugin
 from flexget.utils.database import safe_pickle_synonym
 from flexget.utils.tools import parse_timedelta
 from flexget.feed import Entry
+from flexget.event import event
 
 log = logging.getLogger('input_cache')
 Base = schema.versioned_base('input_cache', 0)
@@ -35,6 +36,12 @@ class InputCacheEntry(Base):
     entry = safe_pickle_synonym('_entry')
 
     cache_id = Column(Integer, ForeignKey('input_cache.id'), nullable=False)
+
+
+@event('manager.db_cleanup')
+def db_cleanup(session):
+    #TODO: remove old cache items
+    pass
 
 
 def config_hash(config):
@@ -141,6 +148,7 @@ class cached(object):
         return wrapped_func
 
 
+#TODO: Convert to new style event?
 class CacheClearer(object):
 
     def on_process_start(self, feed):

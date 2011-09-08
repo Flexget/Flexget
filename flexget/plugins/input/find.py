@@ -1,8 +1,9 @@
-from flexget.feed import Entry
-from flexget.plugin import register_plugin
 import logging
 import os
 import re
+from flexget.feed import Entry
+from flexget.plugin import register_plugin
+from flexget.utils.cached_input import cached
 
 log = logging.getLogger('find')
 
@@ -51,6 +52,7 @@ class InputFind(object):
         if not config.get('regexp'):
             config['regexp'] = '.'
 
+    @cached('find')
     def on_feed_input(self, feed, config):
         self.prepare_config(config)
         entries = []

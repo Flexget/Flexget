@@ -9,6 +9,7 @@ from flexget.plugin import register_plugin, internet, DependencyError
 from flexget.utils.tools import urlopener
 from flexget.utils.database import pipe_list_synonym, with_session
 from flexget.utils.sqlalchemy_utils import drop_tables, table_columns
+from flexget.utils.cached_input import cached
 from flexget.feed import Entry
 
 try:
@@ -72,6 +73,7 @@ class InputThetvdbFavorites(object):
         root.accept('boolean', key='strip_dates')
         return root
 
+    @cached('thetvdb_favorites')
     @internet(log)
     @with_session
     def on_feed_input(self, feed, config, session=None):

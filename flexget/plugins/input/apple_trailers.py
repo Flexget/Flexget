@@ -2,6 +2,7 @@ import logging
 import re
 from flexget.feed import Entry
 from flexget.plugin import priority, register_plugin, get_plugin_by_name, DependencyError
+from flexget.utils.cached_input import cached
 from flexget.utils.tools import urlopener
 from flexget.utils.soup import get_soup
 try:
@@ -41,6 +42,7 @@ class AppleTrailers(InputRSS):
         self.quality = str(config)
 
     @priority(127)
+    @cached('apple_trailers')
     def on_feed_input(self, feed, config):
         # use rss plugin
         rss_config = {'url': self.rss_url}

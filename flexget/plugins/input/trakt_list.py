@@ -1,6 +1,7 @@
 import logging
 import urllib2
 from flexget.utils.tools import urlopener
+from flexget.utils.cached_input import cached
 from flexget.plugin import register_plugin, PluginError, DependencyError
 from flexget.feed import Entry
 
@@ -43,6 +44,7 @@ class TraktList(object):
         root.accept('choice', key='series').accept_choices(['all', 'loved', 'hated', 'collection', 'watched', 'watchlist'])
         return root
 
+    @cached('trakt_list', persist='6 hours')
     def on_feed_input(self, feed, config):
         if 'movies' in config and 'series' in config:
             raise PluginError('Cannot use both series list and movies list in the same feed.')

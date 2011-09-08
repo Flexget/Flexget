@@ -1,6 +1,7 @@
 """Plugin for filesystem feeds."""
 import logging
 from flexget import plugin
+from flexget.utils.cached_input import cached
 
 log = logging.getLogger('listdir')
 
@@ -22,6 +23,7 @@ class Listdir(plugin.Plugin):
         bundle.accept('path')
         return root
 
+    @cached('listdir')
     def on_feed_input(self, feed, config):
         from flexget.feed import Entry
         import os
