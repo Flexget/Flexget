@@ -17,30 +17,35 @@ class ImdbList(object):
     def validator(self):
         from flexget import validator
         root = validator.factory('dict')
-        root.accept('text', key='username', requried=True)
-        root.accept('text', key='password', required=True)
+        root.accept('regexp_match', key='user_id', required=True).\
+            accept('^ur\d{7,8}$', message='user_id must be in the form urXXXXXXX')
+        root.accept('text', key='username')
+        root.accept('text', key='password')
         root.accept('text', key='list', required=True)
         return root
 
     def on_feed_input(self, feed, config):
-        # Create a cookie handler, make sure it is used in our calls to urlopener
-        cookiehandler = urllib2.HTTPCookieProcessor()
-        urlopener = partial(_urlopener, log=log, handlers=[cookiehandler], retries=2)
+        urlopener = partial(_urlopener, log=log, retries=2)
+        if config.get('username') and config.get('password'):
+            # Create a cookie handler, make sure it is used in our calls to urlopener
+            cookiehandler = urllib2.HTTPCookieProcessor()
+            urlopener = partial(urlopener, handlers=[cookiehandler])
 
-        log.verbose('Logging in ...')
+            log.verbose('Logging in ...')
 
-        # Log in to imdb with our handler
-        params = urllib.urlencode({'login': config['username'], 'password': config['password']})
-        try:
-            urlopener('https://secure.imdb.com/register-imdb/login', data=params)
-        except urllib2.URLError, e:
-            raise PluginError('Unable to login to imdb: %s' % e.message)
+            # Log in to imdb with our handler
+            params = urllib.urlencode({'login': config['username'], 'password': config['password']})
+            try:
+                urlopener('https://secure.imdb.com/register-imdb/login', data=params)
+            except urllib2.URLError, e:
+                raise PluginError('Unable to login to imdb: %s' % e.message)
 
         log.verbose('Retrieving list %s ...' % config['list'])
 
         # Get the imdb list in csv format
         try:
-            imdblist = csv.reader(urlopener('http://www.imdb.com/list/export?list_id=%s' % config['list']))
+            imdblist = csv.reader(urlopener('http://www.imdb.com/list/export?list_id=%s&author_id=%s' %
+                                            (config['list'], config['user_id'])))
         except urllib2.URLError, e:
             raise PluginError('Unable to get imdb list: %s' % e.message)
 
