@@ -4,7 +4,7 @@ import urllib
 import urllib2
 from functools import partial
 from flexget.utils.imdb import make_url
-from flexget.utils.tools import urlopener as _urlopener
+from flexget.utils.tools import urlopener as _urlopener, decode_html
 from flexget.plugin import register_plugin, PluginError
 from flexget.feed import Entry
 
@@ -55,7 +55,8 @@ class ImdbList(object):
             if not row or row[0] == 'position':
                 # Don't use blank rows or the headings row
                 continue
-            entries.append(Entry(title=row[6], url=make_url(row[1]), imdb_id=row[1], imdb_name=row[6]))
+            title = decode_html(row[5])
+            entries.append(Entry(title=title, url=make_url(row[1]), imdb_id=row[1], imdb_name=title))
         return entries
 
 
