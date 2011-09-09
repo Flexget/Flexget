@@ -63,11 +63,11 @@ class FilterMovieQueue(queue_base.FilterQueueBase):
             if entry.get('imdb_id', lazy=lazy):
                 conditions.append(QueuedMovie.imdb_id == entry['imdb_id'])
             if entry.get('tmdb_id', lazy=lazy):
-                conditions.append(QueuedMovie.id == entry['tmdb_id'])
+                conditions.append(QueuedMovie.tmdb_id == entry['tmdb_id'])
             if conditions:
                 break
         if not conditions:
-            log.warning("No movie id could be determined for %s" % entry['title'])
+            log.warning('No movie id could be determined for %s' % entry['title'])
             return
 
         quality = entry.get('quality', qualities.UNKNOWN)
