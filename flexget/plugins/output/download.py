@@ -386,7 +386,7 @@ class PluginDownload(object):
 
             # combine to full path + filename, replace / from filename (replaces bc tickets #208, #325, #353)
             name = entry.get('filename', entry['title'])
-            for char in '/:<>^*?~':
+            for char in '/:<>^*?~"':
                 name = name.replace(char, ' ')
             # remove duplicate spaces
             name = ' '.join(name.split())
