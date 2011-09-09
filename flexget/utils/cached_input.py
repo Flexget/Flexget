@@ -1,11 +1,10 @@
 import copy
 import logging
 import hashlib
-from datetime import datetime
+from datetime import datetime, timedelta
 from sqlalchemy import Column, Integer, String, DateTime, PickleType, Unicode, ForeignKey
 from sqlalchemy.orm import relation
 from flexget import schema
-from flexget.plugin import register_plugin
 from flexget.utils.database import safe_pickle_synonym
 from flexget.utils.tools import parse_timedelta
 from flexget.feed import Entry
@@ -40,8 +39,10 @@ class InputCacheEntry(Base):
 
 @event('manager.db_cleanup')
 def db_cleanup(session):
-    #TODO: remove old cache items
-    pass
+    """Removes old input caches from plugins that are no longer configured."""
+    result = session.query(InputCache).filter(InputCache.added < datetime.now() - timedelta(days=7)).delete()
+    if result:
+        log.verbose('Removed %s old input caches.' % result)
 
 
 def config_hash(config):
@@ -67,7 +68,8 @@ class cached(object):
     cache = {}
 
     def __init__(self, name, persist=None):
-        self.name = name
+        # Cast name to unicode to prevent sqlalchemy warnings when filtering
+        self.name = unicode(name)
         # Parse persist time
         self.persist = persist and parse_timedelta(persist)
 
@@ -148,14 +150,10 @@ class cached(object):
         return wrapped_func
 
 
-#TODO: Convert to new style event?
-class CacheClearer(object):
-
-    def on_process_start(self, feed):
-        """Internal. Clears the input cache on every process start.
-        This is neccessary for webui or otherwise it will only use cache.
-        """
-        log.debug('clearing cache')
-        cached.cache = {}
-
-register_plugin(CacheClearer, 'cache_clearer', builtin=True)
+@event('manager.execute.started')
+def clear_cache(manager):
+    """Clears the input cache before execution.
+    This is neccessary for webui or otherwise it will only use cache.
+    """
+    log.debug('clearing cache')
+    cached.cache = {}

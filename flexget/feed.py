@@ -57,26 +57,16 @@ class Entry(dict):
     """
 
     def __init__(self, *args, **kwargs):
-        # Store kwargs into our internal dict
+        self.trace = []
+        self.snapshots = {}
+
         if len(args) == 2:
             kwargs['title'] = args[0]
             kwargs['url'] = args[1]
             args = []
 
-        # consturctor escapes our unicode enforcement in __setitem__
-        if kwargs:
-            updated = {}
-            for key, value in kwargs.iteritems():
-                if isinstance(value, str):
-                    try:
-                        updated[key] = unicode(value)
-                    except UnicodeDecodeError:
-                        raise EntryUnicodeError(key, value)
-            kwargs.update(updated)
-
-        dict.__init__(self, *args, **kwargs)
-        self.trace = []
-        self.snapshots = {}
+        # Make sure constructor does not escape our __setitem__ enforcement
+        self.update(*args, **kwargs)
 
     def __setitem__(self, key, value):
         # enforce unicode compatibility
@@ -115,6 +105,23 @@ class Entry(dict):
             log.debug('trying to debug key `%s` value threw exception: %s' % (key, e))
 
         dict.__setitem__(self, key, value)
+
+    def update(self, *args, **kwargs):
+        """Overridden so our __setitem__ is not avoided."""
+        if args:
+            if len(args) > 1:
+                raise TypeError("update expected at most 1 arguments, got %d" % len(args))
+            other = dict(args[0])
+            for key in other:
+                self[key] = other[key]
+        for key in kwargs:
+            self[key] = kwargs[key]
+
+    def setdefault(self, key, value=None):
+        """Overridden so our __setitem__ is not avoided."""
+        if key not in self:
+            self[key] = value
+        return self[key]
 
     def __getitem__(self, key):
         """Supports lazy loading of fields. If a stored value is a LazyField, call it, return the result."""

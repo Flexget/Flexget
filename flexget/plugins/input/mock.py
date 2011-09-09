@@ -32,9 +32,7 @@ class Mock(plugin.Plugin):
     def on_feed_input(self, feed, config):
         entries = []
         for line in config:
-            entry = Entry()
-            for k, v in line.iteritems():
-                entry[k] = v
+            entry = Entry(line)
             # no url specified, add random one (ie. test)
             if not 'url' in entry:
                 import string
