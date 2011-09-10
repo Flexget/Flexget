@@ -5,17 +5,19 @@ import posixpath
 from datetime import datetime, timedelta
 from urllib2 import URLError
 from random import sample
+from functools import partial
 from BeautifulSoup import BeautifulStoneSoup
 from sqlalchemy import Column, Integer, Float, String, Unicode, Boolean, DateTime, func
 from sqlalchemy.schema import ForeignKey
 from sqlalchemy.orm import relation
 from flexget import schema
-from flexget.utils.tools import urlopener
+from flexget.utils.tools import urlopener as _urlopener
 from flexget.utils.database import with_session, pipe_list_synonym, text_date_synonym
 from flexget.manager import Session
 from flexget.utils.simple_persistence import SimplePersistence
 
 log = logging.getLogger('api_tvdb')
+urlopener = partial(_urlopener, log=log, retries=2)
 Base = schema.versioned_base('api_tvdb', 0)
 
 # This is a FlexGet API key
@@ -41,7 +43,7 @@ def get_mirror(type='xml'):
     if not _mirrors.get(type):
         # Get the list of mirrors from tvdb
         try:
-            data = BeautifulStoneSoup(urlopener(server + api_key + '/mirrors.xml', log))
+            data = BeautifulStoneSoup(urlopener(server + api_key + '/mirrors.xml'))
         except URLError:
             raise LookupError('Could not retrieve mirror list from thetvdb')
         for mirror in  data.findAll('mirror'):
@@ -110,7 +112,7 @@ class TVDBSeries(TVDBContainer, Base):
             raise LookupError('Cannot update a series without a tvdb id.')
         url = get_mirror() + api_key + '/series/%s/%s.xml' % (self.id, language)
         try:
-            data = urlopener(url, log)
+            data = urlopener(url)
         except URLError, e:
             raise LookupError('Request failed %s' % url)
         result = BeautifulStoneSoup(data, convertEntities=BeautifulStoneSoup.HTML_ENTITIES).find('series')
@@ -137,7 +139,7 @@ class TVDBSeries(TVDBContainer, Base):
             os.makedirs(fullpath)
         filename = os.path.join(dirname, posixpath.basename(self.poster))
         thefile = file(os.path.join(base_dir, filename), 'wb')
-        thefile.write(urlopener(url, log).read())
+        thefile.write(urlopener(url).read())
         self.poster_file = filename
         # If we are detached from a session, update the db
         if not Session.object_session(self):
@@ -179,7 +181,7 @@ class TVDBEpisode(TVDBContainer, Base):
         url = get_mirror() + api_key + '/episodes/%s/%s.xml' % (self.id, language)
         from urllib2 import URLError
         try:
-            data = urlopener(url, log)
+            data = urlopener(url)
         except URLError, e:
             raise LookupError('Request failed %s' % url)
         result = BeautifulStoneSoup(data).find('episode')
@@ -207,7 +209,7 @@ def find_series_id(name):
     """Looks up the tvdb id for a series"""
     url = server + 'GetSeries.php?seriesname=%s&language=%s' % (urllib.quote(name), language)
     try:
-        page = urlopener(url, log)
+        page = urlopener(url)
     except URLError, e:
         raise LookupError("Unable to get search results for %s: %s" % (name, e))
     xmldata = BeautifulStoneSoup(page).data
@@ -322,7 +324,7 @@ def lookup_episode(name=None, seasonnum=None, episodenum=None, tvdb_id=None, onl
         log.debug('Episode %s not found in cache, looking up from tvdb.' % ep_description)
         url = get_mirror() + api_key + '/series/%d/default/%d/%d/%s.xml' % (series.id, seasonnum, episodenum, language)
         try:
-            data = BeautifulStoneSoup(urlopener(url, log)).data
+            data = BeautifulStoneSoup(urlopener(url)).data
             if data:
                 ep_data = data.find('episode')
                 if ep_data:
@@ -358,7 +360,7 @@ def mark_expired(session=None):
 
     try:
         # Get items that have changed since our last update
-        updates = BeautifulStoneSoup(urlopener(server + 'Updates.php?type=all&time=%s' % last_server, log)).items
+        updates = BeautifulStoneSoup(urlopener(server + 'Updates.php?type=all&time=%s' % last_server)).items
     except URLError, e:
         log.error('Could not get update information from tvdb: %s' % e)
         return
