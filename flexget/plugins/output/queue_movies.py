@@ -21,7 +21,7 @@ class QueueMovies(object):
         opts.accept('choice', key='quality').accept_choices([q.name for q in qualities.all()], ignore_case=True)
         opts.accept('boolean', key='force')
         return root
-        
+
     def on_feed_output(self, feed, config):
         if not config:
             return
@@ -45,14 +45,20 @@ class QueueMovies(object):
             if not kwargs:
                 log.warning('Could not determine a movie id for %s, it will not be added to queue.' % entry['title'])
                 continue
-            quality = entry.get('quality', config.get('quality'))
-            if quality:
-                kwargs['quality'] = quality
+
+            # since entries usually have unknown quality we need to ignore that ..
+            if entry.get('quality') is not qualities.UNKNOWN:
+                quality = entry['quality']
+            else:
+                quality = config.get('quality', 'ANY')
+
+            kwargs['quality'] = quality
             force = entry.get('force', config.get('force'))
             if force is not None:
                 kwargs['force'] = force
             # Provide movie title if it is already available, to avoid movie_queue doing a lookup
             kwargs['title'] = entry.get('imdb_name') or entry.get('tmdb_name') or entry.get('movie_name')
+            log.debug('queueing kwargs: %s' % kwargs)
             try:
                 queue_add(**kwargs)
             except QueueError, e:
