@@ -24,10 +24,16 @@ class Verbose(object):
     def verbose_details(self, feed, **kwarg):
         kwarg['plugin'] = feed.current_plugin
         kwarg['action'] = kwarg['action'].upper()
-        # lower capitalize first letter of reason
-        if kwarg['reason'] and len(kwarg['reason']) > 2:
-            kwarg['reason'] = kwarg['reason'][0].lower() + kwarg['reason'][1:]
-        feed_log.verbose("%(action)s: `%(title)s` by %(plugin)s plugin because %(reason)s " % kwarg)
+
+        if kwarg['reason'] is None:
+            msg = "%(action)s: `%(title)s` by %(plugin)s plugin"
+        else:
+            # lower capitalize first letter of reason
+            if kwarg['reason'] and len(kwarg['reason']) > 2:
+                kwarg['reason'] = kwarg['reason'][0].lower() + kwarg['reason'][1:]
+            msg = "%(action)s: `%(title)s` by %(plugin)s plugin because %(reason)s"
+
+        feed_log.verbose(msg % kwarg)
 
     def on_feed_exit(self, feed):
         # verbose undecided entries
