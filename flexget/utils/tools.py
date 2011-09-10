@@ -3,11 +3,12 @@
 import urllib2
 import httplib
 import socket
+from urlparse import urlparse
 import time
 from htmlentitydefs import name2codepoint
 import re
 import ntpath
-from datetime import timedelta
+from datetime import timedelta, datetime
 
 
 def str_to_boolean(string):
@@ -203,6 +204,11 @@ class SmartRedirectHandler(urllib2.HTTPRedirectHandler):
         result.status = code
         return result
 
+# Remembers sites that have timed out
+unresponsive_sites = {}
+# Time to wait before trying an unresponsive site again
+WAIT_TIME = timedelta(seconds=60)
+
 
 def urlopener(url, log, **kwargs):
     """Utility function for pulling back a url, with a retry of 3 times, increasing the timeout, etc.
@@ -211,6 +217,15 @@ def urlopener(url, log, **kwargs):
     # get the old timeout for sockets, so we can set it back to that when done. This is NOT threadsafe by the way.
     # In order to avoid requiring python 2.6, we're not using the urlopen timeout parameter. That really should be used
     # after checking for python 2.6.
+
+    site = urlparse(url).netloc
+    if site in unresponsive_sites:
+        if unresponsive_sites[site] > datetime.now() - WAIT_TIME:
+            msg = ('%s is unresponsive, not trying again for %s seconds.' %
+                  (site, (WAIT_TIME - (datetime.now() - unresponsive_sites[site])).seconds))
+            log.warning(msg)
+            raise urllib2.URLError(msg)
+
     retries = kwargs.get('retries', 3)
     oldtimeout = socket.getdefaulttimeout()
     try:
@@ -241,11 +256,16 @@ def urlopener(url, log, **kwargs):
                     reason = str(e.reason)
                 else:
                     reason = 'N/A'
+                if reason == 'timed out':
+                    unresponsive_sites[site] = datetime.now()
                 log.debug('Failed to retrieve url (try %i/3): %s' % (i + 1, reason))
             except httplib.IncompleteRead, e:
                 log.critical('Incomplete read - see python bug 6312')
                 break
             else:
+                # We were successful, removie this site from unresponsive_sites
+                unresponsive_sites.pop(site, None)
+
                 # make the returned instance usable in a with statement by adding __enter__ and __exit__ methods
 
                 def enter(self):
@@ -259,7 +279,7 @@ def urlopener(url, log, **kwargs):
                 return retrieved
 
         log.warning('Could not retrieve url: %s' % url)
-        raise urllib2.URLError('Could not retrieve url after 3 retries.')
+        raise urllib2.URLError('Could not retrieve url after %s tries.' % retries)
     finally:
         socket.setdefaulttimeout(oldtimeout)
 
