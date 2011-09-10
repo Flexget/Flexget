@@ -44,55 +44,52 @@ class Errors(object):
             raise Exception('no path level')
         self.path[self.path_level] = value
 
+# A registry mapping validator names to their class
+registry = {}
+
 
 def factory(name='root', **kwargs):
     """Factory method, returns validator instance."""
-    v = Validator()
-    return v.get_validator(name, **kwargs)
+    if name not in registry:
+        raise Exception('Asked unknown validator \'%s\'' % name)
+    return registry[name](**kwargs)
 
 
 class Validator(object):
     name = 'validator'
+
+    class __metaclass__(type):
+        """Automatically adds subclasses to the registry."""
+        
+        def __init__(cls, name, bases, dict):
+            type.__init__(cls, name, bases, dict)
+            if not 'name' in dict:
+                raise Exception('Validator %s is missing class-attribute name' % name)
+            registry[dict['name']] = cls
 
     def __init__(self, parent=None, message=None, **kwargs):
         self.valid = []
         self.message = message
         if parent is None:
             self.errors = Errors()
-            self.validators = {}
-
-            # register default validators
-            register = [RootValidator, ListValidator, DictValidator, TextValidator, FileValidator, PathValidator,
-                        AnyValidator, NumberValidator, IntegerValidator, DecimalValidator, BooleanValidator,
-                        RegexpMatchValidator, UrlValidator, RegexpValidator, EqualsValidator, ChoiceValidator]
-            for v in register:
-                self.register(v)
         else:
             self.errors = parent.errors
-            self.validators = parent.validators
 
-    def register(self, validator):
-        if not hasattr(validator, 'name'):
-            raise Exception('Validator %s is missing class-attribute name' % validator.__class__.__name__)
-        self.validators[validator.name] = validator
-
+    # TODO: Remove the need for this add parent crap.
     def add_root_parent(self):
         if self.name == 'root':
             return self
-        return self.add_parent(self.get_validator('root'))
+        return self.add_parent(factory('root'))
 
     def add_parent(self, parent, name=None):
         parent.errors = self.errors
-        parent.validators = self.validators
         parent.valid.append(self)
         self.parent = parent
         return parent
 
     def get_validator(self, name, **kwargs):
-        if not self.validators.get(name):
-            raise Exception('Asked unknown validator \'%s\'' % name)
-            # print 'returning %s' % name
-        return self.validators[name](self, **kwargs)
+        kwargs['parent'] = self
+        return factory(name, **kwargs)
 
     def accept(self, name, **kwargs):
         raise NotImplementedError('Validator %s should override accept method' % self.__class__.__name__)
