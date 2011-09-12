@@ -46,8 +46,9 @@ class ImdbList(object):
 
         # Get the imdb list in csv format
         try:
-            imdblist = csv.reader(urlopener('http://www.imdb.com/list/export?list_id=%s&author_id=%s' %
-                                            (config['list'], config['user_id'])))
+            url = 'http://www.imdb.com/list/export?list_id=%s&author_id=%s' % (config['list'], config['user_id'])
+            log.debug('Requesting %s' % url)
+            imdblist = csv.reader(urlopener(url))
         except urllib2.URLError, e:
             raise PluginError('Unable to get imdb list: %s' % e.message)
 
@@ -57,8 +58,11 @@ class ImdbList(object):
             if not row or row[0] == 'position':
                 # Don't use blank rows or the headings row
                 continue
-            title = decode_html(row[5])
-            entries.append(Entry(title=title, url=make_url(row[1]), imdb_id=row[1], imdb_name=title))
+            try:
+                title = decode_html(row[5])
+                entries.append(Entry(title=title, url=make_url(row[1]), imdb_id=row[1], imdb_name=title))
+            except IndexError, e:
+                log.critical('IndexError! Unable to handle row: %s' % row)
         return entries
 
 
