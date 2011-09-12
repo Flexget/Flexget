@@ -70,24 +70,34 @@ class Validator(object):
     def __init__(self, parent=None, message=None, **kwargs):
         self.valid = []
         self.message = message
-        if parent is None:
-            self.errors = Errors()
-        else:
-            self.errors = parent.errors
+        self.parent = parent
+        self._errors = None
 
-    # TODO: Remove the need for this add parent crap.
+    @property
+    def errors(self):
+        """Recursively return the Errors class from the root of the validator tree."""
+        if self.parent:
+            return self.parent.errors
+        else:
+            if not self._errors:
+                self._errors = Errors()
+            return self._errors
+
     def add_root_parent(self):
         if self.name == 'root':
             return self
-        return self.add_parent(factory('root'))
+        root = factory('root')
+        root.accept(self)
+        return root
 
-    def add_parent(self, parent, name=None):
-        parent.errors = self.errors
-        parent.valid.append(self)
+    def add_parent(self, parent):
         self.parent = parent
         return parent
 
     def get_validator(self, name, **kwargs):
+        if isinstance(name, Validator):
+            name.add_parent(self)
+            return name
         kwargs['parent'] = self
         return factory(name, **kwargs)
 
@@ -157,7 +167,6 @@ class RootValidator(Validator):
         return True
 
     def validate(self, data):
-        count = self.errors.count()
         return self.validate_item(data, self.valid)
 
     def schema(self):
@@ -577,7 +586,7 @@ class DictValidator(Validator):
             raise ValueError('key_types and key_validator are mutually exclusive')
         if key_validator:
             # Make sure errors show up in our list
-            key_validator.errors = self.errors
+            key_validator.add_parent(self)
         elif key_types:
             if isinstance(key_types, basestring):
                 key_types = [key_types]

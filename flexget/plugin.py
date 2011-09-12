@@ -641,17 +641,11 @@ def add_plugin_validators(validator, phase=None, group=None, excluded=None, api_
     for plugin in valid_plugins:
         # log.debug('adding: %s' % plugin.name)
         if hasattr(plugin.instance, 'validator'):
-            plugin_validator = plugin.instance.validator()
-            if plugin_validator.name == 'root':
-                # If a root validator is returned, grab the list of child validators
-                outer_validator.valid[plugin.name] = plugin_validator.valid
-            else:
-                outer_validator.valid[plugin.name] = [plugin_validator]
+            outer_validator.accept(plugin.instance.validator(), key=plugin.name)
         else:
-            from flexget.validator import factory
-            outer_validator.valid[plugin.name] = [factory('any')]
+            outer_validator.accept('any', key=plugin.name)
 
     for name in excluded:
         _excluded_recursively.remove(name)
 
-    return outer_validator
+    return validator

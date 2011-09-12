@@ -14,8 +14,7 @@ class NzbMatrix(object):
 
     def validator(self):
         from flexget import validator
-        root = validator.factory('dict')
-        nzbmatrix = root.accept('dict', key='nzbmatrix')
+        nzbmatrix = validator.factory('dict')
         nzbmatrix.accept('integer', key='catid')
         nzbmatrix.accept('integer', key='num')
         nzbmatrix.accept('integer', key='age')
@@ -34,7 +33,7 @@ class NzbMatrix(object):
         # search on it via weblink
         nzbmatrix.accept('choice', key='searchin').accept_choices(
             ['name', 'subject', 'weblink'], ignore_case=True)
-        return root
+        return nzbmatrix
 
     # Search plugin API
     def search(self, feed, entry):

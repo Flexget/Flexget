@@ -53,7 +53,7 @@ class PluginSearch(object):
             else:
                 plugin_validator = plugin.instance.validator()
                 if isinstance(plugin_validator, validator.Validator):
-                    plugin_validator.add_parent(search, plugin.name)
+                    search.accept('dict').accept(plugin_validator, key=plugin.name)
                 else:
                     log.error("plugin %s has a validator method, but does not "
                               "return a validator instance when called with "

@@ -33,18 +33,13 @@ class ImportSeries(FilterSeriesBase):
         self.build_options_validator(root.accept('dict', key='settings'))
         from_section = root.accept('dict', key='from', required=True)
         # Get a list of apiv2 input plugins
-        valid_inputs = [plugin for plugin in get_plugins_by_phase('input') if plugin.api_ver > 1]
+        valid_inputs = (plugin for plugin in get_plugins_by_phase('input') if plugin.api_ver > 1)
         # Build a dict validator that accepts the available input plugins and their settings
         for plugin in valid_inputs:
             if hasattr(plugin.instance, 'validator'):
-                plugin_validator = plugin.instance.validator()
-                if plugin_validator.name == 'root':
-                    # If a root validator is returned, grab the list of child validators
-                    from_section.valid[plugin.name] = plugin_validator.valid
-                else:
-                    from_section.valid[plugin.name] = [plugin_validator]
+                from_section.accept(plugin.instance.validator(), key=plugin.name)
             else:
-                from_section.valid[plugin.name] = [validator.factory('any')]
+                from_section.accept('any', key=plugin.name)
         return root
 
     def on_feed_start(self, feed, config):

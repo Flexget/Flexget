@@ -1,5 +1,5 @@
 import logging
-from flexget.plugin import register_plugin, get_plugin_by_name, PluginError, add_plugin_validators
+from flexget.plugin import register_plugin, get_plugin_by_name, PluginError, add_plugin_validators, get_plugins_by_group
 
 log = logging.getLogger('discover')
 
@@ -24,9 +24,12 @@ class Discover(object):
         add_plugin_validators(inputs, phase='input', excluded=['discover'])
 
         searches = discover.accept('list', key='from', required=True)
-        searches.accept('text')
-        add_plugin_validators(searches, group='search')
-
+        no_config = searches.accept('choice')
+        for plugin in get_plugins_by_group('search'):
+            if hasattr(plugin.instance, 'validator'):
+                searches.accept('dict').accept(plugin.instance.validator(), key=plugin.name)
+            else:
+                no_config.accept(plugin.name)
         return discover
 
     def on_feed_input(self, feed, config):
@@ -67,7 +70,7 @@ class Discover(object):
 
         for item in config['from']:
             for plugin_name, plugin_config in item.iteritems():
-                search = get_plugin_by_name(plugin_name)
+                search = get_plugin_by_name(plugin_name).instance
                 if not callable(getattr(search, 'search')):
                     log.critical('Search plugin %s does not implement search method' % plugin_name)
                 # aww shit, search plugins API is not suitable for this at the moment
