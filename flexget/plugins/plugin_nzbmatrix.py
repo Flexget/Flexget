@@ -9,7 +9,7 @@ socket.setdefaulttimeout(timeout)
 log = logging.getLogger('nzbmatrix')
 
 
-class NzbMatrix:
+class NzbMatrix(object):
     """NZBMatrix search plugin."""
 
     def validator(self):

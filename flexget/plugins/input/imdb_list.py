@@ -1,5 +1,6 @@
 import logging
 import csv
+import re
 import urllib
 import urllib2
 from functools import partial
@@ -11,6 +12,8 @@ from flexget.feed import Entry
 
 log = logging.getLogger('imdb_list')
 
+USER_ID_RE = r'^ur\d{7,8}$'
+
 
 class ImdbList(object):
     """"Creates an entry for each movie in your imdb list."""
@@ -18,8 +21,8 @@ class ImdbList(object):
     def validator(self):
         from flexget import validator
         root = validator.factory('dict')
-        root.accept('regexp_match', key='user_id', required=True).\
-            accept('^ur\d{7,8}$', message='user_id must be in the form urXXXXXXX')
+        root.accept('regexp_match', key='user_id').\
+             accept(USER_ID_RE, message='user_id must be in the form urXXXXXXX')
         root.accept('text', key='username')
         root.accept('text', key='password')
         root.accept('text', key='list', required=True)
@@ -42,26 +45,47 @@ class ImdbList(object):
             except urllib2.URLError, e:
                 raise PluginError('Unable to login to imdb: %s' % e.message)
 
+            # try to automatically figure out user_id from watchlist redirect url
+            if not 'user_id' in config:
+                log.verbose('Getting user_id ...')
+                opener = urlopener('http://www.imdb.com/list/watchlist')
+                redirected = opener.geturl()
+                log.debug('redirected to %s' % redirected)
+                user_id = redirected.split('/')[-2]
+                if re.match(USER_ID_RE, user_id):
+                    config['user_id'] = user_id
+                else:
+                    raise PluginError('Couldn\'t figure out user_id, please configure it manually.')
+
+        if not 'user_id' in config:
+            raise PluginError('Configuration option `user_id` required.')
+
         log.verbose('Retrieving list %s ...' % config['list'])
 
         # Get the imdb list in csv format
         try:
             url = 'http://www.imdb.com/list/export?list_id=%s&author_id=%s' % (config['list'], config['user_id'])
             log.debug('Requesting %s' % url)
-            imdblist = csv.reader(urlopener(url))
+            opener = urlopener(url)
+            mime_type = opener.headers.gettype()
+            log.debug('mime_type: %s' % mime_type)
+            if mime_type != 'text/csv':
+                raise PluginError('Didn\'t get CSV export as response. Probably specified list `%s` does not exists.'
+                    % config['list'])
+            csv_rows = csv.reader(opener)
         except urllib2.URLError, e:
             raise PluginError('Unable to get imdb list: %s' % e.message)
 
         # Create an Entry for each movie in the list
         entries = []
-        for row in imdblist:
+        for row in csv_rows:
             if not row or row[0] == 'position':
                 # Don't use blank rows or the headings row
                 continue
             try:
                 title = decode_html(row[5])
                 entries.append(Entry(title=title, url=make_url(row[1]), imdb_id=row[1], imdb_name=title))
-            except IndexError, e:
+            except IndexError:
                 log.critical('IndexError! Unable to handle row: %s' % row)
         return entries
 

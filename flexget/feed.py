@@ -417,8 +417,8 @@ class Feed(object):
     def plugins(self, phase=None):
         """An iterator over PluginInfo instances enabled on this feed.
 
-        Args:
-            phase: Limits to plugins enabled on given phase, sorted in phase order
+        :param phase: Optional, limits to plugins enabled on given phase, sorted in phase order.
+        :return: Iterator of PluginInfo instances enabled on this feed.
         """
         if phase:
             plugins = sorted(get_plugins_by_phase(phase), key=lambda p: p.phase_handlers[phase], reverse=True)
@@ -514,16 +514,16 @@ class Feed(object):
                 raise
 
     def rerun(self):
-        """Immediattely re-run the feed after execute has completed."""
+        """Immediately re-run the feed after execute has completed."""
         self._rerun = True
-        log.info('Plugin %s has marked feed to be ran again after execution has completed.' % self.current_plugin)
+        log.info('Plugin %s has requested feed to be ran again after execution has completed.' % self.current_plugin)
 
     @useFeedLogging
     def execute(self, disable_phases=None, entries=None):
         """Executes the feed.
 
-        :disable_phases: Disable given phases during execution
-        :entries: Entries to be used in execution instead
+        :param disable_phases: Disable given phases during execution
+        :param entries: Entries to be used in execution instead
             of using the input. Disables input phase.
         """
 
@@ -534,7 +534,7 @@ class Feed(object):
         if disable_phases:
             map(self.disable_phase, disable_phases)
         if entries:
-            # If entries are passed for this execution, disable the input phase
+            # If entries are passed for this execution (eg. rerun), disable the input phase
             self.disable_phase('input')
             self.entries.extend(entries)
 
@@ -546,7 +546,7 @@ class Feed(object):
             raise Exception('configuration errors')
         if self.manager.options.validate:
             if not errors:
-                print 'Feed \'%s\' passed' % self.name
+                log.info('Feed \'%s\' passed' % self.name)
             return
 
         log.debug('starting session')
@@ -582,10 +582,10 @@ class Feed(object):
         if self._rerun:
             if self._rerun_count >= self.max_reruns:
                 log.info('Feed has been rerunning already %s times, stopping for now' % self._rerun_count)
-                # reset the counter for future runs (neccessary only with webui)
+                # reset the counter for future runs (necessary only with webui)
                 self._rerun_count = 0
             else:
-                log.info('Rerunning the feed')
+                log.info('Rerunning the feed in case better resolution can be achieved.')
                 self._rerun_count += 1
                 self.execute(disable_phases=disable_phases, entries=entries)
 

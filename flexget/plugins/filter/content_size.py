@@ -47,9 +47,9 @@ class FilterContentSize(object):
                 log.debug('Entry %s size is unknown, rejecting because of strict mode (default)' % entry['title'])
                 log.info('No size information available for %s, rejecting' % entry['title'])
                 if not 'file' in entry:
-                    feed.reject(entry, 'no size available, file unavailable', remember=True)
+                    feed.reject(entry, 'no size info available nor file to read it from', remember=True)
                 else:
-                    feed.reject(entry, 'no size available from downloaded file', remember=True)
+                    feed.reject(entry, 'no size info available from downloaded file', remember=True)
 
         if len(feed.rejected) > num_rejected:
             # Since we are rejecting after the filter event,

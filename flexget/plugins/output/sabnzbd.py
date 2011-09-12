@@ -1,11 +1,12 @@
 import logging
+import urllib
 from flexget.plugin import get_plugin_by_name, register_plugin
 from flexget.utils.tools import urlopener
 
 log = logging.getLogger('sabnzbd')
 
 
-class OutputSabnzbd:
+class OutputSabnzbd(object):
     """
         Example:
 
@@ -13,8 +14,6 @@ class OutputSabnzbd:
           apikey: 123456
           url: http://localhost/sabnzbd/api?
           category: movies
-
-        Note: url has default value of 'http://localhost:8080/sabnzbd/api?'
 
         All parameters:
 
@@ -55,21 +54,14 @@ class OutputSabnzbd:
         params['mode'] = 'addurl'
         return params
 
-    def on_process_start(self, feed):
+    def on_process_start(self, feed, config):
         """
         register the usable set: keywords
         """
         set = get_plugin_by_name('set')
         set.instance.register_keys({'category': 'text'})
 
-    def on_feed_output(self, feed):
-
-        import urllib
-
-        # convert config into url parameters
-        config = feed.config['sabnzbd']
-        baseurl = config['url']
-
+    def on_feed_output(self, feed, config):
         for entry in feed.accepted:
             if feed.manager.options.test:
                 log.info('Would add into sabnzbd: %s' % entry['title'])
@@ -86,7 +78,7 @@ class OutputSabnzbd:
             # add cleaner nzb name (undocumented api feature)
             params['nzbname'] = ''.join([x for x in entry['title'] if ord(x) < 128])
 
-            request_url = baseurl + urllib.urlencode(params)
+            request_url = config['url'] + urllib.urlencode(params)
             log.debug('request_url: %s' % request_url)
             try:
                 response = urlopener(request_url, log).read()
@@ -103,4 +95,4 @@ class OutputSabnzbd:
             else:
                 log.info('Added `%s` to SABnzbd' % (entry['title']))
 
-register_plugin(OutputSabnzbd, 'sabnzbd')
+register_plugin(OutputSabnzbd, 'sabnzbd', api_ver=2)
