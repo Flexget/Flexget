@@ -1,5 +1,6 @@
 import logging
-from flexget.plugin import register_plugin, get_plugin_by_name, PluginError, add_plugin_validators, get_plugins_by_group, PluginWarning
+from flexget.plugin import register_plugin, get_plugin_by_name, PluginError, \
+    add_plugin_validators, get_plugins_by_group, PluginWarning
 
 log = logging.getLogger('discover')
 
@@ -34,18 +35,22 @@ class Discover(object):
         discover.accept('integer', key='limit')
         return discover
 
-    def on_feed_input(self, feed, config):
-        input_entries = []
+    def execute_inputs(self, config, feed):
+        """
+        :param config: Discover config
+        :param feed: Current feed
+        :return: List of pseudo entries created by inputs under `what` configuration
+        """
+
+        entries = []
         entry_titles = set()
         entry_urls = set()
-
         # run inputs
         for item in config['what']:
             for input_name, input_config in item.iteritems():
                 input = get_plugin_by_name(input_name)
                 if input.api_ver == 1:
                     raise PluginError('Plugin %s does not support API v2' % input_name)
-
                 method = input.phase_handlers['input']
                 try:
                     result = method(feed, input_config)
@@ -63,15 +68,21 @@ class Discover(object):
                         continue
 
                     if entry['title'] in entry_titles:
-                        # TODO: xxx
-                        raise NotImplementedError('TODO: duplicate title, combine entries urls')
+                        log.verbose('Ignored duplicate title `%s`' % entry['title']) # TODO: should combine?
                     else:
-                        input_entries.append(entry)
+                        entries.append(entry)
                         entry_titles.add(entry['title'])
                         entry_urls.update(urls)
+        return entries
 
-        output_entries = []
-        # run searches
+    def execute_searches(self, config, entries):
+        """
+        :param config: Discover plugin config
+        :param entries: List of pseudo entries to search
+        :return: List of entries found from search engines listed under `from` configuration
+        """
+
+        result = []
         for item in config['from']:
             if isinstance(item, dict):
                 plugin_name, plugin_config = item.iteritems()[0]
@@ -80,14 +91,22 @@ class Discover(object):
             search = get_plugin_by_name(plugin_name).instance
             if not callable(getattr(search, 'search')):
                 log.critical('Search plugin %s does not implement search method' % plugin_name)
-            for entry in input_entries:
+            for entry in entries:
                 try:
-                    output_entries.extend(search.search(entry['title'], plugin_config)[:config.get('limit', -1)])
+                    search_results = search.search(entry['title'], plugin_config)
+                    log.debug('Discovered %s entries from %s' % (len(search_results), plugin_name))
+                    # TODO: why does default ignore last entry ?
+                    result.extend(search_results[:config.get('limit', -1)])
                 except (PluginError, PluginWarning):
                     log.debug('No results from %s' % plugin_name)
+        return result
 
-
-        return output_entries
+    def on_feed_input(self, feed, config):
+        entries = self.execute_inputs(config, feed)
+        log.verbose('Discovering %i titles ...' % len(entries))
+        if len(entries) > 500:
+            log.critical('Looks like your inputs in discover configuration produced over 500 entries, please reduce the amount!')
+        return self.execute_searches(config, entries)
 
 
 register_plugin(Discover, 'discover', api_ver=2)
