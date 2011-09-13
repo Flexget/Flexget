@@ -23,7 +23,6 @@ class Listdir(plugin.Plugin):
         bundle.accept('path')
         return root
 
-    @cached('listdir')
     def on_feed_input(self, feed, config):
         from flexget.feed import Entry
         import os
