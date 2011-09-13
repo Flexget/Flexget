@@ -13,6 +13,13 @@ class TestQualityParser(object):
                  ('Test.File.720p.bluray.r5', '720p bluray rc'),
                  ('Test.File.1080p.bluray.rc', '1080p bluray rc'),
 
+                 # 10bit
+                 ('Test.File.480p.10bit', '480p 10bit'),
+                 ('Test.File.720p.10bit', '720p 10bit'),
+                 ('Test.File.720p.bluray.10bit', '720p bluray 10bit'),
+                 ('Test.File.1080p.10bit', '1080p 10bit'),
+                 ('Test.File.1080p.bluray.10bit', '1080p bluray 10bit'),
+
                  ('Test.File.720p.webdl', '720p web-dl'),
                  ('Test.File.1280x720_web dl', '720p web-dl'),
                  ('Test.File.720p.h264.web.dl', '720p web-dl'),
@@ -22,7 +29,7 @@ class TestQualityParser(object):
                  ('Test.File.1080i', '1080i'),
                  ('Test File blurayrip', 'bdrip'),
                  ('Test.File.br-rip', 'bdrip'),
-                 
+
                  ('Test.File.360p.avi', '360p'),
                  ('Test.File.[360p].mkv', '360p'),
                  ('Test.File.368.avi', '368p')]

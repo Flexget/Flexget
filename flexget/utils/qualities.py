@@ -33,11 +33,11 @@ class Quality(object):
 
     def matches(self, text):
         """Test if quality matches to text.
-        
+
         Args:
-        
+
             text: data te be tested against
-            
+
         Returns:
             0 - True if matches
             1 - Remaining text, quality data stripped
@@ -111,14 +111,19 @@ re_webdl = 'web[\W_]?dl'
 re_720p = '(?:1280x)?720p?'
 re_1080p = '(?:1920x)?1080p?'
 re_bluray = '(?:b[dr][\W_]?rip|bluray(?:[\W_]?rip)?)'
+re_10bit = '(10.?bit|hi10p)'
 
-qualities = [Quality(1100, '1080p bluray', [re_1080p, re_bluray], none_of=[re_rc_or_r5]),
+qualities = [Quality(1200, '1080p bluray 10bit', [re_1080p, re_bluray, re_10bit], none_of=[re_rc_or_r5]),
+             Quality(1100, '1080p bluray', [re_1080p, re_bluray], none_of=[re_rc_or_r5]),
              Quality(1000, '1080p web-dl', [re_1080p, re_webdl]),
+             Quality(850, '1080p 10bit', [re_1080p, re_10bit], none_of=[re_bluray, re_rc_or_r5]),
              Quality(800, '1080p', [re_1080p], none_of=[re_bluray, re_rc_or_r5]),
              Quality(750, '1080i'),
-             Quality(650, '720p bluray', [re_720p, re_bluray], none_of=[re_rc_or_r5]),
+             Quality(670, '720p bluray 10bit', [re_720p, re_bluray, re_10bit], none_of=[re_rc_or_r5]),
+             Quality(650, '720p bluray', [re_720p, re_bluray], none_of=[re_rc_or_r5, re_10bit]),
              Quality(600, '720p web-dl', [re_720p, re_webdl]),
-             Quality(500, '720p', [re_720p], none_of=[re_bluray, re_rc_or_r5]),
+             Quality(520, '720p 10bit', [re_720p, re_10bit], none_of=[re_bluray, re_rc_or_r5]),
+             Quality(500, '720p', [re_720p], none_of=[re_bluray, re_rc_or_r5, re_10bit]),
              Quality(450, '720i'),
              Quality(430, '1080p bluray rc', [re_1080p, re_bluray, re_rc_or_r5]),
              Quality(420, '720p bluray rc', [re_720p, re_bluray, re_rc_or_r5]),
@@ -126,9 +131,10 @@ qualities = [Quality(1100, '1080p bluray', [re_1080p, re_bluray], none_of=[re_rc
              Quality(380, 'bdrip', [re_bluray], none_of=[re_rc_or_r5]),
              Quality(350, 'dvdrip', ['dvd(?:[\W_]?rip)?'], none_of=[re_rc_or_r5]),
              Quality(320, 'web-dl', [re_webdl]),
-             Quality(300, '480p', ['480p?']),
+             Quality(310, '480p 10bit', ['480p?', re_10bit]),
+             Quality(300, '480p', ['480p?'], none_of=[re_10bit]),
              Quality(290, '368p', ['368p?']),
-             Quality(280, '360p'), # I don't think we want to make trailing p optional here (ie. xbox360)
+             Quality(280, '360p'), # I don't think we want to make trailing p optional here (eg. xbox360)
              Quality(270, 'hdtv', ['hdtv(?:[\W_]?rip)?']),
              Quality(260, 'dvdrip r5', ['dvd(?:[\W_]?rip)?', re_rc_or_r5]),
              Quality(250, 'bdscr'),
@@ -205,7 +211,7 @@ def quality_match(title):
 
 def parse_quality(title):
     """Find the highest know quality in a given string :title:
-    
+
     Returns:
         quality object or False
     """
