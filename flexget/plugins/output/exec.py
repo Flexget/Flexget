@@ -94,6 +94,7 @@ class PluginExec(object):
         self.execute(feed, 'on_exit')
 
     def execute_cmd(self, cmd, allow_background):
+        log.verbose('Executing: %s' % cmd)
         p = subprocess.Popen(cmd, shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT, close_fds=False)
         if not allow_background:
