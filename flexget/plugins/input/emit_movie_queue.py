@@ -15,12 +15,24 @@ class EmitIMDBQueue(object):
 
     def validator(self):
         from flexget import validator
-        return validator.factory('boolean')
+        root = validator.factory()
+        root.accept('boolean')
+        advanced = root.accept('dict')
+        advanced.accept('boolean', key='year')
+        advanced.accept('boolean', key='quality')
+        return root
+
+    def prepare_config(self, config):
+        if isinstance(config, bool):
+            config = {'year': True, 'quality': True}
+        return config
 
     def on_feed_input(self, feed, config):
         if not config:
             return
-
+        config = self.prepare_config(config)
+        
+        entries = []
         imdb_entries = queue_get()
 
         for imdb_entry in imdb_entries:
@@ -31,24 +43,30 @@ class EmitIMDBQueue(object):
             entry['imdb_url'] = 'http://www.imdb.com/title/' + imdb_entry.imdb_id
             entry['imdb_id'] = imdb_entry.imdb_id
 
+            get_plugin_by_name('tmdb_lookup').instance.lookup(entry)
             # check if title is a imdb url (leftovers from old database?)
             # TODO: maybe this should be fixed at the queue_get ...
             if 'http://' in imdb_entry.title:
                 log.debug('queue contains url instead of title')
-                try:
-                    get_plugin_by_name('imdb_lookup').instance.\
-                        lookup(entry)
-                except PluginError:
-                    log.error('Found imdb url in imdb queue, '\
-                              'but lookup failed: %s' % entry['imdb_url'])
+                if entry.get('movie_name'):
+                    entry['title'] = entry['movie_name']
+                else:
+                    log.error('Found imdb url in imdb queue, but lookup failed: %s' % entry['title'])
                     continue
-                entry['title'] = entry['imdb_name']
             else:
                 # normal title
                 entry['title'] = imdb_entry.title
 
-            feed.entries.append(entry)
+
+            # Add the year and quality if configured to
+            if config.get('year') and entry.get('movie_year'):
+                entry['title'] += ' %s' % entry['movie_year']
+            if config.get('quality') and imdb_entry.quality != 'ANY':
+                entry['title'] += ' %s' % imdb_entry.quality
+            entries.append(entry)
             log.debug('Added title and IMDB id to new entry: %s - %s' %
                      (entry['title'], entry['imdb_id']))
+
+        return entries
 
 register_plugin(EmitIMDBQueue, 'emit_movie_queue', api_ver=2)

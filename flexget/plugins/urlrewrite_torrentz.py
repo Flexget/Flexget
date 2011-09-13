@@ -1,10 +1,11 @@
 import logging
-from flexget.feed import Entry
 import re
 import urllib
-from flexget.plugin import *
 import difflib
 import feedparser
+from flexget.plugin import register_plugin, PluginWarning
+from flexget.feed import Entry
+from flexget.utils.titles.parser import TitleParser
 
 log = logging.getLogger('torrentz')
 
@@ -26,11 +27,18 @@ class UrlRewriteTorrentz(object):
         log.debug('Search got %d results' % len(entries))
         return entries
 
+    # TODO: Put this somewhere for all search plugins
+    def clean_name(self, name):
+        result = name.lower()
+        result = TitleParser.remove_words(result, TitleParser.sounds + TitleParser.codecs)
+        result = re.sub('[ \(\)\-_\[\]\.]+', ' ', result)
+        return result
+
     def search_title(self, name):
         url = 'http://torrentz.eu/feed?q=%s' % urllib.quote(name)
         log.debug('requesting: %s' % url)
         rss = feedparser.parse(url)
-        clean_name = name.replace('.', ' ').replace('-', '').replace('_', ' ').lower()
+        clean_name = self.clean_name(name)
         entries = []
 
         status = rss.get('status', False)
@@ -41,18 +49,20 @@ class UrlRewriteTorrentz(object):
         if ex:
             raise PluginWarning('Got bozo_exception (bad feed)')
 
+        comparator = difflib.SequenceMatcher(lambda x: x in ' -._[]()', clean_name)
         for item in rss.entries:
+            clean_found = self.clean_name(item.title)
             # assign confidence score of how close this link is to the name you're looking for. .6 and above is "close"
-            confidence = difflib.SequenceMatcher(lambda x: x in ' -._', # junk characters
-                                       item.title.lower().replace('.', ' ').replace('-', '').replace('_', ' '),
-                                       clean_name).ratio()
+            comparator.set_seq2(clean_found)
+            confidence = comparator.ratio()
+
             log.debug('name: %s' % clean_name)
-            log.debug('found name: %s' % item.title.lower().replace('.', ' ').replace('-', '').replace('_', ' '))
+            log.debug('found name: %s' % clean_found)
             log.debug('confidence: %s' % str(confidence))
-            if confidence < 0.9:
+            if confidence < 0.7:
                 continue
 
-            m = re.search(r'Seeds: ([,\d]+) Peers: ([,\d]+)', item.description, re.IGNORECASE)
+            m = re.search(r'Size: ([\d]+) Mb Seeds: ([,\d]+) Peers: ([,\d]+)', item.description, re.IGNORECASE)
             if not m:
                 log.debug('regexp did not find seeds / peer data')
                 continue
@@ -60,8 +70,9 @@ class UrlRewriteTorrentz(object):
             entry = Entry()
             entry['title'] = item.title
             entry['url'] = item.link
-            entry['torrent_seeds'] = int(m.group(1).replace(',', ''))
-            entry['torrent_leeches'] = int(m.group(2).replace(',', ''))
+            entry['content_size'] = int(m.group(1))
+            entry['torrent_seeds'] = int(m.group(2).replace(',', ''))
+            entry['torrent_leeches'] = int(m.group(3).replace(',', ''))
             entries.append(entry)
 
         # choose torrent

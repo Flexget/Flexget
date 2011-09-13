@@ -30,6 +30,8 @@ class Discover(object):
                 searches.accept('dict').accept(plugin.instance.validator(), key=plugin.name)
             else:
                 no_config.accept(plugin.name)
+
+        discover.accept('integer', key='limit')
         return discover
 
     def on_feed_input(self, feed, config):
@@ -80,7 +82,7 @@ class Discover(object):
                 log.critical('Search plugin %s does not implement search method' % plugin_name)
             for entry in input_entries:
                 try:
-                    output_entries.extend(search.search(entry['title'], plugin_config))
+                    output_entries.extend(search.search(entry['title'], plugin_config)[:config.get('limit', -1)])
                 except (PluginError, PluginWarning):
                     log.debug('No results from %s' % plugin_name)
 

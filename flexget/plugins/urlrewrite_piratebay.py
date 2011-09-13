@@ -1,11 +1,13 @@
+import re
 import urllib
 import logging
-from flexget.feed import Entry
+import difflib
 from plugin_urlrewriting import UrlRewritingError
+from flexget.feed import Entry
 from flexget.plugin import register_plugin, internet, PluginWarning
 from flexget.utils.tools import urlopener
 from flexget.utils.soup import get_soup
-import difflib
+from flexget.utils.titles.parser import TitleParser
 
 log = logging.getLogger('piratebay')
 
@@ -60,6 +62,13 @@ class UrlRewritePirateBay(object):
         log.debug('search got %d results' % len(entries))
         return entries
 
+    # TODO: Put this somewhere for all search plugins
+    def clean_name(self, name):
+        result = name.lower()
+        result = TitleParser.remove_words(result, TitleParser.sounds + TitleParser.codecs)
+        result = re.sub('[ \(\)\-_\[\]\.]+', ' ', result)
+        return result
+
     @internet(log)
     def search_title(self, name, url=None):
         """
@@ -74,19 +83,20 @@ class UrlRewritePirateBay(object):
         page = urlopener(url, log)
 
         # do this here so I don't have to do it constantly below.
-        clean_name = name.replace('.', ' ').replace('-', '').replace('_', ' ').lower()
+        clean_name = self.clean_name(name)
 
         soup = get_soup(page)
         entries = []
+        comparator = difflib.SequenceMatcher(lambda x: x in ' ', clean_name)
         for link in soup.findAll('a', attrs={'class': 'detLink'}):
+            clean_found = self.clean_name(link.contents[0])
             # assign confidence score of how close this link is to the name you're looking for. .6 and above is "close"
-            confidence = difflib.SequenceMatcher(lambda x: x in ' -._', # junk characters
-                                       link.contents[0].lower().replace('.', ' ').replace('-', '').replace('_', ' '),
-                                       clean_name).ratio()
+            comparator.set_seq2(clean_found)
+            confidence = comparator.ratio()
             log.debug('name: %s' % clean_name)
-            log.debug('found name: %s' % link.contents[0].lower().replace('.', ' ').replace('-', '').replace('_', ' '))
-            log.debug('confidence: %s' % str(confidence))
-            if confidence < 0.8:
+            log.debug('found name: %s' % clean_found)
+            log.debug('confidence: %s' % confidence)
+            if confidence < 0.7:
                 continue
             entry = Entry()
             entry['title'] = link.contents[0]
@@ -94,7 +104,16 @@ class UrlRewritePirateBay(object):
             tds = link.parent.parent.parent.findAll('td')
             entry['torrent_seeds'] = int(tds[-2].contents[0])
             entry['torrent_leeches'] = int(tds[-1].contents[0])
-            #TODO: parse content_size
+            # Parse content_size
+            size = link.findNext(attrs={'class': 'detDesc'}).contents[0]
+            size = re.search('Size ([\.\d]+)\xa0([GMK])iB', size)
+            if size:
+                if size.group(2) == 'G':
+                    entry['content_size'] = int(float(size.group(1)) * 1000 ** 3 / 1024 ** 2)
+                elif size.group(2) == 'M':
+                    entry['content_size'] = int(float(size.group(1)) * 1000 ** 2 / 1024 ** 2)
+                else:
+                    entry['content_size'] = int(float(size.group(1)) * 1000 / 1024 ** 2)
             entries.append(entry)
 
         if not entries:
