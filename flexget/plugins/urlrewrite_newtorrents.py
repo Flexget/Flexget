@@ -1,5 +1,6 @@
 import urllib2
 import logging
+from flexget.feed import Entry
 import re
 from plugin_urlrewriting import UrlRewritingError
 from flexget.plugin import *
@@ -33,7 +34,7 @@ class NewTorrents:
         if url.startswith('http://www.newtorrents.info/?q=') or \
            url.startswith('http://www.newtorrents.info/search'):
             try:
-                url = self.url_from_search(url, entry['title'])
+                url = self.entries_from_search(url, entry['title'])[0]['url']
             except PluginWarning, e:
                 raise UrlRewritingError(e.value)
         else:
@@ -46,9 +47,9 @@ class NewTorrents:
             raise UrlRewritingError('Bug in newtorrents urlrewriter')
             
     # Search plugin API
-    def search(self, feed, entry):
-        search_url = 'http://www.newtorrents.info/search/%s' % entry['title']
-        return self.url_from_search(search_url, entry['title'])
+    def search(self, query, config=None):
+        search_url = 'http://www.newtorrents.info/search/%s' % query
+        return self.entries_from_search(search_url, query)
 
     @internet(log)
     def url_from_page(self, url):
@@ -71,7 +72,7 @@ class NewTorrents:
         return s.replace('.', ' ').replace('_', ' ').strip().lower()
 
     @internet(log)
-    def url_from_search(self, url, name):
+    def entries_from_search(self, url, name):
         """Parses torrent download url from search results"""
         name = self.clean(name)
         import urllib
@@ -92,21 +93,23 @@ class NewTorrents:
             release_name = self.clean(link.parent.next.get('title'))
             # quick dirty hack
             seed = link.findNext('td', attrs={'class': re.compile('s')}).renderContents()
-            
+            if seed == 'n/a':
+                seed = 0
+            #TODO: also parse content_size from results
             confidence = difflib.SequenceMatcher(lambda x: x in ' -._', # junk characters
                                        release_name.lower(),
                                        name.lower()).ratio()
             if confidence >= 0.9:
-                torrents.append((seed, torrent_url))
+                torrents.append(Entry(title=release_name, url=torrent_url, torrent_seeds=seed))
             else:
                 log.debug('rejecting search result: %s !~ %s' % (release_name, name))
         # sort with seed number Reverse order
-        torrents.sort(reverse=True)
+        torrents.sort(reverse=True, key=lambda x: x.get('torrent_seeds', 0))
         # choose the torrent
         if not torrents:
             dashindex = name.rfind('-')
             if dashindex != -1:
-                return self.url_from_search(url, name[:dashindex])
+                return self.entries_from_search(url, name[:dashindex])
             else:
                 raise PluginWarning('No matches for %s' % name, log, log_once=True)
         else:
@@ -114,6 +117,6 @@ class NewTorrents:
                 log.debug('found only one matching search result.')
             else:
                 log.debug('search result contains multiple matches, sorted %s by most seeders' % torrents)
-            return [torrent[1] for torrent in torrents]
+            return torrents
 
 register_plugin(NewTorrents, 'newtorrents', groups=['urlrewriter', 'search'])

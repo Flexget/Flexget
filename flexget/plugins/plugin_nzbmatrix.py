@@ -1,4 +1,5 @@
 import logging
+from flexget.feed import Entry
 from flexget.plugin import internet, register_plugin
 from flexget.utils.tools import urlopener
 
@@ -36,28 +37,26 @@ class NzbMatrix(object):
         return nzbmatrix
 
     # Search plugin API
-    def search(self, feed, entry):
+    def search(self, query, config=None):
         import urllib
-        params = self.getparams(feed)
-        params['search'] = self.clean(entry['title'])
+        params = self.getparams(config)
+        params['search'] = self.clean(query)
         search_url = 'https://api.nzbmatrix.com/v1.1/search.php?' + urllib.urlencode(params)
-        results = self.nzbid_from_search(search_url, params['search'], entry)
-        link_list = []
-        if results == None:
-            return
+        results = self.nzbid_from_search(search_url, params['search'], query)
+        if not results:
+            return []
         else:
+            entries = []
             for result in results:
-                nzbid = result["NZBID"]
-                download_params = {"username": params['username'], 'apikey': params['apikey'], 'id': nzbid}
-                link_list.append("http://api.nzbmatrix.com/v1.1/download.php?" + urllib.urlencode(download_params))
-            return link_list
+                entry = Entry()
+                entry['title'] = result['NZBNAME']
+                download_params = {"username": params['username'], 'apikey': params['apikey'], 'id': result['NZBID']}
+                entry['url'] = "http://api.nzbmatrix.com/v1.1/download.php?" + urllib.urlencode(download_params)
+                entries.append(entry)
+            return entries
 
-    def getparams(self, feed):
-        for cfg_entry in feed.config.get('search'):
-            if isinstance(cfg_entry, dict) and 'nzbmatrix' in cfg_entry:
-                config = cfg_entry['nzbmatrix']
-                break
-        # keeping vars seperate, for code readability. Config entries are
+    def getparams(self, config):
+        # keeping vars separate, for code readability. Config entries are
         # identical to params passed.
         params = config
         if 'searchin' in params:
@@ -83,7 +82,7 @@ class NzbMatrix(object):
                          .replace('-', ' ').strip().lower()
 
     @internet(log)
-    def nzbid_from_search(self, url, name, entry):
+    def nzbid_from_search(self, url, name, query):
         """Parses nzb download url from api results"""
         import time
         import difflib
@@ -91,7 +90,7 @@ class NzbMatrix(object):
         log.debug("Sleeping to respect nzbmatrix rules about hammering the API")
         time.sleep(10)
         apireturn = self.parse_nzb_matrix_api(urlopener(url, log).read(),
-                                              entry['title'])
+                                              query)
         if not apireturn:
             return None
         else:

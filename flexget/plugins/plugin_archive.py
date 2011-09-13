@@ -175,15 +175,25 @@ class Archive(object):
 
 class UrlrewriteArchive(object):
 
-    def search(self, feed, entry):
+    entry_map = {'title': 'title',
+                 'url': 'url',
+                 'description': 'description'}
+
+    def search(self, query, config=None):
         """Search plugin API method"""
-        log.debug('looking for %s' % entry['title'])
-        results = search(feed.session, entry['title'])
+        session = Session()
+        log.debug('looking for %s' % query)
+        results = search(session, query)
 
         # TODO: some logic to return best match? what about quality?
-        if results:
-            log.debug('found %s' % results)
-            return [result.url for result in results]
+        log.debug('found %s' % len(results))
+        entries = []
+        for result in results:
+            entry = Entry()
+            entry.update_using_map(self.entry_map, result)
+            if entry.isvalid():
+                entries.append(entry)
+        return entries
 
 
 def archive_inject(option, opt, value, parser):

@@ -1,5 +1,5 @@
 import logging
-from flexget.plugin import register_plugin, get_plugin_by_name, PluginError, add_plugin_validators, get_plugins_by_group
+from flexget.plugin import register_plugin, get_plugin_by_name, PluginError, add_plugin_validators, get_plugins_by_group, PluginWarning
 
 log = logging.getLogger('discover')
 
@@ -33,7 +33,7 @@ class Discover(object):
         return discover
 
     def on_feed_input(self, feed, config):
-        entries = []
+        input_entries = []
         entry_titles = set()
         entry_urls = set()
 
@@ -64,20 +64,28 @@ class Discover(object):
                         # TODO: xxx
                         raise NotImplementedError('TODO: duplicate title, combine entries urls')
                     else:
-                        entries.append(entry)
+                        input_entries.append(entry)
                         entry_titles.add(entry['title'])
                         entry_urls.update(urls)
 
-        for item in config['from']:
-            for plugin_name, plugin_config in item.iteritems():
-                search = get_plugin_by_name(plugin_name).instance
-                if not callable(getattr(search, 'search')):
-                    log.critical('Search plugin %s does not implement search method' % plugin_name)
-                # aww shit, search plugins API is not suitable for this at the moment
-
+        output_entries = []
         # run searches
+        for item in config['from']:
+            if isinstance(item, dict):
+                plugin_name, plugin_config = item.iteritems()[0]
+            else:
+                plugin_name, plugin_config = item, None
+            search = get_plugin_by_name(plugin_name).instance
+            if not callable(getattr(search, 'search')):
+                log.critical('Search plugin %s does not implement search method' % plugin_name)
+            for entry in input_entries:
+                try:
+                    output_entries.extend(search.search(entry['title'], plugin_config))
+                except (PluginError, PluginWarning):
+                    log.debug('No results from %s' % plugin_name)
 
-        return entries
+
+        return output_entries
 
 
-#register_plugin(Discover, 'discover', api_ver=2)
+register_plugin(Discover, 'discover', api_ver=2)

@@ -1,4 +1,5 @@
 import logging
+from flexget.feed import Entry
 import re
 import urllib
 from flexget.plugin import *
@@ -20,17 +21,17 @@ class UrlRewriteTorrentz(object):
         hash = REGEXP.match(entry['url']).group(1)
         entry['url'] = 'http://zoink.it/torrent/%s.torrent' % hash.upper()
 
-    def search(self, feed, entry):
-        link_list = self.search_title(entry['title'])
-        log.debug('Search got %d results' % len(link_list))
-        return link_list
+    def search(self, query, config=None):
+        entries = self.search_title(query)
+        log.debug('Search got %d results' % len(entries))
+        return entries
 
     def search_title(self, name):
         url = 'http://torrentz.eu/feed?q=%s' % urllib.quote(name)
         log.debug('requesting: %s' % url)
         rss = feedparser.parse(url)
         clean_name = name.replace('.', ' ').replace('-', '').replace('_', ' ').lower()
-        torrents = []
+        entries = []
 
         status = rss.get('status', False)
         if status != 200:
@@ -56,25 +57,22 @@ class UrlRewriteTorrentz(object):
                 log.debug('regexp did not find seeds / peer data')
                 continue
 
-            torrent = {}
-            torrent['name'] = item.title
-            torrent['link'] = item.link
-            torrent['seed'] = int(m.group(1).replace(',', ''))
-            torrent['leech'] = int(m.group(2).replace(',', ''))
-            torrents.append(torrent)
+            entry = Entry()
+            entry['title'] = item.title
+            entry['url'] = item.link
+            entry['torrent_seeds'] = int(m.group(1).replace(',', ''))
+            entry['torrent_leeches'] = int(m.group(2).replace(',', ''))
+            entries.append(entry)
 
         # choose torrent
-        if not torrents:
+        if not entries:
             raise PluginWarning('No close matches for %s' % name, log, log_once=True)
 
-        def best(a, b):
-            score_a = a['seed'] * 2 + a['leech']
-            score_b = b['seed'] * 2 + b['leech']
-            return cmp(score_a, score_b)
+        def score(a):
+            return a['torrent_seeds'] * 2 + a['torrent_leeches']
 
-        torrents.sort(best)
-        torrents.reverse()
+        entries.sort(reverse=True, key=score)
 
-        return [torrent['link'] for torrent in torrents] 
+        return entries
 
 register_plugin(UrlRewriteTorrentz, 'torrentz', groups=['urlrewriter', 'search'])

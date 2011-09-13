@@ -1,6 +1,7 @@
 import urllib
 import urllib2
 import logging
+from flexget.feed import Entry
 import re
 from flexget.plugin import *
 from flexget.utils.soup import get_soup
@@ -17,8 +18,8 @@ class UrlRewriteNewzleech(object):
 
     # Search API
     @internet(log)
-    def search(self, feed, entry):
-        url = u'http://newzleech.com/?%s' % str(urllib.urlencode({'q': entry['title'].encode('latin1'),
+    def search(self, query, config=None):
+        url = u'http://newzleech.com/?%s' % str(urllib.urlencode({'q': query.encode('latin1'),
                                                                   'm': 'search', 'group': '', 'min': 'min',
                                                                   'max': 'max', 'age': '', 'minage': '', 'adv': ''}))
         #log.debug('Search url: %s' % url)
@@ -46,8 +47,9 @@ class UrlRewriteNewzleech(object):
             size = item.find('td', attrs={'class': 'size'}).contents[0]
             nzb_url = 'http://newzleech.com/' + item.find('td', attrs={'class': 'get'}).next.get('href')
 
+            #TODO: confidence match
             # generate regexp from entry title and see if it matches subject
-            regexp = entry['title']
+            regexp = query
             wildcardize = [' ', '-']
             for wild in wildcardize:
                 regexp = regexp.replace(wild, '.')
@@ -74,19 +76,19 @@ class UrlRewriteNewzleech(object):
                         num /= 1024
                     return num
 
-                nzb = {}
+                nzb = Entry(title=subject, url=nzb_url, content_size=parse_size(size))
                 nzb['url'] = nzb_url
                 nzb['size'] = parse_size(size)
 
                 nzbs.append(nzb)
 
         if not nzbs:
-            log.debug('Unable to find %s' % entry['title'])
+            log.debug('Unable to find %s' % query)
             return
 
         # choose largest file
-        nzbs.sort(lambda a, b: cmp(a['size'], b['size']), reverse=True)
+        nzbs.sort(reverse=True, key=lambda x: x.get('content_size', 0))
 
-        return [nzb['url'] for nzb in nzbs]
+        return nzbs
 
 register_plugin(UrlRewriteNewzleech, 'newzleech', groups=['search'])

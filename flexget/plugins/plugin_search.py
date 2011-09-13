@@ -76,13 +76,15 @@ class PluginSearch(object):
             # loop through configured searches
             search_plugins = feed.config.get('search', [])
             for name in search_plugins:
+                config = None
                 if isinstance(name, dict):
                     # assume the name is the first/only key in the dict.
-                    name = name.keys()[0]
+                    name, config = name.items()[0]
                 log.verbose('Searching `%s` from %s' % (entry['title'], name))
                 try:
-                    url = plugins[name].search(feed, entry)[0]
-                    if url:
+                    results = plugins[name].search(entry['title'], config)
+                    if results:
+                        url = results[0]['url']
                         log.debug('Found url: %s' % url)
                         entry['url'] = url
                         found = True

@@ -218,7 +218,10 @@ def urlopener(url, log, **kwargs):
     # In order to avoid requiring python 2.6, we're not using the urlopen timeout parameter. That really should be used
     # after checking for python 2.6.
 
-    site = urlparse(url).netloc
+    if isinstance(url, urllib2.Request):
+        site = url.get_host()
+    else:
+        site = urlparse(url).netloc
     if site in unresponsive_sites:
         if unresponsive_sites[site] > datetime.now() - WAIT_TIME:
             msg = ('%s is unresponsive, not trying again for %s seconds.' %
