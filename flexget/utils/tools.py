@@ -334,13 +334,18 @@ class ReList(list):
             yield self[i]
 
 
-def make_valid_path(path):
+def make_valid_path(path, windows=None):
     """Removes invalid characters from windows pathnames"""
     drive, path = ntpath.splitdrive(path)
-    if drive:
-        # If a drive is found, this is a windows path, and we should remove invalid characters.
+    if windows is None and drive:
+        # If a drive is found, this is a windows path
+        windows = True
+    if windows:
+        # Remove invalid characters
         for char in ':<>*?"|':
             path = path.replace(char, '')
+        # Windows directories and files cannot end with period
+        path = re.sub(r'(?<![\./\\])\.+(?=[/\\]|$)', '', path)
     return drive + path
 
 
