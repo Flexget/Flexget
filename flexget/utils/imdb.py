@@ -176,7 +176,7 @@ class ImdbSearch(object):
                 log.debug('processing name: %s url: %s' % (movie['name'], movie['url']))
 
                 # calc & set best matching ratio
-                seq = difflib.SequenceMatcher(lambda x: x == ' ', movie['name'].lower(), name.lower())
+                seq = difflib.SequenceMatcher(lambda x: x == ' ', movie['name'].title(), name.title())
                 ratio = seq.ratio()
 
                 # deprioritize tv results
@@ -193,7 +193,7 @@ class ImdbSearch(object):
                         continue
                     aka = match.group(0).replace('"', '')
                     log.trace('processing aka %s' % aka)
-                    seq = difflib.SequenceMatcher(lambda x: x == ' ', aka.lower(), name.lower())
+                    seq = difflib.SequenceMatcher(lambda x: x == ' ', aka.title(), name.title())
                     aka_ratio = seq.ratio()
                     if aka_ratio > ratio:
                         ratio = aka_ratio * self.aka_weight
@@ -215,10 +215,7 @@ class ImdbSearch(object):
                 movie['match'] = ratio
                 movies.append(movie)
 
-        def cmp_movie(m1, m2):
-            return cmp(m2['match'], m1['match'])
-
-        movies.sort(cmp_movie)
+        movies.sort(key=lambda x: x['match'], reverse=True)
         return movies
 
 
