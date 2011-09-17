@@ -35,6 +35,12 @@ class FilterQuality(object):
             config = {'quality': config}
         if isinstance(config.get('quality'), basestring):
             config['quality'] = [config['quality']]
+        # Convert all config parameters from strings to their associated quality object
+        if 'quality' in config:
+            config['quality'] = [quals.get(q) for q in config['quality']]
+        for key in ['min', 'max']:
+            if key in config:
+                config[key] = quals.get(config[key])
         return config
 
     # Run before series and imdb plugins, so correct qualities are chosen
