@@ -324,8 +324,11 @@ def get_first_result(tmdb_function, value):
     except URLError, e:
         log.warning('Request failed %s' % url)
         return
-
-    result = json.load(data)
+    try:
+        result = json.load(data)
+    except ValueError:
+        log.warning('TMDb returned invalid json.')
+        return
     # Make sure there is a valid result to return
     if isinstance(result, list) and len(result):
         result = result[0]
