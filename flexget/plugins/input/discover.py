@@ -96,7 +96,7 @@ class Discover(object):
                     search_results = search.search(entry['title'], plugin_config)
                     log.debug('Discovered %s entries from %s' % (len(search_results), plugin_name))
                     # TODO: why does default ignore last entry ?
-                    result.extend(search_results[:config.get('limit', -1)])
+                    result.extend(search_results[:config.get('limit')])
                 except (PluginError, PluginWarning):
                     log.debug('No results from %s' % plugin_name)
         return result
