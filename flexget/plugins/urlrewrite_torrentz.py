@@ -35,7 +35,8 @@ class UrlRewriteTorrentz(object):
         return result
 
     def search_title(self, name):
-        url = 'http://torrentz.eu/feed?q=%s' % urllib.quote(name)
+        # urllib.quote will crash if the unicode string has non ascii characters, so encode in utf-8 beforehand
+        url = 'http://torrentz.eu/feed?q=%s' % urllib.quote(name.encode('utf-8'))
         log.debug('requesting: %s' % url)
         rss = feedparser.parse(url)
         clean_name = self.clean_name(name)

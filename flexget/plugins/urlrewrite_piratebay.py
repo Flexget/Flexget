@@ -78,7 +78,8 @@ class UrlRewritePirateBay(object):
 
         name = name.replace('.', ' ').lower()
         if not url:
-            url = 'http://thepiratebay.org/search/' + urllib.quote(name)
+            # urllib.quote will crash if the unicode string has non ascii characters, so encode in utf-8 beforehand
+            url = 'http://thepiratebay.org/search/' + urllib.quote(name.encode('utf-8'))
             log.debug('Using %s as piratebay search url' % url)
         page = urlopener(url, log)
 
