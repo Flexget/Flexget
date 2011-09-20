@@ -48,9 +48,13 @@ class FilterQuality(object):
     def on_feed_filter(self, feed, config):
         config = self.prepare_config(config)
         for entry in feed.entries:
-            if config.get('quality'):
+            if 'quality' in config:
                 if not entry.get('quality') in config['quality']:
-                    feed.reject(entry, 'quality is %s' % entry['quality'])
+                    print config
+                    msg = 'quality is %s instead one of allowed (%s)' %\
+                          (str(entry['quality']),
+                           ', '.join([str(x) for x in config['quality']]))
+                    feed.reject(entry, msg)
             else:
                 if config.get('min'):
                     if entry.get('quality') < config['min']:
@@ -58,4 +62,5 @@ class FilterQuality(object):
                 if config.get('max'):
                     if entry.get('quality') > config['max']:
                         feed.reject(entry, 'quality %s not <= %s' % (entry['quality'], config['max']))
+
 register_plugin(FilterQuality, 'quality', api_ver=2)
