@@ -28,7 +28,7 @@ class ImdbList(object):
         root.accept('text', key='list', required=True)
         return root
 
-    @cached('imdb_list', persist='6 hours')
+    @cached('imdb_list', persist='2 hours')
     def on_feed_input(self, feed, config):
         urlopener = partial(_urlopener, log=log, retries=2)
         if config.get('username') and config.get('password'):
