@@ -1,6 +1,5 @@
 from datetime import datetime, timedelta
 import logging
-import urllib
 from urllib2 import URLError
 import os
 import posixpath
@@ -316,7 +315,7 @@ class ApiTmdb(object):
 
 def get_first_result(tmdb_function, value):
     if isinstance(value, basestring):
-        value = urllib.quote_plus(value, safe='?&')
+        value = value.replace(' ', '+').encode('utf-8')
     url = '%s/2.1/Movie.%s/%s/json/%s/%s' % (server, tmdb_function, lang, api_key, value)
     try:
         data = urlopener(url, log)
