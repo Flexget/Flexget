@@ -53,7 +53,7 @@ class FilterQuality(object):
                     print config
                     msg = 'quality is %s instead one of allowed (%s)' %\
                           (str(entry['quality']),
-                           ', '.join([str(x) for x in config['quality']]))
+                           ', '.join(str(x) for x in config['quality']))
                     feed.reject(entry, msg)
             else:
                 if config.get('min'):

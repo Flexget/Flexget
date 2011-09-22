@@ -7,7 +7,7 @@ from flexget.feed import Entry
 from flexget.plugin import register_plugin, internet, PluginWarning
 from flexget.utils.tools import urlopener
 from flexget.utils.soup import get_soup
-from flexget.utils.titles.parser import TitleParser
+from flexget.utils.search import torrent_availability, loose_comparator
 
 log = logging.getLogger('piratebay')
 
@@ -62,13 +62,6 @@ class UrlRewritePirateBay(object):
         log.debug('search got %d results' % len(entries))
         return entries
 
-    # TODO: Put this somewhere for all search plugins
-    def clean_name(self, name):
-        result = name.lower()
-        result = TitleParser.remove_words(result, TitleParser.sounds + TitleParser.codecs)
-        result = re.sub('[ \(\)\-_\[\]\.]+', ' ', result)
-        return result
-
     @internet(log)
     def search_title(self, name, url=None):
         """
@@ -83,19 +76,13 @@ class UrlRewritePirateBay(object):
             log.debug('Using %s as piratebay search url' % url)
         page = urlopener(url, log)
 
-        # do this here so I don't have to do it constantly below.
-        clean_name = self.clean_name(name)
-
         soup = get_soup(page)
         entries = []
-        comparator = difflib.SequenceMatcher(lambda x: x in ' ', clean_name)
+        comparator = loose_comparator(name)
         for link in soup.findAll('a', attrs={'class': 'detLink'}):
-            clean_found = self.clean_name(link.contents[0])
-            # assign confidence score of how close this link is to the name you're looking for. .6 and above is "close"
-            comparator.set_seq2(clean_found)
-            confidence = comparator.ratio()
-            log.debug('name: %s' % clean_name)
-            log.debug('found name: %s' % clean_found)
+            confidence = comparator.compare_with(link.contents[0])
+            log.debug('name: %s' % comparator.a)
+            log.debug('found name: %s' % comparator.b)
             log.debug('confidence: %s' % confidence)
             if confidence < 0.7:
                 continue
@@ -125,7 +112,7 @@ class UrlRewritePirateBay(object):
                 raise PluginWarning('No close matches for %s' % name, log, log_once=True)
 
         def score(a):
-            return a['torrent_seeds'] * 2 + a['torrent_leeches']
+            return torrent_availability(a['torrent_seeds'], a['torrent_leeches'])
 
         entries.sort(reverse=True, key=score)
 
