@@ -1,9 +1,9 @@
 import urllib
 import urllib2
 import logging
-from flexget.feed import Entry
 import re
-from flexget.plugin import *
+from flexget.feed import Entry
+from flexget.plugin import register_plugin, internet
 from flexget.utils.soup import get_soup
 from flexget.utils.tools import urlopener
 
@@ -18,7 +18,7 @@ class UrlRewriteNewzleech(object):
 
     # Search API
     @internet(log)
-    def search(self, query, config=None):
+    def search(self, query, config=None, exact=False):
         url = u'http://newzleech.com/?%s' % str(urllib.urlencode({'q': query.encode('latin1'),
                                                                   'm': 'search', 'group': '', 'min': 'min',
                                                                   'max': 'max', 'age': '', 'minage': '', 'adv': ''}))
@@ -33,7 +33,7 @@ class UrlRewriteNewzleech(object):
             'Connection': 'keep-alive',
         }
 
-        req = urllib2.Request(url, None, txheaders)
+        req = urllib2.Request(url, headers=txheaders)
         page = urlopener(req, log)
 
         soup = get_soup(page)
@@ -59,9 +59,9 @@ class UrlRewriteNewzleech(object):
             if re.match(regexp, subject):
                 log.debug('%s matches to regexp' % subject)
                 if complete != u'100':
-                    log.debug('Match is incomplete %s from newzleech, skipping ..' % entry['title'])
+                    log.debug('Match is incomplete %s from newzleech, skipping ..' % query)
                     continue
-                log.info('Found \'%s\'' % entry['title'])
+                log.info('Found \'%s\'' % query)
 
                 def parse_size(value):
                     try:

@@ -82,7 +82,7 @@ class PluginSearch(object):
                     name, config = name.items()[0]
                 log.verbose('Searching `%s` from %s' % (entry['title'], name))
                 try:
-                    results = plugins[name].search(entry['title'], config)
+                    results = plugins[name].search(entry['title'], config, exact=True)
                     if results:
                         url = results[0]['url']
                         log.debug('Found url: %s' % url)

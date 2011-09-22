@@ -179,7 +179,7 @@ class UrlrewriteArchive(object):
                  'url': 'url',
                  'description': 'description'}
 
-    def search(self, query, config=None):
+    def search(self, query, config=None, exact=False):
         """Search plugin API method"""
         session = Session()
         log.debug('looking for %s' % query)

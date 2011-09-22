@@ -4,13 +4,18 @@ from difflib import SequenceMatcher
 from flexget.utils.titles.parser import TitleParser
 
 
+def clean_symbols(text):
+    """Replaces common symbols with spaces."""
+    return re.sub('[ \(\)\-_\[\]\.]+', ' ', text)
+
+
 def clean_title(title):
     """Removes common codec, sound keywords, and special characters info from titles to facilitate
     loose title comparison.
     """
     result = title.lower()
     result = TitleParser.remove_words(result, TitleParser.sounds + TitleParser.codecs)
-    result = re.sub('[ \(\)\-_\[\]\.]+', ' ', result)
+    result = clean_symbols(result)
     return result
 
 
@@ -27,10 +32,10 @@ def loose_comparator(title):
 
 def exact_comparator(title):
     """Create a SequenceMatcher instance with compare_with method for more exact matching."""
-    sm = SequenceMatcher(a=title)
+    sm = SequenceMatcher(a=clean_symbols(title))
 
     def compare_with(other):
-        sm.set_seq2(other)
+        sm.set_seq2(clean_symbols(other))
         return sm.ratio()
     sm.compare_with = compare_with
     return sm

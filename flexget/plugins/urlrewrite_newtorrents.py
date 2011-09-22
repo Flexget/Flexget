@@ -1,12 +1,13 @@
+import urllib
 import urllib2
 import logging
-from flexget.feed import Entry
 import re
 from plugin_urlrewriting import UrlRewritingError
-from flexget.plugin import *
+from flexget.feed import Entry
+from flexget.plugin import register_plugin, PluginWarning, internet
 from flexget.utils.soup import get_soup
-import difflib
 from flexget.utils.tools import urlopener
+from flexget.utils.search import exact_comparator, loose_comparator
 
 timeout = 10
 import socket
@@ -47,9 +48,9 @@ class NewTorrents:
             raise UrlRewritingError('Bug in newtorrents urlrewriter')
             
     # Search plugin API
-    def search(self, query, config=None):
+    def search(self, query, config=None, exact=False):
         search_url = 'http://www.newtorrents.info/search/%s' % query
-        return self.entries_from_search(search_url, query)
+        return self.entries_from_search(search_url, query, exact=exact)
 
     @internet(log)
     def url_from_page(self, url):
@@ -72,11 +73,11 @@ class NewTorrents:
         return s.replace('.', ' ').replace('_', ' ').strip().lower()
 
     @internet(log)
-    def entries_from_search(self, url, name):
+    def entries_from_search(self, url, name, exact=False):
         """Parses torrent download url from search results"""
         name = self.clean(name)
-        import urllib
         url = urllib.quote(url, safe=':/~?=&%')
+        confidence_cutoff = 0.9 if exact else 0.7
 
         log.debug('search url: %s' % url)
 
@@ -88,6 +89,7 @@ class NewTorrents:
         soup = get_soup(html)
         # saving torrents in dict
         torrents = []
+        comparator = exact_comparator(name) if exact else loose_comparator(name)
         for link in soup.findAll('a', attrs={'href': re.compile('down.php')}):
             torrent_url = 'http://www.newtorrents.info%s' % link.get('href')
             release_name = self.clean(link.parent.next.get('title'))
@@ -96,10 +98,8 @@ class NewTorrents:
             if seed == 'n/a':
                 seed = 0
             #TODO: also parse content_size from results
-            confidence = difflib.SequenceMatcher(lambda x: x in ' -._', # junk characters
-                                       release_name.lower(),
-                                       name.lower()).ratio()
-            if confidence >= 0.9:
+            confidence = comparator.compare_with(release_name)
+            if confidence >= confidence_cutoff:
                 torrents.append(Entry(title=release_name, url=torrent_url, torrent_seeds=seed))
             else:
                 log.debug('rejecting search result: %s !~ %s' % (release_name, name))

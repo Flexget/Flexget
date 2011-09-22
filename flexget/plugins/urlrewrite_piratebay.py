@@ -7,7 +7,7 @@ from flexget.feed import Entry
 from flexget.plugin import register_plugin, internet, PluginWarning
 from flexget.utils.tools import urlopener
 from flexget.utils.soup import get_soup
-from flexget.utils.search import torrent_availability, loose_comparator
+from flexget.utils.search import torrent_availability, loose_comparator, exact_comparator
 
 log = logging.getLogger('piratebay')
 
@@ -57,13 +57,13 @@ class UrlRewritePirateBay(object):
             raise UrlRewritingError(e)
 
     # search API
-    def search(self, query, config=None):
-        entries = self.search_title(query)
+    def search(self, query, config=None, exact=False):
+        entries = self.search_title(query, exact=exact)
         log.debug('search got %d results' % len(entries))
         return entries
 
     @internet(log)
-    def search_title(self, name, url=None):
+    def search_title(self, name, url=None, exact=False):
         """
             Search for name from piratebay.
             If optional search :url: is passed it will be used instead of internal search.
@@ -78,13 +78,14 @@ class UrlRewritePirateBay(object):
 
         soup = get_soup(page)
         entries = []
-        comparator = loose_comparator(name)
+        comparator = exact_comparator(name) if exact else loose_comparator(name)
+        confidence_cutoff = 0.9 if exact else 0.7
         for link in soup.findAll('a', attrs={'class': 'detLink'}):
             confidence = comparator.compare_with(link.contents[0])
             log.debug('name: %s' % comparator.a)
             log.debug('found name: %s' % comparator.b)
             log.debug('confidence: %s' % confidence)
-            if confidence < 0.7:
+            if confidence < confidence_cutoff:
                 continue
             entry = Entry()
             entry['title'] = link.contents[0]

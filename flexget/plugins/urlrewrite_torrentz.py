@@ -1,11 +1,10 @@
 import logging
 import re
 import urllib
-import difflib
 import feedparser
 from flexget.plugin import register_plugin, PluginWarning
 from flexget.feed import Entry
-from flexget.utils.search import torrent_availability, loose_comparator
+from flexget.utils.search import torrent_availability, loose_comparator, exact_comparator
 
 log = logging.getLogger('torrentz')
 
@@ -22,12 +21,12 @@ class UrlRewriteTorrentz(object):
         hash = REGEXP.match(entry['url']).group(1)
         entry['url'] = 'http://zoink.it/torrent/%s.torrent' % hash.upper()
 
-    def search(self, query, config=None):
-        entries = self.search_title(query)
+    def search(self, query, config=None, exact=False):
+        entries = self.search_title(query, exact=exact)
         log.debug('Search got %d results' % len(entries))
         return entries
 
-    def search_title(self, name):
+    def search_title(self, name, exact=False):
         # urllib.quote will crash if the unicode string has non ascii characters, so encode in utf-8 beforehand
         url = 'http://torrentz.eu/feed?q=%s' % urllib.quote(name.encode('utf-8'))
         log.debug('requesting: %s' % url)
@@ -42,7 +41,8 @@ class UrlRewriteTorrentz(object):
         if ex:
             raise PluginWarning('Got bozo_exception (bad feed)')
 
-        comparator = loose_comparator(name)
+        comparator = exact_comparator(name) if exact else loose_comparator(name)
+        confidence_cutoff = 0.9 if exact else 0.7
         for item in rss.entries:
             # assign confidence score of how close this link is to the name you're looking for. .6 and above is "close"
             confidence = comparator.compare_with(item.title)
@@ -50,7 +50,7 @@ class UrlRewriteTorrentz(object):
             log.debug('name: %s' % comparator.a)
             log.debug('found name: %s' % comparator.b)
             log.debug('confidence: %s' % str(confidence))
-            if confidence < 0.7:
+            if confidence < confidence_cutoff:
                 continue
 
             m = re.search(r'Size: ([\d]+) Mb Seeds: ([,\d]+) Peers: ([,\d]+)', item.description, re.IGNORECASE)

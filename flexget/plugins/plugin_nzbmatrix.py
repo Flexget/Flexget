@@ -37,7 +37,7 @@ class NzbMatrix(object):
         return nzbmatrix
 
     # Search plugin API
-    def search(self, query, config=None):
+    def search(self, query, config=None, exact=False):
         import urllib
         params = self.getparams(config)
         params['search'] = self.clean(query)

@@ -93,7 +93,7 @@ class Discover(object):
                 log.critical('Search plugin %s does not implement search method' % plugin_name)
             for entry in entries:
                 try:
-                    search_results = search.search(entry['title'], plugin_config)
+                    search_results = search.search(entry['title'], plugin_config, exact=False)
                     log.debug('Discovered %s entries from %s' % (len(search_results), plugin_name))
                     # TODO: why does default ignore last entry ?
                     result.extend(search_results[:config.get('limit')])
