@@ -65,6 +65,10 @@ class TraktAcquired(object):
                     found.setdefault('movies', {}).setdefault('movies', []).append(movie)
                     log.debug('Marking %s for submission to trakt.tv library.' % entry['title'])
 
+        if not found:
+            log.debug('Nothing to submit to trakt.')
+            return
+
         if feed.manager.options.test:
             log.info('Not submitting to trakt.tv because of test mode.')
             return
