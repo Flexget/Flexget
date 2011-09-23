@@ -38,7 +38,7 @@ class MovieParser(TitleParser):
         # Reset before parsing, so the parser can be reused.
         self.reset()
 
-        if not data:
+        if data is None:
             data = self.data
 
         for char in '[]()_,.':

@@ -4,7 +4,7 @@ import urllib
 import feedparser
 from flexget.plugin import register_plugin, PluginWarning
 from flexget.feed import Entry
-from flexget.utils.search import torrent_availability, loose_comparator, exact_comparator
+from flexget.utils.search import torrent_availability, StringComparator
 
 log = logging.getLogger('torrentz')
 
@@ -21,13 +21,15 @@ class UrlRewriteTorrentz(object):
         hash = REGEXP.match(entry['url']).group(1)
         entry['url'] = 'http://zoink.it/torrent/%s.torrent' % hash.upper()
 
-    def search(self, query, config=None, exact=False):
-        entries = self.search_title(query, exact=exact)
+    def search(self, query, comparator, config=None):
+        entries = self.search_title(query, comparator)
         log.debug('Search got %d results' % len(entries))
         return entries
 
-    def search_title(self, name, exact=False):
+    def search_title(self, name, comparator=StringComparator()):
         # urllib.quote will crash if the unicode string has non ascii characters, so encode in utf-8 beforehand
+        comparator.set_seq1(name)
+        name = comparator.search_string()
         url = 'http://torrentz.eu/feed?q=%s' % urllib.quote(name.encode('utf-8'))
         log.debug('requesting: %s' % url)
         rss = feedparser.parse(url)
@@ -41,16 +43,13 @@ class UrlRewriteTorrentz(object):
         if ex:
             raise PluginWarning('Got bozo_exception (bad feed)')
 
-        comparator = exact_comparator(name) if exact else loose_comparator(name)
-        confidence_cutoff = 0.9 if exact else 0.7
         for item in rss.entries:
             # assign confidence score of how close this link is to the name you're looking for. .6 and above is "close"
-            confidence = comparator.compare_with(item.title)
-
+            comparator.set_seq2(item.title)
             log.debug('name: %s' % comparator.a)
             log.debug('found name: %s' % comparator.b)
-            log.debug('confidence: %s' % str(confidence))
-            if confidence < confidence_cutoff:
+            log.debug('confidence: %s' % comparator.ratio())
+            if not comparator.matches():
                 continue
 
             m = re.search(r'Size: ([\d]+) Mb Seeds: ([,\d]+) Peers: ([,\d]+)', item.description, re.IGNORECASE)
@@ -64,16 +63,15 @@ class UrlRewriteTorrentz(object):
             entry['content_size'] = int(m.group(1))
             entry['torrent_seeds'] = int(m.group(2).replace(',', ''))
             entry['torrent_leeches'] = int(m.group(3).replace(',', ''))
+            entry['search_ratio'] = comparator.ratio()
+            entry['search_sort'] = torrent_availability(entry['torrent_seeds'], entry['torrent_leeches'])
             entries.append(entry)
 
         # choose torrent
         if not entries:
             raise PluginWarning('No close matches for %s' % name, log, log_once=True)
 
-        def score(a):
-            return torrent_availability(a['torrent_seeds'], a['torrent_leeches'])
-
-        entries.sort(reverse=True, key=score)
+        entries.sort(reverse=True, key=lambda x: x.get('search_sort'))
 
         return entries
 

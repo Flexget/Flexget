@@ -179,8 +179,9 @@ class UrlrewriteArchive(object):
                  'url': 'url',
                  'description': 'description'}
 
-    def search(self, query, config=None, exact=False):
+    def search(self, query, comparator, config=None):
         """Search plugin API method"""
+        # TODO: Implement comparator matching
         session = Session()
         log.debug('looking for %s' % query)
         results = search(session, query)

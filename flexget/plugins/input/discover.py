@@ -1,4 +1,5 @@
 import logging
+from flexget.utils.search import StringComparator, MovieComparator, clean_title
 from flexget.plugin import register_plugin, get_plugin_by_name, PluginError, \
     add_plugin_validators, get_plugins_by_group, PluginWarning
 
@@ -33,6 +34,7 @@ class Discover(object):
                 no_config.accept(plugin.name)
 
         discover.accept('integer', key='limit')
+        discover.accept('choice', key='type').accept_choices(['normal', 'exact', 'movies'])
         return discover
 
     def execute_inputs(self, config, feed):
@@ -83,6 +85,12 @@ class Discover(object):
         """
 
         result = []
+        if config.get('type', 'normal') == 'normal':
+            comparator = StringComparator(cutoff=0.7, cleaner=clean_title)
+        elif config['type'] == 'exact':
+            comparator = StringComparator(cutoff=0.9)
+        else:
+            comparator = MovieComparator()
         for item in config['from']:
             if isinstance(item, dict):
                 plugin_name, plugin_config = item.iteritems()[0]
@@ -93,13 +101,12 @@ class Discover(object):
                 log.critical('Search plugin %s does not implement search method' % plugin_name)
             for entry in entries:
                 try:
-                    search_results = search.search(entry['title'], plugin_config, exact=False)
+                    search_results = search.search(entry['title'], comparator, plugin_config)
                     log.debug('Discovered %s entries from %s' % (len(search_results), plugin_name))
-                    # TODO: why does default ignore last entry ?
                     result.extend(search_results[:config.get('limit')])
                 except (PluginError, PluginWarning):
                     log.debug('No results from %s' % plugin_name)
-        return result
+        return sorted(result, reverse=True, key=lambda x: x.get('search_sort'))
 
     def on_feed_input(self, feed, config):
         entries = self.execute_inputs(config, feed)

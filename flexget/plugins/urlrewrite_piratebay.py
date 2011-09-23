@@ -7,7 +7,7 @@ from flexget.feed import Entry
 from flexget.plugin import register_plugin, internet, PluginWarning
 from flexget.utils.tools import urlopener
 from flexget.utils.soup import get_soup
-from flexget.utils.search import torrent_availability, loose_comparator, exact_comparator
+from flexget.utils.search import torrent_availability, StringComparator
 
 log = logging.getLogger('piratebay')
 
@@ -57,35 +57,33 @@ class UrlRewritePirateBay(object):
             raise UrlRewritingError(e)
 
     # search API
-    def search(self, query, config=None, exact=False):
-        entries = self.search_title(query, exact=exact)
+    def search(self, query, comparator, config=None):
+        entries = self.search_title(query, comparator)
         log.debug('search got %d results' % len(entries))
         return entries
 
     @internet(log)
-    def search_title(self, name, url=None, exact=False):
+    def search_title(self, name, comparator=StringComparator(), url=None):
         """
             Search for name from piratebay.
             If optional search :url: is passed it will be used instead of internal search.
         """
 
-        name = name.replace('.', ' ').lower()
+        comparator.set_seq1(name)
+        name = comparator.search_string()
         if not url:
             # urllib.quote will crash if the unicode string has non ascii characters, so encode in utf-8 beforehand
             url = 'http://thepiratebay.org/search/' + urllib.quote(name.encode('utf-8'))
             log.debug('Using %s as piratebay search url' % url)
         page = urlopener(url, log)
-
         soup = get_soup(page)
         entries = []
-        comparator = exact_comparator(name) if exact else loose_comparator(name)
-        confidence_cutoff = 0.9 if exact else 0.7
         for link in soup.findAll('a', attrs={'class': 'detLink'}):
-            confidence = comparator.compare_with(link.contents[0])
+            comparator.set_seq2(link.contents[0])
             log.debug('name: %s' % comparator.a)
             log.debug('found name: %s' % comparator.b)
-            log.debug('confidence: %s' % confidence)
-            if confidence < confidence_cutoff:
+            log.debug('confidence: %s' % comparator.ratio())
+            if not comparator.matches():
                 continue
             entry = Entry()
             entry['title'] = link.contents[0]
@@ -93,6 +91,8 @@ class UrlRewritePirateBay(object):
             tds = link.parent.parent.parent.findAll('td')
             entry['torrent_seeds'] = int(tds[-2].contents[0])
             entry['torrent_leeches'] = int(tds[-1].contents[0])
+            entry['search_ratio'] = comparator.ratio()
+            entry['search_sort'] = torrent_availability(entry['torrent_seeds'], entry['torrent_leeches'])
             # Parse content_size
             size = link.findNext(attrs={'class': 'detDesc'}).contents[0]
             size = re.search('Size ([\.\d]+)\xa0([GMK])iB', size)
@@ -108,14 +108,14 @@ class UrlRewritePirateBay(object):
         if not entries:
             dashindex = name.rfind('-')
             if dashindex != -1:
-                return self.search_title(name[:dashindex])
+                return self.search_title(name[:dashindex], comparator=comparator)
             else:
                 raise PluginWarning('No close matches for %s' % name, log, log_once=True)
 
         def score(a):
             return torrent_availability(a['torrent_seeds'], a['torrent_leeches'])
 
-        entries.sort(reverse=True, key=score)
+        entries.sort(reverse=True, key=lambda x: x.get('search_sorted'))
 
         #for torrent in torrents:
         #    log.debug('%s link: %s' % (torrent, torrent['link']))

@@ -7,7 +7,7 @@ from flexget.feed import Entry
 from flexget.plugin import register_plugin, PluginWarning, internet
 from flexget.utils.soup import get_soup
 from flexget.utils.tools import urlopener
-from flexget.utils.search import exact_comparator, loose_comparator
+from flexget.utils.search import StringComparator, torrent_availability
 
 timeout = 10
 import socket
@@ -35,7 +35,7 @@ class NewTorrents:
         if url.startswith('http://www.newtorrents.info/?q=') or \
            url.startswith('http://www.newtorrents.info/search'):
             try:
-                url = self.entries_from_search(url, entry['title'])[0]['url']
+                url = self.entries_from_search(entry['title'], url=url)[0]['url']
             except PluginWarning, e:
                 raise UrlRewritingError(e.value)
         else:
@@ -48,9 +48,8 @@ class NewTorrents:
             raise UrlRewritingError('Bug in newtorrents urlrewriter')
             
     # Search plugin API
-    def search(self, query, config=None, exact=False):
-        search_url = 'http://www.newtorrents.info/search/%s' % query
-        return self.entries_from_search(search_url, query, exact=exact)
+    def search(self, query, comparator, config=None):
+        return self.entries_from_search(query, comparator=comparator)
 
     @internet(log)
     def url_from_page(self, url):
@@ -67,17 +66,14 @@ class NewTorrents:
             raise UrlRewritingError('Failed to get url from download page. Plugin may need a update.')
         else:
             return f.group(1)
-            
-    def clean(self, s):
-        """Formalize names"""
-        return s.replace('.', ' ').replace('_', ' ').strip().lower()
 
     @internet(log)
-    def entries_from_search(self, url, name, exact=False):
+    def entries_from_search(self, name, url=None, comparator=StringComparator(cutoff=0.9)):
         """Parses torrent download url from search results"""
-        name = self.clean(name)
-        url = urllib.quote(url, safe=':/~?=&%')
-        confidence_cutoff = 0.9 if exact else 0.7
+        comparator.set_seq1(name)
+        name = comparator.search_string()
+        if not url:
+            url = 'http://www.newtorrents.info/search/%s' % urllib.quote(name, safe=':/~?=&%')
 
         log.debug('search url: %s' % url)
 
@@ -89,27 +85,26 @@ class NewTorrents:
         soup = get_soup(html)
         # saving torrents in dict
         torrents = []
-        comparator = exact_comparator(name) if exact else loose_comparator(name)
         for link in soup.findAll('a', attrs={'href': re.compile('down.php')}):
             torrent_url = 'http://www.newtorrents.info%s' % link.get('href')
-            release_name = self.clean(link.parent.next.get('title'))
+            release_name = link.parent.next.get('title')
             # quick dirty hack
             seed = link.findNext('td', attrs={'class': re.compile('s')}).renderContents()
             if seed == 'n/a':
                 seed = 0
             #TODO: also parse content_size from results
-            confidence = comparator.compare_with(release_name)
-            if confidence >= confidence_cutoff:
-                torrents.append(Entry(title=release_name, url=torrent_url, torrent_seeds=seed))
+            if comparator.matches(release_name):
+                torrents.append(Entry(title=release_name, url=torrent_url, torrent_seeds=seed,
+                                      search_ratio=comparator.ratio(), search_sort=torrent_availability(seed, 0)))
             else:
                 log.debug('rejecting search result: %s !~ %s' % (release_name, name))
         # sort with seed number Reverse order
-        torrents.sort(reverse=True, key=lambda x: x.get('torrent_seeds', 0))
+        torrents.sort(reverse=True, key=lambda x: x.get('search_sort', 0))
         # choose the torrent
         if not torrents:
             dashindex = name.rfind('-')
             if dashindex != -1:
-                return self.entries_from_search(url, name[:dashindex])
+                return self.entries_from_search(name[:dashindex], comparator=comparator)
             else:
                 raise PluginWarning('No matches for %s' % name, log, log_once=True)
         else:

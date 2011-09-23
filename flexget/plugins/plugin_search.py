@@ -1,4 +1,5 @@
 import logging
+from flexget.utils.search import StringComparator
 from flexget.plugin import get_plugins_by_group, PluginWarning, PluginError, \
     register_parser_option, register_plugin, get_plugin_by_name
 
@@ -82,7 +83,7 @@ class PluginSearch(object):
                     name, config = name.items()[0]
                 log.verbose('Searching `%s` from %s' % (entry['title'], name))
                 try:
-                    results = plugins[name].search(entry['title'], config, exact=True)
+                    results = plugins[name].search(entry['title'], StringComparator(cutoff=0.9), config)
                     if results:
                         url = results[0]['url']
                         log.debug('Found url: %s' % url)
