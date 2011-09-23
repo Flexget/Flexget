@@ -257,7 +257,7 @@ def lookup_series(name=None, tvdb_id=None, only_cached=False, session=None):
         if not only_cached:
             mark_expired(session=session)
         if series.expired and not only_cached:
-            log.info('Data for %s has expired, refreshing from tvdb' % series.seriesname)
+            log.verbose('Data for %s has expired, refreshing from tvdb' % series.seriesname)
             try:
                 series.update()
             except LookupError, e:
