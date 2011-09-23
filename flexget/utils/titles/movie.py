@@ -26,7 +26,7 @@ class MovieParser(TitleParser):
         # parsing results
         self.name = None
         self.year = None
-        self.quality = None
+        self.quality = qualities.UNKNOWN
         self.proper_count = 0
 
     def __str__(self):
@@ -57,7 +57,6 @@ class MovieParser(TitleParser):
         parts = data.split(' ')
         year = None
         cut_part = 256
-        self.quality = 'unknown'
         for part in parts:
             cut = False
             # check for year
@@ -91,9 +90,9 @@ class MovieParser(TitleParser):
         # parse quality
         quality, remaining = qualities.quality_match(data)
         if quality:
-            self.quality = quality.name
+            self.quality = quality
             # remaining string is same as data but quality information removed
-            # find out position where there is first difference, this is earlies
+            # find out position where there is first difference, this is earliest
             # quality bit, anything after that has no relevance to the movie name
             dp = diff_pos(data, remaining)
             if dp is not None:

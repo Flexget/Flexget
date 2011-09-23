@@ -96,7 +96,7 @@ class FilterProperMovies(object):
             parser.data = entry['title']
             parser.parse()
 
-            quality = parser.quality
+            quality = parser.quality.name
 
             log.debug('quality: %s' % quality)
             log.debug('imdb_id: %s' % entry['imdb_id'])

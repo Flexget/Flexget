@@ -70,14 +70,14 @@ class MovieComparator(StringComparator):
         self.parser.parse(a)
         super(MovieComparator, self).set_seq1(self.parser.name)
         self.a_year = self.parser.year
-        self.a_quality = qualities.parse_quality(a)
+        self.a_quality = self.parser.quality
 
     def set_seq2(self, b):
         """Set second string for comparison."""
         self.parser.parse(b)
         super(MovieComparator, self).set_seq2(self.parser.name)
         self.b_year = self.parser.year
-        self.b_quality = qualities.parse_quality(b)
+        self.b_quality = self.parser.quality
 
     def matches(self, other=None):
         """Compare the two strings, return True if they appear to be the same movie.
