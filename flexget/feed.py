@@ -69,8 +69,8 @@ class Entry(dict):
         self.update(*args, **kwargs)
 
     def __setitem__(self, key, value):
-        # enforce unicode compatibility
-        if isinstance(value, str):
+        # Enforce unicode compatibility. Check for all subclasses of basestring, so that NavigableStrings are also cast
+        if isinstance(value, basestring) and not type(value) == unicode:
             try:
                 value = unicode(value)
             except UnicodeDecodeError:
