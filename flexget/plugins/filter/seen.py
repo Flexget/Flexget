@@ -11,15 +11,30 @@
 
 import logging
 from datetime import datetime, timedelta
-from sqlalchemy import Column, Integer, String, DateTime, Unicode, asc, or_
+from sqlalchemy import Column, Integer, String, DateTime, Unicode, asc, or_, select, update
 from sqlalchemy.schema import ForeignKey
 from sqlalchemy.orm import relation
 from flexget.manager import Session
 from flexget.event import event
-from flexget.manager import Base
 from flexget.plugin import register_plugin, priority, register_parser_option
+from flexget import schema
+from flexget.utils.sqlalchemy_utils import table_schema
+from flexget.utils.imdb import extract_id
 
 log = logging.getLogger('seen')
+Base = schema.versioned_base('seen', 1)
+
+
+@schema.upgrade('seen')
+def upgrade(ver, session):
+    if ver is None:
+        log.info('Converting seen imdb_url to imdb_id for seen movies.')
+        field_table = table_schema('seen_field', session)
+        for row in session.execute(select([field_table.c.id, field_table.c.value], field_table.c.field == 'imdb_url')):
+            session.execute(update(field_table, field_table.c.id == row['id'],
+                    {'field': 'imdb_id', 'value': extract_id(row['value'])}))
+        ver = 1
+    return ver
 
 
 class SeenEntry(Base):
@@ -300,8 +315,8 @@ class FilterSeen(object):
             for field in fields:
                 if field not in entry:
                     continue
-                if entry[field] not in values and entry[field] != '':
-                    values.append(entry[field])
+                if entry[field] not in values and entry[field]:
+                    values.append(unicode(entry[field]))
             if values:
                 log.trace('querying for: %s' % ', '.join(values))
                 # check if SeenField.value is any of the values

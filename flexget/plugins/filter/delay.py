@@ -31,6 +31,7 @@ class DelayedEntry(Base):
 def upgrade(ver, session):
     if ver is None:
         log.info('Fixing delay table from erroneous data ...')
+        # TODO: Using the DelayedEntry object here is no good.
         all = session.query(DelayedEntry).all()
         for de in all:
             for key, value in de.entry.iteritems():

@@ -55,7 +55,7 @@ class FilterSeenMovies(FilterSeen):
 
     def __init__(self):
         # remember and filter by these fields
-        self.fields = ['imdb_url']
+        self.fields = ['imdb_id', 'tmdb_id']
         self.keyword = 'seen_movies'
 
     def validator(self):
@@ -70,19 +70,27 @@ class FilterSeenMovies(FilterSeen):
         # strict method
         if config == 'strict':
             for entry in feed.entries:
-                if not 'imdb_url' in entry:
-                    log.info('Rejecting %s because of missing imdb url' % entry['title'])
-                    feed.reject(entry, 'missing imdb url, strict')
+                if 'imdb_id' not in entry and 'tmdb_id' not in entry:
+                    log.info('Rejecting %s because of missing movie (imdb or tmdb) id' % entry['title'])
+                    feed.reject(entry, 'missing movie (imdb or tmdb) id, strict')
         # call super
         super(FilterSeenMovies, self).on_feed_filter(feed, True)
         # check that two copies of a movie have not been accepted this run
-        movies = []
+        imdb_ids = set()
+        tmdb_ids = set()
         for entry in feed.accepted:
-            if entry.get('imdb_url'):
-                if not entry['imdb_url'] in movies:
-                    movies.append(entry['imdb_url'])
-                else:
+            if 'imdb_id' in entry:
+                if entry['imdb_id'] in imdb_ids:
                     feed.reject(entry, 'already accepted once in feed')
+                    continue
+                else:
+                    imdb_ids.add(entry['imdb_id'])
+            if 'tmdb_id' in entry:
+                if entry['tmdb_id'] in tmdb_ids:
+                    feed.reject(entry, 'already accepted once in feed')
+                    continue
+                else:
+                    tmdb_ids.add(entry['tmdb_id'])
 
 register_plugin(FilterSeenMovies, 'seen_movies', api_ver=2)
 register_plugin(RepairSeenMovies, '--repair-seen-movies', builtin=True)

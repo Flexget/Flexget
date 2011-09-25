@@ -53,23 +53,25 @@ class TestFilterSeenMovies(FlexGetBase):
         feeds:
           test_1:
             mock:
-               - {title: 'Seen movie title 1', url: 'http://localhost/seen_movie1', imdb_url: 'http://www.imdb.com/title/tt0103064/'}
-               - {title: 'Seen movie title 2', url: 'http://localhost/seen_movie2', imdb_url: 'http://www.imdb.com/title/tt0103064/'}
+               - {title: 'Seen movie title 1', url: 'http://localhost/seen_movie1', imdb_id: 'tt0103064', tmdb_id: 123}
+               - {title: 'Seen movie title 2', url: 'http://localhost/seen_movie2', imdb_id: 'tt0103064'}
             accept_all: yes
             seen_movies: loose
 
           test_2:
             mock:
-              - {title: 'Seen movie title 3', url: 'http://localhost/seen_movie3', imdb_url: 'http://www.imdb.com/title/tt0103064/'}
-              - {title: 'Seen movie title 4', url: 'http://localhost/seen_movie4', imdb_url: 'http://www.imdb.com/title/tt0103064/'}
-              - {title: 'Seen movie title 5', url: 'http://localhost/seen_movie5', imdb_url: 'http://www.imdb.com/title/tt0231264/'}
+              - {title: 'Seen movie title 3', url: 'http://localhost/seen_movie3', imdb_id: 'tt0103064'}
+              - {title: 'Seen movie title 4', url: 'http://localhost/seen_movie4', imdb_id: 'tt0103064'}
+              - {title: 'Seen movie title 5', url: 'http://localhost/seen_movie5', imdb_id: 'tt0231264'}
+              - {title: 'Seen movie title 6', url: 'http://localhost/seen_movie6', tmdb_id: 123}
             seen_movies: loose
 
           strict:
             mock:
-              - {title: 'Seen movie title 6', url: 'http://localhost/seen_movie6', imdb_url: 'http://www.imdb.com/title/tt0134532/'}
-              - {title: 'Seen movie title 7', url: 'http://localhost/seen_movie7', imdb_url: 'http://www.imdb.com/title/tt0103066/'}
-              - {title: 'Seen movie title 8', url: 'http://localhost/seen_movie8'}
+              - {title: 'Seen movie title 7', url: 'http://localhost/seen_movie7', imdb_id: 'tt0134532'}
+              - {title: 'Seen movie title 8', url: 'http://localhost/seen_movie8', imdb_id: 'tt0103066'}
+              - {title: 'Seen movie title 9', url: 'http://localhost/seen_movie9', tmdb_id: 456}
+              - {title: 'Seen movie title 10', url: 'http://localhost/seen_movie10'}
             seen_movies: strict
     """
 
@@ -88,8 +90,10 @@ class TestFilterSeenMovies(FlexGetBase):
         # should not contain since fields seen in previous feed
         assert not self.feed.find_entry(title='Seen movie title 3'), 'seen movie 3 exists'
         assert not self.feed.find_entry(title='Seen movie title 4'), 'seen movie 4 exists'
-        assert self.feed.find_entry(title='Seen movie title 5'), 'unseen movie 5 exists'
+        assert not self.feed.find_entry(title='Seen movie title 6'), 'seen movie 6 exists (tmdb_id)'
+        assert self.feed.find_entry(title='Seen movie title 5'), 'unseen movie 5 doesn\'t exist'
 
     def test_seen_movies_strict(self):
         self.execute_feed('strict')
-        assert not self.feed.find_entry(title='Seen movie title 8'), 'strict should not have passed movie 8'
+        assert len(self.feed.rejected) == 1, 'Too many movies were rejected'
+        assert not self.feed.find_entry(title='Seen movie title 10'), 'strict should not have passed movie 10'
