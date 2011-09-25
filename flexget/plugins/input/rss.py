@@ -2,10 +2,11 @@ import logging
 import urlparse
 import xml.sax
 import posixpath
-import feedparser
 import urllib2
 import httplib
 import socket
+from datetime import datetime
+import feedparser
 from flexget.feed import Entry
 from flexget.plugin import register_plugin, internet, PluginError
 from flexget.utils.cached_input import cached
@@ -346,7 +347,9 @@ class InputRSS(object):
                                 log.debug('Field `%s` set to `%s` for `%s`' % (rss_field, ea[rss_field], ea['title']))
                         except UnicodeDecodeError:
                             log.warning('Failed to decode entry `%s` field `%s`' % (ea['title'], rss_field))
-
+                # Also grab pubdate if available
+                if hasattr(entry, 'date_parsed'):
+                    ea['rss_pubdate'] = datetime(*entry.date_parsed[:6])
                 # store basic auth info
                 if 'username' in config and 'password' in config:
                     ea['basic_auth_username'] = config['username']
