@@ -253,7 +253,7 @@ def urlopener(url, log, **kwargs):
                     # If it was not a server error, don't keep retrying.
                     log.warning('Could not retrieve url (HTTP %s error): %s' % (e.code, url))
                     raise
-                log.debug('HTTP error (try %i/3): %s' % (i + 1, e.code))
+                log.debug('HTTP error (try %i/%i): %s' % (i + 1, retries, e.code))
             except urllib2.URLError, e:
                 if hasattr(e, 'reason'):
                     reason = str(e.reason)
@@ -261,7 +261,7 @@ def urlopener(url, log, **kwargs):
                     reason = 'N/A'
                 if reason == 'timed out':
                     unresponsive_sites[site] = datetime.now()
-                log.debug('Failed to retrieve url (try %i/3): %s' % (i + 1, reason))
+                log.debug('Failed to retrieve url (try %i/%i): %s' % (i + 1, retries, reason))
             except httplib.IncompleteRead, e:
                 log.critical('Incomplete read - see python bug 6312')
                 break

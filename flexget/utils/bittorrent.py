@@ -88,6 +88,97 @@ def is_torrent_file(metafilepath):
     return bool(magic_marker)
 
 
+def tokenize(text, match=re.compile("([idel])|(\d+):|(-?\d+)").match):
+    i = 0
+    while i < len(text):
+        m = match(text, i)
+        s = m.group(m.lastindex)
+        i = m.end()
+        if m.lastindex == 2:
+            yield "s"
+            yield text[i:i + int(s)]
+            i += int(s)
+        else:
+            yield s
+
+            
+def decode_item(next, token):
+    if token == "i":
+        # integer: "i" value "e"
+        data = int(next())
+        if next() != "e":
+            raise ValueError
+    elif token == "s":
+        # string: "s" value (virtual tokens)
+        data = next()
+    elif token == "l" or token == "d":
+        # container: "l" (or "d") values "e"
+        data = []
+        tok = next()
+        while tok != "e":
+            data.append(decode_item(next, tok))
+            tok = next()
+        if token == "d":
+            data = dict(zip(data[0::2], data[1::2]))
+    else:
+        raise ValueError
+    return data
+
+
+def bdecode(text):
+    try:
+        src = tokenize(text)
+        data = decode_item(src.next, src.next()) # pylint:disable=E1101
+        for token in src: # look for more tokens
+            raise SyntaxError("trailing junk")
+    except (AttributeError, ValueError, StopIteration):
+        raise SyntaxError("syntax error")
+    return data
+
+
+# encoding implementation by d0b
+def encode_string(data):
+    return "%d:%s" % (len(data), data)
+
+
+def encode_unicode(data):
+    return encode_string(str(data))
+
+
+def encode_integer(data):
+    return "i%de" % data
+
+
+def encode_list(data):
+    encoded = "l"
+    for item in data:
+        encoded += bencode(item)
+    encoded += "e"
+    return encoded
+
+
+def encode_dictionary(data):
+    encoded = "d"
+    items = data.items()
+    items.sort()
+    for (key, value) in items:
+        encoded += encode_string(key)
+        encoded += bencode(value)
+    encoded += "e"
+    return encoded
+
+
+def bencode(data):
+    encode_func = {
+        str: encode_string,
+        unicode: encode_unicode,
+        int: encode_integer,
+        long: encode_integer,
+        list: encode_list,
+        dict: encode_dictionary}
+    return encode_func[type(data)](data)
+
+
 class Torrent(object):
     """Represents a torrent"""
     # string type used for keys, if this ever changes, stuff like "x in y"
@@ -107,7 +198,7 @@ class Torrent(object):
         """Accepts torrent file as string"""
 
         # decoded torrent structure
-        self.content = self.decode(content)
+        self.content = bdecode(content)
         self.modified = False
 
     def __repr__(self):
@@ -190,7 +281,7 @@ class Torrent(object):
         """Return Torrent info hash"""
         import hashlib
         hash = hashlib.sha1()
-        info_data = self.encode_dictionary(self.content['info'])
+        info_data = encode_dictionary(self.content['info'])
         hash.update(info_data)
         return hash.hexdigest().upper()
 
@@ -222,89 +313,5 @@ class Torrent(object):
     def __str__(self):
         return '<Torrent instance. Files: %s>' % self.get_filelist()
 
-    def tokenize(self, text, match=re.compile("([idel])|(\d+):|(-?\d+)").match):
-        i = 0
-        while i < len(text):
-            m = match(text, i)
-            s = m.group(m.lastindex)
-            i = m.end()
-            if m.lastindex == 2:
-                yield "s"
-                yield text[i:i + int(s)]
-                i = i + int(s)
-            else:
-                yield s
-
-    def decode_item(self, next, token):
-        if token == "i":
-            # integer: "i" value "e"
-            data = int(next())
-            if next() != "e":
-                raise ValueError
-        elif token == "s":
-            # string: "s" value (virtual tokens)
-            data = next()
-        elif token == "l" or token == "d":
-            # container: "l" (or "d") values "e"
-            data = []
-            tok = next()
-            while tok != "e":
-                data.append(self.decode_item(next, tok))
-                tok = next()
-            if token == "d":
-                data = dict(zip(data[0::2], data[1::2]))
-        else:
-            raise ValueError
-        return data
-
-    def decode(self, text):
-        try:
-            src = self.tokenize(text)
-            data = self.decode_item(src.next, src.next()) # pylint:disable=E1101
-            for token in src: # look for more tokens
-                raise SyntaxError("trailing junk")
-        except (AttributeError, ValueError, StopIteration):
-            raise SyntaxError("syntax error")
-        return data
-
-    # encoding implementation by d0b
-
-    def encode_string(self, data):
-        return "%d:%s" % (len(data), data)
-
-    def encode_unicode(self, data):
-        return self.encode_string(str(data))
-
-    def encode_integer(self, data):
-        return "i%de" % data
-
-    def encode_list(self, data):
-        encoded = "l"
-        for item in data:
-            encoded += self.encode_func(item)
-        encoded += "e"
-        return encoded
-
-    def encode_dictionary(self, data):
-        encoded = "d"
-        items = data.items()
-        items.sort()
-        for (key, value) in items:
-            encoded += self.encode_string(key)
-            encoded += self.encode_func(value)
-        encoded += "e"
-        return encoded
-
-    def encode_func(self, data):
-        encode_func = {
-            str: self.encode_string,
-            unicode: self.encode_unicode,
-            int: self.encode_integer,
-            long: self.encode_integer,
-            list: self.encode_list,
-            dict: self.encode_dictionary}
-        return encode_func[type(data)](data)
-
     def encode(self):
-        data = self.content
-        return self.encode_func(data)
+        return bencode(self.content)

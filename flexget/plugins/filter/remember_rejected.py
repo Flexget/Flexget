@@ -8,9 +8,10 @@ from flexget.event import event
 from flexget.manager import Session
 from flexget.plugin import register_plugin, register_parser_option, register_feed_phase
 from flexget.utils.sqlalchemy_utils import table_columns, drop_tables, table_add_column
+from flexget.utils.tools import parse_timedelta
 
 log = logging.getLogger('remember_rej')
-Base = schema.versioned_base('remember_rejected', 2)
+Base = schema.versioned_base('remember_rejected', 3)
 
 
 @schema.upgrade('remember_rejected')
@@ -25,7 +26,7 @@ def upgrade(ver, session):
             Base.metadata.create_all(bind=session.bind)
             # We go directly to version 2, as remember_rejected_entries table has just been made from current model
             # TODO: Fix this somehow. Just avoid dropping tables?
-            ver = 2
+            ver = 3
         else:
             ver = 0
     if ver == 0:
@@ -36,6 +37,10 @@ def upgrade(ver, session):
         log.info('Adding `added` column to remember_rejected_entry table.')
         table_add_column('remember_rejected_entry', 'added', DateTime, session, default=datetime.now)
         ver = 2
+    if ver == 2:
+        log.info('Adding expires column to remember_rejected_entry table.')
+        table_add_column('remember_rejected_entry', 'expires', DateTime, session)
+        ver = 3
     return ver
 
 
@@ -56,6 +61,7 @@ class RememberEntry(Base):
 
     id = Column(Integer, primary_key=True)
     added = Column(DateTime, default=datetime.now)
+    expires = Column(DateTime)
     title = Column(Unicode)
     url = Column(String)
     rejected_by = Column(String)
@@ -78,6 +84,8 @@ class FilterRememberRejected(object):
         """Purge remembered entries if the config has changed and write new hash"""
         # No session on process start, make our own
         session = Session()
+        # Delete expired items
+        session.query(RememberEntry).filter(RememberEntry.expires < datetime.now()).delete()
         # Generate hash for current config
         config_hash = hashlib.md5(str(feed.config.items())).hexdigest()
         # See if the feed has the same hash as last run
@@ -111,20 +119,28 @@ class FilterRememberRejected(object):
                     feed.reject(entry, 'Rejected by %s plugin on a previous run: %s' %
                                        (reject_entry.rejected_by, reject_entry.reason))
 
-    def on_entry_reject(self, feed, entry, remember=None, **kwargs):
+    def on_entry_reject(self, feed, entry, remember=None, remember_time=None, **kwargs):
         # We only remember rejections that specify the remember keyword argument
-        if not remember:
+        if not remember and not remember_time:
             return
         if entry.get('imaginary'):
             log.debug('Not remembering rejection for imaginary entry `%s`' % entry['title'])
             return
+        expires = None
+        if remember_time:
+            if isinstance(remember_time, basestring):
+                remember_time = parse_timedelta(remember_time)
+            expires = datetime.now() + remember_time
         if not entry.get('title') or not entry.get('original_url'):
             log.debug('Can\'t remember rejection for entry without title or url.')
             return
-        log.info('Remembering rejection of `%s`' % entry['title'])
+        message = 'Remembering rejection of `%s`' % entry['title']
+        if remember_time:
+            message += ' for %i minutes' % (remember_time.seconds / 60)
+        log.info(message)
         (remember_feed_id,) = feed.session.query(RememberFeed.id).filter(RememberFeed.name == feed.name).first()
         feed.session.add(RememberEntry(title=entry['title'], url=entry['original_url'], feed_id=remember_feed_id,
-                                       rejected_by=feed.current_plugin, reason=kwargs.get('reason')))
+                                       rejected_by=feed.current_plugin, reason=kwargs.get('reason'), expires=expires))
         # The test stops passing when this is taken out for some reason...
         feed.session.flush()
 
