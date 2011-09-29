@@ -8,18 +8,19 @@ from flexget.utils import qualities
 
 
 def clean_symbols(text):
-    """Replaces common symbols with spaces."""
-    return re.sub('[ \(\)\-_\[\]\.]+', ' ', text).lower()
+    """Replaces common symbols with spaces. Also normalize unicode strings in decomposed form."""
+    result = text
+    if isinstance(result, unicode):
+        result = normalize('NFKD', result)
+    return re.sub('[ \(\)\-_\[\]\.]+', ' ', result).lower()
 
 
 def clean_title(title):
     """Removes common codec, sound keywords, and special characters info from titles to facilitate
-    loose title comparison. Also normalize unicode strings in decomposed form.
+    loose title comparison.
     """
     result = TitleParser.remove_words(title, TitleParser.sounds + TitleParser.codecs)
     result = clean_symbols(result)
-    if isinstance(result, unicode):
-        result = normalize('NFKD', result)
     return result
 
 
@@ -56,6 +57,10 @@ class StringComparator(SequenceMatcher, object):
 
     def search_string(self):
         """Return a cleaned string based on seq1 that can be used for searching."""
+
+        if isinstance(self.a, unicode):
+            # Convert to combined form for better search results
+            return normalize('NFC', self.a)
         return self.a
 
 
@@ -66,7 +71,7 @@ class MovieComparator(StringComparator):
         self.a_year, self.b_year = None, None
         self.a_quality, self.b_quality = qualities.UNKNOWN, qualities.UNKNOWN
         self.parser = MovieParser()
-        super(MovieComparator, self).__init__(cutoff=0.95)
+        super(MovieComparator, self).__init__(cutoff=0.9)
 
     def set_seq1(self, a):
         """Set first string for comparison."""
