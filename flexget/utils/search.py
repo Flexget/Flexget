@@ -1,6 +1,7 @@
 """ Common tools used by plugins implementing search plugin api """
 import re
 from difflib import SequenceMatcher
+from unicodedata import normalize
 from flexget.utils.titles.parser import TitleParser
 from flexget.utils.titles.movie import MovieParser
 from flexget.utils import qualities
@@ -13,10 +14,12 @@ def clean_symbols(text):
 
 def clean_title(title):
     """Removes common codec, sound keywords, and special characters info from titles to facilitate
-    loose title comparison.
+    loose title comparison. Also normalize unicode strings in decomposed form.
     """
     result = TitleParser.remove_words(title, TitleParser.sounds + TitleParser.codecs)
     result = clean_symbols(result)
+    if isinstance(result, unicode):
+        result = normalize('NFKD', result)
     return result
 
 
@@ -98,6 +101,9 @@ class MovieComparator(StringComparator):
     def search_string(self):
         """Return a cleaned string based on seq1 that can be used for searching."""
         result = self.a
+        if isinstance(result, unicode):
+            # Convert to combined form for better search results
+            result = normalize('NFC', result)
         if self.a_year:
             result += ' %s' % self.a_year
         if self.a_quality > qualities.UNKNOWN:
