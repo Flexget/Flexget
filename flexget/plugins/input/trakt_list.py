@@ -42,6 +42,7 @@ class TraktList(object):
         root.accept('text', key='api_key', required=True)
         root.accept('choice', key='movies').accept_choices(['all', 'loved', 'hated', 'collection', 'watchlist'])
         root.accept('choice', key='series').accept_choices(['all', 'loved', 'hated', 'collection', 'watched', 'watchlist'])
+        root.accept('text', key='custom')
         return root
 
     @cached('trakt_list', persist='2 hours')
@@ -49,30 +50,47 @@ class TraktList(object):
         if 'movies' in config and 'series' in config:
             raise PluginError('Cannot use both series list and movies list in the same feed.')
         if 'movies' in config:
-            data_type = 'movies'
-            list_type = config['movies']
+            config['data_type'] = 'movies'
+            config['list_type'] = config['movies']
             map = self.movie_map
         elif 'series' in config:
-            data_type = 'shows'
-            list_type = config['series']
+            config['data_type'] = 'shows'
+            config['list_type'] = config['series']
             map = self.series_map
+        elif 'custom' in config:
+            config['data_type'] = 'custom'
+            config['list_type'] = config['custom'].replace(' ', '-')
+            # Map type is per item in custom lists
         else:
             raise PluginError('Must define movie or series lists to retrieve from trakt.')
 
         url = 'http://api.trakt.tv/user/'
-        if list_type == 'watchlist':
-            url += 'watchlist/%s' % data_type
+        if config['data_type'] == 'custom':
+            url += 'list.json/%(api_key)s/%(username)s/%(list_type)s'
+        elif config['list_type'] == 'watchlist':
+            url += 'watchlist/%(data_type)s.json/%(api_key)s/%(username)s'
         else:
-            url += 'library/%s/%s' % (data_type, list_type)
-        url += '.json/%s/%s' % (config['api_key'], config['username'])
+            url += 'library/%(data_type)s/%(list_type)s.json/%(api_key)s/%(username)s'
+        url = url % config
 
         entries = []
-        log.verbose('Retrieving list %s %s...' % (data_type, list_type))
+        log.verbose('Retrieving list %s %s...' % (config['data_type'], config['list_type']))
         try:
-            data = urlopener(url, log, retries=2)
+            data = json.load(urlopener(url, log, retries=2))
         except urllib2.URLError, e:
             raise PluginError('Could not retrieve url %s' % url)
-        for item in json.load(data):
+        if 'error' in data:
+            raise PluginError('Error getting trakt list: %s' % data['error'])
+        if config['data_type'] == 'custom':
+            data = data['items']
+        for item in data:
+            if config['data_type'] == 'custom':
+                if item['type'] == 'movie':
+                    map = self.movie_map
+                    item = item['movie']
+                else:
+                    map = self.series_map
+                    item = item['show']
             entry = Entry()
             entry.update_using_map(map, item)
             if entry.isvalid():
