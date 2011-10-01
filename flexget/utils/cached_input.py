@@ -128,6 +128,9 @@ class cached(object):
                 response = func(*args, **kwargs)
                 if api_ver == 1:
                     response = feed.entries
+                if not isinstance(response, list):
+                    log.warning('Input %s did not return a list, cannot cache.' % self.name)
+                    return response
                 # store results to cache
                 log.debug('storing to cache %s %s entries' % (cache_name, len(response)))
                 try:

@@ -1,4 +1,5 @@
 import logging
+from flexget.utils.cached_input import cached
 from flexget.utils.search import StringComparator, MovieComparator, clean_title
 from flexget.plugin import register_plugin, get_plugin_by_name, PluginError, \
     add_plugin_validators, get_plugins_by_group, PluginWarning
@@ -108,6 +109,7 @@ class Discover(object):
                     log.debug('No results from %s' % plugin_name)
         return sorted(result, reverse=True, key=lambda x: x.get('search_sort'))
 
+    @cached('discover')
     def on_feed_input(self, feed, config):
         entries = self.execute_inputs(config, feed)
         log.verbose('Discovering %i titles ...' % len(entries))
