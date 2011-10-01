@@ -132,7 +132,8 @@ class FilterProperMovies(object):
 
             if accept_proper:
                 log.info('Accepting proper version previously downloaded movie `%s`' % entry['title'])
-                fire_event('forget', entry['imdb_url'])
+                # TODO: does this need to be called?
+                # fire_event('forget', entry['imdb_url'])
                 fire_event('forget', entry['imdb_id'])
                 feed.accept(entry, 'proper version of previously downloaded movie')
 
@@ -148,7 +149,7 @@ class FilterProperMovies(object):
             parser.data = entry['title']
             parser.parse()
 
-            quality = parser.quality
+            quality = parser.quality.name
 
             log.debug('quality: %s' % quality)
             log.debug('imdb_id: %s' % entry['imdb_id'])

@@ -400,7 +400,12 @@ class Feed(object):
         self.__run_feed_phase('abort')
 
     def find_entry(self, category='entries', **values):
-        """Find and return entry with given attributes from feed or None"""
+        """
+        Find and return entry with given attributes from feed or None
+        :param category: entries, accepted, rejected or failed. Defaults to entries.
+        :param values: Key values of entries to be searched
+        :return: Entry or None
+        """
         cat = getattr(self, category)
         if not isinstance(cat, list):
             raise TypeError('category must be a list')
