@@ -172,6 +172,7 @@ class FilterRegexp(object):
         method = feed.accept if 'accept' in operation else feed.reject
         match_mode = 'excluding' not in operation
         for entry in feed.entries:
+            log.trace('testing %i regexps to %s' % (len(regexps), entry['title']))
             for regexp_opts in regexps:
                 regexp, opts = regexp_opts.items()[0]
 

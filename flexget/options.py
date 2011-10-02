@@ -68,7 +68,7 @@ class CoreOptionParser(OptionParser):
         self.add_option('--no-cache', action='store_true', dest='nocache', default=0,
                         help='Disable caches. Works only in plugins that have explicit support.')
         self.add_option('--reset', action='store_true', dest='reset', default=0,
-                        help='Forgets everything that has been done and learns current matches.')
+                        help='DANGEROUS. Obliterates the database and runs with learn in order to to regain useful state.')
         # TODO: rename dest to cron, since this does more than just quiet
         self.add_option('--cron', action='store_true', dest='quiet', default=False,
                         help='Disables stdout and stderr output, log file used. Reduces logging level slightly.')
