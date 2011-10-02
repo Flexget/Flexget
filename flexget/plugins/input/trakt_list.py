@@ -12,14 +12,27 @@ except ImportError:
     try:
         import json
     except ImportError:
-        raise DependencyError(issued_by='trakt_list', missing='simplejson', message='trakt_list requires either '
-                'simplejson module or python > 2.5')
+        raise DependencyError(issued_by='trakt_list', missing='simplejson',
+                              message='trakt_list requires either simplejson module or python > 2.5')
 
 log = logging.getLogger('trakt_list')
 
 
 class TraktList(object):
-    """"Creates an entry for each movie in your imdb list."""
+    """"Creates an entry for each item in your trakt list.
+
+    Syntax:
+
+    trakt_list:
+      username: <value>
+      api_key: <value>
+      movies: <all|loved|hated|collection|watchlist>
+      series: <all|loved|hated|collection|watchlist|watched>
+      custom: <value>
+
+    Options username and api_key are required.
+    """
+
     movie_map = {
         'title': 'title',
         'url': 'url',
