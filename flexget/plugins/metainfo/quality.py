@@ -21,9 +21,6 @@ class MetainfoQuality(object):
         if config is False:
             return
         for entry in feed.entries:
-            if entry.get('quality', lazy=False):
-                log.debug('Quality is already set to %s for %s, skipping quality detection.' %
-                          (entry['quality'], entry['title']))
             entry.register_lazy_fields(['quality'], self.lazy_loader)
 
     def lazy_loader(self, entry, field):
@@ -31,6 +28,10 @@ class MetainfoQuality(object):
         return entry.get(field)
 
     def get_quality(self, entry):
+        if entry.get('quality', lazy=False):
+            log.debug('Quality is already set to %s for %s, skipping quality detection.' %
+                      (entry['quality'], entry['title']))
+            return
         quality = qualities.UNKNOWN
         for field_name in ['title', 'description']:
             if field_name not in entry:
