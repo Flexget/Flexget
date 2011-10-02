@@ -1,3 +1,4 @@
+import hashlib
 import logging
 import urllib2
 from flexget.utils.tools import urlopener
@@ -40,6 +41,7 @@ class TraktList(object):
         root = validator.factory('dict')
         root.accept('text', key='username', requried=True)
         root.accept('text', key='api_key', required=True)
+        root.accept('text', key='password')
         root.accept('choice', key='movies').accept_choices(['all', 'loved', 'hated', 'collection', 'watchlist'])
         root.accept('choice', key='series').accept_choices(['all', 'loved', 'hated', 'collection', 'watched', 'watchlist'])
         root.accept('text', key='custom')
@@ -72,6 +74,10 @@ class TraktList(object):
         else:
             url += 'library/%(data_type)s/%(list_type)s.json/%(api_key)s/%(username)s'
         url = url % config
+
+        if 'password' in config:
+            auth = {'username': config['username'], 'password': hashlib.sha1(config['password']).hexdigest()}
+            url = urllib2.Request(url, json.dumps(auth), {'content-type': 'application/json'})
 
         entries = []
         log.verbose('Retrieving list %s %s...' % (config['data_type'], config['list_type']))
