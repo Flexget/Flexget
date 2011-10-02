@@ -11,6 +11,7 @@ from flexget.feed import Entry
 from flexget.plugin import register_plugin, internet, PluginError
 from flexget.utils.cached_input import cached
 from flexget.utils.tools import urlopener
+from flexget.utils.tools import decode_html
 
 log = logging.getLogger('rss')
 
@@ -320,7 +321,6 @@ class InputRSS(object):
             # TODO: confusing? refactor into class member ...
 
             def add_entry(ea):
-                from flexget.utils.tools import decode_html
                 ea['title'] = entry.title
 
                 # Dict with fields to grab mapping from rss field name to FlexGet field name
@@ -339,6 +339,9 @@ class InputRSS(object):
                             log.error('Cannot grab non text field `%s` from rss.' % rss_field)
                             # Remove field from list of fields to avoid repeated error
                             config['other_fields'].remove(rss_field)
+                            continue
+                        if not getattr(entry, rss_field):
+                            log.debug('Not grabbing blank field %s from rss for %s.' % (rss_field, ea['title']))
                             continue
                         try:
                             ea[flexget_field] = decode_html(entry[rss_field])
