@@ -1,3 +1,4 @@
+import urllib
 import logging
 import re
 from flexget.plugin import register_plugin, priority, get_plugin_by_name
@@ -73,20 +74,19 @@ class FilterRegexp(object):
     def prepare_config(self, config):
         """Returns the config in standard format.
 
-        All regexps are turned into dictionaries in the form {regexp: options}
+        All regexps are turned into dictionaries in the form of {compiled regexp: options}
 
-        Options is a dict that can (but may not) contain the following keys
-
+        :param config: Dict that can optionally contain the following keys
             path: will be attached to entries that match
             set: a dict of values to be attached to entries that match via set plugin
             from: a list of fields in entry for the regexps to match against
-            not: a list of regexps that if matching, will disqualify the main match
+            not: a list of compiled regexps that if matching, will disqualify the main match
+        :return: New config dictionary
         """
-
         out_config = {}
         if 'rest' in config:
             out_config['rest'] = config['rest']
-        # Turn all our regexps into advanced form dicts
+        # Turn all our regexps into advanced form dicts and compile them
         for operation, regexps in config.iteritems():
             if operation in ['rest', 'from']:
                 continue
@@ -101,13 +101,19 @@ class FilterRegexp(object):
                 # advanced configuration
                 if config.get('from'):
                     opts.setdefault('from', config['from'])
-                # Put plain strings into list form for from and not
+                # Put plain strings into list form for `from` and `not` options
                 if 'from' in opts and isinstance(opts['from'], basestring):
                     opts['from'] = [opts['from']]
                 if 'not' in opts and isinstance(opts['not'], basestring):
                     opts['not'] = [opts['not']]
-                # make sure regxp is a string for series like '24'
-                regexp = unicode(regexp)
+
+                # compile `not` option regexps
+                if 'not' in opts:
+                    for idx, not_re in enumerate(opts['not'][:]):
+                        opts['not'][idx] = re.compile(not_re, re.IGNORECASE | re.UNICODE)
+
+                # compile regexp and make sure regexp is a string for series like '24'
+                regexp = re.compile(unicode(regexp), re.IGNORECASE | re.UNICODE)
                 out_config.setdefault(operation, []).append({regexp: opts})
         return out_config
 
@@ -133,13 +139,20 @@ class FilterRegexp(object):
                 rest_method(entry, 'regexp `rest`')
 
     def matches(self, entry, regexp, find_from=None, not_regexps=None):
-        """Check if :entry: has any string fields or strings in a list field that match :regexp:.
-        Optional :find_from: can be given as a list to limit searching fields"""
+        """
+        Check if :entry: has any string fields or strings in a list field that match :regexp:
+
+        :param entry: Entry instance
+        :param regexp: Compiled regexp
+        :param find_from: None or a list of fields to search from
+        :param not_regexps: None or list of regexps that can NOT match
+        :return:
+        """
         unquote = ['url']
         for field in find_from or entry:
             if not entry.get(field):
                 continue
-            # Make all fields into lists to search
+            # Make all fields into lists for search purposes
             values = entry[field]
             if not isinstance(values, list):
                 values = [values]
@@ -147,10 +160,9 @@ class FilterRegexp(object):
                 if not isinstance(value, basestring):
                     continue
                 if field in unquote:
-                    import urllib
                     value = urllib.unquote(value)
                     # If none of the not_regexps match
-                if re.search(regexp, value, re.IGNORECASE | re.UNICODE):
+                if regexp.search(value):
                     # Make sure the not_regexps do not match for this field
                     for not_regexp in not_regexps or []:
                         if self.matches(entry, not_regexp, find_from=[field]):
@@ -161,13 +173,14 @@ class FilterRegexp(object):
 
     def filter(self, feed, operation, regexps):
         """
-            operation - one of 'accept' 'reject' 'accept_excluding' and 'reject_excluding'
-                accept and reject will be called on the entry if any of the regxps match
-                _excluding operations will be called if any of the regexps don't match
-            regexps - list of {regexp: options} dictionaries
-
-            Return list of entries that didn't match regexps
+        :param feed: Feed instance
+        :param operation: one of 'accept' 'reject' 'accept_excluding' and 'reject_excluding'
+                          accept and reject will be called on the entry if any of the regxps match
+                          *_excluding operations will be called if any of the regexps don't match
+        :param regexps: list of {compiled_regexp: options} dictionaries
+        :return: Return list of entries that didn't match regexps
         """
+
         rest = []
         method = feed.accept if 'accept' in operation else feed.reject
         match_mode = 'excluding' not in operation
@@ -176,12 +189,13 @@ class FilterRegexp(object):
             for regexp_opts in regexps:
                 regexp, opts = regexp_opts.items()[0]
 
-                # check if entry matches given regexp, also makes sure it doesn't match secondary
+                # check if entry matches given regexp configuration
                 field = self.matches(entry, regexp, opts.get('from'), opts.get('not'))
+
                 # Run if we are in match mode and have a hit, or are in non-match mode and don't have a hit
                 if match_mode == bool(field):
                     # Creates the string with the reason for the hit
-                    matchtext = 'regexp \'%s\' ' % regexp + ('matched field \'%s\'' % field if match_mode else 'didn\'t match')
+                    matchtext = 'regexp \'%s\' ' % regexp.pattern + ('matched field \'%s\'' % field if match_mode else 'didn\'t match')
                     log.debug('%s for %s' % (matchtext, entry['title']))
                     # apply settings to entry and run the method on it
                     if opts.get('path'):

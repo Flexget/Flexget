@@ -20,4 +20,5 @@ class Generate(plugin.DebugPlugin):
             import random
             entry['url'] = 'http://localhost/generate/%s/%s' % (i, ''.join([random.choice(string.letters + string.digits) for x in range(1, 30)]))
             entry['title'] = ''.join([random.choice(string.letters + string.digits) for x in range(1, 30)])
+            entry['description'] = ''.join([random.choice(string.letters + string.digits) for x in range(1, 1000)])
             feed.entries.append(entry)
