@@ -50,7 +50,6 @@ class FilterQuality(object):
         for entry in feed.entries:
             if 'quality' in config:
                 if not entry.get('quality') in config['quality']:
-                    print config
                     msg = 'quality is %s instead one of allowed (%s)' %\
                           (str(entry['quality']),
                            ', '.join(str(x) for x in config['quality']))
