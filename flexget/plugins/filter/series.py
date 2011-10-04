@@ -473,7 +473,9 @@ class FilterSeriesBase(object):
                     if kwargs.get('log_once'):
                         log_once('Series %s is already configured in series plugin' % series, log)
                     else:
-                        log.error('Series %s is configured multiple times in series plugin.' % series)
+                        log.warning('Series %s is configured multiple times in series plugin.' % series)
+                    # Combine the config dicts for both instances of the show
+                    unique_series[series].update(series_settings)
         # Turn our all_series dict back into a list
         return [{series: settings} for (series, settings) in unique_series.iteritems()]
 
