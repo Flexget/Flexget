@@ -134,7 +134,7 @@ class FilterRejectFailed(object):
     def on_feed_filter(self, feed, config):
         if config is False:
             return
-        max_count = config if isinstance(config, int) else 3
+        max_count = 3 if config in [None, True] else config
         for entry in feed.entries:
             item = feed.session.query(FailedEntry).filter(FailedEntry.title == entry['title']).\
                                             filter(FailedEntry.url == entry['url']).\
