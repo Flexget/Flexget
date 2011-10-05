@@ -1,3 +1,4 @@
+from string import capwords
 from sqlalchemy.orm import join
 from sqlalchemy import desc
 from flexget.plugin import register_plugin, register_parser_option, DependencyError
@@ -121,7 +122,7 @@ class SeriesReport(SeriesPlugin):
                 latest = 'N/A'
                 status = 'N/A'
 
-            print ' %-30s%-20s%-21s' % (series.name.title(), latest, status)
+            print ' %-30s%-20s%-21s' % (capwords(series.name), latest, status)
 
         print '-' * 79
         print ' * = downloaded'

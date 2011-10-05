@@ -1,4 +1,5 @@
 import logging
+from string import capwords
 from flexget.plugin import priority, register_plugin
 from flexget.utils.titles import SeriesParser
 from flexget.utils.titles.parser import ParseWarning
@@ -70,7 +71,7 @@ class MetainfoSeries(object):
                 # Replace some special characters with spaces
                 name = re.sub('[\._\(\) ]+', ' ', name).strip(' -')
                 # Normalize capitalization to title case
-                name = name.title()
+                name = capwords(name)
                 # If we didn't get a series name, return
                 if not name:
                     return
