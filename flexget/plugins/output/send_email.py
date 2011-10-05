@@ -18,7 +18,6 @@ class OutputEmail(object):
           to            : the email address of the recipient (required)
           smtp_host     : the host of the smtp server
           smtp_port     : the port of the smtp server
-          smtp_login    : should we use anonymous mode or login to the smtp server ?
           smtp_username : the username to use to connect to the smtp server
           smtp_password : the password to use to connect to the smtp server
           smtp_tls      : should we use TLS to connect to the smtp server ?
@@ -182,12 +181,15 @@ class OutputEmail(object):
                 raise PluginWarning('Unable to send email: %s' % e, log)
 
             try:
-                if config['smtp_login']:
+
+                if config.get('smtp_username') and config.get('smtp_password'):
                     mailServer.login(config['smtp_username'], config['smtp_password'])
                 mailServer.sendmail(message['From'], config['to'], message.as_string())
             except IOError, e:
                 # Ticket #686
-                raise PluginWarning('Unable to send email! IOError: %s' % getattr(e.message, 'N/A'), log)
+                raise PluginWarning('Unable to send email! IOError: %s' % e, log)
+            except SMTPException, e:
+                raise PluginWarning('Unable to send email! SMTPException: %s' % e, log)
 
             mailServer.quit()
 

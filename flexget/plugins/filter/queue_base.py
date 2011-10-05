@@ -59,8 +59,6 @@ class FilterQueueBase(object):
                 # Keep track of entries we accepted, so they can be marked as downloaded on feed_exit if successful
                 self.accepted_entries[item.id] = entry
 
-    # Run before other plugins so download is recorded even if other exit handlers have a failure
-    @priority(200)
     def on_feed_exit(self, feed, config):
         if config is False:
             return

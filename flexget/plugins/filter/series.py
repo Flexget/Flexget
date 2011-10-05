@@ -1067,8 +1067,6 @@ class FilterSeries(SeriesPlugin, FilterSeriesBase):
                     (entry[parser.field], parser.data, parser.field, parser.name))
         feed.accept(entry, reason)
 
-    # Run before other plugins so download is recorded even if other exit handlers have a failure
-    @priority(200)
     def on_feed_exit(self, feed):
         """Learn succeeded episodes"""
         log.debug('on_feed_exit')
