@@ -66,24 +66,9 @@ class ModifySet(object):
         # Create a new dict so we don't overwrite the set config with string replaced values.
         conf = copy(config)
 
-        # Do jinja2 template replacement
-        for field, template_string in conf.items():
-            if isinstance(template_string, basestring):
-                try:
-                    result = render_from_entry(template_string, entry)
-                except UndefinedError, e:
-                    # If the replacement failed, remove this key from the update dict
-                    log.debug('%s did not have the required fields for jinja2 template: %s' % (entry['title'], e))
-                    del conf[field]
-                else:
-                    conf[field] = result
-
-        # Do string replacement
+        # Do jinja2 rendering/string replacement
         for field, value in conf.items():
             if isinstance(value, basestring):
-                if value != config[field]:
-                    # If jinja replacement already occurred, skip this field
-                    continue
                 logger = log.error if errors else log.debug
                 result = replace_from_entry(value, entry, field, logger, default=None)
                 if result is None:

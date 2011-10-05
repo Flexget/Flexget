@@ -446,16 +446,20 @@ class PathValidator(TextValidator):
         if self.allow_replacement:
             # If string replacement is allowed, only validate the part of the
             # path before the first identifier to be replaced
-            pat = re.compile(r'''
-                %                     # Start with percent,
-                (?:\( ([^()]*) \))    # name in parens (do not capture parens),
-                [-+ #0]*              # zero or more flags
-                (?:\*|[0-9]*)         # optional minimum field width
-                (?:\.(?:\*|[0-9]*))?  # optional dot and length modifier
-                [EGXcdefgiorsux%]     # type code (or [formatted] percent character)
-                ''', re.VERBOSE)
-
+            pat = re.compile(r'{[{%].*[}%]}')
             result = pat.search(data)
+            if not result:
+                # Check for old style string replacement if no jinja identifiers are found
+                pat = re.compile(r'''
+                    %                     # Start with percent,
+                    (?:\( ([^()]*) \))    # name in parens (do not capture parens),
+                    [-+ #0]*              # zero or more flags
+                    (?:\*|[0-9]*)         # optional minimum field width
+                    (?:\.(?:\*|[0-9]*))?  # optional dot and length modifier
+                    [EGXcdefgiorsux%]     # type code (or [formatted] percent character)
+                    ''', re.VERBOSE)
+
+                result = pat.search(data)
             if result:
                 path = os.path.dirname(data[0:result.start()])
 

@@ -9,6 +9,8 @@ from htmlentitydefs import name2codepoint
 import re
 import ntpath
 from datetime import timedelta, datetime
+from jinja2 import UndefinedError
+from flexget.utils.template import render_from_entry
 
 
 def str_to_boolean(string):
@@ -288,18 +290,29 @@ def urlopener(url, log, **kwargs):
 
 
 def replace_from_entry(field, entry, field_name, logger, default=''):
-    """This is a helper function to do string replacement from an entry dict.
+    """This is a helper function to do string replacement/jinja2 formatting from an entry dict.
     It catches exceptions from the string replacement and prints errors to the given log.
     field_name is the description to use when printing the error.
     Returns the result of the replacemnt, or default if there is an error."""
+    # Do jinja2 template replacement
     try:
-        result = field % entry
-    except KeyError, e:
-        logger("Could not set %s for %s: does not contain the field '%s'." % (field_name, entry['title'], e))
-        result = default
-    except ValueError, e:
-        from flexget.plugin import PluginError
-        raise PluginError("%s has invalid string replacement: %s: %s" % (field_name, e, field))
+        result = render_from_entry(field, entry)
+    except UndefinedError, e:
+        logger("Could not set %s for %s: does not contain the field '%s' for jinja replacement." %
+               (field_name, entry['title'], e))
+        return default
+
+    # Only try string replacement if jinja didn't do anything
+    if result == field:
+        try:
+            result = field % entry
+        except KeyError, e:
+            logger("Could not set %s for %s: does not contain the field '%s' for string replacement." %
+                   (field_name, entry['title'], e))
+            return default
+        except ValueError, e:
+            from flexget.plugin import PluginError
+            raise PluginError("%s has invalid string replacement: %s: %s" % (field_name, e, field))
     return result
 
 

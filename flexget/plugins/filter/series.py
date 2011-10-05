@@ -625,7 +625,8 @@ class FilterSeries(SeriesPlugin, FilterSeriesBase):
                     # set custom download path
                     if 'path' in series_config:
                         log.debug('setting %s custom path to %s' % (entry['title'], series_config.get('path')))
-                        entry['path'] = series_config.get('path') % entry
+                        # Just add this to the 'set' dictionary, so that string replacement is done cleanly
+                        series_config.setdefault('set', {}).update(path=series_config['path'])
 
                     # accept info from set: and place into the entry
                     if 'set' in series_config:

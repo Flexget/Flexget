@@ -411,7 +411,7 @@ class OutputDeluge(DelugePlugin):
             opts = {}
             path = entry.get('path', config['path'])
             if path:
-                opts['download_location'] = os.path.expanduser(path % entry)
+                opts['download_location'] = os.path.expanduser(replace_from_entry(path, entry, 'path', logger=log.error))
             for fopt, dopt in self.options.iteritems():
                 value = entry.get(fopt, config.get(fopt))
                 if value is not None:

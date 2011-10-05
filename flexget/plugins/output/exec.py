@@ -1,7 +1,8 @@
 import subprocess
 import logging
-from flexget.plugin import register_plugin, priority
 import re
+from flexget.plugin import register_plugin, priority
+from flexget.utils.tools import replace_from_entry
 
 log = logging.getLogger('exec')
 
@@ -123,17 +124,15 @@ class PluginExec(object):
             log.debug('running phase_name: %s operation: %s entries: %s' % (phase_name, operation, len(entries)))
 
             for entry in entries:
-                try:
-                    cmd = config[phase_name][operation]
-                    entrydict = EscapingDict(entry) if config.get('auto_escape') else entry
-                    # Do string replacement from entry, but make sure quotes get escaped
-                    cmd = cmd % entrydict
-                except KeyError, e:
-                    msg = 'Entry `%s` does not have required field %s' % (entry['title'], e.message)
-                    log.error(msg)
+                cmd = config[phase_name][operation]
+                entrydict = EscapingDict(entry) if config.get('auto_escape') else entry
+                # Do string replacement from entry, but make sure quotes get escaped
+                cmd = replace_from_entry(cmd, entrydict, 'exec command', log.error, default=None)
+                if cmd is None:
                     # fail the entry if configured to do so
                     if config.get('fail_entries'):
-                        feed.fail(entry, msg)
+                        feed.fail(entry, 'Entry `%s` does not have required fields for string replacement.' %
+                                         entry['title'])
                     continue
 
                 log.debug('phase_name: %s operation: %s cmd: %s' % (phase_name, operation, cmd))
