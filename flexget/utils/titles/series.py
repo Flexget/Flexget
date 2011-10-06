@@ -125,6 +125,22 @@ class SeriesParser(TitleParser):
         """Replaces some characters with spaces"""
         return re.sub(r'[_.,\[\]\(\): ]+', ' ', data).strip().lower()
 
+    def name_to_re(self, name):
+        """Convert 'foo bar' to '^[^...]*foo[^...]*bar[^...]+"""
+        # TODO: Still doesn't handle the case where the user wants
+        # "Schmost" and the feed contains "Schmost at Sea".
+        blank = r'[\W_]'
+        ignore = '(?:' + '|'.join(self.ignore_prefixes) + ')?'
+        # accept either '&' or 'and'
+        name = name.replace('&', '(?:and|&)')
+        res = re.sub(re.compile(blank + '+', re.UNICODE), ' ', name)
+        res = res.strip()
+        # check for 'and' surrounded by spaces so it is not replaced within a word or from above replacement
+        res = res.replace(' and ', ' (?:and|&) ')
+        res = re.sub(' +', blank + '*', res, re.UNICODE)
+        res = '^' + ignore + blank + '*' + '(' + res + ')' + blank + '+'
+        return res
+
     def parse(self, data=None, field=None, quality=qualities.UNKNOWN):
         # Clear the output variables before parsing
         self._reset()
@@ -145,22 +161,6 @@ class SeriesParser(TitleParser):
         if self.parse_unwanted(self.remove_dirt(self.data)):
             return
 
-        def name_to_re(name):
-            """Convert 'foo bar' to '^[^...]*foo[^...]*bar[^...]+"""
-            # TODO: Still doesn't handle the case where the user wants
-            # "Schmost" and the feed contains "Schmost at Sea".
-            blank = r'[\W_]'
-            ignore = '(?:' + '|'.join(self.ignore_prefixes) + ')?'
-            # accept either '&' or 'and'
-            name = name.replace('&', '(?:and|&)')
-            res = re.sub(blank + '+', ' ', name)
-            res = res.strip()
-            # check for 'and' surrounded by spaces so it is not replaced within a word or from above replacement
-            res = res.replace(' and ', ' (?:and|&) ')
-            res = re.sub(' +', blank + '*', res)
-            res = '^' + ignore + blank + '*' + '(' + res + ')' + blank + '+'
-            return res
-
         log.debug('name: %s data: %s' % (name, self.data))
 
         # name end position
@@ -170,7 +170,7 @@ class SeriesParser(TitleParser):
         # regexp name matching
         if not self.name_regexps:
             # if we don't have name_regexps, generate one from the name
-            self.name_regexps = [name_to_re(name)]
+            self.name_regexps = [self.name_to_re(name)]
             self.re_from_name = True
         # try all specified regexps on this data
         for name_re in self.name_regexps:

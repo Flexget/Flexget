@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from nose.tools import assert_raises
 from nose.tools import raises
 from flexget.utils.titles import SeriesParser, ParseWarning
@@ -514,3 +516,8 @@ class TestSeriesParser(object):
         # Test 'and' isn't replaced within a word
         s = self.parse(name='Sandy Dunes', data='S&y Dunes.S01E01.hdtv')
         assert not s.valid
+
+    def test_unicode(self):
+        s = self.parse(name=u'abc äää abc', data=u'abc.äää.abc.s01e02')
+        assert s.season == 1
+        assert s.episode == 2
