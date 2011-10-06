@@ -116,7 +116,7 @@ class FilterRememberRejected(object):
                 reject_entry = reject_entries.filter(and_(RememberEntry.title == entry['title'],
                                                           RememberEntry.url == entry['url'])).first()
                 if reject_entry:
-                    feed.reject(entry, 'Rejected by %s plugin on a previous run: %s' %
+                    feed.reject(entry, 'Rejected on behalf of %s plugin: %s' %
                                        (reject_entry.rejected_by, reject_entry.reason))
 
     def on_entry_reject(self, feed, entry, remember=None, remember_time=None, **kwargs):
