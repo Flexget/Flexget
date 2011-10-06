@@ -3,7 +3,7 @@ import re
 import urllib
 import feedparser
 from flexget.plugin import register_plugin, PluginWarning
-from flexget.feed import Entry
+from flexget.entry import Entry
 from flexget.utils.search import torrent_availability, StringComparator
 
 log = logging.getLogger('torrentz')

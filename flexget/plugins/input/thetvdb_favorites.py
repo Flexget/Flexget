@@ -10,7 +10,7 @@ from flexget.utils.tools import urlopener
 from flexget.utils.database import pipe_list_synonym, with_session
 from flexget.utils.sqlalchemy_utils import drop_tables, table_columns
 from flexget.utils.cached_input import cached
-from flexget.feed import Entry
+from flexget.entry import Entry
 
 try:
     from flexget.plugins.api_tvdb import lookup_series

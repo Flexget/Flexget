@@ -7,7 +7,7 @@ from sqlalchemy.orm import relation
 from flexget import schema
 from flexget.utils.database import safe_pickle_synonym
 from flexget.utils.tools import parse_timedelta
-from flexget.feed import Entry
+from flexget.entry import Entry
 from flexget.event import event
 
 log = logging.getLogger('input_cache')

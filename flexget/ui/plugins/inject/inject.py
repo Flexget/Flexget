@@ -4,7 +4,7 @@ import urlparse
 from flask import render_template, request, flash, redirect, Module
 from flask.helpers import url_for
 from flexget.ui.webui import register_plugin, executor
-from flexget.feed import Entry
+from flexget.entry import Entry
 
 inject = Module(__name__, url_prefix='/inject')
 

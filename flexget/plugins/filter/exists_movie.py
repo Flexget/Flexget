@@ -1,7 +1,7 @@
 import os
 import logging
 from flexget.plugin import register_plugin, priority, PluginError, get_plugin_by_name
-from flexget.feed import Entry
+from flexget.entry import Entry
 
 log = logging.getLogger('exists_movie')
 

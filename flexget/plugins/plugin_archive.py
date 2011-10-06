@@ -1,11 +1,10 @@
 import logging
 from flexget.event import event
 from flexget.manager import Base
-from flexget.feed import Entry
+from flexget.entry import Entry
 from flexget.plugin import priority, register_parser_option, register_plugin, PluginError
 from flexget.utils.tools import console
-from sqlalchemy import Column, Integer, String, DateTime, Unicode, Index, asc, or_
-from sqlalchemy.orm import join
+from sqlalchemy import Column, Integer, DateTime, Unicode, Index, or_
 from datetime import datetime
 from flexget.manager import Session
 from optparse import SUPPRESS_HELP

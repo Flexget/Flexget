@@ -1,5 +1,5 @@
 import logging
-from flexget.feed import Entry
+from flexget.entry import Entry
 from flexget.plugin import register_plugin, DependencyError
 
 log = logging.getLogger('emit_series')

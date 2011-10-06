@@ -1,6 +1,6 @@
 import logging
 import yaml
-from flexget.feed import Entry
+from flexget.entry import Entry
 from flexget.plugin import *
 from flexget.utils.tools import str_to_boolean
 

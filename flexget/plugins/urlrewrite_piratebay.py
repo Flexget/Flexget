@@ -1,9 +1,8 @@
 import re
 import urllib
 import logging
-import difflib
 from plugin_urlrewriting import UrlRewritingError
-from flexget.feed import Entry
+from flexget.entry import Entry
 from flexget.plugin import register_plugin, internet, PluginWarning
 from flexget.utils.tools import urlopener
 from flexget.utils.soup import get_soup

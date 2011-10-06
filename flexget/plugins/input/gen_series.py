@@ -1,7 +1,7 @@
 import logging
 import random
 import string
-from flexget.feed import Entry
+from flexget.entry import Entry
 from flexget import plugin
 
 log = logging.getLogger('gen_series')

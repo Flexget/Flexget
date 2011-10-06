@@ -4,7 +4,7 @@ import BeautifulSoup
 import urllib
 import urllib2
 import zlib
-from flexget.feed import Entry
+from flexget.entry import Entry
 from flexget.plugin import *
 from flexget.utils.soup import get_soup
 from flexget.utils.cached_input import cached

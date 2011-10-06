@@ -2,7 +2,7 @@ import logging
 from datetime import datetime, timedelta
 from sqlalchemy import Column, Integer, String, Unicode, DateTime, PickleType
 from flexget import schema
-from flexget.feed import Entry
+from flexget.entry import Entry
 from flexget.plugin import register_plugin, priority, PluginError
 from flexget.utils.database import safe_pickle_synonym
 

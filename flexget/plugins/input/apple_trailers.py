@@ -1,6 +1,6 @@
 import logging
 import re
-from flexget.feed import Entry
+from flexget.entry import Entry
 from flexget.plugin import priority, register_plugin, get_plugin_by_name, DependencyError
 from flexget.utils.cached_input import cached
 from flexget.utils.tools import urlopener

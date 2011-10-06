@@ -4,7 +4,7 @@ import urllib2
 from flexget.utils.tools import urlopener
 from flexget.utils.cached_input import cached
 from flexget.plugin import register_plugin, PluginError, DependencyError
-from flexget.feed import Entry
+from flexget.entry import Entry
 
 try:
     import simplejson as json

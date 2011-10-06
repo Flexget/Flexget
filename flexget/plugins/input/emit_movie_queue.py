@@ -1,5 +1,5 @@
 import logging
-from flexget.feed import Entry
+from flexget.entry import Entry
 from flexget.plugin import register_plugin, PluginError, get_plugin_by_name, DependencyError
 
 try:

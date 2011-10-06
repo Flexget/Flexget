@@ -3,7 +3,7 @@ import pickle
 from datetime import datetime
 from sqlalchemy import Column, Integer, String, DateTime, PickleType
 from flexget import schema
-from flexget.feed import Entry
+from flexget.entry import Entry
 from flexget.manager import Session
 from flexget.plugin import register_plugin, priority
 from flexget.utils.database import safe_pickle_synonym

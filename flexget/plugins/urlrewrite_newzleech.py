@@ -2,7 +2,7 @@ import urllib
 import urllib2
 import logging
 import re
-from flexget.feed import Entry
+from flexget.entry import Entry
 from flexget.plugin import register_plugin, internet
 from flexget.utils.soup import get_soup
 from flexget.utils.tools import urlopener

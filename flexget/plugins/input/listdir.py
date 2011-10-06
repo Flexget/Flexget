@@ -1,7 +1,8 @@
 """Plugin for filesystem feeds."""
+import os
 import logging
 from flexget import plugin
-from flexget.utils.cached_input import cached
+from flexget.entry import Entry
 
 log = logging.getLogger('listdir')
 
@@ -24,8 +25,6 @@ class Listdir(plugin.Plugin):
         return root
 
     def on_feed_input(self, feed, config):
-        from flexget.feed import Entry
-        import os
         # If only a single path is passed turn it into a 1 element list
         if isinstance(config, basestring):
             config = [config]

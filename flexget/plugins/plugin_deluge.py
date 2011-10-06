@@ -4,7 +4,7 @@ import os
 import base64
 import re
 import sys
-from flexget.feed import Entry
+from flexget.entry import Entry
 from flexget.utils.tools import replace_from_entry, make_valid_path
 from flexget.plugin import register_plugin, PluginError, priority, get_plugin_by_name, DependencyError
 

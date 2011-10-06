@@ -2,7 +2,7 @@ import os
 from tests import FlexGetBase, with_filecopy
 from flexget.utils.cached_input import cached
 from flexget.plugin import register_plugin
-from flexget.feed import Entry
+from flexget.entry import Entry
 
 
 class InputPersist(object):

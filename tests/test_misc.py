@@ -2,7 +2,7 @@ import os
 from tests import FlexGetBase
 from nose.plugins.attrib import attr
 from nose.tools import raises
-from flexget.feed import EntryUnicodeError, Entry
+from flexget.entry import EntryUnicodeError, Entry
 
 
 class TestDisableBuiltins(FlexGetBase):

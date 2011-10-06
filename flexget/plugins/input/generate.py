@@ -1,5 +1,5 @@
 import logging
-from flexget.feed import Entry
+from flexget.entry import Entry
 from flexget import plugin, validator
 
 # Global constants

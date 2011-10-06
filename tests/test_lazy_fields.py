@@ -1,4 +1,4 @@
-from flexget.feed import Entry
+from flexget.entry import Entry
 
 
 class TestLazyFields(object):

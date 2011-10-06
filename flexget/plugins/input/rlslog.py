@@ -1,7 +1,7 @@
 import urllib2
 import logging
 import re
-from flexget.feed import Entry
+from flexget.entry import Entry
 from flexget.plugin import *
 from flexget.utils.log import log_once
 from flexget.utils.soup import get_soup

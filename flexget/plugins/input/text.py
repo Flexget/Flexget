@@ -1,7 +1,7 @@
 """Plugin for text file or URL feeds via regex."""
 import re
 import logging
-from flexget.feed import Entry
+from flexget.entry import Entry
 from flexget import plugin
 from flexget.utils.cached_input import cached
 from flexget.utils.tools import urlopener
