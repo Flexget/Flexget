@@ -109,16 +109,12 @@ class SeriesParser(TitleParser):
         """
         Some conversions when setting attributes.
         `self.name` and `self.data` are converted to unicode.
-        `self.*_regexps` are converted to ReList.
         """
         if name == 'name' or name == 'data':
             if isinstance(value, str):
                 value = unicode(value)
             elif not isinstance(value, unicode):
                 raise Exception('%s cannot be %s' % (name, repr(value)))
-        elif name.endswith('_regexps'):
-            # Transparently turn regular lists into ReLists
-            value = ReList(value)
         object.__setattr__(self, name, value)
 
     def remove_dirt(self, data):
@@ -170,7 +166,7 @@ class SeriesParser(TitleParser):
         # regexp name matching
         if not self.name_regexps:
             # if we don't have name_regexps, generate one from the name
-            self.name_regexps = [self.name_to_re(name)]
+            self.name_regexps = ReList([self.name_to_re(name)])
             self.re_from_name = True
         # try all specified regexps on this data
         for name_re in self.name_regexps:
