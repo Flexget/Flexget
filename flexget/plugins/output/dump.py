@@ -6,13 +6,14 @@ log = logging.getLogger('dump')
 
 def dump(entries, debug=False):
     """Dump :entries: to stdout"""
+
     for entry in entries:
         #c = entry.copy()
         #sanitize(c)
         #print yaml.safe_dump(entry)
         for field in entry:
             if entry.is_lazy(field):
-                value = '<LazyField>'
+                value = '<LazyField - value will be determined when it\'s accessed>'
             else:
                 value = entry[field]
             if isinstance(value, basestring):

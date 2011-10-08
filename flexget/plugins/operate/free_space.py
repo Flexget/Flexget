@@ -18,7 +18,7 @@ def get_free_space(folder):
 
 
 class PluginFreeSpace(object):
-    """Aborts a feed if an entry is accepted and there is less than a certain abount of space free on a drive."""
+    """Aborts a feed if an entry is accepted and there is less than a certain amount of space free on a drive."""
 
     def validator(self):
         from flexget import validator
@@ -49,5 +49,5 @@ class PluginFreeSpace(object):
                 log.error('Less than %d MB of free space in %s aborting feed.' % (config['space'], config['path']))
                 feed.abort()
 
-                
+
 register_plugin(PluginFreeSpace, 'free_space')
