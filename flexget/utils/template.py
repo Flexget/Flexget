@@ -7,7 +7,8 @@ from datetime import datetime, date, time
 import locale
 from email.utils import parsedate
 from time import mktime
-from jinja2 import Environment, StrictUndefined, ChoiceLoader, FileSystemLoader, PackageLoader
+# UndefinedError is not used here, but may be imported from here
+from jinja2 import Environment, StrictUndefined, ChoiceLoader, FileSystemLoader, PackageLoader, UndefinedError
 from flexget.event import event
 
 log = logging.getLogger('utils.template')
@@ -63,7 +64,6 @@ def filter_re_search(val, pattern):
         return val
     result = re.search(pattern, val)
     if result:
-        i = result.group(0)
         return result.group(0)
     return ''
 

@@ -4,6 +4,7 @@ from httplib import HTTPSConnection
 from urllib import urlencode
 import logging
 from flexget.plugin import get_plugin_by_name, register_plugin
+from flexget.utils.template import render_from_entry, UndefinedError
 
 log = logging.getLogger('prowl')
 
@@ -18,6 +19,7 @@ class OutputProwl(object):
       [application: application name, default FlexGet]
       [event: event title, default New Release]
       [priority: -2 - 2 (2 = highest), default 0]
+      [description: notification to send]
       
     Configuration parameters are also supported from entries (eg. through set).
     """
@@ -29,6 +31,7 @@ class OutputProwl(object):
         config.accept('text', key='application')
         config.accept('text', key='event')
         config.accept('integer', key='priority')
+        config.accept('text', key='description')
         return config
 
     def on_process_start(self, feed):
@@ -36,7 +39,7 @@ class OutputProwl(object):
             Register the usable set: keywords.
         """ 
         set_plugin = get_plugin_by_name('set') 
-        set_plugin.instance.register_keys({'apikey': 'text', 'application': 'text', \
+        set_plugin.instance.register_keys({'apikey': 'text', 'application': 'text',
                                            'event': 'text', 'priority': 'integer'})
 
     def get_config(self, feed):
@@ -62,13 +65,20 @@ class OutputProwl(object):
             application = entry.get('application', config['application'])
             event = entry.get('event', config['event'])
             priority = entry.get('priority', config['priority'])
-            description = entry['title']
-            
+            description = config.get('description', entry['title'])
+
+            # If description has jinja template, render it
+            try:
+                description = render_from_entry(description, entry)
+            except UndefinedError, e:
+                description = entry['title']
+                log.error('Error rendering jinja description: %s' % e)
+
             # Open connection
             h = HTTPSConnection('prowl.weks.net')
             
             # Send the request
-            data = {'priority': priority, 'application': application, 'apikey': apikey, \
+            data = {'priority': priority, 'application': application, 'apikey': apikey,
                     'event': event, 'description': description}
             h.request("POST", "/publicapi/add", headers=headers, body=urlencode(data))
 
