@@ -1,3 +1,5 @@
+from datetime import datetime, timedelta
+from flexget.manager import Session
 from string import capwords
 from sqlalchemy.orm import join
 from sqlalchemy import desc
@@ -75,58 +77,105 @@ class SeriesReport(SeriesPlugin):
         print ' * = downloaded'
         session.close()
 
-    def display_summary(self):
-        """Display series summary. ie --series"""
-
-        print ' %-30s%-20s%-21s' % ('Name', 'Latest', 'Status')
-        print '-' * 79
-
-        from flexget.manager import Session
+    def get_series_summary(self):
+        result = {}
         session = Session()
+        try:
+            for series in session.query(Series).all():
+                name = unicode(series.name)
+                # capitalize if user hasn't, better look and sorting ...
+                if name.islower():
+                    name = capwords(name)
+                result[name] = {'identified_by': series.identified_by}
+                episode = self.latest_seen_episode(session, series)
+                if episode:
+                    latest = {'first_seen': episode.first_seen,
+                              'episode_instance': episode,
+                              'episode_id': episode.identifier,
+                              'age': episode.age,
+                              'status': self.get_latest_status(episode)}
+                    result[name]['latest'] = latest
+        finally:
+            session.close()
+        return result
 
-        for series in session.query(Series).all():
+    def get_latest_status(self, episode):
+        """
+        :param episode: Instance of Episode
+        :return: Status string for given episode
+        """
+        status = ''
+        for release in episode.releases:
+            if release.downloaded:
+                status += '*'
+            status += release.quality.name
+            if release.proper_count > 0:
+                status += '-proper'
+                if release.proper_count > 1:
+                    status += str(release.proper_count)
+            status += ' '
+        return status if status else None
 
-            # get latest episode in episodic format
+    def latest_seen_episode(self, session, series):
+        """
+        :param session: SQLAlchemy session
+        :param series: Instance of Series
+        :return: Instance of latest Episode or None
+        """
+        if unicode(series.name).lower() == 'penn and teller':
+            pass
+        episode = None
+        # try to get latest episode in episodic format
+        if series.identified_by in ('ep', 'auto', None):
             episode = session.query(Episode).select_from(join(Episode, Series)).\
-                      filter(Series.id == series.id).\
-                      filter(Episode.season != None).\
-                      order_by(desc(Episode.season)).\
-                      order_by(desc(Episode.number)).first()
-
-            # no luck, try uid format
+                filter(Series.id == series.id).\
+                filter(Episode.season != None).\
+                order_by(desc(Episode.season)).\
+                order_by(desc(Episode.number)).first()
+        # no luck, try uid format
+        if series.identified_by in ('id', 'auto', None):
             if not episode:
                 episode = session.query(Episode).join(Series, Release).\
-                          filter(Series.id == series.id).\
-                          filter(Episode.season == None).\
-                          order_by(desc(Release.first_seen)).first()
+                    filter(Series.id == series.id).\
+                    filter(Episode.season == None).\
+                order_by(desc(Release.first_seen)).first()
+        return episode
 
-            latest = ''
-            status = ''
+    def display_summary(self, discontinued=False):
+        """
+        Display series summary. ie --series
+        :param discontinued: Whether to display active or discontinued series
+        """
 
-            if episode:
-                if not episode.season or not episode.number:
-                    latest = '%s (id) - %s' % (episode.identifier, episode.age)
-                else:
-                    latest = 'S%sE%s - %s' % (str(episode.season).zfill(2), str(episode.number).zfill(2), episode.age)
+        formatting = ' %-30s %-10s %-10s %-20s'
+        print formatting % ('Name', 'Latest', 'Age', 'Status')
+        print '-' * 79
 
-                for release in self.get_releases(session, series.name, episode.identifier):
-                    if release.downloaded:
-                        status += '*'
-                    status += release.quality.name
-                    if release.proper_count > 0:
-                        status += '-proper'
-                        if release.proper_count > 1:
-                            status += str(release.proper_count)
-                    status += ' '
-            else:
-                latest = 'N/A'
-                status = 'N/A'
+        hidden = 0
+        series = self.get_series_summary()
+        for series_name, data in sorted(series.iteritems()):
+            new_ep = ' '
+            if len(series_name) > 30:
+                series_name = series_name[:27] + '...'
 
-            print ' %-30s%-20s%-21s' % (capwords(series.name), latest, status)
+            if 'latest' in data:
+                if data['latest']['first_seen'] > datetime.now() - timedelta(days=2):
+                    new_ep = '>'
+                if data['latest']['first_seen'] < datetime.now() - timedelta(days=30 * 7):
+                    hidden += 1
+                    continue
+
+            latest = data.get('latest', {})
+            status = latest.get('status', 'N/A')
+            age = latest.get('age', 'N/A')
+            episode_id = latest.get('episode_id', 'N/A')
+
+            print new_ep + formatting[1:] % (series_name, episode_id, age if age else '', status)
 
         print '-' * 79
-        print ' * = downloaded'
-        session.close()
+        print ' * = downloaded | > = new episode %s' % \
+              '| %i series unseen past 6 months hidden' % hidden if hidden else ''
+        print ' Use --series NAME to get detailed information'
 
 
 class SeriesForget(object):

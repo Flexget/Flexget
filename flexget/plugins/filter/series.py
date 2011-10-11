@@ -252,12 +252,6 @@ class SeriesPlugin(object):
 
         return {'season': latest_download.season, 'episode': latest_download.number, 'name': name}
 
-    def get_releases(self, session, name, identifier):
-        """Return all releases for series by identifier."""
-        return session.query(Release).join(Episode, Series).\
-            filter(Series.name == name).\
-            filter(Episode.identifier == identifier).all()
-
     def get_downloaded(self, session, name, identifier):
         """Return list of downloaded releases for this episode"""
         downloaded = session.query(Release).join(Episode, Series).\
