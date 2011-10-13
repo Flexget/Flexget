@@ -1,17 +1,18 @@
 import subprocess
 import logging
 import re
+from UserDict import UserDict
 from flexget.plugin import register_plugin, priority
 from flexget.utils.tools import replace_from_entry
 
 log = logging.getLogger('exec')
 
 
-class EscapingDict(dict):
+class EscapingDict(UserDict):
     """Helper class, same as a dict, but returns all string value with quotes escaped."""
 
     def __getitem__(self, key):
-        value = dict.__getitem__(self, key)
+        value = self.data[key]
         if isinstance(value, basestring):
             value = re.escape(value)
         return value
