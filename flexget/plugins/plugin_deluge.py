@@ -508,10 +508,6 @@ class OutputDeluge(DelugePlugin):
                     else:
                         log.warning('If path does not exist on the machine running the daemon, move will fail.')
 
-            if opts.get('path'):
-                dlist.append(version_deferred.addCallback(create_path, opts['path']))
-                log.debug('Moving storage for %s to %s' % (entry['title'], opts['path']))
-                dlist.append(client.core.move_storage([torrent_id], opts['path']))
             if opts['movedone']:
                 dlist.append(version_deferred.addCallback(create_path, opts['movedone']))
                 dlist.append(client.core.set_torrent_move_completed(torrent_id, True))
@@ -531,11 +527,31 @@ class OutputDeluge(DelugePlugin):
                 else:
                     dlist.append(client.core.queue_bottom([torrent_id]))
                     log.debug('%s moved to bottom of queue' % entry['title'])
-            if opts.get('content_filename') or opts.get('main_file_only'):
 
-                def on_get_torrent_status(status):
-                    """Gets called with torrent status, including file info.
-                    Loops through files and renames anything qualifies for content renaming."""
+            def on_get_torrent_status(status):
+                """Gets called with torrent status, including file info.
+                Sets the torrent options which require knowledge of the current status of the torrent."""
+
+                main_file_dlist = []
+
+                # Determine where the file should be
+                move_now_path = None
+                if opts.get('movedone'):
+                    if status['progress'] == 100:
+                        move_now_path = opts['movedone']
+                    else:
+                        # Deluge will unset the move completed option if we move the storage, forgo setting proper
+                        # path, in favor of leaving proper final location.
+                        log.debug('Not moving storage for %s, as this will prevent movedone.' % entry['title'])
+                elif opts.get('path'):
+                    move_now_path = opts['path']
+
+                if move_now_path and os.path.normpath(move_now_path) != os.path.normpath(status['save_path']):
+                    main_file_dlist.append(version_deferred.addCallback(create_path, move_now_path))
+                    log.debug('Moving storage for %s to %s' % (entry['title'], move_now_path))
+                    main_file_dlist.append(client.core.move_storage([torrent_id], move_now_path))
+
+                if opts.get('content_filename') or opts.get('main_file_only'):
 
                     def file_exists():
                         # Checks the download path as well as the move completed path for existence of the file
@@ -547,7 +563,6 @@ class OutputDeluge(DelugePlugin):
                         else:
                             return False
 
-                    main_file_dlist = []
                     for file in status['files']:
                         # Only rename file if it is > 90% of the content
                         if file['size'] > (status['total_size'] * 0.9):
@@ -566,12 +581,14 @@ class OutputDeluge(DelugePlugin):
                             if opts.get('main_file_only'):
                                 file_priorities = [1 if f['index'] == file['index'] else 0 for f in status['files']]
                                 main_file_dlist.append(client.core.set_torrent_file_priorities(torrent_id, file_priorities))
-                            return defer.DeferredList(main_file_dlist)
+                            break
                     else:
                         log.warning('No files in %s are > 90%% of content size, no files renamed.' % entry['title'])
 
-                status_keys = ['files', 'total_size', 'save_path', 'move_on_completed_path', 'move_on_completed']
-                dlist.append(client.core.get_torrent_status(torrent_id, status_keys).addCallback(on_get_torrent_status))
+                return defer.DeferredList(main_file_dlist)
+
+            status_keys = ['files', 'total_size', 'save_path', 'move_on_completed_path', 'move_on_completed', 'progress']
+            dlist.append(client.core.get_torrent_status(torrent_id, status_keys).addCallback(on_get_torrent_status))
 
             return defer.DeferredList(dlist)
 
@@ -641,8 +658,8 @@ class OutputDeluge(DelugePlugin):
             for entry in feed.accepted:
 
                 def add_entry(entry, opts):
-                    magnet, filedump = None, None
                     """Adds an entry to the deluge session"""
+                    magnet, filedump = None, None
                     if entry.get('url', '').startswith('magnet:'):
                         magnet = entry['url']
                     else:
