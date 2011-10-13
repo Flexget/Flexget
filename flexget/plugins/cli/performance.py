@@ -25,14 +25,17 @@ def startup(manager):
 
         # Monkeypatch query counter for SQLAlchemy
         from sqlalchemy.engine import Connection
-        orig_f = Connection._cursor_execute
+        if hasattr(Connection, 'execute'):
+            orig_f = Connection.execute
 
-        def monkeypatched(*args, **kwargs):
-            global query_count
-            query_count += 1
-            orig_f(*args, **kwargs)
+            def monkeypatched(*args, **kwargs):
+                global query_count
+                query_count += 1
+                return orig_f(*args, **kwargs)
 
-        Connection._cursor_execute = monkeypatched
+            Connection.execute = monkeypatched
+        else:
+            log.critical('Unable to monkeypatch sqlalchemy')
 
         @event('feed.execute.before_plugin')
         def before(feed, keyword):
