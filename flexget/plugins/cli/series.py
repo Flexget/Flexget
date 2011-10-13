@@ -105,14 +105,16 @@ class SeriesReport(SeriesPlugin):
         :return: Status string for given episode
         """
         status = ''
-        for release in episode.releases:
+        for release in sorted(episode.releases, key=lambda r: r.quality):
             if release.downloaded:
-                status += '*'
+                status += '['
             status += release.quality.name
             if release.proper_count > 0:
                 status += '-proper'
                 if release.proper_count > 1:
                     status += str(release.proper_count)
+            if release.downloaded:
+                status += ']'
             status += ' '
         return status if status else None
 
@@ -173,7 +175,7 @@ class SeriesReport(SeriesPlugin):
             print new_ep + formatting[1:] % (series_name, episode_id, age if age else '', status)
 
         print '-' * 79
-        print ' * = downloaded | > = new episode %s' % \
+        print ' [] = downloaded | > = new episode %s' % \
               '| %i series unseen past 6 months hidden' % hidden if hidden else ''
         print ' Use --series NAME to get detailed information'
 
