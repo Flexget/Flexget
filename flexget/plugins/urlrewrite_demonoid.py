@@ -11,6 +11,6 @@ class UrlRewriteDemonoid:
         return entry['url'].startswith('http://www.demonoid.me/files/details/')
 
     def url_rewrite(self, feed, entry):
-        entry['url'] = entry['url'].replace('details', 'download/HTTP')
+        entry['url'] = entry['url'].replace('details', 'download')
 
 register_plugin(UrlRewriteDemonoid, 'demonoid', groups=['urlrewriter'])
