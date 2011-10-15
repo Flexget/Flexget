@@ -1,8 +1,9 @@
 import urllib2
 import logging
 import re
+import zlib
 from flexget.entry import Entry
-from flexget.plugin import *
+from flexget.plugin import register_plugin, internet, get_plugin_by_name, PluginWarning
 from flexget.utils.log import log_once
 from flexget.utils.soup import get_soup
 from flexget.utils.cached_input import cached
@@ -12,7 +13,7 @@ from flexget.utils.tools import urlopener
 log = logging.getLogger('rlslog')
 
 
-class RlsLog:
+class RlsLog(object):
     """
         Adds support for rlslog.net as a feed.
 
@@ -44,6 +45,8 @@ class RlsLog:
         """Parse configured url and return releases array"""
 
         page = urlopener(rlslog_url, log)
+        if page.headers.get('content-encoding') in ('gzip', 'x-gzip', 'deflate'):
+            page = zlib.decompressobj(15 + 32).decompress(page.read())
         soup = get_soup(page)
 
         releases = []
@@ -96,9 +99,7 @@ class RlsLog:
                             release['imdb_score'], release['imdb_votes'] = self.parse_imdb(score_raw)
 
                 # test if entry with this url would be recognized
-                temp = {}
-                temp['title'] = release['title']
-                temp['url'] = link_href
+                temp = {'title': release['title'], 'url': link_href}
                 urlrewriting = get_plugin_by_name('urlrewriting')
                 if urlrewriting['instance'].url_rewritable(feed, temp):
                     release['url'] = link_href
@@ -136,12 +137,14 @@ class RlsLog:
                     log.verbose('Error recieving content, retrying in 5s. Try [%s of 3]. HTTP Error Code: %s' % (str(number + 1), str(e.code)))
                     time.sleep(5)
             except urllib2.URLError, e:
-                if number == 2:
+                if number == 1:
                     raise
                 else:
                     import time
                     log.verbose('Error retrieving the URL, retrying in 5s. Try [%s of 3]. Error: %s' % (str(number + 1), str(e.reason)))
                     time.sleep(5)
+            else:
+                break
 
         for release in releases:
             # construct entry from release
