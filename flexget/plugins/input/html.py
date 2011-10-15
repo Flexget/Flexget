@@ -4,8 +4,9 @@ import BeautifulSoup
 import urllib
 import urllib2
 import zlib
+import re
 from flexget.entry import Entry
-from flexget.plugin import *
+from flexget.plugin import register_plugin, internet, PluginError
 from flexget.utils.soup import get_soup
 from flexget.utils.cached_input import cached
 from flexget.utils.tools import urlopener
@@ -89,7 +90,26 @@ class InputHtml(object):
 
         return self.create_entries(config['url'], soup, config)
 
-    def create_entries(self, pageurl, soup, config):
+    def _title_from_link(self, link, log_link):
+        title = link.contents[0]
+        # tag inside link
+        if isinstance(title, BeautifulSoup.Tag):
+            log.debug('link %s content is tag, cannot get title' % log_link)
+            return None
+        # longshot from next element (?)
+        if title is None:
+            title = link.next.string
+            if title is None:
+                log.debug('longshot failed for %s' % log_link)
+                return None
+        return title
+
+    def _title_from_url(self, url):
+        parts = urllib.splitquery(url[url.rfind('/') + 1:])
+        title = urllib.unquote_plus(parts[0])
+        return title
+
+    def create_entries(self, page_url, soup, config):
 
         queue = []
         duplicates = {}
@@ -110,11 +130,19 @@ class InputHtml(object):
                 continue
 
             url = link['href']
+            log_link = url
+            log_link = log_link.replace('\n', '')
+            log_link = log_link.replace('\r', '')
+
+            # fix broken urls
+            if url.startswith('//'):
+                url = 'http:' + url
+            elif not url.startswith('http://') or not url.startswith('https://'):
+                url = urlparse.urljoin(page_url, url)
 
             # get only links matching regexp
             regexps = config.get('links_re', None)
             if regexps:
-                import re
                 accept = False
                 for regexp in regexps:
                     if re.search(regexp, url):
@@ -122,65 +150,56 @@ class InputHtml(object):
                 if not accept:
                     continue
 
-            title = link.contents[0]
-
-            # tag inside link
-            if isinstance(title, BeautifulSoup.Tag):
-                log.trace('title is tag: %s' % title)
-                continue
-
-            # just unable to get any decent title
-            if title is None:
-                title = link.next.string
-                if title is None:
-                    continue
-
-            # strip unicode white spaces
-            title = title.replace(u'\u200B', u'').strip()
-
-            if not title:
-                continue
-
-            # fix broken urls
-            if url.startswith('//'):
-                url = 'http:' + url
-            elif not url.startswith('http://') or not url.startswith('https://'):
-                url = urlparse.urljoin(pageurl, url)
-
             title_from = config.get('title_from', 'auto')
             if title_from == 'url':
-                parts = urllib.splitquery(url[url.rfind('/') + 1:])
-                title = urllib.unquote_plus(parts[0])
+                title = self._title_from_url(url)
                 log.debug('title from url: %s' % title)
             elif title_from == 'title':
                 if not link.has_key('title'):
-                    safelink = link.encode('ascii', 'ignore')
-                    safelink = safelink.replace('\n', '')
-                    safelink = safelink.replace('\r', '')
-                    log.warning('Link %s doesn\'t have title attribute, ignored.' % safelink)
+                    log.warning('Link `%s` doesn\'t have title attribute, ignored.' % log_link)
                     continue
                 title = link['title']
                 log.debug('title from title: %s' % title)
             elif title_from == 'auto':
+                title = self._title_from_link(link, log_link)
+                if title is None:
+                    continue
                 # automatic mode, check if title is unique
                 # if there are too many duplicate titles, switch to title_from: url
                 if title_exists(title):
                     # ignore index links as a counter
                     if 'index' in title and len(title) < 10:
+                        log.debug('ignored index title %s' % title)
                         continue
                     duplicates.setdefault(title, 0)
                     duplicates[title] += 1
                     if duplicates[title] > duplicate_limit:
-                        log.info('Link names seem to be useless, auto-enabling \'title_from: url\'. This may not work well, you might need to configure it.')
-                        config['title_from'] = 'url'
+                        # if from url seems to be bad choice use title
+                        from_url = self._title_from_url(url)
+                        switch_to = 'url'
+                        for ext in ('.html', '.php'):
+                            if from_url.endswith(ext):
+                                switch_to = 'title'
+                        log.info('Link names seem to be useless, auto-configuring \'title_from: %s\'. '
+                                 'This may not work well, you might need to configure it yourself.' % switch_to)
+                        config['title_from'] = switch_to
                         # start from the beginning  ...
-                        return self.create_entries(pageurl, soup, config)
+                        return self.create_entries(page_url, soup, config)
             elif title_from == 'link' or title_from == 'contents':
                 # link from link name
+                title = self._title_from_link(link, log_link)
+                if title is None:
+                    continue
                 log.debug('title from link: %s' % title)
-                pass
             else:
                 raise PluginError('Unknown title_from value %s' % title_from)
+
+            if not title:
+                log.debug('title could not be determined for %s' % log_link)
+                continue
+
+            # strip unicode white spaces
+            title = title.replace(u'\u200B', u'').strip()
 
             # in case the title contains xxxxxxx.torrent - foooo.torrent clean it a bit (get up to first .torrent)
             # TODO: hack
