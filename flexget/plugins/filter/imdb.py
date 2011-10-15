@@ -104,16 +104,16 @@ class FilterImdb(object):
             reasons = []
             if 'min_score' in config:
                 if entry.get('imdb_score', 0) < config['min_score']:
-                    reasons.append('min_score (%s < %s)' % (entry['imdb_score'], config['min_score']))
+                    reasons.append('min_score (%s < %s)' % (entry.get('imdb_score'), config['min_score']))
             if 'min_votes' in config:
                 if entry.get('imdb_votes', 0) < config['min_votes']:
-                    reasons.append('min_votes (%s < %s)' % (entry['imdb_votes'], config['min_votes']))
+                    reasons.append('min_votes (%s < %s)' % (entry.get('imdb_votes'), config['min_votes']))
             if 'min_year' in config:
                 if entry.get('imdb_year', 0) < config['min_year']:
-                    reasons.append('min_year (%s < %s)' % (entry['imdb_year'], config['min_year']))
+                    reasons.append('min_year (%s < %s)' % (entry.get('imdb_year'), config['min_year']))
             if 'max_year' in config:
                 if entry.get('imdb_year', 0) > config['max_year']:
-                    reasons.append('max_year (%s > %s)' % (entry['imdb_year'], config['max_year']))
+                    reasons.append('max_year (%s > %s)' % (entry.get('imdb_year'), config['max_year']))
             if 'reject_genres' in config:
                 rejected = config['reject_genres']
                 for genre in entry.get('imdb_genres', []):
@@ -169,12 +169,12 @@ class FilterImdb(object):
             if 'reject_mpaa_ratings' in config:
                 rejected = config['reject_mpaa_ratings']
                 if entry.get('imdb_mpaa_rating') in rejected:
-                    reasons.append('reject_mpaa_ratings %s' % entry["imdb_mpaa_rating"])
+                    reasons.append('reject_mpaa_ratings %s' % entry['imdb_mpaa_rating'])
 
             if 'accept_mpaa_ratings' in config:
                 accepted = config['accept_mpaa_ratings']
-                if entry["imdb_mpaa_rating"] not in accepted:
-                    reasons.append('accept_mpaa_ratings %s' % entry["imdb_mpaa_rating"])
+                if entry.get('imdb_mpaa_rating') not in accepted:
+                    reasons.append('accept_mpaa_ratings %s' % entry.get('imdb_mpaa_rating'))
 
             if reasons and not force_accept:
                 msg = 'Didn\'t accept `%s` because of rule(s) %s' % \
