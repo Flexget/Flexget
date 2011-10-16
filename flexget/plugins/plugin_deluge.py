@@ -742,5 +742,5 @@ class OutputDeluge(DelugePlugin):
         self.on_feed_exit(feed, config)
 
 
-register_plugin(InputDeluge, 'input_deluge', api_ver=2)
+register_plugin(InputDeluge, 'from_deluge', api_ver=2)
 register_plugin(OutputDeluge, 'deluge', api_ver=2)
