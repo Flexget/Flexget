@@ -4,6 +4,7 @@ import logging
 import base64
 from flexget.plugin import register_plugin, priority, get_plugin_by_name, PluginError
 from flexget import validator
+from flexget.entry import Entry
 from flexget.utils.tools import replace_from_entry
 
 log = logging.getLogger('transmission')
@@ -27,7 +28,131 @@ def save_opener(f):
     return new_f
 
 
-class PluginTransmission(object):
+class TransmissionBase(object):
+
+    def __init__(self):
+        self.client = None
+        self.opener = None
+
+    def _validator(self, advanced):
+        """Return config validator"""
+        advanced.accept('text', key='host')
+        advanced.accept('integer', key='port')
+        # note that password is optional in transmission
+        advanced.accept('file', key='netrc')
+        advanced.accept('text', key='username')
+        advanced.accept('text', key='password')
+        advanced.accept('boolean', key='enabled')
+        return advanced
+
+    def prepare_config(self, config):
+        if isinstance(config, bool):
+            config = {'enabled': config}
+        config.setdefault('enabled', True)
+        config.setdefault('host', 'localhost')
+        config.setdefault('port', 9091)
+        return config
+
+    def create_rpc_client(self, config):
+        import transmissionrpc
+        from transmissionrpc import TransmissionError
+        from transmissionrpc import HTTPHandlerError
+
+        user, password = None, None
+
+        if 'netrc' in config:
+            try:
+                user, account, password = netrc(config['netrc']).authenticators(config['host'])
+            except IOError, e:
+                log.error('netrc: unable to open: %s' % e.filename)
+            except NetrcParseError, e:
+                log.error('netrc: %s, file: %s, line: %s' % (e.msg, e.filename, e.lineno))
+        else:
+            if 'username' in config:
+                user = config['username']
+            if 'password' in config:
+                password = config['password']
+
+        try:
+            cli = transmissionrpc.Client(config['host'], config['port'], user, password)
+        except TransmissionError, e:
+            if isinstance(e.original, HTTPHandlerError):
+                if e.original.code == 111:
+                    raise PluginError("Cannot connect to transmission. Is it running?")
+                elif e.original.code == 401:
+                    raise PluginError("Username/password for transmission is incorrect. Cannot connect.")
+                elif e.original.code == 110:
+                    raise PluginError("Cannot connect to transmission: Connection timed out.")
+                else:
+                    raise PluginError("Error connecting to transmission: %s" % e.original.message)
+            else:
+                raise PluginError("Error connecting to transmission: %s" % e.message)
+        return cli
+
+    @save_opener
+    def on_process_start(self, feed, config):
+        try:
+            import transmissionrpc
+            from transmissionrpc import TransmissionError
+            from transmissionrpc import HTTPHandlerError
+        except:
+            raise PluginError('Transmissionrpc module version 0.6 or higher required.', log)
+        if [int(part) for part in transmissionrpc.__version__.split('.')] < [0, 6]:
+            raise PluginError('Transmissionrpc module version 0.6 or higher required, please upgrade', log)
+        config = self.prepare_config(config)
+        if config['enabled']:
+            if feed.manager.options.test:
+                log.info('Trying to connect to transmission...')
+                self.client = self.create_rpc_client(config)
+                if self.client:
+                    log.info('Successfully connected to transmission.')
+                else:
+                    log.error('It looks like there was a problem connecting to transmission.')
+
+
+class PluginTransmissionInput(TransmissionBase):
+
+    def validator(self):
+        """Return config validator"""
+        root = validator.factory()
+        root.accept('boolean')
+        advanced = root.accept('dict')
+        self._validator(advanced)
+        advanced.accept('boolean', key='onlycomplete')
+        return root
+    
+    def prepare_config(self, config):
+        config = TransmissionBase.prepare_config(self, config)
+        config.setdefault('onlycomplete', True)
+        return config
+
+    def on_feed_input(self, feed, config):
+        config = self.prepare_config(config)
+        if not config['enabled']:
+            return
+
+        if not self.client:
+            self.client = self.create_rpc_client(config)
+        entries = []
+        for torrent in self.client.info().values():
+            torrentCompleted = self._torrent_completed(torrent)
+            if not config['onlycomplete'] or torrentCompleted:
+                entry = Entry(title=torrent.fields['name'],
+                              url='file://%s' % torrent.fields['torrentFile'],
+                              torrent_info_hash=torrent.fields['hashString'])
+                for field in torrent.fields:
+                    entry['transmission_' + field] = torrent.fields[field]
+                entries.append(entry)
+        return entries
+
+    def _torrent_completed(self, torrent):
+        result = True
+        for tf in torrent.files().iteritems():
+            result &= (tf[1]['completed'] != tf[1]['size'])
+        return result
+
+
+class PluginTransmission(TransmissionBase):
     """
       Add url from entry url to transmission
 
@@ -51,21 +176,12 @@ class PluginTransmission(object):
         removewhendone: no
     """
 
-    def __init__(self):
-        self.client = None
-        self.opener = None
-
     def validator(self):
         """Return config validator"""
         root = validator.factory()
         root.accept('boolean')
         advanced = root.accept('dict')
-        advanced.accept('text', key='host')
-        advanced.accept('integer', key='port')
-        # note that password is optional in transmission
-        advanced.accept('file', key='netrc')
-        advanced.accept('text', key='username')
-        advanced.accept('text', key='password')
+        self._validator(advanced)
         advanced.accept('path', key='path', allow_replacement=True)
         advanced.accept('boolean', key='addpaused')
         advanced.accept('boolean', key='honourlimits')
@@ -74,30 +190,16 @@ class PluginTransmission(object):
         advanced.accept('number', key='maxupspeed')
         advanced.accept('number', key='maxdownspeed')
         advanced.accept('number', key='ratio')
-        advanced.accept('boolean', key='enabled')
         advanced.accept('boolean', key='removewhendone')
         return root
 
-    def get_config(self, feed):
-        config = feed.config['transmission']
-        if isinstance(config, bool):
-            config = {'enabled': config}
-        config.setdefault('enabled', True)
-        config.setdefault('host', 'localhost')
-        config.setdefault('port', 9091)
+    def prepare_config(self, config):
+        config = TransmissionBase.prepare_config(self, config)
         config.setdefault('removewhendone', False)
         return config
 
     @save_opener
-    def on_process_start(self, feed):
-        try:
-            import transmissionrpc
-            from transmissionrpc import TransmissionError
-            from transmissionrpc import HTTPHandlerError
-        except:
-            raise PluginError('Transmissionrpc module version 0.6 or higher required.', log)
-        if [int(part) for part in transmissionrpc.__version__.split('.')] < [0, 6]:
-            raise PluginError('Transmissionrpc module version 0.6 or higher required, please upgrade', log)
+    def on_process_start(self, feed, config):
         set_plugin = get_plugin_by_name('set')
         set_plugin.instance.register_keys({'path': 'text',
                                            'addpaused': 'boolean',
@@ -107,26 +209,15 @@ class PluginTransmission(object):
                                            'maxupspeed': 'number',
                                            'maxdownspeed': 'number',
                                            'ratio': 'number'})
-        config = self.get_config(feed)
-        if config['enabled']:
-            if feed.manager.options.test:
-                log.info('Trying to connect to transmission...')
-                self.client = self.create_rpc_client(feed)
-                if self.client:
-                    log.info('Successfully connected to transmission.')
-                else:
-                    log.error('It looks like there was a problem connecting to transmission.')
-            elif config['removewhendone']:
-                self.client = self.create_rpc_client(feed)
-                self.remove_finished(self.client)
-
+        super(PluginTransmission, self).on_process_start(feed, config)
+        
     @priority(120)
-    def on_feed_download(self, feed):
+    def on_feed_download(self, feed, config):
         """
             Call download plugin to generate the temp files we will load
             into deluge then verify they are valid torrents
         """
-        config = self.get_config(feed)
+        config = self.prepare_config(config)
         if not config['enabled']:
             return
         # If the download plugin is not enabled, we need to call it to get
@@ -137,28 +228,30 @@ class PluginTransmission(object):
 
     @priority(135)
     @save_opener
-    def on_feed_output(self, feed):
-        config = self.get_config(feed)
+    def on_feed_output(self, feed, config):
+        config = self.prepare_config(config)
         # don't add when learning
         if feed.manager.options.learn:
             return
         if not config['enabled']:
             return
         # Do not run if there is nothing to do
-        if not feed.accepted:
+        if not feed.accepted and not config['removewhendone']:
             return
         if self.client is None:
-            self.client = self.create_rpc_client(feed)
+            self.client = self.create_rpc_client(config)
             if self.client:
                 log.debug('Successfully connected to transmission.')
             else:
                 raise PluginError("Couldn't connect to transmission.")
-        self.add_to_transmission(self.client, feed)
-
-    def _make_torrent_options_dict(self, feed, entry):
+        if feed.accepted:
+            self.add_to_transmission(self.client, feed, config)
+        if config['removewhendone']:
+            self.remove_finished(self.client)
+            
+    def _make_torrent_options_dict(self, config, entry):
 
         opt_dic = {}
-        config = self.get_config(feed)
 
         for opt_key in ('path', 'addpaused', 'honourlimits', 'bandwidthpriority',
                         'maxconnections', 'maxupspeed', 'maxdownspeed', 'ratio'):
@@ -202,51 +295,14 @@ class PluginTransmission(object):
 
         return options
 
-    def create_rpc_client(self, feed):
-        import transmissionrpc
-        from transmissionrpc import TransmissionError
-        from transmissionrpc import HTTPHandlerError
-
-        config = self.get_config(feed)
-        user, password = None, None
-
-        if 'netrc' in config:
-            try:
-                user, account, password = netrc(config['netrc']).authenticators(config['host'])
-            except IOError, e:
-                log.error('netrc: unable to open: %s' % e.filename)
-            except NetrcParseError, e:
-                log.error('netrc: %s, file: %s, line: %s' % (e.msg, e.filename, e.lineno))
-        else:
-            if 'username' in config:
-                user = config['username']
-            if 'password' in config:
-                password = config['password']
-
-        try:
-            cli = transmissionrpc.Client(config['host'], config['port'], user, password)
-        except TransmissionError, e:
-            if isinstance(e.original, HTTPHandlerError):
-                if e.original.code == 111:
-                    raise PluginError("Cannot connect to transmission. Is it running?")
-                elif e.original.code == 401:
-                    raise PluginError("Username/password for transmission is incorrect. Cannot connect.")
-                elif e.original.code == 110:
-                    raise PluginError("Cannot connect to transmission: Connection timed out.")
-                else:
-                    raise PluginError("Error connecting to transmission: %s" % e.original.message)
-            else:
-                raise PluginError("Error connecting to transmission: %s" % e.message)
-        return cli
-
-    def add_to_transmission(self, cli, feed):
+    def add_to_transmission(self, cli, feed, config):
         """Adds accepted entries to transmission """
         from transmissionrpc import TransmissionError
         for entry in feed.accepted:
             if feed.manager.options.test:
                 log.info('Would add %s to transmission' % entry['url'])
                 continue
-            options = self._make_torrent_options_dict(feed, entry)
+            options = self._make_torrent_options_dict(config, entry)
 
             downloaded = not(entry['url'].startswith('magnet:'))
 
@@ -282,12 +338,6 @@ class PluginTransmission(object):
                 log.error(e.message)
                 feed.fail(entry)
 
-            # Clean up temp file if download plugin is not configured for
-            # this feed.
-            if downloaded and not 'download' in feed.config:
-                os.remove(entry['file'])
-                del(entry['file'])
-
     def remove_finished(self, cli):
         # Get a list of active transfers
         transfers = cli.info(arguments=['id', 'hashString', 'name', 'status', 'uploadRatio', 'seedRatioLimit'])
@@ -303,7 +353,7 @@ class PluginTransmission(object):
         if remove_ids:
             cli.remove(remove_ids)
 
-    def on_feed_exit(self, feed):
+    def on_feed_exit(self, feed, config):
         """Make sure all temp files are cleaned up when feed exits"""
         # If download plugin is enabled, it will handle cleanup.
         if not 'download' in feed.config:
@@ -312,4 +362,5 @@ class PluginTransmission(object):
 
     on_feed_abort = on_feed_exit
 
-register_plugin(PluginTransmission, 'transmission')
+register_plugin(PluginTransmission, 'transmission', api_ver=2)
+register_plugin(PluginTransmissionInput, 'from_transmission', api_ver=2)
