@@ -30,7 +30,7 @@ class OutputNotifyMyAndroid(object):
         config.accept('integer', key='priority')
         return config
 
-    def on_process_start(self, feed):
+    def on_process_start(self, feed, config):
         """                                                                                                                                                                                                     
             Register the usable set: keywords.
         """ 
