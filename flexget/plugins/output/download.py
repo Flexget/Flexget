@@ -397,26 +397,25 @@ class PluginDownload(object):
                 import filecmp
                 if filecmp.cmp(entry['file'], destfile):
                     log.debug("Identical destination file '%s' already exists", destfile)
-                    return
                 elif config.get('overwrite'):
                     log.debug("Overwriting already existing file %s" % destfile)
                 else:
                     log.info('File `%s` already exists and is not identical, download failed.' % destfile)
                     feed.fail(entry, 'File `%s` already exists and is not identical.' % destfile)
                     return
+            else:
+                # move temp file
+                log.debug('moving %s to %s' % (entry['file'], destfile))
 
-            # move temp file
-            log.debug('moving %s to %s' % (entry['file'], destfile))
-
-            try:
-                shutil.move(entry['file'], destfile)
-            except OSError, err:
-                # ignore permission errors, see ticket #555
-                import errno
-                if not os.path.exists(destfile):
-                    raise PluginError('Unable to write %s' % destfile)
-                if err.errno != errno.EPERM:
-                    raise
+                try:
+                    shutil.move(entry['file'], destfile)
+                except OSError, err:
+                    # ignore permission errors, see ticket #555
+                    import errno
+                    if not os.path.exists(destfile):
+                        raise PluginError('Unable to write %s' % destfile)
+                    if err.errno != errno.EPERM:
+                        raise
 
             # store final destination as output key
             entry['output'] = destfile
