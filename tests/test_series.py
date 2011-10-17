@@ -1173,7 +1173,36 @@ class TestSeriesPremiere(FlexGetBase):
     def testOnlyPremieres(self):
         """Test series premiere"""
         self.execute_feed('test')
-        assert self.feed.find_entry('accepted', title='Foobar.S01E01.PDTV-FlexGet', \
+        assert self.feed.find_entry('accepted', title='Foobar.S01E01.PDTV-FlexGet',
             series_name='Foobar', series_season=1, series_episode=1), 'Series premiere should have been accepted'
         assert len(self.feed.accepted) == 1
     # TODO: Add more tests, test interaction with series plugin and series_exists
+
+
+class TestImportSeries(FlexGetBase):
+
+    __yaml__ = """
+        feeds:
+          timeframe_max:
+            import_series:
+              settings:
+                propers: 12 hours
+                quality: 720p
+                timeframe: 5 minutes
+                max_quality: 720p bluray
+              from:
+                mock:
+                  - title: the show
+            mock:
+              - title: the show s03e02 1080p bluray
+              - title: the show s03e02 hdtv
+    """
+
+    def test_timeframe_max(self):
+        """Tests import_series as well as timeframe with max_quality."""
+        self.execute_feed('timeframe_max')
+        assert not self.feed.accepted, 'Entry shouldnot have been accepted on first run.'
+        age_series(minutes=6)
+        self.execute_feed('timeframe_max')
+        assert self.feed.find_entry('accepted', title='the show s03e02 hdtv'), \
+                'hdtv should have been accepted after timeframe.'
