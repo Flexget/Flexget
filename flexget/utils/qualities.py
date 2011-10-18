@@ -131,6 +131,7 @@ qualities = [Quality(1200, '1080p bluray 10bit', [re_1080p, re_bluray, re_10bit]
              Quality(380, 'bdrip', [re_bluray], none_of=[re_rc_or_r5]),
              Quality(350, 'dvdrip', ['dvd(?:[\W_]?rip)?'], none_of=[re_rc_or_r5]),
              Quality(320, 'web-dl', [re_webdl]),
+             Quality(315, '576p', ['576p?']),
              Quality(310, '480p 10bit', ['480p?', re_10bit]),
              Quality(300, '480p', ['480p?'], none_of=[re_10bit]),
              Quality(290, '368p', ['368p?']),
