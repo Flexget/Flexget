@@ -83,7 +83,7 @@ class ImdbList(object):
                 # Don't use blank rows or the headings row
                 continue
             try:
-                title = decode_html(row[5])
+                title = decode_html(row[5]).decode('utf-8')
                 entries.append(Entry(title=title, url=make_url(row[1]), imdb_id=row[1], imdb_name=title))
             except IndexError:
                 log.critical('IndexError! Unable to handle row: %s' % row)
