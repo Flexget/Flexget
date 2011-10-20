@@ -866,11 +866,11 @@ class TestMixedNumbering(FlexGetBase):
         assert self.feed.find_entry('rejected', title='FooBar.0307.PDTV-FlexGet')
 
 
-class TestAutoExact(FlexGetBase):
+class TestExact(FlexGetBase):
 
     __yaml__ = """
         feeds:
-          test:
+          auto:
             mock:
               - {title: 'ABC.MIAMI.S01E01.PDTV-FlexGet'}
               - {title: 'ABC.S01E01.PDTV-FlexGet'}
@@ -879,14 +879,27 @@ class TestAutoExact(FlexGetBase):
               - ABC
               - ABC LA
               - ABC Miami
+          name_regexp:
+            mock:
+              - title: show s09e05 hdtv
+              - title: show a s09e06 hdtv
+            series:
+              - show:
+                  name_regexp: ^show
+                  exact: yes
     """
 
     def test_auto(self):
         """Series plugin: auto enable exact"""
-        self.execute_feed('test')
+        self.execute_feed('auto')
         assert self.feed.find_entry('accepted', title='ABC.S01E01.PDTV-FlexGet')
         assert self.feed.find_entry('accepted', title='ABC.LA.S01E01.PDTV-FlexGet')
         assert self.feed.find_entry('accepted', title='ABC.MIAMI.S01E01.PDTV-FlexGet')
+
+    def test_with_name_regexp(self):
+        self.execute_feed('name_regexp')
+        assert self.feed.find_entry('accepted', title='show s09e05 hdtv')
+        assert not self.feed.find_entry('accepted', title='show a s09e06 hdtv')
 
 
 class TestTimeframe(FlexGetBase):
