@@ -9,8 +9,7 @@ from htmlentitydefs import name2codepoint
 import re
 import ntpath
 from datetime import timedelta, datetime
-from jinja2 import UndefinedError
-from flexget.utils.template import render_from_entry
+from flexget.utils.template import render_from_entry, RenderError
 
 
 def str_to_boolean(string):
@@ -297,8 +296,8 @@ def replace_from_entry(field, entry, field_name, logger, default=''):
     # Do jinja2 template replacement
     try:
         result = render_from_entry(field, entry)
-    except UndefinedError, e:
-        logger("Could not set %s for %s: does not contain the field '%s' for jinja replacement." %
+    except RenderError, e:
+        logger("Could not set %s for %s: %s" %
                (field_name, entry['title'], e))
         return default
 

@@ -4,7 +4,7 @@ from httplib import HTTPSConnection
 from urllib import urlencode
 import logging
 from flexget.plugin import get_plugin_by_name, register_plugin
-from flexget.utils.template import render_from_entry, UndefinedError
+from flexget.utils.template import render_from_entry, RenderError
 
 log = logging.getLogger('prowl')
 
@@ -70,7 +70,7 @@ class OutputProwl(object):
             # If description has jinja template, render it
             try:
                 description = render_from_entry(description, entry)
-            except UndefinedError, e:
+            except RenderError, e:
                 description = entry['title']
                 log.error('Error rendering jinja description: %s' % e)
 

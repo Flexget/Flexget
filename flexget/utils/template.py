@@ -7,7 +7,6 @@ from datetime import datetime, date, time
 import locale
 from email.utils import parsedate
 from time import mktime
-# UndefinedError is not used here, but may be imported from here
 from jinja2 import Environment, StrictUndefined, ChoiceLoader, FileSystemLoader, PackageLoader, UndefinedError
 from flexget.event import event
 
@@ -15,6 +14,11 @@ log = logging.getLogger('utils.template')
 
 # The environment will be created after the manager has started
 environment = None
+
+
+class RenderError(Exception):
+    """Error raised when there is a problem with jinja rendering."""
+    pass
 
 
 def filter_pathbase(val):
@@ -129,4 +133,7 @@ def render_from_entry(template, entry):
         return u''.join(template.root_render_func(template.new_context(variables)))
     except:
         exc_info = sys.exc_info()
-    return environment.handle_exception(exc_info, True)
+    try:
+        return environment.handle_exception(exc_info, True)
+    except Exception, e:
+        raise RenderError('(%s) %s' % (type(e).__name__, e))

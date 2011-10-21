@@ -1,9 +1,7 @@
 from copy import copy
 import logging
-from jinja2 import UndefinedError
 from flexget.plugin import register_plugin, priority
 from flexget.utils.tools import replace_from_entry
-from flexget.utils.template import render_from_entry
 
 log = logging.getLogger('set')
 
