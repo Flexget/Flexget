@@ -99,6 +99,11 @@ def filter_format_number(val, places=None, grouping=True):
     return locale.format(format, val, grouping)
 
 
+def filter_pad(val, length):
+    """Pads a number with 0s to the specified length."""
+    return '%0*d' % (length, val)
+
+
 @event('manager.startup')
 def make_environment(manager):
     """Create our environment and add our custom filters"""
