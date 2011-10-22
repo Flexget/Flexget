@@ -99,9 +99,9 @@ def filter_format_number(val, places=None, grouping=True):
     return locale.format(format, val, grouping)
 
 
-def filter_pad(val, length):
-    """Pads a number with 0s to the specified length."""
-    return '%0*d' % (length, val)
+def filter_pad(val, width, fillchar='0'):
+    """Pads a number or string with fillchar to the specified width."""
+    return str(val).rjust(width, fillchar)
 
 
 @event('manager.startup')
