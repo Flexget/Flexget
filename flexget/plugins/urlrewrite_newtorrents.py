@@ -92,7 +92,14 @@ class NewTorrents:
             seed = link.findNext('td', attrs={'class': re.compile('s')}).renderContents()
             if seed == 'n/a':
                 seed = 0
-            #TODO: also parse content_size from results
+            else:
+                try:
+                    seed = int(seed)
+                except ValueError:
+                    log.warning('Error converting seed value (%s) from newtorrents to integer.' % seed)
+                    seed = 0
+            
+            #TODO: also parse content_size and peers from results
             if comparator.matches(release_name):
                 torrents.append(Entry(title=release_name, url=torrent_url, torrent_seeds=seed,
                                       search_ratio=comparator.ratio(), search_sort=torrent_availability(seed, 0)))
