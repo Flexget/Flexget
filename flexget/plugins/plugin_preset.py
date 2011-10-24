@@ -76,6 +76,9 @@ class PluginPreset(object):
                 if preset == 'global':
                     continue
                 raise PluginError('Unable to find preset %s for feed %s' % (preset, feed.name), log)
+            if toplevel_presets[preset] is None:
+                log.warning('Preset `%s` is empty. Nothing to merge.' % preset)
+                continue
             log.debug('Merging preset %s into feed %s' % (preset, feed.name))
 
             # We make a copy here because we need to remove

@@ -3,8 +3,7 @@ import re
 import time
 from copy import copy
 from datetime import datetime, timedelta
-from sqlalchemy import Column, Integer, String, Unicode, DateTime, Boolean, desc, select, update
-from sqlalchemy.schema import ForeignKey
+from sqlalchemy import Column, Integer, String, Unicode, DateTime, Boolean, desc, select, update, ForeignKey, Index
 from sqlalchemy.orm import relation, join
 from flexget import schema
 from flexget.event import event
@@ -102,7 +101,7 @@ class Series(Base):
     __tablename__ = 'series'
 
     id = Column(Integer, primary_key=True)
-    _name = Column('name', Unicode)
+    _name = Column('name', Unicode, index=True)
     name = ignore_case_property('_name')
     identified_by = Column(String)
     episodes = relation('Episode', backref='series', cascade='all, delete, delete-orphan')
@@ -151,6 +150,8 @@ class Episode(Base):
 
     def __repr__(self):
         return '<Episode(id=%s,identifier=%s)>' % (self.id, self.identifier)
+
+Index('episode_series_identifier', Episode.series_id, Episode.identifier)
 
 
 class Release(Base):
