@@ -1,7 +1,7 @@
 import hashlib
 import logging
 from datetime import datetime, timedelta
-from sqlalchemy import Column, Integer, String, Unicode, DateTime, ForeignKey, and_
+from sqlalchemy import Column, Integer, String, Unicode, DateTime, ForeignKey, and_, Index
 from sqlalchemy.orm import relation
 from flexget import schema
 from flexget.event import event
@@ -68,6 +68,8 @@ class RememberEntry(Base):
     reason = Column(String)
 
     feed_id = Column(Integer, ForeignKey('remember_rejected_feeds.id'), nullable=False)
+
+Index('remember_feed_title_url', RememberEntry.feed_id, RememberEntry.title, RememberEntry.url)
 
 
 class FilterRememberRejected(object):
