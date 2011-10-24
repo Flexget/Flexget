@@ -246,13 +246,23 @@ class ApiTmdb(object):
             # There was no movie found in the cache, do a lookup from tmdb
             log.debug('Movie %s not found in cache, looking up from tmdb.' % id_str())
             try:
-                if tmdb_id or imdb_id:
+                if imdb_id and not tmdb_id:
+                    result = get_first_result('imdbLookup', imdb_id)
+                    if result:
+                        movie = session.query(TMDBMovie).filter(TMDBMovie.id == result['id']).first()
+                        if movie:
+                            # Movie was in database, but did not have the imdb_id stored, force an update
+                            ApiTmdb.get_movie_details(movie, session)
+                        else:
+                            tmdb_id = result['id']
+                if tmdb_id:
                     movie = TMDBMovie()
                     movie.id = tmdb_id
-                    movie.imdb_id = imdb_id
                     ApiTmdb.get_movie_details(movie, session)
                     if movie.name:
                         session.merge(movie)
+                    else:
+                        movie = None
                 elif title:
                     result = get_first_result('search', search_string)
                     if result:
@@ -278,13 +288,6 @@ class ApiTmdb(object):
     def get_movie_details(movie, session):
         """Populate details for this :movie: from TMDb"""
 
-        if not movie.id and movie.imdb_id:
-            # If we have an imdb_id, do a lookup for tmdb id
-            result = get_first_result('imdbLookup', movie.imdb_id)
-            if result:
-                movie.update_from_dict(result)
-            else:
-                raise LookupError('Unable to find %s on tmdb' % movie.imdb_id)
         if not movie.id:
             raise LookupError('Cannot get tmdb details without tmdb id')
         result = get_first_result('getInfo', movie.id)
