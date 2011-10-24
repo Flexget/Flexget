@@ -781,7 +781,8 @@ class FilterSeries(SeriesPlugin, FilterSeriesBase):
             log.debug('best episode is: %s' % best.data)
 
             # episode advancement. used only with season based series
-            if best.season and best.episode:
+            # We check if they are integers so that if season/episode is 0 this isn't skipped.
+            if isinstance(best.season, int) and isinstance(best.episode, int):
                 if feed.manager.options.disable_advancement:
                     log.debug('episode advancement disabled')
                 else:
