@@ -1,6 +1,6 @@
 import logging
 from datetime import datetime, timedelta
-from sqlalchemy import Column, Integer, String, Unicode, DateTime, PickleType
+from sqlalchemy import Column, Integer, String, Unicode, DateTime, PickleType, Index
 from flexget import schema
 from flexget.entry import Entry
 from flexget.plugin import register_plugin, priority, PluginError
@@ -24,7 +24,8 @@ class DelayedEntry(Base):
     def __repr__(self):
         return '<DelayedEntry(title=%s)>' % self.title
 
-# TODO: index "feed, title" and "expire, feed"
+Index('delay_feed_title', DelayedEntry.feed, DelayedEntry.title)
+# TODO: index "expire, feed"
 
 
 @schema.upgrade('delay')
