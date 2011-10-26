@@ -80,7 +80,11 @@ class TorrentAlive(object):
             return 0
         log.debug('Checking for seeds from %s' % url)
         url += '?info_hash=%s' % quote(info_hash.decode('hex'))
-        data = bdecode(urlopener(url, log, retries=2).read())['files']
+        try:
+            data = bdecode(urlopener(url, log, retries=2).read()).get('files')
+        except SyntaxError, e:
+            log.warning('Error bdecoding tracker response: %s' % e)
+            return 0
         if not data:
             return 0
         return data.values()[0]['complete']
