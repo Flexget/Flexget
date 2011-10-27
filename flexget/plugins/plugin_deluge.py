@@ -673,7 +673,7 @@ class OutputDeluge(DelugePlugin):
                         finally:
                             f.close()
 
-                    log.debug('Adding %s to deluge.' % entry['title'])
+                    log.verbose('Adding %s to deluge.' % entry['title'])
                     if magnet:
                         return client.core.add_torrent_magnet(magnet, opts)
                     else:
