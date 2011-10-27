@@ -94,9 +94,9 @@ class FilterRememberRejected(object):
         old_feed = session.query(RememberFeed).filter(RememberFeed.name == feed.name).first()
         if old_feed and (old_feed.hash != config_hash or feed.manager.options.forget_rejected):
             if feed.manager.options.forget_rejected:
-                log.info('Forgetting previous rejections.')
+                log.info('Forgetting feed %s previous rejections.' % feed.name)
             else:
-                log.verbose('Config has changed since last run, purging remembered entries.')
+                log.debug('Feed %s config has changed since last run, purging remembered entries.' % feed.name)
             session.delete(old_feed)
             old_feed = None
         if not old_feed:
