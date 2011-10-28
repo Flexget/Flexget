@@ -9,7 +9,6 @@ from htmlentitydefs import name2codepoint
 import re
 import ntpath
 from datetime import timedelta, datetime
-from flexget.utils.template import render_from_entry, RenderError
 
 
 def str_to_boolean(string):
