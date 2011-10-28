@@ -21,13 +21,11 @@ class FormLogin(object):
         root.accept('text', key='passfield')
         return root
 
-    def on_feed_start(self, feed):
+    def on_feed_start(self, feed, config):
         try:
             from mechanize import Browser
         except ImportError:
             raise PluginError('mechanize required (python module), please install it.', log)
-
-        config = feed.config['form']
 
         userfield = config.get('userfield', 'username')
         passfield = config.get('passfield', 'password')
@@ -73,11 +71,16 @@ class FormLogin(object):
         br.submit()
 
         cookiejar = br._ua_handlers["_cookies"].cookiejar
+        handler = urllib2.HTTPCookieProcessor(cookiejar)
 
-        opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cookiejar))
-        urllib2.install_opener(opener)
+        if urllib2._opener:
+            log.debug('Adding HTTPCookieProcessor to default opener')
+            urllib2._opener.add_handler(handler)
+        else:
+            log.debug('Creating new opener and installing it')
+            urllib2.install_opener(urllib2.build_opener(handler))
 
-    def on_feed_exit(self, feed):
+    def on_feed_exit(self, feed, config):
         """Feed exiting, remove cookiejar"""
         log.debug('Removing urllib2 opener')
         urllib2.install_opener(None)
@@ -85,4 +88,4 @@ class FormLogin(object):
     # Feed aborted, unhook the cookiejar
     on_feed_abort = on_feed_exit
 
-register_plugin(FormLogin, 'form')
+register_plugin(FormLogin, 'form', api_ver=2)
