@@ -7,8 +7,9 @@ from datetime import datetime, date, time
 import locale
 from email.utils import parsedate
 from time import mktime
-from jinja2 import Environment, StrictUndefined, ChoiceLoader, FileSystemLoader, PackageLoader, UndefinedError
+from jinja2 import Environment, StrictUndefined, ChoiceLoader, FileSystemLoader, PackageLoader
 from flexget.event import event
+from flexget.plugin import PluginError
 
 log = logging.getLogger('utils.template')
 
@@ -124,21 +125,35 @@ def get_template(name):
     return environment.get_template(name)
 
 
-def render_from_entry(template, entry):
+def render_from_entry(template_string, entry):
     """Renders a Template or template string with an Entry as its context."""
 
     # If a plain string was passed, turn it into a Template
-    if isinstance(template, basestring):
-        template = environment.from_string(template)
+    if isinstance(template_string, basestring):
+        template = environment.from_string(template_string)
+    else:
+        # We can also support an actual Template being passed in
+        template = template_string
     # Make a copy of the Entry so we can add some more fields
     variables = copy(entry)
     variables['now'] = datetime.now()
     # We use the lower level render function, so that our Entry is not cast into a dict (and lazy loading lost)
     try:
-        return u''.join(template.root_render_func(template.new_context(variables)))
+        result = u''.join(template.root_render_func(template.new_context(variables)))
     except:
         exc_info = sys.exc_info()
-    try:
-        return environment.handle_exception(exc_info, True)
-    except Exception, e:
-        raise RenderError('(%s) %s' % (type(e).__name__, e))
+        try:
+            return environment.handle_exception(exc_info, True)
+        except Exception, e:
+            raise RenderError('(%s) %s' % (type(e).__name__, e))
+
+    # Only try string replacement if jinja didn't do anything
+    if result == template_string:
+        try:
+            result = template_string % entry
+        except KeyError, e:
+            raise RenderError('Does not contain the field `%s` for string replacement.' % e)
+        except ValueError, e:
+            raise PluginError('Invalid string replacement template: %s (%s)' % (template_string, e))
+
+    return result

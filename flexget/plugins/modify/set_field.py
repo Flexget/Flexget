@@ -1,7 +1,7 @@
 from copy import copy
 import logging
 from flexget.plugin import register_plugin, priority
-from flexget.utils.tools import replace_from_entry
+from flexget.utils.template import RenderError
 
 log = logging.getLogger('set')
 
@@ -68,12 +68,12 @@ class ModifySet(object):
         for field, value in conf.items():
             if isinstance(value, basestring):
                 logger = log.error if errors else log.debug
-                result = replace_from_entry(value, entry, field, logger, default=None)
-                if result is None:
+                try:
+                    conf[field] = entry.render(value)
+                except RenderError, e:
+                    logger('Could not set %s for %s: %s' % (field, entry['title'], e))
                     # If the replacement failed, remove this key from the update dict
                     del conf[field]
-                else:
-                    conf[field] = result
 
         if validate:
             from flexget import validator

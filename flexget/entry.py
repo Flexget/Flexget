@@ -3,6 +3,7 @@ import logging
 import copy
 from flexget.plugin import PluginError
 from flexget.utils.imdb import extract_id, make_url
+from flexget.utils.template import render_from_entry
 
 log = logging.getLogger('entry')
 
@@ -216,3 +217,12 @@ class Entry(dict):
                 self[field] = reduce(func, value.split('.'), source_item)
             else:
                 self[field] = value(source_item)
+
+    def render(self, template):
+        """Renders a template string based on fields in the entry. Raises RenderError if there is a problem.
+
+        :param template: A template string that uses jinja2 or python string replacement format.
+        :return: The result of the rendering.
+        """
+
+        return render_from_entry(template, self)

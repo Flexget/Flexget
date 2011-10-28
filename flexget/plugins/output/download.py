@@ -3,14 +3,14 @@ import time
 import urllib
 import urllib2
 import logging
-from flexget.plugin import register_plugin, register_parser_option, get_plugin_by_name, PluginWarning, PluginError
-from flexget.utils.tools import encode_html, decode_html
-from httplib import BadStatusLine
-from flexget.utils.tools import urlopener, replace_from_entry
 import mimetypes
 import email
 import hashlib
 import shutil
+from httplib import BadStatusLine
+from flexget.plugin import register_plugin, register_parser_option, get_plugin_by_name, PluginWarning, PluginError
+from flexget.utils.tools import encode_html, decode_html, urlopener
+from flexget.utils.template import RenderError
 
 log = logging.getLogger('download')
 
@@ -343,11 +343,11 @@ class PluginDownload(object):
                 path = feed.manager.options.dl_path
 
             # expand variables in path
-            path = replace_from_entry(path, entry, 'path', log.error)
-            if not path:
-                feed.fail(entry, 'Could not set path. Does not contain all fields for string replacement.')
+            try:
+                path = os.path.expanduser(entry.render(path))
+            except RenderError, e:
+                feed.fail(entry, 'Could not set path. Error during string replacement: %s' % e)
                 return
-            path = os.path.expanduser(path)
 
             # If we are in test mode, report and return
             if feed.manager.options.test:

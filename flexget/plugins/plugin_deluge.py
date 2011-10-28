@@ -5,8 +5,9 @@ import base64
 import re
 import sys
 from flexget.entry import Entry
-from flexget.utils.tools import replace_from_entry, make_valid_path
+from flexget.utils.tools import make_valid_path
 from flexget.plugin import register_plugin, PluginError, priority, get_plugin_by_name, DependencyError
+from flexget.utils.template import RenderError
 
 log = logging.getLogger('deluge')
 
@@ -411,7 +412,10 @@ class OutputDeluge(DelugePlugin):
             opts = {}
             path = entry.get('path', config['path'])
             if path:
-                opts['download_location'] = os.path.expanduser(replace_from_entry(path, entry, 'path', logger=log.error))
+                try:
+                    opts['download_location'] = os.path.expanduser(entry.render(path))
+                except RenderError, e:
+                    log.error('Could not set path for %s: %s' % (entry['title'], e))
             for fopt, dopt in self.options.iteritems():
                 value = entry.get(fopt, config.get(fopt))
                 if value is not None:
@@ -445,9 +449,13 @@ class OutputDeluge(DelugePlugin):
             for item in after:
                 # find torrentid of just added torrent
                 if not item in before:
-                    movedone = replace_from_entry(movedone, entry, 'movedone', log.error)
-                    movedone = os.path.expanduser(movedone)
+                    try:
+                        movedone = entry.render(movedone)
+                    except RenderError, e:
+                        log.error('Could not set movedone for %s: %s' % (entry['title'], e))
+                        movedone = ''
                     if movedone:
+                        movedone = os.path.expanduser(movedone)
                         if not os.path.isdir(movedone):
                             log.debug('movedone path %s doesn\'t exist, creating' % movedone)
                             os.makedirs(movedone)
@@ -680,10 +688,12 @@ class OutputDeluge(DelugePlugin):
                         return client.core.add_torrent_file(entry['title'], filedump, opts)
 
                 # Generate deluge options dict for torrent add
-                path = replace_from_entry(entry.get('path', config['path']), entry, 'path', log.error)
                 add_opts = {}
-                if path:
+                try:
+                    path = entry.render(entry.get('path', config['path']))
                     add_opts['download_location'] = make_valid_path(os.path.expanduser(path))
+                except RenderError, e:
+                    log.error('Could not set path for %s: %s' % (entry['title'], e))
                 for fopt, dopt in self.options.iteritems():
                     value = entry.get(fopt, config.get(fopt))
                     if value is not None:
@@ -691,13 +701,18 @@ class OutputDeluge(DelugePlugin):
                         if fopt == 'ratio':
                             add_opts['stop_at_ratio'] = True
                 # Make another set of options, that get set after the torrent has been added
-                content_filename = entry.get('content_filename', config.get('content_filename', ''))
-                movedone = replace_from_entry(entry.get('movedone', config['movedone']), entry, 'movedone', log.error)
-                modify_opts = {'movedone': make_valid_path(os.path.expanduser(movedone)),
-                        'label': format_label(entry.get('label', config['label'])),
-                        'queuetotop': entry.get('queuetotop', config.get('queuetotop', None)),
-                        'content_filename': replace_from_entry(content_filename, entry, 'content_filename', log.error),
-                        'main_file_only': entry.get('main_file_only', config.get('main_file_only', False))}
+                modify_opts = {'label': format_label(entry.get('label', config['label'])),
+                               'queuetotop': entry.get('queuetotop', config.get('queuetotop')),
+                               'main_file_only': entry.get('main_file_only', config.get('main_file_only', False))}
+                try:
+                    movedone = entry.render(entry.get('movedone', config['movedone']))
+                    modify_opts['movedone'] = make_valid_path(os.path.expanduser(movedone))
+                except RenderError, e:
+                    log.error('Error setting movedone for %s: %s' % (entry['title'], e))
+                try:
+                    modify_opts['content_filename'] = entry.render(entry.get('content_filename', config.get('content_filename', '')))
+                except RenderError, e:
+                    log.error('Error setting content_filename for %s: %s' % (entry['title'], e))
 
                 torrent_id = entry.get('deluge_id') or entry.get('torrent_info_hash')
                 torrent_id = torrent_id and torrent_id.lower()

@@ -3,7 +3,7 @@ import logging
 import re
 from UserDict import UserDict
 from flexget.plugin import register_plugin, priority
-from flexget.utils.tools import replace_from_entry
+from flexget.utils.template import render_from_entry, RenderError
 
 log = logging.getLogger('exec')
 
@@ -128,8 +128,10 @@ class PluginExec(object):
                 cmd = config[phase_name][operation]
                 entrydict = EscapingDict(entry) if config.get('auto_escape') else entry
                 # Do string replacement from entry, but make sure quotes get escaped
-                cmd = replace_from_entry(cmd, entrydict, 'exec command', log.error, default=None)
-                if cmd is None:
+                try:
+                    cmd = render_from_entry(cmd, entrydict)
+                except RenderError, e:
+                    log.error('Could not set exec command for %s: %s' % (entry['title'], e))
                     # fail the entry if configured to do so
                     if config.get('fail_entries'):
                         feed.fail(entry, 'Entry `%s` does not have required fields for string replacement.' %

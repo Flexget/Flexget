@@ -288,33 +288,6 @@ def urlopener(url, log, **kwargs):
         socket.setdefaulttimeout(oldtimeout)
 
 
-def replace_from_entry(field, entry, field_name, logger, default=''):
-    """This is a helper function to do string replacement/jinja2 formatting from an entry dict.
-    It catches exceptions from the string replacement and prints errors to the given log.
-    field_name is the description to use when printing the error.
-    Returns the result of the replacemnt, or default if there is an error."""
-    # Do jinja2 template replacement
-    try:
-        result = render_from_entry(field, entry)
-    except RenderError, e:
-        logger("Could not set %s for %s: %s" %
-               (field_name, entry['title'], e))
-        return default
-
-    # Only try string replacement if jinja didn't do anything
-    if result == field:
-        try:
-            result = field % entry
-        except KeyError, e:
-            logger("Could not set %s for %s: does not contain the field '%s' for string replacement." %
-                   (field_name, entry['title'], e))
-            return default
-        except ValueError, e:
-            from flexget.plugin import PluginError
-            raise PluginError("%s has invalid string replacement: %s: %s" % (field_name, e, field))
-    return result
-
-
 class ReList(list):
     """
     A list that stores regexps.

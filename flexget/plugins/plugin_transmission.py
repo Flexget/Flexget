@@ -5,7 +5,7 @@ import base64
 from flexget.plugin import register_plugin, priority, get_plugin_by_name, PluginError
 from flexget import validator
 from flexget.entry import Entry
-from flexget.utils.tools import replace_from_entry
+from flexget.utils.template import RenderError
 
 log = logging.getLogger('transmission')
 
@@ -262,11 +262,12 @@ class PluginTransmission(TransmissionBase):
 
         options = {'add': {}, 'change': {}}
 
-        if 'path' in opt_dic:
-            opt_dic['path'] = replace_from_entry(opt_dic['path'], entry, 'path', log.error)
-            if opt_dic['path']:
-                options['add']['download_dir'] = os.path.expanduser(opt_dic['path'])
-        if 'addpaused' in opt_dic and opt_dic['addpaused']:
+        if opt_dic.get('path'):
+            try:
+                options['add']['download_dir'] = os.path.expanduser(entry.render(opt_dic['path']))
+            except RenderError, e:
+                log.error('Error setting path for %s: %s' % (entry['title'], e))
+        if opt_dic.get('addpaused'):
             options['add']['paused'] = True
         if 'bandwidthpriority' in opt_dic:
             options['add']['bandwidthPriority'] = opt_dic['bandwidthpriority']
