@@ -45,7 +45,7 @@ class PluginPyLoad(object):
     """
 
     __author__ = 'http://pyload.org'
-    __version__ = '0.2'
+    __version__ = '0.21'
 
     DEFAULT_API = 'http://localhost:8000/api'
     DEFAULT_QUEUE = False
@@ -64,6 +64,7 @@ class PluginPyLoad(object):
         advanced.accept('text', key='username')
         advanced.accept('text', key='password')
         advanced.accept('boolean', key='queue')
+        advanced.accept('boolean', key='multihoster')
         advanced.accept('list', key='hoster').accept('text')
         return root
 
@@ -124,13 +125,13 @@ class PluginPyLoad(object):
 
             # no urls found
             if not urls:
-                log.info("No suited urls in entry %s" % entry['name'])
+                log.info("No suited urls in entry %s" % entry['title'])
                 continue
 
             log.debug("Add %d urls to pyLoad" % len(urls))
 
             try:
-                dest = True if config.get('queue', self.DEFAULT_QUEUE) else False
+                dest = 1 if config.get('queue', self.DEFAULT_QUEUE) else 0 # Destination.Queue = 1
                 post = {'name': "'%s'" % entry['title'],
                         'links': str(urls),
                         'dest': dest,
@@ -154,7 +155,7 @@ class PluginPyLoad(object):
             self.session = response.replace('"', '')
         else:
             try:
-                query_api(url, 'getServerVersion')
+                query_api(url, 'getServerVersion', {'session': self.session})
             except HTTPError, e:
                 if e.code == 403: # Forbidden
                     self.session = None
