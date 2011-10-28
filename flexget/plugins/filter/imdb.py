@@ -1,5 +1,5 @@
 import logging
-from flexget.plugin import register_plugin, get_plugin_by_name, PluginError
+from flexget.plugin import register_plugin, get_plugin_by_name, PluginError, priority
 from flexget.utils.log import log_once
 
 log = logging.getLogger('imdb')
@@ -81,6 +81,8 @@ class FilterImdb(object):
         imdb.accept('list', key='accept_mpaa_ratings').accept('text')
         return imdb
 
+    # Run later to avoid unnecessary lookups
+    @priority(120)
     def on_feed_filter(self, feed, config):
 
         lookup = get_plugin_by_name('imdb_lookup').instance.lookup
