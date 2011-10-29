@@ -559,7 +559,7 @@ class FilterSeries(SeriesPlugin, FilterSeriesBase):
                 if (name.lower().startswith(series_name.lower())) and \
                    (name.lower() != series_name.lower()):
                     if not 'exact' in series_config:
-                        log.info('Auto enabling exact matching for series %s (reason %s)' % (series_name, name))
+                        log.verbose('Auto enabling exact matching for series %s (reason %s)' % (series_name, name))
                         series_config['exact'] = True
 
     # Run after metainfo_quality and before metainfo_series
