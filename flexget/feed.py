@@ -223,13 +223,17 @@ class Feed(object):
     def __run_feed_phase(self, phase):
         if phase not in feed_phases + ['abort', 'process_start', 'process_end']:
             raise Exception('%s is not a valid feed phase' % phase)
-        # warn if no filters or outputs in the feed
-        phase_plugins = self.plugins(phase)
-        if phase in ['filter', 'output']:
-            if not phase_plugins and not self.manager.unit_test:
-                log.warning('Feed doesn\'t have any %s plugins, you should add some!' % phase)
+        # warn if no inputs, filters or outputs in the feed
+        if phase in ['input', 'filter', 'output']:
+            if not self.manager.unit_test:
+                # Check that there is at least one manually configured plugin for these phases
+                for p in self.plugins(phase):
+                    if not p.builtin:
+                        break
+                else:
+                    log.warning('Feed doesn\'t have any %s plugins, you should add (at least) one!' % phase)
 
-        for plugin in phase_plugins:
+        for plugin in self.plugins(phase):
             # Abort this phase if one of the plugins disables it
             if phase in self.disabled_phases:
                 return
