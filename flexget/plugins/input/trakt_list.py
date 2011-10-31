@@ -1,6 +1,7 @@
 import hashlib
 import logging
 import urllib2
+import re
 from flexget.utils.tools import urlopener
 from flexget.utils.cached_input import cached
 from flexget.plugin import register_plugin, PluginError, DependencyError
@@ -26,6 +27,7 @@ class TraktList(object):
     trakt_list:
       username: <value>
       api_key: <value>
+      strip_dates: <yes|no>
       movies: <all|loved|hated|collection|watchlist>
       series: <all|loved|hated|collection|watchlist|watched>
       custom: <value>
@@ -58,6 +60,7 @@ class TraktList(object):
         root.accept('choice', key='movies').accept_choices(['all', 'loved', 'hated', 'collection', 'watchlist'])
         root.accept('choice', key='series').accept_choices(['all', 'loved', 'hated', 'collection', 'watched', 'watchlist'])
         root.accept('text', key='custom')
+        root.accept('boolean', key='strip_dates')
         return root
 
     @cached('trakt_list', persist='2 hours')
@@ -113,6 +116,9 @@ class TraktList(object):
             entry = Entry()
             entry.update_using_map(map, item)
             if entry.isvalid():
+                if config.get('strip_dates'):
+                    # Remove year from end of name if present
+                    entry['title'] = re.sub('\s+\(\d{4}\)$', '', entry['title'])
                 entries.append(entry)
 
         return entries
