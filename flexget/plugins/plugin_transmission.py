@@ -329,8 +329,11 @@ class PluginTransmission(TransmissionBase):
                         f.close()
                     r = cli.add(filedump, 30, **options['add'])
                 else:
-                    r = cli.add(None, filename=entry['url'],
-                                timeout=30, **options['add'])
+                    r = cli.add_uri(entry['url'], timeout=30, **options['add'])
+                if r:
+                    torrent = r.values()[0]
+                    for field in torrent.fields:
+                        entry['transmission_' + field] = torrent.fields[field]
                 log.info('"%s" torrent added to transmission' % (entry['title']))
                 if options['change'].keys():
                     for id in r.keys():
