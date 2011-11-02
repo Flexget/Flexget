@@ -165,7 +165,9 @@ class Manager(object):
         raise IOError('Failed to find configuration file %s' % self.options.config)
 
     def load_config(self, config):
-        self.pre_check_config(config)
+        if not self.options.quiet:
+            # pre-check only when running without --cron
+            self.pre_check_config(config)
         try:
             self.config = yaml.safe_load(file(config)) or {}
         except Exception, e:
