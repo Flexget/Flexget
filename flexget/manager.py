@@ -260,8 +260,11 @@ class Manager(object):
                 else:
                     continue
 
-            # print '%i - %i: %s' % (line_num, indentation, line)
-            # print 'prev_mapping: %s, prev_list: %s, prev_ind: %s' % (prev_mapping, prev_list, prev_indentation)
+            cur_list = line.strip()[0] == '-'
+
+#            print '#%i: %s' % (line_num, line)
+#            print 'indentation: %s, prev_ind: %s, prev_mapping: %s, prev_list: %s, cur_list: %s' % \
+#                  (indentation, prev_indentation, prev_mapping, prev_list, cur_list)
 
             if '\t' in line:
                 log.warning('Line %s has tabs, use only spaces!' % line_num)
@@ -275,7 +278,11 @@ class Manager(object):
                 log.warning('Config line %s is indented too much' % line_num)
             if indentation <= prev_indentation + 2 and prev_mapping and prev_list:
                 log.warning('Config line %s is not indented enough' % line_num)
-            if prev_mapping and indentation <= prev_indentation:
+            if prev_mapping and cur_list:
+                # list after opening mapping
+                if indentation < prev_indentation or indentation > prev_indentation + 2:
+                    log.warning('Config line %s containing list element is indented incorrectly' % line_num)
+            elif prev_mapping and indentation <= prev_indentation:
                 # after opening a map, indentation doesn't increase
                 log.warning('Config line %s is indented incorrectly (previous line ends with \':\')' % line_num)
 
@@ -551,7 +558,7 @@ class Manager(object):
         """ Perform database cleanup if cleanup interval has been met.
         """
         if (self.options.db_cleanup or not self.persist.get('last_cleanup') or
-                self.persist['last_cleanup'] < datetime.now() - DB_CLEANUP_INTERVAL):
+            self.persist['last_cleanup'] < datetime.now() - DB_CLEANUP_INTERVAL):
             log.info('Running database cleanup.')
             session = Session()
             fire_event('manager.db_cleanup', session)
