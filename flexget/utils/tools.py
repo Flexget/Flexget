@@ -254,7 +254,7 @@ def urlopener(url, log, **kwargs):
                     log.warning('Could not retrieve url (HTTP %s error): %s' % (e.code, url))
                     raise
                 log.debug('HTTP error (try %i/%i): %s' % (i + 1, retries, e.code))
-            except urllib2.URLError, e:
+            except (urllib2.URLError, socket.timeout), e:
                 if hasattr(e, 'reason'):
                     reason = str(e.reason)
                 else:
