@@ -33,20 +33,10 @@ class FilterIf(object):
         action = root.accept('dict').accept_valid_keys('root', key_validator=key_validator)
         action.accept('choice').accept_choices(['accept', 'reject', 'fail'])
         filter_action = action.accept('dict')
-        # Get a list of apiv2 input plugins, make sure to exclude self
-        valid_filters = [plugin for plugin in get_plugins_by_phase('filter')
-                         if plugin.api_ver > 1 and plugin.name != 'if']
         # Build a dict validator that accepts the available filter plugins and their settings
-        for plugin in valid_filters:
-            if hasattr(plugin.instance, 'validator'):
-                validator = plugin.instance.validator()
-                if validator.name == 'root':
-                    # If a root validator is returned, grab the list of child validators
-                    filter_action.valid[plugin.name] = validator.valid
-                else:
-                    filter_action.valid[plugin.name] = [plugin.instance.validator()]
-            else:
-                filter_action.valid[plugin.name] = [validator.factory('any')]
+        for plugin in get_plugins_by_phase('filter'):
+            if plugin.api_ver > 1 and hasattr(plugin.instance, 'validator') and plugin.name != 'if':
+                filter_action.accept(plugin.instance.validator, key=plugin.name)
         return root
 
     @priority(80)
