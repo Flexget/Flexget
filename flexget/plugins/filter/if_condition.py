@@ -35,7 +35,7 @@ class FilterIf(object):
         filter_action = action.accept('dict')
         # Build a dict validator that accepts the available filter plugins and their settings
         for plugin in get_plugins_by_phase('filter'):
-            if plugin.api_ver > 1 and hasattr(plugin.instance, 'validator') and plugin.name != 'if':
+            if plugin.api_ver > 1 and hasattr(plugin.instance, 'validator'):
                 filter_action.accept(plugin.instance.validator, key=plugin.name)
         return root
 
