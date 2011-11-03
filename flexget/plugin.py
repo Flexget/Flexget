@@ -641,7 +641,7 @@ def add_plugin_validators(validator, phase=None, group=None, excluded=None, api_
     for plugin in valid_plugins:
         # log.debug('adding: %s' % plugin.name)
         if hasattr(plugin.instance, 'validator'):
-            outer_validator.accept(plugin.instance.validator(), key=plugin.name)
+            outer_validator.accept(plugin.instance.validator, key=plugin.name)
         else:
             outer_validator.accept('any', key=plugin.name)
 

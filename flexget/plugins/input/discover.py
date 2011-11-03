@@ -2,7 +2,7 @@ import logging
 from flexget.utils.cached_input import cached
 from flexget.utils.search import StringComparator, MovieComparator, clean_title
 from flexget.plugin import register_plugin, get_plugin_by_name, PluginError, \
-    add_plugin_validators, get_plugins_by_group, PluginWarning
+    get_plugins_by_group, get_plugins_by_phase, PluginWarning
 
 log = logging.getLogger('discover')
 
@@ -23,14 +23,16 @@ class Discover(object):
         from flexget import validator
         discover = validator.factory('dict')
 
-        inputs = discover.accept('list', key='what', required=True)
-        add_plugin_validators(inputs, phase='input', excluded=['discover'])
+        inputs = discover.accept('list', key='what', required=True).accept('dict')
+        for plugin in get_plugins_by_phase('input'):
+            if hasattr(plugin.instance, 'validator'):
+                inputs.accept(plugin.instance.validator, key=plugin.name)
 
         searches = discover.accept('list', key='from', required=True)
         no_config = searches.accept('choice')
         for plugin in get_plugins_by_group('search'):
             if hasattr(plugin.instance, 'validator'):
-                searches.accept('dict').accept(plugin.instance.validator(), key=plugin.name)
+                searches.accept('dict').accept(plugin.instance.validator, key=plugin.name)
             else:
                 no_config.accept(plugin.name)
 

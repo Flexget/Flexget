@@ -95,9 +95,20 @@ class Validator(object):
         return parent
 
     def get_validator(self, name, **kwargs):
+        """Returns a child validator of this one.
+
+        :param name: Can be a validator type string, an already created Validator instance, or a function that returns
+        a validator instance.
+        :param kwargs: Keyword arguments are passed on to validator init if a new validator is created.
+        """
         if isinstance(name, Validator):
+            # If we are passed a Validator instance, make it a child of this validator and return it.
             name.add_parent(self)
             return name
+        elif hasattr(name, '__call__'):
+            # Create a LazyValidator that will serve as a Validator when attributes are accessed.
+            return LazyValidator(name, parent=self)
+        # Otherwise create a new child Validator
         kwargs['parent'] = self
         return factory(name, **kwargs)
 
@@ -210,7 +221,7 @@ class ChoiceValidator(Validator):
         elif isinstance(data, basestring) and data.lower() in self.valid_ic:
             return True
         else:
-            acceptable = [str(value) for value in self.valid + self.valid_ic]
+            acceptable = (str(value) for value in self.valid + self.valid_ic)
             self.errors.add('\'%s\' is not one of acceptable values: %s' % (data, ', '.join(acceptable)))
             return False
 
@@ -677,6 +688,34 @@ class DictValidator(Validator):
 
         return schema
 
+    
+class LazyValidator(object):
+    """Acts as a wrapper for a Validator instance, but does not generate the instance until one of its attributes
+    needs to be accessed."""
+
+    def __init__(self, func, parent=None):
+        """
+        :param func: A function that returns a Validator instance when called.
+        :param parent: The parent validator.
+        """
+        self.func = func
+        self.validator = None
+        self.parent = parent
+
+    def __getattr__(self, item):
+        """Creates the actual validator instance if needed. Return attributes of that instance as our own."""
+        if self.validator is None:
+            self.validator = self.func()
+            assert isinstance(self.validator, Validator)
+            self.validator.add_parent(self.parent)
+        return getattr(self.validator, item)
+
+    def schema(self):
+        """Return the schema of our instance if it has already been created, otherwise return 'ondemand' type."""
+        if self.validator is None:
+            return {'type': 'ondemand'}
+        else:
+            return self.validator.schema()
 
 # ---- TESTING ----
 
