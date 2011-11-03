@@ -244,6 +244,8 @@ class Manager(object):
         prev_mapping = False
         prev_list = True
         prev_scalar = True
+        list_open = False # multiline list with [
+
         for line in file:
             line_num += 1
             # remove linefeed
@@ -262,7 +264,19 @@ class Manager(object):
                 else:
                     continue
 
-            cur_list = line.strip()[0] == '-'
+            cur_list = line.strip().startswith('-')
+
+            # skipping lines as long as multiline compact list is open
+            if list_open:
+                if line.strip().endswith(']'):
+                    list_open = False
+#                    print 'closed list at line %s' % line
+                continue
+            else:
+                list_open = line.strip().endswith(': [') or line.strip().endswith(':[')
+                if list_open:
+#                    print 'list open at line %s' % line
+                    continue
 
 #            print '#%i: %s' % (line_num, line)
 #            print 'indentation: %s, prev_ind: %s, prev_mapping: %s, prev_list: %s, cur_list: %s' % \
