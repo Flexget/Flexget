@@ -50,7 +50,7 @@ class InputCSV(object):
             if not row:
                 continue
             entry = Entry()
-            for name, index in feed.config['csv'].get('values', {}).items():
+            for name, index in config.get('values', {}).items():
                 try:
                     entry[name] = row[index-1]
                 except IndexError:
