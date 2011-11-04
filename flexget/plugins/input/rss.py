@@ -351,7 +351,7 @@ class InputRSS(object):
                         except UnicodeDecodeError:
                             log.warning('Failed to decode entry `%s` field `%s`' % (ea['title'], rss_field))
                 # Also grab pubdate if available
-                if hasattr(entry, 'date_parsed'):
+                if hasattr(entry, 'date_parsed') and entry.date_parsed:
                     ea['rss_pubdate'] = datetime(*entry.date_parsed[:6])
                 # store basic auth info
                 if 'username' in config and 'password' in config:
