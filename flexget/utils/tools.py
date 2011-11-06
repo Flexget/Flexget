@@ -251,7 +251,7 @@ def urlopener(url, log, **kwargs):
             except urllib2.HTTPError, e:
                 if e.code < 500:
                     # If it was not a server error, don't keep retrying.
-                    log.warning('Could not retrieve url (HTTP %s error): %s' % (e.code, url))
+                    log.warning('Could not retrieve url (HTTP %s error): %s' % (e.code, e.url))
                     raise
                 log.debug('HTTP error (try %i/%i): %s' % (i + 1, retries, e.code))
             except (urllib2.URLError, socket.timeout), e:

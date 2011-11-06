@@ -9,6 +9,7 @@ from flexget.utils.database import safe_pickle_synonym
 from flexget.utils.tools import parse_timedelta
 from flexget.entry import Entry
 from flexget.event import event
+from flexget.plugin import PluginError
 
 log = logging.getLogger('input_cache')
 Base = schema.versioned_base('input_cache', 0)
@@ -125,7 +126,23 @@ class cached(object):
                 # Nothing was restored from db or memory cache, run the function
                 log.trace('cache miss')
                 # call input event
-                response = func(*args, **kwargs)
+                try:
+                    response = func(*args, **kwargs)
+                except PluginError, e:
+                    # If there was an error producing entries, but we have valid entries in the db cache, return those.
+                    if self.persist and not feed.manager.options.nocache:
+                        db_cache = feed.session.query(InputCache).filter(InputCache.name == self.name).\
+                                                                  filter(InputCache.hash == hash).first()
+                        if db_cache and db_cache.entries:
+                            log.error('There was an error during %s input (%s), using cache instead.' %
+                                    (self.name, e))
+                            entries = [Entry(e.entry) for e in db_cache.entries]
+                            log.verbose('Restored %s entries from db cache' % len(entries))
+                            # Store to in memory cache
+                            self.cache[cache_name] = copy.deepcopy(entries)
+                            return entries
+                    # If there was nothing in the db cache, re-raise the error.
+                    raise
                 if api_ver == 1:
                     response = feed.entries
                 if not isinstance(response, list):

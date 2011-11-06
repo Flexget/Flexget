@@ -100,7 +100,7 @@ class TraktList(object):
         try:
             data = json.load(urlopener(url, log, retries=2))
         except urllib2.URLError, e:
-            raise PluginError('Could not retrieve url %s' % url)
+            raise PluginError('Could not retrieve list from trakt (%s)' % e)
         if 'error' in data:
             raise PluginError('Error getting trakt list: %s' % data['error'])
         if config['data_type'] == 'custom':
