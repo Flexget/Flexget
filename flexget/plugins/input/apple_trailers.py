@@ -34,7 +34,10 @@ class AppleTrailers(InputRSS):
         config.accept('choice').accept_choices(self.qualities, ignore_case=True)
         return config
 
+    # Run before headers plugin
+    @priority(135)
     def on_feed_start(self, feed, config):
+        # TODO: Resolve user-agent in a way that doesn't involve modifying the feed config.
         # make sure we have dependencies available, will throw DependencyError if not
         get_plugin_by_name('headers')
         # configure them
