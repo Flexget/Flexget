@@ -691,7 +691,8 @@ class OutputDeluge(DelugePlugin):
                 add_opts = {}
                 try:
                     path = entry.render(entry.get('path', config['path']))
-                    add_opts['download_location'] = make_valid_path(os.path.expanduser(path))
+                    if path:
+                        add_opts['download_location'] = make_valid_path(os.path.expanduser(path))
                 except RenderError, e:
                     log.error('Could not set path for %s: %s' % (entry['title'], e))
                 for fopt, dopt in self.options.iteritems():
