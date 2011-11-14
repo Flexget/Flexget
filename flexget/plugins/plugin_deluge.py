@@ -516,12 +516,12 @@ class OutputDeluge(DelugePlugin):
                     else:
                         log.warning('If path does not exist on the machine running the daemon, move will fail.')
 
-            if opts['movedone']:
+            if opts.get('movedone'):
                 dlist.append(version_deferred.addCallback(create_path, opts['movedone']))
                 dlist.append(client.core.set_torrent_move_completed(torrent_id, True))
                 dlist.append(client.core.set_torrent_move_completed_path(torrent_id, opts['movedone']))
                 log.debug('%s move on complete set to %s' % (entry['title'], opts['movedone']))
-            if opts['label']:
+            if opts.get('label'):
 
                 def apply_label(result, torrent_id, label):
                     """Gets called after labels and torrent were added to deluge."""
