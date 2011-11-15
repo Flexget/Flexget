@@ -323,21 +323,29 @@ def lookup_episode(name=None, seasonnum=None, episodenum=None, tvdb_id=None, onl
         # There was no episode found in the cache, do a lookup from tvdb
         log.debug('Episode %s not found in cache, looking up from tvdb.' % ep_description)
         url = get_mirror() + api_key + '/series/%d/default/%d/%d/%s.xml' % (series.id, seasonnum, episodenum, language)
-        try:
-            data = BeautifulStoneSoup(urlopener(url)).data
-            if data:
-                ep_data = data.find('episode')
-                if ep_data:
-                    # Check if this episode id is already in our db
-                    episode = session.query(TVDBEpisode).filter(TVDBEpisode.id == ep_data.id.string).first()
-                    if episode:
-                        episode.update_from_bss(ep_data)
-                    else:
-                        episode = TVDBEpisode(ep_data)
-                    series.episodes.append(episode)
-                    session.merge(series)
-        except URLError, e:
-            raise LookupError('Error looking up episode from TVDb (%s)' % e)
+        # Try the lookup again if there are no errors but no data was returned
+        for attempt in range(2):
+            try:
+                data = BeautifulStoneSoup(urlopener(url)).data
+                if data:
+                    ep_data = data.find('episode')
+                    if ep_data:
+                        # Check if this episode id is already in our db
+                        episode = session.query(TVDBEpisode).filter(TVDBEpisode.id == ep_data.id.string).first()
+                        if episode:
+                            episode.update_from_bss(ep_data)
+                        else:
+                            episode = TVDBEpisode(ep_data)
+                        series.episodes.append(episode)
+                        session.merge(series)
+                if episode:
+                    # Don't try again if we already have data
+                    break
+            except URLError, e:
+                # urlopener already tries multiple times, no need to wait before raising our error
+                raise LookupError('Error looking up episode from TVDb (%s)' % e)
+        else:
+            log.debug('No errors from tvdb, however no episode info was found. Data returned from tvdb: %s' % data)
     if episode:
         # Access the series attribute to force it to load before returning
         episode.series
