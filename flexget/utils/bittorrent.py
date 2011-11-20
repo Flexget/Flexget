@@ -13,6 +13,7 @@ TORRENT_RE = re.compile(r'^d\d{1,3}:')
 # See http://packages.python.org/pyrocore/apidocs/pyrocore.util.metafile-module.html#METAFILE_STD_KEYS
 METAFILE_STD_KEYS = [i.split('.') for i in (
     "announce",
+    "announce-list", # BEP-0012
     "comment",
     "created by",
     "creation date",
@@ -27,6 +28,7 @@ METAFILE_STD_KEYS = [i.split('.') for i in (
     "info.files.length",
     "info.files.path",
 )]
+del i
 
 
 def clean_meta(meta, including_info=False, logger=None):
