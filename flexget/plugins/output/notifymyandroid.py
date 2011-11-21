@@ -2,6 +2,7 @@ from httplib import HTTPSConnection
 from urllib import urlencode
 import logging
 from flexget.plugin import get_plugin_by_name, register_plugin
+from flexget.utils.template import RenderError
 
 log = logging.getLogger('notifymyandroid')
 
@@ -28,6 +29,7 @@ class OutputNotifyMyAndroid(object):
         config.accept('text', key='application')
         config.accept('text', key='event')
         config.accept('integer', key='priority')
+        config.accept('text', key='description')
         return config
 
     def on_process_start(self, feed, config):
@@ -41,10 +43,10 @@ class OutputNotifyMyAndroid(object):
     def prepare_config(self, config):
         if isinstance(config, bool):
             config = {'enabled': config}
-        config.setdefault('apikey', '')
         config.setdefault('application', 'FlexGet')
         config.setdefault('event', 'New release')
         config.setdefault('priority', 0)
+        config.setdefault('description', '{{title}}')
         return config                                                                                                                                                                                           
 
     def on_feed_output(self, feed, config):
@@ -58,9 +60,17 @@ class OutputNotifyMyAndroid(object):
 
             apikey = entry.get('apikey', config['apikey'])
             application = entry.get('application', config['application'])
-            event = entry.get('event', config['event'])
             priority = entry.get('priority', config['priority'])
-            description = entry['title']
+            event = entry.get('event', config['event'])
+            try:
+                event = entry.render(event)
+            except RenderError, e:
+                log.error('Error setting nma event: %s' % e)
+            description = config['description']
+            try:
+                description = entry.render(description)
+            except RenderError, e:
+                log.error('Error setting nma description: %s' % e)
             
             # Open connection
             h = HTTPSConnection('nma.usk.bz')
