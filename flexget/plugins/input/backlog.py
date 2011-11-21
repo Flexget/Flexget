@@ -22,7 +22,7 @@ def upgrade(ver, session):
             backlog_table = table_schema('backlog', session)
             for item in session.query('entry').select_from(backlog_table).all():
                 pickle.loads(item.entry)
-        except ImportError:
+        except (ImportError, TypeError):
             # If there were problems, we can drop the data.
             log.info('Backlog table contains unloadable data, clearing old data.')
             session.execute(backlog_table.delete())
