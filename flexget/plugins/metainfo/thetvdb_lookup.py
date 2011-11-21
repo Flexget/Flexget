@@ -109,8 +109,21 @@ class PluginThetvdbLookup(object):
 
     def lazy_episode_lookup(self, entry, field):
         try:
-            episode = lookup_episode(entry.get('series_name', lazy=False), entry['series_season'],
-                                     entry['series_episode'], tvdb_id=entry.get('thetvdb_id', lazy=False))
+            season_offset = entry.get('thetvdb_lookup_season_offset', 0)
+            episode_offset = entry.get('thetvdb_lookup_episode_offset', 0)
+            if not isinstance(season_offset, int):
+                log.error('thetvdb_lookup_season_offset must be an integer')
+                season_offset = 0
+            if not isinstance(episode_offset, int):
+                log.error('thetvdb_lookup_episode_offset must be an integer')
+                episode_offset = 0
+            if season_offset != 0 or episode_offset != 0:
+                log.debug('Using offset for tvdb lookup: season: %s, episode: %s' % (season_offset, episode_offset))
+
+            episode = lookup_episode(entry.get('series_name', lazy=False),
+                                     entry['series_season'] + season_offset,
+                                     entry['series_episode'] + episode_offset,
+                                     tvdb_id=entry.get('thetvdb_id', lazy=False))
             entry.update_using_map(self.episode_map, episode)
         except LookupError, e:
             log.debug('Error looking up tvdb episode information for %s: %s' % (entry['title'], e.message))
