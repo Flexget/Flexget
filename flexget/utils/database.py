@@ -51,7 +51,11 @@ def text_date_synonym(name):
 
     def setter(self, value):
         if isinstance(value, basestring):
-            setattr(self, name, datetime.strptime(value, '%Y-%m-%d'))
+            try:
+                setattr(self, name, datetime.strptime(value, '%Y-%m-%d'))
+            except ValueError:
+                # Invalid date string given, set to None
+                setattr(self, name, None)
         else:
             setattr(self, name, value)
 
