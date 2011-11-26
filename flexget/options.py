@@ -20,6 +20,8 @@ class OptionParser(OptParser):
         self.add_option('--bugreport', action='callback', callback=self._debug_tb_callback, dest='debug_tb',
                         help="Use this option to create a detailed bug report,"
                              " note that the output might contain PRIVATE data, so edit that out")
+        self.add_option('--logfile', action='store', dest='logfile', default='flexget.log',
+                        help='Specify a custom logfile name/location. Default is flexget.log in the config directory.')
         self.add_option('--debug', action='callback', callback=self._debug_callback, dest='debug',
                         help=SUPPRESS_HELP)
         self.add_option('--debug-trace', action='callback', callback=self._debug_callback, dest='debug_trace',
