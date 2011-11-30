@@ -65,21 +65,22 @@ class TorrentAlive(object):
                 else:
                     log.debug('Found %i seeds from trackers' % seeds)
 
-    def get_scrape_url(self, tracker_url):
-        if tracker_url.endswith('announce'):
+    def get_scrape_url(self, tracker_url, info_hash):
+        if 'announce' in tracker_url:
             result = tracker_url.replace('announce', 'scrape')
-            if result.startswith('udp'):
-                result = result.replace('udp', 'http')
+            if result.startswith('udp:'):
+                result = result.replace('udp:', 'http:')
+            result += '&' if '?' in result else '?'
+            result += 'info_hash=%s' % quote(info_hash.decode('hex'))
             return result
         else:
             log.debug('Cannot determine scrape url for %s' % tracker_url)
 
     def get_tracker_seeds(self, url, info_hash):
-        url = self.get_scrape_url(url)
+        url = self.get_scrape_url(url, info_hash)
         if not url:
             return 0
         log.debug('Checking for seeds from %s' % url)
-        url += '?info_hash=%s' % quote(info_hash.decode('hex'))
         try:
             data = bdecode(urlopener(url, log, retries=2).read()).get('files')
         except SyntaxError, e:
