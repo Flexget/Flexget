@@ -34,7 +34,7 @@ class OutputProwl(object):
         config.accept('text', key='description')
         return config
 
-    def on_process_start(self, feed):
+    def on_process_start(self, feed, config):
         """                                                                                                                                                                                                     
             Register the usable set: keywords.
         """ 
@@ -42,8 +42,7 @@ class OutputProwl(object):
         set_plugin.instance.register_keys({'apikey': 'text', 'application': 'text',
                                            'event': 'text', 'priority': 'integer'})
 
-    def get_config(self, feed):
-        config = feed.config.get('prowl', {})
+    def prepare_config(self, config):
         if isinstance(config, bool):
             config = {'enabled': config}
         config.setdefault('apikey', '')
@@ -52,7 +51,8 @@ class OutputProwl(object):
         config.setdefault('priority', 0)
         return config                                                                                                                                                                                           
 
-    def on_feed_output(self, feed):
+    def on_feed_output(self, feed, config):
+        config = self.prepare_config(config)
         for entry in feed.accepted:
 
             if feed.manager.options.test:
@@ -60,7 +60,6 @@ class OutputProwl(object):
                 continue
 
             # get the parameters
-            config = self.get_config(feed)
             apikey = entry.get('apikey', config['apikey'])
             application = entry.get('application', config['application'])
             event = entry.get('event', config['event'])
@@ -100,4 +99,4 @@ class OutputProwl(object):
             else:
                 log.error("Unknown error when sending Prowl message")
 
-register_plugin(OutputProwl, 'prowl')
+register_plugin(OutputProwl, 'prowl', api_ver=2)
