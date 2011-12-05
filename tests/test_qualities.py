@@ -31,8 +31,10 @@ class TestQualityParser(object):
                  ('Test.File.br-rip', 'bdrip'),
 
                  ('Test.File.dvd.rip', 'dvdrip'),
-                 
+
                  ('Test.File.[576p][00112233].mkv', '576p'),
+
+                 ('Test.TS.FooBar', 'ts'),
 
                  ('Test.File.360p.avi', '360p'),
                  ('Test.File.[360p].mkv', '360p'),

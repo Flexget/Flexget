@@ -145,6 +145,7 @@ qualities = [Quality(1200, '1080p bluray 10bit', [re_1080p, re_bluray, re_10bit]
              Quality(50, 'r5'),
              Quality(40, 'tc'),
              Quality(30, 'preair'),
+             Quality(25, 'ts', ['ts|telesync']),
              Quality(20, 'cam'),
              Quality(10, 'workprint')]
 
