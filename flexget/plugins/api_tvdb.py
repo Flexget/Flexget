@@ -13,6 +13,7 @@ from sqlalchemy.orm import relation
 from flexget import schema
 from flexget.utils.tools import urlopener as _urlopener
 from flexget.utils.database import with_session, pipe_list_synonym, text_date_synonym
+from flexget.utils.sqlalchemy_utils import table_add_column
 from flexget.manager import Session
 from flexget.utils.simple_persistence import SimplePersistence
 
@@ -34,6 +35,10 @@ def upgrade(ver, session):
         if 'last_updated' in persist:
             del persist['last_updated']
         ver = 0
+    if ver == 0:
+        table_add_column('tvdb_episodes', 'gueststars', Unicode, session)
+        ver = 1
+
     return ver
 
 
@@ -166,8 +171,8 @@ class TVDBEpisode(TVDBContainer, Base):
     director = pipe_list_synonym('_director')
     _writer = Column('writer', Unicode)
     writer = pipe_list_synonym('_writer')
-    _guest_stars = Column('guest_stars', Unicode)
-    guest_stars = pipe_list_synonym('_guest_stars')
+    _gueststars = Column('gueststars', Unicode)
+    gueststars = pipe_list_synonym('_gueststars')
     rating = Column(Float)
     filename = Column(Unicode)
     _firstaired = Column('firstaired', DateTime)

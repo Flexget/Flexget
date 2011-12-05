@@ -80,7 +80,7 @@ class PluginThetvdbLookup(object):
         'ep_overview': 'overview',
         'ep_writers': 'writer',
         'ep_directors': 'director',
-        'ep_guest_stars': 'guest_stars'}
+        'ep_guest_stars': 'gueststars'}
 
     def validator(self):
         from flexget import validator
