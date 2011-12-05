@@ -17,9 +17,11 @@ from flexget.utils.sqlalchemy_utils import table_add_column
 from flexget.manager import Session
 from flexget.utils.simple_persistence import SimplePersistence
 
+SCHEMA_VER = 1
+
 log = logging.getLogger('api_tvdb')
 urlopener = partial(_urlopener, log=log, retries=2)
-Base = schema.versioned_base('api_tvdb', 0)
+Base = schema.versioned_base('api_tvdb', SCHEMA_VER)
 
 # This is a FlexGet API key
 api_key = '4D297D8CFDE0E105'
