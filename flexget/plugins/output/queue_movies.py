@@ -47,7 +47,7 @@ class QueueMovies(object):
                 continue
 
             # since entries usually have unknown quality we need to ignore that ..
-            if entry.get('quality') is not qualities.UNKNOWN:
+            if 'quality' in entry and entry['quality'] != qualities.UNKNOWN:
                 quality = entry['quality']
             else:
                 quality = config.get('quality', 'ANY')
