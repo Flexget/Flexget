@@ -23,6 +23,7 @@ class OutputSabnzbd(object):
           category: ...
           script: ...
           pp: ...
+          priority: ...
     """
 
     def validator(self):
@@ -33,6 +34,7 @@ class OutputSabnzbd(object):
         config.accept('text', key='category')
         config.accept('text', key='script')
         config.accept('text', key='pp')
+        config.accept('integer', key='priority')
         config.accept('text', key='password')
         config.accept('text', key='username')
         return config
@@ -47,6 +49,8 @@ class OutputSabnzbd(object):
             params['script'] = config['script']
         if 'pp' in config:
             params['pp'] = config['pp']
+        if 'priority' in config:
+            params['priority'] = config['priority']
         if 'username' in config:
             params['ma_username'] = config['username']
         if 'password' in config:
