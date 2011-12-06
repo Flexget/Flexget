@@ -83,7 +83,17 @@ class TraktAcquired(object):
             item.update({'username': config['username'], 'password': config['password']})
             try:
                 self.post_json_to_trakt(post_url, item)
-            except urllib2.URLError, e:
+            except (urllib2.HTTPError, urllib2.URLError), e:
+                if hasattr(e, 'code'):
+                    if e.code == 404:
+                        # Remove some info from posted json and print the rest to aid debugging
+                        for key in ['username', 'password', 'episodes']:
+                            item.pop(key, None)
+                        log.error('%s not found on trakt: %s' % (config['type'].capitalize(), item))
+                        continue
+                    elif e.code == 401:
+                        log.error('Error authenticating with trakt. Check your username/password/api_key')
+                        continue
                 log.error('Error submitting data to trakt.tv: %s' % e)
                 continue
                 
