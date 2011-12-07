@@ -58,9 +58,7 @@ class InputBacklog(object):
 
     def validator(self):
         from flexget import validator
-        root = validator.factory('regexp_match', message='Must be in format <number> <hours|minutes|days|weeks>')
-        root.accept('\d+ (minute|hour|day|week)s?')
-        return root
+        return validator.factory('interval')
 
     @priority(-255)
     def on_feed_input(self, feed, config):

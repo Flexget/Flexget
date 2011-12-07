@@ -35,6 +35,17 @@ class TestValidator(object):
         re_match.accept('abc.*')
         assert not re_match.validate('foobar'), 'foobar should not have passed'
         assert re_match.validate('abcdefg'), 'abcdefg should have passed'
+
+    def test_interval(self):
+        interval = validator.factory('interval')
+        assert interval.validate('3 days')
+        assert interval.validate('12 hours')
+        assert interval.validate('1 minute')
+
+        assert not interval.validate('aoeu')
+        assert not interval.validate('14')
+        assert not interval.validate('3 dayz')
+        assert not interval.validate('about 5 minutes')
         
     def test_choice(self):
         choice = validator.factory('choice')

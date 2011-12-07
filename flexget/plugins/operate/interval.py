@@ -1,6 +1,7 @@
 import logging
 import datetime
-from flexget.plugin import PluginWarning, register_plugin, register_parser_option
+from flexget.plugin import register_plugin, register_parser_option
+from flexget.utils.tools import parse_timedelta
 
 log = logging.getLogger('interval')
 
@@ -9,7 +10,7 @@ class PluginInterval(object):
     """
         Allows specifying minimum interval for feed execution.
 
-        Format: [n] [minutes|hours|days|months]
+        Format: [n] [minutes|hours|days|weeks]
 
         Example:
 
@@ -18,9 +19,7 @@ class PluginInterval(object):
 
     def validator(self):
         from flexget import validator
-        root = validator.factory('regexp_match')
-        root.accept('\d+ (minutes|hours|days|weeks)')
-        return root
+        return validator.factory('interval')
 
     def on_feed_start(self, feed, config):
         if feed.manager.options.learn:
@@ -33,9 +32,8 @@ class PluginInterval(object):
             log.info('Ignoring interval because of --now')
         else:
             log.debug('last_time: %r' % last_time)
-            amount, unit = config.split(' ')
-            log.debug('amount: %r unit: %r' % (amount, unit))
-            next_time = last_time + datetime.timedelta(**{unit: int(amount)})
+            log.debug('interval: %s' % config)
+            next_time = last_time + parse_timedelta(config)
             log.debug('next_time: %r' % next_time)
             if datetime.datetime.now() < next_time:
                 log.debug('interval not met')

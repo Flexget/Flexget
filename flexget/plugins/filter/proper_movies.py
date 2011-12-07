@@ -6,8 +6,9 @@ from flexget.manager import Base
 from flexget.plugin import register_plugin, priority, get_plugin_by_name, PluginError
 from flexget.utils.log import log_once
 from flexget.utils.titles.movie import MovieParser
+from flexget.utils.tools import parse_timedelta
 from sqlalchemy import Column, Integer, String, Unicode, DateTime
-from datetime import datetime, timedelta
+from datetime import datetime
 
 log = logging.getLogger('proper_movies')
 
@@ -56,8 +57,7 @@ class FilterProperMovies(object):
         from flexget import validator
         root = validator.factory('root')
         root.accept('boolean')
-        regexp = root.accept('regexp_match')
-        regexp.accept('\d+ (minutes|hours|days|weeks)')
+        root.accept('interval')
         return root
 
     @priority(512)
@@ -73,12 +73,10 @@ class FilterProperMovies(object):
             timeframe = None
         else:
             # parse time window
-            amount, unit = config.split(' ')
-            log.debug('amount: %s unit: %s' % (repr(amount), repr(unit)))
-            params = {unit: int(amount)}
+            log.debug('interval: %s' % config)
             try:
-                timeframe = timedelta(**params)
-            except TypeError:
+                timeframe = parse_timedelta(config)
+            except ValueError:
                 raise PluginError('Invalid time format', log)
 
         # throws DependencyError if not present aborting feed

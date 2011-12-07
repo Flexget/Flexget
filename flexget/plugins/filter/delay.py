@@ -5,6 +5,7 @@ from flexget import schema
 from flexget.entry import Entry
 from flexget.plugin import register_plugin, priority, PluginError
 from flexget.utils.database import safe_pickle_synonym
+from flexget.utils.tools import parse_timedelta
 
 log = logging.getLogger('delay')
 Base = schema.versioned_base('delay', 1)
@@ -48,7 +49,7 @@ class FilterDelay(object):
     """
         Add delay to a feed. This is useful for de-prioritizing expensive / bad-quality feeds.
 
-        Format: n [minutes|hours|days|months]
+        Format: n [minutes|hours|days|weeks]
 
         Example:
 
@@ -57,19 +58,13 @@ class FilterDelay(object):
 
     def validator(self):
         from flexget import validator
-        message = "should be in format 'x (minutes|hours|days|weeks)' e.g. '5 days'"
-        root = validator.factory('regexp_match')
-        root.accept('\d+ (minute|hour|day|week)s?', message=message)
-        return root
+        return validator.factory('interval')
 
     def get_delay(self, config):
-        amount, unit = config.split(' ')
-        if not unit.endswith('s'):
-            unit += 's'
-        log.debug('amount: %r unit: %r' % (amount, unit))
+        log.debug('delay: %s' % config)
         try:
-            return timedelta(**{unit: int(amount)})
-        except (TypeError, ValueError):
+            return parse_timedelta(config)
+        except ValueError:
             raise PluginError('Invalid time format', log)
 
     @priority(-1)

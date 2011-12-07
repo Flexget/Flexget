@@ -11,11 +11,11 @@ from flexget.utils import qualities
 from flexget.utils.log import log_once
 from flexget.utils.titles import SeriesParser, ParseWarning
 from flexget.utils.sqlalchemy_utils import table_columns, table_exists, drop_tables, table_schema, table_add_column
-from flexget.utils.tools import merge_dict_from_to
+from flexget.utils.tools import merge_dict_from_to, parse_timedelta
 from flexget.utils.database import quality_property, ignore_case_property
 from flexget.manager import Session
 from flexget.plugin import (register_plugin, register_parser_option, get_plugin_by_name, get_plugin_keywords,
-    PluginWarning, PluginError, DependencyError, priority)
+    PluginWarning, DependencyError, priority)
 
 SCHEMA_VER = 2
 
@@ -369,12 +369,11 @@ class FilterSeriesBase(object):
         # propers
         options.accept('boolean', key='propers')
         message = "should be in format 'x (minutes|hours|days|weeks)' e.g. '5 days'"
-        time_regexp = r'\d+ (minutes|hours|days|weeks)'
-        options.accept('regexp_match', key='propers', message=message + ' or yes/no').accept(time_regexp)
+        options.accept('interval', key='propers', message=message + ' or yes/no')
         # expect flags
         options.accept('choice', key='identified_by').accept_choices(['ep', 'id', 'auto'])
         # timeframe
-        options.accept('regexp_match', key='timeframe', message=message).accept(time_regexp)
+        options.accept('interval', key='timeframe', message=message)
         # strict naming
         options.accept('boolean', key='exact')
         # watched in SXXEXX form
@@ -837,11 +836,10 @@ class FilterSeries(SeriesPlugin, FilterSeriesBase):
                     return pass_filter
             else:
                 # propers with timeframe
-                amount, unit = config['propers'].split(' ')
-                log.debug('amount: %r unit: %r' % (amount, unit))
+                log.debug('proper timeframe: %s' % config['propers'])
                 try:
-                    timeframe = timedelta(**{unit: int(amount)})
-                except TypeError:
+                    timeframe = parse_timedelta(config['propers'])
+                except ValueError:
                     raise PluginWarning('Invalid time format', log)
 
                 first_seen = self.get_first_seen(feed.session, eps[0])
@@ -978,12 +976,10 @@ class FilterSeries(SeriesPlugin, FilterSeriesBase):
         best = eps[0]
 
         # parse options
-        amount, unit = config['timeframe'].split(' ')
-        log.debug('amount: %r unit: %r' % (amount, unit))
-        params = {unit: int(amount)}
+        log.debug('timeframe: %s' % config['timeframe'])
         try:
-            timeframe = timedelta(**params)
-        except TypeError:
+            timeframe = parse_timedelta(config['timeframe'])
+        except ValueError:
             raise PluginWarning('Invalid time format', log)
 
         # Make sure we only start timing from the first seen quality that matches min and max requirements.
