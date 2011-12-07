@@ -1,5 +1,7 @@
 import logging
-from flexget.plugin import priority, register_plugin, get_plugin_keywords, PluginError, register_parser_option
+from flexget import validator
+from flexget.manager import register_config_key
+from flexget.plugin import priority, register_plugin, PluginError, register_parser_option, plugins as all_plugins
 
 log = logging.getLogger('preset')
 
@@ -23,7 +25,6 @@ class PluginPreset(object):
         self.warned = False
 
     def validator(self):
-        from flexget import validator
         root = validator.factory()
         root.accept('text')
         root.accept('boolean')
@@ -61,14 +62,6 @@ class PluginPreset(object):
         log.trace('presets: %s' % config)
 
         toplevel_presets = feed.manager.config.get('presets', {})
-
-        # check for indentation error (plugin as a preset)
-        if (feed.manager.options.test or feed.manager.options.validate) and not self.warned:
-            plugins = get_plugin_keywords()
-            for name in toplevel_presets.iterkeys():
-                if name in plugins:
-                    log.warning('Plugin \'%s\' seems to be in the wrong place? You probably wanted to put it in a preset. Please fix the indentation level!' % name)
-            self.warned = True
 
         # apply presets
         for preset in config:
@@ -129,7 +122,6 @@ class DisablePlugin(object):
     """
 
     def validator(self):
-        from flexget import validator
         root = validator.factory()
         root.accept('text')
         presets = root.accept('list')
@@ -146,6 +138,18 @@ class DisablePlugin(object):
                 log.debug('disabling %s' % disable)
                 del(feed.config[disable])
 
+
+def root_config_validator():
+    """Returns a validator for the 'presets' key of config."""
+    # TODO: better error messages
+    valid_plugins = [p for p in all_plugins if hasattr(all_plugins[p].instance, 'validator')]
+    root = validator.factory('dict')
+    root.reject_keys(valid_plugins, message='plugins should go under a specific preset.')
+    root.accept_any_key('dict').accept_any_key('any')
+    return root
+
+
+register_config_key('presets', root_config_validator)
 register_plugin(PluginPreset, 'preset', builtin=True, api_ver=2)
 register_plugin(DisablePlugin, 'disable_plugin', api_ver=2)
 

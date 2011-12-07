@@ -10,10 +10,6 @@ class PluginDetails(object):
         # list of feed names where no entries is acceptable situation
         self.no_entries_ok = []
 
-    def validator(self):
-        from flexget import validator
-        return validator.factory('boolean')
-
     @priority(-512)
     def on_feed_input(self, feed):
         if not feed.entries:

@@ -1,6 +1,7 @@
 import logging
 import copy
-from flexget.manager import Session
+from flexget import validator
+from flexget.manager import Session, register_config_key
 from flexget.plugin import get_plugins_by_phase, get_plugin_by_name, \
     feed_phases, PluginWarning, PluginError, DependencyError, plugins as all_plugins
 from flexget.utils.simple_persistence import SimpleFeedPersistence
@@ -444,3 +445,16 @@ class Feed(object):
                 log.warning('Used plugin %s does not support validating. Please notify author!' % keyword)
 
         return validate_errors
+
+
+def root_config_validator():
+    """Returns a validator for the 'feeds' key of config."""
+    # TODO: better error messages
+    valid_plugins = [p for p in all_plugins if hasattr(all_plugins[p].instance, 'validator')]
+    root = validator.factory('dict')
+    root.reject_keys(valid_plugins, message='plugins should go under a specific feed.')
+    root.accept_any_key('dict').accept_any_key('any')
+    return root
+
+
+register_config_key('feeds', root_config_validator)

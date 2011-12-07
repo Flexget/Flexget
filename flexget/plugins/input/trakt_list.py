@@ -20,7 +20,7 @@ log = logging.getLogger('trakt_list')
 
 
 class TraktList(object):
-    """"Creates an entry for each item in your trakt list.
+    """Creates an entry for each item in your trakt list.
 
     Syntax:
 

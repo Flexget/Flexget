@@ -55,10 +55,6 @@ Index('failed_title_url', columns.title, columns.url, columns.count)
 class PluginFailed(object):
     """Provides tracking for failures and related commandline utilities."""
 
-    def validator(self):
-        from flexget import validator
-        return validator.factory('boolean')
-
     def on_process_start(self, feed, config):
         if feed.manager.options.failed:
             feed.manager.disable_feeds()

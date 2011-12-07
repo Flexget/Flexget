@@ -657,8 +657,11 @@ class DictValidator(Validator):
                 if rules:
                     self.errors.back_out_errors(self.errors.count() - errors_before_key_val)
             if not rules:
-                self.errors.add('key \'%s\' is not recognized' % key)
-                # TODO: print the valid options
+                error = 'key \'%s\' is not recognized' % key
+                if self.valid:
+                    error += ', valid keys: %s' % ', '.join(sorted(self.valid))
+                # TODO: print options if accept_valid_keys is used
+                self.errors.add(error)
                 continue
             self.validate_item(value, rules)
         self.errors.path_remove_level()

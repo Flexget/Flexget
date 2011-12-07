@@ -28,11 +28,6 @@ class CliConfig(object):
     def __init__(self):
         self.replaces = {}
 
-    def validator(self):
-        # there is no way to misconfigure this ..
-        from flexget import validator
-        return validator.factory('any')
-
     def replace_dict(self, d, replaces):
         for k, v in d.items():
             if isinstance(v, basestring):

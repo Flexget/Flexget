@@ -27,10 +27,6 @@ class InputInject(object):
 
     """
 
-    def validator(self):
-        from flexget import validator
-        return validator.factory('any')
-
     options = {}
 
     @staticmethod

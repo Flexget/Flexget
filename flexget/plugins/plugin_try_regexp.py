@@ -12,11 +12,6 @@ class PluginTryRegexp:
     def __init__(self):
         self.abort = False
 
-    def validator(self):
-        # this is not meant to be configured .. :)
-        from flexget import validator
-        return validator.factory('any')
-
     def matches(self, entry, regexp):
         """Return True if any of the entry string fields match given regexp"""
         import re
@@ -28,7 +23,7 @@ class PluginTryRegexp:
         return (False, None)
 
     def on_feed_filter(self, feed):
-        if not feed.manager.options.try_regexp and not 'try_regexp' in feed.config:
+        if not feed.manager.options.try_regexp:
             return
         if self.abort:
             return

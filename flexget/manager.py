@@ -9,6 +9,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.pool import SingletonThreadPool
 from flexget.event import fire_event
+from flexget import validator
 
 log = logging.getLogger('manager')
 
@@ -16,6 +17,20 @@ Base = declarative_base()
 Session = sessionmaker()
 manager = None
 DB_CLEANUP_INTERVAL = timedelta(days=7)
+
+# Validator that handles root structure of config.
+_config_validator = validator.factory('dict')
+
+
+def register_config_key(key, validator, required=False):
+    """ Registers a valid root level key for the config.
+
+    :param key: Name of the key being registered.
+    :param validator: Validator for the key. (Validator instance, function returning Validator instance,
+        or validator type string)
+    :param required: Boolean specifying whether this is a required key.
+    """
+    _config_validator.accept(validator, key=key, required=required)
 
 
 def useExecLogging(func):
@@ -99,6 +114,11 @@ class Manager(object):
         self.find_config()
         self.acquire_lock()
         self.init_sqlalchemy()
+        errors = self.validate_config()
+        if errors:
+            for error in errors:
+                log.critical(error)
+            return
         self.create_feeds()
 
     def setup_yaml(self):
@@ -327,6 +347,11 @@ class Manager(object):
         file.close()
         log.debug('Pre-checked %s configuration lines' % line_num)
 
+    def validate_config(self):
+        """Check all root level keywords are valid."""
+        _config_validator.validate(self.config)
+        return  _config_validator.errors.messages
+
     def init_sqlalchemy(self):
         """Initialize SQLAlchemy"""
         try:
@@ -439,29 +464,9 @@ class Manager(object):
         # Clear feeds dict
         self.feeds = {}
 
-        if not 'feeds' in self.config:
-            log.critical('There are no feeds in the configuration file!')
-            return
-
-        if not isinstance(self.config['feeds'], dict):
-            log.critical('Feeds is in wrong datatype, please read configuration guides')
-            return
-
         # construct feed list
         feeds = self.config.get('feeds', {}).keys()
         for name in feeds:
-            # validate (TODO: make use of validator?)
-            if not isinstance(self.config['feeds'][name], dict):
-                if isinstance(self.config['feeds'][name], basestring):
-                    from flexget.plugin import plugins
-                    if name in plugins:
-                        log.error('\'%s\' is known keyword, but in wrong indentation level. \
-                        Please indent it correctly under a feed. Reminder: keyword should have 2 \
-                        more spaces than feed name.' % name)
-                        continue
-                log.error('\'%s\' is not a properly configured feed, please check indentation levels.' % name)
-                continue
-
             # create feed
             feed = Feed(self, name, self.config['feeds'][name])
             # if feed name is prefixed with _ it's disabled
