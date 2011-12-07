@@ -7,7 +7,7 @@ from datetime import datetime, date, time
 import locale
 from email.utils import parsedate
 from time import mktime
-from jinja2 import Environment, StrictUndefined, ChoiceLoader, FileSystemLoader, PackageLoader
+from jinja2 import Environment, StrictUndefined, ChoiceLoader, FileSystemLoader, PackageLoader, TemplateNotFound
 from flexget.event import event
 from flexget.plugin import PluginError
 
@@ -110,8 +110,9 @@ def make_environment(manager):
     """Create our environment and add our custom filters"""
     global environment
     environment = Environment(undefined=StrictUndefined,
-                              loader=ChoiceLoader([PackageLoader('flexget'), FileSystemLoader(manager.config_base)]),
-                              extensions=['jinja2.ext.loopcontrols'])
+        loader=ChoiceLoader([PackageLoader('flexget'),
+                             FileSystemLoader(os.path.join(manager.config_base, 'templates'))]),
+        extensions=['jinja2.ext.loopcontrols'])
     for name, filt in globals().items():
         if name.startswith('filter_'):
             environment.filters[name.split('_', 1)[1]] = filt
@@ -120,9 +121,17 @@ def make_environment(manager):
 # TODO: list_templates function
 
 
-def get_template(name):
-    # TODO: This should be given a plugin name as well as a template name, and search in the appropriate subfolder
-    return environment.get_template(name)
+def get_template(templatename, pluginname=None):
+
+    if pluginname is not None:
+        try:
+            return environment.get_template(pluginname + '/' + templatename)
+        except TemplateNotFound:
+            pass
+    try:
+        return environment.get_template(templatename)
+    except TemplateNotFound, e:
+        raise PluginError('Template not found: %s (%s)' % (e, pluginname))
 
 
 def render_from_entry(template_string, entry):
@@ -155,5 +164,16 @@ def render_from_entry(template_string, entry):
             raise RenderError('Does not contain the field `%s` for string replacement.' % e)
         except ValueError, e:
             raise PluginError('Invalid string replacement template: %s (%s)' % (template_string, e))
+
+    return result
+
+
+def render_from_feed(template, feed):
+    """Renders a Template with an feed as its context."""
+
+    try:
+        result = template.render({'feed': feed})
+    except Exception, e:
+        raise RenderError('(%s) %s' % (type(e).__name__, e))
 
     return result

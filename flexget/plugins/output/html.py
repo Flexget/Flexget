@@ -1,44 +1,39 @@
 import os
 import logging
-from flexget.plugin import PluginError, register_plugin
+from flexget.plugin import register_plugin
+from flexget.utils.template import render_from_feed, get_template
 
-log = logging.getLogger('make_html')
+PLUGIN_NAME = 'make_html'
+
+log = logging.getLogger(PLUGIN_NAME)
 
 
 class OutputHtml:
 
-    # TODO: implement
-    def __validator(self):
+    def validator(self):
         from flexget import validator
         root = validator.factory('dict')
-        root.accept('file', key='template')
-        root.accept('text', key='file')
+        root.accept('text', key='template')
+        root.accept('text', key='file', required=True)
         return root
 
-    def on_feed_output(self, feed):
-        try:
-            from Cheetah.Template import Template
-        except:
-            raise PluginError('make_html requires Cheetah template engine')
-
-        config = feed.config['make_html']
+    def on_feed_output(self, feed, config):
+        # Use the default template if none is specified
+        if not config.get('template'):
+            config['template'] = 'default.template'
 
         filename = os.path.expanduser(config['template'])
         output = os.path.expanduser(config['file'])
-
-        import warnings
-        warnings.simplefilter('ignore', UserWarning)
+        # Output to config directory if absolute path has not been specified
+        if not os.path.isabs(output):
+            output = os.path.join(feed.manager.config_base, output)
 
         # create the template
-        template = Template(file=filename)
+        template = render_from_feed(get_template(filename, PLUGIN_NAME), feed)
 
-        # populate it
-        template.accepted = feed.accepted
-        template.rejected = feed.rejected
-        template.entries = feed.entries
-
+        log.verbose('Writing output html to %s' % output)
         f = open(output, 'w')
-        f.write(template.respond().encode('utf-8'))
+        f.write(template.encode('utf-8'))
         f.close()
 
-register_plugin(OutputHtml, 'make_html')
+register_plugin(OutputHtml, PLUGIN_NAME, api_ver=2)
