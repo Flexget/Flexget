@@ -452,7 +452,8 @@ def root_config_validator():
     # TODO: better error messages
     valid_plugins = [p for p in all_plugins if hasattr(all_plugins[p].instance, 'validator')]
     root = validator.factory('dict')
-    root.reject_keys(valid_plugins, message='plugins should go under a specific feed.')
+    root.reject_keys(valid_plugins, message='plugins should go under a specific feed. '
+        '(and feeds are not allowed to be named the same as any plugins)')
     root.accept_any_key('dict').accept_any_key('any')
     return root
 
