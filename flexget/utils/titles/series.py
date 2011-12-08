@@ -60,14 +60,15 @@ class SeriesParser(TitleParser):
                  strict_name=False, allow_groups=None, allow_seasonless=True):
         """Init SeriesParser.
 
-        :name: Name of the series parser is going to try to parse.
+        :param string name: Name of the series parser is going to try to parse.
 
-        :identified_by: What kind of episode numbering scheme is expected, valid values are ep, id and auto (default).
-        :name_regexps: List of regexps for name matching or None (default), by default regexp is generated from name.
-        :ep_regexp: List of regexps detecting episode,season format. Given list is prioritized over built-in regexps.
-        :id_regexp: List of regexps detecting id format. Given list is prioritized over built in regexps.
-        :strict_name: Boolean value, if True name must be immediately be followed by episode identifier.
-        :allow_groups: List of release group names that are allowed. This will also populate attribute `group`.
+        :param string identified_by: What kind of episode numbering scheme is expected, valid values are ep, id and auto (default).
+        :param list name_regexps: Regexps for name matching or None (default), by default regexp is generated from name.
+        :param list ep_regexps: Regexps detecting episode,season format. Given list is prioritized over built-in regexps.
+        :param list id_regexps: Regexps detecting id format. Given list is prioritized over built in regexps.
+        :param boolean strict_name: If True name must be immediately be followed by episode identifier.
+        :param list allow_groups: Optionally specify list of release group names that are allowed.
+        This will also populate attribute `group`.
         """
 
         self.name = name
