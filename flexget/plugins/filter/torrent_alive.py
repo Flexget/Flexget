@@ -45,7 +45,9 @@ class TorrentAlive(object):
                                 continue
                             else:
                                 log.debug('%s seeds found from %s' % (tracker_seeds, tracker))
-                                seeds += tracker_seeds
+                                # The same peer may be connected to multiple trackers, so just use the max seeds
+                                # found by any one tracker.
+                                seeds = max(seeds, tracker_seeds)
                                 # If we successfully connect to a tracker in this tier, no need to try the others
                                 break
                         if seeds >= min_seeds:
