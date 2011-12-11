@@ -1,9 +1,9 @@
 import logging
 from flexget.utils.search import StringComparator
 from flexget.plugin import get_plugins_by_group, PluginWarning, PluginError, \
-    register_parser_option, register_plugin, get_plugin_by_name
+    register_parser_option, register_plugin
 
-log = logging.getLogger('search')
+log = logging.getLogger('urlrewrite_search')
 
 
 class SearchPlugins(object):
@@ -32,7 +32,7 @@ class PluginSearch(object):
 
         Example:
 
-        search:
+        urlrewrite_search:
           - newtorrents
           - piratebay
 
@@ -43,7 +43,6 @@ class PluginSearch(object):
     def validator(self):
         from flexget import validator
         search = validator.factory('list')
-        plugins = {}
         names = []
         for plugin in get_plugins_by_group('search'):
             # If the plugin has a validator, get it's validator and make it a
@@ -62,7 +61,7 @@ class PluginSearch(object):
         search.accept('choice').accept_choices(names)
         return search
 
-    def on_feed_urlrewrite(self, feed):
+    def on_feed_urlrewrite(self, feed, config):
         # no searches in unit test mode
         if feed.manager.unit_test:
             return
@@ -75,15 +74,14 @@ class PluginSearch(object):
         for entry in feed.accepted + [e for e in feed.entries if e.get('imaginary')]:
             found = False
             # loop through configured searches
-            search_plugins = feed.config.get('search', [])
-            for name in search_plugins:
-                config = None
+            for name in config:
+                search_config = None
                 if isinstance(name, dict):
                     # assume the name is the first/only key in the dict.
-                    name, config = name.items()[0]
+                    name, search_config = name.items()[0]
                 log.verbose('Searching `%s` from %s' % (entry['title'], name))
                 try:
-                    results = plugins[name].search(entry['title'], StringComparator(cutoff=0.9), config)
+                    results = plugins[name].search(entry['title'], StringComparator(cutoff=0.9), search_config)
                     if results:
                         url = results[0]['url']
                         log.debug('Found url: %s' % url)
@@ -99,12 +97,8 @@ class PluginSearch(object):
                 # If I don't have a URL, doesn't matter if I'm immortal...
                 entry['immortal'] = False
                 feed.reject(entry, 'search failed')
-            else:
-                # Populate quality
-                # TODO: why does search plugin invoke quality here?
-                get_plugin_by_name('metainfo_quality').instance.get_quality(entry)
 
-register_plugin(PluginSearch, 'search')
+register_plugin(PluginSearch, 'urlrewrite_search', api_ver=2)
 register_plugin(SearchPlugins, '--search-plugins', builtin=True)
 register_parser_option('--search-plugins', action='store_true', dest='search_plugins', default=False,
                        help='List supported search plugins.')
