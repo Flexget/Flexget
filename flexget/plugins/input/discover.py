@@ -96,7 +96,7 @@ class Discover(object):
             comparator = MovieComparator()
         for item in config['from']:
             if isinstance(item, dict):
-                plugin_name, plugin_config = item.iteritems()[0]
+                plugin_name, plugin_config = item.items()[0]
             else:
                 plugin_name, plugin_config = item, None
             search = get_plugin_by_name(plugin_name).instance
