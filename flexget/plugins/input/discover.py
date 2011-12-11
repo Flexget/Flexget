@@ -1,6 +1,6 @@
 import logging
 from flexget.utils.cached_input import cached
-from flexget.utils.search import StringComparator, MovieComparator, clean_title
+from flexget.utils.search import StringComparator, MovieComparator, AnyComparator, clean_title
 from flexget.plugin import register_plugin, get_plugin_by_name, PluginError, \
     get_plugins_by_group, get_plugins_by_phase, PluginWarning
 
@@ -37,7 +37,7 @@ class Discover(object):
                 no_config.accept(plugin.name)
 
         discover.accept('integer', key='limit')
-        discover.accept('choice', key='type').accept_choices(['normal', 'exact', 'movies'])
+        discover.accept('choice', key='type').accept_choices(['any', 'normal', 'exact', 'movies'])
         return discover
 
     def execute_inputs(self, config, feed):
@@ -92,6 +92,8 @@ class Discover(object):
             comparator = StringComparator(cutoff=0.7, cleaner=clean_title)
         elif config['type'] == 'exact':
             comparator = StringComparator(cutoff=0.9)
+        elif config['type'] == 'any':
+            comparator = AnyComparator()
         else:
             comparator = MovieComparator()
         for item in config['from']:

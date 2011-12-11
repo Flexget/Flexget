@@ -24,6 +24,33 @@ def clean_title(title):
     return result
 
 
+class AnyComparator(object):
+    """Comparator that does no comparison. Used to return all results from a search plugin without filtering."""
+
+    def __init__(self):
+        self.a = ''
+
+    def ratio(self):
+        return 1.0
+
+    def set_seq1(self, a):
+        self.a = a
+
+    def set_seq2(self, b):
+        pass
+
+    def matches(self, other=None):
+        return True
+
+    def search_string(self):
+        """Return a cleaned string based on seq1 that can be used for searching."""
+
+        if isinstance(self.a, unicode):
+            # Convert to combined form for better search results
+            return normalize('NFC', self.a)
+        return self.a
+
+
 class StringComparator(SequenceMatcher, object):
     """Compares two strings for similarity. Runs a cleaner function on strings before comparison.
     Cutoff similarity is configurable."""
