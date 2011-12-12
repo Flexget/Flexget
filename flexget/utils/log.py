@@ -60,13 +60,13 @@ def log_once(message, logger=logging.getLogger('log_once')):
     try:
         # abort if this has already been logged
         if session.query(LogMessage).filter_by(md5sum=md5sum).first():
-            session.close()
             return False
 
         row = LogMessage(md5sum)
         session.add(row)
-    finally:
         session.commit()
+    finally:
+        session.close()
 
     logger.info(message)
     return True
