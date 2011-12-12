@@ -29,6 +29,7 @@ class AnyComparator(object):
 
     def __init__(self):
         self.a = ''
+        self.b = ''
 
     def ratio(self):
         return 1.0
@@ -37,7 +38,7 @@ class AnyComparator(object):
         self.a = a
 
     def set_seq2(self, b):
-        pass
+        self.b = b
 
     def matches(self, other=None):
         return True
