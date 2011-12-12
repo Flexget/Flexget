@@ -39,7 +39,9 @@ def register_sql_explain(man):
         maininit = manager.Session.__init__
         
         def init(*args, **kwargs):
-            return maininit(*args, query_cls=ExplainQuery, **kwargs)
+            kwargs['query_cls'] = ExplainQuery
+            return maininit(*args, **kwargs)
+        
         manager.Session.__init__ = init
 
 
