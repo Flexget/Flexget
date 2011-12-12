@@ -1,11 +1,26 @@
 """Logging utilities"""
 
 import logging
-from flexget.manager import Session, Base
+import hashlib
 from datetime import datetime, timedelta
-from sqlalchemy import Column, Integer, String, DateTime
+from sqlalchemy import Column, Integer, String, DateTime, Index
+from flexget import schema
+from flexget.utils.sqlalchemy_utils import table_schema
+from flexget.manager import Session
+from flexget.event import event
 
 log = logging.getLogger('util.log')
+Base = schema.versioned_base('log_once', 0)
+
+
+@schema.upgrade('log_once')
+def upgrade(ver, session):
+    if ver is None:
+        log.info('Adding index to md5sum column of log_once table.')
+        table = table_schema('log_once', session)
+        Index('log_once_md5sum', table.c.md5sum, unique=True).create()
+        ver = 0
+    return ver
 
 
 class LogMessage(Base):
@@ -14,7 +29,7 @@ class LogMessage(Base):
     __tablename__ = 'log_once'
 
     id = Column(Integer, primary_key=True)
-    md5sum = Column(String)
+    md5sum = Column(String, unique=True)
     added = Column(DateTime, default=datetime.now())
 
     def __init__(self, md5sum):
@@ -24,23 +39,19 @@ class LogMessage(Base):
         return "<LogMessage('%s')>" % (self.md5sum)
 
 
-def purge():
+@event('manager.db_cleanup')
+def purge(session):
     """Purge old messages from database"""
     old = datetime.now() - timedelta(days=365)
-    session = Session()
-    try:
-        for message in session.query(LogMessage).filter(LogMessage.added < old):
-            log.debug('purging: %s' % message)
-            session.delete(message)
-    finally:
-        session.commit()
+
+    result = session.query(LogMessage).filter(LogMessage.added < old).delete()
+    if result:
+        log.verbose('Purged %s entries from log_once table.' % result)
 
 
 def log_once(message, logger=logging.getLogger('log_once')):
     """Log message only once using given logger. Returns False if suppressed logging."""
-    purge()
 
-    import hashlib
     digest = hashlib.md5()
     digest.update(message.encode('latin1', 'replace')) # ticket:250
     md5sum = digest.hexdigest()
