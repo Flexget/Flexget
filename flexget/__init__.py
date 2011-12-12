@@ -3,6 +3,10 @@
 import os
 import sys
 import logging
+try:
+    import cProfile as profile
+except ImportError:
+    import profile
 from flexget import logger
 from flexget.options import CoreOptionParser
 from flexget import plugin
@@ -38,4 +42,7 @@ def main():
         log_file = os.path.join(manager.config_base, log_file)
     logger.start(log_file, log_level)
 
-    manager.execute()
+    if options.profile:
+        profile.runctx('manager.execute()', globals(), locals(), os.path.join(manager.config_base, 'flexget.profile'))
+    else:
+        manager.execute()

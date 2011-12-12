@@ -37,6 +37,7 @@ class OptionParser(OptParser):
                         help=SUPPRESS_HELP)
         self.add_option('--del-db', action='store_true', dest='del_db', default=False,
                         help=SUPPRESS_HELP)
+        self.add_option('--profile', action='store_true', dest='profile', default=False, help=SUPPRESS_HELP)
 
     def _debug_callback(self, option, opt, value, parser):
         setattr(parser.values, option.dest, 1)
