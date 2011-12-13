@@ -1,5 +1,6 @@
 import os
 import sys
+import shutil
 import logging
 import yaml
 import atexit
@@ -72,6 +73,9 @@ class Manager(object):
     options = None
 
     def __init__(self, options):
+        """
+        :param options: optparse parsed options object
+        """
         global manager
         assert not manager, 'Only one instance of Manager should be created at a time!'
         manager = self
@@ -81,12 +85,10 @@ class Manager(object):
         self.db_filename = None
         self.engine = None
         self.lockfile = None
+        self.database_uri = None
 
         self.config = {}
         self.feeds = {}
-
-        # shelve (FlexGet 0.9.x)
-        self.shelve_session = None
 
         self.initialize()
 
@@ -355,33 +357,14 @@ class Manager(object):
     def init_sqlalchemy(self):
         """Initialize SQLAlchemy"""
         try:
-            if [int(part) for part in sqlalchemy.__version__.split('.')] < [0, 6, 0]:
-                print >> sys.stderr, 'FATAL: SQLAlchemy 0.6.0 or newer required. Please upgrade your SQLAlchemy.'
+            if [int(part) for part in sqlalchemy.__version__.split('.')] < [0, 7, 0]:
+                print >> sys.stderr, 'FATAL: SQLAlchemy 0.7.0 or newer required. Please upgrade your SQLAlchemy.'
                 sys.exit(1)
         except ValueError, e:
             log.critical('Failed to check SQLAlchemy version, you may need to upgrade it')
 
-        import shutil
-
-        # load old shelve session
-        if self.options.migrate:
-            shelve_session_name = self.options.migrate
-        else:
-            shelve_session_name = os.path.join(self.config_base, 'session-%s.db' % self.config_name)
-        if os.path.exists(shelve_session_name):
-            import shelve
-            import copy
-            log.critical('Old shelve session found, relevant data will be migrated.')
-            old = shelve.open(shelve_session_name, flag='r', protocol=2)
-            self.shelve_session = copy.deepcopy(old['cache'])
-            old.close()
-            if not self.options.test:
-                shutil.move(shelve_session_name, '%s_migrated' % shelve_session_name)
-
         # SQLAlchemy
-        if self.unit_test:
-            connection = 'sqlite:///:memory:'
-        else:
+        if self.database_uri is None:
             self.db_filename = os.path.join(self.config_base, 'db-%s.sqlite' % self.config_name)
             if self.options.test:
                 db_test_filename = os.path.join(self.config_base, 'test-%s.sqlite' % self.config_name)
@@ -393,17 +376,19 @@ class Manager(object):
 
             # in case running on windows, needs double \\
             filename = self.db_filename.replace('\\', '\\\\')
-            connection = 'sqlite:///%s' % filename
+            self.database_uri = 'sqlite:///%s' % filename
 
         # fire up the engine
-        log.debug('connecting to: %s' % connection)
+        log.debug('Connecting to: %s' % self.database_uri)
         try:
-            self.engine = sqlalchemy.create_engine(connection, echo=self.options.debug_sql, poolclass=SingletonThreadPool)
+            self.engine = sqlalchemy.create_engine(self.database_uri,
+                                                   echo=self.options.debug_sql,
+                                                   poolclass=SingletonThreadPool)
         except ImportError:
-            print >> sys.stderr, ('FATAL: Unable to use SQLite. Are you running Python 2.5.x or 2.6.x ?\n'
+            print >> sys.stderr, ('FATAL: Unable to use SQLite. Are you running Python 2.5 - 2.7 ?\n'
             'Python should normally have SQLite support built in.\n'
             'If you\'re running correct version of Python then it is not equipped with SQLite.\n'
-            'Try installing `pysqlite` and / or if you have compiled python yourself, recompile it with SQLite support.')
+            'You can try installing `pysqlite`. If you have compiled python yourself, recompile it with SQLite support.')
             sys.exit(1)
         Session.configure(bind=self.engine)
         # create all tables, doesn't do anything to existing tables
@@ -526,7 +511,15 @@ class Manager(object):
 
     @useExecLogging
     def execute(self, feeds=None, disable_phases=None, entries=None):
-        """Iterate trough feeds and run them."""
+        """
+        Iterate trough feeds and run them. If --learn is used download and output
+        phases are disabled.
+
+        :param feeds: Optional list of feed names to run, all feeds otherwise.
+        :param disable_phases: Optional list of phases to disabled
+        :param entries: Optional list of entries to pass into feed(s).
+            This will also cause feed to disable input phase.
+        """
         # Make a list of Feed instances to execute
         if feeds is None:
             # Default to all feeds if none are specified

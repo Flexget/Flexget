@@ -45,14 +45,21 @@ def setup_once():
 class MockManager(Manager):
     unit_test = True
 
-    def __init__(self, config_text, config_name):
+    def __init__(self, config_text, config_name, db_uri=None):
         self.config_text = config_text
         self.config_name = config_name
-        self.config = None
-        self.config_base = None
-        Manager.__init__(self, test_options)
+        self._db_uri = db_uri or 'sqlite:///:memory:'
+        super(MockManager, self).__init__(test_options)
+
+    def initialize(self):
+        self.database_uri = self._db_uri
+        log.debug('database_uri: %s' % self.database_uri)
+        super(MockManager, self).initialize()
 
     def find_config(self):
+        """
+        Override configuration loading
+        """
         try:
             self.config = yaml.safe_load(self.config_text)
             self.config_base = os.path.dirname(os.path.abspath(sys.path[0]))
@@ -75,13 +82,17 @@ class FlexGetBase(object):
     # setup as "./tmp/<testname>" and automatically removed on teardown.
     #
     # The instance variable __tmp__ is set to the absolute name of the tmpdir
-    # (ending with "os.sep"), and any occurence of "__tmp__" in __yaml__ or
+    # (ending with "os.sep"), and any occurrence of "__tmp__" in __yaml__ or
     # a @with_filecopy destination is also replaced with it.
+
+    # TODO: there's probably flaw in this as this is shared across FlexGetBases ?
     __tmp__ = False
 
     def __init__(self):
         self.manager = None
         self.feed = None
+        self.database_uri = None
+        self.base_path = os.path.dirname(__file__)
 
     def setup(self):
         """Set up test env"""
@@ -89,7 +100,7 @@ class FlexGetBase(object):
         if self.__tmp__:
             self.__tmp__ = util.maketemp() + os.sep
             self.__yaml__ = self.__yaml__.replace("__tmp__", self.__tmp__)
-        self.manager = MockManager(self.__yaml__, self.__class__.__name__)
+        self.manager = MockManager(self.__yaml__, self.__class__.__name__, db_uri=self.database_uri)
 
     def teardown(self):
         try:

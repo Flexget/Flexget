@@ -1,6 +1,7 @@
 import logging
 import random
 import string
+from flexget.manager import Session
 from flexget.entry import Entry
 from flexget import plugin
 
@@ -31,7 +32,7 @@ class GenSeries(plugin.DebugPlugin):
         return container
 
     def on_process_start(self, feed, config):
-        log.info('Generating data ...')
+        log.info('Generating test data ...')
         series = []
         for num in range(config['series']):
             series.append('series %d name' % num)
@@ -61,8 +62,9 @@ class GenSeries(plugin.DebugPlugin):
     def on_feed_exit(self, feed, config):
         if self.entries:
             log.info('There are still %d left to be processed!' % len(self.entries))
+            # rerun ad infinitum, also commits session between them
             feed._rerun = True
             feed._rerun_count = 0
 
-            
+
 #plugin.register_plugin(GenSeries, 'gen_series_data', api_ver=2, debug=True)

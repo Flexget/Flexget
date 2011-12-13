@@ -106,30 +106,6 @@ def forget(value):
 
 class MigrateSeen(object):
 
-    def migrate(self, feed):
-        """Migrates 0.9 session data into new database"""
-
-        session = Session()
-        try:
-            shelve = feed.manager.shelve_session
-            count = 0
-            log.info('If this crashes, you can\'t migrate 0.9 data to 1.0 ... sorry')
-            for name, data in shelve.iteritems():
-                if not 'seen' in data:
-                    continue
-                seen = data['seen']
-                for k, v in seen.iteritems():
-                    se = SeenEntry(u'N/A', seen.feed, u'migrated')
-                    se.fields.append(SeenField(u'unknown', k))
-                    session.add(se)
-                    count += 1
-            session.commit()
-            log.info('It worked! Migrated %s seen items' % count)
-        except Exception:
-            log.critical('It crashed :(')
-        finally:
-            session.close()
-
     def migrate2(self):
         session = Session()
 
@@ -200,10 +176,6 @@ class MigrateSeen(object):
         session.commit()
 
     def on_process_start(self, feed):
-        # migrate shelve -> sqlalchemy
-        if feed.manager.shelve_session:
-            self.migrate(feed)
-
         # migrate seen to seen_entry
         session = Session()
         from flexget.utils.sqlalchemy_utils import table_exists

@@ -42,7 +42,7 @@ def set_version(plugin, version):
     if plugin not in plugin_schemas:
         raise ValueError('Tried to set schema version for %s plugin with no versioned_base.' % plugin)
     if version != plugin_schemas[plugin]['version']:
-        raise ValueError('Tried to set %s plugin schema version to %d when it should be %d as defined in versioned_base.' % 
+        raise ValueError('Tried to set %s plugin schema version to %d when it should be %d as defined in versioned_base.' %
                         (plugin, version, plugin_schemas[plugin]['version']))
     session = Session()
     try:
@@ -70,15 +70,16 @@ def upgrade(plugin):
 
     There is no need to commit the session, it will commit automatically if an upgraded schema version is returned."""
 
-    def upgrade(func):
+    def upgrade_decorator(func):
 
         @event('manager.upgrade')
-        def upgrade(manager):
+        def upgrade_wrapper(manager):
             ver = get_version(plugin)
             session = Session()
             try:
                 new_ver = func(ver, session)
                 if new_ver > ver:
+                    log.info('Plugin `%s` schema upgraded successfully' % plugin)
                     set_version(plugin, new_ver)
                     session.commit()
                 elif new_ver < ver:
@@ -91,8 +92,8 @@ def upgrade(plugin):
             finally:
                 session.close()
 
-        return upgrade
-    return upgrade
+        return upgrade_wrapper
+    return upgrade_decorator
 
 
 def register_plugin_table(tablename, plugin, version):
