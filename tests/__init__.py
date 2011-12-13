@@ -18,7 +18,8 @@ plugins_loaded = False
 
 
 def setup_logging_level():
-    # set logging level according to nosetests verbosity
+    # set logging level according to nosetests verbosity;
+    # overrides the default level in tests/logging.cfg
     level = logging.DEBUG
     if "--verbose" in sys.argv or "-v" in sys.argv:
         level = flexget.logger.TRACE
