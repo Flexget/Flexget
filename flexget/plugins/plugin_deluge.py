@@ -19,7 +19,7 @@ if sys.platform.startswith('win'):
         log.debug('Found deluge install in %s adding to sys.path' % deluge_dir)
         sys.path.append(deluge_dir)
         for item in os.listdir(deluge_dir):
-            if item.endswith('.egg'):
+            if item.endswith(('.egg', '.zip')):
                 sys.path.append(os.path.join(deluge_dir, item))
 
 try:
