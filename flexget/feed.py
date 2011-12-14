@@ -1,5 +1,6 @@
 import logging
 import copy
+import hashlib
 from flexget import validator
 from flexget.manager import Session, register_config_key
 from flexget.plugin import get_plugins_by_phase, get_plugin_by_name, \
@@ -392,6 +393,12 @@ class Feed(object):
     def process_start(self):
         """Execute process_start phase"""
         self.__run_feed_phase('process_start')
+        config_hash = hashlib.md5(str(self.config.items())).hexdigest()
+        if self.simple_persistence.get('feed_config_hash') != config_hash:
+            self.config_modified = True
+            self.simple_persistence['feed_config_hash'] = config_hash
+        else:
+            self.config_modified = False
 
     def process_end(self):
         """Execute terminate phase for this feed"""
