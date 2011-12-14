@@ -1,11 +1,9 @@
-import hashlib
 import logging
 from datetime import datetime, timedelta
 from sqlalchemy import Column, Integer, String, Unicode, DateTime, ForeignKey, and_, Index
 from sqlalchemy.orm import relation
 from flexget import schema
 from flexget.event import event
-from flexget.manager import Session
 from flexget.plugin import register_plugin, register_parser_option, register_feed_phase
 from flexget.utils.sqlalchemy_utils import table_columns, drop_tables, table_add_column
 from flexget.utils.tools import parse_timedelta
@@ -50,7 +48,6 @@ class RememberFeed(Base):
 
     id = Column(Integer, primary_key=True)
     name = Column(Unicode)
-    hash = Column(String)
 
     entries = relation('RememberEntry', backref='feed', cascade='all, delete, delete-orphan')
 
@@ -82,27 +79,24 @@ class FilterRememberRejected(object):
         feed.reject(entry, 'message', remember=True)
     """
 
-    def on_process_start(self, feed, config):
-        """Purge remembered entries if the config has changed and write new hash"""
+    def on_feed_start(self, feed, config):
+        """Purge remembered entries if the config has changed."""
         # No session on process start, make our own
-        session = Session()
         # Delete expired items
-        session.query(RememberEntry).filter(RememberEntry.expires < datetime.now()).delete()
-        # Generate hash for current config
-        config_hash = hashlib.md5(str(feed.config.items())).hexdigest()
-        # See if the feed has the same hash as last run
-        old_feed = session.query(RememberFeed).filter(RememberFeed.name == feed.name).first()
-        if old_feed and (old_feed.hash != config_hash or feed.manager.options.forget_rejected):
+        feed.session.query(RememberEntry).filter(RememberEntry.expires < datetime.now()).delete()
+        # See if the feed has changed since last run
+        old_feed = feed.session.query(RememberFeed).filter(RememberFeed.name == feed.name).first()
+        if old_feed and feed.config_modified or feed.manager.options.forget_rejected:
             if feed.manager.options.forget_rejected:
-                log.info('Forgetting feed %s previous rejections.' % feed.name)
+                log.info('Forgetting previous rejections.')
             else:
-                log.debug('Feed %s config has changed since last run, purging remembered entries.' % feed.name)
-            session.delete(old_feed)
+                log.debug('Feed config has changed since last run, purging remembered entries.')
+            feed.session.delete(old_feed)
             old_feed = None
         if not old_feed:
             # Create this feed in the db if not present
-            session.add(RememberFeed(name=feed.name, hash=config_hash))
-        session.commit()
+            feed.session.add(RememberFeed(name=feed.name))
+        feed.session.commit()
 
     # This runs before metainfo phase to avoid re-parsing metainfo for entries that will be rejected
     def on_feed_prefilter(self, feed, config):

@@ -8,7 +8,7 @@ import socket
 from datetime import datetime
 import feedparser
 from flexget.entry import Entry
-from flexget.plugin import register_plugin, internet, PluginError
+from flexget.plugin import register_plugin, internet, PluginError, get_plugin_by_name, DependencyError
 from flexget.utils.cached_input import cached
 from flexget.utils.tools import urlopener
 from flexget.utils.tools import decode_html
@@ -42,7 +42,7 @@ class InputRSS(object):
           url: <url>
           ascii: yes
 
-        Incase RSS-feed uses some nonstandard field for urls and automatic detection fails
+        In case RSS-feed uses some nonstandard field for urls and automatic detection fails
         you can configure plugin to use url from any feedparser entry attribute.
 
         Example:
@@ -177,18 +177,19 @@ class InputRSS(object):
 
         log.debug('Requesting feed `%s` url `%s`' % (feed.name, config['url']))
 
-        # check etags and last modified -headers
-        # let's not, flexget works better when feed contains all entries all the time ?
         etag = None
         modified = None
-        """
-        etag = feed.cache.get('etag', None)
-        if etag:
-            log.debug('Sending etag %s for feed %s' % (etag, feed.name))
-        modified = feed.cache.get('modified', None)
-        if modified:
-            log.debug('Sending last-modified %s for feed %s' % (etag, feed.name))
-        """
+        # Used to identify which etag/modified to use
+        url_hash = str(hash(config['url']))
+
+        # set etag and last modified headers if config has not changed since last run
+        if not feed.config_modified:
+            etag = feed.simple_persistence.get('%s_etag' % url_hash, None)
+            if etag:
+                log.debug('Sending etag %s for feed %s' % (etag, feed.name))
+            modified = feed.simple_persistence.get('%s_modified' % url_hash, None)
+            if modified:
+                log.debug('Sending last-modified %s for feed %s' % (modified, feed.name))
 
         # set timeout to one minute
         orig_timout = socket.getdefaulttimeout()
@@ -211,8 +212,16 @@ class InputRSS(object):
         if not status:
             log.debug('RSS does not have status (normal if processing a file)')
         elif status == 304:
-            log.debug('Feed %s hasn\'t changed, skipping' % feed.name)
-            return
+            log.verbose('%s hasn\'t changed since last run. Not creating entries.' % config['url'])
+            try:
+                # details plugin will complain if no entries are created, with this we disable that
+                details = get_plugin_by_name('details').instance
+                if feed.name not in details.no_entries_ok:
+                    log.debug('adding %s to details plugin no_entries_ok' % feed.name)
+                    details.no_entries_ok.append(feed.name)
+            except DependencyError:
+                log.debug('unable to get details plugin')
+            return []
         elif status == 401:
             raise PluginError('Authentication needed for feed %s: %s' % \
                 (feed.name, rss.headers['www-authenticate']), log)
@@ -279,17 +288,13 @@ class InputRSS(object):
 
         log.debug('encoding %s' % rss.encoding)
 
-        # update etag, use last modified if no etag exists
-        """
-        if 'etag' in rss and type(rss['etag']) != feedparser.types.NoneType:
-            etag = rss.etag.replace("'", '').replace('"', '')
-            feed.cache.store('etag', etag, 90)
-            log.debug('etag %s saved for feed %s' % (etag, feed.name))
-        elif hasattr(rss, 'headers'):
-            if 'last-modified' in rss.headers:
-                feed.cache.store('modified', rss.modified, 90)
-                log.debug('last modified saved for feed %s', feed.name)
-        """
+        # update etag and last modified if no etag exists
+        if rss.get('etag'):
+            feed.simple_persistence['%s_etag' % url_hash] = rss.etag
+            log.debug('etag %s saved for feed %s' % (rss.etag, feed.name))
+        if rss.get('modified'):
+            feed.simple_persistence['%s_modified' % url_hash] = tuple(rss.modified)
+            log.debug('last modified %s saved for feed %s' % (rss.modified, feed.name))
 
         # new entries to be created
         entries = []
@@ -378,7 +383,6 @@ class InputRSS(object):
 
             # create flexget entry
             e = Entry()
-            urls = []
 
             if not isinstance(config.get('link'), list):
                 # If the link field is not a list, search for first valid url
