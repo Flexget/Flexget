@@ -17,16 +17,25 @@ class TorrentAlive(object):
         root.accept('integer')
         return root
 
+    @priority(150)
+    def on_feed_filter(self, feed, config):
+        if not config:
+            return
+        for entry in feed.entries:
+            if 'torrent_seeds' in entry and entry['torrent_seeds'] < config:
+                feed.reject(entry, reason='Had < %d required seeds. (%s)' % (config, entry['torrent_seeds']))
+
     # Run on output phase so that we let torrent plugin output modified torrent file first
     @priority(250)
     def on_feed_output(self, feed, config):
         if not config:
             return
         # Convert True to 1
-        min_seeds = config
-        if config is True:
-            min_seeds = 1
+        min_seeds = int(config)
         for entry in feed.accepted:
+            if entry.get('torrent_seeds'):
+                log.debug('Not checking trackers for seeds, as torrent_seeds is already filled.')
+                continue
             log.debug('Checking for seeds for %s:' % entry['title'])
             torrent = entry.get('torrent')
             if torrent:
@@ -70,13 +79,14 @@ class TorrentAlive(object):
     def get_scrape_url(self, tracker_url, info_hash):
         if 'announce' in tracker_url:
             result = tracker_url.replace('announce', 'scrape')
-            if result.startswith('udp:'):
-                result = result.replace('udp:', 'http:')
-            result += '&' if '?' in result else '?'
-            result += 'info_hash=%s' % quote(info_hash.decode('hex'))
-            return result
         else:
-            log.debug('Cannot determine scrape url for %s' % tracker_url)
+            log.debug('`announce` not contained in tracker url, guessing scrape address.')
+            result = tracker_url + '/scrape'
+        if result.startswith('udp:'):
+            result = result.replace('udp:', 'http:')
+        result += '&' if '?' in result else '?'
+        result += 'info_hash=%s' % quote(info_hash.decode('hex'))
+        return result
 
     def get_tracker_seeds(self, url, info_hash):
         url = self.get_scrape_url(url, info_hash)
@@ -84,7 +94,7 @@ class TorrentAlive(object):
             return 0
         log.debug('Checking for seeds from %s' % url)
         try:
-            data = bdecode(urlopener(url, log, retries=2).read()).get('files')
+            data = bdecode(urlopener(url, log, retries=1, timeout=10).read()).get('files')
         except SyntaxError, e:
             log.warning('Error bdecoding tracker response: %s' % e)
             return 0

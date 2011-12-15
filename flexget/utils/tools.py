@@ -230,9 +230,10 @@ def urlopener(url, log, **kwargs):
             raise urllib2.URLError(msg)
 
     retries = kwargs.get('retries', 3)
+    timeout = kwargs.get('timeout', 15.0)
     oldtimeout = socket.getdefaulttimeout()
     try:
-        socket.setdefaulttimeout(15.0)
+        socket.setdefaulttimeout(timeout)
 
         handlers = [SmartRedirectHandler()]
         if urllib2._opener:
