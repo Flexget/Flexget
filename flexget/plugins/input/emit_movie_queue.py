@@ -31,7 +31,7 @@ class EmitIMDBQueue(object):
         if not config:
             return
         config = self.prepare_config(config)
-        
+
         entries = []
         imdb_entries = queue_get()
 
@@ -39,7 +39,6 @@ class EmitIMDBQueue(object):
             entry = Entry()
             # make sure the entry has IMDB fields filled
             entry['url'] = ''
-            entry['imaginary'] = True
             entry['imdb_url'] = 'http://www.imdb.com/title/' + imdb_entry.imdb_id
             entry['imdb_id'] = imdb_entry.imdb_id
 

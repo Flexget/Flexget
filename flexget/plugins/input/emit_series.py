@@ -35,17 +35,17 @@ class EmitSeries(SeriesPlugin):
 
             # try next episode (eg. S01E02)
             title = '%s S%02dE%02d' % (series.name, latest['season'], latest['episode'] + 1)
-            feed.entries.append(Entry(title=title, url='', imaginary=True))
+            feed.entries.append(Entry(title=title, url=''))
 
             # different syntax (eg. 01x02)
             title = '%s %02dx%02d' % (series.name, latest['season'], latest['episode'] + 1)
-            feed.entries.append(Entry(title=title, url='', imaginary=True))
+            feed.entries.append(Entry(title=title, url=''))
 
             # TODO: do this only if there hasn't been new episode in few weeks
 
             # try next season
             title = '%s S%02dE%02d' % (series.name, latest['season'] + 1, 1)
-            feed.entries.append(Entry(title=title, url='', imaginary=True))
+            feed.entries.append(Entry(title=title, url=''))
 
         return entries
 

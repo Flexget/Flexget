@@ -70,8 +70,8 @@ class PluginSearch(object):
         for plugin in get_plugins_by_group('search'):
             plugins[plugin.name] = plugin.instance
 
-        # search accepted and imaginary entries
-        for entry in feed.accepted + [e for e in feed.entries if e.get('imaginary')]:
+        # search accepted
+        for entry in feed.accepted:
             found = False
             # loop through configured searches
             for name in config:

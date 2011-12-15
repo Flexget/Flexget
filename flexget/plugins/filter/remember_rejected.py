@@ -119,9 +119,6 @@ class FilterRememberRejected(object):
         # We only remember rejections that specify the remember keyword argument
         if not remember and not remember_time:
             return
-        if entry.get('imaginary'):
-            log.debug('Not remembering rejection for imaginary entry `%s`' % entry['title'])
-            return
         expires = None
         if remember_time:
             if isinstance(remember_time, basestring):
