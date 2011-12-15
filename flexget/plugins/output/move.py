@@ -1,6 +1,7 @@
 import os
 import shutil
 import logging
+import time
 from flexget import validator
 from flexget.plugin import register_plugin
 from flexget.utils.template import RenderError
@@ -28,6 +29,7 @@ class MovePlugin(object):
         root.accept('boolean')
         config = root.accept('dict')
         config.accept('path', key='to', allow_replacement=True)
+        config.accept('boolean', key='unpack_safety')
         #config.accept('list', key='move_with').accept('text') # TODO
         config.accept('number', key='clean_source')
         return config
@@ -75,6 +77,23 @@ class MovePlugin(object):
             if src == dst:
                 log.verbose('Source and destination are same, skipping `%s`' % entry['title'])
                 continue
+
+            # unpack_safety
+            if config.get('unpack_safety', entry.get('unpack_safety', True)):
+                count = 0
+                while True:
+                    if count > 60 * 30:
+                        feed.fail(entry, 'Move has been waiting unpacking for 30 minutes')
+                        continue
+                    size = os.path.getsize(src)
+                    time.sleep(1)
+                    new_size = os.path.getsize(src)
+                    if size != new_size:
+                        if not count % 10:
+                            log.verbose('File `%s` is possibly being unpacked, waiting ...' % filename)
+                    else:
+                        break
+                    count += 1
 
             # Move stuff
             if feed.manager.options.test:

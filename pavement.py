@@ -1,10 +1,10 @@
+import os
 from paver.easy import *
 import paver.virtual
 import paver.setuputils
 from paver import svn
 from paver.setuputils import setup, find_package_data, find_packages
 
-PROJECT_DIR = path(__file__).dirname()
 
 options = environment.options
 setup(
@@ -87,7 +87,6 @@ def test(options):
     args.append('--where=tests')
 
     # Store current path since --where changes it, restore when leaving
-    import os
     cwd = os.getcwd()
     try:
         return nose.run(argv=args, config=cfg)
@@ -230,7 +229,6 @@ def coverage():
     argv.extend(['--cover-package', 'flexget'])
     argv.extend(['--cover-html-dir', '/var/www/flexget_coverage/'])
     nose.run(argv=argv, config=cfg)
-
     print 'Coverage generated'
 
 
