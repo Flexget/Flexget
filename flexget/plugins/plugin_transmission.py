@@ -229,6 +229,7 @@ class PluginTransmission(TransmissionBase):
     @priority(135)
     @save_opener
     def on_feed_output(self, feed, config):
+        from transmissionrpc import TransmissionError
         config = self.prepare_config(config)
         # don't add when learning
         if feed.manager.options.learn:
@@ -247,8 +248,11 @@ class PluginTransmission(TransmissionBase):
         if feed.accepted:
             self.add_to_transmission(self.client, feed, config)
         if config['removewhendone']:
-            self.remove_finished(self.client)
-            
+            try:
+                self.remove_finished(self.client)
+            except TransmissionError, e:
+                log.error('Error while attempting to remove completed torrents from transmission: %s' % e)
+
     def _make_torrent_options_dict(self, config, entry):
 
         opt_dic = {}
