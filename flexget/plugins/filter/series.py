@@ -388,6 +388,8 @@ class FilterSeriesBase(object):
         options.accept('list', key='from_group').accept('text')
         # parse only
         options.accept('boolean', key='parse_only')
+        # This is a flag set by all_series and series_premiere plugins, it should not be set by the user
+        options.accept('boolean', key='series_guessed')
 
     def make_grouped_config(self, config):
         """Turns a simple series list into grouped format with a settings dict"""
