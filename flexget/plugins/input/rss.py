@@ -189,7 +189,11 @@ class InputRSS(object):
                 log.debug('Sending etag %s for feed %s' % (etag, feed.name))
             modified = feed.simple_persistence.get('%s_modified' % url_hash, None)
             if modified:
-                log.debug('Sending last-modified %s for feed %s' % (modified, feed.name))
+                if len(modified) != 9:
+                    log.debug('Invalid date was stored for last modified time.')
+                    modified = None
+                else:
+                    log.debug('Sending last-modified %s for feed %s' % (modified, feed.name))
 
         # set timeout to one minute
         orig_timout = socket.getdefaulttimeout()
@@ -293,7 +297,7 @@ class InputRSS(object):
             feed.simple_persistence['%s_etag' % url_hash] = rss.etag
             log.debug('etag %s saved for feed %s' % (rss.etag, feed.name))
         if rss.get('modified'):
-            feed.simple_persistence['%s_modified' % url_hash] = tuple(rss.modified)
+            feed.simple_persistence['%s_modified' % url_hash] = tuple(rss.feed.modified_parsed)
             log.debug('last modified %s saved for feed %s' % (rss.modified, feed.name))
 
         # new entries to be created
