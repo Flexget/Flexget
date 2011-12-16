@@ -81,6 +81,7 @@ class TorrentAlive(object):
         min_seeds = int(config)
 
         for entry in feed.accepted:
+            # TODO: shouldn't this still check min_seeds ?
             if entry.get('torrent_seeds'):
                 log.debug('Not checking trackers for seeds, as torrent_seeds is already filled.')
                 continue
@@ -108,10 +109,13 @@ class TorrentAlive(object):
                     log.debug('Highest number of seeds found: %s' % seeds)
                 else:
                     # Single tracker
+                    tracker = torrent.content['announce']
                     background = TorrentAliveThread(tracker, info_hash)
-                    background()
+                    background.start()
+                    background.join()
                     seeds = background.tracker_seeds
-                    #Final reject
+
+                # Reject if needed
                 if seeds < min_seeds:
                     feed.reject(entry, reason='Tracker(s) had < %s required seeds. (%s)' % (min_seeds, seeds),
                         remember_time='1 hour')
