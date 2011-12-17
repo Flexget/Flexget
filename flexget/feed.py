@@ -55,7 +55,7 @@ class Feed(object):
           parameters: feed
         """
         self.name = unicode(name)
-        self.config = config
+        self.original_config = config
         self.manager = manager
 
         # simple persistence
@@ -70,9 +70,13 @@ class Feed(object):
     def _reset(self):
         """Reset feed state"""
         log.debug('resetting %s' % self.name)
+        self.config = copy.deepcopy(self.original_config)
         self.enabled = True
         self.session = None
         self.priority = 65535
+
+        # This should not be used until after process_start, when it is evaluated
+        self.config_modified = None
 
         # undecided entries in the feed (created by input)
         self.entries = []

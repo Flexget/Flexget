@@ -183,7 +183,7 @@ class InputRSS(object):
         url_hash = str(hash(config['url']))
 
         # set etag and last modified headers if config has not changed since last run
-        if not feed.config_modified:
+        if feed.config_modified is False:
             etag = feed.simple_persistence.get('%s_etag' % url_hash, None)
             if etag:
                 log.debug('Sending etag %s for feed %s' % (etag, feed.name))
