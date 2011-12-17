@@ -268,7 +268,7 @@ class PluginTransmission(TransmissionBase):
 
         if opt_dic.get('path'):
             try:
-                options['add']['download_dir'] = os.path.expanduser(entry.render(opt_dic['path']))
+                options['add']['download_dir'] = os.path.expanduser(entry.render(opt_dic['path'])).encode('utf-8')
             except RenderError, e:
                 log.error('Error setting path for %s: %s' % (entry['title'], e))
         if opt_dic.get('addpaused'):
