@@ -27,7 +27,7 @@ def main():
         manager = Manager(options)
     except IOError, e:
         # failed to load config, TODO: why should it be handled here? So sys.exit isn't called in webui?
-        log.exception(e)
+        log.critical(e)
         logger.flush_logging_to_console()
         sys.exit(1)
 
