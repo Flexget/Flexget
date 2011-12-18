@@ -83,16 +83,19 @@ class FilterProperMovies(object):
         imdb_lookup = get_plugin_by_name('imdb_lookup').instance
 
         for entry in feed.entries:
-            if 'imdb_id' not in entry:
-                try:
-                    imdb_lookup.lookup(entry)
-                except PluginError, pe:
-                    log_once(pe.value)
-                    continue
 
             parser = MovieParser()
             parser.data = entry['title']
             parser.parse()
+
+            try:
+                imdb_id = imdb_lookup.imdb_id_lookup(movie_title=parser.name, raw_title=entry['title'])
+                if imdb_id is None:
+                    continue
+                entry['imdb_id'] = imdb_id
+            except PluginError, pe:
+                log_once(pe.value)
+                continue
 
             quality = parser.quality.name
 

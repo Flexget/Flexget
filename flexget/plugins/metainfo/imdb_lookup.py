@@ -222,11 +222,12 @@ class ImdbLookup(object):
         if raw_title:
             log.debug('imdb_id_lookup: trying cache with: %s' % raw_title)
             result = session.query(SearchResult).filter(SearchResult.title == raw_title).first()
-            # this title is hopeless, give up ..
-            if result.fails:
-                return None
-            log.debug('--> success! got %s returning %s' % (result, result.imdb_id))
-            return result.imdb_id
+            if result:
+                # this title is hopeless, give up ..
+                if result.fails:
+                    return None
+                log.debug('--> success! got %s returning %s' % (result, result.imdb_id))
+                return result.imdb_id
         if raw_title:
             # last hope with hacky lookup
             fake_entry = Entry(raw_title, '')
