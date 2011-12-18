@@ -1,3 +1,4 @@
+import os
 import logging
 import urlparse
 import xml.sax
@@ -98,6 +99,7 @@ class InputRSS(object):
         advanced.accept('boolean', key='ascii')
         advanced.accept('boolean', key='filename')
         advanced.accept('boolean', key='group_links')
+        advanced.accept('boolean', key='etag')
         return root
 
     def build_config(self, config):
@@ -114,6 +116,8 @@ class InputRSS(object):
         # use basic auth when needed
         if 'username' in config and 'password' in config:
             config['url'] = self.passwordize(config['url'], config['username'], config['password'])
+        # set default for etag
+        config.setdefault('etag', True)
         return config
 
     def passwordize(self, url, user, password):
@@ -141,7 +145,6 @@ class InputRSS(object):
             log.critical('Received content looks a bit like login page')
         if 'error' in data.lower():
             log.critical('Received content looks a bit like error page')
-        import os
         received = os.path.join(feed.manager.config_base, 'received')
         if not os.path.isdir(received):
             os.mkdir(received)
@@ -183,7 +186,7 @@ class InputRSS(object):
         url_hash = str(hash(config['url']))
 
         # set etag and last modified headers if config has not changed since last run
-        if feed.config_modified is False:
+        if config['etag'] and feed.config_modified is False:
             etag = feed.simple_persistence.get('%s_etag' % url_hash, None)
             if etag:
                 log.debug('Sending etag %s for feed %s' % (etag, feed.name))
@@ -293,12 +296,13 @@ class InputRSS(object):
         log.debug('encoding %s' % rss.encoding)
 
         # update etag and last modified if no etag exists
-        if rss.get('etag'):
-            feed.simple_persistence['%s_etag' % url_hash] = rss.etag
-            log.debug('etag %s saved for feed %s' % (rss.etag, feed.name))
-        if rss.get('modified'):
-            feed.simple_persistence['%s_modified' % url_hash] = tuple(rss.feed.modified_parsed)
-            log.debug('last modified %s saved for feed %s' % (rss.modified, feed.name))
+        if config['etag']:
+            if rss.get('etag'):
+                feed.simple_persistence['%s_etag' % url_hash] = rss.etag
+                log.debug('etag %s saved for feed %s' % (rss.etag, feed.name))
+            if rss.get('modified'):
+                feed.simple_persistence['%s_modified' % url_hash] = tuple(rss.modified_parsed)
+                log.debug('last modified %s saved for feed %s' % (rss.modified, feed.name))
 
         # new entries to be created
         entries = []
