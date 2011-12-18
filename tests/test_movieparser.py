@@ -32,6 +32,9 @@ class TestMovieParser:
         assert movie.name == 'Coraline', 'failed to parse %s' % movie.data
         assert movie.quality == '1080p bluray', 'failed to parse quality from %s' % movie.data
 
-        movie = self.parse('Slumdog.Millionaire.DVDRip.XviD-DASH')
+        movie = self.parse('Slumdog.Millionaire.DVDRip.XviD-FlexGet')
         assert movie.name == 'Slumdog Millionaire', 'failed to parse %s' % movie.data
         assert movie.quality == 'dvdrip', 'failed to parse quality from %s' % movie.data
+
+        movie = self.parse('TRON.Legacy.3D.2010.1080p.BluRay.Half.Over-Under.DTS.x264-FlexGet')
+        assert movie.name == 'TRON Legacy', 'failed to parse %s' % movie.data

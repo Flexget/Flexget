@@ -17,7 +17,7 @@ class TitleParser(object):
     editions = ['dc', 'extended', 'uncut', 'remastered', 'unrated', 'theatrical', 'chrono', 'se']
 
     cutoffs = ['limited', 'xvid', 'h264', 'x264', 'h.264', 'x.264', 'screener', 'unrated', '3d', 'extended',
-               'directors', 'multisubs'] + propers + specials + editions
+               'directors', 'multisubs', 'dubbed', 'subbed'] + propers + specials + editions
 
     remove = ['imax']
 

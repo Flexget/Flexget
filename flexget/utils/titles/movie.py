@@ -57,16 +57,16 @@ class MovieParser(TitleParser):
         parts = data.split(' ')
         year = None
         cut_part = 256
-        for part in parts:
+        for part_pos, part in enumerate(parts):
             cut = False
             # check for year
             if part.isdigit():
                 num = int(part)
-                if num > 1930 and num < 2050:
+                if 1930 < num < 2050:
                     year = part
                     cut = True
             # if length > 3 and whole word in uppers, consider as cut word (most likely a group name)
-            if len(part) > 3 and part.isupper() and part.isalpha():
+            if len(part) > 3 and part.isupper() and part.isalpha() and part_pos > 0:
                 cut = True
             # check for cutoff words
             if part.lower() in self.cutoffs:
@@ -77,7 +77,7 @@ class MovieParser(TitleParser):
                 cut = True
             # update cut position
             if cut and parts.index(part) < cut_part:
-                cut_part = parts.index(part)
+                cut_part = part_pos
 
         if cut_part != 256:
             log.debug('parts: %s, cut is: %s' % (parts, parts[cut_part]))

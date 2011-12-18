@@ -7,9 +7,12 @@ from flexget.utils import qualities
 
 
 def with_session(func):
-    """"A decorator which creates a session if one was not passed via keyword argument to the function.
+    """"
+    A decorator which creates a new session if one was not passed
+    via keyword argument to the function.
 
-    Automatically commits and closes the session if one was created, caller is responsible for commit if passed in.
+    Automatically commits and closes the session if one was created,
+    caller is responsible for commit if passed in.
     """
 
     def wrapper(*args, **kwargs):

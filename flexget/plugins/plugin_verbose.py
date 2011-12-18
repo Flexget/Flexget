@@ -22,6 +22,8 @@ class Verbose(object):
         self.verbose_details(feed, action='Failed', title=entry['title'], reason=reason)
 
     def verbose_details(self, feed, **kwarg):
+        if feed.manager.options.silent:
+            return
         kwarg['plugin'] = feed.current_plugin
         kwarg['action'] = kwarg['action'].upper()
 
@@ -36,6 +38,8 @@ class Verbose(object):
         feed_log.verbose(msg % kwarg)
 
     def on_feed_exit(self, feed):
+        if feed.manager.options.silent:
+            return
         # verbose undecided entries
         if feed.manager.options.verbose:
             for entry in feed.entries:
@@ -45,8 +49,9 @@ class Verbose(object):
 
     @priority(-512)
     def on_process_end(self, feed):
+        if feed.manager.options.silent:
+            return
         if feed.manager.options.verbose:
-
             log_once('About undecided entries: They were created by input plugins but were not accepted because '
                      'no (filter) plugin accepted them. If you want them to reach output, configure filters.',
                      logger=log)
@@ -54,3 +59,5 @@ class Verbose(object):
 register_plugin(Verbose, 'verbose', builtin=True)
 register_parser_option('-v', '--verbose', action='store_true', dest='verbose', default=False,
                        help='Verbose undecided entries.')
+register_parser_option('-s', '--silent', action='store_true', dest='silent', default=False,
+                       help='Don\'t verbose any actions (accept, reject, fail).')

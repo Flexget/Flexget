@@ -1,5 +1,7 @@
 import logging
 from datetime import datetime, timedelta
+from flexget.entry import Entry
+from flexget.utils.database import with_session
 from flexget.utils.sqlalchemy_utils import table_columns
 from sqlalchemy import Table, Column, Integer, Float, String, Unicode, Boolean, DateTime
 from sqlalchemy.schema import ForeignKey
@@ -55,6 +57,10 @@ class Movie(Base):
     # updated time, so we can grab new rating counts after 48 hours
     # set a default, so existing data gets updated with a rating
     updated = Column(DateTime)
+
+    @property
+    def imdb_id(self):
+        return extract_id(self.url)
 
     def __repr__(self):
         return '<Movie(name=%s,votes=%s,year=%s)>' % (self.title, self.votes, self.year)
@@ -117,9 +123,16 @@ class SearchResult(Base):
     url = Column(String)
     fails = Column(Boolean, default=False)
 
+    @property
+    def imdb_id(self):
+        return extract_id(self.url)
+
     def __init__(self, title, url=None):
         self.title = title
         self.url = url
+
+    def __repr__(self):
+        return '<SearchResult(title=%s,url=%s,fails=%s)>' % (self.title, self.url, self.fails)
 
 log = logging.getLogger('imdb_lookup')
 
@@ -189,6 +202,36 @@ class ImdbLookup(object):
             # Set all of our fields to None if the lookup failed
             entry.unregister_lazy_fields(self.field_map, self.lazy_loader)
         return entry[field]
+
+    @with_session
+    def imdb_id_lookup(self, movie_title=None, raw_title=None, session=None):
+        """
+        Perform faster lookup providing just imdb_id.
+        Falls back to using basic lookup if data cannot be found from cache.
+        :param movie_title: Name of the movie
+        :param raw_title: Raw entry title
+        :return int: imdb id
+        :raises PluginError: Failure reason
+        """
+        if movie_title:
+            log.debug('imdb_id_lookup: trying with title: %s' % movie_title)
+            movie = session.query(Movie).filter(Movie.title == movie_title).first()
+            if movie:
+                log.debug('--> success! got %s returning %s' % (movie, movie.imdb_id))
+                return movie.imdb_id
+        if raw_title:
+            log.debug('imdb_id_lookup: trying cache with: %s' % raw_title)
+            result = session.query(SearchResult).filter(SearchResult.title == raw_title).first()
+            # this title is hopeless, give up ..
+            if result.fails:
+                return None
+            log.debug('--> success! got %s returning %s' % (result, result.imdb_id))
+            return result.imdb_id
+        if raw_title:
+            # last hope with hacky lookup
+            fake_entry = Entry(raw_title, '')
+            self.lookup(fake_entry)
+            return fake_entry['imdb_id']
 
     @internet(log)
     def lookup(self, entry, search_allowed=True):

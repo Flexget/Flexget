@@ -1,7 +1,8 @@
 import os
 import logging
 from flexget.plugin import register_plugin, priority, PluginError, get_plugin_by_name
-from flexget.entry import Entry
+from flexget.utils.imdb import extract_id
+from flexget.utils.titles.movie import MovieParser
 
 log = logging.getLogger('exists_movie')
 
@@ -18,6 +19,9 @@ class FilterExistsMovie(object):
 
     skip = ['cd1', 'cd2', 'subs', 'sample']
 
+    def __init__(self):
+        self.cache = {}
+
     def validator(self):
         from flexget import validator
         root = validator.factory()
@@ -26,31 +30,41 @@ class FilterExistsMovie(object):
         bundle.accept('path')
         return root
 
-    def get_config(self, feed):
-        config = feed.config.get('exists_movie', [])
+    def build_config(self, config):
         # if only a single path is passed turn it into a 1 element list
         if isinstance(config, basestring):
             config = [config]
         return config
 
+    def on_process_start(self, feed, config):
+        self.cache = {}
+
     @priority(-1)
-    def on_feed_filter(self, feed):
+    def on_feed_filter(self, feed, config):
         if not feed.accepted:
             log.debug('nothing accepted, aborting')
             return
 
-        config = self.get_config(feed)
-        imdb_lookup = get_plugin_by_name('imdb_lookup').instance.lookup
+        config = self.build_config(config)
+        imdb_lookup = get_plugin_by_name('imdb_lookup').instance
 
         incompatible_dirs = 0
         incompatible_entries = 0
         count_entries = 0
         count_dirs = 0
 
-        # list of imdb urls gathered from paths
-        imdb_urls = []
+        # list of imdb ids gathered from paths / cache
+        imdb_ids = []
 
         for path in config:
+            # see if this path has already been scanned
+            if path in self.cache:
+                log.info('Using cached scan for %s' % path)
+                imdb_ids.extend(self.cache[path])
+                continue
+
+            path_ids = []
+
             # with unicode it crashes on some paths ..
             path = str(os.path.expanduser(path))
             if not os.path.exists(path):
@@ -66,42 +80,49 @@ class FilterExistsMovie(object):
                 # files = [x.decode('utf-8', 'ignore') for x in files]
 
                 # TODO: add also video files?
-
                 for item in dirs:
                     if item.lower() in self.skip:
                         continue
                     count_dirs += 1
-                    fake_entry = Entry()
-                    fake_entry['title'] = item
-                    fake_entry['url'] = 'file://%s/%s' % (path, item)
+
+                    movie = MovieParser()
+                    movie.parse(item)
+
                     try:
-                        imdb_lookup(fake_entry)
-                        imdb_url = fake_entry['imdb_url']
-                        if imdb_url in imdb_urls:
-                            log.trace('duplicate %s' % fake_entry['title'])
+                        imdb_id = imdb_lookup.imdb_id_lookup(movie_title=movie.name,
+                                                             raw_title=item,
+                                                             session=feed.session)
+                        if imdb_id in path_ids:
+                            log.trace('duplicate %s' % item)
                             continue
-                        imdb_urls.append(imdb_url)
+                        if imdb_ids is not None:
+                            path_ids.append(imdb_id)
                     except PluginError, e:
-                        log.trace('%s lookup failed (%s)' % (fake_entry['title'], e.value))
+                        log.trace('%s lookup failed (%s)' % (item, e.value))
                         incompatible_dirs += 1
+
+            # store to cache
+            self.cache[path] = path_ids
 
         log.debug('-- Start filtering entries ----------------------------------')
 
         # do actual filtering
         for entry in feed.accepted:
             count_entries += 1
-            if not 'imdb_url' in entry:
+            if not entry.get('imdb_id', lazy=False):
                 try:
-                    imdb_lookup(entry)
+                    imdb_lookup.lookup(entry)
                 except PluginError, e:
                     log.trace('entry %s imdb failed (%s)' % (entry['title'], e.value))
                     incompatible_entries += 1
                     continue
-            if entry['imdb_url'] in imdb_urls:
+
+            # actual filtering
+            if entry['imdb_id'] in imdb_ids:
                 feed.reject(entry, 'movie exists')
 
         if incompatible_dirs or incompatible_entries:
             log.verbose('There were some incompatible items. %s of %s entries and %s of %s directories could not be verified.' %
                 (incompatible_entries, count_entries, incompatible_dirs, count_dirs))
 
-register_plugin(FilterExistsMovie, 'exists_movie', groups=['exists'])
+register_plugin(FilterExistsMovie, 'exists_movie', groups=['exists'], api_ver=2)
