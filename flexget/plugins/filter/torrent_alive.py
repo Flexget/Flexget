@@ -15,6 +15,7 @@ class TorrentAliveThread(threading.Thread):
         threading.Thread.__init__(self)
         self.tracker = tracker
         self.hashfile = info_hash
+        self.tracker_seeds = 0
 
     def run(self):
         try:
