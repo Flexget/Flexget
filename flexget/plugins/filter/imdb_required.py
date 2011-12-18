@@ -6,11 +6,12 @@ log = logging.getLogger('imdb_required')
 
 class FilterImdbRequired(object):
     """
-        Rejects entries without imdb url.
+    Rejects entries without imdb_url or imdb_id.
+    Makes imdb lookup / search if necessary.
 
-        Example:
+    Example:
 
-        imdb_required: yes
+    imdb_required: yes
     """
 
     def validator(self):
@@ -24,7 +25,7 @@ class FilterImdbRequired(object):
                 get_plugin_by_name('imdb_lookup').instance.lookup(entry)
             except PluginError:
                 feed.reject(entry, 'imdb required')
-            if not 'imdb_url' in entry:
+            if 'imdb_url' not in entry and 'imdb_id' not in entry:
                 feed.reject(entry, 'imdb required')
 
 register_plugin(FilterImdbRequired, 'imdb_required')

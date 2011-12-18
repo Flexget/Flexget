@@ -192,8 +192,13 @@ class ImdbLookup(object):
 
     @internet(log)
     def lookup(self, entry, search_allowed=True):
-        """Perform imdb lookup for entry.
-        Raises PluginError with failure reason."""
+        """
+        Perform imdb lookup for entry.
+
+        :param entry: Entry instance
+        :param search_allowed: Allow fallback to search
+        :raises PluginError: Failure reason
+        """
 
         from flexget.manager import manager
 

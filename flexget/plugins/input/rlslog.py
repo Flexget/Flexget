@@ -1,13 +1,12 @@
 import urllib2
 import logging
-import re
 import zlib
+from BeautifulSoup import NavigableString
 from flexget.entry import Entry
-from flexget.plugin import register_plugin, internet, get_plugin_by_name, PluginWarning
+from flexget.plugin import register_plugin, internet, get_plugin_by_name, PluginError
 from flexget.utils.log import log_once
 from flexget.utils.soup import get_soup
 from flexget.utils.cached_input import cached
-from BeautifulSoup import NavigableString
 from flexget.utils.tools import urlopener
 
 log = logging.getLogger('rlslog')
@@ -15,34 +14,19 @@ log = logging.getLogger('rlslog')
 
 class RlsLog(object):
     """
-        Adds support for rlslog.net as a feed.
-
-        In case of movies the plugin supplies pre-parses IMDB-details
-        (helps when chaining with filter_imdb).
+    Adds support for rlslog.net as a feed.
     """
 
     def validator(self):
         from flexget import validator
         return validator.factory('url')
 
-    def parse_imdb(self, s):
-        score = None
-        votes = None
-        re_votes = re.compile('\((\d*).votes\)', re.IGNORECASE)
-        re_score = [re.compile('(\d\.\d)'), re.compile('(\d)/10')]
-        for r in re_score:
-            f = r.search(s)
-            if f is not None:
-                score = float(f.group(1))
-                break
-        f = re_votes.search(s.replace(',', ''))
-        if f is not None:
-            votes = int(f.group(1))
-        #log.debug("parse_imdb returning score: '%s' votes: '%s' from: '%s'" % (str(score), str(votes), s))
-        return (score, votes)
-
     def parse_rlslog(self, rlslog_url, feed):
-        """Parse configured url and return releases array"""
+        """
+        :param rlslog_url: Url to parse from
+        :param feed: Feed instance
+        :return: List of release dictionaries
+        """
 
         page = urlopener(rlslog_url, log)
         if page.headers.get('content-encoding') in ('gzip', 'x-gzip', 'deflate'):
@@ -63,12 +47,6 @@ class RlsLog(object):
                 continue
 
             log.trace('Processing title %s' % (release['title']))
-
-            rating = entrybody.find('strong', text=re.compile(r'imdb rating:', re.IGNORECASE))
-            if rating is not None:
-                score_raw = rating.next.string
-                if score_raw is not None:
-                    release['imdb_score'], release['imdb_votes'] = self.parse_imdb(score_raw)
 
             for link in entrybody.findAll('a'):
                 if not link.contents:
@@ -94,9 +72,6 @@ class RlsLog(object):
                     link_name = link_name.strip().lower()
                     if link_name == 'imdb':
                         release['imdb_url'] = link_href
-                        score_raw = link.next.next.string
-                        if not 'imdb_score' in release and not 'imdb_votes' in release and score_raw is not None:
-                            release['imdb_score'], release['imdb_votes'] = self.parse_imdb(score_raw)
 
                 # test if entry with this url would be recognized
                 temp = {'title': release['title'], 'url': link_href}
@@ -109,7 +84,7 @@ class RlsLog(object):
 
             # reject if no torrent link
             if not 'url' in release:
-                log_once('%s skipped due to missing or unsupported (unresolvable) download link' % (release['title']), log)
+                log_once('%s skipped due to missing or unsupported download link' % (release['title']), log)
             else:
                 releases.append(release)
 
@@ -120,7 +95,7 @@ class RlsLog(object):
     def on_feed_input(self, feed, config):
         url = config
         if url.endswith('feed/'):
-            raise PluginWarning('Invalid URL. Remove trailing feed/ from the url.')
+            raise PluginError('Invalid URL. Remove trailing feed/ from the url.')
 
         releases = []
         entries = []
@@ -146,8 +121,8 @@ class RlsLog(object):
             else:
                 break
 
+        # Construct entry from release
         for release in releases:
-            # construct entry from release
             entry = Entry()
 
             def apply_field(d_from, d_to, f):
@@ -156,7 +131,7 @@ class RlsLog(object):
                         return # None values are not wanted!
                     d_to[f] = d_from[f]
 
-            for field in ['title', 'url', 'imdb_url', 'imdb_score', 'imdb_votes']:
+            for field in ('title', 'url', 'imdb_url'):
                 apply_field(release, entry, field)
 
             entries.append(entry)

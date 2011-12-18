@@ -50,7 +50,10 @@ def purge(session):
 
 
 def log_once(message, logger=logging.getLogger('log_once')):
-    """Log message only once using given logger. Returns False if suppressed logging."""
+    """
+    Log message only once using given logger. Returns False if suppressed logging.
+    When suppressed verbose level is still logged.
+    """
 
     digest = hashlib.md5()
     digest.update(message.encode('latin1', 'replace')) # ticket:250
@@ -60,6 +63,7 @@ def log_once(message, logger=logging.getLogger('log_once')):
     try:
         # abort if this has already been logged
         if session.query(LogMessage).filter_by(md5sum=md5sum).first():
+            logger.verbose(message)
             return False
 
         row = LogMessage(md5sum)
