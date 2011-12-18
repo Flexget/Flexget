@@ -1,12 +1,11 @@
 """
-    Listens events:
+Listens events:
 
-    forget (string)
+forget (string)
 
-        Given string can be feed name, remembered field (url, imdb_url) or a title. If given value is a
-        feed name then everything in that feed will be forgotten. With title all learned fields from it and the
-        title will be forgotten. With field value only that particular field is forgotten.
-
+    Given string can be feed name, remembered field (url, imdb_url) or a title. If given value is a
+    feed name then everything in that feed will be forgotten. With title all learned fields from it and the
+    title will be forgotten. With field value only that particular field is forgotten.
 """
 
 import logging
@@ -31,8 +30,8 @@ def upgrade(ver, session):
         log.info('Converting seen imdb_url to imdb_id for seen movies.')
         field_table = table_schema('seen_field', session)
         for row in session.execute(select([field_table.c.id, field_table.c.value], field_table.c.field == 'imdb_url')):
-            session.execute(update(field_table, field_table.c.id == row['id'],
-                    {'field': 'imdb_id', 'value': extract_id(row['value'])}))
+            new_values = {'field': 'imdb_id', 'value': extract_id(row['value'])}
+            session.execute(update(field_table, field_table.c.id == row['id'], new_values))
         ver = 1
     return ver
 
@@ -80,6 +79,11 @@ class SeenField(Base):
 
 @event('forget')
 def forget(value):
+    """
+    See module docstring
+    :param string value: Can be feed name, entry title or field value
+    :return: count, field_count where count is number of entries removed and field_count number of fields
+    """
     log.debug('forget called with %s' % value)
     session = Session()
 
@@ -164,7 +168,7 @@ class MigrateSeen(object):
         index = 0
         for seen in session.query(Seen).all():
             index += 1
-            if (index % 10 == 0):
+            if not index % 10:
                 bar.update(index)
             se = SeenEntry(u'N/A', seen.feed, u'migrated')
             se.added = seen.added
