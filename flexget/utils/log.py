@@ -36,7 +36,7 @@ class LogMessage(Base):
         self.md5sum = md5sum
 
     def __repr__(self):
-        return "<LogMessage('%s')>" % (self.md5sum)
+        return "<LogMessage('%s')>" % self.md5sum
 
 
 @event('manager.db_cleanup')

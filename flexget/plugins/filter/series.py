@@ -20,7 +20,7 @@ from flexget.plugin import (register_plugin, register_parser_option, get_plugin_
 SCHEMA_VER = 2
 
 log = logging.getLogger('series')
-Base = schema.versioned_base('series', 2)
+Base = schema.versioned_base('series', SCHEMA_VER)
 
 
 @schema.upgrade('series')
