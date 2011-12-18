@@ -88,14 +88,16 @@ class FilterProperMovies(object):
             parser.data = entry['title']
             parser.parse()
 
-            try:
-                imdb_id = imdb_lookup.imdb_id_lookup(movie_title=parser.name, raw_title=entry['title'])
-                if imdb_id is None:
+            # if we have imdb_id already evaluated
+            if entry.get('imdb_id', None, lazy=False) is None:
+                try:
+                    imdb_id = imdb_lookup.imdb_id_lookup(movie_title=parser.name, raw_title=entry['title'])
+                    if imdb_id is None:
+                        continue
+                    entry['imdb_id'] = imdb_id
+                except PluginError, pe:
+                    log_once(pe.value)
                     continue
-                entry['imdb_id'] = imdb_id
-            except PluginError, pe:
-                log_once(pe.value)
-                continue
 
             quality = parser.quality.name
 
