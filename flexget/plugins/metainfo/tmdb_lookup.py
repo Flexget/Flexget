@@ -52,7 +52,8 @@ class PluginTmdbLookup(object):
             movie = lookup(smart_match=entry['title'], tmdb_id=entry.get('tmdb_id', lazy=False), imdb_id=imdb_id)
             entry.update_using_map(self.field_map, movie)
         except LookupError, e:
-            log.debug('Tmdb lookup for %s failed: %s' % (entry['title'], e))
+            msg = 'Tmdb lookup for %s failed: %s' % (entry['title'], e)
+            log.debug(msg)
             # Set all of our fields to None if the lookup failed
             entry.unregister_lazy_fields(self.field_map, self.lazy_loader)
         return entry[field]
