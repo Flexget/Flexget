@@ -94,15 +94,15 @@ class UrlRewriteIsoHunt(object):
             if not m:
                 log.debug('regexp did not find seeds / peer data')
                 continue
+            else:
+                log.debug('regexp found size(%s), Seeds(%s) and Leeches(%s)' % int(m.group(1)), int(m.group(2)), int(m.group(3)))
 
-            log.debug('regexp found size(%s), Seeds(%s) and Leeches(%s)' % int(m.group(1)), int(m.group(2)), int(m.group(3)))
+                entry['content_size'] = int(m.group(1))
+                entry['torrent_seeds'] = int(m.group(2))
+                entry['torrent_leeches'] = int(m.group(3))
+                entry['search_sort'] = torrent_availability(entry['torrent_seeds'], entry['torrent_leeches'])
 
-            entry['content_size'] = int(m.group(1))
-            entry['torrent_seeds'] = int(m.group(2))
-            entry['torrent_leeches'] = int(m.group(3))
-            entry['search_sort'] = torrent_availability(entry['torrent_seeds'], entry['torrent_leeches'])
             entries.append(entry)
-
         # choose torrent
         if not entries:
             raise PluginWarning('No close matches for %s' % name, log, log_once=True)
