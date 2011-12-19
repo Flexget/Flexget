@@ -105,6 +105,13 @@ def filter_pad(val, width, fillchar='0'):
     return str(val).rjust(width, fillchar)
 
 
+def filter_encode(val, encoding):
+    """Encodes a unicode string to given encoding. Also works on lazy fields."""
+    if isinstance(val, basestring):
+        return val.encode(encoding)
+    return unicode(val).encode(encoding)
+
+
 @event('manager.startup')
 def make_environment(manager):
     """Create our environment and add our custom filters"""

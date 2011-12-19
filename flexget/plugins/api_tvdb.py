@@ -333,7 +333,8 @@ def lookup_episode(name=None, seasonnum=None, episodenum=None, tvdb_id=None, onl
         # Try the lookup again if there are no errors but no data was returned
         for attempt in range(2):
             try:
-                data = BeautifulStoneSoup(urlopener(url)).data
+                raw_data = urlopener(url).read().decode('utf-8')
+                data = BeautifulStoneSoup(raw_data).data
                 if data:
                     ep_data = data.find('episode')
                     if ep_data:
@@ -352,7 +353,7 @@ def lookup_episode(name=None, seasonnum=None, episodenum=None, tvdb_id=None, onl
                 # urlopener already tries multiple times, no need to wait before raising our error
                 raise LookupError('Error looking up episode from TVDb (%s)' % e)
         else:
-            log.debug('No errors from tvdb, however no episode info was found. Data returned from tvdb: %s' % data)
+            log.debug('No errors from tvdb, however no episode info was found. Data returned from tvdb: %s' % raw_data)
     if episode:
         # Access the series attribute to force it to load before returning
         episode.series
