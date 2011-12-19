@@ -2,9 +2,9 @@ import logging
 from datetime import datetime, timedelta
 from flexget.entry import Entry
 from flexget.utils.database import with_session
-from flexget.utils.sqlalchemy_utils import table_columns
+from flexget.utils.sqlalchemy_utils import table_columns, get_index_by_name
 from sqlalchemy import Table, Column, Integer, Float, String, Unicode, Boolean, DateTime
-from sqlalchemy.schema import ForeignKey
+from sqlalchemy.schema import ForeignKey, MetaData, Index
 from sqlalchemy.orm import relation, joinedload_all
 from flexget import schema
 from flexget.plugin import register_plugin, internet, PluginError
@@ -13,24 +13,31 @@ from flexget.utils.log import log_once
 from flexget.utils.imdb import ImdbSearch, ImdbParser, extract_id, make_url
 from flexget.utils.sqlalchemy_utils import table_add_column
 
-Base = schema.versioned_base('imdb_lookup', 0)
+SCHEMA_VER = 1
+
+Base = schema.versioned_base('imdb_lookup', 1)
+
 
 # association tables
 genres_table = Table('imdb_movie_genres', Base.metadata,
     Column('movie_id', Integer, ForeignKey('imdb_movies.id')),
-    Column('genre_id', Integer, ForeignKey('imdb_genres.id')))
+    Column('genre_id', Integer, ForeignKey('imdb_genres.id')),
+    Index('ix_imdb_movie_genres', 'movie_id', 'genre_id'))
 
 languages_table = Table('imdb_movie_languages', Base.metadata,
     Column('movie_id', Integer, ForeignKey('imdb_movies.id')),
-    Column('language_id', Integer, ForeignKey('imdb_languages.id')))
+    Column('language_id', Integer, ForeignKey('imdb_languages.id')),
+    Index('ix_imdb_movie_languages', 'movie_id', 'language_id'))
 
 actors_table = Table('imdb_movie_actors', Base.metadata,
     Column('movie_id', Integer, ForeignKey('imdb_movies.id')),
-    Column('actor_id', Integer, ForeignKey('imdb_actors.id')))
+    Column('actor_id', Integer, ForeignKey('imdb_actors.id')),
+    Index('ix_imdb_movie_actors', 'movie_id', 'actor_id'))
 
 directors_table = Table('imdb_movie_directors', Base.metadata,
     Column('movie_id', Integer, ForeignKey('imdb_movies.id')),
-    Column('director_id', Integer, ForeignKey('imdb_directors.id')))
+    Column('director_id', Integer, ForeignKey('imdb_directors.id')),
+    Index('ix_imdb_movie_directors', 'movie_id', 'director_id'))
 
 
 class Movie(Base):
@@ -151,6 +158,20 @@ def upgrade(ver, session):
             log.info('Adding mpaa_rating column to imdb_movies table.')
             table_add_column('imdb_movies', 'mpaa_rating', String, session)
         ver = 0
+    if ver == 0:
+        # create indexes retrospectively (~r2563)
+        log.info('Adding imdb indexes delivering up to 20x speed increase \o/ ...')
+        indexes = [get_index_by_name(actors_table, 'ix_imdb_movie_actors'),
+                   get_index_by_name(genres_table, 'ix_imdb_movie_genres'),
+                   get_index_by_name(languages_table, 'ix_imdb_movie_languages'),
+                   get_index_by_name(directors_table, 'ix_imdb_movie_directors')]
+        for index in indexes:
+            if index is None:
+                log.critical('Index adding failure!')
+                continue
+            log.info('Creating index %s ...' % index.name)
+            index.create(bind=session.connection())
+        ver = 1
     return ver
 
 
@@ -316,7 +337,6 @@ class ImdbLookup(object):
                     session.add(result)
                     raise PluginError('Title `%s` lookup failed' % entry['title'])
 
-
             # check if this imdb page has been parsed & cached
             movie = session.query(Movie).\
                 options(joinedload_all(Movie.genres, Movie.languages,
@@ -341,46 +361,7 @@ class ImdbLookup(object):
                     log.verbose('Parsing imdb for `%s`' % entry['imdb_id'])
                 try:
                     take_a_break = True
-                    imdb = ImdbParser()
-                    imdb.parse(entry['imdb_url'])
-                    # store to database
-                    movie = Movie()
-                    movie.photo = imdb.photo
-                    movie.title = imdb.name
-                    movie.score = imdb.score
-                    movie.votes = imdb.votes
-                    movie.year = imdb.year
-                    movie.mpaa_rating = imdb.mpaa_rating
-                    movie.plot_outline = imdb.plot_outline
-                    movie.url = entry['imdb_url']
-                    for name in imdb.genres:
-                        genre = session.query(Genre).\
-                            filter(Genre.name == name).first()
-                        if not genre:
-                            genre = Genre(name)
-                        movie.genres.append(genre) # pylint:disable=E1101
-                    for name in imdb.languages:
-                        language = session.query(Language).\
-                            filter(Language.name == name).first()
-                        if not language:
-                            language = Language(name)
-                        movie.languages.append(language) # pylint:disable=E1101
-                    for imdb_id, name in imdb.actors.iteritems():
-                        actor = session.query(Actor).\
-                            filter(Actor.imdb_id == imdb_id).first()
-                        if not actor:
-                            actor = Actor(imdb_id, name)
-                        movie.actors.append(actor) # pylint:disable=E1101
-                    for imdb_id, name in imdb.directors.iteritems():
-                        director = session.query(Director).\
-                            filter(Director.imdb_id == imdb_id).first()
-                        if not director:
-                            director = Director(imdb_id, name)
-                        movie.directors.append(director) # pylint:disable=E1101
-                    # so that we can track how long since we've updated the info later
-                    movie.updated = datetime.now()
-                    session.add(movie)
-
+                    movie = self._parse_new_movie(entry['imdb_url'], session)
                 except UnicodeDecodeError:
                     log.error('Unable to determine encoding for %s. Installing chardet library may help.' % entry['imdb_url'])
                     # store cache so this will not be tried again
@@ -409,5 +390,53 @@ class ImdbLookup(object):
         finally:
             log.trace('committing session')
             session.commit()
+
+    def _parse_new_movie(self, imdb_url, session):
+        """
+        Get Movie object by parsing imdb page and save movie into the database.
+        :param imdb_url: Imdb url
+        :param session: Session to be used
+        :return: Newly added Movie
+        """
+        imdb_parser = ImdbParser()
+        imdb_parser.parse(imdb_url)
+        # store to database
+        movie = Movie()
+        movie.photo = imdb_parser.photo
+        movie.title = imdb_parser.name
+        movie.score = imdb_parser.score
+        movie.votes = imdb_parser.votes
+        movie.year = imdb_parser.year
+        movie.mpaa_rating = imdb_parser.mpaa_rating
+        movie.plot_outline = imdb_parser.plot_outline
+        movie.url = imdb_url
+        for name in imdb_parser.genres:
+            genre = session.query(Genre).\
+            filter(Genre.name == name).first()
+            if not genre:
+                genre = Genre(name)
+            movie.genres.append(genre) # pylint:disable=E1101
+        for name in imdb_parser.languages:
+            language = session.query(Language).\
+            filter(Language.name == name).first()
+            if not language:
+                language = Language(name)
+            movie.languages.append(language) # pylint:disable=E1101
+        for imdb_id, name in imdb_parser.actors.iteritems():
+            actor = session.query(Actor).\
+            filter(Actor.imdb_id == imdb_id).first()
+            if not actor:
+                actor = Actor(imdb_id, name)
+            movie.actors.append(actor) # pylint:disable=E1101
+        for imdb_id, name in imdb_parser.directors.iteritems():
+            director = session.query(Director).\
+            filter(Director.imdb_id == imdb_id).first()
+            if not director:
+                director = Director(imdb_id, name)
+            movie.directors.append(director) # pylint:disable=E1101
+            # so that we can track how long since we've updated the info later
+        movie.updated = datetime.now()
+        session.add(movie)
+        return movie
 
 register_plugin(ImdbLookup, 'imdb_lookup', api_ver=2)

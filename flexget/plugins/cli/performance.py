@@ -14,7 +14,7 @@ query_count = 0
 
 def log_query_count(name_point):
     """Debugging purposes, allows logging number of executed queries at :name_point:"""
-    log.info('at point %s total of %s queries were ran' % (name_point, query_count))
+    log.info('At point named `%s` total of %s queries were ran' % (name_point, query_count))
 
 
 @event('manager.startup')

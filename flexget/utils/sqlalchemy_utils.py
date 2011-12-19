@@ -78,3 +78,14 @@ def drop_tables(names, session):
     for table in metadata.sorted_tables:
         if table.name in names:
             table.drop()
+
+
+def get_index_by_name(table, name):
+    """
+    :param table: Table object
+    :param name: Name of the index to get
+    :return: Index object
+    """
+    for index in table.indexes:
+        if index.name == name:
+            return index
