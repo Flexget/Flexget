@@ -11,8 +11,7 @@ log = logging.getLogger('isohunt')
 
 class UrlRewriteIsoHunt(object):
     """IsoHunt urlrewriter and search plugin.
-    
-    
+
     should accept: 
     isohunt: <category>
       
@@ -103,12 +102,12 @@ class UrlRewriteIsoHunt(object):
                 entry['search_sort'] = torrent_availability(entry['torrent_seeds'], entry['torrent_leeches'])
                 entries.append(entry)
 
-                # choose torrent
-                if not entries:
-                    raise PluginWarning('No close matches for %s' % name, log, log_once=True)
+            # choose torrent
+            if not entries:
+                raise PluginWarning('No close matches for %s' % name, log, log_once=True)
 
-                entries.sort(reverse=True, key=lambda x: x.get('search_sort'))
+            entries.sort(reverse=True, key=lambda x: x.get('search_sort'))
 
-                return entries
+            return entries
 
 register_plugin(UrlRewriteIsoHunt, 'isohunt', groups=['urlrewriter', 'search'])
