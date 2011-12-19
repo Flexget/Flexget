@@ -95,7 +95,7 @@ class UrlRewriteIsoHunt(object):
                 log.debug('regexp did not find seeds / peer data')
                 continue
             else:
-                log.debug('regexp found size(%s), Seeds(%s) and Leeches(%s)' % int(m.group(1)), int(m.group(2)), int(m.group(3)))
+                log.debug('regexp found size(%s), Seeds(%s) and Leeches(%s)' % (m.group(1), m.group(2), m.group(3)))
 
                 entry['content_size'] = int(m.group(1))
                 entry['torrent_seeds'] = int(m.group(2))
