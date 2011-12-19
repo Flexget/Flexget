@@ -59,7 +59,7 @@ class FilterExistsMovie(object):
         for path in config:
             # see if this path has already been scanned
             if path in self.cache:
-                log.info('Using cached scan for %s' % path)
+                log.verbose('Using cached scan for %s ...' % path)
                 imdb_ids.extend(self.cache[path])
                 continue
 
