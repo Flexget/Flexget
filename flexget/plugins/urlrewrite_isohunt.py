@@ -75,6 +75,8 @@ class UrlRewriteIsoHunt(object):
             raise PluginWarning('Got bozo_exception (bad feed)')
 
         for item in rss.entries:
+
+
             # assign confidence score of how close this link is to the name you're looking for. .6 and above is "close"
             comparator.set_seq2(item.title)
             log.debug('name: %s' % comparator.a)
@@ -83,31 +85,30 @@ class UrlRewriteIsoHunt(object):
             if not comparator.matches():
                 continue
 
+            entry = Entry()
+            entry['title'] = item.title
+            entry['url'] = item.link
+            entry['search_ratio'] = comparator.ratio()
+
             m = re.search(r'Size: ([\d]+).*Seeds: (\d+).*Leechers: (\d+)', item.description, re.IGNORECASE)
             if not m:
                 log.debug('regexp did not find seeds / peer data')
                 continue
-            else:
-                log.debug('regexp found size: %s' % int(m.group(1)))
-                log.debug('regexp found Seeds: %s' % int(m.group(2)))
-                log.debug('regexp found Leeches: %s' % int(m.group(3)))
 
-                entry = Entry()
-                entry['title'] = item.title
-                entry['url'] = item.link
-                entry['content_size'] = int(m.group(1))
-                entry['torrent_seeds'] = int(m.group(2))
-                entry['torrent_leeches'] = int(m.group(3))
-                entry['search_ratio'] = comparator.ratio()
-                entry['search_sort'] = torrent_availability(entry['torrent_seeds'], entry['torrent_leeches'])
-                entries.append(entry)
+            log.debug('regexp found size(%s), Seeds(%s) and Leeches(%s)' % int(m.group(1)), int(m.group(2)), int(m.group(3)))
 
-            # choose torrent
-            if not entries:
-                raise PluginWarning('No close matches for %s' % name, log, log_once=True)
+            entry['content_size'] = int(m.group(1))
+            entry['torrent_seeds'] = int(m.group(2))
+            entry['torrent_leeches'] = int(m.group(3))
+            entry['search_sort'] = torrent_availability(entry['torrent_seeds'], entry['torrent_leeches'])
+            entries.append(entry)
 
-            entries.sort(reverse=True, key=lambda x: x.get('search_sort'))
+        # choose torrent
+        if not entries:
+            raise PluginWarning('No close matches for %s' % name, log, log_once=True)
 
-            return entries
+        entries.sort(reverse=True, key=lambda x: x.get('search_sort'))
+
+        return entries
 
 register_plugin(UrlRewriteIsoHunt, 'isohunt', groups=['urlrewriter', 'search'])
