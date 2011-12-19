@@ -92,6 +92,7 @@ class PluginFailed(object):
                 item.count += 1
                 item.tof = datetime.now()
             failed.merge(item)
+            log.debug('Marking %s in failed list. Has failed %s times.' % (item.title, item.count))
 
             # limit item number to 25
             for row in failed.query(FailedEntry).order_by(FailedEntry.tof.desc())[25:]:
