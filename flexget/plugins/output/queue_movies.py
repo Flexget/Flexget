@@ -36,9 +36,9 @@ class QueueMovies(object):
             # Find one or both movie id's for this entry. See if an id is already populated before incurring lazy lookup
             kwargs = {}
             for lazy in [False, True]:
-                if entry.get('imdb_id', lazy=lazy):
+                if entry.get('imdb_id', eval_lazy=lazy):
                     kwargs['imdb_id'] = entry['imdb_id']
-                if entry.get('tmdb_id', lazy=lazy):
+                if entry.get('tmdb_id', eval_lazy=lazy):
                     kwargs['tmdb_id'] = entry['tmdb_id']
                 if kwargs:
                     break

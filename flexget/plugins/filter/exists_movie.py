@@ -109,7 +109,7 @@ class FilterExistsMovie(object):
         # do actual filtering
         for entry in feed.accepted:
             count_entries += 1
-            if not entry.get('imdb_id', lazy=False):
+            if not entry.get('imdb_id', eval_lazy=False):
                 try:
                     imdb_lookup.lookup(entry)
                 except PluginError, e:

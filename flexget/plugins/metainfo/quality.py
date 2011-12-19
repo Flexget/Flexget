@@ -28,7 +28,7 @@ class MetainfoQuality(object):
         return entry.get(field)
 
     def get_quality(self, entry):
-        if entry.get('quality', lazy=False):
+        if entry.get('quality', eval_lazy=False):
             log.debug('Quality is already set to %s for %s, skipping quality detection.' %
                       (entry['quality'], entry['title']))
             return

@@ -97,7 +97,7 @@ class PluginThetvdbLookup(object):
     def lazy_series_lookup(self, entry, field):
         """Does the lookup for this entry and populates the entry fields."""
         try:
-            series = lookup_series(entry.get('series_name', lazy=False), tvdb_id=entry.get('thetvdb_id', lazy=False))
+            series = lookup_series(entry.get('series_name', eval_lazy=False), tvdb_id=entry.get('thetvdb_id', eval_lazy=False))
             entry.update_using_map(self.series_map, series)
         except LookupError, e:
             log.debug('Error looking up tvdb series information for %s: %s' % (entry['title'], e.message))
@@ -120,10 +120,10 @@ class PluginThetvdbLookup(object):
             if season_offset != 0 or episode_offset != 0:
                 log.debug('Using offset for tvdb lookup: season: %s, episode: %s' % (season_offset, episode_offset))
 
-            episode = lookup_episode(entry.get('series_name', lazy=False),
+            episode = lookup_episode(entry.get('series_name', eval_lazy=False),
                                      entry['series_season'] + season_offset,
                                      entry['series_episode'] + episode_offset,
-                                     tvdb_id=entry.get('thetvdb_id', lazy=False))
+                                     tvdb_id=entry.get('thetvdb_id', eval_lazy=False))
             entry.update_using_map(self.episode_map, episode)
         except LookupError, e:
             log.debug('Error looking up tvdb episode information for %s: %s' % (entry['title'], e.message))
@@ -139,7 +139,7 @@ class PluginThetvdbLookup(object):
 
         for entry in feed.entries:
             # If there is information for a series lookup, register our series lazy fields
-            if entry.get('series_name') or entry.get('thetvdb_id', lazy=False):
+            if entry.get('series_name') or entry.get('thetvdb_id', eval_lazy=False):
                 entry.register_lazy_fields(self.series_map, self.lazy_series_lookup)
 
                 # If there is season and ep info as well, register episode lazy fields

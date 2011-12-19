@@ -1,17 +1,17 @@
 import logging
 from datetime import datetime, timedelta
-from flexget.entry import Entry
-from flexget.utils.database import with_session
-from flexget.utils.sqlalchemy_utils import table_columns, get_index_by_name
 from sqlalchemy import Table, Column, Integer, Float, String, Unicode, Boolean, DateTime
-from sqlalchemy.schema import ForeignKey, MetaData, Index
+from sqlalchemy.schema import ForeignKey, Index
 from sqlalchemy.orm import relation, joinedload_all
 from flexget import schema
+from flexget.entry import Entry
 from flexget.plugin import register_plugin, internet, PluginError
 from flexget.manager import Session
 from flexget.utils.log import log_once
 from flexget.utils.imdb import ImdbSearch, ImdbParser, extract_id, make_url
 from flexget.utils.sqlalchemy_utils import table_add_column
+from flexget.utils.database import with_session
+from flexget.utils.sqlalchemy_utils import table_columns, get_index_by_name
 
 SCHEMA_VER = 1
 
@@ -68,6 +68,18 @@ class Movie(Base):
     @property
     def imdb_id(self):
         return extract_id(self.url)
+
+    @property
+    def expired(self):
+        """
+        :return: True if movie details are considered to be expired, ie. need of update
+        """
+        refresh_interval = 2
+        if self.year:
+            age = (datetime.now().year - self.year)
+            refresh_interval += age * 5
+            log.debug('movie `%s` age %i expires in %i days' % (self.title, age, refresh_interval))
+        return self.updated < datetime.now() - timedelta(days=refresh_interval)
 
     def __repr__(self):
         return '<Movie(name=%s,votes=%s,year=%s)>' % (self.title, self.votes, self.year)
@@ -267,11 +279,11 @@ class ImdbLookup(object):
 
         from flexget.manager import manager
 
-        if entry.get('imdb_url', lazy=False):
+        if entry.get('imdb_url', eval_lazy=False):
             log.debug('No title passed. Lookup for %s' % entry['imdb_url'])
-        elif entry.get('imdb_id', lazy=False):
+        elif entry.get('imdb_id', eval_lazy=False):
             log.debug('No title passed. Lookup for %s' % entry['imdb_id'])
-        elif entry.get('title', lazy=False):
+        elif entry.get('title', eval_lazy=False):
             log.debug('lookup for %s' % entry['title'])
         else:
             raise PluginError('looking up IMDB for entry failed, no title, imdb_url or imdb_id passed.')
@@ -282,17 +294,17 @@ class ImdbLookup(object):
         try:
             # entry sanity checks
             for field in ['imdb_votes', 'imdb_score']:
-                if entry.get(field, lazy=False):
+                if entry.get(field, eval_lazy=False):
                     value = entry[field]
                     if not isinstance(value, (int, float)):
                         raise PluginError('Entry field %s should be a number!' % field)
 
             # if imdb_id is included, build the url.
-            if entry.get('imdb_id', lazy=False) and not entry.get('imdb_url', lazy=False):
+            if entry.get('imdb_id', eval_lazy=False) and not entry.get('imdb_url', eval_lazy=False):
                 entry['imdb_url'] = make_url(entry['imdb_id'])
 
             # make sure imdb url is valid
-            if entry.get('imdb_url', lazy=False):
+            if entry.get('imdb_url', eval_lazy=False):
                 imdb_id = extract_id(entry['imdb_url'])
                 if imdb_id:
                     entry['imdb_url'] = make_url(imdb_id)
@@ -302,7 +314,7 @@ class ImdbLookup(object):
 
             # no imdb_url, check if there is cached result for it or if the
             # search is known to fail
-            if not entry.get('imdb_url', lazy=False):
+            if not entry.get('imdb_url', eval_lazy=False):
                 result = session.query(SearchResult).\
                          filter(SearchResult.title == entry['title']).first()
                 if result:
@@ -316,7 +328,7 @@ class ImdbLookup(object):
                             entry['imdb_url'] = result.url
 
             # no imdb url, but information required, try searching
-            if not entry.get('imdb_url', lazy=False) and search_allowed:
+            if not entry.get('imdb_url', eval_lazy=False) and search_allowed:
                 log.verbose('Searching from imdb `%s`' % entry['title'])
 
                 take_a_break = True
@@ -343,17 +355,22 @@ class ImdbLookup(object):
                 Movie.actors, Movie.directors)).\
                 filter(Movie.url == entry['imdb_url']).first()
 
-            refresh_interval = 2
-            if movie:
-                if movie.year:
-                    age = (datetime.now().year - movie.year)
-                    refresh_interval += age * 5
-                    log.debug('cached movie `%s` age %i refresh interval %i days' % (movie.title, age, refresh_interval))
+            # determine whether or not movie details needs to be parsed
+            req_parse = False
+            if not movie:
+                req_parse = True
+            elif movie.updated is None:
+                req_parse = True
+            elif movie.expired:
+                req_parse = True
 
-            if not movie or movie.updated is None or \
-               movie.updated < datetime.now() - timedelta(days=refresh_interval):
-                # Remove the old movie, we'll store another one later.
-                session.query(Movie).filter(Movie.url == entry['imdb_url']).delete()
+            if req_parse:
+                if movie is not None:
+                    if movie.expired:
+                        log.verbose('Movie `%s` details expired, refreshing ...' % movie.title)
+                    # Remove the old movie, we'll store another one later.
+                    session.query(Movie).filter(Movie.url == entry['imdb_url']).delete()
+
                 # search and store to cache
                 if 'title' in entry:
                     log.verbose('Parsing imdb for `%s`' % entry['title'])

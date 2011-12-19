@@ -10,8 +10,9 @@ except ImportError:
     try:
         import json
     except ImportError:
-        raise DependencyError(issued_by='trakt_acquired', missing='simplejson', message='trakt_acquired requires either '
-                'simplejson module or python > 2.5')
+        raise DependencyError(issued_by='trakt_acquired', missing='simplejson',
+                              message='trakt_acquired requires either '
+                                      'simplejson module or python > 2.5')
 
 log = logging.getLogger('trakt_acquired')
 
@@ -46,20 +47,22 @@ class TraktAcquired(object):
                         if entry.get('thetvdb_id'):
                             series['tvdb_id'] = entry['thetvdb_id']
                         series['episodes'] = []
-                    series['episodes'].append({'season': entry['series_season'], 'episode': entry['series_episode']})
-                    log.debug('Marking %s S%02dE%02d for submission to trakt.tv library.' % (entry['series_name'], entry['series_season'], entry['series_episode']))
+                    episode = {'season': entry['series_season'], 'episode': entry['series_episode']}
+                    series['episodes'].append(episode)
+                    log.debug('Marking %s S%02dE%02d for submission to trakt.tv library.' % \
+                              (entry['series_name'], entry['series_season'], entry['series_episode']))
             else:
                 # Check entry is a movie
                 if entry.get('imdb_id') or entry.get('tmdb_id'):
                     movie = {}
                     # We know imdb_id or tmdb_id is filled in, so don't cause any more lazy lookups
-                    if entry.get('movie_name', lazy=False):
+                    if entry.get('movie_name', eval_lazy=False):
                         movie['title'] = entry['movie_name']
-                    if entry.get('movie_year', lazy=False):
+                    if entry.get('movie_year', eval_lazy=False):
                         movie['year'] = entry['movie_year']
-                    if entry.get('tmdb_id', lazy=False):
+                    if entry.get('tmdb_id', eval_lazy=False):
                         movie['tmdb_id'] = entry['tmdb_id']
-                    if entry.get('imdb_id', lazy=False):
+                    if entry.get('imdb_id', eval_lazy=False):
                         movie['imdb_id'] = entry['imdb_id']
                     # We use an extra container dict so that the found dict is usable in the same way as found series
                     found.setdefault('movies', {}).setdefault('movies', []).append(movie)
@@ -96,7 +99,7 @@ class TraktAcquired(object):
                         continue
                 log.error('Error submitting data to trakt.tv: %s' % e)
                 continue
-                
+
     def post_json_to_trakt(self, url, data):
         """Dumps data as json and POSTs it to the specified url."""
         req = urllib2.Request(url, json.dumps(data), {'content-type': 'application/json'})

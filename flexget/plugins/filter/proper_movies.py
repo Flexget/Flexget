@@ -89,7 +89,7 @@ class FilterProperMovies(object):
             parser.parse()
 
             # if we have imdb_id already evaluated
-            if entry.get('imdb_id', None, lazy=False) is None:
+            if entry.get('imdb_id', None, eval_lazy=False) is None:
                 try:
                     imdb_id = imdb_lookup.imdb_id_lookup(movie_title=parser.name, raw_title=entry['title'])
                     if imdb_id is None:

@@ -60,9 +60,9 @@ class FilterMovieQueue(queue_base.FilterQueueBase):
         conditions = []
         # Check if a movie id is already populated before incurring a lazy lookup
         for lazy in [False, True]:
-            if entry.get('imdb_id', lazy=lazy):
+            if entry.get('imdb_id', eval_lazy=lazy):
                 conditions.append(QueuedMovie.imdb_id == entry['imdb_id'])
-            if entry.get('tmdb_id', lazy=lazy):
+            if entry.get('tmdb_id', eval_lazy=lazy):
                 conditions.append(QueuedMovie.tmdb_id == entry['tmdb_id'])
             if conditions:
                 break

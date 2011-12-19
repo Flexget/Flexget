@@ -1,6 +1,9 @@
 from tests import FlexGetBase
 from nose.plugins.attrib import attr
 
+# TODO: these tests don't work outside US due imdb implementing geoip based crappy name translation
+# imdb_name needs to be replaced with our own title lookup
+
 
 class TestImdb(FlexGetBase):
 
@@ -140,6 +143,7 @@ class TestImdb(FlexGetBase):
     @attr(online=True)
     def test_score(self):
         self.execute_feed('score')
+        assert self.feed.find_entry(imdb_name='The Matrix'), 'The Matrix not found'
         matrix = float(self.feed.find_entry(imdb_name='The Matrix')['imdb_score'])
         # Currently The Matrix has an 8.7, check a range in case it changes
         assert matrix > 8.6 and matrix < 8.8, \

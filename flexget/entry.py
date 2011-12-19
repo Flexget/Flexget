@@ -130,9 +130,19 @@ class Entry(dict):
         else:
             return result
 
-    def get(self, key, default=None, lazy=True):
-        """Overridden so that our __getitem__ gets used for LazyFields"""
-        if not lazy and self.is_lazy(key):
+    def get(self, key, default=None, eval_lazy=True, lazy=None):
+        """
+        Overridden so that our __getitem__ gets used for LazyFields
+        :param string key: Name of the key
+        :param object default: Value to be returned if key does not exists
+        :param boolean eval_lazy: Allow evaluating LazyFields or not
+        :param lazy: Backwards compatibility
+        :return:
+        """
+        if lazy is not None:
+            log.warning('deprecated lazy kwarg used')
+            eval_lazy = lazy
+        if not eval_lazy and self.is_lazy(key):
             return default
         try:
             return self[key]
@@ -155,7 +165,7 @@ class Entry(dict):
             if self.is_lazy(field):
                 # If the field is already a lazy field, append this function to it's list of functions
                 dict.get(self, field).funcs.append(func)
-            elif not self.get(field, lazy=False):
+            elif not self.get(field, eval_lazy=False):
                 # If it is not a lazy field, and isn't already populated, make it a lazy field
                 self[field] = LazyField(self, field, func)
 
