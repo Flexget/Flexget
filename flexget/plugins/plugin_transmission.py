@@ -99,6 +99,9 @@ class TransmissionBase(object):
             raise PluginError('Transmissionrpc module version 0.6 or higher required.', log)
         if [int(part) for part in transmissionrpc.__version__.split('.')] < [0, 6]:
             raise PluginError('Transmissionrpc module version 0.6 or higher required, please upgrade', log)
+
+    @save_opener
+    def on_feed_start(self, feed, config):
         config = self.prepare_config(config)
         if config['enabled']:
             if feed.manager.options.test:

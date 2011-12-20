@@ -314,11 +314,11 @@ class Manager(object):
             if indentation > prev_indentation + 2 and prev_mapping and not prev_list:
                 # mapping value after non list indented more than 2
                 log.warning('Config line %s is indented too much' % line_num)
-            if indentation <= prev_indentation + 2 and prev_mapping and prev_list:
+            if indentation <= prev_indentation + (2 * (not cur_list)) and prev_mapping and prev_list:
                 log.warning('Config line %s is not indented enough' % line_num)
             if prev_mapping and cur_list:
                 # list after opening mapping
-                if indentation < prev_indentation or indentation > prev_indentation + 2:
+                if indentation < prev_indentation or indentation > prev_indentation + 2 + (2 * prev_list):
                     log.warning('Config line %s containing list element is indented incorrectly' % line_num)
             elif prev_mapping and indentation <= prev_indentation:
                 # after opening a map, indentation doesn't increase
