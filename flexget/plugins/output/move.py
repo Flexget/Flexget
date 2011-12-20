@@ -36,13 +36,10 @@ class MovePlugin(object):
         return root
 
     def on_feed_output(self, feed, config):
-        if isinstance(config, bool):
-            # if plugin is disabled
-            if not config:
-                return
-            # if not, turn into dict config
+        if config is True:
             config = {}
-
+        elif config is False:
+            return
         for entry in feed.accepted:
             if not 'location' in entry:
                 log.warning('Cannot move `%s` because entry does not have location field.' % entry['title'])
