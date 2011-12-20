@@ -111,13 +111,7 @@ class UrlRewritePirateBay(object):
             else:
                 raise PluginWarning('No close matches for %s' % name, log, log_once=True)
 
-        def score(a):
-            return torrent_availability(a['torrent_seeds'], a['torrent_leeches'])
-
-        entries.sort(reverse=True, key=lambda x: x.get('search_sorted'))
-
-        #for torrent in torrents:
-        #    log.debug('%s link: %s' % (torrent, torrent['link']))
+        entries.sort(reverse=True, key=lambda x: x.get('search_sort'))
 
         return entries
 
