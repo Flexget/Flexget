@@ -39,5 +39,6 @@ class Listdir(plugin.Plugin):
                     filepath = '/' + filepath
                 e['url'] = 'file://%s' % filepath
                 e['location'] = os.path.join(path, name)
+                e['filename'] = name
                 entries.append(e)
         return entries

@@ -76,6 +76,7 @@ class InputFind(object):
                         continue
                     filepath = os.path.join(item[0], name)
                     e['location'] = filepath
+                    e['filename'] = name
                     # Windows paths need an extra / prepended to them for url
                     if not filepath.startswith('/'):
                         filepath = '/' + filepath

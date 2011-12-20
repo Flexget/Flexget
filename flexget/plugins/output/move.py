@@ -62,6 +62,8 @@ class MovePlugin(object):
                 log.error('Value replacement failed for `%s`' % entry['title'])
                 continue
             filename = os.path.split(src)[1]
+            if entry.get('filename'):
+                filename = entry['filename']
             dst = os.path.join(dst_path, filename)
 
             if not os.path.exists(dst_path):

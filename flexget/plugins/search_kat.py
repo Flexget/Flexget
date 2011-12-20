@@ -1,5 +1,4 @@
 import logging
-import re
 import urllib
 import feedparser
 from flexget.entry import Entry
