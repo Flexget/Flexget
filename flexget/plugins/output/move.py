@@ -29,12 +29,15 @@ class MovePlugin(object):
         root.accept('boolean')
         config = root.accept('dict')
         config.accept('path', key='to', allow_replacement=True)
+        config.accept('text', key='filename')
         config.accept('boolean', key='unpack_safety')
         #config.accept('list', key='move_with').accept('text') # TODO
         config.accept('number', key='clean_source')
-        return config
+        return root
 
     def on_feed_output(self, feed, config):
+        if config is True:
+            config = {}
         for entry in feed.accepted:
             if not 'location' in entry:
                 log.warning('Cannot move `%s` because entry does not have location field.' % entry['title'])
@@ -50,21 +53,22 @@ class MovePlugin(object):
                 continue
 
             # DST
-            dst_path = entry.get('to', config.get('to'))
-            if dst_path is None:
-                log.warning('Cannot move `%s` because neither config or entry tells where it should be moved to' %
-                            entry['title'])
-                continue
+            filepath, filename = os.path.split(src)
+            dst_path = entry.get('path', config.get('to', filepath))
+            dst_filename = entry.get('filename')
+            if dst_filename == filename:
+                dst_filename = config.get('filename', filename)
 
             try:
                 dst_path = entry.render(dst_path)
+                dst_filename = entry.render(dst_filename)
             except RenderError, e:
                 log.error('Value replacement failed for `%s`' % entry['title'])
                 continue
-            filename = os.path.split(src)[1]
-            if entry.get('filename'):
-                filename = entry['filename']
-            dst = os.path.join(dst_path, filename)
+            dst = os.path.join(dst_path, dst_filename)
+            if dst == entry['location']:
+                log.info('Not moving %s because source and destination are the same.' % dst)
+                continue
 
             if not os.path.exists(dst_path):
                 if feed.manager.options.test:
