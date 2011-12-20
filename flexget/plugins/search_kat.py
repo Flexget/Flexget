@@ -9,7 +9,7 @@ log = logging.getLogger('kat')
 
 
 class SearchKAT(object):
-    """KAT urlrewriter and search plugin.
+    """KAT search plugin.
 
     should accept:
     kat: <category>
@@ -32,7 +32,6 @@ class SearchKAT(object):
         return root
 
     def search(self, query, comparator, config):
-        # urllib.quote will crash if the unicode string has non ascii characters, so encode in utf-8 beforehand
         comparator.set_seq1(query)
         name = comparator.search_string()
         url = 'http://www.kat.ph/search/%s/?rss=1' % urllib.quote(name.encode('utf-8'))
