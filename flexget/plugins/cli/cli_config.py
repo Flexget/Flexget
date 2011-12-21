@@ -28,27 +28,21 @@ class CliConfig(object):
     def __init__(self):
         self.replaces = {}
 
-    def replace_dict(self, d, replaces):
-        for k, v in d.items():
-            if isinstance(v, basestring):
-                for key, value in replaces.iteritems():
-                    if '$%s' % key in v:
-                        nv = v.replace('$%s' % key, value)
-                        log.debug('Replacing key %s (%s -> %s)' % (k, v, nv))
-                        d[k] = nv
-            if isinstance(v, list):
-                for lv in v[:]:
-                    if isinstance(lv, dict):
-                        self.replace_dict(lv, replaces)
-                    elif isinstance(lv, basestring):
-                        for key, value in replaces.iteritems():
-                            if '$%s' % key in lv:
-                                nv = lv.replace('$%s' % key, value)
-                                log.debug('Replacing list item %s (%s -> %s)' % (k, lv, nv))
-                                i = v.index(lv)
-                                v[i] = nv
-            if isinstance(v, dict):
-                self.replace_dict(v, replaces)
+    def replace_item(self, item):
+        if isinstance(item, basestring):
+            # Do replacement in text objects
+            for key, val in self.replaces.iteritems():
+                item = item.replace('$%s' % key, val)
+            return item
+        elif isinstance(item, list):
+            # Make a new list with replacements done
+            return [self.replace_item(x) for x in item]
+        elif isinstance(item, dict):
+            # Make a new dict with replacements done for keys and values
+            return dict((self.replace_item(key), self.replace_item(val)) for key, val in item.iteritems())
+        else:
+            # We don't know how to do replacements on this item, just return it
+            return item
 
     def parse_replaces(self, feed):
         """Parses commandline string into internal dict"""
@@ -70,7 +64,7 @@ class CliConfig(object):
 
     def on_process_start(self, feed):
         if self.parse_replaces(feed):
-            self.replace_dict(feed.config, self.replaces)
+            feed.config = self.replace_item(feed.config)
             log.debug(feed.config)
 
 register_plugin(CliConfig, 'cli_config', builtin=True)
