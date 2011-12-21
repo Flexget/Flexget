@@ -130,6 +130,7 @@ class internet(object):
                     raise PluginError('Failed to reach server. Reason: %s' % e.reason, self.log)
                 elif hasattr(e, 'code'):
                     raise PluginError('The server couldn\'t fulfill the request. Error code: %s' % e.code, self.log)
+                raise PluginError('IOError when connecting to server: %s' % e, self.log)
         return wrapped_func
 
 
