@@ -29,11 +29,11 @@ class MovieQueueManager(object):
             raise usage_error
 
         options['action'] = parser.rargs[0].lower()
-        if options['action'] not in ('add', 'del', 'list', 'downloaded'):
+        if options['action'] not in ('add', 'del', 'list', 'downloaded', 'clear'):
             raise usage_error
 
         if len(parser.rargs) == 1:
-            if options['action'] not in ('list', 'downloaded'):
+            if options['action'] not in ('list', 'downloaded', 'clear'):
                 raise usage_error
 
         # 2, args is the minimum allowed (operation + item) for actions other than list
@@ -73,8 +73,12 @@ class MovieQueueManager(object):
         if options['action'] == 'downloaded':
             self.queue_list(feed.session, downloaded=True)
             return
+        
+        if options['action'] == 'clear':
+            self.clear(feed.session)
+            return
 
-        # all actions except list require movie info to work
+        # all other actions require movie info to work
         # Generate imdb_id, tmdb_id and movie title from any single one
         try:
             what = parse_what(options['what'])
@@ -121,6 +125,21 @@ class MovieQueueManager(object):
         console('-' * 79)
         for item in items:
             console('%-10s %-7s %-37s %-15s %s' % (item.imdb_id, item.tmdb_id, item.title, item.quality, item.immortal))
+    
+        if not items:
+            console('No results')
+    
+        console('-' * 79)
+        
+    def clear(self, session):
+        """Delete movie queue"""
+    
+        items = queue_get(session=session, downloaded=False)
+        console('Removing the following movies from movie queue:')
+        console('-' * 79)
+        for item in items:
+            console(item.title)
+            queue_del(imdb_id=item.imdb_id)
     
         if not items:
             console('No results')
