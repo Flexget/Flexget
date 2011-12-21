@@ -74,6 +74,9 @@ class Movie(Base):
         """
         :return: True if movie details are considered to be expired, ie. need of update
         """
+        if self.updated is None:
+            log.debug('updated is None: %s' % self)
+            return True
         refresh_interval = 2
         if self.year:
             age = (datetime.now().year - self.year)
@@ -358,8 +361,6 @@ class ImdbLookup(object):
             # determine whether or not movie details needs to be parsed
             req_parse = False
             if not movie:
-                req_parse = True
-            elif movie.updated is None:
                 req_parse = True
             elif movie.expired:
                 req_parse = True
