@@ -35,11 +35,11 @@ class CliConfig(object):
                 item = item.replace('$%s' % key, val)
             return item
         elif isinstance(item, list):
-            # Make a new list with replacements done
-            return [self.replace_item(x) for x in item]
+            # Make a new list with replacements done on each item
+            return map(self.replace_item, item)
         elif isinstance(item, dict):
-            # Make a new dict with replacements done for keys and values
-            return dict((self.replace_item(key), self.replace_item(val)) for key, val in item.iteritems())
+            # Make a new dict with replacements done on keys and values
+            return dict(map(self.replace_item, kv_pair) for kv_pair in item.iteritems())
         else:
             # We don't know how to do replacements on this item, just return it
             return item
@@ -51,14 +51,12 @@ class CliConfig(object):
             return False # nothing to process
         if self.replaces:
             return True # already parsed
-        items = s.split(',')
-        for item in items:
+        for item in s.split(','):
             try:
-                key = item[:item.index('=')]
+                key, value = item.split('=')
             except ValueError:
                 log.critical('Invalid --cli-config, no name for %s' % item)
                 continue
-            value = item[item.index('=') + 1:]
             self.replaces[key.strip()] = value.strip()
         return True
 
