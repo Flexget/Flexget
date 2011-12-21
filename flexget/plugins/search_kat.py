@@ -33,7 +33,7 @@ class SearchKAT(object):
 
     def search(self, query, comparator, config):
         comparator.set_seq1(query)
-        name = comparator.search_string()
+        name = comparator.search_string().lower()
         url = 'http://www.kat.ph/search/%s/?rss=1' % urllib.quote(name.encode('utf-8'))
         if config != 'all':
             url += '&category=%s' % config
