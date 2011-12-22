@@ -6,14 +6,16 @@ log = logging.getLogger('crossmatch')
 
 class CrossMatch(object):
     """
-    Example:
+    Perform action based on item on current feed and other inputs.
 
-    crossmatch:
-      from:
-        - rss: http://example.com/
-      fields:
-        - title
-      action: reject
+    Example::
+
+      crossmatch:
+        from:
+          - rss: http://example.com/
+        fields:
+          - title
+        action: reject
     """
 
     def validator(self):
@@ -67,10 +69,10 @@ class CrossMatch(object):
 
     def entry_intersects(self, e1, e2, fields=None):
         """
-        :param e1: Entry
-        :param e2: Entry
+        :param e1: First :class:`flexget.entry.Entry`
+        :param e2: Second :class:`flexget.entry.Entry`
         :param fields: List of fields which are checked
-        :return: Field names in common (list)
+        :return: List of field names in common
         """
 
         if fields is None:

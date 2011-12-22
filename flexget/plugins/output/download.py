@@ -18,28 +18,30 @@ log = logging.getLogger('download')
 class PluginDownload(object):
 
     """
-        Downloads content from entry url and writes it into a file.
+    Downloads content from entry url and writes it into a file.
 
-        Example:
+    Example::
 
-        download: ~/torrents/
+      download: ~/torrents/
 
-        Allow HTML content:
+    Allow HTML content:
 
-        By default download plugin reports failure if received content
-        is a html. Usually this is some sort of custom error page without
-        proper http code and thus entry is assumed to be downloaded
-        incorrectly.
+    By default download plugin reports failure if received content
+    is a html. Usually this is some sort of custom error page without
+    proper http code and thus entry is assumed to be downloaded
+    incorrectly.
 
-        In the rare case you actually need to retrieve html-pages you must
-        disable this feature.
+    In the rare case you actually need to retrieve html-pages you must
+    disable this feature.
 
-        download:
-          path: ~/something/
-          fail_html: no
+    Example::
 
-        You may use commandline parameter --dl-path to temporarily override
-        all paths to another location.
+      download:
+        path: ~/something/
+        fail_html: no
+
+    You may use commandline parameter --dl-path to temporarily override
+    all paths to another location.
     """
 
     def validator(self):
@@ -78,8 +80,13 @@ class PluginDownload(object):
     def get_temp_file(self, feed, entry, require_path=False, handle_magnets=False, fail_html=True):
         """Download entry content and store in temporary folder.
 
-        :require_path: whether or not entries without 'path' field are ignored
-        :handle_magnets: when used any of urls containing magnet link will replace url, otherwise warning is printed.
+        :param bool require_path:
+          whether or not entries without 'path' field are ignored
+        :param bool handle_magnets:
+          when used any of urls containing magnet link will replace url,
+          otherwise warning is printed.
+        :param fail_html:
+          fail entries which url respond with html content
         """
         if entry.get('urls'):
             urls = entry.get('urls')
@@ -127,8 +134,13 @@ class PluginDownload(object):
     def get_temp_files(self, feed, require_path=False, handle_magnets=False, fail_html=True):
         """Download all feed content and store in temporary folder.
 
-        :require_path: whether or not entries without 'path' field are ignored
-        :handle_magnets: when used any of urls containing magnet link will replace url, otherwise warning is printed.
+        :param bool require_path:
+          whether or not entries without 'path' field are ignored
+        :param bool handle_magnets:
+          when used any of urls containing magnet link will replace url,
+          otherwise warning is printed.
+        :param fail_html:
+          fail entries which url respond with html content
         """
         for entry in feed.accepted:
             self.get_temp_file(feed, entry, require_path, handle_magnets, fail_html)

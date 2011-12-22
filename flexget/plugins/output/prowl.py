@@ -8,22 +8,26 @@ from flexget.utils.template import RenderError
 
 log = logging.getLogger('prowl')
 
-headers = {'User-Agent': "FlexGet Prowl plugin/%s" % str(__version__), 
+headers = {'User-Agent': "FlexGet Prowl plugin/%s" % str(__version__),
            'Content-type': "application/x-www-form-urlencoded"}
 
 
 class OutputProwl(object):
     """
-    prowl:
-      apikey: xxxxxxx
-      [application: application name, default FlexGet]
-      [event: event title, default New Release]
-      [priority: -2 - 2 (2 = highest), default 0]
-      [description: notification to send]
-      
+    Send prowl notifications
+
+    Example::
+
+      prowl:
+        apikey: xxxxxxx
+        [application: application name, default FlexGet]
+        [event: event title, default New Release]
+        [priority: -2 - 2 (2 = highest), default 0]
+        [description: notification to send]
+
     Configuration parameters are also supported from entries (eg. through set).
     """
-    
+
     def validator(self):
         from flexget import validator
         config = validator.factory('dict')
@@ -35,10 +39,10 @@ class OutputProwl(object):
         return config
 
     def on_process_start(self, feed, config):
-        """                                                                                                                                                                                                     
+        """
             Register the usable set: keywords.
-        """ 
-        set_plugin = get_plugin_by_name('set') 
+        """
+        set_plugin = get_plugin_by_name('set')
         set_plugin.instance.register_keys({'apikey': 'text', 'application': 'text',
                                            'event': 'text', 'priority': 'integer'})
 
@@ -49,7 +53,7 @@ class OutputProwl(object):
         config.setdefault('application', 'FlexGet')
         config.setdefault('event', 'New release')
         config.setdefault('priority', 0)
-        return config                                                                                                                                                                                           
+        return config
 
     def on_feed_output(self, feed, config):
         config = self.prepare_config(config)
@@ -75,7 +79,7 @@ class OutputProwl(object):
 
             # Open connection
             h = HTTPSConnection('prowl.weks.net')
-            
+
             # Send the request
             data = {'priority': priority, 'application': application, 'apikey': apikey,
                     'event': event, 'description': description}
@@ -88,13 +92,13 @@ class OutputProwl(object):
             # error codes and messages from http://prowl.weks.net/api.php
             if request_status == 200:
                 log.debug("Prowl message sent")
-            elif request_status == 400: 
+            elif request_status == 400:
                 log.error("Bad request, the parameters you provided did not validate")
-            elif request_status == 401: 
+            elif request_status == 401:
                 log.error("Not authorized, the API key given is not valid, and does not correspond to a user.")
-            elif request_status == 406: 
+            elif request_status == 406:
                 log.error("Not acceptable, your IP address has exceeded the API limit.")
-            elif request_status == 500: 
+            elif request_status == 500:
                 log.error("Internal server error, something failed to execute properly on the Prowl side.")
             else:
                 log.error("Unknown error when sending Prowl message")

@@ -42,80 +42,79 @@ class RSSEntry(Base):
 
 class OutputRSS(object):
     """
-        Write RSS containing succeeded (downloaded) entries.
+    Write RSS containing succeeded (downloaded) entries.
 
-        Example:
+    Example::
 
-        make_rss: ~/public_html/flexget.rss
+      make_rss: ~/public_html/flexget.rss
 
-        You may write into same file in multiple feeds.
+    You may write into same file in multiple feeds.
 
-        Example:
+    Example::
 
-        my-feed-A:
-          make_rss: ~/public_html/series.rss
-          .
-          .
-        my-feed-B:
-          make_rss: ~/public_html/series.rss
-          .
-          .
+      my-feed-A:
+        make_rss: ~/public_html/series.rss
+        .
+        .
+      my-feed-B:
+        make_rss: ~/public_html/series.rss
+        .
+        .
 
-        With this example file series.rss would contain succeeded
-        entries from both feeds.
+    With this example file series.rss would contain succeeded
+    entries from both feeds.
 
-        Number of days / items:
-        -----------------------
+    Number of days / items
+    ----------------------
 
-        By default output contains items from last 7 days. You can specify
-        different perioid, number of items or both. Value -1 means unlimited.
+    By default output contains items from last 7 days. You can specify
+    different perioid, number of items or both. Value -1 means unlimited.
 
-        Example:
+    Example::
 
-        make_rss:
-          file: ~/public_html/series.rss
-          days: 2
-          items: 10
+      make_rss:
+        file: ~/public_html/series.rss
+        days: 2
+        items: 10
 
-        Generate RSS that will containg last two days and no more than 10 items.
+    Generate RSS that will containg last two days and no more than 10 items.
 
-        Example 2:
+    Example 2::
 
-        make_rss:
-          file: ~/public_html/series.rss
-          days: -1
-          items: 50
+      make_rss:
+        file: ~/public_html/series.rss
+        days: -1
+        items: 50
 
-        Generate RSS that will contain last 50 items, regardless of dates.
+    Generate RSS that will contain last 50 items, regardless of dates.
 
-        RSS location link:
+    RSS location link:
 
-        You can specify the url location of the rss file.
+    You can specify the url location of the rss file.
 
-        Example:
+    Example::
 
-        make_rss:
-          file: ~/public_html/series.rss
-          rsslink: http://my.server.net/series.rss
+      make_rss:
+        file: ~/public_html/series.rss
+        rsslink: http://my.server.net/series.rss
 
-        RSS link:
-        ---------
+    RSS link
+    --------
 
-        You can specify what field from entry is used as a link in generated rss feed.
+    You can specify what field from entry is used as a link in generated rss feed.
 
-        Example:
+    Example::
 
-        make_rss:
-          file: ~/public_html/series.rss
-          link:
-            - imdb_url
+      make_rss:
+        file: ~/public_html/series.rss
+        link:
+          - imdb_url
 
-        List should contain a list of fields in order of preference.
-        Note that the url field is always used as last possible fallback
-        even without explicitly adding it into the list.
+    List should contain a list of fields in order of preference.
+    Note that the url field is always used as last possible fallback
+    even without explicitly adding it into the list.
 
-        Default list: imdb_url, input_url, url
-
+    Default list: imdb_url, input_url, url
     """
 
     def __init__(self):

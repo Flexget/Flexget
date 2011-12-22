@@ -20,9 +20,9 @@ except ImportError:
 
 class PluginPyLoad(object):
     """
-      Add url from entry url to pyload
+    Add url from entry url to pyLoad
 
-      Example:
+    Example::
 
       pyload:
         api: http://localhost:8000/api
@@ -34,14 +34,14 @@ class PluginPyLoad(object):
         multihoster: yes
         enabled: yes
 
-    Default values for the config elements:
+    Default values for the config elements::
 
-    pyload:
-        api: http://localhost:8000/api
-        queue: no
-        hoster: ALL
-        multihoster: yes
-        enabled: yes
+      pyload:
+          api: http://localhost:8000/api
+          queue: no
+          hoster: ALL
+          multihoster: yes
+          enabled: yes
     """
 
     __author__ = 'http://pyload.org'

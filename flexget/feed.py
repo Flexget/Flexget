@@ -218,7 +218,7 @@ class Feed(object):
         """An iterator over PluginInfo instances enabled on this feed.
 
         :param phase: Optional, limits to plugins enabled on given phase, sorted in phase order.
-        :return: Iterator of PluginInfo instances enabled on this feed.
+        :return: Iterator of enabled :class:`flexget.plugin.PluginInfo` instances on this feed.
         """
         if phase:
             plugins = sorted(get_plugins_by_phase(phase), key=lambda p: p.phase_handlers[phase], reverse=True)

@@ -22,20 +22,19 @@ class PluginExec(object):
     """
     Execute commands
 
-    Simple Example:
-    Execute command for entries that reach output.
+    Simple example, xecute command for entries that reach output::
 
-    exec: echo 'found %(title)s at %(url)s' > file
+      exec: echo 'found {{title}} at {{url}}' > file
 
-    Advanced Example:
+    Advanced Example::
 
-    exec:
-      on_start:
-        phase: echo "Started"
-      on_input:
-        for_entries: echo 'got %(title)s'
-      on_output:
-        for_accepted: echo 'accepted %(title)s - %(url)s > file
+      exec:
+        on_start:
+          phase: echo "Started"
+        on_input:
+          for_entries: echo 'got {{title}}'
+        on_output:
+          for_accepted: echo 'accepted {{title}} - {{url}} > file
 
     You can use all (available) entry fields in the command.
     """

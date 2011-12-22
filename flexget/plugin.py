@@ -185,6 +185,10 @@ _new_phase_queue = {}
 
 def register_parser_option(*args, **kwargs):
     """Adds a parser option to the global parser."""
+    if _parser is None:
+        import warnings
+        warnings.warn('register_parser_option called before it can be')
+        return
     _parser.add_option(*args, **kwargs)
     _plugin_options.append((args, kwargs))
 
@@ -228,9 +232,14 @@ def register_feed_phase(name, before=None, after=None):
 
 class Plugin(object):
     """
-        Base class for auto-registering plugins.
+    Base class for auto-registering plugins.
 
-        Note that inheriting form this class implies API version 2.
+    Note that inheriting form this class implies API version 2.
+
+    .. warning:
+
+       May be removed any time soon. Use :func:`register_plugin` instead until
+       we decide API's destiny.
     """
     PLUGIN_INFO = dict(api_ver=2)
     LOGGER_NAME = None # use default name
@@ -258,8 +267,8 @@ class DebugPlugin(Plugin):
 
 class PluginInfo(dict):
     """
-        Allows accessing key/value pairs of this dictionary subclass via
-        attributes.  Also instantiates a plugin and initializes properties.
+    Allows accessing key/value pairs of this dictionary subclass via
+    attributes. Also instantiates a plugin and initializes properties.
     """
     # Counts duplicate registrations
     dupe_counter = 0
@@ -270,7 +279,8 @@ class PluginInfo(dict):
         return re.sub('[A-Z]+', lambda i: '_' + i.group(0).lower(), plugin_class.__name__).lstrip('_')
 
     def __init__(self, plugin_class, name=None, groups=None, builtin=False, debug=False, api_ver=1):
-        """ Register a plugin.
+        """
+        Register a plugin.
 
         :plugin_class: The plugin factory.
         :name: Name of the plugin (if not given, default to factory class name in underscore form).

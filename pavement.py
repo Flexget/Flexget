@@ -4,7 +4,12 @@ import paver.virtual
 import paver.setuputils
 from paver import svn
 from paver.setuputils import setup, find_package_data, find_packages
+try:
+    from sphinxcontrib import paverutils
+except ImportError:
+    print 'sphinxcontrib required for documentation generation'
 
+sys.path.insert(0, '')
 
 options = environment.options
 setup(
@@ -45,7 +50,14 @@ options(
         packages_to_install=['nose>=0.11'],
         paver_command_line='develop',
         unzip_setuptools=True
-    )
+    ),
+    # sphinxcontrib.paverutils
+    sphinx=Bunch(
+        docroot='docs',
+        builddir='build',
+        builder='html',
+        confdir='docs'
+    ),
 )
 
 def freplace(name, what_str, with_str):

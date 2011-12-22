@@ -11,80 +11,86 @@ log = logging.getLogger('email')
 class OutputEmail(object):
 
     """
-        Send an e-mail with the list of all succeeded (downloaded) entries.
+    Send an e-mail with the list of all succeeded (downloaded) entries.
 
-        Config:
-          from          : the email address from which the email will be sent (required)
-          to            : the email address of the recipient (required)
-          smtp_host     : the host of the smtp server
-          smtp_port     : the port of the smtp server
-          smtp_username : the username to use to connect to the smtp server
-          smtp_password : the password to use to connect to the smtp server
-          smtp_tls      : should we use TLS to connect to the smtp server ?
-          smtp_ssl      : should we use SSL to connect to the smtp server ?
-                          Due to a bug in python, this only works in python 2.6.3 and up
-          active        : is this plugin active or not ?
+    Configuration options
 
-        Config basic example:
+    ===============  ===================================================================
+    Option           Description
+    ===============  ===================================================================
+    from             The email address from which the email will be sent (required)
+    to               The email address of the recipient (required)
+    smtp_host        The host of the smtp server
+    smtp_port        The port of the smtp server
+    smtp_username    The username to use to connect to the smtp server
+    smtp_password    The password to use to connect to the smtp server
+    smtp_tls         Should we use TLS to connect to the smtp server
+    smtp_ssl         Should we use SSL to connect to the smtp server
+                     Due to a bug in python, this only works in python 2.6.3 and up
+    active           Is this plugin active or not
+    ===============  ===================================================================
 
+    Config basic example::
+
+      email:
+        from: xxx@xxx.xxx
+        to: xxx@xxx.xxx
+        smtp_host: smtp.host.com
+
+    Config example with smtp login::
+
+      email:
+        from: xxx@xxx.xxx
+        to: xxx@xxx.xxx
+        smtp_host: smtp.host.com
+        smtp_port: 25
+        smtp_login: true
+        smtp_username: my_smtp_login
+        smtp_password: my_smtp_password
+        smtp_tls: true
+
+    Config multi-feed example::
+
+      global:
         email:
           from: xxx@xxx.xxx
           to: xxx@xxx.xxx
           smtp_host: smtp.host.com
 
-        Config example with smtp login:
-
-        email:
-          from: xxx@xxx.xxx
-          to: xxx@xxx.xxx
-          smtp_host: smtp.host.com
-          smtp_port: 25
-          smtp_login: true
-          smtp_username: my_smtp_login
-          smtp_password: my_smtp_password
-          smtp_tls: true
-
-        Config multi-feed example:
-
-        global:
+      feeds:
+        feed1:
+          rss: http://xxx
+        feed2:
+          rss: http://yyy
           email:
-            from: xxx@xxx.xxx
-            to: xxx@xxx.xxx
-            smtp_host: smtp.host.com
+            active: False
+        feed3:
+          rss: http://zzz
+          email:
+            to: zzz@zzz.zzz
 
-        feeds:
-          feed1:
-            rss: http://xxx
-          feed2:
-            rss: http://yyy
-            email:
-              active: False
-          feed3:
-            rss: http://zzz
-            email:
-              to: zzz@zzz.zzz
+    GMAIL example::
 
-        GMAIL example:
-            from: from@gmail.com
-            to: to@gmail.com
-            smtp_host: smtp.gmail.com
-            smtp_port: 587
-            smtp_login: true
-            smtp_username: gmailUser
-            smtp_password: gmailPassword
-            smtp_tls: true
+      from: from@gmail.com
+      to: to@gmail.com
+      smtp_host: smtp.gmail.com
+      smtp_port: 587
+      smtp_login: true
+      smtp_username: gmailUser
+      smtp_password: gmailPassword
+      smtp_tls: true
 
-        Default values for the config elements:
+    Default values for the config elements::
 
-        email:
-          active: True
-          smtp_host: localhost
-          smtp_port: 25
-          smtp_login: False
-          smtp_username:
-          smtp_password:
-          smtp_tls: False
-          smtp_ssl: False
+      email:
+        active: True
+        smtp_host: localhost
+        smtp_port: 25
+        smtp_login: False
+        smtp_username:
+        smtp_password:
+        smtp_tls: False
+        smtp_ssl: False
     """
 
     def validator(self):
