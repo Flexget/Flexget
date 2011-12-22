@@ -9,7 +9,6 @@ log = logging.getLogger('entry')
 
 
 class EntryUnicodeError(Exception):
-
     """This exception is thrown when trying to set non-unicode compatible field value to entry"""
 
     def __init__(self, key, value):
@@ -21,7 +20,8 @@ class EntryUnicodeError(Exception):
 
 
 class LazyField(object):
-    """Stores callback function(s) to populate entry fields. Runs it when called or to get a string representation."""
+    """Stores callback function(s) to populate entry fields.
+    Runs it when called or to get a string representation."""
 
     def __init__(self, entry, field, func):
         self.entry = entry
@@ -47,12 +47,12 @@ class LazyField(object):
 
 class Entry(dict):
     """
-        Represents one item in feed. Must have url and title fields.
-        See. http://flexget.com/wiki/DevelopersEntry
+    Represents one item in feed. Must have ``url`` and ``title`` fields.
+    See. http://flexget.com/wiki/DevelopersEntry
 
-        Internally stored original_url is necessary because
-        plugins (ie. resolvers) may change this into something else
-        and otherwise that information would be lost.
+    Internally stored ``original_url`` is necessary because
+    plugins (eg. urlrewriters) may change this into something else
+    and otherwise that information would be lost.
     """
 
     def __init__(self, *args, **kwargs):
@@ -137,7 +137,7 @@ class Entry(dict):
         :param object default: Value to be returned if key does not exists
         :param boolean eval_lazy: Allow evaluating LazyFields or not
         :param lazy: Backwards compatibility
-        :return:
+        :return: Value or given default
         """
         if lazy is not None:
             log.warning('deprecated lazy kwarg used')
@@ -156,10 +156,12 @@ class Entry(dict):
     def register_lazy_fields(self, fields, func):
         """Register a list of fields to be lazily loaded by callback func.
 
-        Args:
-            fields: List of field names that are registered as lazy fields
-            func: Callback function which is called when lazy field needs to be evaluated.
-                  Function call will get params (entry, field). See `LazyField` class for more details.
+        :param fields:
+          List of field names that are registered as lazy fields
+        :param func:
+          Callback function which is called when lazy field needs to be evaluated.
+          Function call will get params (entry, field).
+          See :class:`flexget.entry.LazyField` class for more details.
         """
         for field in fields:
             if self.is_lazy(field):
@@ -211,16 +213,17 @@ class Entry(dict):
             self.snapshots[name] = snapshot
 
     def update_using_map(self, field_map, source_item):
-        """Populates entry fields from a source object using a dictionary that maps from entry field names to
+        """
+        Populates entry fields from a source object using a dictionary that maps from entry field names to
         attributes (or keys) in the source object.
 
-        Args:
-            field_map: A dictionary mapping entry field names to the attribute in source_item (or keys, if source_item
-                is a dict)(nested attributes/dicts are also supported, separated by a dot,) or a function that takes
-                source_item as an argument
-            source_item: Source of information to be used by the map
+        :param field_map:
+          A dictionary mapping entry field names to the attribute in source_item (or keys,
+          if source_item is a dict)(nested attributes/dicts are also supported, separated by a dot,)
+          or a function that takes source_item as an argument
+        :param source_item:
+          Source of information to be used by the map
         """
-
         func = dict.get if isinstance(source_item, dict) else getattr
         for field, value in field_map.iteritems():
             if isinstance(value, basestring):
@@ -229,10 +232,11 @@ class Entry(dict):
                 self[field] = value(source_item)
 
     def render(self, template):
-        """Renders a template string based on fields in the entry. Raises RenderError if there is a problem.
+        """
+        Renders a template string based on fields in the entry.
 
         :param template: A template string that uses jinja2 or python string replacement format.
         :return: The result of the rendering.
+        :raises: RenderError if there is a problem.
         """
-
         return render_from_entry(template, self)

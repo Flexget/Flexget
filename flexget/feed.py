@@ -131,10 +131,12 @@ class Feed(object):
                 purge_from.remove(entry)
 
     def disable_phase(self, phase):
-        """Disable :phase: from execution.
+        """Disable ``phase`` from execution.
 
-        All disabled phases are re-enabled after feed execution has been completed.
-        See self._reset()
+        All disabled phases are re-enabled by :meth:`Feed._reset()` after feed
+        execution has been completed.
+
+        :param string phase: Name of ``phase``
         """
         if phase not in feed_phases:
             raise ValueError('%s is not a valid phase' % phase)
