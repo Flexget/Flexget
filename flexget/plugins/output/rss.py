@@ -64,8 +64,7 @@ class OutputRSS(object):
     With this example file series.rss would contain succeeded
     entries from both feeds.
 
-    Number of days / items
-    ----------------------
+    **Number of days / items**
 
     By default output contains items from last 7 days. You can specify
     different perioid, number of items or both. Value -1 means unlimited.
@@ -98,8 +97,7 @@ class OutputRSS(object):
         file: ~/public_html/series.rss
         rsslink: http://my.server.net/series.rss
 
-    RSS link
-    --------
+    **RSS link**
 
     You can specify what field from entry is used as a link in generated rss feed.
 

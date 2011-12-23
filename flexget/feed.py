@@ -8,12 +8,14 @@ from flexget.plugin import get_plugins_by_phase, get_plugin_by_name, \
 from flexget.utils.simple_persistence import SimpleFeedPersistence
 from flexget.event import fire_event
 from flexget.entry import Entry, EntryUnicodeError
+from functools import wraps
 
 log = logging.getLogger('feed')
 
 
 def useFeedLogging(func):
 
+    @wraps(func)
     def wrapper(self, *args, **kw):
         # Set the feed name in the logger
         from flexget import logger
@@ -28,31 +30,39 @@ def useFeedLogging(func):
 
 class Feed(object):
 
+    """
+    Represents one feed in the configuration.
+
+    Fires events
+
+    * feed.execute.before_plugin
+
+      Before a plugin is about to be executed. Note that since this will also include all
+      builtin plugins the amount of calls can be quite high
+
+      ``parameters: feed, keyword``
+
+    * feed.execute.after_plugin
+
+      After a plugin has been executed.
+
+      ``parameters: feed, keyword``
+
+    * feed.execute.completed
+
+      After feed execution has been completed
+
+      ``parameters: feed``
+
+    """
+
     max_reruns = 5
 
     def __init__(self, manager, name, config):
-        """Represents one feed in configuration.
-
-        :name: name of the feed
-        :config: feed configuration (dict)
-
-        Fires events:
-
-        feed.execute.before_plugin:
-          Before a plugin is about to be executed. Note that since this will also include all
-          builtin plugins the amount of calls can be quite high
-
-          parameters: feed, keyword
-
-        feed.execute.after_plugin:
-          After a plugin has been executed.
-
-          parameters: feed, keyword
-
-        feed.execute.completed:
-          After feed execution has been completed
-
-          parameters: feed
+        """
+        :param Manager manager: Manager instance.
+        :param string name: Name of the feed.
+        :param dict config: Feed configuration.
         """
         self.name = unicode(name)
         self.config = config
@@ -137,6 +147,7 @@ class Feed(object):
         execution has been completed.
 
         :param string phase: Name of ``phase``
+        :raises ValueError: *phase* could not be found.
         """
         if phase not in feed_phases:
             raise ValueError('%s is not a valid phase' % phase)
@@ -145,7 +156,14 @@ class Feed(object):
             self.disabled_phases.append(phase)
 
     def accept(self, entry, reason=None, **kwargs):
-        """Accepts this entry with optional reason."""
+        """
+        Accept *entry* immediately with optional but
+        highly recommendable *reason*.
+
+        :param Entry entry: To be aceppeted
+        :param string reason: Optional reason
+        :param kwargs: Optional kwargs will be passed to plugins hooking action
+        """
         if not isinstance(entry, Entry):
             raise Exception('Trying to accept non entry, %r' % entry)
         if entry in self.rejected:
@@ -156,7 +174,14 @@ class Feed(object):
             self.__run_entry_phase('accept', entry, reason=reason, **kwargs)
 
     def reject(self, entry, reason=None, **kwargs):
-        """Reject this entry immediately and permanently with optional reason"""
+        """
+        Reject *entry* immediately and permanently with optional but
+        highly recommendable *reason*.
+
+        :param Entry entry: To be rejected
+        :param string reason: Optional reason
+        :param kwargs: Optional kwargs will be passed to plugins hooking action
+        """
         if not isinstance(entry, Entry):
             raise Exception('Trying to reject non entry, %r' % entry)
         # ignore rejections on immortal entries
@@ -172,7 +197,14 @@ class Feed(object):
             self.__run_entry_phase('reject', entry, reason=reason, **kwargs)
 
     def fail(self, entry, reason=None, **kwargs):
-        """Mark entry as failed."""
+        """
+        Fails *entry* immediately with optional but
+        highly recommendable *reason*.
+
+        :param Entry entry: To be failed
+        :param string reason: Optional reason
+        :param kwargs: Optional kwargs will be passed to plugins hooking action
+        """
         log.debug('Marking entry \'%s\' as failed' % entry['title'])
         if not entry in self.failed:
             self.failed.append(entry)
@@ -181,11 +213,14 @@ class Feed(object):
             self.__run_entry_phase('fail', entry, reason=reason, **kwargs)
 
     def trace(self, entry, message):
-        """Add tracing message to entry."""
+        """Add tracing message to entry.
+
+        .. note:: Not yet supported in any meaningful way
+        """
         entry.trace.append((self.current_plugin, message))
 
     def abort(self, **kwargs):
-        """Abort this feed execution, no more plugins will be executed."""
+        """Abort this feed execution, no more plugins will be executed after the current one exists."""
         if self._abort:
             return
         if not kwargs.get('silent', False):
@@ -198,8 +233,9 @@ class Feed(object):
 
     def find_entry(self, category='entries', **values):
         """
-        Find and return entry with given attributes from feed or None
-        :param category: entries, accepted, rejected or failed. Defaults to entries.
+        Find and return :class:`flexget.entry.Entry` with given attributes from feed or None
+
+        :param string category: entries, accepted, rejected or failed. Defaults to entries.
         :param values: Key values of entries to be searched
         :return: Entry or None
         """
@@ -217,10 +253,12 @@ class Feed(object):
         return None
 
     def plugins(self, phase=None):
-        """An iterator over PluginInfo instances enabled on this feed.
+        """Currently enabled plugins.
 
-        :param phase: Optional, limits to plugins enabled on given phase, sorted in phase order.
-        :return: Iterator of enabled :class:`flexget.plugin.PluginInfo` instances on this feed.
+        :param string phase:
+          Optional, limits to plugins currently configured on given phase, sorted in phase order.
+        :return:
+          An iterator over configured :class:`flexget.plugin.PluginInfo` instances enabled on this feed.
         """
         if phase:
             plugins = sorted(get_plugins_by_phase(phase), key=lambda p: p.phase_handlers[phase], reverse=True)
@@ -321,16 +359,18 @@ class Feed(object):
                 raise
 
     def rerun(self):
-        """Immediately re-run the feed after execute has completed."""
+        """Immediately re-run the feed after execute has completed,
+        feed can be re-run up to :attr:`.max_reruns` times."""
         self._rerun = True
-        log.info('Plugin %s has requested feed to be ran again after execution has completed.' % self.current_plugin)
+        log.info('Plugin %s has requested feed to be ran again after execution has completed.' %
+                 self.current_plugin)
 
     @useFeedLogging
     def execute(self, disable_phases=None, entries=None):
         """Executes the feed.
 
-        :param disable_phases: Disable given phases during execution
-        :param entries: Entries to be used in execution instead
+        :param list disable_phases: Disable given phases names during execution
+        :param list entries: Entries to be used in execution instead
             of using the input. Disables input phase.
         """
 
@@ -396,7 +436,7 @@ class Feed(object):
                 self._rerun_count += 1
                 self.execute(disable_phases=disable_phases, entries=entries)
 
-    def process_start(self):
+    def _process_start(self):
         """Execute process_start phase"""
         self.__run_feed_phase('process_start')
         config_hash = hashlib.md5(str(self.config.items())).hexdigest()
@@ -406,7 +446,7 @@ class Feed(object):
         else:
             self.config_modified = False
 
-    def process_end(self):
+    def _process_end(self):
         """Execute terminate phase for this feed"""
         if self.manager.options.validate:
             log.debug('No process_end phase with --check')

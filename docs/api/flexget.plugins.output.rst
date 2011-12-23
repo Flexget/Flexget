@@ -57,14 +57,6 @@ output Package
     :undoc-members:
     :show-inheritance:
 
-:mod:`memusage` Module
-----------------------
-
-.. automodule:: flexget.plugins.output.memusage
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 :mod:`move` Module
 ------------------
 

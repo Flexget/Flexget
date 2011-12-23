@@ -26,10 +26,14 @@ _config_validator = validator.factory('dict')
 def register_config_key(key, validator, required=False):
     """ Registers a valid root level key for the config.
 
-    :param key: Name of the key being registered.
-    :param validator: Validator for the key. (Validator instance, function returning Validator instance,
-        or validator type string)
-    :param required: Boolean specifying whether this is a required key.
+    :param string key:
+      Name of the root level key being registered.
+    :param validator:
+      Validator for the key.
+      Accepts: :class:`flexget.validator.Validator` instance, function returning
+      Validator instance, or validator type string.
+    :param bool required:
+      Specify whether this is a mandatory key.
     """
     _config_validator.accept(validator, key=key, required=required)
 
@@ -55,17 +59,21 @@ class Manager(object):
 
     Fires events:
 
-    manager.startup
+    * manager.startup
+
       After manager has been initialized. This is when application becomes ready to use
 
-    manager.upgrade
+    * manager.upgrade
+
       Upgrade plugin database schemas etc
 
-    manager.execute.started
+    * manager.execute.started
+
       When execute is about the be started, this happens before any feed phases occur
       including on_process_start
 
-    manager.execute.completed
+    * manager.execute.completed
+
       After manager has executed all Feeds
     """
 
@@ -151,7 +159,7 @@ class Manager(object):
         yaml.SafeDumper.increase_indent = increase_indent_wrapper(yaml.SafeDumper.increase_indent)
 
     def find_config(self):
-        """Find the configuration file and load it"""
+        """Find the configuration file and then call :meth:`.load_config` to load it"""
         startup_path = os.path.dirname(os.path.abspath(sys.path[0]))
         home_path = os.path.join(os.path.expanduser('~'), '.flexget')
         current_path = os.getcwd()
@@ -187,6 +195,14 @@ class Manager(object):
         raise IOError('Failed to find configuration file %s' % self.options.config)
 
     def load_config(self, config):
+        """
+        .. warning::
+
+           Calls sys.exit(1) if configuration file could not be loaded.
+           This is something we probably want to change.
+
+        :param string config: Path to configuration file
+        """
         if not self.options.quiet:
             # pre-check only when running without --cron
             self.pre_check_config(config)
@@ -472,9 +488,7 @@ class Manager(object):
     def process_start(self, feeds=None):
         """Execute process_start for feeds.
 
-        Args:
-
-        :feeds: can be specified as a list of Feed instances, defaults to all feeds
+        :param list feeds: Optional list of :class:`~flexget.feed.Feed` instances, defaults to all.
         """
         if feeds is None:
             feeds = self.feeds.values()
@@ -484,16 +498,15 @@ class Manager(object):
                 continue
             try:
                 log.trace('calling process_start on a feed %s' % feed.name)
-                feed.process_start()
+                feed._process_start()
             except Exception, e:
                 feed.enabled = False
                 log.exception('Feed %s process_start: %s' % (feed.name, e))
 
     def process_end(self, feeds=None):
         """Execute process_end for all feeds.
-        Args:
 
-        :feeds: can be specified as a list of Feed instances, defaults to all feeds
+        :param list feeds: Optional list of :class:`~flexget.feed.Feed` instances, defaults to all.
         """
         if feeds is None:
             feeds = self.feeds.values()
@@ -505,7 +518,7 @@ class Manager(object):
                 continue
             try:
                 log.trace('calling process_end on a feed %s' % feed.name)
-                feed.process_end()
+                feed._process_end()
             except Exception, e:
                 log.exception('Feed %s process_end: %s' % (feed.name, e))
 
@@ -515,9 +528,9 @@ class Manager(object):
         Iterate trough feeds and run them. If --learn is used download and output
         phases are disabled.
 
-        :param feeds: Optional list of feed names to run, all feeds otherwise.
-        :param disable_phases: Optional list of phases to disabled
-        :param entries: Optional list of entries to pass into feed(s).
+        :param list feeds: Optional list of feed names to run, all feeds otherwise.
+        :param list disable_phases: Optional list of phases to disabled
+        :param list entries: Optional list of entries to pass into feed(s).
             This will also cause feed to disable input phase.
         """
         # Make a list of Feed instances to execute

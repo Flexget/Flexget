@@ -60,7 +60,7 @@ class Validator(object):
 
     class __metaclass__(type):
         """Automatically adds subclasses to the registry."""
-        
+
         def __init__(cls, name, bases, dict):
             type.__init__(cls, name, bases, dict)
             if not 'name' in dict:
@@ -97,9 +97,11 @@ class Validator(object):
     def get_validator(self, name, **kwargs):
         """Returns a child validator of this one.
 
-        :param name: Can be a validator type string, an already created Validator instance, or a function that returns
-        a validator instance.
-        :param kwargs: Keyword arguments are passed on to validator init if a new validator is created.
+        :param string name:
+          Can be a validator type string, an already created Validator instance,
+          or a function that returns a validator instance.
+        :param kwargs:
+          Keyword arguments are passed on to validator init if a new validator is created.
         """
         if isinstance(name, Validator):
             # If we are passed a Validator instance, make it a child of this validator and return it.
@@ -129,8 +131,8 @@ class Validator(object):
 
     def validate_item(self, item, rules):
         """
-            Helper method. Validate item against list of rules (validators).
-            Return True if item passed any of the rules, False if none of the rules pass item.
+        Helper method. Validate item against list of rules (validators).
+        Return True if item passed any of the rules, False if none of the rules pass item.
         """
         count = self.errors.count()
         for rule in rules:
@@ -193,12 +195,8 @@ class ChoiceValidator(Validator):
 
     def accept(self, value, **kwargs):
         """
-        Args:
-            value: accepted text, int or boolean
-
-        Kwargs:
-            ignore_case: boolean
-
+        :param value: accepted text, int or boolean
+        :param kwargs: ignore_case (boolean)
         """
         if not isinstance(value, (basestring, int, float)):
             raise Exception('Choice validator only accepts strings and numbers')
@@ -430,7 +428,7 @@ class RegexpMatchValidator(Validator):
 
 class IntervalValidator(RegexpMatchValidator):
     name = 'interval'
-    
+
     def __init__(self, parent=None, **kwargs):
         RegexpMatchValidator.__init__(self, parent, **kwargs)
         self.accept(r'^\d+ (minute|hour|day|week)s?$')
@@ -556,17 +554,10 @@ class DictValidator(Validator):
 
     def accept(self, name, **kwargs):
         """
-        Args:
-            name: validator name that represents accepted value
-
-        Kwargs:
-            key: name of the key in dict
-            required: mark the name as required
-
-        Raises:
-            ValueError if key was not given
+        :param string name: validator name that represents accepted value
+        :param kwargs: ``key`` = name of the key in dict, ``required`` = mark the name as required
+        :raises ValueError: Key was not given in *kwargs*
         """
-
         if not 'key' in kwargs:
             raise ValueError('%s.accept() must specify key' % self.name)
 
@@ -700,7 +691,7 @@ class DictValidator(Validator):
 
         return schema
 
-    
+
 class LazyValidator(object):
     """Acts as a wrapper for a Validator instance, but does not generate the instance until one of its attributes
     needs to be accessed."""

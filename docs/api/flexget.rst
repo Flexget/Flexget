@@ -87,6 +87,5 @@ Subpackages
 .. toctree::
 
     flexget.plugins
-    flexget.ui
     flexget.utils
 
