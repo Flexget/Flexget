@@ -253,7 +253,7 @@ def coverage():
 ])
 def docs():
     if not sphinxcontrib:
-        print 'ERROR: requires sphinxcontrib'
+        print 'ERROR: requires sphinxcontrib-paverutils'
         sys.exit(1)
     from paver import tasks
     setup_section = tasks.environment.options.setdefault("sphinx", Bunch())
@@ -367,7 +367,7 @@ def install_tools():
         import sphinxcontrib
         print 'sphinxcontrib INSTALLED'
     except:
-        pip.main(['install', 'sphinxcontrib'])
+        pip.main(['install', 'sphinxcontrib-paverutils'])
 
     try:
         import pylint
