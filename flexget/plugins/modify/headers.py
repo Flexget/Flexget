@@ -42,13 +42,18 @@ class PluginHeaders(object):
     def validator(self):
         from flexget import validator
         config = validator.factory('dict')
-        config.accept_any_key('text')
-        config.accept_any_key('integer')
+        config.accept_valid_keys('text', key_type='text')
         return config
 
     @priority(130)
     def on_feed_start(self, feed, config):
         """Feed starting"""
+        # Set the headers for this feed's request session
+        if feed.requests.headers:
+            feed.requests.headers.update(config)
+        else:
+            feed.requests.headers = config
+        # Set the headers in urllib2 for backwards compatibility
         if urllib2._opener:
             log.debug('Adding HTTPHeadersProcessor to default opener')
             urllib2._opener.add_handler(HTTPHeadersProcessor(config))
