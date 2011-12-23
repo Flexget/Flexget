@@ -1,4 +1,5 @@
 import os
+import re
 from paver.easy import *
 import paver.virtual
 import paver.setuputils
@@ -111,7 +112,7 @@ def clean():
     """Cleans up the virtualenv"""
     import os, glob
 
-    for p in ('bin', 'Scripts', 'build', 'dist', 'docs', 'include', 'lib', 'man',
+    for p in ('bin', 'Scripts', 'build', 'dist', 'include', 'lib', 'man',
               'share', 'FlexGet.egg-info', 'paver-minilib.zip', 'setup.py'):
         pth = path(p)
         if pth.isdir():
@@ -229,7 +230,6 @@ def make_egg(options):
 def coverage():
     """Make coverage.flexget.com"""
     # --with-coverage --cover-package=flexget --cover-html --cover-html-dir /var/www/flexget_coverage/
-
     import nose
     from nose.plugins.manager import DefaultPluginManager
 
@@ -246,10 +246,21 @@ def coverage():
 
 @task
 @cmdopts([
+    ('docs-dir=', 'd', 'directory to put the documetation in')
+])
+def docs():
+    from paver import tasks
+    setup_section = tasks.environment.options.setdefault("sphinx", Bunch())
+    setup_section.update(outdir=options.docs.get('docs_dir', 'build/sphinx'))
+    call_task('html')
+
+    
+@task
+@cmdopts([
     ('docs-dir=', 'd', 'directory to put the api documetation in'),
     ('excludes=', 'x', 'list of packages to exclude'),
 ])
-def docs():
+def epydocs():
     """Create documentation."""
     from epydoc import cli
 
@@ -262,11 +273,11 @@ def docs():
     doc_packages = list(doc_packages)
 
     # get storage path
-    docs_dir = options.docs.get('docs_dir', 'build/apidocs')
+    docs_dir = options.epydocs.get('docs_dir', 'build/apidocs')
 
     # set up excludes
     try:
-        exclude_names = options.docs.excludes
+        exclude_names = options.epydocs.excludes
     except AttributeError:
         exclude_names = []
     else:
