@@ -172,24 +172,38 @@ class Entry(dict):
                 self[field] = LazyField(self, field, func)
 
     def unregister_lazy_fields(self, fields, func):
-        """Clears given lookup function from a list of fields."""
+        """
+        :param list fields: List of field names to unregister.
+          If given field is not lazy loading, value is set to None
+        :param function func: Function to be removed from registered.
+        :return: Number of removed functions
+        :rtype: int
+        """
+        removed = 0
         for field in fields:
             if self.is_lazy(field):
                 lazy_funcs = dict.get(self, field).funcs
                 if func in lazy_funcs:
+                    removed += 1
                     lazy_funcs.remove(func)
                 if not lazy_funcs:
                     self[field] = None
+        return removed
 
     def is_lazy(self, field):
-        """Returns True if field is lazy loading."""
+        """
+        :param string field: Name of the field to check
+        :return: True if field is lazy loading.
+        """
         return isinstance(dict.get(self, field), LazyField)
 
     def safe_str(self):
         return '%s | %s' % (self['title'], self['url'])
 
     def isvalid(self):
-        """Return True if entry is valid. Return False if this cannot be used."""
+        """
+        :return: True if entry is valid. Return False if this cannot be used.
+        """
         if not 'title' in self:
             return False
         if not 'url' in self:
@@ -201,6 +215,10 @@ class Entry(dict):
         return True
 
     def take_snapshot(self, name):
+        """
+        Takes a snapshot of the entry under *name*. Snapshots can be accessed via :attr:`.snapshots`.
+        :param string name: Snapshot name
+        """
         snapshot = {}
         for field, value in self.iteritems():
             try:

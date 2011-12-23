@@ -11,7 +11,9 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
-.. note:: Index page needs to be done :)
+   api/flexget
+
+.. note:: Index page needs to be improved! :)
 
 Indices and tables
 ==================
