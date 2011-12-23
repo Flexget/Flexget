@@ -9,7 +9,6 @@ from htmlentitydefs import name2codepoint
 import re
 import ntpath
 from datetime import timedelta, datetime
-from flexget.utils.requests import is_unresponsive, set_unresponsive
 
 
 def str_to_boolean(string):
@@ -205,36 +204,33 @@ class SmartRedirectHandler(urllib2.HTTPRedirectHandler):
         result.status = code
         return result
 
+# Remembers sites that have timed out
+unresponsive_sites = {}
+# Time to wait before trying an unresponsive site again
+WAIT_TIME = timedelta(seconds=60)
 
-def urlopener(url_or_request, log, **kwargs):
-    """
-    Utility function for pulling back a url, with a retry of 3 times, increasing the timeout, etc.
-    Re-raises any errors as URLError.
 
-    .. warning:
-       This is being replaced by requests library. flexget.utils.requests should be used going forward.
-
-    :param str url_or_request: URL or Request object to get.
-    :param log: Logger to log debug info and errors to
-    :param kwargs: Keyword arguments to be passed to urlopen
-    :return: The file-like object returned by urlopen
-    """
-
-    if isinstance(url_or_request, urllib2.Request):
-        url = url_or_request.get_host()
-    else:
-        url = url_or_request
-    if is_unresponsive(url):
-        msg = '%s is known to be unresponsive, not trying again.' % urlparse(url).hostname
-        log.warning(msg)
-        raise urllib2.URLError(msg)
-
-    retries = kwargs.get('retries', 3)
-    timeout = kwargs.get('timeout', 15.0)
+def urlopener(url, log, **kwargs):
+    """Utility function for pulling back a url, with a retry of 3 times, increasing the timeout, etc.
+    Should be grabbing all urls this way eventually, to keep error handling code in the same place."""
 
     # get the old timeout for sockets, so we can set it back to that when done. This is NOT threadsafe by the way.
     # In order to avoid requiring python 2.6, we're not using the urlopen timeout parameter. That really should be used
     # after checking for python 2.6.
+
+    if isinstance(url, urllib2.Request):
+        site = url.get_host()
+    else:
+        site = urlparse(url).netloc
+    if site in unresponsive_sites:
+        if unresponsive_sites[site] > datetime.now() - WAIT_TIME:
+            msg = ('%s is unresponsive, not trying again for %s seconds.' %
+                  (site, (WAIT_TIME - (datetime.now() - unresponsive_sites[site])).seconds))
+            log.warning(msg)
+            raise urllib2.URLError(msg)
+
+    retries = kwargs.get('retries', 3)
+    timeout = kwargs.get('timeout', 15.0)
     oldtimeout = socket.getdefaulttimeout()
     try:
         socket.setdefaulttimeout(timeout)
@@ -252,7 +248,7 @@ def urlopener(url_or_request, log, **kwargs):
             if i > 0:
                 time.sleep(3)
             try:
-                retrieved = opener(url_or_request, kwargs.get('data'))
+                retrieved = opener(url, kwargs.get('data'))
             except urllib2.HTTPError, e:
                 if e.code < 500:
                     # If it was not a server error, don't keep retrying.
@@ -265,12 +261,15 @@ def urlopener(url_or_request, log, **kwargs):
                 else:
                     reason = 'N/A'
                 if reason == 'timed out':
-                    set_unresponsive(url)
+                    unresponsive_sites[site] = datetime.now()
                 log.debug('Failed to retrieve url (try %i/%i): %s' % (i + 1, retries, reason))
             except httplib.IncompleteRead, e:
                 log.critical('Incomplete read - see python bug 6312')
                 break
             else:
+                # We were successful, removie this site from unresponsive_sites
+                unresponsive_sites.pop(site, None)
+
                 # make the returned instance usable in a with statement by adding __enter__ and __exit__ methods
 
                 def enter(self):
@@ -283,7 +282,7 @@ def urlopener(url_or_request, log, **kwargs):
                 retrieved.__class__.__exit__ = exit
                 return retrieved
 
-        log.warning('Could not retrieve url: %s' % url_or_request)
+        log.warning('Could not retrieve url: %s' % url)
         raise urllib2.URLError('Could not retrieve url after %s tries.' % retries)
     finally:
         socket.setdefaulttimeout(oldtimeout)

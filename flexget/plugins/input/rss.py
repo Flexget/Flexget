@@ -3,13 +3,15 @@ import logging
 import urlparse
 import xml.sax
 import posixpath
+import urllib2
 import httplib
+import socket
 from datetime import datetime
 import feedparser
-from requests import RequestException
 from flexget.entry import Entry
 from flexget.plugin import register_plugin, internet, PluginError, get_plugin_by_name, DependencyError
 from flexget.utils.cached_input import cached
+from flexget.utils.tools import urlopener
 from flexget.utils.tools import decode_html
 
 log = logging.getLogger('rss')
@@ -125,9 +127,16 @@ class InputRSS(object):
         url = urlparse.urlunsplit(parts)
         return url
 
-    def process_invalid_content(self, feed, data):
+    def process_invalid_content(self, feed, url):
         """If feedparser reports error, save the received data and log error."""
         log.critical('Invalid XML received from feed %s' % feed.name)
+        try:
+            req = urlopener(url, log)
+        except ValueError, exc:
+            log.debug('invalid url `%s` due to %s (ok for a file)' % (url, exc))
+            return
+        data = req.read()
+        req.close()
         ext = 'xml'
         if '<html>' in data.lower():
             log.critical('Received content is HTML page, not an RSS feed')
@@ -177,43 +186,33 @@ class InputRSS(object):
         url_hash = str(hash(config['url']))
 
         # set etag and last modified headers if config has not changed since last run
-        headers = {}
         if config['etag'] and feed.config_modified is False:
             etag = feed.simple_persistence.get('%s_etag' % url_hash, None)
             if etag:
                 log.debug('Sending etag %s for feed %s' % (etag, feed.name))
-                headers['If-None-Match'] = etag
             modified = feed.simple_persistence.get('%s_modified' % url_hash, None)
             if modified:
-                if not isinstance(modified, tuple):
+                if not isinstance(modified, basestring):
                     log.debug('Invalid date was stored for last modified time.')
+                    modified = None
                 else:
-                    # format into an RFC 1123-compliant timestamp. We can't use
-                    # time.strftime() since the %a and %b directives can be affected
-                    # by the current locale, but RFC 2616 states that dates must be
-                    # in English.
-                    weekday = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'][modified[6]]
-                    month = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][modified[1] - 1]
-                    headers['If-Modified-Since'] = ('%s, %02d %s %04d %02d:%02d:%02d GMT' %
-                        (weekday, modified[2], month, modified[0], modified[3], modified[4], modified[5]))
-                    log.debug('Sending last-modified %s for feed %s' % (headers['If-Modified-Since'], feed.name))
+                    log.debug('Sending last-modified %s for feed %s' % (modified, feed.name))
 
-        # Get the feed content
-        if config['url'].startswith(('http', 'https', 'ftp', 'file')):
-            # Get feed using requests library
-            try:
-                # Use the raw response so feedparser can read the headers and status values
-                content = feed.requests.get(config['url'], timeout=60, headers=headers, raise_status=False).raw
-            except RequestException, e:
-                raise PluginError('Unable to download the RSS: %s' % e)
-        else:
-            # This is a file, open it
-            content = open(config['url'], 'rb').read()
-
+        # set timeout to one minute
+        orig_timout = socket.getdefaulttimeout()
         try:
-            rss = feedparser.parse(content)
+            socket.setdefaulttimeout(60)
+
+            # get the feed & parse
+            if urllib2._opener:
+                rss = feedparser.parse(config['url'], etag=etag, modified=modified, handlers=urllib2._opener.handlers)
+            else:
+                rss = feedparser.parse(config['url'], etag=etag, modified=modified)
         except LookupError, e:
             raise PluginError('Unable to parse the RSS: %s' % e)
+        finally:
+            # restore original timeout
+            socket.setdefaulttimeout(orig_timout)
 
         # status checks
         status = rss.get('status', False)
@@ -258,7 +257,7 @@ class InputRSS(object):
                 if not rss.entries:
                     # save invalid data for review, this is a bit ugly but users seem to really confused when
                     # html pages (login pages) are received
-                    self.process_invalid_content(feed, content)
+                    self.process_invalid_content(feed, config['url'])
                     if feed.manager.options.debug:
                         log.exception(ex)
                     raise PluginError('Received invalid RSS content')
@@ -276,7 +275,7 @@ class InputRSS(object):
             else:
                 # all other bozo errors
                 if not rss.entries:
-                    self.process_invalid_content(feed, content)
+                    self.process_invalid_content(feed, config['url'])
                     raise PluginError('Unhandled bozo_exception. Type: %s (feed: %s)' % \
                         (ex.__class__.__name__, feed.name), log)
                 else:
@@ -303,9 +302,8 @@ class InputRSS(object):
                 log.debug('etag %s saved for feed %s' % (rss.etag, feed.name))
             if rss.get('headers'):
                 if  rss.headers.get('last-modified'):
-                    modified = modified = feedparser._parse_date(rss.headers['last-modified'])
-                    feed.simple_persistence['%s_modified' % url_hash] = tuple(modified)
-                    log.debug('last modified %s saved for feed %s' % (modified, feed.name))
+                    feed.simple_persistence['%s_modified' % url_hash] = rss.headers['last-modified']
+                    log.debug('last modified %s saved for feed %s' % (rss.headers['last-modified'], feed.name))
 
         # new entries to be created
         entries = []
