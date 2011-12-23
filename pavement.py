@@ -5,10 +5,13 @@ import paver.virtual
 import paver.setuputils
 from paver import svn
 from paver.setuputils import setup, find_package_data, find_packages
+
+sphinxcontrib = False
 try:
     from sphinxcontrib import paverutils
+    sphinxcontrib = True
 except ImportError:
-    print 'sphinxcontrib required for documentation generation'
+    pass
 
 sys.path.insert(0, '')
 
@@ -249,12 +252,15 @@ def coverage():
     ('docs-dir=', 'd', 'directory to put the documetation in')
 ])
 def docs():
+    if not sphinxcontrib:
+        print 'ERROR: requires sphinxcontrib'
+        sys.exit(1)
     from paver import tasks
     setup_section = tasks.environment.options.setdefault("sphinx", Bunch())
     setup_section.update(outdir=options.docs.get('docs_dir', 'build/sphinx'))
     call_task('html')
 
-    
+
 @task
 @cmdopts([
     ('docs-dir=', 'd', 'directory to put the api documetation in'),
@@ -354,8 +360,14 @@ def install_tools():
     try:
         import pip
     except:
-        print 'Unable to import pip, please install it'
+        print 'FATAL: Unable to import pip, please install it and run this again!'
         return
+
+    try:
+        import sphinxcontrib
+        print 'sphinxcontrib INSTALLED'
+    except:
+        pip.main(['install', 'sphinxcontrib'])
 
     try:
         import pylint
