@@ -65,10 +65,22 @@ def set_version(plugin, version):
 def upgrade(plugin):
     """Used as a decorator to register a schema upgrade function.
 
-    The wrapped function will be passed the current schema version and a session object. The function should return the
-    new version of the schema after the upgrade.
+    The wrapped function will be passed the current schema version and a session object.
+    The function should return the new version of the schema after the upgrade.
 
-    There is no need to commit the session, it will commit automatically if an upgraded schema version is returned."""
+    There is no need to commit the session, it will commit automatically if an upgraded
+    schema version is returned.
+
+    Example::
+
+      from flexget import schema
+      @schema.upgrade('your_plugin')
+      def upgrade(ver, session):
+           if ver == 2:
+               # upgrade
+               ver = 3
+           return ver
+    """
 
     def upgrade_decorator(func):
 
