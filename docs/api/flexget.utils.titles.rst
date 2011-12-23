@@ -32,12 +32,3 @@ titles Package
     :members:
     :undoc-members:
     :show-inheritance:
-
-:mod:`test` Module
-------------------
-
-.. automodule:: flexget.utils.titles.test
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
