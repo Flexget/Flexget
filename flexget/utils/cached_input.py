@@ -47,7 +47,12 @@ def db_cleanup(session):
 
 
 def config_hash(config):
+    """
+    :param dict config: Configuration
+    :return: MD5 hash for *config*
+    """
     if isinstance(config, dict):
+        # this does in fact support nested dicts, they're sorted too!
         return hashlib.md5(str(sorted(config.items()))).hexdigest()
     else:
         return hashlib.md5(str(config)).hexdigest()
@@ -57,13 +62,13 @@ class cached(object):
     """
     Implements transparent caching decorator @cached for inputs.
 
-    Decorator has two parameters
+    Decorator has two parameters:
 
-    :name: in which the configuration is present in feeds configuration.
-    :key: in which the configuration has the cached resource identifier (ie. url). If the :key: is not
-    given or present in the configuration :name: is expected to be a cache name (ie. url)
+    * **name** in which the configuration is present in feeds configuration.
+    * **key** in which the configuration has the cached resource identifier (ie. url).
+      If the key is not given or present in the configuration :name: is expected to be a cache name (ie. url)
 
-    Configuration assumptions may make this unusable in some (future) inputs
+    .. note:: Configuration assumptions may make this unusable in some (future) inputs
     """
 
     cache = {}

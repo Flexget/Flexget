@@ -9,7 +9,7 @@ log = logging.getLogger('entry')
 
 
 class EntryUnicodeError(Exception):
-    """This exception is thrown when trying to set non-unicode compatible field value to entry"""
+    """This exception is thrown when trying to set non-unicode compatible field value to entry."""
 
     def __init__(self, key, value):
         self.key = key
@@ -20,8 +20,14 @@ class EntryUnicodeError(Exception):
 
 
 class LazyField(object):
-    """Stores callback function(s) to populate entry fields.
-    Runs it when called or to get a string representation."""
+    """
+    LazyField is a type of :class:`Entry` field which is evaluated only
+    when it's value is requested. This way FlexGet can avoid doing heavy
+    lookups from the internet or database for details that may not be needed
+    ever.
+
+    Stores callback function(s) to which populates :class:`Entry` fields.
+    Callback is ran when it's called or to get a string representation."""
 
     def __init__(self, entry, field, func):
         self.entry = entry
@@ -47,14 +53,18 @@ class LazyField(object):
 
 class Entry(dict):
     """
-    Represents one item in feed. Must have ``url`` and ``title`` fields.
-    See. http://flexget.com/wiki/DevelopersEntry
+    Represents one item in feed. Must have *url* and *title* fields.
 
-    Internally stored ``original_url`` is necessary because
-    plugins (eg. urlrewriters) may change this into something else
+    Stores automatically *original_url* key, which is necessary because
+    plugins (eg. urlrewriters) may change *url* into something else
     and otherwise that information would be lost.
-    """
 
+    Entry will also transparently convert all ascii strings into unicode
+    and raises :class:`EntryUnicodeError` if conversion fails on any value
+    being set. Such failures are catched by :class:`~flexget.feed.Feed`
+    and trigger :meth:`~flexget.feed.Feed.abort`.
+    """
+    
     def __init__(self, *args, **kwargs):
         self.trace = []
         self.snapshots = {}
@@ -122,7 +132,7 @@ class Entry(dict):
         return self[key]
 
     def __getitem__(self, key):
-        """Supports lazy loading of fields. If a stored value is a LazyField, call it, return the result."""
+        """Supports lazy loading of fields. If a stored value is a :class:`LazyField`, call it, return the result."""
         result = dict.__getitem__(self, key)
         if isinstance(result, LazyField):
             log.trace('evaluating lazy field %s' % key)
@@ -132,12 +142,13 @@ class Entry(dict):
 
     def get(self, key, default=None, eval_lazy=True, lazy=None):
         """
-        Overridden so that our __getitem__ gets used for LazyFields
+        Overridden so that our __getitem__ gets used for :class:`LazyFields`
+
         :param string key: Name of the key
         :param object default: Value to be returned if key does not exists
-        :param boolean eval_lazy: Allow evaluating LazyFields or not
-        :param lazy: Backwards compatibility
-        :return: Value or given default
+        :param bool eval_lazy: Allow evaluating LazyFields or not
+        :param bool lazy: Provided for backwards compatibility
+        :return: Value or given *default*
         """
         if lazy is not None:
             log.warning('deprecated lazy kwarg used')
@@ -161,7 +172,7 @@ class Entry(dict):
         :param func:
           Callback function which is called when lazy field needs to be evaluated.
           Function call will get params (entry, field).
-          See :class:`flexget.entry.LazyField` class for more details.
+          See :class:`LazyField` class for more details.
         """
         for field in fields:
             if self.is_lazy(field):
@@ -194,6 +205,7 @@ class Entry(dict):
         """
         :param string field: Name of the field to check
         :return: True if field is lazy loading.
+        :rtype: bool
         """
         return isinstance(dict.get(self, field), LazyField)
 
@@ -203,6 +215,7 @@ class Entry(dict):
     def isvalid(self):
         """
         :return: True if entry is valid. Return False if this cannot be used.
+        :rtype: bool
         """
         if not 'title' in self:
             return False
@@ -253,8 +266,9 @@ class Entry(dict):
         """
         Renders a template string based on fields in the entry.
 
-        :param template: A template string that uses jinja2 or python string replacement format.
+        :param string template: A template string that uses jinja2 or python string replacement format.
         :return: The result of the rendering.
-        :raises: RenderError if there is a problem.
+        :rtype: string
+        :raises RenderError: If there is a problem.
         """
         return render_from_entry(template, self)
