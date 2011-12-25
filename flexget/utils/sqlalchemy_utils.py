@@ -1,3 +1,6 @@
+"""
+Miscellaneous SQLAlchemy helpers.
+"""
 from sqlalchemy import ColumnDefault, Sequence
 from sqlalchemy.types import AbstractType
 from sqlalchemy.schema import Table, MetaData
@@ -5,8 +8,14 @@ from sqlalchemy.exc import NoSuchTableError
 
 
 def table_exists(name, session):
-    """Hack, return True if table_name exists """
+    """
+    Use SQLAlchemy reflect to check table existences.
 
+    :param string name: Table name to check
+    :param Session session: Session to use
+    :return: True if table exists, False otherwise
+    :rtype: bool
+    """
     try:
         meta = MetaData(bind=session.connection())
         Table(name, meta, autoload=True, autoload_with=session.connection())
@@ -16,8 +25,10 @@ def table_exists(name, session):
 
 
 def table_schema(name, session):
-    """Hack, return table schema as it exists in the current db"""
-
+    """
+    :returns: Table schema using SQLAlchemy reflect as it currently exists in the db
+    :rtype: Table
+    """
     meta = MetaData(bind=session.bind, reflect=True)
     for table in meta.sorted_tables:
         if table.name == name:
@@ -25,10 +36,10 @@ def table_schema(name, session):
 
 
 def table_columns(table, session):
-    """Returns list of columns in table or empty list
-
-    Args:
-        table: Name of table or table schema
+    """
+    :param string table: Name of table or table schema
+    :param Session session: SQLAlchemy Session
+    :returns: List of column names in the table or empty list
     """
 
     res = []
@@ -42,12 +53,14 @@ def table_columns(table, session):
 def table_add_column(table, name, col_type, session, default=None):
     """Adds a column to a table
 
-    Args:
-        table: Table to add column to (can be name or schema)
-        name: Name of new column to add
-        col_type: The sqlalchemy column type to add
-        session: Session to do the alteration
-        default: Default value for the created column (optional)
+    .. warning:: Uses raw statements, probably needs to be changed in
+                 order to work on other databases besides SQLite
+
+    :param string table: Table to add column to (can be name or schema)
+    :param string name: Name of new column to add
+    :param col_type: The sqlalchemy column type to add
+    :param Session session: SQLAlchemy Session to do the alteration
+    :param default: Default value for the created column (optional)
     """
     if isinstance(table, basestring):
         table = table_schema(table, session)
@@ -82,8 +95,10 @@ def drop_tables(names, session):
 
 def get_index_by_name(table, name):
     """
+    Find declaratively defined index from table by name
+
     :param table: Table object
-    :param name: Name of the index to get
+    :param string name: Name of the index to get
     :return: Index object
     """
     for index in table.indexes:

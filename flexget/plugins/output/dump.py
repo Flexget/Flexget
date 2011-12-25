@@ -1,61 +1,89 @@
 from flexget.plugin import register_plugin, register_parser_option
 import logging
+from flexget.utils.tools import console
 
 log = logging.getLogger('dump')
 
 
-def dump(entries, debug=False):
-    """Dump :entries: to stdout"""
+def dump(entries, debug=False, eval_lazy=False):
+    """
+    Dump *entries* to stdout
 
+    :param list entries: Entries to be dumped.
+    :param bool debug: Print non printable fields as well.
+    :param bool eval_lazy: Evaluate lazy fields.
+    """
+
+    invalid = object()
     for entry in entries:
         #c = entry.copy()
         #sanitize(c)
         #print yaml.safe_dump(entry)
         for field in entry:
+            value = invalid
             if entry.is_lazy(field):
-                value = '<LazyField - value will be determined when it\'s accessed>'
+                if eval_lazy:
+                    value = entry[field]
+                else:
+                    value = '<LazyField - value will be determined when it\'s accessed>'
             else:
                 value = entry[field]
+            assert value is not invalid
             if isinstance(value, basestring):
                 try:
-                    print '%-17s: %s' % (field, value.replace('\r', '').replace('\n', ''))
+                    console('%-17s: %s' % (field, value.replace('\r', '').replace('\n', '')))
                 except:
-                    print '%-17s: %s (warning: unable to print)' % (field, repr(value))
+                    console('%-17s: %s (warning: unable to print)' % (field, repr(value)))
             elif isinstance(value, (int, float, list, dict)):
-                print '%-17s: %s' % (field, value)
+                console('%-17s: %s' % (field, value))
             elif value is None:
-                print '%-17s: %s' % (field, value)
+                console('%-17s: %s' % (field, value))
             else:
                 if debug:
-                    print '%-17s: [not printable] (%s)' % (field, value)
-        print ''
+                    console('%-17s: [not printable] (%s)' % (field, value))
+        console('')
 
 
 class OutputDump(object):
     """
-        Dummy plugin for testing, outputs all entries to stdout
+    Outputs all entries to console
     """
+
+    params = None
 
     def validator(self):
         from flexget import validator
         return validator.factory('boolean')
 
+    @staticmethod
+    def optik(option, opt, value, parser):
+        if parser.rargs:
+            OutputDump.params = parser.rargs[0]
+        else:
+            OutputDump.params = True
+
     def on_feed_output(self, feed):
-        if not 'dump' in feed.config and not feed.manager.options.dump_entries:
+        if not 'dump' in feed.config and not OutputDump.params:
             return
         #from flexget.utils.tools import sanitize
         #import yaml
 
+        eval_lazy = 'eval' in OutputDump.params
         undecided = [entry for entry in feed.entries if not entry in feed.accepted]
         if undecided:
-            print '-- Undecided: --------------------------'
-            dump(undecided, feed.manager.options.debug)
+            console('-- Undecided: --------------------------')
+            dump(undecided, feed.manager.options.debug, eval_lazy)
         if feed.accepted:
-            print '-- Accepted: ---------------------------'
-            dump(feed.accepted, feed.manager.options.debug)
+            console('-- Accepted: ---------------------------')
+            dump(feed.accepted, feed.manager.options.debug, eval_lazy)
         if feed.rejected:
-            print '-- Rejected: ---------------------------'
-            dump(feed.rejected, feed.manager.options.debug)
+            console('-- Rejected: ---------------------------')
+            dump(feed.rejected, feed.manager.options.debug, eval_lazy)
 
 register_plugin(OutputDump, 'dump', builtin=True)
-register_parser_option('--dump', action='store_true', dest='dump_entries', default=False, help='Display all feed entries')
+#register_parser_option('--dump', action='store_true', dest='dump_entries', default=False,
+#                       help='Display all feed entries')
+
+register_parser_option('--dump', action='callback', callback=OutputDump.optik,
+                       help='Display all entries in feed with details. '
+                            'Arg `--dump eval` will evaluate all lazy fields.')
