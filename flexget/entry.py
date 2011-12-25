@@ -64,7 +64,7 @@ class Entry(dict):
     being set. Such failures are catched by :class:`~flexget.feed.Feed`
     and trigger :meth:`~flexget.feed.Feed.abort`.
     """
-    
+
     def __init__(self, *args, **kwargs):
         self.trace = []
         self.snapshots = {}

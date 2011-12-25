@@ -6,19 +6,27 @@
 Welcome to FlexGet's documentation!
 ===================================
 
-Contents:
+The core section is most relevant for developers. Plugins documentation
+section may miss some plugins since each plugin must be manually added to the .rst files.
 
-.. toctree::
-   :maxdepth: 2
-
-   api/flexget
-
-.. note:: Index page needs to be improved! :)
-
-Indices and tables
-==================
+**Indices and tables**
 
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
 
+Core documentation
+------------------
+
+.. toctree::
+   :maxdepth: 4
+
+   api/flexget
+
+Plugins
+-------
+
+.. toctree::
+   :maxdepth: 2
+
+   plugins/flexget.plugins
