@@ -1,13 +1,15 @@
+"""
+Provides small event framework
+"""
 import logging
 
 log = logging.getLogger('event')
-
 
 _events = {}
 
 
 class Event(object):
-    """Registered event"""
+    """Represents one registered event."""
 
     def __init__(self, name, func, priority=128):
         self.name = name
@@ -43,7 +45,10 @@ def event(name, priority=128):
 
 
 def get_events(name):
-    """Return list of Events for :name: ordered by priority"""
+    """
+    :param String name: event name
+    :return: List of :class:`Event` for *name* ordered by priority
+    """
     if not name in _events:
         raise KeyError('No such event %s' % name)
     _events[name].sort(reverse=True)
@@ -51,7 +56,14 @@ def get_events(name):
 
 
 def add_event_handler(name, func, priority=128):
-    """Attach event to :func: under a name :name: with :priority:. Returns Event created."""
+    """
+    :param string name: Event name
+    :param function func: Function that acts as event handler
+    :param priority: Priority for this hook
+    :return: Event created
+    :rtype: Event
+    :raises Exception: If *func* is already registered in an event
+    """
     events = _events.setdefault(name, [])
     for event in events:
         if event.func == func:
@@ -63,12 +75,21 @@ def add_event_handler(name, func, priority=128):
 
 
 def remove_event_handler(name, func):
+    """
+    .. warning:: Not implemented!
+    """
     # TODO: implement
     raise NotImplementedError
 
 
 def fire_event(name, *args, **kwargs):
-    """Trigger an event"""
+    """
+    Trigger an event with *name*. If event is not hooked by anything nothing happens.
+
+    :param name: Name of event to be called
+    :param args: List of arguments passed to handler function
+    :param kwargs: Key Value arguments passed to handler function
+    """
     if not name in _events:
         return
     for event in get_events(name):

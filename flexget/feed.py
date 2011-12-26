@@ -33,7 +33,7 @@ class Feed(object):
     """
     Represents one feed in the configuration.
 
-    Fires events
+    **Fires events:**
 
     * feed.execute.before_plugin
 
@@ -233,7 +233,7 @@ class Feed(object):
 
     def find_entry(self, category='entries', **values):
         """
-        Find and return :class:`flexget.entry.Entry` with given attributes from feed or None
+        Find and return :class:`~flexget.entry.Entry` with given attributes from feed or None
 
         :param string category: entries, accepted, rejected or failed. Defaults to entries.
         :param values: Key values of entries to be searched
@@ -253,7 +253,7 @@ class Feed(object):
         return None
 
     def plugins(self, phase=None):
-        """Currently enabled plugins.
+        """Get currently enabled plugins.
 
         :param string phase:
           Optional, limits to plugins currently configured on given phase, sorted in phase order.
@@ -267,6 +267,15 @@ class Feed(object):
         return (p for p in plugins if p.name in self.config or p.builtin)
 
     def __run_feed_phase(self, phase):
+        """Executes feed phase, ie. call all enabled plugins on the feed.
+
+        Fires events:
+
+        * feed.execute.before_plugin
+        * feed.execute.after_plugin
+
+        :param string phase: Name of the phase
+        """
         if phase not in feed_phases + ['abort', 'process_start', 'process_end']:
             raise Exception('%s is not a valid feed phase' % phase)
         # warn if no inputs, filters or outputs in the feed
@@ -319,8 +328,15 @@ class Feed(object):
             self.__run_plugin(plugin, phase, (self, entry), kwargs)
 
     def __run_plugin(self, plugin, phase, args=None, kwargs=None):
-        """Execute given plugin's phase method, with supplied args and kwargs."""
+        """
+        Execute given plugins phase method, with supplied args and kwargs.
+        If plugin throws unexpected exceptions :meth:`abort` will be called.
 
+        :param PluginInfo plugin: Plugin to be executed
+        :param string phase: Name of the phase to be executed
+        :param args: Passed to the plugin
+        :param kwargs: Passed to the plugin
+        """
         keyword = plugin.name
         method = plugin.phase_handlers[phase]
         if args is None:
