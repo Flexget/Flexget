@@ -5,13 +5,12 @@ import posixpath
 from datetime import datetime, timedelta
 from urllib2 import URLError
 from random import sample
-from functools import partial
 from BeautifulSoup import BeautifulStoneSoup
 from sqlalchemy import Column, Integer, Float, String, Unicode, Boolean, DateTime, func
 from sqlalchemy.schema import ForeignKey
 from sqlalchemy.orm import relation
 from flexget import schema
-from flexget.utils.tools import urlopener as _urlopener
+import flexget.utils.requests as requests
 from flexget.utils.database import with_session, pipe_list_synonym, text_date_synonym
 from flexget.utils.sqlalchemy_utils import table_add_column
 from flexget.manager import Session
@@ -20,7 +19,6 @@ from flexget.utils.simple_persistence import SimplePersistence
 SCHEMA_VER = 1
 
 log = logging.getLogger('api_tvdb')
-urlopener = partial(_urlopener, log=log, retries=2)
 Base = schema.versioned_base('api_tvdb', SCHEMA_VER)
 
 # This is a FlexGet API key
@@ -50,8 +48,8 @@ def get_mirror(type='xml'):
     if not _mirrors.get(type):
         # Get the list of mirrors from tvdb
         try:
-            data = BeautifulStoneSoup(urlopener(server + api_key + '/mirrors.xml'))
-        except URLError:
+            data = BeautifulStoneSoup(requests.get(server + api_key + '/mirrors.xml').content)
+        except requests.RequestException:
             raise LookupError('Could not retrieve mirror list from thetvdb')
         for mirror in  data.findAll('mirror'):
             type_mask = int(mirror.typemask.string)
@@ -119,8 +117,8 @@ class TVDBSeries(TVDBContainer, Base):
             raise LookupError('Cannot update a series without a tvdb id.')
         url = get_mirror() + api_key + '/series/%s/%s.xml' % (self.id, language)
         try:
-            data = urlopener(url)
-        except URLError, e:
+            data = requests.get(url).content
+        except requests.RequestException, e:
             raise LookupError('Request failed %s' % url)
         result = BeautifulStoneSoup(data, convertEntities=BeautifulStoneSoup.HTML_ENTITIES).find('series')
         if result:
@@ -146,7 +144,7 @@ class TVDBSeries(TVDBContainer, Base):
             os.makedirs(fullpath)
         filename = os.path.join(dirname, posixpath.basename(self.poster))
         thefile = file(os.path.join(base_dir, filename), 'wb')
-        thefile.write(urlopener(url).read())
+        thefile.write(requests.get(url).content)
         self.poster_file = filename
         # If we are detached from a session, update the db
         if not Session.object_session(self):
@@ -186,10 +184,9 @@ class TVDBEpisode(TVDBContainer, Base):
         if not self.id:
             raise LookupError('Cannot update an episode without an episode id.')
         url = get_mirror() + api_key + '/episodes/%s/%s.xml' % (self.id, language)
-        from urllib2 import URLError
         try:
-            data = urlopener(url)
-        except URLError, e:
+            data = requests.get(url).content
+        except requests.RequestException, e:
             raise LookupError('Request failed %s' % url)
         result = BeautifulStoneSoup(data).find('episode')
         if result:
@@ -216,8 +213,8 @@ def find_series_id(name):
     """Looks up the tvdb id for a series"""
     url = server + 'GetSeries.php?seriesname=%s&language=%s' % (urllib.quote(name), language)
     try:
-        page = urlopener(url)
-    except URLError, e:
+        page = requests.get(url).content
+    except requests.RequestException, e:
         raise LookupError("Unable to get search results for %s: %s" % (name, e))
     xmldata = BeautifulStoneSoup(page).data
     if not xmldata:
@@ -276,26 +273,23 @@ def lookup_series(name=None, tvdb_id=None, only_cached=False, session=None):
             raise LookupError('Series %s not found from cache' % id_str())
         # There was no series found in the cache, do a lookup from tvdb
         log.debug('Series %s not found in cache, looking up from tvdb.' % id_str())
-        try:
+        if tvdb_id:
+            series = TVDBSeries()
+            series.id = tvdb_id
+            series.update()
+            if series.seriesname:
+                session.add(series)
+        elif name:
+            tvdb_id = find_series_id(name)
             if tvdb_id:
-                series = TVDBSeries()
-                series.id = tvdb_id
-                series.update()
-                if series.seriesname:
+                series = session.query(TVDBSeries).filter(TVDBSeries.id == tvdb_id).first()
+                if not series:
+                    series = TVDBSeries()
+                    series.id = tvdb_id
+                    series.update()
                     session.add(series)
-            elif name:
-                tvdb_id = find_series_id(name)
-                if tvdb_id:
-                    series = session.query(TVDBSeries).filter(TVDBSeries.id == tvdb_id).first()
-                    if not series:
-                        series = TVDBSeries()
-                        series.id = tvdb_id
-                        series.update()
-                        session.add(series)
-                    if name.lower() != series.seriesname.lower():
-                        session.add(TVDBSearchResult(search=name, series=series))
-        except URLError, e:
-            raise LookupError('Error looking up series from TVDb (%s)' % e)
+                if name.lower() != series.seriesname.lower():
+                    session.add(TVDBSearchResult(search=name, series=series))
 
     if not series:
         raise LookupError('No results found from tvdb for %s' % id_str())
@@ -330,30 +324,22 @@ def lookup_episode(name=None, seasonnum=None, episodenum=None, tvdb_id=None, onl
         # There was no episode found in the cache, do a lookup from tvdb
         log.debug('Episode %s not found in cache, looking up from tvdb.' % ep_description)
         url = get_mirror() + api_key + '/series/%d/default/%d/%d/%s.xml' % (series.id, seasonnum, episodenum, language)
-        # Try the lookup again if there are no errors but no data was returned
-        for attempt in range(2):
-            try:
-                raw_data = urlopener(url).read().decode('utf-8')
-                data = BeautifulStoneSoup(raw_data).data
-                if data:
-                    ep_data = data.find('episode')
-                    if ep_data:
-                        # Check if this episode id is already in our db
-                        episode = session.query(TVDBEpisode).filter(TVDBEpisode.id == ep_data.id.string).first()
-                        if episode:
-                            episode.update_from_bss(ep_data)
-                        else:
-                            episode = TVDBEpisode(ep_data)
-                        series.episodes.append(episode)
-                        session.merge(series)
-                if episode:
-                    # Don't try again if we already have data
-                    break
-            except URLError, e:
-                # urlopener already tries multiple times, no need to wait before raising our error
-                raise LookupError('Error looking up episode from TVDb (%s)' % e)
-        else:
-            log.debug('No errors from tvdb, however no episode info was found. Data returned from tvdb: %s' % raw_data)
+        try:
+            raw_data = requests.get(url).content
+            data = BeautifulStoneSoup(raw_data).data
+            if data:
+                ep_data = data.find('episode')
+                if ep_data:
+                    # Check if this episode id is already in our db
+                    episode = session.query(TVDBEpisode).filter(TVDBEpisode.id == ep_data.id.string).first()
+                    if episode:
+                        episode.update_from_bss(ep_data)
+                    else:
+                        episode = TVDBEpisode(ep_data)
+                    series.episodes.append(episode)
+                    session.merge(series)
+        except requests.RequestException, e:
+            raise LookupError('Error looking up episode from TVDb (%s)' % e)
     if episode:
         # Access the series attribute to force it to load before returning
         episode.series
@@ -376,7 +362,7 @@ def mark_expired(session=None):
 
     try:
         # Get items that have changed since our last update
-        updates = BeautifulStoneSoup(urlopener(server + 'Updates.php?type=all&time=%s' % last_server)).items
+        updates = BeautifulStoneSoup(requests.get(server + 'Updates.php?type=all&time=%s' % last_server).content).items
     except URLError, e:
         log.error('Could not get update information from tvdb: %s' % e)
         return
