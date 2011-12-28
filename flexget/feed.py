@@ -6,6 +6,7 @@ from flexget.manager import Session, register_config_key
 from flexget.plugin import get_plugins_by_phase, get_plugin_by_name, \
     feed_phases, PluginWarning, PluginError, DependencyError, plugins as all_plugins
 from flexget.utils.simple_persistence import SimpleFeedPersistence
+import flexget.utils.requests as requests
 from flexget.event import fire_event
 from flexget.entry import Entry, EntryUnicodeError
 from functools import wraps
@@ -87,6 +88,7 @@ class Feed(object):
         self.session = None
         self.priority = 65535
 
+        self.requests = requests.Session()
 
         # undecided entries in the feed (created by input)
         self.entries = []

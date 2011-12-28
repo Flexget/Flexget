@@ -71,8 +71,11 @@ class FormLogin(object):
         br.submit()
 
         cookiejar = br._ua_handlers["_cookies"].cookiejar
-        handler = urllib2.HTTPCookieProcessor(cookiejar)
 
+        # Add cookiejar to our requests session
+        feed.requests.add_cookiejar(cookiejar)
+        # Add handler to urllib2 default opener for backwards compatibility
+        handler = urllib2.HTTPCookieProcessor(cookiejar)
         if urllib2._opener:
             log.debug('Adding HTTPCookieProcessor to default opener')
             urllib2._opener.add_handler(handler)

@@ -7,6 +7,7 @@ import os
 import re
 import logging
 import time
+from requests import RequestException
 from event import add_event_handler as add_phase_handler
 
 log = logging.getLogger('plugin')
@@ -113,6 +114,9 @@ class internet(object):
             import urllib2
             try:
                 return func(*args, **kwargs)
+            except RequestException, e:
+                log.debug('decorator caught RequestException')
+                raise PluginError('RequestException: %s' % e)
             except urllib2.HTTPError, e:
                 raise PluginError('HTTPError %s' % e.code, self.log)
             except urllib2.URLError, e:

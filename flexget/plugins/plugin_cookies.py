@@ -143,10 +143,16 @@ class PluginCookies:
                 import sys
                 raise PluginError('Cookies could not be loaded: %s' % sys.exc_info()[1], log)
 
-        # create new opener for urllib2
-        log.debug('Installing urllib2 opener')
-        opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cj))
-        urllib2.install_opener(opener)
+        # Add cookiejar to our requests session
+        feed.requests.add_cookiejar(cj)
+        # Add handler to urllib2 default opener for backwards compatibility
+        handler = urllib2.HTTPCookieProcessor(cj)
+        if urllib2._opener:
+            log.debug('Adding HTTPCookieProcessor to default opener')
+            urllib2._opener.add_handler(handler)
+        else:
+            log.debug('Creating new opener and installing it')
+            urllib2.install_opener(urllib2.build_opener(handler))
 
     def on_feed_exit(self, feed):
         """Feed exiting, remove cookiejar"""

@@ -4,12 +4,13 @@ import urllib
 import urllib2
 import logging
 import mimetypes
-import email
 import hashlib
 import shutil
 from httplib import BadStatusLine
+from requests import RequestException
+from requests.utils import parse_dict_header
 from flexget.plugin import register_plugin, register_parser_option, get_plugin_by_name, PluginWarning, PluginError
-from flexget.utils.tools import encode_html, decode_html, urlopener
+from flexget.utils.tools import encode_html, decode_html
 from flexget.utils.template import RenderError
 
 log = logging.getLogger('download')
@@ -155,6 +156,11 @@ class PluginDownload(object):
                 if not feed.manager.unit_test:
                     log.info('Downloading: %s' % entry['title'])
                 self.download_entry(feed, entry, url)
+        except RequestException, e:
+            # TODO: Improve this error message?
+            log.warning('RequestException %s' % e)
+            return 'Request Exception'
+        # TODO: I think these exceptions will not be thrown by requests library.
         except urllib2.HTTPError, e:
             log.warning('HTTPError %s' % e.code)
             return 'HTTP error'
@@ -199,76 +205,56 @@ class PluginDownload(object):
         log.debug('Downloading url \'%s\'' % url)
 
         # get content
+        auth = None
         if 'basic_auth_password' in entry and 'basic_auth_username' in entry:
             log.debug('Basic auth enabled. User: %s Password: %s' % (entry['basic_auth_username'], entry['basic_auth_password']))
-            passman = urllib2.HTTPPasswordMgrWithDefaultRealm()
-            passman.add_password(None, url, entry['basic_auth_username'], entry['basic_auth_password'])
-            handlers = [urllib2.HTTPBasicAuthHandler(passman)]
-        else:
-            handlers = None
+            auth = (entry['basic_auth_username'], entry['basic_auth_password'])
 
-        opener = urlopener(url, log, handlers=handlers)
-        if opener.headers.get('content-encoding') in ('gzip', 'x-gzip', 'deflate'):
-            import zlib
-            decompress = zlib.decompressobj(15 + 32).decompress
-        else:
-            decompress = None
+        response = feed.requests.get(url, auth=auth)
 
         # generate temp file, with random md5 sum ..
         # url alone is not random enough, it has happened that there are two entries with same url
-        m = hashlib.md5()
-        m.update(url)
-        m.update('%s' % time.time())
+        md5_hash = hashlib.md5('%s%s' % (url, time.time())).hexdigest()
         tmp_path = os.path.join(feed.manager.config_base, 'temp')
         if not os.path.isdir(tmp_path):
             logging.debug('creating tmp_path %s' % tmp_path)
             os.mkdir(tmp_path)
-        datafile = os.path.join(tmp_path, m.hexdigest())
-
-        def read_chunks(data, buffer_size=1024):
-            """ Helper generator to iterate over data in chunks """
-            while True:
-                chunk = data.read(buffer_size)
-                if not chunk:
-                    break
-                yield chunk
+        datafile = os.path.join(tmp_path, md5_hash)
 
         # download and write data into a temp file
+        outfile = open(datafile, 'wb')
         try:
-            outfile = open(datafile, 'wb')
-            try:
-                for chunk in read_chunks(opener):
-                    outfile.write(decompress(chunk) if decompress else chunk)
-            except:
-                # don't leave futile files behind
-                # outfile has to be closed before we can delete it on Windows
-                outfile.close()
-                log.debug('Download interrupted, removing datafile')
-                os.remove(datafile)
-                raise
-            else:
-                outfile.close()
-                # Do a sanity check on downloaded file
-                if os.path.getsize(datafile) == 0:
-                    feed.fail(entry, 'File %s is 0 bytes in size' % datafile)
-                    return
-                # store temp filename into entry so other plugins may read and modify content
-                # temp file is moved into final destination at self.output
-                entry['file'] = datafile
-                log.debug('%s field file set to: %s' % (entry['title'], entry['file']))
+            for chunk in response.iter_content():
+                outfile.write(chunk)
+        except:
+            # don't leave futile files behind
+            # outfile has to be closed before we can delete it on Windows
+            outfile.close()
+            log.debug('Download interrupted, removing datafile')
+            os.remove(datafile)
+            raise
+        else:
+            outfile.close()
+            # Do a sanity check on downloaded file
+            if os.path.getsize(datafile) == 0:
+                feed.fail(entry, 'File %s is 0 bytes in size' % datafile)
+                return
+            # store temp filename into entry so other plugins may read and modify content
+            # temp file is moved into final destination at self.output
+            entry['file'] = datafile
+            log.debug('%s field file set to: %s' % (entry['title'], entry['file']))
 
-        finally:
-            opener.close()
 
-        entry['mime-type'] = opener.headers.gettype()
+        entry['mime-type'] = response.headers['content-type']
 
-        if 'content-length' in opener.headers and not decompress:
-            entry['content-length'] = int(opener.headers.get('content-length'))
+        decompress = 'gzip' in response.headers['content-encoding'] or 'deflate' in response.headers['content-encoding']
+        if 'content-length' in response.headers and not decompress:
+            entry['content-length'] = int(response.headers['content-length'])
 
         # prefer content-disposition naming, note: content-disposition can be disabled completely
         # by setting entry field `content-disposition` to False
         if entry.get('content-disposition', True):
-            self.filename_from_headers(entry, opener)
+            self.filename_from_headers(entry, response)
         else:
             log.info('Content-disposition disabled for %s' % entry['title'])
         self.filename_ext_from_mime(entry)
@@ -276,28 +262,16 @@ class PluginDownload(object):
 
     def filename_from_headers(self, entry, response):
         """Checks entry filename if it's found from content-disposition"""
-        data = str(response.info())
+        if not response.headers.get('content-disposition'):
+            # No content disposition header, nothing we can do
+            return
+        filename = parse_dict_header(response.headers['content-disposition']).get('filename')
         # try to decode/encode, afaik this is against the specs but some servers do it anyway
         try:
-            data = data.decode('utf-8')
+            filename = filename.decode('utf-8')
             log.debug('response info UTF-8 decoded')
         except UnicodeError:
-            try:
-                data = unicode(data)
-                log.debug('response info unicoded')
-            except UnicodeError:
-                pass
-
-        # now we should have unicode string, let's convert into proper format where non-ascii
-        # chars are entities
-        data = encode_html(data)
-        try:
-            filename = email.message_from_string(data).get_filename(failobj=False)
-        except (AttributeError, SystemExit, KeyboardInterrupt):
-            raise # at least rethrow the most common stuff before catch-all
-        except:
-            log.error('Failed to decode filename from response: %r' % data)
-            return
+            pass
         if filename:
             filename = decode_html(filename)
             log.debug('Found filename from headers: %s' % filename)
