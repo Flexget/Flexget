@@ -3,7 +3,6 @@ import urllib
 import os
 import posixpath
 from datetime import datetime, timedelta
-from urllib2 import URLError
 from random import sample
 from BeautifulSoup import BeautifulStoneSoup
 from sqlalchemy import Column, Integer, Float, String, Unicode, Boolean, DateTime, func
@@ -363,7 +362,7 @@ def mark_expired(session=None):
     try:
         # Get items that have changed since our last update
         updates = BeautifulStoneSoup(requests.get(server + 'Updates.php?type=all&time=%s' % last_server).content).items
-    except URLError, e:
+    except requests.RequestException, e:
         log.error('Could not get update information from tvdb: %s' % e)
         return
     if updates:
