@@ -49,6 +49,14 @@ utils Package
     :undoc-members:
     :show-inheritance:
 
+:mod:`requests` Module
+-----------------------
+
+.. automodule:: flexget.utils.requests
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 :mod:`search` Module
 --------------------
 
