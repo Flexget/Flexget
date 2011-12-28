@@ -247,7 +247,8 @@ class PluginDownload(object):
 
         entry['mime-type'] = response.headers['content-type']
 
-        decompress = 'gzip' in response.headers['content-encoding'] or 'deflate' in response.headers['content-encoding']
+        content_encoding = response.headers.get('content-encoding', '')
+        decompress = 'gzip' in content_encoding or 'deflate' in content_encoding
         if 'content-length' in response.headers and not decompress:
             entry['content-length'] = int(response.headers['content-length'])
 

@@ -209,9 +209,33 @@ class InputRSS(object):
             # Get feed using requests library
             try:
                 # Use the raw response so feedparser can read the headers and status values
-                content = feed.requests.get(config['url'], timeout=60, headers=headers, raise_status=False).raw
+                response = feed.requests.get(config['url'], timeout=60, headers=headers, raise_status=False)
+                content = response.content
             except RequestException, e:
                 raise PluginError('Unable to download the RSS: %s' % e)
+
+            # status checks
+            status = response.status_code
+            if not status:
+                log.debug('RSS does not have status (normal if processing a file)')
+            elif status == 304:
+                log.verbose('%s hasn\'t changed since last run. Not creating entries.' % config['url'])
+                try:
+                    # details plugin will complain if no entries are created, with this we disable that
+                    details = get_plugin_by_name('details').instance
+                    if feed.name not in details.no_entries_ok:
+                        log.debug('adding %s to details plugin no_entries_ok' % feed.name)
+                        details.no_entries_ok.append(feed.name)
+                except DependencyError:
+                    log.debug('unable to get details plugin')
+                return []
+            elif status == 401:
+                raise PluginError('Authentication needed for feed %s: %s' % \
+                    (feed.name, rss.headers['www-authenticate']), log)
+            elif status == 404:
+                raise PluginError('RSS Feed %s not found' % feed.name, log)
+            elif status == 500:
+                raise PluginError('Internal server exception on feed %s' % feed.name, log)
         else:
             # This is a file, open it
             content = open(config['url'], 'rb')
@@ -220,29 +244,6 @@ class InputRSS(object):
             rss = feedparser.parse(content)
         except LookupError, e:
             raise PluginError('Unable to parse the RSS: %s' % e)
-
-        # status checks
-        status = rss.get('status', False)
-        if not status:
-            log.debug('RSS does not have status (normal if processing a file)')
-        elif status == 304:
-            log.verbose('%s hasn\'t changed since last run. Not creating entries.' % config['url'])
-            try:
-                # details plugin will complain if no entries are created, with this we disable that
-                details = get_plugin_by_name('details').instance
-                if feed.name not in details.no_entries_ok:
-                    log.debug('adding %s to details plugin no_entries_ok' % feed.name)
-                    details.no_entries_ok.append(feed.name)
-            except DependencyError:
-                log.debug('unable to get details plugin')
-            return []
-        elif status == 401:
-            raise PluginError('Authentication needed for feed %s: %s' % \
-                (feed.name, rss.headers['www-authenticate']), log)
-        elif status == 404:
-            raise PluginError('RSS Feed %s not found' % feed.name, log)
-        elif status == 500:
-            raise PluginError('Internal server exception on feed %s' % feed.name, log)
 
         # check for bozo
         ex = rss.get('bozo_exception', False)
