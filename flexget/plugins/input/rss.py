@@ -216,9 +216,7 @@ class InputRSS(object):
 
             # status checks
             status = response.status_code
-            if not status:
-                log.debug('RSS does not have status (normal if processing a file)')
-            elif status == 304:
+            if status == 304:
                 log.verbose('%s hasn\'t changed since last run. Not creating entries.' % config['url'])
                 try:
                     # details plugin will complain if no entries are created, with this we disable that
@@ -231,11 +229,22 @@ class InputRSS(object):
                 return []
             elif status == 401:
                 raise PluginError('Authentication needed for feed %s: %s' % \
-                    (feed.name, rss.headers['www-authenticate']), log)
+                    (feed.name, response.headers['www-authenticate']), log)
             elif status == 404:
                 raise PluginError('RSS Feed %s not found' % feed.name, log)
             elif status == 500:
                 raise PluginError('Internal server exception on feed %s' % feed.name, log)
+
+            # update etag and last modified
+            if config['etag']:
+                etag = response.headers.get('etag')
+                if etag:
+                    feed.simple_persistence['%s_etag' % url_hash] = etag
+                    log.debug('etag %s saved for feed %s' % (etag, feed.name))
+                if  response.headers.get('last-modified'):
+                    modified = feedparser._parse_date(response.headers['last-modified'])
+                    feed.simple_persistence['%s_modified' % url_hash] = tuple(modified)
+                    log.debug('last modified %s saved for feed %s' % (modified, feed.name))
         else:
             # This is a file, open it
             content = open(config['url'], 'rb')
@@ -302,17 +311,6 @@ class InputRSS(object):
             log.warn('feedparser bozo bit missing, feedparser bug? (FlexGet ticket #721)')
 
         log.debug('encoding %s' % rss.encoding)
-
-        # update etag and last modified if no etag exists
-        if config['etag']:
-            if rss.get('etag'):
-                feed.simple_persistence['%s_etag' % url_hash] = rss.etag
-                log.debug('etag %s saved for feed %s' % (rss.etag, feed.name))
-            if rss.get('headers'):
-                if  rss.headers.get('last-modified'):
-                    modified = feedparser._parse_date(rss.headers['last-modified'])
-                    feed.simple_persistence['%s_modified' % url_hash] = tuple(modified)
-                    log.debug('last modified %s saved for feed %s' % (modified, feed.name))
 
         # new entries to be created
         entries = []
