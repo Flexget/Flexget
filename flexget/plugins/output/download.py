@@ -267,13 +267,14 @@ class PluginDownload(object):
             # No content disposition header, nothing we can do
             return
         filename = parse_dict_header(response.headers['content-disposition']).get('filename')
-        # try to decode/encode, afaik this is against the specs but some servers do it anyway
-        try:
-            filename = filename.decode('utf-8')
-            log.debug('response info UTF-8 decoded')
-        except UnicodeError:
-            pass
+        
         if filename:
+            # try to decode/encode, afaik this is against the specs but some servers do it anyway
+            try:
+                filename = filename.decode('utf-8')
+                log.debug('response info UTF-8 decoded')
+            except UnicodeError:
+                pass
             filename = decode_html(filename)
             log.debug('Found filename from headers: %s' % filename)
             if 'filename' in entry:
