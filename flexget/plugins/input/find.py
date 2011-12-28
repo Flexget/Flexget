@@ -1,7 +1,8 @@
 import logging
 import os
 import re
-from flexget.feed import Entry
+import sys
+from flexget.entry import Entry
 from flexget.plugin import register_plugin
 from flexget.utils.cached_input import cached
 
@@ -57,10 +58,13 @@ class InputFind(object):
         self.prepare_config(config)
         entries = []
         match = re.compile(config['regexp'], re.IGNORECASE).match
+        # Default to utf-8 if we get None from getfilesystemencoding()
+        fs_encoding = sys.getfilesystemencoding() or 'utf-8'
         for path in config['path']:
             log.debug('scanning %s' % path)
             # unicode causes problems in here (#989)
-            for item in os.walk(str(path)):
+            path = path.encode(fs_encoding)
+            for item in os.walk(path):
                 log.debug('item: %s' % str(item))
                 for name in item[2]:
                     # If mask fails continue
@@ -68,15 +72,14 @@ class InputFind(object):
                         continue
                     e = Entry()
                     try:
-                        e['title'] = unicode(name)
+                        # Convert back to unicode
+                        e['title'] = name.decode(fs_encoding)
                     except UnicodeDecodeError:
-                        # TODO: if we hadn't casted path to str this would not be a problem
-                        # how to support everything?
-                        log.warning('Filename `%s` in `%s` encoding broken?' % (repr(name)[1:-1], item[0]))
+                        log.warning('Filename `%r` in `%s` encoding broken?' %
+                                    (name.decode('utf-8', 'replace'), item[0]))
                         continue
-                    filepath = os.path.join(item[0], name)
+                    filepath = os.path.join(item[0], name).decode(fs_encoding)
                     e['location'] = filepath
-                    e['filename'] = name
                     # Windows paths need an extra / prepended to them for url
                     if not filepath.startswith('/'):
                         filepath = '/' + filepath
