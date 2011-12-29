@@ -1,11 +1,15 @@
 from __future__ import absolute_import
 import urllib2
 import time
+import logging
 from datetime import timedelta, datetime
 from urlparse import urlparse
 import requests
 # Allow some request objects to be imported from here instead of requests
 from requests import RequestException
+
+# Don't emit info level urllib3 log messages or below
+logging.getLogger('requests.packages.urllib3').setLevel(logging.WARNING)
 
 # Remembers sites that have timed out
 unresponsive_hosts = {}
