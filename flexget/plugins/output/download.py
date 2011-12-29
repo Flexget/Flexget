@@ -6,11 +6,11 @@ import logging
 import mimetypes
 import hashlib
 import shutil
+from cgi import parse_header
 from httplib import BadStatusLine
 from requests import RequestException
-from requests.utils import parse_dict_header
 from flexget.plugin import register_plugin, register_parser_option, get_plugin_by_name, PluginWarning, PluginError
-from flexget.utils.tools import encode_html, decode_html
+from flexget.utils.tools import decode_html
 from flexget.utils.template import RenderError
 
 log = logging.getLogger('download')
@@ -266,7 +266,7 @@ class PluginDownload(object):
         if not response.headers.get('content-disposition'):
             # No content disposition header, nothing we can do
             return
-        filename = parse_dict_header(response.headers['content-disposition']).get('filename')
+        filename = parse_header(response.headers['content-disposition'])[1].get('filename')
         
         if filename:
             # try to decode/encode, afaik this is against the specs but some servers do it anyway
