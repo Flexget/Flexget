@@ -177,8 +177,6 @@ class InputRSS(object):
 
         log.debug('Requesting feed `%s` url `%s`' % (feed.name, config['url']))
 
-        etag = None
-        modified = None
         # Used to identify which etag/modified to use
         url_hash = str(hash(config['url']))
 

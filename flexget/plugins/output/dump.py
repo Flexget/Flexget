@@ -68,7 +68,7 @@ class OutputDump(object):
         #from flexget.utils.tools import sanitize
         #import yaml
 
-        eval_lazy = 'eval' in OutputDump.params
+        eval_lazy = OutputDump.params == 'eval'
         undecided = [entry for entry in feed.entries if not entry in feed.accepted]
         if undecided:
             console('-- Undecided: --------------------------')
