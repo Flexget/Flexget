@@ -1,13 +1,12 @@
-import urllib2
 import logging
-import zlib
+import time
+from requests import RequestException
 from BeautifulSoup import NavigableString
 from flexget.entry import Entry
 from flexget.plugin import register_plugin, internet, get_plugin_by_name, PluginError
 from flexget.utils.log import log_once
 from flexget.utils.soup import get_soup
 from flexget.utils.cached_input import cached
-from flexget.utils.tools import urlopener
 
 log = logging.getLogger('rlslog')
 
@@ -28,10 +27,8 @@ class RlsLog(object):
         :return: List of release dictionaries
         """
 
-        page = urlopener(rlslog_url, log)
-        if page.headers.get('content-encoding') in ('gzip', 'x-gzip', 'deflate'):
-            page = zlib.decompressobj(15 + 32).decompress(page.read())
-        soup = get_soup(page)
+        # BeautifulSoup doesn't seem to work if data is already decoded to unicode :/
+        soup = get_soup(feed.requests.get(rlslog_url, timeout=25, config={'decode_unicode': False}).content)
 
         releases = []
         for entry in soup.findAll('div', attrs={'class': 'entry'}):
@@ -100,26 +97,17 @@ class RlsLog(object):
         releases = []
         entries = []
 
-        # retry rlslog (badly responding) up to 6 times (our urlopener tries 3 times per each of our tries here)
+        # retry rlslog (badly responding) up to 4 times (requests tries 2 times per each of our tries here)
         for number in range(2):
             try:
                 releases = self.parse_rlslog(url, feed)
-            except urllib2.HTTPError, e:
-                if number == 1:
-                    raise
-                else:
-                    import time
-                    log.verbose('Error recieving content, retrying in 5s. Try [%s of 3]. HTTP Error Code: %s' % (str(number + 1), str(e.code)))
-                    time.sleep(5)
-            except urllib2.URLError, e:
-                if number == 1:
-                    raise
-                else:
-                    import time
-                    log.verbose('Error retrieving the URL, retrying in 5s. Try [%s of 3]. Error: %s' % (str(number + 1), str(e.reason)))
-                    time.sleep(5)
-            else:
                 break
+            except RequestException, e:
+                if number == 1:
+                    raise
+                else:
+                    log.verbose('Error receiving content, retrying in 5s. Try [%s of 2]. Error: %s' % (number + 1, e))
+                    time.sleep(5)
 
         # Construct entry from release
         for release in releases:
