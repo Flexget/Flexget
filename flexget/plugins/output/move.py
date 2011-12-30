@@ -56,17 +56,21 @@ class MovePlugin(object):
 
             # DST
             filepath, filename = os.path.split(src)
+            # get proper value in order of: entry, config, above split
             dst_path = entry.get('path', config.get('to', filepath))
-            dst_filename = entry.get('filename')
-            if dst_filename == filename:
-                dst_filename = config.get('filename', filename)
+            dst_filename = entry.get('filename', config.get('filename', filename))
 
             try:
                 dst_path = entry.render(dst_path)
-                dst_filename = entry.render(dst_filename)
-            except RenderError, e:
-                log.error('Value replacement failed for `%s`' % entry['title'])
+            except RenderError:
+                log.error('Path value replacement `%s` failed for `%s`' % (dst_path, entry['title']))
                 continue
+            try:
+                dst_filename = entry.render(dst_filename)
+            except RenderError:
+                log.error('Filename value replacement `%s` failed for `%s`' % (dst_filename, entry['title']))
+                continue
+
             dst = os.path.join(dst_path, dst_filename)
             if dst == entry['location']:
                 log.info('Not moving %s because source and destination are the same.' % dst)
