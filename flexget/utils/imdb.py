@@ -290,25 +290,31 @@ class ImdbParser(object):
         else:
             log.warning('Unable to get name for %s - plugin needs update?' % url)
 
-        # get votes
-        tag_votes = soup.find(itemprop='ratingCount')
-        if tag_votes:
-            str_votes = ''.join(c for c in tag_votes.string if c.isdigit())
-            self.votes = int(str_votes)
-            log.debug('Detected votes: %s' % self.votes)
-        else:
-            log.warning('Unable to get votes for %s - plugin needs update?' % url)
 
-        # get score
-        span_score = soup.find(itemprop='ratingValue')
-        if span_score:
-            try:
-                self.score = float(span_score.string)
-            except ValueError:
-                log.debug('tag_score %s is not valid float' % b_score.contents[0])
-            log.debug('Detected score: %s' % self.score)
+        # detect if movie is eligible for ratings
+        rating_ineligible = soup.find('div', attrs={'class': 'rating-ineligible'})
+        if rating_ineligible:
+            log.debug('movie is not eligible for ratings')
         else:
-            log.warning('Unable to get score for %s - plugin needs update?' % url)
+            # get votes
+            tag_votes = soup.find(itemprop='ratingCount')
+            if tag_votes:
+                str_votes = ''.join(c for c in tag_votes.string if c.isdigit())
+                self.votes = int(str_votes)
+                log.debug('Detected votes: %s' % self.votes)
+            else:
+                log.warning('Unable to get votes for %s - plugin needs update?' % url)
+
+            # get score
+            span_score = soup.find(itemprop='ratingValue')
+            if span_score:
+                try:
+                    self.score = float(span_score.string)
+                except ValueError:
+                    log.debug('tag_score %s is not valid float' % b_score.contents[0])
+                log.debug('Detected score: %s' % self.score)
+            else:
+                log.warning('Unable to get score for %s - plugin needs update?' % url)
 
         # get genres
         for link in soup.findAll('a', attrs={'href': re.compile('^/genre/')}):
