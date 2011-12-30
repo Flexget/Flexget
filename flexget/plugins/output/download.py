@@ -226,7 +226,7 @@ class PluginDownload(object):
         # download and write data into a temp file
         outfile = open(datafile, 'wb')
         try:
-            for chunk in response.iter_content():
+            for chunk in response.iter_content(decode_unicode=False):
                 outfile.write(chunk)
         except:
             # don't leave futile files behind
