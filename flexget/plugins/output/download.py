@@ -179,8 +179,10 @@ class PluginDownload(object):
             return 'IOError'
         except ValueError, e:
             # Probably unknown url type
-            log.warning(e.message)
-            return e.message
+            msg = 'ValueError %s' % e
+            log.warning(msg)
+            log.debug(msg, exc_info=True)
+            return msg
 
     def download_entry(self, feed, entry, url):
         """Downloads :entry: by using :url:
