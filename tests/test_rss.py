@@ -1,3 +1,4 @@
+import yaml
 from tests import FlexGetBase
 from nose.plugins.attrib import attr
 
@@ -131,9 +132,18 @@ class TestRssOnline(FlexGetBase):
               url: https://secure3.silverorange.com/rsstest/httpauth/rss_with_ssl_and_auth.xml
               username: testuser
               password: testpass
+
+          fanzub:
+            rss: http://www.fanzub.com/rss?cat=anime
+
+          rlslog:
+            rss: http://www.rlslog.net/category/movies/feed/
     """
 
     @attr(online=True)
     def test_rss_online(self):
-        # TODO: XXX
-        pass
+        # Make sure entries are created for all test feeds
+        feeds = yaml.load(self.__yaml__)['feeds']
+        for feed in feeds:
+            self.execute_feed(feed)
+            assert self.feed.entries, 'No results for feed `%s`' % feed

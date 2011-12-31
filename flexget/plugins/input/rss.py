@@ -111,29 +111,13 @@ class InputRSS(object):
             config['other_fields'] = [field.replace(':', '_').lower() for field in config['other_fields']]
         # set default value for group_links as deactivated
         config.setdefault('group_links', False)
-        # use basic auth when needed
-        if 'username' in config and 'password' in config:
-            config['url'] = self.passwordize(config['url'], config['username'], config['password'])
         # set default for etag
         config.setdefault('etag', True)
         return config
 
-    def passwordize(self, url, user, password):
-        """Add username and password to url"""
-        parts = list(urlparse.urlsplit(url))
-        parts[1] = user + ':' + password + '@' + parts[1]
-        url = urlparse.urlunsplit(parts)
-        return url
-
-    def process_invalid_content(self, feed, url):
+    def process_invalid_content(self, feed, data):
         """If feedparser reports error, save the received data and log error."""
 
-        try:
-            data = feed.requests.get(url).content
-        except ValueError, e:
-            log.debug('invalid url `%s` due to %s (ok for a file)' % (url, e))
-            return
-        log.critical('Invalid XML received from feed %s' % feed.name)
         ext = 'xml'
         if '<html>' in data.lower():
             log.critical('Received content is HTML page, not an RSS feed')
@@ -205,9 +189,13 @@ class InputRSS(object):
         # Get the feed content
         if config['url'].startswith(('http', 'https', 'ftp', 'file')):
             # Get feed using requests library
+            auth = None
+            if 'username' in config and 'password' in config:
+                auth = (config['username'], config['password'])
             try:
                 # Use the raw response so feedparser can read the headers and status values
-                response = feed.requests.get(config['url'], timeout=60, headers=headers, raise_status=False)
+                response = feed.requests.get(config['url'], timeout=60, headers=headers, raise_status=False,
+                                             config={'decode_unicode': False}, auth=auth)
                 content = response.content
             except RequestException, e:
                 raise PluginError('Unable to download the RSS: %s' % e)
@@ -245,7 +233,7 @@ class InputRSS(object):
                     log.debug('last modified %s saved for feed %s' % (modified, feed.name))
         else:
             # This is a file, open it
-            content = open(config['url'], 'rb')
+            content = open(config['url'], 'rb').read()
 
         try:
             rss = feedparser.parse(content)
@@ -272,7 +260,7 @@ class InputRSS(object):
                 if not rss.entries:
                     # save invalid data for review, this is a bit ugly but users seem to really confused when
                     # html pages (login pages) are received
-                    self.process_invalid_content(feed, config['url'])
+                    self.process_invalid_content(feed, content)
                     if feed.manager.options.debug:
                         log.exception(ex)
                     raise PluginError('Received invalid RSS content')
@@ -290,7 +278,7 @@ class InputRSS(object):
             else:
                 # all other bozo errors
                 if not rss.entries:
-                    self.process_invalid_content(feed, config['url'])
+                    self.process_invalid_content(feed, content)
                     raise PluginError('Unhandled bozo_exception. Type: %s (feed: %s)' % \
                         (ex.__class__.__name__, feed.name), log)
                 else:
