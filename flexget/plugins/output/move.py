@@ -58,7 +58,17 @@ class MovePlugin(object):
             filepath, filename = os.path.split(src)
             # get proper value in order of: entry, config, above split
             dst_path = entry.get('path', config.get('to', filepath))
-            dst_filename = entry.get('filename', config.get('filename', filename))
+
+            if entry.get('filename') and entry['filename'] != filename:
+                # entry specifies different filename than what was split from the path
+                # since some inputs fill in filename it must be different in order to be used
+                dst_filename = entry['filename']
+            elif 'filename' in config:
+                # use from configuration if given
+                dst_filename = config['filename']
+            else:
+                # just use original filename
+                dst_filename = filename
 
             try:
                 dst_path = entry.render(dst_path)
