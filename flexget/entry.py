@@ -271,4 +271,7 @@ class Entry(dict):
         :rtype: string
         :raises RenderError: If there is a problem.
         """
+        if not isinstance(template, basestring):
+            raise ValueError('Trying to render non string template, got %s' % repr(template))
+        log.trace('rendering: %s' % template)
         return render_from_entry(template, self)
