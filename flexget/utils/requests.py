@@ -71,6 +71,9 @@ class Session(requests.Session):
         """Set some defaults for our session if not explicitly defined."""
         kwargs.setdefault('timeout', 15)
         kwargs.setdefault('config', {}).setdefault('max_retries', 1)
+        # TODO: This is a temporary fix for requests not properly handling deflate encoding, can be removed when
+        # next version of requests is released (>0.9) See #1412
+        kwargs.setdefault('headers', {}).setdefault('Accept-Encoding', ', '.join(('identity', 'compress', 'gzip')))
         requests.Session.__init__(self, **kwargs)
         self.cookiejar = None
         # Stores min intervals between requests for certain sites
