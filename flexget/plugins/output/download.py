@@ -6,6 +6,7 @@ import logging
 import mimetypes
 import hashlib
 import shutil
+import sys
 from cgi import parse_header
 from httplib import BadStatusLine
 from requests import RequestException
@@ -132,6 +133,18 @@ class PluginDownload(object):
             else:
                 feed.fail(entry, ", ".join(errors))
 
+    def save_error_page(self, entry, feed, page):
+        received = os.path.join(feed.manager.config_base, 'received', feed.name)
+        if not os.path.isdir(received):
+            os.makedirs(received)
+        filename = os.path.join(received, '%s.error' % entry['title'].encode(sys.getfilesystemencoding(), 'replace'))
+        log.error('Error retrieving %s, the error page has been saved to %s' % (entry['title'], filename))
+        outfile = open(filename, 'w')
+        try:
+            outfile.write(page)
+        finally:
+            outfile.close()
+
     def get_temp_files(self, feed, require_path=False, handle_magnets=False, fail_html=True):
         """Download all feed content and store in temporary folder.
 
@@ -212,7 +225,14 @@ class PluginDownload(object):
             log.debug('Basic auth enabled. User: %s Password: %s' % (entry['basic_auth_username'], entry['basic_auth_password']))
             auth = (entry['basic_auth_username'], entry['basic_auth_password'])
 
-        response = feed.requests.get(url, auth=auth)
+        response = feed.requests.get(url, auth=auth, raise_status=False)
+        if response.status_code != 200:
+            # Save the error page
+            response.encoding = None
+            if response.content:
+                self.save_error_page(entry, feed, response.content)
+            # Raise the error
+            response.raise_for_status()
 
         # generate temp file, with random md5 sum ..
         # url alone is not random enough, it has happened that there are two entries with same url
