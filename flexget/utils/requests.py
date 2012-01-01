@@ -113,10 +113,11 @@ class Session(requests.Session):
             if domain in url:
                 next_req = domain_dict.get('next_req')
                 if next_req and datetime.now() < next_req:
-                    wait_time = (next_req - datetime.now()).seconds
-                    log.debug('Waiting %s seconds until next request to %s' % (wait_time, domain))
+                    wait_time = next_req - datetime.now()
+                    seconds = wait_time.seconds + (wait_time.microseconds / 1000000.0)
+                    log.debug('Waiting %.2f seconds until next request to %s' % (seconds, domain))
                     # Sleep until it is time for the next request
-                    time.sleep(wait_time)
+                    time.sleep(seconds)
                 # Record the next allowable request time for this domain
                 domain_dict['next_req'] = datetime.now() + domain_dict['delay']
                 break
