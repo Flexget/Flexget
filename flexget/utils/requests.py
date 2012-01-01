@@ -7,6 +7,9 @@ from urlparse import urlparse
 import requests
 # Allow some request objects to be imported from here instead of requests
 from requests import RequestException
+from flexget.utils.tools import parse_timedelta
+
+log = logging.getLogger('requests')
 
 # Don't emit info level urllib3 log messages or below
 logging.getLogger('requests.packages.urllib3').setLevel(logging.WARNING)
@@ -70,6 +73,8 @@ class Session(requests.Session):
         kwargs.setdefault('config', {}).setdefault('max_retries', 1)
         requests.Session.__init__(self, **kwargs)
         self.cookiejar = None
+        # Stores min intervals between requests for certain sites
+        self.domain_delay = {}
 
     def add_cookiejar(self, cookiejar):
         """
@@ -84,6 +89,15 @@ class Session(requests.Session):
             for cookie in cookiejar:
                 self.cookiejar.set_cookie(cookie)
 
+    def set_domain_delay(self, domain, delay):
+        """
+        Registers a minimum interval between requests to `domain`
+
+        :param domain: The domain to set the interval on
+        :param delay: The amount of time between requests, can be a timedelta or string like '3 seconds'
+        """
+        self.domain_delay[domain] = {'delay': parse_timedelta(delay)}
+
     def request(self, method, url, *args, **kwargs):
         """
         Does a request, but raises Timeout immediately if site is known to timeout, and records sites that timeout.
@@ -93,6 +107,19 @@ class Session(requests.Session):
         # Raise Timeout right away if site is known to timeout
         if is_unresponsive(url):
             raise requests.Timeout('Requests to this site are known to timeout.')
+
+        # Check if we need to add a delay before request to this site
+        for domain, domain_dict in self.domain_delay.iteritems():
+            if domain in url:
+                next_req = domain_dict.get('next_req')
+                if next_req and datetime.now() < next_req:
+                    wait_time = (next_req - datetime.now()).seconds
+                    log.debug('Waiting %s seconds until next request to %s' % (wait_time, domain))
+                    # Sleep until it is time for the next request
+                    time.sleep(wait_time)
+                # Record the next allowable request time for this domain
+                domain_dict['next_req'] = datetime.now() + domain_dict['delay']
+                break
 
         # Pop our custom keyword argument before calling super method
         raise_status = kwargs.pop('raise_status', True)

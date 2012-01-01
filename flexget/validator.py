@@ -431,8 +431,8 @@ class IntervalValidator(RegexpMatchValidator):
 
     def __init__(self, parent=None, **kwargs):
         RegexpMatchValidator.__init__(self, parent, **kwargs)
-        self.accept(r'^\d+ (minute|hour|day|week)s?$')
-        self.message = "should be in format 'x (minutes|hours|days|weeks|months)'"
+        self.accept(r'^\d+ (second|minute|hour|day|week)s?$')
+        self.message = "should be in format 'x (seconds|minutes|hours|days|weeks)'"
 
 
 class FileValidator(TextValidator):

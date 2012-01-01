@@ -9,7 +9,6 @@ from htmlentitydefs import name2codepoint
 import re
 import ntpath
 from datetime import timedelta
-from flexget.utils.requests import is_unresponsive, set_unresponsive
 
 
 def str_to_boolean(string):
@@ -219,6 +218,7 @@ def urlopener(url_or_request, log, **kwargs):
     :param kwargs: Keyword arguments to be passed to urlopen
     :return: The file-like object returned by urlopen
     """
+    from flexget.utils.requests import is_unresponsive, set_unresponsive
 
     if isinstance(url_or_request, urllib2.Request):
         url = url_or_request.get_host()
