@@ -6,7 +6,13 @@ log = logging.getLogger('domain_delay')
 
 
 class DomainDelay(object):
-    """Sets a minimum interval between requests to specific domains."""
+    """
+    Sets a minimum interval between requests to specific domains.
+
+    Example::
+      domain_delay:
+        mysite.com: 5 seconds
+    """
 
     def validator(self):
         root = validator.factory('dict')
