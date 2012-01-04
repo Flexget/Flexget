@@ -21,11 +21,11 @@ import sys, os
 # -- General configuration -----------------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.
-#needs_sphinx = '1.0'
+needs_sphinx = '1.0'
 
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
-extensions = ['sphinx.ext.autodoc', 'sphinx.ext.coverage']
+extensions = ['sphinx.ext.autodoc', 'sphinx.ext.coverage', 'sphinx.ext.extlinks']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['templates']
@@ -164,7 +164,7 @@ html_static_path = ['static']
 #html_file_suffix = None
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'FlexGetdoc'
+htmlhelp_basename = 'FlexGetDocs'
 
 
 # -- Options for LaTeX output --------------------------------------------------
@@ -227,8 +227,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-  ('index', 'FlexGet', u'FlexGet Documentation',
-   u'FlexGet', 'FlexGet', 'One line description of project.',
+  ('index', 'FlexGet', u'FlexGet Technical Documentation',
+   u'FlexGet', 'FlexGet', 'Automation tool.',
    'Miscellaneous'),
 ]
 
@@ -240,3 +240,9 @@ texinfo_documents = [
 
 # How to display URL addresses: 'footnote', 'no', or 'inline'.
 #texinfo_show_urls = 'footnote'
+
+# -- Extlinks for Trac ---------------------------------------------------------
+
+# sphinx.ext.extlinks
+extlinks = {'ticket': ('http://flexget.com/ticket/%s', 'ticket '),
+            'wiki': ('http://flexget.com/wiki/%s', 'wiki ')}
