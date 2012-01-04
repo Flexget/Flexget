@@ -107,6 +107,20 @@ class Session(requests.Session):
         Also raises errors getting the content by default.
         """
 
+        # Handle file URI scheme using urllib2, wrap in requests response object
+        if url.startswith('file://'):
+            try:
+                raw = urllib2.urlopen(url)
+            except IOError, e:
+                msg = 'IOError openening file %s: %s' % (url, e)
+                log.error(msg)
+                raise RequestException(msg)
+            resp = requests.Response()
+            resp.raw = raw
+            resp.status_code = 200
+            resp.headers = requests.structures.CaseInsensitiveDict(raw.headers)
+            return resp
+
         # Raise Timeout right away if site is known to timeout
         if is_unresponsive(url):
             raise requests.Timeout('Requests to this site are known to timeout.')

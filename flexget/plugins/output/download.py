@@ -233,6 +233,7 @@ class PluginDownload(object):
                 self.save_error_page(entry, feed, response.content)
             # Raise the error
             response.raise_for_status()
+            return
 
         # generate temp file, with random md5 sum ..
         # url alone is not random enough, it has happened that there are two entries with same url
