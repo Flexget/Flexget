@@ -285,7 +285,7 @@ class SeriesPlugin(object):
             episode = Episode()
             episode.identifier = parser.identifier
             # if episodic format
-            if parser.season and parser.episode:
+            if parser.season and parser.episode is not None:
                 episode.season = parser.season
                 episode.number = parser.episode
             series.episodes.append(episode) # pylint:disable=E1103
@@ -716,7 +716,7 @@ class FilterSeries(SeriesPlugin, FilterSeriesBase):
             entry['quality'] = parser.quality
             entry['proper'] = parser.proper
             entry['proper_count'] = parser.proper_count
-            if parser.season and parser.episode:
+            if parser.season and parser.episode is not None:
                 entry['series_season'] = parser.season
                 entry['series_episode'] = parser.episode
             else:
