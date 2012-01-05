@@ -59,6 +59,9 @@ class MovieParser(TitleParser):
         cut_part = 256
         for part_pos, part in enumerate(parts):
             cut = False
+            # Don't let the first word be cutoff word
+            if part_pos < 1:
+                continue
             # check for year
             if part.isdigit():
                 num = int(part)

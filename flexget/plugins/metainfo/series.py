@@ -29,12 +29,12 @@ class MetainfoSeries(object):
                 continue
             self.guess_entry(entry)
 
-    def guess_entry(self, entry):
+    def guess_entry(self, entry, allow_seasonless=False):
         """Populates series_* fields for entries that are successfully parsed."""
         if entry.get('series_parser') and entry['series_parser'].valid:
             # Return true if we already parsed this, false if series plugin parsed it
             return entry.get('series_guessed')
-        parser = self.guess_series(entry['title'])
+        parser = self.guess_series(entry['title'], allow_seasonless=allow_seasonless)
         if parser:
             entry['series_name'] = parser.name
             entry['series_season'] = parser.season
@@ -46,10 +46,10 @@ class MetainfoSeries(object):
             return True
         return False
 
-    def guess_series(self, title):
+    def guess_series(self, title, allow_seasonless=False):
         """Returns a valid series parser if this :title: appears to be a series"""
 
-        parser = SeriesParser(identified_by='ep', allow_seasonless=False)
+        parser = SeriesParser(identified_by='ep', allow_seasonless=allow_seasonless)
         # We need to replace certain characters with spaces to make sure episode parsing works right
         # We don't remove anything, as the match positions should line up with the original title
         clean_title = re.sub('[_.,\[\]\(\):]', ' ', title)

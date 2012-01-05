@@ -32,6 +32,7 @@ class FilterSeriesPremiere(FilterSeriesBase):
         root.accept('boolean')
         options = root.accept('dict')
         self.build_options_validator(options)
+        options.accept('boolean', key='allow_seasonless')
         return root
 
     # Run after series and metainfo series plugins
@@ -42,7 +43,9 @@ class FilterSeriesPremiere(FilterSeriesBase):
             return
         # Generate the group settings for series plugin
         group_settings = {}
+        allow_seasonless = False
         if isinstance(config, dict):
+            allow_seasonless = config.pop('allow_seasonless', False)
             group_settings = config
         group_settings['series_guessed'] = True
         # Generate a list of unique series that have premieres
@@ -50,7 +53,7 @@ class FilterSeriesPremiere(FilterSeriesBase):
         guess_entry = metainfo_series.instance.guess_entry
         guessed_series = set()
         for entry in feed.entries:
-            if guess_entry(entry):
+            if guess_entry(entry, allow_seasonless=allow_seasonless):
                 if entry['series_id'] == 'S01E01':
                     guessed_series.add(entry['series_name'])
         # Reject any further episodes in those series
