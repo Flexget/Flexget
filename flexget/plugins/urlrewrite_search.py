@@ -25,19 +25,19 @@ class SearchPlugins(object):
 
 class PluginSearch(object):
     """
-        Search entry from sites. Accepts list of known search plugins, list is in priority order.
-        Once hit has been found no more searches are performed. Should be used only when
-        there is no other way to get working download url, ie. when input plugin does not provide
-        any downloadable urls.
+    Search entry from sites. Accepts list of known search plugins, list is in priority order.
+    Once hit has been found no more searches are performed. Should be used only when
+    there is no other way to get working download url, ie. when input plugin does not provide
+    any downloadable urls.
 
-        Example:
+    Example:
 
-        urlrewrite_search:
-          - newtorrents
-          - piratebay
+      urlrewrite_search:
+        - newtorrents
+        - piratebay
 
-        Notes:
-        - Some url rewriters will use search plugins automatically if enry url points into a search page.
+    .. note:: Some url rewriters will use search plugins automatically if enry url
+              points into a search page.
     """
 
     def validator(self):

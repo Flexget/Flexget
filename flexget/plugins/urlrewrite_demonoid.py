@@ -12,25 +12,33 @@ log = logging.getLogger('demonoid')
 
 
 class UrlRewriteDemonoid:
-    """Demonoid urlrewriter.
+    """
+    UrlRewriter and Search functionality for demonoid.
 
-    should accept:
-    demonoid: <category>
+    Will accept:
+      demonoid: <category>
 
-    categories:
-    all
-    applications
-    audio books
-    books
-    comics
-    games
-    anime
-    misc
-    movies
-    music
-    music videos
-    pictures
-    tv
+    Or:
+      demonoid:
+        - category: <category>
+        - quality: <quality>
+        - sub-category: <category>
+
+    Categories:
+
+    * all
+    * applications
+    * audio books
+    * tv
+    * games
+    * books
+    * comics
+    * anime
+    * misc
+    * movies
+    * music
+    * music videos
+    * pictures
     """
 
     def validator(self):
@@ -53,30 +61,7 @@ class UrlRewriteDemonoid:
     # search API
     @internet(log)
     def search(self, query, comparator, config):
-
         """
-            Search for name from demonoid.
-
-            Will accept:   demonoid: <category>
-                           demonoid:
-                             - category: <category>
-                             - quality: <quality>
-                             - sub-category: <category>
-            Categories:
-              all
-              applications
-              audio books
-              tv
-              games
-              books
-              comics
-              anime
-              misc
-              movies
-              music
-              music videos
-              pictures
-
         """
 
         #TODO: check if urls are ever passed and if is wanted behaviour.
@@ -116,7 +101,7 @@ class UrlRewriteDemonoid:
             entry['search_sort'] = torrent_availability(entry['torrent_seeds'], entry['torrent_leeches'])
             # Parse content_size
             size = tds[3].contents[0]
-            size = re.search('([\.\d]+) ([GMK])B', size)
+            size = re.search(r'([\.\d]+) ([GMK])B', size)
             if size:
                 if size.group(2) == 'G':
                     entry['content_size'] = int(float(size.group(1)) * 1000 ** 3 / 1024 ** 2)

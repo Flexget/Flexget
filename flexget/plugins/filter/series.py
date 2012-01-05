@@ -487,9 +487,9 @@ class FilterSeriesBase(object):
 
 class FilterSeries(SeriesPlugin, FilterSeriesBase):
     """
-        Intelligent filter for tv-series.
+    Intelligent filter for tv-series.
 
-        http://flexget.com/wiki/Plugins/series
+    http://flexget.com/wiki/Plugins/series
     """
 
     def __init__(self):

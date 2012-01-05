@@ -7,23 +7,23 @@ log = logging.getLogger('manipulate')
 
 class Manipulate(object):
     """
-        Usage:
+    Usage:
 
-        manipulate:
-          - <destination field>:
-              [phase]: <phase>
-              [from]: <source field>
-              [extract]: <regexp>
-              [separator]: <text>
-              [replace]:
-                regexp: <regexp>
-                format: <regexp>
+      manipulate:
+        - <destination field>:
+            [phase]: <phase>
+            [from]: <source field>
+            [extract]: <regexp>
+            [separator]: <text>
+            [replace]:
+              regexp: <regexp>
+              format: <regexp>
 
-        Example:
+    Example:
 
-        manipulate:
-          - title:
-              extract: \[\d\d\d\d\](.*)
+      manipulate:
+        - title:
+            extract: \[\d\d\d\d\](.*)
     """
 
     def validator(self):

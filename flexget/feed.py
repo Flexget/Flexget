@@ -117,9 +117,9 @@ class Feed(object):
 
     def purge(self):
         """
-        Purge rejected and failed entries.
-        Failed entries will be removed from entries, accepted and rejected
-        Rejected entries will be removed from entries and accepted
+        Purges rejected and failed entries.
+        Failed entries will be removed from :attr:`entries`, :attr:`accepted` and :attr:`rejected`
+        Rejected entries will be removed from :attr:`entries` and :attr:`accepted`
         """
         self.__purge_failed()
         self.__purge_rejected()
