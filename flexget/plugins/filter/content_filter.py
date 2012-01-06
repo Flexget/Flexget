@@ -2,7 +2,6 @@ import logging
 import posixpath
 from fnmatch import fnmatch
 from flexget.plugin import register_plugin, priority
-from flexget.utils.log import log_once
 
 log = logging.getLogger('content_filter')
 
@@ -54,12 +53,12 @@ class FilterContentFilter(object):
             # download plugin has already printed a downloading message.
             if config.get('require'):
                 if not matching_mask(files, config['require']):
-                    log_once('Entry %s does not have any of the required filetypes, rejecting' % entry['title'], log)
+                    log.info('Entry %s does not have any of the required filetypes, rejecting' % entry['title'])
                     feed.reject(entry, 'does not have any of the required filetypes', remember=True)
             if config.get('reject'):
                 mask = matching_mask(files, config['reject'])
                 if mask:
-                    log_once('Entry %s has banned file %s, rejecting' % (entry['title'], mask), log)
+                    log.info('Entry %s has banned file %s, rejecting' % (entry['title'], mask))
                     feed.reject(entry, 'has banned file %s' % mask, remember=True)
 
     def parse_torrent_files(self, entry):
