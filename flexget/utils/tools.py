@@ -49,7 +49,7 @@ class MergeException(Exception):
 
 
 def strip_html(text):
-    """Tries to strip all HTML tags from :text:. If unsuccessful returns original text."""
+    """Tries to strip all HTML tags from *text*. If unsuccessful returns original text."""
     from BeautifulSoup import BeautifulSoup
     try:
         text = ' '.join(BeautifulSoup(text).findAll(text=True))
@@ -85,15 +85,10 @@ def _htmldecode(text):
 
 
 def decode_html(value):
-    """Decode HTML entities from :value: and return it"""
-
     """
-    fails to decode &#x2500;
-
-    from BeautifulSoup import BeautifulSoup
-    return unicode(BeautifulSoup(value, convertEntities=BeautifulSoup.HTML_ENTITIES))
+    :param string value: String to be html-decoded
+    :returns: Html decoded string
     """
-
     return _htmldecode(value)
 
 
@@ -210,8 +205,8 @@ def urlopener(url_or_request, log, **kwargs):
     Utility function for pulling back a url, with a retry of 3 times, increasing the timeout, etc.
     Re-raises any errors as URLError.
 
-    .. warning:
-       This is being replaced by requests library. flexget.utils.requests should be used going forward.
+    .. warning:: This is being replaced by requests library.
+                 flexget.utils.requests should be used going forward.
 
     :param str url_or_request: URL or Request object to get.
     :param log: Logger to log debug info and errors to
@@ -336,12 +331,10 @@ def make_valid_path(path, windows=None):
 
 
 def console(text):
-    """Safe print to console."""
-
+    """Print to console safely."""
     if isinstance(text, str):
         print text
         return
-
     print unicode(text).encode('utf8')
 
 

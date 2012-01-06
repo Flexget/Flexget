@@ -1,5 +1,17 @@
 from tests import FlexGetBase
-from flexget.utils import qualities as quals
+from flexget.utils import qualities
+
+
+class TestQualityModule(object):
+
+    def test_get(self):
+        assert qualities.get('foobar') is qualities.UNKNOWN, 'unknown not returned'
+        assert qualities.get('foobar', default='xxx') is not qualities.UNKNOWN, 'arg default not returned'
+
+    def test_common_name(self):
+        for test_val in ('720p', '1280x720'):
+            got_val = qualities.common_name(test_val)
+            assert got_val == '720p', got_val
 
 
 class TestQualityParser(object):
@@ -41,7 +53,7 @@ class TestQualityParser(object):
                  ('Test.File.368.avi', '368p')]
 
         for item in items:
-            quality = quals.parse_quality(item[0]).name
+            quality = qualities.parse_quality(item[0]).name
             assert quality == item[1], '`%s` quality should be `%s` not `%s`' % (item[0], item[1], quality)
 
 

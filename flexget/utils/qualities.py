@@ -1,3 +1,7 @@
+"""
+.. warning:: Many methods in this module are not thread safe since they do in place sort for :attr:`qualities`
+"""
+
 import re
 import copy
 import logging
@@ -9,13 +13,15 @@ class Quality(object):
 
     def __init__(self, value, name, all_of=None, none_of=None):
         """
-        Args:
-
-            value: numerical value for quality, used for determining order
-            name: commonly used name for the quality
-            all_of: list of match_all that all need to match when testing
-                    whether or not given text matches this quality
-            none_of: list of match_all that cannot match to this quality
+        :param int value:
+          numerical value for quality, used for determining order
+        :param string name:
+          commonly used name for the quality
+        :param list all_of:
+          list of regexps that all need to match when testing
+          whether or not given text matches this quality
+        :param list none_of:
+          list of regexps that cannot match to this quality
         """
         self.value = value
         self.name = name
@@ -34,14 +40,10 @@ class Quality(object):
     def matches(self, text):
         """Test if quality matches to text.
 
-        Args:
-
-            text: data te be tested against
-
-        Returns:
-            0 - True if matches
-            1 - Remaining text, quality data stripped
+        :param string text: data te be tested against
+        :returns: tuple (matches, remaining text without quality data)
         """
+
         #log.debug('testing for quality %s --->' % self.name)
         # none of these regexps can match
         for regexp in self.not_regexps:
@@ -99,7 +101,7 @@ class Quality(object):
     def __str__(self):
         return self.name
 
-    def __deepcopy__(self, memo={}):
+    def __deepcopy__(self, memo=None):
         # No mutable attributes, return a regular copy
         return copy.copy(self)
 
@@ -113,6 +115,7 @@ re_1080p = '(?:1920x)?1080p?'
 re_bluray = '(?:b[dr][\W_]?rip|bluray(?:[\W_]?rip)?)'
 re_10bit = '(10.?bit|hi10p)'
 
+# TODO: this should be marked as private (_qualities), not sure if it used from other places though
 qualities = [Quality(1200, '1080p bluray 10bit', [re_1080p, re_bluray, re_10bit], none_of=[re_rc_or_r5]),
              Quality(1100, '1080p bluray', [re_1080p, re_bluray], none_of=[re_rc_or_r5]),
              Quality(1000, '1080p web-dl', [re_1080p, re_webdl]),
@@ -158,19 +161,26 @@ def all():
     return sorted(qualities, reverse=True) + [UNKNOWN]
 
 
-def get(name, *args):
-    """Return Quality object for :name: (case insensitive)"""
+def get(name, default=None):
+    """
+    Return Quality object for :name: (case insensitive)
+    :param name: Quality name
+    :return: Found :class:`Quality` / UNKNOWN or *default* if given and nothing was found.
+    """
     name = name.lower()
     if name in registry:
         return registry[name]
     q = parse_quality(name)
     if q.value:
         return q
-    return args[0] if args else UNKNOWN
+    return default if default is not None else UNKNOWN
 
 
 def value(name):
-    """Return value of quality with :name: (case insensitive) or 0 if unknown"""
+    """
+    :param str name: case insensitive quality name
+    :return: Return value of quality with given *name* or 0 if unknown
+    """
     return get(name).value
 
 
@@ -187,21 +197,20 @@ def max():
 
 
 def common_name(name):
-    """Return `common name` for :name: (case insensitive)
-    ie.
-    names 1280x720, 720 and 720p will all return 720p"""
+    """Return `common name` for *name* (case insensitive).
+
+    :param string name: Name to be converted in the common form.
+    :returns: common name, eg. 1280x720, 720 and 720p will all return 720p
+    :rtype: string
+    """
     return get(name).name
 
 
 def quality_match(title):
     """Search best quality from title
 
-    Args:
-        title: text to search from
-
-    Returns:
-        0 - quality object matching or Unknown quality
-        1 - remaining title, quality data removed
+    :param string title: text to search from
+    :returns: tuple (:class:`Quality` which can be unknown, remaining title without quality)
     """
     qualities.sort(reverse=True)
     for quality in qualities:
@@ -214,7 +223,6 @@ def quality_match(title):
 def parse_quality(title):
     """Find the highest know quality in a given string :title:
 
-    Returns:
-        quality object or False
+    :returns: :class:`Quality` object or False
     """
     return quality_match(title)[0]

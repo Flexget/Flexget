@@ -191,7 +191,7 @@ class TestHtmlUtils(object):
         assert decode_html('&#x2500;') == u'\u2500'
 
     def test_encode_html(self):
-        """utils encode_html (DISABLED)"""
+        """utils encode_html (FAILS - DISABLED)"""
         return
 
         # why this does not encode < ?
