@@ -114,6 +114,11 @@ class Feed(object):
 
     def __str__(self):
         return '<Feed(name=%s,aborted=%s)>' % (self.name, str(self._abort))
+        
+    @property
+    def undecided(self):
+        """Iterate over undecided entries"""
+        return (entry for entry in self.entries if not entry in self.accepted and entry not in self.rejected)
 
     def purge(self):
         """

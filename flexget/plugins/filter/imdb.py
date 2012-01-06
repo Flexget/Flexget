@@ -87,7 +87,9 @@ class FilterImdb(object):
 
         lookup = get_plugin_by_name('imdb_lookup').instance.lookup
 
-        for entry in feed.entries:
+        # since the plugin does not reject anything, no sense going trough accepted
+        for entry in feed.undecided:
+                
             force_accept = False
 
             try:
