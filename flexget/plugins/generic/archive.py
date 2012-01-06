@@ -150,6 +150,7 @@ class Archive(object):
 
     def on_feed_exit(self, feed, config):
         """Add new entries into archive. We use exit phase in case the feed corrects title or url via some plugins."""
+
         if isinstance(config, bool):
             tag_names = []
         else:
@@ -201,8 +202,13 @@ class Archive(object):
         if count:
             log.verbose('Added %i new entries to archive' % count)
 
-    # archive even on abort
-    on_feed_abort = on_feed_exit
+    def on_feed_abort(self, feed, config):
+        """
+        Archive even on feed abort, except if the abort has happened before session
+        was started. Eg. in on_process_start
+        """
+        if feed.session is not None:
+            self.on_feed_exit(feed, config)
 
 
 class ArchiveInject(object):
@@ -281,11 +287,11 @@ class ArchiveInject(object):
 
         # if this feed is not going to be injected into, abort it
         if feed.name not in ArchiveInject._injecting_into_feeds:
-            log.debug('not injecting to %s, aborting & disabling' % feed.name)
+            log.debug('Not going to inject to %s, aborting & disabling' % feed.name)
             feed.enabled = False
             feed.abort(silent=True)
         else:
-            log.debug('injecting to %s, leaving it enabled' % feed.name)
+            log.debug('Injecting to %s, leaving it enabled' % feed.name)
 
     @priority(255)
     def on_feed_input(self, feed, config):
