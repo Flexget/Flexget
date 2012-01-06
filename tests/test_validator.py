@@ -72,3 +72,22 @@ class TestValidator(object):
         choice.validate('fOO')
         print choice.errors.messages
         assert choice.errors.messages, 'fOO should be invalid'
+
+    def test_lazy(self):
+        """Test lazy validators by making a recursive one."""
+
+        def recursive_validator():
+            root = validator.factory('dict')
+            root.accept('integer', key='int')
+            root.accept(recursive_validator, key='recurse')
+            return root
+
+        test_config = {'int': 1,
+                       'recurse': {
+                           'int': 2,
+                           'recurse': {
+                               'int': 3}}}
+
+        assert recursive_validator().validate(test_config), 'Config should pass validation'
+        test_config['recurse']['badkey'] = 4
+        assert not recursive_validator().validate(test_config), 'Config should not be valid'

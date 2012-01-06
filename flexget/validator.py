@@ -94,25 +94,25 @@ class Validator(object):
         self.parent = parent
         return parent
 
-    def get_validator(self, name, **kwargs):
+    def get_validator(self, value, **kwargs):
         """Returns a child validator of this one.
 
-        :param string name:
+        :param value:
           Can be a validator type string, an already created Validator instance,
           or a function that returns a validator instance.
         :param kwargs:
           Keyword arguments are passed on to validator init if a new validator is created.
         """
-        if isinstance(name, Validator):
+        if isinstance(value, Validator):
             # If we are passed a Validator instance, make it a child of this validator and return it.
-            name.add_parent(self)
-            return name
-        elif hasattr(name, '__call__'):
+            value.add_parent(self)
+            return value
+        elif callable(value):
             # Create a LazyValidator that will serve as a Validator when attributes are accessed.
-            return LazyValidator(name, parent=self)
+            return LazyValidator(value, parent=self)
         # Otherwise create a new child Validator
         kwargs['parent'] = self
-        return factory(name, **kwargs)
+        return factory(value, **kwargs)
 
     def accept(self, name, **kwargs):
         raise NotImplementedError('Validator %s should override accept method' % self.__class__.__name__)
@@ -694,7 +694,7 @@ class DictValidator(Validator):
 
 class LazyValidator(object):
     """Acts as a wrapper for a Validator instance, but does not generate the instance until one of its attributes
-    needs to be accessed."""
+    needs to be accessed. Used to create validators that may otherwise cause endless loops."""
 
     def __init__(self, func, parent=None):
         """
