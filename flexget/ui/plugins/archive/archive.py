@@ -60,4 +60,5 @@ def inject(id):
     return render_template('archive/archive.html')
 
 
-register_plugin(archive, menu='Archive')
+# TODO: Requires refactoring once archive plugin is refactored
+#register_plugin(archive, menu='Archive')
