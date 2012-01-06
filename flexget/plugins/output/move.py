@@ -121,7 +121,7 @@ class MovePlugin(object):
             if feed.manager.options.test:
                 log.info('Would move `%s` to `%s`' % (src, dst))
             else:
-                log.verbose('Moving `%s` to `%s`' % (src, dst))
+                log.info('Moving `%s` to `%s`' % (src, dst))
                 shutil.move(src, dst)
             if 'clean_source' in config:
                 if not os.path.isdir(src):
@@ -132,10 +132,10 @@ class MovePlugin(object):
                         if feed.manager.options.test:
                             log.info('Would delete %s and everything under it' % base_path)
                         else:
-                            log.verbose('Deleting `%s`' % base_path)
+                            log.info('Deleting `%s`' % base_path)
                             shutil.rmtree(base_path, ignore_errors=True)
                     else:
-                        log.verbose(
+                        log.info(
                             'Path `%s` left because it exceeds safety value set in clean_source option' % base_path)
                 else:
                     log.verbose('Cannot clean_source `%s` because source is a directory' % src)
