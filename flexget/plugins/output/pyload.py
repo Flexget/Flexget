@@ -45,7 +45,7 @@ class PluginPyLoad(object):
     """
 
     __author__ = 'http://pyload.org'
-    __version__ = '0.21'
+    __version__ = '0.22'
 
     DEFAULT_API = 'http://localhost:8000/api'
     DEFAULT_QUEUE = False
@@ -98,7 +98,7 @@ class PluginPyLoad(object):
             # bunch of urls now going to check
             content = entry['description'] + " " + entry['url']
 
-            result = query_api(url, "parseURLs", {"html": "'''%s'''" % content, "url": "''", "session": self.session})
+            result = query_api(url, "parseURLs", {"html": json.dumps(content), "url": "''", "session": self.session})
 
             # parsed plugins : urls
             parsed = json.loads(result.read())
@@ -165,6 +165,6 @@ class PluginPyLoad(object):
 
 
 def query_api(url, method, post=None):
-    return urlopen(url.rstrip("/") + "/" + method.strip("/"), urlencode(post) if post else None)
+    return urlopen(url.rstrip("/") + "/" + method.strip("/"), urlencode(post.encode("utf8")) if post else None)
 
 register_plugin(PluginPyLoad, 'pyload', api_ver=2)
