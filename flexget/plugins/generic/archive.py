@@ -162,7 +162,7 @@ class Archive(object):
 
         count = 0
         processed = []
-        for entry in feed.entries + feed.accepted + feed.rejected + feed.failed:
+        for entry in feed.entries + feed.rejected + feed.failed:
             # I think entry can be in multiple of those lists .. not sure though!
             if entry in processed:
                 continue
