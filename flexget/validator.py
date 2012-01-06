@@ -193,14 +193,14 @@ class ChoiceValidator(Validator):
         self.valid_ic = []
         Validator.__init__(self, parent, **kwargs)
 
-    def accept(self, value, **kwargs):
+    def accept(self, value, ignore_case=False):
         """
         :param value: accepted text, int or boolean
-        :param kwargs: ignore_case (boolean)
+        :param bool ignore_case: Whether case matters for text values
         """
         if not isinstance(value, (basestring, int, float)):
             raise Exception('Choice validator only accepts strings and numbers')
-        if isinstance(value, basestring) and kwargs.get('ignore_case'):
+        if isinstance(value, basestring) and ignore_case:
             self.valid_ic.append(value.lower())
         else:
             self.valid.append(value)
@@ -493,10 +493,11 @@ class PathValidator(TextValidator):
 class UrlValidator(TextValidator):
     name = 'url'
 
-    def __init__(self, parent=None, **kwargs):
-        self.protocols = ['ftp', 'http', 'https', 'file']
-        if 'protocols' in kwargs:
-            self.protocols = kwargs['protocols']
+    def __init__(self, parent=None, protocols=None, **kwargs):
+        if protocols:
+            self.protocols = protocols
+        else:
+            self.protocols = ['ftp', 'http', 'https', 'file']
         Validator.__init__(self, parent, **kwargs)
 
     def validate(self, data):
