@@ -114,7 +114,7 @@ class Validator(object):
         kwargs['parent'] = self
         return factory(value, **kwargs)
 
-    def accept(self, name, **kwargs):
+    def accept(self, value, **kwargs):
         raise NotImplementedError('Validator %s should override accept method' % self.__class__.__name__)
 
     def validateable(self, data):
@@ -171,8 +171,8 @@ class Validator(object):
 class RootValidator(Validator):
     name = 'root'
 
-    def accept(self, name, **kwargs):
-        v = self.get_validator(name, **kwargs)
+    def accept(self, value, **kwargs):
+        v = self.get_validator(value, **kwargs)
         self.valid.append(v)
         return v
 
@@ -516,8 +516,8 @@ class UrlValidator(TextValidator):
 class ListValidator(Validator):
     name = 'list'
 
-    def accept(self, name, **kwargs):
-        v = self.get_validator(name, **kwargs)
+    def accept(self, value, **kwargs):
+        v = self.get_validator(value, **kwargs)
         self.valid.append(v)
         return v
 
@@ -552,23 +552,20 @@ class DictValidator(Validator):
         # TODO: not dictionary?
         self.valid = {}
 
-    def accept(self, name, **kwargs):
+    def accept(self, value, key=None, required=False, **kwargs):
         """
-        :param string name: validator name that represents accepted value
-        :param kwargs: ``key`` = name of the key in dict, ``required`` = mark the name as required
-        :raises ValueError: Key was not given in *kwargs*
+        :param value: validator name, instance or function that returns an instance, which validates the given `key`
+        :param string key: The dictionary key to accept
+        :param bool required: = Mark this `key` as required
+        :raises ValueError: `key` was not specified
         """
-        if not 'key' in kwargs:
+        if not key:
             raise ValueError('%s.accept() must specify key' % self.name)
 
-        key = kwargs['key']
-        if kwargs.get('required', False):
+        if required:
             self.require_key(key)
-            # clean dict-validator keys from kwargs, so they can be passed to Validator constructor
-        for k in ['key', 'required']:
-            if k in kwargs:
-                del kwargs[k]
-        v = self.get_validator(name, **kwargs)
+
+        v = self.get_validator(value, **kwargs)
         self.valid.setdefault(key, []).append(v)
         return v
 
@@ -586,31 +583,37 @@ class DictValidator(Validator):
         if not key in self.required_keys:
             self.required_keys.append(key)
 
-    def accept_any_key(self, name, **kwargs):
-        """Accepts any key name with given validator type"""
-        v = self.get_validator(name, **kwargs)
+    def accept_any_key(self, value, **kwargs):
+        """Accepts any leftover keys in dictionary, which will be validated with `value`"""
+        v = self.get_validator(value, **kwargs)
         self.any_key.append(v)
         return v
 
-    # TODO: document, what does this even do?
-    def accept_valid_keys(self, name, **kwargs):
-        """Accepts keys that pass a given validator"""
-        key_types = kwargs.pop('key_type', None)
-        key_validator = kwargs.pop('key_validator', None)
-        if key_types and key_validator:
-            raise ValueError('key_types and key_validator are mutually exclusive')
+    def accept_valid_keys(self, value, key_type=None, key_validator=None, **kwargs):
+        """
+        Accepts keys that pass a given validator, and validates them using validator specified in `value`
+
+        :param value: Validator name, instance or function returning an instance
+            that will be used to validate dict values.
+        :param key_type: Name of validator or list of names that determine which keys in this dict `value` will govern
+        :param Validator key_validator: A validator instance that will be used to determine which keys in the dict
+            `value` will govern
+        :raises ValueError: If both `key_type` and `key_validator` are specified.
+        """
+        if key_type and key_validator:
+            raise ValueError('key_type and key_validator are mutually exclusive')
         if key_validator:
             # Make sure errors show up in our list
             key_validator.add_parent(self)
-        elif key_types:
-            if isinstance(key_types, basestring):
-                key_types = [key_types]
+        elif key_type:
+            if isinstance(key_type, basestring):
+                key_type = [key_type]
             key_validator = self.get_validator('root')
-            for key_type in key_types:
+            for key_type in key_type:
                 key_validator.accept(key_type)
         else:
             raise ValueError('%s.accept_valid_keys() must specify key_type or key_validator' % self.name)
-        v = self.get_validator(name, **kwargs)
+        v = self.get_validator(value, **kwargs)
         self.key_validators.append((key_validator, v))
         return v
 
