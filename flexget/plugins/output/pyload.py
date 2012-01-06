@@ -98,7 +98,7 @@ class PluginPyLoad(object):
             # bunch of urls now going to check
             content = entry['description'] + " " + entry['url']
 
-            result = query_api(url, "parseURLs", {"html": json.dumps(content), "url": "''", "session": self.session})
+            result = query_api(url, "parseURLs", {"html": json.dumps(content.encode("utf8")), "url": "''", "session": self.session})
 
             # parsed plugins : urls
             parsed = json.loads(result.read())
@@ -165,6 +165,6 @@ class PluginPyLoad(object):
 
 
 def query_api(url, method, post=None):
-    return urlopen(url.rstrip("/") + "/" + method.strip("/"), urlencode(post.encode("utf8")) if post else None)
+    return urlopen(url.rstrip("/") + "/" + method.strip("/"), urlencode(post) if post else None)
 
 register_plugin(PluginPyLoad, 'pyload', api_ver=2)
