@@ -58,9 +58,8 @@ class PluginDownload(object):
         advanced.accept('boolean', key='overwrite')
         return root
 
-    def get_config(self, feed):
+    def process_config(self, config):
         """Return plugin configuration in advanced form"""
-        config = feed.config['download']
         if isinstance(config, basestring):
             config = {'path': config}
         if not isinstance(config, dict):
@@ -70,13 +69,13 @@ class PluginDownload(object):
             config['require_path'] = True
         return config
 
-    def on_process_start(self, feed):
+    def on_process_start(self, feed, config):
         """Register the usable set keywords."""
         set_plugin = get_plugin_by_name('set')
         set_plugin.instance.register_keys({'path': 'text'})
 
-    def on_feed_download(self, feed):
-        config = self.get_config(feed)
+    def on_feed_download(self, feed, config):
+        config = self.process_config(config)
         self.get_temp_files(feed, require_path=config.get('require_path', False), fail_html=config['fail_html'])
 
     def get_temp_file(self, feed, entry, require_path=False, handle_magnets=False, fail_html=True):
@@ -318,11 +317,12 @@ class PluginDownload(object):
         else:
             log.debug('Python doesn\'t know extension for mime-type: %s' % entry['mime-type'])
 
-    def on_feed_output(self, feed):
+    def on_feed_output(self, feed, config):
         """Move downloaded content from temp folder to final destination"""
+        config = self.process_config(config)
         for entry in feed.accepted:
             try:
-                self.output(feed, entry)
+                self.output(feed, entry, config)
             except PluginWarning, e:
                 feed.fail(entry)
                 log.error('Plugin error while writing: %s' % e)
@@ -330,14 +330,12 @@ class PluginDownload(object):
                 feed.fail(entry)
                 log.exception('Exception while writing: %s' % e)
 
-    def output(self, feed, entry):
+    def output(self, feed, entry, config):
         """Moves temp-file into final destination
 
         Raises:
             PluginError if operation fails
         """
-
-        config = self.get_config(feed)
 
         if 'file' not in entry and not feed.manager.options.test:
             log.debug('file missing, entry: %s' % entry)
@@ -434,11 +432,11 @@ class PluginDownload(object):
         finally:
             self.cleanup_temp_file(entry)
 
-    def on_feed_exit(self, feed):
+    def on_feed_exit(self, feed, config):
         """Make sure all temp files are cleaned up when feed exits"""
         self.cleanup_temp_files(feed)
 
-    def on_feed_abort(self, feed):
+    def on_feed_abort(self, feed, config):
         """Make sure all temp files are cleaned up when feed is aborted."""
         self.cleanup_temp_files(feed)
 
@@ -454,6 +452,6 @@ class PluginDownload(object):
         for entry in feed.entries + feed.rejected + feed.failed:
             self.cleanup_temp_file(entry)
 
-register_plugin(PluginDownload, 'download')
+register_plugin(PluginDownload, 'download', api_ver=2)
 register_parser_option('--dl-path', action='store', dest='dl_path', default=False,
                        metavar='PATH', help='Override path for download plugin. Applies to all executed feeds.')
