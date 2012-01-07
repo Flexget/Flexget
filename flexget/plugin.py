@@ -240,7 +240,7 @@ class Plugin(object):
 
     Note that inheriting form this class implies API version 2.
 
-    .. warning:
+    .. warning::
 
        May be removed any time soon. Use :func:`register_plugin` instead until
        we decide API's destiny.
@@ -377,10 +377,11 @@ register_plugin = PluginInfo
 
 
 def register(plugin_class, groups=None, auto=False):
-    """ Register plugin with attributes according to C{PLUGIN_INFO} class variable.
-        Additional groups can be optionally provided.
+    """
+    Register plugin with attributes according to C{PLUGIN_INFO} class variable.
+    Additional groups can be optionally provided.
 
-        @return: Plugin info of registered plugin.
+    :return: Plugin info of registered plugin.
     """
     # Base classes outside of plugin modules are NEVER auto-registered; if you have ones
     # in a plugin module, use the "*PluginBase" naming convention
@@ -444,8 +445,7 @@ def get_standard_plugins_path():
 
 def load_plugins_from_dirs(dirs):
     """
-    Args:
-        dirs: list of directories from where plugins are loaded from
+    :param list dirs: Directories from where plugins are loaded from
     """
 
     # add all dirs to plugins_pkg load path so that plugins are loaded from flexget and from ~/.flexget/plugins/
@@ -626,7 +626,6 @@ def add_plugin_validators(validator, phase=None, group=None, excluded=None, api_
     :param group: Name of group which plugins are added.
     :param excluded: List of plugin names to excluded.
     :param api_ver: Add only api_ver plugins (defaults to 2)
-
     :returns: dict validator wrapping the newly added validators
     """
 

@@ -244,9 +244,15 @@ class ImdbLookup(object):
         """
         Perform faster lookup providing just imdb_id.
         Falls back to using basic lookup if data cannot be found from cache.
+
+        .. note::
+
+           API will be changed, it's dumb to return None on errors AND
+           raise PluginError on some else
+
         :param movie_title: Name of the movie
         :param raw_title: Raw entry title
-        :return int: imdb id
+        :return: imdb id or None
         :raises PluginError: Failure reason
         """
         if movie_title:

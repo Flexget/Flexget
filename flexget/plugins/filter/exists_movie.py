@@ -73,6 +73,10 @@ class FilterExistsMovie(object):
 
             log.verbose('Scanning path %s ...' % path)
 
+            # Help debugging by removing a lot of noise
+            #logging.getLogger('movieparser').setLevel(logging.WARNING)
+            #logging.getLogger('imdb_lookup').setLevel(logging.WARNING)
+
             # scan through
             for root, dirs, files in os.walk(path):
                 # convert filelists into utf-8 to avoid unicode problems
@@ -95,14 +99,16 @@ class FilterExistsMovie(object):
                         if imdb_id in path_ids:
                             log.trace('duplicate %s' % item)
                             continue
-                        if imdb_ids is not None:
+                        if imdb_id is not None:
+                            log.trace('adding: %s' % imdb_id)
                             path_ids.append(imdb_id)
                     except PluginError, e:
                         log.trace('%s lookup failed (%s)' % (item, e.value))
                         incompatible_dirs += 1
 
-            # store to cache
+            # store to cache and extend to found list
             self.cache[path] = path_ids
+            imdb_ids.extend(path_ids)
 
         log.debug('-- Start filtering entries ----------------------------------')
 
@@ -122,7 +128,10 @@ class FilterExistsMovie(object):
                 feed.reject(entry, 'movie exists')
 
         if incompatible_dirs or incompatible_entries:
-            log.verbose('There were some incompatible items. %s of %s entries and %s of %s directories could not be verified.' %
+            log.verbose('There were some incompatible items. %s of %s entries '
+                        'and %s of %s directories could not be verified.' %
                 (incompatible_entries, count_entries, incompatible_dirs, count_dirs))
+
+        log.debug('-- Finished filtering entries -------------------------------')
 
 register_plugin(FilterExistsMovie, 'exists_movie', groups=['exists'], api_ver=2)
