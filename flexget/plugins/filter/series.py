@@ -129,6 +129,9 @@ class Episode(Base):
 
     @property
     def age(self):
+        """
+        :return: Pretty string representing age of episode. eg "23d 12h" or "No releases seen"
+        """
         if not self.first_seen:
             return 'No releases seen'
         diff = datetime.now() - self.first_seen
@@ -182,9 +185,9 @@ class Release(Base):
             (self.id, self.quality, self.downloaded, self.proper_count, self.title)
 
 
-class SeriesPlugin(object):
+class SeriesDatabase(object):
 
-    """Database helpers"""
+    """Provides API to series database"""
 
     def get_first_seen(self, session, parser, min_qual=None, max_qual=None):
         """Return datetime when this episode of series was first seen"""
@@ -314,7 +317,7 @@ class SeriesPlugin(object):
 
 
 def forget_series(name):
-    """Remove a whole series :name: from database."""
+    """Remove a whole series `name` from database."""
     session = Session()
     series = session.query(Series).filter(Series.name == name).first()
     if series:
@@ -326,7 +329,7 @@ def forget_series(name):
 
 
 def forget_series_episode(name, identifier):
-    """Remove all episodes by :identifier: from series :name: from database."""
+    """Remove all episodes by `identifier` from series `name` from database."""
     session = Session()
     series = session.query(Series).filter(Series.name == name).first()
     if series:
@@ -344,8 +347,10 @@ def forget_series_episode(name, identifier):
 
 
 class FilterSeriesBase(object):
-    """Class that contains helper methods for both filter.series as well as plugins that configure it,
-     such as thetvdb_favorites, all_series and series_premiere."""
+    """
+    Class that contains helper methods for both filter.series as well as plugins that configure it,
+    such as all_series, series_premiere and import_series.
+    """
 
     def build_options_validator(self, options):
         quals = [q.name for q in qualities.all()]
@@ -392,16 +397,13 @@ class FilterSeriesBase(object):
         options.accept('boolean', key='series_guessed')
 
     def make_grouped_config(self, config):
-        """Turns a simple series list into grouped format with a settings dict"""
+        """Turns a simple series list into grouped format with a empty settings dict"""
         if not isinstance(config, dict):
             # convert simplest configuration internally grouped format
-            config = {'simple': config,
-                      'settings': {}}
+            config = {'simple': config, 'settings': {}}
         else:
-            # already in grouped format, just get settings from there
-            if not 'settings' in config:
-                config['settings'] = {}
-
+            # already in grouped format, just make sure there's settings
+            config.setdefault('settings', {})
         return config
 
     def apply_group_options(self, config):
@@ -485,7 +487,7 @@ class FilterSeriesBase(object):
         return feed.config['series']
 
 
-class FilterSeries(SeriesPlugin, FilterSeriesBase):
+class FilterSeries(SeriesDatabase, FilterSeriesBase):
     """
     Intelligent filter for tv-series.
 
@@ -563,6 +565,10 @@ class FilterSeries(SeriesPlugin, FilterSeriesBase):
                         log.verbose('Auto enabling exact matching for series %s (reason %s)' % (series_name, name))
                         series_config['exact'] = True
 
+    def on_feed_start(self, feed):
+        # ensure clean state
+        self.parser2entry = {}
+
     # Run after metainfo_quality and before metainfo_series
     @priority(125)
     def on_feed_metainfo(self, feed):
@@ -570,13 +576,8 @@ class FilterSeries(SeriesPlugin, FilterSeriesBase):
         self.auto_exact(config)
         for series_item in config:
             series_name, series_config = series_item.items()[0]
-            # yaml loads ascii only as str
-            series_name = unicode(series_name)
             log.trace('series_name: %s series_config: %s' % (series_name, series_config))
-
-            import time
             start_time = time.clock()
-
             self.parse_series(feed.session, feed.entries, series_name, series_config)
             took = time.clock() - start_time
             log.trace('parsing %s took %s' % (series_name, took))
@@ -641,7 +642,7 @@ class FilterSeries(SeriesPlugin, FilterSeriesBase):
 
     def parse_series(self, session, entries, series_name, config):
         """
-        Search for :series_name: and populate all series_* fields in entries when successfully parsed
+        Search for `series_name` and populate all `series_*` fields in entries when successfully parsed
 
         :param session: SQLAlchemy session
         :param entries: List of entries to process
@@ -656,8 +657,7 @@ class FilterSeries(SeriesPlugin, FilterSeriesBase):
                 return [v]
             return v
 
-        # expect flags
-
+        # set parser flags flags based on config / database
         identified_by = config.get('identified_by', 'auto')
         series = session.query(Series).filter(Series.name == series_name).first()
         if series:
@@ -703,7 +703,7 @@ class FilterSeries(SeriesPlugin, FilterSeriesBase):
                 if parser.valid:
                     break
             else:
-                continue
+                continue # next field
 
             log.debug('%s detected as %s, field: %s' % (entry['title'], parser, parser.field))
             entry['series_parser'] = copy(parser)
@@ -1070,6 +1070,8 @@ class FilterSeries(SeriesPlugin, FilterSeriesBase):
                 entry['series_release'].downloaded = True
             else:
                 log.debug('%s is not a series' % entry['title'])
+        # clear feed state
+        self.parser2entry = {}
 
 
 # Register plugin
