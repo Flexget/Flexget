@@ -140,11 +140,9 @@ class PluginTransmissionInput(TransmissionBase):
         for torrent in self.client.info().values():
             torrentCompleted = self._torrent_completed(torrent)
             if not config['onlycomplete'] or torrentCompleted:
-                entry = Entry(title=torrent.fields['name'],
-                              url='file://%s' % torrent.fields['torrentFile'],
-                              torrent_info_hash=torrent.fields['hashString'])
-                for field in torrent.fields:
-                    entry['transmission_' + field] = torrent.fields[field]
+                entry = Entry(title=torrent.name,
+                              url='file://%s' % torrent.torrentFile,
+                              torrent_info_hash=torrent.hashString)
                 entries.append(entry)
         return entries
 
@@ -339,8 +337,6 @@ class PluginTransmission(TransmissionBase):
                     r = cli.add_uri(entry['url'], timeout=30, **options['add'])
                 if r:
                     torrent = r.values()[0]
-                    for field in torrent.fields:
-                        entry['transmission_' + field] = torrent.fields[field]
                 log.info('"%s" torrent added to transmission' % (entry['title']))
                 if options['change'].keys():
                     for id in r.keys():
