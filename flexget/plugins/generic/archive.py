@@ -142,7 +142,6 @@ class Archive(object):
 
     def validator(self):
         from flexget import validator
-
         config = validator.factory()
         config.accept('boolean')
         config.accept('list').accept('text')
@@ -157,7 +156,7 @@ class Archive(object):
             tag_names = config
 
         tags = []
-        for tag_name in tag_names:
+        for tag_name in set(tag_names):
             tags.append(get_tag(tag_name, feed.session))
 
         count = 0
@@ -170,20 +169,20 @@ class Archive(object):
                 processed.append(entry)
 
             ae = feed.session.query(ArchiveEntry).\
-            filter(ArchiveEntry.title == entry['title']).\
-            filter(ArchiveEntry.url == entry['url']).first()
+                 filter(ArchiveEntry.title == entry['title']).\
+                 filter(ArchiveEntry.url == entry['url']).first()
             if ae:
-                # if this feed is not marked as source, add it
-                if not feed.name in ae.sources:
+                # add (missing) sources
+                source = get_source(feed.name, feed.session)
+                if not source in ae.sources:
                     log.debug('Adding `%s` into `%s` sources' % (feed.name, ae))
-                    ae.sources.append(get_source(feed.name, feed.session))
-                else:
-                    log.debug('Entry `%s` already archived' % entry['title'])
-                    # update tags if they're not up to date
-                for tag in tag_names:
-                    if not tag in ae.tags:
-                        log.debug('Adding tag %s into %s' % (tag, ae))
-                        ae.tags.append(get_tag(tag, feed.session))
+                    ae.sources.append(source)
+                # add (missing) tags
+                for tag_name in tag_names:
+                    atag = get_tag(tag_name, feed.session)
+                    if not atag in ae.tags:
+                        log.debug('Adding tag %s into %s' % (tag_name, ae))
+                        ae.tags.append(atag)
             else:
                 # create new archive entry
                 ae = ArchiveEntry()
