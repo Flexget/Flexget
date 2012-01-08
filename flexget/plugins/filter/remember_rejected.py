@@ -86,7 +86,7 @@ class FilterRememberRejected(object):
         feed.session.query(RememberEntry).filter(RememberEntry.expires < datetime.now()).delete()
         # See if the feed has changed since last run
         old_feed = feed.session.query(RememberFeed).filter(RememberFeed.name == feed.name).first()
-        if old_feed and feed.config_modified or feed.manager.options.forget_rejected:
+        if old_feed and (feed.config_modified or feed.manager.options.forget_rejected):
             if feed.manager.options.forget_rejected:
                 log.info('Forgetting previous rejections.')
             else:

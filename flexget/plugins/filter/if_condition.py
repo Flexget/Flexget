@@ -95,6 +95,9 @@ class FilterIf(object):
             raise AttributeError(item)
 
         def handle_phase(feed, config):
+            if feed.name not in self.feed_phases:
+                log.debug('No config dict was generated for this feed.')
+                return
             entry_actions = {
                 'accept': feed.accept,
                 'reject': feed.reject,
