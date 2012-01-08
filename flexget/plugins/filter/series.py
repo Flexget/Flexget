@@ -145,9 +145,9 @@ class Episode(Base):
 
     @property
     def is_premiere(self):
-        if self.season == 1 and self.number == 1:
+        if self.season == 1 and self.number in (0, 1):
             return 'Series Premiere'
-        elif self.number == 1:
+        elif self.number in (0, 1):
             return 'Season Premiere'
         return False
 

@@ -33,6 +33,11 @@ class TestSeriesPremiere(FlexGetBase):
               - {title: 'foo bar s01e01 hdtv'}
             series_premiere:
               path: test
+          test_pilot_and_premiere:
+            mock:
+              - {title: 'foo bar s01e00 hdtv'}
+              - {title: 'foo bar s01e01 hdtv'}
+            series_premiere: yes
     """
 
     def test_only_one(self):
@@ -48,3 +53,8 @@ class TestSeriesPremiere(FlexGetBase):
     def test_path_set(self):
         self.execute_feed('test_path_set')
         assert self.feed.find_entry(title='foo bar s01e01 hdtv', path='test')
+
+    def test_pilot_and_premiere(self):
+        self.execute_feed('test_pilot_and_premiere')
+        print len(self.feed.accepted)
+        assert len(self.feed.accepted) == 2, 'should have accepted pilot and premiere'
