@@ -768,7 +768,8 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
                 if self.process_qualities(feed, config, eps):
                     continue
                 else:
-                    # We haven't gotten any of our qualities, check timeframe to see if we should remove the requirement
+                    # We haven't gotten any of our qualities, check timeframe to see
+                    # if we should remove the requirement
                     if self.process_timeframe(feed, config, eps, series_name):
                         continue
 
@@ -796,22 +797,23 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
                 if self.process_quality(feed, config, eps):
                     continue
                 else:
-                    # We didn't make a quality match, check timeframe to see if we should remove the requirement
+                    # We didn't make a quality match, check timeframe to see
+                    # if we should remove the requirement
                     if self.process_timeframe(feed, config, eps, series_name):
                         continue
 
             # All the remaining match requirements, just choose the best
-            reason = 'last choice'
+            reason = 'only matching choice'
             if len(eps) > 1:
-                reason = 'choose best remaining'
-            self.accept_series(feed, eps[0], reason)
+                reason = 'choosing best remaining'
+            feed.accept(self.parser2entry[eps[0]], reason)
 
     def process_propers(self, feed, config, eps):
-        """Accepts needed propers. Nukes episodes from which there exists proper.
+        """
+        Accepts needed propers. Nukes episodes from which there exists proper.
 
         :returns: A list of episodes to continue processing.
         """
-
         # Return if there are no propers for this episode
         if not any(ep.proper_count > 0 for ep in eps):
             return eps
@@ -873,11 +875,11 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
         return pass_filter
 
     def process_downloaded(self, feed, eps):
-        """Rejects all episodes (regardless of quality) if this episode has been downloaded.
+        """
+        Rejects all episodes (regardless of quality) if this episode has been downloaded.
 
         :returns: True when episode has already been downloaded
         """
-
         downloaded_releases = self.get_downloaded(feed.session, eps[0].name, eps[0].identifier)
         log.debug('downloaded: %s' % [e.title for e in downloaded_releases])
         if downloaded_releases and eps:
@@ -888,21 +890,26 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
             return True
 
     def process_quality(self, feed, config, eps):
+        """
+        Accepts first episode matching the quality configured for the series.
+
+        :return: True if accepted something
+        """
         quality = qualities.get(config['quality'])
         # scan for quality
         for ep in eps:
             if quality == ep.quality:
                 entry = self.parser2entry[ep]
                 log.debug('Series accepting. %s meets quality %s' % (entry['title'], quality))
-                self.accept_series(feed, ep, 'quality met')
+                feed.accept(self.parser2entry[ep], 'quality met')
                 return True
 
     def process_min_max_quality(self, config, eps):
-        """Filters eps that do not fall between min_quality and max_quality.
+        """
+        Filters eps that do not fall between min_quality and max_quality.
 
         :returns: A list of eps that are in the acceptable range
         """
-
         min = qualities.get(config.get('min_quality', ''), qualities.UNKNOWN)
         max = qualities.get(config.get('max_quality', ''), qualities.max())
         log.debug('min: %s max: %s' % (min, max))
@@ -918,11 +925,11 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
         return result
 
     def process_watched(self, feed, config, eps):
-        """Rejects all episodes older than defined in watched.
+        """
+        Rejects all episodes older than defined in watched.
 
         :returns: True when rejected because of watched
         """
-
         from sys import maxint
         best = eps[0]
         wconfig = config.get('watched')
@@ -963,13 +970,12 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
                 return True
 
     def process_timeframe(self, feed, config, eps, series_name):
-        """Runs the timeframe logic to determine if we should wait for a better quality.
-
+        """
+        Runs the timeframe logic to determine if we should wait for a better quality.
         Saves current best to backlog if timeframe has not expired.
 
-        Returns:
-            True - if we should keep the quality (or qualities) restriction
-            False - if the quality restriction should be released, due to timeframe expiring
+        :returns: True - if we should keep the quality (or qualities) restriction
+                  False - if the quality restriction should be released, due to timeframe expiring
         """
 
         if 'timeframe' not in config:
@@ -1014,11 +1020,11 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
             return True
 
     def process_qualities(self, feed, config, eps):
-        """Handles all modes that can accept more than one quality per episode. (qualities, upgrade)
+        """
+        Handles all modes that can accept more than one quality per episode. (qualities, upgrade)
 
-        Returns:
-            True - if at least one wanted quality has been downloaded or accepted
-            False - if no wanted qualities have been accepted
+        :returns: True - if at least one wanted quality has been downloaded or accepted.
+                  False - if no wanted qualities have been accepted
         """
 
         # Get list of already downloaded qualities
@@ -1050,16 +1056,6 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
                 feed.accept(self.parser2entry[ep], 'quality wanted')
                 downloaded_qualities.append(ep.quality) # don't accept more of these
         return bool(downloaded_qualities)
-
-    # TODO: get rid of, see how feed.reject is called, consistency!
-    def accept_series(self, feed, parser, reason):
-        """Accept this series with a given reason"""
-        entry = self.parser2entry[parser]
-        if parser.field:
-            if entry[parser.field] != parser.data:
-                log.critical('BUG? accepted title is different from parser.data %s != %s, field=%s, series=%s' % \
-                    (entry[parser.field], parser.data, parser.field, parser.name))
-        feed.accept(entry, reason)
 
     def on_feed_exit(self, feed):
         """Learn succeeded episodes"""
