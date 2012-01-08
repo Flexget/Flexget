@@ -288,7 +288,6 @@ class ArchiveInject(object):
         if feed.name not in ArchiveInject._injecting_into_feeds:
             log.debug('Not going to inject to %s, aborting & disabling' % feed.name)
             feed.enabled = False
-            feed.abort(silent=True)
         else:
             log.debug('Injecting to %s, leaving it enabled' % feed.name)
 
@@ -503,8 +502,8 @@ class ArchiveCli(object):
             console('')
             console(' consolidate               Migrate old archive data to new model, may take a long time.')
             console(' search [@TAG]s KEYWORDS   Search from the archive.')
-            console(
-                ' inject ID [,ID] [yes]     Inject from archive by ID\'s. If yes is given immortal flag will be used.')
+            console(' inject ID [ID] [yes]      Inject as accepted from archive by ID\'s. '
+                    'If yes is given immortal flag will be used.')
             console(' tag-source SRC TAG [TAG]  Tag all archived items within source with given tag.')
             import sys
 
@@ -547,8 +546,13 @@ class ArchiveCli(object):
             tag_names = args[1:]
             tag_source(source_name, tag_names=tag_names)
         elif action == 'inject':
-            self.inject(args)
-            feed.manager.enable_feeds()
+            try:
+                self.inject(args)
+                feed.manager.enable_feeds()
+            except ValueError:
+                console('Invalid parameters: %s' % ', '.join(args))
+                if ',' in ''.join(args):
+                    console('IDs must be separated with space now!')
         elif action == 'consolidate':
             consolidate()
         elif action == 'search':
@@ -597,10 +601,7 @@ class ArchiveCli(object):
             if arg in immortal_words:
                 immortal = True
                 continue
-            try:
-                ids.append(int(arg))
-            except ValueError:
-                console('Value %s is not a valid number' % arg)
+            ids.append(int(arg))
         map(ArchiveInject.inject, ids)
         ArchiveInject.inject_immortal(immortal)
 
