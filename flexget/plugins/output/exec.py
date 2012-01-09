@@ -144,7 +144,7 @@ class PluginExec(object):
             if feed.manager.options.test:
                 log.info('Would execute: %s' % cmd)
             else:
-                self.execute_cmd(cmd, allow_background)
+                self.execute_cmd(cmd, allow_background, config['encoding'])
 
     def __getattr__(self, item):
         """Creates methods to handle feed phases."""
