@@ -1,8 +1,9 @@
 import subprocess
 import logging
 import re
+import sys
 from UserDict import UserDict
-from flexget.plugin import register_plugin, priority
+from flexget.plugin import register_plugin, phase_methods
 from flexget.utils.template import render_from_entry, RenderError
 
 log = logging.getLogger('exec')
@@ -40,6 +41,7 @@ class PluginExec(object):
     """
 
     NAME = 'exec'
+    HANDLED_PHASES = ['start', 'input', 'filter', 'output', 'exit']
 
     def validator(self):
         from flexget import validator
@@ -58,45 +60,26 @@ class PluginExec(object):
             phase.accept('text', key='for_rejected')
             phase.accept('text', key='for_failed')
 
-        for name in ['on_start', 'on_input', 'on_filter', 'on_output', 'on_exit']:
-            add(name)
+        for phase in self.HANDLED_PHASES:
+            add('on_' + phase)
 
         adv.accept('boolean', key='fail_entries')
         adv.accept('boolean', key='auto_escape')
+        adv.accept('text', key='encoding')
         adv.accept('boolean', key='allow_background')
 
         return root
 
-    def get_config(self, feed):
-        config = feed.config[self.NAME]
+    def prepare_config(self, config):
         if isinstance(config, basestring):
-            config = {'on_output': {'for_accepted': feed.config[self.NAME]}}
+            config = {'on_output': {'for_accepted': config}}
+        if not config.get('encoding'):
+            config['encoding'] = sys.getfilesystemencoding()
         return config
 
-    def on_feed_start(self, feed):
-        self.execute(feed, 'on_start')
-
-    # Make sure we run after other plugins so exec can use their output
-    @priority(100)
-    def on_feed_input(self, feed):
-        self.execute(feed, 'on_input')
-
-    # Make sure we run after other plugins so exec can use their output
-    @priority(100)
-    def on_feed_filter(self, feed):
-        self.execute(feed, 'on_filter')
-
-    # Make sure we run after other plugins so exec can use their output
-    @priority(100)
-    def on_feed_output(self, feed):
-        self.execute(feed, 'on_output')
-
-    def on_feed_exit(self, feed):
-        self.execute(feed, 'on_exit')
-
-    def execute_cmd(self, cmd, allow_background):
+    def execute_cmd(self, cmd, allow_background, encoding):
         log.verbose('Executing: %s' % cmd)
-        p = subprocess.Popen(cmd, shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+        p = subprocess.Popen(cmd.encode(encoding), shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT, close_fds=False)
         if not allow_background:
             (r, w) = (p.stdout, p.stdin)
@@ -107,8 +90,8 @@ class PluginExec(object):
                 log.info('Stdout: %s' % response)
         return p.wait()
 
-    def execute(self, feed, phase_name):
-        config = self.get_config(feed)
+    def execute(self, feed, phase_name, config):
+        config = self.prepare_config(config)
         if not phase_name in config:
             log.debug('phase %s not configured' % phase_name)
             return
@@ -141,9 +124,18 @@ class PluginExec(object):
                 if feed.manager.options.test:
                     log.info('Would execute: %s' % cmd)
                 else:
+                    # Make sure the command can be encoded into appropriate encoding, don't actually encode yet,
+                    # so logging continues to work.
+                    try:
+                        cmd.encode(config['encoding'])
+                    except UnicodeEncodeError:
+                        log.error('Unable to encode cmd `%s` to %s' % (cmd, config['encoding']))
+                        if config.get('fail_entries'):
+                            feed.fail(entry, 'cmd `%s` could not be encoded to %s.' % (cmd, config['encoding']))
+                        continue
                     # Run the command, fail entries with non-zero return code if configured to
-                    if self.execute_cmd(cmd, allow_background) != 0 and config.get('fail_entries'):
-                        feed.fail(entry, "exec return code was non-zero")
+                    if self.execute_cmd(cmd, allow_background, config['encoding']) != 0 and config.get('fail_entries'):
+                        feed.fail(entry, 'exec return code was non-zero')
 
         # phase keyword in this
         if 'phase' in config[phase_name]:
@@ -154,5 +146,22 @@ class PluginExec(object):
             else:
                 self.execute_cmd(cmd, allow_background)
 
+    def __getattr__(self, item):
+        """Creates methods to handle feed phases."""
+        for phase in self.HANDLED_PHASES:
+            if item == phase_methods[phase]:
+                # A phase method we handle has been requested
+                break
+        else:
+            # We don't handle this phase
+            raise AttributeError(item)
 
-register_plugin(PluginExec, 'exec')
+        def phase_handler(feed, config):
+            self.execute(feed, 'on_' + phase, config)
+
+        # Make sure we run after other plugins so exec can use their output
+        phase_handler.priority = 100
+        return phase_handler
+
+
+register_plugin(PluginExec, 'exec', api_ver=2)
