@@ -64,6 +64,7 @@ class InputFind(object):
             log.debug('scanning %s' % path)
             # unicode causes problems in here (#989)
             path = path.encode(fs_encoding)
+            path = os.path.expanduser(path)
             for item in os.walk(path):
                 log.debug('item: %s' % str(item))
                 for name in item[2]:

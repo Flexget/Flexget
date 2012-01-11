@@ -30,6 +30,7 @@ class Listdir(plugin.Plugin):
             config = [config]
         entries = []
         for path in config:
+            path = os.path.expanduser(path)
             for name in os.listdir(unicode(path)):
                 e = Entry()
                 e['title'] = name
