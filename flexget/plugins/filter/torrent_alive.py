@@ -14,46 +14,64 @@ class TorrentAliveThread(threading.Thread):
     def __init__(self, tracker, info_hash):
         threading.Thread.__init__(self)
         self.tracker = tracker
-        self.hashfile = info_hash
+        self.info_hash = info_hash
         self.tracker_seeds = 0
 
     def run(self):
         try:
-            self.tracker_seeds = self.get_tracker_seeds(self.tracker, self.hashfile)
+            self.tracker_seeds = get_tracker_seeds(self.tracker, self.info_hash)
         except URLError, e:
             log.debug('Error scraping %s: %s' % (self.tracker, e))
             self.tracker_seeds = 0
         else:
-            log.debug('%s seeds found from %s' % (self.tracker_seeds, self.get_scrape_url(self.tracker, self.hashfile)))
+            log.debug('%s seeds found from %s' % (self.tracker_seeds, get_scrape_url(self.tracker, self.info_hash)))
 
-    def get_scrape_url(self, tracker_url, info_hash):
-        if 'announce' in tracker_url:
-            result = tracker_url.replace('announce', 'scrape')
-        else:
-            log.debug('`announce` not contained in tracker url, guessing scrape address.')
-            result = tracker_url + '/scrape'
-        if result.startswith('udp:'):
-            result = result.replace('udp:', 'http:')
-        result += '&' if '?' in result else '?'
-        result += 'info_hash=%s' % quote(info_hash.decode('hex'))
-        return result
 
-    def get_tracker_seeds(self, url, info_hash):
-        url = self.get_scrape_url(url, info_hash)
-        if not url:
-            log.debug('if not url is true returning 0')
-            return 0
-        log.debug('Checking for seeds from %s' % url)
-        try:
-            data = bdecode(urlopener(url, log, retries=1, timeout=10).read()).get('files')
-        except SyntaxError, e:
-            log.warning('Error decoding tracker response: %s' % e)
-            return 0
-        if not data:
-            log.debug('the moose is loose')
-            return 0
-        log.debug('get_tracker_seeds is returning: %s' % data.values()[0]['complete'])
-        return data.values()[0]['complete']
+def max_seeds_from_threads(threads):
+    """
+    Joins the threads and returns the maximum seeds found from any of them.
+
+    :param threads: A list of started `TorrentAliveThread`s
+    :return: Maximum seeds found from any of the threads
+    """
+    seeds = 0
+    for background in threads:
+        log.debug('Coming up next: %s' % background.tracker)
+        background.join()
+        seeds = max(seeds, background.tracker_seeds)
+        log.debug('Current hightest number of seeds found: %s' % seeds)
+    return seeds
+
+
+def get_scrape_url(tracker_url, info_hash):
+    if 'announce' in tracker_url:
+        result = tracker_url.replace('announce', 'scrape')
+    else:
+        log.debug('`announce` not contained in tracker url, guessing scrape address.')
+        result = tracker_url + '/scrape'
+    if result.startswith('udp:'):
+        result = result.replace('udp:', 'http:')
+    result += '&' if '?' in result else '?'
+    result += 'info_hash=%s' % quote(info_hash.decode('hex'))
+    return result
+
+
+def get_tracker_seeds(url, info_hash):
+    url = get_scrape_url(url, info_hash)
+    if not url:
+        log.debug('if not url is true returning 0')
+        return 0
+    log.debug('Checking for seeds from %s' % url)
+    try:
+        data = bdecode(urlopener(url, log, retries=1, timeout=10).read()).get('files')
+    except SyntaxError, e:
+        log.warning('Error decoding tracker response: %s' % e)
+        return 0
+    if not data:
+        log.debug('the moose is loose')
+        return 0
+    log.debug('get_tracker_seeds is returning: %s' % data.values()[0]['complete'])
+    return data.values()[0]['complete']
 
 
 class TorrentAlive(object):
@@ -98,23 +116,26 @@ class TorrentAlive(object):
                     for tier in announce_list:
                         for tracker in tier:
                             background = TorrentAliveThread(tracker, info_hash)
-                            threadlist.append(background)
-                            background.start()
+                            try:
+                                background.start()
+                                threadlist.append(background)
+                            except threading.ThreadError:
+                                # If we can't start a new thread, wait for current ones to complete and continue
+                                log.debug('Reached max threads, finishing current threads.')
+                                seeds = max(seeds, max_seeds_from_threads(threadlist))
+                                background.start()
+                                threadlist = [background]
                             log.debug('Started thread to scrape %s with info hash %s' % (tracker, info_hash))
 
-                    for background in threadlist:
-                        log.debug('Coming up next: %s' % background.tracker)
-                        background.join()
-                        seeds = max(seeds, background.tracker_seeds)
-                        log.debug('Current hightest number of seeds found: %s' % seeds)
+                    seeds = max(seeds, max_seeds_from_threads(threadlist))
                     log.debug('Highest number of seeds found: %s' % seeds)
                 else:
                     # Single tracker
                     tracker = torrent.content['announce']
-                    background = TorrentAliveThread(tracker, info_hash)
-                    background.start()
-                    background.join()
-                    seeds = background.tracker_seeds
+                    try:
+                        seeds = get_tracker_seeds(tracker, info_hash)
+                    except URLError, e:
+                        log.debug('Error scraping %s: %s' % (tracker, e))
 
                 # Reject if needed
                 if seeds < min_seeds:
