@@ -144,7 +144,7 @@ qualities = [Quality(1200, '1080p bluray 10bit', [re_1080p, re_bluray, re_10bit]
              Quality(250, 'bdscr'),
              Quality(240, 'dvdscr'),
              Quality(100, 'sdtv', ['(?:[sp]dtv|dvb)(?:[\W_]?rip)?|(?:t|pp)v[\W_]?rip']),
-             Quality(80, 'dsr', ['ds(?:r|[\W_]?rip)']),
+             Quality(80, 'dsr', ['dsr|(?:ds|web)[\W_]?rip']),
              Quality(50, 'r5'),
              Quality(40, 'tc'),
              Quality(30, 'preair'),
