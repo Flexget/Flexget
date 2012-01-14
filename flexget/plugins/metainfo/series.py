@@ -43,6 +43,7 @@ class MetainfoSeries(object):
             entry['series_guessed'] = True
             entry['series_parser'] = parser
             entry['proper'] = parser.proper
+            entry['proper_count'] = parser.proper_count
             return True
         return False
 
