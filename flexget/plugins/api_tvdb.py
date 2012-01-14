@@ -3,7 +3,7 @@ import urllib
 import os
 import posixpath
 from datetime import datetime, timedelta
-from random import sample
+import random
 from BeautifulSoup import BeautifulStoneSoup
 from sqlalchemy import Column, Integer, Float, String, Unicode, Boolean, DateTime, func
 from sqlalchemy.schema import ForeignKey
@@ -52,14 +52,17 @@ def get_mirror(type='xml'):
             data = BeautifulStoneSoup(requests.get(server + api_key + '/mirrors.xml').content)
         except RequestException:
             raise LookupError('Could not retrieve mirror list from thetvdb')
-        for mirror in  data.findAll('mirror'):
+        for mirror in data.findAll('mirror'):
             type_mask = int(mirror.typemask.string)
             mirrorpath = mirror.mirrorpath.string
             for t in [(1, 'xml'), (2, 'banner'), (4, 'zip')]:
                 if type_mask & t[0]:
                     _mirrors.setdefault(t[1], set()).add(mirrorpath)
     if _mirrors.get(type):
-        return sample(_mirrors[type], 1)[0] + ('/banners/' if type == 'banner' else '/api/')
+        return random.sample(_mirrors[type], 1)[0] + ('/banners/' if type == 'banner' else '/api/')
+    else:
+        # If nothing was populated from the server's mirror list, return the main site as fallback
+        return 'http://thetvdb.com' + ('/banners/' if type == 'banner' else '/api/')
 
 
 class TVDBContainer(object):
