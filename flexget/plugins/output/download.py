@@ -260,6 +260,7 @@ class PluginDownload(object):
             # Do a sanity check on downloaded file
             if os.path.getsize(datafile) == 0:
                 feed.fail(entry, 'File %s is 0 bytes in size' % datafile)
+                os.remove(datafile)
                 return
             # store temp filename into entry so other plugins may read and modify content
             # temp file is moved into final destination at self.output
