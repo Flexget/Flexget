@@ -291,12 +291,16 @@ class PluginDownload(object):
         filename = parse_header(response.headers['content-disposition'])[1].get('filename')
         
         if filename:
-            # try to decode/encode, afaik this is against the specs but some servers do it anyway
+            # try to decode to unicode, specs allow latin1, some may do utf-8 anyway
             try:
-                filename = filename.decode('utf-8')
-                log.debug('response info UTF-8 decoded')
+                filename = filename.decode('latin1')
+                log.debug('filename header latin1 decoded')
             except UnicodeError:
-                pass
+                try:
+                    filename = filename.decode('utf-8')
+                    log.debug('filename header UTF-8 decoded')
+                except UnicodeError:
+                    pass
             filename = decode_html(filename)
             log.debug('Found filename from headers: %s' % filename)
             if 'filename' in entry:
