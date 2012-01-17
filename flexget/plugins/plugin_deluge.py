@@ -12,7 +12,7 @@ from flexget.utils.template import RenderError
 log = logging.getLogger('deluge')
 
 # Deluge does not install to python system on Windows, add the install directory to sys.path if it is found
-if sys.platform.startswith('win'):
+if sys.platform.startswith('win') and os.environ.get('ProgramFiles'):
     deluge_dir = os.path.join(os.environ['ProgramFiles'], 'Deluge')
     log.debug('Looking for deluge install in %s' % deluge_dir)
     if os.path.isdir(deluge_dir):
