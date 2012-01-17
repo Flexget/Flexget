@@ -67,7 +67,6 @@ class TestImdb(FlexGetBase):
               reject_genres:
                 - drama
             # No accept_genres?!
-            accept_all: yes
 
           language:
             mock:
