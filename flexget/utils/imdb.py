@@ -317,10 +317,7 @@ class ImdbParser(object):
                 log.warning('Unable to get score for %s - plugin needs update?' % url)
 
         # get genres
-        for link in soup.findAll('a', attrs={'href': re.compile('^/genre/')}):
-            # skip links that have javascript onclick (not in genrelist)
-            if link.has_key('onclick'):
-                continue
+        for link in soup.findAll('a', attrs={'itemprop': 'genre'}):
             self.genres.append(unicode(link.contents[0].lower()))
 
         # get languages
