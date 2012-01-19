@@ -75,6 +75,10 @@ class Manager(object):
     * manager.execute.completed
 
       After manager has executed all Feeds
+
+    * manager.shutdown
+
+      When the manager is exiting
     """
 
     unit_test = False
@@ -598,6 +602,7 @@ class Manager(object):
     def shutdown(self):
         """ Application is being exited
         """
+        fire_event('manager.shutdown', self)
         if not self.unit_test: # don't scroll "nosetests" summary results when logging is enabled
             log.debug('Shutting down')
         self.engine.dispose()

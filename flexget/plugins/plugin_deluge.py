@@ -4,6 +4,7 @@ import os
 import base64
 import re
 import sys
+from flexget.event import event
 from flexget.entry import Entry
 from flexget.utils.tools import make_valid_path
 from flexget.plugin import register_plugin, PluginError, priority, get_plugin_by_name, DependencyError
@@ -181,14 +182,12 @@ try:
                 raise result
             return result
 
-        def on_process_end(self, feed, config):
-            """Shut down the twisted reactor after all feeds have run."""
-            if not reactor._stopped:
-                log.debug('Stopping twisted reactor.')
-                reactor.stop()
-
-        def on_feed_abort(self, feed, config):
-            self.on_process_end(feed, config)
+    @event('manager.shutdown')
+    def stop_reactor(manager):
+        """Shut down the twisted reactor after all feeds have run."""
+        if not reactor._stopped:
+            log.debug('Stopping twisted reactor.')
+            reactor.stop()
 
 except ImportError:
     pass
