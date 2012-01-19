@@ -44,7 +44,7 @@ class FilterQuality(object):
         return config
 
     # Run before series and imdb plugins, so correct qualities are chosen
-    @priority(130)
+    @priority(175)
     def on_feed_filter(self, feed, config):
         config = self.prepare_config(config)
         for entry in feed.entries:
