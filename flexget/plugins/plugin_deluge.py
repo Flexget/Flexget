@@ -58,6 +58,7 @@ try:
                     self.pause()
                 except GeneratorExit:
                     # GeneratorExit means stop the generator; Do it cleanly by stopping the whole reactor.
+                    log.debug('Got GeneratorExit, stopping reactor.', exc_info=True)
                     self.paused = False
                     self.stop()
                 except:
