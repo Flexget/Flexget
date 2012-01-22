@@ -108,6 +108,7 @@ class FlexGetBase(object):
                 self.feed.session.close()
             except:
                 pass
+            self.manager.shutdown()
             self.manager.__del__()
         finally:
             if self.__tmp__:
