@@ -46,3 +46,4 @@ def main():
         profile.runctx('manager.execute()', globals(), locals(), os.path.join(manager.config_base, 'flexget.profile'))
     else:
         manager.execute()
+    manager.shutdown()

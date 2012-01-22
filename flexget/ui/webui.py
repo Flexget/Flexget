@@ -198,6 +198,7 @@ def start(mg):
 
     log.debug('server exited')
     fire_event('webui.stop')
+    manager.shutdown()
 
 
 def start_server():

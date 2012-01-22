@@ -112,8 +112,6 @@ class Manager(object):
         log.debug('sys.getfilesystemencoding: %s' % sys.getfilesystemencoding())
         log.debug('os.path.supports_unicode_filenames: %s' % os.path.supports_unicode_filenames)
 
-        atexit.register(self.shutdown)
-
         fire_event('manager.upgrade', self)
         fire_event('manager.startup', self)
         self.db_cleanup()
