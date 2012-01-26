@@ -123,7 +123,7 @@ class PluginTransmissionInput(TransmissionBase):
         self._validator(advanced)
         advanced.accept('boolean', key='onlycomplete')
         return root
-    
+
     def prepare_config(self, config):
         config = TransmissionBase.prepare_config(self, config)
         config.setdefault('onlycomplete', True)
@@ -211,7 +211,7 @@ class PluginTransmission(TransmissionBase):
                                            'maxdownspeed': 'number',
                                            'ratio': 'number'})
         super(PluginTransmission, self).on_process_start(feed, config)
-        
+
     @priority(120)
     def on_feed_download(self, feed, config):
         """
@@ -310,7 +310,7 @@ class PluginTransmission(TransmissionBase):
                 continue
             options = self._make_torrent_options_dict(config, entry)
 
-            downloaded = not(entry['url'].startswith('magnet:'))
+            downloaded = not entry['url'].startswith('magnet:')
 
             # Check that file is downloaded
             if downloaded and not 'file' in entry:
@@ -342,8 +342,10 @@ class PluginTransmission(TransmissionBase):
                     for id in r.keys():
                         cli.change(id, 30, **options['change'])
             except TransmissionError, e:
-                log.error(e.message)
-                feed.fail(entry)
+                log.debug('TransmissionError', exc_info=True)
+                msg = 'TransmissionError: %s' % e.message or 'N/A'
+                log.error(msg)
+                feed.fail(entry, msg)
 
     def remove_finished(self, cli):
         # Get a list of active transfers
