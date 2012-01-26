@@ -20,18 +20,20 @@ except ImportError:
 
 class PluginPyLoad(object):
     """
-    Add url from entry url to pyLoad
+    Parse feed content or url for hoster links and adds them to pyLoad.
 
     Example::
 
       pyload:
         api: http://localhost:8000/api
         queue: yes
-        username: myusername
-        password: mypassword
+        username: my_username
+        password: my_password
+        folder: desired_folder
         hoster:
           - YoutubeCom
-        multihoster: yes
+        parse_url: no
+        multiple_hoster: yes
         enabled: yes
 
     Default values for the config elements::
@@ -40,17 +42,20 @@ class PluginPyLoad(object):
           api: http://localhost:8000/api
           queue: no
           hoster: ALL
-          multihoster: yes
+          parse_url: no
+          multiple_hoster: yes
           enabled: yes
     """
 
     __author__ = 'http://pyload.org'
-    __version__ = '0.22'
+    __version__ = '0.3'
 
     DEFAULT_API = 'http://localhost:8000/api'
     DEFAULT_QUEUE = False
+    DEFAULT_FOLDER = ''
     DEFAULT_HOSTER = []
-    DEFAULT_MULTIHOSTER = True
+    DEFAULT_PARSE_URL = False
+    DEFAULT_MULTIPLE_HOSTER = True
 
     def __init__(self):
         self.session = None
@@ -63,8 +68,10 @@ class PluginPyLoad(object):
         advanced.accept('text', key='api')
         advanced.accept('text', key='username')
         advanced.accept('text', key='password')
+        advanced.accept('text', key='folder')
         advanced.accept('boolean', key='queue')
-        advanced.accept('boolean', key='multihoster')
+        advanced.accept('boolean', key='parse_url')
+        advanced.accept('boolean', key='multiple_hoster')
         advanced.accept('list', key='hoster').accept('text')
         return root
 
@@ -88,19 +95,27 @@ class PluginPyLoad(object):
             self.check_login(feed, config)
         except URLError:
             raise PluginError('pyLoad not reachable', log)
-        except Exception:
-            raise PluginError('Unknown error', log)
+        except PluginError:
+            raise
+        except Exception, e:
+            raise PluginError('Unknown error: %s' % str(e), log)
 
-        url = config.get('api', self.DEFAULT_API)
+        api = config.get('api', self.DEFAULT_API)
         hoster = config.get('hoster', self.DEFAULT_HOSTER)
+        folder = config.get('folder', self.DEFAULT_FOLDER)
 
         for entry in feed.accepted:
             # bunch of urls now going to check
             content = entry['description'] + " " + entry['url']
+            content = json.dumps(content.encode("utf8"))
 
-            result = query_api(url, "parseURLs", {"html": json.dumps(content.encode("utf8")), "url": "''", "session": self.session})
+            url = json.dumps(entry['url']) if config.get('parse_url', self.DEFAULT_PARSE_URL) else "''"
 
-            # parsed plugins : urls
+            log.debug("Parsing url %s" % url)
+
+            result = query_api(api, "parseURLs", {"html": content, "url": url, "session": self.session})
+
+            # parsed { plugins: [urls] }
             parsed = json.loads(result.read())
 
             urls = []
@@ -109,7 +124,7 @@ class PluginPyLoad(object):
             for name in hoster:
                 if name in parsed:
                     urls.extend(parsed[name])
-                    if not config.get('multihoster', self.DEFAULT_MULTIHOSTER):
+                    if not config.get('multihoster', self.DEFAULT_MULTIPLE_HOSTER):
                         break
 
             # no preferred hoster, add all recognized plugins
@@ -117,7 +132,6 @@ class PluginPyLoad(object):
                 for name, purls in parsed.iteritems():
                     if name != "BasePlugin":
                         urls.extend(purls)
-
 
             if feed.manager.options.test:
                 log.info('Would add `%s` to pyload' % urls)
@@ -137,8 +151,14 @@ class PluginPyLoad(object):
                         'dest': dest,
                         'session': self.session}
 
-                result = query_api(url, "addPackage", post)
-                log.debug('Package added: %s' % result)
+                pid = query_api(api, "addPackage", post).read()
+                log.debug('added package pid: %s' % pid)
+
+                if folder:
+                    # set folder with api
+                    data = {'folder': folder}
+                    query_api(api, "setPackageData", {'pid': pid, 'data': data, 'session': self.session})
+
             except Exception, e:
                 feed.fail(entry, str(e))
 
@@ -149,8 +169,8 @@ class PluginPyLoad(object):
             # Login
             post = {'username': config['username'], 'password': config['password']}
             result = query_api(url, "login", post)
-            response = result.read()
-            if response == 'false':
+            response = json.loads(result.read())
+            if not response:
                 raise PluginError('Login failed', log)
             self.session = response.replace('"', '')
         else:
@@ -165,6 +185,11 @@ class PluginPyLoad(object):
 
 
 def query_api(url, method, post=None):
-    return urlopen(url.rstrip("/") + "/" + method.strip("/"), urlencode(post) if post else None)
+    try:
+        return urlopen(url.rstrip("/") + "/" + method.strip("/"), urlencode(post) if post else None)
+    except HTTPError, e:
+        if e.code == 500:
+            raise PluginError('Internal API Error', log)
+        raise
 
 register_plugin(PluginPyLoad, 'pyload', api_ver=2)
