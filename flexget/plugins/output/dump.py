@@ -1,4 +1,4 @@
-from flexget.plugin import register_plugin, register_parser_option
+from flexget.plugin import register_plugin, register_parser_option, priority
 import logging
 from flexget.utils.tools import console
 
@@ -62,6 +62,7 @@ class OutputDump(object):
         else:
             OutputDump.params = True
 
+    @priority(0)
     def on_feed_output(self, feed):
         if not 'dump' in feed.config and not OutputDump.params:
             return

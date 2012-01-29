@@ -1,7 +1,7 @@
 import logging
 import pickle
 from datetime import datetime
-from sqlalchemy import Column, Integer, String, DateTime, PickleType
+from sqlalchemy import Column, Integer, String, DateTime, PickleType, Index
 from flexget import schema
 from flexget.entry import Entry
 from flexget.manager import Session
@@ -11,7 +11,7 @@ from flexget.utils.sqlalchemy_utils import table_schema
 from flexget.utils.tools import parse_timedelta
 
 log = logging.getLogger('backlog')
-Base = schema.versioned_base('backlog', 0)
+Base = schema.versioned_base('backlog', 1)
 
 
 @schema.upgrade('backlog')
@@ -27,6 +27,11 @@ def upgrade(ver, session):
             log.info('Backlog table contains unloadable data, clearing old data.')
             session.execute(backlog_table.delete())
         ver = 0
+    if ver == 0:
+        backlog_table = table_schema('backlog', session)
+        log.info('Creating index on backlog table.')
+        Index('ix_backlog_feed_expire', backlog_table.c.feed, backlog_table.c.expire).create(bind=session.bind)
+        ver = 1
     return ver
 
 
@@ -43,6 +48,8 @@ class BacklogEntry(Base):
 
     def __repr__(self):
         return '<BacklogEntry(title=%s)>' % (self.title)
+
+Index('ix_backlog_feed_expire', BacklogEntry.feed, BacklogEntry.expire)
 
 
 class InputBacklog(object):

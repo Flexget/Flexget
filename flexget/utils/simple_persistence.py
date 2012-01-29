@@ -10,7 +10,7 @@ can replace underlying mechanism in single point (and provide transparent switch
 import logging
 from datetime import datetime
 import pickle
-from sqlalchemy import Column, Integer, String, DateTime, PickleType, select
+from sqlalchemy import Column, Integer, String, DateTime, PickleType, select, Index
 from UserDict import DictMixin
 from flexget import schema
 from flexget.manager import Session
@@ -18,7 +18,7 @@ from flexget.utils.database import safe_pickle_synonym
 from flexget.utils.sqlalchemy_utils import table_schema
 
 log = logging.getLogger('util.simple_persistence')
-Base = schema.versioned_base('simple_persistence', 1)
+Base = schema.versioned_base('simple_persistence', 2)
 
 
 @schema.upgrade('simple_persistence')
@@ -36,6 +36,11 @@ def upgrade(ver, session):
                 log.warning('Couldn\'t load %s:%s removing from db: %s' % (row['plugin'], row['key'], e))
                 session.execute(table.delete().where(table.c.id == row['id']))
         ver = 1
+    if ver == 1:
+        table = table_schema('simple_persistence', session)
+        log.info('Creating index on simple_persistence table.')
+        Index('ix_simple_persistence_feed_plugin_key', table.c.feed, table.c.plugin, table.c.key).create(bind=session.bind)
+        ver = 2
     return ver
 
 
@@ -60,6 +65,8 @@ class SimpleKeyValue(Base):
 
     def __repr__(self):
         return "<SimpleKeyValue('%s','%s','%s')>" % (self.feed, self.key, self.value)
+
+Index('ix_simple_persistence_feed_plugin_key', SimpleKeyValue.feed, SimpleKeyValue.plugin, SimpleKeyValue.key)
 
 
 class SimplePersistence(DictMixin):

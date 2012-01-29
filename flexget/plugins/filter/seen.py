@@ -10,7 +10,7 @@ forget (string)
 
 import logging
 from datetime import datetime, timedelta
-from sqlalchemy import Column, Integer, String, DateTime, Unicode, asc, or_, select, update
+from sqlalchemy import Column, Integer, String, DateTime, Unicode, asc, or_, select, update, Index
 from sqlalchemy.schema import ForeignKey
 from sqlalchemy.orm import relation
 from flexget.manager import Session
@@ -21,7 +21,7 @@ from flexget.utils.sqlalchemy_utils import table_schema
 from flexget.utils.imdb import extract_id
 
 log = logging.getLogger('seen')
-Base = schema.versioned_base('seen', 1)
+Base = schema.versioned_base('seen', 2)
 
 
 @schema.upgrade('seen')
@@ -33,6 +33,11 @@ def upgrade(ver, session):
             new_values = {'field': 'imdb_id', 'value': extract_id(row['value'])}
             session.execute(update(field_table, field_table.c.id == row['id'], new_values))
         ver = 1
+    if ver == 1:
+        field_table = table_schema('seen_field', session)
+        log.info('Adding index to seen_field table.')
+        Index('ix_seen_field_seen_entry_id', field_table.c.seen_entry_id).create(bind=session.bind)
+        ver = 2
     return ver
 
 
@@ -63,7 +68,7 @@ class SeenField(Base):
     __tablename__ = 'seen_field'
 
     id = Column(Integer, primary_key=True)
-    seen_entry_id = Column(Integer, ForeignKey('seen_entry.id'), nullable=False)
+    seen_entry_id = Column(Integer, ForeignKey('seen_entry.id'), nullable=False, index=True)
     field = Column(Unicode)
     value = Column(Unicode, index=True)
     added = Column(DateTime)

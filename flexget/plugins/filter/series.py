@@ -17,7 +17,7 @@ from flexget.manager import Session
 from flexget.plugin import (register_plugin, register_parser_option, get_plugin_by_name, get_plugin_keywords,
     PluginWarning, DependencyError, priority)
 
-SCHEMA_VER = 2
+SCHEMA_VER = 3
 
 log = logging.getLogger('series')
 Base = schema.versioned_base('series', SCHEMA_VER)
@@ -59,6 +59,11 @@ def upgrade(ver, session):
         log.info('Adding `identified_by` column to series table.')
         table_add_column('series', 'identified_by', String, session)
         ver = 2
+    if ver == 2:
+        release_table = table_schema('episode_releases', session)
+        log.info('Creating index on episode_releases table.')
+        Index('ix_episode_releases_episode_id', release_table.c.episode_id).create(bind=session.bind)
+        ver = 3
 
     return ver
 
@@ -162,7 +167,7 @@ class Release(Base):
     __tablename__ = 'episode_releases'
 
     id = Column(Integer, primary_key=True)
-    episode_id = Column(Integer, ForeignKey('series_episodes.id'), nullable=False)
+    episode_id = Column(Integer, ForeignKey('series_episodes.id'), nullable=False, index=True)
     _quality = Column('quality', String)
     quality = quality_property('_quality')
     downloaded = Column(Boolean, default=False)
@@ -291,7 +296,7 @@ class SeriesDatabase(object):
             if parser.season and parser.episode is not None:
                 episode.season = parser.season
                 episode.number = parser.episode
-            series.episodes.append(episode) # pylint:disable=E1103
+            series.episodes.append(episode)  # pylint:disable=E1103
             log.debug('-> added %s' % episode)
 
         # if release does not exists in episodes, add new
@@ -311,7 +316,7 @@ class SeriesDatabase(object):
             release.quality = parser.quality
             release.proper_count = parser.proper_count
             release.title = parser.data
-            episode.releases.append(release) # pylint:disable=E1103
+            episode.releases.append(release)  # pylint:disable=E1103
             log.debug('-> added %s' % release)
         return release
 
@@ -336,7 +341,7 @@ def forget_series_episode(name, identifier):
         episode = session.query(Episode).filter(Episode.identifier == identifier).\
             filter(Episode.series_id == series.id).first()
         if episode:
-            series.identified_by = '' # reset identified_by flag so that it will be recalculated
+            series.identified_by = ''  # reset identified_by flag so that it will be recalculated
             session.delete(episode)
             session.commit()
             log.debug('Episode %s from series %s removed from database.' % (identifier, name))
@@ -703,7 +708,7 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
                 if parser.valid:
                     break
             else:
-                continue # next field
+                continue  # next field
 
             log.debug('%s detected as %s, field: %s' % (entry['title'], parser, parser.field))
             entry['series_parser'] = copy(parser)
@@ -1054,7 +1059,7 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
                 feed.reject(self.parser2entry[ep], 'quality downloaded')
             else:
                 feed.accept(self.parser2entry[ep], 'quality wanted')
-                downloaded_qualities.append(ep.quality) # don't accept more of these
+                downloaded_qualities.append(ep.quality)  # don't accept more of these
         return bool(downloaded_qualities)
 
     def on_feed_exit(self, feed):
