@@ -2,19 +2,11 @@ import hashlib
 import logging
 import urllib2
 import re
+from flexget.utils import json
 from flexget.utils.tools import urlopener
 from flexget.utils.cached_input import cached
 from flexget.plugin import register_plugin, PluginError, DependencyError
 from flexget.entry import Entry
-
-try:
-    import simplejson as json
-except ImportError:
-    try:
-        import json
-    except ImportError:
-        raise DependencyError(issued_by='trakt_list', missing='simplejson',
-                              message='trakt_list requires either simplejson module or python > 2.5')
 
 log = logging.getLogger('trakt_list')
 

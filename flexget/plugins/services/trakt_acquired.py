@@ -2,17 +2,8 @@ import logging
 import hashlib
 import urllib2
 from flexget.plugin import register_plugin, DependencyError
+from flexget.utils import json
 from flexget.utils.tools import urlopener
-
-try:
-    import simplejson as json
-except ImportError:
-    try:
-        import json
-    except ImportError:
-        raise DependencyError(issued_by='trakt_acquired', missing='simplejson',
-                              message='trakt_acquired requires either '
-                                      'simplejson module or python > 2.5')
 
 log = logging.getLogger('trakt_acquired')
 

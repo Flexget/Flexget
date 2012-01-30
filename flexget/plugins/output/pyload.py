@@ -3,19 +3,11 @@
 from urllib import urlencode
 from urllib2 import urlopen, URLError, HTTPError
 from logging import getLogger
+from flexget.utils import json
 from flexget.plugin import register_plugin, get_plugin_by_name, PluginError, DependencyError
 from flexget import validator
 
 log = getLogger('pyload')
-
-try:
-    import simplejson as json
-except ImportError:
-    try:
-        import json
-    except ImportError:
-        raise DependencyError(issued_by='pyload', missing='simplejson',
-                              message='pyload requires either simplejson module or python > 2.5')
 
 
 class PluginPyLoad(object):
@@ -145,7 +137,7 @@ class PluginPyLoad(object):
             log.debug("Add %d urls to pyLoad" % len(urls))
 
             try:
-                dest = 1 if config.get('queue', self.DEFAULT_QUEUE) else 0 # Destination.Queue = 1
+                dest = 1 if config.get('queue', self.DEFAULT_QUEUE) else 0  # Destination.Queue = 1
                 post = {'name': "'%s'" % entry['title'],
                         'links': str(urls),
                         'dest': dest,
@@ -177,7 +169,7 @@ class PluginPyLoad(object):
             try:
                 query_api(url, 'getServerVersion', {'session': self.session})
             except HTTPError, e:
-                if e.code == 403: # Forbidden
+                if e.code == 403:  # Forbidden
                     self.session = None
                     return self.check_login(feed, config)
                 else:
