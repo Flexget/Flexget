@@ -13,7 +13,7 @@ from flexget.utils.titles import MovieParser
 from flexget.utils.tools import urlopener
 from flexget.utils.database import text_date_synonym, year_property, with_session
 from flexget.manager import Session
-from flexget.plugin import register_plugin, DependencyError
+from flexget.plugin import register_plugin
 
 log = logging.getLogger('api_tmdb')
 Base = schema.versioned_base('api_tmdb', 0)
@@ -314,7 +314,7 @@ def get_first_result(tmdb_function, value):
     url = '%s/2.1/Movie.%s/%s/json/%s/%s' % (server, tmdb_function, lang, api_key, value)
     try:
         data = urlopener(url, log)
-    except URLError, e:
+    except URLError:
         log.warning('Request failed %s' % url)
         return
     try:

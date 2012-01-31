@@ -1,7 +1,6 @@
 import re
 import urllib
 import logging
-from plugin_urlrewriting import UrlRewritingError
 from flexget.entry import Entry
 from flexget.plugin import register_plugin, internet, PluginWarning
 from flexget.utils.tools import urlopener
@@ -115,17 +114,13 @@ class UrlRewriteDemonoid:
         if not entries:
             dashindex = name.rfind('-')
             if dashindex != -1:
-                return self.search_title(name[:dashindex], comparator=comparator, config=config)
+                return self.search(name[:dashindex], comparator=comparator, config=config)
             else:
                 raise PluginWarning('No close matches for %s' % name, log, log_once=True)
 
         log.debug('search got %d results' % len(entries))
 
-        #TODO: check of this does anything/should even be here. indent seems strange.
-        def score(a):
-            return torrent_availability(a['torrent_seeds'], a['torrent_leeches'])
-
-        entries.sort(reverse=True, key=lambda x: x.get('search_sorted'))
+        entries.sort(reverse=True, key=lambda x: x.get('search_sort'))
         return entries
 
 register_plugin(UrlRewriteDemonoid, 'demonoid', groups=['urlrewriter', 'search'])

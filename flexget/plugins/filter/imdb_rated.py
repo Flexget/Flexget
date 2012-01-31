@@ -1,5 +1,5 @@
 import logging
-from flexget.plugin import register_plugin, PluginWarning, get_plugin_by_name
+from flexget.plugin import register_plugin, PluginWarning, PluginError, get_plugin_by_name
 from BeautifulSoup import BeautifulSoup
 from flexget.manager import Base
 from sqlalchemy import Column, Integer, Float, String, DateTime
@@ -105,8 +105,7 @@ class FilterImdbRated(object):
 
     def on_feed_filter(self, feed):
         raise PluginWarning('This plugin no longer works with the imdb, replacement will be implemented soon')
-    
-    
+
         config = feed.config['imdb_rated']
         if isinstance(config, basestring):
             config = {'url': feed.config['imdb_rated']}

@@ -52,7 +52,7 @@ class ThetvdbFavorites(Base):
         self.updated = datetime.now()
 
     def __repr__(self):
-        return '<series_favorites(account_id=%s, series_id=%s)>' % (self.account_id, self.series_id)
+        return '<series_favorites(account_id=%s, series_id=%s)>' % (self.account_id, self.series_ids)
 
 
 class InputThetvdbFavorites(object):
