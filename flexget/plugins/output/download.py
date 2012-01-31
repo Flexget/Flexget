@@ -79,7 +79,9 @@ class PluginDownload(object):
         self.get_temp_files(feed, require_path=config.get('require_path', False), fail_html=config['fail_html'])
 
     def get_temp_file(self, feed, entry, require_path=False, handle_magnets=False, fail_html=True):
-        """Download entry content and store in temporary folder.
+        """
+        Download entry content and store in temporary folder.
+        Fails entry with a reason if there was problem.
 
         :param bool require_path:
           whether or not entries without 'path' field are ignored
@@ -158,9 +160,17 @@ class PluginDownload(object):
         for entry in feed.accepted:
             self.get_temp_file(feed, entry, require_path, handle_magnets, fail_html)
 
+    # TODO: a bit silly method, should be get rid of now with simplier exceptions ?
     def process_entry(self, feed, entry, url):
-        """Processes :entry: by using :url: from it.
-           Does not fail the :entry: if there is a network issue, instead just log and return a string error."""
+        """
+        Processes `entry` by using `url`. Does not use entry['url'].
+        Does not fail the `entry` if there is a network issue, instead just log and return a string error.
+
+        :param feed: Feed
+        :param entry: Entry
+        :param url: Url to try download
+        :return: String error, if failed.
+        """
         try:
             if feed.manager.options.test:
                 log.info('Would download: %s' % entry['title'])
@@ -197,11 +207,10 @@ class PluginDownload(object):
             return msg
 
     def download_entry(self, feed, entry, url):
-        """Downloads :entry: by using :url:
+        """Downloads `entry` by using `url`.
 
-        Raises:
-            Several types of exceptions ...
-            PluginWarning
+        :raises: Several types of exceptions ...
+        :raises: PluginWarning
         """
 
         # see http://bugs.python.org/issue1712522
@@ -267,7 +276,6 @@ class PluginDownload(object):
             entry['file'] = datafile
             log.debug('%s field file set to: %s' % (entry['title'], entry['file']))
 
-
         entry['mime-type'] = response.headers['content-type']
 
         content_encoding = response.headers.get('content-encoding', '')
@@ -290,7 +298,7 @@ class PluginDownload(object):
             # No content disposition header, nothing we can do
             return
         filename = parse_header(response.headers['content-disposition'])[1].get('filename')
-        
+
         if filename:
             # try to decode to unicode, specs allow latin1, some may do utf-8 anyway
             try:

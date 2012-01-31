@@ -12,7 +12,7 @@ class FeedPriority(object):
         from flexget import validator
         return validator.factory('integer')
 
-    def on_process_start(self, feed):
-        feed.priority = feed.config.get('priority', 0)
+    def on_process_start(self, feed, config):
+        feed.priority = feed.config.get('priority', 65535)
 
-register_plugin(FeedPriority, 'priority')
+register_plugin(FeedPriority, 'priority', api_ver=2)
