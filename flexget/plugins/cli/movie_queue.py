@@ -12,7 +12,7 @@ except ImportError:
 
 log = logging.getLogger('cli_movie_queue')
 
-USAGE = '(add|del|list|downloaded) [NAME|IMDB_ID|tmdb_id=TMDB_ID] [QUALITY] [FORCE]'
+USAGE = '(add|del|list|downloaded|clear) [NAME|IMDB_ID|tmdb_id=TMDB_ID] [QUALITY] [FORCE]'
 
 
 class MovieQueueManager(object):
@@ -140,7 +140,7 @@ class MovieQueueManager(object):
         console('-' * 79)
         for item in items:
             console(item.title)
-            queue_del(imdb_id=item.imdb_id)
+            queue_del(item.imdb_id)
 
         if not items:
             console('No results')
