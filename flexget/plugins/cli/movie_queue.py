@@ -44,7 +44,7 @@ class MovieQueueManager(object):
         if len(parser.rargs) >= 3:
             options['quality'] = parser.rargs[2]
         else:
-            options['quality'] = 'ANY' 
+            options['quality'] = 'ANY'
             # TODO: Get default from config somehow?
             # why not use the quality user has queued most, ie option called 'auto' ?
             # and if none is queued default to something good like '720p bluray'
@@ -69,17 +69,25 @@ class MovieQueueManager(object):
         if options['action'] == 'list':
             self.queue_list(feed.session)
             return
-            
+
         if options['action'] == 'downloaded':
             self.queue_list(feed.session, downloaded=True)
             return
-        
+
         if options['action'] == 'clear':
             self.clear(feed.session)
             return
 
-        # all other actions require movie info to work
-        # Generate imdb_id, tmdb_id and movie title from any single one
+        if options['action'] == 'del':
+            try:
+                title = queue_del(options['what'])
+            except QueueError, e:
+                console(e.message)
+            else:
+                console('Removed %s from queue' % title)
+            return
+
+        # Adding to queue requires a lookup for missing information
         try:
             what = parse_what(options['what'])
             options.update(what)
@@ -87,7 +95,7 @@ class MovieQueueManager(object):
             console(e.message)
 
         if not options.get('title') or not (options.get('imdb_id') or options.get('tmdb_id')):
-            console('could not determine movie') # TODO: Rethink errors
+            console('could not determine movie')  # TODO: Rethink errors
             return
 
         try:
@@ -106,44 +114,37 @@ class MovieQueueManager(object):
                         console('ANY is the default and can also be used explicitly to specify that quality should be ignored.')
                 else:
                     console('Added %s to queue with quality %s' % (added['title'], added['quality']))
-            elif options['action'] == 'del':
-                try:
-                    title = queue_del(imdb_id=options['imdb_id'])
-                except QueueError, e:
-                    console(e.message)
-                else:
-                    console('Removed %s from queue' % title)
         except OperationalError:
             log.critical('OperationalError')
 
     def queue_list(self, session, downloaded=False):
         """List IMDb queue"""
-    
+
         items = queue_get(session=session, downloaded=downloaded)
         console('-' * 79)
         console('%-10s %-7s %-37s %-15s %s' % ('IMDB id', 'TMDB id', 'Title', 'Quality', 'Force'))
         console('-' * 79)
         for item in items:
             console('%-10s %-7s %-37s %-15s %s' % (item.imdb_id, item.tmdb_id, item.title, item.quality, item.immortal))
-    
+
         if not items:
             console('No results')
-    
+
         console('-' * 79)
-        
+
     def clear(self, session):
         """Delete movie queue"""
-    
+
         items = queue_get(session=session, downloaded=False)
         console('Removing the following movies from movie queue:')
         console('-' * 79)
         for item in items:
             console(item.title)
             queue_del(imdb_id=item.imdb_id)
-    
+
         if not items:
             console('No results')
-    
+
         console('-' * 79)
 
 

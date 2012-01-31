@@ -104,24 +104,37 @@ def validate_quality(quality):
 
 
 @with_session
-def parse_what(what, session=None):
-    """Parses needed movie information for a given search string.
+def parse_what(what, lookup=True, session=None):
+    """
+    Determines what information was provided by the search string `what`.
+    If `lookup` is true, will fill in other information from tmdb.
 
-    Search string can be one of:
-        <Movie Title>: Search based on title
-        imdb_id=<IMDB id>: search based on imdb id
-        tmdb_id=<TMDB id>: search based on tmdb id"""
+    :param what: Can be one of:
+      <Movie Title>: Search based on title
+      imdb_id=<IMDB id>: search based on imdb id
+      tmdb_id=<TMDB id>: search based on tmdb id
+    :param bool lookup: Whether missing info should be filled in from tmdb.
+    :param session: An existing session that will be used for lookups if provided.
+    :rtype: dict
+    :return: A dictionary with 'title', 'imdb_id' and 'tmdb_id' keys
+    """
 
     tmdb_lookup = get_plugin_by_name('api_tmdb').instance.lookup
 
-    imdb_id = extract_id(what)
+    result = {'title': None, 'imdb_id': None, 'tmdb_id': None}
+    result['imdb_id'] = extract_id(what)
+    if not result['imdb_id'] and what.startswith('tmdb_id='):
+        result['tmdb_id'] = what[8:]
+    else:
+        result['title'] = what
+
+    if not lookup:
+        # If not doing an online lookup we can return here
+        return result
+
     try:
-        if imdb_id:
-            movie = tmdb_lookup(imdb_id=imdb_id, session=session)
-        elif what.startswith('tmdb_id='):
-            movie = tmdb_lookup(tmdb_id=what[8:], session=session)
-        else:
-            movie = tmdb_lookup(title=what, session=session)
+        result['session'] = session
+        movie = tmdb_lookup(**result)
     except LookupError, e:
         raise QueueError(e.message)
 
@@ -161,17 +174,20 @@ def queue_add(title=None, imdb_id=None, tmdb_id=None, quality='ANY', force=True,
 
 
 @with_session
-def queue_del(imdb_id, session=None):
-    """Delete the given item from the queue"""
+def queue_del(what, session=None):
+    """Delete the given item from the queue. `what` can be any string accepted by `parse_what`"""
 
-    # check if the item is queued
-    item = session.query(QueuedMovie).filter(QueuedMovie.imdb_id == imdb_id).first()
+    item = None
+    for key, value in parse_what(what, lookup=False).iteritems():
+        if value:
+            item = session.query(QueuedMovie).filter(getattr(QueuedMovie, key) == value).first()
+            break
     if item:
         title = item.title
         session.delete(item)
         return title
     else:
-        raise QueueError('%s is not in the queue' % imdb_id)
+        raise QueueError('%s is not in the queue' % what)
 
 
 @with_session

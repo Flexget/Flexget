@@ -154,6 +154,7 @@ def render_from_entry(template_string, entry):
         try:
             return environment.handle_exception(exc_info, True)
         except Exception, e:
+            log.debug('Error during rendering', exc_info=True)
             raise RenderError('(%s) %s' % (type(e).__name__, e))
 
     # Only try string replacement if jinja didn't do anything
