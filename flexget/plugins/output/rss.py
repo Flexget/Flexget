@@ -206,7 +206,7 @@ class OutputRSS(object):
 
         config = self.get_config(feed)
         if config['file'] in self.written:
-            log.debugall('skipping already written file %s' % config['file'])
+            log.trace('skipping already written file %s' % config['file'])
             return
 
         # in terminate phase there is no open session in feed, so open new one
@@ -233,7 +233,7 @@ class OutputRSS(object):
                 gen['description'] = db_item.description
                 gen['link'] = db_item.link
                 gen['pubDate'] = db_item.published
-                log.debugall('Adding %s into rss %s' % (gen['title'], config['file']))
+                log.trace('Adding %s into rss %s' % (gen['title'], config['file']))
                 rss_items.append(PyRSS2Gen.RSSItem(**gen))
             else:
                 # no longer needed
