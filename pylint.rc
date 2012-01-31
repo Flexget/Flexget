@@ -120,7 +120,7 @@ ignore-mixin-members=yes
 
 # List of classes names for which member attributes should not be checked
 # (useful for classes with attributes dynamicaly set).
-ignored-classes=SQLObject,RootLogger
+ignored-classes=SQLObject,RootLogger,ScopedSession,RelationshipProperty
 
 # When zope mode is activated, consider the acquired-members option to ignore
 # access to some undefined attributes.
