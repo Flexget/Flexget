@@ -5,7 +5,7 @@ from sqlalchemy.schema import ForeignKey, Index
 from sqlalchemy.orm import relation, joinedload_all
 from flexget import schema
 from flexget.entry import Entry
-from flexget.plugin import register_plugin, internet, PluginError
+from flexget.plugin import register_plugin, internet, PluginError, priority
 from flexget.manager import Session
 from flexget.utils.log import log_once
 from flexget.utils.imdb import ImdbSearch, ImdbParser, extract_id, make_url
@@ -223,6 +223,7 @@ class ImdbLookup(object):
         from flexget import validator
         return validator.factory('boolean')
 
+    @priority(130)
     def on_feed_metainfo(self, feed, config):
         if not config:
             return
