@@ -194,8 +194,7 @@ class InputRSS(object):
                 auth = (config['username'], config['password'])
             try:
                 # Use the raw response so feedparser can read the headers and status values
-                response = feed.requests.get(config['url'], timeout=60, headers=headers, raise_status=False,
-                                             config={'decode_unicode': False}, auth=auth)
+                response = feed.requests.get(config['url'], timeout=60, headers=headers, raise_status=False, auth=auth)
                 content = response.content
             except RequestException, e:
                 raise PluginError('Unable to download the RSS: %s' % e)

@@ -28,7 +28,7 @@ class RlsLog(object):
         """
 
         # BeautifulSoup doesn't seem to work if data is already decoded to unicode :/
-        soup = get_soup(feed.requests.get(rlslog_url, timeout=25, config={'decode_unicode': False}).content)
+        soup = get_soup(feed.requests.get(rlslog_url, timeout=25).content)
 
         releases = []
         for entry in soup.findAll('div', attrs={'class': 'entry'}):

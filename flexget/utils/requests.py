@@ -140,7 +140,9 @@ class Session(requests.Session):
                 break
 
         # Pop our custom keyword argument before calling super method
-        raise_status = kwargs.pop('raise_status', True)
+        config = kwargs.pop('config', {})
+        config['danger_mode'] = kwargs.pop('raise_status', True)
+        kwargs['config'] = config
         cookiejar = kwargs.pop('cookiejar', None)
 
         # Construct a dict with all cookies that apply to this request
@@ -161,10 +163,6 @@ class Session(requests.Session):
             # Mark this site in known unresponsive list
             set_unresponsive(url)
             raise
-
-        # Raise errors unless told not to
-        if raise_status:
-            result.raise_for_status()
 
         return result
 
