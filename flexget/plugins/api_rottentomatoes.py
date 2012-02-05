@@ -3,7 +3,7 @@ import logging
 from urllib2 import URLError
 import os
 import posixpath
-from sqlalchemy import Table, Column, Integer, Float, String, Unicode, Boolean, DateTime, func
+from sqlalchemy import Table, Column, Integer, Float, String, Boolean, DateTime, func
 from sqlalchemy.schema import ForeignKey, Index
 from sqlalchemy.orm import relation
 from flexget import schema
@@ -60,22 +60,22 @@ class RottenTomatoesMovie(RottenTomatoesContainer, Base):
     __tablename__ = 'rottentomatoes_movies'
 
     id = Column(Integer, primary_key=True, autoincrement=False, nullable=False)
-    title = Column(Unicode)
+    title = Column(String)
     year = Column(Integer)
     genres = relation('RottenTomatoesGenre', secondary=genres_table, backref='movies')
     mpaa_rating = Column(String)
     runtime = Column(Integer)
-    critics_consensus = Column(Unicode)
+    critics_consensus = Column(String)
     release_dates = relation('ReleaseDate', backref='movie', cascade='all, delete, delete-orphan')
     critics_rating = Column(String)
     critics_score = Column(Integer)
     audience_rating = Column(String)
     audience_score = Column(Integer)
-    synopsis = Column(Unicode)
+    synopsis = Column(String)
     posters = relation('RottenTomatoesPoster', backref='movie', cascade='all, delete, delete-orphan')
     cast = relation('RottenTomatoesActor', secondary=actors_table, backref='movies')
     directors = relation('RottenTomatoesDirector', secondary=directors_table, backref='movies')
-    studio = Column(Unicode)
+    studio = Column(String)
     alternate_ids = relation('RottenTomatoesAlternateId', backref='movie', cascade='all, delete, delete-orphan')
     links = relation('RottenTomatoesLink', backref='movie', cascade='all, delete, delete-orphan')
 
@@ -99,7 +99,7 @@ class RottenTomatoesMovie(RottenTomatoesContainer, Base):
         return self.updated < datetime.now() - timedelta(days=refresh_interval)
 
     def __repr__(self):
-        return '<RotteTomatoesMovie(title=%s,audience_rating=%s,year=%s)>' % (self.title, self.audience_rating, self.year)
+        return '<RottenTomatoesMovie(title=%s,audience_rating=%s,year=%s)>' % (self.title, self.audience_rating, self.year)
 
 
 class RottenTomatoesGenre(Base):
@@ -147,7 +147,7 @@ class RottenTomatoesActor(Base):
     __tablename__ = 'rottentomatoes_actors'
 
     id = Column(Integer, primary_key=True)
-    name = Column(Unicode)
+    name = Column(String)
 
     def __init__(self, name):
         self.name = name
@@ -158,7 +158,7 @@ class RottenTomatoesDirector(Base):
     __tablename__ = 'rottentomatoes_directors'
 
     id = Column(Integer, primary_key=True)
-    name = Column(Unicode)
+    name = Column(String)
 
     def __init__(self, name):
         self.name = name
@@ -170,7 +170,7 @@ class RottenTomatoesAlternateId(Base):
 
     db_id = Column(Integer, primary_key=True)
     movie_id = Column(Integer, ForeignKey('rottentomatoes_movies.id'))
-    name = Column(Unicode)
+    name = Column(String)
     id = Column(String)
 
     def __init__(self, name, id):
@@ -184,7 +184,7 @@ class RottenTomatoesLink(Base):
 
     db_id = Column(Integer, primary_key=True)
     movie_id = Column(Integer, ForeignKey('rottentomatoes_movies.id'))
-    name = Column(Unicode)
+    name = Column(String)
     url = Column(String)
 
     def __init__(self, name, url):
@@ -197,7 +197,7 @@ class RottenTomatoesSearchResult(Base):
     __tablename__ = 'rottentomatoes_search_results'
 
     id = Column(Integer, primary_key=True)
-    search = Column(Unicode, nullable=False)
+    search = Column(String, nullable=False)
     movie_id = Column(Integer, ForeignKey('rottentomatoes_movies.id'), nullable=True)
     movie = relation(RottenTomatoesMovie, backref='search_strings')
 
