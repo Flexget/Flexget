@@ -19,9 +19,9 @@ log = logging.getLogger('api_rottentomatoes')
 Base = schema.versioned_base('api_rottentomatoes', 0)
 
 # This is developer Atlanta800's API key
-api_key = 'rh8chjzp8vu6gnpwj88736uv'
-api_ver = 'v1.0'
-server = 'http://api.rottentomatoes.com/api/public'
+API_KEY = 'rh8chjzp8vu6gnpwj88736uv'
+API_VER = 'v1.0'
+SERVER = 'http://api.rottentomatoes.com/api/public'
 
 
 # association tables
@@ -278,7 +278,7 @@ def lookup_movie(title=None, year=None, rottentomatoes_id=None, imdb_id=None, sm
         # There was no movie found in the cache, do a lookup from Rotten Tomatoes
         log.debug('Movie %s not found in cache, looking up from rotten tomatoes.' % id_str())
         try:
-            if imdb_id and not rottentomatoes_id:
+            if imdb_id:
                 result = movies_alias(imdb_id, 'imdb')
                 if result:
                     movie = session.query(RottenTomatoesMovie).filter(RottenTomatoesMovie.id == result.get('id')).first()
@@ -286,8 +286,9 @@ def lookup_movie(title=None, year=None, rottentomatoes_id=None, imdb_id=None, sm
                         # Movie was in database, but did not have the imdb_id stored, force an update
                         get_movie_details(movie, session)
                     else:
-                        rottentomatoes_id = result.get('id')
-            if rottentomatoes_id:
+                        movie = RottenTomatoesMovie()
+                        get_movie_details(movie, session, result)
+            elif rottentomatoes_id:
                 movie = RottenTomatoesMovie()
                 movie.id = rottentomatoes_id
                 get_movie_details(movie, session)
@@ -325,52 +326,53 @@ def lookup_movie(title=None, year=None, rottentomatoes_id=None, imdb_id=None, sm
         movie.posters
         return movie
 
-def get_movie_details(movie, session):
+def get_movie_details(movie, session, movie_data=None):
     """Populate details for this :movie: from Rotten Tomatoes"""
 
-    if not movie.id:
-        raise LookupError('Cannot get rotten tomatoes details without rotten tomatoes id')
-    result = movies_info(movie.id)
-    if result:
-        movie.update_from_dict(result)
-        movie.update_from_dict(result.get('ratings'))
-        genres = result.get('genres')
+    if not movie_data:
+        if not movie.id:
+            raise LookupError('Cannot get rotten tomatoes details without rotten tomatoes id')
+        movie_data = movies_info(movie.id)
+    if movie_data:
+        movie.update_from_dict(movie_data)
+        movie.update_from_dict(movie_data.get('ratings'))
+        genres = movie_data.get('genres')
         if genres:
             for name in genres:
                 genre = session.query(RottenTomatoesGenre).filter(func.lower(RottenTomatoesGenre.name) == name.lower()).first()
                 if not genre:
                     genre = RottenTomatoesGenre(name)
                 movie.genres.append(genre)
-        release_dates = result.get('release_dates')
+        release_dates = movie_data.get('release_dates')
         if release_dates:
             for name,date in release_dates.items():
                 movie.release_dates.append(ReleaseDate(name,date))
-        posters = result.get('posters')
+        posters = movie_data.get('posters')
         if posters:
             for name,url in posters.items():
                 movie.posters.append(RottenTomatoesPoster(name,url))
-        cast = result.get('abridged_cast')
+        cast = movie_data.get('abridged_cast')
         if cast:
             for actor in cast:
                 movie.cast.append(RottenTomatoesActor(actor.get('name')))
-        directors = result.get('abridged_directors')
+        directors = movie_data.get('abridged_directors')
         if directors:
             for director in directors:
                 movie.directors.append(RottenTomatoesDirector(director.get('name')))
-        alternate_ids = result.get('alternate_ids')
+        alternate_ids = movie_data.get('alternate_ids')
         if alternate_ids:
             for name,id in alternate_ids.items():
                 movie.alternate_ids.append(RottenTomatoesAlternateId(name,id))
-        links = result.get('links')
+        links = movie_data.get('links')
         if links:
             for name,url in links.items():
                 movie.links.append(RottenTomatoesLink(name,url))
         movie.updated = datetime.now()
     else:
-        raise LookupError('No results for rottentomatoes_id %s' % movie.id)
+        raise LookupError('No movie_datas for rottentomatoes_id %s' % movie.id)
 
 def movies_info(id):
-    url = '%s/%s/movies/%s.json?apikey=%s'% (server, api_ver, id, api_key)
+    url = '%s/%s/movies/%s.json?apikey=%s'% (SERVER, API_VER, id, API_KEY)
     result = get_json(url)
     if isinstance(result, dict) and result.get('id'):
         return result
@@ -378,7 +380,7 @@ def movies_info(id):
 def movies_alias(id,type='imdb'):
     if type == 'imdb':
         id = id.lstrip('t')
-    url = '%s/%s/movie_alias.json?id=%s&type=%s'% (server, api_ver, id, type)
+    url = '%s/%s/movie_alias.json?id=%s&type=%s'% (SERVER, API_VER, id, type)
     result = get_json(url)
     if isinstance(result, dict) and result.get('id'):
         return result
@@ -387,7 +389,7 @@ def movies_search(q,page_limit=None,page=None):
     if isinstance(q, basestring):
         q = q.replace(' ', '+').encode('utf-8')
 
-    url = '%s/%s/movies.json?q=%s&apikey=%s' % (server, api_ver, q, api_key)
+    url = '%s/%s/movies.json?q=%s&apikey=%s' % (SERVER, API_VER, q, API_KEY)
     if page_limit:
         url += '&page_limit=%i' % (page_limit)
     if page:
@@ -399,6 +401,7 @@ def movies_search(q,page_limit=None,page=None):
 
 def get_json(url):
     try:
+        log.debug('fetching json at %s' % url)
         data = urlopener(url, log)
     except URLError, e:
         log.warning('Request failed %s' % url)

@@ -75,13 +75,18 @@ class FilterRottenTomatoes(object):
         return rt
 
     # Run later to avoid unnecessary lookups
-    @priority(120)
+    @priority(115)
     def on_feed_filter(self, feed, config):
 
         lookup = get_plugin_by_name('rottentomatoes_lookup').instance.lookup
 
-        # since the plugin does not reject anything, no sense going trough accepted
-        for entry in feed.undecided:
+        # only go through all the entries if requiring certified fresh
+        if 'require_certified_fresh' in config:
+            entries = feed.entries
+        else:
+            entries = feed.undecided
+
+        for entry in entries:
                 
             force_accept = False
 
@@ -99,6 +104,10 @@ class FilterRottenTomatoes(object):
 
             # Check defined conditions, TODO: rewrite into functions?
             reasons = []
+            if 'require_certified_fresh' in config:
+                if config['require_certified_fresh'] and entry.get('rt_critics_rating') != 'Certified Fresh':
+                    feed.reject(entry, 'require_certified_fresh')
+                    continue
             if 'min_critics_score' in config:
                 if entry.get('rt_critics_score', 0) < config['min_critics_score']:
                     reasons.append('min_critics_score (%s < %s)' % (entry.get('rt_critics_score'),
@@ -111,9 +120,6 @@ class FilterRottenTomatoes(object):
                 if entry.get('rt_average_score', 0) < config['min_average_score']:
                     reasons.append('min_average_score (%s < %s)' % (entry.get('rt_average_score'),
                         config['min_average_score']))
-            if 'require_certified_fresh' in config:
-                if config['require_certified_fresh'] and entry.get('rt_critics_rating').lower() != 'certified fresh':
-                    reasons.append('require_certified_fresh')
             if 'min_year' in config:
                 if entry.get('rt_year', 0) < config['min_year']:
                     reasons.append('min_year (%s < %s)' % (entry.get('rt_year'), config['min_year']))
