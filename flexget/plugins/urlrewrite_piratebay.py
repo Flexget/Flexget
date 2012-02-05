@@ -4,7 +4,7 @@ import logging
 from plugin_urlrewriting import UrlRewritingError
 from flexget.entry import Entry
 from flexget.plugin import register_plugin, internet, PluginWarning
-from flexget.utils.tools import urlopener
+from flexget.utils import requests
 from flexget.utils.soup import get_soup
 from flexget.utils.search import torrent_availability, StringComparator
 
@@ -19,9 +19,10 @@ class UrlRewritePirateBay(object):
         url = entry['url']
         if url.endswith('.torrent'):
             return False
-        if url.startswith('http://thepiratebay.org/'):
+        url = url.replace('thepiratebay.org', 'thepiratebay.se')
+        if url.startswith('http://thepiratebay.se/'):
             return True
-        if url.startswith('http://torrents.thepiratebay.org/'):
+        if url.startswith('http://torrents.thepiratebay.se/'):
             return True
         return False
 
@@ -31,7 +32,7 @@ class UrlRewritePirateBay(object):
             log.error("Didn't actually get a URL...")
         else:
             log.debug("Got the URL: %s" % entry['url'])
-        if entry['url'].startswith('http://thepiratebay.org/search/'):
+        if entry['url'].startswith(('http://thepiratebay.se/search/', 'http://thepiratebay.org/search/')):
             # use search
             try:
                 entry['url'] = self.search_title(entry['title'])[0]['url']
@@ -43,7 +44,7 @@ class UrlRewritePirateBay(object):
 
     @internet(log)
     def parse_download_page(self, url):
-        page = urlopener(url, log)
+        page = requests.get(url).content
         try:
             soup = get_soup(page)
             tag_div = soup.find('div', attrs={'class': 'download'})
@@ -62,7 +63,7 @@ class UrlRewritePirateBay(object):
         return entries
 
     @internet(log)
-    def search_title(self, name, comparator=StringComparator(), url=None):
+    def search_title(self, name, comparator=StringComparator()):
         """
             Search for name from piratebay.
             If optional search :url: is passed it will be used instead of internal search.
@@ -70,11 +71,10 @@ class UrlRewritePirateBay(object):
 
         comparator.set_seq1(name)
         name = comparator.search_string()
-        if not url:
-            # urllib.quote will crash if the unicode string has non ascii characters, so encode in utf-8 beforehand
-            url = 'http://thepiratebay.org/search/' + urllib.quote(name.encode('utf-8')) + '/0/7/0'
-            log.debug('Using %s as piratebay search url' % url)
-        page = urlopener(url, log)
+        # urllib.quote will crash if the unicode string has non ascii characters, so encode in utf-8 beforehand
+        url = 'http://thepiratebay.se/search/' + urllib.quote(name.encode('utf-8')) + '/0/7/0'
+        log.debug('Using %s as piratebay search url' % url)
+        page = requests.get(url).content
         soup = get_soup(page)
         entries = []
         for link in soup.findAll('a', attrs={'class': 'detLink'}):

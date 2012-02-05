@@ -236,7 +236,6 @@ class PluginDownload(object):
         response = feed.requests.get(url, auth=auth, raise_status=False)
         if response.status_code != 200:
             # Save the error page
-            response.encoding = None
             if response.content:
                 self.save_error_page(entry, feed, response.content)
             # Raise the error
