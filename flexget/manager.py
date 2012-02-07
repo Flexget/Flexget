@@ -179,6 +179,9 @@ class Manager(object):
             # normal lookup locations
             possible.append(startup_path)
             possible.append(home_path)
+            if sys.platform.startswith('win'):
+                # On windows look in ~/flexget as well, as explorer does not let you create a folder starting with a dot
+                possible.append(os.path.join(os.path.expanduser('~'), 'flexget'))
             # for virtualenv / dev sandbox
             from flexget import __version__ as version
             if version == '{subversion}':

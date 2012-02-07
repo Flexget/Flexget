@@ -1,4 +1,5 @@
 import os
+import sys
 import logging
 import yaml
 from copy import deepcopy
@@ -20,7 +21,12 @@ class UIManager(Manager):
             Manager.find_config(self)
         except IOError:
             # No config file found, create a blank one in the home path
-            config_path = os.path.join(os.path.expanduser('~'), '.flexget')
+            if sys.platform.startswith('win'):
+                # On windows machines do not use a dot in folder name
+                folder = 'flexget'
+            else:
+                folder = '.flexget'
+            config_path = os.path.join(os.path.expanduser('~'), folder)
             if not os.path.exists(config_path):
                 os.mkdir(config_path)
             config_filename = os.path.join(config_path, self.options.config)
