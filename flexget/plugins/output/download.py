@@ -275,7 +275,7 @@ class PluginDownload(object):
             entry['file'] = datafile
             log.debug('%s field file set to: %s' % (entry['title'], entry['file']))
 
-        entry['mime-type'] = response.headers['content-type']
+        entry['mime-type'] = parse_header(response.headers['content-type'])[0]
 
         content_encoding = response.headers.get('content-encoding', '')
         decompress = 'gzip' in content_encoding or 'deflate' in content_encoding
