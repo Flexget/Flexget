@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from urllib import urlencode
+from urllib import urlencode, quote
 from urllib2 import urlopen, URLError, HTTPError
 from logging import getLogger
 from flexget.utils import json
@@ -98,7 +98,7 @@ class PluginPyLoad(object):
 
         for entry in feed.accepted:
             # bunch of urls now going to check
-            content = entry['description'] + " " + entry['url']
+            content = entry['description'] + " " + quote(entry['url'])
             content = json.dumps(content.encode("utf8"))
 
             url = json.dumps(entry['url']) if config.get('parse_url', self.DEFAULT_PARSE_URL) else "''"
