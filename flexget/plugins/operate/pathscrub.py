@@ -61,11 +61,12 @@ class PathScrub(object):
             else:
                 replace_map = self.replace_maps['linux']
 
-        path = dirty_path
+        # Make sure not to mess with windows drive specifications
+        drive, path = ntpath.splitdrive(dirty_path)
         for search, replace in replace_map.iteritems():
             path = re.sub(search, replace, path)
 
-        return path.strip()
+        return drive + path.strip()
 
 
 plugin.register_plugin(PathScrub, 'pathscrub', api_ver=2)
