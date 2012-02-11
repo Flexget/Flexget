@@ -10,11 +10,18 @@ import sys
 from cgi import parse_header
 from httplib import BadStatusLine
 from requests import RequestException
-from flexget.plugin import register_plugin, register_parser_option, get_plugin_by_name, PluginWarning, PluginError
+from flexget.plugin import (register_plugin, register_parser_option, get_plugin_by_name,
+                            PluginWarning, PluginError, DependencyError)
 from flexget.utils.tools import decode_html
 from flexget.utils.template import RenderError
 
 log = logging.getLogger('download')
+
+try:
+    pathscrub = get_plugin_by_name('pathscrub').instance.scrub
+except DependencyError:
+    log.warning('Download plugin cannot clean paths without pathscrub plugin.')
+    pathscrub = lambda x: x
 
 
 class PluginDownload(object):
@@ -370,6 +377,9 @@ class PluginDownload(object):
                 feed.fail(entry, 'Could not set path. Error during string replacement: %s' % e)
                 return
 
+            # Clean illegal characters from path name
+            path = pathscrub(path)
+
             # If we are in test mode, report and return
             if feed.manager.options.test:
                 log.info('Would write `%s` to `%s`' % (entry['title'], path))
@@ -405,12 +415,16 @@ class PluginDownload(object):
                     else:
                         self.filename_ext_from_mime(entry)
 
-            # combine to full path + filename, replace / from filename (replaces bc tickets #208, #325, #353)
             name = entry.get('filename', entry['title'])
-            for char in '/:<>^*?~"':
-                name = name.replace(char, ' ')
+            # Remove illegal characters from filename #325, #353
+            name = pathscrub(name)
+            # Remove directory separators from filename #208
+            name = name.replace('/', ' ')
+            if sys.platform.startswith('win'):
+                name = name.replace('\\', ' ')
             # remove duplicate spaces
             name = ' '.join(name.split())
+            # combine to full path + filename
             destfile = os.path.join(path, name)
             log.debug('destfile: %s' % destfile)
 

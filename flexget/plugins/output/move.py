@@ -3,10 +3,16 @@ import shutil
 import logging
 import time
 from flexget import validator
-from flexget.plugin import register_plugin
+from flexget.plugin import register_plugin, get_plugin_by_name, DependencyError
 from flexget.utils.template import RenderError
 
 log = logging.getLogger('move')
+
+try:
+    pathscrub = get_plugin_by_name('pathscrub').instance.scrub
+except DependencyError:
+    log.warning('Move plugin cannot clean paths without pathscrub plugin.')
+    pathscrub = lambda x: x
 
 
 def get_directory_size(directory):
@@ -80,7 +86,10 @@ class MovePlugin(object):
             except RenderError:
                 log.error('Filename value replacement `%s` failed for `%s`' % (dst_filename, entry['title']))
                 continue
+            # Clean invalid characters with pathscrub plugin
+            dst_path, dst_filename = pathscrub(dst_path), pathscrub(dst_filename)
 
+            # Join path and filename
             dst = os.path.join(dst_path, dst_filename)
             if dst == entry['location']:
                 log.info('Not moving %s because source and destination are the same.' % dst)

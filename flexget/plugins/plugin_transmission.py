@@ -2,12 +2,18 @@ import os
 from netrc import netrc, NetrcParseError
 import logging
 import base64
-from flexget.plugin import register_plugin, priority, get_plugin_by_name, PluginError
+from flexget.plugin import register_plugin, priority, get_plugin_by_name, PluginError, DependencyError
 from flexget import validator
 from flexget.entry import Entry
 from flexget.utils.template import RenderError
 
 log = logging.getLogger('transmission')
+
+try:
+    pathscrub = get_plugin_by_name('pathscrub').instance.scrub
+except DependencyError:
+    log.warning('Transmission plugin cannot clean paths without pathscrub plugin.')
+    pathscrub = lambda x: x
 
 
 def save_opener(f):
@@ -269,7 +275,8 @@ class PluginTransmission(TransmissionBase):
 
         if opt_dic.get('path'):
             try:
-                options['add']['download_dir'] = os.path.expanduser(entry.render(opt_dic['path'])).encode('utf-8')
+                path = os.path.expanduser(entry.render(opt_dic['path'])).encode('utf-8')
+                options['add']['download_dir'] = pathscrub(path)
             except RenderError, e:
                 log.error('Error setting path for %s: %s' % (entry['title'], e))
         if opt_dic.get('addpaused'):

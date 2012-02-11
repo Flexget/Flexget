@@ -6,11 +6,16 @@ import re
 import sys
 from flexget.event import event
 from flexget.entry import Entry
-from flexget.utils.tools import make_valid_path
 from flexget.plugin import register_plugin, PluginError, priority, get_plugin_by_name, DependencyError
 from flexget.utils.template import RenderError
 
 log = logging.getLogger('deluge')
+
+try:
+    pathscrub = get_plugin_by_name('pathscrub').instance.scrub
+except DependencyError:
+    log.warning('Deluge plugin cannot clean paths without pathscrub plugin.')
+    pathscrub = lambda x: x
 
 # Deluge does not install to python system on Windows, add the install directory to sys.path if it is found
 if sys.platform.startswith('win') and os.environ.get('ProgramFiles'):
@@ -481,7 +486,6 @@ class OutputDeluge(DelugePlugin):
         from deluge.ui.client import client
         from twisted.internet import reactor, defer
 
-
         if not result:
             log.debug('on_connect_success returned a failed result. BUG?')
 
@@ -692,7 +696,7 @@ class OutputDeluge(DelugePlugin):
                 try:
                     path = entry.render(entry.get('path', config['path']))
                     if path:
-                        add_opts['download_location'] = make_valid_path(os.path.expanduser(path))
+                        add_opts['download_location'] = pathscrub(os.path.expanduser(path))
                 except RenderError, e:
                     log.error('Could not set path for %s: %s' % (entry['title'], e))
                 for fopt, dopt in self.options.iteritems():
@@ -707,11 +711,12 @@ class OutputDeluge(DelugePlugin):
                                'main_file_only': entry.get('main_file_only', config.get('main_file_only', False))}
                 try:
                     movedone = entry.render(entry.get('movedone', config['movedone']))
-                    modify_opts['movedone'] = make_valid_path(os.path.expanduser(movedone))
+                    modify_opts['movedone'] = pathscrub(os.path.expanduser(movedone))
                 except RenderError, e:
                     log.error('Error setting movedone for %s: %s' % (entry['title'], e))
                 try:
-                    modify_opts['content_filename'] = entry.render(entry.get('content_filename', config.get('content_filename', '')))
+                    content_filename = entry.get('content_filename', config.get('content_filename', ''))
+                    modify_opts['content_filename'] = pathscrub(entry.render(content_filename))
                 except RenderError, e:
                     log.error('Error setting content_filename for %s: %s' % (entry['title'], e))
 
