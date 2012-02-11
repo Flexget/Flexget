@@ -17,12 +17,6 @@ from flexget.utils.template import RenderError
 
 log = logging.getLogger('download')
 
-try:
-    pathscrub = get_plugin_by_name('pathscrub').instance.scrub
-except DependencyError:
-    log.warning('Download plugin cannot clean paths without pathscrub plugin.')
-    pathscrub = lambda x: x
-
 
 class PluginDownload(object):
 
@@ -77,9 +71,15 @@ class PluginDownload(object):
         return config
 
     def on_process_start(self, feed, config):
-        """Register the usable set keywords."""
+        """Register the usable set keywords, get pathscrub method."""
         set_plugin = get_plugin_by_name('set')
         set_plugin.instance.register_keys({'path': 'text'})
+
+        try:
+            self.pathscrub = get_plugin_by_name('pathscrub').instance.scrub
+        except DependencyError:
+            log.warning('Download plugin cannot clean paths without pathscrub plugin.')
+            self.pathscrub = lambda x: x
 
     def on_feed_download(self, feed, config):
         config = self.process_config(config)
@@ -378,7 +378,7 @@ class PluginDownload(object):
                 return
 
             # Clean illegal characters from path name
-            path = pathscrub(path)
+            path = self.pathscrub(path)
 
             # If we are in test mode, report and return
             if feed.manager.options.test:
@@ -417,7 +417,7 @@ class PluginDownload(object):
 
             name = entry.get('filename', entry['title'])
             # Remove illegal characters from filename #325, #353
-            name = pathscrub(name)
+            name = self.pathscrub(name)
             # Remove directory separators from filename #208
             name = name.replace('/', ' ')
             if sys.platform.startswith('win'):
