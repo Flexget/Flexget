@@ -173,17 +173,10 @@ class InputRSS(object):
                 headers['If-None-Match'] = etag
             modified = feed.simple_persistence.get('%s_modified' % url_hash, None)
             if modified:
-                if not isinstance(modified, tuple):
+                if not isinstance(modified, basestring):
                     log.debug('Invalid date was stored for last modified time.')
                 else:
-                    # format into an RFC 1123-compliant timestamp. We can't use
-                    # time.strftime() since the %a and %b directives can be affected
-                    # by the current locale, but RFC 2616 states that dates must be
-                    # in English.
-                    weekday = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'][modified[6]]
-                    month = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][modified[1] - 1]
-                    headers['If-Modified-Since'] = ('%s, %02d %s %04d %02d:%02d:%02d GMT' %
-                        (weekday, modified[2], month, modified[0], modified[3], modified[4], modified[5]))
+                    headers['If-Modified-Since'] = modified
                     log.debug('Sending last-modified %s for feed %s' % (headers['If-Modified-Since'], feed.name))
 
         # Get the feed content
@@ -227,8 +220,8 @@ class InputRSS(object):
                     feed.simple_persistence['%s_etag' % url_hash] = etag
                     log.debug('etag %s saved for feed %s' % (etag, feed.name))
                 if  response.headers.get('last-modified'):
-                    modified = feedparser._parse_date(response.headers['last-modified'])
-                    feed.simple_persistence['%s_modified' % url_hash] = tuple(modified)
+                    modified = response.headers['last-modified']
+                    feed.simple_persistence['%s_modified' % url_hash] = modified
                     log.debug('last modified %s saved for feed %s' % (modified, feed.name))
         else:
             # This is a file, open it
