@@ -1,7 +1,7 @@
 {% if feed.accepted -%}
 FlexGet has just downloaded {{feed.accepted|length}} new entries for feed {{feed.name}}:
 {%- for entry in feed.accepted %}
-- {{entry.title}} ({{entry.url}})
+- {{entry.title}} ({{entry.url}}){% if entry.output|d(false) %} => {{entry.output}}{% endif %}
 {% endfor %}
 {%- endif -%}
 {% if feed.failed -%}
