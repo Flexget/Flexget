@@ -171,8 +171,15 @@ def render_from_entry(template_string, entry):
 
 
 def render_from_feed(template, feed):
-    """Renders a Template with an feed as its context."""
+    """
+    Renders a Template with a feed as its context.
 
+    :param template: Template or template string to render.
+    :param feed: Feed to render the template from.
+    :return: The rendered template text.
+    """
+    if isinstance(template, basestring):
+        template = environment.from_string(template)
     try:
         result = template.render({'feed': feed})
     except Exception, e:

@@ -1,0 +1,12 @@
+{% if feed.accepted -%}
+FlexGet has just downloaded {{feed.accepted|length}} new entries for feed {{feed.name}}:
+{%- for entry in feed.accepted %}
+- {{entry.title}} ({{entry.url}})
+{% endfor %}
+{%- endif -%}
+{% if feed.failed -%}
+The following entries have failed for feed {{feed.name}}:
+{%- for entry in feed.failed %}
+- {{entry.title}} ({{entry.url}}) Reason: {{entry.reason|d('unknown')}}
+{% endfor %}
+{% endif %}
