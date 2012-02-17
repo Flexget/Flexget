@@ -1,0 +1,8 @@
+*.pyc
+FlexGet.egg-info/
+bin/
+include/
+lib/
+local
+*.swp
+*.swo
