@@ -56,7 +56,6 @@ class FilterRottenTomatoes(object):
     """
 
     def validator(self):
-        """Validate given configuration"""
         from flexget import validator
         rt = validator.factory('dict')
         rt.accept('integer', key='min_year')
@@ -87,7 +86,6 @@ class FilterRottenTomatoes(object):
             entries = feed.undecided
 
         for entry in entries:
-                
             force_accept = False
 
             try:
@@ -190,4 +188,3 @@ class FilterRottenTomatoes(object):
                 feed.accept(entry)
 
 register_plugin(FilterRottenTomatoes, 'rottentomatoes', api_ver=2)
-

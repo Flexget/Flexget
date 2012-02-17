@@ -326,6 +326,7 @@ def lookup_movie(title=None, year=None, rottentomatoes_id=None, imdb_id=None, sm
         movie.posters
         return movie
 
+
 def get_movie_details(movie, session, movie_data=None):
     """Populate details for this :movie: from Rotten Tomatoes"""
 
@@ -345,12 +346,12 @@ def get_movie_details(movie, session, movie_data=None):
                 movie.genres.append(genre)
         release_dates = movie_data.get('release_dates')
         if release_dates:
-            for name,date in release_dates.items():
-                movie.release_dates.append(ReleaseDate(name,date))
+            for name, date in release_dates.items():
+                movie.release_dates.append(ReleaseDate(name, date))
         posters = movie_data.get('posters')
         if posters:
-            for name,url in posters.items():
-                movie.posters.append(RottenTomatoesPoster(name,url))
+            for name, url in posters.items():
+                movie.posters.append(RottenTomatoesPoster(name, url))
         cast = movie_data.get('abridged_cast')
         if cast:
             for actor in cast:
@@ -371,13 +372,15 @@ def get_movie_details(movie, session, movie_data=None):
     else:
         raise LookupError('No movie_datas for rottentomatoes_id %s' % movie.id)
 
+
 def movies_info(id):
     url = '%s/%s/movies/%s.json?apikey=%s'% (SERVER, API_VER, id, API_KEY)
     result = get_json(url)
     if isinstance(result, dict) and result.get('id'):
         return result
 
-def movies_alias(id,type='imdb'):
+
+def movies_alias(id, type='imdb'):
     if type == 'imdb':
         id = id.lstrip('t')
     url = '%s/%s/movie_alias.json?id=%s&type=%s'% (SERVER, API_VER, id, type)
@@ -385,7 +388,8 @@ def movies_alias(id,type='imdb'):
     if isinstance(result, dict) and result.get('id'):
         return result
 
-def movies_search(q,page_limit=None,page=None):
+
+def movies_search(q, page_limit=None, page=None):
     if isinstance(q, basestring):
         q = q.replace(' ', '+').encode('utf-8')
 
@@ -398,6 +402,7 @@ def movies_search(q,page_limit=None,page=None):
     result = get_json(url)
     if isinstance(result, dict) and result.get('total') and len(result.get('movies')):
         return result
+
 
 def get_json(url):
     try:
