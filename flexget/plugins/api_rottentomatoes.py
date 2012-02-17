@@ -7,21 +7,13 @@ from sqlalchemy import Table, Column, Integer, Float, String, Unicode, Boolean, 
 from sqlalchemy.schema import ForeignKey, Index
 from sqlalchemy.orm import relation
 from flexget import schema
+from flexget.utils import json
 from flexget.utils.sqlalchemy_utils import table_add_column, table_schema
 from flexget.utils.titles import MovieParser
 from flexget.utils.tools import urlopener
 from flexget.utils.database import text_date_synonym, year_property, with_session
 from flexget.manager import Session
 from flexget.plugin import register_plugin, DependencyError
-
-try:
-    import simplejson as json
-except ImportError:
-    try:
-        import json
-    except ImportError:
-        raise DependencyError(issued_by='api_rottentomatoes', missing='simplejson', message='api_rottentomatoes requrires either '
-                'simplejson module or python > 2.5')
 
 log = logging.getLogger('api_rottentomatoes')
 Base = schema.versioned_base('api_rottentomatoes', 0)
