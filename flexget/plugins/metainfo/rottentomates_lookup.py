@@ -54,7 +54,13 @@ class PluginRottenTomatoesLookup(object):
 
     def lazy_loader(self, entry, field):
         log.debug('lazy_loader called with field: %s' % field)
-        """Does the lookup for this entry and populates the entry fields."""
+        """Does the lookup for this entry and populates the entry fields.
+
+        :param entry: entry to perform lookup on
+        :param field: the field to be populated (others may be populated as well)
+        :returns: the field value
+ 
+        """
         imdb_id = entry.get('imdb_id', eval_lazy=False) or \
                   imdb.extract_id(entry.get('imdb_url', eval_lazy=False))
         try:
