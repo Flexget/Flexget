@@ -292,6 +292,8 @@ class Manager(object):
         prev_list = True
         prev_scalar = True
         list_open = False # multiline list with [
+        single_quote_open = False # multiline single-quoted scalar
+        double_quote_open = False # multiline double-quoted scalar
 
         for line in file:
             line_num += 1
@@ -323,6 +325,23 @@ class Manager(object):
                 list_open = line.strip().endswith(': [') or line.strip().endswith(':[')
                 if list_open:
 #                    print 'list open at line %s' % line
+                    continue
+
+            if single_quote_open:
+                if line.strip().endswith("'"):
+                    single_quote_open = False
+                continue
+            else:
+                single_quote_open = line.strip().endswith("'")
+                if single_quote_open:
+                    continue
+            if double_quote_open:
+                if line.strip().endswith('"'):
+                    double_quote_open = False
+                continue
+            else:
+                double_quote_open = line.strip().endswith('"')
+                if double_quote_open:
                     continue
 
 #            print '#%i: %s' % (line_num, line)
