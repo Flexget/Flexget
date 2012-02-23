@@ -1,19 +1,14 @@
 from datetime import datetime, timedelta
 import logging
 from urllib2 import URLError
-import os
-import posixpath
-from sqlalchemy import Table, Column, Integer, Float, String, Boolean, DateTime, func
+from sqlalchemy import Table, Column, Integer, String, DateTime, func
 from sqlalchemy.schema import ForeignKey, Index
 from sqlalchemy.orm import relation
 from flexget import schema
 from flexget.utils import json
-from flexget.utils.sqlalchemy_utils import table_add_column, table_schema
 from flexget.utils.titles import MovieParser
 from flexget.utils.tools import urlopener
-from flexget.utils.database import text_date_synonym, year_property, with_session
-from flexget.manager import Session
-from flexget.plugin import register_plugin, DependencyError
+from flexget.utils.database import text_date_synonym, with_session
 
 log = logging.getLogger('api_rottentomatoes')
 Base = schema.versioned_base('api_rottentomatoes', 0)
@@ -362,19 +357,19 @@ def get_movie_details(movie, session, movie_data=None):
                 movie.directors.append(RottenTomatoesDirector(director.get('name')))
         alternate_ids = movie_data.get('alternate_ids')
         if alternate_ids:
-            for name,id in alternate_ids.items():
-                movie.alternate_ids.append(RottenTomatoesAlternateId(name,id))
+            for name, id in alternate_ids.items():
+                movie.alternate_ids.append(RottenTomatoesAlternateId(name, id))
         links = movie_data.get('links')
         if links:
-            for name,url in links.items():
-                movie.links.append(RottenTomatoesLink(name,url))
+            for name, url in links.items():
+                movie.links.append(RottenTomatoesLink(name, url))
         movie.updated = datetime.now()
     else:
         raise LookupError('No movie_datas for rottentomatoes_id %s' % movie.id)
 
 
 def movies_info(id):
-    url = '%s/%s/movies/%s.json?apikey=%s'% (SERVER, API_VER, id, API_KEY)
+    url = '%s/%s/movies/%s.json?apikey=%s' % (SERVER, API_VER, id, API_KEY)
     result = get_json(url)
     if isinstance(result, dict) and result.get('id'):
         return result
@@ -383,7 +378,7 @@ def movies_info(id):
 def movies_alias(id, type='imdb'):
     if type == 'imdb':
         id = id.lstrip('t')
-    url = '%s/%s/movie_alias.json?id=%s&type=%s'% (SERVER, API_VER, id, type)
+    url = '%s/%s/movie_alias.json?id=%s&type=%s' % (SERVER, API_VER, id, type)
     result = get_json(url)
     if isinstance(result, dict) and result.get('id'):
         return result
