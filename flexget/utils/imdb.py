@@ -277,7 +277,6 @@ class ImdbParser(object):
             # We should match the infobar, it's an integral part of the IMDB page.
             log.warning('Unable to get infodiv class for %s - plugin needs update?' % url)
 
-
         # get name
         tag_name = soup.find('h1')
         if tag_name:
@@ -289,7 +288,6 @@ class ImdbParser(object):
                     log.debug('Detected name: %s' % self.name)
         else:
             log.warning('Unable to get name for %s - plugin needs update?' % url)
-
 
         # detect if movie is eligible for ratings
         rating_ineligible = soup.find('div', attrs={'class': 'rating-ineligible'})
@@ -311,7 +309,7 @@ class ImdbParser(object):
                 try:
                     self.score = float(span_score.string)
                 except ValueError:
-                    log.debug('tag_score %s is not valid float' % b_score.contents[0])
+                    log.debug('tag_score %s is not valid float' % span_score.contents[0])
                 log.debug('Detected score: %s' % self.score)
             else:
                 log.warning('Unable to get score for %s - plugin needs update?' % url)
@@ -321,10 +319,13 @@ class ImdbParser(object):
             self.genres.append(unicode(link.contents[0].lower()))
 
         # get languages
-        for link in soup.findAll('a', attrs={'href': re.compile('^/language/')}):
-            lang = unicode(link.contents[0].lower())
-            if not lang in self.languages:
-                self.languages.append(lang.strip())
+        for link in soup.findAll('a', attrs={'itemprop': 'inLanguage'}):
+            # skip non-primary languages "(a few words)", etc.
+            m = re.search('(?x) \( [^()]* \\b few \\b', unicode(link.nextSibling))
+            if not m:
+                lang = unicode(link.contents[0].lower())
+                if not lang in self.languages:
+                    self.languages.append(lang.strip())
 
         # get year
         tag_year = soup.find('a', attrs={'href': re.compile('^/year/\d+')})

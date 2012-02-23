@@ -1,15 +1,13 @@
 __version__ = 0.1
 
-from httplib import HTTPSConnection
-from urllib import urlencode
 import logging
+from requests import RequestException
 from flexget.plugin import get_plugin_by_name, register_plugin
 from flexget.utils.template import RenderError
 
 log = logging.getLogger('prowl')
 
-headers = {'User-Agent': "FlexGet Prowl plugin/%s" % str(__version__),
-           'Content-type': "application/x-www-form-urlencoded"}
+headers = {'User-Agent': 'FlexGet Prowl plugin/%s' % str(__version__)}
 
 
 class OutputProwl(object):
@@ -77,17 +75,17 @@ class OutputProwl(object):
                 description = entry['title']
                 log.error('Error rendering jinja description: %s' % e)
 
-            # Open connection
-            h = HTTPSConnection('prowl.weks.net')
-
-            # Send the request
+            url = 'https://prowl.weks.net/publicapi/add'
             data = {'priority': priority, 'application': application, 'apikey': apikey,
                     'event': event, 'description': description}
-            h.request("POST", "/publicapi/add", headers=headers, body=urlencode(data))
+            try:
+                response = feed.requests.post(url, headers=headers, data=data, raise_status=False)
+            except RequestException, e:
+                log.error('Error with request: %s' % e)
+                continue
 
             # Check if it succeeded
-            response = h.getresponse()
-            request_status = response.status
+            request_status = response.status_code
 
             # error codes and messages from http://prowl.weks.net/api.php
             if request_status == 200:

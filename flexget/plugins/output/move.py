@@ -3,7 +3,7 @@ import shutil
 import logging
 import time
 from flexget import validator
-from flexget.plugin import register_plugin
+from flexget.plugin import register_plugin, get_plugin_by_name, DependencyError
 from flexget.utils.template import RenderError
 
 log = logging.getLogger('move')
@@ -34,6 +34,14 @@ class MovePlugin(object):
         #config.accept('list', key='move_with').accept('text') # TODO
         config.accept('number', key='clean_source')
         return root
+
+    def on_process_start(self, feed, config):
+        """Get pathscrub method."""
+        try:
+            self.pathscrub = get_plugin_by_name('pathscrub').instance.scrub
+        except DependencyError:
+            log.warning('Move plugin cannot clean paths without pathscrub plugin.')
+            self.pathscrub = lambda x: x
 
     def on_feed_output(self, feed, config):
         if config is True:
@@ -80,7 +88,10 @@ class MovePlugin(object):
             except RenderError:
                 log.error('Filename value replacement `%s` failed for `%s`' % (dst_filename, entry['title']))
                 continue
+            # Clean invalid characters with pathscrub plugin
+            dst_path, dst_filename = self.pathscrub(dst_path), self.pathscrub(dst_filename)
 
+            # Join path and filename
             dst = os.path.join(dst_path, dst_filename)
             if dst == entry['location']:
                 log.info('Not moving %s because source and destination are the same.' % dst)

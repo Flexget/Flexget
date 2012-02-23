@@ -47,6 +47,7 @@ class PluginFreeSpace(object):
         if feed.accepted:
             if get_free_space(config['path']) < config['space']:
                 log.error('Less than %d MB of free space in %s aborting feed.' % (config['space'], config['path']))
+                # backlog plugin will save and restore the feed content, if available
                 feed.abort()
 
 

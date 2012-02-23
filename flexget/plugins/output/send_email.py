@@ -4,6 +4,7 @@ import socket
 from email.message import Message
 from smtplib import SMTPException
 from flexget.plugin import PluginError, PluginWarning, register_plugin
+from flexget.utils.template import render_from_feed, get_template, RenderError
 
 log = logging.getLogger('email')
 
@@ -107,10 +108,11 @@ class OutputEmail(object):
         email.accept('text', key='smtp_password')
         email.accept('boolean', key='smtp_tls')
         email.accept('boolean', key='smtp_ssl')
+        email.accept('text', key='template')
+        email.accept('text', key='subject')
         return email
 
-    def get_config(self, feed):
-        config = feed.config['email']
+    def prepare_config(self, config):
         config.setdefault('active', True)
         config.setdefault('smtp_host', 'localhost')
         config.setdefault('smtp_port', 25)
@@ -119,16 +121,18 @@ class OutputEmail(object):
         config.setdefault('smtp_password', '')
         config.setdefault('smtp_tls', False)
         config.setdefault('smtp_ssl', False)
+        config.setdefault('template', 'default.template')
+        config.setdefault('subject', '[FlexGet] {{feed.name}}: {{feed.accepted|length}} new entries downloaded')
         if not isinstance(config['to'], list):
             config['to'] = [config['to']]
         return config
 
-    def on_feed_output(self, feed):
+    def on_feed_output(self, feed, config):
         """Count the email as an output"""
 
-    def on_feed_exit(self, feed):
+    def on_feed_exit(self, feed, config):
         """Send email at exit."""
-        config = self.get_config(feed)
+        config = self.prepare_config(config)
 
         if not config['active']:
             return
@@ -137,24 +141,20 @@ class OutputEmail(object):
         if feed.manager.options.learn:
             return
 
-        # don't send empty emails
-        if not feed.accepted:
-            return
-
         # generate email content
-        entries_count = len(feed.accepted)
-        subject = '[FlexGet] %s : %d new entries downloaded' % (feed.name, entries_count)
-        content = (u'Hi,\n'
-                    'FlexGet has just downloaded %d new entries for feed %s :' % (entries_count, feed.name))
-
-        for entry in feed.accepted:
-            content += "\n - %s (%s)" % (entry['title'], entry['url'])
-            entry_path = entry.get('path', feed.config.get('download'))
-            entry_filename = entry.get('filename', entry['title'])
-            if entry_path:
-                content += " => %s (%s)" % (entry_path, entry_filename)
-
-        content += "\n\n"
+        try:
+            subject = render_from_feed(config['subject'], feed)
+        except RenderError, e:
+            log.error('Error rendering email subject: %s' % e)
+            return
+        try:
+            content = render_from_feed(get_template(config['template'], 'email'), feed)
+        except RenderError, e:
+            log.error('Error rendering email body: %s' % e)
+            return
+        if not content.strip():
+            log.verbose('No content generated from template, not sending email.')
+            return
 
         # prepare email message
         message = Message()
@@ -167,6 +167,7 @@ class OutputEmail(object):
         # send email message
         if feed.manager.options.test:
             log.info('Would send email : %s' % message.as_string())
+            log.info(content)
         else:
             try:
                 if config['smtp_ssl']:
@@ -199,4 +200,4 @@ class OutputEmail(object):
 
             mailServer.quit()
 
-register_plugin(OutputEmail, 'email')
+register_plugin(OutputEmail, 'email', api_ver=2)

@@ -182,6 +182,10 @@ class Manager(object):
             if sys.platform.startswith('win'):
                 # On windows look in ~/flexget as well, as explorer does not let you create a folder starting with a dot
                 possible.append(os.path.join(os.path.expanduser('~'), 'flexget'))
+            else:
+                # The freedesktop.org standard config location
+                xdg_config = os.environ.get('XDG_CONFIG_HOME', os.path.join(os.path.expanduser('~'), '.config'))
+                possible.append(os.path.join(xdg_config, 'flexget'))
             # for virtualenv / dev sandbox
             from flexget import __version__ as version
             if version == '{subversion}':

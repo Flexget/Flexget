@@ -1,12 +1,11 @@
 import logging
 import csv
 import re
-import urllib
-import urllib2
-from functools import partial
+from cgi import parse_header
+from flexget.utils import requests
 from flexget.utils.imdb import make_url
 from flexget.utils.cached_input import cached
-from flexget.utils.tools import urlopener as _urlopener, decode_html
+from flexget.utils.tools import decode_html
 from flexget.plugin import register_plugin, PluginError
 from flexget.entry import Entry
 
@@ -30,28 +29,28 @@ class ImdbList(object):
 
     @cached('imdb_list', persist='2 hours')
     def on_feed_input(self, feed, config):
-        urlopener = partial(_urlopener, log=log, retries=2)
+        sess = requests.Session()
         if config.get('username') and config.get('password'):
-            # Create a cookie handler, make sure it is used in our calls to urlopener
-            cookiehandler = urllib2.HTTPCookieProcessor()
-            urlopener = partial(urlopener, handlers=[cookiehandler])
 
             log.verbose('Logging in ...')
 
             # Log in to imdb with our handler
-            params = urllib.urlencode({'login': config['username'], 'password': config['password']})
+            params = {'login': config['username'], 'password': config['password']}
             try:
-                urlopener('https://secure.imdb.com/register-imdb/login', data=params)
-            except urllib2.URLError, e:
+                r = sess.post('https://secure.imdb.com/register-imdb/login', data=params, raise_status=False)
+            except requests.RequestException, e:
                 raise PluginError('Unable to login to imdb: %s' % e.message)
+
+            # IMDb redirects us upon a successful login.
+            if r.status_code != 302:
+                log.warning('It appears logging in to IMDb was unsuccessful.')
 
             # try to automatically figure out user_id from watchlist redirect url
             if not 'user_id' in config:
                 log.verbose('Getting user_id ...')
-                opener = urlopener('http://www.imdb.com/list/watchlist')
-                redirected = opener.geturl()
-                log.debug('redirected to %s' % redirected)
-                user_id = redirected.split('/')[-2]
+                response = sess.get('http://www.imdb.com/list/watchlist')
+                log.debug('redirected to %s' % response.url)
+                user_id = response.url.split('/')[-2]
                 if re.match(USER_ID_RE, user_id):
                     config['user_id'] = user_id
                 else:
@@ -64,16 +63,17 @@ class ImdbList(object):
 
         # Get the imdb list in csv format
         try:
-            url = 'http://www.imdb.com/list/export?list_id=%s&author_id=%s' % (config['list'], config['user_id'])
+            url = 'http://www.imdb.com/list/export'
+            params = {'list_id': config['list'], 'author_id': config['user_id']}
             log.debug('Requesting %s' % url)
-            opener = urlopener(url)
-            mime_type = opener.headers.gettype()
+            opener = sess.get(url, params=params)
+            mime_type = parse_header(opener.headers['content-type'])[0]
             log.debug('mime_type: %s' % mime_type)
             if mime_type != 'text/csv':
                 raise PluginError('Didn\'t get CSV export as response. Probably specified list `%s` does not exists.'
                     % config['list'])
-            csv_rows = csv.reader(opener)
-        except urllib2.URLError, e:
+            csv_rows = csv.reader(opener.iter_lines())
+        except requests.RequestException, e:
             raise PluginError('Unable to get imdb list: %s' % e.message)
 
         # Create an Entry for each movie in the list

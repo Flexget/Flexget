@@ -6,7 +6,6 @@ import re
 import sys
 from flexget.event import event
 from flexget.entry import Entry
-from flexget.utils.tools import make_valid_path
 from flexget.plugin import register_plugin, PluginError, priority, get_plugin_by_name, DependencyError
 from flexget.utils.template import RenderError
 
@@ -326,7 +325,15 @@ class OutputDeluge(DelugePlugin):
 
     @priority(120)
     def on_process_start(self, feed, config):
-        """Register the usable set: keywords. Detect what version of deluge is loaded."""
+        """Register the usable set: keywords. Detect what version of deluge is loaded. Get pathscrub method from
+        pathscrub plugin if available."""
+
+        try:
+            self.pathscrub = get_plugin_by_name('pathscrub').instance.scrub
+        except DependencyError:
+            log.warning('Deluge plugin cannot clean paths without pathscrub plugin.')
+            self.pathscrub = lambda x: x
+
         set_plugin = get_plugin_by_name('set')
         set_plugin.instance.register_keys({'path': 'text', 'movedone': 'text', \
             'queuetotop': 'boolean', 'label': 'text', 'automanaged': 'boolean', \
@@ -480,7 +487,6 @@ class OutputDeluge(DelugePlugin):
         """Gets called when successfully connected to a daemon."""
         from deluge.ui.client import client
         from twisted.internet import reactor, defer
-
 
         if not result:
             log.debug('on_connect_success returned a failed result. BUG?')
@@ -692,7 +698,7 @@ class OutputDeluge(DelugePlugin):
                 try:
                     path = entry.render(entry.get('path', config['path']))
                     if path:
-                        add_opts['download_location'] = make_valid_path(os.path.expanduser(path))
+                        add_opts['download_location'] = self.pathscrub(os.path.expanduser(path))
                 except RenderError, e:
                     log.error('Could not set path for %s: %s' % (entry['title'], e))
                 for fopt, dopt in self.options.iteritems():
@@ -707,11 +713,12 @@ class OutputDeluge(DelugePlugin):
                                'main_file_only': entry.get('main_file_only', config.get('main_file_only', False))}
                 try:
                     movedone = entry.render(entry.get('movedone', config['movedone']))
-                    modify_opts['movedone'] = make_valid_path(os.path.expanduser(movedone))
+                    modify_opts['movedone'] = self.pathscrub(os.path.expanduser(movedone))
                 except RenderError, e:
                     log.error('Error setting movedone for %s: %s' % (entry['title'], e))
                 try:
-                    modify_opts['content_filename'] = entry.render(entry.get('content_filename', config.get('content_filename', '')))
+                    content_filename = entry.get('content_filename', config.get('content_filename', ''))
+                    modify_opts['content_filename'] = self.pathscrub(entry.render(content_filename))
                 except RenderError, e:
                     log.error('Error setting content_filename for %s: %s' % (entry['title'], e))
 

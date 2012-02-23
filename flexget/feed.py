@@ -114,7 +114,7 @@ class Feed(object):
 
     def __str__(self):
         return '<Feed(name=%s,aborted=%s)>' % (self.name, str(self._abort))
-        
+
     @property
     def undecided(self):
         """Iterate over undecided entries"""
@@ -250,12 +250,10 @@ class Feed(object):
         if not isinstance(cat, list):
             raise TypeError('category must be a list')
         for entry in cat:
-            match = 0
             for k, v in values.iteritems():
-                if k in entry:
-                    if entry.get(k) == v:
-                        match += 1
-            if match == len(values):
+                if not (k in entry and entry[k] == v):
+                    break
+            else:
                 return entry
         return None
 
