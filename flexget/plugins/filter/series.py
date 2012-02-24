@@ -7,6 +7,7 @@ from sqlalchemy import (Column, Integer, String, Unicode, DateTime, Boolean,
                         desc, select, update, ForeignKey, Index, func)
 from sqlalchemy.orm import relation, join
 from sqlalchemy.ext.hybrid import Comparator, hybrid_property
+from sqlalchemy.exc import OperationalError
 from flexget import schema
 from flexget.event import event
 from flexget.utils import qualities
@@ -68,7 +69,10 @@ def upgrade(ver, session):
         ver = 3
     if ver == 3:
         # Remove index on Series.name
-        Index('ix_series_name').drop(bind=session.bind)
+        try:
+            Index('ix_series_name').drop(bind=session.bind)
+        except OperationalError:
+            log.debug('There was no ix_series_name index to remove.')
         # Add Series.name_lower column
         log.info('Adding `name_lower` column to series table.')
         table_add_column('series', 'name_lower', Unicode, session)

@@ -124,8 +124,6 @@ class SeriesReport(SeriesDatabase):
         :param series: Instance of Series
         :return: Instance of latest Episode or None
         """
-        if unicode(series.name).lower() == 'penn and teller':
-            pass
         episode = None
         # try to get latest episode in episodic format
         if series.identified_by in ('ep', 'auto', None):
