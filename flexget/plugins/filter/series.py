@@ -3,8 +3,10 @@ import re
 import time
 from copy import copy
 from datetime import datetime, timedelta
-from sqlalchemy import Column, Integer, String, Unicode, DateTime, Boolean, desc, select, update, ForeignKey, Index
+from sqlalchemy import (Column, Integer, String, Unicode, DateTime, Boolean,
+                        desc, select, update, ForeignKey, Index, func)
 from sqlalchemy.orm import relation, join
+from sqlalchemy.ext.hybrid import Comparator, hybrid_property
 from flexget import schema
 from flexget.event import event
 from flexget.utils import qualities
@@ -12,12 +14,12 @@ from flexget.utils.log import log_once
 from flexget.utils.titles import SeriesParser, ParseWarning
 from flexget.utils.sqlalchemy_utils import table_columns, table_exists, drop_tables, table_schema, table_add_column
 from flexget.utils.tools import merge_dict_from_to, parse_timedelta
-from flexget.utils.database import quality_property, ignore_case_property
+from flexget.utils.database import quality_property
 from flexget.manager import Session
 from flexget.plugin import (register_plugin, register_parser_option, get_plugin_by_name, get_plugin_keywords,
     PluginWarning, DependencyError, priority)
 
-SCHEMA_VER = 3
+SCHEMA_VER = 4
 
 log = logging.getLogger('series')
 Base = schema.versioned_base('series', SCHEMA_VER)
@@ -64,6 +66,17 @@ def upgrade(ver, session):
         log.info('Creating index on episode_releases table.')
         Index('ix_episode_releases_episode_id', release_table.c.episode_id).create(bind=session.bind)
         ver = 3
+    if ver == 3:
+        # Remove index on Series.name
+        Index('ix_series_name').drop(bind=session.bind)
+        # Add Series.name_lower column
+        log.info('Adding `name_lower` column to series table.')
+        table_add_column('series', 'name_lower', Unicode, session)
+        series_table = table_schema('series', session)
+        Index('ix_series_name_lower', series_table.c.name_lower).create(bind=session.bind)
+        # Fill in lower case name column
+        session.execute(update(series_table, values={'name_lower': func.lower(series_table.c.name)}))
+        ver = 4
 
     return ver
 
@@ -98,6 +111,11 @@ def repair(manager):
         manager.persist['series_repaired'] = True
 
 
+class LowerComparator(Comparator):
+    def operate(self, op, other):
+        return op(self.__clause_element__(), func.lower(other))
+
+
 class Series(Base):
 
     """ Name is handled case insensitively transparently
@@ -106,10 +124,24 @@ class Series(Base):
     __tablename__ = 'series'
 
     id = Column(Integer, primary_key=True)
-    _name = Column('name', Unicode, index=True)
-    name = ignore_case_property('_name')
+    _name = Column('name', Unicode)
+    _name_lower = Column('name_lower', Unicode, index=True)
     identified_by = Column(String)
     episodes = relation('Episode', backref='series', cascade='all, delete, delete-orphan')
+
+    # Make a special property that does indexed case insensitive lookups on name, but stores/returns specified case
+    def name_getter(self):
+        return self._name
+
+    def name_setter(self, value):
+        self._name = value
+        self._name_lower = value.lower()
+
+    def name_comparator(self):
+        return LowerComparator(self._name_lower)
+
+    name = hybrid_property(name_getter, name_setter)
+    name.comparator(name_comparator)
 
     def __repr__(self):
         return '<Series(id=%s,name=%s)>' % (self.id, self.name)

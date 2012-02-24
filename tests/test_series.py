@@ -798,21 +798,24 @@ class TestIdioticNumbering(FlexGetBase):
           test_1:
             mock:
               - {title: 'FooBar.S01E01.PDTV-FlexGet'}
+              - {title: 'FooBar.S01E02.PDTV-FlexGet'}
+              - {title: 'FooBar.S01E03.PDTV-FlexGet'}
+              - {title: 'FooBar.S01E04.PDTV-FlexGet'}
           test_2:
             mock:
-              - {title: 'FooBar.102.PDTV-FlexGet'}
+              - {title: 'FooBar.105.PDTV-FlexGet'}
     """
 
     def test_idiotic(self):
-        """Series plugin: idiotic numbering scheme DISABLED"""
-        return
+        """Series plugin: idiotic numbering scheme"""
 
         self.execute_feed('test_1')
+        # auto identified_by should lock into ep mode after the first run
         self.execute_feed('test_2')
-        entry = self.feed.find_entry(title='FooBar.102.PDTV-FlexGet')
+        entry = self.feed.find_entry(title='FooBar.105.PDTV-FlexGet')
         assert entry, 'entry not found?'
         assert entry['series_season'] == 1, 'season not detected'
-        assert entry['series_episode'] == 2, 'episode not detected'
+        assert entry['series_episode'] == 5, 'episode not detected'
 
 
 class TestCapitalization(FlexGetBase):
@@ -1219,3 +1222,28 @@ class TestImportSeries(FlexGetBase):
         self.execute_feed('timeframe_max')
         assert self.feed.find_entry('accepted', title='the show s03e02 hdtv'), \
                 'hdtv should have been accepted after timeframe.'
+
+
+class TestCaseChange(FlexGetBase):
+
+    __yaml__ = """
+        feeds:
+          first:
+            mock:
+              - title: theshow s02e04
+            series:
+              - TheShow
+          second:
+            mock:
+              - title: thEshoW s02e04 other
+            series:
+              - THESHOW
+    """
+
+    def test_case_change(self):
+        self.execute_feed('first')
+        # Make sure series_name uses case from config, make sure episode is accepted
+        assert self.feed.find_entry('accepted', title='theshow s02e04', series_name='TheShow')
+        self.execute_feed('second')
+        # Make sure series_name uses new case from config, make sure ep is rejected because we have a copy
+        assert self.feed.find_entry('rejected', title='thEshoW s02e04 other', series_name='THESHOW')
