@@ -293,8 +293,6 @@ class Manager(object):
         prev_list = True
         prev_scalar = True
         list_open = False # multiline list with [
-        single_quote_open = False # multiline single-quoted scalar
-        double_quote_open = False # multiline double-quoted scalar
 
         for line in file:
             line_num += 1
