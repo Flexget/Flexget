@@ -6,6 +6,7 @@ from sqlalchemy import Table, Column, Integer, String, DateTime, func
 from sqlalchemy.schema import ForeignKey, Index
 from sqlalchemy.orm import relation
 from flexget import schema
+from flexget.manager import Session
 from flexget.utils import json
 from flexget.utils.titles import MovieParser
 from flexget.utils.tools import urlopener
@@ -203,7 +204,6 @@ class RottenTomatoesSearchResult(Base):
         return '<RottenTomatoesSearchResult(search=%s,movie_id=%s,movie=%s)>' % (self.search, self.movie_id, self.movie)
 
 
-@with_session
 def lookup_movie(title=None, year=None, rottentomatoes_id=None, imdb_id=None, smart_match=None, only_cached=False, session=None):
     """Do a lookup from Rotten Tomatoes for the movie matching the passed arguments.
 
@@ -240,6 +240,9 @@ def lookup_movie(title=None, year=None, rottentomatoes_id=None, imdb_id=None, sm
 
     def id_str():
         return '<title=%s,year=%s,rottentomatoes_id=%s,imdb_id=%s>' % (title, year, rottentomatoes_id, imdb_id)
+
+    if not session:
+        session = Session()
 
     log.debug('Looking up rotten tomatoes information for %s' % id_str())
 
@@ -295,17 +298,13 @@ def lookup_movie(title=None, year=None, rottentomatoes_id=None, imdb_id=None, sm
                     else:
                         movie = RottenTomatoesMovie()
                         set_movie_details(movie, session, result)
-                        if movie.title:
-                            session.merge(movie)
-                        else:
-                            movie = None
+                        session.add(movie)
             elif rottentomatoes_id:
                 result = movies_info(rottentomatoes_id)
                 if result:
                     movie = RottenTomatoesMovie()
                     set_movie_details(movie, session, result)
-                    if movie.title:
-                        session.merge(movie)
+                    session.add(movie)
             elif title:
                 results = movies_search(search_string)
                 if results:
@@ -359,7 +358,7 @@ def lookup_movie(title=None, year=None, rottentomatoes_id=None, imdb_id=None, sm
 
                         movie = RottenTomatoesMovie()
                         set_movie_details(movie, session, result)
-                        session.merge(movie)
+                        session.add(movie)
                         if title.lower() != movie.title.lower():
                             session.merge(RottenTomatoesSearchResult(search=search_string, movie=movie))
         except URLError:
@@ -368,12 +367,10 @@ def lookup_movie(title=None, year=None, rottentomatoes_id=None, imdb_id=None, sm
     if not movie:
         raise LookupError('No results found from rotten tomatoes for %s' % id_str())
     else:
-        # Access attributes to force the relationships to eager load before we detach from session
-        movie.genres
-        movie.posters
+        session.commit()
         return movie
 
-def set_movie_details(movie, session, movie_data):
+def set_movie_details(movie, session, movie_data=None):
     """Populate details for this :movie: from given data
 
     :param movie: movie object to update
@@ -439,6 +436,25 @@ def movies_alias(id, type='imdb'):
     result = get_json(url)
     if isinstance(result, dict) and result.get('id'):
         return result
+
+
+def lists(list_type, list_name, country='us', limit=20, page_limit=20, page=None):
+    if isinstance(list_type, basestring):
+        list_type = list_type.replace(' ', '_').encode('utf-8')
+    if isinstance(list_name, basestring):
+        list_name = list_name.replace(' ', '_').encode('utf-8')
+
+    url = '%s/%s/lists/%s/%s.json?apikey=%s' % (SERVER, API_VER, list_type, list_name, API_KEY)
+    if limit:
+        url += '&limit=%i' % (limit)
+    if page_limit:
+        url += '&page_limit=%i' % (page_limit)
+    if page:
+        url += '&page=%i' % (page)
+
+    results = get_json(url)
+    if isinstance(results, dict) and len(results.get('movies')):
+        return results
 
 
 def movies_search(q, page_limit=None, page=None):

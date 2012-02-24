@@ -1,5 +1,5 @@
 import logging
-from flexget.plugin import get_plugin_by_name, register_plugin, DependencyError, priority
+from flexget.plugin import get_plugin_by_name, register_plugin, internet, DependencyError, priority
 from flexget.utils import imdb
 
 try:
@@ -21,7 +21,7 @@ class PluginRottenTomatoesLookup(object):
     field_map = {
         'rt_name': 'title',
         'rt_id': 'id',
-        'imdb_id': lambda movie: 'tt' + filter(lambda alt_id: alt_id.name == 'imdb',
+        'imdb_id': lambda movie: movie.alternate_ids and 'tt' + filter(lambda alt_id: alt_id.name == 'imdb',
             movie.alternate_ids)[0].id,
         'rt_year': 'year',
         'rt_genres': lambda movie: [genre.name for genre in movie.genres],
@@ -40,8 +40,8 @@ class PluginRottenTomatoesLookup(object):
         'rt_actors': lambda movie: [actor.name for actor in movie.cast],
         'rt_directors': lambda movie: [director.name for director in movie.directors],
         'rt_studio': 'studio',
-        'rt_alternate_ids': lambda movie: dict((alt_id.name, alt_id.id) for alt_id in
-            movie.alternate_ids),
+        'rt_alternate_ids': lambda movie: movie.alternate_ids and (dict((alt_id.name, alt_id.id) for
+            alt_id in movie.alternate_ids)),
         'rt_url': lambda movie: filter(lambda link: link.name == 'alternate',
             movie.links)[0].url,
         # Generic fields filled by all movie lookup plugins:
@@ -75,6 +75,7 @@ class PluginRottenTomatoesLookup(object):
             entry.unregister_lazy_fields(self.field_map, self.lazy_loader)
         return entry[field]
 
+    @internet(log)
     def lookup(self, entry):
         """
         Populates all lazy fields to an Entry. May be called by other plugins
