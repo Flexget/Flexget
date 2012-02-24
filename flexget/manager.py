@@ -11,6 +11,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.pool import SingletonThreadPool
 from flexget.event import fire_event
 from flexget import validator
+import re
 
 log = logging.getLogger('manager')
 
@@ -325,23 +326,6 @@ class Manager(object):
                 list_open = line.strip().endswith(': [') or line.strip().endswith(':[')
                 if list_open:
 #                    print 'list open at line %s' % line
-                    continue
-
-            if single_quote_open:
-                if line.strip().endswith("'"):
-                    single_quote_open = False
-                continue
-            else:
-                single_quote_open = line.strip().endswith("'")
-                if single_quote_open:
-                    continue
-            if double_quote_open:
-                if line.strip().endswith('"'):
-                    double_quote_open = False
-                continue
-            else:
-                double_quote_open = line.strip().endswith('"')
-                if double_quote_open:
                     continue
 
 #            print '#%i: %s' % (line_num, line)
