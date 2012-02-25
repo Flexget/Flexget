@@ -79,13 +79,9 @@ class FilterRottenTomatoes(object):
 
         lookup = get_plugin_by_name('rottentomatoes_lookup').instance.lookup
 
-        # only go through all the entries if requiring certified fresh
-        if 'require_certified_fresh' in config:
-            entries = feed.entries
-        else:
-            entries = feed.undecided
+        # since the plugin does not reject anything, no sense going trough accepted
+        for entry in feed.undecided:
 
-        for entry in entries:
             force_accept = False
 
             try:
@@ -104,8 +100,7 @@ class FilterRottenTomatoes(object):
             reasons = []
             if 'require_certified_fresh' in config:
                 if config['require_certified_fresh'] and entry.get('rt_critics_rating') != 'Certified Fresh':
-                    feed.reject(entry, 'require_certified_fresh')
-                    continue
+                    reasons.append('require_certified_fresh')
             if 'min_critics_score' in config:
                 if entry.get('rt_critics_score', 0) < config['min_critics_score']:
                     reasons.append('min_critics_score (%s < %s)' % (entry.get('rt_critics_score'),
