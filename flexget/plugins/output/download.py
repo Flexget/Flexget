@@ -255,9 +255,10 @@ class PluginDownload(object):
         # generate temp file using stdlib
         tmp_path = os.path.join(feed.manager.config_base, 'temp')
         if not os.path.isdir(tmp_path):
-            logging.debug('creating tmp_path %s' % tmp_path)
+            log.debug('creating tmp_path %s' % tmp_path)
             os.mkdir(tmp_path)
-        outfile, datafile = tempfile.mkstemp(dir=tmp_path, text='wb')
+        outfile_fd, datafile = tempfile.mkstemp(dir=tmp_path, text='b')
+        outfile = os.fdopen(outfile_fd, 'w')
         try:
             for chunk in response.iter_content(decode_unicode=False):
                 outfile.write(chunk)
