@@ -118,6 +118,9 @@ class InputRSS(object):
     def process_invalid_content(self, feed, data):
         """If feedparser reports error, save the received data and log error."""
 
+        if data is None:
+            log.critical('Received empty page - no content')
+            return
         ext = 'xml'
         if '<html>' in data.lower():
             log.critical('Received content is HTML page, not an RSS feed')
