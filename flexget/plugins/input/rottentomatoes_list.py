@@ -13,13 +13,36 @@ except ImportError:
 log = logging.getLogger('rottentomatoes_list')
 
 class RottenTomatoesList(object):
-    """Creates an entry for each movie in a Rotten Tomatoes list."""
+    """
+        Emits an entry for each movie in a Rotten Tomatoes list.
+
+        Configuration:
+
+        dvds:
+          - top_rentals
+          - upcoming
+
+        movies:
+          - box_office
+
+        Possible lists are
+          * dvds: top_rentals, current_releases, new_releases, upcoming
+          * movies: box_office, in_theaters, opening, upcoming
+
+    """
+
+
+    def __init__(self):
+        # We could pull these from the API through lists.json but that's extra web/API key usage
+        self.dvd_lists = ['top_rentals', 'current_releases', 'new_releases', 'upcoming']
+        self.movie_lists = ['box_office', 'in_theaters', 'opening', 'upcoming']
+
 
     def validator(self):
         from flexget import validator
         root = validator.factory('dict')
-        root.accept('list', key='dvds').accept('text')
-        root.accept('list', key='movies').accept('text')
+        root.accept('list', key='dvds').accept('choice').accept_choices(self.dvd_lists)
+        root.accept('list', key='movies').accept('choice').accept_choices(self.movie_lists)
         return root
 
 
@@ -41,7 +64,7 @@ class RottenTomatoesList(object):
                             rt_name=movie['title'],
                             url=movie['links']['alternate']))
                 else:
-                    log.critical('Failed to fetch Rotten tomatoes %s list: %s. Bad list name?' %
+                    log.critical('Failed to fetch Rotten tomatoes %s list: %s. List doesn\'t exist?' %
                             (l_type, l_name))
         return entries
 
