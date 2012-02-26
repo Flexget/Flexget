@@ -706,7 +706,7 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
             if 'identified_by' in config:
                 series.identified_by = config['identified_by']
             # if series doesn't have identified_by flag already set, calculate one now
-            if not series.identified_by:
+            if not series.identified_by or series.identified_by == 'auto':
                 series.identified_by = self.auto_identified_by(session, series_name)
                 log.debug('identified_by set to \'%s\' based on series history' % series.identified_by)
             # set flag from database
