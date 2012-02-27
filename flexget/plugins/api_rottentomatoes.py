@@ -266,7 +266,7 @@ def lookup_movie(title=None, year=None, rottentomatoes_id=None, imdb_id=None, sm
                 movie = found.movie
     if movie:
         # Movie found in cache, check if cache has expired.
-        if movie.expired() and not only_cached:
+        if movie.expired and not only_cached:
             log.debug('Cache has expired for %s, attempting to refresh from Rotten Tomatoes.' % id_str())
             try:
                 imdb_id = filter(lambda alt_id: alt_id.name == 'imdb', movie.alternate_ids)[0].id
