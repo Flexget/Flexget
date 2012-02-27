@@ -269,57 +269,6 @@ def docs():
 
 @task
 @cmdopts([
-    ('docs-dir=', 'd', 'directory to put the api documetation in'),
-    ('excludes=', 'x', 'list of packages to exclude'),
-])
-def epydocs():
-    """Create documentation."""
-    from epydoc import cli
-
-    path('build').exists() or path('build').makedirs()
-
-    # get package list, without sub-packages
-    doc_packages  = set(options.setup.packages)
-    for pkg in list(doc_packages):
-        doc_packages -= set(p for p in doc_packages if str(p).startswith(pkg + '.'))
-    doc_packages = list(doc_packages)
-
-    # get storage path
-    docs_dir = options.epydocs.get('docs_dir', 'build/apidocs')
-
-    # set up excludes
-    try:
-        exclude_names = options.epydocs.excludes
-    except AttributeError:
-        exclude_names = []
-    else:
-        exclude_names = exclude_names.replace(',', ' ').split()
-
-    excludes = []
-    for pkg in exclude_names:
-        excludes.append("--exclude")
-        excludes.append('^' + re.escape(pkg))
-
-    # call epydoc in-process
-    sys_argv = sys.argv
-    try:
-        sys.argv = [
-            sys.argv[0] + "::epydoc",
-            "-v",
-            "--inheritance", "listed",
-            "--output", docs_dir,
-            "--name", "%s %s" % (options.setup.name, options.setup.version),
-            "--url", options.setup.url,
-            "--graph", "umlclasstree",
-        ] + excludes + doc_packages
-        sys.stderr.write("Running '%s'\n" % ("' '".join(sys.argv)))
-        cli.cli()
-    finally:
-        sys.argv = sys_argv
-
-
-@task
-@cmdopts([
     ('online', None, 'runs online unit tests'),
     ('dist-dir=', 'd', 'directory to put final built distributions in'),
     ('no-tests', None, 'skips unit tests'),
@@ -394,18 +343,36 @@ def install_tools():
         pip.main(['install', 'http://github.com/cmheisel/nose-xcover/zipball/master'])
 
     try:
-        import epydoc
-        print 'epydoc INSTALLED'
+        import pep8
+        print 'pep8 INSTALLED'
     except:
-        pip.main(['install', 'epydoc'])
+        pip.main(['install', 'pep8'])
 
 
 @task
 def clean_compiled():
-    import os
     for root, dirs, files in os.walk('flexget'):
         for name in files:
             fqn = os.path.join(root, name)
             if fqn[-3:] == 'pyc' or fqn[-3:] == 'pyo' or fqn[-5:] == 'cover':
                 print 'Deleting %s' % fqn
                 os.remove(fqn)
+
+
+@task
+def pep8():
+    try:
+        import pep8
+    except:
+        print 'Run bin/paver install_tools'
+        return    
+    pep8.options, pep8.args = pep8.process_options(['--show-source', '--ignore', 'E501,W291,W293,W601,E261', ''])
+    pep8.options.repeat = 1
+
+    for root, dirs, files in os.walk('flexget'):
+        for name in files:
+            if name[-2:] == 'py':
+                fn = os.path.join(root, name)
+                checker = pep8.Checker(fn)
+                checker.check_all()
+
