@@ -11,7 +11,7 @@ log = logging.getLogger('if')
 
 def safer_eval(statement, locals):
     """A safer eval function. Does not allow __ or try statements, only includes certain 'safe' builtins."""
-    allowed_builtins = ['True', 'False', 'str', 'unicode', 'int', 'float', 'len', 'any', 'all']
+    allowed_builtins = ['True', 'False', 'str', 'unicode', 'int', 'float', 'len', 'any', 'all', 'sorted']
     for name in allowed_builtins:
         locals[name] = globals()['__builtins__'].get(name)
     if re.search(r'__|try\s*:', statement):
