@@ -3,7 +3,7 @@ from flexget.plugin import get_plugin_by_name, register_plugin, internet, Depend
 from flexget.utils import imdb
 
 try:
-    from flexget.plugins.api_rottentomatoes import lookup_movie as lookup
+    from flexget.plugins.api_rottentomatoes import lookup_movie
 except ImportError:
     raise DependencyError(issued_by='rottentomatoes_lookup', missing='api_rottentomatoes',
                           message='rottentomatoes_lookup requires the `api_rottentomatoes` plugin')
@@ -24,11 +24,11 @@ class PluginRottenTomatoesLookup(object):
         'imdb_id': lambda movie: movie.alternate_ids and 'tt' + filter(lambda alt_id: alt_id.name == 'imdb',
             movie.alternate_ids)[0].id,
         'rt_year': 'year',
-        'rt_genres': lambda movie: [genre.name for genre in movie.genres],
+        'rt_genres': lambda movie: movie.genres and [genre.name for genre in movie.genres],
         'rt_mpaa_rating': 'mpaa_rating',
         'rt_runtime': 'runtime',
         'rt_critics_consensus': 'critics_consensus',
-        'rt_releases': lambda movie: dict((release.name, release.date) for release in
+        'rt_releases': lambda movie: movie.release_dates and dict((release.name, release.date) for release in
             movie.release_dates),
         'rt_critics_rating': 'critics_rating',
         'rt_critics_score': 'critics_score',
@@ -36,13 +36,13 @@ class PluginRottenTomatoesLookup(object):
         'rt_audience_score': 'audience_score',
         'rt_average_score': lambda movie: (movie.critics_score + movie.audience_score) / 2,
         'rt_synopsis': 'synopsis',
-        'rt_posters': lambda movie: dict((poster.name, poster.url) for poster in movie.posters),
-        'rt_actors': lambda movie: [actor.name for actor in movie.cast],
-        'rt_directors': lambda movie: [director.name for director in movie.directors],
+        'rt_posters': lambda movie: movie.posters and dict((poster.name, poster.url) for poster in movie.posters),
+        'rt_actors': lambda movie: movie.cast and [actor.name for actor in movie.cast],
+        'rt_directors': lambda movie: movie.directors and [director.name for director in movie.directors],
         'rt_studio': 'studio',
         'rt_alternate_ids': lambda movie: movie.alternate_ids and (dict((alt_id.name, alt_id.id) for
             alt_id in movie.alternate_ids)),
-        'rt_url': lambda movie: filter(lambda link: link.name == 'alternate',
+        'rt_url': lambda movie: movie.links and filter(lambda link: link.name == 'alternate',
             movie.links)[0].url,
         # Generic fields filled by all movie lookup plugins:
         'movie_name': 'title',
@@ -53,7 +53,6 @@ class PluginRottenTomatoesLookup(object):
         return validator.factory('boolean')
 
     def lazy_loader(self, entry, field):
-        log.debug('lazy_loader called with field: %s' % field)
         """Does the lookup for this entry and populates the entry fields.
 
         :param entry: entry to perform lookup on
@@ -61,29 +60,32 @@ class PluginRottenTomatoesLookup(object):
         :returns: the field value
  
         """
-        imdb_id = entry.get('imdb_id', eval_lazy=False) or \
-                  imdb.extract_id(entry.get('imdb_url', eval_lazy=False))
         try:
-            movie = lookup(smart_match=entry['title'],
-                           rottentomatoes_id=entry.get('rt_id', eval_lazy=False),
-                           imdb_id=imdb_id)
-            log.debug(u'Got movie: %s' % movie)
-            entry.update_using_map(self.field_map, movie)
-        except LookupError, e:
-            log.debug(u'Rotten Tomatoes lookup for %s failed: %s' % (entry['title'], e.message))
+            self.lookup(entry)
+        except PluginError, e:
+            log_once(e.value.capitalize(), logger=log)
             # Set all of our fields to None if the lookup failed
             entry.unregister_lazy_fields(self.field_map, self.lazy_loader)
         return entry[field]
 
-    @internet(log)
-    def lookup(self, entry):
+
+    def lookup(self, entry, search_allowed=True):
         """
-        Populates all lazy fields to an Entry. May be called by other plugins
-        requiring Rotten Tomatoes info on an Entry
+        Perform Rotten Tomatoes lookup for entry.
 
         :param entry: Entry instance
+        :param search_allowed: Allow fallback to search
+        :raises PluginError: Failure reason
         """
-        entry.register_lazy_fields(self.field_map, self.lazy_loader)
+        imdb_id = entry.get('imdb_id', eval_lazy=False) or \
+                  imdb.extract_id(entry.get('imdb_url', eval_lazy=False))
+        movie = lookup_movie(smart_match=entry['title'],
+                             rottentomatoes_id=entry.get('rt_id', eval_lazy=False),
+                             imdb_id=imdb_id,
+                             only_cached=(not search_allowed))
+        log.debug(u'Got movie: %s' % movie)
+        entry.update_using_map(self.field_map, movie)
+
 
     def on_feed_metainfo(self, feed, config):
         if not config:

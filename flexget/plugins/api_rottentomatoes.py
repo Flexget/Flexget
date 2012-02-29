@@ -6,6 +6,7 @@ from sqlalchemy import Table, Column, Integer, String, DateTime, func
 from sqlalchemy.schema import ForeignKey, Index
 from sqlalchemy.orm import relation
 from flexget import schema
+from flexget.plugin import internet, PluginError
 from flexget.manager import Session
 from flexget.utils import json
 from flexget.utils.titles import MovieParser
@@ -203,7 +204,7 @@ class RottenTomatoesSearchResult(Base):
     def __repr__(self):
         return '<RottenTomatoesSearchResult(search=%s,movie_id=%s,movie=%s)>' % (self.search, self.movie_id, self.movie)
 
-
+@internet(log)
 def lookup_movie(title=None, year=None, rottentomatoes_id=None, imdb_id=None, smart_match=None, only_cached=False, session=None):
     """Do a lookup from Rotten Tomatoes for the movie matching the passed arguments.
 
@@ -217,7 +218,7 @@ def lookup_movie(title=None, year=None, rottentomatoes_id=None, imdb_id=None, sm
     :param only_cached: if this is specified, an online lookup will not occur if the movie is not in the cache
     :param session: optionally specify a session to use, if specified, returned Movie will be live in that session
     :returns: The Movie object populated with data from Rotten Tomatoes
-    :raises: LookupError if a match cannot be found or there are other problems with the lookup
+    :raises: PluginError if a match cannot be found or there are other problems with the lookup
 
     """
 
@@ -236,7 +237,7 @@ def lookup_movie(title=None, year=None, rottentomatoes_id=None, imdb_id=None, sm
         if year:
             search_string = '%s %s' % (search_string, year)
     elif not (rottentomatoes_id or imdb_id):
-        raise LookupError('No criteria specified for rotten tomatoes lookup')
+        raise PluginError('No criteria specified for rotten tomatoes lookup')
 
     def id_str():
         return '<title=%s,year=%s,rottentomatoes_id=%s,imdb_id=%s>' % (title, year, rottentomatoes_id, imdb_id)
@@ -282,7 +283,7 @@ def lookup_movie(title=None, year=None, rottentomatoes_id=None, imdb_id=None, sm
             log.debug('Movie %s information restored from cache.' % id_str())
     else:
         if only_cached:
-            raise LookupError('Movie %s not found from cache' % id_str())
+            raise PluginError('Movie %s not found from cache' % id_str())
         # There was no movie found in the cache, do a lookup from Rotten Tomatoes
         log.debug('Movie %s not found in cache, looking up from rotten tomatoes.' % id_str())
         try:
@@ -328,7 +329,7 @@ def lookup_movie(title=None, year=None, rottentomatoes_id=None, imdb_id=None, sm
                                 continue
 
                         if not results:
-                            raise LookupError('no appropiate results')
+                            raise PluginError('no appropiate results')
 
                         if len(results) == 1:
                             log.debug('SUCCESS: only one movie remains')
@@ -343,7 +344,7 @@ def lookup_movie(title=None, year=None, rottentomatoes_id=None, imdb_id=None, sm
                                 for r in results:
                                     log.debug('remain: %s (match: %s) %s' % (r['title'], r['match'],
                                         r['id']))
-                                raise LookupError('min_diff')
+                                raise PluginError('min_diff')
 
                         alternate_ids = results[0].get('alternate_ids')
                         if alternate_ids:
@@ -362,11 +363,14 @@ def lookup_movie(title=None, year=None, rottentomatoes_id=None, imdb_id=None, sm
                         if title.lower() != movie.title.lower():
                             session.merge(RottenTomatoesSearchResult(search=search_string, movie=movie))
         except URLError:
-            raise LookupError('Error looking up movie from RottenTomatoes')
+            raise PluginError('Error looking up movie from RottenTomatoes')
 
     if not movie:
-        raise LookupError('No results found from rotten tomatoes for %s' % id_str())
+        raise PluginError('No results found from rotten tomatoes for %s' % id_str())
     else:
+        # Access attributes to force the relationships to eager load before we detach from session
+        for attr in ['alternate_ids', 'cast', 'directors', 'genres', 'links', 'posters', 'release_dates']:
+                getattr(movie, attr)
         session.commit()
         return movie
 
@@ -381,7 +385,7 @@ def set_movie_details(movie, session, movie_data=None):
 
     if not movie_data:
         if not movie.id:
-            raise LookupError('Cannot get rotten tomatoes details without rotten tomatoes id')
+            raise PluginError('Cannot get rotten tomatoes details without rotten tomatoes id')
         movie_data = movies_info(movie.id)
     if movie_data:
         movie.update_from_dict(movie_data)
@@ -419,7 +423,7 @@ def set_movie_details(movie, session, movie_data=None):
                 movie.links.append(RottenTomatoesLink(name, url))
         movie.updated = datetime.now()
     else:
-        raise LookupError('No movie_datas for rottentomatoes_id %s' % movie.id)
+        raise PluginError('No movie_data for rottentomatoes_id %s' % movie.id)
 
 
 def movies_info(id):
