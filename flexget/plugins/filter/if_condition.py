@@ -132,6 +132,7 @@ class FilterIf(object):
                                 feed.reject(e, e.get('reason'))
                             for e in fake_feed.failed:
                                 feed.fail(e, e.get('reason'))
+                feed.purge()
 
         handle_phase.priority = 80
         return handle_phase
