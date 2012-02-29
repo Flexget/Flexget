@@ -28,7 +28,7 @@ class TraktAcquired(object):
         for entry in feed.accepted:
             if config['type'] == 'series':
                 # Check entry is a series episode
-                if entry.get('series_name') and entry.get('series_season') and entry.get('series_episode'):
+                if entry.get('series_name') and entry.get('series_id_type') == 'ep':
                     series = found.setdefault(entry['series_name'], {})
                     if not series:
                         # If this is the first episode found from this series, set the parameters

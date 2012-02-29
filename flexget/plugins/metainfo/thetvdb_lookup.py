@@ -143,8 +143,9 @@ class PluginThetvdbLookup(object):
                 entry.register_lazy_fields(self.series_map, self.lazy_series_lookup)
 
                 # If there is season and ep info as well, register episode lazy fields
-                if entry.get('series_season') and entry.get('series_episode'):
+                if entry.get('series_id_type') == 'ep':
                     entry.register_lazy_fields(self.episode_map, self.lazy_episode_lookup)
+                # TODO: lookup for 'seq' and 'date' type series
 
 
 register_plugin(PluginThetvdbLookup, 'thetvdb_lookup', api_ver=2)

@@ -12,7 +12,7 @@ from flexget import schema
 from flexget.event import event
 from flexget.utils import qualities
 from flexget.utils.log import log_once
-from flexget.utils.titles import SeriesParser, ParseWarning
+from flexget.utils.titles import SeriesParser, ParseWarning, ID_TYPES
 from flexget.utils.sqlalchemy_utils import table_columns, table_exists, drop_tables, table_schema, table_add_column
 from flexget.utils.tools import merge_dict_from_to, parse_timedelta
 from flexget.utils.database import quality_property
@@ -20,7 +20,7 @@ from flexget.manager import Session
 from flexget.plugin import (register_plugin, register_parser_option, get_plugin_by_name, get_plugin_keywords,
     PluginWarning, DependencyError, priority)
 
-SCHEMA_VER = 4
+SCHEMA_VER = 5
 
 log = logging.getLogger('series')
 Base = schema.versioned_base('series', SCHEMA_VER)
@@ -81,6 +81,18 @@ def upgrade(ver, session):
         # Fill in lower case name column
         session.execute(update(series_table, values={'name_lower': func.lower(series_table.c.name)}))
         ver = 4
+    if ver == 4:
+        log.info('Adding `identified_by` column to episodes table.')
+        table_add_column('series_episodes', 'identified_by', String, session)
+        series_table = table_schema('series', session)
+        # Clear out identified_by id series so that they can be auto detected again
+        session.execute(update(series_table, series_table.c.identified_by != 'ep', {'identified_by': None}))
+        # Warn users about a possible config change needed.
+        log.warning('If you are using `identified_by: id` option for the series plugin for date, '
+                    'or abolute numbered series, you will need to update your config. Two new identified_by modes have '
+                    'been added, `date` and `sequence`. In addition, if you are using auto identified_by, it will'
+                    'be relearned based on upcoming episodes.')
+        ver = 5
 
     return ver
 
@@ -161,6 +173,7 @@ class Episode(Base):
     season = Column(Integer)
     number = Column(Integer)
 
+    identified_by = Column(String)
     series_id = Column(Integer, ForeignKey('series.id'), nullable=False)
     releases = relation('Release', backref='episode', cascade='all, delete, delete-orphan')
 
@@ -261,41 +274,51 @@ class SeriesDatabase(object):
 
     def auto_identified_by(self, session, name):
         """
-        Determine if series :name: should be considered identified by episode or id format
+        Determine if series `name` should be considered identified by episode or id format
 
-        Returns 'ep' or 'id' if 3 of the first 5 were parsed as such. Returns 'ep' in the event of a tie.
+        Returns 'ep', 'sequence', 'date' or 'id' if enough history is present to identify the series' id type.
         Returns 'auto' if there is not enough history to determine the format yet
         """
-        total = session.query(Release).join(Episode, Series).\
-            filter(Series.name == name).count()
-        episodic = session.query(Release).join(Episode, Series).\
-            filter(Series.name == name).\
-            filter(Episode.season != None).\
-            filter(Episode.number != None).count()
-        non_episodic = total - episodic
-        log.debug('series %s auto ep/id check: %s/%s' % (name, episodic, non_episodic))
-        # Best of 5, episodic wins in a tie
-        if episodic >= 3 and episodic >= non_episodic:
-            return 'ep'
-        elif non_episodic >= 3 and non_episodic > episodic:
-            return 'id'
-        else:
+
+        type_totals = dict(session.query(Episode.identified_by, func.count(Episode.identified_by)).join(Series).
+                           filter(Series.name == name).group_by(Episode.identified_by).all())
+        # Remove None from the dict, we are only considering episodes that we know the type of (parsed with new parser)
+        type_totals.pop(None, None)
+        if not type_totals:
             return 'auto'
+        # Find total number of parsed episodes
+        total = sum(type_totals.itervalues())
+        # See which type has the most
+        best = max(type_totals, key=lambda x: type_totals[x])
+
+        # Ep mode locks in faster than the rest. At 2 seen episodes.
+        if type_totals.get('ep', 0) >= 2 and type_totals['ep'] > total / 3:
+            log.info('identified_by has locked in to type `ep` for %s' % name)
+            return 'ep'
+        # If we have over 3 episodes all of the same type, lock in
+        if len(type_totals) == 1 and total >= 3:
+            return best
+        # Otherwise wait until 5 episodes to lock in
+        if total >= 5:
+            log.info('identified_by has locked in to type `%s` for %s' % (best, name))
+            return best
+        log.verbose('identified by is currently on `auto` for %s.'
+                    'Multiple id types may be accepted until it locks in on the appropriate type.' % name)
+        return 'auto'
 
     def get_latest_download(self, session, name):
-        """Return latest downloaded episode (season, episode, name) for series :name:"""
+        """Return latest downloaded episode for series `name`"""
         latest_download = session.query(Episode).join(Release, Series).\
             filter(Series.name == name).\
             filter(Release.downloaded == True).\
-            filter(Episode.season != None).\
-            filter(Episode.number != None).\
+            filter(Episode.identified_by.in_(['ep', 'sequence'])).\
             order_by(desc(Episode.season), desc(Episode.number)).first()
 
         if not latest_download:
             log.debug('get_latest_download returning false, no downloaded episodes found for: %s' % name)
-            return False
+            return
 
-        return {'season': latest_download.season, 'episode': latest_download.number, 'name': name}
+        return latest_download
 
     def get_downloaded(self, session, name, identifier):
         """Return list of downloaded releases for this episode"""
@@ -328,10 +351,14 @@ class SeriesDatabase(object):
             log.debug('adding episode %s into series %s' % (parser.identifier, parser.name))
             episode = Episode()
             episode.identifier = parser.identifier
+            episode.identified_by = parser.id_type
             # if episodic format
-            if parser.season and parser.episode is not None:
+            if parser.id_type == 'ep':
                 episode.season = parser.season
                 episode.number = parser.episode
+            elif parser.id_type == 'sequence':
+                episode.season = 0
+                episode.number = parser.id
             series.episodes.append(episode)  # pylint:disable=E1103
             log.debug('-> added %s' % episode)
 
@@ -400,12 +427,15 @@ class FilterSeriesBase(object):
         options.accept('dict', key='set').accept_any_key('any')
         # regexes can be given in as a single string ..
         options.accept('regexp', key='name_regexp')
-        options.accept('regexp', key='ep_regexp')
-        options.accept('regexp', key='id_regexp')
+        for id_type in ID_TYPES:
+            options.accept('regexp', key=id_type + '_regexp')
         # .. or as list containing strings
         options.accept('list', key='name_regexp').accept('regexp')
-        options.accept('list', key='ep_regexp').accept('regexp')
-        options.accept('list', key='id_regexp').accept('regexp')
+        for id_type in ID_TYPES:
+            options.accept('list', key=id_type + '_regexp').accept('regexp')
+        # date parsing options
+        options.accept('boolean', key='date_yearfirst')
+        options.accept('boolean', key='date_dayfirst')
         # quality
         options.accept('choice', key='quality').accept_choices(quals, ignore_case=True)
         options.accept('list', key='qualities').accept('choice').accept_choices(quals, ignore_case=True)
@@ -554,9 +584,9 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
             series.accept('number')
             bundle = series.accept('dict')
             # prevent invalid indentation level
-            bundle.reject_keys(['set', 'path', 'timeframe', 'name_regexp',
-                'ep_regexp', 'id_regexp', 'watched', 'quality', 'min_quality',
-                'max_quality', 'qualities', 'exact', 'from_group'],
+            bundle.reject_keys(['set', 'path', 'timeframe', 'name_regexp', 'ep_regexp', 'id_regexp',
+                                'date_regexp', 'sequence_regexp', 'watched', 'quality', 'min_quality',
+                                'max_quality', 'qualities', 'exact', 'from_group'],
                 'Option \'$key\' has invalid indentation level. It needs 2 more spaces.')
             bundle.accept_any_key('path')
             options = bundle.accept_any_key('dict')
@@ -712,13 +742,17 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
             # set flag from database
             identified_by = series.identified_by
 
-        parser = SeriesParser(name=series_name,
-                              identified_by=identified_by,
-                              name_regexps=get_as_array(config, 'name_regexp'),
-                              ep_regexps=get_as_array(config, 'ep_regexp'),
-                              id_regexps=get_as_array(config, 'id_regexp'),
-                              strict_name=config.get('exact', False),
-                              allow_groups=get_as_array(config, 'from_group'))
+        params = dict(name=series_name,
+                      identified_by=identified_by,
+                      name_regexps=get_as_array(config, 'name_regexp'),
+                      strict_name=config.get('exact', False),
+                      allow_groups=get_as_array(config, 'from_group'),
+                      date_yearfirst=config.get('date_yearfirst'),
+                      date_dayfirst=config.get('date_dayfirst'))
+        for id_type in ID_TYPES:
+            params[id_type + '_regexps'] = get_as_array(config, id_type + '_regexp')
+
+        parser = SeriesParser(**params)
 
         for entry in entries:
             # skip processed entries
@@ -757,12 +791,15 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
             entry['quality'] = parser.quality
             entry['proper'] = parser.proper
             entry['proper_count'] = parser.proper_count
-            if parser.season and parser.episode is not None:
+            if parser.id_type == 'ep':
                 entry['series_season'] = parser.season
                 entry['series_episode'] = parser.episode
+            elif parser.id_type == 'date':
+                entry['series_date'] = parser.id
             else:
                 entry['series_season'] = time.gmtime().tm_year
             entry['series_id'] = parser.identifier
+            entry['series_id_type'] = parser.id_type
 
     def process_series(self, feed, series, series_name, config):
         """
@@ -823,9 +860,8 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
             log.debug('continuing w. episodes: %s' % [e.data for e in eps])
             log.debug('best episode is: %s' % best.data)
 
-            # episode advancement. used only with season based series
-            # We check if they are integers so that if season/episode is 0 this isn't skipped.
-            if isinstance(best.season, int) and isinstance(best.episode, int):
+            # episode advancement. used only with season and seqence based series
+            if best.id_type in ['ep', 'sequence']:
                 if feed.manager.options.disable_advancement:
                     log.debug('episode advancement disabled')
                 else:
@@ -991,23 +1027,24 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
         log.debug('latest download: %s' % latest)
         log.debug('current: %s' % current)
 
-        if latest:
+        if latest and latest.identified_by == current.id_type:
             # allow few episodes "backwards" in case of missed eps
             grace = len(series) + 2
-            if (current.season < latest['season']) or (current.season == latest['season'] and current.episode < (latest['episode'] - grace)):
+            if ((current.season < latest.season) or
+               (current.season == latest.season and current.episode < (latest.number - grace))):
                 log.debug('too old! rejecting all occurrences')
                 for ep in eps:
-                    feed.reject(self.parser2entry[ep], 'Too much in the past from latest downloaded episode S%02dE%02d' %
-                        (latest['season'], latest['episode']))
+                    feed.reject(self.parser2entry[ep], 'Too much in the past from latest downloaded episode %s' %
+                        latest.identifier)
                 return True
 
-            if current.season > latest['season'] + 1:
+            if (current.season > latest.season + 1 or (current.season > latest.season and current.episode >= grace)  or
+               (current.season == latest.season and current.episode > (latest.number + grace))):
                 log.debug('too new! rejecting all occurrences')
                 for ep in eps:
                     feed.reject(self.parser2entry[ep],
-                        ('Too much in the future from latest downloaded episode S%02dE%02d. '
-                         'See `--disable-advancement` if this should be downloaded.') %
-                        (latest['season'], latest['episode']))
+                        ('Too much in the future from latest downloaded episode %s. '
+                         'See `--disable-advancement` if this should be downloaded.') % latest.identifier)
                 return True
 
     def process_timeframe(self, feed, config, eps, series_name):
