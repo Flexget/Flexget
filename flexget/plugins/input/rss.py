@@ -168,9 +168,9 @@ class InputRSS(object):
         url_hash = str(hash(config['url']))
 
         # set etag and last modified headers if config has not changed since
-        # last run and if --now argument wasn't used.
+        # last run and if caching wasn't disabled with --no-cache argument.
         headers = {}
-        if config['etag'] and feed.config_modified is False and not feed.manager.options.interval_ignore:
+        if config['etag'] and feed.config_modified is False and not feed.manager.options.nocache:
             etag = feed.simple_persistence.get('%s_etag' % url_hash, None)
             if etag:
                 log.debug('Sending etag %s for feed %s' % (etag, feed.name))
