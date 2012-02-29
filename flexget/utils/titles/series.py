@@ -317,17 +317,17 @@ class SeriesParser(TitleParser):
                             yearfirst_opts = [self.date_yearfirst]
                         kwargs_list = ({'dayfirst': d, 'yearfirst': y} for d in dayfirst_opts for y in yearfirst_opts)
                         for kwargs in kwargs_list:
-                            possdate = parsedate(match.string, **kwargs)
+                            possdate = parsedate(match.group(0), **kwargs)
                             # Don't accept dates farther than a day in the future
                             if possdate > datetime.now() + timedelta(days=1):
                                 continue
                             if possdate not in possdates:
                                 possdates.append(possdate)
                     except ValueError:
-                        log.debug('%s is not a valid date, skipping' % match)
+                        log.debug('%s is not a valid date, skipping' % match.group(0))
                         continue
                     if not possdates:
-                        log.debug('All possible dates for %s were in the future' % match)
+                        log.debug('All possible dates for %s were in the future' % match.group(0))
                         continue
                     possdates.sort()
                     # Pick the most recent date if there are ambiguities

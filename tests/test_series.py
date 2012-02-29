@@ -1276,7 +1276,7 @@ class TestIDTypes(FlexGetBase):
             mock:
               - title: episode S03E04
               - title: episode 3x05
-              - title: date 2011.4.3
+              - title: date 2011.4.3 other crap hdtv
               - title: date 4.5.11
               - title: sequence 003
               - title: sequence 4

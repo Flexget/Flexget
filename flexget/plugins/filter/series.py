@@ -447,7 +447,7 @@ class FilterSeriesBase(object):
         message = "should be in format 'x (minutes|hours|days|weeks)' e.g. '5 days'"
         options.accept('interval', key='propers', message=message + ' or yes/no')
         # expect flags
-        options.accept('choice', key='identified_by').accept_choices(['ep', 'id', 'auto'])
+        options.accept('choice', key='identified_by').accept_choices(['ep', 'date', 'sequence', 'id', 'auto'])
         # timeframe
         options.accept('interval', key='timeframe', message=message)
         # strict naming
