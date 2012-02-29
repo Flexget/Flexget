@@ -28,8 +28,8 @@ class SeriesParser(TitleParser):
 
     separators = '[!/+,:;|~ x-]'
     roman_numeral_re = 'X{0,3}(?:IX|XI{0,4}|VI{0,4}|IV|V|I{1,4})'
-    english_numbers = ('one', 'two', 'three', 'four', 'five', 'six', 'seven',
-            'eight', 'nine', 'ten')
+    english_numbers = ['one', 'two', 'three', 'four', 'five', 'six', 'seven',
+            'eight', 'nine', 'ten']
 
     # Make sure none of these are found embedded within a word or other numbers
     ep_regexps = ReList([TitleParser.re_not_in_word(regexp) for regexp in [
