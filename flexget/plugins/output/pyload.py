@@ -4,7 +4,7 @@ from urllib import urlencode, quote
 from urllib2 import urlopen, URLError, HTTPError
 from logging import getLogger
 from flexget.utils import json
-from flexget.plugin import register_plugin, get_plugin_by_name, PluginError, DependencyError
+from flexget.plugin import register_plugin, PluginError
 from flexget import validator
 
 log = getLogger('pyload')

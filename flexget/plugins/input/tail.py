@@ -1,10 +1,9 @@
 import os
+import re
+import logging
 from flexget.entry import Entry
 from flexget.plugin import register_plugin, register_parser_option, get_plugin_by_name, DependencyError, PluginError
 from flexget.utils.cached_input import cached
-import re
-import logging
-import sys
 
 log = logging.getLogger('tail')
 

@@ -1,7 +1,7 @@
 from httplib import HTTPSConnection
 from urllib import urlencode
 import logging
-from flexget.plugin import get_plugin_by_name, register_plugin
+from flexget.plugin import register_plugin
 from flexget.utils.template import RenderError
 
 log = logging.getLogger('notifymyandroid')

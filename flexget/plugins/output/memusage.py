@@ -6,7 +6,6 @@ except ImportError:
     # this will leave the plugin unloaded
     raise DependencyError(issued_by='memusage', missing='ext lib `guppy`', silent=True)
 
-from optparse import SUPPRESS_HELP
 from flexget.plugin import register_plugin, register_parser_option
 import logging
 

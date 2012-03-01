@@ -2,13 +2,9 @@ from xmlrpclib import ServerProxy
 import re
 import difflib
 import os.path
-import sys
 import logging
 
-from flexget.manager import Session, Base
 from flexget.plugin import register_plugin
-from sqlalchemy import Column, Integer, String, DateTime, PickleType
-from datetime import datetime, timedelta
 from flexget.utils.tools import urlopener
 
 """
@@ -168,5 +164,5 @@ class Subtitles(object):
                 f.close()
 
         s.LogOut(token)
-        
+
 register_plugin(Subtitles, 'subtitles')

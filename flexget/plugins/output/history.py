@@ -1,10 +1,9 @@
+import logging
 from datetime import datetime
+from optparse import SUPPRESS_HELP
 from sqlalchemy import Column, String, Integer, DateTime, Unicode, desc
 from flexget.manager import Base, Session
 from flexget.plugin import register_parser_option, register_plugin
-from optparse import SUPPRESS_HELP
-from datetime import datetime
-import logging
 
 log = logging.getLogger('history')
 

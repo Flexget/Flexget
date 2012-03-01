@@ -1,5 +1,4 @@
 import logging
-import re
 from flexget.utils.titles.parser import TitleParser
 from flexget.utils import qualities
 

@@ -1,7 +1,7 @@
 import logging
 import hashlib
 import urllib2
-from flexget.plugin import register_plugin, DependencyError
+from flexget.plugin import register_plugin
 from flexget.utils import json
 from flexget.utils.tools import urlopener
 

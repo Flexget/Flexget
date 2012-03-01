@@ -1,7 +1,6 @@
 import logging
 import random
 import string
-from flexget.manager import Session
 from flexget.entry import Entry
 from flexget import plugin
 

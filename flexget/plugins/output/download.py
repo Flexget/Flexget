@@ -4,7 +4,6 @@ import os
 import shutil
 import sys
 import tempfile
-import time
 import urllib
 import urllib2
 from cgi import parse_header

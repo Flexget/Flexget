@@ -27,10 +27,8 @@ class PerfTests(object):
         import time
         from flexget.plugins.metainfo.imdb_lookup import Movie
         from flexget.plugins.cli.performance import log_query_count
-        from flexget.utils.imdb import extract_id
         from sqlalchemy.sql.expression import select
         from progressbar import ProgressBar, Percentage, Bar, ETA
-        from sqlalchemy.orm import joinedload, subqueryload
         from sqlalchemy.orm import joinedload_all
 
         imdb_urls = []

@@ -31,14 +31,6 @@ class ModifySet(object):
         v.accept_any_key('any')
         return v
 
-    # TODO: remove soon
-    def register_key(self, key, type='text'):
-        log.critical('Call to deprecated method `register_key`')
-
-    # TODO: remove soon
-    def register_keys(self, keys):
-        log.critical('Call to deprecated method `register_keys`')
-
     def on_feed_start(self, feed, config):
         """Checks that jinja2 is available"""
         if not self.jinja:
@@ -49,9 +41,9 @@ class ModifySet(object):
     def on_feed_filter(self, feed, config):
         """Adds the set dict to all accepted entries."""
         for entry in feed.entries:
-            self.modify(entry, config, False, entry in feed.accepted)
+            self.modify(entry, config, errors=entry in feed.accepted)
 
-    def modify(self, entry, config, validate=False, errors=True):
+    def modify(self, entry, config, errors=True):
         """This can be called from a plugin to add set values to an entry"""
 
         # Create a new dict so we don't overwrite the set config with string replaced values.
@@ -67,17 +59,6 @@ class ModifySet(object):
                     logger('Could not set %s for %s: %s' % (field, entry['title'], e))
                     # If the replacement failed, remove this key from the update dict
                     del conf[field]
-
-        if validate:
-            from flexget import validator
-            v = validator.factory('dict')
-            for key in self.keys:
-                v.accept(self.keys[key], key=key)
-
-            if not v.validate(config):
-                log.info('set parameters are invalid, error follows')
-                log.info(v.errors.messages)
-                return
 
         # If there are valid items in the config, apply to entry.
         if conf:
