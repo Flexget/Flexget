@@ -302,7 +302,7 @@ class SeriesDatabase(object):
         if total >= 5:
             log.info('identified_by has locked in to type `%s` for %s' % (best, name))
             return best
-        log.verbose('identified by is currently on `auto` for %s.'
+        log.verbose('identified by is currently on `auto` for %s. '
                     'Multiple id types may be accepted until it locks in on the appropriate type.' % name)
         return 'auto'
 
