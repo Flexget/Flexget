@@ -52,7 +52,7 @@ class InputCSV(object):
             entry = Entry()
             for name, index in config.get('values', {}).items():
                 try:
-                    entry[name] = row[index-1]
+                    entry[name] = row[index - 1]
                 except IndexError:
                     raise Exception('Field `%s` index is out of range' % name)
             entries.append(entry)

@@ -34,14 +34,6 @@ class OutputNotifyMyAndroid(object):
         config.accept('text', key='description')
         return config
 
-    def on_process_start(self, feed, config):
-        """
-            Register the usable set: keywords.
-        """
-        set_plugin = get_plugin_by_name('set')
-        set_plugin.instance.register_keys({'apikey': 'text', 'application': 'text',
-                                           'event': 'text', 'priority': 'integer'})
-
     def prepare_config(self, config):
         if isinstance(config, bool):
             config = {'enabled': config}
@@ -78,7 +70,7 @@ class OutputNotifyMyAndroid(object):
             h = HTTPSConnection('nma.usk.bz')
 
             # Send the request
-            data = {'priority': priority, 'application': application, 'apikey': apikey, \
+            data = {'priority': priority, 'application': application, 'apikey': apikey,
                     'event': event, 'description': description}
             h.request("POST", "/publicapi/notify", headers=headers, body=urlencode(data))
 

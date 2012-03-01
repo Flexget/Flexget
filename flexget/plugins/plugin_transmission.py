@@ -201,16 +201,6 @@ class PluginTransmission(TransmissionBase):
 
     @save_opener
     def on_process_start(self, feed, config):
-        set_plugin = get_plugin_by_name('set')
-        set_plugin.instance.register_keys({'path': 'text',
-                                           'addpaused': 'boolean',
-                                           'honourlimits': 'boolean',
-                                           'bandwidthpriority': 'integer',
-                                           'maxconnections': 'integer',
-                                           'maxupspeed': 'number',
-                                           'maxdownspeed': 'number',
-                                           'ratio': 'number'})
-
         try:
             self.pathscrub = get_plugin_by_name('pathscrub').instance.scrub
         except DependencyError:

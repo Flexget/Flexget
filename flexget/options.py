@@ -84,7 +84,6 @@ class CoreOptionParser(OptionParser):
         self.add_option('--validate', action='store_true', dest='validate', default=False,
                         help=SUPPRESS_HELP)
 
-
         self.add_option('--migrate', action='store', dest='migrate', default=None,
                         help=SUPPRESS_HELP)
 

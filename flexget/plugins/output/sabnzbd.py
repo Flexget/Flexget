@@ -1,6 +1,6 @@
 import logging
 import urllib
-from flexget.plugin import get_plugin_by_name, register_plugin
+from flexget.plugin import register_plugin
 from flexget.utils.tools import urlopener
 
 log = logging.getLogger('sabnzbd')
@@ -57,13 +57,6 @@ class OutputSabnzbd(object):
             params['ma_password'] = config['password']
         params['mode'] = 'addurl'
         return params
-
-    def on_process_start(self, feed, config):
-        """
-        register the usable set: keywords
-        """
-        set = get_plugin_by_name('set')
-        set.instance.register_keys({'category': 'text'})
 
     def on_feed_output(self, feed, config):
         for entry in feed.accepted:

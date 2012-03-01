@@ -31,20 +31,13 @@ class ModifySet(object):
         v.accept_any_key('any')
         return v
 
+    # TODO: remove soon
     def register_key(self, key, type='text'):
-        """
-        plugins can call this method to register set keys as valid
-        """
-        if key:
-            if not key in self.keys:
-                self.keys[key] = type
+        log.critical('Call to deprecated method `register_key`')
 
+    # TODO: remove soon
     def register_keys(self, keys):
-        """
-        for easy registration of multiple keys
-        """
-        for key, value in keys.iteritems():
-            self.register_key(key, value)
+        log.critical('Call to deprecated method `register_keys`')
 
     def on_feed_start(self, feed, config):
         """Checks that jinja2 is available"""

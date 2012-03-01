@@ -73,10 +73,7 @@ class PluginDownload(object):
         return config
 
     def on_process_start(self, feed, config):
-        """Register the usable set keywords, get pathscrub method."""
-        set_plugin = get_plugin_by_name('set')
-        set_plugin.instance.register_keys({'path': 'text'})
-
+        """Get pathscrub method."""
         try:
             self.pathscrub = get_plugin_by_name('pathscrub').instance.scrub
         except DependencyError:

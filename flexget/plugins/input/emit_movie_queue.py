@@ -56,7 +56,6 @@ class EmitIMDBQueue(object):
                 # normal title
                 entry['title'] = imdb_entry.title
 
-
             # Add the year and quality if configured to
             if config.get('year') and entry.get('movie_year'):
                 entry['title'] += ' %s' % entry['movie_year']
