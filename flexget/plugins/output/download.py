@@ -257,7 +257,7 @@ class PluginDownload(object):
         if not os.path.isdir(tmp_path):
             log.debug('creating tmp_path %s' % tmp_path)
             os.mkdir(tmp_path)
-        outfile_fd, datafile = tempfile.mkstemp(dir=tmp_path, text='b')
+        outfile_fd, datafile = tempfile.mkstemp(dir=tmp_path)
         outfile = os.fdopen(outfile_fd, 'w')
         try:
             for chunk in response.iter_content(decode_unicode=False):
