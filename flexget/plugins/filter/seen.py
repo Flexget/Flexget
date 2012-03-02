@@ -267,7 +267,7 @@ class SeenCmd(object):
         session.add(se)
         session.commit()
 
-        log.info('Added %s as seen. This will affect all feeds.' % feed.manager.options.seen)
+        log.info('Added %s as seen. This will affect all feeds.' % seen_name)
 
 
 class FilterSeen(object):
