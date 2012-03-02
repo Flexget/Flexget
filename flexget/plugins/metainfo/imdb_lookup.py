@@ -361,9 +361,11 @@ class ImdbLookup(object):
 
             # check if this imdb page has been parsed & cached
             movie = session.query(Movie).\
-                options(joinedload_all(Movie.genres, Movie.languages,
-                Movie.actors, Movie.directors)).\
-                filter(Movie.url == entry['imdb_url']).first()
+                options(joinedload_all(Movie.genres),
+                    joinedload_all(Movie.languages),
+                    joinedload_all(Movie.actors),
+                    joinedload_all(Movie.directors)).\
+                    filter(Movie.url == entry['imdb_url']).first()
 
             # determine whether or not movie details needs to be parsed
             req_parse = False
