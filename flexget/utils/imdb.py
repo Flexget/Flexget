@@ -13,7 +13,8 @@ def extract_id(url):
     """Return IMDb ID of the given URL. Return None if not valid or if URL is not a string."""
     if not isinstance(url, basestring):
         return
-    m = re.search(r'((?:nm|tt)[\d]{7})', url)
+    # Probably should use urlparse.
+    m = re.match(r'https?://[^/]*imdb\.com/(?:title|name)/((?:nm|tt)[\d]{7})', url)
     if m:
         return m.group(1)
 

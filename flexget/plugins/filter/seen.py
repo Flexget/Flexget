@@ -235,7 +235,13 @@ class SeenForget(object):
             return
 
         feed.manager.disable_feeds()
-        count, fcount = forget(unicode(feed.manager.options.forget))
+
+        forget_name = unicode(feed.manager.options.forget)
+        imdb_id = extract_id(forget_name)
+        if imdb_id:
+            forget_name = imdb_id
+
+        count, fcount = forget(forget_name)
         log.info('Removed %s titles (%s fields)' % (count, fcount))
 
 
@@ -247,9 +253,14 @@ class SeenCmd(object):
 
         feed.manager.disable_feeds()
 
+        seen_name = unicode(feed.manager.options.seen)
+        imdb_id = extract_id(seen_name)
+        if imdb_id:
+            seen_name = imdb_id
+
         session = Session()
         se = SeenEntry(u'--seen', unicode(feed.name))
-        sf = SeenField(u'--seen', unicode(feed.manager.options.seen))
+        sf = SeenField(u'--seen', seen_name)
         se.fields.append(sf)
         session.add(se)
         session.commit()
