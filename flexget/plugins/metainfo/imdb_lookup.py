@@ -228,7 +228,10 @@ class ImdbLookup(object):
         if not config:
             return
         for entry in feed.entries:
-            entry.register_lazy_fields(self.field_map, self.lazy_loader)
+            self.register_lazy_fields(entry)
+
+    def register_lazy_fields(self, entry):
+        entry.register_lazy_fields(self.field_map, self.lazy_loader)
 
     def lazy_loader(self, entry, field):
         """Does the lookup for this entry and populates the entry fields."""

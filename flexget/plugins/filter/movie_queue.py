@@ -56,6 +56,10 @@ class FilterMovieQueue(queue_base.FilterQueueBase):
             get_plugin_by_name('tmdb_lookup').instance.lookup(entry)
         except DependencyError:
             log.debug('tmdb_lookup is not available, queue will not work if movie ids are not populated')
+        try:
+            get_plugin_by_name('imdb_lookup').instance.register_lazy_fields(entry)
+        except DependencyError:
+            log.debug('imdb_lookup is not available, queue will not work if movie ids are not populated')
         # make sure the entry has a movie id field filled
         conditions = []
         # Check if a movie id is already populated before incurring a lazy lookup
@@ -67,7 +71,7 @@ class FilterMovieQueue(queue_base.FilterQueueBase):
             if conditions:
                 break
         if not conditions:
-            log.warning('No movie id could be determined for %s' % entry['title'])
+            log.warning('IMDB and TMDB lookups failed for %s.' % entry['title'])
             return
 
         quality = entry.get('quality', qualities.UNKNOWN)
