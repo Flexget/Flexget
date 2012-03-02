@@ -18,7 +18,7 @@ from flexget.event import event
 from flexget.plugin import register_plugin, priority, register_parser_option
 from flexget import schema
 from flexget.utils.sqlalchemy_utils import table_schema
-from flexget.utils.imdb import extract_id
+from flexget.utils.imdb import is_imdb_url, extract_id
 
 log = logging.getLogger('seen')
 Base = schema.versioned_base('seen', 2)
@@ -237,9 +237,10 @@ class SeenForget(object):
         feed.manager.disable_feeds()
 
         forget_name = unicode(feed.manager.options.forget)
-        imdb_id = extract_id(forget_name)
-        if imdb_id:
-            forget_name = imdb_id
+        if is_imdb_url(forget_name):
+            imdb_id = extract_id(forget_name)
+            if imdb_id:
+                forget_name = imdb_id
 
         count, fcount = forget(forget_name)
         log.info('Removed %s titles (%s fields)' % (count, fcount))
@@ -254,9 +255,10 @@ class SeenCmd(object):
         feed.manager.disable_feeds()
 
         seen_name = unicode(feed.manager.options.seen)
-        imdb_id = extract_id(seen_name)
-        if imdb_id:
-            seen_name = imdb_id
+        if is_imdb_url(seen_name):
+            imdb_id = extract_id(seen_name)
+            if imdb_id:
+                seen_name = imdb_id
 
         session = Session()
         se = SeenEntry(u'--seen', unicode(feed.name))

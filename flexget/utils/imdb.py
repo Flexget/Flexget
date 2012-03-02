@@ -9,12 +9,19 @@ from BeautifulSoup import NavigableString, Tag
 log = logging.getLogger('utils.imdb')
 
 
+def is_imdb_url(url):
+    """Tests the url to see if it's for imdb.com."""
+    if not isinstance(url, basestring):
+        return
+    # Probably should use urlparse.
+    return re.match(r'https?://[^/]*imdb\.com/', url)
+
+
 def extract_id(url):
     """Return IMDb ID of the given URL. Return None if not valid or if URL is not a string."""
     if not isinstance(url, basestring):
         return
-    # Probably should use urlparse.
-    m = re.match(r'https?://[^/]*imdb\.com/(?:title|name)/((?:nm|tt)[\d]{7})', url)
+    m = re.search(r'((?:nm|tt)[\d]{7})', url)
     if m:
         return m.group(1)
 
