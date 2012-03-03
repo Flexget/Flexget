@@ -8,6 +8,7 @@ import urllib
 import urllib2
 from cgi import parse_header
 from httplib import BadStatusLine
+from urlparse import urlparse
 
 from requests import RequestException
 
@@ -253,8 +254,10 @@ class PluginDownload(object):
         if not os.path.isdir(tmp_path):
             log.debug('creating tmp_path %s' % tmp_path)
             os.mkdir(tmp_path)
-        outfile_fd, datafile = tempfile.mkstemp(dir=tmp_path, text='b')
-        outfile = os.fdopen(outfile_fd, 'w')
+        tmp_dir = tempfile.mkdtemp(dir=tmp_path)
+        fname = os.path.basename(urlparse(url).path)
+        datafile = os.path.join(tmp_dir, fname)
+        outfile = open(datafile, 'wb')
         try:
             for chunk in response.iter_content(decode_unicode=False):
                 outfile.write(chunk)
@@ -439,6 +442,7 @@ class PluginDownload(object):
 
                 try:
                     shutil.move(entry['file'], destfile)
+                    shutil.rmtree(os.path.dirname(entry['file']))
                 except OSError, err:
                     # ignore permission errors, see ticket #555
                     import errno
