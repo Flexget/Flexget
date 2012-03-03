@@ -45,8 +45,6 @@ class SeriesReport(SeriesDatabase):
             print 'Unknown series `%s`' % name
             return
 
-        print '%s is in identified_by `%s` mode.' % (series.name, series.identified_by or 'auto')
-
         print ' %-63s%-15s' % ('Identifier, Title', 'Quality')
         print '-' * 79
 
@@ -59,7 +57,7 @@ class SeriesReport(SeriesDatabase):
             if episode.identifier is None:
                 print ' None <--- Broken!'
             else:
-                print ' %s (%s) - %s' % (episode.identifier, episode.identified_by, episode.age)
+                print ' %s (%s) - %s' % (episode.identifier, episode.identified_by or 'N/A', episode.age)
 
             for release in episode.releases:
                 status = release.quality.name
@@ -77,6 +75,15 @@ class SeriesReport(SeriesDatabase):
 
         print '-' * 79
         print ' * = downloaded'
+        if not series.identified_by:
+            print ''
+            print ' Series plugin is still learning which episode numbering mode is '
+            print ' correct for this series (identified_by: auto).'
+            print ' Few duplicate downloads can happen with different numbering schemes'
+            print ' during this time.'
+        else:
+            print ' Series uses `%s` mode to identify episode numbering (identified_by).' % series.identified_by
+        print ' See option `identified_by` for more information.'
         session.close()
 
     def get_series_summary(self):
