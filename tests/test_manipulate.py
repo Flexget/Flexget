@@ -5,6 +5,7 @@ class TestManipulate(FlexGetBase):
 
     __yaml__ = """
         feeds:
+
           test_1:
             mock:
               - {title: 'abc FOO'}
@@ -13,12 +14,14 @@ class TestManipulate(FlexGetBase):
                   replace:
                     regexp: FOO
                     format: BAR
+
           test_2:
             mock:
               - {title: '1234 abc'}
             manipulate:
               - title:
                   extract: \d+\s*(.*)
+
           test_multiple_edits:
             mock:
               - {title: 'abc def'}
@@ -29,6 +32,14 @@ class TestManipulate(FlexGetBase):
                     format: "123"
               - title:
                   extract: \d+\s+(.*)
+
+          test_phase:
+            mock:
+              - {title: '1234 abc'}
+            manipulate:
+              - title:
+                  phase: metainfo
+                  extract: \d+\s*(.*)
     """
 
     def test_replace(self):
@@ -42,3 +53,7 @@ class TestManipulate(FlexGetBase):
     def test_multiple_edits(self):
         self.execute_feed('test_multiple_edits')
         assert self.feed.find_entry('entries', title='def'), 'multiple edits on 1 field failed'
+
+    def test_phase(self):
+        self.execute_feed('test_phase')
+        assert self.feed.find_entry('entries', title='abc'), 'extract failed at metainfo phase'
