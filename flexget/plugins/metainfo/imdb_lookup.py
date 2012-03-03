@@ -13,9 +13,9 @@ from flexget.utils.sqlalchemy_utils import table_add_column
 from flexget.utils.database import with_session
 from flexget.utils.sqlalchemy_utils import table_columns, get_index_by_name
 
-SCHEMA_VER = 1
+SCHEMA_VER = 2
 
-Base = schema.versioned_base('imdb_lookup', 1)
+Base = schema.versioned_base('imdb_lookup', SCHEMA_VER)
 
 
 # association tables
@@ -23,11 +23,6 @@ genres_table = Table('imdb_movie_genres', Base.metadata,
     Column('movie_id', Integer, ForeignKey('imdb_movies.id')),
     Column('genre_id', Integer, ForeignKey('imdb_genres.id')),
     Index('ix_imdb_movie_genres', 'movie_id', 'genre_id'))
-
-languages_table = Table('imdb_movie_languages', Base.metadata,
-    Column('movie_id', Integer, ForeignKey('imdb_movies.id')),
-    Column('language_id', Integer, ForeignKey('imdb_languages.id')),
-    Index('ix_imdb_movie_languages', 'movie_id', 'language_id'))
 
 actors_table = Table('imdb_movie_actors', Base.metadata,
     Column('movie_id', Integer, ForeignKey('imdb_movies.id')),
@@ -50,9 +45,9 @@ class Movie(Base):
 
     # many-to-many relations
     genres = relation('Genre', secondary=genres_table, backref='movies')
-    languages = relation('Language', secondary=languages_table, backref='movies')
     actors = relation('Actor', secondary=actors_table, backref='movies')
     directors = relation('Director', secondary=directors_table, backref='movies')
+    languages = relation('MovieLanguage', order_by='MovieLanguage.prominence')
 
     score = Column(Float)
     votes = Column(Integer)
@@ -86,6 +81,21 @@ class Movie(Base):
 
     def __repr__(self):
         return '<Movie(name=%s,votes=%s,year=%s)>' % (self.title, self.votes, self.year)
+
+
+class MovieLanguage(Base):
+
+    __tablename__ = 'imdb_movie_languages'
+
+    movie_id = Column(Integer, ForeignKey('imdb_movies.id'), primary_key=True)
+    language_id = Column(Integer, ForeignKey('imdb_languages.id'), primary_key=True)
+    prominence = Column(Integer)
+
+    language = relation('Language')
+
+    def __init__(self, language, prominence=None):
+        self.language = language
+        self.prominence = prominence
 
 
 class Language(Base):
@@ -187,6 +197,11 @@ def upgrade(ver, session):
             log.info('Creating index %s ...' % index.name)
             index.create(bind=session.connection())
         ver = 1
+    if ver == 1:
+        # http://flexget.com/ticket/1399
+        log.info('Adding prominence column to imdb_movie_languages table.')
+        table_add_column('imdb_movie_languages', 'prominence', Integer, session)
+        ver = 2
     return ver
 
 
@@ -211,7 +226,7 @@ class ImdbLookup(object):
         'imdb_votes': 'votes',
         'imdb_year': 'year',
         'imdb_genres': lambda movie: [genre.name for genre in movie.genres],
-        'imdb_languages': lambda movie: [lang.name for lang in movie.languages],
+        'imdb_languages': lambda movie: [lang.language.name for lang in movie.languages],
         'imdb_actors': lambda movie: dict((actor.imdb_id, actor.name) for actor in movie.actors),
         'imdb_directors': lambda movie: dict((director.imdb_id, director.name) for director in movie.directors),
         'imdb_mpaa_rating': 'mpaa_rating',
@@ -446,12 +461,12 @@ class ImdbLookup(object):
             if not genre:
                 genre = Genre(name)
             movie.genres.append(genre) # pylint:disable=E1101
-        for name in imdb_parser.languages:
+        for index, name in enumerate(imdb_parser.languages):
             language = session.query(Language).\
             filter(Language.name == name).first()
             if not language:
                 language = Language(name)
-            movie.languages.append(language) # pylint:disable=E1101
+            movie.languages.append(MovieLanguage(language, prominence=index))
         for imdb_id, name in imdb_parser.actors.iteritems():
             actor = session.query(Actor).\
             filter(Actor.imdb_id == imdb_id).first()
