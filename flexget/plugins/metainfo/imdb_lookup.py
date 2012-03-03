@@ -188,7 +188,6 @@ def upgrade(ver, session):
         log.info('Adding imdb indexes delivering up to 20x speed increase \o/ ...')
         indexes = [get_index_by_name(actors_table, 'ix_imdb_movie_actors'),
                    get_index_by_name(genres_table, 'ix_imdb_movie_genres'),
-                   get_index_by_name(languages_table, 'ix_imdb_movie_languages'),
                    get_index_by_name(directors_table, 'ix_imdb_movie_directors')]
         for index in indexes:
             if index is None:
