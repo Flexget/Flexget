@@ -59,10 +59,10 @@ class TestSeriesParser(object):
     def test_anime_proper(self):
         """SeriesParser: anime fansub style proper (13v2)"""
         s = self.parse(name='Anime', data='[aoeu] Anime 19v2 [23BA98]')
-        assert s.identifier == '19'
+        assert s.identifier == 19
         assert s.proper_count == 1
         s = self.parse(name='Anime', data='Anime_-_19v3')
-        assert s.identifier == '19'
+        assert s.identifier == 19
         assert s.proper_count == 2
 
     def test_basic(self):
@@ -93,7 +93,8 @@ class TestSeriesParser(object):
         s = self.parse(name='Something', data='Something.2008x12.13-FlexGet')
         assert not s.episode, 'Should not have episode'
         assert not s.season, 'Should not have season'
-        assert s.id == '2008-12-13', 'invalid id'
+        assert s.id_type == 'id'
+        assert s.identifier == '2008-12-13', 'invalid id'
         assert s.valid, 'should not valid'
 
     def test_unwanted(self):
@@ -221,16 +222,34 @@ class TestSeriesParser(object):
         s = self.parse(name='Something', data='Something 2 of 12')
         assert (s.season == 1 and s.episode == 2), 'failed to parse %s' % s
 
+    def test_part(self):
+        """SeriesParser: test parsing part numeral (assume season 1)"""
+        s = self.parse(name='Test', data='Test.Pt.I.720p-FlexGet')
+        assert (s.season == 1 and s.episode == 1), 'failed to parse %s' % s
+        s = self.parse(name='Test', data='Test.Pt.VI.720p-FlexGet')
+        assert (s.season == 1 and s.episode == 6), 'failed to parse %s' % s
+        s = self.parse(name='Test', data='Test.Part.2.720p-FlexGet')
+        assert (s.season == 1 and s.episode == 2), 'failed to parse %s' % s
+        s = self.parse(name='Test', data='Test.Part3.720p-FlexGet')
+        assert (s.season == 1 and s.episode == 3), 'failed to parse %s' % s
+        s = self.parse(name='Test', data='Test.Season.3.Part.IV')
+        assert (s.season == 3 and s.episode == 4), 'failed to parse %s' % s
+        s = self.parse(name='Test', data='Test.Part.One')
+        assert (s.season == 1 and s.episode == 1), 'failed to parse %s' % s
+
     def test_digits(self):
         """SeriesParser: digits (UID)"""
         s = self.parse(name='Something', data='Something 01 FlexGet')
-        assert (s.id == '01'), 'failed to parse %s' % s.data
+        assert (s.id == 1), 'failed to parse %s' % s.data
+        assert s.id_type == 'sequence'
 
         s = self.parse(name='Something', data='Something-121.H264.FlexGet')
-        assert (s.id == '121'), 'failed to parse %s' % s.data
+        assert (s.id == 121), 'failed to parse %s' % s.data
+        assert s.id_type == 'sequence'
 
         s = self.parse(name='Something', data='Something 1 AC3')
-        assert (s.id == '1'), 'failed to parse %s' % s.data
+        assert (s.id == 1), 'failed to parse %s' % s.data
+        assert s.id_type == 'sequence'
 
     def test_quality(self):
         """SeriesParser: quality"""
@@ -272,15 +291,15 @@ class TestSeriesParser(object):
     def test_group_prefix(self):
         """SeriesParser: [group] before name"""
         s = self.parse(name='Foo Bar', data='[l.u.l.z] Foo Bar - 11 (H.264) [5235532D].mkv')
-        assert (s.id == '11'), 'failed to parse %s' % s.data
+        assert (s.id == 11), 'failed to parse %s' % s.data
 
         s = self.parse(name='Foo Bar', data='[7.1.7.5] Foo Bar - 11 (H.264) [5235532D].mkv')
-        assert (s.id == '11'), 'failed to parse %s' % s.data
+        assert (s.id == 11), 'failed to parse %s' % s.data
 
     def test_hd_prefix(self):
         """SeriesParser: HD 720p before name"""
         s = self.parse(name='Foo Bar', data='HD 720p: Foo Bar - 11 (H.264) [5235532D].mkv')
-        assert (s.id == '11'), 'failed to parse %s' % s.data
+        assert (s.id == 11), 'failed to parse %s' % s.data
         assert (s.quality == '720p'), 'failed to pick up quality'
 
     def test_partially_numeric(self):
@@ -292,27 +311,20 @@ class TestSeriesParser(object):
     def test_ignore_seasonpacks(self):
         """SeriesParser: ignoring season packs"""
         """
-        s = SeriesParser()
-        s.name = 'The Foo'
-        s.expect_ep = False
+        s = SeriesParser(name='The Foo')
         s.data = 'The.Foo.S04.1080p.FlexGet.5.1'
         assert_raises(ParseWarning, s.parse)
         """
 
-        s = SeriesParser()
-        s.name = 'Something'
+        s = SeriesParser(name='Something')
         s.data = 'Something S02 Pack 720p WEB-DL-FlexGet'
         assert_raises(ParseWarning, s.parse)
 
-        s = SeriesParser()
-        s.name = 'The Foo'
-        s.expect_ep = False
+        s = SeriesParser(name='The Foo')
         s.data = 'The Foo S05 720p BluRay DTS x264-FlexGet'
         assert_raises(ParseWarning, s.parse)
 
-        s = SeriesParser()
-        s.name = 'The Foo'
-        s.expect_ep = True
+        s = SeriesParser(name='The Foo', identified_by='ep')
         s.data = 'The Foo S05 720p BluRay DTS x264-FlexGet'
         assert_raises(ParseWarning, s.parse)
 
@@ -327,30 +339,22 @@ class TestSeriesParser(object):
 
     def test_idiotic_numbering(self):
         """SeriesParser: idiotic 101, 102, 103, .. numbering"""
-        s = SeriesParser()
-        s.name = 'test'
-        s.data = 'Test.706.720p-FlexGet'
-        s.expect_ep = True
-        s.parse()
+        s = SeriesParser(name='test', identified_by='ep')
+        s.parse('Test.706.720p-FlexGet')
         assert s.season == 7, 'didn''t pick up season'
         assert s.episode == 6, 'didn''t pick up episode'
 
     def test_idiotic_numbering_with_zero(self):
         """SeriesParser: idiotic 0101, 0102, 0103, .. numbering"""
-        s = SeriesParser()
-        s.name = 'test'
-        s.data = 'Test.0706.720p-FlexGet'
-        s.expect_ep = True
-        s.parse()
+        s = SeriesParser(name='test', identified_by='ep')
+        s.parse('Test.0706.720p-FlexGet')
         assert s.season == 7, 'season missing'
         assert s.episode == 6, 'episode missing'
         assert s.identifier == 'S07E06', 'identifier broken'
 
     def test_idiotic_invalid(self):
         """SeriesParser: idiotic confused by invalid"""
-        s = SeriesParser()
-        s.expect_ep = True
-        s.name = 'test'
+        s = SeriesParser(name='test', identified_by='ep')
         s.data = 'Test.Revealed.WS.PDTV.XviD-aAF.5190458.TPB.torrent'
         assert_raises(ParseWarning, s.parse)
         assert not s.season == 5, 'confused, got season'
@@ -403,9 +407,7 @@ class TestSeriesParser(object):
         """SeriesParser: test that qualities are not picked as ep"""
         from flexget.utils import qualities
         for quality in qualities.registry.keys():
-            s = SeriesParser()
-            s.expect_ep = True
-            s.name = 'FooBar'
+            s = SeriesParser(name='FooBar', identified_by='ep')
             s.data = 'FooBar %s XviD-FlexGet' % quality
             assert_raises(ParseWarning, s.parse)
 
@@ -432,19 +434,6 @@ class TestSeriesParser(object):
         assert s.episode == 16
         assert s.quality == 'hdtv'
 
-    def test_part(self):
-        """SeriesParser: test parsing part numeral (assume season 1)"""
-        s = self.parse(name='Test', data='Test.Pt.I.720p-FlexGet')
-        assert (s.season == 1 and s.episode == 1), 'failed to parse %s' % s
-        s = self.parse(name='Test', data='Test.Pt.VI.720p-FlexGet')
-        assert (s.season == 1 and s.episode == 6), 'failed to parse %s' % s
-        s = self.parse(name='Test', data='Test.Part.2.720p-FlexGet')
-        assert (s.season == 1 and s.episode == 2), 'failed to parse %s' % s
-        s = self.parse(name='Test', data='Test.Part3.720p-FlexGet')
-        assert (s.season == 1 and s.episode == 3), 'failed to parse %s' % s
-        s = self.parse(name='Test', data='Test.Season.3.Part.IV')
-        assert (s.season == 3 and s.episode == 4), 'failed to parse %s' % s
-
     def test_from_groups(self):
         """SeriesParser: test from groups"""
         s = SeriesParser()
@@ -457,10 +446,10 @@ class TestSeriesParser(object):
     def test_id_and_hash(self):
         """SeriesParser: Series with confusing hash"""
         s = self.parse(name='Something', data='Something 63 [560D3414]')
-        assert (s.id == '63'), 'failed to parse %s' % s.data
+        assert (s.id == 63), 'failed to parse %s' % s.data
 
         s = self.parse(name='Something', data='Something 62 [293A8395]')
-        assert (s.id == '62'), 'failed to parse %s' % s.data
+        assert (s.id == 62), 'failed to parse %s' % s.data
 
     def test_ticket_700(self):
         """SeriesParser: confusing name (#700)"""
@@ -471,9 +460,46 @@ class TestSeriesParser(object):
     def test_date_id(self):
         """SeriesParser: Series with dates"""
         s = self.parse(name='Something', data='Something.2010.10.25')
-        assert (s.id == '2010-10-25'), 'failed to parse %s' % s.data
+        assert (s.identifier == '2010-10-25'), 'failed to parse %s' % s.data
+        assert s.id_type == 'date'
+
         s = self.parse(name='Something', data='Something 2010-10-25')
-        assert (s.id == '2010-10-25'), 'failed to parse %s' % s.data
+        assert (s.identifier == '2010-10-25'), 'failed to parse %s' % s.data
+        assert s.id_type == 'date'
+
+        s = self.parse(name='Something', data='Something 10/25/2010')
+        assert (s.identifier == '2010-10-25'), 'failed to parse %s' % s.data
+        assert s.id_type == 'date'
+
+        s = self.parse(name='Something', data='Something 25.10.2010')
+        assert (s.identifier == '2010-10-25'), 'failed to parse %s' % s.data
+        assert s.id_type == 'date'
+
+        # February 1 is picked rather than January 2 because it is closer to now
+        s = self.parse(name='Something', data='Something 1.2.11')
+        assert s.identifier == '2011-02-01', 'failed to parse %s' % s.data
+        assert s.id_type == 'date'
+
+        # Future dates should not be considered dates
+        s = self.parse(name='Something', data='Something 01.02.32')
+        assert s.id_type != 'date'
+
+    def test_date_options(self):
+        # By default we should pick the latest interpretation
+        s = self.parse(name='Something', data='Something 01-02-03')
+        assert (s.identifier == '2003-02-01'), 'failed to parse %s' % s.data
+
+        # Test it still works with both options specified
+        s = self.parse(name='Something', data='Something 01-02-03', date_yearfirst=False, date_dayfirst=True)
+        assert (s.identifier == '2003-02-01'), 'failed to parse %s' % s.data
+
+        # If we specify yearfirst yes it should force another interpretation
+        s = self.parse(name='Something', data='Something 01-02-03', date_yearfirst=True)
+        assert (s.identifier == '2001-02-03'), 'failed to parse %s' % s.data
+
+        # If we specify dayfirst no it should force the third interpretation
+        s = self.parse(name='Something', data='Something 01-02-03', date_dayfirst=False)
+        assert (s.identifier == '2003-01-02'), 'failed to parse %s' % s.data
 
     def test_season_title_episode(self):
         """SeriesParser: Series with title between season and episode"""

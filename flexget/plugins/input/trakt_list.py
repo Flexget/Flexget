@@ -5,7 +5,7 @@ import re
 from flexget.utils import json
 from flexget.utils.tools import urlopener
 from flexget.utils.cached_input import cached
-from flexget.plugin import register_plugin, PluginError, DependencyError
+from flexget.plugin import register_plugin, PluginError
 from flexget.entry import Entry
 
 log = logging.getLogger('trakt_list')

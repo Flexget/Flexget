@@ -228,7 +228,10 @@ class ImdbLookup(object):
         if not config:
             return
         for entry in feed.entries:
-            entry.register_lazy_fields(self.field_map, self.lazy_loader)
+            self.register_lazy_fields(entry)
+
+    def register_lazy_fields(self, entry):
+        entry.register_lazy_fields(self.field_map, self.lazy_loader)
 
     def lazy_loader(self, entry, field):
         """Does the lookup for this entry and populates the entry fields."""
@@ -361,9 +364,11 @@ class ImdbLookup(object):
 
             # check if this imdb page has been parsed & cached
             movie = session.query(Movie).\
-                options(joinedload_all(Movie.genres, Movie.languages,
-                Movie.actors, Movie.directors)).\
-                filter(Movie.url == entry['imdb_url']).first()
+                options(joinedload_all(Movie.genres),
+                    joinedload_all(Movie.languages),
+                    joinedload_all(Movie.actors),
+                    joinedload_all(Movie.directors)).\
+                    filter(Movie.url == entry['imdb_url']).first()
 
             # determine whether or not movie details needs to be parsed
             req_parse = False

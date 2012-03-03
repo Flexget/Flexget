@@ -1,5 +1,5 @@
 import logging
-from flexget.plugin import get_plugin_by_name, register_plugin, DependencyError, priority
+from flexget.plugin import register_plugin, DependencyError, priority
 
 try:
     from flexget.plugins.api_tvdb import lookup_series, lookup_episode, get_mirror
@@ -86,14 +86,6 @@ class PluginThetvdbLookup(object):
         from flexget import validator
         return validator.factory('boolean')
 
-    def on_process_start(self, feed, config):
-        """Register the usable set plugin keywords"""
-        try:
-            set_plugin = get_plugin_by_name('set')
-            set_plugin.instance.register_key('thetvdb_id', 'integer')
-        except DependencyError:
-            pass
-
     def lazy_series_lookup(self, entry, field):
         """Does the lookup for this entry and populates the entry fields."""
         try:
@@ -143,8 +135,9 @@ class PluginThetvdbLookup(object):
                 entry.register_lazy_fields(self.series_map, self.lazy_series_lookup)
 
                 # If there is season and ep info as well, register episode lazy fields
-                if entry.get('series_season') and entry.get('series_episode'):
+                if entry.get('series_id_type') == 'ep':
                     entry.register_lazy_fields(self.episode_map, self.lazy_episode_lookup)
+                # TODO: lookup for 'seq' and 'date' type series
 
 
 register_plugin(PluginThetvdbLookup, 'thetvdb_lookup', api_ver=2)

@@ -1,9 +1,10 @@
 import logging
-from flexget.plugin import *
+from flexget.plugin import register_plugin
 
 log = logging.getLogger("redskunk")
 
-class UrlRewriteRedskunk:
+
+class UrlRewriteRedskunk(object):
     """Redskunk urlrewriter."""
 
     def url_rewritable(self, feed, entry):

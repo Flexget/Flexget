@@ -20,7 +20,7 @@ class InputFind(object):
         find:
           path: /storage/movies/
           mask: *.avi
-          
+
         Example:
 
         find:

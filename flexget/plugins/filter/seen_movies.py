@@ -1,6 +1,6 @@
 import logging
 from flexget.plugins.filter.seen import FilterSeen
-from flexget.plugin import register_plugin, priority, register_parser_option
+from flexget.plugin import register_plugin, priority
 
 log = logging.getLogger('seenmovies')
 

@@ -4,7 +4,7 @@ from urllib import urlencode, quote
 from urllib2 import urlopen, URLError, HTTPError
 from logging import getLogger
 from flexget.utils import json
-from flexget.plugin import register_plugin, get_plugin_by_name, PluginError, DependencyError
+from flexget.plugin import register_plugin, PluginError
 from flexget import validator
 
 log = getLogger('pyload')
@@ -69,8 +69,6 @@ class PluginPyLoad(object):
 
     def on_process_start(self, feed, config):
         self.session = None
-        set_plugin = get_plugin_by_name('set')
-        set_plugin.instance.register_keys({'queue': 'boolean'})
 
     def on_feed_output(self, feed, config):
         if not config.get('enabled', True):

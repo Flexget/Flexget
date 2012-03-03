@@ -2,7 +2,7 @@ __version__ = 0.1
 
 import logging
 from requests import RequestException
-from flexget.plugin import get_plugin_by_name, register_plugin
+from flexget.plugin import register_plugin
 from flexget.utils.template import RenderError
 
 log = logging.getLogger('prowl')
@@ -35,14 +35,6 @@ class OutputProwl(object):
         config.accept('integer', key='priority')
         config.accept('text', key='description')
         return config
-
-    def on_process_start(self, feed, config):
-        """
-            Register the usable set: keywords.
-        """
-        set_plugin = get_plugin_by_name('set')
-        set_plugin.instance.register_keys({'apikey': 'text', 'application': 'text',
-                                           'event': 'text', 'priority': 'integer'})
 
     def prepare_config(self, config):
         if isinstance(config, bool):

@@ -12,10 +12,10 @@ log = logging.getLogger('isohunt')
 class UrlRewriteIsoHunt(object):
     """IsoHunt urlrewriter and search plugin.
 
-    should accept: 
+    should accept:
     isohunt: <category>
-      
-      categories: 
+
+      categories:
       empty or -1: All
       0 : Misc.
       1 : Video/Movies
@@ -75,7 +75,6 @@ class UrlRewriteIsoHunt(object):
             raise PluginWarning('Got bozo_exception (bad feed)')
 
         for item in rss.entries:
-
 
             # assign confidence score of how close this link is to the name you're looking for. .6 and above is "close"
             comparator.set_seq2(item.title)

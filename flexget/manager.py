@@ -11,7 +11,6 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.pool import SingletonThreadPool
 from flexget.event import fire_event
 from flexget import validator
-import re
 
 log = logging.getLogger('manager')
 

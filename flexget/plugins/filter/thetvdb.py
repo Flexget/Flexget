@@ -146,7 +146,6 @@ class FilterTvdb(object):
 
         lookup = get_plugin_by_name('thetvdb_lookup').instance.lookup
 
-
         for entry in feed.entries:
             force_accept = False
 

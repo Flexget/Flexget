@@ -2,8 +2,7 @@ import logging
 import re
 import math
 import os.path
-from flexget.plugin import *
-from flexget.utils import qualities
+from flexget.plugin import register_plugin
 
 log = logging.getLogger('metanfo_csize')
 
@@ -39,7 +38,7 @@ class MetainfoContentSize(object):
             if match:
                 try:
                     amount = float(match.group(1).replace(',', '.'))
-                except:
+                except Exception:
                     log.error('BUG: Unable to convert %s into float (%s)' % (match.group(1), entry['title']))
                     continue
                 unit = match.group(2).lower()

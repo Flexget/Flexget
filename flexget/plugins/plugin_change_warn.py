@@ -1,7 +1,6 @@
 import logging
 import sys
 import os
-from flexget.manager import Session
 from flexget.plugin import register_plugin
 
 log = logging.getLogger('change')
