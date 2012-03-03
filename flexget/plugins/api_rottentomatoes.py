@@ -259,7 +259,7 @@ def lookup_movie(title=None, year=None, rottentomatoes_id=None, imdb_id=None, sm
                 movie = found.movie
     if movie:
         # Movie found in cache, check if cache has expired.
-        if movie.expired() and not only_cached:
+        if movie.expired and not only_cached:
             log.debug('Cache has expired for %s, attempting to refresh from Rotten Tomatoes.' % id_str())
             try:
                 get_movie_details(movie, session)
@@ -317,8 +317,8 @@ def lookup_movie(title=None, year=None, rottentomatoes_id=None, imdb_id=None, sm
         raise LookupError('No results found from rotten tomatoes for %s' % id_str())
     else:
         # Access attributes to force the relationships to eager load before we detach from session
-        movie.genres
-        movie.posters
+        for attr in ['alternate_ids', 'cast', 'directors', 'genres', 'links', 'posters', 'release_dates']:
+            getattr(movie, attr)
         return movie
 
 
