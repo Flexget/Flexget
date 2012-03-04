@@ -69,7 +69,6 @@ class PluginRottenTomatoesLookup(object):
             entry.unregister_lazy_fields(self.field_map, self.lazy_loader)
         return entry[field]
 
-
     def lookup(self, entry, search_allowed=True):
         """
         Perform Rotten Tomatoes lookup for entry.
@@ -86,7 +85,6 @@ class PluginRottenTomatoesLookup(object):
                              only_cached=(not search_allowed))
         log.debug(u'Got movie: %s' % movie)
         entry.update_using_map(self.field_map, movie)
-
 
     def on_feed_metainfo(self, feed, config):
         if not config:

@@ -55,6 +55,7 @@ class RottenTomatoesContainer(object):
             if isinstance(update_dict.get(col.name), (basestring, int, float)):
                 setattr(self, col.name, update_dict[col.name])
 
+
 class RottenTomatoesMovie(RottenTomatoesContainer, Base):
 
     __tablename__ = 'rottentomatoes_movies'
@@ -203,6 +204,7 @@ class RottenTomatoesSearchResult(Base):
 
     def __repr__(self):
         return '<RottenTomatoesSearchResult(search=%s,movie_id=%s,movie=%s)>' % (self.search, self.movie_id, self.movie)
+
 
 @internet(log)
 def lookup_movie(title=None, year=None, rottentomatoes_id=None, imdb_id=None, smart_match=None, only_cached=False, session=None):
@@ -381,6 +383,7 @@ def lookup_movie(title=None, year=None, rottentomatoes_id=None, imdb_id=None, sm
                 getattr(movie, attr)
         session.commit()
         return movie
+
 
 def set_movie_details(movie, session, movie_data=None):
     """Populate details for this :movie: from given data

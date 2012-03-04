@@ -56,7 +56,6 @@ class FilterRottenTomatoes(object):
             - G
     """
 
-
     def __init__(self):
         # We could pull these from the API through lists.json but that's extra web/API key usage
         self.critics_ratings = {'rotten': 0, 'fresh': 1, 'certified fresh': 2}

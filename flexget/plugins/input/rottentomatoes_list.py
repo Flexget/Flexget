@@ -12,6 +12,7 @@ except ImportError:
 
 log = logging.getLogger('rottentomatoes_list')
 
+
 class RottenTomatoesList(object):
     """
         Emits an entry for each movie in a Rotten Tomatoes list.
@@ -31,12 +32,10 @@ class RottenTomatoesList(object):
 
     """
 
-
     def __init__(self):
         # We could pull these from the API through lists.json but that's extra web/API key usage
         self.dvd_lists = ['top_rentals', 'current_releases', 'new_releases', 'upcoming']
         self.movie_lists = ['box_office', 'in_theaters', 'opening', 'upcoming']
-
 
     def validator(self):
         from flexget import validator
@@ -44,7 +43,6 @@ class RottenTomatoesList(object):
         root.accept('list', key='dvds').accept('choice').accept_choices(self.dvd_lists)
         root.accept('list', key='movies').accept('choice').accept_choices(self.movie_lists)
         return root
-
 
     @cached('rottentomatoes_list', persist='2 hours')
     def on_feed_input(self, feed, config):
