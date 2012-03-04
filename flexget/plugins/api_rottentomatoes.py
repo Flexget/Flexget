@@ -314,6 +314,7 @@ def lookup_movie(title=None, year=None, rottentomatoes_id=None, imdb_id=None, sm
                     set_movie_details(movie, session, result)
                     session.add(movie)
             if not movie and title:
+                log.verbose('Searching from rt `%s`' % search_string)
                 results = movies_search(search_string)
                 if results:
                     results = results.get('movies')
