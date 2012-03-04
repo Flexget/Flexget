@@ -1,6 +1,7 @@
 import logging
-from flexget.plugin import get_plugin_by_name, register_plugin, internet, DependencyError, priority
+from flexget.plugin import get_plugin_by_name, register_plugin, internet, DependencyError, priority, PluginError
 from flexget.utils import imdb
+from flexget.utils.log import log_once
 
 try:
     from flexget.plugins.api_rottentomatoes import lookup_movie
@@ -91,6 +92,6 @@ class PluginRottenTomatoesLookup(object):
         if not config:
             return
         for entry in feed.entries:
-            self.lookup(entry)
+            entry.register_lazy_fields(self.field_map, self.lazy_loader)
 
 register_plugin(PluginRottenTomatoesLookup, 'rottentomatoes_lookup', api_ver=2)
