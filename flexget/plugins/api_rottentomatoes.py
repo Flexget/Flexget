@@ -222,13 +222,13 @@ def lookup_movie(title=None, year=None, rottentomatoes_id=None, imdb_id=None, sm
 
     """
 
-    if not (rottentomatoes_id or imdb_id or title) and smart_match:
+    if smart_match:
         # If smart_match was specified, and we don't have more specific criteria, parse it into a title and year
         title_parser = MovieParser()
         title_parser.parse(smart_match)
         title = title_parser.name
         year = title_parser.year
-        if title == '':
+        if title == '' and not (rottentomatoes_id or imdb_id or title):
             log.critical('Failed to parse name from %s' % raw_name)
             return None
 
@@ -291,22 +291,29 @@ def lookup_movie(title=None, year=None, rottentomatoes_id=None, imdb_id=None, sm
             if imdb_id:
                 result = movies_alias(imdb_id, 'imdb')
                 if result:
-                    movie = session.query(RottenTomatoesMovie).filter(RottenTomatoesMovie.id == result.get('id')).first()
-                    if movie:
-                        # Movie was in database, but did not have the imdb_id stored, force an update
-                        set_movie_details(movie, session, result)
-                        session.merge(movie)
+                    if title and difflib.SequenceMatcher(lambda x: x == ' ', result['title'], title).ratio() < MIN_MATCH:
+                        log.debug('Rotten Tomatoes had an imdb alias for %s but it didn\'t match the title %s.' % (imdb_id, title))
+                        imdb_id = None
+                    elif year and result['year'] != year:
+                        log.debug('Rotten Tomatoes had an imdb alias for %s but it didn\'t match the year %s.' % (imdb_id, year))
+                        imdb_id = None
                     else:
-                        movie = RottenTomatoesMovie()
-                        set_movie_details(movie, session, result)
-                        session.add(movie)
-            elif rottentomatoes_id:
+                        movie = session.query(RottenTomatoesMovie).filter(RottenTomatoesMovie.id == result.get('id')).first()
+                        if movie:
+                            # Movie was in database, but did not have the imdb_id stored, force an update
+                            set_movie_details(movie, session, result)
+                            session.merge(movie)
+                        else:
+                            movie = RottenTomatoesMovie()
+                            set_movie_details(movie, session, result)
+                            session.add(movie)
+            if not movie and rottentomatoes_id:
                 result = movies_info(rottentomatoes_id)
                 if result:
                     movie = RottenTomatoesMovie()
                     set_movie_details(movie, session, result)
                     session.add(movie)
-            elif title:
+            if not movie and title:
                 results = movies_search(search_string)
                 if results:
                     results = results.get('movies')
