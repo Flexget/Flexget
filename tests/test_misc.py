@@ -1,4 +1,5 @@
 import os
+import stat
 from tests import FlexGetBase
 from nose.plugins.attrib import attr
 from nose.tools import raises
@@ -135,6 +136,10 @@ class TestDownload(FlexGetBase):
         # Re: seems to come from python mimetype detection in download plugin ...
         # Re Re: Implemented in such way that extension does not matter?
         self.testfile = os.path.expanduser('~/flexget_test_data.obj')
+        # A little convoluted, but you have to set the umask in order to have
+        # the current value returned to you
+        curr_umask = os.umask(0)
+        tmp_umask = os.umask(curr_umask)
         if os.path.exists(self.testfile):
             os.remove(self.testfile)
         # executes feed and downloads the file
@@ -142,6 +147,10 @@ class TestDownload(FlexGetBase):
         assert self.feed.entries[0]['output'], 'output missing?'
         self.testfile = self.feed.entries[0]['output']
         assert os.path.exists(self.testfile), 'download file does not exists'
+        testfile_stat = os.stat(self.testfile)
+        modes_equal = 666 - int(oct(curr_umask)) == \
+                      int(oct(stat.S_IMODE(testfile_stat.st_mode)))
+        assert modes_equal, 'download file mode not honoring umask'
 
 
 class TestEntryUnicodeError(object):
