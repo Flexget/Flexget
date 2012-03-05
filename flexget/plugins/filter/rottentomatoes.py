@@ -16,7 +16,8 @@ class FilterRottenTomatoes(object):
         min_critics_score: <num>
         min_audience_score: <num>
         min_average_score: <num>
-        require_certified_fresh: <num>
+        min_critic_rating: <rotten, fresh, or certified fresh>
+        min_audience_rating: <upright or spilled>
         min_year: <num>
         max_year: <num>
 
@@ -55,6 +56,11 @@ class FilterRottenTomatoes(object):
             - G
     """
 
+    def __init__(self):
+        # We could pull these from the API through lists.json but that's extra web/API key usage
+        self.critics_ratings = {'rotten': 0, 'fresh': 1, 'certified fresh': 2}
+        self.audience_ratings = {'spilled': 0, 'upright': 1}
+
     def validator(self):
         from flexget import validator
         rt = validator.factory('dict')
@@ -63,7 +69,8 @@ class FilterRottenTomatoes(object):
         rt.accept('number', key='min_critics_score')
         rt.accept('number', key='min_audience_score')
         rt.accept('number', key='min_average_score')
-        rt.accept('boolean', key='require_certified_fresh')
+        rt.accept('choice', key='min_critics_rating').accept_choices(self.critics_ratings.keys())
+        rt.accept('choice', key='min_audience_rating').accept_choices(self.audience_ratings.keys())
         rt.accept('list', key='reject_genres').accept('text')
         rt.accept('list', key='reject_actors').accept('text')
         rt.accept('list', key='accept_actors').accept('text')
@@ -79,19 +86,15 @@ class FilterRottenTomatoes(object):
 
         lookup = get_plugin_by_name('rottentomatoes_lookup').instance.lookup
 
-        # only go through all the entries if requiring certified fresh
-        if 'require_certified_fresh' in config:
-            entries = feed.entries
-        else:
-            entries = feed.undecided
+        # since the plugin does not reject anything, no sense going trough accepted
+        for entry in feed.undecided:
 
-        for entry in entries:
             force_accept = False
 
             try:
                 lookup(entry)
             except PluginError, e:
-                # logs skip message once trough log_once (info) and then only when ran from cmd line (w/o --cron)
+                # logs skip message once through log_once (info) and then only when ran from cmd line (w/o --cron)
                 msg = 'Skipping %s because of an error: %s' % (entry['title'], e.value)
                 if not log_once(msg, logger=log):
                     log.verbose(msg)
@@ -102,10 +105,6 @@ class FilterRottenTomatoes(object):
 
             # Check defined conditions, TODO: rewrite into functions?
             reasons = []
-            if 'require_certified_fresh' in config:
-                if config['require_certified_fresh'] and entry.get('rt_critics_rating') != 'Certified Fresh':
-                    feed.reject(entry, 'require_certified_fresh')
-                    continue
             if 'min_critics_score' in config:
                 if entry.get('rt_critics_score', 0) < config['min_critics_score']:
                     reasons.append('min_critics_score (%s < %s)' % (entry.get('rt_critics_score'),
@@ -118,6 +117,16 @@ class FilterRottenTomatoes(object):
                 if entry.get('rt_average_score', 0) < config['min_average_score']:
                     reasons.append('min_average_score (%s < %s)' % (entry.get('rt_average_score'),
                         config['min_average_score']))
+            if 'min_critics_rating' in config:
+                if not entry.get('rt_critics_rating'):
+                    reasons.append('min_critics_rating (no rt_critics_rating)')
+                elif self.critics_ratings.get(entry.get('rt_critics_rating').lower(), 0) < self.critics_ratings[config['min_critics_rating']]:
+                    reasons.append('min_critics_rating (%s < %s)' % (entry.get('rt_critics_rating').lower(), config['min_critics_rating']))
+            if 'min_audience_rating' in config:
+                if not entry.get('rt_audience_rating'):
+                    reasons.append('min_audience_rating (no rt_audience_rating)')
+                elif self.audience_ratings.get(entry.get('rt_audience_rating').lower(), 0) < self.audience_ratings[config['min_audience_rating']]:
+                    reasons.append('min_audience_rating (%s < %s)' % (entry.get('rt_audience_rating').lower(), config['min_audience_rating']))
             if 'min_year' in config:
                 if entry.get('rt_year', 0) < config['min_year']:
                     reasons.append('min_year (%s < %s)' % (entry.get('rt_year'), config['min_year']))
