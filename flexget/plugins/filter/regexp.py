@@ -150,7 +150,8 @@ class FilterRegexp(object):
         """
         unquote = ['url']
         for field in find_from or entry:
-            if not entry.get(field):
+            # Only evaluate lazy fields if find_from has been explicitly specified
+            if not entry.get(field, eval_lazy=find_from):
                 continue
             # Make all fields into lists for search purposes
             values = entry[field]
