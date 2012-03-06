@@ -116,7 +116,7 @@ class FilterIf(object):
                         fake_feed.session = feed.session
                         fake_feed.entries = passed_entries
                         fake_feed.accepted = [e for e in feed.accepted if self.check_condition(requirement, e)]
-                        fake_feed.rejected = [e for e in feed.rejected if self.check_condition(requirement, e)]
+
                         try:
                             for plugin_name, plugin_config in action.iteritems():
                                 plugin = get_plugin_by_name(plugin_name)
