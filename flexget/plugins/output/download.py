@@ -442,7 +442,6 @@ class PluginDownload(object):
 
                 try:
                     shutil.move(entry['file'], destfile)
-                    shutil.rmtree(os.path.dirname(entry['file']))
                 except OSError, err:
                     # ignore permission errors, see ticket #555
                     import errno
@@ -470,6 +469,7 @@ class PluginDownload(object):
             if os.path.exists(entry['file']):
                 log.debug('removing temp file %s from %s' % (entry['file'], entry['title']))
                 os.remove(entry['file'])
+            shutil.rmtree(os.path.dirname(entry['file']))
             del(entry['file'])
 
     def cleanup_temp_files(self, feed):
