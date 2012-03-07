@@ -69,7 +69,15 @@ class TraktList(object):
             map = self.series_map
         elif 'custom' in config:
             config['data_type'] = 'custom'
-            config['list_type'] = config['custom'].replace(' ', '-')
+            # Do some translation from visible list name to prepare for use in url
+            list_name = config['custom']
+            # These characters are just stripped in the url
+            for char in '!@#$%^*()[]{}/=?+\\|-_':
+                list_name = list_name.replace(char, '')
+            # These characters get replaced
+            list_name = list_name.replace('&', 'and')
+            list_name = list_name.replace(' ', '-')
+            config['list_type'] = list_name
             # Map type is per item in custom lists
         else:
             raise PluginError('Must define movie or series lists to retrieve from trakt.')
