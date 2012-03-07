@@ -1,3 +1,4 @@
+import hashlib
 import logging
 import mimetypes
 import os
@@ -255,7 +256,7 @@ class PluginDownload(object):
             log.debug('creating tmp_path %s' % tmp_path)
             os.mkdir(tmp_path)
         tmp_dir = tempfile.mkdtemp(dir=tmp_path)
-        fname = urllib.quote_plus(url)
+        fname = hashlib.md5(url).hexdigest()
         datafile = os.path.join(tmp_dir, fname)
         outfile = open(datafile, 'wb')
         try:
