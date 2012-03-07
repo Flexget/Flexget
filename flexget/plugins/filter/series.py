@@ -286,6 +286,7 @@ class SeriesDatabase(object):
         type_totals.pop(None, None)
         if not type_totals:
             return 'auto'
+        log.debug('%s episode type totals: %r' % (name, type_totals))
         # Find total number of parsed episodes
         total = sum(type_totals.itervalues())
         # See which type has the most
