@@ -1,3 +1,4 @@
+import hashlib
 import logging
 import mimetypes
 import os
@@ -253,8 +254,10 @@ class PluginDownload(object):
         if not os.path.isdir(tmp_path):
             log.debug('creating tmp_path %s' % tmp_path)
             os.mkdir(tmp_path)
-        outfile_fd, datafile = tempfile.mkstemp(dir=tmp_path)
-        outfile = os.fdopen(outfile_fd, 'w')
+        tmp_dir = tempfile.mkdtemp(dir=tmp_path)
+        fname = hashlib.md5(url).hexdigest()
+        datafile = os.path.join(tmp_dir, fname)
+        outfile = open(datafile, 'wb')
         try:
             for chunk in response.iter_content(decode_unicode=False):
                 outfile.write(chunk)
@@ -466,6 +469,7 @@ class PluginDownload(object):
             if os.path.exists(entry['file']):
                 log.debug('removing temp file %s from %s' % (entry['file'], entry['title']))
                 os.remove(entry['file'])
+            shutil.rmtree(os.path.dirname(entry['file']))
             del(entry['file'])
 
     def cleanup_temp_files(self, feed):
