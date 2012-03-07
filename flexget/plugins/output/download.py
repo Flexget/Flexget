@@ -9,7 +9,6 @@ import urllib
 import urllib2
 from cgi import parse_header
 from httplib import BadStatusLine
-from urlparse import urlparse
 
 from requests import RequestException
 
