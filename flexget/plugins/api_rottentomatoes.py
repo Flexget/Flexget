@@ -296,9 +296,6 @@ def lookup_movie(title=None, year=None, rottentomatoes_id=None, imdb_id=None, sm
                     if title and difflib.SequenceMatcher(lambda x: x == ' ', result['title'], title).ratio() < MIN_MATCH:
                         log.debug('Rotten Tomatoes had an imdb alias for %s but it didn\'t match the title %s.' % (imdb_id, title))
                         imdb_id = None
-                    elif year and result['year'] != year:
-                        log.debug('Rotten Tomatoes had an imdb alias for %s but it didn\'t match the year %s.' % (imdb_id, year))
-                        imdb_id = None
                     else:
                         movie = session.query(RottenTomatoesMovie).filter(RottenTomatoesMovie.id == result.get('id')).first()
                         if movie:

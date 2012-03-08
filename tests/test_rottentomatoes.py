@@ -31,8 +31,8 @@ class TestRottenTomatoesLookup(FlexGetBase):
                 'Didn\'t populate RT info for Toy Story'
         assert self.feed.find_entry(rt_name='The Matrix', rt_year=1999, rt_id=12897), \
                 'Didn\'t populate RT info for The Matrix'
-        assert self.feed.find_entry(rt_name='Star Wars: Episode I - The Phantom Menace (in 3D)',
-                rt_year=2012, rt_id=10008),\
+        assert self.feed.find_entry(rt_name='Star Wars: Episode I - The Phantom Menace',
+                rt_year=1999, rt_id=10008),\
                 'Didn\'t populate RT info for Star Wars: Episode I - The Phantom Menace (in 3D)'
         assert self.feed.find_entry(rt_name='Taken', rt_year=2008, rt_id=770680780),\
                 'Didn\'t populate RT info for Taken'
