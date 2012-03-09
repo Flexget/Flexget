@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 import logging
-from urllib2 import URLError
+from urllib2 import URLError, quote
 import os
 import posixpath
 from sqlalchemy import Table, Column, Integer, Float, String, Unicode, Boolean, DateTime, func
@@ -310,7 +310,7 @@ class ApiTmdb(object):
 
 def get_first_result(tmdb_function, value):
     if isinstance(value, basestring):
-        value = value.replace(' ', '+').encode('utf-8')
+        value = quote(value.encode('utf-8'), safe='')
     url = '%s/2.1/Movie.%s/%s/json/%s/%s' % (server, tmdb_function, lang, api_key, value)
     try:
         data = urlopener(url, log)
