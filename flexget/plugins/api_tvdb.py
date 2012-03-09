@@ -364,9 +364,13 @@ def mark_expired(session=None):
         # It has been less than an hour, don't check again yet
         return
 
+    updates = None
     try:
         # Get items that have changed since our last update
-        updates = BeautifulStoneSoup(requests.get(server + 'Updates.php?type=all&time=%s' % last_server).content).items
+        content = requests.get(server + 'Updates.php?type=all&time=%s' % last_server).content
+        if not isinstance(content, basestring):
+            raise Exception('exptected string, got %s' % type(content))
+        updates = BeautifulStoneSoup(content).items
     except RequestException, e:
         log.error('Could not get update information from tvdb: %s' % e)
         return

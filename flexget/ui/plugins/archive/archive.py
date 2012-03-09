@@ -1,5 +1,5 @@
 import logging
-from flexget.ui.webui import register_plugin, db_session, manager, app, executor
+from flexget.ui.webui import db_session, app, executor
 from flask import request, render_template, flash, Module
 from flexget.plugin import DependencyError
 

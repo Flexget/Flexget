@@ -5,7 +5,7 @@ from flexget.entry import Entry
 from flexget.plugin import register_plugin, internet, PluginWarning
 from flexget.utils.tools import urlopener
 from flexget.utils.soup import get_soup
-from flexget.utils.search import torrent_availability, StringComparator
+from flexget.utils.search import torrent_availability
 
 log = logging.getLogger('demonoid')
 

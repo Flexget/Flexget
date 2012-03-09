@@ -1,7 +1,6 @@
 """
 At the moment scheduler supports just one global interval for all feeds.
 """
-from copy import copy
 import logging
 from datetime import datetime, timedelta
 import threading

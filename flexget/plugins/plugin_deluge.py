@@ -318,15 +318,17 @@ class OutputDeluge(DelugePlugin):
     def __init__(self):
         self.deluge12 = None
         self.deluge_version = None
-        self.options = {'maxupspeed': 'max_upload_speed', 'maxdownspeed': 'max_download_speed', \
-            'maxconnections': 'max_connections', 'maxupslots': 'max_upload_slots', \
-            'automanaged': 'auto_managed', 'ratio': 'stop_ratio', 'removeatratio': 'remove_at_ratio', \
-            'addpaused': 'add_paused', 'compact': 'compact_allocation'}
+        self.options = {'maxupspeed': 'max_upload_speed', 'maxdownspeed': 'max_download_speed',
+                        'maxconnections': 'max_connections', 'maxupslots': 'max_upload_slots',
+                        'automanaged': 'auto_managed', 'ratio': 'stop_ratio', 'removeatratio': 'remove_at_ratio',
+                        'addpaused': 'add_paused', 'compact': 'compact_allocation'}
 
     @priority(120)
     def on_process_start(self, feed, config):
-        """Register the usable set: keywords. Detect what version of deluge is loaded. Get pathscrub method from
-        pathscrub plugin if available."""
+        """
+        Detect what version of deluge is loaded.
+        Get pathscrub method from pathscrub plugin if available.
+        """
 
         try:
             self.pathscrub = get_plugin_by_name('pathscrub').instance.scrub
@@ -334,12 +336,6 @@ class OutputDeluge(DelugePlugin):
             log.warning('Deluge plugin cannot clean paths without pathscrub plugin.')
             self.pathscrub = lambda x: x
 
-        set_plugin = get_plugin_by_name('set')
-        set_plugin.instance.register_keys({'path': 'text', 'movedone': 'text', \
-            'queuetotop': 'boolean', 'label': 'text', 'automanaged': 'boolean', \
-            'maxupspeed': 'number', 'maxdownspeed': 'number', 'maxupslots': 'integer', \
-            'maxconnections': 'integer', 'ratio': 'number', 'removeatratio': 'boolean', \
-            'addpaused': 'boolean', 'compact': 'boolean', 'content_filename': 'text', 'main_file_only': 'boolean'})
         if self.deluge12 is None:
             logger = log.info if feed.manager.options.test else log.debug
             try:
@@ -358,8 +354,8 @@ class OutputDeluge(DelugePlugin):
     @priority(120)
     def on_feed_download(self, feed, config):
         """
-            call download plugin to generate the temp files we will load into deluge
-            then verify they are valid torrents
+        Call download plugin to generate the temp files we will load into deluge
+        then verify they are valid torrents
         """
         import deluge.ui.common
         config = self.prepare_config(config)

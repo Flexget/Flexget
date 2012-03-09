@@ -1,7 +1,6 @@
 import os
 import logging
 from flexget.plugin import register_plugin, priority, PluginError, get_plugin_by_name
-from flexget.utils.imdb import extract_id
 from flexget.utils.titles.movie import MovieParser
 
 log = logging.getLogger('exists_movie')

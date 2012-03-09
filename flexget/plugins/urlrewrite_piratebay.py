@@ -86,7 +86,7 @@ class UrlRewritePirateBay(object):
                 continue
             entry = Entry()
             entry['title'] = link.contents[0]
-            entry['url'] = 'http://thepiratebay.org' + link.get('href')
+            entry['url'] = 'http://thepiratebay.se' + link.get('href')
             tds = link.parent.parent.parent.findAll('td')
             entry['torrent_seeds'] = int(tds[-2].contents[0])
             entry['torrent_leeches'] = int(tds[-1].contents[0])

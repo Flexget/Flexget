@@ -1,9 +1,10 @@
 import logging
-from flexget.plugin import *
+from flexget.plugin import register_plugin
 
 log = logging.getLogger("stmusic")
 
-class UrlRewriteSTMusic:
+
+class UrlRewriteSTMusic(object):
     """STMusic urlrewriter."""
 
     def url_rewritable(self, feed, entry):
@@ -12,6 +13,6 @@ class UrlRewriteSTMusic:
     def url_rewrite(self, feed, entry):
         import urllib
         entry['url'] = entry['url'].replace('details.php?id=', 'download.php/')
-        entry['url'] = entry['url'] + '/%s.torrent' % (urllib.quote(entry['title'], safe=''))
+        entry['url'] += '/%s.torrent' % (urllib.quote(entry['title'], safe=''))
 
 register_plugin(UrlRewriteSTMusic, 'stmusic', groups=['urlrewriter'])

@@ -1,7 +1,7 @@
 import logging
 from sqlalchemy import desc
 from flexget.ui.webui import register_plugin, db_session
-from flask import request, render_template, flash, Module
+from flask import render_template, Module
 from flexget.plugin import DependencyError
 
 try:

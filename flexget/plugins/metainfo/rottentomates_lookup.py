@@ -1,5 +1,6 @@
 import logging
 from flexget.plugin import get_plugin_by_name, register_plugin, internet, DependencyError, priority, PluginError
+from flexget.plugin import register_plugin, DependencyError
 from flexget.utils import imdb
 from flexget.utils.log import log_once
 
@@ -59,7 +60,7 @@ class PluginRottenTomatoesLookup(object):
         :param entry: entry to perform lookup on
         :param field: the field to be populated (others may be populated as well)
         :returns: the field value
- 
+
         """
         try:
             self.lookup(entry)

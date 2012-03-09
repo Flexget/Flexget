@@ -1,15 +1,16 @@
-import os
-import time
-import urllib
-import urllib2
 import logging
 import mimetypes
-import hashlib
+import os
 import shutil
 import sys
+import tempfile
+import urllib
+import urllib2
 from cgi import parse_header
 from httplib import BadStatusLine
+
 from requests import RequestException
+
 from flexget.plugin import (register_plugin, register_parser_option, get_plugin_by_name,
                             PluginWarning, PluginError, DependencyError)
 from flexget.utils.tools import decode_html
@@ -71,10 +72,7 @@ class PluginDownload(object):
         return config
 
     def on_process_start(self, feed, config):
-        """Register the usable set keywords, get pathscrub method."""
-        set_plugin = get_plugin_by_name('set')
-        set_plugin.instance.register_keys({'path': 'text'})
-
+        """Get pathscrub method."""
         try:
             self.pathscrub = get_plugin_by_name('pathscrub').instance.scrub
         except DependencyError:
@@ -249,17 +247,14 @@ class PluginDownload(object):
             response.raise_for_status()
             return
 
-        # generate temp file, with random md5 sum ..
-        # url alone is not random enough, it has happened that there are two entries with same url
-        md5_hash = hashlib.md5('%s%s' % (url, time.time())).hexdigest()
+        # download and write data into a temp file
+        # generate temp file using stdlib
         tmp_path = os.path.join(feed.manager.config_base, 'temp')
         if not os.path.isdir(tmp_path):
-            logging.debug('creating tmp_path %s' % tmp_path)
+            log.debug('creating tmp_path %s' % tmp_path)
             os.mkdir(tmp_path)
-        datafile = os.path.join(tmp_path, md5_hash)
-
-        # download and write data into a temp file
-        outfile = open(datafile, 'wb')
+        outfile_fd, datafile = tempfile.mkstemp(dir=tmp_path)
+        outfile = os.fdopen(outfile_fd, 'w')
         try:
             for chunk in response.iter_content(decode_unicode=False):
                 outfile.write(chunk)

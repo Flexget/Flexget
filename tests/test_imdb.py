@@ -75,6 +75,7 @@ class TestImdb(FlexGetBase):
               - {title: 'Crank', imdb_url: 'http://www.imdb.com/title/tt0479884/'}
               - {title: 'The Damned United', imdb_url: 'http://www.imdb.com/title/tt1226271/'}
               - {title: 'Rockstar', imdb_url: 'http://www.imdb.com/title/tt1839596/'}
+              - {title: 'Breakaway', imdb_url: 'http://www.imdb.com/title/tt1736552/'}
             imdb:
               accept_languages:
                 - english
@@ -186,7 +187,10 @@ class TestImdb(FlexGetBase):
         assert not self.feed.find_entry('rejected', title='22 Bullets'), \
             '22 Bullets should have been rejected'
         rockstar = self.feed.find_entry(imdb_name='Rockstar')['imdb_languages']
+        # http://flexget.com/ticket/1399
         assert rockstar == ['hindi'], 'Did not find only primary language'
+        breakaway = self.feed.find_entry(imdb_name='Breakaway')['imdb_languages']
+        assert breakaway == ['punjabi', 'english'], 'Languages were not returned in order of prominence'
 
 
 class TestImdbRequired(FlexGetBase):

@@ -1,5 +1,5 @@
 import logging
-from flexget.plugin import register_plugin, priority
+from flexget.plugin import register_plugin
 
 log = logging.getLogger('sort_by')
 

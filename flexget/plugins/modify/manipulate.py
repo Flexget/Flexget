@@ -43,9 +43,11 @@ class Manipulate(object):
         replace.accept('text', key='format', required=True)
         return root
 
-    def on_feed_start(self, feed):
-        """Separates the config into a dict with a list of jobs per phase."""
-        config = feed.config['manipulate']
+    def on_feed_start(self, feed, config):
+        """
+        Separates the config into a dict with a list of jobs per phase.
+        Allows us to skip phases without any jobs in them.
+        """
         self.phase_jobs = {'filter': [], 'metainfo': []}
         for item in config:
             for item_config in item.itervalues():
@@ -54,22 +56,22 @@ class Manipulate(object):
                 self.phase_jobs[phase].append(item)
 
     @priority(255)
-    def on_feed_metainfo(self, feed):
+    def on_feed_metainfo(self, feed, config):
         if not self.phase_jobs['metainfo']:
             # return if no jobs for this phase
             return
         for entry in feed.entries:
-            self.process(feed, entry, self.phase_jobs['metainfo'])
+            self.process(entry, self.phase_jobs['metainfo'])
 
     @priority(255)
-    def on_feed_filter(self, feed):
+    def on_feed_filter(self, feed, config):
         if not self.phase_jobs['filter']:
             # return if no jobs for this phase
             return
         for entry in feed.entries + feed.rejected:
-            self.process(feed, entry, self.phase_jobs['filter'])
+            self.process(entry, self.phase_jobs['filter'])
 
-    def process(self, feed, entry, jobs):
+    def process(self, entry, jobs):
 
         for item in jobs:
             for field, config in item.iteritems():
@@ -101,4 +103,4 @@ class Manipulate(object):
                 entry[field] = field_value
                 log.verbose('Field `%s` is now `%s`' % (field, entry[field]))
 
-register_plugin(Manipulate, 'manipulate')
+register_plugin(Manipulate, 'manipulate', api_ver=2)

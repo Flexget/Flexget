@@ -380,7 +380,7 @@ def lookup_movie(title=None, year=None, rottentomatoes_id=None, imdb_id=None, sm
     else:
         # Access attributes to force the relationships to eager load before we detach from session
         for attr in ['alternate_ids', 'cast', 'directors', 'genres', 'links', 'posters', 'release_dates']:
-                getattr(movie, attr)
+            getattr(movie, attr)
         session.commit()
         return movie
 

@@ -19,7 +19,7 @@ def dump(entries, debug=False, eval_lazy=False):
         #c = entry.copy()
         #sanitize(c)
         #print yaml.safe_dump(entry)
-        for field in entry:
+        for field in sorted(entry):
             value = invalid
             if entry.is_lazy(field):
                 if eval_lazy:

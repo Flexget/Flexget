@@ -1,6 +1,6 @@
 import logging
 from flexget.entry import Entry
-from flexget.plugin import register_plugin, PluginError, get_plugin_by_name, DependencyError
+from flexget.plugin import register_plugin, get_plugin_by_name, DependencyError
 
 try:
     from flexget.plugins.filter.movie_queue import queue_get
@@ -55,7 +55,6 @@ class EmitIMDBQueue(object):
             else:
                 # normal title
                 entry['title'] = imdb_entry.title
-
 
             # Add the year and quality if configured to
             if config.get('year') and entry.get('movie_year'):

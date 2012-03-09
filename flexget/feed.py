@@ -365,7 +365,7 @@ class Feed(object):
                 (keyword, eue.key, eue.value))
             self.abort()
         except PluginError, err:
-            err.log.critical(err)
+            err.log.critical(err.value)
             self.abort()
         except DependencyError, e:
             log.critical('Plugin `%s` cannot be used because dependency `%s` is missing.' %
