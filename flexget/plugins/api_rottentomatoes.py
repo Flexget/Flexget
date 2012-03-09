@@ -291,24 +291,30 @@ def lookup_movie(title=None, year=None, rottentomatoes_id=None, imdb_id=None, sm
         try:
             # Lookups using imdb_id
             if imdb_id:
+                log.debug('Using IMDB alias %s.' % imdb_id)
                 result = movies_alias(imdb_id, 'imdb')
                 if result:
                     if title and difflib.SequenceMatcher(lambda x: x == ' ', result['title'], title).ratio() < MIN_MATCH:
-                        log.debug('Rotten Tomatoes had an imdb alias for %s but it didn\'t match the title %s.' % (imdb_id, title))
+                        log.warning('Rotten Tomatoes had an imdb alias for %s but it didn\'t match the title %s.' % (imdb_id, title))
                         imdb_id = None
                     elif year and result['year'] != year:
                         log.debug('Rotten Tomatoes had an imdb alias for %s but it didn\'t match the year %s.' % (imdb_id, year))
                         imdb_id = None
                     else:
+                        log.debug('imdb_id %s maps to rt_id %s, checking db for info.' % (imdb_id, result['id']))
                         movie = session.query(RottenTomatoesMovie).filter(RottenTomatoesMovie.id == result.get('id')).first()
                         if movie:
-                            # Movie was in database, but did not have the imdb_id stored, force an update
+                            log.debug('Movie %s was in database, but did not have the imdb_id stored, '
+                                    'forcing an update' % movie)
                             set_movie_details(movie, session, result)
                             session.merge(movie)
                         else:
+                            log.debug('%s was not database, setting info.' % result['title'])
                             movie = RottenTomatoesMovie()
                             set_movie_details(movie, session, result)
                             session.add(movie)
+                else:
+                    log.debug('IMDB alias %s returned no results.' % imdb_id)
             if not movie and rottentomatoes_id:
                 result = movies_info(rottentomatoes_id)
                 if result:
@@ -354,7 +360,7 @@ def lookup_movie(title=None, year=None, rottentomatoes_id=None, imdb_id=None, sm
                                 for r in results:
                                     log.debug('remain: %s (match: %s) %s' % (r['title'], r['match'],
                                         r['id']))
-                                raise PluginError('min_diff')
+                                return None
 
                         alternate_ids = results[0].get('alternate_ids')
                         if alternate_ids:
@@ -367,11 +373,19 @@ def lookup_movie(title=None, year=None, rottentomatoes_id=None, imdb_id=None, sm
                         if not result:
                             result = results[0]
 
-                        movie = RottenTomatoesMovie()
-                        set_movie_details(movie, session, result)
-                        session.add(movie)
-                        if title.lower() != movie.title.lower():
-                            session.merge(RottenTomatoesSearchResult(search=search_string, movie=movie))
+                        movie = session.query(RottenTomatoesMovie).filter(RottenTomatoesMovie.id == result['id']).first()
+                        if movie:
+                            log.warning('Found movie %s in database after search even though we '
+                                'already looked, updating it with search result.' % movie)
+
+                            set_movie_details(movie, session, result)
+                            session.merge(movie)
+                        else:
+                            movie = RottenTomatoesMovie()
+                            set_movie_details(movie, session, result)
+                            session.add(movie)
+                            if title.lower() != movie.title.lower():
+                                session.merge(RottenTomatoesSearchResult(search=search_string, movie=movie))
         except URLError:
             raise PluginError('Error looking up movie from RottenTomatoes')
 
