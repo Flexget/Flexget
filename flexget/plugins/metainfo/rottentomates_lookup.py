@@ -80,10 +80,16 @@ class PluginRottenTomatoesLookup(object):
         """
         imdb_id = entry.get('imdb_id', eval_lazy=False) or \
                   imdb.extract_id(entry.get('imdb_url', eval_lazy=False))
-        movie = lookup_movie(smart_match=entry['title'],
-                             rottentomatoes_id=entry.get('rt_id', eval_lazy=False),
-                             imdb_id=imdb_id,
-                             only_cached=(not search_allowed))
+        if imdb_id:
+            movie = lookup_movie(title=entry.get('movie_name'),
+                                 year=entry.get('movie_year'),
+                                 rottentomatoes_id=entry.get('rt_id', eval_lazy=False),
+                                 imdb_id=imdb_id,
+                                 only_cached=(not search_allowed))
+        else:
+            movie = lookup_movie(smart_match=entry['title'],
+                                 rottentomatoes_id=entry.get('rt_id', eval_lazy=False),
+                                 only_cached=(not search_allowed))
         log.debug(u'Got movie: %s' % movie)
         entry.update_using_map(self.field_map, movie)
 
