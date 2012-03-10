@@ -5,6 +5,7 @@ import difflib
 from sqlalchemy import Table, Column, Integer, String, DateTime, func
 from sqlalchemy.schema import ForeignKey, Index
 from sqlalchemy.orm import relation
+from sqlalchemy.exc import IntegrityError
 from flexget import schema
 from flexget.plugin import internet, PluginError
 from flexget.manager import Session
@@ -231,8 +232,7 @@ def lookup_movie(title=None, year=None, rottentomatoes_id=None, imdb_id=None, sm
         title = title_parser.name
         year = title_parser.year
         if title == '' and not (rottentomatoes_id or imdb_id or title):
-            log.critical('Failed to parse name from %s' % raw_name)
-            return None
+            raise PluginError('Failed to parse name from %s' % raw_name)
 
     if title:
         search_string = title.lower()
@@ -360,7 +360,7 @@ def lookup_movie(title=None, year=None, rottentomatoes_id=None, imdb_id=None, sm
                                 for r in results:
                                     log.debug('remain: %s (match: %s) %s' % (r['title'], r['match'],
                                         r['id']))
-                                return None
+                                raise PluginError('min_diff')
 
                         alternate_ids = results[0].get('alternate_ids')
                         if alternate_ids:
@@ -373,19 +373,18 @@ def lookup_movie(title=None, year=None, rottentomatoes_id=None, imdb_id=None, sm
                         if not result:
                             result = results[0]
 
-                        movie = session.query(RottenTomatoesMovie).filter(RottenTomatoesMovie.id == result['id']).first()
-                        if movie:
+                        movie = RottenTomatoesMovie()
+                        set_movie_details(movie, session, result)
+                        try:
+                            session.add(movie)
+                        except IntegrityError:
                             log.warning('Found movie %s in database after search even though we '
                                 'already looked, updating it with search result.' % movie)
-
-                            set_movie_details(movie, session, result)
                             session.merge(movie)
-                        else:
-                            movie = RottenTomatoesMovie()
-                            set_movie_details(movie, session, result)
-                            session.add(movie)
-                            if title.lower() != movie.title.lower():
-                                session.merge(RottenTomatoesSearchResult(search=search_string, movie=movie))
+
+                        if title.lower() != movie.title.lower():
+                            log.debug('Saving search result for \'%s\'' % search_string)
+                            session.add(RottenTomatoesSearchResult(search=search_string, movie=movie))
         except URLError:
             raise PluginError('Error looking up movie from RottenTomatoes')
 
