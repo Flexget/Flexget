@@ -333,13 +333,14 @@ def lookup_movie(title=None, year=None, rottentomatoes_id=None, imdb_id=None, sm
                         results.sort(key=lambda x: x['match'], reverse=True)
 
                         # Remove all movies below MIN_MATCH, and different year
-                        for movie_res in results:
-                            if year and movie_res.get('year') != year:
-                                log.debug('removing %s - %s (wrong year: %s)' % (movie_res['title'],
-                                    movie_res['id'], str(movie_res['year'])))
-                                results.remove(movie_res)
-                                continue
-                            if movie_res.get('match') < MIN_MATCH:
+                        for movie_res in results[:]:
+                            if year and movie_res.get('year'):
+                                if movie_res['year'] != year:
+                                    log.debug('removing %s - %s (wrong year: %s)' % (movie_res['title'],
+                                        movie_res['id'], str(movie_res['year'])))
+                                    results.remove(movie_res)
+                                    continue
+                            if movie_res['match'] < MIN_MATCH:
                                 log.debug('removing %s (min_match)' % movie_res['title'])
                                 results.remove(movie_res)
                                 continue
