@@ -277,7 +277,7 @@ def lookup_movie(title=None, year=None, rottentomatoes_id=None, imdb_id=None, sm
                     result = movies_alias(imdb_id, 'imdb')
                 else:
                     result = movies_info(movie.id)
-                get_movie_details(movie, session, result)
+                set_movie_details(movie, session, result)
                 session.merge(movie)
             except URLError:
                 log.error('Error refreshing movie details from Rotten Tomatoes, cached info being used.')
