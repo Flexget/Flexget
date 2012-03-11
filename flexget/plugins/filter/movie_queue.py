@@ -195,6 +195,25 @@ def queue_del(what, session=None):
 
 
 @with_session
+def queue_forget(what, session=None):
+    """Cause queue to 'forget' given item was downloaded. `what` can be any string accepted by `parse_what`"""
+
+    item = None
+    for key, value in parse_what(what, lookup=False).iteritems():
+        if value:
+            item = session.query(QueuedMovie).filter(getattr(QueuedMovie, key) == value).first()
+            break
+    if item:
+        title = item.title
+        if not item.downloaded:
+            raise QueueError('%s is not marked as downloaded' % title)
+        item.downloaded = None
+        return title
+    else:
+        raise QueueError('%s is not in the queue' % what)
+
+
+@with_session
 def queue_edit(imdb_id, quality, session=None):
     """Change the required quality for a movie in the queue"""
     quality = validate_quality(quality)

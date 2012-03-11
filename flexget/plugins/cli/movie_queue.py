@@ -6,13 +6,13 @@ from flexget.utils.tools import console, str_to_boolean
 from flexget.plugin import DependencyError, register_plugin, register_parser_option
 
 try:
-    from flexget.plugins.filter.movie_queue import QueueError, queue_add, queue_del, queue_get, parse_what
+    from flexget.plugins.filter.movie_queue import QueueError, queue_add, queue_del, queue_get, queue_forget, parse_what
 except ImportError:
     raise DependencyError(issued_by='cli_movie_queue', missing='movie_queue')
 
 log = logging.getLogger('cli_movie_queue')
 
-USAGE = '(add|del|list|downloaded|clear) [NAME|IMDB_ID|tmdb_id=TMDB_ID] [QUALITY] [FORCE]'
+USAGE = '(add|del|forget|list|downloaded|clear) [NAME|IMDB_ID|tmdb_id=TMDB_ID] [QUALITY] [FORCE]'
 
 
 class MovieQueueManager(object):
@@ -29,7 +29,7 @@ class MovieQueueManager(object):
             raise usage_error
 
         options['action'] = parser.rargs[0].lower()
-        if options['action'] not in ('add', 'del', 'list', 'downloaded', 'clear'):
+        if options['action'] not in ('add', 'del', 'forget', 'list', 'downloaded', 'clear'):
             raise usage_error
 
         if len(parser.rargs) == 1:
@@ -85,6 +85,15 @@ class MovieQueueManager(object):
                 console(e.message)
             else:
                 console('Removed %s from queue' % title)
+            return
+
+        if options['action'] == 'forget':
+            try:
+                title = queue_forget(options['what'])
+            except QueueError, e:
+                console(e.message)
+            else:
+                console('Marked %s as undownloaded' % title)
             return
 
         # Adding to queue requires a lookup for missing information
