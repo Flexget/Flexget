@@ -375,12 +375,15 @@ def lookup_movie(title=None, year=None, rottentomatoes_id=None, imdb_id=None, sm
                             result = results[0]
 
                         movie = RottenTomatoesMovie()
-                        set_movie_details(movie, session, result)
                         try:
+                            set_movie_details(movie, session, result)
                             session.add(movie)
                         except IntegrityError:
                             log.warning('Found movie %s in database after search even though we '
                                 'already looked, updating it with search result.' % movie)
+                            session.rollback()
+                            movie = session.query(RottenTomatoesMovie).filter(RottenTomatoesMovie.id == result['id']).first()
+                            set_movie_details(movie, session, result)
                             session.merge(movie)
 
                         if title.lower() != movie.title.lower():
