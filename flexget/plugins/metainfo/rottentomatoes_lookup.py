@@ -81,8 +81,8 @@ class PluginRottenTomatoesLookup(object):
         imdb_id = entry.get('imdb_id', eval_lazy=False) or \
                   imdb.extract_id(entry.get('imdb_url', eval_lazy=False))
         if imdb_id:
-            movie = lookup_movie(title=entry.get('movie_name'),
-                                 year=entry.get('movie_year'),
+            movie = lookup_movie(title=entry.get('imdb_name'),
+                                 year=entry.get('imdb_year'),
                                  rottentomatoes_id=entry.get('rt_id', eval_lazy=False),
                                  imdb_id=imdb_id,
                                  only_cached=(not search_allowed))
