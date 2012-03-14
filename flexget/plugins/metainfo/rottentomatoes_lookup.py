@@ -23,8 +23,8 @@ class PluginRottenTomatoesLookup(object):
     field_map = {
         'rt_name': 'title',
         'rt_id': 'id',
-        'imdb_id': lambda movie: movie.alternate_ids and 'tt' + filter(lambda alt_id: alt_id.name == 'imdb',
-            movie.alternate_ids)[0].id,
+        'imdb_id': lambda movie: (movie.alternate_ids and 'tt' + filter(lambda alt_id: alt_id.name == 'imdb',
+            movie.alternate_ids)[0].id) or None,
         'rt_year': 'year',
         'rt_genres': lambda movie: movie.genres and [genre.name for genre in movie.genres],
         'rt_mpaa_rating': 'mpaa_rating',
