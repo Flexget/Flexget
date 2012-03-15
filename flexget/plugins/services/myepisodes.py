@@ -42,8 +42,8 @@ class MyEpisodes(object):
     Marks a series episode as acquired in your myepisodes.com account.
 
     Simple Example:
-    
-    Most shows are recognized automatically from their TVDBname. 
+
+    Most shows are recognized automatically from their TVDBname.
     And of course the plugin needs to know your MyEpisodes.com account details.
 
     feeds:
@@ -56,10 +56,10 @@ class MyEpisodes(object):
          - chuck
 
     Advanced Example:
-    
-    In some cases, the TVDB name is either not unique or won't even be discovered. 
+
+    In some cases, the TVDB name is either not unique or won't even be discovered.
     In that case you need to specify the MyEpisodes id manually using the set plugin.
-    
+
     feeds:
       tvshows:
         myepisodes:
@@ -115,12 +115,12 @@ class MyEpisodes(object):
 
     def lookup_myepisodes_id(self, entry, opener, session):
         """Populates myepisodes_id field for an entry, and returns the id.
-        
+
         Call will also set entry field `myepisode_id` if successful.
-        
+
         Return:
             myepisode id
-        
+
         Raises:
             LookupError if entry does not have field series_name
         """
@@ -163,7 +163,7 @@ class MyEpisodes(object):
             myepisodes_id = matchObj.group(1)
             db_item = session.query(MyEpisodesInfo).filter(MyEpisodesInfo.myepisodes_id == myepisodes_id).first()
             if db_item:
-                log.info('Changing name to `%s` for series with myepisodes_id %s' % 
+                log.info('Changing name to `%s` for series with myepisodes_id %s' %
                     (series_name.lower(), myepisodes_id))
                 db_item.series_name = series_name.lower()
             else:
@@ -173,20 +173,20 @@ class MyEpisodes(object):
 
     def mark_episode(self, feed, entry, opener):
         """Mark episode as acquired.
-        
+
         Required entry fields:
             - series_name
             - series_season
             - series_episode
-            
+
         Raises:
             PluginWarning if operation fails
-        """    
+        """
 
         if 'series_season' not in entry or 'series_episode' not in entry or 'series_name' not in entry:
             raise PluginWarning('Can\'t mark entry `%s` in myepisodes without series_season, series_episode and series_name fields' %
                 entry['title'], log)
-        
+
         if not self.lookup_myepisodes_id(entry, opener, session=feed.session):
             raise PluginWarning('Couldn\'t get myepisodes id for `%s`' % entry['title'], log)
 
@@ -197,7 +197,7 @@ class MyEpisodes(object):
         if feed.manager.options.test:
             log.info('Would mark %s of `%s` as acquired.' % (entry['series_id'], entry['series_name']))
         else:
-            baseurl2 = urllib2.Request('http://myepisodes.com/myshows.php?action=Update&showid=%s&season=%s&episode=%s&seen=0' % 
+            baseurl2 = urllib2.Request('http://myepisodes.com/myshows.php?action=Update&showid=%s&season=%s&episode=%s&seen=0' %
                 (myepisodes_id, season, episode))
             opener.open(baseurl2)
             log.info('Marked %s of `%s` as acquired.' % (entry['series_id'], entry['series_name']))

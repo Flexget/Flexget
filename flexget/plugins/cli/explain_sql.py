@@ -17,7 +17,7 @@ class Explain(Executable, ClauseElement):
     def __init__(self, stmt):
         self.statement = _literal_as_text(stmt)
 
-        
+
 @compiles(Explain)
 def explain(element, compiler, **kw):
     text = 'EXPLAIN QUERY PLAN ' + compiler.process(element.statement)
@@ -25,7 +25,7 @@ def explain(element, compiler, **kw):
 
 
 class ExplainQuery(Query):
-    
+
     def __iter__(self):
         log.info('Query:\n\t%s' % unicode(self).replace('\n', '\n\t'))
         explain = self.session.execute(Explain(self)).fetchall()
@@ -40,11 +40,11 @@ class ExplainQuery(Query):
 def register_sql_explain(man):
     if man.options.explain_sql:
         maininit = manager.Session.__init__
-        
+
         def init(*args, **kwargs):
             kwargs['query_cls'] = ExplainQuery
             return maininit(*args, **kwargs)
-        
+
         manager.Session.__init__ = init
 
 

@@ -68,7 +68,7 @@ class StringComparator(SequenceMatcher, object):
     def set_seq1(self, a):
         """Set first string for comparison."""
         SequenceMatcher.set_seq1(self, self.cleaner(a))
-        
+
     def set_seq2(self, b):
         """Set second string for comparison."""
         SequenceMatcher.set_seq2(self, self.cleaner(b))
@@ -157,5 +157,5 @@ def torrent_availability(seeds, leeches):
     :param leeches: Number of leeches on the torrent
     :return: A numeric rating
     """
-    
+
     return seeds * 2 + leeches
