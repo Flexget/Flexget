@@ -294,7 +294,8 @@ def lookup_movie(title=None, year=None, rottentomatoes_id=None, imdb_id=None, sm
                 log.debug('Using IMDB alias %s.' % imdb_id)
                 result = movies_alias(imdb_id, 'imdb')
                 if result:
-                    if title and difflib.SequenceMatcher(lambda x: x == ' ', result['title'], title).ratio() < MIN_MATCH:
+                    if title and difflib.SequenceMatcher(lambda x: x == ' ', result['title'].lower(),
+                            title.lower()).ratio() < MIN_MATCH:
                         log.warning('Rotten Tomatoes had an imdb alias for %s but it didn\'t match the title %s.' % (imdb_id, title))
                         imdb_id = None
                     elif year and result['year'] != year:
@@ -328,7 +329,8 @@ def lookup_movie(title=None, year=None, rottentomatoes_id=None, imdb_id=None, sm
                     results = results.get('movies')
                     if results:
                         for movie_res in results:
-                            seq = difflib.SequenceMatcher(lambda x: x == ' ', movie_res['title'], title)
+                            seq = difflib.SequenceMatcher(lambda x: x == ' ',
+                                    movie_res['title'].lower(), title.lower())
                             movie_res['match'] = seq.ratio()
                         results.sort(key=lambda x: x['match'], reverse=True)
 
