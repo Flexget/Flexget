@@ -1,3 +1,4 @@
+import time
 from datetime import datetime, timedelta
 import logging
 from urllib2 import URLError
@@ -299,9 +300,18 @@ def lookup_movie(title=None, year=None, rottentomatoes_id=None, imdb_id=None, sm
                         log.warning('Rotten Tomatoes had an imdb alias for %s but it didn\'t match the title %s.' % (imdb_id, title))
                         imdb_id = None
                     elif year and result['year'] != year:
-                        log.debug('Rotten Tomatoes had an imdb alias for %s but it didn\'t match the year %s.' % (imdb_id, year))
-                        imdb_id = None
-                    else:
+                        release_year = False
+                        if result.get('release_dates', {}).get('theater'):
+                            log.debug('Checking year against theater release date')
+                            release_year = time.strptime(result['release_dates'].get('theater'), '%Y-%m-%d').tm_year
+                        elif result.get('release_dates', {}).get('dvd'):
+                            log.debug('Checking year against dvd release date')
+                            release_year = time.strptime(result['release_dates'].get('dvd'), '%Y-%m-%d').tm_year
+                        if not (release_year and release_year == year):
+                            log.debug('Rotten Tomatoes had an imdb alias for %s but it didn\'t '\
+                                'match the year %s.' % (imdb_id, (release_year or year)))
+                            imdb_id = None
+                    if imdb_id:
                         log.debug('imdb_id %s maps to rt_id %s, checking db for info.' % (imdb_id, result['id']))
                         movie = session.query(RottenTomatoesMovie).filter(RottenTomatoesMovie.id == result.get('id')).first()
                         if movie:
@@ -336,10 +346,18 @@ def lookup_movie(title=None, year=None, rottentomatoes_id=None, imdb_id=None, sm
 
                         # Remove all movies below MIN_MATCH, and different year
                         for movie_res in results[:]:
-                            if year and movie_res.get('year'):
-                                if movie_res['year'] != year:
+
+                            if year and movie_res.get('year') and movie_res['year'] != year:
+                                release_year = False
+                                if movie_res.get('release_dates', {}).get('theater'):
+                                    log.debug('Checking year against theater release date')
+                                    release_year = time.strptime(movie_res['release_dates'].get('theater'), '%Y-%m-%d').tm_year
+                                elif movie_res.get('release_dates', {}).get('dvd'):
+                                    log.debug('Checking year against dvd release date')
+                                    release_year = time.strptime(movie_res['release_dates'].get('dvd'), '%Y-%m-%d').tm_year
+                                if not (release_year and release_year == year):
                                     log.debug('removing %s - %s (wrong year: %s)' % (movie_res['title'],
-                                        movie_res['id'], str(movie_res['year'])))
+                                        movie_res['id'], str(release_year or movie_res['year'])))
                                     results.remove(movie_res)
                                     continue
                             if movie_res['match'] < MIN_MATCH:
