@@ -2,6 +2,8 @@ import logging
 from sqlalchemy import Column, Integer, String
 from flexget.manager import Base, Session
 from flexget.event import event
+from flexget.utils.database import with_session
+from flexget.utils.sqlalchemy_utils import table_schema
 
 log = logging.getLogger('schema')
 
@@ -106,6 +108,27 @@ def upgrade(plugin):
 
         return upgrade_wrapper
     return upgrade_decorator
+
+
+@with_session
+def reset_schema(plugin, session=None):
+    """
+    Removes all tables from given plugin from the database, as well as removing current stored schema number.
+
+    :param plugin: The plugin whose schema should be reset
+    """
+    if plugin not in plugin_schemas:
+        raise ValueError('The plugin %s has no stored schema to reset.' % plugin)
+    table_names = plugin_schemas[plugin].get('tables', [])
+    tables = [table_schema(name, session) for name in table_names]
+    # Remove the plugin's tables
+    for table in tables:
+        table.drop()
+    # Remove the plugin from schema table
+    session.query(PluginSchema).filter(PluginSchema.plugin == plugin).delete()
+    # Create new empty tables
+    Base.metadata.create_all(bind=session.bind)
+    session.commit()
 
 
 def register_plugin_table(tablename, plugin, version):
