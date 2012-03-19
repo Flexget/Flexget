@@ -4,7 +4,7 @@ import time
 from copy import copy
 from datetime import datetime, timedelta
 from sqlalchemy import (Column, Integer, String, Unicode, DateTime, Boolean,
-                        desc, select, update, ForeignKey, Index, func)
+                        desc, select, update, ForeignKey, Index, func, and_)
 from sqlalchemy.orm import relation, join
 from sqlalchemy.ext.hybrid import Comparator, hybrid_property
 from sqlalchemy.exc import OperationalError
@@ -20,7 +20,7 @@ from flexget.manager import Session
 from flexget.plugin import (register_plugin, register_parser_option, get_plugin_by_name, get_plugin_keywords,
     PluginWarning, DependencyError, priority)
 
-SCHEMA_VER = 5
+SCHEMA_VER = 6
 
 log = logging.getLogger('series')
 Base = schema.versioned_base('series', SCHEMA_VER)
@@ -93,6 +93,16 @@ def upgrade(ver, session):
                     'been added, `date` and `sequence`. In addition, if you are using auto identified_by, it will'
                     'be relearned based on upcoming episodes.')
         ver = 5
+    if ver == 5:
+        # Episode advancement now relies on identified_by being filled for the episodes.
+        # This action retroactively marks 'ep' mode for all episodes where the series is already in 'ep' mode.
+        series_table = table_schema('series', session)
+        ep_table = table_schema('series_episodes', session)
+        ep_mode_series = select([series_table.c.id], series_table.c.identified_by == 'ep')
+        where_clause = and_(ep_table.c.series_id.in_(ep_mode_series),
+            ep_table.c.season != None, ep_table.c.number != None, ep_table.c.identified_by == None)
+        session.execute(update(ep_table, where_clause, {'identified_by': 'ep'}))
+        ver = 6
 
     return ver
 
