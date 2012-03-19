@@ -108,7 +108,7 @@ class Quality(object):
 UNKNOWN = Quality(0, 'unknown')
 
 # Reminder, Quality regexps are automatically surrounded!
-re_rc_or_r5 = 'rc|r5'
+re_region = 'r[3-8c]'
 re_webdl = 'web[\W_]?dl'
 re_720p = '(?:1280x)?720p?'
 re_1080p = '(?:1920x)?1080p?'
@@ -116,23 +116,23 @@ re_bluray = '(?:b[dr][\W_]?rip|bluray(?:[\W_]?rip)?)'
 re_10bit = '(10.?bit|hi10p)'
 
 # TODO: this should be marked as private (_qualities), not sure if it used from other places though
-qualities = [Quality(1200, '1080p bluray 10bit', [re_1080p, re_bluray, re_10bit], none_of=[re_rc_or_r5]),
-             Quality(1100, '1080p bluray', [re_1080p, re_bluray], none_of=[re_rc_or_r5]),
+qualities = [Quality(1200, '1080p bluray 10bit', [re_1080p, re_bluray, re_10bit], none_of=[re_region]),
+             Quality(1100, '1080p bluray', [re_1080p, re_bluray], none_of=[re_region]),
              Quality(1000, '1080p web-dl', [re_1080p, re_webdl]),
-             Quality(850, '1080p 10bit', [re_1080p, re_10bit], none_of=[re_bluray, re_rc_or_r5]),
-             Quality(800, '1080p', [re_1080p], none_of=[re_bluray, re_rc_or_r5]),
+             Quality(850, '1080p 10bit', [re_1080p, re_10bit], none_of=[re_bluray, re_region]),
+             Quality(800, '1080p', [re_1080p], none_of=[re_bluray, re_region]),
              Quality(750, '1080i'),
-             Quality(670, '720p bluray 10bit', [re_720p, re_bluray, re_10bit], none_of=[re_rc_or_r5]),
-             Quality(650, '720p bluray', [re_720p, re_bluray], none_of=[re_rc_or_r5, re_10bit]),
+             Quality(670, '720p bluray 10bit', [re_720p, re_bluray, re_10bit], none_of=[re_region]),
+             Quality(650, '720p bluray', [re_720p, re_bluray], none_of=[re_region, re_10bit]),
              Quality(600, '720p web-dl', [re_720p, re_webdl]),
-             Quality(520, '720p 10bit', [re_720p, re_10bit], none_of=[re_bluray, re_rc_or_r5]),
-             Quality(500, '720p', [re_720p], none_of=[re_bluray, re_rc_or_r5, re_10bit]),
+             Quality(520, '720p 10bit', [re_720p, re_10bit], none_of=[re_bluray, re_region]),
+             Quality(500, '720p', [re_720p], none_of=[re_bluray, re_region, re_10bit]),
              Quality(450, '720i'),
-             Quality(430, '1080p bluray rc', [re_1080p, re_bluray, re_rc_or_r5]),
-             Quality(420, '720p bluray rc', [re_720p, re_bluray, re_rc_or_r5]),
+             Quality(430, '1080p bluray rc', [re_1080p, re_bluray, re_region]),
+             Quality(420, '720p bluray rc', [re_720p, re_bluray, re_region]),
              Quality(400, 'hr'),
-             Quality(380, 'bdrip', [re_bluray], none_of=[re_rc_or_r5]),
-             Quality(350, 'dvdrip', ['dvd(?:[\W_]?rip)?'], none_of=[re_rc_or_r5]),
+             Quality(380, 'bdrip', [re_bluray], none_of=[re_region]),
+             Quality(350, 'dvdrip', ['dvd(?:[\W_]?rip)?'], none_of=[re_region]),
              Quality(320, 'web-dl', [re_webdl]),
              Quality(315, '576p', ['576p?']),
              Quality(310, '480p 10bit', ['480p?', re_10bit]),
@@ -140,12 +140,12 @@ qualities = [Quality(1200, '1080p bluray 10bit', [re_1080p, re_bluray, re_10bit]
              Quality(290, '368p', ['368p?']),
              Quality(280, '360p'), # I don't think we want to make trailing p optional here (ie. xbox 360)
              Quality(270, 'hdtv', ['hdtv(?:[\W_]?rip)?']),
-             Quality(260, 'dvdrip r5', ['dvd(?:[\W_]?rip)?', re_rc_or_r5]),
+             Quality(260, 'dvdrip r5', ['dvd(?:[\W_]?rip)?', re_region]),
              Quality(250, 'bdscr'),
              Quality(240, 'dvdscr'),
              Quality(100, 'sdtv', ['(?:[sp]dtv|dvb)(?:[\W_]?rip)?|(?:t|pp)v[\W_]?rip']),
              Quality(80, 'dsr', ['dsr|(?:ds|web)[\W_]?rip']),
-             Quality(50, 'r5'),
+             Quality(50, 'r5', [re_region]),
              Quality(40, 'tc'),
              Quality(30, 'preair'),
              Quality(25, 'ts', ['ts|telesync']),
