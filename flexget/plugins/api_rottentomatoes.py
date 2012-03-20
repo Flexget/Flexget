@@ -1,5 +1,6 @@
 import time, re, logging, difflib
 from datetime import datetime, timedelta
+from math import fabs
 from urllib2 import URLError
 from sqlalchemy import Table, Column, Integer, String, DateTime, func
 from sqlalchemy.schema import ForeignKey, Index
@@ -315,24 +316,27 @@ def lookup_movie(title=None, year=None, rottentomatoes_id=None, imdb_id=None, sm
                 log.debug('Using IMDB alias %s.' % imdb_id)
                 result = movies_alias(imdb_id, 'imdb')
                 if result:
-                    mismatch = False
+                    mismatch = []
                     if title and difflib.SequenceMatcher(lambda x: x == ' ', re.sub('\s+\(.*\)$','', result['title'].lower()),
                             title.lower()).ratio() < MIN_MATCH:
-                        log.warning('Rotten Tomatoes had an imdb alias for %s but it didn\'t match the title %s.' % (imdb_id, title))
-                        mismatch = True
-                    if year and result['year'] != year:
-                        release_year = False
+                        mismatch.append('the title (%s <-?-> %s)' % (title,result['title']))
+                    if year and fabs(result['year'] - year) > 1:
+                        mismatch.append('the year (%s <-?-> %s)' % (year,result['year']))
+                        release_year = None
                         if result.get('release_dates', {}).get('theater'):
                             log.debug('Checking year against theater release date')
                             release_year = time.strptime(result['release_dates'].get('theater'), '%Y-%m-%d').tm_year
+                            if fabs(release_year - year) > 1:
+                                mismatch.append('the theater release (%s)' % release_year)
                         elif result.get('release_dates', {}).get('dvd'):
                             log.debug('Checking year against dvd release date')
                             release_year = time.strptime(result['release_dates'].get('dvd'), '%Y-%m-%d').tm_year
-                        if not (release_year and release_year == year):
-                            log.warning('Rotten Tomatoes had an imdb alias for %s but it didn\'t '\
-                                'match the year %s.' % (imdb_id, (release_year or year)))
-                            mismatch = True
-                    if not mismatch:
+                            if fabs(release_year - year) > 1:
+                                mismatch.append('the DVD release (%s)' % release_year)
+                    if mismatch:
+                        log.warning('Rotten Tomatoes had an imdb alias for %s but it didn\'t match %s.' % \
+                            (imdb_id, ', or '.join(mismatch)))
+                    else:
                         log.debug('imdb_id %s maps to rt_id %s, checking db for info.' % (imdb_id, result['id']))
                         movie = session.query(RottenTomatoesMovie).filter(RottenTomatoesMovie.id == result.get('id')).first()
                         if movie:
