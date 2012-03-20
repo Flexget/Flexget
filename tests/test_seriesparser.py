@@ -547,3 +547,18 @@ class TestSeriesParser(object):
         s = self.parse(name=u'abc äää abc', data=u'abc.äää.abc.s01e02')
         assert s.season == 1
         assert s.episode == 2
+
+    def test_parentheticals(self):
+        s = SeriesParser('The Show (US)')
+        # Make sure US is ok outside of parentheses
+        s.parse('The.Show.US.S01E01')
+        assert s.valid
+        # Make sure US is ok inside parentheses
+        s.parse('The Show (US) S01E01')
+        assert s.valid
+        # Make sure it works without US
+        s.parse('The.Show.S01E01')
+        assert s.valid
+        # Make sure it doesn't work with a different country
+        s.parse('The Show (UK) S01E01')
+        assert not s.valid

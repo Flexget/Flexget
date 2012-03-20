@@ -142,17 +142,25 @@ class SeriesParser(TitleParser):
 
     def name_to_re(self, name):
         """Convert 'foo bar' to '^[^...]*foo[^...]*bar[^...]+"""
-        # TODO: Still doesn't handle the case where the user wants
-        # "Schmost" and the feed contains "Schmost at Sea".
-        blank = r'[\W_]'
+        parenthetical = None
+        if name.endswith(')'):
+            p_start = name.rfind('(')
+            if p_start != -1:
+                parenthetical = name[p_start + 1:-1]
+                name = name[:p_start - 1]
+        # Blanks are any non word characters except & and _
+        blank = r'(?:[^\w&]|_)'
         ignore = '(?:' + '|'.join(self.ignore_prefixes) + ')?'
-        # accept either '&' or 'and'
-        name = name.replace('&', '(?:and|&)')
         res = re.sub(re.compile(blank + '+', re.UNICODE), ' ', name)
         res = res.strip()
-        # check for 'and' surrounded by spaces so it is not replaced within a word or from above replacement
-        res = res.replace(' and ', ' (?:and|&) ')
+        # accept either '&' or 'and'
+        res = re.sub(' (&|and) ', ' (?:and|&) ', res, re.UNICODE)
         res = re.sub(' +', blank + '*', res, re.UNICODE)
+        if parenthetical:
+            res += '(?:' + blank + '+' + parenthetical + ')?'
+            # Turn on exact mode for series ending with a parenthetical,
+            # so that 'Show (US)' is not accepted as 'Show (UK)'
+            self.strict_name = True
         res = '^' + ignore + blank + '*' + '(' + res + ')' + blank + '+'
         return res
 
@@ -182,7 +190,7 @@ class SeriesParser(TitleParser):
         # regexp name matching
         if not self.name_regexps:
             # if we don't have name_regexps, generate one from the name
-            self.name_regexps = ReList([self.name_to_re(name)])
+            self.name_regexps = ReList([self.name_to_re(self.name)])
             self.re_from_name = True
         # try all specified regexps on this data
         for name_re in self.name_regexps:
