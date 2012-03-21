@@ -77,7 +77,7 @@ def filter_formatdate(val, format):
     """Returns a string representation of a datetime object according to format string."""
     if not isinstance(val, (datetime, date, time)):
         return val
-    return val.strftime(format)
+    return val.strftime(format.encode('utf-8')).decode('utf-8')
 
 
 def filter_parsedate(val):
