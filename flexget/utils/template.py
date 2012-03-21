@@ -75,9 +75,10 @@ def filter_re_search(val, pattern):
 
 def filter_formatdate(val, format):
     """Returns a string representation of a datetime object according to format string."""
+    encoding = locale.getpreferredencoding()
     if not isinstance(val, (datetime, date, time)):
         return val
-    return val.strftime(format.encode('utf-8')).decode('utf-8')
+    return val.strftime(format.encode(encoding)).decode(encoding)
 
 
 def filter_parsedate(val):
