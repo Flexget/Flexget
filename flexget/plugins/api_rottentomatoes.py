@@ -1,4 +1,7 @@
-import time, re, logging, difflib
+import time
+import re
+import logging
+import difflib
 from datetime import datetime, timedelta
 from math import fabs
 from urllib2 import URLError
@@ -317,11 +320,11 @@ def lookup_movie(title=None, year=None, rottentomatoes_id=None, imdb_id=None, sm
                 result = movies_alias(imdb_id, 'imdb')
                 if result:
                     mismatch = []
-                    if title and difflib.SequenceMatcher(lambda x: x == ' ', re.sub('\s+\(.*\)$','', result['title'].lower()),
+                    if title and difflib.SequenceMatcher(lambda x: x == ' ', re.sub('\s+\(.*\)$', '', result['title'].lower()),
                             title.lower()).ratio() < MIN_MATCH:
-                        mismatch.append('the title (%s <-?-> %s)' % (title,result['title']))
+                        mismatch.append('the title (%s <-?-> %s)' % (title, result['title']))
                     if year and fabs(result['year'] - year) > 1:
-                        mismatch.append('the year (%s <-?-> %s)' % (year,result['year']))
+                        mismatch.append('the year (%s <-?-> %s)' % (year, result['year']))
                         release_year = None
                         if result.get('release_dates', {}).get('theater'):
                             log.debug('Checking year against theater release date')
