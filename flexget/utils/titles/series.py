@@ -451,7 +451,7 @@ class SeriesParser(TitleParser):
                     season = int(season)
                     if not episode.isdigit():
                         try:
-                            idx = self.english_numbers.index(str(episode))
+                            idx = self.english_numbers.index(str(episode).lower())
                             episode = 1 + idx
                         except ValueError:
                             episode = self.roman_to_int(episode)
