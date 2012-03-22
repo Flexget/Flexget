@@ -458,7 +458,7 @@ class SeriesParser(TitleParser):
                     else:
                         episode = int(episode)
                 except ValueError:
-                    log.critical('Invalid episode number match %s returned with regexp `%s`' % (match.groups(), ep_re.pattern))
+                    log.critical('Invalid episode number match %s returned with regexp `%s` for %s' % (match.groups(), ep_re.pattern, self.data))
                     raise
                 end_episode = None
                 if len(matches) == 3 and matches[2]:
