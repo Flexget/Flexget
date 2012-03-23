@@ -27,9 +27,9 @@ class TestRottenTomatoesLookup(FlexGetBase):
     def test_rottentomatoes_lookup(self):
         self.execute_feed('test')
         # check that these were created
-        assert self.feed.find_entry(rt_name='Toy Story', rt_year=1995, rt_id=9559),\
+        assert self.feed.find_entry(rt_name='Toy Story', rt_year=1995, rt_id=9559, imdb_id='tt0114709'),\
                 'Didn\'t populate RT info for Toy Story'
-        assert self.feed.find_entry(rt_name='The Matrix', rt_year=1999, rt_id=12897), \
+        assert self.feed.find_entry(rt_name='The Matrix', rt_year=1999, rt_id=12897,imdb_id='tt0133093'), \
                 'Didn\'t populate RT info for The Matrix'
         assert self.feed.find_entry(rt_name='Star Wars: Episode I - The Phantom Menace',
                 rt_year=1999, rt_id=10008),\

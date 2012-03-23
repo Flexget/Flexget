@@ -23,15 +23,16 @@ class PluginRottenTomatoesLookup(object):
     field_map = {
         'rt_name': 'title',
         'rt_id': 'id',
-        'imdb_id': lambda movie: movie.alternate_ids and 'tt' + filter(lambda alt_id: alt_id.name == 'imdb',
-            movie.alternate_ids)[0].id,
+        'imdb_id': lambda movie: ('tt' + filter(lambda alt_id: alt_id.name == 'imdb',
+            movie.alternate_ids)[0].id) if filter(lambda alt_id: alt_id.name ==
+                'imdb', movie.alternate_ids) else None,
         'rt_year': 'year',
         'rt_genres': lambda movie: movie.genres and [genre.name for genre in movie.genres],
         'rt_mpaa_rating': 'mpaa_rating',
         'rt_runtime': 'runtime',
         'rt_critics_consensus': 'critics_consensus',
-        'rt_releases': lambda movie: movie.release_dates and dict((release.name, release.date) for release in
-            movie.release_dates),
+        'rt_releases': lambda movie: movie.release_dates and dict((release.name, release.date) for
+            release in movie.release_dates),
         'rt_critics_rating': 'critics_rating',
         'rt_critics_score': 'critics_score',
         'rt_audience_rating': 'audience_rating',
@@ -42,8 +43,8 @@ class PluginRottenTomatoesLookup(object):
         'rt_actors': lambda movie: movie.cast and [actor.name for actor in movie.cast],
         'rt_directors': lambda movie: movie.directors and [director.name for director in movie.directors],
         'rt_studio': 'studio',
-        'rt_alternate_ids': lambda movie: movie.alternate_ids and (dict((alt_id.name, alt_id.id) for
-            alt_id in movie.alternate_ids)),
+        'rt_alternate_ids': lambda movie: movie.alternate_ids and (dict((alt_id.name, alt_id.id)
+            for alt_id in movie.alternate_ids)),
         'rt_url': lambda movie: movie.links and filter(lambda link: link.name == 'alternate',
             movie.links)[0].url,
         # Generic fields filled by all movie lookup plugins:
@@ -80,10 +81,16 @@ class PluginRottenTomatoesLookup(object):
         """
         imdb_id = entry.get('imdb_id', eval_lazy=False) or \
                   imdb.extract_id(entry.get('imdb_url', eval_lazy=False))
-        movie = lookup_movie(smart_match=entry['title'],
-                             rottentomatoes_id=entry.get('rt_id', eval_lazy=False),
-                             imdb_id=imdb_id,
-                             only_cached=(not search_allowed))
+        if imdb_id:
+            movie = lookup_movie(title=entry.get('imdb_name'),
+                                 year=entry.get('imdb_year'),
+                                 rottentomatoes_id=entry.get('rt_id', eval_lazy=False),
+                                 imdb_id=imdb_id,
+                                 only_cached=(not search_allowed))
+        else:
+            movie = lookup_movie(smart_match=entry['title'],
+                                 rottentomatoes_id=entry.get('rt_id', eval_lazy=False),
+                                 only_cached=(not search_allowed))
         log.debug(u'Got movie: %s' % movie)
         entry.update_using_map(self.field_map, movie)
 
