@@ -387,7 +387,7 @@ class PluginDownload(object):
 
             # make path
             if not os.path.isdir(path):
-                log.info('Creating directory %s' % path)
+                log.debug('Creating directory %s' % path)
                 try:
                     os.makedirs(path)
                 except:
