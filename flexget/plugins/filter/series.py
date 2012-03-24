@@ -508,6 +508,10 @@ class FilterSeriesBase(object):
                     series, series_settings = series.items()[0]
                     if series_settings is None:
                         raise Exception('Series %s has unexpected \':\'' % series)
+                # Make sure this isn't a series with no name
+                if not series:
+                    log.warning('Series config contains a series with no name!')
+                    continue
                 # make sure series name is a string to accommodate for "24"
                 if not isinstance(series, basestring):
                     series = str(series)

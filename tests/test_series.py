@@ -1313,3 +1313,21 @@ class TestCaseChange(FlexGetBase):
         self.execute_feed('second')
         # Make sure series_name uses new case from config, make sure ep is rejected because we have a copy
         assert self.feed.find_entry('rejected', title='thEshoW s02e04 other', series_name='THESHOW')
+
+
+class TestInvalidSeries(FlexGetBase):
+
+    __yaml__ = """
+        feeds:
+          blank:
+            mock:
+              - title: whatever
+            series:
+              - '':
+                  quality: 720p
+    """
+
+    def test_blank_series(self):
+        """Make sure a blank series doesn't crash."""
+        self.execute_feed('blank')
+        assert not self.feed._abort, 'Feed should not have aborted'
