@@ -123,16 +123,21 @@ def make_environment(manager):
 
 
 def get_template(templatename, pluginname=None):
+    """Loads a template from disk. Looks in both included plugins and users custom plugin dir."""
 
-    if pluginname is not None:
+    if not templatename.endswith('.template'):
+        templatename += '.template'
+    locations = []
+    if pluginname:
+        locations.append(pluginname + '/' + templatename)
+    locations.append(templatename)
+    for location in locations:
         try:
-            return environment.get_template(pluginname + '/' + templatename)
+            return environment.get_template(location)
         except TemplateNotFound:
             pass
-    try:
-        return environment.get_template(templatename)
-    except TemplateNotFound, e:
-        raise PluginError('Template not found: %s (%s)' % (e, pluginname))
+    else:
+        raise PluginError('Template not found: %s (%s)' % (templatename, pluginname))
 
 
 def render_from_entry(template_string, entry):
