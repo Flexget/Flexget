@@ -141,7 +141,6 @@ qualities = [Quality(1200, '1080p bluray 10bit', [re_1080p, re_bluray, re_10bit]
              Quality(280, '360p'), # I don't think we want to make trailing p optional here (ie. xbox 360)
              Quality(270, 'hdtv', ['hdtv(?:[\W_]?rip)?']),
              Quality(260, 'dvdrip r5', ['dvd(?:[\W_]?rip)?', re_region]),
-             Quality(250, 'bdscr'),
              Quality(250, 'bdscr', ['bdscr(?:eener)?']),
              Quality(240, 'dvdscr', ['(?:(?:dvd|web)[\W_]?)?scr(?:eener)?']),
              Quality(100, 'sdtv', ['(?:[sp]dtv|dvb)(?:[\W_]?rip)?|(?:t|pp)v[\W_]?rip']),
