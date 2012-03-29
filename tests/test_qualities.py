@@ -21,6 +21,8 @@ class TestQualityParser(object):
                  ('Test.File.web-dl.1080p', '1080p web-dl'),
                  ('Test.File.720p.bluray', '720p bluray'),
                  ('Test.File.1080p.bluray', '1080p bluray'),
+                 ('Test.File.1080p.cam', 'cam'),
+                 ('A Movie 2011 TS 576P XviD-DTRG', 'ts'),
 
                  ('Test.File.720p.bluray.r5', '720p bluray rc'),
                  ('Test.File.1080p.bluray.rc', '1080p bluray rc'),
@@ -53,6 +55,7 @@ class TestQualityParser(object):
                  ('Test.File.[360p].mkv', '360p'),
                  ('Test.File.368.avi', '368p'),
                  ('Test.File.720p.hdtv.avi', '720p'),
+                 ('Test.File.1080p.hdtv.avi', '1080p'),
                  ('Test.File.720p.preair.avi', 'preair'),
                  ('Test.File.ts.dvdrip.avi', 'ts')]
 

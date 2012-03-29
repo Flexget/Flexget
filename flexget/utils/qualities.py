@@ -1,13 +1,14 @@
 import re
 import copy
 import logging
+import __builtin__
 
 log = logging.getLogger('utils.qualities')
 
 
 class Quality(object):
 
-    def __init__(self, value, name, all_of=None, none_of=None):
+    def __init__(self, value, name, all_of=None, blocker=False):
         """
         :param int value:
           numerical value for quality, used for determining order
@@ -16,8 +17,8 @@ class Quality(object):
         :param list all_of:
           list of regexps that all need to match when testing
           whether or not given text matches this quality
-        :param list none_of:
-          list of regexps that cannot match to this quality
+        :param bool blocker:
+          if a blocker quality matches, parser will not try to find a higher quality
         """
         self.value = value
         self.name = name
@@ -25,13 +26,11 @@ class Quality(object):
             all_of = [name]
         self.regexps = []
         self.not_regexps = []
+        self.blocker = blocker
 
         # compile regexps
         for r in all_of:
             self.regexps.append(re.compile('(?<![^\W_])' + r + '(?![^\W_])', re.IGNORECASE))
-        if none_of:
-            for r in none_of:
-                self.not_regexps.append(re.compile('(?<![^\W_])' + r + '(?![^\W_])', re.IGNORECASE))
 
     def matches(self, text):
         """Test if quality matches to text.
@@ -114,41 +113,42 @@ re_10bit = '(10.?bit|hi10p)'
 
 # TODO: this should be marked as private (_qualities), not sure if it used from other places though
 
-qualities = [Quality(10, 'workprint'),
-             Quality(20, 'cam'),
-             Quality(25, 'ts', ['ts|telesync']),
-             Quality(30, 'preair'),
-             Quality(40, 'tc', ['tc|telecine']),
-             Quality(50, 'r5', [re_region]),
+qualities = [Quality(10, 'workprint', blocker=True),
+             Quality(20, 'cam', blocker=True),
+             Quality(25, 'ts', ['ts|telesync'], blocker=True),
+             Quality(30, 'preair', blocker=True),
+             Quality(40, 'tc', ['tc|telecine'], blocker=True),
              Quality(80, 'dsr', ['dsr|(?:ds|web)[\W_]?rip']),
              Quality(100, 'sdtv', ['(?:[sp]dtv|dvb)(?:[\W_]?rip)?|(?:t|pp)v[\W_]?rip']),
              Quality(240, 'dvdscr', ['(?:(?:dvd|web)[\W_]?)?scr(?:eener)?']),
              Quality(250, 'bdscr', ['bdscr(?:eener)?']),
-             Quality(260, 'dvdrip r5', ['dvd(?:[\W_]?rip)?', re_region]),
-             Quality(270, 'hdtv', [re_hdtv], none_of=[re_720p]),
+             Quality(260, 'dvdrip r5', ['dvd(?:[\W_]?rip)?', re_region], blocker=True),
+             Quality(270, 'hdtv', [re_hdtv]),
              Quality(280, '360p'), # I don't think we want to make trailing p optional here (ie. xbox 360)
              Quality(290, '368p', ['368p?']),
-             Quality(300, '480p', ['480p?'], none_of=[re_10bit]),
-             Quality(310, '480p 10bit', ['480p?', re_10bit]),
+             Quality(300, '480p', ['480p?']),
+             Quality(310, '480p 10bit', ['480p?', re_10bit], blocker=True),
              Quality(315, '576p', ['576p?']),
              Quality(320, 'web-dl', [re_webdl]),
-             Quality(350, 'dvdrip', ['dvd(?:[\W_]?rip)?'], none_of=[re_region]),
-             Quality(380, 'bdrip', [re_bluray], none_of=[re_region]),
+             Quality(350, 'dvdrip', ['dvd(?:[\W_]?rip)?']),
+             Quality(380, 'bdrip', [re_bluray]),
              Quality(400, 'hr'),
-             Quality(420, '720p bluray rc', [re_720p, re_bluray, re_region]),
-             Quality(430, '1080p bluray rc', [re_1080p, re_bluray, re_region]),
+             Quality(420, '720p bluray rc', [re_720p, re_bluray, re_region], blocker=True),
+             Quality(430, '1080p bluray rc', [re_1080p, re_bluray, re_region], blocker=True),
+             # This is placed out of order to allow other r5 and rc matches to occur first
+             Quality(50, 'r5', [re_region], blocker=True),
              Quality(450, '720i'),
-             Quality(500, '720p', [re_720p], none_of=[re_bluray, re_region, re_10bit]),
-             Quality(520, '720p 10bit', [re_720p, re_10bit], none_of=[re_bluray, re_region]),
+             Quality(500, '720p', [re_720p]),
+             Quality(520, '720p 10bit', [re_720p, re_10bit]),
              Quality(600, '720p web-dl', [re_720p, re_webdl]),
-             Quality(650, '720p bluray', [re_720p, re_bluray], none_of=[re_region, re_10bit]),
-             Quality(670, '720p bluray 10bit', [re_720p, re_bluray, re_10bit], none_of=[re_region]),
+             Quality(650, '720p bluray', [re_720p, re_bluray]),
+             Quality(670, '720p bluray 10bit', [re_720p, re_bluray, re_10bit], blocker=True),
              Quality(750, '1080i'),
-             Quality(800, '1080p', [re_1080p], none_of=[re_bluray, re_region]),
-             Quality(850, '1080p 10bit', [re_1080p, re_10bit], none_of=[re_bluray, re_region]),
+             Quality(800, '1080p', [re_1080p]),
+             Quality(850, '1080p 10bit', [re_1080p, re_10bit]),
              Quality(1000, '1080p web-dl', [re_1080p, re_webdl]),
-             Quality(1100, '1080p bluray', [re_1080p, re_bluray], none_of=[re_region]),
-             Quality(1200, '1080p bluray 10bit', [re_1080p, re_bluray, re_10bit], none_of=[re_region])]
+             Quality(1100, '1080p bluray', [re_1080p, re_bluray]),
+             Quality(1200, '1080p bluray 10bit', [re_1080p, re_bluray, re_10bit], blocker=True)]
 
 registry = dict([(qual.name, qual) for qual in qualities])
 registry['unknown'] = UNKNOWN
@@ -184,12 +184,12 @@ def value(name):
 
 def min():
     """Return lowest known Quality excluding unknown."""
-    return qualities[0]
+    return __builtin__.min(qualities)
 
 
 def max():
     """Return highest known Quality."""
-    return qualities[-1]
+    return __builtin__.max(qualities)
 
 
 def common_name(name):
@@ -208,11 +208,13 @@ def quality_match(title):
     :param string title: text to search from
     :returns: tuple (:class:`Quality` which can be unknown, remaining title without quality)
     """
-    match = []
+    match = None
     for quality in qualities:
         result, remaining = quality.matches(title)
-        if result and (not match or set(match[0].regexps).intersection(set(quality.regexps))):
-            match = [quality, remaining]
+        if result:
+            match = (quality, remaining)
+            if quality.blocker:
+                break
     if match:
         return match
     else:
