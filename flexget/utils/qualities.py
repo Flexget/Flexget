@@ -1,7 +1,3 @@
-"""
-.. warning:: Many methods in this module are not thread safe since they do in place sort for :attr:`qualities`
-"""
-
 import re
 import copy
 import logging
@@ -109,6 +105,7 @@ UNKNOWN = Quality(0, 'unknown')
 
 # Reminder, Quality regexps are automatically surrounded!
 re_region = 'r[3-8c]'
+re_hdtv = 'hdtv(?:[\W_]?rip)?'
 re_webdl = 'web[\W_]?dl'
 re_720p = '(?:1280x)?720p?'
 re_1080p = '(?:1920x)?1080p?'
@@ -116,49 +113,50 @@ re_bluray = '(?:b[dr][\W_]?rip|bluray(?:[\W_]?rip)?)'
 re_10bit = '(10.?bit|hi10p)'
 
 # TODO: this should be marked as private (_qualities), not sure if it used from other places though
-qualities = [Quality(1200, '1080p bluray 10bit', [re_1080p, re_bluray, re_10bit], none_of=[re_region]),
-             Quality(1100, '1080p bluray', [re_1080p, re_bluray], none_of=[re_region]),
-             Quality(1000, '1080p web-dl', [re_1080p, re_webdl]),
-             Quality(850, '1080p 10bit', [re_1080p, re_10bit], none_of=[re_bluray, re_region]),
-             Quality(800, '1080p', [re_1080p], none_of=[re_bluray, re_region]),
-             Quality(750, '1080i'),
-             Quality(670, '720p bluray 10bit', [re_720p, re_bluray, re_10bit], none_of=[re_region]),
-             Quality(650, '720p bluray', [re_720p, re_bluray], none_of=[re_region, re_10bit]),
-             Quality(600, '720p web-dl', [re_720p, re_webdl]),
-             Quality(520, '720p 10bit', [re_720p, re_10bit], none_of=[re_bluray, re_region]),
-             Quality(500, '720p', [re_720p], none_of=[re_bluray, re_region, re_10bit]),
-             Quality(450, '720i'),
-             Quality(430, '1080p bluray rc', [re_1080p, re_bluray, re_region]),
-             Quality(420, '720p bluray rc', [re_720p, re_bluray, re_region]),
-             Quality(400, 'hr'),
-             Quality(380, 'bdrip', [re_bluray], none_of=[re_region]),
-             Quality(350, 'dvdrip', ['dvd(?:[\W_]?rip)?'], none_of=[re_region]),
-             Quality(320, 'web-dl', [re_webdl]),
-             Quality(315, '576p', ['576p?']),
-             Quality(310, '480p 10bit', ['480p?', re_10bit]),
-             Quality(300, '480p', ['480p?'], none_of=[re_10bit]),
-             Quality(290, '368p', ['368p?']),
-             Quality(280, '360p'), # I don't think we want to make trailing p optional here (ie. xbox 360)
-             Quality(270, 'hdtv', ['hdtv(?:[\W_]?rip)?']),
-             Quality(260, 'dvdrip r5', ['dvd(?:[\W_]?rip)?', re_region]),
-             Quality(250, 'bdscr', ['bdscr(?:eener)?']),
-             Quality(240, 'dvdscr', ['(?:(?:dvd|web)[\W_]?)?scr(?:eener)?']),
-             Quality(100, 'sdtv', ['(?:[sp]dtv|dvb)(?:[\W_]?rip)?|(?:t|pp)v[\W_]?rip']),
-             Quality(80, 'dsr', ['dsr|(?:ds|web)[\W_]?rip']),
-             Quality(50, 'r5', [re_region]),
-             Quality(40, 'tc', ['tc|telecine']),
-             Quality(30, 'preair'),
-             Quality(25, 'ts', ['ts|telesync']),
-             Quality(20, 'cam'),
-             Quality(10, 'workprint')]
 
-registry = dict([(qual.name.lower(), qual) for qual in qualities])
+qualities = [Quality(10, 'workprint'),
+             Quality(20, 'cam'),
+             Quality(25, 'ts', ['ts|telesync']),
+             Quality(30, 'preair'),
+             Quality(40, 'tc', ['tc|telecine']),
+             Quality(50, 'r5', [re_region]),
+             Quality(80, 'dsr', ['dsr|(?:ds|web)[\W_]?rip']),
+             Quality(100, 'sdtv', ['(?:[sp]dtv|dvb)(?:[\W_]?rip)?|(?:t|pp)v[\W_]?rip']),
+             Quality(240, 'dvdscr', ['(?:(?:dvd|web)[\W_]?)?scr(?:eener)?']),
+             Quality(250, 'bdscr', ['bdscr(?:eener)?']),
+             Quality(260, 'dvdrip r5', ['dvd(?:[\W_]?rip)?', re_region]),
+             Quality(270, 'hdtv', [re_hdtv], none_of=[re_720p]),
+             Quality(280, '360p'), # I don't think we want to make trailing p optional here (ie. xbox 360)
+             Quality(290, '368p', ['368p?']),
+             Quality(300, '480p', ['480p?'], none_of=[re_10bit]),
+             Quality(310, '480p 10bit', ['480p?', re_10bit]),
+             Quality(315, '576p', ['576p?']),
+             Quality(320, 'web-dl', [re_webdl]),
+             Quality(350, 'dvdrip', ['dvd(?:[\W_]?rip)?'], none_of=[re_region]),
+             Quality(380, 'bdrip', [re_bluray], none_of=[re_region]),
+             Quality(400, 'hr'),
+             Quality(420, '720p bluray rc', [re_720p, re_bluray, re_region]),
+             Quality(430, '1080p bluray rc', [re_1080p, re_bluray, re_region]),
+             Quality(450, '720i'),
+             Quality(500, '720p', [re_720p], none_of=[re_bluray, re_region, re_10bit]),
+             Quality(520, '720p 10bit', [re_720p, re_10bit], none_of=[re_bluray, re_region]),
+             Quality(600, '720p web-dl', [re_720p, re_webdl]),
+             Quality(650, '720p bluray', [re_720p, re_bluray], none_of=[re_region, re_10bit]),
+             Quality(670, '720p bluray 10bit', [re_720p, re_bluray, re_10bit], none_of=[re_region]),
+             Quality(750, '1080i'),
+             Quality(800, '1080p', [re_1080p], none_of=[re_bluray, re_region]),
+             Quality(850, '1080p 10bit', [re_1080p, re_10bit], none_of=[re_bluray, re_region]),
+             Quality(1000, '1080p web-dl', [re_1080p, re_webdl]),
+             Quality(1100, '1080p bluray', [re_1080p, re_bluray], none_of=[re_region]),
+             Quality(1200, '1080p bluray 10bit', [re_1080p, re_bluray, re_10bit], none_of=[re_region])]
+
+registry = dict([(qual.name, qual) for qual in qualities])
 registry['unknown'] = UNKNOWN
 
 
 def all():
     """Return all Qualities in order of best to worst"""
-    return sorted(qualities, reverse=True) + [UNKNOWN]
+    return qualities + [UNKNOWN]
 
 
 def get(name, default=None):
@@ -186,14 +184,12 @@ def value(name):
 
 def min():
     """Return lowest known Quality excluding unknown."""
-    qualities.sort()
     return qualities[0]
 
 
 def max():
     """Return highest known Quality."""
-    qualities.sort(reverse=True)
-    return qualities[0]
+    return qualities[-1]
 
 
 def common_name(name):
@@ -212,12 +208,15 @@ def quality_match(title):
     :param string title: text to search from
     :returns: tuple (:class:`Quality` which can be unknown, remaining title without quality)
     """
-    qualities.sort(reverse=True)
+    match = []
     for quality in qualities:
         result, remaining = quality.matches(title)
-        if result:
-            return quality, remaining
-    return UNKNOWN, title
+        if result and (not match or set(match[0].regexps).intersection(set(quality.regexps))):
+            match = [quality, remaining]
+    if match:
+        return match
+    else:
+        return UNKNOWN, title
 
 
 def parse_quality(title):

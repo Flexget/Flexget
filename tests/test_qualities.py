@@ -43,6 +43,7 @@ class TestQualityParser(object):
                  ('Test.File.br-rip', 'bdrip'),
 
                  ('Test.File.dvd.rip', 'dvdrip'),
+                 ('Test.File.dvd.rip.r5', 'dvdrip r5'),
 
                  ('Test.File.[576p][00112233].mkv', '576p'),
 
@@ -50,7 +51,10 @@ class TestQualityParser(object):
 
                  ('Test.File.360p.avi', '360p'),
                  ('Test.File.[360p].mkv', '360p'),
-                 ('Test.File.368.avi', '368p')]
+                 ('Test.File.368.avi', '368p'),
+                 ('Test.File.720p.hdtv.avi', '720p'),
+                 ('Test.File.720p.preair.avi', 'preair'),
+                 ('Test.File.ts.dvdrip.avi', 'ts')]
 
         for item in items:
             quality = qualities.parse_quality(item[0]).name
