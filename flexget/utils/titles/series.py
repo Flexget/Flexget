@@ -256,7 +256,22 @@ class SeriesParser(TitleParser):
 
         data_stripped = ' '.join(data_parts).strip()
 
-        log.debug("data for id/ep parsing '%s'" % data_stripped)
+        log.debug("data for date/ep/id parsing '%s'" % data_stripped)
+
+        # Try date mode before ep mode
+        if self.identified_by in ['date', 'auto']:
+            date_match = self.parse_date(data_stripped)
+            if date_match:
+                if self.strict_name:
+                    if date_match['match'].start() - name_end >= 2:
+                        return
+                self.id = date_match['date']
+                self.id_groups = date_match['match'].groups()
+                self.id_type = 'date'
+                self.valid = True
+                return
+
+        log.debug('-> no luck with date_regexps')
 
         if self.identified_by in ['ep', 'auto']:
             ep_match = self.parse_episode(data_stripped)
@@ -305,53 +320,6 @@ class SeriesParser(TitleParser):
         # Ep mode is done, check for unwanted ids
         if self.parse_unwanted_id(data_stripped):
             return
-
-        # Try date mode after ep mode
-        if self.identified_by in ['date', 'auto']:
-            for date_re in self.date_regexps:
-                match = re.search(date_re, data_stripped)
-                if match:
-                    # Check if this is a valid date
-                    possdates = []
-
-                    try:
-                        # By default dayfirst and yearfirst will be tried as both True and False
-                        # if either have been defined manually, restrict that option
-                        dayfirst_opts = [True, False]
-                        if self.date_dayfirst is not None:
-                            dayfirst_opts = [self.date_dayfirst]
-                        yearfirst_opts = [True, False]
-                        if self.date_yearfirst is not None:
-                            yearfirst_opts = [self.date_yearfirst]
-                        kwargs_list = ({'dayfirst': d, 'yearfirst': y} for d in dayfirst_opts for y in yearfirst_opts)
-                        for kwargs in kwargs_list:
-                            possdate = parsedate(match.group(0), **kwargs)
-                            # Don't accept dates farther than a day in the future
-                            if possdate > datetime.now() + timedelta(days=1):
-                                continue
-                            if possdate not in possdates:
-                                possdates.append(possdate)
-                    except ValueError:
-                        log.debug('%s is not a valid date, skipping' % match.group(0))
-                        continue
-                    if not possdates:
-                        log.debug('All possible dates for %s were in the future' % match.group(0))
-                        continue
-                    possdates.sort()
-                    # Pick the most recent date if there are ambiguities
-                    bestdate = possdates[-1]
-
-                    # strict_name
-                    if self.strict_name:
-                        if match.start() - name_end >= 2:
-                            return
-                    self.id = bestdate
-                    self.id_groups = match.groups()
-                    self.id_type = 'date'
-                    self.valid = True
-                    log.debug('found id \'%s\' with regexp \'%s\'' % (self.id, date_re.pattern))
-                    return
-            log.debug('-> no luck with date_regexps')
 
         # Check id regexps
         if self.identified_by in ['id', 'auto']:
@@ -421,6 +389,49 @@ class SeriesParser(TitleParser):
             if match:
                 log.debug('unwanted id regexp %s matched %s' % (id_unwanted_re, match.groups()))
                 return True
+
+    def parse_date(self, data):
+        """
+        Parses :data: for a date identifier.
+        If found, returns the date and regexp match object
+        If no date is found returns False
+        """
+        for date_re in self.date_regexps:
+            match = re.search(date_re, data)
+            if match:
+                # Check if this is a valid date
+                possdates = []
+
+                try:
+                    # By default dayfirst and yearfirst will be tried as both True and False
+                    # if either have been defined manually, restrict that option
+                    dayfirst_opts = [True, False]
+                    if self.date_dayfirst is not None:
+                        dayfirst_opts = [self.date_dayfirst]
+                    yearfirst_opts = [True, False]
+                    if self.date_yearfirst is not None:
+                        yearfirst_opts = [self.date_yearfirst]
+                    kwargs_list = ({'dayfirst': d, 'yearfirst': y} for d in dayfirst_opts for y in yearfirst_opts)
+                    for kwargs in kwargs_list:
+                        possdate = parsedate(match.group(0), **kwargs)
+                        # Don't accept dates farther than a day in the future
+                        if possdate > datetime.now() + timedelta(days=1):
+                            continue
+                        if possdate not in possdates:
+                            possdates.append(possdate)
+                except ValueError:
+                    log.debug('%s is not a valid date, skipping' % match.group(0))
+                    continue
+                if not possdates:
+                    log.debug('All possible dates for %s were in the future' % match.group(0))
+                    continue
+                possdates.sort()
+                # Pick the most recent date if there are ambiguities
+                bestdate = possdates[-1]
+                return {'date': bestdate,
+                        'match': match}
+
+        return False
 
     def parse_episode(self, data):
         """

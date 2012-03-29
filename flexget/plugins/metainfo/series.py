@@ -40,6 +40,7 @@ class MetainfoSeries(object):
             entry['series_season'] = parser.season
             entry['series_episode'] = parser.episode
             entry['series_id'] = parser.identifier
+            entry['series_id_type'] = parser.id_type
             entry['series_guessed'] = True
             entry['series_parser'] = parser
             entry['proper'] = parser.proper
@@ -50,39 +51,44 @@ class MetainfoSeries(object):
     def guess_series(self, title, allow_seasonless=False):
         """Returns a valid series parser if this :title: appears to be a series"""
 
-        parser = SeriesParser(identified_by='ep', allow_seasonless=allow_seasonless)
+        parser = SeriesParser(identified_by='auto', allow_seasonless=allow_seasonless)
         # We need to replace certain characters with spaces to make sure episode parsing works right
         # We don't remove anything, as the match positions should line up with the original title
         clean_title = re.sub('[_.,\[\]\(\):]', ' ', title)
-        match = parser.parse_episode(clean_title)
-        if match:
-            if parser.parse_unwanted(clean_title):
+        if parser.parse_unwanted(clean_title):
+            return
+        match = parser.parse_date(clean_title)
+        if not match:
+            match = parser.parse_episode(clean_title)
+            if match and parser.parse_unwanted(clean_title):
                 return
-            elif match['match'].start() > 1:
-                # We start using the original title here, so we can properly ignore unwanted prefixes.
-                # Look for unwanted prefixes to find out where the series title starts
-                start = 0
-                prefix = re.match('|'.join(parser.ignore_prefixes), title)
-                if prefix:
-                    start = prefix.end()
-                # If an episode id is found, assume everything before it is series name
-                name = title[start:match['match'].start()]
-                # Remove possible episode title from series name (anything after a ' - ')
-                name = name.split(' - ')[0]
-                # Replace some special characters with spaces
-                name = re.sub('[\._\(\) ]+', ' ', name).strip(' -')
-                # Normalize capitalization to title case
-                name = capwords(name)
-                # If we didn't get a series name, return
-                if not name:
-                    return
-                parser.name = name
-                parser.data = title
-                try:
-                    parser.parse(data=title)
-                except ParseWarning, pw:
-                    log.debug('ParseWarning: %s' % pw.value)
-                if parser.valid:
-                    return parser
+        if not match:
+            return
+        if match['match'].start() > 1:
+            # We start using the original title here, so we can properly ignore unwanted prefixes.
+            # Look for unwanted prefixes to find out where the series title starts
+            start = 0
+            prefix = re.match('|'.join(parser.ignore_prefixes), title)
+            if prefix:
+                start = prefix.end()
+            # If an episode id is found, assume everything before it is series name
+            name = title[start:match['match'].start()]
+            # Remove possible episode title from series name (anything after a ' - ')
+            name = name.split(' - ')[0]
+            # Replace some special characters with spaces
+            name = re.sub('[\._\(\) ]+', ' ', name).strip(' -')
+            # Normalize capitalization to title case
+            name = capwords(name)
+            # If we didn't get a series name, return
+            if not name:
+                return
+            parser.name = name
+            parser.data = title
+            try:
+                parser.parse(data=title)
+            except ParseWarning, pw:
+                log.debug('ParseWarning: %s' % pw.value)
+            if parser.valid:
+                return parser
 
 register_plugin(MetainfoSeries, 'metainfo_series')

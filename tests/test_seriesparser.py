@@ -484,6 +484,11 @@ class TestSeriesParser(object):
         s = self.parse(name='Something', data='Something 01.02.32')
         assert s.id_type != 'date'
 
+        # Dates with parts used to be parsed as episodes.
+        s = self.parse(name='Something', data='Something.2010.10.25, Part 2')
+        assert (s.identifier == '2010-10-25'), 'failed to parse %s' % s.data
+        assert s.id_type == 'date'
+
     def test_date_options(self):
         # By default we should pick the latest interpretation
         s = self.parse(name='Something', data='Something 01-02-03')

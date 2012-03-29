@@ -238,6 +238,7 @@ class TestFilterSeries(FlexGetBase):
               - {title: 'Test Series - 1x03 - PDTV XViD-FlexGet'}
               - {title: 'Other.Show.S02E01.PDTV.XViD-FlexGet'}
               - {title: 'other show season 2 episode 2'}
+              - {title: 'Date.Show.03-29-2012.HDTV.XViD-FlexGet'}
             all_series: yes
     """
 
@@ -293,6 +294,9 @@ class TestFilterSeries(FlexGetBase):
         entry2 = self.feed.find_entry('accepted', title='other show season 2 episode 2')
         # Make sure case is normalized so series are marked with the same name no matter the case in the title
         assert entry['series_name'] == entry2['series_name'] == 'Other Show', 'Series names should be in title case'
+        entry = self.feed.find_entry('accepted', title='Date.Show.03-29-2012.HDTV.XViD-FlexGet')
+        assert entry['series_guessed']
+        assert entry['series_name'] == 'Date Show'
 
 
 class TestEpisodeAdvancement(FlexGetBase):
