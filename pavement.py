@@ -17,12 +17,13 @@ sys.path.insert(0, '')
 
 options = environment.options
 install_requires = ['FeedParser>=5.1', 'SQLAlchemy >=0.7, <0.8', 'PyYAML', 'BeautifulSoup>=3.2, <3.3',
-                    'html5lib>=0.11', 'PyRSS2Gen', 'pynzb', 'progressbar', 'jinja2', 'flask', 'cherrypy',
-                    'python-dateutil<2.0']
+                    'html5lib>=0.11', 'PyRSS2Gen', 'pynzb', 'progressbar', 'jinja2', 'flask', 'cherrypy']
 if sys.version_info < (2, 6):
     install_requires.append('requests==0.10.0')
+    install_requires.append('python-dateutil<2.0') # dateutil 2.0 is python 3 only
 else:
     install_requires.append('requests>=0.10, !=0.10.1, <0.11') #URL quoting bug in 0.10.1
+    install_requires.append('python-dateutil!=2.0') # dateutil 2.1 started supporting python 2.6+ again
 
 setup(
     name='FlexGet',
@@ -366,7 +367,7 @@ def pep8():
         import pep8
     except:
         print 'Run bin/paver install_tools'
-        return    
+        return
     pep8.options, pep8.args = pep8.process_options(['--show-source', '--ignore', 'E501,W291,W293,W601,E261', ''])
     pep8.options.repeat = 1
 
