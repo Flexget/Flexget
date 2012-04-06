@@ -105,7 +105,7 @@ UNKNOWN = Quality(0, 'unknown')
 # Reminder, Quality regexps are automatically surrounded!
 re_region = 'r[3-8c]'
 re_hdtv = 'hdtv(?:[\W_]?rip)?'
-re_webdl = 'web[\W_]?dl'
+re_webdl = 'web[\W_]?dl(?:[\W_]?rip)?'
 re_720p = '(?:1280x)?720p?'
 re_1080p = '(?:1920x)?1080p?'
 re_bluray = '(?:b[dr][\W_]?rip|bluray(?:[\W_]?rip)?)'
