@@ -172,6 +172,8 @@ def render_from_entry(template_string, entry):
             raise RenderError('Does not contain the field `%s` for string replacement.' % e)
         except ValueError, e:
             raise PluginError('Invalid string replacement template: %s (%s)' % (template_string, e))
+        except TypeError, e:
+            raise RenderError('Error during string replacement: %s' % e.message)
 
     return result
 
