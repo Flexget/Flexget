@@ -417,6 +417,9 @@ class SeriesParser(TitleParser):
                         # Don't accept dates farther than a day in the future
                         if possdate > datetime.now() + timedelta(days=1):
                             continue
+                        # Don't accept dates that are too old
+                        if possdate < datetime(1970, 1, 1):
+                            continue
                         if possdate not in possdates:
                             possdates.append(possdate)
                 except ValueError:
