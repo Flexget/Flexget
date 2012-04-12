@@ -28,7 +28,6 @@ METAFILE_STD_KEYS = [i.split('.') for i in (
     "info.files.length",
     "info.files.path",
 )]
-del i
 
 
 def clean_meta(meta, including_info=False, logger=None):
@@ -92,6 +91,8 @@ def is_torrent_file(metafilepath):
 
 def tokenize(text, match=re.compile("([idel])|(\d+):|(-?\d+)").match):
     i = 0
+    # Make sure there is no trailing whitespace. see #1592
+    text = text.strip()
     while i < len(text):
         m = match(text, i)
         s = m.group(m.lastindex)
@@ -103,7 +104,7 @@ def tokenize(text, match=re.compile("([idel])|(\d+):|(-?\d+)").match):
         else:
             yield s
 
-            
+
 def decode_item(next, token):
     if token == "i":
         # integer: "i" value "e"
