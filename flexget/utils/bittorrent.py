@@ -91,8 +91,6 @@ def is_torrent_file(metafilepath):
 
 def tokenize(text, match=re.compile("([idel])|(\d+):|(-?\d+)").match):
     i = 0
-    # Make sure there is no trailing whitespace. see #1592
-    text = text.strip()
     while i < len(text):
         m = match(text, i)
         s = m.group(m.lastindex)
@@ -199,7 +197,8 @@ class Torrent(object):
 
     def __init__(self, content):
         """Accepts torrent file as string"""
-
+        # Make sure there is no trailing whitespace. see #1592
+        content = content.strip()
         # decoded torrent structure
         self.content = bdecode(content)
         self.modified = False
