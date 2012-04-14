@@ -57,7 +57,11 @@ class TestQualityParser(object):
                  ('Test.File.720p.hdtv.avi', '720p'),
                  ('Test.File.1080p.hdtv.avi', '1080p'),
                  ('Test.File.720p.preair.avi', 'preair'),
-                 ('Test.File.ts.dvdrip.avi', 'ts')]
+                 ('Test.File.ts.dvdrip.avi', 'ts'),
+
+                 # Test qualities as part of words. #1593
+                 ('Tsar.File.720p', '720p'),
+                 ('Camera.1080p', '1080p')]
 
         for item in items:
             quality = qualities.parse_quality(item[0]).name

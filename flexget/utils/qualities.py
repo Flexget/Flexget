@@ -30,7 +30,7 @@ class Quality(object):
 
         # compile regexps
         for r in all_of:
-            self.regexps.append(re.compile('(?<![^\W_])' + r + '(?![^\W_])', re.IGNORECASE))
+            self.regexps.append(re.compile('(?<![^\W_])(?:' + r + ')(?![^\W_])', re.IGNORECASE))
 
     def matches(self, text):
         """Test if quality matches to text.
