@@ -77,7 +77,10 @@ def upgrade(ver, session):
         log.info('Adding `name_lower` column to series table.')
         table_add_column('series', 'name_lower', Unicode, session)
         series_table = table_schema('series', session)
-        Index('ix_series_name_lower', series_table.c.name_lower).create(bind=session.bind)
+        try:
+            Index('ix_series_name_lower', series_table.c.name_lower).create(bind=session.bind)
+        except OperationalError:
+            log.debug('ix_series_name_lower seems to already exist')
         # Fill in lower case name column
         session.execute(update(series_table, values={'name_lower': func.lower(series_table.c.name)}))
         ver = 4
