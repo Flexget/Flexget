@@ -7,7 +7,8 @@ from datetime import datetime, date, time
 import locale
 from email.utils import parsedate
 from time import mktime
-from jinja2 import Environment, StrictUndefined, ChoiceLoader, FileSystemLoader, PackageLoader, TemplateNotFound
+from jinja2 import (Environment, StrictUndefined, ChoiceLoader, FileSystemLoader, PackageLoader, TemplateNotFound,
+                    TemplateSyntaxError)
 from flexget.event import event
 from flexget.plugin import PluginError
 
@@ -145,7 +146,10 @@ def render_from_entry(template_string, entry):
 
     # If a plain string was passed, turn it into a Template
     if isinstance(template_string, basestring):
-        template = environment.from_string(template_string)
+        try:
+            template = environment.from_string(template_string)
+        except TemplateSyntaxError, e:
+            raise PluginError('Error in template syntax: ' + e.message)
     else:
         # We can also support an actual Template being passed in
         template = template_string
