@@ -70,7 +70,7 @@ class ImdbList(object):
             mime_type = parse_header(opener.headers['content-type'])[0]
             log.debug('mime_type: %s' % mime_type)
             if mime_type != 'text/csv':
-                raise PluginError('Didn\'t get CSV export as response. Probably specified list `%s` does not exists.'
+                raise PluginError('Didn\'t get CSV export as response. Probably specified list `%s` does not exist.'
                     % config['list'])
             csv_rows = csv.reader(opener.iter_lines())
         except requests.RequestException, e:
