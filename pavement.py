@@ -25,6 +25,14 @@ else:
     install_requires.append('requests>=0.10, !=0.10.1, <0.11') #URL quoting bug in 0.10.1
     install_requires.append('python-dateutil!=2.0') # dateutil 2.1 started supporting python 2.6+ again
 
+entry_points = {
+    'console_scripts': ['flexget = flexget:main'],
+    'gui_scripts': ['flexget-webui = flexget.ui:main']}
+
+# Provide an alternate exe on windows which does not cause a pop-up when scheduled
+if sys.platform.startswith('win'):
+    entry_points['gui_scripts'].append('flexget-headless = flexget:main')
+
 setup(
     name='FlexGet',
     version='1.0', # our tasks append the r1234 (current svn revision) to the version number
@@ -46,12 +54,7 @@ setup(
         'NZB':          ['pynzb'],
         'TaskTray':     ['pywin32'],
     },
-    entry_points="""
-        [console_scripts]
-        flexget = flexget:main
-        [gui_scripts]
-        flexget-webui = flexget.ui:main
-    """
+    entry_points=entry_points
 )
 
 options(
