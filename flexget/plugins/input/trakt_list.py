@@ -1,9 +1,8 @@
 import hashlib
 import logging
-import urllib2
 import re
+from requests import RequestException
 from flexget.utils import json
-from flexget.utils.tools import urlopener
 from flexget.utils.cached_input import cached
 from flexget.plugin import register_plugin, PluginError
 from flexget.entry import Entry
@@ -57,18 +56,19 @@ class TraktList(object):
 
     @cached('trakt_list', persist='2 hours')
     def on_feed_input(self, feed, config):
+        url_params = config
         if 'movies' in config and 'series' in config:
             raise PluginError('Cannot use both series list and movies list in the same feed.')
         if 'movies' in config:
-            config['data_type'] = 'movies'
-            config['list_type'] = config['movies']
+            url_params['data_type'] = 'movies'
+            url_params['list_type'] = config['movies']
             map = self.movie_map
         elif 'series' in config:
-            config['data_type'] = 'shows'
-            config['list_type'] = config['series']
+            url_params['data_type'] = 'shows'
+            url_params['list_type'] = config['series']
             map = self.series_map
         elif 'custom' in config:
-            config['data_type'] = 'custom'
+            url_params['data_type'] = 'custom'
             # Do some translation from visible list name to prepare for use in url
             list_name = config['custom']
             # These characters are just stripped in the url
@@ -77,36 +77,36 @@ class TraktList(object):
             # These characters get replaced
             list_name = list_name.replace('&', 'and')
             list_name = list_name.replace(' ', '-')
-            config['list_type'] = list_name
+            url_params['list_type'] = list_name
             # Map type is per item in custom lists
         else:
             raise PluginError('Must define movie or series lists to retrieve from trakt.')
 
         url = 'http://api.trakt.tv/user/'
-        if config['data_type'] == 'custom':
+        auth = None
+        if url_params['data_type'] == 'custom':
             url += 'list.json/%(api_key)s/%(username)s/%(list_type)s'
-        elif config['list_type'] == 'watchlist':
+        elif url_params['list_type'] == 'watchlist':
             url += 'watchlist/%(data_type)s.json/%(api_key)s/%(username)s'
         else:
             url += 'library/%(data_type)s/%(list_type)s.json/%(api_key)s/%(username)s'
         url = url % config
 
         if 'password' in config:
-            auth = {'username': config['username'], 'password': hashlib.sha1(config['password']).hexdigest()}
-            url = urllib2.Request(url, json.dumps(auth), {'content-type': 'application/json'})
+            auth = (config['username'], hashlib.sha1(config['password']).hexdigest())
 
         entries = []
-        log.verbose('Retrieving list %s %s...' % (config['data_type'], config['list_type']))
+        log.verbose('Retrieving list %s %s...' % (url_params['data_type'], url_params['list_type']))
         try:
-            data = json.load(urlopener(url, log, retries=2))
-        except urllib2.URLError, e:
-            raise PluginError('Could not retrieve list from trakt (%s)' % e)
+            data = json.loads(feed.requests.get(url, auth=auth).content)
+        except RequestException, e:
+            raise PluginError('Could not retrieve list from trakt (%s)' % e.message)
         if 'error' in data:
             raise PluginError('Error getting trakt list: %s' % data['error'])
-        if config['data_type'] == 'custom':
+        if url_params['data_type'] == 'custom':
             data = data['items']
         for item in data:
-            if config['data_type'] == 'custom':
+            if url_params['data_type'] == 'custom':
                 if item['type'] == 'movie':
                     map = self.movie_map
                     item = item['movie']
