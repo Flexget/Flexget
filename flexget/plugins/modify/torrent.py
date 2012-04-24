@@ -50,7 +50,7 @@ class TorrentFilename(object):
                 try:
                     torrent = Torrent(data)
                 except SyntaxError, e:
-                    feed.fail(entry, '%s - Torrent could not be parsed' % e.message)
+                    feed.fail(entry, '%s - broken or invalid torrent file received' % e.message)
                     self.purge(entry)
                     continue
 
@@ -61,7 +61,7 @@ class TorrentFilename(object):
                 if entry.get('filename'):
                     if not entry['filename'].lower().endswith('.torrent'):
                         # filename present but without .torrent extension, add it
-                        entry['filename'] = entry['filename'] + '.torrent'
+                        entry['filename'] += '.torrent'
                 else:
                     # generate filename from torrent or fall back to title plus extension
                     entry['filename'] = self.make_filename(torrent, entry)
