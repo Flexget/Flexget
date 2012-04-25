@@ -60,19 +60,27 @@ class Manipulate(object):
         if not self.phase_jobs['metainfo']:
             # return if no jobs for this phase
             return
-        for entry in feed.entries:
-            self.process(entry, self.phase_jobs['metainfo'])
+        modified = sum(self.process(entry, self.phase_jobs['metainfo']) for entry in feed.entries)
+        log.verbose('Modified %d entries.' % modified)
+
 
     @priority(255)
     def on_feed_filter(self, feed, config):
         if not self.phase_jobs['filter']:
             # return if no jobs for this phase
             return
-        for entry in feed.entries + feed.rejected:
-            self.process(entry, self.phase_jobs['filter'])
+        modified = sum(self.process(entry, self.phase_jobs['filter']) for entry in feed.entries + feed.rejected)
+        log.verbose('Modified %d entries.' % modified)
 
     def process(self, entry, jobs):
+        """Process given jobs from config for an entry.
 
+        :param entry: Entry to modify
+        :param jobs: Config items to run on this entry
+        :return: True if any fields were modified
+        """
+
+        modified = False
         for item in jobs:
             for field, config in item.iteritems():
                 from_field = field
@@ -85,7 +93,7 @@ class Manipulate(object):
                     if not field_value:
                         log.warning('Cannot extract, field `%s` is not present' % from_field)
                         continue
-                    match = re.search(config['extract'], field_value)
+                    match = re.search(config['extract'], field_value, re.I|re.U)
                     if match:
                         groups = [x for x in match.groups() if x is not None]
                         log.debug('groups: %s' % groups)
@@ -97,10 +105,13 @@ class Manipulate(object):
                         log.warning('Cannot replace, field `%s` is not present' % from_field)
                         continue
                     replace_config = config['replace']
-                    field_value = re.sub(replace_config['regexp'], replace_config['format'], field_value).strip()
+                    field_value = re.sub(replace_config['regexp'], replace_config['format'], field_value, flags=re.I|re.U).strip()
                     log.debug('field `%s` after replace: `%s`' % (field, field_value))
 
+                if from_field != field or entry[field] != field_value:
+                    log.verbose('Field `%s` is now `%s`' % (field, field_value))
+                    modified = True
                 entry[field] = field_value
-                log.verbose('Field `%s` is now `%s`' % (field, entry[field]))
+        return modified
 
 register_plugin(Manipulate, 'manipulate', api_ver=2)
