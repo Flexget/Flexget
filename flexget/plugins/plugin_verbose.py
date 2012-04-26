@@ -42,19 +42,15 @@ class Verbose(object):
             return
         # verbose undecided entries
         if feed.manager.options.verbose:
+            undecided = False
             for entry in feed.entries:
                 if entry in feed.accepted:
                     continue
+                undecided = True
                 log.verbose('UNDECIDED: `%s`' % entry['title'])
-
-    @priority(-512)
-    def on_process_end(self, feed):
-        if feed.manager.options.silent:
-            return
-        if feed.manager.options.verbose:
-            log_once('About undecided entries: They were created by input plugins but were not accepted because '
-                     'no (filter) plugin accepted them. If you want them to reach output, configure filters.',
-                     logger=log)
+            if undecided:
+                log_once('Undecided entries have not been accepted or rejected. If you expected these to reach output,'
+                         ' you must set up filter plugin(s) to accept them.', logger=log)
 
 register_plugin(Verbose, 'verbose', builtin=True)
 register_parser_option('-v', '--verbose', action='store_true', dest='verbose', default=False,
