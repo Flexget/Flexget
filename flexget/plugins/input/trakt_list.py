@@ -56,7 +56,8 @@ class TraktList(object):
 
     @cached('trakt_list', persist='2 hours')
     def on_feed_input(self, feed, config):
-        url_params = config
+        # Don't edit the config, or it won't pass validation on rerun
+        url_params = config.copy()
         if 'movies' in config and 'series' in config:
             raise PluginError('Cannot use both series list and movies list in the same feed.')
         if 'movies' in config:
@@ -90,7 +91,7 @@ class TraktList(object):
             url += 'watchlist/%(data_type)s.json/%(api_key)s/%(username)s'
         else:
             url += 'library/%(data_type)s/%(list_type)s.json/%(api_key)s/%(username)s'
-        url = url % config
+        url = url % url_params
 
         if 'password' in config:
             auth = (config['username'], hashlib.sha1(config['password']).hexdigest())

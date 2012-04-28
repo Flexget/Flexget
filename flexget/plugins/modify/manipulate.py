@@ -105,7 +105,8 @@ class Manipulate(object):
                         log.warning('Cannot replace, field `%s` is not present' % from_field)
                         continue
                     replace_config = config['replace']
-                    field_value = re.sub(replace_config['regexp'], replace_config['format'], field_value, flags=re.I|re.U).strip()
+                    regexp = re.compile(replace_config['regexp'], flags=re.I|re.U)
+                    field_value = regexp.sub(replace_config['format'], field_value).strip()
                     log.debug('field `%s` after replace: `%s`' % (field, field_value))
 
                 if from_field != field or entry[field] != field_value:
