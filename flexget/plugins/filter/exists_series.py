@@ -24,6 +24,7 @@ class FilterExistsSeries(object):
         bundle.accept('path')
         advform = root.accept('dict')
         advform.accept('boolean', key='allow_different_qualities')
+        advform.accept('equals', key='allow_different_qualities').accept('better')
         advform.accept('path', key='path')
         advform.accept('list', key='path').accept('path')
         return root
@@ -90,10 +91,14 @@ class FilterExistsSeries(object):
                                     log.trace('wrong identifier')
                                     continue
                                 log.debug('series_parser.quality = %s' % entry['series_parser'].quality)
-                                if config.get('allow_different_qualities') and \
-                                   disk_parser.quality != entry['series_parser'].quality:
-                                    log.trace('wrong quality')
-                                    continue
+                                if config.get('allow_different_qualities') == 'better':
+                                    if entry['series_parser'].quality > disk_parser.quality:
+                                        log.trace('better quality')
+                                        continue
+                                elif config.get('allow_different_qualities'):
+                                    if disk_parser.quality != entry['series_parser'].quality:
+                                        log.trace('wrong quality')
+                                        continue
                                 log.debug('entry parser.proper_count = %s' % entry['series_parser'].proper_count)
                                 if disk_parser.proper_count >= entry['series_parser'].proper_count:
                                     feed.reject(entry, 'proper already exists')
