@@ -1,11 +1,14 @@
 import logging
 import re
+import random
 from flexget.plugin import register_plugin, priority
 
 log = logging.getLogger('torrent_cache')
 
 MIRRORS = ['http://torrage.com/torrent/',
-           'http://torcache.net/torrent/',
+           # Now using a landing page instead of going directly to the torrent
+           # TODO: May be fixable by setting the referer
+           #'http://torcache.net/torrent/',
            'http://zoink.it/torrent/',
            'http://torrage.ws/torrent/']
 
@@ -24,6 +27,8 @@ class TorrentCache(object):
             elif entry.get('torrent_info_hash'):
                 info_hash = entry['torrent_info_hash']
             if info_hash:
+                # Add the mirrors in random order
+                random.shuffle(MIRRORS)
                 entry.setdefault('urls', [entry['url']])
                 entry['urls'].extend(host + info_hash.upper() + '.torrent' for host in MIRRORS)
 
