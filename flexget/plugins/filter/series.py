@@ -814,6 +814,7 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
                 entry['series_episode'] = parser.episode
             elif parser.id_type == 'date':
                 entry['series_date'] = parser.id
+                entry['series_season'] = parser.id.year
             else:
                 entry['series_season'] = time.gmtime().tm_year
             entry['series_id'] = parser.identifier
