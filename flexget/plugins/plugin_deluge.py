@@ -202,6 +202,7 @@ class InputDeluge(DelugePlugin):
         'num_peers': 'torrent_peers',
         'num_seeds': 'torrent_seeds',
         'progress': 'deluge_progress',
+        'seeding_time': 'deluge_seed_time',
         'private': 'deluge_private',
         'state': 'deluge_state',
         'eta': 'deluge_eta',
