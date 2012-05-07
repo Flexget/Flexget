@@ -1,5 +1,3 @@
-from httplib import HTTPSConnection
-from urllib import urlencode
 import logging
 from flexget.plugin import register_plugin
 from flexget.utils.template import RenderError
@@ -7,8 +5,8 @@ from flexget.utils.template import RenderError
 log = logging.getLogger('notifymyandroid')
 
 __version__ = 0.1
-headers = {'User-Agent': "FlexGet NMA plugin/%s" % str(__version__),
-           'Content-type': "application/x-www-form-urlencoded"}
+headers = {'User-Agent': "FlexGet NMA plugin/%s" % str(__version__)}
+url = 'https://nma.usk.bz/publicapi/notify'
 
 
 class OutputNotifyMyAndroid(object):
@@ -66,17 +64,13 @@ class OutputNotifyMyAndroid(object):
             except RenderError, e:
                 log.error('Error setting nma description: %s' % e)
 
-            # Open connection
-            h = HTTPSConnection('nma.usk.bz')
-
             # Send the request
             data = {'priority': priority, 'application': application, 'apikey': apikey,
                     'event': event, 'description': description}
-            h.request("POST", "/publicapi/notify", headers=headers, body=urlencode(data))
+            response = feed.requests.post(url, headers=headers, data=data, raise_status=False)
 
             # Check if it succeeded
-            response = h.getresponse()
-            request_status = response.status
+            request_status = response.status_code
 
             # error codes and messages from http://nma.usk.bz/api.php
             if request_status == 200:
