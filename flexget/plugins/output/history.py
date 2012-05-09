@@ -38,7 +38,7 @@ class PluginHistory(object):
             feed.manager.disable_feeds()
             session = Session()
             print '-- History: ' + '-' * 67
-            for item in reversed(session.query(History).order_by(desc(History.time)).limit(50).all()):
+            for item in reversed(session.query(History).order_by(desc(History.id)).limit(50).all()):
                 print ' Feed    : %s' % item.feed
                 print ' Title   : %s' % item.title.encode('utf-8')
                 print ' Url     : %s' % item.url
