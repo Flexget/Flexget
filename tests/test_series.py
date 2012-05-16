@@ -933,6 +933,13 @@ class TestExact(FlexGetBase):
               - show:
                   name_regexp: ^show
                   exact: yes
+          date:
+            mock:
+              - title: date show 04.01.2011 hdtv
+              - title: date show b 04.02.2011 hdtv
+            series:
+              - date show:
+                  exact: yes
     """
 
     def test_auto(self):
@@ -947,6 +954,10 @@ class TestExact(FlexGetBase):
         assert self.feed.find_entry('accepted', title='show s09e05 hdtv')
         assert not self.feed.find_entry('accepted', title='show a s09e06 hdtv')
 
+    def test_dated_show(self):
+        self.execute_feed('date')
+        assert self.feed.find_entry('accepted', title='date show 04.01.2011 hdtv')
+        assert not self.feed.find_entry('accepted', title='date show b 04.02.2011 hdtv')
 
 class TestTimeframe(FlexGetBase):
 

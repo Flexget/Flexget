@@ -263,7 +263,7 @@ class SeriesParser(TitleParser):
             date_match = self.parse_date(data_stripped)
             if date_match:
                 if self.strict_name:
-                    if date_match['match'].start() - name_end >= 2:
+                    if date_match['match'].start() > 1:
                         return
                 self.id = date_match['date']
                 self.id_groups = date_match['match'].groups()
@@ -328,7 +328,7 @@ class SeriesParser(TitleParser):
                 if match:
                     # strict_name
                     if self.strict_name:
-                        if match.start() - name_end >= 2:
+                        if match.start() > 1:
                             return
                     self.id = '-'.join(match.groups())
                     self.id_type = 'id'
@@ -344,7 +344,7 @@ class SeriesParser(TitleParser):
                 if match:
                     # strict_name
                     if self.strict_name:
-                        if match.start() - name_end >= 2:
+                        if match.start() > 1:
                             return
                     # First matching group is the sequence number
                     try:
