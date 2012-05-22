@@ -456,6 +456,8 @@ class FilterSeriesBase(object):
         options.accept('boolean', key='upgrade')
         options.accept('choice', key='min_quality').accept_choices(quals, ignore_case=True)
         options.accept('choice', key='max_quality').accept_choices(quals, ignore_case=True)
+        #specials
+        options.accept('boolean', key='specials')
         # propers
         options.accept('boolean', key='propers')
         message = "should be in format 'x (minutes|hours|days|weeks)' e.g. '5 days'"
@@ -845,6 +847,11 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
                 if self.process_watched(feed, config, eps):
                     continue
 
+            # skip special episodes if special handling has been turned off
+            if not config.get('specials', True) and eps[0].special:
+                log.debug('Skipping special episode as support is turned off.')
+                continue
+
             # proper handling
             log.debug('-' * 20 + ' process_propers -->')
             eps = self.process_propers(feed, config, eps)
@@ -879,7 +886,7 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
             log.debug('continuing w. episodes: %s' % [e.data for e in eps])
             log.debug('best episode is: %s' % best.data)
 
-            # episode advancement. used only with season and seqence based series
+            # episode advancement. used only with season and sequence based series
             if best.id_type in ['ep', 'sequence']:
                 if feed.manager.options.disable_advancement:
                     log.debug('episode advancement disabled')
