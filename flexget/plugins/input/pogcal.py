@@ -6,7 +6,7 @@ from flexget import plugin
 
 log = logging.getLogger('pogcal')
 
-class InputPogDesign(plugin.Plugin):
+class InputPogDesign(object):
 
     def validator(self):
         from flexget import validator
@@ -28,10 +28,11 @@ class InputPogDesign(plugin.Plugin):
             raise plugin.PluginError('Error retrieving source: %s' % e)
         soup = BeautifulSoup(page.text, convertEntities=BeautifulSoup.HTML_ENTITIES)
         entries = []
-        for row in soup.findAll('label', {'class': 'label_check' }):
+        for row in soup.findAll('label', {'class': 'label_check'}):
             if row.find(attrs={'checked': 'checked'}):
                 t = row.text
-                if t.endswith('[The]'): t='The ' + t[:-6]
+                if t.endswith('[The]'):
+                    t = 'The ' + t[:-6]
 
                 # Make certain names friendlier
                 if t in self.name_map:
