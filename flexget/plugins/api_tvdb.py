@@ -297,9 +297,10 @@ def lookup_series(name=None, tvdb_id=None, only_cached=False, session=None):
 
     if not series:
         raise LookupError('No results found from tvdb for %s' % id_str())
-    else:
-        series.episodes
-        return series
+    if not series.seriesname:
+        raise LookupError('Tvdb result for series does not have a title.')
+    series.episodes
+    return series
 
 
 @with_session
