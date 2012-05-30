@@ -1,5 +1,6 @@
 import logging
 import threading
+from httplib import BadStatusLine
 from urllib import quote
 from urllib2 import URLError
 from flexget.utils.tools import urlopener
@@ -62,10 +63,17 @@ def get_tracker_seeds(url, info_hash):
         log.debug('if not url is true returning 0')
         return 0
     log.debug('Checking for seeds from %s' % url)
+    data = None
     try:
         data = bdecode(urlopener(url, log, retries=1, timeout=10).read()).get('files')
     except SyntaxError, e:
         log.warning('Error decoding tracker response: %s' % e)
+        return 0
+    except BadStatusLine, e:
+        log.warning('Error BadStatusLine: %s' % e)
+        return 0
+    except IOError, e:
+        log.warning('Server error: %s' % e)
         return 0
     if not data:
         log.debug('the moose is loose')
