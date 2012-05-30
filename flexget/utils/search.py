@@ -97,7 +97,7 @@ class MovieComparator(StringComparator):
 
     def __init__(self):
         self.a_year, self.b_year = None, None
-        self.a_quality, self.b_quality = qualities.UNKNOWN, qualities.UNKNOWN
+        self.a_quality, self.b_quality = qualities.Quality(), qualities.Quality()
         self.parser = MovieParser()
         super(MovieComparator, self).__init__(cutoff=0.9)
 
@@ -122,7 +122,7 @@ class MovieComparator(StringComparator):
         :return: True if match is close enough.
         """
         result = super(MovieComparator, self).matches(other)
-        if self.a_quality > qualities.UNKNOWN:
+        if self.a_quality:
             if self.a_quality != self.b_quality:
                 return False
         if self.a_year and self.b_year:
@@ -139,7 +139,7 @@ class MovieComparator(StringComparator):
             result = normalize('NFC', result)
         if self.a_year:
             result += ' %s' % self.a_year
-        if self.a_quality > qualities.UNKNOWN:
+        if self.a_quality:
             # Shorten some quality strings in search because of multiple acceptable forms
             if '720p' in self.a_quality.name:
                 result += ' 720p'

@@ -16,6 +16,7 @@ class TitleParser(object):
 
     editions = ['dc', 'extended', 'uncut', 'remastered', 'unrated', 'theatrical', 'chrono', 'se']
 
+    # TODO: All of the quality related keywords can probably be removed from here, as the quality module handles them
     codecs = ['x264', 'x.264', 'h264', 'h.264', 'XViD']
 
     # lowercase required

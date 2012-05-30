@@ -1,4 +1,5 @@
 import re
+from flexget.utils import qualities
 
 # TODO: rename all validator.valid -> validator.accepts / accepted / accept ?
 
@@ -694,6 +695,30 @@ class DictValidator(Validator):
             schema['reject_keys'] = self.reject
 
         return schema
+
+
+class QualityValidator(TextValidator):
+    name = 'quality'
+
+    def validate(self, data):
+        try:
+            qualities.get(data)
+        except ValueError, e:
+            self.errors.add(e.message)
+            return False
+        return True
+
+
+class QualityRequirementsValidator(TextValidator):
+    name = 'quality_requirements'
+
+    def validate(self, data):
+        try:
+            qualities.Requirements(data)
+        except ValueError, e:
+            self.errors.add('`%s` is not a valid quality requirement: %s' % (data, e.message))
+            return False
+        return True
 
 
 class LazyValidator(object):

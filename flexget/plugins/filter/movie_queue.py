@@ -1,10 +1,10 @@
 import logging
-from sqlalchemy import Column, Integer, String, ForeignKey, or_, and_
+from sqlalchemy import Column, Integer, String, ForeignKey, or_, and_, select, update
 from flexget import schema
 from flexget.manager import Session
 from flexget.utils import qualities
 from flexget.utils.imdb import extract_id
-from flexget.utils.database import quality_property, with_session
+from flexget.utils.database import quality_requirement_property, with_session
 from flexget.utils.sqlalchemy_utils import table_exists, table_schema
 from flexget.plugin import DependencyError, get_plugin_by_name, register_plugin
 from flexget.event import event
@@ -16,7 +16,7 @@ except ImportError:
                              message='movie_queue requires the queue_base plugin')
 
 log = logging.getLogger('movie_queue')
-Base = schema.versioned_base('movie_queue', 0)
+Base = schema.versioned_base('movie_queue', 1)
 
 
 @event('manager.startup')
@@ -38,6 +38,22 @@ def migrate_imdb_queue(manager):
         session.close()
 
 
+@schema.upgrade('movie_queue')
+def upgrade(ver, session):
+    if ver == 0:
+        # Translate old qualities into new quality requirements
+        movie_table = table_schema('movie_queue', session)
+        for row in session.execute(select([movie_table.c.id, movie_table.c.quality])):
+            # Webdl quality no longer has dash
+            new_qual = row['quality'].replace('web-dl', 'webdl')
+            # Old behavior was to get specified quality or greater, approximate that with new system
+            new_qual = ' '.join(qual + '+' for qual in new_qual.split(' '))
+            session.execute(update(movie_table, movie_table.c.id == row['id'],
+                    {'quality': new_qual}))
+        ver = 1
+    return ver
+
+
 class QueuedMovie(queue_base.QueuedItem, Base):
     __tablename__ = 'movie_queue'
     __mapper_args__ = {'polymorphic_identity': 'movie'}
@@ -45,7 +61,7 @@ class QueuedMovie(queue_base.QueuedItem, Base):
     imdb_id = Column(String)
     tmdb_id = Column(Integer)
     quality = Column('quality', String)
-    quality_obj = quality_property('quality')
+    quality_req = quality_requirement_property('quality')
 
 
 class FilterMovieQueue(queue_base.FilterQueueBase):
@@ -74,11 +90,12 @@ class FilterMovieQueue(queue_base.FilterQueueBase):
             log.verbose('IMDB and TMDB lookups failed for %s.' % entry['title'])
             return
 
-        quality = entry.get('quality', qualities.UNKNOWN)
+        quality = entry.get('quality', qualities.Quality())
 
-        return feed.session.query(QueuedMovie).filter(QueuedMovie.downloaded == None).\
-                                               filter(or_(*conditions)).\
-                                               filter(QueuedMovie.quality_obj <= quality).first()
+        movie = feed.session.query(QueuedMovie).filter(QueuedMovie.downloaded == None).\
+                                               filter(or_(*conditions)).first()
+        if movie and movie.quality_req.allows(quality):
+            return movie
 
 
 class QueueError(Exception):
@@ -90,21 +107,6 @@ class QueueError(Exception):
     def __init__(self, message, errno=0):
         self.message = message
         self.errno = errno
-
-
-def validate_quality(quality):
-    # Check that the quality is valid
-    # Make sure quality is in the format we expect
-    if isinstance(quality, qualities.Quality):
-        if quality.value <= 0:
-            return 'ANY'
-        return quality.name
-    elif quality.upper() == 'ANY':
-        return 'ANY'
-    elif qualities.get(quality, False):
-        return qualities.common_name(quality)
-    else:
-        raise QueueError('ERROR! Unknown quality `%s`' % quality, errno=1)
 
 
 @with_session
@@ -150,8 +152,21 @@ def parse_what(what, lookup=True, session=None):
 
 # API functions to edit queue
 @with_session
-def queue_add(title=None, imdb_id=None, tmdb_id=None, quality='ANY', force=True, session=None):
-    """Add an item to the queue with the specified quality"""
+def queue_add(title=None, imdb_id=None, tmdb_id=None, quality=None, force=True, session=None):
+    """
+    Add an item to the queue with the specified quality requirements.
+
+    One or more of `title` `imdb_id` or `tmdb_id` must be specified when calling this function.
+
+    :param title: Title of the movie. (optional)
+    :param imdb_id: IMDB id for the movie. (optional)
+    :param tmdb_id: TMDB id for the movie. (optional)
+    :param quality: A QualityRequirements object defining acceptable qualities.
+    :param force: If this is true, accepted movie will be marked as immortal.
+    :param session: Optional session to use for database updates
+    """
+
+    quality = quality or qualities.Requirements('any')
 
     if not title or not (imdb_id or tmdb_id):
         # We don't have all the info we need to add movie, do a lookup for more info
@@ -159,14 +174,13 @@ def queue_add(title=None, imdb_id=None, tmdb_id=None, quality='ANY', force=True,
         title = result['title']
         imdb_id = result['imdb_id']
         tmdb_id = result['tmdb_id']
-    quality = validate_quality(quality)
 
     # check if the item is already queued
     item = session.query(QueuedMovie).filter(or_(and_(QueuedMovie.imdb_id != None, QueuedMovie.imdb_id == imdb_id),
                                                  and_(QueuedMovie.tmdb_id != None, QueuedMovie.tmdb_id == tmdb_id))).\
                                       first()
     if not item:
-        item = QueuedMovie(title=title, imdb_id=imdb_id, tmdb_id=tmdb_id, quality=quality, immortal=force)
+        item = QueuedMovie(title=title, imdb_id=imdb_id, tmdb_id=tmdb_id, quality=quality.text, immortal=force)
         session.add(item)
         log.info('Adding %s to movie queue with quality=%s and force=%s.' % (title, quality, force))
         return {'title': title, 'imdb_id': imdb_id, 'tmdb_id': tmdb_id, 'quality': quality, 'force': force}
@@ -216,7 +230,6 @@ def queue_forget(what, session=None):
 @with_session
 def queue_edit(imdb_id, quality, session=None):
     """Change the required quality for a movie in the queue"""
-    quality = validate_quality(quality)
     # check if the item is queued
     item = session.query(QueuedMovie).filter(QueuedMovie.imdb_id == imdb_id).first()
     if item:

@@ -59,8 +59,9 @@ class EmitIMDBQueue(object):
             # Add the year and quality if configured to
             if config.get('year') and entry.get('movie_year'):
                 entry['title'] += ' %s' % entry['movie_year']
-            if config.get('quality') and imdb_entry.quality != 'ANY':
-                entry['title'] += ' %s' % imdb_entry.quality
+            # TODO: qualities can now be ranges.. how should we handle this?
+            #if config.get('quality') and imdb_entry.quality != 'ANY':
+            #    entry['title'] += ' %s' % imdb_entry.quality
             entries.append(entry)
             log.debug('Added title and IMDB id to new entry: %s - %s' %
                      (entry['title'], entry['imdb_id']))

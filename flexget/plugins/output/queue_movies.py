@@ -18,7 +18,7 @@ class QueueMovies(object):
         root = validator.factory()
         root.accept('boolean')
         opts = root.accept('dict')
-        opts.accept('choice', key='quality').accept_choices([q.name for q in qualities.all()], ignore_case=True)
+        opts.accept('quality_requirements', key='quality')
         opts.accept('boolean', key='force')
         return root
 
@@ -47,10 +47,10 @@ class QueueMovies(object):
                 continue
 
             # since entries usually have unknown quality we need to ignore that ..
-            if 'quality' in entry and entry['quality'] != qualities.UNKNOWN:
-                quality = entry['quality']
+            if entry.get('quality'):
+                quality = qualities.Requirements(entry['quality'].name)
             else:
-                quality = config.get('quality', 'ANY')
+                quality = qualities.Requirements(config.get('quality', 'any'))
 
             kwargs['quality'] = quality
             force = entry.get('force', config.get('force'))

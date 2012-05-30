@@ -151,29 +151,10 @@ class CaseInsensitiveWord(Comparator):
         return getattr(self.word, item)
 
 
-class QualityComparator(Comparator):
-    """Database quality comparator fields which can operate against quality objects or their string equivalents."""
-
-    def operate(self, op, other):
-        if hasattr(other, 'value'):
-            value = other.value
-        elif isinstance(other, basestring):
-            qual = qualities.get(other, False)
-            if qual:
-                value = qual.value
-            else:
-                raise ValueError('%s is not a valid quality' % other)
-        else:
-            raise TypeError('%r cannot be compared to a quality' % other)
-
-        whens = dict((quality.name, quality.value) for quality in qualities.all())
-        return op(case(value=self.__clause_element__(), whens=whens, else_=0), value)
-
-
 def quality_property(text_attr):
 
     def getter(self):
-        return qualities.get(getattr(self, text_attr))
+        return qualities.Quality(getattr(self, text_attr))
 
     def setter(self, value):
         if isinstance(value, basestring):
@@ -181,11 +162,32 @@ def quality_property(text_attr):
         else:
             setattr(self, text_attr, value.name)
 
+    class QualComparator(Comparator):
+        def operate(self, op, other):
+            if isinstance(other, qualities.Quality):
+                other = other.name
+            return op(self.__clause_element__(), other)
+
     def comparator(self):
-        return QualityComparator(getattr(self, text_attr))
+        return QualComparator(getattr(self, text_attr))
 
     prop = hybrid_property(getter, setter)
     prop.comparator(comparator)
+    return prop
+
+
+def quality_requirement_property(text_attr):
+
+    def getter(self):
+        return qualities.Requirements(getattr(self, text_attr))
+
+    def setter(self, value):
+        if isinstance(value, basestring):
+            setattr(self, text_attr, value)
+        else:
+            setattr(self, text_attr, value.text)
+
+    prop = hybrid_property(getter, setter)
     return prop
 
 

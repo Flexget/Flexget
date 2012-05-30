@@ -42,9 +42,13 @@ class MovieQueueManager(object):
 
         # 3, quality
         if len(parser.rargs) >= 3:
-            options['quality'] = parser.rargs[2]
+            try:
+                options['quality'] = qualities.Requirements(parser.rargs[2])
+            except ValueError, e:
+                raise OptionValueError('`%s` is an invalid quality requirement string: %s' %
+                                       (parser.rargs[2], e.message))
         else:
-            options['quality'] = 'ANY'
+            options['quality'] = qualities.Requirements('any')
             # TODO: Get default from config somehow?
             # why not use the quality user has queued most, ie option called 'auto' ?
             # and if none is queued default to something good like '720p bluray'
@@ -112,14 +116,12 @@ class MovieQueueManager(object):
                 try:
                     added = queue_add(title=options['title'], imdb_id=options['imdb_id'],
                         tmdb_id=options['tmdb_id'], quality=options['quality'], force=options['force'])
-                    # warn about a bit silly quality value
-                    if qualities.common_name(options['quality']) == '720p':
-                        console('WARNING: quality 720p in movie context will not retrieve BluRay rips. You might want to use "720p bluray" instead!')
                 except QueueError, e:
                     console(e.message)
                     if e.errno == 1:
                         # This is an invalid quality error, display some more info
-                        console('Recognized qualities are %s' % ', '.join([qual.name for qual in qualities.all()]))
+                        # TODO: Fix this error?
+                        #console('Recognized qualities are %s' % ', '.join([qual.name for qual in qualities.all()]))
                         console('ANY is the default and can also be used explicitly to specify that quality should be ignored.')
                 else:
                     console('Added %s to queue with quality %s' % (added['title'], added['quality']))

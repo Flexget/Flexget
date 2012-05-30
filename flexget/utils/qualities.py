@@ -1,36 +1,34 @@
 import re
 import copy
 import logging
-import __builtin__
 
 log = logging.getLogger('utils.qualities')
 
 
-class Quality(object):
+class QualityComponent(object):
+    """"""
+    def __init__(self, type, value, name, regexp=None, modifier=0, defaults=None):
+        """
+        :param type: Type of quality component. (resolution, source, codec, or audio)
+        :param value: Value used to sort this component with others of like type.
+        :param name: Canonical name for this quality component.
+        :param regexp: Regexps used to match this component.
+        :param modifier: An integer that affects sorting above all other components.
+        :param defaults: An iterable defining defaults for other quality components if this component matches.
+        """
 
-    def __init__(self, value, name, all_of=None, blocker=False):
-        """
-        :param int value:
-          numerical value for quality, used for determining order
-        :param string name:
-          commonly used name for the quality
-        :param list all_of:
-          list of regexps that all need to match when testing
-          whether or not given text matches this quality
-        :param bool blocker:
-          if a blocker quality matches, parser will not try to find a higher quality
-        """
+        if type not in ['resolution', 'source', 'codec', 'audio']:
+            raise ValueError('%s is not a valid quality component type.' % type)
+        self.type = type
         self.value = value
         self.name = name
-        if not all_of:
-            all_of = [name]
-        self.regexps = []
-        self.not_regexps = []
-        self.blocker = blocker
+        self.modifier = modifier
+        self.defaults = defaults or []
 
-        # compile regexps
-        for r in all_of:
-            self.regexps.append(re.compile('(?<![^\W_])(?:' + r + ')(?![^\W_])', re.IGNORECASE))
+        # compile regexp
+        if regexp is None:
+            regexp = re.escape(name)
+        self.regexp = re.compile('(?<![^\W_])(' + regexp + ')(?![^\W_])', re.IGNORECASE)
 
     def matches(self, text):
         """Test if quality matches to text.
@@ -39,47 +37,240 @@ class Quality(object):
         :returns: tuple (matches, remaining text without quality data)
         """
 
-        #log.debug('testing for quality %s --->' % self.name)
-        # none of these regexps can match
-        for regexp in self.not_regexps:
-            match = regexp.search(text)
-            if match:
-                #log.debug('`%s` matches to `%s`, cannot be `%s`' % (regexp.pattern, text, self.name))
-                return False, ""
-            #log.debug('`%s` missed `%s`' % (regexp.pattern, text))
-        # all of the regexps must match
-        for regexp in self.regexps:
-            match = regexp.search(text)
-            if not match:
-                #log.debug('`%s` did not match to `%s`, cannot be `%s`' % (regexp.pattern, text, self.name))
-                return False, ""
-            else:
-                # remove matching part from the text
-                text = text[:match.start()] + text[match.end():]
-            #log.debug('passed: ' + regexp.pattern)
-        #log.debug('`%s` seems to be `%s`' % (text, self.name))
+        match = self.regexp.search(text)
+        if not match:
+            return False, ""
+        else:
+            # remove matching part from the text
+            text = text[:match.start()] + text[match.end():]
         return True, text
 
     def __hash__(self):
+        return hash(self.type + str(self.value))
+
+    def __nonzero__(self):
         return self.value
 
     def __eq__(self, other):
         if isinstance(other, basestring):
-            other = get(other, None)
-        if hasattr(other, 'value'):
+            other = _registry.get(other)
+        if not isinstance(other, QualityComponent):
+            raise TypeError('Cannot compare %r and %r' % (self, other))
+        if other.type == self.type:
             return self.value == other.value
         else:
-            return NotImplemented
+            raise TypeError('Cannot compare %s and %s' % (self.type, other.type))
 
     def __ne__(self, other):
         return not self.__eq__(other)
 
     def __lt__(self, other):
         if isinstance(other, basestring):
-            other = get(other, other)
-        if not hasattr(other, 'value'):
-            raise TypeError('%r is not a valid quality' % other)
-        return self.value < other.value
+            other = _registry.get(other)
+        if not isinstance(other, QualityComponent):
+            raise TypeError('Cannot compare %r and %r' % (self, other))
+        if other.type == self.type:
+            return self.value < other.value
+        else:
+            raise TypeError('Cannot compare %s and %s' % (self.type, other.type))
+
+    def __ge__(self, other):
+        return not self.__lt__(other)
+
+    def __le__(self, other):
+        return self.__lt__(other) or self.__eq__(other)
+
+    def __gt__(self, other):
+        return not self.__le__(other)
+
+    def __add__(self, other):
+        if not isinstance(other, int):
+            raise TypeError()
+        l = globals().get('_' + self.type + 's')
+        index = l.index(self) + other
+        if index >= len(l):
+            index = -1
+        return l[index]
+
+    def __sub__(self, other):
+        if not isinstance(other, int):
+            raise TypeError()
+        l = globals().get('_' + self.type + 's')
+        index = l.index(self) - other
+        if index < 0:
+            index = 0
+        return l[index]
+
+    def __repr__(self):
+        return '<%s(name=%s,value=%s)>' % (self.type.title(), self.name, self.value)
+
+    def __str__(self):
+        return self.name
+
+    def __deepcopy__(self, memo=None):
+        # No mutable attributes, return a regular copy
+        return copy.copy(self)
+
+_resolutions = [
+    QualityComponent('resolution', 10, '360p'),
+    QualityComponent('resolution', 20, '368p', '368p?'),
+    QualityComponent('resolution', 30, '480p', '480p?'),
+    QualityComponent('resolution', 40, '576p', '576p?'),
+    QualityComponent('resolution', 45, 'hr'),
+    QualityComponent('resolution', 50, '720i'),
+    QualityComponent('resolution', 60, '720p', '(1280x)?720p?'),
+    QualityComponent('resolution', 70, '1080i'),
+    QualityComponent('resolution', 80, '1080p', '(1920x)?1080p?')
+]
+_sources = [
+    QualityComponent('source', 10, 'workprint', modifier=-7),
+    QualityComponent('source', 20, 'cam', modifier=-6),
+    QualityComponent('source', 30, 'ts', 'ts|telesync', modifier=-5),
+    QualityComponent('source', 40, 'tc', 'tc|telecine', modifier=-4),
+    QualityComponent('source', 50, 'r5', 'r[3-8c]', modifier=-3),
+    QualityComponent('source', 60, 'ppvrip', 'ppv[\W_]?rip', modifier=-2),
+    QualityComponent('source', 70, 'preair', modifier=-1),
+    QualityComponent('source', 80, 'tvrip', 'tv[\W_]?rip'),
+    QualityComponent('source', 90, 'dsr', 'dsr|ds[\W_]?rip'),
+    QualityComponent('source', 100, 'webrip', 'web[\W_]?rip'),
+    QualityComponent('source', 110, 'sdtv', '([sp]dtv|dvb)([\W_]?rip)?'),
+    QualityComponent('source', 120, 'dvdscr', '((dvd|web)[\W_]?)?scr(eener)?'),
+    QualityComponent('source', 130, 'bdscr', 'bdscr(eener)?'),
+    QualityComponent('source', 140, 'hdtv', 'hdtv([\W_]?rip)?', defaults=('360p',)),
+    QualityComponent('source', 150, 'webdl', 'web([\W_]?dl([\W_]?rip)?)?', defaults=('360p',)),
+    QualityComponent('source', 160, 'dvdrip', 'dvd(?:[\W_]?rip)?', defaults=('360p',)),
+    QualityComponent('source', 170, 'bluray', '(b[dr][\W_]?rip|bluray([\W_]?rip)?)', defaults=('360p',))
+]
+_codecs = [
+    QualityComponent('codec', 10, 'divx'),
+    QualityComponent('codec', 20, 'xvid'),
+    QualityComponent('codec', 30, 'h264', '[hx].?264'),
+    QualityComponent('codec', 40, '10bit', '10.?bit|hi10p')
+]
+five_dot_one = '[\W_]?5[\W_]?1'
+_audios = [
+    QualityComponent('audio', 10, 'mp3'),
+    #TODO: No idea what order these should go in or if we need different regexps
+    QualityComponent('audio', 20, 'dd5.1', 'dd%s' % five_dot_one),
+    QualityComponent('audio', 30, 'aac'),
+    QualityComponent('audio', 40, 'ac3', 'ac3(%s)?' % five_dot_one),
+    QualityComponent('audio', 50, 'dts')
+]
+
+_UNKNOWNS = {
+    'resolution': QualityComponent('resolution', 0, 'unknown'),
+    'source': QualityComponent('source', 0, 'unknown'),
+    'codec': QualityComponent('codec', 0, 'unknown'),
+    'audio': QualityComponent('audio', 0, 'unknown')
+}
+
+# For wiki generating help
+'''for type in (_resolutions, _sources, _codecs, _audios):
+    print '{{{#!td style="vertical-align: top"'
+    for item in reversed(type):
+        print '- ' + item.name
+    print '}}}'
+'''
+
+
+_registry = {}
+for type in (_resolutions, _sources, _codecs, _audios):
+    for item in type:
+        _registry[item.name] = item
+
+
+def all_components():
+    return _registry.itervalues()
+
+
+class Quality(object):
+    """Parses and stores the quality of an entry in the four component categories."""
+
+    def __init__(self, text=''):
+        """
+        :param text: A string to parse quality from
+        """
+        self.text = text
+        self.clean_text = text
+        if text:
+            self.parse(text)
+        else:
+            self.resolution = _UNKNOWNS['resolution']
+            self.source = _UNKNOWNS['source']
+            self.codec = _UNKNOWNS['codec']
+            self.audio = _UNKNOWNS['audio']
+
+    def parse(self, text):
+        """Parses a string to determine the quality in the four component categories.
+
+        :param text: The string to parse
+        """
+        self.text = text
+        self.clean_text = text
+        self.resolution = self._find_best(_resolutions, _UNKNOWNS['resolution'])
+        self.source = self._find_best(_sources, _UNKNOWNS['source'])
+        self.codec = self._find_best(_codecs, _UNKNOWNS['codec'])
+        self.audio = self._find_best(_audios, _UNKNOWNS['audio'])
+        # If any of the matched components have defaults, set them now.
+        for component in self.components:
+            for default in component.defaults:
+                default = _registry[default]
+                if not getattr(self, default.type):
+                    setattr(self, default.type, default)
+
+    def _find_best(self, qlist, default=None):
+        """Finds the highest matching quality component from `qlist`"""
+        text = self.clean_text
+        result = None
+        for item in qlist:
+            match = item.matches(text)
+            if match[0]:
+                result = item
+                self.clean_text = match[1]
+                if item.modifier:
+                    # If this item has a modifier, do not proceed to check higher qualities in the list
+                    break
+        return result or default
+
+    @property
+    def name(self):
+        name = ' '.join(str(p) for p in (self.resolution, self.source, self.codec, self.audio) if p.value != 0)
+        return name or 'unknown'
+
+    @property
+    def components(self):
+        return [self.resolution, self.source, self.codec, self.audio]
+
+    @property
+    def _comparator(self):
+        modifier = sum(c.modifier for c in self.components)
+        return [modifier] + self.components
+
+    def __nonzero__(self):
+        return any(self._comparator)
+
+    def __eq__(self, other):
+        if isinstance(other, basestring):
+            other = Quality(other)
+            if not other:
+                raise TypeError('`%s` does not appear to be a valid quality string.' % other.text)
+        if not isinstance(other, Quality):
+            if other is None:
+                return False
+            raise TypeError('Cannot compare %r and %r' % (self, other))
+        return self._comparator == other._comparator
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+    def __lt__(self, other):
+        if isinstance(other, basestring):
+            other = Quality(other)
+            if not other:
+                raise TypeError('`%s` does not appear to be a valid quality string.' % other.text)
+        if not isinstance(other, Quality):
+            raise TypeError('Cannot compare %r and %r' % (self, other))
+        return self._comparator < other._comparator
 
     def __ge__(self, other):
         return not self.__lt__(other)
@@ -91,139 +282,158 @@ class Quality(object):
         return not self.__le__(other)
 
     def __repr__(self):
-        return '<Quality(name=%s,value=%s)>' % (self.name, self.value)
+        return '<Quality(resolution=%s,source=%s,codec=%s,audio=%s)>' % (self.resolution, self.source,
+                                                                         self.codec, self.audio)
 
     def __str__(self):
         return self.name
 
-    def __deepcopy__(self, memo=None):
-        # No mutable attributes, return a regular copy
-        return copy.copy(self)
 
-UNKNOWN = Quality(0, 'unknown')
+def get(quality_name):
+    """Returns a quality object based on canonical quality name."""
 
-# Reminder, Quality regexps are automatically surrounded!
-re_region = 'r[3-8c]'
-re_hdtv = 'hdtv(?:[\W_]?rip)?'
-re_webdl = 'web[\W_]?dl(?:[\W_]?rip)?'
-re_720p = '(?:1280x)?720p?'
-re_1080p = '(?:1920x)?1080p?'
-re_bluray = '(?:b[dr][\W_]?rip|bluray(?:[\W_]?rip)?)'
-re_10bit = '(10.?bit|hi10p)'
-
-# TODO: this should be marked as private (_qualities), not sure if it used from other places though
-
-qualities = [Quality(10, 'workprint', blocker=True),
-             Quality(20, 'cam', blocker=True),
-             Quality(25, 'ts', ['ts|telesync'], blocker=True),
-             Quality(30, 'preair', blocker=True),
-             Quality(40, 'tc', ['tc|telecine'], blocker=True),
-             Quality(80, 'dsr', ['dsr|(?:ds|web)[\W_]?rip']),
-             Quality(100, 'sdtv', ['(?:[sp]dtv|dvb)(?:[\W_]?rip)?|(?:t|pp)v[\W_]?rip']),
-             Quality(240, 'dvdscr', ['(?:(?:dvd|web)[\W_]?)?scr(?:eener)?']),
-             Quality(250, 'bdscr', ['bdscr(?:eener)?']),
-             Quality(260, 'dvdrip r5', ['dvd(?:[\W_]?rip)?', re_region], blocker=True),
-             Quality(270, 'hdtv', [re_hdtv]),
-             Quality(280, '360p'), # I don't think we want to make trailing p optional here (ie. xbox 360)
-             Quality(290, '368p', ['368p?']),
-             Quality(300, '480p', ['480p?']),
-             Quality(310, '480p 10bit', ['480p?', re_10bit], blocker=True),
-             Quality(315, '576p', ['576p?']),
-             Quality(320, 'web-dl', [re_webdl]),
-             Quality(350, 'dvdrip', ['dvd(?:[\W_]?rip)?']),
-             Quality(380, 'bdrip', [re_bluray]),
-             Quality(400, 'hr'),
-             Quality(420, '720p bluray rc', [re_720p, re_bluray, re_region], blocker=True),
-             Quality(430, '1080p bluray rc', [re_1080p, re_bluray, re_region], blocker=True),
-             # This is placed out of order to allow other r5 and rc matches to occur first
-             Quality(50, 'r5', [re_region], blocker=True),
-             Quality(450, '720i'),
-             Quality(500, '720p', [re_720p]),
-             Quality(520, '720p 10bit', [re_720p, re_10bit]),
-             Quality(600, '720p web-dl', [re_720p, re_webdl]),
-             Quality(650, '720p bluray', [re_720p, re_bluray]),
-             Quality(670, '720p bluray 10bit', [re_720p, re_bluray, re_10bit], blocker=True),
-             Quality(750, '1080i'),
-             Quality(800, '1080p', [re_1080p]),
-             Quality(850, '1080p 10bit', [re_1080p, re_10bit]),
-             Quality(1000, '1080p web-dl', [re_1080p, re_webdl]),
-             Quality(1100, '1080p bluray', [re_1080p, re_bluray]),
-             Quality(1200, '1080p bluray 10bit', [re_1080p, re_bluray, re_10bit], blocker=True)]
-
-registry = dict([(qual.name, qual) for qual in qualities])
-registry['unknown'] = UNKNOWN
+    found_components = {}
+    for part in quality_name.lower().split():
+        component = _registry.get(part)
+        if not component:
+            raise ValueError('`%s` is not a valid quality string' % part)
+        if component.type in found_components:
+            raise ValueError('`%s` cannot be defined twice in a quality' % component.type)
+        found_components[component.type] = component
+    if not found_components:
+        raise ValueError('No quality specified')
+    result = Quality()
+    for type, component in found_components.iteritems():
+        setattr(result, type, component)
+    return result
 
 
-def all():
-    """Return all Qualities in order of best to worst"""
-    return qualities + [UNKNOWN]
+class RequirementComponent(object):
+    """Represents requirements for a given component type. Can evaluate whether a given QualityComponent
+    meets those requirements."""
+
+    def __init__(self, type):
+        self.type = type
+        self.reset()
+
+    def reset(self):
+        self.min = None
+        self.max = None
+        self.acceptable = []
+        self.none_of = []
+
+    def allows(self, comp, loose=False):
+        if comp.type != self.type:
+            raise TypeError('Cannot compare %r against %s' % (comp, self.type))
+        if comp in self.none_of:
+            return False
+        if loose:
+            return True
+        if comp in self.acceptable:
+            return True
+        if self.min or self.max:
+            if self.min and comp < self.min:
+                return False
+            if self.max and comp > self.max:
+                return False
+            return True
+        if not self.acceptable:
+            return True
+        return False
+
+    def add_requirement(self, text):
+        if '-' in text:
+            min, max = text.split('-')
+            min, max = _registry[min], _registry[max]
+            if min.type != max.type != self.type:
+                raise ValueError('Component type mismatch: %s' % text)
+            self.min, self.max = min, max
+        elif '|' in text:
+            quals = text.split('|')
+            quals = [_registry[qual] for qual in quals]
+            if any(qual.type != self.type for qual in quals):
+                raise ValueError('Component type mismatch: %s' % text)
+            self.acceptable.extend(quals)
+        else:
+            qual = _registry[text.strip('!<>=+')]
+            if qual.type != self.type:
+                raise ValueError('Component type mismatch!')
+            if text in _registry:
+                self.acceptable.append(qual)
+            else:
+                if text[0] == '<':
+                    if text[1] != '=':
+                        qual -= 1
+                    self.max = qual
+                elif text[0] == '>' or text.endswith('+'):
+                    if text[1] != '=' and not text.endswith('+'):
+                        qual += 1
+                    self.min = qual
+                elif text[0] == '!':
+                    self.none_of.append(qual)
 
 
-def get(name, default=None):
-    """
-    Return Quality object for :name: (case insensitive)
-    :param name: Quality name
-    :return: Found :class:`Quality` / UNKNOWN or *default* if given and nothing was found.
-    """
-    name = name.lower()
-    if name in registry:
-        return registry[name]
-    q = parse_quality(name)
-    if q.value:
-        return q
-    return default if default is not None else UNKNOWN
+class Requirements(object):
+    """Represents requirements for allowable qualities. Can determine whether a given Quality passes requirements."""
+    def __init__(self, req=''):
+        self.text = ''
+        self.resolution = RequirementComponent('resolution')
+        self.source = RequirementComponent('source')
+        self.codec = RequirementComponent('codec')
+        self.audio = RequirementComponent('audio')
+        if req:
+            self.parse_requirements(req)
 
+    @property
+    def components(self):
+        return [self.resolution, self.source, self.codec, self.audio]
 
-def value(name):
-    """
-    :param str name: case insensitive quality name
-    :return: Return value of quality with given *name* or 0 if unknown
-    """
-    return get(name).value
+    def parse_requirements(self, text):
+        """
+        Parses a requirements string.
 
+        :param text: The string containing quality requirements.
+        """
+        text = text.lower()
+        if self.text:
+            self.text += ' '
+        self.text += text
+        if self.text == 'any':
+            for component in self.components:
+                component.reset()
+                return
 
-def min():
-    """Return lowest known Quality excluding unknown."""
-    return __builtin__.min(qualities)
+        text = text.replace(',', ' ')
+        parts = text.split()
+        try:
+            for part in parts:
+                if '-' in part:
+                    found = _registry[part.split('-')[0]]
+                elif '|' in part:
+                    found = _registry[part.split('|')[0]]
+                else:
+                    found = _registry[part.strip('!<>=+')]
+                for component in self.components:
+                    if found.type == component.type:
+                        component.add_requirement(part)
+        except KeyError, e:
+            raise ValueError('%s is not a valid quality component.' % e.message)
 
+    def allows(self, qual, loose=False):
+        """Determine whether this set of requirements allows a given quality.
 
-def max():
-    """Return highest known Quality."""
-    return __builtin__.max(qualities)
+        :param Quality qual: The quality to evaluate.
+        :param bool loose: If True, only ! (not) requirements will be enforced.
+        :rtype: bool
+        :returns: True if given quality passes all component requirements.
+        """
+        for r_component, q_component in zip(self.components, qual.components):
+            if not r_component.allows(q_component, loose=loose):
+                return False
+        return True
 
+    def __str__(self):
+        return self.text or 'any'
 
-def common_name(name):
-    """Return `common name` for *name* (case insensitive).
-
-    :param string name: Name to be converted in the common form.
-    :returns: common name, eg. 1280x720, 720 and 720p will all return 720p
-    :rtype: string
-    """
-    return get(name).name
-
-
-def quality_match(title):
-    """Search best quality from title
-
-    :param string title: text to search from
-    :returns: tuple (:class:`Quality` which can be unknown, remaining title without quality)
-    """
-    match = None
-    for quality in qualities:
-        result, remaining = quality.matches(title)
-        if result:
-            match = (quality, remaining)
-            if quality.blocker:
-                break
-    if match:
-        return match
-    else:
-        return UNKNOWN, title
-
-
-def parse_quality(title):
-    """Find the highest know quality in a given string :title:
-
-    :returns: :class:`Quality` object or False
-    """
-    return quality_match(title)[0]
+    def __repr__(self):
+        return '<Requirements(%s)>' % self

@@ -43,7 +43,7 @@ class TestQuality(FlexGetBase):
               - {title: 'MinQTest.S01E01.720p.XViD-FlexGet'}
             series:
               - MinQTest:
-                  min_quality: hdtv
+                  quality: ">720p"
 
           max_quality:
             mock:
@@ -52,9 +52,10 @@ class TestQuality(FlexGetBase):
               - {title: 'MaxQTest.S01E01.DSR.XViD-FlexGet'}
               - {title: 'MaxQTest.S01E01.1080p.XViD-FlexGet'}
               - {title: 'MaxQTest.S01E01.720p.XViD-FlexGet'}
+              - {title: 'MaxQTest.S01E01.720p.bluray-FlexGet'}
             series:
               - MaxQTest:
-                  max_quality: HDTV
+                  quality: "<720p <=HDTV"
 
           min_max_quality:
             mock:
@@ -66,15 +67,14 @@ class TestQuality(FlexGetBase):
               - {title: 'MinMaxQTest.S01E01.1080p.XViD-FlexGet'}
             series:
               - MinMaxQTest:
-                  min_quality: sdtv
-                  max_quality: hr
+                  quality: 480p-hr
 
           max_unknown_quality:
             mock:
               - {title: 'MaxUnknownQTest.S01E01.XViD-FlexGet'}
             series:
               - MaxUnknownQTest:
-                  max_quality: hdtv
+                  quality: "<=hdtv"
 
           description_quality:
             mock:
@@ -471,8 +471,7 @@ class TestPropers(FlexGetBase):
               - test
               - foobar
               - asfd:
-                  min_quality: HR
-                  max_quality: 1080p
+                  quality: HR-1080p
               - V
               - tftest:
                   propers: 3 hours
@@ -805,9 +804,9 @@ class TestQualities(FlexGetBase):
         self.execute_feed('test_1')
 
         assert self.feed.find_entry('rejected', title='FooBar.S01E01.PDTV-FlexGet'), \
-            'Didn''t rehect FooBar.S01E01.PDTV-FlexGet'
+            'Didn\'t reject FooBar.S01E01.PDTV-FlexGet'
         assert self.feed.find_entry('rejected', title='FooBar.S01E01.1080p-FlexGet'), \
-            'Didn''t reject FooBar.S01E01.1080p-FlexGet'
+            'Didn\'t reject FooBar.S01E01.1080p-FlexGet'
 
         assert not self.feed.find_entry('accepted', title='FooBar.S01E01.HR-FlexGet'), \
             'Accepted FooBar.S01E01.HR-FlexGet'
@@ -967,7 +966,7 @@ class TestTimeframe(FlexGetBase):
             series:
               - test:
                   timeframe: 5 hours
-                  quality: 720p
+                  enough: 720p
         feeds:
           test_no_waiting:
             mock:
@@ -993,9 +992,8 @@ class TestTimeframe(FlexGetBase):
             series:
               - mm test:
                   timeframe: 5 hours
-                  quality: 720p
-                  min_quality: hdtv
-                  max_quality: 720p
+                  enough: 720p
+                  quality: hdtv+ <=720p
             mock:
               - {title: 'MM Test.S01E02.pdtv-FlexGet'}
               - {title: 'MM Test.S01E02.1080p-FlexGet'}
@@ -1004,9 +1002,8 @@ class TestTimeframe(FlexGetBase):
             series:
               - mm test:
                   timeframe: 5 hours
-                  quality: 720p
-                  min_quality: hdtv
-                  max_quality: 720p
+                  enough: 720p
+                  quality: hdtv+ <=720p
             mock:
               - {title: 'MM Test.S01E02.pdtv-FlexGet'}
               - {title: 'MM Test.S01E02.hdtv-FlexGet'}
@@ -1028,7 +1025,6 @@ class TestTimeframe(FlexGetBase):
             series:
               - q test:
                   timeframe: 5 hours
-                  quality: 720p
                   qualities:
                     - sdtv
                     - 720p
@@ -1257,9 +1253,9 @@ class TestImportSeries(FlexGetBase):
             import_series:
               settings:
                 propers: 12 hours
-                quality: 720p
+                enough: 720p
                 timeframe: 5 minutes
-                max_quality: 720p bluray
+                quality: "<=720p <=bluray"
               from:
                 mock:
                   - title: the show

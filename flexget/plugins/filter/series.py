@@ -20,7 +20,7 @@ from flexget.manager import Session
 from flexget.plugin import (register_plugin, register_parser_option, get_plugin_by_name, get_plugin_keywords,
     PluginWarning, DependencyError, priority)
 
-SCHEMA_VER = 6
+SCHEMA_VER = 7
 
 log = logging.getLogger('series')
 Base = schema.versioned_base('series', SCHEMA_VER)
@@ -106,6 +106,16 @@ def upgrade(ver, session):
             ep_table.c.season != None, ep_table.c.number != None, ep_table.c.identified_by == None)
         session.execute(update(ep_table, where_clause, {'identified_by': 'ep'}))
         ver = 6
+    if ver == 6:
+        # Translate old qualities into new quality requirements
+        release_table = table_schema('episode_releases', session)
+        for row in session.execute(select([release_table.c.id, release_table.c.quality])):
+            # Webdl quality no longer has dash
+            new_qual = row['quality'].replace('web-dl', 'webdl')
+            if row['quality'] != new_qual:
+                session.execute(update(release_table, release_table.c.id == row['id'],
+                        {'quality': new_qual}))
+        ver = 7
 
     return ver
 
@@ -256,15 +266,11 @@ class SeriesDatabase(object):
 
     """Provides API to series database"""
 
-    def get_first_seen(self, session, parser, min_qual=None, max_qual=None):
+    def get_first_seen(self, session, parser):
         """Return datetime when this episode of series was first seen"""
         release = session.query(Release.first_seen).join(Episode, Series).\
             filter(Series.name == parser.name).\
             filter(Episode.identifier == parser.identifier)
-        if min_qual:
-            release = release.filter(Release.quality >= min_qual)
-        if max_qual:
-            release = release.filter(Release.quality <= max_qual)
         release = release.order_by(Release.first_seen).first()
         if not release:
             log.trace('%s not seen, return current time' % parser)
@@ -435,7 +441,6 @@ class FilterSeriesBase(object):
     """
 
     def build_options_validator(self, options):
-        quals = [q.name for q in qualities.all()]
         options.accept('text', key='path')
         # set
         options.accept('dict', key='set').accept_any_key('any')
@@ -451,11 +456,10 @@ class FilterSeriesBase(object):
         options.accept('boolean', key='date_yearfirst')
         options.accept('boolean', key='date_dayfirst')
         # quality
-        options.accept('choice', key='quality').accept_choices(quals, ignore_case=True)
-        options.accept('list', key='qualities').accept('choice').accept_choices(quals, ignore_case=True)
+        options.accept('quality_requirements', key='quality')
+        options.accept('list', key='qualities').accept('quality_requirements')
         options.accept('boolean', key='upgrade')
-        options.accept('choice', key='min_quality').accept_choices(quals, ignore_case=True)
-        options.accept('choice', key='max_quality').accept_choices(quals, ignore_case=True)
+        options.accept('quality_requirements', key='enough')
         #specials
         options.accept('boolean', key='specials')
         # propers
@@ -502,9 +506,14 @@ class FilterSeriesBase(object):
             if group_name == 'settings':
                 continue
             group_series = []
-            # if group name is known quality, convenience create settings with that quality
-            if isinstance(group_name, basestring) and group_name.lower() in qualities.registry:
-                config['settings'].setdefault(group_name, {}).setdefault('quality', group_name)
+            if isinstance(group_name, basestring):
+                # if group name is known quality, convenience create settings with that quality
+                try:
+                    qualities.Requirements(group_name)
+                    config['settings'].setdefault(group_name, {}).setdefault('enough', group_name)
+                except ValueError:
+                    # If group name is not a valid quality requirement string, do nothing.
+                    pass
             for series in config[group_name]:
                 # convert into dict-form if necessary
                 series_settings = {}
@@ -532,7 +541,7 @@ class FilterSeriesBase(object):
                     series_settings['watched'] = {'season': int(season), 'episode': int(episode)}
                 # Add quality: 720p if timeframe is specified with no quality
                 if 'timeframe' in series_settings:
-                    series_settings.setdefault('quality', '720p')
+                    series_settings.setdefault('enough', '720p hdtv+')
 
                 group_series.append({series: series_settings})
             config[group_name] = group_series
@@ -605,8 +614,8 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
             bundle = series.accept('dict')
             # prevent invalid indentation level
             bundle.reject_keys(['set', 'path', 'timeframe', 'name_regexp', 'ep_regexp', 'id_regexp',
-                                'date_regexp', 'sequence_regexp', 'watched', 'quality', 'min_quality',
-                                'max_quality', 'qualities', 'exact', 'from_group'],
+                                'date_regexp', 'sequence_regexp', 'watched', 'quality', 'enough',
+                                'qualities', 'exact', 'from_group'],
                 'Option \'$key\' has invalid indentation level. It needs 2 more spaces.')
             bundle.accept_any_key('path')
             options = bundle.accept_any_key('dict')
@@ -787,7 +796,7 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
                     continue
                 # in case quality will not be found from title, set it from entry['quality'] if available
                 quality = None
-                if entry.get('quality', qualities.UNKNOWN) > qualities.UNKNOWN:
+                if entry.get('quality'):
                     log.trace('Setting quality %s from entry field to parser' % entry['quality'])
                     quality = entry['quality']
                 try:
@@ -860,9 +869,9 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
 
             log.debug('current episodes: %s' % [e.data for e in eps])
 
-            # min_ and max_quality
-            if 'min_quality' in config or 'max_quality' in config:
-                eps = self.process_min_max_quality(config, eps)
+            # quality filtering
+            if 'quality' in config:
+                eps = self.process_quality(config, eps)
                 if not eps:
                     continue
 
@@ -896,11 +905,11 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
                         continue
 
             # quality
-            if 'quality' in config:
-                if self.process_quality(feed, config, eps):
+            if 'enough' in config:
+                if self.process_timeframe_enough(feed, config, eps):
                     continue
                 else:
-                    # We didn't make a quality match, check timeframe to see
+                    # We didn't make a quality enough match, check timeframe to see
                     # if we should remove the requirement
                     if self.process_timeframe(feed, config, eps, series_name):
                         continue
@@ -992,36 +1001,33 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
                 feed.reject(self.parser2entry[ep], 'already downloaded episode with id `%s`' % ep.identifier)
             return True
 
-    def process_quality(self, feed, config, eps):
+    def process_timeframe_enough(self, feed, config, eps):
         """
         Accepts first episode matching the quality configured for the series.
 
         :return: True if accepted something
         """
-        quality = qualities.get(config['quality'])
+        req = qualities.Requirements(config['enough'])
         # scan for quality
         for ep in eps:
-            if quality == ep.quality:
+            if req.allows(ep.quality):
                 entry = self.parser2entry[ep]
-                log.debug('Series accepting. %s meets quality %s' % (entry['title'], quality))
+                log.debug('Series accepting. %s meets quality %s' % (entry['title'], req))
                 feed.accept(self.parser2entry[ep], 'quality met')
                 return True
 
-    def process_min_max_quality(self, config, eps):
+    def process_quality(self, config, eps):
         """
-        Filters eps that do not fall between min_quality and max_quality.
+        Filters eps that do not fall between within our defined quality standards.
 
         :returns: A list of eps that are in the acceptable range
         """
-        min = qualities.get(config.get('min_quality', ''), qualities.UNKNOWN)
-        max = qualities.get(config.get('max_quality', ''), qualities.max())
-        log.debug('min: %s max: %s' % (min, max))
+        reqs = qualities.Requirements(config['quality'])
+        log.debug('quality req: %s' % reqs)
         result = []
         # see if any of the eps match accepted qualities
         for ep in eps:
-            quality = ep.quality
-            log.debug('ep: %s min: %s max: %s' % (ep.data, min.value, max.value,))
-            if quality <= max and quality >= min:
+            if reqs.allows(ep.quality):
                 result.append(ep)
         if not result:
             log.debug('no quality meets requirements')
@@ -1094,10 +1100,7 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
         except ValueError:
             raise PluginWarning('Invalid time format', log)
 
-        # Make sure we only start timing from the first seen quality that matches min and max requirements.
-        min_quality = config.get('min_quality') and qualities.get(config['min_quality'])
-        max_quality = config.get('max_quality') and qualities.get(config['max_quality'])
-        first_seen = self.get_first_seen(feed.session, best, min_quality, max_quality)
+        first_seen = self.get_first_seen(feed.session, best)
         expires = first_seen + timeframe
         log.debug('timeframe: %s, first_seen: %s, expires: %s' % (timeframe, first_seen, expires))
 
@@ -1136,17 +1139,19 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
         log.debug('downloaded_qualities: %s' % downloaded_qualities)
 
         # If quality is configured, make sure it is defined in wanted qualities
-        if config.get('quality'):
-            config.setdefault('qualities', []).append(config['quality'])
+        if config.get('enough'):
+            config.setdefault('qualities', []).append(config['enough'])
         # If qualities key is configured, we only want qualities defined in it.
-        wanted_qualities = set([qualities.get(name) for name in config.get('qualities', [])])
+        wanted_qualities = set([qualities.Requirements(name) for name in config.get('qualities', [])])
+        # Compute the requirements from our set that have not yet been fulfilled
+        still_needed = [req for req in wanted_qualities if not any(req.allows(qual) for qual in downloaded_qualities)]
         log.debug('Wanted qualities: %s' % wanted_qualities)
 
         def wanted(quality):
             """Returns True if we want this quality based on the config options."""
-            wanted = not wanted_qualities or quality in wanted_qualities
+            wanted = not wanted_qualities or any(req.allows(quality) for req in wanted_qualities)
             if config.get('upgrade'):
-                wanted = wanted and quality > max(downloaded_qualities or [qualities.UNKNOWN])
+                wanted = wanted and quality > max(downloaded_qualities or [qualities.Quality()])
             return wanted
 
         for ep in eps:
@@ -1154,11 +1159,13 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
             if not wanted(ep.quality):
                 log.debug('%s is unwanted quality' % ep.quality)
                 continue
-            if ep.quality in downloaded_qualities:
+            if not any(req.allows(ep.quality) for req in still_needed):
                 feed.reject(self.parser2entry[ep], 'quality downloaded')
             else:
                 feed.accept(self.parser2entry[ep], 'quality wanted')
-                downloaded_qualities.append(ep.quality)  # don't accept more of these
+                downloaded_qualities.append(ep.quality)
+                # Re-calculate what is still needed
+                still_needed = [req for req in still_needed if not req.allows(ep.quality)]
         return bool(downloaded_qualities)
 
     def on_feed_exit(self, feed):

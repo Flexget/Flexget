@@ -70,19 +70,19 @@ class TestMetainfoQuality(FlexGetBase):
         entry = self.feed.find_entry(title='FooBar.S01E02.720p.HDTV')
         assert entry, 'entry not found?'
         assert 'quality' in entry, 'failed to pick up quality'
-        assert entry['quality'] == '720p', 'picked up wrong quality %s' % entry.get('quality', None)
+        assert entry['quality'].name == '720p hdtv', 'picked up wrong quality %s' % entry.get('quality', None)
         entry = self.feed.find_entry(title='ShowB.S04E19.Name of Ep.720p.WEB-DL.DD5.1.H.264')
         assert entry, 'entry not found?'
         assert 'quality' in entry, 'failed to pick up quality'
-        assert entry['quality'] == '720p web-dl', 'picked up wrong quality %s' % entry.get('quality', None)
+        assert entry['quality'].name == '720p webdl h264 dd5.1', 'picked up wrong quality %s' % entry.get('quality', None)
         # Check that quality gets picked up from description when not in title
         entry = self.feed.find_entry(title='Good.Movie')
         assert 'quality' in entry, 'failed to pick up quality from description'
-        assert entry['quality'] == '720p', 'picked up wrong quality %s' % entry.get('quality', None)
+        assert entry['quality'].name == '720p', 'picked up wrong quality %s' % entry.get('quality', None)
         # quality in description should not override one found in title
         entry = self.feed.find_entry(title='Good.Movie.hdtv')
         assert 'quality' in entry, 'failed to pick up quality'
-        assert entry['quality'] == 'hdtv', 'picked up wrong quality %s' % entry.get('quality', None)
+        assert entry['quality'].name == '360p hdtv', 'picked up wrong quality %s' % entry.get('quality', None)
 
 
 class TestMetainfoSeries(FlexGetBase):
@@ -117,7 +117,7 @@ class TestMetainfoSeries(FlexGetBase):
         """Metainfo series: name/episode"""
         # We search for series name in title case to make sure case is being normalized
         self.execute_feed('test')
-        assert self.feed.find_entry(series_name='Flexget', series_season=1, series_episode=2, quality='hdtv'), \
+        assert self.feed.find_entry(series_name='Flexget', series_season=1, series_episode=2, quality='hdtv xvid'), \
             'Failed to parse series info'
         assert self.feed.find_entry(series_name='Some Series', series_season=3, series_episode=14, quality='720p'), \
             'Failed to parse series info'
