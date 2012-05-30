@@ -194,7 +194,8 @@ class InputRSS(object):
                 response = feed.requests.get(config['url'], timeout=60, headers=headers, raise_status=False, auth=auth)
                 content = response.content
             except RequestException, e:
-                raise PluginError('Unable to download the RSS: %s' % e)
+                raise PluginError('Unable to download the RSS for feed %s (%s): %s' %
+                                  (feed.name, config['url'], e))
 
             # status checks
             status = response.status_code
@@ -210,12 +211,14 @@ class InputRSS(object):
                     log.debug('unable to get details plugin')
                 return []
             elif status == 401:
-                raise PluginError('Authentication needed for feed %s: %s' % \
-                    (feed.name, response.headers['www-authenticate']), log)
+                raise PluginError('Authentication needed for feed %s (%s): %s' %\
+                                  (feed.name, config['url'], response.headers['www-authenticate']), log)
             elif status == 404:
-                raise PluginError('RSS Feed %s not found' % feed.name, log)
+                raise PluginError('RSS Feed %s (%s) not found' % (feed.name, config['url']), log)
             elif status == 500:
-                raise PluginError('Internal server exception on feed %s' % feed.name, log)
+                raise PluginError('Internal server exception on feed %s (%s)' % (feed.name, config['url']), log)
+            elif status != 200:
+                raise PluginError('HTTP error %s received from %s' % (status, config['url']), log)
 
             # update etag and last modified
             if config['etag']:
@@ -234,7 +237,7 @@ class InputRSS(object):
         try:
             rss = feedparser.parse(content)
         except LookupError, e:
-            raise PluginError('Unable to parse the RSS: %s' % e)
+            raise PluginError('Unable to parse the RSS (from %s): %s' % (config['url'], e))
 
         # check for bozo
         ex = rss.get('bozo_exception', False)
@@ -259,24 +262,23 @@ class InputRSS(object):
                     self.process_invalid_content(feed, content)
                     if feed.manager.options.debug:
                         log.exception(ex)
-                    raise PluginError('Received invalid RSS content')
+                    raise PluginError('Received invalid RSS content from feed %s (%s)' % (feed.name, config['url']))
                 else:
                     msg = ('Invalid XML received (%s). However feedparser still produced entries.'
-                        ' Ignoring the error...' % str(ex).replace('<unknown>:', 'line '))
+                           ' Ignoring the error...' % str(ex).replace('<unknown>:', 'line '))
                     if not config.get('silent', False):
                         log.info(msg)
                     else:
                         log.debug(msg)
                     ignore = True
-            elif isinstance(ex, httplib.BadStatusLine) or \
-                 isinstance(ex, IOError):
+            elif isinstance(ex, httplib.BadStatusLine) or isinstance(ex, IOError):
                 raise ex # let the @internet decorator handle
             else:
                 # all other bozo errors
                 if not rss.entries:
                     self.process_invalid_content(feed, content)
-                    raise PluginError('Unhandled bozo_exception. Type: %s (feed: %s)' % \
-                        (ex.__class__.__name__, feed.name), log)
+                    raise PluginError('Unhandled bozo_exception. Type: %s (feed: %s)' %\
+                                      (ex.__class__.__name__, feed.name), log)
                 else:
                     msg = 'Invalid RSS received. However feedparser still produced entries. Ignoring the error ...'
                     if not config.get('silent', False):
@@ -408,7 +410,7 @@ class InputRSS(object):
             if config.get('group_links'):
                 # Append a list of urls from enclosures to the urls field if group_links is enabled
                 e.setdefault('urls', [e['url']]).extend(
-                        [enc.href for enc in entry.get('enclosures', []) if enc.get('href') not in e['urls']])
+                    [enc.href for enc in entry.get('enclosures', []) if enc.get('href') not in e['urls']])
 
             if not e.get('url'):
                 log.debug('%s does not have link (%s) or enclosure' % (entry.title, config['link']))
