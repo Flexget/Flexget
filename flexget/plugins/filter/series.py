@@ -363,45 +363,48 @@ class SeriesDatabase(object):
             session.add(series)
             log.debug('-> added %s' % series)
 
-        # if episode does not exist in series, add new
-        episode = session.query(Episode).filter(Episode.series_id == series.id).\
-            filter(Episode.identifier == parser.identifier).\
-            filter(Episode.series_id != None).first()
-        if not episode:
-            log.debug('adding episode %s into series %s' % (parser.identifier, parser.name))
-            episode = Episode()
-            episode.identifier = parser.identifier
-            episode.identified_by = parser.id_type
-            # if episodic format
-            if parser.id_type == 'ep':
-                episode.season = parser.season
-                episode.number = parser.episode
-            elif parser.id_type == 'sequence':
-                episode.season = 0
-                episode.number = parser.id
-            series.episodes.append(episode)  # pylint:disable=E1103
-            log.debug('-> added %s' % episode)
+        releases = []
+        for ix, identifier in enumerate(parser.identifiers):
+            # if episode does not exist in series, add new
+            episode = session.query(Episode).filter(Episode.series_id == series.id).\
+                filter(Episode.identifier == identifier).\
+                filter(Episode.series_id != None).first()
+            if not episode:
+                log.debug('adding episode %s into series %s' % (identifier, parser.name))
+                episode = Episode()
+                episode.identifier = identifier
+                episode.identified_by = parser.id_type
+                # if episodic format
+                if parser.id_type == 'ep':
+                    episode.season = parser.season
+                    episode.number = parser.episode + ix
+                elif parser.id_type == 'sequence':
+                    episode.season = 0
+                    episode.number = parser.id + ix
+                series.episodes.append(episode)  # pylint:disable=E1103
+                log.debug('-> added %s' % episode)
 
-        # if release does not exists in episodes, add new
-        #
-        # NOTE:
-        #
-        # filter(Release.episode_id != None) fixes weird bug where release had/has been added
-        # to database but doesn't have episode_id, this causes all kinds of havoc with the plugin.
-        # perhaps a bug in sqlalchemy?
-        release = session.query(Release).filter(Release.episode_id == episode.id).\
-            filter(Release.quality == parser.quality).\
-            filter(Release.proper_count == parser.proper_count).\
-            filter(Release.episode_id != None).first()
-        if not release:
-            log.debug('adding release %s into episode' % parser)
-            release = Release()
-            release.quality = parser.quality
-            release.proper_count = parser.proper_count
-            release.title = parser.data
-            episode.releases.append(release)  # pylint:disable=E1103
-            log.debug('-> added %s' % release)
-        return release
+            # if release does not exists in episodes, add new
+            #
+            # NOTE:
+            #
+            # filter(Release.episode_id != None) fixes weird bug where release had/has been added
+            # to database but doesn't have episode_id, this causes all kinds of havoc with the plugin.
+            # perhaps a bug in sqlalchemy?
+            release = session.query(Release).filter(Release.episode_id == episode.id).\
+                filter(Release.quality == parser.quality).\
+                filter(Release.proper_count == parser.proper_count).\
+                filter(Release.episode_id != None).first()
+            if not release:
+                log.debug('adding release %s into episode' % parser)
+                release = Release()
+                release.quality = parser.quality
+                release.proper_count = parser.proper_count
+                release.title = parser.data
+                episode.releases.append(release)  # pylint:disable=E1103
+                log.debug('-> added %s' % release)
+            releases.append(release)
+        return releases
 
 
 def forget_series(name):
@@ -715,9 +718,9 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
             for id, eps in source[series_name].iteritems():
                 for parser in eps:
                     # store found episodes into database and save reference for later use
-                    release = self.store(feed.session, parser)
+                    releases = self.store(feed.session, parser)
                     entry = self.parser2entry[parser]
-                    entry['series_release'] = release
+                    entry['series_releases'] = releases
 
                     # set custom download path
                     if 'path' in series_config:
@@ -828,6 +831,7 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
                 entry['series_season'] = parser.id.year
             else:
                 entry['series_season'] = time.gmtime().tm_year
+            entry['series_episodes'] = parser.episodes
             entry['series_id'] = parser.identifier
             entry['series_id_type'] = parser.id_type
 
@@ -1172,9 +1176,10 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
         """Learn succeeded episodes"""
         log.debug('on_feed_exit')
         for entry in feed.accepted:
-            if 'series_release' in entry:
-                log.debug('marking %s as downloaded' % entry['series_release'])
-                entry['series_release'].downloaded = True
+            if 'series_releases' in entry:
+                for release in entry['series_releases']:
+                    log.debug('marking %s as downloaded' % release)
+                    release.downloaded = True
             else:
                 log.debug('%s is not a series' % entry['title'])
         # clear feed state

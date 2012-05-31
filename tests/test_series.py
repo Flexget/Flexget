@@ -1342,3 +1342,42 @@ class TestInvalidSeries(FlexGetBase):
         """Make sure a blank series doesn't crash."""
         self.execute_feed('blank')
         assert not self.feed._abort, 'Feed should not have aborted'
+
+
+class TestDoubleEps(FlexGetBase):
+
+    __yaml__ = """
+        feeds:
+          test_double1:
+            mock:
+              - title: double S01E02-E03
+            series:
+              - double
+          test_double2:
+            mock:
+              - title: double S01E03
+            series:
+              - double
+
+          test_double_prefered:
+            mock:
+              - title: double S02E03
+              - title: double S02E03-04
+            series:
+              - double
+    """
+
+    def test_double(self):
+        # First should be accepted
+        self.execute_feed('test_double1')
+        assert self.feed.find_entry('accepted', title='double S01E02-E03')
+
+        # We already got ep 3 as part of double, should not be accepted
+        self.execute_feed('test_double2')
+        assert not self.feed.find_entry('accepted', title='double S01E03')
+
+    def test_double_prefered(self):
+        # Given a choice of single or double ep at same quality, grab the double
+        self.execute_feed('test_double_prefered')
+        assert self.feed.find_entry('accepted', title='double S02E03-04')
+        assert not self.feed.find_entry('accepted', title='S02E03')

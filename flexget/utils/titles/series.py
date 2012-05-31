@@ -111,7 +111,7 @@ class SeriesParser(TitleParser):
         # parse produces these
         self.season = None
         self.episode = None
-        self.end_episode = None
+        self.episodes = 1
         self.id = None
         self.id_type = None
         self.id_groups = None
@@ -287,7 +287,10 @@ class SeriesParser(TitleParser):
 
                 self.season = ep_match['season']
                 self.episode = ep_match['episode']
-                self.end_episode = ep_match['end_episode']
+                if ep_match['end_episode']:
+                    self.episodes = (ep_match['end_episode'] - ep_match['episode']) + 1
+                else:
+                    self.episodes = 1
                 self.id_type = 'ep'
                 self.valid = True
                 return
@@ -506,18 +509,26 @@ class SeriesParser(TitleParser):
         return result
 
     @property
-    def identifier(self):
-        """Return String identifier for parsed episode, eg. S01E02"""
+    def identifiers(self):
+        """Return all identifiers this parser represents. (for packs)"""
+        # Currently 'ep' is the only id type that supports packs
         if not self.valid:
             raise Exception('Series flagged invalid')
         if self.id_type == 'ep':
-            return 'S%sE%s' % (str(self.season).zfill(2), str(self.episode).zfill(2))
+            return ['S%02dE%02d' % (self.season, self.episode + x) for x in xrange(self.episodes)]
         elif self.id_type == 'date':
-            return self.id.strftime('%Y-%m-%d')
+            return [self.id.strftime('%Y-%m-%d')]
         if self.id is None:
             raise Exception('Series is missing identifier')
         else:
-            return self.id
+            return [self.id]
+
+    @property
+    def identifier(self):
+        """Return String identifier for parsed episode, eg. S01E02
+        (will be the first identifier if this is a pack)
+        """
+        return self.identifiers[0]
 
     @property
     def proper(self):
@@ -535,7 +546,8 @@ class SeriesParser(TitleParser):
 
     def __cmp__(self, other):
         """Compares quality of parsers, if quality is equal, compares proper_count."""
-        return cmp((self.quality, self.proper_count), (other.quality, other.proper_count))
+        return cmp((self.quality, self.proper_count,self.episodes),
+                   (other.quality, other.proper_count, other.episodes))
 
     def __eq__(self, other):
         return self is other

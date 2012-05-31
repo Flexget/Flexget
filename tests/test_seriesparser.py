@@ -518,21 +518,25 @@ class TestSeriesParser(object):
         s = self.parse(name='Something', data='Something.S04E05-06')
         assert s.season == 4, 'failed to parse season'
         assert s.episode == 5, 'failed to parse episode'
-        assert s.end_episode == 6, 'failed to parse episode range'
+        assert s.episodes == 2, 'failed to parse episode range'
+        s = self.parse(name='Something', data='Something.S04E05-E06')
+        assert s.season == 4, 'failed to parse season'
+        assert s.episode == 5, 'failed to parse episode'
+        assert s.episodes == 2, 'failed to parse episode range'
         s = self.parse(name='Something', data='Something.S04E05E06')
         assert s.season == 4, 'failed to parse season'
         assert s.episode == 5, 'failed to parse episode'
-        assert s.end_episode == 6, 'failed to parse episode range'
+        assert s.episodes == 2, 'failed to parse episode range'
         s = self.parse(name='Something', data='Something.4x05-06')
         assert s.season == 4, 'failed to parse season'
         assert s.episode == 5, 'failed to parse episode'
-        assert s.end_episode == 6, 'failed to parse episode range'
+        assert s.episodes == 2, 'failed to parse episode range'
         # Test that too large a range is not accepted
         s = self.parse(name='Something', data='Something.S04E05E09')
         assert s.valid == False, 'large episode range should not be valid'
         # Make sure regular identifier doesn't have end_episode
         s = self.parse(name='Something', data='Something.S04E05')
-        assert s.end_episode is None, 'should not have detected end_episode'
+        assert s.episodes == 1, 'should not have detected end_episode'
 
     def test_and_replacement(self):
         titles = ['Alpha.&.Beta.S01E02.hdtv', 'alpha.and.beta.S01E02.hdtv', 'alpha&beta.S01E02.hdtv']
