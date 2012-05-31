@@ -154,7 +154,8 @@ _audios = [
     QualityComponent('audio', 20, 'dd5.1', 'dd%s' % five_dot_one),
     QualityComponent('audio', 30, 'aac'),
     QualityComponent('audio', 40, 'ac3', 'ac3(%s)?' % five_dot_one),
-    QualityComponent('audio', 50, 'dts')
+    QualityComponent('audio', 50, 'flac', 'flac(%s)?' % five_dot_one),
+    QualityComponent('audio', 60, 'dts')
 ]
 
 _UNKNOWNS = {
