@@ -16,7 +16,7 @@ except ImportError:
                              message='movie_queue requires the queue_base plugin')
 
 log = logging.getLogger('movie_queue')
-Base = schema.versioned_base('movie_queue', 1)
+Base = schema.versioned_base('movie_queue', 2)
 
 
 @event('manager.startup')
@@ -46,11 +46,20 @@ def upgrade(ver, session):
         for row in session.execute(select([movie_table.c.id, movie_table.c.quality])):
             # Webdl quality no longer has dash
             new_qual = row['quality'].replace('web-dl', 'webdl')
-            # Old behavior was to get specified quality or greater, approximate that with new system
-            new_qual = ' '.join(qual + '+' for qual in new_qual.split(' '))
+            if new_qual.lower() != 'any':
+                # Old behavior was to get specified quality or greater, approximate that with new system
+                new_qual = ' '.join(qual + '+' for qual in new_qual.split(' '))
             session.execute(update(movie_table, movie_table.c.id == row['id'],
                     {'quality': new_qual}))
         ver = 1
+    if ver == 1:
+        # Bad upgrade left some qualities as 'ANY+'
+        movie_table = table_schema('movie_queue', session)
+        for row in session.execute(select([movie_table.c.id, movie_table.c.quality])):
+            if row['quality'].lower() == 'any+':
+                session.execute(update(movie_table, movie_table.c.id == row['id'],
+                        {'quality': 'ANY'}))
+        ver = 2
     return ver
 
 

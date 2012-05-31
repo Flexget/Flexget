@@ -396,6 +396,7 @@ class ImdbLookup(object):
                     if movie.expired:
                         log.verbose('Movie `%s` details expired, refreshing ...' % movie.title)
                     # Remove the old movie, we'll store another one later.
+                    session.query(MovieLanguage).filter(MovieLanguage.movie_id == movie.id).delete()
                     session.query(Movie).filter(Movie.url == entry['imdb_url']).delete()
 
                 # search and store to cache
@@ -455,26 +456,22 @@ class ImdbLookup(object):
         movie.plot_outline = imdb_parser.plot_outline
         movie.url = imdb_url
         for name in imdb_parser.genres:
-            genre = session.query(Genre).\
-            filter(Genre.name == name).first()
+            genre = session.query(Genre).filter(Genre.name == name).first()
             if not genre:
                 genre = Genre(name)
             movie.genres.append(genre) # pylint:disable=E1101
         for index, name in enumerate(imdb_parser.languages):
-            language = session.query(Language).\
-            filter(Language.name == name).first()
+            language = session.query(Language).filter(Language.name == name).first()
             if not language:
                 language = Language(name)
             movie.languages.append(MovieLanguage(language, prominence=index))
         for imdb_id, name in imdb_parser.actors.iteritems():
-            actor = session.query(Actor).\
-            filter(Actor.imdb_id == imdb_id).first()
+            actor = session.query(Actor).filter(Actor.imdb_id == imdb_id).first()
             if not actor:
                 actor = Actor(imdb_id, name)
             movie.actors.append(actor) # pylint:disable=E1101
         for imdb_id, name in imdb_parser.directors.iteritems():
-            director = session.query(Director).\
-            filter(Director.imdb_id == imdb_id).first()
+            director = session.query(Director).filter(Director.imdb_id == imdb_id).first()
             if not director:
                 director = Director(imdb_id, name)
             movie.directors.append(director) # pylint:disable=E1101
