@@ -32,6 +32,10 @@ class FilterExists(object):
 
     @priority(-1)
     def on_feed_filter(self, feed):
+        if not feed.accepted:
+            log.debug('No accepted entries, not scanning for existing.')
+            return
+        log.verbose('Scanning path(s) for existing files.')
         config = self.get_config(feed)
         for path in config:
             # unicode path causes crashes on some paths
@@ -43,10 +47,10 @@ class FilterExists(object):
                 # convert filelists into utf-8 to avoid unicode problems
                 dirs = [x.decode('utf-8', 'ignore') for x in dirs]
                 files = [x.decode('utf-8', 'ignore') for x in files]
-                for entry in feed.entries:
+                for entry in feed.accepted:
                     name = entry['title']
                     if name in dirs or name in files:
                         log.debug('Found %s in %s' % (name, root))
-                        feed.reject(entry, '%s/%s' % (name, root))
+                        feed.reject(entry, os.path.join(root, name))
 
 register_plugin(FilterExists, 'exists')
