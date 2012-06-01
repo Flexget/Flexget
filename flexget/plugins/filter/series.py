@@ -437,6 +437,29 @@ def forget_series_episode(name, identifier):
         raise ValueError('Unknown series %s' % name)
 
 
+def populate_entry_fields(entry, parser):
+    entry['series_parser'] = copy(parser)
+    # add series, season and episode to entry
+    entry['series_name'] = parser.name
+    if 'quality' in entry and entry['quality'] != parser.quality:
+        log.warning('Found different quality for %s. Was %s, overriding with %s.' %\
+                    (entry['title'], entry['quality'], parser.quality))
+    entry['quality'] = parser.quality
+    entry['proper'] = parser.proper
+    entry['proper_count'] = parser.proper_count
+    if parser.id_type == 'ep':
+        entry['series_season'] = parser.season
+        entry['series_episode'] = parser.episode
+    elif parser.id_type == 'date':
+        entry['series_date'] = parser.id
+        entry['series_season'] = parser.id.year
+    else:
+        entry['series_season'] = time.gmtime().tm_year
+    entry['series_episodes'] = parser.episodes
+    entry['series_id'] = parser.pack_identifier
+    entry['series_id_type'] = parser.id_type
+
+
 class FilterSeriesBase(object):
     """
     Class that contains helper methods for both filter.series as well as plugins that configure it,
@@ -487,8 +510,6 @@ class FilterSeriesBase(object):
         options.accept('list', key='from_group').accept('text')
         # parse only
         options.accept('boolean', key='parse_only')
-        # This is a flag set by all_series and series_premiere plugins, it should not be set by the user
-        options.accept('boolean', key='series_guessed')
 
     def make_grouped_config(self, config):
         """Turns a simple series list into grouped format with a empty settings dict"""
@@ -691,12 +712,12 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
         # key: series episode identifier ie. S01E02
         # value: seriesparser
         found_series = {}
-        guessed_series = {}
+        #guessed_series = {}
         for entry in feed.entries:
             if entry.get('series_name') and entry.get('series_id') and entry.get('series_parser'):
-                self.parser2entry[entry['series_parser']] = entry
-                target = guessed_series if entry.get('series_guessed') else found_series
-                target.setdefault(entry['series_name'], {}).setdefault(entry['series_id'], []).append(entry['series_parser'])
+                parser = entry['series_parser']
+                self.parser2entry[parser] = entry
+                found_series.setdefault(entry['series_name'], {}).setdefault(parser.identifier, []).append(parser)
 
         config = self.prepare_config(feed.config.get('series', {}))
 
@@ -710,12 +731,11 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
             # Update database with capitalization from config
             feed.session.query(Series).filter(Series.name == series_name).\
                 update({'name': series_name}, 'fetch')
-            source = guessed_series if series_config.get('series_guessed') else found_series
             # If we didn't find any episodes for this series, continue
-            if not source.get(series_name):
+            if not found_series.get(series_name):
                 log.trace('No entries found for %s this run.' % series_name)
                 continue
-            for id, eps in source[series_name].iteritems():
+            for id, eps in found_series[series_name].iteritems():
                 for parser in eps:
                     # store found episodes into database and save reference for later use
                     releases = self.store(feed.session, parser)
@@ -738,7 +758,7 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
             import time
             start_time = time.clock()
 
-            self.process_series(feed, source[series_name], series_name, series_config)
+            self.process_series(feed, found_series[series_name], series_name, series_config)
 
             took = time.clock() - start_time
             log.trace('processing %s took %s' % (series_name, took))
@@ -788,7 +808,7 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
 
         for entry in entries:
             # skip processed entries
-            if entry.get('series_parser') and entry['series_parser'].valid and not entry.get('series_guessed') and \
+            if entry.get('series_parser') and entry['series_parser'].valid and \
                entry['series_parser'].name.lower() != series_name.lower():
                 continue
             # scan from fields
@@ -813,27 +833,7 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
                 continue  # next field
 
             log.debug('%s detected as %s, field: %s' % (entry['title'], parser, parser.field))
-            entry['series_parser'] = copy(parser)
-            # add series, season and episode to entry
-            entry['series_name'] = series_name
-            entry['series_guessed'] = config.get('series_guessed', False)
-            if 'quality' in entry and entry['quality'] != parser.quality:
-                log.warning('Found different quality for %s. Was %s, overriding with %s.' % \
-                    (entry['title'], entry['quality'], parser.quality))
-            entry['quality'] = parser.quality
-            entry['proper'] = parser.proper
-            entry['proper_count'] = parser.proper_count
-            if parser.id_type == 'ep':
-                entry['series_season'] = parser.season
-                entry['series_episode'] = parser.episode
-            elif parser.id_type == 'date':
-                entry['series_date'] = parser.id
-                entry['series_season'] = parser.id.year
-            else:
-                entry['series_season'] = time.gmtime().tm_year
-            entry['series_episodes'] = parser.episodes
-            entry['series_id'] = parser.identifier
-            entry['series_id_type'] = parser.id_type
+            populate_entry_fields(entry, parser)
 
     def process_series(self, feed, series, series_name, config):
         """

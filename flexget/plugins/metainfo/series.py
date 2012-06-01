@@ -1,6 +1,7 @@
 import logging
 from string import capwords
 from flexget.plugin import priority, register_plugin
+from flexget.plugins.filter.series import populate_entry_fields
 from flexget.utils.titles import SeriesParser
 from flexget.utils.titles.parser import ParseWarning
 import re
@@ -36,20 +37,13 @@ class MetainfoSeries(object):
             return entry.get('series_guessed')
         parser = self.guess_series(entry['title'], allow_seasonless=allow_seasonless)
         if parser:
-            entry['series_name'] = parser.name
-            entry['series_season'] = parser.season
-            entry['series_episode'] = parser.episode
-            entry['series_id'] = parser.identifier
-            entry['series_id_type'] = parser.id_type
+            populate_entry_fields(entry, parser)
             entry['series_guessed'] = True
-            entry['series_parser'] = parser
-            entry['proper'] = parser.proper
-            entry['proper_count'] = parser.proper_count
             return True
         return False
 
     def guess_series(self, title, allow_seasonless=False):
-        """Returns a valid series parser if this :title: appears to be a series"""
+        """Returns a valid series parser if this `title` appears to be a series"""
 
         parser = SeriesParser(identified_by='auto', allow_seasonless=allow_seasonless)
         # We need to replace certain characters with spaces to make sure episode parsing works right

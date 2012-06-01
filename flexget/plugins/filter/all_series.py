@@ -36,7 +36,6 @@ class FilterAllSeries(FilterSeriesBase):
         group_settings = {}
         if isinstance(config, dict):
             group_settings = config
-        group_settings['series_guessed'] = True
         # Generate a list of unique series that metainfo_series can parse for this feed
         metainfo_series = get_plugin_by_name('metainfo_series')
         guess_entry = metainfo_series.instance.guess_entry
@@ -46,7 +45,7 @@ class FilterAllSeries(FilterSeriesBase):
                 guessed_series.add(entry['series_name'])
         # Combine settings and series into series plugin config format
         allseries = {'settings': {'all_series': group_settings}, 'all_series': list(guessed_series)}
-        # Merge the our config in to the main series config
+        # Merge our config in to the main series config
         self.merge_config(feed, allseries)
 
 

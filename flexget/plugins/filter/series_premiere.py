@@ -47,7 +47,6 @@ class FilterSeriesPremiere(FilterSeriesBase):
         if isinstance(config, dict):
             allow_seasonless = config.pop('allow_seasonless', False)
             group_settings = config
-        group_settings['series_guessed'] = True
         # Generate a list of unique series that have premieres
         metainfo_series = get_plugin_by_name('metainfo_series')
         guess_entry = metainfo_series.instance.guess_entry
