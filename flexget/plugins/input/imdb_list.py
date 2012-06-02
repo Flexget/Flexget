@@ -40,10 +40,11 @@ class ImdbList(object):
             try:
                 # First get the login page so we can get the hidden input value
                 soup = get_soup(sess.get('https://secure.imdb.com/register-imdb/login').content)
-                try:
-                    val = soup.find('input', attrs={'name': '49e6c'})['value']
-                    params['49e6c'] = val
-                except TypeError:
+
+                tag = soup.find('input', attrs={'name': '49e6c'})
+                if tag:
+                    params['49e6c'] = tag['value']
+                else:
                     log.warning('Unable to find required info for imdb login, maybe their login method has changed.')
                 # Now we do the actual login with appropriate parameters
                 r = sess.post('https://secure.imdb.com/register-imdb/login', data=params, raise_status=False)
