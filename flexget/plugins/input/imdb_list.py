@@ -8,6 +8,7 @@ from flexget.utils.cached_input import cached
 from flexget.utils.tools import decode_html
 from flexget.plugin import register_plugin, PluginError
 from flexget.entry import Entry
+from flexget.utils.soup import get_soup
 
 log = logging.getLogger('imdb_list')
 
@@ -37,6 +38,14 @@ class ImdbList(object):
             # Log in to imdb with our handler
             params = {'login': config['username'], 'password': config['password']}
             try:
+                # First get the login page so we can get the hidden input value
+                soup = get_soup(sess.get('https://secure.imdb.com/register-imdb/login').content)
+                try:
+                    val = soup.find('input', attrs={'name': '49e6c'})['value']
+                    params['49e6c'] = val
+                except TypeError:
+                    log.warning('Unable to find required info for imdb login, maybe their login method has changed.')
+                # Now we do the actual login with appropriate parameters
                 r = sess.post('https://secure.imdb.com/register-imdb/login', data=params, raise_status=False)
             except requests.RequestException, e:
                 raise PluginError('Unable to login to imdb: %s' % e.message)
