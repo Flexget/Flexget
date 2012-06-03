@@ -15,7 +15,7 @@ from UserDict import DictMixin
 from flexget import schema
 from flexget.manager import Session
 from flexget.utils.database import safe_pickle_synonym
-from flexget.utils.sqlalchemy_utils import table_schema
+from flexget.utils.sqlalchemy_utils import table_schema, create_index
 
 log = logging.getLogger('util.simple_persistence')
 Base = schema.versioned_base('simple_persistence', 2)
@@ -37,9 +37,8 @@ def upgrade(ver, session):
                 session.execute(table.delete().where(table.c.id == row['id']))
         ver = 1
     if ver == 1:
-        table = table_schema('simple_persistence', session)
         log.info('Creating index on simple_persistence table.')
-        Index('ix_simple_persistence_feed_plugin_key', table.c.feed, table.c.plugin, table.c.key).create(bind=session.bind)
+        create_index('simple_persistence', session, 'feed', 'plugin', 'key')
         ver = 2
     return ver
 

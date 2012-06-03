@@ -1,10 +1,13 @@
 """
 Miscellaneous SQLAlchemy helpers.
 """
-from sqlalchemy import ColumnDefault, Sequence
+import logging
+from sqlalchemy import ColumnDefault, Sequence, Index
 from sqlalchemy.types import AbstractType
 from sqlalchemy.schema import Table, MetaData
-from sqlalchemy.exc import NoSuchTableError
+from sqlalchemy.exc import NoSuchTableError, OperationalError
+
+log = logging.getLogger('sql_utils')
 
 
 def table_exists(name, session):
@@ -104,3 +107,20 @@ def get_index_by_name(table, name):
     for index in table.indexes:
         if index.name == name:
             return index
+
+
+def create_index(table_name, session, *column_names):
+    """
+    Creates an index on specified `columns` in `table_name`
+
+    :param table_name: Name of table to create the index on.
+    :param session: Session object which should be used
+    :param column_names: The names of the columns that should belong to this index.
+    """
+    index_name = '_'.join(['ix', table_name] + list(column_names))
+    table = table_schema(table_name, session)
+    columns = [getattr(table.c, column) for column in column_names]
+    try:
+        Index(index_name, *columns).create(bind=session.bind)
+    except OperationalError:
+        log.debug('Error creating index.', exc_info=True)

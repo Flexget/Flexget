@@ -13,7 +13,8 @@ from flexget.event import event
 from flexget.utils import qualities
 from flexget.utils.log import log_once
 from flexget.utils.titles import SeriesParser, ParseWarning, ID_TYPES
-from flexget.utils.sqlalchemy_utils import table_columns, table_exists, drop_tables, table_schema, table_add_column
+from flexget.utils.sqlalchemy_utils import (table_columns, table_exists, drop_tables, table_schema, table_add_column,
+                                            create_index)
 from flexget.utils.tools import merge_dict_from_to, parse_timedelta
 from flexget.utils.database import quality_property
 from flexget.manager import Session
@@ -63,9 +64,8 @@ def upgrade(ver, session):
         table_add_column('series', 'identified_by', String, session)
         ver = 2
     if ver == 2:
-        release_table = table_schema('episode_releases', session)
         log.info('Creating index on episode_releases table.')
-        Index('ix_episode_releases_episode_id', release_table.c.episode_id).create(bind=session.bind)
+        create_index('episode_releases', session, 'episode_id')
         ver = 3
     if ver == 3:
         # Remove index on Series.name
@@ -77,10 +77,7 @@ def upgrade(ver, session):
         log.info('Adding `name_lower` column to series table.')
         table_add_column('series', 'name_lower', Unicode, session)
         series_table = table_schema('series', session)
-        try:
-            Index('ix_series_name_lower', series_table.c.name_lower).create(bind=session.bind)
-        except OperationalError:
-            log.debug('ix_series_name_lower seems to already exist')
+        create_index('series', session, 'name_lower')
         # Fill in lower case name column
         session.execute(update(series_table, values={'name_lower': func.lower(series_table.c.name)}))
         ver = 4
