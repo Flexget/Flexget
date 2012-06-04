@@ -247,6 +247,17 @@ class Quality(object):
         modifier = sum(c.modifier for c in self.components)
         return [modifier] + self.components
 
+    def __contains__(self, other):
+        if isinstance(other, basestring):
+            other = Quality(other)
+        if not other or not self:
+            return False
+        for cat in ('resolution', 'source', 'audio', 'codec'):
+            othercat = getattr(other, cat)
+            if othercat and othercat != getattr(self, cat):
+                return False
+        return True
+
     def __nonzero__(self):
         return any(self._comparator)
 
