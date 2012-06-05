@@ -1181,6 +1181,12 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
                 log.debug('%s is not a series' % entry['title'])
         # clear feed state
         self.parser2entry = {}
+        # Clear internal fields from entries to reduce memory usage
+        if not feed.manager.unit_test:
+            # Unit tests rely on parser, so only do this during normal runs.
+            for entry in feed.entries + feed.rejected:
+                entry.pop('series_parser', None)
+                entry.pop('series_releases', None)
 
 
 # Register plugin
