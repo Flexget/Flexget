@@ -82,7 +82,7 @@ class TestMetainfoQuality(FlexGetBase):
         # quality in description should not override one found in title
         entry = self.feed.find_entry(title='Good.Movie.hdtv')
         assert 'quality' in entry, 'failed to pick up quality'
-        assert entry['quality'].name == '360p hdtv', 'picked up wrong quality %s' % entry.get('quality', None)
+        assert entry['quality'].name == 'hdtv', 'picked up wrong quality %s' % entry.get('quality', None)
 
 
 class TestMetainfoSeries(FlexGetBase):

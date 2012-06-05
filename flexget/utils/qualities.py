@@ -136,10 +136,10 @@ _sources = [
     QualityComponent('source', 110, 'sdtv', '([sp]dtv|dvb)([\W_]?rip)?'),
     QualityComponent('source', 120, 'dvdscr', '((dvd|web)[\W_]?)?scr(eener)?'),
     QualityComponent('source', 130, 'bdscr', 'bdscr(eener)?'),
-    QualityComponent('source', 140, 'hdtv', 'hdtv([\W_]?rip)?', defaults=('360p',)),
-    QualityComponent('source', 150, 'webdl', 'web([\W_]?dl([\W_]?rip)?)?', defaults=('360p',)),
-    QualityComponent('source', 160, 'dvdrip', 'dvd(?:[\W_]?rip)?', defaults=('360p',)),
-    QualityComponent('source', 170, 'bluray', '(b[dr][\W_]?rip|bluray([\W_]?rip)?)', defaults=('360p',))
+    QualityComponent('source', 140, 'hdtv', 'hdtv([\W_]?rip)?',),
+    QualityComponent('source', 150, 'webdl', 'web([\W_]?dl([\W_]?rip)?)?'),
+    QualityComponent('source', 160, 'dvdrip', 'dvd(?:[\W_]?rip)?'),
+    QualityComponent('source', 170, 'bluray', '(b[dr][\W_]?rip|bluray([\W_]?rip)?)')
 ]
 _codecs = [
     QualityComponent('codec', 10, 'divx'),

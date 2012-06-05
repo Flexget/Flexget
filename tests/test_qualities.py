@@ -38,14 +38,14 @@ class TestQualityParser(object):
                  ('Test.File.1280x720_web dl', '720p webdl'),
                  ('Test.File.720p.h264.web.dl', '720p webdl h264'),
                  ('Test.File.1080p.web.x264', '1080p webdl h264'),
-                 ('Test.File.web-dl', '360p webdl'),
+                 ('Test.File.web-dl', 'webdl'),
                  ('Test.File.720P', '720p'),
                  ('Test.File.1920x1080', '1080p'),
                  ('Test.File.1080i', '1080i'),
-                 ('Test File blurayrip', '360p bluray'),
-                 ('Test.File.br-rip', '360p bluray'),
+                 ('Test File blurayrip', 'bluray'),
+                 ('Test.File.br-rip', 'bluray'),
 
-                 ('Test.File.dvd.rip', '360p dvdrip'),
+                 ('Test.File.dvd.rip', 'dvdrip'),
                  ('Test.File.dvd.rip.r5', 'r5'),
 
                  ('Test.File.[576p][00112233].mkv', '576p'),

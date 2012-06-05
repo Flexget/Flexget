@@ -261,7 +261,7 @@ class TestSeriesParser(object):
         assert s.quality.name == '720p', 'failed to parse quality from %s' % s.data
 
         s = self.parse(name='30 Suck', data='30 Suck 4x4 [HDTV - FlexGet]')
-        assert s.quality.name == '360p hdtv', 'failed to parse quality %s' % s.data
+        assert s.quality.name == 'hdtv', 'failed to parse quality %s' % s.data
 
         s = self.parse(name='ShowB', data='ShowB.S04E19.Name of Ep.720p.WEB-DL.DD5.1.H.264')
         assert s.quality.name == '720p webdl h264 dd5.1', 'failed to parse quality %s' % s.data
@@ -306,7 +306,7 @@ class TestSeriesParser(object):
         """SeriesParser: partially numeric names"""
         s = self.parse(name='Foo 2009', data='Foo.2009.S02E04.HDTV.XviD-2HD[FlexGet]')
         assert (s.season == 2 and s.episode == 4), 'failed to parse %s' % s.data
-        assert (s.quality.name == '360p hdtv xvid'), 'failed to parse quality from %s' % s.data
+        assert (s.quality.name == 'hdtv xvid'), 'failed to parse quality from %s' % s.data
 
     def test_ignore_seasonpacks(self):
         """SeriesParser: ignoring season packs"""
@@ -429,7 +429,7 @@ class TestSeriesParser(object):
         assert s.name == 'The New Adventures of Old Christine'
         assert s.season == 5
         assert s.episode == 16
-        assert s.quality.name == '360p hdtv xvid'
+        assert s.quality.name == 'hdtv xvid'
 
     def test_from_groups(self):
         """SeriesParser: test from groups"""
