@@ -457,6 +457,13 @@ class Feed(object):
                 self._rerun_count += 1
                 self.execute(disable_phases=disable_phases, entries=entries)
 
+        # Clean up entries after the feed has executed to reduce ram usage, #1652
+        if not self.manager.unit_test:
+            log.debug('Clearing all entries from feed.')
+            self.entries = []
+            self.rejected = []
+            self.failed = []
+
     def _process_start(self):
         """Execute process_start phase"""
         self.__run_feed_phase('process_start')
