@@ -27,8 +27,7 @@ class PluginCookies:
         cookies.accept('choice', key='type').accept_choices(['firefox3', 'mozilla', 'lwp'])
         return root
 
-    def get_config(self, feed):
-        config = feed.config.get('cookies', {})
+    def prepare_config(self, config):
         if isinstance(config, basestring):
             config = {'file': config}
         if config['file'].endswith('.txt'):
@@ -117,13 +116,19 @@ class PluginCookies:
         cookie_jar._really_load(s, '', True, True)
         return cookie_jar
 
-    def on_feed_start(self, feed):
+    def on_process_start(self, feed, config):
+        self.cookiejars = {}
+
+    def on_feed_start(self, feed, config):
         """Feed starting, install cookiejar"""
         import os
-        config = self.get_config(feed)
+        config = self.prepare_config(config)
         cookie_type = config.get('type')
         cookie_file = os.path.expanduser(config.get('file'))
-        if cookie_type == 'firefox3':
+        if cookie_file in self.cookiejars:
+            log.debug('Loading cookiejar from cache.')
+            cj = self.cookiejars[cookie_file]
+        elif cookie_type == 'firefox3':
             log.debug('Loading %s cookies' % cookie_type)
             cj = self.sqlite2cookie(cookie_file)
         else:
@@ -143,6 +148,9 @@ class PluginCookies:
                 import sys
                 raise PluginError('Cookies could not be loaded: %s' % sys.exc_info()[1], log)
 
+        if cookie_file not in self.cookiejars:
+            self.cookiejars[cookie_file] = cj
+
         # Add cookiejar to our requests session
         feed.requests.add_cookiejar(cj)
         # Add handler to urllib2 default opener for backwards compatibility
@@ -154,7 +162,7 @@ class PluginCookies:
             log.debug('Creating new opener and installing it')
             urllib2.install_opener(urllib2.build_opener(handler))
 
-    def on_feed_exit(self, feed):
+    def on_feed_exit(self, feed, config):
         """Feed exiting, remove cookiejar"""
         log.debug('Removing urllib2 opener')
         urllib2.install_opener(None)
@@ -162,4 +170,7 @@ class PluginCookies:
     # Feed aborted, unhook the cookiejar
     on_feed_abort = on_feed_exit
 
-register_plugin(PluginCookies, 'cookies')
+    def on_process_end(self, feed, config):
+        self.cookiejars = {}
+
+register_plugin(PluginCookies, 'cookies', api_ver=2)

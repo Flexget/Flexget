@@ -1,11 +1,100 @@
 from exceptions import Exception, UnicodeDecodeError, TypeError, KeyError
 import logging
 import copy
+import itertools
 from flexget.plugin import PluginError
 from flexget.utils.imdb import extract_id, make_url
 from flexget.utils.template import render_from_entry
 
 log = logging.getLogger('entry')
+
+
+# Helper functions to iterate over a subset of entries from a unified list of entries
+def accepted(iter):
+    return itertools.ifilter(lambda e: e._state == 'accepted', iter)
+
+
+def rejected(iter):
+    return itertools.ifilter(lambda e: e._state == 'rejected', iter)
+
+
+def failed(iter):
+    return itertools.ifilter(lambda e: e._state == 'failed', iter)
+
+
+class EntryIterator(object):
+    """Makes an iterator act like a list when needed.
+    Used to emulate old feed.accepted/rejected/failed/entries properties."""
+
+    def __init__(self, entries, states):
+        self.all_entries = entries
+        if isinstance(states, basestring):
+            states = [states]
+        self.filter = lambda e: e._state in states
+
+    def __iter__(self):
+        return itertools.ifilter(self.filter, self.all_entries)
+
+    def __bool__(self):
+        return any(e for e in self)
+
+    def __len__(self):
+        return sum(1 for e in self)
+
+    def __add__(self, other):
+        return itertools.chain(self, other)
+
+    def __radd__(self, other):
+        return itertools.chain(other, self)
+
+    def __getitem__(self, item):
+        if not isinstance(item, int):
+            raise ValueError('Index must be integer.')
+        for index, entry in enumerate(self):
+            if index == item:
+                return entry
+        else:
+            raise IndexError('%d is out of bounds' % item)
+
+    def __getslice__(self, a, b):
+        return list(itertools.islice(self, a, b))
+
+    def reverse(self):
+        self.all_entries.sort(reverse=True)
+
+    def sort(self, *args, **kwargs):
+        self.all_entries.sort(*args, **kwargs)
+
+
+class EntryContainer(list):
+    """Container for a list of entries, also provides accepted, rejected failed iterators over them."""
+
+    def __init__(self, iterable=None, feed=None):
+        list.__init__(self, iterable or [])
+        self.feed = feed
+        for entry in self:
+            entry.feed = feed
+
+        self._entries = EntryIterator(self, ['undecided', 'accepted'])
+        self._accepted = EntryIterator(self, 'accepted') # accepted entries, can still be rejected
+        self._rejected = EntryIterator(self, 'rejected') # rejected entries
+        self._failed = EntryIterator(self, 'failed')   # failed entries
+        self._undecided = EntryIterator(self, 'undecided') # undecided entries
+
+    # Make these read-only properties
+    entries = property(lambda self: self._entries)
+    accepted = property(lambda self: self._accepted)
+    rejected = property(lambda self: self._rejected)
+    failed = property(lambda self: self._failed)
+    undecided = property(lambda self: self._undecided)
+
+    def append(self, entry):
+        entry.feed = self.feed
+        list.append(self, entry)
+
+    def extend(self, iterable):
+        for entry in iterable:
+            self.append(entry)
 
 
 class EntryUnicodeError(Exception):
