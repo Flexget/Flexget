@@ -18,7 +18,7 @@ class Manipulate(object):
             [replace]:
               regexp: <regexp>
               format: <regexp>
-            [remove]: yes
+            [remove]: <boolean>
 
     Example:
 
