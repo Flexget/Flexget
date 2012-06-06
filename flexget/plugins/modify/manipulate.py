@@ -94,6 +94,7 @@ class Manipulate(object):
                 if config.get('remove'):
                     if field in entry:
                         del entry[field]
+                        modified = True
                     continue
 
                 if 'extract' in config:
