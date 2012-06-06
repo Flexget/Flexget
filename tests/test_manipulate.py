@@ -40,6 +40,12 @@ class TestManipulate(FlexGetBase):
               - title:
                   phase: metainfo
                   extract: \d+\s*(.*)
+
+          test_remove:
+            mock:
+              - {title: 'abc', description: 'def'}
+            manipulate:
+              - description: { remove: yes }
     """
 
     def test_replace(self):
@@ -57,3 +63,7 @@ class TestManipulate(FlexGetBase):
     def test_phase(self):
         self.execute_feed('test_phase')
         assert self.feed.find_entry('entries', title='abc'), 'extract failed at metainfo phase'
+
+    def test_remove(self):
+        self.execute_feed('test_remove')
+        assert 'description' not in self.feed.find_entry('entries', title='abc'), 'remove failed'

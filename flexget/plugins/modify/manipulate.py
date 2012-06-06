@@ -18,6 +18,7 @@ class Manipulate(object):
             [replace]:
               regexp: <regexp>
               format: <regexp>
+            [remove]: yes
 
     Example:
 
@@ -38,6 +39,7 @@ class Manipulate(object):
         edit.accept('text', key='from')
         edit.accept('regexp', key='extract')
         edit.accept('text', key='separator')
+        edit.accept('boolean', key='remove')
         replace = edit.accept('dict', key='replace')
         replace.accept('regexp', key='regexp', required=True)
         replace.accept('text', key='format', required=True)
@@ -88,6 +90,11 @@ class Manipulate(object):
                     from_field = config['from']
                 field_value = entry.get(from_field)
                 log.debug('field: `%s` from_field: `%s` field_value: `%s`' % (field, from_field, field_value))
+
+                if config.get('remove'):
+                    if field in entry:
+                        del entry[field]
+                    continue
 
                 if 'extract' in config:
                     if not field_value:
