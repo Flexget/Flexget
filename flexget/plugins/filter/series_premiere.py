@@ -53,12 +53,14 @@ class FilterSeriesPremiere(FilterSeriesBase):
         guessed_series = set()
         for entry in feed.entries:
             if guess_entry(entry, allow_seasonless=allow_seasonless):
-                if entry['series_id'] in ('S01E00', 'S01E01'):
+                if entry['series_season'] == 1 and entry['series_episode'] in (0, 1):
                     guessed_series.add(entry['series_name'])
         # Reject any further episodes in those series
         for entry in feed.entries:
             for series in guessed_series:
-                if entry.get('series_name') == series and entry.get('series_id') not in ('S01E00', 'S01E01'):
+                if entry.get('series_name') == series and not (
+                        entry.get('series_season') == 1
+                        and entry.get('series_episode') in (0, 1) ):
                     feed.reject(entry, 'Non premiere episode in a premiere series')
         # Combine settings and series into series plugin config format
         allseries = {'settings': {'series_premiere': group_settings}, 'series_premiere': list(guessed_series)}

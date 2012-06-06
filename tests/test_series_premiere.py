@@ -38,6 +38,10 @@ class TestSeriesPremiere(FlexGetBase):
               - {title: 'foo bar s01e00 hdtv'}
               - {title: 'foo bar s01e01 hdtv'}
             series_premiere: yes
+          test_multi_episode:
+            mock:
+              - {title: 'foo bar s01e01e02 hdtv'}
+            series_premiere: yes
     """
 
     def test_only_one(self):
@@ -56,5 +60,8 @@ class TestSeriesPremiere(FlexGetBase):
 
     def test_pilot_and_premiere(self):
         self.execute_feed('test_pilot_and_premiere')
-        print len(self.feed.accepted)
         assert len(self.feed.accepted) == 2, 'should have accepted pilot and premiere'
+
+    def test_multi_episode(self):
+        self.execute_feed('test_multi_episode')
+        assert len(self.feed.accepted) == 1, 'should have accepted multi-episode premiere'
