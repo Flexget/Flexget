@@ -118,9 +118,9 @@ _resolutions = [
     QualityComponent('resolution', 40, '576p', '576p?'),
     QualityComponent('resolution', 45, 'hr'),
     QualityComponent('resolution', 50, '720i'),
-    QualityComponent('resolution', 60, '720p', '(1280x)?720p?'),
+    QualityComponent('resolution', 60, '720p', '(?:1280x)?720p?'),
     QualityComponent('resolution', 70, '1080i'),
-    QualityComponent('resolution', 80, '1080p', '(1920x)?1080p?')
+    QualityComponent('resolution', 80, '1080p', '(?:1920x)?1080p?')
 ]
 _sources = [
     QualityComponent('source', 10, 'workprint', modifier=-7),
@@ -133,13 +133,13 @@ _sources = [
     QualityComponent('source', 80, 'tvrip', 'tv[\W_]?rip'),
     QualityComponent('source', 90, 'dsr', 'dsr|ds[\W_]?rip'),
     QualityComponent('source', 100, 'webrip', 'web[\W_]?rip'),
-    QualityComponent('source', 110, 'sdtv', '([sp]dtv|dvb)([\W_]?rip)?'),
-    QualityComponent('source', 120, 'dvdscr', '((dvd|web)[\W_]?)?scr(eener)?'),
-    QualityComponent('source', 130, 'bdscr', 'bdscr(eener)?'),
-    QualityComponent('source', 140, 'hdtv', 'hdtv([\W_]?rip)?',),
-    QualityComponent('source', 150, 'webdl', 'web([\W_]?dl([\W_]?rip)?)?'),
+    QualityComponent('source', 110, 'sdtv', '(?:[sp]dtv|dvb)(?:[\W_]?rip)?'),
+    QualityComponent('source', 120, 'dvdscr', '(?:(?:dvd|web)[\W_]?)?scr(?:eener)?'),
+    QualityComponent('source', 130, 'bdscr', 'bdscr(?:eener)?'),
+    QualityComponent('source', 140, 'hdtv', 'hdtv(?:[\W_]?rip)?',),
+    QualityComponent('source', 150, 'webdl', 'web(?:[\W_]?dl(?:[\W_]?rip)?)?'),
     QualityComponent('source', 160, 'dvdrip', 'dvd(?:[\W_]?rip)?'),
-    QualityComponent('source', 170, 'bluray', '(b[dr][\W_]?rip|bluray([\W_]?rip)?)')
+    QualityComponent('source', 170, 'bluray', '(?:b[dr][\W_]?rip|bluray(?:[\W_]?rip)?)')
 ]
 _codecs = [
     QualityComponent('codec', 10, 'divx'),
@@ -153,8 +153,8 @@ _audios = [
     #TODO: No idea what order these should go in or if we need different regexps
     QualityComponent('audio', 20, 'dd5.1', 'dd%s' % five_dot_one),
     QualityComponent('audio', 30, 'aac'),
-    QualityComponent('audio', 40, 'ac3', 'ac3(%s)?' % five_dot_one),
-    QualityComponent('audio', 50, 'flac', 'flac(%s)?' % five_dot_one),
+    QualityComponent('audio', 40, 'ac3', 'ac3(?:%s)?' % five_dot_one),
+    QualityComponent('audio', 50, 'flac', 'flac(?:%s)?' % five_dot_one),
     QualityComponent('audio', 60, 'dts')
 ]
 
