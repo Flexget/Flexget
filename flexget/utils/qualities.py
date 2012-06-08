@@ -147,14 +147,15 @@ _codecs = [
     QualityComponent('codec', 30, 'h264', '[hx].?264'),
     QualityComponent('codec', 40, '10bit', '10.?bit|hi10p')
 ]
-five_dot_one = '[\W_]?5[\W_]?1'
+channels = '(?:(?:[\W_]?5[\W_]?1)|(?:[\W_]?2[\W_]?(?:0|ch)))'
+two_dot_oh = ''
 _audios = [
     QualityComponent('audio', 10, 'mp3'),
     #TODO: No idea what order these should go in or if we need different regexps
-    QualityComponent('audio', 20, 'dd5.1', 'dd%s' % five_dot_one),
-    QualityComponent('audio', 30, 'aac'),
-    QualityComponent('audio', 40, 'ac3', 'ac3(?:%s)?' % five_dot_one),
-    QualityComponent('audio', 50, 'flac', 'flac(?:%s)?' % five_dot_one),
+    QualityComponent('audio', 20, 'dd5.1', 'dd%s' % channels),
+    QualityComponent('audio', 30, 'aac', 'aac%s?' % channels),
+    QualityComponent('audio', 40, 'ac3', 'ac3%s?' % channels),
+    QualityComponent('audio', 50, 'flac', 'flac%s?' % channels),
     QualityComponent('audio', 60, 'dts')
 ]
 

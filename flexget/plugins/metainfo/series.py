@@ -52,10 +52,13 @@ class MetainfoSeries(object):
         if parser.parse_unwanted(clean_title):
             return
         match = parser.parse_date(clean_title)
-        if not match:
+        if match:
+            parser.identified_by = 'date'
+        else:
             match = parser.parse_episode(clean_title)
             if match and parser.parse_unwanted(clean_title):
                 return
+            parser.identified_by = 'ep'
         if not match:
             return
         if match['match'].start() > 1:
