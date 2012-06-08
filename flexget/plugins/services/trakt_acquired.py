@@ -83,7 +83,7 @@ class TraktAcquired(object):
                         # Remove some info from posted json and print the rest to aid debugging
                         for key in ['username', 'password', 'episodes']:
                             item.pop(key, None)
-                        log.error('%s not found on trakt: %s' % (config['type'].capitalize(), item))
+                        log.warning('%s not found on trakt: %s' % (config['type'].capitalize(), item))
                         continue
                     elif e.code == 401:
                         log.error('Error authenticating with trakt. Check your username/password/api_key')
