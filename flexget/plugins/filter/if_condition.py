@@ -14,8 +14,8 @@ def safer_eval(statement, locals):
     allowed_builtins = ['True', 'False', 'str', 'unicode', 'int', 'float', 'len', 'any', 'all', 'sorted']
     for name in allowed_builtins:
         locals[name] = globals()['__builtins__'].get(name)
-    if re.search(r'__|try\s*:', statement):
-        raise ValueError('\'__\' or try blocks not allowed in if statements.')
+    if re.search(r'__|try\s*:|lambda', statement):
+        raise ValueError('`__`, lambda or try blocks not allowed in if statements.')
     return eval(statement, {'__builtins__': None}, locals)
 
 
@@ -31,8 +31,8 @@ class FilterIf(object):
         from flexget import validator
         root = validator.factory('list')
         key_validator = validator.factory('regexp_match',
-                                          message='If statements cannot contain \'__\' or \'try\' statements')
-        key_validator.reject(r'.*?(__|try\s*:)')
+                                          message='If statements cannot contain `__`,  `try` or `lambda` statements')
+        key_validator.reject(r'.*?(__|try\s*:|lambda)')
         key_validator.accept('.')
         action = root.accept('dict').accept_valid_keys('root', key_validator=key_validator)
         action.accept('choice').accept_choices(['accept', 'reject', 'fail'])
