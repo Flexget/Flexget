@@ -315,7 +315,6 @@ class ImdbLookup(object):
         else:
             raise PluginError('looking up IMDB for entry failed, no title, imdb_url or imdb_id passed.')
 
-        take_a_break = False
         session = Session()
 
         try:
@@ -358,7 +357,6 @@ class ImdbLookup(object):
             if not entry.get('imdb_url', eval_lazy=False) and search_allowed:
                 log.verbose('Searching from imdb `%s`' % entry['title'])
 
-                take_a_break = True
                 search = ImdbSearch()
                 search_result = search.smart_match(entry['title'])
                 if search_result:
@@ -405,7 +403,6 @@ class ImdbLookup(object):
                 else:
                     log.verbose('Parsing imdb for `%s`' % entry['imdb_id'])
                 try:
-                    take_a_break = True
                     movie = self._parse_new_movie(entry['imdb_url'], session)
                 except UnicodeDecodeError:
                     log.error('Unable to determine encoding for %s. Installing chardet library may help.' % entry['imdb_url'])
@@ -425,13 +422,6 @@ class ImdbLookup(object):
 
             # store to entry
             entry.update_using_map(self.field_map, movie)
-
-            # give imdb a little break between requests (see: http://flexget.com/ticket/129#comment:1)
-            if (take_a_break and
-                not manager.options.debug and
-                not manager.unit_test):
-                import time
-                time.sleep(3)
         finally:
             log.trace('committing session')
             session.commit()

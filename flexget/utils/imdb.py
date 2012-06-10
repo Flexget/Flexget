@@ -1,12 +1,16 @@
 import difflib
-import urllib
-import urllib2
 import logging
 import re
 from flexget.utils.soup import get_soup
+from flexget.utils.requests import Session
 from BeautifulSoup import NavigableString, Tag
 
 log = logging.getLogger('utils.imdb')
+# IMDb delivers a version of the page which is unparsable to unknown (and some known) user agents, such as requests'
+# Spoof the old urllib user agent to keep results consistent
+requests = Session(headers={'User-Agent': 'Python-urllib/2.6'})
+# give imdb a little break between requests (see: http://flexget.com/ticket/129#comment:1)
+requests.set_domain_delay('imdb.com', '3 seconds')
 
 
 def is_imdb_url(url):
@@ -116,15 +120,12 @@ class ImdbSearch(object):
     def search(self, name):
         """Return array of movie details (dict)"""
         log.debug('Searching: %s' % name)
-        try:
-            url = u'http://www.imdb.com/find?' + urllib.urlencode({'q': name.encode('latin1'), 's': 'all'})
-        except:
-            log.warning('Problems with encoding %s, string possibly corrupted? Ignoring troublesome characters.' % name)
-            url = u'http://www.imdb.com/find?' + urllib.urlencode({'q': name.encode('latin1', 'ignore'), 's': 'all'})
+        url = u'http://www.imdb.com/find'
+        params = {'q': name, 's': 'all'}
 
         log.debug('Serch query: %s' % repr(url))
-        page = urllib2.urlopen(url)
-        actual_url = page.geturl()
+        page = requests.get(url, params=params)
+        actual_url = page.url
 
         movies = []
         # in case we got redirected to movie page (perfect match)
@@ -142,7 +143,7 @@ class ImdbSearch(object):
             return movies
 
         # the god damn page has declared a wrong encoding
-        soup = get_soup(page)
+        soup = get_soup(page.content)
 
         sections = ['Popular Titles', 'Titles (Exact Matches)',
                     'Titles (Partial Matches)', 'Titles (Approx Matches)']
@@ -252,12 +253,8 @@ class ImdbParser(object):
         self.imdb_id = extract_id(imdb_id)
         url = make_url(self.imdb_id)
         self.url = url
-        try:
-            page = urllib2.urlopen(url)
-        except ValueError:
-            raise ValueError('Invalid url %s' % url)
-
-        soup = get_soup(page)
+        page = requests.get(url)
+        soup = get_soup(page.content)
 
         # get photo
         tag_photo = soup.find('div', attrs={'class': 'photo'})
