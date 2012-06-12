@@ -28,7 +28,7 @@ class NewTorrents:
         if entry['url'].startswith('http://www.newtorrents.info/down.php?'):
             return False
         return entry['url'].startswith('http://www.newtorrents.info') and not entry['url'] in self.resolved
-        
+
     # UrlRewriter plugin API
     def url_rewrite(self, feed, entry):
         url = entry['url']
@@ -46,7 +46,7 @@ class NewTorrents:
             self.resolved.append(url)
         else:
             raise UrlRewritingError('Bug in newtorrents urlrewriter')
-            
+
     # Search plugin API
     def search(self, query, comparator, config=None):
         return self.entries_from_search(query, comparator=comparator)
@@ -73,7 +73,7 @@ class NewTorrents:
         comparator.set_seq1(name)
         name = comparator.search_string()
         if not url:
-            url = 'http://www.newtorrents.info/search/%s' % urllib.quote(name, safe=':/~?=&%')
+            url = 'http://www.newtorrents.info/search/%s' % urllib.quote(name.encode('utf-8'), safe=':/~?=&%')
 
         log.debug('search url: %s' % url)
 
@@ -81,7 +81,7 @@ class NewTorrents:
         # fix </SCR'+'IPT> so that BS does not crash
         # TODO: should use beautifulsoup massage
         html = re.sub(r'(</SCR.*?)...(.*?IPT>)', r'\1\2', html)
-        
+
         soup = get_soup(html)
         # saving torrents in dict
         torrents = []
@@ -98,7 +98,7 @@ class NewTorrents:
                 except ValueError:
                     log.warning('Error converting seed value (%s) from newtorrents to integer.' % seed)
                     seed = 0
-            
+
             #TODO: also parse content_size and peers from results
             if comparator.matches(release_name):
                 torrents.append(Entry(title=release_name, url=torrent_url, torrent_seeds=seed,
