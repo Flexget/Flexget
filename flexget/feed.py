@@ -1,17 +1,33 @@
 import logging
 import copy
 import hashlib
+from functools import wraps
+from sqlalchemy import Column, Unicode, String, Integer
 from flexget import validator
+from flexget import schema
 from flexget.manager import Session, register_config_key
 from flexget.plugin import get_plugins_by_phase, get_plugin_by_name, \
     feed_phases, PluginWarning, PluginError, DependencyError, plugins as all_plugins
-from flexget.utils.simple_persistence import SimpleFeedPersistence
+from flexget.utils.simple_persistence import SimpleFeedPersistence, SimplePersistence
 import flexget.utils.requests as requests
 from flexget.event import fire_event
 from flexget.entry import Entry, EntryUnicodeError
-from functools import wraps
 
 log = logging.getLogger('feed')
+Base = schema.versioned_base('feed', 0)
+
+
+class FeedConfigHash(Base):
+    """Stores the config hash for feeds so that we can tell if the config has changed since last run."""
+
+    __tablename__ = 'feed_config_hash'
+
+    id = Column(Integer, primary_key=True)
+    feed = Column('name', Unicode, index=True, nullable=False)
+    hash = Column('hash', String)
+
+    def __repr__(self):
+        return '<FeedConfigHash(feed=%s,hash=%s)>' % (self.feed, self.hash)
 
 
 def useFeedLogging(func):
@@ -386,6 +402,20 @@ class Feed(object):
         log.info('Plugin %s has requested feed to be ran again after execution has completed.' %
                  self.current_plugin)
 
+    def config_changed(self):
+        """Forces config_modified flag to come out true on next run. Used when the db changes, and all
+        entries need to be reprocessed."""
+        log.debug('Marking config as changed.')
+        session = self.session or Session()
+        feed_hash = session.query(FeedConfigHash).filter(FeedConfigHash.feed == self.name).first()
+        if feed_hash:
+            feed_hash.hash = ''
+        self.config_modified = True
+        # If we created our own session, commit and close it.
+        if not self.session:
+            session.commit()
+            session.close()
+
     @useFeedLogging
     def execute(self, disable_phases=None, entries=None):
         """Executes the feed.
@@ -419,6 +449,19 @@ class Feed(object):
 
         log.debug('starting session')
         self.session = Session()
+
+        # Save current config hash and set config_modidied flag
+        config_hash = hashlib.md5(str(self.config.items())).hexdigest()
+        last_hash = self.session.query(FeedConfigHash).filter(FeedConfigHash.feed == self.name).first()
+        if not last_hash:
+            self.config_modified = True
+            last_hash = FeedConfigHash(feed=self.name, hash=config_hash)
+            self.session.add(last_hash)
+        elif last_hash.hash != config_hash:
+            self.config_modified = True
+            last_hash.hash = config_hash
+        else:
+            self.config_modified = False
 
         try:
             # run phases
@@ -467,12 +510,6 @@ class Feed(object):
     def _process_start(self):
         """Execute process_start phase"""
         self.__run_feed_phase('process_start')
-        config_hash = hashlib.md5(str(self.config.items())).hexdigest()
-        if self.simple_persistence.get('feed_config_hash') != config_hash:
-            self.config_modified = True
-            self.simple_persistence['feed_config_hash'] = config_hash
-        else:
-            self.config_modified = False
 
     def _process_end(self):
         """Execute terminate phase for this feed"""

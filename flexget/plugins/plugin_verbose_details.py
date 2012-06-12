@@ -6,14 +6,14 @@ log = logging.getLogger('details')
 
 class PluginDetails(object):
 
-    def __init__(self):
-        # list of feed names where no entries is acceptable situation
-        self.no_entries_ok = []
+    def on_feed_start(self, feed):
+        # Make a flag for feeds to declare if it is ok not to produce entries
+        feed.no_entries_ok = False
 
     @priority(-512)
     def on_feed_input(self, feed):
         if not feed.entries:
-            if feed.name in self.no_entries_ok:
+            if feed.no_entries_ok:
                 log.verbose('Feed didn\'t produce any entries.')
             else:
                 log.verbose('Feed didn\'t produce any entries. This is likely due to a mis-configured or non-functional input.')

@@ -74,6 +74,9 @@ class MovieQueueManager(object):
             self.queue_list(feed.session)
             return
 
+        # If the action was to do more than just list the series, make sure all entries are processed again next run.
+        feed.manager.config_changed()
+
         if options['action'] == 'downloaded':
             self.queue_list(feed.session, downloaded=True)
             return

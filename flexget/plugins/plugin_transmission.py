@@ -6,6 +6,7 @@ from flexget.plugin import register_plugin, priority, get_plugin_by_name, Plugin
 from flexget import validator
 from flexget.entry import Entry
 from flexget.utils.template import RenderError
+from flexget.utils.pathscrub import pathscrub
 
 log = logging.getLogger('transmission')
 
@@ -199,16 +200,6 @@ class PluginTransmission(TransmissionBase):
         config.setdefault('removewhendone', False)
         return config
 
-    @save_opener
-    def on_process_start(self, feed, config):
-        try:
-            self.pathscrub = get_plugin_by_name('pathscrub').instance.scrub
-        except DependencyError:
-            log.warning('Transmission plugin cannot clean paths without pathscrub plugin.')
-            self.pathscrub = lambda x: x
-
-        super(PluginTransmission, self).on_process_start(feed, config)
-
     @priority(120)
     def on_feed_download(self, feed, config):
         """
@@ -267,7 +258,7 @@ class PluginTransmission(TransmissionBase):
         if opt_dic.get('path'):
             try:
                 path = os.path.expanduser(entry.render(opt_dic['path'])).encode('utf-8')
-                options['add']['download_dir'] = self.pathscrub(path)
+                options['add']['download_dir'] = pathscrub(path)
             except RenderError, e:
                 log.error('Error setting path for %s: %s' % (entry['title'], e))
         if opt_dic.get('addpaused'):

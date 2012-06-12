@@ -8,7 +8,7 @@ from datetime import datetime
 import feedparser
 from requests import RequestException
 from flexget.entry import Entry
-from flexget.plugin import register_plugin, internet, PluginError, get_plugin_by_name, DependencyError
+from flexget.plugin import register_plugin, internet, PluginError
 from flexget.utils.cached_input import cached
 from flexget.utils.tools import decode_html
 
@@ -97,7 +97,7 @@ class InputRSS(object):
         advanced.accept('boolean', key='ascii')
         advanced.accept('boolean', key='filename')
         advanced.accept('boolean', key='group_links')
-        advanced.accept('boolean', key='etag')
+        advanced.accept('boolean', key='all_entries')
         return root
 
     def build_config(self, config):
@@ -111,8 +111,8 @@ class InputRSS(object):
             config['other_fields'] = [field.replace(':', '_').lower() for field in config['other_fields']]
         # set default value for group_links as deactivated
         config.setdefault('group_links', False)
-        # set default for etag
-        config.setdefault('etag', True)
+        # set default for all_entries
+        config.setdefault('all_entries', False)
         return config
 
     def process_invalid_content(self, feed, data):
@@ -169,8 +169,9 @@ class InputRSS(object):
 
         # set etag and last modified headers if config has not changed since
         # last run and if caching wasn't disabled with --no-cache argument.
+        all_entries = config['all_entries'] or feed.config_modified or feed.manager.options.nocache
         headers = {}
-        if config['etag'] and feed.config_modified is False and not feed.manager.options.nocache:
+        if not all_entries:
             etag = feed.simple_persistence.get('%s_etag' % url_hash, None)
             if etag:
                 log.debug('Sending etag %s for feed %s' % (etag, feed.name))
@@ -201,14 +202,8 @@ class InputRSS(object):
             status = response.status_code
             if status == 304:
                 log.verbose('%s hasn\'t changed since last run. Not creating entries.' % config['url'])
-                try:
-                    # details plugin will complain if no entries are created, with this we disable that
-                    details = get_plugin_by_name('details').instance
-                    if feed.name not in details.no_entries_ok:
-                        log.debug('adding %s to details plugin no_entries_ok' % feed.name)
-                        details.no_entries_ok.append(feed.name)
-                except DependencyError:
-                    log.debug('unable to get details plugin')
+                # Let details plugin know that it is ok if this feed doesn't produce any entries
+                feed.no_entries_ok = True
                 return []
             elif status == 401:
                 raise PluginError('Authentication needed for feed %s (%s): %s' %\
@@ -221,7 +216,7 @@ class InputRSS(object):
                 raise PluginError('HTTP error %s received from %s' % (status, config['url']), log)
 
             # update etag and last modified
-            if config['etag']:
+            if not config['all_entries']:
                 etag = response.headers.get('etag')
                 if etag:
                     feed.simple_persistence['%s_etag' % url_hash] = etag
@@ -296,6 +291,14 @@ class InputRSS(object):
 
         log.debug('encoding %s' % rss.encoding)
 
+        last_entry_title = ''
+        if not all_entries:
+            # Test to make sure entries are in descending order
+            if rss.entries and rss.entries[0]['date_parsed'] < rss.entries[-1]['date_parsed']:
+                # Sort them if they are not
+                rss.entries.sort(key=lambda x: x['date_parsed'], reverse=True)
+            last_entry_title = feed.simple_persistence.get('%s_last_entry' % url_hash)
+
         # new entries to be created
         entries = []
 
@@ -314,6 +317,13 @@ class InputRSS(object):
 
             # Set the title from the source field
             entry.title = entry[title_field]
+
+            # Check we haven't already processed this entry in a previous run
+            if last_entry_title == entry.title:
+                log.verbose('Not processing entries from last run.')
+                # Let details plugin know that it is ok if this feed doesn't produce any entries
+                feed.no_entries_ok = True
+                break
 
             # convert title to ascii (cleanup)
             if config.get('ascii', False):
@@ -418,6 +428,11 @@ class InputRSS(object):
                 continue
 
             add_entry(e)
+
+        # Save last spot in rss
+        if rss.entries:
+            log.debug('Saving location in rss feed.')
+            feed.simple_persistence['%s_last_entry' % url_hash] = rss.entries[0].title
 
         if ignored:
             if not config.get('silent'):

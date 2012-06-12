@@ -271,6 +271,12 @@ class Manager(object):
         finally:
             config_file.close()
 
+    def config_changed(self):
+        """Makes sure that all feeds will have the config_modified flag come out true on the next run.
+        Useful when changing the db and all feeds need to be completely reprocessed."""
+        for feed in self.feeds.values():
+            feed.config_changed()
+
     def pre_check_config(self, fn):
         """Checks configuration file for common mistakes that are easily detectable"""
 

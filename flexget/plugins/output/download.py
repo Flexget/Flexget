@@ -12,10 +12,10 @@ from httplib import BadStatusLine
 
 from requests import RequestException
 
-from flexget.plugin import (register_plugin, register_parser_option, get_plugin_by_name,
-                            PluginWarning, PluginError, DependencyError)
+from flexget.plugin import register_plugin, register_parser_option, PluginWarning, PluginError
 from flexget.utils.tools import decode_html
 from flexget.utils.template import RenderError
+from flexget.utils.pathscrub import pathscrub
 
 log = logging.getLogger('download')
 
@@ -71,14 +71,6 @@ class PluginDownload(object):
         if not config.get('path'):
             config['require_path'] = True
         return config
-
-    def on_process_start(self, feed, config):
-        """Get pathscrub method."""
-        try:
-            self.pathscrub = get_plugin_by_name('pathscrub').instance.scrub
-        except DependencyError:
-            log.warning('Download plugin cannot clean paths without pathscrub plugin.')
-            self.pathscrub = lambda x: x
 
     def on_feed_download(self, feed, config):
         config = self.process_config(config)
@@ -376,7 +368,7 @@ class PluginDownload(object):
                 return
 
             # Clean illegal characters from path name
-            path = self.pathscrub(path)
+            path = pathscrub(path)
 
             # If we are in test mode, report and return
             if feed.manager.options.test:
@@ -415,7 +407,7 @@ class PluginDownload(object):
 
             name = entry.get('filename', entry['title'])
             # Remove illegal characters from filename #325, #353
-            name = self.pathscrub(name)
+            name = pathscrub(name)
             # Remove directory separators from filename #208
             name = name.replace('/', ' ')
             if sys.platform.startswith('win'):

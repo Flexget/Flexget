@@ -89,6 +89,7 @@ class FilterRememberRejected(object):
         if old_feed and (feed.config_modified or feed.manager.options.forget_rejected):
             if feed.manager.options.forget_rejected:
                 log.info('Forgetting previous rejections.')
+                feed.config_changed()
             else:
                 log.debug('Feed config has changed since last run, purging remembered entries.')
             feed.session.delete(old_feed)

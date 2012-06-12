@@ -27,7 +27,12 @@ class TestInputRSS(FlexGetBase):
               link:
                 - guid
                 - otherlink
-
+          test_all_entries_no:
+            rss:
+              all_entries: no
+          test_all_entries_yes:
+            rss:
+              all_entries: yes
     """
 
     def setup(self):
@@ -109,6 +114,18 @@ class TestInputRSS(FlexGetBase):
                                     description='Description, guid')
         assert entry['urls'] == ['http://localhost/guid', 'http://localhost/otherlink'], \
             'Failed to set urls with both links'
+
+    def test_all_entries_no(self):
+        self.execute_feed('test_all_entries_no')
+        assert self.feed.entries, 'Entries should have been produced on first run.'
+        self.execute_feed('test_all_entries_no')
+        assert not self.feed.entries, 'No entries should have been produced the second run.'
+
+    def test_all_entries_yes(self):
+        self.execute_feed('test_all_entries_yes')
+        assert self.feed.entries, 'Entries should have been produced on first run.'
+        self.execute_feed('test_all_entries_yes')
+        assert self.feed.entries, 'Entries should have been produced on second run.'
 
 
 class TestRssOnline(FlexGetBase):

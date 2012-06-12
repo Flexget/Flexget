@@ -244,6 +244,7 @@ class SeenForget(object):
 
         count, fcount = forget(forget_name)
         log.info('Removed %s titles (%s fields)' % (count, fcount))
+        feed.manager.config_changed()
 
 
 class SeenCmd(object):

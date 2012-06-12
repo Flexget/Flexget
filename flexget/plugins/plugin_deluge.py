@@ -8,6 +8,7 @@ from flexget.event import event
 from flexget.entry import Entry
 from flexget.plugin import register_plugin, PluginError, priority, get_plugin_by_name, DependencyError
 from flexget.utils.template import RenderError
+from flexget.utils.pathscrub import pathscrub
 
 log = logging.getLogger('deluge')
 
@@ -328,14 +329,7 @@ class OutputDeluge(DelugePlugin):
     def on_process_start(self, feed, config):
         """
         Detect what version of deluge is loaded.
-        Get pathscrub method from pathscrub plugin if available.
         """
-
-        try:
-            self.pathscrub = get_plugin_by_name('pathscrub').instance.scrub
-        except DependencyError:
-            log.warning('Deluge plugin cannot clean paths without pathscrub plugin.')
-            self.pathscrub = lambda x: x
 
         if self.deluge12 is None:
             logger = log.info if feed.manager.options.test else log.debug
@@ -695,7 +689,7 @@ class OutputDeluge(DelugePlugin):
                 try:
                     path = entry.render(entry.get('path', config['path']))
                     if path:
-                        add_opts['download_location'] = self.pathscrub(os.path.expanduser(path))
+                        add_opts['download_location'] = pathscrub(os.path.expanduser(path))
                 except RenderError, e:
                     log.error('Could not set path for %s: %s' % (entry['title'], e))
                 for fopt, dopt in self.options.iteritems():
@@ -710,12 +704,12 @@ class OutputDeluge(DelugePlugin):
                                'main_file_only': entry.get('main_file_only', config.get('main_file_only', False))}
                 try:
                     movedone = entry.render(entry.get('movedone', config['movedone']))
-                    modify_opts['movedone'] = self.pathscrub(os.path.expanduser(movedone))
+                    modify_opts['movedone'] = pathscrub(os.path.expanduser(movedone))
                 except RenderError, e:
                     log.error('Error setting movedone for %s: %s' % (entry['title'], e))
                 try:
                     content_filename = entry.get('content_filename', config.get('content_filename', ''))
-                    modify_opts['content_filename'] = self.pathscrub(entry.render(content_filename))
+                    modify_opts['content_filename'] = pathscrub(entry.render(content_filename))
                 except RenderError, e:
                     log.error('Error setting content_filename for %s: %s' % (entry['title'], e))
 

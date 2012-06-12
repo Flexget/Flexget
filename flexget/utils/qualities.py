@@ -118,9 +118,9 @@ _resolutions = [
     QualityComponent('resolution', 40, '576p', '576p?'),
     QualityComponent('resolution', 45, 'hr'),
     QualityComponent('resolution', 50, '720i'),
-    QualityComponent('resolution', 60, '720p', '(?:1280x)?720p?'),
+    QualityComponent('resolution', 60, '720p', '(1280x)?720p?'),
     QualityComponent('resolution', 70, '1080i'),
-    QualityComponent('resolution', 80, '1080p', '(?:1920x)?1080p?')
+    QualityComponent('resolution', 80, '1080p', '(1920x)?1080p?')
 ]
 _sources = [
     QualityComponent('source', 10, 'workprint', modifier=-7),
@@ -148,7 +148,6 @@ _codecs = [
     QualityComponent('codec', 40, '10bit', '10.?bit|hi10p')
 ]
 channels = '(?:(?:[\W_]?5[\W_]?1)|(?:[\W_]?2[\W_]?(?:0|ch)))'
-two_dot_oh = ''
 _audios = [
     QualityComponent('audio', 10, 'mp3'),
     #TODO: No idea what order these should go in or if we need different regexps

@@ -3,7 +3,7 @@ from datetime import datetime
 from sqlalchemy import Column, Integer, String, Unicode, DateTime, PickleType, Index
 from flexget import schema
 from flexget.entry import Entry
-from flexget.plugin import register_plugin, priority, PluginError, get_plugin_by_name, DependencyError
+from flexget.plugin import register_plugin, priority, PluginError
 from flexget.utils.database import safe_pickle_synonym
 from flexget.utils.tools import parse_timedelta
 
@@ -72,14 +72,8 @@ class FilterDelay(object):
         """Captures the current input then replaces it with entries that have passed the delay."""
         if feed.entries:
             log.verbose('Delaying %s new entries for %s' % (len(feed.entries), config))
-            try:
-                # details plugin will complain if no entries are created, with this we disable that
-                details = get_plugin_by_name('details').instance
-                if feed.name not in details.no_entries_ok:
-                    log.debug('adding %s to details plugin no_entries_ok' % feed.name)
-                    details.no_entries_ok.append(feed.name)
-            except DependencyError:
-                log.debug('unable to get details plugin')
+            # Let details plugin know that it is ok if this feed doesn't produce any entries
+            feed.no_entries_ok = True
         # First learn the current entries in the feed to the database
         expire_time = datetime.now() + self.get_delay(config)
         for entry in feed.entries:

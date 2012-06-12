@@ -229,6 +229,8 @@ class SeriesForget(object):
                 except ValueError, e:
                     print e.message
 
+            feed.manager.config_changed()
+
 
 register_plugin(SeriesReport, '--series', builtin=True)
 register_plugin(SeriesForget, '--series-forget', builtin=True)
