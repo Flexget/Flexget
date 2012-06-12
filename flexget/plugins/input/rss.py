@@ -294,9 +294,10 @@ class InputRSS(object):
         last_entry_title = ''
         if not all_entries:
             # Test to make sure entries are in descending order
-            if rss.entries and rss.entries[0]['date_parsed'] < rss.entries[-1]['date_parsed']:
-                # Sort them if they are not
-                rss.entries.sort(key=lambda x: x['date_parsed'], reverse=True)
+            if rss.entries and rss.entries[0].get('published_parsed'):
+                if rss.entries[0]['published_parsed'] < rss.entries[-1]['published_parsed']:
+                    # Sort them if they are not
+                    rss.entries.sort(key=lambda x: x['published_parsed'], reverse=True)
             last_entry_title = feed.simple_persistence.get('%s_last_entry' % url_hash)
 
         # new entries to be created
@@ -366,8 +367,8 @@ class InputRSS(object):
                         except UnicodeDecodeError:
                             log.warning('Failed to decode entry `%s` field `%s`' % (ea['title'], rss_field))
                 # Also grab pubdate if available
-                if hasattr(entry, 'date_parsed') and entry.date_parsed:
-                    ea['rss_pubdate'] = datetime(*entry.date_parsed[:6])
+                if hasattr(entry, 'published_parsed') and entry.published_parsed:
+                    ea['rss_pubdate'] = datetime(*entry.published_parsed[:6])
                 # store basic auth info
                 if 'username' in config and 'password' in config:
                     ea['basic_auth_username'] = config['username']
