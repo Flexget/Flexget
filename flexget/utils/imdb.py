@@ -340,7 +340,7 @@ class ImdbParser(object):
         elif soup.head.title:
             m = re.search(r'(\d{4})\)', unicode(soup.head.title.string))
             if m:
-                self.year = int(m.group())
+                self.year = int(m.group(1))
                 log.debug('Detected year: %s' % self.year)
             else:
                 log.warning('Unable to get year for %s (regexp mismatch) - plugin needs update?' % url)
