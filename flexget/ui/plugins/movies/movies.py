@@ -5,6 +5,7 @@ from flask import render_template, Module, request, redirect, flash, send_file
 from flask.helpers import url_for
 from flexget.plugin import DependencyError, get_plugin_by_name
 from flexget.ui.webui import register_plugin, app, manager
+from flexget.utils import qualities
 
 try:
     from flexget.plugins.filter.movie_queue import QueueError, queue_get, queue_add, queue_del, queue_edit
@@ -68,7 +69,8 @@ def index():
 def add_to_queue():
     what = request.values.get('what')
     imdb_id = request.values.get('imdb_id')
-    quality = request.values.get('quality', 'ANY')
+    # TODO: This is a rather limited selection of quality considering the new quality system. Improve it.
+    quality = qualities.Requirements(request.values.get('quality', 'ANY'))
     force = request.values.get('force') == 'on'
     try:
         title = queue_add(title=what, imdb_id=imdb_id, quality=quality, force=force)['title']
