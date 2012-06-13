@@ -337,17 +337,15 @@ class ImdbParser(object):
         if tag_year:
             self.year = int(tag_year.contents[0])
             log.debug('Detected year: %s' % self.year)
-        else:
-            tag_year = soup.find('span', text=re.compile(r'^\((?:Video|TV) \d+\)'))
-            if tag_year:
-                m = re.search('(\d{4})', unicode(tag_year))
-                if m:
-                    self.year = int(m.group())
-                    log.debug('Detected year: %s' % self.year)
-                else:
-                    log.warning('Unable to get year for %s (regexp mismatch) - plugin needs update?' % url)
+        elif soup.head.title:
+            m = re.search(r'(\d{4})\)', unicode(soup.head.title.string))
+            if m:
+                self.year = int(m.group())
+                log.debug('Detected year: %s' % self.year)
             else:
-                log.warning('Unable to get year for %s (tag not found) - plugin needs update?' % url)
+                log.warning('Unable to get year for %s (regexp mismatch) - plugin needs update?' % url)
+        else:
+            log.warning('Unable to get year for %s (missing title) - plugin needs update?' % url)
 
         # get main cast
         tag_cast = soup.find('table', 'cast_list')
