@@ -373,7 +373,12 @@ class SeriesParser(TitleParser):
             log.debug('found special, setting id to \'%s\'' % self.id)
             return
 
-        raise ParseWarning('Title \'%s\' looks like series \'%s\' but I cannot find any episode or id numbering' % (self.data, self.name))
+        msg = 'Title `%s` looks like series `%s` but I cannot find ' % (self.data, self.name)
+        if self.identified_by == 'auto':
+            msg += 'any series numbering.'
+        else:
+            msg += 'a(n) `%s` style identifier.' % self.identified_by
+        raise ParseWarning(msg)
 
     def parse_unwanted(self, data):
         """Parses data for an unwanted hits. Return True if the data contains unwanted hits."""
