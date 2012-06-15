@@ -89,23 +89,37 @@ class TorrentAlive(object):
         root = validator.factory()
         root.accept('boolean')
         root.accept('integer')
+        advanced = root.accept('dict')
+        advanced.accept('integer', key='min_seeds')
+        advanced.accept('interval', key='reject_for')
         return root
+
+    def prepare_config(self, config):
+        # Convert config to dict form
+        if not isinstance(config, dict):
+            config = {'min_seeds': int(config)}
+        # Set the defaults
+        config.setdefault('min_seeds', 1)
+        config.setdefault('reject_for', '1 hour')
+        return config
 
     @priority(150)
     def on_feed_filter(self, feed, config):
         if not config:
             return
+        config = self.prepare_config(config)
         for entry in feed.entries:
-            if 'torrent_seeds' in entry and entry['torrent_seeds'] < config:
-                feed.reject(entry, reason='Had < %d required seeds. (%s)' % (config, entry['torrent_seeds']))
+            if 'torrent_seeds' in entry and entry['torrent_seeds'] < config['min_seeds']:
+                feed.reject(entry, reason='Had < %d required seeds. (%s)' %
+                                          (config['min_seeds'], entry['torrent_seeds']))
 
     # Run on output phase so that we let torrent plugin output modified torrent file first
     @priority(250)
     def on_feed_output(self, feed, config):
         if not config:
             return
-            # Convert True to 1
-        min_seeds = int(config)
+        config = self.prepare_config(config)
+        min_seeds = config['min_seeds']
 
         for entry in feed.accepted:
             # TODO: shouldn't this still check min_seeds ?
@@ -148,7 +162,7 @@ class TorrentAlive(object):
                 # Reject if needed
                 if seeds < min_seeds:
                     feed.reject(entry, reason='Tracker(s) had < %s required seeds. (%s)' % (min_seeds, seeds),
-                        remember_time='1 hour')
+                        remember_time=config['reject_for'])
                     feed.rerun()
                 else:
                     log.debug('Found %i seeds from trackers' % seeds)
