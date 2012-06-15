@@ -10,6 +10,7 @@ from sqlalchemy.schema import ForeignKey
 from sqlalchemy.orm import relation
 from requests import RequestException
 from flexget import schema
+from flexget.utils.tools import decode_html
 from flexget.utils.requests import Session as ReqSession
 from flexget.utils.database import with_session, pipe_list_synonym, text_date_synonym
 from flexget.utils.sqlalchemy_utils import table_add_column
@@ -49,9 +50,12 @@ def get_mirror(type='xml'):
     if not _mirrors.get(type):
         # Get the list of mirrors from tvdb
         try:
-            data = BeautifulStoneSoup(requests.get(server + api_key + '/mirrors.xml').content)
+            page = requests.get(server + api_key + '/mirrors.xml').content
         except RequestException:
             raise LookupError('Could not retrieve mirror list from thetvdb')
+        if not page:
+            raise LookupError('Could not retrieve mirror list from thetvdb')
+        data = BeautifulStoneSoup(page, convertEntities=BeautifulStoneSoup.HTML_ENTITIES)
         for mirror in data.findAll('mirror'):
             type_mask = int(mirror.typemask.string)
             mirrorpath = mirror.mirrorpath.string
@@ -82,7 +86,8 @@ class TVDBContainer(object):
                 elif isinstance(col.type, Float):
                     value = float(tag.string)
                 else:
-                    value = tag.string
+                    # BeautifulSoup used to take care of the html entities... but seems to have stopped.
+                    value = decode_html(tag.string)
                 setattr(self, col.name, value)
         self.expired = False
 
@@ -192,7 +197,7 @@ class TVDBEpisode(TVDBContainer, Base):
             data = requests.get(url).content
         except RequestException, e:
             raise LookupError('Request failed %s' % url)
-        result = BeautifulStoneSoup(data).find('episode')
+        result = BeautifulStoneSoup(data, convertEntities=BeautifulStoneSoup.HTML_ENTITIES).find('episode')
         if result:
             self.update_from_bss(result)
         else:
@@ -220,7 +225,7 @@ def find_series_id(name):
         page = requests.get(url).content
     except RequestException, e:
         raise LookupError("Unable to get search results for %s: %s" % (name, e))
-    xmldata = BeautifulStoneSoup(page).data
+    xmldata = BeautifulStoneSoup(page, convertEntities=BeautifulStoneSoup.HTML_ENTITIES).data
     if not xmldata:
         log.error("Didn't get a return from tvdb on the series search for %s" % name)
         return
@@ -331,7 +336,7 @@ def lookup_episode(name=None, seasonnum=None, episodenum=None, tvdb_id=None, onl
         url = get_mirror() + api_key + '/series/%d/default/%d/%d/%s.xml' % (series.id, seasonnum, episodenum, language)
         try:
             raw_data = requests.get(url).content
-            data = BeautifulStoneSoup(raw_data).data
+            data = BeautifulStoneSoup(raw_data, convertEntities=BeautifulStoneSoup.HTML_ENTITIES).data
             if data:
                 ep_data = data.find('episode')
                 if ep_data:
@@ -371,7 +376,7 @@ def mark_expired(session=None):
         content = requests.get(server + 'Updates.php?type=all&time=%s' % last_server).content
         if not isinstance(content, basestring):
             raise Exception('exptected string, got %s' % type(content))
-        updates = BeautifulStoneSoup(content).items
+        updates = BeautifulStoneSoup(content, convertEntities=BeautifulStoneSoup.HTML_ENTITIES).items
     except RequestException, e:
         log.error('Could not get update information from tvdb: %s' % e)
         return
