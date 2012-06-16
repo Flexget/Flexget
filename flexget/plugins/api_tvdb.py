@@ -346,7 +346,7 @@ def lookup_episode(name=None, seasonnum=None, episodenum=None, absolutenum=None,
             except LookupError, e:
                 log.warning('Error while updating from tvdb (%s), using cached data.' % e.message)
         else:
-            log.debug('Using episode info from cache.')
+            log.debug('Using episode info for %s from cache.' % ep_description)
     else:
         if only_cached:
             raise LookupError('Episode %s not found from cache' % ep_description)

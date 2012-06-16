@@ -119,7 +119,7 @@ class PluginThetvdbLookup(object):
                 lookupargs['seasonnum'] = entry['series_season'] + season_offset
                 lookupargs['episodenum'] = entry['series_episode'] + episode_offset
             elif entry['series_id_type'] == 'sequence':
-                lookupargs['absolutenum'] = entry['series_id']
+                lookupargs['absolutenum'] = entry['series_id'] + episode_offset
             elif entry['series_id_type'] == 'date':
                 lookupargs['airdate'] = entry['series_date']
             episode = lookup_episode(**lookupargs)
