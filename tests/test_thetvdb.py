@@ -32,6 +32,16 @@ class TestThetvdbLookup(FlexGetBase):
             metainfo_series: yes
             accept_all: yes
             disable_builtins: [seen]
+          test_date:
+            mock:
+              - title: the daily show 2012-6-6
+            series:
+              - the daily show (with jon stewart)
+          test_absolute:
+            mock:
+              - title: naruto 128
+            series:
+              - naruto
 
     """
 
@@ -78,6 +88,18 @@ class TestThetvdbLookup(FlexGetBase):
         session.commit()
         session.close()
         test_run()
+
+    def test_date(self):
+        self.execute_feed('test_date')
+        entry = self.feed.find_entry(title='the daily show 2012-6-6')
+        assert entry
+        assert entry['ep_name'] == 'Michael Fassbender'
+
+    def test_absolute(self):
+        self.execute_feed('test_absolute')
+        entry = self.feed.find_entry(title='naruto 128')
+        assert entry
+        assert entry['ep_name'] == 'A Cry on Deaf Ears'
 
 
 class TestThetvdbFavorites(FlexGetBase):

@@ -80,7 +80,8 @@ class PluginThetvdbLookup(object):
         'ep_overview': 'overview',
         'ep_writers': 'writer',
         'ep_directors': 'director',
-        'ep_guest_stars': 'gueststars'}
+        'ep_guest_stars': 'gueststars',
+        'ep_absolute_number': 'absolute_number'}
 
     def validator(self):
         from flexget import validator
@@ -112,10 +113,16 @@ class PluginThetvdbLookup(object):
             if season_offset != 0 or episode_offset != 0:
                 log.debug('Using offset for tvdb lookup: season: %s, episode: %s' % (season_offset, episode_offset))
 
-            episode = lookup_episode(entry.get('series_name', eval_lazy=False),
-                                     entry['series_season'] + season_offset,
-                                     entry['series_episode'] + episode_offset,
-                                     tvdb_id=entry.get('thetvdb_id', eval_lazy=False))
+            lookupargs = {'name': entry.get('series_name', eval_lazy=False),
+                          'tvdb_id': entry.get('thetvdb_id', eval_lazy=False)}
+            if entry['series_id_type'] == 'ep':
+                lookupargs['seasonnum'] = entry['series_season'] + season_offset
+                lookupargs['episodenum'] = entry['series_episode'] + episode_offset
+            elif entry['series_id_type'] == 'sequence':
+                lookupargs['absolutenum'] = entry['series_id']
+            elif entry['series_id_type'] == 'date':
+                lookupargs['airdate'] = entry['series_date']
+            episode = lookup_episode(**lookupargs)
             entry.update_using_map(self.episode_map, episode)
         except LookupError, e:
             log.debug('Error looking up tvdb episode information for %s: %s' % (entry['title'], e.message))
@@ -135,7 +142,7 @@ class PluginThetvdbLookup(object):
                 entry.register_lazy_fields(self.series_map, self.lazy_series_lookup)
 
                 # If there is season and ep info as well, register episode lazy fields
-                if entry.get('series_id_type') == 'ep':
+                if entry.get('series_id_type') in ('ep', 'sequence', 'date'):
                     entry.register_lazy_fields(self.episode_map, self.lazy_episode_lookup)
                 # TODO: lookup for 'seq' and 'date' type series
 

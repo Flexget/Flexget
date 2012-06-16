@@ -17,7 +17,7 @@ from flexget.utils.sqlalchemy_utils import table_add_column
 from flexget.manager import Session
 from flexget.utils.simple_persistence import SimplePersistence
 
-SCHEMA_VER = 1
+SCHEMA_VER = 2
 
 log = logging.getLogger('api_tvdb')
 Base = schema.versioned_base('api_tvdb', SCHEMA_VER)
@@ -40,6 +40,9 @@ def upgrade(ver, session):
     if ver == 0:
         table_add_column('tvdb_episodes', 'gueststars', Unicode, session)
         ver = 1
+    if ver == 1:
+        table_add_column('tvdb_episodes', 'absolute_number', Integer, session)
+        ver = 2
 
     return ver
 
@@ -174,6 +177,7 @@ class TVDBEpisode(TVDBContainer, Base):
     lastupdated = Column(Integer)
     seasonnumber = Column(Integer)
     episodenumber = Column(Integer)
+    absolute_number = Column(Integer)
     episodename = Column(Unicode)
     overview = Column(Unicode)
     _director = Column('director', Unicode)
@@ -309,16 +313,31 @@ def lookup_series(name=None, tvdb_id=None, only_cached=False, session=None):
 
 
 @with_session
-def lookup_episode(name=None, seasonnum=None, episodenum=None, tvdb_id=None, only_cached=False, session=None):
+def lookup_episode(name=None, seasonnum=None, episodenum=None, absolutenum=None, airdate=None, tvdb_id=None, only_cached=False, session=None):
     # First make sure we have the series data
     series = lookup_series(name=name, tvdb_id=tvdb_id, only_cached=only_cached, session=session)
     if not series:
         raise LookupError('Could not identify series')
-    ep_description = '%s.S%sE%s' % (series.seriesname, seasonnum, episodenum)
-    # See if we have this episode cached
-    episode = session.query(TVDBEpisode).filter(TVDBEpisode.series_id == series.id).\
-                                         filter(TVDBEpisode.seasonnumber == seasonnum).\
-                                         filter(TVDBEpisode.episodenumber == episodenum).first()
+    # Set variables depending on what type of identifier we are looking up
+    if airdate:
+        airdatestring = airdate.strftime('%Y-%m-%d')
+        ep_description = '%s.%s' % (series.seriesname, airdatestring)
+        episode = session.query(TVDBEpisode).filter(TVDBEpisode.series_id == series.id).\
+                                             filter(TVDBEpisode.firstaired == airdate).first()
+        url = get_mirror() + 'GetEpisodeByAirDate.php?apikey=%s&seriesid=%d&airdate=%s&language=%s' %\
+                             (api_key, series.id, airdatestring, language)
+    elif absolutenum:
+        ep_description = '%s.%d' % (series.seriesname, absolutenum)
+        episode = session.query(TVDBEpisode).filter(TVDBEpisode.series_id == series.id).\
+                                             filter(TVDBEpisode.absolute_number == absolutenum).first()
+        url = get_mirror() + api_key + '/series/%d/absolute/%s/%s.xml' % (series.id, absolutenum, language)
+    else:
+        ep_description = '%s.S%sE%s' % (series.seriesname, seasonnum, episodenum)
+        # See if we have this episode cached
+        episode = session.query(TVDBEpisode).filter(TVDBEpisode.series_id == series.id).\
+                                             filter(TVDBEpisode.seasonnumber == seasonnum).\
+                                             filter(TVDBEpisode.episodenumber == episodenum).first()
+        url = get_mirror() + api_key + '/series/%d/default/%d/%d/%s.xml' % (series.id, seasonnum, episodenum, language)
     if episode:
         if episode.expired and not only_cached:
             log.info('Data for %r has expired, refreshing from tvdb' % episode)
@@ -333,11 +352,13 @@ def lookup_episode(name=None, seasonnum=None, episodenum=None, tvdb_id=None, onl
             raise LookupError('Episode %s not found from cache' % ep_description)
         # There was no episode found in the cache, do a lookup from tvdb
         log.debug('Episode %s not found in cache, looking up from tvdb.' % ep_description)
-        url = get_mirror() + api_key + '/series/%d/default/%d/%d/%s.xml' % (series.id, seasonnum, episodenum, language)
         try:
             raw_data = requests.get(url).content
             data = BeautifulStoneSoup(raw_data, convertEntities=BeautifulStoneSoup.HTML_ENTITIES).data
             if data:
+                error = data.find('error')
+                if error:
+                    raise LookupError('Error lookuing up episode from TVDb (%s)' % error.string)
                 ep_data = data.find('episode')
                 if ep_data:
                     # Check if this episode id is already in our db
