@@ -56,6 +56,7 @@ class MovieParser(TitleParser):
         parts = data.split(' ')
         year = None
         cut_part = 256
+        all_caps = True
         for part_pos, part in enumerate(parts):
             cut = False
             # Don't let the first word be cutoff word
@@ -67,8 +68,11 @@ class MovieParser(TitleParser):
                 if 1930 < num < 2050:
                     year = part
                     cut = True
+            # Don't consider all caps words cut words if the whole title has been all caps
+            if not part.isupper():
+                all_caps = False
             # if length > 3 and whole word in uppers, consider as cut word (most likely a group name)
-            if len(part) > 3 and part.isupper() and part.isalpha() and part_pos > 0:
+            if len(part) > 3 and part.isupper() and part.isalpha() and not all_caps:
                 cut = True
             # check for cutoff words
             if part.lower() in self.cutoffs:
