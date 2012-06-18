@@ -71,7 +71,7 @@ class TraktList(object):
         elif 'custom' in config:
             url_params['data_type'] = 'custom'
             # Do some translation from visible list name to prepare for use in url
-            list_name = config['custom']
+            list_name = config['custom'].lower()
             # These characters are just stripped in the url
             for char in '!@#$%^*()[]{}/=?+\\|-_':
                 list_name = list_name.replace(char, '')
