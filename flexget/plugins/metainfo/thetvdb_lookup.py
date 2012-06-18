@@ -81,7 +81,10 @@ class PluginThetvdbLookup(object):
         'ep_writers': 'writer',
         'ep_directors': 'director',
         'ep_guest_stars': 'gueststars',
-        'ep_absolute_number': 'absolute_number'}
+        'tvdb_absolute_number': 'absolute_number',
+        'tvdb_season': 'seasonnumber',
+        'tvdb_episode': 'episodenumber',
+        'tvdb_ep_id': lambda ep: 'S%02dE%02d' % (ep.seasonnumber, ep.episodenumber)}
 
     def validator(self):
         from flexget import validator

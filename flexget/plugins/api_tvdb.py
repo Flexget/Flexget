@@ -52,19 +52,22 @@ def get_mirror(type='xml'):
     global _mirrors
     if not _mirrors.get(type):
         # Get the list of mirrors from tvdb
+        page = None
         try:
             page = requests.get(server + api_key + '/mirrors.xml').content
         except RequestException:
-            raise LookupError('Could not retrieve mirror list from thetvdb')
-        if not page:
-            raise LookupError('Could not retrieve mirror list from thetvdb')
-        data = BeautifulStoneSoup(page, convertEntities=BeautifulStoneSoup.HTML_ENTITIES)
-        for mirror in data.findAll('mirror'):
-            type_mask = int(mirror.typemask.string)
-            mirrorpath = mirror.mirrorpath.string
-            for t in [(1, 'xml'), (2, 'banner'), (4, 'zip')]:
-                if type_mask & t[0]:
-                    _mirrors.setdefault(t[1], set()).add(mirrorpath)
+            pass
+        # If there were problems getting the mirror list we'll just fall back to the main site.
+        if page:
+            data = BeautifulStoneSoup(page, convertEntities=BeautifulStoneSoup.HTML_ENTITIES)
+            for mirror in data.findAll('mirror'):
+                type_mask = int(mirror.typemask.string)
+                mirrorpath = mirror.mirrorpath.string
+                for t in [(1, 'xml'), (2, 'banner'), (4, 'zip')]:
+                    if type_mask & t[0]:
+                        _mirrors.setdefault(t[1], set()).add(mirrorpath)
+        else:
+            log.debug('Unable to get the mirrors list from thetvdb.')
     if _mirrors.get(type):
         return random.sample(_mirrors[type], 1)[0] + ('/banners/' if type == 'banner' else '/api/')
     else:
