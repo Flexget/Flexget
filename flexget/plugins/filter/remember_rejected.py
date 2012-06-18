@@ -83,7 +83,10 @@ class FilterRememberRejected(object):
         """Purge remembered entries if the config has changed."""
         # No session on process start, make our own
         # Delete expired items
-        feed.session.query(RememberEntry).filter(RememberEntry.expires < datetime.now()).delete()
+        deleted = feed.session.query(RememberEntry).filter(RememberEntry.expires < datetime.now()).delete()
+        if deleted:
+            log.debug('%s entries have expired from remember_rejected table.' % deleted)
+            feed.config_changed()
         # See if the feed has changed since last run
         old_feed = feed.session.query(RememberFeed).filter(RememberFeed.name == feed.name).first()
         if old_feed and (feed.config_modified or feed.manager.options.forget_rejected):
