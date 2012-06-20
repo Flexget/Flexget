@@ -35,14 +35,14 @@ class MetainfoSeries(object):
         if entry.get('series_parser') and entry['series_parser'].valid:
             # Return true if we already parsed this, false if series plugin parsed it
             return entry.get('series_guessed')
-        parser = self.guess_series(entry['title'], allow_seasonless=allow_seasonless)
+        parser = self.guess_series(entry['title'], allow_seasonless=allow_seasonless, quality=entry.get('quality'))
         if parser:
             populate_entry_fields(entry, parser)
             entry['series_guessed'] = True
             return True
         return False
 
-    def guess_series(self, title, allow_seasonless=False):
+    def guess_series(self, title, allow_seasonless=False, quality=None):
         """Returns a valid series parser if this `title` appears to be a series"""
 
         parser = SeriesParser(identified_by='auto', allow_seasonless=allow_seasonless)
@@ -82,7 +82,7 @@ class MetainfoSeries(object):
             parser.name = name
             parser.data = title
             try:
-                parser.parse(data=title)
+                parser.parse(data=title, quality=quality)
             except ParseWarning, pw:
                 log.debug('ParseWarning: %s' % pw.value)
             if parser.valid:
