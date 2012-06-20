@@ -482,6 +482,8 @@ class FilterSeriesBase(object):
         options.accept('quality_requirements', key='quality')
         options.accept('list', key='qualities').accept('quality_requirements')
         options.accept('boolean', key='upgrade')
+        options.accept('quality_requirements', key='target')
+        # 'enough' has been renamed to 'target' but leave it for backward compatibility
         options.accept('quality_requirements', key='enough')
         #specials
         options.accept('boolean', key='specials')
@@ -531,7 +533,7 @@ class FilterSeriesBase(object):
                 # if group name is known quality, convenience create settings with that quality
                 try:
                     qualities.Requirements(group_name)
-                    config['settings'].setdefault(group_name, {}).setdefault('enough', group_name)
+                    config['settings'].setdefault(group_name, {}).setdefault('target', group_name)
                 except ValueError:
                     # If group name is not a valid quality requirement string, do nothing.
                     pass
@@ -560,9 +562,13 @@ class FilterSeriesBase(object):
                     season, episode = series_settings['watched'].upper().split('E')
                     season = season.lstrip('S')
                     series_settings['watched'] = {'season': int(season), 'episode': int(episode)}
-                # Add quality: 720p if timeframe is specified with no quality
+                # Convert enough to target for backwards compatibility
+                if 'enough' in series_settings:
+                    log.warning('Series setting `enough` has been renamed to `target` please update your config.')
+                    series_settings.setdefault('target', series_settings['enough'])
+                # Add quality: 720p if timeframe is specified with no target
                 if 'timeframe' in series_settings:
-                    series_settings.setdefault('enough', '720p hdtv+')
+                    series_settings.setdefault('target', '720p hdtv+')
 
                 group_series.append({series: series_settings})
             config[group_name] = group_series
@@ -635,7 +641,7 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
             bundle = series.accept('dict')
             # prevent invalid indentation level
             bundle.reject_keys(['set', 'path', 'timeframe', 'name_regexp', 'ep_regexp', 'id_regexp',
-                                'date_regexp', 'sequence_regexp', 'watched', 'quality', 'enough',
+                                'date_regexp', 'sequence_regexp', 'watched', 'quality', 'enough', 'target',
                                 'qualities', 'exact', 'from_group'],
                 'Option \'$key\' has invalid indentation level. It needs 2 more spaces.')
             bundle.accept_any_key('path')
@@ -906,11 +912,11 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
                         continue
 
             # quality
-            if 'enough' in config:
-                if self.process_timeframe_enough(feed, config, eps):
+            if 'target' in config:
+                if self.process_timeframe_target(feed, config, eps):
                     continue
                 else:
-                    # We didn't make a quality enough match, check timeframe to see
+                    # We didn't make a quality target match, check timeframe to see
                     # if we should remove the requirement
                     if self.process_timeframe(feed, config, eps, series_name):
                         continue
@@ -1002,13 +1008,13 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
                 feed.reject(self.parser2entry[ep], 'already downloaded episode with id `%s`' % ep.identifier)
             return True
 
-    def process_timeframe_enough(self, feed, config, eps):
+    def process_timeframe_target(self, feed, config, eps):
         """
         Accepts first episode matching the quality configured for the series.
 
         :return: True if accepted something
         """
-        req = qualities.Requirements(config['enough'])
+        req = qualities.Requirements(config['target'])
         # scan for quality
         for ep in eps:
             if req.allows(ep.quality):
@@ -1140,8 +1146,8 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
         log.debug('downloaded_qualities: %s' % downloaded_qualities)
 
         # If quality is configured, make sure it is defined in wanted qualities
-        if config.get('enough'):
-            config.setdefault('qualities', []).append(config['enough'])
+        if config.get('target'):
+            config.setdefault('qualities', []).append(config['target'])
         # If qualities key is configured, we only want qualities defined in it.
         wanted_qualities = set([qualities.Requirements(name) for name in config.get('qualities', [])])
         # Compute the requirements from our set that have not yet been fulfilled
