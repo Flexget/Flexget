@@ -146,7 +146,7 @@ class Meta(type):
         new_bases = []
         for base in bases:
             # Check if we are creating a subclass of VersionedBase
-            if base.__name__ is 'VersionedBase':
+            if base.__name__ == 'VersionedBase':
                 # Register this table in plugin_schemas
                 register_plugin_table(dict_['__tablename__'], base.plugin, base.version)
                 # Make sure the resulting class also inherits from Base
