@@ -1,0 +1,6 @@
+{% if feed.failed -%}
+The following entries have failed for feed {{feed.name}}:
+{%- for entry in feed.failed %}
+- {{entry.title}} ({{entry.url}}) Reason: {{entry.reason|d('unknown')}}
+{% endfor %}
+{% endif %}
