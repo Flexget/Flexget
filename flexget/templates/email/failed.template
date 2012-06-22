@@ -1,6 +1,7 @@
 {% if feed.aborted -%}
 Feed '{{feed.name}}' was aborted because: {{feed.abort_reason}}
-{%- endif -%}
+
+{% endif -%}
 {% if feed.failed -%}
 The following entries have failed for feed {{feed.name}}:
 {%- for entry in feed.failed %}

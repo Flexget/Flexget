@@ -1,12 +1,13 @@
 {% if feed.aborted -%}
 Feed '{{feed.name}}' was aborted because: {{feed.abort_reason}}
-{%- endif -%}
+
+{% endif -%}
 {% if feed.accepted -%}
 FlexGet has just downloaded {{feed.accepted|length}} new entries for feed {{feed.name}}:
 {%- for entry in feed.accepted %}
 - {{entry.title}} ({{entry.url}}){% if entry.output|d(false) %} => {{entry.output}}{% endif %}
 {% endfor %}
-{%- endif -%}
+{% endif -%}
 {% if feed.failed -%}
 The following entries have failed for feed {{feed.name}}:
 {%- for entry in feed.failed %}
