@@ -291,14 +291,14 @@ class InputRSS(object):
 
         log.debug('encoding %s' % rss.encoding)
 
-        last_entry_title = ''
+        last_entry_id = ''
         if not all_entries:
             # Test to make sure entries are in descending order
             if rss.entries and rss.entries[0].get('published_parsed'):
                 if rss.entries[0]['published_parsed'] < rss.entries[-1]['published_parsed']:
                     # Sort them if they are not
                     rss.entries.sort(key=lambda x: x['published_parsed'], reverse=True)
-            last_entry_title = feed.simple_persistence.get('%s_last_entry' % url_hash)
+            last_entry_id = feed.simple_persistence.get('%s_last_entry' % url_hash)
 
         # new entries to be created
         entries = []
@@ -320,7 +320,7 @@ class InputRSS(object):
             entry.title = entry[title_field]
 
             # Check we haven't already processed this entry in a previous run
-            if last_entry_title == entry.title:
+            if last_entry_id == entry.title + entry.get('guid', ''):
                 log.verbose('Not processing entries from last run.')
                 # Let details plugin know that it is ok if this feed doesn't produce any entries
                 feed.no_entries_ok = True
@@ -433,7 +433,7 @@ class InputRSS(object):
         # Save last spot in rss
         if rss.entries:
             log.debug('Saving location in rss feed.')
-            feed.simple_persistence['%s_last_entry' % url_hash] = rss.entries[0].title
+            feed.simple_persistence['%s_last_entry' % url_hash] = rss.entries[0].title + rss.entries[0].get('guid', '')
 
         if ignored:
             if not config.get('silent'):
