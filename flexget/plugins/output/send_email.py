@@ -131,6 +131,12 @@ class OutputEmail(object):
         """Count the email as an output"""
 
     def on_feed_exit(self, feed, config):
+        self.send_email(feed, config)
+
+    def on_feed_abort(self, feed, config):
+        self.send_email(feed, config)
+
+    def send_email(self, feed, config):
         """Send email at exit."""
         config = self.prepare_config(config)
 

@@ -118,6 +118,7 @@ class Feed(object):
 
         # TODO: feed.abort() should be done by using exception? not a flag that has to be checked everywhere
         self._abort = False
+        self._abort_reason = None
 
         self._rerun = False
 
@@ -129,7 +130,15 @@ class Feed(object):
         return cmp(self.priority, other.priority)
 
     def __str__(self):
-        return '<Feed(name=%s,aborted=%s)>' % (self.name, str(self._abort))
+        return '<Feed(name=%s,aborted=%s)>' % (self.name, str(self.aborted))
+
+    @property
+    def aborted(self):
+        return self._abort
+
+    @property
+    def abort_reason(self):
+        return self._abort_reason
 
     @property
     def undecided(self):
@@ -242,10 +251,11 @@ class Feed(object):
         """
         entry.trace.append((self.current_plugin, message))
 
-    def abort(self, **kwargs):
+    def abort(self, reason='Unknown', **kwargs):
         """Abort this feed execution, no more plugins will be executed after the current one exists."""
         if self._abort:
             return
+        self._abort_reason = reason
         if not kwargs.get('silent', False):
             log.info('Aborting feed (plugin: %s)' % self.current_plugin)
         else:
@@ -377,20 +387,23 @@ class Feed(object):
             else:
                 warn.log.warning(warn)
         except EntryUnicodeError, eue:
-            log.critical('Plugin %s tried to create non-unicode compatible entry (key: %s, value: %r)' %
-                (keyword, eue.key, eue.value))
-            self.abort()
+            msg = ('Plugin %s tried to create non-unicode compatible entry (key: %s, value: %r)' %
+                   (keyword, eue.key, eue.value))
+            log.critical(msg)
+            self.abort(msg)
         except PluginError, err:
             err.log.critical(err.value)
-            self.abort()
+            self.abort(err.value)
         except DependencyError, e:
-            log.critical('Plugin `%s` cannot be used because dependency `%s` is missing.' %
-                (keyword, e.missing))
+            msg = ('Plugin `%s` cannot be used because dependency `%s` is missing.' %
+                            (keyword, e.missing))
+            log.critical(msg)
             log.debug(e.message)
-            self.abort()
+            self.abort(msg)
         except Exception, e:
-            log.exception('BUG: Unhandled error in plugin %s: %s' % (keyword, e))
-            self.abort()
+            msg = 'BUG: Unhandled error in plugin %s: %s' % (keyword, e)
+            log.exception(msg)
+            self.abort(msg)
             # don't handle plugin errors gracefully with unit test
             if self.manager.unit_test:
                 raise
@@ -527,7 +540,7 @@ class Feed(object):
             for error in errors:
                 log.error(error)
             # feed has errors, abort it
-            self.abort()
+            self.abort('\n'.join(errors))
         return errors
 
     @staticmethod

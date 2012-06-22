@@ -1,3 +1,6 @@
+{% if feed.aborted -%}
+Feed '{{feed.name}}' was aborted because: {{feed.abort_reason}}
+{%- endif -%}
 {% if feed.accepted -%}
 FlexGet has just downloaded {{feed.accepted|length}} new entries for feed {{feed.name}}:
 {%- for entry in feed.accepted %}

@@ -267,10 +267,10 @@ class NumberValidator(Validator):
         pass
 
     def validateable(self, data):
-        return isinstance(data, (int, float))
+        return isinstance(data, (int, float, long))
 
     def validate(self, data):
-        valid = isinstance(data, (int, float))
+        valid = isinstance(data, (int, float, long))
         if not valid:
             self.errors.add('value %s is not valid number' % data)
         return valid
