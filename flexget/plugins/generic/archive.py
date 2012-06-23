@@ -288,7 +288,7 @@ class ArchiveInject(object):
         if feed.name not in ArchiveInject._injecting_into_feeds:
             log.debug('Not going to inject to %s, aborting & disabling' % feed.name)
             feed.enabled = False
-            feed.abort(silent=True)
+            feed.abort('Not injecting to this feed', silent=True)
         else:
             log.debug('Injecting to %s, leaving it enabled' % feed.name)
 

@@ -63,7 +63,7 @@ class ChangeWarn(object):
 
         if found_deprecated:
             feed.manager.disable_feeds()
-            feed.abort()
+            feed.abort('Deprecated config.')
 
 register_plugin(ChangeWarn, 'change_warn', builtin=True)
 

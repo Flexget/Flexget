@@ -38,7 +38,7 @@ class PluginInterval(object):
             if datetime.datetime.now() < next_time:
                 log.debug('interval not met')
                 log.verbose('Interval %s not met on feed %s. Use --now to override.' % (config, feed.name))
-                feed.abort(silent=True)
+                feed.abort('Interval not met', silent=True)
                 return
         log.debug('interval passed')
         feed.simple_persistence['last_time'] = datetime.datetime.now()

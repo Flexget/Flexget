@@ -119,6 +119,7 @@ class Feed(object):
         # TODO: feed.abort() should be done by using exception? not a flag that has to be checked everywhere
         self._abort = False
         self._abort_reason = None
+        self._silent_abort = False
 
         self._rerun = False
 
@@ -134,7 +135,7 @@ class Feed(object):
 
     @property
     def aborted(self):
-        return self._abort
+        return self._abort and not self._silent_abort
 
     @property
     def abort_reason(self):
@@ -258,8 +259,10 @@ class Feed(object):
         self._abort_reason = reason
         if not kwargs.get('silent', False):
             log.info('Aborting feed (plugin: %s)' % self.current_plugin)
+            self._silent_abort = False
         else:
             log.debug('Aborting feed (plugin: %s)' % self.current_plugin)
+            self._silent_abort = True
         # Run the abort phase before we set the _abort flag
         self._abort = True
         self.__run_feed_phase('abort')
