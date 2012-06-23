@@ -3,6 +3,7 @@ import smtplib
 import socket
 from email.message import Message
 from smtplib import SMTPException
+from email.utils import formatdate
 from flexget.utils.tools import MergeException, merge_dict_from_to
 from flexget.plugin import PluginError, PluginWarning, register_plugin
 from flexget import manager
@@ -97,6 +98,7 @@ def send_email(subject, content, config):
     message['To'] = ','.join(config['to'])
     message['From'] = config['from']
     message['Subject'] = subject
+    message['Date'] = formatdate(localtime=True)
     message.set_payload(content.encode('utf-8'))
     message.set_charset('utf-8')
 
@@ -105,6 +107,7 @@ def send_email(subject, content, config):
         log.info('Would send email : %s' % message.as_string())
         log.info(content)
     else:
+        log.verbose('Sending email.')
         try:
             if config['smtp_ssl']:
                 import sys
