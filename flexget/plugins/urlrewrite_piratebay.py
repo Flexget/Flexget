@@ -52,6 +52,9 @@ class UrlRewritePirateBay(object):
                 raise UrlRewritingError('Unable to locate download link from url %s' % url)
             tag_a = tag_div.find('a')
             torrent_url = tag_a.get('href')
+            # URL is sometimes missing the schema
+            if torrent_url.startswith('//'):
+                torrent_url = 'http:' + torrent_url
             return torrent_url
         except Exception, e:
             raise UrlRewritingError(e)
