@@ -22,11 +22,11 @@ class PluginInterval(object):
         return validator.factory('interval')
 
     def on_feed_start(self, feed, config):
-        if feed.manager.options.learn:
-            log.info('Ignoring feed %s interval for --learn' % feed.name)
-            return
         # Allow reruns
         if feed.is_rerun:
+            return
+        if feed.manager.options.learn:
+            log.info('Ignoring feed %s interval for --learn' % feed.name)
             return
         last_time = feed.simple_persistence.get('last_time')
         if not last_time:

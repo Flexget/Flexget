@@ -1,11 +1,11 @@
 import logging
-from datetime import datetime
+from datetime import datetime, timedelta
 from sqlalchemy import Column, Integer, String, Unicode, DateTime
 from sqlalchemy.schema import Index, MetaData
 from flexget import schema
-from flexget.plugin import register_plugin, register_parser_option, priority
+from flexget.plugin import register_plugin, register_parser_option, priority, DependencyError, get_plugin_by_name
 from flexget.manager import Session
-from flexget.utils.tools import console
+from flexget.utils.tools import console, parse_timedelta
 from flexget.utils.sqlalchemy_utils import table_add_column
 
 SCHEMA_VER = 1
@@ -85,9 +85,9 @@ class PluginFailed(object):
         try:
             # query item's existence
             item = failed.query(FailedEntry).filter(FailedEntry.title == entry['title']).\
-                                             filter(FailedEntry.url == entry['url']).first()
+                                             filter(FailedEntry.url == entry['original_url']).first()
             if not item:
-                item = FailedEntry(entry['title'], entry['url'])
+                item = FailedEntry(entry['title'], entry['original_url'])
             else:
                 item.count += 1
                 item.tof = datetime.now()
@@ -117,30 +117,88 @@ class PluginFailed(object):
         self.add_failed(entry)
 
 
-class FilterRejectFailed(object):
-    """Rejects entries that have failed X or more times in the past."""
+class FilterRetryFailed(object):
+    """Stores failed entries for trying again after a certain interval,
+    rejects them after they have failed too many times."""
+
+    def __init__(self):
+        self.backlog = None
 
     def validator(self):
         from flexget import validator
         root = validator.factory()
-        root.accept('integer')
-        root.accept('boolean')
-        return root
+        # Allow retry_failed: no form to turn off plugin altogether
+        root.accept('boolean').accept(False)
+        opts = root.accept('dict')
+        opts.accept('interval', key='retry_time')
+        opts.accept('integer', key='max_retries')
+        opts.accept('number', key='retry_time_multiplier')
+        # Allow turning off the retry multiplier with 'no' as well as 1
+        opts.accept('boolean', key='retry_time_multiplier')
+        return opts
+
+    def prepare_config(self, config):
+        if not isinstance(config, dict):
+            config = {}
+        config.setdefault('retry_time', '1 hour')
+        config.setdefault('max_retries', 3)
+        if config.get('retry_time_multiplier', True) is True:
+            # If multiplier is not specified, or is specified as True, use the default
+            config['retry_time_multiplier'] = 1.5
+        else:
+            # If multiplier is False, turn it off
+            config['retry_time_multiplier'] = 1
+        return config
+
+    def on_process_start(self, feed, config):
+        try:
+            self.backlog = get_plugin_by_name('backlog').instance
+        except DependencyError:
+            log.warning('Unable utilize backlog plugin, failed entries may not be retried properly.')
 
     @priority(255)
     def on_feed_filter(self, feed, config):
         if config is False:
             return
-        max_count = 3 if config in [None, True] else config
+        config = self.prepare_config(config)
+        max_count = config['max_retries']
         for entry in feed.entries:
             item = feed.session.query(FailedEntry).filter(FailedEntry.title == entry['title']).\
-                                            filter(FailedEntry.url == entry['url']).\
-                                            filter(FailedEntry.count >= max_count).first()
+                                            filter(FailedEntry.url == entry['original_url']).\
+                                            filter(FailedEntry.count > max_count).first()
             if item:
                 feed.reject(entry, 'Has already failed %s times in the past' % item.count)
 
+    def on_feed_exit(self, feed, config):
+        if config is False:
+            return
+        config = self.prepare_config(config)
+        base_retry_time = parse_timedelta(config['retry_time'])
+        retry_time_multiplier = config['retry_time_multiplier']
+        for entry in feed.failed:
+            item = feed.session.query(FailedEntry).filter(FailedEntry.title == entry['title']).\
+                                            filter(FailedEntry.url == entry['original_url']).first()
+            if item:
+                # Do not count the failure on this run when adding additional retry time
+                fail_count = item.count - 1
+                # Don't bother saving this if it has met max retries
+                if fail_count >= config['max_retries']:
+                    continue
+                # Timedeltas do not allow floating point multiplication. Convert to seconds and then back to avoid this.
+                base_retry_secs = base_retry_time.days * 86400 + base_retry_time.seconds
+                retry_secs = base_retry_secs * (retry_time_multiplier ** fail_count)
+                retry_time = timedelta(seconds=retry_secs)
+            else:
+                retry_time = base_retry_time
+            if self.backlog:
+                self.backlog.add_backlog(feed, entry, amount=retry_time)
+            if retry_time:
+                feed.reject(entry, reason='Waiting before trying failed entry again.', remember_time=retry_time)
+                # Cause a feed rerun, to look for alternate releases
+                feed.rerun()
+
 register_plugin(PluginFailed, '--failed', builtin=True, api_ver=2)
-register_plugin(FilterRejectFailed, 'reject_failed', builtin=True, api_ver=2)
+register_plugin(FilterRetryFailed, 'retry_failed', builtin=True, api_ver=2)
 register_parser_option('--failed', action='store_true', dest='failed', default=0,
                        help='List recently failed entries.')
 register_parser_option('--clear', action='store_true', dest='clear_failed', default=0,

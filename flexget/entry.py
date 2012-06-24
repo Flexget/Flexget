@@ -89,8 +89,7 @@ class Entry(dict):
         if key == 'url':
             if not isinstance(value, basestring):
                 raise PluginError('Tried to set %r url to %r' % (self.get('title'), value))
-            if not 'original_url' in self:
-                self['original_url'] = value
+            self.setdefault('original_url', value)
 
         # title handling
         if key == 'title':
