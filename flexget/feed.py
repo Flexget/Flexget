@@ -97,6 +97,10 @@ class Feed(object):
         # use reset to init variables when creating
         self._reset()
 
+    @property
+    def is_rerun(self):
+        return self._rerun_count
+
     def _reset(self):
         """Reset feed state"""
         log.debug('resetting %s' % self.name)
@@ -225,7 +229,9 @@ class Feed(object):
             return
 
         if not entry in self.rejected:
-            self.rejected.append(entry)
+            # Leave failed entries in the failed state
+            if entry not in self.failed:
+                self.rejected.append(entry)
             # Run on_entry_reject phase
             self.__run_entry_phase('reject', entry, reason=reason, **kwargs)
 

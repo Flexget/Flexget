@@ -25,6 +25,9 @@ class PluginInterval(object):
         if feed.manager.options.learn:
             log.info('Ignoring feed %s interval for --learn' % feed.name)
             return
+        # Allow reruns
+        if feed.is_rerun:
+            return
         last_time = feed.simple_persistence.get('last_time')
         if not last_time:
             log.info('No previous run recorded, running now')

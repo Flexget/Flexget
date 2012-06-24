@@ -16,9 +16,8 @@ class FilterContentSize(object):
         config.accept('boolean', key='strict')
         return config
 
-    def process_entry(self, feed, entry):
+    def process_entry(self, feed, entry, config, remember=True):
         """Rejects this entry if it does not pass content_size requirements. Returns true if the entry was rejected."""
-        config = feed.config.get('content_size', {})
         if 'content_size' in entry:
             size = entry['content_size']
             log.debug('%s size %s MB' % (entry['title'], size))
@@ -26,12 +25,18 @@ class FilterContentSize(object):
             # download plugin has already printed a downloading message.
             if size < config.get('min', 0):
                 log_once('Entry `%s` too small, rejecting' % entry['title'], log)
-                feed.reject(entry, 'minimum size %s MB, got %s MB' % (config['min'], size), remember=True)
+                feed.reject(entry, 'minimum size %s MB, got %s MB' % (config['min'], size), remember=remember)
                 return True
             if size > config.get('max', maxint):
                 log_once('Entry `%s` too big, rejecting' % entry['title'], log)
-                feed.reject(entry, 'maximum size %s MB, got %s MB' % (config['max'], size), remember=True)
+                feed.reject(entry, 'maximum size %s MB, got %s MB' % (config['max'], size), remember=remember)
                 return True
+
+    @priority(130)
+    def on_feed_filter(self, feed, config):
+        # Do processing on filter phase in case input plugin provided the size
+        for entry in feed.entries:
+            self.process_entry(feed, entry, config, remember=False)
 
     @priority(150)
     def on_feed_modify(self, feed, config):
@@ -42,7 +47,7 @@ class FilterContentSize(object):
         num_rejected = len(feed.rejected)
         for entry in feed.accepted:
             if 'content_size' in entry:
-                self.process_entry(feed, entry)
+                self.process_entry(feed, entry, config)
             elif config.get('strict', True):
                 log.debug('Entry %s size is unknown, rejecting because of strict mode (default)' % entry['title'])
                 log.info('No size information available for %s, rejecting' % entry['title'])

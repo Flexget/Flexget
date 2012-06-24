@@ -275,3 +275,6 @@ class Entry(dict):
             raise ValueError('Trying to render non string template, got %s' % repr(template))
         log.trace('rendering: %s' % template)
         return render_from_entry(template, self)
+
+    def __eq__(self, other):
+        return self.get('title') == other.get('title') and self.get('url') == other.get('url')

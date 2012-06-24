@@ -44,7 +44,7 @@ class FilterQueueBase(object):
         """This should return the QueueItem object for the match, if this entry is in the queue."""
         raise NotImplementedError
 
-    @priority(129)
+    @priority(127)
     def on_feed_filter(self, feed, config):
         if config is False:
             return
