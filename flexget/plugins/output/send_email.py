@@ -1,7 +1,8 @@
 import logging
 import smtplib
 import socket
-from email.message import Message
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 from smtplib import SMTPException
 from email.utils import formatdate
 from flexget.utils.tools import MergeException, merge_dict_from_to
@@ -94,13 +95,13 @@ def send_email(subject, content, config):
     """Send email at exit."""
 
     # prepare email message
-    message = Message()
+    message = MIMEMultipart('alternative')
     message['To'] = ','.join(config['to'])
     message['From'] = config['from']
     message['Subject'] = subject
     message['Date'] = formatdate(localtime=True)
-    message.set_payload(content.encode('utf-8'))
-    message.set_charset('utf-8')
+    content_type = 'html' if '<html>' in content else 'plain'
+    message.attach(MIMEText(content.encode('utf-8'), content_type, _charset='utf-8'))
 
     # send email message
     if manager.manager.options.test:
