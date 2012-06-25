@@ -749,6 +749,9 @@ class TestQualities(FlexGetBase):
                     - hdtv
                     - hr
                     - 720p
+              - FooBum:
+                  quality: 720p-1080i
+                  upgrade: yes
         feeds:
           test_1:
             mock:
@@ -780,6 +783,16 @@ class TestQualities(FlexGetBase):
             mock:
               - {title: 'FooBaz.S01E02.hdtv-FlexGet'}
               - {title: 'FooBaz.S01E02.720p rc-FlexGet'}
+          quality_upgrade_1:
+            mock:
+              - title: FooBum.S03E01.1080p # too high
+              - title: FooBum.S03E01.hdtv # too low
+              - title: FooBum.S03E01.720p # in range
+          quality_upgrade_2:
+            mock:
+              - title: FooBum.S03E01.1080i # should be upgraded to
+              - title: FooBum.S03E01.720p-ver2 # Duplicate ep
+
     """
 
     def test_qualities(self):
@@ -830,6 +843,13 @@ class TestQualities(FlexGetBase):
         self.execute_feed('upgrade_3')
         assert not self.feed.accepted, 'Should not have accepted worse qualities'
 
+    def test_quality_upgrade(self):
+        self.execute_feed('quality_upgrade_1')
+        assert len(self.feed.accepted) == 1, 'Only one ep should have passed quality filter'
+        assert self.feed.find_entry('accepted', title='FooBum.S03E01.720p')
+        self.execute_feed('quality_upgrade_1')
+        assert len(self.feed.accepted) == 1, 'Only one ep should be valid upgrade'
+        assert self.feed.find_entry('accepted', title='FooBum.S03E01.1080i')
 
 class TestIdioticNumbering(FlexGetBase):
 
