@@ -917,6 +917,7 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
                 # Reject eps because we have them
                 for ep in eps:
                     feed.reject(self.parser2entry[ep], 'episode has already been downloaded')
+                continue
 
             best = eps[0]
             log.debug('continuing w. episodes: %s' % [e.data for e in eps])
