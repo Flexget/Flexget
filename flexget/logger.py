@@ -44,7 +44,8 @@ class FlexGetFormatter(logging.Formatter):
             self._fmt = self.flexget_fmt
         else:
             self._fmt = self.plain_fmt
-        return logging.Formatter.format(self, record)
+        # Replace newlines in log messages with \n
+        return logging.Formatter.format(self, record).replace('\n', '\\n')
 
 
 def set_execution(execution):

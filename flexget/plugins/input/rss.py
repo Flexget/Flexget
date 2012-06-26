@@ -92,7 +92,9 @@ class InputRSS(object):
         advanced.accept('text', key='title')
         advanced.accept('text', key='link')
         advanced.accept('list', key='link').accept('text')
-        advanced.accept('list', key='other_fields').accept('text')
+        other_fields = advanced.accept('list', key='other_fields')
+        other_fields.accept('text')
+        other_fields.accept('dict').accept_any_key('text')
         advanced.accept('boolean', key='silent')
         advanced.accept('boolean', key='ascii')
         advanced.accept('boolean', key='filename')
@@ -108,7 +110,14 @@ class InputRSS(object):
         config.setdefault('link', 'auto')
         # Replace : with _ and lower case other fields so they can be found in rss
         if config.get('other_fields'):
-            config['other_fields'] = [field.replace(':', '_').lower() for field in config['other_fields']]
+            other_fields = []
+            for item in config['other_fields']:
+                if isinstance(item, basestring):
+                    key, val = item, item
+                else:
+                    key, val = item.items()[0]
+                other_fields.append({key.replace(':', '_').lower(): val})
+            config['other_fields'] = other_fields
         # set default value for group_links as deactivated
         config.setdefault('group_links', False)
         # set default for all_entries
@@ -345,8 +354,8 @@ class InputRSS(object):
                           'description': 'description',
                           'infohash': 'torrent_info_hash'}
                 # extend the dict of fields to grab with other_fields list in config
-                for field in config.get('other_fields', []):
-                    fields[field] = field
+                for field_map in config.get('other_fields', []):
+                    fields.update(field_map)
 
                 for rss_field, flexget_field in fields.iteritems():
                     if rss_field in entry:
