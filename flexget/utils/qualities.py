@@ -301,6 +301,10 @@ class Quality(object):
     def __str__(self):
         return self.name
 
+    def __hash__(self):
+        # Make these usable as dict keys
+        return hash(self.name)
+
 
 def get(quality_name):
     """Returns a quality object based on canonical quality name."""

@@ -567,7 +567,7 @@ class FilterSeriesBase(object):
                     log.warning('Series setting `enough` has been renamed to `target` please update your config.')
                     series_settings.setdefault('target', series_settings['enough'])
                 # Add quality: 720p if timeframe is specified with no target
-                if 'timeframe' in series_settings:
+                if 'timeframe' in series_settings and 'qualities' not in series_settings:
                     series_settings.setdefault('target', '720p hdtv+')
 
                 group_series.append({series: series_settings})
@@ -868,12 +868,6 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
                 log.debug('Skipping special episode as support is turned off.')
                 continue
 
-            # proper handling
-            log.debug('-' * 20 + ' process_propers -->')
-            eps = self.process_propers(feed, config, eps)
-            if not eps:
-                continue
-
             log.debug('current episodes: %s' % [e.data for e in eps])
 
             # quality filtering
@@ -882,21 +876,47 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
                 if not eps:
                     continue
 
-            # qualities
-            if 'qualities' in config or config.get('upgrade'):
-                log.debug('-' * 20 + ' process_qualities -->')
-                if self.process_qualities(feed, config, eps):
-                    continue
-                else:
-                    # We haven't gotten any of our qualities, check timeframe to see
-                    # if we should remove the requirement
-                    if self.process_timeframe(feed, config, eps, series_name):
-                        continue
+            # Many of the following functions need to know this info. Only look it up once.
+            downloaded = self.get_downloaded(feed.session, eps[0].name, eps[0].identifier)
+            downloaded_qualities = [ep.quality for ep in downloaded]
 
-            # reject downloaded
-            log.debug('-' * 20 + ' downloaded -->')
-            if self.process_downloaded(feed, eps):
+            # proper handling
+            log.debug('-' * 20 + ' process_propers -->')
+            eps = self.process_propers(feed, config, eps, downloaded)
+            if not eps:
                 continue
+
+            # Remove any eps we already have from the list
+            for ep in reversed(eps): # Iterate in reverse so we can safely remove from the list while iterating
+                if ep.quality in downloaded_qualities:
+                    feed.reject(self.parser2entry[ep], 'quality already downloaded')
+                    eps.remove(ep)
+            if not eps:
+                continue
+
+            # Figure out if we need an additional quality for this ep
+            if downloaded:
+                if config.get('upgrade'):
+                    # Remove all the qualities lower than what we have
+                    for ep in reversed(eps):
+                        if ep.quality < max(downloaded_qualities):
+                            feed.reject(self.parser2entry[ep], 'worse quality than already downloaded.')
+                            eps.remove(ep)
+                if not eps:
+                    continue
+
+                if 'qualities' in config:
+                    # Grab any additional wanted qualities
+                    log.debug('-' * 20 + ' process_qualities -->')
+                    self.process_qualities(feed, config, eps, downloaded)
+                    continue
+                elif config.get('upgrade'):
+                    feed.accept(self.parser2entry[eps[0]], 'is an upgrade to existing quality')
+                    continue
+
+                # Reject eps because we have them
+                for ep in eps:
+                    feed.reject(self.parser2entry[ep], 'episode has already been downloaded')
 
             best = eps[0]
             log.debug('continuing w. episodes: %s' % [e.data for e in eps])
@@ -915,37 +935,36 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
             if 'target' in config:
                 if self.process_timeframe_target(feed, config, eps):
                     continue
-                else:
-                    # We didn't make a quality target match, check timeframe to see
-                    # if we should remove the requirement
-                    if self.process_timeframe(feed, config, eps, series_name):
-                        continue
+            elif 'qualities' in config:
+                if self.process_qualities(feed, config, eps, downloaded):
+                    continue
 
-            # All the remaining match requirements, just choose the best
-            reason = 'only matching choice'
-            if len(eps) > 1:
-                reason = 'choosing best remaining'
-            feed.accept(self.parser2entry[eps[0]], reason)
+            reason = 'choosing best quality'
+            # We didn't make a quality target match, check timeframe to see
+            # if we should get something anyway
+            if 'timeframe' in config:
+                if self.process_timeframe(feed, config, eps, series_name):
+                    continue
+                reason = 'Timeframe expired, choosing best available'
 
-    def process_propers(self, feed, config, eps):
+            # Just pick the best ep if we get here
+            feed.accept(self.parser2entry[best], reason)
+
+    def process_propers(self, feed, config, eps, downloaded):
         """
         Accepts needed propers. Nukes episodes from which there exists proper.
 
         :returns: A list of episodes to continue processing.
         """
-        # Return if there are no propers for this episode
-        if not any(ep.proper_count > 0 for ep in eps):
-            return eps
 
         pass_filter = []
         best_propers = []
         # Since eps is sorted by quality then proper_count we always see the highest proper for a quality first.
         (last_qual, best_proper) = (None, 0)
         for ep in eps:
-            if not ep.quality == last_qual:
+            if ep.quality != last_qual:
                 last_qual, best_proper = ep.quality, ep.proper_count
-                if ep.proper_count > 0:
-                    best_propers.append(ep)
+                best_propers.append(ep)
             if ep.proper_count < best_proper:
                 # nuke qualities which there is a better proper available
                 feed.reject(self.parser2entry[ep], 'nuked')
@@ -953,60 +972,35 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
                 pass_filter.append(ep)
 
         # If propers support is turned off, or proper timeframe has expired just return the filtered eps list
-        if 'propers' in config:
-            if isinstance(config['propers'], bool):
-                if not config['propers']:
-                    return pass_filter
-            else:
-                # propers with timeframe
-                log.debug('proper timeframe: %s' % config['propers'])
-                try:
-                    timeframe = parse_timedelta(config['propers'])
-                except ValueError:
-                    raise PluginWarning('Invalid time format', log)
+        if isinstance(config.get('propers', True), bool):
+            if not config.get('propers', True):
+                return pass_filter
+        else:
+            # propers with timeframe
+            log.debug('proper timeframe: %s' % config['propers'])
+            timeframe = parse_timedelta(config['propers'])
 
-                first_seen = self.get_first_seen(feed.session, eps[0])
-                expires = first_seen + timeframe
-                log.debug('propers timeframe: %s' % timeframe)
-                log.debug('first_seen: %s' % first_seen)
-                log.debug('propers ignore after: %s' % str(expires))
+            first_seen = self.get_first_seen(feed.session, eps[0])
+            expires = first_seen + timeframe
+            log.debug('propers timeframe: %s' % timeframe)
+            log.debug('first_seen: %s' % first_seen)
+            log.debug('propers ignore after: %s' % str(expires))
 
-                if datetime.now() > expires:
-                    log.debug('propers timeframe expired')
-                    return pass_filter
+            if datetime.now() > expires:
+                log.debug('propers timeframe expired')
+                return pass_filter
 
-        downloaded_releases = self.get_downloaded(feed.session, eps[0].name, eps[0].identifier)
-        downloaded_qualities = [d.quality for d in downloaded_releases]
+        downloaded_qualities = dict((d.quality, d.proper_count) for d in downloaded)
 
         log.debug('downloaded qualities: %s' % downloaded_qualities)
 
-        def proper_downloaded(parser):
-            for release in downloaded_releases:
-                if release.quality == parser.quality and release.proper_count >= parser.proper_count:
-                    return True
-
         # Accept propers we actually need, and remove them from the list of entries to continue processing
         for ep in best_propers:
-            if ep.quality in downloaded_qualities and not proper_downloaded(ep):
+            if ep.quality in downloaded_qualities and ep.proper_count > downloaded_qualities[ep.quality]:
                 feed.accept(self.parser2entry[ep], 'proper')
                 pass_filter.remove(ep)
 
         return pass_filter
-
-    def process_downloaded(self, feed, eps):
-        """
-        Rejects all episodes (regardless of quality) if this episode has been downloaded.
-
-        :returns: True when episode has already been downloaded
-        """
-        downloaded_releases = self.get_downloaded(feed.session, eps[0].name, eps[0].identifier)
-        log.debug('downloaded: %s' % [e.title for e in downloaded_releases])
-        if downloaded_releases and eps:
-            log.debug('identifier %s is downloaded' % eps[0].identifier)
-            for ep in eps:
-                # Reject these episodes
-                feed.reject(self.parser2entry[ep], 'already downloaded episode with id `%s`' % ep.identifier)
-            return True
 
     def process_timeframe_target(self, feed, config, eps):
         """
@@ -1133,7 +1127,7 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
                 self.backlog.add_backlog(feed, entry)
             return True
 
-    def process_qualities(self, feed, config, eps):
+    def process_qualities(self, feed, config, eps, downloaded):
         """
         Handles all modes that can accept more than one quality per episode. (qualities, upgrade)
 
@@ -1142,12 +1136,9 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
         """
 
         # Get list of already downloaded qualities
-        downloaded_qualities = [r.quality for r in self.get_downloaded(feed.session, eps[0].name, eps[0].identifier)]
+        downloaded_qualities = [r.quality for r in downloaded]
         log.debug('downloaded_qualities: %s' % downloaded_qualities)
 
-        # If quality is configured, make sure it is defined in wanted qualities
-        if config.get('target'):
-            config.setdefault('qualities', []).append(config['target'])
         # If qualities key is configured, we only want qualities defined in it.
         wanted_qualities = set([qualities.Requirements(name) for name in config.get('qualities', [])])
         # Compute the requirements from our set that have not yet been fulfilled
@@ -1166,11 +1157,14 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
             if not wanted(ep.quality):
                 log.debug('%s is unwanted quality' % ep.quality)
                 continue
-            if not any(req.allows(ep.quality) for req in still_needed):
-                feed.reject(self.parser2entry[ep], 'quality downloaded')
-            else:
+            if any(req.allows(ep.quality) for req in still_needed):
+                # Don't get worse qualities in upgrade mode
+                if config.get('upgrade'):
+                    if downloaded_qualities and ep.quality < max(downloaded_qualities):
+                        continue
                 feed.accept(self.parser2entry[ep], 'quality wanted')
                 downloaded_qualities.append(ep.quality)
+                downloaded.append(ep)
                 # Re-calculate what is still needed
                 still_needed = [req for req in still_needed if not req.allows(ep.quality)]
         return bool(downloaded_qualities)

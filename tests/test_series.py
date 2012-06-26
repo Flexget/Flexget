@@ -546,6 +546,22 @@ class TestPropers(FlexGetBase):
           proper_upgrade_2:
             mock:
               - {title: 'Test.S02E01.hdtv.real.proper'}
+
+          anime_proper_1:
+            mock:
+              - title: test 04v0 hdtv
+
+          anime_proper_2:
+            mock:
+              - title: test 04 hdtv
+
+          fastsub_proper_1:
+            mock:
+              - title: test s01e01 Fastsub hdtv
+
+          fastsub_proper_2:
+            mock:
+              - title: test s01e01 hdtv
         """
 
     def test_propers_timeframe(self):
@@ -626,6 +642,18 @@ class TestPropers(FlexGetBase):
         assert self.feed.find_entry('accepted', title='Test.S02E01.hdtv.proper')
         self.execute_feed('proper_upgrade_2')
         assert self.feed.find_entry('accepted', title='Test.S02E01.hdtv.real.proper')
+
+    def test_anime_proper(self):
+        self.execute_feed('anime_proper_1')
+        assert self.feed.accepted, 'ep should have accepted'
+        self.execute_feed('anime_proper_2')
+        assert self.feed.accepted, 'proper ep should have been accepted'
+
+    def test_fastsub_proper(self):
+        self.execute_feed('fastsub_proper_1')
+        assert self.feed.accepted, 'ep should have accepted'
+        self.execute_feed('fastsub_proper_2')
+        assert self.feed.accepted, 'proper ep should have been accepted'
 
 
 class TestSimilarNames(FlexGetBase):
@@ -724,7 +752,7 @@ class TestDuplicates(FlexGetBase):
                 '%s should have been accepted' % item
 
         # these should be rejected
-        rejected = ['Foo.Bar.S02E04.XviD-2HD[ASDF]', 'Foo.Bar.S02E04.HDTV.720p.XviD-2HD[FlexGet]', \
+        rejected = ['Foo.Bar.S02E04.XviD-2HD[ASDF]', 'Foo.Bar.S02E04.HDTV.720p.XviD-2HD[FlexGet]',
                     'Foo.Bar.S02E04.DSRIP.XviD-2HD[ASDF]', 'Foo.Bar.S02E04.HDTV.1080p.XviD-2HD[ASDF]']
         for item in rejected:
             assert self.feed.find_entry('rejected', title=item), \
@@ -847,8 +875,8 @@ class TestQualities(FlexGetBase):
         self.execute_feed('quality_upgrade_1')
         assert len(self.feed.accepted) == 1, 'Only one ep should have passed quality filter'
         assert self.feed.find_entry('accepted', title='FooBum.S03E01.720p')
-        self.execute_feed('quality_upgrade_1')
-        assert len(self.feed.accepted) == 1, 'Only one ep should be valid upgrade'
+        self.execute_feed('quality_upgrade_2')
+        assert len(self.feed.accepted) == 1, 'one ep should be valid upgrade'
         assert self.feed.find_entry('accepted', title='FooBum.S03E01.1080i')
 
 class TestIdioticNumbering(FlexGetBase):
