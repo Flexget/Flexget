@@ -449,6 +449,9 @@ class Feed(object):
 
         log.debug('executing %s' % self.name)
 
+        # Store original config state to be restored if a rerun is needed
+        config_backup = copy.deepcopy(self.config)
+
         self._reset()
         # Handle keyword args
         if disable_phases:
@@ -523,6 +526,8 @@ class Feed(object):
             else:
                 log.info('Rerunning the feed in case better resolution can be achieved.')
                 self._rerun_count += 1
+                # Restore config to original state before running again
+                self.config = config_backup
                 self.execute(disable_phases=disable_phases, entries=entries)
 
         # Clean up entries after the feed has executed to reduce ram usage, #1652

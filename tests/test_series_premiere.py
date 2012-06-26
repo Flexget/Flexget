@@ -42,11 +42,19 @@ class TestSeriesPremiere(FlexGetBase):
             mock:
               - {title: 'foo bar s01e01e02 hdtv'}
             series_premiere: yes
+          rerun:
+            mock:
+              - title: theshow s01e01
+              - title: theshow s01e02
+            series_premiere: yes
+            rerun: yes
     """
 
     def test_only_one(self):
         self.execute_feed('test_only_one')
         assert len(self.feed.accepted) == 1, 'should only have accepted one'
+        assert not self.feed.find_entry('accepted', title='Foo 2009 S01E02 HDTV Xvid-2HD[AOEU]'), \
+            'Non premiere accepted'
 
     def test_dupes_across_feeds(self):
         self.execute_feed('test_dupes_across_feeds_1')
@@ -65,3 +73,7 @@ class TestSeriesPremiere(FlexGetBase):
     def test_multi_episode(self):
         self.execute_feed('test_multi_episode')
         assert len(self.feed.accepted) == 1, 'should have accepted multi-episode premiere'
+
+    def test_rerun(self):
+        self.execute_feed('rerun')
+        assert not self.feed.find_entry('accepted', title='theshow s01e02'), 'accepted non-premiere'
