@@ -475,7 +475,10 @@ class Feed(object):
         # Save current config hash and set config_modidied flag
         config_hash = hashlib.md5(str(self.config.items())).hexdigest()
         last_hash = self.session.query(FeedConfigHash).filter(FeedConfigHash.feed == self.name).first()
-        if not last_hash:
+        if self.is_rerun:
+            # Make sure on rerun config is not marked as modified
+            self.config_modified = False
+        elif not last_hash:
             self.config_modified = True
             last_hash = FeedConfigHash(feed=self.name, hash=config_hash)
             self.session.add(last_hash)
