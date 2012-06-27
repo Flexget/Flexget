@@ -3,6 +3,7 @@ import logging.handlers
 import re
 import sys
 import threading
+import string
 
 # A level more detailed than DEBUG
 TRACE = 5
@@ -44,8 +45,22 @@ class FlexGetFormatter(logging.Formatter):
             self._fmt = self.flexget_fmt
         else:
             self._fmt = self.plain_fmt
+        record.message = record.getMessage()
+        if string.find(self._fmt,"%(asctime)") >= 0:
+            record.asctime = self.formatTime(record, self.datefmt)
+        s = self._fmt % record.__dict__
         # Replace newlines in log messages with \n
-        return logging.Formatter.format(self, record).replace('\n', '\\n')
+        #s = s.replace('\n', '\\n')
+        if record.exc_info:
+            # Cache the traceback text to avoid converting it multiple times
+            # (it's constant anyway)
+            if not record.exc_text:
+                record.exc_text = self.formatException(record.exc_info)
+        if record.exc_text:
+            if s[-1:] != "\n":
+                s += "\n"
+            s += record.exc_text
+        return s
 
 
 def set_execution(execution):
