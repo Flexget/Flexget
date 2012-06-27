@@ -18,8 +18,8 @@ Base = schema.versioned_base('backlog', 1)
 def upgrade(ver, session):
     if ver is None:
         # Make sure there is no data we can't load in the backlog table
+        backlog_table = table_schema('backlog', session)
         try:
-            backlog_table = table_schema('backlog', session)
             for item in session.query('entry').select_from(backlog_table).all():
                 pickle.loads(item.entry)
         except (ImportError, TypeError):

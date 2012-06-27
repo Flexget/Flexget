@@ -116,7 +116,7 @@ class InputRSS(object):
                     key, val = item, item
                 else:
                     key, val = item.items()[0]
-                other_fields.append({key.replace(':', '_').lower(): val})
+                other_fields.append({key.replace(':', '_').lower(): val.lower()})
             config['other_fields'] = other_fields
         # set default value for group_links as deactivated
         config.setdefault('group_links', False)
@@ -342,20 +342,20 @@ class InputRSS(object):
             # remove annoying zero width spaces
             entry.title = entry.title.replace(u'\u200B', u'')
 
+            # Dict with fields to grab mapping from rss field name to FlexGet field name
+            fields = {'guid': 'guid',
+                      'author': 'author',
+                      'description': 'description',
+                      'infohash': 'torrent_info_hash'}
+            # extend the dict of fields to grab with other_fields list in config
+            for field_map in config.get('other_fields', []):
+                fields.update(field_map)
+
             # helper
             # TODO: confusing? refactor into class member ...
 
             def add_entry(ea):
                 ea['title'] = entry.title
-
-                # Dict with fields to grab mapping from rss field name to FlexGet field name
-                fields = {'guid': 'guid',
-                          'author': 'author',
-                          'description': 'description',
-                          'infohash': 'torrent_info_hash'}
-                # extend the dict of fields to grab with other_fields list in config
-                for field_map in config.get('other_fields', []):
-                    fields.update(field_map)
 
                 for rss_field, flexget_field in fields.iteritems():
                     if rss_field in entry:

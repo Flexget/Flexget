@@ -945,6 +945,8 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
             # if we should get something anyway
             if 'timeframe' in config:
                 if self.process_timeframe(feed, config, eps, series_name):
+                    # Save the current best in backlog
+                    self.backlog.add_backlog(feed, self.parser2entry[best])
                     continue
                 reason = 'Timeframe expired, choosing best available'
 
