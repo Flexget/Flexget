@@ -50,7 +50,7 @@ class FlexGetFormatter(logging.Formatter):
             record.asctime = self.formatTime(record, self.datefmt)
         s = self._fmt % record.__dict__
         # Replace newlines in log messages with \n
-        #s = s.replace('\n', '\\n')
+        s = s.replace('\n', '\\n')
         if record.exc_info:
             # Cache the traceback text to avoid converting it multiple times
             # (it's constant anyway)
