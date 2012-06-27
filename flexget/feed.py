@@ -470,6 +470,7 @@ class Feed(object):
         if self.manager.options.validate:
             if not errors:
                 log.info('Feed \'%s\' passed' % self.name)
+            self.enabled = False
             return
 
         log.debug('starting session')

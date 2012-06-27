@@ -71,6 +71,9 @@ def setup(manager):
 def global_send(manager):
     if not 'email' in manager.config:
         return
+    if all(not feed.enabled for feed in manager.feeds.itervalues()):
+        # If all the feeds are disabled, don't do anything.
+        return
     config = prepare_config(manager.config['email'])
     content = ''
     for feed, text in feed_content.iteritems():
