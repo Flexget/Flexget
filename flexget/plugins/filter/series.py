@@ -905,6 +905,10 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
                 if not eps:
                     continue
 
+                if 'target' in config and config.get('upgrade'):
+                    # If we haven't grabbed the target yet, allow upgrade to it
+                    self.process_timeframe_target(feed, config, eps, downloaded)
+                    continue
                 if 'qualities' in config:
                     # Grab any additional wanted qualities
                     log.debug('-' * 20 + ' process_qualities -->')
@@ -1003,19 +1007,23 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
 
         return pass_filter
 
-    def process_timeframe_target(self, feed, config, eps):
+    def process_timeframe_target(self, feed, config, eps, downloaded=None):
         """
         Accepts first episode matching the quality configured for the series.
 
         :return: True if accepted something
         """
         req = qualities.Requirements(config['target'])
+        if downloaded:
+            if any(req.allows(release.quality) for release in downloaded):
+                log.debug('Target quality already achieved.')
+                return True
         # scan for quality
         for ep in eps:
             if req.allows(ep.quality):
                 entry = self.parser2entry[ep]
                 log.debug('Series accepting. %s meets quality %s' % (entry['title'], req))
-                feed.accept(self.parser2entry[ep], 'quality met')
+                feed.accept(self.parser2entry[ep], 'target quality')
                 return True
 
     def process_quality(self, config, eps):
