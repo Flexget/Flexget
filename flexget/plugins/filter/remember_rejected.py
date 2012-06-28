@@ -94,11 +94,13 @@ class FilterRememberRejected(object):
         if not old_feed:
             # Create this feed in the db if not present
             feed.session.add(RememberFeed(name=feed.name))
-        # Delete expired items
-        deleted = feed.session.query(RememberEntry).filter(RememberEntry.expires < datetime.now()).delete()
-        if deleted:
-            log.debug('%s entries have expired from remember_rejected table.' % deleted)
-            feed.config_changed()
+        else:
+            # Delete expired items
+            deleted = feed.session.query(RememberEntry).filter(RememberEntry.feed_id == old_feed.id).\
+                                                        filter(RememberEntry.expires < datetime.now()).delete()
+            if deleted:
+                log.debug('%s entries have expired from remember_rejected table.' % deleted)
+                feed.config_changed()
         feed.session.commit()
 
     # This runs before metainfo phase to avoid re-parsing metainfo for entries that will be rejected
