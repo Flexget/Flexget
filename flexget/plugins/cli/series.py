@@ -133,22 +133,9 @@ class SeriesReport(SeriesDatabase):
         :param series: Instance of Series
         :return: Instance of latest Episode or None
         """
-        episode = None
-        # try to get latest episode in episodic format
-        if series.identified_by in ('ep', 'auto', None):
-            episode = session.query(Episode).select_from(join(Episode, Series)).\
-                filter(Series.id == series.id).\
-                filter(Episode.season != None).\
-                order_by(desc(Episode.season)).\
-                order_by(desc(Episode.number)).first()
-        # no luck, try uid format
-        if series.identified_by in ('id', 'auto', None):
-            if not episode:
-                episode = session.query(Episode).join(Series, Release).\
+        return session.query(Episode).join(Series, Release).\
                     filter(Series.id == series.id).\
-                    filter(Episode.season == None).\
-                order_by(desc(Release.first_seen)).first()
-        return episode
+                    order_by(desc(Release.first_seen)).first()
 
     def display_summary(self, discontinued=False):
         """
