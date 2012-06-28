@@ -45,12 +45,6 @@ class PluginPreset(object):
             return
         config = self.prepare_config(config)
 
-        # implements --preset NAME
-        if feed.manager.options.preset:
-            if feed.manager.options.preset not in config:
-                feed.enabled = False
-                return
-
         # add global in except when disabled with no_global
         if 'no_global' in config:
             config.remove('no_global')
@@ -58,8 +52,6 @@ class PluginPreset(object):
                 config.remove('global')
         elif not 'global' in config:
             config.append('global')
-
-        log.trace('presets: %s' % config)
 
         toplevel_presets = feed.manager.config.get('presets', {})
 
@@ -84,7 +76,7 @@ class PluginPreset(object):
                     if nested_preset not in config:
                         config.append(nested_preset)
                     else:
-                        log.warning('Presets contain eachother in a loop.')
+                        log.warning('Presets contain each other in a loop.')
                 # Replace preset_config with a copy without the preset key, to avoid merging errors
                 preset_config = dict(preset_config)
                 del preset_config['preset']
@@ -95,6 +87,14 @@ class PluginPreset(object):
                 merge_dict_from_to(preset_config, feed.config)
             except MergeException, exc:
                 raise PluginError('Failed to merge preset %s to feed %s due to %s' % (preset, feed.name, exc))
+
+        log.trace('presets: %s' % config)
+
+        # implements --preset NAME
+        if feed.manager.options.preset:
+            if feed.manager.options.preset not in config:
+                feed.enabled = False
+                return
 
 
 class DisablePlugin(object):
