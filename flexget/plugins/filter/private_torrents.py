@@ -32,7 +32,6 @@ class FilterPrivateTorrents(object):
     def on_feed_modify(self, feed):
         private_torrents = feed.config['private_torrents']
 
-        rejected = False
         for entry in feed.accepted:
             if not 'torrent' in entry:
                 log.debug('`%s` is not a torrent' % entry['title'])
@@ -41,9 +40,7 @@ class FilterPrivateTorrents(object):
 
             if not private_torrents and private:
                 feed.reject(entry, 'torrent is marked as private', remember=True)
-                rejected = True
-            if private_torrents and not private:
+            elif private_torrents and not private:
                 feed.reject(entry, 'public torrent', remember=True)
-                rejected = True
 
 register_plugin(FilterPrivateTorrents, 'private_torrents')
