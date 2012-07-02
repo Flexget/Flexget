@@ -1,12 +1,13 @@
 import logging
 import smtplib
 import socket
+import sys
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from smtplib import SMTPException
 from email.utils import formatdate
 from flexget.utils.tools import MergeException, merge_dict_from_to
-from flexget.plugin import PluginError, PluginWarning, register_plugin
+from flexget.plugin import PluginError, register_plugin
 from flexget import manager
 from flexget.event import event
 from flexget.utils.template import render_from_feed, get_template, RenderError
@@ -114,7 +115,6 @@ def send_email(subject, content, config):
         log.verbose('Sending email.')
         try:
             if config['smtp_ssl']:
-                import sys
                 if sys.version_info < (2, 6, 3):
                     raise PluginError('SSL email support requires python >= 2.6.3 due to python bug #4066, upgrade python or use TLS', log)
                     # Create a SSL connection to smtp server
@@ -126,10 +126,12 @@ def send_email(subject, content, config):
                     mailServer.starttls()
                     mailServer.ehlo()
         except socket.error, e:
-            raise PluginWarning('Socket error: %s' % e, log)
+            log.warning('Socket error: %s' % e)
+            return
         except SMTPException, e:
             # Ticket #1133
-            raise PluginWarning('Unable to send email: %s' % e, log)
+            log.warning('Unable to send email: %s' % e)
+            return
 
         try:
 
@@ -138,9 +140,11 @@ def send_email(subject, content, config):
             mailServer.sendmail(message['From'], config['to'], message.as_string())
         except IOError, e:
             # Ticket #686
-            raise PluginWarning('Unable to send email! IOError: %s' % e, log)
+            log.warning('Unable to send email! IOError: %s' % e)
+            return
         except SMTPException, e:
-            raise PluginWarning('Unable to send email! SMTPException: %s' % e, log)
+            log.warning('Unable to send email! SMTPException: %s' % e)
+            return
 
         mailServer.quit()
 
