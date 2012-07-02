@@ -740,8 +740,8 @@ class OutputDeluge(DelugePlugin):
             log.debug('dlist: %s' % result.resultList)
             client.disconnect()
 
-        # Schedule a disconnect to happen in 30 seconds if FlexGet hangs while connected to Deluge
-        reactor.callLater(30, lambda: tasks.called or on_timeout(tasks))
+        # Schedule a disconnect to happen in 50 seconds if FlexGet hangs while connected to Deluge
+        reactor.callLater(50, lambda: tasks.called or on_timeout(tasks))
 
     def on_feed_exit(self, feed, config):
         """Make sure all temp files are cleaned up when feed exits"""
