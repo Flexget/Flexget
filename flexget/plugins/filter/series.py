@@ -936,21 +936,25 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
                     if self.process_episode_advancement(feed, eps, series):
                         continue
 
-            # quality
-            if 'target' in config:
-                if self.process_timeframe_target(feed, config, eps):
-                    continue
-            elif 'qualities' in config:
-                if self.process_qualities(feed, config, eps, downloaded):
-                    continue
-
             reason = 'choosing best quality'
-            # We didn't make a quality target match, check timeframe to see
-            # if we should get something anyway
-            if 'timeframe' in config:
-                if self.process_timeframe(feed, config, eps, series_name):
+            # quality
+            if 'target' in config or 'qualities' in config:
+                if 'target' in config:
+                    if self.process_timeframe_target(feed, config, eps):
+                        continue
+                elif 'qualities' in config:
+                    if self.process_qualities(feed, config, eps, downloaded):
+                        continue
+
+                # We didn't make a quality target match, check timeframe to see
+                # if we should get something anyway
+                if 'timeframe' in config:
+                    if self.process_timeframe(feed, config, eps, series_name):
+                        continue
+                    reason = 'Timeframe expired, choosing best available'
+                else:
+                    # If target or qualities is configured without timeframe, don't accept anything now
                     continue
-                reason = 'Timeframe expired, choosing best available'
 
             # Just pick the best ep if we get here
             feed.accept(self.parser2entry[best], reason)

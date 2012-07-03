@@ -89,12 +89,16 @@ class TestQuality(FlexGetBase):
               - {title: 'GroupQual.S01E01.DSR.XViD-FlexGet'}
               - {title: 'GroupQual.S01E01.1080p.XViD-FlexGet'}
               - {title: 'GroupQual.S01E01.720p.XViD-FlexGet'}
+              - {title: 'Other.S01E01.hdtv.dd5.1.XViD-FlexGet'}
+              - {title: 'Other.S01E01.720p.hdtv.XViD-FlexGet'}
             series:
               720P:
                 - GroupQual
               # Test that an integer group name doesn't cause an exception.
               1080:
                 - Test
+              hdtv <hr !dd5.1:
+                - Other
     """
 
     def test_exact_quality(self):
@@ -144,7 +148,7 @@ class TestQuality(FlexGetBase):
         self.execute_feed('quality_from_group')
         assert self.feed.find_entry('accepted', title='GroupQual.S01E01.720p.XViD-FlexGet'), \
             'GroupQual.S01E01.720p.XViD-FlexGet should have been accepted'
-        assert len(self.feed.accepted) == 1, 'should have accepted only one'
+        assert len(self.feed.accepted) == 1, 'should have accepted only one (no entries should pass for series `other`'
 
 
 class TestDatabase(FlexGetBase):
@@ -782,6 +786,7 @@ class TestQualities(FlexGetBase):
                   upgrade: yes
               - FooD:
                   target: 720p
+                  timeframe: 0 hours
                   upgrade: yes
         feeds:
           test_1:
@@ -889,7 +894,7 @@ class TestQualities(FlexGetBase):
         assert len(self.feed.accepted) == 1, 'one ep should be valid upgrade'
         assert self.feed.find_entry('accepted', title='FooBum.S03E01.1080i')
 
-    def test_quality_upgrade(self):
+    def test_target_upgrade(self):
         self.execute_feed('target_1')
         assert len(self.feed.accepted) == 1, 'Only one ep should have been grabbed'
         assert self.feed.find_entry('accepted', title='Food.S06E11.hdtv')
