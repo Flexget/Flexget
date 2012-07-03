@@ -49,8 +49,11 @@ class SeriesReport(SeriesDatabase):
         print '-' * 79
 
         # Query episodes in sane order instead of iterating from series.episodes
-        episodes = session.query(Episode).filter(Episode.series_id == series.id).\
-            order_by(Episode.identifier).all()
+        episodes = session.query(Episode).filter(Episode.series_id == series.id)
+        if series.identified_by == 'sequence':
+            episodes = episodes.order_by(Episode.number).all()
+        else:
+            episodes = episodes.order_by(Episode.identifier).all()
 
         for episode in episodes:
 
