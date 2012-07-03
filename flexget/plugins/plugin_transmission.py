@@ -261,8 +261,8 @@ class PluginTransmission(TransmissionBase):
                 options['add']['download_dir'] = pathscrub(path)
             except RenderError, e:
                 log.error('Error setting path for %s: %s' % (entry['title'], e))
-        if opt_dic.get('addpaused'):
-            options['add']['paused'] = True
+        if 'addpaused' in opt_dic:
+            options['add']['paused'] = opt_dic['addpaused']
         if 'bandwidthpriority' in opt_dic:
             options['add']['bandwidthPriority'] = opt_dic['bandwidthpriority']
         if 'maxconnections' in opt_dic:
