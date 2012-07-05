@@ -24,14 +24,16 @@ if sys.platform.startswith('win') and os.environ.get('ProgramFiles'):
                 sys.path.append(os.path.join(deluge_dir, item))
 # Look for the deluge.app install on OSX
 elif sys.platform.startswith('darwin'):
-    filename = '/Applications/Deluge.app/Contents/MacOS/Resources/site.py'
+    filename = '/Applications/Deluge.app/Contents/Resources/site.py'
     if not os.path.isfile(filename):
         # Check for the .pyc also
         filename += 'c'
     if os.path.isfile(filename):
         log.debug('Found deluge.app install, adding its packages to sys.path')
         import imp
-        imp.load_source('py2app_site', '/Applications/Deluge.app/Contents/MacOS/Resources/site.py')
+        imp.load_source('py2app_site', filename)
+    else:
+        log.debug('Could not find deluge.app install')
 
 try:
     from twisted.python import log as twisted_log
