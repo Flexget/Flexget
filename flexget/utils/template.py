@@ -8,7 +8,7 @@ import locale
 from email.utils import parsedate
 from time import mktime
 from jinja2 import (Environment, StrictUndefined, ChoiceLoader, FileSystemLoader, PackageLoader, TemplateNotFound,
-                    TemplateSyntaxError)
+                    TemplateSyntaxError, Undefined)
 from flexget.event import event
 from flexget.plugin import PluginError
 from flexget.utils.pathscrub import pathscrub
@@ -97,6 +97,17 @@ def filter_pad(val, width, fillchar='0'):
     return str(val).rjust(width, fillchar)
 
 
+# Override the built-in Jinja default filter due to Jinja bug
+# https://github.com/mitsuhiko/jinja2/pull/138
+def filter_default(value, default_value=u'', boolean=False):
+    if isinstance(value, Undefined) or (boolean and not value):
+        return default_value
+    return value
+
+
+filter_d = filter_default
+
+
 @event('manager.startup')
 def make_environment(manager):
     """Create our environment and add our custom filters"""
@@ -148,7 +159,7 @@ def render_from_entry(template_string, entry):
     variables['now'] = datetime.now()
     # We use the lower level render function, so that our Entry is not cast into a dict (and lazy loading lost)
     try:
-        result = u''.join(template.root_render_func(template.new_context(variables)))
+        result = u''.join(template.root_render_func(template.new_context(variables, shared=True)))
     except:
         exc_info = sys.exc_info()
         try:
