@@ -254,7 +254,7 @@ def lookup_movie(title=None, year=None, rottentomatoes_id=None, imdb_id=None, sm
         title = title_parser.name
         year = title_parser.year
         if title == '' and not (rottentomatoes_id or imdb_id or title):
-            raise PluginError('Failed to parse name from %s' % raw_name)
+            raise PluginError('Failed to parse name from %s' % smart_match)
 
     if title:
         search_string = title.lower()
