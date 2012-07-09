@@ -534,8 +534,6 @@ class ArchiveCli(object):
         if not options:
             return
 
-        feed.manager.disable_feeds()
-
         action = options['action']
         args = options.get('args', [])
 
@@ -546,16 +544,18 @@ class ArchiveCli(object):
             source_name = args[0]
             tag_names = args[1:]
             tag_source(source_name, tag_names=tag_names)
+            feed.manager.disable_feeds()
         elif action == 'inject':
             try:
                 self.inject(args)
-                feed.manager.enable_feeds()
             except ValueError:
                 console('Invalid parameters: %s' % ', '.join(args))
                 if ',' in ''.join(args):
                     console('IDs must be separated with space now!')
+                feed.manager.disable_feeds()
         elif action == 'consolidate':
             consolidate()
+            feed.manager.disable_feeds()
         elif action == 'search':
             tags = []
             for arg in args[:]:
@@ -563,8 +563,9 @@ class ArchiveCli(object):
                     tags.append(arg[1:])
                     args.remove(arg)
             self.search(' '.join(args), tags)
+            feed.manager.disable_feeds()
         elif action == 'test':
-            pass
+            feed.manager.disable_feeds()
         else:
             raise NotImplemented(action)
 
