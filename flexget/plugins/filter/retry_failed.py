@@ -8,7 +8,7 @@ from flexget.manager import Session
 from flexget.utils.tools import console, parse_timedelta
 from flexget.utils.sqlalchemy_utils import table_add_column
 
-SCHEMA_VER = 1
+SCHEMA_VER = 2
 
 log = logging.getLogger('failed')
 Base = schema.versioned_base('failed', SCHEMA_VER)
@@ -27,6 +27,9 @@ def upgrade(ver, session):
         failed = meta.tables['failed']
         Index('failed_title_url', failed.c.title, failed.c.url, failed.c.count).create()
         ver = 1
+    if ver == 1:
+        table_add_column('failed', 'reason', Unicode, session)
+        ver = 2
     return ver
 
 
@@ -37,11 +40,13 @@ class FailedEntry(Base):
     title = Column(Unicode)
     url = Column(String)
     tof = Column(DateTime)
+    reason = Column(Unicode)
     count = Column(Integer, default=1)
 
-    def __init__(self, title, url):
+    def __init__(self, title, url, reason=None):
         self.title = title
         self.url = url
+        self.reason = reason
         self.tof = datetime.now()
 
     def __str__(self):
@@ -74,23 +79,25 @@ class PluginFailed(object):
             if not results:
                 console('No failed entries recorded')
             for entry in results:
-                console('%16s - %s - %s times' % (entry.tof.strftime('%Y-%m-%d %H:%M'), entry.title, entry.count))
+                console('%16s - %s - %s times - %s' %
+                        (entry.tof.strftime('%Y-%m-%d %H:%M'), entry.title, entry.count, entry.reason))
         finally:
             failed.close()
 
-    # TODO: add reason support
-    def add_failed(self, entry):
+    def add_failed(self, entry, reason=None):
         """Adds entry to internal failed list, displayed with --failed"""
+        reason = reason or 'Unknown'
         failed = Session()
         try:
             # query item's existence
             item = failed.query(FailedEntry).filter(FailedEntry.title == entry['title']).\
                                              filter(FailedEntry.url == entry['original_url']).first()
             if not item:
-                item = FailedEntry(entry['title'], entry['original_url'])
+                item = FailedEntry(entry['title'], entry['original_url'], reason)
             else:
                 item.count += 1
                 item.tof = datetime.now()
+                item.reason = reason
             failed.merge(item)
             log.debug('Marking %s in failed list. Has failed %s times.' % (item.title, item.count))
 
@@ -114,7 +121,7 @@ class PluginFailed(object):
             session.close()
 
     def on_entry_fail(self, feed, entry, **kwargs):
-        self.add_failed(entry)
+        self.add_failed(entry, reason=kwargs.get('reason'))
 
 
 class FilterRetryFailed(object):
@@ -193,7 +200,8 @@ class FilterRetryFailed(object):
             if self.backlog:
                 self.backlog.add_backlog(feed, entry, amount=retry_time)
             if retry_time:
-                feed.reject(entry, reason='Waiting before trying failed entry again.', remember_time=retry_time)
+                feed.reject(entry, reason='Waiting before trying failed entry again. (failure reason: %s)' %
+                                          item.reason, remember_time=retry_time)
                 # Cause a feed rerun, to look for alternate releases
                 feed.rerun()
 
