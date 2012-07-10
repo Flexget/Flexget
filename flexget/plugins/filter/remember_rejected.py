@@ -94,8 +94,8 @@ class FilterRememberRejected(object):
         if not old_feed:
             # Create this feed in the db if not present
             feed.session.add(RememberFeed(name=feed.name))
-        else:
-            # Delete expired items
+        elif not feed.is_rerun:
+            # Delete expired items if this is not a rerun
             deleted = feed.session.query(RememberEntry).filter(RememberEntry.feed_id == old_feed.id).\
                                                         filter(RememberEntry.expires < datetime.now()).delete()
             if deleted:
