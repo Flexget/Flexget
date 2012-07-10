@@ -125,7 +125,7 @@ def initialize(unit_test=False):
     logger.addHandler(_mem_handler)
 
     #
-    # Process commandline options, unfortunately we need to do it before optparse is available
+    # Process commandline options, unfortunately we need to do it before argparse is available
     #
 
     # turn on debug level

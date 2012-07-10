@@ -5,7 +5,7 @@ import sys
 import flexget.logger
 from flexget.manager import Manager
 from flexget.plugin import load_plugins
-from flexget.options import CoreOptionParser
+from flexget.options import CoreArgumentParser
 from flexget.feed import Feed
 from tests import util
 import yaml
@@ -13,7 +13,7 @@ import logging
 
 log = logging.getLogger('tests')
 
-test_options = None
+test_arguments = None
 plugins_loaded = False
 
 
@@ -31,14 +31,14 @@ def setup_logging_level():
 
 
 def setup_once():
-    global plugins_loaded, test_options
+    global plugins_loaded, test_arguments
     if not plugins_loaded:
         flexget.logger.initialize(True)
         setup_logging_level()
-        parser = CoreOptionParser(True)
+        parser = CoreArgumentParser(True)
         load_plugins(parser)
         # store options for MockManager
-        test_options = parser.parse_args()[0]
+        test_arguments = parser.parse_args()
         plugins_loaded = True
 
 
@@ -49,7 +49,7 @@ class MockManager(Manager):
         self.config_text = config_text
         self.config_name = config_name
         self._db_uri = db_uri or 'sqlite:///:memory:'
-        super(MockManager, self).__init__(test_options)
+        super(MockManager, self).__init__(test_arguments)
 
     def initialize(self):
         self.database_uri = self._db_uri

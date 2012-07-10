@@ -1,5 +1,5 @@
 import logging
-from optparse import SUPPRESS_HELP
+from argparse import SUPPRESS
 from flexget.plugin import register_parser_option
 from flexget.event import event
 
@@ -65,4 +65,4 @@ def startup(manager):
 
 
 register_parser_option('--debug-perf', action='store_true', dest='debug_perf', default=False,
-                       help=SUPPRESS_HELP)
+                       help=SUPPRESS)

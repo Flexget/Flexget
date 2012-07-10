@@ -1,3 +1,5 @@
+import string
+import random
 import logging
 import yaml
 from flexget.entry import Entry
@@ -29,49 +31,45 @@ class InputInject(object):
 
     options = {}
 
-    @staticmethod
-    def optik_series(option, opt, value, parser):
+    def parse_arguments(self, arguments):
         """--inject <TITLE> [URL] [ACCEPTED] [IMMORTAL]"""
-        #InputInject.options
-        index = 0
-        for arg in parser.rargs[:]:
-            if arg.startswith('-'):
-                break
-            index += 1
-            if index == 1:
-                InputInject.options['entry'] = {'title': arg}
-            elif index == 2:
-                InputInject.options['entry']['url'] = arg
+        options = {}
+        for index, arg in enumerate(arguments):
+            if index == 0:
+                options['entry'] = {'title': arg}
+            elif index == 1:
+                options['entry']['url'] = arg
             elif '=' in arg:
                 field, val = arg.split('=')
-                InputInject.options['entry'][field] = yaml.load(val)
-            elif index == 3:
+                options['entry'][field] = yaml.load(val)
+            elif index == 2:
                 if arg.lower() == 'accept':
-                    InputInject.options['accept'] = True
+                    options['accept'] = True
                 else:
-                    InputInject.options['accept'] = str_to_boolean(arg)
-            elif index == 4:
+                    options['accept'] = str_to_boolean(arg)
+            elif index == 3:
                 if arg.lower() == 'force':
-                    InputInject.options['entry']['immortal'] = True
+                    options['entry']['immortal'] = True
                 else:
-                    InputInject.options['entry']['immortal'] = str_to_boolean(arg)
+                    options['entry']['immortal'] = str_to_boolean(arg)
             else:
                 log.critical('Unknown --inject parameter %s' % arg)
 
+        return options
+
     @priority(255)
     def on_feed_input(self, feed):
-        if not InputInject.options:
+        if not feed.manager.options.inject:
             return
+
+        options = self.parse_arguments(feed.manager.options.inject)
 
         # disable other inputs
         log.info('Disabling the rest of the input phase.')
         feed.disable_phase('input')
 
         # create our injected entry
-        import string
-        import random
-
-        entry = Entry(InputInject.options['entry'], injected=True)
+        entry = Entry(options['entry'], injected=True)
         if not 'url' in entry:
             entry['url'] = 'http://localhost/inject/%s' % ''.join([random.choice(string.letters + string.digits) for x in range(1, 30)])
         if entry.get('immortal'):
@@ -79,12 +77,11 @@ class InputInject(object):
 
         feed.entries.append(entry)
 
-        if InputInject.options.get('accept', False):
+        if options.get('accept', False):
             log.debug('accepting the injection')
             feed.accept(entry, '--inject accepted')
 
 
 register_plugin(InputInject, '--inject', debug=True, builtin=True)
-
-register_parser_option('--inject', action='callback', callback=InputInject.optik_series,
+register_parser_option('--inject', nargs='+', metavar=('TITLE', 'URL'),
                        help='Injects entry to all executed feeds: <TITLE> [URL] [ACCEPT] [FORCE]')

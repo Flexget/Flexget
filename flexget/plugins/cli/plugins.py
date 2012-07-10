@@ -1,5 +1,5 @@
 import logging
-from optparse import SUPPRESS_HELP
+from argparse import SUPPRESS
 from flexget.plugin import register_parser_option, plugins
 from flexget.event import event
 
@@ -36,4 +36,4 @@ def plugins_summary(manager):
 register_parser_option('--plugins', action='store_true', dest='plugins', default=False,
                        help='Print registered plugins summary')
 register_parser_option('--list', action='store_true', dest='plugins', default=False,
-                       help=SUPPRESS_HELP)
+                       help=SUPPRESS)

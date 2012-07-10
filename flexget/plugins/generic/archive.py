@@ -1,15 +1,16 @@
 import logging
+from datetime import datetime
+from argparse import Action, ArgumentError
 from sqlalchemy.orm import relationship
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.schema import Table, ForeignKey
+from sqlalchemy import Column, Integer, DateTime, Unicode, Index
 from flexget import schema
 from flexget.event import event
 from flexget.entry import Entry
 from flexget.plugin import priority, register_parser_option, register_plugin
 from flexget.utils.sqlalchemy_utils import table_schema, get_index_by_name
 from flexget.utils.tools import console, strip_html
-from sqlalchemy import Column, Integer, DateTime, Unicode, Index
-from datetime import datetime
 from flexget.manager import Session
 
 log = logging.getLogger('archive')
@@ -491,45 +492,11 @@ class ArchiveCli(object):
     """
     Commandline interface for the Archive plugin
     """
-
-    options = {}
     ACTIONS = ('consolidate', 'search', 'inject', 'tag-source', 'test')
-
-    @staticmethod
-    def optik(option, opt, value, parser):
-
-        def print_usage():
-            console('Usage for --archive ACTION args, these are subjected to change in near future.')
-            console('')
-            console(' consolidate               Migrate old archive data to new model, may take a long time.')
-            console(' search [@TAG]s KEYWORDS   Search from the archive.')
-            console(' inject ID [ID] [yes]      Inject as accepted from archive by ID\'s. '
-                    'If yes is given immortal flag will be used.')
-            console(' tag-source SRC TAG [TAG]  Tag all archived items within source with given tag.')
-            import sys
-
-            sys.exit(1)
-
-        if not parser.rargs:
-            print_usage()
-
-        action = parser.rargs[0].lower()
-        if action not in ArchiveCli.ACTIONS:
-            print_usage()
-
-        ArchiveCli.options['action'] = action
-        if len(parser.rargs[0]) > 1:
-            args = []
-            for arg in parser.rargs[1:]:
-                # next parameter starts from there
-                if arg.startswith('-'):
-                    break
-                args.append(unicode(arg))
-            ArchiveCli.options['args'] = args
 
     @priority(768)
     def on_process_start(self, feed, config):
-        options = ArchiveCli.options
+        options = feed.manager.options.archive
         # if --archive was not used
         if not options:
             return
@@ -608,11 +575,34 @@ class ArchiveCli(object):
         ArchiveInject.inject_immortal(immortal)
 
 
+class ArchiveCLIAction(Action):
+    def __call__(self, parser, namespace, values, option_string=None):
+
+        namespace.archive = options = {}
+
+        usage = '''
+Usage for --archive ACTION args, these are subjected to change in near future.
+
+ consolidate               Migrate old archive data to new model, may take a long time.
+ search [@TAG]s KEYWORDS   Search from the archive.
+ inject ID [ID] [yes]      Inject as accepted from archive by ID\'s. If yes is given immortal flag will be used.')
+ tag-source SRC TAG [TAG]  Tag all archived items within source with given tag.'''
+
+        if not values:
+            raise ArgumentError(self, usage)
+
+        action = values[0].lower()
+        if action not in ArchiveCli.ACTIONS:
+            raise ArgumentError(self, usage)
+
+        options['action'] = action
+        options['args'] = [unicode(arg) for arg in values[1:]]
+
 register_plugin(Archive, 'archive', api_ver=2)
 register_plugin(ArchiveInject, 'archive_inject', api_ver=2, builtin=True)
 register_plugin(UrlrewriteArchive, 'flexget_archive', groups=['search'])
 register_plugin(ArchiveCli, '--archive-cli', builtin=True, api_ver=2)
-register_parser_option('--archive', action='callback', callback=ArchiveCli.optik,
-                       metavar='ARGS',
+register_parser_option('--archive', nargs='*', action=ArchiveCLIAction,
+                       metavar=('ACTION', 'ARGS'),
                        help='Access [search|inject|tag-source|consolidate] functionalities. '
                             'Without any args display help about those.')

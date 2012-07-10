@@ -1,8 +1,7 @@
 from datetime import datetime, timedelta
-from flexget.manager import Session
 from string import capwords
-from sqlalchemy.orm import join
 from sqlalchemy import desc
+from flexget.manager import Session
 from flexget.plugin import register_plugin, register_parser_option, DependencyError
 
 try:
@@ -15,31 +14,22 @@ class SeriesReport(SeriesDatabase):
 
     """Produces --series report"""
 
-    options = {}
-
-    @staticmethod
-    def optik_series(option, opt, value, parser):
-        """--series [NAME]"""
-        SeriesReport.options['got'] = True
-        if parser.rargs:
-            SeriesReport.options['name'] = parser.rargs[0]
-
     def on_process_start(self, feed):
-        if self.options:
+        if feed.manager.options.series:
             feed.manager.disable_feeds()
 
-            if not 'name' in self.options:
+            if isinstance(feed.manager.options.series, bool):
                 self.display_summary()
             else:
-                self.display_details()
+                self.display_details(feed.manager.options.series)
 
-    def display_details(self):
+    def display_details(self, name):
         """Display detailed series information, ie. --series NAME"""
 
         from flexget.manager import Session
         session = Session()
 
-        name = unicode(self.options['name'].lower())
+        name = unicode(name.lower())
         series = session.query(Series).filter(Series.name == name).first()
         if not series:
             print 'Unknown series `%s`' % name
@@ -181,30 +171,15 @@ class SeriesForget(object):
 
     """Provides --series-forget"""
 
-    options = {}
-
-    @staticmethod
-    def optik_series_forget(option, opt, value, parser):
-        """
-        Callback for Optik
-        --series-forget NAME [ID]
-        """
-        if not parser.rargs:
-            return # how to handle invalid?
-        if len(parser.rargs) > 0:
-            SeriesForget.options['name'] = parser.rargs[0]
-        if len(parser.rargs) > 1:
-            SeriesForget.options['episode'] = parser.rargs[1]
-
     def on_process_start(self, feed):
-        if self.options:
+        if feed.manager.options.series_forget:
             feed.manager.disable_feeds()
 
-            name = unicode(self.options.get('name'))
+            name = unicode(feed.manager.options.series_forget[0])
 
-            if self.options.get('episode'):
+            if len(feed.manager.options.series_forget) > 1:
                 # remove by id
-                identifier = self.options.get('episode').upper()
+                identifier = feed.manager.options.series_forget[1].upper()
                 if identifier and name:
                     try:
                         forget_series_episode(name, identifier)
@@ -225,7 +200,6 @@ class SeriesForget(object):
 register_plugin(SeriesReport, '--series', builtin=True)
 register_plugin(SeriesForget, '--series-forget', builtin=True)
 
-register_parser_option('--series', action='callback', callback=SeriesReport.optik_series,
-                       help='Display series summary.')
-register_parser_option('--series-forget', action='callback', callback=SeriesForget.optik_series_forget,
+register_parser_option('--series', nargs='?', const=True, help='Display series summary.')
+register_parser_option('--series-forget', nargs='1-2', metavar=('NAME', 'EP_ID'),
                        help='Remove complete series or single episode from database: <NAME> [EPISODE]')

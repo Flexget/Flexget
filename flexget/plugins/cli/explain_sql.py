@@ -1,6 +1,6 @@
 import logging
-from optparse import SUPPRESS_HELP
 from time import time
+from argparse import SUPPRESS
 from sqlalchemy.orm.query import Query
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.compiler import compiles
@@ -55,4 +55,4 @@ def deregister_sql_explain(man):
 
 
 register_parser_option('--explain-sql', action='store_true', dest='explain_sql', default=False,
-                       help=SUPPRESS_HELP)
+                       help=SUPPRESS)

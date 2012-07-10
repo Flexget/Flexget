@@ -1,5 +1,5 @@
-from flexget.plugin import register_plugin, register_parser_option, priority
 import logging
+from flexget.plugin import register_plugin, register_parser_option, priority
 from flexget.utils.tools import console
 
 log = logging.getLogger('dump')
@@ -49,27 +49,18 @@ class OutputDump(object):
     Outputs all entries to console
     """
 
-    params = None
-
     def validator(self):
         from flexget import validator
         return validator.factory('boolean')
 
-    @staticmethod
-    def optik(option, opt, value, parser):
-        if parser.rargs:
-            OutputDump.params = parser.rargs[0]
-        else:
-            OutputDump.params = True
-
     @priority(0)
     def on_feed_output(self, feed):
-        if not 'dump' in feed.config and not OutputDump.params:
+        if 'dump' not in feed.config and not feed.manager.options.dump_entries:
             return
         #from flexget.utils.tools import sanitize
         #import yaml
 
-        eval_lazy = OutputDump.params == 'eval'
+        eval_lazy = feed.manager.options.dump_entries == 'eval'
         undecided = [entry for entry in feed.entries if not entry in feed.accepted]
         if undecided:
             console('-- Undecided: --------------------------')
@@ -82,9 +73,6 @@ class OutputDump(object):
             dump(feed.rejected, feed.manager.options.debug, eval_lazy)
 
 register_plugin(OutputDump, 'dump', builtin=True)
-#register_parser_option('--dump', action='store_true', dest='dump_entries', default=False,
-#                       help='Display all feed entries')
-
-register_parser_option('--dump', action='callback', callback=OutputDump.optik,
+register_parser_option('--dump', nargs='?', choices=['eval'], const=True, dest='dump_entries',
                        help='Display all entries in feed with details. '
                             'Arg `--dump eval` will evaluate all lazy fields.')

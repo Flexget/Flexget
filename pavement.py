@@ -24,6 +24,9 @@ if sys.version_info < (2, 6):
 else:
     install_requires.append('requests>=0.10, !=0.10.1, <0.11') #URL quoting bug in 0.10.1
     install_requires.append('python-dateutil!=2.0') # dateutil 2.1 started supporting python 2.6+ again
+if sys.version_info < (2,7):
+    # argparse is part of the standard library in python 2.7+
+    install_requires.append('argparse')
 
 entry_points = {
     'console_scripts': ['flexget = flexget:main'],

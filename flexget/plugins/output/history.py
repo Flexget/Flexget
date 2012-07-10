@@ -1,6 +1,6 @@
 import logging
 from datetime import datetime
-from optparse import SUPPRESS_HELP
+from argparse import SUPPRESS
 from sqlalchemy import Column, String, Integer, DateTime, Unicode, desc
 from flexget.manager import Base, Session
 from flexget.plugin import register_parser_option, register_plugin
@@ -68,4 +68,4 @@ register_plugin(PluginHistory, '--history', builtin=True)
 register_parser_option('--history', action='store_true', dest='history', default=False,
                        help='List 50 latest accepted entries.')
 register_parser_option('--downloads', action='store_true', dest='history', default=False,
-                       help=SUPPRESS_HELP)
+                       help=SUPPRESS)

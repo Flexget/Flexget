@@ -1,5 +1,5 @@
 import logging
-from optparse import OptionValueError
+from argparse import ArgumentError, Action
 from sqlalchemy.exc import OperationalError
 from flexget.utils import qualities
 from flexget.utils.tools import console, str_to_boolean
@@ -12,54 +12,14 @@ except ImportError:
 
 log = logging.getLogger('cli_movie_queue')
 
-USAGE = '(add|del|forget|list|downloaded|clear) [NAME|IMDB_ID|tmdb_id=TMDB_ID] [QUALITY] [FORCE]'
+ACTIONS = ['add', 'del', 'forget', 'list', 'downloaded', 'clear']
+USAGE = '(%s) [NAME|IMDB_ID|tmdb_id=TMDB_ID] [QUALITY] [FORCE]' % '|'.join(ACTIONS)
 
 
 class MovieQueueManager(object):
     """
     Handle IMDb queue management; add, delete and list
     """
-
-    @staticmethod
-    def optik_movie_queue(option, opt, value, parser):
-        """Callback for Optik, parses --movie-queue options and populates movie_queue options value"""
-        options = {}
-        usage_error = OptionValueError('Usage: ' + USAGE)
-        if not parser.rargs:
-            raise usage_error
-
-        options['action'] = parser.rargs[0].lower()
-        if options['action'] not in ('add', 'del', 'forget', 'list', 'downloaded', 'clear'):
-            raise usage_error
-
-        if len(parser.rargs) == 1:
-            if options['action'] not in ('list', 'downloaded', 'clear'):
-                raise usage_error
-
-        # 2, args is the minimum allowed (operation + item) for actions other than list
-        if len(parser.rargs) >= 2:
-            options['what'] = parser.rargs[1]
-
-        # 3, quality
-        if len(parser.rargs) >= 3:
-            try:
-                options['quality'] = qualities.Requirements(parser.rargs[2])
-            except ValueError, e:
-                raise OptionValueError('`%s` is an invalid quality requirement string: %s' %
-                                       (parser.rargs[2], e.message))
-        else:
-            options['quality'] = qualities.Requirements('any')
-            # TODO: Get default from config somehow?
-            # why not use the quality user has queued most, ie option called 'auto' ?
-            # and if none is queued default to something good like '720p bluray'
-
-        # 4, force download
-        if len(parser.rargs) >= 4:
-            options['force'] = str_to_boolean(parser.rargs[3])
-        else:
-            options['force'] = True
-
-        parser.values.movie_queue = options
 
     def on_process_start(self, feed):
         """Handle --movie-queue management"""
@@ -161,8 +121,49 @@ class MovieQueueManager(object):
 
         console('-' * 79)
 
+class MovieQueueAction(Action):
+    def __call__(self, parser, namespace, values, option_string=None):
+        options = namespace.movie_queue = {}
+
+        # Assume 'list' if no action was given
+        if not values:
+            values = ['list']
+
+        if values[0].lower() not in ACTIONS:
+            raise ArgumentError(self, '`%s` is not a valid action.\nUsage: ' % values[0] + USAGE)
+        options['action'] = values[0].lower()
+
+        if len(values) == 1:
+            if options['action'] not in ('list', 'downloaded', 'clear'):
+                raise ArgumentError(self, 'You must specify the movie.\nUsage: ' + USAGE)
+
+        # 2, args is the minimum allowed (operation + item) for actions other than list
+        if len(values) >= 2:
+            options['what'] = values[1]
+
+        # 3, quality
+        if len(values) >= 3:
+            try:
+                options['quality'] = qualities.Requirements(values[2])
+            except ValueError, e:
+                raise ArgumentError(self, '`%s` is an invalid quality requirement string: %s' %
+                                       (values[2], e.message))
+        else:
+            options['quality'] = qualities.Requirements('any')
+            # TODO: Get default from config somehow?
+            # why not use the quality user has queued most, ie option called 'auto' ?
+            # and if none is queued default to something good like '720p bluray'
+
+        # 4, force download
+        if len(values) >= 4:
+            options['force'] = str_to_boolean(values[3])
+        else:
+            options['force'] = True
+
+        if len(values) > 4:
+            raise ArgumentError(self, 'Too many arguments passed.\nUsage: ' + USAGE)
+
 
 register_plugin(MovieQueueManager, 'movie_queue_manager', builtin=True)
-register_parser_option('--movie-queue', action='callback',
-                       callback=MovieQueueManager.optik_movie_queue,
-                       help=USAGE)
+register_parser_option('--movie-queue', nargs='*', metavar=('ACTION', 'TITLE'),
+                       action=MovieQueueAction, help=USAGE)

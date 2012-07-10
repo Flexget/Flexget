@@ -4,7 +4,7 @@ import logging
 import yaml
 from copy import deepcopy
 from flexget.manager import Manager
-from flexget.ui.options import StoreErrorOptionParser
+from flexget.ui.options import StoreErrorArgumentParser
 
 log = logging.getLogger('ui.manager')
 
@@ -13,7 +13,7 @@ class UIManager(Manager):
 
     def __init__(self, options, coreparser):
         Manager.__init__(self, options)
-        self.parser = StoreErrorOptionParser(coreparser)
+        self.parser = StoreErrorArgumentParser(coreparser)
 
     def find_config(self):
         """If no config file is found by the webui, a blank one is created."""

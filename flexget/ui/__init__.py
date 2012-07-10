@@ -4,8 +4,8 @@ import os
 import sys
 import logging
 from flexget import logger
-from flexget.options import CoreOptionParser
-from flexget.ui.options import UIOptionParser
+from flexget.options import CoreArgumentParser
+from flexget.ui.options import UIArgumentParser
 from flexget.ui.manager import UIManager
 import flexget.ui.webui
 from flexget import plugin
@@ -19,12 +19,12 @@ def main():
     logger.initialize()
 
     # The core plugins need a core parser to add their options to
-    core_parser = CoreOptionParser()
+    core_parser = CoreArgumentParser()
     plugin.load_plugins(core_parser)
 
     # Use the ui options parser to parse the cli
-    parser = UIOptionParser(core_parser)
-    options = parser.parse_args()[0]
+    parser = UIArgumentParser(core_parser)
+    options = parser.parse_args()
     try:
         manager = UIManager(options, core_parser)
     except IOError, e:

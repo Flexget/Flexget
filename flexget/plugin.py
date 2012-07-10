@@ -193,7 +193,7 @@ def register_parser_option(*args, **kwargs):
         import warnings
         warnings.warn('register_parser_option called before it can be')
         return
-    _parser.add_option(*args, **kwargs)
+    _parser.add_argument(*args, **kwargs)
     _plugin_options.append((args, kwargs))
 
 
@@ -569,7 +569,7 @@ def load_plugins(parser):
     if plugins_loaded:
         if parser is not None:
             for args, kwargs in _plugin_options:
-                parser.add_option(*args, **kwargs)
+                parser.add_argument(*args, **kwargs)
         return 0
 
     # suppress DeprecationWarning's

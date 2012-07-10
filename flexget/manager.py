@@ -86,7 +86,7 @@ class Manager(object):
 
     def __init__(self, options):
         """
-        :param options: optparse parsed options object
+        :param options: argparse parsed options object
         """
         global manager
         assert not manager, 'Only one instance of Manager should be created at a time!'

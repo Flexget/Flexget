@@ -63,7 +63,7 @@ class ExecThread(threading.Thread):
                     logging.getLogger().removeHandler(streamhandler)
 
     def _apply_options(self, parser, options):
-        """Applies dict :options: to OptParse parser results"""
+        """Applies dict :options: to ArgParse parser results"""
 
         for name, value in options.iteritems():
             if hasattr(parser, name):

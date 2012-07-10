@@ -17,7 +17,7 @@ bufferqueue = BufferQueue()
 def index():
     context = {'progress': manager.parser.get_help().split('\n')}
     if request.method == 'POST':
-        parser = manager.parser.parse_args(request.form.get('options', ''))[0]
+        parser = manager.parser.parse_args(request.form.get('options', ''))
         if manager.parser.error_msg:
             flash(escape(manager.parser.error_msg), 'error')
             context['options'] = request.form['options']

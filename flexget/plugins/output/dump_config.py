@@ -1,5 +1,5 @@
 import logging
-from optparse import SUPPRESS_HELP
+from argparse import SUPPRESS
 from flexget.plugin import register_plugin, register_parser_option
 
 log = logging.getLogger('dump_config')
@@ -23,6 +23,6 @@ class OutputDumpConfig(object):
 
 register_plugin(OutputDumpConfig, 'dump_config', debug=True, builtin=True)
 register_parser_option('--dump-config', action='store_true', dest='dump_config', default=False, \
-                       help=SUPPRESS_HELP)
+                       help=SUPPRESS)
 register_parser_option('--dump-config-python', action='store_true', dest='dump_config_python', default=False, \
-                       help=SUPPRESS_HELP)
+                       help=SUPPRESS)

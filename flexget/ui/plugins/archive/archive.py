@@ -4,7 +4,7 @@ from flask import request, render_template, flash, Module
 from flexget.plugin import DependencyError
 
 try:
-    from flexget.plugins.plugin_archive import ArchiveEntry, search
+    from flexget.plugins.generic.archive import ArchiveEntry, search
 except ImportError:
     raise DependencyError(issued_by='ui.archive', missing='archive')
 

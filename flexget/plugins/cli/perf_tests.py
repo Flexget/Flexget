@@ -1,4 +1,4 @@
-from optparse import SUPPRESS_HELP
+from argparse import SUPPRESS
 from flexget.manager import Session
 from flexget.plugin import register_plugin, register_parser_option
 import logging
@@ -73,4 +73,4 @@ class PerfTests(object):
 
 register_plugin(PerfTests, 'perftests', api_ver=2, debug=True, builtin=True)
 register_parser_option('--perf-test', action='store', dest='perf_test', default='',
-                       help=SUPPRESS_HELP)
+                       help=SUPPRESS)
