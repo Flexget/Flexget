@@ -439,7 +439,7 @@ def populate_entry_fields(entry, parser):
     # add series, season and episode to entry
     entry['series_name'] = parser.name
     if 'quality' in entry and entry['quality'] != parser.quality:
-        log.warning('Found different quality for %s. Was %s, overriding with %s.' %\
+        log.verbose('Found different quality for %s. Was %s, overriding with %s.' %\
                     (entry['title'], entry['quality'], parser.quality))
     entry['quality'] = parser.quality
     entry['proper'] = parser.proper

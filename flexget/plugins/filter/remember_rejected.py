@@ -83,7 +83,7 @@ class FilterRememberRejected(object):
         """Purge remembered entries if the config has changed."""
         # See if the feed has changed since last run
         old_feed = feed.session.query(RememberFeed).filter(RememberFeed.name == feed.name).first()
-        if old_feed and (feed.config_modified or feed.manager.options.forget_rejected):
+        if not feed.is_rerun and old_feed and (feed.config_modified or feed.manager.options.forget_rejected):
             if feed.manager.options.forget_rejected:
                 log.info('Forgetting previous rejections.')
                 feed.config_changed()
