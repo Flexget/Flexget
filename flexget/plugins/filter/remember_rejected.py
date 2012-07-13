@@ -115,7 +115,7 @@ class FilterRememberRejected(object):
                     # We don't record or reject any entries without url
                     continue
                 reject_entry = reject_entries.filter(and_(RememberEntry.title == entry['title'],
-                                                          RememberEntry.url == entry['url'])).first()
+                                                          RememberEntry.url == entry['original_url'])).first()
                 if reject_entry:
                     feed.reject(entry, 'Rejected on behalf of %s plugin: %s' %
                                        (reject_entry.rejected_by, reject_entry.reason))
