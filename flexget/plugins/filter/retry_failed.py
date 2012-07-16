@@ -86,7 +86,7 @@ class PluginFailed(object):
 
     def add_failed(self, entry, reason=None):
         """Adds entry to internal failed list, displayed with --failed"""
-        reason = reason or 'Unknown'
+        reason = unicode(reason or 'Unknown')
         failed = Session()
         try:
             # query item's existence
