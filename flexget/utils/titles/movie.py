@@ -1,6 +1,7 @@
 import logging
 from flexget.utils.titles.parser import TitleParser
 from flexget.utils import qualities
+from flexget.utils.tools import str_to_int
 
 log = logging.getLogger('movieparser')
 
@@ -54,7 +55,6 @@ class MovieParser(TitleParser):
 
         # split to parts
         parts = data.split(' ')
-        year = None
         cut_part = 256
         all_caps = True
         for part_pos, part in enumerate(parts):
@@ -63,10 +63,10 @@ class MovieParser(TitleParser):
             if part_pos < 1:
                 continue
             # check for year
-            if part.isdigit():
-                num = int(part)
+            num = str_to_int(part)
+            if num is not None:
                 if 1930 < num < 2050:
-                    year = part
+                    self.year = num
                     cut = True
             # Don't consider all caps words cut words if the whole title has been all caps
             if not part.isupper():
@@ -113,7 +113,3 @@ class MovieParser(TitleParser):
 
         # save results
         self.name = data
-
-        if year:
-            if year.isdigit():
-                self.year = int(year)

@@ -3,6 +3,7 @@ import logging
 import re
 from flexget.utils.soup import get_soup
 from flexget.utils.requests import Session
+from flexget.utils.tools import str_to_int
 from BeautifulSoup import NavigableString, Tag
 
 log = logging.getLogger('utils.imdb')
@@ -302,8 +303,7 @@ class ImdbParser(object):
             # get votes
             tag_votes = soup.find(itemprop='ratingCount')
             if tag_votes:
-                str_votes = ''.join(c for c in tag_votes.string if c.isdigit())
-                self.votes = int(str_votes)
+                self.votes = str_to_int(tag_votes.string) or 0
                 log.debug('Detected votes: %s' % self.votes)
             else:
                 log.warning('Unable to get votes for %s - plugin needs update?' % url)

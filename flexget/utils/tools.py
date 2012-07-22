@@ -17,6 +17,13 @@ def str_to_boolean(string):
         return False
 
 
+def str_to_int(string):
+    try:
+        return int(string)
+    except ValueError:
+        None
+
+
 def convert_bytes(bytes):
     """Returns given bytes as prettified string."""
 
