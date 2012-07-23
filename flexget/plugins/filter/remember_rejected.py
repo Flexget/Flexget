@@ -4,7 +4,7 @@ from sqlalchemy import Column, Integer, String, Unicode, DateTime, ForeignKey, a
 from sqlalchemy.orm import relation
 from flexget import schema
 from flexget.event import event
-from flexget.plugin import register_plugin, register_parser_option, register_feed_phase
+from flexget.plugin import register_plugin, register_parser_option, priority
 from flexget.utils.sqlalchemy_utils import table_columns, drop_tables, table_add_column
 from flexget.utils.tools import parse_timedelta
 
@@ -103,8 +103,8 @@ class FilterRememberRejected(object):
                 feed.config_changed()
         feed.session.commit()
 
-    # This runs before metainfo phase to avoid re-parsing metainfo for entries that will be rejected
-    def on_feed_prefilter(self, feed, config):
+    @priority(255)
+    def on_feed_filter(self, feed, config):
         """Reject any remembered entries from previous runs"""
         (feed_id,) = feed.session.query(RememberFeed.id).filter(RememberFeed.name == feed.name).first()
         reject_entries = feed.session.query(RememberEntry).filter(RememberEntry.feed_id == feed_id)
@@ -152,6 +152,5 @@ def db_cleanup(session):
 
 
 register_plugin(FilterRememberRejected, 'remember_rejected', builtin=True, api_ver=2)
-register_feed_phase('prefilter', after='input')
 register_parser_option('--forget-rejected', action='store_true', dest='forget_rejected',
                        help='Forget all previous rejections so entries can be processed again.')
