@@ -19,7 +19,7 @@ def str_to_boolean(string):
 
 def str_to_int(string):
     try:
-        return int(string)
+        return int(string.replace(',', ''))
     except ValueError:
         None
 
