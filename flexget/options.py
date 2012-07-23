@@ -62,6 +62,9 @@ class ArgumentParser(ArgParser):
         super(ArgumentParser, self).add_argument(*args, **kwargs)
 
     def parse_args(self, args=None, namespace=None):
+        if args is None:
+            args = sys.argv[1:]
+        args = [unicode(arg, sys.getfilesystemencoding()) for arg in args]
         args = super(ArgumentParser, self).parse_args(args, namespace)
         if args.debug_trace:
             args.debug = True
