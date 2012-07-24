@@ -1,6 +1,6 @@
 import logging
 import datetime
-from flexget.plugin import register_plugin, register_parser_option
+from flexget.plugin import register_plugin, register_parser_option, priority
 from flexget.utils.tools import parse_timedelta
 
 log = logging.getLogger('interval')
@@ -21,6 +21,7 @@ class PluginInterval(object):
         from flexget import validator
         return validator.factory('interval')
 
+    @priority(255)
     def on_feed_start(self, feed, config):
         # Allow reruns
         if feed.is_rerun:

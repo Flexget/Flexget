@@ -79,6 +79,7 @@ class FilterRememberRejected(object):
         feed.reject(entry, 'message', remember=True)
     """
 
+    @priority(0)
     def on_feed_start(self, feed, config):
         """Purge remembered entries if the config has changed."""
         # See if the feed has changed since last run
