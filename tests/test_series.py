@@ -341,6 +341,12 @@ class TestEpisodeAdvancement(FlexGetBase):
 
           test_forwards_4:
             mock:
+              - {title: 'forwards s04e02'}
+            series:
+              - forwards
+
+          test_forwards_5:
+            mock:
               - {title: 'forwards s05e01'}
             series:
               - forwards
@@ -408,8 +414,11 @@ class TestEpisodeAdvancement(FlexGetBase):
         assert self.feed.find_entry('accepted', title='forwards s03e01'), \
             'forwards s03e01 should have been accepted'
         self.execute_feed('test_forwards_4')
+        assert self.feed.find_entry('rejected', title='forwards s04e02'),\
+        'forwards s04e02 should have been rejected'
+        self.execute_feed('test_forwards_5')
         assert self.feed.find_entry('rejected', title='forwards s05e01'), \
-            'forwards s02e01 should have been rejected'
+            'forwards s05e01 should have been rejected'
 
     def test_unordered(self):
         """Series plugin: unordered episode advancement"""

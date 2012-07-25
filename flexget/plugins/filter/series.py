@@ -1084,7 +1084,7 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
                         latest.identifier)
                 return True
 
-            if (current.season > latest.season + 1 or (current.season > latest.season and current.episode >= grace)  or
+            if (current.season > latest.season + 1 or (current.season > latest.season and current.episode > 1)  or
                (current.season == latest.season and current.episode > (latest.number + grace))):
                 log.debug('too new! rejecting all occurrences')
                 for ep in eps:
