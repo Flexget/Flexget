@@ -76,7 +76,7 @@ def get_tracker_seeds(url, info_hash):
         log.warning('Server error: %s' % e)
         return 0
     if not data:
-        log.debug('the moose is loose')
+        log.debug('No data received from tracker scrape.')
         return 0
     log.debug('get_tracker_seeds is returning: %s' % data.values()[0]['complete'])
     return data.values()[0]['complete']

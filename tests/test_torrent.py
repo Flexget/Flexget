@@ -1,7 +1,9 @@
 import os
 
+from nose.plugins.attrib import attr
 from tests import FlexGetBase, with_filecopy
 from flexget.utils.bittorrent import Torrent
+from .util import date_aged
 
 
 class TestInfoHash(FlexGetBase):
@@ -229,3 +231,45 @@ class TestTorrentScrub(FlexGetBase):
             msize = os.path.getsize(self.__tmp__ + filename)
             assert osize == msize, "Filesizes aren't supposed to differ (%r %d, %r %d)!" % (
                 filename, osize, self.__tmp__ + filename, msize)
+
+
+class TestTorrentAlive(FlexGetBase):
+    __yaml__ = """
+        presets:
+          global:
+            accept_all: yes
+        feeds:
+          test_torrent_alive_fail:
+            mock:
+              - {title: 'test', file: 'test_torrent_alive.torrent', url: fake}
+            torrent_alive: 100000
+          test_torrent_alive_pass:
+            mock:
+              - {title: 'test', file: 'test_torrent_alive.torrent', url: fake}
+            torrent_alive: 0
+    """
+
+    @attr(online=True)
+    @with_filecopy('test.torrent', 'test_torrent_alive.torrent')
+    def test_torrent_alive_fail(self):
+        self.execute_feed('test_torrent_alive_fail')
+        assert not self.feed.accepted, 'Torrent should not have met seed requirement.'
+        assert self.feed._rerun_count == 1, 'Feed should have been rerun 1 time.'
+
+        # Run it again to make sure remember_rejected prevents a rerun from occurring
+        self.execute_feed('test_torrent_alive_fail')
+        assert not self.feed.accepted, 'Torrent should have been rejected by remember_rejected.'
+        assert self.feed._rerun_count == 0, 'Feed should not have been rerun.'
+
+        # Run it again after rejection expires to make sure remember_rejected lets us retry.
+        with date_aged('1 hour'):
+            self.execute_feed('test_torrent_alive_fail')
+            assert not self.feed.accepted, 'Torrent should not have met seed requirement.'
+            assert self.feed._rerun_count == 1, 'Feed should have been rerun 1 time.'
+
+    @attr(online=True)
+    @with_filecopy('test.torrent', 'test_torrent_alive.torrent')
+    def test_torrent_alive_pass(self):
+        self.execute_feed('test_torrent_alive_pass')
+        assert self.feed.accepted
+        assert self.feed._rerun_count == 0, 'Torrent should have been accepted without rerun.'

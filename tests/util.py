@@ -7,6 +7,8 @@ import os
 import shutil
 import errno
 import logging
+import time
+from flexget.utils.tools import parse_timedelta
 
 log = logging.getLogger('tests.util')
 
@@ -81,3 +83,19 @@ def maketemp(name=None):
             raise
     os.mkdir(tmp)
     return tmp
+
+
+class date_aged(object):
+    """Context manager which hacks time.time and datetime.now builtins to have a simulated offset."""
+
+    def __init__(self, offset):
+        self.offset = parse_timedelta(offset)
+        self.real_time = time.time
+
+    def __enter__(self):
+        log.debug('Offsetting current time by %r.' % self.offset)
+        time.time = lambda: self.real_time() + self.offset.seconds + self.offset.days * 3600 * 24
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        log.debug('Resetting current time to now.')
+        time.time = self.real_time
