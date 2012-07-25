@@ -21,7 +21,7 @@ def str_to_int(string):
     try:
         return int(string.replace(',', ''))
     except ValueError:
-        None
+        return None
 
 
 def convert_bytes(bytes):

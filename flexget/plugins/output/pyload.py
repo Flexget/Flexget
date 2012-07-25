@@ -114,7 +114,7 @@ class PluginPyLoad(object):
             for name in hoster:
                 if name in parsed:
                     urls.extend(parsed[name])
-                    if not config.get('multihoster', self.DEFAULT_MULTIPLE_HOSTER):
+                    if not config.get('multiple_hoster', self.DEFAULT_MULTIPLE_HOSTER):
                         break
 
             # no preferred hoster, add all recognized plugins
