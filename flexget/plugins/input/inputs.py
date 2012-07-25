@@ -37,7 +37,11 @@ class PluginInputs(object):
                     log.warning('Error during input plugin %s: %s' % (input_name, e))
                     continue
                 if not result:
-                    log.warning('Input %s did not return anything' % input_name)
+                    msg = 'Input %s did not return anything' % input_name
+                    if feed.no_entries_ok:
+                        log.verbose(msg)
+                    else:
+                        log.warning(msg)
                     continue
                 for entry in result:
                     if entry['title'] in entry_titles:
