@@ -9,11 +9,11 @@ log = logging.getLogger('listdir')
 
 class Listdir(plugin.Plugin):
     """
-        Uses local path content as an input.
+    Uses local path content as an input.
 
-        Example:
+    Example::
 
-        listdir: /storage/movies/
+      listdir: /storage/movies/
     """
 
     def validator(self):

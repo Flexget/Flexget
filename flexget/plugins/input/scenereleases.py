@@ -11,11 +11,11 @@ log = logging.getLogger('scenereleases')
 
 class InputScenereleases:
     """
-        Uses scenereleases.info category url as input.
+    Uses scenereleases.info category url as input.
 
-        Example:
+    Example::
 
-        scenereleases: http://scenereleases.info/category/movies/movies-dvd-rip
+      scenereleases: http://scenereleases.info/category/movies/movies-dvd-rip
     """
 
     def validator(self):

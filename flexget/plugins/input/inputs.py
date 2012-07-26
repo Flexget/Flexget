@@ -5,9 +5,11 @@ log = logging.getLogger('inputs')
 
 
 class PluginInputs(object):
-    """ Allows the same input plugin to be configured multiple times in a feed.
+    """
+    Allows the same input plugin to be configured multiple times in a feed.
 
-    Example:
+    Example::
+
       inputs:
         - rss: http://feeda.com
         - rss: http://feedb.com

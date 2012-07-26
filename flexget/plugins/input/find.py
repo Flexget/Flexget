@@ -11,23 +11,23 @@ log = logging.getLogger('find')
 
 class InputFind(object):
     """
-        Uses local path content as an input, recurses through directories and creates entries for files that match mask.
+    Uses local path content as an input, recurses through directories and creates entries for files that match mask.
 
-        You can specify either the mask key, in shell file matching format, (see python fnmatch module,) or regexp key.
+    You can specify either the mask key, in shell file matching format, (see python fnmatch module,) or regexp key.
 
-        Example:
+    Example::
 
-        find:
-          path: /storage/movies/
-          mask: *.avi
+      find:
+        path: /storage/movies/
+        mask: *.avi
 
-        Example:
+    Example::
 
-        find:
-          path:
-            - /storage/movies/
-            - /storage/tv/
-          regexp: .*\.(avi|mkv)$
+      find:
+        path:
+          - /storage/movies/
+          - /storage/tv/
+        regexp: .*\.(avi|mkv)$
     """
 
     def validator(self):

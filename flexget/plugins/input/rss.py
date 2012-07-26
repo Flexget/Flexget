@@ -17,66 +17,66 @@ log = logging.getLogger('rss')
 
 class InputRSS(object):
     """
-        Parses RSS feed.
+    Parses RSS feed.
 
-        Hazzlefree configuration for public rss feeds:
+    Hazzlefree configuration for public rss feeds::
 
-        rss: <url>
+      rss: <url>
 
-        Configuration with basic http authentication:
+    Configuration with basic http authentication::
 
-        rss:
-          url: <url>
-          username: <name>
-          password: <password>
+      rss:
+        url: <url>
+        username: <name>
+        password: <password>
 
-        Advanced usages:
+    Advanced usages:
 
-        You may wish to clean up the entry by stripping out all non-ascii characters.
-        This can be done by setting ascii value to yes.
+    You may wish to clean up the entry by stripping out all non-ascii characters.
+    This can be done by setting ascii value to yes.
 
-        Example:
+    Example::
 
-        rss:
-          url: <url>
-          ascii: yes
+      rss:
+        url: <url>
+        ascii: yes
 
-        In case RSS-feed uses some nonstandard field for urls and automatic detection fails
-        you can configure plugin to use url from any feedparser entry attribute.
+    In case RSS-feed uses some nonstandard field for urls and automatic detection fails
+    you can configure plugin to use url from any feedparser entry attribute.
 
-        Example:
+    Example::
 
-        rss:
-          url: <url>
-          link: guid
+      rss:
+        url: <url>
+        link: guid
 
-        If you want to keep information in another rss field attached to the flexget entry, you can use the other_fields option.
+    If you want to keep information in another rss field attached to the flexget entry, you can use the other_fields option.
 
-        Example:
+    Example::
 
-        rss:
-          url: <url>
-          other_fields: [date]
+      rss:
+        url: <url>
+        other_fields: [date]
 
-        You can disable few possibly annoying warnings by setting silent value to
-        yes on feeds where there are frequently invalid items.
+    You can disable few possibly annoying warnings by setting silent value to
+    yes on feeds where there are frequently invalid items.
 
-        Example:
+    Example::
 
-        rss:
-          url: <url>
-          silent: yes
+      rss:
+        url: <url>
+        silent: yes
 
-        You can group all the links of an item, to make the download plugin tolerant
-        to broken urls: it will try to download each url until one works.
-        Links are enclosures plus item fields given by the link value, in that order.
-        The value to set is "group_links".
+    You can group all the links of an item, to make the download plugin tolerant
+    to broken urls: it will try to download each url until one works.
+    Links are enclosures plus item fields given by the link value, in that order.
+    The value to set is "group_links".
 
-        Example:
+    Example::
 
-        rss:
-          url: <url>
-          group_links: yes
+      rss:
+        url: <url>
+        group_links: yes
     """
 
     def validator(self):

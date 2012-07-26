@@ -56,14 +56,15 @@ class ThetvdbFavorites(Base):
 
 
 class InputThetvdbFavorites(object):
-    """Creates a list of entries for your series marked as favorites at thetvdb.com for use in import_series.
+    """
+    Creates a list of entries for your series marked as favorites at thetvdb.com for use in import_series.
 
-    Example:
+    Example::
 
-    import_series:
-      from:
-        thetvdb_favorites:
-          account_id: 23098230
+      import_series:
+        from:
+          thetvdb_favorites:
+            account_id: 23098230
     """
 
     def validator(self):

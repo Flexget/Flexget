@@ -56,9 +56,9 @@ class InputBacklog(object):
     """
     Keeps feed history for given amount of time.
 
-    Example:
+    Example::
 
-    backlog: 4 days
+      backlog: 4 days
 
     Rarely useful for end users, mainly used by other plugins.
     """

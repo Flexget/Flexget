@@ -42,11 +42,13 @@ class InputTail(object):
     """
     Parse any text for entries using regular expression.
 
-    file: <file>
-    entry:
-      <field>: <regexp to match value>
-    format:
-      <field>: <python string formatting>
+    ::
+
+      file: <file>
+      entry:
+        <field>: <regexp to match value>
+      format:
+        <field>: <python string formatting>
 
     Note: each entry must have atleast two fields, title and url
 
@@ -54,14 +56,14 @@ class InputTail(object):
     decoded. List of encodings
     at http://docs.python.org/library/codecs.html#standard-encodings.
 
-    Example:
+    Example::
 
-    tail:
-      file: ~/irclogs/some/log
-      entry:
-        title: 'TITLE: (.*) URL:'
-        url: 'URL: (.*)'
-      encoding: utf8
+      tail:
+        file: ~/irclogs/some/log
+        entry:
+          title: 'TITLE: (.*) URL:'
+          url: 'URL: (.*)'
+        encoding: utf8
     """
 
     def validator(self):

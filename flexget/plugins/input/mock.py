@@ -9,13 +9,15 @@ log = logging.getLogger('mock')
 # Mainly used in unit tests, but can be useful for users too (i.e. not "debug")
 class Mock(plugin.Plugin):
     """
-        Allows adding mock input entries. Example:
+    Allows adding mock input entries.
 
-        mock:
-          - {title: foobar, url: http://some.com }
-          - {title: mock, url: http://another.com }
+    Example::
 
-        If url is not given a random url pointing to localhost will be generated.
+      mock:
+        - {title: foobar, url: http://some.com }
+        - {title: mock, url: http://another.com }
+
+    If url is not given a random url pointing to localhost will be generated.
     """
 
     def validator(self):

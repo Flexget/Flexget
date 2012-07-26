@@ -8,15 +8,16 @@ log = logging.getLogger('discover')
 
 
 class Discover(object):
-    """ Discover content based on other inputs material.
+    """
+    Discover content based on other inputs material.
 
-    Example:
+    Example::
 
-    discover:
-      what:
-        - emit_series: yes
-      from:
-        - piratebay
+      discover:
+        what:
+          - emit_series: yes
+        from:
+          - piratebay
     """
 
     def validator(self):
