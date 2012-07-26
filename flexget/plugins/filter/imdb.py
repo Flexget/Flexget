@@ -7,59 +7,59 @@ log = logging.getLogger('imdb')
 
 class FilterImdb(object):
     """
-        This plugin allows filtering based on IMDB score, votes and genres etc.
+    This plugin allows filtering based on IMDB score, votes and genres etc.
 
-        Configuration:
+    Note: All parameters are optional. Some are mutually exclusive.
 
-        Note: All parameters are optional. Some are mutually exclusive.
+    Configuration::
 
-        min_score: <num>
-        min_votes: <num>
-        min_year: <num>
-        max_year: <num>
+      min_score: <num>
+      min_votes: <num>
+      min_year: <num>
+      max_year: <num>
 
-        # reject if genre contains any of these
-        reject_genres:
-          - genre1
-          - genre2
+      # reject if genre contains any of these
+      reject_genres:
+        - genre1
+        - genre2
 
-        # reject if language contain any of these
-        reject_languages:
-          - language1
+      # reject if language contain any of these
+      reject_languages:
+        - language1
 
-        # accept only these primary languages
-        accept_languages:
-          - language1
+      # accept only these primary languages
+      accept_languages:
+        - language1
 
-        # accept movies with any of these actors
-        accept_actors:
-          - nm0004695
-          - nm0004754
+      # accept movies with any of these actors
+      accept_actors:
+        - nm0004695
+        - nm0004754
 
-        # reject movie if it has any of these actors
-        reject_actors:
-          - nm0001191
-          - nm0002071
+      # reject movie if it has any of these actors
+      reject_actors:
+        - nm0001191
+        - nm0002071
 
-        # accept all movies by these directors
-        accept_directors:
-          - nm0000318
+      # accept all movies by these directors
+      accept_directors:
+        - nm0000318
 
-        # reject movies by these directors
-        reject_directors:
-          - nm0093051
+      # reject movies by these directors
+      reject_directors:
+        - nm0093051
 
-        # reject movies/TV shows with any of these ratings
-        reject_mpaa_ratings:
-          - PG_13
-          - R
-          - X
+      # reject movies/TV shows with any of these ratings
+      reject_mpaa_ratings:
+        - PG_13
+        - R
+        - X
 
-        # accept movies/TV shows with only these ratings
-        accept_mpaa_ratings:
-          - PG
-          - G
-          - TV_Y
+      # accept movies/TV shows with only these ratings
+      accept_mpaa_ratings:
+        - PG
+        - G
+        - TV_Y
     """
 
     def validator(self):
