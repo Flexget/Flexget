@@ -6,11 +6,11 @@ log = logging.getLogger('require_field')
 
 class FilterRequireField(object):
     """
-        Rejects entries without imdb url.
+    Rejects entries without imdb url.
 
-        Example:
+    Example::
 
-        require_field: imdb_url
+      require_field: imdb_url
     """
 
     def validator(self):

@@ -10,9 +10,9 @@ class FilterExists(object):
     """
         Reject entries that already exist in given path.
 
-        Example:
+        Example::
 
-        exists: /storage/movies/
+          exists: /storage/movies/
     """
 
     def validator(self):

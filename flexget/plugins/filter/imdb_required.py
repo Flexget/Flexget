@@ -9,9 +9,9 @@ class FilterImdbRequired(object):
     Rejects entries without imdb_url or imdb_id.
     Makes imdb lookup / search if necessary.
 
-    Example:
+    Example::
 
-    imdb_required: yes
+      imdb_required: yes
     """
 
     def validator(self):

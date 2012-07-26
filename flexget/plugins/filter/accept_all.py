@@ -8,9 +8,9 @@ class FilterAcceptAll(object):
     """
         Just accepts all entries.
 
-        Example:
+        Example::
 
-        accept_all: true
+          accept_all: true
     """
 
     def validator(self):

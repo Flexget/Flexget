@@ -8,17 +8,17 @@ log = logging.getLogger('preset')
 
 class PluginPreset(object):
     """
-        Use presets.
+    Use presets.
 
-        Example:
+    Example::
 
-        preset: movies
+      preset: movies
 
-        Example, list of presets:
+    Example, list of presets::
 
-        preset:
-          - movies
-          - imdb
+      preset:
+        - movies
+        - imdb
     """
 
     def __init__(self):

@@ -9,11 +9,11 @@ log = logging.getLogger('exists_series')
 
 class FilterExistsSeries(object):
     """
-        Intelligent series aware exists rejecting.
+    Intelligent series aware exists rejecting.
 
-        Example:
+    Example::
 
-        exists_series: /storage/series/
+      exists_series: /storage/series/
     """
 
     def validator(self):

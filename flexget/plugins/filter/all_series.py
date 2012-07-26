@@ -8,13 +8,15 @@ class FilterAllSeries(FilterSeriesBase):
 
     This plugin just configures the series plugin dynamically with all series from the feed.
     It can take any of the options of the series plugin.
-    Example:
-    all_series: yes
 
-    all_series:
-      min_quality: hdtv
-      max_quality: 720p
-      propers: no
+    Example::
+      all_series: yes
+
+    ::
+      all_series:
+        min_quality: hdtv
+        max_quality: 720p
+        propers: no
     """
 
     def validator(self):

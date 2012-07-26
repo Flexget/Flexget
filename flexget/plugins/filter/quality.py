@@ -7,12 +7,12 @@ log = logging.getLogger('quality')
 
 class FilterQuality(object):
     """
-        Rejects all entries that don't have one of the specified qualities
+    Rejects all entries that don't have one of the specified qualities
 
-        Example:
+    Example::
 
-        quality:
-          - hdtv
+      quality:
+        - hdtv
     """
 
     def validator(self):

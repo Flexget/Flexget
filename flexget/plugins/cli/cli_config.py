@@ -7,21 +7,21 @@ log = logging.getLogger('cli_config')
 class CliConfig(object):
 
     """
-        Allows specifying yml configuration values from commandline parameters.
+    Allows specifying yml configuration values from commandline parameters.
 
-        Yml variables are prefixed with dollar sign ($).
-        Commandline parameter must be comma separated list of variable=values.
+    Yml variables are prefixed with dollar sign ($).
+    Commandline parameter must be comma separated list of variable=values.
 
-        Configuration example:
+    Configuration example::
 
-        feeds:
-          my feed:
-            rss: $url
-            download: $path
+      feeds:
+        my feed:
+          rss: $url
+          download: $path
 
-        Commandline example:
+    Commandline example::
 
-        --cli-config "url=http://some.url/, path=~/downloads"
+      --cli-config "url=http://some.url/, path=~/downloads"
 
     """
 

@@ -8,9 +8,9 @@ class PluginInclude(object):
     """
     Include configuration from another yaml file.
 
-    Example:
+    Example::
 
-    include: series.yml
+      include: series.yml
 
     File content must be valid for a feed configuration
     """

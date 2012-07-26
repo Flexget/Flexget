@@ -51,9 +51,9 @@ class FilterDelay(object):
 
         Format: n [minutes|hours|days|weeks]
 
-        Example:
+        Example::
 
-        delay: 2 hours
+          delay: 2 hours
     """
 
     def validator(self):

@@ -8,14 +8,14 @@ log = logging.getLogger('cookies')
 
 class PluginCookies:
     """
-        Adds cookie to all requests (rss, resolvers, download). Anything
-        that uses urllib2 to be exact.
+    Adds cookie to all requests (rss, resolvers, download). Anything
+    that uses urllib2 to be exact.
 
-        Currently supports Firefox 3 cookies only.
+    Currently supports Firefox 3 cookies only.
 
-        Example:
+    Example::
 
-        cookies: /path/firefox/profile/something/cookies.sqlite
+      cookies: /path/firefox/profile/something/cookies.sqlite
     """
 
     def validator(self):

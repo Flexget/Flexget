@@ -9,11 +9,11 @@ log = logging.getLogger('exists_movie')
 class FilterExistsMovie(object):
 
     """
-        Reject existing movies.
+    Reject existing movies.
 
-        Example:
+    Example::
 
-        exists_movie: /storage/movies/
+      exists_movie: /storage/movies/
     """
 
     skip = ['cd1', 'cd2', 'subs', 'sample']

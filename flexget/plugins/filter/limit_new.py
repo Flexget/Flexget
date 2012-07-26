@@ -6,17 +6,17 @@ log = logging.getLogger('limit_new')
 
 class FilterLimitNew(object):
     """
-        Limit number of new items.
+    Limit number of new items.
 
-        Example:
+    Example::
 
-        limit_new: 1
+      limit_new: 1
 
-        This would allow only one new item to pass trough per execution.
-        Useful for passing torrents slowly into download.
+    This would allow only one new item to pass trough per execution.
+    Useful for passing torrents slowly into download.
 
-        Note that since this is per execution, actual rate depends how often
-        FlexGet is executed.
+    Note that since this is per execution, actual rate depends how often
+    FlexGet is executed.
     """
 
     def __init__(self):

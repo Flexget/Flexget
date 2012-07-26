@@ -75,7 +75,7 @@ class FilterRememberRejected(object):
 
     This is enabled when item is rejected with remember=True flag.
 
-    Example:
+    Example::
         feed.reject(entry, 'message', remember=True)
     """
 

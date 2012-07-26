@@ -31,21 +31,19 @@ class ImdbRated(Base):
 
 class FilterImdbRated(object):
     """
-        Reject already voted entries based on user imdb vote history.
+    Reject already voted entries based on user imdb vote history.
 
-        Example:
+    Example::
 
-        imdb_rated: http://www.imdb.com/mymovies/list?l=<YOUR USER ID>
+      imdb_rated: http://www.imdb.com/mymovies/list?l=<YOUR USER ID>
 
-        Reverse, reject unvoted:
+    Reverse, reject unvoted::
 
-        Example:
+      imdb_rated:
+        url: http://www.imdb.com/mymovies/list?l=<YOUR USER ID>
+        reverse: yes
 
-        imdb_rated:
-          url: http://www.imdb.com/mymovies/list?l=<YOUR USER ID>
-          reverse: yes
-
-        Note: in theory this should work with any other page containing imdb urls.
+    Note: in theory this should work with any other page containing imdb urls.
     """
 
     def validator(self):

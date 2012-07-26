@@ -7,22 +7,22 @@ log = logging.getLogger('sort_by')
 class PluginSortBy:
 
     """
-        Sort feed entries based on a field
+    Sort feed entries based on a field
 
-        Example:
+    Example::
 
-        sort_by: title
+      sort_by: title
 
-        More complex:
+    More complex::
 
-        sort_by:
-          field: imdb_score
-          reverse: yes
+      sort_by:
+        field: imdb_score
+        reverse: yes
 
-        Reverse the order of the entries, without sorting on a field:
+    Reverse the order of the entries, without sorting on a field::
 
-        sort_by:
-            reverse: yes
+      sort_by:
+        reverse: yes
     """
 
     def validator(self):
