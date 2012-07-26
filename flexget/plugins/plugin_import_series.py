@@ -9,22 +9,22 @@ class ImportSeries(FilterSeriesBase):
 
     """Generates series configuration from any input (supporting API version 2, soon all)
 
-    Configuration:
+    Configuration::
 
-    import_series:
-      [settings]:
-         # same configuration as series plugin
-      from:
-        [input plugin]: <configuration>
+      import_series:
+        [settings]:
+           # same configuration as series plugin
+        from:
+          [input plugin]: <configuration>
 
-    Example:
+    Example::
 
-    import_series:
-      settings:
-        quality: 720p
-      from:
-        listdir:
-          - /media/series
+      import_series:
+        settings:
+          quality: 720p
+        from:
+          listdir:
+            - /media/series
     """
 
     def validator(self):

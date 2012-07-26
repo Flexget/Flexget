@@ -14,10 +14,10 @@ class UrlRewriteDemonoid:
     """
     UrlRewriter and Search functionality for demonoid.
 
-    Will accept:
+    Will accept::
       demonoid: <category>
 
-    Or:
+    .. Or::
       demonoid:
         - category: <category>
         - quality: <quality>
@@ -66,7 +66,7 @@ class UrlRewriteDemonoid:
         #TODO: check if urls are ever passed and if is wanted behaviour.
         #did: removed the url function & replaced it with category specification.
 
-        #TODO: check wether we should support quality selection for movies/tv
+        #TODO: check whether we should support quality selection for movies/tv
         comparator.set_seq1(query)
         name = comparator.search_string()
         optiondict = ({'all': 0, 'applications': 5, 'audio books': 17, 'books': 11, 'comics': 10, 'games': 4,

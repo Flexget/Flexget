@@ -156,9 +156,9 @@ class PluginTransmissionInput(TransmissionBase):
 
 class PluginTransmission(TransmissionBase):
     """
-      Add url from entry url to transmission
+    Add url from entry url to transmission
 
-      Example:
+    Example::
 
       transmission:
         host: localhost
@@ -169,9 +169,9 @@ class PluginTransmission(TransmissionBase):
         path: the download location
         removewhendone: yes
 
-    Default values for the config elements:
+    Default values for the config elements::
 
-    transmission:
+      transmission:
         host: localhost
         port: 9091
         enabled: yes

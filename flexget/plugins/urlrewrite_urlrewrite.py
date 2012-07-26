@@ -7,14 +7,14 @@ log = logging.getLogger('urlrewrite')
 
 class UrlRewrite(object):
     """
-        Generic configurable urlrewriter.
+    Generic configurable urlrewriter.
 
-        Example:
+    Example::
 
-        urlrewrite:
-          demonoid:
-            regexp: http://www\.demonoid\.com/files/details/
-            format: http://www.demonoid.com/files/download/HTTP/
+      urlrewrite:
+        demonoid:
+          regexp: http://www\.demonoid\.com/files/details/
+          format: http://www.demonoid.com/files/download/HTTP/
     """
 
     resolves = {}

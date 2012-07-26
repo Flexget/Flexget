@@ -30,13 +30,13 @@ class PluginSearch(object):
     there is no other way to get working download url, ie. when input plugin does not provide
     any downloadable urls.
 
-    Example:
+    Example::
 
       urlrewrite_search:
         - newtorrents
         - piratebay
 
-    .. note:: Some url rewriters will use search plugins automatically if enry url
+    .. note:: Some url rewriters will use search plugins automatically if entry url
               points into a search page.
     """
 
