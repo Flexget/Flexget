@@ -103,22 +103,22 @@ class DisablePlugin(object):
 
     Example::
 
-        presets:
-          movies:
-            download: ~/torrents/movies/
+      presets:
+        movies:
+          download: ~/torrents/movies/
+          .
+          .
+
+      feeds:
+        nzbs:
+          preset: movies
+          disable_plugin:
+            - download
+          sabnzbd:
             .
             .
 
-        feeds:
-          nzbs:
-            preset: movies
-            disable_plugin:
-              - download
-            sabnzbd:
-              .
-              .
-
-        Feed nzbs uses all other configuration from preset movies but removes the download plugin
+      #Feed nzbs uses all other configuration from preset movies but removes the download plugin
     """
 
     def validator(self):
