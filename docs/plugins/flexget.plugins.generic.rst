@@ -9,6 +9,14 @@ generic Package
     :undoc-members:
     :show-inheritance:
 
+:mod:`archive` Module
+----------------------------
+
+.. automodule:: flexget.plugins.generic.archive
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 :mod:`cron_env` Module
 ----------------------
 

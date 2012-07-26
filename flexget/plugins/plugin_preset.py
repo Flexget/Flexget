@@ -101,7 +101,7 @@ class DisablePlugin(object):
     """
     Allows disabling plugins when using presets.
 
-    Example:
+    Example::
 
         presets:
           movies:

@@ -25,14 +25,6 @@ plugins Package
     :undoc-members:
     :show-inheritance:
 
-:mod:`plugin_archive` Module
-----------------------------
-
-.. automodule:: flexget.plugins.plugin_archive
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 :mod:`plugin_change_warn` Module
 --------------------------------
 

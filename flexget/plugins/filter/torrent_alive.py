@@ -32,7 +32,7 @@ def max_seeds_from_threads(threads):
     """
     Joins the threads and returns the maximum seeds found from any of them.
 
-    :param threads: A list of started `TorrentAliveThread`s
+    :param threads: A list of started `TorrentAliveThread`
     :return: Maximum seeds found from any of the threads
     """
     seeds = 0

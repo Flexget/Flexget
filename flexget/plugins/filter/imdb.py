@@ -20,46 +20,46 @@ class FilterImdb(object):
 
         # reject if genre contains any of these
         reject_genres:
-            - genre1
-            - genre2
+          - genre1
+          - genre2
 
         # reject if language contain any of these
         reject_languages:
-            - language1
+          - language1
 
         # accept only these primary languages
         accept_languages:
-            - language1
+          - language1
 
         # accept movies with any of these actors
         accept_actors:
-            - nm0004695
-            - nm0004754
+          - nm0004695
+          - nm0004754
 
         # reject movie if it has any of these actors
         reject_actors:
-            - nm0001191
-            - nm0002071
+          - nm0001191
+          - nm0002071
 
         # accept all movies by these directors
         accept_directors:
-            - nm0000318
+          - nm0000318
 
         # reject movies by these directors
         reject_directors:
-            - nm0093051
+          - nm0093051
 
         # reject movies/TV shows with any of these ratings
         reject_mpaa_ratings:
-            - PG_13
-            - R
-            - X
+          - PG_13
+          - R
+          - X
 
         # accept movies/TV shows with only these ratings
         accept_mpaa_ratings:
-            - PG
-            - G
-            - TV_Y
+          - PG
+          - G
+          - TV_Y
     """
 
     def validator(self):
@@ -89,7 +89,7 @@ class FilterImdb(object):
 
         # since the plugin does not reject anything, no sense going trough accepted
         for entry in feed.undecided:
-                
+
             force_accept = False
 
             try:

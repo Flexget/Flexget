@@ -177,7 +177,7 @@ filter Package
     :undoc-members:
     :show-inheritance:
 
-:mod:`reject_failed` Module
+:mod:`retry_failed` Module
 ---------------------------
 
 .. automodule:: flexget.plugins.filter.reject_failed
