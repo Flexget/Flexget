@@ -17,12 +17,6 @@ class UrlRewriteDemonoid:
     Will accept::
       demonoid: <category>
 
-    .. Or::
-      demonoid:
-        - category: <category>
-        - quality: <quality>
-        - sub-category: <category>
-
     Categories:
 
     * all
@@ -45,10 +39,6 @@ class UrlRewriteDemonoid:
         root = validator.factory('choice')
         root.accept_choices(['all', 'applications', 'audio books', 'tv', 'games', 'books', 'comics', 'anime', 'misc',
                              'movies', 'music', 'music videos', 'pictures'])
-        #root = validator.factory()
-        #root.accept('url')
-        #advanced = root.accept('dict')
-        #advanced.accept('url', key='url')
         return root
 
     def url_rewritable(self, feed, entry):
@@ -60,12 +50,6 @@ class UrlRewriteDemonoid:
     # search API
     @internet(log)
     def search(self, query, comparator, config):
-        """
-        """
-
-        #TODO: check if urls are ever passed and if is wanted behaviour.
-        #did: removed the url function & replaced it with category specification.
-
         #TODO: check whether we should support quality selection for movies/tv
         comparator.set_seq1(query)
         name = comparator.search_string()

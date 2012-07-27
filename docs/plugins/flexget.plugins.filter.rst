@@ -180,7 +180,7 @@ filter Package
 :mod:`retry_failed` Module
 ---------------------------
 
-.. automodule:: flexget.plugins.filter.reject_failed
+.. automodule:: flexget.plugins.filter.retry_failed
     :members:
     :undoc-members:
     :show-inheritance:
