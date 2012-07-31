@@ -573,8 +573,16 @@ class TestPropers(FlexGetBase):
               - title: test s01e01 Fastsub hdtv
 
           fastsub_proper_2:
-            mock:
+               mock:
+                 - title: test s01e01 Fastsub repack hdtv
+
+          fastsub_proper_3:
+             mock:
               - title: test s01e01 hdtv
+
+          fastsub_proper_4:
+            mock:
+               - title: test s01e01 proper hdtv
         """
 
     def test_propers_timeframe(self):
@@ -666,6 +674,10 @@ class TestPropers(FlexGetBase):
         self.execute_feed('fastsub_proper_1')
         assert self.feed.accepted, 'ep should have accepted'
         self.execute_feed('fastsub_proper_2')
+        assert self.feed.accepted, 'proper ep should have been accepted'
+        self.execute_feed('fastsub_proper_3')
+        assert self.feed.accepted, 'proper ep should have been accepted'
+        self.execute_feed('fastsub_proper_4')
         assert self.feed.accepted, 'proper ep should have been accepted'
 
 

@@ -249,7 +249,9 @@ class SeriesParser(TitleParser):
                 self.proper_count += 1
                 data_parts.remove(part)
             elif part == 'fastsub':
-                self.proper_count = -1
+                # Subtract 5 to leave room for fastsub propers before the normal release
+                self.proper_count -= 5
+                data_parts.remove(part)
             elif part in self.specials:
                 self.special = True
                 data_parts.remove(part)
