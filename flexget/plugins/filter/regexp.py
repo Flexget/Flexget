@@ -149,7 +149,7 @@ class FilterRegexp(object):
         :return:
         """
         unquote = ['url']
-        for field in find_from or entry:
+        for field in find_from or ['title', 'description']:
             # Only evaluate lazy fields if find_from has been explicitly specified
             if not entry.get(field, eval_lazy=find_from):
                 continue
