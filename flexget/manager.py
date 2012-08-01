@@ -212,6 +212,9 @@ class Manager(object):
 
         :param string config: Path to configuration file
         """
+        if not self.options.quiet:
+            # pre-check only when running without --cron
+            self.pre_check_config(config)
         try:
             self.config = yaml.safe_load(file(config)) or {}
         except Exception, e:
@@ -247,9 +250,6 @@ class Manager(object):
                     print ' Fault is almost always in this or previous line\n'
                 if lines == 2:
                     print ' Fault is almost always in one of these lines or previous ones\n'
-            if not self.options.quiet:
-                # pre-check only when running without --cron
-                self.pre_check_config(config)
 
             # When --debug escalate to full stacktrace
             if self.options.debug:
