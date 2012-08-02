@@ -17,10 +17,11 @@ def pathscrub(dirty_path, os=None):
     Strips illegal characters for a given os from a path.
 
     :param dirty_path: Path to be scrubbed.
-    :param os_mode: Defines which os mode should be used, can be 'windows', 'mac', 'linux', or None to auto-detect
+    :param os: Defines which os mode should be used, can be 'windows', 'mac', 'linux', or None to auto-detect
     :return: A valid path.
     """
 
+    # See if global os_mode has been defined by pathscrub plugin
     if os_mode and not os:
         os = os_mode
 
