@@ -96,6 +96,7 @@ def upgrade(plugin):
                     log.info('Plugin `%s` schema upgraded successfully' % plugin)
                     set_version(plugin, new_ver)
                     session.commit()
+                    manager.db_upgraded = True
                 elif new_ver < ver:
                     log.critical('A lower schema version was returned (%s) from the %s upgrade function '
                                  'than passed in (%s)' % (new_ver, plugin, ver))

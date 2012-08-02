@@ -98,6 +98,7 @@ class Manager(object):
         self.engine = None
         self.lockfile = None
         self.database_uri = None
+        self.db_upgraded = False
 
         self.config = {}
         self.feeds = {}
@@ -113,6 +114,8 @@ class Manager(object):
         log.debug('os.path.supports_unicode_filenames: %s' % os.path.supports_unicode_filenames)
 
         fire_event('manager.upgrade', self)
+        if manager.db_upgraded:
+            fire_event('manager.db_upgraded', self)
         fire_event('manager.startup', self)
         self.db_cleanup()
 
