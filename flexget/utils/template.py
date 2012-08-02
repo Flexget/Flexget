@@ -46,7 +46,7 @@ def filter_pathdir(val):
 
 def filter_pathscrub(val, os_mode=None):
     """Replace problematic characters in a path."""
-    return pathscrub(val, os_mode=os_mode)
+    return pathscrub(val, os_mode)
 
 
 def filter_re_replace(val, pattern, repl):

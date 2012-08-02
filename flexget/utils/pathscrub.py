@@ -12,7 +12,7 @@ replace_maps = {
     'linux': {}} # No replacements on linux
 
 
-def pathscrub(dirty_path, os_mode=os_mode):
+def pathscrub(dirty_path, os=None):
     """
     Strips illegal characters for a given os from a path.
 
@@ -21,7 +21,10 @@ def pathscrub(dirty_path, os_mode=os_mode):
     :return: A valid path.
     """
 
-    if os_mode:
+    if os_mode and not os:
+        os = os_mode
+
+    if os:
         # If os is defined, use replacements for that os
         replace_map = replace_maps[os_mode]
     else:
