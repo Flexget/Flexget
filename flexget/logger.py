@@ -12,11 +12,11 @@ VERBOSE = 15
 
 
 class FlexGetLogger(logging.Logger):
-    """Custom logger that adds feed and execution info to log records."""
+    """Custom logger that adds task and execution info to log records."""
     local = threading.local()
 
     def makeRecord(self, name, level, fn, lno, msg, args, exc_info, func=None, extra=None):
-        extra = {'feed': getattr(FlexGetLogger.local, 'feed', u''),
+        extra = {'task': getattr(FlexGetLogger.local, 'task', u''),
                  'execution': getattr(FlexGetLogger.local, 'execution', '')}
         return logging.Logger.makeRecord(self, name, level, fn, lno, msg, args, exc_info, func, extra)
 
@@ -35,13 +35,13 @@ class FlexGetLogger(logging.Logger):
 class FlexGetFormatter(logging.Formatter):
     """Custom formatter that can handle both regular log records and those created by FlexGetLogger"""
     plain_fmt = '%(asctime)-15s %(levelname)-8s %(name)-29s %(message)s'
-    flexget_fmt = '%(asctime)-15s %(levelname)-8s %(name)-13s %(feed)-15s %(message)s'
+    flexget_fmt = '%(asctime)-15s %(levelname)-8s %(name)-13s %(task)-15s %(message)s'
 
     def __init__(self):
         logging.Formatter.__init__(self, self.plain_fmt, '%Y-%m-%d %H:%M')
 
     def format(self, record):
-        if hasattr(record, 'feed'):
+        if hasattr(record, 'task'):
             self._fmt = self.flexget_fmt
         else:
             self._fmt = self.plain_fmt
@@ -67,8 +67,8 @@ def set_execution(execution):
     FlexGetLogger.local.execution = execution
 
 
-def set_feed(feed):
-    FlexGetLogger.local.feed = feed
+def set_task(task):
+    FlexGetLogger.local.task = task
 
 
 class PrivacyFilter(logging.Filter):

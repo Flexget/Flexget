@@ -11,26 +11,26 @@ log = logging.getLogger('tail')
 class ResetTail(object):
     """Adds --tail-reset"""
 
-    def on_process_start(self, feed):
-        if not feed.manager.options.tail_reset:
+    def on_process_start(self, task):
+        if not task.manager.options.tail_reset:
             return
 
-        feed.manager.disable_feeds()
+        task.manager.disable_tasks()
 
         from flexget.utils.simple_persistence import SimpleKeyValue
         from flexget.manager import Session
 
         session = Session()
         try:
-            poses = session.query(SimpleKeyValue).filter(SimpleKeyValue.key == feed.manager.options.tail_reset).all()
+            poses = session.query(SimpleKeyValue).filter(SimpleKeyValue.key == task.manager.options.tail_reset).all()
             if not poses:
-                print 'No position stored for file %s' % feed.manager.options.tail_reset
+                print 'No position stored for file %s' % task.manager.options.tail_reset
                 print 'Note that file must give in same format as in config, ie. ~/logs/log can not be given as /home/user/logs/log'
             for pos in poses:
                 if pos.value == 0:
-                    print 'Feed %s tail position is already zero' % pos.feed
+                    print 'Task %s tail position is already zero' % pos.task
                 else:
-                    print 'Feed %s tail position (%s) reseted to zero' % (pos.feed, pos.value)
+                    print 'Task %s tail position (%s) reseted to zero' % (pos.task, pos.value)
                     pos.value = 0
             session.commit()
         finally:
@@ -84,16 +84,16 @@ class InputTail(object):
             entry[k] = v % entry
 
     @cached('tail')
-    def on_feed_input(self, feed):
+    def on_task_input(self, task):
 
-        # Let details plugin know that it is ok if this feed doesn't produce any entries
-        feed.no_entries_ok = True
+        # Let details plugin know that it is ok if this task doesn't produce any entries
+        task.no_entries_ok = True
 
-        filename = os.path.expanduser(feed.config['tail']['file'])
-        encoding = feed.config['tail'].get('encoding', None)
+        filename = os.path.expanduser(task.config['tail']['file'])
+        encoding = task.config['tail'].get('encoding', None)
         file = open(filename, 'r')
 
-        last_pos = feed.simple_persistence.setdefault(filename, 0)
+        last_pos = task.simple_persistence.setdefault(filename, 0)
         if os.path.getsize(filename) < last_pos:
             log.info('File size is smaller than in previous execution, reseting to beginning of the file')
             last_pos = 0
@@ -102,8 +102,8 @@ class InputTail(object):
 
         log.debug('continuing from last position %s' % last_pos)
 
-        entry_config = feed.config['tail'].get('entry')
-        format_config = feed.config['tail'].get('format', {})
+        entry_config = task.config['tail'].get('entry')
+        format_config = task.config['tail'].get('format', {})
 
         # keep track what fields have been found
         used = {}
@@ -120,7 +120,7 @@ class InputTail(object):
                     raise PluginError('Failed to decode file using %s. Check encoding.' % encoding)
 
             if not line:
-                feed.simple_persistence[filename] = file.tell()
+                task.simple_persistence[filename] = file.tell()
                 break
 
             for field, regexp in entry_config.iteritems():
@@ -133,7 +133,7 @@ class InputTail(object):
                             log.info('Found field %s again before entry was completed. \
                                       Adding current incomplete, but valid entry and moving to next.' % field)
                             self.format_entry(entry, format_config)
-                            feed.entries.append(entry)
+                            task.entries.append(entry)
                         else:
                             log.info('Invalid data, entry field %s is already found once. Ignoring entry.' % field)
                         # start new entry
@@ -152,7 +152,7 @@ class InputTail(object):
                         log.info('Invalid data, constructed entry is missing mandatory fields (title or url)')
                     else:
                         self.format_entry(entry, format_config)
-                        feed.entries.append(entry)
+                        task.entries.append(entry)
                         log.debug('Added entry %s' % entry)
                         # start new entry
                         entry = Entry()

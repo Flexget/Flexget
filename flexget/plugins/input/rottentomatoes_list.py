@@ -45,7 +45,7 @@ class RottenTomatoesList(object):
         return root
 
     @cached('rottentomatoes_list', persist='2 hours')
-    def on_feed_input(self, feed, config):
+    def on_task_input(self, task, config):
         entries = []
         for l_type, l_names in config.items():
             for l_name in l_names:

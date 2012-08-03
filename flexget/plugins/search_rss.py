@@ -1,6 +1,6 @@
 import logging
 import urllib
-from flexget.feed import Feed
+from flexget.task import Task
 from flexget.plugin import register_plugin, get_plugin_by_name
 
 log = logging.getLogger('search_rss')
@@ -20,15 +20,15 @@ class SearchRSS(object):
         comparator.set_seq1(query)
         search_string = urllib.quote(comparator.search_string().encode('utf-8'))
         rss_plugin = get_plugin_by_name('rss')
-        # Create a fake feed to pass to the rss plugin input handler
-        feed = Feed(manager, 'search_rss_feed', {})
+        # Create a fake task to pass to the rss plugin input handler
+        task = Task(manager, 'search_rss_task', {})
         # Use a copy of the config, so we don't overwrite jinja url when filling in search term
         config = rss_plugin.instance.build_config(config).copy()
         template = environment.from_string(config['url'])
         config['url'] = template.render({'search_term': search_string})
         # TODO: capture some other_fields to try to find seed/peer/content_size numbers?
         entries = []
-        for entry in rss_plugin.phase_handlers['input'](feed, config):
+        for entry in rss_plugin.phase_handlers['input'](task, config):
             if comparator.matches(entry['title']):
                 entry['search_ratio'] = comparator.ratio()
                 entries.append(entry)

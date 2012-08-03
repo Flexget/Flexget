@@ -22,10 +22,10 @@ class EmitSeries(SeriesDatabase):
         from flexget import validator
         return validator.factory('boolean')
 
-    def on_feed_input(self, feed, config):
+    def on_task_input(self, task, config):
         entries = []
-        for series in feed.session.query(Series).all():
-            latest = self.get_latest_info(feed.session, series.name)
+        for series in task.session.query(Series).all():
+            latest = self.get_latest_info(task.session, series.name)
             if not latest:
                 # no latest known episode, skip
                 continue
@@ -35,17 +35,17 @@ class EmitSeries(SeriesDatabase):
 
             # try next episode (eg. S01E02)
             title = '%s S%02dE%02d' % (series.name, latest['season'], latest['episode'] + 1)
-            feed.entries.append(Entry(title=title, url=''))
+            task.entries.append(Entry(title=title, url=''))
 
             # different syntax (eg. 01x02)
             title = '%s %02dx%02d' % (series.name, latest['season'], latest['episode'] + 1)
-            feed.entries.append(Entry(title=title, url=''))
+            task.entries.append(Entry(title=title, url=''))
 
             # TODO: do this only if there hasn't been new episode in few weeks
 
             # try next season
             title = '%s S%02dE%02d' % (series.name, latest['season'] + 1, 1)
-            feed.entries.append(Entry(title=title, url=''))
+            task.entries.append(Entry(title=title, url=''))
 
         return entries
 

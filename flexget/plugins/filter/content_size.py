@@ -16,7 +16,7 @@ class FilterContentSize(object):
         config.accept('boolean', key='strict')
         return config
 
-    def process_entry(self, feed, entry, config, remember=True):
+    def process_entry(self, task, entry, config, remember=True):
         """Rejects this entry if it does not pass content_size requirements. Returns true if the entry was rejected."""
         if 'content_size' in entry:
             size = entry['content_size']
@@ -25,41 +25,41 @@ class FilterContentSize(object):
             # download plugin has already printed a downloading message.
             if size < config.get('min', 0):
                 log_once('Entry `%s` too small, rejecting' % entry['title'], log)
-                feed.reject(entry, 'minimum size %s MB, got %s MB' % (config['min'], size), remember=remember)
+                task.reject(entry, 'minimum size %s MB, got %s MB' % (config['min'], size), remember=remember)
                 return True
             if size > config.get('max', maxint):
                 log_once('Entry `%s` too big, rejecting' % entry['title'], log)
-                feed.reject(entry, 'maximum size %s MB, got %s MB' % (config['max'], size), remember=remember)
+                task.reject(entry, 'maximum size %s MB, got %s MB' % (config['max'], size), remember=remember)
                 return True
 
     @priority(130)
-    def on_feed_filter(self, feed, config):
+    def on_task_filter(self, task, config):
         # Do processing on filter phase in case input plugin provided the size
-        for entry in feed.entries:
-            self.process_entry(feed, entry, config, remember=False)
+        for entry in task.entries:
+            self.process_entry(task, entry, config, remember=False)
 
     @priority(150)
-    def on_feed_modify(self, feed, config):
-        if feed.manager.options.test or feed.manager.options.learn:
+    def on_task_modify(self, task, config):
+        if task.manager.options.test or task.manager.options.learn:
             log.info('Plugin is partially disabled with --test and --learn because size information may not be available')
             return
 
-        num_rejected = len(feed.rejected)
-        for entry in feed.accepted:
+        num_rejected = len(task.rejected)
+        for entry in task.accepted:
             if 'content_size' in entry:
-                self.process_entry(feed, entry, config)
+                self.process_entry(task, entry, config)
             elif config.get('strict', True):
                 log.debug('Entry %s size is unknown, rejecting because of strict mode (default)' % entry['title'])
                 log.info('No size information available for %s, rejecting' % entry['title'])
                 if not 'file' in entry:
-                    feed.reject(entry, 'no size info available nor file to read it from', remember=True)
+                    task.reject(entry, 'no size info available nor file to read it from', remember=True)
                 else:
-                    feed.reject(entry, 'no size info available from downloaded file', remember=True)
+                    task.reject(entry, 'no size info available from downloaded file', remember=True)
 
-        if len(feed.rejected) > num_rejected:
+        if len(task.rejected) > num_rejected:
             # Since we are rejecting after the filter event,
-            # re-run this feed to see if there is an alternate entry to accept
-            feed.rerun()
+            # re-run this task to see if there is an alternate entry to accept
+            task.rerun()
 
 
 register_plugin(FilterContentSize, 'content_size', api_ver=2)

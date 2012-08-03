@@ -14,8 +14,8 @@ class CliConfig(object):
 
     Configuration example::
 
-      feeds:
-        my feed:
+      tasks:
+        my task:
           rss: $url
           download: $path
 
@@ -44,9 +44,9 @@ class CliConfig(object):
             # We don't know how to do replacements on this item, just return it
             return item
 
-    def parse_replaces(self, feed):
+    def parse_replaces(self, task):
         """Parses commandline string into internal dict"""
-        s = feed.manager.options.cli_config
+        s = task.manager.options.cli_config
         if not s:
             return False # nothing to process
         if self.replaces:
@@ -60,10 +60,10 @@ class CliConfig(object):
             self.replaces[key.strip()] = value.strip()
         return True
 
-    def on_process_start(self, feed):
-        if self.parse_replaces(feed):
-            feed.config = self.replace_item(feed.config)
-            log.debug(feed.config)
+    def on_process_start(self, task):
+        if self.parse_replaces(task):
+            task.config = self.replace_item(task.config)
+            log.debug(task.config)
 
 register_plugin(CliConfig, 'cli_config', builtin=True)
 register_parser_option('--cli-config', action='store', dest='cli_config', default=False,

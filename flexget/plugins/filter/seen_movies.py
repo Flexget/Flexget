@@ -28,28 +28,28 @@ class FilterSeenMovies(FilterSeen):
 
     # We run last (-255) to make sure we don't reject duplicates before all the other plugins get a chance to reject.
     @priority(-255)
-    def on_feed_filter(self, feed, config):
+    def on_task_filter(self, task, config):
         # strict method
         if config == 'strict':
-            for entry in feed.entries:
+            for entry in task.entries:
                 if 'imdb_id' not in entry and 'tmdb_id' not in entry:
                     log.info('Rejecting %s because of missing movie (imdb or tmdb) id' % entry['title'])
-                    feed.reject(entry, 'missing movie (imdb or tmdb) id, strict')
+                    task.reject(entry, 'missing movie (imdb or tmdb) id, strict')
         # call super
-        super(FilterSeenMovies, self).on_feed_filter(feed, True)
+        super(FilterSeenMovies, self).on_task_filter(task, True)
         # check that two copies of a movie have not been accepted this run
         imdb_ids = set()
         tmdb_ids = set()
-        for entry in feed.accepted:
+        for entry in task.accepted:
             if 'imdb_id' in entry:
                 if entry['imdb_id'] in imdb_ids:
-                    feed.reject(entry, 'already accepted once in feed')
+                    task.reject(entry, 'already accepted once in task')
                     continue
                 else:
                     imdb_ids.add(entry['imdb_id'])
             if 'tmdb_id' in entry:
                 if entry['tmdb_id'] in tmdb_ids:
-                    feed.reject(entry, 'already accepted once in feed')
+                    task.reject(entry, 'already accepted once in task')
                     continue
                 else:
                     tmdb_ids.add(entry['tmdb_id'])

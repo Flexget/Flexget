@@ -21,12 +21,12 @@ class ModifyExtension(object):
         root.accept('number')
         return root
 
-    def on_feed_modify(self, feed):
-        ext = feed.config.get('extension')
+    def on_task_modify(self, task):
+        ext = task.config.get('extension')
         if ext.startswith('.'):
             ext = ext[1:]
 
-        for entry in feed.entries:
+        for entry in task.entries:
             log.debug('`%s` filename is `%s`' % (entry['title'], entry.get('filename', 'N/A')))
             entry['filename'] = '%s.%s' % (entry.get('filename', entry['title']), ext)
             log.debug('filename is now `%s`' % entry['filename'])

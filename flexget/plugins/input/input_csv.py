@@ -43,7 +43,7 @@ class InputCSV(object):
 
     @cached('csv')
     @internet(log)
-    def on_feed_input(self, feed, config):
+    def on_task_input(self, task, config):
         entries = []
         page = urlopener(config['url'], log)
         for row in csv.reader(page):

@@ -16,12 +16,12 @@ class CronEnvPlugin(object):
         self.executed = False
         self.persistence = SimplePersistence(plugin='cron_env')
 
-    def on_process_start(self, feed, entries):
+    def on_process_start(self, task, entries):
         if self.executed:
             return
 
         encoding = sys.getfilesystemencoding()
-        if feed.manager.options.quiet:
+        if task.manager.options.quiet:
             if 'terminal_encoding' in self.persistence:
                 terminal_encoding = self.persistence['terminal_encoding']
                 if terminal_encoding != encoding:

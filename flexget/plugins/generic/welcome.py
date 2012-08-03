@@ -16,15 +16,15 @@ class WelcomePlugin(object):
         self.executed = False
         self.persistence = SimplePersistence(plugin='welcome')
 
-    def on_process_start(self, feed, entries):
-        if self.executed or not feed.manager.options.quiet:
+    def on_process_start(self, task, entries):
+        if self.executed or not task.manager.options.quiet:
             return
         count = self.persistence.setdefault('count', 5)
         if not count:
             return
 
         # check for old users, assume old user if db larger than 2 MB
-        if count == 5 and os.stat(feed.manager.db_filename).st_size / 1024 / 1024 >= 2:
+        if count == 5 and os.stat(task.manager.db_filename).st_size / 1024 / 1024 >= 2:
             log.debug('Looks like old user, skipping welcome message')
             self.persistence['count'] = 0
             return

@@ -130,7 +130,7 @@ class DelugePlugin(object):
         config.setdefault('user', '')
         config.setdefault('pass', '')
 
-    def on_process_start(self, feed, config):
+    def on_process_start(self, task, config):
         """Raise a DependencyError if our dependencies aren't available"""
         # This is overridden by OutputDeluge to add deluge 1.1 support
         try:
@@ -144,7 +144,7 @@ class DelugePlugin(object):
             raise DependencyError('output_deluge', 'twisted.internet', 'Twisted.internet package required', log)
         log.debug('Using deluge 1.2 api')
 
-    def on_feed_abort(self, feed, config):
+    def on_task_abort(self, task, config):
         pass
 
 # Add some more methods to the base class if we are using deluge 1.2+
@@ -165,11 +165,11 @@ try:
             log.debug('Connect to deluge daemon failed, result: %s' % result)
             reactor.callLater(0, reactor.pause, PluginError('Could not connect to deluge daemon', log))
 
-        def on_connect_success(self, result, feed, config):
+        def on_connect_success(self, result, task, config):
             """Gets called when successfully connected to the daemon. Should do the work then call client.disconnect"""
             raise NotImplementedError
 
-        def connect(self, feed, config):
+        def connect(self, task, config):
             """Connects to the deluge daemon and runs on_connect_success """
 
             if config['host'] in ['localhost', '127.0.0.1'] and not config.get('user'):
@@ -189,7 +189,7 @@ try:
                 username=config['user'],
                 password=config['pass'])
 
-            d.addCallback(self.on_connect_success, feed, config).addErrback(self.on_connect_fail)
+            d.addCallback(self.on_connect_success, task, config).addErrback(self.on_connect_fail)
             result = reactor.run()
             if isinstance(result, Exception):
                 raise result
@@ -197,7 +197,7 @@ try:
 
     @event('manager.shutdown')
     def stop_reactor(manager):
-        """Shut down the twisted reactor after all feeds have run."""
+        """Shut down the twisted reactor after all tasks have run."""
         if not reactor._stopped:
             log.debug('Stopping twisted reactor.')
             reactor.stop()
@@ -254,15 +254,15 @@ class InputDeluge(DelugePlugin):
         self.prepare_connection_info(config)
         return config
 
-    def on_feed_input(self, feed, config):
+    def on_task_input(self, task, config):
         """Generates and returns a list of entries from the deluge daemon."""
         # Reset the entries list
         self.entries = []
         # Call connect, entries get generated if everything is successful
-        self.connect(feed, self.prepare_config(config))
+        self.connect(task, self.prepare_config(config))
         return self.entries
 
-    def on_connect_success(self, result, feed, config):
+    def on_connect_success(self, result, task, config):
         """Creates a list of FlexGet entries from items loaded in deluge and stores them to self.entries"""
         from deluge.ui.client import client
 
@@ -338,20 +338,20 @@ class OutputDeluge(DelugePlugin):
                         'addpaused': 'add_paused', 'compact': 'compact_allocation'}
 
     @priority(120)
-    def on_process_start(self, feed, config):
+    def on_process_start(self, task, config):
         """
         Detect what version of deluge is loaded.
         """
 
         if self.deluge12 is None:
-            logger = log.info if feed.manager.options.test else log.debug
+            logger = log.info if task.manager.options.test else log.debug
             try:
                 log.debug('Looking for deluge 1.1 API')
                 from deluge.ui.client import sclient
                 log.debug('1.1 API found')
             except ImportError:
                 log.debug('Looking for deluge 1.2 API')
-                DelugePlugin.on_process_start(self, feed, config)
+                DelugePlugin.on_process_start(self, task, config)
                 logger('Using deluge 1.2 api')
                 self.deluge12 = True
             else:
@@ -359,7 +359,7 @@ class OutputDeluge(DelugePlugin):
                 self.deluge12 = False
 
     @priority(120)
-    def on_feed_download(self, feed, config):
+    def on_task_download(self, task, config):
         """
         Call download plugin to generate the temp files we will load into deluge
         then verify they are valid torrents
@@ -369,42 +369,42 @@ class OutputDeluge(DelugePlugin):
         if not config['enabled']:
             return
         # If the download plugin is not enabled, we need to call it to get our temp .torrent files
-        if not 'download' in feed.config:
+        if not 'download' in task.config:
             download = get_plugin_by_name('download')
-            for entry in feed.accepted:
+            for entry in task.accepted:
                 if not entry.get('deluge_id'):
-                    download.instance.get_temp_file(feed, entry, handle_magnets=True)
+                    download.instance.get_temp_file(task, entry, handle_magnets=True)
 
         # Check torrent files are valid
-        for entry in feed.accepted:
+        for entry in task.accepted:
             if os.path.exists(entry.get('file', '')):
                 # Check if downloaded file is a valid torrent file
                 try:
                     deluge.ui.common.TorrentInfo(entry['file'])
                 except Exception:
-                    feed.fail(entry, 'Invalid torrent file')
+                    task.fail(entry, 'Invalid torrent file')
                     log.error('Torrent file appears invalid for: %s', entry['title'])
 
     @priority(135)
-    def on_feed_output(self, feed, config):
+    def on_task_output(self, task, config):
         """Add torrents to deluge at exit."""
         config = self.prepare_config(config)
         # don't add when learning
-        if feed.manager.options.learn:
+        if task.manager.options.learn:
             return
-        if not config['enabled'] or not (feed.accepted or feed.manager.options.test):
+        if not config['enabled'] or not (task.accepted or task.manager.options.test):
             return
 
         add_to_deluge = self.connect if self.deluge12 else self.add_to_deluge11
-        add_to_deluge(feed, config)
-        # Clean up temp file if download plugin is not configured for this feed
-        if not 'download' in feed.config:
-            for entry in feed.accepted + feed.failed:
+        add_to_deluge(task, config)
+        # Clean up temp file if download plugin is not configured for this task
+        if not 'download' in task.config:
+            for entry in task.accepted + task.failed:
                 if os.path.exists(entry.get('file', '')):
                     os.remove(entry['file'])
                     del(entry['file'])
 
-    def add_to_deluge11(self, feed, config):
+    def add_to_deluge11(self, task, config):
         """Add torrents to deluge using deluge 1.1.x api."""
         try:
             from deluge.ui.client import sclient
@@ -412,12 +412,12 @@ class OutputDeluge(DelugePlugin):
             raise PluginError('Deluge module required', log)
 
         sclient.set_core_uri()
-        for entry in feed.accepted:
+        for entry in task.accepted:
             try:
                 before = sclient.get_session_state()
             except Exception, (errno, msg):
                 raise PluginError('Could not communicate with deluge core. %s' % msg, log)
-            if feed.manager.options.test:
+            if task.manager.options.test:
                 return
             opts = {}
             path = entry.get('path', config['path'])
@@ -435,15 +435,15 @@ class OutputDeluge(DelugePlugin):
 
             # check that file is downloaded
             if not 'file' in entry:
-                feed.fail(entry, 'file missing?')
+                task.fail(entry, 'file missing?')
                 continue
 
             # see that temp file is present
             if not os.path.exists(entry['file']):
-                tmp_path = os.path.join(feed.manager.config_base, 'temp')
+                tmp_path = os.path.join(task.manager.config_base, 'temp')
                 log.debug('entry: %s' % entry)
                 log.debug('temp: %s' % ', '.join(os.listdir(tmp_path)))
-                feed.fail(entry, 'Downloaded temp file \'%s\' doesn\'t exist!?' % entry['file'])
+                task.fail(entry, 'Downloaded temp file \'%s\' doesn\'t exist!?' % entry['file'])
                 continue
 
             sclient.add_torrent_file([entry['file']], [opts])
@@ -486,7 +486,7 @@ class OutputDeluge(DelugePlugin):
             else:
                 log.info('%s is already loaded in deluge. Cannot change label, movedone, or queuetotop' % entry['title'])
 
-    def on_connect_success(self, result, feed, config):
+    def on_connect_success(self, result, task, config):
         """Gets called when successfully connected to a daemon."""
         from deluge.ui.client import client
         from twisted.internet import reactor, defer
@@ -494,7 +494,7 @@ class OutputDeluge(DelugePlugin):
         if not result:
             log.debug('on_connect_success returned a failed result. BUG?')
 
-        if feed.manager.options.test:
+        if task.manager.options.test:
             log.debug('Test connection to deluge daemon successful.')
             client.disconnect()
             return
@@ -609,15 +609,15 @@ class OutputDeluge(DelugePlugin):
 
             return defer.DeferredList(dlist)
 
-        def on_fail(result, feed, entry):
+        def on_fail(result, task, entry):
             """Gets called when daemon reports a failure adding the torrent."""
             log.info('%s was not added to deluge! %s' % (entry['title'], result))
-            feed.fail(entry, 'Could not be added to deluge')
+            task.fail(entry, 'Could not be added to deluge')
 
         # dlist is a list of deferreds that must complete before we exit
         dlist = []
         # loop through entries to get a list of labels to add
-        labels = set([format_label(entry['label']) for entry in feed.accepted if entry.get('label')])
+        labels = set([format_label(entry['label']) for entry in task.accepted if entry.get('label')])
         if config.get('label'):
             labels.add(format_label(config['label']))
         label_deferred = defer.succeed(True)
@@ -672,7 +672,7 @@ class OutputDeluge(DelugePlugin):
             Adds new torrents and modifies the settings for ones already in the session."""
             dlist = []
             # add the torrents
-            for entry in feed.accepted:
+            for entry in task.accepted:
 
                 def add_entry(entry, opts):
                     """Adds an entry to the deluge session"""
@@ -681,7 +681,7 @@ class OutputDeluge(DelugePlugin):
                         magnet = entry['url']
                     else:
                         if not os.path.exists(entry['file']):
-                            feed.fail(entry, 'Downloaded temp file \'%s\' doesn\'t exist!' % entry['file'])
+                            task.fail(entry, 'Downloaded temp file \'%s\' doesn\'t exist!' % entry['file'])
                             del(entry['file'])
                             return
                         try:
@@ -736,7 +736,7 @@ class OutputDeluge(DelugePlugin):
                                   client.core.set_torrent_options([torrent_id], add_opts)])
                 else:
                     dlist.append(add_entry(entry, add_opts).addCallbacks(set_torrent_options, on_fail,
-                            callbackArgs=(entry, modify_opts), errbackArgs=(feed, entry)))
+                            callbackArgs=(entry, modify_opts), errbackArgs=(task, entry)))
             return defer.DeferredList(dlist)
         dlist.append(client.core.get_session_state().addCallback(on_get_session_state))
 
@@ -756,17 +756,17 @@ class OutputDeluge(DelugePlugin):
         # Leave the timeout long, to give time for possible lookups to occur
         reactor.callLater(60, lambda: tasks.called or on_timeout(tasks))
 
-    def on_feed_exit(self, feed, config):
-        """Make sure all temp files are cleaned up when feed exits"""
+    def on_task_exit(self, task, config):
+        """Make sure all temp files are cleaned up when task exits"""
         # If download plugin is enabled, it will handle cleanup.
-        if not 'download' in feed.config:
+        if not 'download' in task.config:
             download = get_plugin_by_name('download')
-            download.instance.cleanup_temp_files(feed)
+            download.instance.cleanup_temp_files(task)
 
-    def on_feed_abort(self, feed, config):
+    def on_task_abort(self, task, config):
         """Make sure normal cleanup tasks still happen on abort."""
-        DelugePlugin.on_feed_abort(self, feed, config)
-        self.on_feed_exit(feed, config)
+        DelugePlugin.on_task_abort(self, task, config)
+        self.on_task_exit(task, config)
 
 
 register_plugin(InputDeluge, 'from_deluge', api_ver=2)

@@ -40,7 +40,7 @@ class BacklogEntry(Base):
     __tablename__ = 'backlog'
 
     id = Column(Integer, primary_key=True)
-    feed = Column(String)
+    task = Column('feed', String)
     title = Column(String)
     expire = Column(DateTime)
     _entry = Column('entry', PickleType(mutable=False))
@@ -49,12 +49,12 @@ class BacklogEntry(Base):
     def __repr__(self):
         return '<BacklogEntry(title=%s)>' % (self.title)
 
-Index('ix_backlog_feed_expire', BacklogEntry.feed, BacklogEntry.expire)
+Index('ix_backlog_feed_expire', BacklogEntry.task, BacklogEntry.expire)
 
 
 class InputBacklog(object):
     """
-    Keeps feed history for given amount of time.
+    Keeps task history for given amount of time.
 
     Example::
 
@@ -68,38 +68,38 @@ class InputBacklog(object):
         return validator.factory('interval')
 
     @priority(-255)
-    def on_feed_input(self, feed, config):
+    def on_task_input(self, task, config):
         # Get a list of entries to inject
-        injections = self.get_injections(feed)
+        injections = self.get_injections(task)
         # Take a snapshot of the entries' states after the input event in case we have to store them to backlog
-        for entry in feed.entries + injections:
+        for entry in task.entries + injections:
             entry.take_snapshot('after_input')
         if config:
-            # If backlog is manually enabled for this feed, learn the entries.
-            self.learn_backlog(feed, config)
-        # Return the entries from backlog that are not already in the feed
+            # If backlog is manually enabled for this task, learn the entries.
+            self.learn_backlog(task, config)
+        # Return the entries from backlog that are not already in the task
         return injections
 
-    def on_feed_abort(self, feed, config):
-        """Remember all entries until next execution when feed gets aborted."""
-        if feed.entries:
-            log.debug('Remembering all entries to backlog because of feed abort.')
-            self.learn_backlog(feed)
+    def on_task_abort(self, task, config):
+        """Remember all entries until next execution when task gets aborted."""
+        if task.entries:
+            log.debug('Remembering all entries to backlog because of task abort.')
+            self.learn_backlog(task)
 
-    def add_backlog(self, feed, entry, amount=''):
-        """Add single entry to feed backlog
+    def add_backlog(self, task, entry, amount=''):
+        """Add single entry to task backlog
 
         If :amount: is not specified, entry will only be injected on next execution."""
         snapshot = entry.snapshots.get('after_input')
         if not snapshot:
-            if feed.current_phase != 'input':
+            if task.current_phase != 'input':
                 # Not having a snapshot is normal during input phase, don't display a warning
                 log.warning('No input snapshot available for `%s`, using current state' % entry['title'])
             snapshot = entry
         session = Session()
         expire_time = datetime.now() + parse_timedelta(amount)
         backlog_entry = session.query(BacklogEntry).filter(BacklogEntry.title == entry['title']).\
-                                                filter(BacklogEntry.feed == feed.name).first()
+                                                filter(BacklogEntry.task == task.name).first()
         if backlog_entry:
             # If there is already a backlog entry for this, update the expiry time if necessary.
             if backlog_entry.expire < expire_time:
@@ -110,25 +110,25 @@ class InputBacklog(object):
             backlog_entry = BacklogEntry()
             backlog_entry.title = entry['title']
             backlog_entry.entry = snapshot
-            backlog_entry.feed = feed.name
+            backlog_entry.task = task.name
             backlog_entry.expire = expire_time
             session.add(backlog_entry)
         session.commit()
 
-    def learn_backlog(self, feed, amount=''):
-        """Learn current entries into backlog. All feed inputs must have been executed."""
-        for entry in feed.entries:
-            self.add_backlog(feed, entry, amount)
+    def learn_backlog(self, task, amount=''):
+        """Learn current entries into backlog. All task inputs must have been executed."""
+        for entry in task.entries:
+            self.add_backlog(task, entry, amount)
 
-    def get_injections(self, feed):
+    def get_injections(self, task):
         """Insert missing entries from backlog."""
         entries = []
-        feed_backlog = feed.session.query(BacklogEntry).filter(BacklogEntry.feed == feed.name)
-        for backlog_entry in feed_backlog.all():
+        task_backlog = task.session.query(BacklogEntry).filter(BacklogEntry.task == task.name)
+        for backlog_entry in task_backlog.all():
             entry = Entry(backlog_entry.entry)
 
-            # this is already in the feed
-            if feed.find_entry(title=entry['title'], url=entry['url']):
+            # this is already in the task
+            if task.find_entry(title=entry['title'], url=entry['url']):
                 continue
             log.debug('Restoring %s' % entry['title'])
             entries.append(entry)
@@ -136,9 +136,9 @@ class InputBacklog(object):
             log.verbose('Added %s entries from backlog' % len(entries))
 
         # purge expired
-        for backlog_entry in feed_backlog.filter(datetime.now() > BacklogEntry.expire).all():
+        for backlog_entry in task_backlog.filter(datetime.now() > BacklogEntry.expire).all():
             log.debug('Purging %s' % backlog_entry.title)
-            feed.session.delete(backlog_entry)
+            task.session.delete(backlog_entry)
 
         return entries
 

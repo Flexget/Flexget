@@ -64,7 +64,7 @@ class cached(object):
 
     Decorator has two parameters:
 
-    * **name** in which the configuration is present in feeds configuration.
+    * **name** in which the configuration is present in tasks configuration.
     * **key** in which the configuration has the cached resource identifier (ie. url).
       If the key is not given or present in the configuration :name: is expected to be a cache name (ie. url)
 
@@ -82,8 +82,8 @@ class cached(object):
     def __call__(self, func):
 
         def wrapped_func(*args, **kwargs):
-            # get feed from method parameters
-            feed = args[1]
+            # get task from method parameters
+            task = args[1]
 
             # detect api version
             api_ver = 1
@@ -91,10 +91,10 @@ class cached(object):
                 api_ver = 2
 
             if api_ver == 1:
-                # get name for a cache from feeds configuration
-                if not self.name in feed.config:
-                    raise Exception('@cache config name %s is not configured in feed %s' % (self.name, feed.name))
-                hash = config_hash(feed.config[self.name])
+                # get name for a cache from tasks configuration
+                if not self.name in task.config:
+                    raise Exception('@cache config name %s is not configured in task %s' % (self.name, task.name))
+                hash = config_hash(task.config[self.name])
             else:
                 hash = config_hash(args[2])
 
@@ -115,9 +115,9 @@ class cached(object):
                     log.verbose('Restored %s entries from cache' % len(entries))
                 return entries
             else:
-                if self.persist and not feed.manager.options.nocache:
+                if self.persist and not task.manager.options.nocache:
                     # Check database cache
-                    db_cache = feed.session.query(InputCache).filter(InputCache.name == self.name).\
+                    db_cache = task.session.query(InputCache).filter(InputCache.name == self.name).\
                                                               filter(InputCache.hash == hash).\
                                                               filter(InputCache.added > datetime.now() - self.persist).\
                                                               first()
@@ -135,8 +135,8 @@ class cached(object):
                     response = func(*args, **kwargs)
                 except PluginError, e:
                     # If there was an error producing entries, but we have valid entries in the db cache, return those.
-                    if self.persist and not feed.manager.options.nocache:
-                        db_cache = feed.session.query(InputCache).filter(InputCache.name == self.name).\
+                    if self.persist and not task.manager.options.nocache:
+                        db_cache = task.session.query(InputCache).filter(InputCache.name == self.name).\
                                                                   filter(InputCache.hash == hash).first()
                         if db_cache and db_cache.entries:
                             log.error('There was an error during %s input (%s), using cache instead.' %
@@ -149,7 +149,7 @@ class cached(object):
                     # If there was nothing in the db cache, re-raise the error.
                     raise
                 if api_ver == 1:
-                    response = feed.entries
+                    response = task.entries
                 if not isinstance(response, list):
                     log.warning('Input %s did not return a list, cannot cache.' % self.name)
                     return response
@@ -159,17 +159,17 @@ class cached(object):
                     self.cache[cache_name] = copy.deepcopy(response)
                 except TypeError:
                     # might be caused because of backlog restoring some idiotic stuff, so not neccessarily a bug
-                    log.critical('Unable to save feed content into cache, if problem persists longer than a day please report this as a bug')
+                    log.critical('Unable to save task content into cache, if problem persists longer than a day please report this as a bug')
                 if self.persist:
                     # Store to database
                     log.debug('Storing cache %s to database.' % cache_name)
-                    db_cache = feed.session.query(InputCache).filter(InputCache.name == self.name).\
+                    db_cache = task.session.query(InputCache).filter(InputCache.name == self.name).\
                                                               filter(InputCache.hash == hash).first()
                     if not db_cache:
                         db_cache = InputCache(name=self.name, hash=hash)
                     db_cache.entries = [InputCacheEntry(entry=e) for e in response]
                     db_cache.added = datetime.now()
-                    feed.session.merge(db_cache)
+                    task.session.merge(db_cache)
                 return response
 
         return wrapped_func

@@ -13,7 +13,7 @@ class AddTrackers(object):
           - uri://tracker_address:port/
 
         This will add all tracker URL uri://tracker_address:port/.
-        TIP: You can use global section in configuration to make this enabled on all feeds.
+        TIP: You can use global section in configuration to make this enabled on all tasks.
     """
 
     def validator(self):
@@ -23,8 +23,8 @@ class AddTrackers(object):
         return trackers
 
     @priority(127)
-    def on_feed_modify(self, feed, config):
-        for entry in feed.entries:
+    def on_task_modify(self, task, config):
+        for entry in task.entries:
             if 'torrent' in entry:
                 for url in config:
                     if not url in entry['torrent'].get_multitrackers():
@@ -45,7 +45,7 @@ class RemoveTrackers(object):
           - moviex
 
         This will remove all trackers that contain text moviex in their url.
-        TIP: You can use global section in configuration to make this enabled on all feeds.
+        TIP: You can use global section in configuration to make this enabled on all tasks.
     """
 
     def validator(self):
@@ -55,8 +55,8 @@ class RemoveTrackers(object):
         return trackers
 
     @priority(127)
-    def on_feed_modify(self, feed, config):
-        for entry in feed.entries:
+    def on_task_modify(self, task, config):
+        for entry in task.entries:
             if 'torrent' in entry:
                 trackers = entry['torrent'].get_multitrackers()
                 for tracker in trackers:

@@ -9,8 +9,8 @@ class TorrentScrub(plugin.Plugin):
     """ Scrubs torrents from unwanted keys.
 
         Example:
-            feeds:
-              rutorrent-fast-resume-infected-feed:
+            tasks:
+              rutorrent-fast-resume-infected-task:
                 torrent_scrub: resume
     """
     # Scrub at high level, but BELOW "torrent"
@@ -32,7 +32,7 @@ class TorrentScrub(plugin.Plugin):
         return root
 
     @plugin.priority(SCRUB_PRIO)
-    def on_feed_modify(self, feed, config):
+    def on_task_modify(self, task, config):
         """ Scrub items that are torrents, if they're affected.
         """
         if isinstance(config, list):
@@ -43,7 +43,7 @@ class TorrentScrub(plugin.Plugin):
                 self.log.debug("Plugin configured, but disabled")
                 return
 
-        for entry in feed.entries:
+        for entry in task.entries:
             # Skip non-torrents
             if "torrent" not in entry:
                 continue

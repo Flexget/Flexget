@@ -77,7 +77,7 @@ class InputThetvdbFavorites(object):
     @cached('thetvdb_favorites')
     @internet(log)
     @with_session
-    def on_feed_input(self, feed, config, session=None):
+    def on_task_input(self, task, config, session=None):
         account_id = str(config['account_id'])
         # Get the cache for this user
         user_favorites = session.query(ThetvdbFavorites).filter(ThetvdbFavorites.account_id == account_id).first()

@@ -12,7 +12,7 @@ class TestDisableBuiltins(FlexGetBase):
     """
 
     __yaml__ = """
-        feeds:
+        tasks:
             test:
                 mock:
                     - {title: 'dupe1', url: 'http://localhost/dupe', 'imdb_score': 5}
@@ -31,27 +31,27 @@ class TestDisableBuiltins(FlexGetBase):
     def test_disable_builtins(self):
         return
 
-        self.execute_feed('test')
-        assert self.feed.find_entry(title='dupe1') and self.feed.find_entry(title='dupe2'), 'disable_builtins is not working?'
+        self.execute_task('test')
+        assert self.task.find_entry(title='dupe1') and self.task.find_entry(title='dupe2'), 'disable_builtins is not working?'
 
 
 class TestInputHtml(FlexGetBase):
 
     __yaml__ = """
-        feeds:
+        tasks:
           test:
             html: http://download.flexget.com/
     """
 
     def test_parsing(self):
-        self.execute_feed('test')
-        assert self.feed.entries, 'did not produce entries'
+        self.execute_task('test')
+        assert self.task.entries, 'did not produce entries'
 
 
 class TestPriority(FlexGetBase):
 
     __yaml__ = """
-        feeds:
+        tasks:
           test:
             mock:
               - {title: 'Smoke hdtv'}
@@ -78,16 +78,16 @@ class TestPriority(FlexGetBase):
     """
 
     def test_smoke(self):
-        self.execute_feed('test')
-        assert self.feed.accepted, 'set plugin should have changed quality before quality plugin was run'
-        self.execute_feed('test2')
-        assert self.feed.rejected, 'quality plugin should have rejected Smoke as hdtv'
+        self.execute_task('test')
+        assert self.task.accepted, 'set plugin should have changed quality before quality plugin was run'
+        self.execute_task('test2')
+        assert self.task.rejected, 'quality plugin should have rejected Smoke as hdtv'
 
 
 class TestImmortal(FlexGetBase):
 
     __yaml__ = """
-        feeds:
+        tasks:
           test:
             mock:
               - {title: 'title1', immortal: yes}
@@ -98,15 +98,15 @@ class TestImmortal(FlexGetBase):
     """
 
     def test_immortal(self):
-        self.execute_feed('test')
-        assert self.feed.find_entry(title='title1'), 'rejected immortal entry'
-        assert not self.feed.find_entry(title='title2'), 'did not reject mortal'
+        self.execute_task('test')
+        assert self.task.find_entry(title='title1'), 'rejected immortal entry'
+        assert not self.task.find_entry(title='title2'), 'did not reject mortal'
 
 
 class TestDownload(FlexGetBase):
 
     __yaml__ = """
-        feeds:
+        tasks:
           test:
             mock:
               - title: README
@@ -142,10 +142,10 @@ class TestDownload(FlexGetBase):
         tmp_umask = os.umask(curr_umask)
         if os.path.exists(self.testfile):
             os.remove(self.testfile)
-        # executes feed and downloads the file
-        self.execute_feed('test')
-        assert self.feed.entries[0]['output'], 'output missing?'
-        self.testfile = self.feed.entries[0]['output']
+        # executes task and downloads the file
+        self.execute_task('test')
+        assert self.task.entries[0]['output'], 'output missing?'
+        self.testfile = self.task.entries[0]['output']
         assert os.path.exists(self.testfile), 'download file does not exists'
         testfile_stat = os.stat(self.testfile)
         modes_equal = 666 - int(oct(curr_umask)) == \
@@ -164,7 +164,7 @@ class TestEntryUnicodeError(object):
 class TestFilterRequireField(FlexGetBase):
 
     __yaml__ = """
-        feeds:
+        tasks:
           test:
             mock:
               - {title: 'Taken[2008]DvDrip[Eng]-FOO', imdb_url: 'http://www.imdb.com/title/tt0936501/'}
@@ -178,16 +178,16 @@ class TestFilterRequireField(FlexGetBase):
     """
 
     def test_field_required(self):
-        self.execute_feed('test')
-        assert not self.feed.find_entry('rejected', title='Taken[2008]DvDrip[Eng]-FOO'), \
+        self.execute_task('test')
+        assert not self.task.find_entry('rejected', title='Taken[2008]DvDrip[Eng]-FOO'), \
             'Taken should NOT have been rejected'
-        assert self.feed.find_entry('rejected', title='ASDFASDFASDF'), \
+        assert self.task.find_entry('rejected', title='ASDFASDFASDF'), \
             'ASDFASDFASDF should have been rejected'
 
-        self.execute_feed('test2')
-        assert not self.feed.find_entry('rejected', title='Entry.S01E05.720p'), \
+        self.execute_task('test2')
+        assert not self.task.find_entry('rejected', title='Entry.S01E05.720p'), \
             'Entry should NOT have been rejected'
-        assert self.feed.find_entry('rejected', title='Entry2.is.a.Movie'), \
+        assert self.task.find_entry('rejected', title='Entry2.is.a.Movie'), \
             'Entry2 should have been rejected'
 
 
@@ -212,7 +212,7 @@ class TestHtmlUtils(object):
 class TestSetPlugin(FlexGetBase):
 
     __yaml__ = """
-        feeds:
+        tasks:
           test:
             mock:
               - {title: 'Entry 1'}
@@ -236,25 +236,25 @@ class TestSetPlugin(FlexGetBase):
     """
 
     def test_set(self):
-        self.execute_feed('test')
-        entry = self.feed.find_entry('entries', title='Entry 1')
+        self.execute_task('test')
+        entry = self.task.find_entry('entries', title='Entry 1')
         assert entry['thefield'] == 'TheValue'
         assert entry['otherfield'] == 3.0
 
     def test_string_replacement(self):
-        self.execute_feed('test_string_replacement')
-        assert self.feed.find_entry('entries', title='Entry 1')['field'] == 'TheValue'
+        self.execute_task('test_string_replacement')
+        assert self.task.find_entry('entries', title='Entry 1')['field'] == 'TheValue'
         # The string repalcement should fail, an error will be shown, and the field will get a blank value.
-        assert 'field' not in self.feed.find_entry('entries', title='Entry 2'),\
+        assert 'field' not in self.task.find_entry('entries', title='Entry 2'),\
                 '`field` should not have been created when string replacement fails'
 
     def test_jinja(self):
-        self.execute_feed('test_jinja')
-        entry = self.feed.find_entry('entries', title='Entry 1')
+        self.execute_task('test_jinja')
+        entry = self.task.find_entry('entries', title='Entry 1')
         assert entry['field'] == 'The VALUE'
         assert entry['otherfield'] == ''
         assert entry['alu'] == 'alu'
-        entry = self.feed.find_entry('entries', title='Entry 2')
+        entry = self.task.find_entry('entries', title='Entry 2')
         assert 'field' not in entry,\
                 '`field` should not have been created when jinja rendering fails'
         assert entry['otherfield'] == 'no series'

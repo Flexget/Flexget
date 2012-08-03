@@ -1,5 +1,5 @@
 from flexget.ui.webui import manager, register_plugin, app
-from flexget.feed import Feed
+from flexget.task import Task
 from flask import render_template, request, flash, redirect, Module
 import yaml
 import logging
@@ -64,7 +64,7 @@ def edit_text(root, name):
             log.exception(e)
         else:
             # valid yaml, now run validator
-            errors = Feed.validate_config(config)
+            errors = Task.validate_config(config)
             if errors:
                 for error in errors:
                     flash(error, 'error')

@@ -29,8 +29,8 @@ class FilterExistsSeries(object):
         advform.accept('list', key='path').accept('path')
         return root
 
-    def get_config(self, feed):
-        config = feed.config.get('exists_series', [])
+    def get_config(self, task):
+        config = task.config.get('exists_series', [])
         # if config is not a dict, assign value to 'path' key
         if not isinstance(config, dict):
             config = {'path': config}
@@ -40,22 +40,22 @@ class FilterExistsSeries(object):
         return config
 
     @priority(-1)
-    def on_feed_filter(self, feed):
+    def on_task_filter(self, task):
         accepted_series = {}
-        for entry in feed.accepted:
+        for entry in task.accepted:
             if 'series_parser' in entry:
                 if entry['series_parser'].valid:
                     accepted_series.setdefault(entry['series_parser'].name, []).append(entry)
                 else:
                     log.debug('entry %s series_parser invalid' % entry['title'])
         if not accepted_series:
-            if feed.accepted:
+            if task.accepted:
                 log.warning('No accepted entries have series information. exists_series cannot filter them')
             else:
                 log.debug('Scanning not needed')
             return
 
-        config = self.get_config(feed)
+        config = self.get_config(task)
         for path in config.get('path'):
             log.verbose('Scanning %s' % path)
             # crashes on some paths with unicode
@@ -101,12 +101,12 @@ class FilterExistsSeries(object):
                                         continue
                                 log.debug('entry parser.proper_count = %s' % entry['series_parser'].proper_count)
                                 if disk_parser.proper_count >= entry['series_parser'].proper_count:
-                                    feed.reject(entry, 'proper already exists')
+                                    task.reject(entry, 'proper already exists')
                                     continue
                                 else:
                                     log.trace('new one is better proper, allowing')
                                     continue
 
-                                feed.reject(entry, 'episode already exists')
+                                task.reject(entry, 'episode already exists')
 
 register_plugin(FilterExistsSeries, 'exists_series', groups=['exists'])

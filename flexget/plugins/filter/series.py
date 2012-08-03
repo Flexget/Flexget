@@ -604,14 +604,14 @@ class FilterSeriesBase(object):
         # Turn our all_series dict back into a list
         return [{series: settings} for (series, settings) in unique_series.iteritems()]
 
-    def merge_config(self, feed, config):
+    def merge_config(self, task, config):
         """Merges another series config dict in with the current one."""
 
         # Make sure we start with both configs as a list of complex series
-        native_series = self.prepare_config(feed.config.get('series', {}))
+        native_series = self.prepare_config(task.config.get('series', {}))
         merging_series = self.prepare_config(config)
-        feed.config['series'] = self.combine_series_lists(native_series, merging_series, log_once=True)
-        return feed.config['series']
+        task.config['series'] = self.combine_series_lists(native_series, merging_series, log_once=True)
+        return task.config['series']
 
 
 class FilterSeries(SeriesDatabase, FilterSeriesBase):
@@ -625,7 +625,7 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
         self.parser2entry = {}
         self.backlog = None
 
-    def on_process_start(self, feed):
+    def on_process_start(self, task):
         try:
             self.backlog = get_plugin_by_name('backlog').instance
         except DependencyError:
@@ -692,37 +692,37 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
                         log.verbose('Auto enabling exact matching for series %s (reason %s)' % (series_name, name))
                         series_config['exact'] = True
 
-    def on_feed_start(self, feed):
+    def on_task_start(self, task):
         # ensure clean state
         self.parser2entry = {}
 
     # Run after metainfo_quality and before metainfo_series
     @priority(125)
-    def on_feed_metainfo(self, feed):
-        config = self.prepare_config(feed.config.get('series', {}))
+    def on_task_metainfo(self, task):
+        config = self.prepare_config(task.config.get('series', {}))
         self.auto_exact(config)
         for series_item in config:
             series_name, series_config = series_item.items()[0]
             log.trace('series_name: %s series_config: %s' % (series_name, series_config))
             start_time = time.clock()
-            self.parse_series(feed.session, feed.entries, series_name, series_config)
+            self.parse_series(task.session, task.entries, series_name, series_config)
             took = time.clock() - start_time
             log.trace('parsing %s took %s' % (series_name, took))
 
-    def on_feed_filter(self, feed):
+    def on_task_filter(self, task):
         """Filter series"""
-        # Parsing was done in metainfo phase, create the dicts to pass to process_series from the feed entries
+        # Parsing was done in metainfo phase, create the dicts to pass to process_series from the task entries
         # key: series episode identifier ie. S01E02
         # value: seriesparser
         found_series = {}
         #guessed_series = {}
-        for entry in feed.entries:
+        for entry in task.entries:
             if entry.get('series_name') and entry.get('series_id') and entry.get('series_parser'):
                 parser = entry['series_parser']
                 self.parser2entry[parser] = entry
                 found_series.setdefault(entry['series_name'], {}).setdefault(parser.identifier, []).append(parser)
 
-        config = self.prepare_config(feed.config.get('series', {}))
+        config = self.prepare_config(task.config.get('series', {}))
 
         for series_item in config:
             series_name, series_config = series_item.items()[0]
@@ -732,7 +732,7 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
             # yaml loads ascii only as str
             series_name = unicode(series_name)
             # Update database with capitalization from config
-            feed.session.query(Series).filter(Series.name == series_name).\
+            task.session.query(Series).filter(Series.name == series_name).\
                 update({'name': series_name}, 'fetch')
             # If we didn't find any episodes for this series, continue
             if not found_series.get(series_name):
@@ -741,7 +741,7 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
             for id, eps in found_series[series_name].iteritems():
                 for parser in eps:
                     # store found episodes into database and save reference for later use
-                    releases = self.store(feed.session, parser)
+                    releases = self.store(task.session, parser)
                     entry = self.parser2entry[parser]
                     entry['series_releases'] = releases
 
@@ -761,7 +761,7 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
             import time
             start_time = time.clock()
 
-            self.process_series(feed, found_series[series_name], series_name, series_config)
+            self.process_series(task, found_series[series_name], series_name, series_config)
 
             took = time.clock() - start_time
             log.trace('processing %s took %s' % (series_name, took))
@@ -838,11 +838,11 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
             log.debug('%s detected as %s, field: %s' % (entry['title'], parser, parser.field))
             populate_entry_fields(entry, parser)
 
-    def process_series(self, feed, series, series_name, config):
+    def process_series(self, task, series, series_name, config):
         """
         Accept or Reject episode from available releases, or postpone choosing.
 
-        :param feed: Current Feed
+        :param task: Current Task
         :param series: List of SeriesParser instances (?)
         :param series_name: Name of series being processed
         :param config: Series configuration
@@ -860,7 +860,7 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
             # reject episodes that have been marked as watched in config file
             if 'watched' in config:
                 log.debug('-' * 20 + ' watched -->')
-                if self.process_watched(feed, config, eps):
+                if self.process_watched(task, config, eps):
                     continue
 
             # skip special episodes if special handling has been turned off
@@ -877,19 +877,19 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
                     continue
 
             # Many of the following functions need to know this info. Only look it up once.
-            downloaded = self.get_downloaded(feed.session, eps[0].name, eps[0].identifier)
+            downloaded = self.get_downloaded(task.session, eps[0].name, eps[0].identifier)
             downloaded_qualities = [ep.quality for ep in downloaded]
 
             # proper handling
             log.debug('-' * 20 + ' process_propers -->')
-            eps = self.process_propers(feed, config, eps, downloaded)
+            eps = self.process_propers(task, config, eps, downloaded)
             if not eps:
                 continue
 
             # Remove any eps we already have from the list
             for ep in reversed(eps): # Iterate in reverse so we can safely remove from the list while iterating
                 if ep.quality in downloaded_qualities:
-                    feed.reject(self.parser2entry[ep], 'quality already downloaded')
+                    task.reject(self.parser2entry[ep], 'quality already downloaded')
                     eps.remove(ep)
             if not eps:
                 continue
@@ -900,27 +900,27 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
                     # Remove all the qualities lower than what we have
                     for ep in reversed(eps):
                         if ep.quality < max(downloaded_qualities):
-                            feed.reject(self.parser2entry[ep], 'worse quality than already downloaded.')
+                            task.reject(self.parser2entry[ep], 'worse quality than already downloaded.')
                             eps.remove(ep)
                 if not eps:
                     continue
 
                 if 'target' in config and config.get('upgrade'):
                     # If we haven't grabbed the target yet, allow upgrade to it
-                    self.process_timeframe_target(feed, config, eps, downloaded)
+                    self.process_timeframe_target(task, config, eps, downloaded)
                     continue
                 if 'qualities' in config:
                     # Grab any additional wanted qualities
                     log.debug('-' * 20 + ' process_qualities -->')
-                    self.process_qualities(feed, config, eps, downloaded)
+                    self.process_qualities(task, config, eps, downloaded)
                     continue
                 elif config.get('upgrade'):
-                    feed.accept(self.parser2entry[eps[0]], 'is an upgrade to existing quality')
+                    task.accept(self.parser2entry[eps[0]], 'is an upgrade to existing quality')
                     continue
 
                 # Reject eps because we have them
                 for ep in eps:
-                    feed.reject(self.parser2entry[ep], 'episode has already been downloaded')
+                    task.reject(self.parser2entry[ep], 'episode has already been downloaded')
                 continue
 
             best = eps[0]
@@ -929,27 +929,27 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
 
             # episode advancement. used only with season and sequence based series
             if best.id_type in ['ep', 'sequence']:
-                if feed.manager.options.disable_advancement:
+                if task.manager.options.disable_advancement:
                     log.debug('episode advancement disabled')
                 else:
                     log.debug('-' * 20 + ' episode advancement -->')
-                    if self.process_episode_advancement(feed, eps, series):
+                    if self.process_episode_advancement(task, eps, series):
                         continue
 
             reason = 'choosing best quality'
             # quality
             if 'target' in config or 'qualities' in config:
                 if 'target' in config:
-                    if self.process_timeframe_target(feed, config, eps):
+                    if self.process_timeframe_target(task, config, eps):
                         continue
                 elif 'qualities' in config:
-                    if self.process_qualities(feed, config, eps, downloaded):
+                    if self.process_qualities(task, config, eps, downloaded):
                         continue
 
                 # We didn't make a quality target match, check timeframe to see
                 # if we should get something anyway
                 if 'timeframe' in config:
-                    if self.process_timeframe(feed, config, eps, series_name):
+                    if self.process_timeframe(task, config, eps, series_name):
                         continue
                     reason = 'Timeframe expired, choosing best available'
                 else:
@@ -957,9 +957,9 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
                     continue
 
             # Just pick the best ep if we get here
-            feed.accept(self.parser2entry[best], reason)
+            task.accept(self.parser2entry[best], reason)
 
-    def process_propers(self, feed, config, eps, downloaded):
+    def process_propers(self, task, config, eps, downloaded):
         """
         Accepts needed propers. Nukes episodes from which there exists proper.
 
@@ -976,7 +976,7 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
                 best_propers.append(ep)
             if ep.proper_count < best_proper:
                 # nuke qualities which there is a better proper available
-                feed.reject(self.parser2entry[ep], 'nuked')
+                task.reject(self.parser2entry[ep], 'nuked')
             else:
                 pass_filter.append(ep)
 
@@ -989,7 +989,7 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
             log.debug('proper timeframe: %s' % config['propers'])
             timeframe = parse_timedelta(config['propers'])
 
-            first_seen = self.get_first_seen(feed.session, eps[0])
+            first_seen = self.get_first_seen(task.session, eps[0])
             expires = first_seen + timeframe
             log.debug('propers timeframe: %s' % timeframe)
             log.debug('first_seen: %s' % first_seen)
@@ -1006,12 +1006,12 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
         # Accept propers we actually need, and remove them from the list of entries to continue processing
         for ep in best_propers:
             if ep.quality in downloaded_qualities and ep.proper_count > downloaded_qualities[ep.quality]:
-                feed.accept(self.parser2entry[ep], 'proper')
+                task.accept(self.parser2entry[ep], 'proper')
                 pass_filter.remove(ep)
 
         return pass_filter
 
-    def process_timeframe_target(self, feed, config, eps, downloaded=None):
+    def process_timeframe_target(self, task, config, eps, downloaded=None):
         """
         Accepts first episode matching the quality configured for the series.
 
@@ -1027,7 +1027,7 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
             if req.allows(ep.quality):
                 entry = self.parser2entry[ep]
                 log.debug('Series accepting. %s meets quality %s' % (entry['title'], req))
-                feed.accept(self.parser2entry[ep], 'target quality')
+                task.accept(self.parser2entry[ep], 'target quality')
                 return True
 
     def process_quality(self, config, eps):
@@ -1047,7 +1047,7 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
             log.debug('no quality meets requirements')
         return result
 
-    def process_watched(self, feed, config, eps):
+    def process_watched(self, task, config, eps):
         """
         Rejects all episodes older than defined in watched.
 
@@ -1062,14 +1062,14 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
             log.debug('%s episode %s is already watched, rejecting all occurrences' % (best.name, best.identifier))
             for ep in eps:
                 entry = self.parser2entry[ep]
-                feed.reject(entry, 'watched')
+                task.reject(entry, 'watched')
             return True
 
-    def process_episode_advancement(self, feed, eps, series):
+    def process_episode_advancement(self, task, eps, series):
         """Rejects all episodes that are too old or new (advancement), return True when this happens."""
 
         current = eps[0]
-        latest = self.get_latest_download(feed.session, current.name)
+        latest = self.get_latest_download(task.session, current.name)
         log.debug('latest download: %s' % latest)
         log.debug('current: %s' % current)
 
@@ -1080,7 +1080,7 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
                (current.season == latest.season and current.episode < (latest.number - grace))):
                 log.debug('too old! rejecting all occurrences')
                 for ep in eps:
-                    feed.reject(self.parser2entry[ep], 'Too much in the past from latest downloaded episode %s' %
+                    task.reject(self.parser2entry[ep], 'Too much in the past from latest downloaded episode %s' %
                         latest.identifier)
                 return True
 
@@ -1088,12 +1088,12 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
                (current.season == latest.season and current.episode > (latest.number + grace))):
                 log.debug('too new! rejecting all occurrences')
                 for ep in eps:
-                    feed.reject(self.parser2entry[ep],
+                    task.reject(self.parser2entry[ep],
                         ('Too much in the future from latest downloaded episode %s. '
                          'See `--disable-advancement` if this should be downloaded.') % latest.identifier)
                 return True
 
-    def process_timeframe(self, feed, config, eps, series_name):
+    def process_timeframe(self, task, config, eps, series_name):
         """
         Runs the timeframe logic to determine if we should wait for a better quality.
         Saves current best to backlog if timeframe has not expired.
@@ -1114,11 +1114,11 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
         except ValueError:
             raise PluginWarning('Invalid time format', log)
 
-        first_seen = self.get_first_seen(feed.session, best)
+        first_seen = self.get_first_seen(task.session, best)
         expires = first_seen + timeframe
         log.debug('timeframe: %s, first_seen: %s, expires: %s' % (timeframe, first_seen, expires))
 
-        stop = feed.manager.options.stop_waiting.lower() == series_name.lower()
+        stop = task.manager.options.stop_waiting.lower() == series_name.lower()
         if expires <= datetime.now() or stop:
             # Expire timeframe, accept anything
             log.info('Timeframe expired, releasing quality restriction.')
@@ -1137,10 +1137,10 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
 
             # add best entry to backlog (backlog is able to handle duplicate adds)
             if self.backlog:
-                self.backlog.add_backlog(feed, entry)
+                self.backlog.add_backlog(task, entry)
             return True
 
-    def process_qualities(self, feed, config, eps, downloaded):
+    def process_qualities(self, task, config, eps, downloaded):
         """
         Handles all modes that can accept more than one quality per episode. (qualities, upgrade)
 
@@ -1175,24 +1175,24 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
                 if config.get('upgrade'):
                     if downloaded_qualities and ep.quality < max(downloaded_qualities):
                         continue
-                feed.accept(self.parser2entry[ep], 'quality wanted')
+                task.accept(self.parser2entry[ep], 'quality wanted')
                 downloaded_qualities.append(ep.quality)
                 downloaded.append(ep)
                 # Re-calculate what is still needed
                 still_needed = [req for req in still_needed if not req.allows(ep.quality)]
         return bool(downloaded_qualities)
 
-    def on_feed_exit(self, feed):
+    def on_task_exit(self, task):
         """Learn succeeded episodes"""
-        log.debug('on_feed_exit')
-        for entry in feed.accepted:
+        log.debug('on_task_exit')
+        for entry in task.accepted:
             if 'series_releases' in entry:
                 for release in entry['series_releases']:
                     log.debug('marking %s as downloaded' % release)
                     release.downloaded = True
             else:
                 log.debug('%s is not a series' % entry['title'])
-        # clear feed state
+        # clear task state
         self.parser2entry = {}
 
 

@@ -14,14 +14,14 @@ class SeriesReport(SeriesDatabase):
 
     """Produces --series report"""
 
-    def on_process_start(self, feed):
-        if feed.manager.options.series:
-            feed.manager.disable_feeds()
+    def on_process_start(self, task):
+        if task.manager.options.series:
+            task.manager.disable_tasks()
 
-            if isinstance(feed.manager.options.series, bool):
+            if isinstance(task.manager.options.series, bool):
                 self.display_summary()
             else:
-                self.display_details(feed.manager.options.series)
+                self.display_details(task.manager.options.series)
 
     def display_details(self, name):
         """Display detailed series information, ie. --series NAME"""
@@ -171,15 +171,15 @@ class SeriesForget(object):
 
     """Provides --series-forget"""
 
-    def on_process_start(self, feed):
-        if feed.manager.options.series_forget:
-            feed.manager.disable_feeds()
+    def on_process_start(self, task):
+        if task.manager.options.series_forget:
+            task.manager.disable_tasks()
 
-            name = unicode(feed.manager.options.series_forget[0])
+            name = unicode(task.manager.options.series_forget[0])
 
-            if len(feed.manager.options.series_forget) > 1:
+            if len(task.manager.options.series_forget) > 1:
                 # remove by id
-                identifier = feed.manager.options.series_forget[1].upper()
+                identifier = task.manager.options.series_forget[1].upper()
                 if identifier and name:
                     try:
                         forget_series_episode(name, identifier)
@@ -194,7 +194,7 @@ class SeriesForget(object):
                 except ValueError, e:
                     print e.message
 
-            feed.manager.config_changed()
+            task.manager.config_changed()
 
 
 register_plugin(SeriesReport, '--series', builtin=True)

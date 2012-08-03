@@ -3,8 +3,8 @@ Listens events:
 
 forget (string)
 
-    Given string can be feed name, remembered field (url, imdb_url) or a title. If given value is a
-    feed name then everything in that feed will be forgotten. With title all learned fields from it and the
+    Given string can be task name, remembered field (url, imdb_url) or a title. If given value is a
+    task name then everything in that task will be forgotten. With title all learned fields from it and the
     title will be forgotten. With field value only that particular field is forgotten.
 """
 
@@ -48,19 +48,19 @@ class SeenEntry(Base):
     id = Column(Integer, primary_key=True)
     title = Column(Unicode)
     reason = Column(Unicode)
-    feed = Column(Unicode)
+    task = Column('feed', Unicode)
     added = Column(DateTime)
 
     fields = relation('SeenField', backref='seen_entry', cascade='all, delete, delete-orphan')
 
-    def __init__(self, title, feed, reason=None):
+    def __init__(self, title, task, reason=None):
         self.title = title
         self.reason = reason
-        self.feed = feed
+        self.task = task
         self.added = datetime.now()
 
     def __str__(self):
-        return '<SeenEntry(title=%s,reason=%s,feed=%s,added=%s)>' % (self.title, self.reason, self.feed, self.added)
+        return '<SeenEntry(title=%s,reason=%s,task=%s,added=%s)>' % (self.title, self.reason, self.task, self.added)
 
 
 class SeenField(Base):
@@ -86,7 +86,7 @@ class SeenField(Base):
 def forget(value):
     """
     See module docstring
-    :param string value: Can be feed name, entry title or field value
+    :param string value: Can be task name, entry title or field value
     :return: count, field_count where count is number of entries removed and field_count number of fields
     """
     log.debug('forget called with %s' % value)
@@ -95,7 +95,7 @@ def forget(value):
     try:
         count = 0
         field_count = 0
-        for se in session.query(SeenEntry).filter(or_(SeenEntry.title == value, SeenEntry.feed == value)).all():
+        for se in session.query(SeenEntry).filter(or_(SeenEntry.title == value, SeenEntry.task == value)).all():
             field_count += len(se.fields)
             count += 1
             log.debug('forgetting %s' % se)
@@ -131,13 +131,13 @@ class MigrateSeen(object):
             id = Column(Integer, primary_key=True)
             field = Column(String)
             value = Column(String, index=True)
-            feed = Column(String)
+            task = Column('feed', String)
             added = Column(DateTime)
 
-            def __init__(self, field, value, feed):
+            def __init__(self, field, value, task):
                 self.field = field
                 self.value = value
-                self.feed = feed
+                self.task = task
                 self.added = datetime.now()
 
             def __str__(self):
@@ -175,7 +175,7 @@ class MigrateSeen(object):
             index += 1
             if not index % 10:
                 bar.update(index)
-            se = SeenEntry(u'N/A', seen.feed, u'migrated')
+            se = SeenEntry(u'N/A', seen.task, u'migrated')
             se.added = seen.added
             se.fields.append(SeenField(seen.field, seen.value))
             session.add(se)
@@ -184,7 +184,7 @@ class MigrateSeen(object):
         session.execute('drop table seen;')
         session.commit()
 
-    def on_process_start(self, feed):
+    def on_process_start(self, task):
         # migrate seen to seen_entry
         session = Session()
         from flexget.utils.sqlalchemy_utils import table_exists
@@ -195,16 +195,16 @@ class MigrateSeen(object):
 
 class SeenSearch(object):
 
-    def on_process_start(self, feed):
-        if not feed.manager.options.seen_search:
+    def on_process_start(self, task):
+        if not task.manager.options.seen_search:
             return
 
-        feed.manager.disable_feeds()
+        task.manager.disable_tasks()
 
         session = Session()
         shown = []
         for field in session.query(SeenField).\
-            filter(SeenField.value.like(unicode('%' + feed.manager.options.seen_search + '%'))).\
+            filter(SeenField.value.like(unicode('%' + task.manager.options.seen_search + '%'))).\
             order_by(asc(SeenField.added)).all():
 
             se = session.query(SeenEntry).filter(SeenEntry.id == field.seen_entry_id).first()
@@ -217,7 +217,7 @@ class SeenSearch(object):
                 continue
             shown.append(se.id)
 
-            print 'ID: %s Name: %s Feed: %s Added: %s' % (se.id, se.title, se.feed, se.added.strftime('%c'))
+            print 'ID: %s Name: %s Task: %s Added: %s' % (se.id, se.title, se.task, se.added.strftime('%c'))
             for sf in se.fields:
                 print ' %s: %s' % (sf.field, sf.value)
             print ''
@@ -230,13 +230,13 @@ class SeenSearch(object):
 
 class SeenForget(object):
 
-    def on_process_start(self, feed):
-        if not feed.manager.options.forget:
+    def on_process_start(self, task):
+        if not task.manager.options.forget:
             return
 
-        feed.manager.disable_feeds()
+        task.manager.disable_tasks()
 
-        forget_name = unicode(feed.manager.options.forget)
+        forget_name = task.manager.options.forget
         if is_imdb_url(forget_name):
             imdb_id = extract_id(forget_name)
             if imdb_id:
@@ -244,31 +244,31 @@ class SeenForget(object):
 
         count, fcount = forget(forget_name)
         log.info('Removed %s titles (%s fields)' % (count, fcount))
-        feed.manager.config_changed()
+        task.manager.config_changed()
 
 
 class SeenCmd(object):
 
-    def on_process_start(self, feed):
-        if not feed.manager.options.seen:
+    def on_process_start(self, task):
+        if not task.manager.options.seen:
             return
 
-        feed.manager.disable_feeds()
+        task.manager.disable_tasks()
 
-        seen_name = unicode(feed.manager.options.seen)
+        seen_name = task.manager.options.seen
         if is_imdb_url(seen_name):
             imdb_id = extract_id(seen_name)
             if imdb_id:
                 seen_name = imdb_id
 
         session = Session()
-        se = SeenEntry(u'--seen', unicode(feed.name))
+        se = SeenEntry(u'--seen', unicode(task.name))
         sf = SeenField(u'--seen', seen_name)
         se.fields.append(sf)
         session.add(se)
         session.commit()
 
-        log.info('Added %s as seen. This will affect all feeds.' % seen_name)
+        log.info('Added %s as seen. This will affect all tasks.' % seen_name)
 
 
 class FilterSeen(object):
@@ -277,7 +277,7 @@ class FilterSeen(object):
         subsequent executions. Without this plugin FlexGet would
         download all matching content on every execution.
 
-        This plugin is enabled on all feeds by default.
+        This plugin is enabled on all tasks by default.
         See wiki for more information.
     """
 
@@ -294,7 +294,7 @@ class FilterSeen(object):
         return root
 
     @priority(255)
-    def on_feed_filter(self, feed, config, remember_rejected=False):
+    def on_task_filter(self, task, config, remember_rejected=False):
         """Filter seen entries"""
         if config is False:
             log.debug('%s is disabled' % self.keyword)
@@ -304,7 +304,7 @@ class FilterSeen(object):
         if isinstance(config, list):
             fields.extend(config)
 
-        for entry in feed.entries:
+        for entry in task.entries:
             # construct list of values looked
             values = []
             for field in fields:
@@ -315,13 +315,13 @@ class FilterSeen(object):
             if values:
                 log.trace('querying for: %s' % ', '.join(values))
                 # check if SeenField.value is any of the values
-                found = feed.session.query(SeenField).filter(SeenField.value.in_(values)).first()
+                found = task.session.query(SeenField).filter(SeenField.value.in_(values)).first()
                 if found:
                     log.debug("Rejecting '%s' '%s' because of seen '%s'" % (entry['url'], entry['title'], found.value))
-                    feed.reject(entry, 'Entry with %s `%s` is already seen' % (found.field, found.value),
+                    task.reject(entry, 'Entry with %s `%s` is already seen' % (found.field, found.value),
                                 remember=remember_rejected)
 
-    def on_feed_exit(self, feed, config):
+    def on_task_exit(self, task, config):
         """Remember succeeded entries"""
         if config is False:
             log.debug('disabled')
@@ -331,18 +331,18 @@ class FilterSeen(object):
         if isinstance(config, list):
             fields.extend(config)
 
-        for entry in feed.accepted:
-            self.learn(feed, entry, fields=fields)
+        for entry in task.accepted:
+            self.learn(task, entry, fields=fields)
             # verbose if in learning mode
-            if feed.manager.options.learn:
+            if task.manager.options.learn:
                 log.info("Learned '%s' (will skip this in the future)" % (entry['title']))
 
-    def learn(self, feed, entry, fields=None, reason=None):
+    def learn(self, task, entry, fields=None, reason=None):
         """Marks entry as seen"""
         # no explicit fields given, use default
         if not fields:
             fields = self.fields
-        se = SeenEntry(entry['title'], unicode(feed.name), reason)
+        se = SeenEntry(entry['title'], unicode(task.name), reason)
         remembered = []
         for field in fields:
             if not field in entry:
@@ -356,14 +356,14 @@ class FilterSeen(object):
             log.debug("Learned '%s' (field: %s)" % (entry[field], field))
         # Only add the entry to the session if it has one of the required fields
         if se.fields:
-            feed.session.add(se)
+            task.session.add(se)
 
-    def forget(self, feed, title):
+    def forget(self, task, title):
         """Forget SeenEntry with :title:. Return True if forgotten."""
-        se = feed.session.query(SeenEntry).filter(SeenEntry.title == title).first()
+        se = task.session.query(SeenEntry).filter(SeenEntry.title == title).first()
         if se:
             log.debug("Forgotten '%s' (%s fields)" % (title, len(se.fields)))
-            feed.session.delete(se)
+            task.session.delete(se)
             return True
 
 
@@ -385,8 +385,8 @@ register_plugin(SeenForget, '--forget', builtin=True)
 register_plugin(MigrateSeen, 'migrate_seen', builtin=True)
 
 register_parser_option('--forget', action='store', dest='forget', default=False,
-                       metavar='FEED|VALUE', help='Forget feed (completely) or given title or url.')
+                       metavar='TASK|VALUE', help='Forget task (completely) or given title or url.')
 register_parser_option('--seen', action='store', dest='seen', default=False,
-                       metavar='VALUE', help='Add title or url to what has been seen in feeds.')
+                       metavar='VALUE', help='Add title or url to what has been seen in tasks.')
 register_parser_option('--seen-search', action='store', dest='seen_search', default=False,
                        metavar='VALUE', help='Search given text from seen database.')

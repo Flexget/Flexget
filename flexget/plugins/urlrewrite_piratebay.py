@@ -15,7 +15,7 @@ class UrlRewritePirateBay(object):
     """PirateBay urlrewriter."""
 
     # urlrewriter API
-    def url_rewritable(self, feed, entry):
+    def url_rewritable(self, task, entry):
         url = entry['url']
         if url.endswith('.torrent'):
             return False
@@ -27,7 +27,7 @@ class UrlRewritePirateBay(object):
         return False
 
     # urlrewriter API
-    def url_rewrite(self, feed, entry):
+    def url_rewrite(self, task, entry):
         if not 'url' in entry:
             log.error("Didn't actually get a URL...")
         else:

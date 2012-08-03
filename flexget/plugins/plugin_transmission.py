@@ -91,7 +91,7 @@ class TransmissionBase(object):
         return cli
 
     @save_opener
-    def on_process_start(self, feed, config):
+    def on_process_start(self, task, config):
         try:
             import transmissionrpc
             from transmissionrpc import TransmissionError
@@ -102,10 +102,10 @@ class TransmissionBase(object):
             raise PluginError('Transmissionrpc module version 0.6 or higher required, please upgrade', log)
 
     @save_opener
-    def on_feed_start(self, feed, config):
+    def on_task_start(self, task, config):
         config = self.prepare_config(config)
         if config['enabled']:
-            if feed.manager.options.test:
+            if task.manager.options.test:
                 log.info('Trying to connect to transmission...')
                 self.client = self.create_rpc_client(config)
                 if self.client:
@@ -130,7 +130,7 @@ class PluginTransmissionInput(TransmissionBase):
         config.setdefault('onlycomplete', True)
         return config
 
-    def on_feed_input(self, feed, config):
+    def on_task_input(self, task, config):
         config = self.prepare_config(config)
         if not config['enabled']:
             return
@@ -201,7 +201,7 @@ class PluginTransmission(TransmissionBase):
         return config
 
     @priority(120)
-    def on_feed_download(self, feed, config):
+    def on_task_download(self, task, config):
         """
             Call download plugin to generate the temp files we will load
             into deluge then verify they are valid torrents
@@ -211,22 +211,22 @@ class PluginTransmission(TransmissionBase):
             return
         # If the download plugin is not enabled, we need to call it to get
         # our temp .torrent files
-        if not 'download' in feed.config:
+        if not 'download' in task.config:
             download = get_plugin_by_name('download')
-            download.instance.get_temp_files(feed, handle_magnets=True, fail_html=True)
+            download.instance.get_temp_files(task, handle_magnets=True, fail_html=True)
 
     @priority(135)
     @save_opener
-    def on_feed_output(self, feed, config):
+    def on_task_output(self, task, config):
         from transmissionrpc import TransmissionError
         config = self.prepare_config(config)
         # don't add when learning
-        if feed.manager.options.learn:
+        if task.manager.options.learn:
             return
         if not config['enabled']:
             return
         # Do not run if there is nothing to do
-        if not feed.accepted and not config['removewhendone']:
+        if not task.accepted and not config['removewhendone']:
             return
         if self.client is None:
             self.client = self.create_rpc_client(config)
@@ -234,8 +234,8 @@ class PluginTransmission(TransmissionBase):
                 log.debug('Successfully connected to transmission.')
             else:
                 raise PluginError("Couldn't connect to transmission.")
-        if feed.accepted:
-            self.add_to_transmission(self.client, feed, config)
+        if task.accepted:
+            self.add_to_transmission(self.client, task, config)
         if config['removewhendone']:
             try:
                 self.remove_finished(self.client)
@@ -290,11 +290,11 @@ class PluginTransmission(TransmissionBase):
 
         return options
 
-    def add_to_transmission(self, cli, feed, config):
+    def add_to_transmission(self, cli, task, config):
         """Adds accepted entries to transmission """
         from transmissionrpc import TransmissionError
-        for entry in feed.accepted:
-            if feed.manager.options.test:
+        for entry in task.accepted:
+            if task.manager.options.test:
                 log.info('Would add %s to transmission' % entry['url'])
                 continue
             options = self._make_torrent_options_dict(config, entry)
@@ -303,15 +303,15 @@ class PluginTransmission(TransmissionBase):
 
             # Check that file is downloaded
             if downloaded and not 'file' in entry:
-                feed.fail(entry, 'file missing?')
+                task.fail(entry, 'file missing?')
                 continue
 
             # Verify the temp file exists
             if downloaded and not os.path.exists(entry['file']):
-                tmp_path = os.path.join(feed.manager.config_base, 'temp')
+                tmp_path = os.path.join(task.manager.config_base, 'temp')
                 log.debug('entry: %s' % entry)
                 log.debug('temp: %s' % ', '.join(os.listdir(tmp_path)))
-                feed.fail(entry, "Downloaded temp file '%s' doesn't exist!?" % entry['file'])
+                task.fail(entry, "Downloaded temp file '%s' doesn't exist!?" % entry['file'])
                 continue
 
             try:
@@ -334,7 +334,7 @@ class PluginTransmission(TransmissionBase):
                 log.debug('TransmissionError', exc_info=True)
                 msg = 'TransmissionError: %s' % e.message or 'N/A'
                 log.error(msg)
-                feed.fail(entry, msg)
+                task.fail(entry, msg)
 
     def remove_finished(self, cli):
         # Get a list of active transfers
@@ -351,14 +351,14 @@ class PluginTransmission(TransmissionBase):
         if remove_ids:
             cli.remove(remove_ids)
 
-    def on_feed_exit(self, feed, config):
-        """Make sure all temp files are cleaned up when feed exits"""
+    def on_task_exit(self, task, config):
+        """Make sure all temp files are cleaned up when task exits"""
         # If download plugin is enabled, it will handle cleanup.
-        if not 'download' in feed.config:
+        if not 'download' in task.config:
             download = get_plugin_by_name('download')
-            download.instance.cleanup_temp_files(feed)
+            download.instance.cleanup_temp_files(task)
 
-    on_feed_abort = on_feed_exit
+    on_task_abort = on_task_exit
 
 register_plugin(PluginTransmission, 'transmission', api_ver=2)
 register_plugin(PluginTransmissionInput, 'from_transmission', api_ver=2)

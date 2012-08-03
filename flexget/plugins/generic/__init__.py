@@ -1,1 +1,1 @@
-"""Plugins handling multiple feed phases."""
+"""Plugins handling multiple task phases."""

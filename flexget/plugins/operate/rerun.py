@@ -6,16 +6,16 @@ log = logging.getLogger('rerun')
 
 
 class MaxReRuns(object):
-    """Force a feed to rerun for debugging purposes."""
+    """Force a task to rerun for debugging purposes."""
 
     def validator(self):
         root = validator.factory('boolean')
         return root
 
-    def on_feed_start(self, feed, config):
-        if config and not feed.is_rerun:
-            log.debug('forcing a feed rerun')
-            feed.rerun()
+    def on_task_start(self, task, config):
+        if config and not task.is_rerun:
+            log.debug('forcing a task rerun')
+            task.rerun()
 
 
 register_plugin(MaxReRuns, 'rerun', api_ver=2, debug=True)

@@ -55,11 +55,11 @@ class TraktList(object):
         return root
 
     @cached('trakt_list', persist='2 hours')
-    def on_feed_input(self, feed, config):
+    def on_task_input(self, task, config):
         # Don't edit the config, or it won't pass validation on rerun
         url_params = config.copy()
         if 'movies' in config and 'series' in config:
-            raise PluginError('Cannot use both series list and movies list in the same feed.')
+            raise PluginError('Cannot use both series list and movies list in the same task.')
         if 'movies' in config:
             url_params['data_type'] = 'movies'
             url_params['list_type'] = config['movies']
@@ -99,7 +99,7 @@ class TraktList(object):
         entries = []
         log.verbose('Retrieving list %s %s...' % (url_params['data_type'], url_params['list_type']))
         try:
-            data = json.loads(feed.requests.get(url, auth=auth).content)
+            data = json.loads(task.requests.get(url, auth=auth).content)
         except RequestException, e:
             raise PluginError('Could not retrieve list from trakt (%s)' % e.message)
         if 'error' in data:

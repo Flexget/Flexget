@@ -116,11 +116,11 @@ class PluginCookies:
         cookie_jar._really_load(s, '', True, True)
         return cookie_jar
 
-    def on_process_start(self, feed, config):
+    def on_process_start(self, task, config):
         self.cookiejars = {}
 
-    def on_feed_start(self, feed, config):
-        """Feed starting, install cookiejar"""
+    def on_task_start(self, task, config):
+        """Task starting, install cookiejar"""
         import os
         config = self.prepare_config(config)
         cookie_type = config.get('type')
@@ -152,7 +152,7 @@ class PluginCookies:
             self.cookiejars[cookie_file] = cj
 
         # Add cookiejar to our requests session
-        feed.requests.add_cookiejar(cj)
+        task.requests.add_cookiejar(cj)
         # Add handler to urllib2 default opener for backwards compatibility
         handler = urllib2.HTTPCookieProcessor(cj)
         if urllib2._opener:
@@ -162,15 +162,15 @@ class PluginCookies:
             log.debug('Creating new opener and installing it')
             urllib2.install_opener(urllib2.build_opener(handler))
 
-    def on_feed_exit(self, feed, config):
-        """Feed exiting, remove cookiejar"""
+    def on_task_exit(self, task, config):
+        """Task exiting, remove cookiejar"""
         log.debug('Removing urllib2 opener')
         urllib2.install_opener(None)
 
-    # Feed aborted, unhook the cookiejar
-    on_feed_abort = on_feed_exit
+    # Task aborted, unhook the cookiejar
+    on_task_abort = on_task_exit
 
-    def on_process_end(self, feed, config):
+    def on_process_end(self, task, config):
         self.cookiejars = {}
 
 register_plugin(PluginCookies, 'cookies', api_ver=2)

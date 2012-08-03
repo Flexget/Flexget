@@ -1,4 +1,4 @@
-"""Plugin for filesystem feeds."""
+"""Plugin for filesystem tasks."""
 import os
 import logging
 from flexget import plugin
@@ -24,7 +24,7 @@ class Listdir(plugin.Plugin):
         bundle.accept('path')
         return root
 
-    def on_feed_input(self, feed, config):
+    def on_task_input(self, task, config):
         # If only a single path is passed turn it into a 1 element list
         if isinstance(config, basestring):
             config = [config]

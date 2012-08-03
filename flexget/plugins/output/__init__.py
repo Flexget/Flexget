@@ -1,1 +1,1 @@
-"""Plugins for "output" feed phase."""
+"""Plugins for "output" task phase."""

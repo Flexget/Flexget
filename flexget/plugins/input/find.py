@@ -54,7 +54,7 @@ class InputFind(object):
             config['regexp'] = '.'
 
     @cached('find')
-    def on_feed_input(self, feed, config):
+    def on_task_input(self, task, config):
         self.prepare_config(config)
         entries = []
         match = re.compile(config['regexp'], re.IGNORECASE).match

@@ -22,10 +22,10 @@ class InputInject(object):
 
         Example use:
 
-        flexget --inject "Some.Series.S02E12.Imaginary" --feed my-series --learn
+        flexget --inject "Some.Series.S02E12.Imaginary" --task my-series --learn
 
-        This would inject imaginary series into a single feed and learn it as a downloaded,
-        assuming feed accepts the injected entry.
+        This would inject imaginary series into a single task and learn it as a downloaded,
+        assuming task accepts the injected entry.
 
     """
 
@@ -58,15 +58,15 @@ class InputInject(object):
         return options
 
     @priority(255)
-    def on_feed_input(self, feed):
-        if not feed.manager.options.inject:
+    def on_task_input(self, task):
+        if not task.manager.options.inject:
             return
 
-        options = self.parse_arguments(feed.manager.options.inject)
+        options = self.parse_arguments(task.manager.options.inject)
 
         # disable other inputs
         log.info('Disabling the rest of the input phase.')
-        feed.disable_phase('input')
+        task.disable_phase('input')
 
         # create our injected entry
         entry = Entry(options['entry'], injected=True)
@@ -75,13 +75,13 @@ class InputInject(object):
         if entry.get('immortal'):
             log.debug('Injected entry is immortal')
 
-        feed.entries.append(entry)
+        task.entries.append(entry)
 
         if options.get('accept', False):
             log.debug('accepting the injection')
-            feed.accept(entry, '--inject accepted')
+            task.accept(entry, '--inject accepted')
 
 
 register_plugin(InputInject, '--inject', debug=True, builtin=True)
 register_parser_option('--inject', nargs='+', metavar=('TITLE', 'URL'),
-                       help='Injects entry to all executed feeds: <TITLE> [URL] [ACCEPT] [FORCE]')
+                       help='Injects entry to all executed tasks: <TITLE> [URL] [ACCEPT] [FORCE]')

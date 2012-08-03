@@ -5,11 +5,11 @@ from flexget.plugin import get_plugin_by_name
 
 class TestURLRewriters(FlexGetBase):
     """
-        Bad example, does things manually, you should use feed.find_entry to check existance
+        Bad example, does things manually, you should use task.find_entry to check existance
     """
 
     __yaml__ = """
-        feeds:
+        tasks:
           test:
             # make test data
             mock:
@@ -22,7 +22,7 @@ class TestURLRewriters(FlexGetBase):
 
     def setup(self):
         FlexGetBase.setup(self)
-        self.execute_feed('test')
+        self.execute_task('test')
 
     def get_urlrewriter(self, name):
         info = get_plugin_by_name(name)
@@ -31,30 +31,30 @@ class TestURLRewriters(FlexGetBase):
     def test_piratebay(self):
         # test with piratebay entry
         urlrewriter = self.get_urlrewriter('piratebay')
-        entry = self.feed.entries[0]
-        assert_true(urlrewriter.url_rewritable(self.feed, entry))
+        entry = self.task.entries[0]
+        assert_true(urlrewriter.url_rewritable(self.task, entry))
 
     def test_piratebay_search(self):
         # test with piratebay entry
         urlrewriter = self.get_urlrewriter('piratebay')
-        entry = self.feed.entries[1]
-        assert_true(urlrewriter.url_rewritable(self.feed, entry))
+        entry = self.task.entries[1]
+        assert_true(urlrewriter.url_rewritable(self.task, entry))
 
     def test_nyaa_torrents(self):
-        entry = self.feed.entries[2]
+        entry = self.task.entries[2]
         urlrewriter = self.get_urlrewriter('nyaa')
         assert entry['url'] == 'http://www.nyaa.eu/?page=torrentinfo&tid=12345'
-        assert_true(urlrewriter.url_rewritable(self.feed, entry))
-        urlrewriter.url_rewrite(self.feed, entry)
+        assert_true(urlrewriter.url_rewritable(self.task, entry))
+        urlrewriter.url_rewrite(self.task, entry)
         assert entry['url'] == 'http://www.nyaa.eu/?page=download&tid=12345'
 
     def test_isohunt(self):
-        entry = self.feed.find_entry(title='isohunt search')
+        entry = self.task.find_entry(title='isohunt search')
         urlrewriter = self.get_urlrewriter('isohunt')
-        assert not urlrewriter.url_rewritable(self.feed, entry), \
+        assert not urlrewriter.url_rewritable(self.task, entry), \
             'search entry should not be url_rewritable'
-        entry = self.feed.find_entry(title='isohunt direct')
-        assert urlrewriter.url_rewritable(self.feed, entry), \
+        entry = self.task.find_entry(title='isohunt direct')
+        assert urlrewriter.url_rewritable(self.task, entry), \
             'direct entry should be url_rewritable'
 
 
@@ -62,7 +62,7 @@ class TestRegexpurlrewriter(FlexGetBase):
     # TODO: this test is broken?
 
     __yaml__ = """
-        feeds:
+        tasks:
           test:
             mock:
               - {title: 'irrelevant', url: 'http://newzleech.com/?p=123'}
@@ -73,6 +73,6 @@ class TestRegexpurlrewriter(FlexGetBase):
     """
 
     def test_newzleech(self):
-        self.execute_feed('test')
-        assert not self.feed.find_entry(url='http://newzleech.com/?m=gen&dl=1&post=123'), \
+        self.execute_task('test')
+        assert not self.task.find_entry(url='http://newzleech.com/?m=gen&dl=1&post=123'), \
             'did not url_rewrite properly'

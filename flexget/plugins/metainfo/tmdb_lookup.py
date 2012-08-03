@@ -69,10 +69,10 @@ class PluginTmdbLookup(object):
         """
         entry.register_lazy_fields(self.field_map, self.lazy_loader)
 
-    def on_feed_metainfo(self, feed, config):
+    def on_task_metainfo(self, task, config):
         if not config:
             return
-        for entry in feed.entries:
+        for entry in task.entries:
             self.lookup(entry)
 
 register_plugin(PluginTmdbLookup, 'tmdb_lookup', api_ver=2)

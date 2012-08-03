@@ -16,11 +16,11 @@ class MetainfoQuality(object):
         from flexget import validator
         return validator.factory('boolean')
 
-    def on_feed_metainfo(self, feed, config):
+    def on_task_metainfo(self, task, config):
         # check if disabled (value set to false)
         if config is False:
             return
-        for entry in feed.entries:
+        for entry in task.entries:
             entry.register_lazy_fields(['quality'], self.lazy_loader)
 
     def lazy_loader(self, entry, field):

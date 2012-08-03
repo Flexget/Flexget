@@ -93,10 +93,10 @@ class PluginRottenTomatoesLookup(object):
         log.debug(u'Got movie: %s' % movie)
         entry.update_using_map(self.field_map, movie)
 
-    def on_feed_metainfo(self, feed, config):
+    def on_task_metainfo(self, task, config):
         if not config:
             return
-        for entry in feed.entries:
+        for entry in task.entries:
             entry.register_lazy_fields(self.field_map, self.lazy_loader)
 
 register_plugin(PluginRottenTomatoesLookup, 'rottentomatoes_lookup', api_ver=2)

@@ -22,16 +22,16 @@ class PluginPathByExt(object):
         config.accept_any_key('any')
         return config
 
-    def on_feed_modify(self, feed):
-        self.ext(feed, self.set_path)
+    def on_task_modify(self, task):
+        self.ext(task, self.set_path)
 
     def set_path(self, entry, path):
         log.debug('Setting %s path to %s' % (entry['title'], path))
         entry['path'] = path
 
-    def ext(self, feed, callback):
-        config = feed.config
-        for entry in feed.entries:
+    def ext(self, task, callback):
+        config = task.config
+        for entry in task.entries:
             if 'mime-type' in entry:
                 # check if configuration has mimetype that entry has
                 if entry['mime-type'] in config:

@@ -22,7 +22,7 @@ class Proxy(object):
         return root
 
     @plugin.priority(255)
-    def on_feed_start(self, feed, config):
+    def on_task_start(self, task, config):
         if not config:
             # If no configuration is provided, see if there are any proxy env variables
             proxies = {}
@@ -38,7 +38,7 @@ class Proxy(object):
             # Map all protocols to the configured proxy
             proxies = dict((prot, config) for prot in PROTOCOLS)
         log.verbose('Setting proxy to %s' % proxies)
-        feed.requests.proxies = proxies
+        task.requests.proxies = proxies
 
 
 plugin.register_plugin(Proxy, 'proxy', builtin=True, api_ver=2)

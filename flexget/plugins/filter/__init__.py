@@ -1,1 +1,1 @@
-"""Plugins for "filter" feed phase, and non-modifying download filters."""
+"""Plugins for "filter" task phase, and non-modifying download filters."""

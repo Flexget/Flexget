@@ -34,7 +34,7 @@ class InputTVTorrents(object):
 
     @cached('tvt')
     @internet(log)
-    def on_feed_input(self, feed):
+    def on_task_input(self, task):
         pageurl = "http://tvtorrents.com/loggedin/recently_aired.do"
         log.debug("InputPlugin tvtorrents requesting url %s" % pageurl)
 
@@ -84,6 +84,6 @@ class InputTVTorrents(object):
             entry['url'] = url
             entry['title'] = title
 
-            feed.entries.append(entry)
+            task.entries.append(entry)
 
 register_plugin(InputTVTorrents, 'tvt')

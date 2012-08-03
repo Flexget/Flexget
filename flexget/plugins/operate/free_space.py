@@ -18,7 +18,7 @@ def get_free_space(folder):
 
 
 class PluginFreeSpace(object):
-    """Aborts a feed if an entry is accepted and there is less than a certain amount of space free on a drive."""
+    """Aborts a task if an entry is accepted and there is less than a certain amount of space free on a drive."""
 
     def validator(self):
         from flexget import validator
@@ -31,24 +31,24 @@ class PluginFreeSpace(object):
         advanced.accept('path', key='path')
         return root
 
-    def get_config(self, feed):
-        config = feed.config.get('free_space', {})
+    def get_config(self, task):
+        config = task.config.get('free_space', {})
         if isinstance(config, (float, int)):
             config = {'space': config}
         # Use config path if none is specified
         if not config.get('path'):
-            config['path'] = feed.manager.config_base
+            config['path'] = task.manager.config_base
         return config
 
     @priority(255)
-    def on_feed_download(self, feed):
-        config = self.get_config(feed)
+    def on_task_download(self, task):
+        config = self.get_config(task)
         # Only bother aborting if there were accepted entries this run.
-        if feed.accepted:
+        if task.accepted:
             if get_free_space(config['path']) < config['space']:
-                log.error('Less than %d MB of free space in %s aborting feed.' % (config['space'], config['path']))
-                # backlog plugin will save and restore the feed content, if available
-                feed.abort('Less than %d MB of free space in %s' % (config['space'], config['path']))
+                log.error('Less than %d MB of free space in %s aborting task.' % (config['space'], config['path']))
+                # backlog plugin will save and restore the task content, if available
+                task.abort('Less than %d MB of free space in %s' % (config['space'], config['path']))
 
 
 register_plugin(PluginFreeSpace, 'free_space')

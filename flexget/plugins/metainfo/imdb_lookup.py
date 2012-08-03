@@ -238,10 +238,10 @@ class ImdbLookup(object):
         return validator.factory('boolean')
 
     @priority(130)
-    def on_feed_metainfo(self, feed, config):
+    def on_task_metainfo(self, task, config):
         if not config:
             return
-        for entry in feed.entries:
+        for entry in task.entries:
             self.register_lazy_fields(entry)
 
     def register_lazy_fields(self, entry):

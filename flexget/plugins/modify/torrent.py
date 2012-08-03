@@ -15,18 +15,18 @@ class TorrentFilename(object):
     TORRENT_PRIO = 255
 
     @priority(TORRENT_PRIO)
-    def on_feed_modify(self, feed):
+    def on_task_modify(self, task):
         # Only scan through accepted entries, as the file must have been downloaded in order to parse anything
-        for entry in feed.accepted:
+        for entry in task.accepted:
             # skip if entry does not have file assigned
             if not 'file' in entry:
                 log.trace('%s doesn\'t have a file associated' % entry['title'])
                 continue
             if not os.path.exists(entry['file']):
-                feed.fail(entry, 'File %s does not exists' % entry['file'])
+                task.fail(entry, 'File %s does not exists' % entry['file'])
                 continue
             if os.path.getsize(entry['file']) == 0:
-                feed.fail(entry, 'File %s is 0 bytes in size' % entry['file'])
+                task.fail(entry, 'File %s is 0 bytes in size' % entry['file'])
                 continue
             if not is_torrent_file(entry['file']):
                 continue
@@ -42,7 +42,7 @@ class TorrentFilename(object):
 
                 if 'content-length' in entry:
                     if len(data) != entry['content-length']:
-                        feed.fail(entry, 'Torrent file length doesn\'t match to the one reported by the server')
+                        task.fail(entry, 'Torrent file length doesn\'t match to the one reported by the server')
                         self.purge(entry)
                         continue
 
@@ -50,7 +50,7 @@ class TorrentFilename(object):
                 try:
                     torrent = Torrent(data)
                 except SyntaxError, e:
-                    feed.fail(entry, '%s - broken or invalid torrent file received' % e.message)
+                    task.fail(entry, '%s - broken or invalid torrent file received' % e.message)
                     self.purge(entry)
                     continue
 
@@ -69,8 +69,8 @@ class TorrentFilename(object):
                 log.exception(e)
 
     @priority(TORRENT_PRIO)
-    def on_feed_output(self, feed):
-        for entry in feed.entries:
+    def on_task_output(self, task):
+        for entry in task.entries:
             if 'torrent' in entry:
                 if entry['torrent'].modified:
                     # re-write data into a file

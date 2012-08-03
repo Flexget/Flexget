@@ -15,18 +15,18 @@ class NzbSize(object):
     """
 
     @priority(200)
-    def on_feed_modify(self, feed):
+    def on_task_modify(self, task):
         """
         The downloaded file is accessible in modify phase
         """
         try:
             from pynzb import nzb_parser
         except ImportError:
-            # TODO: remove builtin status so this won't get repeated on every feed execution
+            # TODO: remove builtin status so this won't get repeated on every task execution
             # TODO: this will get loaded even without any need for nzb
             raise DependencyError(issued_by='nzb_size', missing='lib pynzb')
 
-        for entry in feed.accepted:
+        for entry in task.accepted:
             if entry.get('mime-type', None) in [u'text/nzb', u'application/x-nzb'] or \
                entry.get('filename', '').endswith('.nzb'):
 

@@ -48,21 +48,21 @@ class OutputRSS(object):
 
       make_rss: ~/public_html/flexget.rss
 
-    You may write into same file in multiple feeds.
+    You may write into same file in multiple tasks.
 
     Example::
 
-      my-feed-A:
+      my-task-A:
         make_rss: ~/public_html/series.rss
         .
         .
-      my-feed-B:
+      my-task-B:
         make_rss: ~/public_html/series.rss
         .
         .
 
     With this example file series.rss would contain succeeded
-    entries from both feeds.
+    entries from both tasks.
 
     **Number of days / items**
 
@@ -134,12 +134,12 @@ class OutputRSS(object):
         links.accept('text')
         return root
 
-    def on_feed_output(self, feed):
+    def on_task_output(self, task):
         # makes this plugin count as output (stops warnings about missing outputs)
         pass
 
-    def get_config(self, feed):
-        config = feed.config['make_rss']
+    def get_config(self, task):
+        config = task.config['make_rss']
         if not isinstance(config, dict):
             config = {'file': config}
         config.setdefault('days', 7)
@@ -151,24 +151,24 @@ class OutputRSS(object):
         config['link'].append('url')
         return config
 
-    def on_feed_exit(self, feed):
+    def on_task_exit(self, task):
         """Store finished / downloaded entries at exit"""
         if not rss2gen:
             raise PluginWarning('plugin make_rss requires PyRSS2Gen library.')
-        config = self.get_config(feed)
+        config = self.get_config(task)
 
         # don't run with --test
-        if feed.manager.options.test:
+        if task.manager.options.test:
             return
 
         # when history is disabled, remove everything from backlog on every run (a bit hackish, rarely usefull)
         if not config['history']:
             log.debug('disabling history')
-            for item in feed.session.query(RSSEntry).filter(RSSEntry.file == config['file']).all():
-                feed.session.delete(item)
+            for item in task.session.query(RSSEntry).filter(RSSEntry.file == config['file']).all():
+                task.session.delete(item)
 
         # save entries into db for RSS generation
-        for entry in feed.accepted:
+        for entry in task.accepted:
             rss = RSSEntry()
             rss.title = entry['title']
             for field in config['link']:
@@ -194,22 +194,22 @@ class OutputRSS(object):
 
             # TODO: check if this exists and suggest disabling history if it does since it shouldn't happen normally ...
             log.debug('Saving %s into rss database' % entry['title'])
-            feed.session.add(rss)
+            task.session.add(rss)
 
-    def on_process_end(self, feed):
+    def on_process_end(self, task):
         """Write RSS file at application terminate."""
         if not rss2gen:
             return
         # don't generate rss when learning
-        if feed.manager.options.learn:
+        if task.manager.options.learn:
             return
 
-        config = self.get_config(feed)
+        config = self.get_config(task)
         if config['file'] in self.written:
             log.trace('skipping already written file %s' % config['file'])
             return
 
-        # in terminate phase there is no open session in feed, so open new one
+        # in terminate phase there is no open session in task, so open new one
         from flexget.manager import Session
         session = Session()
 

@@ -73,10 +73,10 @@ class UrlRewriteNyaa:
         entries.sort(reverse=True, key=lambda x: x.get('search_sort'))
         return entries
 
-    def url_rewritable(self, feed, entry):
+    def url_rewritable(self, task, entry):
         return entry['url'].startswith('http://www.nyaa.eu/?page=torrentinfo&tid=')
 
-    def url_rewrite(self, feed, entry):
+    def url_rewrite(self, task, entry):
         entry['url'] = entry['url'].replace('torrentinfo', 'download')
 
 register_plugin(UrlRewriteNyaa, 'nyaa', groups=['search', 'urlrewriter'])

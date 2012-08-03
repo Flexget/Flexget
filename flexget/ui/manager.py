@@ -44,7 +44,7 @@ class UIManager(Manager):
 
     def update_feeds(self):
         """Updates instances of all configured feeds from config"""
-        from flexget.feed import Feed
+        from flexget.task import Task
 
         if not isinstance(self.config['feeds'], dict):
             log.critical('Feeds is in wrong datatype, please read configuration guides')
@@ -61,7 +61,7 @@ class UIManager(Manager):
                     self.feeds[name].enabled = True
             else:
                 # Create feed
-                feed = Feed(self, name, deepcopy(self.config['feeds'][name]))
+                feed = Task(self, name, deepcopy(self.config['feeds'][name]))
                 # If feed name is prefixed with _ it's disabled
                 if name.startswith('_'):
                     feed.enabled = False

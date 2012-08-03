@@ -118,14 +118,14 @@ class FilterRegexp(object):
         return out_config
 
     @priority(172)
-    def on_feed_filter(self, feed, config):
+    def on_task_filter(self, task, config):
         # TODO: what if accept and accept_excluding configured? Should raise error ...
         config = self.prepare_config(config)
         rest = []
         for operation, regexps in config.iteritems():
             if operation == 'rest':
                 continue
-            r = self.filter(feed, operation, regexps)
+            r = self.filter(task, operation, regexps)
             if not rest:
                 rest = r
             else:
@@ -133,7 +133,7 @@ class FilterRegexp(object):
                 rest = [entry for entry in r if entry in rest]
 
         if 'rest' in config:
-            rest_method = feed.accept if config['rest'] == 'accept' else feed.reject
+            rest_method = task.accept if config['rest'] == 'accept' else task.reject
             for entry in rest:
                 log.debug('Rest method %s for %s' % (config['rest'], entry['title']))
                 rest_method(entry, 'regexp `rest`')
@@ -172,9 +172,9 @@ class FilterRegexp(object):
                         return field
         return None
 
-    def filter(self, feed, operation, regexps):
+    def filter(self, task, operation, regexps):
         """
-        :param feed: Feed instance
+        :param task: Task instance
         :param operation: one of 'accept' 'reject' 'accept_excluding' and 'reject_excluding'
                           accept and reject will be called on the entry if any of the regxps match
                           *_excluding operations will be called if any of the regexps don't match
@@ -183,9 +183,9 @@ class FilterRegexp(object):
         """
 
         rest = []
-        method = feed.accept if 'accept' in operation else feed.reject
+        method = task.accept if 'accept' in operation else task.reject
         match_mode = 'excluding' not in operation
-        for entry in feed.entries:
+        for entry in task.entries:
             log.trace('testing %i regexps to %s' % (len(regexps), entry['title']))
             for regexp_opts in regexps:
                 regexp, opts = regexp_opts.items()[0]

@@ -12,7 +12,7 @@ from event import add_event_handler as add_phase_handler
 
 log = logging.getLogger('plugin')
 
-__all__ = ['PluginWarning', 'PluginError', 'register_plugin', 'register_parser_option', 'register_feed_phase',
+__all__ = ['PluginWarning', 'PluginError', 'register_plugin', 'register_parser_option', 'register_task_phase',
            'get_plugin_by_name', 'get_plugins_by_group', 'get_plugin_keywords', 'get_plugins_by_phase',
            'get_phases_by_plugin', 'internet', 'priority']
 
@@ -98,7 +98,7 @@ class internet(object):
     """@internet decorator for plugin phase methods.
 
     Catches all internet related exceptions and raises PluginError with relevant message.
-    Feed handles PluginErrors by aborting the feed.
+    Task handles PluginErrors by aborting the task.
     """
 
     def __init__(self, logger=None):
@@ -152,14 +152,14 @@ def _strip_trailing_sep(path):
 
 DEFAULT_PRIORITY = 128
 
-# feed phases, in order of their execution; note that this can be extended by
+# task phases, in order of their execution; note that this can be extended by
 # registering new phases at runtime
-feed_phases = ['start', 'input', 'metainfo', 'filter', 'download', 'modify', 'output', 'exit']
+task_phases = ['start', 'input', 'metainfo', 'filter', 'download', 'modify', 'output', 'exit']
 
 # map phase names to method names
 phase_methods = {
-    # feed
-    'abort': 'on_feed_abort', # special; not a feed phase that gets called normally
+    # task
+    'abort': 'on_task_abort', # special; not a task phase that gets called normally
 
     # entry handling
     'accept': 'on_entry_accept',
@@ -170,7 +170,7 @@ phase_methods = {
     'process_start': 'on_process_start',
     'process_end': 'on_process_end',
 }
-phase_methods.update((_phase, 'on_feed_' + _phase) for _phase in feed_phases) # DRY
+phase_methods.update((_phase, 'on_task_' + _phase) for _phase in task_phases) # DRY
 
 # Plugin package naming
 PLUGIN_NAMESPACE = 'flexget.plugins'
@@ -197,27 +197,27 @@ def register_parser_option(*args, **kwargs):
     _plugin_options.append((args, kwargs))
 
 
-def register_feed_phase(name, before=None, after=None):
-    """Adds a new feed phase to the available phases."""
+def register_task_phase(name, before=None, after=None):
+    """Adds a new task phase to the available phases."""
     if before and after:
         raise RegisterException('You can only give either before or after for a phase.')
     if not before and not after:
         raise RegisterException('You must specify either a before or after phase.')
-    if name in feed_phases or name in _new_phase_queue:
+    if name in task_phases or name in _new_phase_queue:
         raise RegisterException('Phase %s already exists.' % name)
 
     def add_phase(phase_name, before, after):
-        if not before is None and not before in feed_phases:
+        if not before is None and not before in task_phases:
             return False
-        if not after is None and not after in feed_phases:
+        if not after is None and not after in task_phases:
             return False
         # add method name to phase -> method lookup table
-        phase_methods[phase_name] = 'on_feed_' + phase_name
+        phase_methods[phase_name] = 'on_task_' + phase_name
         # place phase in phase list
         if before is None:
-            feed_phases.insert(feed_phases.index(after) + 1, phase_name)
+            task_phases.insert(task_phases.index(after) + 1, phase_name)
         if after is None:
-            feed_phases.insert(feed_phases.index(before), phase_name)
+            task_phases.insert(task_phases.index(before), phase_name)
 
         # create possibly newly available phase handlers
         for loaded_plugin in plugins:
@@ -291,7 +291,7 @@ class PluginInfo(dict):
         :groups: Groups this plugin belongs to.
         :builtin: Auto-activated?
         :debug: True if plugin is for debugging purposes.
-        :api_ver: Signature of callback hooks (1=feed; 2=feed,config).
+        :api_ver: Signature of callback hooks (1=task; 2=task,config).
         """
         dict.__init__(self)
 
@@ -480,7 +480,7 @@ def load_plugins_from_dirs(dirs):
             log.debug('Looking for plugins in %s', dir)
             load_plugins_from_dir(dir)
 
-            # Also look in sub-packages named like the feed phases, plus "generic"
+            # Also look in sub-packages named like the task phases, plus "generic"
             for subpkg in plugin_packages:
                 subpath = os.path.join(dir, subpkg)
                 if os.path.isdir(subpath):

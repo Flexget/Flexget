@@ -135,11 +135,11 @@ class PluginThetvdbLookup(object):
 
     # Run after series and metainfo series
     @priority(110)
-    def on_feed_metainfo(self, feed, config):
+    def on_task_metainfo(self, task, config):
         if not config:
             return
 
-        for entry in feed.entries:
+        for entry in task.entries:
             # If there is information for a series lookup, register our series lazy fields
             if entry.get('series_name') or entry.get('thetvdb_id', eval_lazy=False):
                 entry.register_lazy_fields(self.series_map, self.lazy_series_lookup)

@@ -46,7 +46,7 @@ class MyEpisodes(object):
     Most shows are recognized automatically from their TVDBname.
     And of course the plugin needs to know your MyEpisodes.com account details.
 
-    feeds:
+    tasks:
       tvshows:
         myepisodes:
           username: <username>
@@ -60,7 +60,7 @@ class MyEpisodes(object):
     In some cases, the TVDB name is either not unique or won't even be discovered.
     In that case you need to specify the MyEpisodes id manually using the set plugin.
 
-    feeds:
+    tasks:
       tvshows:
         myepisodes:
           username: <username>
@@ -81,9 +81,9 @@ class MyEpisodes(object):
         root.accept('text', key='password', required=True)
         return root
 
-    def on_feed_exit(self, feed, config):
+    def on_task_exit(self, task, config):
         """Mark all accepted episodes as acquired on MyEpisodes"""
-        if not feed.accepted:
+        if not task.accepted:
             # Nothing accepted, don't do anything
             return
 
@@ -107,9 +107,9 @@ class MyEpisodes(object):
             raise PluginWarning(('Login to myepisodes.com failed, please check '
                                  'your account data or see if the site is down.'), log)
 
-        for entry in feed.accepted:
+        for entry in task.accepted:
             try:
-                self.mark_episode(feed, entry, opener)
+                self.mark_episode(task, entry, opener)
             except PluginWarning, w:
                 log.warning(str(w))
 
@@ -171,7 +171,7 @@ class MyEpisodes(object):
             entry['myepisodes_id'] = myepisodes_id
             return myepisodes_id
 
-    def mark_episode(self, feed, entry, opener):
+    def mark_episode(self, task, entry, opener):
         """Mark episode as acquired.
 
         Required entry fields:
@@ -187,14 +187,14 @@ class MyEpisodes(object):
             raise PluginWarning('Can\'t mark entry `%s` in myepisodes without series_season, series_episode and series_name fields' %
                 entry['title'], log)
 
-        if not self.lookup_myepisodes_id(entry, opener, session=feed.session):
+        if not self.lookup_myepisodes_id(entry, opener, session=task.session):
             raise PluginWarning('Couldn\'t get myepisodes id for `%s`' % entry['title'], log)
 
         myepisodes_id = entry['myepisodes_id']
         season = entry['series_season']
         episode = entry['series_episode']
 
-        if feed.manager.options.test:
+        if task.manager.options.test:
             log.info('Would mark %s of `%s` as acquired.' % (entry['series_id'], entry['series_name']))
         else:
             baseurl2 = urllib2.Request('http://myepisodes.com/myshows.php?action=Update&showid=%s&season=%s&episode=%s&seen=0' %

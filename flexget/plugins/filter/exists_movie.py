@@ -35,12 +35,12 @@ class FilterExistsMovie(object):
             config = [config]
         return config
 
-    def on_process_start(self, feed, config):
+    def on_process_start(self, task, config):
         self.cache = {}
 
     @priority(-1)
-    def on_feed_filter(self, feed, config):
-        if not feed.accepted:
+    def on_task_filter(self, task, config):
+        if not task.accepted:
             log.debug('nothing accepted, aborting')
             return
 
@@ -94,7 +94,7 @@ class FilterExistsMovie(object):
                     try:
                         imdb_id = imdb_lookup.imdb_id_lookup(movie_title=movie.name,
                                                              raw_title=item,
-                                                             session=feed.session)
+                                                             session=task.session)
                         if imdb_id in path_ids:
                             log.trace('duplicate %s' % item)
                             continue
@@ -112,7 +112,7 @@ class FilterExistsMovie(object):
         log.debug('-- Start filtering entries ----------------------------------')
 
         # do actual filtering
-        for entry in feed.accepted:
+        for entry in task.accepted:
             count_entries += 1
             if not entry.get('imdb_id', eval_lazy=False):
                 try:
@@ -124,7 +124,7 @@ class FilterExistsMovie(object):
 
             # actual filtering
             if entry['imdb_id'] in imdb_ids:
-                feed.reject(entry, 'movie exists')
+                task.reject(entry, 'movie exists')
 
         if incompatible_dirs or incompatible_entries:
             log.verbose('There were some incompatible items. %s of %s entries '

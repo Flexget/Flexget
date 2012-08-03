@@ -27,7 +27,7 @@ class EmitIMDBQueue(object):
             config = {'year': True, 'quality': True}
         return config
 
-    def on_feed_input(self, feed, config):
+    def on_task_input(self, task, config):
         if not config:
             return
         config = self.prepare_config(config)

@@ -20,12 +20,12 @@ class TraktAcquired(object):
         root.accept('choice', key='type', required=True).accept_choices(['movies', 'series'])
         return root
 
-    def on_feed_exit(self, feed, config):
+    def on_task_exit(self, task, config):
         """Finds accepted movies and series episodes and submits them to trakt as acquired."""
         # Change password to an SHA1 digest of the password
         config['password'] = hashlib.sha1(config['password']).hexdigest()
         found = {}
-        for entry in feed.accepted:
+        for entry in task.accepted:
             if config['type'] == 'series':
                 # Check entry is a series episode
                 if entry.get('series_name') and entry.get('series_id_type') == 'ep':
@@ -63,7 +63,7 @@ class TraktAcquired(object):
             log.debug('Nothing to submit to trakt.')
             return
 
-        if feed.manager.options.test:
+        if task.manager.options.test:
             log.info('Not submitting to trakt.tv because of test mode.')
             return
 

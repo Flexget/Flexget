@@ -10,13 +10,13 @@ from flexget.utils.tools import MergeException, merge_dict_from_to
 from flexget.plugin import PluginError, register_plugin
 from flexget import manager
 from flexget.event import event
-from flexget.utils.template import render_from_feed, get_template, RenderError
+from flexget.utils.template import render_from_task, get_template, RenderError
 from flexget import validator
 
 log = logging.getLogger('email')
 
-# A dict which stores the email content from each feed when plugin is configured globally
-feed_content = {}
+# A dict which stores the email content from each task when plugin is configured globally
+task_content = {}
 
 def options_validator():
     email = validator.factory('dict')
@@ -57,40 +57,40 @@ def setup(manager):
         return
     config = prepare_config(manager.config['email'])
     config['global'] = True
-    global feed_content
-    feed_content = {}
-    for feed in manager.feeds.itervalues():
-        feed.config.setdefault('email', {})
+    global task_content
+    task_content = {}
+    for task in manager.tasks.itervalues():
+        task.config.setdefault('email', {})
         try:
-            merge_dict_from_to(config, feed.config['email'])
+            merge_dict_from_to(config, task.config['email'])
         except MergeException, exc:
-            raise PluginError('Failed to merge email config to feed %s due to %s' % (feed.name, exc))
-        feed.config.setdefault('email', config)
+            raise PluginError('Failed to merge email config to task %s due to %s' % (task.name, exc))
+        task.config.setdefault('email', config)
 
 
 @event('manager.execute.completed')
 def global_send(manager):
     if not 'email' in manager.config:
         return
-    if all(not feed.enabled for feed in manager.feeds.itervalues()):
-        # If all the feeds are disabled, don't do anything.
+    if all(not task.enabled for task in manager.tasks.itervalues()):
+        # If all the tasks are disabled, don't do anything.
         return
     config = prepare_config(manager.config['email'])
     content = ''
-    for feed, text in feed_content.iteritems():
-        content += '_' * 30 + ' Feed: %s ' % feed + '_' * 30 + '\n'
+    for task, text in task_content.iteritems():
+        content += '_' * 30 + ' Task: %s ' % task + '_' * 30 + '\n'
 
         content += text + '\n'
     if not content:
-        log.verbose('No feeds generated any email notifications. Not sending.')
+        log.verbose('No tasks generated any email notifications. Not sending.')
         return
     if config.get('subject'):
         # If subject is specified, use it from the config
         subject = config['subject']
     elif config['template'].startswith('failed'):
-        subject = '[FlexGet] Failures on feed(s): %s' % ', '.join(feed_content)
+        subject = '[FlexGet] Failures on task(s): %s' % ', '.join(task_content)
     else:
-        subject = '[FlexGet] Notifications for feed(s): %s' % ', '.join(feed_content)
+        subject = '[FlexGet] Notifications for task(s): %s' % ', '.join(task_content)
     send_email(subject, content, config)
 
 
@@ -190,7 +190,7 @@ class OutputEmail(object):
         smtp_password: my_smtp_password
         smtp_tls: true
 
-    Config multi-feed example::
+    Config multi-task example::
 
       global:
         email:
@@ -198,14 +198,14 @@ class OutputEmail(object):
           to: xxx@xxx.xxx
           smtp_host: smtp.host.com
 
-      feeds:
-        feed1:
+      tasks:
+        task1:
           rss: http://xxx
-        feed2:
+        task2:
           rss: http://yyy
           email:
             active: False
-        feed3:
+        task3:
           rss: http://zzz
           email:
             to: zzz@zzz.zzz
@@ -239,10 +239,10 @@ class OutputEmail(object):
         v.accept('boolean', key='global')
         return v
 
-    def on_feed_output(self, feed, config):
+    def on_task_output(self, task, config):
         """Count the email as an output"""
 
-    def on_feed_exit(self, feed, config):
+    def on_task_exit(self, task, config):
         """Send email at exit."""
 
         config = prepare_config(config)
@@ -251,27 +251,27 @@ class OutputEmail(object):
             return
 
         # don't send mail when learning
-        if feed.manager.options.learn:
+        if task.manager.options.learn:
             return
 
         # generate email content
         if config.get('subject'):
             subject = config['subject']
         else:
-            subject = '[FlexGet] {{feed.name}}: '
-            if feed.aborted:
+            subject = '[FlexGet] {{task.name}}: '
+            if task.aborted:
                 subject += 'Aborted'
-            elif feed.failed:
-                subject += '{{feed.failed|length}} failed entries'
+            elif task.failed:
+                subject += '{{task.failed|length}} failed entries'
             else:
-                subject += '{{feed.accepted|length}} new entries downloaded'
+                subject += '{{task.accepted|length}} new entries downloaded'
         try:
-            subject = render_from_feed(subject, feed)
+            subject = render_from_task(subject, task)
         except RenderError, e:
             log.error('Error rendering email subject: %s' % e)
             return
         try:
-            content = render_from_feed(get_template(config['template'], 'email'), feed)
+            content = render_from_task(get_template(config['template'], 'email'), task)
         except RenderError, e:
             log.error('Error rendering email body: %s' % e)
             return
@@ -282,16 +282,16 @@ class OutputEmail(object):
 
         if config.get('global'):
             # Email plugin was configured at root, save the email output
-            log.debug('Saving email content for feed %s' % feed.name)
-            feed_content[feed.name] = content
+            log.debug('Saving email content for task %s' % task.name)
+            task_content[task.name] = content
         else:
             send_email(subject, content, config)
 
     # Also send the email on abort
-    def on_feed_abort(self, feed, config):
-        # The config may not be correct if the feed is aborting
+    def on_task_abort(self, task, config):
+        # The config may not be correct if the task is aborting
         try:
-            self.on_feed_exit(feed, config)
+            self.on_task_exit(task, config)
         except Exception, e:
             log.info('Could not send abort email because email config is invalid.')
             # Log the exception to debug, in case something different is going wrong.

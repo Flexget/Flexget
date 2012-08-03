@@ -36,20 +36,20 @@ class AppleTrailers(InputRSS):
 
     # Run before headers plugin
     @priority(135)
-    def on_feed_start(self, feed, config):
-        # TODO: Resolve user-agent in a way that doesn't involve modifying the feed config.
+    def on_task_start(self, task, config):
+        # TODO: Resolve user-agent in a way that doesn't involve modifying the task config.
         # make sure we have dependencies available, will throw DependencyError if not
         get_plugin_by_name('headers')
         # configure them
-        feed.config['headers'] = {'User-Agent': 'QuickTime/7.6.6'}
+        task.config['headers'] = {'User-Agent': 'QuickTime/7.6.6'}
         self.quality = str(config)
 
     @priority(127)
     @cached('apple_trailers')
-    def on_feed_input(self, feed, config):
+    def on_task_input(self, task, config):
         # use rss plugin
         rss_config = {'url': self.rss_url}
-        rss_entries = super(AppleTrailers, self).on_feed_input(feed, rss_config)
+        rss_entries = super(AppleTrailers, self).on_task_input(task, rss_config)
 
         # Multiple entries can point to the same movie page (trailer 1, clip
         # 1, etc.)

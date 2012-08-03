@@ -22,12 +22,12 @@ class QueueMovies(object):
         opts.accept('boolean', key='force')
         return root
 
-    def on_feed_output(self, feed, config):
+    def on_task_output(self, task, config):
         if not config:
             return
         if not isinstance(config, dict):
             config = {}
-        for entry in feed.accepted:
+        for entry in task.accepted:
             # Tell tmdb_lookup to add lazy lookup fields if not already present
             try:
                 get_plugin_by_name('tmdb_lookup').instance.lookup(entry)
@@ -62,7 +62,7 @@ class QueueMovies(object):
             try:
                 queue_add(**kwargs)
             except QueueError, e:
-                feed.fail(entry, 'Error adding movie to queue: %s' % e.message)
+                task.fail(entry, 'Error adding movie to queue: %s' % e.message)
 
 
 register_plugin(QueueMovies, 'queue_movies', api_ver=2)

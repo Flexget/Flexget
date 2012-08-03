@@ -1,5 +1,5 @@
 import logging
-from flexget.plugin import get_plugins_by_group, priority, PluginError, register_plugin, register_feed_phase
+from flexget.plugin import get_plugins_by_group, priority, PluginError, register_plugin, register_task_phase
 
 log = logging.getLogger('urlrewriter')
 
@@ -19,20 +19,20 @@ class PluginUrlRewriting(object):
     Provides URL rewriting framework
     """
 
-    def on_feed_urlrewrite(self, feed):
+    def on_task_urlrewrite(self, task):
         # no urlrewriting in unit test mode
-        if feed.manager.unit_test:
+        if task.manager.unit_test:
             return
-        log.debug('Checking %s entries' % len(feed.accepted))
+        log.debug('Checking %s entries' % len(task.accepted))
         # try to urlrewrite all accepted
-        for entry in feed.accepted:
+        for entry in task.accepted:
             try:
-                self.url_rewrite(feed, entry)
+                self.url_rewrite(task, entry)
             except UrlRewritingError, e:
                 log.warn(e.value)
-                feed.fail(entry)
+                task.fail(entry)
 
-    def url_rewritable(self, feed, entry):
+    def url_rewritable(self, task, entry):
         """Return True if entry is urlrewritable by registered rewriter."""
         for urlrewriter in get_plugins_by_group('urlrewriter'):
             log.trace('checking urlrewriter %s' % urlrewriter.name)
@@ -41,19 +41,19 @@ class PluginUrlRewriting(object):
         return False
 
     @priority(255)
-    def url_rewrite(self, feed, entry):
+    def url_rewrite(self, task, entry):
         """Rewrites given entry url. Raises UrlRewritingError if failed."""
         tries = 0
-        while self.url_rewritable(feed, entry):
+        while self.url_rewritable(task, entry):
             tries += 1
             if tries > 300:
                 raise UrlRewritingError('URL rewriting was left in infinite loop while rewriting url for %s, some rewriter is returning always True' % entry)
             for urlrewriter in get_plugins_by_group('urlrewriter'):
                 name = urlrewriter.name
                 try:
-                    if urlrewriter.instance.url_rewritable(feed, entry):
+                    if urlrewriter.instance.url_rewritable(task, entry):
                         log.debug('Url rewriting %s' % entry['url'])
-                        urlrewriter.instance.url_rewrite(feed, entry)
+                        urlrewriter.instance.url_rewrite(task, entry)
                         log.info('Entry \'%s\' URL rewritten to %s (with %s)' % (entry['title'], entry['url'], name))
                 except UrlRewritingError, r:
                     # increase failcount
@@ -67,4 +67,4 @@ class PluginUrlRewriting(object):
                     raise UrlRewritingError('%s: Internal error with url %s' % (name, entry['url']))
 
 register_plugin(PluginUrlRewriting, 'urlrewriting', builtin=True)
-register_feed_phase('urlrewrite', before='download')
+register_task_phase('urlrewrite', before='download')

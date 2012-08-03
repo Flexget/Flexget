@@ -124,7 +124,7 @@ class InputRSS(object):
         config.setdefault('all_entries', False)
         return config
 
-    def process_invalid_content(self, feed, data):
+    def process_invalid_content(self, task, data):
         """If feedparser reports error, save the received data and log error."""
 
         if data is None:
@@ -138,10 +138,10 @@ class InputRSS(object):
             log.critical('Received content looks a bit like login page')
         if 'error' in data.lower():
             log.critical('Received content looks a bit like error page')
-        received = os.path.join(feed.manager.config_base, 'received')
+        received = os.path.join(task.manager.config_base, 'received')
         if not os.path.isdir(received):
             os.mkdir(received)
-        filename = os.path.join(received, '%s.%s' % (feed.name, ext))
+        filename = os.path.join(received, '%s.%s' % (task.name, ext))
         f = open(filename, 'w')
         f.write(data)
         f.close()
@@ -168,30 +168,30 @@ class InputRSS(object):
 
     @cached('rss')
     @internet(log)
-    def on_feed_input(self, feed, config):
+    def on_task_input(self, task, config):
         config = self.build_config(config)
 
-        log.debug('Requesting feed `%s` url `%s`' % (feed.name, config['url']))
+        log.debug('Requesting task `%s` url `%s`' % (task.name, config['url']))
 
         # Used to identify which etag/modified to use
         url_hash = str(hash(config['url']))
 
         # set etag and last modified headers if config has not changed since
         # last run and if caching wasn't disabled with --no-cache argument.
-        all_entries = config['all_entries'] or feed.config_modified or feed.manager.options.nocache
+        all_entries = config['all_entries'] or task.config_modified or task.manager.options.nocache
         headers = {}
         if not all_entries:
-            etag = feed.simple_persistence.get('%s_etag' % url_hash, None)
+            etag = task.simple_persistence.get('%s_etag' % url_hash, None)
             if etag:
-                log.debug('Sending etag %s for feed %s' % (etag, feed.name))
+                log.debug('Sending etag %s for task %s' % (etag, task.name))
                 headers['If-None-Match'] = etag
-            modified = feed.simple_persistence.get('%s_modified' % url_hash, None)
+            modified = task.simple_persistence.get('%s_modified' % url_hash, None)
             if modified:
                 if not isinstance(modified, basestring):
                     log.debug('Invalid date was stored for last modified time.')
                 else:
                     headers['If-Modified-Since'] = modified
-                    log.debug('Sending last-modified %s for feed %s' % (headers['If-Modified-Since'], feed.name))
+                    log.debug('Sending last-modified %s for task %s' % (headers['If-Modified-Since'], task.name))
 
         # Get the feed content
         if config['url'].startswith(('http', 'https', 'ftp', 'file')):
@@ -201,26 +201,26 @@ class InputRSS(object):
                 auth = (config['username'], config['password'])
             try:
                 # Use the raw response so feedparser can read the headers and status values
-                response = feed.requests.get(config['url'], timeout=60, headers=headers, raise_status=False, auth=auth)
+                response = task.requests.get(config['url'], timeout=60, headers=headers, raise_status=False, auth=auth)
                 content = response.content
             except RequestException, e:
-                raise PluginError('Unable to download the RSS for feed %s (%s): %s' %
-                                  (feed.name, config['url'], e))
+                raise PluginError('Unable to download the RSS for task %s (%s): %s' %
+                                  (task.name, config['url'], e))
 
             # status checks
             status = response.status_code
             if status == 304:
                 log.verbose('%s hasn\'t changed since last run. Not creating entries.' % config['url'])
                 # Let details plugin know that it is ok if this feed doesn't produce any entries
-                feed.no_entries_ok = True
+                task.no_entries_ok = True
                 return []
             elif status == 401:
-                raise PluginError('Authentication needed for feed %s (%s): %s' %\
-                                  (feed.name, config['url'], response.headers['www-authenticate']), log)
+                raise PluginError('Authentication needed for task %s (%s): %s' %\
+                                  (task.name, config['url'], response.headers['www-authenticate']), log)
             elif status == 404:
-                raise PluginError('RSS Feed %s (%s) not found' % (feed.name, config['url']), log)
+                raise PluginError('RSS Feed %s (%s) not found' % (task.name, config['url']), log)
             elif status == 500:
-                raise PluginError('Internal server exception on feed %s (%s)' % (feed.name, config['url']), log)
+                raise PluginError('Internal server exception on task %s (%s)' % (task.name, config['url']), log)
             elif status != 200:
                 raise PluginError('HTTP error %s received from %s' % (status, config['url']), log)
 
@@ -228,12 +228,12 @@ class InputRSS(object):
             if not config['all_entries']:
                 etag = response.headers.get('etag')
                 if etag:
-                    feed.simple_persistence['%s_etag' % url_hash] = etag
-                    log.debug('etag %s saved for feed %s' % (etag, feed.name))
+                    task.simple_persistence['%s_etag' % url_hash] = etag
+                    log.debug('etag %s saved for task %s' % (etag, task.name))
                 if  response.headers.get('last-modified'):
                     modified = response.headers['last-modified']
-                    feed.simple_persistence['%s_modified' % url_hash] = modified
-                    log.debug('last modified %s saved for feed %s' % (modified, feed.name))
+                    task.simple_persistence['%s_modified' % url_hash] = modified
+                    log.debug('last modified %s saved for task %s' % (modified, task.name))
         else:
             # This is a file, open it
             content = open(config['url'], 'rb').read()
@@ -263,10 +263,10 @@ class InputRSS(object):
                 if not rss.entries:
                     # save invalid data for review, this is a bit ugly but users seem to really confused when
                     # html pages (login pages) are received
-                    self.process_invalid_content(feed, content)
-                    if feed.manager.options.debug:
+                    self.process_invalid_content(task, content)
+                    if task.manager.options.debug:
                         log.exception(ex)
-                    raise PluginError('Received invalid RSS content from feed %s (%s)' % (feed.name, config['url']))
+                    raise PluginError('Received invalid RSS content from task %s (%s)' % (task.name, config['url']))
                 else:
                     msg = ('Invalid XML received (%s). However feedparser still produced entries.'
                            ' Ignoring the error...' % str(ex).replace('<unknown>:', 'line '))
@@ -280,9 +280,9 @@ class InputRSS(object):
             else:
                 # all other bozo errors
                 if not rss.entries:
-                    self.process_invalid_content(feed, content)
-                    raise PluginError('Unhandled bozo_exception. Type: %s (feed: %s)' %\
-                                      (ex.__class__.__name__, feed.name), log)
+                    self.process_invalid_content(task, content)
+                    raise PluginError('Unhandled bozo_exception. Type: %s (task: %s)' %\
+                                      (ex.__class__.__name__, task.name), log)
                 else:
                     msg = 'Invalid RSS received. However feedparser still produced entries. Ignoring the error ...'
                     if not config.get('silent', False):
@@ -293,7 +293,7 @@ class InputRSS(object):
         if 'bozo' in rss:
             if rss.bozo and not ignore:
                 log.error(rss)
-                log.error('Bozo exception %s on feed %s' % (type(ex), feed.name))
+                log.error('Bozo exception %s on task %s' % (type(ex), task.name))
                 return
         else:
             log.warn('feedparser bozo bit missing, feedparser bug? (FlexGet ticket #721)')
@@ -307,7 +307,7 @@ class InputRSS(object):
                 if rss.entries[0]['published_parsed'] < rss.entries[-1]['published_parsed']:
                     # Sort them if they are not
                     rss.entries.sort(key=lambda x: x['published_parsed'], reverse=True)
-            last_entry_id = feed.simple_persistence.get('%s_last_entry' % url_hash)
+            last_entry_id = task.simple_persistence.get('%s_last_entry' % url_hash)
 
         # new entries to be created
         entries = []
@@ -331,8 +331,8 @@ class InputRSS(object):
             # Check we haven't already processed this entry in a previous run
             if last_entry_id == entry.title + entry.get('guid', ''):
                 log.verbose('Not processing entries from last run.')
-                # Let details plugin know that it is ok if this feed doesn't produce any entries
-                feed.no_entries_ok = True
+                # Let details plugin know that it is ok if this task doesn't produce any entries
+                task.no_entries_ok = True
                 break
 
             # convert title to ascii (cleanup)
@@ -442,7 +442,7 @@ class InputRSS(object):
         # Save last spot in rss
         if rss.entries:
             log.debug('Saving location in rss feed.')
-            feed.simple_persistence['%s_last_entry' % url_hash] = rss.entries[0].title + rss.entries[0].get('guid', '')
+            task.simple_persistence['%s_last_entry' % url_hash] = rss.entries[0].title + rss.entries[0].get('guid', '')
 
         if ignored:
             if not config.get('silent'):

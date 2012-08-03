@@ -21,13 +21,13 @@ class FilterRequireField(object):
         return root
 
     @priority(32)
-    def on_feed_filter(self, feed, config):
+    def on_task_filter(self, task, config):
         if isinstance(config, basestring):
             config = [config]
-        for entry in feed.entries:
+        for entry in task.entries:
             for field in config:
                 if not entry.get(field):
-                    feed.reject(entry, 'Required field %s is not present' % field)
+                    task.reject(entry, 'Required field %s is not present' % field)
                     break
 
 

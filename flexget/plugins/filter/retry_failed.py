@@ -60,13 +60,13 @@ Index('failed_title_url', columns.title, columns.url, columns.count)
 class PluginFailed(object):
     """Provides tracking for failures and related commandline utilities."""
 
-    def on_process_start(self, feed, config):
-        if feed.manager.options.failed:
-            feed.manager.disable_feeds()
+    def on_process_start(self, task, config):
+        if task.manager.options.failed:
+            task.manager.disable_tasks()
             self.print_failed()
             return
-        if feed.manager.options.clear_failed:
-            feed.manager.disable_feeds()
+        if task.manager.options.clear_failed:
+            task.manager.disable_tasks()
             self.clear_failed()
             return
 
@@ -120,7 +120,7 @@ class PluginFailed(object):
         finally:
             session.close()
 
-    def on_entry_fail(self, feed, entry, **kwargs):
+    def on_entry_fail(self, task, entry, **kwargs):
         self.add_failed(entry, reason=kwargs.get('reason'))
 
 
@@ -157,33 +157,33 @@ class FilterRetryFailed(object):
             config['retry_time_multiplier'] = 1
         return config
 
-    def on_process_start(self, feed, config):
+    def on_process_start(self, task, config):
         try:
             self.backlog = get_plugin_by_name('backlog').instance
         except DependencyError:
             log.warning('Unable utilize backlog plugin, failed entries may not be retried properly.')
 
     @priority(255)
-    def on_feed_filter(self, feed, config):
+    def on_task_filter(self, task, config):
         if config is False:
             return
         config = self.prepare_config(config)
         max_count = config['max_retries']
-        for entry in feed.entries:
-            item = feed.session.query(FailedEntry).filter(FailedEntry.title == entry['title']).\
+        for entry in task.entries:
+            item = task.session.query(FailedEntry).filter(FailedEntry.title == entry['title']).\
                                             filter(FailedEntry.url == entry['original_url']).\
                                             filter(FailedEntry.count > max_count).first()
             if item:
-                feed.reject(entry, 'Has already failed %s times in the past' % item.count)
+                task.reject(entry, 'Has already failed %s times in the past' % item.count)
 
-    def on_feed_exit(self, feed, config):
+    def on_task_exit(self, task, config):
         if config is False:
             return
         config = self.prepare_config(config)
         base_retry_time = parse_timedelta(config['retry_time'])
         retry_time_multiplier = config['retry_time_multiplier']
-        for entry in feed.failed:
-            item = feed.session.query(FailedEntry).filter(FailedEntry.title == entry['title']).\
+        for entry in task.failed:
+            item = task.session.query(FailedEntry).filter(FailedEntry.title == entry['title']).\
                                             filter(FailedEntry.url == entry['original_url']).first()
             if item:
                 # Do not count the failure on this run when adding additional retry time
@@ -198,12 +198,12 @@ class FilterRetryFailed(object):
             else:
                 retry_time = base_retry_time
             if self.backlog:
-                self.backlog.add_backlog(feed, entry, amount=retry_time)
+                self.backlog.add_backlog(task, entry, amount=retry_time)
             if retry_time:
-                feed.reject(entry, reason='Waiting before trying failed entry again. (failure reason: %s)' %
+                task.reject(entry, reason='Waiting before trying failed entry again. (failure reason: %s)' %
                                           item.reason, remember_time=retry_time)
-                # Cause a feed rerun, to look for alternate releases
-                feed.rerun()
+                # Cause a task rerun, to look for alternate releases
+                task.rerun()
 
 register_plugin(PluginFailed, '--failed', builtin=True, api_ver=2)
 register_plugin(FilterRetryFailed, 'retry_failed', builtin=True, api_ver=2)

@@ -3,7 +3,7 @@ NOTE:
 
 Avoid using this module on your own or in plugins, this was originally made for 0.9 -> 1.0 transition.
 
-You can safely use feed.simple_persistence and manager.persist, if we implement something better we
+You can safely use task.simple_persistence and manager.persist, if we implement something better we
 can replace underlying mechanism in single point (and provide transparent switch).
 """
 
@@ -49,35 +49,35 @@ class SimpleKeyValue(Base):
     __tablename__ = 'simple_persistence'
 
     id = Column(Integer, primary_key=True)
-    feed = Column(String)
+    task = Column('feed', String)
     plugin = Column(String)
     key = Column(String)
     _value = Column('value', PickleType)
     value = safe_pickle_synonym('_value')
     added = Column(DateTime, default=datetime.now())
 
-    def __init__(self, feed, plugin, key, value):
-        self.feed = feed
+    def __init__(self, task, plugin, key, value):
+        self.task = task
         self.plugin = plugin
         self.key = key
         self.value = value
 
     def __repr__(self):
-        return "<SimpleKeyValue('%s','%s','%s')>" % (self.feed, self.key, self.value)
+        return "<SimpleKeyValue('%s','%s','%s')>" % (self.task, self.key, self.value)
 
-Index('ix_simple_persistence_feed_plugin_key', SimpleKeyValue.feed, SimpleKeyValue.plugin, SimpleKeyValue.key)
+Index('ix_simple_persistence_feed_plugin_key', SimpleKeyValue.task, SimpleKeyValue.plugin, SimpleKeyValue.key)
 
 
 class SimplePersistence(DictMixin):
 
     def __init__(self, plugin, session=None):
-        self.feedname = None
+        self.taskname = None
         self.plugin = plugin
         self.session = session
 
     def __setitem__(self, key, value):
         session = self.session or Session()
-        skv = session.query(SimpleKeyValue).filter(SimpleKeyValue.feed == self.feedname).\
+        skv = session.query(SimpleKeyValue).filter(SimpleKeyValue.task == self.taskname).\
                 filter(SimpleKeyValue.plugin == self.plugin).filter(SimpleKeyValue.key == key).first()
         if skv:
             # update existing
@@ -85,7 +85,7 @@ class SimplePersistence(DictMixin):
             skv.value = value
         else:
             # add new key
-            skv = SimpleKeyValue(self.feedname, self.plugin, key, value)
+            skv = SimpleKeyValue(self.taskname, self.plugin, key, value)
             log.debug('adding key %s value %s' % (key, repr(value)))
             session.add(skv)
         if not self.session:
@@ -95,7 +95,7 @@ class SimplePersistence(DictMixin):
 
     def __getitem__(self, key):
         session = self.session or Session()
-        skv = session.query(SimpleKeyValue).filter(SimpleKeyValue.feed == self.feedname).\
+        skv = session.query(SimpleKeyValue).filter(SimpleKeyValue.task == self.taskname).\
             filter(SimpleKeyValue.plugin == self.plugin).filter(SimpleKeyValue.key == key).first()
         if not self.session:
             session.close()
@@ -106,7 +106,7 @@ class SimplePersistence(DictMixin):
 
     def __delitem__(self, key):
         session = self.session or Session()
-        session.query(SimpleKeyValue).filter(SimpleKeyValue.feed == self.feedname).\
+        session.query(SimpleKeyValue).filter(SimpleKeyValue.task == self.taskname).\
             filter(SimpleKeyValue.plugin == self.plugin).filter(SimpleKeyValue.key == key).delete()
         if not self.session:
             session.commit()
@@ -114,7 +114,7 @@ class SimplePersistence(DictMixin):
 
     def keys(self):
         session = self.session or Session()
-        query = session.query(SimpleKeyValue.key).filter(SimpleKeyValue.feed == self.feedname).\
+        query = session.query(SimpleKeyValue.key).filter(SimpleKeyValue.task == self.taskname).\
              filter(SimpleKeyValue.plugin == self.plugin).all()
         if query:
             return [item.key for item in query]
@@ -122,19 +122,19 @@ class SimplePersistence(DictMixin):
             return []
 
 
-class SimpleFeedPersistence(SimplePersistence):
+class SimpleTaskPersistence(SimplePersistence):
 
-    def __init__(self, feed):
-        self.feed = feed
+    def __init__(self, task):
+        self.task = task
 
     @property
     def plugin(self):
-        return self.feed.current_plugin
+        return self.task.current_plugin
 
     @property
-    def feedname(self):
-        return self.feed.name
+    def taskname(self):
+        return self.task.name
 
     @property
     def session(self):
-        return self.feed.session
+        return self.task.session

@@ -17,9 +17,9 @@ class FilterAcceptAll(object):
         from flexget import validator
         return validator.factory('boolean')
 
-    def on_feed_filter(self, feed, config):
+    def on_task_filter(self, task, config):
         if config:
-            for entry in feed.entries:
-                feed.accept(entry)
+            for entry in task.entries:
+                task.accept(entry)
 
 register_plugin(FilterAcceptAll, 'accept_all', api_ver=2)

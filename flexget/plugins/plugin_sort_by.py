@@ -7,7 +7,7 @@ log = logging.getLogger('sort_by')
 class PluginSortBy:
 
     """
-    Sort feed entries based on a field
+    Sort task entries based on a field
 
     Example::
 
@@ -35,7 +35,7 @@ class PluginSortBy:
         complex.accept('boolean', key='reverse')
         return root
 
-    def on_feed_filter(self, feed, config):
+    def on_task_filter(self, task, config):
         if isinstance(config, basestring):
             field = config
             reverse = False
@@ -46,8 +46,8 @@ class PluginSortBy:
         log.debug('sorting entries by: %s' % config)
 
         if not field:
-            feed.entries.reverse()
-            feed.accepted.reverse()
+            task.entries.reverse()
+            task.accepted.reverse()
             return
 
         def cmp_helper(a, b):
@@ -55,7 +55,7 @@ class PluginSortBy:
             vb = b.get(field, 0)
             return cmp(va, vb)
 
-        feed.entries.sort(cmp_helper, reverse=reverse)
-        feed.accepted.sort(cmp_helper, reverse=reverse)
+        task.entries.sort(cmp_helper, reverse=reverse)
+        task.accepted.sort(cmp_helper, reverse=reverse)
 
 register_plugin(PluginSortBy, 'sort_by', api_ver=2)

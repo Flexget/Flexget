@@ -36,14 +36,14 @@ class UrlRewrite(object):
         config.accept('text', key='format', required=True)
         return root
 
-    def on_feed_start(self, feed):
-        for name, config in feed.config.get('urlrewrite', {}).iteritems():
+    def on_task_start(self, task):
+        for name, config in task.config.get('urlrewrite', {}).iteritems():
             match = re.compile(config['regexp'])
             format = config['format']
             self.resolves[name] = {'regexp_compiled': match, 'format': format, 'regexp': config['regexp']}
             log.debug('Added rewrite %s' % name)
 
-    def url_rewritable(self, feed, entry):
+    def url_rewritable(self, task, entry):
         log.trace('running url_rewritable')
         log.trace(self.resolves)
         for name, config in self.resolves.iteritems():
@@ -53,7 +53,7 @@ class UrlRewrite(object):
                 return True
         return False
 
-    def url_rewrite(self, feed, entry):
+    def url_rewrite(self, task, entry):
         for name, config in self.resolves.iteritems():
             regexp = config['regexp_compiled']
             format = config['format']
@@ -64,8 +64,8 @@ class UrlRewrite(object):
                 entry['url'] = regexp.sub(format, entry['url'])
 
                 if regexp.match(entry['url']):
-                    feed.fail(entry, 'urlrewriting')
-                    feed.purge()
+                    task.fail(entry, 'urlrewriting')
+                    task.purge()
                     from plugin_urlrewriting import UrlRewritingError
                     raise UrlRewritingError('Regexp %s result should NOT continue to match!' % name)
                 return

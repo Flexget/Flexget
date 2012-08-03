@@ -23,20 +23,20 @@ class FilterExists(object):
         bundle.accept('path')
         return root
 
-    def get_config(self, feed):
-        config = feed.config.get('exists', None)
+    def get_config(self, task):
+        config = task.config.get('exists', None)
         # If only a single path is passed turn it into a 1 element list
         if isinstance(config, basestring):
             config = [config]
         return config
 
     @priority(-1)
-    def on_feed_filter(self, feed):
-        if not feed.accepted:
+    def on_task_filter(self, task):
+        if not task.accepted:
             log.debug('No accepted entries, not scanning for existing.')
             return
         log.verbose('Scanning path(s) for existing files.')
-        config = self.get_config(feed)
+        config = self.get_config(task)
         for path in config:
             # unicode path causes crashes on some paths
             path = str(os.path.expanduser(path))
@@ -47,10 +47,10 @@ class FilterExists(object):
                 # convert filelists into utf-8 to avoid unicode problems
                 dirs = [x.decode('utf-8', 'ignore') for x in dirs]
                 files = [x.decode('utf-8', 'ignore') for x in files]
-                for entry in feed.accepted:
+                for entry in task.accepted:
                     name = entry['title']
                     if name in dirs or name in files:
                         log.debug('Found %s in %s' % (name, root))
-                        feed.reject(entry, os.path.join(root, name))
+                        task.reject(entry, os.path.join(root, name))
 
 register_plugin(FilterExists, 'exists')

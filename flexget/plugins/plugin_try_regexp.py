@@ -6,7 +6,7 @@ log = logging.getLogger('try_regexp')
 
 class PluginTryRegexp:
     """
-        This plugin allows user to test regexps for a feed.
+        This plugin allows user to test regexps for a task.
     """
 
     def __init__(self):
@@ -22,8 +22,8 @@ class PluginTryRegexp:
                 return (True, field)
         return (False, None)
 
-    def on_feed_filter(self, feed):
-        if not feed.manager.options.try_regexp:
+    def on_task_filter(self, task):
+        if not task.manager.options.try_regexp:
             return
         if self.abort:
             return
@@ -31,7 +31,7 @@ class PluginTryRegexp:
         print '-' * 79
         print 'Hi there, welcome to try regexps in realtime!'
         print 'Press ^D or type \'exit\' to continue. Type \'continue\' to continue non-interactive execution.'
-        print 'Feed \'%s\' has %s entries, enter regexp to see what matches it.' % (feed.name, len(feed.entries))
+        print 'Task \'%s\' has %s entries, enter regexp to see what matches it.' % (task.name, len(task.entries))
         while (True):
             try:
                 s = raw_input('--> ')
@@ -44,7 +44,7 @@ class PluginTryRegexp:
                 break
 
             count = 0
-            for entry in feed.entries:
+            for entry in task.entries:
                 try:
                     match, field = self.matches(entry, s)
                     if match:
@@ -53,7 +53,7 @@ class PluginTryRegexp:
                 except:
                     print 'Invalid regular expression'
                     break
-            print '%s of %s entries matched' % (count, len(feed.entries))
+            print '%s of %s entries matched' % (count, len(task.entries))
         print 'Bye!'
 
 register_plugin(PluginTryRegexp, '--try-regexp', builtin=True)

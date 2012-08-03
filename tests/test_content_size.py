@@ -4,7 +4,7 @@ from tests import FlexGetBase, with_filecopy
 class TestTorrentSize(FlexGetBase):
 
     __yaml__ = """
-        feeds:
+        tasks:
           test_min:
             mock:
               - {title: 'test', file: 'test_min.torrent'}
@@ -38,33 +38,33 @@ class TestTorrentSize(FlexGetBase):
     @with_filecopy('test.torrent', 'test_min.torrent')
     def test_min(self):
         """Content Size: torrent with min size"""
-        self.execute_feed('test_min')
-        assert self.feed.find_entry('rejected', title='test'), \
+        self.execute_task('test_min')
+        assert self.task.find_entry('rejected', title='test'), \
             'should have rejected, minimum size'
 
     @with_filecopy('test.torrent', 'test_max.torrent')
     def test_max(self):
         """Content Size: torrent with max size"""
-        self.execute_feed('test_max')
-        assert self.feed.find_entry('rejected', title='test'), \
+        self.execute_task('test_max')
+        assert self.task.find_entry('rejected', title='test'), \
             'should have rejected, maximum size'
 
     @with_filecopy('test.torrent', 'test_strict.torrent')
     def test_strict(self):
         """Content Size: strict enabled"""
-        self.execute_feed('test_strict')
-        assert self.feed.find_entry('rejected', title='test'), \
+        self.execute_task('test_strict')
+        assert self.task.find_entry('rejected', title='test'), \
             'should have rejected non torrent'
 
     def test_cache(self):
         """Content Size: caching"""
-        self.execute_feed('test_cache')
-        assert self.feed.find_entry('rejected', title='test'), \
+        self.execute_task('test_cache')
+        assert self.task.find_entry('rejected', title='test'), \
             'should have rejected, too small'
 
         # Make sure remember_rejected rejects on the second execution
-        self.execute_feed('test_cache')
-        assert self.feed.find_entry('rejected', title='test', rejected_by='remember_rejected'), \
+        self.execute_task('test_cache')
+        assert self.task.find_entry('rejected', title='test', rejected_by='remember_rejected'), \
             'should have rejected, size present from the cache'
 
 
@@ -73,7 +73,7 @@ class TestFileSize(FlexGetBase):
     This doesn't do a super job of testing, because we don't have any test files bigger than 1 MB."""
 
     __yaml__ = """
-        feeds:
+        tasks:
           test_min:
             mock:
               - {title: 'test', location: 'min.file'}
@@ -97,8 +97,8 @@ class TestFileSize(FlexGetBase):
     @with_filecopy('test.torrent', 'min.file')
     def test_min(self):
         """Content Size: torrent with min size"""
-        self.execute_feed('test_min')
-        entry = self.feed.find_entry('rejected', title='test')
+        self.execute_task('test_min')
+        entry = self.task.find_entry('rejected', title='test')
         assert entry, 'should have rejected, minimum size'
         assert entry['content_size'] == 0, \
             'content_size was not detected'
@@ -106,14 +106,14 @@ class TestFileSize(FlexGetBase):
     @with_filecopy('test.torrent', 'max.file')
     def test_max(self):
         """Content Size: torrent with max size"""
-        self.execute_feed('test_max')
-        entry = self.feed.find_entry('accepted', title='test')
+        self.execute_task('test_max')
+        entry = self.task.find_entry('accepted', title='test')
         assert entry, 'should have been accepted, it is below maximum size'
         assert entry['content_size'] == 0, \
             'content_size was not detected'
 
     def test_torrent(self):
-        self.execute_feed('test_torrent')
-        entry = self.feed.find_entry('entries', title='test')
+        self.execute_task('test_torrent')
+        entry = self.task.find_entry('entries', title='test')
         assert 'content_size' not in entry, \
             'size of .torrent file should not be read as content_size'

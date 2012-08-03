@@ -23,14 +23,14 @@ class NewTorrents:
         self.resolved = []
 
     # UrlRewriter plugin API
-    def url_rewritable(self, feed, entry):
+    def url_rewritable(self, task, entry):
         # Return true only for urls that can and should be resolved
         if entry['url'].startswith('http://www.newtorrents.info/down.php?'):
             return False
         return entry['url'].startswith('http://www.newtorrents.info') and not entry['url'] in self.resolved
 
     # UrlRewriter plugin API
-    def url_rewrite(self, feed, entry):
+    def url_rewrite(self, task, entry):
         url = entry['url']
         if (url.startswith('http://www.newtorrents.info/?q=') or
            url.startswith('http://www.newtorrents.info/search')):

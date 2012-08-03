@@ -41,12 +41,12 @@ class OutputNotifyMyAndroid(object):
         config.setdefault('description', '{{title}}')
         return config
 
-    def on_feed_output(self, feed, config):
+    def on_task_output(self, task, config):
         # get the parameters
         config = self.prepare_config(config)
-        for entry in feed.accepted:
+        for entry in task.accepted:
 
-            if feed.manager.options.test:
+            if task.manager.options.test:
                 log.info("Would send notifymyandroid message about: %s", entry['title'])
                 continue
 
@@ -67,7 +67,7 @@ class OutputNotifyMyAndroid(object):
             # Send the request
             data = {'priority': priority, 'application': application, 'apikey': apikey,
                     'event': event, 'description': description}
-            response = feed.requests.post(url, headers=headers, data=data, raise_status=False)
+            response = task.requests.post(url, headers=headers, data=data, raise_status=False)
 
             # Check if it succeeded
             request_status = response.status_code

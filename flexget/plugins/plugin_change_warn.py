@@ -20,50 +20,50 @@ class ChangeWarn(object):
         self.warned = False
         self.executed = False
 
-    def on_process_start(self, feed):
+    def on_process_start(self, task):
         # Run only once
         if self.executed:
             return
 
         self.executed = True
         found_deprecated = False
-        config = feed.manager.config
+        config = task.manager.config
 
-        if 'imdb_queue_input' in feed.config:
+        if 'imdb_queue_input' in task.config:
             log.critical('imdb_queue_input was renamed to emit_imdb_queue')
             found_deprecated = True
 
-        if 'emit_imdb_queue' in feed.config:
+        if 'emit_imdb_queue' in task.config:
             log.critical('emit_imdb_queue was renamed to emit_movie_queue, please update your config')
             found_deprecated = True
 
-        if 'imdb_watchlist' in feed.config:
+        if 'imdb_watchlist' in task.config:
             log.critical('imdb_watchlist was renamed to more generic imdb_list, please update your config')
             found_deprecated = True
 
-        if 'transmissionrpc' in feed.config:
+        if 'transmissionrpc' in task.config:
             log.critical('transmissionrpc was renamed to transmission')
             found_deprecated = True
 
-        if 'torrent_size' in feed.config:
+        if 'torrent_size' in task.config:
             log.critical('Plugin torrent_size is deprecated, use content_size instead')
             found_deprecated = True
 
-        if 'nzb_size' in feed.config:
+        if 'nzb_size' in task.config:
             log.critical('Plugin nzb_size is deprecated, use content_size instead')
             found_deprecated = True
 
-        if 'imdb_queue' in feed.config:
+        if 'imdb_queue' in task.config:
             log.critical('Plugin imdb_queue has been replaced by movie_queue, update your config')
             found_deprecated = True
 
         # priority (dict) was renamed to plugin_priority
-        if isinstance(feed.config.get('priority', None), dict):
+        if isinstance(task.config.get('priority', None), dict):
             log.critical('Plugin \'priority\' was renamed to \'plugin_priority\'')
 
         if found_deprecated:
-            feed.manager.disable_feeds()
-            feed.abort('Deprecated config.')
+            task.manager.disable_tasks()
+            task.abort('Deprecated config.')
 
 register_plugin(ChangeWarn, 'change_warn', builtin=True)
 

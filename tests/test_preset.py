@@ -18,7 +18,7 @@ class TestPreset(FlexGetBase):
             mock:
               - {title: 'b'}
 
-        feeds:
+        tasks:
           test1:
             preset: movies
 
@@ -37,25 +37,25 @@ class TestPreset(FlexGetBase):
     """
 
     def test_preset1(self):
-        self.execute_feed('test1')
-        assert self.feed.find_entry(title='global'), 'test1, preset global not applied'
-        assert self.feed.find_entry(title='movies'), 'test1, preset movies not applied'
+        self.execute_task('test1')
+        assert self.task.find_entry(title='global'), 'test1, preset global not applied'
+        assert self.task.find_entry(title='movies'), 'test1, preset movies not applied'
 
     def test_preset2(self):
-        self.execute_feed('test2')
-        assert not self.feed.find_entry(title='global'), 'test2, preset global applied'
-        assert not self.feed.find_entry(title='movies'), 'test2, preset movies applied'
+        self.execute_task('test2')
+        assert not self.task.find_entry(title='global'), 'test2, preset global applied'
+        assert not self.task.find_entry(title='movies'), 'test2, preset movies applied'
 
     def test_preset3(self):
-        self.execute_feed('test3')
-        assert not self.feed.find_entry(title='global'), 'test3, preset global applied'
-        assert self.feed.find_entry(title='movies'), 'test3, preset movies not applied'
+        self.execute_task('test3')
+        assert not self.task.find_entry(title='global'), 'test3, preset global applied'
+        assert self.task.find_entry(title='movies'), 'test3, preset movies not applied'
 
     def test_nested(self):
-        self.execute_feed('test_nested')
-        assert self.feed.find_entry(title='a'), 'Entry from preset a was not created'
-        assert self.feed.find_entry(title='b'), 'Entry from preset b was not created'
-        assert len(self.feed.entries) == 2, 'Should only have been 2 entries created'
+        self.execute_task('test_nested')
+        assert self.task.find_entry(title='a'), 'Entry from preset a was not created'
+        assert self.task.find_entry(title='b'), 'Entry from preset b was not created'
+        assert len(self.task.entries) == 2, 'Should only have been 2 entries created'
 
 
 class TestPresetMerge(FlexGetBase):
@@ -74,7 +74,7 @@ class TestPresetMerge(FlexGetBase):
                 - biography
                 - romance
 
-        feeds:
+        tasks:
           test:
             preset: movies
             imdb:
@@ -84,6 +84,6 @@ class TestPresetMerge(FlexGetBase):
     """
 
     def test_merge(self):
-        self.execute_feed('test')
-        assert self.feed.config['imdb']['min_score'] == 6.5, 'float merge failed'
-        assert 'comedy' in self.feed.config['imdb']['reject_genres'], 'list merge failed'
+        self.execute_task('test')
+        assert self.task.config['imdb']['min_score'] == 6.5, 'float merge failed'
+        assert 'comedy' in self.task.config['imdb']['reject_genres'], 'list merge failed'

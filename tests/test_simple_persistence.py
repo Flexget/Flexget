@@ -2,20 +2,20 @@ from tests import FlexGetBase
 
 
 class TestSimplePersistence(FlexGetBase):
-    
+
     __yaml__ = """
-        feeds:
+        tasks:
           test:
             mock:
               - {title: 'irrelevant'}
     """
-    
+
     def test_setdefault(self):
-        self.execute_feed('test')
+        self.execute_task('test')
 
-        feed = self.feed
+        task = self.task
 
-        value1 = feed.simple_persistence.setdefault('test', 'abc')
-        value2 = feed.simple_persistence.setdefault('test', 'def')
+        value1 = task.simple_persistence.setdefault('test', 'abc')
+        value2 = task.simple_persistence.setdefault('test', 'def')
 
         assert value1 == value2, 'set default broken'

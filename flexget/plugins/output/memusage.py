@@ -41,16 +41,16 @@ class OutputMemUsage(object):
         from flexget import validator
         return validator.factory('boolean')
 
-    def on_process_start(self, feed):
-        if not feed.manager.options.mem_usage:
+    def on_process_start(self, task):
+        if not task.manager.options.mem_usage:
             return
         # start only once
         if self.heapy:
             return
         self.heapy = hpy()
 
-    def on_process_end(self, feed):
-        if not feed.manager.options.mem_usage:
+    def on_process_end(self, task):
+        if not task.manager.options.mem_usage:
             return
         # prevents running this multiple times ...
         if not self.heapy:

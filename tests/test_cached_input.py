@@ -11,7 +11,7 @@ class InputPersist(object):
     hasrun = False
 
     @cached('test_input', persist='5 minutes')
-    def on_feed_input(self, feed, config):
+    def on_task_input(self, task, config):
         if self.hasrun:
             return []
         self.hasrun = True
@@ -23,7 +23,7 @@ register_plugin(InputPersist, 'test_input', api_ver=2)
 class TestInputCache(FlexGetBase):
 
     __yaml__ = """
-        feeds:
+        tasks:
           test_memory:
             rss:
               url: cached.xml
@@ -34,25 +34,25 @@ class TestInputCache(FlexGetBase):
     @with_filecopy('rss.xml', 'cached.xml')
     def test_memory_cache(self):
         """Test memory input caching"""
-        # Don't use execute_feed in this test as it runs process_start (which clears the cache) before each feed
-        self.manager.create_feeds()
+        # Don't use execute_task in this test as it runs process_start (which clears the cache) before each task
+        self.manager.create_tasks()
         self.manager.process_start()
-        feed = self.manager.feeds['test_memory']
-        feed.execute()
-        assert feed.entries, 'should have created entries at the start'
+        task = self.manager.tasks['test_memory']
+        task.execute()
+        assert task.entries, 'should have created entries at the start'
         os.remove('cached.xml')
         f = open('cached.xml', 'w')
         f.write('')
         f.close()
-        feed = self.manager.feeds['test_memory']
-        feed.execute()
-        assert feed.entries, 'should have created entries from the cache'
+        task = self.manager.tasks['test_memory']
+        task.execute()
+        assert task.entries, 'should have created entries from the cache'
         self.manager.process_end()
 
     def test_db_cache(self):
         """Test db input caching"""
 
-        self.execute_feed('test_db')
-        assert self.feed.entries, 'should have created entries at the start'
-        self.execute_feed('test_db')
-        assert self.feed.entries, 'should have created entries from the cache'
+        self.execute_task('test_db')
+        assert self.task.entries, 'should have created entries at the start'
+        self.execute_task('test_db')
+        assert self.task.entries, 'should have created entries from the cache'

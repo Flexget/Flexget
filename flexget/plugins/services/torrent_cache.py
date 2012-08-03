@@ -17,8 +17,8 @@ class TorrentCache(object):
     """Adds urls to torrent cache sites to the urls list."""
 
     @priority(-255)
-    def on_feed_filter(self, feed, config):
-        for entry in feed.accepted:
+    def on_task_filter(self, task, config):
+        for entry in task.accepted:
             info_hash = None
             if entry['url'].startswith('magnet:'):
                 info_hash_search = re.search('btih:([0-9a-f]+)', entry['url'], re.IGNORECASE)

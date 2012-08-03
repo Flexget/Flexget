@@ -1,7 +1,7 @@
 import os
 import logging
 from flexget.plugin import register_plugin
-from flexget.utils.template import render_from_feed, get_template
+from flexget.utils.template import render_from_task, get_template
 
 PLUGIN_NAME = 'make_html'
 
@@ -17,7 +17,7 @@ class OutputHtml:
         root.accept('text', key='file', required=True)
         return root
 
-    def on_feed_output(self, feed, config):
+    def on_task_output(self, task, config):
         # Use the default template if none is specified
         if not config.get('template'):
             config['template'] = 'default.template'
@@ -26,10 +26,10 @@ class OutputHtml:
         output = os.path.expanduser(config['file'])
         # Output to config directory if absolute path has not been specified
         if not os.path.isabs(output):
-            output = os.path.join(feed.manager.config_base, output)
+            output = os.path.join(task.manager.config_base, output)
 
         # create the template
-        template = render_from_feed(get_template(filename, PLUGIN_NAME), feed)
+        template = render_from_task(get_template(filename, PLUGIN_NAME), task)
 
         log.verbose('Writing output html to %s' % output)
         f = open(output, 'w')

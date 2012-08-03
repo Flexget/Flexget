@@ -21,14 +21,14 @@ class MetainfoContentSize(object):
         from flexget import validator
         return validator.factory('boolean')
 
-    def on_feed_metainfo(self, feed):
+    def on_task_metainfo(self, task):
         # check if disabled (value set to false)
-        if 'metainfo_content_size' in feed.config:
-            if not feed.config['metainfo_content_size']:
+        if 'metainfo_content_size' in task.config:
+            if not task.config['metainfo_content_size']:
                 return
 
         count = 0
-        for entry in feed.entries:
+        for entry in task.entries:
             if entry.get('content_size'):
                 # Don't override if already set
                 log.trace('skipping content size check because it is already set for %r' % entry['title'])

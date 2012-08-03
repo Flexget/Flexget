@@ -5,7 +5,7 @@ log = logging.getLogger('sequence')
 
 
 class PluginSequence(object):
-    """ Allows the same plugin to be configured multiple times in a feed.
+    """ Allows the same plugin to be configured multiple times in a task.
 
     Example:
     sequence:
@@ -24,7 +24,7 @@ class PluginSequence(object):
         return root
 
     def __getattr__(self, item):
-        """Returns a function for all on_feed_* and on_process_* events, that runs all the configured plugins."""
+        """Returns a function for all on_task_* and on_process_* events, that runs all the configured plugins."""
         for phase, method in phase_methods.iteritems():
             # TODO: Deal with entry phases
             if item == method and phase not in ['accept', 'reject', 'fail']:
@@ -32,7 +32,7 @@ class PluginSequence(object):
         else:
             raise AttributeError(item)
 
-        def handle_phase(feed, config):
+        def handle_phase(task, config):
             """Function that runs all of the configured plugins which act on the current phase."""
             # Keep a list of all results, for input plugin combining
             results = []
@@ -41,7 +41,7 @@ class PluginSequence(object):
                     if phase in get_phases_by_plugin(plugin_name):
                         method = get_plugin_by_name(plugin_name).phase_handlers[phase]
                         log.debug('Running plugin %s' % plugin_name)
-                        result = method(feed, plugin_config)
+                        result = method(task, plugin_config)
                         if isinstance(result, list):
                             results.extend(result)
             return results

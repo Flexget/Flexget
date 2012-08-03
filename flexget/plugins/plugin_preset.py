@@ -40,8 +40,8 @@ class PluginPreset(object):
         return config
 
     @priority(255)
-    def on_process_start(self, feed, config):
-        if config is False: # handles 'preset: no' form to turn off preset on this feed
+    def on_process_start(self, task, config):
+        if config is False: # handles 'preset: no' form to turn off preset on this task
             return
         config = self.prepare_config(config)
 
@@ -53,18 +53,18 @@ class PluginPreset(object):
         elif not 'global' in config:
             config.append('global')
 
-        toplevel_presets = feed.manager.config.get('presets', {})
+        toplevel_presets = task.manager.config.get('presets', {})
 
         # apply presets
         for preset in config:
             if preset not in toplevel_presets:
                 if preset == 'global':
                     continue
-                raise PluginError('Unable to find preset %s for feed %s' % (preset, feed.name), log)
+                raise PluginError('Unable to find preset %s for task %s' % (preset, task.name), log)
             if toplevel_presets[preset] is None:
                 log.warning('Preset `%s` is empty. Nothing to merge.' % preset)
                 continue
-            log.debug('Merging preset %s into feed %s' % (preset, feed.name))
+            log.debug('Merging preset %s into task %s' % (preset, task.name))
 
             # We make a copy here because we need to remove
             preset_config = toplevel_presets[preset]
@@ -84,16 +84,16 @@ class PluginPreset(object):
             # merge
             from flexget.utils.tools import MergeException, merge_dict_from_to
             try:
-                merge_dict_from_to(preset_config, feed.config)
+                merge_dict_from_to(preset_config, task.config)
             except MergeException, exc:
-                raise PluginError('Failed to merge preset %s to feed %s due to %s' % (preset, feed.name, exc))
+                raise PluginError('Failed to merge preset %s to task %s due to %s' % (preset, task.name, exc))
 
         log.trace('presets: %s' % config)
 
         # implements --preset NAME
-        if feed.manager.options.preset:
-            if feed.manager.options.preset not in config:
-                feed.enabled = False
+        if task.manager.options.preset:
+            if task.manager.options.preset not in config:
+                task.enabled = False
                 return
 
 
@@ -109,7 +109,7 @@ class DisablePlugin(object):
           .
           .
 
-      feeds:
+      tasks:
         nzbs:
           preset: movies
           disable_plugin:
@@ -118,7 +118,7 @@ class DisablePlugin(object):
             .
             .
 
-      #Feed nzbs uses all other configuration from preset movies but removes the download plugin
+      #Task nzbs uses all other configuration from preset movies but removes the download plugin
     """
 
     def validator(self):
@@ -129,14 +129,14 @@ class DisablePlugin(object):
         return root
 
     @priority(250)
-    def on_feed_start(self, feed, config):
+    def on_task_start(self, task, config):
         if isinstance(config, basestring):
             config = [config]
         # let's disable them
         for disable in config:
-            if disable in feed.config:
+            if disable in task.config:
                 log.debug('disabling %s' % disable)
-                del(feed.config[disable])
+                del(task.config[disable])
 
 
 def root_config_validator():
@@ -155,4 +155,4 @@ register_plugin(PluginPreset, 'preset', builtin=True, api_ver=2)
 register_plugin(DisablePlugin, 'disable_plugin', api_ver=2)
 
 register_parser_option('--preset', action='store', dest='preset', default=False,
-                       metavar='NAME', help='Execute feeds with given preset.')
+                       metavar='NAME', help='Execute tasks with given preset.')

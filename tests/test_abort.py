@@ -4,9 +4,9 @@ from tests import FlexGetBase
 class TestAbort(FlexGetBase):
 
     __yaml__ = """
-        feeds:
+        tasks:
           test:
-            # causes on_feed_abort to be called
+            # causes on_task_abort to be called
             disable_builtins: yes
 
             # causes abort
@@ -18,5 +18,5 @@ class TestAbort(FlexGetBase):
     """
 
     def test_abort(self):
-        self.execute_feed('test')
-        assert self.feed._abort, 'Feed not aborted'
+        self.execute_task('test')
+        assert self.task._abort, 'Task not aborted'

@@ -10,8 +10,8 @@ class TorrentSize(object):
     """
 
     @priority(200)
-    def on_feed_modify(self, feed):
-        for entry in feed.entries:
+    def on_task_modify(self, task):
+        for entry in task.entries:
             if 'torrent' in entry:
                 size = entry['torrent'].get_size() / 1024 / 1024
                 log.debug('%s size: %s MB' % (entry['title'], size))

@@ -6,7 +6,7 @@ log = logging.getLogger('inputs')
 
 class PluginInputs(object):
     """
-    Allows the same input plugin to be configured multiple times in a feed.
+    Allows the same input plugin to be configured multiple times in a task.
 
     Example::
 
@@ -22,7 +22,7 @@ class PluginInputs(object):
         add_plugin_validators(inputs, phase='input', excluded=['inputs'])
         return root
 
-    def on_feed_input(self, feed, config):
+    def on_task_input(self, task, config):
         entries = []
         entry_titles = set()
         entry_urls = set()
@@ -34,13 +34,13 @@ class PluginInputs(object):
 
                 method = input.phase_handlers['input']
                 try:
-                    result = method(feed, input_config)
+                    result = method(task, input_config)
                 except PluginError, e:
                     log.warning('Error during input plugin %s: %s' % (input_name, e))
                     continue
                 if not result:
                     msg = 'Input %s did not return anything' % input_name
-                    if feed.no_entries_ok:
+                    if task.no_entries_ok:
                         log.verbose(msg)
                     else:
                         log.warning(msg)

@@ -45,7 +45,7 @@ class Manipulate(object):
         replace.accept('text', key='format', required=True)
         return root
 
-    def on_feed_start(self, feed, config):
+    def on_task_start(self, task, config):
         """
         Separates the config into a dict with a list of jobs per phase.
         Allows us to skip phases without any jobs in them.
@@ -58,20 +58,20 @@ class Manipulate(object):
                 self.phase_jobs[phase].append(item)
 
     @priority(255)
-    def on_feed_metainfo(self, feed, config):
+    def on_task_metainfo(self, task, config):
         if not self.phase_jobs['metainfo']:
             # return if no jobs for this phase
             return
-        modified = sum(self.process(entry, self.phase_jobs['metainfo']) for entry in feed.entries)
+        modified = sum(self.process(entry, self.phase_jobs['metainfo']) for entry in task.entries)
         log.verbose('Modified %d entries.' % modified)
 
 
     @priority(255)
-    def on_feed_filter(self, feed, config):
+    def on_task_filter(self, task, config):
         if not self.phase_jobs['filter']:
             # return if no jobs for this phase
             return
-        modified = sum(self.process(entry, self.phase_jobs['filter']) for entry in feed.entries + feed.rejected)
+        modified = sum(self.process(entry, self.phase_jobs['filter']) for entry in task.entries + task.rejected)
         log.verbose('Modified %d entries.' % modified)
 
     def process(self, entry, jobs):

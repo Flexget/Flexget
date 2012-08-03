@@ -16,7 +16,7 @@ class DelayedEntry(Base):
     __tablename__ = 'delay'
 
     id = Column(Integer, primary_key=True)
-    feed = Column(String)
+    task = Column('feed', String)
     title = Column(Unicode)
     expire = Column(DateTime)
     _entry = Column('entry', PickleType(mutable=False))
@@ -25,8 +25,8 @@ class DelayedEntry(Base):
     def __repr__(self):
         return '<DelayedEntry(title=%s)>' % self.title
 
-Index('delay_feed_title', DelayedEntry.feed, DelayedEntry.title)
-# TODO: index "expire, feed"
+Index('delay_feed_title', DelayedEntry.task, DelayedEntry.title)
+# TODO: index "expire, task"
 
 
 @schema.upgrade('delay')
@@ -47,7 +47,7 @@ def upgrade(ver, session):
 
 class FilterDelay(object):
     """
-        Add delay to a feed. This is useful for de-prioritizing expensive / bad-quality feeds.
+        Add delay to a task. This is useful for de-prioritizing expensive / bad-quality tasks.
 
         Format: n [minutes|hours|days|weeks]
 
@@ -68,34 +68,34 @@ class FilterDelay(object):
             raise PluginError('Invalid time format', log)
 
     @priority(-1)
-    def on_feed_input(self, feed, config):
+    def on_task_input(self, task, config):
         """Captures the current input then replaces it with entries that have passed the delay."""
-        if feed.entries:
-            log.verbose('Delaying %s new entries for %s' % (len(feed.entries), config))
-            # Let details plugin know that it is ok if this feed doesn't produce any entries
-            feed.no_entries_ok = True
-        # First learn the current entries in the feed to the database
+        if task.entries:
+            log.verbose('Delaying %s new entries for %s' % (len(task.entries), config))
+            # Let details plugin know that it is ok if this task doesn't produce any entries
+            task.no_entries_ok = True
+        # First learn the current entries in the task to the database
         expire_time = datetime.now() + self.get_delay(config)
-        for entry in feed.entries:
+        for entry in task.entries:
             log.debug('Delaying %s' % entry['title'])
             # check if already in queue
-            if not feed.session.query(DelayedEntry).\
+            if not task.session.query(DelayedEntry).\
                    filter(DelayedEntry.title == entry['title']).\
-                   filter(DelayedEntry.feed == feed.name).first():
+                   filter(DelayedEntry.task == task.name).first():
                 delay_entry = DelayedEntry()
                 delay_entry.title = entry['title']
                 delay_entry.entry = entry
-                delay_entry.feed = feed.name
+                delay_entry.task = task.name
                 delay_entry.expire = expire_time
-                feed.session.add(delay_entry)
+                task.session.add(delay_entry)
 
-        # Clear the current entries from the feed now that they are stored
-        feed.entries = []
+        # Clear the current entries from the task now that they are stored
+        task.entries = []
 
         # Generate the list of entries whose delay has passed
-        passed_delay = feed.session.query(DelayedEntry).\
+        passed_delay = task.session.query(DelayedEntry).\
             filter(datetime.now() > DelayedEntry.expire).\
-            filter(DelayedEntry.feed == feed.name)
+            filter(DelayedEntry.task == task.name)
         delayed_entries = [Entry(item.entry) for item in passed_delay.all()]
         for entry in delayed_entries:
             entry['passed_delay'] = True

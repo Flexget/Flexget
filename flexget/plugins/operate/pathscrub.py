@@ -17,15 +17,15 @@ class PathScrub(object):
         root.accept_choices(['windows', 'linux', 'mac'], ignore_case=True)
         return root
 
-    def on_feed_start(self, feed, config):
+    def on_task_start(self, task, config):
         # Change path scrub os mode
         pathscrub.os_mode = config
 
-    def on_feed_exit(self, feed, config):
-        # Reset os mode when feed has finished
+    def on_task_exit(self, task, config):
+        # Reset os mode when task has finished
         pathscrub.os_mode = None
 
-    on_feed_abort = on_feed_exit
+    on_task_abort = on_task_exit
 
 
 plugin.register_plugin(PathScrub, 'pathscrub', api_ver=2)

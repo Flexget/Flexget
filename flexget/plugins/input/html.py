@@ -63,7 +63,7 @@ class InputHtml(object):
 
     @cached('html')
     @internet(log)
-    def on_feed_input(self, feed, config):
+    def on_task_input(self, task, config):
         config = self.build_config(config)
 
         log.debug('InputPlugin html requesting url %s' % config['url'])
@@ -222,7 +222,7 @@ class InputHtml(object):
 
             queue.append(entry)
 
-        # add from queue to feed
+        # add from queue to task
         return queue
 
 

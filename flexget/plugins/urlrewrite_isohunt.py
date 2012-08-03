@@ -40,7 +40,7 @@ class UrlRewriteIsoHunt(object):
                              'books', 'music video', 'unclassified', 'all'])
         return root
 
-    def url_rewritable(self, feed, entry):
+    def url_rewritable(self, task, entry):
         url = entry['url']
         # search is not supported
         if url.startswith('http://isohunt.com/torrents/?ihq='):
@@ -50,7 +50,7 @@ class UrlRewriteIsoHunt(object):
             return False
         return url.startswith('http://isohunt.com') and url.find('download') == -1
 
-    def url_rewrite(self, feed, entry):
+    def url_rewrite(self, task, entry):
         entry['url'] = entry['url'].replace('torrent_details', 'download')
 
     def search(self, query, comparator, config):

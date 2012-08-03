@@ -13,15 +13,15 @@ class UrlRewriteGoogleCse:
     """Google custom query urlrewriter."""
 
     # urlrewriter API
-    def url_rewritable(self, feed, entry):
+    def url_rewritable(self, task, entry):
         if entry['url'].startswith('http://www.google.com/cse?'):
             return True
         if entry['url'].startswith('http://www.google.com/custom?'):
             return True
         return False
-        
+
     # urlrewriter API
-    def url_rewrite(self, feed, entry):
+    def url_rewrite(self, task, entry):
         try:
             # need to fake user agent
             txheaders = {'User-agent': 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'}

@@ -4,7 +4,7 @@ from tests import FlexGetBase
 class TestInputs(FlexGetBase):
 
     __yaml__ = """
-        feeds:
+        tasks:
           test_inputs:
             inputs:
               - mock:
@@ -29,17 +29,17 @@ class TestInputs(FlexGetBase):
     """
 
     def test_inputs(self):
-        self.execute_feed('test_inputs')
-        assert len(self.feed.entries) == 2, 'Should have created 2 entries'
+        self.execute_task('test_inputs')
+        assert len(self.task.entries) == 2, 'Should have created 2 entries'
 
     def test_no_dupes(self):
-        self.execute_feed('test_no_dupes')
-        assert len(self.feed.entries) == 2, 'Should only have created 2 entries'
-        assert self.feed.find_entry(title='title1a'), 'title1a should be in entries'
-        assert self.feed.find_entry(title='title2'), 'title2 should be in entries'
+        self.execute_task('test_no_dupes')
+        assert len(self.task.entries) == 2, 'Should only have created 2 entries'
+        assert self.task.find_entry(title='title1a'), 'title1a should be in entries'
+        assert self.task.find_entry(title='title2'), 'title2 should be in entries'
 
     """def test_no_url(self):
         # Oops, this test doesn't do anything, as the mock plugin adds a fake url to entries
         # TODO: fix this
-        self.execute_feed('test_no_url')
-        assert len(self.feed.entries) == 2, 'Should have created 2 entries'"""
+        self.execute_task('test_no_url')
+        assert len(self.task.entries) == 2, 'Should have created 2 entries'"""

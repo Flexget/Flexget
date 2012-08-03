@@ -28,16 +28,16 @@ class FilterContentFilter(object):
         config.accept('boolean', key='strict')
         return config
 
-    def get_config(self, feed):
-        config = feed.config.get('content_filter')
+    def get_config(self, task):
+        config = task.config.get('content_filter')
         for key in ['require', 'reject']:
             if key in config:
                 if isinstance(config[key], basestring):
                     config[key] = [config[key]]
         return config
 
-    def process_entry(self, feed, entry):
-        config = self.get_config(feed)
+    def process_entry(self, task, entry):
+        config = self.get_config(task)
         if 'content_files' in entry:
             files = entry['content_files']
             log.debug('%s files: %s' % (entry['title'], files))
@@ -55,12 +55,12 @@ class FilterContentFilter(object):
             if config.get('require'):
                 if not matching_mask(files, config['require']):
                     log.info('Entry %s does not have any of the required filetypes, rejecting' % entry['title'])
-                    feed.reject(entry, 'does not have any of the required filetypes', remember=True)
+                    task.reject(entry, 'does not have any of the required filetypes', remember=True)
             if config.get('reject'):
                 mask = matching_mask(files, config['reject'])
                 if mask:
                     log.info('Entry %s has banned file %s, rejecting' % (entry['title'], mask))
-                    feed.reject(entry, 'has banned file %s' % mask, remember=True)
+                    task.reject(entry, 'has banned file %s' % mask, remember=True)
 
     def parse_torrent_files(self, entry):
         if 'torrent' in entry:
@@ -69,18 +69,18 @@ class FilterContentFilter(object):
                 entry['content_files'] = files
 
     @priority(150)
-    def on_feed_modify(self, feed):
-        if feed.manager.options.test or feed.manager.options.learn:
+    def on_task_modify(self, task):
+        if task.manager.options.test or task.manager.options.learn:
             log.info('Plugin is partially disabled with --test and --learn because content filename information may not be available')
             return
 
-        config = self.get_config(feed)
-        for entry in feed.accepted:
+        config = self.get_config(task)
+        for entry in task.accepted:
             # TODO: I don't know if we can pares filenames from nzbs, just do torrents for now
             # possibly also do compressed files in the future
             self.parse_torrent_files(entry)
-            self.process_entry(feed, entry)
+            self.process_entry(task, entry)
             if not 'content_files' in entry and config.get('strict'):
-                feed.reject(entry, 'no content files parsed for entry', remember=True)
+                task.reject(entry, 'no content files parsed for entry', remember=True)
 
 register_plugin(FilterContentFilter, 'content_filter')

@@ -19,13 +19,13 @@ class FilterImdbRequired(object):
         return validator.factory('boolean')
 
     @priority(32)
-    def on_feed_filter(self, feed):
-        for entry in feed.entries:
+    def on_task_filter(self, task):
+        for entry in task.entries:
             try:
                 get_plugin_by_name('imdb_lookup').instance.lookup(entry)
             except PluginError:
-                feed.reject(entry, 'imdb required')
+                task.reject(entry, 'imdb required')
             if 'imdb_url' not in entry and 'imdb_id' not in entry:
-                feed.reject(entry, 'imdb required')
+                task.reject(entry, 'imdb required')
 
 register_plugin(FilterImdbRequired, 'imdb_required')

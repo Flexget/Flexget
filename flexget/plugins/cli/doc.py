@@ -35,7 +35,7 @@ def trim(docstring):
 @event('manager.startup')
 def print_doc(manager):
     if manager.options.doc:
-        manager.disable_feeds()
+        manager.disable_tasks()
         plugin_name = manager.options.doc
         plugin = plugins.get(plugin_name, None)
         if plugin:

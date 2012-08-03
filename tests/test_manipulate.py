@@ -4,7 +4,7 @@ from tests import FlexGetBase
 class TestManipulate(FlexGetBase):
 
     __yaml__ = """
-        feeds:
+        tasks:
 
           test_1:
             mock:
@@ -49,21 +49,21 @@ class TestManipulate(FlexGetBase):
     """
 
     def test_replace(self):
-        self.execute_feed('test_1')
-        assert self.feed.find_entry('entries', title='abc BAR'), 'replace failed'
+        self.execute_task('test_1')
+        assert self.task.find_entry('entries', title='abc BAR'), 'replace failed'
 
     def test_extract(self):
-        self.execute_feed('test_2')
-        assert self.feed.find_entry('entries', title='abc'), 'extract failed'
+        self.execute_task('test_2')
+        assert self.task.find_entry('entries', title='abc'), 'extract failed'
 
     def test_multiple_edits(self):
-        self.execute_feed('test_multiple_edits')
-        assert self.feed.find_entry('entries', title='def'), 'multiple edits on 1 field failed'
+        self.execute_task('test_multiple_edits')
+        assert self.task.find_entry('entries', title='def'), 'multiple edits on 1 field failed'
 
     def test_phase(self):
-        self.execute_feed('test_phase')
-        assert self.feed.find_entry('entries', title='abc'), 'extract failed at metainfo phase'
+        self.execute_task('test_phase')
+        assert self.task.find_entry('entries', title='abc'), 'extract failed at metainfo phase'
 
     def test_remove(self):
-        self.execute_feed('test_remove')
-        assert 'description' not in self.feed.find_entry('entries', title='abc'), 'remove failed'
+        self.execute_task('test_remove')
+        assert 'description' not in self.task.find_entry('entries', title='abc'), 'remove failed'

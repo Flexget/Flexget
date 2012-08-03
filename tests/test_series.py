@@ -13,7 +13,7 @@ def age_series(**kwargs):
 class TestQuality(FlexGetBase):
 
     __yaml__ = """
-        feeds:
+        tasks:
           exact_quality:
             mock:
               - {title: 'QTest.S01E01.HDTV.XViD-FlexGet'}
@@ -103,52 +103,52 @@ class TestQuality(FlexGetBase):
 
     def test_exact_quality(self):
         """Series plugin: choose by quality"""
-        self.execute_feed('exact_quality')
-        assert self.feed.find_entry('accepted', title='QTest.S01E01.720p.XViD-FlexGet'), \
+        self.execute_task('exact_quality')
+        assert self.task.find_entry('accepted', title='QTest.S01E01.720p.XViD-FlexGet'), \
             '720p should have been accepted'
-        assert len(self.feed.accepted) == 1, 'should have accepted only one'
+        assert len(self.task.accepted) == 1, 'should have accepted only one'
 
     def test_quality_fail(self):
-        self.execute_feed('quality_fail')
-        assert not self.feed.accepted, 'No qualities should have matched'
+        self.execute_task('quality_fail')
+        assert not self.task.accepted, 'No qualities should have matched'
 
     def test_min_quality(self):
         """Series plugin: min_quality"""
-        self.execute_feed('min_quality')
-        assert self.feed.find_entry('accepted', title='MinQTest.S01E01.1080p.XViD-FlexGet'), \
+        self.execute_task('min_quality')
+        assert self.task.find_entry('accepted', title='MinQTest.S01E01.1080p.XViD-FlexGet'), \
             'MinQTest.S01E01.1080p.XViD-FlexGet should have been accepted'
-        assert len(self.feed.accepted) == 1, 'should have accepted only one'
+        assert len(self.task.accepted) == 1, 'should have accepted only one'
 
     def test_max_quality(self):
         """Series plugin: max_quality"""
-        self.execute_feed('max_quality')
-        assert self.feed.find_entry('accepted', title='MaxQTest.S01E01.HDTV.XViD-FlexGet'), \
+        self.execute_task('max_quality')
+        assert self.task.find_entry('accepted', title='MaxQTest.S01E01.HDTV.XViD-FlexGet'), \
             'MaxQTest.S01E01.HDTV.XViD-FlexGet should have been accepted'
-        assert len(self.feed.accepted) == 1, 'should have accepted only one'
+        assert len(self.task.accepted) == 1, 'should have accepted only one'
 
     def test_min_max_quality(self):
         """Series plugin: min_quality with max_quality"""
-        self.execute_feed('min_max_quality')
-        assert self.feed.find_entry('accepted', title='MinMaxQTest.S01E01.HR.XViD-FlexGet'), \
+        self.execute_task('min_max_quality')
+        assert self.task.find_entry('accepted', title='MinMaxQTest.S01E01.HR.XViD-FlexGet'), \
             'MinMaxQTest.S01E01.HR.XViD-FlexGet should have been accepted'
-        assert len(self.feed.accepted) == 1, 'should have accepted only one'
+        assert len(self.task.accepted) == 1, 'should have accepted only one'
 
     def test_max_unknown_quality(self):
         """Series plugin: max quality with unknown quality"""
-        self.execute_feed('max_unknown_quality')
-        assert len(self.feed.accepted) == 1, 'should have accepted'
+        self.execute_task('max_unknown_quality')
+        assert len(self.task.accepted) == 1, 'should have accepted'
 
     def test_quality_from_description(self):
         """Series plugin: quality from description"""
-        self.execute_feed('description_quality')
-        assert len(self.feed.accepted) == 1, 'should have accepted'
+        self.execute_task('description_quality')
+        assert len(self.task.accepted) == 1, 'should have accepted'
 
     def test_group_quality(self):
         """Series plugin: quality from group name"""
-        self.execute_feed('quality_from_group')
-        assert self.feed.find_entry('accepted', title='GroupQual.S01E01.720p.XViD-FlexGet'), \
+        self.execute_task('quality_from_group')
+        assert self.task.find_entry('accepted', title='GroupQual.S01E01.720p.XViD-FlexGet'), \
             'GroupQual.S01E01.720p.XViD-FlexGet should have been accepted'
-        assert len(self.feed.accepted) == 1, 'should have accepted only one (no entries should pass for series `other`'
+        assert len(self.task.accepted) == 1, 'should have accepted only one (no entries should pass for series `other`'
 
 
 class TestDatabase(FlexGetBase):
@@ -160,7 +160,7 @@ class TestDatabase(FlexGetBase):
               - some series
               - progress
 
-        feeds:
+        tasks:
           test_1:
             mock:
               - {title: 'Some.Series.S01E20.720p.XViD-FlexGet'}
@@ -182,29 +182,29 @@ class TestDatabase(FlexGetBase):
     def test_database(self):
         """Series plugin: simple database"""
 
-        self.execute_feed('test_1')
-        self.execute_feed('test_2')
-        assert self.feed.find_entry('rejected', title='Some.Series.S01E20.720p.XViD-DoppelGanger'), \
+        self.execute_task('test_1')
+        self.execute_task('test_2')
+        assert self.task.find_entry('rejected', title='Some.Series.S01E20.720p.XViD-DoppelGanger'), \
             'failed basic download remembering'
 
     def test_doppelgangers(self):
         """Series plugin: doppelganger releases (dupes)"""
 
-        self.execute_feed('progress_1')
-        assert self.feed.find_entry('accepted', title='Progress.S01E20.720p-FlexGet'), \
+        self.execute_task('progress_1')
+        assert self.task.find_entry('accepted', title='Progress.S01E20.720p-FlexGet'), \
             'best quality not accepted'
         # should not accept anything
-        self.execute_feed('progress_1')
-        assert not self.feed.accepted, 'repeated execution accepted'
+        self.execute_task('progress_1')
+        assert not self.task.accepted, 'repeated execution accepted'
         # introduce new doppelgangers
-        self.execute_feed('progress_2')
-        assert not self.feed.accepted, 'doppelgangers accepted'
+        self.execute_task('progress_2')
+        assert not self.task.accepted, 'doppelgangers accepted'
 
 
 class TestFilterSeries(FlexGetBase):
 
     __yaml__ = """
-        feeds:
+        tasks:
           test:
             mock:
               - {title: 'Another.Series.S01E20.720p.XViD-FlexGet'}
@@ -248,57 +248,57 @@ class TestFilterSeries(FlexGetBase):
 
     def test_smoke(self):
         """Series plugin: test several standard features"""
-        self.execute_feed('test')
+        self.execute_task('test')
 
         # normal passing
-        assert self.feed.find_entry(title='Another.Series.S01E20.720p.XViD-FlexGet'), \
+        assert self.task.find_entry(title='Another.Series.S01E20.720p.XViD-FlexGet'), \
             'Another.Series.S01E20.720p.XViD-FlexGet should have passed'
 
         # date formats
         df = ['Date.Series.10-11-2008.XViD', 'Date.Series.10.12.2008.XViD', 'Date Series 2010 11 17 XViD',
               'Date.Series.2008-10-13.XViD', 'Date.Series.10.14.09.XViD']
         for d in df:
-            entry = self.feed.find_entry(title=d)
+            entry = self.task.find_entry(title=d)
             assert entry, 'Date format did not match %s' % d
             assert 'series_parser' in entry, 'series_parser missing from %s' % d
             assert entry['series_parser'].id_type == 'date', '%s did not return three groups for dates' % d
 
         # parse from filename
-        assert self.feed.find_entry(filename='Filename.Series.S01E26.XViD'), 'Filename parsing failed'
+        assert self.task.find_entry(filename='Filename.Series.S01E26.XViD'), 'Filename parsing failed'
 
         # empty description
-        assert self.feed.find_entry(title='Empty.Description.S01E22.XViD'), 'Empty Description failed'
+        assert self.task.find_entry(title='Empty.Description.S01E22.XViD'), 'Empty Description failed'
 
         # chaining with regexp plugin
-        assert self.feed.find_entry('rejected', title='Another.Series.S01E21.1080p.H264-FlexGet'), \
+        assert self.task.find_entry('rejected', title='Another.Series.S01E21.1080p.H264-FlexGet'), \
             'regexp chaining'
 
     def test_metainfo_series_override(self):
         """Series plugin: override metainfo_series"""
-        self.execute_feed('metainfo_series_override')
+        self.execute_task('metainfo_series_override')
         # Make sure the metainfo_series plugin is working first
-        entry = self.feed.find_entry('entries', title='Other.Show.with.extra.crap.S02E01.PDTV.XViD-FlexGet')
+        entry = self.task.find_entry('entries', title='Other.Show.with.extra.crap.S02E01.PDTV.XViD-FlexGet')
         assert entry['series_guessed'], 'series should have been guessed'
         assert entry['series_name'] == entry['series_parser'].name == 'Other Show With Extra Crap', \
             'metainfo_series is not running'
         # Make sure the good series data overrode metainfo data for the listed series
-        entry = self.feed.find_entry('accepted', title='Test.Series.with.extra.crap.S01E02.PDTV.XViD-FlexGet')
+        entry = self.task.find_entry('accepted', title='Test.Series.with.extra.crap.S01E02.PDTV.XViD-FlexGet')
         assert not entry.get('series_guessed'), 'series plugin should override series_guessed'
         assert entry['series_name'] == entry['series_parser'].name == 'Test Series', \
             'Series name should be \'Test Series\', was: entry: %s, parser: %s' % (entry['series_name'], entry['series_parser'].name)
 
     def test_all_series_mode(self):
         """Series plugin: test all option"""
-        self.execute_feed('test_all_series_mode')
-        assert self.feed.find_entry('accepted', title='Test.Series.S01E02.PDTV.XViD-FlexGet')
-        entry = self.feed.find_entry('accepted', title='Test Series - 1x03 - PDTV XViD-FlexGet')
+        self.execute_task('test_all_series_mode')
+        assert self.task.find_entry('accepted', title='Test.Series.S01E02.PDTV.XViD-FlexGet')
+        entry = self.task.find_entry('accepted', title='Test Series - 1x03 - PDTV XViD-FlexGet')
         assert entry['series_name'] == 'Test Series'
-        entry = self.feed.find_entry('accepted', title='Other.Show.S02E01.PDTV.XViD-FlexGet')
+        entry = self.task.find_entry('accepted', title='Other.Show.S02E01.PDTV.XViD-FlexGet')
         assert entry['series_guessed']
-        entry2 = self.feed.find_entry('accepted', title='other show season 2 episode 2')
+        entry2 = self.task.find_entry('accepted', title='other show season 2 episode 2')
         # Make sure case is normalized so series are marked with the same name no matter the case in the title
         assert entry['series_name'] == entry2['series_name'] == 'Other Show', 'Series names should be in title case'
-        entry = self.feed.find_entry('accepted', title='Date.Show.03-29-2012.HDTV.XViD-FlexGet')
+        entry = self.task.find_entry('accepted', title='Date.Show.03-29-2012.HDTV.XViD-FlexGet')
         assert entry['series_guessed']
         assert entry['series_name'] == 'Date Show'
 
@@ -306,7 +306,7 @@ class TestFilterSeries(FlexGetBase):
 class TestEpisodeAdvancement(FlexGetBase):
 
     __yaml__ = """
-        feeds:
+        tasks:
 
           test_backwards_1:
             mock:
@@ -393,65 +393,65 @@ class TestEpisodeAdvancement(FlexGetBase):
 
     def test_backwards(self):
         """Series plugin: episode advancement (backwards)"""
-        self.execute_feed('test_backwards_1')
-        assert self.feed.find_entry('accepted', title='backwards s01e12'), \
+        self.execute_task('test_backwards_1')
+        assert self.task.find_entry('accepted', title='backwards s01e12'), \
             'backwards s01e12 should have been accepted'
-        assert self.feed.find_entry('accepted', title='backwards s01e10'), \
+        assert self.task.find_entry('accepted', title='backwards s01e10'), \
             'backwards s01e10 should have been accepted within grace margin'
-        self.execute_feed('test_backwards_2')
-        assert self.feed.find_entry('rejected', title='backwards s01e01'), \
+        self.execute_task('test_backwards_2')
+        assert self.task.find_entry('rejected', title='backwards s01e01'), \
             'backwards s01e01 should have been rejected, too old'
 
     def test_forwards(self):
         """Series plugin: episode advancement (future)"""
-        self.execute_feed('test_forwards_1')
-        assert self.feed.find_entry('accepted', title='forwards s01e01'), \
+        self.execute_task('test_forwards_1')
+        assert self.task.find_entry('accepted', title='forwards s01e01'), \
             'forwards s01e01 should have been accepted'
-        self.execute_feed('test_forwards_2')
-        assert self.feed.find_entry('accepted', title='forwards s02e01'), \
+        self.execute_task('test_forwards_2')
+        assert self.task.find_entry('accepted', title='forwards s02e01'), \
             'forwards s02e01 should have been accepted'
-        self.execute_feed('test_forwards_3')
-        assert self.feed.find_entry('accepted', title='forwards s03e01'), \
+        self.execute_task('test_forwards_3')
+        assert self.task.find_entry('accepted', title='forwards s03e01'), \
             'forwards s03e01 should have been accepted'
-        self.execute_feed('test_forwards_4')
-        assert self.feed.find_entry('rejected', title='forwards s04e02'),\
+        self.execute_task('test_forwards_4')
+        assert self.task.find_entry('rejected', title='forwards s04e02'),\
         'forwards s04e02 should have been rejected'
-        self.execute_feed('test_forwards_5')
-        assert self.feed.find_entry('rejected', title='forwards s05e01'), \
+        self.execute_task('test_forwards_5')
+        assert self.task.find_entry('rejected', title='forwards s05e01'), \
             'forwards s05e01 should have been rejected'
 
     def test_unordered(self):
         """Series plugin: unordered episode advancement"""
-        self.execute_feed('test_unordered')
-        assert len(self.feed.accepted) == 12, \
+        self.execute_task('test_unordered')
+        assert len(self.task.accepted) == 12, \
             'not everyone was accepted'
 
     def test_sequence(self):
         # First should be accepted
-        self.execute_feed('test_seq1')
-        entry = self.feed.find_entry('accepted', title='seq 05')
+        self.execute_task('test_seq1')
+        entry = self.task.find_entry('accepted', title='seq 05')
         assert entry['series_id'] == 5
 
         # Next in sequence should be accepted
-        self.execute_feed('test_seq2')
-        entry = self.feed.find_entry('accepted', title='seq 06')
+        self.execute_task('test_seq2')
+        entry = self.task.find_entry('accepted', title='seq 06')
         assert entry['series_id'] == 6
 
         # Should be too far in the future
-        self.execute_feed('test_seq3')
-        entry = self.feed.find_entry(title='seq 10')
-        assert entry not in self.feed.accepted, 'Should have been too far in future'
+        self.execute_task('test_seq3')
+        entry = self.task.find_entry(title='seq 10')
+        assert entry not in self.task.accepted, 'Should have been too far in future'
 
         # Should be too far in the past
-        self.execute_feed('test_seq4')
-        entry = self.feed.find_entry(title='seq 01')
-        assert entry not in self.feed.accepted, 'Should have been too far in the past'
+        self.execute_task('test_seq4')
+        entry = self.task.find_entry(title='seq 01')
+        assert entry not in self.task.accepted, 'Should have been too far in the past'
 
 
 class TestFilterSeriesPriority(FlexGetBase):
 
     __yaml__ = """
-        feeds:
+        tasks:
           test:
             mock:
               - {title: 'foobar 720p s01e01'}
@@ -465,10 +465,10 @@ class TestFilterSeriesPriority(FlexGetBase):
 
     def test_priorities(self):
         """Series plugin: regexp plugin is able to reject before series plugin"""
-        self.execute_feed('test')
-        assert self.feed.find_entry('rejected', title='foobar 720p s01e01'), \
+        self.execute_task('test')
+        assert self.task.find_entry('rejected', title='foobar 720p s01e01'), \
             'foobar 720p s01e01 should have been rejected'
-        assert self.feed.find_entry('accepted', title='foobar hdtv s01e01'), \
+        assert self.task.find_entry('accepted', title='foobar hdtv s01e01'), \
             'foobar hdtv s01e01 is not accepted'
 
 
@@ -491,7 +491,7 @@ class TestPropers(FlexGetBase):
               - notest:
                   propers: no
 
-        feeds:
+        tasks:
           propers_1:
             mock:
               - {title: 'Test.S01E01.720p-FlexGet'}
@@ -587,98 +587,98 @@ class TestPropers(FlexGetBase):
 
     def test_propers_timeframe(self):
         """Series plugin: propers timeframe"""
-        self.execute_feed('proper_timeframe_1')
-        assert self.feed.find_entry('accepted', title='TFTest.S01E01.720p-FlexGet'), \
+        self.execute_task('proper_timeframe_1')
+        assert self.task.find_entry('accepted', title='TFTest.S01E01.720p-FlexGet'), \
             'Did not accept before timeframe'
 
         # let 6 hours pass
         age_series(hours=6)
 
-        self.execute_feed('proper_timeframe_2')
-        assert self.feed.find_entry('rejected', title='TFTest.S01E01.720p.proper-FlexGet'), \
+        self.execute_task('proper_timeframe_2')
+        assert self.task.find_entry('rejected', title='TFTest.S01E01.720p.proper-FlexGet'), \
             'Did not reject after proper timeframe'
 
     def test_no_propers(self):
         """Series plugin: no propers at all"""
-        self.execute_feed('no_propers_1')
-        assert len(self.feed.accepted) == 1, 'broken badly'
-        self.execute_feed('no_propers_2')
-        assert len(self.feed.rejected) == 1, 'accepted proper'
+        self.execute_task('no_propers_1')
+        assert len(self.task.accepted) == 1, 'broken badly'
+        self.execute_task('no_propers_2')
+        assert len(self.task.rejected) == 1, 'accepted proper'
 
     def test_min_max_propers(self):
         """Series plugin: min max propers"""
-        self.execute_feed('min_max_quality_1')
-        assert len(self.feed.accepted) == 1, 'uhh, broken badly'
-        self.execute_feed('min_max_quality_2')
-        assert len(self.feed.accepted) == 1, 'should have accepted proper'
+        self.execute_task('min_max_quality_1')
+        assert len(self.task.accepted) == 1, 'uhh, broken badly'
+        self.execute_task('min_max_quality_2')
+        assert len(self.task.accepted) == 1, 'should have accepted proper'
 
     def test_lot_propers(self):
         """Series plugin: proper flood"""
-        self.execute_feed('lot_propers')
-        assert len(self.feed.accepted) == 1, 'should have accepted (only) one of the propers'
+        self.execute_task('lot_propers')
+        assert len(self.task.accepted) == 1, 'should have accepted (only) one of the propers'
 
     def test_diff_quality_propers(self):
         """Series plugin: proper in different/wrong quality"""
-        self.execute_feed('diff_quality_1')
-        assert len(self.feed.accepted) == 1
-        self.execute_feed('diff_quality_2')
-        assert len(self.feed.accepted) == 0, 'should not have accepted lower quality proper'
+        self.execute_task('diff_quality_1')
+        assert len(self.task.accepted) == 1
+        self.execute_task('diff_quality_2')
+        assert len(self.task.accepted) == 0, 'should not have accepted lower quality proper'
 
     def test_propers(self):
         """Series plugin: proper accepted after episode is downloaded"""
         # start with normal download ...
-        self.execute_feed('propers_1')
-        assert self.feed.find_entry('accepted', title='Test.S01E01.720p-FlexGet'), \
+        self.execute_task('propers_1')
+        assert self.task.find_entry('accepted', title='Test.S01E01.720p-FlexGet'), \
             'Test.S01E01-FlexGet should have been accepted'
 
         # rejects downloaded
-        self.execute_feed('propers_1')
-        assert self.feed.find_entry('rejected', title='Test.S01E01.720p-FlexGet'), \
+        self.execute_task('propers_1')
+        assert self.task.find_entry('rejected', title='Test.S01E01.720p-FlexGet'), \
             'Test.S01E01-FlexGet should have been rejected'
 
         # accepts proper
-        self.execute_feed('propers_2')
-        assert self.feed.find_entry('accepted', title='Test.S01E01.720p.Proper-FlexGet'), \
+        self.execute_task('propers_2')
+        assert self.task.find_entry('accepted', title='Test.S01E01.720p.Proper-FlexGet'), \
             'new undownloaded proper should have been accepted'
 
         # reject downloaded proper
-        self.execute_feed('propers_2')
-        assert self.feed.find_entry('rejected', title='Test.S01E01.720p.Proper-FlexGet'), \
+        self.execute_task('propers_2')
+        assert self.task.find_entry('rejected', title='Test.S01E01.720p.Proper-FlexGet'), \
             'downloaded proper should have been rejected'
 
         # reject episode that has been downloaded normally and with proper
-        self.execute_feed('propers_3')
-        assert self.feed.find_entry('rejected', title='Test.S01E01.FlexGet'), \
+        self.execute_task('propers_3')
+        assert self.task.find_entry('rejected', title='Test.S01E01.FlexGet'), \
             'Test.S01E01.FlexGet should have been rejected'
 
     def test_proper_available(self):
         """Series plugin: proper available immediately"""
-        self.execute_feed('proper_at_first')
-        assert self.feed.find_entry('accepted', title='Foobar.S01E01.720p.proper.FlexGet'), \
+        self.execute_task('proper_at_first')
+        assert self.task.find_entry('accepted', title='Foobar.S01E01.720p.proper.FlexGet'), \
             'Foobar.S01E01.720p.proper.FlexGet should have been accepted'
 
     def test_proper_upgrade(self):
         """Series plugin: real proper after proper"""
-        self.execute_feed('proper_upgrade_1')
-        assert self.feed.find_entry('accepted', title='Test.S02E01.hdtv.proper')
-        self.execute_feed('proper_upgrade_2')
-        assert self.feed.find_entry('accepted', title='Test.S02E01.hdtv.real.proper')
+        self.execute_task('proper_upgrade_1')
+        assert self.task.find_entry('accepted', title='Test.S02E01.hdtv.proper')
+        self.execute_task('proper_upgrade_2')
+        assert self.task.find_entry('accepted', title='Test.S02E01.hdtv.real.proper')
 
     def test_anime_proper(self):
-        self.execute_feed('anime_proper_1')
-        assert self.feed.accepted, 'ep should have accepted'
-        self.execute_feed('anime_proper_2')
-        assert self.feed.accepted, 'proper ep should have been accepted'
+        self.execute_task('anime_proper_1')
+        assert self.task.accepted, 'ep should have accepted'
+        self.execute_task('anime_proper_2')
+        assert self.task.accepted, 'proper ep should have been accepted'
 
     def test_fastsub_proper(self):
-        self.execute_feed('fastsub_proper_1')
-        assert self.feed.accepted, 'ep should have accepted'
-        self.execute_feed('fastsub_proper_2')
-        assert self.feed.accepted, 'proper ep should have been accepted'
-        self.execute_feed('fastsub_proper_3')
-        assert self.feed.accepted, 'proper ep should have been accepted'
-        self.execute_feed('fastsub_proper_4')
-        assert self.feed.accepted, 'proper ep should have been accepted'
+        self.execute_task('fastsub_proper_1')
+        assert self.task.accepted, 'ep should have accepted'
+        self.execute_task('fastsub_proper_2')
+        assert self.task.accepted, 'proper ep should have been accepted'
+        self.execute_task('fastsub_proper_3')
+        assert self.task.accepted, 'proper ep should have been accepted'
+        self.execute_task('fastsub_proper_4')
+        assert self.task.accepted, 'proper ep should have been accepted'
 
 
 class TestSimilarNames(FlexGetBase):
@@ -686,7 +686,7 @@ class TestSimilarNames(FlexGetBase):
     # hmm, not very good way to test this .. seriesparser should be tested alone?
 
     __yaml__ = """
-        feeds:
+        tasks:
           test:
             mock:
               - {title: 'FooBar.S03E01.DSR-FlexGet'}
@@ -700,13 +700,13 @@ class TestSimilarNames(FlexGetBase):
 
     def setup(self):
         FlexGetBase.setup(self)
-        self.execute_feed('test')
+        self.execute_task('test')
 
     def test_names(self):
         """Series plugin: similar namings"""
-        assert self.feed.find_entry('accepted', title='FooBar.S03E01.DSR-FlexGet'), 'Standard failed?'
-        assert self.feed.find_entry('accepted', title='FooBar: FirstAlt.S02E01.DSR-FlexGet'), 'FirstAlt failed'
-        assert self.feed.find_entry('accepted', title='FooBar: SecondAlt.S01E01.DSR-FlexGet'), 'SecondAlt failed'
+        assert self.task.find_entry('accepted', title='FooBar.S03E01.DSR-FlexGet'), 'Standard failed?'
+        assert self.task.find_entry('accepted', title='FooBar: FirstAlt.S02E01.DSR-FlexGet'), 'FirstAlt failed'
+        assert self.task.find_entry('accepted', title='FooBar: SecondAlt.S01E01.DSR-FlexGet'), 'SecondAlt failed'
 
 
 class TestDuplicates(FlexGetBase):
@@ -718,7 +718,7 @@ class TestDuplicates(FlexGetBase):
             disable_builtins:
               - seen
 
-        feeds:
+        tasks:
           test_dupes:
             mock:
               - {title: 'Foo.2009.S02E04.HDTV.XviD-2HD[FlexGet]'}
@@ -756,31 +756,31 @@ class TestDuplicates(FlexGetBase):
 
     def test_dupes(self):
         """Series plugin: dupes with same quality"""
-        self.execute_feed('test_dupes')
-        assert len(self.feed.accepted) == 1, 'accepted both'
+        self.execute_task('test_dupes')
+        assert len(self.task.accepted) == 1, 'accepted both'
 
     def test_true_dupes(self):
         """Series plugin: true duplicate items"""
-        self.execute_feed('test_true_dupes')
-        assert len(self.feed.accepted) == 1, 'should have accepted (only) one'
+        self.execute_task('test_true_dupes')
+        assert len(self.task.accepted) == 1, 'should have accepted (only) one'
 
     def test_downloaded(self):
         """Series plugin: multiple downloaded and new episodes are handled correctly"""
 
-        self.execute_feed('test_1')
-        self.execute_feed('test_2')
+        self.execute_task('test_1')
+        self.execute_task('test_2')
 
         # these should be accepted
         accepted = ['Foo.Bar.S02E03.HDTV.XviD-FlexGet', 'Foo.Bar.S02E05.720p.HDTV.XviD-YYY']
         for item in accepted:
-            assert self.feed.find_entry('accepted', title=item), \
+            assert self.task.find_entry('accepted', title=item), \
                 '%s should have been accepted' % item
 
         # these should be rejected
         rejected = ['Foo.Bar.S02E04.XviD-2HD[ASDF]', 'Foo.Bar.S02E04.HDTV.720p.XviD-2HD[FlexGet]',
                     'Foo.Bar.S02E04.DSRIP.XviD-2HD[ASDF]', 'Foo.Bar.S02E04.HDTV.1080p.XviD-2HD[ASDF]']
         for item in rejected:
-            assert self.feed.find_entry('rejected', title=item), \
+            assert self.task.find_entry('rejected', title=item), \
                 '%s should have been rejected' % item
 
 
@@ -809,7 +809,7 @@ class TestQualities(FlexGetBase):
                   target: 720p
                   timeframe: 0 hours
                   upgrade: yes
-        feeds:
+        tasks:
           test_1:
             mock:
               - {title: 'FooBar.S01E01.PDTV-FlexGet'}
@@ -861,67 +861,67 @@ class TestQualities(FlexGetBase):
 
     def test_qualities(self):
         """Series plugin: qualities"""
-        self.execute_feed('test_1')
+        self.execute_task('test_1')
 
-        assert self.feed.find_entry('accepted', title='FooBar.S01E01.PDTV-FlexGet'), \
+        assert self.task.find_entry('accepted', title='FooBar.S01E01.PDTV-FlexGet'), \
             'Didn''t accept FooBar.S01E01.PDTV-FlexGet'
-        assert self.feed.find_entry('accepted', title='FooBar.S01E01.1080p-FlexGet'), \
+        assert self.task.find_entry('accepted', title='FooBar.S01E01.1080p-FlexGet'), \
             'Didn''t accept FooBar.S01E01.1080p-FlexGet'
 
-        assert not self.feed.find_entry('accepted', title='FooBar.S01E01.HR-FlexGet'), \
+        assert not self.task.find_entry('accepted', title='FooBar.S01E01.HR-FlexGet'), \
             'Accepted FooBar.S01E01.HR-FlexGet'
 
-        self.execute_feed('test_2')
+        self.execute_task('test_2')
 
-        assert self.feed.find_entry('accepted', title='FooBar.S01E01.720p-FlexGet'), \
+        assert self.task.find_entry('accepted', title='FooBar.S01E01.720p-FlexGet'), \
             'Didn''t accept FooBar.S01E01.720p-FlexGet'
 
         # test that it rejects them afterwards
 
-        self.execute_feed('test_1')
+        self.execute_task('test_1')
 
-        assert self.feed.find_entry('rejected', title='FooBar.S01E01.PDTV-FlexGet'), \
+        assert self.task.find_entry('rejected', title='FooBar.S01E01.PDTV-FlexGet'), \
             'Didn\'t reject FooBar.S01E01.PDTV-FlexGet'
-        assert self.feed.find_entry('rejected', title='FooBar.S01E01.1080p-FlexGet'), \
+        assert self.task.find_entry('rejected', title='FooBar.S01E01.1080p-FlexGet'), \
             'Didn\'t reject FooBar.S01E01.1080p-FlexGet'
 
-        assert not self.feed.find_entry('accepted', title='FooBar.S01E01.HR-FlexGet'), \
+        assert not self.task.find_entry('accepted', title='FooBar.S01E01.HR-FlexGet'), \
             'Accepted FooBar.S01E01.HR-FlexGet'
 
     def test_propers(self):
         """Series plugin: qualities + propers"""
-        self.execute_feed('propers_1')
-        assert self.feed.accepted
-        self.execute_feed('propers_2')
-        assert self.feed.accepted, 'proper not accepted'
-        self.execute_feed('propers_2')
-        assert not self.feed.accepted, 'proper accepted again'
+        self.execute_task('propers_1')
+        assert self.task.accepted
+        self.execute_task('propers_2')
+        assert self.task.accepted, 'proper not accepted'
+        self.execute_task('propers_2')
+        assert not self.task.accepted, 'proper accepted again'
 
     def test_qualities_upgrade(self):
-        self.execute_feed('upgrade_1')
-        assert self.feed.find_entry('accepted', title='FooBaz.S01E02.HR-FlexGet'), 'HR quality should be accepted'
-        assert len(self.feed.accepted) == 1, 'Only best quality should be accepted'
-        self.execute_feed('upgrade_2')
-        assert self.feed.find_entry('accepted', title='FooBaz.S01E02.720p-FlexGet'), '720p quality should be accepted'
-        assert len(self.feed.accepted) == 1, 'Only best quality should be accepted'
-        self.execute_feed('upgrade_3')
-        assert not self.feed.accepted, 'Should not have accepted worse qualities'
+        self.execute_task('upgrade_1')
+        assert self.task.find_entry('accepted', title='FooBaz.S01E02.HR-FlexGet'), 'HR quality should be accepted'
+        assert len(self.task.accepted) == 1, 'Only best quality should be accepted'
+        self.execute_task('upgrade_2')
+        assert self.task.find_entry('accepted', title='FooBaz.S01E02.720p-FlexGet'), '720p quality should be accepted'
+        assert len(self.task.accepted) == 1, 'Only best quality should be accepted'
+        self.execute_task('upgrade_3')
+        assert not self.task.accepted, 'Should not have accepted worse qualities'
 
     def test_quality_upgrade(self):
-        self.execute_feed('quality_upgrade_1')
-        assert len(self.feed.accepted) == 1, 'Only one ep should have passed quality filter'
-        assert self.feed.find_entry('accepted', title='FooBum.S03E01.720p')
-        self.execute_feed('quality_upgrade_2')
-        assert len(self.feed.accepted) == 1, 'one ep should be valid upgrade'
-        assert self.feed.find_entry('accepted', title='FooBum.S03E01.1080i')
+        self.execute_task('quality_upgrade_1')
+        assert len(self.task.accepted) == 1, 'Only one ep should have passed quality filter'
+        assert self.task.find_entry('accepted', title='FooBum.S03E01.720p')
+        self.execute_task('quality_upgrade_2')
+        assert len(self.task.accepted) == 1, 'one ep should be valid upgrade'
+        assert self.task.find_entry('accepted', title='FooBum.S03E01.1080i')
 
     def test_target_upgrade(self):
-        self.execute_feed('target_1')
-        assert len(self.feed.accepted) == 1, 'Only one ep should have been grabbed'
-        assert self.feed.find_entry('accepted', title='Food.S06E11.hdtv')
-        self.execute_feed('target_2')
-        assert len(self.feed.accepted) == 1, 'one ep should be valid upgrade'
-        assert self.feed.find_entry('accepted', title='Food.S06E11.720p'), 'Should upgrade to `target`'
+        self.execute_task('target_1')
+        assert len(self.task.accepted) == 1, 'Only one ep should have been grabbed'
+        assert self.task.find_entry('accepted', title='Food.S06E11.hdtv')
+        self.execute_task('target_2')
+        assert len(self.task.accepted) == 1, 'one ep should be valid upgrade'
+        assert self.task.find_entry('accepted', title='Food.S06E11.720p'), 'Should upgrade to `target`'
 
 class TestIdioticNumbering(FlexGetBase):
 
@@ -931,7 +931,7 @@ class TestIdioticNumbering(FlexGetBase):
             series:
               - FooBar
 
-        feeds:
+        tasks:
           test_1:
             mock:
               - {title: 'FooBar.S01E01.PDTV-FlexGet'}
@@ -944,9 +944,9 @@ class TestIdioticNumbering(FlexGetBase):
         """Series plugin: idiotic numbering scheme DISABLED"""
         return
 
-        self.execute_feed('test_1')
-        self.execute_feed('test_2')
-        entry = self.feed.find_entry(title='FooBar.102.PDTV-FlexGet')
+        self.execute_task('test_1')
+        self.execute_task('test_2')
+        entry = self.task.find_entry(title='FooBar.102.PDTV-FlexGet')
         assert entry, 'entry not found?'
         assert entry['series_season'] == 1, 'season not detected'
         assert entry['series_episode'] == 2, 'episode not detected'
@@ -955,7 +955,7 @@ class TestIdioticNumbering(FlexGetBase):
 class TestCapitalization(FlexGetBase):
 
     __yaml__ = """
-        feeds:
+        tasks:
           test_1:
             mock:
               - {title: 'FooBar.S01E01.PDTV-FlexGet'}
@@ -970,10 +970,10 @@ class TestCapitalization(FlexGetBase):
 
     def test_capitalization(self):
         """Series plugin: configuration capitalization"""
-        self.execute_feed('test_1')
-        assert self.feed.find_entry('accepted', title='FooBar.S01E01.PDTV-FlexGet')
-        self.execute_feed('test_2')
-        assert self.feed.find_entry('rejected', title='FooBar.S01E01.PDTV-FlexGet')
+        self.execute_task('test_1')
+        assert self.task.find_entry('accepted', title='FooBar.S01E01.PDTV-FlexGet')
+        self.execute_task('test_2')
+        assert self.task.find_entry('rejected', title='FooBar.S01E01.PDTV-FlexGet')
 
 
 class TestMixedNumbering(FlexGetBase):
@@ -984,7 +984,7 @@ class TestMixedNumbering(FlexGetBase):
             series:
               - FooBar
 
-        feeds:
+        tasks:
           test_1:
             mock:
               - {title: 'FooBar.S03E07.PDTV-FlexGet'}
@@ -997,16 +997,16 @@ class TestMixedNumbering(FlexGetBase):
         """Series plugin: Mixed series numbering - DISABLED!"""
         return
 
-        self.execute_feed('test_1')
-        assert self.feed.find_entry('accepted', title='FooBar.S03E07.PDTV-FlexGet')
-        self.execute_feed('test_2')
-        assert self.feed.find_entry('rejected', title='FooBar.0307.PDTV-FlexGet')
+        self.execute_task('test_1')
+        assert self.task.find_entry('accepted', title='FooBar.S03E07.PDTV-FlexGet')
+        self.execute_task('test_2')
+        assert self.task.find_entry('rejected', title='FooBar.0307.PDTV-FlexGet')
 
 
 class TestExact(FlexGetBase):
 
     __yaml__ = """
-        feeds:
+        tasks:
           auto:
             mock:
               - {title: 'ABC.MIAMI.S01E01.PDTV-FlexGet'}
@@ -1035,20 +1035,20 @@ class TestExact(FlexGetBase):
 
     def test_auto(self):
         """Series plugin: auto enable exact"""
-        self.execute_feed('auto')
-        assert self.feed.find_entry('accepted', title='ABC.S01E01.PDTV-FlexGet')
-        assert self.feed.find_entry('accepted', title='ABC.LA.S01E01.PDTV-FlexGet')
-        assert self.feed.find_entry('accepted', title='ABC.MIAMI.S01E01.PDTV-FlexGet')
+        self.execute_task('auto')
+        assert self.task.find_entry('accepted', title='ABC.S01E01.PDTV-FlexGet')
+        assert self.task.find_entry('accepted', title='ABC.LA.S01E01.PDTV-FlexGet')
+        assert self.task.find_entry('accepted', title='ABC.MIAMI.S01E01.PDTV-FlexGet')
 
     def test_with_name_regexp(self):
-        self.execute_feed('name_regexp')
-        assert self.feed.find_entry('accepted', title='show s09e05 hdtv')
-        assert not self.feed.find_entry('accepted', title='show a s09e06 hdtv')
+        self.execute_task('name_regexp')
+        assert self.task.find_entry('accepted', title='show s09e05 hdtv')
+        assert not self.task.find_entry('accepted', title='show a s09e06 hdtv')
 
     def test_dated_show(self):
-        self.execute_feed('date')
-        assert self.feed.find_entry('accepted', title='date show 04.01.2011 hdtv')
-        assert not self.feed.find_entry('accepted', title='date show b 04.02.2011 hdtv')
+        self.execute_task('date')
+        assert self.task.find_entry('accepted', title='date show 04.01.2011 hdtv')
+        assert not self.task.find_entry('accepted', title='date show b 04.02.2011 hdtv')
 
 class TestTimeframe(FlexGetBase):
 
@@ -1059,7 +1059,7 @@ class TestTimeframe(FlexGetBase):
               - test:
                   timeframe: 5 hours
                   enough: 720p
-        feeds:
+        tasks:
           test_no_waiting:
             mock:
               - {title: 'Test.S01E01.720p-FlexGet'}
@@ -1129,82 +1129,82 @@ class TestTimeframe(FlexGetBase):
 
     def test_no_waiting(self):
         """Series plugin: no timeframe waiting needed"""
-        self.execute_feed('test_no_waiting')
-        assert self.feed.find_entry('accepted', title='Test.S01E01.720p-FlexGet'), \
+        self.execute_task('test_no_waiting')
+        assert self.task.find_entry('accepted', title='Test.S01E01.720p-FlexGet'), \
             '720p not accepted immediattely'
 
     def test_stop_waiting(self):
         """Series plugin: timeframe quality appears, stop waiting, proper appears"""
-        self.execute_feed('test_stop_waiting_1')
-        assert self.feed.entries and not self.feed.accepted
-        self.execute_feed('test_stop_waiting_2')
-        assert self.feed.find_entry('accepted', title='Test.S01E02.720p-FlexGet'), \
+        self.execute_task('test_stop_waiting_1')
+        assert self.task.entries and not self.task.accepted
+        self.execute_task('test_stop_waiting_2')
+        assert self.task.find_entry('accepted', title='Test.S01E02.720p-FlexGet'), \
             '720p should have caused stop waiting'
-        self.execute_feed('test_proper_afterwards')
-        assert self.feed.find_entry('accepted', title='Test.S01E02.720p.Proper-FlexGet'), \
+        self.execute_task('test_proper_afterwards')
+        assert self.task.find_entry('accepted', title='Test.S01E02.720p.Proper-FlexGet'), \
             'proper should have been accepted'
 
     def test_expires(self):
         """Series plugin: timeframe expires"""
         # first excecution should not accept anything
-        self.execute_feed('test_expires')
-        assert not self.feed.accepted
+        self.execute_task('test_expires')
+        assert not self.task.accepted
 
         # let 3 hours pass
         age_series(hours=3)
-        self.execute_feed('test_expires')
-        assert not self.feed.accepted, 'expired too soon'
+        self.execute_task('test_expires')
+        assert not self.task.accepted, 'expired too soon'
 
         # let another 3 hours pass, should expire now!
         age_series(hours=6)
-        self.execute_feed('test_expires')
-        assert self.feed.accepted, 'timeframe didn\'t expire'
+        self.execute_task('test_expires')
+        assert self.task.accepted, 'timeframe didn\'t expire'
 
     def test_min_max_fail(self):
-        self.execute_feed('test_min_max_fail')
-        assert not self.feed.accepted
+        self.execute_task('test_min_max_fail')
+        assert not self.task.accepted
 
         # Let 6 hours pass, timeframe should not even been started, as pdtv doesn't meet min_quality
         age_series(hours=6)
-        self.execute_feed('test_min_max_fail')
-        assert self.feed.entries and not self.feed.accepted
+        self.execute_task('test_min_max_fail')
+        assert self.task.entries and not self.task.accepted
 
     def test_min_max_pass(self):
-        self.execute_feed('test_min_max_pass')
-        assert not self.feed.accepted
+        self.execute_task('test_min_max_pass')
+        assert not self.task.accepted
 
         # Let 6 hours pass, timeframe should expire and accept hdtv copy
         age_series(hours=6)
-        self.execute_feed('test_min_max_pass')
-        assert self.feed.find_entry('accepted', title='MM Test.S01E02.hdtv-FlexGet')
-        assert len(self.feed.accepted) == 1
+        self.execute_task('test_min_max_pass')
+        assert self.task.find_entry('accepted', title='MM Test.S01E02.hdtv-FlexGet')
+        assert len(self.task.accepted) == 1
 
     def test_qualities_fail(self):
-        self.execute_feed('test_qualities_fail')
-        assert self.feed.find_entry('accepted', title='Q Test.S01E02.1080p-FlexGet'),\
+        self.execute_task('test_qualities_fail')
+        assert self.task.find_entry('accepted', title='Q Test.S01E02.1080p-FlexGet'),\
             'should have accepted wanted quality'
-        assert len(self.feed.accepted) == 1
+        assert len(self.task.accepted) == 1
 
         # Let 6 hours pass, timeframe should not even been started, as we already have one of our qualities
         age_series(hours=6)
-        self.execute_feed('test_qualities_fail')
-        assert self.feed.entries and not self.feed.accepted
+        self.execute_task('test_qualities_fail')
+        assert self.task.entries and not self.task.accepted
 
     def test_qualities_pass(self):
-        self.execute_feed('test_qualities_pass')
-        assert not self.feed.accepted, 'None of the qualities should have matched'
+        self.execute_task('test_qualities_pass')
+        assert not self.task.accepted, 'None of the qualities should have matched'
 
         # Let 6 hours pass, timeframe should expire and accept 1080p copy
         age_series(hours=6)
-        self.execute_feed('test_qualities_pass')
-        assert self.feed.find_entry('accepted', title='Q Test.S01E02.1080p-FlexGet')
-        assert len(self.feed.accepted) == 1
+        self.execute_task('test_qualities_pass')
+        assert self.task.find_entry('accepted', title='Q Test.S01E02.1080p-FlexGet')
+        assert len(self.task.accepted) == 1
 
 
 class TestBacklog(FlexGetBase):
 
     __yaml__ = """
-        feeds:
+        tasks:
           backlog:
             mock:
               - {title: 'Test.S01E01.hdtv-FlexGet'}
@@ -1214,13 +1214,13 @@ class TestBacklog(FlexGetBase):
 
     def testBacklog(self):
         """Series plugin: backlog"""
-        self.execute_feed('backlog')
-        assert self.feed.entries and not self.feed.accepted, 'no entries at the start'
-        # simulate test going away from the feed
-        del(self.manager.config['feeds']['backlog']['mock'])
+        self.execute_task('backlog')
+        assert self.task.entries and not self.task.accepted, 'no entries at the start'
+        # simulate test going away from the task
+        del(self.manager.config['tasks']['backlog']['mock'])
         age_series(hours=12)
-        self.execute_feed('backlog')
-        assert self.feed.accepted, 'backlog is not injecting episodes'
+        self.execute_task('backlog')
+        assert self.task.accepted, 'backlog is not injecting episodes'
 
 
 class TestManipulate(FlexGetBase):
@@ -1228,7 +1228,7 @@ class TestManipulate(FlexGetBase):
     """Tests that it's possible to manipulate entries before they're parsed by series plugin"""
 
     __yaml__ = """
-        feeds:
+        tasks:
           test_1:
             mock:
               - {title: 'PREFIX: Test.S01E01.hdtv-FlexGet'}
@@ -1247,17 +1247,17 @@ class TestManipulate(FlexGetBase):
     def testManipulate(self):
         """Series plugin: test manipulation priority"""
         # should not work with the prefix
-        self.execute_feed('test_1')
-        assert not self.feed.accepted, 'series accepted even with prefix?'
-        assert not self.feed.accepted, 'series rejecte even with prefix?'
-        self.execute_feed('test_2')
-        assert self.feed.accepted, 'manipulate failed to pre-clean title'
+        self.execute_task('test_1')
+        assert not self.task.accepted, 'series accepted even with prefix?'
+        assert not self.task.accepted, 'series rejecte even with prefix?'
+        self.execute_task('test_2')
+        assert self.task.accepted, 'manipulate failed to pre-clean title'
 
 
 class TestFromGroup(FlexGetBase):
 
     __yaml__ = """
-        feeds:
+        tasks:
           test:
             mock:
               - {title: '[Ignored] Test 12'}
@@ -1271,10 +1271,10 @@ class TestFromGroup(FlexGetBase):
 
     def testFromGroup(self):
         """Series plugin: test from_group"""
-        self.execute_feed('test')
-        assert self.feed.find_entry('accepted', title='[FlexGet] Test 12')
-        assert self.feed.find_entry('accepted', title='Test.13.HDTV-FlexGet')
-        assert self.feed.find_entry('accepted', title='Test.14.HDTV-Name')
+        self.execute_task('test')
+        assert self.task.find_entry('accepted', title='[FlexGet] Test 12')
+        assert self.task.find_entry('accepted', title='Test.13.HDTV-FlexGet')
+        assert self.task.find_entry('accepted', title='Test.14.HDTV-Name')
 
 
 class TestWatched(FlexGetBase):
@@ -1285,7 +1285,7 @@ class TestWatched(FlexGetBase):
             mock:
               - {title: 'WTest.S02E03.HDTV.XViD-FlexGet'}
               - {title: 'W2Test.S02E03.HDTV.XViD-FlexGet'}
-        feeds:
+        tasks:
           watched_test:
             series:
               - WTest:
@@ -1305,12 +1305,12 @@ class TestWatched(FlexGetBase):
     """
 
     def test_watched(self):
-        self.execute_feed('watched_test')
-        assert not self.feed.accepted, 'No entries should have been accepted, as they have been watched'
+        self.execute_task('watched_test')
+        assert not self.task.accepted, 'No entries should have been accepted, as they have been watched'
 
     def test_unwatched(self):
-        self.execute_feed('unwatched_test')
-        assert len(self.feed.accepted) == 2, 'Entries should have been accepted, they are after the watched episode'
+        self.execute_task('unwatched_test')
+        assert len(self.task.accepted) == 2, 'Entries should have been accepted, they are after the watched episode'
 
 
 class TestSeriesPremiere(FlexGetBase):
@@ -1320,7 +1320,7 @@ class TestSeriesPremiere(FlexGetBase):
           global:
             metainfo_series: yes
             series_premiere: yes
-        feeds:
+        tasks:
           test:
             mock:
               - {title: 'Foobar.S01E01.PDTV-FlexGet'}
@@ -1330,17 +1330,17 @@ class TestSeriesPremiere(FlexGetBase):
 
     def testOnlyPremieres(self):
         """Test series premiere"""
-        self.execute_feed('test')
-        assert self.feed.find_entry('accepted', title='Foobar.S01E01.PDTV-FlexGet',
+        self.execute_task('test')
+        assert self.task.find_entry('accepted', title='Foobar.S01E01.PDTV-FlexGet',
             series_name='Foobar', series_season=1, series_episode=1), 'Series premiere should have been accepted'
-        assert len(self.feed.accepted) == 1
+        assert len(self.task.accepted) == 1
     # TODO: Add more tests, test interaction with series plugin and series_exists
 
 
 class TestImportSeries(FlexGetBase):
 
     __yaml__ = """
-        feeds:
+        tasks:
           timeframe_max:
             import_series:
               settings:
@@ -1358,18 +1358,18 @@ class TestImportSeries(FlexGetBase):
 
     def test_timeframe_max(self):
         """Tests import_series as well as timeframe with max_quality."""
-        self.execute_feed('timeframe_max')
-        assert not self.feed.accepted, 'Entry shouldnot have been accepted on first run.'
+        self.execute_task('timeframe_max')
+        assert not self.task.accepted, 'Entry shouldnot have been accepted on first run.'
         age_series(minutes=6)
-        self.execute_feed('timeframe_max')
-        assert self.feed.find_entry('accepted', title='the show s03e02 hdtv'), \
+        self.execute_task('timeframe_max')
+        assert self.task.find_entry('accepted', title='the show s03e02 hdtv'), \
                 'hdtv should have been accepted after timeframe.'
 
 
 class TestIDTypes(FlexGetBase):
 
     __yaml__ = """
-        feeds:
+        tasks:
           all_types:
             series:
               - episode
@@ -1387,8 +1387,8 @@ class TestIDTypes(FlexGetBase):
     """
 
     def test_id_types(self):
-        self.execute_feed('all_types')
-        for entry in self.feed.entries:
+        self.execute_task('all_types')
+        for entry in self.task.entries:
             assert entry['series_name'], '%s not parsed by series plugin' % entry['title']
             assert entry['series_id_type'] in entry['series_name']
 
@@ -1396,7 +1396,7 @@ class TestIDTypes(FlexGetBase):
 class TestCaseChange(FlexGetBase):
 
     __yaml__ = """
-        feeds:
+        tasks:
           first:
             mock:
               - title: theshow s02e04
@@ -1410,18 +1410,18 @@ class TestCaseChange(FlexGetBase):
     """
 
     def test_case_change(self):
-        self.execute_feed('first')
+        self.execute_task('first')
         # Make sure series_name uses case from config, make sure episode is accepted
-        assert self.feed.find_entry('accepted', title='theshow s02e04', series_name='TheShow')
-        self.execute_feed('second')
+        assert self.task.find_entry('accepted', title='theshow s02e04', series_name='TheShow')
+        self.execute_task('second')
         # Make sure series_name uses new case from config, make sure ep is rejected because we have a copy
-        assert self.feed.find_entry('rejected', title='thEshoW s02e04 other', series_name='THESHOW')
+        assert self.task.find_entry('rejected', title='thEshoW s02e04 other', series_name='THESHOW')
 
 
 class TestInvalidSeries(FlexGetBase):
 
     __yaml__ = """
-        feeds:
+        tasks:
           blank:
             mock:
               - title: whatever
@@ -1432,14 +1432,14 @@ class TestInvalidSeries(FlexGetBase):
 
     def test_blank_series(self):
         """Make sure a blank series doesn't crash."""
-        self.execute_feed('blank')
-        assert not self.feed._abort, 'Feed should not have aborted'
+        self.execute_task('blank')
+        assert not self.task._abort, 'Task should not have aborted'
 
 
 class TestDoubleEps(FlexGetBase):
 
     __yaml__ = """
-        feeds:
+        tasks:
           test_double1:
             mock:
               - title: double S01E02-E03
@@ -1461,15 +1461,15 @@ class TestDoubleEps(FlexGetBase):
 
     def test_double(self):
         # First should be accepted
-        self.execute_feed('test_double1')
-        assert self.feed.find_entry('accepted', title='double S01E02-E03')
+        self.execute_task('test_double1')
+        assert self.task.find_entry('accepted', title='double S01E02-E03')
 
         # We already got ep 3 as part of double, should not be accepted
-        self.execute_feed('test_double2')
-        assert not self.feed.find_entry('accepted', title='double S01E03')
+        self.execute_task('test_double2')
+        assert not self.task.find_entry('accepted', title='double S01E03')
 
     def test_double_prefered(self):
         # Given a choice of single or double ep at same quality, grab the double
-        self.execute_feed('test_double_prefered')
-        assert self.feed.find_entry('accepted', title='double S02E03-04')
-        assert not self.feed.find_entry('accepted', title='S02E03')
+        self.execute_task('test_double_prefered')
+        assert self.task.find_entry('accepted', title='double S02E03-04')
+        assert not self.task.find_entry('accepted', title='S02E03')

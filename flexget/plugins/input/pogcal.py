@@ -18,7 +18,7 @@ class InputPogDesign(object):
     name_map = {'The Tonight Show [Leno]': 'The Tonight Show With Jay Leno',
                 'Late Show [Letterman]': 'David Letterman'}
 
-    def on_feed_input(self, feed, config):
+    def on_task_input(self, task, config):
         try:
             r = requests.post('http://www.pogdesign.co.uk/cat/', data={'username': config['username'], 'password': config['password'], 'sub_login': 'Account Login'}, allow_redirects=True)
             if 'U / P Invalid' in r.text:

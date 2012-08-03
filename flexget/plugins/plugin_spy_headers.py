@@ -81,7 +81,7 @@ class PluginSpyHeaders(object):
         from flexget import validator
         return validator.factory('any')
 
-    def on_feed_start(self, feed):
+    def on_task_start(self, task):
         if urllib2._opener:
             log.debug('Adding HTTPCaptureHeaderHandler to default opener')
             urllib2._opener.add_handler(HTTPCaptureHeaderHandler())
@@ -90,14 +90,14 @@ class PluginSpyHeaders(object):
             opener = urllib2.build_opener(HTTPCaptureHeaderHandler())
             urllib2.install_opener(opener)
 
-    def on_feed_exit(self, feed):
-        """Feed exiting, remove additions"""
+    def on_task_exit(self, task):
+        """Task exiting, remove additions"""
         if urllib2._opener:
             log.debug('Removing urllib2 default opener')
             # TODO: this uninstalls all other handlers as well, but does it matter?
             urllib2.install_opener(None)
 
     # remove also on abort
-    on_feed_abort = on_feed_exit
+    on_task_abort = on_task_exit
 
 register_plugin(PluginSpyHeaders, 'spy_headers')

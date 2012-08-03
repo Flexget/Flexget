@@ -22,7 +22,7 @@ class InputScenereleases:
         from flexget import validator
         return validator.factory('url')
 
-    def parse_site(self, url, feed):
+    def parse_site(self, url, task):
         """Parse configured url and return releases array"""
 
         page = urlopener(url, log)
@@ -64,7 +64,7 @@ class InputScenereleases:
                 temp['title'] = release['title']
                 temp['url'] = link_href
                 urlrewriting = get_plugin_by_name('urlrewriting')
-                if urlrewriting['instance'].url_rewritable(feed, temp):
+                if urlrewriting['instance'].url_rewritable(task, temp):
                     release['url'] = link_href
                     log.trace('--> accepting %s (resolvable)' % link_href)
                 else:
@@ -81,8 +81,8 @@ class InputScenereleases:
 
     @cached('scenereleases')
     @internet(log)
-    def on_feed_input(self, feed, config):
-        releases = self.parse_site(config, feed)
+    def on_task_input(self, task, config):
+        releases = self.parse_site(config, task)
         entries = []
 
         for release in releases:

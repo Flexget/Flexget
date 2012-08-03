@@ -37,18 +37,18 @@ def startup(manager):
         else:
             log.critical('Unable to monkeypatch sqlalchemy')
 
-        @event('feed.execute.before_plugin')
-        def before(feed, keyword):
-            fd = _start.setdefault(feed.name, {})
+        @event('task.execute.before_plugin')
+        def before(task, keyword):
+            fd = _start.setdefault(task.name, {})
             fd.setdefault('time', {})[keyword] = time.time()
             fd.setdefault('queries', {})[keyword] = query_count
 
-        @event('feed.execute.after_plugin')
-        def after(feed, keyword):
-            took = time.time() - _start[feed.name]['time'][keyword]
-            queries = query_count - _start[feed.name]['queries'][keyword]
+        @event('task.execute.after_plugin')
+        def after(task, keyword):
+            took = time.time() - _start[task.name]['time'][keyword]
+            queries = query_count - _start[task.name]['queries'][keyword]
             # Store results, increases previous values
-            pd = performance.setdefault(feed.name, {})
+            pd = performance.setdefault(task.name, {})
             data = pd.setdefault(keyword, {})
             data['took'] = data.get('took', 0) + took
             data['queries'] = data.get('queries', 0) + queries
@@ -56,7 +56,7 @@ def startup(manager):
         @event('manager.execute.completed')
         def results(manager):
             for name, data in performance.iteritems():
-                log.info('Performance results for feed %s:' % name)
+                log.info('Performance results for task %s:' % name)
                 for keyword, results in data.iteritems():
                     took = results['took']
                     queries = results['queries']

@@ -53,7 +53,7 @@ class LazyField(object):
 
 class Entry(dict):
     """
-    Represents one item in feed. Must have `url` and *title* fields.
+    Represents one item in task. Must have `url` and *title* fields.
 
     Stores automatically *original_url* key, which is necessary because
     plugins (eg. urlrewriters) may change *url* into something else
@@ -61,8 +61,8 @@ class Entry(dict):
 
     Entry will also transparently convert all ascii strings into unicode
     and raises :class:`EntryUnicodeError` if conversion fails on any value
-    being set. Such failures are caught by :class:`~flexget.feed.Feed`
-    and trigger :meth:`~flexget.feed.Feed.abort`.
+    being set. Such failures are caught by :class:`~flexget.task.Task`
+    and trigger :meth:`~flexget.task.Task.abort`.
     """
 
     def __init__(self, *args, **kwargs):

@@ -104,24 +104,24 @@ class TorrentAlive(object):
         return config
 
     @priority(150)
-    def on_feed_filter(self, feed, config):
+    def on_task_filter(self, task, config):
         if not config:
             return
         config = self.prepare_config(config)
-        for entry in feed.entries:
+        for entry in task.entries:
             if 'torrent_seeds' in entry and entry['torrent_seeds'] < config['min_seeds']:
-                feed.reject(entry, reason='Had < %d required seeds. (%s)' %
+                task.reject(entry, reason='Had < %d required seeds. (%s)' %
                                           (config['min_seeds'], entry['torrent_seeds']))
 
     # Run on output phase so that we let torrent plugin output modified torrent file first
     @priority(250)
-    def on_feed_output(self, feed, config):
+    def on_task_output(self, task, config):
         if not config:
             return
         config = self.prepare_config(config)
         min_seeds = config['min_seeds']
 
-        for entry in feed.accepted:
+        for entry in task.accepted:
             # TODO: shouldn't this still check min_seeds ?
             if entry.get('torrent_seeds'):
                 log.debug('Not checking trackers for seeds, as torrent_seeds is already filled.')
@@ -161,9 +161,9 @@ class TorrentAlive(object):
 
                 # Reject if needed
                 if seeds < min_seeds:
-                    feed.reject(entry, reason='Tracker(s) had < %s required seeds. (%s)' % (min_seeds, seeds),
+                    task.reject(entry, reason='Tracker(s) had < %s required seeds. (%s)' % (min_seeds, seeds),
                         remember_time=config['reject_for'])
-                    feed.rerun()
+                    task.rerun()
                 else:
                     log.debug('Found %i seeds from trackers' % seeds)
 

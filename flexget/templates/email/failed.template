@@ -1,10 +1,10 @@
-{% if feed.aborted -%}
-Feed '{{feed.name}}' was aborted because: {{feed.abort_reason}}
+{% if task.aborted -%}
+Task '{{task.name}}' was aborted because: {{task.abort_reason}}
 
 {% endif -%}
-{% if feed.failed -%}
-The following entries have failed for feed {{feed.name}}:
-{%- for entry in feed.failed %}
+{% if task.failed -%}
+The following entries have failed for task {{task.name}}:
+{%- for entry in task.failed %}
 - {{entry.title}} ({{entry.url}}) Reason: {{entry.reason|d('unknown')}}
 {% endfor %}
 {% endif %}

@@ -20,11 +20,11 @@ class MetainfoSeries(object):
 
     # Run after series plugin so we don't try to re-parse it's entries
     @priority(120)
-    def on_feed_metainfo(self, feed):
+    def on_task_metainfo(self, task):
         # Don't run if we are disabled
-        if not feed.config.get('metainfo_series', True):
+        if not task.config.get('metainfo_series', True):
             return
-        for entry in feed.entries:
+        for entry in task.entries:
             # If series plugin already parsed this, don't touch it.
             if entry.get('series_name'):
                 continue

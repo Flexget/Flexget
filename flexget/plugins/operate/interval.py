@@ -8,7 +8,7 @@ log = logging.getLogger('interval')
 
 class PluginInterval(object):
     """
-        Allows specifying minimum interval for feed execution.
+        Allows specifying minimum interval for task execution.
 
         Format: [n] [minutes|hours|days|weeks]
 
@@ -22,17 +22,17 @@ class PluginInterval(object):
         return validator.factory('interval')
 
     @priority(255)
-    def on_feed_start(self, feed, config):
+    def on_task_start(self, task, config):
         # Allow reruns
-        if feed.is_rerun:
+        if task.is_rerun:
             return
-        if feed.manager.options.learn:
-            log.info('Ignoring feed %s interval for --learn' % feed.name)
+        if task.manager.options.learn:
+            log.info('Ignoring task %s interval for --learn' % task.name)
             return
-        last_time = feed.simple_persistence.get('last_time')
+        last_time = task.simple_persistence.get('last_time')
         if not last_time:
             log.info('No previous run recorded, running now')
-        elif feed.manager.options.interval_ignore:
+        elif task.manager.options.interval_ignore:
             log.info('Ignoring interval because of --now')
         else:
             log.debug('last_time: %r' % last_time)
@@ -41,11 +41,11 @@ class PluginInterval(object):
             log.debug('next_time: %r' % next_time)
             if datetime.datetime.now() < next_time:
                 log.debug('interval not met')
-                log.verbose('Interval %s not met on feed %s. Use --now to override.' % (config, feed.name))
-                feed.abort('Interval not met', silent=True)
+                log.verbose('Interval %s not met on task %s. Use --now to override.' % (config, task.name))
+                task.abort('Interval not met', silent=True)
                 return
         log.debug('interval passed')
-        feed.simple_persistence['last_time'] = datetime.datetime.now()
+        task.simple_persistence['last_time'] = datetime.datetime.now()
 
 register_plugin(PluginInterval, 'interval', api_ver=2)
 register_parser_option('--now', action='store_true', dest='interval_ignore', default=False,

@@ -72,11 +72,11 @@ class PluginDownload(object):
             config['require_path'] = True
         return config
 
-    def on_feed_download(self, feed, config):
+    def on_task_download(self, task, config):
         config = self.process_config(config)
-        self.get_temp_files(feed, require_path=config.get('require_path', False), fail_html=config['fail_html'])
+        self.get_temp_files(task, require_path=config.get('require_path', False), fail_html=config['fail_html'])
 
-    def get_temp_file(self, feed, entry, require_path=False, handle_magnets=False, fail_html=True):
+    def get_temp_file(self, task, entry, require_path=False, handle_magnets=False, fail_html=True):
         """
         Download entry content and store in temporary folder.
         Fails entry with a reason if there was problem.
@@ -109,7 +109,7 @@ class PluginDownload(object):
                 # Don't fail here, there might be a magnet later in the list of urls
                 log.debug('Skipping url %s because there is no path for download' % url)
                 continue
-            error = self.process_entry(feed, entry, url)
+            error = self.process_entry(task, entry, url)
 
             # disallow html content
             html_mimes = ['html', 'text/html']
@@ -128,12 +128,12 @@ class PluginDownload(object):
             # check if entry must have a path (download: yes)
             if require_path and 'path' not in entry:
                 log.error('%s can\'t be downloaded, no path specified for entry' % entry['title'])
-                feed.fail(entry, 'no path specified for entry')
+                task.fail(entry, 'no path specified for entry')
             else:
-                feed.fail(entry, ", ".join(errors))
+                task.fail(entry, ", ".join(errors))
 
-    def save_error_page(self, entry, feed, page):
-        received = os.path.join(feed.manager.config_base, 'received', feed.name)
+    def save_error_page(self, entry, task, page):
+        received = os.path.join(task.manager.config_base, 'received', task.name)
         if not os.path.isdir(received):
             os.makedirs(received)
         filename = os.path.join(received, '%s.error' % entry['title'].encode(sys.getfilesystemencoding(), 'replace'))
@@ -144,8 +144,8 @@ class PluginDownload(object):
         finally:
             outfile.close()
 
-    def get_temp_files(self, feed, require_path=False, handle_magnets=False, fail_html=True):
-        """Download all feed content and store in temporary folder.
+    def get_temp_files(self, task, require_path=False, handle_magnets=False, fail_html=True):
+        """Download all task content and store in temporary folder.
 
         :param bool require_path:
           whether or not entries without 'path' field are ignored
@@ -155,27 +155,27 @@ class PluginDownload(object):
         :param fail_html:
           fail entries which url respond with html content
         """
-        for entry in feed.accepted:
-            self.get_temp_file(feed, entry, require_path, handle_magnets, fail_html)
+        for entry in task.accepted:
+            self.get_temp_file(task, entry, require_path, handle_magnets, fail_html)
 
     # TODO: a bit silly method, should be get rid of now with simplier exceptions ?
-    def process_entry(self, feed, entry, url):
+    def process_entry(self, task, entry, url):
         """
         Processes `entry` by using `url`. Does not use entry['url'].
         Does not fail the `entry` if there is a network issue, instead just log and return a string error.
 
-        :param feed: Feed
+        :param task: Task
         :param entry: Entry
         :param url: Url to try download
         :return: String error, if failed.
         """
         try:
-            if feed.manager.options.test:
+            if task.manager.options.test:
                 log.info('Would download: %s' % entry['title'])
             else:
-                if not feed.manager.unit_test:
+                if not task.manager.unit_test:
                     log.info('Downloading: %s' % entry['title'])
-                self.download_entry(feed, entry, url)
+                self.download_entry(task, entry, url)
         except RequestException, e:
             # TODO: Improve this error message?
             log.warning('RequestException %s' % e)
@@ -204,7 +204,7 @@ class PluginDownload(object):
             log.debug(msg, exc_info=True)
             return msg
 
-    def download_entry(self, feed, entry, url):
+    def download_entry(self, task, entry, url):
         """Downloads `entry` by using `url`.
 
         :raises: Several types of exceptions ...
@@ -231,18 +231,18 @@ class PluginDownload(object):
             log.debug('Basic auth enabled. User: %s Password: %s' % (entry['basic_auth_username'], entry['basic_auth_password']))
             auth = (entry['basic_auth_username'], entry['basic_auth_password'])
 
-        response = feed.requests.get(url, auth=auth, raise_status=False)
+        response = task.requests.get(url, auth=auth, raise_status=False)
         if response.status_code != 200:
             # Save the error page
             if response.content:
-                self.save_error_page(entry, feed, response.content)
+                self.save_error_page(entry, task, response.content)
             # Raise the error
             response.raise_for_status()
             return
 
         # download and write data into a temp file
         # generate temp file using stdlib
-        tmp_path = os.path.join(feed.manager.config_base, 'temp')
+        tmp_path = os.path.join(task.manager.config_base, 'temp')
         if not os.path.isdir(tmp_path):
             log.debug('creating tmp_path %s' % tmp_path)
             os.mkdir(tmp_path)
@@ -264,7 +264,7 @@ class PluginDownload(object):
             outfile.close()
             # Do a sanity check on downloaded file
             if os.path.getsize(datafile) == 0:
-                feed.fail(entry, 'File %s is 0 bytes in size' % datafile)
+                task.fail(entry, 'File %s is 0 bytes in size' % datafile)
                 os.remove(datafile)
                 return
             # store temp filename into entry so other plugins may read and modify content
@@ -326,27 +326,27 @@ class PluginDownload(object):
         else:
             log.debug('Python doesn\'t know extension for mime-type: %s' % entry['mime-type'])
 
-    def on_feed_output(self, feed, config):
+    def on_task_output(self, task, config):
         """Move downloaded content from temp folder to final destination"""
         config = self.process_config(config)
-        for entry in feed.accepted:
+        for entry in task.accepted:
             try:
-                self.output(feed, entry, config)
+                self.output(task, entry, config)
             except PluginWarning, e:
-                feed.fail(entry)
+                task.fail(entry)
                 log.error('Plugin error while writing: %s' % e)
             except Exception, e:
-                feed.fail(entry)
+                task.fail(entry)
                 log.exception('Exception while writing: %s' % e)
 
-    def output(self, feed, entry, config):
+    def output(self, task, entry, config):
         """Moves temp-file into final destination
 
         Raises:
             PluginError if operation fails
         """
 
-        if 'file' not in entry and not feed.manager.options.test:
+        if 'file' not in entry and not task.manager.options.test:
             log.debug('file missing, entry: %s' % entry)
             raise PluginError('Entry `%s` has no temp file associated with' % entry['title'])
 
@@ -357,21 +357,21 @@ class PluginDownload(object):
                 raise PluginError('Invalid `path` in entry `%s`' % entry['title'])
 
             # override path from command line parameter
-            if feed.manager.options.dl_path:
-                path = feed.manager.options.dl_path
+            if task.manager.options.dl_path:
+                path = task.manager.options.dl_path
 
             # expand variables in path
             try:
                 path = os.path.expanduser(entry.render(path))
             except RenderError, e:
-                feed.fail(entry, 'Could not set path. Error during string replacement: %s' % e)
+                task.fail(entry, 'Could not set path. Error during string replacement: %s' % e)
                 return
 
             # Clean illegal characters from path name
             path = pathscrub(path)
 
             # If we are in test mode, report and return
-            if feed.manager.options.test:
+            if task.manager.options.test:
                 log.info('Would write `%s` to `%s`' % (entry['title'], path))
                 # Set a fake location, so the exec plugin can do string replacement during --test #1015
                 entry['output'] = os.path.join(path, 'TEST_MODE_NO_OUTPUT')
@@ -387,7 +387,7 @@ class PluginDownload(object):
 
             # check that temp file is present
             if not os.path.exists(entry['file']):
-                tmp_path = os.path.join(feed.manager.config_base, 'temp')
+                tmp_path = os.path.join(task.manager.config_base, 'temp')
                 log.debug('entry: %s' % entry)
                 log.debug('temp: %s' % ', '.join(os.listdir(tmp_path)))
                 raise PluginWarning('Downloaded temp file `%s` doesn\'t exist!?' % entry['file'])
@@ -426,7 +426,7 @@ class PluginDownload(object):
                     log.debug("Overwriting already existing file %s" % destfile)
                 else:
                     log.info('File `%s` already exists and is not identical, download failed.' % destfile)
-                    feed.fail(entry, 'File `%s` already exists and is not identical.' % destfile)
+                    task.fail(entry, 'File `%s` already exists and is not identical.' % destfile)
                     return
             else:
                 # move temp file
@@ -448,13 +448,13 @@ class PluginDownload(object):
         finally:
             self.cleanup_temp_file(entry)
 
-    def on_feed_exit(self, feed, config):
-        """Make sure all temp files are cleaned up when feed exits"""
-        self.cleanup_temp_files(feed)
+    def on_task_exit(self, task, config):
+        """Make sure all temp files are cleaned up when task exits"""
+        self.cleanup_temp_files(task)
 
-    def on_feed_abort(self, feed, config):
-        """Make sure all temp files are cleaned up when feed is aborted."""
-        self.cleanup_temp_files(feed)
+    def on_task_abort(self, task, config):
+        """Make sure all temp files are cleaned up when task is aborted."""
+        self.cleanup_temp_files(task)
 
     def cleanup_temp_file(self, entry):
         if 'file' in entry:
@@ -464,11 +464,11 @@ class PluginDownload(object):
             shutil.rmtree(os.path.dirname(entry['file']))
             del(entry['file'])
 
-    def cleanup_temp_files(self, feed):
+    def cleanup_temp_files(self, task):
         """Checks all entries for leftover temp files and deletes them."""
-        for entry in feed.entries + feed.rejected + feed.failed:
+        for entry in task.entries + task.rejected + task.failed:
             self.cleanup_temp_file(entry)
 
 register_plugin(PluginDownload, 'download', api_ver=2)
 register_parser_option('--dl-path', action='store', dest='dl_path', default=False,
-                       metavar='PATH', help='Override path for download plugin. Applies to all executed feeds.')
+                       metavar='PATH', help='Override path for download plugin. Applies to all executed tasks.')

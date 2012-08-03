@@ -30,7 +30,7 @@ class GenSeries(plugin.DebugPlugin):
         container = validator.factory('any')
         return container
 
-    def on_process_start(self, feed, config):
+    def on_process_start(self, task, config):
         log.info('Generating test data ...')
         series = []
         for num in range(config['series']):
@@ -47,9 +47,9 @@ class GenSeries(plugin.DebugPlugin):
         log.info('Generated %d entries' % len(self.entries))
 
         # configure series plugin, bad way but this is debug shit
-        feed.config['series'] = series
+        task.config['series'] = series
 
-    def on_feed_input(self, feed, config):
+    def on_task_input(self, task, config):
         entries = []
         for num, entry in enumerate(self.entries):
             entries.append(entry)
@@ -58,12 +58,12 @@ class GenSeries(plugin.DebugPlugin):
         self.entries = self.entries[len(entries):]
         return entries
 
-    def on_feed_exit(self, feed, config):
+    def on_task_exit(self, task, config):
         if self.entries:
             log.info('There are still %d left to be processed!' % len(self.entries))
             # rerun ad infinitum, also commits session between them
-            feed._rerun = True
-            feed._rerun_count = 0
+            task._rerun = True
+            task._rerun_count = 0
 
 
 #plugin.register_plugin(GenSeries, 'gen_series_data', api_ver=2, debug=True)

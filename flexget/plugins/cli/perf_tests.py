@@ -8,10 +8,10 @@ log = logging.getLogger('perftests')
 
 class PerfTests(object):
 
-    def on_process_start(self, feed, config):
-        test_name = feed.manager.options.perf_test
+    def on_process_start(self, task, config):
+        test_name = task.manager.options.perf_test
         if test_name:
-            feed.manager.disable_feeds()
+            task.manager.disable_tasks()
         else:
             return
         session = Session()

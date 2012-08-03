@@ -41,10 +41,10 @@ class UrlRewriteDemonoid:
                              'movies', 'music', 'music videos', 'pictures'])
         return root
 
-    def url_rewritable(self, feed, entry):
+    def url_rewritable(self, task, entry):
         return entry['url'].startswith('http://www.demonoid.me/files/details/')
 
-    def url_rewrite(self, feed, entry):
+    def url_rewrite(self, task, entry):
         entry['url'] = entry['url'].replace('details', 'download')
 
     # search API

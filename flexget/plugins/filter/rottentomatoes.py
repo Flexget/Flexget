@@ -82,12 +82,12 @@ class FilterRottenTomatoes(object):
 
     # Run later to avoid unnecessary lookups
     @priority(115)
-    def on_feed_filter(self, feed, config):
+    def on_task_filter(self, task, config):
 
         lookup = get_plugin_by_name('rottentomatoes_lookup').instance.lookup
 
         # since the plugin does not reject anything, no sense going trough accepted
-        for entry in feed.undecided:
+        for entry in task.undecided:
 
             force_accept = False
 
@@ -185,15 +185,15 @@ class FilterRottenTomatoes(object):
             if reasons and not force_accept:
                 msg = 'Didn\'t accept `%s` because of rule(s) %s' % \
                     (entry.get('rt_name', None) or entry['title'], ', '.join(reasons))
-                if feed.manager.options.debug:
+                if task.manager.options.debug:
                     log.debug(msg)
                 else:
-                    if feed.manager.options.quiet:
+                    if task.manager.options.quiet:
                         log_once(msg, log)
                     else:
                         log.info(msg)
             else:
                 log.debug('Accepting %s' % (entry['title']))
-                feed.accept(entry)
+                task.accept(entry)
 
 register_plugin(FilterRottenTomatoes, 'rottentomatoes', api_ver=2)

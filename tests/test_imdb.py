@@ -8,7 +8,7 @@ from nose.plugins.attrib import attr
 class TestImdb(FlexGetBase):
 
     __yaml__ = """
-        feeds:
+        tasks:
           test:
             mock:
               # tests search
@@ -86,117 +86,117 @@ class TestImdb(FlexGetBase):
     @attr(online=True)
     def test_lookup(self):
         """IMDB: Test Lookup (ONLINE)"""
-        self.execute_feed('test')
-        assert self.feed.find_entry(imdb_name='Spirited Away'), \
+        self.execute_task('test')
+        assert self.task.find_entry(imdb_name='Spirited Away'), \
             'Failed IMDB lookup (search chihiro)'
-        assert self.feed.find_entry(imdb_name='Princess Mononoke'), \
+        assert self.task.find_entry(imdb_name='Princess Mononoke'), \
             'Failed imdb lookup (direct)'
-        assert self.feed.find_entry(imdb_name='Taken', imdb_url='http://www.imdb.com/title/tt0936501/'), \
+        assert self.task.find_entry(imdb_name='Taken', imdb_url='http://www.imdb.com/title/tt0936501/'), \
             'Failed to pick correct Taken from search results'
-        assert self.feed.find_entry(imdb_url='http://www.imdb.com/title/tt1049413/'), \
+        assert self.task.find_entry(imdb_url='http://www.imdb.com/title/tt1049413/'), \
             'Failed to lookup Up.REPACK.720p.Bluray.x264-FlexGet'
 
     @attr(online=True)
     def test_year(self):
-        self.execute_feed('year')
-        assert self.feed.find_entry('accepted', imdb_name='Taken'), \
+        self.execute_task('year')
+        assert self.task.find_entry('accepted', imdb_name='Taken'), \
             'Taken should\'ve been accepted'
         # mononoke should not be accepted or rejected
-        assert not self.feed.find_entry('accepted', imdb_name='Mononoke-hime'), \
+        assert not self.task.find_entry('accepted', imdb_name='Mononoke-hime'), \
             'Mononoke-hime should not have been accepted'
-        assert not self.feed.find_entry('rejected', imdb_name='Mononoke-hime'), \
+        assert not self.task.find_entry('rejected', imdb_name='Mononoke-hime'), \
             'Mononoke-hime should not have been rejected'
-        assert not self.feed.find_entry('accepted', imdb_name='Inglourious Basterds 2009'), \
+        assert not self.task.find_entry('accepted', imdb_name='Inglourious Basterds 2009'), \
             'Inglourious Basterds should not have been accepted'
 
     @attr(online=True)
     def test_actors(self):
-        self.execute_feed('actor')
+        self.execute_task('actor')
 
         # check that actors have been parsed properly
-        matrix = self.feed.find_entry(imdb_name='The Matrix')
+        matrix = self.task.find_entry(imdb_name='The Matrix')
         assert 'nm0000206' in matrix['imdb_actors'], \
             'Keanu Reeves is missing'
         assert matrix['imdb_actors']['nm0000206'] == 'Keanu Reeves', \
             'Keanu Reeves name is missing'
 
-        assert self.feed.find_entry('accepted', imdb_name='The Matrix'), \
+        assert self.task.find_entry('accepted', imdb_name='The Matrix'), \
             'The Matrix should\'ve been accepted'
-        assert not self.feed.find_entry('rejected', imdb_name='The Terminator'), \
+        assert not self.task.find_entry('rejected', imdb_name='The Terminator'), \
             'The The Terminator have been rejected'
 
     # TODO: html parsing needs updating to account for new imdb layout
     @attr(online=True)
     def _test_directors(self):
-        self.execute_feed('director')
+        self.execute_task('director')
         # check that directors have been parsed properly
-        matrix = self.feed.find_entry(imdb_name='The Matrix')
+        matrix = self.task.find_entry(imdb_name='The Matrix')
         assert 'nm0905154' in matrix['imdb_directors'], \
             'Lana Wachowski is missing'
         assert matrix['imdb_directors']['nm0905154'] == 'Lana Wachowski', \
             'Lana Wachowski name is missing'
 
-        assert self.feed.find_entry('accepted', imdb_name='The Matrix'), \
+        assert self.task.find_entry('accepted', imdb_name='The Matrix'), \
             'The Matrix should\'ve been accepted'
-        assert not self.feed.find_entry('rejected', imdb_name='The Terminator'), \
+        assert not self.task.find_entry('rejected', imdb_name='The Terminator'), \
             'The The Terminator have been rejected'
 
     @attr(online=True)
     def test_score(self):
-        self.execute_feed('score')
-        assert self.feed.find_entry(imdb_name='The Matrix'), 'The Matrix not found'
-        matrix = float(self.feed.find_entry(imdb_name='The Matrix')['imdb_score'])
+        self.execute_task('score')
+        assert self.task.find_entry(imdb_name='The Matrix'), 'The Matrix not found'
+        matrix = float(self.task.find_entry(imdb_name='The Matrix')['imdb_score'])
         # Currently The Matrix has an 8.7, check a range in case it changes
         assert matrix > 8.6 and matrix < 8.8, \
             'The Matrix should have score 8.7 not %s. (Did the rating change?)' % matrix
-        assert int(self.feed.find_entry(imdb_name='The Matrix')['imdb_votes']) > 450000, \
+        assert int(self.task.find_entry(imdb_name='The Matrix')['imdb_votes']) > 450000, \
             'The Matrix should have more than 450000 votes'
-        bfe = float(self.feed.find_entry(title='Battlefield Earth')['imdb_score'])
+        bfe = float(self.task.find_entry(title='Battlefield Earth')['imdb_score'])
         # Currently Battlefield Earth has an 2.4, check a range in case it changes
         assert bfe >= 2.3 and bfe <= 2.5, \
             'Battlefield Earth should have score 2.3 not %s. (Did the rating change?)' % bfe
-        assert self.feed.find_entry('accepted', imdb_name='The Matrix'), \
+        assert self.task.find_entry('accepted', imdb_name='The Matrix'), \
             'The Matrix should\'ve been accepted'
-        assert not self.feed.find_entry('accepted', title='Battlefield Earth'), \
+        assert not self.task.find_entry('accepted', title='Battlefield Earth'), \
             'Battlefield Earth shouldn\'t have been accepted'
 
     @attr(online=True)
     def test_genre(self):
-        self.execute_feed('genre')
-        matrix = (self.feed.find_entry(imdb_name='The Matrix')['imdb_genres'])
+        self.execute_task('genre')
+        matrix = (self.task.find_entry(imdb_name='The Matrix')['imdb_genres'])
         assert matrix == ['action', 'adventure', 'sci-fi'], \
             'Could not find genres for The Matrix'
-        toe = (self.feed.find_entry(imdb_name='Terms of Endearment')['imdb_genres'])
+        toe = (self.task.find_entry(imdb_name='Terms of Endearment')['imdb_genres'])
         assert toe == ['romance', 'comedy', 'drama'], \
             'Could not find genres for Terms of Endearment'
-        assert self.feed.find_entry('accepted', imdb_name='The Matrix'), \
+        assert self.task.find_entry('accepted', imdb_name='The Matrix'), \
             'The Matrix should\'ve been accepted'
-        assert not self.feed.find_entry('rejected', title='Terms of Endearment'), \
+        assert not self.task.find_entry('rejected', title='Terms of Endearment'), \
             'Terms of Endearment should have been rejected'
 
     @attr(online=True)
     def test_language(self):
-        self.execute_feed('language')
-        matrix = self.feed.find_entry(imdb_name='The Matrix')['imdb_languages']
+        self.execute_task('language')
+        matrix = self.task.find_entry(imdb_name='The Matrix')['imdb_languages']
         assert matrix == ['english'], 'Could not find languages for The Matrix'
-        bullets = self.feed.find_entry(imdb_name='22 Bullets')['imdb_languages']
+        bullets = self.task.find_entry(imdb_name='22 Bullets')['imdb_languages']
         assert bullets[0] == 'french', 'Could not find languages for 22 Bullets'
         for movie in ['The Matrix', 'Crank', 'The Damned United']:
-            assert self.feed.find_entry('accepted', imdb_name=movie), \
+            assert self.task.find_entry('accepted', imdb_name=movie), \
                 '%s should\'ve been accepted' % movie
-        assert not self.feed.find_entry('rejected', title='22 Bullets'), \
+        assert not self.task.find_entry('rejected', title='22 Bullets'), \
             '22 Bullets should have been rejected'
-        rockstar = self.feed.find_entry(imdb_name='Rockstar')['imdb_languages']
+        rockstar = self.task.find_entry(imdb_name='Rockstar')['imdb_languages']
         # http://flexget.com/ticket/1399
         assert rockstar == ['hindi'], 'Did not find only primary language'
-        breakaway = self.feed.find_entry(imdb_name='Breakaway')['imdb_languages']
+        breakaway = self.task.find_entry(imdb_name='Breakaway')['imdb_languages']
         assert breakaway == ['punjabi', 'english'], 'Languages were not returned in order of prominence'
 
 
 class TestImdbRequired(FlexGetBase):
 
     __yaml__ = """
-        feeds:
+        tasks:
           test:
             mock:
               - {title: 'Taken[2008]DvDrip[Eng]-FOO', imdb_url: 'http://www.imdb.com/title/tt0936501/'}
@@ -206,17 +206,17 @@ class TestImdbRequired(FlexGetBase):
 
     @attr(online=True)
     def test_imdb_required(self):
-        self.execute_feed('test')
-        assert not self.feed.find_entry('rejected', title='Taken[2008]DvDrip[Eng]-FOO'), \
+        self.execute_task('test')
+        assert not self.task.find_entry('rejected', title='Taken[2008]DvDrip[Eng]-FOO'), \
             'Taken should NOT have been rejected'
-        assert self.feed.find_entry('rejected', title='ASDFASDFASDF'), \
+        assert self.task.find_entry('rejected', title='ASDFASDFASDF'), \
             'ASDFASDFASDF should have been rejected'
 
 
 class TestImdbLookup(FlexGetBase):
 
     __yaml__ = """
-        feeds:
+        tasks:
           invalid url:
             mock:
               - {title: 'Taken', imdb_url: 'imdb.com/title/tt0936501/'}
@@ -225,8 +225,8 @@ class TestImdbLookup(FlexGetBase):
 
     @attr(online=True)
     def test_invalid_url(self):
-        self.execute_feed('invalid url')
+        self.execute_task('invalid url')
         # check that these were created
-        assert self.feed.entries[0]['imdb_score'], 'didn\'t get score'
-        assert self.feed.entries[0]['imdb_year'], 'didn\'t get year'
-        assert self.feed.entries[0]['imdb_plot_outline'], 'didn\'t get plot'
+        assert self.task.entries[0]['imdb_score'], 'didn\'t get score'
+        assert self.task.entries[0]['imdb_year'], 'didn\'t get year'
+        assert self.task.entries[0]['imdb_plot_outline'], 'didn\'t get plot'

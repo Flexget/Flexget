@@ -1,1 +1,1 @@
-"""Plugins for "exit" feed phase."""
+"""Plugins for "exit" task phase."""

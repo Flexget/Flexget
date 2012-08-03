@@ -14,13 +14,13 @@ class MetainfoImdbUrl(object):
         from flexget import validator
         return validator.factory('boolean')
 
-    def on_feed_metainfo(self, feed):
+    def on_task_metainfo(self, task):
         # check if disabled (value set to false)
-        if 'scan_imdb' in feed.config:
-            if not feed.config['scan_imdb']:
+        if 'scan_imdb' in task.config:
+            if not task.config['scan_imdb']:
                 return
 
-        for entry in feed.entries:
+        for entry in task.entries:
             if not 'description' in entry:
                 continue
             urls = re.findall(r'\bimdb.com/title/tt\d+\b', entry['description'])

@@ -174,13 +174,13 @@ div.clear {
 
 
     <div id="main">
-	
-    {% for entry in feed.accepted %}
+
+    {% for entry in task.accepted %}
 
         <!-- HANDLE SERIES -->
 		{% if entry.series_name is defined %}
             <div class="series">
-				
+
 				{% if entry.series_banner_url is defined %}
                     <div class="banner">
                         <img src="{{ entry.series_banner_url }}">
@@ -201,7 +201,7 @@ div.clear {
                     {% endif %}
 
                     <div class="clear">&nbsp;</div>
-					
+
 					{% if entry.ep_rating is defined %}
                         <div class="ep_rating">Rating: {{entry.ep_rating}}</div>
                     {% endif %}
@@ -211,7 +211,7 @@ div.clear {
                         <div class="series_status">Status: {{ entry.series_status }}</div>
                         -->
                     {% endif %}
-					
+
 					{% if entry.ep_director is defined %}
                         <div class="ep_director">Director: {{  entry.ep_director }}</div>
                     {% endif %}
@@ -235,7 +235,7 @@ div.clear {
                 <div id="info-{{ loop.index }}" style="display: none;">
                     <!-- a hack to keep browser from reseting position to top when clicking the Details link -->
                     <a name="a-{{ loop.index }}" style="display:none;">&nbsp;</a>
-					
+
 					{% if entry.series_genres is defined and entry.series_genres is iterable %}
                         <div class="genres">
                             <h2>Genres</h2>
@@ -280,7 +280,7 @@ div.clear {
             </div>
 
         <!-- HANDLE MOVIES -->
-		
+
 		{% elif entry.imdb_url is defined %}
             <div class="movie">
                 <div class="header">
@@ -315,7 +315,7 @@ div.clear {
                         {{ entry.imdb_plot_outline }}
                     </div>
                 {% endif %}
-				
+
 				{% if entry.imdb_genres is defined and entry.imdb_genres is iterable %}
                     <div class="genres">
                         <h2>Genres</h2>

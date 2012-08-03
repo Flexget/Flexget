@@ -29,7 +29,7 @@ class ImdbList(object):
         return root
 
     @cached('imdb_list', persist='2 hours')
-    def on_feed_input(self, feed, config):
+    def on_task_input(self, task, config):
         sess = requests.Session()
         if config.get('username') and config.get('password'):
 

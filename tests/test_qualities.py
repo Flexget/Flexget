@@ -80,7 +80,7 @@ class TestFilterQuality(FlexGetBase):
               - {title: 'Smoke.cam'}
               - {title: 'Smoke.HR'}
             accept_all: yes
-        feeds:
+        tasks:
           qual:
             quality:
               - hdtv
@@ -94,45 +94,45 @@ class TestFilterQuality(FlexGetBase):
     """
 
     def test_quality(self):
-        self.execute_feed('qual')
-        entry = self.feed.find_entry('rejected', title='Smoke.cam')
+        self.execute_task('qual')
+        entry = self.task.find_entry('rejected', title='Smoke.cam')
         assert entry, 'Smoke.cam should have been rejected'
 
-        entry = self.feed.find_entry(title='Smoke.1280x720')
+        entry = self.task.find_entry(title='Smoke.1280x720')
         assert entry, 'entry not found?'
-        assert entry in self.feed.accepted, '720p should be accepted'
-        assert len(self.feed.rejected) == 2, 'wrong number of entries rejected'
-        assert len(self.feed.accepted) == 2, 'wrong number of entries accepted'
+        assert entry in self.task.accepted, '720p should be accepted'
+        assert len(self.task.rejected) == 2, 'wrong number of entries rejected'
+        assert len(self.task.accepted) == 2, 'wrong number of entries accepted'
 
     def test_min(self):
-        self.execute_feed('min')
-        entry = self.feed.find_entry('rejected', title='Smoke.HDTV')
+        self.execute_task('min')
+        entry = self.task.find_entry('rejected', title='Smoke.HDTV')
         assert entry, 'Smoke.HDTV should have been rejected'
 
-        entry = self.feed.find_entry(title='Smoke.1280x720')
+        entry = self.task.find_entry(title='Smoke.1280x720')
         assert entry, 'entry not found?'
-        assert entry in self.feed.accepted, '720p should be accepted'
-        assert len(self.feed.rejected) == 2, 'wrong number of entries rejected'
-        assert len(self.feed.accepted) == 2, 'wrong number of entries accepted'
+        assert entry in self.task.accepted, '720p should be accepted'
+        assert len(self.task.rejected) == 2, 'wrong number of entries rejected'
+        assert len(self.task.accepted) == 2, 'wrong number of entries accepted'
 
     def test_max(self):
-        self.execute_feed('max')
-        entry = self.feed.find_entry('rejected', title='Smoke.1280x720')
+        self.execute_task('max')
+        entry = self.task.find_entry('rejected', title='Smoke.1280x720')
         assert entry, 'Smoke.1280x720 should have been rejected'
 
-        entry = self.feed.find_entry(title='Smoke.cam')
+        entry = self.task.find_entry(title='Smoke.cam')
         assert entry, 'entry not found?'
-        assert entry in self.feed.accepted, 'cam should be accepted'
-        assert len(self.feed.rejected) == 3, 'wrong number of entries rejected'
-        assert len(self.feed.accepted) == 1, 'wrong number of entries accepted'
+        assert entry in self.task.accepted, 'cam should be accepted'
+        assert len(self.task.rejected) == 3, 'wrong number of entries rejected'
+        assert len(self.task.accepted) == 1, 'wrong number of entries accepted'
 
     def test_min_max(self):
-        self.execute_feed('min_max')
-        entry = self.feed.find_entry('rejected', title='Smoke.1280x720')
+        self.execute_task('min_max')
+        entry = self.task.find_entry('rejected', title='Smoke.1280x720')
         assert entry, 'Smoke.1280x720 should have been rejected'
 
-        entry = self.feed.find_entry(title='Smoke.HR')
+        entry = self.task.find_entry(title='Smoke.HR')
         assert entry, 'entry not found?'
-        assert entry in self.feed.accepted, 'HR should be accepted'
-        assert len(self.feed.rejected) == 3, 'wrong number of entries rejected'
-        assert len(self.feed.accepted) == 1, 'wrong number of entries accepted'
+        assert entry in self.task.accepted, 'HR should be accepted'
+        assert len(self.task.rejected) == 3, 'wrong number of entries rejected'
+        assert len(self.task.accepted) == 1, 'wrong number of entries accepted'

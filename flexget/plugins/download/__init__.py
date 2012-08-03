@@ -1,1 +1,1 @@
-"""Plugins for "download" feed phase."""
+"""Plugins for "download" task phase."""

@@ -38,7 +38,7 @@ class ArchiveEntry(Base):
     title = Column(Unicode, index=True)
     url = Column(Unicode, index=True)
     description = Column(Unicode)
-    feed = Column(Unicode) # DEPRECATED, but SQLite does not support drop column
+    task = Column('feed', Unicode) # DEPRECATED, but SQLite does not support drop column
     added = Column(DateTime, index=True)
 
     tags = relationship("ArchiveTag", secondary=archive_tags_table)
@@ -48,8 +48,8 @@ class ArchiveEntry(Base):
         self.added = datetime.now()
 
     def __str__(self):
-        return '<ArchiveEntry(title=%s,url=%s,feed=%s,added=%s)>' %\
-               (self.title, self.url, self.feed, self.added.strftime('%Y-%m-%d %H:%M'))
+        return '<ArchiveEntry(title=%s,url=%s,task=%s,added=%s)>' %\
+               (self.title, self.url, self.task, self.added.strftime('%Y-%m-%d %H:%M'))
 
 
 class ArchiveTag(Base):
@@ -136,8 +136,8 @@ def upgrade(ver, session):
 class Archive(object):
     """
     Archives all new items into database where they can be later searched and injected.
-    Stores the entries in the state as they are at the exit phase, this way feed cleanup for title
-    etc is stored into the database. This may however make injecting them back to the original feed work
+    Stores the entries in the state as they are at the exit phase, this way task cleanup for title
+    etc is stored into the database. This may however make injecting them back to the original task work
     wrongly.
     """
 
@@ -148,8 +148,8 @@ class Archive(object):
         config.accept('list').accept('text')
         return config
 
-    def on_feed_exit(self, feed, config):
-        """Add new entries into archive. We use exit phase in case the feed corrects title or url via some plugins."""
+    def on_task_exit(self, task, config):
+        """Add new entries into archive. We use exit phase in case the task corrects title or url via some plugins."""
 
         if isinstance(config, bool):
             tag_names = []
@@ -158,29 +158,29 @@ class Archive(object):
 
         tags = []
         for tag_name in set(tag_names):
-            tags.append(get_tag(tag_name, feed.session))
+            tags.append(get_tag(tag_name, task.session))
 
         count = 0
         processed = []
-        for entry in feed.entries + feed.rejected + feed.failed:
+        for entry in task.entries + task.rejected + task.failed:
             # I think entry can be in multiple of those lists .. not sure though!
             if entry in processed:
                 continue
             else:
                 processed.append(entry)
 
-            ae = feed.session.query(ArchiveEntry).\
+            ae = task.session.query(ArchiveEntry).\
                  filter(ArchiveEntry.title == entry['title']).\
                  filter(ArchiveEntry.url == entry['url']).first()
             if ae:
                 # add (missing) sources
-                source = get_source(feed.name, feed.session)
+                source = get_source(task.name, task.session)
                 if not source in ae.sources:
-                    log.debug('Adding `%s` into `%s` sources' % (feed.name, ae))
+                    log.debug('Adding `%s` into `%s` sources' % (task.name, ae))
                     ae.sources.append(source)
                 # add (missing) tags
                 for tag_name in tag_names:
-                    atag = get_tag(tag_name, feed.session)
+                    atag = get_tag(tag_name, task.session)
                     if not atag in ae.tags:
                         log.debug('Adding tag %s into %s' % (tag_name, ae))
                         ae.tags.append(atag)
@@ -191,34 +191,34 @@ class Archive(object):
                 ae.url = entry['url']
                 if 'description' in entry:
                     ae.description = entry['description']
-                ae.feed = feed.name
-                ae.sources.append(get_source(feed.name, feed.session))
+                ae.task = task.name
+                ae.sources.append(get_source(task.name, task.session))
                 if tags:
                     # note, we're extending empty list
                     ae.tags.extend(tags)
                 log.debug('Adding `%s` with %i tags to archive' % (ae, len(tags)))
-                feed.session.add(ae)
+                task.session.add(ae)
                 count += 1
         if count:
             log.verbose('Added %i new entries to archive' % count)
 
-    def on_feed_abort(self, feed, config):
+    def on_task_abort(self, task, config):
         """
-        Archive even on feed abort, except if the abort has happened before session
+        Archive even on task abort, except if the abort has happened before session
         was started. Eg. in on_process_start
         """
-        if feed.session is not None:
-            self.on_feed_exit(feed, config)
+        if task.session is not None:
+            self.on_task_exit(task, config)
 
 
 class ArchiveInject(object):
     """
-    Provides functionality to inject items from archive into feeds
+    Provides functionality to inject items from archive into tasks
     """
 
     # ArchiveEntries to be injected
     _inject_entries = []
-    _injecting_into_feeds = set()
+    _injecting_into_tasks = set()
     _inject_ids = set()
     _immortal = False
 
@@ -246,12 +246,12 @@ class ArchiveInject(object):
     def reset(*args, **kwargs):
         log.debug('reset ArchiveInject state')
         ArchiveInject._inject_entries = []
-        ArchiveInject._injecting_into_feeds = set()
+        ArchiveInject._injecting_into_tasks = set()
         ArchiveInject._inject_ids = set()
         ArchiveInject._immortal = False
 
     @priority(512)
-    def on_process_start(self, feed, config):
+    def on_process_start(self, task, config):
         if not self.injecting:
             return
 
@@ -268,45 +268,45 @@ class ArchiveInject(object):
                         log.critical('There\'s no archived item with ID `%s`' % id)
                         continue
 
-                    # find if there is no longer any feed within sources
+                    # find if there is no longer any task within sources
                     for source in archive_entry.sources:
-                        if source.name in feed.manager.feeds:
+                        if source.name in task.manager.tasks:
                             break
                     else:
                         log.error('None of sources (%s) exists anymore, cannot inject `%s` from archive!' %\
                                   (', '.join([s.name for s in archive_entry.sources]), archive_entry.title))
                         continue
 
-                    # update list of feeds to be injected
+                    # update list of tasks to be injected
                     for source in archive_entry.sources:
-                        ArchiveInject._injecting_into_feeds.add(source.name)
+                        ArchiveInject._injecting_into_tasks.add(source.name)
 
                     self._inject_entries.append(archive_entry)
             finally:
                 session.close()
 
-        # if this feed is not going to be injected into, abort it
-        if feed.name not in ArchiveInject._injecting_into_feeds:
-            log.debug('Not going to inject to %s, aborting & disabling' % feed.name)
-            feed.enabled = False
-            feed.abort('Not injecting to this feed', silent=True)
+        # if this task is not going to be injected into, abort it
+        if task.name not in ArchiveInject._injecting_into_tasks:
+            log.debug('Not going to inject to %s, aborting & disabling' % task.name)
+            task.enabled = False
+            task.abort('Not injecting to this task', silent=True)
         else:
-            log.debug('Injecting to %s, leaving it enabled' % feed.name)
+            log.debug('Injecting to %s, leaving it enabled' % task.name)
 
     @priority(255)
-    def on_feed_input(self, feed, config):
+    def on_task_input(self, task, config):
         if not self.injecting:
             return
 
         entries = []
 
         # disable other inputs
-        log.info('Disabling all other inputs in the feed.')
-        feed.disable_phase('input')
+        log.info('Disabling all other inputs in the task.')
+        task.disable_phase('input')
 
         for inject_entry in self._inject_entries:
-            if feed.name not in [s.name for s in inject_entry.sources]:
-                # inject_entry was not meant for this feed, continue to next item
+            if task.name not in [s.name for s in inject_entry.sources]:
+                # inject_entry was not meant for this task, continue to next item
                 continue
             log.info('Injecting from archive `%s`' % inject_entry.title)
             entry = Entry(inject_entry.title, inject_entry.url)
@@ -321,12 +321,12 @@ class ArchiveInject(object):
         return entries
 
     @priority(512)
-    def on_feed_filter(self, feed, config):
+    def on_task_filter(self, task, config):
         if not self.injecting:
             return
-        for entry in feed.entries:
+        for entry in task.entries:
             if entry.get('injected', False):
-                feed.accept(entry, 'injected')
+                task.accept(entry, 'injected')
 
 
 class UrlrewriteArchive(object):
@@ -400,16 +400,16 @@ def consolidate():
                 session.rollback()
                 return
 
-            # add legacy feed to the sources list
-            orig.sources.append(get_source(orig.feed, session))
-            # remove feed, deprecated .. well, let's still keep it ..
-            #orig.feed = None
+            # add legacy task to the sources list
+            orig.sources.append(get_source(orig.task, session))
+            # remove task, deprecated .. well, let's still keep it ..
+            #orig.task = None
 
             for dupe in session.query(ArchiveEntry).\
                         filter(ArchiveEntry.id != orig.id).\
                         filter(ArchiveEntry.title == orig.title).\
                         filter(ArchiveEntry.url == orig.url).all():
-                orig.sources.append(get_source(dupe.feed, session))
+                orig.sources.append(get_source(dupe.task, session))
                 duplicates.append(dupe.id)
 
         if duplicates:
@@ -495,8 +495,8 @@ class ArchiveCli(object):
     ACTIONS = ('consolidate', 'search', 'inject', 'tag-source', 'test')
 
     @priority(768)
-    def on_process_start(self, feed, config):
-        options = feed.manager.options.archive
+    def on_process_start(self, task, config):
+        options = task.manager.options.archive
         # if --archive was not used
         if not options:
             return
@@ -511,7 +511,7 @@ class ArchiveCli(object):
             source_name = args[0]
             tag_names = args[1:]
             tag_source(source_name, tag_names=tag_names)
-            feed.manager.disable_feeds()
+            task.manager.disable_tasks()
         elif action == 'inject':
             try:
                 self.inject(args)
@@ -519,10 +519,10 @@ class ArchiveCli(object):
                 console('Invalid parameters: %s' % ', '.join(args))
                 if ',' in ''.join(args):
                     console('IDs must be separated with space now!')
-                feed.manager.disable_feeds()
+                task.manager.disable_tasks()
         elif action == 'consolidate':
             consolidate()
-            feed.manager.disable_feeds()
+            task.manager.disable_tasks()
         elif action == 'search':
             tags = []
             for arg in args[:]:
@@ -530,9 +530,9 @@ class ArchiveCli(object):
                     tags.append(arg[1:])
                     args.remove(arg)
             self.search(' '.join(args), tags)
-            feed.manager.disable_feeds()
+            task.manager.disable_tasks()
         elif action == 'test':
-            feed.manager.disable_feeds()
+            task.manager.disable_tasks()
         else:
             raise NotImplemented(action)
 

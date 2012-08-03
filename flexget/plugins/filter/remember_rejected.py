@@ -42,14 +42,14 @@ def upgrade(ver, session):
     return ver
 
 
-class RememberFeed(Base):
+class RememberTask(Base):
 
     __tablename__ = 'remember_rejected_feeds'
 
     id = Column(Integer, primary_key=True)
     name = Column(Unicode)
 
-    entries = relation('RememberEntry', backref='feed', cascade='all, delete, delete-orphan')
+    entries = relation('RememberEntry', backref='task', cascade='all, delete, delete-orphan')
 
 
 class RememberEntry(Base):
@@ -64,9 +64,9 @@ class RememberEntry(Base):
     rejected_by = Column(String)
     reason = Column(String)
 
-    feed_id = Column(Integer, ForeignKey('remember_rejected_feeds.id'), nullable=False)
+    task_id = Column('feed_id', Integer, ForeignKey('remember_rejected_feeds.id'), nullable=False)
 
-Index('remember_feed_title_url', RememberEntry.feed_id, RememberEntry.title, RememberEntry.url)
+Index('remember_feed_title_url', RememberEntry.task_id, RememberEntry.title, RememberEntry.url)
 
 
 class FilterRememberRejected(object):
@@ -76,52 +76,52 @@ class FilterRememberRejected(object):
     This is enabled when item is rejected with remember=True flag.
 
     Example::
-        feed.reject(entry, 'message', remember=True)
+        task.reject(entry, 'message', remember=True)
     """
 
     @priority(0)
-    def on_feed_start(self, feed, config):
+    def on_task_start(self, task, config):
         """Purge remembered entries if the config has changed."""
-        # See if the feed has changed since last run
-        old_feed = feed.session.query(RememberFeed).filter(RememberFeed.name == feed.name).first()
-        if not feed.is_rerun and old_feed and (feed.config_modified or feed.manager.options.forget_rejected):
-            if feed.manager.options.forget_rejected:
+        # See if the task has changed since last run
+        old_task = task.session.query(RememberTask).filter(RememberTask.name == task.name).first()
+        if not task.is_rerun and old_task and (task.config_modified or task.manager.options.forget_rejected):
+            if task.manager.options.forget_rejected:
                 log.info('Forgetting previous rejections.')
-                feed.config_changed()
+                task.config_changed()
             else:
-                log.debug('Feed config has changed since last run, purging remembered entries.')
-            feed.session.delete(old_feed)
-            old_feed = None
-        if not old_feed:
-            # Create this feed in the db if not present
-            feed.session.add(RememberFeed(name=feed.name))
-        elif not feed.is_rerun:
+                log.debug('Task config has changed since last run, purging remembered entries.')
+            task.session.delete(old_task)
+            old_task = None
+        if not old_task:
+            # Create this task in the db if not present
+            task.session.add(RememberTask(name=task.name))
+        elif not task.is_rerun:
             # Delete expired items if this is not a rerun
-            deleted = feed.session.query(RememberEntry).filter(RememberEntry.feed_id == old_feed.id).\
+            deleted = task.session.query(RememberEntry).filter(RememberEntry.task_id == old_task.id).\
                                                         filter(RememberEntry.expires < datetime.now()).delete()
             if deleted:
                 log.debug('%s entries have expired from remember_rejected table.' % deleted)
-                feed.config_changed()
-        feed.session.commit()
+                task.config_changed()
+        task.session.commit()
 
     @priority(255)
-    def on_feed_filter(self, feed, config):
+    def on_task_filter(self, task, config):
         """Reject any remembered entries from previous runs"""
-        (feed_id,) = feed.session.query(RememberFeed.id).filter(RememberFeed.name == feed.name).first()
-        reject_entries = feed.session.query(RememberEntry).filter(RememberEntry.feed_id == feed_id)
+        (task_id,) = task.session.query(RememberTask.id).filter(RememberTask.name == task.name).first()
+        reject_entries = task.session.query(RememberEntry).filter(RememberEntry.task_id == task_id)
         if reject_entries.count():
             # Reject all the remembered entries
-            for entry in feed.entries:
+            for entry in task.entries:
                 if not entry.get('url'):
                     # We don't record or reject any entries without url
                     continue
                 reject_entry = reject_entries.filter(and_(RememberEntry.title == entry['title'],
                                                           RememberEntry.url == entry['original_url'])).first()
                 if reject_entry:
-                    feed.reject(entry, 'Rejected on behalf of %s plugin: %s' %
+                    task.reject(entry, 'Rejected on behalf of %s plugin: %s' %
                                        (reject_entry.rejected_by, reject_entry.reason))
 
-    def on_entry_reject(self, feed, entry, remember=None, remember_time=None, **kwargs):
+    def on_entry_reject(self, task, entry, remember=None, remember_time=None, **kwargs):
         # We only remember rejections that specify the remember keyword argument
         if not remember and not remember_time:
             return
@@ -137,11 +137,11 @@ class FilterRememberRejected(object):
         if remember_time:
             message += ' for %i minutes' % (remember_time.seconds / 60)
         log.info(message)
-        (remember_feed_id,) = feed.session.query(RememberFeed.id).filter(RememberFeed.name == feed.name).first()
-        feed.session.add(RememberEntry(title=entry['title'], url=entry['original_url'], feed_id=remember_feed_id,
-                                       rejected_by=feed.current_plugin, reason=kwargs.get('reason'), expires=expires))
+        (remember_task_id,) = task.session.query(RememberTask.id).filter(RememberTask.name == task.name).first()
+        task.session.add(RememberEntry(title=entry['title'], url=entry['original_url'], task_id=remember_task_id,
+                                       rejected_by=task.current_plugin, reason=kwargs.get('reason'), expires=expires))
         # The test stops passing when this is taken out for some reason...
-        feed.session.flush()
+        task.session.flush()
 
 
 @event('manager.db_cleanup')

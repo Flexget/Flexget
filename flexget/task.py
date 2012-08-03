@@ -7,69 +7,69 @@ from flexget import validator
 from flexget import schema
 from flexget.manager import Session, register_config_key
 from flexget.plugin import get_plugins_by_phase, get_plugin_by_name, \
-    feed_phases, PluginWarning, PluginError, DependencyError, plugins as all_plugins
-from flexget.utils.simple_persistence import SimpleFeedPersistence, SimplePersistence
+    task_phases, PluginWarning, PluginError, DependencyError, plugins as all_plugins
+from flexget.utils.simple_persistence import SimpleTaskPersistence, SimplePersistence
 import flexget.utils.requests as requests
 from flexget.event import fire_event
 from flexget.entry import Entry, EntryUnicodeError
 
-log = logging.getLogger('feed')
+log = logging.getLogger('task')
 Base = schema.versioned_base('feed', 0)
 
 
-class FeedConfigHash(Base):
-    """Stores the config hash for feeds so that we can tell if the config has changed since last run."""
+class TaskConfigHash(Base):
+    """Stores the config hash for tasks so that we can tell if the config has changed since last run."""
 
     __tablename__ = 'feed_config_hash'
 
     id = Column(Integer, primary_key=True)
-    feed = Column('name', Unicode, index=True, nullable=False)
+    task = Column('name', Unicode, index=True, nullable=False)
     hash = Column('hash', String)
 
     def __repr__(self):
-        return '<FeedConfigHash(feed=%s,hash=%s)>' % (self.feed, self.hash)
+        return '<TaskConfigHash(task=%s,hash=%s)>' % (self.task, self.hash)
 
 
-def useFeedLogging(func):
+def useTaskLogging(func):
 
     @wraps(func)
     def wrapper(self, *args, **kw):
-        # Set the feed name in the logger
+        # Set the task name in the logger
         from flexget import logger
-        logger.set_feed(self.name)
+        logger.set_task(self.name)
         try:
             return func(self, *args, **kw)
         finally:
-            logger.set_feed('')
+            logger.set_task('')
 
     return wrapper
 
 
-class Feed(object):
+class Task(object):
 
     """
-    Represents one feed in the configuration.
+    Represents one task in the configuration.
 
     **Fires events:**
 
-    * feed.execute.before_plugin
+    * task.execute.before_plugin
 
       Before a plugin is about to be executed. Note that since this will also include all
       builtin plugins the amount of calls can be quite high
 
-      ``parameters: feed, keyword``
+      ``parameters: task, keyword``
 
-    * feed.execute.after_plugin
+    * task.execute.after_plugin
 
       After a plugin has been executed.
 
-      ``parameters: feed, keyword``
+      ``parameters: task, keyword``
 
-    * feed.execute.completed
+    * task.execute.completed
 
-      After feed execution has been completed
+      After task execution has been completed
 
-      ``parameters: feed``
+      ``parameters: task``
 
     """
 
@@ -78,15 +78,15 @@ class Feed(object):
     def __init__(self, manager, name, config):
         """
         :param Manager manager: Manager instance.
-        :param string name: Name of the feed.
-        :param dict config: Feed configuration.
+        :param string name: Name of the task.
+        :param dict config: Task configuration.
         """
         self.name = unicode(name)
         self.config = config
         self.manager = manager
 
         # simple persistence
-        self.simple_persistence = SimpleFeedPersistence(self)
+        self.simple_persistence = SimpleTaskPersistence(self)
 
         # not to be reseted
         self._rerun_count = 0
@@ -102,7 +102,7 @@ class Feed(object):
         return self._rerun_count
 
     def _reset(self):
-        """Reset feed state"""
+        """Reset task state"""
         log.debug('resetting %s' % self.name)
         self.enabled = True
         self.session = None
@@ -110,7 +110,7 @@ class Feed(object):
 
         self.requests = requests.Session()
 
-        # undecided entries in the feed (created by input)
+        # undecided entries in the task (created by input)
         self.entries = []
 
         # You should NOT change these arrays, use reject, accept and fail methods!
@@ -120,7 +120,7 @@ class Feed(object):
 
         self.disabled_phases = []
 
-        # TODO: feed.abort() should be done by using exception? not a flag that has to be checked everywhere
+        # TODO: task.abort() should be done by using exception? not a flag that has to be checked everywhere
         self._abort = False
         self._abort_reason = None
         self._silent_abort = False
@@ -135,7 +135,7 @@ class Feed(object):
         return cmp(self.priority, other.priority)
 
     def __str__(self):
-        return '<Feed(name=%s,aborted=%s)>' % (self.name, str(self.aborted))
+        return '<Task(name=%s,aborted=%s)>' % (self.name, str(self.aborted))
 
     @property
     def aborted(self):
@@ -160,18 +160,18 @@ class Feed(object):
         self.__purge_rejected()
 
     def __purge_failed(self):
-        """Purge failed entries from feed."""
+        """Purge failed entries from task."""
         self.__purge(self.failed, self.entries)
         self.__purge(self.failed, self.rejected)
         self.__purge(self.failed, self.accepted)
 
     def __purge_rejected(self):
-        """Purge rejected entries from feed."""
+        """Purge rejected entries from task."""
         self.__purge(self.rejected, self.entries)
         self.__purge(self.rejected, self.accepted)
 
     def __purge(self, purge_what, purge_from):
-        """Purge entries in list from feed.entries"""
+        """Purge entries in list from task.entries"""
         # TODO: there is probably more efficient way to do this now that I got rid of __count
         for entry in purge_what:
             if entry in purge_from:
@@ -180,13 +180,13 @@ class Feed(object):
     def disable_phase(self, phase):
         """Disable ``phase`` from execution.
 
-        All disabled phases are re-enabled by :meth:`Feed._reset()` after feed
+        All disabled phases are re-enabled by :meth:`Task._reset()` after task
         execution has been completed.
 
         :param string phase: Name of ``phase``
         :raises ValueError: *phase* could not be found.
         """
-        if phase not in feed_phases:
+        if phase not in task_phases:
             raise ValueError('%s is not a valid phase' % phase)
         if phase not in self.disabled_phases:
             log.debug('Disabling %s phase' % phase)
@@ -259,23 +259,23 @@ class Feed(object):
         entry.trace.append((self.current_plugin, message))
 
     def abort(self, reason='Unknown', **kwargs):
-        """Abort this feed execution, no more plugins will be executed after the current one exists."""
+        """Abort this task execution, no more plugins will be executed after the current one exists."""
         if self._abort:
             return
         self._abort_reason = reason
         if not kwargs.get('silent', False):
-            log.info('Aborting feed (plugin: %s)' % self.current_plugin)
+            log.info('Aborting task (plugin: %s)' % self.current_plugin)
             self._silent_abort = False
         else:
-            log.debug('Aborting feed (plugin: %s)' % self.current_plugin)
+            log.debug('Aborting task (plugin: %s)' % self.current_plugin)
             self._silent_abort = True
         # Run the abort phase before we set the _abort flag
         self._abort = True
-        self.__run_feed_phase('abort')
+        self.__run_task_phase('abort')
 
     def find_entry(self, category='entries', **values):
         """
-        Find and return :class:`~flexget.entry.Entry` with given attributes from feed or None
+        Find and return :class:`~flexget.entry.Entry` with given attributes from task or None
 
         :param string category: entries, accepted, rejected or failed. Defaults to entries.
         :param values: Key values of entries to be searched
@@ -298,7 +298,7 @@ class Feed(object):
         :param string phase:
           Optional, limits to plugins currently configured on given phase, sorted in phase order.
         :return:
-          An iterator over configured :class:`flexget.plugin.PluginInfo` instances enabled on this feed.
+          An iterator over configured :class:`flexget.plugin.PluginInfo` instances enabled on this task.
         """
         if phase:
             plugins = sorted(get_plugins_by_phase(phase), key=lambda p: p.phase_handlers[phase], reverse=True)
@@ -306,19 +306,19 @@ class Feed(object):
             plugins = all_plugins.itervalues()
         return (p for p in plugins if p.name in self.config or p.builtin)
 
-    def __run_feed_phase(self, phase):
-        """Executes feed phase, ie. call all enabled plugins on the feed.
+    def __run_task_phase(self, phase):
+        """Executes task phase, ie. call all enabled plugins on the task.
 
         Fires events:
 
-        * feed.execute.before_plugin
-        * feed.execute.after_plugin
+        * task.execute.before_plugin
+        * task.execute.after_plugin
 
         :param string phase: Name of the phase
         """
-        if phase not in feed_phases + ['abort', 'process_start', 'process_end']:
-            raise Exception('%s is not a valid feed phase' % phase)
-        # warn if no inputs, filters or outputs in the feed
+        if phase not in task_phases + ['abort', 'process_start', 'process_end']:
+            raise Exception('%s is not a valid task phase' % phase)
+        # warn if no inputs, filters or outputs in the task
         if phase in ['input', 'filter', 'output']:
             if not self.manager.unit_test:
                 # Check that there is at least one manually configured plugin for these phases
@@ -326,7 +326,7 @@ class Feed(object):
                     if not p.builtin:
                         break
                 else:
-                    log.warning('Feed doesn\'t have any %s plugins, you should add (at least) one!' % phase)
+                    log.warning('Task doesn\'t have any %s plugins, you should add (at least) one!' % phase)
 
         for plugin in self.plugins(phase):
             # Abort this phase if one of the plugins disables it
@@ -338,14 +338,14 @@ class Feed(object):
 
             if plugin.api_ver == 1:
                 # backwards compatibility
-                # pass method only feed (old behaviour)
+                # pass method only task (old behaviour)
                 args = (self,)
             else:
-                # pass method feed, copy of config (so plugin cannot modify it)
+                # pass method task, copy of config (so plugin cannot modify it)
                 args = (self, copy.copy(self.config.get(plugin.name)))
 
             try:
-                fire_event('feed.execute.before_plugin', self, plugin.name)
+                fire_event('task.execute.before_plugin', self, plugin.name)
                 response = self.__run_plugin(plugin, phase, args)
                 if phase == 'input' and response:
                     # add entries returned by input to self.entries
@@ -353,7 +353,7 @@ class Feed(object):
                 # purge entries between plugins
                 self.purge()
             finally:
-                fire_event('feed.execute.after_plugin', self, plugin.name)
+                fire_event('task.execute.after_plugin', self, plugin.name)
 
             # Make sure we abort if any plugin sets our abort flag
             if self._abort and phase != 'abort':
@@ -418,10 +418,10 @@ class Feed(object):
                 raise
 
     def rerun(self):
-        """Immediately re-run the feed after execute has completed,
-        feed can be re-run up to :attr:`.max_reruns` times."""
+        """Immediately re-run the task after execute has completed,
+        task can be re-run up to :attr:`.max_reruns` times."""
         self._rerun = True
-        log.info('Plugin %s has requested feed to be ran again after execution has completed.' %
+        log.info('Plugin %s has requested task to be ran again after execution has completed.' %
                  self.current_plugin)
 
     def config_changed(self):
@@ -429,18 +429,18 @@ class Feed(object):
         entries need to be reprocessed."""
         log.debug('Marking config as changed.')
         session = self.session or Session()
-        feed_hash = session.query(FeedConfigHash).filter(FeedConfigHash.feed == self.name).first()
-        if feed_hash:
-            feed_hash.hash = ''
+        task_hash = session.query(TaskConfigHash).filter(TaskConfigHash.task == self.name).first()
+        if task_hash:
+            task_hash.hash = ''
         self.config_modified = True
         # If we created our own session, commit and close it.
         if not self.session:
             session.commit()
             session.close()
 
-    @useFeedLogging
+    @useTaskLogging
     def execute(self, disable_phases=None, entries=None):
-        """Executes the feed.
+        """Executes the task.
 
         :param list disable_phases: Disable given phases names during execution
         :param list entries: Entries to be used in execution instead
@@ -469,7 +469,7 @@ class Feed(object):
             raise Exception('configuration errors')
         if self.manager.options.validate:
             if not errors:
-                log.info('Feed \'%s\' passed' % self.name)
+                log.info('Task \'%s\' passed' % self.name)
             self.enabled = False
             return
 
@@ -478,13 +478,13 @@ class Feed(object):
 
         # Save current config hash and set config_modidied flag
         config_hash = hashlib.md5(str(self.config.items())).hexdigest()
-        last_hash = self.session.query(FeedConfigHash).filter(FeedConfigHash.feed == self.name).first()
+        last_hash = self.session.query(TaskConfigHash).filter(TaskConfigHash.task == self.name).first()
         if self.is_rerun:
             # Make sure on rerun config is not marked as modified
             self.config_modified = False
         elif not last_hash:
             self.config_modified = True
-            last_hash = FeedConfigHash(feed=self.name, hash=config_hash)
+            last_hash = TaskConfigHash(task=self.name, hash=config_hash)
             self.session.add(last_hash)
         elif last_hash.hash != config_hash:
             self.config_modified = True
@@ -494,7 +494,7 @@ class Feed(object):
 
         try:
             # run phases
-            for phase in feed_phases:
+            for phase in task_phases:
                 if phase in self.disabled_phases:
                     # log keywords not executed
                     for plugin in self.plugins(phase):
@@ -504,60 +504,60 @@ class Feed(object):
                     continue
 
                 # run all plugins with this phase
-                self.__run_feed_phase(phase)
+                self.__run_task_phase(phase)
 
-                # if abort flag has been set feed should be aborted now
+                # if abort flag has been set task should be aborted now
                 # since this calls return rerun will not be done
                 if self._abort:
                     return
 
             log.debug('committing session, abort=%s' % self._abort)
             self.session.commit()
-            fire_event('feed.execute.completed', self)
+            fire_event('task.execute.completed', self)
         finally:
-            # this will cause database rollback on exception and feed.abort
+            # this will cause database rollback on exception and task.abort
             self.session.close()
 
-        # rerun feed
+        # rerun task
         if self._rerun:
             if self._rerun_count >= self.max_reruns:
-                log.info('Feed has been rerunning already %s times, stopping for now' % self._rerun_count)
+                log.info('Task has been rerunning already %s times, stopping for now' % self._rerun_count)
                 # reset the counter for future runs (necessary only with webui)
                 self._rerun_count = 0
             else:
-                log.info('Rerunning the feed in case better resolution can be achieved.')
+                log.info('Rerunning the task in case better resolution can be achieved.')
                 self._rerun_count += 1
                 # Restore config to original state before running again
                 self.config = config_backup
                 self.execute(disable_phases=disable_phases, entries=entries)
 
-        # Clean up entries after the feed has executed to reduce ram usage, #1652
+        # Clean up entries after the task has executed to reduce ram usage, #1652
         if not self.manager.unit_test:
-            log.debug('Clearing all entries from feed.')
+            log.debug('Clearing all entries from task.')
             self.entries = []
             self.rejected = []
             self.failed = []
 
     def _process_start(self):
         """Execute process_start phase"""
-        self.__run_feed_phase('process_start')
+        self.__run_task_phase('process_start')
 
     def _process_end(self):
-        """Execute terminate phase for this feed"""
+        """Execute terminate phase for this task"""
         if self.manager.options.validate:
             log.debug('No process_end phase with --check')
             return
-        self.__run_feed_phase('process_end')
+        self.__run_task_phase('process_end')
 
     def validate(self):
-        """Called during feed execution. Validates config, prints errors and aborts feed if invalid."""
+        """Called during task execution. Validates config, prints errors and aborts task if invalid."""
         errors = self.validate_config(self.config)
         # log errors and abort
         if errors:
-            log.critical('Feed \'%s\' has configuration errors:' % self.name)
+            log.critical('Task \'%s\' has configuration errors:' % self.name)
             for error in errors:
                 log.error(error)
-            # feed has errors, abort it
+            # task has errors, abort it
             self.abort('\n'.join(errors))
         return errors
 
@@ -598,14 +598,16 @@ class Feed(object):
 
 
 def root_config_validator():
-    """Returns a validator for the 'feeds' key of config."""
+    """Returns a validator for the 'tasks' key of config."""
     # TODO: better error messages
     valid_plugins = [p for p in all_plugins if hasattr(all_plugins[p].instance, 'validator')]
     root = validator.factory('dict')
-    root.reject_keys(valid_plugins, message='plugins should go under a specific feed. '
-        '(and feeds are not allowed to be named the same as any plugins)')
+    root.reject_keys(valid_plugins, message='plugins should go under a specific task. '
+        '(and tasks are not allowed to be named the same as any plugins)')
     root.accept_any_key('dict').accept_any_key('any')
     return root
 
 
+register_config_key('tasks', root_config_validator)
+# Backwards compatibility with feeds key
 register_config_key('feeds', root_config_validator)

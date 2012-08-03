@@ -19,10 +19,10 @@ class DomainDelay(object):
         root.accept_valid_keys('interval', key_type='text')
         return root
 
-    def on_feed_start(self, feed, config):
+    def on_task_start(self, task, config):
         for domain, delay in config.iteritems():
             log.debug('Adding minimum interval of %s between requests to %s' % (delay, domain))
-            feed.requests.set_domain_delay(domain, delay)
+            task.requests.set_domain_delay(domain, delay)
 
 
 register_plugin(DomainDelay, 'domain_delay', api_ver=2)

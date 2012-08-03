@@ -21,28 +21,28 @@ class MovieQueueManager(object):
     Handle IMDb queue management; add, delete and list
     """
 
-    def on_process_start(self, feed):
+    def on_process_start(self, task):
         """Handle --movie-queue management"""
 
-        if not getattr(feed.manager.options, 'movie_queue', False):
+        if not getattr(task.manager.options, 'movie_queue', False):
             return
 
-        feed.manager.disable_feeds()
-        options = feed.manager.options.movie_queue
+        task.manager.disable_tasks()
+        options = task.manager.options.movie_queue
 
         if options['action'] == 'list':
-            self.queue_list(feed.session)
+            self.queue_list(task.session)
             return
 
         # If the action was to do more than just list the series, make sure all entries are processed again next run.
-        feed.manager.config_changed()
+        task.manager.config_changed()
 
         if options['action'] == 'downloaded':
-            self.queue_list(feed.session, downloaded=True)
+            self.queue_list(task.session, downloaded=True)
             return
 
         if options['action'] == 'clear':
-            self.clear(feed.session)
+            self.clear(task.session)
             return
 
         if options['action'] == 'del':

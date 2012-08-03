@@ -15,29 +15,29 @@ class FilterSeenInfoHash(FilterSeen):
         return validator.factory('boolean')
 
     @priority(180)
-    def on_feed_filter(self, feed, config):
+    def on_task_filter(self, task, config):
         # Return if we are disabled.
         if config is False:
             return
         # First make sure all the torrent_info_hash fields are in upper case
-        for entry in feed.entries:
+        for entry in task.entries:
             if isinstance(entry.get('torrent_info_hash'), basestring):
                 entry['torrent_info_hash'] = entry['torrent_info_hash'].upper()
-        FilterSeen.on_feed_filter(self, feed, config, remember_rejected=True)
+        FilterSeen.on_task_filter(self, task, config, remember_rejected=True)
 
-    def on_feed_modify(self, feed, config):
+    def on_task_modify(self, task, config):
         # Return if we are disabled.
         if config is False:
             return
         # Run the filter again after the torrent plugin has populated the infohash
-        self.on_feed_filter(feed, config)
+        self.on_task_filter(task, config)
         # Make sure no duplicates were accepted this run
         accepted_infohashes = set()
-        for entry in feed.accepted:
+        for entry in task.accepted:
             if 'torrent_info_hash' in entry:
                 infohash = entry['torrent_info_hash']
                 if infohash in accepted_infohashes:
-                    feed.reject(entry, 'Already accepted torrent with this infohash once for this feed')
+                    task.reject(entry, 'Already accepted torrent with this infohash once for this task')
                 else:
                     accepted_infohashes.add(infohash)
 

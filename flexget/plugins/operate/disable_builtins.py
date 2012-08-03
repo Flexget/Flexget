@@ -11,10 +11,10 @@ def all_builtins():
 
 
 class PluginDisableBuiltins(object):
-    """Disables all (or specific) builtin plugins from a feed."""
-    
+    """Disables all (or specific) builtin plugins from a task."""
+
     def __init__(self):
-        # cannot trust that on_feed_start would have been executed
+        # cannot trust that on_task_start would have been executed
         self.disabled = []
 
     def validator(self):
@@ -28,7 +28,7 @@ class PluginDisableBuiltins(object):
         log.debug('Builtin plugins: %s' % ', '.join(plugin.name for plugin in all_builtins()))
 
     @priority(255)
-    def on_feed_start(self, feed, config):
+    def on_task_start(self, task, config):
         self.disabled = []
         if not config:
             return
@@ -40,7 +40,7 @@ class PluginDisableBuiltins(object):
         log.debug('Disabled builtin plugin(s): %s' % ', '.join(self.disabled))
 
     @priority(-255)
-    def on_feed_exit(self, feed, config):
+    def on_task_exit(self, task, config):
         if not self.disabled:
             return
 
@@ -49,6 +49,6 @@ class PluginDisableBuiltins(object):
         log.debug('Enabled builtin plugin(s): %s' % ', '.join(self.disabled))
         self.disabled = []
 
-    on_feed_abort = on_feed_exit
+    on_task_abort = on_task_exit
 
 register_plugin(PluginDisableBuiltins, 'disable_builtins', api_ver=2)

@@ -41,7 +41,7 @@ def register_config_key(key, validator, required=False):
 def useExecLogging(func):
 
     def wrapper(self, *args, **kw):
-        # Set the feed name in the logger
+        # Set the task name in the logger
         from flexget import logger
         import time
         logger.set_execution(str(time.time()))
@@ -69,12 +69,12 @@ class Manager(object):
 
     * manager.execute.started
 
-      When execute is about the be started, this happens before any feed phases occur
+      When execute is about the be started, this happens before any task phases occur
       including on_process_start
 
     * manager.execute.completed
 
-      After manager has executed all Feeds
+      After manager has executed all Tasks
 
     * manager.shutdown
 
@@ -101,7 +101,7 @@ class Manager(object):
         self.db_upgraded = False
 
         self.config = {}
-        self.feeds = {}
+        self.tasks = {}
 
         self.initialize()
 
@@ -134,7 +134,7 @@ class Manager(object):
             for error in errors:
                 log.critical(error)
             return
-        self.create_feeds()
+        self.create_tasks()
 
     def setup_yaml(self):
         """ Set up the yaml loader to return unicode objects for strings by default
@@ -275,10 +275,10 @@ class Manager(object):
             config_file.close()
 
     def config_changed(self):
-        """Makes sure that all feeds will have the config_modified flag come out true on the next run.
-        Useful when changing the db and all feeds need to be completely reprocessed."""
-        for feed in self.feeds.values():
-            feed.config_changed()
+        """Makes sure that all tasks will have the config_modified flag come out true on the next run.
+        Useful when changing the db and all tasks need to be completely reprocessed."""
+        for task in self.tasks.values():
+            task.config_changed()
 
     def pre_check_config(self, fn):
         """Checks configuration file for common mistakes that are easily detectable"""
@@ -358,7 +358,7 @@ class Manager(object):
                 # after opening a map, indentation doesn't increase
                 log.warning('Config line %s is indented incorrectly (previous line ends with \':\')' % line_num)
 
-            # notify if user is trying to set same key multiple times in a feed (a common mistake)
+            # notify if user is trying to set same key multiple times in a task (a common mistake)
             for level in duplicates.iterkeys():
                 # when indentation goes down, delete everything indented more than that
                 if indentation < level:
@@ -477,98 +477,104 @@ class Manager(object):
         else:
             log.debug('Lockfile %s not found' % self.lockfile)
 
-    def create_feeds(self):
-        """Creates instances of all configured feeds"""
-        from flexget.feed import Feed
-        # Clear feeds dict
-        self.feeds = {}
+    def create_tasks(self):
+        """Creates instances of all configured tasks"""
+        from flexget.task import Task
+        # Clear tasks dict
+        self.tasks = {}
 
-        # construct feed list
-        feeds = self.config.get('feeds', {}).keys()
-        for name in feeds:
-            # create feed
-            feed = Feed(self, name, self.config['feeds'][name])
-            # if feed name is prefixed with _ it's disabled
+        # Backwards compatibility with feeds key
+        if 'feeds' in self.config:
+            log.warning('`feeds` key has been deprecated and replaced by `tasks`. Please update your config.')
+            if 'tasks' in self.config:
+                log.error('You have defined both `feeds` and `tasks`. Stop that.')
+            self.config['tasks'] = self.config.pop('feeds')
+        # construct task list
+        tasks = self.config.get('tasks', {}).keys()
+        for name in tasks:
+            # create task
+            task = Task(self, name, self.config['tasks'][name])
+            # if task name is prefixed with _ it's disabled
             if name.startswith('_'):
-                feed.enabled = False
-            self.feeds[name] = feed
+                task.enabled = False
+            self.tasks[name] = task
 
-    def disable_feeds(self):
-        """Disables all feeds."""
-        for feed in self.feeds.itervalues():
-            feed.enabled = False
+    def disable_tasks(self):
+        """Disables all tasks."""
+        for task in self.tasks.itervalues():
+            task.enabled = False
 
-    def enable_feeds(self):
-        """Enables all feeds."""
-        for feed in self.feeds.itervalues():
-            feed.enabled = True
+    def enable_tasks(self):
+        """Enables all tasks."""
+        for task in self.tasks.itervalues():
+            task.enabled = True
 
-    def process_start(self, feeds=None):
-        """Execute process_start for feeds.
+    def process_start(self, tasks=None):
+        """Execute process_start for tasks.
 
-        :param list feeds: Optional list of :class:`~flexget.feed.Feed` instances, defaults to all.
+        :param list tasks: Optional list of :class:`~flexget.task.Task` instances, defaults to all.
         """
-        if feeds is None:
-            feeds = self.feeds.values()
+        if tasks is None:
+            tasks = self.tasks.values()
 
-        for feed in feeds:
-            if not feed.enabled:
+        for task in tasks:
+            if not task.enabled:
                 continue
             try:
-                log.trace('calling process_start on a feed %s' % feed.name)
-                feed._process_start()
+                log.trace('calling process_start on a task %s' % task.name)
+                task._process_start()
             except Exception, e:
-                feed.enabled = False
-                log.exception('Feed %s process_start: %s' % (feed.name, e))
+                task.enabled = False
+                log.exception('Task %s process_start: %s' % (task.name, e))
 
-    def process_end(self, feeds=None):
-        """Execute process_end for all feeds.
+    def process_end(self, tasks=None):
+        """Execute process_end for all tasks.
 
-        :param list feeds: Optional list of :class:`~flexget.feed.Feed` instances, defaults to all.
+        :param list tasks: Optional list of :class:`~flexget.task.Task` instances, defaults to all.
         """
-        if feeds is None:
-            feeds = self.feeds.values()
+        if tasks is None:
+            tasks = self.tasks.values()
 
-        for feed in feeds:
-            if not feed.enabled:
+        for task in tasks:
+            if not task.enabled:
                 continue
-            if feed._abort:
+            if task._abort:
                 continue
             try:
-                log.trace('calling process_end on a feed %s' % feed.name)
-                feed._process_end()
+                log.trace('calling process_end on a task %s' % task.name)
+                task._process_end()
             except Exception, e:
-                log.exception('Feed %s process_end: %s' % (feed.name, e))
+                log.exception('Task %s process_end: %s' % (task.name, e))
 
     @useExecLogging
-    def execute(self, feeds=None, disable_phases=None, entries=None):
+    def execute(self, tasks=None, disable_phases=None, entries=None):
         """
-        Iterate trough feeds and run them. If --learn is used download and output
+        Iterate trough tasks and run them. If --learn is used download and output
         phases are disabled.
 
-        :param list feeds: Optional list of feed names to run, all feeds otherwise.
+        :param list tasks: Optional list of task names to run, all tasks otherwise.
         :param list disable_phases: Optional list of phases to disabled
-        :param list entries: Optional list of entries to pass into feed(s).
-            This will also cause feed to disable input phase.
+        :param list entries: Optional list of entries to pass into task(s).
+            This will also cause task to disable input phase.
         """
-        # Make a list of Feed instances to execute
-        if feeds is None:
-            # Default to all feeds if none are specified
-            run_feeds = self.feeds.values()
+        # Make a list of Task instances to execute
+        if tasks is None:
+            # Default to all tasks if none are specified
+            run_tasks = self.tasks.values()
         else:
-            # Turn the list of feed names or instances into a list of instances
-            run_feeds = []
-            for feed in feeds:
-                if isinstance(feed, basestring):
-                    if feed in self.feeds:
-                        run_feeds.append(self.feeds[feed])
+            # Turn the list of task names or instances into a list of instances
+            run_tasks = []
+            for task in tasks:
+                if isinstance(task, basestring):
+                    if task in self.tasks:
+                        run_tasks.append(self.tasks[task])
                     else:
-                        log.error('Feed `%s` does not exist.' % feed)
+                        log.error('Task `%s` does not exist.' % task)
                 else:
-                    run_feeds.append(feed)
+                    run_tasks.append(task)
 
-        if not run_feeds:
-            log.warning('There are no feeds to execute, please add some feeds')
+        if not run_tasks:
+            log.warning('There are no tasks to execute, please add some tasks')
             return
 
         disable_phases = disable_phases or []
@@ -579,16 +585,16 @@ class Manager(object):
             disable_phases.extend(['download', 'output'])
 
         fire_event('manager.execute.started', self)
-        self.process_start(feeds=run_feeds)
+        self.process_start(tasks=run_tasks)
 
-        for feed in sorted(run_feeds):
-            if not feed.enabled or feed._abort:
+        for task in sorted(run_tasks):
+            if not task.enabled or task._abort:
                 continue
             try:
-                feed.execute(disable_phases=disable_phases, entries=entries)
+                task.execute(disable_phases=disable_phases, entries=entries)
             except Exception, e:
-                feed.enabled = False
-                log.exception('Feed %s: %s' % (feed.name, e))
+                task.enabled = False
+                log.exception('Task %s: %s' % (task.name, e))
             except KeyboardInterrupt:
                 # show real stack trace in debug mode
                 if self.options.debug:
@@ -596,7 +602,7 @@ class Manager(object):
                 print '**** Keyboard Interrupt ****'
                 return
 
-        self.process_end(feeds=run_feeds)
+        self.process_end(tasks=run_tasks)
         fire_event('manager.execute.completed', self)
 
     def db_cleanup(self):

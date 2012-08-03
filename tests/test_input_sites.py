@@ -5,7 +5,7 @@ from nose.plugins.attrib import attr
 class TestInputSites(FlexGetBase):
 
     __yaml__ = """
-        feeds:
+        tasks:
           test_rlslog:
             rlslog: http://www.rlslog.net/category/movies/dvdrip/
           test_scenereleases:
@@ -16,15 +16,15 @@ class TestInputSites(FlexGetBase):
 
     @attr(online=True)
     def test_rlslog(self):
-        self.execute_feed('test_rlslog')
-        assert self.feed.entries, 'no entries created / site may be down'
+        self.execute_task('test_rlslog')
+        assert self.task.entries, 'no entries created / site may be down'
 
     @attr(online=True)
     def test_scenereleases(self):
-        self.execute_feed('test_scenereleases')
-        assert self.feed.entries, 'no entries created / site may be down'
+        self.execute_task('test_scenereleases')
+        assert self.task.entries, 'no entries created / site may be down'
 
     @attr(online=True)
     def test_apple_trailers(self):
-        self.execute_feed('test_apple_trailers')
-        assert self.feed.entries, 'no entries created / site may be down'
+        self.execute_task('test_apple_trailers')
+        assert self.task.entries, 'no entries created / site may be down'

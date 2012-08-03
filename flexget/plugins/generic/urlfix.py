@@ -15,11 +15,11 @@ class UrlFix(object):
         return validator.factory('boolean')
 
     @priority(-255)
-    def on_feed_input(self, feed):
-        if 'urlfix' in feed.config:
-            if not feed.config['urlfix']:
+    def on_task_input(self, task):
+        if 'urlfix' in task.config:
+            if not task.config['urlfix']:
                 return
-        for entry in feed.entries:
+        for entry in task.entries:
             if '&amp;' in entry['url']:
                 log_once('Corrected `%s` url (replaced &amp; with &)' % entry['title'], logger=log)
                 entry['url'] = entry['url'].replace('&amp;', '&')

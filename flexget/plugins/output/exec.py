@@ -90,14 +90,14 @@ class PluginExec(object):
                 log.info('Stdout: %s' % response)
         return p.wait()
 
-    def execute(self, feed, phase_name, config):
+    def execute(self, task, phase_name, config):
         config = self.prepare_config(config)
         if not phase_name in config:
             log.debug('phase %s not configured' % phase_name)
             return
 
-        name_map = {'for_entries': feed.entries, 'for_accepted': feed.accepted,
-                    'for_rejected': feed.rejected, 'for_failed': feed.failed}
+        name_map = {'for_entries': task.entries, 'for_accepted': task.accepted,
+                    'for_rejected': task.rejected, 'for_failed': task.failed}
 
         allow_background = config.get('allow_background')
         for operation, entries in name_map.iteritems():
@@ -116,12 +116,12 @@ class PluginExec(object):
                     log.error('Could not set exec command for %s: %s' % (entry['title'], e))
                     # fail the entry if configured to do so
                     if config.get('fail_entries'):
-                        feed.fail(entry, 'Entry `%s` does not have required fields for string replacement.' %
+                        task.fail(entry, 'Entry `%s` does not have required fields for string replacement.' %
                                          entry['title'])
                     continue
 
                 log.debug('phase_name: %s operation: %s cmd: %s' % (phase_name, operation, cmd))
-                if feed.manager.options.test:
+                if task.manager.options.test:
                     log.info('Would execute: %s' % cmd)
                 else:
                     # Make sure the command can be encoded into appropriate encoding, don't actually encode yet,
@@ -131,23 +131,23 @@ class PluginExec(object):
                     except UnicodeEncodeError:
                         log.error('Unable to encode cmd `%s` to %s' % (cmd, config['encoding']))
                         if config.get('fail_entries'):
-                            feed.fail(entry, 'cmd `%s` could not be encoded to %s.' % (cmd, config['encoding']))
+                            task.fail(entry, 'cmd `%s` could not be encoded to %s.' % (cmd, config['encoding']))
                         continue
                     # Run the command, fail entries with non-zero return code if configured to
                     if self.execute_cmd(cmd, allow_background, config['encoding']) != 0 and config.get('fail_entries'):
-                        feed.fail(entry, 'exec return code was non-zero')
+                        task.fail(entry, 'exec return code was non-zero')
 
         # phase keyword in this
         if 'phase' in config[phase_name]:
             cmd = config[phase_name]['phase']
             log.debug('phase cmd: %s' % cmd)
-            if feed.manager.options.test:
+            if task.manager.options.test:
                 log.info('Would execute: %s' % cmd)
             else:
                 self.execute_cmd(cmd, allow_background, config['encoding'])
 
     def __getattr__(self, item):
-        """Creates methods to handle feed phases."""
+        """Creates methods to handle task phases."""
         for phase in self.HANDLED_PHASES:
             if item == phase_methods[phase]:
                 # A phase method we handle has been requested
@@ -156,8 +156,8 @@ class PluginExec(object):
             # We don't handle this phase
             raise AttributeError(item)
 
-        def phase_handler(feed, config):
-            self.execute(feed, 'on_' + phase, config)
+        def phase_handler(task, config):
+            self.execute(task, 'on_' + phase, config)
 
         # Make sure we run after other plugins so exec can use their output
         phase_handler.priority = 100

@@ -1,4 +1,4 @@
-"""Plugin for mocking feed data."""
+"""Plugin for mocking task data."""
 import logging
 from flexget.entry import Entry
 from flexget import plugin
@@ -31,7 +31,7 @@ class Mock(plugin.Plugin):
         entry.accept_any_key('list').accept('any')
         return container
 
-    def on_feed_input(self, feed, config):
+    def on_task_input(self, task, config):
         entries = []
         for line in config:
             entry = Entry(line)

@@ -183,18 +183,18 @@ def render_from_entry(template_string, entry):
     return result
 
 
-def render_from_feed(template, feed):
+def render_from_task(template, task):
     """
-    Renders a Template with a feed as its context.
+    Renders a Template with a task as its context.
 
     :param template: Template or template string to render.
-    :param feed: Feed to render the template from.
+    :param task: Task to render the template from.
     :return: The rendered template text.
     """
     if isinstance(template, basestring):
         template = environment.from_string(template)
     try:
-        result = template.render({'feed': feed})
+        result = template.render({'task': task})
     except Exception, e:
         raise RenderError('(%s) %s' % (type(e).__name__, e))
 

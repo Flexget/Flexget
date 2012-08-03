@@ -29,18 +29,18 @@ class FilterPrivateTorrents(object):
         return validator.factory('boolean')
 
     @priority(127)
-    def on_feed_modify(self, feed):
-        private_torrents = feed.config['private_torrents']
+    def on_task_modify(self, task):
+        private_torrents = task.config['private_torrents']
 
-        for entry in feed.accepted:
+        for entry in task.accepted:
             if not 'torrent' in entry:
                 log.debug('`%s` is not a torrent' % entry['title'])
                 continue
             private = entry['torrent'].private
 
             if not private_torrents and private:
-                feed.reject(entry, 'torrent is marked as private', remember=True)
+                task.reject(entry, 'torrent is marked as private', remember=True)
             elif private_torrents and not private:
-                feed.reject(entry, 'public torrent', remember=True)
+                task.reject(entry, 'public torrent', remember=True)
 
 register_plugin(FilterPrivateTorrents, 'private_torrents')

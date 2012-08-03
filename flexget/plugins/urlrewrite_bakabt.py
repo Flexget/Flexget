@@ -12,7 +12,7 @@ class UrlRewriteBakaBT(object):
     """BakaBT urlrewriter."""
 
     # urlrewriter API
-    def url_rewritable(self, feed, entry):
+    def url_rewritable(self, task, entry):
         url = entry['url']
         if url.startswith('http://www.bakabt.com/download/'):
             return False
@@ -21,7 +21,7 @@ class UrlRewriteBakaBT(object):
         return False
 
     # urlrewriter API
-    def url_rewrite(self, feed, entry):
+    def url_rewrite(self, task, entry):
         entry['url'] = self.parse_download_page(entry['url'])
 
     @internet(log)

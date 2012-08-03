@@ -54,25 +54,25 @@ class OutputDump(object):
         return validator.factory('boolean')
 
     @priority(0)
-    def on_feed_output(self, feed):
-        if 'dump' not in feed.config and not feed.manager.options.dump_entries:
+    def on_task_output(self, task):
+        if 'dump' not in task.config and not task.manager.options.dump_entries:
             return
         #from flexget.utils.tools import sanitize
         #import yaml
 
-        eval_lazy = feed.manager.options.dump_entries == 'eval'
-        undecided = [entry for entry in feed.entries if not entry in feed.accepted]
+        eval_lazy = task.manager.options.dump_entries == 'eval'
+        undecided = [entry for entry in task.entries if not entry in task.accepted]
         if undecided:
             console('-- Undecided: --------------------------')
-            dump(undecided, feed.manager.options.debug, eval_lazy)
-        if feed.accepted:
+            dump(undecided, task.manager.options.debug, eval_lazy)
+        if task.accepted:
             console('-- Accepted: ---------------------------')
-            dump(feed.accepted, feed.manager.options.debug, eval_lazy)
-        if feed.rejected:
+            dump(task.accepted, task.manager.options.debug, eval_lazy)
+        if task.rejected:
             console('-- Rejected: ---------------------------')
-            dump(feed.rejected, feed.manager.options.debug, eval_lazy)
+            dump(task.rejected, task.manager.options.debug, eval_lazy)
 
 register_plugin(OutputDump, 'dump', builtin=True)
 register_parser_option('--dump', nargs='?', choices=['eval'], const=True, dest='dump_entries',
-                       help='Display all entries in feed with details. '
+                       help='Display all entries in task with details. '
                             'Arg `--dump eval` will evaluate all lazy fields.')

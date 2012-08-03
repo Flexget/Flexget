@@ -55,7 +55,7 @@ class Text(plugin.Plugin):
 
     @cached('text')
     @plugin.internet(log)
-    def on_feed_input(self, feed, config):
+    def on_task_input(self, task, config):
         url = config['url']
         content = urlopener(url, log)
 

@@ -8,7 +8,7 @@ log = logging.getLogger('set')
 
 class ModifySet(object):
 
-    """Allows adding information to a feed entry for use later.
+    """Allows adding information to a task entry for use later.
 
     Example:
 
@@ -31,17 +31,17 @@ class ModifySet(object):
         v.accept_any_key('any')
         return v
 
-    def on_feed_start(self, feed, config):
+    def on_task_start(self, task, config):
         """Checks that jinja2 is available"""
         if not self.jinja:
             log.warning("jinja2 module is not available, set plugin will only work with python string replacement.")
 
     # Filter priority is -255 so we run after all filters are finished
     @priority(-255)
-    def on_feed_filter(self, feed, config):
+    def on_task_filter(self, task, config):
         """Adds the set dict to all accepted entries."""
-        for entry in feed.entries:
-            self.modify(entry, config, errors=entry in feed.accepted)
+        for entry in task.entries:
+            self.modify(entry, config, errors=entry in task.accepted)
 
     def modify(self, entry, config, errors=True):
         """This can be called from a plugin to add set values to an entry"""

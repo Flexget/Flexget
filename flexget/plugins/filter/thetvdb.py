@@ -141,16 +141,16 @@ class FilterTvdb(object):
         return False
 
     @priority(126)
-    def on_feed_filter(self, feed):
-        config = feed.config['thetvdb']
+    def on_task_filter(self, task):
+        config = task.config['thetvdb']
 
         lookup = get_plugin_by_name('thetvdb_lookup').instance.lookup
 
-        for entry in feed.entries:
+        for entry in task.entries:
             force_accept = False
 
             try:
-                lookup(feed, entry)
+                lookup(task, entry)
             except PluginError, e:
                 log.error('Skipping %s because of an error: %s' % (entry['title'], e.value))
                 continue
@@ -218,12 +218,12 @@ class FilterTvdb(object):
             if reasons and not force_accept:
                 msg = 'Skipping %s because of rule(s) %s' % \
                     (entry.get('series_name_thetvdb', None) or entry['title'], ', '.join(reasons))
-                if feed.manager.options.debug:
+                if task.manager.options.debug:
                     log.debug(msg)
                 else:
                     log_once(msg, log)
             else:
                 log.debug('Accepting %s' % (entry))
-                feed.accept(entry)
+                task.accept(entry)
 
 register_plugin(FilterTvdb, 'thetvdb')

@@ -9,7 +9,7 @@ from .util import date_aged
 class TestInfoHash(FlexGetBase):
 
     __yaml__ = """
-        feeds:
+        tasks:
           test:
             mock:
               - {title: 'test', file: 'test.torrent'}
@@ -18,8 +18,8 @@ class TestInfoHash(FlexGetBase):
 
     def test_infohash(self):
         """Torrent: infohash parsing"""
-        self.execute_feed('test')
-        hash = self.feed.entries[0].get('torrent_info_hash')
+        self.execute_task('test')
+        hash = self.task.entries[0].get('torrent_info_hash')
         assert hash == '20AE692114DC343C86DF5B07C276E5077E581766', \
             'InfoHash does not match (got %s)' % hash
 
@@ -27,7 +27,7 @@ class TestInfoHash(FlexGetBase):
 class TestSeenInfoHash(FlexGetBase):
 
     __yaml__ = """
-        feeds:
+        tasks:
           test:
             mock:
               - {title: test, file: test.torrent}
@@ -45,16 +45,16 @@ class TestSeenInfoHash(FlexGetBase):
 
     @with_filecopy('test.torrent', 'test2.torrent')
     def test_seen_info_hash(self):
-        self.execute_feed('test')
-        assert self.feed.find_entry('accepted', title='test'), 'torrent should have been accepted on first run'
-        self.execute_feed('test2')
-        assert self.feed.find_entry('rejected', title='test2'), 'torrent should have been rejected on second run'
+        self.execute_task('test')
+        assert self.task.find_entry('accepted', title='test'), 'torrent should have been accepted on first run'
+        self.execute_task('test2')
+        assert self.task.find_entry('rejected', title='test2'), 'torrent should have been rejected on second run'
 
     def test_same_run(self):
         # Test that 2 entries with the same info hash don't get accepted on the same run.
         # Also tests that the plugin compares info hash case insensitively.
-        self.execute_feed('test_same_run')
-        assert len(self.feed.accepted) == 1, 'Should not have accepted both entries with the same info hash'
+        self.execute_task('test_same_run')
+        assert len(self.task.accepted) == 1, 'Should not have accepted both entries with the same info hash'
 
 
 class TestModifyTrackers(FlexGetBase):
@@ -63,7 +63,7 @@ class TestModifyTrackers(FlexGetBase):
         presets:
           global:
             accept_all: yes
-        feeds:
+        tasks:
           test_add_trackers:
             mock:
               - {title: 'test', file: 'test_add_trackers.torrent'}
@@ -91,27 +91,27 @@ class TestModifyTrackers(FlexGetBase):
 
     @with_filecopy('test.torrent', 'test_add_trackers.torrent')
     def test_add_trackers(self):
-        self.execute_feed('test_add_trackers')
+        self.execute_task('test_add_trackers')
         torrent = self.load_torrent('test_add_trackers.torrent')
         assert 'udp://thetracker.com/announce' in torrent.get_multitrackers(), \
             'udp://thetracker.com/announce should have been added to trackers'
         # Check magnet url
-        assert 'tr=udp://thetracker.com/announce' in self.feed.find_entry(title='test_magnet')['url']
+        assert 'tr=udp://thetracker.com/announce' in self.task.find_entry(title='test_magnet')['url']
 
     @with_filecopy('test.torrent', 'test_remove_trackers.torrent')
     def test_remove_trackers(self):
-        self.execute_feed('test_remove_trackers')
+        self.execute_task('test_remove_trackers')
         torrent = self.load_torrent('test_remove_trackers.torrent')
         assert 'http://torrent.ubuntu.com:6969/announce' not in torrent.get_multitrackers(), \
             'ubuntu tracker should have been removed'
         # Check magnet url
-        assert 'tr=http://torrent.ubuntu.com:6969/announce' not in self.feed.find_entry(title='test_magnet')['url']
+        assert 'tr=http://torrent.ubuntu.com:6969/announce' not in self.task.find_entry(title='test_magnet')['url']
 
 
 class TestPrivateTorrents(FlexGetBase):
 
     __yaml__ = """
-        feeds:
+        tasks:
           test:
             mock:
               - {title: 'test_private', file: 'private.torrent'}
@@ -121,16 +121,16 @@ class TestPrivateTorrents(FlexGetBase):
     """
 
     def test_private_torrents(self):
-        self.execute_feed('test')
-        assert self.feed.find_entry('rejected', title='test_private'), 'did not reject private torrent'
-        assert self.feed.find_entry('accepted', title='test_public'), 'did not pass public torrent'
+        self.execute_task('test')
+        assert self.task.find_entry('rejected', title='test_private'), 'did not reject private torrent'
+        assert self.task.find_entry('accepted', title='test_public'), 'did not pass public torrent'
 
 
 class TestTorrentScrub(FlexGetBase):
 
     __tmp__ = True
     __yaml__ = """
-        feeds:
+        tasks:
           test_all:
             mock:
               - {title: 'test', file: '__tmp__test.torrent'}
@@ -165,15 +165,15 @@ class TestTorrentScrub(FlexGetBase):
 
     @with_filecopy(test_files, "__tmp__")
     def test_torrent_scrub(self):
-        # Run feed
-        self.execute_feed('test_all')
+        # Run task
+        self.execute_task('test_all')
 
         for clean, filename in self.test_cases:
             original = Torrent.from_file(filename)
             title = os.path.splitext(filename)[0]
 
-            modified = self.feed.find_entry(title=title)
-            assert modified, "%r cannot be found in %r" % (title, self.feed)
+            modified = self.task.find_entry(title=title)
+            assert modified, "%r cannot be found in %r" % (title, self.task)
             modified = modified.get('torrent')
             assert modified, "No 'torrent' key in %r" % (title,)
 
@@ -211,10 +211,10 @@ class TestTorrentScrub(FlexGetBase):
 
     @with_filecopy(test_files, "__tmp__")
     def test_torrent_scrub_fields(self):
-        self.execute_feed('test_fields')
+        self.execute_task('test_fields')
         title = 'fields.LICENSE'
-        torrent = self.feed.find_entry(title=title)
-        assert torrent, "%r cannot be found in %r" % (title, self.feed)
+        torrent = self.task.find_entry(title=title)
+        assert torrent, "%r cannot be found in %r" % (title, self.task)
         torrent = torrent.get('torrent')
         assert torrent, "No 'torrent' key in %r" % (title,)
 
@@ -224,7 +224,7 @@ class TestTorrentScrub(FlexGetBase):
 
     @with_filecopy(test_files, "__tmp__")
     def test_torrent_scrub_off(self):
-        self.execute_feed('test_off')
+        self.execute_task('test_off')
 
         for filename in self.test_files:
             osize = os.path.getsize(filename)
@@ -238,7 +238,7 @@ class TestTorrentAlive(FlexGetBase):
         presets:
           global:
             accept_all: yes
-        feeds:
+        tasks:
           test_torrent_alive_fail:
             mock:
               - {title: 'test', file: 'test_torrent_alive.torrent', url: fake}
@@ -252,24 +252,24 @@ class TestTorrentAlive(FlexGetBase):
     @attr(online=True)
     @with_filecopy('test.torrent', 'test_torrent_alive.torrent')
     def test_torrent_alive_fail(self):
-        self.execute_feed('test_torrent_alive_fail')
-        assert not self.feed.accepted, 'Torrent should not have met seed requirement.'
-        assert self.feed._rerun_count == 1, 'Feed should have been rerun 1 time.'
+        self.execute_task('test_torrent_alive_fail')
+        assert not self.task.accepted, 'Torrent should not have met seed requirement.'
+        assert self.task._rerun_count == 1, 'Task should have been rerun 1 time.'
 
         # Run it again to make sure remember_rejected prevents a rerun from occurring
-        self.execute_feed('test_torrent_alive_fail')
-        assert not self.feed.accepted, 'Torrent should have been rejected by remember_rejected.'
-        assert self.feed._rerun_count == 0, 'Feed should not have been rerun.'
+        self.execute_task('test_torrent_alive_fail')
+        assert not self.task.accepted, 'Torrent should have been rejected by remember_rejected.'
+        assert self.task._rerun_count == 0, 'Task should not have been rerun.'
 
         # Run it again after rejection expires to make sure remember_rejected lets us retry.
         with date_aged('1 hour'):
-            self.execute_feed('test_torrent_alive_fail')
-            assert not self.feed.accepted, 'Torrent should not have met seed requirement.'
-            assert self.feed._rerun_count == 1, 'Feed should have been rerun 1 time.'
+            self.execute_task('test_torrent_alive_fail')
+            assert not self.task.accepted, 'Torrent should not have met seed requirement.'
+            assert self.task._rerun_count == 1, 'Task should have been rerun 1 time.'
 
     @attr(online=True)
     @with_filecopy('test.torrent', 'test_torrent_alive.torrent')
     def test_torrent_alive_pass(self):
-        self.execute_feed('test_torrent_alive_pass')
-        assert self.feed.accepted
-        assert self.feed._rerun_count == 0, 'Torrent should have been accepted without rerun.'
+        self.execute_task('test_torrent_alive_pass')
+        assert self.task.accepted
+        assert self.task._rerun_count == 0, 'Torrent should have been accepted without rerun.'

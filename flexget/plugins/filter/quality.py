@@ -25,15 +25,15 @@ class FilterQuality(object):
 
     # Run before series and imdb plugins, so correct qualities are chosen
     @priority(175)
-    def on_feed_filter(self, feed, config):
+    def on_task_filter(self, task, config):
         if not isinstance(config, list):
             config = [config]
         reqs = [quals.Requirements(req) for req in config]
-        for entry in feed.entries:
+        for entry in task.entries:
             if not entry.get('quality'):
-                feed.reject(entry, 'Entry doesn\'t have a quality')
+                task.reject(entry, 'Entry doesn\'t have a quality')
                 continue
             if not any(req.allows(entry['quality']) for req in reqs):
-                feed.reject(entry, '%s does not match quality requirement %s' % (entry['quality'], reqs))
+                task.reject(entry, '%s does not match quality requirement %s' % (entry['quality'], reqs))
 
 register_plugin(FilterQuality, 'quality', api_ver=2)

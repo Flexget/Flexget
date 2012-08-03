@@ -36,12 +36,12 @@ class MovePlugin(object):
         config.accept('number', key='clean_source')
         return root
 
-    def on_feed_output(self, feed, config):
+    def on_task_output(self, task, config):
         if config is True:
             config = {}
         elif config is False:
             return
-        for entry in feed.accepted:
+        for entry in task.accepted:
             if not 'location' in entry:
                 log.warning('Cannot move `%s` because entry does not have location field.' % entry['title'])
                 continue
@@ -92,12 +92,12 @@ class MovePlugin(object):
                 continue
 
             if not os.path.exists(dst_path):
-                if feed.manager.options.test:
+                if task.manager.options.test:
                     log.info('Would create `%s`' % dst_path)
                 else:
                     log.info('Creating destination directory `%s`' % dst_path)
                     os.makedirs(dst_path)
-            if not os.path.isdir(dst_path) and not feed.manager.options.test:
+            if not os.path.isdir(dst_path) and not task.manager.options.test:
                 log.warning('Cannot move `%s` because destination `%s` is not a directory' % (entry['title'], dst_path))
                 continue
 
@@ -110,7 +110,7 @@ class MovePlugin(object):
                 count = 0
                 while True:
                     if count > 60 * 30:
-                        feed.fail(entry, 'Move has been waiting unpacking for 30 minutes')
+                        task.fail(entry, 'Move has been waiting unpacking for 30 minutes')
                         continue
                     size = os.path.getsize(src)
                     time.sleep(1)
@@ -123,7 +123,7 @@ class MovePlugin(object):
                     count += 1
 
             # Move stuff
-            if feed.manager.options.test:
+            if task.manager.options.test:
                 log.info('Would move `%s` to `%s`' % (src, dst))
             else:
                 log.info('Moving `%s` to `%s`' % (src, dst))
@@ -134,7 +134,7 @@ class MovePlugin(object):
                     size = get_directory_size(base_path) / 1024 / 1024
                     log.debug('base_path: %s size: %s' % (base_path, size))
                     if size <= config['clean_source']:
-                        if feed.manager.options.test:
+                        if task.manager.options.test:
                             log.info('Would delete %s and everything under it' % base_path)
                         else:
                             log.info('Deleting `%s`' % base_path)

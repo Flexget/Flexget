@@ -41,10 +41,10 @@ class Discover(object):
         discover.accept('choice', key='type').accept_choices(['any', 'normal', 'exact', 'movies'])
         return discover
 
-    def execute_inputs(self, config, feed):
+    def execute_inputs(self, config, task):
         """
         :param config: Discover config
-        :param feed: Current feed
+        :param task: Current task
         :return: List of pseudo entries created by inputs under `what` configuration
         """
 
@@ -59,7 +59,7 @@ class Discover(object):
                     raise PluginError('Plugin %s does not support API v2' % input_name)
                 method = input.phase_handlers['input']
                 try:
-                    result = method(feed, input_config)
+                    result = method(task, input_config)
                 except PluginError, e:
                     log.warning('Error during input plugin %s: %s' % (input_name, e))
                     continue
@@ -115,8 +115,8 @@ class Discover(object):
         return sorted(result, reverse=True, key=lambda x: x.get('search_sort'))
 
     @cached('discover')
-    def on_feed_input(self, feed, config):
-        entries = self.execute_inputs(config, feed)
+    def on_task_input(self, task, config):
+        entries = self.execute_inputs(config, task)
         log.verbose('Discovering %i titles ...' % len(entries))
         if len(entries) > 500:
             log.critical('Looks like your inputs in discover configuration produced over 500 entries, please reduce the amount!')

@@ -6,7 +6,7 @@ from tests import FlexGetBase
 class TestMigrate(FlexGetBase):
 
     __yaml__ = """
-        feeds:
+        tasks:
           test:
             mock:
               - {title: 'foobar'}
@@ -27,5 +27,5 @@ class TestMigrate(FlexGetBase):
         # TODO: for some reason this will fail
         return
 
-        self.execute_feed('test')
-        assert self.feed.accepted
+        self.execute_task('test')
+        assert self.task.accepted

@@ -16,23 +16,23 @@ class SubtitleQueue(Base):
     __tablename__ = 'subtitle_queue'
 
     id = Column(Integer, primary_key=True)
-    feed = Column(String)
+    task = Column(String)
     imdb_id = Column(String)
     added = Column(DateTime)
 
-    def __init__(self, feed, imdb_id):
-        self.feed = feed
+    def __init__(self, task, imdb_id):
+        self.task = task
         self.imdb_id = imdb_id
         self.added = datetime.now()
 
     def __str__(self):
-        return '<SubtitleQueue(%s=%s)>' % (self.feed, self.imdb_id)
+        return '<SubtitleQueue(%s=%s)>' % (self.task, self.imdb_id)
 
 TODO:
 
  * add new option, retry: [n] days
  * add everything into queue using above class
- * consume queue (look up by feed name), configuration is available from feed
+ * consume queue (look up by task name), configuration is available from task
  * remove successful downloads
  * remove queue items that are part retry: n days
 
@@ -62,24 +62,24 @@ class Subtitles(object):
         subs.accept('path', key='output')
         return subs
 
-    def get_config(self, feed):
-        config = feed.config['subtitles']
+    def get_config(self, task):
+        config = task.config['subtitles']
         if not isinstance(config, dict):
             config = {}
-        config.setdefault('output', feed.manager.config_base)
+        config.setdefault('output', task.manager.config_base)
         config.setdefault('languages', ['eng'])
         config.setdefault('min_sub_rating', 0.0)
         config.setdefault('match_limit', 0.8)
         config['output'] = os.path.expanduser(config['output'])
         return config
 
-    def on_feed_download(self, feed):
+    def on_task_download(self, task):
 
         # filter all entries that have IMDB ID set
         try:
-            entries = filter(lambda x: x['imdb_url'] is not None, feed.accepted)
+            entries = filter(lambda x: x['imdb_url'] is not None, task.accepted)
         except KeyError:
-            # No imdb urls on this feed, skip it
+            # No imdb urls on this task, skip it
             # TODO: should do lookup via imdb_lookup plugin?
             return
 
@@ -93,7 +93,7 @@ class Subtitles(object):
         if res['status'] != '200 OK':
             raise Exception("Login to opensubtitles.org XML-RPC interface failed")
 
-        config = self.get_config(feed)
+        config = self.get_config(task)
 
         token = res['token']
 

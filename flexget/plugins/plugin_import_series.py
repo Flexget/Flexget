@@ -38,7 +38,7 @@ class ImportSeries(FilterSeriesBase):
                 from_section.accept(plugin.instance.validator, key=plugin.name)
         return root
 
-    def on_feed_start(self, feed, config):
+    def on_task_start(self, task, config):
 
         series = set()
         for input_name, input_config in config.get('from', {}).iteritems():
@@ -47,7 +47,7 @@ class ImportSeries(FilterSeriesBase):
                 raise PluginError('Plugin %s does not support API v2' % input_name)
 
             method = input.phase_handlers['input']
-            result = method(feed, input_config)
+            result = method(task, input_config)
             if not result:
                 log.warning('Input %s did not return anything' % input_name)
                 continue
@@ -64,7 +64,7 @@ class ImportSeries(FilterSeriesBase):
         if 'settings' in config:
             series_config['settings'] = {'generated_series': config['settings']}
         # Merge our series config in with the base series config
-        self.merge_config(feed, series_config)
+        self.merge_config(task, series_config)
 
 
 register_plugin(ImportSeries, 'import_series', api_ver=2)

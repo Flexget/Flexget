@@ -12,9 +12,9 @@ class SearchPlugins(object):
         Implements --search-plugins
     """
 
-    def on_process_start(self, feed):
-        if feed.manager.options.search_plugins:
-            feed.manager.disable_feeds()
+    def on_process_start(self, task):
+        if task.manager.options.search_plugins:
+            task.manager.disable_tasks()
             header = '-- Supported search plugins: '
             header = header + '-' * (79 - len(header))
             print header
@@ -61,9 +61,9 @@ class PluginSearch(object):
         search.accept('choice').accept_choices(names)
         return search
 
-    def on_feed_urlrewrite(self, feed, config):
+    def on_task_urlrewrite(self, task, config):
         # no searches in unit test mode
-        if feed.manager.unit_test:
+        if task.manager.unit_test:
             return
 
         plugins = {}
@@ -71,7 +71,7 @@ class PluginSearch(object):
             plugins[plugin.name] = plugin.instance
 
         # search accepted
-        for entry in feed.accepted:
+        for entry in task.accepted:
             found = False
             # loop through configured searches
             for name in config:
@@ -96,7 +96,7 @@ class PluginSearch(object):
             if not found:
                 # If I don't have a URL, doesn't matter if I'm immortal...
                 entry['immortal'] = False
-                feed.reject(entry, 'search failed')
+                task.reject(entry, 'search failed')
 
 register_plugin(PluginSearch, 'urlrewrite_search', api_ver=2)
 register_plugin(SearchPlugins, '--search-plugins', builtin=True)

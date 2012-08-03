@@ -11,9 +11,9 @@ log = logging.getLogger('deadfrog')
 
 class UrlRewriteDeadFrog(object):
     """DeadFrog urlrewriter."""
-   
+
     # urlrewriter API
-    def url_rewritable(self, feed, entry):
+    def url_rewritable(self, task, entry):
         url = entry['url']
         if url.startswith('http://www.deadfrog.us/download/'):
             return False
@@ -22,7 +22,7 @@ class UrlRewriteDeadFrog(object):
         return False
 
     # urlrewriter API
-    def url_rewrite(self, feed, entry):
+    def url_rewrite(self, task, entry):
         entry['url'] = self.parse_download_page(entry['url'])
 
     @internet(log)

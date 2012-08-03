@@ -37,7 +37,7 @@ class FilterSeriesPremiere(FilterSeriesBase):
 
     # Run after series and metainfo series plugins
     @priority(115)
-    def on_feed_metainfo(self, feed, config):
+    def on_task_metainfo(self, task, config):
         if not config:
             # Don't run when we are disabled
             return
@@ -51,21 +51,21 @@ class FilterSeriesPremiere(FilterSeriesBase):
         metainfo_series = get_plugin_by_name('metainfo_series')
         guess_entry = metainfo_series.instance.guess_entry
         guessed_series = set()
-        for entry in feed.entries:
+        for entry in task.entries:
             if guess_entry(entry, allow_seasonless=allow_seasonless):
                 if entry['series_season'] == 1 and entry['series_episode'] in (0, 1):
                     guessed_series.add(entry['series_name'])
         # Reject any further episodes in those series
-        for entry in feed.entries:
+        for entry in task.entries:
             for series in guessed_series:
                 if entry.get('series_name') == series and not (
                         entry.get('series_season') == 1
                         and entry.get('series_episode') in (0, 1) ):
-                    feed.reject(entry, 'Non premiere episode in a premiere series')
+                    task.reject(entry, 'Non premiere episode in a premiere series')
         # Combine settings and series into series plugin config format
         allseries = {'settings': {'series_premiere': group_settings}, 'series_premiere': list(guessed_series)}
         # Merge the our config in to the main series config
-        self.merge_config(feed, allseries)
+        self.merge_config(task, allseries)
 
 
 register_plugin(FilterSeriesPremiere, 'series_premiere', api_ver=2)

@@ -8,7 +8,7 @@ class TestFilterSeen(FlexGetBase):
           global:
             accept_all: true
 
-        feeds:
+        tasks:
           test:
             mock:
               - {title: 'Seen title 1', url: 'http://localhost/seen1'}
@@ -26,31 +26,31 @@ class TestFilterSeen(FlexGetBase):
     """
 
     def test_seen(self):
-        self.execute_feed('test')
-        assert self.feed.find_entry(title='Seen title 1'), 'Test entry missing'
+        self.execute_task('test')
+        assert self.task.find_entry(title='Seen title 1'), 'Test entry missing'
         # run again, should filter
-        self.feed.execute()
-        assert not self.feed.find_entry(title='Seen title 1'), 'Seen test entry remains'
+        self.task.execute()
+        assert not self.task.find_entry(title='Seen title 1'), 'Seen test entry remains'
 
-        # execute another feed
-        self.execute_feed('test2')
-        # should not contain since fields seen in previous feed
-        assert not self.feed.find_entry(title='Seen title 1'), 'Seen test entry 1 remains in second feed'
-        assert not self.feed.find_entry(title='Seen title 2'), 'Seen test entry 2 remains in second feed'
-        # new item in feed should exists
-        assert self.feed.find_entry(title='Seen title 3'), 'Unseen test entry 3 not in second feed'
+        # execute another task
+        self.execute_task('test2')
+        # should not contain since fields seen in previous task
+        assert not self.task.find_entry(title='Seen title 1'), 'Seen test entry 1 remains in second task'
+        assert not self.task.find_entry(title='Seen title 2'), 'Seen test entry 2 remains in second task'
+        # new item in task should exists
+        assert self.task.find_entry(title='Seen title 3'), 'Unseen test entry 3 not in second task'
 
         # test that we don't filter reject on non-string fields (ie, seen same imdb_score)
 
-        self.execute_feed('test_number')
-        assert self.feed.find_entry(title='New title 1') and self.feed.find_entry(title='New title 2'), \
+        self.execute_task('test_number')
+        assert self.task.find_entry(title='New title 1') and self.task.find_entry(title='New title 2'), \
             'Item should not have been rejected because of number field'
 
 
 class TestFilterSeenMovies(FlexGetBase):
 
     __yaml__ = """
-        feeds:
+        tasks:
           test_1:
             mock:
                - {title: 'Seen movie title 1', url: 'http://localhost/seen_movie1', imdb_id: 'tt0103064', tmdb_id: 123}
@@ -76,24 +76,24 @@ class TestFilterSeenMovies(FlexGetBase):
     """
 
     def test_seen_movies(self):
-        self.execute_feed('test_1')
-        assert not (self.feed.find_entry(title='Seen movie title 1') and self.feed.find_entry(title='Seen movie title 2')), 'Movie accepted twice in one run'
+        self.execute_task('test_1')
+        assert not (self.task.find_entry(title='Seen movie title 1') and self.task.find_entry(title='Seen movie title 2')), 'Movie accepted twice in one run'
 
         # execute again
-        self.feed.execute()
-        assert not self.feed.find_entry(title='Seen movie title 1'), 'Test movie entry 1 should be rejected in second execution'
-        assert not self.feed.find_entry(title='Seen movie title 2'), 'Test movie entry 2 should be rejected in second execution'
+        self.task.execute()
+        assert not self.task.find_entry(title='Seen movie title 1'), 'Test movie entry 1 should be rejected in second execution'
+        assert not self.task.find_entry(title='Seen movie title 2'), 'Test movie entry 2 should be rejected in second execution'
 
-        # execute another feed
-        self.execute_feed('test_2')
+        # execute another task
+        self.execute_task('test_2')
 
-        # should not contain since fields seen in previous feed
-        assert not self.feed.find_entry(title='Seen movie title 3'), 'seen movie 3 exists'
-        assert not self.feed.find_entry(title='Seen movie title 4'), 'seen movie 4 exists'
-        assert not self.feed.find_entry(title='Seen movie title 6'), 'seen movie 6 exists (tmdb_id)'
-        assert self.feed.find_entry(title='Seen movie title 5'), 'unseen movie 5 doesn\'t exist'
+        # should not contain since fields seen in previous task
+        assert not self.task.find_entry(title='Seen movie title 3'), 'seen movie 3 exists'
+        assert not self.task.find_entry(title='Seen movie title 4'), 'seen movie 4 exists'
+        assert not self.task.find_entry(title='Seen movie title 6'), 'seen movie 6 exists (tmdb_id)'
+        assert self.task.find_entry(title='Seen movie title 5'), 'unseen movie 5 doesn\'t exist'
 
     def test_seen_movies_strict(self):
-        self.execute_feed('strict')
-        assert len(self.feed.rejected) == 1, 'Too many movies were rejected'
-        assert not self.feed.find_entry(title='Seen movie title 10'), 'strict should not have passed movie 10'
+        self.execute_task('strict')
+        assert len(self.task.rejected) == 1, 'Too many movies were rejected'
+        assert not self.task.find_entry(title='Seen movie title 10'), 'strict should not have passed movie 10'

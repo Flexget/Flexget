@@ -20,15 +20,15 @@ class RlsLog(object):
         from flexget import validator
         return validator.factory('url')
 
-    def parse_rlslog(self, rlslog_url, feed):
+    def parse_rlslog(self, rlslog_url, task):
         """
         :param rlslog_url: Url to parse from
-        :param feed: Feed instance
+        :param task: Task instance
         :return: List of release dictionaries
         """
 
         # BeautifulSoup doesn't seem to work if data is already decoded to unicode :/
-        soup = get_soup(feed.requests.get(rlslog_url, timeout=25).content)
+        soup = get_soup(task.requests.get(rlslog_url, timeout=25).content)
 
         releases = []
         for entry in soup.findAll('div', attrs={'class': 'entry'}):
@@ -73,7 +73,7 @@ class RlsLog(object):
                 # test if entry with this url would be recognized
                 temp = {'title': release['title'], 'url': link_href}
                 urlrewriting = get_plugin_by_name('urlrewriting')
-                if urlrewriting['instance'].url_rewritable(feed, temp):
+                if urlrewriting['instance'].url_rewritable(task, temp):
                     release['url'] = link_href
                     log.trace('--> accepting %s (known url pattern)' % link_href)
                 else:
@@ -89,7 +89,7 @@ class RlsLog(object):
 
     @cached('rlslog')
     @internet(log)
-    def on_feed_input(self, feed, config):
+    def on_task_input(self, task, config):
         url = config
         if url.endswith('feed/'):
             raise PluginError('Invalid URL. Remove trailing feed/ from the url.')
@@ -100,7 +100,7 @@ class RlsLog(object):
         # retry rlslog (badly responding) up to 4 times (requests tries 2 times per each of our tries here)
         for number in range(2):
             try:
-                releases = self.parse_rlslog(url, feed)
+                releases = self.parse_rlslog(url, task)
                 break
             except RequestException, e:
                 if number == 1:

@@ -16,8 +16,8 @@ class VerifySSLCertificates(object):
         return validator.factory('boolean')
 
     @plugin.priority(255)
-    def on_feed_start(self, feed, config):
+    def on_task_start(self, task, config):
         if config is False:
-            feed.requests.verify = False
+            task.requests.verify = False
 
 plugin.register_plugin(VerifySSLCertificates, 'verify_ssl_certificates', api_ver=2)

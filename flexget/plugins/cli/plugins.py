@@ -9,7 +9,7 @@ log = logging.getLogger('plugins')
 @event('manager.startup')
 def plugins_summary(manager):
     if manager.options.plugins:
-        manager.disable_feeds()
+        manager.disable_tasks()
         print '-' * 79
         print '%-20s%-30s%s' % ('Name', 'Roles (priority)', 'Info')
         print '-' * 79

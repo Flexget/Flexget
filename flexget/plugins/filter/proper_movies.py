@@ -19,7 +19,7 @@ class ProperMovie(Base):
 
     id = Column(Integer, primary_key=True)
     title = Column(Unicode)
-    feed = Column(Unicode)
+    task = Column('feed', Unicode)
     imdb_id = Column(String, index=True)
     quality = Column(String)
     proper_count = Column(Integer)
@@ -29,8 +29,8 @@ class ProperMovie(Base):
         self.added = datetime.now()
 
     def __repr__(self):
-        return '<ProperMovie(title=%s,feed=%s,imdb_id=%s,quality=%s,proper_count=%s,added=%s)>' % \
-            (self.title, self.feed, self.imdb_id, self.quality, self.proper_count, self.added)
+        return '<ProperMovie(title=%s,task=%s,imdb_id=%s,quality=%s,proper_count=%s,added=%s)>' % \
+            (self.title, self.task, self.imdb_id, self.quality, self.proper_count, self.added)
 
 
 # create index
@@ -61,7 +61,7 @@ class FilterProperMovies(object):
         return root
 
     @priority(512)
-    def on_feed_filter(self, feed, config):
+    def on_task_filter(self, task, config):
         log.debug('check for enforcing')
 
         # parse config
@@ -79,10 +79,10 @@ class FilterProperMovies(object):
             except ValueError:
                 raise PluginError('Invalid time format', log)
 
-        # throws DependencyError if not present aborting feed
+        # throws DependencyError if not present aborting task
         imdb_lookup = get_plugin_by_name('imdb_lookup').instance
 
-        for entry in feed.entries:
+        for entry in task.entries:
 
             parser = MovieParser()
             parser.data = entry['title']
@@ -107,7 +107,7 @@ class FilterProperMovies(object):
             log.debug('imdb_id: %s' % entry['imdb_id'])
             log.debug('current proper count: %s' % parser.proper_count)
 
-            proper_movie = feed.session.query(ProperMovie).\
+            proper_movie = task.session.query(ProperMovie).\
                 filter(ProperMovie.imdb_id == entry['imdb_id']).\
                 filter(ProperMovie.quality == quality).\
                 order_by(desc(ProperMovie.proper_count)).first()
@@ -140,12 +140,12 @@ class FilterProperMovies(object):
                 # TODO: does this need to be called?
                 # fire_event('forget', entry['imdb_url'])
                 fire_event('forget', entry['imdb_id'])
-                feed.accept(entry, 'proper version of previously downloaded movie')
+                task.accept(entry, 'proper version of previously downloaded movie')
 
-    def on_feed_exit(self, feed, config):
+    def on_task_exit(self, task, config):
         """Add downloaded movies to the database"""
         log.debug('check for learning')
-        for entry in feed.accepted:
+        for entry in task.accepted:
             if 'imdb_id' not in entry:
                 log.debug('`%s` does not have imdb_id' % entry['title'])
                 continue
@@ -160,7 +160,7 @@ class FilterProperMovies(object):
             log.debug('imdb_id: %s' % entry['imdb_id'])
             log.debug('proper count: %s' % parser.proper_count)
 
-            proper_movie = feed.session.query(ProperMovie).\
+            proper_movie = task.session.query(ProperMovie).\
                 filter(ProperMovie.imdb_id == entry['imdb_id']).\
                 filter(ProperMovie.quality == quality).\
                 filter(ProperMovie.proper_count == parser.proper_count).first()
@@ -168,11 +168,11 @@ class FilterProperMovies(object):
             if not proper_movie:
                 pm = ProperMovie()
                 pm.title = entry['title']
-                pm.feed = feed.name
+                pm.task = task.name
                 pm.imdb_id = entry['imdb_id']
                 pm.quality = quality
                 pm.proper_count = parser.proper_count
-                feed.session.add(pm)
+                task.session.add(pm)
                 log.debug('added %s' % pm)
             else:
                 log.debug('%s already exists' % proper_movie)

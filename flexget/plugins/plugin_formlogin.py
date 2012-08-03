@@ -21,7 +21,7 @@ class FormLogin(object):
         root.accept('text', key='passfield')
         return root
 
-    def on_feed_start(self, feed, config):
+    def on_task_start(self, task, config):
         try:
             from mechanize import Browser
         except ImportError:
@@ -56,10 +56,10 @@ class FormLogin(object):
             except Exception, e:
                 pass
         else:
-            received = os.path.join(feed.manager.config_base, 'received')
+            received = os.path.join(task.manager.config_base, 'received')
             if not os.path.isdir(received):
                 os.mkdir(received)
-            filename = os.path.join(received, '%s.formlogin.html' % feed.name)
+            filename = os.path.join(received, '%s.formlogin.html' % task.name)
             f = open(filename, 'w')
             f.write(br.response().get_data())
             f.close()
@@ -73,7 +73,7 @@ class FormLogin(object):
         cookiejar = br._ua_handlers["_cookies"].cookiejar
 
         # Add cookiejar to our requests session
-        feed.requests.add_cookiejar(cookiejar)
+        task.requests.add_cookiejar(cookiejar)
         # Add handler to urllib2 default opener for backwards compatibility
         handler = urllib2.HTTPCookieProcessor(cookiejar)
         if urllib2._opener:
@@ -83,12 +83,12 @@ class FormLogin(object):
             log.debug('Creating new opener and installing it')
             urllib2.install_opener(urllib2.build_opener(handler))
 
-    def on_feed_exit(self, feed, config):
-        """Feed exiting, remove cookiejar"""
+    def on_task_exit(self, task, config):
+        """Task exiting, remove cookiejar"""
         log.debug('Removing urllib2 opener')
         urllib2.install_opener(None)
 
-    # Feed aborted, unhook the cookiejar
-    on_feed_abort = on_feed_exit
+    # Task aborted, unhook the cookiejar
+    on_task_abort = on_task_exit
 
 register_plugin(FormLogin, 'form', api_ver=2)

@@ -14,10 +14,10 @@ REGEXP = re.compile(r'http://torrentz\.eu/(?P<hash>[a-f0-9]{40})')
 class UrlRewriteTorrentz(object):
     """Torrentz urlrewriter."""
 
-    def url_rewritable(self, feed, entry):
+    def url_rewritable(self, task, entry):
         return REGEXP.match(entry['url'])
 
-    def url_rewrite(self, feed, entry):
+    def url_rewrite(self, task, entry):
         hash = REGEXP.match(entry['url']).group(1)
         entry['url'] = 'http://zoink.it/torrent/%s.torrent' % hash.upper()
 

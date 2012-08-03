@@ -6,7 +6,7 @@ log = logging.getLogger('crossmatch')
 
 class CrossMatch(object):
     """
-    Perform action based on item on current feed and other inputs.
+    Perform action based on item on current task and other inputs.
 
     Example::
 
@@ -28,7 +28,7 @@ class CrossMatch(object):
         add_plugin_validators(inputs, phase='input')
         return root
 
-    def on_feed_filter(self, feed, config):
+    def on_task_filter(self, task, config):
 
         fields = config['fields']
         action = config['action']
@@ -46,7 +46,7 @@ class CrossMatch(object):
                     raise PluginError('Plugin %s does not support API v2' % input_name)
                 method = input.phase_handlers['input']
                 try:
-                    result.extend(method(feed, input_config))
+                    result.extend(method(task, input_config))
                 except PluginError, e:
                     log.warning('Error during input plugin %s: %s' % (input_name, e))
                     continue
@@ -55,7 +55,7 @@ class CrossMatch(object):
                     continue
 
         # perform action on intersecting entries
-        for entry in feed.entries:
+        for entry in task.entries:
             for generated_entry in result:
                 log.trace('checking if %s matches %s' % (entry['title'], generated_entry['title']))
                 common = self.entry_intersects(entry, generated_entry, fields)
@@ -63,9 +63,9 @@ class CrossMatch(object):
                     msg = 'intersects with %s on field(s) %s' % \
                           (generated_entry['title'], ', '.join(common))
                     if action == 'reject':
-                        feed.reject(entry, msg)
+                        task.reject(entry, msg)
                     if action == 'accept':
-                        feed.accept(entry, msg)
+                        task.accept(entry, msg)
 
     def entry_intersects(self, e1, e2, fields=None):
         """

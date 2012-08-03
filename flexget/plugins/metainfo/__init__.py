@@ -1,1 +1,1 @@
-"""Plugins for "metainfo" feed phase."""
+"""Plugins for "metainfo" task phase."""

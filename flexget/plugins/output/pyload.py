@@ -12,7 +12,7 @@ log = getLogger('pyload')
 
 class PluginPyLoad(object):
     """
-    Parse feed content or url for hoster links and adds them to pyLoad.
+    Parse task content or url for hoster links and adds them to pyLoad.
 
     Example::
 
@@ -67,22 +67,22 @@ class PluginPyLoad(object):
         advanced.accept('list', key='hoster').accept('text')
         return root
 
-    def on_process_start(self, feed, config):
+    def on_process_start(self, task, config):
         self.session = None
 
-    def on_feed_output(self, feed, config):
+    def on_task_output(self, task, config):
         if not config.get('enabled', True):
             return
-        if not feed.accepted:
+        if not task.accepted:
             return
 
-        self.add_entries(feed, config)
+        self.add_entries(task, config)
 
-    def add_entries(self, feed, config):
+    def add_entries(self, task, config):
         """Adds accepted entries"""
 
         try:
-            self.check_login(feed, config)
+            self.check_login(task, config)
         except URLError:
             raise PluginError('pyLoad not reachable', log)
         except PluginError:
@@ -94,7 +94,7 @@ class PluginPyLoad(object):
         hoster = config.get('hoster', self.DEFAULT_HOSTER)
         folder = config.get('folder', self.DEFAULT_FOLDER)
 
-        for entry in feed.accepted:
+        for entry in task.accepted:
             # bunch of urls now going to check
             content = entry['description'] + " " + quote(entry['url'])
             content = json.dumps(content.encode("utf8"))
@@ -123,7 +123,7 @@ class PluginPyLoad(object):
                     if name != "BasePlugin":
                         urls.extend(purls)
 
-            if feed.manager.options.test:
+            if task.manager.options.test:
                 log.info('Would add `%s` to pyload' % urls)
                 continue
 
@@ -150,9 +150,9 @@ class PluginPyLoad(object):
                     query_api(api, "setPackageData", {'pid': pid, 'data': data, 'session': self.session})
 
             except Exception, e:
-                feed.fail(entry, str(e))
+                task.fail(entry, str(e))
 
-    def check_login(self, feed, config):
+    def check_login(self, task, config):
         url = config.get('api', self.DEFAULT_API)
 
         if not self.session:
@@ -169,7 +169,7 @@ class PluginPyLoad(object):
             except HTTPError, e:
                 if e.code == 403:  # Forbidden
                     self.session = None
-                    return self.check_login(feed, config)
+                    return self.check_login(task, config)
                 else:
                     raise PluginError('HTTP Error %s' % e, log)
 

@@ -45,11 +45,11 @@ class OutputProwl(object):
         config.setdefault('priority', 0)
         return config
 
-    def on_feed_output(self, feed, config):
+    def on_task_output(self, task, config):
         config = self.prepare_config(config)
-        for entry in feed.accepted:
+        for entry in task.accepted:
 
-            if feed.manager.options.test:
+            if task.manager.options.test:
                 log.info("Would send prowl message about: %s", entry['title'])
                 continue
 
@@ -71,7 +71,7 @@ class OutputProwl(object):
             data = {'priority': priority, 'application': application, 'apikey': apikey,
                     'event': event, 'description': description}
             try:
-                response = feed.requests.post(url, headers=headers, data=data, raise_status=False)
+                response = task.requests.post(url, headers=headers, data=data, raise_status=False)
             except RequestException, e:
                 log.error('Error with request: %s' % e)
                 continue

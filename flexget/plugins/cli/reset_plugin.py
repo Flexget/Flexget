@@ -11,7 +11,7 @@ log = logging.getLogger('reset_plugin')
 def reset_plugin(manager):
     if not manager.options.reset_plugin:
         return
-    manager.disable_feeds()
+    manager.disable_tasks()
     plugin = manager.options.reset_plugin
     try:
         reset_schema(plugin)

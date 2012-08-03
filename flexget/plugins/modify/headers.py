@@ -9,7 +9,7 @@ class HTTPHeadersProcessor(urllib2.BaseHandler):
 
     # run first
     handler_order = urllib2.HTTPHandler.handler_order - 10
- 
+
     def __init__(self, headers=None):
         if headers:
             self.headers = headers
@@ -32,7 +32,7 @@ class HTTPHeadersProcessor(urllib2.BaseHandler):
 
 class PluginHeaders(object):
     """Allow setting up any headers in all requests (which use urllib2)
-        
+
     Example:
 
     headers:
@@ -46,13 +46,13 @@ class PluginHeaders(object):
         return config
 
     @priority(130)
-    def on_feed_start(self, feed, config):
-        """Feed starting"""
-        # Set the headers for this feed's request session
-        if feed.requests.headers:
-            feed.requests.headers.update(config)
+    def on_task_start(self, task, config):
+        """Task starting"""
+        # Set the headers for this task's request session
+        if task.requests.headers:
+            task.requests.headers.update(config)
         else:
-            feed.requests.headers = config
+            task.requests.headers = config
         # Set the headers in urllib2 for backwards compatibility
         if urllib2._opener:
             log.debug('Adding HTTPHeadersProcessor to default opener')
@@ -61,14 +61,14 @@ class PluginHeaders(object):
             log.debug('Creating new opener and installing it')
             opener = urllib2.build_opener(HTTPHeadersProcessor(config))
             urllib2.install_opener(opener)
-        
-    def on_feed_exit(self, feed, config):
-        """Feed exiting, remove additions"""
+
+    def on_task_exit(self, task, config):
+        """Task exiting, remove additions"""
         if urllib2._opener:
             log.debug('Removing urllib2 default opener')
             # TODO: this uninstalls all other handlers as well, but does it matter?
             urllib2.install_opener(None)
-            
-    on_feed_abort = on_feed_exit
+
+    on_task_abort = on_task_exit
 
 register_plugin(PluginHeaders, 'headers', api_ver=2)

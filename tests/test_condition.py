@@ -12,7 +12,7 @@ class TestCondition(FlexGetBase):
               - {title: 'brilliant', rating: 9.9}
               - {title: 'fresh', year: 2011}
 
-        feeds:
+        tasks:
           test_condition_reject:
             if:
               - year < 2011: reject
@@ -42,30 +42,30 @@ class TestCondition(FlexGetBase):
     """
 
     def test_reject(self):
-        self.execute_feed('test_condition_reject')
-        count = len(self.feed.rejected)
+        self.execute_task('test_condition_reject')
+        count = len(self.task.rejected)
         assert count == 1
 
     def test_accept(self):
-        self.execute_feed('test_condition_accept')
-        count = len(self.feed.accepted)
+        self.execute_task('test_condition_accept')
+        count = len(self.task.accepted)
         assert count == 2
 
     def test_implicit_and(self):
         for i in "12":
-            self.execute_feed('test_condition_and' + i)
-            count = len(self.feed.accepted)
+            self.execute_task('test_condition_and' + i)
+            count = len(self.task.accepted)
             assert count == int(i)
 
     def test_has_field(self):
-        self.execute_feed('test_has_field')
-        assert len(self.feed.accepted) == 2
+        self.execute_task('test_has_field')
+        assert len(self.task.accepted) == 2
 
     def test_sub_plugin(self):
-        self.execute_feed('test_sub_plugin')
-        entry = self.feed.find_entry('accepted', title='test', some_field='some value')
+        self.execute_task('test_sub_plugin')
+        entry = self.task.find_entry('accepted', title='test', some_field='some value')
         assert entry
-        assert len(self.feed.accepted) == 1
+        assert len(self.task.accepted) == 1
 
 
 class TestQualityCondition(FlexGetBase):
@@ -83,7 +83,7 @@ class TestQualityCondition(FlexGetBase):
               - {title: 'Smoke.HR'}
             accept_all: yes
 
-        feeds:
+        tasks:
           test_condition_quality_name_2:
             if:
               - "quality in ['hdtv', '1080i']": reject
@@ -94,8 +94,8 @@ class TestQualityCondition(FlexGetBase):
     """
 
     def test_quality(self):
-        for feedname in self.manager.config['feeds']:
-            self.execute_feed(feedname)
-            count = len(self.feed.rejected)
-            expected = int(feedname[-1])
+        for taskname in self.manager.config['tasks']:
+            self.execute_task(taskname)
+            count = len(self.task.rejected)
+            expected = int(taskname[-1])
             assert count == expected, "Expected %s rejects, got %d" % (expected, count)

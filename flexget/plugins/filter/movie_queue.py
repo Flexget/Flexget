@@ -75,7 +75,7 @@ class QueuedMovie(queue_base.QueuedItem, Base):
 
 class FilterMovieQueue(queue_base.FilterQueueBase):
 
-    def matches(self, feed, config, entry):
+    def matches(self, task, config, entry):
         # Tell tmdb_lookup to add lazy lookup fields if not already present
         try:
             get_plugin_by_name('tmdb_lookup').instance.lookup(entry)
@@ -101,7 +101,7 @@ class FilterMovieQueue(queue_base.FilterQueueBase):
 
         quality = entry.get('quality', qualities.Quality())
 
-        movie = feed.session.query(QueuedMovie).filter(QueuedMovie.downloaded == None).\
+        movie = task.session.query(QueuedMovie).filter(QueuedMovie.downloaded == None).\
                                                filter(or_(*conditions)).first()
         if movie and movie.quality_req.allows(quality):
             return movie

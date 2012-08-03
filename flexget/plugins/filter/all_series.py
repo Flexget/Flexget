@@ -4,9 +4,9 @@ from flexget.plugins.filter.series import FilterSeriesBase
 
 class FilterAllSeries(FilterSeriesBase):
     """
-    Grabs all entries that appear to be series episodes in a feed.
+    Grabs all entries that appear to be series episodes in a task.
 
-    This plugin just configures the series plugin dynamically with all series from the feed.
+    This plugin just configures the series plugin dynamically with all series from the task.
     It can take any of the options of the series plugin.
 
     Example::
@@ -30,7 +30,7 @@ class FilterAllSeries(FilterSeriesBase):
 
     # Run after series and metainfo series plugins
     @priority(115)
-    def on_feed_metainfo(self, feed, config):
+    def on_task_metainfo(self, task, config):
         if not config:
             # Don't run when we are disabled
             return
@@ -38,17 +38,17 @@ class FilterAllSeries(FilterSeriesBase):
         group_settings = {}
         if isinstance(config, dict):
             group_settings = config
-        # Generate a list of unique series that metainfo_series can parse for this feed
+        # Generate a list of unique series that metainfo_series can parse for this task
         metainfo_series = get_plugin_by_name('metainfo_series')
         guess_entry = metainfo_series.instance.guess_entry
         guessed_series = set()
-        for entry in feed.entries:
+        for entry in task.entries:
             if guess_entry(entry):
                 guessed_series.add(entry['series_name'])
         # Combine settings and series into series plugin config format
         allseries = {'settings': {'all_series': group_settings}, 'all_series': list(guessed_series)}
         # Merge our config in to the main series config
-        self.merge_config(feed, allseries)
+        self.merge_config(task, allseries)
 
 
 register_plugin(FilterAllSeries, 'all_series', api_ver=2)

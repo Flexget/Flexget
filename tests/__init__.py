@@ -6,7 +6,7 @@ import flexget.logger
 from flexget.manager import Manager
 from flexget.plugin import load_plugins
 from flexget.options import CoreArgumentParser
-from flexget.feed import Feed
+from flexget.task import Task
 from tests import util
 import yaml
 import logging
@@ -90,7 +90,7 @@ class FlexGetBase(object):
 
     def __init__(self):
         self.manager = None
-        self.feed = None
+        self.task = None
         self.database_uri = None
         self.base_path = os.path.dirname(__file__)
 
@@ -105,7 +105,7 @@ class FlexGetBase(object):
     def teardown(self):
         try:
             try:
-                self.feed.session.close()
+                self.task.session.close()
             except:
                 pass
             self.manager.shutdown()
@@ -116,32 +116,32 @@ class FlexGetBase(object):
                 log.trace('Removing tmpdir %r' % self.__tmp__)
                 shutil.rmtree(self.__tmp__.rstrip(os.sep))
 
-    def execute_feed(self, name):
-        """Use to execute one test feed from config"""
-        log.info('********** Running feed: %s ********** ' % name)
-        config = self.manager.config['feeds'][name]
-        if hasattr(self, 'feed'):
+    def execute_task(self, name):
+        """Use to execute one test task from config"""
+        log.info('********** Running task: %s ********** ' % name)
+        config = self.manager.config['tasks'][name]
+        if hasattr(self, 'task'):
             if hasattr(self, 'session'):
-                self.feed.session.close() # pylint: disable-msg=E0203
-        self.feed = Feed(self.manager, name, config)
-        self.manager.execute(feeds=[self.feed])
+                self.task.session.close() # pylint: disable-msg=E0203
+        self.task = Task(self.manager, name, config)
+        self.manager.execute(tasks=[self.task])
 
     def dump(self):
         """Helper method for debugging"""
         from flexget.plugins.output.dump import dump
         #from flexget.utils.tools import sanitize
-        # entries = sanitize(self.feed.entries)
-        # accepted = sanitize(self.feed.accepted)
-        # rejected = sanitize(self.feed.rejected)
+        # entries = sanitize(self.task.entries)
+        # accepted = sanitize(self.task.accepted)
+        # rejected = sanitize(self.task.rejected)
         print '\n-- ENTRIES: -----------------------------------------------------'
         # print yaml.safe_dump(entries)
-        dump(self.feed.entries, True)
+        dump(self.task.entries, True)
         print '-- ACCEPTED: ----------------------------------------------------'
         # print yaml.safe_dump(accepted)
-        dump(self.feed.entries, True)
+        dump(self.task.entries, True)
         print '-- REJECTED: ----------------------------------------------------'
         # print yaml.safe_dump(rejected)
-        dump(self.feed.entries, True)
+        dump(self.task.entries, True)
 
 
 class with_filecopy(object):

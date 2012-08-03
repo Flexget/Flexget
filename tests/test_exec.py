@@ -12,7 +12,7 @@ class TestExec(FlexGetBase):
           global:
             set:
               temp_dir: '__tmp__'
-        feeds:
+        tasks:
           replace_from_entry:
             mock:
               - {title: 'replace'}
@@ -35,14 +35,14 @@ class TestExec(FlexGetBase):
     """
 
     def test_replace_from_entry(self):
-        self.execute_feed('replace_from_entry')
-        assert len(self.feed.accepted) == 2, "not all entries were accepted"
-        for entry in self.feed.accepted:
+        self.execute_task('replace_from_entry')
+        assert len(self.task.accepted) == 2, "not all entries were accepted"
+        for entry in self.task.accepted:
             assert os.path.exists(os.path.join(self.__tmp__, entry['title'])), "exec.py did not create a file for %s" % entry['title']
 
     def test_adv_format(self):
-        self.execute_feed('test_adv_format')
-        for entry in self.feed.accepted:
+        self.execute_task('test_adv_format')
+        for entry in self.task.accepted:
             with open(os.path.join(self.__tmp__, entry['title']), 'r') as infile:
                 line = infile.readline().rstrip('\n')
                 assert line == '/path/with spaces/thefile', '%s != /path/with spaces' % line
@@ -54,8 +54,8 @@ class TestExec(FlexGetBase):
                 assert line == '/a hybrid /path/with spaces', '%s != /a hybrid /path/with spaces' % line
 
     def test_auto_escape(self):
-        self.execute_feed('test_auto_escape')
-        for entry in self.feed.accepted:
+        self.execute_task('test_auto_escape')
+        for entry in self.task.accepted:
             with open(os.path.join(self.__tmp__, entry['title']), 'r') as infile:
                 line = infile.readline().rstrip('\n')
                 assert line == 'single \' double\"', '%s != single \' double\"' % line

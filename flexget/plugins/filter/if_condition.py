@@ -3,7 +3,7 @@ import re
 import datetime
 from copy import copy
 from collections import defaultdict
-from flexget.feed import Feed
+from flexget.task import Task
 from flexget.plugin import register_plugin, plugins as all_plugins, get_plugin_by_name, phase_methods
 
 log = logging.getLogger('if')
@@ -25,7 +25,7 @@ class FilterIf(object):
     Actions include accept, reject, and fail, as well as the ability to run other filter plugins on the entries."""
 
     def __init__(self):
-        self.feed_phases = {}
+        self.task_phases = {}
 
     def validator(self):
         from flexget import validator
@@ -43,9 +43,9 @@ class FilterIf(object):
                 filter_action.accept(plugin.instance.validator, key=plugin.name)
         return root
 
-    def on_process_start(self, feed, config):
+    def on_process_start(self, task, config):
         """Divide the config into parts based on which phase they need to run on."""
-        phase_dict = self.feed_phases[feed.name] = defaultdict(lambda: [])
+        phase_dict = self.task_phases[task.name] = defaultdict(lambda: [])
         for item in config:
             action = item.values()[0]
             if isinstance(action, basestring):
@@ -57,7 +57,7 @@ class FilterIf(object):
                         if phase == 'process_start':
                             # If plugin has a process_start handler, run it now unconditionally
                             try:
-                                plugin.phase_handlers[phase](feed, plugin_config)
+                                plugin.phase_handlers[phase](task, plugin_config)
                             except TypeError:
                                 # Print to debug, as validator will show user error message
                                 log.debug('Cannot run api < 2 plugins.')
@@ -94,17 +94,17 @@ class FilterIf(object):
         else:
             raise AttributeError(item)
 
-        def handle_phase(feed, config):
-            if feed.name not in self.feed_phases:
-                log.debug('No config dict was generated for this feed.')
+        def handle_phase(task, config):
+            if task.name not in self.task_phases:
+                log.debug('No config dict was generated for this task.')
                 return
             entry_actions = {
-                'accept': feed.accept,
-                'reject': feed.reject,
-                'fail': feed.fail}
-            for item in self.feed_phases[feed.name][phase]:
+                'accept': task.accept,
+                'reject': task.reject,
+                'fail': task.fail}
+            for item in self.task_phases[task.name][phase]:
                 requirement, action = item.items()[0]
-                passed_entries = [e for e in feed.entries if self.check_condition(requirement, e)]
+                passed_entries = [e for e in task.entries if self.check_condition(requirement, e)]
                 if passed_entries:
                     if isinstance(action, basestring):
                         # Simple entry action (accept, reject or fail) was specified as a string
@@ -112,27 +112,27 @@ class FilterIf(object):
                             entry_actions[action](entry, 'Matched requirement: %s' % requirement)
                     else:
                         # Other plugins were specified to run on this entry
-                        fake_feed = Feed(feed.manager, feed.name, feed.config)
-                        fake_feed.session = feed.session
-                        fake_feed.entries = passed_entries
-                        fake_feed.accepted = [e for e in feed.accepted if self.check_condition(requirement, e)]
+                        fake_task = Task(task.manager, task.name, task.config)
+                        fake_task.session = task.session
+                        fake_task.entries = passed_entries
+                        fake_task.accepted = [e for e in task.accepted if self.check_condition(requirement, e)]
 
                         try:
                             for plugin_name, plugin_config in action.iteritems():
                                 plugin = get_plugin_by_name(plugin_name)
                                 method = plugin.phase_handlers[phase]
-                                method(fake_feed, plugin_config)
+                                method(fake_task, plugin_config)
                         except Exception:
                             raise
                         else:
-                            # Populate changes from the fake feed to the real one
-                            for e in fake_feed.accepted:
-                                feed.accept(e, e.get('reason'))
-                            for e in fake_feed.rejected:
-                                feed.reject(e, e.get('reason'))
-                            for e in fake_feed.failed:
-                                feed.fail(e, e.get('reason'))
-                feed.purge()
+                            # Populate changes from the fake task to the real one
+                            for e in fake_task.accepted:
+                                task.accept(e, e.get('reason'))
+                            for e in fake_task.rejected:
+                                task.reject(e, e.get('reason'))
+                            for e in fake_task.failed:
+                                task.fail(e, e.get('reason'))
+                task.purge()
 
         handle_phase.priority = 80
         return handle_phase

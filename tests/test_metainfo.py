@@ -4,7 +4,7 @@ from tests import FlexGetBase
 class TestMetainfo(FlexGetBase):
 
     __yaml__ = """
-        feeds:
+        tasks:
           test_quality:
             mock:
               - {title: 'test quality', description: 'metainfo quality should parse quality 720p from this'}
@@ -17,21 +17,21 @@ class TestMetainfo(FlexGetBase):
 
     def test_quality(self):
         """Metainfo: parse quality"""
-        self.execute_feed('test_quality')
-        assert self.feed.find_entry(quality='720p'), 'Quality not parsed'
+        self.execute_task('test_quality')
+        assert self.task.find_entry(quality='720p'), 'Quality not parsed'
 
     def test_content_size(self):
         """Metainfo: parse content size"""
-        self.execute_feed('test_content_size')
-        assert self.feed.find_entry(content_size=10), 'Content size 10 MB absent'
-        assert self.feed.find_entry(content_size=200), 'Content size 200 MB absent'
-        assert self.feed.find_entry(content_size=1024), 'Content size 1024 MB absent'
+        self.execute_task('test_content_size')
+        assert self.task.find_entry(content_size=10), 'Content size 10 MB absent'
+        assert self.task.find_entry(content_size=200), 'Content size 200 MB absent'
+        assert self.task.find_entry(content_size=1024), 'Content size 1024 MB absent'
 
 
 class TestMetainfoImdb(FlexGetBase):
 
     __yaml__ = """
-        feeds:
+        tasks:
           test:
             mock:
               - {title: 'Scan Test 1', description: 'title: Foo Bar Asdf\n imdb-url: http://www.imdb.com/title/tt0330793/ more text'}
@@ -42,21 +42,21 @@ class TestMetainfoImdb(FlexGetBase):
 
     def test_imdb(self):
         """Metainfo: imdb url"""
-        self.execute_feed('test')
-        assert self.feed.find_entry(imdb_url='http://www.imdb.com/title/tt0330793/'), \
+        self.execute_task('test')
+        assert self.task.find_entry(imdb_url='http://www.imdb.com/title/tt0330793/'), \
             'Failed to pick url from test 1'
-        assert self.feed.find_entry(imdb_url='http://www.imdb.com/title/tt0472198/'), \
+        assert self.task.find_entry(imdb_url='http://www.imdb.com/title/tt0472198/'), \
             'Failed to pick url from test 2'
-        assert not self.feed.find_entry(imdb_url='http://www.imdb.com/title/tt66666/'), \
+        assert not self.task.find_entry(imdb_url='http://www.imdb.com/title/tt66666/'), \
             'Failed to ignore multiple imdb urls in test 4'
-        assert not self.feed.find_entry(imdb_url='http://www.imdb.com/title/tt99999/'), \
+        assert not self.task.find_entry(imdb_url='http://www.imdb.com/title/tt99999/'), \
             'Failed to ignore multiple imdb urls in test 4'
 
 
 class TestMetainfoQuality(FlexGetBase):
 
     __yaml__ = """
-        feeds:
+        tasks:
           test:
             mock:
               - {title: 'FooBar.S01E02.720p.HDTV'}
@@ -66,21 +66,21 @@ class TestMetainfoQuality(FlexGetBase):
     """
 
     def test_quality(self):
-        self.execute_feed('test')
-        entry = self.feed.find_entry(title='FooBar.S01E02.720p.HDTV')
+        self.execute_task('test')
+        entry = self.task.find_entry(title='FooBar.S01E02.720p.HDTV')
         assert entry, 'entry not found?'
         assert 'quality' in entry, 'failed to pick up quality'
         assert entry['quality'].name == '720p hdtv', 'picked up wrong quality %s' % entry.get('quality', None)
-        entry = self.feed.find_entry(title='ShowB.S04E19.Name of Ep.720p.WEB-DL.DD5.1.H.264')
+        entry = self.task.find_entry(title='ShowB.S04E19.Name of Ep.720p.WEB-DL.DD5.1.H.264')
         assert entry, 'entry not found?'
         assert 'quality' in entry, 'failed to pick up quality'
         assert entry['quality'].name == '720p webdl h264 dd5.1', 'picked up wrong quality %s' % entry.get('quality', None)
         # Check that quality gets picked up from description when not in title
-        entry = self.feed.find_entry(title='Good.Movie')
+        entry = self.task.find_entry(title='Good.Movie')
         assert 'quality' in entry, 'failed to pick up quality from description'
         assert entry['quality'].name == '720p', 'picked up wrong quality %s' % entry.get('quality', None)
         # quality in description should not override one found in title
-        entry = self.feed.find_entry(title='Good.Movie.hdtv')
+        entry = self.task.find_entry(title='Good.Movie.hdtv')
         assert 'quality' in entry, 'failed to pick up quality'
         assert entry['quality'].name == 'hdtv', 'picked up wrong quality %s' % entry.get('quality', None)
 
@@ -90,7 +90,7 @@ class TestMetainfoSeries(FlexGetBase):
         presets:
           global:
             metainfo_series: yes
-        feeds:
+        tasks:
           test:
             mock:
               - {title: 'FlexGet.S01E02.TheName.HDTV.xvid'}
@@ -116,28 +116,28 @@ class TestMetainfoSeries(FlexGetBase):
     def test_metainfo_series(self):
         """Metainfo series: name/episode"""
         # We search for series name in title case to make sure case is being normalized
-        self.execute_feed('test')
-        assert self.feed.find_entry(series_name='Flexget', series_season=1, series_episode=2, quality='hdtv xvid'), \
+        self.execute_task('test')
+        assert self.task.find_entry(series_name='Flexget', series_season=1, series_episode=2, quality='hdtv xvid'), \
             'Failed to parse series info'
-        assert self.feed.find_entry(series_name='Some Series', series_season=3, series_episode=14, quality='720p'), \
+        assert self.task.find_entry(series_name='Some Series', series_season=3, series_episode=14, quality='720p'), \
             'Failed to parse series info'
-        assert self.feed.find_entry(series_name='Something', series_season=2, series_episode=1, quality='hdtv'), \
+        assert self.task.find_entry(series_name='Something', series_season=2, series_episode=1, quality='hdtv'), \
             'Failed to parse series info'
         # Test unwanted prefixes get stripped from series name
-        assert self.feed.find_entry(series_name='Some Series', series_season=3, series_episode=15, quality='720p'), \
+        assert self.task.find_entry(series_name='Some Series', series_season=3, series_episode=15, quality='720p'), \
             'Failed to parse series info'
-        assert self.feed.find_entry(series_name='Some Series', series_season=3, series_episode=16, quality='720p'), \
+        assert self.task.find_entry(series_name='Some Series', series_season=3, series_episode=16, quality='720p'), \
             'Failed to parse series info'
         # Test episode title and parentheses are stripped from series name
-        assert self.feed.find_entry(series_name='Show-a Us', series_season=2, series_episode=9, quality='hdtv'), \
+        assert self.task.find_entry(series_name='Show-a Us', series_season=2, series_episode=9, quality='hdtv'), \
             'Failed to parse series info'
-        assert self.feed.find_entry(series_name='Jack\'s Show', series_season=3, series_episode=1, quality='1080p'), \
+        assert self.task.find_entry(series_name='Jack\'s Show', series_season=3, series_episode=1, quality='1080p'), \
             'Failed to parse series info'
 
     def test_false_positives(self):
         """Metainfo series: check for false positives"""
-        self.execute_feed('false_positives')
-        for entry in self.feed.entries:
+        self.execute_task('false_positives')
+        for entry in self.task.entries:
             # None of these should be detected as series
             error = '%s sholud not be detected as a series' % entry['title']
             assert 'series_name' not in entry, error

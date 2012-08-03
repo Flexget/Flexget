@@ -7,19 +7,19 @@ log = logging.getLogger('dump_config')
 
 class OutputDumpConfig(object):
     """
-        Dumps feed config in STDOUT in yaml at exit or abort event.
+        Dumps task config in STDOUT in yaml at exit or abort event.
     """
 
-    def on_feed_exit(self, feed):
-        if feed.manager.options.dump_config:
+    def on_task_exit(self, task):
+        if task.manager.options.dump_config:
             import yaml
-            print '--- config from feed: %s' % feed.name
-            print yaml.safe_dump(feed.config)
+            print '--- config from task: %s' % task.name
+            print yaml.safe_dump(task.config)
             print '---'
-        if feed.manager.options.dump_config_python:
-            print feed.config
+        if task.manager.options.dump_config_python:
+            print task.config
 
-    on_feed_abort = on_feed_exit
+    on_task_abort = on_task_exit
 
 register_plugin(OutputDumpConfig, 'dump_config', debug=True, builtin=True)
 register_parser_option('--dump-config', action='store_true', dest='dump_config', default=False, \

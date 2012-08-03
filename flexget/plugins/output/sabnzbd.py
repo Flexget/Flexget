@@ -58,9 +58,9 @@ class OutputSabnzbd(object):
         params['mode'] = 'addurl'
         return params
 
-    def on_feed_output(self, feed, config):
-        for entry in feed.accepted:
-            if feed.manager.options.test:
+    def on_task_output(self, task, config):
+        for entry in task.accepted:
+            if task.manager.options.test:
                 log.info('Would add into sabnzbd: %s' % entry['title'])
                 continue
 
@@ -82,13 +82,13 @@ class OutputSabnzbd(object):
             except Exception, e:
                 log.critical('Failed to use sabnzbd. Requested %s' % request_url)
                 log.critical('Result was: %s' % e)
-                feed.fail(entry, 'sabnzbd unreachable')
-                if feed.manager.options.debug:
+                task.fail(entry, 'sabnzbd unreachable')
+                if task.manager.options.debug:
                     log.exception(e)
                 continue
 
             if 'error' in response.lower():
-                feed.fail(entry, response.replace('\n', ''))
+                task.fail(entry, response.replace('\n', ''))
             else:
                 log.info('Added `%s` to SABnzbd' % (entry['title']))
 
