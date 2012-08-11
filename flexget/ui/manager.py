@@ -32,43 +32,43 @@ class UIManager(Manager):
             config_filename = os.path.join(config_path, self.options.config)
             log.info('Config file %s not found. Creating new config %s' % (self.options.config, config_filename))
             newconfig = file(config_filename, 'w')
-            # Write empty feeds and presets to the config
-            newconfig.write(yaml.dump({'presets': {}, 'feeds': {}}))
+            # Write empty tasks and presets to the config
+            newconfig.write(yaml.dump({'presets': {}, 'tasks': {}}))
             newconfig.close()
             self.load_config(config_filename)
 
     def execute(self, *args, **kwargs):
-        # Update feed instances to match config
-        self.update_feeds()
+        # Update task instances to match config
+        self.update_tasks()
         Manager.execute(self, *args, **kwargs)
 
-    def update_feeds(self):
-        """Updates instances of all configured feeds from config"""
+    def update_tasks(self):
+        """Updates instances of all configured tasks from config"""
         from flexget.task import Task
 
-        if not isinstance(self.config['feeds'], dict):
-            log.critical('Feeds is in wrong datatype, please read configuration guides')
+        if not isinstance(self.config['tasks'], dict):
+            log.critical('Tasks is in wrong datatype, please read configuration guides')
             return
 
-        # construct feed list
-        for name in self.config.get('feeds', {}):
-            if not isinstance(self.config['feeds'][name], dict):
+        # construct task list
+        for name in self.config.get('tasks', {}):
+            if not isinstance(self.config['tasks'][name], dict):
                 continue
-            if name in self.feeds:
-                # This feed already has an instance, update it
-                self.feeds[name].config = deepcopy(self.config['feeds'][name])
+            if name in self.tasks:
+                # This task already has an instance, update it
+                self.tasks[name].config = deepcopy(self.config['tasks'][name])
                 if not name.startswith('_'):
-                    self.feeds[name].enabled = True
+                    self.tasks[name].enabled = True
             else:
-                # Create feed
-                feed = Task(self, name, deepcopy(self.config['feeds'][name]))
-                # If feed name is prefixed with _ it's disabled
+                # Create task
+                task = Task(self, name, deepcopy(self.config['tasks'][name]))
+                # If task name is prefixed with _ it's disabled
                 if name.startswith('_'):
-                    feed.enabled = False
-                self.feeds[name] = feed
-        # Delete any feed instances that are no longer in the config
-        for name in [n for n in self.feeds if n not in self.config['feeds']]:
-            del self.feeds[name]
+                    task.enabled = False
+                self.tasks[name] = task
+        # Delete any task instances that are no longer in the config
+        for name in [n for n in self.tasks if n not in self.config['tasks']]:
+            del self.tasks[name]
 
     def check_lock(self):
         if self.options.autoreload:

@@ -89,8 +89,8 @@ class ExecThread(threading.Thread):
         if 'options' in kwargs and not isinstance(kwargs['options'], dict):
             raise TypeError('options should be a dict, got %s' % type(kwargs['options']))
 
-        if 'feeds' in kwargs and not hasattr(kwargs['feeds'], '__iter__'):
-            raise TypeError('feeds should be iterable, got %s' % type(kwargs['feeds']))
+        if 'tasks' in kwargs and not hasattr(kwargs['tasks'], '__iter__'):
+            raise TypeError('tasks should be iterable, got %s' % type(kwargs['tasks']))
 
         if 'options' in kwargs and 'parsed_options' in kwargs:
             raise ValueError('options and parsed_options are mutually exclusive')

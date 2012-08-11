@@ -17,7 +17,7 @@ def index():
 
 @configure.route('/new/<root>', methods=['POST', 'GET'])
 def new_text(root):
-    if root not in ['feeds', 'presets']:
+    if root not in ['tasks', 'presets']:
         flash('Invalid root.', 'error')
         return redirect(url_for('index'))
     config_type = root.rstrip('s')
@@ -106,25 +106,25 @@ def edit(root, name):
 
 @app.template_filter('other_type')
 def other_type(root):
-    if root == 'feeds':
+    if root == 'tasks':
         return 'presets'
-    return 'feeds'
+    return 'tasks'
 
 
 def get_related(root, name):
-    """Returns a list of related feeds/presets for a given preset/feed"""
-    if root == 'feeds':
+    """Returns a list of related tasks/presets for a given preset/task"""
+    if root == 'tasks':
         presets = manager.config[root][name].get('preset', [])
         if isinstance(presets, basestring):
             presets = [presets]
         return presets
     elif root == 'presets':
-        feeds = []
-        for feed, config in manager.config['feeds'].iteritems():
+        tasks = []
+        for task, config in manager.config['tasks'].iteritems():
             if config.get('preset'):
                 if name == config['preset'] or name in config['preset']:
-                    feeds.append(feed)
-        return feeds
+                    tasks.append(task)
+        return tasks
 
 
 register_plugin(configure, menu='Configure', order=10)

@@ -1,6 +1,3 @@
-"""
-At the moment scheduler supports just one global interval for all feeds.
-"""
 import logging
 from datetime import datetime, timedelta
 import threading
@@ -22,11 +19,11 @@ class Schedule(Base):
     __tablename__ = 'schedule'
 
     id = Column(Integer, primary_key=True)
-    feed = Column(Unicode)
+    task = Column('feed', Unicode)
     interval = Column(Integer)
 
-    def __init__(self, feed, interval):
-        self.feed = feed
+    def __init__(self, task, interval):
+        self.task = task
         self.interval = interval
 
 
@@ -67,116 +64,116 @@ class RepeatingTimer(threading.Thread):
                 self.function(*self.args, **self.kwargs)
 
 
-def get_feed_interval(feed):
-    feed_interval = db_session.query(Schedule).filter(Schedule.feed == feed).first()
-    if feed_interval:
-        return feed_interval.interval
+def get_task_interval(task):
+    task_interval = db_session.query(Schedule).filter(Schedule.task == task).first()
+    if task_interval:
+        return task_interval.interval
 
 
-def set_feed_interval(feed, interval):
-    feed_interval = db_session.query(Schedule).filter(Schedule.feed == feed).first()
-    if feed_interval:
-        log.debug('Updating %s interval' % feed)
-        feed_interval.interval = interval
+def set_task_interval(task, interval):
+    task_interval = db_session.query(Schedule).filter(Schedule.task == task).first()
+    if task_interval:
+        log.debug('Updating %s interval' % task)
+        task_interval.interval = interval
     else:
-        log.debug('Creating new %s interval' % feed)
-        db_session.add(Schedule(feed, interval))
+        log.debug('Creating new %s interval' % task)
+        db_session.add(Schedule(task, interval))
     db_session.commit()
     stop_empty_timers()
 
 
 @schedule.context_processor
 def get_intervals():
-    schedule_items = db_session.query(Schedule).filter(Schedule.feed != u'__DEFAULT__').all()
-    default_interval = db_session.query(Schedule).filter(Schedule.feed == u'__DEFAULT__').first()
+    schedule_items = db_session.query(Schedule).filter(Schedule.task != u'__DEFAULT__').all()
+    default_interval = db_session.query(Schedule).filter(Schedule.task == u'__DEFAULT__').first()
     if default_interval:
         default_interval = default_interval.interval
     else:
         default_interval = DEFAULT_INTERVAL
     return {'default_interval': default_interval,
             'schedule_items': schedule_items,
-            'feeds': set(get_all_feeds()) - set(get_scheduled_feeds())}
+            'tasks': set(get_all_tasks()) - set(get_scheduled_tasks())}
 
 
-def update_interval(form, feed):
+def update_interval(form, task):
     try:
-        interval = float(form[feed + '_interval'])
+        interval = float(form[task + '_interval'])
     except ValueError:
-        flash('%s interval must be a number!' % feed.capitalize(), 'error')
+        flash('%s interval must be a number!' % task.capitalize(), 'error')
     else:
         if interval <= 0:
-            flash('%s interval must be greater than zero!' % feed.capitalize(), 'error')
+            flash('%s interval must be greater than zero!' % task.capitalize(), 'error')
         else:
-            unit = form[feed + '_unit']
+            unit = form[task + '_unit']
             delta = timedelta(**{unit: interval})
             # Convert the timedelta to integer minutes
             interval = int((delta.seconds + delta.days * 24 * 3600) / 60.0)
             if interval < 1:
                 interval = 1
-            log.info('new interval for %s: %d minutes' % (feed, interval))
-            set_feed_interval(feed, interval)
+            log.info('new interval for %s: %d minutes' % (task, interval))
+            set_task_interval(task, interval)
             start_timer(interval)
-            flash('%s scheduling updated successfully.' % feed.capitalize(), 'success')
+            flash('%s scheduling updated successfully.' % task.capitalize(), 'success')
 
 
 @schedule.route('/', methods=['POST', 'GET'])
 def index():
     global timer
     if request.method == 'POST':
-        for feed in get_all_feeds() + [u'__DEFAULT__']:
-            if request.form.get(feed + '_interval'):
-                update_interval(request.form, feed)
+        for task in get_all_tasks() + [u'__DEFAULT__']:
+            if request.form.get(task + '_interval'):
+                update_interval(request.form, task)
 
     return render_template('schedule/schedule.html')
 
 
-@schedule.route('/delete/<feed>')
-def delete_schedule(feed):
-    db_session.query(Schedule).filter(Schedule.feed == feed).delete()
+@schedule.route('/delete/<task>')
+def delete_schedule(task):
+    db_session.query(Schedule).filter(Schedule.task == task).delete()
     db_session.commit()
     stop_empty_timers()
     return redirect(url_for('index'))
 
 
-@schedule.route('/add/<feed>')
-def add_schedule(feed):
-    schedule = db_session.query(Schedule).filter(Schedule.feed == feed).first()
+@schedule.route('/add/<task>')
+def add_schedule(task):
+    schedule = db_session.query(Schedule).filter(Schedule.task == task).first()
     if not schedule:
-        schedule = Schedule(feed, DEFAULT_INTERVAL)
+        schedule = Schedule(task, DEFAULT_INTERVAL)
         db_session.add(schedule)
         db_session.commit()
     start_timer(DEFAULT_INTERVAL)
     return redirect(url_for('index'))
 
 
-def get_all_feeds():
-    return [feed for feed in manager.config.get('feeds', {}).keys() if not feed.startswith('_')]
+def get_all_tasks():
+    return [task for task in manager.config.get('tasks', {}).keys() if not task.startswith('_')]
 
 
-def get_scheduled_feeds():
-    return [item.feed for item in db_session.query(Schedule).all()]
+def get_scheduled_tasks():
+    return [item.task for item in db_session.query(Schedule).all()]
 
 
 def execute(interval):
     """Adds a run to the executor"""
 
-    # Make a list of feeds that run on this interval
+    # Make a list of tasks that run on this interval
     schedules = db_session.query(Schedule).filter(Schedule.interval == interval).all()
-    feeds = set([sch.feed for sch in schedules])
-    if u'__DEFAULT__' in feeds:
-        feeds.remove(u'__DEFAULT__')
-        # Get a list of all feeds that do not have their own schedule
-        default_feeds = set(get_all_feeds()) - set(get_scheduled_feeds())
-        feeds.update(default_feeds)
+    tasks = set([sch.task for sch in schedules])
+    if u'__DEFAULT__' in tasks:
+        tasks.remove(u'__DEFAULT__')
+        # Get a list of all tasks that do not have their own schedule
+        default_tasks = set(get_all_tasks()) - set(get_scheduled_tasks())
+        tasks.update(default_tasks)
 
-    if not feeds:
-        # No feeds scheduled to run at this interval, stop the timer
+    if not tasks:
+        # No tasks scheduled to run at this interval, stop the timer
         stop_timer(interval)
         return
 
-    log.info('Executing feeds: %s' % ", ".join(feeds))
+    log.info('Executing tasks: %s' % ", ".join(tasks))
     fire_event('scheduler.execute')
-    executor.execute(feeds=feeds)
+    executor.execute(tasks=tasks)
 
 
 def start_timer(interval):
@@ -200,7 +197,7 @@ def stop_timer(interval):
 
 
 def stop_empty_timers():
-    """Stops timers that don't have any more feeds using them."""
+    """Stops timers that don't have any more tasks using them."""
     current_intervals = set([i.interval for i in db_session.query(Schedule).all()])
     for interval in timers.keys():
         if interval not in current_intervals:

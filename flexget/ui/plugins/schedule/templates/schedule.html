@@ -10,16 +10,16 @@
         }
     </style>
     <script type="text/javascript">
-        function on_delete(feed){
-            var ans = confirm("Really delete schedule for "+feed+"?");
+        function on_delete(task){
+            var ans = confirm("Really delete schedule for "+task+"?");
             if (ans) {
-                location.href = "/schedule/delete/"+feed;
+                location.href = "/schedule/delete/"+task;
             }
         }
         function on_add(){
-            var feed = $("#add_feed").val();
-            if (feed) {
-                location.href = "/schedule/add/"+feed;
+            var task = $("#add_task").val();
+            if (task) {
+                location.href = "/schedule/add/"+task;
             }
         }
         function show_add_area(){
@@ -54,18 +54,18 @@
             {%- for item in schedule_items %}
                 <tr>
                     <td align="center">
-                        {{ item.feed }}
+                        {{ item.task }}
                     </td><td>
-                        <input name="{{ item.feed }}_interval" value="{{ item.interval }}" size="10" style="text-align: right;">
+                        <input name="{{ item.task }}_interval" value="{{ item.interval }}" size="10" style="text-align: right;">
                     </td><td>
-                        <select name="{{ item.feed }}_unit">
+                        <select name="{{ item.task }}_unit">
                             <option value="minutes" selected>minutes</option>
                             <option value="hours">hours</option>
                             <option value="days">days</option>
                         </select>
                     </td><td>
                         <img src="{{ url_for('.static', filename='img/fatcow-icons/16x16/delete.png') }}" alt="Delete"
-                             onclick="on_delete('{{ item.feed }}')"/>
+                             onclick="on_delete('{{ item.task }}')"/>
                     </td>
                 </tr>
             {% endfor -%}
@@ -74,9 +74,9 @@
                 <table class="add_table">
                     <tr>
                         <td>
-                            <select id="add_feed">
-                            {% for feed in feeds %}
-                                <option value="{{ feed }}">{{ feed }}</option>
+                            <select id="add_task">
+                            {% for task in tasks %}
+                                <option value="{{ task }}">{{ task }}</option>
                             {% endfor %}
                             </select>
                         </td><td>
@@ -88,10 +88,10 @@
         </div>
 
         <div class="buttons">
-            {% if feeds %}
+            {% if tasks %}
             <button type="button" onclick="show_add_area()">
                 <img src="{{ url_for(".static", filename="img/fatcow-icons/16x16/add.png") }}" alt="Add" align="top">
-                Add Feed
+                Add Task
             </button>
             {% endif %}
             <button type="submit" name="submit" value="change">Save Changes</button>

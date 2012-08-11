@@ -25,15 +25,15 @@
             mtype: 'GET',
             postData: {
                 log_type:  function () {return $("input[name='log_type']:checked").val();},
-                feed:  function () {return $("#feedlist > li > div.selected").attr('id')},
+                task:  function () {return $("#tasklist > li > div.selected").attr('id')},
                 exec: function () {return $("#execlist > li > div.selected").attr('id')}
             },
-            colNames: ['Date','Level','Logger', 'Feed', 'Message'],
+            colNames: ['Date','Level','Logger', 'Task', 'Message'],
             colModel: [
                 {name:'created', width:150, align: 'right'},
                 {name:'levelno', width:65, sortable: false},
                 {name:'logger', width:100, sortable: false},
-                {name:'feed', width:100, sortable: false},
+                {name:'task', width:100, sortable: false},
                 {name:'message', width:900, sortable: false}
             ],
             pager: '#pager',
@@ -60,12 +60,12 @@
         $("input[name='log_type']").change(function() {
             $("#execlist > li > div").removeClass('selected')
             $("#execlist > li > div:first").addClass('selected')
-            $("#feedlist > li > div").removeClass('selected')
-            $("#feedlist > li > div:first").addClass('selected')
+            $("#tasklist > li > div").removeClass('selected')
+            $("#tasklist > li > div:first").addClass('selected')
             refreshGrid();
         });
-        $("#feedlist > li > div").click(function() {
-            $("#feedlist > li > div").removeClass('selected');
+        $("#tasklist > li > div").click(function() {
+            $("#tasklist > li > div").removeClass('selected');
             $(this).addClass('selected');
             $("input[name='log_type']").filter("[value='core']").attr("checked", true);
             refreshGrid();
@@ -78,9 +78,9 @@
         });
         function refreshGrid(){
             if ($("input[name='log_type']:checked").val() == 'webui')
-                $("#logarea").hideCol("feed");
+                $("#logarea").hideCol("task");
             else
-                $("#logarea").showCol("feed");
+                $("#logarea").showCol("task");
             $("#logarea").trigger("reloadGrid");
         };
     });
@@ -111,12 +111,12 @@
         {% endfor %}
     </ul>
     </dd>
-    <dt><div><b>Feeds</b></div></dt>
+    <dt><div><b>Tasks</b></div></dt>
     <dd>
-    <ul id="feedlist">
+    <ul id="tasklist">
         <li><div id="" class="item selected"><a href="#">All</a></div></li>
-        {% for feed in menu_feeds -%}
-        <li><div class="item" id="{{ feed }}"><a href="#">{{ feed }}</a></div></li>
+        {% for task in menu_tasks -%}
+        <li><div class="item" id="{{ task }}"><a href="#">{{ task }}</a></div></li>
         {% endfor %}
     </ul>
     </dd>

@@ -17,7 +17,7 @@ class LogEntry(Base):
     logger = Column(String)
     levelno = Column(Integer)
     message = Column(Unicode)
-    feed = Column(Unicode)
+    task = Column('feed', Unicode)
     execution = Column(String)
 
     def __init__(self, record):
@@ -25,7 +25,7 @@ class LogEntry(Base):
         self.logger = record.name
         self.levelno = record.levelno
         self.message = unicode(record.getMessage())
-        self.feed = getattr(record, 'feed', u'')
+        self.task = getattr(record, 'task', u'')
         self.execution = getattr(record, 'execution', '')
 
 
@@ -43,12 +43,12 @@ def update_menus():
     import time
 
     strftime = lambda secs: time.strftime('%Y-%m-%d %H:%M', time.localtime(float(secs)))
-    menu_feeds = [i[0] for i in db_session.query(LogEntry.feed).filter(LogEntry.feed != '')
-                                          .distinct().order_by(asc('feed'))[:]]
+    menu_tasks = [i[0] for i in db_session.query(LogEntry.task).filter(LogEntry.task != '')
+                                          .distinct().order_by(asc('task'))[:]]
     menu_execs = [(i[0], strftime(i[0])) for i in db_session.query(LogEntry.execution)
                                                             .filter(LogEntry.execution != '')
                                                             .distinct().order_by(desc('execution'))[:10]]
-    return {'menu_feeds': menu_feeds, 'menu_execs': menu_execs}
+    return {'menu_tasks': menu_tasks, 'menu_execs': menu_execs}
 
 
 @log_viewer.route('/')
@@ -59,7 +59,7 @@ def index():
 @log_viewer.route('/_get_logdata.json')
 def get_logdata():
     log_type = request.args.get('log_type')
-    feed = request.args.get('feed')
+    task = request.args.get('task')
     execution = request.args.get('exec')
     page = int(request.args.get('page'))
     limit = int(request.args.get('rows', 0))
@@ -72,8 +72,8 @@ def get_logdata():
         query = query.filter(or_(LogEntry.logger.in_(['webui', 'werkzeug', 'event']), LogEntry.logger.like('ui%')))
     elif log_type == 'core':
         query = query.filter(and_(~LogEntry.logger.in_(['webui', 'werkzeug', 'event']), ~LogEntry.logger.like('ui%')))
-    if feed:
-        query = query.filter(LogEntry.feed == feed)
+    if task:
+        query = query.filter(LogEntry.task == task)
     if execution:
         query = query.filter(LogEntry.execution == execution)
     count = query.count()
@@ -92,7 +92,7 @@ def get_logdata():
                              'created': entry.created.strftime('%Y-%m-%d %H:%M'),
                              'levelno': logging.getLevelName(entry.levelno),
                              'logger': entry.logger,
-                             'feed': entry.feed,
+                             'task': entry.task,
                              'message': entry.message})
     return jsonify(json)
 

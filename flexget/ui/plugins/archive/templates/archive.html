@@ -33,8 +33,8 @@ TODO: how to get this visible since count is now retrieved via ajax call ...
 
 <div class="warning">
     <p>
-        Your archive seems to be empty. To use archive feature you need to have feed(s) with archive plugin enabled.
-        Once archive plugin is enabled in a feed it starts to add all new content from the feed into the archive.
+        Your archive seems to be empty. To use archive feature you need to have task(s) with archive plugin enabled.
+        Once archive plugin is enabled in a task it starts to add all new content from the task into the archive.
     </p>
 </div>
 -->
@@ -50,7 +50,7 @@ TODO: how to get this visible since count is now retrieved via ajax call ...
                 <th>Name</th>
                 <th>Description</th>
                 <th>Added</th>
-                <th>Feed</th>
+                <th>Task</th>
             </tr>
             {% for archive in results %}
                 <tr class="{{ loop.cycle('odd', 'even') }}">
@@ -62,7 +62,7 @@ TODO: how to get this visible since count is now retrieved via ajax call ...
                     <td><a href="{{ archive.url }}">{{ archive.title|wordwrap(width=60) }}</a></td>
                     <td>{{ archive.description|default('N/A', True)|wordwrap(width=40)|safe }}</td>
                     <td>{{ archive.added | pretty_age}}</td>
-                    <td>{{ archive.feed }}</td>
+                    <td>{{ archive.task }}</td>
                 </tr>
             {% endfor %}
         </table>
