@@ -89,12 +89,14 @@ class TestThetvdbLookup(FlexGetBase):
         session.close()
         test_run()
 
+    @attr(online=True)
     def test_date(self):
         self.execute_task('test_date')
         entry = self.task.find_entry(title='the daily show 2012-6-6')
         assert entry
         assert entry['ep_name'] == 'Michael Fassbender'
 
+    @attr(online=True)
     def test_absolute(self):
         self.execute_task('test_absolute')
         entry = self.task.find_entry(title='naruto 128')
