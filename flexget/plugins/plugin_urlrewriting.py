@@ -14,15 +14,11 @@ class UrlRewritingError(Exception):
 
 
 class PluginUrlRewriting(object):
-
     """
     Provides URL rewriting framework
     """
 
     def on_task_urlrewrite(self, task):
-        # no urlrewriting in unit test mode
-        if task.manager.unit_test:
-            return
         log.debug('Checking %s entries' % len(task.accepted))
         # try to urlrewrite all accepted
         for entry in task.accepted:

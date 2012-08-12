@@ -66,13 +66,14 @@ class TestRegexpurlrewriter(FlexGetBase):
           test:
             mock:
               - {title: 'irrelevant', url: 'http://newzleech.com/?p=123'}
-            regexp_url_rewrite:
+            accept_all: yes
+            urlrewrite:
               newzleech:
-                match: http\:\/\/newzleech.com\/\?p\=
-                replace: http://newzleech.com/?m=gen&dl=1&post=
+                regexp: 'http://newzleech.com/\?p=(?P<id>\d+)'
+                format: 'http://newzleech.com/?m=gen&dl=1&post=\g<id>'
     """
 
     def test_newzleech(self):
         self.execute_task('test')
-        assert not self.task.find_entry(url='http://newzleech.com/?m=gen&dl=1&post=123'), \
+        assert self.task.find_entry(url='http://newzleech.com/?m=gen&dl=1&post=123'), \
             'did not url_rewrite properly'

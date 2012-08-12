@@ -116,7 +116,7 @@ class FlexGetBase(object):
                 log.trace('Removing tmpdir %r' % self.__tmp__)
                 shutil.rmtree(self.__tmp__.rstrip(os.sep))
 
-    def execute_task(self, name):
+    def execute_task(self, name, abort_ok=False):
         """Use to execute one test task from config"""
         log.info('********** Running task: %s ********** ' % name)
         config = self.manager.config['tasks'][name]
@@ -125,6 +125,8 @@ class FlexGetBase(object):
                 self.task.session.close() # pylint: disable-msg=E0203
         self.task = Task(self.manager, name, config)
         self.manager.execute(tasks=[self.task])
+        if not abort_ok:
+            assert not self.task.aborted, 'Task should not have aborted.'
 
     def dump(self):
         """Helper method for debugging"""

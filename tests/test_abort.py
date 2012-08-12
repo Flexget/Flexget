@@ -18,5 +18,5 @@ class TestAbort(FlexGetBase):
     """
 
     def test_abort(self):
-        self.execute_task('test')
-        assert self.task._abort, 'Task not aborted'
+        self.execute_task('test', abort_ok=True)
+        assert self.task.aborted, 'Task not aborted'
