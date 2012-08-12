@@ -60,9 +60,9 @@ class TestPriority(FlexGetBase):
               quality: 720p
             quality: 720p
             plugin_priority:
-              accept_all: 3
-              set: 2
-              quality: 1
+              set: 3
+              quality: 2
+              accept_all: 1
 
           test2:
             mock:
@@ -72,9 +72,9 @@ class TestPriority(FlexGetBase):
               quality: 720p
             quality: 720p
             plugin_priority:
-              accept_all: 3
+              set: 3
               quality: 2
-              set: 1
+              accept_all: 1
     """
 
     def test_smoke(self):

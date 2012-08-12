@@ -444,6 +444,10 @@ class Requirements(object):
         :rtype: bool
         :returns: True if given quality passes all component requirements.
         """
+        if isinstance(qual, basestring):
+            qual = Quality(qual)
+            if not qual:
+                raise TypeError('`%s` does not appear to be a valid quality string.' % qual.text)
         for r_component, q_component in zip(self.components, qual.components):
             if not r_component.allows(q_component, loose=loose):
                 return False
