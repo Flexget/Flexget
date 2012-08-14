@@ -17,8 +17,6 @@ class EscapingDict(UserDict):
         if isinstance(value, basestring):
             # TODO: May need to be different depending on OS
             value = value.replace('"', '\\"')
-            if not sys.platform.startswith('win'):
-                value = value.replace('\'', '\\\'')
             #value = re.escape(value)
         return value
 
