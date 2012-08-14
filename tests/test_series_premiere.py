@@ -42,7 +42,7 @@ class TestSeriesPremiere(FlexGetBase):
             mock:
               - {title: 'foo bar s01e01e02 hdtv'}
             series_premiere: yes
-          rerun:
+          test_rerun:
             mock:
               - title: theshow s01e01
               - title: theshow s01e02
@@ -75,5 +75,5 @@ class TestSeriesPremiere(FlexGetBase):
         assert len(self.task.accepted) == 1, 'should have accepted multi-episode premiere'
 
     def test_rerun(self):
-        self.execute_task('rerun')
+        self.execute_task('test_rerun')
         assert not self.task.find_entry('accepted', title='theshow s01e02'), 'accepted non-premiere'
