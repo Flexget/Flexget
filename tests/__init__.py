@@ -98,7 +98,7 @@ class FlexGetBase(object):
         """Set up test env"""
         setup_once()
         if self.__tmp__:
-            self.__tmp__ = util.maketemp() + os.sep
+            self.__tmp__ = util.maketemp() + '/'
             self.__yaml__ = self.__yaml__.replace("__tmp__", self.__tmp__)
         self.manager = MockManager(self.__yaml__, self.__class__.__name__, db_uri=self.database_uri)
 

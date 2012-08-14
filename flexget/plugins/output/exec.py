@@ -15,7 +15,11 @@ class EscapingDict(UserDict):
     def __getitem__(self, key):
         value = self.data[key]
         if isinstance(value, basestring):
-            value = re.escape(value)
+            # TODO: May need to be different depending on OS
+            value = value.replace('"', '\\"')
+            if not sys.platform.startswith('win'):
+                value = value.replace('\'', '\\\'')
+            #value = re.escape(value)
         return value
 
 

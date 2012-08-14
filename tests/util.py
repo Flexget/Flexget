@@ -72,7 +72,8 @@ def maketemp(name=None):
         # Colons are not valid characters in directories on Windows
         name = find_test_name().replace(':', '_')
 
-    tmp = os.path.join(tmp, name)
+    # Always use / instead of \ to avoid escaping issues
+    tmp = os.path.join(tmp, name).replace('\\', '/')
     log.trace("Creating empty tmpdir %r" % tmp)
     try:
         shutil.rmtree(tmp)

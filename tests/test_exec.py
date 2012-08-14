@@ -12,26 +12,27 @@ class TestExec(FlexGetBase):
           global:
             set:
               temp_dir: '__tmp__'
+            accept_all: yes
         tasks:
           replace_from_entry:
             mock:
               - {title: 'replace'}
               - {title: 'replace with spaces'}
             exec: python exec.py "%(temp_dir)s" "%(title)s"
-            accept_all: yes
           test_adv_format:
             mock:
               - {title: entry1, location: '/path/with spaces', quotefield: "with'quote"}
             exec:
-              on_download:
-                for_entries: python exec.py '%(temp_dir)s' '%(title)s' '%(location)s' '/the/final destinaton/'\
-                                                  "a %(quotefield)s" '/a hybrid %(location)s'
+              auto_escape: yes
+              on_output:
+                for_entries: python exec.py "%(temp_dir)s" "%(title)s" "%(location)s" "/the/final destinaton/" "a %(quotefield)s" "/a hybrid%(location)s"
           test_auto_escape:
             mock:
               - {title: entry2, quotes: single ' double", otherchars: '% a $a! ` *'}
             exec:
-              on_download:
-                for_entries: python exec.py '%(temp_dir)s' '%(title)s' %(quotes)s /start/%(quotes)s %(otherchars)s
+              auto_escape: yes
+              on_output:
+                for_entries: python exec.py "%(temp_dir)s" "%(title)s" "%(quotes)s" "/start/%(quotes)s" "%(otherchars)s"
     """
 
     def test_replace_from_entry(self):
@@ -45,13 +46,13 @@ class TestExec(FlexGetBase):
         for entry in self.task.accepted:
             with open(os.path.join(self.__tmp__, entry['title']), 'r') as infile:
                 line = infile.readline().rstrip('\n')
-                assert line == '/path/with spaces/thefile', '%s != /path/with spaces' % line
+                assert line == '/path/with spaces', '%s != /path/with spaces' % line
                 line = infile.readline().rstrip('\n')
-                assert line == '/the/final-destinaton/', '%s != /the/final destinaton/' % line
+                assert line == '/the/final destinaton/', '%s != /the/final destinaton/' % line
                 line = infile.readline().rstrip('\n')
-                assert line == 'a with"quote', '%s != a with"quote' % line
+                assert line == 'a with\'quote', '%s != a with\'quote' % line
                 line = infile.readline().rstrip('\n')
-                assert line == '/a hybrid /path/with spaces', '%s != /a hybrid /path/with spaces' % line
+                assert line == '/a hybrid/path/with spaces', '%s != /a hybrid/path/with spaces' % line
 
     def test_auto_escape(self):
         self.execute_task('test_auto_escape')
