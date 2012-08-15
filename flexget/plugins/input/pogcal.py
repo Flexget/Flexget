@@ -1,5 +1,5 @@
 import logging
-from BeautifulSoup import BeautifulSoup
+from bs4 import BeautifulSoup
 from flexget.utils import requests
 from flexget.entry import Entry
 from flexget import plugin
@@ -26,9 +26,9 @@ class InputPogDesign(object):
             page = requests.get('http://www.pogdesign.co.uk/cat/showselect.php', cookies=r.cookies)
         except requests.RequestException, e:
             raise plugin.PluginError('Error retrieving source: %s' % e)
-        soup = BeautifulSoup(page.text, convertEntities=BeautifulSoup.HTML_ENTITIES)
+        soup = BeautifulSoup(page.text)
         entries = []
-        for row in soup.findAll('label', {'class': 'label_check'}):
+        for row in soup.find_all('label', {'class': 'label_check'}):
             if row.find(attrs={'checked': 'checked'}):
                 t = row.text
                 if t.endswith('[The]'):
@@ -40,7 +40,7 @@ class InputPogDesign(object):
 
                 e = Entry()
                 e['title'] = t
-                url = row.findNext('a', {'class': 'selectsummary'})
+                url = row.find_next('a', {'class': 'selectsummary'})
                 e['url'] = 'http://www.pogdesign.co.uk' + url['href']
                 entries.append(e)
         return entries

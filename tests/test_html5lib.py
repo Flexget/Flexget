@@ -1,20 +1,17 @@
-import html5lib
-from html5lib import treebuilders
-from cStringIO import StringIO
+from flexget.utils.soup import get_soup
 
 class TestHtml5Lib():
 
     def test_parse_broken(self):
-        parser = html5lib.HTMLParser(tree=treebuilders.getTreeBuilder('beautifulsoup'))
-        s = StringIO("""<html>
+        s = """<html>
 <head><title>Foo</title>
 <body>
 <p class=foo><b>Some Text</b>
-<p><em>Some Other Text</em>""")
-        soup = parser.parse(s)
+<p><em>Some Other Text</em>"""
+        soup = get_soup(s)
 
         body = soup.find('body')
-        ps = body.findAll('p')
+        ps = body.find_all('p')
         assert ps[0].parent.name == 'body'
         assert ps[1].parent.name == 'body'
         b = soup.find('b')

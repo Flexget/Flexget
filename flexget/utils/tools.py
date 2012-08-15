@@ -56,9 +56,9 @@ class MergeException(Exception):
 
 def strip_html(text):
     """Tries to strip all HTML tags from *text*. If unsuccessful returns original text."""
-    from BeautifulSoup import BeautifulSoup
+    from bs4 import BeautifulSoup
     try:
-        text = ' '.join(BeautifulSoup(text).findAll(text=True))
+        text = ' '.join(BeautifulSoup(text).find_all(text=True))
         return ' '.join(text.split())
     except:
         return text

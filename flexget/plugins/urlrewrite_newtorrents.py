@@ -85,11 +85,11 @@ class NewTorrents:
         soup = get_soup(html)
         # saving torrents in dict
         torrents = []
-        for link in soup.findAll('a', attrs={'href': re.compile('down.php')}):
+        for link in soup.find_all('a', attrs={'href': re.compile('down.php')}):
             torrent_url = 'http://www.newtorrents.info%s' % link.get('href')
             release_name = link.parent.next.get('title')
             # quick dirty hack
-            seed = link.findNext('td', attrs={'class': re.compile('s')}).renderContents()
+            seed = link.find_next('td', attrs={'class': re.compile('s')}).renderContents()
             if seed == 'n/a':
                 seed = 0
             else:

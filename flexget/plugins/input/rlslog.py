@@ -1,7 +1,7 @@
 import logging
 import time
 from requests import RequestException
-from BeautifulSoup import NavigableString
+from bs4 import NavigableString
 from flexget.entry import Entry
 from flexget.plugin import register_plugin, internet, get_plugin_by_name, PluginError
 from flexget.utils.log import log_once
@@ -31,7 +31,7 @@ class RlsLog(object):
         soup = get_soup(task.requests.get(rlslog_url, timeout=25).content)
 
         releases = []
-        for entry in soup.findAll('div', attrs={'class': 'entry'}):
+        for entry in soup.find_all('div', attrs={'class': 'entry'}):
             release = {}
             h3 = entry.find('h3', attrs={'class': 'entrytitle'})
             if not h3:
@@ -45,11 +45,11 @@ class RlsLog(object):
 
             log.trace('Processing title %s' % (release['title']))
 
-            for link in entrybody.findAll('a'):
+            for link in entrybody.find_all('a'):
                 if not link.contents:
                     log.trace('link content empty, skipping')
                     continue
-                if not link.has_key('href'):
+                if not link.has_attr('href'):
                     log.trace('link %s missing href' % link)
                     continue
 

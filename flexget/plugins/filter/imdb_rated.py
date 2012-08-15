@@ -1,6 +1,6 @@
 import logging
 from flexget.plugin import register_plugin, PluginWarning, PluginError, get_plugin_by_name
-from BeautifulSoup import BeautifulSoup
+from bs4 import BeautifulSoup
 from flexget.manager import Base
 from sqlalchemy import Column, Integer, Float, String, DateTime
 import re
@@ -85,10 +85,10 @@ class FilterImdbRated(object):
         massage.append((re.compile('amazon-affiliates""'), lambda match: 'amazon-affiliates"'))
 
         data = urlopener(config['url'], log)
-        soup = BeautifulSoup(data, markupMassage=massage)
+        soup = BeautifulSoup(data)
 
         count = 0
-        for a_imdb_link in soup.findAll('a', attrs={'href': re.compile(r'/title/tt\d+')}):
+        for a_imdb_link in soup.find_all('a', attrs={'href': re.compile(r'/title/tt\d+')}):
             imdb_url = 'http://www.imdb.com%s' % a_imdb_link.get('href')
 
             if not task.session.query(ImdbRated).filter(ImdbRated.url == config['url']).\

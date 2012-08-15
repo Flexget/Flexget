@@ -3,7 +3,7 @@ from flexget.entry import Entry
 from flexget.plugin import *
 from flexget.utils.soup import get_soup
 from flexget.utils.cached_input import cached
-from BeautifulSoup import NavigableString
+from bs4 import NavigableString
 from flexget.utils.tools import urlopener
 
 log = logging.getLogger('scenereleases')
@@ -29,7 +29,7 @@ class InputScenereleases:
         soup = get_soup(page)
 
         releases = []
-        for entry in soup.findAll('div', attrs={'class': 'entry'}):
+        for entry in soup.find_all('div', attrs={'class': 'entry'}):
             release = {}
             title = entry.find('h2')
             if not title:
@@ -39,7 +39,7 @@ class InputScenereleases:
 
             log.debug('Processing title %s' % (release['title']))
 
-            for link in entry.findAll('a'):
+            for link in entry.find_all('a'):
                 # no content in the link
                 if not link.contents:
                     continue
@@ -49,7 +49,7 @@ class InputScenereleases:
                 if not isinstance(link_name, NavigableString):
                     continue
                 link_name = link_name.strip().lower()
-                if link.has_key('href'):
+                if link.has_attr('href'):
                     link_href = link['href']
                 else:
                     continue
@@ -90,7 +90,7 @@ class InputScenereleases:
             entry = Entry()
 
             def apply_field(d_from, d_to, f):
-                if d_from.has_key(f):
+                if d_from.has_attr(f):
                     if d_from[f] is None:
                         return # None values are not wanted!
                     d_to[f] = d_from[f]

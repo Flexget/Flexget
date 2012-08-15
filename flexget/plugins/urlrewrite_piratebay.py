@@ -80,7 +80,7 @@ class UrlRewritePirateBay(object):
         page = requests.get(url).content
         soup = get_soup(page)
         entries = []
-        for link in soup.findAll('a', attrs={'class': 'detLink'}):
+        for link in soup.find_all('a', attrs={'class': 'detLink'}):
             comparator.set_seq2(link.contents[0])
             log.debug('name: %s' % comparator.a)
             log.debug('found name: %s' % comparator.b)
@@ -90,13 +90,13 @@ class UrlRewritePirateBay(object):
             entry = Entry()
             entry['title'] = link.contents[0]
             entry['url'] = 'http://thepiratebay.se' + link.get('href')
-            tds = link.parent.parent.parent.findAll('td')
+            tds = link.parent.parent.parent.find_all('td')
             entry['torrent_seeds'] = int(tds[-2].contents[0])
             entry['torrent_leeches'] = int(tds[-1].contents[0])
             entry['search_ratio'] = comparator.ratio()
             entry['search_sort'] = torrent_availability(entry['torrent_seeds'], entry['torrent_leeches'])
             # Parse content_size
-            size = link.findNext(attrs={'class': 'detDesc'}).contents[0]
+            size = link.find_next(attrs={'class': 'detDesc'}).contents[0]
             size = re.search('Size ([\.\d]+)\xa0([GMK])iB', size)
             if size:
                 if size.group(2) == 'G':

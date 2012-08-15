@@ -48,13 +48,13 @@ class InputTVTorrents(object):
         hurl = hlines[17].strip().split("'")
         hashurl = hurl[1] + "%s" + hurl[3] + digest + hurl[5] + hash
 
-        for link in soup.findAll('a'):
+        for link in soup.find_all('a'):
             if not 'href' in link:
                 continue
             url = link['href']
             title = link.contents[0]
 
-            if link.has_key('onclick') and link['onclick'].find("loadTorrent") != -1:
+            if link.has_attr('onclick') and link['onclick'].find("loadTorrent") != -1:
                 infohash = link['onclick'].split("'")[1]
                 td = link.parent.parent.contents[4]
                 sname = td.contents[0].strip()

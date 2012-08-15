@@ -69,7 +69,7 @@ class AppleTrailers(InputRSS):
             page = urlopener(inc_url, log)
 
             soup = get_soup(page)
-            links = soup.findAll('a', attrs={'class': 'target-quicktimeplayer', 'href': re.compile(r'_h?480p\.mov$')})
+            links = soup.find_all('a', attrs={'class': 'target-quicktimeplayer', 'href': re.compile(r'_h?480p\.mov$')})
             for link in links:
                 url = link.get('href')
                 url = url[:url.rfind('_')]

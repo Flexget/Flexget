@@ -28,14 +28,14 @@ class UrlRewriteGoogleCse:
             req = urllib2.Request(entry['url'], None, txheaders)
             page = urlopener(req, log)
             soup = get_soup(page)
-            results = soup.findAll('a', attrs={'class': 'l'})
+            results = soup.find_all('a', attrs={'class': 'l'})
             if not results:
                 raise UrlRewritingError('No results')
             for res in results:
                 url = res.get('href')
                 url = url.replace('/interstitial?url=', '')
                 # generate match regexp from google search result title
-                regexp = '.*'.join([x.contents[0] for x in res.findAll('em')])
+                regexp = '.*'.join([x.contents[0] for x in res.find_all('em')])
                 if re.match(regexp, entry['title']):
                     log.debug('resolved, found with %s' % regexp)
                     entry['url'] = url

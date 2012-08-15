@@ -29,8 +29,6 @@ class TestDisableBuiltins(FlexGetBase):
     """
 
     def test_disable_builtins(self):
-        return
-
         self.execute_task('test')
         assert self.task.find_entry(title='dupe1') and self.task.find_entry(title='dupe2'), 'disable_builtins is not working?'
 
@@ -43,6 +41,7 @@ class TestInputHtml(FlexGetBase):
             html: http://download.flexget.com/
     """
 
+    @attr(online=True)
     def test_parsing(self):
         self.execute_task('test')
         assert self.task.entries, 'did not produce entries'

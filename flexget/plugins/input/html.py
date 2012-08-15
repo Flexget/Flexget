@@ -1,6 +1,6 @@
 import urlparse
 import logging
-import BeautifulSoup
+from bs4 import Tag
 import urllib
 import urllib2
 import zlib
@@ -93,7 +93,7 @@ class InputHtml(object):
     def _title_from_link(self, link, log_link):
         title = link.contents[0]
         # tag inside link
-        if isinstance(title, BeautifulSoup.Tag):
+        if isinstance(title, Tag):
             log.debug('link %s content is tag, cannot get title' % log_link)
             return None
         # longshot from next element (?)
@@ -121,9 +121,9 @@ class InputHtml(object):
                 if entry['title'] == title:
                     return True
 
-        for link in soup.findAll('a'):
+        for link in soup.find_all('a'):
             # not a valid link
-            if not link.has_key('href'):
+            if not link.has_attr('href'):
                 continue
             # no content in the link
             if not link.contents:
@@ -155,7 +155,7 @@ class InputHtml(object):
                 title = self._title_from_url(url)
                 log.debug('title from url: %s' % title)
             elif title_from == 'title':
-                if not link.has_key('title'):
+                if not link.has_attr('title'):
                     log.warning('Link `%s` doesn\'t have title attribute, ignored.' % log_link)
                     continue
                 title = link['title']

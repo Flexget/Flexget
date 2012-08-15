@@ -156,12 +156,12 @@ class ImdbSearch(object):
                 continue
             log.debug('processing section %s' % section)
             try:
-                section_table = section_tag.parent.parent.nextSibling
+                section_table = section_tag.find_next('table')
             except AttributeError:
                 log.debug('Section %s does not have a table?' % section)
                 continue
 
-            links = section_table.findAll('a', attrs={'href': re.compile(r'/title/tt')})
+            links = section_table.find_all('a', attrs={'href': re.compile(r'/title/tt')})
             if not links:
                 log.debug('section %s does not have links' % section)
             for count, link in enumerate(links):
@@ -170,7 +170,7 @@ class ImdbSearch(object):
                     continue
 
                 # skip links without text value, these are small pictures before title
-                if len(link.contents) == 1 and not isinstance(link.contents[0], NavigableString):
+                if len(link.contents) == 1 and not isinstance(link.contents[0], basestring):
                     continue
 
                 movie = {}
@@ -195,7 +195,7 @@ class ImdbSearch(object):
                     ratio = ratio * self.tv_weight
 
                 # check if some of the akas have better ratio
-                for aka in link.parent.findAll('p', attrs={'class': 'find-aka'}):
+                for aka in link.parent.find_all('p', attrs={'class': 'find-aka'}):
                     aka = aka.next.string
                     match = re.search(r'".*"', aka)
                     if not match:
@@ -320,13 +320,13 @@ class ImdbParser(object):
                 log.warning('Unable to get score for %s - plugin needs update?' % url)
 
         # get genres
-        for link in soup.findAll('a', attrs={'itemprop': 'genre'}):
+        for link in soup.find_all('a', attrs={'itemprop': 'genre'}):
             self.genres.append(unicode(link.contents[0].lower()))
 
         # get languages
-        for link in soup.findAll('a', attrs={'itemprop': 'inLanguage'}):
+        for link in soup.find_all('a', attrs={'itemprop': 'inLanguage'}):
             # skip non-primary languages "(a few words)", etc.
-            m = re.search('(?x) \( [^()]* \\b few \\b', unicode(link.nextSibling))
+            m = re.search('(?x) \( [^()]* \\b few \\b', unicode(link.next_sibling))
             if not m:
                 lang = unicode(link.contents[0].lower())
                 if not lang in self.languages:
@@ -350,7 +350,7 @@ class ImdbParser(object):
         # get main cast
         tag_cast = soup.find('table', 'cast_list')
         if tag_cast:
-            for actor in tag_cast.findAll('a', href=re.compile('/name/nm')):
+            for actor in tag_cast.find_all('a', href=re.compile('/name/nm')):
                 actor_id = extract_id(actor['href'])
                 actor_name = unicode(actor.contents[0])
                 # tag instead of name
@@ -361,7 +361,7 @@ class ImdbParser(object):
         # get director(s)
         h4_director = soup.find('h4', text=re.compile('Director'))
         if h4_director:
-            for director in h4_director.parent.parent.findAll('a', href=re.compile('/name/nm')):
+            for director in h4_director.parent.parent.find_all('a', href=re.compile('/name/nm')):
                 director_id = extract_id(director['href'])
                 director_name = unicode(director.contents[0])
                 # tag instead of name
@@ -377,7 +377,7 @@ class ImdbParser(object):
         # get plot
         h2_plot = soup.find('h2', text='Storyline')
         if h2_plot:
-            p_plot = h2_plot.findNext('p')
+            p_plot = h2_plot.find_next('p')
             if p_plot:
                 self.plot_outline = p_plot.next.string.strip()
                 log.debug('Detected plot outline: %s' % self.plot_outline)

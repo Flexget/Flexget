@@ -41,9 +41,9 @@ class UrlRewriteNewzleech(object):
 
         nzbs = []
 
-        for item in soup.findAll('table', attrs={'class': 'contentt'}):
+        for item in soup.find_all('table', attrs={'class': 'contentt'}):
             subject_tag = item.find('td', attrs={'class': 'subject'}).next
-            subject = ''.join(subject_tag.findAll(text=True))
+            subject = ''.join(subject_tag.find_all(text=True))
             complete = item.find('td', attrs={'class': 'complete'}).contents[0]
             size = item.find('td', attrs={'class': 'size'}).contents[0]
             nzb_url = 'http://newzleech.com/' + item.find('td', attrs={'class': 'get'}).next.get('href')
