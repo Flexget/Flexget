@@ -610,6 +610,9 @@ class Manager(object):
         """
         if (self.options.db_cleanup or not self.persist.get('last_cleanup') or
             self.persist['last_cleanup'] < datetime.now() - DB_CLEANUP_INTERVAL):
+            if not self.options.db_cleanup and not self.options.quiet:
+                log.verbose('Not running database cleanup on manual run. It will be run on next --cron run.')
+                return
             log.info('Running database cleanup.')
             session = Session()
             fire_event('manager.db_cleanup', session)

@@ -11,9 +11,6 @@ VACUUM_INTERVAL = timedelta(weeks=24) # 6 months
 # Run after the cleanup is actually finished, but before analyze
 @event('manager.db_cleanup', 1)
 def on_cleanup(session):
-    # Only run vacuum on --cron
-    if not manager.manager.options.quiet:
-        return
     # Vacuum can take a long time, and is not needed frequently
     persistence = SimplePersistence('db_vacuum')
     last_vacuum = persistence.get('last_vacuum')
