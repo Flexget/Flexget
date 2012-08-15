@@ -238,6 +238,9 @@ class InputRSS(object):
             # This is a file, open it
             content = open(config['url'], 'rb').read()
 
+        if not content:
+            log.error('No data recieved for rss feed.')
+            return
         try:
             rss = feedparser.parse(content)
         except LookupError, e:
