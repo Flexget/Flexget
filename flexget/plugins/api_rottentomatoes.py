@@ -8,6 +8,7 @@ from urllib2 import URLError
 from sqlalchemy import Table, Column, Integer, String, DateTime, func
 from sqlalchemy.schema import ForeignKey, Index
 from sqlalchemy.orm import relation
+from sqlalchemy import sql
 from sqlalchemy.exc import IntegrityError
 from flexget import schema
 from flexget.plugin import internet, PluginError
@@ -19,7 +20,7 @@ from flexget.utils.database import text_date_synonym
 from flexget.utils.sqlalchemy_utils import table_schema, table_add_column
 
 log = logging.getLogger('api_rottentomatoes')
-Base = schema.versioned_base('api_rottentomatoes', 1)
+Base = schema.versioned_base('api_rottentomatoes', 2)
 
 # This is developer Atlanta800's API key
 API_KEY = 'rh8chjzp8vu6gnpwj88736uv'
@@ -43,6 +44,10 @@ def upgrade(ver, session):
             session.execute(table.delete())
         table_add_column('rottentomatoes_actors', 'rt_id', String, session)
         ver = 1
+    if ver is 1:
+        table = table_schema('rottentomatoes_search_results', session)
+        session.execute(sql.delete(table, table.c.movie_id == None))
+        ver = 2
     return ver
 
 
@@ -222,7 +227,7 @@ class RottenTomatoesSearchResult(Base):
 
     id = Column(Integer, primary_key=True)
     search = Column(String, nullable=False)
-    movie_id = Column(Integer, ForeignKey('rottentomatoes_movies.id'), nullable=True)
+    movie_id = Column(Integer, ForeignKey('rottentomatoes_movies.id'), nullable=False)
     movie = relation(RottenTomatoesMovie, backref='search_strings')
 
     def __repr__(self):
@@ -288,9 +293,11 @@ def lookup_movie(title=None, year=None, rottentomatoes_id=None, imdb_id=None, sm
             movie_filter = movie_filter.filter(RottenTomatoesMovie.year == year)
         movie = movie_filter.first()
         if not movie:
+            log.debug('No matches in movie cache found, checking search cache.')
             found = session.query(RottenTomatoesSearchResult). \
                     filter(func.lower(RottenTomatoesSearchResult.search) == search_string).first()
             if found and found.movie:
+                log.debug('Movie found in search cache.')
                 movie = found.movie
     if movie:
         # Movie found in cache, check if cache has expired.
@@ -323,6 +330,7 @@ def lookup_movie(title=None, year=None, rottentomatoes_id=None, imdb_id=None, sm
                     if title and difflib.SequenceMatcher(lambda x: x == ' ', re.sub('\s+\(.*\)$', '', result['title'].lower()),
                             title.lower()).ratio() < MIN_MATCH:
                         mismatch.append('the title (%s <-?-> %s)' % (title, result['title']))
+                    result['year'] = int(result['year'])
                     if year and fabs(result['year'] - year) > 1:
                         mismatch.append('the year (%s <-?-> %s)' % (year, result['year']))
                         release_year = None
@@ -377,19 +385,21 @@ def lookup_movie(title=None, year=None, rottentomatoes_id=None, imdb_id=None, sm
                         # Remove all movies below MIN_MATCH, and different year
                         for movie_res in results[:]:
 
-                            if year and movie_res.get('year') and movie_res['year'] != year:
-                                release_year = False
-                                if movie_res.get('release_dates', {}).get('theater'):
-                                    log.debug('Checking year against theater release date')
-                                    release_year = time.strptime(movie_res['release_dates'].get('theater'), '%Y-%m-%d').tm_year
-                                elif movie_res.get('release_dates', {}).get('dvd'):
-                                    log.debug('Checking year against dvd release date')
-                                    release_year = time.strptime(movie_res['release_dates'].get('dvd'), '%Y-%m-%d').tm_year
-                                if not (release_year and release_year == year):
-                                    log.debug('removing %s - %s (wrong year: %s)' % (movie_res['title'],
-                                        movie_res['id'], str(release_year or movie_res['year'])))
-                                    results.remove(movie_res)
-                                    continue
+                            if year and movie_res.get('year'):
+                                movie_res['year'] = int(movie_res['year'])
+                                if movie_res['year'] != year:
+                                    release_year = False
+                                    if movie_res.get('release_dates', {}).get('theater'):
+                                        log.debug('Checking year against theater release date')
+                                        release_year = time.strptime(movie_res['release_dates'].get('theater'), '%Y-%m-%d').tm_year
+                                    elif movie_res.get('release_dates', {}).get('dvd'):
+                                        log.debug('Checking year against dvd release date')
+                                        release_year = time.strptime(movie_res['release_dates'].get('dvd'), '%Y-%m-%d').tm_year
+                                    if not (release_year and release_year == year):
+                                        log.debug('removing %s - %s (wrong year: %s)' % (movie_res['title'],
+                                            movie_res['id'], str(release_year or movie_res['year'])))
+                                        results.remove(movie_res)
+                                        continue
                             if movie_res['match'] < MIN_MATCH:
                                 log.debug('removing %s (min_match)' % movie_res['title'])
                                 results.remove(movie_res)
@@ -432,6 +442,7 @@ def lookup_movie(title=None, year=None, rottentomatoes_id=None, imdb_id=None, sm
                                 movie.alternate_ids.append(RottenTomatoesAlternateId('flexget_imdb',\
                                         imdb_id.lstrip('t')))
                             session.add(movie)
+                            session.commit()
                         except IntegrityError:
                             log.warning('Found movie %s in database after search even though we '
                                 'already looked, updating it with search result.' % movie)
@@ -445,6 +456,7 @@ def lookup_movie(title=None, year=None, rottentomatoes_id=None, imdb_id=None, sm
                                 movie.alternate_ids.append(RottenTomatoesAlternateId('flexget_imdb',\
                                         imdb_id.lstrip('t')))
                             session.merge(movie)
+                            session.commit()
 
                         if title.lower() != movie.title.lower():
                             log.debug('Saving search result for \'%s\'' % search_string)
@@ -587,6 +599,6 @@ def get_json(url):
     try:
         result = json.load(data)
     except ValueError:
-        log.warning('Rotten Tomatoes returned invalid json.')
+        log.warning('Rotten Tomatoes returned invalid json at: %s' % url)
         return
     return result
