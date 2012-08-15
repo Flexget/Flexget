@@ -60,7 +60,6 @@ class FilterProperMovies(object):
         root.accept('interval')
         return root
 
-    @priority(512)
     def on_task_filter(self, task, config):
         log.debug('check for enforcing')
 
