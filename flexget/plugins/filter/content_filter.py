@@ -37,6 +37,13 @@ class FilterContentFilter(object):
         return config
 
     def process_entry(self, task, entry):
+        """
+        Process an entry and reject it if it doesn't pass filter.
+
+        :param task: Task entry belongs to.
+        :param entry: Entry to process
+        :return: True, if entry was rejected.
+        """
         config = self.get_config(task)
         if 'content_files' in entry:
             files = entry['content_files']
@@ -56,11 +63,13 @@ class FilterContentFilter(object):
                 if not matching_mask(files, config['require']):
                     log.info('Entry %s does not have any of the required filetypes, rejecting' % entry['title'])
                     task.reject(entry, 'does not have any of the required filetypes', remember=True)
+                    return True
             if config.get('reject'):
                 mask = matching_mask(files, config['reject'])
                 if mask:
                     log.info('Entry %s has banned file %s, rejecting' % (entry['title'], mask))
                     task.reject(entry, 'has banned file %s' % mask, remember=True)
+                    return True
 
     def parse_torrent_files(self, entry):
         if 'torrent' in entry:
@@ -72,15 +81,17 @@ class FilterContentFilter(object):
     def on_task_modify(self, task):
         if task.manager.options.test or task.manager.options.learn:
             log.info('Plugin is partially disabled with --test and --learn because content filename information may not be available')
-            return
+            #return
 
         config = self.get_config(task)
         for entry in task.accepted:
             # TODO: I don't know if we can pares filenames from nzbs, just do torrents for now
             # possibly also do compressed files in the future
             self.parse_torrent_files(entry)
-            self.process_entry(task, entry)
-            if not 'content_files' in entry and config.get('strict'):
+            if self.process_entry(task, entry):
+                task.rerun()
+            elif not 'content_files' in entry and config.get('strict'):
                 task.reject(entry, 'no content files parsed for entry', remember=True)
+                task.rerun()
 
 register_plugin(FilterContentFilter, 'content_filter')
