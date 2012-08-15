@@ -32,6 +32,7 @@ class MovePlugin(object):
         config.accept('path', key='to', allow_replacement=True)
         config.accept('text', key='filename')
         config.accept('boolean', key='unpack_safety')
+        config.accept('boolean', key='allow_dir')
         #config.accept('list', key='move_with').accept('text') # TODO
         config.accept('number', key='clean_source')
         return root
@@ -51,8 +52,12 @@ class MovePlugin(object):
             if not os.path.exists(src):
                 log.warning('Cannot move `%s` because location `%s` does not exists (anymore)' % (entry['title'], src))
                 continue
-            if not os.path.isfile(src):
-                log.warning('Cannot move `%s` because location `%s` is not a file' % (entry['title'], src))
+            if os.path.isdir(src):
+                if not config.get('allow_dir'):
+                    log.warning('Cannot move `%s` because location `%s` is a directory' % (entry['title'], src))
+                    continue
+            elif not os.path.isfile(src):
+                log.warning('Cannot move `%s` because location `%s` is not a file ' % (entry['title'], src))
                 continue
 
             # DST
