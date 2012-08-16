@@ -2,6 +2,7 @@ import logging
 import copy
 import hashlib
 from functools import wraps
+import itertools
 from sqlalchemy import Column, Unicode, String, Integer
 from flexget import validator
 from flexget import schema
@@ -43,6 +44,83 @@ def useTaskLogging(func):
             logger.set_task('')
 
     return wrapper
+
+
+class EntryIterator(object):
+    """An iterator over a subset of entries to emulate old task.accepted/rejected/failed/entries properties."""
+
+    def __init__(self, entries, states):
+        self.all_entries = entries
+        if isinstance(states, basestring):
+            states = [states]
+        self.filter = lambda e: e._state in states
+
+    def __iter__(self):
+        return itertools.ifilter(self.filter, self.all_entries)
+
+    def __bool__(self):
+        return any(e for e in self)
+
+    def __len__(self):
+        return sum(1 for e in self)
+
+    def __add__(self, other):
+        return itertools.chain(self, other)
+
+    def __radd__(self, other):
+        return itertools.chain(other, self)
+
+    def __getitem__(self, item):
+        if not isinstance(item, int):
+            raise ValueError('Index must be integer.')
+        for index, entry in enumerate(self):
+            if index == item:
+                return entry
+        else:
+            raise IndexError('%d is out of bounds' % item)
+
+    def __getslice__(self, a, b):
+        return list(itertools.islice(self, a, b))
+
+    def reverse(self):
+        self.all_entries.sort(reverse=True)
+
+    def sort(self, *args, **kwargs):
+        self.all_entries.sort(*args, **kwargs)
+
+
+class EntryContainer(list):
+    """Container for a list of entries, also contains accepted, rejected failed iterators over them."""
+
+    def __init__(self, iterable=None, task=None):
+        list.__init__(self, iterable or [])
+        self.task = task
+        for entry in self:
+            entry.task = task
+
+        self._entries = EntryIterator(self, ['undecided', 'accepted'])
+        self._accepted = EntryIterator(self, 'accepted') # accepted entries, can still be rejected
+        self._rejected = EntryIterator(self, 'rejected') # rejected entries
+        self._failed = EntryIterator(self, 'failed')   # failed entries
+        self._undecided = EntryIterator(self, 'undecided') # undecided entries
+
+    # Make these read-only properties
+    entries = property(lambda self: self._entries)
+    accepted = property(lambda self: self._accepted)
+    rejected = property(lambda self: self._rejected)
+    failed = property(lambda self: self._failed)
+    undecided = property(lambda self: self._undecided)
+
+    def append(self, entry):
+        entry.task = self.task
+        list.append(self, entry)
+
+    def extend(self, iterable):
+        for entry in iterable:
+            self.append(entry)
+
+    def __repr__(self):
+        return '<EntryContainer(task=%s,%s)' % (self.task.name, list.__repr__(self))
 
 
 class Task(object):
@@ -88,7 +166,7 @@ class Task(object):
         # simple persistence
         self.simple_persistence = SimpleTaskPersistence(self)
 
-        # not to be reseted
+        # not to be reset
         self._rerun_count = 0
 
         # This should not be used until after process_start, when it is evaluated
@@ -96,6 +174,13 @@ class Task(object):
 
         # use reset to init variables when creating
         self._reset()
+
+    # Make these read-only properties
+    all_entries = property(lambda self: self._all_entries)
+    entries = property(lambda self: self.all_entries.entries)
+    accepted = property(lambda self: self.all_entries.accepted)
+    rejected = property(lambda self: self.all_entries.rejected)
+    failed = property(lambda self: self.all_entries.failed)
 
     @property
     def is_rerun(self):
@@ -110,13 +195,8 @@ class Task(object):
 
         self.requests = requests.Session()
 
-        # undecided entries in the task (created by input)
-        self.entries = []
-
-        # You should NOT change these arrays, use reject, accept and fail methods!
-        self.accepted = [] # accepted entries, can still be rejected
-        self.rejected = [] # rejected entries
-        self.failed = []   # failed entries
+        # List of all entries in the task
+        self._all_entries = EntryContainer(task=self)
 
         self.disabled_phases = []
 
@@ -150,33 +230,6 @@ class Task(object):
         """Iterate over undecided entries"""
         return (entry for entry in self.entries if not entry in self.accepted and entry not in self.rejected)
 
-    def purge(self):
-        """
-        Purges rejected and failed entries.
-        Failed entries will be removed from :attr:`entries`, :attr:`accepted` and :attr:`rejected`
-        Rejected entries will be removed from :attr:`entries` and :attr:`accepted`
-        """
-        self.__purge_failed()
-        self.__purge_rejected()
-
-    def __purge_failed(self):
-        """Purge failed entries from task."""
-        self.__purge(self.failed, self.entries)
-        self.__purge(self.failed, self.rejected)
-        self.__purge(self.failed, self.accepted)
-
-    def __purge_rejected(self):
-        """Purge rejected entries from task."""
-        self.__purge(self.rejected, self.entries)
-        self.__purge(self.rejected, self.accepted)
-
-    def __purge(self, purge_what, purge_from):
-        """Purge entries in list from task.entries"""
-        # TODO: there is probably more efficient way to do this now that I got rid of __count
-        for entry in purge_what:
-            if entry in purge_from:
-                purge_from.remove(entry)
-
     def disable_phase(self, phase):
         """Disable ``phase`` from execution.
 
@@ -203,12 +256,7 @@ class Task(object):
         """
         if not isinstance(entry, Entry):
             raise Exception('Trying to accept non entry, %r' % entry)
-        if entry in self.rejected:
-            log.debug('tried to accept rejected %r' % entry)
-        if entry not in self.accepted and entry not in self.rejected:
-            self.accepted.append(entry)
-            # Run on_entry_accept phase
-            self.__run_entry_phase('accept', entry, reason=reason, **kwargs)
+        entry.accept(reason=reason, **kwargs)
 
     def reject(self, entry, reason=None, **kwargs):
         """
@@ -221,19 +269,7 @@ class Task(object):
         """
         if not isinstance(entry, Entry):
             raise Exception('Trying to reject non entry, %r' % entry)
-        # ignore rejections on immortal entries
-        if entry.get('immortal'):
-            reason_str = '(%s)' % reason if reason else ''
-            log.info('Tried to reject immortal %s %s' % (entry['title'], reason_str))
-            self.trace(entry, 'Tried to reject immortal %s' % reason_str)
-            return
-
-        if not entry in self.rejected:
-            # Leave failed entries in the failed state
-            if entry not in self.failed:
-                self.rejected.append(entry)
-            # Run on_entry_reject phase
-            self.__run_entry_phase('reject', entry, reason=reason, **kwargs)
+        entry.reject(reason=reason, **kwargs)
 
     def fail(self, entry, reason=None, **kwargs):
         """
@@ -244,12 +280,9 @@ class Task(object):
         :param string reason: Optional reason
         :param kwargs: Optional kwargs will be passed to plugins hooking action
         """
-        log.debug('Marking entry \'%s\' as failed' % entry['title'])
-        if not entry in self.failed:
-            self.failed.append(entry)
-            log.error('Failed %s (%s)' % (entry['title'], reason))
-            # Run on_entry_fail phase
-            self.__run_entry_phase('fail', entry, reason=reason, **kwargs)
+        if not isinstance(entry, Entry):
+            raise Exception('Trying to fail non entry, %r' % entry)
+        entry.fail(reason=reason, **kwargs)
 
     def trace(self, entry, message):
         """Add tracing message to entry.
@@ -282,8 +315,8 @@ class Task(object):
         :return: Entry or None
         """
         cat = getattr(self, category)
-        if not isinstance(cat, list):
-            raise TypeError('category must be a list')
+        if not isinstance(cat, EntryIterator):
+            raise TypeError('category must be a EntryIterator')
         for entry in cat:
             for k, v in values.iteritems():
                 if not (k in entry and entry[k] == v):
@@ -349,9 +382,7 @@ class Task(object):
                 response = self.__run_plugin(plugin, phase, args)
                 if phase == 'input' and response:
                     # add entries returned by input to self.entries
-                    self.entries.extend(response)
-                # purge entries between plugins
-                self.purge()
+                    self.all_entries.extend(response)
             finally:
                 fire_event('task.execute.after_plugin', self, plugin.name)
 
@@ -359,7 +390,7 @@ class Task(object):
             if self._abort and phase != 'abort':
                 return
 
-    def __run_entry_phase(self, phase, entry, **kwargs):
+    def _run_entry_phase(self, phase, entry, **kwargs):
         # TODO: entry events are not very elegant, refactor into real (new) events or something ...
         if phase not in ['accept', 'reject', 'fail']:
             raise Exception('Not a valid entry phase')
@@ -459,7 +490,7 @@ class Task(object):
         if entries:
             # If entries are passed for this execution (eg. rerun), disable the input phase
             self.disable_phase('input')
-            self.entries.extend(entries)
+            self.all_entries.extend(entries)
 
         # validate configuration
         errors = self.validate()

@@ -68,6 +68,8 @@ class Entry(dict):
     def __init__(self, *args, **kwargs):
         self.trace = []
         self.snapshots = {}
+        self._state = 'undecided'
+        self.task = None
 
         if len(args) == 2:
             kwargs['title'] = args[0]
@@ -76,6 +78,50 @@ class Entry(dict):
 
         # Make sure constructor does not escape our __setitem__ enforcement
         self.update(*args, **kwargs)
+
+    def accept(self, reason=None, **kwargs):
+        if self.rejected:
+            log.debug('tried to accept rejected %r' % self)
+        elif not self.accepted:
+            self._state = 'accepted'
+            # Run on_entry_accept phase
+            self.task._run_entry_phase('accept', self, reason=reason, **kwargs)
+
+    def reject(self, reason=None, **kwargs):
+        # ignore rejections on immortal entries
+        if self.get('immortal'):
+            reason_str = '(%s)' % reason if reason else ''
+            log.info('Tried to reject immortal %s %s' % (self['title'], reason_str))
+            self.task.trace(self, 'Tried to reject immortal %s' % reason_str)
+            return
+        if not self.rejected:
+            self._state = 'rejected'
+            # Run on_entry_reject phase
+            self.task._run_entry_phase('reject', self, reason=reason, **kwargs)
+
+    def fail(self, reason=None, **kwargs):
+        log.debug('Marking entry \'%s\' as failed' % self['title'])
+        if not self.failed:
+            self._state = 'failed'
+            log.error('Failed %s (%s)' % (self['title'], reason))
+            # Run on_entry_fail phase
+            self.task._run_entry_phase('fail', self, reason=reason, **kwargs)
+
+    @property
+    def accepted(self):
+        return self._state == 'accepted'
+
+    @property
+    def rejected(self):
+        return self._state == 'rejected'
+
+    @property
+    def failed(self):
+        return self._state == 'failed'
+
+    @property
+    def undecided(self):
+        return self._state == 'undecided'
 
     def __setitem__(self, key, value):
         # Enforce unicode compatibility. Check for all subclasses of basestring, so that NavigableStrings are also cast
@@ -277,3 +323,6 @@ class Entry(dict):
 
     def __eq__(self, other):
         return self.get('title') == other.get('title') and self.get('url') == other.get('url')
+
+    def __repr__(self):
+        return '<Entry(title=%s,state=%s,task=%s)>' % (self['title'], self._state, self.task.name)

@@ -90,7 +90,7 @@ class FilterDelay(object):
                 task.session.add(delay_entry)
 
         # Clear the current entries from the task now that they are stored
-        task.entries = []
+        task.all_entries[:] = []
 
         # Generate the list of entries whose delay has passed
         passed_delay = task.session.query(DelayedEntry).\

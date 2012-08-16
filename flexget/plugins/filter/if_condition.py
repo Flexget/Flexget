@@ -114,8 +114,8 @@ class FilterIf(object):
                         # Other plugins were specified to run on this entry
                         fake_task = Task(task.manager, task.name, task.config)
                         fake_task.session = task.session
-                        fake_task.entries = passed_entries
-                        fake_task.accepted = [e for e in task.accepted if self.check_condition(requirement, e)]
+                        # This entry still belongs to our feed, accept/reject etc. will carry through.
+                        fake_task.all_entries[:] = passed_entries
 
                         try:
                             for plugin_name, plugin_config in action.iteritems():
@@ -124,15 +124,6 @@ class FilterIf(object):
                                 method(fake_task, plugin_config)
                         except Exception:
                             raise
-                        else:
-                            # Populate changes from the fake task to the real one
-                            for e in fake_task.accepted:
-                                task.accept(e, e.get('reason'))
-                            for e in fake_task.rejected:
-                                task.reject(e, e.get('reason'))
-                            for e in fake_task.failed:
-                                task.fail(e, e.get('reason'))
-                task.purge()
 
         handle_phase.priority = 80
         return handle_phase
