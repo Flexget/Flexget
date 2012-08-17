@@ -563,11 +563,12 @@ class Task(object):
                 self.execute(disable_phases=disable_phases, entries=entries)
 
         # Clean up entries after the task has executed to reduce ram usage, #1652
-        if not self.manager.unit_test:
+        # TODO: This doesn't work with unified entries, not sure best replacement
+        """if not self.manager.unit_test:
             log.debug('Clearing all entries from task.')
             self.entries = []
             self.rejected = []
-            self.failed = []
+            self.failed = []"""
 
     def _process_start(self):
         """Execute process_start phase"""
