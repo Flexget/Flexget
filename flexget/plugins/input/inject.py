@@ -75,7 +75,7 @@ class InputInject(object):
         if entry.get('immortal'):
             log.debug('Injected entry is immortal')
 
-        task.entries.append(entry)
+        task.all_entries.append(entry)
 
         if options.get('accept', False):
             log.debug('accepting the injection')
