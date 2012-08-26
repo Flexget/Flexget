@@ -325,4 +325,5 @@ class Entry(dict):
         return self.get('title') == other.get('title') and self.get('url') == other.get('url')
 
     def __repr__(self):
-        return '<Entry(title=%s,state=%s,task=%s)>' % (self['title'], self._state, self.task.name)
+        task_name = self.task.name if self.task else 'None'
+        return '<Entry(title=%s,state=%s,task=%s)>' % (self['title'], self._state, task_name)
