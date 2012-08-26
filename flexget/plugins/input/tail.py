@@ -84,13 +84,13 @@ class InputTail(object):
             entry[k] = v % entry
 
     @cached('tail')
-    def on_task_input(self, task):
+    def on_task_input(self, task, config):
 
         # Let details plugin know that it is ok if this task doesn't produce any entries
         task.no_entries_ok = True
 
-        filename = os.path.expanduser(task.config['tail']['file'])
-        encoding = task.config['tail'].get('encoding', None)
+        filename = os.path.expanduser(config['file'])
+        encoding = config.get('encoding', None)
         file = open(filename, 'r')
 
         last_pos = task.simple_persistence.setdefault(filename, 0)
@@ -102,11 +102,12 @@ class InputTail(object):
 
         log.debug('continuing from last position %s' % last_pos)
 
-        entry_config = task.config['tail'].get('entry')
-        format_config = task.config['tail'].get('format', {})
+        entry_config = config.get('entry')
+        format_config = config.get('format', {})
 
         # keep track what fields have been found
         used = {}
+        entries = []
         entry = Entry()
 
         # now parse text
@@ -133,7 +134,7 @@ class InputTail(object):
                             log.info('Found field %s again before entry was completed. \
                                       Adding current incomplete, but valid entry and moving to next.' % field)
                             self.format_entry(entry, format_config)
-                            task.entries.append(entry)
+                            entries.append(entry)
                         else:
                             log.info('Invalid data, entry field %s is already found once. Ignoring entry.' % field)
                         # start new entry
@@ -152,13 +153,14 @@ class InputTail(object):
                         log.info('Invalid data, constructed entry is missing mandatory fields (title or url)')
                     else:
                         self.format_entry(entry, format_config)
-                        task.entries.append(entry)
+                        entries.append(entry)
                         log.debug('Added entry %s' % entry)
                         # start new entry
                         entry = Entry()
                         used = {}
+        return entries
 
-register_plugin(InputTail, 'tail')
+register_plugin(InputTail, 'tail', api_ver=2)
 register_plugin(ResetTail, '--tail-reset', builtin=True)
 register_parser_option('--tail-reset', action='store', dest='tail_reset', default=False, metavar='FILE',
     help='Reset tail position for a file.')
