@@ -7,12 +7,39 @@ from flexget.plugin import register_plugin, internet, PluginWarning
 from flexget.utils import requests
 from flexget.utils.soup import get_soup
 from flexget.utils.search import torrent_availability, StringComparator
+from flexget import validator
 
 log = logging.getLogger('piratebay')
 
+CATEGORIES = {
+    'all': 0,
+    'audio': 100,
+    'music': 101,
+    'video': 200,
+    'movies': 201,
+    'tv': 205,
+    'highres movies': 207
+}
+
+SORT = {
+    'default': 99, # This is piratebay default, not flexget default.
+    'date': 3,
+    'size': 5,
+    'seeds': 7,
+    'leechers': 9
+}
 
 class UrlRewritePirateBay(object):
     """PirateBay urlrewriter."""
+
+    def validator(self):
+        root = validator.factory()
+        root.accept('boolean')
+        advanced = root.accept('dict')
+        advanced.accept('choice', key='category').accept_choices(CATEGORIES)
+        advanced.accept('choice', key='sort_by').accept_choices(SORT)
+        advanced.accept('boolean', key='sort_reverse')
+        return root
 
     # urlrewriter API
     def url_rewritable(self, task, entry):
@@ -35,7 +62,7 @@ class UrlRewritePirateBay(object):
         if entry['url'].startswith(('http://thepiratebay.se/search/', 'http://thepiratebay.org/search/')):
             # use search
             try:
-                entry['url'] = self.search_title(entry['title'])[0]['url']
+                entry['url'] = self.search(entry['title'])[0]['url']
             except PluginWarning, e:
                 raise UrlRewritingError(e)
         else:
@@ -59,23 +86,23 @@ class UrlRewritePirateBay(object):
         except Exception, e:
             raise UrlRewritingError(e)
 
-    # search API
-    def search(self, query, comparator, config=None):
-        entries = self.search_title(query, comparator)
-        log.debug('search got %d results' % len(entries))
-        return entries
-
     @internet(log)
-    def search_title(self, name, comparator=StringComparator()):
+    def search(self, query, comparator=StringComparator(), config=None):
         """
-            Search for name from piratebay.
-            If optional search :url: is passed it will be used instead of internal search.
+        Search for name from piratebay.
         """
+        if not isinstance(config, dict):
+            config = {}
+        sort = SORT.get(config.get('sort_by', 'seeds'))
+        if config.get('sort_reverse'):
+            sort += 1
+        category = CATEGORIES.get(config.get('category', 'all'))
+        filter_url = '/0/%d/%d' % (sort, category)
 
-        comparator.set_seq1(name)
-        name = comparator.search_string()
+        comparator.set_seq1(query)
+        query = comparator.search_string()
         # urllib.quote will crash if the unicode string has non ascii characters, so encode in utf-8 beforehand
-        url = 'http://thepiratebay.se/search/' + urllib.quote(name.encode('utf-8')) + '/0/7/0'
+        url = 'http://thepiratebay.se/search/' + urllib.quote(query.encode('utf-8')) + filter_url
         log.debug('Using %s as piratebay search url' % url)
         page = requests.get(url).content
         soup = get_soup(page)
@@ -108,11 +135,11 @@ class UrlRewritePirateBay(object):
             entries.append(entry)
 
         if not entries:
-            dashindex = name.rfind('-')
+            dashindex = query.rfind('-')
             if dashindex != -1:
-                return self.search_title(name[:dashindex], comparator=comparator)
+                return self.search(query[:dashindex], comparator=comparator)
             else:
-                raise PluginWarning('No close matches for %s' % name, log, log_once=True)
+                raise PluginWarning('No close matches for %s' % query, log, log_once=True)
 
         entries.sort(reverse=True, key=lambda x: x.get('search_sort'))
 
