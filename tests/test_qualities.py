@@ -59,6 +59,8 @@ class TestQualityParser(object):
                  ('Test.File.1080p.hdtv.avi', '1080p hdtv'),
                  ('Test.File.720p.preair.avi', '720p preair'),
                  ('Test.File.ts.dvdrip.avi', 'ts'),
+                 ('Test.File.HDTS.blah', 'ts'),
+                 ('Test.File.HDCAM.bluray.lie', 'cam'),
 
                  # Test qualities as part of words. #1593
                  ('Tsar.File.720p', '720p'),

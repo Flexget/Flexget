@@ -124,8 +124,8 @@ _resolutions = [
 ]
 _sources = [
     QualityComponent('source', 10, 'workprint', modifier=-8),
-    QualityComponent('source', 20, 'cam', modifier=-7),
-    QualityComponent('source', 30, 'ts', 'ts|telesync', modifier=-6),
+    QualityComponent('source', 20, 'cam', '(?:hd)?cam', modifier=-7),
+    QualityComponent('source', 30, 'ts', '(?:hd)?ts|telesync', modifier=-6),
     QualityComponent('source', 40, 'tc', 'tc|telecine', modifier=-5),
     QualityComponent('source', 50, 'r5', 'r[2-8c]', modifier=-4),
     QualityComponent('source', 60, 'hdrip', 'hd[\W_]?rip', modifier=-3),
