@@ -754,7 +754,7 @@ class OutputDeluge(DelugePlugin):
 
         # Schedule a disconnect to happen if FlexGet hangs while connected to Deluge
         # Leave the timeout long, to give time for possible lookups to occur
-        reactor.callLater(60, lambda: tasks.called or on_timeout(tasks))
+        reactor.callLater(120, lambda: tasks.called or on_timeout(tasks))
 
     def on_task_exit(self, task, config):
         """Make sure all temp files are cleaned up when task exits"""
