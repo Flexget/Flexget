@@ -18,7 +18,8 @@ CATEGORIES = {
     'video': 200,
     'movies': 201,
     'tv': 205,
-    'highres movies': 207
+    'highres movies': 207,
+    'comics': 602
 }
 
 SORT = {
@@ -37,6 +38,7 @@ class UrlRewritePirateBay(object):
         root.accept('boolean')
         advanced = root.accept('dict')
         advanced.accept('choice', key='category').accept_choices(CATEGORIES)
+        advanced.accept('integer', key='category')
         advanced.accept('choice', key='sort_by').accept_choices(SORT)
         advanced.accept('boolean', key='sort_reverse')
         return root
@@ -93,10 +95,13 @@ class UrlRewritePirateBay(object):
         """
         if not isinstance(config, dict):
             config = {}
-        sort = SORT.get(config.get('sort_by', 'seeds'))
+        sort = SORT.get(config.get('sort_by', 'seeders'))
         if config.get('sort_reverse'):
             sort += 1
-        category = CATEGORIES.get(config.get('category', 'all'))
+        if isinstance(config.get('category'), int):
+            category = config['category']
+        else:
+            category = CATEGORIES.get(config.get('category', 'all'))
         filter_url = '/0/%d/%d' % (sort, category)
 
         comparator.set_seq1(query)
