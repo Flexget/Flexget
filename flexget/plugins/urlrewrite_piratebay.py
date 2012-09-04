@@ -95,7 +95,7 @@ class UrlRewritePirateBay(object):
         """
         if not isinstance(config, dict):
             config = {}
-        sort = SORT.get(config.get('sort_by', 'seeders'))
+        sort = SORT.get(config.get('sort_by', 'seeds'))
         if config.get('sort_reverse'):
             sort += 1
         if isinstance(config.get('category'), int):
