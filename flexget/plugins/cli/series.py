@@ -162,8 +162,8 @@ class SeriesReport(SeriesDatabase):
             print new_ep + formatting[1:] % (series_name, episode_id, age if age else '', status)
 
         print '-' * 79
-        print ' [] = downloaded | > = new episode %s' % \
-              '| %i series unseen past 6 months hidden' % hidden if hidden else ''
+        print (' [] = downloaded | > = new episode ' +
+              ('| %i series unseen past 6 months hidden' % hidden if hidden else ''))
         print ' Use --series NAME to get detailed information'
 
 
