@@ -369,19 +369,15 @@ def clean_compiled():
 
 
 @task
-def pep8():
+@consume_args
+def pep8(args):
     try:
         import pep8
     except:
         print 'Run bin/paver install_tools'
         return
-    pep8.options, pep8.args = pep8.process_options(['--show-source', '--ignore', 'E501,W291,W293,W601,E261', ''])
-    pep8.options.repeat = 1
 
-    for root, dirs, files in os.walk('flexget'):
-        for name in files:
-            if name[-2:] == 'py':
-                fn = os.path.join(root, name)
-                checker = pep8.Checker(fn)
-                checker.check_all()
+    styleguide = pep8.StyleGuide(show_source=True, ignore=['W291', 'W293', 'E261'], repeat=1, max_line_length=120,
+        parse_argv=args)
+    styleguide.input_dir('flexget')
 
