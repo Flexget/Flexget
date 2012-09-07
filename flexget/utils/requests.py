@@ -44,25 +44,6 @@ def set_unresponsive(url):
     unresponsive_hosts[host] = datetime.now()
 
 
-def cookies_for_url(url, cookiejar):
-    """
-    Returns a dict containing the cookies from `cookiejar` that apply to given `url`.
-
-    :param str url: The url that cookies should apply to.
-    :param CookieJar cookiejar: The CookieJar instance to get cookies from.
-    :return: A dict with cookies that apply to given url.
-    :rtype: dict
-    """
-
-    result = {}
-    req = urllib2.Request(url)
-    # The policy _now attribute must be set to prevent the _cookies_for_request from crashing.
-    cookiejar._policy._now = int(time.time())
-    for cookie in cookiejar._cookies_for_request(req):
-        result[cookie.name] = cookie.value
-    return result
-
-
 class Session(requests.Session):
     """Subclass of requests Session class which defines some of our own defaults, records unresponsive sites,
     and raises errors by default."""
@@ -81,16 +62,12 @@ class Session(requests.Session):
 
     def add_cookiejar(self, cookiejar):
         """
-        Add a CookieJar whose cookies will apply to this session. If the session already has a cookiejar set,
-        the cookies will be merged together.
+        Merges cookies from `cookiejar` into cookiejar for this session.
 
         :param cookiejar: CookieJar instance to add to the session.
         """
-        if not self.cookiejar:
-            self.cookiejar = cookiejar
-        else:
-            for cookie in cookiejar:
-                self.cookiejar.set_cookie(cookie)
+        for cookie in cookiejar:
+            self.cookies.set_cookie(cookie)
 
     def set_domain_delay(self, domain, delay):
         """
@@ -143,19 +120,6 @@ class Session(requests.Session):
         config = kwargs.pop('config', {})
         config['danger_mode'] = kwargs.pop('raise_status', True)
         kwargs['config'] = config
-        cookiejar = kwargs.pop('cookiejar', None)
-
-        # Construct a dict with all cookies that apply to this request
-        all_cookies = {}
-        if self.cookiejar:
-            all_cookies.update(cookies_for_url(url, self.cookiejar))
-        if self.cookies:
-            all_cookies.update(self.cookies)
-        if cookiejar:
-            all_cookies.update(cookies_for_url(url, cookiejar))
-        if kwargs.get('cookies'):
-            all_cookies.update(kwargs['cookies'])
-        kwargs['cookies'] = all_cookies
 
         try:
             result = requests.Session.request(self, method, url, *args, **kwargs)

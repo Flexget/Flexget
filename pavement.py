@@ -18,14 +18,8 @@ sys.path.insert(0, '')
 options = environment.options
 install_requires = ['FeedParser>=5.1.2', 'SQLAlchemy >=0.7, <0.8', 'PyYAML', 'BeautifulSoup>=3.2, <3.3',
                     'beautifulsoup4>=4.1, <4.2', 'html5lib>=0.11', 'PyRSS2Gen', 'pynzb', 'progressbar', 'jinja2',
-                    'flask', 'cherrypy']
-if sys.version_info < (2, 6):
-    install_requires.append('requests==0.10.0')
-    install_requires.append('python-dateutil<2.0') # dateutil 2.0 is python 3 only
-else:
-    install_requires.append('requests>=0.10, !=0.10.1, <0.11') #URL quoting bug in 0.10.1
-    install_requires.append('python-dateutil!=2.0') # dateutil 2.1 started supporting python 2.6+ again
-if sys.version_info < (2,7):
+                    'flask', 'cherrypy', 'requests>=0.14, <0.15', 'python-dateutil!=2.0']
+if sys.version_info < (2, 7):
     # argparse is part of the standard library in python 2.7+
     install_requires.append('argparse')
 
