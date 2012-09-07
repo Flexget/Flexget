@@ -4,7 +4,6 @@ import logging
 from flexget.entry import Entry
 from flexget import plugin
 from flexget.utils.cached_input import cached
-from flexget.utils.tools import urlopener
 
 log = logging.getLogger('text')
 
@@ -57,7 +56,7 @@ class Text(plugin.Plugin):
     @plugin.internet(log)
     def on_task_input(self, task, config):
         url = config['url']
-        content = urlopener(url, log)
+        request = task.requests.get(url)
 
         entry_config = config.get('entry')
         format_config = config.get('format', {})
@@ -68,7 +67,7 @@ class Text(plugin.Plugin):
         entry = Entry()
 
         # now parse text
-        for line in content:
+        for line in request.iter_lines():
             for field, regexp in entry_config.iteritems():
                 #log.debug('search field: %s regexp: %s' % (field, regexp))
                 match = re.search(regexp, line)
