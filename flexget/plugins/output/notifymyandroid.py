@@ -51,8 +51,12 @@ class OutputNotifyMyAndroid(object):
                 continue
 
             apikey = entry.get('apikey', config['apikey'])
-            application = entry.get('application', config['application'])
             priority = entry.get('priority', config['priority'])
+            application = entry.get('application', config['application'])
+            try:
+                application = entry.render(application)
+            except RenderError, e:
+                log.error('Error setting nma application: %s' % e)
             event = entry.get('event', config['event'])
             try:
                 event = entry.render(event)
