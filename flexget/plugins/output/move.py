@@ -133,7 +133,7 @@ class MovePlugin(object):
             else:
                 log.info('Moving `%s` to `%s`' % (src, dst))
                 shutil.move(src, dst)
-                entry['output'] = dst
+            entry['output'] = dst
             if 'clean_source' in config:
                 if not os.path.isdir(src):
                     base_path = os.path.split(src)[0]
