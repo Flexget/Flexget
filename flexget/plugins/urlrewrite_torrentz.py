@@ -5,14 +5,25 @@ import feedparser
 from flexget.plugin import register_plugin, PluginWarning
 from flexget.entry import Entry
 from flexget.utils.search import torrent_availability, StringComparator
+from flexget import validator
 
 log = logging.getLogger('torrentz')
 
 REGEXP = re.compile(r'http://torrentz\.eu/(?P<hash>[a-f0-9]{40})')
-
+REPUTATIONS = { # Maps reputation name to feed address
+    'any': 'feed_any',
+    'low': 'feed_low',
+    'good': 'feed',
+    'verified': 'feed_verified'
+}
 
 class UrlRewriteTorrentz(object):
     """Torrentz urlrewriter."""
+
+    def validator(self):
+        root = validator.factory('choice')
+        root.accept_choices(REPUTATIONS)
+        return root
 
     def url_rewritable(self, task, entry):
         return REGEXP.match(entry['url'])
@@ -21,16 +32,15 @@ class UrlRewriteTorrentz(object):
         hash = REGEXP.match(entry['url']).group(1)
         entry['url'] = 'http://zoink.it/torrent/%s.torrent' % hash.upper()
 
-    def search(self, query, comparator, config=None):
-        entries = self.search_title(query, comparator)
-        log.debug('Search got %d results' % len(entries))
-        return entries
-
-    def search_title(self, name, comparator=StringComparator()):
+    def search(self, query, comparator=StringComparator(), config=None):
+        if config:
+            feed = REPUTATIONS[config]
+        else:
+            feed = REPUTATIONS['good']
         # urllib.quote will crash if the unicode string has non ascii characters, so encode in utf-8 beforehand
-        comparator.set_seq1(name)
-        name = comparator.search_string()
-        url = 'http://torrentz.eu/feed?q=%s' % urllib.quote(name.encode('utf-8'))
+        comparator.set_seq1(query)
+        query = comparator.search_string()
+        url = 'http://torrentz.eu/%s?q=%s' % (feed, urllib.quote(query.encode('utf-8')))
         log.debug('requesting: %s' % url)
         rss = feedparser.parse(url)
         entries = []
@@ -69,10 +79,10 @@ class UrlRewriteTorrentz(object):
 
         # choose torrent
         if not entries:
-            raise PluginWarning('No close matches for %s' % name, log, log_once=True)
+            raise PluginWarning('No close matches for %s' % query, log, log_once=True)
 
         entries.sort(reverse=True, key=lambda x: x.get('search_sort'))
-
+        log.debug('Search got %d results' % len(entries))
         return entries
 
 register_plugin(UrlRewriteTorrentz, 'torrentz', groups=['urlrewriter', 'search'])
