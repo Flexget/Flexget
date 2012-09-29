@@ -252,7 +252,7 @@ class PluginDownload(object):
         datafile = os.path.join(tmp_dir, fname)
         outfile = open(datafile, 'wb')
         try:
-            for chunk in response.iter_content(decode_unicode=False):
+            for chunk in response.iter_content(chunk_size=20 * 1024, decode_unicode=False):
                 outfile.write(chunk)
         except:
             # don't leave futile files behind
