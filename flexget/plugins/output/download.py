@@ -233,6 +233,7 @@ class PluginDownload(object):
 
         response = task.requests.get(url, auth=auth, raise_status=False)
         if response.status_code != 200:
+            log.debug('Got %s response from server. Saving error page.' % response.status_code)
             # Save the error page
             if response.content:
                 self.save_error_page(entry, task, response.content)
