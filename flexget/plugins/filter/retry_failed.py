@@ -200,8 +200,9 @@ class FilterRetryFailed(object):
             if self.backlog:
                 self.backlog.add_backlog(task, entry, amount=retry_time)
             if retry_time:
+                fail_reason = item.reason if item else entry.get('reason', 'unknown')
                 task.reject(entry, reason='Waiting before trying failed entry again. (failure reason: %s)' %
-                                          item.reason, remember_time=retry_time)
+                                          fail_reason, remember_time=retry_time)
                 # Cause a task rerun, to look for alternate releases
                 task.rerun()
 
