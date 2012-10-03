@@ -952,10 +952,12 @@ class TestIdioticNumbering(FlexGetBase):
         assert entry['series_episode'] == 2, 'episode not detected'
 
 
-class TestCapitalization(FlexGetBase):
+class TestNormalization(FlexGetBase):
 
     __yaml__ = """
         tasks:
+          global:
+            disable_builtins: [seen]
           test_1:
             mock:
               - {title: 'FooBar.S01E01.PDTV-FlexGet'}
@@ -963,9 +965,19 @@ class TestCapitalization(FlexGetBase):
               - FOOBAR
           test_2:
             mock:
-              - {title: 'FooBar.S01E01.PDTV-FlexGet'}
+              - {title: 'FooBar.S01E01.PDTV-aoeu'}
             series:
               - foobar
+          test_3:
+            mock:
+              - title: Foo bar & co 2012.s01e01.sdtv.a
+            series:
+              - foo bar & co 2012
+          test_4:
+            mock:
+              - title: Foo bar & co 2012.s01e01.sdtv.b
+            series:
+              - Foo/Bar and Co. (2012)
     """
 
     def test_capitalization(self):
@@ -973,7 +985,13 @@ class TestCapitalization(FlexGetBase):
         self.execute_task('test_1')
         assert self.task.find_entry('accepted', title='FooBar.S01E01.PDTV-FlexGet')
         self.execute_task('test_2')
-        assert self.task.find_entry('rejected', title='FooBar.S01E01.PDTV-FlexGet')
+        assert self.task.find_entry('rejected', title='FooBar.S01E01.PDTV-aoeu')
+
+    def test_normalization(self):
+        self.execute_task('test_3')
+        assert self.task.find_entry('accepted', title='Foo bar & co 2012.s01e01.sdtv.a')
+        self.execute_task('test_4')
+        assert self.task.find_entry('rejected', title='Foo bar & co 2012.s01e01.sdtv.b')
 
 
 class TestMixedNumbering(FlexGetBase):

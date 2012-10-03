@@ -15,18 +15,18 @@ class TestSeriesPremiere(FlexGetBase):
             mock:
               - {title: 'Foo.2009.S01E01.HDTV.XviD-2HD[FlexGet]'}
               - {title: 'Foo 2009 S01E01 HDTV XviD-2HD[ASDF]'}
-              - {title: 'Foo (2009) S01E01HDTV XviD-2HD[AOEU]'}
+              - {title: 'Foo (2009) S01E01 720p XviD-2HD[AOEU]'}
               - {title: 'Foo 2009 S01E02 HDTV Xvid-2HD[AOEU]'}
             series_premiere: yes
 
           test_dupes_across_tasks_1:
             mock:
-              - {title: 'Foo.Bar.S01E01.HDTV.XviD-2HD[FlexGet]'}
+              - {title: 'Foo.Bar.2009.S01E01.HDTV.XviD-2HD[FlexGet]'}
             series_premiere: yes
 
           test_dupes_across_tasks_2:
             mock:
-              - {title: 'foo bar s01e01 dsr xvid-2hd[dmg]'}
+              - {title: 'foo bar (2009) s01e01 dsr xvid-2hd[dmg]'}
             series_premiere: yes
           test_path_set:
             mock:

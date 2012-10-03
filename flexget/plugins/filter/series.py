@@ -1,10 +1,11 @@
 import logging
+import string
 import re
 import time
 from copy import copy
 from datetime import datetime, timedelta
 from sqlalchemy import (Column, Integer, String, Unicode, DateTime, Boolean,
-                        desc, select, update, ForeignKey, Index, func, and_)
+                        desc, select, update, delete, ForeignKey, Index, func, and_)
 from sqlalchemy.orm import relation, join
 from sqlalchemy.ext.hybrid import Comparator, hybrid_property
 from sqlalchemy.exc import OperationalError
@@ -21,7 +22,7 @@ from flexget.manager import Session
 from flexget.plugin import (register_plugin, register_parser_option, get_plugin_by_name, get_plugin_keywords,
     PluginWarning, DependencyError, priority)
 
-SCHEMA_VER = 7
+SCHEMA_VER = 8
 
 log = logging.getLogger('series')
 Base = schema.versioned_base('series', SCHEMA_VER)
@@ -113,6 +114,19 @@ def upgrade(ver, session):
                 session.execute(update(release_table, release_table.c.id == row['id'],
                         {'quality': new_qual}))
         ver = 7
+    if ver == 7:
+        # Merge series that qualify as duplicates with new normalization scheme
+        series_table = table_schema('series', session)
+        ep_table = table_schema('series_episodes', session)
+        all_series = session.execute(select([series_table.c.name_lower, series_table.c.id]))
+        unique_series = {}
+        for row in all_series:
+            unique_series.setdefault(normalize_series_name(row['name_lower']), []).append(row['id'])
+        for series, ids in unique_series.iteritems():
+            session.execute(update(ep_table, ep_table.c.series_id.in_(ids), {'series_id': ids[0]}))
+            session.execute(update(series_table, series_table.c.id == ids[0], {'name_lower': series}))
+            session.execute(delete(series_table, series_table.c.id.in_(ids[1:])))
+        ver = 8
 
     return ver
 
@@ -147,9 +161,22 @@ def repair(manager):
         manager.persist['series_repaired'] = True
 
 
-class LowerComparator(Comparator):
+TRANSLATE_MAP = {ord(u'&'): u'and'}
+for char in u'_./-,[]():\'\\':
+    TRANSLATE_MAP[ord(char)] = u' '
+
+
+def normalize_series_name(name):
+    """Returns a normalized version of the series name."""
+    name = name.translate(TRANSLATE_MAP) # Replaced some symbols with spaces
+    name = u' '.join(name.split())
+    name = name.lower()
+    return name
+
+
+class NormalizedComparator(Comparator):
     def operate(self, op, other):
-        return op(self.__clause_element__(), func.lower(other))
+        return op(self.__clause_element__(), normalize_series_name(other))
 
 
 class Series(Base):
@@ -161,7 +188,7 @@ class Series(Base):
 
     id = Column(Integer, primary_key=True)
     _name = Column('name', Unicode)
-    _name_lower = Column('name_lower', Unicode, index=True)
+    _name_normalized = Column('name_lower', Unicode, index=True)
     identified_by = Column(String)
     episodes = relation('Episode', backref='series', cascade='all, delete, delete-orphan')
 
@@ -171,10 +198,10 @@ class Series(Base):
 
     def name_setter(self, value):
         self._name = value
-        self._name_lower = value.lower()
+        self._name_normalized = normalize_series_name(value)
 
     def name_comparator(self):
-        return LowerComparator(self._name_lower)
+        return NormalizedComparator(self._name_normalized)
 
     name = hybrid_property(name_getter, name_setter)
     name.comparator(name_comparator)
@@ -389,6 +416,7 @@ class SeriesDatabase(object):
             # to database but doesn't have episode_id, this causes all kinds of havoc with the plugin.
             # perhaps a bug in sqlalchemy?
             release = session.query(Release).filter(Release.episode_id == episode.id).\
+                filter(Release.title == parser.data).\
                 filter(Release.quality == parser.quality).\
                 filter(Release.proper_count == parser.proper_count).\
                 filter(Release.episode_id != None).first()
