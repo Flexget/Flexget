@@ -22,7 +22,7 @@ from flexget.manager import Session
 from flexget.plugin import (register_plugin, register_parser_option, get_plugin_by_name, get_plugin_keywords,
     PluginWarning, DependencyError, priority)
 
-SCHEMA_VER = 8
+SCHEMA_VER = 9
 
 log = logging.getLogger('series')
 Base = schema.versioned_base('series', SCHEMA_VER)
@@ -114,7 +114,8 @@ def upgrade(ver, session):
                 session.execute(update(release_table, release_table.c.id == row['id'],
                         {'quality': new_qual}))
         ver = 7
-    if ver == 7:
+    # Normalization rules changed for 7 and 8, but only run this once
+    if ver in [7, 8]:
         # Merge series that qualify as duplicates with new normalization scheme
         series_table = table_schema('series', session)
         ep_table = table_schema('series_episodes', session)
@@ -127,7 +128,7 @@ def upgrade(ver, session):
             session.execute(update(series_table, series_table.c.id == ids[0], {'name_lower': series}))
             if len(ids) > 1:
                 session.execute(delete(series_table, series_table.c.id.in_(ids[1:])))
-        ver = 8
+        ver = 9
 
     return ver
 
@@ -162,16 +163,19 @@ def repair(manager):
         manager.persist['series_repaired'] = True
 
 
-TRANSLATE_MAP = {ord(u'&'): u'and'}
-for char in u'_./-,[]():\'\\':
+TRANSLATE_MAP = {ord(u'&'): u' and '}
+for char in u'\'\\':
+    TRANSLATE_MAP[ord(char)] = u''
+for char in u'_./-,[]():':
     TRANSLATE_MAP[ord(char)] = u' '
 
 
 def normalize_series_name(name):
     """Returns a normalized version of the series name."""
+    name = name.lower()
+    name = name.replace('&amp;', ' and ')
     name = name.translate(TRANSLATE_MAP) # Replaced some symbols with spaces
     name = u' '.join(name.split())
-    name = name.lower()
     return name
 
 
@@ -189,7 +193,7 @@ class Series(Base):
 
     id = Column(Integer, primary_key=True)
     _name = Column('name', Unicode)
-    _name_normalized = Column('name_lower', Unicode, index=True)
+    _name_normalized = Column('name_lower', Unicode, index=True, unique=True)
     identified_by = Column(String)
     episodes = relation('Episode', backref='series', cascade='all, delete, delete-orphan')
 
@@ -761,8 +765,9 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
             # yaml loads ascii only as str
             series_name = unicode(series_name)
             # Update database with capitalization from config
-            task.session.query(Series).filter(Series.name == series_name).\
-                update({'name': series_name}, 'fetch')
+            db_series = task.session.query(Series).filter(Series.name == series_name).first()
+            if db_series:
+                db_series.name = series_name
             # If we didn't find any episodes for this series, continue
             if not found_series.get(series_name):
                 log.trace('No entries found for %s this run.' % series_name)

@@ -13,10 +13,12 @@ class TestSeriesPremiere(FlexGetBase):
         tasks:
           test_only_one:
             mock:
-              - {title: 'Foo.2009.S01E01.HDTV.XviD-2HD[FlexGet]'}
-              - {title: 'Foo 2009 S01E01 HDTV XviD-2HD[ASDF]'}
-              - {title: 'Foo (2009) S01E01 720p XviD-2HD[AOEU]'}
-              - {title: 'Foo 2009 S01E02 HDTV Xvid-2HD[AOEU]'}
+              - title: Foo's.&.Bar's.2009.S01E01.HDTV.XviD-2HD[FlexGet]
+              - title: Foos and Bars 2009 S01E01 HDTV XviD-2HD[ASDF]
+              - title: Foo's &amp; Bars (2009) S01E01 720p XviD-2HD[AOEU]
+              - title: Foos&bars-2009-S01E01 1080p x264
+
+              - title: Foos and Bars 2009 S01E02 HDTV Xvid-2HD[AOEU]
             series_premiere: yes
 
           test_dupes_across_tasks_1:
@@ -53,7 +55,7 @@ class TestSeriesPremiere(FlexGetBase):
     def test_only_one(self):
         self.execute_task('test_only_one')
         assert len(self.task.accepted) == 1, 'should only have accepted one'
-        assert not self.task.find_entry('accepted', title='Foo 2009 S01E02 HDTV Xvid-2HD[AOEU]'), \
+        assert not self.task.find_entry('accepted', title='Foos and Bars 2009 S01E02 HDTV Xvid-2HD[AOEU]'), \
             'Non premiere accepted'
 
     def test_dupes_across_tasks(self):

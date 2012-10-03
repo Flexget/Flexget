@@ -1,5 +1,5 @@
 from flexget.plugin import register_plugin, priority, get_plugin_by_name
-from flexget.plugins.filter.series import FilterSeriesBase
+from flexget.plugins.filter.series import FilterSeriesBase, normalize_series_name
 
 
 class FilterAllSeries(FilterSeriesBase):
@@ -41,12 +41,12 @@ class FilterAllSeries(FilterSeriesBase):
         # Generate a list of unique series that metainfo_series can parse for this task
         metainfo_series = get_plugin_by_name('metainfo_series')
         guess_entry = metainfo_series.instance.guess_entry
-        guessed_series = set()
+        guessed_series = {}
         for entry in task.entries:
             if guess_entry(entry):
-                guessed_series.add(entry['series_name'])
+                guessed_series.setdefault(normalize_series_name(entry['series_name']), entry['series_name'])
         # Combine settings and series into series plugin config format
-        allseries = {'settings': {'all_series': group_settings}, 'all_series': list(guessed_series)}
+        allseries = {'settings': {'all_series': group_settings}, 'all_series': guessed_series.values()}
         # Merge our config in to the main series config
         self.merge_config(task, allseries)
 

@@ -1,5 +1,5 @@
 from flexget.plugin import register_plugin, priority, get_plugin_by_name
-from flexget.plugins.filter.series import FilterSeriesBase
+from flexget.plugins.filter.series import FilterSeriesBase, normalize_series_name
 
 
 class FilterSeriesPremiere(FilterSeriesBase):
@@ -50,20 +50,21 @@ class FilterSeriesPremiere(FilterSeriesBase):
         # Generate a list of unique series that have premieres
         metainfo_series = get_plugin_by_name('metainfo_series')
         guess_entry = metainfo_series.instance.guess_entry
-        guessed_series = set()
+        # Make a set of unique series according to series name normalization rules
+        guessed_series = {}
         for entry in task.entries:
             if guess_entry(entry, allow_seasonless=allow_seasonless):
                 if entry['series_season'] == 1 and entry['series_episode'] in (0, 1):
-                    guessed_series.add(entry['series_name'])
+                    guessed_series.setdefault(normalize_series_name(entry['series_name']), entry['series_name'])
         # Reject any further episodes in those series
         for entry in task.entries:
-            for series in guessed_series:
+            for series in guessed_series.itervalues():
                 if entry.get('series_name') == series and not (
                         entry.get('series_season') == 1
                         and entry.get('series_episode') in (0, 1) ):
                     task.reject(entry, 'Non premiere episode in a premiere series')
         # Combine settings and series into series plugin config format
-        allseries = {'settings': {'series_premiere': group_settings}, 'series_premiere': list(guessed_series)}
+        allseries = {'settings': {'series_premiere': group_settings}, 'series_premiere': guessed_series.values()}
         # Merge the our config in to the main series config
         self.merge_config(task, allseries)
 
