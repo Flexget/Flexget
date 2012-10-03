@@ -125,7 +125,8 @@ def upgrade(ver, session):
         for series, ids in unique_series.iteritems():
             session.execute(update(ep_table, ep_table.c.series_id.in_(ids), {'series_id': ids[0]}))
             session.execute(update(series_table, series_table.c.id == ids[0], {'name_lower': series}))
-            session.execute(delete(series_table, series_table.c.id.in_(ids[1:])))
+            if len(ids) > 1:
+                session.execute(delete(series_table, series_table.c.id.in_(ids[1:])))
         ver = 8
 
     return ver
