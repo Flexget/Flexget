@@ -12,7 +12,9 @@ class SearchKAT(object):
     """KAT search plugin.
 
     should accept:
-    kat: <category>
+    kat:
+      category: <category>
+      verified: yes/no
 
     categories:
       all
@@ -27,16 +29,20 @@ class SearchKAT(object):
     def validator(self):
         from flexget import validator
 
-        root = validator.factory('choice')
-        root.accept_choices(['all', 'movies', 'tv', 'music', 'books', 'xxx', 'other'])
+        root = validator.factory('dict')
+        root.accept('choice', key='category').accept_choices(['all', 'movies', 'tv', 'music', 'books', 'xxx', 'other'])
+        root.accept('boolean', key='verified')
         return root
 
     def search(self, query, comparator, config):
         comparator.set_seq1(query)
         name = comparator.search_string().lower()
-        url = 'http://www.kat.ph/search/%s/?rss=1' % urllib.quote(name.encode('utf-8'))
-        if config != 'all':
-            url += '&category=%s' % config
+        search_string = name
+        if config.get('verified'):
+            search_string += ' verified:1'
+        url = 'http://kat.ph/search/%s/?rss=1' % urllib.quote(search_string.encode('utf-8'))
+        if config.get('category', 'all') != 'all':
+            url += '&category=%s' % config['category']
 
         log.debug('requesting: %s' % url)
         rss = feedparser.parse(url)
@@ -59,10 +65,11 @@ class SearchKAT(object):
 
             entry = Entry()
             entry['title'] = item.title
-            if item.torrentlink.startswith('//'):
-                entry['url'] = 'http:' + item.torrentlink
-            else:
-                entry['url'] = item.torrentlink
+
+            if not item.get('enclosures'):
+                log.warning('Could not get url for entry from KAT. Maybe plugin needs updated?')
+                continue
+            entry['url'] = item.enclosures[0]['url']
             entry['search_ratio'] = comparator.ratio()
             entry['torrent_seeds'] = int(item.seeds)
             entry['torrent_leeches'] = int(item.leechs)

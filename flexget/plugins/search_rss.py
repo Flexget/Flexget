@@ -26,6 +26,7 @@ class SearchRSS(object):
         config = rss_plugin.instance.build_config(config).copy()
         template = environment.from_string(config['url'])
         config['url'] = template.render({'search_term': search_string})
+        config['all_entries'] = True
         # TODO: capture some other_fields to try to find seed/peer/content_size numbers?
         entries = []
         for entry in rss_plugin.phase_handlers['input'](task, config):
