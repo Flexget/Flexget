@@ -118,15 +118,15 @@ def upgrade(ver, session):
         # Merge series that qualify as duplicates with new normalization scheme
         series_table = table_schema('series', session)
         ep_table = table_schema('series_episodes', session)
-        all_series = session.execute(select([series_table.c.name_lower, series_table.c.id]))
+        all_series = session.execute(select([series_table.c.name, series_table.c.id]))
         unique_series = {}
         for row in all_series:
-            unique_series.setdefault(normalize_series_name(row['name_lower']), []).append(row['id'])
+            unique_series.setdefault(normalize_series_name(row['name']), []).append(row['id'])
         for series, ids in unique_series.iteritems():
             session.execute(update(ep_table, ep_table.c.series_id.in_(ids), {'series_id': ids[0]}))
-            session.execute(update(series_table, series_table.c.id == ids[0], {'name_lower': series}))
             if len(ids) > 1:
                 session.execute(delete(series_table, series_table.c.id.in_(ids[1:])))
+            session.execute(update(series_table, series_table.c.id == ids[0], {'name_lower': series}))
         ver = 9
 
     return ver
