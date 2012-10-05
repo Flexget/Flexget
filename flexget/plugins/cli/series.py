@@ -3,6 +3,7 @@ from string import capwords
 from sqlalchemy import desc
 from flexget.manager import Session
 from flexget.plugin import register_plugin, register_parser_option, DependencyError
+from flexget.utils.tools import console
 
 try:
     from flexget.plugins.filter.series import SeriesDatabase, Series, Episode, Release, forget_series, forget_series_episode
@@ -32,11 +33,11 @@ class SeriesReport(SeriesDatabase):
         name = unicode(name.lower())
         series = session.query(Series).filter(Series.name == name).first()
         if not series:
-            print 'Unknown series `%s`' % name
+            console('Unknown series `%s`' % name)
             return
 
-        print ' %-63s%-15s' % ('Identifier, Title', 'Quality')
-        print '-' * 79
+        console(' %-63s%-15s' % ('Identifier, Title', 'Quality'))
+        console('-' * 79)
 
         # Query episodes in sane order instead of iterating from series.episodes
         episodes = session.query(Episode).filter(Episode.series_id == series.id)
@@ -48,9 +49,9 @@ class SeriesReport(SeriesDatabase):
         for episode in episodes:
 
             if episode.identifier is None:
-                print ' None <--- Broken!'
+                console(' None <--- Broken!')
             else:
-                print ' %s (%s) - %s' % (episode.identifier, episode.identified_by or 'N/A', episode.age)
+                console(' %s (%s) - %s' % (episode.identifier, episode.identified_by or 'N/A', episode.age))
 
             for release in episode.releases:
                 status = release.quality.name
@@ -62,21 +63,21 @@ class SeriesReport(SeriesDatabase):
                     if release.proper_count > 1:
                         status += str(release.proper_count)
                 if release.downloaded:
-                    print '  * %-60s%-15s' % (title, status)
+                    console('  * %-60s%-15s' % (title, status))
                 else:
-                    print '    %-60s%-15s' % (title, status)
+                    console('    %-60s%-15s' % (title, status))
 
-        print '-' * 79
-        print ' * = downloaded'
+        console('-' * 79)
+        console(' * = downloaded')
         if not series.identified_by:
-            print ''
-            print ' Series plugin is still learning which episode numbering mode is '
-            print ' correct for this series (identified_by: auto).'
-            print ' Few duplicate downloads can happen with different numbering schemes'
-            print ' during this time.'
+            console('')
+            console(' Series plugin is still learning which episode numbering mode is ')
+            console(' correct for this series (identified_by: auto).')
+            console(' Few duplicate downloads can happen with different numbering schemes')
+            console(' during this time.')
         else:
-            print ' Series uses `%s` mode to identify episode numbering (identified_by).' % series.identified_by
-        print ' See option `identified_by` for more information.'
+            console(' Series uses `%s` mode to identify episode numbering (identified_by).' % series.identified_by)
+        console(' See option `identified_by` for more information.')
         session.close()
 
     def get_series_summary(self):
@@ -137,8 +138,8 @@ class SeriesReport(SeriesDatabase):
         """
 
         formatting = ' %-30s %-10s %-10s %-20s'
-        print formatting % ('Name', 'Latest', 'Age', 'Status')
-        print '-' * 79
+        console(formatting % ('Name', 'Latest', 'Age', 'Status'))
+        console('-' * 79)
 
         hidden = 0
         series = self.get_series_summary()
@@ -159,12 +160,12 @@ class SeriesReport(SeriesDatabase):
             age = latest.get('age', 'N/A')
             episode_id = latest.get('episode_id', 'N/A')
 
-            print new_ep + formatting[1:] % (series_name, episode_id, age if age else '', status)
+            console(new_ep + formatting[1:] % (series_name, episode_id, age if age else '', status))
 
-        print '-' * 79
-        print (' [] = downloaded | > = new episode ' +
+        console('-' * 79)
+        console(' [] = downloaded | > = new episode ' +
               ('| %i series unseen past 6 months hidden' % hidden if hidden else ''))
-        print ' Use --series NAME to get detailed information'
+        console(' Use --series NAME to get detailed information')
 
 
 class SeriesForget(object):
@@ -183,16 +184,16 @@ class SeriesForget(object):
                 if identifier and name:
                     try:
                         forget_series_episode(name, identifier)
-                        print 'Removed episode `%s` from series `%s`.' % (identifier, name.capitalize())
+                        console('Removed episode `%s` from series `%s`.' % (identifier, name.capitalize()))
                     except ValueError, e:
-                        print e.message
+                        console(e.message)
             else:
                 # remove whole series
                 try:
                     forget_series(name)
-                    print 'Removed series `%s` from database.' % name.capitalize()
+                    console('Removed series `%s` from database.' % name.capitalize())
                 except ValueError, e:
-                    print e.message
+                    console(e.message)
 
             task.manager.config_changed()
 
