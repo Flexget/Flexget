@@ -583,7 +583,7 @@ class FilterSeriesBase(object):
                     continue
                 # make sure series name is a string to accommodate for "24"
                 if not isinstance(series, basestring):
-                    series = str(series)
+                    series = unicode(series)
                 # if series have given path instead of dict, convert it into a dict
                 if isinstance(series_settings, basestring):
                     series_settings = {'path': series_settings}
