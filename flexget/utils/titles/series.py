@@ -335,7 +335,11 @@ class SeriesParser(TitleParser):
                     if self.strict_name:
                         if match.start() > 1:
                             return
-                    self.id = '-'.join(match.groups())
+                    id = '-'.join(g for g in match.groups() if g)
+                    if not id:
+                        # If match groups were all blank, don't accept this match
+                        continue
+                    self.id = id
                     self.id_type = 'id'
                     self.valid = True
                     log.debug('found id \'%s\' with regexp \'%s\'' % (self.id, id_re.pattern))

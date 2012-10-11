@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from nose.tools import assert_raises
-from nose.tools import raises
+from nose.tools import assert_raises, raises
 from flexget.utils.titles import SeriesParser, ParseWarning
 
 #
@@ -568,3 +567,16 @@ class TestSeriesParser(object):
         # Make sure it doesn't work with a different country
         s.parse('The Show (UK) S01E01')
         assert not s.valid
+
+    def test_id_regexps(self):
+        s = SeriesParser('The Show', id_regexps=['(dog)?e(cat)?'])
+        s.parse('The Show dogecat')
+        assert s.valid
+        assert s.id == 'dog-cat'
+        s.parse('The Show doge')
+        assert s.valid
+        assert s.id == 'dog'
+        s.parse('The Show ecat')
+        assert s.valid
+        assert s.id == 'cat'
+        assert_raises(ParseWarning, s.parse, 'The Show e')
