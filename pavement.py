@@ -42,8 +42,8 @@ setup(
     install_requires=install_requires,
     packages=find_packages(exclude=['tests']),
     package_data=find_package_data('flexget', package='flexget',
-                                   exclude=['FlexGet.egg-info', '*.pyc'],
-                                   only_in_packages=False), # NOTE: the exclude does not seem to work
+        exclude=['FlexGet.egg-info', '*.pyc'],
+        only_in_packages=False), # NOTE: the exclude does not seem to work
     zip_safe=False,
     test_suite='nose.collector',
     setup_requires=['nose>=0.11'],
@@ -51,7 +51,7 @@ setup(
         'memusage':     ['guppy'],
         'NZB':          ['pynzb'],
         'TaskTray':     ['pywin32'],
-    },
+        },
     entry_points=entry_points
 )
 
@@ -139,14 +139,11 @@ def clean():
 
 @task
 @cmdopts([
-    ('dist-dir=', 'd', 'directory to put final built distributions in')
+    ('dist-dir=', 'd', 'directory to put final built distributions in'),
+    ('revision=', 'r', 'minor revision number of this build')
 ])
 def sdist(options):
     """Build tar.gz distribution package"""
-
-    revision = svn.info().get('last_changed_rev')
-
-    print 'Revision: %s' % revision
 
     # clean previous build
     print 'Cleaning build...'
@@ -164,17 +161,24 @@ def sdist(options):
     for pyc in path('tests/').files('*.pyc'):
         pyc.remove()
 
-    ver = '%sr%s' % (options['version'], revision)
-
-    print 'Building %s' % ver
-
+    revision = 9999999
     # hack for getting options from release task
     if hasattr(options, 'release'):
         if options.release.get('dist_dir'):
             options.setdefault('sdist', Bunch())['dist_dir'] = options.release.dist_dir
+        if options.release.get('revision'):
+            revision = options.release.revision
     else:
         if options.sdist.get('dist_dir'):
             options.setdefault('sdist', Bunch())['dist_dir'] = options.sdist.dist_dir
+        if options.sdist.get('revision'):
+            revision = options.sdist.revision
+
+    print 'Revision: %s' % revision
+
+    ver = '%s.%s' % (options['version'], revision)
+
+    print 'Building %s' % ver
 
     # replace version number
     set_init_version(ver)
@@ -275,7 +279,8 @@ def docs():
     ('online', None, 'runs online unit tests'),
     ('dist-dir=', 'd', 'directory to put final built distributions in'),
     ('no-tests', None, 'skips unit tests'),
-    ('type=', None, 'type of release (src | egg)')
+    ('type=', None, 'type of release (src | egg)'),
+    ('revision=', 'r', 'minor revision number of this build')
 ])
 def release(options):
     """Make a FlexGet release. Same as bdist_egg but adds version information."""
