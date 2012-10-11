@@ -177,6 +177,7 @@ def sdist(options):
     print 'Revision: %s' % revision
 
     ver = '%s.%s' % (options['version'], revision)
+    os.environ['FLEXGET_VERSION'] = ver
 
     print 'Building %s' % ver
 
