@@ -140,7 +140,7 @@ def clean():
 @task
 @cmdopts([
     ('dist-dir=', 'd', 'directory to put final built distributions in')
-])
+], share_with=['make_egg'])
 def sdist(options):
     """Build tar.gz distribution package"""
 
@@ -194,10 +194,9 @@ def sdist(options):
 @task
 @cmdopts([
     ('dist-dir=', 'd', 'directory to put final built distributions in')
-])
+], share_with=['sdist'])
 def make_egg(options):
     # naming this task to bdist_egg will make egg installation fail
-    options.setdefault('release', Bunch())
 
     revision = svn.info().get('last_changed_rev')
     ver = '%sr%s' % (options['version'], revision)
@@ -214,16 +213,7 @@ def make_egg(options):
     import shutil
     shutil.copytree('FlexGet.egg-info', 'FlexGet.egg-info-backup')
 
-    if options.release.get('dist_dir'):
-        options.setdefault('bdist_egg', Bunch())['dist_dir'] = options.release.dist_dir
-
-    # hack for getting options from release task
-    if hasattr(options, 'release'):
-        if options.release.get('dist_dir'):
-            options.setdefault('bdist_egg', Bunch())['dist_dir'] = options.release.dist_dir
-    else:
-        if options.sdist.get('dist_dir'):
-            options.setdefault('bdist_egg', Bunch())['dist_dir'] = options.sdist.dist_dir
+    options.setdefault('bdist_egg', Bunch())['dist_dir'] = options.make_egg.dist_dir
 
     for t in ["minilib", "generate_setup", "setuptools.command.bdist_egg"]:
         call_task(t)
@@ -271,9 +261,8 @@ def docs():
 
 
 @task
+@might_call('test', 'sdist', 'make_egg')
 @cmdopts([
-    ('online', None, 'runs online unit tests'),
-    ('dist-dir=', 'd', 'directory to put final built distributions in'),
     ('no-tests', None, 'skips unit tests'),
     ('type=', None, 'type of release (src | egg)')
 ])
@@ -295,8 +284,6 @@ def release(options):
             print 'Unable to remove %s' % pth
 
     # run unit tests
-    if options.release.get('online'):
-        options.setdefault('test', Bunch())['online'] = True
     if not options.release.get('no_tests'):
         if not test():
             print 'Unit tests did not pass'
@@ -305,10 +292,10 @@ def release(options):
 
     if options.release.get('type') == 'egg':
         print 'Making egg release'
-        make_egg(options)
+        make_egg()
     else:
         print 'Making src release'
-        sdist(options)
+        sdist()
 
 
 @task
@@ -375,3 +362,17 @@ def pep8(args):
         parse_argv=args)
     styleguide.input_dir('flexget')
 
+@task
+def generate_bootstrap():
+    import virtualenv, textwrap
+    output = virtualenv.create_bootstrap_script(textwrap.dedent("""
+    def after_install(options, home_dir):
+        if sys.platform == 'win32':
+            bin_dir = join(home_dir, 'Scripts')
+        else:
+            bin_dir = join(home_dir, 'bin')
+        subprocess.call([join(bin_dir, 'easy_install'), 'paver==1.1.1'])
+        subprocess.call([join(bin_dir, 'easy_install'), 'nose>=0.11'])
+        subprocess.call([join(bin_dir, 'paver'),'develop'])
+    """))
+    f = open('bootstrap.py', 'w').write(output)
