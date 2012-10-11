@@ -366,6 +366,10 @@ def pep8(args):
 def generate_bootstrap():
     import virtualenv, textwrap
     output = virtualenv.create_bootstrap_script(textwrap.dedent("""
+    def adjust_options(options, args):
+        args[:] = ['.']
+        options.unzip_setuptools = True
+
     def after_install(options, home_dir):
         if sys.platform == 'win32':
             bin_dir = join(home_dir, 'Scripts')

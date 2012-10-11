@@ -1822,6 +1822,10 @@ def create_bootstrap_script(extra_text, python_version=''):
     return content.replace('##EXT' 'END##', extra_text)
 
 
+def adjust_options(options, args):
+    args[:] = ['.']
+    options.unzip_setuptools = True
+
 def after_install(options, home_dir):
     if sys.platform == 'win32':
         bin_dir = join(home_dir, 'Scripts')
