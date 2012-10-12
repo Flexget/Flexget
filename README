@@ -1,7 +1,7 @@
 How to use SVN / GIT checkout
 -----------------------------
 
-Check that you have Python 2.5 - 2.7 available with command 'python -V'. 
+Check that you have Python 2.6 - 2.7 available with command 'python -V'.
 
 In some environments newer python might be available under another name 
 like 'python26' or 'python2.7' in which case you need to use that one 

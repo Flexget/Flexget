@@ -358,7 +358,12 @@ def pep8(args):
         print 'Run bin/paver install_tools'
         return
 
-    styleguide = pep8.StyleGuide(show_source=True, ignore=['W291', 'W293', 'E261'], repeat=1, max_line_length=120,
+    # Ignoring certain errors
+    ignore = [
+        'E711', 'E712', # These are comparisons to singletons i.e. == False, and == None. We need these for sqlalchemy.
+        'W291', 'W293', 'E261'
+    ]
+    styleguide = pep8.StyleGuide(show_source=True, ignore=ignore, repeat=1, max_line_length=120,
         parse_argv=args)
     styleguide.input_dir('flexget')
 
