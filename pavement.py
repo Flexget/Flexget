@@ -46,7 +46,6 @@ setup(
                                    only_in_packages=False), # NOTE: the exclude does not seem to work
     zip_safe=False,
     test_suite='nose.collector',
-    setup_requires=['nose>=0.11'],
     extras_require={
         'memusage':     ['guppy'],
         'NZB':          ['pynzb'],
@@ -60,7 +59,6 @@ options(
         extra_files=['virtual', 'svn']
     ),
     virtualenv=Bunch(
-        packages_to_install=['nose>=0.11'],
         paver_command_line='develop',
         unzip_setuptools=True
     ),
@@ -168,14 +166,6 @@ def sdist(options):
 
     print 'Building %s' % ver
 
-    # hack for getting options from release task
-    if hasattr(options, 'release'):
-        if options.release.get('dist_dir'):
-            options.setdefault('sdist', Bunch())['dist_dir'] = options.release.dist_dir
-    else:
-        if options.sdist.get('dist_dir'):
-            options.setdefault('sdist', Bunch())['dist_dir'] = options.sdist.dist_dir
-
     # replace version number
     set_init_version(ver)
 
@@ -213,7 +203,7 @@ def make_egg(options):
     import shutil
     shutil.copytree('FlexGet.egg-info', 'FlexGet.egg-info-backup')
 
-    options.setdefault('bdist_egg', Bunch())['dist_dir'] = options.make_egg.dist_dir
+    options.setdefault('bdist_egg', Bunch())['dist_dir'] = options.make_egg.get('dist_dir')
 
     for t in ["minilib", "generate_setup", "setuptools.command.bdist_egg"]:
         call_task(t)
@@ -327,6 +317,11 @@ def install_tools():
         pip.main(['install', 'coverage'])
 
     try:
+        import nose
+    except:
+        pip.main(['install', 'nose>=0.11'])
+
+    try:
         import nosexcover
         print 'Nose-xcover INSTALLED'
     except:
@@ -366,22 +361,3 @@ def pep8(args):
     styleguide = pep8.StyleGuide(show_source=True, ignore=ignore, repeat=1, max_line_length=120,
         parse_argv=args)
     styleguide.input_dir('flexget')
-
-@task
-def generate_bootstrap():
-    import virtualenv, textwrap
-    output = virtualenv.create_bootstrap_script(textwrap.dedent("""
-    def adjust_options(options, args):
-        args[:] = ['.']
-        options.unzip_setuptools = True
-
-    def after_install(options, home_dir):
-        if sys.platform == 'win32':
-            bin_dir = join(home_dir, 'Scripts')
-        else:
-            bin_dir = join(home_dir, 'bin')
-        subprocess.call([join(bin_dir, 'easy_install'), 'paver==1.1.1'])
-        subprocess.call([join(bin_dir, 'easy_install'), 'nose>=0.11'])
-        subprocess.call([join(bin_dir, 'paver'),'develop'])
-    """))
-    f = open('bootstrap.py', 'w').write(output)

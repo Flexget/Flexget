@@ -1821,9 +1821,14 @@ def create_bootstrap_script(extra_text, python_version=''):
                + content)
     return content.replace('##EXT' 'END##', extra_text)
 
-
 def adjust_options(options, args):
     args[:] = ['.']
+
+
+    options.no_site_packages = False
+    if hasattr(options,"system_site_packages"):
+        options.system_site_packages = True
+        
     options.unzip_setuptools = True
 
 def after_install(options, home_dir):
@@ -1832,9 +1837,7 @@ def after_install(options, home_dir):
     else:
         bin_dir = join(home_dir, 'bin')
     subprocess.call([join(bin_dir, 'easy_install'), 'paver==1.1.1'])
-    subprocess.call([join(bin_dir, 'easy_install'), 'nose>=0.11'])
     subprocess.call([join(bin_dir, 'paver'),'develop'])
-
 
 def convert(s):
     b = base64.b64decode(s.encode('ascii'))
