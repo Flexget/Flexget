@@ -102,6 +102,8 @@ class TraktList(object):
             data = json.loads(task.requests.get(url, auth=auth).content)
         except RequestException, e:
             raise PluginError('Could not retrieve list from trakt (%s)' % e.message)
+        if not isinstance(data, dict):
+            raise PluginError('Faulty trakt response: %s' % data)
         if 'error' in data:
             raise PluginError('Error getting trakt list: %s' % data['error'])
         if url_params['data_type'] == 'custom':
