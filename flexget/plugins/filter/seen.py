@@ -10,18 +10,18 @@ forget (string)
 
 import logging
 from datetime import datetime, timedelta
-from sqlalchemy import Column, Integer, String, DateTime, Unicode, asc, or_, select, update, Index
+from sqlalchemy import Column, Integer, String, DateTime, Unicode, Boolean, asc, or_, select, update, Index
 from sqlalchemy.schema import ForeignKey
 from sqlalchemy.orm import relation
 from flexget.manager import Session
 from flexget.event import event
 from flexget.plugin import register_plugin, priority, register_parser_option
 from flexget import schema
-from flexget.utils.sqlalchemy_utils import table_schema
+from flexget.utils.sqlalchemy_utils import table_schema, table_add_column
 from flexget.utils.imdb import is_imdb_url, extract_id
 
 log = logging.getLogger('seen')
-Base = schema.versioned_base('seen', 2)
+Base = schema.versioned_base('seen', 3)
 
 
 @schema.upgrade('seen')
@@ -38,6 +38,10 @@ def upgrade(ver, session):
         log.info('Adding index to seen_field table.')
         Index('ix_seen_field_seen_entry_id', field_table.c.seen_entry_id).create(bind=session.bind)
         ver = 2
+    if ver == 2:
+        log.info('Adding local column to seen_entry table')
+        table_add_column('seen_entry', 'local', Boolean, session, default=False)
+
     return ver
 
 
@@ -50,14 +54,16 @@ class SeenEntry(Base):
     reason = Column(Unicode)
     task = Column('feed', Unicode)
     added = Column(DateTime)
+    local = Column(Boolean)
 
     fields = relation('SeenField', backref='seen_entry', cascade='all, delete, delete-orphan')
 
-    def __init__(self, title, task, reason=None):
+    def __init__(self, title, task, reason=None, local=False):
         self.title = title
         self.reason = reason
         self.task = task
         self.added = datetime.now()
+        self.local = local
 
     def __str__(self):
         return '<SeenEntry(title=%s,reason=%s,task=%s,added=%s)>' % (self.title, self.reason, self.task, self.added)
@@ -290,7 +296,7 @@ class FilterSeen(object):
         from flexget import validator
         root = validator.factory()
         root.accept('boolean')
-        root.accept('list').accept('text')
+        root.accept('choice').accept_choices(['global', 'local'])
         return root
 
     @priority(255)
@@ -301,8 +307,7 @@ class FilterSeen(object):
             return
 
         fields = self.fields
-        if isinstance(config, list):
-            fields.extend(config)
+        local = config == 'local'
 
         for entry in task.entries:
             # construct list of values looked
@@ -315,7 +320,12 @@ class FilterSeen(object):
             if values:
                 log.trace('querying for: %s' % ', '.join(values))
                 # check if SeenField.value is any of the values
-                found = task.session.query(SeenField).filter(SeenField.value.in_(values)).first()
+                found = task.session.query(SeenField).join(SeenEntry).filter(SeenField.value.in_(values))
+                if local:
+                    found = found.filter(SeenEntry.task == task.name)
+                else:
+                    found = found.filter(SeenEntry.local == False)
+                found = found.first()
                 if found:
                     log.debug("Rejecting '%s' '%s' because of seen '%s'" % (entry['url'], entry['title'], found.value))
                     task.reject(entry, 'Entry with %s `%s` is already seen' % (found.field, found.value),
@@ -332,17 +342,17 @@ class FilterSeen(object):
             fields.extend(config)
 
         for entry in task.accepted:
-            self.learn(task, entry, fields=fields)
+            self.learn(task, entry, fields=fields, local=config == 'local')
             # verbose if in learning mode
             if task.manager.options.learn:
                 log.info("Learned '%s' (will skip this in the future)" % (entry['title']))
 
-    def learn(self, task, entry, fields=None, reason=None):
+    def learn(self, task, entry, fields=None, reason=None, local=False):
         """Marks entry as seen"""
         # no explicit fields given, use default
         if not fields:
             fields = self.fields
-        se = SeenEntry(entry['title'], unicode(task.name), reason)
+        se = SeenEntry(entry['title'], unicode(task.name), reason, local)
         remembered = []
         for field in fields:
             if not field in entry:

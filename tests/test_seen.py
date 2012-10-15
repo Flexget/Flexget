@@ -47,6 +47,41 @@ class TestFilterSeen(FlexGetBase):
             'Item should not have been rejected because of number field'
 
 
+class TestSeenLocal(FlexGetBase):
+
+    __yaml__ = """
+      presets:
+        global:
+          accept_all: yes
+      tasks:
+        global seen 1:
+          mock:
+          - title: item 1
+        local seen:
+          seen: local
+          mock:
+          - title: item 1
+          - title: item 2
+        global seen 2:
+          mock:
+          - title: item 1
+          - title: item 2
+    """
+
+    def test_local(self):
+        self.execute_task('global seen 1')
+        # global seen 1 task should not affect seen in the local seen task
+        self.execute_task('local seen')
+        assert self.task.find_entry('accepted', title='item 1'), 'item 1 should be accepted first run'
+        # seen should still work normally within the local seen task
+        self.execute_task('local seen')
+        assert self.task.find_entry('rejected', title='item 1'), 'item 1 should be seen on second run'
+        # local seen task should not affect global seen 2 task, but global seen 1 should
+        self.execute_task('global seen 2')
+        assert self.task.find_entry('rejected', title='item 1'), 'item 1 should be seen'
+        assert self.task.find_entry('accepted', title='item 2'), 'item 2 should be accepted'
+
+
 class TestFilterSeenMovies(FlexGetBase):
 
     __yaml__ = """
