@@ -41,6 +41,7 @@ def upgrade(ver, session):
     if ver == 2:
         log.info('Adding local column to seen_entry table')
         table_add_column('seen_entry', 'local', Boolean, session, default=False)
+        ver = 3
 
     return ver
 
