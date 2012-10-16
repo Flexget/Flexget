@@ -329,8 +329,10 @@ class SeriesDatabase(object):
 
         type_totals = dict(session.query(Episode.identified_by, func.count(Episode.identified_by)).join(Series).
                            filter(Series.name == name).group_by(Episode.identified_by).all())
-        # Remove None from the dict, we are only considering episodes that we know the type of (parsed with new parser)
+        # Remove None and specials from the dict,
+        # we are only considering episodes that we know the type of (parsed with new parser)
         type_totals.pop(None, None)
+        type_totals.pop('special', None)
         if not type_totals:
             return 'auto'
         log.debug('%s episode type totals: %r' % (name, type_totals))

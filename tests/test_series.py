@@ -929,7 +929,8 @@ class TestIdioticNumbering(FlexGetBase):
         presets:
           global:
             series:
-              - FooBar
+              - FooBar:
+                  identified_by: ep
 
         tasks:
           test_1:
@@ -941,8 +942,7 @@ class TestIdioticNumbering(FlexGetBase):
     """
 
     def test_idiotic(self):
-        """Series plugin: idiotic numbering scheme DISABLED"""
-        return
+        """Series plugin: idiotic numbering scheme"""
 
         self.execute_task('test_1')
         self.execute_task('test_2')
@@ -1000,7 +1000,8 @@ class TestMixedNumbering(FlexGetBase):
         presets:
           global:
             series:
-              - FooBar
+              - FooBar:
+                  identified_by: ep
 
         tasks:
           test_1:
@@ -1012,8 +1013,7 @@ class TestMixedNumbering(FlexGetBase):
     """
 
     def test_mixednumbering(self):
-        """Series plugin: Mixed series numbering - DISABLED!"""
-        return
+        """Series plugin: Mixed series numbering"""
 
         self.execute_task('test_1')
         assert self.task.find_entry('accepted', title='FooBar.S03E07.PDTV-FlexGet')
@@ -1491,3 +1491,52 @@ class TestDoubleEps(FlexGetBase):
         self.execute_task('test_double_prefered')
         assert self.task.find_entry('accepted', title='double S02E03-04')
         assert not self.task.find_entry('accepted', title='S02E03')
+
+class TestAutoLockin(FlexGetBase):
+    __yaml__ = """
+        presets:
+          global:
+            series:
+            - FooBar
+            - BarFood
+        tasks:
+          try_date_1:
+            mock:
+            - title: FooBar 2012-10-10 HDTV
+          lock_ep:
+            mock:
+            - title: FooBar S01E01 HDTV
+            - title: FooBar S01E02 HDTV
+            - title: FooBar S01E03 HDTV
+          try_date_2:
+            mock:
+            - title: FooBar 2012-10-11 HDTV
+          test_special_lock:
+            mock:
+            - title: BarFood christmas special HDTV
+            - title: BarFood easter special HDTV
+            - title: BarFood haloween special HDTV
+            - title: BarFood bad special HDTV
+          try_reg:
+            mock:
+            - title: BarFood S01E01 HDTV
+            - title: BarFood 2012-9-9 HDTV
+
+    """
+
+    def test_ep_lockin(self):
+        self.execute_task('try_date_1')
+        assert self.task.find_entry('accepted', title='FooBar 2012-10-10 HDTV'), \
+            'dates should be accepted before locked in on an identifier type'
+        self.execute_task('lock_ep')
+        assert len(self.task.accepted) == 3, 'All ep mode episodes should have been accepted'
+        self.execute_task('try_date_2')
+        assert not self.task.find_entry('accepted', title='FooBar 2012-10-11 HDTV'), \
+            'dates should not be accepted after series has locked in to ep mode'
+
+    def test_special_lock(self):
+        """Make sure series plugin does not lock in to type 'special'"""
+        self.execute_task('test_special_lock')
+        assert len(self.task.accepted) == 4, 'All specials should have been accepted'
+        self.execute_task('try_reg')
+        assert len(self.task.accepted) == 2, 'Specials should not have caused episode type lock-in'
