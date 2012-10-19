@@ -21,7 +21,7 @@ from flexget.utils.sqlalchemy_utils import table_schema, table_add_column
 from flexget.utils.imdb import is_imdb_url, extract_id
 
 log = logging.getLogger('seen')
-Base = schema.versioned_base('seen', 3)
+Base = schema.versioned_base('seen', 4)
 
 
 @schema.upgrade('seen')
@@ -42,6 +42,12 @@ def upgrade(ver, session):
         log.info('Adding local column to seen_entry table')
         table_add_column('seen_entry', 'local', Boolean, session, default=False)
         ver = 3
+    if ver == 3:
+        # setting the default to False in the last migration was broken, fix the data
+        log.info('Repairing seen table')
+        entry_table = table_schema('seen_entry', session)
+        session.execute(update(entry_table, entry_table.c.local == None, {'local': False}))
+        ver = 4
 
     return ver
 
