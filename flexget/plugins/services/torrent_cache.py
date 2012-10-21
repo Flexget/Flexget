@@ -16,8 +16,8 @@ MIRRORS = ['http://torrage.com/torrent/',
 class TorrentCache(object):
     """Adds urls to torrent cache sites to the urls list."""
 
-    @priority(-255)
-    def on_task_filter(self, task, config):
+    @priority(120)
+    def on_task_urlrewrite(self, task, config):
         for entry in task.accepted:
             info_hash = None
             if entry['url'].startswith('magnet:'):
