@@ -53,22 +53,17 @@ class ImportSeries(FilterSeriesBase):
                 continue
 
             for entry in result:
+                s = series.setdefault(entry['title'], {})
                 if entry.get('thetvdb_id'):
-                    series[entry['title']] = entry['thetvdb_id']
-                else:
-                    series.setdefault(entry['title'], None)
+                    s['set'] = {'thetvdb_id': entry['thetvdb_id']}
 
         if not series:
             log.info('Did not get any series to generate series configuration')
             return
 
         # Make a series config with the found series
-        series_config = {'generated_series': []}
-        for s, thetvdb_id in series.iteritems():
-            if thetvdb_id:
-                series_config['generated_series'].append({s: {'set': {'thetvdb_id': thetvdb_id}}})
-            else:
-                series_config['generated_series'].append(s)
+        # Turn our dict of series with settings into a list of one item dicts
+        series_config = {'generated_series': [dict([s]) for s in series.iteritems()]}
         # If options were specified, add them to the series config
         if 'settings' in config:
             series_config['settings'] = {'generated_series': config['settings']}
