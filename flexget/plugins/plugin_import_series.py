@@ -40,7 +40,7 @@ class ImportSeries(FilterSeriesBase):
 
     def on_task_start(self, task, config):
 
-        series = set()
+        series = {}
         for input_name, input_config in config.get('from', {}).iteritems():
             input = get_plugin_by_name(input_name)
             if input.api_ver == 1:
@@ -52,14 +52,23 @@ class ImportSeries(FilterSeriesBase):
                 log.warning('Input %s did not return anything' % input_name)
                 continue
 
-            series.update([x['title'] for x in result])
+            for entry in result:
+                if entry.get('thetvdb_id'):
+                    series[entry['title']] = entry['thetvdb_id']
+                else:
+                    series.setdefault(entry['title'], None)
 
         if not series:
             log.info('Did not get any series to generate series configuration')
             return
 
         # Make a series config with the found series
-        series_config = {'generated_series': list(series)}
+        series_config = {'generated_series': []}
+        for s, thetvdb_id in series.iteritems():
+            if thetvdb_id:
+                series_config['generated_series'].append({s: {'set': {'thetvdb_id': thetvdb_id}}})
+            else:
+                series_config['generated_series'].append(s)
         # If options were specified, add them to the series config
         if 'settings' in config:
             series_config['settings'] = {'generated_series': config['settings']}
