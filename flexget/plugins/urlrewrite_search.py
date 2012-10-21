@@ -1,7 +1,7 @@
 import logging
 from flexget.utils.search import StringComparator
 from flexget.plugin import get_plugins_by_group, PluginWarning, PluginError, \
-    register_parser_option, register_plugin
+    register_parser_option, register_plugin, priority
 
 log = logging.getLogger('urlrewrite_search')
 
@@ -61,6 +61,8 @@ class PluginSearch(object):
         search.accept('choice').accept_choices(names)
         return search
 
+    # Run before main urlrewriting
+    @priority(130)
     def on_task_urlrewrite(self, task, config):
         # no searches in unit test mode
         if task.manager.unit_test:
