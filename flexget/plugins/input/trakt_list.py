@@ -4,7 +4,7 @@ import re
 from requests import RequestException
 from flexget.utils import json
 from flexget.utils.cached_input import cached
-from flexget.plugin import register_plugin, PluginError
+from flexget.plugin import register_plugin, PluginError, PluginWarning
 from flexget.entry import Entry
 
 log = logging.getLogger('trakt_list')
@@ -104,6 +104,8 @@ class TraktList(object):
             raise PluginError('Could not retrieve list from trakt (%s)' % e.message)
         if 'error' in data:
             raise PluginError('Error getting trakt list: %s' % data['error'])
+        if not data:
+            raise PluginWarning('No data returned from trakt. Maybe password is wrong?')
         if url_params['data_type'] == 'custom':
             if not isinstance(data['items'], list):
                 raise PluginError('Faulty custom items in response: %s' % data['items'])
