@@ -21,7 +21,7 @@ SCHEMA_VER = 2
 
 log = logging.getLogger('api_tvdb')
 Base = schema.versioned_base('api_tvdb', SCHEMA_VER)
-requests = ReqSession(timeout=20)
+requests = ReqSession(timeout=25)
 
 # This is a FlexGet API key
 api_key = '4D297D8CFDE0E105'
