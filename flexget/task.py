@@ -530,7 +530,7 @@ class Task(object):
                     # log keywords not executed
                     for plugin in self.plugins(phase):
                         if plugin.name in self.config:
-                            log.info('Plugin %s is not executed because %s phase is disabled' %
+                            log.info('Plugin %s is not executed because %s phase is disabled (e.g. --test)' %
                                      (plugin.name, phase))
                     continue
 
