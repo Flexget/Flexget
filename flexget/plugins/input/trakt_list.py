@@ -94,18 +94,32 @@ class TraktList(object):
         url = url % url_params
 
         if 'password' in config:
-            auth = (config['username'], hashlib.sha1(config['password']).hexdigest())
+            auth = {'username': config['username'],
+                    'password': hashlib.sha1(config['password']).hexdigest()}
 
         entries = []
         log.verbose('Retrieving list %s %s...' % (url_params['data_type'], url_params['list_type']))
+
+        result = task.requests.get(url, data=json.dumps(auth))
         try:
-            data = json.loads(task.requests.get(url, auth=auth).content)
+            data = task.requests.post(url, data=json.dumps(auth)).json
         except RequestException, e:
             raise PluginError('Could not retrieve list from trakt (%s)' % e.message)
+
+        def check_auth():
+            if task.requests.post(
+                    'http://api.trakt.tv/account/test/' + config['api_key'],
+                    data=json.dumps(auth), raise_status=False
+                    ).status_code != 200:
+                raise PluginError('Authentication to trakt failed.')
+
         if 'error' in data:
+            check_auth()
             raise PluginError('Error getting trakt list: %s' % data['error'])
         if not data:
-            raise PluginWarning('No data returned from trakt. Maybe password is wrong?')
+            check_auth()
+            log.warning('No data returned from trakt.')
+            return
         if url_params['data_type'] == 'custom':
             if not isinstance(data['items'], list):
                 raise PluginError('Faulty custom items in response: %s' % data['items'])
