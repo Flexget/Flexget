@@ -268,8 +268,8 @@ def lookup_series(name=None, tvdb_id=None, only_cached=False, session=None):
     if not series and name:
         series = session.query(TVDBSeries).filter(func.lower(TVDBSeries.seriesname) == name.lower()).first()
         if not series:
-            found = session.query(TVDBSearchResult). \
-                    filter(func.lower(TVDBSearchResult.search) == name.lower()).first()
+            found = session.query(TVDBSearchResult).filter(
+                func.lower(TVDBSearchResult.search) == name.lower()).first()
             if found and found.series:
                 series = found.series
     if series:
@@ -327,8 +327,8 @@ def lookup_episode(name=None, seasonnum=None, episodenum=None, absolutenum=None,
         ep_description = '%s.%s' % (series.seriesname, airdatestring)
         episode = session.query(TVDBEpisode).filter(TVDBEpisode.series_id == series.id).\
                                              filter(TVDBEpisode.firstaired == airdate).first()
-        url = get_mirror() + 'GetEpisodeByAirDate.php?apikey=%s&seriesid=%d&airdate=%s&language=%s' %\
-                             (api_key, series.id, airdatestring, language)
+        url = get_mirror() + ('GetEpisodeByAirDate.php?apikey=%s&seriesid=%d&airdate=%s&language=%s' %
+                             (api_key, series.id, airdatestring, language))
     elif absolutenum:
         ep_description = '%s.%d' % (series.seriesname, absolutenum)
         episode = session.query(TVDBEpisode).filter(TVDBEpisode.series_id == series.id).\
@@ -388,26 +388,58 @@ def mark_expired(session=None):
     # Only get the expired list every hour
     last_server = persist.get('last_server')
     last_local = persist.get('last_local')
-    if not last_local or not last_server:
-        last_server = ''
-    elif last_local + timedelta(hours=1) > datetime.now():
+
+    if not last_local:
+        # Never run before? Lets reset ALL series
+        log.info('Setting all series to expire')
+        session.query(TVDBSeries).update({'expired': True}, 'fetch')
+        persist['last_local'] = datetime.now()
+        return
+    elif last_local + timedelta(hours=6) > datetime.now():
         # It has been less than an hour, don't check again yet
         return
 
-    updates = None
+    if not last_server:
+        last_server = 0
+
+    #Need to figure out what type of update file to use
+    #Default of day
+    get_update = 'day'
+    last_update_days = (datetime.now() - last_local).days
+
+    if 1 < last_update_days < 7:
+        get_update = 'week'
+    elif last_update_days > 7:
+        get_update = 'month'
+
     try:
         # Get items that have changed since our last update
-        content = requests.get(server + 'Updates.php?type=all&time=%s' % last_server).content
+        log.debug("Getting %s worth of updates from thetvdb" % get_update)
+        content = requests.get(server + api_key + '/updates/updates_%s.xml' % get_update).content
         if not isinstance(content, basestring):
-            raise Exception('exptected string, got %s' % type(content))
-        updates = BeautifulStoneSoup(content, convertEntities=BeautifulStoneSoup.HTML_ENTITIES).items
+            raise Exception('expected string, got %s' % type(content))
+        updates = BeautifulStoneSoup(content, convertEntities=BeautifulStoneSoup.HTML_ENTITIES).data
     except RequestException, e:
         log.error('Could not get update information from tvdb: %s' % e)
         return
+
     if updates:
+        new_server = int(updates['time'])
+
+        if new_server < last_server:
+            #nothing changed on the server, ignoring
+            log.debug("Not checking for expired as nothing has changed on server")
+            return
+
         # Make lists of expired series and episode ids
-        expired_series = [int(series.string) for series in updates.findAll('series')]
-        expired_episodes = [int(ep.string) for ep in updates.findAll('episode')]
+        expired_series = []
+        expired_episodes = []
+
+        for series in updates.findAll('series', recursive=False):
+            expired_series.append(int(series.id.string))
+
+        for episode in updates.findAll('episode', recursive=False):
+            expired_series.append(int(episode.id.string))
 
         def chunked(seq):
             """Helper to divide our expired lists into sizes sqlite can handle in a query. (<1000)"""
@@ -421,7 +453,7 @@ def mark_expired(session=None):
         for chunk in chunked(expired_episodes):
             num = session.query(TVDBEpisode).filter(TVDBEpisode.id.in_(chunk)).update({'expired': True}, 'fetch')
             log.debug('%s episodes marked as expired' % num)
+
         # Save the time of this update
-        new_server = str(updates.find('time').string)
         persist['last_local'] = datetime.now()
         persist['last_server'] = new_server
