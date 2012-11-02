@@ -1103,7 +1103,7 @@ class TestTimeframe(FlexGetBase):
             series:
               - mm test:
                   timeframe: 5 hours
-                  enough: 720p
+                  target: 720p
                   quality: hdtv+ <=720p
             mock:
               - {title: 'MM Test.S01E02.pdtv-FlexGet'}
@@ -1113,7 +1113,7 @@ class TestTimeframe(FlexGetBase):
             series:
               - mm test:
                   timeframe: 5 hours
-                  enough: 720p
+                  target: 720p
                   quality: hdtv+ <=720p
             mock:
               - {title: 'MM Test.S01E02.pdtv-FlexGet'}
@@ -1398,7 +1398,7 @@ class TestImportSeries(FlexGetBase):
             import_series:
               settings:
                 propers: 12 hours
-                enough: 720p
+                target: 720p
                 timeframe: 5 minutes
                 quality: "<=720p <=bluray"
               from:
