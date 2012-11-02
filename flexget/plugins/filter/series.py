@@ -1144,12 +1144,14 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
 
         # parse options
         log.debug('timeframe: %s' % config['timeframe'])
-        try:
-            timeframe = parse_timedelta(config['timeframe'])
-        except ValueError:
-            raise PluginWarning('Invalid time format', log)
+        timeframe = parse_timedelta(config['timeframe'])
 
-        first_seen = self.get_first_seen(task.session, best)
+        releases = self.parser2entry[eps[0]]['series_releases'][0].episode.releases
+        if config.get('quality'):
+            req = qualities.Requirements(config['quality'])
+            first_seen = min(rls.first_seen for rls in releases if req.allows(rls.quality))
+        else:
+            first_seen = min(rls.first_seen for rls in releases)
         expires = first_seen + timeframe
         log.debug('timeframe: %s, first_seen: %s, expires: %s' % (timeframe, first_seen, expires))
 

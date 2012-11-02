@@ -1,4 +1,5 @@
 from tests import FlexGetBase
+from util import date_aged
 
 
 def age_series(**kwargs):
@@ -1076,7 +1077,7 @@ class TestTimeframe(FlexGetBase):
             series:
               - test:
                   timeframe: 5 hours
-                  enough: 720p
+                  target: 720p
         tasks:
           test_no_waiting:
             mock:
@@ -1142,6 +1143,24 @@ class TestTimeframe(FlexGetBase):
             mock:
               - {title: 'Q Test.S01E02.hdtv-FlexGet'}
               - {title: 'Q Test.S01E02.1080p-FlexGet'}
+
+          test_with_quality_1:
+            series:
+            - q test:
+                timeframe: 5 hours
+                quality: hdtv+
+                target: 720p
+            mock:
+            - title: q test s01e01 pdtv 720p
+
+          test_with_quality_2:
+            series:
+            - q test:
+                timeframe: 5 hours
+                quality: hdtv+
+                target: 720p
+            mock:
+            - title: q test s01e01 hdtv
 
     """
 
@@ -1217,6 +1236,22 @@ class TestTimeframe(FlexGetBase):
         self.execute_task('test_qualities_pass')
         assert self.task.find_entry('accepted', title='Q Test.S01E02.1080p-FlexGet')
         assert len(self.task.accepted) == 1
+
+    def test_with_quality(self):
+        self.execute_task('test_with_quality_1')
+        assert not self.task.accepted, 'Entry does not pass quality'
+        with date_aged('6 hours'):
+            # Entry from first test feed should not pass quality
+            self.execute_task('test_with_quality_1')
+            assert not self.task.accepted, 'Entry does not pass quality'
+            # Timeframe should not yet have started
+            self.execute_task('test_with_quality_2')
+            assert not self.task.accepted, 'Timeframe should not yet have passed'
+        with date_aged('12 hours'):
+            self.execute_task('test_with_quality_2')
+            assert self.task.accepted, 'Timeframe should have passed'
+
+
 
 
 class TestBacklog(FlexGetBase):
