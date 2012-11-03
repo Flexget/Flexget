@@ -1,4 +1,5 @@
 from flexget import validator
+from tests.util import maketemp
 import yaml
 
 
@@ -10,7 +11,7 @@ class TestValidator(object):
         dv = root.accept('dict')
         assert dv.name == 'dict', 'expected dict'
         dv.accept('text', key='text')
-        
+
     def test_dict(self):
         dv = validator.factory('dict')
         dv.accept('dict', key='foo')
@@ -29,7 +30,7 @@ class TestValidator(object):
         result = dv.validate({'three': {}})
         assert dv.errors.messages, 'should not have passed three'
         assert not result, 'should have an invalid result for 3'
-        
+
     def test_regexp_match(self):
         re_match = validator.factory('regexp_match')
         re_match.accept('abc.*')
@@ -46,7 +47,7 @@ class TestValidator(object):
         assert not interval.validate('14')
         assert not interval.validate('3 dayz')
         assert not interval.validate('about 5 minutes')
-        
+
     def test_choice(self):
         choice = validator.factory('choice')
         choice.accept('foo')
@@ -91,3 +92,18 @@ class TestValidator(object):
         assert recursive_validator().validate(test_config), 'Config should pass validation'
         test_config['recurse']['badkey'] = 4
         assert not recursive_validator().validate(test_config), 'Config should not be valid'
+
+    def test_choice(self):
+        path = validator.factory('path')
+        path_allow_missing = validator.factory('path', allow_missing=True)
+        temp_path = maketemp()
+        path.validate(temp_path)
+        print path.errors.messages
+        assert not path.errors.messages, '%s should be valid' % (temp_path)
+        path_allow_missing.validate('missing_directory')
+        print path_allow_missing.errors.messages
+        assert not path_allow_missing.errors.messages, 'missing_directory should be valid with allow_missing'
+        path.validate('missing_directory')
+        print path.errors.messages
+        assert path.errors.messages, 'missing_directory should be invalid'
+        path_allow_missing.errors.messages = []
