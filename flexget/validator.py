@@ -454,8 +454,9 @@ class FileValidator(TextValidator):
 class PathValidator(TextValidator):
     name = 'path'
 
-    def __init__(self, parent=None, allow_replacement=False, **kwargs):
+    def __init__(self, parent=None, allow_replacement=False, allow_missing=False, **kwargs):
         self.allow_replacement = allow_replacement
+        self.allow_missing = allow_missing
         Validator.__init__(self, parent, **kwargs)
 
     def validate(self, data):
@@ -482,7 +483,7 @@ class PathValidator(TextValidator):
             if result:
                 path = os.path.dirname(data[0:result.start()])
 
-        if not os.path.isdir(os.path.expanduser(path)):
+        if not self.allow_missing and not os.path.isdir(os.path.expanduser(path)):
             self.errors.add('Path %s does not exist' % path)
             return False
         return True
