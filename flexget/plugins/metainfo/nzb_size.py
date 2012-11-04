@@ -31,7 +31,8 @@ class NzbSize(object):
                entry.get('filename', '').endswith('.nzb'):
 
                 if 'file' not in entry:
-                    log.warning('%s does not have a to get size from' % entry['title'])
+                    log.warning('`%s` does not have a `file` that could be used to get size information' %
+                                entry['title'])
                     continue
 
                 filename = entry['file']
