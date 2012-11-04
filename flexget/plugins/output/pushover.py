@@ -47,7 +47,7 @@ class OutputPushover(object):
             device = entry.get("device", config["device"])
 
             # Send the request
-            data = {"userkey": userkey, "apikey": apikey, "device": device,
+            data = {"user": userkey, "token": apikey, "device": device,
                     "title": "New Flexget Download", "message": entry["title"]}
             response = task.requests.post(url, headers=headers, data=data, raise_status=False)
 
