@@ -91,18 +91,14 @@ class InputHtml(object):
         return self.create_entries(config['url'], soup, config)
 
     def _title_from_link(self, link, log_link):
-        title = link.contents[0]
-        # tag inside link
-        if isinstance(title, Tag):
-            log.debug('link %s content is tag, cannot get title' % log_link)
-            return None
+        title = link.text
         # longshot from next element (?)
-        if title is None:
+        if not title:
             title = link.next.string
             if title is None:
                 log.debug('longshot failed for %s' % log_link)
                 return None
-        return title
+        return title or None
 
     def _title_from_url(self, url):
         parts = urllib.splitquery(url[url.rfind('/') + 1:])
