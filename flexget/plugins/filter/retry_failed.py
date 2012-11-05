@@ -67,7 +67,8 @@ class PluginFailed(object):
             return
         if task.manager.options.clear_failed:
             task.manager.disable_tasks()
-            self.clear_failed()
+            if self.clear_failed():
+                task.manager.config_changed()
             return
 
     def print_failed(self):
@@ -109,14 +110,17 @@ class PluginFailed(object):
             failed.close()
 
     def clear_failed(self):
-        """Clears list of failed entries"""
+        """
+        Clears list of failed entries
+
+        :return: The number of entries cleared.
+        """
         session = Session()
         try:
-            results = session.query(FailedEntry).all()
-            for row in results:
-                session.delete(row)
-            console('Cleared %i items.' % len(results))
+            results = session.query(FailedEntry).delete()
+            console('Cleared %i items.' % results)
             session.commit()
+            return results
         finally:
             session.close()
 
