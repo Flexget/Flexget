@@ -16,7 +16,7 @@ except ImportError:
 sys.path.insert(0, '')
 
 options = environment.options
-install_requires = ['FeedParser>=5.1.2', 'SQLAlchemy >=0.7, <0.8', 'PyYAML', 'BeautifulSoup>=3.2, <3.3',
+install_requires = ['FeedParser>=5.1.2', 'SQLAlchemy >=0.7, <0.7.99', 'PyYAML', 'BeautifulSoup>=3.2, <3.3',
                     'beautifulsoup4>=4.1, <4.2', 'html5lib>=0.11', 'PyRSS2Gen', 'pynzb', 'progressbar', 'jinja2',
                     'flask', 'cherrypy', 'requests>=0.14, <0.15', 'python-dateutil!=2.0']
 if sys.version_info < (2, 7):
