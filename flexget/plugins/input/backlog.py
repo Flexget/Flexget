@@ -43,7 +43,7 @@ class BacklogEntry(Base):
     task = Column('feed', String)
     title = Column(String)
     expire = Column(DateTime)
-    _entry = Column('entry', PickleType(mutable=False))
+    _entry = Column('entry', PickleType)
     entry = safe_pickle_synonym('_entry')
 
     def __repr__(self):

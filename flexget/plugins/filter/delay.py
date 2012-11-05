@@ -19,7 +19,7 @@ class DelayedEntry(Base):
     task = Column('feed', String)
     title = Column(Unicode)
     expire = Column(DateTime)
-    _entry = Column('entry', PickleType(mutable=False))
+    _entry = Column('entry', PickleType)
     entry = safe_pickle_synonym('_entry')
 
     def __repr__(self):
