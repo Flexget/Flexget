@@ -96,7 +96,7 @@ class PluginPyLoad(object):
 
         for entry in task.accepted:
             # bunch of urls now going to check
-            content = entry['description'] + " " + quote(entry['url'])
+            content = entry.get('description', '') + ' ' + quote(entry['url'])
             content = json.dumps(content.encode("utf8"))
 
             url = json.dumps(entry['url']) if config.get('parse_url', self.DEFAULT_PARSE_URL) else "''"
