@@ -1,5 +1,4 @@
 from tests import FlexGetBase
-from util import date_aged
 
 
 def age_series(**kwargs):
@@ -1240,16 +1239,18 @@ class TestTimeframe(FlexGetBase):
     def test_with_quality(self):
         self.execute_task('test_with_quality_1')
         assert not self.task.accepted, 'Entry does not pass quality'
-        with date_aged('6 hours'):
-            # Entry from first test feed should not pass quality
-            self.execute_task('test_with_quality_1')
-            assert not self.task.accepted, 'Entry does not pass quality'
-            # Timeframe should not yet have started
-            self.execute_task('test_with_quality_2')
-            assert not self.task.accepted, 'Timeframe should not yet have passed'
-        with date_aged('12 hours'):
-            self.execute_task('test_with_quality_2')
-            assert self.task.accepted, 'Timeframe should have passed'
+
+        age_series(hours=6)
+        # Entry from first test feed should not pass quality
+        self.execute_task('test_with_quality_1')
+        assert not self.task.accepted, 'Entry does not pass quality'
+        # Timeframe should not yet have started
+        self.execute_task('test_with_quality_2')
+        assert not self.task.accepted, 'Timeframe should not yet have passed'
+
+        age_series(hours=6)
+        self.execute_task('test_with_quality_2')
+        assert self.task.accepted, 'Timeframe should have passed'
 
 
 
