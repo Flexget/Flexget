@@ -44,7 +44,7 @@ def update_menus():
 
     strftime = lambda secs: time.strftime('%Y-%m-%d %H:%M', time.localtime(float(secs)))
     menu_tasks = [i[0] for i in db_session.query(LogEntry.task).filter(LogEntry.task != '')
-                                          .distinct().order_by(asc('task'))[:]]
+                                          .distinct().order_by(asc(LogEntry.task))[:]]
     menu_execs = [(i[0], strftime(i[0])) for i in db_session.query(LogEntry.execution)
                                                             .filter(LogEntry.execution != '')
                                                             .distinct().order_by(desc('execution'))[:10]]
@@ -69,9 +69,9 @@ def get_logdata():
     # Generate the filtered query
     query = db_session.query(LogEntry)
     if log_type == 'webui':
-        query = query.filter(or_(LogEntry.logger.in_(['webui', 'werkzeug', 'event']), LogEntry.logger.like('ui%')))
+        query = query.filter(or_(LogEntry.logger.in_(['webui', 'werkzeug', 'event']), LogEntry.logger.like('%ui.%')))
     elif log_type == 'core':
-        query = query.filter(and_(~LogEntry.logger.in_(['webui', 'werkzeug', 'event']), ~LogEntry.logger.like('ui%')))
+        query = query.filter(and_(~LogEntry.logger.in_(['webui', 'werkzeug', 'event']), ~LogEntry.logger.like('%ui.%')))
     if task:
         query = query.filter(LogEntry.task == task)
     if execution:
