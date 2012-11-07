@@ -43,7 +43,7 @@ def update_menus():
     import time
 
     strftime = lambda secs: time.strftime('%Y-%m-%d %H:%M', time.localtime(float(secs)))
-    menu_tasks = [i[0] for i in db_session.query(LogEntry.task).filter(LogEntry.task != '')
+    menu_tasks = [i[0] for i in db_session.query(LogEntry.task).filter(LogEntry.task != u'')
                                           .distinct().order_by(asc(LogEntry.task))[:]]
     menu_execs = [(i[0], strftime(i[0])) for i in db_session.query(LogEntry.execution)
                                                             .filter(LogEntry.execution != '')
