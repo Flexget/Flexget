@@ -12,7 +12,7 @@ CATEGORIES = {'all': '0_0',
 FILTERS = ['all', 'filter remakes', 'trusted only', 'a+ only']
 
 
-class UrlRewriteNyaa:
+class UrlRewriteNyaa(object):
     """Nyaa urlrewriter and search plugin."""
 
     def validator(self):
