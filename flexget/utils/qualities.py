@@ -7,7 +7,7 @@ log = logging.getLogger('utils.qualities')
 
 class QualityComponent(object):
     """"""
-    def __init__(self, type, value, name, regexp=None, modifier=0, defaults=None):
+    def __init__(self, type, value, name, regexp=None, modifier=None, defaults=None):
         """
         :param type: Type of quality component. (resolution, source, codec, or audio)
         :param value: Value used to sort this component with others of like type.
@@ -135,7 +135,7 @@ _sources = [
     QualityComponent('source', 100, 'dsr', 'dsr|ds[\W_]?rip'),
     QualityComponent('source', 110, 'webrip', 'web[\W_]?rip'),
     QualityComponent('source', 120, 'sdtv', '(?:[sp]dtv|dvb)(?:[\W_]?rip)?'),
-    QualityComponent('source', 130, 'dvdscr', '(?:(?:dvd|web)[\W_]?)?scr(?:eener)?'),
+    QualityComponent('source', 130, 'dvdscr', '(?:(?:dvd|web)[\W_]?)?scr(?:eener)?', modifier=0),
     QualityComponent('source', 140, 'bdscr', 'bdscr(?:eener)?'),
     QualityComponent('source', 150, 'hdtv', 'a?hdtv(?:[\W_]?rip)?',),
     QualityComponent('source', 160, 'webdl', 'web(?:[\W_]?dl(?:[\W_]?rip)?)?'),
@@ -229,7 +229,7 @@ class Quality(object):
             if match[0]:
                 result = item
                 self.clean_text = match[1]
-                if item.modifier:
+                if item.modifier is not None:
                     # If this item has a modifier, do not proceed to check higher qualities in the list
                     break
         return result or default
@@ -245,7 +245,7 @@ class Quality(object):
 
     @property
     def _comparator(self):
-        modifier = sum(c.modifier for c in self.components)
+        modifier = sum(c.modifier for c in self.components if c.modifier)
         return [modifier] + self.components
 
     def __contains__(self, other):
