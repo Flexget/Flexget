@@ -5,8 +5,8 @@ from flexget.utils.template import RenderError
 log = logging.getLogger("pushover")
 
 __version__ = 0.1
-headers = {"User-Agent": "FlexGet Pushover plugin/%s" % str(__version__)}
-url = "https://api.pushover.net/1/messages.json"
+client_headers = {"User-Agent": "FlexGet Pushover plugin/%s" % str(__version__)}
+pushover_url = "https://api.pushover.net/1/messages.json"
 
 class OutputPushover(object):
     """
@@ -15,7 +15,10 @@ class OutputPushover(object):
       pushover:
         userkey: <USER_KEY>
         apikey: <API_KEY>
-        device: <DEVICE_STRING>
+        [device: <DEVICE_STRING>]
+        [title: <MESSAGE_TITLE>]
+        [priority: <PRIORITY>] (1 = high, -1 = silent)
+        [url: <URL>]
 
     Configuration parameters are also supported from entries (eg. through set).
     """
@@ -25,12 +28,21 @@ class OutputPushover(object):
         config = validator.factory("dict")
         config.accept("text", key="userkey", required=True)
         config.accept("text", key="apikey", required=True)
-        config.accept("text", key="device", required=True)
+        config.accept("text", key="device", required=False)
+        config.accept("text", key="title", required=False)
+        config.accept("integer", key="priority", required=False)
+        config.accept("url", key="url", required=False)
         return config
 
     def prepare_config(self, config):
         if isinstance(config, bool):
             config = {"enabled": config}
+
+        config.setdefault("device", None)
+        config.setdefault("title", "Download started")
+        config.setdefault("priority", 0)
+        config.setdefault("url", None)
+
         return config
 
     def on_task_output(self, task, config):
@@ -38,18 +50,38 @@ class OutputPushover(object):
         config = self.prepare_config(config)
         for entry in task.accepted:
 
+            userkey = config["userkey"]
+            apikey = config["apikey"]
+            device = config["device"]
+            title = config["title"]
+            message = entry["title"]
+            priority = config["priority"]
+            url = config["url"]
+
             if task.manager.options.test:
-                log.info("Would send Pushover notification about: %s", entry["title"])
+                log.info("Test mode.  Pushover notification would be:")
+                if device:
+                    log.info("    Device: %s" % device)
+                else:
+                    log.info("    Device: [broadcast]")
+                log.info("    Title: %s" % title)
+                log.info("    Message: %s" % message)
+                log.info("    URL: %s" % url)
+                log.info("    Priority: %d" % priority)
+
+                # Test mode.  Skip remainder.
                 continue
 
-            userkey = entry.get("userkey", config["userkey"])
-            apikey = entry.get("apikey", config["apikey"])
-            device = entry.get("device", config["device"])
-
             # Send the request
-            data = {"user": userkey, "token": apikey, "device": device,
-                    "title": "Download started", "message": entry["title"]}
-            response = task.requests.post(url, headers=headers, data=data, raise_status=False)
+            data = {"user": userkey, "token": apikey, "title": title, "message": message}
+            if device:
+                data["device"] = device
+            if priority:
+                data["priority"] = priority
+            if url:
+                data["url"] = url
+
+            response = task.requests.post(pushover_url, headers=client_headers, data=data, raise_status=False)
 
             # Check if it succeeded
             request_status = response.status_code
