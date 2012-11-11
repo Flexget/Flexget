@@ -38,6 +38,7 @@ class OutputPushover(object):
         if isinstance(config, bool):
             config = {"enabled": config}
 
+        # Set the defaults
         config.setdefault("device", None)
         config.setdefault("title", "Download started")
         config.setdefault("priority", 0)
@@ -48,16 +49,26 @@ class OutputPushover(object):
     def on_task_output(self, task, config):
         # get the parameters
         config = self.prepare_config(config)
-        for entry in task.accepted:
 
+        # Loop through the provided entries
+        for entry in task.accepted:
+            # Set a bunch of local variables from the config and the entry
             userkey = config["userkey"]
             apikey = config["apikey"]
             device = config["device"]
             title = config["title"]
             message = entry["title"]
             priority = config["priority"]
-            url = config["url"]
+            url = entry.get("imdb_url", config["url"])
 
+            # Attempt to render the entry's title field
+            try:
+                message = entry.render(message)
+            except RenderError, e:
+                log.warning("Problem rendering entry 'title' field: %s" % e)
+                message = entry["title"]
+
+            # Check for test mode
             if task.manager.options.test:
                 log.info("Test mode.  Pushover notification would be:")
                 if device:
@@ -72,7 +83,7 @@ class OutputPushover(object):
                 # Test mode.  Skip remainder.
                 continue
 
-            # Send the request
+            # Build the request
             data = {"user": userkey, "token": apikey, "title": title, "message": message}
             if device:
                 data["device"] = device
@@ -81,6 +92,7 @@ class OutputPushover(object):
             if url:
                 data["url"] = url
 
+            # Make the request
             response = task.requests.post(pushover_url, headers=client_headers, data=data, raise_status=False)
 
             # Check if it succeeded
