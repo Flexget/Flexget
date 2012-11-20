@@ -15,10 +15,11 @@ class OutputPushover(object):
       pushover:
         userkey: <USER_KEY>
         apikey: <API_KEY>
-        [device: <DEVICE_STRING>]
-        [title: <MESSAGE_TITLE>]
-        [priority: <PRIORITY>] (1 = high, -1 = silent)
-        [url: <URL>]
+        [device: <DEVICE_STRING>] (default: None)
+        [title: <MESSAGE_TITLE>] (default: "Download started")
+        [message: <MESSAGE_BODY>] (default: "{{series_name}} {{series_id}}")
+        [priority: <PRIORITY>] (default = 0, high = 1, silent = -1)
+        [url: <URL>] (default: None (replaced with the IMDB URL))
 
     Configuration parameters are also supported from entries (eg. through set).
     """
@@ -30,6 +31,7 @@ class OutputPushover(object):
         config.accept("text", key="apikey", required=True)
         config.accept("text", key="device", required=False)
         config.accept("text", key="title", required=False)
+        config.accept("text", key="message", required=False)
         config.accept("integer", key="priority", required=False)
         config.accept("url", key="url", required=False)
         return config
@@ -41,6 +43,7 @@ class OutputPushover(object):
         # Set the defaults
         config.setdefault("device", None)
         config.setdefault("title", "Download started")
+        config.setdefault("message", "{{series_name}} {{series_id}}")
         config.setdefault("priority", 0)
         config.setdefault("url", None)
 
@@ -57,7 +60,7 @@ class OutputPushover(object):
             apikey = config["apikey"]
             device = config["device"]
             title = config["title"]
-            message = entry["title"]
+            message = entry.get("title", config["message"])
             priority = config["priority"]
             url = entry.get("imdb_url", config["url"])
 
