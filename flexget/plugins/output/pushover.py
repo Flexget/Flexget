@@ -15,11 +15,11 @@ class OutputPushover(object):
       pushover:
         userkey: <USER_KEY>
         apikey: <API_KEY>
-        [device: <DEVICE_STRING>] (default: None)
-        [title: <MESSAGE_TITLE>] (default: "Download started")
-        [message: <MESSAGE_BODY>] (default: "{{series_name}} {{series_id}}")
-        [priority: <PRIORITY>] (default = 0, high = 1, silent = -1)
-        [url: <URL>] (default: None (replaced with the IMDB URL))
+        [device: <DEVICE_STRING>] (default: (none))
+        [title: <MESSAGE_TITLE>] (default: "Download started" -- accepts Jinja)
+        [message: <MESSAGE_BODY>] (default: "{{series_name}} {{series_id}}" -- accepts Jinja)
+        [priority: <PRIORITY>] (default = 0 -- normal = 0, high = 1, silent = -1)
+        [url: <URL>] (default: "{{imdb_url}}" -- accepts Jinja)
 
     Configuration parameters are also supported from entries (eg. through set).
     """
@@ -45,7 +45,7 @@ class OutputPushover(object):
         config.setdefault("title", "Download started")
         config.setdefault("message", "{{series_name}} {{series_id}}")
         config.setdefault("priority", 0)
-        config.setdefault("url", None)
+        config.setdefault("url", "{{imdb_url}}")
 
         return config
 
@@ -60,16 +60,30 @@ class OutputPushover(object):
             apikey = config["apikey"]
             device = config["device"]
             title = config["title"]
-            message = entry.get("title", config["message"])
+            message = config["message"]
             priority = config["priority"]
-            url = entry.get("imdb_url", config["url"])
+            url = config["url"]
 
-            # Attempt to render the entry's title field
+            # Attempt to render the title field
+            try:
+                title = entry.render(title)
+            except RenderError, e:
+                log.warning("Problem rendering 'title': %s" % e)
+                title = "Download started"
+
+            # Attempt to render the message field
             try:
                 message = entry.render(message)
             except RenderError, e:
-                log.warning("Problem rendering entry 'title' field: %s" % e)
+                log.warning("Problem rendering 'message': %s" % e)
                 message = entry["title"]
+
+            # Attempt to render the url field
+            try:
+                url = entry.render(url)
+            except RenderError, e:
+                log.warning("Problem rendering 'url': %s" % e)
+                url = entry["imdb_url"]
 
             # Check for test mode
             if task.manager.options.test:
@@ -87,13 +101,11 @@ class OutputPushover(object):
                 continue
 
             # Build the request
-            data = {"user": userkey, "token": apikey, "title": title, "message": message}
+            data = {"user": userkey, "token": apikey, "title": title, "message": message, "url": url}
             if device:
                 data["device"] = device
             if priority:
                 data["priority"] = priority
-            if url:
-                data["url"] = url
 
             # Make the request
             response = task.requests.post(pushover_url, headers=client_headers, data=data, raise_status=False)
