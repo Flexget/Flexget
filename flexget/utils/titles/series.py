@@ -52,8 +52,8 @@ class SeriesParser(TitleParser):
         '(\d{2,4})%s(\d{1,2})%s(\d{1,2})' % (separators, separators),
         '(\d{1,2})%s(\d{1,2})%s(\d{2,4})' % (separators, separators)]])
     sequence_regexps = ReList([TitleParser.re_not_in_word(regexp) for regexp in [
-        '(?:pt|part)\s?(\d+|%s)' % roman_numeral_re,
-        '(\d{1,3})(?:v(?P<version>\d))?']])
+        '(\d{1,3})(?:v(?P<version>\d))?',
+        '(?:pt|part)\s?(\d+|%s)' % roman_numeral_re]])
     id_regexps = ReList([TitleParser.re_not_in_word(regexp) for regexp in [
         '(\d{4})x(\d+)\W(\d+)']])
     unwanted_id_regexps = ReList([
