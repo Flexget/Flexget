@@ -184,7 +184,7 @@ class RootValidator(Validator):
         return self.validate_item(data, self.valid)
 
     def schema(self):
-        return {'type': 'root', 'valid': [v.schema() for v in self.valid]}
+        return {'anyOf': [v.schema() for v in self.valid]}
 
 
 class ChoiceValidator(Validator):
@@ -225,7 +225,7 @@ class ChoiceValidator(Validator):
             return False
 
     def schema(self):
-        return {'type': 'choice', 'valid': self.valid + self.valid_ic}
+        return {'enum': self.valid + self.valid_ic}
 
 
 class AnyValidator(Validator):
@@ -257,7 +257,7 @@ class EqualsValidator(Validator):
         return self.valid == data
 
     def schema(self):
-        return {'type': 'equals', 'valid': self.valid}
+        return {'enum': [self.valid]}
 
 
 class NumberValidator(Validator):
@@ -314,7 +314,8 @@ class DecimalValidator(Validator):
         return valid
 
     def schema(self):
-        return {'type': 'decimal'}
+        # TODO: maybe needs to require float somehow. Or maybe this class should just be replaced with NumberValidator
+        return {'type': 'number'}
 
 
 class BooleanValidator(Validator):
@@ -352,7 +353,7 @@ class TextValidator(Validator):
         return valid
 
     def schema(self):
-        return {'type': 'text'}
+        return {'type': 'string'}
 
 
 class RegexpValidator(Validator):
@@ -376,7 +377,7 @@ class RegexpValidator(Validator):
         return True
 
     def schema(self):
-        return {'type': 'regexp'}
+        return {'type': 'string', 'format': 'regex'}
 
 
 class RegexpMatchValidator(Validator):
@@ -422,9 +423,8 @@ class RegexpMatchValidator(Validator):
         return False
 
     def schema(self):
-        return {'type': 'regexp_match', 'valid': {
-            'accept': [r.pattern for r in self.regexps],
-            'reject': [r.pattern for r in self.reject_regexps]}}
+        # TODO: fix multiple acceptable regexps, implement reject regexps
+        return {'type': 'string', 'pattern': self.regexps[0].pattern}
 
 
 class IntervalValidator(RegexpMatchValidator):
@@ -434,6 +434,9 @@ class IntervalValidator(RegexpMatchValidator):
         RegexpMatchValidator.__init__(self, parent, **kwargs)
         self.accept(r'^\d+ (second|minute|hour|day|week)s?$')
         self.message = "should be in format 'x (seconds|minutes|hours|days|weeks)'"
+
+    def schema(self):
+        return {'type': 'string', 'pattern': r'^\d+ (second|minute|hour|day|week)s?$'}
 
 
 class FileValidator(TextValidator):
@@ -448,7 +451,8 @@ class FileValidator(TextValidator):
         return True
 
     def schema(self):
-        return {'type': 'file'}
+        # TODO: fix this
+        return {'type': 'string', 'format': 'file'}
 
 
 class PathValidator(TextValidator):
@@ -489,7 +493,8 @@ class PathValidator(TextValidator):
         return True
 
     def schema(self):
-        return {'type': 'path'}
+        # TODO: Fix this
+        return {'type': 'string', 'format': 'path'}
 
 
 class UrlValidator(TextValidator):
@@ -513,7 +518,7 @@ class UrlValidator(TextValidator):
         return valid
 
     def schema(self):
-        return {'type': 'url'}
+        return {'type': 'string', 'format': 'uri'}
 
 
 class ListValidator(Validator):
@@ -540,7 +545,8 @@ class ListValidator(Validator):
         return count == self.errors.count()
 
     def schema(self):
-        return {'type': 'list', 'valid': [v.schema() for v in self.valid]}
+        # TODO: should not be a list with only one item?
+        return {'type': 'array', 'items': {'anyOf': [v.schema() for v in self.valid]}}
 
 
 class DictValidator(Validator):
@@ -677,23 +683,25 @@ class DictValidator(Validator):
         return count == self.errors.count()
 
     def schema(self):
-        schema = {'type': 'dict'}
-        valid = {}
-        for name, validators in self.valid.iteritems():
+        schema = {'type': 'object'}
+        properties = schema['properties'] = {}
+        for key, validators in self.valid.iteritems():
             if not validators:
                 continue
             if len(validators) == 1:
-                valid[name] = validators[0].schema()
+                properties[key] = validators[0].schema()
             else:
-                valid[name] = [v.schema() for v in validators]
-
-        schema['valid'] = valid
+                properties[key] = {'anyOf': [v.schema() for v in validators]}
         if self.required_keys:
-            schema['required_keys'] = self.required_keys
+            schema['required'] = self.required_keys
         if self.any_key:
-            schema['any_key'] = [v.schema() for v in self.any_key]
-        if self.reject_keys:
-            schema['reject_keys'] = self.reject
+            # TODO: Maybe should not be a list when len is 1
+            schema['additionalProperties'] = [v.schema() for v in self.any_key]
+        else:
+            schema['additionalProperties'] = False
+            # TODO: implement this, and accept_valid_keys
+        #if self.reject_keys:
+        #    schema['reject_keys'] = self.reject
 
         return schema
 
@@ -709,6 +717,10 @@ class QualityValidator(TextValidator):
             return False
         return True
 
+    # TODO: Do this different?
+    def schema(self):
+        return {'type': 'string', 'format': 'quality'}
+
 
 class QualityRequirementsValidator(TextValidator):
     name = 'quality_requirements'
@@ -720,6 +732,10 @@ class QualityRequirementsValidator(TextValidator):
             self.errors.add('`%s` is not a valid quality requirement: %s' % (data, e.message))
             return False
         return True
+
+    # TODO: Do this different?
+    def schema(self):
+        return {'type': 'string', 'format': 'qualityRquirements'}
 
 
 class LazyValidator(object):
@@ -746,7 +762,9 @@ class LazyValidator(object):
     def schema(self):
         """Return the schema of our instance if it has already been created, otherwise return 'ondemand' type."""
         if self.validator is None:
-            return {'type': 'ondemand'}
+            # TODO: Implement this
+            return {'type': 'any'}
+            #return {'type': 'ondemand'}
         else:
             return self.validator.schema()
 
@@ -844,12 +862,14 @@ def complex_test():
 
 
 if __name__ == '__main__':
-    v = complex_test()
+    from flexget.plugins.input.rss import InputRSS
+    #v = complex_test()
+    v = InputRSS().validator()
     schema = v.schema()
 
-    import yaml
+    import json
 
-    print yaml.dump(schema)
+    print json.dumps(schema, sort_keys=True, indent=4)
 
     """
     root = factory()

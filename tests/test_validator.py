@@ -93,7 +93,7 @@ class TestValidator(object):
         test_config['recurse']['badkey'] = 4
         assert not recursive_validator().validate(test_config), 'Config should not be valid'
 
-    def test_choice(self):
+    def test_path(self):
         path = validator.factory('path')
         path_allow_missing = validator.factory('path', allow_missing=True)
         temp_path = maketemp()
