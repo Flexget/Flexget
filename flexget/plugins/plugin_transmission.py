@@ -150,7 +150,7 @@ class PluginTransmissionInput(TransmissionBase):
     def _torrent_completed(self, torrent):
         result = True
         for tf in torrent.files().iteritems():
-            result &= (tf[1]['completed'] != tf[1]['size'])
+            result &= (tf[1]['completed'] == tf[1]['size'])
         return result
 
 
