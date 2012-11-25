@@ -1,14 +1,15 @@
 """ Plugin Loading & Management.
 """
 
-from flexget import plugins as plugins_pkg
 import sys
 import os
 import re
 import logging
 import time
+from itertools import ifilter
 from requests import RequestException
 from event import add_event_handler as add_phase_handler
+from flexget import plugins as plugins_pkg
 
 log = logging.getLogger('plugin')
 
@@ -152,6 +153,8 @@ def _strip_trailing_sep(path):
 
 DEFAULT_PRIORITY = 128
 
+plugin_contexts = ['task', 'root']
+
 # task phases, in order of their execution; note that this can be extended by
 # registering new phases at runtime
 task_phases = ['start', 'input', 'metainfo', 'filter', 'download', 'modify', 'output', 'exit']
@@ -282,16 +285,18 @@ class PluginInfo(dict):
         """Convention is to take camel-case class name and rewrite it to an underscore form, e.g. 'PluginName' to 'plugin_name'"""
         return re.sub('[A-Z]+', lambda i: '_' + i.group(0).lower(), plugin_class.__name__).lstrip('_')
 
-    def __init__(self, plugin_class, name=None, groups=None, builtin=False, debug=False, api_ver=1):
+    def __init__(self, plugin_class, name=None, groups=None, builtin=False, debug=False, api_ver=1, contexts=None, category=None):
         """
         Register a plugin.
 
-        :plugin_class: The plugin factory.
-        :name: Name of the plugin (if not given, default to factory class name in underscore form).
-        :groups: Groups this plugin belongs to.
-        :builtin: Auto-activated?
-        :debug: True if plugin is for debugging purposes.
-        :api_ver: Signature of callback hooks (1=task; 2=task,config).
+        :param plugin_class: The plugin factory.
+        :param name: Name of the plugin (if not given, default to factory class name in underscore form).
+        :param groups: Groups this plugin belongs to.
+        :param builtin: Auto-activated?
+        :param debug: True if plugin is for debugging purposes.
+        :param api_ver: Signature of callback hooks (1=task; 2=task,config).
+        :param contexts: List of where this plugin is configurable. Can be 'task', 'root', or None
+        :param category: The type of plugin. Can be one of the task phases. Defaults to the package containing the plugin.
         """
         dict.__init__(self)
 
@@ -299,6 +304,13 @@ class PluginInfo(dict):
             groups = []
         if name is None:
             name = PluginInfo.name_from_class(plugin_class)
+        if contexts is None:
+            contexts = ['task']
+        elif isinstance(contexts, basestring):
+            contexts = [contexts]
+        if category is None:
+            # By default look at the containing package of the plugin.
+            category = plugin_class.__module__.split('.')[-2]
 
         # Set basic info attributes
         self.api_ver = api_ver
@@ -306,6 +318,8 @@ class PluginInfo(dict):
         self.groups = groups
         self.builtin = builtin
         self.debug = debug
+        self.contexts = contexts
+        self.category = category
         self.phase_handlers = {}
 
         # Create plugin instance
@@ -587,11 +601,27 @@ def load_plugins(parser):
     log.debug('Plugins took %.2f seconds to load' % took)
 
 
+def get_plugins(phase=None, group=None, context=None, category=None, min_api=None):
+    def matches(plugin):
+        if phase and not phase in plugin.phase_handlers:
+            return False
+        if group and not group in plugin.groups:
+            return False
+        if context and not context in plugin.contexts:
+            return False
+        if category and not category == plugin.category:
+            return False
+        if min_api is not None and plugin.api_ver < min_api:
+            return False
+        return True
+    return ifilter(matches, plugins.itervalues())
+
+
 def get_plugins_by_phase(phase):
     """Return an iterator over all plugins that hook :phase:"""
     if not phase in phase_methods:
         raise Exception('Unknown phase %s' % phase)
-    return (p for p in plugins.itervalues() if phase in p.phase_handlers)
+    return get_plugins(phase=phase)
 
 
 def get_phases_by_plugin(name):
@@ -601,7 +631,7 @@ def get_phases_by_plugin(name):
 
 def get_plugins_by_group(group):
     """Return an iterator over all plugins with in specified group."""
-    return (p for p in plugins.itervalues() if group in p.get('groups'))
+    return get_plugins(group=group)
 
 
 def get_plugin_keywords():
