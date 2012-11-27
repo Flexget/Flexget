@@ -1,5 +1,8 @@
 {% extends "configure/configure.html" %}
 {% block configure %}
+    <script type="text/javascript" language="JavaScript" src="/static/js/yaml.js"></script>
+    <script type="text/javascript" language="JavaScript" src="/static/js/jsoneditor.js"></script>
+    <link rel="stylesheet" type="text/css" href="/static/css/jsoneditor.css">
     <script type="text/javascript">
         $(function (){
             $('#name_input').hide();
@@ -8,7 +11,7 @@
             $('#name_label').replaceWith($('#name_input'));
             $('#name_input').show();
         }
-    </script>
+	</script>
     
     
     <style type="text/css">
@@ -33,7 +36,9 @@
         
         <p>Fully UI-based editing will be implemented later</p>
 
-        <textarea class="config" name="config" cols=80 rows=25 spellcheck="false" wrap="off">{{ config }}</textarea>
+        <input type="checkbox" name="useJSONEditor" id="useJSONEditor" onchange="showhideJSONEditor(this.checked);" />Use JSONEditor<br />
+        <textarea class="config" name="config" cols=80 rows=25 spellcheck="false" wrap="off" id="config">{{ config }}</textarea>
+        <div id="editArea"></div>
         <div>
             <button type="submit" id="submit">Submit</button>
         </div>
@@ -44,4 +49,24 @@
             {% endfor %}
         {% endif %}
     </form>
+	<script type="text/javascript">
+        var container = document.getElementById("editArea");
+        var editor = new JSONEditor(container,{change: getJSON},YAML.decode(document.getElementById('config').value));
+        function getJSON() {
+			var json = editor.get();
+			document.getElementById('config').value = YAML.encode(json,200)
+		}
+		//document.getElementById('config').style.display = 'none';
+		function showhideJSONEditor(val) {
+			editor.set(YAML.decode(document.getElementById('config').value));
+			if (val) {
+				document.getElementById('editArea').style.display = '';
+				document.getElementById('config').style.display = 'none';
+			} else {
+				document.getElementById('editArea').style.display = 'none';
+				document.getElementById('config').style.display = '';
+			}
+		}
+		showhideJSONEditor(document.getElementById("useJSONEditor").checked);
+     </script>
 {% endblock %}
