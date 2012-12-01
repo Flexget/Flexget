@@ -88,7 +88,7 @@ class TestImdb(FlexGetBase):
         """IMDB: Test Lookup (ONLINE)"""
         self.execute_task('test')
         assert self.task.find_entry(imdb_name='Spirited Away'), \
-            'Failed IMDB lookup (search chihiro)'
+            'Failed IMDB lookup (search Spirited Away)'
         assert self.task.find_entry(imdb_name='Princess Mononoke'), \
             'Failed imdb lookup (direct)'
         assert self.task.find_entry(imdb_name='Taken', imdb_url='http://www.imdb.com/title/tt0936501/'), \

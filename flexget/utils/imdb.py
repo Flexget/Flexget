@@ -4,7 +4,7 @@ import re
 from flexget.utils.soup import get_soup
 from flexget.utils.requests import Session
 from flexget.utils.tools import str_to_int
-from BeautifulSoup import NavigableString, Tag
+from BeautifulSoup import Tag
 
 log = logging.getLogger('utils.imdb')
 # IMDb delivers a version of the page which is unparsable to unknown (and some known) user agents, such as requests'
@@ -41,19 +41,13 @@ class ImdbSearch(object):
     def __init__(self):
         # de-prioritize aka matches a bit
         self.aka_weight = 0.95
-        # prioritize popular matches a bit by depriorizing others
-        self.unpopular_weight = 0.85
-        # de-prioritize tv results
-        self.tv_weight = 0.75
         # prioritize first
-        self.first_weight = 1.02
+        self.first_weight = 1.1
         self.min_match = 0.5
         self.min_diff = 0.01
         self.debug = False
 
-        self.remove = ['imax']
-
-        self.ignore_types = ['VG']
+        self.max_results = 10
 
     def ireplace(self, str, old, new, count=0):
         """Case insensitive string replace"""
@@ -93,10 +87,6 @@ class ImdbSearch(object):
                 log.debug('best_match removing %s (min_match)' % movie['name'])
                 movies.remove(movie)
                 continue
-            if movie.get('type', None) in self.ignore_types:
-                log.debug('best_match removing %s (ignored type)' % movie['name'])
-                movies.remove(movie)
-                continue
 
         if not movies:
             log.debug('FAILURE: no movies remain')
@@ -122,7 +112,8 @@ class ImdbSearch(object):
         """Return array of movie details (dict)"""
         log.debug('Searching: %s' % name)
         url = u'http://www.imdb.com/find'
-        params = {'q': name, 's': 'all'}
+        # This will only include movies searched by title in the results
+        params = {'q': name, 's': 'tt', 'ttype': 'ft'}
 
         log.debug('Serch query: %s' % repr(url))
         page = requests.get(url, params=params)
@@ -146,84 +137,58 @@ class ImdbSearch(object):
         # the god damn page has declared a wrong encoding
         soup = get_soup(page.content)
 
-        sections = ['Popular Titles', 'Titles (Exact Matches)',
-                    'Titles (Partial Matches)', 'Titles (Approx Matches)']
+        section_table = soup.find('table', 'findList')
+        if not section_table:
+            log.debug('results table not found')
+            return
 
-        for section in sections:
-            section_tag = soup.find('b', text=section)
-            if not section_tag:
-                log.debug('section %s not found' % section)
-                continue
-            log.debug('processing section %s' % section)
-            try:
-                section_table = section_tag.find_next('table')
-            except AttributeError:
-                log.debug('Section %s does not have a table?' % section)
-                continue
+        rows = section_table.find_all('td', 'result_text')
+        if not rows:
+            log.debug('Titles section does not have links')
+        for count, row in enumerate(rows):
+            # Title search gives a lot of results, only check the first ones
+            if count > self.max_results:
+                break
 
-            links = section_table.find_all('a', attrs={'href': re.compile(r'/title/tt')})
-            if not links:
-                log.debug('section %s does not have links' % section)
-            for count, link in enumerate(links):
-                # skip links with div as a parent (not movies, somewhat rare links in additional details)
-                if link.parent.name == u'div':
+            movie = {}
+            additional = re.findall(r'\((.*?)\)', row.text)
+            if len(additional) > 0:
+                movie['year'] = additional[-1]
+
+            link = row.find_next('a')
+            movie['name'] = link.text
+            movie['url'] = 'http://www.imdb.com' + link.get('href')
+            movie['imdb_id'] = extract_id(movie['url'])
+            log.debug('processing name: %s url: %s' % (movie['name'], movie['url']))
+
+            # calc & set best matching ratio
+            seq = difflib.SequenceMatcher(lambda x: x == ' ', movie['name'].title(), name.title())
+            ratio = seq.ratio()
+
+            # check if some of the akas have better ratio
+            for aka in link.parent.find_all('p', attrs={'class': 'find-aka'}):
+                aka = aka.next.string
+                match = re.search(r'".*"', aka)
+                if not match:
+                    log.debug('aka `%s` is invalid' % aka)
                     continue
+                aka = match.group(0).replace('"', '')
+                log.trace('processing aka %s' % aka)
+                seq = difflib.SequenceMatcher(lambda x: x == ' ', aka.title(), name.title())
+                aka_ratio = seq.ratio()
+                if aka_ratio > ratio:
+                    ratio = aka_ratio * self.aka_weight
+                    log.debug('- aka `%s` matches better to `%s` ratio %s (weighted to %s)' %
+                              (aka, name, aka_ratio, ratio))
 
-                # skip links without text value, these are small pictures before title
-                if len(link.contents) == 1 and not isinstance(link.contents[0], basestring):
-                    continue
+            # prioritize items by position
+            position_ratio = (self.first_weight - 1) / (count + 1) + 1
+            log.debug('- prioritizing based on position %s `%s`: %s' % (count, movie['url'], position_ratio))
+            ratio *= position_ratio
 
-                movie = {}
-                additional = re.findall(r'\((.*?)\)', link.next.next)
-                if len(additional) > 0:
-                    movie['year'] = filter(unicode.isdigit, additional[0]) # strip non numbers ie. 2008/I
-                if len(additional) > 1:
-                    movie['type'] = additional[1]
-
-                movie['name'] = unicode(link.contents[0])
-                movie['url'] = 'http://www.imdb.com' + link.get('href')
-                movie['imdb_id'] = extract_id(movie['url'])
-                log.debug('processing name: %s url: %s' % (movie['name'], movie['url']))
-
-                # calc & set best matching ratio
-                seq = difflib.SequenceMatcher(lambda x: x == ' ', movie['name'].title(), name.title())
-                ratio = seq.ratio()
-
-                # deprioritize tv results
-                if movie.get('type') == 'TV':
-                    log.debug('deprioritize tv')
-                    ratio = ratio * self.tv_weight
-
-                # check if some of the akas have better ratio
-                for aka in link.parent.find_all('p', attrs={'class': 'find-aka'}):
-                    aka = aka.next.string
-                    match = re.search(r'".*"', aka)
-                    if not match:
-                        log.debug('aka `%s` is invalid' % aka)
-                        continue
-                    aka = match.group(0).replace('"', '')
-                    log.trace('processing aka %s' % aka)
-                    seq = difflib.SequenceMatcher(lambda x: x == ' ', aka.title(), name.title())
-                    aka_ratio = seq.ratio()
-                    if aka_ratio > ratio:
-                        ratio = aka_ratio * self.aka_weight
-                        log.debug('- aka `%s` matches better to `%s` ratio %s (weighted to %s)' %
-                                  (aka, name, aka_ratio, ratio))
-
-                # prioritize popular titles
-                if section != sections[0]:
-                    ratio = ratio * self.unpopular_weight
-                else:
-                    log.debug('- priorizing popular %s' % movie['url'])
-
-                # prioritize first item
-                if count == 1:
-                    log.debug('- prioritizing first hit `%s`' % movie['url'])
-                    ratio = ratio * self.first_weight
-
-                # store ratio
-                movie['match'] = ratio
-                movies.append(movie)
+            # store ratio
+            movie['match'] = ratio
+            movies.append(movie)
 
         movies.sort(key=lambda x: x['match'], reverse=True)
         return movies
@@ -314,31 +279,31 @@ class ImdbParser(object):
                 try:
                     self.score = float(span_score.string)
                 except ValueError:
-                    log.debug('tag_score %s is not valid float' % span_score.contents[0])
+                    log.debug('tag_score %s is not valid float' % span_score.text)
                 log.debug('Detected score: %s' % self.score)
             else:
                 log.warning('Unable to get score for %s - plugin needs update?' % url)
 
         # get genres
         for link in soup.find_all('a', attrs={'itemprop': 'genre'}):
-            self.genres.append(unicode(link.contents[0].lower()))
+            self.genres.append(link.text.lower())
 
         # get languages
         for link in soup.find_all('a', attrs={'itemprop': 'inLanguage'}):
             # skip non-primary languages "(a few words)", etc.
-            m = re.search('(?x) \( [^()]* \\b few \\b', unicode(link.next_sibling))
+            m = re.search('(?x) \( [^()]* \\b few \\b', link.next_sibling)
             if not m:
-                lang = unicode(link.contents[0].lower())
+                lang = link.text.lower()
                 if not lang in self.languages:
                     self.languages.append(lang.strip())
 
         # get year
         tag_year = soup.find('a', attrs={'href': re.compile('^/year/\d+')})
         if tag_year:
-            self.year = int(tag_year.contents[0])
+            self.year = int(tag_year.text)
             log.debug('Detected year: %s' % self.year)
         elif soup.head.title:
-            m = re.search(r'(\d{4})\)', unicode(soup.head.title.string))
+            m = re.search(r'(\d{4})\)', soup.head.title.string)
             if m:
                 self.year = int(m.group(1))
                 log.debug('Detected year: %s' % self.year)
@@ -352,7 +317,7 @@ class ImdbParser(object):
         if tag_cast:
             for actor in tag_cast.find_all('a', href=re.compile('/name/nm')):
                 actor_id = extract_id(actor['href'])
-                actor_name = unicode(actor.contents[0])
+                actor_name = actor.text
                 # tag instead of name
                 if isinstance(actor_name, Tag):
                     actor_name = None
@@ -363,7 +328,7 @@ class ImdbParser(object):
         if h4_director:
             for director in h4_director.parent.parent.find_all('a', href=re.compile('/name/nm')):
                 director_id = extract_id(director['href'])
-                director_name = unicode(director.contents[0])
+                director_name = director.text
                 # tag instead of name
                 if isinstance(director_name, Tag):
                     director_name = None
