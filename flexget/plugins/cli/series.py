@@ -109,17 +109,15 @@ class SeriesReport(SeriesDatabase):
         """
         status = ''
         for release in sorted(episode.releases, key=lambda r: r.quality):
-            if release.downloaded:
-                status += '['
+            if not release.downloaded:
+                continue
             status += release.quality.name
             if release.proper_count > 0:
                 status += '-proper'
                 if release.proper_count > 1:
                     status += str(release.proper_count)
-            if release.downloaded:
-                status += ']'
-            status += ' '
-        return status if status else None
+            status += ', '
+        return status.rstrip(', ') if status else None
 
     def latest_seen_episode(self, session, series):
         """
@@ -138,7 +136,7 @@ class SeriesReport(SeriesDatabase):
         """
 
         formatting = ' %-30s %-10s %-10s %-20s'
-        console(formatting % ('Name', 'Latest', 'Age', 'Status'))
+        console(formatting % ('Name', 'Latest', 'Age', 'Downloaded'))
         console('-' * 79)
 
         hidden = 0
@@ -163,7 +161,7 @@ class SeriesReport(SeriesDatabase):
             console(new_ep + formatting[1:] % (series_name, episode_id, age if age else '', status))
 
         console('-' * 79)
-        console(' [] = downloaded | > = new episode ' +
+        console(' > = new episode ' +
               ('| %i series unseen past 6 months hidden' % hidden if hidden else ''))
         console(' Use --series NAME to get detailed information')
 
