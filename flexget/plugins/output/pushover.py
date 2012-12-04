@@ -83,7 +83,7 @@ class OutputPushover(object):
                 url = entry.render(url)
             except RenderError, e:
                 log.warning("Problem rendering 'url': %s" % e)
-                url = entry["imdb_url"]
+                url = entry.get("imdb_url", "")
 
             # Check for test mode
             if task.manager.options.test:

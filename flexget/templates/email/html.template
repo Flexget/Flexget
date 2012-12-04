@@ -177,25 +177,25 @@ div.clear {
     <div id="main">
 
     {% for entry in task.accepted %}
-
+        {{ entry.title }}
         <!-- HANDLE SERIES -->
-		{% if entry.series_name is defined %}
+        {% if entry.series_name is defined %}
             <div class="series">
 
-				{% if entry.series_banner_url is defined %}
+                {% if entry.series_banner_url|d(false) %}
                     <div class="banner">
-                        <img src="{{ entry.series_banner_url }}">
+                        <img src="{{ entry.series_banner_url }}" alt="{{ entry.series_name }}" title="{{ entry.series_name }}">
                     </div>
                 {% else %}
                     <h1>{{ entry.series_name }}</h1>
                 {% endif %}
 
                 <div class="basic">
-					{% if entry.ep_name is defined %}
+                    {% if entry.ep_name is defined %}
                         <div class="ep_name">{{ entry.ep_name }}</div>
                     {% endif %}
 
-					{% if entry.series_episode is defined and entry.series_season is defined %}
+                    {% if entry.series_episode is defined and entry.series_season is defined %}
                         <div class="season_ep">
                             Season: {{ entry.series_season }} Episode: {{ entry.series_episode }}
                         </div>
@@ -203,90 +203,77 @@ div.clear {
 
                     <div class="clear">&nbsp;</div>
 
-					{% if entry.ep_rating is defined %}
+                    {% if entry.ep_rating|d(false) %}
                         <div class="ep_rating">Rating: {{entry.ep_rating}}</div>
                     {% endif %}
 
-					{% if entry.series_status is defined %}
+                    {% if entry.series_status is defined %}
                         <!--
                         <div class="series_status">Status: {{ entry.series_status }}</div>
                         -->
                     {% endif %}
 
-					{% if entry.ep_director is defined %}
+                    {% if entry.ep_director is defined %}
                         <div class="ep_director">Director: {{  entry.ep_director }}</div>
                     {% endif %}
 
                     <div class="clear">&nbsp;</div>
                 </div>
 
-				{% if entry.ep_overview is defined %}
+                {% if entry.ep_overview|d(false) %}
                     <div class="overview">
                         <h2>Overview</h2>
                         <p>{{ entry.ep_overview }}</p>
                     </div>
                 {% endif %}
 
-                <div class="details-button">
-                    <div id="js-{{ loop.index }}-more">
-                        <a href="#a-{{ loop.index }}" onclick="toggle_visibility('js-{{ loop.index }}-more', 'info-{{ loop.index }}');">More</a>
-                    </div>
-                </div>
-
                 <div id="info-{{ loop.index }}" style="display: none;">
                     <!-- a hack to keep browser from reseting position to top when clicking the Details link -->
                     <a name="a-{{ loop.index }}" style="display:none;">&nbsp;</a>
 
-					{% if entry.series_genres is defined and entry.series_genres is iterable %}
+                    {% if entry.series_genres is defined and entry.series_genres is iterable %}
                         <div class="genres">
                             <h2>Genres</h2>
                             <ul>
-							{% for genre in entry.series_genres %}
+                            {% for genre in entry.series_genres %}
                                 <li>{{ genre }}</li>
                             {% endfor %}
                             </ul>
                         </div>
                     {% endif %}
 
-					{% if entry.series_actors is defined and entry.series_actors is iterable %}
+                    {% if entry.series_actors is defined and entry.series_actors is iterable %}
                         <div class="actors">
                             <h2>Actors</h2>
                             <ul>
-							{% for actor in entry.series_actors %}
+                            {% for actor in entry.series_actors %}
                                 <li>{{ actor }}</li>
                             {% endfor %}
                             </ul>
                         </div>
                     {% endif %}
 
-					{% if entry.ep_guest_stars is defined and entry.ep_guest_stars is iterable %}
+                    {% if entry.ep_guest_stars is defined and entry.ep_guest_stars is iterable %}
                         <div class="actors">
                             <h2>Guest stars</h2>
                             <ul>
-	                        {% for actor in entry.ep_guest_stars %}
+                            {% for actor in entry.ep_guest_stars %}
                                 <li>{{ actor }}</li>
                             {% endfor %}
                             </ul>
                         </div>
                     {% endif %}
-
-                    <div class="details-button">
-                        <div id="js-{{ loop.index }}-less">
-                            <a href="#a-{{ loop.index }}" onclick="toggle_visibility('info-{{ loop.index }}', 'js-{{ loop.index }}-more');">Less</a>
-                        </div>
-                    </div>
-
                 </div>
 
             </div>
 
         <!-- HANDLE MOVIES -->
 
-		{% elif entry.imdb_url is defined %}
+        {% elif entry.imdb_url is defined %}
             <div class="movie">
                 <div class="header">
                     <div class="name">
-						{% if entry.imdb_name is defined and entry.imdb_year is defined%}
+                        {% if entry.imdb_name is defined and entry.imdb_year is defined%}
                             <h1>{{ entry.imdb_name }} ({{ entry.imdb_year }})</h1>
                             <h2>{{ entry.title }}</h2>
                         {% else %}
@@ -295,13 +282,13 @@ div.clear {
                     </div>
 
                     <div class="ratings">
-						{% if entry.imdb_score is defined %}
+                        {% if entry.imdb_score is defined %}
                             <div class="score">
                                 Score: {{ entry.imdb_score }}
                             </div>
                         {% endif %}
 
-						{% if entry.imdb_votes is defined %}
+                        {% if entry.imdb_votes is defined %}
                             <div class="votes">
                                 Votes: {{ entry.imdb_votes }}
                             </div>
@@ -310,29 +297,29 @@ div.clear {
                     <div class="clear">&nbsp;</div>
                 </div>
 
-				{% if entry.imdb_plot_outline is defined %}
+                {% if entry.imdb_plot_outline is defined %}
                     <div class="overview">
                         <h2>Plot</h2>
                         {{ entry.imdb_plot_outline }}
                     </div>
                 {% endif %}
 
-				{% if entry.imdb_genres is defined and entry.imdb_genres is iterable %}
+                {% if entry.imdb_genres is defined and entry.imdb_genres is iterable %}
                     <div class="genres">
                         <h2>Genres</h2>
                         <ul>
-						{% for genre in entry.imdb_genres %}
+                        {% for genre in entry.imdb_genres %}
                             <li>{{ genre }}</li>
                         {% endfor %}
                         </ul>
                     </div>
                 {% endif %}
 
-				{% if entry.imdb_actors is defined and entry.imdb_actors is iterable %}
+                {% if entry.imdb_actors is defined and entry.imdb_actors is iterable %}
                     <div class="actors">
                         <h2>Actors</h2>
                         <ul>
-						{% for imdbid, actor in entry.imdb_actors.items() %}
+			{% for imdbid, actor in entry.imdb_actors.items() %}
                             <li><a href="http://www.imdb.com/name/{{ imdbid }}">{{ actor }}</a></li>
                         {% endfor %}
                         </ul>
