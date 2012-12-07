@@ -1,0 +1,6 @@
+{% if task.accepted -%}
+FlexGet has just downloaded {{task.accepted|length}} new entries for task {{task.name}}:
+{%- for entry in task.accepted %}
+- {{entry.title}} ({{entry.url}}){% if entry.output|d(false) %} => {{entry.output}}{% endif %}
+{% endfor %}
+{% endif -%}
