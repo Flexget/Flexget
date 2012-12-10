@@ -644,7 +644,7 @@ class FilterSeriesBase(object):
         # Make sure we start with both configs as a list of complex series
         native_series = self.prepare_config(task.config.get('series', {}))
         merging_series = self.prepare_config(config)
-        task.config['series'] = self.combine_series_lists(native_series, merging_series, log_once=True)
+        task.config['series'] = self.combine_series_lists(merging_series, native_series, log_once=True)
         return task.config['series']
 
 
