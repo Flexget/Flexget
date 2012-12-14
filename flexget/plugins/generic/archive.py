@@ -343,7 +343,7 @@ class UrlrewriteArchive(object):
 
         root = validator.factory()
         root.accept('boolean')
-        root.accept('list')
+        root.accept('list').accept('text')
         return root
 
     def search(self, query, comparator, config=None):
