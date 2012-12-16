@@ -1,9 +1,7 @@
 import os
-import re
 from paver.easy import *
 import paver.virtual
 import paver.setuputils
-from paver import svn
 from paver.setuputils import setup, find_package_data, find_packages
 
 sphinxcontrib = False
@@ -42,15 +40,15 @@ setup(
     install_requires=install_requires,
     packages=find_packages(exclude=['tests']),
     package_data=find_package_data('flexget', package='flexget',
-                                   exclude=['FlexGet.egg-info', '*.pyc'],
-                                   only_in_packages=False), # NOTE: the exclude does not seem to work
+        exclude=['FlexGet.egg-info', '*.pyc'],
+        only_in_packages=False), # NOTE: the exclude does not seem to work
     zip_safe=False,
     test_suite='nose.collector',
     extras_require={
         'memusage':     ['guppy'],
         'NZB':          ['pynzb'],
         'TaskTray':     ['pywin32'],
-    },
+        },
     entry_points=entry_points
 )
 
@@ -138,12 +136,16 @@ def clean():
 
 @task
 @cmdopts([
-    ('dist-dir=', 'd', 'directory to put final built distributions in')
+    ('dist-dir=', 'd', 'directory to put final built distributions in'),
+    ('revision=', 'r', 'minor revision number of this build')
 ], share_with=['make_egg'])
 def sdist(options):
     """Build tar.gz distribution package"""
 
-    revision = svn.info().get('last_changed_rev')
+    if not options.sdist.get('revision'):
+        print 'Revision number required.'
+        return
+    revision = options.sdist.pop('revision')
 
     print 'Revision: %s' % revision
 
@@ -163,7 +165,7 @@ def sdist(options):
     for pyc in path('tests/').files('*.pyc'):
         pyc.remove()
 
-    ver = '%sr%s' % (options['version'], revision)
+    ver = '%s.%s' % (options['version'], revision)
 
     print 'Building %s' % ver
 
@@ -184,13 +186,17 @@ def sdist(options):
 
 @task
 @cmdopts([
-    ('dist-dir=', 'd', 'directory to put final built distributions in')
+    ('dist-dir=', 'd', 'directory to put final built distributions in'),
+    ('revision=', 'r', 'minor revision number of this build')
 ], share_with=['sdist'])
 def make_egg(options):
     # naming this task to bdist_egg will make egg installation fail
 
-    revision = svn.info().get('last_changed_rev')
-    ver = '%sr%s' % (options['version'], revision)
+    if not options.make_egg.get('revision'):
+        print 'Revision number required.'
+        return
+    revision = options.make_egg.revision
+    ver = '%s.%s' % (options['version'], revision)
 
     # hack version number into setup( ... options='1.0-svn' ...)
     from paver import tasks
