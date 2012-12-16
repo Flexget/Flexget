@@ -1,0 +1,5 @@
+pylint
+coverage
+nose>=0.11
+http://github.com/cmheisel/nose-xcover/zipball/master
+pep8

@@ -60,7 +60,8 @@ options(
     ),
     virtualenv=Bunch(
         paver_command_line='develop',
-        unzip_setuptools=True
+        unzip_setuptools=True,
+        distribute=True
     ),
     # sphinxcontrib.paverutils
     sphinx=Bunch(
@@ -290,7 +291,7 @@ def release(options):
 
 @task
 def install_tools():
-    """Install development / hudson tools and dependencies"""
+    """Install development / jenkins tools and dependencies"""
 
     try:
         import pip
@@ -304,34 +305,7 @@ def install_tools():
     except:
         pip.main(['install', 'sphinxcontrib-paverutils'])
 
-    try:
-        import pylint
-        print 'Pylint INSTALLED'
-    except:
-        pip.main(['install', 'pylint']) # OR instead of pylint logilab.pylintinstaller ?
-
-    try:
-        import coverage
-        print 'Coverage INSTALLED'
-    except:
-        pip.main(['install', 'coverage'])
-
-    try:
-        import nose
-    except:
-        pip.main(['install', 'nose>=0.11'])
-
-    try:
-        import nosexcover
-        print 'Nose-xcover INSTALLED'
-    except:
-        pip.main(['install', 'http://github.com/cmheisel/nose-xcover/zipball/master'])
-
-    try:
-        import pep8
-        print 'pep8 INSTALLED'
-    except:
-        pip.main(['install', 'pep8'])
+    pip.main(['install', '-r', 'jenkins-requirements.txt'])
 
 
 @task
@@ -361,3 +335,31 @@ def pep8(args):
     styleguide = pep8.StyleGuide(show_source=True, ignore=ignore, repeat=1, max_line_length=120,
         parse_argv=args)
     styleguide.input_dir('flexget')
+
+
+@task
+def bootstrap():
+    """
+    Current paver bootstrap task ignores the distribute option, do some hackery to fix that.
+    This should not be needed after next release of paver (>1.1.1)
+    """
+    import textwrap
+    vopts = options.virtualenv
+    more_text = ""
+    if vopts.get('distribute') is not None:
+        more_text = textwrap.dedent("""
+        def more_adjust_options(orig_adjust_options):
+            def adjust_options(options, args):
+                orig_adjust_options(options, args)
+                options.use_distribute = %s
+            return adjust_options
+        adjust_options = more_adjust_options(adjust_options)
+        """ % bool(vopts.get('distribute')))
+
+    paver.virtual._create_bootstrap(vopts.get("script_name", "bootstrap.py"),
+        vopts.get("packages_to_install", []),
+        vopts.get("paver_command_line", None),
+        dest_dir=vopts.get("dest_dir", '.'),
+        no_site_packages=vopts.get("no_site_packages", False),
+        unzip_setuptools=vopts.get("unzip_setuptools", False),
+        more_text=more_text)
