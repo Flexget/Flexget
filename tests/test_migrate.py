@@ -22,7 +22,9 @@ class TestMigrate(FlexGetBase):
         self.database_uri = 'sqlite:///%s' % filename
         super(TestMigrate, self).setup()
 
-    @with_filecopy('db-r1042.sqlite', 'upgrade_test.sqlite')
+    # This fails on windows when it tries to delete upgrade_test.sqlite
+    # WindowsError: [Error 32] The process cannot access the file because it is being used by another process: 'upgrade_test.sqlite'
+    #@with_filecopy('db-r1042.sqlite', 'upgrade_test.sqlite')
     def test_upgrade(self):
         # TODO: for some reason this will fail
         return
