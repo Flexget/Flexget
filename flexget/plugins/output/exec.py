@@ -1,10 +1,9 @@
 import subprocess
 import logging
-import re
 import sys
 from UserDict import UserDict
 from flexget.plugin import register_plugin, phase_methods
-from flexget.utils.template import render_from_entry, RenderError
+from flexget.utils.template import render_from_entry, render_from_task, RenderError
 
 log = logging.getLogger('exec')
 
@@ -142,11 +141,16 @@ class PluginExec(object):
         # phase keyword in this
         if 'phase' in config[phase_name]:
             cmd = config[phase_name]['phase']
-            log.debug('phase cmd: %s' % cmd)
-            if task.manager.options.test:
-                log.info('Would execute: %s' % cmd)
+            try:
+                cmd = render_from_task(cmd, task)
+            except RenderError, e:
+                log.error('Error rendering `%s`: %s' % (cmd, e))
             else:
-                self.execute_cmd(cmd, allow_background, config['encoding'])
+                log.debug('phase cmd: %s' % cmd)
+                if task.manager.options.test:
+                    log.info('Would execute: %s' % cmd)
+                else:
+                    self.execute_cmd(cmd, allow_background, config['encoding'])
 
     def __getattr__(self, item):
         """Creates methods to handle task phases."""
