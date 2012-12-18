@@ -2,10 +2,12 @@ import logging
 import re
 import urllib
 import feedparser
+import random
 from flexget.plugin import register_plugin, PluginWarning
 from flexget.entry import Entry
 from flexget.utils.search import torrent_availability, StringComparator
 from flexget import validator
+from flexget.plugins.services import torrent_cache 
 
 log = logging.getLogger('torrentz')
 
@@ -16,6 +18,11 @@ REPUTATIONS = { # Maps reputation name to feed address
     'good': 'feed',
     'verified': 'feed_verified'
 }
+
+# Copy torrent cache sites from torrent_cache but exclude zoink.it
+# since it's the primary
+MIRRORS = [mirror for mirror in torrent_cache.MIRRORS
+           if 'zoink.it' not in mirror]
 
 class UrlRewriteTorrentz(object):
     """Torrentz urlrewriter."""
@@ -29,8 +36,11 @@ class UrlRewriteTorrentz(object):
         return REGEXP.match(entry['url'])
 
     def url_rewrite(self, task, entry):
-        hash = REGEXP.match(entry['url']).group(1)
-        entry['url'] = 'http://zoink.it/torrent/%s.torrent' % hash.upper()
+        hash = REGEXP.match(entry['url']).group(1).upper()
+        entry['url'] = 'http://zoink.it/torrent/%s.torrent' % hash
+        random.shuffle(MIRRORS)
+        entry.setdefault('urls', [entry['url']])
+        entry['urls'].extend(host + hash + '.torrent' for host in MIRRORS)
 
     def search(self, query, comparator=StringComparator(), config=None):
         if config:
