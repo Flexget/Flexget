@@ -27,10 +27,11 @@ class TorrentCache(object):
             elif entry.get('torrent_info_hash'):
                 info_hash = entry['torrent_info_hash']
             if info_hash:
-                # Add the mirrors in random order
-                random.shuffle(MIRRORS)
                 entry.setdefault('urls', [entry['url']])
-                entry['urls'].extend(host + info_hash.upper() + '.torrent' for host in MIRRORS)
+                urls = set(host + info_hash.upper() + '.torrent' for host in MIRRORS)
+                # Don't add any duplicate addresses
+                urls -= set(entry['urls'])
+                entry['urls'].extend(urls)
 
 
 register_plugin(TorrentCache, 'torrent_cache', api_ver=2, builtin=True)
