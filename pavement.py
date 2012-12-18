@@ -1,4 +1,5 @@
 import os
+import sys
 from paver.easy import *
 import paver.virtual
 import paver.setuputils
@@ -144,7 +145,7 @@ def sdist(options):
 
     if not options.sdist.get('revision'):
         print 'Revision number required.'
-        return
+        sys.exit(1)
     revision = options.sdist.pop('revision')
 
     print 'Revision: %s' % revision
@@ -194,7 +195,7 @@ def make_egg(options):
 
     if not options.make_egg.get('revision'):
         print 'Revision number required.'
-        return
+        sys.exit(1)
     revision = options.make_egg.revision
     ver = '%s.%s' % (options['version'], revision)
 
@@ -268,7 +269,7 @@ def release(options):
 
     if options.release.get('type') not in ['src', 'egg']:
         print 'Invalid --type, must be src or egg'
-        return
+        sys.exit(1)
 
     print 'Cleaning build...'
     for p in ['build']:
@@ -284,7 +285,6 @@ def release(options):
     if not options.release.get('no_tests'):
         if not test():
             print 'Unit tests did not pass'
-            import sys
             sys.exit(1)
 
     if options.release.get('type') == 'egg':
@@ -303,7 +303,7 @@ def install_tools():
         import pip
     except:
         print 'FATAL: Unable to import pip, please install it and run this again!'
-        return
+        sys.exit(1)
 
     try:
         import sphinxcontrib
@@ -331,7 +331,7 @@ def pep8(args):
         import pep8
     except:
         print 'Run bin/paver install_tools'
-        return
+        sys.exit(1)
 
     # Ignoring certain errors
     ignore = [
