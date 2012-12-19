@@ -151,7 +151,7 @@ class FilterTvdb(object):
 
             try:
                 lookup(task, entry)
-            except PluginError, e:
+            except PluginError as e:
                 log.error('Skipping %s because of an error: %s' % (entry['title'], e.value))
                 continue
 

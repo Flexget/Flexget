@@ -251,7 +251,7 @@ class ImdbLookup(object):
         """Does the lookup for this entry and populates the entry fields."""
         try:
             self.lookup(entry)
-        except PluginError, e:
+        except PluginError as e:
             log_once(e.value.capitalize(), logger=log)
             # Set all of our fields to None if the lookup failed
             entry.unregister_lazy_fields(self.field_map, self.lazy_loader)
@@ -411,7 +411,7 @@ class ImdbLookup(object):
                     movie.url = entry['imdb_url']
                     session.add(movie)
                     raise PluginError('UnicodeDecodeError')
-                except ValueError, e:
+                except ValueError as e:
                     # TODO: might be a little too broad catch, what was this for anyway? ;P
                     if manager.options.debug:
                         log.exception(e)

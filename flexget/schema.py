@@ -101,7 +101,7 @@ def upgrade(plugin):
                     log.critical('A lower schema version was returned (%s) from the %s upgrade function '
                                  'than passed in (%s)' % (new_ver, plugin, ver))
                     manager.disable_tasks()
-            except Exception, e:
+            except Exception as e:
                 log.exception('Failed to upgrade database for plugin %s: %s' % (plugin, e))
                 manager.disable_tasks()
             finally:

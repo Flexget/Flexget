@@ -712,7 +712,7 @@ class QualityValidator(TextValidator):
     def validate(self, data):
         try:
             qualities.get(data)
-        except ValueError, e:
+        except ValueError as e:
             self.errors.add(e.message)
             return False
         return True
@@ -728,7 +728,7 @@ class QualityRequirementsValidator(TextValidator):
     def validate(self, data):
         try:
             qualities.Requirements(data)
-        except ValueError, e:
+        except ValueError as e:
             self.errors.add('`%s` is not a valid quality requirement: %s' % (data, e.message))
             return False
         return True

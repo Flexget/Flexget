@@ -55,17 +55,17 @@ class OutputNotifyMyAndroid(object):
             application = entry.get('application', config['application'])
             try:
                 application = entry.render(application)
-            except RenderError, e:
+            except RenderError as e:
                 log.error('Error setting nma application: %s' % e)
             event = entry.get('event', config['event'])
             try:
                 event = entry.render(event)
-            except RenderError, e:
+            except RenderError as e:
                 log.error('Error setting nma event: %s' % e)
             description = config['description']
             try:
                 description = entry.render(description)
-            except RenderError, e:
+            except RenderError as e:
                 log.error('Error setting nma description: %s' % e)
 
             # Send the request

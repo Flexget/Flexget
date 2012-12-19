@@ -254,13 +254,13 @@ def urlopener(url_or_request, log, **kwargs):
                 time.sleep(3)
             try:
                 retrieved = opener(url_or_request, kwargs.get('data'))
-            except urllib2.HTTPError, e:
+            except (urllib2.URLError, socket.timeout) as e:
                 if e.code < 500:
                     # If it was not a server error, don't keep retrying.
                     log.warning('Could not retrieve url (HTTP %s error): %s' % (e.code, e.url))
                     raise
                 log.debug('HTTP error (try %i/%i): %s' % (i + 1, retries, e.code))
-            except (urllib2.URLError, socket.timeout), e:
+            except (urllib2.URLError, socket.timeout) as e:
                 if hasattr(e, 'reason'):
                     reason = str(e.reason)
                 else:
@@ -268,7 +268,7 @@ def urlopener(url_or_request, log, **kwargs):
                 if reason == 'timed out':
                     set_unresponsive(url)
                 log.debug('Failed to retrieve url (try %i/%i): %s' % (i + 1, retries, reason))
-            except httplib.IncompleteRead, e:
+            except httplib.IncompleteRead as e:
                 log.critical('Incomplete read - see python bug 6312')
                 break
             else:

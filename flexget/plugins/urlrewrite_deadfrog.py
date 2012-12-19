@@ -32,7 +32,7 @@ class UrlRewriteDeadFrog(object):
         page = urlopener(req, log)
         try:
             soup = get_soup(page)
-        except Exception, e:
+        except Exception as e:
             raise UrlRewritingError(e)
         down_link = soup.find('a', attrs={'href': re.compile("download/\d+/.*\.torrent")})
         if not down_link:

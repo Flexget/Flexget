@@ -176,28 +176,28 @@ class PluginDownload(object):
                 if not task.manager.unit_test:
                     log.info('Downloading: %s' % entry['title'])
                 self.download_entry(task, entry, url)
-        except RequestException, e:
+        except RequestException as e:
             # TODO: Improve this error message?
             log.warning('RequestException %s' % e)
             return 'Request Exception'
         # TODO: I think these exceptions will not be thrown by requests library.
-        except urllib2.HTTPError, e:
+        except urllib2.HTTPError as e:
             log.warning('HTTPError %s' % e.code)
             return 'HTTP error'
-        except urllib2.URLError, e:
+        except urllib2.URLError as e:
             log.warning('URLError %s' % e.reason)
             return 'URL Error'
-        except BadStatusLine, e:
+        except BadStatusLine as e:
             log.warning('Failed to reach server. Reason: %s' % getattr(e, 'message', 'N/A'))
             return 'BadStatusLine'
-        except IOError, e:
+        except IOError as e:
             if hasattr(e, 'reason'):
                 log.warning('Failed to reach server. Reason: %s' % e.reason)
             elif hasattr(e, 'code'):
                 log.warning('The server couldn\'t fulfill the request. Error code: %s' % e.code)
             log.debug('IOError', exc_info=True)
             return 'IOError'
-        except ValueError, e:
+        except ValueError as e:
             # Probably unknown url type
             msg = 'ValueError %s' % e
             log.warning(msg)
@@ -336,10 +336,10 @@ class PluginDownload(object):
         for entry in task.accepted:
             try:
                 self.output(task, entry, config)
-            except PluginWarning, e:
+            except PluginWarning as e:
                 task.fail(entry)
                 log.error('Plugin error while writing: %s' % e)
-            except Exception, e:
+            except Exception as e:
                 task.fail(entry)
                 log.exception('Exception while writing: %s' % e)
 
@@ -367,7 +367,7 @@ class PluginDownload(object):
             # expand variables in path
             try:
                 path = os.path.expanduser(entry.render(path))
-            except RenderError, e:
+            except RenderError as e:
                 task.fail(entry, 'Could not set path. Error during string replacement: %s' % e)
                 return
 
@@ -438,7 +438,7 @@ class PluginDownload(object):
 
                 try:
                     shutil.move(entry['file'], destfile)
-                except OSError, err:
+                except OSError as err:
                     # ignore permission errors, see ticket #555
                     import errno
                     if not os.path.exists(destfile):

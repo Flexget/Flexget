@@ -65,7 +65,7 @@ class UrlRewritePirateBay(object):
             # use search
             try:
                 entry['url'] = self.search(entry['title'])[0]['url']
-            except PluginWarning, e:
+            except PluginWarning as e:
                 raise UrlRewritingError(e)
         else:
             # parse download page
@@ -85,7 +85,7 @@ class UrlRewritePirateBay(object):
             if torrent_url.startswith('//'):
                 torrent_url = 'http:' + torrent_url
             return torrent_url
-        except Exception, e:
+        except Exception as e:
             raise UrlRewritingError(e)
 
     @internet(log)

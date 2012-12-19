@@ -21,7 +21,7 @@ class TorrentAliveThread(threading.Thread):
     def run(self):
         try:
             self.tracker_seeds = get_tracker_seeds(self.tracker, self.info_hash)
-        except URLError, e:
+        except URLError as e:
             log.debug('Error scraping %s: %s' % (self.tracker, e))
             self.tracker_seeds = 0
         else:
@@ -66,13 +66,13 @@ def get_tracker_seeds(url, info_hash):
     data = None
     try:
         data = bdecode(urlopener(url, log, retries=1, timeout=10).read()).get('files')
-    except SyntaxError, e:
+    except SyntaxError as e:
         log.warning('Error decoding tracker response: %s' % e)
         return 0
-    except BadStatusLine, e:
+    except BadStatusLine as e:
         log.warning('Error BadStatusLine: %s' % e)
         return 0
-    except IOError, e:
+    except IOError as e:
         log.warning('Server error: %s' % e)
         return 0
     if not data:
@@ -156,7 +156,7 @@ class TorrentAlive(object):
                     tracker = torrent.content['announce']
                     try:
                         seeds = get_tracker_seeds(tracker, info_hash)
-                    except URLError, e:
+                    except URLError as e:
                         log.debug('Error scraping %s: %s' % (tracker, e))
 
                 # Reject if needed

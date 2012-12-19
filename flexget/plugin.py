@@ -115,21 +115,21 @@ class internet(object):
             import urllib2
             try:
                 return func(*args, **kwargs)
-            except RequestException, e:
+            except RequestException as e:
                 log.debug('decorator caught RequestException')
                 raise PluginError('RequestException: %s' % e)
-            except urllib2.HTTPError, e:
+            except urllib2.HTTPError as e:
                 raise PluginError('HTTPError %s' % e.code, self.log)
-            except urllib2.URLError, e:
+            except urllib2.URLError as e:
                 log.debug('decorator caught urlerror')
                 raise PluginError('URLError %s' % e.reason, self.log)
             except BadStatusLine:
                 log.debug('decorator caught badstatusline')
                 raise PluginError('Got BadStatusLine', self.log)
-            except ValueError, e:
+            except ValueError as e:
                 log.debug('decorator caught ValueError')
                 raise PluginError(e.message)
-            except IOError, e:
+            except IOError as e:
                 log.debug('decorator caught ioerror')
                 if hasattr(e, 'reason'):
                     raise PluginError('Failed to reach server. Reason: %s' % e.reason, self.log)
@@ -540,7 +540,7 @@ def load_plugins_from_dir(basepath, subpkg=None):
     for modulename in found_plugins:
         try:
             __import__(modulename, level=0)
-        except DependencyError, e:
+        except DependencyError as e:
             if e.has_message():
                 msg = e.message
             else:
@@ -549,10 +549,10 @@ def load_plugins_from_dir(basepath, subpkg=None):
                 log.warning(msg)
             else:
                 log.debug(msg)
-        except ImportError, e:
+        except ImportError as e:
             log.critical('Plugin `%s` failed to import dependencies' % modulename)
             log.exception(e)
-        except Exception, e:
+        except Exception as e:
             log.critical('Exception while loading plugin %s' % modulename)
             log.exception(e)
             raise

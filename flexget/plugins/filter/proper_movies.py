@@ -96,7 +96,7 @@ class FilterProperMovies(object):
                     if imdb_id is None:
                         continue
                     entry['imdb_id'] = imdb_id
-                except PluginError, pe:
+                except PluginError as pe:
                     log_once(pe.value)
                     continue
 

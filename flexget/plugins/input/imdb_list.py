@@ -48,7 +48,7 @@ class ImdbList(object):
                     log.warning('Unable to find required info for imdb login, maybe their login method has changed.')
                 # Now we do the actual login with appropriate parameters
                 r = sess.post('https://secure.imdb.com/register-imdb/login', data=params, raise_status=False)
-            except requests.RequestException, e:
+            except requests.RequestException as e:
                 raise PluginError('Unable to login to imdb: %s' % e.message)
 
             # IMDb redirects us upon a successful login.
@@ -83,7 +83,7 @@ class ImdbList(object):
                 raise PluginError('Didn\'t get CSV export as response. Probably specified list `%s` does not exist.'
                     % config['list'])
             csv_rows = csv.reader(opener.iter_lines())
-        except requests.RequestException, e:
+        except requests.RequestException as e:
             raise PluginError('Unable to get imdb list: %s' % e.message)
 
         # Create an Entry for each movie in the list

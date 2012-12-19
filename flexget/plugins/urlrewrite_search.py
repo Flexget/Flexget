@@ -90,7 +90,7 @@ class PluginSearch(object):
                         entry['url'] = url
                         found = True
                         break
-                except (PluginError, PluginWarning), pw:
+                except (PluginError, PluginWarning) as pw:
                     log.verbose('Failed: %s' % pw.value)
                     continue
 

@@ -59,7 +59,7 @@ def edit_text(root, name):
         context['config'] = request.form['config']
         try:
             config = yaml.load(request.form['config'])
-        except yaml.scanner.ScannerError, e:
+        except yaml.scanner.ScannerError as e:
             flash('Invalid YAML document: %s' % e, 'error')
             log.exception(e)
         else:

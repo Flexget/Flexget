@@ -77,7 +77,7 @@ class TraktAcquired(object):
             item.update({'username': config['username'], 'password': config['password']})
             try:
                 self.post_json_to_trakt(post_url, item)
-            except (urllib2.HTTPError, urllib2.URLError), e:
+            except (urllib2.HTTPError, urllib2.URLError) as e:
                 if hasattr(e, 'code'):
                     if e.code == 404:
                         # Remove some info from posted json and print the rest to aid debugging

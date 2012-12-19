@@ -47,7 +47,7 @@ class HTTPCaptureHeaderHandler(urllib2.AbstractHTTPHandler):
         try:
             h.request(req.get_method(), req.get_selector(), req.data, headers)
             r = h.getresponse()
-        except socket.error, err: # XXX what error?
+        except socket.error as err: # XXX what error?
             raise urllib2.URLError(err)
         r.recv = r.read
         fp = socket._fileobject(r, close=True)

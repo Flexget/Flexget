@@ -63,7 +63,7 @@ def setup(manager):
         task.config.setdefault('email', {})
         try:
             merge_dict_from_to(config, task.config['email'])
-        except MergeException, exc:
+        except MergeException as exc:
             raise PluginError('Failed to merge email config to task %s due to %s' % (task.name, exc))
         task.config.setdefault('email', config)
 
@@ -125,10 +125,10 @@ def send_email(subject, content, config):
                     mailServer.ehlo()
                     mailServer.starttls()
                     mailServer.ehlo()
-        except socket.error, e:
+        except socket.error as e:
             log.warning('Socket error: %s' % e)
             return
-        except SMTPException, e:
+        except SMTPException as e:
             # Ticket #1133
             log.warning('Unable to send email: %s' % e)
             return
@@ -138,11 +138,11 @@ def send_email(subject, content, config):
             if config.get('smtp_username') and config.get('smtp_password'):
                 mailServer.login(config['smtp_username'], config['smtp_password'])
             mailServer.sendmail(message['From'], config['to'], message.as_string())
-        except IOError, e:
+        except IOError as e:
             # Ticket #686
             log.warning('Unable to send email! IOError: %s' % e)
             return
-        except SMTPException, e:
+        except SMTPException as e:
             log.warning('Unable to send email! SMTPException: %s' % e)
             return
 
@@ -267,12 +267,12 @@ class OutputEmail(object):
                 subject += '{{task.accepted|length}} new entries downloaded'
         try:
             subject = render_from_task(subject, task)
-        except RenderError, e:
+        except RenderError as e:
             log.error('Error rendering email subject: %s' % e)
             return
         try:
             content = render_from_task(get_template(config['template'], 'email'), task)
-        except RenderError, e:
+        except RenderError as e:
             log.error('Error rendering email body: %s' % e)
             return
 
@@ -292,7 +292,7 @@ class OutputEmail(object):
         # The config may not be correct if the task is aborting
         try:
             self.on_task_exit(task, config)
-        except Exception, e:
+        except Exception as e:
             log.info('Could not send abort email because email config is invalid.')
             # Log the exception to debug, in case something different is going wrong.
             log.debug('Email error:', exc_info=True)

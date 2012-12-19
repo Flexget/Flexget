@@ -30,7 +30,7 @@ def migrate_imdb_queue(manager):
             for row in session.execute(old_table.select()):
                 try:
                     queue_add(imdb_id=row['imdb_id'], quality=row['quality'], force=row['immortal'], session=session)
-                except QueueError, e:
+                except QueueError as e:
                     log.error('Unable to migrate %s from imdb_queue to movie_queue' % row['title'])
             old_table.drop()
             session.commit()
@@ -150,7 +150,7 @@ def parse_what(what, lookup=True, session=None):
     try:
         result['session'] = session
         movie = tmdb_lookup(**result)
-    except LookupError, e:
+    except LookupError as e:
         raise QueueError(e.message)
 
     if movie:

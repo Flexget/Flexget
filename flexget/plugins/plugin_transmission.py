@@ -64,9 +64,9 @@ class TransmissionBase(object):
         if 'netrc' in config:
             try:
                 user, account, password = netrc(config['netrc']).authenticators(config['host'])
-            except IOError, e:
+            except IOError as e:
                 log.error('netrc: unable to open: %s' % e.filename)
-            except NetrcParseError, e:
+            except NetrcParseError as e:
                 log.error('netrc: %s, file: %s, line: %s' % (e.msg, e.filename, e.lineno))
         else:
             if 'username' in config:
@@ -76,7 +76,7 @@ class TransmissionBase(object):
 
         try:
             cli = transmissionrpc.Client(config['host'], config['port'], user, password)
-        except TransmissionError, e:
+        except TransmissionError as e:
             if isinstance(e.original, HTTPHandlerError):
                 if e.original.code == 111:
                     raise PluginError("Cannot connect to transmission. Is it running?")
@@ -239,7 +239,7 @@ class PluginTransmission(TransmissionBase):
         if config['removewhendone']:
             try:
                 self.remove_finished(self.client)
-            except TransmissionError, e:
+            except TransmissionError as e:
                 log.error('Error while attempting to remove completed torrents from transmission: %s' % e)
 
     def _make_torrent_options_dict(self, config, entry):
@@ -259,7 +259,7 @@ class PluginTransmission(TransmissionBase):
             try:
                 path = os.path.expanduser(entry.render(opt_dic['path'])).encode('utf-8')
                 options['add']['download_dir'] = pathscrub(path)
-            except RenderError, e:
+            except RenderError as e:
                 log.error('Error setting path for %s: %s' % (entry['title'], e))
         if 'addpaused' in opt_dic:
             options['add']['paused'] = opt_dic['addpaused']
@@ -330,7 +330,7 @@ class PluginTransmission(TransmissionBase):
                 if options['change'].keys():
                     for id in r.keys():
                         cli.change(id, 30, **options['change'])
-            except TransmissionError, e:
+            except TransmissionError as e:
                 log.debug('TransmissionError', exc_info=True)
                 msg = 'TransmissionError: %s' % e.message or 'N/A'
                 log.error(msg)

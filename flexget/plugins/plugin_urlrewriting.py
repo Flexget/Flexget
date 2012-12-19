@@ -24,7 +24,7 @@ class PluginUrlRewriting(object):
         for entry in task.accepted:
             try:
                 self.url_rewrite(task, entry)
-            except UrlRewritingError, e:
+            except UrlRewritingError as e:
                 log.warn(e.value)
                 task.fail(entry)
 
@@ -51,14 +51,14 @@ class PluginUrlRewriting(object):
                         log.debug('Url rewriting %s' % entry['url'])
                         urlrewriter.instance.url_rewrite(task, entry)
                         log.info('Entry \'%s\' URL rewritten to %s (with %s)' % (entry['title'], entry['url'], name))
-                except UrlRewritingError, r:
+                except UrlRewritingError as r:
                     # increase failcount
                     #count = self.shared_cache.storedefault(entry['url'], 1)
                     #count += 1
                     raise UrlRewritingError('URL rewriting %s failed: %s' % (name, str(r.value)))
-                except PluginError, e:
+                except PluginError as e:
                     raise UrlRewritingError('URL rewriting %s failed: %s' % (name, str(e.value)))
-                except Exception, e:
+                except Exception as e:
                     log.exception(e)
                     raise UrlRewritingError('%s: Internal error with url %s' % (name, entry['url']))
 

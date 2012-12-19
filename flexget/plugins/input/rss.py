@@ -203,7 +203,7 @@ class InputRSS(object):
                 # Use the raw response so feedparser can read the headers and status values
                 response = task.requests.get(config['url'], timeout=60, headers=headers, raise_status=False, auth=auth)
                 content = response.content
-            except RequestException, e:
+            except RequestException as e:
                 raise PluginError('Unable to download the RSS for task %s (%s): %s' %
                                   (task.name, config['url'], e))
 
@@ -243,7 +243,7 @@ class InputRSS(object):
             return
         try:
             rss = feedparser.parse(content)
-        except LookupError, e:
+        except LookupError as e:
             raise PluginError('Unable to parse the RSS (from %s): %s' % (config['url'], e))
 
         # check for bozo

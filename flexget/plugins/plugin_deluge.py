@@ -135,7 +135,7 @@ class DelugePlugin(object):
         # This is overridden by OutputDeluge to add deluge 1.1 support
         try:
             from deluge.ui.client import client
-        except ImportError, e:
+        except ImportError as e:
             log.debug('Error importing deluge: %s' % e)
             raise DependencyError('output_deluge', 'deluge', 'Deluge module and it\'s dependencies required. ImportError: %s' % e, log)
         try:
@@ -424,7 +424,7 @@ class OutputDeluge(DelugePlugin):
             if path:
                 try:
                     opts['download_location'] = os.path.expanduser(entry.render(path))
-                except RenderError, e:
+                except RenderError as e:
                     log.error('Could not set path for %s: %s' % (entry['title'], e))
             for fopt, dopt in self.options.iteritems():
                 value = entry.get(fopt, config.get(fopt))
@@ -461,7 +461,7 @@ class OutputDeluge(DelugePlugin):
                 if not item in before:
                     try:
                         movedone = entry.render(movedone)
-                    except RenderError, e:
+                    except RenderError as e:
                         log.error('Could not set movedone for %s: %s' % (entry['title'], e))
                         movedone = ''
                     if movedone:
@@ -702,7 +702,7 @@ class OutputDeluge(DelugePlugin):
                     path = entry.render(entry.get('path', config['path']))
                     if path:
                         add_opts['download_location'] = pathscrub(os.path.expanduser(path))
-                except RenderError, e:
+                except RenderError as e:
                     log.error('Could not set path for %s: %s' % (entry['title'], e))
                 for fopt, dopt in self.options.iteritems():
                     value = entry.get(fopt, config.get(fopt))
@@ -717,12 +717,12 @@ class OutputDeluge(DelugePlugin):
                 try:
                     movedone = entry.render(entry.get('movedone', config['movedone']))
                     modify_opts['movedone'] = pathscrub(os.path.expanduser(movedone))
-                except RenderError, e:
+                except RenderError as e:
                     log.error('Error setting movedone for %s: %s' % (entry['title'], e))
                 try:
                     content_filename = entry.get('content_filename', config.get('content_filename', ''))
                     modify_opts['content_filename'] = pathscrub(entry.render(content_filename))
-                except RenderError, e:
+                except RenderError as e:
                     log.error('Error setting content_filename for %s: %s' % (entry['title'], e))
 
                 torrent_id = entry.get('deluge_id') or entry.get('torrent_info_hash')

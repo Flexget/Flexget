@@ -93,7 +93,7 @@ class FilterRottenTomatoes(object):
 
             try:
                 lookup(entry)
-            except PluginError, e:
+            except PluginError as e:
                 # logs skip message once through log_once (info) and then only when ran from cmd line (w/o --cron)
                 msg = 'Skipping %s because of an error: %s' % (entry['title'], e.value)
                 if not log_once(msg, logger=log):

@@ -85,7 +85,7 @@ class PluginPreset(object):
             from flexget.utils.tools import MergeException, merge_dict_from_to
             try:
                 merge_dict_from_to(preset_config, task.config)
-            except MergeException, exc:
+            except MergeException as exc:
                 raise PluginError('Failed to merge preset %s to task %s due to %s' % (preset, task.name, exc))
 
         log.trace('presets: %s' % config)

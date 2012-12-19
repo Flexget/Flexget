@@ -79,7 +79,7 @@ class OutputSabnzbd(object):
             log.debug('request_url: %s' % request_url)
             try:
                 response = urlopener(request_url, log).read()
-            except Exception, e:
+            except Exception as e:
                 log.critical('Failed to use sabnzbd. Requested %s' % request_url)
                 log.critical('Result was: %s' % e)
                 task.fail(entry, 'sabnzbd unreachable')

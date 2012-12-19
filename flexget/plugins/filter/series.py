@@ -862,7 +862,7 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
                     quality = entry['quality']
                 try:
                     parser.parse(data, field=field, quality=quality)
-                except ParseWarning, pw:
+                except ParseWarning as pw:
                     log_once(pw.value, logger=log)
 
                 if parser.valid:

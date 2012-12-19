@@ -74,7 +74,7 @@ def add_to_queue():
     force = request.values.get('force') == 'on'
     try:
         title = queue_add(title=what, imdb_id=imdb_id, quality=quality, force=force)['title']
-    except QueueError, e:
+    except QueueError as e:
         flash(e.message, 'error')
     else:
         flash('%s successfully added to queue.' % title, 'success')
@@ -86,7 +86,7 @@ def del_from_queue():
     imdb_id = request.values.get('imdb_id')
     try:
         title = queue_del(imdb_id)
-    except QueueError, e:
+    except QueueError as e:
         flash(e.message, 'error')
     else:
         flash('%s removed from queue.' % title, 'delete')
@@ -99,7 +99,7 @@ def edit_movie_quality():
     quality = request.values.get('quality')
     try:
         queue_edit(imdb_id, quality)
-    except QueueError, e:
+    except QueueError as e:
         flash(e.message, 'error')
     else:
         # TODO: Display movie name instead of id

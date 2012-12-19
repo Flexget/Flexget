@@ -63,7 +63,7 @@ class OutputProwl(object):
             # If description has jinja template, render it
             try:
                 description = entry.render(description)
-            except RenderError, e:
+            except RenderError as e:
                 description = entry['title']
                 log.error('Error rendering jinja description: %s' % e)
 
@@ -72,7 +72,7 @@ class OutputProwl(object):
                     'event': event, 'description': description}
             try:
                 response = task.requests.post(url, headers=headers, data=data, raise_status=False)
-            except RequestException, e:
+            except RequestException as e:
                 log.error('Error with request: %s' % e)
                 continue
 

@@ -433,7 +433,7 @@ class Requirements(object):
                 for component in self.components:
                     if found.type == component.type:
                         component.add_requirement(part)
-        except KeyError, e:
+        except KeyError as e:
             raise ValueError('%s is not a valid quality component.' % e.message)
 
     def allows(self, qual, loose=False):

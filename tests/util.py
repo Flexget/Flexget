@@ -16,7 +16,7 @@ log = logging.getLogger('tests.util')
 def mkdir(*a, **kw):
     try:
         os.mkdir(*a, **kw)
-    except OSError, e:
+    except OSError as e:
         if e.errno == errno.EEXIST:
             pass
         else:
@@ -77,7 +77,7 @@ def maketemp(name=None):
     log.trace("Creating empty tmpdir %r" % tmp)
     try:
         shutil.rmtree(tmp)
-    except OSError, e:
+    except OSError as e:
         if e.errno == errno.ENOENT:
             pass
         else:

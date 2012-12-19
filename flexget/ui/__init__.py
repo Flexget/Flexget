@@ -27,7 +27,7 @@ def main():
     options = parser.parse_args()
     try:
         manager = UIManager(options, core_parser)
-    except IOError, e:
+    except IOError as e:
         # failed to load config
         log.critical(e.message)
         logger.flush_logging_to_console()

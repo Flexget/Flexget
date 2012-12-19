@@ -49,7 +49,7 @@ class TorrentFilename(object):
                 # construct torrent object
                 try:
                     torrent = Torrent(data)
-                except SyntaxError, e:
+                except SyntaxError as e:
                     task.fail(entry, '%s - broken or invalid torrent file received' % e.message)
                     self.purge(entry)
                     continue
@@ -65,7 +65,7 @@ class TorrentFilename(object):
                 else:
                     # generate filename from torrent or fall back to title plus extension
                     entry['filename'] = self.make_filename(torrent, entry)
-            except Exception, e:
+            except Exception as e:
                 log.exception(e)
 
     @priority(TORRENT_PRIO)

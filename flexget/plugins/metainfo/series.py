@@ -83,7 +83,7 @@ class MetainfoSeries(object):
             parser.data = title
             try:
                 parser.parse(data=title, quality=quality)
-            except ParseWarning, pw:
+            except ParseWarning as pw:
                 log.debug('ParseWarning: %s' % pw.value)
             if parser.valid:
                 return parser

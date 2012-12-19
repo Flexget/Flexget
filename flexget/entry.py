@@ -154,7 +154,7 @@ class Entry(dict):
 
         try:
             log.trace('ENTRY SET: %s = %r' % (key, value))
-        except Exception, e:
+        except Exception as e:
             log.debug('trying to debug key `%s` value threw exception: %s' % (key, e))
 
         dict.__setitem__(self, key, value)

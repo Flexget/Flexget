@@ -101,7 +101,7 @@ class FilterExistsMovie(object):
                         if imdb_id is not None:
                             log.trace('adding: %s' % imdb_id)
                             path_ids.append(imdb_id)
-                    except PluginError, e:
+                    except PluginError as e:
                         log.trace('%s lookup failed (%s)' % (item, e.value))
                         incompatible_dirs += 1
 
@@ -117,7 +117,7 @@ class FilterExistsMovie(object):
             if not entry.get('imdb_id', eval_lazy=False):
                 try:
                     imdb_lookup.lookup(entry)
-                except PluginError, e:
+                except PluginError as e:
                     log.trace('entry %s imdb failed (%s)' % (entry['title'], e.value))
                     incompatible_entries += 1
                     continue

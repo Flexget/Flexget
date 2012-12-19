@@ -36,7 +36,7 @@ class NewTorrents:
            url.startswith('http://www.newtorrents.info/search')):
             try:
                 url = self.entries_from_search(entry['title'], url=url)[0]['url']
-            except PluginWarning, e:
+            except PluginWarning as e:
                 raise UrlRewritingError(e.value)
         else:
             url = self.url_from_page(url)

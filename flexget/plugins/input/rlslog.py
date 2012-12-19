@@ -102,7 +102,7 @@ class RlsLog(object):
             try:
                 releases = self.parse_rlslog(url, task)
                 break
-            except RequestException, e:
+            except RequestException as e:
                 if number == 1:
                     raise
                 else:

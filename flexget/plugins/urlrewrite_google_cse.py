@@ -41,7 +41,7 @@ class UrlRewriteGoogleCse:
                     entry['url'] = url
                     return
             raise UrlRewritingError('Unable to resolve')
-        except Exception, e:
+        except Exception as e:
             raise UrlRewritingError(e)
 
 register_plugin(UrlRewriteGoogleCse, 'google_cse', groups=['urlrewriter'])

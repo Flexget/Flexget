@@ -89,7 +89,7 @@ class Session(requests.Session):
         if url.startswith('file://'):
             try:
                 raw = urllib2.urlopen(url)
-            except IOError, e:
+            except IOError as e:
                 msg = 'IOError openening file %s: %s' % (url, e)
                 log.error(msg)
                 raise RequestException(msg)

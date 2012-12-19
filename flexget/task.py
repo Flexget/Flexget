@@ -419,28 +419,28 @@ class Task(object):
         # call the plugin
         try:
             return method(*args, **kwargs)
-        except PluginWarning, warn:
+        except PluginWarning as warn:
             # check if this warning should be logged only once (may keep repeating)
             if warn.kwargs.get('log_once', False):
                 from flexget.utils.log import log_once
                 log_once(warn.value, warn.log)
             else:
                 warn.log.warning(warn)
-        except EntryUnicodeError, eue:
+        except EntryUnicodeError as eue:
             msg = ('Plugin %s tried to create non-unicode compatible entry (key: %s, value: %r)' %
                    (keyword, eue.key, eue.value))
             log.critical(msg)
             self.abort(msg)
-        except PluginError, err:
+        except PluginError as err:
             err.log.critical(err.value)
             self.abort(err.value)
-        except DependencyError, e:
+        except DependencyError as e:
             msg = ('Plugin `%s` cannot be used because dependency `%s` is missing.' %
                             (keyword, e.missing))
             log.critical(msg)
             log.debug(e.message)
             self.abort(msg)
-        except Exception, e:
+        except Exception as e:
             msg = 'BUG: Unhandled error in plugin %s: %s' % (keyword, e)
             log.exception(msg)
             self.abort(msg)
@@ -613,7 +613,7 @@ class Task(object):
             if hasattr(plugin.instance, 'validator'):
                 try:
                     validator = plugin.instance.validator()
-                except TypeError, e:
+                except TypeError as e:
                     log.critical('Invalid validator method in plugin %s' % keyword)
                     log.exception(e)
                     continue

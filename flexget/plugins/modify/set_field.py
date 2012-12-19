@@ -55,7 +55,7 @@ class ModifySet(object):
                 logger = log.error if errors else log.debug
                 try:
                     conf[field] = entry.render(value)
-                except RenderError, e:
+                except RenderError as e:
                     logger('Could not set %s for %s: %s' % (field, entry['title'], e))
                     # If the replacement failed, remove this key from the update dict
                     del conf[field]

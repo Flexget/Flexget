@@ -78,11 +78,11 @@ class FilterIf(object):
             if passed:
                 log.debug('%s matched requirement %s' % (entry['title'], condition))
             return passed
-        except NameError, e:
+        except NameError as e:
             # Extract the name that did not exist
             missing_field = e.message.split('\'')[1]
             log.debug('%s does not contain the field %s' % (entry['title'], missing_field))
-        except Exception, e:
+        except Exception as e:
             log.error('Error occurred in if statement: %r' % e)
 
     def __getattr__(self, item):

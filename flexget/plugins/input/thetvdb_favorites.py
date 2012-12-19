@@ -116,7 +116,7 @@ class InputThetvdbFavorites(object):
             # Lookup the series name from the id
             try:
                 series = lookup_series(tvdb_id=series_id)
-            except LookupError, e:
+            except LookupError as e:
                 log.error('Error looking up %s from thetvdb: %s' % (series_id, e.message))
             else:
                 series_name = series.seriesname

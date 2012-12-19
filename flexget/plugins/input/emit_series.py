@@ -6,7 +6,7 @@ log = logging.getLogger('emit_series')
 
 try:
     from flexget.plugins.filter.series import Series, Episode, SeriesDatabase
-except ImportError, e:
+except ImportError as e:
     log.error(e.message)
     raise DependencyError(issued_by='emit_series', missing='series')
 

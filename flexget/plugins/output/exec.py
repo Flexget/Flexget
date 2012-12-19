@@ -113,7 +113,7 @@ class PluginExec(object):
                 # Do string replacement from entry, but make sure quotes get escaped
                 try:
                     cmd = render_from_entry(cmd, entrydict)
-                except RenderError, e:
+                except RenderError as e:
                     log.error('Could not set exec command for %s: %s' % (entry['title'], e))
                     # fail the entry if configured to do so
                     if config.get('fail_entries'):
@@ -143,7 +143,7 @@ class PluginExec(object):
             cmd = config[phase_name]['phase']
             try:
                 cmd = render_from_task(cmd, task)
-            except RenderError, e:
+            except RenderError as e:
                 log.error('Error rendering `%s`: %s' % (cmd, e))
             else:
                 log.debug('phase cmd: %s' % cmd)

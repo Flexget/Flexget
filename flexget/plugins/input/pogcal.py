@@ -24,7 +24,7 @@ class InputPogDesign(object):
             if 'U / P Invalid' in r.text:
                 raise plugin.PluginError('Invalid username/password for pogdesign.')
             page = requests.get('http://www.pogdesign.co.uk/cat/showselect.php', cookies=r.cookies)
-        except requests.RequestException, e:
+        except requests.RequestException as e:
             raise plugin.PluginError('Error retrieving source: %s' % e)
         soup = BeautifulSoup(page.text)
         entries = []

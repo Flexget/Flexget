@@ -61,7 +61,7 @@ class QueueMovies(object):
             log.debug('queueing kwargs: %s' % kwargs)
             try:
                 queue_add(**kwargs)
-            except QueueError, e:
+            except QueueError as e:
                 task.fail(entry, 'Error adding movie to queue: %s' % e.message)
 
 

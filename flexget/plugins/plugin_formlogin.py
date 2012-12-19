@@ -38,7 +38,7 @@ class FormLogin(object):
         br.set_handle_robots(False)
         try:
             br.open(url)
-        except Exception, e:
+        except Exception as e:
             # TODO: improve error handling
             raise PluginError('Unable to post login form', log)
 
@@ -53,7 +53,7 @@ class FormLogin(object):
                 loginform[userfield] = username
                 loginform[passfield] = password
                 break
-            except Exception, e:
+            except Exception as e:
                 pass
         else:
             received = os.path.join(task.manager.config_base, 'received')

@@ -47,7 +47,7 @@ class CrossMatch(object):
                 method = input.phase_handlers['input']
                 try:
                     result.extend(method(task, input_config))
-                except PluginError, e:
+                except PluginError as e:
                     log.warning('Error during input plugin %s: %s' % (input_name, e))
                     continue
                 if not result:

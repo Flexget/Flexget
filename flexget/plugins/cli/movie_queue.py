@@ -48,7 +48,7 @@ class MovieQueueManager(object):
         if options['action'] == 'del':
             try:
                 title = queue_del(options['what'])
-            except QueueError, e:
+            except QueueError as e:
                 console(e.message)
             else:
                 console('Removed %s from queue' % title)
@@ -57,7 +57,7 @@ class MovieQueueManager(object):
         if options['action'] == 'forget':
             try:
                 title = queue_forget(options['what'])
-            except QueueError, e:
+            except QueueError as e:
                 console(e.message)
             else:
                 console('Marked %s as undownloaded' % title)
@@ -67,7 +67,7 @@ class MovieQueueManager(object):
         try:
             what = parse_what(options['what'])
             options.update(what)
-        except QueueError, e:
+        except QueueError as e:
             console(e.message)
 
         if not options.get('title') or not (options.get('imdb_id') or options.get('tmdb_id')):
@@ -79,7 +79,7 @@ class MovieQueueManager(object):
                 try:
                     added = queue_add(title=options['title'], imdb_id=options['imdb_id'],
                         tmdb_id=options['tmdb_id'], quality=options['quality'], force=options['force'])
-                except QueueError, e:
+                except QueueError as e:
                     console(e.message)
                     if e.errno == 1:
                         # This is an invalid quality error, display some more info
@@ -145,7 +145,7 @@ class MovieQueueAction(Action):
         if len(values) >= 3:
             try:
                 options['quality'] = qualities.Requirements(values[2])
-            except ValueError, e:
+            except ValueError as e:
                 raise ArgumentError(self, '`%s` is an invalid quality requirement string: %s' %
                                        (values[2], e.message))
         else:

@@ -16,7 +16,7 @@ def reset_plugin(manager):
     try:
         reset_schema(plugin)
         console('The database for `%s` has been reset.' % plugin)
-    except ValueError, e:
+    except ValueError as e:
         console('Unable to reset %s: %s' % (plugin, e.message))
 
 

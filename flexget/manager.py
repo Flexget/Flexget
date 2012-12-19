@@ -220,7 +220,7 @@ class Manager(object):
             self.pre_check_config(config)
         try:
             self.config = yaml.safe_load(file(config)) or {}
-        except Exception, e:
+        except Exception as e:
             log.critical(e)
             print ''
             print '-' * 79
@@ -394,7 +394,7 @@ class Manager(object):
             if [int(part) for part in sqlalchemy.__version__.split('.')] < [0, 7, 0]:
                 print >> sys.stderr, 'FATAL: SQLAlchemy 0.7.0 or newer required. Please upgrade your SQLAlchemy.'
                 sys.exit(1)
-        except ValueError, e:
+        except ValueError as e:
             log.critical('Failed to check SQLAlchemy version, you may need to upgrade it')
 
         # SQLAlchemy
@@ -431,7 +431,7 @@ class Manager(object):
             if self.options.reset or self.options.del_db:
                 Base.metadata.drop_all(bind=self.engine)
             Base.metadata.create_all(bind=self.engine)
-        except OperationalError, e:
+        except OperationalError as e:
             if os.path.exists(self.db_filename):
                 print >> sys.stderr, '%s - make sure you have write permissions to file %s' % (e.message, self.db_filename)
             else:
@@ -525,7 +525,7 @@ class Manager(object):
             try:
                 log.trace('calling process_start on a task %s' % task.name)
                 task._process_start()
-            except Exception, e:
+            except Exception as e:
                 task.enabled = False
                 log.exception('Task %s process_start: %s' % (task.name, e))
 
@@ -545,7 +545,7 @@ class Manager(object):
             try:
                 log.trace('calling process_end on a task %s' % task.name)
                 task._process_end()
-            except Exception, e:
+            except Exception as e:
                 log.exception('Task %s process_end: %s' % (task.name, e))
 
     @useExecLogging
@@ -594,7 +594,7 @@ class Manager(object):
                 continue
             try:
                 task.execute(disable_phases=disable_phases, entries=entries)
-            except Exception, e:
+            except Exception as e:
                 task.enabled = False
                 log.exception('Task %s: %s' % (task.name, e))
             except KeyboardInterrupt:

@@ -87,7 +87,7 @@ class PluginPyLoad(object):
             raise PluginError('pyLoad not reachable', log)
         except PluginError:
             raise
-        except Exception, e:
+        except Exception as e:
             raise PluginError('Unknown error: %s' % str(e), log)
 
         api = config.get('api', self.DEFAULT_API)
@@ -149,7 +149,7 @@ class PluginPyLoad(object):
                     data = {'folder': folder}
                     query_api(api, "setPackageData", {'pid': pid, 'data': data, 'session': self.session})
 
-            except Exception, e:
+            except Exception as e:
                 task.fail(entry, str(e))
 
     def check_login(self, task, config):
@@ -166,7 +166,7 @@ class PluginPyLoad(object):
         else:
             try:
                 query_api(url, 'getServerVersion', {'session': self.session})
-            except HTTPError, e:
+            except HTTPError as e:
                 if e.code == 403:  # Forbidden
                     self.session = None
                     return self.check_login(task, config)
@@ -177,7 +177,7 @@ class PluginPyLoad(object):
 def query_api(url, method, post=None):
     try:
         return urlopen(url.rstrip("/") + "/" + method.strip("/"), urlencode(post) if post else None)
-    except HTTPError, e:
+    except HTTPError as e:
         if e.code == 500:
             raise PluginError('Internal API Error', log)
         raise

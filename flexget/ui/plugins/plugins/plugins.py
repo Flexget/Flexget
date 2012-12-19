@@ -28,7 +28,7 @@ def phases():
 def plugins_by_phase(phase):
     try:
         return jsonify(plugins=plugin_infos(get_plugins(phase=phase)))
-    except Exception, e:
+    except Exception as e:
         return e.message, 404
 
 

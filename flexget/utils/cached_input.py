@@ -133,7 +133,7 @@ class cached(object):
                 # call input event
                 try:
                     response = func(*args, **kwargs)
-                except PluginError, e:
+                except PluginError as e:
                     # If there was an error producing entries, but we have valid entries in the db cache, return those.
                     if self.persist and not task.manager.options.nocache:
                         db_cache = task.session.query(InputCache).filter(InputCache.name == self.name).\

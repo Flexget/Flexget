@@ -76,7 +76,7 @@ class FilterExistsSeries(object):
                         disk_parser.data = name
                         try:
                             disk_parser.parse(data=name)
-                        except ParseWarning, pw:
+                        except ParseWarning as pw:
                             from flexget.utils.log import log_once
                             log_once(pw.value, logger=log)
                         if disk_parser.valid:

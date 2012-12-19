@@ -99,7 +99,7 @@ class MyEpisodes(object):
         try:
             logincon = opener.open(baseurl, loginparams)
             loginsrc = logincon.read()
-        except urllib2.URLError, e:
+        except urllib2.URLError as e:
             log.error('Error logging in to myepisodes: %s' % e)
             return
 
@@ -110,7 +110,7 @@ class MyEpisodes(object):
         for entry in task.accepted:
             try:
                 self.mark_episode(task, entry, opener)
-            except PluginWarning, w:
+            except PluginWarning as w:
                 log.warning(str(w))
 
     def lookup_myepisodes_id(self, entry, opener, session):
@@ -146,7 +146,7 @@ class MyEpisodes(object):
             try:
                 series = lookup_series(name=series_name, tvdb_id=entry.get('thetvdb_id'))
                 query_name = series.seriesname
-            except LookupError, e:
+            except LookupError as e:
                 log.warning('Unable to lookup series `%s` from tvdb, using raw name.' % series_name)
                 query_name = series_name
 
@@ -155,7 +155,7 @@ class MyEpisodes(object):
         try:
             con = opener.open(baseurl, params)
             txt = con.read()
-        except urllib2.URLError, e:
+        except urllib2.URLError as e:
             log.error('Error searching for myepisodes id: %s' % e)
 
         matchObj = re.search(r'&showid=([0-9]*)">' + query_name + '</a>', txt, re.MULTILINE | re.IGNORECASE)

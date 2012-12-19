@@ -82,12 +82,12 @@ def load_ui_plugins():
         try:
             log.info('Loading UI plugin %s' % name)
             exec "import flexget.ui.plugins.%s" % name
-        except DependencyError, e:
+        except DependencyError as e:
             # plugin depends on another plugin that was not imported successfully
             log.error(e.message)
-        except EnvironmentError, e:
+        except EnvironmentError as e:
             log.info('Plugin %s: %s' % (name, e.message))
-        except Exception, e:
+        except Exception as e:
             log.critical('Exception while loading plugin %s' % name)
             log.exception(e)
             raise
@@ -245,7 +245,7 @@ def daemonize(stdin='/dev/null', stdout='/dev/null', stderr='/dev/null'):
             atexit._exithandlers = []
             # exit first parent
             sys.exit(0)
-    except OSError, e:
+    except OSError as e:
         sys.stderr.write("fork #1 failed: %d (%s)\n" % (e.errno, e.strerror))
         sys.exit(1)
 
@@ -262,7 +262,7 @@ def daemonize(stdin='/dev/null', stdout='/dev/null', stderr='/dev/null'):
             atexit._exithandlers = []
             # exit from second parent
             sys.exit(0)
-    except OSError, e:
+    except OSError as e:
         sys.stderr.write("fork #2 failed: %d (%s)\n" % (e.errno, e.strerror))
         sys.exit(1)
 

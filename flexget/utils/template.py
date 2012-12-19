@@ -149,7 +149,7 @@ def render_from_entry(template_string, entry):
     if isinstance(template_string, basestring):
         try:
             template = environment.from_string(template_string)
-        except TemplateSyntaxError, e:
+        except TemplateSyntaxError as e:
             raise PluginError('Error in template syntax: ' + e.message)
     else:
         # We can also support an actual Template being passed in
@@ -164,7 +164,7 @@ def render_from_entry(template_string, entry):
         exc_info = sys.exc_info()
         try:
             return environment.handle_exception(exc_info, True)
-        except Exception, e:
+        except Exception as e:
             error = RenderError('(%s) %s' % (type(e).__name__, e))
             log.debug('Error during rendering: %s' % error)
             raise error
@@ -173,11 +173,11 @@ def render_from_entry(template_string, entry):
     if result == template_string:
         try:
             result = template_string % entry
-        except KeyError, e:
+        except KeyError as e:
             raise RenderError('Does not contain the field `%s` for string replacement.' % e)
-        except ValueError, e:
+        except ValueError as e:
             raise PluginError('Invalid string replacement template: %s (%s)' % (template_string, e))
-        except TypeError, e:
+        except TypeError as e:
             raise RenderError('Error during string replacement: %s' % e.message)
 
     return result
@@ -195,7 +195,7 @@ def render_from_task(template, task):
         template = environment.from_string(template)
     try:
         result = template.render({'task': task})
-    except Exception, e:
+    except Exception as e:
         raise RenderError('(%s) %s' % (type(e).__name__, e))
 
     return result

@@ -32,7 +32,7 @@ def upgrade(ver, session):
         for row in session.execute(select([table.c.id, table.c.plugin, table.c.key, table.c.value])):
             try:
                 p = pickle.loads(row['value'])
-            except Exception, e:
+            except Exception as e:
                 log.warning('Couldn\'t load %s:%s removing from db: %s' % (row['plugin'], row['key'], e))
                 session.execute(table.delete().where(table.c.id == row['id']))
         ver = 1

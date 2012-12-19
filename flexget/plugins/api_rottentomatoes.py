@@ -593,7 +593,7 @@ def get_json(url):
     try:
         log.debug('fetching json at %s' % url)
         data = urlopener(url, log)
-    except URLError, e:
+    except URLError as e:
         log.warning('Request failed %s' % url)
         return
     try:

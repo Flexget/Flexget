@@ -183,14 +183,14 @@ class SeriesForget(object):
                     try:
                         forget_series_episode(name, identifier)
                         console('Removed episode `%s` from series `%s`.' % (identifier, name.capitalize()))
-                    except ValueError, e:
+                    except ValueError as e:
                         console(e.message)
             else:
                 # remove whole series
                 try:
                     forget_series(name)
                     console('Removed series `%s` from database.' % name.capitalize())
-                except ValueError, e:
+                except ValueError as e:
                     console(e.message)
 
             task.manager.config_changed()

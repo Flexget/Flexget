@@ -67,21 +67,21 @@ class OutputPushover(object):
             # Attempt to render the title field
             try:
                 title = entry.render(title)
-            except RenderError, e:
+            except RenderError as e:
                 log.warning("Problem rendering 'title': %s" % e)
                 title = "Download started"
 
             # Attempt to render the message field
             try:
                 message = entry.render(message)
-            except RenderError, e:
+            except RenderError as e:
                 log.warning("Problem rendering 'message': %s" % e)
                 message = entry["title"]
 
             # Attempt to render the url field
             try:
                 url = entry.render(url)
-            except RenderError, e:
+            except RenderError as e:
                 log.warning("Problem rendering 'url': %s" % e)
                 url = entry.get("imdb_url", "")
 

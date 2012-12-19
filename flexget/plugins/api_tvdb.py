@@ -133,7 +133,7 @@ class TVDBSeries(TVDBContainer, Base):
         url = get_mirror() + api_key + '/series/%s/%s.xml' % (self.id, language)
         try:
             data = requests.get(url).content
-        except RequestException, e:
+        except RequestException as e:
             raise LookupError('Request failed %s' % url)
         result = BeautifulStoneSoup(data, convertEntities=BeautifulStoneSoup.HTML_ENTITIES).find('series')
         if result:
@@ -202,7 +202,7 @@ class TVDBEpisode(TVDBContainer, Base):
         url = get_mirror() + api_key + '/episodes/%s/%s.xml' % (self.id, language)
         try:
             data = requests.get(url).content
-        except RequestException, e:
+        except RequestException as e:
             raise LookupError('Request failed %s' % url)
         result = BeautifulStoneSoup(data, convertEntities=BeautifulStoneSoup.HTML_ENTITIES).find('episode')
         if result:
@@ -230,7 +230,7 @@ def find_series_id(name):
     url = server + 'GetSeries.php?seriesname=%s&language=%s' % (urllib.quote(name), language)
     try:
         page = requests.get(url).content
-    except RequestException, e:
+    except RequestException as e:
         raise LookupError("Unable to get search results for %s: %s" % (name, e))
     xmldata = BeautifulStoneSoup(page, convertEntities=BeautifulStoneSoup.HTML_ENTITIES).data
     if not xmldata:
@@ -280,7 +280,7 @@ def lookup_series(name=None, tvdb_id=None, only_cached=False, session=None):
             log.verbose('Data for %s has expired, refreshing from tvdb' % series.seriesname)
             try:
                 series.update()
-            except LookupError, e:
+            except LookupError as e:
                 log.warning('Error while updating from tvdb (%s), using cached data.' % e.message)
         else:
             log.debug('Series %s information restored from cache.' % id_str())
@@ -346,7 +346,7 @@ def lookup_episode(name=None, seasonnum=None, episodenum=None, absolutenum=None,
             log.info('Data for %r has expired, refreshing from tvdb' % episode)
             try:
                 episode.update()
-            except LookupError, e:
+            except LookupError as e:
                 log.warning('Error while updating from tvdb (%s), using cached data.' % e.message)
         else:
             log.debug('Using episode info for %s from cache.' % ep_description)
@@ -372,7 +372,7 @@ def lookup_episode(name=None, seasonnum=None, episodenum=None, absolutenum=None,
                         episode = TVDBEpisode(ep_data)
                     series.episodes.append(episode)
                     session.merge(series)
-        except RequestException, e:
+        except RequestException as e:
             raise LookupError('Error looking up episode from TVDb (%s)' % e)
     if episode:
         # Access the series attribute to force it to load before returning
@@ -419,7 +419,7 @@ def mark_expired(session=None):
         if not isinstance(content, basestring):
             raise Exception('expected string, got %s' % type(content))
         updates = BeautifulStoneSoup(content, convertEntities=BeautifulStoneSoup.HTML_ENTITIES).data
-    except RequestException, e:
+    except RequestException as e:
         log.error('Could not get update information from tvdb: %s' % e)
         return
 

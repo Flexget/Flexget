@@ -31,7 +31,7 @@ class UrlRewriteBakaBT(object):
         page = urlopener(req, log)
         try:
             soup = get_soup(page)
-        except Exception, e:
+        except Exception as e:
             raise UrlRewritingError(e)
         tag_a = soup.find('a', attrs={'class': 'download_link'})
         if not tag_a:
