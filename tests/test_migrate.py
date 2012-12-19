@@ -1,5 +1,4 @@
 import os
-from tests import with_filecopy
 from tests import FlexGetBase
 
 

@@ -1,6 +1,5 @@
 from tests import FlexGetBase
 import os
-import os.path
 from tests.util import maketemp
 
 

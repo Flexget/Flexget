@@ -1,6 +1,5 @@
 import os
 import glob
-from tests import FlexGetBase
 from flexget import plugin, plugins
 from nose.tools import raises
 

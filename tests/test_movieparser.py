@@ -1,4 +1,4 @@
-from flexget.utils.titles import MovieParser, ParseWarning
+from flexget.utils.titles import MovieParser
 
 
 class TestMovieParser:

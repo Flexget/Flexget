@@ -1,6 +1,5 @@
 from flexget import validator
 from tests.util import maketemp
-import yaml
 
 
 class TestValidator(object):

@@ -1,7 +1,5 @@
-from __future__ import with_statement
 from tests import FlexGetBase
 import os
-import os.path
 
 
 class TestExec(FlexGetBase):
