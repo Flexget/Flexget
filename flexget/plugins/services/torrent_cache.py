@@ -30,7 +30,9 @@ class TorrentCache(object):
                 entry.setdefault('urls', [entry['url']])
                 urls = set(host + info_hash.upper() + '.torrent' for host in MIRRORS)
                 # Don't add any duplicate addresses
-                urls -= set(entry['urls'])
+                urls = list(urls - set(entry['urls']))
+                # Add the cache mirrors in a random order
+                random.shuffle(urls)
                 entry['urls'].extend(urls)
 
 
