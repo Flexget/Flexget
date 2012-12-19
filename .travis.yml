@@ -8,7 +8,5 @@ install:
   - pip install .
 # command to run tests, e.g. python setup.py test
 script: nosetests
-# Master branch will be taken care of by jenkins
-branches:
-  except:
-    - master
+notifications:
+  email: false
