@@ -1,5 +1,4 @@
 import logging
-from flexget.utils import requests
 from flexget.plugin import register_plugin, DependencyError
 from flexget.utils.cached_input import cached
 from flexget.entry import Entry

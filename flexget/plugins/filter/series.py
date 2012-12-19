@@ -19,7 +19,7 @@ from flexget.utils.tools import merge_dict_from_to, parse_timedelta
 from flexget.utils.database import quality_property
 from flexget.manager import Session
 from flexget.plugin import (register_plugin, register_parser_option, get_plugin_by_name, get_plugin_keywords,
-    PluginWarning, DependencyError, priority)
+                            DependencyError, priority)
 
 SCHEMA_VER = 9
 

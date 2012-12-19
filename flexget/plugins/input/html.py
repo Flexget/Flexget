@@ -1,6 +1,5 @@
 import urlparse
 import logging
-from bs4 import Tag
 import urllib
 import urllib2
 import zlib

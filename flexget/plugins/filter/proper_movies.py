@@ -3,7 +3,7 @@ from sqlalchemy.schema import Index
 from sqlalchemy.sql.expression import desc
 from flexget.event import fire_event
 from flexget.manager import Base
-from flexget.plugin import register_plugin, priority, get_plugin_by_name, PluginError
+from flexget.plugin import register_plugin, get_plugin_by_name, PluginError
 from flexget.utils.log import log_once
 from flexget.utils.titles.movie import MovieParser
 from flexget.utils.tools import parse_timedelta

@@ -2,7 +2,7 @@ import copy
 import os
 import logging
 from flexget.plugin import register_plugin, priority, PluginWarning
-from flexget.utils.titles import SeriesParser, ParseWarning
+from flexget.utils.titles import  ParseWarning
 
 log = logging.getLogger('exists_series')
 

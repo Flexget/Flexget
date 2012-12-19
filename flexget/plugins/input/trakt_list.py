@@ -4,7 +4,7 @@ import re
 from requests import RequestException
 from flexget.utils import json
 from flexget.utils.cached_input import cached
-from flexget.plugin import register_plugin, PluginError, PluginWarning
+from flexget.plugin import register_plugin, PluginError
 from flexget.entry import Entry
 
 log = logging.getLogger('trakt_list')

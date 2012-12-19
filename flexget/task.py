@@ -7,9 +7,9 @@ from sqlalchemy import Column, Unicode, String, Integer
 from flexget import validator
 from flexget import schema
 from flexget.manager import Session, register_config_key
-from flexget.plugin import get_plugins_by_phase, get_plugin_by_name, \
-    task_phases, PluginWarning, PluginError, DependencyError, plugins as all_plugins
-from flexget.utils.simple_persistence import SimpleTaskPersistence, SimplePersistence
+from flexget.plugin import (get_plugins_by_phase, get_plugin_by_name,task_phases, PluginWarning, PluginError,
+                            DependencyError, plugins as all_plugins)
+from flexget.utils.simple_persistence import SimpleTaskPersistence
 import flexget.utils.requests as requests
 from flexget.event import fire_event
 from flexget.entry import Entry, EntryUnicodeError

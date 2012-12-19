@@ -1,5 +1,5 @@
 from datetime import datetime
-from sqlalchemy import extract, func, case
+from sqlalchemy import extract, func
 from sqlalchemy.orm import synonym
 from sqlalchemy.ext.hybrid import Comparator, hybrid_property
 from flexget.manager import Session
