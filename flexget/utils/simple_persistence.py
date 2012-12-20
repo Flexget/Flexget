@@ -7,6 +7,7 @@ You can safely use task.simple_persistence and manager.persist, if we implement 
 can replace underlying mechanism in single point (and provide transparent switch).
 """
 
+from __future__ import unicode_literals, division, absolute_import
 import logging
 from datetime import datetime
 import pickle

@@ -1,3 +1,4 @@
+from __future__ import unicode_literals, division, absolute_import
 import logging
 from flexget.plugin import register_plugin, get_plugin_by_name, get_plugin_keywords, get_phases_by_plugin, phase_methods
 

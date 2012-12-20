@@ -2,6 +2,7 @@
 A method to create test-specific temporary directories
 """
 
+from __future__ import unicode_literals, division, absolute_import
 import sys
 import os
 import shutil

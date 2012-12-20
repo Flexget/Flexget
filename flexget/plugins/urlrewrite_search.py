@@ -1,3 +1,4 @@
+from __future__ import unicode_literals, division, absolute_import
 import logging
 from flexget.utils.search import StringComparator
 from flexget.plugin import get_plugins_by_group, PluginWarning, PluginError, \

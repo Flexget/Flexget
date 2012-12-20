@@ -1,3 +1,4 @@
+from __future__ import unicode_literals, division, absolute_import
 import sys
 from argparse import ArgumentParser as ArgParser, Action, ArgumentError, SUPPRESS
 import flexget
@@ -63,8 +64,7 @@ class ArgumentParser(ArgParser):
 
     def parse_args(self, args=None, namespace=None):
         if args is None:
-            args = sys.argv[1:]
-        args = [unicode(arg, sys.getfilesystemencoding()) for arg in args]
+            args = [unicode(arg, sys.getfilesystemencoding()) for arg in sys.argv[1:]]
         args = super(ArgumentParser, self).parse_args(args, namespace)
         if args.debug_trace:
             args.debug = True

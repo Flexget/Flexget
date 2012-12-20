@@ -1,3 +1,4 @@
+from __future__ import unicode_literals, division, absolute_import
 from datetime import timedelta
 from tests import FlexGetBase
 from flexget.manager import Session

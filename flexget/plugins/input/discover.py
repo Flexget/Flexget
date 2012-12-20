@@ -1,3 +1,4 @@
+from __future__ import unicode_literals, division, absolute_import
 import logging
 from flexget.utils.cached_input import cached
 from flexget.utils.search import StringComparator, MovieComparator, AnyComparator, clean_title

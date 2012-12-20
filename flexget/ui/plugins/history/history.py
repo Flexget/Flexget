@@ -1,3 +1,4 @@
+from __future__ import unicode_literals, division, absolute_import
 import logging
 from sqlalchemy import desc
 from flexget.ui.webui import register_plugin, db_session

@@ -1,3 +1,4 @@
+from __future__ import unicode_literals, division, absolute_import
 import re
 import logging
 from flexget.plugin import *
@@ -66,7 +67,7 @@ class UrlRewrite(object):
                 if regexp.match(entry['url']):
                     task.fail(entry, 'urlrewriting')
                     task.purge()
-                    from plugin_urlrewriting import UrlRewritingError
+                    from flexget.plugins.plugin_urlrewriting import UrlRewritingError
                     raise UrlRewritingError('Regexp %s result should NOT continue to match!' % name)
                 return
 

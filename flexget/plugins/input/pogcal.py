@@ -1,3 +1,4 @@
+from __future__ import unicode_literals, division, absolute_import
 import logging
 from bs4 import BeautifulSoup
 from flexget.utils import requests

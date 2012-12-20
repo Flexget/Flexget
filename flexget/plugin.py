@@ -1,6 +1,7 @@
 """ Plugin Loading & Management.
 """
 
+from __future__ import unicode_literals, division, absolute_import
 import sys
 import os
 import re
@@ -8,7 +9,7 @@ import logging
 import time
 from itertools import ifilter
 from requests import RequestException
-from event import add_event_handler as add_phase_handler
+from flexget.event import add_event_handler as add_phase_handler
 from flexget import plugins as plugins_pkg
 
 log = logging.getLogger('plugin')

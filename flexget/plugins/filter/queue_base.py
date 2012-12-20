@@ -1,3 +1,4 @@
+from __future__ import unicode_literals, division, absolute_import
 from datetime import datetime
 import logging
 from sqlalchemy import Column, Integer, Boolean, String, Unicode, DateTime

@@ -1,3 +1,4 @@
+from __future__ import unicode_literals, division, absolute_import
 from tests import FlexGetBase
 from nose.plugins.attrib import attr
 

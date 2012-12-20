@@ -1,9 +1,10 @@
-__version__ = 0.1
-
+from __future__ import unicode_literals, division, absolute_import
 import logging
 from requests import RequestException
 from flexget.plugin import register_plugin
 from flexget.utils.template import RenderError
+
+__version__ = 0.1
 
 log = logging.getLogger('prowl')
 

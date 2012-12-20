@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from __future__ import unicode_literals, division, absolute_import
 from urllib import urlencode, quote
 from urllib2 import urlopen, URLError, HTTPError
 from logging import getLogger

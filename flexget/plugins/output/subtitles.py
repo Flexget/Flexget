@@ -1,3 +1,4 @@
+from __future__ import unicode_literals, division, absolute_import
 from xmlrpclib import ServerProxy
 import re
 import difflib

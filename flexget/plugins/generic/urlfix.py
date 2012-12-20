@@ -1,3 +1,4 @@
+from __future__ import unicode_literals, division, absolute_import
 import logging
 from flexget.plugin import priority, register_plugin
 from flexget.utils.log import log_once

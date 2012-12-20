@@ -1,5 +1,6 @@
 """Contains miscellaneous helpers"""
 
+from __future__ import unicode_literals, division, absolute_import
 import urllib2
 import httplib
 import socket

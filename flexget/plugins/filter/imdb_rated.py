@@ -1,3 +1,4 @@
+from __future__ import unicode_literals, division, absolute_import
 import logging
 from flexget.plugin import register_plugin, PluginWarning, PluginError, get_plugin_by_name
 from bs4 import BeautifulSoup

@@ -1,3 +1,4 @@
+from __future__ import unicode_literals, division, absolute_import
 from flask import redirect, render_template, Module, request, flash, url_for
 from sqlalchemy.sql.expression import desc, asc
 

@@ -1,3 +1,4 @@
+from __future__ import unicode_literals, division, absolute_import
 import logging
 from sqlalchemy import Column, Integer, String
 from flexget.manager import Base, Session
@@ -162,7 +163,7 @@ class Meta(type):
             else:
                 new_bases.append(base)
 
-        return type.__new__(mcs, metaname, tuple(new_bases), dict_)
+        return type.__new__(mcs, str(metaname), tuple(new_bases), dict_)
 
     def __getattr__(self, item):
         """Transparently return attributes of Base instead of our own."""

@@ -1,3 +1,4 @@
+from __future__ import unicode_literals, division, absolute_import
 import os
 from tests import FlexGetBase
 

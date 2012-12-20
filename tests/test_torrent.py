@@ -1,3 +1,4 @@
+from __future__ import unicode_literals, division, absolute_import
 import os
 
 from nose.plugins.attrib import attr
@@ -84,9 +85,8 @@ class TestModifyTrackers(FlexGetBase):
     """
 
     def load_torrent(self, filename):
-        f = open(filename, 'rb')
-        data = f.read()
-        f.close()
+        with open(filename, 'rb') as f:
+            data = f.read()
         return Torrent(data)
 
     @with_filecopy('test.torrent', 'test_add_trackers.torrent')

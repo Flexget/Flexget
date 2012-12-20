@@ -1,3 +1,4 @@
+from __future__ import unicode_literals, division, absolute_import
 from nose.plugins.attrib import attr
 from flexget.manager import Session
 from flexget.plugins.api_tvdb import lookup_episode

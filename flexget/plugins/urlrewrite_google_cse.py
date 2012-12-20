@@ -1,3 +1,4 @@
+from __future__ import unicode_literals, division, absolute_import
 import re
 import urllib2
 import logging

@@ -1,7 +1,8 @@
+from __future__ import unicode_literals, division, absolute_import
 import re
 import urllib
 import logging
-from plugin_urlrewriting import UrlRewritingError
+from flexget.plugins.plugin_urlrewriting import UrlRewritingError
 from flexget.entry import Entry
 from flexget.plugin import register_plugin, internet, PluginWarning
 from flexget.utils import requests

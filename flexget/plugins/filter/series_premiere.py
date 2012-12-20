@@ -1,3 +1,4 @@
+from __future__ import unicode_literals, division, absolute_import
 from flexget.plugin import register_plugin, priority, get_plugin_by_name
 from flexget.plugins.filter.series import FilterSeriesBase, normalize_series_name
 

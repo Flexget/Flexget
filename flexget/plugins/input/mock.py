@@ -1,4 +1,5 @@
 """Plugin for mocking task data."""
+from __future__ import unicode_literals, division, absolute_import
 import logging
 from flexget.entry import Entry
 from flexget import plugin

@@ -1,6 +1,7 @@
 """Torrenting utils, mostly for handling bencoding and torrent files."""
 # Torrent decoding is a short fragment from effbot.org. Site copyright says:
 # Test scripts and other short code fragments can be considered as being in the public domain.
+from __future__ import unicode_literals, division, absolute_import
 import re
 import logging
 
@@ -75,12 +76,8 @@ def is_torrent_file(metafilepath):
         @param metafilepath: Path to the file to check, must have read permissions for it.
         @return: True if there is a high probability this is a metafile.
     """
-    f = open(metafilepath, 'rb')
-    try:
-        # read first 200 bytes to verify if a file is a torrent or not
+    with open(metafilepath, 'rb') as f:
         data = f.read(200)
-    finally:
-        f.close()
 
     magic_marker = bool(TORRENT_RE.match(data))
     if not magic_marker:
@@ -96,7 +93,7 @@ def tokenize(text, match=re.compile("([idel])|(\d+):|(-?\d+)").match):
         s = m.group(m.lastindex)
         i = m.end()
         if m.lastindex == 2:
-            yield "s"
+            yield b"s"
             yield text[i:i + int(s)]
             i += int(s)
         else:
@@ -104,22 +101,22 @@ def tokenize(text, match=re.compile("([idel])|(\d+):|(-?\d+)").match):
 
 
 def decode_item(next, token):
-    if token == "i":
+    if token == b"i":
         # integer: "i" value "e"
         data = int(next())
-        if next() != "e":
+        if next() != b"e":
             raise ValueError
-    elif token == "s":
+    elif token == b"s":
         # string: "s" value (virtual tokens)
         data = next()
-    elif token == "l" or token == "d":
+    elif token == b"l" or token == b"d":
         # container: "l" (or "d") values "e"
         data = []
         tok = next()
-        while tok != "e":
+        while tok != b"e":
             data.append(decode_item(next, tok))
             tok = next()
-        if token == "d":
+        if token == b"d":
             data = dict(zip(data[0::2], data[1::2]))
     else:
         raise ValueError
@@ -139,33 +136,33 @@ def bdecode(text):
 
 # encoding implementation by d0b
 def encode_string(data):
-    return "%d:%s" % (len(data), data)
+    return b"%d:%s" % (len(data), data)
 
 
 def encode_unicode(data):
-    return encode_string(str(data))
+    return encode_string(data.encode('utf8'))
 
 
 def encode_integer(data):
-    return "i%de" % data
+    return b"i%de" % data
 
 
 def encode_list(data):
-    encoded = "l"
+    encoded = b"l"
     for item in data:
         encoded += bencode(item)
-    encoded += "e"
+    encoded += b"e"
     return encoded
 
 
 def encode_dictionary(data):
-    encoded = "d"
+    encoded = b"d"
     items = data.items()
     items.sort()
     for (key, value) in items:
-        encoded += encode_string(key)
+        encoded += bencode(key)
         encoded += bencode(value)
-    encoded += "e"
+    encoded += b"e"
     return encoded
 
 
@@ -189,11 +186,8 @@ class Torrent(object):
     @classmethod
     def from_file(cls, filename):
         """Create torrent from file on disk."""
-        handle = open(filename, 'rb')
-        try:
+        with open(filename, 'rb') as handle:
             return cls(handle.read())
-        finally:
-            handle.close()
 
     def __init__(self, content):
         """Accepts torrent file as string"""
@@ -215,18 +209,16 @@ class Torrent(object):
         files = []
         if 'length' in self.content['info']:
             # single file torrent
-            t = {}
-            t['name'] = self.content['info']['name']
-            t['size'] = self.content['info']['length']
-            t['path'] = ''
+            t = {'name': self.content['info']['name'],
+                 'size': self.content['info']['length'],
+                 'path': ''}
             files.append(t)
         else:
             # multifile torrent
             for item in self.content['info']['files']:
-                t = {}
-                t['path'] = '/'.join(item['path'][:-1])
-                t['name'] = item['path'][-1]
-                t['size'] = item['length']
+                t = {'path': '/'.join(item['path'][:-1]),
+                     'name': item['path'][-1],
+                     'size': item['length']}
                 files.append(t)
 
         # Decode strings

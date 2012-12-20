@@ -1,3 +1,4 @@
+from __future__ import unicode_literals, division, absolute_import
 import logging
 from flexget.plugin import register_plugin, priority
 # TORRENT_RE is redundant by now, but keep it here, in case someone was crazy enough to import it

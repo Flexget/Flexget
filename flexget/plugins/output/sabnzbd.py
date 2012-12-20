@@ -1,3 +1,4 @@
+from __future__ import unicode_literals, division, absolute_import
 import logging
 import urllib
 from flexget.plugin import register_plugin

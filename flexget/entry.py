@@ -1,3 +1,4 @@
+from __future__ import unicode_literals, division, absolute_import
 from exceptions import Exception, UnicodeDecodeError, TypeError, KeyError
 import logging
 import copy

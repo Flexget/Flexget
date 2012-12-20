@@ -1,3 +1,4 @@
+from __future__ import unicode_literals, division, absolute_import
 import logging
 from argparse import SUPPRESS
 from flexget.plugin import register_plugin, register_parser_option, priority

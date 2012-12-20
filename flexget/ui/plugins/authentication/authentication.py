@@ -1,3 +1,4 @@
+from __future__ import unicode_literals, division, absolute_import
 import logging
 from sqlalchemy import Column, Unicode
 from flask import Module, request, Response

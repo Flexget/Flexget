@@ -1,4 +1,5 @@
 """Plugin for filesystem tasks."""
+from __future__ import unicode_literals, division, absolute_import
 import os
 import logging
 from flexget import plugin

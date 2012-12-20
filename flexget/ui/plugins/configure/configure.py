@@ -1,3 +1,4 @@
+from __future__ import unicode_literals, division, absolute_import
 from flexget.ui.webui import manager, register_plugin, app
 from flexget.task import Task
 from flask import render_template, request, flash, redirect, Module

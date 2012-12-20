@@ -4,6 +4,7 @@
 # Notes      : Based on (i.e. ripped off from) Mark Hammond's
 #              win32gui_taskbar.py and win32gui_menu.py demos from PyWin32
 
+from __future__ import unicode_literals, division, absolute_import
 import os
 from flexget.event import event
 from flexget.plugin import DependencyError

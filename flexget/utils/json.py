@@ -2,7 +2,7 @@
 Helper module that can load whatever version of the json module is available.
 Plugins can just import the methods from this module.
 """
-from __future__ import absolute_import
+from __future__ import unicode_literals, division, absolute_import
 from flexget.plugin import DependencyError
 
 try:

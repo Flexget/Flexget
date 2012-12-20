@@ -1,3 +1,4 @@
+from __future__ import unicode_literals, division, absolute_import
 import hashlib
 import logging
 import mimetypes
@@ -222,7 +223,7 @@ class PluginDownload(object):
             except:
                 log.warning('Unable to URL-encode URL for `%s`' % entry['title'])
         if not isinstance(url, unicode):
-            url = urllib.quote(url, safe=':/~?=&%')
+            url = urllib.quote(url, safe=b':/~?=&%')
         log.debug('Downloading url \'%s\'' % url)
 
         # get content

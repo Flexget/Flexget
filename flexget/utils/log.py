@@ -1,5 +1,6 @@
 """Logging utilities"""
 
+from __future__ import unicode_literals, division, absolute_import
 import logging
 import hashlib
 from datetime import datetime, timedelta

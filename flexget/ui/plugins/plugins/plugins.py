@@ -1,3 +1,4 @@
+from __future__ import unicode_literals, division, absolute_import
 from flask import Module, jsonify
 from flexget.ui.webui import register_plugin
 from flexget.plugin import plugins, get_plugins, task_phases, get_plugin_by_name, DependencyError, plugin_contexts

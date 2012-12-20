@@ -1,3 +1,4 @@
+from __future__ import unicode_literals, division, absolute_import
 from datetime import datetime, timedelta
 import logging
 from urllib2 import URLError, quote
@@ -309,8 +310,10 @@ class ApiTmdb(object):
 
 
 def get_first_result(tmdb_function, value):
+    if isinstance(value, unicode):
+        value = value.encode('utf-8')
     if isinstance(value, basestring):
-        value = quote(value.encode('utf-8'), safe='')
+        value = quote(value, safe=b'')
     url = '%s/2.1/Movie.%s/%s/json/%s/%s' % (server, tmdb_function, lang, api_key, value)
     try:
         data = urlopener(url, log)

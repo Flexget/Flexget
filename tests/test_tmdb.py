@@ -1,3 +1,4 @@
+from __future__ import unicode_literals, division, absolute_import
 from tests import FlexGetBase
 from nose.plugins.attrib import attr
 
@@ -20,6 +21,6 @@ class TestTmdbLookup(FlexGetBase):
     def test_tmdb_lookup(self):
         self.execute_task('test')
         # check that these were created
-        assert self.task.find_entry(tmdb_name='Taken', tmdb_year=2008), 'Didn\'t populate tmdb info for Taken'
+        assert self.task.find_entry(tmdb_name='Taken', tmdb_year=2009), 'Didn\'t populate tmdb info for Taken'
         assert self.task.find_entry(tmdb_name='The Matrix', tmdb_year=1999), \
                 'Didn\'t populate tmdb info for The Matrix'

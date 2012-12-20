@@ -1,3 +1,4 @@
+from __future__ import unicode_literals, division, absolute_import
 import os
 from argparse import SUPPRESS
 from flexget.options import ArgumentParser, CoreArgumentParser

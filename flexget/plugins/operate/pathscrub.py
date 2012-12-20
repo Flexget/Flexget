@@ -1,3 +1,4 @@
+from __future__ import unicode_literals, division, absolute_import
 from flexget import plugin
 from flexget import validator
 from flexget.utils import pathscrub

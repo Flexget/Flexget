@@ -1,5 +1,6 @@
 #!/usr/bin/python
 
+from __future__ import unicode_literals, division, absolute_import
 import os
 import sys
 import flexget.logger

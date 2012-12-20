@@ -8,6 +8,7 @@ forget (string)
     title will be forgotten. With field value only that particular field is forgotten.
 """
 
+from __future__ import unicode_literals, division, absolute_import
 import logging
 from datetime import datetime, timedelta
 from sqlalchemy import Column, Integer, String, DateTime, Unicode, Boolean, asc, or_, select, update, Index

@@ -1,3 +1,4 @@
+from __future__ import unicode_literals, division, absolute_import
 from tests import FlexGetBase
 from nose.tools import assert_true
 from flexget.plugin import get_plugin_by_name

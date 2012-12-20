@@ -1,3 +1,4 @@
+from __future__ import unicode_literals, division, absolute_import
 import logging
 from flexget.utils.titles.parser import TitleParser
 from flexget.utils import qualities
