@@ -5,6 +5,7 @@ import shutil
 import logging
 import yaml
 import atexit
+import codecs
 from datetime import datetime, timedelta
 import sqlalchemy
 from sqlalchemy.orm import sessionmaker
@@ -293,7 +294,7 @@ class Manager(object):
         def isodd(n):
             return bool(n % 2)
 
-        file = open(fn)
+        file = codecs.open(fn, 'r', 'utf8')
         line_num = 0
         duplicates = {}
         # flags
