@@ -376,7 +376,7 @@ class SeriesParser(TitleParser):
         # No id found, check if this is a special
         if self.special:
             # Attempt to set id as the title of the special
-            self.id = data_stripped
+            self.id = data_stripped or 'special'
             self.id_type = 'special'
             self.valid = True
             log.debug('found special, setting id to \'%s\'' % self.id)
