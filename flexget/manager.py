@@ -4,6 +4,7 @@ import sys
 import shutil
 import logging
 import yaml
+import codecs
 import atexit
 from datetime import datetime, timedelta
 import sqlalchemy
@@ -293,7 +294,7 @@ class Manager(object):
         def isodd(n):
             return bool(n % 2)
 
-        file = open(fn)
+        file = codecs.open(fn, encoding='utf-8')
         line_num = 0
         duplicates = {}
         # flags
