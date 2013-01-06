@@ -26,7 +26,6 @@ log = logging.getLogger('webui')
 app = Flask(__name__)
 manager = None
 db_session = None
-server = None
 executor = None
 
 _home = None
@@ -203,22 +202,19 @@ def start(mg):
 
 
 def start_server():
-    global server
-    from cherrypy import wsgiserver
-    d = wsgiserver.WSGIPathInfoDispatcher({'/': app})
-    server = wsgiserver.CherryPyWSGIServer(('0.0.0.0', manager.options.port), d)
-
-    log.debug('server %s' % server)
     try:
-        server.start()
+        app.run('0.0.0.0', manager.options.port)
     except KeyboardInterrupt:
         stop_server()
 
 
 def stop_server(*args):
     log.debug('Shutting down server')
-    if server:
-        server.stop()
+    shutdown = request.environ.get('werkzeug.server.shutdown')
+    if shutdown is None:
+        raise RuntimeError('Not running with the Werkzeug Server')
+
+    shutdown()
 
 
 def set_exit_handler(func):
