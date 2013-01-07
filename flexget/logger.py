@@ -47,7 +47,7 @@ class FlexGetFormatter(logging.Formatter):
         else:
             self._fmt = self.plain_fmt
         record.message = record.getMessage()
-        if string.find(self._fmt,"%(asctime)") >= 0:
+        if string.find(self._fmt, "%(asctime)") >= 0:
             record.asctime = self.formatTime(record, self.datefmt)
         s = self._fmt % record.__dict__
         # Replace newlines in log messages with \n
@@ -84,7 +84,7 @@ class PrivacyFilter(logging.Filter):
             self.replaces.append(p)
 
         for param in ['passwd', 'password', 'pw', 'pass', 'passkey',
-            'key', 'apikey', 'user', 'username', 'uname', 'login', 'id']:
+                      'key', 'apikey', 'user', 'username', 'uname', 'login', 'id']:
             hide(param)
 
     def filter(self, record):

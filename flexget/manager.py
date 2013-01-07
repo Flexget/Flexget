@@ -7,10 +7,12 @@ import yaml
 import codecs
 import atexit
 from datetime import datetime, timedelta
+
 import sqlalchemy
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.pool import SingletonThreadPool
+
 from flexget.event import fire_event
 from flexget import validator
 
@@ -41,6 +43,9 @@ def register_config_key(key, validator, required=False):
 
 
 def useExecLogging(func):
+    """
+    Decorator for setting task name to log messages.
+    """
 
     def wrapper(self, *args, **kw):
         # Set the task name in the logger
@@ -232,7 +237,8 @@ class Manager(object):
             print ' o Indentation error'
             print ' o Missing : from end of the line'
             print ' o Non ASCII characters (use UTF8)'
-            print ' o If text contains any of :[]{}% characters it must be single-quoted (eg. value{1} should be \'value{1}\')\n'
+            print ' o If text contains any of :[]{}% characters it must be single-quoted ' \
+                  '(eg. value{1} should be \'value{1}\')\n'
 
             # Not very good practice but we get several kind of exceptions here, I'm not even sure all of them
             # At least: ReaderError, YmlScannerError (or something like that)
@@ -302,7 +308,7 @@ class Manager(object):
         prev_mapping = False
         prev_list = True
         prev_scalar = True
-        list_open = False # multiline list with [
+        list_open = False  # multiline list with [
 
         for line in file:
             line_num += 1
@@ -379,7 +385,8 @@ class Manager(object):
             # this line is a list
             prev_list = line.strip()[0] == '-'
             if prev_list:
-                # This line is in a list, so clear the duplicates, as duplicates are not always wrong in a list. see #697
+                # This line is in a list, so clear the duplicates,
+                # as duplicates are not always wrong in a list. see #697
                 duplicates[indentation] = {}
 
         file.close()
@@ -388,7 +395,7 @@ class Manager(object):
     def validate_config(self):
         """Check all root level keywords are valid."""
         _config_validator.validate(self.config)
-        return  _config_validator.errors.messages
+        return _config_validator.errors.messages
 
     def init_sqlalchemy(self):
         """Initialize SQLAlchemy"""
@@ -422,9 +429,10 @@ class Manager(object):
                                                    poolclass=SingletonThreadPool)
         except ImportError:
             print >> sys.stderr, ('FATAL: Unable to use SQLite. Are you running Python 2.5 - 2.7 ?\n'
-            'Python should normally have SQLite support built in.\n'
-            'If you\'re running correct version of Python then it is not equipped with SQLite.\n'
-            'You can try installing `pysqlite`. If you have compiled python yourself, recompile it with SQLite support.')
+                                  'Python should normally have SQLite support built in.\n'
+                                  'If you\'re running correct version of Python then it is not equipped with SQLite.\n'
+                                  'You can try installing `pysqlite`. If you have compiled python yourself, '
+                                  'recompile it with SQLite support.')
             sys.exit(1)
         Session.configure(bind=self.engine)
         # create all tables, doesn't do anything to existing tables
@@ -435,9 +443,11 @@ class Manager(object):
             Base.metadata.create_all(bind=self.engine)
         except OperationalError as e:
             if os.path.exists(self.db_filename):
-                print >> sys.stderr, '%s - make sure you have write permissions to file %s' % (e.message, self.db_filename)
+                print >> sys.stderr, '%s - make sure you have write permissions to file %s' % \
+                                     (e.message, self.db_filename)
             else:
-                print >> sys.stderr, '%s - make sure you have write permissions to directory %s' % (e.message, self.config_base)
+                print >> sys.stderr, '%s - make sure you have write permissions to directory %s' % \
+                                     (e.message, self.config_base)
             raise Exception(e.message)
 
     def check_lock(self):
@@ -612,8 +622,8 @@ class Manager(object):
     def db_cleanup(self):
         """ Perform database cleanup if cleanup interval has been met.
         """
-        if (self.options.db_cleanup or not self.persist.get('last_cleanup') or
-            self.persist['last_cleanup'] < datetime.now() - DB_CLEANUP_INTERVAL):
+        expired = self.persist.get('last_cleanup', datetime.now()) < datetime.now() - DB_CLEANUP_INTERVAL
+        if self.options.db_cleanup or not self.persist.get('last_cleanup') or expired:
             if not self.options.db_cleanup and not self.options.quiet:
                 log.verbose('Not running database cleanup on manual run. It will be run on next --cron run.')
                 return
@@ -630,7 +640,7 @@ class Manager(object):
         """ Application is being exited
         """
         fire_event('manager.shutdown', self)
-        if not self.unit_test: # don't scroll "nosetests" summary results when logging is enabled
+        if not self.unit_test:  # don't scroll "nosetests" summary results when logging is enabled
             log.debug('Shutting down')
         self.engine.dispose()
         # remove temporary database used in test mode
@@ -639,5 +649,5 @@ class Manager(object):
                 raise Exception('trying to delete non test database?')
             os.remove(self.db_filename)
             log.info('Removed test database')
-        if not self.unit_test: # don't scroll "nosetests" summary results when logging is enabled
+        if not self.unit_test:  # don't scroll "nosetests" summary results when logging is enabled
             log.debug('Shutdown completed')

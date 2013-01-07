@@ -5,11 +5,14 @@ import os
 import posixpath
 from datetime import datetime, timedelta
 import random
+
 from BeautifulSoup import BeautifulStoneSoup
+
 from sqlalchemy import Column, Integer, Float, String, Unicode, Boolean, DateTime, func
 from sqlalchemy.schema import ForeignKey
 from sqlalchemy.orm import relation
 from requests import RequestException
+
 from flexget import schema
 from flexget.utils.tools import decode_html
 from flexget.utils.requests import Session as ReqSession
@@ -317,7 +320,8 @@ def lookup_series(name=None, tvdb_id=None, only_cached=False, session=None):
 
 
 @with_session
-def lookup_episode(name=None, seasonnum=None, episodenum=None, absolutenum=None, airdate=None, tvdb_id=None, only_cached=False, session=None):
+def lookup_episode(name=None, seasonnum=None, episodenum=None, absolutenum=None, airdate=None,
+                   tvdb_id=None, only_cached=False, session=None):
     # First make sure we have the series data
     series = lookup_series(name=name, tvdb_id=tvdb_id, only_cached=only_cached, session=session)
     if not series:

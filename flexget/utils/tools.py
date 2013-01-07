@@ -250,7 +250,7 @@ def urlopener(url_or_request, log, **kwargs):
             handler_names = [h.__class__.__name__ for h in handlers]
             log.debug('Additional handlers have been specified for this urlopen: %s' % ', '.join(handler_names))
         opener = urllib2.build_opener(*handlers).open
-        for i in range(retries): # retry getting the url up to 3 times.
+        for i in range(retries):  # retry getting the url up to 3 times.
             if i > 0:
                 time.sleep(3)
             try:

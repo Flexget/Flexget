@@ -335,8 +335,9 @@ def pep8(args):
 
     # Ignoring certain errors
     ignore = [
-        'E711', 'E712', # These are comparisons to singletons i.e. == False, and == None. We need these for sqlalchemy.
-        'W291', 'W293', 'E261'
+        'E711', 'E712',  # These are comparisons to singletons i.e. == False, and == None. We need these for sqlalchemy.
+        'W291', 'W293', 'E261',
+        'E128'  # E128 continuation line under-indented for visual indent
     ]
     styleguide = pep8.StyleGuide(show_source=True, ignore=ignore, repeat=1, max_line_length=120,
         parse_argv=args)

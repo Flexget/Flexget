@@ -4,7 +4,7 @@ from argparse import ArgumentParser as ArgParser, Action, ArgumentError, SUPPRES
 import flexget
 
 
-def required_length(nmin,nmax):
+def required_length(nmin, nmax):
     """Generates a custom Action to validate an arbitrary range of arguments."""
     class RequiredLength(Action):
         def __call__(self, parser, args, values, option_string=None):
@@ -25,28 +25,29 @@ class ArgumentParser(ArgParser):
         ArgParser.__init__(self, **kwargs)
 
         self.add_argument('-V', '--version', action='version', version=flexget.__version__,
-                        help='Print FlexGet version and exit.')
+                          help='Print FlexGet version and exit.')
         # This option is already handled above.
         self.add_argument('--bugreport', action='store_true', dest='debug_tb',
-                        help="Use this option to create a detailed bug report,"
-                             " note that the output might contain PRIVATE data, so edit that out")
+                          help='Use this option to create a detailed bug report, '
+                               'note that the output might contain PRIVATE data, so edit that out')
         self.add_argument('--logfile', default='flexget.log',
-                        help='Specify a custom logfile name/location. Default is flexget.log in the config directory.')
+                          help='Specify a custom logfile name/location. '
+                               'Default is flexget.log in the config directory.')
         self.add_argument('--debug', action='store_true', dest='debug',
-                        help=SUPPRESS)
+                          help=SUPPRESS)
         self.add_argument('--debug-trace', action='store_true', dest='debug_trace',
-                        help=SUPPRESS)
+                          help=SUPPRESS)
         self.add_argument('--loglevel', default='verbose',
-                        choices=['none', 'critical', 'error', 'warning', 'info', 'verbose', 'debug', 'trace'],
-                        help=SUPPRESS)
+                          choices=['none', 'critical', 'error', 'warning', 'info', 'verbose', 'debug', 'trace'],
+                          help=SUPPRESS)
         self.add_argument('--debug-sql', action='store_true', default=False,
-                        help=SUPPRESS)
+                          help=SUPPRESS)
         self.add_argument('-c', dest='config', default='config.yml',
-                        help='Specify configuration file. Default is config.yml')
+                          help='Specify configuration file. Default is config.yml')
         self.add_argument('--experimental', action='store_true', default=False,
-                        help=SUPPRESS)
+                          help=SUPPRESS)
         self.add_argument('--del-db', action='store_true', dest='del_db', default=False,
-                        help=SUPPRESS)
+                          help=SUPPRESS)
         self.add_argument('--profile', action='store_true', default=False, help=SUPPRESS)
 
     def add_argument(self, *args, **kwargs):
@@ -87,35 +88,36 @@ class CoreArgumentParser(ArgumentParser):
         self._unit_test = unit_test
 
         self.add_argument('--log-start', action='store_true', dest='log_start', default=0,
-                        help=SUPPRESS)
+                          help=SUPPRESS)
         self.add_argument('--test', action='store_true', dest='test', default=0,
-                        help='Verbose what would happen on normal execution.')
+                          help='Verbose what would happen on normal execution.')
         self.add_argument('--check', action='store_true', dest='validate', default=0,
-                        help='Validate configuration file and print errors.')
+                          help='Validate configuration file and print errors.')
         self.add_argument('--learn', action='store_true', dest='learn', default=0,
-                        help='Matches are not downloaded but will be skipped in the future.')
+                          help='Matches are not downloaded but will be skipped in the future.')
         self.add_argument('--no-cache', action='store_true', dest='nocache', default=0,
-                        help='Disable caches. Works only in plugins that have explicit support.')
+                          help='Disable caches. Works only in plugins that have explicit support.')
         self.add_argument('--reset', action='store_true', dest='reset', default=0,
-                        help='DANGEROUS. Obliterates the database and runs with learn in order to to regain useful state.')
+                          help='DANGEROUS. Obliterates the database and runs with learn '
+                               'in order to to regain useful state.')
         # TODO: rename dest to cron, since this does more than just quiet
         self.add_argument('--cron', action='store_true', dest='quiet', default=False,
-                        help='Disables stdout and stderr output, log file used. Reduces logging level slightly.')
+                          help='Disables stdout and stderr output, log file used. Reduces logging level slightly.')
         self.add_argument('--db-cleanup', action='store_true', dest='db_cleanup', default=False,
-                        help='Forces the database cleanup event to run right now.')
+                          help='Forces the database cleanup event to run right now.')
 
         # Plugins should respect this flag and retry where appropriate
         self.add_argument('--retry', action='store_true', dest='retry', default=0, help=SUPPRESS)
 
         self.add_argument('--validate', action='store_true', dest='validate', default=False,
-                        help=SUPPRESS)
+                          help=SUPPRESS)
 
         self.add_argument('--migrate', action='store', dest='migrate', default=None,
-                        help=SUPPRESS)
+                          help=SUPPRESS)
 
         # provides backward compatibility to --cron and -d
         self.add_argument('-q', '--quiet', action='store_true', dest='quiet', default=False,
-                        help=SUPPRESS)
+                          help=SUPPRESS)
 
     def parse_args(self, args=None, namespace=None):
         args = super(CoreArgumentParser, self).parse_args(args or self._unit_test and ['--reset'] or None, namespace)

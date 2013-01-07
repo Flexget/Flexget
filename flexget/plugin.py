@@ -163,7 +163,7 @@ task_phases = ['start', 'input', 'metainfo', 'filter', 'download', 'modify', 'ou
 # map phase names to method names
 phase_methods = {
     # task
-    'abort': 'on_task_abort', # special; not a task phase that gets called normally
+    'abort': 'on_task_abort',  # special; not a task phase that gets called normally
 
     # entry handling
     'accept': 'on_entry_accept',
@@ -174,7 +174,7 @@ phase_methods = {
     'process_start': 'on_process_start',
     'process_end': 'on_process_end',
 }
-phase_methods.update((_phase, 'on_task_' + _phase) for _phase in task_phases) # DRY
+phase_methods.update((_phase, 'on_task_' + _phase) for _phase in task_phases)  # DRY
 
 # Plugin package naming
 PLUGIN_NAMESPACE = 'flexget.plugins'
@@ -250,7 +250,7 @@ class Plugin(object):
        we decide API's destiny.
     """
     PLUGIN_INFO = dict(api_ver=2)
-    LOGGER_NAME = None # use default name
+    LOGGER_NAME = None  # use default name
 
     def __init__(self, plugin_info, *args, **kw):
         """Initialize basic plugin attributes."""
@@ -260,7 +260,7 @@ class Plugin(object):
 
 class BuiltinPlugin(Plugin):
     """A builtin plugin."""
-    PLUGIN_INFO = Plugin.PLUGIN_INFO.copy() # inherit base info
+    PLUGIN_INFO = Plugin.PLUGIN_INFO.copy()  # inherit base info
     PLUGIN_INFO.update(builtin=True)
 
 
@@ -269,7 +269,7 @@ class DebugPlugin(Plugin):
         A plugin for debugging purposes.
     """
     # Note that debug plugins are never builtin, so we don't need a mixin
-    PLUGIN_INFO = Plugin.PLUGIN_INFO.copy() # inherit base info
+    PLUGIN_INFO = Plugin.PLUGIN_INFO.copy()  # inherit base info
     PLUGIN_INFO.update(debug=True)
 
 
@@ -283,10 +283,14 @@ class PluginInfo(dict):
 
     @classmethod
     def name_from_class(cls, plugin_class):
-        """Convention is to take camel-case class name and rewrite it to an underscore form, e.g. 'PluginName' to 'plugin_name'"""
+        """
+        Convention is to take camel-case class name and rewrite it to an underscore form,
+        e.g. 'PluginName' to 'plugin_name'
+        """
         return re.sub('[A-Z]+', lambda i: '_' + i.group(0).lower(), plugin_class.__name__).lstrip('_')
 
-    def __init__(self, plugin_class, name=None, groups=None, builtin=False, debug=False, api_ver=1, contexts=None, category=None):
+    def __init__(self, plugin_class, name=None, groups=None, builtin=False, debug=False, api_ver=1,
+                 contexts=None, category=None):
         """
         Register a plugin.
 
@@ -297,7 +301,8 @@ class PluginInfo(dict):
         :param debug: True if plugin is for debugging purposes.
         :param api_ver: Signature of callback hooks (1=task; 2=task,config).
         :param contexts: List of where this plugin is configurable. Can be 'task', 'root', or None
-        :param category: The type of plugin. Can be one of the task phases. Defaults to the package containing the plugin.
+        :param category: The type of plugin. Can be one of the task phases.
+            Defaults to the package containing the plugin.
         """
         dict.__init__(self)
 
@@ -329,20 +334,20 @@ class PluginInfo(dict):
             # Base class init needs plugin info immediately
             try:
                 self.instance = self.plugin_class(self)
-            except: # OK, gets re-raised
+            except:  # OK, gets re-raised
                 log.error("Could not create plugin '%s' from class %s.%s" % (
                     self.name, self.plugin_class.__module__, self.plugin_class.__name__))
                 raise
         else:
             # Manually registered
             self.instance = self.plugin_class()
-            self.instance.plugin_info = self # give plugin easy access to its own info
+            self.instance.plugin_info = self  # give plugin easy access to its own info
             self.instance.log = logging.getLogger(getattr(self.instance, "LOGGER_NAME", None) or self.name)
 
         if self.name in plugins:
             PluginInfo.dupe_counter += 1
-            log.critical('Error while registering plugin %s. %s' % \
-                (self.name, ('A plugin with the name %s is already registered' % self.name)))
+            log.critical('Error while registering plugin %s. %s' %
+                         (self.name, ('A plugin with the name %s is already registered' % self.name)))
         else:
             self.build_phase_handlers()
             plugins[self.name] = self
@@ -420,7 +425,7 @@ def register(plugin_class, groups=None, auto=False):
         if auto:
             log.trace("Auto-registering plugin %s" % name)
         return PluginInfo(plugin_class, name, list(set(info.get('groups', []) + (groups or []))),
-            info.get('builtin', False), info.get('debug', False), info.get('api_ver', 1))
+                          info.get('builtin', False), info.get('debug', False), info.get('api_ver', 1))
 
 
 def get_standard_plugins_path():
@@ -530,7 +535,7 @@ def load_plugins_from_dir(basepath, subpkg=None):
             f_base, ext = os.path.splitext(filename)
             if ext in valid_suffixes:
                 if f_base == '__init__':
-                    continue # don't load __init__.py again
+                    continue  # don't load __init__.py again
                 if (namespace + f_base) in _loaded_plugins:
                     log.debug('Duplicate plugin module `%s` in `%s` ignored, `%s` already loaded!' % (
                         namespace + f_base, dirpath, _loaded_plugins[namespace + f_base]))
@@ -567,7 +572,7 @@ def load_plugins_from_dir(basepath, subpkg=None):
                     if not issubclass(obj, Plugin):
                         continue
                 except TypeError:
-                    continue # not a class
+                    continue  # not a class
                 else:
                     register(obj, auto=True)
 

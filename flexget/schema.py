@@ -1,6 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
+
 from sqlalchemy import Column, Integer, String
+
 from flexget.manager import Base, Session
 from flexget.event import event
 from flexget.utils.database import with_session
@@ -44,9 +46,10 @@ def get_version(plugin):
 def set_version(plugin, version):
     if plugin not in plugin_schemas:
         raise ValueError('Tried to set schema version for %s plugin with no versioned_base.' % plugin)
-    if version != plugin_schemas[plugin]['version']:
-        raise ValueError('Tried to set %s plugin schema version to %d when it should be %d as defined in versioned_base.' %
-                        (plugin, version, plugin_schemas[plugin]['version']))
+    base_version = plugin_schemas[plugin]['version']
+    if version != base_version:
+        raise ValueError('Tried to set %s plugin schema version to %d when '
+                         'it should be %d as defined in versioned_base.' % (plugin, version, base_version))
     session = Session()
     try:
         schema = session.query(PluginSchema).filter(PluginSchema.plugin == plugin).first()
@@ -136,7 +139,7 @@ def reset_schema(plugin, session=None):
 def register_plugin_table(tablename, plugin, version):
     plugin_schemas.setdefault(plugin, {'version': version, 'tables': []})
     if plugin_schemas[plugin]['version'] != version:
-        raise Exception('Two different schema versions recieved for plugin %s' % plugin)
+        raise Exception('Two different schema versions received for plugin %s' % plugin)
     plugin_schemas[plugin]['tables'].append(tablename)
 
 
