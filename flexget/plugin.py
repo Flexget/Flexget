@@ -238,41 +238,6 @@ def register_task_phase(name, before=None, after=None):
             del _new_phase_queue[phase_name]
 
 
-class Plugin(object):
-    """
-    Base class for auto-registering plugins.
-
-    Note that inheriting form this class implies API version 2.
-
-    .. warning::
-
-       May be removed any time soon. Use :func:`register_plugin` instead until
-       we decide API's destiny.
-    """
-    PLUGIN_INFO = dict(api_ver=2)
-    LOGGER_NAME = None  # use default name
-
-    def __init__(self, plugin_info, *args, **kw):
-        """Initialize basic plugin attributes."""
-        self.plugin_info = plugin_info
-        self.log = logging.getLogger(self.LOGGER_NAME or self.plugin_info.name)
-
-
-class BuiltinPlugin(Plugin):
-    """A builtin plugin."""
-    PLUGIN_INFO = Plugin.PLUGIN_INFO.copy()  # inherit base info
-    PLUGIN_INFO.update(builtin=True)
-
-
-class DebugPlugin(Plugin):
-    """
-        A plugin for debugging purposes.
-    """
-    # Note that debug plugins are never builtin, so we don't need a mixin
-    PLUGIN_INFO = Plugin.PLUGIN_INFO.copy()  # inherit base info
-    PLUGIN_INFO.update(debug=True)
-
-
 class PluginInfo(dict):
     """
     Allows accessing key/value pairs of this dictionary subclass via
@@ -330,19 +295,9 @@ class PluginInfo(dict):
 
         # Create plugin instance
         self.plugin_class = plugin_class
-        if issubclass(self.plugin_class, Plugin):
-            # Base class init needs plugin info immediately
-            try:
-                self.instance = self.plugin_class(self)
-            except:  # OK, gets re-raised
-                log.error("Could not create plugin '%s' from class %s.%s" % (
-                    self.name, self.plugin_class.__module__, self.plugin_class.__name__))
-                raise
-        else:
-            # Manually registered
-            self.instance = self.plugin_class()
-            self.instance.plugin_info = self  # give plugin easy access to its own info
-            self.instance.log = logging.getLogger(getattr(self.instance, "LOGGER_NAME", None) or self.name)
+        self.instance = self.plugin_class()
+        self.instance.plugin_info = self  # give plugin easy access to its own info
+        self.instance.log = logging.getLogger(getattr(self.instance, "LOGGER_NAME", None) or self.name)
 
         if self.name in plugins:
             PluginInfo.dupe_counter += 1
@@ -394,38 +349,6 @@ class PluginInfo(dict):
 
 
 register_plugin = PluginInfo
-
-
-def register(plugin_class, groups=None, auto=False):
-    """
-    Register plugin with attributes according to C{PLUGIN_INFO} class variable.
-    Additional groups can be optionally provided.
-
-    :return: Plugin info of registered plugin.
-    """
-    # Base classes outside of plugin modules are NEVER auto-registered; if you have ones
-    # in a plugin module, use the "*PluginBase" naming convention
-    if auto and plugin_class.__name__.endswith("PluginBase"):
-        log.trace("NOT auto-registering plugin base class %s.%s" % (
-            plugin_class.__module__, plugin_class.__name__))
-        return
-
-    info = plugin_class.PLUGIN_INFO
-    name = PluginInfo.name_from_class(plugin_class)
-
-    # If this very class was already registered, that's OK
-    if name in plugins and plugin_class is plugins[name].plugin_class:
-        if not auto:
-            log.trace("Ignoring dupe registration of same class %s.%s" % (
-                plugin_class.__module__, plugin_class.__name__))
-        if groups:
-            plugins[name].groups = list(set(groups) | set(plugins[name].groups))
-        return plugins[name]
-    else:
-        if auto:
-            log.trace("Auto-registering plugin %s" % name)
-        return PluginInfo(plugin_class, name, list(set(info.get('groups', []) + (groups or []))),
-                          info.get('builtin', False), info.get('debug', False), info.get('api_ver', 1))
 
 
 def get_standard_plugins_path():
@@ -564,17 +487,6 @@ def load_plugins_from_dir(basepath, subpkg=None):
             raise
         else:
             log.trace('Loaded module %s from %s' % (modulename[len(PLUGIN_NAMESPACE) + 1:], dirpath))
-
-            # Auto-register plugins that inherit from plugin base classes,
-            # and weren't already registered manually
-            for obj in vars(sys.modules[modulename]).values():
-                try:
-                    if not issubclass(obj, Plugin):
-                        continue
-                except TypeError:
-                    continue  # not a class
-                else:
-                    register(obj, auto=True)
 
     if _new_phase_queue:
         for phase, args in _new_phase_queue.iteritems():

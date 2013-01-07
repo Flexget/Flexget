@@ -3,15 +3,16 @@ import logging
 import random
 import string
 from flexget.entry import Entry
-from flexget import plugin
+from flexget.plugin import register_plugin
 
 log = logging.getLogger('gen_series')
 
 PER_RUN = 50
 
 
-class GenSeries(plugin.DebugPlugin):
-    """ Purely for debugging purposes. Not great quality :)
+class GenSeries(object):
+    """
+    Purely for debugging purposes. Not great quality :)
 
     gen_series_data:
         series: NUM
@@ -20,10 +21,10 @@ class GenSeries(plugin.DebugPlugin):
         qualities:
           - LIST
 
-    this will also configure series plugin for testing
+    This will also auto configure series plugin for testing
     """
 
-    def __init__(self, plugin_info, *args, **kw):
+    def __init__(self):
         self.entries = []
 
     def validator(self):
@@ -67,4 +68,4 @@ class GenSeries(plugin.DebugPlugin):
             task._rerun_count = 0
 
 
-#plugin.register_plugin(GenSeries, 'gen_series_data', api_ver=2, debug=True)
+register_plugin(GenSeries, 'gen_series_data', api_ver=2, debug=True)

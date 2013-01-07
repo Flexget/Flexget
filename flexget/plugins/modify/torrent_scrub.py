@@ -6,7 +6,7 @@ from flexget.utils import bittorrent
 from flexget.plugins.modify import torrent as modify_torrent
 
 
-class TorrentScrub(plugin.Plugin):
+class TorrentScrub(object):
     """ Scrubs torrents from unwanted keys.
 
         Example:
@@ -29,7 +29,7 @@ class TorrentScrub(plugin.Plugin):
         root = validator.factory()
         root.accept("boolean")
         root.accept("choice").accept_choices(self.SCRUB_MODES, ignore_case=True)
-        root.accept("list").accept("text") # list of keys to scrub
+        root.accept("list").accept("text")  # list of keys to scrub
         return root
 
     @plugin.priority(SCRUB_PRIO)
@@ -68,7 +68,7 @@ class TorrentScrub(plugin.Plugin):
             elif mode == "fields":
                 # Scrub all configured fields
                 for key in config:
-                    fieldname = key # store for logging
+                    fieldname = key  # store for logging
                     key = bittorrent.Torrent.KEY_TYPE(key)
                     field = metainfo
 
@@ -96,6 +96,8 @@ class TorrentScrub(plugin.Plugin):
                     + " scrubbed from torrent '%s'!") % (", ".join(sorted(modified)), entry['title']))
                 new_infohash = entry["torrent"].get_info_hash()
                 if infohash != new_infohash:
-                    self.log.warn("Info hash changed from #%s to #%s in '%s'" % (infohash, new_infohash, entry['filename']))
+                    self.log.warn("Info hash changed from #%s to #%s in '%s'" %
+                                  (infohash, new_infohash, entry['filename']))
 
-plugin.register(TorrentScrub, groups=["torrent"])
+
+plugin.register_plugin(TorrentScrub, groups=["torrent"], api_ver=2)

@@ -3,18 +3,18 @@ from __future__ import unicode_literals, division, absolute_import
 import re
 import logging
 from flexget.entry import Entry
-from flexget import plugin
 from flexget.utils.cached_input import cached
+from flexget.plugin import register_plugin, internet
 
 log = logging.getLogger('text')
 
 
-class Text(plugin.Plugin):
+class Text(object):
 
     """
     Parse any text for entries using regular expression.
 
-    ::
+    Example::
 
       url: <url>
       entry:
@@ -54,7 +54,7 @@ class Text(plugin.Plugin):
             entry[k] = v % entry
 
     @cached('text')
-    @plugin.internet(log)
+    @internet(log)
     def on_task_input(self, task, config):
         url = config['url']
         request = task.requests.get(url)
@@ -74,7 +74,7 @@ class Text(plugin.Plugin):
                 match = re.search(regexp, line)
                 if match:
                     # check if used field detected, in such case start with new entry
-                    if used.has_key(field):
+                    if field in used:
                         if entry.isvalid():
                             log.info('Found field %s again before entry was completed. \
                                       Adding current incomplete, but valid entry and moving to next.' % field)
@@ -104,3 +104,6 @@ class Text(plugin.Plugin):
                         entry = Entry()
                         used = {}
         return entries
+
+
+register_plugin(Text, 'text', api_ver=2)

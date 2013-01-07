@@ -2,13 +2,12 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
 from flexget.entry import Entry
-from flexget import plugin
+from flexget.plugin import register_plugin
 
 log = logging.getLogger('mock')
 
 
-# Mainly used in unit tests, but can be useful for users too (i.e. not "debug")
-class Mock(plugin.Plugin):
+class Mock(object):
     """
     Allows adding mock input entries.
 
@@ -40,6 +39,10 @@ class Mock(plugin.Plugin):
             if not 'url' in entry:
                 import string
                 import random
-                entry['url'] = 'http://localhost/mock/%s' % ''.join([random.choice(string.letters + string.digits) for x in range(1, 30)])
+                entry['url'] = 'http://localhost/mock/%s' % \
+                               ''.join([random.choice(string.letters + string.digits) for x in range(1, 30)])
             entries.append(entry)
         return entries
+
+
+register_plugin(Mock, 'mock', api_ver=2)
