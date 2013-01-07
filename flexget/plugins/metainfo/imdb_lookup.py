@@ -1,7 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
 from datetime import datetime, timedelta
-from sqlalchemy import Table, Column, Integer, Float, String, Unicode, Boolean, DateTime
+from sqlalchemy import Table, Column, Integer, Float, String, Unicode, Boolean, DateTime, delete
 from sqlalchemy.schema import ForeignKey, Index
 from sqlalchemy.orm import relation, joinedload_all
 from flexget import schema
@@ -12,9 +12,9 @@ from flexget.utils.log import log_once
 from flexget.utils.imdb import ImdbSearch, ImdbParser, extract_id, make_url
 from flexget.utils.sqlalchemy_utils import table_add_column
 from flexget.utils.database import with_session
-from flexget.utils.sqlalchemy_utils import table_columns, get_index_by_name
+from flexget.utils.sqlalchemy_utils import table_columns, get_index_by_name, table_schema
 
-SCHEMA_VER = 2
+SCHEMA_VER = 3
 
 Base = schema.versioned_base('imdb_lookup', SCHEMA_VER)
 
@@ -155,6 +155,7 @@ class SearchResult(Base):
     title = Column(Unicode, index=True)
     url = Column(String)
     fails = Column(Boolean, default=False)
+    queried = Column(DateTime)
 
     @property
     def imdb_id(self):
@@ -163,6 +164,7 @@ class SearchResult(Base):
     def __init__(self, title, url=None):
         self.title = title
         self.url = url
+        self.queried = datetime.now()
 
     def __repr__(self):
         return '<SearchResult(title=%s,url=%s,fails=%s)>' % (self.title, self.url, self.fails)
@@ -202,6 +204,12 @@ def upgrade(ver, session):
         log.info('Adding prominence column to imdb_movie_languages table.')
         table_add_column('imdb_movie_languages', 'prominence', Integer, session)
         ver = 2
+    if ver == 2:
+        log.info('Adding search result timestamp and clearing all previous results.')
+        table_add_column('imdb_search', 'queried', DateTime, session)
+        search_table = table_schema('imdb_search', session)
+        session.execute(delete(search_table, search_table.c.fails))
+        ver = 3
     return ver
 
 
