@@ -255,7 +255,7 @@ def urlopener(url_or_request, log, **kwargs):
                 time.sleep(3)
             try:
                 retrieved = opener(url_or_request, kwargs.get('data'))
-            except (urllib2.URLError, socket.timeout) as e:
+            except urllib2.HTTPError as e:
                 if e.code < 500:
                     # If it was not a server error, don't keep retrying.
                     log.warning('Could not retrieve url (HTTP %s error): %s' % (e.code, e.url))
