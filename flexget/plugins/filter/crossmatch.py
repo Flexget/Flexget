@@ -34,7 +34,7 @@ class CrossMatch(object):
         fields = config['fields']
         action = config['action']
 
-        result = []
+        match_entries = []
 
         # TODO: xxx
         # we probably want to have common "run and combine inputs" function sometime soon .. this code is in
@@ -47,17 +47,19 @@ class CrossMatch(object):
                     raise PluginError('Plugin %s does not support API v2' % input_name)
                 method = input.phase_handlers['input']
                 try:
-                    result.extend(method(task, input_config))
+                    result = method(task, input_config)
                 except PluginError as e:
                     log.warning('Error during input plugin %s: %s' % (input_name, e))
                     continue
-                if not result:
+                if result:
+                    match_entries.extend(result)
+                else:
                     log.warning('Input %s did not return anything' % input_name)
                     continue
 
         # perform action on intersecting entries
         for entry in task.entries:
-            for generated_entry in result:
+            for generated_entry in match_entries:
                 log.trace('checking if %s matches %s' % (entry['title'], generated_entry['title']))
                 common = self.entry_intersects(entry, generated_entry, fields)
                 if common:
