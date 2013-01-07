@@ -249,58 +249,36 @@ class InputRSS(object):
 
         # check for bozo
         ex = rss.get('bozo_exception', False)
-        ignore = False
-        if ex:
-            if isinstance(ex, feedparser.NonXMLContentType):
-                # see: http://www.feedparser.org/docs/character-encoding.html#advanced.encoding.nonxml
-                log.debug('ignoring feedparser.NonXMLContentType')
-                ignore = True
-            elif isinstance(ex, feedparser.CharacterEncodingOverride):
-                # see: ticket 88
-                log.debug('ignoring feedparser.CharacterEncodingOverride')
-                ignore = True
-            elif isinstance(ex, UnicodeEncodeError):
-                if rss.entries:
-                    log.info('Feed has UnicodeEncodeError but seems to produce entries, ignoring the error ...')
-                    ignore = True
-            elif isinstance(ex, xml.sax._exceptions.SAXParseException):
-                if not rss.entries:
+        if ex or rss.get('bozo'):
+            if rss.entries:
+                msg = 'Bozo error %s while parsing feed, but entries were produced, ignoring the error.' % type(ex)
+                if config.get('silent', False):
+                    log.debug(msg)
+                else:
+                    log.verbose(msg)
+            else:
+                if isinstance(ex, feedparser.NonXMLContentType):
+                    # see: http://www.feedparser.org/docs/character-encoding.html#advanced.encoding.nonxml
+                    log.debug('ignoring feedparser.NonXMLContentType')
+                elif isinstance(ex, feedparser.CharacterEncodingOverride):
+                    # see: ticket 88
+                    log.debug('ignoring feedparser.CharacterEncodingOverride')
+                elif isinstance(ex, UnicodeEncodeError):
+                    raise PluginError('Feed has UnicodeEncodeError while parsing...')
+                elif isinstance(ex, (xml.sax._exceptions.SAXParseException, xml.sax._exceptions.SAXException)):
                     # save invalid data for review, this is a bit ugly but users seem to really confused when
                     # html pages (login pages) are received
                     self.process_invalid_content(task, content)
                     if task.manager.options.debug:
                         log.exception(ex)
                     raise PluginError('Received invalid RSS content from task %s (%s)' % (task.name, config['url']))
+                elif isinstance(ex, httplib.BadStatusLine) or isinstance(ex, IOError):
+                    raise ex # let the @internet decorator handle
                 else:
-                    msg = ('Invalid XML received (%s). However feedparser still produced entries.'
-                           ' Ignoring the error...' % str(ex).replace('<unknown>:', 'line '))
-                    if not config.get('silent', False):
-                        log.info(msg)
-                    else:
-                        log.debug(msg)
-                    ignore = True
-            elif isinstance(ex, httplib.BadStatusLine) or isinstance(ex, IOError):
-                raise ex # let the @internet decorator handle
-            else:
-                # all other bozo errors
-                if not rss.entries:
+                    # all other bozo errors
                     self.process_invalid_content(task, content)
                     raise PluginError('Unhandled bozo_exception. Type: %s (task: %s)' %\
                                       (ex.__class__.__name__, task.name), log)
-                else:
-                    msg = 'Invalid RSS received. However feedparser still produced entries. Ignoring the error ...'
-                    if not config.get('silent', False):
-                        log.info(msg)
-                    else:
-                        log.debug(msg)
-
-        if 'bozo' in rss:
-            if rss.bozo and not ignore:
-                log.error(rss)
-                log.error('Bozo exception %s on task %s' % (type(ex), task.name))
-                return
-        else:
-            log.warn('feedparser bozo bit missing, feedparser bug? (FlexGet ticket #721)')
 
         log.debug('encoding %s' % rss.encoding)
 
