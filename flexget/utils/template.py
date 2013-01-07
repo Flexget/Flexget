@@ -95,7 +95,7 @@ def filter_format_number(val, places=None, grouping=True):
 
 def filter_pad(val, width, fillchar='0'):
     """Pads a number or string with fillchar to the specified width."""
-    return str(val).rjust(width, fillchar)
+    return unicode(val).rjust(width, fillchar)
 
 
 # Override the built-in Jinja default filter due to Jinja bug
