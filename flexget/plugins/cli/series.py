@@ -7,7 +7,8 @@ from flexget.plugin import register_plugin, register_parser_option, DependencyEr
 from flexget.utils.tools import console
 
 try:
-    from flexget.plugins.filter.series import SeriesDatabase, Series, Episode, Release, forget_series, forget_series_episode
+    from flexget.plugins.filter.series import (SeriesDatabase, Series, Episode, Release,
+                                               forget_series, forget_series_episode)
 except ImportError:
     raise DependencyError(issued_by='cli_series', missing='series', message='Series commandline interface not loaded')
 
@@ -82,6 +83,9 @@ class SeriesReport(SeriesDatabase):
         session.close()
 
     def get_series_summary(self):
+        """
+        :return: Dictionary where key is series name and value is dictionary of summary details.
+        """
         result = {}
         session = Session()
         try:
@@ -91,13 +95,18 @@ class SeriesReport(SeriesDatabase):
                 if name.islower():
                     name = capwords(name)
                 result[name] = {'identified_by': series.identified_by}
-                episode = self.latest_seen_episode(session, series)
+                episode = self.get_latest_download(session, series.name)
+                #episode = self.latest_seen_episode(session, series)
+
                 if episode:
                     latest = {'first_seen': episode.first_seen,
                               'episode_instance': episode,
                               'episode_id': episode.identifier,
                               'age': episode.age,
-                              'status': self.get_latest_status(episode)}
+                              'status': self.get_latest_status(episode),
+                              'behind': self.new_eps_after(session, episode)}
+
+#                    raise Exception
                     result[name]['latest'] = latest
         finally:
             session.close()
@@ -127,8 +136,8 @@ class SeriesReport(SeriesDatabase):
         :return: Instance of latest Episode or None
         """
         return session.query(Episode).join(Series, Release).\
-                    filter(Series.id == series.id).\
-                    order_by(desc(Release.first_seen)).first()
+            filter(Series.id == series.id).\
+            order_by(desc(Release.first_seen)).first()
 
     def display_summary(self, discontinued=False):
         """
@@ -141,29 +150,41 @@ class SeriesReport(SeriesDatabase):
         console('-' * 79)
 
         hidden = 0
-        series = self.get_series_summary()
-        for series_name, data in sorted(series.iteritems()):
+        for series_name, data in sorted((self.get_series_summary()).iteritems()):
             new_ep = ' '
             if len(series_name) > 30:
                 series_name = series_name[:27] + '...'
 
-            if 'latest' in data:
-                if data['latest']['first_seen'] > datetime.now() - timedelta(days=2):
+            last_dl = data.get('latest', {})
+            behind = last_dl.get('behind', 0)
+
+            # hide or not
+            if last_dl:
+                if last_dl['first_seen'] > datetime.now() - timedelta(days=2):
                     new_ep = '>'
-                if data['latest']['first_seen'] < datetime.now() - timedelta(days=30 * 7):
+                # don't hide if the series is behind too much
+                if last_dl['first_seen'] < datetime.now() - timedelta(days=30 * 7) and behind <= 3:
                     hidden += 1
                     continue
+            else:
+                # no recorded downloads
+                hidden += 1
+                continue
 
-            latest = data.get('latest', {})
-            status = latest.get('status', 'N/A')
-            age = latest.get('age', 'N/A')
-            episode_id = latest.get('episode_id', 'N/A')
+            status = last_dl.get('status', 'N/A')
+            age = last_dl.get('age', 'N/A')
+            episode_id = last_dl.get('episode_id', 'N/A')
+            if behind:
+                episode_id += ' +%s' % last_dl['behind']
 
             console(new_ep + formatting[1:] % (series_name, episode_id, age if age else '', status))
+            if behind >= 3:
+                console(' ! Latest download is %d episodes behind, this may require '
+                        'manual intervention' % behind)
 
         console('-' * 79)
         console(' > = new episode ' +
-              ('| %i series unseen past 6 months hidden' % hidden if hidden else ''))
+                ('| %i series unseen past 6 months hidden' % hidden if hidden else ''))
         console(' Use --series NAME to get detailed information')
 
 

@@ -4,11 +4,13 @@ import re
 import time
 from copy import copy
 from datetime import datetime, timedelta
+
 from sqlalchemy import (Column, Integer, String, Unicode, DateTime, Boolean,
-                        desc, select, update, delete, ForeignKey, Index, func, and_)
+                        desc, select, update, delete, ForeignKey, Index, func, and_, or_)
 from sqlalchemy.orm import relation, join
 from sqlalchemy.ext.hybrid import Comparator, hybrid_property
 from sqlalchemy.exc import OperationalError
+
 from flexget import schema
 from flexget.event import event
 from flexget.utils import qualities
@@ -112,7 +114,7 @@ def upgrade(ver, session):
             new_qual = row['quality'].replace('web-dl', 'webdl')
             if row['quality'] != new_qual:
                 session.execute(update(release_table, release_table.c.id == row['id'],
-                        {'quality': new_qual}))
+                                       {'quality': new_qual}))
         ver = 7
     # Normalization rules changed for 7 and 8, but only run this once
     if ver in [7, 8]:
@@ -136,8 +138,9 @@ def upgrade(ver, session):
 @event('manager.db_cleanup')
 def db_cleanup(session):
     # Clean up old undownloaded releases
-    result = session.query(Release).filter(Release.downloaded == False).\
-                                    filter(Release.first_seen < datetime.now() - timedelta(days=120)).delete()
+    result = session.query(Release).\
+        filter(Release.downloaded == False).\
+        filter(Release.first_seen < datetime.now() - timedelta(days=120)).delete()
     if result:
         log.verbose('Removed %d undownloaded episode releases.' % result)
     # Clean up episodes without releases
@@ -174,7 +177,7 @@ def normalize_series_name(name):
     """Returns a normalized version of the series name."""
     name = name.lower()
     name = name.replace('&amp;', ' and ')
-    name = name.translate(TRANSLATE_MAP) # Replaced some symbols with spaces
+    name = name.translate(TRANSLATE_MAP)  # Replaced some symbols with spaces
     name = u' '.join(name.split())
     return name
 
@@ -242,7 +245,7 @@ class Episode(Base):
             return 'No releases seen'
         diff = datetime.now() - self.first_seen
         age_days = diff.days
-        age_hours = diff.seconds / 60 / 60
+        age_hours = diff.seconds // 60 // 60
         age = ''
         if age_days:
             age += '%sd ' % age_days
@@ -258,7 +261,8 @@ class Episode(Base):
         return False
 
     def __repr__(self):
-        return '<Episode(id=%s,identifier=%s)>' % (self.id, self.identifier)
+        return '<Episode(id=%s,identifier=%s,season=%s,number=%s)>' % \
+               (self.id, self.identifier, self.season, self.number)
 
 Index('episode_series_identifier', Episode.series_id, Episode.identifier)
 
@@ -358,7 +362,11 @@ class SeriesDatabase(object):
         return 'auto'
 
     def get_latest_download(self, session, name):
-        """Return latest downloaded episode for series `name`"""
+        """
+        :param Session session: SQLAlchemy session
+        :param str name: Name of series
+        :return: Instance of Episode or None if not found.
+        """
         latest_download = session.query(Episode).join(Release, Series).\
             filter(Series.name == name).\
             filter(Release.downloaded == True).\
@@ -366,13 +374,37 @@ class SeriesDatabase(object):
             order_by(desc(Episode.season), desc(Episode.number)).first()
 
         if not latest_download:
-            log.debug('get_latest_download returning false, no downloaded episodes found for: %s' % name)
+            log.debug('get_latest_download returning None, no downloaded episodes found for: %s' % name)
             return
 
         return latest_download
 
+    def new_eps_after(self, session, since_ep):
+        """
+        :param session: SQLAlchemy session
+        :param since_ep: Episode instance
+        :return: Number of episodes since then
+        """
+        series = session.query(Series).filter(Series.name == since_ep.series.name).one()
+        if series.identified_by == 'ep':
+            return session.query(Episode).select_from(join(Episode, Series)).\
+                filter(Series.name == series.name).\
+                filter(or_(and_(Episode.season == since_ep.season, Episode.number > since_ep.number),
+                           Episode.season > since_ep.season)).count()
+        elif series.identified_by == 'seq':
+            return session.query(Episode).select_from(join(Episode, Series)).\
+                filter(Series.name == series.name).filter(Episode.number > since_ep.number).count()
+        else:
+            log.debug('unsupported identified_by %s' % series.identified_by)
+            return 0
+
     def get_downloaded(self, session, name, identifier):
-        """Return list of downloaded releases for this episode"""
+        """
+        :param Session session: SQLAlchemy session
+        :param str name: Series name
+        :param str identifier: Episode identifier
+        :return: List of downloaded Releases for this given episode or None.
+        """
         downloaded = session.query(Release).join(Episode, Series).\
             filter(Series.name == name).\
             filter(Episode.identifier == identifier).\
@@ -474,7 +506,7 @@ def populate_entry_fields(entry, parser):
     # add series, season and episode to entry
     entry['series_name'] = parser.name
     if 'quality' in entry and entry['quality'] != parser.quality:
-        log.verbose('Found different quality for %s. Was %s, overriding with %s.' %\
+        log.verbose('Found different quality for %s. Was %s, overriding with %s.' %
                     (entry['title'], entry['quality'], parser.quality))
     entry['quality'] = parser.quality
     entry['proper'] = parser.proper
@@ -675,10 +707,9 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
             series.accept('number')
             bundle = series.accept('dict')
             # prevent invalid indentation level
-            bundle.reject_keys(['set', 'path', 'timeframe', 'name_regexp', 'ep_regexp', 'id_regexp',
-                                'date_regexp', 'sequence_regexp', 'watched', 'quality', 'enough', 'target',
-                                'qualities', 'exact', 'from_group'],
-                'Option \'$key\' has invalid indentation level. It needs 2 more spaces.')
+            rejected = ['set', 'path', 'timeframe', 'name_regexp', 'ep_regexp', 'id_regexp', 'date_regexp',
+                        'sequence_regexp', 'watched', 'quality', 'enough', 'target', 'qualities', 'exact', 'from_group']
+            bundle.reject_keys(rejected, 'Option \'$key\' has invalid indentation level. It needs 2 more spaces.')
             bundle.accept_any_key('path')
             options = bundle.accept_any_key('dict')
             self.build_options_validator(options)
@@ -750,7 +781,6 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
         # key: series episode identifier ie. S01E02
         # value: seriesparser
         found_series = {}
-        #guessed_series = {}
         for entry in task.entries:
             if entry.get('series_name') and entry.get('series_id') and entry.get('series_parser'):
                 parser = entry['series_parser']
@@ -1116,17 +1146,17 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
                (current.season == latest.season and current.episode < (latest.number - grace))):
                 log.debug('too old! rejecting all occurrences')
                 for ep in eps:
-                    task.reject(self.parser2entry[ep], 'Too much in the past from latest downloaded episode %s' %
-                        latest.identifier)
+                    task.reject(self.parser2entry[ep],
+                                'Too much in the past from latest downloaded episode %s' % latest.identifier)
                 return True
 
-            if (current.season > latest.season + 1 or (current.season > latest.season and current.episode > 1)  or
+            if (current.season > latest.season + 1 or (current.season > latest.season and current.episode > 1) or
                (current.season == latest.season and current.episode > (latest.number + grace))):
                 log.debug('too new! rejecting all occurrences')
                 for ep in eps:
                     task.reject(self.parser2entry[ep],
-                        ('Too much in the future from latest downloaded episode %s. '
-                         'See `--disable-advancement` if this should be downloaded.') % latest.identifier)
+                                ('Too much in the future from latest downloaded episode %s. '
+                                 'See `--disable-advancement` if this should be downloaded.') % latest.identifier)
                 return True
 
     def process_timeframe(self, task, config, eps, series_name):
@@ -1170,8 +1200,8 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
             minutes, seconds = divmod(remainder, 60)
 
             entry = self.parser2entry[best]
-            log.info('Timeframe waiting %s for %sh:%smin, currently best is %s' % \
-                (series_name, hours, minutes, entry['title']))
+            log.info('Timeframe waiting %s for %sh:%smin, currently best is %s' %
+                     (series_name, hours, minutes, entry['title']))
 
             # add best entry to backlog (backlog is able to handle duplicate adds)
             if self.backlog:
