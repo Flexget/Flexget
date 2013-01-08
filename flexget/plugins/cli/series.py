@@ -106,7 +106,6 @@ class SeriesReport(SeriesDatabase):
                               'status': self.get_latest_status(episode),
                               'behind': self.new_eps_after(session, episode)}
 
-#                    raise Exception
                     result[name]['latest'] = latest
         finally:
             session.close()
