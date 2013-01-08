@@ -385,7 +385,7 @@ class SeriesDatabase(object):
         :param since_ep: Episode instance
         :return: Number of episodes since then
         """
-        series = session.query(Series).filter(Series.name == since_ep.series.name).one()
+        series = since_ep.series
         if series.identified_by == 'ep':
             return session.query(Episode).select_from(join(Episode, Series)).\
                 filter(Series.name == series.name).\
