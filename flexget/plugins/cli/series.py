@@ -96,7 +96,6 @@ class SeriesReport(SeriesDatabase):
                     name = capwords(name)
                 result[name] = {'identified_by': series.identified_by}
                 episode = self.get_latest_download(session, series.name)
-                #episode = self.latest_seen_episode(session, series)
 
                 if episode:
                     latest = {'first_seen': episode.first_seen,
@@ -127,16 +126,6 @@ class SeriesReport(SeriesDatabase):
                     status += str(release.proper_count)
             status += ', '
         return status.rstrip(', ') if status else None
-
-    def latest_seen_episode(self, session, series):
-        """
-        :param session: SQLAlchemy session
-        :param series: Instance of Series
-        :return: Instance of latest Episode or None
-        """
-        return session.query(Episode).join(Series, Release).\
-            filter(Series.id == series.id).\
-            order_by(desc(Release.first_seen)).first()
 
     def display_summary(self, discontinued=False):
         """
