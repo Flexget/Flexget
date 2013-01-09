@@ -1,7 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 from datetime import datetime, timedelta
 from string import capwords
-from sqlalchemy import desc
 from flexget.manager import Session
 from flexget.plugin import register_plugin, register_parser_option, DependencyError
 from flexget.utils.tools import console

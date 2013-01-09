@@ -373,6 +373,9 @@ class SeriesDatabase(object):
         :return: Instance of Episode or None if not found.
         """
         series = session.query(Series).filter(Series.name == name).first()
+        if not series:
+            log.debug('No series %s found for get_latest_download' % name)
+            return
         downloaded = session.query(Episode).join(Release, Series).\
             filter(Series.id == series.id).\
             filter(Release.downloaded == True)
