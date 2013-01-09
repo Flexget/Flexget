@@ -119,7 +119,7 @@ _resolutions = [
     QualityComponent('resolution', 40, '576p', '576p?'),
     QualityComponent('resolution', 45, 'hr'),
     QualityComponent('resolution', 50, '720i'),
-    QualityComponent('resolution', 60, '720p', '(1280x)?720p?'),
+    QualityComponent('resolution', 60, '720p', '(1280x)?720p?x?'),
     QualityComponent('resolution', 70, '1080i'),
     QualityComponent('resolution', 80, '1080p', '(1920x)?1080p?')
 ]
