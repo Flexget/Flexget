@@ -232,9 +232,14 @@ class Episode(Base):
     series_id = Column(Integer, ForeignKey('series.id'), nullable=False)
     releases = relation('Release', backref='episode', cascade='all, delete, delete-orphan')
 
-    @property
+    @hybrid_property
     def first_seen(self):
         return min(release.first_seen for release in self.releases)
+
+    @first_seen.expression
+    def first_seen(cls):
+        return select([func.min(Release.first_seen)]).where(Release.episode_id == cls.id).\
+            correlate(Episode.__table__).label('first_seen')
 
     @property
     def age(self):
@@ -367,11 +372,19 @@ class SeriesDatabase(object):
         :param str name: Name of series
         :return: Instance of Episode or None if not found.
         """
-        latest_download = session.query(Episode).join(Release, Series).\
-            filter(Series.name == name).\
-            filter(Release.downloaded == True).\
-            filter(Episode.identified_by.in_(['ep', 'sequence'])).\
-            order_by(desc(Episode.season), desc(Episode.number)).first()
+        series = session.query(Series).filter(Series.name == name).first()
+        downloaded = session.query(Episode).join(Release, Series).\
+            filter(Series.id == series.id).\
+            filter(Release.downloaded == True)
+        if series.identified_by in ['auto', 'id']:
+            latest_download = downloaded.order_by(desc(Episode.first_seen)).first()
+        elif series.identified_by in ['ep', 'sequence']:
+            latest_download = downloaded.order_by(desc(Episode.season), desc(Episode.number)).first()
+        elif series.identified_by == 'date':
+            latest_download = downloaded.order_by(desc(Episode.identifier)).first()
+        else:
+            log.debug('get_latest_download doesn\'t support identified_by %s: %s' % (series.identified_by, name))
+            return
 
         if not latest_download:
             log.debug('get_latest_download returning None, no downloaded episodes found for: %s' % name)
@@ -386,14 +399,15 @@ class SeriesDatabase(object):
         :return: Number of episodes since then
         """
         series = since_ep.series
+        series_eps = session.query(Episode).select_from(join(Episode, Series)).\
+            filter(Series.id == series.id)
         if series.identified_by == 'ep':
-            return session.query(Episode).select_from(join(Episode, Series)).\
-                filter(Series.name == series.name).\
-                filter(or_(and_(Episode.season == since_ep.season, Episode.number > since_ep.number),
+            return series_eps.filter(or_(and_(Episode.season == since_ep.season, Episode.number > since_ep.number),
                            Episode.season > since_ep.season)).count()
         elif series.identified_by == 'seq':
-            return session.query(Episode).select_from(join(Episode, Series)).\
-                filter(Series.name == series.name).filter(Episode.number > since_ep.number).count()
+            return series_eps.filter(Episode.number > since_ep.number).count()
+        elif series.identified_by == 'id':
+            return series_eps.filter(Episode.first_seen > since_ep.first_seen).count()
         else:
             log.debug('unsupported identified_by %s' % series.identified_by)
             return 0
