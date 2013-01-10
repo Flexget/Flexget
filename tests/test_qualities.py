@@ -45,6 +45,7 @@ class TestQualityParser(object):
                  ('Test.File.1080i', '1080i'),
                  ('Test File blurayrip', 'bluray'),
                  ('Test.File.br-rip', 'bluray'),
+                 ('Test.File.720px', '720p'),
 
                  ('Test.File.dvd.rip', 'dvdrip'),
                  ('Test.File.dvd.rip.r5', 'r5'),

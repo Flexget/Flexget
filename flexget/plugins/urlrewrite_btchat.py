@@ -1,6 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
-from flexget.plugin import *
+from flexget.plugin import register_plugin
 
 log = logging.getLogger("btchat")
 
