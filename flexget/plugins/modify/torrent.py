@@ -56,7 +56,7 @@ class TorrentFilename(object):
                     continue
 
                 entry['torrent'] = torrent
-                entry['torrent_info_hash'] = torrent.get_info_hash()
+                entry['torrent_info_hash'] = torrent.info_hash
                 # if we do not have good filename (by download plugin)
                 # for this entry, try to generate one from torrent content
                 if entry.get('filename'):

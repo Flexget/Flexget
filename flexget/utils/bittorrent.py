@@ -241,7 +241,8 @@ class Torrent(object):
 
         return files
 
-    def get_size(self):
+    @property
+    def size(self):
         """Return total size of the torrent"""
         size = 0
         # single file torrent
@@ -257,10 +258,10 @@ class Torrent(object):
     def private(self):
         return self.content['info'].get('private', False)
 
-    def get_multitrackers(self):
+    @property
+    def trackers(self):
         """
-        Return array containing all multi-trackers in this torrent.
-        Returns empty array if torrent has only standard single announce url.
+        :returns: List of trackers, supports single-tracker and multi-tracker implementations
         """
         trackers = []
         # the spec says, if announce-list present use ONLY that
@@ -269,9 +270,12 @@ class Torrent(object):
         for tl in self.content.get('announce-list', []):
             for t in tl:
                 trackers.append(t)
+        if not self.content.get('announce') in trackers:
+            trackers.append(self.content.get('announce'))
         return trackers
 
-    def get_info_hash(self):
+    @property
+    def info_hash(self):
         """Return Torrent info hash"""
         import hashlib
         hash = hashlib.sha1()
@@ -279,10 +283,12 @@ class Torrent(object):
         hash.update(info_data)
         return hash.hexdigest().upper()
 
-    def get_comment(self):
+    @property
+    def comment(self):
         return self.content['comment']
 
-    def set_comment(self, comment):
+    @comment.setter
+    def comment(self, comment):
         self.content['comment'] = comment
         self.modified = True
 

@@ -14,7 +14,7 @@ class TorrentSize(object):
     def on_task_modify(self, task):
         for entry in task.entries:
             if 'torrent' in entry:
-                size = entry['torrent'].get_size() / 1024 / 1024
+                size = entry['torrent'].size / 1024 / 1024
                 log.debug('%s size: %s MB' % (entry['title'], size))
                 entry['content_size'] = size
 

@@ -131,7 +131,7 @@ class TorrentAlive(object):
             torrent = entry.get('torrent')
             if torrent:
                 seeds = 0
-                info_hash = torrent.get_info_hash()
+                info_hash = torrent.info_hash
                 announce_list = torrent.content.get('announce-list')
                 if announce_list:
                     # Multitracker torrent
