@@ -293,13 +293,6 @@ class Task(object):
             raise Exception('Trying to fail non entry, %r' % entry)
         entry.fail(reason=reason, **kwargs)
 
-    def trace(self, entry, message):
-        """Add tracing message to entry.
-
-        .. note:: Not yet supported in any meaningful way
-        """
-        entry.trace.append((self.current_plugin, message))
-
     def abort(self, reason='Unknown', **kwargs):
         """Abort this task execution, no more plugins will be executed after the current one exists."""
         if self._abort:
