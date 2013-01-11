@@ -102,7 +102,7 @@ class SeriesReport(SeriesDatabase):
                               'episode_id': episode.identifier,
                               'age': episode.age,
                               'status': self.get_latest_status(episode),
-                              'behind': self.new_eps_after(session, episode)}
+                              'behind': self.new_eps_after(episode)}
 
                     result[name]['latest'] = latest
         finally:
