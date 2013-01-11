@@ -250,6 +250,8 @@ class Task(object):
 
     def accept(self, entry, reason=None, **kwargs):
         """
+        .. deprecated:: This has been deprecated in favor of `Entry.accept`
+
         Accept *entry* immediately with optional but
         highly recommendable *reason*.
 
@@ -263,6 +265,8 @@ class Task(object):
 
     def reject(self, entry, reason=None, **kwargs):
         """
+        .. deprecated:: This has been deprecated in favor of `Entry.reject`
+
         Reject *entry* immediately and permanently with optional but
         highly recommendable *reason*.
 
@@ -276,6 +280,8 @@ class Task(object):
 
     def fail(self, entry, reason=None, **kwargs):
         """
+        .. deprecated:: This has been deprecated in favor of `Entry.fail`
+
         Fails *entry* immediately with optional but
         highly recommendable *reason*.
 

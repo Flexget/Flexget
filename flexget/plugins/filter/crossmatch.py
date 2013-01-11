@@ -66,9 +66,9 @@ class CrossMatch(object):
                     msg = 'intersects with %s on field(s) %s' % \
                           (generated_entry['title'], ', '.join(common))
                     if action == 'reject':
-                        task.reject(entry, msg)
+                        entry.reject(msg)
                     if action == 'accept':
-                        task.accept(entry, msg)
+                        entry.accept(msg)
 
     def entry_intersects(self, e1, e2, fields=None):
         """

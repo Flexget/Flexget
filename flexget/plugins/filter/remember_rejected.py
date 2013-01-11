@@ -77,7 +77,7 @@ class FilterRememberRejected(object):
     This is enabled when item is rejected with remember=True flag.
 
     Example::
-        task.reject(entry, 'message', remember=True)
+        entry.reject('message', remember=True)
     """
 
     @priority(0)

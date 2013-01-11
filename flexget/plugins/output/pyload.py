@@ -135,7 +135,7 @@ class PluginPyLoad(object):
             # no urls found
             if not urls:
                 if config.get('handle_no_url_as_failure', self.DEFAULT_HANDLE_NO_URL_AS_FAILURE):
-                    task.fail(entry, "No suited urls in entry %s" % entry['title'])
+                    entry.fail("No suited urls in entry %s" % entry['title'])
                 else:
                     log.info("No suited urls in entry %s" % entry['title'])
                 continue
@@ -158,7 +158,7 @@ class PluginPyLoad(object):
                     query_api(api, "setPackageData", {'pid': pid, 'data': data, 'session': self.session})
 
             except Exception as e:
-                task.fail(entry, str(e))
+                entry.fail(str(e))
 
     def check_login(self, task, config):
         url = config.get('api', self.DEFAULT_API)

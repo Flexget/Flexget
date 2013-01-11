@@ -371,7 +371,7 @@ class OutputDeluge(DelugePlugin):
                 try:
                     deluge.ui.common.TorrentInfo(entry['file'])
                 except Exception:
-                    task.fail(entry, 'Invalid torrent file')
+                    entry.fail('Invalid torrent file')
                     log.error('Torrent file appears invalid for: %s', entry['title'])
 
     @priority(135)
@@ -424,7 +424,7 @@ class OutputDeluge(DelugePlugin):
 
             # check that file is downloaded
             if not 'file' in entry:
-                task.fail(entry, 'file missing?')
+                entry.fail('file missing?')
                 continue
 
             # see that temp file is present
@@ -432,7 +432,7 @@ class OutputDeluge(DelugePlugin):
                 tmp_path = os.path.join(task.manager.config_base, 'temp')
                 log.debug('entry: %s' % entry)
                 log.debug('temp: %s' % ', '.join(os.listdir(tmp_path)))
-                task.fail(entry, 'Downloaded temp file \'%s\' doesn\'t exist!?' % entry['file'])
+                entry.fail('Downloaded temp file \'%s\' doesn\'t exist!?' % entry['file'])
                 continue
 
             sclient.add_torrent_file([entry['file']], [opts])
@@ -601,7 +601,7 @@ class OutputDeluge(DelugePlugin):
         def on_fail(result, task, entry):
             """Gets called when daemon reports a failure adding the torrent."""
             log.info('%s was not added to deluge! %s' % (entry['title'], result))
-            task.fail(entry, 'Could not be added to deluge')
+            entry.fail('Could not be added to deluge')
 
         # dlist is a list of deferreds that must complete before we exit
         dlist = []
@@ -670,7 +670,7 @@ class OutputDeluge(DelugePlugin):
                         magnet = entry['url']
                     else:
                         if not os.path.exists(entry['file']):
-                            task.fail(entry, 'Downloaded temp file \'%s\' doesn\'t exist!' % entry['file'])
+                            entry.fail('Downloaded temp file \'%s\' doesn\'t exist!' % entry['file'])
                             del(entry['file'])
                             return
                         try:

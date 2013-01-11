@@ -28,7 +28,7 @@ class FilterRequireField(object):
         for entry in task.entries:
             for field in config:
                 if not entry.get(field):
-                    task.reject(entry, 'Required field %s is not present' % field)
+                    entry.reject('Required field %s is not present' % field)
                     break
 
 

@@ -23,7 +23,7 @@ class FilterOnlyNew(object):
             return
         log.verbose('Rejecting entries after the task has run so they are not processed next time.')
         for entry in task.entries:
-            task.reject(entry, 'Already processed entry', remember=True)
+            entry.reject('Already processed entry', remember=True)
 
 
 register_plugin(FilterOnlyNew, 'only_new', api_ver=2)

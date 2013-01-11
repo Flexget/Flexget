@@ -63,7 +63,7 @@ class FilterSeriesPremiere(FilterSeriesBase):
                 if entry.get('series_name') == series and not (
                         entry.get('series_season') == 1
                         and entry.get('series_episode') in (0, 1) ):
-                    task.reject(entry, 'Non premiere episode in a premiere series')
+                    entry.reject('Non premiere episode in a premiere series')
         # Combine settings and series into series plugin config format
         allseries = {'settings': {'series_premiere': group_settings}, 'series_premiere': guessed_series.values()}
         # Merge the our config in to the main series config

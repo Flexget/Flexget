@@ -65,7 +65,7 @@ class UrlRewrite(object):
                 entry['url'] = regexp.sub(format, entry['url'])
 
                 if regexp.match(entry['url']):
-                    task.fail(entry, 'urlrewriting')
+                    entry.fail('urlrewriting')
                     task.purge()
                     from flexget.plugins.plugin_urlrewriting import UrlRewritingError
                     raise UrlRewritingError('Regexp %s result should NOT continue to match!' % name)

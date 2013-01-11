@@ -27,7 +27,7 @@ class PluginUrlRewriting(object):
                 self.url_rewrite(task, entry)
             except UrlRewritingError as e:
                 log.warn(e.value)
-                task.fail(entry)
+                entry.fail()
 
     def url_rewritable(self, task, entry):
         """Return True if entry is urlrewritable by registered rewriter."""

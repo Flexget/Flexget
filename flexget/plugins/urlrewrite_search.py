@@ -99,7 +99,7 @@ class PluginSearch(object):
             if not found:
                 # If I don't have a URL, doesn't matter if I'm immortal...
                 entry['immortal'] = False
-                task.reject(entry, 'search failed')
+                entry.reject('search failed')
 
 register_plugin(PluginSearch, 'urlrewrite_search', api_ver=2)
 register_plugin(SearchPlugins, '--search-plugins', builtin=True)

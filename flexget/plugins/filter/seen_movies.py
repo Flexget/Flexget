@@ -35,7 +35,7 @@ class FilterSeenMovies(FilterSeen):
             for entry in task.entries:
                 if 'imdb_id' not in entry and 'tmdb_id' not in entry:
                     log.info('Rejecting %s because of missing movie (imdb or tmdb) id' % entry['title'])
-                    task.reject(entry, 'missing movie (imdb or tmdb) id, strict')
+                    entry.reject('missing movie (imdb or tmdb) id, strict')
         # call super
         super(FilterSeenMovies, self).on_task_filter(task, True)
         # check that two copies of a movie have not been accepted this run
@@ -44,13 +44,13 @@ class FilterSeenMovies(FilterSeen):
         for entry in task.accepted:
             if 'imdb_id' in entry:
                 if entry['imdb_id'] in imdb_ids:
-                    task.reject(entry, 'already accepted once in task')
+                    entry.reject('already accepted once in task')
                     continue
                 else:
                     imdb_ids.add(entry['imdb_id'])
             if 'tmdb_id' in entry:
                 if entry['tmdb_id'] in tmdb_ids:
-                    task.reject(entry, 'already accepted once in task')
+                    entry.reject('already accepted once in task')
                     continue
                 else:
                     tmdb_ids.add(entry['tmdb_id'])

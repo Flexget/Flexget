@@ -24,10 +24,10 @@ class TorrentFilename(object):
                 log.trace('%s doesn\'t have a file associated' % entry['title'])
                 continue
             if not os.path.exists(entry['file']):
-                task.fail(entry, 'File %s does not exists' % entry['file'])
+                entry.fail('File %s does not exists' % entry['file'])
                 continue
             if os.path.getsize(entry['file']) == 0:
-                task.fail(entry, 'File %s is 0 bytes in size' % entry['file'])
+                entry.fail('File %s is 0 bytes in size' % entry['file'])
                 continue
             if not is_torrent_file(entry['file']):
                 continue
@@ -43,7 +43,7 @@ class TorrentFilename(object):
 
                 if 'content-length' in entry:
                     if len(data) != entry['content-length']:
-                        task.fail(entry, 'Torrent file length doesn\'t match to the one reported by the server')
+                        entry.fail('Torrent file length doesn\'t match to the one reported by the server')
                         self.purge(entry)
                         continue
 
@@ -51,7 +51,7 @@ class TorrentFilename(object):
                 try:
                     torrent = Torrent(data)
                 except SyntaxError as e:
-                    task.fail(entry, '%s - broken or invalid torrent file received' % e.message)
+                    entry.fail('%s - broken or invalid torrent file received' % e.message)
                     self.purge(entry)
                     continue
 

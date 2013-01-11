@@ -102,12 +102,10 @@ class FilterExistsSeries(object):
                                         continue
                                 log.debug('entry parser.proper_count = %s' % entry['series_parser'].proper_count)
                                 if disk_parser.proper_count >= entry['series_parser'].proper_count:
-                                    task.reject(entry, 'proper already exists')
+                                    entry.reject('proper already exists')
                                     continue
                                 else:
                                     log.trace('new one is better proper, allowing')
                                     continue
-
-                                task.reject(entry, 'episode already exists')
 
 register_plugin(FilterExistsSeries, 'exists_series', groups=['exists'])

@@ -133,11 +133,11 @@ class PluginExec(object):
                     except UnicodeEncodeError:
                         log.error('Unable to encode cmd `%s` to %s' % (cmd, config['encoding']))
                         if config.get('fail_entries'):
-                            task.fail(entry, 'cmd `%s` could not be encoded to %s.' % (cmd, config['encoding']))
+                            entry.fail('cmd `%s` could not be encoded to %s.' % (cmd, config['encoding']))
                         continue
                     # Run the command, fail entries with non-zero return code if configured to
                     if self.execute_cmd(cmd, allow_background, config['encoding']) != 0 and config.get('fail_entries'):
-                        task.fail(entry, 'exec return code was non-zero')
+                        entry.fail('exec return code was non-zero')
 
         # phase keyword in this
         if 'phase' in config[phase_name]:

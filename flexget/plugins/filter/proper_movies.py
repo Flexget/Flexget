@@ -140,7 +140,7 @@ class FilterProperMovies(object):
                 # TODO: does this need to be called?
                 # fire_event('forget', entry['imdb_url'])
                 fire_event('forget', entry['imdb_id'])
-                task.accept(entry, 'proper version of previously downloaded movie')
+                entry.accept('proper version of previously downloaded movie')
 
     def on_task_exit(self, task, config):
         """Add downloaded movies to the database"""
