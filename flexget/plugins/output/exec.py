@@ -118,8 +118,7 @@ class PluginExec(object):
                     log.error('Could not set exec command for %s: %s' % (entry['title'], e))
                     # fail the entry if configured to do so
                     if config.get('fail_entries'):
-                        task.fail(entry, 'Entry `%s` does not have required fields for string replacement.' %
-                                         entry['title'])
+                        entry.fail('Entry `%s` does not have required fields for string replacement.' % entry['title'])
                     continue
 
                 log.debug('phase_name: %s operation: %s cmd: %s' % (phase_name, operation, cmd))

@@ -2,6 +2,8 @@ from __future__ import unicode_literals, division, absolute_import
 import urllib
 import logging
 import re
+
+from flexget.entry import Entry
 from flexget.plugin import register_plugin, priority, get_plugin_by_name
 
 log = logging.getLogger('regexp')
@@ -134,7 +136,7 @@ class FilterRegexp(object):
                 rest = [entry for entry in leftovers if entry in rest]
 
         if 'rest' in config:
-            rest_method = task.accept if config['rest'] == 'accept' else task.reject
+            rest_method = Entry.accept if config['rest'] == 'accept' else Entry.reject
             for entry in rest:
                 log.debug('Rest method %s for %s' % (config['rest'], entry['title']))
                 rest_method(entry, 'regexp `rest`')
@@ -183,7 +185,7 @@ class FilterRegexp(object):
         :return: Return list of entries that didn't match regexps
         """
         rest = []
-        method = task.accept if 'accept' in operation else task.reject
+        method = Entry.accept if 'accept' in operation else Entry.reject
         match_mode = 'excluding' not in operation
         for entry in task.entries:
             log.trace('testing %i regexps to %s' % (len(regexps), entry['title']))

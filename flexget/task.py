@@ -248,51 +248,6 @@ class Task(object):
             log.debug('Disabling %s phase' % phase)
             self.disabled_phases.append(phase)
 
-    def accept(self, entry, reason=None, **kwargs):
-        """
-        .. deprecated:: This has been deprecated in favor of `Entry.accept`
-
-        Accept *entry* immediately with optional but
-        highly recommendable *reason*.
-
-        :param Entry entry: To be aceppeted
-        :param string reason: Optional reason
-        :param kwargs: Optional kwargs will be passed to plugins hooking action
-        """
-        if not isinstance(entry, Entry):
-            raise Exception('Trying to accept non entry, %r' % entry)
-        entry.accept(reason=reason, **kwargs)
-
-    def reject(self, entry, reason=None, **kwargs):
-        """
-        .. deprecated:: This has been deprecated in favor of `Entry.reject`
-
-        Reject *entry* immediately and permanently with optional but
-        highly recommendable *reason*.
-
-        :param Entry entry: To be rejected
-        :param string reason: Optional reason
-        :param kwargs: Optional kwargs will be passed to plugins hooking action
-        """
-        if not isinstance(entry, Entry):
-            raise Exception('Trying to reject non entry, %r' % entry)
-        entry.reject(reason=reason, **kwargs)
-
-    def fail(self, entry, reason=None, **kwargs):
-        """
-        .. deprecated:: This has been deprecated in favor of `Entry.fail`
-
-        Fails *entry* immediately with optional but
-        highly recommendable *reason*.
-
-        :param Entry entry: To be failed
-        :param string reason: Optional reason
-        :param kwargs: Optional kwargs will be passed to plugins hooking action
-        """
-        if not isinstance(entry, Entry):
-            raise Exception('Trying to fail non entry, %r' % entry)
-        entry.fail(reason=reason, **kwargs)
-
     def abort(self, reason='Unknown', **kwargs):
         """Abort this task execution, no more plugins will be executed after the current one exists."""
         if self._abort:

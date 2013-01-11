@@ -119,7 +119,7 @@ class FilterRememberRejected(object):
                 reject_entry = reject_entries.filter(and_(RememberEntry.title == entry['title'],
                                                           RememberEntry.url == entry['original_url'])).first()
                 if reject_entry:
-                    task.reject(entry, 'Rejected on behalf of %s plugin: %s' %
+                    entry.reject('Rejected on behalf of %s plugin: %s' %
                                        (reject_entry.rejected_by, reject_entry.reason))
 
     def on_entry_reject(self, task, entry, remember=None, remember_time=None, **kwargs):
