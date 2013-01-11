@@ -89,12 +89,12 @@ class SeriesReport(SeriesDatabase):
         session = Session()
         try:
             for series in session.query(Series).all():
-                name = unicode(series.name)
+                name = series.name
                 # capitalize if user hasn't, better look and sorting ...
                 if name.islower():
                     name = capwords(name)
                 result[name] = {'identified_by': series.identified_by}
-                episode = self.get_latest_download(session, series.name)
+                episode = self.get_latest_download(series)
 
                 if episode:
                     latest = {'first_seen': episode.first_seen,

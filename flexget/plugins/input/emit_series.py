@@ -26,7 +26,7 @@ class EmitSeries(SeriesDatabase):
     def on_task_input(self, task, config):
         entries = []
         for series in task.session.query(Series).all():
-            latest = self.get_latest_info(task.session, series.name)
+            latest = self.get_latest_info(series)
             if not latest:
                 # no latest known episode, skip
                 continue
