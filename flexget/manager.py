@@ -311,6 +311,9 @@ class Manager(object):
         list_open = False  # multiline list with [
 
         for line in file:
+            if '# warnings off' in line.strip().lower():
+                log.debug('config pre-check warnings off')
+                break
             line_num += 1
             # remove linefeed
             line = line.rstrip()
