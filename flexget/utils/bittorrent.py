@@ -216,7 +216,7 @@ class Torrent(object):
         else:
             # multifile torrent
             for item in self.content['info']['files']:
-                t = {'path': '/'.join(item['path'][:-1]),
+                t = {'path': b'/'.join(item['path'][:-1]),
                      'name': item['path'][-1],
                      'size': item['length']}
                 files.append(t)
