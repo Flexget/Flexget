@@ -29,7 +29,7 @@ class PogcalAcquired(object):
         root.accept('text', key='password', required=True)
         return root
 
-    def on_task_output(self, task, config):
+    def on_task_exit(self, task, config):
         if not task.accepted and not task.manager.options.test:
             return
         try:
