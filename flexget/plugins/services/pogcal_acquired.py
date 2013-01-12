@@ -44,7 +44,7 @@ class PogcalAcquired(object):
             log.error('Username/password for pogdesign calendar appear to be incorrect.')
             return
         for entry in task.accepted:
-            if not entry.get('series_name') and entry.get('series_id_type') == 'ep':
+            if not entry.get('series_name') or not entry.get('series_id_type') == 'ep':
                 continue
             show_id = self.find_show_id(entry['series_name'], task.session)
             if not show_id:
