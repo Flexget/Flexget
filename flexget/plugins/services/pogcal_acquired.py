@@ -65,29 +65,33 @@ class PogcalAcquired(object):
                           (entry['series_name'], entry['series_id'], e))
 
     def find_show_id(self, show_name, db_sess):
-        # Normalize and format show name
-        show_name = show_name.lower()
-        if show_name.startswith('the'):
-            show_name = show_name[3:].strip() + ' [the]'
         # Check if we have this show id cached
+        show_name = show_name.lower()
         db_show = db_sess.query(PogcalShow).filter(PogcalShow.name == show_name).first()
         if db_show:
             return db_show.id
         # Try to look up the id from pogdesign
+        show_re = self.show_re(show_name)
         try:
             page = session.get('http://www.pogdesign.co.uk/cat/showselect.php')
         except requests.RequestException as e:
-            log.error('Error looking up show `%s` from pogdesign calendar: %s' % (show_name, e))
+            log.error('Error looking up show `%s` from pogdesign calendar: %s' % (show_re, e))
             return
         soup = get_soup(page.content)
-        search = re.compile(re.escape(show_name), flags=re.I)
+        search = re.compile(show_re, flags=re.I)
         show = soup.find(text=search)
         if show:
             id = int(show.previous['value'])
             db_sess.add(PogcalShow(id=id, name=show_name))
             return id
         else:
-            log.verbose('Could not find pogdesign calendar id for show `%s`' % show_name)
+            log.verbose('Could not find pogdesign calendar id for show `%s`' % show_re)
 
+    def show_re(self, show_name):
+        # Normalize and format show name
+        show_re = re.sub(r'\s+\((.*)\)$', r'( \(\1\))?', show_name)
+        if show_re.startswith('the'):
+            show_re = show_re[3:].strip() + r' \[the\]'
+        return show_re
 
 register_plugin(PogcalAcquired, 'pogcal_acquired', api_ver=2)
