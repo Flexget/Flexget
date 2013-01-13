@@ -13,7 +13,7 @@ from flexget.schema import versioned_base
 
 log = logging.getLogger('pogcal_acquired')
 Base = versioned_base('pogcal_acquired', 0)
-session = requests.Session()
+session = requests.Session(config={'max_retries': 2})
 
 
 class PogcalShow(Base):
@@ -43,6 +43,8 @@ class PogcalAcquired(object):
         if 'logout' not in result.text:
             log.error('Username/password for pogdesign calendar appear to be incorrect.')
             return
+        elif task.manager.options.test:
+            log.verbose('Successfully logged in to pogdesign calendar.')
         for entry in task.accepted:
             if not entry.get('series_name') or not entry.get('series_id_type') == 'ep':
                 continue
