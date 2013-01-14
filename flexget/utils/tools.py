@@ -4,10 +4,11 @@ from __future__ import unicode_literals, division, absolute_import
 import urllib2
 import httplib
 import socket
-from urlparse import urlparse
 import time
-from htmlentitydefs import name2codepoint
 import re
+import sys
+from urlparse import urlparse
+from htmlentitydefs import name2codepoint
 from datetime import timedelta
 
 
@@ -327,7 +328,7 @@ def console(text):
     if isinstance(text, str):
         print text
         return
-    print unicode(text).encode('utf8')
+    print unicode(text).encode(sys.stdout.encoding, 'replace')
 
 
 def parse_timedelta(value):

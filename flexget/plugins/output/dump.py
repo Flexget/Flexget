@@ -36,7 +36,9 @@ def dump(entries, debug=False, eval_lazy=False, trace=False):
                     console('%-17s: %s' % (field, value.replace('\r', '').replace('\n', '')))
                 except:
                     console('%-17s: %s (warning: unable to print)' % (field, repr(value)))
-            elif isinstance(value, (int, float, list, dict)):
+            elif isinstance(value, list):
+                console('%-17s: %s' % (field, '[%s]' % ', '.join(unicode(v) for v in value)))
+            elif isinstance(value, (int, float, dict)):
                 console('%-17s: %s' % (field, value))
             elif value is None:
                 console('%-17s: %s' % (field, value))
