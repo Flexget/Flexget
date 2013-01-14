@@ -305,6 +305,8 @@ class OutputDeluge(DelugePlugin):
         deluge.accept('boolean', key='compact')
         deluge.accept('text', key='content_filename')
         deluge.accept('boolean', key='main_file_only')
+        trackers = deluge.accept('list', key='add_trackers')
+        trackers.accept('text')
         deluge.accept('boolean', key='enabled')
         return root
 
@@ -591,9 +593,16 @@ class OutputDeluge(DelugePlugin):
                     else:
                         log.warning('No files in %s are > 90%% of content size, no files renamed.' % entry['title'])
 
+                if opts.get('add_trackers'):
+                    extra_trackers = opts.get('add_trackers')
+                    new_trackers = list(status['trackers'])
+                    for tracker in extra_trackers:
+                        new_trackers.append({'url': tracker, 'tier': len(new_trackers)+1})
+                    main_file_dlist.append(client.core.set_torrent_trackers(torrent_id, new_trackers))
+
                 return defer.DeferredList(main_file_dlist)
 
-            status_keys = ['files', 'total_size', 'save_path', 'move_on_completed_path', 'move_on_completed', 'progress']
+            status_keys = ['files', 'total_size', 'save_path', 'move_on_completed_path', 'move_on_completed', 'progress', 'trackers']
             dlist.append(client.core.get_torrent_status(torrent_id, status_keys).addCallback(on_get_torrent_status))
 
             return defer.DeferredList(dlist)
@@ -702,7 +711,8 @@ class OutputDeluge(DelugePlugin):
                 # Make another set of options, that get set after the torrent has been added
                 modify_opts = {'label': format_label(entry.get('label', config['label'])),
                                'queuetotop': entry.get('queuetotop', config.get('queuetotop')),
-                               'main_file_only': entry.get('main_file_only', config.get('main_file_only', False))}
+                               'main_file_only': entry.get('main_file_only', config.get('main_file_only', False)),
+                               'add_trackers': config.get('add_trackers', '')}
                 try:
                     movedone = entry.render(entry.get('movedone', config['movedone']))
                     modify_opts['movedone'] = pathscrub(os.path.expanduser(movedone))
