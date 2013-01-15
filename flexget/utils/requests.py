@@ -46,7 +46,7 @@ def set_unresponsive(url):
 
 class FileAdapter(requests.adapters.BaseAdapter):
     """Handles file:// URIs by passing them to urllib2"""
-    def send(self, request):
+    def send(self, request, **kwargs):
         url = request.url
         try:
             raw = urllib2.urlopen(url)
