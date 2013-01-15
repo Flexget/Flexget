@@ -7,6 +7,7 @@ import socket
 import time
 import re
 import sys
+import locale
 from urlparse import urlparse
 from htmlentitydefs import name2codepoint
 from datetime import timedelta
@@ -323,12 +324,33 @@ class ReList(list):
             yield self[i]
 
 
+# Determine the encoding for io
+io_encoding = None
+if hasattr(sys.stdout, 'encoding'):
+    io_encoding = sys.stdout.encoding
+if not io_encoding:
+    try:
+        io_encoding = locale.getpreferredencoding()
+    except Exception:
+        pass
+if not io_encoding:
+    # Default to utf8 if nothing can be determined
+    io_encoding = 'utf8'
+else:
+    # Normalize the encoding
+    io_encoding = io_encoding.lower()
+    if io_encoding == 'cp65001':
+        io_encoding = 'utf8'
+    elif io_encoding in ['us-ascii', '646', 'ansi_x3.4-1968']:
+        io_encoding = 'ascii'
+
+
 def console(text):
     """Print to console safely."""
     if isinstance(text, str):
         print text
         return
-    print unicode(text).encode(sys.stdout.encoding or 'utf8', 'replace')
+    print unicode(text).encode(io_encoding, 'replace')
 
 
 def parse_timedelta(value):
