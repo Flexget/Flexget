@@ -13,7 +13,7 @@ from flexget.schema import versioned_base
 
 log = logging.getLogger('pogcal_acquired')
 Base = versioned_base('pogcal_acquired', 0)
-session = requests.Session(config={'max_retries': 2})
+session = requests.Session(max_retries=2)
 
 
 class PogcalShow(Base):
