@@ -328,7 +328,7 @@ def console(text):
     if isinstance(text, str):
         print text
         return
-    print unicode(text).encode(sys.stdout.encoding, 'replace')
+    print unicode(text).encode(sys.stdout.encoding or 'utf8', 'replace')
 
 
 def parse_timedelta(value):
