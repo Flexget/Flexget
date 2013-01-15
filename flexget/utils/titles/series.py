@@ -169,7 +169,7 @@ class SeriesParser(TitleParser):
             # Turn on exact mode for series ending with a parenthetical,
             # so that 'Show (US)' is not accepted as 'Show (UK)'
             self.strict_name = True
-        res = '^' + ignore + blank + '*' + '(' + res + ')' + blank + '+'
+        res = '^' + ignore + blank + '*' + '(' + res + ')' + blank + '*'
         return res
 
     def parse(self, data=None, field=None, quality=None):

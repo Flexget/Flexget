@@ -9,11 +9,13 @@ from flexget import validator
 from flexget.plugin import register_plugin
 from flexget.utils import requests
 from flexget.utils.soup import get_soup
+from flexget.utils.titles.series import SeriesParser
 from flexget.schema import versioned_base
 
 log = logging.getLogger('pogcal_acquired')
 Base = versioned_base('pogcal_acquired', 0)
-session = requests.Session(max_retries=2)
+session = requests.Session(max_retries=3)
+series_parser = SeriesParser()
 
 
 class PogcalShow(Base):
@@ -72,13 +74,13 @@ class PogcalAcquired(object):
         db_show = db_sess.query(PogcalShow).filter(PogcalShow.name == show_name).first()
         if db_show:
             return db_show.id
-        # Try to look up the id from pogdesign
-        show_re = self.show_re(show_name)
         try:
             page = session.get('http://www.pogdesign.co.uk/cat/showselect.php')
         except requests.RequestException as e:
-            log.error('Error looking up show `%s` from pogdesign calendar: %s' % (show_re, e))
+            log.error('Error looking up show show list from pogdesign calendar: %s' % e)
             return
+        # Try to find the show id from pogdesign show list
+        show_re = series_parser.name_to_re(show_name)
         soup = get_soup(page.content)
         search = re.compile(show_re, flags=re.I)
         show = soup.find(text=search)
@@ -88,12 +90,5 @@ class PogcalAcquired(object):
             return id
         else:
             log.verbose('Could not find pogdesign calendar id for show `%s`' % show_re)
-
-    def show_re(self, show_name):
-        # Normalize and format show name
-        show_re = re.sub(r'\s+\((.*)\)$', r'( \(\1\))?', show_name)
-        if show_re.startswith('the'):
-            show_re = show_re[3:].strip() + r' \[the\]'
-        return show_re
 
 register_plugin(PogcalAcquired, 'pogcal_acquired', api_ver=2)
