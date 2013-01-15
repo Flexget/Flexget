@@ -4,7 +4,9 @@ import re
 import datetime
 from copy import copy
 from collections import defaultdict
+
 from flexget.task import Task
+from flexget.entry import Entry
 from flexget.plugin import register_plugin, plugins as all_plugins, get_plugin_by_name, phase_methods
 
 log = logging.getLogger('if')
@@ -100,9 +102,9 @@ class FilterIf(object):
                 log.debug('No config dict was generated for this task.')
                 return
             entry_actions = {
-                'accept': task.accept,
-                'reject': task.reject,
-                'fail': task.fail}
+                'accept': Entry.accept,
+                'reject': Entry.reject,
+                'fail': Entry.fail}
             for item in self.task_phases[task.name][phase]:
                 requirement, action = item.items()[0]
                 passed_entries = [e for e in task.entries if self.check_condition(requirement, e)]

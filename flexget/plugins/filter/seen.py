@@ -336,7 +336,7 @@ class FilterSeen(object):
                 found = found.first()
                 if found:
                     log.debug("Rejecting '%s' '%s' because of seen '%s'" % (entry['url'], entry['title'], found.value))
-                    task.reject(entry, 'Entry with %s `%s` is already seen' % (found.field, found.value),
+                    entry.reject('Entry with %s `%s` is already seen' % (found.field, found.value),
                                 remember=remember_rejected)
 
     def on_task_exit(self, task, config):

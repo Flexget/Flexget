@@ -118,8 +118,7 @@ class PluginExec(object):
                     log.error('Could not set exec command for %s: %s' % (entry['title'], e))
                     # fail the entry if configured to do so
                     if config.get('fail_entries'):
-                        task.fail(entry, 'Entry `%s` does not have required fields for string replacement.' %
-                                         entry['title'])
+                        entry.fail('Entry `%s` does not have required fields for string replacement.' % entry['title'])
                     continue
 
                 log.debug('phase_name: %s operation: %s cmd: %s' % (phase_name, operation, cmd))
@@ -133,11 +132,11 @@ class PluginExec(object):
                     except UnicodeEncodeError:
                         log.error('Unable to encode cmd `%s` to %s' % (cmd, config['encoding']))
                         if config.get('fail_entries'):
-                            task.fail(entry, 'cmd `%s` could not be encoded to %s.' % (cmd, config['encoding']))
+                            entry.fail('cmd `%s` could not be encoded to %s.' % (cmd, config['encoding']))
                         continue
                     # Run the command, fail entries with non-zero return code if configured to
                     if self.execute_cmd(cmd, allow_background, config['encoding']) != 0 and config.get('fail_entries'):
-                        task.fail(entry, 'exec return code was non-zero')
+                        entry.fail('exec return code was non-zero')
 
         # phase keyword in this
         if 'phase' in config[phase_name]:

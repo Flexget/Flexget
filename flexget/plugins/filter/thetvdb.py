@@ -225,6 +225,6 @@ class FilterTvdb(object):
                     log_once(msg, log)
             else:
                 log.debug('Accepting %s' % (entry))
-                task.accept(entry)
+                entry.accept()
 
 register_plugin(FilterTvdb, 'thetvdb')

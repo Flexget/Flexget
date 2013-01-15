@@ -56,7 +56,7 @@ class FilterQueueBase(object):
                 # Accept this entry if it matches a queue item that has not been accepted this run yet
                 if item.immortal:
                     entry['immortal'] = True
-                task.accept(entry, reason='Matches %s queue item: %s' % (item.discriminator, item.title))
+                entry.accept(reason='Matches %s queue item: %s' % (item.discriminator, item.title))
                 # Keep track of entries we accepted, so they can be marked as downloaded on task_exit if successful
                 self.accepted_entries[item.id] = entry
 

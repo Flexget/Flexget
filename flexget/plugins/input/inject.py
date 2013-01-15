@@ -80,7 +80,7 @@ class InputInject(object):
 
         if options.get('accept', False):
             log.debug('accepting the injection')
-            task.accept(entry, '--inject accepted')
+            entry.accept('--inject accepted')
 
 
 register_plugin(InputInject, '--inject', debug=True, builtin=True)

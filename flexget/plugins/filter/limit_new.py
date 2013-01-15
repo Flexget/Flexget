@@ -44,7 +44,7 @@ class FilterLimitNew(object):
             if index < amount:
                 log.verbose('Allowed %s (%s)' % (entry['title'], entry['url']))
             else:
-                task.reject(entry, 'limit exceeded')
+                entry.reject('limit exceeded')
                 # Also save this in backlog so that it can be accepted next time.
                 if self.backlog:
                     self.backlog.add_backlog(task, entry)

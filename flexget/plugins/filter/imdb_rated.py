@@ -130,11 +130,11 @@ class FilterImdbRated(object):
             if config.get('reverse', False):
                 # reversed, reject unrated
                 if not is_rated:
-                    task.reject(entry, 'imdb rated reverse')
+                    entry.reject('imdb rated reverse')
             else:
                 # normal mode, reject rated
                 if is_rated:
-                    task.reject(entry, 'imdb rated')
+                    entry.reject('imdb rated')
 
 
 register_plugin(FilterImdbRated, 'imdb_rated')

@@ -25,10 +25,10 @@ flexget Package
     :undoc-members:
     :show-inheritance:
 
-:mod:`feed` Module
+:mod:`task` Module
 ------------------
 
-.. automodule:: flexget.feed
+.. automodule:: flexget.task
     :members:
     :undoc-members:
     :show-inheritance:

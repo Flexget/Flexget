@@ -81,14 +81,6 @@ plugins Package
     :undoc-members:
     :show-inheritance:
 
-:mod:`plugin_nzbmatrix` Module
-------------------------------
-
-.. automodule:: flexget.plugins.plugin_nzbmatrix
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 :mod:`plugin_preset` Module
 ---------------------------
 
@@ -197,14 +189,6 @@ plugins Package
 ---------------------------------
 
 .. automodule:: flexget.plugins.urlrewrite_deadfrog
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-:mod:`urlrewrite_demonoid` Module
----------------------------------
-
-.. automodule:: flexget.plugins.urlrewrite_demonoid
     :members:
     :undoc-members:
     :show-inheritance:

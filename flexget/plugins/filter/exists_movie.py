@@ -125,7 +125,7 @@ class FilterExistsMovie(object):
 
             # actual filtering
             if entry['imdb_id'] in imdb_ids:
-                task.reject(entry, 'movie exists')
+                entry.reject('movie exists')
 
         if incompatible_dirs or incompatible_entries:
             log.verbose('There were some incompatible items. %s of %s entries '

@@ -195,6 +195,6 @@ class FilterRottenTomatoes(object):
                         log.info(msg)
             else:
                 log.debug('Accepting %s' % (entry['title']))
-                task.accept(entry)
+                entry.accept()
 
 register_plugin(FilterRottenTomatoes, 'rottentomatoes', api_ver=2)

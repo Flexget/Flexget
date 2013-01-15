@@ -83,13 +83,13 @@ class OutputSabnzbd(object):
             except Exception as e:
                 log.critical('Failed to use sabnzbd. Requested %s' % request_url)
                 log.critical('Result was: %s' % e)
-                task.fail(entry, 'sabnzbd unreachable')
+                entry.fail('sabnzbd unreachable')
                 if task.manager.options.debug:
                     log.exception(e)
                 continue
 
             if 'error' in response.lower():
-                task.fail(entry, response.replace('\n', ''))
+                entry.fail(response.replace('\n', ''))
             else:
                 log.info('Added `%s` to SABnzbd' % (entry['title']))
 

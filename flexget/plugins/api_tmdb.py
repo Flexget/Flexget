@@ -4,9 +4,11 @@ import logging
 from urllib2 import URLError, quote
 import os
 import posixpath
+
 from sqlalchemy import Table, Column, Integer, Float, String, Unicode, Boolean, DateTime, func
 from sqlalchemy.schema import ForeignKey
 from sqlalchemy.orm import relation
+
 from flexget import schema
 from flexget.utils import json
 from flexget.utils.sqlalchemy_utils import table_add_column, table_schema

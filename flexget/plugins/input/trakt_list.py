@@ -103,7 +103,7 @@ class TraktList(object):
 
         result = task.requests.get(url, data=json.dumps(auth))
         try:
-            data = task.requests.post(url, data=json.dumps(auth)).json
+            data = task.requests.post(url, data=json.dumps(auth)).json()
         except RequestException as e:
             raise PluginError('Could not retrieve list from trakt (%s)' % e.message)
 

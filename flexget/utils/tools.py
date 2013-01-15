@@ -4,10 +4,12 @@ from __future__ import unicode_literals, division, absolute_import
 import urllib2
 import httplib
 import socket
-from urlparse import urlparse
 import time
-from htmlentitydefs import name2codepoint
 import re
+import sys
+import locale
+from urlparse import urlparse
+from htmlentitydefs import name2codepoint
 from datetime import timedelta
 
 
@@ -250,12 +252,12 @@ def urlopener(url_or_request, log, **kwargs):
             handler_names = [h.__class__.__name__ for h in handlers]
             log.debug('Additional handlers have been specified for this urlopen: %s' % ', '.join(handler_names))
         opener = urllib2.build_opener(*handlers).open
-        for i in range(retries): # retry getting the url up to 3 times.
+        for i in range(retries):  # retry getting the url up to 3 times.
             if i > 0:
                 time.sleep(3)
             try:
                 retrieved = opener(url_or_request, kwargs.get('data'))
-            except (urllib2.URLError, socket.timeout) as e:
+            except urllib2.HTTPError as e:
                 if e.code < 500:
                     # If it was not a server error, don't keep retrying.
                     log.warning('Could not retrieve url (HTTP %s error): %s' % (e.code, e.url))
@@ -322,12 +324,33 @@ class ReList(list):
             yield self[i]
 
 
+# Determine the encoding for io
+io_encoding = None
+if hasattr(sys.stdout, 'encoding'):
+    io_encoding = sys.stdout.encoding
+if not io_encoding:
+    try:
+        io_encoding = locale.getpreferredencoding()
+    except Exception:
+        pass
+if not io_encoding:
+    # Default to utf8 if nothing can be determined
+    io_encoding = 'utf8'
+else:
+    # Normalize the encoding
+    io_encoding = io_encoding.lower()
+    if io_encoding == 'cp65001':
+        io_encoding = 'utf8'
+    elif io_encoding in ['us-ascii', '646', 'ansi_x3.4-1968']:
+        io_encoding = 'ascii'
+
+
 def console(text):
     """Print to console safely."""
     if isinstance(text, str):
         print text
         return
-    print unicode(text).encode('utf8')
+    print unicode(text).encode(io_encoding, 'replace')
 
 
 def parse_timedelta(value):

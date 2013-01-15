@@ -2,6 +2,8 @@ from __future__ import unicode_literals, division, absolute_import
 import urllib
 import logging
 import re
+
+from flexget.entry import Entry
 from flexget.plugin import register_plugin, priority, get_plugin_by_name
 
 log = logging.getLogger('regexp')
@@ -126,15 +128,15 @@ class FilterRegexp(object):
         for operation, regexps in config.iteritems():
             if operation == 'rest':
                 continue
-            r = self.filter(task, operation, regexps)
+            leftovers = self.filter(task, operation, regexps)
             if not rest:
-                rest = r
+                rest = leftovers
             else:
                 # If there is already something in rest, take the intersection with r (entries no operations matched)
-                rest = [entry for entry in r if entry in rest]
+                rest = [entry for entry in leftovers if entry in rest]
 
         if 'rest' in config:
-            rest_method = task.accept if config['rest'] == 'accept' else task.reject
+            rest_method = Entry.accept if config['rest'] == 'accept' else Entry.reject
             for entry in rest:
                 log.debug('Rest method %s for %s' % (config['rest'], entry['title']))
                 rest_method(entry, 'regexp `rest`')
@@ -147,7 +149,7 @@ class FilterRegexp(object):
         :param regexp: Compiled regexp
         :param find_from: None or a list of fields to search from
         :param not_regexps: None or list of regexps that can NOT match
-        :return:
+        :return: Field matching
         """
         unquote = ['url']
         for field in find_from or ['title', 'description']:
@@ -168,10 +170,10 @@ class FilterRegexp(object):
                     # Make sure the not_regexps do not match for this field
                     for not_regexp in not_regexps or []:
                         if self.matches(entry, not_regexp, find_from=[field]):
+                            entry.trace('Configured not_regexp %s matched, ignored' % not_regexp)
                             break
-                    else: # None of the not_regexps matched
+                    else:  # None of the not_regexps matched
                         return field
-        return None
 
     def filter(self, task, operation, regexps):
         """
@@ -182,9 +184,8 @@ class FilterRegexp(object):
         :param regexps: list of {compiled_regexp: options} dictionaries
         :return: Return list of entries that didn't match regexps
         """
-
         rest = []
-        method = task.accept if 'accept' in operation else task.reject
+        method = Entry.accept if 'accept' in operation else Entry.reject
         match_mode = 'excluding' not in operation
         for entry in task.entries:
             log.trace('testing %i regexps to %s' % (len(regexps), entry['title']))
@@ -197,7 +198,8 @@ class FilterRegexp(object):
                 # Run if we are in match mode and have a hit, or are in non-match mode and don't have a hit
                 if match_mode == bool(field):
                     # Creates the string with the reason for the hit
-                    matchtext = 'regexp \'%s\' ' % regexp.pattern + ('matched field \'%s\'' % field if match_mode else 'didn\'t match')
+                    matchtext = 'regexp \'%s\' ' % regexp.pattern + ('matched field \'%s\'' %
+                                                                     field if match_mode else 'didn\'t match')
                     log.debug('%s for %s' % (matchtext, entry['title']))
                     # apply settings to entry and run the method on it
                     if opts.get('path'):
@@ -212,6 +214,7 @@ class FilterRegexp(object):
                     break
             else:
                 # We didn't run method for any of the regexps, add this entry to rest
+                entry.trace('None of configured %s regexps matched' % operation)
                 rest.append(entry)
         return rest
 

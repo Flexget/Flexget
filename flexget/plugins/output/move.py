@@ -116,7 +116,7 @@ class MovePlugin(object):
                 count = 0
                 while True:
                     if count > 60 * 30:
-                        task.fail(entry, 'Move has been waiting unpacking for 30 minutes')
+                        entry.fail('Move has been waiting unpacking for 30 minutes')
                         continue
                     size = os.path.getsize(src)
                     time.sleep(1)

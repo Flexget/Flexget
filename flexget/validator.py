@@ -19,7 +19,7 @@ class Errors(object):
 
     def add(self, msg):
         """Add new error message to current path."""
-        path = [str(p) for p in self.path]
+        path = [unicode(p) for p in self.path]
         msg = '[/%s] %s' % ('/'.join(path), msg)
         self.messages.append(msg)
 
@@ -221,7 +221,7 @@ class ChoiceValidator(Validator):
         elif isinstance(data, basestring) and data.lower() in self.valid_ic:
             return True
         else:
-            acceptable = sorted(str(value) for value in self.valid + self.valid_ic)
+            acceptable = sorted(unicode(value) for value in self.valid + self.valid_ic)
             self.errors.add('\'%s\' is not one of acceptable values: %s' % (data, ', '.join(acceptable)))
             return False
 

@@ -129,9 +129,9 @@ class PluginDownload(object):
             # check if entry must have a path (download: yes)
             if require_path and 'path' not in entry:
                 log.error('%s can\'t be downloaded, no path specified for entry' % entry['title'])
-                task.fail(entry, 'no path specified for entry')
+                entry.fail('no path specified for entry')
             else:
-                task.fail(entry, ", ".join(errors))
+                entry.fail(", ".join(errors))
 
     def save_error_page(self, entry, task, page):
         received = os.path.join(task.manager.config_base, 'received', task.name)
@@ -266,7 +266,7 @@ class PluginDownload(object):
             outfile.close()
             # Do a sanity check on downloaded file
             if os.path.getsize(datafile) == 0:
-                task.fail(entry, 'File %s is 0 bytes in size' % datafile)
+                entry.fail('File %s is 0 bytes in size' % datafile)
                 os.remove(datafile)
                 return
             # store temp filename into entry so other plugins may read and modify content
@@ -338,10 +338,10 @@ class PluginDownload(object):
             try:
                 self.output(task, entry, config)
             except PluginWarning as e:
-                task.fail(entry)
+                entry.fail()
                 log.error('Plugin error while writing: %s' % e)
             except Exception as e:
-                task.fail(entry)
+                entry.fail()
                 log.exception('Exception while writing: %s' % e)
 
     def output(self, task, entry, config):
@@ -369,7 +369,7 @@ class PluginDownload(object):
             try:
                 path = os.path.expanduser(entry.render(path))
             except RenderError as e:
-                task.fail(entry, 'Could not set path. Error during string replacement: %s' % e)
+                entry.fail('Could not set path. Error during string replacement: %s' % e)
                 return
 
             # Clean illegal characters from path name
@@ -431,7 +431,7 @@ class PluginDownload(object):
                     log.debug("Overwriting already existing file %s" % destfile)
                 else:
                     log.info('File `%s` already exists and is not identical, download failed.' % destfile)
-                    task.fail(entry, 'File `%s` already exists and is not identical.' % destfile)
+                    entry.fail('File `%s` already exists and is not identical.' % destfile)
                     return
             else:
                 # move temp file

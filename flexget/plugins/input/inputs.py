@@ -41,7 +41,7 @@ class PluginInputs(object):
                     continue
                 if not result:
                     msg = 'Input %s did not return anything' % input_name
-                    if task.no_entries_ok:
+                    if getattr(task, 'no_entries_ok', False):
                         log.verbose(msg)
                     else:
                         log.warning(msg)

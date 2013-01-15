@@ -111,7 +111,7 @@ class TorrentAlive(object):
         config = self.prepare_config(config)
         for entry in task.entries:
             if 'torrent_seeds' in entry and entry['torrent_seeds'] < config['min_seeds']:
-                task.reject(entry, reason='Had < %d required seeds. (%s)' %
+                entry.reject(reason='Had < %d required seeds. (%s)' %
                                           (config['min_seeds'], entry['torrent_seeds']))
 
     # Run on output phase so that we let torrent plugin output modified torrent file first
@@ -131,7 +131,7 @@ class TorrentAlive(object):
             torrent = entry.get('torrent')
             if torrent:
                 seeds = 0
-                info_hash = torrent.get_info_hash()
+                info_hash = torrent.info_hash
                 announce_list = torrent.content.get('announce-list')
                 if announce_list:
                     # Multitracker torrent
@@ -162,7 +162,7 @@ class TorrentAlive(object):
 
                 # Reject if needed
                 if seeds < min_seeds:
-                    task.reject(entry, reason='Tracker(s) had < %s required seeds. (%s)' % (min_seeds, seeds),
+                    entry.reject(reason='Tracker(s) had < %s required seeds. (%s)' % (min_seeds, seeds),
                         remember_time=config['reject_for'])
                     task.rerun()
                 else:

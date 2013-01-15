@@ -26,11 +26,11 @@ class FilterContentSize(object):
             # download plugin has already printed a downloading message.
             if size < config.get('min', 0):
                 log_once('Entry `%s` too small, rejecting' % entry['title'], log)
-                task.reject(entry, 'minimum size %s MB, got %s MB' % (config['min'], size), remember=remember)
+                entry.reject('no size info available nor file to read it from', remember=True)
                 return True
             if size > config.get('max', maxint):
                 log_once('Entry `%s` too big, rejecting' % entry['title'], log)
-                task.reject(entry, 'maximum size %s MB, got %s MB' % (config['max'], size), remember=remember)
+                entry.reject('no size info available nor file to read it from', remember=True)
                 return True
 
     @priority(130)
@@ -53,9 +53,9 @@ class FilterContentSize(object):
                 log.debug('Entry %s size is unknown, rejecting because of strict mode (default)' % entry['title'])
                 log.info('No size information available for %s, rejecting' % entry['title'])
                 if not 'file' in entry:
-                    task.reject(entry, 'no size info available nor file to read it from', remember=True)
+                    entry.reject('no size info available nor file to read it from', remember=True)
                 else:
-                    task.reject(entry, 'no size info available from downloaded file', remember=True)
+                    entry.reject('no size info available from downloaded file', remember=True)
 
         if len(task.rejected) > num_rejected:
             # Since we are rejecting after the filter event,

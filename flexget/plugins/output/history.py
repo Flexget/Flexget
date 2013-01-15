@@ -2,9 +2,12 @@ from __future__ import unicode_literals, division, absolute_import
 import logging
 from datetime import datetime
 from argparse import SUPPRESS
+
 from sqlalchemy import Column, String, Integer, DateTime, Unicode, desc
+
 from flexget.manager import Base, Session
 from flexget.plugin import register_parser_option, register_plugin
+from flexget.utils.tools import console
 
 log = logging.getLogger('history')
 
@@ -31,23 +34,23 @@ class History(Base):
 class PluginHistory(object):
 
     """
-        Provides --history
+    Provides --history
     """
 
     def on_process_start(self, task):
         if task.manager.options.history:
             task.manager.disable_tasks()
             session = Session()
-            print '-- History: ' + '-' * 67
+            console('-- History: ' + '-' * 67)
             for item in reversed(session.query(History).order_by(desc(History.id)).limit(50).all()):
-                print ' Task    : %s' % item.task
-                print ' Title   : %s' % item.title.encode('utf-8')
-                print ' Url     : %s' % item.url
+                console(' Task    : %s' % item.task)
+                console(' Title   : %s' % item.title)
+                console(' Url     : %s' % item.url)
                 if item.filename:
-                    print ' Stored  : %s' % item.filename
-                print ' Time    : %s' % item.time.strftime("%c")
-                print ' Details : %s' % item.details
-                print '-' * 79
+                    console(' Stored  : %s' % item.filename)
+                console(' Time    : %s' % item.time.strftime("%c"))
+                console(' Details : %s' % item.details)
+                console('-' * 79)
             session.close()
 
     def on_task_exit(self, task):

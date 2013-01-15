@@ -4,16 +4,18 @@ import copy
 import hashlib
 from functools import wraps
 import itertools
+
 from sqlalchemy import Column, Unicode, String, Integer
+
 from flexget import validator
 from flexget import schema
 from flexget.manager import Session, register_config_key
-from flexget.plugin import (get_plugins_by_phase, get_plugin_by_name,task_phases, PluginWarning, PluginError,
+from flexget.plugin import (get_plugins_by_phase, get_plugin_by_name, task_phases, PluginWarning, PluginError,
                             DependencyError, plugins as all_plugins)
 from flexget.utils.simple_persistence import SimpleTaskPersistence
-import flexget.utils.requests as requests
 from flexget.event import fire_event
 from flexget.entry import Entry, EntryUnicodeError
+import flexget.utils.requests as requests
 
 log = logging.getLogger('task')
 Base = schema.versioned_base('feed', 0)
@@ -100,10 +102,10 @@ class EntryContainer(list):
             entry.task = task
 
         self._entries = EntryIterator(self, ['undecided', 'accepted'])
-        self._accepted = EntryIterator(self, 'accepted') # accepted entries, can still be rejected
-        self._rejected = EntryIterator(self, 'rejected') # rejected entries
-        self._failed = EntryIterator(self, 'failed')   # failed entries
-        self._undecided = EntryIterator(self, 'undecided') # undecided entries
+        self._accepted = EntryIterator(self, 'accepted')  # accepted entries, can still be rejected
+        self._rejected = EntryIterator(self, 'rejected')  # rejected entries, can not be accepted
+        self._failed = EntryIterator(self, 'failed')  # failed entries
+        self._undecided = EntryIterator(self, 'undecided')  # undecided entries (default)
 
     # Make these read-only properties
     entries = property(lambda self: self._entries)
@@ -245,52 +247,6 @@ class Task(object):
         if phase not in self.disabled_phases:
             log.debug('Disabling %s phase' % phase)
             self.disabled_phases.append(phase)
-
-    def accept(self, entry, reason=None, **kwargs):
-        """
-        Accept *entry* immediately with optional but
-        highly recommendable *reason*.
-
-        :param Entry entry: To be aceppeted
-        :param string reason: Optional reason
-        :param kwargs: Optional kwargs will be passed to plugins hooking action
-        """
-        if not isinstance(entry, Entry):
-            raise Exception('Trying to accept non entry, %r' % entry)
-        entry.accept(reason=reason, **kwargs)
-
-    def reject(self, entry, reason=None, **kwargs):
-        """
-        Reject *entry* immediately and permanently with optional but
-        highly recommendable *reason*.
-
-        :param Entry entry: To be rejected
-        :param string reason: Optional reason
-        :param kwargs: Optional kwargs will be passed to plugins hooking action
-        """
-        if not isinstance(entry, Entry):
-            raise Exception('Trying to reject non entry, %r' % entry)
-        entry.reject(reason=reason, **kwargs)
-
-    def fail(self, entry, reason=None, **kwargs):
-        """
-        Fails *entry* immediately with optional but
-        highly recommendable *reason*.
-
-        :param Entry entry: To be failed
-        :param string reason: Optional reason
-        :param kwargs: Optional kwargs will be passed to plugins hooking action
-        """
-        if not isinstance(entry, Entry):
-            raise Exception('Trying to fail non entry, %r' % entry)
-        entry.fail(reason=reason, **kwargs)
-
-    def trace(self, entry, message):
-        """Add tracing message to entry.
-
-        .. note:: Not yet supported in any meaningful way
-        """
-        entry.trace.append((self.current_plugin, message))
 
     def abort(self, reason='Unknown', **kwargs):
         """Abort this task execution, no more plugins will be executed after the current one exists."""
@@ -437,7 +393,7 @@ class Task(object):
             self.abort(err.value)
         except DependencyError as e:
             msg = ('Plugin `%s` cannot be used because dependency `%s` is missing.' %
-                            (keyword, e.missing))
+                   (keyword, e.missing))
             log.critical(msg)
             log.debug(e.message)
             self.abort(msg)
@@ -495,9 +451,9 @@ class Task(object):
 
         # validate configuration
         errors = self.validate()
-        if self._abort: # todo: bad practice
+        if self._abort:  # todo: bad practice
             return
-        if errors and self.manager.unit_test: # todo: bad practice
+        if errors and self.manager.unit_test:  # todo: bad practice
             raise Exception('configuration errors')
         if self.manager.options.validate:
             if not errors:
@@ -636,7 +592,7 @@ def root_config_validator():
     valid_plugins = [p for p in all_plugins if hasattr(all_plugins[p].instance, 'validator')]
     root = validator.factory('dict')
     root.reject_keys(valid_plugins, message='plugins should go under a specific task. '
-        '(and tasks are not allowed to be named the same as any plugins)')
+                                            '(and tasks are not allowed to be named the same as any plugins)')
     root.accept_any_key('dict').accept_any_key('any')
     return root
 

@@ -10,7 +10,8 @@ from BeautifulSoup import Tag
 log = logging.getLogger('utils.imdb')
 # IMDb delivers a version of the page which is unparsable to unknown (and some known) user agents, such as requests'
 # Spoof the old urllib user agent to keep results consistent
-requests = Session(headers={'User-Agent': 'Python-urllib/2.6'})
+requests = Session()
+requests.headers.update({'User-Agent': 'Python-urllib/2.6'})
 # give imdb a little break between requests (see: http://flexget.com/ticket/129#comment:1)
 requests.set_domain_delay('imdb.com', '3 seconds')
 

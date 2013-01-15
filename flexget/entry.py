@@ -67,7 +67,7 @@ class Entry(dict):
     """
 
     def __init__(self, *args, **kwargs):
-        self.trace = []
+        self.traces = []
         self.snapshots = {}
         self._state = 'undecided'
         self.task = None
@@ -80,11 +80,27 @@ class Entry(dict):
         # Make sure constructor does not escape our __setitem__ enforcement
         self.update(*args, **kwargs)
 
+    def trace(self, message, operation=None, plugin=None):
+        """
+        Adds trace message to the entry which should contain useful information about why
+        plugin did not operate on entry. Accept and Reject messages are added to trace automatically.
+
+        :param string message: Message to add into entry trace.
+        :param string operation: None, reject, accept or fail
+        :param plugin: Uses task.current_plugin by default, pass value to override
+        """
+        if operation not in (None, 'accept', 'reject', 'fail'):
+            raise ValueError('Unknown operation %s' % operation)
+        item = (plugin or self.task.current_plugin, operation, message)
+        if item not in self.traces:
+            self.traces.append(item)
+
     def accept(self, reason=None, **kwargs):
         if self.rejected:
             log.debug('tried to accept rejected %r' % self)
         elif not self.accepted:
             self._state = 'accepted'
+            self.trace(reason, operation='accept')
             # Run on_entry_accept phase
             self.task._run_entry_phase('accept', self, reason=reason, **kwargs)
 
@@ -93,10 +109,11 @@ class Entry(dict):
         if self.get('immortal'):
             reason_str = '(%s)' % reason if reason else ''
             log.info('Tried to reject immortal %s %s' % (self['title'], reason_str))
-            self.task.trace(self, 'Tried to reject immortal %s' % reason_str)
+            self.trace('Tried to reject immortal %s' % reason_str)
             return
         if not self.rejected:
             self._state = 'rejected'
+            self.trace(reason, operation='reject')
             # Run on_entry_reject phase
             self.task._run_entry_phase('reject', self, reason=reason, **kwargs)
 
@@ -104,6 +121,7 @@ class Entry(dict):
         log.debug('Marking entry \'%s\' as failed' % self['title'])
         if not self.failed:
             self._state = 'failed'
+            self.trace(reason, operation='fail')
             log.error('Failed %s (%s)' % (self['title'], reason))
             # Run on_entry_fail phase
             self.task._run_entry_phase('fail', self, reason=reason, **kwargs)

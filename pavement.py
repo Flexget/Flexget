@@ -15,9 +15,9 @@ except ImportError:
 sys.path.insert(0, '')
 
 options = environment.options
-install_requires = ['FeedParser>=5.1.2', 'SQLAlchemy >=0.7, <0.7.99', 'PyYAML', 'BeautifulSoup>=3.2, <3.3',
+install_requires = ['FeedParser>=5.1.3', 'SQLAlchemy >=0.7, <0.7.99', 'PyYAML', 'BeautifulSoup>=3.2, <3.3',
                     'beautifulsoup4>=4.1, <4.2', 'html5lib>=0.11', 'PyRSS2Gen', 'pynzb', 'progressbar', 'jinja2',
-                    'flask', 'cherrypy', 'requests>=0.14, <0.15', 'python-dateutil!=2.0']
+                    'flask', 'cherrypy', 'requests>=1.0, <1.99', 'python-dateutil!=2.0']
 if sys.version_info < (2, 7):
     # argparse is part of the standard library in python 2.7+
     install_requires.append('argparse')
@@ -335,8 +335,9 @@ def pep8(args):
 
     # Ignoring certain errors
     ignore = [
-        'E711', 'E712', # These are comparisons to singletons i.e. == False, and == None. We need these for sqlalchemy.
-        'W291', 'W293', 'E261'
+        'E711', 'E712',  # These are comparisons to singletons i.e. == False, and == None. We need these for sqlalchemy.
+        'W291', 'W293', 'E261',
+        'E128'  # E128 continuation line under-indented for visual indent
     ]
     styleguide = pep8.StyleGuide(show_source=True, ignore=ignore, repeat=1, max_line_length=120,
         parse_argv=args)

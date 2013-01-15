@@ -52,6 +52,6 @@ class FilterExists(object):
                     name = entry['title']
                     if name in dirs or name in files:
                         log.debug('Found %s in %s' % (name, root))
-                        task.reject(entry, os.path.join(root, name))
+                        entry.reject(os.path.join(root, name))
 
 register_plugin(FilterExists, 'exists')

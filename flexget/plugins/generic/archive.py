@@ -327,7 +327,7 @@ class ArchiveInject(object):
             return
         for entry in task.entries:
             if entry.get('injected', False):
-                task.accept(entry, 'injected')
+                entry.accept('injected')
 
 
 class UrlrewriteArchive(object):

@@ -90,6 +90,7 @@ class FlexGetBase(object):
     __tmp__ = False
 
     def __init__(self):
+        self.log = log
         self.manager = None
         self.task = None
         self.database_uri = None

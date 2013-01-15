@@ -2,13 +2,13 @@
 from __future__ import unicode_literals, division, absolute_import
 import os
 import logging
-from flexget import plugin
+from flexget.plugin import register_plugin
 from flexget.entry import Entry
 
 log = logging.getLogger('listdir')
 
 
-class Listdir(plugin.Plugin):
+class Listdir(object):
     """
     Uses local path content as an input.
 
@@ -44,3 +44,6 @@ class Listdir(plugin.Plugin):
                 e['filename'] = name
                 entries.append(e)
         return entries
+
+
+register_plugin(Listdir, 'listdir', api_ver=2)

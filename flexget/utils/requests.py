@@ -44,20 +44,36 @@ def set_unresponsive(url):
     unresponsive_hosts[host] = datetime.now()
 
 
+class FileAdapter(requests.adapters.BaseAdapter):
+    """Handles file:// URIs by passing them to urllib2"""
+    def send(self, request):
+        url = request.url
+        try:
+            raw = urllib2.urlopen(url)
+        except IOError as e:
+            msg = 'IOError openening file %s: %s' % (url, e)
+            log.error(msg)
+            raise RequestException(msg)
+        resp = requests.Response()
+        resp.raw = raw
+        resp.status_code = 200
+        resp.headers = requests.structures.CaseInsensitiveDict(raw.headers)
+        return resp
+
+    def close(self):
+        pass
+
 class Session(requests.Session):
     """Subclass of requests Session class which defines some of our own defaults, records unresponsive sites,
     and raises errors by default."""
 
-    def __init__(self, **kwargs):
+    def __init__(self, timeout=None, max_retries=None):
         """Set some defaults for our session if not explicitly defined."""
-        kwargs.setdefault('timeout', 15)
-        kwargs.setdefault('config', {}).setdefault('max_retries', 1)
-        kwargs.setdefault('prefetch', False)
-        # TODO: This is a temporary fix for requests not properly handling deflate encoding, can be removed when
-        # next version of requests is released (>0.9) See #1412
-        kwargs.setdefault('headers', {}).setdefault('Accept-Encoding', ', '.join(('identity', 'compress', 'gzip')))
-        requests.Session.__init__(self, **kwargs)
-        self.cookiejar = None
+        requests.Session.__init__(self)
+        self.timeout = timeout
+        self.stream = True
+        self.mount('file://', FileAdapter())
+        self.adapters['http://'].max_retries = max_retries or 1
         # Stores min intervals between requests for certain sites
         self.domain_delay = {}
 
@@ -85,20 +101,6 @@ class Session(requests.Session):
         Also raises errors getting the content by default.
         """
 
-        # Handle file URI scheme using urllib2, wrap in requests response object
-        if url.startswith('file://'):
-            try:
-                raw = urllib2.urlopen(url)
-            except IOError as e:
-                msg = 'IOError openening file %s: %s' % (url, e)
-                log.error(msg)
-                raise RequestException(msg)
-            resp = requests.Response()
-            resp.raw = raw
-            resp.status_code = 200
-            resp.headers = requests.structures.CaseInsensitiveDict(raw.headers)
-            return resp
-
         # Raise Timeout right away if site is known to timeout
         if is_unresponsive(url):
             raise requests.Timeout('Requests to this site are known to timeout.')
@@ -117,10 +119,8 @@ class Session(requests.Session):
                 domain_dict['next_req'] = datetime.now() + domain_dict['delay']
                 break
 
-        # Pop our custom keyword argument before calling super method
-        config = kwargs.pop('config', {})
-        config['danger_mode'] = kwargs.pop('raise_status', True)
-        kwargs['config'] = config
+        kwargs.setdefault('timeout', self.timeout)
+        raise_status = kwargs.pop('raise_status', True)
 
         try:
             result = requests.Session.request(self, method, url, *args, **kwargs)
@@ -128,6 +128,9 @@ class Session(requests.Session):
             # Mark this site in known unresponsive list
             set_unresponsive(url)
             raise
+
+        if raise_status:
+            result.raise_for_status()
 
         return result
 

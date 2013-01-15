@@ -304,7 +304,7 @@ class PluginTransmission(TransmissionBase):
 
             # Check that file is downloaded
             if downloaded and not 'file' in entry:
-                task.fail(entry, 'file missing?')
+                entry.fail('file missing?')
                 continue
 
             # Verify the temp file exists
@@ -312,7 +312,7 @@ class PluginTransmission(TransmissionBase):
                 tmp_path = os.path.join(task.manager.config_base, 'temp')
                 log.debug('entry: %s' % entry)
                 log.debug('temp: %s' % ', '.join(os.listdir(tmp_path)))
-                task.fail(entry, "Downloaded temp file '%s' doesn't exist!?" % entry['file'])
+                entry.fail("Downloaded temp file '%s' doesn't exist!?" % entry['file'])
                 continue
 
             try:
@@ -335,7 +335,7 @@ class PluginTransmission(TransmissionBase):
                 log.debug('TransmissionError', exc_info=True)
                 msg = 'TransmissionError: %s' % e.message or 'N/A'
                 log.error(msg)
-                task.fail(entry, msg)
+                entry.fail(msg)
 
     def remove_finished(self, cli):
         # Get a list of active transfers

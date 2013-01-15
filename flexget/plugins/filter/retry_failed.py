@@ -179,7 +179,7 @@ class FilterRetryFailed(object):
                                             filter(FailedEntry.url == entry['original_url']).\
                                             filter(FailedEntry.count > max_count).first()
             if item:
-                task.reject(entry, 'Has already failed %s times in the past' % item.count)
+                entry.reject('Has already failed %s times in the past' % item.count)
 
     def on_task_exit(self, task, config):
         if config is False:
@@ -206,7 +206,7 @@ class FilterRetryFailed(object):
                 self.backlog.add_backlog(task, entry, amount=retry_time)
             if retry_time:
                 fail_reason = item.reason if item else entry.get('reason', 'unknown')
-                task.reject(entry, reason='Waiting before trying failed entry again. (failure reason: %s)' %
+                entry.reject(reason='Waiting before trying failed entry again. (failure reason: %s)' %
                                           fail_reason, remember_time=retry_time)
                 # Cause a task rerun, to look for alternate releases
                 task.rerun()

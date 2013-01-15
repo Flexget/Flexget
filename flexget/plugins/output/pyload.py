@@ -41,7 +41,7 @@ class PluginPyLoad(object):
     """
 
     __author__ = 'http://pyload.org'
-    __version__ = '0.3'
+    __version__ = '0.4'
 
     DEFAULT_API = 'http://localhost:8000/api'
     DEFAULT_QUEUE = False
@@ -49,6 +49,8 @@ class PluginPyLoad(object):
     DEFAULT_HOSTER = []
     DEFAULT_PARSE_URL = False
     DEFAULT_MULTIPLE_HOSTER = True
+    DEFAULT_PREFERRED_HOSTER_ONLY = False
+    DEFAULT_HANDLE_NO_URL_AS_FAILURE = False
 
     def __init__(self):
         self.session = None
@@ -66,6 +68,8 @@ class PluginPyLoad(object):
         advanced.accept('boolean', key='parse_url')
         advanced.accept('boolean', key='multiple_hoster')
         advanced.accept('list', key='hoster').accept('text')
+        advanced.accept('boolean', key='preferred_hoster_only')
+        advanced.accept('boolean', key='handle_no_url_as_failure')
         return root
 
     def on_process_start(self, task, config):
@@ -118,8 +122,8 @@ class PluginPyLoad(object):
                     if not config.get('multiple_hoster', self.DEFAULT_MULTIPLE_HOSTER):
                         break
 
-            # no preferred hoster, add all recognized plugins
-            if not urls:
+            # no preferred hoster and not preferred hoster only - add all recognized plugins
+            if not urls and not config.get('preferred_hoster_only', self.DEFAULT_PREFERRED_HOSTER_ONLY):
                 for name, purls in parsed.iteritems():
                     if name != "BasePlugin":
                         urls.extend(purls)
@@ -130,14 +134,17 @@ class PluginPyLoad(object):
 
             # no urls found
             if not urls:
-                log.info("No suited urls in entry %s" % entry['title'])
+                if config.get('handle_no_url_as_failure', self.DEFAULT_HANDLE_NO_URL_AS_FAILURE):
+                    entry.fail("No suited urls in entry %s" % entry['title'])
+                else:
+                    log.info("No suited urls in entry %s" % entry['title'])
                 continue
 
             log.debug("Add %d urls to pyLoad" % len(urls))
 
             try:
                 dest = 1 if config.get('queue', self.DEFAULT_QUEUE) else 0  # Destination.Queue = 1
-                post = {'name': "'%s'" % entry['title'],
+                post = {'name': "'%s'" % entry['title'].encode("ascii","ignore"),
                         'links': str(urls),
                         'dest': dest,
                         'session': self.session}
@@ -151,7 +158,7 @@ class PluginPyLoad(object):
                     query_api(api, "setPackageData", {'pid': pid, 'data': data, 'session': self.session})
 
             except Exception as e:
-                task.fail(entry, str(e))
+                entry.fail(str(e))
 
     def check_login(self, task, config):
         url = config.get('api', self.DEFAULT_API)
