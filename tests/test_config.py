@@ -1,24 +1,26 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals, division, absolute_import
 from tests import FlexGetBase
+from flexget.manager import Manager
 import os
-import codecs
 
 
 class TestConfig(FlexGetBase):
-    __tmp__ = True
-    __yaml__ = """
-        tasks:
-          Задание:
-            mock:
-              - {title: 'Test', url: 'http://localhost/foo'}
-    """
-
     def setup(self):
         super(TestConfig, self).setup()
-        self.config_file = os.path.join(self.__tmp__, 'config.yml')
-        with codecs.open(self.config_file, 'w', 'utf8') as f:
-            f.write(self.__yaml__)
+        # save original and revert find_config method for tests
+        self.origin_find_config = self.manager.__class__.find_config
+        self.manager.__class__.find_config = Manager.find_config
 
-    def test_config_checker_utf8(self):
-        self.manager.pre_check_config(self.config_file)
+    def teardown(self):
+        # restore original mock method
+        self.manager.__class__.find_config = self.origin_find_config
+        super(TestConfig, self).teardown()
+
+    def test_config_find_load_and_check_utf8(self):
+        config_utf8_filename = os.path.join(self.base_path, 'config_utf8.yml')
+        self.manager.options.config = config_utf8_filename
+
+        self.manager.config = {}
+        self.manager.find_config()
+        assert self.manager.config, 'Config didn\'t load'
