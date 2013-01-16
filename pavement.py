@@ -349,6 +349,9 @@ def bootstrap():
     """
     Current paver bootstrap task ignores the distribute option, do some hackery to fix that.
     This should not be needed after next release of paver (>1.1.1)
+
+    This also prevents --system-site-packages option from being hard coded into bootstrap.py
+    https://github.com/paver/paver/issues/87
     """
     import textwrap
     vopts = options.virtualenv
@@ -357,7 +360,10 @@ def bootstrap():
         more_text = textwrap.dedent("""
         def more_adjust_options(orig_adjust_options):
             def adjust_options(options, args):
+                # Don't let paver overwrite system_site_packages options specified by the user
+                ssp = options.system_site_packages
                 orig_adjust_options(options, args)
+                options.system_site_packages = ssp
                 options.use_distribute = %s
             return adjust_options
         adjust_options = more_adjust_options(adjust_options)
@@ -367,6 +373,5 @@ def bootstrap():
         vopts.get("packages_to_install", []),
         vopts.get("paver_command_line", None),
         dest_dir=vopts.get("dest_dir", '.'),
-        no_site_packages=vopts.get("no_site_packages", False),
         unzip_setuptools=vopts.get("unzip_setuptools", False),
         more_text=more_text)

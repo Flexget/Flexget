@@ -1914,7 +1914,10 @@ def after_install(options, home_dir):
     subprocess.call([join(bin_dir, 'paver'),'develop'])
 def more_adjust_options(orig_adjust_options):
     def adjust_options(options, args):
+        # Don't let paver overwrite system_site_packages options specified by the user
+        ssp = options.system_site_packages
         orig_adjust_options(options, args)
+        options.system_site_packages = ssp
         options.use_distribute = True
     return adjust_options
 adjust_options = more_adjust_options(adjust_options)
