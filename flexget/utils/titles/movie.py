@@ -1,5 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
+import re
+
 from flexget.utils.titles.parser import TitleParser
 from flexget.utils import qualities
 from flexget.utils.tools import str_to_int
@@ -41,6 +43,9 @@ class MovieParser(TitleParser):
 
         if data is None:
             data = self.data
+
+        # Move anything in leading brackets to the end
+        data = re.sub(r'^\[(.*?)\](.*)', r'\2 \1', data)
 
         for char in '[]()_,.':
             data = data.replace(char, ' ')
