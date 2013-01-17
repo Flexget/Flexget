@@ -1,0 +1,4 @@
+tasks:
+  Задание:
+    mock:
+      - {title: 'Test', url: 'http://localhost/foo'}
