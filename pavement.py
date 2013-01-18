@@ -182,7 +182,7 @@ def sdist(options):
         call_task(t)
 
     # restore version ...
-    set_init_version('{subversion}')
+    set_init_version('{git}')
 
 
 @task
@@ -217,7 +217,7 @@ def make_egg(options):
         call_task(t)
 
     # restore version ...
-    set_init_version('{subversion}')
+    set_init_version('{git}')
 
     # restore egg info from backup
     print 'Removing FlexGet.egg-info ...'

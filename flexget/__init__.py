@@ -9,7 +9,7 @@ from flexget.options import CoreArgumentParser
 from flexget import plugin
 from flexget.manager import Manager
 
-__version__ = '{subversion}'
+__version__ = '{git}'
 
 log = logging.getLogger('main')
 

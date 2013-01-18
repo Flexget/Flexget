@@ -120,9 +120,9 @@ try:
                 log.critical('           After getting rid of these FlexGet should run again normally')
 
                 from flexget import __version__ as version
-                if version == '{subversion}':
+                if version == '{git}':
                     log.critical('')
-                    log.critical('           If you are using bootstrapped subversion checkout you can run:')
+                    log.critical('           If you are using bootstrapped git checkout you can run:')
                     log.critical('           bin/paver clean_compiled')
 
                 log.critical('')
@@ -133,13 +133,13 @@ try:
 except:
     pass
 
-# complain if beautifulsoup is screwed (subversion users / because of broken build)
+# complain if beautifulsoup is screwed (git users / because of broken build)
 import BeautifulSoup
 if [int(part) for part in BeautifulSoup.__version__.split('.')] < [3, 2]:
     log.critical('BeautifulSoup is too old, please upgrade it!')
     sys.exit(1)
 
-# complain if beautifulsoup is screwed (subversion users / because of broken build)
+# complain if beautifulsoup is screwed (git users / because of broken build)
 try:
     import BeautifulSoup
     if [int(part) for part in BeautifulSoup.__version__.split('.')] < [3, 2]:

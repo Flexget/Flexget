@@ -198,8 +198,8 @@ class Manager(object):
                 possible.append(os.path.join(xdg_config, 'flexget'))
             # for virtualenv / dev sandbox
             from flexget import __version__ as version
-            if version == '{subversion}':
-                log.debug('Running subversion, adding virtualenv / sandbox paths')
+            if version == '{git}':
+                log.debug('Running git, adding virtualenv / sandbox paths')
                 possible.append(os.path.join(exec_path, '..'))
                 possible.append(current_path)
                 possible.append(exec_path)

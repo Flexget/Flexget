@@ -1,7 +1,10 @@
 from __future__ import unicode_literals, division, absolute_import
 import sys
-from argparse import ArgumentParser as ArgParser, Action, ArgumentError, SUPPRESS
+import subprocess
+from argparse import ArgumentParser as ArgParser, Action, ArgumentError, SUPPRESS, _VersionAction
+
 import flexget
+from flexget.utils.tools import console
 
 
 def required_length(nmin, nmax):
@@ -14,6 +17,27 @@ def required_length(nmin, nmax):
     return RequiredLength
 
 
+class VersionAction(_VersionAction):
+    """
+    Action to print the current version.
+    Also attempts to get more information from git describe if on git checkout.
+    """
+    def __call__(self, parser, namespace, values, option_string=None):
+        if self.version == '{git}':
+            # Attempt to get version from git
+            version = ''
+            try:
+                p = subprocess.Popen('git describe', stdout=subprocess.PIPE)
+                version = p.stdout.read()
+            except Exception:
+                pass
+            if version.startswith('1.0'):
+                self.version += version
+            else:
+                console('Unable to get current version from git.')
+        super(VersionAction, self).__call__(parser, namespace, values, option_string)
+
+
 class ArgumentParser(ArgParser):
     """Contains all the options that both the core and webui should have"""
 
@@ -24,7 +48,7 @@ class ArgumentParser(ArgParser):
 
         ArgParser.__init__(self, **kwargs)
 
-        self.add_argument('-V', '--version', action='version', version=flexget.__version__,
+        self.add_argument('-V', '--version', action=VersionAction, version=flexget.__version__,
                           help='Print FlexGet version and exit.')
         # This option is already handled above.
         self.add_argument('--bugreport', action='store_true', dest='debug_tb',
