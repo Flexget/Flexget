@@ -82,6 +82,15 @@ class TestImdb(FlexGetBase):
                 - english
               reject_languages:
                 - french
+          mpaa:
+            mock:
+            - title: Saw 2004
+              imdb_url: http://www.imdb.com/title/tt0387564/
+            - title: Aladdin 1992
+              imdb_url: http://www.imdb.com/title/tt0103639/
+            imdb:
+              reject_mpaa_ratings:
+              - R
     """
 
     @attr(online=True)
@@ -126,9 +135,8 @@ class TestImdb(FlexGetBase):
         assert not self.task.find_entry('rejected', imdb_name='The Terminator'), \
             'The The Terminator have been rejected'
 
-    # TODO: html parsing needs updating to account for new imdb layout
     @attr(online=True)
-    def _test_directors(self):
+    def test_directors(self):
         self.execute_task('director')
         # check that directors have been parsed properly
         matrix = self.task.find_entry(imdb_name='The Matrix')
@@ -192,6 +200,16 @@ class TestImdb(FlexGetBase):
         assert rockstar == ['hindi'], 'Did not find only primary language'
         breakaway = self.task.find_entry(imdb_name='Breakaway')['imdb_languages']
         assert breakaway == ['punjabi', 'english'], 'Languages were not returned in order of prominence'
+
+    @attr(online=True)
+    def test_mpaa(self):
+        self.execute_task('mpaa')
+        aladdin = self.task.find_entry(imdb_name='Aladdin')
+        assert aladdin['imdb_mpaa_rating'] == 'G', 'Didn\'t get right rating for Aladdin'
+        assert aladdin.accepted, 'Non R rated movie should have been accepted'
+        saw = self.task.find_entry(imdb_name='Saw')
+        assert saw['imdb_mpaa_rating'] == 'R', 'Didn\'t get right rating for Saw'
+        assert not saw.accepted, 'R rated movie should not have been accepted'
 
 
 class TestImdbRequired(FlexGetBase):
