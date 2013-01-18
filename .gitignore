@@ -8,3 +8,4 @@ include/
 lib/
 local
 .idea/
+config.yml
