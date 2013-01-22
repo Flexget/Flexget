@@ -1,6 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
 import re
+from urllib2 import HTTPError
 from flexget.entry import Entry
 from flexget.plugin import priority, register_plugin, get_plugin_by_name, DependencyError
 from flexget.utils.cached_input import cached
@@ -67,7 +68,11 @@ class AppleTrailers(InputRSS):
 
         for url, title in entries.iteritems():
             inc_url = url + 'includes/playlists/web.inc'
-            page = urlopener(inc_url, log)
+            try:
+                page = urlopener(inc_url, log)
+            except HTTPError, err:
+                log.warning("HTTPError when opening playlist page: %d %s" % (err.code, err.reason))
+                continue
 
             soup = get_soup(page)
             links = soup.find_all('a', attrs={'class': 'target-quicktimeplayer', 'href': re.compile(r'_h?480p\.mov$')})
