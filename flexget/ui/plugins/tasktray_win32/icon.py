@@ -52,7 +52,7 @@ class SysTrayIcon(object):
         del self._next_action_id
 
         self.default_menu_index = (default_menu_index or 0)
-        self.window_class_name = window_class_name or "SysTrayIconPy"
+        self.window_class_name = window_class_name or b"SysTrayIconPy"
 
         message_map = {win32gui.RegisterWindowMessage("TaskbarCreated"): self.restart,
                        win32con.WM_DESTROY: self.destroy,
