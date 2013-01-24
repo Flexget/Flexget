@@ -6,6 +6,7 @@ from sqlalchemy import Column, Integer, String, DateTime
 from flexget import schema
 from flexget.plugin import register_plugin, PluginWarning
 from flexget.utils.sqlalchemy_utils import table_columns, table_add_column
+from flexget.utils.template import render_from_task, get_template, RenderError
 
 log = logging.getLogger('make_rss')
 Base = schema.versioned_base('make_rss', 0)
@@ -131,6 +132,8 @@ class OutputRSS(object):
         rss.accept('boolean', key='history')
         rss.accept('text', key='rsslink')
         rss.accept('text', key='encoding') # TODO: only valid choices
+        rss.accept('text', key='title')
+        rss.accept('text', key='description')
         links = rss.accept('list', key='link')
         links.accept('text')
         return root
@@ -148,6 +151,8 @@ class OutputRSS(object):
         config.setdefault('history', True)
         config.setdefault('encoding', 'iso-8859-1')
         config.setdefault('link', ['imdb_url', 'input_url'])
+        config.setdefault("title", "{{title}} (from {{task}})")
+        config.setdefault("description", "{{series_name}} {{series_id}}")
         # add url as last resort
         config['link'].append('url')
         return config
@@ -171,26 +176,26 @@ class OutputRSS(object):
         # save entries into db for RSS generation
         for entry in task.accepted:
             rss = RSSEntry()
-            rss.title = entry['title']
+            rss.title = entry.render(config['title'])
             for field in config['link']:
                 if field in entry:
                     rss.link = entry[field]
                     break
 
-            # TODO: just a quick hack, implement better :)
-            description = ''
-            if 'imdb_score' in entry:
-                description += 'Score: %s / 10 | ' % entry['imdb_score']
-            if 'imdb_votes' in entry:
-                description += 'Votes: %s | ' % entry['imdb_votes']
-            if 'imdb_genres' in entry:
-                description += 'Genres: %s | ' % ', '.join(entry['imdb_genres'])
-            if 'imdb_plot_outline' in entry:
-                description += 'Description: %s' % entry['imdb_plot_outline']
-            else:
-                description += entry.get('description', '')
+                #description = get_template(config['template'], 'rss')
 
-            rss.description = description
+            description = """{% if series_name is defined %}{% if series_banner_url is defined %}<img src="{{series_banner_url}}" />{% endif %}
+{% if series_name_tvdb is defined %}{{series_name_tvdb}}{% else %}{{series_name}}{% endif %} {{series_id}} {{ep_name|d('')}}
+<b>Cast:</b> {{series_actors|d('')}}
+<b>Guest Starring:</b> {{ep_guest_stars|d('')}}
+<b>Overview:</b> {{ep_overview|d('')}}
+{% elif imdb_name is defined %}{{imdb_name}} {{imdb_year}}
+<b>Score:</b> {{imdb_score|d('N/A')}} ({{imdb_votes|d('0')}} votes)
+<b>Genres:</b> {{imdb_genres|d('N/A')}}
+<b>Plot:</b> {{imdb_plot_outline|d('N/A')}}
+{% else %}{{title}}{% endif %}"""
+
+            rss.description = entry.render(description)
             rss.file = config['file']
 
             # TODO: check if this exists and suggest disabling history if it does since it shouldn't happen normally ...
