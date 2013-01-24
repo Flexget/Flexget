@@ -185,7 +185,7 @@ class OutputRSS(object):
                 #description = get_template(config['template'], 'rss')
 
             description = """{% if series_name is defined %}{% if series_banner_url is defined %}<img src="{{series_banner_url}}" />{% endif %}
-{% if series_name_tvdb is defined %}{{series_name_tvdb}}{% else %}{{series_name}}{% endif %} {{series_id}} {{ep_name|d('')}}
+{{series_name_tvdb|d(series_name)}} {{series_id}} {{ep_name|d('')}}
 <b>Cast:</b> {{series_actors|d('')}}
 <b>Guest Starring:</b> {{ep_guest_stars|d('')}}
 <b>Overview:</b> {{ep_overview|d('')}}
