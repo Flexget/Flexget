@@ -6,7 +6,7 @@ from sqlalchemy import Column, Integer, String, DateTime
 from flexget import schema
 from flexget.plugin import register_plugin, PluginWarning
 from flexget.utils.sqlalchemy_utils import table_columns, table_add_column
-from flexget.utils.template import render_from_task, get_template, RenderError
+from flexget.utils.template import render_from_entry, get_template
 
 log = logging.getLogger('make_rss')
 Base = schema.versioned_base('make_rss', 0)
@@ -152,7 +152,7 @@ class OutputRSS(object):
         config.setdefault('encoding', 'iso-8859-1')
         config.setdefault('link', ['imdb_url', 'input_url'])
         config.setdefault("title", "{{title}} (from {{task}})")
-        config.setdefault("description", "{{series_name}} {{series_id}}")
+        config.setdefault("template", "default")
         # add url as last resort
         config['link'].append('url')
         return config
@@ -182,20 +182,19 @@ class OutputRSS(object):
                     rss.link = entry[field]
                     break
 
-                #description = get_template(config['template'], 'rss')
+       #      description = """{% if series_name is defined %}{% if series_banner_url is defined %}<img src="{{series_banner_url}}" />{% endif %}
+# {{series_name_tvdb|d(series_name)}} {{series_id}} {{ep_name|d('')}}
+# <b>Cast:</b> {{series_actors|d('')}}
+# <b>Guest Starring:</b> {{ep_guest_stars|d('')}}
+# <b>Overview:</b> {{ep_overview|d('')}}
+# {% elif imdb_name is defined %}{{imdb_name}} {{imdb_year}}
+# <b>Score:</b> {{imdb_score|d('N/A')}} ({{imdb_votes|d('0')}} votes)
+# <b>Genres:</b> {{imdb_genres|d('N/A')}}
+# <b>Plot:</b> {{imdb_plot_outline|d('N/A')}}
+# {% else %}{{title}}{% endif %}"""
 
-            description = """{% if series_name is defined %}{% if series_banner_url is defined %}<img src="{{series_banner_url}}" />{% endif %}
-{{series_name_tvdb|d(series_name)}} {{series_id}} {{ep_name|d('')}}
-<b>Cast:</b> {{series_actors|d('')}}
-<b>Guest Starring:</b> {{ep_guest_stars|d('')}}
-<b>Overview:</b> {{ep_overview|d('')}}
-{% elif imdb_name is defined %}{{imdb_name}} {{imdb_year}}
-<b>Score:</b> {{imdb_score|d('N/A')}} ({{imdb_votes|d('0')}} votes)
-<b>Genres:</b> {{imdb_genres|d('N/A')}}
-<b>Plot:</b> {{imdb_plot_outline|d('N/A')}}
-{% else %}{{title}}{% endif %}"""
-
-            rss.description = entry.render(description)
+            #rss.description = entry.render(description)
+            rss.description = render_from_entry(get_template(config['template'], 'rss'), entry)
             rss.file = config['file']
 
             # TODO: check if this exists and suggest disabling history if it does since it shouldn't happen normally ...

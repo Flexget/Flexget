@@ -1,0 +1,11 @@
+{% if series_name is defined %}
+{% if series_banner_url is defined %}<img src="{{series_banner_url}}" />{% endif %}
+{% if series_name_tvdb is defined %}{{series_name_tvdb}}{% else %}{{series_name}}{% endif %} {{series_id}} {{ep_name|d('')}}
+{% if series_actors is defined %}<b>Cast:</b> {{series_actors|d('')}}<br/>{% endif %}
+{% if ep_guest_stars is defined %}<b>Guest Starring:</b> {{ep_guest_stars|d('')}}}<br/>{% endif %}
+{% if ep_overview is defined %}<b>Overview:</b> {{ep_overview|d('')}}{% endif %}
+{% elif imdb_name is defined %}{{imdb_name}} {{imdb_year}}
+<b>Score:</b> {{imdb_score|d('N/A')}} ({{imdb_votes|d('0')}} votes)<br/>
+{% if imdb_genres is defined %}<b>Genres:</b> {% for genre in imdb_genres %}{{genre}}{% endfor %}<br/>{% endif %}
+<b>Plot:</b> {{imdb_plot_outline|d('N/A')}}
+{% else %}{{title}}{% endif %}
