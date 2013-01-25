@@ -4,8 +4,6 @@ import urllib2
 import httplib
 import socket
 
-import requests
-
 from flexget.plugin import register_plugin
 
 log = logging.getLogger('spy_headers')
@@ -87,7 +85,7 @@ class PluginSpyHeaders(object):
 
     def log_requests_headers(self, response):
         log.info('Request  : %s' % response.request.url)
-        log.info('Response : %s (%s)' % (response.status_code, requests.codes[response.status_code]))
+        log.info('Response : %s (%s)' % (response.status_code, response.reason))
         log.info('-- Headers: --------------------------')
         for header, value in response.request.headers.iteritems():
             log.info('%s: %s' % (header, value))
