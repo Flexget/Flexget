@@ -44,9 +44,7 @@ class OutputPushover(object):
         # Set the defaults
         config.setdefault("device", None)
         config.setdefault("title", "Download from {{task}}")
-        config.setdefault("message", """{% if series_name is defined %}{{series_name_tvdb|d(series_name)}} {{series_id}} {{ep_name|d('')}}
-        {% elif imdb_name is defined %}{{imdb_name}} {{imdb_year}}
-        {% else %}{{title}}{% endif %}""")
+        config.setdefault("message", """{% if series_name is defined %}{{series_name_tvdb|d(series_name)}} {{series_id}} {{ep_name|d('')}}{% elif imdb_name is defined %}{{imdb_name}} {{imdb_year}}{% else %}{{title}}{% endif %}""")
         config.setdefault("priority", 0)
         config.setdefault("url", "{% if imdb_url is defined %}{{imdb_url}}{% endif %}")
 
