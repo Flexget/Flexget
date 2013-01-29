@@ -26,6 +26,7 @@ CATEGORIES = {
     'Documentaries': 29
 }
 
+
 class UrlRewriteTorrentleech(object):
     """
         Torrentleech urlrewriter and search plugin.
@@ -42,7 +43,6 @@ class UrlRewriteTorrentleech(object):
 
     def validator(self):
         root = validator.factory()
-        root.accept('boolean')
         advanced = root.accept('dict')
         advanced.accept('text', key='rss_key', required=True)
         advanced.accept('text', key='username', required=True)
@@ -82,10 +82,10 @@ class UrlRewriteTorrentleech(object):
         """
         Search for name from torrentleech.
         """
-        rss_key=config['rss_key']
+        rss_key = config['rss_key']
         
         # build the form request:
-        data = {'username':config['username'], 'password':config['password'], 'remember_me':'on', 'submit':'submit'}
+        data = {'username': config['username'], 'password': config['password'], 'remember_me': 'on', 'submit': 'submit'}
         # POST the login form:
         login = requests.post('http://torrentleech.org/', data=data)
 
@@ -110,9 +110,9 @@ class UrlRewriteTorrentleech(object):
         soup = get_soup(page)
         
         entries = []
-        for tr in soup.find_all("tr", ["even","odd"]):
+        for tr in soup.find_all("tr", ["even", "odd"]):
             # within each even or odd row, find the torrent names
-            link=tr.find("a", attrs={'href':re.compile('/torrent/\d+')})
+            link = tr.find("a", attrs={'href': re.compile('/torrent/\d+')})
             log.debug('link phase: %s' % link.contents[0])
             # extracts the contents of the <a>titlename/<a> tag
             comparator.set_seq2(link.contents[0])
@@ -120,21 +120,21 @@ class UrlRewriteTorrentleech(object):
             log.debug('found name: %s' % comparator.b)
             log.debug('confidence: %s' % comparator.ratio())
             if not comparator.matches():
-            	continue
+                continue
             entry = Entry()
             entry['title'] = link.contents[0]
             
             # find download link
-            torrent_url = tr.find("a", attrs={'href':re.compile('/download/\d+/.*')}).get('href')
+            torrent_url = tr.find("a", attrs={'href': re.compile('/download/\d+/.*')}).get('href')
             # parse link and split along /download/12345 and /name.torrent
             download_url = re.search('(/download/\d+)/(.+\.torrent)', torrent_url)
             # change link to rss and splice in rss_key
-            torrent_url = 'http://torrentleech.org/rss' + download_url.group(1) + '/' + rss_key + '/' +download_url.group(2)
+            torrent_url = 'http://torrentleech.org/rss' + download_url.group(1) + '/' + rss_key + '/' + download_url.group(2)
             log.debug('RSS-ified download link: %s' % torrent_url)
             entry['url'] = torrent_url
             
             # us tr object for seeders/leechers
-            seeders, leechers = tr.find_all('td', ["seeders","leechers"])
+            seeders, leechers = tr.find_all('td', ["seeders", "leechers"])
             entry['torrent_seeds'] = int(seeders.contents[0])
             entry['torrent_leeches'] = int(leechers.contents[0])
             entry['search_ratio'] = comparator.ratio()
