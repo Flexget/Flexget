@@ -176,7 +176,7 @@ class TorrentAlive(object):
         for entry in task.entries:
             if 'torrent_seeds' in entry and entry['torrent_seeds'] < config['min_seeds']:
                 entry.reject(reason='Had < %d required seeds. (%s)' %
-                                          (config['min_seeds'], entry['torrent_seeds']))
+                            (config['min_seeds'], entry['torrent_seeds']))
 
     # Run on output phase so that we let torrent plugin output modified torrent file first
     @priority(250)
