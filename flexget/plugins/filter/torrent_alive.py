@@ -4,7 +4,6 @@ import threading
 import socket
 from urlparse import urlparse
 import struct
-import re
 from random import randrange
 from httplib import BadStatusLine
 from urllib import quote
@@ -50,19 +49,14 @@ def max_seeds_from_threads(threads):
 
 
 def get_scrape_url(tracker_url, info_hash):
-    #added elif to remove the `announce` log from udp trackers
     if 'announce' in tracker_url:
         result = tracker_url.replace('announce', 'scrape')
-    elif tracker_url.startswith('http:'):
+    elif tracker_url.startswith('http:'): # Check only HTTP not UDP
         log.debug('`announce` not contained in tracker url, guessing scrape address.')
         result = tracker_url + '/scrape'
     else:
         result = tracker_url + '/scrape'
 
-##### Leaving the old if for unknown reasons ######
-#    if result.startswith('udp:'):
-#        result = result.replace('udp:', 'http:')
-#####################################################
     result += '&' if '?' in result else '?'
     result += 'info_hash=%s' % quote(info_hash.decode('hex'))
     return result
@@ -73,9 +67,8 @@ def get_udp_seeds(url,info_hash):
 
     connection_id = 0x41727101980 # connection id is always this
     transaction_id = randrange(1,65535) # Random Transaction ID creation
-        
-
-    #Create the socket
+      
+    # Create the socket
     try:
         clisocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         clisocket.settimeout(5.0)
@@ -114,10 +107,10 @@ def get_udp_seeds(url,info_hash):
     seeders, completed, leechers = struct.unpack(b">LLL", res[index:index+12]) # set seeders, completed, leechers to values recieved from packet res in 12 bit increments
     log.debug('get_udp_seeds is returning: %s', seeders)
     clisocket.close()
-    return seeders # return seeders since that is all we are looking for
+    return seeders 
 
 
-def get_http_seeds(url, info_hash):     # Renamed the old get_tracker_seeds to be used just with http requests the new from get_tracker_seeds
+def get_http_seeds(url, info_hash):
     url = get_scrape_url(url, info_hash)
     if not url:
         log.debug('if not url is true returning 0')
@@ -141,8 +134,7 @@ def get_http_seeds(url, info_hash):     # Renamed the old get_tracker_seeds to b
     log.debug('get_http_seeds is returning: %s' % data.values()[0]['complete'])
     return data.values()[0]['complete']
 
-def get_tracker_seeds(url, info_hash): # Remade the tracker_seeds to call for udp and http trackers
-    #log.debug('Checking for seeds from %s' %parsed_url)
+def get_tracker_seeds(url, info_hash):
     if url.startswith('udp'):
         return get_udp_seeds(url, info_hash)
     elif url.startswith('http'):
