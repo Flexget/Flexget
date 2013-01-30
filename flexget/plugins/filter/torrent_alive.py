@@ -32,6 +32,7 @@ class TorrentAliveThread(threading.Thread):
         else:
             log.debug('%s seeds found from %s' % (self.tracker_seeds, get_scrape_url(self.tracker, self.info_hash)))
 
+
 def max_seeds_from_threads(threads):
     """
     Joins the threads and returns the maximum seeds found from any of them.
@@ -61,12 +62,13 @@ def get_scrape_url(tracker_url, info_hash):
     result += 'info_hash=%s' % quote(info_hash.decode('hex'))
     return result
 
-def get_udp_seeds(url,info_hash):
+
+def get_udp_seeds(url, info_hash):
     parsed_url = urlparse(url)
     log.debug('Checking for seeds from %s' % url)
 
     connection_id = 0x41727101980 # connection id is always this
-    transaction_id = randrange(1,65535) # Random Transaction ID creation
+    transaction_id = randrange(1, 65535) # Random Transaction ID creation
       
     # Create the socket
     try:
@@ -81,7 +83,7 @@ def get_udp_seeds(url,info_hash):
         # set 16 bytes ["QLL" = 16 bytes] for the fmq for unpack
         res = clisocket.recv(16)
         # check recieved packet for response
-        action,transaction_id,connection_id = struct.unpack(b">LLQ",res) 
+        action, transaction_id, connection_id = struct.unpack(b">LLQ", res) 
 
         #build packet hash out of decoded info_hash
         packet_hash = info_hash.decode('hex')
@@ -104,7 +106,7 @@ def get_udp_seeds(url,info_hash):
         return 0
 
     index = 8 # index 8 because the first 8 bits are not needed
-    seeders, completed, leechers = struct.unpack(b">LLL", res[index:index+12]) # set seeders, completed, leechers to values recieved from packet res in 12 bit increments
+    seeders, completed, leechers = struct.unpack(b">LLL", res[index:index + 12])
     log.debug('get_udp_seeds is returning: %s', seeders)
     clisocket.close()
     return seeders 
@@ -134,6 +136,7 @@ def get_http_seeds(url, info_hash):
     log.debug('get_http_seeds is returning: %s' % data.values()[0]['complete'])
     return data.values()[0]['complete']
 
+
 def get_tracker_seeds(url, info_hash):
     if url.startswith('udp'):
         return get_udp_seeds(url, info_hash)
@@ -142,6 +145,7 @@ def get_tracker_seeds(url, info_hash):
     else:
         log.warning('There has beena problem with the get_tracker_seeds')
         return 0
+
 
 class TorrentAlive(object):
 
