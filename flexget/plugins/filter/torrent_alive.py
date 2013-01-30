@@ -24,13 +24,8 @@ class TorrentAliveThread(threading.Thread):
         self.tracker_seeds = 0
 
     def run(self):
-        try:
-            self.tracker_seeds = get_tracker_seeds(self.tracker, self.info_hash)
-        except URLError as e:
-            log.debug('Error scraping %s: %s' % (self.tracker, e))
-            self.tracker_seeds = 0
-        else:
-            log.debug('%s seeds found from %s' % (self.tracker_seeds, get_scrape_url(self.tracker, self.info_hash)))
+        self.tracker_seeds = get_tracker_seeds(self.tracker, self.info_hash)
+        log.debug('%s seeds found from %s' % (self.tracker_seeds, get_scrape_url(self.tracker, self.info_hash)))
 
 
 def max_seeds_from_threads(threads):
@@ -52,10 +47,8 @@ def max_seeds_from_threads(threads):
 def get_scrape_url(tracker_url, info_hash):
     if 'announce' in tracker_url:
         result = tracker_url.replace('announce', 'scrape')
-    elif tracker_url.startswith('http:'): # Check only HTTP not UDP
-        log.debug('`announce` not contained in tracker url, guessing scrape address.')
-        result = tracker_url + '/scrape'
     else:
+        log.debug('`announce` not contained in tracker url, guessing scrape address.')
         result = tracker_url + '/scrape'
 
     result += '&' if '?' in result else '?'
@@ -67,9 +60,9 @@ def get_udp_seeds(url, info_hash):
     parsed_url = urlparse(url)
     log.debug('Checking for seeds from %s' % url)
 
-    connection_id = 0x41727101980 # connection id is always this
-    transaction_id = randrange(1, 65535) # Random Transaction ID creation
-      
+    connection_id = 0x41727101980  # connection id is always this
+    transaction_id = randrange(1, 65535)  # Random Transaction ID creation
+
     # Create the socket
     try:
         clisocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -77,19 +70,19 @@ def get_udp_seeds(url, info_hash):
         clisocket.connect((parsed_url.hostname, parsed_url.port))
 
         # build packet with connection_ID, using 0 value for action, giving our transaction ID for this packet
-        packet = struct.pack(b">QLL", connection_id, 0, transaction_id) 
+        packet = struct.pack(b">QLL", connection_id, 0, transaction_id)
         clisocket.send(packet)
-        
+
         # set 16 bytes ["QLL" = 16 bytes] for the fmq for unpack
         res = clisocket.recv(16)
         # check recieved packet for response
-        action, transaction_id, connection_id = struct.unpack(b">LLQ", res) 
+        action, transaction_id, connection_id = struct.unpack(b">LLQ", res)
 
         #build packet hash out of decoded info_hash
         packet_hash = info_hash.decode('hex')
 
         # construct packet for scrape with decoded info_hash setting action byte to 2 for scape
-        packet = struct.pack(b">QLL", connection_id, 2, transaction_id) + packet_hash 
+        packet = struct.pack(b">QLL", connection_id, 2, transaction_id) + packet_hash
 
         clisocket.send(packet)
         # set recieve size of 8 + 12 bytes
@@ -98,18 +91,17 @@ def get_udp_seeds(url, info_hash):
     except IOError as e:
         log.warning('Socket Error: %s', e)
         return 0
-    # Made Check for UDP error packet
-    check_packet = res[:]
-    action, transaction_id, totalseeds = struct.unpack(b">LLL", check_packet[:12])
+    # Check for UDP error packet
+    (action,) = struct.unpack(b">L", res[:4])
     if action == 3:
         log.error('There was a UDP Packet Error 3')
         return 0
 
-    index = 8 # index 8 because the first 8 bits are not needed
-    seeders, completed, leechers = struct.unpack(b">LLL", res[index:index + 12])
+    # first 8 bytes are followed by seeders, completed and leechers for requested torrent
+    seeders, completed, leechers = struct.unpack(b">LLL", res[8:20])
     log.debug('get_udp_seeds is returning: %s', seeders)
     clisocket.close()
-    return seeders 
+    return seeders
 
 
 def get_http_seeds(url, info_hash):
@@ -121,6 +113,9 @@ def get_http_seeds(url, info_hash):
     data = None
     try:
         data = bdecode(urlopener(url, log, retries=1, timeout=10).read()).get('files')
+    except URLError as e:
+        log.debug('Error scraping: %s' % e)
+        return 0
     except SyntaxError as e:
         log.warning('Error decoding tracker response: %s' % e)
         return 0
@@ -227,7 +222,7 @@ class TorrentAlive(object):
                 # Reject if needed
                 if seeds < min_seeds:
                     entry.reject(reason='Tracker(s) had < %s required seeds. (%s)' % (min_seeds, seeds),
-                        remember_time=config['reject_for'])
+                                 remember_time=config['reject_for'])
                     task.rerun()
                 else:
                     log.debug('Found %i seeds from trackers' % seeds)
