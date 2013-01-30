@@ -50,19 +50,26 @@ def max_seeds_from_threads(threads):
 
 
 def get_scrape_url(tracker_url, info_hash):
+    #added elif to remove the `announce` log from udp trackers
     if 'announce' in tracker_url:
         result = tracker_url.replace('announce', 'scrape')
-    else:
+    elif tracker_url.startswith('http:'):
         log.debug('`announce` not contained in tracker url, guessing scrape address.')
         result = tracker_url + '/scrape'
-    if result.startswith('udp:'):
-        result = result.replace('udp:', 'http:')
+    else:
+        result = tracker_url + '/scrape'
+
+##### Leaving the old if for unknown reasons ######
+#    if result.startswith('udp:'):
+#        result = result.replace('udp:', 'http:')
+#####################################################
     result += '&' if '?' in result else '?'
     result += 'info_hash=%s' % quote(info_hash.decode('hex'))
     return result
 
 def get_udp_seeds(url,info_hash):
-    parsedurl = urlparse(url)
+    parsed_url = urlparse(url)
+    log.debug('Checking for seeds from %s' % url)
 
     connection_id = 0x41727101980 # connection id is always this
     transaction_id = randrange(1,65535) # Random Transaction ID creation
@@ -72,24 +79,40 @@ def get_udp_seeds(url,info_hash):
     try:
         clisocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         clisocket.settimeout(5.0)
-        clisocket.connect((parsedurl.hostname, parsedurl.port))
-        packet = struct.pack(b">QLL", connection_id, 0, transaction_id) # build packet with connection_ID, using 0 value for connect, giving our transaction ID for this packet
-        clisocket.send(packet)
-        res = clisocket.recv(16) # set 16 bits ["QLL" = 16 bits] for the fmq for unpack
-        action,transaction_id,connection_id = struct.unpack(b">LLQ",res) #check recieved packet for response
-        # maybe an if statement here checking action bit to check for error code action = 3
-        packet_hash = info_hash.decode('hex') #build packet hash out of decoded info_hash
+        clisocket.connect((parsed_url.hostname, parsed_url.port))
 
-        packet = struct.pack(b">QLL", connection_id, 2, transaction_id) + packet_hash # construct packet for scrape with decoded info_hash
+        # build packet with connection_ID, using 0 value for action, giving our transaction ID for this packet
+        packet = struct.pack(b">QLL", connection_id, 0, transaction_id) 
+        clisocket.send(packet)
+        
+        # set 16 bytes ["QLL" = 16 bytes] for the fmq for unpack
+        res = clisocket.recv(16)
+        # check recieved packet for response
+        action,transaction_id,connection_id = struct.unpack(b">LLQ",res) 
+
+        #build packet hash out of decoded info_hash
+        packet_hash = info_hash.decode('hex')
+
+        # construct packet for scrape with decoded info_hash setting action byte to 2 for scape
+        packet = struct.pack(b">QLL", connection_id, 2, transaction_id) + packet_hash 
 
         clisocket.send(packet)
-        res = clisocket.recv(20) # recieve size of 8 + 12 bits
-    except socket.error, e:
-        log.debug('Random socket error!')
+        # set recieve size of 8 + 12 bytes
+        res = clisocket.recv(20)
+
+    except IOError as e:
+        log.warning('Socket Error: %s', e)
         return 0
+    # Made Check for UDP error packet
+    check_packet = res[:]
+    action, transaction_id, totalseeds = struct.unpack(b">LLL", check_packet[:12])
+    if action == 3:
+        log.error('There was a UDP Packet Error 3')
+        return 0
+
     index = 8 # index 8 because the first 8 bits are not needed
     seeders, completed, leechers = struct.unpack(b">LLL", res[index:index+12]) # set seeders, completed, leechers to values recieved from packet res in 12 bit increments
-    log.debug('get_udp_seeds is returning: %s' % seeders)
+    log.debug('get_udp_seeds is returning: %s', seeders)
     clisocket.close()
     return seeders # return seeders since that is all we are looking for
 
@@ -119,7 +142,7 @@ def get_http_seeds(url, info_hash):     # Renamed the old get_tracker_seeds to b
     return data.values()[0]['complete']
 
 def get_tracker_seeds(url, info_hash): # Remade the tracker_seeds to call for udp and http trackers
-    #log.debug('Checking for seeds from %s' %parsedurl)
+    #log.debug('Checking for seeds from %s' %parsed_url)
     if url.startswith('udp'):
         return get_udp_seeds(url, info_hash)
     elif url.startswith('http'):
