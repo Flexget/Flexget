@@ -270,8 +270,8 @@ class ImdbParser(object):
             else:
                 log.warning('Unable to get votes for %s - plugin needs update?' % url)
 
-            # get score
-            span_score = soup.find(itemprop='ratingValue')
+            # get score - find the ratingValue item that contains a numerical value
+            span_score = soup.find(itemprop='ratingValue', text=re.compile('[\d\.]+'))
             if span_score:
                 try:
                     self.score = float(span_score.string)
@@ -286,7 +286,7 @@ class ImdbParser(object):
             self.genres.append(link.text.lower())
 
         # get languages
-        for link in soup.find_all('a', attrs={'itemprop': 'inLanguage'}):
+        for link in soup.find_all('a', href=re.compile('/language/.*')):
             # skip non-primary languages "(a few words)", etc.
             m = re.search('(?x) \( [^()]* \\b few \\b', link.next_sibling)
             if not m:
