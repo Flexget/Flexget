@@ -89,7 +89,7 @@ class PluginRottenTomatoesLookup(object):
         :raises PluginError: Failure reason
         """
         imdb_id = entry.get('imdb_id', eval_lazy=False) or \
-                  imdb.extract_id(entry.get('imdb_url', eval_lazy=False))
+            imdb.extract_id(entry.get('imdb_url', eval_lazy=False))
         if imdb_id:
             movie = lookup_movie(title=entry.get('imdb_name'),
                                  year=entry.get('imdb_year'),

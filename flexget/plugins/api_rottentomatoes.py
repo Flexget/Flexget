@@ -284,11 +284,11 @@ def lookup_movie(title=None, year=None, rottentomatoes_id=None, imdb_id=None, sm
     # Try to lookup from cache
     if rottentomatoes_id:
         movie = session.query(RottenTomatoesMovie).\
-                filter(RottenTomatoesMovie.id == rottentomatoes_id).first()
+            filter(RottenTomatoesMovie.id == rottentomatoes_id).first()
     if not movie and imdb_id:
         alt_id = session.query(RottenTomatoesAlternateId).\
-                 filter(RottenTomatoesAlternateId.name.in_(['imdb', 'flexget_imdb'])).\
-                 filter(RottenTomatoesAlternateId.id == imdb_id.lstrip('t')).first()
+            filter(RottenTomatoesAlternateId.name.in_(['imdb', 'flexget_imdb'])).\
+            filter(RottenTomatoesAlternateId.id == imdb_id.lstrip('t')).first()
         if alt_id:
             movie = session.query(RottenTomatoesMovie).filter(RottenTomatoesMovie.id == alt_id.movie_id).first()
     if not movie and title:
@@ -299,7 +299,7 @@ def lookup_movie(title=None, year=None, rottentomatoes_id=None, imdb_id=None, sm
         if not movie:
             log.debug('No matches in movie cache found, checking search cache.')
             found = session.query(RottenTomatoesSearchResult).\
-                    filter(func.lower(RottenTomatoesSearchResult.search) == search_string).first()
+                filter(func.lower(RottenTomatoesSearchResult.search) == search_string).first()
             if found and found.movie:
                 log.debug('Movie found in search cache.')
                 movie = found.movie

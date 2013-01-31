@@ -37,7 +37,7 @@ class SeriesParser(TitleParser):
     # Make sure none of these are found embedded within a word or other numbers
     ep_regexps = ReList([TitleParser.re_not_in_word(regexp) for regexp in [
         '(?:series|season|s)\s?(\d{1,3})(?:\s(?:.*\s)?)?(?:episode|ep|e|part|pt)\s?(\d{1,3}|%s)(?:\s?e?(\d{1,2}))?' %
-            roman_numeral_re,
+        roman_numeral_re,
         '(?:series|season)\s?(\d{1,3})\s(\d{1,3})\s?of\s?(?:\d{1,3})',
         '(\d{1,2})\s?x\s?(\d+)(?:\s(\d{1,2}))?',
         '(\d{1,3})\s?of\s?(?:\d{1,3})',

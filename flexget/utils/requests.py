@@ -63,6 +63,7 @@ class FileAdapter(requests.adapters.BaseAdapter):
     def close(self):
         pass
 
+
 class Session(requests.Session):
     """Subclass of requests Session class which defines some of our own defaults, records unresponsive sites,
     and raises errors by default."""

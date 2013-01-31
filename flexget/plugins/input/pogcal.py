@@ -7,6 +7,7 @@ from flexget import plugin
 
 log = logging.getLogger('pogcal')
 
+
 class InputPogDesign(object):
 
     def validator(self):

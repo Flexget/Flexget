@@ -93,7 +93,7 @@ class FilterImdbRated(object):
             imdb_url = 'http://www.imdb.com%s' % a_imdb_link.get('href')
 
             if not task.session.query(ImdbRated).filter(ImdbRated.url == config['url']).\
-                                                 filter(ImdbRated.imdb_url == imdb_url).first():
+                    filter(ImdbRated.imdb_url == imdb_url).first():
                 rated = ImdbRated(config['url'], imdb_url)
                 task.session.add(rated)
                 log.debug('adding %s' % rated)
@@ -124,8 +124,8 @@ class FilterImdbRated(object):
                 continue
 
             is_rated = task.session.query(ImdbRated).\
-                       filter(ImdbRated.url == config['url']).\
-                       filter(ImdbRated.imdb_url == entry['imdb_url']).first() is not None
+                filter(ImdbRated.url == config['url']).\
+                filter(ImdbRated.imdb_url == entry['imdb_url']).first() is not None
 
             if config.get('reverse', False):
                 # reversed, reject unrated

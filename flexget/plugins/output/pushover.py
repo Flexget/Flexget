@@ -9,6 +9,7 @@ __version__ = 0.1
 client_headers = {"User-Agent": "FlexGet Pushover plugin/%s" % str(__version__)}
 pushover_url = "https://api.pushover.net/1/messages.json"
 
+
 class OutputPushover(object):
     """
     Example::

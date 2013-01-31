@@ -23,7 +23,7 @@ class ImdbList(object):
         from flexget import validator
         root = validator.factory('dict')
         root.accept('regexp_match', key='user_id').\
-             accept(USER_ID_RE, message='user_id must be in the form urXXXXXXX')
+            accept(USER_ID_RE, message='user_id must be in the form urXXXXXXX')
         root.accept('text', key='username')
         root.accept('text', key='password')
         root.accept('text', key='list', required=True)

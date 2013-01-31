@@ -31,6 +31,7 @@ SORT = {
     'leechers': 9
 }
 
+
 class UrlRewritePirateBay(object):
     """PirateBay urlrewriter."""
 

@@ -8,6 +8,7 @@ from flexget.plugins.modify import torrent as modify_torrent
 
 log = logging.getLogger('torrent_scrub')
 
+
 class TorrentScrub(object):
     """ Scrubs torrents from unwanted keys.
 

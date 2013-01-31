@@ -18,6 +18,7 @@ REPUTATIONS = { # Maps reputation name to feed address
     'verified': 'feed_verified'
 }
 
+
 class UrlRewriteTorrentz(object):
     """Torrentz urlrewriter."""
 

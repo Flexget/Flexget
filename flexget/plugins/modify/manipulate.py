@@ -66,7 +66,6 @@ class Manipulate(object):
         modified = sum(self.process(entry, self.phase_jobs['metainfo']) for entry in task.entries)
         log.verbose('Modified %d entries.' % modified)
 
-
     @priority(255)
     def on_task_filter(self, task, config):
         if not self.phase_jobs['filter']:
@@ -102,7 +101,7 @@ class Manipulate(object):
                     if not field_value:
                         log.warning('Cannot extract, field `%s` is not present' % from_field)
                         continue
-                    match = re.search(config['extract'], field_value, re.I|re.U)
+                    match = re.search(config['extract'], field_value, re.I | re.U)
                     if match:
                         groups = [x for x in match.groups() if x is not None]
                         log.debug('groups: %s' % groups)
@@ -114,7 +113,7 @@ class Manipulate(object):
                         log.warning('Cannot replace, field `%s` is not present' % from_field)
                         continue
                     replace_config = config['replace']
-                    regexp = re.compile(replace_config['regexp'], flags=re.I|re.U)
+                    regexp = re.compile(replace_config['regexp'], flags=re.I | re.U)
                     field_value = regexp.sub(replace_config['format'], field_value).strip()
                     log.debug('field `%s` after replace: `%s`' % (field, field_value))
 

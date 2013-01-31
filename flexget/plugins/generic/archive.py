@@ -171,8 +171,8 @@ class Archive(object):
                 processed.append(entry)
 
             ae = task.session.query(ArchiveEntry).\
-                 filter(ArchiveEntry.title == entry['title']).\
-                 filter(ArchiveEntry.url == entry['url']).first()
+                filter(ArchiveEntry.title == entry['title']).\
+                filter(ArchiveEntry.url == entry['url']).first()
             if ae:
                 # add (missing) sources
                 source = get_source(task.name, task.session)
@@ -274,7 +274,7 @@ class ArchiveInject(object):
                         if source.name in task.manager.tasks:
                             break
                     else:
-                        log.error('None of sources (%s) exists anymore, cannot inject `%s` from archive!' %\
+                        log.error('None of sources (%s) exists anymore, cannot inject `%s` from archive!' %
                                   (', '.join([s.name for s in archive_entry.sources]), archive_entry.title))
                         continue
 
@@ -407,9 +407,9 @@ def consolidate():
             #orig.task = None
 
             for dupe in session.query(ArchiveEntry).\
-                        filter(ArchiveEntry.id != orig.id).\
-                        filter(ArchiveEntry.title == orig.title).\
-                        filter(ArchiveEntry.url == orig.url).all():
+                filter(ArchiveEntry.id != orig.id).\
+                filter(ArchiveEntry.title == orig.title).\
+                    filter(ArchiveEntry.url == orig.url).all():
                 orig.sources.append(get_source(dupe.task, session))
                 duplicates.append(dupe.id)
 
@@ -456,7 +456,7 @@ def tag_source(source_name, tag_names=None):
         # tag 'em
         log.verbose('Please wait while adding tags %s ...' % (', '.join(tag_names)))
         for a in session.query(ArchiveEntry).\
-        filter(ArchiveEntry.sources.any(name=source_name)).yield_per(5):
+            filter(ArchiveEntry.sources.any(name=source_name)).yield_per(5):
             a.tags.extend(tags)
     finally:
         session.commit()
@@ -542,7 +542,7 @@ class ArchiveCli(object):
         def print_ae(ae):
             diff = datetime.now() - ae.added
 
-            console('ID: %-6s | Title: %s\nAdded: %s (%d days ago)\nURL: %s' %\
+            console('ID: %-6s | Title: %s\nAdded: %s (%d days ago)\nURL: %s' %
                     (ae.id, ae.title, ae.added, diff.days, ae.url))
             source_names = ', '.join([s.name for s in ae.sources])
             tag_names = ', '.join([t.name for t in ae.tags])

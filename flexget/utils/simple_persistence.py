@@ -79,7 +79,7 @@ class SimplePersistence(DictMixin):
     def __setitem__(self, key, value):
         session = self.session or Session()
         skv = session.query(SimpleKeyValue).filter(SimpleKeyValue.task == self.taskname).\
-                filter(SimpleKeyValue.plugin == self.plugin).filter(SimpleKeyValue.key == key).first()
+            filter(SimpleKeyValue.plugin == self.plugin).filter(SimpleKeyValue.key == key).first()
         if skv:
             # update existing
             log.debug('updating key %s value %s' % (key, repr(value)))
@@ -116,7 +116,7 @@ class SimplePersistence(DictMixin):
     def keys(self):
         session = self.session or Session()
         query = session.query(SimpleKeyValue.key).filter(SimpleKeyValue.task == self.taskname).\
-             filter(SimpleKeyValue.plugin == self.plugin).all()
+            filter(SimpleKeyValue.plugin == self.plugin).all()
         if query:
             return [item.key for item in query]
         else:

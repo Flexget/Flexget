@@ -14,6 +14,7 @@ def plugin_infos(plugins):
 
     return dict((p.name, plugin_info(p)) for p in plugins)
 
+
 # JSON API
 @plugins_module.route('/all')
 def all_plugins():

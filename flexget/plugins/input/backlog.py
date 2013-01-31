@@ -100,7 +100,7 @@ class InputBacklog(object):
         session = Session()
         expire_time = datetime.now() + parse_timedelta(amount)
         backlog_entry = session.query(BacklogEntry).filter(BacklogEntry.title == entry['title']).\
-                                                filter(BacklogEntry.task == task.name).first()
+            filter(BacklogEntry.task == task.name).first()
         if backlog_entry:
             # If there is already a backlog entry for this, update the expiry time if necessary.
             if backlog_entry.expire < expire_time:

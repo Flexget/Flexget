@@ -122,6 +122,7 @@ class MovieQueueManager(object):
 
         console('-' * 79)
 
+
 class MovieQueueAction(Action):
     def __call__(self, parser, namespace, values, option_string=None):
         options = namespace.movie_queue = {}
@@ -148,7 +149,7 @@ class MovieQueueAction(Action):
                 options['quality'] = qualities.Requirements(values[2])
             except ValueError as e:
                 raise ArgumentError(self, '`%s` is an invalid quality requirement string: %s' %
-                                       (values[2], e.message))
+                                    (values[2], e.message))
         else:
             options['quality'] = qualities.Requirements('any')
             # TODO: Get default from config somehow?

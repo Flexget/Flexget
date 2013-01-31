@@ -29,7 +29,7 @@ class NzbSize(object):
 
         for entry in task.accepted:
             if entry.get('mime-type', None) in [u'text/nzb', u'application/x-nzb'] or \
-               entry.get('filename', '').endswith('.nzb'):
+                    entry.get('filename', '').endswith('.nzb'):
 
                 if 'file' not in entry:
                     log.warning('`%s` does not have a `file` that could be used to get size information' %

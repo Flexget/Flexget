@@ -2,6 +2,7 @@ from __future__ import unicode_literals, division, absolute_import
 from flexget import plugin
 from flexget import validator
 
+
 class Magnets(object):
     """Removes magnet urls form the urls list. Rejects entries that have nothing but magnet urls."""
     def validator(self):
