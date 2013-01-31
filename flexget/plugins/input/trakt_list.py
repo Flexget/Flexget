@@ -111,7 +111,7 @@ class TraktList(object):
             if task.requests.post(
                     'http://api.trakt.tv/account/test/' + config['api_key'],
                     data=json.dumps(auth), raise_status=False
-                    ).status_code != 200:
+            ).status_code != 200:
                 raise PluginError('Authentication to trakt failed.')
 
         if 'error' in data:

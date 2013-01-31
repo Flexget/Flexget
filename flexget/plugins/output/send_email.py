@@ -19,6 +19,7 @@ log = logging.getLogger('email')
 # A dict which stores the email content from each task when plugin is configured globally
 task_content = {}
 
+
 def options_validator():
     email = validator.factory('dict')
     email.accept('boolean', key='active')
@@ -93,7 +94,6 @@ def global_send(manager):
     else:
         subject = '[FlexGet] Notifications for task(s): %s' % ', '.join(task_content)
     send_email(subject, content, config)
-
 
 
 def send_email(subject, content, config):

@@ -61,7 +61,7 @@ class UrlRewriteIsoHunt(object):
         optionlist = ['misc', 'movies', 'audio', 'tv', 'games', 'apps', 'pics', 'anime', 'comics', 'books',
                       'music video', 'unclassified', 'all']
         url = 'http://isohunt.com/js/rss/%s?iht=%s&noSL' % (
-        urllib.quote(name.encode('utf-8')), optionlist.index(config))
+            urllib.quote(name.encode('utf-8')), optionlist.index(config))
 
         log.debug('requesting: %s' % url)
         rss = feedparser.parse(url)
