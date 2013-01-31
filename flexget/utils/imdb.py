@@ -168,7 +168,7 @@ class ImdbSearch(object):
             ratio = seq.ratio()
 
             # check if some of the akas have better ratio
-            for aka in link.parent.find_all('p', attrs={'class': 'find-aka'}):
+            for aka in link.parent.find_all('i'):
                 aka = aka.next.string
                 match = re.search(r'".*"', aka)
                 if not match:
@@ -232,12 +232,12 @@ class ImdbParser(object):
                 self.photo = tag_img.get('src')
                 log.debug('Detected photo: %s' % self.photo)
 
-        # get rating. Always the first absmiddle.
+        # get rating. contentRating <span> in infobar.
         tag_infobar_div = soup.find('div', attrs={'class': 'infobar'})
         if tag_infobar_div:
-            tag_mpaa_rating = tag_infobar_div.find('span', attrs={'class': 'absmiddle'})
+            tag_mpaa_rating = tag_infobar_div.find('span', attrs={'itemprop': 'contentRating'})
             if tag_mpaa_rating:
-                self.mpaa_rating = tag_mpaa_rating['title']
+                self.mpaa_rating = tag_mpaa_rating.text
                 log.debug('Detected mpaa rating: %s' % self.mpaa_rating)
             else:
                 log.debug('Unable to match signature of mpaa rating for %s - could be a TV episode, or plugin needs update?' % url)
