@@ -5,10 +5,11 @@ import urllib2
 import re
 import cookielib
 from datetime import datetime
+
 from sqlalchemy import Column, Integer, String, DateTime
+
 from flexget import schema
 from flexget.plugin import register_plugin, DependencyError, PluginWarning
-
 
 try:
     from flexget.plugins.api_tvdb import lookup_series
@@ -25,7 +26,7 @@ class MyEpisodesInfo(Base):
     __tablename__ = 'myepisodes'
 
     id = Column(Integer, primary_key=True)
-    series_name = Column(String, unique=True) # don't know if unique is correct python syntax for saying there must only be one entry with the same content
+    series_name = Column(String, unique=True)
     myepisodes_id = Column(Integer, unique=True)
     updated = Column(DateTime)
 
@@ -135,7 +136,8 @@ class MyEpisodes(object):
         series_name = entry['series_name']
 
         # First check if we already have a myepisodes id stored for this series
-        myepisodes_info = session.query(MyEpisodesInfo).filter(MyEpisodesInfo.series_name == series_name.lower()).first()
+        myepisodes_info = session.query(MyEpisodesInfo).\
+            filter(MyEpisodesInfo.series_name == series_name.lower()).first()
         if myepisodes_info:
             entry['myepisodes_id'] = myepisodes_info.myepisodes_id
             return myepisodes_info.myepisodes_id
@@ -185,7 +187,8 @@ class MyEpisodes(object):
         """
 
         if 'series_season' not in entry or 'series_episode' not in entry or 'series_name' not in entry:
-            raise PluginWarning('Can\'t mark entry `%s` in myepisodes without series_season, series_episode and series_name fields' %
+            raise PluginWarning(
+                'Can\'t mark entry `%s` in myepisodes without series_season, series_episode and series_name fields' %
                 entry['title'], log)
 
         if not self.lookup_myepisodes_id(entry, opener, session=task.session):
@@ -198,7 +201,8 @@ class MyEpisodes(object):
         if task.manager.options.test:
             log.info('Would mark %s of `%s` as acquired.' % (entry['series_id'], entry['series_name']))
         else:
-            baseurl2 = urllib2.Request('http://myepisodes.com/myshows.php?action=Update&showid=%s&season=%s&episode=%s&seen=0' %
+            baseurl2 = urllib2.Request(
+                'http://myepisodes.com/myshows.php?action=Update&showid=%s&season=%s&episode=%s&seen=0' %
                 (myepisodes_id, season, episode))
             opener.open(baseurl2)
             log.info('Marked %s of `%s` as acquired.' % (entry['series_id'], entry['series_name']))

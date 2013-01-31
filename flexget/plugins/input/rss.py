@@ -6,8 +6,10 @@ import xml.sax
 import posixpath
 import httplib
 from datetime import datetime
+
 import feedparser
 from requests import RequestException
+
 from flexget.entry import Entry
 from flexget.plugin import register_plugin, internet, PluginError
 from flexget.utils.cached_input import cached
@@ -51,7 +53,8 @@ class InputRSS(object):
         url: <url>
         link: guid
 
-    If you want to keep information in another rss field attached to the flexget entry, you can use the other_fields option.
+    If you want to keep information in another rss field attached to the flexget entry,
+    you can use the other_fields option.
 
     Example::
 
@@ -217,7 +220,7 @@ class InputRSS(object):
                 task.no_entries_ok = True
                 return []
             elif status == 401:
-                raise PluginError('Authentication needed for task %s (%s): %s' %\
+                raise PluginError('Authentication needed for task %s (%s): %s' %
                                   (task.name, config['url'], response.headers['www-authenticate']), log)
             elif status == 404:
                 raise PluginError('RSS Feed %s (%s) not found' % (task.name, config['url']), log)
@@ -274,11 +277,11 @@ class InputRSS(object):
                         log.exception(ex)
                     raise PluginError('Received invalid RSS content from task %s (%s)' % (task.name, config['url']))
                 elif isinstance(ex, httplib.BadStatusLine) or isinstance(ex, IOError):
-                    raise ex # let the @internet decorator handle
+                    raise ex  # let the @internet decorator handle
                 else:
                     # all other bozo errors
                     self.process_invalid_content(task, content)
-                    raise PluginError('Unhandled bozo_exception. Type: %s (task: %s)' %\
+                    raise PluginError('Unhandled bozo_exception. Type: %s (task: %s)' %
                                       (ex.__class__.__name__, task.name), log)
 
         log.debug('encoding %s' % rss.encoding)
