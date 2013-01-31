@@ -14,7 +14,7 @@ try:
     from flexget.plugins.filter import queue_base
 except ImportError:
     raise DependencyError(issued_by='movie_queue', missing='queue_base',
-                             message='movie_queue requires the queue_base plugin')
+        message='movie_queue requires the queue_base plugin')
 
 log = logging.getLogger('movie_queue')
 Base = schema.versioned_base('movie_queue', 2)
@@ -103,7 +103,7 @@ class FilterMovieQueue(queue_base.FilterQueueBase):
         quality = entry.get('quality', qualities.Quality())
 
         movie = task.session.query(QueuedMovie).filter(QueuedMovie.downloaded == None).\
-                                               filter(or_(*conditions)).first()
+            filter(or_(*conditions)).first()
         if movie and movie.quality_req.allows(quality):
             return movie
 
@@ -188,7 +188,7 @@ def queue_add(title=None, imdb_id=None, tmdb_id=None, quality=None, force=True, 
     # check if the item is already queued
     item = session.query(QueuedMovie).filter(or_(and_(QueuedMovie.imdb_id != None, QueuedMovie.imdb_id == imdb_id),
                                                  and_(QueuedMovie.tmdb_id != None, QueuedMovie.tmdb_id == tmdb_id))).\
-                                      first()
+        first()
     if not item:
         item = QueuedMovie(title=title, imdb_id=imdb_id, tmdb_id=tmdb_id, quality=quality.text, immortal=force)
         session.add(item)

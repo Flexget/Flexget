@@ -351,7 +351,7 @@ class ImdbLookup(object):
             # search is known to fail
             if not entry.get('imdb_url', eval_lazy=False):
                 result = session.query(SearchResult).\
-                         filter(SearchResult.title == entry['title']).first()
+                    filter(SearchResult.title == entry['title']).first()
                 if result:
                     if result.fails and not manager.options.retry:
                         # this movie cannot be found, not worth trying again ...
@@ -389,7 +389,7 @@ class ImdbLookup(object):
                     joinedload_all(Movie.languages),
                     joinedload_all(Movie.actors),
                     joinedload_all(Movie.directors)).\
-                    filter(Movie.url == entry['imdb_url']).first()
+                filter(Movie.url == entry['imdb_url']).first()
 
             # determine whether or not movie details needs to be parsed
             req_parse = False

@@ -181,7 +181,7 @@ def merge_dict_from_to(d1, d2):
                 elif isinstance(v, list):
                     d2[k].extend(copy.deepcopy(v))
                 elif isinstance(v, basestring) or isinstance(v, bool) or \
-                     isinstance(v, int) or isinstance(v, float):
+                    isinstance(v, int) or isinstance(v, float):
                     pass
                 else:
                     raise Exception('Unknown type: %s value: %s in dictionary' % (type(v), repr(v)))

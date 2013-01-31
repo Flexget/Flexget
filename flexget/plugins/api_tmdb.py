@@ -214,7 +214,7 @@ class ApiTmdb(object):
             movie = movie_filter.first()
             if not movie:
                 found = session.query(TMDBSearchResult). \
-                        filter(func.lower(TMDBSearchResult.search) == search_string).first()
+                    filter(func.lower(TMDBSearchResult.search) == search_string).first()
                 if found and found.movie:
                     movie = found.movie
         if movie:

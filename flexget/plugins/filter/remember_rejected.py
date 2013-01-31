@@ -99,7 +99,7 @@ class FilterRememberRejected(object):
         elif not task.is_rerun:
             # Delete expired items if this is not a rerun
             deleted = task.session.query(RememberEntry).filter(RememberEntry.task_id == old_task.id).\
-                                                        filter(RememberEntry.expires < datetime.now()).delete()
+                filter(RememberEntry.expires < datetime.now()).delete()
             if deleted:
                 log.debug('%s entries have expired from remember_rejected table.' % deleted)
                 task.config_changed()
@@ -120,7 +120,7 @@ class FilterRememberRejected(object):
                                                           RememberEntry.url == entry['original_url'])).first()
                 if reject_entry:
                     entry.reject('Rejected on behalf of %s plugin: %s' %
-                                       (reject_entry.rejected_by, reject_entry.reason))
+                        (reject_entry.rejected_by, reject_entry.reason))
 
     def on_entry_reject(self, task, entry, remember=None, remember_time=None, **kwargs):
         # We only remember rejections that specify the remember keyword argument
