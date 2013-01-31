@@ -299,3 +299,24 @@ class TestTorrentAlive(FlexGetBase):
         self.execute_task('test_torrent_alive_pass')
         assert self.task.accepted
         assert self.task._rerun_count == 0, 'Torrent should have been accepted without rerun.'
+
+
+class TestRtorrentMagnet(FlexGetBase):
+    __tmp__ = True
+    __yaml__ = """
+        tasks:
+          test:
+            mock:
+              - title: 'test'
+                url: 'magnet:?xt=urn:btih:HASH&dn=title&tr=http://torrent.ubuntu.com:6969/announce'
+            rtorrent_magnet: __tmp__
+            accept_all: yes
+    """
+
+
+    def test_rtorrent_magnet(self):
+        self.execute_task('test')
+        filename = 'meta-test.torrent'
+        fullpath = os.path.join(self.__tmp__, filename)
+        assert os.path.isfile(fullpath)
+        assert open(fullpath).read() == 'd10:magnet-uri76:magnet:?xt=urn:btih:HASH&dn=title&tr=http://torrent.ubuntu.com:6969/announcee'
