@@ -282,8 +282,12 @@ class ImdbParser(object):
                 log.warning('Unable to get score for %s - plugin needs update?' % url)
 
         # get genres
-        for link in soup.find_all('a', attrs={'itemprop': 'genre'}):
-            self.genres.append(link.text.lower())
+        genres = soup.find('div', itemprop='genre')
+        if genres:
+            for link in genres.find_all('a'):
+                self.genres.append(link.text.strip().lower())
+        else:
+            log.warning('Unable to find genres section for %s - plugin needs update?' % url)
 
         # get languages
         for link in soup.find_all('a', href=re.compile('/language/.*')):
@@ -314,7 +318,7 @@ class ImdbParser(object):
         if tag_cast:
             for actor in tag_cast.find_all('a', href=re.compile('/name/nm')):
                 actor_id = extract_id(actor['href'])
-                actor_name = actor.text
+                actor_name = actor.text.strip()
                 # tag instead of name
                 if isinstance(actor_name, Tag):
                     actor_name = None
