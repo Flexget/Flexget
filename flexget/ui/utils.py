@@ -19,7 +19,7 @@ def pretty_date(time=False):
         if second_diff < 60:
             return str(second_diff) + " seconds ago"
         if second_diff < 120:
-            return  "a minute ago"
+            return "a minute ago"
         if second_diff < 3600:
             return str(second_diff / 60) + " minutes ago"
         if second_diff < 7200:

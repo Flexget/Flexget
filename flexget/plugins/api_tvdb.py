@@ -331,20 +331,20 @@ def lookup_episode(name=None, seasonnum=None, episodenum=None, absolutenum=None,
         airdatestring = airdate.strftime('%Y-%m-%d')
         ep_description = '%s.%s' % (series.seriesname, airdatestring)
         episode = session.query(TVDBEpisode).filter(TVDBEpisode.series_id == series.id).\
-                                             filter(TVDBEpisode.firstaired == airdate).first()
+            filter(TVDBEpisode.firstaired == airdate).first()
         url = get_mirror() + ('GetEpisodeByAirDate.php?apikey=%s&seriesid=%d&airdate=%s&language=%s' %
                              (api_key, series.id, airdatestring, language))
     elif absolutenum:
         ep_description = '%s.%d' % (series.seriesname, absolutenum)
         episode = session.query(TVDBEpisode).filter(TVDBEpisode.series_id == series.id).\
-                                             filter(TVDBEpisode.absolute_number == absolutenum).first()
+            filter(TVDBEpisode.absolute_number == absolutenum).first()
         url = get_mirror() + api_key + '/series/%d/absolute/%s/%s.xml' % (series.id, absolutenum, language)
     else:
         ep_description = '%s.S%sE%s' % (series.seriesname, seasonnum, episodenum)
         # See if we have this episode cached
         episode = session.query(TVDBEpisode).filter(TVDBEpisode.series_id == series.id).\
-                                             filter(TVDBEpisode.seasonnumber == seasonnum).\
-                                             filter(TVDBEpisode.episodenumber == episodenum).first()
+            filter(TVDBEpisode.seasonnumber == seasonnum).\
+            filter(TVDBEpisode.episodenumber == episodenum).first()
         url = get_mirror() + api_key + '/series/%d/default/%d/%d/%s.xml' % (series.id, seasonnum, episodenum, language)
     if episode:
         if episode.expired and not only_cached:

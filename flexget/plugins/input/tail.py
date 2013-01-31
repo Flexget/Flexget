@@ -130,7 +130,7 @@ class InputTail(object):
                 match = re.search(regexp, line)
                 if match:
                     # check if used field detected, in such case start with new entry
-                    if used.has_key(field):
+                    if field in used:
                         if entry.isvalid():
                             log.info('Found field %s again before entry was completed. \
                                       Adding current incomplete, but valid entry and moving to next.' % field)

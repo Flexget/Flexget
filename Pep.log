@@ -1,0 +1,324 @@
+
+flexget/plugin.py:408:12: E127 continuation line over-indented for visual indent
+           os.path.isfile(os.path.join(os.path.dirname(plugins_pkg.__file__), subpkg, '__init__.py')):
+           ^
+flexget/plugins/api_rottentomatoes.py:287:17: E127 continuation line over-indented for visual indent
+                filter(RottenTomatoesMovie.id == rottentomatoes_id).first()
+                ^
+flexget/plugins/api_rottentomatoes.py:290:18: E127 continuation line over-indented for visual indent
+                 filter(RottenTomatoesAlternateId.name.in_(['imdb', 'flexget_imdb'])).\
+                 ^
+flexget/plugins/api_rottentomatoes.py:291:18: E127 continuation line over-indented for visual indent
+                 filter(RottenTomatoesAlternateId.id == imdb_id.lstrip('t')).first()
+                 ^
+flexget/plugins/api_rottentomatoes.py:302:21: E127 continuation line over-indented for visual indent
+                    filter(func.lower(RottenTomatoesSearchResult.search) == search_string).first()
+                    ^
+flexget/plugins/api_tmdb.py:217:25: E127 continuation line over-indented for visual indent
+                        filter(func.lower(TMDBSearchResult.search) == search_string).first()
+                        ^
+flexget/plugins/api_tvdb.py:334:46: E127 continuation line over-indented for visual indent
+                                             filter(TVDBEpisode.firstaired == airdate).first()
+                                             ^
+flexget/plugins/api_tvdb.py:340:46: E127 continuation line over-indented for visual indent
+                                             filter(TVDBEpisode.absolute_number == absolutenum).first()
+                                             ^
+flexget/plugins/api_tvdb.py:346:46: E127 continuation line over-indented for visual indent
+                                             filter(TVDBEpisode.seasonnumber == seasonnum).\
+                                             ^
+flexget/plugins/api_tvdb.py:347:46: E127 continuation line over-indented for visual indent
+                                             filter(TVDBEpisode.episodenumber == episodenum).first()
+                                             ^
+
+flexget/plugins/plugin_transmission.py:346:91: E502 the backslash is redundant between brackets
+            log.debug('Transfer "%s": status: "%s" upload ratio: %.2f seed ratio: %.2f' % \
+                                                                                          ^
+flexget/plugins/urlrewrite_isohunt.py:64:9: E122 continuation line missing indentation or outdented
+        urllib.quote(name.encode('utf-8')), optionlist.index(config))
+        ^
+flexget/plugins/urlrewrite_piratebay.py:34:1: E302 expected 2 blank lines, found 1
+class UrlRewritePirateBay(object):
+^
+flexget/plugins/urlrewrite_torrentz.py:21:1: E302 expected 2 blank lines, found 1
+class UrlRewriteTorrentz(object):
+^
+flexget/plugins/metainfo/feed.py:27:72: W292 no newline at end of file
+register_plugin(MetainfoTask, 'metainfo_task', api_ver=2, builtin=True)
+                                                                       ^
+flexget/plugins/metainfo/imdb_lookup.py:354:26: E127 continuation line over-indented for visual indent
+                         filter(SearchResult.title == entry['title']).first()
+                         ^
+flexget/plugins/metainfo/imdb_lookup.py:392:21: E127 continuation line over-indented for visual indent
+                    filter(Movie.url == entry['imdb_url']).first()
+                    ^
+flexget/plugins/metainfo/nzb_size.py:32:16: E127 continuation line over-indented for visual indent
+               entry.get('filename', '').endswith('.nzb'):
+               ^
+flexget/plugins/metainfo/quality.py:46:70: E502 the backslash is redundant between brackets
+            log.trace('Found quality %s (%s) for %s from field %s' % \
+                                                                     ^
+flexget/plugins/metainfo/rottentomatoes_lookup.py:92:19: E127 continuation line over-indented for visual indent
+                  imdb.extract_id(entry.get('imdb_url', eval_lazy=False))
+                  ^
+flexget/plugins/metainfo/tmdb_lookup.py:52:19: E127 continuation line over-indented for visual indent
+                  imdb.extract_id(entry.get('imdb_url', eval_lazy=False))
+                  ^
+flexget/plugins/input/backlog.py:103:49: E127 continuation line over-indented for visual indent
+                                                filter(BacklogEntry.task == task.name).first()
+                                                ^
+flexget/plugins/input/generate.py:29:61: W292 no newline at end of file
+register_plugin(Generate, 'generate', api_ver=2, debug=True)
+                                                            ^
+flexget/plugins/input/imdb_list.py:26:14: E127 continuation line over-indented for visual indent
+             accept(USER_ID_RE, message='user_id must be in the form urXXXXXXX')
+             ^
+flexget/plugins/input/listdir.py:49:47: W292 no newline at end of file
+register_plugin(Listdir, 'listdir', api_ver=2)
+                                              ^
+flexget/plugins/input/mock.py:48:41: W292 no newline at end of file
+register_plugin(Mock, 'mock', api_ver=2)
+                                        ^
+flexget/plugins/input/pogcal.py:10:1: E302 expected 2 blank lines, found 1
+class InputPogDesign(object):
+^
+
+flexget/plugins/input/rss.py:220:81: E502 the backslash is redundant between brackets
+                raise PluginError('Authentication needed for task %s (%s): %s' %\
+                                                                                ^
+flexget/plugins/input/rss.py:235:19: E271 multiple spaces after keyword
+                if  response.headers.get('last-modified'):
+                  ^
+flexget/plugins/input/rss.py:281:88: E502 the backslash is redundant between brackets
+                    raise PluginError('Unhandled bozo_exception. Type: %s (task: %s)' %\
+                                                                                       ^
+flexget/plugins/input/scenereleases.py:77:121: E501 line too long (123 > 120 characters)
+                log_once('%s skipped due to missing or unsupported (unresolvable) download link' % (release['title']), log)
+                                                                                                                        ^
+flexget/plugins/input/tail.py:29:121: E501 line too long (132 > 120 characters)
+                print 'Note that file must give in same format as in config, ie. ~/logs/log can not be given as /home/user/logs/log'
+                                                                                                                        ^
+flexget/plugins/input/tail.py:133:28: W601 .has_key() is deprecated, use 'in'
+                    if used.has_key(field):
+                           ^
+flexget/plugins/input/text.py:109:41: W292 no newline at end of file
+register_plugin(Text, 'text', api_ver=2)
+                                        ^
+flexget/plugins/input/trakt_list.py:53:121: E501 line too long (123 > 120 characters)
+        root.accept('choice', key='series').accept_choices(['all', 'loved', 'hated', 'collection', 'watched', 'watchlist'])
+                                                                                                                        ^
+flexget/plugins/input/trakt_list.py:114:21: E123 closing bracket does not match indentation of opening bracket's line
+                    ).status_code != 200:
+                    ^
+flexget/plugins/services/myepisodes.py:28:121: E501 line too long (155 > 120 characters)
+    series_name = Column(String, unique=True) # don't know if unique is correct python syntax for saying there must only be one entry with the same content
+                                                                                                                        ^
+flexget/plugins/services/myepisodes.py:138:121: E501 line too long (121 > 120 characters)
+        myepisodes_info = session.query(MyEpisodesInfo).filter(MyEpisodesInfo.series_name == series_name.lower()).first()
+                                                                                                                        ^
+flexget/plugins/services/myepisodes.py:188:121: E501 line too long (133 > 120 characters)
+            raise PluginWarning('Can\'t mark entry `%s` in myepisodes without series_season, series_episode and series_name fields' %
+                                                                                                                        ^
+flexget/plugins/services/myepisodes.py:201:121: E501 line too long (128 > 120 characters)
+            baseurl2 = urllib2.Request('http://myepisodes.com/myshows.php?action=Update&showid=%s&season=%s&episode=%s&seen=0' %
+                                                                                                                        ^
+flexget/plugins/services/trakt_acquired.py:44:93: E502 the backslash is redundant between brackets
+                    log.debug('Marking %s S%02dE%02d for submission to trakt.tv library.' % \
+                                                                                            ^
+flexget/plugins/filter/content_filter.py:84:121: E501 line too long (134 > 120 characters)
+            log.info('Plugin is partially disabled with --test and --learn because content filename information may not be available')
+                                                                                                                        ^
+flexget/plugins/filter/content_size.py:45:121: E501 line too long (122 > 120 characters)
+            log.info('Plugin is partially disabled with --test and --learn because size information may not be available')
+                                                                                                                        ^
+flexget/plugins/filter/delay.py:84:20: E127 continuation line over-indented for visual indent
+                   filter(DelayedEntry.title == entry['title']).\
+                   ^
+flexget/plugins/filter/delay.py:85:20: E127 continuation line over-indented for visual indent
+                   filter(DelayedEntry.task == task.name).first():
+                   ^
+flexget/plugins/filter/exists_series.py:6:33: E271 multiple spaces after keyword
+from flexget.utils.titles import  ParseWarning
+                                ^
+flexget/plugins/filter/imdb_rated.py:96:50: E127 continuation line over-indented for visual indent
+                                                 filter(ImdbRated.imdb_url == imdb_url).first():
+                                                 ^
+flexget/plugins/filter/imdb_rated.py:127:24: E127 continuation line over-indented for visual indent
+                       filter(ImdbRated.url == config['url']).\
+                       ^
+flexget/plugins/filter/imdb_rated.py:128:24: E127 continuation line over-indented for visual indent
+                       filter(ImdbRated.imdb_url == entry['imdb_url']).first() is not None
+                       ^
+flexget/plugins/filter/magnets.py:5:1: E302 expected 2 blank lines, found 1
+class Magnets(object):
+^
+flexget/plugins/filter/movie_queue.py:17:30: E127 continuation line over-indented for visual indent
+                             message='movie_queue requires the queue_base plugin')
+                             ^
+flexget/plugins/filter/movie_queue.py:106:48: E127 continuation line over-indented for visual indent
+                                               filter(or_(*conditions)).first()
+                                               ^
+flexget/plugins/filter/movie_queue.py:191:39: E127 continuation line over-indented for visual indent
+                                      first()
+                                      ^
+flexget/plugins/filter/remember_rejected.py:102:57: E127 continuation line over-indented for visual indent
+                                                        filter(RememberEntry.expires < datetime.now()).delete()
+                                                        ^
+flexget/plugins/filter/remember_rejected.py:123:40: E127 continuation line over-indented for visual indent
+                                       (reject_entry.rejected_by, reject_entry.reason))
+                                       ^
+flexget/plugins/filter/retry_failed.py:96:46: E127 continuation line over-indented for visual indent
+                                             filter(FailedEntry.url == entry['original_url']).first()
+                                             ^
+flexget/plugins/filter/retry_failed.py:179:45: E127 continuation line over-indented for visual indent
+                                            filter(FailedEntry.url == entry['original_url']).\
+                                            ^
+flexget/plugins/filter/retry_failed.py:180:45: E127 continuation line over-indented for visual indent
+                                            filter(FailedEntry.count > max_count).first()
+                                            ^
+flexget/plugins/filter/retry_failed.py:192:45: E127 continuation line over-indented for visual indent
+                                            filter(FailedEntry.url == entry['original_url']).first()
+                                            ^
+flexget/plugins/filter/retry_failed.py:210:43: E127 continuation line over-indented for visual indent
+                                          fail_reason, remember_time=retry_time)
+                                          ^
+flexget/plugins/filter/rottentomatoes.py:124:121: E501 line too long (142 > 120 characters)
+                elif self.critics_ratings.get(entry.get('rt_critics_rating').lower(), 0) < self.critics_ratings[config['min_critics_rating']]:
+                                                                                                                        ^
+flexget/plugins/filter/rottentomatoes.py:125:121: E501 line too long (139 > 120 characters)
+                    reasons.append('min_critics_rating (%s < %s)' % (entry.get('rt_critics_rating').lower(), config['min_critics_rating']))
+                                                                                                                        ^
+flexget/plugins/filter/rottentomatoes.py:129:121: E501 line too long (146 > 120 characters)
+                elif self.audience_ratings.get(entry.get('rt_audience_rating').lower(), 0) < self.audience_ratings[config['min_audience_rating']]:
+                                                                                                                        ^
+flexget/plugins/filter/rottentomatoes.py:130:121: E501 line too long (142 > 120 characters)
+                    reasons.append('min_audience_rating (%s < %s)' % (entry.get('rt_audience_rating').lower(), config['min_audience_rating']))
+                                                                                                                        ^
+flexget/plugins/filter/seen.py:222:13: E125 continuation line does not distinguish itself from next logical line
+            order_by(asc(SeenField.added)).all():
+            ^
+flexget/plugins/filter/series_premiere.py:65:66: E202 whitespace before ')'
+                        and entry.get('series_episode') in (0, 1) ):
+                                                                 ^
+flexget/plugins/filter/thetvdb.py:169:121: E501 line too long (131 > 120 characters)
+                    reasons.append('ep_air_date (%s < %s)' % (entry['ep_air_date'].strftime("%Y"), config['min_episode_air_year']))
+                                                                                                                        ^
+flexget/plugins/filter/thetvdb.py:172:121: E501 line too long (131 > 120 characters)
+                    reasons.append('ep_air_date (%s < %s)' % (entry['ep_air_date'].strftime("%Y"), config['max_episode_air_year']))
+                                                                                                                        ^
+flexget/plugins/generic/archive.py:174:18: E127 continuation line over-indented for visual indent
+                 filter(ArchiveEntry.title == entry['title']).\
+                 ^
+flexget/plugins/generic/archive.py:175:18: E127 continuation line over-indented for visual indent
+                 filter(ArchiveEntry.url == entry['url']).first()
+                 ^
+flexget/plugins/generic/archive.py:277:108: E502 the backslash is redundant between brackets
+                        log.error('None of sources (%s) exists anymore, cannot inject `%s` from archive!' %\
+                                                                                                           ^
+flexget/plugins/generic/archive.py:410:25: E127 continuation line over-indented for visual indent
+                        filter(ArchiveEntry.id != orig.id).\
+                        ^
+flexget/plugins/generic/archive.py:411:25: E127 continuation line over-indented for visual indent
+                        filter(ArchiveEntry.title == orig.title).\
+                        ^
+flexget/plugins/generic/archive.py:412:25: E127 continuation line over-indented for visual indent
+                        filter(ArchiveEntry.url == orig.url).all():
+                        ^
+flexget/plugins/generic/archive.py:459:9: E122 continuation line missing indentation or outdented
+        filter(ArchiveEntry.sources.any(name=source_name)).yield_per(5):
+        ^
+flexget/plugins/generic/archive.py:545:79: E502 the backslash is redundant between brackets
+            console('ID: %-6s | Title: %s\nAdded: %s (%d days ago)\nURL: %s' %\
+                                                                              ^
+flexget/plugins/cli/movie_queue.py:89:121: E501 line too long (128 > 120 characters)
+                        console('ANY is the default and can also be used explicitly to specify that quality should be ignored.')
+                                                                                                                        ^
+flexget/plugins/cli/movie_queue.py:125:1: E302 expected 2 blank lines, found 1
+class MovieQueueAction(Action):
+^
+flexget/plugins/cli/movie_queue.py:151:40: E127 continuation line over-indented for visual indent
+                                       (values[2], e.message))
+                                       ^
+flexget/plugins/output/download.py:232:121: E501 line too long (129 > 120 characters)
+            log.debug('Basic auth enabled. User: %s Password: %s' % (entry['basic_auth_username'], entry['basic_auth_password']))
+                                                                                                                        ^
+flexget/plugins/output/pushover.py:12:1: E302 expected 2 blank lines, found 1
+class OutputPushover(object):
+^
+flexget/plugins/output/pushover.py:47:121: E501 line too long (230 > 120 characters)
+        config.setdefault("message", """{% if series_name is defined %}{{series_name_tvdb|d(series_name)}} {{series_id}} {{ep_name|d('')}}{% elif imdb_name is defined %}{{imdb_name}} {{imdb_year}}{% else %}{{title}}{% endif %}""")
+                                                                                                                        ^
+flexget/plugins/output/pyload.py:147:71: E231 missing whitespace after ','
+                post = {'name': "'%s'" % entry['title'].encode("ascii","ignore"),
+                                                                      ^
+flexget/plugins/output/rss.py:185:121: E501 line too long (145 > 120 characters)
+       #      description = """{% if series_name is defined %}{% if series_banner_url is defined %}<img src="{{series_banner_url}}" />{% endif %}
+                                                                                                                        ^
+flexget/plugins/output/send_email.py:22:1: E302 expected 2 blank lines, found 1
+def options_validator():
+^
+flexget/plugins/output/send_email.py:99:1: E303 too many blank lines (3)
+def send_email(subject, content, config):
+^
+flexget/plugins/output/send_email.py:120:121: E501 line too long (139 > 120 characters)
+                    raise PluginError('SSL email support requires python >= 2.6.3 due to python bug #4066, upgrade python or use TLS', log)
+                                                                                                                        ^
+flexget/plugins/output/subtitles.py:130:121: E501 line too long (124 > 120 characters)
+            subtitles = filter(lambda x: float(x['SubRating']) >= min_sub_rating or float(x['SubRating']) == 0.0, subtitles)
+                                                                                                                        ^
+flexget/plugins/modify/manipulate.py:70:5: E303 too many blank lines (2)
+    @priority(255)
+    ^
+flexget/plugins/modify/manipulate.py:105:75: E225 missing whitespace around operator
+                    match = re.search(config['extract'], field_value, re.I|re.U)
+                                                                          ^
+flexget/plugins/modify/manipulate.py:117:77: E225 missing whitespace around operator
+                    regexp = re.compile(replace_config['regexp'], flags=re.I|re.U)
+                                                                            ^
+flexget/plugins/modify/torrent_scrub.py:11:1: E302 expected 2 blank lines, found 1
+class TorrentScrub(object):
+^
+flexget/utils/cached_input.py:122:63: E127 continuation line over-indented for visual indent
+                                                              filter(InputCache.hash == hash).\
+                                                              ^
+flexget/utils/cached_input.py:123:63: E127 continuation line over-indented for visual indent
+                                                              filter(InputCache.added > datetime.now() - self.persist).\
+                                                              ^
+flexget/utils/cached_input.py:124:63: E127 continuation line over-indented for visual indent
+                                                              first()
+                                                              ^
+flexget/utils/cached_input.py:141:67: E127 continuation line over-indented for visual indent
+                                                                  filter(InputCache.hash == hash).first()
+                                                                  ^
+flexget/utils/cached_input.py:163:121: E501 line too long (141 > 120 characters)
+                    log.critical('Unable to save task content into cache, if problem persists longer than a day please report this as a bug')
+                                                                                                                        ^
+flexget/utils/cached_input.py:168:63: E127 continuation line over-indented for visual indent
+                                                              filter(InputCache.hash == hash).first()
+                                                              ^
+flexget/utils/imdb.py:85:121: E501 line too long (129 > 120 characters)
+                    log.debug('best_match removing %s - %s (wrong year: %s)' % (movie['name'], movie['url'], str(movie['year'])))
+                                                                                                                        ^
+flexget/utils/imdb.py:243:121: E501 line too long (131 > 120 characters)
+                log.debug('Unable to match signature of mpaa rating for %s - could be a TV episode, or plugin needs update?' % url)
+                                                                                                                        ^
+flexget/utils/requests.py:66:1: E302 expected 2 blank lines, found 1
+class Session(requests.Session):
+^
+flexget/utils/simple_persistence.py:82:17: E127 continuation line over-indented for visual indent
+                filter(SimpleKeyValue.plugin == self.plugin).filter(SimpleKeyValue.key == key).first()
+                ^
+flexget/utils/simple_persistence.py:119:14: E127 continuation line over-indented for visual indent
+             filter(SimpleKeyValue.plugin == self.plugin).all()
+             ^
+flexget/utils/tools.py:184:22: E127 continuation line over-indented for visual indent
+                     isinstance(v, int) or isinstance(v, float):
+                     ^
+flexget/utils/titles/series.py:40:13: E126 continuation line over-indented for hanging indent
+            roman_numeral_re,
+            ^
+flexget/ui/utils.py:22:19: E271 multiple spaces after keyword
+            return  "a minute ago"
+                  ^
+flexget/ui/plugins/plugins/plugins.py:18:1: E302 expected 2 blank lines, found 1
+@plugins_module.route('/all')
+^

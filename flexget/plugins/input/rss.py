@@ -232,7 +232,7 @@ class InputRSS(object):
                 if etag:
                     task.simple_persistence['%s_etag' % url_hash] = etag
                     log.debug('etag %s saved for task %s' % (etag, task.name))
-                if  response.headers.get('last-modified'):
+                if response.headers.get('last-modified'):
                     modified = response.headers['last-modified']
                     task.simple_persistence['%s_modified' % url_hash] = modified
                     log.debug('last modified %s saved for task %s' % (modified, task.name))

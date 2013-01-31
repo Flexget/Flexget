@@ -219,7 +219,7 @@ class SeenSearch(object):
         shown = []
         for field in session.query(SeenField).\
             filter(SeenField.value.like(unicode('%' + task.manager.options.seen_search + '%'))).\
-            order_by(asc(SeenField.added)).all():
+                order_by(asc(SeenField.added)).all():
 
             se = session.query(SeenEntry).filter(SeenEntry.id == field.seen_entry_id).first()
             if not se:
