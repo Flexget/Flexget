@@ -137,7 +137,7 @@ class ImdbSearch(object):
             return movies
 
         # the god damn page has declared a wrong encoding
-        soup = get_soup(page.content)
+        soup = get_soup(page.text)
 
         section_table = soup.find('table', 'findList')
         if not section_table:
@@ -222,7 +222,7 @@ class ImdbParser(object):
         url = make_url(self.imdb_id)
         self.url = url
         page = requests.get(url)
-        soup = get_soup(page.content)
+        soup = get_soup(page.text)
 
         # get photo
         tag_photo = soup.find('td', attrs={'id': 'img_primary'})
