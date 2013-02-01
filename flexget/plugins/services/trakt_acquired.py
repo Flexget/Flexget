@@ -41,7 +41,7 @@ class TraktAcquired(object):
                         series['episodes'] = []
                     episode = {'season': entry['series_season'], 'episode': entry['series_episode']}
                     series['episodes'].append(episode)
-                    log.debug('Marking %s S%02dE%02d for submission to trakt.tv library.' % \
+                    log.debug('Marking %s S%02dE%02d for submission to trakt.tv library.' %
                               (entry['series_name'], entry['series_season'], entry['series_episode']))
             else:
                 # Check entry is a movie
