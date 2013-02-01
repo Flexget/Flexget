@@ -18,7 +18,9 @@ class PluginRtorrentMagnet(object):
 
     magnet:?xt=urn:btih:190F1ABAED7AE7252735A811149753AA83E34309&dn=URL+Escaped+Torrent+Name
 
-    rTorrent would expect to see something like meta-URL_Escaped_Torrent_Name.torrent and the torrent file must contain the text:
+    rTorrent would expect to see something like meta-URL_Escaped_Torrent_Name.torrent
+
+    The torrent file must also contain the text:
 
     d10:magnet-uri88:xt=urn:btih:190F1ABAED7AE7252735A811149753AA83E34309&dn=URL+Escaped+Torrent+Namee
 
