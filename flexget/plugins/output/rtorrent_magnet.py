@@ -18,7 +18,9 @@ class PluginRtorrentMagnet(object):
 
     magnet:?xt=urn:btih:190F1ABAED7AE7252735A811149753AA83E34309&dn=URL+Escaped+Torrent+Name
 
-    rTorrent would expect to see something like meta-URL_Escaped_Torrent_Name.torrent and the torrent file must contain the text:
+    rTorrent would expect to see something like meta-URL_Escaped_Torrent_Name.torrent
+
+    The torrent file must also contain the text:
 
     d10:magnet-uri88:xt=urn:btih:190F1ABAED7AE7252735A811149753AA83E34309&dn=URL+Escaped+Torrent+Namee
 
@@ -48,18 +50,13 @@ class PluginRtorrentMagnet(object):
 
     @plugin.priority(0)
     def on_task_download(self, task, config):
-        if isinstance(config, basestring) == False:
-            return
 
         for entry in task.accepted:
             if 'output' in entry:
                 log.debug('Ignoring, %s already has an output file: %s' % (entry['title'], entry['output']))
                 continue
 
-            if entry.get('urls'):
-                urls = entry.get('urls')
-            else:
-                urls = [entry['url']]
+            urls = entry.get('urls', [entry['url']])
 
             for url in urls:
                 if url.startswith('magnet:'):
