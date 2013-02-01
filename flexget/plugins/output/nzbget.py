@@ -39,8 +39,8 @@ class OutputNzbget(object):
         from xmlrpclib import ServerProxy
 
         params = self.get_params(config)
-        
-        server = ServerProxy( params["url"] )   
+
+        server = ServerProxy(params["url"])
 
         for entry in task.accepted:
             if task.manager.options.test:
