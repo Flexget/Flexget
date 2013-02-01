@@ -253,6 +253,11 @@ def docs():
         print 'ERROR: requires sphinxcontrib-paverutils'
         sys.exit(1)
     from paver import tasks
+    if not os.path.exists('build'):
+        os.mkdir('build')
+    if not os.path.exists(os.path.join('build', 'sphinx')):
+        os.mkdir(os.path.join('build', 'sphinx'))
+
     setup_section = tasks.environment.options.setdefault("sphinx", Bunch())
     setup_section.update(outdir=options.docs.get('docs_dir', 'build/sphinx'))
     call_task('html')
