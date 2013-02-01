@@ -50,18 +50,13 @@ class PluginRtorrentMagnet(object):
 
     @plugin.priority(0)
     def on_task_download(self, task, config):
-        if isinstance(config, basestring) == False:
-            return
 
         for entry in task.accepted:
             if 'output' in entry:
                 log.debug('Ignoring, %s already has an output file: %s' % (entry['title'], entry['output']))
                 continue
 
-            if entry.get('urls'):
-                urls = entry.get('urls')
-            else:
-                urls = [entry['url']]
+            urls = entry.get('urls',[entry['url']])
 
             for url in urls:
                 if url.startswith('magnet:'):
