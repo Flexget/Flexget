@@ -21,7 +21,7 @@ class TestInfoHash(FlexGetBase):
         """Torrent: infohash parsing"""
         self.execute_task('test')
         hash = self.task.entries[0].get('torrent_info_hash')
-        assert hash == '20AE692114DC343C86DF5B07C276E5077E581766', \
+        assert hash == '14FFE5DD23188FD5CB53A1D47F1289DB70ABF31E', \
             'InfoHash does not match (got %s)' % hash
 
 
@@ -79,9 +79,9 @@ class TestModifyTrackers(FlexGetBase):
               - {title: 'test', file: 'test_remove_trackers.torrent'}
               - title: 'test_magnet'
             set:
-              url: 'magnet:?xt=urn:btih:HASH&dn=title&tr=http://torrent.ubuntu.com:6969/announce'
+              url: 'magnet:?xt=urn:btih:HASH&dn=title&tr=http://ipv6.torrent.ubuntu.com:6969/announce'
             remove_trackers:
-              - ubuntu
+              - ipv6
 
           test_modify_trackers:
             mock:
@@ -108,18 +108,13 @@ class TestModifyTrackers(FlexGetBase):
 
     @with_filecopy('test.torrent', 'test_remove_trackers.torrent')
     def test_remove_trackers(self):
-        """test_remove_trackers - BROKEN - DISABLED"""
-        return
-        # the example torrent file uses single tracker via 'announce' key in the torrent,
-        # but the remove_multitracker implementation this relies on does not touch that ...
-
         self.execute_task('test_remove_trackers')
         torrent = self.load_torrent('test_remove_trackers.torrent')
-        assert 'http://torrent.ubuntu.com:6969/announce' not in torrent.trackers, \
-            'ubuntu tracker should have been removed'
+        assert 'http://ipv6.torrent.ubuntu.com:6969/announce' not in torrent.trackers, \
+            'ipv6 tracker should have been removed'
 
         # Check magnet url
-        assert 'tr=http://torrent.ubuntu.com:6969/announce' not in self.task.find_entry(title='test_magnet')['url']
+        assert 'tr=http://ipv6.torrent.ubuntu.com:6969/announce' not in self.task.find_entry(title='test_magnet')['url']
 
     @with_filecopy('test.torrent', 'test_modify_trackers.torrent')
     def test_modify_trackers(self):
