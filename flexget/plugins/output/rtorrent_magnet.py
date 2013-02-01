@@ -56,7 +56,7 @@ class PluginRtorrentMagnet(object):
                 log.debug('Ignoring, %s already has an output file: %s' % (entry['title'], entry['output']))
                 continue
 
-            urls = entry.get('urls',[entry['url']])
+            urls = entry.get('urls', [entry['url']])
 
             for url in urls:
                 if url.startswith('magnet:'):

@@ -225,7 +225,7 @@ class ImdbParser(object):
         soup = get_soup(page.content)
 
         # get photo
-        tag_photo = soup.find('div', attrs={'class': 'photo'})
+        tag_photo = soup.find('td', attrs={'id': 'img_primary'})
         if tag_photo:
             tag_img = tag_photo.find('img')
             if tag_img:
@@ -237,7 +237,14 @@ class ImdbParser(object):
         if tag_infobar_div:
             tag_mpaa_rating = tag_infobar_div.find('span', attrs={'itemprop': 'contentRating'})
             if tag_mpaa_rating:
-                self.mpaa_rating = tag_mpaa_rating.text
+                if not tag_mpaa_rating['class'] or not tag_mpaa_rating['class'][0].startswith('us_'):
+                    log.warning('Could not determine mpaa rating for %s' % url)
+                else:
+                    rating_class = tag_mpaa_rating['class'][0]
+                    if rating_class == 'us_not_rated':
+                        self.mpaa_rating = 'NR'
+                    else:
+                        self.mpaa_rating = rating_class.lstrip('us_').replace('_', '-').upper()
                 log.debug('Detected mpaa rating: %s' % self.mpaa_rating)
             else:
                 log.debug('Unable to match signature of mpaa rating for %s - could be a TV episode, or plugin needs update?' % url)
@@ -327,7 +334,7 @@ class ImdbParser(object):
         # get director(s)
         h4_director = soup.find('h4', text=re.compile('Director'))
         if h4_director:
-            for director in h4_director.parent.parent.find_all('a', href=re.compile('/name/nm')):
+            for director in h4_director.parent.find_all('a', href=re.compile('/name/nm')):
                 director_id = extract_id(director['href'])
                 director_name = director.text
                 # tag instead of name
