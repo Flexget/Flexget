@@ -275,7 +275,8 @@ class TestTorrentAlive(FlexGetBase):
     def test_torrent_alive_fail(self):
         self.execute_task('test_torrent_alive_fail')
         assert not self.task.accepted, 'Torrent should not have met seed requirement.'
-        assert self.task._rerun_count == 1, 'Task should have been rerun 1 time.'
+        assert self.task._rerun_count == 1, ('Task should have been rerun 1 time. Was rerun %s times.' %
+                                             self.task._rerun_count)
 
         # Run it again to make sure remember_rejected prevents a rerun from occurring
         self.execute_task('test_torrent_alive_fail')

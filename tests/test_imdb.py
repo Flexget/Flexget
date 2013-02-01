@@ -207,7 +207,8 @@ class TestImdb(FlexGetBase):
     def test_mpaa(self):
         self.execute_task('mpaa')
         aladdin = self.task.find_entry(imdb_name='Aladdin')
-        assert aladdin['imdb_mpaa_rating'] == 'G', 'Didn\'t get right rating for Aladdin'
+        assert aladdin['imdb_mpaa_rating'] == 'G', ('Didn\'t get right rating for Aladdin. Should be G got %s' %
+                                                    aladdin['imdb_mpaa_rating'])
         assert aladdin.accepted, 'Non R rated movie should have been accepted'
         saw = self.task.find_entry(imdb_name='Saw')
         assert saw['imdb_mpaa_rating'] == 'R', 'Didn\'t get right rating for Saw'
