@@ -19,8 +19,8 @@ class OutputRapidPush(object):
         apikey: xxxxxxx
         [category: category, default FlexGet]
         [title: title, default New release]
-	[group: device group, default no group]
-	[message: the message, to include the title from flexget insert {{title}} at the wanted position, default {{title}}]
+        [group: device group, default no group]
+        [message: the message, to include the title from flexget insert {{title}} at the wanted position, default {{title}}]
         [priority: 0 - 6 (6 = highest), default 2 (normal)]
 
     Configuration parameters are also supported from entries (eg. through set).
@@ -32,7 +32,7 @@ class OutputRapidPush(object):
         config.accept('text', key='apikey', required=True)
         config.accept('text', key='category')
         config.accept('text', key='title')
-	config.accept('text', key='group')
+        config.accept('text', key='group')
         config.accept('integer', key='priority')
         config.accept('text', key='message')
         return config
@@ -43,14 +43,14 @@ class OutputRapidPush(object):
         config.setdefault('title', 'New release')
         config.setdefault('category', 'FlexGet')
         config.setdefault('priority', 2)
-	config.setdefault('group', '')
+        config.setdefault('group', '')
         config.setdefault('message', '{{title}}')
         return config
 
     def on_task_output(self, task, config):
         # get the parameters
         config = self.prepare_config(config)
-	log.info("Get all accepted entries")
+        log.info("Get all accepted entries")
         for entry in task.accepted:
 
             if task.manager.options.test:
@@ -79,14 +79,19 @@ class OutputRapidPush(object):
             except RenderError as e:
                 log.error('Error setting RapidPush message: %s' % e)
 
-	    group = entry.get('group', config['group'])
+            group = entry.get('group', config['group'])
             try:
                 group = entry.render(group)
             except RenderError as e:
                 log.error('Error setting RapidPush group: %s' % e)
 
             # Send the request
-	    data_string = json.dumps({'title': title, 'message': message, 'priority': priority, 'category': category, 'group': group})
+            data_string = json.dumps({
+                'title': title,
+                'message': message,
+                'priority': priority,
+                'category': category,
+                'group': group})
             data = {'apikey': apikey, 'command': 'notify', 'header_errors': '1', 'data': data_string}
             response = task.requests.post(url, headers=headers, data=data, raise_status=False)
 
