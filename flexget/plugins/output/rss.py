@@ -2,7 +2,9 @@ from __future__ import unicode_literals, division, absolute_import
 import logging
 import datetime
 import os
+
 from sqlalchemy import Column, Integer, String, DateTime
+
 from flexget import schema
 from flexget.plugin import register_plugin, PluginWarning
 from flexget.utils.sqlalchemy_utils import table_columns, table_add_column
@@ -78,7 +80,7 @@ class OutputRSS(object):
         days: 2
         items: 10
 
-    Generate RSS that will containg last two days and no more than 10 items.
+    Generate RSS that will containing last two days and no more than 10 items.
 
     Example 2::
 
@@ -124,14 +126,14 @@ class OutputRSS(object):
         """Validate given configuration"""
         from flexget import validator
         root = validator.factory()
-        root.accept('text') # TODO: path / file
+        root.accept('text')  # TODO: path / file
         rss = root.accept('dict')
         rss.accept('text', key='file', required=True)
         rss.accept('integer', key='days')
         rss.accept('integer', key='items')
         rss.accept('boolean', key='history')
         rss.accept('text', key='rsslink')
-        rss.accept('text', key='encoding') # TODO: only valid choices
+        rss.accept('text', key='encoding')  # TODO: only valid choices
         rss.accept('text', key='title')
         rss.accept('text', key='description')
         links = rss.accept('list', key='link')
@@ -151,7 +153,7 @@ class OutputRSS(object):
         config.setdefault('history', True)
         config.setdefault('encoding', 'iso-8859-1')
         config.setdefault('link', ['imdb_url', 'input_url'])
-        config.setdefault("title", "{{title}} (from {{task}})")
+        config.setdefault("title", "{{title}} (from {{task.name}})")
         config.setdefault("template", "default")
         # add url as last resort
         config['link'].append('url')
@@ -182,18 +184,6 @@ class OutputRSS(object):
                     rss.link = entry[field]
                     break
 
-       #      description = """{% if series_name is defined %}{% if series_banner_url is defined %}<img src="{{series_banner_url}}" />{% endif %}
-# {{series_name_tvdb|d(series_name)}} {{series_id}} {{ep_name|d('')}}
-# <b>Cast:</b> {{series_actors|d('')}}
-# <b>Guest Starring:</b> {{ep_guest_stars|d('')}}
-# <b>Overview:</b> {{ep_overview|d('')}}
-# {% elif imdb_name is defined %}{{imdb_name}} {{imdb_year}}
-# <b>Score:</b> {{imdb_score|d('N/A')}} ({{imdb_votes|d('0')}} votes)
-# <b>Genres:</b> {{imdb_genres|d('N/A')}}
-# <b>Plot:</b> {{imdb_plot_outline|d('N/A')}}
-# {% else %}{{title}}{% endif %}"""
-
-            #rss.description = entry.render(description)
             rss.description = render_from_entry(get_template(config['template'], 'rss'), entry)
             rss.file = config['file']
 
@@ -233,11 +223,10 @@ class OutputRSS(object):
                     add = False
             if add:
                 # add into generated feed
-                gen = {}
-                gen['title'] = db_item.title
-                gen['description'] = db_item.description
-                gen['link'] = db_item.link
-                gen['pubDate'] = db_item.published
+                gen = {'title': db_item.title,
+                       'description': db_item.description,
+                       'link': db_item.link,
+                       'pubDate': db_item.published}
                 log.trace('Adding %s into rss %s' % (gen['title'], config['file']))
                 rss_items.append(PyRSS2Gen.RSSItem(**gen))
             else:

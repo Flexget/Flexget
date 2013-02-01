@@ -8,8 +8,11 @@ from datetime import datetime, date, time
 import locale
 from email.utils import parsedate
 from time import mktime
-from jinja2 import (Environment, StrictUndefined, ChoiceLoader, FileSystemLoader, PackageLoader, TemplateNotFound,
+
+from jinja2 import (Environment, StrictUndefined, ChoiceLoader,
+                    FileSystemLoader, PackageLoader, TemplateNotFound,
                     TemplateSyntaxError, Undefined)
+
 from flexget.event import event
 from flexget.plugin import PluginError
 from flexget.utils.pathscrub import pathscrub
@@ -158,6 +161,7 @@ def render_from_entry(template_string, entry):
     # Make a copy of the Entry so we can add some more fields
     variables = copy(entry)
     variables['now'] = datetime.now()
+    variables['task'] = entry.task
     # We use the lower level render function, so that our Entry is not cast into a dict (and lazy loading lost)
     try:
         result = u''.join(template.root_render_func(template.new_context(variables, shared=True)))
