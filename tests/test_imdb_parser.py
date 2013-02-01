@@ -1,9 +1,12 @@
 from __future__ import unicode_literals, division, absolute_import
 
+from nose.plugins.attrib import attr
+
 from flexget.utils.imdb import ImdbParser
 
 
 class TestImdbParser(object):
+    @attr(online=True)
     def test_parsed_data(self):
         parser = ImdbParser()
         parser.parse('tt0114814')
