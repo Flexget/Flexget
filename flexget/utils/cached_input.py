@@ -138,7 +138,7 @@ class cached(object):
                     # If there was an error producing entries, but we have valid entries in the db cache, return those.
                     if self.persist and not task.manager.options.nocache:
                         db_cache = task.session.query(InputCache).filter(InputCache.name == self.name).\
-                                                                  filter(InputCache.hash == hash).first()
+                            filter(InputCache.hash == hash).first()
                         if db_cache and db_cache.entries:
                             log.error('There was an error during %s input (%s), using cache instead.' %
                                     (self.name, e))
