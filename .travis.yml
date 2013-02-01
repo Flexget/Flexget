@@ -7,6 +7,6 @@ install:
   - pip install paver
   - pip install .
 # command to run tests, e.g. python setup.py test
-script: nosetests
+script: nosetests --attr !online
 notifications:
   email: false
