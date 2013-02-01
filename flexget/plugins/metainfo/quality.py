@@ -43,7 +43,7 @@ class MetainfoQuality(object):
                 break
         entry['quality'] = quality
         if quality:
-            log.trace('Found quality %s (%s) for %s from field %s' % \
+            log.trace('Found quality %s (%s) for %s from field %s' %
                 (entry['quality'], quality, entry['title'], field_name))
 
 register_plugin(MetainfoQuality, 'metainfo_quality', api_ver=2, builtin=True)
