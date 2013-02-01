@@ -237,7 +237,7 @@ class ImdbParser(object):
         if tag_infobar_div:
             tag_mpaa_rating = tag_infobar_div.find('span', attrs={'itemprop': 'contentRating'})
             if tag_mpaa_rating:
-                if not tag_mpaa_rating['class'] or not tag_mpaa_rating['class'][0].startswith('us_'):
+                if not tag_mpaa_rating.get('class') or not tag_mpaa_rating['class'][0].startswith('us_'):
                     log.warning('Could not determine mpaa rating for %s' % url)
                 else:
                     rating_class = tag_mpaa_rating['class'][0]
@@ -247,7 +247,8 @@ class ImdbParser(object):
                         self.mpaa_rating = rating_class.lstrip('us_').replace('_', '-').upper()
                 log.debug('Detected mpaa rating: %s' % self.mpaa_rating)
             else:
-                log.debug('Unable to match signature of mpaa rating for %s - could be a TV episode, or plugin needs update?' % url)
+                log.debug('Unable to match signature of mpaa rating for %s - '
+                          'could be a TV episode, or plugin needs update?' % url)
         else:
             # We should match the infobar, it's an integral part of the IMDB page.
             log.warning('Unable to get infodiv class for %s - plugin needs update?' % url)
