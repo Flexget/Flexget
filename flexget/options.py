@@ -1,6 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
 import sys
-import subprocess
 from argparse import ArgumentParser as ArgParser, Action, ArgumentError, SUPPRESS, _VersionAction
 
 import flexget
@@ -24,30 +23,23 @@ class VersionAction(_VersionAction):
     Also attempts to get more information from git describe if on git checkout.
     """
     def __call__(self, parser, namespace, values, option_string=None):
-        if self.version == '{git}':
-            # Attempt to get version from git
-            version = ''
-            try:
-                subprocess.call(['git', 'fetch', '--tags'], stdout=subprocess.PIPE)
-                p = subprocess.Popen(['git', 'describe'], stdout=subprocess.PIPE)
-                version = p.stdout.read().strip()
-            except Exception:
-                pass
-            if version.startswith('1.0'):
-                self.version += version
         # Print the version number
         console('%s' % self.version)
-        # Check for latest version from server
-        try:
-            page = requests.get('http://download.flexget.com/latestversion')
-        except requests.RequestException:
-            console('Error getting latest version number from download.flexget.com')
+        if self.version == '{git}':
+            console('To check the latest released version you have run:')
+            console('`git fetch --tags` then `git describe`')
         else:
-            ver = page.text.strip()
-            if self.version.lstrip('{git}') == ver:
-                console('You are on the latest release.')
+            # Check for latest version from server
+            try:
+                page = requests.get('http://download.flexget.com/latestversion')
+            except requests.RequestException:
+                console('Error getting latest version number from download.flexget.com')
             else:
-                console('Latest release: %s' % ver)
+                ver = page.text.strip()
+                if self.version == ver:
+                    console('You are on the latest release.')
+                else:
+                    console('Latest release: %s' % ver)
         parser.exit()
 
 
