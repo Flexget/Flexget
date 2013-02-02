@@ -51,10 +51,10 @@ class ImdbSearch(object):
 
         self.max_results = 10
 
-    def ireplace(self, str, old, new, count=0):
+    def ireplace(self, text, old, new, count=0):
         """Case insensitive string replace"""
         pattern = re.compile(re.escape(old), re.I)
-        return re.sub(pattern, new, str, count)
+        return re.sub(pattern, new, text, count)
 
     def smart_match(self, raw_name):
         """Accepts messy name, cleans it and uses information available to make smartest and best match"""
@@ -103,7 +103,7 @@ class ImdbSearch(object):
         diff = movies[0]['match'] - movies[1]['match']
         if diff < self.min_diff:
             log.debug('unable to determine correct movie, min_diff too small (`%s` <-?-> `%s`)' %
-                (movies[0], movies[1]))
+                      (movies[0], movies[1]))
             for m in movies:
                 log.debug('remain: %s (match: %s) %s' % (m['name'], m['match'], m['url']))
             return None
@@ -132,7 +132,7 @@ class ImdbSearch(object):
             movie['name'] = name
             movie['url'] = actual_url
             movie['imdb_id'] = extract_id(actual_url)
-            movie['year'] = None # skips year check
+            movie['year'] = None  # skips year check
             movies.append(movie)
             return movies
 
