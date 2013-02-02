@@ -161,6 +161,7 @@ def render_from_entry(template_string, entry):
     # Make a copy of the Entry so we can add some more fields
     variables = copy(entry)
     variables['now'] = datetime.now()
+    # Add task name to variables, usually it's there because metainfo_task plugin, but not always
     if 'task' not in variables and hasattr(entry, 'task'):
         variables['task'] = entry.task.name
     # We use the lower level render function, so that our Entry is not cast into a dict (and lazy loading lost)

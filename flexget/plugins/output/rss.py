@@ -153,8 +153,8 @@ class OutputRSS(object):
         config.setdefault('history', True)
         config.setdefault('encoding', 'iso-8859-1')
         config.setdefault('link', ['imdb_url', 'input_url'])
-        config.setdefault("title", "{{title}} (from {{task.name}})")
-        config.setdefault("template", "default")
+        config.setdefault('title', '{{title}} (from {{task}})')
+        config.setdefault('template', 'default')
         # add url as last resort
         config['link'].append('url')
         return config
