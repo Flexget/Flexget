@@ -53,8 +53,9 @@ class ImdbList(object):
                 raise PluginError('Unable to login to imdb: %s' % e.message)
 
             # IMDb redirects us upon a successful login.
-            if r.status_code != 302:
-                log.warning('It appears logging in to IMDb was unsuccessful.')
+            # removed - doesn't happen always?
+            # if r.status_code != 302:
+            #     log.warning('It appears logging in to IMDb was unsuccessful.')
 
             # try to automatically figure out user_id from watchlist redirect url
             if not 'user_id' in config:
@@ -82,7 +83,7 @@ class ImdbList(object):
             log.debug('mime_type: %s' % mime_type)
             if mime_type != 'text/csv':
                 raise PluginError('Didn\'t get CSV export as response. Probably specified list `%s` does not exist.'
-                    % config['list'])
+                                  % config['list'])
             csv_rows = csv.reader(opener.iter_lines())
         except requests.RequestException as e:
             raise PluginError('Unable to get imdb list: %s' % e.message)

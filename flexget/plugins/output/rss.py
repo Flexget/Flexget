@@ -245,6 +245,7 @@ class OutputRSS(object):
         # write rss
         fn = os.path.expanduser(config['file'])
         try:
+            log.verbose('Writing output rss to %s' % fn)
             rss.write_xml(open(fn, 'w'), encoding=config['encoding'])
         except LookupError:
             log.critical('Unknown encoding %s' % config['encoding'])
