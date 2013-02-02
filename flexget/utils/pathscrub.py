@@ -13,12 +13,13 @@ replace_maps = {
     'linux': {}} # No replacements on linux
 
 
-def pathscrub(dirty_path, os=None):
+def pathscrub(dirty_path, os=None, filename=False):
     """
     Strips illegal characters for a given os from a path.
 
     :param dirty_path: Path to be scrubbed.
     :param os: Defines which os mode should be used, can be 'windows', 'mac', 'linux', or None to auto-detect
+    :param filename: If this is True, path separators will be replaced with '-'
     :return: A valid path.
     """
 
@@ -43,5 +44,8 @@ def pathscrub(dirty_path, os=None):
     drive, path = ntpath.splitdrive(dirty_path)
     for search, replace in replace_map.iteritems():
         path = re.sub(search, replace, path)
+
+    if filename:
+        path = path.replace('/', '-').replace('\\', '-')
 
     return drive + path.strip()
