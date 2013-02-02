@@ -1,7 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 import sys
 import subprocess
-import re
 from argparse import ArgumentParser as ArgParser, Action, ArgumentError, SUPPRESS, _VersionAction
 
 import flexget
@@ -40,11 +39,11 @@ class VersionAction(_VersionAction):
         console('%s' % self.version)
         # Check for latest version from server
         try:
-            page = requests.get('http://download.flexget.com')
+            page = requests.get('http://download.flexget.com/latestversion')
         except requests.RequestException:
             console('Error getting latest version number from download.flexget.com')
         else:
-            ver = re.search(r'FlexGet-([\d\.]*)\.tar\.gz', page.text).group(1)
+            ver = page.text.strip()
             if self.version.lstrip('{git}') == ver:
                 console('You are on the latest release.')
             else:
