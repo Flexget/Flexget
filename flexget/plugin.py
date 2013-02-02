@@ -370,6 +370,7 @@ def _load_plugins_from_dirs(dirs):
     :param list dirs: Directories from where plugins are loaded from
     """
 
+    log.debug('Trying to load plugins from: %s' % dirs)
     # add all dirs to plugins_pkg load path so that plugins are loaded from flexget and from ~/.flexget/plugins/
     plugins_pkg.__path__ = map(_strip_trailing_sep, dirs)
     for importer, name, ispkg in pkgutil.walk_packages(dirs, plugins_pkg.__name__ + '.'):
@@ -418,7 +419,6 @@ def load_plugins(parser):
         if parser is not None:
             for args, kwargs in _plugin_options:
                 parser.add_argument(*args, **kwargs)
-        return 0
 
     # suppress DeprecationWarning's
     import warnings

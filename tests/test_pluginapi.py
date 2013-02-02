@@ -27,7 +27,6 @@ class TestPluginApi(object):
         from flexget.options import CoreArgumentParser
 
         plugin.load_plugins(CoreArgumentParser())
-        assert 0 == plugin.load_plugins(CoreArgumentParser())
         plugin_path = os.path.dirname(plugins.__file__)
         plugin_modules = set(os.path.basename(i)
             for k in ("/*.py", "/*/*.py")
@@ -63,7 +62,8 @@ class TestExternalPluginLoading(FlexGetBase):
     """
 
     def setup(self):
-        os.environ['FLEXGET_PLUGIN_PATH'] = os.path.join(os.path.dirname(__file__), 'external_plugins')
+        os.environ['FLEXGET_PLUGIN_PATH'] = os.path.join(self.base_path, 'external_plugins')
+        plugin.load_plugins(plugin._parser)
         super(TestExternalPluginLoading, self).setup()
 
     def teardown(self):
