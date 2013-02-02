@@ -384,7 +384,7 @@ def load_plugins_from_dirs(dirs):
             continue
         loader = importer.find_module(name)
         # Don't load from pyc files
-        if loader.filename.endswith('.pyc'):
+        if not loader.filename.endswith('.py'):
             continue
         try:
             loaded_module = loader.load_module(name)

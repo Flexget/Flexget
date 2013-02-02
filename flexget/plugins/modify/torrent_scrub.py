@@ -2,9 +2,10 @@
 """
 from __future__ import unicode_literals, division, absolute_import
 import logging
+
 from flexget import plugin, validator
 from flexget.utils import bittorrent
-from flexget.plugins.modify import torrent as modify_torrent
+from flexget.plugins.modify.torrent import TorrentFilename
 
 log = logging.getLogger('torrent_scrub')
 
@@ -18,7 +19,7 @@ class TorrentScrub(object):
                 torrent_scrub: resume
     """
     # Scrub at high level, but BELOW "torrent"
-    SCRUB_PRIO = modify_torrent.TorrentFilename.TORRENT_PRIO - 10
+    SCRUB_PRIO = TorrentFilename.TORRENT_PRIO - 10
 
     # Scrubbing modes
     SCRUB_MODES = ("off", "on", "all", "resume", "rtorrent",)
