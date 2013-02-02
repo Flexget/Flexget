@@ -1,8 +1,11 @@
 from __future__ import unicode_literals, division, absolute_import
 import os
 import glob
-from flexget import plugin, plugins
+
 from nose.tools import raises
+
+from tests import FlexGetBase
+from flexget import plugin, plugins
 
 
 class TestPluginApi(object):
@@ -50,3 +53,23 @@ class TestPluginApi(object):
         assert 'test_plugin' in plugin.plugins
         assert 'oneword' in plugin.plugins
         assert 'test_html' in plugin.plugins
+
+
+class TestExternalPluginLoading(FlexGetBase):
+    __yaml__ = """
+        tasks:
+          ext_plugin:
+            external_plugin: yes
+    """
+
+    def setup(self):
+        os.environ['FLEXGET_PLUGIN_PATH'] = os.path.join(os.path.dirname(__file__), 'external_plugins')
+        super(TestExternalPluginLoading, self).setup()
+
+    def teardown(self):
+        del os.environ['FLEXGET_PLUGIN_PATH']
+        super(TestExternalPluginLoading, self).teardown()
+
+    def test_external_plugin_loading(self):
+        self.execute_task('ext_plugin')
+        assert self.task.find_entry(title='test entry'), 'External plugin did not create entry'
