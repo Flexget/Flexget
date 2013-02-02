@@ -7,8 +7,11 @@ import os
 import re
 import logging
 import time
+import pkgutil
 from itertools import ifilter
+
 from requests import RequestException
+
 from flexget.event import add_event_handler as add_phase_handler
 from flexget import plugins as plugins_pkg
 
@@ -175,9 +178,6 @@ phase_methods = {
     'process_end': 'on_process_end',
 }
 phase_methods.update((_phase, 'on_task_' + _phase) for _phase in task_phases)  # DRY
-
-# Plugin package naming
-PLUGIN_NAMESPACE = 'flexget.plugins'
 
 # Mapping of plugin name to PluginInfo instance (logical singletons)
 plugins = {}
@@ -365,24 +365,6 @@ def get_standard_plugins_path():
 
     # Add flexget.plugins directory (core plugins)
     path.append(os.path.abspath(os.path.dirname(plugins_pkg.__file__)))
-
-    # Leads to problems if flexget is imported via PYTHONPATH and another copy
-    # is installed into site-packages, remove this altogether if nobody has any problems
-    # (and those that have can use FLEXGET_PLUGIN_PATH explicitely)
-    ## Search the arch independent path if we can determine that and
-    ## the plugin is found nowhere else, and we're in default mode
-    #if not env_path and sys.platform != 'win32':
-    #    try:
-    #        from distutils.sysconfig import get_python_lib
-    #    except ImportError:
-    #        # If distutuils is not available, we just won't add that path
-    #        log.debug('FYI: Not adding archless plugin path due to distutils missing')
-    #    else:
-    #        archless_path = os.path.join(get_python_lib(), 'flexget', 'plugins')
-    #        if archless_path not in path:
-    #            log.debug("FYI: Adding archless plugin path '%s' from distutils" % archless_path)
-    #            path.append(archless_path)
-
     return path
 
 
@@ -393,100 +375,37 @@ def load_plugins_from_dirs(dirs):
 
     # add all dirs to plugins_pkg load path so that plugins are loaded from flexget and from ~/.flexget/plugins/
     plugins_pkg.__path__ = map(_strip_trailing_sep, dirs)
-
-    # construct list of plugin_packages from all load path subdirectories
-    plugin_packages = []
-    for dir in dirs:
-        if not os.path.exists(dir):
+    for importer, name, ispkg in pkgutil.walk_packages(dirs, plugins_pkg.__name__ + '.'):
+        if ispkg:
             continue
-        plugin_packages.extend([n for n in os.listdir(dir) if os.path.isdir(os.path.join(dir, n))])
-
-    # import plugin packages and manipulate their load paths
-    for subpkg in plugin_packages[:]:
-        # must be a proper python package with __init__.py
-        if os.path.isdir(os.path.join(os.path.dirname(plugins_pkg.__file__), subpkg)) and \
-           os.path.isfile(os.path.join(os.path.dirname(plugins_pkg.__file__), subpkg, '__init__.py')):
-
-            # import sub-package and manipulate its search path so that all existing subdirs are in it
-            getattr(__import__(PLUGIN_NAMESPACE, fromlist=[subpkg], level=0), subpkg).__path__ = [
-                _strip_trailing_sep(os.path.join(package_base, subpkg))
-                for package_base in dirs if os.path.isfile(os.path.join(package_base, subpkg, '__init__.py'))]
-        else:
-            log.debug('removing defunct plugin_package %s' % subpkg)
-            plugin_packages.remove(subpkg)
-
-    # actually load plugins from directories
-    for dir in dirs:
-        if not dir:
+        # Don't load any plugins again if they are already loaded
+        # This can happen if one plugin imports from another plugin
+        if name in sys.modules:
             continue
-        if os.path.isdir(dir):
-            log.debug('Looking for plugins in %s', dir)
-            load_plugins_from_dir(dir)
-
-            # Also look in sub-packages named like the task phases, plus "generic"
-            for subpkg in plugin_packages:
-                subpath = os.path.join(dir, subpkg)
-                if os.path.isdir(subpath):
-                    # Only log existing subdirs
-                    log.debug("Looking for sub-plugins in '%s'", subpath)
-                    load_plugins_from_dir(dir, subpkg)
-        else:
-            log.debug('Ignoring non-existing plugin directory %s', dir)
-
-
-def load_plugins_from_dir(basepath, subpkg=None):
-    # Get the list of valid python suffixes for plugins
-    # this includes .py, .pyc, and .pyo (depending on if we are running -O)
-    # but it doesn't include compiled modules (.so, .dll, etc)
-    #
-    # This causes quite a bit problems when renaming plugins and is there really need to import .pyc / pyo?
-    #
-    # import imp
-    # valid_suffixes = [suffix for suffix, mod_type, flags in imp.get_suffixes()
-    #                         if flags in (imp.PY_SOURCE, imp.PY_COMPILED)]
-    valid_suffixes = ['.py']
-    namespace = PLUGIN_NAMESPACE + '.'
-    dirpath = basepath
-    if subpkg:
-        namespace += subpkg + '.'
-        dirpath = os.path.join(dirpath, subpkg)
-
-    found_plugins = set()
-    for filename in os.listdir(dirpath):
-        path = os.path.join(dirpath, filename)
-        if os.path.isfile(path):
-            f_base, ext = os.path.splitext(filename)
-            if ext in valid_suffixes:
-                if f_base == '__init__':
-                    continue  # don't load __init__.py again
-                if (namespace + f_base) in _loaded_plugins:
-                    log.debug('Duplicate plugin module `%s` in `%s` ignored, `%s` already loaded!' % (
-                        namespace + f_base, dirpath, _loaded_plugins[namespace + f_base]))
-                else:
-                    _loaded_plugins[namespace + f_base] = path
-                    found_plugins.add(namespace + f_base)
-
-    for modulename in found_plugins:
+        loader = importer.find_module(name)
+        # Don't load from pyc files
+        if loader.filename.endswith('.pyc'):
+            continue
         try:
-            __import__(modulename, level=0)
+            loaded_module = loader.load_module(name)
         except DependencyError as e:
             if e.has_message():
                 msg = e.message
             else:
-                msg = 'Plugin `%s` requires `%s` to load.' % (e.issued_by or modulename, e.missing or 'N/A')
+                msg = 'Plugin `%s` requires `%s` to load.' % (e.issued_by or name, e.missing or 'N/A')
             if not e.silent:
                 log.warning(msg)
             else:
                 log.debug(msg)
         except ImportError as e:
-            log.critical('Plugin `%s` failed to import dependencies' % modulename)
+            log.critical('Plugin `%s` failed to import dependencies' % name)
             log.exception(e)
         except Exception as e:
-            log.critical('Exception while loading plugin %s' % modulename)
+            log.critical('Exception while loading plugin %s' % name)
             log.exception(e)
             raise
         else:
-            log.trace('Loaded module %s from %s' % (modulename[len(PLUGIN_NAMESPACE) + 1:], dirpath))
+            log.trace('Loaded module %s from %s' % (name, loaded_module.__file__))
 
     if _new_phase_queue:
         for phase, args in _new_phase_queue.iteritems():
