@@ -29,15 +29,13 @@ class VersionAction(_VersionAction):
             # Attempt to get version from git
             version = ''
             try:
-                subprocess.call(['git', 'fetch', '--tags'])
+                subprocess.call(['git', 'fetch', '--tags'], stdout=subprocess.PIPE)
                 p = subprocess.Popen(['git', 'describe'], stdout=subprocess.PIPE)
                 version = p.stdout.read().strip()
             except Exception:
                 pass
             if version.startswith('1.0'):
                 self.version += version
-            else:
-                console('Unable to get current version tag from git.')
         # Print the version number
         console('%s' % self.version)
         # Check for latest version from server
