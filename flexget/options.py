@@ -25,6 +25,7 @@ class VersionAction(_VersionAction):
     def __call__(self, parser, namespace, values, option_string=None):
         if self.version == '{git}':
             # Attempt to get version from git
+            console('Make sure you run `git fetch` to grab the latest version tags from the repo.')
             version = ''
             try:
                 p = subprocess.Popen('git describe', stdout=subprocess.PIPE)
