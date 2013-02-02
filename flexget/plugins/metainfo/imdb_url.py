@@ -1,7 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
 import re
 import logging
-from flexget.plugin import *
+from flexget.plugin import register_plugin
 
 log = logging.getLogger('metainfo_imdb_url')
 

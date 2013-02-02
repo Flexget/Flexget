@@ -3,7 +3,7 @@ import re
 import urllib2
 import logging
 from flexget.plugins.plugin_urlrewriting import UrlRewritingError
-from flexget.plugin import *
+from flexget.plugin import register_plugin
 from flexget.utils.soup import get_soup
 from flexget.utils.tools import urlopener
 

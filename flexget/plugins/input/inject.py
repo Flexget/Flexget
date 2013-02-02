@@ -4,7 +4,7 @@ import random
 import logging
 import yaml
 from flexget.entry import Entry
-from flexget.plugin import *
+from flexget.plugin import register_plugin, register_parser_option, priority
 from flexget.utils.tools import str_to_boolean
 
 log = logging.getLogger('inject')

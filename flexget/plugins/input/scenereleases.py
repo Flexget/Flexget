@@ -1,7 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
 from flexget.entry import Entry
-from flexget.plugin import *
+from flexget.plugin import register_plugin, get_plugin_by_name, internet
 from flexget.utils.soup import get_soup
 from flexget.utils.cached_input import cached
 from bs4 import NavigableString
