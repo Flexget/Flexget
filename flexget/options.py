@@ -1,10 +1,12 @@
 from __future__ import unicode_literals, division, absolute_import
 import sys
 import subprocess
+import re
 from argparse import ArgumentParser as ArgParser, Action, ArgumentError, SUPPRESS, _VersionAction
 
 import flexget
 from flexget.utils.tools import console
+from flexget.utils import requests
 
 
 def required_length(nmin, nmax):
@@ -25,18 +27,31 @@ class VersionAction(_VersionAction):
     def __call__(self, parser, namespace, values, option_string=None):
         if self.version == '{git}':
             # Attempt to get version from git
-            console('Make sure you run `git fetch` to grab the latest version tags from the repo.')
             version = ''
             try:
-                p = subprocess.Popen('git describe', stdout=subprocess.PIPE)
-                version = p.stdout.read()
+                subprocess.call(['git', 'fetch', '--tags'])
+                p = subprocess.Popen(['git', 'describe'], stdout=subprocess.PIPE)
+                version = p.stdout.read().strip()
             except Exception:
                 pass
             if version.startswith('1.0'):
                 self.version += version
             else:
-                console('Unable to get current version from git.')
-        super(VersionAction, self).__call__(parser, namespace, values, option_string)
+                console('Unable to get current version tag from git.')
+        # Print the version number
+        console('%s' % self.version)
+        # Check for latest version from server
+        try:
+            page = requests.get('http://download.flexget.com')
+        except requests.RequestException:
+            console('Error getting latest version number from download.flexget.com')
+        else:
+            ver = re.search(r'FlexGet-([\d\.]*)\.tar\.gz', page.text).group(1)
+            if self.version.lstrip('{git}') == ver:
+                console('You are on the latest release.')
+            else:
+                console('Latest release: %s' % ver)
+        parser.exit()
 
 
 class ArgumentParser(ArgParser):
