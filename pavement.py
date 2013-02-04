@@ -71,6 +71,7 @@ options(
     ),
 )
 
+
 def freplace(name, what_str, with_str):
     """Replaces a :what_str: with :with_str: in file :name:"""
     import fileinput
@@ -78,6 +79,7 @@ def freplace(name, what_str, with_str):
         if what_str in line:
             line = line.replace(what_str, with_str)
         print line,
+
 
 def set_init_version(ver):
     """Replaces the version with :ver: in __init__.py"""

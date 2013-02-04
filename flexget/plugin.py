@@ -151,10 +151,6 @@ def priority(value):
         return target
     return decorator
 
-
-def _strip_trailing_sep(path):
-    return path.rstrip("\\/")
-
 DEFAULT_PRIORITY = 128
 
 plugin_contexts = ['task', 'root']
@@ -246,35 +242,29 @@ class PluginInfo(dict):
     # Counts duplicate registrations
     dupe_counter = 0
 
-    @classmethod
-    def name_from_class(cls, plugin_class):
-        """
-        Convention is to take camel-case class name and rewrite it to an underscore form,
-        e.g. 'PluginName' to 'plugin_name'
-        """
-        return re.sub('[A-Z]+', lambda i: '_' + i.group(0).lower(), plugin_class.__name__).lstrip('_')
-
     def __init__(self, plugin_class, name=None, groups=None, builtin=False, debug=False, api_ver=1,
                  contexts=None, category=None):
         """
         Register a plugin.
 
         :param plugin_class: The plugin factory.
-        :param name: Name of the plugin (if not given, default to factory class name in underscore form).
-        :param groups: Groups this plugin belongs to.
-        :param builtin: Auto-activated?
-        :param debug: True if plugin is for debugging purposes.
-        :param api_ver: Signature of callback hooks (1=task; 2=task,config).
-        :param contexts: List of where this plugin is configurable. Can be 'task', 'root', or None
-        :param category: The type of plugin. Can be one of the task phases.
-            Defaults to the package containing the plugin.
+        :param string name: Name of the plugin (if not given, default to factory class name in underscore form).
+        :param list groups: Groups this plugin belongs to.
+        :param bool builtin: Auto-activated?
+        :param bool debug: True if plugin is for debugging purposes.
+        :param int api_ver: Signature of callback hooks (1=task; 2=task,config).
+        :param list contexts: List of where this plugin is configurable. Can be 'task', 'root', or None
+        :param string category: The type of plugin. Can be one of the task phases.
+            Defaults to the package name containing the plugin.
         """
         dict.__init__(self)
 
         if groups is None:
             groups = []
         if name is None:
-            name = PluginInfo.name_from_class(plugin_class)
+            # Convention is to take camel-case class name and rewrite it to an underscore form,
+            # e.g. 'PluginName' to 'plugin_name'
+            name = re.sub('[A-Z]+', lambda i: '_' + i.group(0).lower(), plugin_class.__name__).lstrip('_')
         if contexts is None:
             contexts = ['task']
         elif isinstance(contexts, basestring):
@@ -351,24 +341,31 @@ class PluginInfo(dict):
 register_plugin = PluginInfo
 
 
+def _strip_trailing_sep(path):
+    return path.rstrip("\\/")
+
+
 def get_standard_plugins_path():
-    """Determine a plugin path suitable for general use."""
-    # Get basic path from enironment
+    """
+    :returns: List of directories where plugins should be tried to load from.
+    :rtype: list
+    """
+    # Get basic path from environment
     env_path = os.environ.get('FLEXGET_PLUGIN_PATH')
     if env_path:
         # Get rid of trailing slashes, since Python can't handle them when
         # it tries to import modules.
-        path = map(_strip_trailing_sep, env_path.split(os.pathsep))
+        paths = map(_strip_trailing_sep, env_path.split(os.pathsep))
     else:
         # Use standard default
-        path = [os.path.join(os.path.expanduser('~'), '.flexget', 'plugins')]
+        paths = [os.path.join(os.path.expanduser('~'), '.flexget', 'plugins')]
 
     # Add flexget.plugins directory (core plugins)
-    path.append(os.path.abspath(os.path.dirname(plugins_pkg.__file__)))
-    return path
+    paths.append(os.path.abspath(os.path.dirname(plugins_pkg.__file__)))
+    return paths
 
 
-def load_plugins_from_dirs(dirs):
+def _load_plugins_from_dirs(dirs):
     """
     :param list dirs: Directories from where plugins are loaded from
     """
@@ -430,7 +427,7 @@ def load_plugins(parser):
     start_time = time.time()
     _parser = parser
     try:
-        load_plugins_from_dirs(get_standard_plugins_path())
+        _load_plugins_from_dirs(get_standard_plugins_path())
     finally:
         _parser = None
     took = time.time() - start_time
@@ -439,7 +436,20 @@ def load_plugins(parser):
 
 
 def get_plugins(phase=None, group=None, context=None, category=None, min_api=None):
+    """
+    Query other plugins characteristics.
+
+    :param string phase: Require phase
+    :param string group: Plugin must belong to this group.
+    :param string context: Where plugin is configured, eg. (root, task)
+    :param string category: Type of plugin, phase names.
+    :param int min_api: Minimum api version.
+    :return: List of PluginInfo instances.
+    :rtype: list
+    """
     def matches(plugin):
+        if phase is not None and phase not in phase_methods:
+            raise ValueError('Unknown phase %s' % phase)
         if phase and not phase in plugin.phase_handlers:
             return False
         if group and not group in plugin.groups:
@@ -455,7 +465,12 @@ def get_plugins(phase=None, group=None, context=None, category=None, min_api=Non
 
 
 def get_plugins_by_phase(phase):
-    """Return an iterator over all plugins that hook :phase:"""
+    """
+    .. deprecated:: 1.0.3328
+       Use :func:`get_plugins` instead
+
+    Return an iterator over all plugins that hook :phase:
+    """
     if not phase in phase_methods:
         raise Exception('Unknown phase %s' % phase)
     return get_plugins(phase=phase)
@@ -467,7 +482,12 @@ def get_phases_by_plugin(name):
 
 
 def get_plugins_by_group(group):
-    """Return an iterator over all plugins with in specified group."""
+    """
+    .. deprecated:: 1.0.3328
+       Use :func:`get_plugins` instead
+
+    Return an iterator over all plugins with in specified group.
+    """
     return get_plugins(group=group)
 
 
@@ -486,6 +506,7 @@ def get_plugin_by_name(name, issued_by='???'):
 _excluded_recursively = []
 
 
+# TODO: remove and use LazyValidator
 def add_plugin_validators(validator, phase=None, group=None, excluded=None, api_ver=2):
     """
     :param validator: Instance of validator where other plugin validators are added into. (Eg. list or dict validator)
