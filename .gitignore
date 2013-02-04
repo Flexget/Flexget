@@ -13,3 +13,4 @@ config.yml
 db-config.sqlite
 flexget.log
 flexget.log.offset
+received/

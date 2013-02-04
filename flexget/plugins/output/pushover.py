@@ -1,6 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
-from flexget.plugin import register_plugin
+from flexget.plugin import register_plugin, priority
 from flexget.utils.template import RenderError
 
 log = logging.getLogger("pushover")
@@ -51,6 +51,8 @@ class OutputPushover(object):
 
         return config
 
+    # Run last to prevent repeated runs due to errors in other plugins
+    @priority(255)
     def on_task_output(self, task, config):
         # get the parameters
         config = self.prepare_config(config)
