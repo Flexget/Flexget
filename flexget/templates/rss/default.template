@@ -9,8 +9,8 @@
   {{imdb_name}} {{imdb_year}}<br />
   <b>Score:</b> {{imdb_score|d('N/A')}} ({{imdb_votes|d('0')}} votes)<br/>
   {% if imdb_genres is defined %}<b>Genres:</b> {{ imdb_genres|join(', ') }}<br/>{% endif %}
-  {% if imdb_directors is defined %}<b>Directed By:</b>{% for imdbid, actor in imdb_directors.items() %}<a href="http://www.imdb.com/name/{{ imdbid }}">{{ actor }}</a>, {% endfor %}<br/>{% endif %}
-  {% if imdb_actors is defined %}<b>Cast:</b>{% for imdbid, actor in imdb_actors.items() %}<a href="http://www.imdb.com/name/{{ imdbid }}">{{ actor }}</a>, {% endfor %}<br/>{% endif %}
+  {% if imdb_directors is defined %}<b>Directed By:</b> {% for imdbid, actor in imdb_directors.items() %}<a href="http://www.imdb.com/name/{{ imdbid }}">{{ actor }}</a>, {% endfor %}<br/>{% endif %}
+  {% if imdb_actors is defined %}<b>Cast:</b> {% for imdbid, actor in imdb_actors.items() %}<a href="http://www.imdb.com/name/{{ imdbid }}">{{ actor }}</a>, {% endfor %}<br/>{% endif %}
   <b>Plot:</b> {{imdb_plot_outline|d('N/A')}}
 {% else %}
   {{title}}
