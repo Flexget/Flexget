@@ -125,7 +125,7 @@ class InputRSS(object):
         # set default value for group_links as deactivated
         config.setdefault('group_links', False)
         # set default for all_entries
-        config.setdefault('all_entries', False)
+        config.setdefault('all_entries', True)
         return config
 
     def process_invalid_content(self, task, data):
