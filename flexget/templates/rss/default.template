@@ -1,17 +1,16 @@
 {% if series_name is defined %}
-  {% if series_banner_url is defined %}<img src="{{series_banner_url}}" /><br/>{% endif %}
-  {% if series_name_tvdb is defined %}{{series_name_tvdb}}{% else %}{{series_name}}{% endif %} {{series_id}} {{ep_name|d('')}}<br/>
-  {% if series_actors is defined %}<b>Cast:</b> {{ series_actors|join(', ') }}<br/>{% endif %}
-  {% if ep_guest_stars is defined %}<b>Guest Starring:</b> {{ ep_guest_stars|join(', ') }}<br/>{% endif %}
-  {% if ep_overview is defined %}<b>Overview:</b> {{ep_overview|d('')}}{% endif %}
+  {% if series_banner_url is defined %}<p><img src="{{series_banner_url}}" /></p>{% endif %}
+  <p>{% if series_name_tvdb is defined %}{{series_name_tvdb}}{% else %}{{series_name}}{% endif %} {{series_id}} {{ep_name|d('')}}</p>
+  {% if series_actors is defined %}<p><strong>Cast:</strong> {{ series_actors|join(', ') }}</p>{% endif %}
+  {% if ep_guest_stars is defined %}<p><strong>Guest Starring:</strong> {{ ep_guest_stars|join(', ') }}</p>{% endif %}
+  {% if ep_overview is defined %}<p><strong>Overview:</strong> {{ep_overview|d('')}}</p>{% endif %}
 {% elif imdb_name is defined %}
-  {{title}}<br/>
-  {{imdb_name}} {{imdb_year}}<br />
-  <b>Score:</b> {{imdb_score|d('N/A')}} ({{imdb_votes|d('0')}} votes)<br/>
-  {% if imdb_genres is defined %}<b>Genres:</b> {{ imdb_genres|join(', ') }}<br/>{% endif %}
-  {% if imdb_directors is defined %}<b>Directed By:</b> {% for imdbid, actor in imdb_directors.items() %}<a href="http://www.imdb.com/name/{{ imdbid }}">{{ actor }}</a>, {% endfor %}<br/>{% endif %}
-  {% if imdb_actors is defined %}<b>Cast:</b> {% for imdbid, actor in imdb_actors.items() %}<a href="http://www.imdb.com/name/{{ imdbid }}">{{ actor }}</a>, {% endfor %}<br/>{% endif %}
-  <b>Plot:</b> {{imdb_plot_outline|d('N/A')}}
+  <p>{{imdb_name}} ({{imdb_year}})</p>
+  <p><strong>Score:</strong> {{imdb_score|d('N/A')}} ({{imdb_votes|d('0')}} votes)</p>
+  {% if imdb_genres is defined %}<p><strong>Genres:</strong> {{ imdb_genres|join(', ') }}</p>{% endif %}
+  {% if imdb_directors is defined %}<p><strong>Directed By:</strong> {% for imdbid, actor in imdb_directors.items() %}<a href="http://www.imdb.com/name/{{ imdbid }}">{{ actor }}</a>, {% endfor %}</p>{% endif %}
+  {% if imdb_actors is defined %}<p><strong>Cast:</strong> {% for imdbid, actor in imdb_actors.items() %}<a href="http://www.imdb.com/name/{{ imdbid }}">{{ actor }}</a>, {% endfor %}</p>{% endif %}
+  <p><strong>Plot:</strong> {{imdb_plot_outline|d('N/A')}}</p>
 {% else %}
   {{title}}
 {% endif %}
