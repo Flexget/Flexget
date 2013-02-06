@@ -69,6 +69,6 @@ class OutputNotifyOsd(object):
 
         n = Notify.Notification.new(title, '\n'.join(body_items), None)
         n.show()
-        n.close()
+        Notify.uninit()
 
 register_plugin(OutputNotifyOsd, 'notify_osd', api_ver=2)
