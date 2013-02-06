@@ -1,6 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
 import sys
+import time
 from flexget.plugin import register_plugin, priority
 from flexget.utils.template import RenderError, render_from_task
 
@@ -27,11 +28,11 @@ class OutputNotifyOsd(object):
 
     def on_task_start(self, task, config):
         try:
-            from pynotify import Notification
+            from gi.repository import Notify
         except ImportError as e:
-            log.debug('Error importing pynotify: %s' % e)
-            raise DependencyError('Notification', 'pynotify',
-                'Notification module and it\'s depenencies required. ImportError: %s' % e, log)
+            log.debug('Error importing Notify: %s' % e)
+            raise DependencyError('notify_osd', 'gi.repository',
+                'Notify module required. ImportError: %s' % e)
 
     @priority(0)
     def on_task_output(self, task, config):
@@ -41,9 +42,9 @@ class OutputNotifyOsd(object):
                 title_template: Notification title, supports jinja templating, default {{task.name}}
                 item_template: Notification body, suports jinja templating, default {{}}
         """
-        import pynotify
+        from gi.repository import Notify
 
-        if not pynotify.init("Flexget"):
+        if not Notify.init("Flexget"):
             log.error('Unable to init libnotify.')
             return
 
@@ -70,9 +71,9 @@ class OutputNotifyOsd(object):
         except RenderError as e:
             log.error('Error setting title Notify-osd message: %s' % e)
 
-        n = pynotify.Notification(title,
-            '\n'.join(body_items),
-        )
+        n = Notify.Notification.new(title,'\n'.join(body_items), None)
         n.show()
+        n.close()
+        Notify.uninit()
 
 register_plugin(OutputNotifyOsd, 'notify_osd', api_ver=2)
