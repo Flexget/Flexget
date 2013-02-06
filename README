@@ -1,4 +1,4 @@
-How to use SVN / GIT checkout
+How to use GIT checkout
 -----------------------------
 
 Check that you have Python 2.6 - 2.7 available with command 'python -V'.
@@ -24,7 +24,7 @@ installation by running:
 bin/flexget -V
 
 You may also place the configuration files in ~/.flexget (Unix, Mac OS X) 
-or C:\Documents and Setting\<username>\.flexget (Windows).
+or C:\Documents and Setting\<username>\flexget (Windows).
 
 If you don't want to use virtualenv there's 'flexget_vanilla.py' file which
 can be used to run FlexGet without bootstrapping, note that you will need to
