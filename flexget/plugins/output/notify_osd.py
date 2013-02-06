@@ -2,7 +2,7 @@ from __future__ import unicode_literals, division, absolute_import
 import logging
 import sys
 import time
-from flexget.plugin import register_plugin, priority
+from flexget.plugin import register_plugin, priority, DependencyError
 from flexget.utils.template import RenderError, render_from_task
 
 log = logging.getLogger('notify_osd')
@@ -73,7 +73,5 @@ class OutputNotifyOsd(object):
 
         n = Notify.Notification.new(title,'\n'.join(body_items), None)
         n.show()
-        n.close()
-        Notify.uninit()
 
 register_plugin(OutputNotifyOsd, 'notify_osd', api_ver=2)
