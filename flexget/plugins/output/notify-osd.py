@@ -11,9 +11,11 @@ class OutputNotifyOsd(object):
 
     def validator(self):
         from flexget import validator
-        config = validator.factory('dict')
-        config.accept('text', key='title_template')
-        config.accept('text', key='item_template')
+        config = validator.factory()
+        config.accept('boolean')
+        advanced = config.accept('dict')
+        advanced.accept('text', key='title_template')
+        advanced.accept('text', key='item_template')
         return config
 
     def prepare_config(self, config):
