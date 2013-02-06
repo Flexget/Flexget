@@ -30,8 +30,8 @@ class OutputNotifyOsd(object):
             from pynotify import Notification
         except ImportError as e:
             log.debug('Error importing pynotify: %s' % e)
-            raise DependencyError('Notification', 'pynotify',
-                'Notification module and it\'s depenencies required. ImportError: %s' % e, log)
+            raise DependencyError('notify_osd', 'pynotify',
+                'pynotify module required. ImportError: %s' % e)
 
     @priority(0)
     def on_task_output(self, task, config):
