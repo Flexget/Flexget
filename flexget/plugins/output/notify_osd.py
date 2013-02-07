@@ -43,10 +43,6 @@ class OutputNotifyOsd(object):
         """
         from gi.repository import Notify
 
-        if not Notify.init("Flexget"):
-            log.error('Unable to init libnotify.')
-            return
-
         if not task.accepted:
             return
 
@@ -67,8 +63,11 @@ class OutputNotifyOsd(object):
         except RenderError as e:
             log.error('Error setting title Notify-osd message: %s' % e)
 
+        if not Notify.init("Flexget"):
+            log.error('Unable to init libnotify.')
+            return
+
         n = Notify.Notification.new(title, '\n'.join(body_items), None)
         n.show()
-        Notify.uninit()
 
 register_plugin(OutputNotifyOsd, 'notify_osd', api_ver=2)
