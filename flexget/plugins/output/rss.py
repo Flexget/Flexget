@@ -184,11 +184,12 @@ class OutputRSS(object):
                     rss.link = entry[field]
                     break
 
+            # TODO: better exception handling
             try:
                 rss.description = render_from_entry(get_template(config['template'], 'rss'), entry)
             except:
                 log.error("Error while rendering entry %s, falling back to plain title", entry)
-                rss.description = entry.render("{{title}} - (Render Error)")
+                rss.description = entry['title'] + ' - (Render Error)'
             rss.file = config['file']
 
             # TODO: check if this exists and suggest disabling history if it does since it shouldn't happen normally ...

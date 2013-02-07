@@ -5,6 +5,8 @@
   {% if ep_guest_stars is defined %}<p><strong>Guest Starring:</strong> {{ ep_guest_stars|join(', ') }}</p>{% endif %}
   {% if ep_overview is defined %}<p><strong>Overview:</strong> {{ep_overview|d('')}}</p>{% endif %}
 {% elif imdb_name is defined %}
+  {% if tmdb_posters is defined %}<p><img src="{{tmdb_posters[0]}}" /></p>{% endif %}
+
   <p>{{imdb_name}} ({{imdb_year}})</p>
   <p><strong>Score:</strong> {{imdb_score|d('N/A')}} ({{imdb_votes|d('0')}} votes)</p>
   {% if imdb_genres is defined %}<p><strong>Genres:</strong> {{ imdb_genres|join(', ') }}</p>{% endif %}
