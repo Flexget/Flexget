@@ -3,6 +3,7 @@ import os
 from netrc import netrc, NetrcParseError
 import logging
 import base64
+
 from flexget.plugin import register_plugin, priority, get_plugin_by_name, PluginError
 from flexget import validator
 from flexget.entry import Entry
@@ -344,7 +345,7 @@ class PluginTransmission(TransmissionBase):
         # Go through the list of active transfers and add finished transfers to remove_ids.
         for transfer in transfers.itervalues():
             log.debug('Transfer "%s": status: "%s" upload ratio: %.2f seed ratio: %.2f' %
-                (transfer.name, transfer.status, transfer.uploadRatio, transfer.seedRatioLimit))
+                      (transfer.name, transfer.status, transfer.uploadRatio, transfer.seedRatioLimit))
             if transfer.status == 'stopped' and transfer.uploadRatio >= transfer.seedRatioLimit:
                 log.info('Removing finished torrent `%s` from transmission' % transfer.name)
                 remove_ids.append(transfer.id)
