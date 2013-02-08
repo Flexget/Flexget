@@ -3,14 +3,14 @@ import ntpath
 import sys
 import re
 
-os_mode = None # Can be 'windows', 'mac', 'linux' or None. None will auto-detect os.
+os_mode = None  # Can be 'windows', 'mac', 'linux' or None. None will auto-detect os.
 replace_maps = {
     'windows': {
-        '[:*?"<>| ]+': ' ', # Turn illegal characters into a space
-        r'\.\s*([/\\]|$)': r'\1'}, # Dots cannot end file or directory names
+        '[:*?"<>| ]+': ' ',  # Turn illegal characters into a space
+        r'\.\s*([/\\]|$)': r'\1'},  # Dots cannot end file or directory names
     'mac': {
         '[: ]+': ' '},
-    'linux': {}} # No replacements on linux
+    'linux': {}}  # No replacements on linux
 
 
 def pathscrub(dirty_path, os=None, filename=False):
