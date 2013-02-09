@@ -44,9 +44,9 @@ class SeriesParser(TitleParser):
         '(?:episode|ep|part|pt)\s?(\d{1,3}|%s)' % roman_numeral_re,
         'part\s(%s)' % '|'.join(map(str, english_numbers))]])
     unwanted_ep_regexps = ReList([
-        '(\d{1,3})\s?x\s?(0+)[^1-9]', # 5x0
-        'S(\d{1,3})D(\d{1,3})', # S3D1
-        '(\d{1,3})\s?x\s?(all)', # 1xAll
+        '(\d{1,3})\s?x\s?(0+)[^1-9]',  # 5x0
+        'S(\d{1,3})D(\d{1,3})',  # S3D1
+        '(\d{1,3})\s?x\s?(all)',  # 1xAll
         'season(?:s)?\s?\d\s?(?:&\s?\d)?[\s-]*(?:complete|full)',
         'seasons\s(\d\s){2,}',
         'disc\s\d'])
