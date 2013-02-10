@@ -59,7 +59,7 @@ class TorrentScrub(object):
             infohash = entry["torrent"].info_hash
 
             if mode in ("on", "all", "true"):
-                modified = bittorrent.clean_meta(metainfo, including_info=(mode == "all"), logger=self.log.debug)
+                modified = bittorrent.clean_meta(metainfo, including_info=(mode == "all"), logger=log.debug)
             elif mode in ("resume", "rtorrent"):
                 if mode == "resume":
                     self.RT_KEYS = self.RT_KEYS[:1]
@@ -83,10 +83,10 @@ class TorrentScrub(object):
                         except KeyError:
                             # Key not found in this entry
                             field = None
-                        self.log.trace((key, field))
+                        log.trace((key, field))
 
                     if field and key in field:
-                        self.log.debug("Removing key '%s'..." % (fieldname,))
+                        log.debug("Removing key '%s'..." % (fieldname,))
                         del field[key]
                         modified.add(fieldname)
             else:
@@ -96,8 +96,8 @@ class TorrentScrub(object):
             if modified:
                 entry["torrent"].content = metainfo
                 entry["torrent"].modified = True
-                self.log.info((("Key %s was" if len(modified) == 1 else "Keys %s were")
-                    + " scrubbed from torrent '%s'!") % (", ".join(sorted(modified)), entry['title']))
+                log.info((("Key %s was" if len(modified) == 1 else "Keys %s were")
+                          + " scrubbed from torrent '%s'!") % (", ".join(sorted(modified)), entry['title']))
                 new_infohash = entry["torrent"].info_hash
                 if infohash != new_infohash:
                     log.warn("Info hash changed from #%s to #%s in '%s'" %
