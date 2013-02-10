@@ -1,3 +1,7 @@
+"""
+FlexGet build and development utilities - unfortunately this file is somewhat messy
+"""
+
 import os
 import sys
 from paver.easy import *
@@ -32,8 +36,9 @@ if sys.platform.startswith('win'):
 
 setup(
     name='FlexGet',
-    version='1.0', # our tasks append the r1234 (current svn revision) to the version number
-    description='FlexGet is a program aimed to automate downloading or processing content (torrents, podcasts, etc.) from different sources like RSS-feeds, html-pages, various sites and more.',
+    version='1.0',  # our tasks append the .1234 (current build number) to the version number
+    description='FlexGet is a program aimed to automate downloading or processing content (torrents, podcasts, etc.) '
+                'from different sources like RSS-feeds, html-pages, various sites and more.',
     author='Marko Koivusalo',
     author_email='marko.koivusalo@gmail.com',
     license='MIT',
@@ -42,14 +47,14 @@ setup(
     packages=find_packages(exclude=['tests']),
     package_data=find_package_data('flexget', package='flexget',
         exclude=['FlexGet.egg-info', '*.pyc'],
-        only_in_packages=False), # NOTE: the exclude does not seem to work
+        only_in_packages=False),  # NOTE: the exclude does not seem to work
     zip_safe=False,
     test_suite='nose.collector',
     extras_require={
-        'memusage':     ['guppy'],
-        'NZB':          ['pynzb'],
-        'TaskTray':     ['pywin32'],
-        },
+        'memusage': ['guppy'],
+        'NZB': ['pynzb'],
+        'TaskTray': ['pywin32'],
+    },
     entry_points=entry_points
 )
 
@@ -72,17 +77,8 @@ options(
 )
 
 
-def freplace(name, what_str, with_str):
-    """Replaces a :what_str: with :with_str: in file :name:"""
-    import fileinput
-    for line in fileinput.FileInput(name, inplace=1):
-        if what_str in line:
-            line = line.replace(what_str, with_str)
-        print line,
-
-
 def set_init_version(ver):
-    """Replaces the version with :ver: in __init__.py"""
+    """Replaces the version with ``ver`` in __init__.py"""
     import fileinput
     for line in fileinput.FileInput('flexget/__init__.py', inplace=1):
         if line.startswith('__version__ = '):
@@ -122,7 +118,8 @@ def test(options):
 @task
 def clean():
     """Cleans up the virtualenv"""
-    import os, glob
+    import os
+    import glob
 
     for p in ('bin', 'Scripts', 'build', 'dist', 'include', 'lib', 'man',
               'share', 'FlexGet.egg-info', 'paver-minilib.zip', 'setup.py'):
@@ -347,7 +344,7 @@ def pep8(args):
         'E128'  # E128 continuation line under-indented for visual indent
     ]
     styleguide = pep8.StyleGuide(show_source=True, ignore=ignore, repeat=1, max_line_length=120,
-        parse_argv=args)
+                                 parse_argv=args)
     styleguide.input_dir('flexget')
 
 
@@ -377,8 +374,8 @@ def bootstrap():
         """ % bool(vopts.get('distribute')))
 
     paver.virtual._create_bootstrap(vopts.get("script_name", "bootstrap.py"),
-        vopts.get("packages_to_install", []),
-        vopts.get("paver_command_line", None),
-        dest_dir=vopts.get("dest_dir", '.'),
-        unzip_setuptools=vopts.get("unzip_setuptools", False),
-        more_text=more_text)
+                                    vopts.get("packages_to_install", []),
+                                    vopts.get("paver_command_line", None),
+                                    dest_dir=vopts.get("dest_dir", '.'),
+                                    unzip_setuptools=vopts.get("unzip_setuptools", False),
+                                    more_text=more_text)
