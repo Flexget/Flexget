@@ -1,9 +1,11 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
 from datetime import datetime, timedelta
+
 from sqlalchemy import Table, Column, Integer, Float, String, Unicode, Boolean, DateTime, delete
 from sqlalchemy.schema import ForeignKey, Index
 from sqlalchemy.orm import relation, joinedload_all
+
 from flexget import schema
 from flexget.entry import Entry
 from flexget.plugin import register_plugin, internet, PluginError, priority
@@ -414,7 +416,8 @@ class ImdbLookup(object):
                 try:
                     movie = self._parse_new_movie(entry['imdb_url'], session)
                 except UnicodeDecodeError:
-                    log.error('Unable to determine encoding for %s. Installing chardet library may help.' % entry['imdb_url'])
+                    log.error('Unable to determine encoding for %s. Installing chardet library may help.' %
+                              entry['imdb_url'])
                     # store cache so this will not be tried again
                     movie = Movie()
                     movie.url = entry['imdb_url']
@@ -458,7 +461,7 @@ class ImdbLookup(object):
             genre = session.query(Genre).filter(Genre.name == name).first()
             if not genre:
                 genre = Genre(name)
-            movie.genres.append(genre) # pylint:disable=E1101
+            movie.genres.append(genre)  # pylint:disable=E1101
         for index, name in enumerate(imdb_parser.languages):
             language = session.query(Language).filter(Language.name == name).first()
             if not language:
@@ -468,12 +471,12 @@ class ImdbLookup(object):
             actor = session.query(Actor).filter(Actor.imdb_id == imdb_id).first()
             if not actor:
                 actor = Actor(imdb_id, name)
-            movie.actors.append(actor) # pylint:disable=E1101
+            movie.actors.append(actor)  # pylint:disable=E1101
         for imdb_id, name in imdb_parser.directors.iteritems():
             director = session.query(Director).filter(Director.imdb_id == imdb_id).first()
             if not director:
                 director = Director(imdb_id, name)
-            movie.directors.append(director) # pylint:disable=E1101
+            movie.directors.append(director)  # pylint:disable=E1101
             # so that we can track how long since we've updated the info later
         movie.updated = datetime.now()
         session.add(movie)
