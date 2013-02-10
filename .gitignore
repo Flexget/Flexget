@@ -12,5 +12,11 @@ local
 config.yml
 db-config.sqlite
 flexget.log
-flexget.log.offset
+flexget.log.*
 received/
+share/
+dist/
+build/
+*.sqlite
+*.yml
+paver-minilib.zip
