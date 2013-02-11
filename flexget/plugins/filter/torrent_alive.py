@@ -223,6 +223,7 @@ class TorrentAlive(object):
                 if seeds < min_seeds:
                     entry.reject(reason='Tracker(s) had < %s required seeds. (%s)' % (min_seeds, seeds),
                                  remember_time=config['reject_for'])
+                    # Maybe there is better match that has enough seeds
                     task.rerun()
                 else:
                     log.debug('Found %i seeds from trackers' % seeds)
