@@ -1,10 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
 import time
-import re
 import logging
 import difflib
 from datetime import datetime, timedelta
-from math import fabs
 from urllib2 import URLError
 
 from sqlalchemy import Table, Column, Integer, String, DateTime, func, sql
@@ -105,6 +103,7 @@ class RottenTomatoesMovie(RottenTomatoesContainer, Base):
     cast = relation('RottenTomatoesActor', secondary=actors_table, backref='movies')
     directors = relation('RottenTomatoesDirector', secondary=directors_table, backref='movies')
     studio = Column(String)
+    # NOTE: alternate_ids is not anymore used, it used to store imdb_id
     alternate_ids = relation('RottenTomatoesAlternateId', backref='movie', cascade='all, delete, delete-orphan')
     links = relation('RottenTomatoesLink', backref='movie', cascade='all, delete, delete-orphan')
 
@@ -237,15 +236,14 @@ class RottenTomatoesSearchResult(Base):
 
 
 @internet(log)
-def lookup_movie(title=None, year=None, rottentomatoes_id=None, imdb_id=None, smart_match=None,
+def lookup_movie(title=None, year=None, rottentomatoes_id=None, smart_match=None,
                  only_cached=False, session=None):
     """
     Do a lookup from Rotten Tomatoes for the movie matching the passed arguments.
     Any combination of criteria can be passed, the most specific criteria specified will be used.
 
     :param rottentomatoes_id: rottentomatoes_id of desired movie
-    :param imdb_id: imdb_id of desired movie
-    :param title: title of desired movie
+    :param string title: title of desired movie
     :param year: release year of desired movie
     :param smart_match: attempt to clean and parse title and year from a string
     :param only_cached: if this is specified, an online lookup will not occur if the movie is not in the cache
@@ -261,18 +259,18 @@ def lookup_movie(title=None, year=None, rottentomatoes_id=None, imdb_id=None, sm
         title_parser.parse(smart_match)
         title = title_parser.name
         year = title_parser.year
-        if title == '' and not (rottentomatoes_id or imdb_id or title):
+        if title == '' and not (rottentomatoes_id or title):
             raise PluginError('Failed to parse name from %s' % smart_match)
 
     if title:
         search_string = title.lower()
         if year:
             search_string = '%s %s' % (search_string, year)
-    elif not (rottentomatoes_id or imdb_id):
+    elif not rottentomatoes_id:
         raise PluginError('No criteria specified for rotten tomatoes lookup')
 
     def id_str():
-        return '<title=%s,year=%s,rottentomatoes_id=%s,imdb_id=%s>' % (title, year, rottentomatoes_id, imdb_id)
+        return '<title=%s,year=%s,rottentomatoes_id=%s>' % (title, year, rottentomatoes_id)
 
     if not session:
         session = Session()
@@ -285,12 +283,6 @@ def lookup_movie(title=None, year=None, rottentomatoes_id=None, imdb_id=None, sm
     if rottentomatoes_id:
         movie = session.query(RottenTomatoesMovie).\
             filter(RottenTomatoesMovie.id == rottentomatoes_id).first()
-    if not movie and imdb_id:
-        alt_id = session.query(RottenTomatoesAlternateId).\
-            filter(RottenTomatoesAlternateId.name.in_(['imdb', 'flexget_imdb'])).\
-            filter(RottenTomatoesAlternateId.id == imdb_id.lstrip('t')).first()
-        if alt_id:
-            movie = session.query(RottenTomatoesMovie).filter(RottenTomatoesMovie.id == alt_id.movie_id).first()
     if not movie and title:
         movie_filter = session.query(RottenTomatoesMovie).filter(func.lower(RottenTomatoesMovie.title) == title.lower())
         if year:
@@ -308,12 +300,7 @@ def lookup_movie(title=None, year=None, rottentomatoes_id=None, imdb_id=None, sm
         if movie.expired and not only_cached:
             log.debug('Cache has expired for %s, attempting to refresh from Rotten Tomatoes.' % id_str())
             try:
-                imdb_alt_id = movie.alternate_ids and filter(
-                    lambda alt_id: alt_id.name in ['imdb', 'flexget_imdb'], movie.alternate_ids)[0].id
-                if imdb_alt_id:
-                    result = movies_alias(imdb_alt_id, 'imdb')
-                else:
-                    result = movies_info(movie.id)
+                result = movies_info(movie.id)
                 movie = _set_movie_details(movie, session, result)
                 session.merge(movie)
             except URLError:
@@ -326,54 +313,6 @@ def lookup_movie(title=None, year=None, rottentomatoes_id=None, imdb_id=None, sm
         # There was no movie found in the cache, do a lookup from Rotten Tomatoes
         log.debug('Movie %s not found in cache, looking up from rotten tomatoes.' % id_str())
         try:
-            # Lookups using imdb_id
-            # TODO: extract to method
-            if imdb_id:
-                log.debug('Using IMDB alias %s.' % imdb_id)
-                result = movies_alias(imdb_id, 'imdb')
-                if result:
-                    mismatch = []
-                    min_match = difflib.SequenceMatcher(lambda x: x == ' ',
-                                                        re.sub('\s+\(.*\)$', '', result['title'].lower()),
-                                                        title.lower()).ratio() < MIN_MATCH
-                    if title and min_match:
-                        mismatch.append('the title (%s <-?-> %s)' % (title, result['title']))
-                    result['year'] = int(result['year'])
-                    if year and fabs(result['year'] - year) > 1:
-                        mismatch.append('the year (%s <-?-> %s)' % (year, result['year']))
-                        release_year = None
-                        if result.get('release_dates', {}).get('theater'):
-                            log.debug('Checking year against theater release date')
-                            release_year = time.strptime(result['release_dates'].get('theater'), '%Y-%m-%d').tm_year
-                            if fabs(release_year - year) > 1:
-                                mismatch.append('the theater release (%s)' % release_year)
-                        elif result.get('release_dates', {}).get('dvd'):
-                            log.debug('Checking year against dvd release date')
-                            release_year = time.strptime(result['release_dates'].get('dvd'), '%Y-%m-%d').tm_year
-                            if fabs(release_year - year) > 1:
-                                mismatch.append('the DVD release (%s)' % release_year)
-                    if mismatch:
-                        log.warning('Rotten Tomatoes had an imdb alias for %s but it didn\'t match %s.' %
-                                    (imdb_id, ', or '.join(mismatch)))
-                    else:
-                        log.debug('imdb_id %s maps to rt_id %s, checking db for info.' % (imdb_id, result['id']))
-                        movie = session.query(RottenTomatoesMovie).\
-                            filter(RottenTomatoesMovie.id == result.get('id')).first()
-                        if movie:
-                            log.debug('Movie %s was in database, but did not have the imdb_id stored, '
-                                      'forcing an update' % movie)
-                            movie = _set_movie_details(movie, session, result)
-                            session.merge(movie)
-                        else:
-                            log.debug('%s was not in database, setting info.' % result['title'])
-                            movie = RottenTomatoesMovie()
-                            movie = _set_movie_details(movie, session, result)
-                            if not movie:
-                                raise PluginError('set_movie_details returned %s' % movie)
-                            session.add(movie)
-                else:
-                    log.debug('IMDB alias %s returned no results.' % imdb_id)
-
             if not movie and rottentomatoes_id:
                 result = movies_info(rottentomatoes_id)
                 if result:
@@ -437,24 +376,13 @@ def lookup_movie(title=None, year=None, rottentomatoes_id=None, imdb_id=None, sm
                                     log.debug('remain: %s (match: %s) %s' % (r['title'], r['match'], r['id']))
                                 raise PluginError('min_diff')
 
-                        imdb_alt_id = results[0].get('alternate_ids', {}).get('imdb')
-                        if imdb_alt_id:
-                            result = movies_alias(imdb_alt_id)
-                        else:
-                            result = movies_info(results[0].get('id'))
+                        result = movies_info(results[0].get('id'))
 
                         if not result:
                             result = results[0]
 
                         movie = RottenTomatoesMovie()
                         movie = _set_movie_details(movie, session, result)
-                        if imdb_id and not filter(
-                            lambda alt_id: alt_id.name == 'imdb' and alt_id.id == imdb_id.lstrip('t'),
-                                movie.alternate_ids):  # TODO: get rid of these confusing lambdas
-                            log.warning('Adding flexget_imdb alternate id %s for movie %s' %
-                                        (imdb_id, movie))
-                            movie.alternate_ids.append(RottenTomatoesAlternateId('flexget_imdb',
-                                                                                 imdb_id.lstrip('t')))
                         session.add(movie)
                         session.commit()
 
@@ -476,7 +404,8 @@ def lookup_movie(title=None, year=None, rottentomatoes_id=None, imdb_id=None, sm
 
 # TODO: get rid of or heavily refactor
 def _set_movie_details(movie, session, movie_data=None):
-    """Populate details for this :movie: from given data
+    """
+    Populate ``movie`` object from given data
 
     :param movie: movie object to update
     :param session: session to use, returned Movie will be live in that session
@@ -549,16 +478,7 @@ def movies_info(id):
         return result
 
 
-def movies_alias(id, type='imdb'):
-    if type == 'imdb':
-        id = id.lstrip('t')
-    url = '%s/%s/movie_alias.json?id=%s&type=%s' % (SERVER, API_VER, id, type)
-    result = get_json(url)
-    if isinstance(result, dict) and result.get('id'):
-        return result
-
-
-def lists(list_type, list_name, country='us', limit=20, page_limit=20, page=None):
+def lists(list_type, list_name, limit=20, page_limit=20, page=None):
     if isinstance(list_type, basestring):
         list_type = list_type.replace(' ', '_').encode('utf-8')
     if isinstance(list_name, basestring):
