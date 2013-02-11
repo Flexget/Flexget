@@ -2,16 +2,24 @@ from __future__ import unicode_literals, division, absolute_import
 import difflib
 import logging
 import re
+
+from BeautifulSoup import Tag
+
 from flexget.utils.soup import get_soup
 from flexget.utils.requests import Session
 from flexget.utils.tools import str_to_int
-from BeautifulSoup import Tag
+
 
 log = logging.getLogger('utils.imdb')
 # IMDb delivers a version of the page which is unparsable to unknown (and some known) user agents, such as requests'
 # Spoof the old urllib user agent to keep results consistent
 requests = Session()
 requests.headers.update({'User-Agent': 'Python-urllib/2.6'})
+#requests.headers.update({'User-Agent': random.choice(USERAGENTS)})
+
+# this makes most of the titles to be returned in english translation, but not all of them
+requests.headers.update({'Accept-Language': 'en-US,en;q=0.8'})
+
 # give imdb a little break between requests (see: http://flexget.com/ticket/129#comment:1)
 requests.set_domain_delay('imdb.com', '3 seconds')
 
@@ -209,6 +217,7 @@ class ImdbParser(object):
         self.year = 0
         self.plot_outline = None
         self.name = None
+        self.original_name = None
         self.url = None
         self.imdb_id = None
         self.photo = None
@@ -264,6 +273,15 @@ class ImdbParser(object):
                     log.debug('Detected name: %s' % self.name)
         else:
             log.warning('Unable to get name for %s - plugin needs update?' % url)
+
+        tag_original_title_i = soup.find('i', text=re.compile(r'original title'))
+        if tag_original_title_i:
+            span = tag_original_title_i.parent
+            tag_original_title_i.decompose()
+            self.original_name = span.text.strip()
+            log.debug('Detected original name: %s' % self.original_name)
+        else:
+            log.warning('Unable to get original title for %s - plugin needs update?' % url)
 
         # detect if movie is eligible for ratings
         rating_ineligible = soup.find('div', attrs={'class': 'rating-ineligible'})
