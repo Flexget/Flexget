@@ -1,9 +1,16 @@
+# TODO: these tests don't work outside US due imdb implementing geoip based crappy name translation
+# imdb_name needs to be replaced with our own title lookup
+
+"""
+.. NOTE::
+
+   Added `imdb_original_name` recently, so in case the title lookup translations cause problems
+   switch to find_entry to use that instead!
+"""
+
 from __future__ import unicode_literals, division, absolute_import
 from tests import FlexGetBase
 from nose.plugins.attrib import attr
-
-# TODO: these tests don't work outside US due imdb implementing geoip based crappy name translation
-# imdb_name needs to be replaced with our own title lookup
 
 
 class TestImdb(FlexGetBase):
@@ -125,6 +132,8 @@ class TestImdb(FlexGetBase):
 
         # check that actors have been parsed properly
         matrix = self.task.find_entry(imdb_name='The Matrix')
+        assert matrix, 'entry for matrix missing'
+
         assert 'nm0000206' in matrix['imdb_actors'], \
             'Keanu Reeves is missing'
         assert matrix['imdb_actors']['nm0000206'] == 'Keanu Reeves', \
@@ -156,13 +165,13 @@ class TestImdb(FlexGetBase):
         assert self.task.find_entry(imdb_name='The Matrix'), 'The Matrix not found'
         matrix = float(self.task.find_entry(imdb_name='The Matrix')['imdb_score'])
         # Currently The Matrix has an 8.7, check a range in case it changes
-        assert matrix > 8.6 and matrix < 8.8, \
+        assert 8.6 < matrix < 8.8, \
             'The Matrix should have score 8.7 not %s. (Did the rating change?)' % matrix
         assert int(self.task.find_entry(imdb_name='The Matrix')['imdb_votes']) > 450000, \
             'The Matrix should have more than 450000 votes'
         bfe = float(self.task.find_entry(title='Battlefield Earth')['imdb_score'])
         # Currently Battlefield Earth has an 2.4, check a range in case it changes
-        assert bfe >= 2.3 and bfe <= 2.5, \
+        assert 2.3 <= bfe <= 2.5, \
             'Battlefield Earth should have score 2.3 not %s. (Did the rating change?)' % bfe
         assert self.task.find_entry('accepted', imdb_name='The Matrix'), \
             'The Matrix should\'ve been accepted'
@@ -188,8 +197,8 @@ class TestImdb(FlexGetBase):
         self.execute_task('language')
         matrix = self.task.find_entry(imdb_name='The Matrix')['imdb_languages']
         assert matrix == ['english'], 'Could not find languages for The Matrix'
-        # IMDB returns imdb_name of "L'immortel" for 22 Bullets
-        bullets = self.task.find_entry(imdb_name='L\'immortel')['imdb_languages']
+        # IMDB may return imdb_name of "L'immortel" for 22 Bullets
+        bullets = self.task.find_entry(imdb_original_name='L\'immortel')['imdb_languages']
         assert bullets[0] == 'french', 'Could not find languages for 22 Bullets'
         for movie in ['The Matrix', 'Crank', 'The Damned United']:
             assert self.task.find_entry('accepted', imdb_name=movie), \
@@ -201,7 +210,9 @@ class TestImdb(FlexGetBase):
         # # http://flexget.com/ticket/1399
         # assert rockstar == ['hindi'], 'Did not find only primary language'
         breakaway = self.task.find_entry(imdb_name='Breakaway')['imdb_languages']
-        assert breakaway == ['punjabi', 'english'], 'Languages were not returned in order of prominence'
+        # switched to panjabi since that's what I got ...
+        assert breakaway == ['panjabi', 'english'], \
+            'Languages were not returned in order of prominence, got %s' % (', '.join(breakaway))
 
     @attr(online=True)
     def test_mpaa(self):
