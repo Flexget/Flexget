@@ -1,22 +1,22 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
-import json
+from flexget.utils import json
+import pprint
 from flexget.plugin import register_plugin
 from flexget.utils.template import RenderError
 
 log = logging.getLogger('rapidpush')
 
-__version__ = 0.1
+__version__ = 0.2
 headers = {'User-Agent': "FlexGet RapidPush plugin/%s" % str(__version__)}
 url = 'https://rapidpush.net/api'
-
 
 class OutputRapidPush(object):
     """
     Example::
 
       rapidpush:
-        apikey: xxxxxxx
+        apikey: xxxxxxx, [bbbbbb, [...]] Multiple API-Keys seperated by comma
         [category: category, default FlexGet]
         [title: title, default New release]
         [group: device group, default no group]
@@ -39,7 +39,7 @@ class OutputRapidPush(object):
 
     def prepare_config(self, config):
         if isinstance(config, bool):
-            config = {'enabled': config}	
+            config = {'enabled': config}
         config.setdefault('title', 'New release')
         config.setdefault('category', 'FlexGet')
         config.setdefault('priority', 2)
@@ -92,26 +92,20 @@ class OutputRapidPush(object):
                 'priority': priority,
                 'category': category,
                 'group': group})
-            data = {'apikey': apikey, 'command': 'notify', 'header_errors': '1', 'data': data_string}
+            data = {'apikey': apikey, 'command': 'notify', 'data': data_string}
             response = task.requests.post(url, headers=headers, data=data, raise_status=False)
 
-            # Check if it succeeded
-            request_status = response.status_code
-
-            # error codes and messages are explained at: https://rapidpush.net/developer-info.html
-            if request_status == 200:
-                log.debug("RapidPush message sent")
-            elif request_status == 405:
-                log.error("invalid parameter")
-            elif request_status == 407:
-                log.error("Could not insert notification, internal error")
-            elif request_status == 408:
-                log.error("Invalid API-Key.")
-            elif request_status == 409:
-                log.error("Invalid command")
-            elif request_status == 410:
-                log.error("API rate limit exceeded")
+            json_data = json.loads(response.content)
+            if json_data.has_key('code'):
+                if json_data['code'] == 200:
+                    log.debug("RapidPush message sent")
+                else:
+                    log.error(json_data['desc'] + " (" + str(json_data['code']) + ")")
             else:
-                log.error("Unknown error while sending RapidPush notification")
+                for item in json_data:
+                    if json_data[item]['code'] == 200:
+                        log.debug(item + ": RapidPush message sent")
+                    else:
+                        log.error(item + ": " + json_data[item]['desc'] + " (" + str(json_data[item]['code']) + ")")
 
 register_plugin(OutputRapidPush, 'rapidpush', api_ver=2)
