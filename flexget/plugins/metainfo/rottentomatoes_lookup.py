@@ -1,7 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
 from flexget.plugin import register_plugin, DependencyError, PluginError
-from flexget.utils import imdb
 from flexget.utils.log import log_once
 
 try:
@@ -26,9 +25,10 @@ def get_rt_url(movie):
 
 
 class PluginRottenTomatoesLookup(object):
-    """Retrieves Rotten Tomatoes information for entries.
+    """
+    Retrieves Rotten Tomatoes information for entries.
 
-    Example:
+    Example::
         rottentomatoes_lookup: yes
     """
 
@@ -88,18 +88,9 @@ class PluginRottenTomatoesLookup(object):
         :param search_allowed: Allow fallback to search
         :raises PluginError: Failure reason
         """
-        imdb_id = entry.get('imdb_id', eval_lazy=False) or \
-            imdb.extract_id(entry.get('imdb_url', eval_lazy=False))
-        if imdb_id:
-            movie = lookup_movie(title=entry.get('imdb_name'),
-                                 year=entry.get('imdb_year'),
-                                 rottentomatoes_id=entry.get('rt_id', eval_lazy=False),
-                                 imdb_id=imdb_id,
-                                 only_cached=(not search_allowed))
-        else:
-            movie = lookup_movie(smart_match=entry['title'],
-                                 rottentomatoes_id=entry.get('rt_id', eval_lazy=False),
-                                 only_cached=(not search_allowed))
+        movie = lookup_movie(smart_match=entry['title'],
+                             rottentomatoes_id=entry.get('rt_id', eval_lazy=False),
+                             only_cached=(not search_allowed))
         log.debug(u'Got movie: %s' % movie)
         entry.update_using_map(self.field_map, movie)
 
