@@ -1,7 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
 from flexget.utils import json
-import pprint
 from flexget.plugin import register_plugin
 from flexget.utils.template import RenderError
 
@@ -38,8 +37,6 @@ class OutputRapidPush(object):
         return config
 
     def prepare_config(self, config):
-        if isinstance(config, bool):
-            config = {'enabled': config}
         config.setdefault('title', 'New release')
         config.setdefault('category', 'FlexGet')
         config.setdefault('priority', 2)
@@ -95,7 +92,7 @@ class OutputRapidPush(object):
             data = {'apikey': apikey, 'command': 'notify', 'data': data_string}
             response = task.requests.post(url, headers=headers, data=data, raise_status=False)
 
-            json_data = json.loads(response.content)
+            json_data = response.json()
             if json_data.has_key('code'):
                 if json_data['code'] == 200:
                     log.debug("RapidPush message sent")
