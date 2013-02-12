@@ -281,7 +281,8 @@ class ImdbParser(object):
             self.original_name = span.text.strip()
             log.debug('Detected original name: %s' % self.original_name)
         else:
-            log.warning('Unable to get original title for %s - plugin needs update?' % url)
+            # if title is already in original language, it doesn't have the tag
+            log.debug('Unable to get original title for %s' % url)
 
         # detect if movie is eligible for ratings
         rating_ineligible = soup.find('div', attrs={'class': 'rating-ineligible'})
