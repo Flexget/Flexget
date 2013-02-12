@@ -1,9 +1,11 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
 from datetime import datetime, timedelta
+
 from sqlalchemy import Table, Column, Integer, Float, String, Unicode, Boolean, DateTime, delete
 from sqlalchemy.schema import ForeignKey, Index
 from sqlalchemy.orm import relation, joinedload_all
+
 from flexget import schema
 from flexget.entry import Entry
 from flexget.plugin import register_plugin, internet, PluginError, priority
@@ -14,7 +16,7 @@ from flexget.utils.sqlalchemy_utils import table_add_column
 from flexget.utils.database import with_session
 from flexget.utils.sqlalchemy_utils import table_columns, get_index_by_name, table_schema
 
-SCHEMA_VER = 3
+SCHEMA_VER = 4
 
 Base = schema.versioned_base('imdb_lookup', SCHEMA_VER)
 
@@ -42,6 +44,7 @@ class Movie(Base):
 
     id = Column(Integer, primary_key=True)
     title = Column(Unicode)
+    original_title = Column(Unicode)
     url = Column(String, index=True)
 
     # many-to-many relations
@@ -210,6 +213,10 @@ def upgrade(ver, session):
         search_table = table_schema('imdb_search', session)
         session.execute(delete(search_table, search_table.c.fails))
         ver = 3
+    if ver == 3:
+        log.info('Adding original title column, cached data will not have this information')
+        table_add_column('imdb_movies', 'original_title', Unicode, session)
+        ver = 4
     return ver
 
 
@@ -228,6 +235,7 @@ class ImdbLookup(object):
         'imdb_url': 'url',
         'imdb_id': lambda movie: extract_id(movie.url),
         'imdb_name': 'title',
+        'imdb_original_name': 'original_title',
         'imdb_photo': 'photo',
         'imdb_plot_outline': 'plot_outline',
         'imdb_score': 'score',
@@ -414,7 +422,8 @@ class ImdbLookup(object):
                 try:
                     movie = self._parse_new_movie(entry['imdb_url'], session)
                 except UnicodeDecodeError:
-                    log.error('Unable to determine encoding for %s. Installing chardet library may help.' % entry['imdb_url'])
+                    log.error('Unable to determine encoding for %s. Installing chardet library may help.' %
+                              entry['imdb_url'])
                     # store cache so this will not be tried again
                     movie = Movie()
                     movie.url = entry['imdb_url']
@@ -438,42 +447,44 @@ class ImdbLookup(object):
     def _parse_new_movie(self, imdb_url, session):
         """
         Get Movie object by parsing imdb page and save movie into the database.
+
         :param imdb_url: Imdb url
         :param session: Session to be used
         :return: Newly added Movie
         """
-        imdb_parser = ImdbParser()
-        imdb_parser.parse(imdb_url)
+        parser = ImdbParser()
+        parser.parse(imdb_url)
         # store to database
         movie = Movie()
-        movie.photo = imdb_parser.photo
-        movie.title = imdb_parser.name
-        movie.score = imdb_parser.score
-        movie.votes = imdb_parser.votes
-        movie.year = imdb_parser.year
-        movie.mpaa_rating = imdb_parser.mpaa_rating
-        movie.plot_outline = imdb_parser.plot_outline
+        movie.photo = parser.photo
+        movie.title = parser.name
+        movie.original_title = parser.original_name
+        movie.score = parser.score
+        movie.votes = parser.votes
+        movie.year = parser.year
+        movie.mpaa_rating = parser.mpaa_rating
+        movie.plot_outline = parser.plot_outline
         movie.url = imdb_url
-        for name in imdb_parser.genres:
+        for name in parser.genres:
             genre = session.query(Genre).filter(Genre.name == name).first()
             if not genre:
                 genre = Genre(name)
-            movie.genres.append(genre) # pylint:disable=E1101
-        for index, name in enumerate(imdb_parser.languages):
+            movie.genres.append(genre)  # pylint:disable=E1101
+        for index, name in enumerate(parser.languages):
             language = session.query(Language).filter(Language.name == name).first()
             if not language:
                 language = Language(name)
             movie.languages.append(MovieLanguage(language, prominence=index))
-        for imdb_id, name in imdb_parser.actors.iteritems():
+        for imdb_id, name in parser.actors.iteritems():
             actor = session.query(Actor).filter(Actor.imdb_id == imdb_id).first()
             if not actor:
                 actor = Actor(imdb_id, name)
-            movie.actors.append(actor) # pylint:disable=E1101
-        for imdb_id, name in imdb_parser.directors.iteritems():
+            movie.actors.append(actor)  # pylint:disable=E1101
+        for imdb_id, name in parser.directors.iteritems():
             director = session.query(Director).filter(Director.imdb_id == imdb_id).first()
             if not director:
                 director = Director(imdb_id, name)
-            movie.directors.append(director) # pylint:disable=E1101
+            movie.directors.append(director)  # pylint:disable=E1101
             # so that we can track how long since we've updated the info later
         movie.updated = datetime.now()
         session.add(movie)

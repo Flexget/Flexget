@@ -153,8 +153,8 @@ class OutputRSS(object):
         config.setdefault('history', True)
         config.setdefault('encoding', 'iso-8859-1')
         config.setdefault('link', ['imdb_url', 'input_url'])
-        config.setdefault("title", "{{title}} (from {{task.name}})")
-        config.setdefault("template", "default")
+        config.setdefault('title', '{{title}} (from {{task}})')
+        config.setdefault('template', 'default')
         # add url as last resort
         config['link'].append('url')
         return config
@@ -184,7 +184,12 @@ class OutputRSS(object):
                     rss.link = entry[field]
                     break
 
-            rss.description = render_from_entry(get_template(config['template'], 'rss'), entry)
+            # TODO: better exception handling
+            try:
+                rss.description = render_from_entry(get_template(config['template'], 'rss'), entry)
+            except:
+                log.error("Error while rendering entry %s, falling back to plain title", entry)
+                rss.description = entry['title'] + ' - (Render Error)'
             rss.file = config['file']
 
             # TODO: check if this exists and suggest disabling history if it does since it shouldn't happen normally ...
@@ -245,6 +250,7 @@ class OutputRSS(object):
         # write rss
         fn = os.path.expanduser(config['file'])
         try:
+            log.verbose('Writing output rss to %s' % fn)
             rss.write_xml(open(fn, 'w'), encoding=config['encoding'])
         except LookupError:
             log.critical('Unknown encoding %s' % config['encoding'])

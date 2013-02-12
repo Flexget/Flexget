@@ -3,8 +3,8 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to FlexGet's documentation!
-===================================
+FlexGet's documentation!
+========================
 
 The core section is most relevant for developers. Plugins documentation
 section may miss some plugins since each plugin must be manually added to the .rst files.

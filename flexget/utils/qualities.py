@@ -152,7 +152,7 @@ _codecs = [
 channels = '(?:(?:[\W_]?5[\W_]?1)|(?:[\W_]?2[\W_]?(?:0|ch)))'
 _audios = [
     QualityComponent('audio', 10, 'mp3'),
-    #TODO: No idea what order these should go in or if we need different regexps
+    # TODO: No idea what order these should go in or if we need different regexps
     QualityComponent('audio', 20, 'dd5.1', 'dd%s' % channels),
     QualityComponent('audio', 30, 'aac', 'aac%s?' % channels),
     QualityComponent('audio', 40, 'ac3', 'ac3%s?' % channels),
@@ -177,8 +177,8 @@ _UNKNOWNS = {
 
 
 _registry = {}
-for type in (_resolutions, _sources, _codecs, _audios):
-    for item in type:
+for items in (_resolutions, _sources, _codecs, _audios):
+    for item in items:
         _registry[item.name] = item
 
 

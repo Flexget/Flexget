@@ -1,8 +1,10 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
+
 from flexget import validator
 from flexget.manager import register_config_key
 from flexget.plugin import priority, register_plugin, PluginError, register_parser_option, plugins as all_plugins
+from flexget.utils.tools import MergeException, merge_dict_from_to
 
 log = logging.getLogger('preset')
 
@@ -82,12 +84,12 @@ class PluginPreset(object):
                 preset_config = dict(preset_config)
                 del preset_config['preset']
 
-            # merge
-            from flexget.utils.tools import MergeException, merge_dict_from_to
+            # Merge
             try:
                 merge_dict_from_to(preset_config, task.config)
             except MergeException as exc:
-                raise PluginError('Failed to merge preset %s to task %s due to %s' % (preset, task.name, exc))
+                raise PluginError('Failed to merge preset %s to task %s. Error: %s' %
+                                  (preset, task.name, exc.value))
 
         log.trace('presets: %s' % config)
 
@@ -119,7 +121,7 @@ class DisablePlugin(object):
             .
             .
 
-      #Task nzbs uses all other configuration from preset movies but removes the download plugin
+      # Task nzbs uses all other configuration from preset movies but removes the download plugin
     """
 
     def validator(self):
@@ -146,7 +148,7 @@ def root_config_validator():
     valid_plugins = [p for p in all_plugins if hasattr(all_plugins[p].instance, 'validator')]
     root = validator.factory('dict')
     root.reject_keys(valid_plugins, message='plugins should go under a specific preset. '
-        '(and presets are not allowed to be named the same as any plugins)')
+                                            '(and presets are not allowed to be named the same as any plugins)')
     root.accept_any_key('dict').accept_any_key('any')
     return root
 

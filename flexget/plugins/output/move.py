@@ -89,7 +89,7 @@ class MovePlugin(object):
                 log.error('Filename value replacement `%s` failed for `%s`' % (dst_filename, entry['title']))
                 continue
             # Clean invalid characters with pathscrub plugin
-            dst_path, dst_filename = pathscrub(dst_path), pathscrub(dst_filename)
+            dst_path, dst_filename = pathscrub(dst_path), pathscrub(dst_filename, filename=True)
 
             # Join path and filename
             dst = os.path.join(dst_path, dst_filename)

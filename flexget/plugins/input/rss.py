@@ -14,6 +14,7 @@ from flexget.entry import Entry
 from flexget.plugin import register_plugin, internet, PluginError
 from flexget.utils.cached_input import cached
 from flexget.utils.tools import decode_html
+from flexget.utils.pathscrub import pathscrub
 
 log = logging.getLogger('rss')
 
@@ -125,10 +126,10 @@ class InputRSS(object):
         # set default value for group_links as deactivated
         config.setdefault('group_links', False)
         # set default for all_entries
-        config.setdefault('all_entries', False)
+        config.setdefault('all_entries', True)
         return config
 
-    def process_invalid_content(self, task, data):
+    def process_invalid_content(self, task, data, url):
         """If feedparser reports error, save the received data and log error."""
 
         if data is None:
@@ -145,11 +146,16 @@ class InputRSS(object):
         received = os.path.join(task.manager.config_base, 'received')
         if not os.path.isdir(received):
             os.mkdir(received)
-        filename = os.path.join(received, '%s.%s' % (task.name, ext))
-        f = open(filename, 'w')
+        filename = task.name
+        sourcename = urlparse.urlparse(url).netloc
+        if sourcename:
+            filename += '-' + sourcename
+        filename = pathscrub(filename, filename=True)
+        filepath = os.path.join(received, '%s.%s' % (filename, ext))
+        f = open(filepath, 'w')
         f.write(data)
         f.close()
-        log.critical('I have saved the invalid content to %s for you to view' % filename)
+        log.critical('I have saved the invalid content to %s for you to view' % filepath)
 
     def add_enclosure_info(self, entry, enclosure, filename=True, multiple=False):
         """Stores information from an rss enclosure into an Entry."""
@@ -272,7 +278,7 @@ class InputRSS(object):
                 elif isinstance(ex, (xml.sax._exceptions.SAXParseException, xml.sax._exceptions.SAXException)):
                     # save invalid data for review, this is a bit ugly but users seem to really confused when
                     # html pages (login pages) are received
-                    self.process_invalid_content(task, content)
+                    self.process_invalid_content(task, content, config['url'])
                     if task.manager.options.debug:
                         log.exception(ex)
                     raise PluginError('Received invalid RSS content from task %s (%s)' % (task.name, config['url']))
@@ -280,7 +286,7 @@ class InputRSS(object):
                     raise ex  # let the @internet decorator handle
                 else:
                     # all other bozo errors
-                    self.process_invalid_content(task, content)
+                    self.process_invalid_content(task, content, config['url'])
                     raise PluginError('Unhandled bozo_exception. Type: %s (task: %s)' %
                                       (ex.__class__.__name__, task.name), log)
 

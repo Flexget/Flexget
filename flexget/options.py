@@ -1,10 +1,10 @@
 from __future__ import unicode_literals, division, absolute_import
 import sys
-import subprocess
 from argparse import ArgumentParser as ArgParser, Action, ArgumentError, SUPPRESS, _VersionAction
 
 import flexget
 from flexget.utils.tools import console
+from flexget.utils import requests
 
 
 def required_length(nmin, nmax):
@@ -23,19 +23,24 @@ class VersionAction(_VersionAction):
     Also attempts to get more information from git describe if on git checkout.
     """
     def __call__(self, parser, namespace, values, option_string=None):
+        # Print the version number
+        console('%s' % self.version)
         if self.version == '{git}':
-            # Attempt to get version from git
-            version = ''
+            console('To check the latest released version you have run:')
+            console('`git fetch --tags` then `git describe`')
+        else:
+            # Check for latest version from server
             try:
-                p = subprocess.Popen('git describe', stdout=subprocess.PIPE)
-                version = p.stdout.read()
-            except Exception:
-                pass
-            if version.startswith('1.0'):
-                self.version += version
+                page = requests.get('http://download.flexget.com/latestversion')
+            except requests.RequestException:
+                console('Error getting latest version number from download.flexget.com')
             else:
-                console('Unable to get current version from git.')
-        super(VersionAction, self).__call__(parser, namespace, values, option_string)
+                ver = page.text.strip()
+                if self.version == ver:
+                    console('You are on the latest release.')
+                else:
+                    console('Latest release: %s' % ver)
+        parser.exit()
 
 
 class ArgumentParser(ArgParser):

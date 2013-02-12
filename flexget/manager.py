@@ -425,6 +425,9 @@ class Manager(object):
             filename = self.db_filename.replace('\\', '\\\\')
             self.database_uri = 'sqlite:///%s' % filename
 
+        if self.db_filename and not os.path.exists(self.db_filename):
+            log.verbose('Creating new database %s ...' % self.db_filename)
+
         # fire up the engine
         log.debug('Connecting to: %s' % self.database_uri)
         try:
@@ -443,6 +446,7 @@ class Manager(object):
         from sqlalchemy.exc import OperationalError
         try:
             if self.options.reset or self.options.del_db:
+                log.verbose('Deleting everything from database ...')
                 Base.metadata.drop_all(bind=self.engine)
             Base.metadata.create_all(bind=self.engine)
         except OperationalError as e:

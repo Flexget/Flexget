@@ -1,7 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
 from flexget.utils import json
-from flexget.plugin import register_plugin
+from flexget.plugin import register_plugin, priority
 from flexget.utils.template import RenderError
 
 log = logging.getLogger('rapidpush')
@@ -19,7 +19,7 @@ class OutputRapidPush(object):
         [category: category, default FlexGet]
         [title: title, default New release]
         [group: device group, default no group]
-        [message: the message, to include the title from flexget insert {{title}} at the wanted position, default {{title}}]
+        [message: the message, supports Jinja templating, default {{title}}]
         [priority: 0 - 6 (6 = highest), default 2 (normal)]
 
     Configuration parameters are also supported from entries (eg. through set).
@@ -44,6 +44,8 @@ class OutputRapidPush(object):
         config.setdefault('message', '{{title}}')
         return config
 
+    # Run last to make sure other outputs are successful before sending notification
+    @priority(0)
     def on_task_output(self, task, config):
         # get the parameters
         config = self.prepare_config(config)
