@@ -1,6 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
-from flexget.plugin import register_plugin
+
+from flexget.plugin import register_plugin, priority
 from flexget.utils.template import RenderError
 
 log = logging.getLogger('notifymyandroid')
@@ -42,6 +43,8 @@ class OutputNotifyMyAndroid(object):
         config.setdefault('description', '{{title}}')
         return config
 
+    # Run last to make sure other outputs are successful before sending notification
+    @priority(0)
     def on_task_output(self, task, config):
         # get the parameters
         config = self.prepare_config(config)

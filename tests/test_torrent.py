@@ -4,7 +4,6 @@ import os
 from nose.plugins.attrib import attr
 from tests import FlexGetBase, with_filecopy
 from flexget.utils.bittorrent import Torrent
-from .util import date_aged
 
 
 class TestInfoHash(FlexGetBase):
@@ -20,9 +19,9 @@ class TestInfoHash(FlexGetBase):
     def test_infohash(self):
         """Torrent: infohash parsing"""
         self.execute_task('test')
-        hash = self.task.entries[0].get('torrent_info_hash')
-        assert hash == '14FFE5DD23188FD5CB53A1D47F1289DB70ABF31E', \
-            'InfoHash does not match (got %s)' % hash
+        info_hash = self.task.entries[0].get('torrent_info_hash')
+        assert info_hash == '14FFE5DD23188FD5CB53A1D47F1289DB70ABF31E', \
+            'InfoHash does not match (got %s)' % info_hash
 
 
 class TestSeenInfoHash(FlexGetBase):
@@ -282,12 +281,6 @@ class TestTorrentAlive(FlexGetBase):
         self.execute_task('test_torrent_alive_fail')
         assert not self.task.accepted, 'Torrent should have been rejected by remember_rejected.'
         assert self.task._rerun_count == 0, 'Task should not have been rerun.'
-
-        # Run it again after rejection expires to make sure remember_rejected lets us retry.
-        with date_aged('1 hour'):
-            self.execute_task('test_torrent_alive_fail')
-            assert not self.task.accepted, 'Torrent should not have met seed requirement.'
-            assert self.task._rerun_count == 1, 'Task should have been rerun 1 time.'
 
     @attr(online=True)
     @with_filecopy('test.torrent', 'test_torrent_alive.torrent')

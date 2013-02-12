@@ -2,7 +2,7 @@ from __future__ import unicode_literals, division, absolute_import
 import logging
 import hashlib
 
-from flexget.plugin import register_plugin
+from flexget.plugin import register_plugin, priority
 from flexget.utils.template import RenderError
 
 __version__ = 0.1
@@ -46,6 +46,8 @@ class OutputSMSru(object):
         config.setdefault("message", "accepted {{title}}")
         return config
 
+    # Run last to make sure other outputs are successful before sending notification
+    @priority(0)
     def on_task_output(self, task, config):
         # Get the parameters
         config = self.prepare_config(config)

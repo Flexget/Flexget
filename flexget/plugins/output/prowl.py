@@ -1,7 +1,9 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
+
 from requests import RequestException
-from flexget.plugin import register_plugin
+
+from flexget.plugin import register_plugin, priority
 from flexget.utils.template import RenderError
 
 __version__ = 0.1
@@ -46,6 +48,8 @@ class OutputProwl(object):
         config.setdefault('priority', 0)
         return config
 
+    # Run last to make sure other outputs are successful before sending notification
+    @priority(0)
     def on_task_output(self, task, config):
         config = self.prepare_config(config)
         for entry in task.accepted:

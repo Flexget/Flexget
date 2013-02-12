@@ -535,7 +535,7 @@ class ArchiveCli(object):
         elif action == 'test':
             task.manager.disable_tasks()
         else:
-            raise NotImplemented(action)
+            raise NotImplementedError(action)
 
     def search(self, search_term, tags=None):
 

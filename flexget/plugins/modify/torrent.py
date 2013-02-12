@@ -1,9 +1,9 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
-from flexget.plugin import register_plugin, priority
-# TORRENT_RE is redundant by now, but keep it here, in case someone was crazy enough to import it
-from flexget.utils.bittorrent import Torrent, is_torrent_file
 import os
+
+from flexget.plugin import register_plugin, priority
+from flexget.utils.bittorrent import Torrent, is_torrent_file
 
 log = logging.getLogger('modif_torrent')
 
@@ -104,7 +104,6 @@ class TorrentFilename(object):
         return fn
 
     def purge(self, entry):
-        import os
         if os.path.exists(entry['file']):
             log.debug('removing temp file %s from %s' % (entry['file'], entry['title']))
             os.remove(entry['file'])

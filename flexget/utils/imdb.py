@@ -2,16 +2,24 @@ from __future__ import unicode_literals, division, absolute_import
 import difflib
 import logging
 import re
+
+from BeautifulSoup import Tag
+
 from flexget.utils.soup import get_soup
 from flexget.utils.requests import Session
 from flexget.utils.tools import str_to_int
-from BeautifulSoup import Tag
+
 
 log = logging.getLogger('utils.imdb')
 # IMDb delivers a version of the page which is unparsable to unknown (and some known) user agents, such as requests'
 # Spoof the old urllib user agent to keep results consistent
 requests = Session()
 requests.headers.update({'User-Agent': 'Python-urllib/2.6'})
+#requests.headers.update({'User-Agent': random.choice(USERAGENTS)})
+
+# this makes most of the titles to be returned in english translation, but not all of them
+requests.headers.update({'Accept-Language': 'en-US,en;q=0.8'})
+
 # give imdb a little break between requests (see: http://flexget.com/ticket/129#comment:1)
 requests.set_domain_delay('imdb.com', '3 seconds')
 
@@ -51,10 +59,10 @@ class ImdbSearch(object):
 
         self.max_results = 10
 
-    def ireplace(self, str, old, new, count=0):
+    def ireplace(self, text, old, new, count=0):
         """Case insensitive string replace"""
         pattern = re.compile(re.escape(old), re.I)
-        return re.sub(pattern, new, str, count)
+        return re.sub(pattern, new, text, count)
 
     def smart_match(self, raw_name):
         """Accepts messy name, cleans it and uses information available to make smartest and best match"""
@@ -103,7 +111,7 @@ class ImdbSearch(object):
         diff = movies[0]['match'] - movies[1]['match']
         if diff < self.min_diff:
             log.debug('unable to determine correct movie, min_diff too small (`%s` <-?-> `%s`)' %
-                (movies[0], movies[1]))
+                      (movies[0], movies[1]))
             for m in movies:
                 log.debug('remain: %s (match: %s) %s' % (m['name'], m['match'], m['url']))
             return None
@@ -132,12 +140,12 @@ class ImdbSearch(object):
             movie['name'] = name
             movie['url'] = actual_url
             movie['imdb_id'] = extract_id(actual_url)
-            movie['year'] = None # skips year check
+            movie['year'] = None  # skips year check
             movies.append(movie)
             return movies
 
         # the god damn page has declared a wrong encoding
-        soup = get_soup(page.content)
+        soup = get_soup(page.text)
 
         section_table = soup.find('table', 'findList')
         if not section_table:
@@ -209,6 +217,7 @@ class ImdbParser(object):
         self.year = 0
         self.plot_outline = None
         self.name = None
+        self.original_name = None
         self.url = None
         self.imdb_id = None
         self.photo = None
@@ -222,7 +231,7 @@ class ImdbParser(object):
         url = make_url(self.imdb_id)
         self.url = url
         page = requests.get(url)
-        soup = get_soup(page.content)
+        soup = get_soup(page.text)
 
         # get photo
         tag_photo = soup.find('td', attrs={'id': 'img_primary'})
@@ -237,7 +246,7 @@ class ImdbParser(object):
         if tag_infobar_div:
             tag_mpaa_rating = tag_infobar_div.find('span', attrs={'itemprop': 'contentRating'})
             if tag_mpaa_rating:
-                if not tag_mpaa_rating['class'] or not tag_mpaa_rating['class'][0].startswith('us_'):
+                if not tag_mpaa_rating.get('class') or not tag_mpaa_rating['class'][0].startswith('us_'):
                     log.warning('Could not determine mpaa rating for %s' % url)
                 else:
                     rating_class = tag_mpaa_rating['class'][0]
@@ -247,7 +256,8 @@ class ImdbParser(object):
                         self.mpaa_rating = rating_class.lstrip('us_').replace('_', '-').upper()
                 log.debug('Detected mpaa rating: %s' % self.mpaa_rating)
             else:
-                log.debug('Unable to match signature of mpaa rating for %s - could be a TV episode, or plugin needs update?' % url)
+                log.debug('Unable to match signature of mpaa rating for %s - '
+                          'could be a TV episode, or plugin needs update?' % url)
         else:
             # We should match the infobar, it's an integral part of the IMDB page.
             log.warning('Unable to get infodiv class for %s - plugin needs update?' % url)
@@ -263,6 +273,16 @@ class ImdbParser(object):
                     log.debug('Detected name: %s' % self.name)
         else:
             log.warning('Unable to get name for %s - plugin needs update?' % url)
+
+        tag_original_title_i = soup.find('i', text=re.compile(r'original title'))
+        if tag_original_title_i:
+            span = tag_original_title_i.parent
+            tag_original_title_i.decompose()
+            self.original_name = span.text.strip()
+            log.debug('Detected original name: %s' % self.original_name)
+        else:
+            # if title is already in original language, it doesn't have the tag
+            log.debug('Unable to get original title for %s' % url)
 
         # detect if movie is eligible for ratings
         rating_ineligible = soup.find('div', attrs={'class': 'rating-ineligible'})

@@ -924,6 +924,7 @@ class TestQualities(FlexGetBase):
         assert len(self.task.accepted) == 1, 'one ep should be valid upgrade'
         assert self.task.find_entry('accepted', title='Food.S06E11.720p'), 'Should upgrade to `target`'
 
+
 class TestIdioticNumbering(FlexGetBase):
 
     __yaml__ = """
@@ -1183,7 +1184,7 @@ class TestTimeframe(FlexGetBase):
 
     def test_expires(self):
         """Series plugin: timeframe expires"""
-        # first excecution should not accept anything
+        # first execution should not accept anything
         self.execute_task('test_expires')
         assert not self.task.accepted
 
@@ -1252,8 +1253,6 @@ class TestTimeframe(FlexGetBase):
         age_series(hours=6)
         self.execute_task('test_with_quality_2')
         assert self.task.accepted, 'Timeframe should have passed'
-
-
 
 
 class TestBacklog(FlexGetBase):
@@ -1528,6 +1527,7 @@ class TestDoubleEps(FlexGetBase):
         self.execute_task('test_double_prefered')
         assert self.task.find_entry('accepted', title='double S02E03-04')
         assert not self.task.find_entry('accepted', title='S02E03')
+
 
 class TestAutoLockin(FlexGetBase):
     __yaml__ = """

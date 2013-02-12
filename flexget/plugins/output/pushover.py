@@ -1,6 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
-from flexget.plugin import register_plugin
+
+from flexget.plugin import register_plugin, priority
 from flexget.utils.template import RenderError
 
 log = logging.getLogger("pushover")
@@ -18,10 +19,10 @@ class OutputPushover(object):
         userkey: <USER_KEY>
         apikey: <API_KEY>
         [device: <DEVICE_STRING>] (default: (none))
-        [title: <MESSAGE_TITLE>] (default: "Download started" -- accepts Jinja)
-        [message: <MESSAGE_BODY>] (default: "{{series_name}} {{series_id}}" -- accepts Jinja)
+        [title: <MESSAGE_TITLE>] (default: "Download started" -- accepts Jinja2)
+        [message: <MESSAGE_BODY>] (default: "{{series_name}} {{series_id}}" -- accepts Jinja2)
         [priority: <PRIORITY>] (default = 0 -- normal = 0, high = 1, silent = -1)
-        [url: <URL>] (default: "{{imdb_url}}" -- accepts Jinja)
+        [url: <URL>] (default: "{{imdb_url}}" -- accepts Jinja2)
 
     Configuration parameters are also supported from entries (eg. through set).
     """
@@ -44,13 +45,19 @@ class OutputPushover(object):
 
         # Set the defaults
         config.setdefault("device", None)
+        # TODO: don't assume it's a download
         config.setdefault("title", "Download from {{task}}")
-        config.setdefault("message", """{% if series_name is defined %}{{series_name_tvdb|d(series_name)}} {{series_id}} {{ep_name|d('')}}{% elif imdb_name is defined %}{{imdb_name}} {{imdb_year}}{% else %}{{title}}{% endif %}""")
+        # TODO: use template file
+        config.setdefault("message", "{% if series_name is defined %}{{series_name_tvdb|d(series_name)}} "
+                                     "{{series_id}} {{ep_name|d('')}}{% elif imdb_name is defined %}{{imdb_name}} "
+                                     "{{imdb_year}}{% else %}{{title}}{% endif %}")
         config.setdefault("priority", 0)
         config.setdefault("url", "{% if imdb_url is defined %}{{imdb_url}}{% endif %}")
 
         return config
 
+    # Run last to make sure other outputs are successful before sending notification
+    @priority(0)
     def on_task_output(self, task, config):
         # get the parameters
         config = self.prepare_config(config)
@@ -122,5 +129,6 @@ class OutputPushover(object):
                 log.error("Bad input, the parameters you provided did not validate")
             else:
                 log.error("Unknown error when sending Pushover notification")
+
 
 register_plugin(OutputPushover, "pushover", api_ver=2)
