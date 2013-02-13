@@ -109,6 +109,6 @@ class DisableUrlRewriter(object):
 
 
 register_plugin(PluginUrlRewriting, 'urlrewriting', builtin=True, api_ver=2)
-register_plugin(DisableUrlRewriter, 'disable_urlrewriters', builtin=True, api_ver=2)
+register_plugin(DisableUrlRewriter, 'disable_urlrewriters', api_ver=2)
 
 register_task_phase('urlrewrite', before='download')
