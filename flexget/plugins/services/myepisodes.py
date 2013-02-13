@@ -143,11 +143,11 @@ class MyEpisodes(object):
             return myepisodes_info.myepisodes_id
 
         # Get the series name from thetvdb to increase match chance on myepisodes
-        if entry.get('series_name_tvdb'):
-            query_name = entry['series_name_tvdb']
+        if entry.get('tvdb_series_name'):
+            query_name = entry['tvdb_series_name']
         else:
             try:
-                series = lookup_series(name=series_name, tvdb_id=entry.get('thetvdb_id'))
+                series = lookup_series(name=series_name, tvdb_id=entry.get('tvdb_id'))
                 query_name = series.seriesname
             except LookupError as e:
                 log.warning('Unable to lookup series `%s` from tvdb, using raw name.' % series_name)

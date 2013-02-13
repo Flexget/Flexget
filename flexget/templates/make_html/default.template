@@ -190,8 +190,8 @@ div.clear {
                 {% endif %}
 
                 <div class="basic">
-					{% if entry.ep_name is defined %}
-                        <div class="ep_name">{{ entry.ep_name }}</div>
+					{% if entry.tvdb_ep_name is defined %}
+                        <div class="ep_name">{{ entry.tvdb_ep_name }}</div>
                     {% endif %}
 
 					{% if entry.series_episode is defined and entry.series_season is defined %}
@@ -202,8 +202,8 @@ div.clear {
 
                     <div class="clear">&nbsp;</div>
 
-					{% if entry.ep_rating is defined %}
-                        <div class="ep_rating">Rating: {{entry.ep_rating}}</div>
+					{% if entry.tvdb_ep_rating is defined %}
+                        <div class="ep_rating">Rating: {{entry.tvdb_ep_rating}}</div>
                     {% endif %}
 
 					{% if entry.series_status is defined %}
@@ -212,17 +212,17 @@ div.clear {
                         -->
                     {% endif %}
 
-					{% if entry.ep_director is defined %}
-                        <div class="ep_director">Director: {{  entry.ep_director }}</div>
+					{% if entry.tvdb_ep_director is defined %}
+                        <div class="ep_director">Director: {{  entry.tvdb_ep_director }}</div>
                     {% endif %}
 
                     <div class="clear">&nbsp;</div>
                 </div>
 
-				{% if entry.ep_overview is defined %}
+				{% if entry.tvdb_ep_overview is defined %}
                     <div class="overview">
                         <h2>Overview</h2>
-                        <p>{{ entry.ep_overview }}</p>
+                        <p>{{ entry.tvdb_ep_overview }}</p>
                     </div>
                 {% endif %}
 
@@ -236,11 +236,11 @@ div.clear {
                     <!-- a hack to keep browser from reseting position to top when clicking the Details link -->
                     <a name="a-{{ loop.index }}" style="display:none;">&nbsp;</a>
 
-					{% if entry.series_genres is defined and entry.series_genres is iterable %}
+					{% if entry.tvdb_genres is defined and entry.tvdb_genres is iterable %}
                         <div class="genres">
                             <h2>Genres</h2>
                             <ul>
-							{% for genre in entry.series_genres %}
+							{% for genre in entry.tvdb_genres %}
                                 <li>{{ genre }}</li>
                             {% endfor %}
                             </ul>
@@ -258,11 +258,11 @@ div.clear {
                         </div>
                     {% endif %}
 
-					{% if entry.ep_guest_stars is defined and entry.ep_guest_stars is iterable %}
+					{% if entry.tvdb_ep_guest_stars is defined and entry.tvdb_ep_guest_stars is iterable %}
                         <div class="actors">
                             <h2>Guest stars</h2>
                             <ul>
-	                        {% for actor in entry.ep_guest_stars %}
+	                        {% for actor in entry.tvdb_ep_guest_stars %}
                                 <li>{{ actor }}</li>
                             {% endfor %}
                             </ul>
