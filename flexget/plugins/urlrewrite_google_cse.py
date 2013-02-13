@@ -2,15 +2,22 @@ from __future__ import unicode_literals, division, absolute_import
 import re
 import urllib2
 import logging
+import urlparse
+
 from flexget.plugins.plugin_urlrewriting import UrlRewritingError
-from flexget.plugin import register_plugin
+from flexget.plugin import register_plugin, get_plugin_by_name
+from flexget.utils.requests import Session
 from flexget.utils.soup import get_soup
 from flexget.utils.tools import urlopener
 
-log = logging.getLogger('google_cse')
+log = logging.getLogger('google')
+
+requests = Session()
+requests.headers.update({'User-Agent': 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'})
+requests.set_domain_delay('imdb.com', '2 seconds')
 
 
-class UrlRewriteGoogleCse:
+class UrlRewriteGoogleCse(object):
     """Google custom query urlrewriter."""
 
     # urlrewriter API
@@ -45,4 +52,43 @@ class UrlRewriteGoogleCse:
         except Exception as e:
             raise UrlRewritingError(e)
 
-register_plugin(UrlRewriteGoogleCse, 'google_cse', groups=['urlrewriter'])
+
+class UrlRewriteGoogle(object):
+
+    # urlrewriter API
+    def url_rewritable(self, task, entry):
+        if entry['url'].startswith('https://www.google.com/search?q='):
+            return True
+        return False
+
+    # urlrewriter API
+    def url_rewrite(self, task, entry):
+        log.debug('Requesting %s' % entry['url'])
+        page = requests.get(entry['url'])
+        soup = get_soup(page.text)
+
+        for link in soup.findAll('a', attrs={'href': re.compile(r'^/url')}):
+            # Extract correct url from google internal link
+            href = 'http://google.com' + link['href']
+            args = urlparse.parse_qs(urlparse.urlparse(href).query)
+            href = args['q'][0]
+
+            # import IPython; IPython.embed()
+            # import sys
+            # sys.exit(1)
+            #href = link['href'].lstrip('/url?q=').split('&')[0]
+
+            # Test if entry with this url would be recognized by some urlrewriter
+            log.trace('Checking if %s is known by some rewriter' % href)
+            fake_entry = {'title': entry['title'], 'url': href}
+            urlrewriting = get_plugin_by_name('urlrewriting')
+            if urlrewriting['instance'].url_rewritable(task, fake_entry):
+                log.debug('--> rewriting %s (known url pattern)' % href)
+                entry['url'] = href
+                return
+            else:
+                log.debug('<-- ignoring %s (unknown url pattern)' % href)
+        raise UrlRewritingError('Unable to resolve')
+
+register_plugin(UrlRewriteGoogleCse, 'google_cse', groups=['urlrewriter'], api_ver=2)
+register_plugin(UrlRewriteGoogle, 'google', groups=['urlrewriter'], api_ver=2)
