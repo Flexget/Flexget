@@ -24,64 +24,64 @@ class PluginThetvdbLookup(object):
 
     This information is provided (via entry):
     series info:
-      series_name_thetvdb
-      series_rating
-      series_status (Continuing or Ended)
-      series_runtime (show runtime in minutes)
-      series_first_air_date
-      series_air_time
-      series_content_rating
-      series_genres
-      series_network
-      series_banner_url
-      series_fanart_url
-      series_poster_url
-      series_airs_day_of_week
-      series_actors
-      series_language (en, fr, etc.)
+      tvdb_series_name
+      tvdb_rating
+      tvdb_status (Continuing or Ended)
+      tvdb_runtime (show runtime in minutes)
+      tvdb_first_air_date
+      tvdb_air_time
+      tvdb_content_rating
+      tvdb_genres
+      tvdb_network
+      tvdb_banner_url
+      tvdb_fanart_url
+      tvdb_poster_url
+      tvdb_airs_day_of_week
+      tvdb_actors
+      tvdb_language (en, fr, etc.)
       imdb_url (if available)
       zap2it_id (if available)
     episode info: (if episode is found)
-      ep_name
-      ep_overview
-      ep_directors
-      ep_writers
-      ep_air_date
-      ep_rating
-      ep_guest_stars
-      ep_image_url
+      tvdb_ep_name
+      tvdb_ep_overview
+      tvdb_ep_directors
+      tvdb_ep_writers
+      tvdb_ep_air_date
+      tvdb_ep_rating
+      tvdb_ep_guest_stars
+      tvdb_ep_image_url
     """
 
     # Series info
     series_map = {
-        'series_name_tvdb': 'seriesname',
-        'series_rating': 'rating',
-        'series_status': 'status',
-        'series_runtime': 'runtime',
-        'series_first_air_date': 'firstaired',
-        'series_air_time': 'airs_time',
-        'series_content_rating': 'contentrating',
-        'series_genres': 'genre',
-        'series_network': 'network',
-        'series_banner_url': lambda series: series.banner and get_mirror('banner') + series.banner,
-        'series_fanart_url': lambda series: series.fanart and get_mirror('banner') + series.fanart,
-        'series_poster_url': lambda series: series.poster and get_mirror('banner') + series.poster,
-        'series_airs_day_of_week': 'airs_dayofweek',
-        'series_language': 'language',
+        'tvdb_series_name': 'seriesname',
+        'tvdb_rating': 'rating',
+        'tvdb_status': 'status',
+        'tvdb_runtime': 'runtime',
+        'tvdb_first_air_date': 'firstaired',
+        'tvdb_air_time': 'airs_time',
+        'tvdb_content_rating': 'contentrating',
+        'tvdb_genres': 'genre',
+        'tvdb_network': 'network',
+        'tvdb_banner_url': lambda series: series.banner and get_mirror('banner') + series.banner,
+        'tvdb_fanart_url': lambda series: series.fanart and get_mirror('banner') + series.fanart,
+        'tvdb_poster_url': lambda series: series.poster and get_mirror('banner') + series.poster,
+        'tvdb_airs_day_of_week': 'airs_dayofweek',
+        'tvdb_language': 'language',
         'imdb_url': lambda series: series.imdb_id and 'http://www.imdb.com/title/%s' % series.imdb_id,
         'imdb_id': 'imdb_id',
         'zap2it_id': 'zap2it_id',
-        'thetvdb_id': 'id'}
+        'tvdb_id': 'id'}
     # Episode info
     episode_map = {
-        'ep_name': 'episodename',
-        'ep_air_date': 'firstaired',
-        'ep_rating': 'rating',
-        'ep_image_url': lambda ep: ep.filename and get_mirror('banner') + ep.filename,
-        'ep_overview': 'overview',
-        'ep_writers': 'writer',
-        'ep_directors': 'director',
-        'ep_guest_stars': 'gueststars',
+        'tvdb_ep_name': 'episodename',
+        'tvdb_tvdb_ep_air_date': 'firstaired',
+        'tvdb_ep_rating': 'rating',
+        'tvdb_ep_image_url': lambda ep: ep.filename and get_mirror('banner') + ep.filename,
+        'tvdb_ep_overview': 'overview',
+        'tvdb_ep_writers': 'writer',
+        'tvdb_ep_directors': 'director',
+        'tvdb_ep_guest_stars': 'gueststars',
         'tvdb_absolute_number': 'absolute_number',
         'tvdb_season': 'seasonnumber',
         'tvdb_episode': 'episodenumber',
@@ -94,7 +94,7 @@ class PluginThetvdbLookup(object):
     def lazy_series_lookup(self, entry, field):
         """Does the lookup for this entry and populates the entry fields."""
         try:
-            series = lookup_series(entry.get('series_name', eval_lazy=False), tvdb_id=entry.get('thetvdb_id', eval_lazy=False))
+            series = lookup_series(entry.get('series_name', eval_lazy=False), tvdb_id=entry.get('tvdb_id', eval_lazy=False))
             entry.update_using_map(self.series_map, series)
         except LookupError as e:
             log.debug('Error looking up tvdb series information for %s: %s' % (entry['title'], e.message))
@@ -118,7 +118,7 @@ class PluginThetvdbLookup(object):
                 log.debug('Using offset for tvdb lookup: season: %s, episode: %s' % (season_offset, episode_offset))
 
             lookupargs = {'name': entry.get('series_name', eval_lazy=False),
-                          'tvdb_id': entry.get('thetvdb_id', eval_lazy=False)}
+                          'tvdb_id': entry.get('tvdb_id', eval_lazy=False)}
             if entry['series_id_type'] == 'ep':
                 lookupargs['seasonnum'] = entry['series_season'] + season_offset
                 lookupargs['episodenum'] = entry['series_episode'] + episode_offset
@@ -142,7 +142,7 @@ class PluginThetvdbLookup(object):
 
         for entry in task.entries:
             # If there is information for a series lookup, register our series lazy fields
-            if entry.get('series_name') or entry.get('thetvdb_id', eval_lazy=False):
+            if entry.get('series_name') or entry.get('tvdb_id', eval_lazy=False):
                 entry.register_lazy_fields(self.series_map, self.lazy_series_lookup)
 
                 # If there is season and ep info as well, register episode lazy fields
