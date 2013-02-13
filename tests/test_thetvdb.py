@@ -13,7 +13,7 @@ class TestThetvdbLookup(FlexGetBase):
             thetvdb_lookup: yes
             # Access a tvdb field to cause lazy loading to occur
             set:
-              afield: "{{ thetvdb_id }}{{ ep_name }}"
+              afield: "{{ tvdb_id }}{{ tvdb_ep_name }}"
         tasks:
           test:
             mock:
@@ -51,13 +51,13 @@ class TestThetvdbLookup(FlexGetBase):
         """thetvdb: Test Lookup (ONLINE)"""
         self.execute_task('test')
         entry = self.task.find_entry(title='House.S01E02.HDTV.XViD-FlexGet')
-        assert entry['ep_name'] == 'Paternity', \
-            '%s ep_name should be Paternity' % entry['title']
-        assert int(entry['series_runtime']) == 60, \
-            'runtime for %s is %s, should be 60' % (entry['title'], entry['series_runtime'])
-        assert entry['series_genres'] == ['Comedy', 'Drama']
+        assert entry['tvdb_ep_name'] == 'Paternity', \
+            '%s tvdb_ep_name should be Paternity' % entry['title']
+        assert int(entry['tvdb_runtime']) == 60, \
+            'runtime for %s is %s, should be 60' % (entry['title'], entry['tvdb_runtime'])
+        assert entry['tvdb_genres'] == ['Comedy', 'Drama']
         assert entry['afield'] == '73255Paternity', 'afield was not set correctly'
-        assert self.task.find_entry(ep_name='School Reunion'), \
+        assert self.task.find_entry(tvdb_ep_name='School Reunion'), \
             'Failed imdb lookup Doctor Who 2005 S02E03'
 
     @attr(online=True)
@@ -66,7 +66,7 @@ class TestThetvdbLookup(FlexGetBase):
         self.execute_task('test_unknown_series')
         # Make sure it didn't make a false match
         entry = self.task.find_entry('accepted', title='Aoeu.Htns.S01E01.htvd')
-        assert entry.get('thetvdb_id') is None, 'should not have populated tvdb data'
+        assert entry.get('tvdb_id') is None, 'should not have populated tvdb data'
 
     @attr(online=True)
     def test_mark_expired(self):
@@ -75,7 +75,7 @@ class TestThetvdbLookup(FlexGetBase):
             # Run the task and check tvdb data was populated.
             self.execute_task('test_mark_expired')
             entry = self.task.find_entry(title='House.S02E02.hdtv')
-            assert entry['ep_name'] == 'Autopsy'
+            assert entry['tvdb_ep_name'] == 'Autopsy'
 
         # Run the task once, this populates data from tvdb
         test_run()
@@ -95,14 +95,14 @@ class TestThetvdbLookup(FlexGetBase):
         self.execute_task('test_date')
         entry = self.task.find_entry(title='the daily show 2012-6-6')
         assert entry
-        assert entry['ep_name'] == 'Michael Fassbender'
+        assert entry['tvdb_ep_name'] == 'Michael Fassbender'
 
     @attr(online=True)
     def test_absolute(self):
         self.execute_task('test_absolute')
         entry = self.task.find_entry(title='naruto 128')
         assert entry
-        assert entry['ep_name'] == 'A Cry on Deaf Ears'
+        assert entry['tvdb_ep_name'] == 'A Cry on Deaf Ears'
 
 
 class TestThetvdbFavorites(FlexGetBase):

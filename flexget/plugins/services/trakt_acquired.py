@@ -33,11 +33,11 @@ class TraktAcquired(object):
                     series = found.setdefault(entry['series_name'], {})
                     if not series:
                         # If this is the first episode found from this series, set the parameters
-                        series['title'] = entry.get('series_name_tvdb', entry['series_name'])
+                        series['title'] = entry.get('tvdb_series_name', entry['series_name'])
                         if entry.get('imdb_id'):
                             series['imdb_id'] = entry['imdb_id']
-                        if entry.get('thetvdb_id'):
-                            series['tvdb_id'] = entry['thetvdb_id']
+                        if entry.get('tvdb_id'):
+                            series['tvdb_id'] = entry['tvdb_id']
                         series['episodes'] = []
                     episode = {'season': entry['series_season'], 'episode': entry['series_episode']}
                     series['episodes'].append(episode)
