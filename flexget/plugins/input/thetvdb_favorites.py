@@ -124,7 +124,7 @@ class InputThetvdbFavorites(object):
                 if config.get('strip_dates'):
                     # Remove year from end of series name if present
                     series_name = re.sub(r'\s+\(\d{4}\)$', '', series_name)
-                entries.append(Entry(series_name, '', thetvdb_id=series.id))
+                entries.append(Entry(series_name, '', tvdb_id=series.id))
         return entries
 
 register_plugin(InputThetvdbFavorites, 'thetvdb_favorites', api_ver=2)
