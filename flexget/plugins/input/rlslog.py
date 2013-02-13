@@ -1,5 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
+import re
 import time
 from requests import RequestException
 from bs4 import NavigableString
@@ -46,45 +47,18 @@ class RlsLog(object):
 
             log.trace('Processing title %s' % (release['title']))
 
-            for link in entrybody.find_all('a'):
-                if not link.contents:
-                    log.trace('link content empty, skipping')
-                    continue
-                if not link.has_attr('href'):
-                    log.trace('link %s missing href' % link)
-                    continue
+            # find imdb url
+            link_imdb = entrybody.find('a', text=re.compile(r'imdb', re.IGNORECASE))
+            if link_imdb:
+                release['imdb_url'] = link_imdb['href']
 
-                link_name = link.contents[0]
-                link_name_ok = True
-                if link_name is None:
-                    log.trace('link_name is none')
-                    link_name_ok = False
-                if not isinstance(link_name, NavigableString):
-                    log.trace('link_name is not NavigableString')
-                    link_name_ok = False
-
-                link_href = link['href']
-
-                # parse imdb link
-                if link_name_ok:
-                    link_name = link_name.strip().lower()
-                    if link_name == 'imdb':
-                        release['imdb_url'] = link_href
-
-                # test if entry with this url would be recognized
-                temp = {'title': release['title'], 'url': link_href}
-                urlrewriting = get_plugin_by_name('urlrewriting')
-                if urlrewriting['instance'].url_rewritable(task, temp):
-                    release['url'] = link_href
-                    log.trace('--> accepting %s (known url pattern)' % link_href)
-                else:
-                    log.trace('<-- ignoring %s (unknown url pattern)' % link_href)
-
-            # reject if no torrent link
-            if not 'url' in release:
-                log_once('%s skipped due to missing or unsupported download link' % (release['title']), log)
-            else:
+            # find google search url
+            google = entrybody.find('a', href=re.compile(r'google', re.IGNORECASE))
+            if google:
+                release['url'] = google['href']
                 releases.append(release)
+            else:
+                log_once('%s skipped due to missing or unsupported download link' % (release['title']), log)
 
         return releases
 
@@ -117,7 +91,7 @@ class RlsLog(object):
             def apply_field(d_from, d_to, f):
                 if f in d_from:
                     if d_from[f] is None:
-                        return # None values are not wanted!
+                        return  # None values are not wanted!
                     d_to[f] = d_from[f]
 
             for field in ('title', 'url', 'imdb_url'):
