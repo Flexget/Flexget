@@ -15,7 +15,7 @@ class OutputRapidPush(object):
     Example::
 
       rapidpush:
-        apikey: xxxxxxx, [bbbbbb, [...]] Multiple API-Keys seperated by comma
+        apikey: xxxxxxx (can also be a list of api keys)
         [category: category, default FlexGet]
         [title: title, default New release]
         [group: device group, default no group]
@@ -29,6 +29,7 @@ class OutputRapidPush(object):
         from flexget import validator
         config = validator.factory('dict')
         config.accept('text', key='apikey', required=True)
+        config.accept('list', key='apikey').accept('text')
         config.accept('text', key='category')
         config.accept('text', key='title')
         config.accept('text', key='group')
@@ -58,6 +59,9 @@ class OutputRapidPush(object):
 
             log.info("Send RapidPush notification about: %s", entry['title'])
             apikey = entry.get('apikey', config['apikey'])
+            if isinstance(apikey, list):
+                apikey = ', '.join(apikey)
+
             priority = entry.get('priority', config['priority'])
 
             category = entry.get('category', config['category'])
