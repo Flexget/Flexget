@@ -425,7 +425,8 @@ class TestSeriesParser(object):
 
     def test_name_uncorrupted(self):
         """SeriesParser: test name doesn't get corrupted when cleaned"""
-        s = self.parse(name='The New Adventures of Old Christine', data='The.New.Adventures.of.Old.Christine.S05E16.HDTV.XviD-FlexGet')
+        s = self.parse(name='The New Adventures of Old Christine',
+                       data='The.New.Adventures.of.Old.Christine.S05E16.HDTV.XviD-FlexGet')
         assert s.name == 'The New Adventures of Old Christine'
         assert s.season == 5
         assert s.episode == 16
@@ -439,6 +440,15 @@ class TestSeriesParser(object):
         s.allow_groups = ['xxxx', 'group']
         s.parse()
         assert s.group == 'group', 'did not get group'
+
+    def test_group_dashes(self):
+        """SeriesParser: group name around extra dashes"""
+        s = SeriesParser()
+        s.name = 'Test'
+        s.data = 'Test.S01E01-FooBar-Group'
+        s.allow_groups = ['xxxx', 'group']
+        s.parse()
+        assert s.group == 'group', 'did not get group with extra dashes'
 
     def test_id_and_hash(self):
         """SeriesParser: Series with confusing hash"""
@@ -512,7 +522,7 @@ class TestSeriesParser(object):
     def test_specials(self):
         """SeriesParser: Special episodes with no id"""
         s = self.parse(name='The Show', data='The Show 2005 A Christmas Carol 2010 Special 720p HDTV x264')
-        assert s.valid == True, 'Special episode should be valid'
+        assert s.valid, 'Special episode should be valid'
 
     def test_double_episodes(self):
         s = self.parse(name='Something', data='Something.S04E05-06')
