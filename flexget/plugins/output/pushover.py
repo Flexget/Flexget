@@ -16,7 +16,9 @@ class OutputPushover(object):
     Example::
 
       pushover:
-        userkey: <USER_KEY>
+        userkeys: 
+            - <USER_KEY_1>
+            - <USER_KEY_2>
         apikey: <API_KEY>
         [device: <DEVICE_STRING>] (default: (none))
         [title: <MESSAGE_TITLE>] (default: "Download started" -- accepts Jinja2)
@@ -30,7 +32,7 @@ class OutputPushover(object):
     def validator(self):
         from flexget import validator
         config = validator.factory("dict")
-        config.accept("text", key="userkey", required=True)
+        config.accept("list", key="userkeys", required=True).accept("text")
         config.accept("text", key="apikey", required=True)
         config.accept("text", key="device", required=False)
         config.accept("text", key="title", required=False)
@@ -65,7 +67,7 @@ class OutputPushover(object):
         # Loop through the provided entries
         for entry in task.accepted:
             # Set a bunch of local variables from the config and the entry
-            userkey = config["userkey"]
+            userkeys = config["userkeys"]
             apikey = config["apikey"]
             device = config["device"]
             title = config["title"]
@@ -94,41 +96,44 @@ class OutputPushover(object):
                 log.warning("Problem rendering 'url': %s" % e)
                 url = entry.get("imdb_url", "")
 
-            # Check for test mode
-            if task.manager.options.test:
-                log.info("Test mode.  Pushover notification would be:")
+            for userkey in userkeys:
+                # Build the request
+                data = {"user": userkey, "token": apikey, "title": title, "message": message, "url": url}
                 if device:
-                    log.info("    Device: %s" % device)
+                    data["device"] = device
+                if priority:
+                    data["priority"] = priority
+    
+                # Check for test mode
+                if task.manager.options.test:
+                    log.info("Test mode.  Pushover notification would be:")
+                    if device:
+                        log.info("    Device: %s" % device)
+                    else:
+                        log.info("    Device: [broadcast]")
+                    log.info("    Title: %s" % title)
+                    log.info("    Message: %s" % message)
+                    log.info("    URL: %s" % url)
+                    log.info("    Priority: %d" % priority)
+                    log.info("    userkey: %s" % userkey)
+                    log.info("    apikey: %s" % apikey)
+
+                    # Test mode.  Skip remainder.
+                    continue
+
+                # Make the request
+                response = task.requests.post(pushover_url, headers=client_headers, data=data, raise_status=False)
+    
+                # Check if it succeeded
+                request_status = response.status_code
+    
+                # error codes and messages from Pushover API
+                if request_status == 200:
+                    log.debug("Pushover notification sent")
+                elif request_status >= 400:
+                    log.error("Bad input, the parameters you provided did not validate")
                 else:
-                    log.info("    Device: [broadcast]")
-                log.info("    Title: %s" % title)
-                log.info("    Message: %s" % message)
-                log.info("    URL: %s" % url)
-                log.info("    Priority: %d" % priority)
-
-                # Test mode.  Skip remainder.
-                continue
-
-            # Build the request
-            data = {"user": userkey, "token": apikey, "title": title, "message": message, "url": url}
-            if device:
-                data["device"] = device
-            if priority:
-                data["priority"] = priority
-
-            # Make the request
-            response = task.requests.post(pushover_url, headers=client_headers, data=data, raise_status=False)
-
-            # Check if it succeeded
-            request_status = response.status_code
-
-            # error codes and messages from Pushover API
-            if request_status == 200:
-                log.debug("Pushover notification sent")
-            elif request_status >= 400:
-                log.error("Bad input, the parameters you provided did not validate")
-            else:
-                log.error("Unknown error when sending Pushover notification")
+                    log.error("Unknown error when sending Pushover notification")
 
 
 register_plugin(OutputPushover, "pushover", api_ver=2)
