@@ -403,8 +403,9 @@ class SeriesDatabase(object):
         series_eps = session.query(Episode).select_from(join(Episode, Series)).\
             filter(Series.id == series.id)
         if series.identified_by == 'ep':
-            return series_eps.filter(or_(and_(Episode.season == since_ep.season, Episode.number > since_ep.number),
-                           Episode.season > since_ep.season)).count()
+            return series_eps.filter((Episode.identified_by == 'ep') &
+                                     (((Episode.season == since_ep.season) & Episode.number > since_ep.number) |
+                                      Episode.season > since_ep.season)).count()
         elif series.identified_by == 'seq':
             return series_eps.filter(Episode.number > since_ep.number).count()
         elif series.identified_by == 'id':
