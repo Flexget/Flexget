@@ -3,6 +3,8 @@ import logging
 
 from flexget.plugin import register_plugin, priority
 from flexget.utils.template import RenderError
+from flexget.utils import json
+import time
 
 log = logging.getLogger("pushover")
 
@@ -16,15 +18,14 @@ class OutputPushover(object):
     Example::
 
       pushover:
-        userkeys: 
-            - <USER_KEY_1>
-            - <USER_KEY_2>
+        userkey: <USER_KEY> (can also be a list of userkeys)
         apikey: <API_KEY>
         [device: <DEVICE_STRING>] (default: (none))
         [title: <MESSAGE_TITLE>] (default: "Download started" -- accepts Jinja2)
         [message: <MESSAGE_BODY>] (default: "{{series_name}} {{series_id}}" -- accepts Jinja2)
         [priority: <PRIORITY>] (default = 0 -- normal = 0, high = 1, silent = -1)
         [url: <URL>] (default: "{{imdb_url}}" -- accepts Jinja2)
+        [sound: <SOUND>] (default: pushover)
 
     Configuration parameters are also supported from entries (eg. through set).
     """
@@ -32,13 +33,15 @@ class OutputPushover(object):
     def validator(self):
         from flexget import validator
         config = validator.factory("dict")
-        config.accept("list", key="userkeys", required=True).accept("text")
+        config.accept("text", key="userkeys", required=True)
+        config.accept("list", key="userkeys").accept("text")
         config.accept("text", key="apikey", required=True)
         config.accept("text", key="device", required=False)
         config.accept("text", key="title", required=False)
         config.accept("text", key="message", required=False)
         config.accept("integer", key="priority", required=False)
         config.accept("url", key="url", required=False)
+        config.accept("text", key="sound", required=False)
         return config
 
     def prepare_config(self, config):
@@ -55,6 +58,7 @@ class OutputPushover(object):
                                      "{{imdb_year}}{% else %}{{title}}{% endif %}")
         config.setdefault("priority", 0)
         config.setdefault("url", "{% if imdb_url is defined %}{{imdb_url}}{% endif %}")
+        config.setdefault("sound", "pushover")
 
         return config
 
@@ -64,15 +68,23 @@ class OutputPushover(object):
         # get the parameters
         config = self.prepare_config(config)
 
+        # Support for multiple userkeys 
+        userkeys = config["userkeys"]
+        if isinstance(userkeys, unicode):
+            userkeys = [userkeys]
+            log.info(userkeys)
+            
+        # Set a bunch of local variables from the config
+        apikey = config["apikey"]
+        device = config["device"]
+        priority = config["priority"]
+        sound = config["sound"]
+
         # Loop through the provided entries
         for entry in task.accepted:
-            # Set a bunch of local variables from the config and the entry
-            userkeys = config["userkeys"]
-            apikey = config["apikey"]
-            device = config["device"]
+
             title = config["title"]
             message = config["message"]
-            priority = config["priority"]
             url = config["url"]
 
             # Attempt to render the title field
@@ -103,6 +115,8 @@ class OutputPushover(object):
                     data["device"] = device
                 if priority:
                     data["priority"] = priority
+                if sound:
+                    data["sound"] = sound
     
                 # Check for test mode
                 if task.manager.options.test:
@@ -117,6 +131,7 @@ class OutputPushover(object):
                     log.info("    Priority: %d" % priority)
                     log.info("    userkey: %s" % userkey)
                     log.info("    apikey: %s" % apikey)
+                    log.info("    sound: %s" % sound)
 
                     # Test mode.  Skip remainder.
                     continue
@@ -130,8 +145,12 @@ class OutputPushover(object):
                 # error codes and messages from Pushover API
                 if request_status == 200:
                     log.debug("Pushover notification sent")
+                elif request_status == 500:
+                    log.debug("Pushover notification failed, Pushover API having issues")
+                    #TODO: Implement retrying. API requests 5 seconds between retries.
                 elif request_status >= 400:
-                    log.error("Bad input, the parameters you provided did not validate")
+                    errors = json.loads(response.content)['errors']
+                    log.error("Pushover API error: %s" % errors[0])
                 else:
                     log.error("Unknown error when sending Pushover notification")
 
