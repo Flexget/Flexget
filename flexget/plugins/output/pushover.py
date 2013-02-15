@@ -33,8 +33,8 @@ class OutputPushover(object):
     def validator(self):
         from flexget import validator
         config = validator.factory("dict")
-        config.accept("text", key="userkeys", required=True)
-        config.accept("list", key="userkeys").accept("text")
+        config.accept("text", key="userkey", required=True)
+        config.accept("list", key="userkey").accept("text")
         config.accept("text", key="apikey", required=True)
         config.accept("text", key="device", required=False)
         config.accept("text", key="title", required=False)
@@ -69,10 +69,9 @@ class OutputPushover(object):
         config = self.prepare_config(config)
 
         # Support for multiple userkeys 
-        userkeys = config["userkeys"]
-        if isinstance(userkeys, unicode):
+        userkeys = config["userkey"]
+        if not isinstance(userkeys, list):
             userkeys = [userkeys]
-            log.info(userkeys)
             
         # Set a bunch of local variables from the config
         apikey = config["apikey"]
