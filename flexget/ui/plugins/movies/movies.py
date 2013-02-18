@@ -86,7 +86,7 @@ def add_to_queue():
 def del_from_queue():
     imdb_id = request.values.get('imdb_id')
     try:
-        title = queue_del(imdb_id)
+        title = queue_del(imdb_id=imdb_id)
     except QueueError as e:
         flash(e.message, 'error')
     else:
@@ -99,7 +99,7 @@ def edit_movie_quality():
     imdb_id = request.values.get('imdb_id')
     quality = request.values.get('quality')
     try:
-        queue_edit(imdb_id, quality)
+        queue_edit(quality, imdb_id=imdb_id)
     except QueueError as e:
         flash(e.message, 'error')
     else:
