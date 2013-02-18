@@ -6,7 +6,7 @@ from flexget.utils.template import RenderError
 
 log = logging.getLogger('rapidpush')
 
-__version__ = 0.2
+__version__ = 0.3
 headers = {'User-Agent': "FlexGet RapidPush plugin/%s" % str(__version__)}
 url = 'https://rapidpush.net/api'
 
