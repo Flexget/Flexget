@@ -631,7 +631,8 @@ class Manager(object):
         """ Perform database cleanup if cleanup interval has been met.
         """
         expired = self.persist.get('last_cleanup', datetime.now()) < datetime.now() - DB_CLEANUP_INTERVAL
-        if self.options.db_cleanup or not self.persist.get('last_cleanup') or expired:
+        if self.options.db_cleanup or not self.persist.get('last_cleanup') or expired and \
+                any([t.enabled for t in self.tasks.values()]):
             if not self.options.db_cleanup and not self.options.quiet:
                 log.verbose('Not running database cleanup on manual run. It will be run on next --cron run.')
                 return
