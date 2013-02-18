@@ -47,14 +47,14 @@ class CliConfig(object):
 
     def parse_replaces(self, task):
         """Parses commandline string into internal dict"""
-        s = task.manager.options.cli_config
-        if not s:
-            return False # nothing to process
+        arg = task.manager.options.cli_config
+        if not arg:
+            return False  # nothing to process
         if self.replaces:
-            return True # already parsed
-        for item in s.split(','):
+            return True  # already parsed
+        for item in arg.split(','):
             try:
-                key, value = item.split('=')
+                key, value = item.split('=', 1)
             except ValueError:
                 log.critical('Invalid --cli-config, no name for %s' % item)
                 continue
@@ -68,4 +68,4 @@ class CliConfig(object):
 
 register_plugin(CliConfig, 'cli_config', builtin=True)
 register_parser_option('--cli-config', action='store', dest='cli_config', default=False,
-                       metavar='PARAMS', help='Configuration parameters trough commandline. See --doc cli_config.')
+                       metavar='PARAMS', help='Configuration parameters trough commandline.')
