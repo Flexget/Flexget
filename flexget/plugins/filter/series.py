@@ -394,7 +394,6 @@ class SeriesDatabase(object):
 
     def new_eps_after(self, since_ep):
         """
-        :param session: SQLAlchemy session
         :param since_ep: Episode instance
         :return: Number of episodes since then
         """
