@@ -21,6 +21,10 @@ class OutputRapidPush(object):
         [group: device group, default no group]
         [message: the message, supports Jinja templating, default {{title}}]
         [priority: 0 - 6 (6 = highest), default 2 (normal)]
+        [notify_accepted: boolean true or false, default true]
+        [notify_rejected: boolean true or false, default false]
+        [notify_failed: boolean true or false, default false]
+        [notify_undecided: boolean true or false, default false]
 
     Configuration parameters are also supported from entries (eg. through set).
     """
@@ -35,6 +39,10 @@ class OutputRapidPush(object):
         config.accept('text', key='group')
         config.accept('integer', key='priority')
         config.accept('text', key='message')
+        config.accept('boolean', key='notify_accepted')
+        config.accept('boolean', key='notify_rejected')
+        config.accept('boolean', key='notify_failed')
+        config.accept('boolean', key='notify_undecided')
         return config
 
     def prepare_config(self, config):
@@ -43,6 +51,10 @@ class OutputRapidPush(object):
         config.setdefault('priority', 2)
         config.setdefault('group', '')
         config.setdefault('message', '{{title}}')
+        config.setdefault('notify_accepted', True)
+        config.setdefault('notify_rejected', False)
+        config.setdefault('notify_failed', False)
+        config.setdefault('notify_undecided', False)
         return config
 
     # Run last to make sure other outputs are successful before sending notification
@@ -50,9 +62,25 @@ class OutputRapidPush(object):
     def on_task_output(self, task, config):
         # get the parameters
         config = self.prepare_config(config)
-        log.info("Get all accepted entries")
-        for entry in task.accepted:
 
+        if config['notify_accepted']:
+            log.info("Notify accepted entries")
+            self.process_notifications(task, task.accepted, config)
+        if config['notify_rejected']:
+            log.info("Notify rejected entries")
+            self.process_notifications(task, task.rejected, config)
+        if config['notify_failed']:
+            log.info("Notify failed entries")
+            self.process_notifications(task, task.failed, config)
+        if config['notify_undecided']:
+            log.info("Notify undecided entries")
+            self.process_notifications(task, task.undecided, config)
+
+    # Process the given events.
+    def process_notifications(self, task, entries, config):
+        for entry in entries:
+            log.info("Would send RapidPush notification about: %s", entry['title'])
+            continue
             if task.manager.options.test:
                 log.info("Would send RapidPush notification about: %s", entry['title'])
                 continue
