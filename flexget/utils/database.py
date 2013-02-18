@@ -1,8 +1,10 @@
 from __future__ import unicode_literals, division, absolute_import
 from datetime import datetime
+
 from sqlalchemy import extract, func
 from sqlalchemy.orm import synonym
 from sqlalchemy.ext.hybrid import Comparator, hybrid_property
+
 from flexget.manager import Session
 from flexget.utils import qualities
 
