@@ -433,7 +433,8 @@ class Manager(object):
         try:
             self.engine = sqlalchemy.create_engine(self.database_uri,
                                                    echo=self.options.debug_sql,
-                                                   poolclass=SingletonThreadPool)
+                                                   poolclass=SingletonThreadPool,
+                                                   )  # assert_unicode=True
         except ImportError:
             print >> sys.stderr, ('FATAL: Unable to use SQLite. Are you running Python 2.5 - 2.7 ?\n'
                                   'Python should normally have SQLite support built in.\n'
