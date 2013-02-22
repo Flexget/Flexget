@@ -61,7 +61,6 @@ class GetBest(object):
 
 	Configuration:
 		get_best_seen:
-		  timeframe: <int≥
 		  timeframe: <int>
 
 	# to wait for a week:
@@ -146,6 +145,7 @@ class GetBest(object):
 					log.debug('IMDB votes could not be found for movie %s, discarding entry' % (entry['title']))
 				task.session.add(rp)
 
+		# """ If there was any accepted entries in the task, making sure it will be overwritten next run """
 		else:
 			if item:
 				task.session.delete(item)
