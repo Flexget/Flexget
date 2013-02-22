@@ -591,3 +591,16 @@ class TestSeriesParser(object):
         assert s.valid
         assert s.id == 'cat'
         assert_raises(ParseWarning, s.parse, 'The Show e')
+
+    def test_apostrophe(self):
+        s = self.parse(name=u"FlexGet's show", data=u"FlexGet's show s01e01")
+        assert s.valid
+        s = self.parse(name=u"FlexGet's show", data=u"FlexGets show s01e01")
+        assert s.valid
+        s = self.parse(name=u"FlexGet's show", data=u"FlexGet s show s01e01")
+        assert s.valid
+        s = self.parse(name=u"FlexGet's show", data=u"FlexGet show s01e01")
+        assert not s.valid
+        # bad data with leftover escaping
+        s = self.parse(name=u"FlexGet's show", data=u"FlexGet\\'s show s01e01")
+        assert s.valid

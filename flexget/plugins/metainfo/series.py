@@ -1,11 +1,12 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
 from string import capwords
+import re
+
 from flexget.plugin import priority, register_plugin
 from flexget.plugins.filter.series import populate_entry_fields
 from flexget.utils.titles import SeriesParser
 from flexget.utils.titles.parser import ParseWarning
-import re
 
 log = logging.getLogger('metanfo_series')
 
