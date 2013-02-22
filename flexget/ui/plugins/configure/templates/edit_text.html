@@ -12,8 +12,8 @@
             $('#name_input').show();
         }
 	</script>
-    
-    
+
+
     <style type="text/css">
         textarea.config {
             background: #222;
@@ -24,16 +24,16 @@
             -khtml-border-radius: 0.4em;
         }
     </style>
-    
-    
+
+
     <form action="" method="post">
         <h2 id="name_label">
             {{ name }}
             <img onclick="edit_name()" src="{{ url_for('.static', filename='img/fatcow-icons/16x16/script_edit.png') }}" alt="Edit Name">
         </h2>
-             
+
         <h2 id="name_input"><input type="text" name="name" value="{{ name }}" style="font-size: 18px;"></h2>
-        
+
         <p>Fully UI-based editing will be implemented later</p>
 
         <input type="checkbox" name="useJSONEditor" id="useJSONEditor" onchange="showhideJSONEditor(this.checked);" />Use JSONEditor<br />
@@ -51,7 +51,7 @@
     </form>
 	<script type="text/javascript">
         var container = document.getElementById("editArea");
-        var editor = new JSONEditor(container,{change: getJSON},YAML.decode(document.getElementById('config').value));
+        var editor = new JSONEditor(container,{change: getJSON, rootNodeName: '{{ name }}'},YAML.decode(document.getElementById('config').value));
         function getJSON() {
 			var json = editor.get();
 			document.getElementById('config').value = YAML.encode(json,200)
