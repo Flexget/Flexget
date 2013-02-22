@@ -13,22 +13,6 @@ class FilterTvdb(object):
         languages, directors, writers, network, guest stars, episode
         rating, and actors
 
-        series info:
-            series_rating
-            series_status (Continuing or Ended)
-            series_runtime (show runtime in minutes)
-            series_content_rating
-            series_genres
-            series_network
-            series_actors
-            series_language (en, fr, etc.)
-          episode info: (if episode is found)
-            ep_director
-            ep_writer
-            ep_rating
-            ep_guest_stars
-            ep_air_date
-
         Configuration:
 
         Note: All parameters are optional. Some are mutually exclusive.
@@ -159,61 +143,61 @@ class FilterTvdb(object):
             # Check defined conditions
             reasons = []
             if 'min_series_rating' in config:
-                if entry['series_rating'] < config['min_series_rating']:
-                    reasons.append('series_rating (%s < %s)' % (entry['series_rating'], config['min_series_rating']))
+                if entry['tvdb_rating'] < config['min_series_rating']:
+                    reasons.append('series_rating (%s < %s)' % (entry['tvdb_rating'], config['min_series_rating']))
             if 'min_episode_rating' in config:
-                if entry['ep_rating'] < config['min_episode_rating']:
-                    reasons.append('ep_rating (%s < %s)' % (entry['ep_rating'], config['min_episode_rating']))
+                if entry['tvdb_ep_rating'] < config['min_episode_rating']:
+                    reasons.append('tvdb_ep_rating (%s < %s)' % (entry['tvdb_ep_rating'], config['min_episode_rating']))
             if 'min_episode_air_year' in config:
-                if entry['ep_air_date'].strftime("%Y") < config['min_episode_air_year']:
-                    reasons.append('ep_air_date (%s < %s)' % (entry['ep_air_date'].strftime("%Y"), config['min_episode_air_year']))
+                if entry['tvdb_ep_air_date'].strftime("%Y") < config['min_episode_air_year']:
+                    reasons.append('tvdb_ep_air_date (%s < %s)' % (entry['tvdb_ep_air_date'].strftime("%Y"), config['min_episode_air_year']))
             if 'max_episode_air_year' in config:
-                if entry['ep_air_date'].strftime("%Y") > config['max_episode_air_year']:
-                    reasons.append('ep_air_date (%s < %s)' % (entry['ep_air_date'].strftime("%Y"), config['max_episode_air_year']))
+                if entry['tvdb_ep_air_date'].strftime("%Y") > config['max_episode_air_year']:
+                    reasons.append('tvdb_ep_air_date (%s < %s)' % (entry['tvdb_ep_air_date'].strftime("%Y"), config['max_episode_air_year']))
 
-            if self.is_in_set(config, 'reject_content_rating', entry['series_content_rating']):
+            if self.is_in_set(config, 'reject_content_rating', entry['tvdb_content_rating']):
                 reasons.append('reject_content_rating')
 
-            if not self.is_in_set(config, 'accept_content_rating', entry['series_content_rating']):
+            if not self.is_in_set(config, 'accept_content_rating', entry['tvdb_content_rating']):
                 reasons.append('accept_content_rating')
 
-            if self.is_in_set(config, 'reject_network', entry['series_network']):
+            if self.is_in_set(config, 'reject_network', entry['tvdb_network']):
                 reasons.append('reject_network')
 
-            if not self.is_in_set(config, 'accept_network', entry['series_network']):
+            if not self.is_in_set(config, 'accept_network', entry['tvdb_network']):
                 reasons.append('accept_network')
 
-            if self.is_in_set(config, 'reject_genres', entry['series_genres']):
+            if self.is_in_set(config, 'reject_genres', entry['tvdb_genres']):
                 reasons.append('reject_genres')
 
-            if self.is_in_set(config, 'reject_status', entry['series_status']):
+            if self.is_in_set(config, 'reject_status', entry['tvdb_status']):
                 reasons.append('reject_status')
 
-            if self.is_in_set(config, 'reject_languages', entry['series_language']):
+            if self.is_in_set(config, 'reject_languages', entry['tvdb_language']):
                 reasons.append('reject_languages')
 
-            if not self.is_in_set(config, 'accept_languages', entry['series_language']):
+            if not self.is_in_set(config, 'accept_languages', entry['tvdb_language']):
                 reasons.append('accept_languages')
 
             # Accept if actors contains an accepted actor, but don't reject otherwise
-            if self.is_in_set(config, 'accept_actors', entry['series_actors'] + entry['ep_guest_stars']):
+            if self.is_in_set(config, 'accept_actors', entry['tvdb_actors'] + entry['tvdb_ep_guest_stars']):
                 force_accept = True
 
-            if self.is_in_set(config, 'reject_actors', entry['series_actors'] + entry['ep_guest_stars']):
+            if self.is_in_set(config, 'reject_actors', entry['tvdb_actors'] + entry['tvdb_ep_guest_stars']):
                 reasons.append('reject_genres')
 
             # Accept if writer is an accepted writer, but don't reject otherwise
-            if self.is_in_set(config, 'accept_writers', entry['ep_writer']):
+            if self.is_in_set(config, 'accept_writers', entry['tvdb_ep_writer']):
                 force_accept = True
 
-            if self.is_in_set(config, 'reject_writers', entry['ep_writer']):
+            if self.is_in_set(config, 'reject_writers', entry['tvdb_ep_writer']):
                 reasons.append('reject_writers')
 
             # Accept if director is an accepted director, but don't reject otherwise
-            if self.is_in_set(config, 'accept_directors', entry['ep_director']):
+            if self.is_in_set(config, 'accept_directors', entry['tvdb_ep_director']):
                 force_accept = True
 
-            if self.is_in_set(config, 'reject_directors', entry['ep_director']):
+            if self.is_in_set(config, 'reject_directors', entry['tvdb_ep_director']):
                 reasons.append('reject_directors')
 
             if reasons and not force_accept:

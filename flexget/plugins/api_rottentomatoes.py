@@ -381,10 +381,15 @@ def lookup_movie(title=None, year=None, rottentomatoes_id=None, smart_match=None
                         if not result:
                             result = results[0]
 
-                        movie = RottenTomatoesMovie()
-                        movie = _set_movie_details(movie, session, result)
-                        session.add(movie)
-                        session.commit()
+                        movie = session.query(RottenTomatoesMovie).filter(
+                            RottenTomatoesMovie.id == result['id']).first()
+
+                        if not movie:
+                            movie = RottenTomatoesMovie()
+                            movie = _set_movie_details(movie, session, result)
+                            session.add(movie)
+                            session.commit()
+
 
                         if title.lower() != movie.title.lower():
                             log.debug('Saving search result for \'%s\'' % search_string)

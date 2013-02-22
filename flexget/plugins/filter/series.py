@@ -394,7 +394,6 @@ class SeriesDatabase(object):
 
     def new_eps_after(self, since_ep):
         """
-        :param session: SQLAlchemy session
         :param since_ep: Episode instance
         :return: Number of episodes since then
         """
@@ -403,8 +402,13 @@ class SeriesDatabase(object):
         series_eps = session.query(Episode).select_from(join(Episode, Series)).\
             filter(Series.id == series.id)
         if series.identified_by == 'ep':
-            return series_eps.filter(or_(and_(Episode.season == since_ep.season, Episode.number > since_ep.number),
-                           Episode.season > since_ep.season)).count()
+            if since_ep.season is None or since_ep.number is None:
+                log.debug('new_eps_after for %s falling back to timestamp because latest dl in non-ep format' %
+                          series.name)
+                return series_eps.filter(Episode.first_seen > since_ep.first_seen).count()
+            return series_eps.filter((Episode.identified_by == 'ep') &
+                                     (((Episode.season == since_ep.season) & Episode.number > since_ep.number) |
+                                      Episode.season > since_ep.season)).count()
         elif series.identified_by == 'seq':
             return series_eps.filter(Episode.number > since_ep.number).count()
         elif series.identified_by == 'id':
@@ -416,6 +420,7 @@ class SeriesDatabase(object):
     def store(self, session, parser, series=None):
         """
         Push series information into database. Returns added/existing release.
+
         :param session: Database session to use
         :param parser: parser for release that should be added to database
         :param series: Series in database to add release to. Will be looked up if not provided.

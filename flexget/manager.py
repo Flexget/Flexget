@@ -433,7 +433,8 @@ class Manager(object):
         try:
             self.engine = sqlalchemy.create_engine(self.database_uri,
                                                    echo=self.options.debug_sql,
-                                                   poolclass=SingletonThreadPool)
+                                                   poolclass=SingletonThreadPool,
+                                                   )  # assert_unicode=True
         except ImportError:
             print >> sys.stderr, ('FATAL: Unable to use SQLite. Are you running Python 2.5 - 2.7 ?\n'
                                   'Python should normally have SQLite support built in.\n'
@@ -631,7 +632,8 @@ class Manager(object):
         """ Perform database cleanup if cleanup interval has been met.
         """
         expired = self.persist.get('last_cleanup', datetime.now()) < datetime.now() - DB_CLEANUP_INTERVAL
-        if self.options.db_cleanup or not self.persist.get('last_cleanup') or expired:
+        if self.options.db_cleanup or not self.persist.get('last_cleanup') or expired and \
+                any([t.enabled for t in self.tasks.values()]):
             if not self.options.db_cleanup and not self.options.quiet:
                 log.verbose('Not running database cleanup on manual run. It will be run on next --cron run.')
                 return

@@ -1,9 +1,9 @@
 {% if series_name is defined %}
-  {% if series_banner_url is defined %}<p><img src="{{series_banner_url}}" /></p>{% endif %}
-  <p>{% if series_name_tvdb is defined %}{{series_name_tvdb}}{% else %}{{series_name}}{% endif %} {{series_id}} {{ep_name|d('')}}</p>
-  {% if series_actors is defined %}<p><strong>Cast:</strong> {{ series_actors|join(', ') }}</p>{% endif %}
-  {% if ep_guest_stars is defined %}<p><strong>Guest Starring:</strong> {{ ep_guest_stars|join(', ') }}</p>{% endif %}
-  {% if ep_overview is defined %}<p><strong>Overview:</strong> {{ep_overview|d('')}}</p>{% endif %}
+  {% if tvdb_banner_url is defined %}<p><img src="{{tvdb_banner_url}}" /></p>{% endif %}
+  <p>{% if tvdb_series_name is defined %}{{tvdb_series_name}}{% else %}{{series_name}}{% endif %} {{series_id}} {{tvdb_ep_name|d('')}}</p>
+  {% if tvdb_actors is defined %}<p><strong>Cast:</strong> {{ tvdb_actors|join(', ') }}</p>{% endif %}
+  {% if tvdb_ep_guest_stars is defined %}<p><strong>Guest Starring:</strong> {{ tvdb_ep_guest_stars|join(', ') }}</p>{% endif %}
+  {% if tvdb_ep_overview is defined %}<p><strong>Overview:</strong> {{tvdb_ep_overview|d('')}}</p>{% endif %}
 {% elif imdb_name is defined %}
   {% if tmdb_posters is defined %}<p><img src="{{tmdb_posters[0]}}" /></p>{% endif %}
 
