@@ -263,14 +263,10 @@ class ImdbParser(object):
             log.warning('Unable to get infodiv class for %s - plugin needs update?' % url)
 
         # get name
-        tag_name = soup.find('h1')
+        tag_name = soup.find('h1').find('span', attrs={'itemprop': 'name'})
         if tag_name:
-            if tag_name.next:
-                # Handle a page not found in IMDB. tag_name.string is
-                # "<br/> Page Not Found" and there is no next tag. Thus, None.
-                if tag_name.next.string is not None:
-                    self.name = tag_name.next.string.strip()
-                    log.debug('Detected name: %s' % self.name)
+            self.name = tag_name.text
+            log.debug('Detected name: %s' % self.name)
         else:
             log.warning('Unable to get name for %s - plugin needs update?' % url)
 
@@ -282,7 +278,7 @@ class ImdbParser(object):
             log.debug('Detected original name: %s' % self.original_name)
         else:
             # if title is already in original language, it doesn't have the tag
-            log.debug('Unable to get original title for %s' % url)
+            log.debug('Unable to get original title for %s - it probably does not exists' % url)
 
         # detect if movie is eligible for ratings
         rating_ineligible = soup.find('div', attrs={'class': 'rating-ineligible'})
