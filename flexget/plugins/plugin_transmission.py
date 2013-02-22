@@ -257,38 +257,40 @@ class PluginTransmission(TransmissionBase):
 
         options = {'add': {}, 'change': {}}
 
+        add = options['add']
         if opt_dic.get('path'):
             try:
                 path = os.path.expanduser(entry.render(opt_dic['path']))
-                options['add']['download_dir'] = pathscrub(path).encode('utf-8')
+                add['download_dir'] = pathscrub(path).encode('utf-8')
             except RenderError as e:
                 log.error('Error setting path for %s: %s' % (entry['title'], e))
         if 'addpaused' in opt_dic:
-            options['add']['paused'] = opt_dic['addpaused']
+            add['paused'] = opt_dic['addpaused']
         if 'bandwidthpriority' in opt_dic:
-            options['add']['bandwidthPriority'] = opt_dic['bandwidthpriority']
+            add['bandwidthPriority'] = opt_dic['bandwidthpriority']
         if 'maxconnections' in opt_dic:
-            options['add']['peer_limit'] = opt_dic['maxconnections']
+            add['peer_limit'] = opt_dic['maxconnections']
 
+        change = options['change']
         if 'honourlimits' in opt_dic and not opt_dic['honourlimits']:
-            options['change']['honorsSessionLimits'] = False
+            change['honorsSessionLimits'] = False
         if 'maxupspeed' in opt_dic:
-            options['change']['uploadLimit'] = opt_dic['maxupspeed']
-            options['change']['uploadLimited'] = True
+            change['uploadLimit'] = opt_dic['maxupspeed']
+            change['uploadLimited'] = True
         if 'maxdownspeed' in opt_dic:
-            options['change']['downloadLimit'] = opt_dic['maxdownspeed']
-            options['change']['downloadLimited'] = True
+            change['downloadLimit'] = opt_dic['maxdownspeed']
+            change['downloadLimited'] = True
 
         if 'ratio' in opt_dic:
-            options['change']['seedRatioLimit'] = opt_dic['ratio']
+            change['seedRatioLimit'] = opt_dic['ratio']
             if opt_dic['ratio'] == -1:
                 # seedRatioMode:
                 # 0 follow the global settings
                 # 1 override the global settings, seeding until a certain ratio
                 # 2 override the global settings, seeding regardless of ratio
-                options['change']['seedRatioMode'] = 2
+                change['seedRatioMode'] = 2
             else:
-                options['change']['seedRatioMode'] = 1
+                change['seedRatioMode'] = 1
 
         return options
 
@@ -334,6 +336,7 @@ class PluginTransmission(TransmissionBase):
                         cli.change(id, 30, **options['change'])
             except TransmissionError as e:
                 log.debug('TransmissionError', exc_info=True)
+                log.debug('Failed options dict: %s' % options)
                 msg = 'TransmissionError: %s' % e.message or 'N/A'
                 log.error(msg)
                 entry.fail(msg)
