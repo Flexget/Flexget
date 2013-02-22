@@ -111,7 +111,8 @@ JSONEditor = function (container, options, json) {
 JSONEditor.prototype._setOptions = function (options) {
     this.options = {
         'search': true,
-        'history': true
+        'history': true,
+        'rootNodeName': 'object'
     };
 
     // copy all options
@@ -153,7 +154,9 @@ JSONEditor.prototype.set = function (json) {
 
         // replace the root node
         var params = {
-            'value': json
+            'value': json,
+            'field': this.options.rootNodeName,
+            'fieldEditable': false
         };
         var node = new JSONEditor.Node(params);
         this._setRoot(node);
