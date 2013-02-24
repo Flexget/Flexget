@@ -60,7 +60,10 @@ class BestSeenExpires(Expires):
 
 class GetBest(object):
     """
-    This is a plugin for the imdb plugin
+    This plugin will look for entries as long as there are no accepted entries.
+
+    Requires imdb_lookup or rottentomatoes_lookup, either specifically or
+    implicitly (i.e by using imdb or rottentomatoes)
 
     It enables you to specify a number of days to wait,
     and if no entries have been accepted within that time,
