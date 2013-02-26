@@ -3,6 +3,7 @@ import logging
 import re
 import urllib
 import feedparser
+
 from flexget.plugin import register_plugin, PluginWarning
 from flexget.entry import Entry
 from flexget.utils.search import torrent_availability, StringComparator
@@ -11,7 +12,7 @@ from flexget import validator
 log = logging.getLogger('torrentz')
 
 REGEXP = re.compile(r'http://torrentz\.eu/(?P<hash>[a-f0-9]{40})')
-REPUTATIONS = { # Maps reputation name to feed address
+REPUTATIONS = {  # Maps reputation name to feed address
     'any': 'feed_any',
     'low': 'feed_low',
     'good': 'feed',
@@ -31,11 +32,10 @@ class UrlRewriteTorrentz(object):
         return REGEXP.match(entry['url'])
 
     def url_rewrite(self, task, entry):
-        hash = REGEXP.match(entry['url']).group(1)
+        thash = REGEXP.match(entry['url']).group(1)
         # Would be cool if we can have a list that automatically switches when a server is down
-        #entry['url'] = 'http://zoink.it/torrent/%s.torrent' % hash.upper()
-        entry['url'] = 'https://torcache.net/torrent/%s.torrent' % hash.upper()
-        entry['torrent_info_hash'] = hash
+        entry['url'] = 'https://torcache.net/torrent/%s.torrent' % thash.upper()
+        entry['torrent_info_hash'] = thash
 
     def search(self, query, comparator=StringComparator(), config=None):
         if config:
