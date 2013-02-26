@@ -33,7 +33,6 @@ class UrlRewriteTorrentz(object):
 
     def url_rewrite(self, task, entry):
         thash = REGEXP.match(entry['url']).group(1)
-        # Would be cool if we can have a list that automatically switches when a server is down
         entry['url'] = 'https://torcache.net/torrent/%s.torrent' % thash.upper()
         entry['torrent_info_hash'] = thash
 
@@ -67,7 +66,8 @@ class UrlRewriteTorrentz(object):
             if not comparator.matches():
                 continue
 
-            m = re.search(r'Size: ([\d]+) Mb Seeds: ([,\d]+) Peers: ([,\d]+)', item.description, re.IGNORECASE)
+            m = re.search(r'Size: ([\d]+) Mb Seeds: ([,\d]+) Peers: ([,\d]+) Hash: ([a-f0-9]+)',
+                          item.description, re.IGNORECASE)
             if not m:
                 log.debug('regexp did not find seeds / peer data')
                 continue
@@ -78,6 +78,7 @@ class UrlRewriteTorrentz(object):
             entry['content_size'] = int(m.group(1))
             entry['torrent_seeds'] = int(m.group(2).replace(',', ''))
             entry['torrent_leeches'] = int(m.group(3).replace(',', ''))
+            entry['torrent_info_hash'] = m.group(4).upper()
             entry['search_ratio'] = comparator.ratio()
             entry['search_sort'] = torrent_availability(entry['torrent_seeds'], entry['torrent_leeches'])
             entries.append(entry)
