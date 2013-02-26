@@ -32,7 +32,9 @@ class UrlRewriteTorrentz(object):
 
     def url_rewrite(self, task, entry):
         hash = REGEXP.match(entry['url']).group(1)
-        entry['url'] = 'http://zoink.it/torrent/%s.torrent' % hash.upper()
+        # Would be cool if we can have a list that automatically switches when a server is down
+        #entry['url'] = 'http://zoink.it/torrent/%s.torrent' % hash.upper()
+        entry['url'] = 'https://torcache.net/torrent/%s.torrent' % hash.upper()
         entry['torrent_info_hash'] = hash
 
     def search(self, query, comparator=StringComparator(), config=None):
