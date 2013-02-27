@@ -1,6 +1,22 @@
 from __future__ import unicode_literals, division, absolute_import
+
+import jsonschema
+
 from flexget import validator
+from flexget import plugin
+from tests import FlexGetBase
 from tests.util import maketemp
+
+
+class TestSchemaValidator(FlexGetBase):
+    def test_plugin_schemas_are_valid(self):
+        for p in plugin.plugins.values():
+            if p.schema is None:
+                continue
+            try:
+                validator.SchemaValidator.check_schema(p.schema)
+            except jsonschema.SchemaError as e:
+                assert False, 'plugin `%s` has an invalid schema: %s' % (p.name, e.message)
 
 
 class TestValidator(object):
