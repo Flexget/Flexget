@@ -282,6 +282,7 @@ class PluginInfo(dict):
         self.contexts = contexts
         self.category = category
         self.phase_handlers = {}
+        self._schema = None
 
         # Create plugin instance
         self.plugin_class = plugin_class
@@ -296,6 +297,14 @@ class PluginInfo(dict):
         else:
             self.build_phase_handlers()
             plugins[self.name] = self
+
+    @property
+    def schema(self):
+        if self._schema is None:
+            if not hasattr(self.instance, 'validator'):
+                return None
+            self._schema = self.instance.validator().schema()
+        return self._schema
 
     def reset_phase_handlers(self):
         """Temporary utility method"""

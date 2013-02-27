@@ -1,8 +1,45 @@
 from __future__ import unicode_literals, division, absolute_import
 import re
+import urlparse
+
+import jsonschema
+
 from flexget.utils import qualities
+from flexget.plugin import get_plugins, get_plugin_by_name
 
 # TODO: rename all validator.valid -> validator.accepts / accepted / accept ?
+
+
+def plugins_schema(**kwargs):
+    """Generate a schema that accepts a set of plugins."""
+    plugins = get_plugins(**kwargs)
+    return {
+        "type": "object",
+        "properties": dict((plugin.name, {"$ref": "/schema/plugin/%s" % plugin.name}) for plugin in plugins),
+        "additionalProperties": False,
+    }
+
+
+def resolve_local(uri):
+    parsed = urlparse.urlparse(uri)
+    if parsed.path == '/schema/plugins':
+        kwargs = dict(urlparse.parse_qsl(parsed.query))
+        return plugins_schema(**kwargs)
+    if parsed.path.startswith('/schema/plugin/'):
+        plugin = parsed.path.split('/')[-1]
+        return get_plugin_by_name(plugin).schema
+    raise jsonschema.RefResolutionError("%s could not be resolved" % uri)
+
+
+class SchemaValidator(jsonschema.Draft4Validator):
+    """
+    Validator for our schemas.
+    Sets up local ref resolving and our custom format checkers.
+    """
+    def __init__(self, schema):
+        resolver = jsonschema.RefResolver.from_schema(schema)
+        resolver.handlers[''] = resolve_local
+        super(SchemaValidator, self).__init__(schema, resolver=resolver)
 
 
 class Errors(object):
@@ -57,15 +94,16 @@ def factory(name='root', **kwargs):
     return registry[name](**kwargs)
 
 
-def any_schema(schema_list):
+def any_schema(schemas):
     """
     Creates a schema that will match any of the given schemas.
     Will not use anyOf if there is just one validator in the list, for simpler error messages.
     """
-    if len(schema_list) == 1:
-        return schema_list[0]
+    schemas = list(schemas)
+    if len(schemas) == 1:
+        return schemas[0]
     else:
-        return {'anyOf': [s for s in schema_list]}
+        return {'anyOf': [s for s in schemas]}
 
 
 
@@ -699,7 +737,7 @@ class DictValidator(Validator):
         for key, validators in self.valid.iteritems():
             if not validators:
                 continue
-            properties[key] = any_schema(v for v in validators)
+            properties[key] = any_schema(v.schema() for v in validators)
         if self.required_keys:
             schema['required'] = self.required_keys
         if self.any_key:
