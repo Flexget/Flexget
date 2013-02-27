@@ -18,6 +18,19 @@ class TestSchemaValidator(FlexGetBase):
             except jsonschema.SchemaError as e:
                 assert False, 'plugin `%s` has an invalid schema: %s' % (p.name, e.message)
 
+    def test_resolves_local_refs(self):
+        schema = {'$ref': '/schema/plugin/accept_all'}
+        v = validator.SchemaValidator(schema)
+        # accept_all validator should be for type boolean
+        assert v.is_valid(True)
+        assert not v.is_valid(14)
+
+    def test_custom_format_checker(self):
+        schema = {'type': 'string', 'format': 'quality'}
+        v = validator.SchemaValidator(schema)
+        assert v.is_valid('720p')
+        assert not v.is_valid('aoeu')
+
 
 class TestValidator(object):
 

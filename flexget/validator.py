@@ -1,4 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
+import os
 import re
 import urlparse
 
@@ -31,6 +32,42 @@ def resolve_local(uri):
     raise jsonschema.RefResolutionError("%s could not be resolved" % uri)
 
 
+format_checker = jsonschema.FormatChecker(('regex', 'email'))
+
+
+@format_checker.checks('quality')
+def is_quality(instance):
+    try:
+        qualities.get(instance)
+        return True
+    except ValueError:
+        return False
+
+
+@format_checker.checks('quality_requirements')
+def is_quality_requirements(instance):
+    try:
+        qualities.Requirements(instance)
+        return True
+    except ValueError:
+        return False
+
+
+@format_checker.checks('file')
+def is_file(instance):
+    if not os.path.isfile(os.path.expanduser(instance)):
+        return False
+    return True
+
+
+#TODO: jsonschema has a format checker for uri if rfc3987 is installed, perhaps we should use that
+@format_checker.checks('url')
+def is_url(instance):
+    regexp = ('(' + '|'.join(['ftp', 'http', 'https', 'file', 'udp']) +
+              '):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?')
+    return re.match(regexp, instance) is not None
+
+
 class SchemaValidator(jsonschema.Draft4Validator):
     """
     Validator for our schemas.
@@ -39,7 +76,7 @@ class SchemaValidator(jsonschema.Draft4Validator):
     def __init__(self, schema):
         resolver = jsonschema.RefResolver.from_schema(schema)
         resolver.handlers[''] = resolve_local
-        super(SchemaValidator, self).__init__(schema, resolver=resolver)
+        super(SchemaValidator, self).__init__(schema, resolver=resolver, format_checker=format_checker)
 
 
 class Errors(object):
@@ -501,7 +538,6 @@ class FileValidator(TextValidator):
         return True
 
     def schema(self):
-        # TODO: file format validator
         return {'type': 'string', 'format': 'file'}
 
 
@@ -568,7 +604,7 @@ class UrlValidator(TextValidator):
         return valid
 
     def schema(self):
-        return {'type': 'string', 'format': 'uri'}
+        return {'type': 'string', 'format': 'url'}
 
 
 class ListValidator(Validator):
@@ -763,7 +799,6 @@ class QualityValidator(TextValidator):
         return True
 
     def schema(self):
-        # TODO: Implement quality format validator
         return {'type': 'string', 'format': 'quality'}
 
 
@@ -779,7 +814,6 @@ class QualityRequirementsValidator(TextValidator):
         return True
 
     def schema(self):
-        # TODO: Implement qualityRequirements format validator
         return {'type': 'string', 'format': 'qualityRequirements'}
 
 
