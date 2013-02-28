@@ -4,7 +4,7 @@ import logging
 from sqlalchemy import Column, Integer, String, ForeignKey, or_, and_, select, update
 from sqlalchemy.orm.exc import NoResultFound
 
-from flexget import schema
+from flexget import db_schema
 from flexget.manager import Session
 from flexget.utils import qualities
 from flexget.utils.imdb import extract_id
@@ -20,7 +20,7 @@ except ImportError:
                           message='movie_queue requires the queue_base plugin')
 
 log = logging.getLogger('movie_queue')
-Base = schema.versioned_base('movie_queue', 2)
+Base = db_schema.versioned_base('movie_queue', 2)
 
 
 @event('manager.startup')
@@ -42,7 +42,7 @@ def migrate_imdb_queue(manager):
         session.close()
 
 
-@schema.upgrade('movie_queue')
+@db_schema.upgrade('movie_queue')
 def upgrade(ver, session):
     if ver == 0:
         # Translate old qualities into new quality requirements

@@ -3,7 +3,7 @@ import logging
 from datetime import datetime, timedelta
 from sqlalchemy import Column, Integer, String, Unicode, DateTime
 from sqlalchemy.schema import Index, MetaData
-from flexget import schema
+from flexget import db_schema
 from flexget.plugin import register_plugin, register_parser_option, priority, DependencyError, get_plugin_by_name
 from flexget.manager import Session
 from flexget.utils.tools import console, parse_timedelta
@@ -12,10 +12,10 @@ from flexget.utils.sqlalchemy_utils import table_add_column
 SCHEMA_VER = 2
 
 log = logging.getLogger('failed')
-Base = schema.versioned_base('failed', SCHEMA_VER)
+Base = db_schema.versioned_base('failed', SCHEMA_VER)
 
 
-@schema.upgrade('failed')
+@db_schema.upgrade('failed')
 def upgrade(ver, session):
     if ver is None:
         # add count column

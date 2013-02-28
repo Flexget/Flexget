@@ -11,7 +11,7 @@ from sqlalchemy.orm import relation, join
 from sqlalchemy.ext.hybrid import Comparator, hybrid_property
 from sqlalchemy.exc import OperationalError
 
-from flexget import schema
+from flexget import db_schema
 from flexget.event import event
 from flexget.utils import qualities
 from flexget.utils.log import log_once
@@ -27,10 +27,10 @@ from flexget.plugin import (register_plugin, register_parser_option, get_plugin_
 SCHEMA_VER = 9
 
 log = logging.getLogger('series')
-Base = schema.versioned_base('series', SCHEMA_VER)
+Base = db_schema.versioned_base('series', SCHEMA_VER)
 
 
-@schema.upgrade('series')
+@db_schema.upgrade('series')
 def upgrade(ver, session):
     if ver is None:
         if table_exists('episode_qualities', session):

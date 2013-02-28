@@ -5,13 +5,13 @@ import os
 
 from sqlalchemy import Column, Integer, String, DateTime
 
-from flexget import schema
+from flexget import db_schema
 from flexget.plugin import register_plugin, PluginWarning
 from flexget.utils.sqlalchemy_utils import table_columns, table_add_column
 from flexget.utils.template import render_from_entry, get_template
 
 log = logging.getLogger('make_rss')
-Base = schema.versioned_base('make_rss', 0)
+Base = db_schema.versioned_base('make_rss', 0)
 
 rss2gen = True
 try:
@@ -20,7 +20,7 @@ except:
     rss2gen = False
 
 
-@schema.upgrade('make_rss')
+@db_schema.upgrade('make_rss')
 def upgrade(ver, session):
     if ver is None:
         columns = table_columns('make_rss', session)

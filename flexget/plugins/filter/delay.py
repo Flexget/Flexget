@@ -2,14 +2,14 @@ from __future__ import unicode_literals, division, absolute_import
 import logging
 from datetime import datetime
 from sqlalchemy import Column, Integer, String, Unicode, DateTime, PickleType, Index
-from flexget import schema
+from flexget import db_schema
 from flexget.entry import Entry
 from flexget.plugin import register_plugin, priority, PluginError
 from flexget.utils.database import safe_pickle_synonym
 from flexget.utils.tools import parse_timedelta
 
 log = logging.getLogger('delay')
-Base = schema.versioned_base('delay', 1)
+Base = db_schema.versioned_base('delay', 1)
 
 
 class DelayedEntry(Base):
@@ -30,7 +30,7 @@ Index('delay_feed_title', DelayedEntry.task, DelayedEntry.title)
 # TODO: index "expire, task"
 
 
-@schema.upgrade('delay')
+@db_schema.upgrade('delay')
 def upgrade(ver, session):
     if ver is None:
         log.info('Fixing delay table from erroneous data ...')

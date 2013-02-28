@@ -6,7 +6,7 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.schema import Table, ForeignKey
 from sqlalchemy import Column, Integer, DateTime, Unicode, Index
-from flexget import schema
+from flexget import db_schema
 from flexget.event import event
 from flexget.entry import Entry
 from flexget.plugin import priority, register_parser_option, register_plugin
@@ -18,7 +18,7 @@ log = logging.getLogger('archive')
 
 SCHEMA_VER = 0
 
-Base = schema.versioned_base('archive', SCHEMA_VER)
+Base = db_schema.versioned_base('archive', SCHEMA_VER)
 
 archive_tags_table = Table('archive_entry_tags', Base.metadata,
                            Column('entry_id', Integer, ForeignKey('archive_entry.id')),
@@ -105,7 +105,7 @@ def get_tag(name, session):
         return source
 
 
-@schema.upgrade('archive')
+@db_schema.upgrade('archive')
 def upgrade(ver, session):
     if ver is None:
         # get rid of old index

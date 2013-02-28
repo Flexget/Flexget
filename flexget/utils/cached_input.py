@@ -5,7 +5,7 @@ import hashlib
 from datetime import datetime, timedelta
 from sqlalchemy import Column, Integer, String, DateTime, PickleType, Unicode, ForeignKey
 from sqlalchemy.orm import relation
-from flexget import schema
+from flexget import db_schema
 from flexget.utils.database import safe_pickle_synonym
 from flexget.utils.tools import parse_timedelta
 from flexget.entry import Entry
@@ -13,7 +13,7 @@ from flexget.event import event
 from flexget.plugin import PluginError
 
 log = logging.getLogger('input_cache')
-Base = schema.versioned_base('input_cache', 0)
+Base = db_schema.versioned_base('input_cache', 0)
 
 
 class InputCache(Base):
