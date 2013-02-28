@@ -10,7 +10,7 @@ from flexget.plugin import register_plugin
 from flexget.utils import requests
 from flexget.utils.soup import get_soup
 from flexget.utils.titles.series import SeriesParser
-from flexget.schema import versioned_base
+from flexget.db_schema import versioned_base
 
 log = logging.getLogger('pogcal_acquired')
 Base = versioned_base('pogcal_acquired', 0)

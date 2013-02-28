@@ -2,7 +2,7 @@ from __future__ import unicode_literals, division, absolute_import
 import logging
 from flexget.plugin import register_parser_option
 from flexget.event import event
-from flexget.schema import reset_schema, plugin_schemas
+from flexget.db_schema import reset_schema, plugin_schemas
 from flexget.utils.tools import console
 
 log = logging.getLogger('reset_plugin')

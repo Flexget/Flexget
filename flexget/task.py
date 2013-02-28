@@ -8,7 +8,7 @@ import itertools
 from sqlalchemy import Column, Unicode, String, Integer
 
 from flexget import validator
-from flexget import schema
+from flexget import db_schema
 from flexget.manager import Session, register_config_key
 from flexget.plugin import (get_plugins_by_phase, get_plugin_by_name, task_phases, PluginWarning, PluginError,
                             DependencyError, plugins as all_plugins)
@@ -18,7 +18,7 @@ from flexget.entry import Entry, EntryUnicodeError
 import flexget.utils.requests as requests
 
 log = logging.getLogger('task')
-Base = schema.versioned_base('feed', 0)
+Base = db_schema.versioned_base('feed', 0)
 
 
 class TaskConfigHash(Base):

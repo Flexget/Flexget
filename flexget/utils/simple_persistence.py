@@ -13,16 +13,16 @@ from datetime import datetime
 import pickle
 from sqlalchemy import Column, Integer, String, DateTime, PickleType, select, Index
 from UserDict import DictMixin
-from flexget import schema
+from flexget import db_schema
 from flexget.manager import Session
 from flexget.utils.database import safe_pickle_synonym
 from flexget.utils.sqlalchemy_utils import table_schema, create_index
 
 log = logging.getLogger('util.simple_persistence')
-Base = schema.versioned_base('simple_persistence', 2)
+Base = db_schema.versioned_base('simple_persistence', 2)
 
 
-@schema.upgrade('simple_persistence')
+@db_schema.upgrade('simple_persistence')
 def upgrade(ver, session):
     if ver is None:
         # Upgrade to version 0 was a failed attempt at cleaning bad entries from our table, better attempt in ver 1

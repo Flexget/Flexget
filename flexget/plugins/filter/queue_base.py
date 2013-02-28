@@ -2,7 +2,7 @@ from __future__ import unicode_literals, division, absolute_import
 from datetime import datetime
 import logging
 from sqlalchemy import Column, Integer, Boolean, String, Unicode, DateTime
-from flexget.schema import versioned_base
+from flexget.db_schema import versioned_base
 from flexget.plugin import priority
 
 log = logging.getLogger('queue')

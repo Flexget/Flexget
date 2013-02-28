@@ -13,7 +13,7 @@ from sqlalchemy.schema import ForeignKey
 from sqlalchemy.orm import relation
 from requests import RequestException
 
-from flexget import schema
+from flexget import db_schema
 from flexget.utils.tools import decode_html
 from flexget.utils.requests import Session as ReqSession
 from flexget.utils.database import with_session, pipe_list_synonym, text_date_synonym
@@ -24,7 +24,7 @@ from flexget.utils.simple_persistence import SimplePersistence
 SCHEMA_VER = 2
 
 log = logging.getLogger('api_tvdb')
-Base = schema.versioned_base('api_tvdb', SCHEMA_VER)
+Base = db_schema.versioned_base('api_tvdb', SCHEMA_VER)
 requests = ReqSession(timeout=25)
 
 # This is a FlexGet API key
@@ -35,7 +35,7 @@ _mirrors = {}
 persist = SimplePersistence('api_tvdb')
 
 
-@schema.upgrade('api_tvdb')
+@db_schema.upgrade('api_tvdb')
 def upgrade(ver, session):
     if ver is None:
         if 'last_updated' in persist:

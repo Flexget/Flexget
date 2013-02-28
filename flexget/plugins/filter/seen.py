@@ -17,15 +17,15 @@ from sqlalchemy.orm import relation
 from flexget.manager import Session
 from flexget.event import event
 from flexget.plugin import register_plugin, priority, register_parser_option
-from flexget import schema
+from flexget import db_schema
 from flexget.utils.sqlalchemy_utils import table_schema, table_add_column
 from flexget.utils.imdb import is_imdb_url, extract_id
 
 log = logging.getLogger('seen')
-Base = schema.versioned_base('seen', 4)
+Base = db_schema.versioned_base('seen', 4)
 
 
-@schema.upgrade('seen')
+@db_schema.upgrade('seen')
 def upgrade(ver, session):
     if ver is None:
         log.info('Converting seen imdb_url to imdb_id for seen movies.')
