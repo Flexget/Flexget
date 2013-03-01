@@ -22,6 +22,7 @@ class FilterContentFilter(object):
     schema = {
         'type': 'object',
         'properties': {
+            # These two properties allow a string or list of strings, define that below and reference it from both
             'require': {'$ref': '#/definitions/string_or_strings'},
             'reject': {'$ref': '#/definitions/string_or_strings'},
             'strict': {'type': 'boolean'}
@@ -29,6 +30,7 @@ class FilterContentFilter(object):
         'additionalProperties': False,
         'definitions': {
             'string_or_strings': {
+                # This schema allows a string or list of strings
                 'anyOf': [
                     {'type': 'string'},
                     {'type': 'array', 'items': {'type': 'string'}}
