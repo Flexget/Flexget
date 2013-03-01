@@ -20,15 +20,17 @@ class Mock(object):
     If url is not given a random url pointing to localhost will be generated.
     """
 
-    def validator(self):
-        from flexget import validator
-        container = validator.factory('list')
-        entry = container.accept('dict')
-        entry.accept('text', key='title', required=True)
-        entry.accept('url', key='text')
-        entry.accept_any_key('any')
-        entry.accept_any_key('list').accept('any')
-        return container
+    schema = {
+        'type': 'array',
+        'items': {
+            'type': 'object',
+            'properties': {
+                'title': {'type': 'string'},
+                'url': {'type': 'string'}
+            },
+            'required': ['title']
+        }
+    }
 
     def on_task_input(self, task, config):
         entries = []
