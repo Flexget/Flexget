@@ -21,6 +21,9 @@ def register_schema(path, schema):
 
 
 def resolve_local(uri):
+    """
+    Finds and returns a schema pointed to by `uri` that has been registered in the register_schema function.
+    """
     parsed = urlparse.urlparse(uri)
     if parsed.path in schema_paths:
         schema = schema_paths[parsed.path]
