@@ -12,6 +12,7 @@ from itertools import ifilter
 
 from requests import RequestException
 
+from flexget import config_schema
 from flexget.event import add_event_handler as add_phase_handler
 from flexget import plugins as plugins_pkg
 
@@ -282,13 +283,23 @@ class PluginInfo(dict):
         self.contexts = contexts
         self.category = category
         self.phase_handlers = {}
-        self._schema = None
 
         # Create plugin instance
         self.plugin_class = plugin_class
         self.instance = self.plugin_class()
         self.instance.plugin_info = self  # give plugin easy access to its own info
         self.instance.log = logging.getLogger(getattr(self.instance, "LOGGER_NAME", None) or self.name)
+
+        if hasattr(self.instance, 'schema'):
+            self.schema = self.instance.schema
+        elif hasattr(self.instance, 'validator'):
+            self.schema = self.instance.validator().schema()
+        else:
+            # TODO: I think plugins without schemas should not be allowed in config, maybe rethink this
+            self.schema = {}
+
+        if self.schema is not None:
+            config_schema.register_schema('/schema/plugin/%s' % self.name, self.schema)
 
         if self.name in plugins:
             PluginInfo.dupe_counter += 1
@@ -297,14 +308,6 @@ class PluginInfo(dict):
         else:
             self.build_phase_handlers()
             plugins[self.name] = self
-
-    @property
-    def schema(self):
-        if self._schema is None:
-            if not hasattr(self.instance, 'validator'):
-                return None
-            self._schema = self.instance.validator().schema()
-        return self._schema
 
     def reset_phase_handlers(self):
         """Temporary utility method"""
@@ -471,6 +474,13 @@ def get_plugins(phase=None, group=None, context=None, category=None, min_api=Non
             return False
         return True
     return ifilter(matches, plugins.itervalues())
+
+
+def plugin_schemas(**kwargs):
+    """Create a dict schema that matches plugins specified by `kwargs`"""
+    return {'type': 'object',
+            'properties': dict((p.name, {'$ref': '/schema/plugin/%s' % p.name}) for p in get_plugins(**kwargs)),
+            'additionalProperties': False}
 
 
 def get_plugins_by_phase(phase):

@@ -3,34 +3,7 @@ from __future__ import unicode_literals, division, absolute_import
 import jsonschema
 
 from flexget import validator
-from flexget import plugin
-from tests import FlexGetBase
 from tests.util import maketemp
-
-
-class TestSchemaValidator(FlexGetBase):
-    def test_plugin_schemas_are_valid(self):
-        for p in plugin.plugins.values():
-            if p.schema is None:
-                continue
-            try:
-                validator.SchemaValidator.check_schema(p.schema)
-            except jsonschema.SchemaError as e:
-                assert False, 'plugin `%s` has an invalid schema: %s' % (p.name, e.message)
-
-    def test_resolves_local_refs(self):
-        schema = {'$ref': '/schema/plugin/accept_all'}
-        v = validator.SchemaValidator(schema)
-        # accept_all validator should be for type boolean
-        assert v.is_valid(True)
-        assert not v.is_valid(14)
-
-    def test_custom_format_checker(self):
-        schema = {'type': 'string', 'format': 'quality'}
-        v = validator.SchemaValidator(schema)
-        assert v.is_valid('720p')
-        assert not v.is_valid('aoeu')
-
 
 class TestValidator(object):
 

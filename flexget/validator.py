@@ -1,82 +1,9 @@
 from __future__ import unicode_literals, division, absolute_import
-import os
 import re
-import urlparse
-
-import jsonschema
 
 from flexget.utils import qualities
-from flexget.plugin import get_plugins, get_plugin_by_name
 
 # TODO: rename all validator.valid -> validator.accepts / accepted / accept ?
-
-
-def plugins_schema(**kwargs):
-    """Generate a schema that accepts a set of plugins."""
-    plugins = get_plugins(**kwargs)
-    return {
-        "type": "object",
-        "properties": dict((plugin.name, {"$ref": "/schema/plugin/%s" % plugin.name}) for plugin in plugins),
-        "additionalProperties": False,
-    }
-
-
-def resolve_local(uri):
-    parsed = urlparse.urlparse(uri)
-    if parsed.path == '/schema/plugins':
-        kwargs = dict(urlparse.parse_qsl(parsed.query))
-        return plugins_schema(**kwargs)
-    if parsed.path.startswith('/schema/plugin/'):
-        plugin = parsed.path.split('/')[-1]
-        return get_plugin_by_name(plugin).schema
-    raise jsonschema.RefResolutionError("%s could not be resolved" % uri)
-
-
-format_checker = jsonschema.FormatChecker(('regex', 'email'))
-
-
-@format_checker.checks('quality')
-def is_quality(instance):
-    try:
-        qualities.get(instance)
-        return True
-    except ValueError:
-        return False
-
-
-@format_checker.checks('quality_requirements')
-def is_quality_requirements(instance):
-    try:
-        qualities.Requirements(instance)
-        return True
-    except ValueError:
-        return False
-
-
-@format_checker.checks('file')
-def is_file(instance):
-    if not os.path.isfile(os.path.expanduser(instance)):
-        return False
-    return True
-
-
-#TODO: jsonschema has a format checker for uri if rfc3987 is installed, perhaps we should use that
-@format_checker.checks('url')
-def is_url(instance):
-    regexp = ('(' + '|'.join(['ftp', 'http', 'https', 'file', 'udp']) +
-              '):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?')
-    return re.match(regexp, instance) is not None
-
-
-class SchemaValidator(jsonschema.Draft4Validator):
-    """
-    Validator for our schemas.
-    Sets up local ref resolving and our custom format checkers.
-    """
-    def __init__(self, schema):
-        resolver = jsonschema.RefResolver.from_schema(schema)
-        resolver.handlers[''] = resolve_local
-        super(SchemaValidator, self).__init__(schema, resolver=resolver, format_checker=format_checker)
 
 
 class Errors(object):
@@ -206,50 +133,9 @@ class Validator(object):
     def accept(self, value, **kwargs):
         raise NotImplementedError('Validator %s should override accept method' % self.__class__.__name__)
 
-    def validateable(self, data):
-        """Return True if validator can be used to validate given data, False otherwise."""
-        raise NotImplementedError('Validator %s should override validateable method' % self.__class__.__name__)
-
-    def validate(self, data):
-        """Validate given data and log errors, return True if passed and False if not."""
-        raise NotImplementedError('Validator %s should override validate method' % self.__class__.__name__)
-
     def schema(self):
         """Return schema for validator"""
         raise NotImplementedError(self.__name__)
-
-    def validate_item(self, item, rules):
-        """
-        Helper method. Validate item against list of rules (validators).
-        Return True if item passed any of the rules, False if none of the rules pass item.
-        """
-        count = self.errors.count()
-        for rule in rules:
-            # print 'validating %s' % rule.name
-            if rule.validateable(item):
-                if rule.validate(item):
-                    # item is valid, remove added errors before returning
-                    self.errors.back_out_errors(self.errors.count() - count)
-                    return True
-
-        # If no validators matched or reported errors, and one of them has a custom error message, display it.
-        if count == self.errors.count():
-            for rule in rules:
-                if rule.message:
-                    self.errors.add(rule.message)
-                # If there are still no errors, list the valid types, as well as what was actually received
-            if count == self.errors.count():
-                acceptable = [v.name for v in rules]
-                # Make acceptable into an english list, with commas and 'or'
-                acceptable = ', '.join(acceptable[:-2] + ['']) + ' or '.join(acceptable[-2:])
-                self.errors.add('must be a `%s` value' % acceptable)
-                if isinstance(item, dict):
-                    self.errors.add('got a dict instead of %s' % acceptable)
-                elif isinstance(item, list):
-                    self.errors.add('got a list instead of %s' % acceptable)
-                else:
-                    self.errors.add('value \'%s\' is not valid %s' % (item, acceptable))
-        return False
 
     def __str__(self):
         return '<validator:name=%s>' % self.name
@@ -264,12 +150,6 @@ class RootValidator(Validator):
         v = self.get_validator(value, **kwargs)
         self.valid.append(v)
         return v
-
-    def validateable(self, data):
-        return True
-
-    def validate(self, data):
-        return self.validate_item(data, self.valid)
 
     def schema(self):
         return any_schema([v.schema() for v in self.valid])
@@ -299,19 +179,6 @@ class ChoiceValidator(Validator):
         for value in values:
             self.accept(value, **kwargs)
 
-    def validateable(self, data):
-        return isinstance(data, (basestring, int, float))
-
-    def validate(self, data):
-        if data in self.valid:
-            return True
-        elif isinstance(data, basestring) and data.lower() in self.valid_ic:
-            return True
-        else:
-            acceptable = sorted(unicode(value) for value in self.valid + self.valid_ic)
-            self.errors.add('\'%s\' is not one of acceptable values: %s' % (data, ', '.join(acceptable)))
-            return False
-
     def schema(self):
         return {'enum': self.valid + self.valid_ic}
 
@@ -321,12 +188,6 @@ class AnyValidator(Validator):
 
     def accept(self, value, **kwargs):
         self.valid = value
-
-    def validateable(self, data):
-        return True
-
-    def validate(self, data):
-        return True
 
     def schema(self):
         return {}
@@ -338,12 +199,6 @@ class EqualsValidator(Validator):
     def accept(self, value, **kwargs):
         self.valid = value
 
-    def validateable(self, data):
-        return isinstance(data, (basestring, int, float))
-
-    def validate(self, data):
-        return self.valid == data
-
     def schema(self):
         return {'enum': [self.valid]}
 
@@ -354,15 +209,6 @@ class NumberValidator(Validator):
     def accept(self, name, **kwargs):
         pass
 
-    def validateable(self, data):
-        return isinstance(data, (int, float, long))
-
-    def validate(self, data):
-        valid = isinstance(data, (int, float, long))
-        if not valid:
-            self.errors.add('value %s is not valid number' % data)
-        return valid
-
     def schema(self):
         return {'type': 'number'}
 
@@ -372,15 +218,6 @@ class IntegerValidator(Validator):
 
     def accept(self, name, **kwargs):
         pass
-
-    def validateable(self, data):
-        return isinstance(data, int)
-
-    def validate(self, data):
-        valid = isinstance(data, int)
-        if not valid:
-            self.errors.add('value %s is not valid integer' % data)
-        return valid
 
     def schema(self):
         return {'type': 'integer'}
@@ -393,15 +230,6 @@ class DecimalValidator(Validator):
     def accept(self, name, **kwargs):
         pass
 
-    def validateable(self, data):
-        return isinstance(data, float)
-
-    def validate(self, data):
-        valid = isinstance(data, float)
-        if not valid:
-            self.errors.add('value %s is not valid decimal number' % data)
-        return valid
-
     def schema(self):
         return {'type': 'number'}
 
@@ -411,15 +239,6 @@ class BooleanValidator(Validator):
 
     def accept(self, name, **kwargs):
         pass
-
-    def validateable(self, data):
-        return isinstance(data, bool)
-
-    def validate(self, data):
-        valid = isinstance(data, bool)
-        if not valid:
-            self.errors.add('value %s is not valid boolean' % data)
-        return valid
 
     def schema(self):
         return {'type': 'boolean'}
@@ -431,15 +250,6 @@ class TextValidator(Validator):
     def accept(self, name, **kwargs):
         pass
 
-    def validateable(self, data):
-        return isinstance(data, basestring)
-
-    def validate(self, data):
-        valid = isinstance(data, basestring)
-        if not valid:
-            self.errors.add('value %s is not valid text' % data)
-        return valid
-
     def schema(self):
         return {'type': 'string'}
 
@@ -449,20 +259,6 @@ class RegexpValidator(Validator):
 
     def accept(self, name, **kwargs):
         pass
-
-    def validateable(self, data):
-        return isinstance(data, basestring)
-
-    def validate(self, data):
-        if not isinstance(data, basestring):
-            self.errors.add('Value should be text')
-            return False
-        try:
-            re.compile(data)
-        except:
-            self.errors.add('%s is not a valid regular expression' % data)
-            return False
-        return True
 
     def schema(self):
         return {'type': 'string', 'format': 'regex'}
@@ -489,26 +285,6 @@ class RegexpMatchValidator(Validator):
 
     def reject(self, regexp):
         self.add_regexp(self.reject_regexps, regexp)
-
-    def validateable(self, data):
-        return isinstance(data, basestring)
-
-    def validate(self, data):
-        if not isinstance(data, basestring):
-            self.errors.add('Value should be text')
-            return False
-        for regexp in self.reject_regexps:
-            if regexp.match(data):
-                break
-        else:
-            for regexp in self.regexps:
-                if regexp.match(data):
-                    return True
-        if self.message:
-            self.errors.add(self.message)
-        else:
-            self.errors.add('%s does not match regexp' % data)
-        return False
 
     def schema(self):
         schema = any_schema([{'type': 'string', 'pattern': regexp.pattern} for regexp in self.regexps])
@@ -549,35 +325,6 @@ class PathValidator(TextValidator):
         self.allow_missing = allow_missing
         Validator.__init__(self, parent, **kwargs)
 
-    def validate(self, data):
-        import os
-
-        path = data
-        if self.allow_replacement:
-            # If string replacement is allowed, only validate the part of the
-            # path before the first identifier to be replaced
-            pat = re.compile(r'{[{%].*[}%]}')
-            result = pat.search(data)
-            if not result:
-                # Check for old style string replacement if no jinja identifiers are found
-                pat = re.compile(r'''
-                    %                     # Start with percent,
-                    (?:\( ([^()]*) \))    # name in parens (do not capture parens),
-                    [-+ #0]*              # zero or more flags
-                    (?:\*|[0-9]*)         # optional minimum field width
-                    (?:\.(?:\*|[0-9]*))?  # optional dot and length modifier
-                    [EGXcdefgiorsux%]     # type code (or [formatted] percent character)
-                    ''', re.VERBOSE)
-
-                result = pat.search(data)
-            if result:
-                path = os.path.dirname(data[0:result.start()])
-
-        if not self.allow_missing and not os.path.isdir(os.path.expanduser(path)):
-            self.errors.add('Path %s does not exist' % path)
-            return False
-        return True
-
     def schema(self):
         # TODO: Make path format validator
         return {'type': 'string', 'format': 'path'}
@@ -593,16 +340,6 @@ class UrlValidator(TextValidator):
             self.protocols = ['ftp', 'http', 'https', 'file']
         Validator.__init__(self, parent, **kwargs)
 
-    def validate(self, data):
-        regexp = '(' + '|'.join(self.protocols) + '):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?'
-        if not isinstance(data, basestring):
-            self.errors.add('expecting text')
-            return False
-        valid = re.match(regexp, data) is not None
-        if not valid:
-            self.errors.add('value %s is not a valid url' % data)
-        return valid
-
     def schema(self):
         return {'type': 'string', 'format': 'url'}
 
@@ -614,21 +351,6 @@ class ListValidator(Validator):
         v = self.get_validator(value, **kwargs)
         self.valid.append(v)
         return v
-
-    def validateable(self, data):
-        return isinstance(data, list)
-
-    def validate(self, data):
-        if not isinstance(data, list):
-            self.errors.add('value must be a list')
-            return False
-        self.errors.path_add_level()
-        count = self.errors.count()
-        for item in data:
-            self.errors.path_update_value('list:%i' % data.index(item))
-            self.validate_item(item, self.valid)
-        self.errors.path_remove_level()
-        return count == self.errors.count()
 
     def schema(self):
         return {'type': 'array', 'items': any_schema([v.schema() for v in self.valid])}
@@ -711,62 +433,6 @@ class DictValidator(Validator):
         self.key_validators.append((key_validator, v))
         return v
 
-    def validateable(self, data):
-        return isinstance(data, dict)
-
-    def validate(self, data):
-        if not isinstance(data, dict):
-            self.errors.add('value must be a dictionary')
-            return False
-
-        count = self.errors.count()
-        self.errors.path_add_level()
-        for key, value in data.iteritems():
-            self.errors.path_update_value('dict:%s' % key)
-            # reject keys
-            if key in self.reject:
-                msg = self.reject[key]
-                if msg:
-                    from string import Template
-
-                    template = Template(msg)
-                    self.errors.add(template.safe_substitute(key=key))
-                else:
-                    self.errors.add('key \'%s\' is forbidden here' % key)
-                continue
-                # Get rules for key, most specific rules will be used
-            rules = []
-            if key in self.valid:
-                # Rules for explicitly allowed keys
-                rules = self.valid.get(key, [])
-            else:
-                errors_before_key_val = self.errors.count()
-                for key_validator, value_validator in self.key_validators:
-                    # Use validate_item to make sure error message is added
-                    if key_validator.validateable(key) and key_validator.validate(key):
-                        # Rules for a validated_key
-                        rules = [value_validator]
-                        break
-                else:
-                    if self.any_key:
-                        # Rules for any key
-                        rules = self.any_key
-                if rules:
-                    self.errors.back_out_errors(self.errors.count() - errors_before_key_val)
-            if not rules:
-                error = 'key \'%s\' is not recognized' % key
-                if self.valid:
-                    error += ', valid keys: %s' % ', '.join(sorted(self.valid))
-                # TODO: print options if accept_valid_keys is used
-                self.errors.add(error)
-                continue
-            self.validate_item(value, rules)
-        self.errors.path_remove_level()
-        for required in self.required_keys:
-            if not required in data:
-                self.errors.add('key \'%s\' required' % required)
-        return count == self.errors.count()
-
     def schema(self):
         schema = {'type': 'object'}
         properties = schema['properties'] = {}
@@ -778,9 +444,12 @@ class DictValidator(Validator):
             schema['required'] = self.required_keys
         if self.any_key:
             schema['additionalProperties'] = any_schema([v.schema() for v in self.any_key])
+        elif self.key_validators:
+            # TODO: this doesn't actually validate keys
+            schema['additionalProperties'] = any_schema(kv[1].schema() for kv in self.key_validators)
         else:
             schema['additionalProperties'] = False
-        # TODO: implement this, and accept_valid_keys
+        # TODO: implement this
         #if self.reject_keys:
         #    schema['reject_keys'] = self.reject
 
@@ -790,28 +459,12 @@ class DictValidator(Validator):
 class QualityValidator(TextValidator):
     name = 'quality'
 
-    def validate(self, data):
-        try:
-            qualities.get(data)
-        except ValueError as e:
-            self.errors.add(e.message)
-            return False
-        return True
-
     def schema(self):
         return {'type': 'string', 'format': 'quality'}
 
 
 class QualityRequirementsValidator(TextValidator):
     name = 'quality_requirements'
-
-    def validate(self, data):
-        try:
-            qualities.Requirements(data)
-        except ValueError as e:
-            self.errors.add('`%s` is not a valid quality requirement: %s' % (data, e.message))
-            return False
-        return True
 
     def schema(self):
         return {'type': 'string', 'format': 'qualityRequirements'}
