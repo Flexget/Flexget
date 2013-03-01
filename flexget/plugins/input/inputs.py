@@ -18,7 +18,7 @@ class PluginInputs(object):
 
     schema = {
         'type': 'array',
-        'items': plugin_schemas(phase='input')
+        'items': {'$ref': '/schema/plugins?phase=input'}
     }
 
     def on_task_input(self, task, config):

@@ -24,8 +24,8 @@ class Discover(object):
     schema = {
         'type': 'object',
         'properties': {
-            'what': {'type': 'array', 'items': plugin_schemas(phase='input')},
-            'from': {'type': 'array', 'items': plugin_schemas(group='search')},
+            'what': {'type': 'array', 'items': {'$ref': '/schema/plugins?phase=input'}},
+            'from': {'type': 'array', 'items': {'$ref': '/schema/plugins?group=search'}},
             'type': {'type': 'string', 'enum': ['any', 'normal', 'exact', 'movies']},
         },
         'additionalProperties': False

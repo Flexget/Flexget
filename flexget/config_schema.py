@@ -11,13 +11,22 @@ schema_paths = {}
 
 
 def register_schema(path, schema):
+    """
+    Register `schema` to be available at `path` for $refs
+
+    :param path: Path to make schema available
+    :param schema: The schema, or function which returns the schema
+    """
     schema_paths[path] = schema
 
 
 def resolve_local(uri):
     parsed = urlparse.urlparse(uri)
     if parsed.path in schema_paths:
-        return schema_paths[parsed.path]
+        schema = schema_paths[parsed.path]
+        if callable(schema):
+            return schema(**dict(urlparse.parse_qsl(parsed.query)))
+        return schema
     raise jsonschema.RefResolutionError("%s could not be resolved" % uri)
 
 
