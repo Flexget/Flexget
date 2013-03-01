@@ -2,6 +2,8 @@ from __future__ import unicode_literals, division, absolute_import
 import logging
 import posixpath
 from fnmatch import fnmatch
+
+from flexget.config_schema import one_or_more
 from flexget.plugin import register_plugin, priority
 
 log = logging.getLogger('content_filter')
@@ -22,21 +24,12 @@ class FilterContentFilter(object):
     schema = {
         'type': 'object',
         'properties': {
-            # These two properties allow a string or list of strings, define that below and reference it from both
-            'require': {'$ref': '#/definitions/string_or_strings'},
-            'reject': {'$ref': '#/definitions/string_or_strings'},
+            # These two properties allow a string or list of strings
+            'require': one_or_more({'type': 'string'}),
+            'reject': one_or_more({'type': 'string'}),
             'strict': {'type': 'boolean'}
         },
-        'additionalProperties': False,
-        'definitions': {
-            'string_or_strings': {
-                # This schema allows a string or list of strings
-                'anyOf': [
-                    {'type': 'string'},
-                    {'type': 'array', 'items': {'type': 'string'}}
-                ]
-            }
-        }
+        'additionalProperties': False
     }
 
     def get_config(self, task):

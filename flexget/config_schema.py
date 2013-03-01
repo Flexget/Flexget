@@ -78,3 +78,14 @@ class SchemaValidator(jsonschema.Draft4Validator):
         resolver = jsonschema.RefResolver.from_schema(schema)
         resolver.handlers[''] = resolve_local
         super(SchemaValidator, self).__init__(schema, resolver=resolver, format_checker=format_checker)
+
+
+def one_or_more(schema):
+    """
+    Helper function to construct a schema that accepts the given `schema` or an array containing the given schema.
+    """
+
+    return {'anyOf': [
+        schema,
+        {'type': 'array', 'items': schema}
+    ]}
