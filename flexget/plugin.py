@@ -483,6 +483,9 @@ def plugin_schemas(**kwargs):
             'additionalProperties': False}
 
 
+config_schema.register_schema('/schema/plugins', plugin_schemas)
+
+
 def get_plugins_by_phase(phase):
     """
     .. deprecated:: 1.0.3328
