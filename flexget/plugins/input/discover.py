@@ -2,8 +2,8 @@ from __future__ import unicode_literals, division, absolute_import
 import logging
 from flexget.utils.cached_input import cached
 from flexget.utils.search import StringComparator, MovieComparator, AnyComparator, clean_title
-from flexget.plugin import register_plugin, get_plugin_by_name, PluginError, \
-    get_plugins_by_group, get_plugins_by_phase, PluginWarning
+from flexget.plugin import (register_plugin, get_plugin_by_name, PluginError,
+    get_plugins_by_group, get_plugins_by_phase, PluginWarning, plugin_schemas)
 
 log = logging.getLogger('discover')
 
@@ -21,26 +21,15 @@ class Discover(object):
           - piratebay
     """
 
-    def validator(self):
-        from flexget import validator
-        discover = validator.factory('dict')
-
-        inputs = discover.accept('list', key='what', required=True).accept('dict')
-        for plugin in get_plugins_by_phase('input'):
-            if hasattr(plugin.instance, 'validator'):
-                inputs.accept(plugin.instance.validator, key=plugin.name)
-
-        searches = discover.accept('list', key='from', required=True)
-        no_config = searches.accept('choice')
-        for plugin in get_plugins_by_group('search'):
-            if hasattr(plugin.instance, 'validator'):
-                searches.accept('dict').accept(plugin.instance.validator, key=plugin.name)
-            else:
-                no_config.accept(plugin.name)
-
-        discover.accept('integer', key='limit')
-        discover.accept('choice', key='type').accept_choices(['any', 'normal', 'exact', 'movies'])
-        return discover
+    schema = {
+        'type': 'object',
+        'properties': {
+            'what': {'type': 'array', 'items': plugin_schemas(phase='input')},
+            'from': {'type': 'array', 'items': plugin_schemas(group='search')},
+            'type': {'type': 'string', 'enum': ['any', 'normal', 'exact', 'movies']},
+        },
+        'additionalProperties': False
+    }
 
     def execute_inputs(self, config, task):
         """
