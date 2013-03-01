@@ -1,6 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
-from flexget.plugin import register_plugin, add_plugin_validators, get_plugin_by_name, PluginError, plugin_schemas
+from flexget.plugin import register_plugin, get_plugin_by_name, PluginError
 
 log = logging.getLogger('inputs')
 
