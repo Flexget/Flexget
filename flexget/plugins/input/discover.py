@@ -27,6 +27,7 @@ class Discover(object):
             'what': {'type': 'array', 'items': {'$ref': '/schema/plugins?phase=input'}},
             'from': {'type': 'array', 'items': {'$ref': '/schema/plugins?group=search'}},
             'type': {'type': 'string', 'enum': ['any', 'normal', 'exact', 'movies']},
+            'limit': {'type': 'integer', 'minimum': 1}
         },
         'additionalProperties': False
     }
