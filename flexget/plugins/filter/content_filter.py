@@ -19,15 +19,23 @@ class FilterContentFilter(object):
           - '*.mkv'
     """
 
-    def validator(self):
-        from flexget import validator
-        config = validator.factory('dict')
-        config.accept('text', key='require')
-        config.accept('list', key='require').accept('text')
-        config.accept('text', key='reject')
-        config.accept('list', key='reject').accept('text')
-        config.accept('boolean', key='strict')
-        return config
+    schema = {
+        'type': 'object',
+        'properties': {
+            'require': {'$ref': '#/definitions/string_or_strings'},
+            'reject': {'$ref': '#/definitions/string_or_strings'},
+            'strict': {'type': 'boolean'}
+        },
+        'additionalProperties': False,
+        'definitions': {
+            'string_or_strings': {
+                'anyOf': [
+                    {'type': 'string'},
+                    {'type': 'array', 'items': {'type': 'string'}}
+                ]
+            }
+        }
+    }
 
     def get_config(self, task):
         config = task.config.get('content_filter')
