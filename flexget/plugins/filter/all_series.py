@@ -15,19 +15,16 @@ class FilterAllSeries(FilterSeriesBase):
 
     ::
       all_series:
-        min_quality: hdtv
-        max_quality: 720p
+        quality: hdtv+
         propers: no
     """
 
-    def validator(self):
-        from flexget import validator
-        root = validator.factory()
-        # Accept yes to just turn on
-        root.accept('boolean')
-        options = root.accept('dict')
-        self.build_options_validator(options)
-        return root
+    schema = {
+        'anyOf': [
+            {'type': 'boolean'},
+            {'$ref': '/schema/plugin/series#/definitions/series_options'}
+        ]
+    }
 
     # Run after series and metainfo series plugins
     @priority(115)

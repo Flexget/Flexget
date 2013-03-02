@@ -12,6 +12,7 @@ from sqlalchemy.ext.hybrid import Comparator, hybrid_property
 from sqlalchemy.exc import OperationalError
 
 from flexget import db_schema
+from flexget.config_schema import one_or_more
 from flexget.event import event
 from flexget.utils import qualities
 from flexget.utils.log import log_once
@@ -542,53 +543,6 @@ class FilterSeriesBase(object):
     such as all_series, series_premiere and import_series.
     """
 
-    def build_options_validator(self, options):
-        options.accept('text', key='path')
-        # set
-        options.accept('dict', key='set').accept_any_key('any')
-        # regexes can be given in as a single string ..
-        options.accept('regexp', key='name_regexp')
-        for id_type in ID_TYPES:
-            options.accept('regexp', key=id_type + '_regexp')
-        # .. or as list containing strings
-        options.accept('list', key='name_regexp').accept('regexp')
-        for id_type in ID_TYPES:
-            options.accept('list', key=id_type + '_regexp').accept('regexp')
-        # date parsing options
-        options.accept('boolean', key='date_yearfirst')
-        options.accept('boolean', key='date_dayfirst')
-        # quality
-        options.accept('quality_requirements', key='quality')
-        options.accept('list', key='qualities').accept('quality_requirements')
-        options.accept('boolean', key='upgrade')
-        options.accept('quality_requirements', key='target')
-        # 'enough' has been renamed to 'target' but leave it for backward compatibility
-        options.accept('quality_requirements', key='enough')
-        #specials
-        options.accept('boolean', key='specials')
-        # propers
-        options.accept('boolean', key='propers')
-        message = "should be in format 'x (minutes|hours|days|weeks)' e.g. '5 days'"
-        options.accept('interval', key='propers', message=message + ' or yes/no')
-        # expect flags
-        options.accept('choice', key='identified_by').accept_choices(['ep', 'date', 'sequence', 'id', 'auto'])
-        # timeframe
-        options.accept('interval', key='timeframe', message=message)
-        # strict naming
-        options.accept('boolean', key='exact')
-        # watched in SXXEXX form
-        watched = options.accept('regexp_match', key='watched')
-        watched.accept('(?i)s\d\de\d\d$', message='Must be in SXXEXX format')
-        # watched in dict form
-        watched = options.accept('dict', key='watched')
-        watched.accept('integer', key='season')
-        watched.accept('integer', key='episode')
-        # from group
-        options.accept('text', key='from_group')
-        options.accept('list', key='from_group').accept('text')
-        # parse only
-        options.accept('boolean', key='parse_only')
-
     def make_grouped_config(self, config):
         """Turns a simple series list into grouped format with a empty settings dict"""
         if not isinstance(config, dict):
@@ -709,47 +663,80 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
         except DependencyError:
             log.warning('Unable utilize backlog plugin, episodes may slip trough timeframe')
 
-    def validator(self):
-        from flexget import validator
-
-        def build_list(series):
-            """Build series list to series."""
-            series.accept('text')
-            series.accept('number')
-            bundle = series.accept('dict')
-            # prevent invalid indentation level
-            rejected = ['set', 'path', 'timeframe', 'name_regexp', 'ep_regexp', 'id_regexp', 'date_regexp',
-                        'sequence_regexp', 'watched', 'quality', 'enough', 'target', 'qualities', 'exact', 'from_group']
-            bundle.reject_keys(rejected, 'Option \'$key\' has invalid indentation level. It needs 2 more spaces.')
-            bundle.accept_any_key('path')
-            options = bundle.accept_any_key('dict')
-            self.build_options_validator(options)
-
-        root = validator.factory()
-
+    # TODO: reject option names at wrong level
+    schema = {
+        'type': ['array', 'object'],
         # simple format:
         #   - series
         #   - another series
-
-        simple = root.accept('list')
-        build_list(simple)
-
+        'items': {
+            'type': ['string', 'number', 'object'],
+            'additionalProperties': {'$ref': '#/definitions/series_options'}
+        },
         # advanced format:
         #   settings:
         #     group: {...}
         #   group:
         #     {...}
-
-        advanced = root.accept('dict')
-        settings = advanced.accept('dict', key='settings')
-        settings.reject_keys(get_plugin_keywords())
-        settings_group = settings.accept_any_key('dict')
-        self.build_options_validator(settings_group)
-
-        group = advanced.accept_any_key('list')
-        build_list(group)
-
-        return root
+        'properties': {
+            'settings': {
+                'type': 'object',
+                'additionalProperties': {'$ref': '#/definitions/series_options'}
+            }
+        },
+        'additionalProperties': {
+            'type': 'array',
+            'items': {
+                'type': ['string', 'number', 'object'],
+                'additionalProperties': {'$ref': '#/definitions/series_options'}
+            }
+        },
+        # subschema for reuse here and in dependent plugins
+        'definitions': {
+            'series_options': {
+                'type': 'object',
+                'properties': {
+                    'path': {'type': 'string', 'format': 'path'},
+                    'set': {'type': 'object'},
+                    # Custom regexp options
+                    'name_regexp': one_or_more({'type': 'string', 'format': 'regex'}),
+                    'ep_regexp': one_or_more({'type': 'string', 'format': 'regex'}),
+                    'date_regexp': one_or_more({'type': 'string', 'format': 'regex'}),
+                    'sequence_regexp': one_or_more({'type': 'string', 'format': 'regex'}),
+                    'id_regexp': one_or_more({'type': 'string', 'format': 'regex'}),
+                    # Date parsing options
+                    'date_yearfirst': {'type': 'boolean'},
+                    'date_dayfirst': {'type': 'boolean'},
+                    # Quality options
+                    'quality': {'type': 'string', 'format': 'quality_requirements'},
+                    'qualities': {'type': 'array', 'items': {'type': 'string', 'format': 'quality_requirements'}},
+                    'timeframe': {'type': 'string', 'format': 'interval'},
+                    'upgrade': {'type': 'boolean'},
+                    'target': {'type': 'string', 'format': 'quality_requirements'},
+                    # Specials
+                    'specials': {'type': 'boolean'},
+                    # Propers (can be boolean, or an interval string)
+                    'propers': {'type': ['boolean', 'string'], 'format': 'interval'},
+                    # Identified by
+                    'identified_by': {'enum': ['ep', 'date', 'sequence', 'id', 'auto']},
+                    # Strict naming
+                    'exact': {'type': 'boolean'},
+                    # Watched
+                    'watched': {
+                        'type': ['string', 'object'],
+                        # SxxEyy form
+                        'pattern': '(?i)^s\d\de\d\d$',
+                        # dict form
+                        'properties': {'season': {'type': 'integer'}, 'episode': {'type': 'integer'}},
+                        'additionalProperties': False
+                    },
+                    'from_group': one_or_more({'type': 'string'}),
+                    'parse_only': {'type': 'boolean'}
+                },
+                'additionalProperties': False
+            }
+        }
+    }
 
     def auto_exact(self, config):
         """Automatically enable exact naming option for series that look like a problem"""
