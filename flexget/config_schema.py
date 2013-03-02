@@ -82,10 +82,19 @@ class SchemaValidator(jsonschema.Draft4Validator):
 
 def one_or_more(schema):
     """
-    Helper function to construct a schema that accepts the given `schema` or an array containing the given schema.
+    Helper function to construct a schema that validates items matching `schema` or an array
+    containing items matching `schema`.
+
+    Limitation: `schema` must not be a schema that validates arrays already
     """
 
-    return {'anyOf': [
-        schema,
-        {'type': 'array', 'items': schema}
-    ]}
+    assert 'array' not in schema.get('type', []), 'Cannot use array schemas with one_or_more'
+    new_schema = schema.copy()
+    if 'type' in schema:
+        if isinstance(schema['type'], basestring):
+            new_schema['type'] = [schema['type'], 'array']
+        else:
+            new_schema['type'] = schema['type'] + ['array']
+    new_schema['items'] = schema
+
+    return new_schema
