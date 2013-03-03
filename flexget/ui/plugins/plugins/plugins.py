@@ -1,7 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
 from flask import Module, jsonify
 from flexget.ui.webui import register_plugin
-from flexget.plugin import plugins, get_plugins, task_phases, get_plugin_by_name, DependencyError, plugin_contexts
+from flexget.plugin import plugins, get_plugins, task_phases, plugin_contexts
 
 plugins_module = Module(__name__, url_prefix='/plugins')
 
@@ -67,19 +67,6 @@ def categories():
 @plugins_module.route('/category/<category>')
 def plugins_by_category(category):
     return jsonify(plugins=plugin_infos(get_plugins(category=category)))
-
-
-@plugins_module.route('/schema/<name>')
-def plugin_schema(name):
-    try:
-        plugin = get_plugin_by_name(name).instance
-    except DependencyError:
-        return 'Plugin %s does not exist' % name, 404
-    try:
-        validator = plugin.validator()
-    except AttributeError:
-        return 'Plugin %s does not have a schema' % name, 404
-    return jsonify(validator.schema())
 
 
 register_plugin(plugins_module)
