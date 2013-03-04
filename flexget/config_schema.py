@@ -20,7 +20,7 @@ def register_schema(path, schema):
     schema_paths[path] = schema
 
 
-def resolve_local(uri):
+def resolve_ref(uri):
     """
     Finds and returns a schema pointed to by `uri` that has been registered in the register_schema function.
     """
@@ -34,31 +34,14 @@ def resolve_local(uri):
 
 
 format_checker = jsonschema.FormatChecker(('regex', 'email'))
-
-
-@format_checker.checks('quality')
-def is_quality(instance):
-    try:
-        qualities.get(instance)
-        return True
-    except ValueError:
-        return False
-
-
-@format_checker.checks('quality_requirements')
-def is_quality_requirements(instance):
-    try:
-        qualities.Requirements(instance)
-        return True
-    except ValueError:
-        return False
+format_checker.checks('quality', raises=ValueError)(qualities.get)
+format_checker.checks('quality_requirements', raises=ValueError)(qualities.Requirements)
 
 
 @format_checker.checks('file')
 def is_file(instance):
-    if not os.path.isfile(os.path.expanduser(instance)):
-        return False
-    return True
+    if os.path.isfile(os.path.expanduser(instance)):
+        return True
 
 
 #TODO: jsonschema has a format checker for uri if rfc3987 is installed, perhaps we should use that
@@ -66,7 +49,7 @@ def is_file(instance):
 def is_url(instance):
     regexp = ('(' + '|'.join(['ftp', 'http', 'https', 'file', 'udp']) +
               '):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?')
-    return re.match(regexp, instance) is not None
+    return re.match(regexp, instance)
 
 
 class SchemaValidator(jsonschema.Draft4Validator):
@@ -76,7 +59,7 @@ class SchemaValidator(jsonschema.Draft4Validator):
     """
     def __init__(self, schema):
         resolver = jsonschema.RefResolver.from_schema(schema)
-        resolver.handlers[''] = resolve_local
+        resolver.handlers[''] = resolve_ref
         super(SchemaValidator, self).__init__(schema, resolver=resolver, format_checker=format_checker)
 
 
