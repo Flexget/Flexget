@@ -3,7 +3,7 @@ from __future__ import unicode_literals, division, absolute_import
 from flask import Module, jsonify, request
 from jsonschema import RefResolutionError
 
-from flexget.config_schema import resolve_local
+from flexget.config_schema import resolve_ref
 from flexget.ui.webui import register_plugin
 
 schema = Module(__name__)
@@ -16,7 +16,7 @@ def get_schema(path):
     if request.query_string:
         refpath += '?' + request.query_string
     try:
-        return jsonify(resolve_local(refpath))
+        return jsonify(resolve_ref(refpath))
     except RefResolutionError:
         return 'Schema not found', 404
 
