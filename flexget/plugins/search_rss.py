@@ -11,9 +11,7 @@ class SearchRSS(object):
     """A generic search plugin that can use rss based search feeds. Configure it like rss
     plugin, but include {{{search_term}}} in the url where the search term should go."""
 
-    def validator(self):
-        rss_plugin = get_plugin_by_name('rss')
-        return rss_plugin.instance.validator()
+    schema = {'$ref': '/schema/plugin/rss'}
 
     def search(self, query, comparator, config=None):
         from flexget.utils.template import environment
