@@ -16,6 +16,7 @@ class OutputNotifyOsd(object):
         advanced = config.accept('dict')
         advanced.accept('text', key='title_template')
         advanced.accept('text', key='item_template')
+        advanced.accept('integer', key='timeout')
         return config
 
     def prepare_config(self, config):
@@ -23,6 +24,7 @@ class OutputNotifyOsd(object):
             config = {}
         config.setdefault('title_template', '{{task.name}}')
         config.setdefault('item_template', '{{title}}')
+        config.setdefault('timeout', 4)
         return config
 
     def on_task_start(self, task, config):
@@ -40,6 +42,7 @@ class OutputNotifyOsd(object):
             notify_osd:
                 title_template: Notification title, supports jinja templating, default {{task.name}}
                 item_template: Notification body, suports jinja templating, default {{title}}
+                timeout: Set how long the Notification is displayed, this is an integer default = 4 seconds, Default: 4
         """
         from gi.repository import Notify
 
@@ -48,7 +51,6 @@ class OutputNotifyOsd(object):
 
         config = self.prepare_config(config)
         body_items = []
-
         for entry in task.accepted:
             try:
                 body_items.append(entry.render(config['item_template']))
@@ -68,6 +70,11 @@ class OutputNotifyOsd(object):
             return
 
         n = Notify.Notification.new(title, '\n'.join(body_items), None)
-        n.show()
+        timeout = (config['timeout'] * 1000)
+        n.set_timeout(timeout)
+
+        if not n.show():
+            log.error('Unable to send notification for %s', title)
+            return
 
 register_plugin(OutputNotifyOsd, 'notify_osd', api_ver=2)
