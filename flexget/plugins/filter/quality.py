@@ -1,5 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
+
+from flexget.config_schema import one_or_more
 from flexget.plugin import register_plugin, priority
 import flexget.utils.qualities as quals
 
@@ -16,13 +18,7 @@ class FilterQuality(object):
         - hdtv
     """
 
-    def validator(self):
-        from flexget import validator
-
-        root = validator.factory()
-        root.accept('quality_requirements')
-        root.accept('list').accept('quality_requirements')
-        return root
+    schema = one_or_more({'type': 'string', 'format': 'quality_requirements'})
 
     # Run before series and imdb plugins, so correct qualities are chosen
     @priority(175)

@@ -28,6 +28,7 @@ class FilterExistsSeries(object):
                     'path': one_or_more({'type': 'string', 'format': 'path'}),
                     'allow_different_qualities': {'enum': ['better', True, False]}
                 },
+                'required': ['path'],
                 'additionalProperties': False
             }
         ]

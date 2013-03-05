@@ -32,14 +32,11 @@ class QueuedItem(Base):
 class FilterQueueBase(object):
     """Base class to handle general tasks of keeping a queue of wanted items."""
 
+    schema = {'type': 'boolean'}
+
     def on_task_start(self, task, config):
         # Dict of entries accepted by this plugin {imdb_id: entry} format
         self.accepted_entries = {}
-
-    def validator(self):
-        """Default validator just accepts a boolean, can be overridden by subclasses"""
-        from flexget import validator
-        return validator.factory('boolean')
 
     def matches(self, task, config, entry):
         """This should return the QueueItem object for the match, if this entry is in the queue."""

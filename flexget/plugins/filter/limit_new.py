@@ -20,12 +20,13 @@ class FilterLimitNew(object):
     FlexGet is executed.
     """
 
+    schema = {
+        'type': 'integer',
+        'minimum': 1
+    }
+
     def __init__(self):
         self.backlog = None
-
-    def validator(self):
-        from flexget import validator
-        return validator.factory('integer')
 
     def on_process_start(self, task, config):
         try:

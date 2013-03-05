@@ -5,8 +5,8 @@ from flexget import validator
 
 class Magnets(object):
     """Removes magnet urls form the urls list. Rejects entries that have nothing but magnet urls."""
-    def validator(self):
-        return validator.factory('boolean')
+
+    schema = {'type': 'boolean'}
 
     @plugin.priority(0)
     def on_task_urlrewrite(self, task, config):
