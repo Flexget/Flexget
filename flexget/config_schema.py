@@ -84,5 +84,6 @@ def one_or_more(schema):
         else:
             new_schema['type'] = schema['type'] + ['array']
     new_schema['items'] = schema
+    new_schema['minItems'] = 1
 
     return new_schema

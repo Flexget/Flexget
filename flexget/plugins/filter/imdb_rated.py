@@ -53,7 +53,8 @@ class FilterImdbRated(object):
         'properties': {
             'url': {'type': 'string', 'format': 'url'},
             'reverse': {'type': 'boolean'}
-        }
+        },
+        'required': ['url']
     }
 
     def update_rated(self, task, config):
