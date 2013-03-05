@@ -1,6 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
 import os
 import logging
+
+from flexget.config_schema import one_or_more
 from flexget.plugin import register_plugin, priority, PluginError, get_plugin_by_name
 from flexget.utils.titles.movie import MovieParser
 
@@ -17,18 +19,12 @@ class FilterExistsMovie(object):
       exists_movie: /storage/movies/
     """
 
+    schema = one_or_more({'type': 'string', 'format': 'path'})
+
     skip = ['cd1', 'cd2', 'subs', 'sample']
 
     def __init__(self):
         self.cache = {}
-
-    def validator(self):
-        from flexget import validator
-        root = validator.factory()
-        root.accept('path')
-        bundle = root.accept('list')
-        bundle.accept('path')
-        return root
 
     def build_config(self, config):
         # if only a single path is passed turn it into a 1 element list

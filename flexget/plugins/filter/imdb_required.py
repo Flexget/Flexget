@@ -15,9 +15,7 @@ class FilterImdbRequired(object):
       imdb_required: yes
     """
 
-    def validator(self):
-        from flexget import validator
-        return validator.factory('boolean')
+    schema = {'type': 'boolean'}
 
     @priority(32)
     def on_task_filter(self, task):
