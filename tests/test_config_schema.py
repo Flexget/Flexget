@@ -3,20 +3,18 @@ from __future__ import unicode_literals, division, absolute_import
 import jsonschema
 
 from flexget import config_schema
-from flexget import plugin
 from tests import FlexGetBase
 
 
 class TestSchemaValidator(FlexGetBase):
-    def test_plugin_schemas_are_valid(self):
-        for p in plugin.plugins.values():
-            if p.schema is None:
-                continue
+    def test_registered_schemas_are_valid(self):
+        for path in config_schema.schema_paths:
+            schema = config_schema.resolve_ref(path)
             try:
-                config_schema.SchemaValidator.check_schema(p.schema)
+                config_schema.SchemaValidator.check_schema(schema)
             except jsonschema.SchemaError as e:
                 assert False, 'plugin `%s` has an invalid schema. %s %s' % (
-                    p.name, '/'.join(str(p) for p in e.path), e.message)
+                    path, '/'.join(str(p) for p in e.path), e.message)
 
     def test_resolves_local_refs(self):
         schema = {'$ref': '/schema/plugin/accept_all'}
