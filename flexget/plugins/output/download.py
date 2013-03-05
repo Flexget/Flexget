@@ -50,6 +50,16 @@ class PluginDownload(object):
     all paths to another location.
     """
 
+    schema = {
+        'type': ['boolean', 'string', 'object'],
+        'format': 'path',
+        'properties': {
+            'path': {'type': 'string', 'format': 'path'},
+            'fail_html': {'type': 'boolean'},
+            'overwrite': {'type': 'boolean'}
+        }
+    }
+
     def validator(self):
         """Return config validator"""
         from flexget import validator
