@@ -33,6 +33,12 @@ def resolve_ref(uri):
     raise jsonschema.RefResolutionError("%s could not be resolved" % uri)
 
 
+class RefResolver(jsonschema.RefResolver):
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault('handlers', {'': resolve_ref})
+        super(RefResolver, self).__init__(*args, **kwargs)
+
+
 format_checker = jsonschema.FormatChecker(('regex', 'email'))
 format_checker.checks('quality', raises=ValueError)(qualities.get)
 format_checker.checks('quality_requirements', raises=ValueError)(qualities.Requirements)
@@ -58,8 +64,7 @@ class SchemaValidator(jsonschema.Draft4Validator):
     Sets up local ref resolving and our custom format checkers.
     """
     def __init__(self, schema):
-        resolver = jsonschema.RefResolver.from_schema(schema)
-        resolver.handlers[''] = resolve_ref
+        resolver = RefResolver.from_schema(schema)
         super(SchemaValidator, self).__init__(schema, resolver=resolver, format_checker=format_checker)
 
 
