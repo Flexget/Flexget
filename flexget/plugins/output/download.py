@@ -57,7 +57,8 @@ class PluginDownload(object):
             'path': {'type': 'string', 'format': 'path'},
             'fail_html': {'type': 'boolean'},
             'overwrite': {'type': 'boolean'}
-        }
+        },
+        'additionalProperties': False
     }
 
     def validator(self):

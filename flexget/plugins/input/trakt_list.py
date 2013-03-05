@@ -38,7 +38,8 @@ class TraktList(object):
             'custom': {'type': 'string'},
             'strip_dates': {'type': 'boolean'}
         },
-        'required': ['username', 'api_key']
+        'required': ['username', 'api_key'],
+        'additionalProperties': False
     }
 
     movie_map = {
