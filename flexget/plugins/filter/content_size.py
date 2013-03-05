@@ -15,7 +15,8 @@ class FilterContentSize(object):
             'min': {'type': 'number'},
             'max': {'type': 'number'},
             'strict': {'type': 'boolean'}
-        }
+        },
+        'additionalProperties': False
     }
 
     def process_entry(self, task, entry, config, remember=True):

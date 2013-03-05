@@ -106,7 +106,8 @@ class InputRSS(object):
                 'type': ['string', 'object'], 'additionalProperties': {'type': 'string'}
             }}
         },
-        'required': ['url']
+        'required': ['url'],
+        'additionalProperties': False
     }
 
     def build_config(self, config):
