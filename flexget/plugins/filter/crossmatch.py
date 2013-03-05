@@ -19,15 +19,15 @@ class CrossMatch(object):
         action: reject
     """
 
-    def validator(self):
-        from flexget.validator import factory
-        root = factory('dict')
-        root.accept('list', key='fields', required=True).accept('text')
-        root.accept('choice', key='action', required=True).accept_choices(['accept', 'reject'])
-
-        inputs = root.accept('list', key='from', required=True)
-        add_plugin_validators(inputs, phase='input')
-        return root
+    schema = {
+        'type': 'object',
+        'properties': {
+            'fields': {'type': 'array', 'items': {'type': 'string'}},
+            'action': {'enum': ['accept', 'reject']},
+            'from': {'type': 'array', 'items': {'$ref': '/schema/plugins?phase=input'}}
+        },
+        'additionalProperties': False
+    }
 
     def on_task_filter(self, task, config):
 
