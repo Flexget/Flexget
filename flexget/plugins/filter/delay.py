@@ -57,9 +57,7 @@ class FilterDelay(object):
           delay: 2 hours
     """
 
-    def validator(self):
-        from flexget import validator
-        return validator.factory('interval')
+    schema = {'type': 'string', 'format': 'interval'}
 
     def get_delay(self, config):
         log.debug('delay: %s' % config)

@@ -57,6 +57,11 @@ def is_url(instance):
               '):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?')
     return re.match(regexp, instance)
 
+@format_checker.checks('interval')
+def is_interval(instance):
+    regexp = r'^\d+ (second|minute|hour|day|week)s?$'
+    return re.match(regexp, instance)
+
 
 class SchemaValidator(jsonschema.Draft4Validator):
     """
