@@ -298,8 +298,8 @@ class ImdbParser(object):
             if span_score:
                 try:
                     self.score = float(span_score.string)
-                except ValueError:
-                    log.debug('tag_score %s is not valid float' % span_score.text)
+                except (ValueError, TypeError):
+                    log.debug('tag_score %r is not valid float' % span_score.string)
                 log.debug('Detected score: %s' % self.score)
             else:
                 log.warning('Unable to get score for %s - plugin needs update?' % url)
