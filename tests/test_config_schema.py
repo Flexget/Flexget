@@ -18,8 +18,8 @@ class TestSchemaValidator(FlexGetBase):
             try:
                 config_schema.SchemaValidator.check_schema(schema)
             except jsonschema.SchemaError as e:
-                assert False, 'plugin `%s` has an invalid schema. %s %s' % (
-                    path, '/'.join(str(p) for p in e.path), e.message)
+                assert False, 'plugin `%s` has an invalid schema. %s %s %s' % (
+                    path, '/'.join(str(p) for p in e.path), e.validator, e.message)
 
     def test_refs_in_schemas_are_resolvable(self):
         def refs_in(item):
