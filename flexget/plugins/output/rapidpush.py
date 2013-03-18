@@ -6,7 +6,7 @@ from flexget.utils.template import RenderError
 
 log = logging.getLogger('rapidpush')
 
-__version__ = 0.3
+__version__ = 0.4
 headers = {'User-Agent': "FlexGet RapidPush plugin/%s" % str(__version__)}
 url = 'https://rapidpush.net/api'
 
@@ -19,7 +19,8 @@ class OutputRapidPush(object):
         [category: category, default FlexGet]
         [title: title, default New release]
         [group: device group, default no group]
-        [message: the message, supports Jinja templating, default {{title}}]
+        [message: the message, default {{title}}]
+        [channel: the broadcast notification channel, if provided it will be send to the channel subscribers instead of your devices, default no channel]
         [priority: 0 - 6 (6 = highest), default 2 (normal)]
         [notify_accepted: boolean true or false, default true]
         [notify_rejected: boolean true or false, default false]
@@ -37,6 +38,7 @@ class OutputRapidPush(object):
         config.accept('text', key='category')
         config.accept('text', key='title')
         config.accept('text', key='group')
+        config.accept('text', key='channel')
         config.accept('integer', key='priority')
         config.accept('text', key='message')
         config.accept('boolean', key='notify_accepted')
@@ -50,6 +52,7 @@ class OutputRapidPush(object):
         config.setdefault('category', 'FlexGet')
         config.setdefault('priority', 2)
         config.setdefault('group', '')
+        config.setdefault('channel', '')
         config.setdefault('message', '{{title}}')
         config.setdefault('notify_accepted', True)
         config.setdefault('notify_rejected', False)
@@ -88,14 +91,6 @@ class OutputRapidPush(object):
             if isinstance(apikey, list):
                 apikey = ','.join(apikey)
 
-            priority = entry.get('priority', config['priority'])
-
-            category = entry.get('category', config['category'])
-            try:
-                category = entry.render(category)
-            except RenderError as e:
-                log.error('Error setting RapidPush category: %s' % e)
-
             title = config['title']
             try:
                 title = entry.render(title)
@@ -108,20 +103,47 @@ class OutputRapidPush(object):
             except RenderError as e:
                 log.error('Error setting RapidPush message: %s' % e)
 
-            group = entry.get('group', config['group'])
-            try:
-                group = entry.render(group)
-            except RenderError as e:
-                log.error('Error setting RapidPush group: %s' % e)
+            # Check if we have to send a normal or a broadcast notification.
+            if not config['channel']:
+                priority = entry.get('priority', config['priority'])
 
-            # Send the request
-            data_string = json.dumps({
-                'title': title,
-                'message': message,
-                'priority': priority,
-                'category': category,
-                'group': group})
-            data = {'apikey': apikey, 'command': 'notify', 'data': data_string}
+                category = entry.get('category', config['category'])
+                try:
+                    category = entry.render(category)
+                except RenderError as e:
+                    log.error('Error setting RapidPush category: %s' % e)
+
+            
+
+                group = entry.get('group', config['group'])
+                try:
+                    group = entry.render(group)
+                except RenderError as e:
+                    log.error('Error setting RapidPush group: %s' % e)
+
+                # Send the request
+                data_string = json.dumps({
+                    'title': title,
+                    'message': message,
+                    'priority': priority,
+                    'category': category,
+                    'group': group})
+                data = {'apikey': apikey, 'command': 'notify', 'data': data_string}
+            else:
+                channel = config['channel']
+                try:
+                    channel = entry.render(channel)
+                except RenderError as e:
+                    log.error('Error setting RapidPush channel: %s' % e)  
+
+                # Send the broadcast request
+                data_string = json.dumps({
+                    'title': title,
+                    'message': message,
+                    'channel': channel})
+                data = {'apikey': apikey, 'command': 'broadcast', 'data': data_string}  
+
+            
             response = task.requests.post(url, headers=headers, data=data, raise_status=False)
 
             json_data = response.json()
