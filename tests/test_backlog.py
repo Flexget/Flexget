@@ -12,6 +12,9 @@ class TestBacklog(FlexGetBase):
             set:
               description: '%(description)sI'
               laterfield: 'something'
+            # Change the priority of set plugin so it runs on all entries. TODO: Remove, this is an ugly hack.
+            plugin_priority:
+              set: -254
             backlog: 10 minutes
     """
 
