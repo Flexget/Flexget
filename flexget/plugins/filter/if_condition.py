@@ -1,4 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
+import __builtin__
 import logging
 import re
 import datetime
@@ -16,7 +17,7 @@ def safer_eval(statement, locals):
     """A safer eval function. Does not allow __ or try statements, only includes certain 'safe' builtins."""
     allowed_builtins = ['True', 'False', 'str', 'unicode', 'int', 'float', 'len', 'any', 'all', 'sorted']
     for name in allowed_builtins:
-        locals[name] = globals()['__builtins__'].get(name)
+        locals[name] = getattr(__builtin__, name)
     if re.search(r'__|try\s*:|lambda', statement):
         raise ValueError('`__`, lambda or try blocks not allowed in if statements.')
     return eval(statement, {'__builtins__': None}, locals)
