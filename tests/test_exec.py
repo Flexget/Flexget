@@ -1,6 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
-from tests import FlexGetBase
 import os
+import sys
+
+from tests import FlexGetBase
 
 
 class TestExec(FlexGetBase):
@@ -17,20 +19,20 @@ class TestExec(FlexGetBase):
             mock:
               - {title: 'replace'}
               - {title: 'replace with spaces'}
-            exec: python exec.py "{{temp_dir}}" "{{title}}"
+            exec: """ + sys.executable + """ exec.py "{{temp_dir}}" "{{title}}"
           test_adv_format:
             mock:
               - {title: entry1, location: '/path/with spaces', quotefield: "with'quote"}
             exec:
               on_output:
-                for_entries: python exec.py "{{temp_dir}}" "{{title}}" "{{location}}" "/the/final destinaton/" "a {{quotefield}}" "/a hybrid{{location}}"
+                for_entries: """ + sys.executable + """ exec.py "{{temp_dir}}" "{{title}}" "{{location}}" "/the/final destinaton/" "a {{quotefield}}" "/a hybrid{{location}}"
           test_auto_escape:
             mock:
               - {title: entry2, quotes: single ' double", otherchars: '% a $a! ` *'}
             exec:
               auto_escape: yes
               on_output:
-                for_entries: python exec.py "{{temp_dir}}" "{{title}}" "{{quotes}}" "/start/{{quotes}}" "{{otherchars}}"
+                for_entries: """ + sys.executable + """ exec.py "{{temp_dir}}" "{{title}}" "{{quotes}}" "/start/{{quotes}}" "{{otherchars}}"
     """
 
     def test_replace_from_entry(self):
