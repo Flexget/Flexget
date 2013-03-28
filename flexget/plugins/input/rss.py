@@ -247,7 +247,8 @@ class InputRSS(object):
                     log.debug('last modified %s saved for task %s' % (modified, task.name))
         else:
             # This is a file, open it
-            content = open(config['url'], 'rb').read()
+            with open(config['url'], 'rb') as f:
+                content = f.read()
 
         if not content:
             log.error('No data recieved for rss feed.')
