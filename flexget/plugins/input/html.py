@@ -79,9 +79,8 @@ class InputHtml(object):
             name = config['dump']
             log.info('Dumping %s into %s' % (config['url'], name))
             data = soup.prettify()
-            f = open(name, 'w')
-            f.write(data)
-            f.close()
+            with open(name, 'w') as f:
+                f.write(data)
 
         return self.create_entries(config['url'], soup, config)
 

@@ -33,8 +33,7 @@ class OutputHtml:
         template = render_from_task(get_template(filename, PLUGIN_NAME), task)
 
         log.verbose('Writing output html to %s' % output)
-        f = open(output, 'w')
-        f.write(template.encode('utf-8'))
-        f.close()
+        with open(output, 'w') as f:
+            f.write(template.encode('utf-8'))
 
 register_plugin(OutputHtml, PLUGIN_NAME, api_ver=2)

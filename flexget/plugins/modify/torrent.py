@@ -35,11 +35,10 @@ class TorrentFilename(object):
 
             # create torrent object from torrent
             try:
-                f = open(entry['file'], 'rb')
-                # NOTE: this reads entire file into memory, but we're pretty sure it's
-                # a small torrent file since it starts with TORRENT_RE
-                data = f.read()
-                f.close()
+                with open(entry['file'], 'rb') as f:
+                    # NOTE: this reads entire file into memory, but we're pretty sure it's
+                    # a small torrent file since it starts with TORRENT_RE
+                    data = f.read()
 
                 if 'content-length' in entry:
                     if len(data) != entry['content-length']:
@@ -76,9 +75,8 @@ class TorrentFilename(object):
                 if entry['torrent'].modified:
                     # re-write data into a file
                     log.debug('Writing modified torrent file for %s' % entry['title'])
-                    f = open(entry['file'], 'wb+')
-                    f.write(entry['torrent'].encode())
-                    f.close()
+                    with open(entry['file'], 'wb+') as f:
+                        f.write(entry['torrent'].encode())
 
     def make_filename(self, torrent, entry):
         """Build a filename for this torrent"""

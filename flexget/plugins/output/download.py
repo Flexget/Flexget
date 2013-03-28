@@ -139,11 +139,8 @@ class PluginDownload(object):
             os.makedirs(received)
         filename = os.path.join(received, '%s.error' % entry['title'].encode(sys.getfilesystemencoding(), 'replace'))
         log.error('Error retrieving %s, the error page has been saved to %s' % (entry['title'], filename))
-        outfile = open(filename, 'w')
-        try:
+        with open(filename, 'w') as outfile:
             outfile.write(page)
-        finally:
-            outfile.close()
 
     def get_temp_files(self, task, require_path=False, handle_magnets=False, fail_html=True):
         """Download all task content and store in temporary folder.

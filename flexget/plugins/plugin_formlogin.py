@@ -61,9 +61,8 @@ class FormLogin(object):
             if not os.path.isdir(received):
                 os.mkdir(received)
             filename = os.path.join(received, '%s.formlogin.html' % task.name)
-            f = open(filename, 'w')
-            f.write(br.response().get_data())
-            f.close()
+            with open(filename, 'w') as f:
+                f.write(br.response().get_data())
             log.critical('I have saved the login page content to %s for you to view' % filename)
             raise PluginError('Unable to find login fields', log)
 

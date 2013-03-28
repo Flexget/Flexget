@@ -249,16 +249,17 @@ class OutputRSS(object):
                              items=rss_items)
         # write rss
         fn = os.path.expanduser(config['file'])
-        try:
-            log.verbose('Writing output rss to %s' % fn)
-            rss.write_xml(open(fn, 'w'), encoding=config['encoding'])
-        except LookupError:
-            log.critical('Unknown encoding %s' % config['encoding'])
-            return
-        except IOError:
-            # TODO: plugins cannot raise PluginWarnings in terminate event ..
-            log.critical('Unable to write %s' % fn)
-            return
+        with open(fn, 'w') as file:
+            try:
+                log.verbose('Writing output rss to %s' % fn)
+                rss.write_xml(file, encoding=config['encoding'])
+            except LookupError:
+                log.critical('Unknown encoding %s' % config['encoding'])
+                return
+            except IOError:
+                # TODO: plugins cannot raise PluginWarnings in terminate event ..
+                log.critical('Unable to write %s' % fn)
+                return
         self.written[config['file']] = True
 
 

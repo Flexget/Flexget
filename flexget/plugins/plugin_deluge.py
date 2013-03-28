@@ -681,11 +681,8 @@ class OutputDeluge(DelugePlugin):
                             entry.fail('Downloaded temp file \'%s\' doesn\'t exist!' % entry['file'])
                             del(entry['file'])
                             return
-                        f = open(entry['file'], 'rb')
-                        try:
+                        with open(entry['file'], 'rb') as f:
                             filedump = base64.encodestring(f.read())
-                        finally:
-                            f.close()
 
                     log.verbose('Adding %s to deluge.' % entry['title'])
                     if magnet:
