@@ -308,4 +308,6 @@ class TestRtorrentMagnet(FlexGetBase):
         filename = 'meta-test.torrent'
         fullpath = os.path.join(self.__tmp__, filename)
         assert os.path.isfile(fullpath)
-        assert open(fullpath).read() == 'd10:magnet-uri76:magnet:?xt=urn:btih:HASH&dn=title&tr=http://torrent.ubuntu.com:6969/announcee'
+        with open(fullpath) as f:
+            assert (f.read() ==
+                    'd10:magnet-uri76:magnet:?xt=urn:btih:HASH&dn=title&tr=http://torrent.ubuntu.com:6969/announcee')
