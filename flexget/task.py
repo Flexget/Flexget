@@ -473,7 +473,7 @@ class Task(object):
         self.session = Session()
 
         # Save current config hash and set config_modidied flag
-        config_hash = hashlib.md5(str(self.config.items())).hexdigest()
+        config_hash = hashlib.md5(str(sorted(self.config.items()))).hexdigest()
         last_hash = self.session.query(TaskConfigHash).filter(TaskConfigHash.task == self.name).first()
         if self.is_rerun:
             # Make sure on rerun config is not marked as modified
