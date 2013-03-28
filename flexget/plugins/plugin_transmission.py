@@ -320,11 +320,8 @@ class PluginTransmission(TransmissionBase):
 
             try:
                 if downloaded:
-                    f = open(entry['file'], 'rb')
-                    try:
+                    with open(entry['file'], 'rb') as f:
                         filedump = base64.encodestring(f.read())
-                    finally:
-                        f.close()
                     r = cli.add(filedump, 30, **options['add'])
                 else:
                     r = cli.add_uri(entry['url'], timeout=30, **options['add'])

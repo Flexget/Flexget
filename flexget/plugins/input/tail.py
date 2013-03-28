@@ -92,73 +92,72 @@ class InputTail(object):
 
         filename = os.path.expanduser(config['file'])
         encoding = config.get('encoding', None)
-        file = open(filename, 'r')
+        with open(filename, 'r') as file:
+            last_pos = task.simple_persistence.setdefault(filename, 0)
+            if os.path.getsize(filename) < last_pos:
+                log.info('File size is smaller than in previous execution, reseting to beginning of the file')
+                last_pos = 0
 
-        last_pos = task.simple_persistence.setdefault(filename, 0)
-        if os.path.getsize(filename) < last_pos:
-            log.info('File size is smaller than in previous execution, reseting to beginning of the file')
-            last_pos = 0
+            file.seek(last_pos)
 
-        file.seek(last_pos)
+            log.debug('continuing from last position %s' % last_pos)
 
-        log.debug('continuing from last position %s' % last_pos)
+            entry_config = config.get('entry')
+            format_config = config.get('format', {})
 
-        entry_config = config.get('entry')
-        format_config = config.get('format', {})
+            # keep track what fields have been found
+            used = {}
+            entries = []
+            entry = Entry()
 
-        # keep track what fields have been found
-        used = {}
-        entries = []
-        entry = Entry()
+            # now parse text
 
-        # now parse text
+            while True:
+                line = file.readline()
+                if encoding:
+                    try:
+                        line = line.decode(encoding)
+                    except UnicodeError:
+                        raise PluginError('Failed to decode file using %s. Check encoding.' % encoding)
 
-        while True:
-            line = file.readline()
-            if encoding:
-                try:
-                    line = line.decode(encoding)
-                except UnicodeError:
-                    raise PluginError('Failed to decode file using %s. Check encoding.' % encoding)
+                if not line:
+                    task.simple_persistence[filename] = file.tell()
+                    break
 
-            if not line:
-                task.simple_persistence[filename] = file.tell()
-                break
+                for field, regexp in entry_config.iteritems():
+                    #log.debug('search field: %s regexp: %s' % (field, regexp))
+                    match = re.search(regexp, line)
+                    if match:
+                        # check if used field detected, in such case start with new entry
+                        if field in used:
+                            if entry.isvalid():
+                                log.info('Found field %s again before entry was completed. \
+                                          Adding current incomplete, but valid entry and moving to next.' % field)
+                                self.format_entry(entry, format_config)
+                                entries.append(entry)
+                            else:
+                                log.info('Invalid data, entry field %s is already found once. Ignoring entry.' % field)
+                            # start new entry
+                            entry = Entry()
+                            used = {}
 
-            for field, regexp in entry_config.iteritems():
-                #log.debug('search field: %s regexp: %s' % (field, regexp))
-                match = re.search(regexp, line)
-                if match:
-                    # check if used field detected, in such case start with new entry
-                    if field in used:
-                        if entry.isvalid():
-                            log.info('Found field %s again before entry was completed. \
-                                      Adding current incomplete, but valid entry and moving to next.' % field)
+                        # add field to entry
+                        entry[field] = match.group(1)
+                        used[field] = True
+                        log.debug('found field: %s value: %s' % (field, entry[field]))
+
+                    # if all fields have been found
+                    if len(used) == len(entry_config):
+                        # check that entry has at least title and url
+                        if not entry.isvalid():
+                            log.info('Invalid data, constructed entry is missing mandatory fields (title or url)')
+                        else:
                             self.format_entry(entry, format_config)
                             entries.append(entry)
-                        else:
-                            log.info('Invalid data, entry field %s is already found once. Ignoring entry.' % field)
-                        # start new entry
-                        entry = Entry()
-                        used = {}
-
-                    # add field to entry
-                    entry[field] = match.group(1)
-                    used[field] = True
-                    log.debug('found field: %s value: %s' % (field, entry[field]))
-
-                # if all fields have been found
-                if len(used) == len(entry_config):
-                    # check that entry has at least title and url
-                    if not entry.isvalid():
-                        log.info('Invalid data, constructed entry is missing mandatory fields (title or url)')
-                    else:
-                        self.format_entry(entry, format_config)
-                        entries.append(entry)
-                        log.debug('Added entry %s' % entry)
-                        # start new entry
-                        entry = Entry()
-                        used = {}
+                            log.debug('Added entry %s' % entry)
+                            # start new entry
+                            entry = Entry()
+                            used = {}
         return entries
 
 register_plugin(InputTail, 'tail', api_ver=2)
