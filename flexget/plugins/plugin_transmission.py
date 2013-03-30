@@ -140,6 +140,11 @@ class PluginTransmissionInput(TransmissionBase):
         if not self.client:
             self.client = self.create_rpc_client(config)
         entries = []
+        
+        # Hack/Workaround for http://flexget.com/ticket/2002
+        # TODO: Proper fix
+        self.client.http_handler.set_authentication(self.client.url, config['username'], config['password'])
+        
         for torrent in self.client.info().values():
             torrentCompleted = self._torrent_completed(torrent)
             if not config['onlycomplete'] or torrentCompleted:
