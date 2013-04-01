@@ -72,11 +72,11 @@ class SearchKAT(object):
                 continue
             entry['url'] = item.enclosures[0]['url']
             entry['search_ratio'] = comparator.ratio()
-            entry['torrent_seeds'] = int(item.seeds)
-            entry['torrent_leeches'] = int(item.leechs)
+            entry['torrent_seeds'] = int(item.torrent_seeds)
+            entry['torrent_leeches'] = int(item.torrent_peers)
             entry['search_sort'] = torrent_availability(entry['torrent_seeds'], entry['torrent_leeches'])
-            entry['content_size'] = int(item.size) / 1024 / 1024
-            entry['torrent_info_hash'] = item.hash
+            entry['content_size'] = int(item.torrent_contentlength) / 1024 / 1024
+            entry['torrent_info_hash'] = item.torrent_infohash
 
             entries.append(entry)
 
