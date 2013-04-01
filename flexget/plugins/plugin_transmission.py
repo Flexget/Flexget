@@ -54,6 +54,13 @@ class TransmissionBase(object):
         config.setdefault('enabled', True)
         config.setdefault('host', 'localhost')
         config.setdefault('port', 9091)
+        if 'netrc' in config:
+            try:
+                config['username'], _, config['password'] = netrc(config['netrc']).authenticators(config['host'])
+            except IOError as e:
+                log.error('netrc: unable to open: %s' % e.filename)
+            except NetrcParseError as e:
+                log.error('netrc: %s, file: %s, line: %s' % (e.msg, e.filename, e.lineno))
         return config
 
     def create_rpc_client(self, config):
@@ -61,20 +68,7 @@ class TransmissionBase(object):
         from transmissionrpc import TransmissionError
         from transmissionrpc import HTTPHandlerError
 
-        user, password = None, None
-
-        if 'netrc' in config:
-            try:
-                user, account, password = netrc(config['netrc']).authenticators(config['host'])
-            except IOError as e:
-                log.error('netrc: unable to open: %s' % e.filename)
-            except NetrcParseError as e:
-                log.error('netrc: %s, file: %s, line: %s' % (e.msg, e.filename, e.lineno))
-        else:
-            if 'username' in config:
-                user = config['username']
-            if 'password' in config:
-                password = config['password']
+        user, password = config.get('username'), config.get('password')
 
         try:
             cli = transmissionrpc.Client(config['host'], config['port'], user, password)
@@ -140,11 +134,12 @@ class PluginTransmissionInput(TransmissionBase):
         if not self.client:
             self.client = self.create_rpc_client(config)
         entries = []
-        
+
         # Hack/Workaround for http://flexget.com/ticket/2002
         # TODO: Proper fix
-        self.client.http_handler.set_authentication(self.client.url, config['username'], config['password'])
-        
+        if 'username' in config and 'password' in config:
+            self.client.http_handler.set_authentication(self.client.url, config['username'], config['password'])
+
         for torrent in self.client.info().values():
             torrentCompleted = self._torrent_completed(torrent)
             if not config['onlycomplete'] or torrentCompleted:
