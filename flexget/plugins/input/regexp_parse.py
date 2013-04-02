@@ -86,7 +86,7 @@ class RegexpParse(object):
             flags = 0
             if 'flags' in dic:
                 flags = self.flagstr_to_flags(dic['flags'])
-            compiled_regexps.append(re.compile(dic['regex'], flags))
+            compiled_regexps.append(re.compile(dic['regexp'], flags))
         return compiled_regexps
 
     def isvalid(self, entry):
@@ -130,7 +130,7 @@ class RegexpParse(object):
 
 	#put every key in keys into the rey_to_regexps list
         for key, value in config['keys'].iteritems():
-            key_to_regexps[key] = self.compile_regexp_dict_list(value['regexs'])
+            key_to_regexps[key] = self.compile_regexp_dict_list(value['regexps'])
             if 'required' in value and value['required']:
                 self.required.append(key)
 
@@ -139,7 +139,7 @@ class RegexpParse(object):
             entry = Entry()
             for key, regexps in key_to_regexps.iteritems():
                 for regexp in regexps:
-                    m = regex.search(section)
+                    m = regexp.search(section)
                     if m:
                         entry[key] = m.group(0)
                         break
