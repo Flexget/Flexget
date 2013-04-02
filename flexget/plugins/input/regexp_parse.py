@@ -11,6 +11,7 @@ log = logging.getLogger('regexp_parse')
 
 class RegexpParse(object):
 
+    #dict used to convert string values of regexp flags to int
     FLAG_VALUES = {'DEBUG': re.DEBUG,
                    'I': re.I,
                    'IGNORECASE': re.IGNORECASE,
@@ -75,7 +76,7 @@ class RegexpParse(object):
         COMBIND_FLAGS = 0
         split_flags = flag_str.split(',')
         for flag in split_flags:
-            COMBIND_FLAGS = COMBIND_FLAGS | RegexParse.FLAG_VALUES[flag.strip()]
+            COMBIND_FLAGS = COMBIND_FLAGS | RegexpParse.FLAG_VALUES[flag.strip()]
         return COMBIND_FLAGS
 
     def compile_regexp_dict_list(self, re_list):
