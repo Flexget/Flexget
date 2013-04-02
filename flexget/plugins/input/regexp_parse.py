@@ -37,7 +37,7 @@ class RegexpParse(object):
         root.accept('file', key='source', required=True)
 
 	#sections to divied source into
-	sections_regexp_lists = root.accept('list', key='sections', required=True)
+	sections_regexp_lists = root.accept('list', key='sections')
         section_regexp_list = sections_regexp_lists.accept('dict', required=True)
         section_regexp_list.accept('regexp', key='regexp', required=True)
         section_regexp_list.accept('text', key='flags')
@@ -71,22 +71,25 @@ class RegexpParse(object):
         return root
 
     def flagstr_to_flags(self, flag_str):
+	"""turns a comma seperated list of flags into the int value"""
         COMBIND_FLAGS = 0
         split_flags = flag_str.split(',')
         for flag in split_flags:
-            COMBIND_FLAGS = COMBIND_FLAGS | RegexInput.FLAG_VALUES[flag.strip()]
+            COMBIND_FLAGS = COMBIND_FLAGS | RegexParse.FLAG_VALUES[flag.strip()]
         return COMBIND_FLAGS
 
-    def compile_regex_dict_list(self, re_list):
-        compiled_regexs = []
+    def compile_regexp_dict_list(self, re_list):
+	"""turns a list of dicts containing regexps information into a list of compiled regexps."""
+        compiled_regexps = []
         for dic in re_list:
             flags = 0
             if 'flags' in dic:
                 flags = self.flagstr_to_flags(dic['flags'])
-            compiled_regexs.append(re.compile(dic['regex'], flags))
-        return compiled_regexs
+            compiled_regexps.append(re.compile(dic['regex'], flags))
+        return compiled_regexps
 
     def isvalid(self, entry):
+	"""checks to make sure that all required fields are present in the entry"""
         for key in self.required:
             if key not in entry:
                 return False
@@ -96,10 +99,9 @@ class RegexpParse(object):
     @internet(log)
     def on_task_input(self, task, config):
 
-	print config
 	entries = []
 	
-        url = config['resource']
+        url = config['source']
 
         #if it's a file open it and read into content
         if os.path.isfile(os.path.expanduser(url)):
@@ -112,33 +114,30 @@ class RegexpParse(object):
         seperators = config.get('sections')
         if seperators:
             for sep in seperators:
+		print sep
                 flags = 0
                 if 'flags' in sep:
                     flags = self.flagstr_to_flags(sep['flags'])
-                sections.extend(re.findall(sep['regex'], content, flags))
+                sections.extend(re.findall(sep['regexp'], content, flags))
 
         #no seperators just do work on the whole content
         else:
             sections.append(content)
 
         #holds all the regex in a dict for the field they are trying to fill
-        key_to_regexs = {}
-        key_to_regexs['title'] = self.compile_regex_dict_list(config.get('title'))
-        key_to_regexs['url'] = self.compile_regex_dict_list(config.get('url'))
+        key_to_regexps = {}
 
-        custom_keys = config.get('custom-keys')
-
-        if custom_keys:
-            for key, value in custom_keys.iteritems():
-                key_to_regexs[key] = self.compile_regex_dict_list(value['regexs'])
-                if 'required' in value and value['required']:
-                    self.required.append(key)
+	#put every key in keys into the rey_to_regexps list
+        for key, value in config['keys'].iteritems():
+            key_to_regexps[key] = self.compile_regexp_dict_list(value['regexs'])
+            if 'required' in value and value['required']:
+                self.required.append(key)
 
         entries = []
         for section in sections:
             entry = Entry()
-            for key, regexs in key_to_regexs.iteritems():
-                for regex in regexs:
+            for key, regexps in key_to_regexps.iteritems():
+                for regexp in regexps:
                     m = regex.search(section)
                     if m:
                         entry[key] = m.group(0)
