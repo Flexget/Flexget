@@ -115,7 +115,6 @@ class RegexpParse(object):
         seperators = config.get('sections')
         if seperators:
             for sep in seperators:
-		print sep
                 flags = 0
                 if 'flags' in sep:
                     flags = self.flagstr_to_flags(sep['flags'])
