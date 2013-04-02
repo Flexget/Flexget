@@ -33,31 +33,40 @@ class RegexpParse(object):
         from flexget import validator
         root = validator.factory('dict')
 
-        root.accept('url', key='resource', required=True)
-        root.accept('file', key='resource', required=True)
+        root.accept('url', key='source', required=True)
+        root.accept('file', key='source', required=True)
 
-        title_regex_list = root.accept('list', key='title', required=True)
-        title_regex = title_regex_list.accept('dict', requiered=True)
-        title_regex.accept('regexp', key='regex', required=True)
-        title_regex.accept('text', key='flags')
+	#sections to divied source into
+	sections_regexp_lists = root.accept('list', key='sections', required=True)
+        section_regexp_list = sections_regexp_lists.accept('dict', required=True)
+        section_regexp_list.accept('regexp', key='regexp', required=True)
+        section_regexp_list.accept('text', key='flags')
+	
+	keys = root.accept('dict', key='keys', required=True)
 
-        link_regex_list = root.accept('list', key='url', required=True)
-        link_regex = link_regex_list.accept('dict', required=True)
-        link_regex.accept('regexp', key='regex', required=True)
-        link_regex.accept('text', key='flags')
+	#required key need to specify for validator
+        title = keys.accept('dict', key='title', required=True)
+        title.accept('boolean', key='required')
+        regexp_list = title.accept('list', key='regexps', required=True)
+        regexp = regexp_list.accept('dict', required=True)
+        regexp.accept('regexp', key='regexp', required=True)
+        regexp.accept('text', key='flags')
 
-        section_regex_list = root.accept('list', key='sections')
-        section_regex = section_regex_list.accept('dict', required=True)
-        section_regex.accept('regexp', key='regex', required=True)
-        section_regex.accept('text', key='flags')
+	#required key need to specify for validator
+        url = keys.accept_any_key('dict', key='url', required=True)
+        url.accept('boolean', key='required')
+        regexp_list = url.accept('list', key='regexps', required=True)
+        regexp = regexp_list.accept('dict', required=True)
+        regexp.accept('regexp', key='regexp', required=True)
+        regexp.accept('text', key='flags')
 
-        custom_keys = root.accept('dict', key='custom-keys')
-        key = custom_keys.accept_any_key('dict')
+	#accept any other key the user wants to use
+        key = keys.accept_any_key('dict')
         key.accept('boolean', key='required')
-        regex_list = key.accept('list', key='regexs', required=True)
-        regex = regex_list.accept('dict', required=True)
-        regex.accept('regexp', key='regex', required=True)
-        regex.accept('text', key='flags')
+        regexp_list = key.accept('list', key='regexps', required=True)
+        regexp = regexp_list.accept('dict', required=True)
+        regexp.accept('regexp', key='regexp', required=True)
+        regexp.accept('text', key='flags')
 
         return root
 
@@ -87,14 +96,18 @@ class RegexpParse(object):
     @internet(log)
     def on_task_input(self, task, config):
 
+	print config
+	entries = []
+	
         url = config['resource']
 
-        ##if it's a file open it and read into content
+        #if it's a file open it and read into content
         if os.path.isfile(os.path.expanduser(url)):
             content = open(url).read()
+	#else use requests to get the data
         else:
             content = task.requests.get(url).text
-
+	
         sections = []
         seperators = config.get('sections')
         if seperators:
@@ -132,7 +145,7 @@ class RegexpParse(object):
                         break
             if self.isvalid(entry):
                 entries.append(entry)
-
+	
         return entries
 
 
