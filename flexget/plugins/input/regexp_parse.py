@@ -6,10 +6,10 @@ from flexget.entry import Entry
 from flexget.utils.cached_input import cached
 from flexget.plugin import register_plugin, internet
 
-log = logging.getLogger('regex-input')
+log = logging.getLogger('regexp_parse')
 
 
-class RegexInput(object):
+class RegexpParse(object):
 
     FLAG_VALUES = {'DEBUG': re.DEBUG,
                    'I': re.I,
@@ -136,4 +136,4 @@ class RegexInput(object):
         return entries
 
 
-register_plugin(RegexInput, 'regex-input', api_ver=2)
+register_plugin(RegexpParse, 'regexp_parse', api_ver=2)
