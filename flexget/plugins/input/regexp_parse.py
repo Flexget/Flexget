@@ -10,6 +10,27 @@ log = logging.getLogger('regexp_parse')
 
 
 class RegexpParse(object):
+    """regexp_parse:
+    source: http://username:password@ezrss.it/feed/
+    sections:
+      - {regexp: "(?<=<item>).*?(?=</item>)", flags: "DOTALL"}
+
+    keys:
+      title:
+        regexps:
+          - {regexp: '(?<=<title><!\[CDATA\[).*?(?=\]\]></title>)'} #comment
+      url:
+        regexps:
+          - {regexp: "magnet:.*?(?=])"}
+      custom_field:
+        regexps:
+          - {regexp: "custom regexps", flags: "flags for python regexps see python regexps docs"}
+        required: False
+      custom_field2:
+        regexps:
+          - {regexp: 'first custom regexps'}
+          - {regexp: 'can't find first regexp so try this one'}
+    """
 
     #dict used to convert string values of regexp flags to int
     FLAG_VALUES = {'DEBUG': re.DEBUG,
@@ -72,7 +93,7 @@ class RegexpParse(object):
         return root
 
     def flagstr_to_flags(self, flag_str):
-	"""turns a comma seperated list of flags into the int value"""
+	"""turns a comma seperated list of flags into the int value."""
         COMBIND_FLAGS = 0
         split_flags = flag_str.split(',')
         for flag in split_flags:
@@ -90,7 +111,7 @@ class RegexpParse(object):
         return compiled_regexps
 
     def isvalid(self, entry):
-	"""checks to make sure that all required fields are present in the entry"""
+	"""checks to make sure that all required fields are present in the entry."""
         for key in self.required:
             if key not in entry:
                 return False
