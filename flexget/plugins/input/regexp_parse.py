@@ -8,24 +8,25 @@ from flexget.plugin import register_plugin, internet
 
 log = logging.getLogger('regexp_parse')
 
+
 class RegexpParse(object):
     """This plugin is designed to take input from a web resource or a file.
     It then parses the text via regexps supplied in the config file.
-    
+
     source: is a file or url to get the data from. You can specify a username:password
 
     sections: Takes a list of dicts that contain regexps to split the data up into sections.
-    The regexps listed here are used by find all so every matching string in the data will be 
-    a valid section.  
+    The regexps listed here are used by find all so every matching string in the data will be
+    a valid section.
 
     keys: hold the keys that will be set in the entries
 
-    key: 
+    key:
       regexps: a list of dicts that hold regexps. The key is set to the first string that matches
       any of the regexps listed. The regexps are evaluated in the order they are supplied so if a
-      string matches the first regexp none of the others in the list will be used. 
+      string matches the first regexp none of the others in the list will be used.
 
-      required: a boolean that when set to true will only allow entries that contain this key 
+      required: a boolean that when set to true will only allow entries that contain this key
       onto the next stage. url and title are always required no matter what you do (part of flexget)
 
       #TODO: consider adding a set field that will allow you to set the field if no regexps match
@@ -83,15 +84,15 @@ class RegexpParse(object):
         root.accept('url', key='source', required=True)
         root.accept('file', key='source', required=True)
 
-	#sections to divied source into
-	sections_regexp_lists = root.accept('list', key='sections')
+        #sections to divied source into
+        sections_regexp_lists = root.accept('list', key='sections')
         section_regexp_list = sections_regexp_lists.accept('dict', required=True)
         section_regexp_list.accept('regexp', key='regexp', required=True)
         section_regexp_list.accept('text', key='flags')
-	
-	keys = root.accept('dict', key='keys', required=True)
 
-	#required key need to specify for validator
+        keys = root.accept('dict', key='keys', required=True)
+
+        #required key need to specify for validator
         title = keys.accept('dict', key='title', required=True)
         title.accept('boolean', key='required')
         regexp_list = title.accept('list', key='regexps', required=True)
@@ -99,7 +100,7 @@ class RegexpParse(object):
         regexp.accept('regexp', key='regexp', required=True)
         regexp.accept('text', key='flags')
 
-	#required key need to specify for validator
+        #required key need to specify for validator
         url = keys.accept_any_key('dict', key='url', required=True)
         url.accept('boolean', key='required')
         regexp_list = url.accept('list', key='regexps', required=True)
@@ -107,7 +108,7 @@ class RegexpParse(object):
         regexp.accept('regexp', key='regexp', required=True)
         regexp.accept('text', key='flags')
 
-	#accept any other key the user wants to use
+        #accept any other key the user wants to use
         key = keys.accept_any_key('dict')
         key.accept('boolean', key='required')
         regexp_list = key.accept('list', key='regexps', required=True)
@@ -118,7 +119,7 @@ class RegexpParse(object):
         return root
 
     def flagstr_to_flags(self, flag_str):
-	"""turns a comma seperated list of flags into the int value."""
+        """turns a comma seperated list of flags into the int value."""
         COMBIND_FLAGS = 0
         split_flags = flag_str.split(',')
         for flag in split_flags:
@@ -126,7 +127,7 @@ class RegexpParse(object):
         return COMBIND_FLAGS
 
     def compile_regexp_dict_list(self, re_list):
-	"""turns a list of dicts containing regexps information into a list of compiled regexps."""
+        """turns a list of dicts containing regexps information into a list of compiled regexps."""
         compiled_regexps = []
         for dic in re_list:
             flags = 0
@@ -136,7 +137,7 @@ class RegexpParse(object):
         return compiled_regexps
 
     def isvalid(self, entry):
-	"""checks to make sure that all required fields are present in the entry."""
+        """checks to make sure that all required fields are present in the entry."""
         for key in self.required:
             if key not in entry:
                 return False
@@ -146,17 +147,17 @@ class RegexpParse(object):
     @internet(log)
     def on_task_input(self, task, config):
 
-	entries = []
-	
+        entries = []
+
         url = config['source']
 
         #if it's a file open it and read into content
         if os.path.isfile(os.path.expanduser(url)):
             content = open(url).read()
-	#else use requests to get the data
+        #else use requests to get the data
         else:
             content = task.requests.get(url).text
-	
+
         sections = []
         seperators = config.get('sections')
         if seperators:
@@ -173,7 +174,7 @@ class RegexpParse(object):
         #holds all the regex in a dict for the field they are trying to fill
         key_to_regexps = {}
 
-	#put every key in keys into the rey_to_regexps list
+        #put every key in keys into the rey_to_regexps list
         for key, value in config['keys'].iteritems():
             key_to_regexps[key] = self.compile_regexp_dict_list(value['regexps'])
             if 'required' in value and value['required']:
@@ -190,7 +191,7 @@ class RegexpParse(object):
                         break
             if self.isvalid(entry):
                 entries.append(entry)
-	
+
         return entries
 
 
