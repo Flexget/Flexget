@@ -68,7 +68,7 @@ class Session(requests.Session):
     """Subclass of requests Session class which defines some of our own defaults, records unresponsive sites,
     and raises errors by default."""
 
-    def __init__(self, timeout=None, max_retries=None):
+    def __init__(self, timeout=30, max_retries=None):
         """Set some defaults for our session if not explicitly defined."""
         requests.Session.__init__(self)
         self.timeout = timeout
