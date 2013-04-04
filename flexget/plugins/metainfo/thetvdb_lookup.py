@@ -75,7 +75,7 @@ class PluginThetvdbLookup(object):
     # Episode info
     episode_map = {
         'tvdb_ep_name': 'episodename',
-        'tvdb_tvdb_ep_air_date': 'firstaired',
+        'tvdb_ep_air_date': 'firstaired',
         'tvdb_ep_rating': 'rating',
         'tvdb_ep_image_url': lambda ep: ep.filename and get_mirror('banner') + ep.filename,
         'tvdb_ep_overview': 'overview',
