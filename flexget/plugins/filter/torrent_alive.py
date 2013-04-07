@@ -2,7 +2,7 @@ from __future__ import unicode_literals, division, absolute_import
 import logging
 import threading
 import socket
-from urlparse import urlparse
+from urlparse import urlparse, SplitResult, urlsplit, urlunsplit
 import struct
 from random import randrange
 from httplib import BadStatusLine
@@ -46,7 +46,10 @@ def max_seeds_from_threads(threads):
 
 def get_scrape_url(tracker_url, info_hash):
     if 'announce' in tracker_url:
-        result = tracker_url.replace('announce', 'scrape')
+        v = urlsplit(tracker_url)
+        sr = SplitResult(v.scheme, v.netloc, v.path.replace('announce', 'scrape'),
+                         v.query, v.fragment)
+        result = urlunsplit(sr)
     else:
         log.debug('`announce` not contained in tracker url, guessing scrape address.')
         result = tracker_url + '/scrape'

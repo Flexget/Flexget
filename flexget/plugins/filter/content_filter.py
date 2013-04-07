@@ -76,6 +76,7 @@ class FilterContentFilter(object):
         if 'torrent' in entry:
             files = [posixpath.join(item['path'], item['name']) for item in entry['torrent'].get_filelist()]
             if files:
+                # TODO: should not add this to entry, this is a filter plugin
                 entry['content_files'] = files
 
     @priority(150)
