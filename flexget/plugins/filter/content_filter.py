@@ -24,6 +24,8 @@ class FilterContentFilter(object):
         config = validator.factory('dict')
         config.accept('text', key='require')
         config.accept('list', key='require').accept('text')
+        config.accept('text', key='require_all')
+        config.accept('list', key='require_all').accept('text')
         config.accept('text', key='reject')
         config.accept('list', key='reject').accept('text')
         config.accept('boolean', key='strict')
@@ -31,7 +33,7 @@ class FilterContentFilter(object):
 
     def get_config(self, task):
         config = task.config.get('content_filter')
-        for key in ['require', 'reject']:
+        for key in ['require', 'require_all', 'reject']:
             if key in config:
                 if isinstance(config[key], basestring):
                     config[key] = [config[key]]
