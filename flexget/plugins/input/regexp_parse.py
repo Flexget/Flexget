@@ -39,7 +39,7 @@ class RegexpParse(object):
     regexp_parse:
       source: http://username:password@ezrss.it/feed/
       sections:
-        - {regexp: "(?<=<item>).*?(?=</item>)", flags: "DOTALL"}
+        - {regexp: "(?<=<item>).*?(?=</item>)", flags: "DOTALL,IGNORECASE"}
 
       keys:
         title:
@@ -50,7 +50,7 @@ class RegexpParse(object):
             - {regexp: "magnet:.*?(?=])"}
         custom_field:
           regexps:
-            - {regexp: "custom regexps", flags: "flags for python regexps see python regexps docs"}
+            - {regexp: "custom regexps", flags: "comma seperated list of flags (see python regex docs)"}
           required: False
         custom_field2:
           regexps:
