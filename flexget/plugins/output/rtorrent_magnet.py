@@ -31,7 +31,11 @@ class PluginRtorrentMagnet(object):
     """
 
     def write_torrent_file(self, task, entry):
-        path = os.path.join(entry['path'], 'meta-%s.torrent' % entry['title'].encode(sys.getfilesystemencoding(), 'replace'))
+        path = os.path.join(
+            entry['path'],
+            'meta-%s.torrent' % entry['title'].encode(sys.getfilesystemencoding(), 'replace')
+        )
+        path = os.path.expanduser(path)
         log.info('Writing rTorrent Magnet File: %s', path)
 
         if task.manager.options.test:
@@ -49,7 +53,7 @@ class PluginRtorrentMagnet(object):
         return root
 
     @plugin.priority(0)
-    def on_task_download(self, task, config):
+    def on_task_output(self, task, config):
 
         for entry in task.accepted:
             if 'output' in entry:
