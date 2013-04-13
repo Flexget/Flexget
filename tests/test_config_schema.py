@@ -97,3 +97,27 @@ class TestSchemaValidator(FlexGetBase):
             message_type.return_value = 'I am error'
             errors = list(v.iter_errors(42))
             assert errors[0].message == 'I am error'
+
+    def test_anyOf_branch_is_chosen_based_on_type_errors(self):
+        schema = {
+            "anyOf": [
+                {"type": "string"},
+                {
+                    "anyOf": [
+                        {"type": "integer"},
+                        {"type": "number", "minimum": 5}
+                    ]
+                }
+            ]
+        }
+        v = config_schema.SchemaValidator(schema)
+        # If there are type errors on both sides, it should be a virtual type error with all types
+        errors = list(v.iter_errors(True))
+        assert len(errors) == 1
+        assert tuple(errors[0].schema_path) == ('anyOf', 'type')
+        # It should have all the types together
+        assert set(errors[0].validator_value) == set(['string', 'number', 'integer'])
+        # If there are no type errors going down one branch it should choose it
+        errors = list(v.iter_errors(1.5))
+        assert len(errors) == 1
+        assert errors[0].validator == 'minimum'
