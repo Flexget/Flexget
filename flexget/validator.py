@@ -134,6 +134,12 @@ class Validator(object):
         raise NotImplementedError('Validator %s should override accept method' % self.__class__.__name__)
 
     def schema(self):
+        schema = self._schema()
+        if self.message:
+            schema['error'] = self.message
+        return schema
+
+    def _schema(self):
         """Return schema for validator"""
         raise NotImplementedError(self.__name__)
 
@@ -158,7 +164,7 @@ class RootValidator(Validator):
         self.valid.append(v)
         return v
 
-    def schema(self):
+    def _schema(self):
         return any_schema([v.schema() for v in self.valid])
 
 
@@ -186,7 +192,7 @@ class ChoiceValidator(Validator):
         for value in values:
             self.accept(value, **kwargs)
 
-    def schema(self):
+    def _schema(self):
         schemas = []
         if self.valid:
             schemas.append({'enum': self.valid + self.valid_ic})
@@ -201,7 +207,7 @@ class AnyValidator(Validator):
     def accept(self, value, **kwargs):
         self.valid = value
 
-    def schema(self):
+    def _schema(self):
         return {}
 
 
@@ -211,7 +217,7 @@ class EqualsValidator(Validator):
     def accept(self, value, **kwargs):
         self.valid = value
 
-    def schema(self):
+    def _schema(self):
         return {'enum': [self.valid]}
 
 
@@ -221,7 +227,7 @@ class NumberValidator(Validator):
     def accept(self, name, **kwargs):
         pass
 
-    def schema(self):
+    def _schema(self):
         return {'type': 'number'}
 
 
@@ -231,7 +237,7 @@ class IntegerValidator(Validator):
     def accept(self, name, **kwargs):
         pass
 
-    def schema(self):
+    def _schema(self):
         return {'type': 'integer'}
 
 
@@ -242,7 +248,7 @@ class DecimalValidator(Validator):
     def accept(self, name, **kwargs):
         pass
 
-    def schema(self):
+    def _schema(self):
         return {'type': 'number'}
 
 
@@ -252,7 +258,7 @@ class BooleanValidator(Validator):
     def accept(self, name, **kwargs):
         pass
 
-    def schema(self):
+    def _schema(self):
         return {'type': 'boolean'}
 
 
@@ -262,7 +268,7 @@ class TextValidator(Validator):
     def accept(self, name, **kwargs):
         pass
 
-    def schema(self):
+    def _schema(self):
         return {'type': 'string'}
 
 
@@ -272,7 +278,7 @@ class RegexpValidator(Validator):
     def accept(self, name, **kwargs):
         pass
 
-    def schema(self):
+    def _schema(self):
         return {'type': 'string', 'format': 'regex'}
 
 
@@ -298,7 +304,7 @@ class RegexpMatchValidator(Validator):
     def reject(self, regexp):
         self.add_regexp(self.reject_regexps, regexp)
 
-    def schema(self):
+    def _schema(self):
         schema = any_schema([{'type': 'string', 'pattern': regexp.pattern} for regexp in self.regexps])
         if self.reject_regexps:
             schema['not'] = any_schema([{'pattern': rej_regexp.pattern} for rej_regexp in self.reject_regexps])
@@ -325,7 +331,7 @@ class FileValidator(TextValidator):
             return False
         return True
 
-    def schema(self):
+    def _schema(self):
         return {'type': 'string', 'format': 'file'}
 
 
@@ -337,7 +343,7 @@ class PathValidator(TextValidator):
         self.allow_missing = allow_missing
         Validator.__init__(self, parent, **kwargs)
 
-    def schema(self):
+    def _schema(self):
         if self.allow_missing:
             return {'type': 'string'}
         return {'type': 'string', 'format': 'path'}
@@ -353,7 +359,7 @@ class UrlValidator(TextValidator):
             self.protocols = ['ftp', 'http', 'https', 'file']
         Validator.__init__(self, parent, **kwargs)
 
-    def schema(self):
+    def _schema(self):
         return {'type': 'string', 'format': 'url'}
 
 
@@ -365,7 +371,7 @@ class ListValidator(Validator):
         self.valid.append(v)
         return v
 
-    def schema(self):
+    def _schema(self):
         return {'type': 'array', 'items': any_schema([v.schema() for v in self.valid])}
 
 
@@ -446,7 +452,7 @@ class DictValidator(Validator):
         self.key_validators.append((key_validator, v))
         return v
 
-    def schema(self):
+    def _schema(self):
         schema = {'type': 'object'}
         properties = schema['properties'] = {}
         for key, validators in self.valid.iteritems():
@@ -472,14 +478,14 @@ class DictValidator(Validator):
 class QualityValidator(TextValidator):
     name = 'quality'
 
-    def schema(self):
+    def _schema(self):
         return {'type': 'string', 'format': 'quality'}
 
 
 class QualityRequirementsValidator(TextValidator):
     name = 'quality_requirements'
 
-    def schema(self):
+    def _schema(self):
         return {'type': 'string', 'format': 'qualityRequirements'}
 
 
@@ -504,7 +510,7 @@ class LazyValidator(object):
             self.validator.add_parent(self.parent)
         return getattr(self.validator, item)
 
-    def schema(self):
+    def _schema(self):
         """Return the schema of our instance if it has already been created, otherwise return 'ondemand' type."""
         if self.validator is None:
             # TODO: Change this whole class to be a plugin validator implemented with $ref?
