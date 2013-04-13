@@ -79,14 +79,17 @@ class ValidationError(jsonschema.ValidationError):
     """
 
     @property
+    def error_with_path(self):
+        return "[/%s] %s" % ('/'.join(map(unicode, self.path)), self.message)
+
+    @property
     def message(self):
-        msg = self._message
         custom_error = self.schema.get('error_%s' % self.validator, self.schema.get('error'))
         if custom_error:
-            msg = template.render(custom_error, self.__dict__)
+            return template.render(custom_error, self.__dict__)
         elif hasattr(self, 'message_%s' % self.validator):
-            msg = getattr(self, 'message_%s' % self.validator)()
-        return "[/%s] %s" % ('/'.join(map(unicode, self.path)), msg)
+            return getattr(self, 'message_%s' % self.validator)()
+        return self._message
 
     @message.setter
     def message(self, value):
@@ -94,6 +97,11 @@ class ValidationError(jsonschema.ValidationError):
 
     def message_type(self):
         return self._message.replace("'object'", "'dict'")
+
+    def message_format(self):
+        if self.validator_value == 'interval':
+            return "should be in format 'x (seconds|minutes|hours|days|weeks)"
+        return self._message
 
         
 
