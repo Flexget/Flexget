@@ -101,7 +101,7 @@ class TestSchemaValidator(FlexGetBase):
     def test_anyOf_branch_is_chosen_based_on_type_errors(self):
         schema = {
             "anyOf": [
-                {"type": "string"},
+                {"type": ["string", "array"]},
                 {
                     "anyOf": [
                         {"type": "integer"},
@@ -116,7 +116,7 @@ class TestSchemaValidator(FlexGetBase):
         assert len(errors) == 1
         assert tuple(errors[0].schema_path) == ('anyOf', 'type')
         # It should have all the types together
-        assert set(errors[0].validator_value) == set(['string', 'number', 'integer'])
+        assert set(errors[0].validator_value) == set(['string', 'array', 'number', 'integer'])
         # If there are no type errors going down one branch it should choose it
         errors = list(v.iter_errors(1.5))
         assert len(errors) == 1
