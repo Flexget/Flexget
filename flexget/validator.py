@@ -62,13 +62,13 @@ def any_schema(schemas):
     """
     Creates a schema that will match any of the given schemas.
     Will not use anyOf if there is just one validator in the list, for simpler error messages.
+
     """
     schemas = list(schemas)
     if len(schemas) == 1:
         return schemas[0]
     else:
-        return {'anyOf': [s for s in schemas]}
-
+        return {'anyOf': schemas}
 
 
 class Validator(object):
