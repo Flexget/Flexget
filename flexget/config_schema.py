@@ -106,6 +106,15 @@ class ValidationError(jsonschema.ValidationError):
             return unicode(self.cause)
         return self._message
 
+    def message_additionalProperties(self):
+        if self.validator_value is False:
+            extras = set(jsonschema._find_additional_properties(self.instance, self.schema))
+            if len(extras) == 1:
+                return 'The key `%s` is not valid here.' % extras.pop()
+            else:
+                return 'The keys %s are not valid here.' % ', '.join('`%s`' % e for e in extras)
+        return self._message
+
 
 class SchemaValidator(jsonschema.Draft4Validator):
     """
