@@ -14,7 +14,6 @@ from jinja2 import (Environment, StrictUndefined, ChoiceLoader,
                     TemplateSyntaxError, Undefined)
 
 from flexget.event import event
-from flexget.plugin import PluginError
 from flexget.utils.pathscrub import pathscrub
 
 log = logging.getLogger('utils.template')
@@ -143,8 +142,27 @@ def get_template(templatename, pluginname=None):
         except TemplateNotFound:
             pass
     else:
-        raise PluginError('Template not found: %s (%s)' % (templatename, pluginname))
+        # TODO: Plugins need to catch and reraise this as PluginError, or perhaps we should have
+        # a validator for template files
+        raise ValueError('Template not found: %s (%s)' % (templatename, pluginname))
 
+
+def render(template, context):
+    """
+    Renders a Template with `context` as its context.
+
+    :param template: Template or template string to render.
+    :param context: Context to render the template from.
+    :return: The rendered template text.
+    """
+    if isinstance(template, basestring):
+        template = environment.from_string(template)
+    try:
+        result = template.render(context)
+    except Exception as e:
+        raise RenderError('(%s) %s' % (type(e).__name__, e))
+
+    return result
 
 def render_from_entry(template_string, entry):
     """Renders a Template or template string with an Entry as its context."""
