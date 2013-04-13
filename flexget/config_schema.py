@@ -103,7 +103,6 @@ class ValidationError(jsonschema.ValidationError):
             return "should be in format 'x (seconds|minutes|hours|days|weeks)"
         return self._message
 
-        
 
 class SchemaValidator(jsonschema.Draft4Validator):
     """
@@ -117,6 +116,24 @@ class SchemaValidator(jsonschema.Draft4Validator):
     def iter_errors(self, instance, _schema=None):
         for e in super(SchemaValidator, self).iter_errors(instance, _schema=_schema):
             yield ValidationError.create_from(e)
+
+    def validate_anyOf(self, *args, **kwargs):
+        for error in super(SchemaValidator, self).validate_anyOf(*args, **kwargs):
+            subschema_errors = {}
+            for sube in error.context:
+                subschema_errors.setdefault(sube.schema_path[0], []).append(sube)
+            no_type_errors = [i for i, errors in subschema_errors.iteritems()
+                              if not any(e.schema_path[1] == 'type' for e in errors)]
+            if len(no_type_errors) == 1:
+                # If one of the possible schemas did not have a 'type' error, assume that is the intended one and issue
+                # all errors from that subschema
+                for e in subschema_errors[no_type_errors[0]]:
+                    e.schema_path.extendleft(reversed(error.schema_path))
+                    e.path.extendleft(reversed(error.path))
+                    yield e
+            else:
+                yield error
+
 
 
 def one_or_more(schema):
