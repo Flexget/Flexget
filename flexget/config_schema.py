@@ -66,10 +66,12 @@ def is_url(instance):
               '):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?')
     return re.match(regexp, instance)
 
-@format_checker.checks('interval')
+@format_checker.checks('interval', raises=ValueError)
 def is_interval(instance):
     regexp = r'^\d+ (second|minute|hour|day|week)s?$'
-    return re.match(regexp, instance)
+    if not re.match(regexp, instance):
+        raise ValueError("should be in format 'x (seconds|minutes|hours|days|weeks)")
+    return True
 
 
 class ValidationError(jsonschema.ValidationError):
@@ -99,8 +101,8 @@ class ValidationError(jsonschema.ValidationError):
         return self._message.replace("'object'", "'dict'")
 
     def message_format(self):
-        if self.validator_value == 'interval':
-            return "should be in format 'x (seconds|minutes|hours|days|weeks)"
+        if self.cause:
+            return unicode(self.cause)
         return self._message
 
 
