@@ -84,11 +84,11 @@ class TestSchemaValidator(FlexGetBase):
         errors = list(v.iter_errors(13))
         assert errors[0].message.endswith(schema['error_type'])
 
-    def test_path_precedes_errors(self):
-        schema = {'properties': {'p': {'items': {'type': 'string'}}}}
+    def test_error_with_path(self):
+        schema = {'properties': {'p': {'items': {'type': 'string', 'error': 'ERROR'}}}}
         v = config_schema.SchemaValidator(schema)
         errors = list(v.iter_errors({'p': [13]}))
-        assert errors[0].message.startswith('[/p/0]')
+        assert errors[0].error_with_path == '[/p/0] ERROR'
 
     def test_builtin_error_rewriting(self):
         schema = {'type': 'object'}

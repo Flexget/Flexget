@@ -399,8 +399,7 @@ class Manager(object):
     def validate_config(self):
         """Check all root level keywords are valid."""
         validator = config_schema.SchemaValidator(_task_config_schema)
-        # TODO: Better error messages
-        return list('%s: %s' % ('/'.join(str(p) for p in e.path), e.message) for e in validator.iter_errors(self.config))
+        return list(e.error_with_path for e in validator.iter_errors(self.config))
 
     def init_sqlalchemy(self):
         """Initialize SQLAlchemy"""
