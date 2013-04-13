@@ -80,12 +80,13 @@ class ValidationError(jsonschema.ValidationError):
 
     @property
     def message(self):
+        msg = self._message
         custom_error = self.schema.get('error_%s' % self.validator, self.schema.get('error'))
         if custom_error:
-            return template.render(custom_error, self.__dict__)
-        if hasattr(self, 'message_%s' % self.validator):
-            return getattr(self, 'message_%s' % self.validator)()
-        return self._message
+            msg = template.render(custom_error, self.__dict__)
+        elif hasattr(self, 'message_%s' % self.validator):
+            msg = getattr(self, 'message_%s' % self.validator)()
+        return "[/%s] %s" % ('/'.join(map(unicode, self.path)), msg)
 
     @message.setter
     def message(self, value):
