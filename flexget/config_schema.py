@@ -55,7 +55,7 @@ def is_path(instance):
     pat = re.compile(r'{[{%].*[}%]}')
     result = pat.search(instance)
     if result:
-        path = os.path.dirname(instance[0:result.start()])
+        instance = os.path.dirname(instance[0:result.start()])
     return os.path.isdir(os.path.expanduser(instance))
 
 
