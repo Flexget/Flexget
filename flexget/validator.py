@@ -138,6 +138,7 @@ class Validator(object):
         raise NotImplementedError(self.__name__)
 
     def validate(self, value):
+        """This is just to unit test backwards compatibility of json schema with old validators"""
         validator = SchemaValidator(self.schema())
         errors = list(e.message for e in validator.iter_errors(value))
         self.errors.messages = errors
