@@ -14,15 +14,10 @@ class PluginSequence(object):
       - rss: http://feedb.com
     """
 
-    def validator(self):
-        from flexget import validator
-        root = validator.factory()
-        valid_plugins = root.accept('list').accept('dict')
-        for plugin_name in get_plugin_keywords():
-            plugin = get_plugin_by_name(plugin_name)
-            if plugin.api_ver > 1 and hasattr(plugin.instance, 'validator'):
-                valid_plugins.accept(plugin.instance.validator, key=plugin_name)
-        return root
+    schema = {
+        'type': 'array',
+        'items': {'$ref': '/schema/plugins'}
+    }
 
     def __getattr__(self, item):
         """Returns a function for all on_task_* and on_process_* events, that runs all the configured plugins."""
