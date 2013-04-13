@@ -62,27 +62,27 @@ class TestSchemaValidator(FlexGetBase):
         schema = {'type': 'string', 'error': 'This is not okay'}
         v = config_schema.SchemaValidator(schema)
         errors = list(v.iter_errors(13))
-        assert errors[0].message.endswith(schema['error'])
+        assert errors[0].message == schema['error']
 
     def test_custom_error_template(self):
         schema = {'type': 'string', 'minLength': 10, 'error': '{{validator}} failed for {{instance}}'}
         v = config_schema.SchemaValidator(schema)
         errors = list(v.iter_errors(13))
-        assert errors[0].message.endswith("type failed for 13")
+        assert errors[0].message == "type failed for 13"
         errors = list(v.iter_errors('aoeu'))
-        assert errors[0].message.endswith("minLength failed for aoeu")
+        assert errors[0].message == "minLength failed for aoeu"
 
     def test_custom_keyword_error(self):
         schema = {'type': 'string', 'error_type': 'This is not okay'}
         v = config_schema.SchemaValidator(schema)
         errors = list(v.iter_errors(13))
-        assert errors[0].message.endswith(schema['error_type'])
+        assert errors[0].message == schema['error_type']
 
     def test_custom_keyword_error_overrides(self):
         schema = {'type': 'string', 'error_type': 'This is not okay', 'error': 'This is worse'}
         v = config_schema.SchemaValidator(schema)
         errors = list(v.iter_errors(13))
-        assert errors[0].message.endswith(schema['error_type'])
+        assert errors[0].message == schema['error_type']
 
     def test_error_with_path(self):
         schema = {'properties': {'p': {'items': {'type': 'string', 'error': 'ERROR'}}}}
@@ -96,4 +96,4 @@ class TestSchemaValidator(FlexGetBase):
         with mock.patch.object(config_schema.ValidationError, 'message_type') as message_type:
             message_type.return_value = 'I am error'
             errors = list(v.iter_errors(42))
-            assert errors[0].message.endswith('I am error')
+            assert errors[0].message == 'I am error'
