@@ -1,6 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
 
 import jsonschema
+import mock
 
 from flexget import config_schema
 from tests import FlexGetBase
@@ -56,3 +57,25 @@ class TestSchemaValidator(FlexGetBase):
         v = config_schema.SchemaValidator(schema)
         assert v.is_valid('720p')
         assert not v.is_valid('aoeu')
+
+    def test_custom_error(self):
+        schema = {'type': 'string', 'error': 'This is not okay'}
+        v = config_schema.SchemaValidator(schema)
+        errors = list(v.iter_errors(13))
+        assert errors[0].message == schema['error']
+
+    def test_custom_error_template(self):
+        schema = {'type': 'string', 'minLength': 10, 'error': '{{validator}} failed for {{instance}}'}
+        v = config_schema.SchemaValidator(schema)
+        errors = list(v.iter_errors(13))
+        assert errors[0].message == "type failed for 13"
+        errors = list(v.iter_errors('aoeu'))
+        assert errors[0].message == "minLength failed for aoeu"
+
+    def test_builtin_error_rewriting(self):
+        schema = {'type': 'object'}
+        v = config_schema.SchemaValidator(schema)
+        with mock.patch.object(config_schema.ValidationError, 'message_type') as message_type:
+            message_type.return_value = 'I am error'
+            errors = list(v.iter_errors(42))
+            assert errors[0].message == 'I am error'

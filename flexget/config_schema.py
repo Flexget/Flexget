@@ -5,7 +5,7 @@ import urlparse
 
 import jsonschema
 
-from flexget.utils import qualities
+from flexget.utils import qualities, template
 
 schema_paths = {}
 
@@ -72,6 +72,30 @@ def is_interval(instance):
     return re.match(regexp, instance)
 
 
+class ValidationError(jsonschema.ValidationError):
+    """
+     Overrides error messages from jsonschema with custom ones for FlexGet
+
+    """
+
+    @property
+    def message(self):
+        custom_error = self.schema.get('error_%s' % self.validator, self.schema.get('error'))
+        if custom_error:
+            return template.render(custom_error, self.__dict__)
+        if hasattr(self, 'message_%s' % self.validator):
+            return getattr(self, 'message_%s' % self.validator)()
+        return self._message
+
+    @message.setter
+    def message(self, value):
+        self._message = value
+
+    def message_type(self):
+        return self._message.replace("'object'", "'dict'")
+
+        
+
 class SchemaValidator(jsonschema.Draft4Validator):
     """
     Validator for our schemas.
@@ -80,6 +104,10 @@ class SchemaValidator(jsonschema.Draft4Validator):
     def __init__(self, schema):
         resolver = RefResolver.from_schema(schema)
         super(SchemaValidator, self).__init__(schema, resolver=resolver, format_checker=format_checker)
+
+    def iter_errors(self, instance, _schema=None):
+        for e in super(SchemaValidator, self).iter_errors(instance, _schema=_schema):
+            yield ValidationError.create_from(e)
 
 
 def one_or_more(schema):
