@@ -106,6 +106,9 @@ class ValidationError(jsonschema.ValidationError):
             return unicode(self.cause)
         return self._message
 
+    def message_enum(self):
+        return 'Must be one of the following: %s' % ', '.join(map(unicode, self.validator_value))
+
     def message_additionalProperties(self):
         if self.validator_value is False:
             extras = set(jsonschema._find_additional_properties(self.instance, self.schema))
@@ -168,17 +171,11 @@ def one_or_more(schema):
     Helper function to construct a schema that validates items matching `schema` or an array
     containing items matching `schema`.
 
-    Limitation: `schema` must not be a schema that validates arrays already
     """
 
-    assert 'array' not in schema.get('type', []), 'Cannot use array schemas with one_or_more'
-    new_schema = schema.copy()
-    if 'type' in schema:
-        if isinstance(schema['type'], basestring):
-            new_schema['type'] = [schema['type'], 'array']
-        else:
-            new_schema['type'] = schema['type'] + ['array']
-    new_schema['items'] = schema
-    new_schema['minItems'] = 1
-
-    return new_schema
+    return {
+        "anyOf": [
+            schema,
+            {"type": "array", "items": schema, "minItems": 1}
+        ]
+    }
