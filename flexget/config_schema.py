@@ -46,8 +46,17 @@ format_checker.checks('quality_requirements', raises=ValueError)(qualities.Requi
 
 @format_checker.checks('file')
 def is_file(instance):
-    if os.path.isfile(os.path.expanduser(instance)):
-        return True
+    return os.path.isfile(os.path.expanduser(instance))
+
+@format_checker.checks('path')
+def is_path(instance):
+    # If string replacement is allowed, only validate the part of the
+    # path before the first identifier to be replaced
+    pat = re.compile(r'{[{%].*[}%]}')
+    result = pat.search(instance)
+    if result:
+        path = os.path.dirname(instance[0:result.start()])
+    return os.path.isdir(os.path.expanduser(instance))
 
 
 #TODO: jsonschema has a format checker for uri if rfc3987 is installed, perhaps we should use that
