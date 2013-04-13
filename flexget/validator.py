@@ -1,7 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
 import re
 
-from flexget.utils import qualities
+from flexget.config_schema import SchemaValidator
 
 # TODO: rename all validator.valid -> validator.accepts / accepted / accept ?
 
@@ -137,6 +137,12 @@ class Validator(object):
         """Return schema for validator"""
         raise NotImplementedError(self.__name__)
 
+    def validate(self, value):
+        validator = SchemaValidator(self.schema())
+        errors = list(e.message for e in validator.iter_errors(value))
+        self.errors.messages = errors
+        return not errors
+
     def __str__(self):
         return '<validator:name=%s>' % self.name
 
@@ -180,7 +186,12 @@ class ChoiceValidator(Validator):
             self.accept(value, **kwargs)
 
     def schema(self):
-        return {'enum': self.valid + self.valid_ic}
+        schemas = []
+        if self.valid:
+            schemas.append({'enum': self.valid + self.valid_ic})
+        if self.valid_ic:
+            schemas.append(any_schema({"type": "string", "pattern": "(?i)%s" % p} for p in self.valid_ic))
+        return any_schema(schemas)
 
 
 class AnyValidator(Validator):
@@ -326,7 +337,8 @@ class PathValidator(TextValidator):
         Validator.__init__(self, parent, **kwargs)
 
     def schema(self):
-        # TODO: Make path format validator
+        if self.allow_missing:
+            return {'type': 'string'}
         return {'type': 'string', 'format': 'path'}
 
 
