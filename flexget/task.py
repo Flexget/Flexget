@@ -553,9 +553,9 @@ class Task(object):
         if errors:
             log.critical('Task \'%s\' has configuration errors:' % self.name)
             for error in errors:
-                log.error(error)
+                log.error(error.error_with_path)
             # task has errors, abort it
-            self.abort('\n'.join(errors))
+            self.abort('\n'.join(e.error_with_path for e in errors))
         return errors
 
     @staticmethod
@@ -564,7 +564,7 @@ class Task(object):
         # Don't validate commented out plugins
         schema['patternProperties'] = {'^_': {}}
         validator = config_schema.SchemaValidator(schema)
-        return list(e.error_with_path for e in validator.iter_errors(config))
+        return list(validator.iter_errors(config))
 
 
 task_config_schema = {
