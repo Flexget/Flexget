@@ -197,8 +197,10 @@ class ChoiceValidator(Validator):
         if self.valid:
             schemas.append({'enum': self.valid + self.valid_ic})
         if self.valid_ic:
-            schemas.append(any_schema({"type": "string", "pattern": "(?i)%s" % p} for p in self.valid_ic))
-        return any_schema(schemas)
+            schemas.append(any_schema({"type": "string", "pattern": "(?i)^%s$" % p} for p in self.valid_ic))
+        s = any_schema(schemas)
+        s['error'] = 'Must be one of the following: %s' % ', '.join(map(unicode, self.valid + self.valid_ic))
+        return s
 
 
 class AnyValidator(Validator):
