@@ -40,24 +40,33 @@ class RefResolver(jsonschema.RefResolver):
         super(RefResolver, self).__init__(*args, **kwargs)
 
 
-format_checker = jsonschema.FormatChecker(('regex', 'email'))
+format_checker = jsonschema.FormatChecker(('email',))
 format_checker.checks('quality', raises=ValueError)(qualities.get)
 format_checker.checks('quality_requirements', raises=ValueError)(qualities.Requirements)
 
+@format_checker.checks('regex', raises=ValueError)
+def is_regex(instance):
+    try:
+        return re.compile(instance)
+    except re.error as e:
+        raise ValueError('Error parsing regex: %s' % e)
 
-@format_checker.checks('file')
+@format_checker.checks('file', raises=ValueError)
 def is_file(instance):
-    return os.path.isfile(os.path.expanduser(instance))
+    if os.path.isfile(os.path.expanduser(instance)):
+        return True
+    raise ValueError('`%s` does not exist' % instance)
 
-@format_checker.checks('path')
+@format_checker.checks('path', raises=ValueError)
 def is_path(instance):
-    # If string replacement is allowed, only validate the part of the
-    # path before the first identifier to be replaced
+    # Only validate the part of the path before the first identifier to be replaced
     pat = re.compile(r'{[{%].*[}%]}')
     result = pat.search(instance)
     if result:
         instance = os.path.dirname(instance[0:result.start()])
-    return os.path.isdir(os.path.expanduser(instance))
+    if os.path.isdir(os.path.expanduser(instance)):
+        return True
+    raise ValueError('`%s` does not exist' % instance)
 
 
 #TODO: jsonschema has a format checker for uri if rfc3987 is installed, perhaps we should use that
