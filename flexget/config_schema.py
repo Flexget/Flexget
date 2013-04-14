@@ -99,7 +99,20 @@ class ValidationError(jsonschema.ValidationError):
         self._message = value
 
     def message_type(self):
-        return self._message.replace("'object'", "'dict'")
+        if isinstance(self.validator_value, basestring):
+            valid_types = [self.validator_value]
+        else:
+            valid_types = list(self.validator_value)
+        # Replace some types with more pythony ones
+        replace = {'object': 'dict', 'array': 'list'}
+        valid_types = [replace.get(t, t) for t in valid_types]
+        # Make valid_types into an english list, with commas and 'or'
+        valid_types = ', '.join(valid_types[:-2] + ['']) + ' or '.join(valid_types[-2:])
+        if isinstance(self.instance, dict):
+            return 'Got a dict, expected: %s' % valid_types
+        if isinstance(self.instance, list):
+            return 'Got a list, expected: %s' % valid_types
+        return 'Got `%s`, expected: %s' % (self.instance, valid_types)
 
     def message_format(self):
         if self.cause:
