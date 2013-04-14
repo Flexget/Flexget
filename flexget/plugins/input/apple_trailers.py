@@ -24,17 +24,10 @@ class AppleTrailers(InputRSS):
         Choice of quality is one of: ipod, '320', '480', 640w, 480p, 720p, 1080p
     """
 
-    def __init__(self):
-        self.rss_url = 'http://trailers.apple.com/trailers/home/rss/newtrailers.rss'
-        self.qualities = ['ipod', 320, '320', 480, '480', '640w', '480p', '720p', '1080p']
+    rss_url = 'http://trailers.apple.com/trailers/home/rss/newtrailers.rss'
+    qualities = ['ipod', 320, '320', 480, '480', '640w', '480p', '720p', '1080p']
 
-    def validator(self):
-        from flexget import validator
-        config = validator.factory()
-        # TODO: 320 and 480 need to be quoted. is it possible to validate
-        # without the need for quotes?
-        config.accept('choice').accept_choices(self.qualities, ignore_case=True)
-        return config
+    schema = {"enum": qualities}
 
     # Run before headers plugin
     @priority(135)
