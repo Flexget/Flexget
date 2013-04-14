@@ -139,7 +139,7 @@ class Manager(object):
         errors = self.validate_config()
         if errors:
             for error in errors:
-                log.critical(error)
+                log.critical(error.error_with_path)
             return
         self.create_tasks()
 
@@ -397,9 +397,14 @@ class Manager(object):
         log.debug('Pre-checked %s configuration lines' % line_num)
 
     def validate_config(self):
-        """Check all root level keywords are valid."""
+        """
+        Check all root level keywords are valid.
+
+        :returns: A list of `ValidationError`s
+
+        """
         validator = config_schema.SchemaValidator(_task_config_schema)
-        return list(e.error_with_path for e in validator.iter_errors(self.config))
+        return list(validator.iter_errors(self.config))
 
     def init_sqlalchemy(self):
         """Initialize SQLAlchemy"""
