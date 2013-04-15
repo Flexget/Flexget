@@ -44,37 +44,40 @@ def set_unresponsive(url):
     unresponsive_hosts[host] = datetime.now()
 
 
-class FileAdapter(requests.adapters.BaseAdapter):
-    """Handles file:// URIs by passing them to urllib2"""
-    def send(self, request, **kwargs):
-        url = request.url
-        try:
-            raw = urllib2.urlopen(url)
-        except IOError as e:
-            msg = 'IOError openening file %s: %s' % (url, e)
-            log.error(msg)
-            raise RequestException(msg)
-        resp = requests.Response()
-        resp.raw = raw
-        resp.status_code = 200
-        resp.headers = requests.structures.CaseInsensitiveDict(raw.headers)
-        return resp
+def _wrap_urlopen(url, timeout=None):
+    """
+    Handles alternate schemes using urllib, wraps the response in a requests.Response
 
-    def close(self):
-        pass
+    This is not installed as an adapter in requests, since urls without network locations
+    (e.g. file:///somewhere) will cause errors
+
+    """
+    try:
+        raw = urllib2.urlopen(url, timeout=timeout)
+    except IOError as e:
+        msg = 'Error getting %s: %s' % (url, e)
+        log.error(msg)
+        raise RequestException(msg)
+    resp = requests.Response()
+    resp.raw = raw
+    resp.status_code = raw.code or 200
+    resp.headers = requests.structures.CaseInsensitiveDict(raw.headers)
+    return resp
 
 
 class Session(requests.Session):
-    """Subclass of requests Session class which defines some of our own defaults, records unresponsive sites,
-    and raises errors by default."""
+    """
+    Subclass of requests Session class which defines some of our own defaults, records unresponsive sites,
+    and raises errors by default.
 
-    def __init__(self, timeout=30, max_retries=None):
+    """
+
+    def __init__(self, timeout=30, max_retries=1):
         """Set some defaults for our session if not explicitly defined."""
         requests.Session.__init__(self)
         self.timeout = timeout
         self.stream = True
-        self.mount('file://', FileAdapter())
-        self.adapters['http://'].max_retries = max_retries or 1
+        self.adapters['http://'].max_retries = max_retries
         # Stores min intervals between requests for certain sites
         self.domain_delay = {}
 
@@ -122,6 +125,10 @@ class Session(requests.Session):
 
         kwargs.setdefault('timeout', self.timeout)
         raise_status = kwargs.pop('raise_status', True)
+
+        # If we do not have an adapter for this url, pass it off to urllib
+        if not any(url.startswith(adapter) for adapter in self.adapters):
+            return _wrap_urlopen(url, timeout=kwargs['timeout'])
 
         try:
             result = requests.Session.request(self, method, url, *args, **kwargs)
