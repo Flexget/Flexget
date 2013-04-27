@@ -424,7 +424,7 @@ class SeriesDatabase(object):
         :param session: Database session to use
         :param parser: parser for release that should be added to database
         :param series: Series in database to add release to. Will be looked up if not provided.
-        :return:
+        :return: List of Releases
         """
         if not series:
             # if series does not exist in database, add new
@@ -931,6 +931,8 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
             if not entries:
                 continue
 
+            reason = None
+
             # sort episodes in order of quality
             entries.sort(key=lambda e: e['series_parser'], reverse=True)
 
@@ -954,6 +956,7 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
                 entries = self.process_quality(config, entries)
                 if not entries:
                     continue
+                reason = 'matches quality'
 
             # Many of the following functions need to know this info. Only look it up once.
             downloaded = ep.downloaded_releases
@@ -1015,7 +1018,6 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
                     if self.process_episode_advancement(ep, entries):
                         continue
 
-            reason = 'choosing best quality'
             # quality
             if 'target' in config or 'qualities' in config:
                 if 'target' in config:
@@ -1036,6 +1038,7 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
                     continue
 
             # Just pick the best ep if we get here
+            reason = reason or 'choosing best quality'
             best.accept(reason)
 
     def process_propers(self, config, episode, entries):
@@ -1122,6 +1125,8 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
         for entry in entries:
             if reqs.allows(entry['series_parser'].quality):
                 result.append(entry)
+            else:
+                log.verbose('Ignored `%s`. Does not meet quality requirement `%s`.' % (entry['title'], reqs))
         if not result:
             log.debug('no quality meets requirements')
         return result
