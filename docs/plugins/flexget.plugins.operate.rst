@@ -25,18 +25,18 @@ operate Package
     :undoc-members:
     :show-inheritance:
 
-:mod:`feed_execution` Module
+:mod:`task_execution` Module
 ----------------------------
 
-.. automodule:: flexget.plugins.operate.feed_execution
+.. automodule:: flexget.plugins.operate.task_execution
     :members:
     :undoc-members:
     :show-inheritance:
 
-:mod:`feed_priority` Module
+:mod:`task_priority` Module
 ---------------------------
 
-.. automodule:: flexget.plugins.operate.feed_priority
+.. automodule:: flexget.plugins.operate.task_priority
     :members:
     :undoc-members:
     :show-inheritance:

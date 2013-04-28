@@ -1,8 +1,35 @@
-Develop
-=======
+Introduction
+============
 
 We welcome all new developers and contributors with very friendly community.
 Join #FlexGet @ freenode.
+
+Technologies used
+-----------------
+
+List of external libraries and utilities. As for new libraries, we require that all of them are
+installable on Windows trough ``pip``. This will exclude things that require compilers like LXML.
+
+Core
+~~~~
+
+* SQLAlchemy
+* BeautifulSoup
+* Feedparser
+* Python-Requests
+* PyNBZ
+* Jinja2
+* PyYaml
+* Some smaller misc libraries
+
+WebUI
+~~~~~
+
+* Flask
+* Jinja2
+* CherryPy
+
+CherryPy is only used for WSGI server.
 
 How do I get started?
 ---------------------
@@ -54,9 +81,35 @@ By default no online tests are executed, these can be enabled with ``--online``
 argument. There are other ways to run the tests as well, more specifically
 we use `nose`_ framework.
 
+Run single test file via nose::
+
+  nosetests test_file
+
+Run single test suite (class)::
+
+  nosetests test_file:class
+
+Run single test case from suite::
+
+  nosetests test_file:class.case
+
+Live example::
+
+  nosetests test_seriesparser:TestSeriesParser.test_basic
+
+.. NOTE::
+
+   Don't use .py extension or include path with these. Configuration file ``setup.cfg`` defines
+   needed parameters for Nose.
+
+Project has `Jenkins CI server`_ which polls master branch and makes runs tests
+and makes new build if they pass.
+
 Unit tests are not mandatory for a plugin to be included in the FlexGet
 distribution but it makes maintaining our code trough project life and
 refactoring so much easier.
+
+.. _Jenkins CI server: http://ci.flexget.com
 
 Code Style
 ~~~~~~~~~~

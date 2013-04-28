@@ -22,7 +22,9 @@ Instructions for aspiring developer
 .. toctree::
    :maxdepth: 2
 
-   develop/develop
+   develop/index
+   develop/mock
+   develop/tdd
 
 
 Core documentation
