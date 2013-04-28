@@ -17,10 +17,10 @@ metainfo Package
     :undoc-members:
     :show-inheritance:
 
-:mod:`feed` Module
+:mod:`task` Module
 ------------------
 
-.. automodule:: flexget.plugins.metainfo.feed
+.. automodule:: flexget.plugins.metainfo.task
     :members:
     :undoc-members:
     :show-inheritance:
