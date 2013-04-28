@@ -14,7 +14,7 @@ class InputFtpList(object):
     Configuration:
       ftp_list:
         config:
-            use-ssl: 0
+            use-ssl: no
             name: <ftp name>
             username: <username>
             password: <password>
@@ -36,21 +36,27 @@ class InputFtpList(object):
         config.accept('text', key='password', required=True)
         config.accept('text', key='host', required=True)
         config.accept('integer', key='port', required=True)
-        config.accept('integer', key='use-ssl')
-
+        config.accept('boolean', key='use-ssl')
         return root
 
+    def prepare_config(self, config):
+        config.setdefault('use-ssl', False)
+        return config
+
     def on_task_input(self, task, config):
-        if config['config']['use-ssl'] == 1:
+        config = self.prepare_config(config)
+        conectionConfig = config['config']
+
+        if conectionConfig['use-ssl']:
             ftp = ftplib.FTP_TLS()
         else:
             ftp = ftplib.FTP()
 
         #ftp.set_debuglevel(2)
-        log.debug('Trying connecting to: %s', (config['config']['host']))
+        log.debug('Trying connecting to: %s', (conectionConfig['host']))
         try: 
-            ftp.connect(config['config']['host'], config['config']['port'])
-            ftp.login(config['config']['username'], config['config']['password'])
+            ftp.connect(conectionConfig['host'], conectionConfig['port'])
+            ftp.login(conectionConfig['username'], conectionConfig['password'])
         except ftplib.all_errors, e:
             raise PluginError(e)
 
@@ -60,8 +66,8 @@ class InputFtpList(object):
         ftp.set_pasv(True)
         entries = []
         for path in config['dirs']:
-            baseurl = "ftp://%s:%s@%s:%s/" % (config['config']['username'], config['config']['password'], 
-                      config['config']['host'], config['config']['port']) 
+            baseurl = "ftp://%s:%s@%s:%s/" % (conectionConfig['username'], conectionConfig['password'], 
+                      conectionConfig['host'], conectionConfig['port']) 
 
             try:
                 dirs = ftp.nlst(path)
