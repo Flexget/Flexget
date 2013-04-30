@@ -69,7 +69,6 @@ class OutputProwl(object):
             try:
                 event = entry.render(event)
             except RenderError as e:
-                event = entry['event']
                 log.error('Error rendering jinja event: %s' % e)
 
             # If description has jinja template, render it
