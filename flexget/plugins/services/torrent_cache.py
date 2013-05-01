@@ -7,9 +7,7 @@ from flexget.plugin import register_plugin, priority
 log = logging.getLogger('torrent_cache')
 
 MIRRORS = ['http://torrage.com/torrent/',
-           'https://torcache.net/torrent/',
-           #'http://zoink.it/torrent/',
-           'http://torrage.ws/torrent/']
+           'https://torcache.net/torrent/']
 
 
 class TorrentCache(object):
