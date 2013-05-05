@@ -228,10 +228,12 @@ class Manager(object):
         try:
             self.config = yaml.safe_load(file(config)) or {}
         except Exception as e:
-            log.critical(e)
+            msg = str(e).replace('\n', ' ')
+            msg = ' '.join(msg.split())
+            log.critical(msg)
             print ''
             print '-' * 79
-            print ' Malformed configuration file, common reasons:'
+            print ' Malformed configuration file (check messages above). Common reasons:'
             print '-' * 79
             print ''
             print ' o Indentation error'
@@ -349,7 +351,10 @@ class Manager(object):
 #            print 'indentation: %s, prev_ind: %s, prev_mapping: %s, prev_list: %s, cur_list: %s' % \
 #                  (indentation, prev_indentation, prev_mapping, prev_list, cur_list)
 
-            if '\t' in line:
+            if ':\t' in line:
+                log.critical('Line %s has TAB character after : character. '
+                             'DO NOT use tab key when editing config!' % line_num)
+            elif '\t' in line:
                 log.warning('Line %s has tabs, use only spaces!' % line_num)
             if isodd(indentation):
                 log.warning('Config line %s has odd (uneven) indentation' % line_num)
