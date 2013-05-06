@@ -1,12 +1,23 @@
 from __future__ import unicode_literals, division, absolute_import
 from datetime import datetime
 import logging
+
 from sqlalchemy import Column, Integer, Boolean, String, Unicode, DateTime
-from flexget.schema import versioned_base
+
+from flexget import schema
 from flexget.plugin import priority
+from flexget.utils.sqlalchemy_utils import table_add_column
 
 log = logging.getLogger('queue')
-Base = versioned_base('queue', 0)
+Base = schema.versioned_base('queue', 1)
+
+
+@schema.upgrade('queue')
+def upgrade(ver, session):
+    if ver == 0:
+        table_add_column('queue', 'last_emit', DateTime, session)
+        ver = 1
+    return ver
 
 
 class QueuedItem(Base):
@@ -15,6 +26,7 @@ class QueuedItem(Base):
     title = Column(Unicode)
     added = Column(DateTime)
     immortal = Column(Boolean)
+    last_emit = Column(DateTime)
     # These fields are populated when the queue item has been downloaded
     downloaded = Column(DateTime)
     entry_title = Column(Unicode)
