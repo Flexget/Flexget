@@ -9,14 +9,17 @@ from flexget.plugin import priority
 from flexget.utils.sqlalchemy_utils import table_add_column
 
 log = logging.getLogger('queue')
-Base = schema.versioned_base('queue', 1)
+Base = schema.versioned_base('queue', 2)
 
 
 @schema.upgrade('queue')
 def upgrade(ver, session):
-    if ver == 0:
+    if False:  # ver == 0: disable this, since we don't have a remove column function
         table_add_column('queue', 'last_emit', DateTime, session)
         ver = 1
+    if ver < 2:
+        # We don't have a remove column for 'last_emit', do nothing
+        ver = 2
     return ver
 
 
@@ -26,7 +29,6 @@ class QueuedItem(Base):
     title = Column(Unicode)
     added = Column(DateTime)
     immortal = Column(Boolean)
-    last_emit = Column(DateTime)
     # These fields are populated when the queue item has been downloaded
     downloaded = Column(DateTime)
     entry_title = Column(Unicode)

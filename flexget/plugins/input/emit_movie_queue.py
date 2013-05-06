@@ -25,7 +25,6 @@ class EmitMovieQueue(object):
         advanced = root.accept('dict')
         advanced.accept('boolean', key='year')
         advanced.accept('boolean', key='quality')
-        advanced.accept('interval', key='try_every')
         return root
 
     def prepare_config(self, config):
@@ -33,22 +32,16 @@ class EmitMovieQueue(object):
             config = {}
         config.setdefault('year', True)
         config.setdefault('quality', False)
-        config.setdefault('try_every', '0 seconds')
         return config
 
     def on_task_input(self, task, config):
         if not config:
             return
         config = self.prepare_config(config)
-        max_last_emit = datetime.utcnow() - parse_timedelta(config['try_every'])
 
         entries = []
 
         for queue_item in queue_get(session=task.session):
-            if queue_item.last_emit and queue_item.last_emit > max_last_emit:
-                log.debug('Waiting to emit %s', queue_item.title)
-                continue
-            queue_item.last_emit = datetime.utcnow()
             entry = Entry()
             # make sure the entry has IMDB fields filled
             entry['url'] = ''
