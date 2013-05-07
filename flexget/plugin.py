@@ -299,7 +299,9 @@ class PluginInfo(dict):
             self.schema = {}
 
         if self.schema is not None:
-            config_schema.register_schema('/schema/plugin/%s' % self.name, self.schema)
+            location = '/schema/plugin/%s' % self.name
+            self.schema['id'] = location
+            config_schema.register_schema(location, self.schema)
 
         if self.name in plugins:
             PluginInfo.dupe_counter += 1
@@ -479,7 +481,7 @@ def get_plugins(phase=None, group=None, context=None, category=None, min_api=Non
 def plugin_schemas(**kwargs):
     """Create a dict schema that matches plugins specified by `kwargs`"""
     return {'type': 'object',
-            'properties': dict((p.name, {'$ref': '/schema/plugin/%s' % p.name}) for p in get_plugins(**kwargs)),
+            'properties': dict((p.name, {'$ref': p.schema['id']}) for p in get_plugins(**kwargs)),
             'additionalProperties': False}
 
 
