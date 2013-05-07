@@ -149,10 +149,15 @@ class SchemaValidator(jsonschema.Draft4Validator):
     def __init__(self, schema):
         resolver = RefResolver.from_schema(schema)
         super(SchemaValidator, self).__init__(schema, resolver=resolver, format_checker=format_checker)
+        self.set_defaults = False
 
-    def iter_errors(self, instance, _schema=None):
-        for e in super(SchemaValidator, self).iter_errors(instance, _schema=_schema):
-            yield ValidationError.create_from(e)
+    def iter_errors(self, instance, _schema=None, set_defaults=False):
+        self.set_defaults = set_defaults
+        try:
+            for e in super(SchemaValidator, self).iter_errors(instance, _schema=_schema):
+                yield ValidationError.create_from(e)
+        finally:
+            self.set_defaults = False
 
     def validate_anyOf(self, *args, **kwargs):
         for error in super(SchemaValidator, self).validate_anyOf(*args, **kwargs):
@@ -190,9 +195,10 @@ class SchemaValidator(jsonschema.Draft4Validator):
     def validate_properties(self, properties, instance, schema):
         if not self.is_type(instance, 'object'):
             return
-        for key, subschema in properties.iteritems():
-            if 'default' in subschema:
-                instance.setdefault(key, subschema['default'])
+        if self.set_defaults:
+            for key, subschema in properties.iteritems():
+                if 'default' in subschema:
+                    instance.setdefault(key, subschema['default'])
         for error in super(SchemaValidator, self).validate_properties(properties, instance, schema):
             yield error
 
