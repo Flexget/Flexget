@@ -22,14 +22,14 @@ class FilterContentFilter(object):
     """
 
     schema = {
-        'type': 'object',
-        'properties': {
+        "type": "object",
+        "properties": {
             # These two properties allow a string or list of strings
-            'require': one_or_more({'type': 'string'}),
-            'reject': one_or_more({'type': 'string'}),
-            'strict': {'type': 'boolean'}
+            "require": one_or_more({"type": "string"}),
+            "reject": one_or_more({"type": "string"}),
+            "strict": {"type": "boolean", "default": False}
         },
-        'additionalProperties': False
+        "additionalProperties": False
     }
 
     def get_config(self, task):
@@ -94,7 +94,7 @@ class FilterContentFilter(object):
             self.parse_torrent_files(entry)
             if self.process_entry(task, entry):
                 task.rerun()
-            elif not 'content_files' in entry and config.get('strict'):
+            elif not 'content_files' in entry and config['strict']:
                 entry.reject('no content files parsed for entry', remember=True)
                 task.rerun()
 

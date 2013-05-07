@@ -55,8 +55,8 @@ class PluginDownload(object):
         'format': 'path',
         'properties': {
             'path': {'type': 'string', 'format': 'path'},
-            'fail_html': {'type': 'boolean'},
-            'overwrite': {'type': 'boolean'}
+            'fail_html': {'type': 'boolean', 'default': True},
+            'overwrite': {'type': 'boolean', 'default': False}
         },
         'additionalProperties': False
     }
@@ -79,7 +79,6 @@ class PluginDownload(object):
             config = {'path': config}
         if not isinstance(config, dict):
             config = {}
-        config.setdefault('fail_html', True)
         if not config.get('path'):
             config['require_path'] = True
         return config

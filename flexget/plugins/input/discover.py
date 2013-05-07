@@ -26,9 +26,10 @@ class Discover(object):
         'properties': {
             'what': {'type': 'array', 'items': {'$ref': '/schema/plugins?phase=input'}},
             'from': {'type': 'array', 'items': {'$ref': '/schema/plugins?group=search'}},
-            'type': {'type': 'string', 'enum': ['any', 'normal', 'exact', 'movies']},
+            'type': {'type': 'string', 'enum': ['any', 'normal', 'exact', 'movies'], 'default': 'normal'},
             'limit': {'type': 'integer', 'minimum': 1}
         },
+        'required': ['what', 'from'],
         'additionalProperties': False
     }
 
