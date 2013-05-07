@@ -151,13 +151,22 @@ class SchemaValidator(jsonschema.Draft4Validator):
         super(SchemaValidator, self).__init__(schema, resolver=resolver, format_checker=format_checker)
         self.set_defaults = False
 
-    def iter_errors(self, instance, _schema=None, set_defaults=False):
-        self.set_defaults = set_defaults
+    def process_config(self, config):
+        """
+        Validates the instance, and sets defaults within it.
+
+        :returns: A list with :class:`ValidationError`s if any
+
+        """
+        self.set_defaults = True
         try:
-            for e in super(SchemaValidator, self).iter_errors(instance, _schema=_schema):
-                yield ValidationError.create_from(e)
+            return list(self.iter_errors(config))
         finally:
             self.set_defaults = False
+
+    def iter_errors(self, instance, _schema=None):
+        for e in super(SchemaValidator, self).iter_errors(instance, _schema=_schema):
+            yield ValidationError.create_from(e)
 
     def validate_anyOf(self, *args, **kwargs):
         for error in super(SchemaValidator, self).validate_anyOf(*args, **kwargs):
