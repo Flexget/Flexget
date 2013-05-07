@@ -128,12 +128,12 @@ class TestSchemaValidator(FlexGetBase):
         schema = {"properties": {"p": {"default": 5}}}
         v = config_schema.SchemaValidator(schema)
         config = {}
-        v.validate(config, set_defaults=True)
+        v.process_config(config)
         assert config["p"] == 5
 
     def test_defaults_does_not_override_explicit_value(self):
         schema = {"properties": {"p": {"default": 5}}}
         v = config_schema.SchemaValidator(schema)
         config = {"p": "foo"}
-        v.validate(config, set_defaults=True)
+        v.process_config(config)
         assert config["p"] == "foo"
