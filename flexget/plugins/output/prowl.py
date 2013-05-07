@@ -65,6 +65,12 @@ class OutputProwl(object):
             priority = entry.get('priority', config['priority'])
             description = config.get('description', entry['title'])
 
+            # If event has jinja template, render it
+            try:
+                event = entry.render(event)
+            except RenderError as e:
+                log.error('Error rendering jinja event: %s' % e)
+
             # If description has jinja template, render it
             try:
                 description = entry.render(description)
