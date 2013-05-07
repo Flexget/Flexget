@@ -96,11 +96,11 @@ class InputRSS(object):
             'password': {'type': 'string'},
             'title': {'type': 'string'},
             'link': one_or_more({'type': 'string'}),
-            'silent': {'type': 'boolean'},
-            'ascii': {'type': 'boolean'},
+            'silent': {'type': 'boolean', 'default': False},
+            'ascii': {'type': 'boolean', 'default': False},
             'filename': {'type': 'boolean'},
-            'group_links': {'type': 'boolean'},
-            'all_entries': {'type': 'boolean'},
+            'group_links': {'type': 'boolean', 'default': False},
+            'all_entries': {'type': 'boolean', 'default': True},
             'other_fields': {'type': 'array', 'items': {
                 # Items can be a string, or a dict with a string value
                 'type': ['string', 'object'], 'additionalProperties': {'type': 'string'}

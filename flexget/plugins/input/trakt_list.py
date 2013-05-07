@@ -36,7 +36,7 @@ class TraktList(object):
             'movies': {'enum': ['all', 'loved', 'hated', 'collection', 'watchlist']},
             'series': {'enum': ['all', 'loved', 'hated', 'collection', 'watched', 'watchlist']},
             'custom': {'type': 'string'},
-            'strip_dates': {'type': 'boolean'}
+            'strip_dates': {'type': 'boolean', 'default': False}
         },
         'required': ['username', 'api_key'],
         'additionalProperties': False

@@ -20,16 +20,16 @@ class FilterExistsSeries(object):
     """
 
     schema = {
-        'anyOf': [
-            one_or_more({'type': 'string', 'format': 'path'}),
+        "anyOf": [
+            one_or_more({"type": "string", "format": "path"}),
             {
-                'type': 'object',
-                'properties': {
-                    'path': one_or_more({'type': 'string', 'format': 'path'}),
-                    'allow_different_qualities': {'enum': ['better', True, False]}
+                "type": "object",
+                "properties": {
+                    "path": one_or_more({"type": "string", "format": "path"}),
+                    "allow_different_qualities": {"enum": ["better", True, False], "default": False}
                 },
-                'required': ['path'],
-                'additionalProperties': False
+                "required": ["path"],
+                "additionalProperties": False
             }
         ]
     }
