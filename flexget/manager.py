@@ -404,7 +404,7 @@ class Manager(object):
 
         """
         validator = config_schema.SchemaValidator(_task_config_schema)
-        return list(validator.iter_errors(self.config))
+        return list(validator.iter_errors(self.config, set_defaults=True))
 
     def init_sqlalchemy(self):
         """Initialize SQLAlchemy"""

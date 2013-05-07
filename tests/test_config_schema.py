@@ -21,6 +21,8 @@ class TestSchemaValidator(FlexGetBase):
             except jsonschema.SchemaError as e:
                 assert False, 'plugin `%s` has an invalid schema. %s %s %s' % (
                     path, '/'.join(str(p) for p in e.path), e.validator, e.message)
+            except Exception as e:
+                assert False, 'plugin `%s` has an invalid schema. %s' % (path, e)
 
     def test_refs_in_schemas_are_resolvable(self):
         def refs_in(item):
@@ -126,12 +128,12 @@ class TestSchemaValidator(FlexGetBase):
         schema = {"properties": {"p": {"default": 5}}}
         v = config_schema.SchemaValidator(schema)
         config = {}
-        v.validate(config)
+        v.validate(config, set_defaults=True)
         assert config["p"] == 5
 
     def test_defaults_does_not_override_explicit_value(self):
         schema = {"properties": {"p": {"default": 5}}}
         v = config_schema.SchemaValidator(schema)
         config = {"p": "foo"}
-        v.validate(config)
+        v.validate(config, set_defaults=True)
         assert config["p"] == "foo"

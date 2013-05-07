@@ -564,7 +564,7 @@ class Task(object):
         # Don't validate commented out plugins
         schema['patternProperties'] = {'^_': {}}
         validator = config_schema.SchemaValidator(schema)
-        return list(validator.iter_errors(config))
+        return list(validator.iter_errors(config, set_defaults=True))
 
 
 task_config_schema = {
