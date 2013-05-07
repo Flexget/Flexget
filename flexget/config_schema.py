@@ -221,7 +221,7 @@ def one_or_more(schema):
 
     return {
         "anyOf": [
-            schema,
-            {"type": "array", "items": schema, "minItems": 1}
+            {"type": "array", "items": schema, "minItems": 1},
+            schema
         ]
     }
