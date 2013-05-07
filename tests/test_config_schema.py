@@ -121,3 +121,17 @@ class TestSchemaValidator(FlexGetBase):
         errors = list(v.iter_errors(1.5))
         assert len(errors) == 1
         assert errors[0].validator == 'minimum'
+
+    def test_defaults_are_filled(self):
+        schema = {"properties": {"p": {"default": 5}}}
+        v = config_schema.SchemaValidator(schema)
+        config = {}
+        v.validate(config)
+        assert config["p"] == 5
+
+    def test_defaults_does_not_override_explicit_value(self):
+        schema = {"properties": {"p": {"default": 5}}}
+        v = config_schema.SchemaValidator(schema)
+        config = {"p": "foo"}
+        v.validate(config)
+        assert config["p"] == "foo"

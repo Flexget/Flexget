@@ -187,6 +187,15 @@ class SchemaValidator(jsonschema.Draft4Validator):
             else:
                 yield error
 
+    def validate_properties(self, properties, instance, schema):
+        if not self.is_type(instance, 'object'):
+            return
+        for key, subschema in properties.iteritems():
+            if 'default' in subschema:
+                instance.setdefault(key, subschema['default'])
+        for error in super(SchemaValidator, self).validate_properties(properties, instance, schema):
+            yield error
+
 
 def one_or_more(schema):
     """
