@@ -1,8 +1,11 @@
-{% extends "configure/configure.html" %}
-{% block configure %}
+{% extends "layout.html" %}
+
+{% block head %}
     <link rel="stylesheet" href="{{ url_for("static", filename="css/page.index.css") }}" />
     <link rel="stylesheet" href="{{ url_for("static", filename="renderers/basic.jsonary.css") }}" />
     <link rel="stylesheet" href="{{ url_for("static", filename="renderers/common.css") }}" />
+{% endblock %}
+{% block main %}
     <table width=100%>
         <tr>
             <td width=80%>
