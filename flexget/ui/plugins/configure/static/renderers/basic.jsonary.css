@@ -44,11 +44,11 @@ textarea {
 }
 
 .json-object-key {
-	text-align: right;
+	text-align: left;
 	vertical-align: top;
 	font-style: italic;
 	color: #840;
-	padding-left: 2em;
+	padding-left: 1em;
 }
 
 .json-object-delete {

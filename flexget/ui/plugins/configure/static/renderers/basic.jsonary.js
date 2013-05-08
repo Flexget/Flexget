@@ -272,7 +272,7 @@
 	Jsonary.render.register({	
 		renderHtml: function (data, context) {
 			var uiState = context.uiState;
-			var result = '{<table class="json-object"><tbody>';
+			var result = ' <table class="json-object"><tbody>';
 			data.properties(function (key, subData) {
 				result += '<tr class="json-object-pair">';
 				result +=	'<td class="json-object-key"><div class="json-object-key-text">' + escapeHtml(key) + ':</div></td>';
@@ -301,7 +301,7 @@
 					result += '<span class="json-object-add">add: ' + addLinkHtml + '</span>';
 				}
 			}
-			return result + "}";
+			return result + " ";
 		},
 		action: function (context, actionName, arg1) {
 			var data = context.data;
@@ -329,7 +329,7 @@
 		renderHtml: function (data, context) {
 			var tupleTypingLength = data.schemas().tupleTypingLength();
 			var maxItems = data.schemas().maxItems();
-			var result = "[";
+			var result = " ";
 			data.indices(function (index, subData) {
 				result += '<div class="json-array-item">';
 				result += '<span class="json-array-value">' + context.renderHtml(subData) + '</span>';
@@ -341,7 +341,7 @@
 					result += context.actionHtml(addHtml, "add");
 				}
 			}
-			return result + "]";
+			return result + " ";
 		},
 		action: function (context, actionName) {
 			var data = context.data;
@@ -562,10 +562,10 @@
 			var valueSpan = document.createElement("a");
 			if (data.value()) {
 				valueSpan.setAttribute("class", "json-boolean-true");
-				valueSpan.innerHTML = "true";
+				valueSpan.innerHTML = "yes";
 			} else {
 				valueSpan.setAttribute("class", "json-boolean-false");
-				valueSpan.innerHTML = "false";
+				valueSpan.innerHTML = "no";
 			}
 			element.appendChild(valueSpan);
 			if (!data.readOnly()) {
@@ -654,7 +654,7 @@
 				} else if (typeof enumValues[0] == "number") {
 					element.innerHTML = '<span class="json-number">' + enumValues[0] + '</span>';
 				} else if (typeof enumValues[0] == "boolean") {
-					var text = (enumValues[0] ? "true" : "false");
+					var text = (enumValues[0] ? "yes" : "no");
 					element.innerHTML = '<span class="json-boolean-' + text + '">' + text + '</span>';
 				} else {
 					element.innerHTML = '<span class="json-raw">' + escapeHtml(JSON.stringify(enumValues[0])) + '</span>';
