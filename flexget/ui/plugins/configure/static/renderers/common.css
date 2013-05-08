@@ -111,3 +111,10 @@
 	background-color: #E8F0F8;
 	background-image: none;
 }
+
+.button.disabled, .button.disabled:hover {
+	border-color: #CCC;
+	color: #888;
+	background-color: #EEE;
+	background-image: none;
+}
