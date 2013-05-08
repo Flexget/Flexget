@@ -19,8 +19,9 @@ class UrlRewriteNewzleech(object):
 
     # Search API
     @internet(log)
-    def search(self, query, comparator, config=None):
+    def search(self, entry, comparator, config=None):
         # TODO: Implement comparator matching
+        query = entry['title']
         url = u'http://newzleech.com/?%s' % str(urllib.urlencode({'q': query.encode('latin1'),
                                                                   'm': 'search', 'group': '', 'min': 'min',
                                                                   'max': 'max', 'age': '', 'minage': '', 'adv': ''}))
