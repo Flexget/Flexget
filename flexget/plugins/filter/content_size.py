@@ -10,13 +10,13 @@ log = logging.getLogger('content_size')
 class FilterContentSize(object):
 
     schema = {
-        "type": "object",
-        "properties": {
-            "min": {"type": "number"},
-            "max": {"type": "number"},
-            "strict": {"type": "boolean", "default": True}
+        'type': 'object',
+        'properties': {
+            'min': {'type': 'number'},
+            'max': {'type': 'number'},
+            'strict': {'type': 'boolean', 'default': True}
         },
-        "additionalProperties": False
+        'additionalProperties': False
     }
 
     def process_entry(self, task, entry, config, remember=True):
