@@ -27,7 +27,7 @@ class AppleTrailers(InputRSS):
     rss_url = 'http://trailers.apple.com/trailers/home/rss/newtrailers.rss'
     qualities = ['ipod', 320, '320', 480, '480', '640w', '480p', '720p', '1080p']
 
-    schema = {"enum": qualities}
+    schema = {'enum': qualities}
 
     # Run before headers plugin
     @priority(135)
