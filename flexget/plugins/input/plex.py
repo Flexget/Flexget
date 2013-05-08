@@ -38,9 +38,8 @@ class InputPlex(object):
 
     def on_task_input(self, task, config):
         config = self.prepare_config(config)
-        url = "http://" + config['server'] + ":" + str(config['port']) + "/library/sections/" + str(config['section']) + "/all"
         try:
-            datasource = urllib2.urlopen(url)
+            datasource = urllib2.urlopen("http://%s:%d/library/sections/%d/all" % (config['server'], config['port'], config['section']))
         except urllib2.URLError, (err):
             raise PluginError('Error retrieving source: %s' % err)
         dom = parse(datasource)
@@ -53,7 +52,7 @@ class InputPlex(object):
             title=re.sub(r'[^A-Za-z0-9- ]', r'', title)
             e = Entry()
             e['title'] = title
-            e['url'] = "noop"
+            e['url'] = "NULL"
             entries.append(e)
         return entries
 
