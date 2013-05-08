@@ -1,0 +1,19 @@
+body {
+  background-color: #F8F8F0;
+  padding-bottom: 160px;
+}
+
+#url-bar {
+  width: 80%;
+  float: right;
+}
+
+#main {
+}
+
+.loading {
+	background-image: url('loading.gif');
+	background-position: bottom;
+	background-repeat: no-repeat;
+	padding-bottom: 32px;
+}
