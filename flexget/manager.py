@@ -24,7 +24,9 @@ manager = None
 DB_CLEANUP_INTERVAL = timedelta(days=7)
 
 # Validator that handles root structure of config.
-_task_config_schema = {'type': 'object', 'additionalProperties': False}
+_root_config_schema = {'type': 'object', 'additionalProperties': False}
+# TODO: Is /schema/root this the best place for this?
+config_schema.register_schema('/schema/root', _root_config_schema)
 
 
 def register_config_key(key, schema, required=False):
@@ -37,9 +39,9 @@ def register_config_key(key, schema, required=False):
     :param bool required:
       Specify whether this is a mandatory key.
     """
-    _task_config_schema.setdefault('properties', {})[key] = schema
+    _root_config_schema.setdefault('properties', {})[key] = schema
     if required:
-        _task_config_schema.setdefault('required', []).append(key)
+        _root_config_schema.setdefault('required', []).append(key)
 
 
 def useExecLogging(func):
@@ -403,7 +405,7 @@ class Manager(object):
         :returns: A list of `ValidationError`s
 
         """
-        validator = config_schema.SchemaValidator(_task_config_schema)
+        validator = config_schema.SchemaValidator(_root_config_schema)
         return validator.process_config(self.config)
 
     def init_sqlalchemy(self):

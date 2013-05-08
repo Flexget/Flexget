@@ -15,7 +15,10 @@ log = logging.getLogger('ui.config')
 def root():
     if request.method == 'POST':
         manager.config = json.loads(request.data)
-    return jsonify(manager.config)
+    result = jsonify(manager.config)
+    # TODO: This should not be hard coded
+    result.headers[b'Content-Type'] += '; profile=/schema/root'
+    return result
 
 
 def getset_item(obj, item, set=None):
@@ -45,9 +48,13 @@ def with_path(path):
         elem = path[-1]
         if request.method == 'POST':
             getset_item(result, elem, set=json.loads(request.data))
-        return jsonify(getset_item(result, elem))
+        result = jsonify(getset_item(result, elem))
     except LookupError as e:
         return unicode(e), 404
+    # TODO: This should not be hard coded
+    if len(path) == 2 and path[0] in ['tasks', 'presets']:
+        result.headers[b'Content-Type'] += '; profile=/schema/plugins?context=task'
+    return result
 
 
 register_plugin(config)
