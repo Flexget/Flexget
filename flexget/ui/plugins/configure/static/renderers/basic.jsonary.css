@@ -64,6 +64,7 @@ textarea {
     list-style: none;
     padding: 0;
 	display: block;
+	padding-left: 2.2em;
 	color: #888;
 	font-size: 0.9em;
 }
