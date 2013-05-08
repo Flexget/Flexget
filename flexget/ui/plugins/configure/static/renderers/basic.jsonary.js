@@ -283,9 +283,9 @@
 			if (!data.readOnly()) {
 				var addLinkHtml = "";
 				var schemas = data.schemas();
-				var definedProperties = schemas.definedProperties();
+				var definedProperties = schemas.definedProperties().sort();
 				var keyFunction = function (index, key) {
-					var addHtml = '<span class="json-object-add-key">' + escapeHtml(key) + '</span>';
+					var addHtml = '<li class="json-object-add-key">' + escapeHtml(key) + '</li>';
 					addLinkHtml += context.actionHtml(addHtml, "add-named", key);
 				};
 				for (var i = 0; i < definedProperties.length; i++) {
@@ -294,11 +294,11 @@
 					}
 				}
 				if (schemas.allowedAdditionalProperties()) {
-					var newHtml = '<span class="json-object-add-key-new">+ new</span>';
+					var newHtml = '<li class="json-object-add-key-new">+ new</li>';
 					addLinkHtml += context.actionHtml(newHtml, "add-new");
 				}
 				if (addLinkHtml != "") {
-					result += '<span class="json-object-add">add: ' + addLinkHtml + '</span>';
+					result += 'add:<ul class="json-object-add">' + addLinkHtml + '</ul>';
 				}
 			}
 			return result + " ";

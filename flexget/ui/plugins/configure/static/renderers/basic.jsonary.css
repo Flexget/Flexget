@@ -61,13 +61,17 @@ textarea {
 }
 
 .json-object-add {
+    list-style: none;
+    padding: 0;
 	display: block;
-	padding-left: 2.2em;
 	color: #888;
 	font-size: 0.9em;
 }
 
 .json-object-add-key, .json-object-add-key-new {
+    display: list-item;
+    float: left;
+    width: 12em;
 	text-decoration: none;
 	margin-left: 1em;
 	color: #000;
