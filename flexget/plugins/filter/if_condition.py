@@ -28,13 +28,13 @@ class FilterIf(object):
     Actions include accept, reject, and fail, as well as the ability to run other filter plugins on the entries."""
 
     schema = {
-        "type": "array",
-        "items": {
-            "type": "object",
-            "additionalProperties": {
-                "anyOf": [
-                    {"$ref": "/schema/plugins"},
-                    {"enum": ["accept", 'reject', 'fail']}
+        'type': 'array',
+        'items': {
+            'type': 'object',
+            'additionalProperties': {
+                'anyOf': [
+                    {'$ref': '/schema/plugins'},
+                    {'enum': ['accept', 'reject', 'fail']}
                 ]
             }
         }

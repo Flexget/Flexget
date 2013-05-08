@@ -22,14 +22,14 @@ class FilterContentFilter(object):
     """
 
     schema = {
-        "type": "object",
-        "properties": {
+        'type': 'object',
+        'properties': {
             # These two properties allow a string or list of strings
-            "require": one_or_more({"type": "string"}),
-            "reject": one_or_more({"type": "string"}),
-            "strict": {"type": "boolean", "default": False}
+            'require': one_or_more({'type': 'string'}),
+            'reject': one_or_more({'type': 'string'}),
+            'strict': {'type': 'boolean', 'default': False}
         },
-        "additionalProperties": False
+        'additionalProperties': False
     }
 
     def get_config(self, task):

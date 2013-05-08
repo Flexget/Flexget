@@ -20,14 +20,14 @@ class CrossMatch(object):
     """
 
     schema = {
-        "type": "object",
-        "properties": {
-            "fields": {"type": "array", "items": {"type": "string"}},
-            "action": {"enum": ["accept", "reject"]},
-            "from": {"type": "array", "items": {"$ref": "/schema/plugins?phase=input"}}
+        'type': 'object',
+        'properties': {
+            'fields': {'type': 'array', 'items': {'type': 'string'}},
+            'action': {'enum': ['accept', 'reject']},
+            'from': {'type': 'array', 'items': {'$ref': '/schema/plugins?phase=input'}}
         },
-        "required": ["fields", "action", "from"],
-        "additionalProperties": False
+        'required': ['fields', 'action', 'from'],
+        'additionalProperties': False
     }
 
     def on_task_filter(self, task, config):
