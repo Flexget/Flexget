@@ -718,7 +718,9 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
                     # Propers (can be boolean, or an interval string)
                     'propers': {'type': ['boolean', 'string'], 'format': 'interval'},
                     # Identified by
-                    'identified_by': {'enum': ['ep', 'date', 'sequence', 'id', 'auto']},
+                    'identified_by': {
+                        'type': 'string', 'enum': ['ep', 'date', 'sequence', 'id', 'auto'], 'default': 'auto'
+                    },
                     # Strict naming
                     'exact': {'type': 'boolean'},
                     # Watched

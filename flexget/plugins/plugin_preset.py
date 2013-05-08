@@ -24,16 +24,16 @@ class PluginPreset(object):
         - imdb
     """
 
+    schema = {
+        'oneOf': [
+            {'title': 'list of presets','type': 'array', 'items': {'type': 'string'}},
+            {'title': 'single preset', 'type': 'string'},
+            {'title': 'disable presets', 'type': 'boolean', 'enum': [False]}
+        ]
+    }
+
     def __init__(self):
         self.warned = False
-
-    def validator(self):
-        root = validator.factory()
-        root.accept('text')
-        root.accept('boolean')
-        presets = root.accept('list')
-        presets.accept('text')
-        return root
 
     def prepare_config(self, config):
         if config is None or isinstance(config, bool):
