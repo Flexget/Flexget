@@ -35,7 +35,8 @@ class SearchKAT(object):
         root.accept('boolean', key='verified')
         return root
 
-    def search(self, query, comparator, config):
+    def search(self, entry, comparator, config):
+        query = entry['title']
         comparator.set_seq1(query)
         name = comparator.search_string().lower()
         search_string = name

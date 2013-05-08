@@ -108,7 +108,7 @@ class Discover(object):
                 log.critical('Search plugin %s does not implement search method' % plugin_name)
             for entry in entries:
                 try:
-                    search_results = search.search(entry['title'], comparator, plugin_config)
+                    search_results = search.search(entry, comparator, plugin_config)
                     log.debug('Discovered %s entries from %s' % (len(search_results), plugin_name))
                     result.extend(search_results[:config.get('limit')])
                 except (PluginError, PluginWarning):
