@@ -115,12 +115,30 @@ class Discover(object):
                     log.debug('No results from %s' % plugin_name)
         return sorted(result, reverse=True, key=lambda x: x.get('search_sort'))
 
+    def execute_check_released(self, config, task, arg_entries):
+        entries = []
+        for entry in arg_entries:
+            log.info(entry['title'])
+            estimators = get_plugins_by_group('estimate_released')
+            for estimator in estimators:
+                # is_released can return None if it has no idea, True if released, False if not released
+                res = estimator.instance.is_released(task, entry)
+                if (res is None):
+                    continue
+                elif (res is False):
+                    break
+                elif (res is True):
+                    entries.append(entry)
+                    break
+        return entries
+
     @cached('discover')
     def on_task_input(self, task, config):
         entries = self.execute_inputs(config, task)
         log.verbose('Discovering %i titles ...' % len(entries))
         if len(entries) > 500:
             log.critical('Looks like your inputs in discover configuration produced over 500 entries, please reduce the amount!')
+        entries = self.execute_check_released(config, task, entries)
         return self.execute_searches(config, entries)
 
 
