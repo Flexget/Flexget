@@ -20,7 +20,7 @@ class FilterAllSeries(FilterSeriesBase):
     """
 
     schema = {
-        'anyOf': [
+        'oneOf': [
             {'type': 'boolean'},
             {'$ref': '/schema/plugin/series#/definitions/series_options'}
         ]

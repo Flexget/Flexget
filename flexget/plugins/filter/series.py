@@ -694,6 +694,7 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
         # subschema for reuse here and in dependent plugins
         'definitions': {
             'series_options': {
+                'title': 'series options',
                 'type': 'object',
                 'properties': {
                     'path': {'type': 'string', 'format': 'path'},
