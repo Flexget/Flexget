@@ -159,8 +159,58 @@ textarea {
 /**** String ****/
 
 .json-string {
+	white-space: pre;
 	white-space: pre-wrap;
 	border-radius: 3px;
+	font-size: inherit;
+	min-width: 5em;
+}
+
+.json-string-content-editable {
+	display: inline;
+	display: inline-block;
+	vertical-align: text-top;
+	background-color: #FFF;
+	background-color: rgba(255, 255, 255, 0.95);
+	outline: 1px solid #BBB;
+	border-radius: 0px;
+	color: #444;
+	margin: 0.3em;
+	padding: 0.3em;
+	font-family: inherit;
+	text-shadow: none;
+	font-size: 0.9em;
+	line-height: 1.2em;
+}
+
+.json-string-content-editable:focus {
+	color: #000;
+	border-color: #48C;
+	box-shadow: 0px 0px 10px #000;
+}
+
+.json-string-content-editable p {
+	display: block !important;
+	margin: 0px !important;
+	padding: 0px !important;
+}
+
+.json-string-content-editable * {
+	position: static !important;
+	margin: 0px !important;
+	padding: 0px !important;
+	font-size: inherit !important;
+	font-family: inherit !important;
+	color: #000 !important;
+	background: none !important;
+	border: none !important;
+	outline: none !important;
+	font-weight: normal !important;
+	font-style: normal !important;
+	text-decoration: none !important;
+	text-transform: none !important;
+	font-variant: normal !important;
+	line-height: 1.2em !important;
 }
 
 textarea.json-string {

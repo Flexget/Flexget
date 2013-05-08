@@ -1,6 +1,6 @@
 (function () {
 	function escapeHtml(text) {
-		return text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("'", "&#39;").replace('"', "&quot;");
+		return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/'/g, "&#39;").replace(/"/g, "&quot;");
 	}
 	if (window.escapeHtml == undefined) {
 		window.escapeHtml = escapeHtml;
@@ -399,6 +399,49 @@
 		textarea.style.width = parseInt(style.width.substring(0, style.width.length - 2)) + 4 + "px";
 		textarea.style.height = parseInt(style.height.substring(0, style.height.length - 2)) + 4 + "px";
 	}
+	
+	function getText(element) {
+		var result = "";
+		for (var i = 0; i < element.childNodes.length; i++) {
+			var child = element.childNodes[i];
+			if (child.nodeType == 1) {
+				var tagName = child.tagName.toLowerCase();
+				if (tagName == "br") {
+					result += "\n";
+					continue;
+				}
+				if (child.tagName == "li") {
+					result += "\n*\t";
+				}
+				if (tagName == "p"
+					|| /^h[0-6]$/.test(tagName)
+					|| tagName == "header"
+					|| tagName == "aside"
+					|| tagName == "blockquote"
+					|| tagName == "footer"
+					|| tagName == "div"
+					|| tagName == "table"
+					|| tagName == "hr") {
+					if (result != "") {
+						result += "\n";
+					}
+				}
+				if (tagName == "td" || tagName == "th") {
+					result += "\t";
+				}
+				
+				result += getText(child);
+				
+				if (tagName == "tr") {
+					result += "\n";
+				}
+			} else if (child.nodeType == 3) {
+				result += child.nodeValue;
+			}
+		}
+		result = result.replace("\r\n", "\n");
+		return result;
+	}
 
 	// Edit string
 	Jsonary.render.register({
@@ -418,6 +461,18 @@
 			}
 		},
 		render: function (element, data, context) {
+			//Use contentEditable
+			if (element.contentEditable !== null) {
+				element.innerHTML = '<div class="json-string json-string-content-editable">' + escapeHtml(data.value()).replace(/\n/g, "<br>") + '</div>';
+				var valueSpan = element.childNodes[0];
+				valueSpan.contentEditable = "true";
+				valueSpan.onblur = function () {
+					var newString = getText(valueSpan);
+					data.setValue(newString);
+				};
+				return;
+			}
+			
 			if (typeof window.getComputedStyle != "function") {
 				return;
 			}
@@ -482,6 +537,11 @@
 			element = null;
 		},
 		update: function (element, data, context, operation) {
+			if (element.contentEditable !== null) {
+				var valueSpan = element.childNodes[0];
+				valueSpan.innerHTML = escapeHtml(data.value()).replace(/\n/g, "<br>");
+				return false;
+			};
 			if (operation.action() == "replace") {
 				var textarea = null;
 				for (var i = 0; i < element.childNodes.length; i++) {
@@ -539,11 +599,15 @@
 				var minimum = data.schemas().minimum();
 				if (minimum == null || data.value() > minimum + interval || data.value() == (minimum + interval) && !data.schemas().exclusiveMinimum()) {
 					result = context.actionHtml('<span class="json-number-decrement button">-</span>', 'decrement') + result;
+				} else {
+					result = '<span class="json-number-decrement button disabled">-</span>' + result;
 				}
 				
 				var maximum = data.schemas().maximum();
 				if (maximum == null || data.value() < maximum - interval || data.value() == (maximum - interval) && !data.schemas().exclusiveMaximum()) {
 					result += context.actionHtml('<span class="json-number-increment button">+</span>', 'increment');
+				} else {
+					result += '<span class="json-number-increment button disabled">+</span>';
 				}
 			}
 			return result;
