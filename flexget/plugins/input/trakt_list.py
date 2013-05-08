@@ -39,6 +39,12 @@ class TraktList(object):
             'strip_dates': {'type': 'boolean', 'default': False}
         },
         'required': ['username', 'api_key'],
+        'error_oneOf': 'Must specify one and only one of `movies`, `series` or `custom`',
+        'oneOf': [
+            {'title': 'movie list', 'required': ['movies']},
+            {'title': 'series list', 'required': ['series']},
+            {'title': 'custom list', 'required': ['custom']}
+        ],
         'additionalProperties': False
     }
 
