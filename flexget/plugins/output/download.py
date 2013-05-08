@@ -51,27 +51,21 @@ class PluginDownload(object):
     """
 
     schema = {
-        'type': ['boolean', 'string', 'object'],
-        'format': 'path',
-        'properties': {
-            'path': {'type': 'string', 'format': 'path'},
-            'fail_html': {'type': 'boolean', 'default': True},
-            'overwrite': {'type': 'boolean', 'default': False}
-        },
-        'additionalProperties': False
+        'oneOf': [
+            {
+                'title': 'specify options',
+                'type': 'object',
+                'properties': {
+                    'path': {'type': 'string', 'format': 'path'},
+                    'fail_html': {'type': 'boolean', 'default': True},
+                    'overwrite': {'type': 'boolean', 'default': False}
+                },
+                'additionalProperties': False
+            },
+            {'title': 'specify path', 'type': 'string', 'format': 'path'},
+            {'title': 'no options', 'type': 'boolean', 'enum': [True]}
+        ]
     }
-
-    def validator(self):
-        """Return config validator"""
-        from flexget import validator
-        root = validator.factory()
-        root.accept('path', allow_replacement=True)
-        root.accept('boolean')
-        advanced = root.accept('dict')
-        advanced.accept('path', key='path', allow_replacement=True)
-        advanced.accept('boolean', key='fail_html')
-        advanced.accept('boolean', key='overwrite')
-        return root
 
     def process_config(self, config):
         """Return plugin configuration in advanced form"""

@@ -219,9 +219,10 @@ def one_or_more(schema):
 
     """
 
+    schema.setdefault('title', 'single value')
     return {
-        "anyOf": [
-            {"type": "array", "items": schema, "minItems": 1},
+        'oneOf': [
+            {'title': 'multiple values', 'type': 'array', 'items': schema, 'minItems': 1},
             schema
         ]
     }
