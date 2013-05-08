@@ -1,4 +1,3 @@
-// jstl
 (function (publicApi) {
 	var templateMap = {};
 	var loadedUrls = {};
@@ -52,34 +51,48 @@
 		return {
 			toString: function () {return this.code;},
 			code: rawCode,
-			compile: function (directEvalFunction, constFunctions) {
-				return compile(this.code, directEvalFunction, constFunctions);
+			compile: function (directEvalFunction, constFunctions, additionalParams) {
+				return compile(this.code, directEvalFunction, constFunctions, additionalParams);
 			}
 		};
 	}
 
-	function compile(template, directEvalFunction, headerText) {
+	function compile(template, directEvalFunction, headerText, additionalParams) {
 		if (directEvalFunction == undefined) {
 			directEvalFunction = publicApi.defaultFunction;
 		}
 		if (headerText == undefined) {
 			headerText = publicApi.defaultHeaderCode;
 		}
+		if (additionalParams == undefined) {
+			additionalParams = {};
+		}
 		var constants = [];
 		var variables = [];
 		
 		var substitutionFunctionName = "subFunc" + Math.floor(Math.random()*1000000000);
-		var resultVariableName = "result" + Math.floor(Math.random()*1000000000);
 		var jscode = '(function () {\n';
 		
 		var directFunctions = [];
 		var directFunctionVarNames = [];
+		for (var key in additionalParams) {
+			if (additionalParams[key]) {
+				directFunctionVarNames.push(key);
+				directFunctions.push(additionalParams[key]);
+			}
+		}
 		var parts = (" " + template).split(/<\?js|<\?|<%/g);
 		var initialString = parts.shift().substring(1);
-		jscode += '	var ' + resultVariableName + ' = ' + JSON.stringify(initialString) + ';\n';
-		jscode += '	var echo = function (str) {' + resultVariableName + ' += str;};\n';
 		if (headerText) {
 			jscode += "\n" + headerText + "\n";
+		}
+		jscode += '	var _arguments = arguments;\n';
+		if (additionalParams['echo'] !== undefined) {
+			jscode += '	echo(' + JSON.stringify(initialString) + ');\n';
+		} else {
+			var resultVariableName = "result" + Math.floor(Math.random()*1000000000);
+			jscode += '	var ' + resultVariableName + ' = ' + JSON.stringify(initialString) + ';\n';
+			jscode += '	var echo = function (str) {' + resultVariableName + ' += str;};\n';
 		}
 		while (parts.length > 0) {
 			var part = parts.shift();
@@ -90,15 +103,26 @@
 			if (/\s/.test(embeddedCode.charAt(0))) {
 				jscode += "\n" + embeddedCode + "\n";
 			} else {
-				var argName = "fn" + Math.floor(Math.random()*10000000000);
-				directFunctionVarNames.push(argName);
-				directFunctions.push(directEvalFunction(embeddedCode));
-				jscode += "\n\t" + resultVariableName + " += " + argName + ".apply(this, arguments);\n";
+				var directFunction = directEvalFunction(embeddedCode) || defaultFunction(embeddedCode);
+				if (typeof directFunction == "string") {
+					jscode += "\n\t	echo(" + directFunction + ");\n";
+				} else {
+					directFunctions.push(directFunction);
+					var argName = "fn" + Math.floor(Math.random()*10000000000);
+					directFunctionVarNames.push(argName);
+					jscode += "\n	echo(" + argName + ".apply(this, _arguments));\n";
+				}
 			}
 			
-			jscode += '	' + resultVariableName + ' += ' + JSON.stringify(constant) + ';\n';
+			jscode += '	echo(' + JSON.stringify(constant) + ');\n';
 		}
-		jscode += '\n	return ' + resultVariableName + ';\n})';
+		if (additionalParams['echo'] !== undefined) {
+			jscode += '\n	return "";\n})';
+		} else {
+			jscode += '\n	return ' + resultVariableName + ';\n})';
+		}
+		
+		//console.log("\n\n" + jscode + "\n\n");
 		
 		var f = Function.apply(null, directFunctionVarNames.concat(["return " + jscode]));
 		return f.apply(null, directFunctions);
@@ -130,8 +154,8 @@
 	function action(html, actionName) {
 		echo(context.actionHtml.apply(context, arguments));
 	};
-	function render(subData) {
-		echo(context.renderHtml(subData));
+	function render(subData, label) {
+		echo(context.renderHtml(subData, label));
 	};
 	*/
 	var headerCode = jstl.getTemplate('jsonary-template-header-code').code;
@@ -144,6 +168,8 @@
 			return function (data, context) {
 				return context.renderHtml(data.subPath(path));
 			};
+		} else if (path.charAt(0) == "=") {
+			return 'window.escapeHtml(' + path.substring(1) + ')';
 		} else {
 			return function (data, context) {
 				var string = "" + data.propertyValue(path);
