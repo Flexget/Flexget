@@ -124,6 +124,30 @@ class TestSchemaValidator(FlexGetBase):
         assert len(errors) == 1
         assert errors[0].validator == 'minimum'
 
+    def test_oneOf_branch_is_chosen_based_on_type_errors(self):
+        schema = {
+            "oneOf": [
+                {"type": ["string", "array"]},
+                {
+                    "oneOf": [
+                        {"type": "integer"},
+                        {"type": "number", "minimum": 5}
+                    ]
+                }
+            ]
+        }
+        v = config_schema.SchemaValidator(schema)
+        # If there are type errors on both sides, it should be a virtual type error with all types
+        errors = list(v.iter_errors(True))
+        assert len(errors) == 1
+        assert tuple(errors[0].schema_path) == ('oneOf', 'type')
+        # It should have all the types together
+        assert set(errors[0].validator_value) == set(['string', 'array', 'number', 'integer'])
+        # If there are no type errors going down one branch it should choose it
+        errors = list(v.iter_errors(1.5))
+        assert len(errors) == 1
+        assert errors[0].validator == 'minimum'
+
     def test_defaults_are_filled(self):
         schema = {"properties": {"p": {"default": 5}}}
         v = config_schema.SchemaValidator(schema)

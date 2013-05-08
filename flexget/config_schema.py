@@ -166,10 +166,29 @@ class SchemaValidator(jsonschema.Draft4Validator):
 
     def iter_errors(self, instance, _schema=None):
         for e in super(SchemaValidator, self).iter_errors(instance, _schema=_schema):
-            yield ValidationError.create_from(e)
+            if not isinstance(e, ValidationError):
+                e = ValidationError.create_from(e)
+            yield e
 
-    def validate_anyOf(self, *args, **kwargs):
-        for error in super(SchemaValidator, self).validate_anyOf(*args, **kwargs):
+    def validate_anyOf(self, anyOf, instance, schema):
+        errors = super(SchemaValidator, self).validate_anyOf(anyOf, instance, schema)
+        for e in self.select_child_errors(errors):
+            yield e
+
+    def validate_oneOf(self, oneOf, instance, schema):
+        errors = super(SchemaValidator, self).validate_oneOf(oneOf, instance, schema)
+        for e in self.select_child_errors(errors):
+            yield e
+
+    def select_child_errors(self, errors):
+        """
+        Looks through subschema errors, if any subschema is determined to be the intended one,
+        (based on 'type' keyword errors,) errors from its branch will be released instead of the parent error.
+        """
+        for error in errors:
+            if not error.context:
+                yield error
+                continue
             # Split the suberrors up by which subschema they are from
             subschema_errors = defaultdict(list)
             for sube in error.context:
