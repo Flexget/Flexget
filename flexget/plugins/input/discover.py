@@ -7,7 +7,6 @@ from flexget.plugin import register_plugin, get_plugin_by_name, PluginError, \
 import datetime
 from flexget.utils.tools import parse_timedelta
 
-
 log = logging.getLogger('discover')
 
 
@@ -120,7 +119,7 @@ class Discover(object):
                     log.debug('No results from %s' % plugin_name)
         return sorted(result, reverse=True, key=lambda x: x.get('search_sort'))
 
-    def execute_check_released(self, config, task, arg_entries):
+    def filter_released(self, config, task, arg_entries):
         if ('even_notreleased' not in config):
             config['even_notreleased'] = False
         if (config['even_notreleased']):
@@ -128,11 +127,13 @@ class Discover(object):
         released = get_plugin_by_name("est_released").instance
         entries = []
         for entry in arg_entries:
-            if (released.estimate(task, entry)):
+            est_date = released.estimate(task, entry)
+            if (est_date is not None and datetime.datetime.now().date() >= est_date):
+                log.info("%s is relased" % entry['title'])
                 entries.append(entry)
         return entries
 
-    def execute_check_lastexecution(sekf, config, task, arg_entries):
+    def filter_lastexecution(sekf, config, task, arg_entries):
         if ('interval' not in config):
             config['interval'] = "1 hour"
         interval = parse_timedelta(config['interval'])
@@ -163,8 +164,8 @@ class Discover(object):
         log.verbose('Discovering %i titles ...' % len(entries))
         if len(entries) > 500:
             log.critical('Looks like your inputs in discover configuration produced over 500 entries, please reduce the amount!')
-        entries = self.execute_check_lastexecution(config, task, entries)
-        entries = self.execute_check_released(config, task, entries)
+        entries = self.filter_lastexecution(config, task, entries)
+        entries = self.filter_released(config, task, entries)
         return self.execute_searches(config, entries)
 
 
