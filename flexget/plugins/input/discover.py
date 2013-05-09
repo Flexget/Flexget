@@ -43,6 +43,7 @@ class Discover(object):
 
         discover.accept('integer', key='limit')
         discover.accept('interval', key='interval')
+        discover.accept('boolean', key='even_notreleased')
         discover.accept('choice', key='type').accept_choices(['any', 'normal', 'exact', 'movies'])
         return discover
 
@@ -120,8 +121,16 @@ class Discover(object):
         return sorted(result, reverse=True, key=lambda x: x.get('search_sort'))
 
     def execute_check_released(self, config, task, arg_entries):
+        if ('even_notreleased' not in config):
+            config['even_notreleased'] = False
+        if (config['even_notreleased']):
+            return arg_entries
         released = get_plugin_by_name("est_released").instance
-        return released.filter_helper(task, arg_entries, config)
+        entries = []
+        for entry in arg_entries:
+            if (released.estimate(task, entry)):
+                entries.append(entry)
+        return entries
 
     def execute_check_lastexecution(sekf, config, task, arg_entries):
         if ('interval' not in config):
