@@ -39,8 +39,8 @@ class EmitSeries(SeriesDatabase):
             entries.append(Entry(title=title, url='', serie_name=series.name, serie_season=latest['season'], serie_episode=latest['episode'] + 1))
 
             # different syntax (eg. 01x02)
-            title = '%s %02dx%02d' % (series.name, latest['season'], latest['episode'] + 1)
-            entries.append(Entry(title=title, url='', serie_name=series.name, serie_season=latest['season'], serie_episode=latest['episode'] + 1))
+            #title = '%s %02dx%02d' % (series.name, latest['season'], latest['episode'] + 1)
+            #entries.append(Entry(title=title, url='', serie_name=series.name, serie_season=latest['season'], serie_episode=latest['episode'] + 1))
 
             # try next season
             title = '%s S%02dE%02d' % (series.name, latest['season'] + 1, 1)

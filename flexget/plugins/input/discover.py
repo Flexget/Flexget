@@ -75,7 +75,7 @@ class Discover(object):
                         continue
 
                     if entry['title'] in entry_titles:
-                        log.verbose('Ignored duplicate title `%s`' % entry['title']) # TODO: should combine?
+                        log.verbose('Ignored duplicate title `%s`' % entry['title'])    # TODO: should combine?
                     else:
                         entries.append(entry)
                         entry_titles.add(entry['title'])
@@ -116,21 +116,8 @@ class Discover(object):
         return sorted(result, reverse=True, key=lambda x: x.get('search_sort'))
 
     def execute_check_released(self, config, task, arg_entries):
-        entries = []
-        for entry in arg_entries:
-            log.info(entry['title'])
-            estimators = get_plugins_by_group('estimate_released')
-            for estimator in estimators:
-                # is_released can return None if it has no idea, True if released, False if not released
-                res = estimator.instance.is_released(task, entry)
-                if (res is None):
-                    continue
-                elif (res is False):
-                    break
-                elif (res is True):
-                    entries.append(entry)
-                    break
-        return entries
+        released = get_plugin_by_name("est_released").instance
+        return released.filter_helper(task, arg_entries, config)
 
     @cached('discover')
     def on_task_input(self, task, config):
@@ -138,6 +125,7 @@ class Discover(object):
         log.verbose('Discovering %i titles ...' % len(entries))
         if len(entries) > 500:
             log.critical('Looks like your inputs in discover configuration produced over 500 entries, please reduce the amount!')
+
         entries = self.execute_check_released(config, task, entries)
         return self.execute_searches(config, entries)
 
