@@ -21,7 +21,7 @@ function navigateTo(itemUrl, req) {
 	currentUrl = itemUrl;
 	window.location = "#" + itemUrl;
 	$('#url-bar').val(itemUrl);
-	
+
 	if (req == undefined) {
 		req = Jsonary.getData(itemUrl);
 	}

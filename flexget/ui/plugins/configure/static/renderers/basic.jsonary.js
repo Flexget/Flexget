@@ -19,7 +19,8 @@
 				var parent = data.parent();
 				if (parent.basicType() == "object") {
 					var required = parent.schemas().requiredProperties();
-					showDelete = required.indexOf(data.parentKey()) == -1;
+					var minProperties = parent.schemas().minProperties();
+					showDelete = required.indexOf(data.parentKey()) == -1 && parent.keys().length > minProperties;
 				} else if (parent.basicType() == "array") {
 					var tupleTypingLength = parent.schemas().tupleTypingLength();
 					var minItems = parent.schemas().minItems();
@@ -78,7 +79,7 @@
 			return !data.readOnly();
 		}
 	});
-	
+
 	Jsonary.render.register({
 		component: Jsonary.render.Components.TYPE_SELECTOR,
 		renderHtml: function (data, context) {
@@ -143,7 +144,7 @@
 		renderHtml: function (data, context) {
 			var result = "";
 			var fixedSchemas = data.schemas().fixed();
-			
+
 			context.uiState.xorSelected = [];
 			context.uiState.orSelected = [];
 			if (context.uiState.dialogOpen) {
@@ -255,7 +256,7 @@
 			return true;
 		}
 	});
-		
+
 	function updateTextAreaSize(textarea) {
 		var lines = textarea.value.split("\n");
 		var maxWidth = 4;
@@ -269,7 +270,7 @@
 	}
 
 	// Display/edit objects
-	Jsonary.render.register({	
+	Jsonary.render.register({
 		renderHtml: function (data, context) {
 			var uiState = context.uiState;
 			var result = ' <table class="json-object"><tbody>';
@@ -281,24 +282,27 @@
 			});
 			result += '</tbody></table>';
 			if (!data.readOnly()) {
-				var addLinkHtml = "";
 				var schemas = data.schemas();
-				var definedProperties = schemas.definedProperties().sort();
-				var keyFunction = function (index, key) {
-					var addHtml = '<li class="json-object-add-key">' + escapeHtml(key) + '</li>';
-					addLinkHtml += context.actionHtml(addHtml, "add-named", key);
-				};
-				for (var i = 0; i < definedProperties.length; i++) {
-					if (!data.property(definedProperties[i]).defined()) {
-						keyFunction(i, definedProperties[i]);
+				var maxProperties = schemas.maxProperties();
+				if (maxProperties == null || maxProperties > data.keys().length) {
+					var addLinkHtml = "";
+					var definedProperties = schemas.definedProperties().sort();
+					var keyFunction = function (index, key) {
+						var addHtml = '<span class="json-object-add-key">' + escapeHtml(key) + '</span>';
+						addLinkHtml += context.actionHtml(addHtml, "add-named", key);
+					};
+					for (var i = 0; i < definedProperties.length; i++) {
+						if (!data.property(definedProperties[i]).defined()) {
+							keyFunction(i, definedProperties[i]);
+						}
 					}
-				}
-				if (schemas.allowedAdditionalProperties()) {
-					var newHtml = '<li class="json-object-add-key-new">+ new</li>';
-					addLinkHtml += context.actionHtml(newHtml, "add-new");
-				}
-				if (addLinkHtml != "") {
-					result += 'add:<ul class="json-object-add">' + addLinkHtml + '</ul>';
+					if (schemas.allowedAdditionalProperties()) {
+						var newHtml = '<span class="json-object-add-key-new">+ new</span>';
+						addLinkHtml += context.actionHtml(newHtml, "add-new");
+					}
+					if (addLinkHtml != "") {
+						result += 'add: <span class="json-object-add">' + addLinkHtml + '</span>';
+					}
 				}
 			}
 			return result + " ";
@@ -356,7 +360,7 @@
 			return data.basicType() == "array";
 		}
 	});
-	
+
 	// Display string
 	Jsonary.render.register({
 		renderHtml: function (data, context) {
@@ -377,7 +381,7 @@
 			return data.basicType() == "string" && data.readOnly() && schemas.formats().indexOf("date-time") != -1;
 		}
 	});
-	
+
 	function copyTextStyle(source, target) {
 		var style = getComputedStyle(source, null);
 		for (var key in style) {
@@ -393,7 +397,7 @@
 		textarea.style.width = parseInt(style.width.substring(0, style.width.length - 2)) + 4 + "px";
 		textarea.style.height = parseInt(style.height.substring(0, style.height.length - 2)) + 4 + "px";
 	}
-	
+
 	function getText(element) {
 		var result = "";
 		for (var i = 0; i < element.childNodes.length; i++) {
@@ -423,9 +427,9 @@
 				if (tagName == "td" || tagName == "th") {
 					result += "\t";
 				}
-				
+
 				result += getText(child);
-				
+
 				if (tagName == "tr") {
 					result += "\n";
 				}
@@ -466,7 +470,7 @@
 				};
 				return;
 			}
-			
+
 			if (typeof window.getComputedStyle != "function") {
 				return;
 			}
@@ -486,10 +490,10 @@
 					noticeBox.innerHTML = "";
 				}
 			}
-			
+
 			// size match
 			var sizeMatchBox = document.createElement("div");
-			
+
 			var textarea = null;
 			for (var i = 0; i < element.childNodes.length; i++) {
 				if (element.childNodes[i].nodeType == 1) {
@@ -508,8 +512,8 @@
 			sizeMatchBox.style.whiteSpace = "pre";
 			sizeMatchBox.style.zIndex = -10000;
 			var suffix = "MMMMM";
-			updateTextareaSize(textarea, sizeMatchBox, suffix);		
-			
+			updateTextareaSize(textarea, sizeMatchBox, suffix);
+
 			textarea.value = data.value();
 			textarea.onkeyup = function () {
 				updateNoticeBox(this.value);
@@ -543,7 +547,7 @@
 						textarea = element.childNodes[i];
 						break;
 					}
-				}				
+				}
 				textarea.value = data.value();
 				textarea.onkeyup();
 				return false;
@@ -556,7 +560,7 @@
 		}
 	});
 
-	// Display/edit boolean	
+	// Display/edit boolean
 	Jsonary.render.register({
 		render: function (element, data) {
 			var valueSpan = document.createElement("a");
@@ -582,19 +586,19 @@
 			return data.basicType() == "boolean";
 		}
 	});
-	
+
 	// Edit number
 	Jsonary.render.register({
 		renderHtml: function (data, context) {
 			var result = context.actionHtml('<span class="json-number">' + data.value() + '</span>', "input");
-			
+
 			var interval = data.schemas().numberInterval();
 			if (interval != undefined) {
 				var minimum = data.schemas().minimum();
 				if (minimum == null || data.value() > minimum + interval || data.value() == (minimum + interval) && !data.schemas().exclusiveMinimum()) {
 					result = context.actionHtml('<span class="json-number-decrement button">-</span>', 'decrement') + result;
 				}
-				
+
 				var maximum = data.schemas().maximum();
 				if (maximum == null || data.value() < maximum - interval || data.value() == (maximum - interval) && !data.schemas().exclusiveMaximum()) {
 					result += context.actionHtml('<span class="json-number-increment button">+</span>', 'increment');
