@@ -1,7 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
 from flexget.plugin import register_plugin, get_plugins_by_group
-
+from datetime import datetime
 log = logging.getLogger('est_released')
 
 
@@ -24,20 +24,15 @@ class EstimateReleased(object):
         estimators = get_plugins_by_group('estimate_released')
         for estimator in estimators:
             # is_released can return None if it has no idea, True if released, False if not released
-            res, est_date = estimator.instance.is_released(task, entry)
-            if (res is None):
-                continue
-            elif (not res):
-                return False, est_date
-            elif (res):
-                return True, est_date
-                break
-        return False, None
+            est_date = estimator.instance.is_released(task, entry)
+            if (est_date is not None):
+                return est_date
 
     def on_task_filter(self, task, config):
         if config:
             for entry in self.filter_helper(task, task.entries, config):
-                if (self.estimate(task, entry)):
+                est_date = self.estimate(task, entry)
+                if (est_date is not None and datetime.now().date() >= est_date):
                     entry.accept()
 
 register_plugin(EstimateReleased, 'est_released', api_ver=2)
