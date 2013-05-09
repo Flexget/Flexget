@@ -4,6 +4,7 @@ from flexget.utils.database import with_session
 
 
 log = logging.getLogger('api_tvrage')
+cache = {}    # we ll set episode in the cache to speed things up if multiple session ask for same show (now need to persist it ?)
 
 """
     See https://github.com/ckreutzer/python-tvrage for more details, it's pretty classic.
@@ -14,8 +15,10 @@ log = logging.getLogger('api_tvrage')
 
 @with_session
 def lookup_series(name=None, session=None):
-    show = tvrage.api.Show(name)
-    return show
+    if (name in cache):
+        return cache[name]
+    cache[name] = tvrage.api.Show(name)
+    return cache[name]
 
 
 @with_session

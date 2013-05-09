@@ -10,12 +10,11 @@ log = logging.getLogger('est_series')
 class EstimatesRelasedSeries(object):
 
     def get_serie_info(self, serie_name):
-        # TODO : Helper function to make a cache, discover use the same instance of classes, if we make multiple request this could help
         return lookup_series(name=serie_name)
 
     def is_released(self, task, entry):
         if ('serie_name' in entry and 'serie_episode' in entry and 'serie_season' in entry):
-            log.info("Checking %s " % entry['title'])
+            log.info("Checking %s (%s/%s/%s)" % (entry['title'], entry['serie_name'], entry['serie_season'], entry['serie_episode']))
             serie_info = self.get_serie_info(entry['serie_name'])
             if serie_info is None:
                 log.debug("No serie info obtained from TVRage -> res='none'")
@@ -31,9 +30,9 @@ class EstimatesRelasedSeries(object):
 
             now = datetime.now()
             if now.date() < wanted_episode_info.airdate:
-                log.debug("Episode air %s we are %s -> res='false'" % (wanted_episode_info.airdate, now))
+                log.debug("Episode air %s -> res='false'" % (wanted_episode_info.airdate))
                 return False
-            log.debug("Episode air %s we are %s -> res='true'" % (wanted_episode_info.airdate, now))
+            log.debug("Episode air %s  -> res='true'" % (wanted_episode_info.airdate))
             return True
         return None
 
