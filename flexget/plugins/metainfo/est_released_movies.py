@@ -15,10 +15,10 @@ class EstimatesRelasedMovies(object):
             try:
                 if now.date() < entry['tmdb_released'].date():
                     log.debug("title hasn't aired yet : air %s" % (entry['tmdb_released'].date()))
-                    return False
+                    return False, entry['tmdb_released'].date()
             except:
-                return None
-            return True
-        return None
+                return None, None
+            return True, entry['tmdb_released'].date()
+        return None, None
 
 register_plugin(EstimatesRelasedMovies, 'est_relased_movies', groups=['estimate_released'])

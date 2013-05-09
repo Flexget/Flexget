@@ -18,7 +18,7 @@ class EstimatesRelasedSeries(object):
             serie_info = self.get_serie_info(entry['serie_name'])
             if serie_info is None:
                 log.debug("No serie info obtained from TVRage -> res='none'")
-                return None
+                return None, None
             try:
                 wanted_episode_info = serie_info.season(entry['serie_season']).episode(entry['serie_episode'])
             except:
@@ -26,14 +26,14 @@ class EstimatesRelasedSeries(object):
 
             if wanted_episode_info is None:
                 log.debug("No wanted episode info obtained from TVRage -> res='none'")
-                return None
+                return None, None
 
             now = datetime.now()
             if now.date() < wanted_episode_info.airdate:
                 log.debug("Episode air %s -> res='false'" % (wanted_episode_info.airdate))
-                return False
+                return False, wanted_episode_info.airdate
             log.debug("Episode air %s  -> res='true'" % (wanted_episode_info.airdate))
-            return True
-        return None
+            return True, wanted_episode_info.airdate
+        return None, None
 
 register_plugin(EstimatesRelasedSeries, 'est_relased_series', groups=['estimate_released'])
