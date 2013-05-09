@@ -24,8 +24,12 @@ class Discover(object):
     schema = {
         'type': 'object',
         'properties': {
-            'what': {'type': 'array', 'items': {'$ref': '/schema/plugins?phase=input'}},
-            'from': {'type': 'array', 'items': {'$ref': '/schema/plugins?group=search'}},
+            'what': {'type': 'array', 'items': {
+                'allOf': [{'$ref': '/schema/plugins?phase=input'}, {'maxProperties': 1, 'minProperties': 1}]
+            }},
+            'from': {'type': 'array', 'items': {
+                'allOf': [{'$ref': '/schema/plugins?group=search'}, {'maxProperties': 1, 'minProperties': 1}]
+            }},
             'type': {'type': 'string', 'enum': ['any', 'normal', 'exact', 'movies'], 'default': 'normal'},
             'limit': {'type': 'integer', 'minimum': 1}
         },
