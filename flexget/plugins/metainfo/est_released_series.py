@@ -19,7 +19,8 @@ class EstimatesRelasedSeries(object):
                 log.debug("No serie info obtained from TVRage -> res='none'")
                 return None
             try:
-                wanted_episode_info = serie_info.season(entry['serie_season']).episode(entry['serie_episode'])
+                wanted_season_info = serie_info.season(entry['serie_season'])
+                wanted_episode_info = wanted_season_info.episode(entry['serie_episode'])
             except:
                 wanted_episode_info = None
 

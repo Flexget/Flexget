@@ -6,6 +6,7 @@ from flexget.plugin import register_plugin, get_plugin_by_name, PluginError, \
     get_plugins_by_group, get_plugins_by_phase, PluginWarning
 import datetime
 from flexget.utils.tools import parse_timedelta
+from flexget.plugins.est_released import estimate
 
 log = logging.getLogger('discover')
 
@@ -124,10 +125,9 @@ class Discover(object):
             config['even_notreleased'] = False
         if (config['even_notreleased']):
             return arg_entries
-        released = get_plugin_by_name("est_released").instance
         entries = []
         for entry in arg_entries:
-            est_date = released.estimate(task, entry)
+            est_date = estimate(task, entry)
             if (est_date is not None and datetime.datetime.now().date() >= est_date):
                 log.info("%s is relased" % entry['title'])
                 entries.append(entry)
