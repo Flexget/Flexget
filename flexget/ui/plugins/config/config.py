@@ -27,7 +27,7 @@ def getset_item(obj, item, set=None):
     If `set` is specified, `item` in `obj` will be set to `set`s value
     """
     # We don't know whether path elements are strings or ints, so try both
-    for func in [int, lambda x: x]:
+    for func in [lambda x: x, int]:
         try:
             item = func(item)
             if set is not None:
