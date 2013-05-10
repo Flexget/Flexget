@@ -28,7 +28,7 @@ function navigateTo(itemUrl, req) {
 	$('#main').empty().addClass("loading");
 	window.scrollTo(0, 0);
 	req.getData(function(data, request) {
-		$('#main').removeClass("loading").empty().renderJson(data.editableCopy());
+		$('#main').removeClass("loading").empty().renderJson(data);//.editableCopy()
 	});
 }
 
