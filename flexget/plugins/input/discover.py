@@ -5,10 +5,30 @@ from flexget.utils.search import StringComparator, MovieComparator, AnyComparato
 from flexget.plugin import register_plugin, get_plugin_by_name, PluginError, \
     get_plugins_by_group, get_plugins_by_phase, PluginWarning
 import datetime
+from flexget import schema
 from flexget.utils.tools import parse_timedelta
 from flexget.plugins.est_released import estimate
+from sqlalchemy import Column, Integer, DateTime, Unicode, and_
 
 log = logging.getLogger('discover')
+Base = schema.versioned_base('discover', 0)
+
+
+class DiscoverEntry(Base):
+    __tablename__ = 'discover_entry'
+
+    id = Column(Integer, primary_key=True)
+    title = Column(Unicode, index=True)
+    task = Column('feed', Unicode, index=True)
+    last_execution = Column(DateTime)
+
+    def __init__(self, title, task):
+        self.title = title
+        self.task = task
+        self.last_execution = datetime.datetime.now()
+
+    def __str__(self):
+        return '<DiscoverEntry(title=%s,task=%s,added=%s)>' % (self.title, self.task, self.last_execution)
 
 
 class Discover(object):
@@ -120,6 +140,12 @@ class Discover(object):
                     log.debug('No results from %s' % plugin_name)
         return sorted(result, reverse=True, key=lambda x: x.get('search_sort'))
 
+    def clean_discoverentry(self, task):
+        value = datetime.datetime.now() - parse_timedelta("7 days")
+        for de in task.session.query(DiscoverEntry).filter(DiscoverEntry.last_execution <= value).all():
+            log.debug('deleting %s' % de)
+            task.session.delete(de)
+
     def filter_released(self, config, task, arg_entries):
         if ('even_notreleased' not in config):
             config['even_notreleased'] = False
@@ -133,13 +159,20 @@ class Discover(object):
                 entries.append(entry)
         return entries
 
-    def filter_lastexecution(sekf, config, task, arg_entries):
+    def filter_lastexecution(self, config, task, arg_entries):
         if ('interval' not in config):
             config['interval'] = "1 hour"
+
+        self.clean_discoverentry(task)
         interval = parse_timedelta(config['interval'])
         entries = []
         for entry in arg_entries:
-            last_time = task.simple_persistence.get(entry['title'])
+            de = task.session.query(DiscoverEntry).filter(and_(DiscoverEntry.title == entry['title'], DiscoverEntry.task == unicode(task.name))).first()
+            if not de:
+                last_time = None
+            else:
+                last_time = de.last_execution
+
             if not last_time:
                 log.info('%s -> No previous run recorded, running now' % entry['title'])
             elif task.manager.options.interval_ignore:
@@ -154,7 +187,12 @@ class Discover(object):
                     log.verbose('Interval %s not met for %s. Use --now to override.' % (config['interval'], entry['title']))
                     continue
             log.debug('interval passed')
-            task.simple_persistence[entry['title']] = datetime.datetime.now()
+            if not de:
+                de = DiscoverEntry(entry['title'], unicode(task.name))
+                task.session.add(de)
+            else:
+                de.last_execution = datetime.datetime.now()
+                task.session.merge(de)
             entries.append(entry)
         return entries
 
