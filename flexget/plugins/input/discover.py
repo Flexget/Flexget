@@ -194,7 +194,7 @@ class Discover(object):
                 log.debug('next_time: %r' % next_time)
                 if datetime.datetime.now() < next_time:
                     log.debug('interval not met')
-                    log.verbose('Interval %s not met for %s. Use --discover-now to override.' %
+                    log.verbose('Discover interval %s not met for %s. Use --discover-now to override.' %
                                 (config['interval'], entry['title']))
                     continue
             log.debug('interval passed')
@@ -209,6 +209,7 @@ class Discover(object):
 
     @cached('discover')
     def on_task_input(self, task, config):
+        task.no_entries_ok = True
         entries = self.execute_inputs(config, task)
         log.verbose('Discovering %i titles ...' % len(entries))
         if len(entries) > 500:
