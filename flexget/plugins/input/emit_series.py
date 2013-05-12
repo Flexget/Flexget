@@ -31,23 +31,26 @@ class EmitSeries(SeriesDatabase):
                 # no latest known episode, skip
                 continue
 
-            # TODO: do this only after average time between episode has been passed since
-            # last episode
-
             # try next episode (eg. S01E02)
             title = '%s S%02dE%02d' % (series.name, latest['season'], latest['episode'] + 1)
-            entries.append(Entry(title=title, url='', series_name=series.name,
-                                 series_season=latest['season'], series_episode=latest['episode'] + 1))
+            entries.append(Entry(title=title, url='',
+                                 series_name=series.name,
+                                 series_season=latest['season'],
+                                 series_episode=latest['episode'] + 1))
 
             # different syntax (eg. 01x02)
-            #title = '%s %02dx%02d' % (series.name, latest['season'], latest['episode'] + 1)
-            #entries.append(Entry(title=title, url='', series_name=series.name,
-            # series_season=latest['season'], series_episode=latest['episode'] + 1))
+            title = '%s %02dx%02d' % (series.name, latest['season'], latest['episode'] + 1)
+            entries.append(Entry(title=title, url='',
+                                 series_name=series.name,
+                                 series_season=latest['season']+1,
+                                 series_episode=1))
 
             # try next season
             title = '%s S%02dE%02d' % (series.name, latest['season'] + 1, 1)
-            entries.append(Entry(title=title, url='', series_name=series.name,
-                                 series_season=latest['season']+1, series_episode=1))
+            entries.append(Entry(title=title, url='',
+                                 series_name=series.name,
+                                 series_season=latest['season']+1,
+                                 series_episode=1))
 
         return entries
 
