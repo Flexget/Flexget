@@ -22,6 +22,9 @@ class EstimateRelease(object):
         log.info(entry['title'])
         estimators = get_plugins_by_group('estimate_release')
         for estimator in estimators:
-            return estimator.instance.estimate(entry)
+            estimate = estimator.instance.estimate(entry)
+            # return first successful estimation
+            if estimate is not None:
+                return estimate
 
 register_plugin(EstimateRelease, 'estimate_release', api_ver=2)
