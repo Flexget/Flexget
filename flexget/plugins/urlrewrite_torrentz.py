@@ -36,11 +36,12 @@ class UrlRewriteTorrentz(object):
         entry['url'] = 'https://torcache.net/torrent/%s.torrent' % thash.upper()
         entry['torrent_info_hash'] = thash
 
-    def search(self, query, comparator=StringComparator(), config=None):
+    def search(self, entry, comparator=StringComparator(), config=None):
         if config:
             feed = REPUTATIONS[config]
         else:
             feed = REPUTATIONS['good']
+        query = entry['title']
         # urllib.quote will crash if the unicode string has non ascii characters, so encode in utf-8 beforehand
         comparator.set_seq1(query)
         query = comparator.search_string()
