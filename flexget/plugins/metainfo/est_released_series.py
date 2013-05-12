@@ -8,26 +8,28 @@ log = logging.getLogger('est_series')
 
 class EstimatesRelasedSeries(object):
 
-    def get_serie_info(self, serie_name):
-        return lookup_series(name=serie_name)
+    def get_series_info(self, series_name):
+        return lookup_series(name=series_name)
 
-    def is_released(self, task, entry):
-        if ('serie_name' in entry and 'serie_episode' in entry and 'serie_season' in entry):
-            log.info("Checking %s (%s/%s/%s)" % (entry['title'], entry['serie_name'], entry['serie_season'], entry['serie_episode']))
-            serie_info = self.get_serie_info(entry['serie_name'])
-            if serie_info is None:
-                log.debug("No serie info obtained from TVRage -> res='none'")
+    def estimate(self, entry):
+        if 'series_name' in entry and 'series_episode' in entry and 'series_season' in entry:
+            log.verbose("Querying release estimation for %s S%02dE%02d ..." %
+                        (entry['series_name'], entry['series_season'], entry['series_episode']))
+            series_info = self.get_series_info(entry['series_name'])
+            if series_info is None:
+                log.debug('No series info obtained from TVRage to %s' % entry['series_name'])
                 return None
             try:
-                wanted_season_info = serie_info.season(entry['serie_season'])
-                wanted_episode_info = wanted_season_info.episode(entry['serie_episode'])
-            except:
-                wanted_episode_info = None
+                season_info = series_info.season(entry['series_season'])
+                if season_info:
+                    episode_info = season_info.episode(entry['series_episode'])
+                    if episode_info:
+                        return episode_info.airdate
+            except Exception as e:
+                log.exception(e)
 
-            if wanted_episode_info is None:
-                log.debug("No wanted episode info obtained from TVRage -> res='none'")
-                return None
-            return wanted_episode_info.airdate
-        return None
+            log.debug('No episode info obtained from TVRage for %s season %s episode %s' %
+                      (entry['series_name'], entry['series_season'], entry['series_episode']))
 
-register_plugin(EstimatesRelasedSeries, 'est_relased_series', groups=['estimate_released'])
+
+register_plugin(EstimatesRelasedSeries, 'est_relased_series', groups=['estimate_release'])

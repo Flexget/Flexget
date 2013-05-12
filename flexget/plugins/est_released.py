@@ -1,14 +1,27 @@
 import logging
-from flexget.plugin import get_plugins_by_group
+from flexget.plugin import get_plugins_by_group, register_plugin
+
 log = logging.getLogger('est_released')
 
 
-# Helper funciton called by discover plugins
-def estimate(task, entry):
-    log.info(entry['title'])
-    estimators = get_plugins_by_group('estimate_released')
-    for estimator in estimators:
-        # is_released returns estimated date of released for the entry, None if it can't figure it out
-        est_date = estimator.instance.is_released(task, entry)
-        if (est_date is not None):
-            return est_date
+class EstimateRelease(object):
+
+    """
+    Front-end for estimator plugins that estimate release times
+    for various things (series, movies).
+    """
+
+    def estimate(self, entry):
+        """
+        Estimate release schedule for Entry
+
+        :param entry:
+        :return: estimated date of released for the entry, None if it can't figure it out
+        """
+
+        log.info(entry['title'])
+        estimators = get_plugins_by_group('estimate_release')
+        for estimator in estimators:
+            return estimator.instance.estimate(entry)
+
+register_plugin(EstimateRelease, 'estimate_release', api_ver=2)
