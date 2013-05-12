@@ -110,5 +110,5 @@ Continue by implementing the test case.
 Summary
 -------
 
-This demonstrates main princible and workflow behind TDD and shows how it can
+This demonstrates main principle and workflow behind TDD and shows how it can
 be achieved with FlexGet.
