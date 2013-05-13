@@ -1,14 +1,16 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
+
+from sqlalchemy import Column, Integer, DateTime, Unicode, and_
+from flexget.event import event
+
 from flexget.utils.cached_input import cached
 from flexget.utils.search import StringComparator, MovieComparator, AnyComparator, clean_title
 from flexget.plugin import register_plugin, get_plugin_by_name, PluginError, \
-    get_plugins_by_group, get_plugins_by_phase, PluginWarning
+    get_plugins_by_group, get_plugins_by_phase, PluginWarning, register_parser_option
 import datetime
 from flexget import schema
 from flexget.utils.tools import parse_timedelta
-from flexget.plugins.est_released import estimate
-from sqlalchemy import Column, Integer, DateTime, Unicode, and_
 
 log = logging.getLogger('discover')
 Base = schema.versioned_base('discover', 0)
@@ -19,7 +21,7 @@ class DiscoverEntry(Base):
 
     id = Column(Integer, primary_key=True)
     title = Column(Unicode, index=True)
-    task = Column('feed', Unicode, index=True)
+    task = Column(Unicode, index=True)
     last_execution = Column(DateTime)
 
     def __init__(self, title, task):
@@ -29,6 +31,14 @@ class DiscoverEntry(Base):
 
     def __str__(self):
         return '<DiscoverEntry(title=%s,task=%s,added=%s)>' % (self.title, self.task, self.last_execution)
+
+
+@event('manager.db_cleanup')
+def db_cleanup(session):
+    value = datetime.datetime.now() - parse_timedelta('7 days')
+    for de in session.query(DiscoverEntry).filter(DiscoverEntry.last_execution <= value).all():
+        log.debug('deleting %s' % de)
+        session.delete(de)
 
 
 class Discover(object):
@@ -42,6 +52,9 @@ class Discover(object):
           - emit_series: yes
         from:
           - piratebay
+        type: [any|normal|exact|movies]
+        interval: [1 hours|days|weeks]
+        ignore_estimations: [yes|no]
     """
 
     def validator(self):
@@ -63,7 +76,7 @@ class Discover(object):
 
         discover.accept('integer', key='limit')
         discover.accept('interval', key='interval')
-        discover.accept('boolean', key='even_notreleased')
+        discover.accept('boolean', key='ignore_estimations')
         discover.accept('choice', key='type').accept_choices(['any', 'normal', 'exact', 'movies'])
         return discover
 
@@ -73,7 +86,6 @@ class Discover(object):
         :param task: Current task
         :return: List of pseudo entries created by inputs under `what` configuration
         """
-
         entries = []
         entry_titles = set()
         entry_urls = set()
@@ -140,36 +152,34 @@ class Discover(object):
                     log.debug('No results from %s' % plugin_name)
         return sorted(result, reverse=True, key=lambda x: x.get('search_sort'))
 
-    def clean_discoverentry(self, task):
-        value = datetime.datetime.now() - parse_timedelta("7 days")
-        for de in task.session.query(DiscoverEntry).filter(DiscoverEntry.last_execution <= value).all():
-            log.debug('deleting %s' % de)
-            task.session.delete(de)
-
-    def filter_released(self, config, task, arg_entries):
-        if ('even_notreleased' not in config):
-            config['even_notreleased'] = False
-        if (config['even_notreleased']):
-            return arg_entries
-        entries = []
-        for entry in arg_entries:
-            est_date = estimate(task, entry)
-            if (est_date is not None and datetime.datetime.now().date() >= est_date):
-                log.info("%s is relased" % entry['title'])
-                entries.append(entry)
+    def estimated(self, entries):
+        """
+        :return: Entries that we have estimated to be available
+        """
+        estimator = get_plugin_by_name('estimate_release').instance
+        result = []
+        for entry in entries:
+            est_date = estimator.estimate(entry)
+            if est_date is not None and datetime.datetime.now().date() >= est_date:
+                log.info('%s has been released at %s' % (entry['title'], est_date))
+                result.append(entry)
             else:
-                log.info("%s is not relased yet (Released : %s)" % (entry['title'],est_date))
-        return entries
+                log.info("%s hasn't been released yet (Expected:%s)" % (entry['title'], est_date))
+        return result
 
-    def filter_lastexecution(self, config, task, arg_entries):
-        if ('interval' not in config):
-            config['interval'] = "1 hour"
+    def interval_expired(self, config, task, entries):
+        """
+        Maintain some limit levels so that we don't hammer search
+        sites with unreasonable amount of queries.
 
-        self.clean_discoverentry(task)
+        :return: Entries that are up for ``config['interval']``
+        """
+        config.setdefault('interval', '5 hour')
         interval = parse_timedelta(config['interval'])
-        entries = []
-        for entry in arg_entries:
-            de = task.session.query(DiscoverEntry).filter(and_(DiscoverEntry.title == entry['title'], DiscoverEntry.task == unicode(task.name))).first()
+        result = []
+        for entry in entries:
+            de = task.session.query(DiscoverEntry).filter(and_(DiscoverEntry.title == entry['title'],
+                                                               DiscoverEntry.task == unicode(task.name))).first()
             if not de:
                 last_time = None
             else:
@@ -177,8 +187,8 @@ class Discover(object):
 
             if not last_time:
                 log.info('%s -> No previous run recorded, running now' % entry['title'])
-            elif task.manager.options.interval_ignore:
-                log.info('Ignoring interval because of --now')
+            elif task.manager.options.discover_now:
+                log.info('Ignoring interval because of --discover-now')
             else:
                 log.debug('last_time: %r' % last_time)
                 log.debug('interval: %s' % config)
@@ -186,7 +196,8 @@ class Discover(object):
                 log.debug('next_time: %r' % next_time)
                 if datetime.datetime.now() < next_time:
                     log.debug('interval not met')
-                    log.verbose('Interval %s not met for %s. Use --now to override.' % (config['interval'], entry['title']))
+                    log.verbose('Discover interval %s not met for %s. Use --discover-now to override.' %
+                                (config['interval'], entry['title']))
                     continue
             log.debug('interval passed')
             if not de:
@@ -195,18 +206,24 @@ class Discover(object):
             else:
                 de.last_execution = datetime.datetime.now()
                 task.session.merge(de)
-            entries.append(entry)
-        return entries
+            result.append(entry)
+        return result
 
     @cached('discover')
     def on_task_input(self, task, config):
+        task.no_entries_ok = True
         entries = self.execute_inputs(config, task)
         log.verbose('Discovering %i titles ...' % len(entries))
         if len(entries) > 500:
-            log.critical('Looks like your inputs in discover configuration produced over 500 entries, please reduce the amount!')
-        entries = self.filter_lastexecution(config, task, entries)
-        entries = self.filter_released(config, task, entries)
+            log.critical('Looks like your inputs in discover configuration produced '
+                         'over 500 entries, please reduce the amount!')
+        # TODO: the entries that are estimated should be given priority over expiration
+        entries = self.interval_expired(config, task, entries)
+        if not config.get('ignore_estimations', False):
+            entries = self.estimated(entries)
         return self.execute_searches(config, entries)
 
 
 register_plugin(Discover, 'discover', api_ver=2)
+register_parser_option('--discover-now', action='store_true', dest='discover_now', default=False,
+                       help='Immediately try to discover everything.')
