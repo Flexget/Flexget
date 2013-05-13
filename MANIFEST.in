@@ -4,4 +4,5 @@ include pavement.py
 include paver-minilib.zip
 include setup.py
 include bootstrap.py
-recursive-include tests *.py
+recursive-include tests *
+recursive-exclude tests *.pyc *.pyo
