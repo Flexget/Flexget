@@ -26,7 +26,8 @@ class UrlRewriteNyaa(object):
         advanced.accept('choice', key='filter').accept_choices(FILTERS)
         return root
 
-    def search(self, query, comparator, config):
+    def search(self, entry, comparator, config):
+        query = entry['title']
         if not isinstance(config, dict):
             config = {'category': config}
         config.setdefault('category', 'anime')

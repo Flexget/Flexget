@@ -91,10 +91,11 @@ class UrlRewritePirateBay(object):
             raise UrlRewritingError(e)
 
     @internet(log)
-    def search(self, query, comparator=StringComparator(), config=None):
+    def search(self, entry, comparator=StringComparator(), config=None):
         """
         Search for name from piratebay.
         """
+        query = entry['title']
         if not isinstance(config, dict):
             config = {}
         sort = SORT.get(config.get('sort_by', 'seeds'))
