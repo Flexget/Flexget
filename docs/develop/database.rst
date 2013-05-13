@@ -12,9 +12,10 @@ Migrations
 The plugin system tries to make each plugin as much separated as possible. When
 the need for schema migrations became too overwhelming the team evaluated few
 possibilities but none of them were able to version each plugin separately. Even
-the "official" tool from SQLAlchemy authors does not seem to make it easily possible.
+the latest official tool from SQLAlchemy authors does not seem to make it easily 
+possible.
 
-Because this special requirement we had to make custom implementation for it.
+Because this special requirement we had to make custom implementation for migrations.
 
 
 Migrate Base
@@ -22,7 +23,7 @@ Migrate Base
 
 The plugin needs only to use custom ``Base`` from :mod:`flexget.schema.versioned_base`.
 
-.. code::
+.. code-block:: python
 
    SCHEMA_VER = 0
    Base = schema.versioned_base('plugin_name_here', SCHEMA_VER)
@@ -31,7 +32,7 @@ This will automatically track all the declarative models plugin uses. When there
 are changes in the plugin database, increment the number and add migration code.
 This is done with decorated function in the following manner.
 
-.. code::
+.. code-block:: python
 
    @schema.upgrade('series')
    def upgrade(ver, session):
@@ -57,7 +58,7 @@ If the plugin accumulates data into database that should be cleaned at some poin
 `manager.db_cleanup` event should be used. This will be automatically called every
 7 days in non intrusive way.
 
-.. code::
+.. code-block:: python
 
    @event('manager.db_cleanup')
    def db_cleanup(session):
