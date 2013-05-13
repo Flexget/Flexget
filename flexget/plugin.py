@@ -269,7 +269,7 @@ class PluginInfo(dict):
             contexts = ['task']
         elif isinstance(contexts, basestring):
             contexts = [contexts]
-        if category is None:
+        if category is None and plugin_class.__module__.startswith('flexget.plugins'):
             # By default look at the containing package of the plugin.
             category = plugin_class.__module__.split('.')[-2]
 

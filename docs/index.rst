@@ -25,6 +25,7 @@ Instructions for aspiring developer
    develop/index
    develop/mock
    develop/tdd
+   develop/database
 
 
 Core documentation

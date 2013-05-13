@@ -10,7 +10,7 @@ Create test
 
 Write new test case called ``tests/test_hello.py``.
 
-.. code::
+.. testcode::
 
    from tests import FlexGetBase
 
@@ -42,7 +42,7 @@ Create new file called ``flexget/plugins/output/hello.py``.
 
 Within this file we will add our plugin.
 
-.. code::
+.. testcode::
 
    from __future__ import unicode_literals, division, absolute_import
    from flexget.plugin import register_plugin
@@ -65,7 +65,7 @@ new field to each entry called ``hello`` with value ``True``.
 Let's supplement the testsuite with the test.
 
 
-.. code::
+.. testcode::
 
    from tests import FlexGetBase
 
@@ -93,7 +93,7 @@ Add functionality to plugin
 
 Continue by implementing the test case.
 
-.. code::
+.. testcode::
 
    from __future__ import unicode_literals, division, absolute_import
    from flexget.plugin import register_plugin
@@ -110,5 +110,5 @@ Continue by implementing the test case.
 Summary
 -------
 
-This demonstrates main princible and workflow behind TDD and shows how it can
+This demonstrates main principle and workflow behind TDD and shows how it can
 be achieved with FlexGet.
