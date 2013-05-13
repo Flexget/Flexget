@@ -78,10 +78,11 @@ class UrlRewriteTorrentleech(object):
             entry['url'] = entry['url']
 
     @internet(log)
-    def search(self, query, comparator=StringComparator(), config=None):
+    def search(self, entry, comparator=StringComparator(), config=None):
         """
         Search for name from torrentleech.
         """
+        query = entry['title']
         rss_key = config['rss_key']
         
         # build the form request:

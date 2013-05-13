@@ -54,7 +54,8 @@ class UrlRewriteIsoHunt(object):
     def url_rewrite(self, task, entry):
         entry['url'] = entry['url'].replace('torrent_details', 'download')
 
-    def search(self, query, comparator, config):
+    def search(self, entry, comparator, config):
+        query = entry['title']
         # urllib.quote will crash if the unicode string has non ascii characters, so encode in utf-8 beforehand
         comparator.set_seq1(query)
         name = comparator.search_string()

@@ -157,6 +157,8 @@ class Discover(object):
             if (est_date is not None and datetime.datetime.now().date() >= est_date):
                 log.info("%s is relased" % entry['title'])
                 entries.append(entry)
+            else:
+                log.info("%s is not relased yet (Released : %s)" % (entry['title'],est_date))
         return entries
 
     def filter_lastexecution(self, config, task, arg_entries):
