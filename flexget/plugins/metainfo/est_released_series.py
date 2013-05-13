@@ -27,7 +27,7 @@ class EstimatesRelasedSeries(object):
                         return episode_info.airdate
             # this may occur if we ask for a season or an episode that doesn't exists and we don't want a messy log
             # with "normal" exception
-            except KeyError as e:   
+            except KeyError as e:
                 return None
             except Exception as e:
                 log.exception(e)
