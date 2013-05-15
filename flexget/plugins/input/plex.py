@@ -3,7 +3,6 @@ from xml.dom.minidom import parse, parseString
 import re
 import logging
 from flexget.utils import requests
-from string import split
 from flexget.plugin import register_plugin, PluginError
 from flexget.entry import Entry
 
@@ -13,25 +12,35 @@ class InputPlex(object):
     """
     Uses a plex media server (www.plexapp.com) tv section as an input.
 
-    'section' is a required parameter, locate it at http://<yourplexserver>:32400/library/sections/
-    'selection' can be set to different keys:
+    'section'           Required parameter, locate it at http://<yourplexserver>:32400/library/sections/
+    'selection'         Can be set to different keys:
         - all
         - unwatched
         - recentlyAdded
         - recentlyViewed
         - recentlyViewedShows
       'all' and 'recentlyViewedShows' will only produce a list of show names while the other three will produce filename and download url 
+    'username'          Myplex (http://my.plexapp.com) username, used to connect to shared PMS' 
+    'password'          Myplex (http://my.plexapp.com) password, used to connect to shared PMS' 
+    'server'            IP of PMS to connect to. 
+    'lowercase_title'   Convert filename (title) to lower case.
+    'strip_year'        Remove year from title, ex: Show Name (2012) 01x01 => Show Name 01x01
+
     Default paramaters:
-      server   : 'localhost'
-      port     : 32400
-      selection: all
+      server         : localhost
+      port           : 32400
+      selection      : all
+      lowercase_title: no
+      strip_year     : yes
 
     Example:
 
       plex:
         server: 192.168.1.23
         section: 3
+        selection: recentlyAdded
     """
+
     def validator(self):
         from flexget import validator
         config = validator.factory('dict')
@@ -41,6 +50,8 @@ class InputPlex(object):
         config.accept('integer', key='section', required=True)
         config.accept('text', key='username')
         config.accept('text', key='password')
+        config.accept('boolean', key='lowercase_title')
+        config.accept('boolean', key='strip_year')
         return config
 
     def prepare_config(self, config):
@@ -49,6 +60,8 @@ class InputPlex(object):
         config.setdefault('selection', 'all');
         config.setdefault('username', '')
         config.setdefault('password', '')
+        config.setdefault('lowercase_title', False)
+        config.setdefault('strip_year', True)
         return config
 
     def on_task_input(self, task, config):
@@ -89,25 +102,40 @@ class InputPlex(object):
         if config['selection'] == 'all' or config['selection'] == 'recentlyViewedShows':
             for node in dom.getElementsByTagName('Directory'):
                 title=node.getAttribute('title')
-                title=re.sub(r'^(.*)\(\d+\)$', r'\1', title)
+                if config['strip_year']:
+                    title=re.sub(r'^(.*)\(\d+\)$', r'\1', title)
                 title=re.sub(r'[\(\)]', r'', title)
                 title=re.sub(r'\&', r'And', title)
                 title=re.sub(r'[^A-Za-z0-9- ]', r'', title)
+                if config['lowercase_title']:
+                    title = title.lower()
                 e = Entry()
                 e['title'] = title
                 e['url'] = "NULL"
                 entries.append(e)
         else:
             for node in dom.getElementsByTagName('Video'):
+                title = node.getAttribute('grandparentTitle')
+                if config['strip_year']:
+                    title=re.sub(r'^(.*)\(\d+\)$', r'\1', title)
+                title=re.sub(r'[\(\)]', r'', title)
+                title=re.sub(r'\&', r'And', title).strip()
+                title=re.sub(r'[^A-Za-z0-9- ]', r'', title).replace(" ", ".")
+                if config['lowercase_title']:
+                    title = title.lower()
+                season = int(node.getAttribute('parentIndex'))
+                episode = int(node.getAttribute('index'))
                 for media in node.getElementsByTagName('Media'):
+                    vcodec = media.getAttribute('videoCodec')
+                    acodec = media.getAttribute('audioCodec')
+                    container = media.getAttribute('container')
+                    resolution = media.getAttribute('videoResolution') + "p"
                     for part in media.getElementsByTagName('Part'):
                         key = part.getAttribute('key')
-                        tmp = part.getAttribute('file')
-                        title = split(tmp, "/")[-1]
-                e = Entry()
-                e['title'] = title
-                e['url'] = "http://%s:%d%s%s" % (config['server'], config['port'], key, accesstoken)
-                entries.append(e)
+                        e = Entry()
+                        e['title'] = "%s_%02dx%02d_%s_%s_%s.%s" % (title, season, episode, vcodec, acodec, resolution, container) 
+                        e['url'] = "http://%s:%d%s%s" % (config['server'], config['port'], key, accesstoken)
+                        entries.append(e)
         return entries
 
 register_plugin(InputPlex, 'plex', api_ver=2)
