@@ -44,7 +44,12 @@ request. Once we see any semi-serious input from a developer we will grant
 write permissions to our central repository. You can also request this earlier
 if you wish.
 
+If you are new to Git there are several interactive tutorials you can try to get
+you started including `tryGit`_ and `LearnGitBranching`_.
+
 .. _GIT clone: https://github.com/Flexget/Flexget
+.. _tryGit: http://try.github.io
+.. _LearnGitBranching: http://pcottle.github.io/learnGitBranching/
 
 Environment
 -----------
