@@ -113,10 +113,10 @@ class Manager(object):
         self.initialize()
         
         # check if stdout is not connected to terminal (cron run)
-        if not os.isatty(sys.stdout.fileno()):
-            log.warning('It appears you\'re running from CRON')
-        else:
-            log.warning('It appears you\'re running from terminal')
+        #if not os.isatty(sys.stdout.fileno()):
+        #    log.warning('It appears you\'re running from CRON')
+        #else:
+        #    log.warning('It appears you\'re running from terminal')
 
         # cannot be imported at module level because of circular references
         from flexget.utils.simple_persistence import SimplePersistence
