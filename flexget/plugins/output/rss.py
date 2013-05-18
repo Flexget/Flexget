@@ -1,4 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
+import base64
+import hashlib
 import logging
 import datetime
 import os
@@ -228,10 +230,17 @@ class OutputRSS(object):
                     add = False
             if add:
                 # add into generated feed
+                hasher = hashlib.sha1()
+                hasher.update(db_item.title)
+                hasher.update(db_item.description)
+                hasher.update(db_item.link)
+                guid = base64.urlsafe_b64encode(hasher.digest())
+
                 gen = {'title': db_item.title,
                        'description': db_item.description,
                        'link': db_item.link,
-                       'pubDate': db_item.published}
+                       'pubDate': db_item.published,
+                       'guid': guid}
                 log.trace('Adding %s into rss %s' % (gen['title'], config['file']))
                 rss_items.append(PyRSS2Gen.RSSItem(**gen))
             else:
