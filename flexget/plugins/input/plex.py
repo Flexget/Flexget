@@ -126,7 +126,13 @@ class InputPlex(object):
             for node in dom.getElementsByTagName('Video'):
                 title = node.getAttribute('grandparentTitle')
                 season = int(node.getAttribute('parentIndex'))
-                episode = int(node.getAttribute('index'))
+                if node.getAttribute('parentIndex') == node.getAttribute('year'):
+                    season = node.getAttribute('originallyAvailableAt') 
+                    filenamemap = "%s_%s%s_%s_%s_%s.%s"
+                    episode = ""
+                else:
+                    episode = int(node.getAttribute('index'))
+                    filenamemap = "%s_%02dx%02d_%s_%s_%s.%s"
                 for media in node.getElementsByTagName('Media'):
                     vcodec = media.getAttribute('videoCodec')
                     acodec = media.getAttribute('audioCodec')
@@ -145,7 +151,7 @@ class InputPlex(object):
                             title=re.sub(r'[^A-Za-z0-9- ]', r'', title).replace(" ", ".")
                             if config['lowercase_title']:
                                 title = title.lower()
-                            e['title'] = "%s_%02dx%02d_%s_%s_%s.%s" % (title, season, episode, resolution, vcodec, acodec, container) 
+                            e['title'] = filenamemap % (title, season, episode, resolution, vcodec, acodec, container) 
                         e['url'] = "http://%s:%d%s%s" % (config['server'], config['port'], key, accesstoken)
                         entries.append(e)
         return entries
