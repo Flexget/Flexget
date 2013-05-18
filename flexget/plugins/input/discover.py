@@ -1,7 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
 
-from sqlalchemy import Column, Integer, DateTime, Unicode, and_
+from sqlalchemy import Column, Integer, DateTime, Unicode, and_, Index
 from flexget.event import event
 
 from flexget.utils.cached_input import cached
@@ -31,6 +31,8 @@ class DiscoverEntry(Base):
 
     def __str__(self):
         return '<DiscoverEntry(title=%s,task=%s,added=%s)>' % (self.title, self.task, self.last_execution)
+
+Index('ix_discover_entry_title_task', DiscoverEntry.title, DiscoverEntry.task)
 
 
 @event('manager.db_cleanup')
@@ -160,7 +162,10 @@ class Discover(object):
         result = []
         for entry in entries:
             est_date = estimator.estimate(entry)
-            if est_date is not None and datetime.datetime.now().date() >= est_date:
+            if est_date is None:
+                log.debug('No release date could be determined for %s' % entry['title'])
+                result.append(entry)
+            elif datetime.datetime.now().date() >= est_date:
                 log.info('%s has been released at %s' % (entry['title'], est_date))
                 result.append(entry)
             else:
@@ -179,7 +184,7 @@ class Discover(object):
         result = []
         for entry in entries:
             de = task.session.query(DiscoverEntry).filter(and_(DiscoverEntry.title == entry['title'],
-                                                               DiscoverEntry.task == unicode(task.name))).first()
+                                                               DiscoverEntry.task == task.name)).first()
             if not de:
                 last_time = None
             else:
@@ -191,7 +196,7 @@ class Discover(object):
                 log.info('Ignoring interval because of --discover-now')
             else:
                 log.debug('last_time: %r' % last_time)
-                log.debug('interval: %s' % config)
+                log.debug('interval: %s' % config['interval'])
                 next_time = last_time + interval
                 log.debug('next_time: %r' % next_time)
                 if datetime.datetime.now() < next_time:
