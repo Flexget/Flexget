@@ -20,7 +20,7 @@ register_plugin(SearchPlugin, 'test_search', groups=['search'])
 class TestDiscover(FlexGetBase):
     __yaml__ = """
         tasks:
-          test_discover:
+          test_sort:
             discover:
               what:
               - mock:
@@ -41,8 +41,8 @@ class TestDiscover(FlexGetBase):
               - test_search: yes
     """
 
-    def test_discover(self):
-        self.execute_task('test_discover')
+    def test_sort(self):
+        self.execute_task('test_sort')
         assert len(self.task.entries) == 3
         # Entries should be ordered by search_sort
         order = list(e.get('search_sort') for e in self.task.entries)
