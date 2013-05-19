@@ -162,10 +162,13 @@ class Discover(object):
         result = []
         for entry in entries:
             est_date = estimator.estimate(entry)
+            if isinstance(est_date, datetime.date):
+                # If we just got a date, add a time so we can compare it to now()
+                est_date = datetime.datetime.combine(est_date, datetime.time())
             if est_date is None:
                 log.debug('No release date could be determined for %s' % entry['title'])
                 result.append(entry)
-            elif datetime.datetime.now().date() >= est_date:
+            elif datetime.datetime.now() >= est_date:
                 log.info('%s has been released at %s' % (entry['title'], est_date))
                 result.append(entry)
             else:
