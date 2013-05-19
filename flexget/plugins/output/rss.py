@@ -5,7 +5,7 @@ import logging
 import datetime
 import os
 
-from sqlalchemy import Column, Integer, String, DateTime
+from sqlalchemy import Column, Integer, String, DateTime, Unicode
 
 from flexget import schema
 from flexget.plugin import register_plugin, PluginWarning
@@ -38,11 +38,11 @@ class RSSEntry(Base):
     __tablename__ = 'make_rss'
 
     id = Column(Integer, primary_key=True)
-    title = Column(String)
-    description = Column(String)
+    title = Column(Unicode)
+    description = Column(Unicode)
     link = Column(String)
     rsslink = Column(String)
-    file = Column(String)
+    file = Column(Unicode)
     published = Column(DateTime, default=datetime.datetime.utcnow())
 
 
@@ -167,10 +167,6 @@ class OutputRSS(object):
             raise PluginWarning('plugin make_rss requires PyRSS2Gen library.')
         config = self.get_config(task)
 
-        # don't run with --test
-        if task.manager.options.test:
-            return
-
         # when history is disabled, remove everything from backlog on every run (a bit hackish, rarely usefull)
         if not config['history']:
             log.debug('disabling history')
@@ -231,8 +227,8 @@ class OutputRSS(object):
             if add:
                 # add into generated feed
                 hasher = hashlib.sha1()
-                hasher.update(db_item.title)
-                hasher.update(db_item.description)
+                hasher.update(db_item.title.encode('utf-8'))
+                hasher.update(db_item.description.encode('utf-8'))
                 hasher.update(db_item.link)
                 guid = base64.urlsafe_b64encode(hasher.digest())
 
@@ -256,6 +252,12 @@ class OutputRSS(object):
                              description='FlexGet generated RSS feed',
                              lastBuildDate=datetime.datetime.utcnow(),
                              items=rss_items)
+
+        # don't run with --test
+        if task.manager.options.test:
+            log.info('Would write rss file with %d entries.', len(rss_items))
+            return
+
         # write rss
         fn = os.path.expanduser(config['file'])
         with open(fn, 'w') as file:
