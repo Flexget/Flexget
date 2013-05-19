@@ -26,11 +26,11 @@ class FilterContentSize(object):
             # download plugin has already printed a downloading message.
             if size < config.get('min', 0):
                 log_once('Entry `%s` too small, rejecting' % entry['title'], log)
-                entry.reject('no size info available nor file to read it from', remember=True)
+                entry.reject('minimum size %s MB, got %s MB' % (config['min'], size), remember=remember)
                 return True
             if size > config.get('max', maxint):
                 log_once('Entry `%s` too big, rejecting' % entry['title'], log)
-                entry.reject('no size info available nor file to read it from', remember=True)
+                entry.reject('maximum size %s MB, got %s MB' % (config['max'], size), remember=remember)
                 return True
 
     @priority(130)

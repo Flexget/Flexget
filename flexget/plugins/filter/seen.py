@@ -336,7 +336,9 @@ class FilterSeen(object):
                 found = found.first()
                 if found:
                     log.debug("Rejecting '%s' '%s' because of seen '%s'" % (entry['url'], entry['title'], found.value))
-                    entry.reject('Entry with %s `%s` is already seen' % (found.field, found.value),
+                    se = task.session.query(SeenEntry).filter(SeenEntry.id == found.seen_entry_id).one()
+                    entry.reject('Entry with %s `%s` is already marked seen in the task %s at %s' % 
+                                 (found.field, found.value, se.task, se.added.strftime('%Y-%m-%d %H:%M')),
                                 remember=remember_rejected)
 
     def on_task_exit(self, task, config):
