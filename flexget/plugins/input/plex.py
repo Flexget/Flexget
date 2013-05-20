@@ -14,7 +14,7 @@ class InputPlex(object):
     """
     Uses a plex media server (www.plexapp.com) tv section as an input.
 
-    'section'           Required parameter, locate it at http://<yourplexserver>:32400/library/sections/
+    'section'           Required parameter, numerical (/library/sections/<num>) or section name.
     'selection'         Can be set to different keys:
         - all
         - unwatched
@@ -51,6 +51,7 @@ class InputPlex(object):
         config.accept('text', key='server')
         config.accept('text', key='selection')
         config.accept('integer', key='port')
+        config.accept('text', key='section', required=True)
         config.accept('integer', key='section', required=True)
         config.accept('text', key='username')
         config.accept('text', key='password')
@@ -102,13 +103,28 @@ class InputPlex(object):
                     accesstoken = "?X-Plex-Token=%s" % accesstoken
             if accesstoken == "":
                 raise PluginError('Could not retrieve accesstoken for %s.' % config['server'])
+        if not isinstance(config['section'], int):
+            try:
+                r = requests.get("http://%s:%d/library/sections/%s" % 
+                    (config['server'], config['port'], accesstoken))
+            except requests.RequestException as e:
+                raise PluginError('Error retrieving source: %s' % e)
+            dom = parseString(r.text.encode("utf-8"))
+            for node in dom.getElementsByTagName('Directory'):
+                if node.getAttribute('title') == config['section']:
+                    config['section'] = int(node.getAttribute('key'))
+        if not isinstance(config['section'], int):
+             raise PluginError('Could not find section \'%s\'' % config['section'])
         try:
-            r = requests.get("http://%s:%d/library/sections/%d/%s%s" % (config['server'], config['port'], config['section'], config['selection'], accesstoken))
+            r = requests.get("http://%s:%d/library/sections/%s/%s%s" % 
+                (config['server'], config['port'], config['section'], config['selection'], accesstoken))
         except requests.RequestException as e:
             raise PluginError('Error retrieving source: %s' % e)
         dom = parseString(r.text.encode("utf-8"))
         entries = []
         if config['selection'] == 'all' or config['selection'] == 'recentlyViewedShows':
+            if dom.getElementsByTagName('MediaContainer')[0].getAttribute('viewGroup') != "show":
+                raise PluginError('Selected section is not a TV section.')
             for node in dom.getElementsByTagName('Directory'):
                 title=node.getAttribute('title')
                 if config['strip_year']:
@@ -123,6 +139,8 @@ class InputPlex(object):
                 e['url'] = "NULL"
                 entries.append(e)
         else:
+            if dom.getElementsByTagName('MediaContainer')[0].getAttribute('viewGroup') != "episode":
+                raise PluginError('Selected section is not a TV section.')
             for node in dom.getElementsByTagName('Video'):
                 title = node.getAttribute('grandparentTitle')
                 season = int(node.getAttribute('parentIndex'))
