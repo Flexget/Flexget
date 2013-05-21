@@ -175,6 +175,12 @@ class Discover(object):
                 log.info("%s hasn't been released yet (Expected:%s)" % (entry['title'], est_date))
         return result
 
+    def interval_total_seconds(self, interval):
+        """
+            Because python 2.6 doesn't have total_seconds()
+        """
+        return (interval.seconds + interval.days * 24 * 3600)
+
     def interval_expired(self, config, task, entries):
         """
         Maintain some limit levels so that we don't hammer search
@@ -198,11 +204,13 @@ class Discover(object):
             if not last_time:
                 log.info('%s -> No previous run recorded, running now' % entry['title'])
                 # First time we excecute it so set last_execution to be now (default) minus a random of the Interval
-                last_execution = datetime.datetime.now() - datetime.timedelta(seconds=random.random() * interval.seconds)
+                delta = datetime.timedelta(seconds=(random.random() * self.interval_total_seconds(interval)))
+                last_execution = last_execution - delta
             elif task.manager.options.discover_now:
                 log.info('Ignoring interval because of --discover-now')
                 # Forced execution it so set last_execution to be now (default) minus a random of the Interval time to shuffle stuff
-                last_execution = datetime.datetime.now() - datetime.timedelta(seconds=random.random() * interval.seconds)
+                delta = datetime.timedelta(seconds=(random.random() * self.interval_total_seconds(interval)))
+                last_execution = last_execution - delta
             else:
                 log.debug('last_time: %r' % last_time)
                 log.debug('interval: %s' % config['interval'])
