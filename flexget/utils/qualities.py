@@ -223,10 +223,9 @@ class Quality(object):
 
     def _find_best(self, qlist, default=None):
         """Finds the highest matching quality component from `qlist`"""
-        text = self.clean_text
         result = None
         for item in qlist:
-            match = item.matches(text)
+            match = item.matches(self.clean_text)
             if match[0]:
                 result = item
                 self.clean_text = match[1]
