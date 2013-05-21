@@ -6,7 +6,7 @@ import feedparser
 
 from flexget.plugin import register_plugin, PluginWarning
 from flexget.entry import Entry
-from flexget.utils.search import torrent_availability, StringComparator
+from flexget.utils.search import torrent_availability, normalize_unicode
 from flexget import validator
 
 log = logging.getLogger('torrentz')
@@ -36,15 +36,13 @@ class UrlRewriteTorrentz(object):
         entry['url'] = 'https://torcache.net/torrent/%s.torrent' % thash.upper()
         entry['torrent_info_hash'] = thash
 
-    def search(self, entry, comparator=StringComparator(), config=None):
+    def search(self, entry, config=None):
         if config:
             feed = REPUTATIONS[config]
         else:
             feed = REPUTATIONS['good']
-        query = entry['title']
+        query = normalize_unicode(entry['title'])
         # urllib.quote will crash if the unicode string has non ascii characters, so encode in utf-8 beforehand
-        comparator.set_seq1(query)
-        query = comparator.search_string()
         url = 'http://torrentz.eu/%s?q=%s' % (feed, urllib.quote(query.encode('utf-8')))
         log.debug('requesting: %s' % url)
         rss = feedparser.parse(url)
@@ -59,14 +57,6 @@ class UrlRewriteTorrentz(object):
             raise PluginWarning('Got bozo_exception (bad feed)')
 
         for item in rss.entries:
-            # assign confidence score of how close this link is to the name you're looking for. .6 and above is "close"
-            comparator.set_seq2(item.title)
-            log.debug('name: %s' % comparator.a)
-            log.debug('found name: %s' % comparator.b)
-            log.debug('confidence: %s' % comparator.ratio())
-            if not comparator.matches():
-                continue
-
             m = re.search(r'Size: ([\d]+) Mb Seeds: ([,\d]+) Peers: ([,\d]+) Hash: ([a-f0-9]+)',
                           item.description, re.IGNORECASE)
             if not m:
@@ -80,7 +70,6 @@ class UrlRewriteTorrentz(object):
             entry['torrent_seeds'] = int(m.group(2).replace(',', ''))
             entry['torrent_leeches'] = int(m.group(3).replace(',', ''))
             entry['torrent_info_hash'] = m.group(4).upper()
-            entry['search_ratio'] = comparator.ratio()
             entry['search_sort'] = torrent_availability(entry['torrent_seeds'], entry['torrent_leeches'])
             entries.append(entry)
 

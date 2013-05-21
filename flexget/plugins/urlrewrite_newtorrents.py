@@ -8,7 +8,7 @@ from flexget.entry import Entry
 from flexget.plugin import register_plugin, PluginWarning, internet
 from flexget.utils.soup import get_soup
 from flexget.utils.tools import urlopener
-from flexget.utils.search import StringComparator, torrent_availability
+from flexget.utils.search import torrent_availability, normalize_unicode
 
 timeout = 10
 import socket
@@ -49,9 +49,8 @@ class NewTorrents:
             raise UrlRewritingError('Bug in newtorrents urlrewriter')
 
     # Search plugin API
-    def search(self, entry, comparator, config=None):
-        query = entry['title']
-        return self.entries_from_search(query, comparator=comparator)
+    def search(self, entry, config=None):
+        return self.entries_from_search(entry['title'])
 
     @internet(log)
     def url_from_page(self, url):
@@ -70,10 +69,9 @@ class NewTorrents:
             return f.group(1)
 
     @internet(log)
-    def entries_from_search(self, name, url=None, comparator=StringComparator(cutoff=0.9)):
+    def entries_from_search(self, name, url=None):
         """Parses torrent download url from search results"""
-        comparator.set_seq1(name)
-        name = comparator.search_string()
+        name = normalize_unicode(name)
         if not url:
             url = 'http://www.newtorrents.info/search/%s' % urllib.quote(name.encode('utf-8'), safe=':/~?=&%')
 
@@ -102,18 +100,15 @@ class NewTorrents:
                     seed = 0
 
             #TODO: also parse content_size and peers from results
-            if comparator.matches(release_name):
-                torrents.append(Entry(title=release_name, url=torrent_url, torrent_seeds=seed,
-                                      search_ratio=comparator.ratio(), search_sort=torrent_availability(seed, 0)))
-            else:
-                log.debug('rejecting search result: %s !~ %s' % (release_name, name))
+            torrents.append(Entry(title=release_name, url=torrent_url, torrent_seeds=seed,
+                                  search_sort=torrent_availability(seed, 0)))
         # sort with seed number Reverse order
         torrents.sort(reverse=True, key=lambda x: x.get('search_sort', 0))
         # choose the torrent
         if not torrents:
             dashindex = name.rfind('-')
             if dashindex != -1:
-                return self.entries_from_search(name[:dashindex], comparator=comparator)
+                return self.entries_from_search(name[:dashindex])
             else:
                 raise PluginWarning('No matches for %s' % name, log, log_once=True)
         else:

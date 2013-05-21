@@ -347,9 +347,8 @@ class UrlrewriteArchive(object):
         root.accept('list').accept('text')
         return root
 
-    def search(self, entry, comparator, config=None):
+    def search(self, entry, config=None):
         """Search plugin API method"""
-        # TODO: Implement comparator matching, now just returns ordered by age (newest first)
 
         session = Session()
         query = entry['title']

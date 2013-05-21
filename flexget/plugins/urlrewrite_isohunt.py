@@ -2,9 +2,11 @@ from __future__ import unicode_literals, division, absolute_import
 import logging
 import re
 import urllib
+
 import feedparser
+
 from flexget.entry import Entry
-from flexget.utils.search import torrent_availability
+from flexget.utils.search import torrent_availability, normalize_unicode
 from flexget.plugin import PluginWarning, register_plugin
 
 log = logging.getLogger('isohunt')
@@ -54,11 +56,9 @@ class UrlRewriteIsoHunt(object):
     def url_rewrite(self, task, entry):
         entry['url'] = entry['url'].replace('torrent_details', 'download')
 
-    def search(self, entry, comparator, config):
-        query = entry['title']
+    def search(self, entry, config):
         # urllib.quote will crash if the unicode string has non ascii characters, so encode in utf-8 beforehand
-        comparator.set_seq1(query)
-        name = comparator.search_string()
+        name = normalize_unicode(entry['title'])
         optionlist = ['misc', 'movies', 'audio', 'tv', 'games', 'apps', 'pics', 'anime', 'comics', 'books',
                       'music video', 'unclassified', 'all']
         url = 'http://isohunt.com/js/rss/%s?iht=%s&noSL' % (
@@ -77,19 +77,9 @@ class UrlRewriteIsoHunt(object):
             raise PluginWarning('Got bozo_exception (bad feed)')
 
         for item in rss.entries:
-
-            # assign confidence score of how close this link is to the name you're looking for. .6 and above is "close"
-            comparator.set_seq2(item.title)
-            log.debug('name: %s' % comparator.a)
-            log.debug('found name: %s' % comparator.b)
-            log.debug('confidence: %s' % comparator.ratio())
-            if not comparator.matches():
-                continue
-
             entry = Entry()
             entry['title'] = item.title
             entry['url'] = item.link
-            entry['search_ratio'] = comparator.ratio()
 
             m = re.search(r'Size: ([\d]+).*Seeds: (\d+).*Leechers: (\d+)', item.description, re.IGNORECASE)
             if not m:
