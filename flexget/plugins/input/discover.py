@@ -27,7 +27,7 @@ class DiscoverEntry(Base):
     def __init__(self, title, task):
         self.title = title
         self.task = task
-        self.last_execution = datetime.datetime.now()
+        self.last_execution = None
 
     def __str__(self):
         return '<DiscoverEntry(title=%s,task=%s,added=%s)>' % (self.title, self.task, self.last_execution)
@@ -180,44 +180,33 @@ class Discover(object):
         """
         config.setdefault('interval', '5 hour')
         interval = parse_timedelta(config['interval'])
+        if task.manager.options.discover_now:
+            log.info('Ignoring interval because of --discover-now')
         result = []
         for entry in entries:
-            de = task.session.query(DiscoverEntry).filter(and_(DiscoverEntry.title == entry['title'],
-                                                               DiscoverEntry.task == task.name)).first()
-            if not de:
-                last_time = None
-            else:
-                last_time = de.last_execution
+            de = task.session.query(DiscoverEntry).\
+                filter(DiscoverEntry.title == entry['title']).\
+                filter(DiscoverEntry.task == task.name).first()
 
-            # set last_execution to be now (default)
-            last_execution = datetime.datetime.now()
-            if not last_time:
-                log.info('%s -> No previous run recorded, running now' % entry['title'])
-                # First time we excecute it so set last_execution to be now (default) minus a random of the Interval
+            if not de:
+                log.info('%s -> No previous run recorded' % entry['title'])
+                de = DiscoverEntry(entry['title'], task.name)
+                task.session.add(de)
+            if task.manager.options.discover_now or not de.last_execution:
+                # First time we execute (and on --discover-now) we randomize time to avoid clumping
                 delta = datetime.timedelta(seconds=(random.random() * self.interval_total_seconds(interval)))
-                last_execution = last_execution - delta
-            elif task.manager.options.discover_now:
-                log.info('Ignoring interval because of --discover-now')
-                # Forced execution it so set last_execution to be now (default) minus a random of the Interval time to shuffle stuff
-                delta = datetime.timedelta(seconds=(random.random() * self.interval_total_seconds(interval)))
-                last_execution = last_execution - delta
+                de.last_execution = datetime.datetime.now() - delta
             else:
-                log.debug('last_time: %r' % last_time)
-                log.debug('interval: %s' % config['interval'])
-                next_time = last_time + interval
-                log.debug('next_time: %r' % next_time)
+                next_time = de.last_execution + interval
+                log.debug('last_time: %r, interval: %s, next_time: %r, ',
+                          de.last_execution, config['interval'], next_time)
                 if datetime.datetime.now() < next_time:
                     log.debug('interval not met')
                     log.verbose('Discover interval %s not met for %s. Use --discover-now to override.' %
                                 (config['interval'], entry['title']))
                     continue
+                de.last_execution = datetime.datetime.now()
             log.debug('interval passed')
-            if not de:
-                de = DiscoverEntry(entry['title'], unicode(task.name))
-                task.session.add(de)
-            else:
-                de.last_execution = last_execution
-                task.session.merge(de)
             result.append(entry)
         return result
 
