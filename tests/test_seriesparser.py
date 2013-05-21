@@ -251,6 +251,10 @@ class TestSeriesParser(object):
         assert (s.id == 1), 'failed to parse %s' % s.data
         assert s.id_type == 'sequence'
 
+        s = self.parse(name='Something', data='[TheGroup] Something - 12 1280x720 x264-Hi10P')
+        assert (s.id == 12), 'failed to parse %s' % s.data
+        assert s.id_type == 'sequence'
+
     def test_quality(self):
         """SeriesParser: quality"""
         s = self.parse(name='Foo Bar', data='Foo.Bar.S01E01.720p.HDTV.x264-FlexGet')
