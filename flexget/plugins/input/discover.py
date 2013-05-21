@@ -1,6 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
-
+import random
 from sqlalchemy import Column, Integer, DateTime, Unicode, and_, Index
 from flexget.event import event
 
@@ -193,10 +193,16 @@ class Discover(object):
             else:
                 last_time = de.last_execution
 
+            # set last_execution to be now (default)
+            last_execution = datetime.datetime.now()
             if not last_time:
                 log.info('%s -> No previous run recorded, running now' % entry['title'])
+                # First time we excecute it so set last_execution to be now (default) minus a random of the Interval
+                last_execution = datetime.datetime.now() - datetime.timedelta(seconds=random.random() * interval.seconds)
             elif task.manager.options.discover_now:
                 log.info('Ignoring interval because of --discover-now')
+                # Forced execution it so set last_execution to be now (default) minus a random of the Interval time to shuffle stuff
+                last_execution = datetime.datetime.now() - datetime.timedelta(seconds=random.random() * interval.seconds)
             else:
                 log.debug('last_time: %r' % last_time)
                 log.debug('interval: %s' % config['interval'])
@@ -212,7 +218,7 @@ class Discover(object):
                 de = DiscoverEntry(entry['title'], unicode(task.name))
                 task.session.add(de)
             else:
-                de.last_execution = datetime.datetime.now()
+                de.last_execution = last_execution
                 task.session.merge(de)
             result.append(entry)
         return result
