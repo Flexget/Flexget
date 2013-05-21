@@ -71,7 +71,7 @@ class UrlRewriteTorrentleech(object):
         if entry['url'].startswith('http://torrentleech.org/torrents/browse/index/query/'):
             # use search
             try:
-                entry['url'] = self.search(entry['title'])[0]['url']
+                entry['url'] = self.search(entry)[0]['url']
             except PluginWarning as e:
                 raise UrlRewritingError(e)
         else:
