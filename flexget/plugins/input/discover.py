@@ -5,7 +5,7 @@ from sqlalchemy import Column, Integer, DateTime, Unicode, and_, Index
 from flexget.event import event
 
 from flexget.utils.cached_input import cached
-from flexget.utils.search import StringComparator, MovieComparator, AnyComparator, clean_title
+from flexget.utils.search import clean_title
 from flexget.plugin import register_plugin, get_plugin_by_name, PluginError, \
     get_plugins_by_group, get_plugins_by_phase, PluginWarning, register_parser_option
 import datetime
@@ -54,7 +54,6 @@ class Discover(object):
           - emit_series: yes
         from:
           - piratebay
-        type: [any|normal|exact|movies]
         interval: [1 hours|days|weeks]
         ignore_estimations: [yes|no]
     """
@@ -79,7 +78,6 @@ class Discover(object):
         discover.accept('integer', key='limit')
         discover.accept('interval', key='interval')
         discover.accept('boolean', key='ignore_estimations')
-        discover.accept('choice', key='type').accept_choices(['any', 'normal', 'exact', 'movies'])
         return discover
 
     def execute_inputs(self, config, task):
@@ -129,14 +127,6 @@ class Discover(object):
         """
 
         result = []
-        if config.get('type', 'normal') == 'normal':
-            comparator = StringComparator(cutoff=0.7, cleaner=clean_title)
-        elif config['type'] == 'exact':
-            comparator = StringComparator(cutoff=0.9)
-        elif config['type'] == 'any':
-            comparator = AnyComparator()
-        else:
-            comparator = MovieComparator()
         for item in config['from']:
             if isinstance(item, dict):
                 plugin_name, plugin_config = item.items()[0]
@@ -147,7 +137,7 @@ class Discover(object):
                 log.critical('Search plugin %s does not implement search method' % plugin_name)
             for entry in entries:
                 try:
-                    search_results = search.search(entry, comparator, plugin_config)
+                    search_results = search.search(entry, plugin_config)
                     log.debug('Discovered %s entries from %s' % (len(search_results), plugin_name))
                     result.extend(search_results[:config.get('limit')])
                 except (PluginError, PluginWarning):

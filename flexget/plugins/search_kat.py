@@ -3,7 +3,7 @@ import logging
 import urllib
 import feedparser
 from flexget.entry import Entry
-from flexget.utils.search import torrent_availability
+from flexget.utils.search import torrent_availability, normalize_unicode
 from flexget.plugin import PluginWarning, register_plugin
 
 log = logging.getLogger('kat')
@@ -35,11 +35,8 @@ class SearchKAT(object):
         root.accept('boolean', key='verified')
         return root
 
-    def search(self, entry, comparator, config):
-        query = entry['title']
-        comparator.set_seq1(query)
-        name = comparator.search_string().lower()
-        search_string = name
+    def search(self, entry, config):
+        search_string = normalize_unicode(entry['title']).lower()
         if config.get('verified'):
             search_string += ' verified:1'
         url = 'http://kat.ph/search/%s/?rss=1' % urllib.quote(search_string.encode('utf-8'))
@@ -59,12 +56,6 @@ class SearchKAT(object):
             raise PluginWarning('Got bozo_exception (bad feed)')
 
         for item in rss.entries:
-            # Check if item passes comparator
-            comparator.set_seq2(item.title)
-            log.debug('name: %s, found name: %s, confidence: %s' % (comparator.a, comparator.b, comparator.ratio()))
-            if not comparator.matches():
-                continue
-
             entry = Entry()
             entry['title'] = item.title
 
@@ -72,7 +63,6 @@ class SearchKAT(object):
                 log.warning('Could not get url for entry from KAT. Maybe plugin needs updated?')
                 continue
             entry['url'] = item.enclosures[0]['url']
-            entry['search_ratio'] = comparator.ratio()
             entry['torrent_seeds'] = int(item.torrent_seeds)
             entry['torrent_leeches'] = int(item.torrent_peers)
             entry['search_sort'] = torrent_availability(entry['torrent_seeds'], entry['torrent_leeches'])
@@ -83,7 +73,7 @@ class SearchKAT(object):
 
         # choose torrent
         if not entries:
-            raise PluginWarning('No matches for %s' % name, log, log_once=True)
+            raise PluginWarning('No matches for %s' % search_string, log, log_once=True)
 
         entries.sort(reverse=True, key=lambda x: x.get('search_sort'))
         return entries

@@ -7,7 +7,7 @@ from flexget.entry import Entry
 from flexget.plugin import register_plugin, internet, PluginWarning
 from flexget.utils import requests
 from flexget.utils.soup import get_soup
-from flexget.utils.search import torrent_availability, StringComparator
+from flexget.utils.search import torrent_availability, normalize_unicode
 from flexget import validator
 from flexget.utils.tools import urlopener
 
@@ -30,13 +30,13 @@ CATEGORIES = {
 class UrlRewriteTorrentleech(object):
     """
         Torrentleech urlrewriter and search plugin.
-        
+
         torrentleech:
           rss_key: xxxxxxxxx  (required)
           username: xxxxxxxx  (required)
           password: xxxxxxxx  (required)
           category: HD
-          
+
           Category is any of: all, Cam, TS, R5, DVDRip,
           DVDR, HD, BDRip, Boxsets, Documentaries
     """
@@ -78,13 +78,12 @@ class UrlRewriteTorrentleech(object):
             entry['url'] = entry['url']
 
     @internet(log)
-    def search(self, entry, comparator=StringComparator(), config=None):
+    def search(self, entry, config=None):
         """
         Search for name from torrentleech.
         """
-        query = entry['title']
         rss_key = config['rss_key']
-        
+
         # build the form request:
         data = {'username': config['username'], 'password': config['password'], 'remember_me': 'on', 'submit': 'submit'}
         # POST the login form:
@@ -101,30 +100,23 @@ class UrlRewriteTorrentleech(object):
             category = CATEGORIES.get(config.get('category', 'all'))
         filter_url = '/categories/%d' % (category)
 
-        comparator.set_seq1(query)
-        query = comparator.search_string()
+        query = normalize_unicode(entry['title'])
         # urllib.quote will crash if the unicode string has non ascii characters, so encode in utf-8 beforehand
         url = 'http://torrentleech.org/torrents/browse/index/query/' + urllib.quote(query.encode('utf-8')) + filter_url
         log.debug('Using %s as torrentleech search url' % url)
-        
+
         page = requests.get(url, cookies=login.cookies).content
         soup = get_soup(page)
-        
+
         entries = []
         for tr in soup.find_all("tr", ["even", "odd"]):
             # within each even or odd row, find the torrent names
             link = tr.find("a", attrs={'href': re.compile('/torrent/\d+')})
             log.debug('link phase: %s' % link.contents[0])
-            # extracts the contents of the <a>titlename/<a> tag
-            comparator.set_seq2(link.contents[0])
-            log.debug('name: %s' % comparator.a)
-            log.debug('found name: %s' % comparator.b)
-            log.debug('confidence: %s' % comparator.ratio())
-            if not comparator.matches():
-                continue
             entry = Entry()
+            # extracts the contents of the <a>titlename/<a> tag
             entry['title'] = link.contents[0]
-            
+
             # find download link
             torrent_url = tr.find("a", attrs={'href': re.compile('/download/\d+/.*')}).get('href')
             # parse link and split along /download/12345 and /name.torrent
@@ -133,14 +125,13 @@ class UrlRewriteTorrentleech(object):
             torrent_url = 'http://torrentleech.org/rss' + download_url.group(1) + '/' + rss_key + '/' + download_url.group(2)
             log.debug('RSS-ified download link: %s' % torrent_url)
             entry['url'] = torrent_url
-            
+
             # us tr object for seeders/leechers
             seeders, leechers = tr.find_all('td', ["seeders", "leechers"])
             entry['torrent_seeds'] = int(seeders.contents[0])
             entry['torrent_leeches'] = int(leechers.contents[0])
-            entry['search_ratio'] = comparator.ratio()
             entry['search_sort'] = torrent_availability(entry['torrent_seeds'], entry['torrent_leeches'])
-            
+
             # use tr object for size
             size = tr.find("td", text=re.compile('([\.\d]+) ([GMK])B')).contents[0]
             size = re.search('([\.\d]+) ([GMK])B', size)
@@ -156,7 +147,7 @@ class UrlRewriteTorrentleech(object):
         if not entries:
             dashindex = query.rfind('-')
             if dashindex != -1:
-                return self.search(query[:dashindex], comparator=comparator)
+                return self.search(query[:dashindex])
             else:
                 raise PluginWarning('No close matches for %s' % query, log, log_once=True)
 
