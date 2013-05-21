@@ -66,7 +66,7 @@ class UrlRewritePirateBay(object):
         if entry['url'].startswith(('http://thepiratebay.se/search/', 'http://thepiratebay.org/search/')):
             # use search
             try:
-                entry['url'] = self.search(entry['title'])[0]['url']
+                entry['url'] = self.search(entry)[0]['url']
             except PluginWarning as e:
                 raise UrlRewritingError(e)
         else:
@@ -91,7 +91,7 @@ class UrlRewritePirateBay(object):
             raise UrlRewritingError(e)
 
     @internet(log)
-    def search(self, entry, config=None):
+    def search(self, arg_entry, config=None):
         """
         Search for name from piratebay.
         """
@@ -106,7 +106,7 @@ class UrlRewritePirateBay(object):
             category = CATEGORIES.get(config.get('category', 'all'))
         filter_url = '/0/%d/%d' % (sort, category)
 
-        query = normalize_unicode(entry['title'])
+        query = normalize_unicode(arg_entry['title'])
         # urllib.quote will crash if the unicode string has non ascii characters, so encode in utf-8 beforehand
         url = 'http://thepiratebay.se/search/' + urllib.quote(query.encode('utf-8')) + filter_url
         log.debug('Using %s as piratebay search url' % url)
@@ -136,7 +136,9 @@ class UrlRewritePirateBay(object):
         if not entries:
             dashindex = query.rfind('-')
             if dashindex != -1:
-                return self.search(query[:dashindex])
+                new_entry = Entry()
+                new_entry['title'] = query[:dashindex]
+                return self.search(new_entry)
             else:
                 raise PluginWarning('No close matches for %s' % query, log, log_once=True)
 
