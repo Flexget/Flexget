@@ -141,7 +141,7 @@ class Manager(object):
         errors = self.validate_config()
         if errors:
             for error in errors:
-                log.critical(error.error_with_path)
+                log.critical("[%s] %s", error.json_pointer, error.message)
             return
         self.create_tasks()
 
@@ -405,8 +405,7 @@ class Manager(object):
         :returns: A list of `ValidationError`s
 
         """
-        validator = config_schema.SchemaValidator(_root_config_schema)
-        return validator.process_config(self.config)
+        return config_schema.process_config(self.config, _root_config_schema)
 
     def init_sqlalchemy(self):
         """Initialize SQLAlchemy"""
