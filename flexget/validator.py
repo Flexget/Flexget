@@ -1,7 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
 import re
 
-from flexget.config_schema import SchemaValidator
+from flexget.config_schema import process_config
 
 # TODO: rename all validator.valid -> validator.accepts / accepted / accept ?
 
@@ -145,8 +145,7 @@ class Validator(object):
 
     def validate(self, value):
         """This is just to unit test backwards compatibility of json schema with old validators"""
-        validator = SchemaValidator(self.schema())
-        errors = list(e.message for e in validator.iter_errors(value))
+        errors = list(e.message for e in process_config(value, self.schema()))
         self.errors.messages = errors
         return not errors
 
