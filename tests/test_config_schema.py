@@ -49,56 +49,49 @@ class TestSchemaValidator(FlexGetBase):
 
     def test_resolves_local_refs(self):
         schema = {'$ref': '/schema/plugin/accept_all'}
-        v = config_schema.SchemaValidator(schema)
         # accept_all schema should be for type boolean
-        assert v.is_valid(True)
-        assert not v.is_valid(14)
+        assert not config_schema.process_config(True, schema)
+        assert config_schema.process_config(14, schema)
 
     def test_custom_format_checker(self):
         schema = {'type': 'string', 'format': 'quality'}
-        v = config_schema.SchemaValidator(schema)
-        assert v.is_valid('720p')
-        assert not v.is_valid('aoeu')
+        assert not config_schema.process_config('720p', schema)
+        assert config_schema.process_config('aoeu', schema)
 
     def test_custom_error(self):
         schema = {'type': 'string', 'error': 'This is not okay'}
-        v = config_schema.SchemaValidator(schema)
-        errors = list(v.iter_errors(13))
+        errors = config_schema.process_config(13, schema)
         assert errors[0].message == schema['error']
 
     def test_custom_error_template(self):
         schema = {'type': 'string', 'minLength': 10, 'error': '{{validator}} failed for {{instance}}'}
-        v = config_schema.SchemaValidator(schema)
-        errors = list(v.iter_errors(13))
+        errors = config_schema.process_config(13, schema)
         assert errors[0].message == "type failed for 13"
-        errors = list(v.iter_errors('aoeu'))
+        errors = config_schema.process_config('aoeu', schema)
         assert errors[0].message == "minLength failed for aoeu"
 
     def test_custom_keyword_error(self):
         schema = {'type': 'string', 'error_type': 'This is not okay'}
-        v = config_schema.SchemaValidator(schema)
-        errors = list(v.iter_errors(13))
+        errors = config_schema.process_config(13, schema)
         assert errors[0].message == schema['error_type']
 
     def test_custom_keyword_error_overrides(self):
         schema = {'type': 'string', 'error_type': 'This is not okay', 'error': 'This is worse'}
-        v = config_schema.SchemaValidator(schema)
-        errors = list(v.iter_errors(13))
+        errors = config_schema.process_config(13, schema)
         assert errors[0].message == schema['error_type']
 
     def test_error_with_path(self):
         schema = {'properties': {'p': {'items': {'type': 'string', 'error': 'ERROR'}}}}
-        v = config_schema.SchemaValidator(schema)
-        errors = list(v.iter_errors({'p': [13]}))
-        assert errors[0].error_with_path == '[/p/0] ERROR'
+        errors = config_schema.process_config({'p': [13]}, schema)
+        assert errors[0].json_pointer == '/p/0'
+        assert errors[0].message == 'ERROR'
 
     def test_builtin_error_rewriting(self):
         schema = {'type': 'object'}
-        v = config_schema.SchemaValidator(schema)
-        with mock.patch.object(config_schema.ValidationError, 'message_type') as message_type:
-            message_type.return_value = 'I am error'
-            errors = list(v.iter_errors(42))
-            assert errors[0].message == 'I am error'
+        errors = config_schema.process_config(42, schema)
+        # We don't call them objects around here
+        assert 'object' not in errors[0].message
+        assert 'dict' in errors[0].message
 
     def test_anyOf_branch_is_chosen_based_on_type_errors(self):
         schema = {
@@ -112,15 +105,14 @@ class TestSchemaValidator(FlexGetBase):
                 }
             ]
         }
-        v = config_schema.SchemaValidator(schema)
         # If there are type errors on both sides, it should be a virtual type error with all types
-        errors = list(v.iter_errors(True))
+        errors = config_schema.process_config(True, schema)
         assert len(errors) == 1
         assert tuple(errors[0].schema_path) == ('anyOf', 'type')
         # It should have all the types together
         assert set(errors[0].validator_value) == set(['string', 'array', 'number', 'integer'])
         # If there are no type errors going down one branch it should choose it
-        errors = list(v.iter_errors(1.5))
+        errors = config_schema.process_config(1.5, schema)
         assert len(errors) == 1
         assert errors[0].validator == 'minimum'
 
@@ -136,28 +128,25 @@ class TestSchemaValidator(FlexGetBase):
                 }
             ]
         }
-        v = config_schema.SchemaValidator(schema)
+        errors = config_schema.process_config(True, schema)
         # If there are type errors on both sides, it should be a virtual type error with all types
-        errors = list(v.iter_errors(True))
         assert len(errors) == 1
         assert tuple(errors[0].schema_path) == ('oneOf', 'type')
         # It should have all the types together
         assert set(errors[0].validator_value) == set(['string', 'array', 'number', 'integer'])
         # If there are no type errors going down one branch it should choose it
-        errors = list(v.iter_errors(1.5))
+        errors = config_schema.process_config(1.5, schema)
         assert len(errors) == 1
         assert errors[0].validator == 'minimum'
 
     def test_defaults_are_filled(self):
         schema = {"properties": {"p": {"default": 5}}}
-        v = config_schema.SchemaValidator(schema)
         config = {}
-        v.process_config(config)
+        config_schema.process_config(config, schema)
         assert config["p"] == 5
 
     def test_defaults_does_not_override_explicit_value(self):
         schema = {"properties": {"p": {"default": 5}}}
-        v = config_schema.SchemaValidator(schema)
         config = {"p": "foo"}
-        v.process_config(config)
+        config_schema.process_config(config, schema)
         assert config["p"] == "foo"

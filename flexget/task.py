@@ -552,10 +552,11 @@ class Task(object):
         # log errors and abort
         if errors:
             log.critical('Task \'%s\' has configuration errors:' % self.name)
-            for error in errors:
-                log.error(error.error_with_path)
+            msgs = ["[%s] %s" % (e.json_pointer, e.message) for e in errors]
+            for msg in msgs:
+                log.error(msg)
             # task has errors, abort it
-            self.abort('\n'.join(e.error_with_path for e in errors))
+            self.abort('\n'.join(msgs))
         return errors
 
     @staticmethod
@@ -563,14 +564,12 @@ class Task(object):
         schema = plugin_schemas(context='task')
         # Don't validate commented out plugins
         schema['patternProperties'] = {'^_': {}}
-        validator = config_schema.SchemaValidator(schema)
-        return validator.process_config(config)
+        return config_schema.process_config(config, schema)
 
 
 task_config_schema = {
     'type': 'object',
     'additionalProperties': {'type': 'object'}
-    # TODO: reject keys that are plugin names
 }
 
 register_config_key('tasks', task_config_schema, required=True)
