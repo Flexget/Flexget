@@ -1,11 +1,46 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
+import random
+from sqlalchemy import Column, Integer, DateTime, Unicode, and_, Index
+from flexget.event import event
+
 from flexget.utils.cached_input import cached
-from flexget.utils.search import StringComparator, MovieComparator, AnyComparator, clean_title
+from flexget.utils.search import clean_title
 from flexget.plugin import register_plugin, get_plugin_by_name, PluginError, \
-    get_plugins_by_group, get_plugins_by_phase, PluginWarning
+    get_plugins_by_group, get_plugins_by_phase, PluginWarning, register_parser_option
+import datetime
+from flexget import schema
+from flexget.utils.tools import parse_timedelta
 
 log = logging.getLogger('discover')
+Base = schema.versioned_base('discover', 0)
+
+
+class DiscoverEntry(Base):
+    __tablename__ = 'discover_entry'
+
+    id = Column(Integer, primary_key=True)
+    title = Column(Unicode, index=True)
+    task = Column(Unicode, index=True)
+    last_execution = Column(DateTime)
+
+    def __init__(self, title, task):
+        self.title = title
+        self.task = task
+        self.last_execution = None
+
+    def __str__(self):
+        return '<DiscoverEntry(title=%s,task=%s,added=%s)>' % (self.title, self.task, self.last_execution)
+
+Index('ix_discover_entry_title_task', DiscoverEntry.title, DiscoverEntry.task)
+
+
+@event('manager.db_cleanup')
+def db_cleanup(session):
+    value = datetime.datetime.now() - parse_timedelta('7 days')
+    for de in session.query(DiscoverEntry).filter(DiscoverEntry.last_execution <= value).all():
+        log.debug('deleting %s' % de)
+        session.delete(de)
 
 
 class Discover(object):
@@ -19,6 +54,8 @@ class Discover(object):
           - emit_series: yes
         from:
           - piratebay
+        interval: [1 hours|days|weeks]
+        ignore_estimations: [yes|no]
     """
 
     def validator(self):
@@ -39,7 +76,8 @@ class Discover(object):
                 no_config.accept(plugin.name)
 
         discover.accept('integer', key='limit')
-        discover.accept('choice', key='type').accept_choices(['any', 'normal', 'exact', 'movies'])
+        discover.accept('interval', key='interval')
+        discover.accept('boolean', key='ignore_estimations')
         return discover
 
     def execute_inputs(self, config, task):
@@ -48,7 +86,6 @@ class Discover(object):
         :param task: Current task
         :return: List of pseudo entries created by inputs under `what` configuration
         """
-
         entries = []
         entry_titles = set()
         entry_urls = set()
@@ -75,7 +112,7 @@ class Discover(object):
                         continue
 
                     if entry['title'] in entry_titles:
-                        log.verbose('Ignored duplicate title `%s`' % entry['title']) # TODO: should combine?
+                        log.verbose('Ignored duplicate title `%s`' % entry['title'])    # TODO: should combine?
                     else:
                         entries.append(entry)
                         entry_titles.add(entry['title'])
@@ -90,14 +127,6 @@ class Discover(object):
         """
 
         result = []
-        if config.get('type', 'normal') == 'normal':
-            comparator = StringComparator(cutoff=0.7, cleaner=clean_title)
-        elif config['type'] == 'exact':
-            comparator = StringComparator(cutoff=0.9)
-        elif config['type'] == 'any':
-            comparator = AnyComparator()
-        else:
-            comparator = MovieComparator()
         for item in config['from']:
             if isinstance(item, dict):
                 plugin_name, plugin_config = item.items()[0]
@@ -108,20 +137,94 @@ class Discover(object):
                 log.critical('Search plugin %s does not implement search method' % plugin_name)
             for entry in entries:
                 try:
-                    search_results = search.search(entry['title'], comparator, plugin_config)
+                    search_results = search.search(entry, plugin_config)
                     log.debug('Discovered %s entries from %s' % (len(search_results), plugin_name))
                     result.extend(search_results[:config.get('limit')])
                 except (PluginError, PluginWarning):
                     log.debug('No results from %s' % plugin_name)
         return sorted(result, reverse=True, key=lambda x: x.get('search_sort'))
 
+    def estimated(self, entries):
+        """
+        :return: Entries that we have estimated to be available
+        """
+        estimator = get_plugin_by_name('estimate_release').instance
+        result = []
+        for entry in entries:
+            est_date = estimator.estimate(entry)
+            if isinstance(est_date, datetime.date):
+                # If we just got a date, add a time so we can compare it to now()
+                est_date = datetime.datetime.combine(est_date, datetime.time())
+            if est_date is None:
+                log.debug('No release date could be determined for %s' % entry['title'])
+                result.append(entry)
+            elif datetime.datetime.now() >= est_date:
+                log.info('%s has been released at %s' % (entry['title'], est_date))
+                result.append(entry)
+            else:
+                log.info("%s hasn't been released yet (Expected:%s)" % (entry['title'], est_date))
+        return result
+
+    def interval_total_seconds(self, interval):
+        """
+            Because python 2.6 doesn't have total_seconds()
+        """
+        return (interval.seconds + interval.days * 24 * 3600)
+
+    def interval_expired(self, config, task, entries):
+        """
+        Maintain some limit levels so that we don't hammer search
+        sites with unreasonable amount of queries.
+
+        :return: Entries that are up for ``config['interval']``
+        """
+        config.setdefault('interval', '5 hour')
+        interval = parse_timedelta(config['interval'])
+        if task.manager.options.discover_now:
+            log.info('Ignoring interval because of --discover-now')
+        result = []
+        for entry in entries:
+            de = task.session.query(DiscoverEntry).\
+                filter(DiscoverEntry.title == entry['title']).\
+                filter(DiscoverEntry.task == task.name).first()
+
+            if not de:
+                log.info('%s -> No previous run recorded' % entry['title'])
+                de = DiscoverEntry(entry['title'], task.name)
+                task.session.add(de)
+            if task.manager.options.discover_now or not de.last_execution:
+                # First time we execute (and on --discover-now) we randomize time to avoid clumping
+                delta = datetime.timedelta(seconds=(random.random() * self.interval_total_seconds(interval)))
+                de.last_execution = datetime.datetime.now() - delta
+            else:
+                next_time = de.last_execution + interval
+                log.debug('last_time: %r, interval: %s, next_time: %r, ',
+                          de.last_execution, config['interval'], next_time)
+                if datetime.datetime.now() < next_time:
+                    log.debug('interval not met')
+                    log.verbose('Discover interval %s not met for %s. Use --discover-now to override.' %
+                                (config['interval'], entry['title']))
+                    continue
+                de.last_execution = datetime.datetime.now()
+            log.debug('interval passed')
+            result.append(entry)
+        return result
+
     @cached('discover')
     def on_task_input(self, task, config):
+        task.no_entries_ok = True
         entries = self.execute_inputs(config, task)
         log.verbose('Discovering %i titles ...' % len(entries))
         if len(entries) > 500:
-            log.critical('Looks like your inputs in discover configuration produced over 500 entries, please reduce the amount!')
+            log.critical('Looks like your inputs in discover configuration produced '
+                         'over 500 entries, please reduce the amount!')
+        # TODO: the entries that are estimated should be given priority over expiration
+        entries = self.interval_expired(config, task, entries)
+        if not config.get('ignore_estimations', False):
+            entries = self.estimated(entries)
         return self.execute_searches(config, entries)
 
 
 register_plugin(Discover, 'discover', api_ver=2)
+register_parser_option('--discover-now', action='store_true', dest='discover_now', default=False,
+                       help='Immediately try to discover everything.')

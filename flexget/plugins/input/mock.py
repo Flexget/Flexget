@@ -26,9 +26,7 @@ class Mock(object):
         entry = container.accept('dict')
         entry.accept('text', key='title', required=True)
         entry.accept('url', key='text')
-        entry.accept_any_key('text')
-        entry.accept_any_key('number')
-        entry.accept_any_key('list').accept('any')
+        entry.accept_any_key('any')
         return container
 
     def on_task_input(self, task, config):

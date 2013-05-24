@@ -1,9 +1,12 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
 import urllib
+
 import feedparser
+
 from flexget.entry import Entry
 from flexget.plugin import register_plugin, PluginWarning
+from flexget.utils.search import normalize_unicode
 
 log = logging.getLogger('nyaa')
 
@@ -26,13 +29,12 @@ class UrlRewriteNyaa(object):
         advanced.accept('choice', key='filter').accept_choices(FILTERS)
         return root
 
-    def search(self, query, comparator, config):
+    def search(self, entry, config):
         if not isinstance(config, dict):
             config = {'category': config}
         config.setdefault('category', 'anime')
         config.setdefault('filter', 'all')
-        comparator.set_seq1(query)
-        name = comparator.search_string()
+        name = normalize_unicode(entry['title'])
         url = 'http://www.nyaa.eu/?page=rss&cats=%s&filter=%s&term=%s' % (
               CATEGORIES[config['category']], FILTERS.index(config['filter']), urllib.quote(name.encode('utf-8')))
 
@@ -49,16 +51,10 @@ class UrlRewriteNyaa(object):
             raise PluginWarning('Got bozo_exception (bad feed)')
 
         for item in rss.entries:
-            # Check if item passes comparator
-            comparator.set_seq2(item.title)
-            log.debug('name: %s, found name: %s, confidence: %s' % (comparator.a, comparator.b, comparator.ratio()))
-            if not comparator.matches():
-                continue
 
             entry = Entry()
             entry['title'] = item.title
             entry['url'] = item.link
-            entry['search_ratio'] = comparator.ratio()
             # TODO: parse some shit
             #entry['torrent_seeds'] = int(item.seeds)
             #entry['torrent_leeches'] = int(item.leechs)

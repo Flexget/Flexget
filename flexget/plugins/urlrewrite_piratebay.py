@@ -7,7 +7,7 @@ from flexget.entry import Entry
 from flexget.plugin import register_plugin, internet, PluginWarning
 from flexget.utils import requests
 from flexget.utils.soup import get_soup
-from flexget.utils.search import torrent_availability, StringComparator
+from flexget.utils.search import torrent_availability, normalize_unicode
 from flexget import validator
 
 log = logging.getLogger('piratebay')
@@ -66,7 +66,7 @@ class UrlRewritePirateBay(object):
         if entry['url'].startswith(('http://thepiratebay.se/search/', 'http://thepiratebay.org/search/')):
             # use search
             try:
-                entry['url'] = self.search(entry['title'])[0]['url']
+                entry['url'] = self.search(entry)[0]['url']
             except PluginWarning as e:
                 raise UrlRewritingError(e)
         else:
@@ -91,7 +91,7 @@ class UrlRewritePirateBay(object):
             raise UrlRewritingError(e)
 
     @internet(log)
-    def search(self, query, comparator=StringComparator(), config=None):
+    def search(self, arg_entry, config=None):
         """
         Search for name from piratebay.
         """
@@ -106,8 +106,9 @@ class UrlRewritePirateBay(object):
             category = CATEGORIES.get(config.get('category', 'all'))
         filter_url = '/0/%d/%d' % (sort, category)
 
-        comparator.set_seq1(query)
-        query = comparator.search_string()
+        query = normalize_unicode(arg_entry['title'])
+        # TPB search doesn't like dashes
+        query = query.replace('-', ' ')
         # urllib.quote will crash if the unicode string has non ascii characters, so encode in utf-8 beforehand
         url = 'http://thepiratebay.se/search/' + urllib.quote(query.encode('utf-8')) + filter_url
         log.debug('Using %s as piratebay search url' % url)
@@ -115,19 +116,12 @@ class UrlRewritePirateBay(object):
         soup = get_soup(page)
         entries = []
         for link in soup.find_all('a', attrs={'class': 'detLink'}):
-            comparator.set_seq2(link.contents[0])
-            log.debug('name: %s' % comparator.a)
-            log.debug('found name: %s' % comparator.b)
-            log.debug('confidence: %s' % comparator.ratio())
-            if not comparator.matches():
-                continue
             entry = Entry()
             entry['title'] = link.contents[0]
             entry['url'] = 'http://thepiratebay.se' + link.get('href')
             tds = link.parent.parent.parent.find_all('td')
             entry['torrent_seeds'] = int(tds[-2].contents[0])
             entry['torrent_leeches'] = int(tds[-1].contents[0])
-            entry['search_ratio'] = comparator.ratio()
             entry['search_sort'] = torrent_availability(entry['torrent_seeds'], entry['torrent_leeches'])
             # Parse content_size
             size = link.find_next(attrs={'class': 'detDesc'}).contents[0]
@@ -140,13 +134,6 @@ class UrlRewritePirateBay(object):
                 else:
                     entry['content_size'] = int(float(size.group(1)) * 1000 / 1024 ** 2)
             entries.append(entry)
-
-        if not entries:
-            dashindex = query.rfind('-')
-            if dashindex != -1:
-                return self.search(query[:dashindex], comparator=comparator)
-            else:
-                raise PluginWarning('No close matches for %s' % query, log, log_once=True)
 
         entries.sort(reverse=True, key=lambda x: x.get('search_sort'))
 
