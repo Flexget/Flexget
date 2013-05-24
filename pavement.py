@@ -182,6 +182,7 @@ def sdist(options):
 
     # restore version ...
     set_init_version('{git}')
+    return ver
 
 
 @task
@@ -223,6 +224,7 @@ def make_egg(options):
     shutil.rmtree('FlexGet.egg-info')
     print 'Restoring FlexGet.egg-info'
     shutil.move('FlexGet.egg-info-backup', 'FlexGet.egg-info')
+    return ver
 
 
 @task
@@ -266,7 +268,8 @@ def docs():
 @might_call('test', 'sdist', 'make_egg')
 @cmdopts([
     ('no-tests', None, 'skips unit tests'),
-    ('type=', None, 'type of release (src | egg)')
+    ('type=', None, 'type of release (src | egg)'),
+    ('ver-file=', None, 'java properties file to create with version number FG_VERSION')
 ])
 def release(options):
     """Make a FlexGet release. Same as bdist_egg but adds version information."""
@@ -293,11 +296,14 @@ def release(options):
 
     if options.release.get('type') == 'egg':
         print 'Making egg release'
-        make_egg()
+        ver = make_egg()
     else:
         print 'Making src release'
-        sdist()
+        ver = sdist()
 
+    if options.release.ver_file:
+        with open(options.release.ver_file, 'w') as ver_file:
+            ver_file.write('FG_VERSION=%s' % ver)
 
 @task
 def install_tools():
