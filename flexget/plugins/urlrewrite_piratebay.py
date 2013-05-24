@@ -107,6 +107,8 @@ class UrlRewritePirateBay(object):
         filter_url = '/0/%d/%d' % (sort, category)
 
         query = normalize_unicode(arg_entry['title'])
+        # TPB search doesn't like dashes
+        query = query.replace('-', ' ')
         # urllib.quote will crash if the unicode string has non ascii characters, so encode in utf-8 beforehand
         url = 'http://thepiratebay.se/search/' + urllib.quote(query.encode('utf-8')) + filter_url
         log.debug('Using %s as piratebay search url' % url)
@@ -132,15 +134,6 @@ class UrlRewritePirateBay(object):
                 else:
                     entry['content_size'] = int(float(size.group(1)) * 1000 / 1024 ** 2)
             entries.append(entry)
-
-        if not entries:
-            dashindex = query.rfind('-')
-            if dashindex != -1:
-                new_entry = Entry()
-                new_entry['title'] = query[:dashindex]
-                return self.search(new_entry)
-            else:
-                raise PluginWarning('No close matches for %s' % query, log, log_once=True)
 
         entries.sort(reverse=True, key=lambda x: x.get('search_sort'))
 
