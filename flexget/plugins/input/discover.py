@@ -9,11 +9,11 @@ from flexget.event import event
 from flexget.utils.cached_input import cached
 from flexget.plugin import (register_plugin, get_plugin_by_name, PluginError,
     PluginWarning, register_parser_option)
-from flexget import schema
+from flexget import db_schema
 from flexget.utils.tools import parse_timedelta
 
 log = logging.getLogger('discover')
-Base = schema.versioned_base('discover', 0)
+Base = db_schema.versioned_base('discover', 0)
 
 
 class DiscoverEntry(Base):
