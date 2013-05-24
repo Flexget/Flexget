@@ -1,0 +1,120 @@
+.link {
+	color: #05C;
+}
+
+.link:hover {
+	color: #07F;
+	text-decoration: underline;
+}
+
+/****** Prompt *******/
+
+.prompt-outer {
+	display: inline;
+	position: relative;
+	text-align: center;
+	position: absolute;
+	left: 10%;
+	width: 80%;
+}
+
+.prompt-inner {
+	display: inline-block;
+}
+
+.prompt-overlay {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 70%;
+	height: 100%;
+	background-color: #000;
+	padding-left: 15%;
+	padding-right: 15%;
+	background-color: rgba(100, 100, 100, 0.3);
+	background-image: URL('images/background-stripe.png');
+}
+
+.prompt-box {
+	position: relative;
+	text-align: left;
+	background-color: white;
+	border: 2px solid black;
+	border-radius: 10px;
+	padding: 1em;
+	padding-bottom: 1.5em;
+	padding-top: 0.5em;
+}
+
+.prompt-box h1 {
+	text-align: center;
+	font-size: 1.3em;
+	font-weight: bold;
+	border: none;
+	border-bottom: 1px solid black;
+	margin: 0;
+}
+
+.prompt-box h2 {
+	color: #666;
+	text-align: center;
+	font-size: 1.1em;
+	font-style: italic;
+	border: none;
+	margin: 0;
+	padding: 0;
+	margin-bottom: 1em;
+}
+
+.prompt-buttons {
+	position: relative;
+	top: -13px;
+	border: 2px solid black;
+	border-bottom-left-radius: 10px;
+	border-bottom-right-radius: 10px;
+	padding-top: 0.3em;
+	padding-bottom: 0.3em;
+}
+
+/************ Buttons *************/
+
+.button {
+	display: inline;
+	color: #444;
+	font-weight: bold;
+	text-decoration: none;
+	margin-left: 0.5em;
+	margin-right: 0.5em;
+	padding-left: 0.5em;
+	padding-right: 0.5em;
+	border: 1px solid #888;
+	border-radius: 3px;
+	background-color: #DDD;
+	background-image: URL('images/background-fade.png');
+	background-repeat: repeat-x;
+	background-position: top;
+}
+
+.button:hover {
+	color: #222;
+	background-image: URL('images/background-fade-bold.png');
+}
+
+.button.link {
+	color: #05C;
+	background-color: #E0E8F0;
+	background-image: none;
+}
+
+.button.link:hover {
+	color: #07F;
+	background-color: #E8F0F8;
+	background-image: none;
+}
+
+.button.disabled, .button.disabled:hover {
+	border-color: #CCC;
+	color: #888;
+	background-color: #EEE;
+	background-image: none;
+}

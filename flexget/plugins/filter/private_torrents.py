@@ -25,9 +25,7 @@ class FilterPrivateTorrents(object):
     Non-torrent content is not interviened.
     """
 
-    def validator(self):
-        from flexget import validator
-        return validator.factory('boolean')
+    schema = {'type': 'boolean'}
 
     @priority(127)
     def on_task_modify(self, task):

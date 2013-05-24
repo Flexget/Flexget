@@ -2,6 +2,8 @@ from __future__ import unicode_literals, division, absolute_import
 import copy
 import os
 import logging
+
+from flexget.config_schema import one_or_more
 from flexget.plugin import register_plugin, priority, PluginWarning
 from flexget.utils.titles import ParseWarning
 
@@ -17,18 +19,20 @@ class FilterExistsSeries(object):
       exists_series: /storage/series/
     """
 
-    def validator(self):
-        from flexget import validator
-        root = validator.factory()
-        root.accept('path')
-        bundle = root.accept('list')
-        bundle.accept('path')
-        advform = root.accept('dict')
-        advform.accept('boolean', key='allow_different_qualities')
-        advform.accept('equals', key='allow_different_qualities').accept('better')
-        advform.accept('path', key='path')
-        advform.accept('list', key='path').accept('path')
-        return root
+    schema = {
+        'anyOf': [
+            one_or_more({'type': 'string', 'format': 'path'}),
+            {
+                'type': 'object',
+                'properties': {
+                    'path': one_or_more({'type': 'string', 'format': 'path'}),
+                    'allow_different_qualities': {'enum': ['better', True, False], 'default': False}
+                },
+                'required': ['path'],
+                'additionalProperties': False
+            }
+        ]
+    }
 
     def get_config(self, task):
         config = task.config.get('exists_series', [])

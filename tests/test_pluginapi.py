@@ -5,7 +5,7 @@ import glob
 from nose.tools import raises
 
 from tests import FlexGetBase
-from flexget import plugin, plugins
+from flexget import plugin, plugins, CoreArgumentParser
 
 
 class TestPluginApi(object):
@@ -63,7 +63,7 @@ class TestExternalPluginLoading(FlexGetBase):
 
     def setup(self):
         os.environ['FLEXGET_PLUGIN_PATH'] = os.path.join(self.base_path, 'external_plugins')
-        plugin.load_plugins(plugin._parser)
+        plugin.load_plugins(CoreArgumentParser())
         super(TestExternalPluginLoading, self).setup()
 
     def teardown(self):

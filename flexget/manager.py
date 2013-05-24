@@ -14,7 +14,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.pool import SingletonThreadPool
 
 from flexget.event import fire_event
-from flexget import validator
+from flexget import config_schema
 
 log = logging.getLogger('manager')
 
@@ -24,22 +24,24 @@ manager = None
 DB_CLEANUP_INTERVAL = timedelta(days=7)
 
 # Validator that handles root structure of config.
-_config_validator = validator.factory('dict')
+_root_config_schema = {'type': 'object', 'additionalProperties': False}
+# TODO: Is /schema/root this the best place for this?
+config_schema.register_schema('/schema/root', _root_config_schema)
 
 
-def register_config_key(key, validator, required=False):
+def register_config_key(key, schema, required=False):
     """ Registers a valid root level key for the config.
 
     :param string key:
       Name of the root level key being registered.
-    :param validator:
-      Validator for the key.
-      Accepts: :class:`flexget.validator.Validator` instance, function returning
-      Validator instance, or validator type string.
+    :param dict schema:
+      Schema for the key.
     :param bool required:
       Specify whether this is a mandatory key.
     """
-    _config_validator.accept(validator, key=key, required=required)
+    _root_config_schema.setdefault('properties', {})[key] = schema
+    if required:
+        _root_config_schema.setdefault('required', []).append(key)
 
 
 def useExecLogging(func):
@@ -145,7 +147,7 @@ class Manager(object):
         errors = self.validate_config()
         if errors:
             for error in errors:
-                log.critical(error)
+                log.critical("[%s] %s", error.json_pointer, error.message)
             return
         self.create_tasks()
 
@@ -408,9 +410,13 @@ class Manager(object):
         log.debug('Pre-checked %s configuration lines' % line_num)
 
     def validate_config(self):
-        """Check all root level keywords are valid."""
-        _config_validator.validate(self.config)
-        return _config_validator.errors.messages
+        """
+        Check all root level keywords are valid.
+
+        :returns: A list of `ValidationError`s
+
+        """
+        return config_schema.process_config(self.config, _root_config_schema)
 
     def init_sqlalchemy(self):
         """Initialize SQLAlchemy"""

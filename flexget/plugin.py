@@ -12,6 +12,7 @@ from itertools import ifilter
 
 from requests import RequestException
 
+from flexget import config_schema
 from flexget.event import add_event_handler as add_phase_handler
 from flexget import plugins as plugins_pkg
 
@@ -289,6 +290,19 @@ class PluginInfo(dict):
         self.instance.plugin_info = self  # give plugin easy access to its own info
         self.instance.log = logging.getLogger(getattr(self.instance, "LOGGER_NAME", None) or self.name)
 
+        if hasattr(self.instance, 'schema'):
+            self.schema = self.instance.schema
+        elif hasattr(self.instance, 'validator'):
+            self.schema = self.instance.validator().schema()
+        else:
+            # TODO: I think plugins without schemas should not be allowed in config, maybe rethink this
+            self.schema = {}
+
+        if self.schema is not None:
+            location = '/schema/plugin/%s' % self.name
+            self.schema['id'] = location
+            config_schema.register_schema(location, self.schema)
+
         if self.name in plugins:
             PluginInfo.dupe_counter += 1
             log.critical('Error while registering plugin %s. %s' %
@@ -462,6 +476,16 @@ def get_plugins(phase=None, group=None, context=None, category=None, min_api=Non
             return False
         return True
     return ifilter(matches, plugins.itervalues())
+
+
+def plugin_schemas(**kwargs):
+    """Create a dict schema that matches plugins specified by `kwargs`"""
+    return {'type': 'object',
+            'properties': dict((p.name, {'$ref': p.schema['id']}) for p in get_plugins(**kwargs)),
+            'additionalProperties': False}
+
+
+config_schema.register_schema('/schema/plugins', plugin_schemas)
 
 
 def get_plugins_by_phase(phase):

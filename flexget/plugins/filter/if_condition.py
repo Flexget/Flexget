@@ -28,24 +28,21 @@ class FilterIf(object):
 
     Actions include accept, reject, and fail, as well as the ability to run other filter plugins on the entries."""
 
+    schema = {
+        'type': 'array',
+        'items': {
+            'type': 'object',
+            'additionalProperties': {
+                'anyOf': [
+                    {'$ref': '/schema/plugins'},
+                    {'enum': ['accept', 'reject', 'fail']}
+                ]
+            }
+        }
+    }
+
     def __init__(self):
         self.task_phases = {}
-
-    def validator(self):
-        from flexget import validator
-        root = validator.factory('list')
-        key_validator = validator.factory('regexp_match',
-                                          message='If statements cannot contain `__`,  `try` or `lambda` statements')
-        key_validator.reject(r'.*?(__|try\s*:|lambda)')
-        key_validator.accept('.')
-        action = root.accept('dict').accept_valid_keys('root', key_validator=key_validator)
-        action.accept('choice').accept_choices(['accept', 'reject', 'fail'])
-        filter_action = action.accept('dict')
-        # Build a dict validator that accepts all api > 2 plugins except input plugins.
-        for plugin in all_plugins.itervalues():
-            if plugin.api_ver > 1 and hasattr(plugin.instance, 'validator') and 'input' not in plugin.phase_handlers:
-                filter_action.accept(plugin.instance.validator, key=plugin.name)
-        return root
 
     def on_process_start(self, task, config):
         """Divide the config into parts based on which phase they need to run on."""

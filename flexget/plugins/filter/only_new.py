@@ -8,9 +8,7 @@ log = logging.getLogger('only_new')
 class FilterOnlyNew(object):
     """Causes input plugins to only emit entries that haven't been seen on previous runs."""
 
-    def validator(self):
-        from flexget.validator import BooleanValidator
-        return BooleanValidator()
+    schema = {'type': 'boolean'}
 
     def on_process_start(self, task, config):
         """Make sure the remember_rejected plugin is available"""

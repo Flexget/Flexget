@@ -5,16 +5,16 @@ import logging
 import hashlib
 from datetime import datetime, timedelta
 from sqlalchemy import Column, Integer, String, DateTime, Index
-from flexget import schema
+from flexget import db_schema
 from flexget.utils.sqlalchemy_utils import table_schema
 from flexget.manager import Session
 from flexget.event import event
 
 log = logging.getLogger('util.log')
-Base = schema.versioned_base('log_once', 0)
+Base = db_schema.versioned_base('log_once', 0)
 
 
-@schema.upgrade('log_once')
+@db_schema.upgrade('log_once')
 def upgrade(ver, session):
     if ver is None:
         log.info('Adding index to md5sum column of log_once table.')

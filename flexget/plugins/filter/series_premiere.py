@@ -26,15 +26,13 @@ class FilterSeriesPremiere(FilterSeriesBase):
         - integrate thetvdb to allow refining by genres, etc.
     """
 
-    def validator(self):
-        from flexget import validator
-        root = validator.factory()
-        # Accept yes to just turn on
-        root.accept('boolean')
-        options = root.accept('dict')
-        self.build_options_validator(options)
-        options.accept('boolean', key='allow_seasonless')
-        return root
+    # TODO: allow_seasonless option
+    schema = {
+        'anyOf': [
+            {'type': 'boolean'},
+            {'$ref': '/schema/plugin/series#/definitions/series_options'}
+        ]
+    }
 
     # Run after series and metainfo series plugins
     @priority(115)

@@ -2,6 +2,8 @@ from __future__ import unicode_literals, division, absolute_import
 import logging
 import posixpath
 from fnmatch import fnmatch
+
+from flexget.config_schema import one_or_more
 from flexget.plugin import register_plugin, priority
 
 log = logging.getLogger('content_filter')
@@ -19,17 +21,17 @@ class FilterContentFilter(object):
           - '*.mkv'
     """
 
-    def validator(self):
-        from flexget import validator
-        config = validator.factory('dict')
-        config.accept('text', key='require')
-        config.accept('list', key='require').accept('text')
-        config.accept('text', key='require_all')
-        config.accept('list', key='require_all').accept('text')
-        config.accept('text', key='reject')
-        config.accept('list', key='reject').accept('text')
-        config.accept('boolean', key='strict')
-        return config
+    schema = {
+        'type': 'object',
+        'properties': {
+            # These two properties allow a string or list of strings
+            'require': one_or_more({'type': 'string'}),
+            'require_all': one_or_more({'type': 'string'}),
+            'reject': one_or_more({'type': 'string'}),
+            'strict': {'type': 'boolean', 'default': False}
+        },
+        'additionalProperties': False
+    }
 
     def get_config(self, task):
         config = task.config.get('content_filter')

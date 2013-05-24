@@ -299,4 +299,4 @@ class OutputEmail(object):
             log.debug('Email error:', exc_info=True)
 
 register_plugin(OutputEmail, 'email', api_ver=2)
-manager.register_config_key('email', options_validator)
+manager.register_config_key('email', options_validator().schema())

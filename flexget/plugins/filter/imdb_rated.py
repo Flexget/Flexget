@@ -47,14 +47,15 @@ class FilterImdbRated(object):
     Note: in theory this should work with any other page containing imdb urls.
     """
 
-    def validator(self):
-        from flexget import validator
-        root = validator.factory()
-        root.accept('url')
-        complex = root.accept('dict')
-        complex.accept('url', key='url')
-        complex.accept('boolean', key='reverse')
-        return root
+    schema = {
+        'type': ['string', 'object'],
+        'format': 'url',
+        'properties': {
+            'url': {'type': 'string', 'format': 'url'},
+            'reverse': {'type': 'boolean'}
+        },
+        'required': ['url']
+    }
 
     def update_rated(self, task, config):
         """Update my movies list"""

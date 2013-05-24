@@ -28,16 +28,14 @@ class ImportSeries(FilterSeriesBase):
             - /media/series
     """
 
-    def validator(self):
-        from flexget import validator
-        root = validator.factory('dict')
-        self.build_options_validator(root.accept('dict', key='settings'))
-        from_section = root.accept('dict', key='from', required=True)
-        # Build a dict validator that accepts the available input plugins and their settings
-        for plugin in get_plugins_by_phase('input'):
-            if plugin.api_ver > 1 and hasattr(plugin.instance, 'validator'):
-                from_section.accept(plugin.instance.validator, key=plugin.name)
-        return root
+    schema = {
+        'type': 'object',
+        'properties': {
+            'settings': {'$ref': '/schema/plugin/series#/definitions/series_options'},
+            'from': {'$ref': '/schema/plugins?phase=input'}
+        },
+        'additionalProperties': False
+    }
 
     def on_task_start(self, task, config):
 

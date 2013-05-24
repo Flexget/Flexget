@@ -9,13 +9,15 @@ log = logging.getLogger('content_size')
 
 class FilterContentSize(object):
 
-    def validator(self):
-        from flexget import validator
-        config = validator.factory('dict')
-        config.accept('number', key='min')
-        config.accept('number', key='max')
-        config.accept('boolean', key='strict')
-        return config
+    schema = {
+        'type': 'object',
+        'properties': {
+            'min': {'type': 'number'},
+            'max': {'type': 'number'},
+            'strict': {'type': 'boolean', 'default': True}
+        },
+        'additionalProperties': False
+    }
 
     def process_entry(self, task, entry, config, remember=True):
         """Rejects this entry if it does not pass content_size requirements. Returns true if the entry was rejected."""
@@ -49,7 +51,7 @@ class FilterContentSize(object):
         for entry in task.accepted:
             if 'content_size' in entry:
                 self.process_entry(task, entry, config)
-            elif config.get('strict', True):
+            elif config['strict']:
                 log.debug('Entry %s size is unknown, rejecting because of strict mode (default)' % entry['title'])
                 log.info('No size information available for %s, rejecting' % entry['title'])
                 if not 'file' in entry:
