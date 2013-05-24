@@ -1,5 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
+from difflib import SequenceMatcher
 import logging
+
 from flexget.plugin import get_plugins_by_group, PluginWarning, PluginError, \
     register_parser_option, register_plugin, priority
 
@@ -74,7 +76,6 @@ class PluginSearch(object):
 
         # search accepted
         for entry in task.accepted:
-            found = False
             # loop through configured searches
             for name in config:
                 search_config = None
@@ -84,19 +85,22 @@ class PluginSearch(object):
                 log.verbose('Searching `%s` from %s' % (entry['title'], name))
                 try:
                     results = plugins[name].search(entry, search_config)
-                    # TODO: We should filter to make sure the search result is close enough
-                    if results:
-                        url = results[0]['url']
-                        log.debug('Found url: %s' % url)
-                        entry['url'] = url
-                        found = True
-                        break
+                    matcher = SequenceMatcher(a=entry['title'])
+                    for result in results:
+                        matcher.set_seq2(result['title'])
+                        if matcher.ratio() > 0.9:
+                            log.debug('Found url: %s', result['url'])
+                            entry['url'] = result['url']
+                            break
+                    else:
+                        continue
+                    break
                 except (PluginError, PluginWarning) as pw:
                     log.verbose('Failed: %s' % pw.value)
                     continue
 
             # Search failed
-            if not found:
+            else:
                 # If I don't have a URL, doesn't matter if I'm immortal...
                 entry['immortal'] = False
                 entry.reject('search failed')
