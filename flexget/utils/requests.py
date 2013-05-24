@@ -60,6 +60,9 @@ def _wrap_urlopen(url, timeout=None):
         raise RequestException(msg)
     resp = requests.Response()
     resp.raw = raw
+    # requests passes the `decode_content` kwarg to read
+    orig_read = raw.read
+    resp.raw.read = lambda size, **kwargs: orig_read(size)
     resp.status_code = raw.code or 200
     resp.headers = requests.structures.CaseInsensitiveDict(raw.headers)
     return resp
