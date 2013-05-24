@@ -5,7 +5,7 @@ import re
 from datetime import datetime, timedelta
 from BeautifulSoup import BeautifulStoneSoup
 from sqlalchemy import Column, Integer, Unicode, DateTime, String
-from flexget import schema
+from flexget import db_schema
 from flexget.plugin import register_plugin, internet, DependencyError
 from flexget.utils.tools import urlopener
 from flexget.utils.database import pipe_list_synonym, with_session
@@ -20,10 +20,10 @@ except ImportError:
                           message='thetvdb_lookup requires the `api_tvdb` plugin')
 
 log = logging.getLogger('thetvdb_favorites')
-Base = schema.versioned_base('thetvdb_favorites', 0)
+Base = db_schema.versioned_base('thetvdb_favorites', 0)
 
 
-@schema.upgrade('thetvdb_favorites')
+@db_schema.upgrade('thetvdb_favorites')
 def upgrade(ver, session):
     if ver is None:
         columns = table_columns('thetvdb_favorites', session)

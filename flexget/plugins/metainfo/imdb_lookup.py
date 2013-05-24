@@ -6,7 +6,7 @@ from sqlalchemy import Table, Column, Integer, Float, String, Unicode, Boolean, 
 from sqlalchemy.schema import ForeignKey, Index
 from sqlalchemy.orm import relation, joinedload_all
 
-from flexget import schema
+from flexget import db_schema
 from flexget.entry import Entry
 from flexget.plugin import register_plugin, internet, PluginError, priority
 from flexget.manager import Session
@@ -18,7 +18,7 @@ from flexget.utils.sqlalchemy_utils import table_columns, get_index_by_name, tab
 
 SCHEMA_VER = 4
 
-Base = schema.versioned_base('imdb_lookup', SCHEMA_VER)
+Base = db_schema.versioned_base('imdb_lookup', SCHEMA_VER)
 
 
 # association tables
@@ -175,7 +175,7 @@ class SearchResult(Base):
 log = logging.getLogger('imdb_lookup')
 
 
-@schema.upgrade('imdb_lookup')
+@db_schema.upgrade('imdb_lookup')
 def upgrade(ver, session):
     if ver is None:
         columns = table_columns('imdb_movies', session)

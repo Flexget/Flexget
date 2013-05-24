@@ -1,6 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
-from flexget.plugin import register_plugin, add_plugin_validators, get_plugin_by_name, PluginError
+from flexget.plugin import register_plugin, get_plugin_by_name, PluginError
 
 log = logging.getLogger('inputs')
 
@@ -16,12 +16,10 @@ class PluginInputs(object):
         - rss: http://feedb.com
     """
 
-    def validator(self):
-        from flexget import validator
-        root = validator.factory()
-        inputs = root.accept('list')
-        add_plugin_validators(inputs, phase='input', excluded=['inputs'])
-        return root
+    schema = {
+        'type': 'array',
+        'items': {'allOf': [{'$ref': '/schema/plugins?phase=input'}, {'maxProperties': 1, 'minProperties': 1}]}
+    }
 
     def on_task_input(self, task, config):
         entries = []

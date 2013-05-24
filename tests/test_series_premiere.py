@@ -35,7 +35,7 @@ class TestSeriesPremiere(FlexGetBase):
             mock:
               - {title: 'foo bar s01e01 hdtv'}
             series_premiere:
-              path: test
+              path: .
           test_pilot_and_premiere:
             mock:
               - {title: 'foo bar s01e00 hdtv'}
@@ -67,7 +67,7 @@ class TestSeriesPremiere(FlexGetBase):
 
     def test_path_set(self):
         self.execute_task('test_path_set')
-        assert self.task.find_entry(title='foo bar s01e01 hdtv', path='test')
+        assert self.task.find_entry(title='foo bar s01e01 hdtv', path='.')
 
     def test_pilot_and_premiere(self):
         self.execute_task('test_pilot_and_premiere')

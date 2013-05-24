@@ -50,17 +50,22 @@ class PluginDownload(object):
     all paths to another location.
     """
 
-    def validator(self):
-        """Return config validator"""
-        from flexget import validator
-        root = validator.factory()
-        root.accept('path', allow_replacement=True)
-        root.accept('boolean')
-        advanced = root.accept('dict')
-        advanced.accept('path', key='path', allow_replacement=True)
-        advanced.accept('boolean', key='fail_html')
-        advanced.accept('boolean', key='overwrite')
-        return root
+    schema = {
+        'oneOf': [
+            {
+                'title': 'specify options',
+                'type': 'object',
+                'properties': {
+                    'path': {'type': 'string', 'format': 'path'},
+                    'fail_html': {'type': 'boolean', 'default': True},
+                    'overwrite': {'type': 'boolean', 'default': False}
+                },
+                'additionalProperties': False
+            },
+            {'title': 'specify path', 'type': 'string', 'format': 'path'},
+            {'title': 'no options', 'type': 'boolean', 'enum': [True]}
+        ]
+    }
 
     def process_config(self, config):
         """Return plugin configuration in advanced form"""
@@ -68,7 +73,6 @@ class PluginDownload(object):
             config = {'path': config}
         if not isinstance(config, dict):
             config = {}
-        config.setdefault('fail_html', True)
         if not config.get('path'):
             config['require_path'] = True
         return config

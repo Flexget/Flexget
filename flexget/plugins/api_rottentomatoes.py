@@ -9,7 +9,7 @@ from sqlalchemy import Table, Column, Integer, String, DateTime, func, sql
 from sqlalchemy.schema import ForeignKey, Index
 from sqlalchemy.orm import relation
 
-from flexget import schema
+from flexget import db_schema
 from flexget.plugin import internet, PluginError
 from flexget.manager import Session
 from flexget.utils import json
@@ -19,7 +19,7 @@ from flexget.utils.database import text_date_synonym
 from flexget.utils.sqlalchemy_utils import table_schema, table_add_column
 
 log = logging.getLogger('api_rottentomatoes')
-Base = schema.versioned_base('api_rottentomatoes', 2)
+Base = db_schema.versioned_base('api_rottentomatoes', 2)
 
 # This is developer Atlanta800's API key
 API_KEY = 'rh8chjzp8vu6gnpwj88736uv'
@@ -30,7 +30,7 @@ MIN_MATCH = 0.5
 MIN_DIFF = 0.01
 
 
-@schema.upgrade('api_rottentomatoes')
+@db_schema.upgrade('api_rottentomatoes')
 def upgrade(ver, session):
     if ver is 0:
         table_names = ['rottentomatoes_actors', 'rottentomatoes_alternate_ids',

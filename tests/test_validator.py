@@ -1,7 +1,11 @@
+"""
+These validate methods are never run by FlexGet anymore, but these tests serve as a sanity check that the
+old validators will get converted to new schemas properly for plugins still using the `validator` method.
+"""
 from __future__ import unicode_literals, division, absolute_import
+
 from flexget import validator
 from tests.util import maketemp
-
 
 class TestValidator(object):
 
@@ -27,9 +31,10 @@ class TestValidator(object):
         result = dv.validate({3: {}})
         assert not dv.errors.messages, 'should have passed 3'
         assert result, 'invalid result for key 3'
-        result = dv.validate({'three': {}})
+        # Json schema cannot do key validation
+        """result = dv.validate({'three': {}})
         assert dv.errors.messages, 'should not have passed three'
-        assert not result, 'should have an invalid result for 3'
+        assert not result, 'should have an invalid result for 3'"""
 
     def test_regexp_match(self):
         re_match = validator.factory('regexp_match')
@@ -74,7 +79,8 @@ class TestValidator(object):
         print choice.errors.messages
         assert choice.errors.messages, 'fOO should be invalid'
 
-    def test_lazy(self):
+    # This validator is not supported with json schema
+    def _lazy(self):
         """Test lazy validators by making a recursive one."""
 
         def recursive_validator():

@@ -3,7 +3,7 @@ import logging
 import pickle
 from datetime import datetime
 from sqlalchemy import Column, Integer, String, DateTime, PickleType, Index
-from flexget import schema
+from flexget import db_schema
 from flexget.entry import Entry
 from flexget.manager import Session
 from flexget.plugin import register_plugin, priority
@@ -12,10 +12,10 @@ from flexget.utils.sqlalchemy_utils import table_schema
 from flexget.utils.tools import parse_timedelta
 
 log = logging.getLogger('backlog')
-Base = schema.versioned_base('backlog', 1)
+Base = db_schema.versioned_base('backlog', 1)
 
 
-@schema.upgrade('backlog')
+@db_schema.upgrade('backlog')
 def upgrade(ver, session):
     if ver is None:
         # Make sure there is no data we can't load in the backlog table

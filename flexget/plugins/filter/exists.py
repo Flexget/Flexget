@@ -1,6 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
 import os
 import logging
+
+from flexget.config_schema import one_or_more
 from flexget.plugin import register_plugin, priority, PluginWarning
 
 log = logging.getLogger('exists')
@@ -16,13 +18,7 @@ class FilterExists(object):
           exists: /storage/movies/
     """
 
-    def validator(self):
-        from flexget import validator
-        root = validator.factory()
-        root.accept('path')
-        bundle = root.accept('list')
-        bundle.accept('path')
-        return root
+    schema = one_or_more({'type': 'string', 'format': 'path'})
 
     def get_config(self, task):
         config = task.config.get('exists', None)

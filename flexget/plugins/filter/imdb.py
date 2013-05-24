@@ -63,24 +63,25 @@ class FilterImdb(object):
         - TV_Y
     """
 
-    def validator(self):
-        """Validate given configuration"""
-        from flexget import validator
-        imdb = validator.factory('dict')
-        imdb.accept('integer', key='min_year')
-        imdb.accept('integer', key='max_year')
-        imdb.accept('integer', key='min_votes')
-        imdb.accept('number', key='min_score')
-        imdb.accept('list', key='reject_genres').accept('text')
-        imdb.accept('list', key='reject_languages').accept('text')
-        imdb.accept('list', key='accept_languages').accept('text')
-        imdb.accept('list', key='reject_actors').accept('text')
-        imdb.accept('list', key='accept_actors').accept('text')
-        imdb.accept('list', key='reject_directors').accept('text')
-        imdb.accept('list', key='accept_directors').accept('text')
-        imdb.accept('list', key='reject_mpaa_ratings').accept('text')
-        imdb.accept('list', key='accept_mpaa_ratings').accept('text')
-        return imdb
+    schema = {
+        'type': 'object',
+        'properties': {
+            'min_year': {'type': 'integer'},
+            'max_year': {'type': 'integer'},
+            'min_votes': {'type': 'integer'},
+            'min_score': {'type': 'number'},
+            'reject_genres': {'type': 'array', 'items': {'type': 'string'}},
+            'reject_languages': {'type': 'array', 'items': {'type': 'string'}},
+            'accept_languages': {'type': 'array', 'items': {'type': 'string'}},
+            'reject_actors': {'type': 'array', 'items': {'type': 'string'}},
+            'accept_actors': {'type': 'array', 'items': {'type': 'string'}},
+            'reject_directors': {'type': 'array', 'items': {'type': 'string'}},
+            'accept_directors': {'type': 'array', 'items': {'type': 'string'}},
+            'reject_mpaa_ratings': {'type': 'array', 'items': {'type': 'string'}},
+            'accept_mpaa_ratings': {'type': 'array', 'items': {'type': 'string'}}
+        },
+        'additionalProperties': False
+    }
 
     # Run later to avoid unnecessary lookups
     @priority(120)

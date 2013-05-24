@@ -9,7 +9,7 @@ from sqlalchemy import Table, Column, Integer, Float, String, Unicode, Boolean, 
 from sqlalchemy.schema import ForeignKey
 from sqlalchemy.orm import relation
 
-from flexget import schema
+from flexget import db_schema
 from flexget.utils.sqlalchemy_utils import table_add_column, table_schema
 from flexget.utils.titles import MovieParser
 from flexget.utils import requests
@@ -18,7 +18,7 @@ from flexget.manager import Session
 from flexget.plugin import register_plugin
 
 log = logging.getLogger('api_tmdb')
-Base = schema.versioned_base('api_tmdb', 0)
+Base = db_schema.versioned_base('api_tmdb', 0)
 
 # This is a FlexGet API key
 api_key = 'bdfc018dbdb7c243dc7cb1454ff74b95'
@@ -26,7 +26,7 @@ lang = 'en'
 server = 'http://api.themoviedb.org'
 
 
-@schema.upgrade('api_tmdb')
+@db_schema.upgrade('api_tmdb')
 def upgrade(ver, session):
     if ver is None:
         log.info('Adding columns to tmdb cache table, marking current cache as expired.')

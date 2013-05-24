@@ -7,18 +7,18 @@ import itertools
 
 from sqlalchemy import Column, Unicode, String, Integer
 
-from flexget import validator
-from flexget import schema
+from flexget import config_schema
+from flexget import db_schema
 from flexget.manager import Session, register_config_key
 from flexget.plugin import (get_plugins_by_phase, get_plugin_by_name, task_phases, PluginWarning, PluginError,
-                            DependencyError, plugins as all_plugins)
+                            DependencyError, plugins as all_plugins, plugin_schemas)
 from flexget.utils.simple_persistence import SimpleTaskPersistence
 from flexget.event import fire_event
 from flexget.entry import Entry, EntryUnicodeError
 import flexget.utils.requests as requests
 
 log = logging.getLogger('task')
-Base = schema.versioned_base('feed', 0)
+Base = db_schema.versioned_base('feed', 0)
 
 
 class TaskConfigHash(Base):
@@ -552,59 +552,26 @@ class Task(object):
         # log errors and abort
         if errors:
             log.critical('Task \'%s\' has configuration errors:' % self.name)
-            for error in errors:
-                log.error(error)
+            msgs = ["[%s] %s" % (e.json_pointer, e.message) for e in errors]
+            for msg in msgs:
+                log.error(msg)
             # task has errors, abort it
-            self.abort('\n'.join(errors))
+            self.abort('\n'.join(msgs))
         return errors
 
     @staticmethod
     def validate_config(config):
-        """Plugin configuration validation. Return list of error messages that were detected."""
-        validate_errors = []
-        # validate config is a dictionary
-        if not isinstance(config, dict):
-            validate_errors.append('Config is not a dictionary.')
-            return validate_errors
-        # validate all plugins
-        for keyword in config:
-            if keyword.startswith('_'):
-                continue
-            try:
-                plugin = get_plugin_by_name(keyword)
-            except:
-                validate_errors.append('Unknown plugin \'%s\'' % keyword)
-                continue
-            if hasattr(plugin.instance, 'validator'):
-                try:
-                    validator = plugin.instance.validator()
-                except TypeError as e:
-                    log.critical('Invalid validator method in plugin %s' % keyword)
-                    log.exception(e)
-                    continue
-                if not validator.name == 'root':
-                    # if validator is not root type, add root validator as it's parent
-                    validator = validator.add_root_parent()
-                if not validator.validate(config[keyword]):
-                    for msg in validator.errors.messages:
-                        validate_errors.append('%s %s' % (keyword, msg))
-            else:
-                log.warning('Used plugin %s does not support validating. Please notify author!' % keyword)
-
-        return validate_errors
+        schema = plugin_schemas(context='task')
+        # Don't validate commented out plugins
+        schema['patternProperties'] = {'^_': {}}
+        return config_schema.process_config(config, schema)
 
 
-def root_config_validator():
-    """Returns a validator for the 'tasks' key of config."""
-    # TODO: better error messages
-    valid_plugins = [p for p in all_plugins if hasattr(all_plugins[p].instance, 'validator')]
-    root = validator.factory('dict')
-    root.reject_keys(valid_plugins, message='plugins should go under a specific task. '
-                                            '(and tasks are not allowed to be named the same as any plugins)')
-    root.accept_any_key('dict').accept_any_key('any')
-    return root
+task_config_schema = {
+    'type': 'object',
+    'additionalProperties': {'type': 'object'}
+}
 
-
-register_config_key('tasks', root_config_validator)
+register_config_key('tasks', task_config_schema, required=True)
 # Backwards compatibility with feeds key
-register_config_key('feeds', root_config_validator)
+register_config_key('feeds', task_config_schema)

@@ -10,6 +10,7 @@ from datetime import datetime
 import feedparser
 from requests import RequestException
 
+from flexget.config_schema import one_or_more
 from flexget.entry import Entry
 from flexget.plugin import register_plugin, internet, PluginError
 from flexget.utils.cached_input import cached
@@ -84,28 +85,30 @@ class InputRSS(object):
         group_links: yes
     """
 
-    def validator(self):
-        from flexget import validator
-        root = validator.factory()
-        root.accept('url')
-        root.accept('file')
-        advanced = root.accept('dict')
-        advanced.accept('url', key='url', required=True)
-        advanced.accept('file', key='url')
-        advanced.accept('text', key='username')
-        advanced.accept('text', key='password')
-        advanced.accept('text', key='title')
-        advanced.accept('text', key='link')
-        advanced.accept('list', key='link').accept('text')
-        other_fields = advanced.accept('list', key='other_fields')
-        other_fields.accept('text')
-        other_fields.accept('dict').accept_any_key('text')
-        advanced.accept('boolean', key='silent')
-        advanced.accept('boolean', key='ascii')
-        advanced.accept('boolean', key='filename')
-        advanced.accept('boolean', key='group_links')
-        advanced.accept('boolean', key='all_entries')
-        return root
+    schema = {
+        'type': ['string', 'object'],
+        # Simple form, just url or file
+        'anyOf': [{'format': 'url'}, {'format': 'file'}],
+        # Advanced form, with options
+        'properties': {
+            'url': {'type': 'string', 'anyOf': [{'format': 'url'}, {'format': 'file'}]},
+            'username': {'type': 'string'},
+            'password': {'type': 'string'},
+            'title': {'type': 'string'},
+            'link': one_or_more({'type': 'string'}),
+            'silent': {'type': 'boolean', 'default': False},
+            'ascii': {'type': 'boolean', 'default': False},
+            'filename': {'type': 'boolean'},
+            'group_links': {'type': 'boolean', 'default': False},
+            'all_entries': {'type': 'boolean', 'default': True},
+            'other_fields': {'type': 'array', 'items': {
+                # Items can be a string, or a dict with a string value
+                'type': ['string', 'object'], 'additionalProperties': {'type': 'string'}
+            }}
+        },
+        'required': ['url'],
+        'additionalProperties': False
+    }
 
     def build_config(self, config):
         """Set default values to config"""

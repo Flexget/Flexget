@@ -27,6 +27,27 @@ class TraktList(object):
     Options username and api_key are required.
     """
 
+    schema = {
+        'type': 'object',
+        'properties': {
+            'username': {'type': 'string'},
+            'api_key': {'type': 'string'},
+            'password': {'type': 'string'},
+            'movies': {'enum': ['all', 'loved', 'hated', 'collection', 'watchlist']},
+            'series': {'enum': ['all', 'loved', 'hated', 'collection', 'watched', 'watchlist']},
+            'custom': {'type': 'string'},
+            'strip_dates': {'type': 'boolean', 'default': False}
+        },
+        'required': ['username', 'api_key'],
+        'error_oneOf': 'Must specify one and only one of `movies`, `series` or `custom`',
+        'oneOf': [
+            {'title': 'movie list', 'required': ['movies']},
+            {'title': 'series list', 'required': ['series']},
+            {'title': 'custom list', 'required': ['custom']}
+        ],
+        'additionalProperties': False
+    }
+
     movie_map = {
         'title': 'title',
         'url': 'url',
@@ -42,18 +63,6 @@ class TraktList(object):
         'imdb_id': 'imdb_id',
         'tvdb_id': 'tvdb_id',
         'tvrage_id': 'tvrage_id'}
-
-    def validator(self):
-        from flexget import validator
-        root = validator.factory('dict')
-        root.accept('text', key='username', requried=True)
-        root.accept('text', key='api_key', required=True)
-        root.accept('text', key='password')
-        root.accept('choice', key='movies').accept_choices(['all', 'loved', 'hated', 'collection', 'watchlist'])
-        root.accept('choice', key='series').accept_choices(['all', 'loved', 'hated', 'collection', 'watched', 'watchlist'])
-        root.accept('text', key='custom')
-        root.accept('boolean', key='strip_dates')
-        return root
 
     @cached('trakt_list', persist='2 hours')
     def on_task_input(self, task, config):

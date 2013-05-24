@@ -3,17 +3,17 @@ import logging
 from datetime import datetime, timedelta
 from sqlalchemy import Column, Integer, String, Unicode, DateTime, ForeignKey, and_, Index
 from sqlalchemy.orm import relation
-from flexget import schema
+from flexget import db_schema
 from flexget.event import event
 from flexget.plugin import register_plugin, register_parser_option, priority
 from flexget.utils.sqlalchemy_utils import table_columns, drop_tables, table_add_column
 from flexget.utils.tools import parse_timedelta
 
 log = logging.getLogger('remember_rej')
-Base = schema.versioned_base('remember_rejected', 3)
+Base = db_schema.versioned_base('remember_rejected', 3)
 
 
-@schema.upgrade('remember_rejected')
+@db_schema.upgrade('remember_rejected')
 def upgrade(ver, session):
     if ver is None:
         columns = table_columns('remember_rejected_entry', session)

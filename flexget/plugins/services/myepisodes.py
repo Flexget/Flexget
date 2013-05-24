@@ -8,7 +8,7 @@ from datetime import datetime
 
 from sqlalchemy import Column, Integer, String, DateTime
 
-from flexget import schema
+from flexget import db_schema
 from flexget.plugin import register_plugin, DependencyError, PluginWarning
 
 try:
@@ -19,7 +19,7 @@ except ImportError:
 
 
 log = logging.getLogger('myepisodes')
-Base = schema.versioned_base('myepisodes', 0)
+Base = db_schema.versioned_base('myepisodes', 0)
 
 
 class MyEpisodesInfo(Base):

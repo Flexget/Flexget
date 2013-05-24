@@ -1,14 +1,14 @@
 from __future__ import unicode_literals, division, absolute_import
+import datetime
 import logging
 import random
-from sqlalchemy import Column, Integer, DateTime, Unicode, and_, Index
-from flexget.event import event
 
+from sqlalchemy import Column, Integer, DateTime, Unicode, and_, Index
+
+from flexget.event import event
 from flexget.utils.cached_input import cached
-from flexget.utils.search import clean_title
-from flexget.plugin import register_plugin, get_plugin_by_name, PluginError, \
-    get_plugins_by_group, get_plugins_by_phase, PluginWarning, register_parser_option
-import datetime
+from flexget.plugin import (register_plugin, get_plugin_by_name, PluginError,
+    PluginWarning, register_parser_option)
 from flexget import schema
 from flexget.utils.tools import parse_timedelta
 
@@ -58,27 +58,22 @@ class Discover(object):
         ignore_estimations: [yes|no]
     """
 
-    def validator(self):
-        from flexget import validator
-        discover = validator.factory('dict')
-
-        inputs = discover.accept('list', key='what', required=True).accept('dict')
-        for plugin in get_plugins_by_phase('input'):
-            if hasattr(plugin.instance, 'validator'):
-                inputs.accept(plugin.instance.validator, key=plugin.name)
-
-        searches = discover.accept('list', key='from', required=True)
-        no_config = searches.accept('choice')
-        for plugin in get_plugins_by_group('search'):
-            if hasattr(plugin.instance, 'validator'):
-                searches.accept('dict').accept(plugin.instance.validator, key=plugin.name)
-            else:
-                no_config.accept(plugin.name)
-
-        discover.accept('integer', key='limit')
-        discover.accept('interval', key='interval')
-        discover.accept('boolean', key='ignore_estimations')
-        return discover
+    schema = {
+        'type': 'object',
+        'properties': {
+            'what': {'type': 'array', 'items': {
+                'allOf': [{'$ref': '/schema/plugins?phase=input'}, {'maxProperties': 1, 'minProperties': 1}]
+            }},
+            'from': {'type': 'array', 'items': {
+                'allOf': [{'$ref': '/schema/plugins?group=search'}, {'maxProperties': 1, 'minProperties': 1}]
+            }},
+            'interval': {'type': 'string', 'format': 'interval', 'default': '5 hours'},
+            'ignore_estimations': {'type': 'boolean', 'default': False},
+            'limit': {'type': 'integer', 'minimum': 1}
+        },
+        'required': ['what', 'from'],
+        'additionalProperties': False
+    }
 
     def execute_inputs(self, config, task):
         """

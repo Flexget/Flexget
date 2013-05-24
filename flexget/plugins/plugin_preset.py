@@ -3,7 +3,7 @@ import logging
 
 from flexget import validator
 from flexget.manager import register_config_key
-from flexget.plugin import priority, register_plugin, PluginError, register_parser_option, plugins as all_plugins
+from flexget.plugin import priority, register_plugin, PluginError, register_parser_option
 from flexget.utils.tools import MergeException, merge_dict_from_to
 
 log = logging.getLogger('preset')
@@ -24,16 +24,16 @@ class PluginPreset(object):
         - imdb
     """
 
+    schema = {
+        'oneOf': [
+            {'title': 'list of presets','type': 'array', 'items': {'type': 'string'}},
+            {'title': 'single preset', 'type': 'string'},
+            {'title': 'disable presets', 'type': 'boolean', 'enum': [False]}
+        ]
+    }
+
     def __init__(self):
         self.warned = False
-
-    def validator(self):
-        root = validator.factory()
-        root.accept('text')
-        root.accept('boolean')
-        presets = root.accept('list')
-        presets.accept('text')
-        return root
 
     def prepare_config(self, config):
         if config is None or isinstance(config, bool):
@@ -142,18 +142,14 @@ class DisablePlugin(object):
                 del(task.config[disable])
 
 
-def root_config_validator():
-    """Returns a validator for the 'presets' key of config."""
-    # TODO: better error messages
-    valid_plugins = [p for p in all_plugins if hasattr(all_plugins[p].instance, 'validator')]
-    root = validator.factory('dict')
-    root.reject_keys(valid_plugins, message='plugins should go under a specific preset. '
-                                            '(and presets are not allowed to be named the same as any plugins)')
-    root.accept_any_key('dict').accept_any_key('any')
-    return root
+root_config_schema = {
+    'type': 'object',
+    'additionalProperties': {}
+    # TODO: Reject keys that are plugin names
+}
 
 
-register_config_key('presets', root_config_validator)
+register_config_key('presets', root_config_schema)
 register_plugin(PluginPreset, 'preset', builtin=True, api_ver=2)
 register_plugin(DisablePlugin, 'disable_plugin', api_ver=2)
 

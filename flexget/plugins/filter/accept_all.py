@@ -14,9 +14,7 @@ class FilterAcceptAll(object):
           accept_all: true
     """
 
-    def validator(self):
-        from flexget import validator
-        return validator.factory('boolean')
+    schema = {'type': 'boolean'}
 
     def on_task_filter(self, task, config):
         if config:
