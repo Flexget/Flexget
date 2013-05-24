@@ -20,6 +20,7 @@ Core
 * PyNBZ
 * Jinja2
 * PyYaml
+* jsonschema
 * Some smaller misc libraries
 
 WebUI
