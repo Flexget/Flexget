@@ -74,6 +74,7 @@ class InputPlex(object):
     def on_task_input(self, task, config):
         config = self.prepare_config(config)
         accesstoken = ""
+        plexserver = config['server']  
         if gethostbyname(config['server']) != config['server']:
             config['server'] = gethostbyname(config['server'])
         log.debug("ube %s" % config['server'])
@@ -122,9 +123,8 @@ class InputPlex(object):
             raise PluginError('Error retrieving source: %s' % e)
         dom = parseString(r.text.encode("utf-8"))
         entries = []
-        if config['selection'] == 'all' or config['selection'] == 'recentlyViewedShows':
-            if dom.getElementsByTagName('MediaContainer')[0].getAttribute('viewGroup') != "show":
-                raise PluginError('Selected section is not a TV section.')
+        plexsectionname = dom.getElementsByTagName('MediaContainer')[0].getAttribute('title1')
+        if dom.getElementsByTagName('MediaContainer')[0].getAttribute('viewGroup') == "show":
             for node in dom.getElementsByTagName('Directory'):
                 title=node.getAttribute('title')
                 if config['strip_year']:
@@ -137,10 +137,12 @@ class InputPlex(object):
                 e = Entry()
                 e['title'] = title
                 e['url'] = "NULL"
+                e['plexserver'] = plexserver
+                e['plexport'] = config['port']
+                e['plexsection'] = config['section']
+                e['plexsectionname'] = plexsectionname
                 entries.append(e)
-        else:
-            if dom.getElementsByTagName('MediaContainer')[0].getAttribute('viewGroup') != "episode":
-                raise PluginError('Selected section is not a TV section.')
+        elif dom.getElementsByTagName('MediaContainer')[0].getAttribute('viewGroup') == "episode":
             for node in dom.getElementsByTagName('Video'):
                 title = node.getAttribute('grandparentTitle')
                 season = int(node.getAttribute('parentIndex'))
@@ -171,7 +173,15 @@ class InputPlex(object):
                                 title = title.lower()
                             e['title'] = filenamemap % (title, season, episode, resolution, vcodec, acodec, container) 
                         e['url'] = "http://%s:%d%s%s" % (config['server'], config['port'], key, accesstoken)
+                        e['plex_server'] = plexserver
+                        e['plex_server_ip'] = config['server']
+                        e['plex_port'] = config['port']
+                        e['plex_section'] = config['section']
+                        e['plex_section_name'] = plexsectionname
+                        e['plex_path'] = key
                         entries.append(e)
+        else:
+            raise PluginError('Selected section is not a TV section.')
         return entries
 
 register_plugin(InputPlex, 'plex', api_ver=2)
