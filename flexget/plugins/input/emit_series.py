@@ -12,6 +12,7 @@ except ImportError as e:
     log.error(e.message)
     raise DependencyError(issued_by='emit_series', missing='series')
 
+# TODO: Make this plugin awesome
 
 class EmitSeries(SeriesDatabase):
     """
