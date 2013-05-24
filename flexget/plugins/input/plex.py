@@ -76,7 +76,6 @@ class InputPlex(object):
         accesstoken = ""
         if gethostbyname(config['server']) != config['server']:
             config['server'] = gethostbyname(config['server'])
-        log.debug("ube %s" % config['server'])
         if config['username'] and config['password'] and config['server'] != '127.0.0.1':
             header = {'X-Plex-Client-Identifier': 'flexget'} 
             log.debug("Trying to to connect to myplex.")
