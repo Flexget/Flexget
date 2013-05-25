@@ -302,7 +302,7 @@ def release(options):
         print 'Making src release'
         ver = sdist()
 
-    if options.release.ver_file:
+    if getattr(options.release, 'ver_file', False):
         with open(options.release.ver_file, 'w') as ver_file:
             ver_file.write('FG_VERSION=%s' % ver)
 
