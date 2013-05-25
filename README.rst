@@ -1,5 +1,28 @@
+FlexGet
+=======
+
+FlexGet is a multipurpose automation tool for content like torrents, nzbs,
+podcasts, comics, series, movies, etc. It can use different kinds of sources
+like RSS-feeds, html pages, csv files, search engines and there are even
+plugins for sites that do not provide any kind of useful feeds.
+
+There are numerous plugins that allow utilizing FlexGet in interesting ways
+and more are being added continuously.
+
+FlexGet is extremely useful in conjunction with applications which have watch
+directory support or provide interface for external utilities like FlexGet.
+
+
+Install
+-------
+
+FlexGet is installable via pip with the command::
+
+    pip install flexget
+
+
 How to use GIT checkout
------------------------------
+-----------------------
 
 Check that you have Python 2.6 - 2.7 available with command 'python -V'.
 

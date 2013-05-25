@@ -35,11 +35,15 @@ entry_points = {
 if sys.platform.startswith('win'):
     entry_points['gui_scripts'].append('flexget-headless = flexget:main')
 
+with open("README.rst") as readme:
+    long_description = readme.read()
+
 setup(
     name='FlexGet',
     version='1.1',  # our tasks append the .1234 (current build number) to the version number
     description='FlexGet is a program aimed to automate downloading or processing content (torrents, podcasts, etc.) '
                 'from different sources like RSS-feeds, html-pages, various sites and more.',
+    long_description=long_description,
     author='Marko Koivusalo',
     author_email='marko.koivusalo@gmail.com',
     license='MIT',
@@ -56,7 +60,19 @@ setup(
         'NZB': ['pynzb'],
         'TaskTray': ['pywin32'],
     },
-    entry_points=entry_points
+    entry_points=entry_points,
+    classifiers=[
+        "Development Status :: 5 - Production/Stable",
+        "License :: OSI Approved :: MIT License",
+        "Operating System :: OS Independent",
+        "Programming Language :: Python",
+        "Programming Language :: Python :: 2",
+        "Programming Language :: Python :: 2.6",
+        "Programming Language :: Python :: 2.7",
+        "Programming Language :: Python :: Implementation :: CPython",
+        "Programming Language :: Python :: Implementation :: PyPy",
+    ]
+
 )
 
 options(
