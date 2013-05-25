@@ -75,6 +75,7 @@ class PluginDownload(object):
             config = {}
         if not config.get('path'):
             config['require_path'] = True
+        config.setdefault('fail_html', True)
         return config
 
     def on_task_download(self, task, config):
