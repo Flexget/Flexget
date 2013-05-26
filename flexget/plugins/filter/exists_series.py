@@ -5,6 +5,7 @@ import logging
 
 from flexget.config_schema import one_or_more
 from flexget.plugin import register_plugin, priority, PluginWarning
+from flexget.utils.log import log_once
 from flexget.utils.titles import ParseWarning
 
 log = logging.getLogger('exists_series')
@@ -46,22 +47,25 @@ class FilterExistsSeries(object):
 
     @priority(-1)
     def on_task_filter(self, task):
+        if not task.accepted:
+            log.debug('Scanning not needed')
+            return
+        config = self.get_config(task)
         accepted_series = {}
+        paths = set()
         for entry in task.accepted:
             if 'series_parser' in entry:
                 if entry['series_parser'].valid:
                     accepted_series.setdefault(entry['series_parser'].name, []).append(entry)
+                    for path in config['path']:
+                        paths.add(entry.render(path))
                 else:
                     log.debug('entry %s series_parser invalid', entry['title'])
         if not accepted_series:
-            if task.accepted:
-                log.warning('No accepted entries have series information. exists_series cannot filter them')
-            else:
-                log.debug('Scanning not needed')
+            log.warning('No accepted entries have series information. exists_series cannot filter them')
             return
 
-        config = self.get_config(task)
-        for path in config.get('path'):
+        for path in paths:
             log.verbose('Scanning %s', path)
             # crashes on some paths with unicode
             path = str(os.path.expanduser(path))
@@ -82,7 +86,6 @@ class FilterExistsSeries(object):
                         try:
                             disk_parser.parse(data=name)
                         except ParseWarning as pw:
-                            from flexget.utils.log import log_once
                             log_once(pw.value, logger=log)
                         if disk_parser.valid:
                             log.debug('name %s is same series as %s', name, series)
