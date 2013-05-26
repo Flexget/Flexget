@@ -30,21 +30,21 @@ In some environments newer python might be available under another name
 like 'python26' or 'python2.7' in which case you need to use that one 
 instead of plain 'python'.
 
-To start using FlexGet from this directory, run the following commands:
+To start using FlexGet from this directory, run the following commands::
 
-python bootstrap.py
+    python bootstrap.py
 
 This will initialize python virtualenv and install all required dependencies
 in it.
 
-If you need deluge or transmission libraries from system wide python use
+If you need deluge or transmission libraries from system wide python use::
 
-python bootstrap --system-site-packages
+    python bootstrap --system-site-packages
 
 After that FlexGet is usable via '<checkout directory>/bin/flexget'. Verify
-installation by running:
+installation by running::
 
-bin/flexget -V
+    bin/flexget -V
 
 You may also place the configuration files in ~/.flexget (Unix, Mac OS X) 
 or C:\Documents and Setting\<username>\flexget (Windows).
