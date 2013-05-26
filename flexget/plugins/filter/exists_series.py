@@ -6,6 +6,7 @@ import logging
 from flexget.config_schema import one_or_more
 from flexget.plugin import register_plugin, priority, PluginWarning
 from flexget.utils.log import log_once
+from flexget.utils.template import RenderError
 from flexget.utils.titles import ParseWarning
 
 log = logging.getLogger('exists_series')
@@ -58,7 +59,10 @@ class FilterExistsSeries(object):
                 if entry['series_parser'].valid:
                     accepted_series.setdefault(entry['series_parser'].name, []).append(entry)
                     for path in config['path']:
-                        paths.add(entry.render(path))
+                        try:
+                            paths.add(entry.render(path))
+                        except RenderError as e:
+                            log.error('Error rendering path `%s`: %s', path, e)
                 else:
                     log.debug('entry %s series_parser invalid', entry['title'])
         if not accepted_series:
