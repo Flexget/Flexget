@@ -189,7 +189,7 @@ class SeriesParser(TitleParser):
         if self.parse_unwanted(self.remove_dirt(self.data)):
             return
 
-        log.debug('name: %s data: %s' % (name, self.data))
+        log.debug('name: %s data: %s', name, self.data)
 
         # name end position
         name_start = 0
@@ -209,18 +209,18 @@ class SeriesParser(TitleParser):
                 else:
                     name_start, name_end = match.span()
 
-                log.debug('NAME SUCCESS: %s matched to %s' % (name_re.pattern, self.data))
+                log.debug('NAME SUCCESS: %s matched to %s', name_re.pattern, self.data)
                 break
         else:
             # leave this invalid
-            log.debug('FAIL: name regexps %s do not match %s' % ([regexp.pattern for regexp in self.name_regexps],
-                                                                 self.data))
+            log.debug('FAIL: name regexps %s do not match %s',
+                      [regexp.pattern for regexp in self.name_regexps], self.data)
             return
 
         # remove series name from raw data, move any prefix to end of string
         data_stripped = self.data[name_end:] + ' ' + self.data[:name_start]
         data_stripped = data_stripped.lower()
-        log.debug('data stripped: %s' % data_stripped)
+        log.debug('data stripped: %s', data_stripped)
 
         # allow group(s)
         if self.allow_groups:
@@ -228,14 +228,14 @@ class SeriesParser(TitleParser):
                 group = group.lower()
                 for fmt in ['[%s]', '-%s']:
                     if fmt % group in data_stripped:
-                        log.debug('%s is from group %s' % (self.data, group))
+                        log.debug('%s is from group %s', self.data, group)
                         self.group = group
                         data_stripped = data_stripped.replace(fmt % group, '')
                         break
                 if self.group:
                     break
             else:
-                log.debug('%s is not from groups %s' % (self.data, self.allow_groups))
+                log.debug('%s is not from groups %s', self.data, self.allow_groups)
                 return  # leave invalid
 
         # Find quality and clean from data
@@ -244,7 +244,7 @@ class SeriesParser(TitleParser):
         if quality:
             self.quality = quality
             # Remove quality string from data
-            log.debug('quality detected, using remaining data `%s`' % quality.clean_text)
+            log.debug('quality detected, using remaining data `%s`', quality.clean_text)
             data_stripped = quality.clean_text
 
         # Remove unwanted words from data for ep / id parsing
@@ -266,7 +266,7 @@ class SeriesParser(TitleParser):
 
         data_stripped = ' '.join(data_parts).strip()
 
-        log.debug("data for date/ep/id parsing '%s'" % data_stripped)
+        log.debug("data for date/ep/id parsing '%s'", data_stripped)
 
         # Try date mode before ep mode
         if self.identified_by in ['date', 'auto']:
@@ -293,8 +293,8 @@ class SeriesParser(TitleParser):
 
                 if ep_match['end_episode'] > ep_match['episode'] + 2:
                     # This is a pack of too many episodes, ignore it.
-                    log.debug('Series pack contains too many episodes (%d). Rejecting' %
-                              (ep_match['end_episode'] - ep_match['episode']))
+                    log.debug('Series pack contains too many episodes (%d). Rejecting',
+                              ep_match['end_episode'] - ep_match['episode'])
                     return
 
                 self.season = ep_match['season']
@@ -350,7 +350,7 @@ class SeriesParser(TitleParser):
                     self.id = id
                     self.id_type = 'id'
                     self.valid = True
-                    log.debug('found id \'%s\' with regexp \'%s\'' % (self.id, id_re.pattern))
+                    log.debug('found id \'%s\' with regexp \'%s\'', self.id, id_re.pattern)
                     return
             log.debug('-> no luck with id_regexps')
 
@@ -376,7 +376,7 @@ class SeriesParser(TitleParser):
                             self.proper_count = int(match.group('version')) - 1
                     self.id_type = 'sequence'
                     self.valid = True
-                    log.debug('found id \'%s\' with regexp \'%s\'' % (self.id, sequence_re.pattern))
+                    log.debug('found id \'%s\' with regexp \'%s\'', self.id, sequence_re.pattern)
                     return
             log.debug('-> no luck with sequence_regexps')
 
@@ -386,7 +386,7 @@ class SeriesParser(TitleParser):
             self.id = data_stripped or 'special'
             self.id_type = 'special'
             self.valid = True
-            log.debug('found special, setting id to \'%s\'' % self.id)
+            log.debug('found special, setting id to \'%s\'', self.id)
             return
 
         msg = 'Title `%s` looks like series `%s` but I cannot find ' % (self.data, self.name)
@@ -401,7 +401,7 @@ class SeriesParser(TitleParser):
         for ep_unwanted_re in self.unwanted_ep_regexps:
             match = re.search(ep_unwanted_re, data)
             if match:
-                log.debug('unwanted regexp %s matched %s' % (ep_unwanted_re.pattern, match.groups()))
+                log.debug('unwanted regexp %s matched %s', ep_unwanted_re.pattern, match.groups())
                 return True
 
     def parse_unwanted_id(self, data):
@@ -409,7 +409,7 @@ class SeriesParser(TitleParser):
         for id_unwanted_re in self.unwanted_id_regexps:
             match = re.search(id_unwanted_re, data)
             if match:
-                log.debug('unwanted id regexp %s matched %s' % (id_unwanted_re, match.groups()))
+                log.debug('unwanted id regexp %s matched %s', id_unwanted_re, match.groups())
                 return True
 
     def parse_date(self, data):
@@ -445,10 +445,10 @@ class SeriesParser(TitleParser):
                         if possdate not in possdates:
                             possdates.append(possdate)
                 except ValueError:
-                    log.debug('%s is not a valid date, skipping' % match.group(0))
+                    log.debug('%s is not a valid date, skipping', match.group(0))
                     continue
                 if not possdates:
-                    log.debug('All possible dates for %s were in the future' % match.group(0))
+                    log.debug('All possible dates for %s were in the future', match.group(0))
                     continue
                 possdates.sort()
                 # Pick the most recent date if there are ambiguities
@@ -470,7 +470,7 @@ class SeriesParser(TitleParser):
             match = re.search(ep_re, data)
 
             if match:
-                log.debug('found episode number with regexp %s (%s)' % (ep_re.pattern, match.groups()))
+                log.debug('found episode number with regexp %s (%s)', ep_re.pattern, match.groups())
                 matches = match.groups()
                 if len(matches) >= 2:
                     season = matches[0]
@@ -494,8 +494,8 @@ class SeriesParser(TitleParser):
                     else:
                         episode = int(episode)
                 except ValueError:
-                    log.critical('Invalid episode number match %s returned with regexp `%s` for %s' %
-                                 (match.groups(), ep_re.pattern, self.data))
+                    log.critical('Invalid episode number match %s returned with regexp `%s` for %s',
+                                 match.groups(), ep_re.pattern, self.data)
                     raise
                 end_episode = None
                 if len(matches) == 3 and matches[2]:

@@ -143,15 +143,15 @@ def db_cleanup(session):
         filter(Release.downloaded == False).\
         filter(Release.first_seen < datetime.now() - timedelta(days=120)).delete()
     if result:
-        log.verbose('Removed %d undownloaded episode releases.' % result)
+        log.verbose('Removed %d undownloaded episode releases.', result)
     # Clean up episodes without releases
     result = session.query(Episode).filter(~Episode.releases.any()).delete(False)
     if result:
-        log.verbose('Removed %d episodes without releases.' % result)
+        log.verbose('Removed %d episodes without releases.', result)
     # Clean up series without episodes
     result = session.query(Series).filter(~Series.episodes.any()).delete(False)
     if result:
-        log.verbose('Removed %d series without episodes.' % result)
+        log.verbose('Removed %d series without episodes.', result)
 
 
 @event('manager.startup')
@@ -161,7 +161,7 @@ def repair(manager):
         session = Session()
         # For some reason at least I have some releases in database which don't belong to any episode.
         for release in session.query(Release).filter(Release.episode == None).all():
-            log.info('Purging orphan release %s from database' % release.title)
+            log.info('Purging orphan release %s from database', release.title)
             session.delete(release)
         session.commit()
         manager.persist['series_repaired'] = True
@@ -327,7 +327,7 @@ class SeriesDatabase(object):
             order_by(desc(Episode.season)).\
             order_by(desc(Episode.number)).first()
         if not episode:
-            # log.trace('get_latest_info: no info available for %s' % name)
+            # log.trace('get_latest_info: no info available for %s', name)
             return False
         # log.trace('get_latest_info, series: %s season: %s episode: %s' % \
         #    (name, episode.season, episode.number))
@@ -350,7 +350,7 @@ class SeriesDatabase(object):
         type_totals.pop('special', None)
         if not type_totals:
             return 'auto'
-        log.debug('%s episode type totals: %r' % (series.name, type_totals))
+        log.debug('%s episode type totals: %r', series.name, type_totals)
         # Find total number of parsed episodes
         total = sum(type_totals.itervalues())
         # See which type has the most
@@ -358,17 +358,17 @@ class SeriesDatabase(object):
 
         # Ep mode locks in faster than the rest. At 2 seen episodes.
         if type_totals.get('ep', 0) >= 2 and type_totals['ep'] > total / 3:
-            log.info('identified_by has locked in to type `ep` for %s' % series.name)
+            log.info('identified_by has locked in to type `ep` for %s', series.name)
             return 'ep'
         # If we have over 3 episodes all of the same type, lock in
         if len(type_totals) == 1 and total >= 3:
             return best
         # Otherwise wait until 5 episodes to lock in
         if total >= 5:
-            log.info('identified_by has locked in to type `%s` for %s' % (best, series.name))
+            log.info('identified_by has locked in to type `%s` for %s', best, series.name)
             return best
         log.verbose('identified by is currently on `auto` for %s. '
-                    'Multiple id types may be accepted until it locks in on the appropriate type.' % series.name)
+                    'Multiple id types may be accepted until it locks in on the appropriate type.', series.name)
         return 'auto'
 
     def get_latest_download(self, series):
@@ -388,7 +388,7 @@ class SeriesDatabase(object):
             latest_download = downloaded.order_by(desc(Episode.first_seen)).first()
 
         if not latest_download:
-            log.debug('get_latest_download returning None, no downloaded episodes found for: %s' % series.name)
+            log.debug('get_latest_download returning None, no downloaded episodes found for: %s', series.name)
             return
 
         return latest_download
@@ -415,7 +415,7 @@ class SeriesDatabase(object):
         elif series.identified_by == 'id':
             return series_eps.filter(Episode.first_seen > since_ep.first_seen).count()
         else:
-            log.debug('unsupported identified_by %s' % series.identified_by)
+            log.debug('unsupported identified_by %s', series.identified_by)
             return 0
 
     def store(self, session, parser, series=None):
@@ -433,7 +433,7 @@ class SeriesDatabase(object):
                 filter(Series.name == parser.name).\
                 filter(Series.id != None).first()
             if not series:
-                log.debug('adding series %s into db' % parser.name)
+                log.debug('adding series %s into db', parser.name)
                 series = Series()
                 series.name = parser.name
                 session.add(series)
@@ -446,7 +446,7 @@ class SeriesDatabase(object):
                 filter(Episode.identifier == identifier).\
                 filter(Episode.series_id != None).first()
             if not episode:
-                log.debug('adding episode %s into series %s' % (identifier, parser.name))
+                log.debug('adding episode %s into series %s', identifier, parser.name)
                 episode = Episode()
                 episode.identifier = identifier
                 episode.identified_by = parser.id_type
@@ -473,7 +473,7 @@ class SeriesDatabase(object):
                 filter(Release.proper_count == parser.proper_count).\
                 filter(Release.episode_id != None).first()
             if not release:
-                log.debug('adding release %s into episode' % parser)
+                log.debug('adding release %s into episode', parser)
                 release = Release()
                 release.quality = parser.quality
                 release.proper_count = parser.proper_count
@@ -491,7 +491,7 @@ def forget_series(name):
     if series:
         session.delete(series)
         session.commit()
-        log.debug('Removed series %s from database.' % name)
+        log.debug('Removed series %s from database.', name)
     else:
         raise ValueError('Unknown series %s' % name)
 
@@ -507,7 +507,7 @@ def forget_series_episode(name, identifier):
             series.identified_by = ''  # reset identified_by flag so that it will be recalculated
             session.delete(episode)
             session.commit()
-            log.debug('Episode %s from series %s removed from database.' % (identifier, name))
+            log.debug('Episode %s from series %s removed from database.', identifier, name)
         else:
             raise ValueError('Unknown identifier %s for series %s' % (identifier, name.capitalize()))
     else:
@@ -631,7 +631,7 @@ class FilterSeriesBase(object):
                     if kwargs.get('log_once'):
                         log_once('Series %s is already configured in series plugin' % series, log)
                     else:
-                        log.warning('Series %s is configured multiple times in series plugin.' % series)
+                        log.warning('Series %s is configured multiple times in series plugin.', series)
                     # Combine the config dicts for both instances of the show
                     unique_series[series].update(series_settings)
         # Turn our all_series dict back into a list
@@ -756,7 +756,7 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
                 if (name.lower().startswith(series_name.lower())) and \
                    (name.lower() != series_name.lower()):
                     if not 'exact' in series_config:
-                        log.verbose('Auto enabling exact matching for series %s (reason %s)' % (series_name, name))
+                        log.verbose('Auto enabling exact matching for series %s (reason %s)', series_name, name)
                         series_config['exact'] = True
 
     # Run after metainfo_quality and before metainfo_series
@@ -766,11 +766,11 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
         self.auto_exact(config)
         for series_item in config:
             series_name, series_config = series_item.items()[0]
-            log.trace('series_name: %s series_config: %s' % (series_name, series_config))
+            log.trace('series_name: %s series_config: %s', series_name, series_config)
             start_time = time.clock()
             self.parse_series(task.session, task.entries, series_name, series_config)
             took = time.clock() - start_time
-            log.trace('parsing %s took %s' % (series_name, took))
+            log.trace('parsing %s took %s', series_name, took)
 
     def on_task_filter(self, task):
         """Filter series"""
@@ -787,7 +787,7 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
         for series_item in config:
             series_name, series_config = series_item.items()[0]
             if series_config.get('parse_only'):
-                log.debug('Skipping filtering of series %s because of parse_only' % series_name)
+                log.debug('Skipping filtering of series %s because of parse_only', series_name)
                 continue
             # Make sure number shows (e.g. 24) are turned into strings
             series_name = unicode(series_name)
@@ -796,7 +796,7 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
             if db_series:
                 db_series.name = series_name
             else:
-                log.debug('adding series %s into db' % series_name)
+                log.debug('adding series %s into db', series_name)
                 db_series = Series()
                 db_series.name = series_name
                 task.session.add(db_series)
@@ -812,7 +812,7 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
 
                 # set custom download path
                 if 'path' in series_config:
-                    log.debug('setting %s custom path to %s' % (entry['title'], series_config.get('path')))
+                    log.debug('setting %s custom path to %s', entry['title'], series_config.get('path'))
                     # Just add this to the 'set' dictionary, so that string replacement is done cleanly
                     series_config.setdefault('set', {}).update(path=series_config['path'])
 
@@ -823,10 +823,10 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
 
             # If we didn't find any episodes for this series, continue
             if not series_entries:
-                log.trace('No entries found for %s this run.' % series_name)
+                log.trace('No entries found for %s this run.', series_name)
                 continue
 
-            log.trace('series_name: %s series_config: %s' % (series_name, series_config))
+            log.trace('series_name: %s series_config: %s', series_name, series_config)
 
             import time
             start_time = time.clock()
@@ -834,7 +834,7 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
             self.process_series(task, series_entries, series_config)
 
             took = time.clock() - start_time
-            log.trace('processing %s took %s' % (series_name, took))
+            log.trace('processing %s took %s', series_name, took)
 
     def parse_series(self, session, entries, series_name, config):
         """
@@ -863,7 +863,7 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
             # if series doesn't have identified_by flag already set, calculate one now
             if not series.identified_by or series.identified_by == 'auto':
                 series.identified_by = self.auto_identified_by(series)
-                log.debug('identified_by set to \'%s\' based on series history' % series.identified_by)
+                log.debug('identified_by set to \'%s\' based on series history', series.identified_by)
             # set flag from database
             identified_by = series.identified_by
 
@@ -893,7 +893,7 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
                 # in case quality will not be found from title, set it from entry['quality'] if available
                 quality = None
                 if entry.get('quality'):
-                    log.trace('Setting quality %s from entry field to parser' % entry['quality'])
+                    log.trace('Setting quality %s from entry field to parser', entry['quality'])
                     quality = entry['quality']
                 try:
                     parser.parse(data, field=field, quality=quality)
@@ -905,7 +905,7 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
             else:
                 continue  # next field
 
-            log.debug('%s detected as %s, field: %s' % (entry['title'], parser, parser.field))
+            log.debug('%s detected as %s, field: %s', entry['title'], parser, parser.field)
             populate_entry_fields(entry, parser)
 
     def process_series(self, task, series_entries, config):
@@ -926,7 +926,7 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
             # sort episodes in order of quality
             entries.sort(key=lambda e: e['series_parser'], reverse=True)
 
-            log.debug('start with episodes: %s' % [e['title'] for e in entries])
+            log.debug('start with episodes: %s', [e['title'] for e in entries])
 
             # reject episodes that have been marked as watched in config file
             if 'watched' in config:
@@ -939,7 +939,7 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
                 log.debug('Skipping special episode as support is turned off.')
                 continue
 
-            log.debug('current episodes: %s' % [e['title'] for e in entries])
+            log.debug('current episodes: %s', [e['title'] for e in entries])
 
             # quality filtering
             if 'quality' in config:
@@ -996,8 +996,8 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
                 continue
 
             best = entries[0]
-            log.debug('continuing w. episodes: %s' % [e['title'] for e in entries])
-            log.debug('best episode is: %s' % best['title'])
+            log.debug('continuing w. episodes: %s', [e['title'] for e in entries])
+            log.debug('best episode is: %s', best['title'])
 
             # episode advancement. used only with season and sequence based series
             if ep.identified_by in ['ep', 'sequence']:
@@ -1058,14 +1058,14 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
                 return pass_filter
         else:
             # propers with timeframe
-            log.debug('proper timeframe: %s' % config['propers'])
+            log.debug('proper timeframe: %s', config['propers'])
             timeframe = parse_timedelta(config['propers'])
 
             first_seen = episode.first_seen
             expires = first_seen + timeframe
-            log.debug('propers timeframe: %s' % timeframe)
-            log.debug('first_seen: %s' % first_seen)
-            log.debug('propers ignore after: %s' % str(expires))
+            log.debug('propers timeframe: %s', timeframe)
+            log.debug('first_seen: %s', first_seen)
+            log.debug('propers ignore after: %s', expires)
 
             if datetime.now() > expires:
                 log.debug('propers timeframe expired')
@@ -1073,7 +1073,7 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
 
         downloaded_qualities = dict((d.quality, d.proper_count) for d in episode.downloaded_releases)
 
-        log.debug('downloaded qualities: %s' % downloaded_qualities)
+        log.debug('downloaded qualities: %s', downloaded_qualities)
 
         # Accept propers we actually need, and remove them from the list of entries to continue processing
         for entry in best_propers:
@@ -1098,7 +1098,7 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
         # scan for quality
         for entry in entries:
             if req.allows(entry['series_parser'].quality):
-                log.debug('Series accepting. %s meets quality %s' % (entry['title'], req))
+                log.debug('Series accepting. %s meets quality %s', entry['title'], req)
                 entry.accept('target quality')
                 return True
 
@@ -1109,14 +1109,14 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
         :returns: A list of eps that are in the acceptable range
         """
         reqs = qualities.Requirements(config['quality'])
-        log.debug('quality req: %s' % reqs)
+        log.debug('quality req: %s', reqs)
         result = []
         # see if any of the eps match accepted qualities
         for entry in entries:
             if reqs.allows(entry['series_parser'].quality):
                 result.append(entry)
             else:
-                log.verbose('Ignored `%s`. Does not meet quality requirement `%s`.' % (entry['title'], reqs))
+                log.verbose('Ignored `%s`. Does not meet quality requirement `%s`.', entry['title'], reqs)
         if not result:
             log.debug('no quality meets requirements')
         return result
@@ -1131,8 +1131,8 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
         w_season = config['watched'].get('season', -1)
         w_episode = config['watched'].get('episode', maxint)
         if episode.season < w_season or (episode.season == w_season and episode.number <= w_episode):
-            log.debug('%s episode %s is already watched, rejecting all occurrences' %
-                      (episode.series.name, episode.identifier))
+            log.debug('%s episode %s is already watched, rejecting all occurrences',
+                      episode.series.name, episode.identifier)
             for entry in entries:
                 entry.reject('watched')
             return True
@@ -1177,7 +1177,7 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
         best = entries[0]
 
         # parse options
-        log.debug('timeframe: %s' % config['timeframe'])
+        log.debug('timeframe: %s', config['timeframe'])
         timeframe = parse_timedelta(config['timeframe'])
 
         releases = episode.releases
@@ -1187,7 +1187,7 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
         else:
             first_seen = min(rls.first_seen for rls in releases)
         expires = first_seen + timeframe
-        log.debug('timeframe: %s, first_seen: %s, expires: %s' % (timeframe, first_seen, expires))
+        log.debug('timeframe: %s, first_seen: %s, expires: %s', timeframe, first_seen, expires)
 
         stop = task.manager.options.stop_waiting.lower() == episode.series.name.lower()
         if expires <= datetime.now() or stop:
@@ -1220,13 +1220,13 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
 
         # Get list of already downloaded qualities
         downloaded_qualities = [r.quality for r in downloaded]
-        log.debug('downloaded_qualities: %s' % downloaded_qualities)
+        log.debug('downloaded_qualities: %s', downloaded_qualities)
 
         # If qualities key is configured, we only want qualities defined in it.
         wanted_qualities = set([qualities.Requirements(name) for name in config.get('qualities', [])])
         # Compute the requirements from our set that have not yet been fulfilled
         still_needed = [req for req in wanted_qualities if not any(req.allows(qual) for qual in downloaded_qualities)]
-        log.debug('Wanted qualities: %s' % wanted_qualities)
+        log.debug('Wanted qualities: %s', wanted_qualities)
 
         def wanted(quality):
             """Returns True if we want this quality based on the config options."""
@@ -1237,9 +1237,9 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
 
         for entry in entries:
             quality = entry['series_parser'].quality
-            log.debug('ep: %s quality: %s' % (entry['title'], quality))
+            log.debug('ep: %s quality: %s', entry['title'], quality)
             if not wanted(quality):
-                log.debug('%s is unwanted quality' % quality)
+                log.debug('%s is unwanted quality', quality)
                 continue
             if any(req.allows(quality) for req in still_needed):
                 # Don't get worse qualities in upgrade mode
@@ -1262,7 +1262,7 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
                     log.debug('marking %s as downloaded' % release)
                     release.downloaded = True
             else:
-                log.debug('%s is not a series' % entry['title'])
+                log.debug('%s is not a series', entry['title'])
 
 
 # Register plugin
