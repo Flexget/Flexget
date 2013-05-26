@@ -145,7 +145,11 @@ class PluginTransmissionInput(TransmissionBase):
             if not config['onlycomplete'] or torrentCompleted:
                 entry = Entry(title=torrent.name,
                               url='file://%s' % torrent.torrentFile,
-                              torrent_info_hash=torrent.hashString)
+                              torrent_info_hash=torrent.hashString,
+                              content_size=torrent.totalSize/(1024*1024))
+                for attr in ['comment', 'downloadDir', 'isFinished', 'isPrivate']:
+                        entry['transmission_' + attr] = getattr(torrent, attr)
+                entry['transmission_trackers'] = [t['announce'] for t in torrent.trackers]
                 entries.append(entry)
         return entries
 
