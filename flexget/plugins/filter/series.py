@@ -858,7 +858,7 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
         series = session.query(Series).filter(Series.name == series_name).first()
         if series:
             # configuration always overrides everything
-            if 'identified_by' in config:
+            if config.get('identified_by', 'auto') != 'auto':
                 series.identified_by = config['identified_by']
             # if series doesn't have identified_by flag already set, calculate one now
             if not series.identified_by or series.identified_by == 'auto':
