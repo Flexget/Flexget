@@ -11,7 +11,7 @@ class EstimatesRelasedMovies(object):
         if 'tmdb_released' in entry:
             log.verbose('Querying release estimation for %s' % entry['title'])
             try:
-                return entry['tmdb_released'].date()
+                return entry['tmdb_released']
             except Exception as e:
                 log.exception(e)
         else:
