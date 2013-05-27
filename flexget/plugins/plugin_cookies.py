@@ -19,14 +19,19 @@ class PluginCookies:
       cookies: /path/firefox/profile/something/cookies.sqlite
     """
 
-    def validator(self):
-        from flexget import validator
-        root = validator.factory()
-        root.accept('file')
-        cookies = root.accept('dict')
-        cookies.accept('file', key='file', required=True)
-        cookies.accept('choice', key='type').accept_choices(['firefox3', 'mozilla', 'lwp'])
-        return root
+    schema = {
+        'oneOf': [
+            {'type': 'string', 'format': 'file'},
+            {
+                'type': 'object',
+                'properties': {
+                    'file': {'type': 'string', 'format': 'file'},
+                    'type': {'type': 'string', 'enum': ['firefox3', 'mozilla', 'lwp']}
+                },
+                'additionalProperties': False
+            }
+        ]
+    }
 
     def prepare_config(self, config):
         if isinstance(config, basestring):
