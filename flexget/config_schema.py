@@ -125,6 +125,7 @@ def is_interval(instance):
         raise ValueError("should be in format 'x (seconds|minutes|hours|days|weeks)'")
     return True
 
+
 def get_error_message(error):
     """
      Create user facing error message from a :class:`jsonschema.ValidationError` `error`
@@ -154,7 +155,6 @@ def get_error_message(error):
     if error.validator == 'format':
         if error.cause:
             return unicode(error.cause)
-        return error._message
 
     if error.validator == 'enum':
         return 'Must be one of the following: %s' % ', '.join(map(unicode, error.validator_value))
@@ -166,7 +166,7 @@ def get_error_message(error):
                 return 'The key `%s` is not valid here.' % extras.pop()
             else:
                 return 'The keys %s are not valid here.' % ', '.join('`%s`' % e for e in extras)
-        return error._message
+    return error.message
 
 
 def select_child_errors(validator, errors):
