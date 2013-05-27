@@ -1,6 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
-from flexget.plugin import register_plugin, add_plugin_validators, PluginError, get_plugin_by_name
+from flexget.plugin import register_plugin, PluginError, get_plugin_by_name
 
 log = logging.getLogger('crossmatch')
 
