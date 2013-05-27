@@ -135,7 +135,7 @@ class OutputRSS(object):
                     'items': {'type': 'integer'},
                     'history': {'type': 'boolean'},
                     'rsslink': {'type': 'string'},
-                    'encoding': {'type', 'string'},  # TODO: only valid choices
+                    'encoding': {'type': 'string'},  # TODO: only valid choices
                     'title': {'type': 'string'},
                     'description': {'type': 'string'},
                     'link': {'type': 'array', 'items': {'type': 'string'}}
