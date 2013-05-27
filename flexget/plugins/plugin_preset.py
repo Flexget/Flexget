@@ -145,7 +145,6 @@ class DisablePlugin(object):
 root_config_schema = {
     'type': 'object',
     'additionalProperties': {}
-    # TODO: Reject keys that are plugin names
 }
 
 
