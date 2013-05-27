@@ -697,7 +697,7 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
                 'title': 'series options',
                 'type': 'object',
                 'properties': {
-                    'path': {'type': 'string', 'format': 'path'},
+                    'path': {'type': 'string'},
                     'set': {'type': 'object'},
                     # Custom regexp options
                     'name_regexp': one_or_more({'type': 'string', 'format': 'regex'}),
