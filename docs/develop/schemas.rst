@@ -103,6 +103,36 @@ The following schema will allow either a boolean or an integer::
 
     {"oneOf": [{"type": "boolean"}, {"type": "integer"}]}
 
+``format``
+^^^^^^^^^^
+
+The format keyword is used to make sure a string follows a specific format.
+Here are the format validators included with FlexGet, along with what they
+validate::
+
+email
+    email addresses
+
+quality
+    FlexGet quality, e.g. ``702p hdtv``
+
+quality_requirements
+    FlexGet quality requirements specifier, e.g. ``720p-1080p hdtv+``
+
+regex
+    valid regular expression
+
+file
+    an existing file on the local filesystem
+
+path
+    an existing directory on the local filesystem (if path contains Jinja, only
+    validates path exists before first Jinja component of path)
+
+The following schema checks for valid regex::
+
+    {"type": "string", "format": "regex"}
+
 ``$ref``
 ^^^^^^^^
 
