@@ -141,7 +141,7 @@ def db_cleanup(session):
     # Clean up old undownloaded releases
     result = session.query(Release).\
         filter(Release.downloaded == False).\
-        filter(Release.first_seen < datetime.now() - timedelta(days=120)).delete()
+        filter(Release.first_seen < datetime.now() - timedelta(days=120)).delete(False)
     if result:
         log.verbose('Removed %d undownloaded episode releases.', result)
     # Clean up episodes without releases
