@@ -1,13 +1,14 @@
 from __future__ import unicode_literals, division, absolute_import
-import functools
+from collections import defaultdict
+from copy import deepcopy
 import os
 import re
 import urlparse
-from collections import defaultdict
 
 import jsonschema
 
 from flexget.utils import qualities, template
+from flexget.utils.tools import merge_dict_from_to
 
 schema_paths = {}
 
@@ -36,6 +37,15 @@ def one_or_more(schema):
             schema
         ]
     }
+
+
+# TODO: I don't really like this, figure a better way
+def extend_schema(uri, schema):
+    """Extends the schema at ``uri`` with the given ``schema``"""
+    resolver = RefResolver('', {})
+    base_schema = deepcopy(resolver.resolving(uri).__enter__())
+    merge_dict_from_to(schema, base_schema)
+    return base_schema
 
 
 def resolve_ref(uri):
