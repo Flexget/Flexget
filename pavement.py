@@ -48,6 +48,7 @@ setup(
     author_email='marko.koivusalo@gmail.com',
     license='MIT',
     url='http://flexget.com',
+    download_url='http://download.flexget.com',
     install_requires=install_requires,
     packages=find_packages(exclude=['tests']),
     package_data=find_package_data('flexget', package='flexget',
