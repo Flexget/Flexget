@@ -124,23 +124,27 @@ class OutputRSS(object):
     def __init__(self):
         self.written = {}
 
-    def validator(self):
-        """Validate given configuration"""
-        from flexget import validator
-        root = validator.factory()
-        root.accept('text')  # TODO: path / file
-        rss = root.accept('dict')
-        rss.accept('text', key='file', required=True)
-        rss.accept('integer', key='days')
-        rss.accept('integer', key='items')
-        rss.accept('boolean', key='history')
-        rss.accept('text', key='rsslink')
-        rss.accept('text', key='encoding')  # TODO: only valid choices
-        rss.accept('text', key='title')
-        rss.accept('text', key='description')
-        links = rss.accept('list', key='link')
-        links.accept('text')
-        return root
+    schema = {
+        'oneOf': [
+            {'type': 'string'},  # TODO: path / file
+            {
+                'type': 'object',
+                'properties': {
+                    'file': {'type': 'string'},
+                    'days': {'type': 'integer'},
+                    'items': {'type': 'integer'},
+                    'history': {'type': 'boolean'},
+                    'rsslink': {'type': 'string'},
+                    'encoding': {'type', 'string'},  # TODO: only valid choices
+                    'title': {'type': 'string'},
+                    'description': {'type': 'string'},
+                    'link': {'type': 'array', 'items': {'type': 'string'}}
+                },
+                'required': ['file'],
+                'additionalProperties': False
+            }
+        ]
+    }
 
     def on_task_output(self, task):
         # makes this plugin count as output (stops warnings about missing outputs)
