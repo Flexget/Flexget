@@ -124,8 +124,7 @@ class Validator(object):
             value.add_parent(self)
             return value
         elif callable(value):
-            # Create a LazyValidator that will serve as a Validator when attributes are accessed.
-            return LazyValidator(value, parent=self)
+            raise ValueError('lazy validators are no longer supported. Upgrade plugin to use new schema validation.')
         # Otherwise create a new child Validator
         kwargs['parent'] = self
         return factory(value, **kwargs)
@@ -488,36 +487,6 @@ class QualityRequirementsValidator(TextValidator):
 
     def _schema(self):
         return {'type': 'string', 'format': 'qualityRequirements'}
-
-
-class LazyValidator(object):
-    """Acts as a wrapper for a Validator instance, but does not generate the instance until one of its attributes
-    needs to be accessed. Used to create validators that may otherwise cause endless loops."""
-
-    def __init__(self, func, parent=None):
-        """
-        :param func: A function that returns a Validator instance when called.
-        :param parent: The parent validator.
-        """
-        self.func = func
-        self.validator = None
-        self.parent = parent
-
-    def __getattr__(self, item):
-        """Creates the actual validator instance if needed. Return attributes of that instance as our own."""
-        if self.validator is None:
-            self.validator = self.func()
-            assert isinstance(self.validator, Validator)
-            self.validator.add_parent(self.parent)
-        return getattr(self.validator, item)
-
-    def _schema(self):
-        """Return the schema of our instance if it has already been created, otherwise return 'ondemand' type."""
-        if self.validator is None:
-            # TODO: Change this whole class to be a plugin validator implemented with $ref?
-            return {}
-        else:
-            return self.validator.schema()
 
 # ---- TESTING ----
 
