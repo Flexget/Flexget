@@ -1,4 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
+
+from flexget.config_schema import extend_schema
 from flexget.plugin import register_plugin, priority, get_plugin_by_name
 from flexget.plugins.filter.series import FilterSeriesBase, normalize_series_name
 
@@ -30,7 +32,8 @@ class FilterSeriesPremiere(FilterSeriesBase):
     schema = {
         'anyOf': [
             {'type': 'boolean'},
-            {'$ref': '/schema/plugin/series#/definitions/series_options'}
+            extend_schema('/schema/plugin/series#/definitions/series_options',
+                          {"properties": {"allow_seasonless": {"type": "boolean"}}})
         ]
     }
 
