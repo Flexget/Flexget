@@ -28,14 +28,16 @@ class ImportSeries(FilterSeriesBase):
             - /media/series
     """
 
-    schema = {
-        'type': 'object',
-        'properties': {
-            'settings': {'$ref': '/schema/plugin/series#/definitions/series_options'},
-            'from': {'$ref': '/schema/plugins?phase=input'}
-        },
-        'additionalProperties': False
-    }
+    @property
+    def schema(self):
+        return {
+            'type': 'object',
+            'properties': {
+                'settings': self.settings_schema,
+                'from': {'$ref': '/schema/plugins?phase=input'}
+            },
+            'additionalProperties': False
+        }
 
     def on_task_start(self, task, config):
 

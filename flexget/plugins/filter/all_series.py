@@ -19,12 +19,9 @@ class FilterAllSeries(FilterSeriesBase):
         propers: no
     """
 
-    schema = {
-        'oneOf': [
-            {'type': 'boolean'},
-            {'$ref': '/schema/plugin/series#/definitions/series_options'}
-        ]
-    }
+    @property
+    def schema(self):
+        return {'oneOf': [{'type': 'boolean'}, self.settings_schema]}
 
     # Run after series and metainfo series plugins
     @priority(115)

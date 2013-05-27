@@ -543,6 +543,54 @@ class FilterSeriesBase(object):
     such as all_series, series_premiere and import_series.
     """
 
+    @property
+    def settings_schema(self):
+        return {
+            'title': 'series options',
+            'type': 'object',
+            'properties': {
+                'path': {'type': 'string'},
+                'set': {'type': 'object'},
+                # Custom regexp options
+                'name_regexp': one_or_more({'type': 'string', 'format': 'regex'}),
+                'ep_regexp': one_or_more({'type': 'string', 'format': 'regex'}),
+                'date_regexp': one_or_more({'type': 'string', 'format': 'regex'}),
+                'sequence_regexp': one_or_more({'type': 'string', 'format': 'regex'}),
+                'id_regexp': one_or_more({'type': 'string', 'format': 'regex'}),
+                # Date parsing options
+                'date_yearfirst': {'type': 'boolean'},
+                'date_dayfirst': {'type': 'boolean'},
+                # Quality options
+                'quality': {'type': 'string', 'format': 'quality_requirements'},
+                'qualities': {'type': 'array', 'items': {'type': 'string', 'format': 'quality_requirements'}},
+                'timeframe': {'type': 'string', 'format': 'interval'},
+                'upgrade': {'type': 'boolean'},
+                'target': {'type': 'string', 'format': 'quality_requirements'},
+                # Specials
+                'specials': {'type': 'boolean'},
+                # Propers (can be boolean, or an interval string)
+                'propers': {'type': ['boolean', 'string'], 'format': 'interval'},
+                # Identified by
+                'identified_by': {
+                    'type': 'string', 'enum': ['ep', 'date', 'sequence', 'id', 'auto'], 'default': 'auto'
+                },
+                # Strict naming
+                'exact': {'type': 'boolean'},
+                # Watched
+                'watched': {
+                    'type': ['string', 'object'],
+                    # SxxEyy form
+                    'pattern': '(?i)^s\d\de\d\d$',
+                    # dict form
+                    'properties': {'season': {'type': 'integer'}, 'episode': {'type': 'integer'}},
+                    'additionalProperties': False
+                },
+                'from_group': one_or_more({'type': 'string'}),
+                'parse_only': {'type': 'boolean'}
+            },
+            'additionalProperties': False
+        }
+
     def make_grouped_config(self, config):
         """Turns a simple series list into grouped format with a empty settings dict"""
         if not isinstance(config, dict):
@@ -663,83 +711,36 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
         except DependencyError:
             log.warning('Unable utilize backlog plugin, episodes may slip trough timeframe')
 
-    # TODO: reject option names at wrong level
-    schema = {
-        'type': ['array', 'object'],
-        # simple format:
-        #   - series
-        #   - another series
-        'items': {
-            'type': ['string', 'number', 'object'],
-            'additionalProperties': {'$ref': '#/definitions/series_options'}
-        },
-        # advanced format:
-        #   settings:
-        #     group: {...}
-        #   group:
-        #     {...}
-        'properties': {
-            'settings': {
-                'type': 'object',
-                'additionalProperties': {'$ref': '#/definitions/series_options'}
-            }
-        },
-        'additionalProperties': {
-            'type': 'array',
+    @property
+    def schema(self):
+        return {
+            'type': ['array', 'object'],
+            # simple format:
+            #   - series
+            #   - another series
             'items': {
                 'type': ['string', 'number', 'object'],
-                'additionalProperties': {'$ref': '#/definitions/series_options'}
-            }
-        },
-        # subschema for reuse here and in dependent plugins
-        'definitions': {
-            'series_options': {
-                'title': 'series options',
-                'type': 'object',
-                'properties': {
-                    'path': {'type': 'string'},
-                    'set': {'type': 'object'},
-                    # Custom regexp options
-                    'name_regexp': one_or_more({'type': 'string', 'format': 'regex'}),
-                    'ep_regexp': one_or_more({'type': 'string', 'format': 'regex'}),
-                    'date_regexp': one_or_more({'type': 'string', 'format': 'regex'}),
-                    'sequence_regexp': one_or_more({'type': 'string', 'format': 'regex'}),
-                    'id_regexp': one_or_more({'type': 'string', 'format': 'regex'}),
-                    # Date parsing options
-                    'date_yearfirst': {'type': 'boolean'},
-                    'date_dayfirst': {'type': 'boolean'},
-                    # Quality options
-                    'quality': {'type': 'string', 'format': 'quality_requirements'},
-                    'qualities': {'type': 'array', 'items': {'type': 'string', 'format': 'quality_requirements'}},
-                    'timeframe': {'type': 'string', 'format': 'interval'},
-                    'upgrade': {'type': 'boolean'},
-                    'target': {'type': 'string', 'format': 'quality_requirements'},
-                    # Specials
-                    'specials': {'type': 'boolean'},
-                    # Propers (can be boolean, or an interval string)
-                    'propers': {'type': ['boolean', 'string'], 'format': 'interval'},
-                    # Identified by
-                    'identified_by': {
-                        'type': 'string', 'enum': ['ep', 'date', 'sequence', 'id', 'auto'], 'default': 'auto'
-                    },
-                    # Strict naming
-                    'exact': {'type': 'boolean'},
-                    # Watched
-                    'watched': {
-                        'type': ['string', 'object'],
-                        # SxxEyy form
-                        'pattern': '(?i)^s\d\de\d\d$',
-                        # dict form
-                        'properties': {'season': {'type': 'integer'}, 'episode': {'type': 'integer'}},
-                        'additionalProperties': False
-                    },
-                    'from_group': one_or_more({'type': 'string'}),
-                    'parse_only': {'type': 'boolean'}
-                },
-                'additionalProperties': False
+                'additionalProperties': self.settings_schema
+            },
+            # advanced format:
+            #   settings:
+            #     group: {...}
+            #   group:
+            #     {...}
+            'properties': {
+                'settings': {
+                    'type': 'object',
+                    'additionalProperties': self.settings_schema
+                }
+            },
+            'additionalProperties': {
+                'type': 'array',
+                'items': {
+                    'type': ['string', 'number', 'object'],
+                    'additionalProperties': self.settings_schema
+                }
             }
         }
-    }
 
     def auto_exact(self, config):
         """Automatically enable exact naming option for series that look like a problem"""

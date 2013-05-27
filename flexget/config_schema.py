@@ -39,15 +39,6 @@ def one_or_more(schema):
     }
 
 
-# TODO: I don't really like this, figure a better way
-def extend_schema(uri, schema):
-    """Extends the schema at ``uri`` with the given ``schema``"""
-    resolver = RefResolver('', {})
-    base_schema = deepcopy(resolver.resolving(uri).__enter__())
-    merge_dict_from_to(schema, base_schema)
-    return base_schema
-
-
 def resolve_ref(uri):
     """
     Finds and returns a schema pointed to by `uri` that has been registered in the register_schema function.
