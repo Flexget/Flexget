@@ -20,7 +20,6 @@ class UrlRewriteNewzleech(object):
     # Search API
     @internet(log)
     def search(self, entry, config=None):
-        # TODO: Implement comparator matching
         query = entry['title']
         url = u'http://newzleech.com/?%s' % str(urllib.urlencode({'q': query.encode('latin1'),
                                                                   'm': 'search', 'group': '', 'min': 'min',
@@ -50,7 +49,6 @@ class UrlRewriteNewzleech(object):
             size = item.find('td', attrs={'class': 'size'}).contents[0]
             nzb_url = 'http://newzleech.com/' + item.find('td', attrs={'class': 'get'}).next.get('href')
 
-            #TODO: confidence match
             # generate regexp from entry title and see if it matches subject
             regexp = query
             wildcardize = [' ', '-']
