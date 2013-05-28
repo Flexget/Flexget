@@ -15,10 +15,7 @@ class DomainDelay(object):
         mysite.com: 5 seconds
     """
 
-    def validator(self):
-        root = validator.factory('dict')
-        root.accept_valid_keys('interval', key_type='text')
-        return root
+    schema = {'type': 'object', 'additionalProperties': {'type': 'string', 'format': 'interval'}}
 
     def on_task_start(self, task, config):
         for domain, delay in config.iteritems():

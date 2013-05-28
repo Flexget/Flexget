@@ -18,12 +18,13 @@ class PluginDisableBuiltins(object):
         # cannot trust that on_task_start would have been executed
         self.disabled = []
 
-    def validator(self):
-        from flexget import validator
-        root = validator.factory()
-        root.accept('boolean')
-        root.accept('list').accept('choice').accept_choices(plugin.name for plugin in all_builtins())
-        return root
+    # TODO: schemas are registered to a uri at plugin load, the list of builtins will not be complete at that time
+    schema = {
+        'oneOf': [
+            {'type': 'boolean'},
+            {'type': 'array', 'items': {'type': 'string', 'enum': [p.name for p in all_builtins()]}}
+        ]
+    }
 
     def debug(self):
         log.debug('Builtin plugins: %s' % ', '.join(plugin.name for plugin in all_builtins()))

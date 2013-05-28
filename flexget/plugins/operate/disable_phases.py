@@ -16,11 +16,8 @@ class PluginDisablePhases(object):
       - download
     """
 
-    def validator(self):
-        from flexget import validator
-        root = validator.factory('list')
-        root.accept('choice').accept_choices(task_phases)
-        return root
+    # TODO: schemas are registered to a uri at plugin load, the list of phases may not be complete at that time
+    schema = {'type': 'array', 'items': {'type': 'string', 'enum': task_phases}}
 
     def on_task_start(self, task, config):
         map(task.disable_phase, config)
