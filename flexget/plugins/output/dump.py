@@ -57,9 +57,7 @@ class OutputDump(object):
     Outputs all entries to console
     """
 
-    def validator(self):
-        from flexget import validator
-        return validator.factory('boolean')
+    schema = {'type': 'boolean'}
 
     @priority(0)
     def on_task_output(self, task):

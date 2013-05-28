@@ -25,11 +25,16 @@ class PogcalShow(Base):
 
 
 class PogcalAcquired(object):
-    def validator(self):
-        root = validator.factory('dict')
-        root.accept('text', key='username', required=True)
-        root.accept('text', key='password', required=True)
-        return root
+
+    schema = {
+        'type': 'object',
+        'properties': {
+            'username': {'type': 'string'},
+            'password': {'type': 'string'}
+        },
+        'required': ['username', 'password'],
+        'additionalProperties': False
+    }
 
     def on_task_exit(self, task, config):
         if not task.accepted and not task.manager.options.test:

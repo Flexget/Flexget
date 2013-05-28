@@ -76,12 +76,15 @@ class MyEpisodes(object):
     How to find the MyEpisodes id: http://matrixagents.org/screencasts/myep_example-20110507-131555.png
     """
 
-    def validator(self):
-        from flexget import validator
-        root = validator.factory('dict')
-        root.accept('text', key='username', required=True)
-        root.accept('text', key='password', required=True)
-        return root
+    schema = {
+        'type': 'object',
+        'properties': {
+            'username': {'type': 'string'},
+            'password': {'type': 'string'}
+        },
+        'required': ['username', 'password'],
+        'additionalProperties': False
+    }
 
     def on_task_exit(self, task, config):
         """Mark all accepted episodes as acquired on MyEpisodes"""

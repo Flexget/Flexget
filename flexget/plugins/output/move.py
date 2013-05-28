@@ -26,17 +26,23 @@ def get_directory_size(directory):
 
 class MovePlugin(object):
 
-    def validator(self):
-        root = validator.factory()
-        root.accept('boolean')
-        config = root.accept('dict')
-        config.accept('path', key='to', allow_replacement=True)
-        config.accept('text', key='filename')
-        config.accept('boolean', key='unpack_safety')
-        config.accept('boolean', key='allow_dir')
-        #config.accept('list', key='move_with').accept('text') # TODO
-        config.accept('number', key='clean_source')
-        return root
+    schema = {
+        'oneOf': [
+            {'type': 'boolean'},
+            {
+                'type': 'object',
+                'properties': {
+                    'to': {'type': 'string', 'format': 'path'},
+                    'filename': {'type': 'string'},
+                    'unpack_safety': {'type': 'boolean'},
+                    'allow_dir': {'type': 'boolean'},
+                    'clean_source': {'type': 'number'},
+                    #'move_with': {'type': 'array', 'items': {'type': 'string'}}  # TODO
+                },
+                'additionalProperties': False
+            }
+        ]
+    }
 
     def on_task_output(self, task, config):
         if config is True:
