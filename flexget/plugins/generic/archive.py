@@ -2,10 +2,12 @@ from __future__ import unicode_literals, division, absolute_import
 import logging
 from datetime import datetime
 from argparse import Action, ArgumentError
+
 from sqlalchemy.orm import relationship
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.schema import Table, ForeignKey
 from sqlalchemy import Column, Integer, DateTime, Unicode, Index
+
 from flexget import db_schema
 from flexget.event import event
 from flexget.entry import Entry
@@ -141,6 +143,14 @@ class Archive(object):
     etc is stored into the database. This may however make injecting them back to the original task work
     wrongly.
     """
+
+    schema = {
+        'oneOf': [
+            {'type': 'boolean'},
+            {'type': 'array', 'items': {'type': 'string'}}
+        ]
+
+    }
 
     def validator(self):
         from flexget import validator
