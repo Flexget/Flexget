@@ -5,7 +5,6 @@ from datetime import datetime
 
 from sqlalchemy import Column, Unicode, Integer
 
-from flexget import validator
 from flexget.plugin import register_plugin
 from flexget.utils import requests
 from flexget.utils.soup import get_soup

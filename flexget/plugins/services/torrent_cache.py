@@ -2,6 +2,7 @@ from __future__ import unicode_literals, division, absolute_import
 import logging
 import re
 import random
+
 from flexget.plugin import register_plugin, priority
 
 log = logging.getLogger('torrent_cache')
