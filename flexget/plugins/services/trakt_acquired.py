@@ -12,14 +12,17 @@ log = logging.getLogger('trakt_acquired')
 class TraktAcquired(object):
     """Marks all accepted TV episodes or movies as acquired in your trakt.tv library."""
 
-    def validator(self):
-        from flexget import validator
-        root = validator.factory('dict')
-        root.accept('text', key='username', required=True)
-        root.accept('text', key='password', required=True)
-        root.accept('text', key='api_key', required=True)
-        root.accept('choice', key='type', required=True).accept_choices(['movies', 'series'])
-        return root
+    schema = {
+        'type': 'object',
+        'properties': {
+            'username': {'type': 'string'},
+            'password': {'type': 'string'},
+            'api_key': {'type': 'string'},
+            'type': {'type': 'string', 'enum': ['movies', 'series']}
+        },
+        'required': ['username', 'password', 'api_key', 'type'],
+        'additionalProperties': False
+    }
 
     def on_task_exit(self, task, config):
         """Finds accepted movies and series episodes and submits them to trakt as acquired."""

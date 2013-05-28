@@ -45,32 +45,39 @@ class PluginExec(object):
     NAME = 'exec'
     HANDLED_PHASES = ['start', 'input', 'filter', 'output', 'exit']
 
-    def validator(self):
-        from flexget import validator
-        root = validator.factory('root')
-        # Simple format, runs on_output for_accepted
-        root.accept('text')
-
-        # Advanced format
-        adv = root.accept('dict')
-
-        def add(name):
-            phase = adv.accept('dict', key=name)
-            phase.accept('text', key='phase')
-            phase.accept('text', key='for_entries')
-            phase.accept('text', key='for_accepted')
-            phase.accept('text', key='for_rejected')
-            phase.accept('text', key='for_failed')
-
-        for phase in self.HANDLED_PHASES:
-            add('on_' + phase)
-
-        adv.accept('boolean', key='fail_entries')
-        adv.accept('boolean', key='auto_escape')
-        adv.accept('text', key='encoding')
-        adv.accept('boolean', key='allow_background')
-
-        return root
+    schema = {
+        'oneOf': [
+            {'type': 'string'},
+            {
+                'type': 'object',
+                'properties': {
+                    'on_start': {'$ref': '#/definitions/phaseSettings'},
+                    'on_input': {'$ref': '#/definitions/phaseSettings'},
+                    'on_filter': {'$ref': '#/definitions/phaseSettings'},
+                    'on_output': {'$ref': '#/definitions/phaseSettings'},
+                    'on_exit': {'$ref': '#/definitions/phaseSettings'},
+                    'fail_entries': {'type': 'boolean'},
+                    'auto_escape': {'type': 'boolean'},
+                    'encoding': {'type': 'string'},
+                    'allow_background': {'type': 'boolean'}
+                },
+                'additionalProperties': False
+            }
+        ],
+        'definitions': {
+            'phaseSettings': {
+                'type': 'object',
+                'properties': {
+                    'phase': {'type': 'string'},
+                    'for_entries': {'type': 'string'},
+                    'for_accepted': {'type': 'string'},
+                    'for_rejected': {'type': 'string'},
+                    'for_failed': {'type': 'string'}
+                },
+                'additionalProperties': False
+            }
+        }
+    }
 
     def prepare_config(self, config):
         if isinstance(config, basestring):

@@ -38,9 +38,7 @@ class OutputMemUsage(object):
     def __init__(self):
         self.heapy = None
 
-    def validator(self):
-        from flexget import validator
-        return validator.factory('boolean')
+    schema = {'type': 'boolean'}
 
     def on_process_start(self, task):
         if not task.manager.options.mem_usage:
