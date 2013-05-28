@@ -166,7 +166,10 @@ def get_error_message(error):
                 return 'The key `%s` is not valid here.' % extras.pop()
             else:
                 return 'The keys %s are not valid here.' % ', '.join('`%s`' % e for e in extras)
-    return error.message
+
+    # Remove u'' string representation from jsonschema error messages
+    message = re.sub('u\'(.*?)\'', '`\\1`', error.message)
+    return message
 
 
 def select_child_errors(validator, errors):
