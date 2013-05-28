@@ -15,30 +15,22 @@ class OutputNzbget(object):
         top: False
     """
 
-    def validator(self):
-        from flexget import validator
-        config = validator.factory('dict')
-
-        config.accept('text', key='url', required=True)
-        config.accept('text', key='category')
-        config.accept('integer', key='priority')
-        config.accept('boolean', key='top')
-        return config
-
-    def get_params(self, config):
-        params = {}
-
-        params['url'] = config['url']
-        params['category'] = config.get("category", "")
-        params['priority'] = config.get("priority", 0)
-        params['top'] = config.get("top", False)
-
-        return params
+    schema = {
+        'type': 'object',
+        'properties': {
+            'url': {'type': 'string'},
+            'category': {'type': 'string', 'default': ''},
+            'priority': {'type': 'integer', 'default': 0},
+            'top': {'type': 'boolean', 'default': False}
+        },
+        'required': ['url'],
+        'additionalProperties': False
+    }
 
     def on_task_output(self, task, config):
         from xmlrpclib import ServerProxy
 
-        params = self.get_params(config)
+        params = dict(config)
 
         server = ServerProxy(params["url"])
 
