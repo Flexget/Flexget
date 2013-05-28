@@ -1,6 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
-import os
 import logging
+import os
+
 from flexget import plugin
 from flexget import validator
 

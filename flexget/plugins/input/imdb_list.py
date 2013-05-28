@@ -3,6 +3,7 @@ import logging
 import csv
 import re
 from cgi import parse_header
+
 from flexget.utils import requests
 from flexget.utils.imdb import make_url
 from flexget.utils.cached_input import cached

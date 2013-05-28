@@ -3,12 +3,11 @@ import datetime
 import logging
 import random
 
-from sqlalchemy import Column, Integer, DateTime, Unicode, and_, Index
+from sqlalchemy import Column, Integer, DateTime, Unicode, Index
 
 from flexget.event import event
 from flexget.utils.cached_input import cached
-from flexget.plugin import (register_plugin, get_plugin_by_name, PluginError,
-    PluginWarning, register_parser_option)
+from flexget.plugin import register_plugin, get_plugin_by_name, PluginError, PluginWarning, register_parser_option
 from flexget import db_schema
 from flexget.utils.tools import parse_timedelta
 

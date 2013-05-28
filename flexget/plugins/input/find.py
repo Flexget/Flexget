@@ -3,6 +3,7 @@ import logging
 import os
 import re
 import sys
+
 from flexget.entry import Entry
 from flexget.plugin import register_plugin
 from flexget.utils.cached_input import cached

@@ -3,7 +3,7 @@ import os
 import shutil
 import logging
 import time
-from flexget import validator
+
 from flexget.plugin import register_plugin
 from flexget.utils.template import RenderError
 from flexget.utils.pathscrub import pathscrub

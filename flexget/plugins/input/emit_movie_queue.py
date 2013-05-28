@@ -1,11 +1,9 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
-from datetime import datetime
 
 from flexget.entry import Entry
 from flexget.plugin import register_plugin, get_plugin_by_name, DependencyError
 from flexget.utils.imdb import make_url as make_imdb_url
-from flexget.utils.tools import parse_timedelta
 
 try:
     from flexget.plugins.filter.movie_queue import queue_get
