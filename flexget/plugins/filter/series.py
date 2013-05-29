@@ -200,6 +200,7 @@ class Series(Base):
     _name_normalized = Column('name_lower', Unicode, index=True, unique=True)
     identified_by = Column(String)
     episodes = relation('Episode', backref='series', cascade='all, delete, delete-orphan')
+    in_tasks = relation('SeriesTask', backref='series', cascade='all, delete, delete-orphan')
 
     # Make a special property that does indexed case insensitive lookups on name, but stores/returns specified case
     def name_getter(self):
@@ -312,6 +313,17 @@ class Release(Base):
 
     def __repr__(self):
         return unicode(self).encode('ascii', 'replace')
+
+
+class SeriesTask(Base):
+    __tablename__ = 'series_tasks'
+
+    id = Column(Integer, primary_key=True)
+    series_id = Column(Integer, ForeignKey('series.id'), nullable=False)
+    name = Column(Unicode, index=True)
+
+    def __init__(self, name):
+        self.name = name
 
 
 class SeriesDatabase(object):
@@ -759,6 +771,25 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
                     if not 'exact' in series_config:
                         log.verbose('Auto enabling exact matching for series %s (reason %s)', series_name, name)
                         series_config['exact'] = True
+
+    @priority(0)
+    def on_task_start(self, task):
+        config = self.prepare_config(task.config.get('series', {}))
+        # Clear
+        task.session.query(SeriesTask).filter(SeriesTask.name == task.name).delete()
+        for series_item in config:
+            series_name, series_config = series_item.items()[0]
+            # Make sure number shows (e.g. 24) are turned into strings
+            series_name = unicode(series_name)
+            # Update database with capitalization from config
+            db_series = task.session.query(Series).filter(Series.name == series_name).first()
+            if not db_series:
+                log.debug('adding series %s into db', series_name)
+                db_series = Series()
+                db_series.name = series_name
+                task.session.add(db_series)
+                log.debug('-> added %s' % db_series)
+            db_series.in_tasks.append(SeriesTask(task.name))
 
     # Run after metainfo_quality and before metainfo_series
     @priority(125)

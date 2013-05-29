@@ -7,12 +7,11 @@ from flexget.plugin import register_plugin, DependencyError
 log = logging.getLogger('emit_series')
 
 try:
-    from flexget.plugins.filter.series import Series, SeriesDatabase
+    from flexget.plugins.filter.series import SeriesTask, SeriesDatabase
 except ImportError as e:
     log.error(e.message)
     raise DependencyError(issued_by='emit_series', missing='series')
 
-# TODO: Make this plugin awesome
 
 class EmitSeries(SeriesDatabase):
     """
@@ -21,13 +20,14 @@ class EmitSeries(SeriesDatabase):
     Supports only series enumerated by season, episode.
     """
 
-    def validator(self):
-        from flexget import validator
-        return validator.factory('boolean')
+    schema = {'type': 'boolean'}
 
     def on_task_input(self, task, config):
+        if not config:
+            return
         entries = []
-        for series in task.session.query(Series).all():
+        for seriestask in task.session.query(SeriesTask).filter(SeriesTask.name == task.name).all():
+            series = seriestask.series
             latest = self.get_latest_info(series)
             if not latest:
                 # no latest known episode, skip
