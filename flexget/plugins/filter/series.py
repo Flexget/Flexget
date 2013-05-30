@@ -6,7 +6,7 @@ from copy import copy
 from datetime import datetime, timedelta
 
 from sqlalchemy import (Column, Integer, String, Unicode, DateTime, Boolean,
-                        desc, select, update, delete, ForeignKey, Index, func, and_, or_)
+                        desc, select, update, delete, ForeignKey, Index, func, and_, not_)
 from sqlalchemy.orm import relation, join
 from sqlalchemy.ext.hybrid import Comparator, hybrid_property
 from sqlalchemy.exc import OperationalError
@@ -707,21 +707,32 @@ class FilterSeriesBase(object):
         return task.config['series']
 
 
+@event('manager.execute.started')
+def remove_old_tasks(manager):
+    """Unmark series from tasks which have been deleted or series plugin removed"""
+    series_tasks = [task for (task, config) in manager.config.iteritems() if 'series' in config]
+    session = Session()
+    try:
+        if not series_tasks:
+            # Sqlalchemy gives a warning if we provide an empty `in_`
+            deleted = session.query(SeriesTask).delete()
+        else:
+            deleted = session.query(SeriesTask).filter(not_(SeriesTask.name.in_(series_tasks))).delete()
+    except:
+        raise
+    else:
+        if deleted:
+            session.commit()
+    finally:
+        session.close()
+
+
 class FilterSeries(SeriesDatabase, FilterSeriesBase):
     """
     Intelligent filter for tv-series.
 
     http://flexget.com/wiki/Plugins/series
     """
-
-    def __init__(self):
-        self.backlog = None
-
-    def on_process_start(self, task):
-        try:
-            self.backlog = get_plugin_by_name('backlog').instance
-        except DependencyError:
-            log.warning('Unable utilize backlog plugin, episodes may slip trough timeframe')
 
     @property
     def schema(self):
@@ -754,6 +765,35 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
             }
         }
 
+    def __init__(self):
+        self.backlog = None
+
+    def on_process_start(self, task):
+        try:
+            self.backlog = get_plugin_by_name('backlog').instance
+        except DependencyError:
+            log.warning('Unable utilize backlog plugin, episodes may slip trough timeframe')
+
+    @priority(0)
+    def on_task_start(self, task):
+        """Update in the database which series are configured in this task"""
+        config = self.prepare_config(task.config.get('series', {}))
+        # Clear
+        task.session.query(SeriesTask).filter(SeriesTask.name == task.name).delete()
+        for series_item in config:
+            series_name, series_config = series_item.items()[0]
+            # Make sure number shows (e.g. 24) are turned into strings
+            series_name = unicode(series_name)
+            # Update database with capitalization from config
+            db_series = task.session.query(Series).filter(Series.name == series_name).first()
+            if not db_series:
+                log.debug('adding series %s into db', series_name)
+                db_series = Series()
+                db_series.name = series_name
+                task.session.add(db_series)
+                log.debug('-> added %s' % db_series)
+            db_series.in_tasks.append(SeriesTask(task.name))
+
     def auto_exact(self, config):
         """Automatically enable exact naming option for series that look like a problem"""
 
@@ -771,25 +811,6 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
                     if not 'exact' in series_config:
                         log.verbose('Auto enabling exact matching for series %s (reason %s)', series_name, name)
                         series_config['exact'] = True
-
-    @priority(0)
-    def on_task_start(self, task):
-        config = self.prepare_config(task.config.get('series', {}))
-        # Clear
-        task.session.query(SeriesTask).filter(SeriesTask.name == task.name).delete()
-        for series_item in config:
-            series_name, series_config = series_item.items()[0]
-            # Make sure number shows (e.g. 24) are turned into strings
-            series_name = unicode(series_name)
-            # Update database with capitalization from config
-            db_series = task.session.query(Series).filter(Series.name == series_name).first()
-            if not db_series:
-                log.debug('adding series %s into db', series_name)
-                db_series = Series()
-                db_series.name = series_name
-                task.session.add(db_series)
-                log.debug('-> added %s' % db_series)
-            db_series.in_tasks.append(SeriesTask(task.name))
 
     # Run after metainfo_quality and before metainfo_series
     @priority(125)
