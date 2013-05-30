@@ -37,7 +37,7 @@ class SearchBTN(object):
                 log.error('Error searching btn: %s' % e)
                 continue
             content = r.json()
-            if content['result']['results']:
+            if 'torrents' in content['result']:
                 for item in content['result']['torrents'].itervalues():
                     if item['Category'] != 'Episode':
                         continue
