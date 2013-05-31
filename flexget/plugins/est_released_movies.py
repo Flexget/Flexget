@@ -5,7 +5,7 @@ from flexget.plugin import register_plugin
 log = logging.getLogger('est_movies')
 
 
-class EstimatesRelasedMovies(object):
+class EstimatesReleasedMovies(object):
 
     def estimate(self, entry):
         if 'tmdb_released' in entry:
@@ -18,4 +18,4 @@ class EstimatesRelasedMovies(object):
             log.debug('Unable to check release for %s, tmdb_release field is not defined' %
                       entry['title'])
 
-register_plugin(EstimatesRelasedMovies, 'est_relased_movies', groups=['estimate_release'])
+register_plugin(EstimatesReleasedMovies, 'est_released_movies', groups=['estimate_release'])
