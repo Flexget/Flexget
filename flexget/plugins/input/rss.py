@@ -219,6 +219,9 @@ class InputRSS(object):
             except RequestException as e:
                 raise PluginError('Unable to download the RSS for task %s (%s): %s' %
                                   (task.name, config['url'], e))
+            if config.get('ascii'):
+                # convert content to ascii (cleanup), can also help with parsing problems on malformed feeds
+                content = response.text.encode('ascii', 'ignore')
 
             # status checks
             status = response.status_code
@@ -251,6 +254,9 @@ class InputRSS(object):
             # This is a file, open it
             with open(config['url'], 'rb') as f:
                 content = f.read()
+            if config.get('ascii'):
+                # Just assuming utf-8 file in this case
+                content = content.decode('utf-8', 'ignore').encode('ascii', 'ignore')
 
         if not content:
             log.error('No data recieved for rss feed.')
@@ -329,10 +335,6 @@ class InputRSS(object):
                 # Let details plugin know that it is ok if this task doesn't produce any entries
                 task.no_entries_ok = True
                 break
-
-            # convert title to ascii (cleanup)
-            if config.get('ascii', False):
-                entry.title = entry.title.encode('ascii', 'ignore')
 
             # remove annoying zero width spaces
             entry.title = entry.title.replace(u'\u200B', u'')
