@@ -4,14 +4,17 @@ import logging
 from sqlalchemy import desc, func
 
 from flexget.manager import Session
-from flexget.plugin import register_plugin, priority
-from flexget.plugins.filter.series import SeriesDatabase, Series, Episode
+from flexget.plugin import register_plugin, priority, DependencyError
 from flexget.utils.tools import multiply_timedelta
+try:
+    from flexget.plugins.filter.series import Series, Episode
+except ImportError:
+    raise DependencyError(issued_by='est_released_series', missing='series plugin', silent=True)
 
 log = logging.getLogger('est_series')
 
 
-class EstimatesReleasedSeries(SeriesDatabase):
+class EstimatesReleasedSeries(object):
 
     @priority(0)  # Run only if better online lookups fail
     def estimate(self, entry):
