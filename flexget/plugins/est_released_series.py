@@ -1,39 +1,35 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
-from flexget.plugin import register_plugin
-from flexget.plugins.api_tvrage import lookup_series
+
+from sqlalchemy import desc, func
+
+from flexget.manager import Session
+from flexget.plugin import register_plugin, priority
+from flexget.plugins.filter.series import SeriesDatabase, Series, Episode
+from flexget.utils.tools import multiply_timedelta
 
 log = logging.getLogger('est_series')
 
 
-class EstimatesRelasedSeries(object):
+class EstimatesReleasedSeries(SeriesDatabase):
 
-    def get_series_info(self, series_name):
-        return lookup_series(name=series_name)
-
+    @priority(0)  # Run only if better online lookups fail
     def estimate(self, entry):
-        if 'series_name' in entry and 'series_episode' in entry and 'series_season' in entry:
-            log.verbose("Querying release estimation for %s S%02dE%02d ..." %
-                        (entry['series_name'], entry['series_season'], entry['series_episode']))
-            series_info = self.get_series_info(entry['series_name'])
-            if series_info is None:
-                log.debug('No series info obtained from TVRage to %s' % entry['series_name'])
-                return None
-            try:
-                season_info = series_info.season(entry['series_season'])
-                if season_info:
-                    episode_info = season_info.episode(entry['series_episode'])
-                    if episode_info:
-                        return episode_info.airdate
-            # this may occur if we ask for a season or an episode that doesn't exists and we don't want a messy log
-            # with "normal" exception
-            except KeyError as e:
-                return None
-            except Exception as e:
-                log.exception(e)
-
-            log.debug('No episode info obtained from TVRage for %s season %s episode %s' %
-                      (entry['series_name'], entry['series_season'], entry['series_episode']))
+        if all(field in entry for field in ['series_name', 'series_season', 'series_episode']):
+            session = Session()
+            series = session.query(Series).filter(Series.name == entry['series_name']).first()
+            if not series:
+                return
+            episodes = (session.query(Episode).join(Series).
+                filter(Episode.season != None).
+                filter(Series.id == series.id).
+                filter(Episode.season == func.max(Episode.season).select()).
+                order_by(desc(Episode.number)).limit(2).all())
+            if len(episodes) < 2:
+                return
+            last_diff = episodes[0].first_seen - episodes[1].first_seen
+            return episodes[0].first_seen + multiply_timedelta(last_diff, 0.9)
+            # TODO: Some fancier logic? Season break estimates?
 
 
-register_plugin(EstimatesRelasedSeries, 'est_relased_series', groups=['estimate_release'])
+register_plugin(EstimatesReleasedSeries, 'est_released_series', groups=['estimate_release'])

@@ -19,9 +19,9 @@ class EstimateRelease(object):
         :return: estimated date of released for the entry, None if it can't figure it out
         """
 
-        log.info(entry['title'])
+        log.debug(entry['title'])
         estimators = get_plugins_by_group('estimate_release')
-        for estimator in estimators:
+        for estimator in sorted(estimators, key=lambda e: getattr(e.instance.estimate, 'priority', 128), reverse=True):
             estimate = estimator.instance.estimate(entry)
             # return first successful estimation
             if estimate is not None:
