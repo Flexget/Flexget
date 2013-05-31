@@ -30,9 +30,11 @@ class EstimatesReleasedSeries(object):
                 order_by(desc(Episode.number)).limit(2).all())
             if len(episodes) < 2:
                 return
+            if episodes[0].number != episodes[0].number + 1:
+                return
             last_diff = episodes[0].first_seen - episodes[1].first_seen
             return episodes[0].first_seen + multiply_timedelta(last_diff, 0.9)
             # TODO: Some fancier logic? Season break estimates?
 
 
-register_plugin(EstimatesReleasedSeries, 'est_released_series', groups=['estimate_release'])
+register_plugin(EstimatesReleasedSeries, 'est_released_series', groups=['estimate_release'], api_ver=2)
