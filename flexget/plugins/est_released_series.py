@@ -1,4 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
+from datetime import timedelta
 import logging
 
 from sqlalchemy import desc, func
@@ -30,11 +31,21 @@ class EstimatesReleasedSeries(object):
                 order_by(desc(Episode.number)).limit(2).all())
             if len(episodes) < 2:
                 return
-            if episodes[0].number != episodes[0].number + 1:
+            # If last two eps were not contiguous, don't guess
+            if episodes[0].number != episodes[1].number + 1:
                 return
             last_diff = episodes[0].first_seen - episodes[1].first_seen
+            # If last eps were grabbed close together, we might be catching up, don't guess
+            # Or, if last eps were too far apart, don't guess
+            # TODO: What range?
+            if last_diff < timedelta(days=2) or last_diff > timedelta(days=10):
+                return
+            # Estimate next season somewhat more than a normal episode break
+            if entry['series_season'] > episodes[0].season:
+                # TODO: How big should this be?
+                return episodes[0].first_seen + multiply_timedelta(last_diff, 2)
+            # Estimate next episode comes out about same length as last ep span, with a little leeway
             return episodes[0].first_seen + multiply_timedelta(last_diff, 0.9)
-            # TODO: Some fancier logic? Season break estimates?
 
 
 register_plugin(EstimatesReleasedSeries, 'est_released_series', groups=['estimate_release'], api_ver=2)
