@@ -7,11 +7,12 @@ from sqlalchemy import Column, Integer, String, DateTime, PickleType, Index
 
 from flexget import db_schema
 from flexget.entry import Entry
+from flexget.event import event
 from flexget.manager import Session
-from flexget.plugin import register_plugin, priority
+from flexget.plugin import register_plugin, register_parser_option, priority
 from flexget.utils.database import safe_pickle_synonym
 from flexget.utils.sqlalchemy_utils import table_schema
-from flexget.utils.tools import parse_timedelta
+from flexget.utils.tools import parse_timedelta, console
 
 log = logging.getLogger('backlog')
 Base = db_schema.versioned_base('backlog', 1)
@@ -145,4 +146,18 @@ class InputBacklog(object):
 
         return entries
 
+
+@event('manager.startup')
+def clear_backlog(manager):
+    if not manager.options.clear_backlog:
+        return
+    manager.disable_tasks()
+    session = Session()
+    num = session.query(BacklogEntry).delete()
+    session.close()
+    console('%s entries cleared from backlog.' % num)
+
+
+
 register_plugin(InputBacklog, 'backlog', builtin=True, api_ver=2)
+register_parser_option('--clear-backlog', action='store_true', default=False, help='Remove all items from the backlog.')
