@@ -34,7 +34,7 @@ class Listdir(object):
             path = os.path.expanduser(path)
             for name in os.listdir(unicode(path)):
                 e = Entry()
-                e['title'] = name
+                e['title'] = os.path.splitext(name)[0]
                 filepath = os.path.join(path, name)
                 # Windows paths need an extra / preceded to them
                 if not filepath.startswith('/'):

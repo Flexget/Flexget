@@ -76,7 +76,7 @@ class InputFind(object):
                     e = Entry()
                     try:
                         # Convert back to unicode
-                        e['title'] = name.decode(fs_encoding)
+                        e['title'] = os.path.splitext(name.decode(fs_encoding))[0]
                     except UnicodeDecodeError:
                         log.warning('Filename `%r` in `%s` encoding broken?' %
                                     (name.decode('utf-8', 'replace'), item[0]))
