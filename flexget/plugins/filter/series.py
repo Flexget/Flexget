@@ -22,8 +22,7 @@ from flexget.utils.sqlalchemy_utils import (table_columns, table_exists, drop_ta
 from flexget.utils.tools import merge_dict_from_to, parse_timedelta
 from flexget.utils.database import quality_property
 from flexget.manager import Session
-from flexget.plugin import (register_plugin, register_parser_option, get_plugin_by_name, get_plugin_keywords,
-                            DependencyError, priority)
+from flexget.plugin import register_plugin, register_parser_option, get_plugin_by_name, DependencyError, priority
 
 SCHEMA_VER = 9
 
@@ -1200,8 +1199,10 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
         if latest and latest.identified_by == episode.identified_by:
             # allow few episodes "backwards" in case of missed eps
             grace = len(entries) + 2
-            if ((episode.season < latest.season) or
-               (episode.season == latest.season and episode.number < (latest.number - grace))):
+            if (
+                    episode.season < latest.season or
+                    (episode.identified_by == 'sequence' and episode.number < (latest.number - grace))
+            ):
                 log.debug('too old! rejecting all occurrences')
                 for entry in entries:
                     entry.reject('Too much in the past from latest downloaded episode %s' % latest.identifier)
