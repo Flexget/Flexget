@@ -72,10 +72,6 @@ class SearchKAT(object):
 
                 entries.add(entry)
 
-        # choose torrent
-        if not entries:
-            raise PluginWarning('No matches for %s' % search_string, log, log_once=True)
-
-        return sorted(entries, reverse=True, key=lambda x: x.get('search_sort'))
+        return entries
 
 register_plugin(SearchKAT, 'kat', groups=['search'])
