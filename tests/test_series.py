@@ -311,12 +311,18 @@ class TestEpisodeAdvancement(FlexGetBase):
 
           test_backwards_1:
             mock:
-              - {title: 'backwards s01e12'}
-              - {title: 'backwards s01e10'}
+              - {title: 'backwards s02e12'}
+              - {title: 'backwards s02e10'}
             series:
               - backwards
 
           test_backwards_2:
+            mock:
+              - {title: 'backwards s02e01'}
+            series:
+              - backwards
+
+          test_backwards_3:
             mock:
               - {title: 'backwards s01e01'}
             series:
@@ -395,13 +401,16 @@ class TestEpisodeAdvancement(FlexGetBase):
     def test_backwards(self):
         """Series plugin: episode advancement (backwards)"""
         self.execute_task('test_backwards_1')
-        assert self.task.find_entry('accepted', title='backwards s01e12'), \
-            'backwards s01e12 should have been accepted'
-        assert self.task.find_entry('accepted', title='backwards s01e10'), \
-            'backwards s01e10 should have been accepted within grace margin'
+        assert self.task.find_entry('accepted', title='backwards s02e12'), \
+            'backwards s02e12 should have been accepted'
+        assert self.task.find_entry('accepted', title='backwards s02e10'), \
+            'backwards s02e10 should have been accepted within grace margin'
         self.execute_task('test_backwards_2')
+        assert self.task.find_entry('accepted', title='backwards s02e01'), \
+            'backwards s02e01 should have been accepted, in current season'
+        self.execute_task('test_backwards_3')
         assert self.task.find_entry('rejected', title='backwards s01e01'), \
-            'backwards s01e01 should have been rejected, too old'
+            'backwards s01e01 should have been rejected, in previous season'
 
     def test_forwards(self):
         """Series plugin: episode advancement (future)"""
