@@ -1,10 +1,12 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
 import csv
+
+from requests import RequestException
+
 from flexget.entry import Entry
-from flexget.plugin import register_plugin, internet
+from flexget.plugin import register_plugin, PluginError
 from flexget.utils.cached_input import cached
-from flexget.utils.tools import urlopener
 
 log = logging.getLogger('csv')
 
@@ -34,28 +36,36 @@ class InputCSV(object):
         List of other common (optional) fields can be found from wiki.
     """
 
-    def validator(self):
-        from flexget import validator
-        config = validator.factory('dict')
-        config.accept('url', key='url', required=True)
-        values = config.accept('dict', key='values', required=True)
-        values.accept_any_key('integer')
-        return config
+    schema = {
+        'type': 'object',
+        'properties': {
+            'url': {'type': 'string', 'format': 'url'},
+            'values': {'type': 'object', 'additionalProperties': {'type': 'integer'}}
+        },
+        'required': ['values'],
+        'additionalProperties': False
+    }
 
     @cached('csv')
-    @internet(log)
     def on_task_input(self, task, config):
         entries = []
-        page = urlopener(config['url'], log)
+        try:
+            r = task.requests.get(config['url'])
+        except RequestException as e:
+            raise PluginError('Error fetching `%s`: %s' % (config['url'], e))
+        # CSV module needs byte strings, we'll convert back to unicode later
+        page = r.text.encode('utf-8').splitlines()
         for row in csv.reader(page):
             if not row:
                 continue
             entry = Entry()
             for name, index in config.get('values', {}).items():
                 try:
-                    entry[name] = row[index - 1]
+                    # Convert the value back to unicode
+                    entry[name] = row[index - 1].decode('utf-8').strip()
                 except IndexError:
-                    raise Exception('Field `%s` index is out of range' % name)
+                    raise PluginError('Field `%s` index is out of range' % name)
+
             entries.append(entry)
         return entries
 
