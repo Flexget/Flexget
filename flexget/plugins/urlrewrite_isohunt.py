@@ -95,10 +95,7 @@ class UrlRewriteIsoHunt(object):
                     entry['search_sort'] = torrent_availability(entry['torrent_seeds'], entry['torrent_leeches'])
 
                 entries.add(entry)
-        # choose torrent
-        if not entries:
-            raise PluginWarning('No close matches for %s' % search_string, log, log_once=True)
 
-        return sorted(entries, reverse=True, key=lambda x: x.get('search_sort'))
+        return entries
 
 register_plugin(UrlRewriteIsoHunt, 'isohunt', groups=['urlrewriter', 'search'])
