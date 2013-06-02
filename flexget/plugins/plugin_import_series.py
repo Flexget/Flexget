@@ -1,7 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
-from flexget.plugin import register_plugin, get_plugin_by_name, get_plugins_by_phase, PluginError
-from flexget.plugins.filter.series import FilterSeriesBase
 import logging
+
+from flexget.plugin import register_plugin, get_plugin_by_name, PluginError
+from flexget.plugins.filter.series import FilterSeriesBase
 
 log = logging.getLogger('import_series')
 

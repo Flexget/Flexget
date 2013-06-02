@@ -2,8 +2,6 @@ from __future__ import unicode_literals, division, absolute_import
 from datetime import datetime, timedelta
 from string import capwords
 
-from sqlalchemy import distinct
-
 from flexget.manager import Session
 from flexget.plugin import register_plugin, register_parser_option, DependencyError
 from flexget.utils.tools import console
@@ -90,9 +88,9 @@ class SeriesReport(SeriesDatabase):
         result = {}
         session = Session()
         try:
-            seriestasks = session.query(SeriesTask).distinct().all()
+            seriestasks = session.query(SeriesTask).all()
             if seriestasks:
-                all_series = (st.series for st in seriestasks)
+                all_series = set(st.series for st in seriestasks)
             else:
                 all_series = session.query(Series).all()
             for series in all_series:
