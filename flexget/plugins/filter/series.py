@@ -4,8 +4,9 @@ import re
 import time
 from copy import copy
 from datetime import datetime, timedelta
+from functools import total_ordering
 
-from sqlalchemy import (Column, Integer, String, Unicode, DateTime, Boolean,
+from sqlalchemy import (Column, Integer, String, Unicode, DateTime, Date, Boolean,
                         desc, select, update, delete, ForeignKey, Index, func, and_, not_)
 from sqlalchemy.orm import relation, join
 from sqlalchemy.ext.hybrid import Comparator, hybrid_property
@@ -22,9 +23,10 @@ from flexget.utils.sqlalchemy_utils import (table_columns, table_exists, drop_ta
 from flexget.utils.tools import merge_dict_from_to, parse_timedelta
 from flexget.utils.database import quality_property
 from flexget.manager import Session
-from flexget.plugin import register_plugin, register_parser_option, get_plugin_by_name, DependencyError, priority
+from flexget.plugin import (register_plugin, register_parser_option, get_plugin_by_name, DependencyError, priority,
+                            PluginError)
 
-SCHEMA_VER = 9
+SCHEMA_VER = 10
 
 log = logging.getLogger('series')
 Base = db_schema.versioned_base('series', SCHEMA_VER)
@@ -131,6 +133,9 @@ def upgrade(ver, session):
                 session.execute(delete(series_table, series_table.c.id.in_(ids[1:])))
             session.execute(update(series_table, series_table.c.id == ids[0], {'name_lower': series}))
         ver = 9
+    if ver == 9:
+        table_add_column('series', 'begin_episode_id', Integer, session)
+        ver = 10
 
     return ver
 
@@ -198,7 +203,10 @@ class Series(Base):
     _name = Column('name', Unicode)
     _name_normalized = Column('name_lower', Unicode, index=True, unique=True)
     identified_by = Column(String)
-    episodes = relation('Episode', backref='series', cascade='all, delete, delete-orphan')
+    begin_episode_id = Column(Integer, ForeignKey('series_episodes.id', name='begin_episode_id', use_alter=True))
+    begin = relation('Episode', uselist=False, primaryjoin="Series.begin_episode_id == Episode.id", foreign_keys=[begin_episode_id])
+    episodes = relation('Episode', backref='series', cascade='all, delete, delete-orphan',
+                        primaryjoin='Series.id == Episode.series_id')
     in_tasks = relation('SeriesTask', backref='series', cascade='all, delete, delete-orphan')
 
     # Make a special property that does indexed case insensitive lookups on name, but stores/returns specified case
@@ -222,6 +230,7 @@ class Series(Base):
         return unicode(self).encode('ascii', 'replace')
 
 
+@total_ordering
 class Episode(Base):
 
     __tablename__ = 'series_episodes'
@@ -279,6 +288,26 @@ class Episode(Base):
 
     def __repr__(self):
         return unicode(self).encode('ascii', 'replace')
+
+    def __eq__(self, other):
+        if not isinstance(other, Episode):
+            return NotImplemented
+        if self.identified_by != other.identified_by:
+            return NotImplemented
+        return self.identifier == other.identifier
+
+    def __lt__(self, other):
+        if not isinstance(other, Episode):
+            return NotImplemented
+        if self.identified_by != other.identified_by:
+            return NotImplemented
+        if self.identified_by in ['ep', 'sequence']:
+            return self.season < other.season or (self.season == other.season and self.number < other.number)
+        if self.identified_by == 'date':
+            return self.identifier < other.identifier
+        # Can't compare id type identifiers
+        return NotImplemented
+
 
 Index('episode_series_identifier', Episode.series_id, Episode.identifier)
 
@@ -353,7 +382,7 @@ class SeriesDatabase(object):
         """
 
         session = Session.object_session(series)
-        type_totals = dict(session.query(Episode.identified_by, func.count(Episode.identified_by)).join(Series).
+        type_totals = dict(session.query(Episode.identified_by, func.count(Episode.identified_by)).join(Episode.series).
                            filter(Series.id == series.id).group_by(Episode.identified_by).all())
         # Remove None and specials from the dict,
         # we are only considering episodes that we know the type of (parsed with new parser)
@@ -388,7 +417,7 @@ class SeriesDatabase(object):
         :return: Instance of Episode or None if not found.
         """
         session = Session.object_session(series)
-        downloaded = session.query(Episode).join(Release, Series).\
+        downloaded = session.query(Episode).join(Episode.releases, Episode.series).\
             filter(Series.id == series.id).\
             filter(Release.downloaded == True)
         if series.identified_by in ['ep', 'sequence']:
@@ -411,7 +440,7 @@ class SeriesDatabase(object):
         """
         session = Session.object_session(since_ep)
         series = since_ep.series
-        series_eps = session.query(Episode).select_from(join(Episode, Series)).\
+        series_eps = session.query(Episode).join(Episode.series).\
             filter(Series.id == series.id)
         if series.identified_by == 'ep':
             if since_ep.season is None or since_ep.number is None:
@@ -471,7 +500,7 @@ class SeriesDatabase(object):
                 series.episodes.append(episode)  # pylint:disable=E1103
                 log.debug('-> added %s' % episode)
 
-            # if release does not exists in episodes, add new
+            # if release does not exists in episode, add new
             #
             # NOTE:
             #
@@ -587,14 +616,15 @@ class FilterSeriesBase(object):
                 },
                 # Strict naming
                 'exact': {'type': 'boolean'},
-                # Watched
-                'watched': {
-                    'type': ['string', 'object'],
-                    # SxxEyy form
-                    'pattern': '(?i)^s\d\de\d\d$',
-                    # dict form
-                    'properties': {'season': {'type': 'integer'}, 'episode': {'type': 'integer'}},
-                    'additionalProperties': False
+                # Begin takes an ep, sequence or date identifier
+                'begin': {
+                    'oneOf': [
+                        {'name': 'ep identifier', 'type': 'string', 'pattern': r'^S\d{2}E\d{2,3}$',
+                         'error_pattern': 'episode identifiers should be in the form `SxxEyy`'},
+                        {'name': 'date identifier', 'type': 'string', 'pattern': r'^\d{4}-\d{2}-\d{2}$',
+                         'error_pattern': 'date identifiers must be in the form `YYYY-MM-DD`'},
+                        {'name': 'sequence identifier', 'type': 'integer', 'minimum': 0}
+                    ]
                 },
                 'from_group': one_or_more({'type': 'string'}),
                 'parse_only': {'type': 'boolean'}
@@ -776,6 +806,7 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
     @priority(0)
     def on_task_start(self, task):
         """Update in the database which series are configured in this task"""
+        # TODO: This whole bit can be skipped if not task.config_modified, once import_series properly updates that flag
         config = self.prepare_config(task.config.get('series', {}))
         # Clear
         task.session.query(SeriesTask).filter(SeriesTask.name == task.name).delete()
@@ -792,6 +823,40 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
                 task.session.add(db_series)
                 log.debug('-> added %s' % db_series)
             db_series.in_tasks.append(SeriesTask(task.name))
+            # Set the begin episode
+            if series_config.get('begin'):
+                # If identified_by is not explicitly specified, auto-detect it based on begin identifier
+                # TODO: use some method of series parser to do the identifier parsing
+                if isinstance(series_config['begin'], int):
+                    identified_by = 'sequence'
+                elif re.match(r'^S\d{1,2}E\d{1,2}$', series_config['begin']):
+                    identified_by = 'ep'
+                else:
+                    identified_by = 'date'
+                if series_config.get('identified_by', 'auto') != 'auto':
+                    if identified_by != series_config['identified_by']:
+                        raise PluginError('`begin` value `%s` does not match idenentifier type for identified_by `%s`' %
+                                          (series_config['begin'], series_config['identified_by']))
+                db_series.identified_by = identified_by
+                episode = (task.session.query(Episode).filter(Episode.series_id == db_series.id).
+                           filter(Episode.identified_by == db_series.identified_by).
+                           filter(Episode.identifier == str(series_config['begin'])).first())
+                if not episode:
+                    # TODO: Don't duplicate code from self.store method
+                    episode = Episode()
+                    episode.identifier = series_config['begin']
+                    episode.identified_by = identified_by
+                    if identified_by == 'ep':
+                        match = re.match(r'S(\d+)E(\d+)', series_config['begin'])
+                        episode.season = int(match.group(1))
+                        episode.number = int(match.group(2))
+                    elif identified_by == 'sequence':
+                        episode.season = 0
+                        episode.number = series_config['begin']
+                    db_series.episodes.append(episode)
+                    # Need to flush to get an id on new Episode before assigning it as series begin
+                    task.session.flush()
+                db_series.begin = episode
 
     def auto_exact(self, config):
         """Automatically enable exact naming option for series that look like a problem"""
@@ -981,9 +1046,11 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
             log.debug('start with episodes: %s', [e['title'] for e in entries])
 
             # reject episodes that have been marked as watched in config file
-            if 'watched' in config:
-                log.debug('-' * 20 + ' watched -->')
-                if self.process_watched(config, ep, entries):
+            if ep.series.begin:
+                if ep < ep.series.begin:
+                    for entry in entries:
+                        entry.reject('Episode `%s` is before begin value of `%s`' %
+                                     (ep.identifier, ep.series.begin.identifier))
                     continue
 
             # skip special episodes if special handling has been turned off
@@ -1172,22 +1239,6 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
         if not result:
             log.debug('no quality meets requirements')
         return result
-
-    def process_watched(self, config, episode, entries):
-        """
-        Rejects all episodes older than defined in watched.
-
-        :returns: True when rejected because of watched
-        """
-        from sys import maxint
-        w_season = config['watched'].get('season', -1)
-        w_episode = config['watched'].get('episode', maxint)
-        if episode.season < w_season or (episode.season == w_season and episode.number <= w_episode):
-            log.debug('%s episode %s is already watched, rejecting all occurrences',
-                      episode.series.name, episode.identifier)
-            for entry in entries:
-                entry.reject('watched')
-            return True
 
     def process_episode_advancement(self, episode, entries):
         """Rejects all episodes that are too old or new (advancement), return True when this happens."""
