@@ -1,19 +1,19 @@
 from __future__ import unicode_literals, division, absolute_import
 from datetime import datetime, timedelta
 from string import capwords
+
 from flexget.manager import Session
 from flexget.plugin import register_plugin, register_parser_option, DependencyError
 from flexget.utils.tools import console
 
 try:
-    from flexget.plugins.filter.series import (SeriesDatabase, Series, Episode, Release,
+    from flexget.plugins.filter.series import (SeriesDatabase, Series, Episode, Release, SeriesTask,
                                                forget_series, forget_series_episode)
 except ImportError:
     raise DependencyError(issued_by='cli_series', missing='series', message='Series commandline interface not loaded')
 
 
 class SeriesReport(SeriesDatabase):
-
     """Produces --series report"""
 
     def on_process_start(self, task):
@@ -88,7 +88,12 @@ class SeriesReport(SeriesDatabase):
         result = {}
         session = Session()
         try:
-            for series in session.query(Series).all():
+            seriestasks = session.query(SeriesTask).all()
+            if seriestasks:
+                all_series = set(st.series for st in seriestasks)
+            else:
+                all_series = session.query(Series).all()
+            for series in all_series:
                 name = series.name
                 # capitalize if user hasn't, better look and sorting ...
                 if name.islower():
@@ -176,7 +181,6 @@ class SeriesReport(SeriesDatabase):
 
 
 class SeriesForget(object):
-
     """Provides --series-forget"""
 
     def on_process_start(self, task):

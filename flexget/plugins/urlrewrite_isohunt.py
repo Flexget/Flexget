@@ -58,47 +58,43 @@ class UrlRewriteIsoHunt(object):
 
     def search(self, entry, config):
         # urllib.quote will crash if the unicode string has non ascii characters, so encode in utf-8 beforehand
-        name = normalize_unicode(entry['title'])
         optionlist = ['misc', 'movies', 'audio', 'tv', 'games', 'apps', 'pics', 'anime', 'comics', 'books',
                       'music video', 'unclassified', 'all']
-        url = 'http://isohunt.com/js/rss/%s?iht=%s&noSL' % (
-            urllib.quote(name.encode('utf-8')), optionlist.index(config))
+        entries = set()
+        search_strings = [normalize_unicode(s) for s in entry.get('search_strings', [entry['title']])]
+        for search_string in search_strings:
+            url = 'http://isohunt.com/js/rss/%s?iht=%s&noSL' % (
+                urllib.quote(search_string.encode('utf-8')), optionlist.index(config))
 
-        log.debug('requesting: %s' % url)
-        rss = feedparser.parse(url)
-        entries = []
+            log.debug('requesting: %s' % url)
+            rss = feedparser.parse(url)
 
-        status = rss.get('status', False)
-        if status != 200:
-            raise PluginWarning('Search result not 200 (OK), received %s' % status)
+            status = rss.get('status', False)
+            if status != 200:
+                raise PluginWarning('Search result not 200 (OK), received %s' % status)
 
-        ex = rss.get('bozo_exception', False)
-        if ex:
-            raise PluginWarning('Got bozo_exception (bad feed)')
+            ex = rss.get('bozo_exception', False)
+            if ex:
+                raise PluginWarning('Got bozo_exception (bad feed)')
 
-        for item in rss.entries:
-            entry = Entry()
-            entry['title'] = item.title
-            entry['url'] = item.link
+            for item in rss.entries:
+                entry = Entry()
+                entry['title'] = item.title
+                entry['url'] = item.link
 
-            m = re.search(r'Size: ([\d]+).*Seeds: (\d+).*Leechers: (\d+)', item.description, re.IGNORECASE)
-            if not m:
-                log.debug('regexp did not find seeds / peer data')
-                continue
-            else:
-                log.debug('regexp found size(%s), Seeds(%s) and Leeches(%s)' % (m.group(1), m.group(2), m.group(3)))
+                m = re.search(r'Size: ([\d]+).*Seeds: (\d+).*Leechers: (\d+)', item.description, re.IGNORECASE)
+                if not m:
+                    log.debug('regexp did not find seeds / peer data')
+                    continue
+                else:
+                    log.debug('regexp found size(%s), Seeds(%s) and Leeches(%s)' % (m.group(1), m.group(2), m.group(3)))
 
-                entry['content_size'] = int(m.group(1))
-                entry['torrent_seeds'] = int(m.group(2))
-                entry['torrent_leeches'] = int(m.group(3))
-                entry['search_sort'] = torrent_availability(entry['torrent_seeds'], entry['torrent_leeches'])
+                    entry['content_size'] = int(m.group(1))
+                    entry['torrent_seeds'] = int(m.group(2))
+                    entry['torrent_leeches'] = int(m.group(3))
+                    entry['search_sort'] = torrent_availability(entry['torrent_seeds'], entry['torrent_leeches'])
 
-            entries.append(entry)
-        # choose torrent
-        if not entries:
-            raise PluginWarning('No close matches for %s' % name, log, log_once=True)
-
-        entries.sort(reverse=True, key=lambda x: x.get('search_sort'))
+                entries.add(entry)
 
         return entries
 

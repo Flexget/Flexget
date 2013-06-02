@@ -28,7 +28,7 @@ class SearchBTN(object):
                 search['name'] = entry['series_id']
             searches = [search]
 
-        results = []
+        results = set()
         for search in searches:
             data = json.dumps({'method': 'getTorrents', 'params': [api_key, search], 'id': 1})
             try:
@@ -37,7 +37,7 @@ class SearchBTN(object):
                 log.error('Error searching btn: %s' % e)
                 continue
             content = r.json()
-            if content['result']['results']:
+            if 'torrents' in content['result']:
                 for item in content['result']['torrents'].itervalues():
                     if item['Category'] != 'Episode':
                         continue
@@ -50,7 +50,7 @@ class SearchBTN(object):
                     entry['search_sort'] = torrent_availability(entry['torrent_seeds'], entry['torrent_leeches'])
                     if item['TvdbID']:
                         entry['tvdb_id'] = int(item['TvdbID'])
-                    results.append(entry)
+                    results.add(entry)
         return results
 
 
