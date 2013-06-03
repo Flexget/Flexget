@@ -164,6 +164,7 @@ def render(template, context):
 
     return result
 
+
 def render_from_entry(template_string, entry):
     """Renders a Template or template string with an Entry as its context."""
 
@@ -172,7 +173,7 @@ def render_from_entry(template_string, entry):
         try:
             template = environment.from_string(template_string)
         except TemplateSyntaxError as e:
-            raise PluginError('Error in template syntax: ' + e.message)
+            raise RenderError('Error in template syntax: ' + e.message)
     else:
         # We can also support an actual Template being passed in
         template = template_string
@@ -201,7 +202,7 @@ def render_from_entry(template_string, entry):
         except KeyError as e:
             raise RenderError('Does not contain the field `%s` for string replacement.' % e)
         except ValueError as e:
-            raise PluginError('Invalid string replacement template: %s (%s)' % (template_string, e))
+            raise RenderError('Invalid string replacement template: %s (%s)' % (template_string, e))
         except TypeError as e:
             raise RenderError('Error during string replacement: %s' % e.message)
 
