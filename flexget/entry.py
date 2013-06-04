@@ -2,6 +2,7 @@ from __future__ import unicode_literals, division, absolute_import
 from exceptions import Exception, UnicodeDecodeError, TypeError, KeyError
 import logging
 import copy
+import functools
 
 from flexget.plugin import PluginError
 from flexget.utils.imdb import extract_id, make_url
@@ -71,7 +72,7 @@ class Entry(dict):
         self.traces = []
         self.snapshots = {}
         self._state = 'undecided'
-        self.task = None
+        self.hooks = {'accept': [], 'reject': [], 'fail': [], 'succeed': []}
 
         if len(args) == 2:
             kwargs['title'] = args[0]
@@ -92,9 +93,25 @@ class Entry(dict):
         """
         if operation not in (None, 'accept', 'reject', 'fail'):
             raise ValueError('Unknown operation %s' % operation)
-        item = (plugin or self.task.current_plugin, operation, message)
+        item = (plugin, operation, message)
         if item not in self.traces:
             self.traces.append(item)
+
+    def run_hooks(self, hook, **kwargs):
+        for func in self.hooks[hook]:
+            func(self, **kwargs)
+
+    def on_accept(self, func, **kwargs):
+        self.hooks['accept'].append(functools.partial(func, **kwargs))
+
+    def on_reject(self, func, **kwargs):
+        self.hooks['reject'].append(functools.partial(func, **kwargs))
+
+    def on_fail(self, func, **kwargs):
+        self.hooks['fail'].append(functools.partial(func, **kwargs))
+
+    def on_succeed(self, func, **kwargs):
+        self.hooks['succeed'].append(functools.partial(func, **kwargs))
 
     def accept(self, reason=None, **kwargs):
         if self.rejected:
@@ -102,8 +119,8 @@ class Entry(dict):
         elif not self.accepted:
             self._state = 'accepted'
             self.trace(reason, operation='accept')
-            # Run on_entry_accept phase
-            self.task._run_entry_phase('accept', self, reason=reason, **kwargs)
+            # Run entry on_accept hooks
+            self.run_hooks('accept', reason=reason, **kwargs)
 
     def reject(self, reason=None, **kwargs):
         # ignore rejections on immortal entries
@@ -115,8 +132,8 @@ class Entry(dict):
         if not self.rejected:
             self._state = 'rejected'
             self.trace(reason, operation='reject')
-            # Run on_entry_reject phase
-            self.task._run_entry_phase('reject', self, reason=reason, **kwargs)
+            # Run entry on_reject hooks
+            self.run_hooks('reject', reason=reason, **kwargs)
 
     def fail(self, reason=None, **kwargs):
         log.debug('Marking entry \'%s\' as failed' % self['title'])
@@ -124,8 +141,15 @@ class Entry(dict):
             self._state = 'failed'
             self.trace(reason, operation='fail')
             log.error('Failed %s (%s)' % (self['title'], reason))
-            # Run on_entry_fail phase
-            self.task._run_entry_phase('fail', self, reason=reason, **kwargs)
+            # Run entry on_fail hooks
+            self.run_hooks('fail', reason=reason, **kwargs)
+
+    def succeed(self, **kwargs):
+        if not self.accepted:
+            log.debug('Cannot succeed entry that was not accepted.')
+            return
+        # Run entry on_succeed hooks
+        self.run_hooks('succeed', **kwargs)
 
     @property
     def accepted(self):
@@ -345,5 +369,4 @@ class Entry(dict):
         return self.get('title') == other.get('title') and self.get('url') == other.get('url')
 
     def __repr__(self):
-        task_name = self.task.name if self.task else 'None'
-        return '<Entry(title=%s,state=%s,task=%s)>' % (self['title'], self._state, task_name)
+        return '<Entry(title=%s,state=%s)>' % (self['title'], self._state)

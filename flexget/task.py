@@ -98,8 +98,6 @@ class EntryContainer(list):
     def __init__(self, iterable=None, task=None):
         list.__init__(self, iterable or [])
         self.task = task
-        for entry in self:
-            entry.task = task
 
         self._entries = EntryIterator(self, ['undecided', 'accepted'])
         self._accepted = EntryIterator(self, 'accepted')  # accepted entries, can still be rejected
@@ -113,18 +111,6 @@ class EntryContainer(list):
     rejected = property(lambda self: self._rejected)
     failed = property(lambda self: self._failed)
     undecided = property(lambda self: self._undecided)
-
-    def append(self, entry):
-        """
-        Add entry to this container and set :attr:`~flexget.entry.Entry.task`
-
-        :param Entry entry: Add to container
-        :raises ValueError: If given entry does not pass Entry.isvalid()
-        """
-        if not entry.isvalid():
-            raise ValueError('Entry is not valid, title or url is missing.')
-        entry.task = self.task
-        list.append(self, entry)
 
     def extend(self, iterable):
         for entry in iterable:
