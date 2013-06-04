@@ -1,5 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
+
 from flexget.plugin import priority, register_plugin
 from flexget.utils.log import log_once
 
@@ -11,9 +12,7 @@ class UrlFix(object):
     Automatically fix broken urls.
     """
 
-    def validator(self):
-        from flexget import validator
-        return validator.factory('boolean')
+    schema = {'type': 'boolean'}
 
     @priority(-255)
     def on_task_input(self, task):

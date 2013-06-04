@@ -2,6 +2,7 @@ from __future__ import unicode_literals, division, absolute_import
 import logging
 import re
 from urllib2 import HTTPError
+
 from flexget.entry import Entry
 from flexget.plugin import priority, register_plugin, get_plugin_by_name, DependencyError
 from flexget.utils.cached_input import cached

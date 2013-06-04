@@ -26,6 +26,7 @@ Instructions for aspiring developer
    develop/mock
    develop/tdd
    develop/database
+   develop/schemas
 
 
 Core documentation

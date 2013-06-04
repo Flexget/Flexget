@@ -1,12 +1,13 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
+
 from flexget.entry import Entry
 from flexget.plugin import register_plugin, DependencyError
 
 log = logging.getLogger('emit_series')
 
 try:
-    from flexget.plugins.filter.series import Series, SeriesDatabase
+    from flexget.plugins.filter.series import SeriesTask, SeriesDatabase
 except ImportError as e:
     log.error(e.message)
     raise DependencyError(issued_by='emit_series', missing='series')
@@ -15,43 +16,37 @@ except ImportError as e:
 
 class EmitSeries(SeriesDatabase):
     """
-    Emit next episode number from all known series.
+    Emit next episode number from all series configured in this task.
 
     Supports only series enumerated by season, episode.
     """
 
-    def validator(self):
-        from flexget import validator
-        return validator.factory('boolean')
+    schema = {'type': 'boolean'}
+
+    def search_strings(self, series, season, episode):
+        return ['%s S%02dE%02d' % (series, season, episode),
+                '%s %02dx%02d' % (series, season, episode)]
 
     def on_task_input(self, task, config):
+        if not config:
+            return
         entries = []
-        for series in task.session.query(Series).all():
+        for seriestask in task.session.query(SeriesTask).filter(SeriesTask.name == task.name).all():
+            series = seriestask.series
             latest = self.get_latest_info(series)
             if not latest:
                 # no latest known episode, skip
                 continue
 
-            # try next episode (eg. S01E02)
-            title = '%s S%02dE%02d' % (series.name, latest['season'], latest['episode'] + 1)
-            entries.append(Entry(title=title, url='',
-                                 series_name=series.name,
-                                 series_season=latest['season'],
-                                 series_episode=latest['episode'] + 1))
-
-            # different syntax (eg. 01x02)
-            title = '%s %02dx%02d' % (series.name, latest['season'], latest['episode'] + 1)
-            entries.append(Entry(title=title, url='',
-                                 series_name=series.name,
-                                 series_season=latest['season']+1,
-                                 series_episode=1))
-
-            # try next season
-            title = '%s S%02dE%02d' % (series.name, latest['season'] + 1, 1)
-            entries.append(Entry(title=title, url='',
-                                 series_name=series.name,
-                                 series_season=latest['season']+1,
-                                 series_episode=1))
+            # try next episode and next season
+            for season, episode in [(latest['season'], latest['episode'] + 1), (latest['season'] + 1, 1)]:
+                search_strings = self.search_strings(series.name, season, episode)
+                entries.append(Entry(title=search_strings[0], url='',
+                                     search_strings=search_strings,
+                                     series_name=series.name,
+                                     series_season=season,
+                                     series_episode=episode,
+                                     series_id='S%02dE%02d' % (season, episode)))
 
         return entries
 

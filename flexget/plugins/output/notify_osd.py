@@ -9,15 +9,20 @@ log = logging.getLogger('notify_osd')
 
 class OutputNotifyOsd(object):
 
-    def validator(self):
-        from flexget import validator
-        config = validator.factory()
-        config.accept('boolean')
-        advanced = config.accept('dict')
-        advanced.accept('text', key='title_template')
-        advanced.accept('text', key='item_template')
-        advanced.accept('integer', key='timeout')
-        return config
+    schema = {
+        'oneOf': [
+            {'type': 'boolean'},
+            {
+                'type': 'object',
+                'properties': {
+                    'title_template': {'type': 'string'},
+                    'item_template': {'type': 'string'},
+                    'timeout': {'type': 'integer'}
+                },
+                'additionalProperties': False
+            }
+        ]
+    }
 
     def prepare_config(self, config):
         if isinstance(config, bool):

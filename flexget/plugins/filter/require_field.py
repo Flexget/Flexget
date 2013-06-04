@@ -1,5 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
+
+from flexget.config_schema import one_or_more
 from flexget.plugin import register_plugin, priority
 
 log = logging.getLogger('require_field')
@@ -14,12 +16,7 @@ class FilterRequireField(object):
       require_field: imdb_url
     """
 
-    def validator(self):
-        from flexget import validator
-        root = validator.factory()
-        root.accept('text')
-        root.accept('list').accept('text')
-        return root
+    schema = one_or_more({"type": "string"})
 
     @priority(32)
     def on_task_filter(self, task, config):

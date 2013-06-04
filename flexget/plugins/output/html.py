@@ -11,12 +11,15 @@ log = logging.getLogger(PLUGIN_NAME)
 
 class OutputHtml:
 
-    def validator(self):
-        from flexget import validator
-        root = validator.factory('dict')
-        root.accept('text', key='template')
-        root.accept('text', key='file', required=True)
-        return root
+    schema = {
+        'type': 'object',
+        'properties': {
+            'template': {'type': 'string'},
+            'file': {'type': 'string'}
+        },
+        'required': ['file'],
+        'additionalProperties': False
+    }
 
     def on_task_output(self, task, config):
         # Use the default template if none is specified

@@ -10,6 +10,7 @@ from os.path import basename
 
 log = logging.getLogger('plex')
 
+
 class InputPlex(object):
     """
     Uses a plex media server (www.plexapp.com) tv section as an input.
@@ -21,13 +22,15 @@ class InputPlex(object):
         - recentlyAdded
         - recentlyViewed
         - recentlyViewedShows
-      'all' and 'recentlyViewedShows' will only produce a list of show names while the other three will produce filename and download url.
+      'all' and 'recentlyViewedShows' will only produce a list of show names while the other three will produce 
+      filename and download url.
     'username'          Myplex (http://my.plexapp.com) username, used to connect to shared PMS'.
     'password'          Myplex (http://my.plexapp.com) password, used to connect to shared PMS'. 
     'server'            Host/IP of PMS to connect to. 
     'lowercase_title'   Convert filename (title) to lower case.
     'strip_year'        Remove year from title, ex: Show Name (2012) 01x01 => Show Name 01x01
-    'original_filename' Use filename stored in PMS instead of transformed name. lowercase_title and strip_year will be ignored.
+    'original_filename' Use filename stored in PMS instead of transformed name. lowercase_title and strip_year
+                        will be ignored.
 
     Default paramaters:
       server           : localhost
@@ -63,7 +66,7 @@ class InputPlex(object):
     def prepare_config(self, config):
         config.setdefault('server', '127.0.0.1')
         config.setdefault('port', 32400)
-        config.setdefault('selection', 'all');
+        config.setdefault('selection', 'all')
         config.setdefault('username', '')
         config.setdefault('password', '')
         config.setdefault('lowercase_title', False)
@@ -74,16 +77,18 @@ class InputPlex(object):
     def on_task_input(self, task, config):
         config = self.prepare_config(config)
         accesstoken = ""
+        plexserver = config['server']  
         if gethostbyname(config['server']) != config['server']:
             config['server'] = gethostbyname(config['server'])
-        log.debug("ube %s" % config['server'])
         if config['username'] and config['password'] and config['server'] != '127.0.0.1':
             header = {'X-Plex-Client-Identifier': 'flexget'} 
             log.debug("Trying to to connect to myplex.")
             try:
-                r = requests.post('https://my.plexapp.com/users/sign_in.xml', auth=(config['username'], config['password']), headers=header)
+                r = requests.post('https://my.plexapp.com/users/sign_in.xml', 
+                    auth=(config['username'], config['password']), headers=header)
             except requests.RequestException as e:
-                raise PluginError('Could not login to my.plexapp.com: %s. Username: %s Password: %s' % (e, config['username'], config['password']))
+                raise PluginError('Could not login to my.plexapp.com: %s. Username: %s Password: %s' 
+                    % (e, config['username'], config['password']))
             log.debug("Managed to connect to myplex.")
             if 'Invalid email' in r.text:
                 raise PluginError('Could not login to my.plexapp.com: invalid username and/or password!')
@@ -94,9 +99,10 @@ class InputPlex(object):
             try:
                 r = requests.get("https://my.plexapp.com/pms/servers?X-Plex-Token=%s" % plextoken)
             except requests.RequestException as e:
-                raise PluginError('Could not get servers from my.plexapp.com using authentication-token: %s.' % plextoken)
+                raise PluginError('Could not get servers from my.plexapp.com using authentication-token: %s.' 
+                    % plextoken)
             dom = parseString(r.text)
-            for node in  dom.getElementsByTagName('Server'):
+            for node in dom.getElementsByTagName('Server'):
                 if node.getAttribute('address') == config['server']:
                     accesstoken = node.getAttribute('accessToken') 
                     log.debug("Got accesstoken: %s" % plextoken)
@@ -114,7 +120,7 @@ class InputPlex(object):
                 if node.getAttribute('title') == config['section']:
                     config['section'] = int(node.getAttribute('key'))
         if not isinstance(config['section'], int):
-             raise PluginError('Could not find section \'%s\'' % config['section'])
+            raise PluginError('Could not find section \'%s\'' % config['section'])
         try:
             r = requests.get("http://%s:%d/library/sections/%s/%s%s" % 
                 (config['server'], config['port'], config['section'], config['selection'], accesstoken))
@@ -122,25 +128,26 @@ class InputPlex(object):
             raise PluginError('Error retrieving source: %s' % e)
         dom = parseString(r.text.encode("utf-8"))
         entries = []
-        if config['selection'] == 'all' or config['selection'] == 'recentlyViewedShows':
-            if dom.getElementsByTagName('MediaContainer')[0].getAttribute('viewGroup') != "show":
-                raise PluginError('Selected section is not a TV section.')
+        plexsectionname = dom.getElementsByTagName('MediaContainer')[0].getAttribute('title1')
+        if dom.getElementsByTagName('MediaContainer')[0].getAttribute('viewGroup') == "show":
             for node in dom.getElementsByTagName('Directory'):
-                title=node.getAttribute('title')
+                title = node.getAttribute('title')
                 if config['strip_year']:
-                    title=re.sub(r'^(.*)\(\d+\)$', r'\1', title)
-                title=re.sub(r'[\(\)]', r'', title)
-                title=re.sub(r'\&', r'And', title)
-                title=re.sub(r'[^A-Za-z0-9- ]', r'', title)
+                    title = re.sub(r'^(.*)\(\d+\)$', r'\1', title)
+                title = re.sub(r'[\(\)]', r'', title)
+                title = re.sub(r'\&', r'And', title)
+                title = re.sub(r'[^A-Za-z0-9- ]', r'', title)
                 if config['lowercase_title']:
                     title = title.lower()
                 e = Entry()
                 e['title'] = title
                 e['url'] = "NULL"
+                e['plexserver'] = plexserver
+                e['plexport'] = config['port']
+                e['plexsection'] = config['section']
+                e['plexsectionname'] = plexsectionname
                 entries.append(e)
-        else:
-            if dom.getElementsByTagName('MediaContainer')[0].getAttribute('viewGroup') != "episode":
-                raise PluginError('Selected section is not a TV section.')
+        elif dom.getElementsByTagName('MediaContainer')[0].getAttribute('viewGroup') == "episode":
             for node in dom.getElementsByTagName('Video'):
                 title = node.getAttribute('grandparentTitle')
                 season = int(node.getAttribute('parentIndex'))
@@ -148,9 +155,13 @@ class InputPlex(object):
                     season = node.getAttribute('originallyAvailableAt') 
                     filenamemap = "%s_%s%s_%s_%s_%s.%s"
                     episode = ""
-                else:
+                elif node.getAttribute('index'):
                     episode = int(node.getAttribute('index'))
                     filenamemap = "%s_%02dx%02d_%s_%s_%s.%s"
+                else:
+                    log.debug("Could not get episode number for '%s' (Hint, ratingKey: %s)" 
+                        % (title, node.getAttribute('ratingKey')))
+                    break
                 for media in node.getElementsByTagName('Media'):
                     vcodec = media.getAttribute('videoCodec')
                     acodec = media.getAttribute('audioCodec')
@@ -163,15 +174,23 @@ class InputPlex(object):
                             e['title'] = basename(part.getAttribute('file'))
                         else:
                             if config['strip_year']:
-                                title=re.sub(r'^(.*)\(\d+\)$', r'\1', title)
-                            title=re.sub(r'[\(\)]', r'', title)
-                            title=re.sub(r'\&', r'And', title).strip()
-                            title=re.sub(r'[^A-Za-z0-9- ]', r'', title).replace(" ", ".")
+                                title = re.sub(r'^(.*)\(\d+\)$', r'\1', title)
+                            title = re.sub(r'[\(\)]', r'', title)
+                            title = re.sub(r'\&', r'And', title).strip()
+                            title = re.sub(r'[^A-Za-z0-9- ]', r'', title).replace(" ", ".")
                             if config['lowercase_title']:
                                 title = title.lower()
                             e['title'] = filenamemap % (title, season, episode, resolution, vcodec, acodec, container) 
                         e['url'] = "http://%s:%d%s%s" % (config['server'], config['port'], key, accesstoken)
+                        e['plex_server'] = plexserver
+                        e['plex_server_ip'] = config['server']
+                        e['plex_port'] = config['port']
+                        e['plex_section'] = config['section']
+                        e['plex_section_name'] = plexsectionname
+                        e['plex_path'] = key
                         entries.append(e)
+        else:
+            raise PluginError('Selected section is not a TV section.')
         return entries
 
 register_plugin(InputPlex, 'plex', api_ver=2)

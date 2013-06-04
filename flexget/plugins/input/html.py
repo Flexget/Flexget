@@ -4,6 +4,7 @@ import logging
 import urllib
 import zlib
 import re
+
 from flexget.entry import Entry
 from flexget.plugin import register_plugin, internet, PluginError
 from flexget.utils.soup import get_soup

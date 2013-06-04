@@ -2,6 +2,7 @@ from __future__ import unicode_literals, division, absolute_import
 import logging
 import random
 import string
+
 from flexget.entry import Entry
 from flexget.plugin import register_plugin
 

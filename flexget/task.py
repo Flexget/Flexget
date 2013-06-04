@@ -10,7 +10,7 @@ from sqlalchemy import Column, Unicode, String, Integer
 from flexget import config_schema
 from flexget import db_schema
 from flexget.manager import Session, register_config_key
-from flexget.plugin import (get_plugins_by_phase, get_plugin_by_name, task_phases, PluginWarning, PluginError,
+from flexget.plugin import (get_plugins_by_phase, task_phases, PluginWarning, PluginError,
                             DependencyError, plugins as all_plugins, plugin_schemas)
 from flexget.utils.simple_persistence import SimpleTaskPersistence
 from flexget.event import fire_event

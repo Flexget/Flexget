@@ -2,7 +2,9 @@ from __future__ import unicode_literals, division, absolute_import
 import logging
 import pickle
 from datetime import datetime
+
 from sqlalchemy import Column, Integer, String, DateTime, PickleType, Index
+
 from flexget import db_schema
 from flexget.entry import Entry
 from flexget.manager import Session

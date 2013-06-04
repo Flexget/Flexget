@@ -18,17 +18,20 @@ class SearchRSS(object):
     def search(self, entry, config=None):
         from flexget.utils.template import environment
         from flexget.manager import manager
-        query = entry['title']
-        search_string = urllib.quote(normalize_unicode(query).encode('utf-8'))
+        search_strings = [urllib.quote(normalize_unicode(s).encode('utf-8'))
+                          for s in entry.get('search_strings', [entry['title']])]
         rss_plugin = get_plugin_by_name('rss')
-        # Create a fake task to pass to the rss plugin input handler
-        task = Task(manager, 'search_rss_task', {})
-        # Use a copy of the config, so we don't overwrite jinja url when filling in search term
-        config = rss_plugin.instance.build_config(config).copy()
-        template = environment.from_string(config['url'])
-        config['url'] = template.render({'search_term': search_string})
-        config['all_entries'] = True
-        # TODO: capture some other_fields to try to find seed/peer/content_size numbers?
-        return rss_plugin.phase_handlers['input'](task, config)
+        entries = set()
+        for search_string in search_strings:
+            # Create a fake task to pass to the rss plugin input handler
+            task = Task(manager, 'search_rss_task', {})
+            # Use a copy of the config, so we don't overwrite jinja url when filling in search term
+            config = rss_plugin.instance.build_config(config).copy()
+            template = environment.from_string(config['url'])
+            config['url'] = template.render({'search_term': search_string})
+            config['all_entries'] = True
+            # TODO: capture some other_fields to try to find seed/peer/content_size numbers?
+            entries.update(rss_plugin.phase_handlers['input'](task, config))
+        return entries
 
 register_plugin(SearchRSS, 'search_rss', groups=['search'])

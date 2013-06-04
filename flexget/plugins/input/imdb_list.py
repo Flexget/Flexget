@@ -3,6 +3,7 @@ import logging
 import csv
 import re
 from cgi import parse_header
+
 from flexget.utils import requests
 from flexget.utils.imdb import make_url
 from flexget.utils.cached_input import cached
@@ -19,15 +20,21 @@ USER_ID_RE = r'^ur\d{7,8}$'
 class ImdbList(object):
     """"Creates an entry for each movie in your imdb list."""
 
-    def validator(self):
-        from flexget import validator
-        root = validator.factory('dict')
-        root.accept('regexp_match', key='user_id').\
-            accept(USER_ID_RE, message='user_id must be in the form urXXXXXXX')
-        root.accept('text', key='username')
-        root.accept('text', key='password')
-        root.accept('text', key='list', required=True)
-        return root
+    schema = {
+        'type': 'object',
+        'properties': {
+            'user_id': {
+                'type': 'string',
+                'pattern': USER_ID_RE,
+                'error_pattern': 'user_id must be in the form urXXXXXXX'
+            },
+            'username': {'type': 'string'},
+            'password': {'type': 'string'},
+            'list': {'type': 'string'}
+        },
+        'required': ['list'],
+        'additionalProperties': False
+    }
 
     @cached('imdb_list', persist='2 hours')
     def on_task_input(self, task, config):

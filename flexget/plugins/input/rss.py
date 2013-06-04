@@ -157,7 +157,7 @@ class InputRSS(object):
         filepath = os.path.join(received, '%s.%s' % (filename, ext))
         with open(filepath, 'w') as f:
             f.write(data)
-        log.critical('I have saved the invalid content to %s for you to view' % filepath)
+        log.critical('I have saved the invalid content to %s for you to view', filepath)
 
     def add_enclosure_info(self, entry, enclosure, filename=True, multiple=False):
         """Stores information from an rss enclosure into an Entry."""
@@ -176,14 +176,14 @@ class InputRSS(object):
         # If enclosure has size OR there are multiple enclosures use filename from url
         if (entry.get('size') or multiple and basename) and filename:
             entry['filename'] = basename
-            log.trace('filename `%s` from enclosure' % entry['filename'])
+            log.trace('filename `%s` from enclosure', entry['filename'])
 
     @cached('rss')
     @internet(log)
     def on_task_input(self, task, config):
         config = self.build_config(config)
 
-        log.debug('Requesting task `%s` url `%s`' % (task.name, config['url']))
+        log.debug('Requesting task `%s` url `%s`', task.name, config['url'])
 
         # Used to identify which etag/modified to use
         url_hash = str(hash(config['url']))
@@ -196,7 +196,7 @@ class InputRSS(object):
         if not all_entries:
             etag = task.simple_persistence.get('%s_etag' % url_hash, None)
             if etag:
-                log.debug('Sending etag %s for task %s' % (etag, task.name))
+                log.debug('Sending etag %s for task %s', etag, task.name)
                 headers['If-None-Match'] = etag
             modified = task.simple_persistence.get('%s_modified' % url_hash, None)
             if modified:
@@ -204,7 +204,7 @@ class InputRSS(object):
                     log.debug('Invalid date was stored for last modified time.')
                 else:
                     headers['If-Modified-Since'] = modified
-                    log.debug('Sending last-modified %s for task %s' % (headers['If-Modified-Since'], task.name))
+                    log.debug('Sending last-modified %s for task %s', headers['If-Modified-Since'], task.name)
 
         # Get the feed content
         if config['url'].startswith(('http', 'https', 'ftp', 'file')):
@@ -223,7 +223,7 @@ class InputRSS(object):
             # status checks
             status = response.status_code
             if status == 304:
-                log.verbose('%s hasn\'t changed since last run. Not creating entries.' % config['url'])
+                log.verbose('%s hasn\'t changed since last run. Not creating entries.', config['url'])
                 # Let details plugin know that it is ok if this feed doesn't produce any entries
                 task.no_entries_ok = True
                 return []
@@ -242,11 +242,11 @@ class InputRSS(object):
                 etag = response.headers.get('etag')
                 if etag:
                     task.simple_persistence['%s_etag' % url_hash] = etag
-                    log.debug('etag %s saved for task %s' % (etag, task.name))
+                    log.debug('etag %s saved for task %s', etag, task.name)
                 if response.headers.get('last-modified'):
                     modified = response.headers['last-modified']
                     task.simple_persistence['%s_modified' % url_hash] = modified
-                    log.debug('last modified %s saved for task %s' % (modified, task.name))
+                    log.debug('last modified %s saved for task %s', modified, task.name)
         else:
             # This is a file, open it
             with open(config['url'], 'rb') as f:
@@ -293,7 +293,7 @@ class InputRSS(object):
                     raise PluginError('Unhandled bozo_exception. Type: %s (task: %s)' %
                                       (ex.__class__.__name__, task.name), log)
 
-        log.debug('encoding %s' % rss.encoding)
+        log.debug('encoding %s', rss.encoding)
 
         last_entry_id = ''
         if not all_entries:
@@ -356,20 +356,20 @@ class InputRSS(object):
                     if rss_field in entry:
                         if not isinstance(getattr(entry, rss_field), basestring):
                             # Error if this field is not a string
-                            log.error('Cannot grab non text field `%s` from rss.' % rss_field)
+                            log.error('Cannot grab non text field `%s` from rss.', rss_field)
                             # Remove field from list of fields to avoid repeated error
                             config['other_fields'].remove(rss_field)
                             continue
                         if not getattr(entry, rss_field):
-                            log.debug('Not grabbing blank field %s from rss for %s.' % (rss_field, ea['title']))
+                            log.debug('Not grabbing blank field %s from rss for %s.', rss_field, ea['title'])
                             continue
                         try:
                             ea[flexget_field] = decode_html(entry[rss_field])
                             if rss_field in config.get('other_fields', []):
                                 # Print a debug message for custom added fields
-                                log.debug('Field `%s` set to `%s` for `%s`' % (rss_field, ea[rss_field], ea['title']))
+                                log.debug('Field `%s` set to `%s` for `%s`', rss_field, ea[rss_field], ea['title'])
                         except UnicodeDecodeError:
-                            log.warning('Failed to decode entry `%s` field `%s`' % (ea['title'], rss_field))
+                            log.warning('Failed to decode entry `%s` field `%s`', ea['title'], rss_field)
                 # Also grab pubdate if available
                 if hasattr(entry, 'published_parsed') and entry.published_parsed:
                     ea['rss_pubdate'] = datetime(*entry.published_parsed[:6])
@@ -384,10 +384,10 @@ class InputRSS(object):
 
             if len(enclosures) > 1 and not config.get('group_links'):
                 # There is more than 1 enclosure, create an Entry for each of them
-                log.debug('adding %i entries from enclosures' % len(enclosures))
+                log.debug('adding %i entries from enclosures', len(enclosures))
                 for enclosure in enclosures:
                     if not 'href' in enclosure:
-                        log.debug('RSS-entry `%s` enclosure does not have URL' % entry.title)
+                        log.debug('RSS-entry `%s` enclosure does not have URL', entry.title)
                         continue
                     # There is a valid url for this enclosure, create an Entry for it
                     ee = Entry()
@@ -428,7 +428,7 @@ class InputRSS(object):
                     [enc.href for enc in entry.get('enclosures', []) if enc.get('href') not in e['urls']])
 
             if not e.get('url'):
-                log.debug('%s does not have link (%s) or enclosure' % (entry.title, config['link']))
+                log.debug('%s does not have link (%s) or enclosure', entry.title, config['link'])
                 ignored += 1
                 continue
 
@@ -441,7 +441,7 @@ class InputRSS(object):
 
         if ignored:
             if not config.get('silent'):
-                log.warning('Skipped %s RSS-entries without required information (title, link or enclosures)' % ignored)
+                log.warning('Skipped %s RSS-entries without required information (title, link or enclosures)', ignored)
 
         return entries
 

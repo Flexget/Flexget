@@ -3,6 +3,7 @@ import urllib
 import logging
 import re
 
+from flexget.config_schema import one_or_more
 from flexget.entry import Entry
 from flexget.plugin import register_plugin, priority, get_plugin_by_name
 
@@ -37,42 +38,51 @@ class FilterRegexp(object):
         Possible operations: accept, reject, accept_excluding, reject_excluding
     """
 
-    def validator(self):
-        from flexget import validator
-
-        def build_list(regexps):
-            regexps.accept('regexp')
-
-            # bundle is a dictionary form
-            bundle = regexps.accept('dict')
-            value_validator = bundle.accept_valid_keys('root', key_type='regexp')
-            # path as a single parameter
-            value_validator.accept('path', allow_replacement=True)
-
-            # advanced configuration as a parameter
-            advanced = value_validator.accept('dict')
-            advanced.accept('path', key='path', allow_replacement=True)
-            # accept set parameters
-            set = advanced.accept('dict', key='set')
-            set.accept_any_key('any')
-            # not as a single parameter
-            advanced.accept('regexp', key='not')
-            # not in a list form
-            advanced.accept('list', key='not').accept('regexp')
-            # from as a single parameter
-            advanced.accept('text', key='from')
-            # from in a list form
-            advanced.accept('list', key='from').accept('text')
-
-        conf = validator.factory('dict')
-        for operation in ['accept', 'reject', 'accept_excluding', 'reject_excluding']:
-            regexps = conf.accept('list', key=operation)
-            build_list(regexps)
-
-        conf.accept('choice', key='rest').accept_choices(['accept', 'reject'])
-        conf.accept('text', key='from')
-        conf.accept('list', key='from').accept('text')
-        return conf
+    schema = {
+        'type': 'object',
+        'properties': {
+            'accept': {'$ref': '#/definitions/regex_list'},
+            'reject': {'$ref': '#/definitions/regex_list'},
+            'accept_excluding': {'$ref': '#/definitions/regex_list'},
+            'reject_excluding': {'$ref': '#/definitions/regex_list'},
+            'rest': {'type': 'string', 'enum': ['accept', 'reject']},
+            'from': one_or_more({'type': 'string'})
+        },
+        'additionalProperties': False,
+        'definitions': {
+            # The validator for a list of regexps, each with or without settings
+            'regex_list': {
+                'type': 'array',
+                'items': {
+                    'oneOf': [
+                        # Plain regex string
+                        {'type': 'string', 'format': 'regex'},
+                        # Regex with options (regex is key, options are value)
+                        {
+                            'type': 'object',
+                            'additionalProperties': {
+                                'oneOf': [
+                                    # Simple options, just path
+                                    {'type': 'string', 'format': 'path'},
+                                    # Dict style options
+                                    {
+                                        'type': 'object',
+                                        'properties': {
+                                            'path': {'type': 'string', 'format': 'path'},
+                                            'set': {'type': 'object'},
+                                            'not': one_or_more({'type': 'string', 'format': 'regex'}),
+                                            'from': one_or_more({'type': 'string'})
+                                        },
+                                        'additionalProperties': False
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                }
+            }
+        }
+    }
 
     def prepare_config(self, config):
         """Returns the config in standard format.

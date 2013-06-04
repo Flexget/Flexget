@@ -404,6 +404,19 @@ class TestSeriesParser(object):
         s.parse()
         assert not s.valid, 'Red Tomato (US) should not match Red Tomato in exact mode'
 
+    def test_name_word_boundries(self):
+        s = SeriesParser(name='test')
+        s.parse('Test.S01E02.720p-FlexGet')
+        assert s.valid, 'normal failed'
+        # In non-exact mode these should match
+        s.parse('Test.crap.S01E02.720p-FlexGet')
+        assert s.valid, 'normal failed'
+        s.parse('Test_crap.S01E02.720p-FlexGet')
+        assert s.valid, 'underscore failed'
+        # However if the title ends mid-word, it should not match
+        s.parse('Testing.S01E02.720p-FlexGet')
+        assert not s.valid, 'word border failed'
+
     def test_quality_as_ep(self):
         """SeriesParser: test that qualities are not picked as ep"""
         from flexget.utils import qualities

@@ -2,10 +2,12 @@ from __future__ import unicode_literals, division, absolute_import
 import logging
 from datetime import datetime
 from argparse import Action, ArgumentError
+
 from sqlalchemy.orm import relationship
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.schema import Table, ForeignKey
 from sqlalchemy import Column, Integer, DateTime, Unicode, Index
+
 from flexget import db_schema
 from flexget.event import event
 from flexget.entry import Entry
@@ -141,6 +143,14 @@ class Archive(object):
     etc is stored into the database. This may however make injecting them back to the original task work
     wrongly.
     """
+
+    schema = {
+        'oneOf': [
+            {'type': 'boolean'},
+            {'type': 'array', 'items': {'type': 'string'}}
+        ]
+
+    }
 
     def validator(self):
         from flexget import validator
@@ -351,20 +361,20 @@ class UrlrewriteArchive(object):
         """Search plugin API method"""
 
         session = Session()
-        query = entry['title']
-        try:
-            log.debug('looking for `%s` config: %s' % (query, config))
-            entries = []
-            for archive_entry in search(session, query, desc=True):
-                log.debug('rewrite search result: %s' % archive_entry)
-                entry = Entry()
-                entry.update_using_map(self.entry_map, archive_entry)
-                if entry.isvalid():
-                    entries.append(entry)
-            log.debug('found %i entries' % len(entries))
-            return entries
-        finally:
-            session.close()
+        entries = set()
+        for query in entry.get('search_strings', [entry['title']]):
+            try:
+                log.debug('looking for `%s` config: %s' % (query, config))
+                for archive_entry in search(session, query, desc=True):
+                    log.debug('rewrite search result: %s' % archive_entry)
+                    entry = Entry()
+                    entry.update_using_map(self.entry_map, archive_entry)
+                    if entry.isvalid():
+                        entries.add(entry)
+            finally:
+                session.close()
+        log.debug('found %i entries' % len(entries))
+        return entries
 
 
 def consolidate():
