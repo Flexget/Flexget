@@ -32,14 +32,11 @@ class History(Base):
 
 
 class PluginHistory(object):
-
     """
     Provides --history
     """
 
-    def validator(self):
-        from flexget import validator
-        return validator.factory('boolean')
+    schema = {'type': 'boolean'}
 
     def on_process_start(self, task, config):
         if task.manager.options.history:

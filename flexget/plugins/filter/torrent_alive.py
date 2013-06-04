@@ -185,7 +185,7 @@ class TorrentAlive(object):
         min_seeds = config['min_seeds']
 
         for entry in task.accepted:
-            # TODO: shouldn't this still check min_seeds ?
+            # If torrent_seeds is filled, we will have already filtered in filter phase
             if entry.get('torrent_seeds'):
                 log.debug('Not checking trackers for seeds, as torrent_seeds is already filled.')
                 continue

@@ -75,6 +75,7 @@ class PluginDownload(object):
             config = {}
         if not config.get('path'):
             config['require_path'] = True
+        config.setdefault('fail_html', True)
         return config
 
     def on_task_download(self, task, config):
@@ -254,7 +255,7 @@ class PluginDownload(object):
         datafile = os.path.join(tmp_dir, fname)
         outfile = open(datafile, 'wb')
         try:
-            for chunk in response.iter_content(chunk_size=20 * 1024, decode_unicode=False):
+            for chunk in response.iter_content(chunk_size=150*1024, decode_unicode=False):
                 outfile.write(chunk)
         except:
             # don't leave futile files behind

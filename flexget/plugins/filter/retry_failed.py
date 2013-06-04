@@ -136,18 +136,25 @@ class FilterRetryFailed(object):
     def __init__(self):
         self.backlog = None
 
-    def validator(self):
-        from flexget import validator
-        root = validator.factory()
-        # Allow retry_failed: no form to turn off plugin altogether
-        root.accept('boolean').accept(False)
-        opts = root.accept('dict')
-        opts.accept('interval', key='retry_time')
-        opts.accept('integer', key='max_retries')
-        opts.accept('number', key='retry_time_multiplier')
-        # Allow turning off the retry multiplier with 'no' as well as 1
-        opts.accept('boolean', key='retry_time_multiplier')
-        return opts
+    schema = {
+        "oneOf": [
+            # Allow retry_failed: no form to turn off plugin altogether
+            {"type": "boolean"},
+            {
+                "type": "object",
+                "properties": {
+                    "retry_time": {"type": "string", "format": "interval", "default": "1 hour"},
+                    "max_retries": {"type": "integer", "minimum": 0, "default": 3},
+                    "retry_time_multiplier": {
+                        # Allow turning off the retry multiplier with 'no' as well as 1
+                        "oneOf": [{"type": "number", "minimum": 0}, {"type": "boolean"}],
+                        "default": 1.5
+                    }
+                },
+                "additionalProperties": False
+            }
+        ]
+    }
 
     def prepare_config(self, config):
         if not isinstance(config, dict):

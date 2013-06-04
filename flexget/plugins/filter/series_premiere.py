@@ -1,4 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
+
 from flexget.plugin import register_plugin, priority, get_plugin_by_name
 from flexget.plugins.filter.series import FilterSeriesBase, normalize_series_name
 
@@ -26,13 +27,11 @@ class FilterSeriesPremiere(FilterSeriesBase):
         - integrate thetvdb to allow refining by genres, etc.
     """
 
-    # TODO: allow_seasonless option
-    schema = {
-        'anyOf': [
-            {'type': 'boolean'},
-            {'$ref': '/schema/plugin/series#/definitions/series_options'}
-        ]
-    }
+    @property
+    def schema(self):
+        settings = self.settings_schema
+        settings['properties']['allow_seasonless'] = {"type": "boolean"}
+        return {'anyOf': [{'type': 'boolean'}, settings]}
 
     # Run after series and metainfo series plugins
     @priority(115)

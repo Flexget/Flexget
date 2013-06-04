@@ -5,6 +5,8 @@ import logging
 
 from flexget.config_schema import one_or_more
 from flexget.plugin import register_plugin, priority, PluginWarning
+from flexget.utils.log import log_once
+from flexget.utils.template import RenderError
 from flexget.utils.titles import ParseWarning
 
 log = logging.getLogger('exists_series')
@@ -46,23 +48,29 @@ class FilterExistsSeries(object):
 
     @priority(-1)
     def on_task_filter(self, task):
+        if not task.accepted:
+            log.debug('Scanning not needed')
+            return
+        config = self.get_config(task)
         accepted_series = {}
+        paths = set()
         for entry in task.accepted:
             if 'series_parser' in entry:
                 if entry['series_parser'].valid:
                     accepted_series.setdefault(entry['series_parser'].name, []).append(entry)
+                    for path in config['path']:
+                        try:
+                            paths.add(entry.render(path))
+                        except RenderError as e:
+                            log.error('Error rendering path `%s`: %s', path, e)
                 else:
-                    log.debug('entry %s series_parser invalid' % entry['title'])
+                    log.debug('entry %s series_parser invalid', entry['title'])
         if not accepted_series:
-            if task.accepted:
-                log.warning('No accepted entries have series information. exists_series cannot filter them')
-            else:
-                log.debug('Scanning not needed')
+            log.warning('No accepted entries have series information. exists_series cannot filter them')
             return
 
-        config = self.get_config(task)
-        for path in config.get('path'):
-            log.verbose('Scanning %s' % path)
+        for path in paths:
+            log.verbose('Scanning %s', path)
             # crashes on some paths with unicode
             path = str(os.path.expanduser(path))
             if not os.path.exists(path):
@@ -82,20 +90,19 @@ class FilterExistsSeries(object):
                         try:
                             disk_parser.parse(data=name)
                         except ParseWarning as pw:
-                            from flexget.utils.log import log_once
                             log_once(pw.value, logger=log)
                         if disk_parser.valid:
-                            log.debug('name %s is same series as %s' % (name, series))
-                            log.debug('disk_parser.identifier = %s' % disk_parser.identifier)
-                            log.debug('disk_parser.quality = %s' % disk_parser.quality)
-                            log.debug('disk_parser.proper_count = %s' % disk_parser.proper_count)
+                            log.debug('name %s is same series as %s', name, series)
+                            log.debug('disk_parser.identifier = %s', disk_parser.identifier)
+                            log.debug('disk_parser.quality = %s', disk_parser.quality)
+                            log.debug('disk_parser.proper_count = %s', disk_parser.proper_count)
 
                             for entry in accepted_series[series]:
-                                log.debug('series_parser.identifier = %s' % entry['series_parser'].identifier)
+                                log.debug('series_parser.identifier = %s', entry['series_parser'].identifier)
                                 if disk_parser.identifier != entry['series_parser'].identifier:
                                     log.trace('wrong identifier')
                                     continue
-                                log.debug('series_parser.quality = %s' % entry['series_parser'].quality)
+                                log.debug('series_parser.quality = %s', entry['series_parser'].quality)
                                 if config.get('allow_different_qualities') == 'better':
                                     if entry['series_parser'].quality > disk_parser.quality:
                                         log.trace('better quality')
@@ -104,7 +111,7 @@ class FilterExistsSeries(object):
                                     if disk_parser.quality != entry['series_parser'].quality:
                                         log.trace('wrong quality')
                                         continue
-                                log.debug('entry parser.proper_count = %s' % entry['series_parser'].proper_count)
+                                log.debug('entry parser.proper_count = %s', entry['series_parser'].proper_count)
                                 if disk_parser.proper_count >= entry['series_parser'].proper_count:
                                     entry.reject('proper already exists')
                                     continue

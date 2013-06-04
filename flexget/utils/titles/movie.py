@@ -92,12 +92,12 @@ class MovieParser(TitleParser):
                 cut_part = part_pos
 
         if cut_part != 256:
-            log.debug('parts: %s, cut is: %s' % (parts, parts[cut_part]))
+            log.debug('parts: %s, cut is: %s', parts, parts[cut_part])
 
         # calculate cut positon from cut_part
         abs_cut = len(' '.join(parts[:cut_part]))
 
-        log.debug('after parts check, cut data would be: `%s` abs_cut: %i' % (data[:abs_cut], abs_cut))
+        log.debug('after parts check, cut data would be: `%s` abs_cut: %i', data[:abs_cut], abs_cut)
 
         # parse quality
         quality = qualities.Quality(data)
@@ -108,14 +108,14 @@ class MovieParser(TitleParser):
             # quality bit, anything after that has no relevance to the movie name
             dp = diff_pos(data, quality.clean_text)
             if dp is not None:
-                log.debug('quality start: %s' % dp)
+                log.debug('quality start: %s', dp)
                 if dp < abs_cut:
                     log.debug('quality cut is even shorter')
                     abs_cut = dp
 
         # make cut
         data = data[:abs_cut].strip()
-        log.debug('data cut to `%s` - this will be the name' % data)
+        log.debug('data cut to `%s` - this will be the name', data)
 
         # save results
         self.name = data

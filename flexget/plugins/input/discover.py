@@ -3,14 +3,13 @@ import datetime
 import logging
 import random
 
-from sqlalchemy import Column, Integer, DateTime, Unicode, and_, Index
+from sqlalchemy import Column, Integer, DateTime, Unicode, Index
 
 from flexget.event import event
 from flexget.utils.cached_input import cached
-from flexget.plugin import (register_plugin, get_plugin_by_name, PluginError,
-    PluginWarning, register_parser_option)
+from flexget.plugin import register_plugin, get_plugin_by_name, PluginError, PluginWarning, register_parser_option
 from flexget import db_schema
-from flexget.utils.tools import parse_timedelta
+from flexget.utils.tools import parse_timedelta, multiply_timedelta
 
 log = logging.getLogger('discover')
 Base = db_schema.versioned_base('discover', 0)
@@ -147,17 +146,18 @@ class Discover(object):
         result = []
         for entry in entries:
             est_date = estimator.estimate(entry)
-            if isinstance(est_date, datetime.date):
-                # If we just got a date, add a time so we can compare it to now()
-                est_date = datetime.datetime.combine(est_date, datetime.time())
             if est_date is None:
                 log.debug('No release date could be determined for %s' % entry['title'])
                 result.append(entry)
-            elif datetime.datetime.now() >= est_date:
-                log.info('%s has been released at %s' % (entry['title'], est_date))
+                continue
+            if type(est_date) == datetime.date:
+                # If we just got a date, add a time so we can compare it to now()
+                est_date = datetime.datetime.combine(est_date, datetime.time())
+            if datetime.datetime.now() >= est_date:
+                log.verbose('%s has been released at %s' % (entry['title'], est_date))
                 result.append(entry)
             else:
-                log.info("%s hasn't been released yet (Expected:%s)" % (entry['title'], est_date))
+                log.verbose("%s hasn't been released yet (Expected:%s)" % (entry['title'], est_date))
         return result
 
     def interval_total_seconds(self, interval):
@@ -189,7 +189,7 @@ class Discover(object):
                 task.session.add(de)
             if task.manager.options.discover_now or not de.last_execution:
                 # First time we execute (and on --discover-now) we randomize time to avoid clumping
-                delta = datetime.timedelta(seconds=(random.random() * self.interval_total_seconds(interval)))
+                delta = multiply_timedelta(interval, random.random())
                 de.last_execution = datetime.datetime.now() - delta
             else:
                 next_time = de.last_execution + interval

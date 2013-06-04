@@ -24,30 +24,22 @@ class OutputNotifyMyAndroid(object):
     Configuration parameters are also supported from entries (eg. through set).
     """
 
-    def validator(self):
-        from flexget import validator
-        config = validator.factory('dict')
-        config.accept('text', key='apikey', required=True)
-        config.accept('text', key='application')
-        config.accept('text', key='event')
-        config.accept('integer', key='priority')
-        config.accept('text', key='description')
-        return config
-
-    def prepare_config(self, config):
-        if isinstance(config, bool):
-            config = {'enabled': config}
-        config.setdefault('application', 'FlexGet')
-        config.setdefault('event', 'New release')
-        config.setdefault('priority', 0)
-        config.setdefault('description', '{{title}}')
-        return config
+    schema = {
+        'type': 'object',
+        'properties': {
+            'apikey': {'type': 'string'},
+            'application': {'type': 'string', 'default': 'FlexGet'},
+            'event': {'type': 'string', 'default': 'New release'},
+            'description': {'type': 'string', 'default': '{{title}}'},
+            'priority': {'type': 'integer', 'default': 0}
+        },
+        'required': ['apikey'],
+        'additionalProperties': False
+    }
 
     # Run last to make sure other outputs are successful before sending notification
     @priority(0)
     def on_task_output(self, task, config):
-        # get the parameters
-        config = self.prepare_config(config)
         for entry in task.accepted:
 
             if task.manager.options.test:

@@ -311,12 +311,18 @@ class TestEpisodeAdvancement(FlexGetBase):
 
           test_backwards_1:
             mock:
-              - {title: 'backwards s01e12'}
-              - {title: 'backwards s01e10'}
+              - {title: 'backwards s02e12'}
+              - {title: 'backwards s02e10'}
             series:
               - backwards
 
           test_backwards_2:
+            mock:
+              - {title: 'backwards s02e01'}
+            series:
+              - backwards
+
+          test_backwards_3:
             mock:
               - {title: 'backwards s01e01'}
             series:
@@ -395,13 +401,16 @@ class TestEpisodeAdvancement(FlexGetBase):
     def test_backwards(self):
         """Series plugin: episode advancement (backwards)"""
         self.execute_task('test_backwards_1')
-        assert self.task.find_entry('accepted', title='backwards s01e12'), \
-            'backwards s01e12 should have been accepted'
-        assert self.task.find_entry('accepted', title='backwards s01e10'), \
-            'backwards s01e10 should have been accepted within grace margin'
+        assert self.task.find_entry('accepted', title='backwards s02e12'), \
+            'backwards s02e12 should have been accepted'
+        assert self.task.find_entry('accepted', title='backwards s02e10'), \
+            'backwards s02e10 should have been accepted within grace margin'
         self.execute_task('test_backwards_2')
+        assert self.task.find_entry('accepted', title='backwards s02e01'), \
+            'backwards s02e01 should have been accepted, in current season'
+        self.execute_task('test_backwards_3')
         assert self.task.find_entry('rejected', title='backwards s01e01'), \
-            'backwards s01e01 should have been rejected, too old'
+            'backwards s01e01 should have been rejected, in previous season'
 
     def test_forwards(self):
         """Series plugin: episode advancement (future)"""
@@ -1335,36 +1344,87 @@ class TestWatched(FlexGetBase):
 
     __yaml__ = """
         presets:
-          global:
+          eps:
             mock:
               - {title: 'WTest.S02E03.HDTV.XViD-FlexGet'}
               - {title: 'W2Test.S02E03.HDTV.XViD-FlexGet'}
         tasks:
-          watched_test:
+          before_ep_test:
+            preset: eps
             series:
               - WTest:
-                  watched: S02E04
+                  begin: S02E05
               - W2Test:
-                  watched:
-                    season: 3
-                    episode: 1
-          unwatched_test:
+                  begin: S03E02
+          after_ep_test:
+            preset: eps
             series:
               - WTest:
-                  watched: s02e02
+                  begin: S02E03
               - W2Test:
-                  watched:
-                    season: 1
-                    episode: 3
+                  begin: S01E04
+          before_seq_test:
+            mock:
+            - title: WTest.1.HDTV.XViD-FlexGet
+            - title: W2Test.13.HDTV.XViD-FlexGet
+            series:
+              - WTest:
+                  begin: 2
+              - W2Test:
+                  begin: 120
+          after_seq_test:
+            mock:
+            - title: WTest.2.HDTV.XViD-FlexGet
+            - title: W2Test.123.HDTV.XViD-FlexGet
+            series:
+              - WTest:
+                  begin: 2
+              - W2Test:
+                  begin: 120
+          before_date_test:
+            mock:
+            - title: WTest.2001.6.6.HDTV.XViD-FlexGet
+            - title: W2Test.12.30.2012.HDTV.XViD-FlexGet
+            series:
+              - WTest:
+                  begin: '2009-05-05'
+              - W2Test:
+                  begin: '2012-12-31'
+          after_date_test:
+            mock:
+            - title: WTest.2009.5.5.HDTV.XViD-FlexGet
+            - title: W2Test.1.1.2013.HDTV.XViD-FlexGet
+            series:
+              - WTest:
+                  begin: '2009-05-05'
+              - W2Test:
+                  begin: '2012-12-31'
+
     """
 
-    def test_watched(self):
-        self.execute_task('watched_test')
-        assert not self.task.accepted, 'No entries should have been accepted, as they have been watched'
+    def test_before_ep(self):
+        self.execute_task('before_ep_test')
+        assert not self.task.accepted, 'No entries should have been accepted, they are before the begin episode'
 
-    def test_unwatched(self):
-        self.execute_task('unwatched_test')
-        assert len(self.task.accepted) == 2, 'Entries should have been accepted, they are after the watched episode'
+    def test_after_ep(self):
+        self.execute_task('after_ep_test')
+        assert len(self.task.accepted) == 2, 'Entries should have been accepted, they are not before the begin episode'
+
+    def test_before_seq(self):
+        self.execute_task('before_seq_test')
+        assert not self.task.accepted, 'No entries should have been accepted, they are before the begin episode'
+
+    def test_after_seq(self):
+        self.execute_task('after_seq_test')
+        assert len(self.task.accepted) == 2, 'Entries should have been accepted, they are not before the begin episode'
+
+    def test_before_date(self):
+        self.execute_task('before_date_test')
+        assert not self.task.accepted, 'No entries should have been accepted, they are before the begin episode'
+
+    def test_after_date(self):
+        self.execute_task('after_date_test')
+        assert len(self.task.accepted) == 2, 'Entries should have been accepted, they are not before the begin episode'
 
 
 class TestSeriesPremiere(FlexGetBase):
