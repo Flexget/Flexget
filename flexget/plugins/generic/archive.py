@@ -1,5 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
+import re
 from datetime import datetime
 from argparse import Action, ArgumentError
 
@@ -368,7 +369,8 @@ class UrlrewriteArchive(object):
             for archive_entry in search(session, query, desc=True):
                 log.debug('rewrite search result: %s' % archive_entry)
                 entry = Entry()
-                entry.update_using_map(self.entry_map, archive_entry)
+                entry.update_using_map(self.entry_map, archive_entry, 
+                                       ignore_none=True)
                 if entry.isvalid():
                     entries.append(entry)
             log.debug('found %i entries' % len(entries))
@@ -478,14 +480,17 @@ def search(session, text, tags=None, sources=None, desc=False):
     """
     Search from the archive.
 
-    :param string text: Search keywords, spaces will be replaced with %
+    :param string text: Search text, spaces and dots are tried to be ignored.
     :param Session session: SQLAlchemy session, should not be closed while iterating results.
     :param list tags: Optional list of acceptable tags
     :param list sources: Optional list of acceptable sources
     :param bool desc: Sort results descending
     :return: ArchiveEntries responding to query
     """
-    keyword = unicode(text).replace(' ', '%')
+    keyword = unicode(text).replace(' ', '%').replace('.', '%')
+    # clean the text from any unwanted regexp, convert spaces and keep dots as dots
+    normalized_re = re.escape(text.replace('.', ' ')).replace('\\ ', ' ').replace(' ', '.')
+    find_re = re.compile(normalized_re, re.IGNORECASE)
     query = session.query(ArchiveEntry).filter(ArchiveEntry.title.like('%' + keyword + '%'))
     if tags:
         query = query.filter(ArchiveEntry.tags.any(ArchiveTag.name.in_(tags)))
@@ -496,7 +501,10 @@ def search(session, text, tags=None, sources=None, desc=False):
     else:
         query = query.order_by(ArchiveEntry.added.asc())
     for a in query.yield_per(5):
-        yield a
+        if find_re.match(a.title):
+            yield a
+        else:
+            log.trace('title %s is too wide match' % a.title)
 
 
 class ArchiveCli(object):
