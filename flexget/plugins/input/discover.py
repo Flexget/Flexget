@@ -129,7 +129,8 @@ class Discover(object):
             search = get_plugin_by_name(plugin_name).instance
             if not callable(getattr(search, 'search')):
                 log.critical('Search plugin %s does not implement search method' % plugin_name)
-            for entry in entries:
+            for index, entry in enumerate(entries):
+                log.verbose('Searching for `%s` (%i of %i)' % (entry['title'], index, len(entries)))
                 try:
                     search_results = search.search(entry, plugin_config)
                     log.debug('Discovered %s entries from %s' % (len(search_results), plugin_name))
