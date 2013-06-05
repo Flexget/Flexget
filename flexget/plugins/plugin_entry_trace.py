@@ -6,8 +6,7 @@ from flexget.plugin import register_plugin, priority
 log = logging.getLogger('entry_trace')
 
 
-def on_entry_action(entry, action=None, task=None, **kwargs):
-    reason = kwargs.get('reason')
+def on_entry_action(entry, action=None, task=None, reason=None, **kwargs):
     entry[action.lower() + '_by'] = task.current_plugin
     entry.pop('reason', None)
     if reason:

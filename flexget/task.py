@@ -14,7 +14,7 @@ from flexget.plugin import (get_plugins_by_phase, task_phases, PluginWarning, Pl
                             DependencyError, plugins as all_plugins, plugin_schemas)
 from flexget.utils.simple_persistence import SimpleTaskPersistence
 from flexget.event import fire_event
-from flexget.entry import Entry, EntryUnicodeError
+from flexget.entry import EntryUnicodeError
 import flexget.utils.requests as requests
 
 log = logging.getLogger('task')
@@ -95,9 +95,8 @@ class EntryIterator(object):
 class EntryContainer(list):
     """Container for a list of entries, also contains accepted, rejected failed iterators over them."""
 
-    def __init__(self, iterable=None, task=None):
+    def __init__(self, iterable=None):
         list.__init__(self, iterable or [])
-        self.task = task
 
         self._entries = EntryIterator(self, ['undecided', 'accepted'])
         self._accepted = EntryIterator(self, 'accepted')  # accepted entries, can still be rejected
@@ -112,12 +111,8 @@ class EntryContainer(list):
     failed = property(lambda self: self._failed)
     undecided = property(lambda self: self._undecided)
 
-    def extend(self, iterable):
-        for entry in iterable:
-            self.append(entry)
-
     def __repr__(self):
-        return '<EntryContainer(task=%s,%s)' % (self.task.name, list.__repr__(self))
+        return '<EntryContainer(%s)>' % list.__repr__(self)
 
 
 class Task(object):
@@ -333,6 +328,8 @@ class Task(object):
                 response = self.__run_plugin(plugin, phase, args)
                 if phase == 'input' and response:
                     # add entries returned by input to self.entries
+                    for e in response:
+                        e.task = self
                     self.all_entries.extend(response)
             finally:
                 fire_event('task.execute.after_plugin', self, plugin.name)
