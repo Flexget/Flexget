@@ -231,9 +231,9 @@ class OutputRSS(object):
             if add:
                 # add into generated feed
                 hasher = hashlib.sha1()
-                hasher.update(db_item.title.encode('utf-8'))
-                hasher.update(db_item.description.encode('utf-8'))
-                hasher.update(db_item.link)
+                hasher.update(db_item.title.encode('utf8'))
+                hasher.update(db_item.description.encode('utf8'))
+                hasher.update(db_item.link.encode('utf8'))
                 guid = base64.urlsafe_b64encode(hasher.digest())
 
                 gen = {'title': db_item.title,

@@ -1073,8 +1073,7 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
                 return pass_filter
 
         downloaded_qualities = dict((d.quality, d.proper_count) for d in episode.downloaded_releases)
-
-        log.debug('downloaded qualities: %s', downloaded_qualities)
+        log.debug('propers - downloaded qualities: %s' % downloaded_qualities)
 
         # Accept propers we actually need, and remove them from the list of entries to continue processing
         for entry in best_propers:
