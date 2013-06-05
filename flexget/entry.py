@@ -73,6 +73,7 @@ class Entry(dict):
         self.snapshots = {}
         self._state = 'undecided'
         self.hooks = {'accept': [], 'reject': [], 'fail': [], 'succeed': []}
+        self.task = None
 
         if len(args) == 2:
             kwargs['title'] = args[0]

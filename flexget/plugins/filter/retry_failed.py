@@ -72,6 +72,11 @@ class PluginFailed(object):
                 task.manager.config_changed()
             return
 
+    @priority(-255)
+    def on_task_input(self, task, config):
+        for entry in task.all_entries:
+            entry.on_fail(self.add_failed)
+
     def print_failed(self):
         """Parameter --failed"""
 
@@ -86,9 +91,9 @@ class PluginFailed(object):
         finally:
             failed.close()
 
-    def add_failed(self, entry, reason=None):
+    def add_failed(self, entry, reason=None, **kwargs):
         """Adds entry to internal failed list, displayed with --failed"""
-        reason = unicode(reason or 'Unknown')
+        reason = reason or 'Unknown'
         failed = Session()
         try:
             # query item's existence
@@ -124,9 +129,6 @@ class PluginFailed(object):
             return results
         finally:
             session.close()
-
-    def on_entry_fail(self, task, entry, **kwargs):
-        self.add_failed(entry, reason=kwargs.get('reason'))
 
 
 class FilterRetryFailed(object):
