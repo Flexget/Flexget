@@ -105,6 +105,11 @@ class FilterRememberRejected(object):
                 task.config_changed()
         task.session.commit()
 
+    @priority(-255)
+    def on_task_input(self, task, config):
+        for entry in task.all_entries:
+            entry.on_reject(self.on_entry_reject, task=task)
+
     @priority(255)
     def on_task_filter(self, task, config):
         """Reject any remembered entries from previous runs"""
@@ -122,7 +127,7 @@ class FilterRememberRejected(object):
                     entry.reject('Rejected on behalf of %s plugin: %s' %
                         (reject_entry.rejected_by, reject_entry.reason))
 
-    def on_entry_reject(self, task, entry, remember=None, remember_time=None, **kwargs):
+    def on_entry_reject(self, entry, task=None, remember=None, remember_time=None, **kwargs):
         # We only remember rejections that specify the remember keyword argument
         if not remember and not remember_time:
             return

@@ -14,7 +14,7 @@ from flexget.plugin import (get_plugins_by_phase, task_phases, PluginWarning, Pl
                             DependencyError, plugins as all_plugins, plugin_schemas)
 from flexget.utils.simple_persistence import SimpleTaskPersistence
 from flexget.event import fire_event
-from flexget.entry import Entry, EntryUnicodeError
+from flexget.entry import EntryUnicodeError
 import flexget.utils.requests as requests
 
 log = logging.getLogger('task')
@@ -95,11 +95,8 @@ class EntryIterator(object):
 class EntryContainer(list):
     """Container for a list of entries, also contains accepted, rejected failed iterators over them."""
 
-    def __init__(self, iterable=None, task=None):
+    def __init__(self, iterable=None):
         list.__init__(self, iterable or [])
-        self.task = task
-        for entry in self:
-            entry.task = task
 
         self._entries = EntryIterator(self, ['undecided', 'accepted'])
         self._accepted = EntryIterator(self, 'accepted')  # accepted entries, can still be rejected
@@ -114,24 +111,8 @@ class EntryContainer(list):
     failed = property(lambda self: self._failed)
     undecided = property(lambda self: self._undecided)
 
-    def append(self, entry):
-        """
-        Add entry to this container and set :attr:`~flexget.entry.Entry.task`
-
-        :param Entry entry: Add to container
-        :raises ValueError: If given entry does not pass Entry.isvalid()
-        """
-        if not entry.isvalid():
-            raise ValueError('Entry is not valid, title or url is missing.')
-        entry.task = self.task
-        list.append(self, entry)
-
-    def extend(self, iterable):
-        for entry in iterable:
-            self.append(entry)
-
     def __repr__(self):
-        return '<EntryContainer(task=%s,%s)' % (self.task.name, list.__repr__(self))
+        return '<EntryContainer(%s)>' % list.__repr__(self)
 
 
 class Task(object):
@@ -192,6 +173,7 @@ class Task(object):
     accepted = property(lambda self: self.all_entries.accepted)
     rejected = property(lambda self: self.all_entries.rejected)
     failed = property(lambda self: self.all_entries.failed)
+    undecided = property(lambda self: self.all_entries.undecided)
 
     @property
     def is_rerun(self):
@@ -207,7 +189,7 @@ class Task(object):
         self.requests = requests.Session()
 
         # List of all entries in the task
-        self._all_entries = EntryContainer(task=self)
+        self._all_entries = EntryContainer()
 
         self.disabled_phases = []
 
@@ -235,11 +217,6 @@ class Task(object):
     @property
     def abort_reason(self):
         return self._abort_reason
-
-    @property
-    def undecided(self):
-        """Iterate over undecided entries"""
-        return (entry for entry in self.entries if not entry in self.accepted and entry not in self.rejected)
 
     def disable_phase(self, phase):
         """Disable ``phase`` from execution.
@@ -347,6 +324,8 @@ class Task(object):
                 response = self.__run_plugin(plugin, phase, args)
                 if phase == 'input' and response:
                     # add entries returned by input to self.entries
+                    for e in response:
+                        e.task = self
                     self.all_entries.extend(response)
             finally:
                 fire_event('task.execute.after_plugin', self, plugin.name)
@@ -507,6 +486,8 @@ class Task(object):
                 if self._abort:
                     return
 
+            for entry in self.all_entries:
+                entry.complete()
             log.debug('committing session, abort=%s' % self._abort)
             self.session.commit()
             fire_event('task.execute.completed', self)

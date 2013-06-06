@@ -15,27 +15,27 @@ def dump(entries, debug=False, eval_lazy=False, trace=False):
     :param bool eval_lazy: Evaluate lazy fields.
     :param bool trace: Display trace information.
     """
+    def sort_key(field):
+        # Sort certain fields above the rest
+        if field == 'title':
+            return 0
+        if field == 'url':
+            return 1
+        if field == 'original_url':
+            return 2
+        return field
 
-    invalid = object()
     for entry in entries:
-        #c = entry.copy()
-        #sanitize(c)
-        #print yaml.safe_dump(entry)
-        for field in sorted(entry):
-            value = invalid
-            if entry.is_lazy(field):
-                if eval_lazy:
-                    value = entry[field]
-                else:
-                    value = '<LazyField - value will be determined when it\'s accessed>'
+        for field in sorted(entry, key=sort_key):
+            if entry.is_lazy(field) and not eval_lazy:
+                value = '<LazyField - value will be determined when it is accessed>'
             else:
                 value = entry[field]
-            assert value is not invalid
             if isinstance(value, basestring):
                 try:
                     console('%-17s: %s' % (field, value.replace('\r', '').replace('\n', '')))
-                except:
-                    console('%-17s: %s (warning: unable to print)' % (field, repr(value)))
+                except Exception:
+                    console('%-17s: %r (warning: unable to print)' % (field, value))
             elif isinstance(value, list):
                 console('%-17s: %s' % (field, '[%s]' % ', '.join(unicode(v) for v in value)))
             elif isinstance(value, (int, float, dict)):
@@ -44,7 +44,7 @@ def dump(entries, debug=False, eval_lazy=False, trace=False):
                 console('%-17s: %s' % (field, value))
             else:
                 if debug:
-                    console('%-17s: [not printable] (%s)' % (field, value))
+                    console('%-17s: [not printable] (%r)' % (field, value))
         if trace:
             console('-- Processing trace:')
             for item in entry.traces:
@@ -68,7 +68,7 @@ class OutputDump(object):
 
         eval_lazy = task.manager.options.dump_entries == 'eval'
         trace = task.manager.options.dump_entries == 'trace'
-        undecided = [entry for entry in task.entries if not entry in task.accepted]
+        undecided = [entry for entry in task.all_entries if entry.undecided]
         if undecided:
             console('-- Undecided: --------------------------')
             dump(undecided, task.manager.options.debug, eval_lazy, trace)

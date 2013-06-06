@@ -33,22 +33,42 @@ class EmitSeries(SeriesDatabase):
         entries = []
         for seriestask in task.session.query(SeriesTask).filter(SeriesTask.name == task.name).all():
             series = seriestask.series
-            latest = self.get_latest_info(series)
-            if not latest:
-                # no latest known episode, skip
+            if series.identified_by != 'ep':
+                log.debug('cannot discover non-ep based series')
+                continue
+
+            latest = self.get_latest_episode(series)
+            if series.begin and (not latest or latest < series.begin):
+                search_episodes = [(series.begin.season, series.begin.number)]
+            elif latest:
+                # TODO: Only try next season if last episode had no results
+                search_episodes = [(latest.season, latest.number + 1), (latest.season + 1, 1)]
+            else:
                 continue
 
             # try next episode and next season
-            for season, episode in [(latest['season'], latest['episode'] + 1), (latest['season'] + 1, 1)]:
+            for season, episode in search_episodes:
                 search_strings = self.search_strings(series.name, season, episode)
-                entries.append(Entry(title=search_strings[0], url='',
-                                     search_strings=search_strings,
-                                     series_name=series.name,
-                                     series_season=season,
-                                     series_episode=episode,
-                                     series_id='S%02dE%02d' % (season, episode)))
+                entry = Entry(title=search_strings[0], url='',
+                              search_strings=search_strings,
+                              series_name=series.name,
+                              series_season=season,
+                              series_episode=episode,
+                              series_id='S%02dE%02d' % (season, episode))
+                entry.on_complete(self.on_search_complete, task=task)
+                entries.append(entry)
 
         return entries
+
+    def on_search_complete(self, entry, task=None, **kwargs):
+        if entry.accepted:
+            # We accepted a result from this search, rerun the task to look for next ep
+            task.rerun()
+        elif entry.undecided:
+            # We searched but no results were accepted, try to search for next season
+            # TODO: Make sure we emit next season next run somehow
+            # task.rerun()
+            pass
 
 
 register_plugin(EmitSeries, 'emit_series', api_ver=2)
