@@ -564,9 +564,8 @@ def set_series_begin(series, ep_id):
 def forget_series(name):
     """Remove a whole series `name` from database."""
     session = Session()
-    series = session.query(Series).filter(Series.name == name).first()
-    if series:
-        session.delete(series)
+    deleted = session.query(Series).filter(Series.name == name).delete()
+    if deleted:
         session.commit()
         log.debug('Removed series %s from database.', name)
     else:
