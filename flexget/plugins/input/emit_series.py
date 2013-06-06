@@ -38,16 +38,29 @@ class EmitSeries(SeriesDatabase):
                 continue
 
             # try next episode and next season
+            # TODO: Only try next season if last episode had no results
             for season, episode in [(latest['season'], latest['episode'] + 1), (latest['season'] + 1, 1)]:
                 search_strings = self.search_strings(series.name, season, episode)
-                entries.append(Entry(title=search_strings[0], url='',
-                                     search_strings=search_strings,
-                                     series_name=series.name,
-                                     series_season=season,
-                                     series_episode=episode,
-                                     series_id='S%02dE%02d' % (season, episode)))
+                entry = Entry(title=search_strings[0], url='',
+                              search_strings=search_strings,
+                              series_name=series.name,
+                              series_season=season,
+                              series_episode=episode,
+                              series_id='S%02dE%02d' % (season, episode))
+                entry.on_complete(self.on_search_complete, task=task)
+                entries.append(entry)
 
         return entries
+
+    def on_search_complete(self, entry, task=None, **kwargs):
+        if entry.accepted:
+            # We accepted a result from this search, rerun the task to look for next ep
+            task.rerun()
+        elif entry.undecided:
+            # We searched but no results were accepted, try to search for next season
+            # TODO: Make sure we emit next season next run somehow
+            # task.rerun()
+            pass
 
 
 register_plugin(EmitSeries, 'emit_series', api_ver=2)

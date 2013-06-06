@@ -72,7 +72,7 @@ class Entry(dict):
         self.traces = []
         self.snapshots = {}
         self._state = 'undecided'
-        self.hooks = {'accept': [], 'reject': [], 'fail': [], 'succeed': []}
+        self.hooks = {'accept': [], 'reject': [], 'fail': [], 'complete': []}
         self.task = None
 
         if len(args) == 2:
@@ -111,8 +111,8 @@ class Entry(dict):
     def on_fail(self, func, **kwargs):
         self.hooks['fail'].append(functools.partial(func, **kwargs))
 
-    def on_succeed(self, func, **kwargs):
-        self.hooks['succeed'].append(functools.partial(func, **kwargs))
+    def on_complete(self, func, **kwargs):
+        self.hooks['complete'].append(functools.partial(func, **kwargs))
 
     def accept(self, reason=None, **kwargs):
         if self.rejected:
@@ -145,12 +145,9 @@ class Entry(dict):
             # Run entry on_fail hooks
             self.run_hooks('fail', reason=reason, **kwargs)
 
-    def succeed(self, **kwargs):
-        if not self.accepted:
-            log.debug('Cannot succeed entry that was not accepted.')
-            return
-        # Run entry on_succeed hooks
-        self.run_hooks('succeed', **kwargs)
+    def complete(self, **kwargs):
+        # Run entry on_complete hooks
+        self.run_hooks('complete', **kwargs)
 
     @property
     def accepted(self):
@@ -367,7 +364,10 @@ class Entry(dict):
         return render_from_entry(template, self)
 
     def __eq__(self, other):
-        return self.get('title') == other.get('title') and self.get('url') == other.get('url')
+        return self.get('title') == other.get('title') and self.get('original_url') == other.get('original_url')
+
+    def __hash__(self):
+        return hash(self.get('title', '') + self.get('original_url', ''))
 
     def __repr__(self):
         return '<Entry(title=%s,state=%s)>' % (self['title'], self._state)

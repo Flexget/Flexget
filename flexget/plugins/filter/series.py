@@ -361,7 +361,7 @@ class SeriesDatabase(object):
     def get_latest_info(self, series):
         """Return latest known identifier in dict (season, episode, name) for series name"""
         session = Session.object_session(series)
-        episode = session.query(Episode).select_from(join(Episode, Series)).\
+        episode = session.query(Episode).join(Episode.series).\
             filter(Episode.season != None).\
             filter(Series.id == series.id).\
             order_by(desc(Episode.season)).\
