@@ -23,7 +23,6 @@ class PluginSequence(object):
     def __getattr__(self, item):
         """Returns a function for all on_task_* and on_process_* events, that runs all the configured plugins."""
         for phase, method in phase_methods.iteritems():
-            # TODO: Deal with entry phases
             if item == method and phase not in ['accept', 'reject', 'fail']:
                 break
         else:

@@ -24,7 +24,7 @@ class EstimatesReleasedSeries(object):
             series = session.query(Series).filter(Series.name == entry['series_name']).first()
             if not series:
                 return
-            episodes = (session.query(Episode).join(Series).
+            episodes = (session.query(Episode).join(Episode.series).
                 filter(Episode.season != None).
                 filter(Series.id == series.id).
                 filter(Episode.season == func.max(Episode.season).select()).

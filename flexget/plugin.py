@@ -165,11 +165,6 @@ phase_methods = {
     # task
     'abort': 'on_task_abort',  # special; not a task phase that gets called normally
 
-    # entry handling
-    'accept': 'on_entry_accept',
-    'reject': 'on_entry_reject',
-    'fail': 'on_entry_fail',
-
     # lifecycle
     'process_start': 'on_process_start',
     'process_end': 'on_process_end',
