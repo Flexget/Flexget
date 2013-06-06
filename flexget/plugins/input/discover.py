@@ -231,7 +231,6 @@ class Discover(object):
             result.append(entry)
         return result
 
-    @cached('discover')
     def on_task_input(self, task, config):
         task.no_entries_ok = True
         entries = self.execute_inputs(config, task)

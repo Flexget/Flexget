@@ -29,6 +29,8 @@ class EmitSeries(SeriesDatabase):
     def on_task_input(self, task, config):
         if not config:
             return
+        if not task.is_rerun:
+            self.try_next_season = {}
         entries = []
         for seriestask in task.session.query(SeriesTask).filter(SeriesTask.name == task.name).all():
             series = seriestask.series
@@ -40,8 +42,10 @@ class EmitSeries(SeriesDatabase):
             if series.begin and (not latest or latest < series.begin):
                 search_episodes = [(series.begin.season, series.begin.number)]
             elif latest:
-                # TODO: Only try next season if last episode had no results
-                search_episodes = [(latest.season, latest.number + 1), (latest.season + 1, 1)]
+                if self.try_next_season.get(series.name):
+                    search_episodes = [(latest.season + 1, 1)]
+                else:
+                    search_episodes = [(latest.season, latest.number + 1)]
             else:
                 continue
 
@@ -62,12 +66,15 @@ class EmitSeries(SeriesDatabase):
     def on_search_complete(self, entry, task=None, **kwargs):
         if entry.accepted:
             # We accepted a result from this search, rerun the task to look for next ep
+            self.try_next_season.pop(entry['series_name'], None)
             task.rerun()
         elif entry.undecided:
-            # We searched but no results were accepted, try to search for next season
-            # TODO: Make sure we emit next season next run somehow
-            # task.rerun()
-            pass
+            if entry['series_name'] not in self.try_next_season:
+                self.try_next_season[entry['series_name']] = True
+                task.rerun()
+            else:
+                # Don't try a second time
+                self.try_next_season[entry['series_name']] = False
 
 
 register_plugin(EmitSeries, 'emit_series', api_ver=2)
