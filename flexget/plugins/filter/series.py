@@ -528,10 +528,13 @@ def set_series_begin(series, ep_id):
     session = Session.object_session(series)
     if isinstance(ep_id, int):
         identified_by = 'sequence'
-    elif re.match(r'^S\d{1,2}E\d{1,2}$', ep_id):
+    elif re.match(r'(?i)^S\d{1,2}E\d{1,2}$', ep_id):
         identified_by = 'ep'
-    else:
+        ep_id = ep_id.upper()
+    elif re.match(r'\d{4}-\d{2}-\d{2}', ep_id):
         identified_by = 'date'
+    else:
+        raise ValueError('`%s` is not a valid episode identifier' % ep_id)
     if series.identified_by not in ['auto', None]:
         if identified_by != series.identified_by:
             raise ValueError('`begin` value `%s` does not match identifier type for identified_by `%s`' %
