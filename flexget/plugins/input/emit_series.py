@@ -32,14 +32,21 @@ class EmitSeries(SeriesDatabase):
         entries = []
         for seriestask in task.session.query(SeriesTask).filter(SeriesTask.name == task.name).all():
             series = seriestask.series
-            latest = self.get_latest_info(series)
-            if not latest:
-                # no latest known episode, skip
+            if series.identified_by != 'ep':
+                log.debug('cannot discover non-ep based series')
+                continue
+
+            latest = self.get_latest_episode(series)
+            if series.begin and (not latest or latest < series.begin):
+                search_episodes = [(series.begin.season, series.begin.number)]
+            elif latest:
+                # TODO: Only try next season if last episode had no results
+                search_episodes = [(latest.season, latest.number + 1), (latest.season + 1, 1)]
+            else:
                 continue
 
             # try next episode and next season
-            # TODO: Only try next season if last episode had no results
-            for season, episode in [(latest['season'], latest['episode'] + 1), (latest['season'] + 1, 1)]:
+            for season, episode in search_episodes:
                 search_strings = self.search_strings(series.name, season, episode)
                 entry = Entry(title=search_strings[0], url='',
                               search_strings=search_strings,

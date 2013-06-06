@@ -1,6 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
 from datetime import datetime, timedelta
 
+from flexget.entry import Entry
 from flexget.plugin import register_plugin
 import flexget.validator
 from tests import FlexGetBase
@@ -13,7 +14,7 @@ class SearchPlugin(object):
         return flexget.validator.factory('boolean')
 
     def search(self, entry, comparator=None, config=None):
-        return [entry]
+        return [Entry(entry)]
 
 register_plugin(SearchPlugin, 'test_search', groups=['search'])
 
