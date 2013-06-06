@@ -4,7 +4,6 @@ import re
 import time
 from copy import copy
 from datetime import datetime, timedelta
-from functools import total_ordering
 
 from sqlalchemy import (Column, Integer, String, Unicode, DateTime, Date, Boolean,
                         desc, select, update, delete, ForeignKey, Index, func, and_, not_)
@@ -230,7 +229,6 @@ class Series(Base):
         return unicode(self).encode('ascii', 'replace')
 
 
-@total_ordering
 class Episode(Base):
 
     __tablename__ = 'series_episodes'
