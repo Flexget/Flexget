@@ -87,9 +87,8 @@ class FilterIf(object):
             log.error('Error occurred in if statement: %r' % e)
 
     def __getattr__(self, item):
-        """Provides handlers for all phases except input and entry phases."""
+        """Provides handlers for all phases."""
         for phase, method in phase_methods.iteritems():
-            # TODO: Deal with entry phases
             if item == method and phase not in ['accept', 'reject', 'fail', 'input']:
                 break
         else:
