@@ -221,8 +221,15 @@ def series_begin(manager):
     if not series:
         console('Unknown series `%s`' % series_name)
         return
-    set_series_begin(series, ep_id)
-    console('Episodes for `%s` will be accepted starting with `%s`' % (series.name, ep_id))
+    try:
+        set_series_begin(series, ep_id)
+    except ValueError as e:
+        console(e)
+    else:
+        console('Episodes for `%s` will be accepted starting with `%s`' % (series.name, ep_id))
+        session.commit()
+    finally:
+        session.close()
 
 
 register_plugin(SeriesReport, '--series', builtin=True)
