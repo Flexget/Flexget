@@ -173,6 +173,7 @@ class Task(object):
     accepted = property(lambda self: self.all_entries.accepted)
     rejected = property(lambda self: self.all_entries.rejected)
     failed = property(lambda self: self.all_entries.failed)
+    undecided = property(lambda self: self.all_entries.undecided)
 
     @property
     def is_rerun(self):
@@ -216,11 +217,6 @@ class Task(object):
     @property
     def abort_reason(self):
         return self._abort_reason
-
-    @property
-    def undecided(self):
-        """Iterate over undecided entries"""
-        return (entry for entry in self.entries if not entry in self.accepted and entry not in self.rejected)
 
     def disable_phase(self, phase):
         """Disable ``phase`` from execution.
