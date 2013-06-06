@@ -358,12 +358,12 @@ class SeriesDatabase(object):
 
     """Provides API to series database"""
 
-    def get_latest_info(self, series):
+    def get_latest_episode(self, series):
         """Return latest known identifier in dict (season, episode, name) for series name"""
         session = Session.object_session(series)
         episode = session.query(Episode).join(Episode.series).\
-            filter(Episode.season != None).\
             filter(Series.id == series.id).\
+            filter(Episode.season != None).\
             order_by(desc(Episode.season)).\
             order_by(desc(Episode.number)).first()
         if not episode:
@@ -371,7 +371,7 @@ class SeriesDatabase(object):
             return False
         # log.trace('get_latest_info, series: %s season: %s episode: %s' % \
         #    (name, episode.season, episode.number))
-        return {'season': episode.season, 'episode': episode.number, 'name': series.name}
+        return episode
 
     def auto_identified_by(self, series):
         """
