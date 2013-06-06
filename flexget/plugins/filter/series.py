@@ -532,7 +532,7 @@ def set_series_begin(series, ep_id):
         identified_by = 'ep'
     else:
         identified_by = 'date'
-    if series.identified_by != 'auto':
+    if series.identified_by not in ['auto', None]:
         if identified_by != series.identified_by:
             raise ValueError('`begin` value `%s` does not match identifier type for identified_by `%s`' %
                               (ep_id, series.identified_by))
@@ -859,7 +859,10 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
             db_series.in_tasks.append(SeriesTask(task.name))
             # Set the begin episode
             if series_config.get('begin'):
-                set_series_begin(db_series, series_config['begin'])
+                try:
+                    set_series_begin(db_series, series_config['begin'])
+                except ValueError as e:
+                    raise PluginError(e)
 
 
     def auto_exact(self, config):
