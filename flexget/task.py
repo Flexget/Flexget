@@ -188,7 +188,7 @@ class Task(object):
         self.requests = requests.Session()
 
         # List of all entries in the task
-        self._all_entries = EntryContainer(task=self)
+        self._all_entries = EntryContainer()
 
         self.disabled_phases = []
 
@@ -490,6 +490,8 @@ class Task(object):
                 if self._abort:
                     return
 
+            for entry in self.all_entries:
+                entry.complete()
             log.debug('committing session, abort=%s' % self._abort)
             self.session.commit()
             fire_event('task.execute.completed', self)
