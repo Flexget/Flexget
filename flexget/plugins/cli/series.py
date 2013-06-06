@@ -1,6 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
 from datetime import datetime, timedelta
 from string import capwords
+from flexget.event import event
 
 from flexget.manager import Session
 from flexget.plugin import register_plugin, register_parser_option, DependencyError
@@ -8,7 +9,7 @@ from flexget.utils.tools import console
 
 try:
     from flexget.plugins.filter.series import (SeriesDatabase, Series, Episode, Release, SeriesTask,
-                                               forget_series, forget_series_episode)
+                                               forget_series, forget_series_episode, set_series_begin)
 except ImportError:
     raise DependencyError(issued_by='cli_series', missing='series', message='Series commandline interface not loaded')
 
@@ -209,9 +210,26 @@ class SeriesForget(object):
             task.manager.config_changed()
 
 
+@event('manager.startup')
+def series_begin(manager):
+    if not manager.options.series_begin:
+        return
+    manager.disable_tasks()
+    series_name, ep_id = manager.options.series_begin
+    session = Session()
+    series = session.query(Series).filter(Series.name == series_name).first()
+    if not series:
+        console('Unknown series `%s`' % series_name)
+        return
+    set_series_begin(series, ep_id)
+    console('Episodes for `%s` will be accepted starting with `%s`' % (series.name, ep_id))
+
+
 register_plugin(SeriesReport, '--series', builtin=True)
 register_plugin(SeriesForget, '--series-forget', builtin=True)
 
+register_parser_option('--series-begin', nargs=2, metavar=('NAME', 'EP_ID'),
+                       help='Mark the first desired episode of a series. Episodes before this will not be grabbed')
 register_parser_option('--series', nargs='?', const=True, help='Display series summary.')
 register_parser_option('--series-forget', nargs='1-2', metavar=('NAME', 'EP_ID'),
                        help='Remove complete series or single episode from database: <NAME> [EPISODE]')

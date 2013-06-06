@@ -522,6 +522,42 @@ class SeriesDatabase(object):
         return releases
 
 
+def set_series_begin(series, ep_id):
+    # If identified_by is not explicitly specified, auto-detect it based on begin identifier
+    # TODO: use some method of series parser to do the identifier parsing
+    session = Session.object_session(series)
+    if isinstance(ep_id, int):
+        identified_by = 'sequence'
+    elif re.match(r'^S\d{1,2}E\d{1,2}$', ep_id):
+        identified_by = 'ep'
+    else:
+        identified_by = 'date'
+    if series.identified_by != 'auto':
+        if identified_by != series.identified_by:
+            raise ValueError('`begin` value `%s` does not match identifier type for identified_by `%s`' %
+                              (ep_id, series.identified_by))
+    series.identified_by = identified_by
+    episode = (session.query(Episode).filter(Episode.series_id == series.id).
+               filter(Episode.identified_by == series.identified_by).
+               filter(Episode.identifier == str(ep_id)).first())
+    if not episode:
+        # TODO: Don't duplicate code from self.store method
+        episode = Episode()
+        episode.identifier = ep_id
+        episode.identified_by = identified_by
+        if identified_by == 'ep':
+            match = re.match(r'S(\d+)E(\d+)', ep_id)
+            episode.season = int(match.group(1))
+            episode.number = int(match.group(2))
+        elif identified_by == 'sequence':
+            episode.season = 0
+            episode.number = ep_id
+        series.episodes.append(episode)
+        # Need to flush to get an id on new Episode before assigning it as series begin
+        session.flush()
+    series.begin = episode
+
+
 def forget_series(name):
     """Remove a whole series `name` from database."""
     session = Session()
@@ -823,38 +859,8 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
             db_series.in_tasks.append(SeriesTask(task.name))
             # Set the begin episode
             if series_config.get('begin'):
-                # If identified_by is not explicitly specified, auto-detect it based on begin identifier
-                # TODO: use some method of series parser to do the identifier parsing
-                if isinstance(series_config['begin'], int):
-                    identified_by = 'sequence'
-                elif re.match(r'^S\d{1,2}E\d{1,2}$', series_config['begin']):
-                    identified_by = 'ep'
-                else:
-                    identified_by = 'date'
-                if series_config.get('identified_by', 'auto') != 'auto':
-                    if identified_by != series_config['identified_by']:
-                        raise PluginError('`begin` value `%s` does not match idenentifier type for identified_by `%s`' %
-                                          (series_config['begin'], series_config['identified_by']))
-                db_series.identified_by = identified_by
-                episode = (task.session.query(Episode).filter(Episode.series_id == db_series.id).
-                           filter(Episode.identified_by == db_series.identified_by).
-                           filter(Episode.identifier == str(series_config['begin'])).first())
-                if not episode:
-                    # TODO: Don't duplicate code from self.store method
-                    episode = Episode()
-                    episode.identifier = series_config['begin']
-                    episode.identified_by = identified_by
-                    if identified_by == 'ep':
-                        match = re.match(r'S(\d+)E(\d+)', series_config['begin'])
-                        episode.season = int(match.group(1))
-                        episode.number = int(match.group(2))
-                    elif identified_by == 'sequence':
-                        episode.season = 0
-                        episode.number = series_config['begin']
-                    db_series.episodes.append(episode)
-                    # Need to flush to get an id on new Episode before assigning it as series begin
-                    task.session.flush()
-                db_series.begin = episode
+                set_series_begin(db_series, series_config['begin'])
+
 
     def auto_exact(self, config):
         """Automatically enable exact naming option for series that look like a problem"""
