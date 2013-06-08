@@ -61,16 +61,31 @@ def get_scrape_url(tracker_url, info_hash):
 
 def get_udp_seeds(url, info_hash):
     parsed_url = urlparse(url)
+    port = None
+    try:
+        port = parsed_url.port
+    except ValueError, ve:
+        log.error('UDP Port Error, url was %s' % url)
+        return 0
+
     log.debug('Checking for seeds from %s' % url)
 
     connection_id = 0x41727101980  # connection id is always this
     transaction_id = randrange(1, 65535)  # Random Transaction ID creation
 
+    if port is None:
+        log.error('UDP Port Error, port was None')
+        return 0
+
+    if port < 0 or port > 65535:
+        log.error('UDP Port Error, port was %s' % port)
+        return 0
+
     # Create the socket
     try:
         clisocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         clisocket.settimeout(5.0)
-        clisocket.connect((parsed_url.hostname, parsed_url.port))
+        clisocket.connect((parsed_url.hostname, port))
 
         # build packet with connection_ID, using 0 value for action, giving our transaction ID for this packet
         packet = struct.pack(b">QLL", connection_id, 0, transaction_id)
