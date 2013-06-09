@@ -119,6 +119,11 @@ quality
 quality_requirements
     FlexGet quality requirements specifier, e.g. ``720p-1080p hdtv+``
 
+interval
+    A text representation of a time interval, e.g. ``3 hours``, ``10 minutes``
+    Intervals in this format can be parsed to a :class:`datetime.timedelta` object using the utility function
+    :func:`flexget.utils.tools.parse_timedelta`
+
 regex
     valid regular expression
 
