@@ -535,7 +535,7 @@ def set_series_begin(series, ep_id):
         identified_by = 'date'
     else:
         raise ValueError('`%s` is not a valid episode identifier' % ep_id)
-    if series.identified_by not in ['auto', None]:
+    if series.identified_by not in ['auto', '', None]:
         if identified_by != series.identified_by:
             raise ValueError('`begin` value `%s` does not match identifier type for identified_by `%s`' %
                               (ep_id, series.identified_by))
@@ -1133,7 +1133,8 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
                     log.debug('episode advancement disabled')
                 else:
                     log.debug('-' * 20 + ' episode advancement -->')
-                    if self.process_episode_advancement(ep, entries):
+                    # Grace is number of distinct eps in the task for this series + 2
+                    if self.process_episode_advancement(ep, entries, grace=len(series_entries)+2):
                         continue
 
             # quality
@@ -1249,7 +1250,7 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
             log.debug('no quality meets requirements')
         return result
 
-    def process_episode_advancement(self, episode, entries):
+    def process_episode_advancement(self, episode, entries, grace):
         """Rejects all episodes that are too old or new (advancement), return True when this happens."""
 
         latest = self.get_latest_download(episode.series)
@@ -1257,8 +1258,7 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
         log.debug('current: %s' % episode)
 
         if latest and latest.identified_by == episode.identified_by:
-            # allow few episodes "backwards" in case of missed eps
-            grace = len(entries) + 2
+            # Allow any previous episodes this season, or previous episodes within grace if sequence mode
             if (
                     episode.season < latest.season or
                     (episode.identified_by == 'sequence' and episode.number < (latest.number - grace))
@@ -1268,6 +1268,7 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
                     entry.reject('Too much in the past from latest downloaded episode %s' % latest.identifier)
                 return True
 
+            # Allow future episodes within grace, or first episode of next season
             if (episode.season > latest.season + 1 or (episode.season > latest.season and episode.number > 1) or
                (episode.season == latest.season and episode.number > (latest.number + grace))):
                 log.debug('too new! rejecting all occurrences')
