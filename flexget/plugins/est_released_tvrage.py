@@ -13,14 +13,18 @@ class EstimatesReleasedTVRage(object):
 
     def estimate(self, entry):
         if 'series_name' in entry and 'series_episode' in entry and 'series_season' in entry:
+            season = entry['series_season']
+            if entry.get('series_id_type') == 'sequence':
+                # Tvrage has absolute numbered shows under season 1
+                season = 1
             log.verbose("Querying release estimation for %s S%02dE%02d ..." %
-                        (entry['series_name'], entry['series_season'], entry['series_episode']))
+                        (entry['series_name'], season, entry['series_episode']))
             series_info = self.get_series_info(entry['series_name'])
             if series_info is None:
                 log.debug('No series info obtained from TVRage to %s' % entry['series_name'])
                 return None
             try:
-                season_info = series_info.season(entry['series_season'])
+                season_info = series_info.season(season)
                 if season_info:
                     episode_info = season_info.episode(entry['series_episode'])
                     if episode_info:

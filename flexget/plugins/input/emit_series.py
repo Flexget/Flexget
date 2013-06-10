@@ -24,18 +24,27 @@ class EmitSeries(SeriesDatabase):
 
     schema = {'type': 'boolean'}
 
-    def search_strings(self, series, season, episode):
-        return ['%s S%02dE%02d' % (series, season, episode),
-                '%s %02dx%02d' % (series, season, episode)]
+    def ep_identifiers(self, season, episode):
+        return ['S%02dE%02d' % (season, episode),
+                '%dx%02d' % (season, episode)]
+
+    def sequence_identifiers(self, episode):
+        return ['%d' % episode]
 
     def search_entry(self, series, season, episode, task, rerun=True):
-        search_strings = self.search_strings(series.name, season, episode)
+        if series.identified_by == 'ep':
+            search_strings = ['%s %s' % (series.name, id) for id in self.ep_identifiers(season, episode)]
+            series_id = 'S%02dE%02d' % (season, episode)
+        else:
+            search_strings = ['%s %s' % (series.name, id) for id in self.sequence_identifiers(episode)]
+            series_id = episode
         entry = Entry(title=search_strings[0], url='',
                       search_strings=search_strings,
                       series_name=series.name,
                       series_season=season,
                       series_episode=episode,
-                      series_id='S%02dE%02d' % (season, episode))
+                      series_id=series_id,
+                      series_id_type=series.identified_by)
         if rerun:
             entry.on_complete(self.on_search_complete, task=task)
         return entry
@@ -48,8 +57,8 @@ class EmitSeries(SeriesDatabase):
         entries = []
         for seriestask in task.session.query(SeriesTask).filter(SeriesTask.name == task.name).all():
             series = seriestask.series
-            if series.identified_by != 'ep':
-                log.debug('cannot discover non-ep based series')
+            if series.identified_by not in ['ep', 'sequence']:
+                log.debug('can only emit ep or sequence based series')
                 continue
 
             latest = self.get_latest_download(series)
