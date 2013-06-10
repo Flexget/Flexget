@@ -25,7 +25,11 @@ class SearchBTN(object):
         if 'series_name' in entry:
             search = {'series': entry['series_name']}
             if 'series_id' in entry:
-                search['name'] = entry['series_id']
+                # BTN wants an ep style identifier even for sequence shows
+                if entry.get('series_id_type') == 'sequence':
+                    search['name'] = 'S01E%02d' % entry['series_id']
+                else:
+                    search['name'] = entry['series_id']
             searches = [search]
 
         results = set()
@@ -44,6 +48,7 @@ class SearchBTN(object):
                     entry = Entry()
                     entry['title'] = item['ReleaseName']
                     entry['url'] = item['DownloadURL']
+                    entry['description'] = ' '.join([item['Resolution'], item['Source'], item['Codec']])
                     entry['torrent_seeds'] = int(item['Seeders'])
                     entry['torrent_leeches'] = int(item['Leechers'])
                     entry['torrent_info_hash'] = item['InfoHash']
