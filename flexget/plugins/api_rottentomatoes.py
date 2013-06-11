@@ -369,7 +369,7 @@ def lookup_movie(title=None, year=None, rottentomatoes_id=None, smart_match=None
                             diff = results[0]['match'] - results[1]['match']
                             if diff < MIN_DIFF:
                                 log.debug('unable to determine correct movie, min_diff too small'
-                                          '(`%s (%d) - %s` <-?-> `%s (%d) - %s`)' %
+                                          '(`%s (%s) - %s` <-?-> `%s (%s) - %s`)' %
                                           (results[0]['title'], results[0]['year'], results[0]['id'],
                                            results[1]['title'], results[1]['year'], results[1]['id']))
                                 for r in results:
