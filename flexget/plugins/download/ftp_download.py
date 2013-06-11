@@ -18,35 +18,33 @@ class OutputFtp(object):
 
         config:
             ftp_download:
-                tls: False
-                ftp_tmp_path: /tmp
+              tls: False
+              ftp_tmp_path: /tmp
     
         TODO:
           - Resume downloads
           - create banlists files
-          - validate conections parameters
+          - validate connection parameters
 
     """
 
     def validator(self):
         from flexget import validator
         root = validator.factory('dict')
-        root.accept('integer', key='use-ssl')
-        root.accept('text', key='ftp_tmp_path')
+        root.accept('boolean', key='use-ssl')
+        root.accept('path', key='ftp_tmp_path')
         return root
 
     def prepare_config(self, config, task):
         config.setdefault('use-ssl', False)
-        temp_path = os.path.join(task.manager.config_base, 'temp')
-        config.setdefault('ftp_tmp_path', temp_path)
+        config.setdefault('ftp_tmp_path', os.path.join(task.manager.config_base, 'temp'))
 
         return config
 
     def on_task_download(self, task, config):
         config = self.prepare_config(config, task)
-        entries = task.accepted
-        for entry in entries:
-            ftpUrl = urlparse(entry.get('url'))
+        for entry in task.accepted:
+            ftp_url = urlparse(entry.get('url'))
             title = entry.get('title')
             
             if config['use-ssl']:
@@ -55,12 +53,12 @@ class OutputFtp(object):
                 ftp = ftplib.FTP()
 
             try:
-            #ftp.set_debuglevel(2)
-                ftp.connect(ftpUrl.hostname, ftpUrl.port)
-                ftp.login(ftpUrl.username, ftpUrl.password)
+                # ftp.set_debuglevel(2)
+                ftp.connect(ftp_url.hostname, ftp_url.port)
+                ftp.login(ftp_url.username, ftp_url.password)
                 ftp.sendcmd('TYPE I')
                 ftp.set_pasv(True)
-            except ftplib.error_perm, ex:
+            except ftplib.error_perm:
                 log.error('Connection error')
 
             if not os.path.isdir(config['ftp_tmp_path']):
@@ -73,17 +71,19 @@ class OutputFtp(object):
                 log.debug('creating tmp_path %s' % tmp_path)
                 os.mkdir(tmp_path)
 
-            try: # Directory
-                ftp.cwd(ftpUrl.path)
+            try:
+                # Directory
+                ftp.cwd(ftp_url.path)
                 self.ftp_walk(ftp, tmp_path)
-            except: # File
-                self.ftp_down(ftp, ftpUrl.path, tmp_path)
+            except ftplib.error_perm:
+                # File
+                self.ftp_down(ftp, ftp_url.path, tmp_path)
             
     def ftp_walk(self, ftp, tmp_path):
-        log.info("DIR->" + ftp.pwd())
+        log.debug("DIR->" + ftp.pwd())
         try:
             dirs = ftp.nlst(ftp.pwd())
-        except ftplib.error_perm, ex:
+        except ftplib.error_perm as ex:
             log.info("Error %s" % ex)
             return
 
@@ -104,17 +104,15 @@ class OutputFtp(object):
         
                 self.ftp_walk(ftp, new_tmp_dir)
                 ftp.cwd('..')
-            except Exception, e:
+            except ftplib.error_perm:
                 log.info("downloading " + base_item_name + " in " + tmp_path)
                 self.ftp_down(ftp, item, tmp_path)
 
     def ftp_down(self, ftp, file_name, tmp_path):
-        currdir = os.path.dirname(file_name)
         file_name = os.path.basename(file_name)
 
-        tempdir = tmp_path 
-        if not os.path.exists(tempdir): 
-            os.makedirs(tempdir)
+        if not os.path.exists(tmp_path):
+            os.makedirs(tmp_path)
 
         src_filesize = 0
         try:
@@ -125,7 +123,7 @@ class OutputFtp(object):
             self.ftp_walk(ftp, tmp_path)
 
         try:
-            dst_file = os.path.join(tempdir, file_name)
+            dst_file = os.path.join(tmp_path, file_name)
             action = 'Download'
             if os.path.exists(dst_file):
                 dst_filesize = os.stat(dst_file).st_size
@@ -134,14 +132,14 @@ class OutputFtp(object):
                     action = 'NoDownload'
 
             if action == 'Download':
-                with open(os.path.join(tempdir, file_name), 'wb') as f:
+                with open(os.path.join(tmp_path, file_name), 'wb') as f:
                     def callback(data):
                         f.write(data)
                     ftp.retrbinary('RETR %s' % file_name, callback)
                     f.close()
-                    log.info('RETR: ' + os.path.join(tempdir, file_name))
+                    log.info('RETR: ' + os.path.join(tmp_path, file_name))
             else:
-                log.info('NoDownload: ' + file_name + ' -> ' + os.path.join(tempdir, file_name))
+                log.info('NoDownload: ' + file_name + ' -> ' + os.path.join(tmp_path, file_name))
         except Exception, e:
             log.exception(e) 
 

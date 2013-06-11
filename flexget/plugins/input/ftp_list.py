@@ -14,16 +14,16 @@ class InputFtpList(object):
     Configuration:
       ftp_list:
         config:
-            use-ssl: no
-            name: <ftp name>
-            username: <username>
-            password: <password>
-            host: <host to connect>
-            port: <port>
+          use-ssl: no
+          name: <ftp name>
+          username: <username>
+          password: <password>
+          host: <host to connect>
+          port: <port>
         dirs:
-            - <directory 1>
-            - <directory 2>
-            - ....
+          - <directory 1>
+          - <directory 2>
+          - ....
     """
 
     def validator(self):
@@ -45,19 +45,19 @@ class InputFtpList(object):
 
     def on_task_input(self, task, config):
         config = self.prepare_config(config)
-        conectionConfig = config['config']
+        connection_config = config['config']
 
-        if conectionConfig['use-ssl']:
+        if connection_config['use-ssl']:
             ftp = ftplib.FTP_TLS()
         else:
             ftp = ftplib.FTP()
 
-        #ftp.set_debuglevel(2)
-        log.debug('Trying connecting to: %s', (conectionConfig['host']))
+        # ftp.set_debuglevel(2)
+        log.debug('Trying connecting to: %s', (connection_config['host']))
         try: 
-            ftp.connect(conectionConfig['host'], conectionConfig['port'])
-            ftp.login(conectionConfig['username'], conectionConfig['password'])
-        except ftplib.all_errors, e:
+            ftp.connect(connection_config['host'], connection_config['port'])
+            ftp.login(connection_config['username'], connection_config['password'])
+        except ftplib.all_errors as e:
             raise PluginError(e)
 
         log.debug('Connected.')
@@ -66,8 +66,8 @@ class InputFtpList(object):
         ftp.set_pasv(True)
         entries = []
         for path in config['dirs']:
-            baseurl = "ftp://%s:%s@%s:%s/" % (conectionConfig['username'], conectionConfig['password'], 
-                      conectionConfig['host'], conectionConfig['port']) 
+            baseurl = "ftp://%s:%s@%s:%s/" % (connection_config['username'], connection_config['password'],
+                                              connection_config['host'], connection_config['port'])
 
             try:
                 dirs = ftp.nlst(path)
@@ -80,11 +80,7 @@ class InputFtpList(object):
             for p in dirs:
                 url = baseurl + p
                 title = os.path.basename(p)
-                entry = Entry()
-                entry['title'] = title
-                entry['description'] = title
-                entry['url'] = url
-                entries.append(entry)
+                entries.append(Entry(title, url))
 
         return entries
 
