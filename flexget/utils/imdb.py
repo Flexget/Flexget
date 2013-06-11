@@ -367,7 +367,7 @@ class ImdbParser(object):
         h2_plot = soup.find('h2', text='Storyline')
         if h2_plot:
             p_plot = h2_plot.find_next('p')
-            if p_plot:
+            if p_plot and p_plot.next.string:
                 self.plot_outline = p_plot.next.string.strip()
                 log.debug('Detected plot outline: %s' % self.plot_outline)
             else:

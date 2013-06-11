@@ -47,3 +47,12 @@ class TestImdbParser(object):
         assert parser.url == 'http://www.imdb.com/title/tt0114814/', 'URL not parsed correctly'
         assert 400000 < parser.votes < 500000, 'Votes not parsed correctly'
         assert parser.year == 1995, 'Year not parsed correctly'
+
+    @attr(online=True)
+    def test_no_plot(self):
+        # Make sure parser doesn't crash for movies with no plot
+        parser = ImdbParser()
+        parser.parse('tt0245062')
+        assert parser.name == 'The Magnet'
+        # There is no plot
+        assert not parser.plot_outline
