@@ -16,8 +16,12 @@ from sqlalchemy.orm import relation
 from flexget import schema
 from flexget.utils.sqlalchemy_utils import table_add_column, table_schema
 
+'''
+Flexget Dev API Key for Trakt.tv
+6c228565a45a302e49fb7d2dab066c9ab948b7be
+'''
 
-api_key = [apikey]
+api_key = '6c228565a45a302e49fb7d2dab066c9ab948b7be/'
 search_show = 'http://api.trakt.tv/search/shows.json/'
 episode_summary = 'http://api.trakt.tv/show/episode/summary.json/'
 show_summary = 'http://api.trakt.tv/show/summary.json/'
@@ -107,8 +111,9 @@ def lookup_series(title=None, tvdb_id=None, only_cached=False, session=None):
         if not series:
             found = session.query(TraktSearchResults). \
                 filter(func.lower(TraktSearchResults.search) == title.lower()).first()
-                if found and found.series:
-                    series = found.series
+            if found and found.series:
+                series = found.series
+
     if series:
         series.update()
         except LookupError as e:
