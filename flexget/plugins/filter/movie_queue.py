@@ -15,6 +15,7 @@ from flexget.event import event
 
 try:
     from flexget.plugins.filter import queue_base
+    from flexget.plugins.filter.queue_base import QueueError
 except ImportError:
     raise DependencyError(issued_by='movie_queue', missing='queue_base',
                           message='movie_queue requires the queue_base plugin')
@@ -109,16 +110,6 @@ class FilterMovieQueue(queue_base.FilterQueueBase):
         if movie and movie.quality_req.allows(quality):
             return movie
 
-
-class QueueError(Exception):
-    """Exception raised if there is an error with a queue operation"""
-
-    # TODO: I think message was removed from exception baseclass and is now masked
-    # some other custom exception (DependencyError) had to make so tweaks to make it work ..
-
-    def __init__(self, message, errno=0):
-        self.message = message
-        self.errno = errno
 
 
 @with_session
