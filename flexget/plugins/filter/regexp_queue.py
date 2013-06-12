@@ -66,6 +66,8 @@ def queue_add(regexp=None, quality=None, session=None):
     # check if that regexp is already known
     item = session.query(QueuedRegexp).filter(QueuedRegexp.regexp == regexp).first()
 
+    quality = quality or qualities.Requirements('any')
+
     if not item:
         item = QueuedRegexp(regexp=regexp, quality=quality.text)
         session.add(item)
@@ -77,5 +79,51 @@ def queue_add(regexp=None, quality=None, session=None):
         else:
             raise QueueError('ERROR: %s is already in the queue' % regexp)
 
+
+@with_session
+def queue_del(regexp=None, session=None):
+    """
+    Delete the given item from the queue.
+    :param regexp: Regexp that should match to accept an entry
+    :param session: Optional session to use for database updates
+    """
+    log.debug('queue_del - regexp=%s' % regexp)
+    query = session.query(QueuedRegexp).filter(QueuedRegexp.regexp == regexp)
+    try:
+        item = query.one()
+        regexp = item.regexp
+        session.delete(item)
+        return regexp
+    except NoResultFound as e:
+        raise QueueError('regexp=%s' % (regexp))
+
+@with_session
+def queue_edit(regexp, quality, session=None):
+    """
+    :param regexp: Regexp to edit
+    :param quality: New Quality
+    :param session: Optional session to use, new session used otherwise
+    """
+    try:
+        item = session.query(QueuedRegexp).filter(QueuedRegexp.regexp == regexp).one()
+        item.quality = quality
+
+        return item.regexp
+    except NoResultFound as e:
+        raise QueueError('regexp=%s not found from queue' % (regexp))
+
+@with_session
+def queue_get(session, downloaded=False):
+    """
+    Get the current regexp queue
+
+    :param session: New session is used if not given
+    :param downloaded: Wheter or not to return only downloaded
+    :return: List of QueuedRegexp (deatched from session)
+    """
+    if not downloaded:
+        return session.query(QueuedRegexp).filter(QueueRegexp.downloaded == None).all()
+    else:
+        return session.query(QueuedRegexp).filter(QueueRegexp.downloaded != None).all()
 
 register_plugin(FilterRegexpQueue, 'regexp_queue', api_ver=2)
