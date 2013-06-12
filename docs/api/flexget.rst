@@ -65,16 +65,27 @@ flexget Package
     :undoc-members:
     :show-inheritance:
 
-:mod:`schema` Module
+:mod:`db_schema` Module
 --------------------
 
-.. automodule:: flexget.schema
+.. automodule:: flexget.db_schema
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`config_schema` Module
+--------------------
+
+.. automodule:: flexget.config_schema
     :members:
     :undoc-members:
     :show-inheritance:
 
 :mod:`validator` Module
 -----------------------
+
+.. deprecated:: 1.1
+    Use :mod:`config_schema` instead
 
 .. automodule:: flexget.validator
     :members:
