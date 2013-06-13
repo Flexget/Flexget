@@ -36,7 +36,6 @@ class TVRageSeries(Base):
     last_update = Column(DateTime)              # last time we updated the db for the show
 
     def __init__(self, series):
-        # TODO init with tvrage object
         self.name = series.name.lower()
         self.showid = series.showid
         self.link = series.link
@@ -55,15 +54,11 @@ class TVRageSeries(Base):
                 self.episodes.append(episode)
 
     @with_session
-    def season(self, seasonnum, session=None):
-        count = session.query(TVRageEpisodes).\
-                    filter(TVRageEpisodes.tvrage_series_id == self.id).\
-                    filter(TVRageEpisodes.seasonnum == seasonnum).\
-                    count()
-        if count == 0:
-            return None
-        res = TVRageSeason(self, seasonnum)
-        return res
+    def episode(self, seasonnum, episodenum, session=None):
+        return session.query(TVRageEpisodes).\
+            filter(TVRageEpisodes.tvrage_series_id == self.id).\
+            filter(TVRageEpisodes.seasonnum == seasonnum).\
+            filter(TVRageEpisodes.epnum == episodenum).first()
 
     def __str__(self):
         return '<TvrageSeries(title=%s,id=%s,last_update=%s)>' % (self.name, self.id, self.last_update)
@@ -71,22 +66,6 @@ class TVRageSeries(Base):
     def finnished(self):
         return self.ended != 0
 
-class TVRageSeason(object):
-    def __init__(self,series,seasonnum):
-        self.series = series
-        self.seasonnum = seasonnum
-
-    @with_session
-    def episode(self, episodenum, session=None):
-        res = session.query(TVRageEpisodes).\
-            filter(TVRageEpisodes.tvrage_series_id == self.series.id).\
-            filter(TVRageEpisodes.seasonnum == self.seasonnum).\
-            filter(TVRageEpisodes.epnum == episodenum).first()
-        return res
-
-
-    def __str__(self):
-        return '<TVRageSeason(title=%s,season=%s)>' % (self.series.name, self.seasonnum)
 
 class TVRageEpisodes(Base):
     __tablename__ = 'tvrage_episode'
@@ -100,7 +79,6 @@ class TVRageEpisodes(Base):
     title = Column(String)
 
     def __init__(self, ep):
-        # TODO init with tvrage object
         self.epnum = ep.number
         self.seasonnum = ep.season
         self.prodnum = ep.prodnumber
@@ -114,15 +92,16 @@ class TVRageEpisodes(Base):
     """
         Returns the next episode from this episode
     """
-    def next(self):
+    @with_session
+    def next(self, session=None):
         res = session.query(TVRageEpisodes).\
-            filter(TVRageEpisodes.tvrage_series_id == self.series.tvrage_series_id).\
+            filter(TVRageEpisodes.tvrage_series_id == self.tvrage_series_id).\
             filter(TVRageEpisodes.seasonnum == self.seasonnum).\
-            filter(TVRageEpisodes.epnum == episodenum+1).first()
+            filter(TVRageEpisodes.epnum == self.epnum+1).first()
         if res is not None:
             return res
         return session.query(TVRageEpisodes).\
-            filter(TVRageEpisodes.tvrage_series_id == self.series.tvrage_series_id).\
+            filter(TVRageEpisodes.tvrage_series_id == self.tvrage_series_id).\
             filter(TVRageEpisodes.seasonnum == self.seasonnum+1).\
             filter(TVRageEpisodes.epnum == 1).first()
 

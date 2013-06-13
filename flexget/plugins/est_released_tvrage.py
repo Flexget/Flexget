@@ -24,15 +24,9 @@ class EstimatesReleasedTVRage(object):
                 log.debug('No series info obtained from TVRage to %s' % entry['series_name'])
                 return None
             try:
-                season_info = series_info.season(season)
-                if season_info:
-                    episode_info = season_info.episode(entry['series_episode'])
-                    if episode_info:
-                        return episode_info.airdate
-            # this may occur if we ask for a season or an episode that doesn't exists and we don't want a messy log
-            # with "normal" exception
-            except KeyError as e:
-                return None
+                episode_info = series_info.episode(season, entry['series_episode'])
+                if episode_info:
+                    return episode_info.airdate
             except Exception as e:
                 log.exception(e)
 
