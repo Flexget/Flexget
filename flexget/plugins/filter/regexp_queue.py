@@ -1,6 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
 
+import re
+
 from sqlalchemy import Column, Boolean, String, ForeignKey, Integer, and_
 from sqlalchemy.orm.exc import NoResultFound
 
@@ -47,8 +49,8 @@ class FilterRegexpQueue(queue_base.FilterQueueBase):
         expressions = filter(lambda exp: exp.quality_req.allows(quality), expressions)
 
         # compile all the expressions and check if they match
-        compile = lambda exp: re.compile(exp.regexp, re.IGNORECASE | rc.UNICODE)
-        expressions = filter(lambda exp: compile(exp).matches(title), expressions)
+        compile = lambda exp: re.compile(exp.regexp, re.IGNORECASE | re.UNICODE)
+        expressions = filter(lambda exp: compile(exp).search(title), expressions)
 
         # all left over expressions fit the quality and match
         if len(expressions) > 0:
@@ -126,9 +128,9 @@ def queue_get(session, downloaded=False):
     :return: List of QueuedRegexp (deatched from session)
     """
     if not downloaded:
-        return session.query(QueuedRegexp).filter(QueueRegexp.downloaded == None).all()
+        return session.query(QueuedRegexp).filter(QueuedRegexp.downloaded == None).all()
     else:
-        return session.query(QueuedRegexp).filter(QueueRegexp.downloaded != None).all()
+        return session.query(QueuedRegexp).filter(QueuedRegexp.downloaded != None).all()
 
 
 register_plugin(FilterRegexpQueue, 'regexp_queue', api_ver=2)
