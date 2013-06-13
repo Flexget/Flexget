@@ -8,6 +8,7 @@ class TestTvRage(FlexGetBase):
 
     def test_setdefault(self):
         friends = lookup_series("Friends")
+        friends = lookup_series("Friends")
         s1e22 = friends.episode(1,22)
         log.info("s1e22 %s " % s1e22)
 
