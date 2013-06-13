@@ -5,9 +5,10 @@ import datetime
 from sqlalchemy import Column, Integer, DateTime, String, Index, Boolean, ForeignKey
 from sqlalchemy.orm import relation
 
+from flexget.event import event
 from flexget.utils.database import with_session
 from flexget import db_schema
-
+from flexget.utils.tools import parse_timedelta
 
 log = logging.getLogger('api_tvrage')
 cache = {}    # we ll set episode in the cache to speed things up if multiple session ask for same show (now need to persist it ?)
@@ -18,7 +19,14 @@ cache = {}    # we ll set episode in the cache to speed things up if multiple se
     python-tvrage itself.
 """
 Base = db_schema.versioned_base('tvrage', 0)
+update_interval = '7 days'
 
+@event('manager.db_cleanup')
+def db_cleanup(session):
+    value = datetime.datetime.now() - parse_timedelta('30 days')
+    for de in session.query(TVRageSeries).filter(TVRageSeries.last_update <= value).all():
+        log.debug('deleting %s' % de)
+        session.delete(de)
 
 class TVRageSeries(Base):
     __tablename__ = 'tvrage_series'
@@ -105,13 +113,21 @@ class TVRageEpisodes(Base):
             filter(TVRageEpisodes.seasonnum == self.seasonnum+1).\
             filter(TVRageEpisodes.epnum == 1).first()
 
+
 @with_session
 def lookup_series(name=None, session=None):
     # TODO : Maybe find a better way to find a match from a name, so far series are named in lowercase
-    res = session.query(TVRageSeries).filter(TVRageSeries.name==name.lower()).first()
-    # TODO : if too old result update
+    res = session.query(TVRageSeries).filter(TVRageSeries.name == name.lower()).first()
+
     if res is not None:
-        return res
+        # if too old result, clean the db and refetch it
+        interval = parse_timedelta(update_interval)
+        if datetime.datetime.now() > res.last_update+interval:
+            log.info("Refetching tvrage info.")
+            session.delete(res)
+        else:
+            return res
+    log.info("Data not found, fetching tvrage info for %s" % name)
     fetched = tvrage.api.Show(name)
     series = TVRageSeries(fetched)
     session.add(series)
