@@ -1,4 +1,4 @@
-import tvrage.api
+import tvrage.api   #  See https://github.com/ckreutzer/python-tvrage for more details, it's pretty classic.
 import logging
 import datetime
 
@@ -11,15 +11,10 @@ from flexget import db_schema
 from flexget.utils.tools import parse_timedelta
 
 log = logging.getLogger('api_tvrage')
-cache = {}    # we ll set episode in the cache to speed things up if multiple session ask for same show (now need to persist it ?)
 
-"""
-    See https://github.com/ckreutzer/python-tvrage for more details, it's pretty classic.
-    A cache could be handy to avoid querying informations but I guess it should be implemented in
-    python-tvrage itself.
-"""
 Base = db_schema.versioned_base('tvrage', 0)
 update_interval = '7 days'
+
 
 @event('manager.db_cleanup')
 def db_cleanup(session):
@@ -27,6 +22,7 @@ def db_cleanup(session):
     for de in session.query(TVRageSeries).filter(TVRageSeries.last_update <= value).all():
         log.debug('deleting %s' % de)
         session.delete(de)
+
 
 class TVRageSeries(Base):
     __tablename__ = 'tvrage_series'
