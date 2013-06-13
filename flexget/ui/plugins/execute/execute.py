@@ -2,8 +2,7 @@ from __future__ import unicode_literals, division, absolute_import
 import logging
 from Queue import Empty
 from flask import render_template, request, flash
-from flask import Module, escape
-from flask.helpers import jsonify
+from flask import Module, escape, jsonify
 from flexget.ui.webui import register_plugin, manager, executor
 from flexget.ui.executor import BufferQueue
 
