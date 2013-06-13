@@ -24,8 +24,7 @@ class TVRageSeries(Base):
     __tablename__ = 'tvrage_series'
     id = Column(Integer, primary_key=True)
     name = Column(String, index=True)
-    # TODO : Check the delete is cascade
-    episodes = relation('TVRageEpisodes', order_by='TVRageEpisodes.seasonnum, TVRageEpisodes.epnum')
+    episodes = relation('TVRageEpisodes', order_by='TVRageEpisodes.seasonnum, TVRageEpisodes.epnum', cascade='all, delete, delete-orphan')
     showid = Column(String)
     link = Column(String)
     classification = Column(String)
@@ -54,7 +53,7 @@ class TVRageSeries(Base):
             for j in season.keys():
                 episode = TVRageEpisodes(season.episode(j))
                 self.episodes.append(episode)
-    
+
     @with_session
     def season(self, seasonnum, session=None):
         count = session.query(TVRageEpisodes).\
@@ -68,6 +67,9 @@ class TVRageSeries(Base):
 
     def __str__(self):
         return '<TvrageSeries(title=%s,id=%s,last_update=%s)>' % (self.name, self.id, self.last_update)
+
+    def finnished(self):
+        return self.ended != 0
 
 class TVRageSeason(object):
     def __init__(self,series,seasonnum):
@@ -109,12 +111,24 @@ class TVRageEpisodes(Base):
     def __str__(self):
         return '<TVRageEpisodes(title=%s,id=%s,season=%s,episode=%s)>' % (self.title, self.id, self.seasonnum, self.epnum)
 
-
-
-
+    """
+        Returns the next episode from this episode
+    """
+    def next(self):
+        res = session.query(TVRageEpisodes).\
+            filter(TVRageEpisodes.tvrage_series_id == self.series.tvrage_series_id).\
+            filter(TVRageEpisodes.seasonnum == self.seasonnum).\
+            filter(TVRageEpisodes.epnum == episodenum+1).first()
+        if res is not None:
+            return res
+        return session.query(TVRageEpisodes).\
+            filter(TVRageEpisodes.tvrage_series_id == self.series.tvrage_series_id).\
+            filter(TVRageEpisodes.seasonnum == self.seasonnum+1).\
+            filter(TVRageEpisodes.epnum == 1).first()
 
 @with_session
 def lookup_series(name=None, session=None):
+    # TODO : Maybe find a better way to find a match from a name, so far series are named in lowercase
     res = session.query(TVRageSeries).filter(TVRageSeries.name==name.lower()).first()
     # TODO : if too old result update
     if res is not None:
