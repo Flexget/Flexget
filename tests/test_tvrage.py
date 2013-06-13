@@ -21,4 +21,4 @@ class TestTvRage(FlexGetBase):
         e32 = s1.episode(32)
         log.info("e32 %s " % e32)
         assert not e32
-        
+        assert show.finnished()
