@@ -827,6 +827,15 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
                 log.trace('No entries found for %s this run.', series_name)
                 continue
 
+            # configuration always overrides everything
+            if series_config.get('identified_by', 'auto') != 'auto':
+                # TODO: This should be moved to task_start when we merge with emit_series branch
+                db_series.identified_by = series_config['identified_by']
+            # if series doesn't have identified_by flag already set, calculate one now that new eps are added to db
+            if not db_series.identified_by or db_series.identified_by == 'auto':
+                db_series.identified_by = self.auto_identified_by(db_series)
+                log.debug('identified_by set to \'%s\' based on series history', db_series.identified_by)
+
             log.trace('series_name: %s series_config: %s', series_name, series_config)
 
             import time
@@ -856,17 +865,11 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
 
         # set parser flags flags based on config / database
         identified_by = config.get('identified_by', 'auto')
-        series = session.query(Series).filter(Series.name == series_name).first()
-        if series:
-            # configuration always overrides everything
-            if config.get('identified_by', 'auto') != 'auto':
-                series.identified_by = config['identified_by']
-            # if series doesn't have identified_by flag already set, calculate one now
-            if not series.identified_by or series.identified_by == 'auto':
-                series.identified_by = self.auto_identified_by(series)
-                log.debug('identified_by set to \'%s\' based on series history', series.identified_by)
-            # set flag from database
-            identified_by = series.identified_by
+        if identified_by == 'auto':
+            series = session.query(Series).filter(Series.name == series_name).first()
+            if series:
+                # set flag from database
+                identified_by = series.identified_by or 'auto'
 
         params = dict(name=series_name,
                       identified_by=identified_by,
