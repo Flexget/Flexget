@@ -9,22 +9,23 @@ from tests import FlexGetBase
 class TestRegexpQueue(FlexGetBase):
     def test_add_item(self):
         regexp = 'Text.*Text'
-        assert queue_add(regexp=regexp).get('regexp') == regexp, "Regexp wasn't the same"
+        assert queue_add(regexp=regexp).regexp == regexp, "Regexp wasn't the same"
 
     def test_add_item_with_quality(self):
         regexp = "Test.*Test"
-
-        quality = Quality('flac')
-        assert queue_add(regexp=regexp, quality=quality).get('quality') == quality.text, "Quality wasn't the same"
+        quality_req = QRequirements('flac')
+        item = queue_add(regexp=regexp, quality=quality_req)
+        assert not item is None
+        assert item.quality_req.text == quality_req.text, "Quality wasn't the same"
 
     def test_del_item(self):
         regexp = 'Text.*Text'
-        obj_dict = queue_add(regexp=regexp)
-        assert queue_del(regexp=regexp) == obj_dict['regexp'], 'Didn\'t delete the right item.'
+        item = queue_add(regexp=regexp)
+        assert queue_del(regexp=regexp) == item.regexp, 'Didn\'t delete the right item.'
 
     def test_edit_item(self):
         regexp = 'Text.*Text'
-        obj_dict = queue_add(regexp=regexp)
+        item = queue_add(regexp=regexp)
         new_quality = QRequirements('flac')
         assert queue_edit(regexp=regexp, quality=new_quality.text) == regexp, 'Didn\'t edit the right item.'
         session = Session()
