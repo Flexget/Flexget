@@ -6,13 +6,6 @@ log = logging.getLogger('TestTvRage')
 
 class TestTvRage(FlexGetBase):
 
-    __yaml__ = """
-        tasks:
-          test:
-            mock:
-              - {title: 'irrelevant'}
-    """
-
     def test_setdefault(self):
         log.info("runninnngggg")
         show = lookup_series("Friends")
