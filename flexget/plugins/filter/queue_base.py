@@ -49,7 +49,7 @@ class QueueError(Exception):
     # some other custom exception (DependencyError) had to make so tweaks to make it work ..
 
     def __init__(self, message, errno=0):
-        self.message = message
+        super(QueueError, self).__init__(message)
         self.errno = errno
 
 
