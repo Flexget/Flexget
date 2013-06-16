@@ -39,7 +39,7 @@ class SearchKAT(object):
         search_string = normalize_unicode(entry['title']).lower()
         if config.get('verified'):
             search_string += ' verified:1'
-        url = 'http://kat.ph/search/%s/?rss=1' % urllib.quote(search_string.encode('utf-8'))
+        url = 'http://kickass.to/search/%s/?rss=1' % urllib.quote(search_string.encode('utf-8'))
         if config.get('category', 'all') != 'all':
             url += '&category=%s' % config['category']
 
