@@ -42,6 +42,16 @@ class QueuedItem(Base):
         super(QueuedItem, self).__init__(**kwargs)
         self.added = datetime.now()
 
+class QueueError(Exception):
+    """Exception raised if there is an error with a queue operation"""
+
+    # TODO: I think message was removed from exception baseclass and is now masked
+    # some other custom exception (DependencyError) had to make so tweaks to make it work ..
+
+    def __init__(self, message, errno=0):
+        self.message = message
+        self.errno = errno
+
 
 class FilterQueueBase(object):
     """Base class to handle general tasks of keeping a queue of wanted items."""
