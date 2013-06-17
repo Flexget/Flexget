@@ -98,20 +98,50 @@ class Entry(dict):
         if item not in self.traces:
             self.traces.append(item)
 
-    def run_hooks(self, hook, **kwargs):
-        for func in self.hooks[hook]:
+    def run_hooks(self, event, **kwargs):
+        """
+        Run hooks that have been registered for given ``event``.
+
+        :param event: Name of event to run hooks for
+        :param kwargs: Keyword arguments that should be passed to the registered functions
+        """
+        for func in self.hooks[event]:
             func(self, **kwargs)
 
     def on_accept(self, func, **kwargs):
+        """
+        Register a function to be called when this entry is accepted.
+
+        :param func: The function to call
+        :param kwargs: Keyword arguments that should be passed to the registered function
+        """
         self.hooks['accept'].append(functools.partial(func, **kwargs))
 
     def on_reject(self, func, **kwargs):
+        """
+        Register a function to be called when this entry is rejected.
+
+        :param func: The function to call
+        :param kwargs: Keyword arguments that should be passed to the registered function
+        """
         self.hooks['reject'].append(functools.partial(func, **kwargs))
 
     def on_fail(self, func, **kwargs):
+        """
+        Register a function to be called when this entry is failed.
+
+        :param func: The function to call
+        :param kwargs: Keyword arguments that should be passed to the registered function
+        """
         self.hooks['fail'].append(functools.partial(func, **kwargs))
 
     def on_complete(self, func, **kwargs):
+        """
+        Register a function to be called when a :class:`Task` has finished processing this entry.
+
+        :param func: The function to call
+        :param kwargs: Keyword arguments that should be passed to the registered function
+        """
         self.hooks['complete'].append(functools.partial(func, **kwargs))
 
     def accept(self, reason=None, **kwargs):
