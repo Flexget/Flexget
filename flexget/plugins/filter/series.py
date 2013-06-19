@@ -776,18 +776,11 @@ class FilterSeriesBase(object):
 
 @event('manager.execute.started')
 def remove_old_tasks(manager):
-    """Unmark series from tasks which have been deleted or series plugin removed"""
-    series_tasks = [task for (task, config) in manager.config.iteritems() if 'series' in config]
+    """Unmark series from tasks which have been deleted"""
     session = Session()
     try:
-        if not series_tasks:
-            # Sqlalchemy gives a warning if we provide an empty `in_`
-            deleted = session.query(SeriesTask).delete()
-        else:
-            deleted = session.query(SeriesTask).filter(not_(SeriesTask.name.in_(series_tasks))).delete()
-    except:
-        raise
-    else:
+        deleted = (session.query(SeriesTask).filter(not_(SeriesTask.name.in_(manager.config['tasks']))).
+                   delete(synchronize_session=False))
         if deleted:
             session.commit()
     finally:
@@ -840,34 +833,6 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
             self.backlog = get_plugin_by_name('backlog').instance
         except DependencyError:
             log.warning('Unable utilize backlog plugin, episodes may slip trough timeframe')
-
-    @priority(0)
-    def on_task_start(self, task):
-        """Update in the database which series are configured in this task"""
-        # TODO: This whole bit can be skipped if not task.config_modified, once import_series properly updates that flag
-        config = self.prepare_config(task.config.get('series', {}))
-        # Clear
-        task.session.query(SeriesTask).filter(SeriesTask.name == task.name).delete()
-        for series_item in config:
-            series_name, series_config = series_item.items()[0]
-            # Make sure number shows (e.g. 24) are turned into strings
-            series_name = unicode(series_name)
-            # Update database with capitalization from config
-            db_series = task.session.query(Series).filter(Series.name == series_name).first()
-            if not db_series:
-                log.debug('adding series %s into db', series_name)
-                db_series = Series()
-                db_series.name = series_name
-                task.session.add(db_series)
-                log.debug('-> added %s' % db_series)
-            db_series.in_tasks.append(SeriesTask(task.name))
-            # Set the begin episode
-            if series_config.get('begin'):
-                try:
-                    set_series_begin(db_series, series_config['begin'])
-                except ValueError as e:
-                    raise PluginError(e)
-
 
     def auto_exact(self, config):
         """Automatically enable exact naming option for series that look like a problem"""
@@ -1382,8 +1347,42 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
                 log.debug('%s is not a series', entry['title'])
 
 
+class SeriesDBManager(FilterSeriesBase):
+    """Update in the database with series info from the config"""
+
+    @priority(0)
+    def on_task_start(self, task, config):
+        if not task.config_modified:
+            return
+        task.session.query(SeriesTask).filter(SeriesTask.name == task.name).delete()
+        if not task.config.get('series'):
+            return
+        config = self.prepare_config(task.config['series'])
+        # Clear
+        for series_item in config:
+            series_name, series_config = series_item.items()[0]
+            # Make sure number shows (e.g. 24) are turned into strings
+            series_name = unicode(series_name)
+            # Update database with capitalization from config
+            db_series = task.session.query(Series).filter(Series.name == series_name).first()
+            if not db_series:
+                log.debug('adding series %s into db', series_name)
+                db_series = Series()
+                db_series.name = series_name
+                task.session.add(db_series)
+                log.debug('-> added %s' % db_series)
+            db_series.in_tasks.append(SeriesTask(task.name))
+            # Set the begin episode
+            if series_config.get('begin'):
+                try:
+                    set_series_begin(db_series, series_config['begin'])
+                except ValueError as e:
+                    raise PluginError(e)
+
+
 # Register plugin
 register_plugin(FilterSeries, 'series')
+register_plugin(SeriesDBManager, 'series_db', builtin=True, api_ver=2)
 register_parser_option('--stop-waiting', action='store', dest='stop_waiting', default='',
                        metavar='NAME', help='Stop timeframe for a given series.')
 register_parser_option('--disable-advancement', action='store_true', dest='disable_advancement', default=False,
