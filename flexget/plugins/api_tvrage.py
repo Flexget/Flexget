@@ -93,11 +93,9 @@ class TVRageEpisodes(Base):
     def __str__(self):
         return '<TVRageEpisodes(title=%s,id=%s,season=%s,episode=%s)>' % (self.title, self.id, self.seasonnum, self.epnum)
 
-    """
-        Returns the next episode from this episode
-    """
     @with_session
     def next(self, session=None):
+        """Returns the next episode after this episode"""
         res = session.query(TVRageEpisodes).\
             filter(TVRageEpisodes.tvrage_series_id == self.tvrage_series_id).\
             filter(TVRageEpisodes.seasonnum == self.seasonnum).\
@@ -124,7 +122,10 @@ def lookup_series(name=None, session=None):
         else:
             return res
     log.info("Data not found, fetching tvrage info for %s" % name)
-    fetched = tvrage.api.Show(name)
+    try:
+        fetched = tvrage.api.Show(name)
+    except tvrage.exceptions.ShowNotFound:
+        raise LookupError('Could not find show %s' % name)
     series = TVRageSeries(fetched)
     session.add(series)
     return series
