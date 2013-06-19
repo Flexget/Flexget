@@ -245,6 +245,8 @@ class Episode(Base):
 
     @hybrid_property
     def first_seen(self):
+        if not self.releases:
+            return None
         return min(release.first_seen for release in self.releases)
 
     @first_seen.expression
