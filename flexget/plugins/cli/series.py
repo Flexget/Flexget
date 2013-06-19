@@ -100,8 +100,8 @@ class SeriesReport(SeriesDatabase):
                 if name.islower():
                     name = capwords(name)
                 result[name] = {'identified_by': series.identified_by}
+                result[name]['in_tasks'] = [task.name for task in series.in_tasks]
                 episode = self.get_latest_download(series)
-
                 if episode:
                     latest = {'first_seen': episode.first_seen,
                               'episode_instance': episode,
@@ -159,7 +159,7 @@ class SeriesReport(SeriesDatabase):
                 if last_dl['first_seen'] < datetime.now() - timedelta(days=30 * 7) and behind <= 3:
                     hidden += 1
                     continue
-            else:
+            elif not data.get('in_tasks'):
                 # no recorded downloads
                 hidden += 1
                 continue
