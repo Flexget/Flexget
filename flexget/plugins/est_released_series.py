@@ -8,6 +8,11 @@ from flexget.manager import Session
 from flexget.plugin import register_plugin, priority, DependencyError
 from flexget.utils.tools import multiply_timedelta
 try:
+    from flexget.plugins.api_tvrage import lookup_series
+    api_tvrage = True
+except ImportError as e:
+    api_tvrage = False
+try:
     from flexget.plugins.filter.series import Series, Episode
 except ImportError:
     raise DependencyError(issued_by='est_released_series', missing='series plugin', silent=True)
@@ -20,15 +25,42 @@ class EstimatesReleasedSeries(object):
     @priority(0)  # Run only if better online lookups fail
     def estimate(self, entry):
         if all(field in entry for field in ['series_name', 'series_season', 'series_episode']):
+            # Try to get airdate from tvrage first
+            if api_tvrage:
+                season = entry['series_season']
+                if entry.get('series_id_type') == 'sequence':
+                    # Tvrage has absolute numbered shows under season 1
+                    season = 1
+                log.verbose("Querying release estimation for %s S%02dE%02d ..." %
+                            (entry['series_name'], season, entry['series_episode']))
+                try:
+                    series_info = lookup_series(name=entry['series_name'])
+                except LookupError as e:
+                    log.debug('tvrage lookup error: %s' % e)
+                else:
+                    if series_info:
+                        try:
+                            episode_info = series_info.episode(season, entry['series_episode'])
+                            if episode_info:
+                                return episode_info.airdate
+                        except Exception as e:
+                            log.exception(e)
+                    else:
+                        log.debug('No series info obtained from TVRage to %s' % entry['series_name'])
+
+                log.debug('No episode info obtained from TVRage for %s season %s episode %s' %
+                          (entry['series_name'], entry['series_season'], entry['series_episode']))
+
+            # If no results from tvrage, estimate a date based on series history
             session = Session()
             series = session.query(Series).filter(Series.name == entry['series_name']).first()
             if not series:
                 return
             episodes = (session.query(Episode).join(Episode.series).
-                filter(Episode.season != None).
-                filter(Series.id == series.id).
-                filter(Episode.season == func.max(Episode.season).select()).
-                order_by(desc(Episode.number)).limit(2).all())
+                        filter(Episode.season != None).
+                        filter(Series.id == series.id).
+                        filter(Episode.season == func.max(Episode.season).select()).
+                        order_by(desc(Episode.number)).limit(2).all())
             if len(episodes) < 2:
                 return
             # If last two eps were not contiguous, don't guess
