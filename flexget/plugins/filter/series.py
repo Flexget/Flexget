@@ -884,14 +884,12 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
                 continue
             # Make sure number shows (e.g. 24) are turned into strings
             series_name = unicode(series_name)
-            # Update database with capitalization from config
             db_series = task.session.query(Series).filter(Series.name == series_name).first()
-            if db_series:
-                db_series.name = series_name
-            else:
+            if not db_series:
                 log.debug('adding series %s into db', series_name)
                 db_series = Series()
                 db_series.name = series_name
+                db_series.identified_by = series_config.get('identified_by', 'auto')
                 task.session.add(db_series)
                 log.debug('-> added %s' % db_series)
             if not series_name in found_series:
@@ -1354,24 +1352,28 @@ class SeriesDBManager(FilterSeriesBase):
     def on_task_start(self, task, config):
         if not task.config_modified:
             return
+        # Clear all series from this task
         task.session.query(SeriesTask).filter(SeriesTask.name == task.name).delete()
         if not task.config.get('series'):
             return
         config = self.prepare_config(task.config['series'])
-        # Clear
         for series_item in config:
             series_name, series_config = series_item.items()[0]
             # Make sure number shows (e.g. 24) are turned into strings
             series_name = unicode(series_name)
-            # Update database with capitalization from config
             db_series = task.session.query(Series).filter(Series.name == series_name).first()
-            if not db_series:
+            if db_series:
+                # Update database with capitalization from config
+                db_series.name = series_name
+            else:
                 log.debug('adding series %s into db', series_name)
                 db_series = Series()
                 db_series.name = series_name
                 task.session.add(db_series)
                 log.debug('-> added %s' % db_series)
             db_series.in_tasks.append(SeriesTask(task.name))
+            if series_config.get('identified_by', 'auto') != 'auto':
+                db_series.identified_by = series_config['identified_by']
             # Set the begin episode
             if series_config.get('begin'):
                 try:
