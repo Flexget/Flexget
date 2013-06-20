@@ -1122,7 +1122,7 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
                     continue
 
             # Just pick the best ep if we get here
-            reason = reason or 'choosing best quality'
+            reason = reason or 'choosing best available quality'
             best.accept(reason)
 
     def process_propers(self, config, episode, entries):

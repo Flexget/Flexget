@@ -108,6 +108,16 @@ class Entry(dict):
         for func in self.hooks[event]:
             func(self, **kwargs)
 
+    def add_hook(self, event, func, **kwargs):
+        """
+        Add a hook for ``event`` to this entry.
+
+        :param event: One of: 'accept', 'reject', 'fail', 'complete'
+        :param func: Function to execute when event occurs
+        :param kwargs: Keyword arguments that should be passed to ``func``
+        """
+        self.hooks[event].append(functools.partial(func, **kwargs))
+
     def on_accept(self, func, **kwargs):
         """
         Register a function to be called when this entry is accepted.
@@ -115,7 +125,7 @@ class Entry(dict):
         :param func: The function to call
         :param kwargs: Keyword arguments that should be passed to the registered function
         """
-        self.hooks['accept'].append(functools.partial(func, **kwargs))
+        self.add_hook('accept', func, **kwargs)
 
     def on_reject(self, func, **kwargs):
         """
@@ -124,7 +134,7 @@ class Entry(dict):
         :param func: The function to call
         :param kwargs: Keyword arguments that should be passed to the registered function
         """
-        self.hooks['reject'].append(functools.partial(func, **kwargs))
+        self.add_hook('reject', func, **kwargs)
 
     def on_fail(self, func, **kwargs):
         """
@@ -133,7 +143,7 @@ class Entry(dict):
         :param func: The function to call
         :param kwargs: Keyword arguments that should be passed to the registered function
         """
-        self.hooks['fail'].append(functools.partial(func, **kwargs))
+        self.add_hook('fail', func, **kwargs)
 
     def on_complete(self, func, **kwargs):
         """
@@ -142,7 +152,7 @@ class Entry(dict):
         :param func: The function to call
         :param kwargs: Keyword arguments that should be passed to the registered function
         """
-        self.hooks['complete'].append(functools.partial(func, **kwargs))
+        self.add_hook('complete', func, **kwargs)
 
     def accept(self, reason=None, **kwargs):
         if self.rejected:
