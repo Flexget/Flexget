@@ -1,10 +1,11 @@
 __author__ = 'deksan'
 
 import logging
-import feedparser
 import urllib
-
 from urlparse import urlparse
+
+import feedparser
+
 from flexget import validator
 from flexget.entry import Entry
 from flexget.plugin import register_plugin
@@ -17,7 +18,7 @@ log = logging.getLogger('newznab')
 class Newznab(object):
     """
     Newznab search plugin
-    Provide a url or your webiste + apikey and a category
+    Provide a url or your website + apikey and a category
 
     Config example::
 
@@ -51,9 +52,9 @@ class Newznab(object):
         if 'url' not in config:
             if 'apikey' in config and 'website' in config:
                 params = {
-                    "t": config['category'],
-                    "apikey": config['apikey'],
-                    "extended": 1
+                    't': config['category'],
+                    'apikey': config['apikey'],
+                    'extended': 1
                 }
                 config['url'] = config['website']+'/api?'+urllib.urlencode(params)
         parsed_url = urlparse(config['url'])
@@ -70,21 +71,21 @@ class Newznab(object):
             raise
 
         if not len(rss.entries):
-            log.info("No results returned")
+            log.info('No results returned')
 
         for rss_entry in rss.entries:
             new_entry = Entry()
             for key in rss_entry.keys():
                 new_entry[key] = rss_entry[key]
-            new_entry["url"] = new_entry["link"]
+            new_entry['url'] = new_entry['link']
             entries.append(new_entry)
         return entries
 
     def search(self, entry, config=None):
         config = self.build_config(config)
-        if config["category"] == "movie":
+        if config['category'] == 'movie':
             return self.do_search_movie(entry, config)
-        elif config["category"] == "tvsearch":
+        elif config['category'] == 'tvsearch':
             return self.do_search_tvsearch(entry, config)
         else:
             entries = []
@@ -92,7 +93,7 @@ class Newznab(object):
             return entries
 
     def do_search_tvsearch(self, arg_entry, config=None):
-        log.info("Searching for %s" % (arg_entry["title"]))
+        log.info('Searching for %s' % (arg_entry['title']))
         # normally this should be used with emit_series who has provided season and episodenumber
         if 'series_name' not in arg_entry or 'series_season' not in arg_entry or 'series_episode' not in arg_entry:
             return []
@@ -100,18 +101,19 @@ class Newznab(object):
         if not serie_info:
             return []
 
-        url = config['url'] + "&rid=" + str(serie_info.showid) + "&season=" + str(arg_entry['series_season']) + "&ep=" + str(arg_entry['series_episode'])
+        url = (config['url'] + '&rid=%s&season=%s&ep=%s' %
+               (serie_info.showid, arg_entry['series_season'], arg_entry['series_episode']))
         return self.fill_entries_for_url(url, config)
 
     def do_search_movie(self, arg_entry, config=None):
         entries = []
-        log.info("Searching for %s (imdbid:%s) " % (arg_entry["title"], arg_entry["imdb_id"]))
+        log.info('Searching for %s (imdbid:%s)' % (arg_entry['title'], arg_entry['imdb_id']))
         # normally this should be used with emit_movie_queue who has imdbid (i guess)
         if 'imdb_id' not in arg_entry:
             return entries
 
-        imdb_id = arg_entry["imdb_id"].replace('tt', '')
-        url = config['url'] + "&imdbid=" + imdb_id
+        imdb_id = arg_entry['imdb_id'].replace('tt', '')
+        url = config['url'] + '&imdbid=' + imdb_id
         return self.fill_entries_for_url(url, config)
 
 register_plugin(Newznab, 'newznab', api_ver=2, groups=['search'])
