@@ -34,40 +34,36 @@ class UrlRewriteNyaa(object):
             config = {'category': config}
         config.setdefault('category', 'anime')
         config.setdefault('filter', 'all')
-        name = normalize_unicode(entry['title'])
-        url = 'http://www.nyaa.eu/?page=rss&cats=%s&filter=%s&term=%s' % (
-              CATEGORIES[config['category']], FILTERS.index(config['filter']), urllib.quote(name.encode('utf-8')))
+        entries = set()
+        for search_string in entry.get('search_strings', [entry['title']]):
+            name = normalize_unicode(search_string)
+            url = 'http://www.nyaa.eu/?page=rss&cats=%s&filter=%s&term=%s' % (
+                  CATEGORIES[config['category']], FILTERS.index(config['filter']), urllib.quote(name.encode('utf-8')))
 
-        log.debug('requesting: %s' % url)
-        rss = feedparser.parse(url)
-        entries = []
+            log.debug('requesting: %s' % url)
+            rss = feedparser.parse(url)
 
-        status = rss.get('status', False)
-        if status != 200:
-            raise PluginWarning('Search result not 200 (OK), received %s' % status)
+            status = rss.get('status', False)
+            if status != 200:
+                raise PluginWarning('Search result not 200 (OK), received %s' % status)
 
-        ex = rss.get('bozo_exception', False)
-        if ex:
-            raise PluginWarning('Got bozo_exception (bad feed)')
+            ex = rss.get('bozo_exception', False)
+            if ex:
+                raise PluginWarning('Got bozo_exception (bad feed)')
 
-        for item in rss.entries:
+            for item in rss.entries:
 
-            entry = Entry()
-            entry['title'] = item.title
-            entry['url'] = item.link
-            # TODO: parse some shit
-            #entry['torrent_seeds'] = int(item.seeds)
-            #entry['torrent_leeches'] = int(item.leechs)
-            #entry['search_sort'] = torrent_availability(entry['torrent_seeds'], entry['torrent_leeches'])
-            #entry['content_size'] = int(item.size) / 1024 / 1024
+                entry = Entry()
+                entry['title'] = item.title
+                entry['url'] = item.link
+                # TODO: parse some shit
+                #entry['torrent_seeds'] = int(item.seeds)
+                #entry['torrent_leeches'] = int(item.leechs)
+                #entry['search_sort'] = torrent_availability(entry['torrent_seeds'], entry['torrent_leeches'])
+                #entry['content_size'] = int(item.size) / 1024 / 1024
 
-            entries.append(entry)
+                entries.add(entry)
 
-        # choose torrent
-        if not entries:
-            raise PluginWarning('No matches for %s' % name, log, log_once=True)
-
-        entries.sort(reverse=True, key=lambda x: x.get('search_sort'))
         return entries
 
     def url_rewritable(self, task, entry):

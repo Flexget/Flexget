@@ -35,10 +35,10 @@ class NewTorrents:
         url = entry['url']
         if (url.startswith('http://www.newtorrents.info/?q=') or
            url.startswith('http://www.newtorrents.info/search')):
-            try:
-                url = self.entries_from_search(entry['title'], url=url)[0]['url']
-            except PluginWarning as e:
-                raise UrlRewritingError(e.value)
+            results = self.entries_from_search(entry['title'], url=url)
+            if not results:
+                raise UrlRewritingError("No matches for %s" % entry['title'])
+            url = results[0]['url']
         else:
             url = self.url_from_page(url)
 
@@ -50,7 +50,10 @@ class NewTorrents:
 
     # Search plugin API
     def search(self, entry, config=None):
-        return self.entries_from_search(entry['title'])
+        entries = set()
+        for search_string in entry.get('search_string', [entry['title']]):
+            entries.update(self.entries_from_search(search_string))
+        return entries
 
     @internet(log)
     def url_from_page(self, url):
@@ -110,7 +113,7 @@ class NewTorrents:
             if dashindex != -1:
                 return self.entries_from_search(name[:dashindex])
             else:
-                raise PluginWarning('No matches for %s' % name, log, log_once=True)
+                return torrents
         else:
             if len(torrents) == 1:
                 log.debug('found only one matching search result.')

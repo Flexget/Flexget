@@ -1,19 +1,16 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
-from flexget.plugin import register_plugin
+
+from flexget.plugin import register_plugin, priority
 
 log = logging.getLogger('entry_trace')
 
 
-def entry_action_factory(action):
-
-    def on_entry_action(self, task, entry, **kwargs):
-        reason = kwargs.get('reason')
-        entry[action.lower() + '_by'] = task.current_plugin
-        entry.pop('reason', None)
-        if reason:
-            entry['reason'] = reason
-    return on_entry_action
+def on_entry_action(entry, act=None, task=None, reason=None, **kwargs):
+    entry[act.lower() + '_by'] = task.current_plugin
+    entry.pop('reason', None)
+    if reason:
+        entry['reason'] = reason
 
 
 class EntryOperations(object):
@@ -29,9 +26,12 @@ class EntryOperations(object):
       reason: <given message by plugin>
     """
 
-    on_entry_accept = entry_action_factory('accepted')
-    on_entry_reject = entry_action_factory('rejected')
-    on_entry_fail = entry_action_factory('failed')
+    @priority(-255)
+    def on_task_input(self, task, config):
+        for entry in task.all_entries:
+            entry.on_accept(on_entry_action, act='accepted', task=task)
+            entry.on_reject(on_entry_action, act='rejected', task=task)
+            entry.on_fail(on_entry_action, act='failed', task=task)
 
 
-register_plugin(EntryOperations, 'entry_operations', builtin=True)
+register_plugin(EntryOperations, 'entry_operations', builtin=True, api_ver=2)

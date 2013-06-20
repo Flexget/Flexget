@@ -41,43 +41,39 @@ class UrlRewriteTorrentz(object):
             feed = REPUTATIONS[config]
         else:
             feed = REPUTATIONS['good']
-        query = normalize_unicode(entry['title'])
-        # urllib.quote will crash if the unicode string has non ascii characters, so encode in utf-8 beforehand
-        url = 'http://torrentz.eu/%s?q=%s' % (feed, urllib.quote(query.encode('utf-8')))
-        log.debug('requesting: %s' % url)
-        rss = feedparser.parse(url)
-        entries = []
+        entries = set()
+        for search_string in entry.get('search_string', [entry['title']]):
+            query = normalize_unicode(search_string)
+            # urllib.quote will crash if the unicode string has non ascii characters, so encode in utf-8 beforehand
+            url = 'http://torrentz.eu/%s?q=%s' % (feed, urllib.quote(query.encode('utf-8')))
+            log.debug('requesting: %s' % url)
+            rss = feedparser.parse(url)
 
-        status = rss.get('status', False)
-        if status != 200:
-            raise PluginWarning('Search result not 200 (OK), received %s' % status)
+            status = rss.get('status', False)
+            if status != 200:
+                raise PluginWarning('Search result not 200 (OK), received %s' % status)
 
-        ex = rss.get('bozo_exception', False)
-        if ex:
-            raise PluginWarning('Got bozo_exception (bad feed)')
+            ex = rss.get('bozo_exception', False)
+            if ex:
+                raise PluginWarning('Got bozo_exception (bad feed)')
 
-        for item in rss.entries:
-            m = re.search(r'Size: ([\d]+) Mb Seeds: ([,\d]+) Peers: ([,\d]+) Hash: ([a-f0-9]+)',
-                          item.description, re.IGNORECASE)
-            if not m:
-                log.debug('regexp did not find seeds / peer data')
-                continue
+            for item in rss.entries:
+                m = re.search(r'Size: ([\d]+) Mb Seeds: ([,\d]+) Peers: ([,\d]+) Hash: ([a-f0-9]+)',
+                              item.description, re.IGNORECASE)
+                if not m:
+                    log.debug('regexp did not find seeds / peer data')
+                    continue
 
-            entry = Entry()
-            entry['title'] = item.title
-            entry['url'] = item.link
-            entry['content_size'] = int(m.group(1))
-            entry['torrent_seeds'] = int(m.group(2).replace(',', ''))
-            entry['torrent_leeches'] = int(m.group(3).replace(',', ''))
-            entry['torrent_info_hash'] = m.group(4).upper()
-            entry['search_sort'] = torrent_availability(entry['torrent_seeds'], entry['torrent_leeches'])
-            entries.append(entry)
+                entry = Entry()
+                entry['title'] = item.title
+                entry['url'] = item.link
+                entry['content_size'] = int(m.group(1))
+                entry['torrent_seeds'] = int(m.group(2).replace(',', ''))
+                entry['torrent_leeches'] = int(m.group(3).replace(',', ''))
+                entry['torrent_info_hash'] = m.group(4).upper()
+                entry['search_sort'] = torrent_availability(entry['torrent_seeds'], entry['torrent_leeches'])
+                entries.add(entry)
 
-        # choose torrent
-        if not entries:
-            raise PluginWarning('No close matches for %s' % query, log, log_once=True)
-
-        entries.sort(reverse=True, key=lambda x: x.get('search_sort'))
         log.debug('Search got %d results' % len(entries))
         return entries
 
