@@ -191,8 +191,6 @@ class Task(object):
         # List of all entries in the task
         self._all_entries = EntryContainer()
 
-        self.entry_hooks = {'accept': [], 'reject': [], 'fail': [], 'complete': []}
-
         self.disabled_phases = []
 
         # TODO: task.abort() should be done by using exception? not a flag that has to be checked everywhere
@@ -249,9 +247,6 @@ class Task(object):
         # Run the abort phase before we set the _abort flag
         self._abort = True
         self.__run_task_phase('abort')
-
-    def add_entry_hook(self, event, func, **kwargs):
-        self.entry_hooks[event].append((func, kwargs))
 
     def find_entry(self, category='entries', **values):
         """
@@ -331,9 +326,6 @@ class Task(object):
                     # add entries returned by input to self.all_entries
                     for e in response:
                         e.task = self
-                        for event, arglist in self.entry_hooks.iteritems():
-                            for func, kwargs in arglist:
-                                e.add_hook(event, func, **kwargs)
                     self.all_entries.extend(response)
             finally:
                 fire_event('task.execute.after_plugin', self, plugin.name)
