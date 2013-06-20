@@ -1382,6 +1382,7 @@ class SeriesDBManager(FilterSeriesBase):
 
 # Register plugin
 register_plugin(FilterSeries, 'series')
+# This is a builtin so that it can update the database for tasks that may have had series plugin removed
 register_plugin(SeriesDBManager, 'series_db', builtin=True, api_ver=2)
 register_parser_option('--stop-waiting', action='store', dest='stop_waiting', default='',
                        metavar='NAME', help='Stop timeframe for a given series.')
