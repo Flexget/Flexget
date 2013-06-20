@@ -72,7 +72,7 @@ class Entry(dict):
         self.traces = []
         self.snapshots = {}
         self._state = 'undecided'
-        self.hooks = {'accept': [], 'reject': [], 'fail': [], 'complete': []}
+        self._hooks = {'accept': [], 'reject': [], 'fail': [], 'complete': []}
         self.task = None
 
         if len(args) == 2:
@@ -98,25 +98,29 @@ class Entry(dict):
         if item not in self.traces:
             self.traces.append(item)
 
-    def run_hooks(self, event, **kwargs):
+    def run_hooks(self, action, **kwargs):
         """
-        Run hooks that have been registered for given ``event``.
+        Run hooks that have been registered for given ``action``.
 
-        :param event: Name of event to run hooks for
+        :param action: Name of action to run hooks for
         :param kwargs: Keyword arguments that should be passed to the registered functions
         """
-        for func in self.hooks[event]:
+        for func in self._hooks[action]:
             func(self, **kwargs)
 
-    def add_hook(self, event, func, **kwargs):
+    def add_hook(self, action, func, **kwargs):
         """
-        Add a hook for ``event`` to this entry.
+        Add a hook for ``action`` to this entry.
 
-        :param event: One of: 'accept', 'reject', 'fail', 'complete'
+        :param action: One of: 'accept', 'reject', 'fail', 'complete'
         :param func: Function to execute when event occurs
         :param kwargs: Keyword arguments that should be passed to ``func``
+        :raises: ValueError when given an invalid ``action``
         """
-        self.hooks[event].append(functools.partial(func, **kwargs))
+        try:
+            self._hooks[action].append(functools.partial(func, **kwargs))
+        except KeyError:
+            raise ValueError('`%s` is not a valid entry action' % action)
 
     def on_accept(self, func, **kwargs):
         """

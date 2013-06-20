@@ -16,56 +16,22 @@ log = logging.getLogger('newznab')
 
 class Newznab(object):
     """
-        Newznab urlrewriter
-        Provide a url or your webiste + apikey and a category
+    Newznab search plugin
+    Provide a url or your webiste + apikey and a category
 
-        movies:
-          movie_queue: yes
-          newznab:
-            url: "http://website/api?apikey=xxxxxxxxxxxxxxxxxxxxxxxxxx&t=movie&extended=1"
-            website: https://website
-            apikey: xxxxxxxxxxxxxxxxxxxxxxxxxx
-            category: movie
-            wait: 30 seconds
-        Category is any of: movie, tvsearch, music, book
-        wait is time between two api request in seconds (if you don't want to get banned)
+    Config example::
 
+        newznab:
+          url: "http://website/api?apikey=xxxxxxxxxxxxxxxxxxxxxxxxxx&t=movie&extended=1"
+          website: https://website
+          apikey: xxxxxxxxxxxxxxxxxxxxxxxxxx
+          category: movie
+          wait: 30 seconds
 
-        Example how to use for tv series :
-        --------------------------------------------------------------------------------
-              tvsearch:
-                series:
-                  720p+:
-                    - Your lovely show 1
-                    - Your lovely show 2
-                discover:
-                  what:
-                    - emit_series: yes
-                  from:
-                    - newznab:
-                        website: "http://www.xxxxxx.com/"
-                        apikey: "xxxxxxxxxxxxxxxxxxxxxxxxxx"
-                        category: tv
-                        wait: 3 seconds
-                make_rss:
-                  file: /tmp/output.xml
-
-        Example how to use for movies (queue is set with imdb plugins for example) :
-        --------------------------------------------------------------------------------
-              moviessearch:
-                movie_queue: yes
-                discover:
-                  what:
-                    - emit_movie_queue: yes
-                  from:
-                    - newznab:
-                        website: "http://www.xxxxxx.com/"
-                        apikey: "xxxxxxxxxxxxxxxxxxxxxxxxxx"
-                        category: movie
-                        wait: 3
-                make_rss:
-                  file: /tmp/output.xml
+    Category is any of: movie, tvsearch, music, book
+    wait is time between two api request in seconds (if you don't want to get banned)
     """
+
     def validator(self):
         """Return config validator."""
         root = validator.factory('dict')

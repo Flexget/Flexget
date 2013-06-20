@@ -1,6 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
 from flexget.utils.soup import get_soup
 
+
 class TestHtml5Lib():
 
     def test_parse_broken(self):

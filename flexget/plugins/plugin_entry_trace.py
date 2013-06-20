@@ -6,8 +6,8 @@ from flexget.plugin import register_plugin, priority
 log = logging.getLogger('entry_trace')
 
 
-def on_entry_action(entry, action=None, task=None, reason=None, **kwargs):
-    entry[action.lower() + '_by'] = task.current_plugin
+def on_entry_action(entry, act=None, task=None, reason=None, **kwargs):
+    entry[act.lower() + '_by'] = task.current_plugin
     entry.pop('reason', None)
     if reason:
         entry['reason'] = reason
@@ -29,9 +29,9 @@ class EntryOperations(object):
     @priority(-255)
     def on_task_input(self, task, config):
         for entry in task.all_entries:
-            entry.on_accept(on_entry_action, action='accepted', task=task)
-            entry.on_reject(on_entry_action, action='rejected', task=task)
-            entry.on_fail(on_entry_action, action='failed', task=task)
+            entry.on_accept(on_entry_action, act='accepted', task=task)
+            entry.on_reject(on_entry_action, act='rejected', task=task)
+            entry.on_fail(on_entry_action, act='failed', task=task)
 
 
 register_plugin(EntryOperations, 'entry_operations', builtin=True, api_ver=2)

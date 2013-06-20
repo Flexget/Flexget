@@ -1224,10 +1224,8 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
 
         if latest and latest.identified_by == episode.identified_by:
             # Allow any previous episodes this season, or previous episodes within grace if sequence mode
-            if (
-                    episode.season < latest.season or
-                    (episode.identified_by == 'sequence' and episode.number < (latest.number - grace))
-            ):
+            if (episode.season < latest.season or
+                    (episode.identified_by == 'sequence' and episode.number < (latest.number - grace))):
                 log.debug('too old! rejecting all occurrences')
                 for entry in entries:
                     entry.reject('Too much in the past from latest downloaded episode %s' % latest.identifier)
