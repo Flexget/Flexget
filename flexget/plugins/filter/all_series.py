@@ -33,6 +33,7 @@ class FilterAllSeries(FilterSeriesBase):
         group_settings = {}
         if isinstance(config, dict):
             group_settings = config
+        group_settings['identified_by'] = 'ep'
         # Generate a list of unique series that metainfo_series can parse for this task
         metainfo_series = get_plugin_by_name('metainfo_series')
         guess_entry = metainfo_series.instance.guess_entry

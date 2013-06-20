@@ -65,10 +65,11 @@ class UrlRewritePirateBay(object):
             log.debug("Got the URL: %s" % entry['url'])
         if entry['url'].startswith(('http://thepiratebay.se/search/', 'http://thepiratebay.org/search/')):
             # use search
-            try:
-                entry['url'] = self.search(entry)[0]['url']
-            except PluginWarning as e:
-                raise UrlRewritingError(e)
+            results = self.search(entry)
+            if not results:
+                raise UrlRewritingError("No search results found")
+            # TODO: Close matching was taken out of search methods, this may need to be fixed to be more picky
+            entry['url'] = results[0]['url']
         else:
             # parse download page
             entry['url'] = self.parse_download_page(entry['url'])
@@ -106,37 +107,36 @@ class UrlRewritePirateBay(object):
             category = CATEGORIES.get(config.get('category', 'all'))
         filter_url = '/0/%d/%d' % (sort, category)
 
-        query = normalize_unicode(arg_entry['title'])
-        # TPB search doesn't like dashes
-        query = query.replace('-', ' ')
-        # urllib.quote will crash if the unicode string has non ascii characters, so encode in utf-8 beforehand
-        url = 'http://thepiratebay.se/search/' + urllib.quote(query.encode('utf-8')) + filter_url
-        log.debug('Using %s as piratebay search url' % url)
-        page = requests.get(url).content
-        soup = get_soup(page)
-        entries = []
-        for link in soup.find_all('a', attrs={'class': 'detLink'}):
-            entry = Entry()
-            entry['title'] = link.contents[0]
-            entry['url'] = 'http://thepiratebay.se' + link.get('href')
-            tds = link.parent.parent.parent.find_all('td')
-            entry['torrent_seeds'] = int(tds[-2].contents[0])
-            entry['torrent_leeches'] = int(tds[-1].contents[0])
-            entry['search_sort'] = torrent_availability(entry['torrent_seeds'], entry['torrent_leeches'])
-            # Parse content_size
-            size = link.find_next(attrs={'class': 'detDesc'}).contents[0]
-            size = re.search('Size ([\.\d]+)\xa0([GMK])iB', size)
-            if size:
-                if size.group(2) == 'G':
-                    entry['content_size'] = int(float(size.group(1)) * 1000 ** 3 / 1024 ** 2)
-                elif size.group(2) == 'M':
-                    entry['content_size'] = int(float(size.group(1)) * 1000 ** 2 / 1024 ** 2)
-                else:
-                    entry['content_size'] = int(float(size.group(1)) * 1000 / 1024 ** 2)
-            entries.append(entry)
+        entries = set()
+        for search_string in arg_entry.get('search_string', [arg_entry['title']]):
+            query = normalize_unicode(search_string)
+            # TPB search doesn't like dashes
+            query = query.replace('-', ' ')
+            # urllib.quote will crash if the unicode string has non ascii characters, so encode in utf-8 beforehand
+            url = 'http://thepiratebay.se/search/' + urllib.quote(query.encode('utf-8')) + filter_url
+            log.debug('Using %s as piratebay search url' % url)
+            page = requests.get(url).content
+            soup = get_soup(page)
+            for link in soup.find_all('a', attrs={'class': 'detLink'}):
+                entry = Entry()
+                entry['title'] = link.contents[0]
+                entry['url'] = 'http://thepiratebay.se' + link.get('href')
+                tds = link.parent.parent.parent.find_all('td')
+                entry['torrent_seeds'] = int(tds[-2].contents[0])
+                entry['torrent_leeches'] = int(tds[-1].contents[0])
+                entry['search_sort'] = torrent_availability(entry['torrent_seeds'], entry['torrent_leeches'])
+                # Parse content_size
+                size = link.find_next(attrs={'class': 'detDesc'}).contents[0]
+                size = re.search('Size ([\.\d]+)\xa0([GMK])iB', size)
+                if size:
+                    if size.group(2) == 'G':
+                        entry['content_size'] = int(float(size.group(1)) * 1000 ** 3 / 1024 ** 2)
+                    elif size.group(2) == 'M':
+                        entry['content_size'] = int(float(size.group(1)) * 1000 ** 2 / 1024 ** 2)
+                    else:
+                        entry['content_size'] = int(float(size.group(1)) * 1000 / 1024 ** 2)
+                entries.add(entry)
 
-        entries.sort(reverse=True, key=lambda x: x.get('search_sort'))
-
-        return entries
+        return sorted(entries, reverse=True, key=lambda x: x.get('search_sort'))
 
 register_plugin(UrlRewritePirateBay, 'piratebay', groups=['urlrewriter', 'search'])

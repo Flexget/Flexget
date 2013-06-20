@@ -362,21 +362,20 @@ class UrlrewriteArchive(object):
         """Search plugin API method"""
 
         session = Session()
-        query = entry['title']
+        entries = set()
         try:
-            log.debug('looking for `%s` config: %s' % (query, config))
-            entries = []
-            for archive_entry in search(session, query, desc=True):
-                log.debug('rewrite search result: %s' % archive_entry)
-                entry = Entry()
-                entry.update_using_map(self.entry_map, archive_entry, 
-                                       ignore_none=True)
-                if entry.isvalid():
-                    entries.append(entry)
-            log.debug('found %i entries' % len(entries))
-            return entries
+            for query in entry.get('search_strings', [entry['title']]):
+                log.debug('looking for `%s` config: %s' % (query, config))
+                for archive_entry in search(session, query, desc=True):
+                    log.debug('rewrite search result: %s' % archive_entry)
+                    entry = Entry()
+                    entry.update_using_map(self.entry_map, archive_entry, ignore_none=True)
+                    if entry.isvalid():
+                        entries.add(entry)
         finally:
             session.close()
+        log.debug('found %i entries' % len(entries))
+        return entries
 
 
 def consolidate():

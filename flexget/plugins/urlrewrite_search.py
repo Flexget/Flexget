@@ -86,7 +86,7 @@ class PluginSearch(object):
                 try:
                     results = plugins[name].search(entry, search_config)
                     matcher = SequenceMatcher(a=entry['title'])
-                    for result in results:
+                    for result in sorted(results, key=lambda e: e.get('search_sort'), reverse=True):
                         matcher.set_seq2(result['title'])
                         if matcher.ratio() > 0.9:
                             log.debug('Found url: %s', result['url'])

@@ -1,7 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
 from flexget.utils.log import log_once
-from flexget.plugin import register_plugin, register_parser_option
+from flexget.plugin import register_plugin, register_parser_option, priority
 from flexget.task import log as task_log
 
 log = logging.getLogger('verbose')
@@ -13,32 +13,23 @@ class Verbose(object):
     Verbose entry accept, reject and failure
     """
 
-    def on_entry_accept(self, task, entry, reason='', **kwargs):
-        self.verbose_details(task, action='Accepted', title=entry['title'], reason=reason)
-
-    def on_entry_reject(self, task, entry, reason='', **kwargs):
-        self.verbose_details(task, action='Rejected', title=entry['title'], reason=reason)
-
-    def on_entry_fail(self, task, entry, reason='', **kwargs):
-        self.verbose_details(task, action='Failed', title=entry['title'], reason=reason)
-
-    def verbose_details(self, task, **kwarg):
+    @priority(-255)
+    def on_task_input(self, task, config):
         if task.manager.options.silent:
             return
-        kwarg['plugin'] = task.current_plugin
-        kwarg['action'] = kwarg['action'].upper()
+        for entry in task.all_entries:
+            entry.on_accept(self.verbose_details, task=task, act='accepted', reason='')
+            entry.on_reject(self.verbose_details, task=task, act='rejected', reason='')
+            entry.on_fail(self.verbose_details, task=task, act='failed', reason='')
 
-        if kwarg['reason'] is None:
-            msg = "%(action)s: `%(title)s` by %(plugin)s plugin"
-        else:
-            # lower capitalize first letter of reason
-            if kwarg['reason'] and len(kwarg['reason']) > 2:
-                kwarg['reason'] = kwarg['reason'][0].lower() + kwarg['reason'][1:]
-            msg = "%(action)s: `%(title)s` by %(plugin)s plugin because %(reason)s"
+    def verbose_details(self, entry, task=None, act=None, reason=None, **kwargs):
+        msg = "%s: `%s` by %s plugin" % (act.upper(), entry['title'], task.current_plugin)
+        if reason:
+            msg += 'because %s' % reason[0].lower() + reason[1:]
 
-        task_log.verbose(msg % kwarg)
+        task_log.verbose(msg)
 
-    def on_task_exit(self, task):
+    def on_task_exit(self, task, config):
         if task.manager.options.silent:
             return
         # verbose undecided entries
@@ -53,7 +44,7 @@ class Verbose(object):
                 log_once('Undecided entries have not been accepted or rejected. If you expected these to reach output,'
                          ' you must set up filter plugin(s) to accept them.', logger=log)
 
-register_plugin(Verbose, 'verbose', builtin=True)
+register_plugin(Verbose, 'verbose', builtin=True, api_ver=2)
 register_parser_option('-v', '--verbose', action='store_true', dest='verbose', default=False,
                        help='Verbose undecided entries.')
 register_parser_option('-s', '--silent', action='store_true', dest='silent', default=False,

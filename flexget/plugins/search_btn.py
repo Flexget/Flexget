@@ -25,10 +25,14 @@ class SearchBTN(object):
         if 'series_name' in entry:
             search = {'series': entry['series_name']}
             if 'series_id' in entry:
-                search['name'] = entry['series_id']
+                # BTN wants an ep style identifier even for sequence shows
+                if entry.get('series_id_type') == 'sequence':
+                    search['name'] = 'S01E%02d' % entry['series_id']
+                else:
+                    search['name'] = entry['series_id']
             searches = [search]
 
-        results = []
+        results = set()
         for search in searches:
             data = json.dumps({'method': 'getTorrents', 'params': [api_key, search], 'id': 1})
             try:
@@ -37,20 +41,21 @@ class SearchBTN(object):
                 log.error('Error searching btn: %s' % e)
                 continue
             content = r.json()
-            if content['result']['results']:
+            if 'torrents' in content['result']:
                 for item in content['result']['torrents'].itervalues():
                     if item['Category'] != 'Episode':
                         continue
                     entry = Entry()
                     entry['title'] = item['ReleaseName']
                     entry['url'] = item['DownloadURL']
+                    entry['description'] = ' '.join([item['Resolution'], item['Source'], item['Codec']])
                     entry['torrent_seeds'] = int(item['Seeders'])
                     entry['torrent_leeches'] = int(item['Leechers'])
                     entry['torrent_info_hash'] = item['InfoHash']
                     entry['search_sort'] = torrent_availability(entry['torrent_seeds'], entry['torrent_leeches'])
                     if item['TvdbID']:
                         entry['tvdb_id'] = int(item['TvdbID'])
-                    results.append(entry)
+                    results.add(entry)
         return results
 
 
