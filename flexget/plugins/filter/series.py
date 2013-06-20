@@ -657,7 +657,7 @@ class FilterSeriesBase(object):
                 # Begin takes an ep, sequence or date identifier
                 'begin': {
                     'oneOf': [
-                        {'name': 'ep identifier', 'type': 'string', 'pattern': r'^S\d{2}E\d{2,3}$',
+                        {'name': 'ep identifier', 'type': 'string', 'pattern': r'(?i)^S\d{2}E\d{2,3}$',
                          'error_pattern': 'episode identifiers should be in the form `SxxEyy`'},
                         {'name': 'date identifier', 'type': 'string', 'pattern': r'^\d{4}-\d{2}-\d{2}$',
                          'error_pattern': 'date identifiers must be in the form `YYYY-MM-DD`'},
