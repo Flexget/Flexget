@@ -1,4 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
+import hashlib
 import logging
 
 from sqlalchemy import Column, Integer, Unicode
@@ -72,7 +73,7 @@ class ImportSeries(FilterSeriesBase):
                     s['set'] = {'tvdb_id': entry['tvdb_id']}
 
         # Set the config_modified flag if the list of shows changed since last time
-        new_hash = unicode(hash(unicode(sorted(series))))
+        new_hash = hashlib.md5(unicode(sorted(series))).hexdigest().decode('ascii')
         last_hash = task.session.query(LastHash).filter(LastHash.task == task.name).first()
         if not last_hash:
             last_hash = LastHash(task=task.name)

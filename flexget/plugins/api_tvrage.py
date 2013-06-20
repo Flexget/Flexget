@@ -28,7 +28,8 @@ class TVRageSeries(Base):
     __tablename__ = 'tvrage_series'
     id = Column(Integer, primary_key=True)
     name = Column(String, index=True)
-    episodes = relation('TVRageEpisodes', order_by='TVRageEpisodes.seasonnum, TVRageEpisodes.epnum', cascade='all, delete, delete-orphan')
+    episodes = relation('TVRageEpisodes', order_by='TVRageEpisodes.season, TVRageEpisodes.episode',
+                        cascade='all, delete, delete-orphan')
     showid = Column(String)
     link = Column(String)
     classification = Column(String)
@@ -58,16 +59,16 @@ class TVRageSeries(Base):
                 self.episodes.append(episode)
 
     @with_session
-    def episode(self, seasonnum, episodenum, session=None):
-        return session.query(TVRageEpisodes).\
-            filter(TVRageEpisodes.tvrage_series_id == self.id).\
-            filter(TVRageEpisodes.seasonnum == seasonnum).\
-            filter(TVRageEpisodes.epnum == episodenum).first()
+    def find_episode(self, season, episode, session=None):
+        return (session.query(TVRageEpisodes).
+                filter(TVRageEpisodes.tvrage_series_id == self.id).
+                filter(TVRageEpisodes.season == season).
+                filter(TVRageEpisodes.episode == episode).first())
 
     def __str__(self):
         return '<TvrageSeries(title=%s,id=%s,last_update=%s)>' % (self.name, self.id, self.last_update)
 
-    def finnished(self):
+    def finished(self):
         return self.ended != 0
 
 
@@ -75,37 +76,37 @@ class TVRageEpisodes(Base):
     __tablename__ = 'tvrage_episode'
     id = Column(Integer, primary_key=True)
     tvrage_series_id = Column(Integer, ForeignKey('tvrage_series.id'), nullable=False)
-    epnum = Column(Integer, index=True)
-    seasonnum = Column(Integer, index=True)
+    episode = Column(Integer, index=True)
+    season = Column(Integer, index=True)
     prodnum = Column(Integer)
     airdate = Column(DateTime)
     link = Column(String)
     title = Column(String)
 
     def __init__(self, ep):
-        self.epnum = ep.number
-        self.seasonnum = ep.season
+        self.episode = ep.number
+        self.season = ep.season
         self.prodnum = ep.prodnumber
         self.airdate = ep.airdate
         self.link = ep.link
         self.title = ep.title
 
     def __str__(self):
-        return '<TVRageEpisodes(title=%s,id=%s,season=%s,episode=%s)>' % (self.title, self.id, self.seasonnum, self.epnum)
+        return '<TVRageEpisodes(title=%s,id=%s,season=%s,episode=%s)>' % (self.title, self.id, self.season, self.episode)
 
     @with_session
     def next(self, session=None):
         """Returns the next episode after this episode"""
         res = session.query(TVRageEpisodes).\
             filter(TVRageEpisodes.tvrage_series_id == self.tvrage_series_id).\
-            filter(TVRageEpisodes.seasonnum == self.seasonnum).\
-            filter(TVRageEpisodes.epnum == self.epnum+1).first()
+            filter(TVRageEpisodes.season == self.season).\
+            filter(TVRageEpisodes.episode == self.episode+1).first()
         if res is not None:
             return res
         return session.query(TVRageEpisodes).\
             filter(TVRageEpisodes.tvrage_series_id == self.tvrage_series_id).\
-            filter(TVRageEpisodes.seasonnum == self.seasonnum+1).\
-            filter(TVRageEpisodes.epnum == 1).first()
+            filter(TVRageEpisodes.season == self.season+1).\
+            filter(TVRageEpisodes.episode == 1).first()
 
 
 @with_session

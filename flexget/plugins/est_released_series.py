@@ -40,7 +40,7 @@ class EstimatesReleasedSeries(object):
                 else:
                     if series_info:
                         try:
-                            episode_info = series_info.episode(season, entry['series_episode'])
+                            episode_info = series_info.find_episode(season, entry['series_episode'])
                             if episode_info:
                                 return episode_info.airdate
                         except Exception as e:

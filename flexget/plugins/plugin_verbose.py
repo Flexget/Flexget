@@ -18,12 +18,12 @@ class Verbose(object):
         if task.manager.options.silent:
             return
         for entry in task.all_entries:
-            entry.on_accept(self.verbose_details, task=task, action='accepted', reason='')
-            entry.on_reject(self.verbose_details, task=task, action='rejected', reason='')
-            entry.on_fail(self.verbose_details, task=task, action='failed', reason='')
+            entry.on_accept(self.verbose_details, task=task, act='accepted', reason='')
+            entry.on_reject(self.verbose_details, task=task, act='rejected', reason='')
+            entry.on_fail(self.verbose_details, task=task, act='failed', reason='')
 
-    def verbose_details(self, entry, task=None, action=None, reason=None, **kwargs):
-        msg = "%s: `%s` by %s plugin" % (action.upper(), entry['title'], task.current_plugin)
+    def verbose_details(self, entry, task=None, act=None, reason=None, **kwargs):
+        msg = "%s: `%s` by %s plugin" % (act.upper(), entry['title'], task.current_plugin)
         if reason:
             msg += 'because %s' % reason[0].lower() + reason[1:]
 
