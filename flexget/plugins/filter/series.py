@@ -629,6 +629,7 @@ class FilterSeriesBase(object):
             'properties': {
                 'path': {'type': 'string'},
                 'set': {'type': 'object'},
+                'alternate_name': one_or_more({'type': 'string'}),
                 # Custom regexp options
                 'name_regexp': one_or_more({'type': 'string', 'format': 'regex'}),
                 'ep_regexp': one_or_more({'type': 'string', 'format': 'regex'}),
@@ -962,6 +963,7 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
 
         params = dict(name=series_name,
                       identified_by=identified_by,
+                      alternate_names=get_as_array(config, 'alternate_name'),
                       name_regexps=get_as_array(config, 'name_regexp'),
                       strict_name=config.get('exact', False),
                       allow_groups=get_as_array(config, 'from_group'),

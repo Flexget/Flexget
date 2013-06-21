@@ -68,13 +68,15 @@ class SeriesParser(TitleParser):
         '(?:HD.720p?:)',
         '(?:HD.1080p?:)']
 
-    def __init__(self, name='', identified_by='auto', name_regexps=None, ep_regexps=None, date_regexps=None,
-                 sequence_regexps=None, id_regexps=None, strict_name=False, allow_groups=None, allow_seasonless=True,
-                 date_dayfirst=None, date_yearfirst=None):
-        """Init SeriesParser.
+    def __init__(self, name='', alternate_names=None, identified_by='auto', name_regexps=None, ep_regexps=None,
+                 date_regexps=None, sequence_regexps=None, id_regexps=None, strict_name=False, allow_groups=None,
+                 allow_seasonless=True, date_dayfirst=None, date_yearfirst=None):
+        """
+        Init SeriesParser.
 
         :param string name: Name of the series parser is going to try to parse.
 
+        :param list alternate_names: Other names for this series that should be allowed.
         :param string identified_by: What kind of episode numbering scheme is expected,
             valid values are ep, date, sequence, id and auto (default).
         :param list name_regexps: Regexps for name matching or None (default),
@@ -95,6 +97,7 @@ class SeriesParser(TitleParser):
         """
 
         self.name = name
+        self.alternate_names = alternate_names or []
         self.data = ''
         self.identified_by = identified_by
         # Stores the type of identifier found, 'ep', 'date', 'sequence' or 'special'
@@ -198,7 +201,7 @@ class SeriesParser(TitleParser):
         # regexp name matching
         if not self.name_regexps:
             # if we don't have name_regexps, generate one from the name
-            self.name_regexps = ReList([self.name_to_re(self.name)])
+            self.name_regexps = ReList(self.name_to_re(name) for name in [self.name] + self.alternate_names)
             self.re_from_name = True
         # try all specified regexps on this data
         for name_re in self.name_regexps:

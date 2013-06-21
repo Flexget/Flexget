@@ -245,6 +245,21 @@ class TestFilterSeries(FlexGetBase):
               - {title: 'other show season 2 episode 2'}
               - {title: 'Date.Show.03-29-2012.HDTV.XViD-FlexGet'}
             all_series: yes
+
+          test_alternate_name:
+            mock:
+            - title: The.Show.S01E01
+            - title: Other.Name.S01E02
+            - title: many.names.S01E01
+            - title: name.1.S01E02
+            - title: name.2.S01E03
+            series:
+            - The Show:
+                alternate_name: Other Name
+            - many names:
+                alternate_name:
+                - name 1
+                - name 2
     """
 
     def test_smoke(self):
@@ -302,6 +317,10 @@ class TestFilterSeries(FlexGetBase):
         entry = self.task.find_entry('accepted', title='Date.Show.03-29-2012.HDTV.XViD-FlexGet')
         assert entry['series_guessed']
         assert entry['series_name'] == 'Date Show'
+
+    def test_alternate_name(self):
+        self.execute_task('test_alternate_name')
+        assert all(e.accepted for e in self.task.all_entries), 'All releases should have matched a show'
 
 
 class TestEpisodeAdvancement(FlexGetBase):
