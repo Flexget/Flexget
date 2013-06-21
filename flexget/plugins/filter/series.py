@@ -919,7 +919,6 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
 
             # configuration always overrides everything
             if series_config.get('identified_by', 'auto') != 'auto':
-                # TODO: This should be moved to task_start when we merge with emit_series branch
                 db_series.identified_by = series_config['identified_by']
             # if series doesn't have identified_by flag already set, calculate one now that new eps are added to db
             if not db_series.identified_by or db_series.identified_by == 'auto':

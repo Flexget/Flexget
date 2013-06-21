@@ -110,11 +110,15 @@ class TraktList(object):
         entries = []
         log.verbose('Retrieving list %s %s...' % (url_params['data_type'], url_params['list_type']))
 
-        result = task.requests.get(url, data=json.dumps(auth))
         try:
-            data = task.requests.post(url, data=json.dumps(auth)).json()
+            result = task.requests.post(url, data=json.dumps(auth))
         except RequestException as e:
             raise PluginError('Could not retrieve list from trakt (%s)' % e.message)
+        try:
+            data = result.json()
+        except ValueError:
+            log.debug('Could not decode json from response: %s', data.text)
+            raise PluginError('Error getting list from trakt.')
 
         def check_auth():
             if task.requests.post(
