@@ -621,3 +621,14 @@ class TestSeriesParser(object):
         # bad data with leftover escaping
         s = self.parse(name=u"FlexGet's show", data=u"FlexGet\\'s show s01e01")
         assert s.valid
+
+    def test_alternate_names(self):
+        s = SeriesParser('The Show', alternate_names=['Show', 'Completely Different'])
+        s.parse('The Show S01E01')
+        assert s.valid
+        s.parse('Show S01E01')
+        assert s.valid
+        s.parse('Completely.Different.S01E01')
+        assert s.valid
+        s.parse('Not The Show S01E01')
+        assert not s.valid
