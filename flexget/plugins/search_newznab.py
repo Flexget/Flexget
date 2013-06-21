@@ -27,17 +27,14 @@ class Newznab(object):
           website: https://website
           apikey: xxxxxxxxxxxxxxxxxxxxxxxxxx
           category: movie
-          wait: 30 seconds
 
     Category is any of: movie, tvsearch, music, book
-    wait is time between two api request in seconds (if you don't want to get banned)
     """
 
     def validator(self):
         """Return config validator."""
         root = validator.factory('dict')
         root.accept('url', key='url', required=False)
-        root.accept('text', key='wait', required=False)
         root.accept('url', key='website', required=False)
         root.accept('text', key='apikey', required=False)
         root.accept('choice', key='category', required=True).accept_choices(['movie', 'tvsearch', 'tv', 'music', 'book'])
@@ -47,8 +44,6 @@ class Newznab(object):
         if config['category'] == 'tv':
             config['category'] = 'tvsearch'
         log.debug(config['category'])
-        if 'wait' not in config:
-            config['wait'] = '30 seconds'
         if 'url' not in config:
             if 'apikey' in config and 'website' in config:
                 params = {
@@ -57,9 +52,6 @@ class Newznab(object):
                     'extended': 1
                 }
                 config['url'] = config['website']+'/api?'+urllib.urlencode(params)
-        parsed_url = urlparse(config['url'])
-        requests = Session()
-        requests.set_domain_delay(parsed_url.netloc, config['wait'])
         return config
 
     def fill_entries_for_url(self, url, config):
