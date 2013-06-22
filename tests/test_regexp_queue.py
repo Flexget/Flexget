@@ -1,8 +1,22 @@
 from __future__ import unicode_literals, division, absolute_import
 
-from flexget.plugins.filter.regexp_queue import (queue_add, queue_del, queue_edit,
-                                        queue_get, QueuedRegexp, FilterRegexpQueue,
-                                        QueueError)
+from nose.tools import raises
+from datetime import datetime
+
+from flexget.plugins.filter.regexp_queue import (queue_add,
+                                        queue_del,
+                                        queue_edit,
+                                        queue_get_single,
+                                        queue_get,
+                                        queue_forget,
+                                        QueuedRegexp,
+                                        FilterRegexpQueue,
+                                        QueueError,
+                                        )
+from flexget.plugins.cli.regexp_queue import RegexpQueueCLI, CLIException
+
+from flexget.utils.database import with_session
+from flexget.utils.sqlalchemy_utils import row_to_dict
 from flexget.utils.qualities import Requirements as QRequirements, Quality
 from flexget.manager import Session
 from tests import FlexGetBase
@@ -27,16 +41,12 @@ class TestRegexpQueue(FlexGetBase):
 
         assert queue_add(regexp=regexp).regexp == regexp, "Regexp wasn't the same"
 
+    @raises(QueueError)
     def test_add_duplicate_item(self):
         regexp = 'Text.*Text'
 
         assert queue_add(regexp=regexp).regexp == regexp, "Regexp wasn't the same"
-        try:
-            queue_add(regexp=regexp)
-        except QueueError:
-            pass
-        else:
-            assert False, 'Exception wasn\' thrown'
+        queue_add(regexp=regexp)
 
 
     def test_add_item_with_quality(self):
@@ -53,19 +63,45 @@ class TestRegexpQueue(FlexGetBase):
 
         assert queue_del(regexp=regexp) == item.regexp, 'Didn\'t delete the right item.'
 
-    def test_edit_item(self):
-        session = Session()
+
+    def test_get_single_item(self):
         regexp = 'Text.*Text'
-        item = queue_add(regexp=regexp)
+        input_item = queue_add(regexp=regexp)
+        output_item = queue_get_single(regexp=regexp)
+
+        assert row_to_dict(input_item) == row_to_dict(output_item)
+
+    @with_session
+    def test_forget_item(self, session=None):
+        regexp = 'Text.+ABC'
+
+        item = queue_add(regexp=regexp, session=session)
+        item.downloaded = datetime.now()
+
+        assert not item.downloaded is None
+
+        edited_item = queue_forget(regexp=regexp, session=session)
+
+        assert edited_item.downloaded is None
+
+    def test_edit_item(self):
+        regexp = 'Text.*Text-123'
         new_quality = QRequirements('flac')
 
-        assert queue_edit(regexp=regexp, quality=new_quality.text) == regexp, 'Didn\'t edit the right item.'
+        item = queue_add(regexp=regexp)
+        edited_item = queue_edit(regexp=regexp, quality=new_quality.text)
 
-        item = session.query(QueuedRegexp).filter(QueuedRegexp.regexp == regexp).first()
+        d_item = row_to_dict(item)
+        d_edited_item = row_to_dict(edited_item)
+
+        # remove quality since they differ
+        d_item.pop('quality'), d_edited_item.pop('quality')
+
+        assert d_edited_item == d_item, 'Didn\'t edit the right item.'
 
         # TODO: quality_req doesn't implement __eq__ which would just compare self.text == b.text
-        assert item.quality == new_quality.text, 'Quality text should be the same.'
-        assert str(item.quality_req) == str(new_quality), 'str.-repr. of qualties should be same'
+        assert edited_item.quality == new_quality.text, 'Quality text should be the same.'
+        assert str(edited_item.quality_req) == str(new_quality), 'str.-repr. of qualties should be same'
 
     def test_get_item(self):
         regexp = 'Text.*Text'
@@ -73,7 +109,7 @@ class TestRegexpQueue(FlexGetBase):
         queue_entries = queue_get()
 
         assert len(queue_entries) == 1
-        assert queue_entries[0].regexp == item.regexp
+        assert row_to_dict(queue_entries[0]) == row_to_dict(item)
 
     def test_matches(self):
         self.execute_task('test_matches')

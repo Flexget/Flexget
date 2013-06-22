@@ -76,7 +76,7 @@ def queue_add(regexp=None, quality=None, session=None):
         item = QueuedRegexp(regexp=regexp, quality=quality.text)
         session.add(item)
         log.info('Adding %s to regexp queue with quality=%s.' % (regexp, quality))
-        return item # {'regexp': regexp, 'quality': quality}
+        return item
     else:
         if item.downloaded:
             raise QueueError('ERROR: %s has already been queued and downloaded' % regexp)
@@ -109,14 +109,27 @@ def queue_edit(regexp, quality, session=None):
     :param quality: New Quality
     :param session: Optional session to use, new session used otherwise
     """
-    try:
-        item = session.query(QueuedRegexp).filter(QueuedRegexp.regexp == regexp).one()
-        item.quality = quality
+    item = queue_get_single(regexp=regexp, session=session)
+    item.quality = quality
 
-        return item.regexp
-    except NoResultFound as e:
-        raise QueueError('regexp=%s not found from queue' % (regexp))
+    return item
 
+@with_session
+def queue_forget(regexp, session=None):
+    """
+    Mark a queued regexp as not yet downloaded.
+
+    :param session: Nnew session is used if not given
+    :param regexp: The regexp that should be reset
+    """
+
+    item = queue_get_single(regexp=regexp)
+    if not item.downloaded:
+        raise QueueError('Item wasn\'t downloaded yet')
+
+    item.downloaded = None
+
+    return item
 
 @with_session
 def queue_get(session, downloaded=False):
@@ -131,6 +144,23 @@ def queue_get(session, downloaded=False):
         return session.query(QueuedRegexp).filter(QueuedRegexp.downloaded == None).all()
     else:
         return session.query(QueuedRegexp).filter(QueuedRegexp.downloaded != None).all()
+
+
+@with_session
+def queue_get_single(regexp, session=None):
+    """
+    Get a single entry from the queue matching the given regexp.
+
+    :param session: New session is used if not given
+    :param regexp: The regexp-string to be matched against
+    :return: QueuedRegexp
+    """
+
+    try:
+        item = session.query(QueuedRegexp).filter(QueuedRegexp.regexp == regexp).one()
+        return item
+    except NoResultFound as e:
+        raise QueueError('regexp=%s not found' % regexp)
 
 
 register_plugin(FilterRegexpQueue, 'regexp_queue', api_ver=2)
