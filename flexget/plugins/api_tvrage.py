@@ -1,4 +1,4 @@
-import tvrage.api   #  See https://github.com/ckreutzer/python-tvrage for more details, it's pretty classic.
+import tvrage.api  # See https://github.com/ckreutzer/python-tvrage for more details, it's pretty classic.
 import logging
 import datetime
 
@@ -55,7 +55,7 @@ class TVRageSeries(Base):
     started = Column(Integer)
     ended = Column(Integer)
     seasons = Column(Integer)
-    last_update = Column(DateTime)              # last time we updated the db for the show
+    last_update = Column(DateTime)  # last time we updated the db for the show
 
     def __init__(self, series):
         self.name = series.name.lower()
@@ -132,14 +132,14 @@ def lookup_series(name=None, session=None):
     res = session.query(TVRageSeries).filter(TVRageSeries.name == name.lower()).first()
 
     if res is not None:
-        # if too old result, clean the db and refetch it
+        # if too old result, clean the db and refresh it
         interval = parse_timedelta(update_interval)
         if datetime.datetime.now() > res.last_update+interval:
-            log.info("Refetching tvrage info.")
+            log.info('Refreshing tvrage info for %s' % name)
             session.delete(res)
         else:
             return res
-    log.info("Data not found, fetching tvrage info for %s" % name)
+    log.info('Fetching tvrage info for %s' % name)
     try:
         fetched = tvrage.api.Show(name)
     except tvrage.exceptions.ShowNotFound:

@@ -526,6 +526,13 @@ class SeriesDatabase(object):
 
 
 def set_series_begin(series, ep_id):
+    """
+    Set beginning for series
+
+    :param Series series: Series instance
+    :param ep_id: Integer for sequence mode, SxxEyy for episodic and yyyy-mm-dd for date.
+    :raises ValueError: If malformed ep_id or series in different mode
+    """
     # If identified_by is not explicitly specified, auto-detect it based on begin identifier
     # TODO: use some method of series parser to do the identifier parsing
     session = Session.object_session(series)
