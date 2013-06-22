@@ -130,7 +130,7 @@ class Discover(object):
             if not callable(getattr(search, 'search')):
                 log.critical('Search plugin %s does not implement search method' % plugin_name)
             for index, entry in enumerate(entries):
-                log.verbose('Searching for `%s` (%i of %i)' % (entry['title'], index, len(entries)))
+                log.verbose('Searching for `%s` (%i of %i)' % (entry['title'], index + 1, len(entries)))
                 try:
                     search_results = search.search(entry, plugin_config)
                     if not search_results:
