@@ -125,3 +125,13 @@ def create_index(table_name, session, *column_names):
         Index(index_name, *columns).create(bind=session.bind)
     except OperationalError:
         log.debug('Error creating index.', exc_info=True)
+
+
+def row_to_dict(row):
+    """
+    Converts the specified sqlalchemy `row` into a dictionary.
+
+    :param row: SQLAlchemy row
+    :return: dict object
+    """
+    return {column.name: getattr(row, column.name) for column in row.__table__.columns}
