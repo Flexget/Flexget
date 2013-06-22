@@ -395,9 +395,10 @@ class Task(object):
     def rerun(self):
         """Immediately re-run the task after execute has completed,
         task can be re-run up to :attr:`.max_reruns` times."""
-        self._rerun = True
-        log.info('Plugin %s has requested task to be ran again after execution has completed.' %
-                 self.current_plugin)
+        if not self._rerun:
+            self._rerun = True
+            log.info('Plugin %s has requested task to be ran again after execution has completed.' %
+                     self.current_plugin)
 
     def config_changed(self):
         """Forces config_modified flag to come out true on next run. Used when the db changes, and all
