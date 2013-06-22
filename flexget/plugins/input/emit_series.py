@@ -19,7 +19,7 @@ class EmitSeries(SeriesDatabase):
     """
     Emit next episode number from all series configured in this task.
 
-    Supports only series enumerated by season, episode.
+    Supports only 'ep' and 'sequence' mode series.
     """
 
     schema = {'type': 'boolean'}
@@ -58,7 +58,8 @@ class EmitSeries(SeriesDatabase):
         for seriestask in task.session.query(SeriesTask).filter(SeriesTask.name == task.name).all():
             series = seriestask.series
             if series.identified_by not in ['ep', 'sequence']:
-                log.debug('can only emit ep or sequence based series')
+                log.verbose('Can only emit ep or sequence based series. `%s` is identified_by %s' %
+                            (series.name, series.identified_by or 'auto'))
                 continue
 
             latest = self.get_latest_download(series)
@@ -89,6 +90,8 @@ class EmitSeries(SeriesDatabase):
                     if latest_ep_this_season.downloaded_releases:
                         entries.append(self.search_entry(series, latest.season, latest_ep_this_season.number + 1, task))
             else:
+                log.verbose('Series `%s` has no history. Set begin option, or use --series-begin '
+                            'to set first episode to emit' % series.name)
                 continue
 
         return entries
