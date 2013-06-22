@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from datetime import timedelta
+from datetime import timedelta, datetime
 import logging
 
 from sqlalchemy import desc, func
@@ -43,6 +43,11 @@ class EstimatesReleasedSeries(object):
                             episode_info = series_info.find_episode(season, entry['series_episode'])
                             if episode_info:
                                 return episode_info.airdate
+                            else:
+                                # If episode does not exist in tvrage database, we always return a future date
+                                log.verbose('%s S%02dE%02d does not exist in tvrage database, assuming unreleased',
+                                          series_info.name, season, entry['series_episode'])
+                                return datetime.now() + timedelta(weeks=4)
                         except Exception as e:
                             log.exception(e)
                     else:
