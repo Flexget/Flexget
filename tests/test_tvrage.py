@@ -14,6 +14,7 @@ class TestTvRage(FlexGetBase):
     @attr(online=True)
     def test_tvrage(self):
         friends = lookup_series("Friends")
+        assert friends.genres == ['Comedy']
         s1e22 = friends.find_episode(1, 22)
         log.info("s1e22 %s " % s1e22)
 

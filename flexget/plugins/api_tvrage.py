@@ -2,17 +2,19 @@ import tvrage.api   #  See https://github.com/ckreutzer/python-tvrage for more d
 import logging
 import datetime
 
-from sqlalchemy import Column, Integer, DateTime, String, Index, Boolean, ForeignKey
+from sqlalchemy import Column, Integer, DateTime, String, ForeignKey, select, update
 from sqlalchemy.orm import relation
 
 from flexget.event import event
 from flexget.utils.database import with_session
 from flexget import db_schema
+from flexget.utils.database import pipe_list_synonym
+from flexget.utils.sqlalchemy_utils import table_schema
 from flexget.utils.tools import parse_timedelta
 
 log = logging.getLogger('api_tvrage')
 
-Base = db_schema.versioned_base('tvrage', 0)
+Base = db_schema.versioned_base('tvrage', 1)
 update_interval = '7 days'
 
 
@@ -24,6 +26,20 @@ def db_cleanup(session):
         session.delete(de)
 
 
+@db_schema.upgrade('tvrage')
+def upgrade(ver, session):
+    if ver == 0:
+        series_table = table_schema('tvrage_series', session)
+        for row in session.execute(select([series_table.c.id, series_table.c.genres])):
+            # Recalculate the proper_count from title for old episodes
+            new_genres = row['genres']
+            if new_genres:
+                new_genres = row['genres'].replace(',', '|')
+            session.execute(update(series_table, series_table.c.id == row['id'], {'genres': new_genres}))
+        ver = 1
+    return ver
+
+
 class TVRageSeries(Base):
     __tablename__ = 'tvrage_series'
     id = Column(Integer, primary_key=True)
@@ -33,7 +49,8 @@ class TVRageSeries(Base):
     showid = Column(String)
     link = Column(String)
     classification = Column(String)
-    genres = Column(String)
+    _genres = Column('genres', String)
+    genres = pipe_list_synonym('_genres')
     country = Column(String)
     started = Column(Integer)
     ended = Column(Integer)
@@ -45,7 +62,7 @@ class TVRageSeries(Base):
         self.showid = series.showid
         self.link = series.link
         self.classification = series.classification
-        self.genres = ','.join(series.genres)
+        self.genres = filter(None, series.genres)  # Sometimes tvdb has a None in the genres list
         self.country = series.country
         self.started = series.started
         self.ended = series.ended
