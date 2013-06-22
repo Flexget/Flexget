@@ -209,7 +209,7 @@ class Discover(object):
                 filter(DiscoverEntry.task == task.name).first()
 
             if not de:
-                log.info('%s -> No previous run recorded' % entry['title'])
+                log.debug('%s -> No previous run recorded' % entry['title'])
                 de = DiscoverEntry(entry['title'], task.name)
                 task.session.add(de)
             if task.manager.options.discover_now or not de.last_execution:
