@@ -5,9 +5,9 @@ import time
 from copy import copy
 from datetime import datetime, timedelta
 
-from sqlalchemy import (Column, Integer, String, Unicode, DateTime, Date, Boolean,
+from sqlalchemy import (Column, Integer, String, Unicode, DateTime, Boolean,
                         desc, select, update, delete, ForeignKey, Index, func, and_, not_)
-from sqlalchemy.orm import relation, join
+from sqlalchemy.orm import relation
 from sqlalchemy.ext.hybrid import Comparator, hybrid_property
 from sqlalchemy.exc import OperationalError
 
@@ -203,7 +203,8 @@ class Series(Base):
     _name_normalized = Column('name_lower', Unicode, index=True, unique=True)
     identified_by = Column(String)
     begin_episode_id = Column(Integer, ForeignKey('series_episodes.id', name='begin_episode_id', use_alter=True))
-    begin = relation('Episode', uselist=False, primaryjoin="Series.begin_episode_id == Episode.id", foreign_keys=[begin_episode_id])
+    begin = relation('Episode', uselist=False, primaryjoin="Series.begin_episode_id == Episode.id",
+                     foreign_keys=[begin_episode_id], post_update=True)
     episodes = relation('Episode', backref='series', cascade='all, delete, delete-orphan',
                         primaryjoin='Series.id == Episode.series_id')
     in_tasks = relation('SeriesTask', backref='series', cascade='all, delete, delete-orphan')
