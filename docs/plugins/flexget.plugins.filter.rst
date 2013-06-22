@@ -177,6 +177,14 @@ filter Package
     :undoc-members:
     :show-inheritance:
 
+:mod:`regexp` Module
+--------------------
+
+.. automodule:: flexget.plugins.filter.regexp_queue
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 :mod:`retry_failed` Module
 ---------------------------
 
