@@ -141,7 +141,68 @@ class TestRegexpQueue(FlexGetBase):
         assert self.task.find_entry('accepted', title='Text Hello Text') is None
         assert len(self.task.accepted) == 0
 
-# TODO
-#class TestRegexpQueueCLI(FlexGetBase):
-#    def test_add_regexp(self):
-#        pass
+
+
+class TestRegexpQueueCLI(FlexGetBase):
+    def test_register_cli(self):
+        RegexpQueueCLI.register()
+
+    def test_add_regexp(self):
+        RegexpQueueCLI.handle(None, ['add','test','720p+'])
+        queue_entries = queue_get()
+
+        assert len(queue_entries) == 1
+
+        entry = queue_entries[0]
+
+        assert entry.regexp == 'test'
+        assert entry.quality_req.text == '720p+'
+
+    @raises(CLIException)
+    def test_del_nonexisting_regexp(self):
+        RegexpQueueCLI.do_del(None, ['test', '720p+'])
+
+    def test_del_existing_regexp(self):
+        RegexpQueueCLI.do_add(None, ['test2','720p'])
+        RegexpQueueCLI.do_del(None, ['test2']), "Shouldn't throw exception"
+
+    @raises(CLIException)
+    def test_del_without_arg(self):
+        RegexpQueueCLI.do_del(None, [])
+
+    def test_list_empty(self):
+        RegexpQueueCLI.do_list(None, [])
+
+    def test_list_not_empty(self):
+        RegexpQueueCLI.do_add(None, ['test'])
+        RegexpQueueCLI.do_list(None, [])
+
+    def test_list_downloaded_empty(self):
+        RegexpQueueCLI.do_downloaded(None, [])
+
+    def test_list_donloaded_not_empty(self):
+        item = queue_add(regexp='test3')
+        item.downloaded = True
+        RegexpQueueCLI.do_downloaded(None, [])
+
+    @raises(CLIException)
+    def test_forget_throws(self):
+        RegexpQueueCLI.do_forget(None, [])
+
+    @raises(CLIException)
+    def test_forget_throws_invalid_item(self):
+        RegexpQueueCLI.do_forget(None, ['test'])
+
+    @with_session
+    def test_forget(self, session=None):
+        regexp = 'test'
+        item = queue_add(regexp=regexp, session=session)
+        item.downloaded = datetime.now()
+
+        assert not item.downloaded is None
+
+        RegexpQueueCLI.do_forget(None, [regexp])
+        item = queue_get_single(regexp=regexp, session=session)
+
+        assert item.downloaded is None,\
+                "Should no longer be marked as downloaded (%s)" % item.downloaded

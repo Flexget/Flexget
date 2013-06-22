@@ -9,8 +9,15 @@ from flexget.utils import qualities
 from flexget.utils.tools import console
 
 try:
-    from flexget.plugins.filter.regexp_queue import (QueuedRegexp, queue_add,
-            queue_del, queue_edit, queue_get, QueueError)
+    from flexget.plugins.filter.regexp_queue import (QueuedRegexp,
+                                                    queue_add,
+                                                    queue_del,
+                                                    queue_edit,
+                                                    queue_get,
+                                                    queue_forget,
+                                                    queue_get_single,
+                                                    QueueError,
+                                                    )
 except ImportError:
     raise DependencyError(issued_by='cli_regexp_queue', missing='regexp_queue', message='RegexpQueue commandline interface not loaded')
 
@@ -60,17 +67,19 @@ class BaseCLI(object):
 
     @classmethod
     def register(cls):
-        cmdline_option(cls.OPTION, nargs=cls.NARGS, metavar=cls.METAVAR,
-                help=cls.USAGE)(cls.handle)
+        cmdline_option(cls.OPTION_NAME, **cls.KWARGS)(cls.handle)
 
 class RegexpQueueCLI(BaseCLI):
-    OPTION = '--regexp-queue'
-    NARGS = '*'
-    METAVAR = ('ACTION', 'REGEXP')
-    DEFAULT_ACTION = 'list'
+    OPTION_NAME = '--regexp-queue'
+
     ACTIONS = ['add', 'del', 'forget', 'list', 'downloaded', 'clear']
+    DEFAULT_ACTION = 'list'
+
     USAGE = '(%s) [REGEXP] [QUALITY]' % '|'.join(ACTIONS)
-    ITEM_FORMAT = staticmethod(lambda item: '%-20s %-15s' % (item.regexp, item.quality))
+
+    FORMAT_ITEM = staticmethod(lambda item: '%-20s %-15s' % (item.regexp, item.quality))
+
+    KWARGS = { 'nargs': '*', 'metavar': ('ACTION', 'REGEXP'), 'help': USAGE}
 
     @staticmethod
     def do_add(manager, args):
@@ -110,7 +119,7 @@ class RegexpQueueCLI(BaseCLI):
         line = lambda: console('-' * 79)
         line()
         if len(items) > 0:
-            map(console, map(cls.ITEM_FORMAT, items))
+            map(console, map(cls.FORMAT_ITEM, items))
         else:
             console('No results')
 
@@ -139,7 +148,7 @@ class RegexpQueueCLI(BaseCLI):
         line()
         if len(items) > 0:
             for item in items:
-                console(cls.ITEM_FORMAT(item))
+                console(cls.FORMAT_ITEM(item))
                 queue_del(item.regexp)
         else:
             console('No results')
@@ -152,12 +161,13 @@ class RegexpQueueCLI(BaseCLI):
             raise CLIException('Missing regexp to delete')
 
         regexp = args[0]
-        item = queue_get(regexp=regexp)
-        if not item:
-            raise CLIException('Unknown regexp %s' % regexp)
-        console('Deleteing:')
+        try:
+            item = queue_get_single(regexp=regexp)
+            queue_forget(regexp=regexp)
+        except QueueError as e:
+            raise CLIException('QueueError: %s' % e.message)
+        console('Forgetting:')
         console(cls.FORMAT_ITEM(item))
-        queue_del(item.regexp)
 
 RegexpQueueCLI.register()
 
