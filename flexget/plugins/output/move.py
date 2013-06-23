@@ -139,8 +139,8 @@ class MovePlugin(object):
             # Check dst contains src_ext
             dst_filename, dst_ext = os.path.splitext(dst)
             if dst_ext != src_ext:
-                log.info('Adding extension to  `%s` to dst `%s`' % (src_ext, dst))
-                dst = dst + src_ext
+                log.verbose('Adding extension `%s` to dst `%s`' % (src_ext, dst))
+                dst += src_ext
 
             # Move stuff
             if task.manager.options.test:
