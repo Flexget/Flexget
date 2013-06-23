@@ -51,6 +51,14 @@ class TestSeriesPremiere(FlexGetBase):
               - title: theshow s01e02
             series_premiere: yes
             rerun: yes
+          test_no_configured_1:
+            series:
+            - explicit show
+          test_no_configured_2:
+            series_premiere: yes
+            mock:
+            - title: explicit show s01e01
+            - title: other show s01e01
     """
 
     def test_only_one(self):
@@ -80,3 +88,11 @@ class TestSeriesPremiere(FlexGetBase):
     def test_rerun(self):
         self.execute_task('test_rerun')
         assert not self.task.find_entry('accepted', title='theshow s01e02'), 'accepted non-premiere'
+
+    def test_no_configured_shows(self):
+        self.execute_task('test_no_configured_1')
+        self.execute_task('test_no_configured_2')
+        entry = self.task.find_entry(title='explicit show s01e01')
+        assert not entry.accepted
+        entry = self.task.find_entry(title='other show s01e01')
+        assert entry.accepted
