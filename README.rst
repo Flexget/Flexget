@@ -45,7 +45,7 @@ in it.
 
 If you need deluge or transmission libraries from system wide python use::
 
-    python bootstrap --system-site-packages
+    python bootstrap.py --system-site-packages
 
 After that FlexGet is usable via ``<checkout directory>/bin/flexget``. Verify
 installation by running::
