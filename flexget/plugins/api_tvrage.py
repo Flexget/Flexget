@@ -1,6 +1,7 @@
 import tvrage.api  # See https://github.com/ckreutzer/python-tvrage for more details, it's pretty classic.
 import logging
 import datetime
+from socket import timeout
 
 from sqlalchemy import Column, Integer, DateTime, String, ForeignKey, select, update
 from sqlalchemy.orm import relation
@@ -144,6 +145,8 @@ def lookup_series(name=None, session=None):
         fetched = tvrage.api.Show(name)
     except tvrage.exceptions.ShowNotFound:
         raise LookupError('Could not find show %s' % name)
+    except timeout:
+        raise LookupError('Timed out while connecting to tvrage')
     series = TVRageSeries(fetched)
     session.add(series)
     return series
