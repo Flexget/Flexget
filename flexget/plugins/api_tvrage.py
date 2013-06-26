@@ -173,7 +173,7 @@ def lookup_series(name=None, session=None):
     if not series:
         series = TVRageSeries(fetched)
         session.add(series)
-        session.add(TVRageLookup(fetched.name, series))
+        session.add(TVRageLookup(unicode(fetched.name), series))
     else:
         series.update(fetched)
     if name.lower() != fetched.name.lower():
