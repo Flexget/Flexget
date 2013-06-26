@@ -771,7 +771,8 @@ class FilterSeriesBase(object):
                     # Combine the config dicts for both instances of the show
                     unique_series[series].update(series_settings)
         # Turn our all_series dict back into a list
-        return [{series: settings} for (series, settings) in unique_series.iteritems()]
+        # sort by reverse alpha, so that in the event of 2 series with common prefix, more specific is parsed first
+        return [{series: unique_series[series]} for series in sorted(unique_series, reverse=True)]
 
     def merge_config(self, task, config):
         """Merges another series config dict in with the current one."""
