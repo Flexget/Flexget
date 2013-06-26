@@ -163,7 +163,7 @@ def lookup_series(name=None, session=None):
             return series
     log.debug('Fetching tvrage info for %s' % name)
     try:
-        fetched = tvrage.api.Show(name)
+        fetched = tvrage.api.Show(name.encode('utf-8'))
     except tvrage.exceptions.ShowNotFound:
         raise LookupError('Could not find show %s' % name)
     except timeout:
