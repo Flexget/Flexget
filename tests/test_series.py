@@ -725,17 +725,27 @@ class TestSimilarNames(FlexGetBase):
               - FooBar
               - 'FooBar: FirstAlt'
               - 'FooBar: SecondAlt'
+          test_ambiguous:
+            mock:
+            - title: Foo.2.2
+            series:
+            - Foo:
+                identified_by: sequence
+            - Foo 2:
+                identified_by: sequence
     """
-
-    def setup(self):
-        FlexGetBase.setup(self)
-        self.execute_task('test')
 
     def test_names(self):
         """Series plugin: similar namings"""
+        self.execute_task('test')
         assert self.task.find_entry('accepted', title='FooBar.S03E01.DSR-FlexGet'), 'Standard failed?'
         assert self.task.find_entry('accepted', title='FooBar: FirstAlt.S02E01.DSR-FlexGet'), 'FirstAlt failed'
         assert self.task.find_entry('accepted', title='FooBar: SecondAlt.S01E01.DSR-FlexGet'), 'SecondAlt failed'
+
+    def test_ambiguous(self):
+        self.execute_task('test_ambiguous')
+        # In the event of ambiguous match, more specific one should be chosen
+        assert self.task.find_entry('accepted', title='Foo.2.2')['series_name'] == 'Foo 2'
 
 
 class TestDuplicates(FlexGetBase):
