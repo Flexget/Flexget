@@ -89,7 +89,10 @@ class AppleTrailers(InputRSS):
                 # Need to add an 'h' in front of the resolution
                 entry_url = link['href']
                 entry_url = entry_url[:entry_url.find(config + '.mov')] + 'h%s.mov' % config
-                result.append(Entry(title, entry_url))
+                entry = Entry(title, entry_url)
+                # Populate a couple entry fields for making pretty filenames
+                entry['movie_name'], entry['apple_trailers_name'] = title.split(' - ')
+                result.append(entry)
 
         return result
 
