@@ -97,7 +97,7 @@ class TestImdb(FlexGetBase):
               imdb_url: http://www.imdb.com/title/tt0103639/
             imdb:
               reject_mpaa_ratings:
-              - R
+              - NC-17
     """
 
     @attr(online=True)
@@ -222,7 +222,7 @@ class TestImdb(FlexGetBase):
                                                     aladdin['imdb_mpaa_rating'])
         assert aladdin.accepted, 'Non R rated movie should have been accepted'
         saw = self.task.find_entry(imdb_name='Saw')
-        assert saw['imdb_mpaa_rating'] == 'R', 'Didn\'t get right rating for Saw'
+        assert saw['imdb_mpaa_rating'] == 'NC-17', 'Didn\'t get right rating for Saw'
         assert not saw.accepted, 'R rated movie should not have been accepted'
 
 
