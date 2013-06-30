@@ -274,7 +274,7 @@ class ImdbParser(object):
         if tag_original_title_i:
             span = tag_original_title_i.parent
             tag_original_title_i.decompose()
-            self.original_name = span.text.strip()
+            self.original_name = span.text.strip().strip('"')
             log.debug('Detected original name: %s' % self.original_name)
         else:
             # if title is already in original language, it doesn't have the tag
