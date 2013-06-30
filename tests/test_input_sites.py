@@ -12,7 +12,7 @@ class TestInputSites(FlexGetBase):
           test_scenereleases:
             scenereleases: http://sceper.eu/category/movies/movies-dvd-rip?themedemo=SceneRLSv3
           test_apple_trailers:
-              apple_trailers: '320'
+              apple_trailers: 480p
     """
 
     @attr(online=True)
