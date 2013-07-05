@@ -166,7 +166,8 @@ def lookup_series(name=None, session=None):
         fetched = tvrage.api.Show(name.encode('utf-8'))
     except tvrage.exceptions.ShowNotFound:
         raise LookupError('Could not find show %s' % name)
-    except timeout:
+    except (timeout, AttributeError):
+        # AttributeError is due to a bug in tvrage package trying to access URLError.code
         raise LookupError('Timed out while connecting to tvrage')
     if not series:
         series = session.query(TVRageSeries).filter(TVRageSeries.showid == fetched.showid).first()
