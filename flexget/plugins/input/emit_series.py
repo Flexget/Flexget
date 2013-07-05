@@ -57,6 +57,9 @@ class EmitSeries(SeriesDatabase):
         entries = []
         for seriestask in task.session.query(SeriesTask).filter(SeriesTask.name == task.name).all():
             series = seriestask.series
+            if not series:
+                # TODO: How can this happen?
+                continue
             if series.identified_by not in ['ep', 'sequence']:
                 log.verbose('Can only emit ep or sequence based series. `%s` is identified_by %s' %
                             (series.name, series.identified_by or 'auto'))
