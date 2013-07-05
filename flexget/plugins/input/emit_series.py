@@ -59,6 +59,8 @@ class EmitSeries(SeriesDatabase):
             series = seriestask.series
             if not series:
                 # TODO: How can this happen?
+                log.debug('Found SeriesTask item without series specified. Cleaning up.')
+                task.session.delete(seriestask)
                 continue
             if series.identified_by not in ['ep', 'sequence']:
                 log.verbose('Can only emit ep or sequence based series. `%s` is identified_by %s' %
