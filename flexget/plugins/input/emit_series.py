@@ -46,7 +46,7 @@ class EmitSeries(SeriesDatabase):
                       series_id=series_id,
                       series_id_type=series.identified_by)
         if rerun:
-            entry.on_complete(self.on_search_complete, task=task)
+            entry.on_complete(self.on_search_complete, task=task, identified_by=series.identified_by)
         return entry
 
     def on_task_input(self, task, config):
@@ -101,12 +101,15 @@ class EmitSeries(SeriesDatabase):
 
         return entries
 
-    def on_search_complete(self, entry, task=None, **kwargs):
+    def on_search_complete(self, entry, task=None, identified_by=None, **kwargs):
         if entry.accepted:
             # We accepted a result from this search, rerun the task to look for next ep
             self.try_next_season.pop(entry['series_name'], None)
             task.rerun()
         else:
+            if identified_by != 'ep':
+                # Do not try next season if this is not an 'ep' show
+                return
             if entry['series_name'] not in self.try_next_season:
                 self.try_next_season[entry['series_name']] = True
                 task.rerun()
