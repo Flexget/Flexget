@@ -55,7 +55,7 @@ def series_list():
 
 @series_module.route('/<name>')
 def episodes(name):
-    query = db_session.query(Episode).join(Series)
+    query = db_session.query(Episode).join(Episode.series)
     episodes = query.filter(Series.name == name).order_by(desc(Episode.identifier)).all()
     context = {'episodes': episodes, 'name': name}
     return render_template('series/series.html', **context)
