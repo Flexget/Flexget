@@ -421,6 +421,8 @@ class SeriesDatabase(object):
         downloaded = session.query(Episode).join(Episode.releases, Episode.series).\
             filter(Series.id == series.id).\
             filter(Release.downloaded == True)
+        if series.identified_by and series.identified_by != 'auto':
+            downloaded = downloaded.filter(Episode.identified_by == series.identified_by)
         if series.identified_by in ['ep', 'sequence']:
             latest_download = downloaded.order_by(desc(Episode.season), desc(Episode.number)).first()
         elif series.identified_by == 'date':
